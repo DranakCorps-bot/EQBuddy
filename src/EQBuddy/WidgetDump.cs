@@ -107,7 +107,31 @@ internal static class WidgetDump
     private static double Dumpable(double value) => double.IsFinite(value) ? value : -1;
 
     /// <summary>Write the dump when the EXPAND gate is up. Same guard, same file, same
-    /// keys as the block always had — the E2E suite's assertions are the contract.</summary>
+    /// keys as the block always had — the E2E suite's assertions are the contract.
+    ///
+    /// **The catch at the bottom used to be bare, and that is what a frozen debug.txt
+    /// beside a living app looks like from outside.** A throw anywhere in the block —
+    /// including <see cref="PaintOneMoment"/>'s satellite paints, which run real WPF
+    /// layout from inside the dump path — was swallowed silently: the FILE stopped
+    /// advancing while <c>_uiTicks</c> went on climbing in memory and the app lived on,
+    /// which the E2E harness can only read as "the app STOPPED TICKING". Four CI reds on
+    /// `TheGearCardDrawsItsGroupsAndPivotsBetweenSlotAndZone` are frozen-at-tick-4/5/6
+    /// dumps with an EMPTY error.log beside them (Fable, RELEASE-GATE item, 2026-09-06),
+    /// and nothing in the artifact could tell a swallowed throw here from a dispatcher
+    /// that never ran the timer again. That is trap 34's shape at its worst: the WPF
+    /// layer's ONLY test seam could not report its own failure, so its failure read as a
+    /// dead app.
+    ///
+    /// So it says which. <c>App.LogError</c> puts the exception in the profile's
+    /// error.log, which <c>AppHarness.Artifacts()</c> already folds into every timeout
+    /// message — the instrument rides the existing channel rather than adding one. Then a
+    /// minimal <c>tick=… dumpError=…</c> fallback replaces the dump, so the artifact of
+    /// the next red names the family in one line: an ADVANCING tick beside a
+    /// <c>dumpError</c> is a throw in here; a FROZEN tick with no <c>dumpError</c> is the
+    /// dispatcher, and the two used to be the same picture. The fallback write is inside
+    /// its own try, because a logger that can throw is the bug it reports.
+    ///
+    /// This claims no fix. It is the instrument that makes the next red readable.</summary>
     public static void MaybeWrite(MainWindow w, StatsSnapshot s)
     {
         if (!string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("EQBUDDY_EXPAND")))
@@ -514,7 +538,24 @@ internal static class WidgetDump
                     $"altTabTaskbar={(w.ShowInTaskbar ? 1 : 0)}";
                 System.IO.File.WriteAllText(Core.AppPaths.File("debug.txt"), dump);
             }
-            catch { }
+            catch (Exception ex)
+            {
+                // The exception itself, with its stack, through the app's own logger —
+                // error.log is what the harness already reads back on a timeout.
+                App.LogError(ex);
+                // And the one line that survives into the dump the harness parses. Keys
+                // the suite knows: `tick` keeps its meaning (RefreshUi's own count, so a
+                // reader can see it ADVANCE while the dump is stuck), and `dumpError`
+                // names the type. Every other key is absent, which DumpValue already
+                // spells -1 — a wait for one of them then times out on its own terms with
+                // this line in the artifact, rather than being answered by a stale value.
+                try
+                {
+                    System.IO.File.WriteAllText(Core.AppPaths.File("debug.txt"),
+                        $"tick={w._uiTicks} dumpError={ex.GetType().Name}");
+                }
+                catch { /* a logger that can throw is the bug it reports */ }
+            }
         }
     }
 

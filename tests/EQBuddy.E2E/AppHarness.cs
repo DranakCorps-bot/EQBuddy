@@ -241,6 +241,15 @@ internal sealed class AppHarness : IDisposable
     /// The dump's `tick` separates them in one line, and the process itself answers the
     /// third case — an app that has EXITED leaves a debug.txt that looks perfectly healthy
     /// and perfectly frozen, which reads as a broken feature for the full 90 s.
+    ///
+    /// **And on STOPPED TICKING it now photographs the frozen process before it gives
+    /// up.** Naming the failure is not the same as naming the FRAME: four CI reds on
+    /// `TheGearCardDrawsItsGroupsAndPivotsBetweenSlotAndZone` produced identical, complete,
+    /// frozen dumps with an empty error.log, and no artifact in the repo could say what the
+    /// UI thread was doing. A minidump of the pid, taken here — the last moment the process
+    /// is still frozen and still ours — is the one thing that answers it, and it is trap
+    /// 33/49's "ship the instrument before the third theory" made literal. See
+    /// <see cref="CaptureFrozenProcess"/>.
     /// </summary>
     private string? WhyTheAppCannotAnswer()
     {
@@ -256,10 +265,76 @@ internal sealed class AppHarness : IDisposable
             return null;
         }
         var still = DateTime.UtcNow - _tickMovedAt;
-        return still < StallTimeout ? null
-            : $"the app STOPPED TICKING: debug.txt tick has read {tick} for {still.TotalSeconds:0}s " +
-              $"(process alive, Responding={IsResponding()}). Every number in the dump below is " +
-              "frozen at that tick, so none of them is evidence about the assertion.";
+        if (still < StallTimeout) return null;
+        // Taken BEFORE the message is built, so the capture happens while the process is
+        // still standing in the state being reported rather than after the wait has
+        // unwound and the fixture has torn it down.
+        var capture = CaptureFrozenProcess(tick);
+        return $"the app STOPPED TICKING: debug.txt tick has read {tick} for {still.TotalSeconds:0}s " +
+               $"(process alive, Responding={IsResponding()}). Every number in the dump below is " +
+               $"frozen at that tick, so none of them is evidence about the assertion. {capture}";
+    }
+
+    /// <summary>Where a frozen-process minidump goes. The e2e-windows workflow sets
+    /// <c>EQBUDDY_E2E_ARTIFACTS</c> and uploads that directory on failure; a local run with
+    /// nothing set gets a folder beside the test binary, which is where a developer will
+    /// look for it and which no CI step has to know about.</summary>
+    private static string ArtifactsDir =>
+        Environment.GetEnvironmentVariable("EQBUDDY_E2E_ARTIFACTS") is { Length: > 0 } set
+            ? set
+            : Path.Combine(AppContext.BaseDirectory, "e2e-artifacts");
+
+    private bool _frozenCaptured;
+
+    /// <summary>How many minidumps ONE test-host run may write. Full-memory dumps of a WPF
+    /// app are hundreds of MB, and a systemic freeze would take one per test — an
+    /// instrument that fills the runner's disk stops being an instrument. Two is enough
+    /// evidence (a second one says whether the frame is the same) and bounded.</summary>
+    private const int MaxFrozenCaptures = 2;
+
+    private static int _frozenCaptures;
+
+    /// <summary>
+    /// Write a full-memory minidump of the frozen app, once per harness and at most
+    /// <see cref="MaxFrozenCaptures"/> times per test-host run.
+    ///
+    /// **Full memory, not a stack-only mini.** The question this exists to answer is what
+    /// the UI thread is doing, and a managed stack cannot be walked out of a dump that did
+    /// not bring the heap — a smaller file that cannot answer the question is the whole
+    /// cost with none of the value.
+    ///
+    /// It never throws and it never fails a test on its own account: the diagnosis it
+    /// serves is already a failure, and a capture that turned a readable red into an
+    /// unreadable one would be worse than no capture. Whatever happens is said in the
+    /// timeout message, including the reason it did not happen.
+    /// </summary>
+    private string CaptureFrozenProcess(int tick)
+    {
+        if (_frozenCaptured) return "(minidump already taken for this app.)";
+        _frozenCaptured = true;
+        if (Interlocked.Increment(ref _frozenCaptures) > MaxFrozenCaptures)
+            return $"(minidump skipped: {MaxFrozenCaptures} already taken this run.)";
+        try
+        {
+            var process = _process ?? throw new InvalidOperationException("App not launched.");
+            Directory.CreateDirectory(ArtifactsDir);
+            var path = Path.Combine(ArtifactsDir,
+                $"freeze-tick{tick}-pid{process.Id}-{DateTime.UtcNow:yyyyMMdd-HHmmss}.dmp");
+            using (var file = File.Create(path))
+            {
+                if (!Native.MiniDumpWriteDump(process.Handle, process.Id, file.SafeFileHandle,
+                        Native.FullMemoryDump, IntPtr.Zero, IntPtr.Zero, IntPtr.Zero))
+                    return "Minidump of the frozen process FAILED: MiniDumpWriteDump reported " +
+                           $"error {System.Runtime.InteropServices.Marshal.GetLastWin32Error()}.";
+            }
+            var mb = new FileInfo(path).Length / (1024 * 1024);
+            return $"Minidump of the frozen process: {path} ({mb} MB) — " +
+                   "open it and read the UI thread's stack.";
+        }
+        catch (Exception ex)
+        {
+            return $"Minidump of the frozen process FAILED: {ex.GetType().Name}: {ex.Message}";
+        }
     }
 
     private string IsResponding()
@@ -557,6 +632,16 @@ internal sealed class AppHarness : IDisposable
 
         [System.Runtime.InteropServices.DllImport("user32.dll")]
         public static extern bool PostMessage(IntPtr hwnd, uint message, nint wparam, nint lparam);
+
+        /// <summary>MiniDumpWithFullMemory | MiniDumpWithHandleData | MiniDumpWithThreadInfo
+        /// | MiniDumpWithFullMemoryInfo. The heap is what makes managed frames readable;
+        /// the thread info is what says which thread was the UI one.</summary>
+        public const int FullMemoryDump = 0x0002 | 0x0004 | 0x0800 | 0x1000;
+
+        [System.Runtime.InteropServices.DllImport("dbghelp.dll", SetLastError = true)]
+        public static extern bool MiniDumpWriteDump(IntPtr process, int processId,
+            Microsoft.Win32.SafeHandles.SafeFileHandle file, int dumpType, IntPtr exceptionParam, IntPtr userStreamParam,
+            IntPtr callbackParam);
     }
 
     /// <summary>Failure diagnostics: the state dump and the tail of the profile's
