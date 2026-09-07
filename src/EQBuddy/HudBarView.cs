@@ -421,31 +421,32 @@ internal sealed class HudBarView
         // all — and the Avalonia one is the lane that historically drifted.
         foreach (var cell in UI.Shared.MiniBarPresentation.Cells(s, _settings.MiniStats))
         {
-            // dps and hps left this map with their cells (SA-1). Their windows are
-            // untouched and Options -> Cards & windows still turns each on and off, which
-            // is the door a default profile has: the double-click gesture is opt-in and
-            // OFF out of the box (DoubleClickChipsToggleBreakouts), so no player who has
-            // configured nothing loses a way in (trap 59).
-            BreakoutKind? breakout = cell.Key switch
-            {
-                "pet" => BreakoutKind.Pet,
-                "loot" => BreakoutKind.Loot,
-                _ => null,   // kills/procs/motes/money/deaths have no breakout
-            };
+            // **EVERY CELL IS AN EXPANSION CHIP AS OF OE-9** — the owner's ~1:29 PM CT amend
+            // (2026-09-07): *"Everything on the minimized bar MUST have hover peek +
+            // pop-out"*. The hand switch that used to pick a target per cell is gone: the
+            // cell's own MiniStats key IS the HudExpand key, so one lookup answers for the
+            // chip, the panel, the title, the icon and the ⧉ (trap 4). A `null` here would
+            // now mean a cell HudExpand has never heard of, which is a settings file from a
+            // later version — and it gets the old plain chip rather than a hole in the bar.
+            //
             // There is no "xp" case here any more: xp is an always-on trio slot since
             // SA-1, and RenderGlance above carries both its number and the double-click
             // that opens the Progress window (Bevel's fold, Helm-signed 2026-08-24 —
             // "reuse existing theme window on current tab … retire tab-less 272x135
             // float"). A branch for a key MiniBarPresentation.Order no longer contains
             // would be unreachable code claiming to be a feature.
-            //
-            // OE-7: a cell whose stat owns a float is an EXPANSION chip. The target comes
-            // from HudExpand rather than from a second switch beside the one above — one
-            // fact, one source (trap 4), and it is the same table BreakoutHost's ⧉ routes
-            // through, so the chip and the pop-out cannot disagree about which window this
-            // cell means.
+            var target = HudExpand.TargetForKey(cell.Key);
+            // The opt-in double-click is unchanged and still only ever toggles a FLOAT:
+            // `DoubleClickChipsToggleBreakouts` means "open its window straight away", and
+            // for the cells whose destination is a theme window the single click's panel and
+            // its ⧉ are the path. Read off the destination rather than a second switch, so a
+            // chip cannot double-click to one window and pop out to another.
+            BreakoutKind? breakout =
+                target is { } t && HudExpand.DestinationOf(t).BreakoutName is { } name
+                    ? Enum.Parse<BreakoutKind>(name)
+                    : null;
             _host.Children.Add(Chip(cell.Icon, cell.Text, "AccentBrush", breakout: breakout,
-                expand: breakout is { } k ? HudExpand.TargetForBreakout(k.ToString()) : null));
+                expand: target));
         }
 
         // THE BUFF SET'S CHIP (OE-7), and the one cell on this bar that is not in

@@ -48,7 +48,81 @@ public enum HudExpandTarget
     /// is drawn by <c>HudBarView</c> from the buff tracker's own count rather than from a
     /// snapshot field, because there is no buff state on <c>StatsSnapshot</c> at all.</summary>
     Buffs,
+
+    // ---- OE-9: THE REST OF THE TRAY ------------------------------------------------
+    //
+    // The five below are every remaining cell of `MiniBarPresentation.Order`, and they
+    // arrive TOGETHER for the reason the owner's ~1:29 PM CT amend (2026-09-07) gives:
+    // *"Everything on the minimized bar MUST have hover peek + pop-out"*. That amend
+    // supersedes the signed #389 plan's four-target carve — which had left Deaths out on
+    // Bevel #371's reading — and it closes lock 9's last hole. A bar where five of the
+    // twelve chips answered a hover and the rest did not is exactly the per-tracker
+    // exception lock 9 forbids, and there is no longer a cell that cannot say what it is.
+
+    /// <summary>The ✨ motes cell. Its ⧉ is the Progress window's WEALTH tab, not a float
+    /// of its own — <c>ProgressSurface.TabForKey</c> already answered "motes" with Wealth
+    /// long before this was asked, which is the app agreeing with the routing in advance.
+    /// </summary>
+    Motes,
+
+    /// <summary>The 💀 kills cell. Its ⧉ is the Kills &amp; Drops window on its Kills tab —
+    /// the FIRST target whose destination is neither a float nor Progress, and therefore the
+    /// one that turned <see cref="HudExpand.DestinationOf"/>'s predecessor from an exact
+    /// proxy into a wrong one (trap 64; see that method).</summary>
+    Kills,
+
+    /// <summary>The ⚡ weapon-procs cell. Its ⧉ is the DAMAGE float, which gains a procs
+    /// block rather than a tenth always-on-top window: procs are a damage-surface fact
+    /// everywhere else in the app (the Combat card, the Evolved shell's Live room), and a
+    /// new float for five rows is the proliferation SA-2 was signed to end.</summary>
+    Procs,
+
+    /// <summary>The 🪙 coin cell. Progress → Wealth, same as <see cref="Motes"/> — the
+    /// owner's own lock reads Money's breakout as "the Wealth section of Progress", which is
+    /// what makes a SECTION of an existing window a destination this vocabulary allows.
+    /// </summary>
+    Money,
+
+    /// <summary>The deaths cell, and the one the signed plan left out. Its ⧉ is the World
+    /// window's Travels tab — the old Travels &amp; Deaths card's body, which is where the
+    /// death list has lived since the World fold. The fourth destination host, and the
+    /// reason the map below is worth having as a map rather than as three special cases.
+    /// </summary>
+    Deaths,
 }
+
+/// <summary>Which WINDOW a target's ⧉ opens. Four, since OE-9 — and the count is the
+/// argument for <see cref="HudDestination"/> existing at all.</summary>
+public enum HudDestinationHost
+{
+    /// <summary>One of the six <c>BreakoutKind</c> floats.</summary>
+    Float,
+
+    /// <summary>The Progress theme window (Experience / Wealth / Faction / Raids).</summary>
+    ProgressWindow,
+
+    /// <summary>The Kills &amp; Drops window.</summary>
+    CreatureWindow,
+
+    /// <summary>The World window (Map / Camps / Routes / Travels).</summary>
+    WorldWindow,
+}
+
+/// <summary>
+/// WHERE A TARGET'S ⧉ SENDS ITS DETAIL — the window, and the tab on it.
+/// </summary>
+/// <param name="Host">Which window family.</param>
+/// <param name="BreakoutName">The <c>BreakoutKind</c> member NAME when
+/// <paramref name="Host"/> is <see cref="HudDestinationHost.Float"/>, else null. A NAME
+/// rather than the enum for the reason <see cref="BreakoutPresentation"/> gives: that enum
+/// is a WPF type, and taking it here would put the decision back inside the layer that
+/// cannot test it.</param>
+/// <param name="FloatKind">The <see cref="BreakoutPresentation"/> kind that supplies the
+/// float's WORDS. Carried beside the member name rather than derived from it, so the
+/// tooltip does not depend on the two happening to differ only in case.</param>
+/// <param name="Tab">The tab key the window opens on, or null for "wherever it was".</param>
+public sealed record HudDestination(
+    HudDestinationHost Host, string? BreakoutName, string? FloatKind, string? Tab);
 
 /// <summary>
 /// THE MINI BAR'S EXPANSION — which tracker is showing under the bar, whether it is a
@@ -125,9 +199,17 @@ public sealed class HudExpand
         _ => "collapsed",
     };
 
-    /// <summary>A target's one-word key, for the dump and for the <c>EQBUDDY_HUDEXPAND</c>
-    /// hook. <see cref="TargetForKey"/> is the inverse and they are tested as a pair, so a
-    /// name can never be readable in one direction only.</summary>
+    /// <summary>
+    /// A target's one-word key, for the dump and for the <c>EQBUDDY_HUDEXPAND</c> hook.
+    /// <see cref="TargetForKey"/> is the inverse and they are tested as a pair, so a name can
+    /// never be readable in one direction only.
+    ///
+    /// **Every key here that names a tray cell IS that cell's <c>MiniStats</c> key**, which
+    /// is not a coincidence and is load-bearing since OE-9: <see cref="TargetForKey"/> is the
+    /// bridge <c>HudBarView</c> uses to turn a <see cref="MiniBarCell"/> into an expansion
+    /// chip, so the chip, the panel, the title, the icon and the ⧉ all read one table
+    /// (trap 4). The hand switch that used to pick a target per cell is gone with it.
+    /// </summary>
     public static string Key(HudExpandTarget target) => target switch
     {
         HudExpandTarget.Hps => "hps",
@@ -136,11 +218,17 @@ public sealed class HudExpand
         HudExpandTarget.Watch => "watch",
         HudExpandTarget.Loot => "loot",
         HudExpandTarget.Buffs => "buffs",
+        HudExpandTarget.Motes => "motes",
+        HudExpandTarget.Kills => "kills",
+        HudExpandTarget.Procs => "procs",
+        HudExpandTarget.Money => "money",
+        HudExpandTarget.Deaths => "deaths",
         _ => "dps",
     };
 
     /// <summary>The key back to a target, or null for anything else. Case-insensitive: it
-    /// reads an environment variable a human types.</summary>
+    /// reads an environment variable a human types — and, since OE-9, a
+    /// <see cref="MiniBarCell.Key"/> the bar hands it.</summary>
     public static HudExpandTarget? TargetForKey(string? key) => key?.Trim().ToLowerInvariant() switch
     {
         "dps" => HudExpandTarget.Dps,
@@ -150,93 +238,156 @@ public sealed class HudExpand
         "watch" => HudExpandTarget.Watch,
         "loot" => HudExpandTarget.Loot,
         "buffs" => HudExpandTarget.Buffs,
+        "motes" => HudExpandTarget.Motes,
+        "kills" => HudExpandTarget.Kills,
+        "procs" => HudExpandTarget.Procs,
+        "money" => HudExpandTarget.Money,
+        "deaths" => HudExpandTarget.Deaths,
         _ => null,
     };
 
     /// <summary>
-    /// The tracker a <c>BreakoutKind</c> member belongs to, or null for a name that is not
-    /// one.
+    /// WHERE ⧉ SENDS A TARGET — total over the enum, and the whole reason OE-9 was a plan
+    /// rather than a diff.
     ///
-    /// **Keyed by the enum member's NAME, for the reason <see cref="BreakoutPresentation"/>
-    /// already gives**: the breakout enum is a WPF type, so taking it here would put a
-    /// decision back inside the layer that cannot test it. Progress is deliberately absent
-    /// on both sides — it left <c>BreakoutKind</c> by a signed fold on 2026-08-25.
+    /// **It replaces the SECOND proxy in this lineage, and the first one is why the second
+    /// was worth catching before it bit** (trap 64). <c>HudExpandBar</c> once chose the float
+    /// with <c>target == Hps ? Healing : Damage</c> — exact while the enum held three
+    /// members, and silently routing four new ones to the Damage window the day it did not.
+    /// OE-7 fixed that with a name table and left the SAME shape one level up: the caller
+    /// read *"no breakout name → the Progress window"*, which was exact while Progress was
+    /// the only non-float destination. <see cref="HudExpandTarget.Kills"/> is the member that
+    /// makes it wrong, and it would have gone to Progress with **no line of that method
+    /// changing**. There are four destination hosts now, so the fact is named instead of
+    /// being inferred from an absence.
     ///
-    /// Since OE-7 every one of the six kinds answers, which is the whole seat: a kind with
-    /// no target here is a float whose ✕ has no way back, and that is the state the
-    /// persistent disable existed to paper over.
+    /// **A destination is not a per-target special case — it is a WINDOW and a TAB**, which
+    /// is what lets two targets share one (Dps and Procs both mean the Damage float; Money
+    /// and Motes both mean Progress → Wealth) and what lock 7's close handling keys on. See
+    /// <see cref="SameWindow"/>.
     /// </summary>
-    public static HudExpandTarget? TargetForBreakout(string enumMemberName) => enumMemberName switch
+    public static HudDestination DestinationOf(HudExpandTarget target) => target switch
     {
-        "Damage" => HudExpandTarget.Dps,
-        "Healing" => HudExpandTarget.Hps,
-        "Pet" => HudExpandTarget.Pet,
-        "Watch" => HudExpandTarget.Watch,
-        "Loot" => HudExpandTarget.Loot,
-        "Buffs" => HudExpandTarget.Buffs,
-        _ => null,
+        HudExpandTarget.Hps => Float("Healing", BreakoutPresentation.Healing),
+        HudExpandTarget.Pet => Float("Pet", BreakoutPresentation.Pet),
+        HudExpandTarget.Watch => Float("Watch", BreakoutPresentation.Watch),
+        HudExpandTarget.Loot => Float("Loot", BreakoutPresentation.Loot),
+        HudExpandTarget.Buffs => Float("Buffs", BreakoutPresentation.Buffs),
+        // The Progress WINDOW on whatever tab it was left on — the 2026-08-25 fold ("reuse
+        // the existing theme window on its current tab"), untouched.
+        HudExpandTarget.Progress =>
+            new(HudDestinationHost.ProgressWindow, null, null, null),
+        // "wealth" because that is what ProgressSurface.TabForKey already answers for both
+        // "motes" and "money" — the app agreed with this routing before it was asked.
+        HudExpandTarget.Motes or HudExpandTarget.Money =>
+            new(HudDestinationHost.ProgressWindow, null, null, "wealth"),
+        HudExpandTarget.Kills =>
+            new(HudDestinationHost.CreatureWindow, null, null, "kills"),
+        // The old Travels & Deaths card's body, which is the World window's Travels tab
+        // since the World fold. A HOTKEY would not have counted (trap 59) and neither would
+        // an Options tick; this is a window the ⧉ opens.
+        HudExpandTarget.Deaths =>
+            new(HudDestinationHost.WorldWindow, null, null, "travels"),
+        // PROCS SHARES THE DAMAGE FLOAT rather than getting a tenth always-on-top window.
+        // Procs are a damage-surface fact everywhere else in the app, and the float carries
+        // the detail (lock 6) — so the float GAINS the procs block the Live room already
+        // draws inside the damage surface, off this same peek builder.
+        HudExpandTarget.Procs => Float("Damage", BreakoutPresentation.Damage),
+        _ => Float("Damage", BreakoutPresentation.Damage),
     };
 
-    /// <summary>
-    /// The inverse: the <c>BreakoutKind</c> member NAME a target pops to, or null for
-    /// Progress — which pops to the Progress WINDOW and is not a float at all.
-    ///
-    /// **It exists because the thing it replaced was a PROXY that had stopped being one**
-    /// (trap 64). <c>HudExpandBar</c> chose the float with
-    /// <c>target == Hps ? Healing : Damage</c>, which was exact while the enum held exactly
-    /// three members and silently routes Pet, Watch, Loot and Buffs to the Damage window the
-    /// moment it does not — with nothing in a diff to say so, because the line never
-    /// changes. A total mapping asserted against <see cref="TargetForBreakout"/> is the
-    /// version a new member cannot slip past.
-    /// </summary>
-    public static string? BreakoutName(HudExpandTarget target) => target switch
-    {
-        HudExpandTarget.Dps => "Damage",
-        HudExpandTarget.Hps => "Healing",
-        HudExpandTarget.Pet => "Pet",
-        HudExpandTarget.Watch => "Watch",
-        HudExpandTarget.Loot => "Loot",
-        HudExpandTarget.Buffs => "Buffs",
-        _ => null,
-    };
+    private static HudDestination Float(string name, string kind) =>
+        new(HudDestinationHost.Float, name, kind, null);
 
     /// <summary>
-    /// The <see cref="BreakoutPresentation"/> kind a target's words and vector come from.
+    /// Do these two destinations mean the SAME window on screen?
     ///
-    /// ONE switch, so <see cref="Title"/>, <see cref="Icon"/> and <see cref="PopOutTip"/>
-    /// cannot disagree about which surface a target means (trap 4). They were three parallel
-    /// switches when the enum had three members, which is exactly how many members it takes
-    /// for three copies to look like no risk at all.
+    /// **Lock 7 goes destination-keyed because two targets can now share a window**, so
+    /// "which close collapses the model" cannot key on the breakout kind alone: a ✕ on the
+    /// Damage float has to collapse a pinned PROCS panel that popped there, and closing the
+    /// Progress window has to collapse Motes and Money as well as Progress. The TAB is
+    /// deliberately not compared — a player who closes the Progress window has closed it
+    /// whichever tab they wandered to.
     /// </summary>
-    public static string KindOf(HudExpandTarget target) => target switch
+    public static bool SameWindow(HudDestination a, HudDestination b) =>
+        a.Host == b.Host
+        && (a.Host != HudDestinationHost.Float
+            || string.Equals(a.BreakoutName, b.BreakoutName, StringComparison.Ordinal));
+
+    /// <summary>
+    /// The <c>BreakoutKind</c> member NAME a target pops to, or null when its destination is
+    /// not a float at all. A thin read of <see cref="DestinationOf"/> and NOT a second table:
+    /// the caller that parses this into the WPF enum and the caller that decides which window
+    /// closed must not be able to disagree.
+    /// </summary>
+    public static string? BreakoutName(HudExpandTarget target) =>
+        DestinationOf(target).BreakoutName;
+
+    /// <summary>
+    /// The <see cref="BreakoutPresentation"/> kind a target's words and vector come from, or
+    /// **null for the five tray cells whose surface has no float** — in which case
+    /// <see cref="MiniBarPresentation"/> supplies both, keyed by the same
+    /// <see cref="Key"/> the cell already had.
+    ///
+    /// ONE switch, so <see cref="Title"/> and <see cref="Icon"/> cannot disagree about which
+    /// surface a target means (trap 4). **The null is not laziness and it is not the same
+    /// question as <see cref="DestinationOf"/>**: Procs POPS to the Damage float and is not
+    /// called "Your damage", so a target's words and a target's window are two facts. Reading
+    /// one off the other is how the Procs chip would have grown a sword.
+    /// </summary>
+    public static string? KindOf(HudExpandTarget target) => target switch
     {
+        HudExpandTarget.Dps => BreakoutPresentation.Damage,
         HudExpandTarget.Hps => BreakoutPresentation.Healing,
         HudExpandTarget.Progress => BreakoutPresentation.Progress,
         HudExpandTarget.Pet => BreakoutPresentation.Pet,
         HudExpandTarget.Watch => BreakoutPresentation.Watch,
         HudExpandTarget.Loot => BreakoutPresentation.Loot,
         HudExpandTarget.Buffs => BreakoutPresentation.Buffs,
-        _ => BreakoutPresentation.Damage,
+        _ => null,
     };
 
-    /// <summary>What the panel calls itself. The pop-out's tooltip names the destination in
-    /// the "X is now Y" spirit — a player who pops the panel out should already know which
-    /// window is about to appear.</summary>
+    /// <summary>What the panel calls itself. The five tray cells take the name their CELL
+    /// already has (<see cref="MiniBarPresentation.Names"/>) rather than a third naming table
+    /// — the chip and the panel it opens must not be two different words for one stat.
+    /// </summary>
     public static string Title(HudExpandTarget target) =>
-        BreakoutPresentation.Title(KindOf(target));
+        KindOf(target) is { } kind
+            ? BreakoutPresentation.Title(kind)
+            : MiniBarPresentation.Names[Key(target)];
 
     /// <summary>The panel header's vector — the same one the bar's own chip wears, so the
-    /// panel and the chip that opened it cannot be read as two different things.</summary>
+    /// panel and the chip that opened it cannot be read as two different things. Same source
+    /// split as <see cref="Title"/>, for the same reason.</summary>
     public static string Icon(HudExpandTarget target) =>
-        BreakoutPresentation.Icon(KindOf(target));
+        KindOf(target) is { } kind
+            ? BreakoutPresentation.Icon(kind)
+            : MiniBarPresentation.Icons[Key(target)];
 
-    /// <summary>Where ⧉ sends this tracker's detail, in words, for the pop-out's tooltip.
-    /// Progress names a WINDOW rather than a float on purpose: it is a different destination
-    /// and a tooltip that hid the difference would be the #233 "X is now Y" complaint inside
-    /// a hover.</summary>
-    public static string PopOutTip(HudExpandTarget target) => target == HudExpandTarget.Progress
-        ? "Open the Progress window"
-        : $"Open the floating {Title(target)} window";
+    /// <summary>
+    /// Where ⧉ sends this tracker's detail, in words, for the pop-out's tooltip.
+    ///
+    /// **It reads the DESTINATION, never the target's own title** — which matters more since
+    /// OE-9 than it did when it was written, because three of the five new chips do not go to
+    /// a window named after themselves and one of them (Procs) goes to a float called
+    /// something else entirely. A tooltip built from the chip's name would have promised a
+    /// "Weapon procs window" that does not exist. That is the #233 "X is now Y" rule inside a
+    /// hover, and it is the only warning a player gets before a different window appears.
+    /// </summary>
+    public static string PopOutTip(HudExpandTarget target) => $"Open {Words(DestinationOf(target))}";
+
+    /// <summary>A destination in words, for <see cref="PopOutTip"/> and for anything else
+    /// that has to name where a surface went.</summary>
+    public static string Words(HudDestination destination) => destination.Host switch
+    {
+        HudDestinationHost.Float =>
+            $"the floating {BreakoutPresentation.Title(destination.FloatKind!)} window",
+        HudDestinationHost.ProgressWindow => destination.Tab is { Length: > 0 } tab
+            ? $"the Progress window ({char.ToUpperInvariant(tab[0]) + tab[1..]})"
+            : "the Progress window",
+        HudDestinationHost.CreatureWindow => "the Kills & Drops window",
+        _ => "the World window (Travels & Deaths)",
+    };
 
     /// <summary>
     /// The pointer arrived on a chip — PEEK (lock 3).

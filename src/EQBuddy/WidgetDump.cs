@@ -373,6 +373,14 @@ internal static class WidgetDump
                     //                  count — trap 24's "a title is not an identity" one
                     //                  layer in.
                     $"hudExpandBody={w._hudExpandBar.BodyKind} " +
+                    //   hudExpandEmpty WHICH empty state, when the body drew one: "none" /
+                    //                  "notarget" / "empty". `hudExpandRows=0` cannot tell
+                    //                  OE-9 lock 2's two apart — "select a target" and "this
+                    //                  creature has no known drops" are different facts, and
+                    //                  a Loot peek that fell back to the SESSION would show
+                    //                  neither while reporting rows. Trap 20's shape: what is
+                    //                  being asserted is the thing that is not there.
+                    $"hudExpandEmpty={w._hudExpandBar.EmptyKey} " +
                     // FREE PLACEMENT (OE-8). FIVE keys, and the pairing is the whole design:
                     //
                     //   hudRowPark   / hudPanelPark        the EFFECT — where the window

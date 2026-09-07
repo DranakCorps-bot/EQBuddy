@@ -1307,6 +1307,20 @@ $Shots = [ordered]@{
                            Set = @{ Minimized = $true
                                     DisabledBreakouts = @('Damage','Healing','Pet','Watch','Loot','Buffs')
                                     MiniStats = @('kills','loot') } }
+    # OE-9 lock 2's OTHER empty state, and the one nothing else in this file can reach: with
+    # no target the peek asks for one rather than falling back to the session. `ShowTargetDrops
+    # = $false` is what stages it — the same gate the float's Target view passes through — so
+    # the picture does not depend on where in the fixture's pull the replay settles (trap 51's
+    # lesson one door over: a shot whose state is inherited is a shot of whatever ran before).
+    # PREDICTION: Bag vector, "Loot", ↗ and ✕; a dim "No target" subtext; ONE dim line,
+    # "Select a target — /consider a creature to see its drops here."; no rows, no overflow
+    # line. A picture with loot rows on it is the session fallback the lock forbids.
+    'hud-expand-loot-notarget' = @{ Title = 'EQBuddy HUD Panel'
+                           Env = @{ EQBUDDY_HUDEXPAND = 'loot' }
+                           Set = @{ Minimized = $true
+                                    DisabledBreakouts = @('Damage','Healing','Pet','Watch','Loot','Buffs')
+                                    MiniStats = @('kills','loot')
+                                    ShowTargetDrops = $false } }
     'hud-expand-watch' = @{ Title = 'EQBuddy HUD Panel'
                            Env = @{ EQBUDDY_HUDEXPAND = 'watch' }
                            Set = @{ Minimized = $true

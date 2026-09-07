@@ -84,6 +84,18 @@ internal sealed class HudExpandWindow : Window
     /// </summary>
     public string BodyKind { get; private set; } = "none";
 
+    /// <summary>
+    /// WHICH empty state is on screen — the <c>hudExpandEmpty</c> dump fact: "none" when rows
+    /// drew, "notarget" for the Loot peek's no-target line, "empty" for every other apology.
+    ///
+    /// **It exists because <c>hudExpandRows=0</c> cannot tell OE-9 lock 2's two empty states
+    /// apart**, and those are the two the re-scope is ABOUT: "select a target" and "this
+    /// creature has no known drops" are different facts, and a peek that fell back to the
+    /// session would show neither while still reporting rows. Read off the DRAWN body rather
+    /// than off the target, or it would agree with the wiring by construction (trap 39).
+    /// </summary>
+    public string EmptyKey { get; private set; } = "none";
+
     /// <summary>The pointer is over the panel itself. A peek must survive the trip from the
     /// chip to the panel — otherwise the panel collapses out from under the cursor that is
     /// reaching for its ⧉, which is a hover expand that cannot be used.</summary>
@@ -520,26 +532,33 @@ internal sealed class HudExpandWindow : Window
     /// the existing theme window on its current tab" — and a panel that rebuilt those rooms
     /// would be the tab-less float coming back under a new name.
     ///
-    /// **Watch, Loot and Buffs (OE-7) go through <see cref="HudExpandPeek"/> for the same
-    /// reason Damage/Healing/Pet go through <see cref="LivePresentation"/>**: the choice of
-    /// rows is a decision, this file cannot be unit-tested, and Watch's is a decision the
-    /// float already makes. Everything below the <c>switch</c> is drawing.
+    /// **Watch, Loot and Buffs (OE-7) — and Motes, Kills, Procs, Money and Deaths (OE-9) —
+    /// go through <see cref="HudExpandPeek"/> for the same reason Damage/Healing/Pet go
+    /// through <see cref="LivePresentation"/>**: the choice of rows is a decision, this file
+    /// cannot be unit-tested, and Watch's and Procs' are decisions a float already makes.
+    /// Everything below the <c>switch</c> is drawing.
     /// </summary>
     private void Render(StatsSnapshot s, HudExpandTarget target)
     {
         if (target == HudExpandTarget.Progress) { RenderProgress(s); return; }
-        if (Peek(s, target) is { } body) { RenderPeek(body, HudExpand.KindOf(target)); return; }
+        if (Peek(s, target) is { } body) { RenderPeek(body, BodyKindOf(target)); return; }
 
-        var kind = HudExpand.KindOf(target);
+        var kind = HudExpand.KindOf(target)!;   // the meter path is only ever the three floats
         BodyKind = kind;
-        // SESSION scope, always. The float carries the Fight/Session toggle and this does
-        // not: a peek needs one number that means one thing, and a second scope axis on a
-        // panel with no room for a strip would be a state the player cannot see or change.
-        var meter = LivePresentation.Meter(kind, s, fightScope: false, DateTime.Now);
+        // **DPS PEEKS THE CURRENT FIGHT** — the owner's ~1:30 PM CT lock (2026-09-07),
+        // the same class of call as the Loot peek's target scope: what a GLANCE is for is
+        // what is happening now, and the float is where the session lives. Healing and Pet
+        // stay session-scoped because the lock names DPS and nothing else, and inventing the
+        // other two would be this PR deciding product it was not handed.
+        //
+        // There is still no toggle here: the float carries Fight/Session, and a second axis
+        // on a panel with no room for a strip would be a state the player cannot change.
+        var fight = target == HudExpandTarget.Dps;
+        var meter = LivePresentation.Meter(kind, s, fight, DateTime.Now);
         _subtext.Text = meter.Subtext;
 
         var rows = meter.Rows.OrderByDescending(r => r.Total).Take(MaxRows).ToList();
-        var sig = LivePresentation.MeterSignature(kind, false, "panel", meter);
+        var sig = LivePresentation.MeterSignature(kind, fight, "panel", meter);
         if (sig == _signature) return;
         _signature = sig;
 
@@ -547,10 +566,12 @@ internal sealed class HudExpandWindow : Window
         if (meter.Empty is { } empty)
         {
             RowCount = 0;
+            EmptyKey = "empty";
             _rows.Children.Add(EmptyLine(empty));
             return;
         }
         RowCount = rows.Count;
+        EmptyKey = "none";
         var top = Math.Max(1, rows.Max(r => r.Total));
         var bar = BreakdownRows.BarBrush(this);
         foreach (var row in rows)
@@ -569,21 +590,41 @@ internal sealed class HudExpandWindow : Window
             _rows.Children.Add(EmptyLine($"…and {meter.Rows.Count - rows.Count} more — ↗ for the full list"));
     }
 
-    /// <summary>The three OE-7 targets that are not a meter, or null for the ones that are.
+    /// <summary>Every target that is not a meter, or null for the three that are.
     /// Pet is deliberately NOT here — <see cref="LivePresentation.Meter"/> has always known
     /// it, and giving it a peek builder of its own would be a second producer of the rows
     /// its float draws (trap 33).</summary>
     private PeekBody? Peek(StatsSnapshot s, HudExpandTarget target) => target switch
     {
         HudExpandTarget.Watch => HudExpandPeek.Watch(_settings.TrackedRules, s.Tracked),
+        // TARGET drops, not the session (#392's re-scope, landed on main) — see LootPeek.
         HudExpandTarget.Loot => LootPeek(s),
         // ActiveCount first, so a run with no buffs never allocates a snapshot list — this
         // is on the widget's one-second tick, and BuffsCardView guards it the same way.
         HudExpandTarget.Buffs => HudExpandPeek.Buffs(
             _main._buffTracker.ActiveCount > 0 ? _main._buffTracker.Snapshot(DateTime.Now) : [],
             DateTime.Now),
+        // OE-9's five, each off the SAME snapshot fields its full surface reads.
+        HudExpandTarget.Motes => HudExpandPeek.Motes(Motes.Summarize(s.Loot, s.Elapsed)),
+        HudExpandTarget.Kills => HudExpandPeek.Kills(s.YourKills, s.YourKillCount, s.KillsPerHour),
+        HudExpandTarget.Procs => HudExpandPeek.Procs(s.Procs, s.CombatSeconds),
+        HudExpandTarget.Money => HudExpandPeek.Money(
+            s.Copper, s.CorpseCopper, s.VendorCopper, s.CopperPerHour),
+        HudExpandTarget.Deaths => HudExpandPeek.Deaths(s.Deaths),
         _ => null,
     };
+
+    /// <summary>
+    /// The <c>hudExpandBody</c> value for a peek target: the float's presentation kind where
+    /// there is one, and otherwise the target's own key.
+    ///
+    /// The five OE-9 targets have no <see cref="BreakoutPresentation"/> kind — that is what
+    /// <see cref="HudExpand.KindOf"/>'s null MEANS — so the body fact takes their key, which
+    /// is what the <c>EQBUDDY_HUDEXPAND</c> hook and the E2E assertions already speak. The
+    /// two vocabularies agree for every kind that has both.
+    /// </summary>
+    private static string BodyKindOf(HudExpandTarget target) =>
+        HudExpand.KindOf(target) ?? HudExpand.Key(target);
 
     /// <summary>The Loot peek's target-drops read — the SAME <c>MainWindow</c> calls
     /// <see cref="LootBreakoutView.Render"/> makes for that window's own Target scope, so the
@@ -610,11 +651,19 @@ internal sealed class HudExpandWindow : Window
         if (body.Empty is { } empty)
         {
             RowCount = 0;
+            // The no-target line is named apart from every other apology because the
+            // re-scope's whole claim is that these two states are two (see EmptyKey).
+            // Compared against `LootPresentation.NoTargetNote` — the const #392's builder
+            // returns — so the slug follows the copy Bevel edits rather than a second string
+            // that would have to be edited alongside it. It is the one thing #392's own
+            // signature cannot tell apart: both its empty states key on "loot|…|empty".
+            EmptyKey = empty == LootPresentation.NoTargetNote ? "notarget" : "empty";
             _rows.Children.Add(EmptyLine(empty));
             return;
         }
         var shown = body.Rows.Take(MaxRows).ToList();
         RowCount = shown.Count;
+        EmptyKey = "none";
         var bar = BreakdownRows.BarBrush(this);
         foreach (var row in shown)
             _rows.Children.Add(BreakdownRows.Row(this, row.Name, row.Value, row.Share, bar,
@@ -640,6 +689,7 @@ internal sealed class HudExpandWindow : Window
 
         _rows.Children.Clear();
         RowCount = lines.Count;
+        EmptyKey = "none";
         foreach (var line in lines) _rows.Children.Add(EmptyLine(line, dim: false));
     }
 

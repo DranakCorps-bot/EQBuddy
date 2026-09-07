@@ -49,15 +49,34 @@ internal sealed class HudExpandBar
             _model.Away();
             Apply();
         };
-        // Lock 7 — "close floated window → just the mini-bar, nothing expanded". Keyed on
-        // the kind, so a ✕ on some other float, or on one this bar has moved on from,
-        // collapses nothing (HudExpand.WindowClosed's own guard).
-        breakouts.Dismissed += kind =>
-        {
-            if (HudExpand.TargetForBreakout(kind.ToString()) is not { } target) return;
-            _model.WindowClosed(target);
-            Apply();
-        };
+        // Lock 7 — "close floated window → just the mini-bar, nothing expanded".
+        //
+        // **DESTINATION-keyed since OE-9, not kind-keyed**, and the difference is a real bug
+        // rather than a refactor: two targets can now share one window (Dps and Procs both
+        // pop to the Damage float; Progress, Motes and Money all pop to the Progress window),
+        // so "which target did this kind belong to" no longer has one answer. The old
+        // `TargetForBreakout` lookup would have collapsed a pinned Dps panel on a ✕ the Procs
+        // panel had opened, and left the Procs one up. What the model needs to know is
+        // whether the window that closed is the window ITS target went to.
+        breakouts.Dismissed += kind => WindowClosed(HudDestinationHost.Float, kind.ToString());
+    }
+
+    /// <summary>
+    /// A window this bar may have popped to has closed (lock 7).
+    ///
+    /// The model's own target-keyed guard stays underneath — a ✕ on a float the bar has since
+    /// moved on from must not collapse what the bar is showing NOW — and this adds the half
+    /// that guard cannot see: WHICH window closed, compared against where the current target
+    /// actually went. <see cref="HudExpand.SameWindow"/> is the comparison, and it ignores the
+    /// tab on purpose (closing the Progress window closes it whichever tab you wandered to).
+    /// </summary>
+    private void WindowClosed(HudDestinationHost host, string? breakoutName = null)
+    {
+        if (!_model.IsWindowOpen) return;
+        var closed = new HudDestination(host, breakoutName, null, null);
+        if (!HudExpand.SameWindow(HudExpand.DestinationOf(_model.Target), closed)) return;
+        _model.WindowClosed(_model.Target);
+        Apply();
     }
 
     /// <summary>The <c>hudExpand</c> / <c>hudExpandMode</c> dump facts, and the panel's own
@@ -73,6 +92,11 @@ internal sealed class HudExpandBar
     /// See <c>HudExpandWindow.BodyKind</c>: <see cref="TargetKey"/> is the header's claim
     /// and this is the body's, and OE-7 made them two decisions rather than one.</summary>
     public string BodyKind => _panel?.BodyKind ?? "none";
+
+    /// <summary>The <c>hudExpandEmpty</c> fact — WHICH empty state, since OE-9 lock 2 made
+    /// the Loot peek's two of them the thing under test. See
+    /// <see cref="HudExpandWindow.EmptyKey"/>.</summary>
+    public string EmptyKey => _panel?.EmptyKey ?? "none";
 
     /// <summary>What the bar's chips light for: the tracker whose panel is on screen, or
     /// null. Read by <see cref="HudBarView"/> every tick, so the lit chip and the panel
@@ -157,12 +181,13 @@ internal sealed class HudExpandBar
     }
 
     /// <summary>
-    /// Lock 6: ⧉ — the under-bar panel collapses and the float carries the detail.
+    /// Lock 6: ⧉ — the under-bar panel collapses and the destination carries the detail.
     ///
-    /// **Progress goes to the Progress WINDOW, not to a float**, and that is a signed fold
-    /// rather than a preference: <c>Progress</c> left <c>BreakoutKind</c> on 2026-08-25
-    /// ("reuse the existing theme window on its current tab"), <c>DocumentationSizeTests</c>
-    /// pins that list, and giving it a breakout here would revert it.
+    /// **FOUR destinations since OE-9, and the routing is a total map rather than a
+    /// fallback.** This method used to read *"no breakout kind → the Progress window"*, which
+    /// was exact while Progress was the only non-float destination and would have sent Kills
+    /// and Deaths there with no line of it changing (trap 64 — the second proxy in this
+    /// lineage; see <see cref="HudExpand.DestinationOf"/>).
     /// </summary>
     public void PopOut()
     {
@@ -170,18 +195,47 @@ internal sealed class HudExpandBar
         var target = _model.Target;
         _model.PopOut();
         Apply();
-        if (BreakoutFor(target) is not { } kind) { _main.ShowProgressWindow(); return; }
-        _breakouts.Open(kind);
+        Open(HudExpand.DestinationOf(target));
     }
 
-    /// <summary>The Progress window closed. Lock 7's other half — the one destination that
-    /// is not a <c>BreakoutKind</c> and therefore never reaches
-    /// <c>BreakoutHost.Dismissed</c>.</summary>
-    public void ProgressWindowClosed()
+    /// <summary>Open (or front) whichever window a target's ⧉ names. The three theme windows
+    /// front and activate themselves; a float is the one that needs telling apart, because
+    /// <see cref="BreakoutHost.Open"/> and <see cref="BreakoutHost.Visible"/> are two calls.
+    /// </summary>
+    private void Open(HudDestination destination, bool bringForward = false)
     {
-        _model.WindowClosed(HudExpandTarget.Progress);
-        Apply();
+        switch (destination.Host)
+        {
+            case HudDestinationHost.ProgressWindow:
+                _main.ShowProgressWindow(destination.Tab);
+                break;
+            case HudDestinationHost.CreatureWindow:
+                _main.ShowCreatureWindow(CreatureSurface.TabForKey(destination.Tab));
+                break;
+            case HudDestinationHost.WorldWindow:
+                _main.ShowWorldWindow(WorldSurface.TabForKey(destination.Tab));
+                break;
+            default:
+                var kind = Enum.Parse<BreakoutKind>(destination.BreakoutName!);
+                if (bringForward) _breakouts.Visible(kind)?.Activate();
+                else _breakouts.Open(kind);
+                break;
+        }
     }
+
+    /// <summary>The Progress window closed. Lock 7 for the destinations that are not a
+    /// <c>BreakoutKind</c> and therefore never reach <c>BreakoutHost.Dismissed</c> —
+    /// there are three of them now, and each one needs a hook where its window is built.
+    /// </summary>
+    public void ProgressWindowClosed() => WindowClosed(HudDestinationHost.ProgressWindow);
+
+    /// <summary>The Kills &amp; Drops window closed — the hook OE-9 had to add, because
+    /// <see cref="HudExpandTarget.Kills"/> is the first target that pops to it.</summary>
+    public void CreatureWindowClosed() => WindowClosed(HudDestinationHost.CreatureWindow);
+
+    /// <summary>The World window closed — <see cref="HudExpandTarget.Deaths"/>'s
+    /// destination.</summary>
+    public void WorldWindowClosed() => WindowClosed(HudDestinationHost.WorldWindow);
 
     /// <summary>The widget left (or re-entered) the collapsed HUD. The panel is the BAR's,
     /// and a slaved companion left parked under an expanded widget is trap 12's mechanism
@@ -218,27 +272,6 @@ internal sealed class HudExpandBar
         _main.RefreshHudChips();
     }
 
-    private void BringForward(HudExpandTarget target)
-    {
-        if (BreakoutFor(target) is not { } kind) { _main.ShowProgressWindow(); return; }
-        _breakouts.Visible(kind)?.Activate();
-    }
-
-    /// <summary>
-    /// The float a target pops to, or null for Progress — which goes to the Progress WINDOW.
-    ///
-    /// **It reads <see cref="HudExpand.BreakoutName"/> rather than deciding here**, and that
-    /// is the trap-64 fix rather than tidiness: this method used to be
-    /// <c>target == Hps ? Healing : Damage</c>, which was EXACT while the enum held Dps, Hps
-    /// and Progress — the ternary was standing in for "there are only two floats" — and
-    /// would have routed all four of OE-7's new targets to the Damage window without a
-    /// single line of it changing. The name comes from UI.Shared, where a test can hold it
-    /// against <see cref="HudExpand.TargetForBreakout"/> in both directions;
-    /// <see cref="Enum.Parse{TEnum}(string)"/> then fails loudly on a name
-    /// <c>BreakoutKind</c> does not have, instead of silently picking a default.
-    /// </summary>
-    private static BreakoutKind? BreakoutFor(HudExpandTarget target) =>
-        HudExpand.BreakoutName(target) is { } name
-            ? Enum.Parse<BreakoutKind>(name)
-            : null;
+    private void BringForward(HudExpandTarget target) =>
+        Open(HudExpand.DestinationOf(target), bringForward: true);
 }
