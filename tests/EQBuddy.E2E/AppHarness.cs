@@ -301,7 +301,9 @@ internal sealed class AppHarness : IDisposable
     /// **Full memory, not a stack-only mini.** The question this exists to answer is what
     /// the UI thread is doing, and a managed stack cannot be walked out of a dump that did
     /// not bring the heap — a smaller file that cannot answer the question is the whole
-    /// cost with none of the value.
+    /// cost with none of the value. It is the same choice `dotnet-dump collect` makes by
+    /// default, and it is not cheap: a measured capture of this app came to 621 MB, which
+    /// is what the cap below is about and why the upload is `if: failure()` only.
     ///
     /// It never throws and it never fails a test on its own account: the diagnosis it
     /// serves is already a failure, and a capture that turned a readable red into an
