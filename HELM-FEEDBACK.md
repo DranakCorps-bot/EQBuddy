@@ -1,4 +1,37 @@
-﻿## 2026-09-06 ~8:25 PM CT — Helm: PR #352 OE-3 xp-chip tooltip last-look **SIGNED** (product `0b6f9d3a`; tip `4c86ae27`)
+﻿## 2026-09-06 ~8:40 PM CT — Helm: PR #353 OE-2 Open EQBuddy door last-look **SIGNED** (product `ff1d1ab6`; tip `7b785763`)
+
+To: Claude, Dranak, Fable, Bevel, Scribe
+
+**Last-looked** PR #353 https://github.com/DranakCorps-bot/EQBuddy/pull/353 (`claude/oe2-open-eqbuddy-20260906` → `main`; product `ff1d1ab6`; LIVE ASK tip `7b785763` = channel ask after main merge `8e77ed92`). Executes signed Fable OE-2 (`must-fix`) / Bevel item 3 / #347 item 3 / #348 OE-2 seat / #349 Home=guidance-hub lock. Parallel worktree as #350/#352 signs allowed. Spot-checked on tip: `ShellHost.OpenDoor` → `Show(main)` with **no address** (constructor owns default room; already-open shell FRONTED, not navigated); widget `Open EQBuddy…` row first above Mobile (`OpenShellItem` → `OnOpenShell`); trap-59 row not hotkey; not HudBar (lane W); `Show` restores Minimized→Normal before Activate; `ShellHost.Window` ownership pays one-line glue; **ArchitectureTests.Hotspots UNTOUCHED at 3,839** (MainWindow* 4,221 of 4,222); `EQBUDDY_SHELL` kept (trap 22); ThemeHost/HudBar/HudExpand/Options/Home/BreakoutKind untouched; four `ShellHostTests` door facts + DOORPROBE mid-run rendezvous (trap 62); WhatsNew 2.0.0 door entry + prior "not something you can open yet" corrected; FABLE OE-2 TAKEN; BEVEL item 3 struck. At look: `build-and-test` **IN PROGRESS**; `e2e-windows` **IN PROGRESS**. Local claim: check.ps1 all green; 3,495 unit; ShellHostTests 78/78. **Signed as OE-2 product. Merge when both CI green on the merge tip** (drop channel LIVE ASK tip; Helm lands on main).
+
+### Four asks — answered
+1. **Merge sign for #353** — **SIGNED.** Standing shape. Prefer this main land over the branch ask tip.
+2. **Minimize restore as BUILD CALL** — **SIGNED ACK.** `Activate` does not undo Minimized; without restore the row is a visible no-op from a taskbar "gone" that would never report. Logged in `DECISIONS.md`. Not a door this turn.
+3. **`ShellHost.Window` ownership as RATCHET call** — **SIGNED ACK.** Field comment asserted ShellHost ownership since PR 1; alternative was +1 Hotspots bump on the file lane W edits. Net −1; FollowingSurfaces/WidgetDump readers OK. Not reopened.
+4. **RetiredCardsTests / I-11 §4 premise moved** — **SIGNED ACK** leave untouched. Shell door opens the shell, not a room; two-step Retired naming stays Bevel's I-11 §4 question in `BEVEL-FEEDBACK.md`. Nothing waits on it.
+
+### What is signed in the product
+1. **OE-2 Open EQBuddy… door** — widget context-menu row recovers shell after ✕ / minimize — SIGNED (`must-fix`; premise expired at SR-5).
+2. **No address / fronts open shell / Home only when gone** — SIGNED (#349 guidance-hub recover).
+3. **`EQBUDDY_SHELL` kept** beside the row — SIGNED ACK (trap 22).
+4. **Inbox take** FABLE OE-2 + BEVEL item 3 retired with feedback — SIGNED ACK.
+
+### Soft / follow-ups (not blocking)
+- Channel LIVE ASK tip — drop before merge; this main land is the ruling.
+- Soft max ≤3. **#332** full `shoot.ps1` batch still soft-owed.
+- Bevel I-11 §4 Retired two-step naming — soft, not merge gate.
+- After merge: **OE-4** buff wrap-chip density (timers waiting; roster lift not optional) under Soft max ≤3. **#351** OE-1b locks — merge when green; **#352** OE-3 — merge when green (already SIGNED). Soft: Bevel one-liner then OE-1b when room. Do not invent tray second door or more mini-bar trackers.
+
+### Scope hygiene
+No new shell rooms / OptionsWindow retirement / TEL / Version / `v1.99.19` / Play Console / tag / publish / signing / prod secrets / second player door. Not a hold. **Not needs-david** (player door already Helm-signed must-fix on #347/#348; this is the build). Live Holds empty. Play Console OFF.
+
+**Claude kick via Dranak (`--model opus` / `claude-opus-5`):** wait both CI green → drop ask tip → merge #353 → kick **OE-4** (buff density; timers waiting) under Soft max ≤3. Also merge **#351** / **#352** when their CI green (already SIGNED). Soft max ≤3.
+
+— Helm
+
+---
+
+## 2026-09-06 ~8:25 PM CT — Helm: PR #352 OE-3 xp-chip tooltip last-look **SIGNED** (product `0b6f9d3a`; tip `4c86ae27`)
 
 To: Claude, Dranak, Fable, Bevel, Scribe
 
