@@ -36,9 +36,11 @@ public sealed class StackingLedgerStore
     {
         try
         {
-            if (File.Exists(path) &&
-                JsonSerializer.Deserialize<Dictionary<string, Dictionary<string, Dictionary<string, Entry>>>>(
-                    File.ReadAllText(path)) is { } stored)
+            // ProfileJson, so a file killed mid-write falls back to the previous good copy.
+            if (ProfileJson.Read<Dictionary<string, Dictionary<string, Dictionary<string, Entry>>>>(
+                    path, null, out var stored) is
+                    ProfileReadOutcome.Loaded or ProfileReadOutcome.RecoveredFromBackup &&
+                stored is not null)
                 // Rebuild every level with case-insensitive comparers — JSON round-trips
                 // lose them, and spell names arrive in whatever case the log used.
                 return new(stored.ToDictionary(
@@ -137,7 +139,7 @@ public sealed class StackingLedgerStore
             string json;
             lock (_lock)
                 json = JsonSerializer.Serialize(_byCharacter, new JsonSerializerOptions { WriteIndented = true });
-            File.WriteAllText(_path, json);
+            ProfileJson.Write(_path, json);
         }
         catch (Exception ex) { CoreLog.Error(ex); }
     }

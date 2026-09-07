@@ -190,8 +190,8 @@ public sealed class BuffTracker
         _storePath = path;
         try
         {
-            if (!File.Exists(path)) return;
-            var stored = JsonSerializer.Deserialize<Dictionary<string, double>>(File.ReadAllText(path));
+            // ProfileJson, so a file killed mid-write falls back to the previous good copy.
+            ProfileJson.Read<Dictionary<string, double>>(path, null, out var stored);
             if (stored is null) return;
             lock (_lock)
                 foreach (var (spell, seconds) in stored)
@@ -475,8 +475,7 @@ public sealed class BuffTracker
         {
             string json;
             lock (_lock) json = JsonSerializer.Serialize(_learned);
-            Directory.CreateDirectory(Path.GetDirectoryName(path)!);
-            File.WriteAllText(path, json);
+            ProfileJson.Write(path, json);
         }
         catch { /* best-effort */ }
     }

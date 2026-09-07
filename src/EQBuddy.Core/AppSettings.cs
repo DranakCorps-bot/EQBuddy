@@ -791,23 +791,20 @@ public sealed class AppSettings
         // is present in the build and was never in effect. Guarded by
         // `HudStatPromotionLoadTests`, which drives the real `Load` against a real file and
         // fails on the pre-fix tree.
-        var hadFile = File.Exists(FilePath);
-        try
-        {
-            settings = hadFile
-                ? JsonSerializer.Deserialize<AppSettings>(File.ReadAllText(FilePath), JsonOpts) ?? new()
-                : new AppSettings();
-        }
-        catch (Exception ex)
-        {
-            CoreLog.Error(ex); // corrupted settings — start fresh, but say so
-            settings = new AppSettings();
-            // …and a fresh object is a fresh PROFILE as far as the migrations are
-            // concerned. Nothing the player chose survived the parse, so reading these
-            // defaults as their stored choices would be a migration acting on evidence
-            // that is not there.
-            hadFile = false;
-        }
+        //
+        // Read through ProfileJson, which falls back to the .bak that the last good Save
+        // left behind. That fallback IS the fix for "every republish resets my settings":
+        // a settings.json killed mid-write comes back as NUL bytes, and before this the
+        // only answer to that was the defaults below — theme, watch rules and hidden cards
+        // all at once, then written straight over the corrupt file by the migration save.
+        var outcome = ProfileJson.Read<AppSettings>(FilePath, JsonOpts, out var stored);
+        settings = stored ?? new AppSettings();
+        // A recovered backup is a REAL profile: it holds the choices this player made, so
+        // the migrations must be told so or they re-seed defaults over the top. Only
+        // Missing and Unreadable are fresh profiles — for Unreadable, nothing the player
+        // chose survived, and reading these defaults as their stored choices would be a
+        // migration acting on evidence that is not there.
+        var hadFile = outcome is ProfileReadOutcome.Loaded or ProfileReadOutcome.RecoveredFromBackup;
         settings._fileStamp = StampOf(FilePath);
         var changed = settings.ApplyMigrations(hadFile);
         // A READ that writes, and the reason is good: an id assigned at construction is
@@ -1374,9 +1371,11 @@ public sealed class AppSettings
     {
         try
         {
-            Directory.CreateDirectory(Path.GetDirectoryName(FilePath)!);
             WarnIfClobberingAnotherWriter();
-            File.WriteAllText(FilePath, JsonSerializer.Serialize(this, JsonOpts));
+            // Atomic and flushed to disk, so a kill in the middle of this — which is what
+            // install-local.ps1 -Evolved does to the running copy after 15 seconds — can
+            // leave the old settings or the new ones, and never a file of zeros.
+            ProfileJson.Write(FilePath, JsonSerializer.Serialize(this, JsonOpts));
             _fileStamp = StampOf(FilePath);
         }
         catch (Exception ex)

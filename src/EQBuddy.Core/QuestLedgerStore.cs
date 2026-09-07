@@ -553,7 +553,7 @@ public sealed class QuestLedgerStore
             string json;
             lock (_lock)
                 json = JsonSerializer.Serialize(_byCharacter, new JsonSerializerOptions { WriteIndented = true });
-            File.WriteAllText(_path, json);
+            ProfileJson.Write(_path, json);
         }
         catch (Exception ex) { CoreLog.Error(ex); }
     }

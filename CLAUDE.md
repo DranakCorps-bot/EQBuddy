@@ -1878,6 +1878,49 @@ Read this list before touching the areas it names. Every entry cost a release.
     standing in for. Name the fact instead (`DumpNarrowed`, not a length), which is also
     trap 49's *"put the participants in the test names"* one level down.
 
+65. **`File.WriteAllText` TRUNCATES THE REAL FILE AND DOES NOT WAIT FOR THE DISK — so a
+    process killed mid-save leaves a file of the right LENGTH full of ZEROS, and the app
+    that reads it back cannot tell that from a player who reset their own settings.** The
+    tell is exact and worth memorising: `'0x00' is an invalid start of a value. Path: $ |
+    LineNumber: 0`. NTFS commits the new length in metadata before the data reaches the
+    platter, so the file is not truncated or half-written — it is the right size and blank,
+    which is why every "corrupt JSON" guess about encoding or partial documents is wrong.
+    → **What it cost is the whole of #385.** David's `%AppData%\EQBuddy Evolved\error.log`
+    threw it from `AppSettings.Load`, `AaLedgerStore`, `StackingLedgerStore`,
+    `QuestLedgerStore` **and** `SpawnCycleLedger` at ONE timestamp (2026-09-07 06:59:54) —
+    five files, one abrupt termination. `install-local.ps1 -Evolved` force-kills the
+    running portable copy when it has not closed within 15 seconds, so **a republish is
+    precisely the event that lands in the window**, and the player-facing shape was "every
+    time you publish, EQBuddy forgets everything": theme back to ParchmentBrass, the
+    built-in Watch rule re-seeded against a `DefaultRulesVersion` reset to 0, hidden cards
+    back because `HiddenSections` was empty. Three settings at once is the signature of a
+    profile read as BRAND NEW, not of three bugs.
+    → **AND THE CATCH BLOCK FINISHED THE JOB.** `Load` caught the exception, started from
+    defaults, reported `hadFile: false`, and the migration chain then reported work — so
+    `Load` **saved those defaults over the corrupt file**, destroying the last copy of the
+    profile and the evidence in one write. A recovery handler that writes is not a recovery
+    handler. The same event is visible from the other side one day earlier, in the trap 13
+    clobber warning: *"was 389793 bytes … now 4697 bytes"* — 4,697 bytes IS a defaults file,
+    and nobody read it as one.
+    → **Now guarded:** `Core/ProfileJson` is the one place any profile JSON is written —
+    temp file, `Flush(flushToDisk: true)`, then `File.Replace`, which is atomic on NTFS and
+    hands the outgoing copy to `.bak` in the same operation. **The flush is the entire
+    point**: a plain `WriteAllText`-then-rename still lets the rename reach the disk ahead
+    of the data, so it looks like a fix and is not one. `ProfileJson.Read` is the other half
+    — an unreadable file falls back to `.bak`, restores it in the same breath, and sets the
+    bad copy aside as `.corrupt` rather than overwriting it. `ProfileJsonTornWriteTests`
+    holds it, prove-failed: three of eleven fail with the fallback disabled.
+    → **The narrow reading in `Read` is load-bearing and was found by a green suite going
+    red.** A MISSING file is `Missing` and the backup is never consulted; only a file that
+    is PRESENT and will not parse recovers. Widening it to "present or absent" resurrects a
+    profile file somebody deleted on purpose — which is what broke
+    `HudStatPromotionLoadTests.AProfileWithNoFileAtAllIsBornPromoted` the moment every save
+    started leaving a `.bak` beside it. **A recovery rule has to name the exact failure it
+    recovers from**, or it starts answering questions nobody asked it.
+    → **The general shape: every `File.WriteAllText` to a file the player cannot recreate is
+    this bug waiting for a kill.** Grep for it before adding another. Caches are fine (they
+    refetch); a profile is not.
+
 ## Tooling notes that cost time when ignored
 
 - **`pwsh -NoProfile -File scripts/status.ps1`** answers "where did we leave off?" in one
