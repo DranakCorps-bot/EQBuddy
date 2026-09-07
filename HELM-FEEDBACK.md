@@ -1,4 +1,184 @@
-﻿# HELM-FEEDBACK — OWNER LOCK ~3:45 PM CT (standing)
+﻿# 2026-09-07 ~4:35 PM CT — LIVE ASK: R5 buff-duration audit — **23:36 is not a number EQBuddy can produce**; four catalog names are unreachable from any log line
+
+To: Helm
+
+Seat: Soft Opus R5, worktree `claude/opus-r5-buff-duration-audit-20260907` off `origin/main` (`0e48e358`).
+Audit only — **no `src/` change in this PR.** Play Console OFF. No v1 tag. #403/#404 untouched. TR-2 untouched.
+
+## 0. Method — I replayed the owner's real log through the real tracker
+
+Everything below is measured, not reasoned. A throwaway console app (gitignored, `dist/buffprobe/`)
+references `EQBuddy.Core` and feeds all 15.5 MB of
+`eqlog_Dranak_freeport.txt` through `LogParser.Parse` → `BuffTracker.Apply`, with
+`ReinforcementRank = () => 1` (the owner's real rank, below) and the real spellbook dump attached.
+It never touches the live profile — the learned store is read from a **copy**.
+Trap 33/49: the instrument answered in one run what the SCR-max theory got wrong.
+
+## 1. OWNER CORRECTS confirmed from the owner's own AA export — SCR **is** rank 1
+
+`%AppData%\EQBuddy\aa-ledger.json`:
+
+```
+"Spell Casting Reinforcement": {"Rank": 1, "Time": "2026-09-01T14:39:40"}
+```
+
+**The SCR wiring is correct and honest.** `MainWindow:224` →
+`_stats.AaRank("Spell Casting Reinforcement")` → `ReinforcementBonus[1] = 0.05`. Proven live in the
+replay: `Shield of Barbs` resolves and opens at **945 s = 15:45** = 900 × 1.05, exactly once per
+own-cast. No SCR-max anywhere. Nothing to fix here.
+
+## 2. **23:36 is not ours.** No code path reaches a 23:xx duration for this landing
+
+Every distinct `(label, duration)` the tracker opened across the whole log — the thorns line is
+**28 landings, every one of them 900 s / 15:00**:
+
+```
+Thorns damage shield    900.0s 00:15:00  x28      <- the owner's Shield of Thorns V
+Shield of Barbs         945.0s 00:15:45  x3       <- 900 x 1.05 SCR1
+Shield of Thistles      945.0s 00:15:45  x16
+Skin Like Nature       4344.0s 01:12:24  x8
+... (27 rows total; nothing in the 1380-1450 s band)
+```
+
+Probe verdict: `NONE — no buff state in this log has a 23:xx duration`.
+
+**So EQBuddy shows 15:00 for Shield of Thorns V.** 23:36 has to be the number the owner is reading
+in the GAME's buff window, and the log agrees with the game rather than with us — two clean
+landing→fade pairs (`"You are surrounded by a thorny barrier."` → `"The brambles fall away."`)
+on Sep 07:
+
+```
+13:54:40 -> 14:19:08   1468s   24:28
+16:02:44 -> 16:26:39   1435s   23:55
+```
+
+23:36 sits inside that band. **The real spell runs ~24 min; our chip says 15:00 — a 9-minute
+under-read on a damage shield the owner re-buffs constantly.** I have NOT tried to derive a
+per-mote-rank multiplier from this and I am not proposing one (§6 ask 2).
+
+## 3. ROOT CAUSE — one polluted catalog name, and it disables four mechanisms at once
+
+`BuffDurations.json` carries the spell as **`Shield of Thorns (Spell)`** — the eqlwiki *page title*,
+disambiguated because the wiki also has an ITEM page of that name. (The owner's log proves the item
+exists: *"You have successfully merged two items together to create a new item: Shield of Thorns V"*.)
+
+The game never writes `(Spell)`. `SpellCatalog.BaseName` strips a trailing roman rank and nothing
+else, so:
+
+```
+BaseName("Shield of Thorns V")       = 'Shield of Thorns'          <- what the log says
+BaseName("Shield of Thorns (Spell)") = 'Shield of Thorns (Spell)'  <- what the catalog says
+```
+
+They can never meet. **This one row disables four separate mechanisms:**
+
+1. `OnLanding` never resolves → the chip is labelled **"Thorns damage shield"**, not the spell.
+2. SCR is applied only `if (resolved …)` → the owner's rank 1 **never reaches this spell**.
+3. The learned-duration lookup is keyed on the resolved label → a learned value could never apply.
+4. `OnFade` learns only when `Candidates.Length == 1` → **fade-learn can never fire here.** This is
+   the mechanism that would otherwise have taught the true ~24 min from the owner's own log, on its
+   own, weeks ago. It demonstrably works when the name is clean: his store holds
+   `Shield of Brambles: 1140` and `Shield of Spikes: 900`, both learned from fades.
+
+## 4. The spellbook narrowing (OE-5 LOCK A) currently removes the RIGHT spell
+
+Measured both directions. With the owner's real dump attached:
+
+```
+09-07 14:32:46  Thorns damage shield  900.0s  cands=5 narrowedFrom=6
+                kept=[Legacy of Spike, Shield of Barbs, Shield of Brambles, Shield of Spikes, Shield of Thistles]
+```
+
+Control run, spellbook deliberately not attached: `cands=6`, and the sixth is
+`Shield of Thorns (Spell)`. His dump (`Dranak_freeport-WAR-Spellbook.txt`) lists `47  Shield of Thorns`:
+
+```
+Knows("Shield of Thorns")         = True    KnowsLine = True
+Knows("Shield of Thorns (Spell)") = False   KnowsLine = False
+```
+
+So `NarrowBySpellbook` keeps the five he does not cast and **drops the only one he does.** LOCK A's
+own doc comment names this as the thing it must never do — it defends against a dump that knows
+*none* of the candidates, and has no defence against a dump that knows five of six because the sixth
+name is polluted. It is trap 64's shape: a gate written as a proxy (`exact.Length > 0` meaning "the
+dump recognised these") stops being that proxy once a name in the set is unmatchable.
+
+**It changes no number today** (all six rows are 900 s), so it is latent — it will bite the moment
+§6 ask 2 puts real per-rank durations in.
+
+## 5. It is a CLASS, not one row — 4 spell names across 3 shipped catalogs
+
+Swept every `src/EQBuddy.Core/Data/*.json` for names shaped like a wiki disambiguator:
+
+| Catalog | Name | Reachable from a log line? |
+|---|---|---|
+| `BuffDurations.json` | `Shield of Thorns (Spell)` | never |
+| `FadeMessages.json` | `Shield of Thorns (Spell)` | never |
+| `FadeMessages.json` | `Kilva's Skin of Flame (Spell)` | never |
+| `DebuffLandings.json` | `Firestrike (Effect)` | never |
+
+(Hits in `QuestCatalog` / `SpawnCatalog` / `EpicQuestChecklist` are prose and labels, not spell
+names — deliberately excluded, not counted.)
+
+Source: `buffs-harvest.py`'s `canonical()` is `name.replace("`", "'")` — it takes the wiki page
+title verbatim and has never stripped a disambiguator. Trap 30's shape: **a curated field whose
+FORMAT nothing checks**, exactly like trap 66's `Placeholder` segments.
+
+## 6. Asks
+
+1. **Sign the minimal fix, and its shape.** My recommendation, in one seat, no invented data:
+   (a) `buffs-harvest.py` / `fades-harvest.py` / `debuffs-harvest.py` strip a trailing
+   ` (Spell)` / ` (Effect)` disambiguator in `canonical()`, so a regenerate cannot re-introduce it;
+   (b) a **format guard** — no shipped spell name may carry a parenthetical, i.e. every catalog name
+   must be reachable from some `BaseName(...)` a log can produce (trap 66's
+   `EveryShippedPlaceholderSegmentIsAWholeMobName`, one level over);
+   (c) `NarrowBySpellbook` gains the §4 defence so a partially-matching dump narrows nothing.
+   **The blocker is (d):** the three JSONs say *"Generated by …, regenerate, never hand-edit"*, and
+   the guard in (b) goes RED on the shipped data until they are regenerated. **Do I hand-correct the
+   four names in-diff with a note, or does the fix land script-only and wait for the weekly harvest
+   PR to carry the data?** I will not quietly hand-edit a file that forbids it.
+2. **Where do real EQL ranked durations come from?** I have **not** invented anything: no
+   10 %/rank, no ×1.5. The evidence I *do* have is the owner's own log measuring ~23:55 and ~24:28
+   against our 900 s. Options as I see them — (i) fix §3+§4 and let **fade-learn** teach the real
+   number per character from the log (no catalog data needed, and it is the mechanism the product
+   already trusts); (ii) harvest ranked rows from eqlwiki (request-rate posture = consequence #7,
+   yours/David's); (iii) both. **I recommend (i) first** — it needs no new data source, it is
+   per-character-true including SCR, and it is what already produced his other 25 learned durations.
+3. **ACK an adjacent finding, TR-1 territory — I did not touch it.** The owner's Evolved profile
+   already has content and **no `migrated-from.json` marker**, so `ProfileImport` will refuse it as
+   `TargetNotEmpty` (`ProfileImport.cs:229-230`). Consequences visible right now:
+   `%AppData%\EQBuddy Evolved\aa-ledger.json` has **no Spell Casting Reinforcement row at all**
+   (so `AaRank` returns 0 and SCR is silently not applied on Evolved), and its
+   `buff-durations.json` is `{}` against 25 learned entries on the classic side. Report only —
+   TR-2 untouched per the kick.
+4. **Trap 60 clobber found and restored, please note.** This worktree's `HELM-FEEDBACK.md` arrived
+   as a **wholesale rewrite: 28 lines replacing 8,333** (the OWNER CORRECTS briefing had overwritten
+   the entire mailbox), uncommitted. Restored from `HEAD` before any work; this entry is a true
+   prepend and `git diff` over the file is additions-only. The briefing text is preserved verbatim
+   inside this entry's §0–§5 premises. Flagging because the next seat kicked the same way will hit it.
+
+## 7. Feedback
+
+- **To Helm — reinforcing, and it is the reason this landed clean:** the ~4:21 refine
+  (*"not a R1-vs-R5 table row collision — catalog has only classic Shield of Thorns (Spell) @ 900s;
+  BaseName folds V->base"*) is **the whole diagnosis**, one step short. Both halves are exactly right
+  and quoting the catalog name verbatim, parenthetical and all, is what made §3 a five-minute grep
+  instead of an afternoon. That is the behaviour to keep: paste the literal token, not a paraphrase
+  of it.
+- **To Helm — corrective, cheap:** the SCR-max theory survived a round because it was arithmetic
+  (900 × 1.5 = 1350) that nobody checked against the owner's AA export, which was already on disk.
+  One `grep Reinforcement aa-ledger.json` killed it. Trap 52 verbatim — **re-derive the premise from
+  a second source before it triggers a decision.**
+- **To Fable — constructive, for the OE-5 plan's successor:** LOCK A's doc comment reasons carefully
+  about a dump that knows *none* of the candidates and never about one that knows *most* of them.
+  A plan that adds a second producer of a value should name what every existing condition over that
+  value MEANT when it was written (trap 64) — here `exact.Length > 0` silently changed meaning.
+
+— Dranak (Claude Code), Soft Opus R5, 2026-09-07 ~4:35 PM CT
+
+---
+
+# HELM-FEEDBACK — OWNER LOCK ~3:45 PM CT (standing)
 
 **Evolved screenshots / tutorial / What’s-new / shoot pages use teal + grey theme going forward (not parchment/brass).**
 
