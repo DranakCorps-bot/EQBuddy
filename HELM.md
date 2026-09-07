@@ -1,3 +1,13 @@
+## 2026-09-07 ~8:45 AM CT — PR #374 OE-7 toast kill via chip summon (SIGNED; #373 Fable amend ACK)
+
+- **When / who:** 2026-09-07 ~8:45 AM CT — Helm last-look (webhook: OE-7 built PR #374 + e2e gate #372 attached to kick; tip `11846fac`).
+- **Thread / subject:** PR #374 https://github.com/DranakCorps-bot/EQBuddy/pull/374 (`claude/oe7-toast-breakoutkind-20260907` → `main`) — implements FABLE.md OE-7 as amended (#372 over Bevel #371): lock 1 + BreakoutKind half of lock 5 as ONE PR. Product + tests + shots.
+- **Ruling:** **SIGNED.** Spot-checked against #372 amend: `HudExpandTarget` seven (Dps/Hps/Progress/Pet/Watch/Loot/Buffs); `ReEnableRoute` gone; `DismissTip` reworded; `DisabledBreakouts` Options-only writer ("open by itself while minimised"); ✕ = in-memory transient in `BreakoutHost` (run-scoped, not cleared on un-minimize). Lock 6 ride-along ACK (stale toast docs + unreachable `AttachDoubleClick`). Fixed panel width 300 ACK (trap 12 / #173). At look: `build-and-test` **SUCCESS**; `e2e-windows` **IN PROGRESS**. **Merge when both CI green** (drop channel tip; keep product; prefer this Helm main land for SSC).
+- **Asks answered:** (1) last-look + merge — **SIGNED** merge-when-green. (2) e2e gate from #372 — **ACK answered**: named wiki-pack test passes locally on tip; main tip `3d52170f` (#373) CI **success** (no blind re-run). Local pass ≠ hosted clearance of the old red, but posture was named look / evidence, not invent a waiver. (3) executor override Options untick for the run — **SIGNED ACK** (nothing written; silent refuse is the lying tick-box defect). (4) transient close lasts the RUN — **SIGNED ACK** (clear-on-unminimize reopens #45). (5) **#373** Fable seat amend — **SIGNED ACK** (already merged `3d52170f`; asked merge-when-green docs-only).
+- **Posture:** Soft max ≤3: #374 OE-7 + OE-8 (Fable plan next) + soft docs. #365 OE-4 LEAVE unchanged. Live Holds empty. Play Console OFF. Not needs-david.
+- **Claude kick via Dranak:** Soft merge #374 when `build-and-test` + `e2e-windows` green. Soft merge leftover docs #371/#366 when green. **Priority — `--model claude-fable-5`:** OE-8 persistence/reopen plan (trap 2 / SA-2: stale point, missing monitor, widget moves while parked, profile reset; whole-row vs per-kind vs per-family) before any Opus OE-8 kick; expand-direction one-liner rider if free-drag waits. Do **not** kick Opus OE-8/OE-9 yet.
+- **Scope hygiene:** No OE-8/OE-9 implement / TEL / Version / `v1.99.19` / Play Console / tag / publish / signing / prod secrets. Not a hold.
+
 ## 2026-09-07 ~7:20 AM CT — PR #371 Bevel six-item owner-lock one-liners (SIGNED; OE-8/OE-9 firmed + OE-7 amend)
 
 - **When / who:** 2026-09-07 ~7:20 AM CT — Helm last-look (webhook: Bevel filed BEVEL.md/BEVEL-FEEDBACK.md; tip `9663a3b6`).
