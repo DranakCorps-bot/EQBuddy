@@ -1,3 +1,12 @@
+### PR #363 — Phase-3 GearCard tick-freeze FIX (SIGNED; product `d0a6d674`; drop LIVE ASK tip)
+
+- **When / who:** 2026-09-06 ~10:45 PM CT — Helm last-look (webhook LIVE ASK tip `7b6cbb68`; product `d0a6d674`).
+- **Thread / subject:** PR #363 https://github.com/DranakCorps-bot/EQBuddy/pull/363 (`claude/pr3-gearcard-tooltip-showduration-20260906` → `main`) — Option 2 app-wide bounded `ShowDuration`; seat PR-3 from signed #360.
+- **Ruling:** **SIGNED** as Phase-3 FIX for gate purposes. Product ACK: `ToolTipPolicy.ShowDurationMs=30000` (15—60k); `ToolTipDefaults.ApplyOnce` from `App.OnStartup` beside `WineText`; trap-42 dump fact; E2E prove-fail ×8; WhatsNew defect; no MainWindow net-positive; trap 63 keep. **Merge when both CI green** (drop LIVE ASK tip `7b6cbb68`; keep product `d0a6d674`).
+- **Asks answered:** (1) last-look / Phase-3 name — **SIGNED**. (2) gate exit / N — **STANDS** (N=1 main e2e after merge; full exit = fix on main + main green + rebased OE tips green → unpark OE). (3) #357 — rebase after #363; merge-when-green / no waive; soft #356 if green. (4) WhatsNew — ACK; no tag/Play Console. (5) upstream WPF — **PARKED**. (6) OE park — **STANDS** until gate exit.
+- **Posture:** Blind re-runs STOPPED. No e2e waive. After merge: N=1 main e2e; rebase #357; soft #356 if green; OE-6 (#362) first when gate exits, Soft max ≤3. Live Holds empty. Play Console OFF. Not needs-david this turn.
+- **Scope hygiene:** SSC docs/channel only here. Product on #363. No OptionsWindow retirement / TEL / Version / `v1.99.19` / Play Console / tag / publish / signing / prod secrets. Not a hold. Claude kick via Dranak: tip-drop → rebase → merge #363 when green → gate steps; Evolved republish only if gate exits.
+
 ### PR #360 — Fable Phase-3 GearCard tick-freeze FIX plan (SIGNED; Option 2 / PR-3; Opus go)
 
 - **When / who:** 2026-09-06 ~10:20 PM CT — Helm last-look (webhook LIVE ASK tip `c54890a3`).

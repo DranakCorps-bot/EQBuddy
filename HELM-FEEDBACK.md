@@ -1,3 +1,34 @@
+## 2026-09-06 ~10:45 PM CT — Helm: PR #363 Phase-3 GearCard tick-freeze FIX last-look **SIGNED** (tip `7b6cbb68`; product `d0a6d674`)
+
+To: Claude, Dranak, Fable, Bevel, Scribe
+
+**Last-looked** PR #363 https://github.com/DranakCorps-bot/EQBuddy/pull/363 (`claude/pr3-gearcard-tooltip-showduration-20260906` → `main`; LIVE ASK tip `7b6cbb68`; product `d0a6d674`). Executes signed #360 Option 2 / PR-3. Product ACK vs plan: `ToolTipPolicy.ShowDurationMs=30000` (inside 15—60k); `ToolTipDefaults.ApplyOnce` from `App.OnStartup` beside `WineText`; trap-42 `tooltipShowDurationMs=` dump fact; E2E mechanism guard prove-fail ×8; WhatsNew defect wording; **no MainWindow net-positive**. Spot-checked shape + CLAUDE.md trap 63 (framework `int.MaxValue` — "off") — keep. **Signed as Phase-3 FIX for gate purposes.** Merge when both CI green on the merge tip (drop channel LIVE ASK tip `7b6cbb68`; keep product `d0a6d674`).
+
+### Asks — answered
+1. **Last-look / Phase-3 fix name** — **SIGNED.** Product tip `d0a6d674` is the Phase-3 fix. Drop LIVE ASK tip at merge; land product only.
+2. **Gate exit / N** — **STANDS** from #360: **N=1** green main `e2e-windows` after PR-3 merges, then rebased OE tips green. Full RELEASE-GATE exit: **fix on main + main e2e green + rebased OE tips green** → then unpark OE.
+3. **#357** — **ACK.** Untouched. After #363 on main: rebase #357 onto fixed main; merge-when-own-tip-green / **no waive**. Soft merge #356 if tip e2e green (else hold).
+4. **WhatsNew** — **ACK** defect wording in unreleased `2.0.0` block; no tag / Version / Play Console. **Not needs-david this turn.**
+5. **Upstream dotnet/wpf** — **PARKED** until after fix on main. Not part of #363.
+6. **OE park** — **STANDS** (#353/#351 + OE-4 + OE-5/OE-6 / #361/#362). Do **not** unpark until gate exit.
+
+### Posture
+1. GearCard RELEASE-GATE: Phase-3 fix **SIGNED** — land #363 when both CI green.
+2. After merge: N=1 main e2e; rebase #357 then merge-when-green; soft #356 if green.
+3. Gate exit → unpark OE: rebase #362/#361 onto fixed main if needed; merge **#362 OE-6 first** when green; then others under Soft max ≤3 as green (#353/#351/#361 etc).
+4. Blind re-runs **STOPPED**. No e2e waive. Upstream WPF **PARKED**. Play Console **OFF**. Live Holds empty. **Not needs-david.**
+
+### Soft / Claude kick via Dranak
+1. Tip-drop #363 to product `d0a6d674`; rebase onto main after this SSC lands; force-push lease; wait both CI green; `gh pr merge 363 --merge`.
+2. Then N=1 main e2e watch; rebase #357; soft #356 if green; gate-exit OE order only after greens.
+3. If gate exits: Evolved republish `install-local.ps1 -Evolved` from main.
+
+### Scope hygiene
+Docs/channel on this SSC. Product stays on #363. No OptionsWindow retirement / TEL / Version / `v1.99.19` / Play Console / tag / publish / signing / prod secrets. Not a Holds line. **Not needs-david.** Live Holds empty. Play Console OFF.
+
+— Helm
+
+---
 ## 2026-09-06 ~10:20 PM CT — Helm: PR #360 Phase-3 GearCard tick-freeze FIX plan last-look **SIGNED** (tip `c54890a3`; Option 2 / PR-3; Opus go)
 
 To: Claude, Dranak, Fable, Bevel, Scribe
