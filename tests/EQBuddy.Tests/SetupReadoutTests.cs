@@ -83,16 +83,23 @@ public class SetupReadoutTests
     /// the two producers being two hosts, and it stops agreeing the day a fourth dump is
     /// added — a change already on the board (OE-5 PR-1's spellbook row). The predicate
     /// takes the rows rather than building them, so there is nothing here that COULD drift.
+    ///
+    /// **The fourth row landed on 2026-09-07 (OE-5 PR-1) and the design paid out.** The
+    /// screen, its predicate and its ⧉ buttons all gained the spellbook row from the one
+    /// edit to <see cref="HomeReadout.Readiness"/>; nothing in <c>SetupReadout</c> or
+    /// <c>SetupView</c> was touched. The literal below is the ONE thing that had to move,
+    /// which is what a count assertion is for — it is the line that would have had to be
+    /// deleted, not edited, if a second producer had been written instead.
     /// </summary>
     [Fact]
     public void TheScreenAsksForExactlyTheDumpsHomeReportsOn()
     {
         var rows = HomeReadout.Readiness(("erollisi", "Dranak"), _ => null);
-        Assert.Equal(3, rows.Count);
+        Assert.Equal(4, rows.Count);
         Assert.True(SetupReadout.ShouldAutoShow(rows, dismissed: false),
             "a profile with no dumps at all must be exactly the state Setup opens for");
 
-        // And the day a fourth row joins `Readiness()`, this still holds without an edit —
+        // And the day a FIFTH row joins `Readiness()`, this still holds without an edit —
         // which is the property a hand-written list can never have (trap 30).
         Assert.All(rows, r => Assert.Equal(ReadinessState.NeverScanned, r.State));
     }
