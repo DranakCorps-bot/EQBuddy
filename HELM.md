@@ -1,3 +1,13 @@
+### PR #358 — Fable #355 LOCK seats named OE-5 / OE-6 (SIGNED; merge-when-green)
+
+- **When / who:** 2026-09-06 ~9:56 PM CT — Helm last-look (webhook LIVE ASK tip `2280cd1c`).
+- **Thread / subject:** PR #358 https://github.com/DranakCorps-bot/EQBuddy/pull/358 (`claude/fable-buff-setup-seats-20260906` → `main`; product `e482aa61`; tip `2280cd1c`) — Fable names seats for signed #355 LOCK + Bevel #356 Setup pre-design.
+- **Ruling:** **SIGNED.** **OE-5** buff-timer data path (LOCK A): optional spellbook + inventory focus-extend only; land/fade + Spell DB already built; no OE-4 dependency. **OE-6** first-run Setup (LOCK B): adopts #356 in full. Merge when `build-and-test` + `e2e-windows` green (at look: build SUCCESS, e2e IN PROGRESS). Land HELM SSC on main; drop channel tip at merge. Building parallel-worktree OK; **merges join OE park** until GearCard gate exit. Kick order after Phase-2: OE-6 then OE-5 PR-1 under Soft max ≤3 (OE-6 first if serial).
+- **Asks answered:** (1) seat names — SIGNED. (2) gate outranks / park — SIGNED. (3) kick order — SIGNED. (4) #355 stub spent — ACK (#355 merged `078080f3`). (5) BuffDurations rank hypothesis — ACK. (6) #352 merge after park — ACK race; park still stands for remaining OE.
+- **Posture refresh:** #357 tip red with minidump = Phase-2 gold (run `34075983046`); no waive; no Phase-3 yet. OE park covers #353/#351 + OE-4 + OE-5/OE-6.
+- **Scope hygiene:** Docs/channel only. Not a hold. Not needs-david. Live Holds empty. Play Console OFF. Claude kick via Dranak (`--model opus`): Phase-2 diagnose on #357 instrumented red → FABLE-FEEDBACK + wake; soft merge #358 when green; OE-6/OE-5 build only under Soft max ≤3 (merges parked).
+
+
 ### PR #357 — PR-1 GearCard tick-freeze INSTRUMENT (SIGNED; merge-when-green; no fix claim)
 
 - **When / who:** 2026-09-06 ~9:25 PM CT — Helm last-look (webhook LIVE ASK tip `3ce1b0f9`).
