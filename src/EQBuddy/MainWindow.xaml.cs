@@ -1690,7 +1690,7 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
             {
                 _creatureWindow = null;
                 _creatureHost.WindowClosed();
-                _hudExpandBar.CreatureWindowClosed();   // OE-9: the Kills chip's ⧉ lands here
+                _hudExpandBar.CreatureWindowClosed();   // OE-9: the Kills chip's pop-out lands here
                 _killsCard?.Sync();
             };
         }
@@ -3914,7 +3914,7 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
         {
             if (ReferenceEquals(_worldWindow, w)) _worldWindow = null;
             _worldHost.WindowClosed();
-            _hudExpandBar.WorldWindowClosed();   // OE-9: the Deaths chip's ⧉ lands here
+            _hudExpandBar.WorldWindowClosed();   // OE-9: the Deaths chip's pop-out lands here
         };
         _worldWindow = w;
         if (tab is { } t3) w.SetTab(t3);

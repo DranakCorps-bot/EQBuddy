@@ -1360,6 +1360,78 @@ $Shots = [ordered]@{
                                'Your skin glows with a pale greenish tint.'
                                'Sanctari begins casting Aegolism.'
                                'You are filled with the power of Aegolism.') }
+    # ============================ OE-9: THE REST OF THE TRAY ==========================
+    # `HudExpandTarget` went from seven members to twelve — the owner's ~1:29 PM CT amend
+    # (2026-09-07): everything on the minimized bar peeks and pops out. Five surfaces that
+    # nothing else in this file photographs, so five shots (trap 22: a surface with no
+    # fixture state cannot be reviewed and reads as reviewed anyway).
+    #
+    # **Two of them are STAGED rather than inherited, because the fixture has neither.** A
+    # `grep` for "feels alive with power" (the item-proc line `ItemProcRx` matches) and for
+    # "have been slain" both come back ZERO — so left alone, `hud-expand-procs` and
+    # `-deaths` would be two more pictures of the empty-state layout `hud-expand-watch`
+    # already covers, which is the reviewable half missing exactly where the new code is.
+    # `AppendLive` supplies the lines.
+    #
+    # PREDICTIONS, written before the first run (trap 23) — each number grepped out of the
+    # fixture rather than assumed:
+    #   * `hud-expand-kills` — Skull vector, "Kills"; subtext "Session · 82 kills · N.N/hr"
+    #     (the mini bar's own Kills cell reads 82 in `mini-bar-chips`' recorded result, so
+    #     this is a cross-check as well as a prediction); FIVE bar rows, biggest first, each
+    #     value a bare count, then "…and N more — ↗ for the full list".
+    #   * `hud-expand-money` — Coin vector, "Coin"; subtext "Session · <coin> · <coin>/hr";
+    #     FOUR rows and no fifth — Looted / Sold to vendors / Total / Per hour — with NO
+    #     gauge on any of them, because this is one figure broken into its parts rather than
+    #     a ranking. There is coin: thirty "You receive N silver … from the corpse" lines.
+    #   * `hud-expand-motes` — Sparkle vector, "Motes"; ONE row, "Mote of Infinitesimal
+    #     Potential", because the fixture carries exactly one mote line. Its gauge is full
+    #     (it is the only tier) and the subtext carries #154's potency/hr.
+    #   * `hud-expand-procs` — Bolt vector, "Weapon procs"; ONE row for the staged
+    #     "Polished Mithril Mask (Exaltation)" proc, "×1 · N/min · 0 dmg" — zero damage
+    #     because the staged line has no damage line behind it, which is a true state and
+    #     the honest thing to photograph rather than faking a hit.
+    #   * `hud-expand-deaths` — Skull vector (deaths share it with kills — worth LOOKING at,
+    #     since the two panels are then told apart only by their titles), "Deaths"; subtext
+    #     "Session · 2 deaths"; TWO rows, newest first, each a killer name and a wall clock.
+    # A panel that is all empty-state text on any of the five is a staging bug until proven
+    # otherwise.
+    'hud-expand-kills' = @{ Title = 'EQBuddy HUD Panel'
+                           Env = @{ EQBUDDY_HUDEXPAND = 'kills' }
+                           Set = @{ Minimized = $true
+                                    DisabledBreakouts = @('Damage','Healing','Pet','Watch','Loot','Buffs')
+                                    MiniStats = @('kills','loot') } }
+    'hud-expand-money' = @{ Title = 'EQBuddy HUD Panel'
+                           Env = @{ EQBUDDY_HUDEXPAND = 'money' }
+                           Set = @{ Minimized = $true
+                                    DisabledBreakouts = @('Damage','Healing','Pet','Watch','Loot','Buffs')
+                                    MiniStats = @('kills','money') } }
+    'hud-expand-motes' = @{ Title = 'EQBuddy HUD Panel'
+                           Env = @{ EQBUDDY_HUDEXPAND = 'motes' }
+                           Set = @{ Minimized = $true
+                                    DisabledBreakouts = @('Damage','Healing','Pet','Watch','Loot','Buffs')
+                                    MiniStats = @('kills','motes') } }
+    'hud-expand-procs' = @{ Title = 'EQBuddy HUD Panel'
+                           Env = @{ EQBUDDY_HUDEXPAND = 'procs' }
+                           Set = @{ Minimized = $true
+                                    DisabledBreakouts = @('Damage','Healing','Pet','Watch','Loot','Buffs')
+                                    MiniStats = @('kills','procs') }
+                           # `ItemProcRx`'s exact shape, from its own doc comment (Kerdude's
+                           # spellblade snippet, #85). The fixture has none, and a peek with
+                           # nothing in it cannot be reviewed.
+                           AppendLive = @(
+                               'Your Polished Mithril Mask (Exaltation) feels alive with power.') }
+    'hud-expand-deaths' = @{ Title = 'EQBuddy HUD Panel'
+                           Env = @{ EQBUDDY_HUDEXPAND = 'deaths' }
+                           Set = @{ Minimized = $true
+                                    DisabledBreakouts = @('Damage','Healing','Pet','Watch','Loot','Buffs')
+                                    MiniStats = @('kills','deaths') }
+                           # BOTH death shapes EQ Legends writes (LogParser's own note): the
+                           # named killer and the killer-less DoT form, which is the one that
+                           # went uncounted entirely until it was parsed. Two rows also mean
+                           # the newest-first order is visible, which one row could not show.
+                           AppendLive = @(
+                               'You have been slain by a giant spider!'
+                               'You died.') }
     # THE BAR ITSELF, with OE-7's chips on it — `mini-bar` above photographs the pre-promotion
     # ten-cell profile and does not carry the buff star, which is the one cell that had never
     # existed before this seat.
@@ -1381,6 +1453,15 @@ $Shots = [ordered]@{
     # apart in the capture — which is the reading a reviewer would also get, and the reason
     # it is worth saying here rather than leaving the next person to squint. The mix reads as
     # one row; the borders group without shouting.
+    #
+    # **OE-9 RETIRES THE MIX, so both paragraphs above are the record of what the committed
+    # image shows rather than a live prediction.** Every cell on the bar is an expansion chip
+    # now (the owner's ~1:29 PM CT amend), so there is no un-bordered cell left for Kills to
+    # be: NEW PREDICTION is the name slot, then six bordered chips and NO hairline divider
+    # anywhere. That is a real question for this shot rather than a formality — the reason
+    # the old mix was worth photographing was that two shapes might jostle, and the reason
+    # this one is, is that six borders in a row might read as a toolbar. It needs re-shooting
+    # and LOOKING at, not just re-running.
     'mini-bar-chips'  = @{ Title = 'EQBuddy'
                            Env = @{}
                            Set = @{ Minimized = $true

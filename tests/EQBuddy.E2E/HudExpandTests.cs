@@ -115,37 +115,68 @@ public sealed class HudExpandTests
     }
 
     /// <summary>
-    /// OE-7's four new targets reach the screen, on the same model as the three that shipped.
+    /// EVERY TARGET THAT IS NOT THE SHIPPED TRIO reaches the screen, on the same model —
+    /// OE-7's four, and OE-9's five.
     ///
     /// **The panel BODY is what is asserted, not just that a panel appeared.** Each of these
-    /// four draws through a different builder — <c>LivePresentation.Meter</c> for Pet,
-    /// <c>HudExpandPeek</c> for the other three — and a target wired to the wrong body is
-    /// exactly the failure that renders perfectly and photographs as a correct screenshot of
-    /// the wrong feature (trap 24's shape one layer in). `hudExpandRows` at 1 or more tells a
-    /// drawn row from the empty state, which is the half a picture cannot settle.
+    /// draws through a different builder — <c>LivePresentation.Meter</c> for Pet,
+    /// <c>HudExpandPeek</c> for the rest — and a target wired to the wrong body is exactly the
+    /// failure that renders perfectly and photographs as a correct screenshot of the wrong
+    /// feature (trap 24's shape one layer in). `hudExpandRows` at 1 or more tells a drawn row
+    /// from the empty state, which is the half a picture cannot settle.
     ///
     /// The prediction, written before it ran (trap 23) — **and the Pet row is here because it
-    /// was WRONG the first time, which is the point of writing one down.** Pet has rows; Loot is
-    /// TARGET-scoped (#392): no /consider → no-target empty (0 rows), never session drops. Pet:
-    /// the fixture has a CHARMED pet (the
-    /// `hud-expand-dps` capture carries a "Pet (Giant spider)" row, which is what settled it).
-    /// A `grep -i pet` over the fixture finds nothing but "You cannot have more than one pet
-    /// at a time" and reads as "no pet", because a pet is named rather than called one — and
-    /// that is what the first version of this test asserted. Watch and Buffs genuinely have
-    /// none: nothing is pinned in this profile and no buff is up.
+    /// was WRONG the first time, which is the point of writing one down.** Pet has rows: the
+    /// fixture has a CHARMED pet (the `hud-expand-dps` capture carries a "Pet (Giant spider)"
+    /// row, which is what settled it). A `grep -i pet` over the fixture finds nothing but "You
+    /// cannot have more than one pet at a time" and reads as "no pet", because a pet is named
+    /// rather than called one — and that is what the first version of this test asserted.
+    /// Watch and Buffs genuinely have none: nothing is pinned in this profile and no buff is
+    /// up. **Loot is TARGET-scoped since #392** and the fixture's trailing lines are past
+    /// `TargetLinger`, so it ends with no target at all — 0 rows, never session drops. That
+    /// was not predicted, it was MEASURED: `hud-expand-loot` came back byte-identical to
+    /// `hud-expand-loot-notarget` until a /consider was staged into it.
     ///
     /// The mismatch was settled by the `hudExpandBody` fact rather than by re-reasoning
     /// (trap 33's closing line: ship the instrument before the third theory). "Pet drew five
     /// rows" is equally consistent with a correct Pet panel and with the Damage meter under a
     /// Pet header — five is also `MaxRows` against this fixture's eleven damage sources — and
     /// nothing else in the dump could tell those apart.
+    ///
+    /// **OE-9's five, predicted from the fixture BEFORE the run rather than from what it
+    /// happened to report** — each one grepped, because "a melee log surely has procs" is the
+    /// kind of confident guess that made the Pet row wrong:
+    /// <list type="bullet">
+    /// <item>`kills` — ROWS. It is what this session IS.</item>
+    /// <item>`money` — ROWS (four facts). Thirty "You receive N silver … from the corpse"
+    /// lines, so the coin total cannot be zero.</item>
+    /// <item>`motes` — ROWS. Exactly ONE mote line ("a Mote of Infinitesimal Potential"), so
+    /// one tier row; asserted at 1 or more rather than exactly 1, because the row count is
+    /// about the WIRING and the exact tally belongs to the unit tests.</item>
+    /// <item>`procs` — EMPTY, and this is the one worth stating. `ItemProcRx` matches
+    /// "Your &lt;item&gt; feels alive with power." and the fixture contains that string zero
+    /// times, so the honest prediction is the empty state. Asserting a row here would have
+    /// been a red test blaming a correct feature.</item>
+    /// <item>`deaths` — EMPTY. Not one "have slain you" in the log; the farming session went
+    /// well.</item>
+    /// </list>
+    ///
+    /// **`loot` LEFT this theory** — it is target-scoped now, so what it draws depends on
+    /// where the replay settles rather than on the session, and
+    /// <see cref="TheLootPeekShowsTargetDropsAndSaysSoWhenThereIsNoTarget"/> stages its state
+    /// instead of predicting it.
     /// </summary>
     [Theory]
     [InlineData("loot", 0)]
     [InlineData("pet", 1)]
     [InlineData("watch", 0)]
     [InlineData("buffs", 0)]
-    public void TheFourNewTargetsDrawTheirOwnBody(string key, int minimumRows)
+    [InlineData("kills", 1)]
+    [InlineData("money", 1)]
+    [InlineData("motes", 1)]
+    [InlineData("procs", 0)]
+    [InlineData("deaths", 0)]
+    public void EveryNonTrioTargetDrawsItsOwnBody(string key, int minimumRows)
     {
         using var app = new AppHarness(settings =>
         {
@@ -171,5 +202,45 @@ public sealed class HudExpandTests
         else
             app.WaitForDump("hudExpandRows", 0,
                 $"the {key} panel to draw its empty state — the fixture has no {key}");
+    }
+
+    /// <summary>
+    /// OE-9 lock 2: THE LOOT PEEK IS TARGET-SCOPED, and with no target it says so instead of
+    /// falling back to the session.
+    ///
+    /// **The no-target state is STAGED rather than hoped for.** `ShowTargetDrops = false` is
+    /// what makes `TargetDropsContent` return no target on every tick — the same gate the Loot
+    /// float's Target view passes through — so this does not depend on where in the fixture's
+    /// pull the replay happens to settle. Left on, the fixture ends inside a melee session and
+    /// the panel would show whatever was last swung at, which is a real state and a different
+    /// test.
+    ///
+    /// **`hudExpandEmpty` is what makes it an assertion at all** (trap 20): the session slice
+    /// this replaced would have drawn 39 rows here, but so would a target with drops, and
+    /// `hudExpandRows=0` alone cannot tell "select a target" from "this creature has no known
+    /// drops". `hudExpandBody=loot` is the positive event on the far side of the decision — it
+    /// is written only where the loot body is BUILT — so nothing here is a bare zero asked one
+    /// moment too early (trap 62).
+    /// </summary>
+    [Fact]
+    public void TheLootPeekShowsTargetDropsAndSaysSoWhenThereIsNoTarget()
+    {
+        using var app = new AppHarness(settings =>
+        {
+            settings.Minimized = true;
+            settings.MiniStats = ["kills"];
+            settings.DisabledBreakouts =
+                ["Damage", "Healing", "Pet", "Watch", "Loot", "Buffs"];
+            settings.DefaultRulesVersion = int.MaxValue;
+            settings.TrackedRules.Clear();
+            settings.ShowTargetDrops = false;
+        }, new Dictionary<string, string> { ["EQBUDDY_HUDEXPAND"] = "loot" });
+        app.Launch();
+
+        app.WaitForDump("hudExpand", "loot", "the loot chip's panel to be the one showing");
+        app.WaitForDump("hudExpandBody", "loot", "the loot builder to be what drew the rows");
+        app.WaitForDump("hudExpandEmpty", "notarget",
+            "the no-target line rather than a session fallback");
+        app.WaitForDump("hudExpandRows", 0, "and no rows under it");
     }
 }
