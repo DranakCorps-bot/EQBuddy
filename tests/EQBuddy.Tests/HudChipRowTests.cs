@@ -240,6 +240,85 @@ public class HudChipRowTests
             hudLeft: -1400, hudTop: 100, hudHeight: 60, rowHeight: 24,
             workAreaTop: 0, workAreaBottom: 1000).Left);
 
+    // ---- The under-bar panel's X anchor (owner repro, 2026-09-07 ~3:50 PM CT) ----
+    //
+    // THE BUG THESE PIN: the panel took its Left from `Placement`, which answers with the
+    // WIDGET's left edge — so it docked under the LEFTMOST tray chip whichever chip the
+    // pointer was on. Every row below fails on the pre-fix arithmetic except the two that
+    // assert the old answer is still what "no chip" means.
+
+    /// <summary>The panel's left edge is the HOVERED chip's, not the bar's. 312 is a chip
+    /// well right of the first one; the pre-fix answer for it was 100.</summary>
+    [Fact]
+    public void ThePanelAnchorsUnderTheHoveredChip()
+        => Assert.Equal(100 + 312, HudChipRow.AnchoredLeft(
+            hudLeft: 100, chipOffsetX: 312, panelWidth: 300,
+            areaLeft: 0, areaRight: 1920));
+
+    /// <summary>Two chips, two anchors — the whole of the report. A rule that returned the
+    /// same number for both would be the shipped bug, and an equality on one chip alone
+    /// cannot see it.</summary>
+    [Fact]
+    public void TwoChipsPutThePanelInTwoPlaces()
+        => Assert.NotEqual(
+            HudChipRow.AnchoredLeft(100, chipOffsetX: 96, panelWidth: 300, 0, 1920),
+            HudChipRow.AnchoredLeft(100, chipOffsetX: 312, panelWidth: 300, 0, 1920));
+
+    /// <summary>No chip to anchor to — the bar has not drawn, the hook fired early, the
+    /// target has no cell — answers the widget's edge, which is byte-for-byte what shipped
+    /// before this change. "We cannot tell yet" and "draw where you always drew" are the same
+    /// instruction, exactly as they are for an unmeasured height in
+    /// <see cref="HudChipRow.Placement"/>.</summary>
+    [Theory]
+    [InlineData(double.NaN)]
+    [InlineData(0d)]
+    [InlineData(-4d)]
+    public void WithNoChipItIsTheOldBarLeftAnswer(double chipOffsetX)
+        => Assert.Equal(100, HudChipRow.AnchoredLeft(
+            hudLeft: 100, chipOffsetX: chipOffsetX, panelWidth: 300,
+            areaLeft: 0, areaRight: 1920));
+
+    /// <summary>A chip near the right edge slides the panel left just enough to fit. A panel
+    /// hanging off the screen is the same defect as a chicklet that never drew — and it is
+    /// the one this feature could not have before, since the bar's own left edge was always
+    /// where the widget already was.</summary>
+    [Fact]
+    public void ARightHandChipSlidesThePanelBackOntoTheMonitor()
+        => Assert.Equal(1920 - 300, HudChipRow.AnchoredLeft(
+            hudLeft: 1500, chipOffsetX: 380, panelWidth: 300,
+            areaLeft: 0, areaRight: 1920));
+
+    /// <summary>An anchor that is not on the area it was handed is LEFT ALONE. That area is
+    /// some other monitor — the primary's, when a window has no presentation source to ask —
+    /// and clamping to it would tear the panel off the chip and onto a screen the widget is
+    /// not on. Same reasoning <see cref="HudChipRow.Placement"/> gives for refusing to clamp
+    /// horizontally at all.</summary>
+    [Fact]
+    public void AnAnchorOnAnotherMonitorIsNeverClamped()
+        => Assert.Equal(-1400 + 200, HudChipRow.AnchoredLeft(
+            hudLeft: -1400, chipOffsetX: 200, panelWidth: 300,
+            areaLeft: 0, areaRight: 1920));
+
+    /// <summary>A work area narrower than the panel has no room to clamp INTO, so the chip
+    /// wins: the alternative is pinning every panel to the same edge and calling it
+    /// placement.</summary>
+    [Fact]
+    public void AWorkAreaNarrowerThanThePanelDoesNotClamp()
+        => Assert.Equal(100 + 200, HudChipRow.AnchoredLeft(
+            hudLeft: 100, chipOffsetX: 200, panelWidth: 300,
+            areaLeft: 0, areaRight: 250));
+
+    /// <summary>A width that is not real yet — the first layout pass — anchors without a
+    /// clamp rather than refusing to anchor. The panel is under the right chip on the frame
+    /// it appears, and the clamp arrives with the measurement.</summary>
+    [Theory]
+    [InlineData(0d)]
+    [InlineData(double.NaN)]
+    public void AnUnmeasuredPanelStillAnchors(double panelWidth)
+        => Assert.Equal(100 + 900, HudChipRow.AnchoredLeft(
+            hudLeft: 100, chipOffsetX: 900, panelWidth: panelWidth,
+            areaLeft: 0, areaRight: 1920));
+
     // ---- The family builders, lifted out of MainWindow with the row ----
 
     private static readonly DateTime T0 = DateTime.Parse("2026-09-05T12:00:00");

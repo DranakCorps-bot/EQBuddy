@@ -247,4 +247,106 @@ public sealed class HudExpandTests
             "the no-target line rather than a session fallback");
         app.WaitForDump("hudExpandRows", 0, "and no rows under it");
     }
+
+    // ---- THE ANCHOR (owner repro, 2026-09-07 ~3:50 PM CT) ----------------------------
+    //
+    // *"The peek/expand panel always docks under the LEFTMOST tray chip, not under the chip
+    // actually hovered."* The unit half is `HudChipRowTests`' `AnchoredLeft` rows — the
+    // arithmetic, with no window. These two are the half that says a running app puts the
+    // window there, which trap 42 cost two builds to learn is a different claim.
+    //
+    // **Nothing here asserts the desk.** All three facts are offsets from the WIDGET's own
+    // left edge and the assertions are RELATIONSHIPS between them, so a 1024×768 hosted
+    // runner and a 4K desk answer the same. The widget is seeded near the top-left for one
+    // reason: a bar hard against the right edge would put the monitor clamp between the chip
+    // and the panel, which is a real rule with its own unit rows and not what these prove.
+
+    /// <summary>
+    /// A MID/RIGHT chip's peek docks the panel under THAT chip — the owner's repro, stated
+    /// as the two things that have to be true at once.
+    ///
+    /// `hudPanelAnchor == hudChipAnchor` is "the panel is under the chip". On its own it
+    /// could not fail the shipped bug's other reading, so `hudPanelAnchor > hudChipAnchorFirst`
+    /// is beside it: the leftmost expansion chip is where every panel used to open, and a test
+    /// that only knew where the panel IS could not say it was not still opening there (trap
+    /// 20 — what is being asserted is the thing that is not there). Both are read off ONE
+    /// dump line, so the two numbers come from one moment (trap 56).
+    ///
+    /// THE PREDICTION, written before it ran: three starred cells put the Deaths chip at the
+    /// right-hand end of the bar, well past the DPS chip that sits second in the trio.
+    /// </summary>
+    [Fact]
+    public void PeekingARightHandChipDocksThePanelUnderThatChipAndNotTheFirstOne()
+    {
+        using var app = new AppHarness(settings =>
+        {
+            settings.Minimized = true;
+            // Three cells, so the hovered chip is nowhere near the bar's left edge — the
+            // whole point of the repro. Deaths is last in MiniBarPresentation.Order.
+            settings.MiniStats = ["kills", "loot", "deaths"];
+            settings.DisabledBreakouts =
+                ["Damage", "Healing", "Pet", "Watch", "Loot", "Buffs"];
+            settings.DefaultRulesVersion = int.MaxValue;
+            settings.TrackedRules.Clear();
+            settings.WindowLeft = 20;
+            settings.WindowTop = 20;
+        }, new Dictionary<string, string> { ["EQBUDDY_HUDEXPAND"] = "deaths:peek" });
+        app.Launch();
+
+        app.WaitForDump("hudExpand", "deaths", "the deaths chip's panel to be the one showing");
+        app.WaitForDump("hudExpandPanel", 1, "the companion window to be on screen");
+        // The positive events on the far side of the decision: the bar has measured the chip
+        // and the panel has been placed. Waiting for these rather than reading straight after
+        // Launch is what keeps the comparison below from being asked a moment too early
+        // (trap 62) — a panel that has not been parked yet reports -1, not a wrong number.
+        app.WaitForDumpAtLeast("hudChipAnchor", 1, "the bar to report where the Deaths chip is");
+        app.WaitForDumpAtLeast("hudPanelAnchor", 1, "the panel to have been placed");
+
+        var facts = app.DumpValues("hudPanelAnchor", "hudChipAnchor", "hudChipAnchorFirst");
+        var (panel, chip, first) = (facts[0], facts[1], facts[2]);
+        Assert.True(panel == chip,
+            $"the panel should sit under the chip it was opened from " +
+            $"(hudPanelAnchor={panel}, hudChipAnchor={chip})");
+        Assert.True(panel > first,
+            $"the panel should NOT dock under the leftmost chip " +
+            $"(hudPanelAnchor={panel}, hudChipAnchorFirst={first})");
+    }
+
+    /// <summary>
+    /// …and the LEFTMOST chip still opens where it always did. The fix moves the panel to
+    /// whichever chip was hovered, so the first chip's own peek has to keep answering the bar
+    /// edge it answered before — otherwise "anchor to the hovered cell" would have been
+    /// "anchor to something else", which is the same bug pointing the other way.
+    ///
+    /// It is also the negative the test above needs: two chips, two anchors. A rule that
+    /// returned one number for every target would pass one of these and fail the other,
+    /// whichever number it picked.
+    /// </summary>
+    [Fact]
+    public void PeekingTheFirstChipStillDocksUnderTheFirstChip()
+    {
+        using var app = new AppHarness(settings =>
+        {
+            settings.Minimized = true;
+            settings.MiniStats = ["kills", "loot", "deaths"];
+            settings.DisabledBreakouts =
+                ["Damage", "Healing", "Pet", "Watch", "Loot", "Buffs"];
+            settings.DefaultRulesVersion = int.MaxValue;
+            settings.TrackedRules.Clear();
+            settings.WindowLeft = 20;
+            settings.WindowTop = 20;
+        }, new Dictionary<string, string> { ["EQBUDDY_HUDEXPAND"] = "dps:peek" });
+        app.Launch();
+
+        app.WaitForDump("hudExpand", "dps", "the DPS chip's panel to be the one showing");
+        app.WaitForDump("hudExpandPanel", 1, "the companion window to be on screen");
+        app.WaitForDumpAtLeast("hudChipAnchor", 1, "the bar to report where the DPS chip is");
+        app.WaitForDumpAtLeast("hudPanelAnchor", 1, "the panel to have been placed");
+
+        var facts = app.DumpValues("hudPanelAnchor", "hudChipAnchor", "hudChipAnchorFirst");
+        var (panel, chip, first) = (facts[0], facts[1], facts[2]);
+        Assert.True(panel == chip && chip == first,
+            $"the DPS chip is the leftmost expansion chip and its panel opens under it " +
+            $"(hudPanelAnchor={panel}, hudChipAnchor={chip}, hudChipAnchorFirst={first})");
+    }
 }

@@ -59,6 +59,54 @@ internal sealed class HudBarView
     /// panel, because a panel count would include the trio's own separator chrome.</summary>
     public int CellCount { get; private set; }
 
+    // ---- WHICH CHIP THE PANEL HANGS UNDER (the ~3:50 PM CT anchor fix) ----
+    //
+    // The under-bar panel used to open at the WIDGET's left edge, so it docked under the
+    // leftmost chip whichever one was hovered. What it needs is the hovered chip's own
+    // offset, and the bar is the only thing that knows where its chips are.
+    //
+    // **ONE field, written in two places, with a stated precedence — not two sources for
+    // one fact (trap 4).** `ExpandChip` records the FIRST chip built for a target, which is
+    // what answers for the `EQBUDDY_HUDEXPAND` hook and for any path that has a target and
+    // no pointer; a real `MouseEnter` overwrites it with the chip actually under the cursor,
+    // which is the only thing that can tell four Watch chips apart (they all share one
+    // target). Cleared at the top of every `Render`, and re-armed by the same tick's enter —
+    // the pointer resting on a chip leaves the OLD element and enters the NEW one once per
+    // second, which is the behaviour `HudExpandWindow.Reveal` already guards against.
+
+    private readonly Dictionary<HudExpandTarget, FrameworkElement> _chips = [];
+    private FrameworkElement? _firstChip;
+
+    /// <summary>
+    /// A target's chip offset from the widget's left edge, in <c>Window.Left</c>'s own units,
+    /// or NaN when this bar has no chip for it (the third slot is HPS and Progress was asked
+    /// for; the hook fired before the bar drew; the widget is not minimized at all).
+    ///
+    /// **The transform is the framework's, so trap 1 cannot happen here**: the bar's content
+    /// sits under the widget's UI-scale <c>LayoutTransform</c> and
+    /// <see cref="Visual.TransformToAncestor"/> walks it, so what comes back is in the same
+    /// DIP space as <c>Window.Left</c> rather than in pre-scale units. NaN is the honest
+    /// answer for "cannot tell", and <see cref="HudChipRow.AnchoredLeft"/> reads it as "draw
+    /// where you always drew".
+    /// </summary>
+    public double AnchorOf(HudExpandTarget target) =>
+        _chips.TryGetValue(target, out var chip) ? OffsetOf(chip) : double.NaN;
+
+    /// <summary>The LEFTMOST expansion chip's offset — the answer the panel used to give for
+    /// every target, and therefore the one an assertion has to be able to compare against
+    /// (the <c>hudChipAnchorFirst</c> dump fact). A test that only knew where the panel IS
+    /// could not say it was not still docking under the first chip.</summary>
+    public double FirstAnchor => _firstChip is { } chip ? OffsetOf(chip) : double.NaN;
+
+    private static double OffsetOf(FrameworkElement chip)
+    {
+        if (!chip.IsVisible || Window.GetWindow(chip) is not { } window) return double.NaN;
+        // A chip from a previous render that has already been detached measures nothing and
+        // throws rather than answering; NaN is what "cannot tell" is spelled as here.
+        try { return chip.TransformToAncestor(window).Transform(default).X; }
+        catch (InvalidOperationException) { return double.NaN; }
+    }
+
     /// <summary>Which number the glance's third slot currently is. Held here because the
     /// swap has hysteresis: <see cref="HudGlance"/> is a pure decision and needs to be
     /// told what it decided last time. Also the <c>hudGlance</c> dump fact.</summary>
@@ -286,7 +334,12 @@ internal sealed class HudBarView
         else chip.Background = System.Windows.Media.Brushes.Transparent;
         chip.SetResourceReference(Border.BorderBrushProperty,
             lit ? "AccentBrush" : "HairlineBrush");
-        chip.MouseEnter += (_, _) => _expand.Hover(target);
+        // WHERE THE PANEL HANGS FROM. The first chip built for a target answers for the
+        // pointer-less paths; the pointer, when there is one, names the chip itself — see
+        // the field's own note above for why both write one field.
+        _chips.TryAdd(target, chip);
+        _firstChip ??= chip;
+        chip.MouseEnter += (_, _) => { _chips[target] = chip; _expand.Hover(target); };
         chip.MouseLeave += (_, _) => _expand.Away();
         // The double-click stays behind its own opt-in, exactly as it was: OE-1 does not
         // touch DoubleClickChipsToggleBreakouts, and honouring the gesture for a player who
@@ -414,6 +467,11 @@ internal sealed class HudBarView
     public void Render(StatsSnapshot s, string? characterName)
     {
         _host.Children.Clear();
+        // The anchors belong to the elements this render is about to replace: a chip from
+        // last tick is detached and can only answer NaN, which would drop the panel back to
+        // the widget's edge for one tick every second.
+        _chips.Clear();
+        _firstChip = null;
         // FIRST, and unconditionally: the three numbers that no longer have a toggle.
         RenderGlance(s, characterName);
         // Which cells, in which order, with which icon and what each reads: all from

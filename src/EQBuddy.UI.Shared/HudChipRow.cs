@@ -389,6 +389,11 @@ public static class HudChipRow
     /// the bottom of the work area it goes ABOVE the widget instead: a chicklet half off
     /// the screen is the same defect as one that never drew.
     ///
+    /// **The under-bar PANEL takes its Left from <see cref="AnchoredLeft"/> instead** — it
+    /// hangs off one CHIP and the row hangs off the whole bar, which is a difference this
+    /// method has no chip to express. Everything else about where that panel goes, the
+    /// vertical flip included, is still this arithmetic.
+    ///
     /// **One unit space, the caller's, used consistently** (trap 1). WPF hands DIPs
     /// throughout — <c>Window.Left/Top/ActualHeight</c> and <c>SystemParameters.WorkArea</c>
     /// agree there — and nothing under the widget's UI-scale transform is involved: this
@@ -416,6 +421,59 @@ public static class HudChipRow
     }
 
     private static double Real(double v) => double.IsFinite(v) ? v : 0;
+
+    /// <summary>
+    /// WHERE THE UNDER-BAR PANEL'S LEFT EDGE GOES — under the CHIP that was hovered, not
+    /// under the bar.
+    ///
+    /// **This is a bug fix, not a preference** (owner repro, 2026-09-07 ~3:50 PM CT: *"the
+    /// peek/expand panel always docks under the leftmost tray chip, not under the chip
+    /// actually hovered"*). <see cref="Placement"/> answers with <c>hudLeft</c> — the
+    /// WIDGET's left edge — which was exact while the panel was the only thing hanging off
+    /// the bar and became wrong the moment every tray cell grew a peek (OE-9): twelve chips
+    /// spread across the bar, one panel, and it opened under the first of them every time.
+    /// The vertical half of the question is unchanged and still <see cref="Placement"/>'s;
+    /// only the horizontal one moved, because only the horizontal one has a chip in it.
+    ///
+    /// **<paramref name="chipOffsetX"/> is the chip's own offset from the widget's left edge,
+    /// in the caller's units** (DIPs — the caller reads it through a visual transform, so the
+    /// widget's UI-scale <c>LayoutTransform</c> is already accounted for and no pixel
+    /// arithmetic happens here or there; trap 1). A value that is not real yet — no chip for
+    /// this target, a bar that has not laid out, a target reached by the
+    /// <c>EQBUDDY_HUDEXPAND</c> hook before the bar drew — answers <paramref name="hudLeft"/>,
+    /// which is exactly what shipped before this change: "we cannot tell yet" and "draw where
+    /// you always drew" are the same instruction, the same way an unmeasured height does not
+    /// flip in <see cref="Placement"/>.
+    ///
+    /// **The clamp keeps a right-hand chip's panel on the monitor, and REFUSES to act when
+    /// the anchor is not on the area it was handed.** A panel hanging off the right edge is
+    /// the same defect as a chicklet half off the screen; but <see cref="Placement"/> declines
+    /// to clamp horizontally at all, on purpose, because a negative Left is legitimate on a
+    /// multi-monitor desk and the primary monitor's area would yank a secondary-monitor panel
+    /// away from the bar it belongs to. Both facts survive here: the caller passes the
+    /// WIDGET's own monitor (<c>ScreenGuard.WorkAreaAt</c>), and an anchor outside the area it
+    /// was given is taken as evidence that the area is not this window's monitor — so it is
+    /// left alone rather than dragged onto one.
+    /// </summary>
+    /// <param name="hudLeft">The widget's left edge — the answer when there is no chip.</param>
+    /// <param name="chipOffsetX">The hovered chip's offset from that edge, or NaN.</param>
+    /// <param name="panelWidth">The panel's drawn width, for the right-edge clamp.</param>
+    /// <param name="areaLeft">Work-area left of the monitor the widget is on.</param>
+    /// <param name="areaRight">…and its right.</param>
+    public static double AnchoredLeft(
+        double hudLeft, double chipOffsetX, double panelWidth,
+        double areaLeft, double areaRight)
+    {
+        if (!double.IsFinite(chipOffsetX) || chipOffsetX <= 0) return hudLeft;
+        var anchor = hudLeft + chipOffsetX;
+        if (!double.IsFinite(panelWidth) || panelWidth <= 0) return anchor;
+        if (!double.IsFinite(areaLeft) || !double.IsFinite(areaRight)) return anchor;
+        if (areaRight - areaLeft < panelWidth) return anchor;
+        // Not on the area we were handed: that area is some other monitor, and clamping to it
+        // would tear the panel off the chip it is anchored to.
+        if (anchor < areaLeft || anchor > areaRight) return anchor;
+        return Math.Clamp(anchor, areaLeft, areaRight - panelWidth);
+    }
 
     // ---- FREE PLACEMENT (OE-8): NaN means SLAVED, a finite pair means PARKED ----
     //
