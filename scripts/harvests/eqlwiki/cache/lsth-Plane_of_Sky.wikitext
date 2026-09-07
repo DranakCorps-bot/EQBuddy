@@ -1,4 +1,4 @@
-{{Sky Era}}
+{{Classic Era}}
 [[File:planeofsky3.jpg|thumb|right|200px|Plane of Sky island progression map]]
 [[File:planeofsky.jpg|thumb|right|Plane of Sky map]]
 
@@ -204,11 +204,14 @@ This small island is home to [[the Hand of Veeshan]] and [[Eye of Veeshan]]. The
 [[Eye of Veeshan]] is the very last boss. The fight is pretty straightforward tank and spank, but the Eye can be difficult to land a slow on if you haven't mote-upgraded your spells. She spams lifetaps, which can make for occasionally unpredictable spikes of damage, so don't get comfortable letting your HP get too low. When engaged in a solo instance at diff 0, she has 32000 HP. 
 
 == Plane of Sky Class Quests ==
+
+:''Main article: [[Plane of Sky Tests]]''
+
 These are the various class quests, and in general, completing all of these quests will unlock the respective class as a Primary Class option in your loadouts.  The EQ Legends team simplified these quests a bit from Classic to need various wind runes and one or two specific items.  The wind runes drop from all mobs in the Plane of Sky, and many players simply farm the trash mobs on one of the early islands.
 
 === Quest Givers ===
 
-After entering the [[Plane of Sky]], you can access the Efreeti Chamber with all of the quest givers.
+After entering the [[Plane of Sky]], you can access the Efreeti Chamber with all of the quest givers and a banker.
 
 First, find the '''[[Key Master]]''' near where you zoned in on island 1 and purchase an [[Efreeti's Key]]. It is free and looks like a [[Jade]].
 
@@ -216,7 +219,7 @@ First, find the '''[[Key Master]]''' near where you zoned in on island 1 and pur
 
 After you have the key left click on the teleportation pad at the North point of the island, around {{Loc|Plane of Sky| 1600, 520}}.
 
-From there find Efreeti for your class based on the details below. You can hail them and use the keyword for each test if you want to confirm your items before handing them in.
+There's an Efreeti quest NPC for each class. You can hail them and use the keyword for each test if you want to confirm your items before handing them in.
 
 === [[Bard]] Tests ===
 
@@ -224,8 +227,9 @@ From there find Efreeti for your class based on the details below. You can hail 
 
 {| class="eoTable3"
 |-
-! Quest || Trigger Phrases || Rune || Quest Items || Reward
+! Reward || Quest || Trigger Phrases || Rune || Quest Items
 |-
+| {{:Mask of Song}}
 | Bard Test of Tone
 | tone
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
@@ -238,8 +242,8 @@ From there find Efreeti for your class based on the details below. You can hail 
 <li>'''{{SkyNoDrop|[[Light Woolen Mask]]}}''' (3-Gorga)</li>
 </ul>
 </div>
-| {{:Mask of Song}}
 |-
+| {{:Mantle of the Songweaver}}
 | Bard Test of Voice
 | voice
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
@@ -252,8 +256,8 @@ From there find Efreeti for your class based on the details below. You can hail 
 <li>'''{{SkyNoDrop|[[Light Woolen Mantle]]}}''' (4-KoS)</li>
 </ul>
 </div>
-| {{:Mantle of the Songweaver}}
 |-
+| {{:Ervaj's Flute of Flight}}
 | Bard Test of Pitch
 | pitch
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
@@ -266,8 +270,8 @@ From there find Efreeti for your class based on the details below. You can hail 
 <li>'''{{SkyNoDrop|[[Crude Wooden Flute]]}}''' (5-SL)</li>
 </ul>
 </div>
-| {{:Ervaj's Flute of Flight}}
 |-
+| {{:Amulet of the Fae}}
 | Bard Test of Wind
 | wind
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
@@ -280,8 +284,8 @@ From there find Efreeti for your class based on the details below. You can hail 
 <li>'''{{SkyNoDrop|[[Amulet of Woven Hair]]}}''' (6-BZ)</li>
 </ul>
 </div>
-| {{:Fae Amulet}}
 |-
+| {{:Denon's Horn of Disaster}}
 | Bard Test of Brass
 | brass
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
@@ -295,8 +299,8 @@ From there find Efreeti for your class based on the details below. You can hail 
 <li>[[Efreeti War Horn]]</li>
 </ul>
 </div>
-| {{:Denon's Horn of Disaster}}
 |-
+| {{:Spear of Harmony}}
 | Bard Test of Harmony
 | harmony
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
@@ -310,7 +314,6 @@ From there find Efreeti for your class based on the details below. You can hail 
 <li>[[Efreeti War Spear]]</li>
 </ul>
 </div>
-| {{:Spear of Harmony}}
 |}
 
 === [[Beastlord]] Tests ===
@@ -319,8 +322,9 @@ From there find Efreeti for your class based on the details below. You can hail 
 
 {| class="eoTable3"
 |-
-! Quest || Trigger Phrases || Rune || Quest Items || Reward
+! Reward || Quest || Trigger Phrases || Rune || Quest Items
 |-
+| {{:Spiroc Beak Earcuff}}
 | Beastlord Test of Aviak
 | aviak
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
@@ -333,8 +337,8 @@ From there find Efreeti for your class based on the details below. You can hail 
 <li>'''{{SkyNoDrop|[[Spiroc Elder's Totem]]}} ''' (5-SL)</li>
 </ul>
 </div>
-| {{:Spiroc Beak Earcuff}}
 |-
+| {{:Azarack Skin Wristwraps}}   
 | Beastlord Test of Azarack
 | azarack
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
@@ -347,8 +351,8 @@ From there find Efreeti for your class based on the details below. You can hail 
 <li>'''{{SkyNoDrop|[[Azarack Skin]]}}  (2-PoS)'''</li>
 </ul>
 </div>
-| {{:Azarack Skin Wristwraps}}   
 |-
+| {{:Windhowl}}, {{:Spirit Render}}  
 | Beastlord Test of Claw
 | claw
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
@@ -363,8 +367,8 @@ From there find Efreeti for your class based on the details below. You can hail 
 <li>[[Brass Knuckles]]</li>
 </ul>
 </div>
-| {{:Windhowl}}, {{:Spirit Render}}  
 |-
+| {{:Griffon-Hide Armguards}}  
 | Beastlord Test of Harpy
 | harpy
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
@@ -377,8 +381,8 @@ From there find Efreeti for your class based on the details below. You can hail 
 <li>'''{{SkyNoDrop|[[Leather Cord]]}}''' (3-Gorga)</li>
 </ul>
 </div>
-| {{:Griffon-Hide Armguards}}  
 |-
+| {{:Diaphonous Waistband}}
 | Beastlord Test of Wind
 | wind
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
@@ -391,7 +395,6 @@ From there find Efreeti for your class based on the details below. You can hail 
 <li>'''{{SkyNoDrop|[[Silken Wrap]]}}''' (6-BZ)</li>
 </ul>
 </div>
-| {{:Diaphonous Waistband}}
 |}
 
 === [[Berserker]] Tests ===
@@ -400,8 +403,9 @@ From there find Efreeti for your class based on the details below. You can hail 
 
 {| class="eoTable3"
 |-
-! Quest || Trigger Phrases || Rune || Quest Items || Reward
+! Reward || Quest || Trigger Phrases || Rune || Quest Items
 |-
+| {{:Skycleaver}}
 | Berserker Test of Sharpness
 | sharpness
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
@@ -415,8 +419,8 @@ From there find Efreeti for your class based on the details below. You can hail 
 <li>[[Efreeti Standard]]</li>
 </ul>
 </div>
-|| {{:Skycleaver}}
 |-
+| {{:Molten Coil}}
 | Berserker Test of Will
 | will
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
@@ -429,8 +433,8 @@ From there find Efreeti for your class based on the details below. You can hail 
 <li>'''{{SkyNoDrop|[[Pulsating Ruby]]}} (6-BZ)'''</li>
 </ul>
 </div>
-| {{:Molten Coil}}
 |-
+| {{:Sash of Ferocity}}
 | Berserker Test of Ferocity
 | ferocity
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
@@ -443,8 +447,8 @@ From there find Efreeti for your class based on the details below. You can hail 
 <li>'''{{SkyNoDrop|[[High Quality Raiment]]}} (5-SL)'''</li>
 </ul>
 </div>
-| {{:Sash of Ferocity}}
 |-
+| {{:Shroud of the Sky}} 
 | Berserker Test of Burden
 | burden
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
@@ -457,8 +461,8 @@ From there find Efreeti for your class based on the details below. You can hail 
 <li>'''{{SkyNoDrop|[[Feathered Cape]]}}  (3-Gorga)'''</li>
 </ul>
 </div>
-| {{:Shroud of the Sky}} 
 |-
+| {{:Blood-Drawn Runes}}
 | Berserker Test of Blood
 | blood
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
@@ -471,8 +475,8 @@ From there find Efreeti for your class based on the details below. You can hail 
 <li>'''{{SkyNoDrop|[[Azarack Blood]]}} (2-PoS)'''</li>
 </ul>
 </div>
-| {{:Blood-Drawn Runes}}
 |-
+| {{:Cudgel of the Fool}}
 | Berserker Test of Fools Errand
 | fools errand
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
@@ -485,7 +489,6 @@ From there find Efreeti for your class based on the details below. You can hail 
 <li>[[Efreeti Great Staff]] (8-EoV)</li>
 </ul>
 </div>
-| {{:Cudgel of the Fool}}
 |}
 
 === [[Cleric]] Tests ===
@@ -494,8 +497,9 @@ From there find Efreeti for your class based on the details below. You can hail 
 
 {| class="eoTable3"
 |-
-! Quest || Trigger Phrases || Rune || Quest Items || Reward
+! Reward || Quest || Trigger Phrases || Rune || Quest Items
 |-
+| {{:Truewind Earring}}
 | Cleric Test of Courage
 | courage
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
@@ -508,8 +512,8 @@ From there find Efreeti for your class based on the details below. You can hail 
 <li>'''{{SkyNoDrop|[[Silver Hoop]]}}''' (3-Gorga)</li>
 </ul>
 </div>
-| {{:Truewind Earring}}
 |-
+| {{:Aegis of the Wind}}
 | Cleric Test of Skill
 | skill
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
@@ -522,8 +526,8 @@ From there find Efreeti for your class based on the details below. You can hail 
 <li>'''{{SkyNoDrop|[[Small Shield]]}}''' (4-KoS)</li>
 </ul>
 </div>
-| {{:Aegis of the Wind}}
 |-
+| {{:Pauldrons of Piety}}
 | Cleric Test of Protection
 | protection
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
@@ -536,8 +540,8 @@ From there find Efreeti for your class based on the details below. You can hail 
 <li>'''{{SkyNoDrop|[[Shiny Pauldrons]]}}''' (5-SL)</li>
 </ul>
 </div>
-| {{:Pauldrons of Piety}}
 |-
+| {{:Necklace of Resolution}}
 | Cleric Test of Resolution
 | resolution
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
@@ -550,8 +554,8 @@ From there find Efreeti for your class based on the details below. You can hail 
 <li>'''{{SkyNoDrop|[[Silvered Spiroc Necklace]]}}''' (6-BZ)</li>
 </ul>
 </div>
-| {{:Necklace of Resolution}}
 |-
+| {{:Theurgist's Star}}
 | Cleric Test of Theurgy
 | theurgy
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
@@ -565,8 +569,8 @@ From there find Efreeti for your class based on the details below. You can hail 
 <li>[[Efreeti Mace]]</li>
 </ul>
 </div>
-| {{:Theurgist's Star}}
 |-
+| {{:Baton of the Sky}}
 | Cleric Test of The Weak
 | weak
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
@@ -580,7 +584,6 @@ From there find Efreeti for your class based on the details below. You can hail 
 <li>[[Efreeti Standard]]</li>
 </ul>
 </div>
-| {{:Baton of the Sky}}
 |}
 
 === [[Druid]] Tests ===
@@ -589,8 +592,9 @@ From there find Efreeti for your class based on the details below. You can hail 
 
 {| class="eoTable3"
 |-
-! Quest || Trigger Phrases || Rune || Quest Items || Reward
+! Reward || Quest || Trigger Phrases || Rune || Quest Items
 |-
+| {{:Drake-Hide Mask}}
 | Druid Test of Wolf
 | wolf
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
@@ -603,8 +607,8 @@ From there find Efreeti for your class based on the details below. You can hail 
 <li>'''{{SkyNoDrop|[[Worn Leather Mask]]}}''' (3-Gorga)</li>
 </ul>
 </div>
-| {{:Drake-Hide Mask}}
 |-
+| {{:Nature Walker's Mantle}}
 | Druid Test of Bear
 | bear
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
@@ -617,8 +621,8 @@ From there find Efreeti for your class based on the details below. You can hail 
 <li>'''{{SkyNoDrop|[[Mantle of Woven Grass]]}}''' (4-KoS)</li>
 </ul>
 </div>
-| {{:Nature Walker's Mantle}}
 |-
+| {{:Shillelagh}}
 | Druid Test of Tree
 | tree
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
@@ -632,8 +636,8 @@ From there find Efreeti for your class based on the details below. You can hail 
 <li>[[Efreeti Statuette]]</li>
 </ul>
 </div>
-| {{:Shillelagh}}
 |-
+| {{:Honeycomb Belt}}
 | Druid Test of The Bee
 | bee
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
@@ -646,8 +650,8 @@ From there find Efreeti for your class based on the details below. You can hail 
 <li>'''{{SkyNoDrop|[[Divine Honeycomb]]}}''' (6-BZ)</li>
 </ul>
 </div>
-| {{:Honeycomb Belt}}
 |-
+| {{:Spiroc Banisher Focus}}
 | Druid Test of Eagle
 | eagle
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
@@ -661,8 +665,8 @@ From there find Efreeti for your class based on the details below. You can hail 
 <li>'''{{SkyNoDrop|[[Spiroc Elder's Totem]]}}''' (5-SL)</li>
 </ul>
 </div>
-| {{:Spiroc Banisher Focus}}
 |-
+| {{:Espri}}
 | Druid Test of Nature
 | nature
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
@@ -676,7 +680,6 @@ From there find Efreeti for your class based on the details below. You can hail 
 <li>[[Efreeti Scimitar]]</li>
 </ul>
 </div>
-| {{:Espri}}
 |}
 
 === [[Enchanter]] Tests ===
@@ -685,8 +688,9 @@ From there find Efreeti for your class based on the details below. You can hail 
 
 {| class="eoTable3"
 |-
-! Quest || Trigger Phrases || Rune || Quest Items || Reward
+! Reward || Quest || Trigger Phrases || Rune || Quest Items
 |-
+| {{:Sphinx Hair Cord}}
 | Enchanter Test of Illusion
 | illusion
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
@@ -699,8 +703,8 @@ From there find Efreeti for your class based on the details below. You can hail 
 <li>'''{{SkyNoDrop|[[Finely Woven Cloth Cord]]}}''' (3-Gorga)</li>
 </ul>
 </div>
-| {{:Sphinx Hair Cord}}
 |-
+| {{:Wind Walker's Mantle}}
 | Enchanter Test of Metamorphism
 | metamorphism
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
@@ -713,8 +717,8 @@ From there find Efreeti for your class based on the details below. You can hail 
 <li>'''{{SkyNoDrop|[[Light Cloth Mantle]]}}''' (4-KoS)</li>
 </ul>
 </div>
-| {{:Wind Walker's Mantle}}
 |-
+| {{:Ivory Mask}}
 | Enchanter Test of Deception
 | deception
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
@@ -727,8 +731,8 @@ From there find Efreeti for your class based on the details below. You can hail 
 <li>'''{{SkyNoDrop|[[Silken Mask]]}}''' (5-SL)</li>
 </ul>
 </div>
-| {{:Ivory Mask}}
 |-
+| {{:Earring of Displacement}}
 | Enchanter Test of Dislocation
 | dislocation
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
@@ -741,8 +745,8 @@ From there find Efreeti for your class based on the details below. You can hail 
 <li>'''{{SkyNoDrop|[[Adamantium Earring]]}}''' (6-BZ)</li>
 </ul>
 </div>
-| {{:Earring of Displacement}}
 |-
+| {{:Necklace of Whispering Winds}}
 | Enchanter Test of Memorization
 | memorization
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
@@ -755,8 +759,8 @@ From there find Efreeti for your class based on the details below. You can hail 
 <li>'''{{SkyNoDrop|[[Glowing Necklace]]}}''' (7-SotS)</li>
 </ul>
 </div>
-| {{:Necklace of Whispering Winds}}
 |-
+| {{:Rod of the Protecting Winds}}
 | Enchanter Test of Incapacitation
 | incapacitation
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
@@ -770,7 +774,6 @@ From there find Efreeti for your class based on the details below. You can hail 
 <li>[[Efreeti Wind Staff]]</li>
 </ul>
 </div>
-| {{:Rod of the Protecting Winds}}
 |}
 
 === [[Magician]] Tests ===
@@ -779,8 +782,9 @@ From there find Efreeti for your class based on the details below. You can hail 
 
 {| class="eoTable3"
 |-
-! Quest || Trigger Phrases || Rune || Quest Items || Reward
+! Reward || Quest || Trigger Phrases || Rune || Quest Items
 |-
+| {{:Bracelet of Clarification}}
 | Magician Test of Clarification
 | clarification
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
@@ -793,8 +797,8 @@ From there find Efreeti for your class based on the details below. You can hail 
 <li>'''{{SkyNoDrop|[[Feathered Cape]]}}''' (3-Gorga)</li>
 </ul>
 </div>
-| {{:Bracelet of Clarification}}
 |-
+| {{:Mask of Empowerment}}
 | Magician Test of Empowerment
 | empowerment
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
@@ -807,8 +811,8 @@ From there find Efreeti for your class based on the details below. You can hail 
 <li>'''{{SkyNoDrop|[[Ceramic Mask]]}}''' (4-KoS)</li>
 </ul>
 </div>
-| {{:Mask of Empowerment}}
 |-
+| {{:Gold White Pendant}}
 | Magician Test of Shielding
 | shielding
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
@@ -821,8 +825,8 @@ From there find Efreeti for your class based on the details below. You can hail 
 <li>'''{{SkyNoDrop|[[Golden Coffer]]}}''' (5-SL)</li>
 </ul>
 </div>
-| {{:Gold White Pendant}}
 |-
+| {{:Drake-Hide Amice}}
 | Magician Test of Summoning
 | summoning
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
@@ -835,8 +839,8 @@ From there find Efreeti for your class based on the details below. You can hail 
 <li>'''{{SkyNoDrop|[[Large Diamond]]}}''' (6-BZ)</li>
 </ul>
 </div>
-| {{:Drake-Hide Amice}}
 |-
+| {{:Duennan Shielding Ring}}
 | Magician Test of Interpretation
 | interpretation
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
@@ -849,8 +853,8 @@ From there find Efreeti for your class based on the details below. You can hail 
 <li>'''{{SkyNoDrop|[[Golden Efreeti Ring]]}}''' (7-SotS)</li>
 </ul>
 </div>
-| {{:Duennan Shielding Ring}}
 |-
+| {{:Staff of The Magister}}
 | Magician Test of Gesticulation
 | gesticulation
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
@@ -864,8 +868,8 @@ From there find Efreeti for your class based on the details below. You can hail 
 <li>[[Efreeti Magi Staff]]</li>
 </ul>
 </div>
-| {{:Staff of The Magister}}
 |-
+| {{:Staff of Elemental Mastery: Air}}
 | Magician Test of Displacement
 | displacement
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
@@ -880,7 +884,6 @@ From there find Efreeti for your class based on the details below. You can hail 
 <li>'''{{SkyNoDrop|[[Djinni Stave]]}}''' (7-SotS)</li>
 </ul>
 </div>
-| {{:Staff of Elemental Mastery: Air}}
 |}
 
 === [[Monk]] Tests ===
@@ -888,8 +891,9 @@ From there find Efreeti for your class based on the details below. You can hail 
 
 {| class="eoTable3"
 |-
-! Quest || Trigger Phrases || Rune || Quest Items || Reward
+! Reward || Quest || Trigger Phrases || Rune || Quest Items
 |-
+| {{:Back Straps of Mastery}}
 | Monk Test of Strength
 | strength
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
@@ -902,8 +906,8 @@ From there find Efreeti for your class based on the details below. You can hail 
 <li>'''{{SkyNoDrop|[[Silken Strands]]}}''' (3-Gorga)</li>
 </ul>
 </div>
-| {{:Back Straps of Mastery}}
 |-
+| {{:Ton Po's Eye Patch}}
 | Monk Test of Sight
 | sight
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
@@ -916,8 +920,8 @@ From there find Efreeti for your class based on the details below. You can hail 
 <li>'''{{SkyNoDrop|[[Cracked Leather Eyepatch]]}}''' (4-KoS)</li>
 </ul>
 </div>
-| {{:Ton Po's Eye Patch}}
 |-
+| {{:Sandals of Alacrity}}
 | Monk Test of Speed
 | speed
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
@@ -930,8 +934,8 @@ From there find Efreeti for your class based on the details below. You can hail 
 <li>'''{{SkyNoDrop|[[Dove Slippers]]}}''' (5-SL)</li>
 </ul>
 </div>
-| {{:Sandals of Alacrity}}
 |-
+| {{:Ton Po's Shoulder Wraps}}
 | Monk Test of Tears
 | tears
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
@@ -944,8 +948,8 @@ From there find Efreeti for your class based on the details below. You can hail 
 <li>'''{{SkyNoDrop|[[Silken Wrap]]}}''' (6-BZ)</li>
 </ul>
 </div>
-| {{:Ton Po's Shoulder Wraps}}
 |-
+| {{:Wu's Fist of Mastery}}
 | Monk Test of Fists
 | fists
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
@@ -959,8 +963,8 @@ From there find Efreeti for your class based on the details below. You can hail 
 <li>[[Brass Knuckles]]</li>
 </ul>
 </div>
-| {{:Wu's Fist of Mastery}}
 |-
+| {{:Golden Sash of Tranquility}}
 | Monk Test of Tranquility
 | tranquility
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
@@ -973,7 +977,6 @@ From there find Efreeti for your class based on the details below. You can hail 
 <li>'''{{SkyNoDrop|[[Tear of Quellious]]}}''' (8-EoV)</li>
 </ul>
 </div>
-| {{:Golden Sash of Tranquility}}
 |}
 
 === [[Necromancer]] Tests ===
@@ -981,8 +984,9 @@ From there find Efreeti for your class based on the details below. You can hail 
 
 {| class="eoTable3"
 |-
-! Quest || Trigger Phrases || Rune || Quest Items || Reward
+! Reward || Quest || Trigger Phrases || Rune || Quest Items
 |-
+| {{:Bloody Griffon-Hide Wrist Guard}}
 | Necromancer Test of Flight
 | flight
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
@@ -995,8 +999,8 @@ From there find Efreeti for your class based on the details below. You can hail 
 <li>'''{{SkyNoDrop|[[Griffon's Beak]]}}''' (3-Gorga)</li>
 </ul>
 </div>
-| {{:Bloody Griffon-Hide Wrist Guard}}
 |-
+| {{:Cloak of Spiroc Feathers}}
 | Necromancer Test of Power
 | power
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
@@ -1009,8 +1013,8 @@ From there find Efreeti for your class based on the details below. You can hail 
 <li>'''{{SkyNoDrop|[[Black Silk Cape]]}}''' (4-KoS)</li>
 </ul>
 </div>
-| {{:Cloak of Spiroc Feathers}}
 |-
+| {{:Bloodsoaked Raiment}}
 | Necromancer Test of Mind
 | mind
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
@@ -1023,8 +1027,8 @@ From there find Efreeti for your class based on the details below. You can hail 
 <li>'''{{SkyNoDrop|[[Fine Cloth Raiment]]}}''' (5-SL)</li>
 </ul>
 </div>
-| {{:Bloodsoaked Raiment}}
 |-
+| {{:Sphinx Heart Amulet}}
 | Necromancer Test of Heart
 | heart
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
@@ -1037,8 +1041,8 @@ From there find Efreeti for your class based on the details below. You can hail 
 <li>'''{{SkyNoDrop|[[Pulsating Ruby]]}}''' (6-BZ)</li>
 </ul>
 </div>
-| {{:Sphinx Heart Amulet}}
 |-
+| {{:Band of Wailing Winds}}
 | Necromancer Test of Finger
 | finger
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
@@ -1051,8 +1055,8 @@ From there find Efreeti for your class based on the details below. You can hail 
 <li>'''{{SkyNoDrop|[[Ring of Veeshan]]}}''' (7-SotS)</li>
 </ul>
 </div>
-| {{:Band of Wailing Winds}}
 |-
+| {{:Gorgon Head Staff}}
 | Necromancer Test of Hands
 | hands
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
@@ -1066,7 +1070,6 @@ From there find Efreeti for your class based on the details below. You can hail 
 <li>[[Efreeti Great Staff]] (8-EoV)</li>
 </ul>
 </div>
-| {{:Gorgon Head Staff}}
 |}
 
 === [[Paladin]] Tests ===
@@ -1075,8 +1078,9 @@ From there find Efreeti for your class based on the details below. You can hail 
 
 {| class="eoTable3"
 |-
-! Quest || Trigger Phrases || Rune || Quest Items || Reward
+! Reward || Quest || Trigger Phrases || Rune || Quest Items
 |-
+| {{:Girdle of Faith}}
 | Paladin Test of Spirit
 | spirit
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
@@ -1089,8 +1093,8 @@ From there find Efreeti for your class based on the details below. You can hail 
 <li>'''{{SkyNoDrop|[[Ivory Sky Diamond]]}}''' (5-SL)</li>
 </ul>
 </div>
-| {{:Girdle of Faith}}
 |-
+| {{:Aldryn, Blade of the Ocean}}
 | Paladin Test of Sacrifice
 | sacrifice
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
@@ -1103,8 +1107,8 @@ From there find Efreeti for your class based on the details below. You can hail 
 <li>'''{{SkyNoDrop|[[Bixie Sword Blade]]}}''' (6-BZ)</li>
 </ul>
 </div>
-| {{:Aldryn, Blade of the Ocean}}
 |-
+| {{:Thelvorn, Blade of Light}}
 | Paladin Test of Love
 | love
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
@@ -1118,8 +1122,8 @@ From there find Efreeti for your class based on the details below. You can hail 
 <li>'''{{SkyNoDrop|[[Sphinx Claw]]}}''' (7-SotS)</li>
 </ul>
 </div>
-| {{:Thelvorn, Blade of Light}}
 |-
+| {{:Truvinan}}
 | Paladin Test of Compassion
 | compassion
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
@@ -1133,7 +1137,6 @@ From there find Efreeti for your class based on the details below. You can hail 
 <li>[[Efreeti Zweihander]]</li>
 </ul>
 </div>
-| {{:Truvinan}}
 |}
 
 === [[Ranger]] Tests ===
@@ -1142,8 +1145,9 @@ From there find Efreeti for your class based on the details below. You can hail 
 
 {| class="eoTable3"
 |-
-! Quest || Trigger Phrases || Rune || Quest Items || Reward
+! Reward || Quest || Trigger Phrases || Rune || Quest Items
 |-
+| {{:Griffon Talon Necklace}}
 | Ranger Test of Body
 | body
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
@@ -1156,8 +1160,8 @@ From there find Efreeti for your class based on the details below. You can hail 
 <li>'''{{SkyNoDrop|[[Griffon Talon]]}}''' (3-Gorga)</li>
 </ul>
 </div>
-| {{:Griffon Talon Necklace}}
 |-
+| {{:Dark Cloak of the Sky}}
 | Ranger Test of Defense
 | defense
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
@@ -1170,8 +1174,8 @@ From there find Efreeti for your class based on the details below. You can hail 
 <li>'''{{SkyNoDrop|[[Fine Velvet Cloak]]}}''' (4-KoS)</li>
 </ul>
 </div>
-| {{:Dark Cloak of the Sky}}
 |-
+| {{:Earthshaker's Mantle}}
 | Ranger Test of The Earth
 | elemental earth
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
@@ -1184,8 +1188,8 @@ From there find Efreeti for your class based on the details below. You can hail 
 <li>'''{{SkyNoDrop|[[Spiroc Earth Totem]]}}''' (5-SL)</li>
 </ul>
 </div>
-| {{:Earthshaker's Mantle}}
 |-
+| {{:Thunderforged Earring}}
 | Ranger Test of Thunder
 | elemental thunder
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
@@ -1198,8 +1202,8 @@ From there find Efreeti for your class based on the details below. You can hail 
 <li>'''{{SkyNoDrop|[[White Gold Earring]]}}''' (6-BZ)</li>
 </ul>
 </div>
-| {{:Thunderforged Earring}}
 |-
+| {{:Arydryidriyorn}}
 | Ranger Test of Blade
 | blade
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
@@ -1213,8 +1217,8 @@ From there find Efreeti for your class based on the details below. You can hail 
 <li>[[Efreeti Long Sword]]</li>
 </ul>
 </div>
-| {{:Arydryidriyorn}}
 |-
+| {{:Windstriker}}
 | Ranger Test of Ranged Attack
 | ranged attack
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
@@ -1228,7 +1232,6 @@ From there find Efreeti for your class based on the details below. You can hail 
 <li>[[Efreeti War Bow]]</li>
 </ul>
 </div>
-| {{:Windstriker}}
 |}
 
 === [[Rogue]] Tests ===
@@ -1237,8 +1240,9 @@ From there find Efreeti for your class based on the details below. You can hail 
 
 {| class="eoTable3"
 |-
-! Quest || Trigger Phrases || Rune || Quest Items || Reward
+! Reward || Quest || Trigger Phrases || Rune || Quest Items
 |-
+| {{:Wispy Choker of Vigor}}
 | Rogue Test of Thievery
 | thievery
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
@@ -1251,8 +1255,8 @@ From there find Efreeti for your class based on the details below. You can hail 
 <li>'''{{SkyNoDrop|[[Inlaid Choker]]}}''' (3-Gorga)</li>
 </ul>
 </div>
-| {{:Wispy Choker of Vigor}}
 |-
+| {{:Renard's Belt of Quickness}}
 | Rogue Test of Trickery
 | trickery
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
@@ -1265,8 +1269,8 @@ From there find Efreeti for your class based on the details below. You can hail 
 <li>'''{{SkyNoDrop|[[Sphinxian Circlet]]}}''' (7-SotS)</li>
 </ul>
 </div>
-| {{:Renard's Belt of Quickness}}
 |-
+| {{:Griffon Wing Spauldors}}
 | Rogue Test of Silence
 | silence
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
@@ -1279,8 +1283,8 @@ From there find Efreeti for your class based on the details below. You can hail 
 <li>'''{{SkyNoDrop|[[Spiroc Sky Totem]]}}''' (5-SL)</li>
 </ul>
 </div>
-| {{:Griffon Wing Spauldors}}
 |-
+| {{:Crystal Mask}}
 | Rogue Test of Cunning
 | cunning
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
@@ -1293,8 +1297,8 @@ From there find Efreeti for your class based on the details below. You can hail 
 <li>'''{{SkyNoDrop|[[Jester's Mask]]}}''' (4-KoS)</li>
 </ul>
 </div>
-| {{:Crystal Mask}}
 |-
+| {{:Shimmering Bracer of Protection}}
 | Rogue Test of Stealth
 | stealth
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
@@ -1307,8 +1311,8 @@ From there find Efreeti for your class based on the details below. You can hail 
 <li>'''{{SkyNoDrop|[[Fine Wool Cloak]]}}''' (6-BZ)</li>
 </ul>
 </div>
-| {{:Shimmering Bracer of Protection}}
 |-
+| {{:Thornstinger}}
 | Rogue Test of Deception
 | deception
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
@@ -1322,7 +1326,6 @@ From there find Efreeti for your class based on the details below. You can hail 
 <li>'''{{SkyNoDrop|[[Bloodsky Sapphire]]}}''' (8-EoV)</li>
 </ul>
 </div>
-| {{:Thornstinger}}
 |}
 
 === [[Shadow Knight]] Tests ===
@@ -1331,8 +1334,9 @@ From there find Efreeti for your class based on the details below. You can hail 
 
 {| class="eoTable3"
 |-
-! Quest || Trigger Phrases || Rune || Quest Items || Reward
+! Reward || Quest || Trigger Phrases || Rune || Quest Items
 |-
+| {{:Amulet of the Sphinx Eye}}
 | Shadow Knight Test of Bash
 | bash
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
@@ -1345,8 +1349,8 @@ From there find Efreeti for your class based on the details below. You can hail 
 <li>'''{{SkyNoDrop|[[Finely Crafted Amulet]]}}''' (3-Gorga)</li>
 </ul>
 </div>
-| {{:Amulet of the Sphinx Eye}}
 |-
+| {{:Crimson Ring of the Djinni}}
 | Shadow Knight Test of Smash
 | smash
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
@@ -1359,8 +1363,8 @@ From there find Efreeti for your class based on the details below. You can hail 
 <li>'''{{SkyNoDrop|[[Silvery Ring]]}}''' (4-KoS)</li>
 </ul>
 </div>
-| {{:Crimson Ring of the Djinni}}
 |-
+| {{:Pegasus-Hide Belt}}
 | Shadow Knight Test of Slash
 | slash
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
@@ -1373,8 +1377,8 @@ From there find Efreeti for your class based on the details below. You can hail 
 <li>'''{{SkyNoDrop|[[Finely Woven Cloth Belt]]}}''' (5-SL)</li>
 </ul>
 </div>
-| {{:Pegasus-Hide Belt}}
 |-
+| {{:Blood Sky Face Plate}}
 | Shadow Knight Test of Disempowerment
 | disempowerment
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
@@ -1387,8 +1391,8 @@ From there find Efreeti for your class based on the details below. You can hail 
 <li>'''{{SkyNoDrop|[[Rusted Pauldrons]]}}''' (6-BZ)</li>
 </ul>
 </div>
-| {{:Blood Sky Face Plate}}
 |-
+| {{:Obtenebrate Mithril Guard}}
 | Shadow Knight Test of Envenoming
 | envenoming
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
@@ -1401,8 +1405,8 @@ From there find Efreeti for your class based on the details below. You can hail 
 <li>[[Efreeti War Shield]]</li>
 </ul>
 </div>
-| {{:Obtenebrate Mithril Guard}}
 |-
+| {{:Pearlescent Pauldrons}}
 | Shadow Knight Raising of the Dead
 | raising of the dead
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
@@ -1416,8 +1420,8 @@ From there find Efreeti for your class based on the details below. You can hail 
 <li>'''{{SkyNoDrop|[[Fae Pauldrons]]}}''' (8-EoV)</li>
 </ul>
 </div>
-| {{:Pearlescent Pauldrons}}
 |-
+| {{:Khyldorn the Blood Drinker}}
 | Shadow Knight Test of Necropotence
 | necropotence
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
@@ -1431,7 +1435,6 @@ From there find Efreeti for your class based on the details below. You can hail 
 <li>[[Efreeti War Axe]]</li>
 </ul>
 </div>
-| {{:Khyldorn the Blood Drinker}}
 |}
 
 === [[Shaman]] Tests ===
@@ -1440,8 +1443,9 @@ From there find Efreeti for your class based on the details below. You can hail 
 
 {| class="eoTable3"
 |-
-! Quest || Trigger Phrases || Rune || Quest Items || Reward
+! Reward || Quest || Trigger Phrases || Rune || Quest Items
 |-
+| {{:Amulet of the Fang}}
 | Shaman Test of Might
 | might
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
@@ -1454,8 +1458,8 @@ From there find Efreeti for your class based on the details below. You can hail 
 <li>'''{{SkyNoDrop|[[Leather Cord]]}}''' (3-Gorga)</li>
 </ul>
 </div>
-| {{:Amulet of the Fang}}
 |-
+| {{:Bracelet of the Spirits}}
 | Shaman Test of Health
 | health
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
@@ -1468,8 +1472,8 @@ From there find Efreeti for your class based on the details below. You can hail 
 <li>'''{{SkyNoDrop|[[Ceremonial Belt]]}}''' (5-SL)</li>
 </ul>
 </div>
-| {{:Bracelet of the Spirits}}
 |-
+| {{:Fairy-Hide Mantle}}
 | Shaman Test of Sight
 | sight
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
@@ -1482,8 +1486,8 @@ From there find Efreeti for your class based on the details below. You can hail 
 <li>'''{{SkyNoDrop|[[Light Damask Mantle]]}}''' (5-SL)</li>
 </ul>
 </div>
-| {{:Fairy-Hide Mantle}}
 |-
+| {{:Warhammer of the Wind}}
 | Shaman Test of Shrink
 | shrink
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
@@ -1497,8 +1501,8 @@ From there find Efreeti for your class based on the details below. You can hail 
 <li>[[Efreeti War Club]]</li>
 </ul>
 </div>
-| {{:Warhammer of the Wind}}
 |-
+| {{:Vermilion Sky Ring}}
 | Shaman Test of Snake
 | snake
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
@@ -1512,8 +1516,8 @@ From there find Efreeti for your class based on the details below. You can hail 
 <li>'''{{SkyNoDrop|[[Spiritualist`s Ring]]}}''' (7-SotS)</li>
 </ul>
 </div>
-| {{:Vermilion Sky Ring}}
 |-
+| {{:Garduk}}
 | Shaman Test of The Witch Doctor
 | witch doctor
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
@@ -1527,7 +1531,6 @@ From there find Efreeti for your class based on the details below. You can hail 
 <li>[[Efreeti War Maul]]</li>
 </ul>
 </div>
-| {{:Garduk}}
 |}
 
 === [[Warrior]] Tests ===
@@ -1536,8 +1539,9 @@ From there find Efreeti for your class based on the details below. You can hail 
 
 {| class="eoTable3"
 |-
-! Quest || Trigger Phrases || Rune || Quest Items || Reward
+! Reward || Quest || Trigger Phrases || Rune || Quest Items
 |-
+| {{:Azure Ruby Ring}}
 | Warrior Test of Skill
 | skill
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
@@ -1550,8 +1554,8 @@ From there find Efreeti for your class based on the details below. You can hail 
 <li>'''{{SkyNoDrop|[[Azure Ring]]}}''' (3-Gorga)</li>
 </ul>
 </div>
-| {{:Azure Ruby Ring}}
 |-
+| {{:Runed Wind Amulet}}
 | Warrior Test of Strength
 | strength
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
@@ -1564,8 +1568,8 @@ From there find Efreeti for your class based on the details below. You can hail 
 <li>'''{{SkyNoDrop|[[Stone Amulet]]}}''' (4-KoS)</li>
 </ul>
 </div>
-| {{:Runed Wind Amulet}}
 |-
+| {{:Pauldrons of the Blue Sky}}
 | Warrior Test of Force
 | force
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
@@ -1578,8 +1582,8 @@ From there find Efreeti for your class based on the details below. You can hail 
 <li>'''{{SkyNoDrop|[[Spiroc Air Totem]]}}''' (5-SL)</li>
 </ul>
 </div>
-| {{:Pauldrons of the Blue Sky}}
 |-
+| {{:Belt of the Four Winds}}
 | Warrior Test of Think
 | think
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
@@ -1593,8 +1597,8 @@ From there find Efreeti for your class based on the details below. You can hail 
 <li>[[Efreeti Belt]]</li>
 </ul>
 </div>
-| {{:Belt of the Four Winds}}
 |-
+| {{:Dagas}}
 | Warrior Test of Smash
 | smash
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
@@ -1608,8 +1612,8 @@ From there find Efreeti for your class based on the details below. You can hail 
 <li>'''{{SkyNoDrop|[[Gem of Invigoration]]}}''' (7-Trash)</li>
 </ul>
 </div>
-| {{:Dagas}}
 |-
+| {{:Fangol}}
 | Warrior Test of Bash
 | bash
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
@@ -1623,7 +1627,6 @@ From there find Efreeti for your class based on the details below. You can hail 
 <li>[[Efreeti Battle Axe]]</li>
 </ul>
 </div>
-| {{:Fangol}}
 |}
 
 === [[Wizard]] Tests ===
@@ -1632,8 +1635,9 @@ From there find Efreeti for your class based on the details below. You can hail 
 
 {| class="eoTable3"
 |-
-! Quest || Trigger Phrases || Rune || Quest Items || Reward
+! Reward || Quest || Trigger Phrases || Rune || Quest Items
 |-
+| {{:Augmentor's Mask}}
 | Wizard Test of Concentration
 | concentration
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
@@ -1646,8 +1650,8 @@ From there find Efreeti for your class based on the details below. You can hail 
 <li>'''{{SkyNoDrop|[[Grey Damask Cloak]]}}''' (3-Gorga)</li>
 </ul>
 </div>
-| {{:Augmentor's Mask}}
 |-
+| {{:Al`Kabor's Cap of Binding}}
 | Wizard Test of Focus
 | focus
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
@@ -1660,8 +1664,8 @@ From there find Efreeti for your class based on the details below. You can hail 
 <li>'''{{SkyNoDrop|[[Woven Skull Cap]]}}''' (4-KoS)</li>
 </ul>
 </div>
-| {{:Al`Kabor's Cap of Binding}}
 |-
+| {{:Raiment of Thunder}}
 | Wizard Test of Meditation
 | meditation
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
@@ -1674,8 +1678,8 @@ From there find Efreeti for your class based on the details below. You can hail 
 <li>'''{{SkyNoDrop|[[High Quality Raiment]]}}''' (5-SL)</li>
 </ul>
 </div>
-| {{:Raiment of Thunder}}
 |-
+| {{:Solidate Mithril Ring}}
 | Wizard Test of Conception
 | conception
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
@@ -1689,8 +1693,8 @@ From there find Efreeti for your class based on the details below. You can hail 
 <li>[[Efreeti Statuette]]</li>
 </ul>
 </div>
-| {{:Solidate Mithril Ring}}
 |-
+| {{:Amulet of the Void}}
 | Wizard Test of Visualization
 | visualization
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
@@ -1703,8 +1707,8 @@ From there find Efreeti for your class based on the details below. You can hail 
 <li>'''{{SkyNoDrop|[[Amethyst Amulet]]}}''' (7-SotS)</li>
 </ul>
 </div>
-| {{:Amulet of the Void}}
 |-
+| {{:Nargon's Staff}}
 | Wizard Test of Preparation
 | preparation
 | <div class="checkbox-list eql-sky-table-checklist" style="margin:0; padding:0;">
@@ -1718,7 +1722,6 @@ From there find Efreeti for your class based on the details below. You can hail 
 <li>[[Efreeti War Staff]]</li>
 </ul>
 </div>
-| {{:Nargon's Staff}}
 |}
 
 = Random Drop Items =

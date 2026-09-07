@@ -119,7 +119,6 @@ This custom quest is designed to send you to every dungeon in Norrath, granting 
 {{End}}
 
 : Alright now, you might actually have the spirit for this!  Having yourself a grand adventure, are ya?  Don't let your head get too big now, the next batch will really test you.
-: You might actually have the spirit for this!  Having yourself a grand adventure, are ya?  Don't let your head get too big now, the next batch will really test you.
 
 == Part 3 ==
 Let's start out on, you guessed it, Faydwer again.  Get yourself one of those fancy gnomish underwater helmets and explore the maze of Kedge Keep.  From there, head into Nagafen's Lair, but not too deep!  Explore the upper tunnels of the kobolds.  Finally, head back to those disgusting frogs of Lower Guk - and this time there are undead ones too!{{CheckboxList}}

@@ -1,7 +1,8 @@
+{{Classic Era}}
 {{Spellpagesmart|
 
 | spellname = Ward Summoned
-| spellicon = C
+| spellicon = 153
 | description = A burst of holy power that inflicts 14 damage to a summoned target.
 | Table = {{{Table|0}}}
 | TableLevel = {{{TableLevel|}}}

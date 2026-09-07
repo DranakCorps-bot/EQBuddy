@@ -1,7 +1,8 @@
-<noinclude>{{Classic Era}}</noinclude>{{Spellpagesmart|
+{{Classic Era}}
+{{Spellpagesmart|
 
 | spellname = Drones of Doom
-| spellicon = T
+| spellicon = 159
 | description = Commands a swarm of insects to attack your target relentlessly, causing 156 damage every six seconds for 48s.
 | Table = {{{Table|0}}}
 | TableLevel = {{{TableLevel|}}}
@@ -43,11 +44,8 @@
 | msg_wears_off = The swarm departs.
 
 | where_to_obtain = 
-{{SpellWhereTable|
-{{SpellWhereRowB | [[Firiona Vie]] | [[Raciel Sanherb]] | Outpost | (-3396,3310) }}
-{{SpellWhereRow  | [[Steamfont Mountains]] | [[Crisyn]] | Druid Ring | (-1750,1657) }}
-}}
 
-| TableLocations = Steamfont Mnt<br/>Firiona Vie
-| TableEra = {{{TableEra|Classic}}}
+<ul>
+<li>[[Druid#Spell Vendors|Druid Spell Vendors]]</li>
+</ul>
 }}

@@ -1,7 +1,8 @@
+{{Classic Era}}
 {{Spellpagesmart|
 
 | spellname = Vengeance of the Wild
-| spellicon = G
+| spellicon = 55
 | description = Inflicts the vengeance of the wild on your target, causing between 122 and 131 damage every six seconds for 30s.
 
 | Table = {{{Table|0}}}
@@ -34,9 +35,8 @@
 
 | where_to_obtain = 
 
-{{SpellWhereTable|
-{{SpellWhereRowB | [[New Sebilis Expedition]] | [[Wanderer Rakshaazi]] | Spell Vendor Area | (120, -163) }}
-{{SpellWhereRow | [[West Commonlands]] | [[Slea Pinewhisper]] | Druid Ring | (450, 1383, -52) }}
-}}
+<ul>
+<li>[[Druid#Spell Vendors|Druid Spell Vendors]]</li>
+</ul>
 
 }}

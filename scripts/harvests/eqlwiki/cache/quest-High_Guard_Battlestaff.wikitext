@@ -1,6 +1,6 @@
 {{Classic Era}}
 {{Unsolved}}
-[[File:npc_lumi_stergnon.png|frame|Lumi Stergnon]]
+[[File:npc_lumi_stergnon.png|thumb|Lumi Stergnon]]
 {| class="questTopTable"
 ! ''' Start Zone: '''
 | [[Erudin]]

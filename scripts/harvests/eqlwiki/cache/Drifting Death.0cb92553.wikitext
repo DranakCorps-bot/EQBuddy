@@ -1,7 +1,8 @@
+{{Classic Era}}
 {{Spellpagesmart|
 
 | spellname = Drifting Death
-| spellicon = T
+| spellicon = 159
 | description = Commands a swarm of insects to attack your target relentlessly, causing between 195 and 198 damage every 6 seconds for 54s.
 | Table = {{{Table|0}}}
 | TableLevel = {{{TableLevel|}}}
@@ -29,11 +30,7 @@
 
 | where_to_obtain = 
 
-{{SpellWhereTable|
-{{SpellWhereRowB | [[Butcherblock Mountains]] | [[Ellona]] | Druid Ring | (-2085,2016) }}
-{{SpellWhereRow  | [[The Wakening Land]] | [[Weinna Oakchild]] | Tower to Plane of Growth | (521,-1038) }}
-}}
-
-| TableLocations = Butcherblock<br/>Wakening
-| TableEra = {{{TableEra|Classic}}}
+<ul>
+<li>[[Druid#Spell Vendors|Druid Spell Vendors]]</li>
+</ul>
 }}

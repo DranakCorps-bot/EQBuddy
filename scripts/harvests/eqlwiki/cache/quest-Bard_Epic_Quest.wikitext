@@ -36,13 +36,13 @@ __NOTOC__
 * Talk to [[Konia Swiftfoot]] in [[Western Karana]] (guard tower #4), receive a [[Torch of Misty]]
 * Give the torch to [[Fajio Knejo]] in [[Misty Thicket]], receive [[Torch of Ro]]
 * Give the torch to [[Andad Filla]] in [[Southern Desert of Ro|South Ro]], receive [[Torch of Rathe]]
-* Give the torch to [[Misty Tekchita]] in [[Lake Rathetear]], receive ring [[Proof of Speed]]
+* Give the torch to [[Misty Tekcihta]] in [[Lake Rathetear]], receive ring [[Proof of Speed]]
 * Give the ring to [[Konia Swiftfoot]] in [[Western Karana|W Karana]], receive [[Maestro's Symphony Page 24 Top]] 
 
 ==== Maestro's Symphony Page 24 Bottom ====
 * Ask [[Baenar Swiftsong]] in [[South Karana]], “what doll,” receive [[Solusek Mining Company Invoice]]
 * Take the invoice to [[Marfen Binkdirple]] in [[Solusek's Eye]], receive [[Mechanical Doll]]
-* Give the doll to [[Serra]] in [[Unrest]], receive [[Note for Baenar]] previously [[Ripped Qeynos Bards Guild Flyer]] ? I didn't get this 2nd one on turn in 2/6/25
+* Give the doll to [[Serra]] in [[Unrest]], receive [[Note for Baenar]] 
 * Give the note to [[Baenar Swiftsong]] in [[South Karana]], receive a [[Note to Maligar]]
 * Give the note to [[Maligar]] in [[Western Plains of Karana]]
 * Kill [45][[Maligar's Enraged Doppleganger]], loot his head
@@ -96,9 +96,9 @@ She will tell you to take a torch to Fajio Knejo.  Fajio can be found in Misty T
 
 Fajio says: 'Run Onward, my friend, to the far off Desert of Ro and give this torch to Andad Filla.
 
-Andad Filla is in South Ro -3043 , +1243.  He spawns and sits very near to the Innothule Swamp entrance and when you give him the torch from Fajio he will give you yet another torch to give to Misty Tekchita.  
+Andad Filla is in South Ro -3043 , +1243.  He spawns and sits very near to the Innothule Swamp entrance and when you give him the torch from Fajio he will give you yet another torch to give to Misty Tekcihta.  
 
-Andad says: You still have a way to go! Seek out Misty Tekchita near the arena at Lake Rathe. Run like the wind!
+Andad says: You still have a way to go! Seek out Misty Tekcihta near the arena at Lake Rathe. Run like the wind!
 
 Misty is in [[Lake Rathetear]] (#13 on map)  If she is there when you get there you can find her near the entrance to the Arena.  Misty will give you a Ring called [[Proof of Speed]].  Return this ring to Konia Swiftfoot and you will get the top part of page 24.
 
@@ -205,7 +205,7 @@ Baldric Slezaf pulls a fantastic looking sword from its scabbard and says, 'I mi
 # Page 25
 # Lute made by Forpar Fizfla
 
-'''To get top part page 24 go to [[Western Karana]] and see Konia Swiftfoot, who may be found inside a guard tower at -500, -2400. She gives you a Torch of Misty and starts a race. Take the torch to Fajio Knejo in Misty Thicket (close to the wall guards). He gives you a Torch of Ro. Then take that torch to Andad Filla in South Ro (close to innothule zone) who gives you a Torch of Rathe. Then take that torch to Misty Tekchita in Lake Rathe (by arena zone). This will get you Proof of Speed. Finally, take this back to Konia Swiftfoot and you will get the top part of page 24.'''
+'''To get top part page 24 go to [[Western Karana]] and see Konia Swiftfoot, who may be found inside a guard tower at -500, -2400. She gives you a Torch of Misty and starts a race. Take the torch to Fajio Knejo in Misty Thicket (close to the wall guards). He gives you a Torch of Ro. Then take that torch to Andad Filla in South Ro (close to innothule zone) who gives you a Torch of Rathe. Then take that torch to Misty Tekcihta in Lake Rathe (by arena zone). This will get you Proof of Speed. Finally, take this back to Konia Swiftfoot and you will get the top part of page 24.'''
 
 You say, 'Hail, Konia Swiftfoot'
 

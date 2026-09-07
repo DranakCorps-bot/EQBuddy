@@ -1,3 +1,4 @@
+{{Kunark Era}}
 [[File:npc_dyth_xteria.png|frame|Dyth X`Teria]]
 {| class="questTopTable"
 ! ''' Start Zone: '''

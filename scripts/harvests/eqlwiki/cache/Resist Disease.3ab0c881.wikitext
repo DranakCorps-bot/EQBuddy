@@ -1,5 +1,5 @@
 {{Classic Era}}
-{{Spellpage|
+{{Spellpagesmart|
 
 | spellname = Resist Disease
 | spellicon = 65
@@ -39,27 +39,11 @@
 
 | where_to_obtain = 
 
-{{SpellWhereTable|
-{{SpellWhereRowB | [[Ak'Anon]] | [[Clockwork Merchant (CG-6)]] | Cleric Guild | (1197,-560) }}
-{{SpellWhereRow  | [[Ak'Anon]] | [[Clockwork Merchant (NG-14)]] | Necromancer Guild | (2111,-429) }}
-{{SpellWhereRowB | [[Ak'Anon]] | [[Clockwork Merchant (NG-1)]] | Necromancer Guild | (2082,-410) }}
-{{SpellWhereRow  | [[Butcherblock Mountains]] | [[Ellona]] | Druid Ring | (-2085,2016) }}
-{{SpellWhereRowB | [[Freeport|East Freeport]] | [[Ainla Yurimar]] | Underground | (-162,-270) }}
-{{SpellWhereRow  | [[Erudin]] | [[Junice Weslent]] | Cleric Guild - Quellious (Outside) | (-697,-55) }}
-{{SpellWhereRowB | [[Everfrost Peaks]] | [[Starn Bearjumper]] | Ruined Temple | (2870,-36) }}
-{{SpellWhereRow  | [[Felwithe]] | [[Terren Starwatcher]] | Cleric Guild | (13,-426) }}
-{{SpellWhereRowB | [[Innothule Swamp]] | [[Stragak]] | Northern Hand | (1170,539) }}
-{{SpellWhereRow  | [[Neriak|Neriak - 3rd Gate]] | [[Lyniv S'Kor]] | Cleric Guild | (410,-858) }}
-{{SpellWhereRowB | [[Neriak|Neriak - 3rd Gate]] | [[Rizyra F'Lok]] | Necromancer Guild (F1) | (1335,-1213) }}
-{{SpellWhereRow  | [[New Sebilis Expedition]] | [[Zealot Zorshais]] | Bank Room | (278, -115) }}
-{{SpellWhereRowB | [[Freeport|North Freeport]] | [[Nosspri Andrika]] | Cleric Guild (basement) | (102,391) }}
-{{SpellWhereRow  | [[Qeynos|North Qeynos]] | [[Ladia Qursii]] | Cleric Guild (Outside) | (-225,-238) }}
-{{SpellWhereRowB | [[Paineel]] | [[Leovre Kieqmarn]] | Necromancer Guild | (665,804) }}
-{{SpellWhereRow  | [[Qeynos Aqueducts|Qeynos Catacombs]] | [[Senst Ereek]] | Cleric Guild | (340,-413) }}
-{{SpellWhereRowB | [[Qeynos Aqueducts|Qeynos Catacombs]] | [[Dallisen Xalladyr]] | Necromancer Guild | (402,-311) }}
-{{SpellWhereRow  | [[Rivervale]] | [[Misty Valefriend]] | Cleric Guild | (-226,-374) }}
-}}
-
-| TableLocations = Vendors
-| TableEra = {{{TableEra|Classic}}}
+<ul><li>[[Beastlord#Spell Vendors|Beastlord Spell Vendors]]</li>
+<li>[[Druid#Spell Vendors|Druid Spell Vendors]]</li>
+<li>[[Enchanter#Spell Vendors|Enchanter Spell Vendors]]</li>
+<li>[[Magician#Spell Vendors|Magician Spell Vendors]]</li>
+<li>[[Necromancer#Spell Vendors|Necromancer Spell Vendors]]</li>
+<li>[[Shaman#Spell Vendors|Shaman Spell Vendors]]</li>
+</ul>
 }}

@@ -1,7 +1,8 @@
+{{Classic Era}}
 {{Spellpagesmart|
 
 | spellname = Form of the Great Wolf
-| spellicon = T
+| spellicon = 81
 | description = Fills you with the spirit of the wild, allowing you to take the form a wolf and granting *100%N.
 | Table = {{{Table|0}}}
 | TableLevel = {{{TableLevel|}}}
@@ -37,13 +38,8 @@
 
 | where_to_obtain = 
 
-{{SpellWhereTable|
-{{SpellWhereRowB | [[Greater Faydark]] | [[Horth Evergreen]] | Kelethin Druid Guild | (-640,219) }}
-{{SpellWhereRow  | [[Rivervale]] | [[Torth Largefoot]] | Druid Guild | (-32,-384) }}
-{{SpellWhereRowB | [[Surefall Glade]] | [[Arrivae Valleren]] | Druid Guild | (-156,-300) }}
-}}
-
-| TableLocations = Kelethin<br/>Rivervale<br/>Surefall
-| TableEra = {{{TableEra|Classic}}}
+<ul>
+<li>[[Druid#Spell Vendors|Druid Spell Vendors]]</li>
+</ul>
 }}
 [[Category: Illusions]]

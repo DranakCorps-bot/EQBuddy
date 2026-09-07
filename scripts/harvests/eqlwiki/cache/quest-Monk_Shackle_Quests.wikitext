@@ -1,6 +1,6 @@
 __NOTOC__
 {{Kunark Era}}
-<onlyinclude>[[File:npc_grand_master_glox.png|frame|Grand Master Glox]]
+<onlyinclude>[[File:npc_grand_master_glox.png|thumb|Grand Master Glox]]
 {| class="questTopTable"
 ! ''' Start Zone: '''
 | [[Cabilis|East Cabilis]]
@@ -98,17 +98,13 @@ You receive 4 gold pieces.
 You receive your {{:Shackle of Clay}}.
 
 == Shackle Quest No. 2 (Stone) ==
-
-Note: Adventurers who have lost their [[Shackle of Dust]] and are looking to avoid [[The Penance]] may [[Multiquest]] this quest by creating a new Iksar monk and using their shackle. 
-
-===Checklist===
-
+=== Checkbox ===
 {{CheckboxList}}
 * Obtain Shackle of Dust
 * Obtain Shackle of Clay
 * Obtain two [[Iksar Bandit Mask]]s
 * Turn in shackles and masks to Master Raska (to receive [[Shackle of Stone]])
-{{end}}
+{{End}}
 
 ===Walkthrough===
 

@@ -1,0 +1,54 @@
+{{Classic Era}}
+[[File:npc_Exterminator_Galub.png|thumb|Exterminator Galub]]
+{| class="raidMobTopTable"
+! ''' Starts In: '''
+| [[The Rathe Mountains]]
+|-
+! ''' Quest Giver: '''
+| [[Exterminator Galub]]
+|-
+! ''' Minimum Level: '''
+| 1+
+|-
+! ''' Classes: '''
+| ALL
+|-
+! ''' Related Zones: '''
+| [[The Rathe Mountains]]
+|-
+! ''' Related NPCs: '''
+| [[a domesticated hatchling]], [[a crab spiderling]]
+|-
+! ''' Required Faction: '''
+| Unknown
+|}
+
+= Reward =
+
+<ul><li>  Experience
+</li><li> [[Faction]]
+</li><li> Coin
+</li></ul>
+
+= Walkthrough =
+
+You say, "Hail, Exterminator Galub"
+
+: Exterminator Galub says, '"Welcome to Gukta. I am afraid I do not have too much time to talk, my friend. Recently, the jungle hatchling population has gotten way out of control around here. I was brought in to try to curb their numbers but there are too many! Perhaps you could be of assistance to me. If you have time kill some hatchlings and bring me their eyes. I will reward you of course.'
+
+Hand 4 [[Spiderling Eye]] to [[Exterminator Galub]]:
+
+<div class="facblock">
+* Your faction standing with [[Protectors of Gukta]] has been adjusted by +5.
+{{YouGainExperience}}
+
+'''You recieve 1 copper, 1 silver, and 1 gold piece.'''
+
+= Notes =
+
+* Completed this as as a character that started as a Froglok, unsure as to the faction requirements.
+
+
+[[Category:Quests]]
+[[Category:The Rathe Mountains]]
+[[Category:All Classes Quests]]

@@ -1,8 +1,8 @@
-<noinclude>{{Classic Era}}</noinclude>
+{{Classic Era}}
 {{Spellpagesmart|
 
 | spellname = Fixation of Ro
-| spellicon = O
+| spellicon = 51
 | description = Surrounds your target in dancing flames, lowering their attack and armor class.
 | Table = {{{Table|0}}}
 | TableLevel = {{{TableLevel|}}}
@@ -34,8 +34,8 @@
 | msg_wears_off = The flames die away.
 
 | where_to_obtain = 
-* Velious Mob Drop 
-   
-| TableLocations = Dropped
-| TableEra = {{{TableEra|Velious}}}
+
+<ul>
+<li>[[Druid#Spell Vendors|Druid Spell Vendors]]</li>
+</ul>
 }}

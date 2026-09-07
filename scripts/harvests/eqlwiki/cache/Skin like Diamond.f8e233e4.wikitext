@@ -1,7 +1,8 @@
+{{Classic Era}}
 {{Spellpagesmart|
 
 | spellname = Skin Like Diamond
-| spellicon = K
+| spellicon = 131
 | description = Hardens the skin of your target, increasing their hit points and armor class for 54 min.
 | Table = {{{Table|0}}}
 | TableLevel = {{{TableLevel|}}}
@@ -40,11 +41,7 @@
 
 | where_to_obtain = 
 
-{{SpellWhereTable|
-{{SpellWhereRowB | [[Butcherblock Mountains]] | [[Ellona]] | Druid Ring | (-2085,2016) }}
-{{SpellWhereRow  | [[Firiona Vie]] | [[Raciel Sanherb]] | Outpost | (-3396,3310) }}
-{{SpellWhereRowB | [[The Wakening Land]] | [[Weinna Oakchild]] | ? | (521,-1038) }}
-}}
-| TableLocations = Butcherblock Mnt<br/>Firiona Vie<br/>Wakening Land
-| TableEra = {{{TableEra|Classic}}}
+<ul>
+<li>[[Druid#Spell Vendors|Druid Spell Vendors]]</li>
+</ul>
 }}

@@ -1,7 +1,8 @@
+{{Classic Era}}
 {{Spellpagesmart|
 
 | spellname = Greater Wolf Form
-| spellicon = T
+| spellicon = 81
 | description = Fills you with the spirit of the wild, allowing you to take the form of a wolf, increasing your movement speed, and attack rating.
 | Table = {{{Table|0}}}
 | TableLevel = {{{TableLevel|}}}
@@ -40,13 +41,8 @@
 
 | where_to_obtain = 
 
-{{SpellWhereTable|
-{{SpellWhereRowB | [[Firiona Vie]] | [[Raciel Sanherb]] | Outpost | (-3396,3310) }}
-{{SpellWhereRow  | [[Greater Faydark]] | [[Horth Evergreen]] | Kelethin Druid Guild | (-640,219) }}
-{{SpellWhereRowB | [[Rivervale]] | [[Torth Largefoot]] | Druid Guild | (-32,-384) }}
-{{SpellWhereRow  | [[Surefall Glade]] | [[Arrivae Valleren]] | Druid Guild | (-156,-300) }}
-}}
-| TableLocations = Firiona Vie<br/>Kelethin<br/>Rivervale<br/>Surefall Glade
-| TableEra = {{{TableEra|Classic}}}
+<ul>
+<li>[[Druid#Spell Vendors|Druid Spell Vendors]]</li>
+</ul>
 }}
 [[Category: Illusions]]

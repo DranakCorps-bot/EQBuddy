@@ -1,5 +1,5 @@
 {{Classic Era}}
-{{Spellpage|
+{{Spellpagesmart|
 
 | spellname = Resist Poison
 | spellicon = 61
@@ -36,24 +36,9 @@
 
 | where_to_obtain = 
 
-{{SpellWhereTable|
-{{SpellWhereRowB | [[Ak'Anon]] | [[Clockwork Merchant (CG-4)]] | Cleric Guild | (1223,-547) }}
-{{SpellWhereRow  | [[Ak'Anon]] | [[Clockwork Merchant (NG-13)]] | Necromancer Guild | (2112,-438) }}
-{{SpellWhereRowB | [[Butcherblock Mountains]] | [[Ellona]] | Druid Ring | (-2085,2016) }}
-{{SpellWhereRow  | [[Cabilis|East Cabilis]] | [[Grazik Plaguebringer]] | Temple of Terror (East Tower - Basement) | (1126,-263) }}
-{{SpellWhereRowB | [[Erudin]] | [[Alysa Eltern]] | Cleric Guild - Quellious (Outside) | (-707,-57) }}
-{{SpellWhereRow  | [[Everfrost Peaks]] | [[Starn Bearjumper]] | Ruined Temple | (2870,-36) }}
-{{SpellWhereRowB | [[Felwithe]] | [[Terri Woodshape]] | Cleric Guild | (2,-456) }}
-{{SpellWhereRow  | [[Innothule Swamp]] | [[Stragak]] | Northern Hand | (1170,539) }}
-{{SpellWhereRowB | [[Neriak|Neriak - 3rd Gate]] | [[Friz Punox]] | Cleric Guid | (412,-788) }}
-{{SpellWhereRow  | [[Freeport|North Freeport]] | [[Perep Chen]] | Cleric Guild (basement) | (106,311) }}
-{{SpellWhereRow  | [[Kaladim|North Kaladim]] | [[Dorlita Splitshield]] | Cleric Guild | (733,138) }}
-{{SpellWhereRowB | [[Qeynos|North Qeynos]] | [[Enpero Mesog]] | Cleric Guild (Outside) | (-216,-230) }}
-{{SpellWhereRow  | [[Qeynos Aqueducts|Qeynos Catacombs]] | [[Naes Ereek]] | Cleric Guild | (340,-427) }}
-{{SpellWhereRowB | [[Rivervale]] | [[Alice Sweetoven]] | Cleric Guild | (-232,-419) }}
-{{SpellWhereRow  | [[The Wakening Land]] | [[Weinna Oakchild]] | Tower to Plane of Growth | (521,-1038) }}
-}}
-
-| TableLocations = Vendors
-| TableEra = {{{TableEra|Classic}}}
+<ul>
+<li>[[Cleric#Spell Vendors|Cleric Spell Vendors]]</li>
+<li>[[Druid#Spell Vendors|Druid Spell Vendors]]</li>
+<li>[[Shaman#Spell Vendors|Shaman Spell Vendors]]</li>
+</ul>
 }}

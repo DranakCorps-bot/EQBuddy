@@ -27,7 +27,7 @@
 
 == Walkthrough ==
 
-'''Find [[Tiam Khonsir]] located behind the Temple of Deepwater Knights in the city of [[Erudin]].'''
+'''Find [[Tiam Khonsir]] (-1127, -419) located behind the Temple of Deepwater Knights in the city of [[Erudin]].'''
 
 You say, 'Hail, Tiam Khonsir'
 

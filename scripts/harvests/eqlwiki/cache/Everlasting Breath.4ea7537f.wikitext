@@ -1,7 +1,8 @@
-{{Spellpage|
+{{Classic Era}}
+{{Spellpagesmart|
 
 | spellname = Everlasting Breath
-| spellicon = F
+| spellicon = 20
 | description = Fills your lungs with magical breath, removing your necessity for air for 27 min.
 
 | classes = * [[Druid]] - Level 50
@@ -32,4 +33,11 @@
 | msg_cast_on_you = You feel no need to breathe.
 | msg_cast_on_other = Someone  doesn't seem to be breathing anymore.
 | msg_wears_off = You resume breathing.
+
+| where_to_obtain = 
+
+<ul>
+<li>[[Druid#Spell Vendors|Druid Spell Vendors]]</li>
+</ul>
+
 }}

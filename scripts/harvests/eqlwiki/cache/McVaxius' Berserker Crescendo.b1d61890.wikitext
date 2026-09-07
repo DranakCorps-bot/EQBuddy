@@ -12,7 +12,7 @@
 
 | slots = 
 
-{{SpellSlotRowSmart | 1 | Increase Melee Haste by 8% | simple = {{#ifeq:{{{Table|0}}}|0|0|1}} }}
+{{SpellSlotRowSmart | 1 | Increase Melee Haste by 18% | simple = {{#ifeq:{{{Table|0}}}|0|0|1}} }}
 {{SpellSlotRowSmart | 2 | Increase STR by 15 (L42) to 21 (L60) | simple = {{#ifeq:{{{Table|0}}}|0|0|1}} }}
 {{SpellSlotRowSmart | 3 | Increase AC by 6 (L42) to 9 (L60) | simple = {{#ifeq:{{{Table|0}}}|0|0|1}} }}
 {{SpellSlotRowSmart | Enhanced by instrument? | '''Yes (not attack speed)''' | simple = {{#ifeq:{{{Table|0}}}|0|0|1}} }}

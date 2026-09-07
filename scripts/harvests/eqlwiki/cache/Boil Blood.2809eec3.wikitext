@@ -16,7 +16,7 @@
 
 | slots = 
 
-{{SpellSlotRow | 1 | Decrease Hitpoints by 24 per tick }}
+{{SpellSlotRow | 1 | Decrease Hitpoints by 67 per tick }}
 
 | skill = [[Skill Alteration | Alteration]]
 

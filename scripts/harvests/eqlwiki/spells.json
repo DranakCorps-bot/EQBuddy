@@ -3722,7 +3722,7 @@
    "modifier": 0
   },
   "range_raw": "150",
-  "description": "Calls down a hailstorm from the sky, causing three waves of 125 damage, up to a maximum of 4 targets hit. (0.625DPM per hit). On a single target where all 3 waves hit, 1.875 damage per mana, meaning it is less mana-efficient than Firestrike unless all 4 possible strikes land.\n\n\n*Note: Rain nukes are limited to 4 hits total. Either you can hit the same mobs 3 times, you can hit 2 mobs twice each, or you can hit 4 mobs once each.",
+  "description": "Calls down a hailstorm from the sky, causing three waves of 125 damage, up to a maximum of 4 targets hit.",
   "slot_effects": [
    {
     "slot": 1,
@@ -3939,7 +3939,7 @@
  {
   "name": "Banish Summoned",
   "page_title": "Banish Summoned",
-  "template": "Spellpage",
+  "template": "Spellpagesmart",
   "classes": [
    {
     "class": "Druid",
@@ -5437,7 +5437,7 @@
  {
   "name": "Bind Affinity",
   "page_title": "Bind Affinity",
-  "template": "Spellpage",
+  "template": "Spellpagesmart",
   "classes": [
    {
     "class": "Cleric",
@@ -7123,7 +7123,7 @@
   "slot_effects": [
    {
     "slot": 1,
-    "effect": "Decrease Hitpoints by 24 per tick"
+    "effect": "Decrease Hitpoints by 67 per tick"
    }
   ],
   "msg_cast_on_you": "Your blood boils.",
@@ -9450,7 +9450,7 @@
  {
   "name": "Burst of Flame",
   "page_title": "Burst of Flame",
-  "template": "Spellpage",
+  "template": "Spellpagesmart",
   "classes": [
    {
     "class": "Druid",
@@ -11189,7 +11189,7 @@
    "modifier": 0
   },
   "range_raw": "150",
-  "description": "Calls down a hailstorm from the sky, causing three waves of 27 damage, up to a maximum of 4 targets hit. (0.435DPM per hit)\n\n\n*Note: Rain nukes are limited to 4 hits total. Either you can hit the same mobs 3 times, you can hit 2 mobs twice each, or you can hit 4 mobs once each.",
+  "description": "Calls down a hailstorm from the sky, causing three waves of 27 damage, up to a maximum of 4 targets hit.",
   "slot_effects": [
    {
     "slot": 1,
@@ -19946,7 +19946,7 @@
  {
   "name": "Dismiss Summoned",
   "page_title": "Dismiss Summoned",
-  "template": "Spellpage",
+  "template": "Spellpagesmart",
   "classes": [
    {
     "class": "Druid",
@@ -24839,7 +24839,7 @@
  {
   "name": "Endure Cold",
   "page_title": "Endure Cold",
-  "template": "Spellpage",
+  "template": "Spellpagesmart",
   "classes": [
    {
     "class": "Beastlord",
@@ -24912,7 +24912,7 @@
  {
   "name": "Endure Disease",
   "page_title": "Endure Disease",
-  "template": "Spellpage",
+  "template": "Spellpagesmart",
   "classes": [
    {
     "class": "Beastlord",
@@ -24985,7 +24985,7 @@
  {
   "name": "Endure Fire",
   "page_title": "Endure Fire",
-  "template": "Spellpage",
+  "template": "Spellpagesmart",
   "classes": [
    {
     "class": "Beastlord",
@@ -25048,7 +25048,7 @@
  {
   "name": "Endure Magic",
   "page_title": "Endure Magic",
-  "template": "Spellpage",
+  "template": "Spellpagesmart",
   "classes": [
    {
     "class": "Cleric",
@@ -25116,7 +25116,7 @@
  {
   "name": "Endure Poison",
   "page_title": "Endure Poison",
-  "template": "Spellpage",
+  "template": "Spellpagesmart",
   "classes": [
    {
     "class": "Cleric",
@@ -27098,7 +27098,7 @@
  {
   "name": "Everlasting Breath",
   "page_title": "Everlasting Breath",
-  "template": "Spellpage",
+  "template": "Spellpagesmart",
   "classes": [
    {
     "class": "Druid",
@@ -27280,7 +27280,7 @@
  {
   "name": "Expel Summoned",
   "page_title": "Expel Summoned",
-  "template": "Spellpage",
+  "template": "Spellpagesmart",
   "classes": [
    {
     "class": "Magician",
@@ -27391,7 +27391,7 @@
  {
   "name": "Expulse Summoned",
   "page_title": "Expulse Summoned",
-  "template": "Spellpage",
+  "template": "Spellpagesmart",
   "classes": [
    {
     "class": "Druid",
@@ -29227,7 +29227,7 @@
    "modifier": 0
   },
   "range_raw": "200",
-  "description": "Ignites your target's skin, doing 392 damage, and lowering their ice resistance for 18 secs (3 ticks). 1.51 DPM.",
+  "description": "Ignites your target's skin, doing 392 damage, and lowering their ice resistance for 18 secs (3 ticks).",
   "slot_effects": [
    {
     "slot": 1,
@@ -32186,7 +32186,7 @@
   "slot_effects": [
    {
     "slot": 1,
-    "effect": "Increase STR by 40 (effect decreases over time)"
+    "effect": "Increase STR by 40 (effect decreases over time).  Upgrading the spell increases the strength gained (+100 STR at level III)"
    }
   ],
   "msg_cast_on_you": "Your muscles erupt with frenzied strength.",
@@ -33281,7 +33281,7 @@
   "recast_time_raw": "12.00",
   "duration_raw": "Instant",
   "duration_seconds": 0.0,
-  "resist_raw": "Magic (+15)",
+  "resist_raw": "Magic (0?)",
   "resist": null,
   "range_raw": "200",
   "description": "Summons a whirling wind 170 damage and stuns the target up to level 55 for 2 seconds.",
@@ -33884,7 +33884,7 @@
  {
   "name": "Gate",
   "page_title": "Gate",
-  "template": "Spellpage",
+  "template": "Spellpagesmart",
   "classes": [
    {
     "class": "Cleric",
@@ -35266,49 +35266,6 @@
   ],
   "msg_cast_on_you": "You feel much better.",
   "msg_cast_on_other": "Someone feels much better.",
-  "msg_wears_off": null,
-  "cc_families": []
- },
- {
-  "name": "Greater Healing",
-  "page_title": "Healing Water",
-  "template": "Spellpagesmart",
-  "classes": [
-   {
-    "class": "Druid",
-    "level": 34,
-    "note": null
-   }
-  ],
-  "classes_raw": "* [[Druid]] - Level 34",
-  "school": "Alteration",
-  "school_raw": "[[Skill Alteration | Alteration]]",
-  "target_type": "Single Friendly (or Self)",
-  "spell_type_raw": "Beneficial",
-  "beneficial": true,
-  "mana": 150.0,
-  "mana_raw": "150",
-  "cast_time_seconds": 0.75,
-  "casting_time_raw": "0.75",
-  "recast_seconds": 6.0,
-  "recast_time_raw": "6.00",
-  "duration_raw": "Instant",
-  "duration_seconds": 0.0,
-  "resist_raw": "Unresistable",
-  "resist": {
-   "type": "Unresistable",
-   "modifier": null
-  },
-  "range_raw": "100",
-  "description": "Conjures healing water from the ground, healing 425 damage to your target.",
-  "slot_effects": [
-   {
-    "slot": 1,
-    "effect": "Increase Hitpoints by 345 (L34) to 425 (L50)"
-   }
-  ],
-  "msg_cast_on_you": "Healing water flows over you.",
-  "msg_cast_on_other": null,
   "msg_wears_off": null,
   "cc_families": []
  },
@@ -37630,6 +37587,49 @@
   ],
   "msg_cast_on_you": "Your wounds heal.",
   "msg_cast_on_other": "Someone  drinks a healing potion.",
+  "msg_wears_off": null,
+  "cc_families": []
+ },
+ {
+  "name": "Healing Water",
+  "page_title": "Healing Water",
+  "template": "Spellpagesmart",
+  "classes": [
+   {
+    "class": "Druid",
+    "level": 34,
+    "note": null
+   }
+  ],
+  "classes_raw": "* [[Druid]] - Level 34",
+  "school": "Alteration",
+  "school_raw": "[[Skill Alteration | Alteration]]",
+  "target_type": "Single Friendly (or Self)",
+  "spell_type_raw": "Beneficial",
+  "beneficial": true,
+  "mana": 150.0,
+  "mana_raw": "150",
+  "cast_time_seconds": 0.75,
+  "casting_time_raw": "0.75",
+  "recast_seconds": 6.0,
+  "recast_time_raw": "6.00",
+  "duration_raw": "Instant",
+  "duration_seconds": 0.0,
+  "resist_raw": "Unresistable",
+  "resist": {
+   "type": "Unresistable",
+   "modifier": null
+  },
+  "range_raw": "100",
+  "description": "Conjures healing water from the ground, healing 425 damage to your target.",
+  "slot_effects": [
+   {
+    "slot": 1,
+    "effect": "Increase Hitpoints by 345 (L34) to 425 (L50)"
+   }
+  ],
+  "msg_cast_on_you": "Healing water flows over you.",
+  "msg_cast_on_other": null,
   "msg_wears_off": null,
   "cc_families": []
  },
@@ -47073,7 +47073,7 @@
  {
   "name": "Levitation",
   "page_title": "Levitation",
-  "template": "Spellpage",
+  "template": "Spellpagesmart",
   "classes": [
    {
     "class": "Druid",
@@ -47549,7 +47549,7 @@
    "modifier": 0
   },
   "range_raw": "200",
-  "description": "Calls down lightning from the sky, causing 477 damage to all those in the vicinity of your target.  2.04 damage per mana on a single target, 8.15 damage per mana on a full quad. Outdoors only.",
+  "description": "Calls down lightning from the sky, causing 477 damage to all those in the vicinity of your target.",
   "slot_effects": [
    {
     "slot": 1,
@@ -47807,7 +47807,7 @@
    "modifier": 0
   },
   "range_raw": "200",
-  "description": "Calls down lightning from the sky, causing between 163 and 184 damage and up to 3 others nearby. (1.23 DPM) This spell can hit at most 4 targets. Only castable outdoors.",
+  "description": "Calls down lightning from the sky over your target, causing 184 damage to up to 4 creatures in the area.",
   "slot_effects": [
    {
     "slot": 1,
@@ -49646,13 +49646,13 @@
   "recast_time_raw": "6.00",
   "duration_raw": "11 Min",
   "duration_seconds": 660.0,
-  "resist_raw": "Magic (0)",
+  "resist_raw": "Unresistable",
   "resist": {
-   "type": "Magic",
-   "modifier": 0
+   "type": "Unresistable",
+   "modifier": null
   },
   "range_raw": "200",
-  "description": "Decreases your target's resistance to cold, fire, magic, and poison.",
+  "description": "Decreases your target's resistance to cold, fire, magic, and poison.\n\nNote: This spell is unresistable. This was an undocumented change prior to the August 25, 2026 patch, which corrected the tooltip.",
   "slot_effects": [
    {
     "slot": 1,
@@ -51876,7 +51876,7 @@
   "slot_effects": [
    {
     "slot": 1,
-    "effect": "Increase Melee Haste by 8%"
+    "effect": "Increase Melee Haste by 18%"
    },
    {
     "slot": 2,
@@ -56235,6 +56235,10 @@
    {
     "slot": 1,
     "effect": "Increase Hitpoints by 13 (L45) to 16 (L50) per tick"
+   },
+   {
+    "slot": 2,
+    "effect": "Increase Endurance by 10 (L45) per tick"
    }
   ],
   "msg_cast_on_you": "You begin to regenerate.",
@@ -57595,7 +57599,7 @@
    "modifier": 0
   },
   "range_raw": "150",
-  "description": "Calls down a hailstorm from the sky, causing three waves of 62 damage, up to a maximum of 4 targets hit. (0.496DPM per hit)\n\n\n*Note: Rain nukes are limited to 4 hits total. Either you can hit the same mobs 3 times, you can hit 2 mobs twice each, or you can hit 4 mobs once each.\n'''WARNING:''' This spell '''WILL NOT''' deal the final killing blow to any mob. Instead, it will just resist to infinity.",
+  "description": "Calls down a hailstorm from the sky, causing three waves of 62 damage, up to a maximum of 4 targets hit.",
   "slot_effects": [
    {
     "slot": 1,
@@ -59179,7 +59183,7 @@
  {
   "name": "Protection of Wood",
   "page_title": "Protection of Wood",
-  "template": "Spellpage",
+  "template": "Spellpagesmart",
   "classes": [
    {
     "class": "Druid",
@@ -61108,6 +61112,55 @@
   "cc_families": []
  },
  {
+  "name": "Reanimation Efficiency III",
+  "page_title": "Reanimation Efficiency III",
+  "template": "Spellpagesmart",
+  "classes": [],
+  "classes_raw": "No eligible class",
+  "school": null,
+  "school_raw": null,
+  "target_type": "Self",
+  "spell_type_raw": "Beneficial",
+  "beneficial": true,
+  "mana": null,
+  "mana_raw": null,
+  "cast_time_seconds": null,
+  "casting_time_raw": "Instant",
+  "recast_seconds": null,
+  "recast_time_raw": null,
+  "duration_raw": "2:06:00",
+  "duration_seconds": null,
+  "resist_raw": "Unresistable",
+  "resist": {
+   "type": "Unresistable",
+   "modifier": null
+  },
+  "range_raw": "100",
+  "description": "Reduces the mana cost of summon undead spells by up to 25%.  This bonus will decay on spells over level 60.",
+  "slot_effects": [
+   {
+    "slot": 1,
+    "effect": "Decrease Spell Mana Cost by 1% to 25%"
+   },
+   {
+    "slot": 2,
+    "effect": "Limit Max Level: 60 (lose 5% per level after)"
+   },
+   {
+    "slot": 3,
+    "effect": "Limit Effect: Summon Skeleton Pet"
+   },
+   {
+    "slot": 4,
+    "effect": "Limit Type: Exclude Combat Skills"
+   }
+  ],
+  "msg_cast_on_you": null,
+  "msg_cast_on_other": null,
+  "msg_wears_off": null,
+  "cc_families": []
+ },
+ {
   "name": "Reanimation Haste I",
   "page_title": "Reanimation Haste I",
   "template": "Spellpagesmart",
@@ -61765,7 +61818,7 @@
    "modifier": null
   },
   "range_raw": null,
-  "description": "Slows your attack speed and lowers your intelligence while increasing your regeneration rate.<br>\n'''NOTE: This may not decrease attack speed at all, Lucy data shows it decreasing INT/STR until 2007.[http://lucy.allakhazam.com/spellhistory.html?id=1252&source=Live]'''",
+  "description": "Slows your attack speed and lowers your intelligence while increasing your regeneration rate.<br>",
   "slot_effects": [
    {
     "slot": 1,
@@ -61773,7 +61826,7 @@
    },
    {
     "slot": 2,
-    "effect": "Decrease Attack Speed by 20% / (Decrease STR by 2 (L1) to 61 (L60)??)"
+    "effect": "Decrease Attack Speed by 20%"
    },
    {
     "slot": 4,
@@ -61944,7 +61997,7 @@
  {
   "name": "Remove Minor Curse",
   "page_title": "Remove Minor Curse",
-  "template": "Spellpage",
+  "template": "Spellpagesmart",
   "classes": [
    {
     "class": "Cleric",
@@ -62420,7 +62473,7 @@
  {
   "name": "Resist Cold",
   "page_title": "Resist Cold",
-  "template": "Spellpage",
+  "template": "Spellpagesmart",
   "classes": [
    {
     "class": "Cleric",
@@ -62488,7 +62541,7 @@
  {
   "name": "Resist Disease",
   "page_title": "Resist Disease",
-  "template": "Spellpage",
+  "template": "Spellpagesmart",
   "classes": [
    {
     "class": "Beastlord",
@@ -62556,7 +62609,7 @@
  {
   "name": "Resist Fire",
   "page_title": "Resist Fire",
-  "template": "Spellpage",
+  "template": "Spellpagesmart",
   "classes": [
    {
     "class": "Druid",
@@ -62614,7 +62667,7 @@
  {
   "name": "Resist Magic",
   "page_title": "Resist Magic",
-  "template": "Spellpage",
+  "template": "Spellpagesmart",
   "classes": [
    {
     "class": "Enchanter",
@@ -62677,7 +62730,7 @@
  {
   "name": "Resist Poison",
   "page_title": "Resist Poison",
-  "template": "Spellpage",
+  "template": "Spellpagesmart",
   "classes": [
    {
     "class": "Cleric",
@@ -64570,7 +64623,7 @@
    "modifier": -200
   },
   "range_raw": "200",
-  "description": "Surrounds your target in dancing flames, lowering their fire resistance and armor class. This spell generates a large amount of hate.\n\nNote: Didn't have a Fire (-200) resist modifier until 2002 because the \"Resistadj\" value wasn't created until then,[https://lucy.allakhazam.com/spellhistory.html?id=1437&source=Live] although the same patch that added Fire (-200) to Ro's Fiery Sundering also removed the pre-existing line \"Slot 1: Lure(6)\", implying that the spell was already abnormally hard to resist before the update that introduced the \"Resistadj\" value to the spell system. Prior to 2002, spells didn't have an entry for \"Resistadj\", with more difficult spells simply being given a \"Lure\" designation with some numerical value indicating how lure-y they were.\n\nIn Lucy, the line reporting that the Resistadj value was changed from 0 to -200 was simply an indicator that the value was first created in the system.\n\nFor context, [[Lure of Flame]] was marked as \"Slot 1: Lure(5)\" before the same patch on 2002-9-04 that updated Ro's Fiery Sundering to Fire (-200). The same patch in 2002 that removed \"Slot 1: Lure(5)\" from Lure of Flame also changed the Resistadj value from 0 to -300 for Lure of Flame, as well. Clearly, Lure of Flame did not actually have a Resistadj value of 0 before this patch; rather, the Resistadj value did not exist at all, and instead, stating that it was changed from 0 to -300 was Lucy's way of indicating that this new, unified Resistadj system had been added to replace the prior \"Lure\" designation that certain spells had. This was one part of several reworkings of the spell resist system that the old EQ devs had implemented over time. [https://lucy.allakhazam.com/spellhistory.html?id=1638&source=Live]",
+  "description": "Surrounds your target in dancing flames, lowering their fire resistance and armor class. This spell generates a large amount of hate.",
   "slot_effects": [
    {
     "slot": 2,
@@ -66938,7 +66991,7 @@
  {
   "name": "Sense Animals",
   "page_title": "Sense Animals",
-  "template": "Spellpage",
+  "template": "Spellpagesmart",
   "classes": [
    {
     "class": "Druid",
@@ -67897,7 +67950,7 @@
    "modifier": null
   },
   "range_raw": "AE Range (40)",
-  "description": "Fills your group with the spirit of the wild, allowing them to take the form a wolf for 360 min and granting *100%N.",
+  "description": "Fills your group with the spirit of the wild, allowing them to take the form a wolf for 360 min and granting Ultravision, and increased movement speed and attack.",
   "slot_effects": [
    {
     "slot": 1,
@@ -77836,7 +77889,7 @@
  {
   "name": "Summon Companion",
   "page_title": "Summon Companion",
-  "template": "Spellpage",
+  "template": "Spellpagesmart",
   "classes": [
    {
     "class": "Beastlord",
@@ -78043,7 +78096,7 @@
  {
   "name": "Summon Drink",
   "page_title": "Summon Drink",
-  "template": "Spellpage",
+  "template": "Spellpagesmart",
   "classes": [
    {
     "class": "Magician",
@@ -78224,6 +78277,43 @@
   "cc_families": []
  },
  {
+  "name": "Summon Familiar: Murderbee",
+  "page_title": "Summon Familiar: Murderbee",
+  "template": "Spellpage",
+  "classes": [],
+  "classes_raw": "NPC Only Spell",
+  "school": null,
+  "school_raw": null,
+  "target_type": "Self",
+  "spell_type_raw": "Beneficial",
+  "beneficial": true,
+  "mana": null,
+  "mana_raw": null,
+  "cast_time_seconds": 14.0,
+  "casting_time_raw": "14",
+  "recast_seconds": 1.0,
+  "recast_time_raw": "1",
+  "duration_raw": "6:00:00",
+  "duration_seconds": null,
+  "resist_raw": "Unresistable",
+  "resist": {
+   "type": "Unresistable",
+   "modifier": null
+  },
+  "range_raw": null,
+  "description": "Summons a murderbee familiar. Purely cosmetic.",
+  "slot_effects": [
+   {
+    "slot": 1,
+    "effect": "Summon Familiar: Murderbee"
+   }
+  ],
+  "msg_cast_on_you": "You summon forth a small murderbee.",
+  "msg_cast_on_other": "Soandso summons forth a small murderbee.",
+  "msg_wears_off": "Your small murderbee departs.",
+  "cc_families": []
+ },
+ {
   "name": "Summon Fang",
   "page_title": "Summon Fang",
   "template": "Spellpage",
@@ -78269,7 +78359,7 @@
  {
   "name": "Summon Food",
   "page_title": "Summon Food",
-  "template": "Spellpage",
+  "template": "Spellpagesmart",
   "classes": [
    {
     "class": "Cleric",

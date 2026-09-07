@@ -67,6 +67,8 @@ This area has also seen recent problems with undead. Several powerful necromance
 
 Surefall Glade is reachable through a narrow tunnel that enters the impassable hills that mark the northern edge of [[Qeynos Hills]]. [[Qeynos]] has posted guards at that entrance, while the rangers and druids extend their patrols into the hills themselves. Travelling due north from Qeynos will bring one to the entrance to Surefall Glade.
 
+This zone is NOT friendly to evils. For some guidance on changing that, check out [https://eqlwiki.com/User:Abserd/How_to_not_be_KOS_in_Surefall_Glade Abserd's Guide]
+
 == History ==
 
 During the reign of Antonius Bayle the Third (father to Qeynos's current Monarch), Surefall Glade was founded in a small glade set into a mountain valley in the southern-most tip of the Jaggedpine Forest.  At first, the Glade provided a sort of base camp for explorers into the Jaggedpine.

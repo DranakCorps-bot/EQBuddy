@@ -64,11 +64,14 @@ The Mountains of Rathe is a vast and dangerous mid level zone. It lies along the
 * 18. Sphinx ([[Ankhefenmut]]) & Sphinx ([[Zazamoukh]])
 * 19. Froglock newbie mob area, levels 4-10
 * 20. Froglock starting area with good & evil guildmasters, spell vendors, bank, general vendors and quest NPCs
+** [[Gaz Commander Faltip]] needed for [[Soldier's Brooch Quest]] is to the east of this area, standing on a rock
 * 21. Lizard Man Camp
 * 22. Lizard Man Camp
 * 23. Orc Camp
 * 24. Haunted Stone Ring. [[Kazzel D`Leryt]] roams between here and the hill between 22 and 23
 * 25. Haunted Tower with Bindlegrob and Sindlegrob
+* 26. [[A Troll Greenblood]], [[A Troll Marauder]], [[A Tier'Dal Spellbinder]], [[A Tier'Dal Priest]] needed for [[Soldier's Brooch Quest]]
+
 
 
 |}

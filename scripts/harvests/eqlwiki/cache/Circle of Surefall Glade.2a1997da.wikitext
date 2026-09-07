@@ -1,3 +1,4 @@
+{{Classic Era}}
 {{Spellpagesmart|
 
 | spellname = Circle of Surefall Glade
@@ -27,9 +28,7 @@
 
 | where_to_obtain = 
 
-{{SpellWhereTable|
-{{SpellWhereRowB | [[Greater Faydark]] | [[Aleena Lightleaf]] | Kelethin Ranger Guild | (-400,490) }}
-{{SpellWhereRowB | [[Greater Faydark]] | [[Hendricks]] | Kelethin | (-537, -550) }}
-}}
-
+<ul>
+<li>[[Druid#Spell Vendors|Druid Spell Vendors]]</li>
+</ul>
 }}

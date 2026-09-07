@@ -24,7 +24,7 @@
       "cost_per_rank_raw": "3/6/9",
       "level_requirement": 1,
       "requirements_raw": "Requirements: Level 1.",
-      "effect_text": "This passive ability reduces the chance of failing Alchemy recipes by 10/25/?%. Requirements: Level 1."
+      "effect_text": "This passive ability reduces the chance of failing Alchemy recipes by 10/25/50%. Requirements: Level 1."
     },
     {
       "name": "Baking Mastery",
@@ -35,7 +35,7 @@
       "cost_per_rank_raw": "2/4/6",
       "level_requirement": 1,
       "requirements_raw": "Requirements: Level 1.",
-      "effect_text": "This passive ability reduces the chance of failing Baking recipes by 10/25/?%. Requirements: Level 1."
+      "effect_text": "This passive ability reduces the chance of failing Baking recipes by 10/25/50%. Requirements: Level 1."
     },
     {
       "name": "Blacksmithing Mastery",
@@ -46,7 +46,7 @@
       "cost_per_rank_raw": "2/4/6",
       "level_requirement": 1,
       "requirements_raw": "Requirements: Level 1.",
-      "effect_text": "This passive ability reduces the chance of failing Blacksmithing recipes by 10/25/?%. Requirements: Level 1."
+      "effect_text": "This passive ability reduces the chance of failing Blacksmithing recipes by 10/25/50%. Requirements: Level 1."
     },
     {
       "name": "Brewing Mastery",
@@ -57,7 +57,7 @@
       "cost_per_rank_raw": "2/4/6",
       "level_requirement": 1,
       "requirements_raw": "Requirements: Level 1.",
-      "effect_text": "This passive ability reduces the chance of failing Brewing recipes by 10/?/?%. Requirements: Level 1."
+      "effect_text": "This passive ability reduces the chance of failing Brewing recipes by 10/25/50%. Requirements: Level 1."
     },
     {
       "name": "Circular Breathing",
@@ -79,7 +79,7 @@
       "cost_per_rank_raw": "2/4/6",
       "level_requirement": 1,
       "requirements_raw": "Requirements: Level 1.",
-      "effect_text": "This passive ability increases your melee avoidance by 2%/5%/10%. Melee avoidance is the component of armor class that allows you to avoid incoming attacks and is derived from agility, item avoidance, and your defense skill. Requirements: Level 1."
+      "effect_text": "This passive ability increases your melee avoidance by 2/5/10%. Melee avoidance is the component of armor class that allows you to avoid incoming attacks and is derived from agility, item avoidance, and your defense skill. Requirements: Level 1."
     },
     {
       "name": "Combat Fury",
@@ -145,7 +145,7 @@
       "cost_per_rank_raw": "2/4/6",
       "level_requirement": 1,
       "requirements_raw": "Requirements: Level 1.",
-      "effect_text": "This passive ability reduces the chance of failing Fletching recipes by 10/25/?%. Requirements: Level 1."
+      "effect_text": "This passive ability reduces the chance of failing Fletching recipes by 10/25/50%. Requirements: Level 1."
     },
     {
       "name": "Foraging",
@@ -299,7 +299,7 @@
       "cost_per_rank_raw": "2/4/6",
       "level_requirement": 1,
       "requirements_raw": "Requirements: Level 1.",
-      "effect_text": "This passive ability reduces the chance of failing Pottery recipes by 10/25/?%. Requirements: Level 1."
+      "effect_text": "This passive ability reduces the chance of failing Pottery recipes by 10/25/50%. Requirements: Level 1."
     },
     {
       "name": "Quick Buff",
@@ -332,7 +332,7 @@
       "cost_per_rank_raw": "2/2/2/2/2",
       "level_requirement": 1,
       "requirements_raw": "Requirements: Level 1.",
-      "effect_text": "This passive ability reduces how far incoming melee attacks push you backward by 10%. Requirements: Level 1."
+      "effect_text": "This passive ability reduces how far incoming melee attacks push you backward by 10/20/30/40/50%. Requirements: Level 1."
     },
     {
       "name": "Tailoring Mastery",
@@ -343,7 +343,7 @@
       "cost_per_rank_raw": "2/4/6",
       "level_requirement": 1,
       "requirements_raw": "Requirements: Level 1.",
-      "effect_text": "This passive ability reduces the chance of failing Tailoring recipes by 10/25/?%. Requirements: Level 1."
+      "effect_text": "This passive ability reduces the chance of failing Tailoring recipes by 10/25/50%. Requirements: Level 1."
     },
     {
       "name": "Acrobatics",
@@ -376,7 +376,7 @@
       "cost_per_rank_raw": "3/6/9",
       "level_requirement": 46,
       "requirements_raw": "Requirements: Level 46.",
-      "effect_text": "This passive ability increases your flurry chance (up to two extra attacks after a primary slot triple attack) by 7/11/?%. Requirements: Level 46."
+      "effect_text": "This passive ability increases your flurry chance (up to two extra attacks after a primary slot triple attack) by 7/11/15%. Requirements: Level 46."
     },
     {
       "name": "Companion's Discipline",
@@ -714,10 +714,10 @@
       "class": null,
       "max_rank": 4,
       "ranks_raw": "4",
-      "cost_per_rank_raw": "3/?/?/?",
+      "cost_per_rank_raw": "3/6/?/?",
       "level_requirement": 1,
       "requirements_raw": "Requirements: Level 1.",
-      "effect_text": "This passive ability reduces the reuse time of your Sense Traps and Disarm Traps skills by 1/?/?/? seconds. Requirements: Level 1."
+      "effect_text": "This passive ability reduces the reuse time of your Sense Traps and Disarm Traps skills by 1/3/?/? seconds. Requirements: Level 1."
     },
     {
       "name": "Instrument Mastery",
@@ -959,7 +959,7 @@
       "cost_per_rank_raw": "0",
       "level_requirement": 12,
       "requirements_raw": "Requirements: Level 12/30/50.",
-      "effect_text": "This passive ability grants your healing spells a 2/?/?% chance to score an exceptional heal. An exceptional heal doubles the healing value of the spell. Requirements: Level 12/30/50."
+      "effect_text": "This passive ability grants your healing spells a 2/4/?% chance to score an exceptional heal. An exceptional heal doubles the healing value of the spell. Requirements: Level 12/30/50."
     },
     {
       "name": "Enhanced Root",
@@ -978,7 +978,7 @@
       "class": "Druid",
       "max_rank": 3,
       "ranks_raw": "3",
-      "cost_per_rank_raw": "3/?/?",
+      "cost_per_rank_raw": "3/6/9",
       "level_requirement": 1,
       "requirements_raw": "Requirements: Level 1.",
       "effect_text": "This passive ability reduces the cast time of your evacuation and succor spells and abilities by 10%. Requirements: Level 1."
@@ -1033,10 +1033,10 @@
       "class": "Magician",
       "max_rank": 5,
       "ranks_raw": "5",
-      "cost_per_rank_raw": "3/?/?/?/?",
+      "cost_per_rank_raw": "3/5/6/6/6",
       "level_requirement": 1,
       "requirements_raw": "Requirements: Level 1.",
-      "effect_text": "This passive ability prevents components used in the summoning of pets from being expended. Requirements: Level 1."
+      "effect_text": "Rank 1: This passive ability prevents components used in the summoning of pets from being expended.<br>Rank 2: Reduces cast time of your summon item, summon pet and summon target spells by 10% and of your summon swarm pet spells and abilities by 2%.<br>Rank 3: Reduces cast time of your summon item, summon pet and summon target spells by 25% and of your summon swarm pet spells and abilities by 5%.<br>Rank 4: Reduces cast time of your summon item, summon pet and summon target spells by 50% and of your summon swarm pet spells and abilities by 10%.<br>Rank 5: Allows reclaim energy to return 95% of the base mana cost of your current pet<br><br>Requirements: Level 1."
     },
     {
       "name": "Elemental Form",
@@ -1248,15 +1248,15 @@
       "effect_text": "Gives a passive 2/4/6% increase to your direct healing spells. Requirements: Level 12/30/50."
     },
     {
-      "name": "Valiant Steed",
+      "name": "<s>Valiant Steed</s>",
       "category": "Class",
       "class": "Paladin",
       "max_rank": 1,
       "ranks_raw": "1",
       "cost_per_rank_raw": "9",
       "level_requirement": 50,
-      "requirements_raw": "Requirements: Level 50, Holy Steed at Level 1.",
-      "effect_text": "Ability Activation ID: 570 - Refresh Time: 0:00:01 - Ability Timer(s): 0. This ability, when activated, summons the bridle of a very fast Valiant Unicorn. Requirements: Level 50, Holy Steed at Level 1."
+      "requirements_raw": "Requirements: Level 50, Holy Steed at Level 1.</s> This AA has been removed.",
+      "effect_text": "<s>Ability Activation ID: 570 - Refresh Time: 0:00:01 - Ability Timer(s): 0. This ability, when activated, summons the bridle of a very fast Valiant Unicorn. Requirements: Level 50, Holy Steed at Level 1.</s> This AA has been removed."
     },
     {
       "name": "Hunter's Attack Power",
@@ -1369,15 +1369,15 @@
       "effect_text": "Gives a passive 10/15/20% bonus to the duration of all poisons. Additionally lowers the resist value of all poisons by 25/50/75. Requirements: Level 12/30/50."
     },
     {
-      "name": "Abyssal Steed",
+      "name": "<s>Abyssal Steed</s>",
       "category": "Class",
       "class": "Shadow Knight",
       "max_rank": 1,
       "ranks_raw": "1",
       "cost_per_rank_raw": "9",
       "level_requirement": 50,
-      "requirements_raw": "Requirements: Level 50, Unholy Steed at Level 1.",
-      "effect_text": "Ability Activation ID: 571 - Refresh Time: 0:00:01 - Ability Timer(s): 0. This ability, when activated, summons the bridle of a very fast Abyssal Nightmare. Requirements: Level 50, Unholy Steed at Level 1."
+      "requirements_raw": "Requirements: Level 50, Unholy Steed at Level 1.</s> This AA has been removed.",
+      "effect_text": "<s>Ability Activation ID: 571 - Refresh Time: 0:00:01 - Ability Timer(s): 0. This ability, when activated, summons the bridle of a very fast Abyssal Nightmare. Requirements: Level 50, Unholy Steed at Level 1.</s> This AA has been removed."
     },
     {
       "name": "Harm Touch",

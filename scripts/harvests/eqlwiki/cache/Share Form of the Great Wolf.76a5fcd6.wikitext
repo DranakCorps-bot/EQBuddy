@@ -1,8 +1,9 @@
+{{Classic Era}}
 {{Spellpagesmart|
 
 | spellname = Share Form of the Great Wolf
-| spellicon = T
-| description = Fills your group with the spirit of the wild, allowing them to take the form a wolf for 360 min and granting *100%N.
+| spellicon = 81
+| description = Fills your group with the spirit of the wild, allowing them to take the form a wolf for 360 min and granting Ultravision, and increased movement speed and attack.
 
 | Table = {{{Table|0}}}
 | TableLevel = {{{TableLevel|}}}
@@ -38,13 +39,12 @@
 | msg_cast_on_other = Player turns into a wolf.
 | msg_wears_off = You are no longer a wolf.
 
-|| where_to_obtain = 
 
-{{SpellWhereTable|
-{{SpellWhereRowB | [[New Sebilis Expedition]] | [[Wanderer Rakshaazi]] | Spell Vendor Area | (120, -163) }}
-{{SpellWhereRow | [[West Commonlands]] | [[Slea Pinewhisper]] | Druid Ring | (450, 1383, -52) }}
-}}
+| where_to_obtain = 
 
+<ul>
+<li>[[Druid#Spell Vendors|Druid Spell Vendors]]</li>
+</ul>
 }}
 
 [[Category: Illusions]]

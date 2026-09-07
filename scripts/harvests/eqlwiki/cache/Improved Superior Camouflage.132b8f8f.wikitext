@@ -1,8 +1,8 @@
-<noinclude>{{Classic Era}}</noinclude>
+{{Classic Era}}
 {{Spellpagesmart|
 
 | spellname = Improved Superior Camo
-| spellicon = B
+| spellicon = 18
 | description = Covers your body in a mystic cloak, allowing you to blend in with your surroundings.
 
 | Table = {{{Table|0}}}
@@ -30,10 +30,8 @@
 | msg_wears_off = You appear.
 
 | where_to_obtain = 
-* [[shardwurm matriarch]]
-* [[a crystaline shardwurm]]
-* Velious Mob Drop 
-   
-| TableLocations = Dropped
-| TableEra = {{{TableEra|Velious}}}
+
+<ul>
+<li>[[Druid#Spell Vendors|Druid Spell Vendors]]</li>
+</ul>
 }}

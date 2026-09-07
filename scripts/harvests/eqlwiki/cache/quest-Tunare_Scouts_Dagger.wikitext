@@ -1,5 +1,5 @@
 {{Classic Era}}
-[[File:npc_tylfon.png|frame|Tylfon]]
+[[File:npc_tylfon.png|thumb|Tylfon]]
 {| class="questTopTable"
 ! ''' Start Zone: '''
 | [[Greater Faydark|Kelethin]]
@@ -11,7 +11,7 @@
 | 1
 |-
 ! ''' Classes: '''
-| [[Bard]], [[Enchanter]], [[Magician]], [[Necromancer]], [[Ranger]], [[Rogue]], [[Shadow Knight]], [[Warrior]], [[Wizard]]
+| [[Rogue]]
 |-
 ! ''' Related Zones: '''
 | [[Greater Faydark]]
@@ -52,11 +52,4 @@ You receive 5 silver pieces.
 [[Category:Quests]]
 [[Category:Greater Faydark]]
 [[Category:Bard Quests]]
-[[Category:Enchanter Quests]]
-[[Category:Magician Quests]]
-[[Category:Necromancer Quests]]
-[[Category:Ranger Quests]]
 [[Category:Rogue Quests]]
-[[Category:Shadow Knight Quests]]
-[[Category:Warrior Quests]]
-[[Category:Wizard Quests]]

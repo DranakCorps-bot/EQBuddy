@@ -1,7 +1,8 @@
+{{Classic Era}}
 {{Spellpagesmart|
 
 | spellname = Sunbeam
-| spellicon = B
+| spellicon = 23
 | description = Calls down an intense sunbeam that blinds any creature near your target. Only usable outdoors.
 | Table = {{{Table|0}}}
 | TableLevel = {{{TableLevel|}}}
@@ -34,9 +35,7 @@
 
 | where_to_obtain = 
 
-{{SpellWhereTable|
-{{SpellWhereRowB | [[Northern Karana]] | [[Tak Whistler]] | Druid Ring | (-2732,-1466) }}
-}}
-| TableLocations = Northern Karana
-| TableEra = {{{TableEra|Classic}}}
+<ul>
+<li>[[Druid#Spell Vendors|Druid Spell Vendors]]</li>
+</ul>
 }}

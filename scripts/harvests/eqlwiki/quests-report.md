@@ -1,10 +1,10 @@
 # Quest harvest report
 
-- Quest Items category members: 4020
-- Pages enumerated: 928
-- Parsed: 1178 (empty pages: 0)
-- With turn-in items: 855
-- Unique turn-in item names: 2419
+- Quest Items category members: 4027
+- Pages enumerated: 929
+- Parsed: 1179 (empty pages: 0)
+- With turn-in items: 858
+- Unique turn-in item names: 2423
 - Missing quest giver: 27
 - Collection pages split: 57 (250 step quests)
 - Backoff events: 0
@@ -385,6 +385,7 @@
 - Captain Nealith's Brother
 - Catfish Tail
 - Cazic Thule Symbol Quests
+- Class Race Quest List
 - Clear Water Quest
 - Cleric Spells (Evil)
 - Cleric Spells (Good)
@@ -525,7 +526,6 @@
 - Kevlin Diggs' Debt
 - Key to Sleeper's Tomb
 - Kilij's Plans
-- Kobold Shaman Paws
 - Kwinn's Quest
 - Kwint's Kwest
 - Legion Lager Quest
@@ -608,7 +608,6 @@
 - Soil of Underfoot
 - Soldier's Brooch Quest
 - Solusek's Flower
-- Something is Wrrrong
 - Steel Warrior Initiation
 - Strife to the Coldain
 - Supplies for the New Sebilisian Expedition
@@ -650,7 +649,6 @@
 - The Vengeful Musicians
 - The Waylaid Courier
 - The Worldly Path
-- This Means Warrr
 - Tinmizer's Fabulous Compactor (Quest)
 - Tiny Savages
 - Tome of Ages

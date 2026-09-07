@@ -23,7 +23,7 @@
 |'''soldungb'''
 |-
 ! ''' [[Zone Spawn Timer]]: '''
-|11:00
+|8:50
 |-
 ! '''Succor/Evacuate:'''
 | -424, -263 (Zone line to Lavastorm)
@@ -111,7 +111,7 @@ There are multiple zones from Solusek's Eye (Sol A) into Nagafen's Lair. These a
 |48-55 (Needs verified)
 |-
 ! ''' Types of Monsters: '''
-[[Fire Giant Warrior]], [[Fire Giant Wizard]]
+|[[Fire Giant Warrior]], [[Fire Giant Wizard]]
 |-
 ! ''' Raid Boss NPCs: '''
 |[[King Tranix]], '''[[Lord Nagafen]]''', [[Magi Rokyl]], [[Warlord Skarlon]]

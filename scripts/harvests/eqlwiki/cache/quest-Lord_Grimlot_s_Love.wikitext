@@ -1,5 +1,5 @@
 {{Classic Era}}{{unsolved}}
-[[File:npc_lord_grimrot.png|frame|Lord Grimrot]]
+[[File:npc_lord_grimrot.png|thumb|Lord Grimrot]]
 {| class="questTopTable"
 ! ''' Start Zone: '''
 | [[Southern Karana]]

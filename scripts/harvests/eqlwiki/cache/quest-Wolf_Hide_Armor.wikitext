@@ -1,4 +1,5 @@
-{{Classic Era}}[[File:npc_baobob_miller.png|frame|Baobob Miller]]
+{{Classic Era}}
+[[File:npc_baobob_miller.png|frame|Baobob Miller]]
 {| class="questTopTable"
 ! ''' Start Zone: '''
 | [[Qeynos Hills]]
@@ -36,7 +37,7 @@
 
 '''You say, "Who is your sister?'''
 
-: Baobob Miller says, "My little sister Chanda is the second best tanner around! Seriously though, she is a very skilled artisan and people travel far and wide to acquire one of her fine bear skin cloaks. I am proud of her. She doesn't really like to meet new people, but if you tell her '''[Baobob sent you]''', I am sure she can help you get into some nice bear skin boots.
+: Baobob Miller says, "My little sister [[Chanda Miller|Chanda]] is the second best tanner around! Seriously though, she is a very skilled artisan and people travel far and wide to acquire one of her fine bear skin cloaks. I am proud of her. She doesn't really like to meet new people, but if you tell her '''[Baobob sent you]''', I am sure she can help you get into some nice bear skin boots.
 
 '''You say, 'What garment?''''
 
@@ -44,15 +45,15 @@
 
 '''You say, 'What boots?''''
 
-: Baobob Miller says, 'If you can bring me a '''[[Medium Quality Wolf Skin|wolf skin of medium quality]]''' and pay me a fee of say.. hmmmm.. for you.. 15 gold pieces, I think I can make you a pair of boots that will make all of Qeynos envy you.'
+: Baobob Miller says, 'If you can bring me a '''[[Medium Quality Wolf Skin|wolf skin of medium quality]]''' and pay me a fee of say.. hmmmm.. for you.. '''15 gold pieces''', I think I can make you a pair of boots that will make all of Qeynos envy you.'
 
 '''You say, 'What cloaks?'''
 
-: Baobob Miller says, 'Yes! One of my wolf skin cloaks would go very well with your.. eeerr.. style.. Ahem! Let's see.. I think i can get you into one for 21 gold pieces, but, you have to provide the skin, and I make my cloaks with only the '''[[High Quality Wolf Skin|highest quality of wolf skins]]'''.'
+: Baobob Miller says, 'Yes! One of my wolf skin cloaks would go very well with your.. eeerr.. style.. Ahem! Let's see.. I think i can get you into one for '''21 gold pieces''', but, you have to provide the skin, and I make my cloaks with only the '''[[High Quality Wolf Skin|highest quality of wolf skins]]'''.'
 
 '''You say, 'What belts?'''
 
-: Baobob Miller says, 'Belts are far more forgiving than cloaks or boots. A '''[[Low Quality Wolf Skin|lesser quality pelt]]''' and 5 gold pieces would get you a nice wolf-hide belt.'
+: Baobob Miller says, 'Belts are far more forgiving than cloaks or boots. A '''[[Low Quality Wolf Skin|lesser quality pelt]]''' and '''5 gold pieces''' would get you a nice wolf-hide belt.'
 
 Buying one of the items also gives you the following faction adjustments:  
 

@@ -1,8 +1,8 @@
 {{Classic Era}}
-{{Spellpage|
+{{Spellpagesmart|
 
 | spellname = Levitation
-| spellicon = M
+| spellicon = 80
 | description = Forms a cloud of dense air around your feet, allowing you to float slightly off the ground for 20 min 30s.
 
 | classes = 
@@ -38,6 +38,12 @@
 | msg_cast_on_you = Your feet leave the ground.
 | msg_cast_on_other = Someone  floats above the ground.
 | msg_wears_off = You can no longer levitate.
-}}
 
-[[Category:NPC Only Spells]]
+| where_to_obtain = 
+
+<ul>
+<li>[[Druid#Spell Vendors|Druid Spell Vendors]]</li>
+<li>[[Wizard#Spell Vendors|Wizard Spell Vendors]]</li>
+</ul>
+
+}}

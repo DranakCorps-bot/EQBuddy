@@ -3,7 +3,6 @@
 | spellname = Rejuvenation
 | spellicon = J
 | description = Slows your attack speed and lowers your intelligence while increasing your regeneration rate.<br>
-'''NOTE: This may not decrease attack speed at all, Lucy data shows it decreasing INT/STR until 2007.[http://lucy.allakhazam.com/spellhistory.html?id=1252&source=Live]'''
 
 | classes = 
 
@@ -20,7 +19,7 @@ This spell is cast by NPCs only.
 | slots = 
 
 {{SpellSlotRow | 1 | Decrease INT by 2 (L1) to 61 (L60) }}
-{{SpellSlotRow | 2 | Decrease Attack Speed by 20% / (Decrease STR by 2 (L1) to 61 (L60)??) }}
+{{SpellSlotRow | 2 | Decrease Attack Speed by 20% }}
 {{SpellSlotRow | 4 | Increase Hitpoints by 2 per tick (L1) to 61 per tick (L60) }}
 
 | skill = 

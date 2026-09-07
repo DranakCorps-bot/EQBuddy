@@ -60,9 +60,7 @@ Hand in a [[Poacher's Head]] to Jras. Note that the poacher's head doesn't have 
 * Your faction standing with [[Heretics]] has been adjusted by -1.
 </div>
 {{YouGainExperience}}
-: You get a small amount of coin
-: You get a minor item
-
+'''You get a small amount of coin and a minor item.'''
 
 [[Category:Quests]]
 [[Category:Erudin]]

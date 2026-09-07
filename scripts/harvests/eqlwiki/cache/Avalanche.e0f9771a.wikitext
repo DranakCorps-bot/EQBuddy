@@ -1,11 +1,9 @@
+{{Classic Era}}
 {{Spellpagesmart|
 
 | spellname = Avalanche
-| spellicon = S
-| description = Calls down a hailstorm from the sky, causing three waves of 125 damage, up to a maximum of 4 targets hit. (0.625DPM per hit). On a single target where all 3 waves hit, 1.875 damage per mana, meaning it is less mana-efficient than Firestrike unless all 4 possible strikes land.
-
-
-*Note: Rain nukes are limited to 4 hits total. Either you can hit the same mobs 3 times, you can hit 2 mobs twice each, or you can hit 4 mobs once each.
+| spellicon = 56
+| description = Calls down a hailstorm from the sky, causing three waves of 125 damage, up to a maximum of 4 targets hit.
 
 | Table = {{{Table|0}}}
 | TableLevel = {{{TableLevel|}}}
@@ -29,11 +27,7 @@
 
 | where_to_obtain = 
 
-{{SpellWhereTable|
-{{SpellWhereRowB | [[Butcherblock Mountains]] | [[Ellona]] | Druid Ring | (-2085,2016) }}
-{{SpellWhereRow  | [[The Wakening Land]] | [[Weinna Oakchild]] | � | (521,-1038) }}
-}}
-
-| TableLocations = Butcherblock<br/>Qeynos<br/>Wakening Land
-| TableEra = {{{TableEra|Classic}}}
+<ul>
+<li>[[Druid#Spell Vendors|Druid Spell Vendors]]</li>
+</ul>
 }}

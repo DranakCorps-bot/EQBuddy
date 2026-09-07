@@ -1,7 +1,8 @@
+{{Classic Era}}
 {{Spellpagesmart|
 
 | spellname = Shield of Barbs
-| spellicon = P
+| spellicon = 155
 | description = Surrounds your target in a shield of barbs that causes damage to anything that strikes them for 15 min.
 
 | Table = {{{Table|0}}}
@@ -27,14 +28,9 @@
 | msg_cast_on_you = You are surrounded by a thorny barrier.
 | msg_cast_on_other = Someone  is surrounded by a thorny barrier.
 | msg_wears_off = The brambles fall away.
-
 | where_to_obtain = 
 
-{{SpellWhereTable|
-{{SpellWhereRowB | [[Northern Karana]] | [[Tak Whistler]] | Druid Ring | (-2732,-1466) }}
-}}
-
-| TableLocations = N.Karana
-| TableEra = Classic
-
+<ul>
+<li>[[Druid#Spell Vendors|Druid Spell Vendors]]</li>
+</ul>
 }}

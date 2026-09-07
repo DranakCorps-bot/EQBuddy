@@ -1,5 +1,5 @@
 {{Classic Era}}
-[[File:npc_byzar_bloodforge.png|frame|Byzar Bloodforge]]
+[[File:npc_byzar_bloodforge.png|thumb|Byzar Bloodforge]]
 {| class="questTopTable"
 ! ''' Start Zone: '''
 | [[Kaladim|South Kaladim]]

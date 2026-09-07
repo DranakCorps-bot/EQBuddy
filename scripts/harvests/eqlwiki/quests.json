@@ -1312,10 +1312,6 @@
     "qty": 1
    },
    {
-    "name": "Ripped Qeynos Bards Guild Flyer",
-    "qty": 1
-   },
-   {
     "name": "Solusek Mining Company Invoice",
     "qty": 1
    },
@@ -1801,9 +1797,9 @@
    }
   ],
   "rewards": [
+   "Amulet of the Fae",
    "Denon's Horn of Disaster",
    "Ervaj's Flute of Flight",
-   "Fae Amulet",
    "Mantle of the Songweaver",
    "Mask of Song",
    "Spear of Harmony"
@@ -2314,7 +2310,7 @@
   "startZone": "Ak'Anon",
   "questGiver": "Larkon Theardor",
   "minLevel": 10,
-  "classes": "Cleric, Druid, Enchanter, Magician, Necromancer, Paladin, Shaman, Wizard",
+  "classes": "Enchanter, Magician, Necromancer, Wizard",
   "items": [
    {
     "name": "Basilisk Tongue",
@@ -2331,13 +2327,9 @@
   ],
   "categories": [
    "Ak'Anon",
-   "Cleric Quests",
-   "Druid Quests",
    "Enchanter Quests",
    "Magician Quests",
    "Necromancer Quests",
-   "Paladin Quests",
-   "Shaman Quests",
    "Wizard Quests"
   ],
   "relatedZones": [
@@ -2963,11 +2955,15 @@
   "classes": "Cleric",
   "items": [
    {
+    "name": "Airtight Metal Box",
+    "qty": 1
+   },
+   {
     "name": "Container of Infectious Reagents",
     "qty": 1
    },
    {
-    "name": "Empty Infectious Vial",
+    "name": "Diseased Bone Marrow",
     "qty": 1
    }
   ],
@@ -3668,9 +3664,11 @@
   "items": [],
   "rewards": [
    "Aviak Feather",
+   "Broad Sword",
    "Conch Shell",
    "Fishing Spear",
-   "Kiola Nut"
+   "Kiola Nut",
+   "Targ Shield"
   ],
   "categories": [
    "Ocean of Tears"
@@ -3716,7 +3714,7 @@
    "Karnor's Castle",
    "Trakanon's Teeth"
   ],
-  "era": "",
+  "era": "Kunark",
   "repeatable": false
  },
  {
@@ -4927,12 +4925,7 @@
   "questGiver": "",
   "minLevel": 0,
   "classes": "",
-  "items": [
-   {
-    "name": "Innoruuk Symbol Quests",
-    "qty": 1
-   }
-  ],
+  "items": [],
   "rewards": [
    "Class_Race_Quest_List/Bard",
    "Class_Race_Quest_List/Cleric",
@@ -18776,7 +18769,12 @@
   "questGiver": "Leraena Shelyrak",
   "minLevel": 5,
   "classes": "?",
-  "items": [],
+  "items": [
+   {
+    "name": "Odd Kobold Paw",
+    "qty": 1
+   }
+  ],
   "rewards": [
    "Cure Disease",
    "Holy Armor"
@@ -23100,10 +23098,6 @@
     "qty": 1
    },
    {
-    "name": "Slime Blood of Cazic Thule",
-    "qty": 1
-   },
-   {
     "name": "Spiroc Feathers",
     "qty": 1
    },
@@ -24330,7 +24324,7 @@
   "relatedZones": [
    "Qeynos"
   ],
-  "era": "",
+  "era": "Classic",
   "repeatable": false
  },
  {
@@ -29017,6 +29011,32 @@
   "repeatable": false
  },
  {
+  "name": "Rathe Mountains Spiders",
+  "url": "https://eqlwiki.com/Rathe_Mountains_Spiders",
+  "startZone": "",
+  "questGiver": "Exterminator Galub",
+  "minLevel": 1,
+  "classes": "ALL",
+  "items": [
+   {
+    "name": "Spiderling Eye",
+    "qty": 1
+   }
+  ],
+  "rewards": [
+   "Faction"
+  ],
+  "categories": [
+   "All Classes Quests",
+   "The Rathe Mountains"
+  ],
+  "relatedZones": [
+   "The Rathe Mountains"
+  ],
+  "era": "Classic",
+  "repeatable": false
+ },
+ {
   "name": "Rathmana's Traveling Offer",
   "url": "https://eqlwiki.com/Rathmana%27s_Traveling_Offer",
   "startZone": "Southern Desert of Ro",
@@ -30733,7 +30753,7 @@
   "startZone": "Kaladim",
   "questGiver": "Diggins",
   "minLevel": 9,
-  "classes": "Bard, Enchanter, Magician, Necromancer, Ranger, Rogue, Shadow Knight, Shaman, Warrior, Wizard",
+  "classes": "Rogue",
   "items": [
    {
     "name": "RunnyEye Warbeads",
@@ -30747,17 +30767,8 @@
    "Rusty Spear"
   ],
   "categories": [
-   "Bard Quests",
-   "Enchanter Quests",
-   "Magician Quests",
-   "Necromancer Quests",
    "North Kaladim",
-   "Ranger Quests",
-   "Rogue Quests",
-   "Shadow Knight Quests",
-   "Shaman Quests",
-   "Warrior Quests",
-   "Wizard Quests"
+   "Rogue Quests"
   ],
   "relatedZones": [
    "Butcherblock Mountains"
@@ -33901,6 +33912,7 @@
    }
   ],
   "rewards": [
+   "Bronze_Dagger",
    "Cast-Iron Rapier"
   ],
   "categories": [
@@ -34242,7 +34254,7 @@
   "startZone": "Kaladim",
   "questGiver": "Nultal Malfoot",
   "minLevel": 2,
-  "classes": "Cleric, Druid, Enchanter, Magician, Necromancer, Paladin, Ranger, Shadow Knight, Shaman, Wizard",
+  "classes": "Cleric",
   "items": [
    {
     "name": "Skunk Scent Gland",
@@ -34262,16 +34274,7 @@
   ],
   "categories": [
    "Cleric Quests",
-   "Druid Quests",
-   "Enchanter Quests",
-   "Magician Quests",
-   "Necromancer Quests",
-   "North Kaladim",
-   "Paladin Quests",
-   "Ranger Quests",
-   "Shadow Knight Quests",
-   "Shaman Quests",
-   "Wizard Quests"
+   "North Kaladim"
   ],
   "relatedZones": [
    "Butcherblock Mountains"
@@ -34504,7 +34507,7 @@
   "url": "https://eqlwiki.com/Soldier%27s_Brooch_Quest",
   "startZone": "Rathe Mountains",
   "questGiver": "Gaz Commander Faltip",
-  "minLevel": 30,
+  "minLevel": 0,
   "classes": "All",
   "items": [],
   "rewards": [
@@ -34583,7 +34586,12 @@
   "questGiver": "The Kerran Sha`rr",
   "minLevel": 1,
   "classes": "All",
-  "items": [],
+  "items": [
+   {
+    "name": "Desecrated Kejaar Totem",
+    "qty": 1
+   }
+  ],
   "rewards": [
    "Hamed's Ring of Tears"
   ],
@@ -34594,7 +34602,7 @@
   "relatedZones": [
    "Kerra Island"
   ],
-  "era": "",
+  "era": "Classic",
   "repeatable": false
  },
  {
@@ -35809,6 +35817,10 @@
     "qty": 1
    },
    {
+    "name": "Dusty Ribcage",
+    "qty": 1
+   },
+   {
     "name": "Dwarven Ale",
     "qty": 1
    },
@@ -36178,7 +36190,15 @@
   "classes": "Paladin",
   "items": [
    {
-    "name": "A Sealed List",
+    "name": "Dwarf Decapitated Head",
+    "qty": 1
+   },
+   {
+    "name": "Gnome Decapitated Head",
+    "qty": 1
+   },
+   {
+    "name": "Human Decapitated Head",
     "qty": 1
    }
   ],
@@ -38135,6 +38155,10 @@
     "qty": 1
    },
    {
+    "name": "Mundane Shield",
+    "qty": 1
+   },
+   {
     "name": "Powder of Reanimation",
     "qty": 1
    }
@@ -38832,7 +38856,7 @@
   "relatedZones": [
    "Felwithe"
   ],
-  "era": "",
+  "era": "Velious",
   "repeatable": false
  },
  {
@@ -38865,8 +38889,7 @@
    }
   ],
   "rewards": [
-   "Reaper of the Dead",
-   "Thex Mallet"
+   "Reaper of the Dead"
   ],
   "categories": [
    "Necromancer Quests",
@@ -38886,10 +38909,17 @@
   "questGiver": "The Kerran Sha`rr",
   "minLevel": 1,
   "classes": "All",
-  "items": [],
+  "items": [
+   {
+    "name": "Desecrated Kejaar Totem",
+    "qty": 1
+   },
+   {
+    "name": "Heretic Insurrection Orders",
+    "qty": 1
+   }
+  ],
   "rewards": [
-   "Desecrated Kejaar Totem",
-   "Heretic Insurrection Orders",
    "Talisman of Kejaar Kerrath"
   ],
   "categories": [
@@ -40326,7 +40356,7 @@
   "startZone": "Greater Faydark",
   "questGiver": "Tylfon",
   "minLevel": 1,
-  "classes": "Bard, Enchanter, Magician, Necromancer, Ranger, Rogue, Shadow Knight, Warrior, Wizard",
+  "classes": "Rogue",
   "items": [
    {
     "name": "Rusty Dagger",
@@ -40338,15 +40368,8 @@
   ],
   "categories": [
    "Bard Quests",
-   "Enchanter Quests",
    "Greater Faydark",
-   "Magician Quests",
-   "Necromancer Quests",
-   "Ranger Quests",
-   "Rogue Quests",
-   "Shadow Knight Quests",
-   "Warrior Quests",
-   "Wizard Quests"
+   "Rogue Quests"
   ],
   "relatedZones": [
    "Greater Faydark"

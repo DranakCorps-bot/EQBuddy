@@ -1090,7 +1090,7 @@ For a comparison of the efficiency of spells by level see: [[Necromancer Spell L
 |effects=1: Summons a Skeleton Pet
 |duration=Instant
 |school=Conjuration
-|location=Vendor
+|location=Autogranted Vendor
 |era={{Classic Short}}
 }}
 {{KhazamSpellRow
@@ -1119,6 +1119,7 @@ For a comparison of the efficiency of spells by level see: [[Necromancer Spell L
 </div>
 
 <div id="spells_level_17">
+
 ==Level 17==
 <table class="eoTable2 " style="width:100%;">
     <tr>

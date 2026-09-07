@@ -17,7 +17,7 @@
 | [[Blackburrow]], [[Splitpaw Lair]]
 |-
 ! ''' Related NPCs: '''
-| [[Lord Elgnub]], [[a Lteth Val Scribe]], [[a one eyed gnoll]]
+| [[Lord Elgnub]], [[a Lteth Val Scribe]], [[a one-eyed gnoll]]
 |}
 
 == Reward ==
@@ -65,7 +65,7 @@ You say, 'What true potential?'
 Marton Sayer says, 'The true potential of Gnoll Slayer is an enchantment which was once imbedded into a gnoll's eye which was placed into the hilt of the blade. The spell would help you fight off disease and call forth a wolf to fight beside you. Alas, the gnoll eye was stolen from the blade by a great, one-eyed, white gnoll. Along with the eye, the only book which explained how to return the enchantment was also stolen. I know not where this gnoll might be. If you can find the journal and the eye, return them with the Gnoll Slayer to me, for I have been searching for decades.'</blockquote>
 
 * Head to [[Splitpaw Lair]]
-* Kill [[a one eyed gnoll]]
+* Kill [[a one-eyed gnoll]]
 ** Loot a [[Gnoll's Eye]]
 * Kill [[a Lteth Val Scribe]]
 ** Loot a [[Journal of Greater Enchantment]]

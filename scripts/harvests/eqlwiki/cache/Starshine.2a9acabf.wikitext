@@ -1,4 +1,4 @@
-<noinclude>{{Classic Era}}</noinclude>
+{{Classic Era}}
 {{Spellpagesmart|
 
 | spellname = Starshine
@@ -34,13 +34,8 @@
 
 | where_to_obtain = 
 
-{{SpellWhereTable|
-{{SpellWhereRowB | [[Greater Faydark]] | [[Zelli Starsfire]] | Kelethin Druid Guild | (-622,243) }}
-{{SpellWhereRow  | [[Rivervale]] | [[Staria Longhair]] | Druid Guild | (-62,-403) }}
-{{SpellWhereRowB | [[Surefall Glade]] | [[Sallah]] | Druid Guild | (-153,-286) }}
-}}
-
-| TableLocations = Kelethin<br/>Rivervale<br/>Surefall Glade
-| TableEra = Classic
+<ul>
+<li>[[Druid#Spell Vendors|Druid Spell Vendors]]</li>
+</ul>
 
 }}

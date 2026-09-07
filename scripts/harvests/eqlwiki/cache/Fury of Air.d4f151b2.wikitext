@@ -1,7 +1,8 @@
+{{Classic Era}}
 {{Spellpagesmart|
 
 | spellname = Fury of Air
-| spellicon = M
+| spellicon = 85
 | description = Summons a whirling wind 170 damage and stuns the target up to level 55 for 2 seconds.
 
 | Table = {{{Table|0}}}
@@ -23,7 +24,7 @@
 | duration = Instant
 | target_type = Single
 | spell_type = Detrimental
-| resist = Magic (+15)
+| resist = Magic (0?)
 
 | msg_cast_on_you = Lightning surges through your body.
 | msg_cast_on_other = Someone  has been struck by lightning.
@@ -31,9 +32,7 @@
 
 | where_to_obtain = 
 
-{{SpellWhereTable|
-{{SpellWhereRowB | [[New Sebilis Expedition]] | [[Wanderer Rakshaazi]] | Spell Vendor Area | (120, -163) }}
-{{SpellWhereRow | [[West Commonlands]] | [[Slea Pinewhisper]] | Druid Ring | (450, 1383, -52) }}
-}}
-
+<ul>
+<li>[[Druid#Spell Vendors|Druid Spell Vendors]]</li>
+</ul>
 }}

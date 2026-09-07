@@ -1,7 +1,8 @@
+{{Classic Era}}
 {{Spellpagesmart|
 
 | spellname = Pack Regeneration
-| spellicon = J
+| spellicon = 118
 | description = Hastens your group's natural healing, regenerating up to 9 hit points every 6 seconds for 14 min.
 
 | Table = {{{Table|0}}}
@@ -33,11 +34,7 @@
 
 | where_to_obtain = 
 
-{{SpellWhereTable|
-{{SpellWhereRowB | [[Butcherblock Mountains]] | [[Ellona]] | Druid Ring | (-2085,2016) }}
-{{SpellWhereRow  | [[The Wakening Land]] | [[Weinna Oakchild]] | � | (521,-1038) }}
-}}
-
-| TableLocations = Butcherblock<br/>Wakening Land
-| TableEra = {{{TableEra|Classic}}}
+<ul>
+<li>[[Druid#Spell Vendors|Druid Spell Vendors]]</li>
+</ul>
 }}

@@ -1,4 +1,9 @@
 __NOTOC__
+
+<div style="float: right; margin-right: 10%; margin-left: 1em;">
+[[File:Crafted_Armor.png|200px|thumb|none|Crafted Armor on a Male Dark Elf]]
+</div>
+
 {| class="questTopTable"
 ! ''' Start Zone: '''
 | [[Southern Karana]]
@@ -20,6 +25,8 @@ __NOTOC__
 |}
 
 Crafted Armor is a mid-level [[Warrior]] specific armor set.
+
+<div style="clear: both;"></div>
 
 == Rewards ==
 

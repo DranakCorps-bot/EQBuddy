@@ -1,7 +1,8 @@
+{{Classic Era}}
 {{Spellpagesmart|
 
 | spellname = Ice
-| spellicon = S
+| spellicon = 56
 | description = Covers your target in glistening ice, causing between 520 and 538 damage, and lowering their fire resistance.
 
 | Table = {{{Table|0}}}
@@ -31,14 +32,7 @@
 
 | where_to_obtain = 
 
-{{SpellWhereTable|
-{{SpellWhereRowB | [[Lavastorm Mountains]] | [[Tisiana]] | Druid Ring | (982,1369) }}
-{{SpellWhereRow  | [[The Wakening Land]] | [[Phillip Aghllsews]] | #3, Tower with portal to the Plane of Growth | (519,-1028) }}
-}}
-
-Will cause [[Breath of Ro]] to wear off of a mob.
-
-| TableLocations = Lavastorm<br/>Wakening
-| TableEra = Classic
-
+<ul>
+<li>[[Druid#Spell Vendors|Druid Spell Vendors]]</li>
+</ul>
 }}

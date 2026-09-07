@@ -1,5 +1,5 @@
 {{Classic Era}}
-[[File:npc_tolkar_parlone.png|frame|Tolkar Parlone]]
+[[File:npc_tolkar_parlone.png|thumb|Tolkar Parlone]]
 {| class="questTopTable"
 ! ''' Start Zone: '''
 | [[Felwithe|Northern Felwithe]]

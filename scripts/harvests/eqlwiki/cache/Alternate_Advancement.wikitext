@@ -13,17 +13,17 @@ General AAs are available to all classes, regardless of level or selection. Thes
 |-
 | Adamant Will || 4 || 2/4/6/9 || This passive ability grants you an additional 20/40/60/80% chance to resist charm, and 15/30/45/60% chance to resist mesmerization spells. Requirements: Level 1.
 |-
-| Alchemy Mastery || 3 || 3/6/9 || This passive ability reduces the chance of failing Alchemy recipes by 10/25/?%. Requirements: Level 1.
+| Alchemy Mastery || 3 || 3/6/9 || This passive ability reduces the chance of failing Alchemy recipes by 10/25/50%. Requirements: Level 1.
 |-
-| Baking Mastery || 3 || 2/4/6 || This passive ability reduces the chance of failing Baking recipes by 10/25/?%. Requirements: Level 1.
+| Baking Mastery || 3 || 2/4/6 || This passive ability reduces the chance of failing Baking recipes by 10/25/50%. Requirements: Level 1.
 |-
-| Blacksmithing Mastery || 3 || 2/4/6 || This passive ability reduces the chance of failing Blacksmithing recipes by 10/25/?%. Requirements: Level 1.
+| Blacksmithing Mastery || 3 || 2/4/6 || This passive ability reduces the chance of failing Blacksmithing recipes by 10/25/50%. Requirements: Level 1.
 |-
-| Brewing Mastery || 3 || 2/4/6 || This passive ability reduces the chance of failing Brewing recipes by 10/?/?%. Requirements: Level 1.
+| Brewing Mastery || 3 || 2/4/6 || This passive ability reduces the chance of failing Brewing recipes by 10/25/50%. Requirements: Level 1.
 |-
 | Circular Breathing || 4 || 2/3/4/5 || This passive ability increases your endurance regeneration by 1/2/3/4 point(s). Requirements: Level 1.
 |-
-| Combat Agility || 3 || 2/4/6 || This passive ability increases your melee avoidance by 2%/5%/10%. Melee avoidance is the component of armor class that allows you to avoid incoming attacks and is derived from agility, item avoidance, and your defense skill. Requirements: Level 1.
+| Combat Agility || 3 || 2/4/6 || This passive ability increases your melee avoidance by 2/5/10%. Melee avoidance is the component of armor class that allows you to avoid incoming attacks and is derived from agility, item avoidance, and your defense skill. Requirements: Level 1.
 |-
 | Combat Fury || 4 || 1/2/3/4 || This passive ability increases your chance of performing a critical melee hit with all skills by 1/2/3/5%. Requirements: Level 1.
 |-
@@ -35,7 +35,7 @@ General AAs are available to all classes, regardless of level or selection. Thes
 |-
 | First Aid || 6 || 1/1/1/3/?/? || This passive ability increases the maximum health you can bind wound to 80/90/100/100/100/100% and increases the amount of healing provided by a single bandage by 0/0/0/10/25/50%. Requirements: Level 1.
 |-
-| Fletching Mastery || 3 || 2/4/6 || This passive ability reduces the chance of failing Fletching recipes by 10/25/?%. Requirements: Level 1.
+| Fletching Mastery || 3 || 2/4/6 || This passive ability reduces the chance of failing Fletching recipes by 10/25/50%. Requirements: Level 1.
 |-
 | Foraging || 1 || 3 || This passive ability increases your Forage skill cap by 50 points. Requirements: Level 1.
 |-
@@ -66,15 +66,15 @@ General AAs are available to all classes, regardless of level or selection. Thes
 |-
 | Permanent Illusion || 1 || 5 || This passive ability extends the duration of your beneficial illusion spells to 16.6 hours and allows them to persist when zoning. Requirements: Level 1.
 |-
-| Pottery Mastery || 3 || 2/4/6 || This passive ability reduces the chance of failing Pottery recipes by 10/25/?%. Requirements: Level 1.
+| Pottery Mastery || 3 || 2/4/6 || This passive ability reduces the chance of failing Pottery recipes by 10/25/50%. Requirements: Level 1.
 |-
 | Quick Buff || 1 || 5 || Ability Activation ID: 4 - Refresh Time: 0:10:00 - Ability Timer(s): 98. This ability, when activated, will cast all currently memorized beneficial spells on all valid group and raid targets in range, for full mana and reagent cost. NOTE: This ability will continue casting spells even if you have no mana left. Requirements: Level 1.
 |-
 | Steadfast Will || 8 || 2/2/3/3/3/3/6/12 || This passive ability grants you a 15/30/50/60/70/80/90/100% chance to endure what would otherwise be a stunning melee attack, from any angle, without being stunned. Requirements: level 1. Only tanks (WAR/PAL/SHD) can train the full 8/8, Rangers and Monks can reach 7/8 and all other classes are capped at 6/8. Requirements: Level 1.
 |-
-| Stoicism || 5 || 2/2/2/2/2 || This passive ability reduces how far incoming melee attacks push you backward by 10%. Requirements: Level 1.
+| Stoicism || 5 || 2/2/2/2/2 || This passive ability reduces how far incoming melee attacks push you backward by 10/20/30/40/50%. Requirements: Level 1.
 |-
-| Tailoring Mastery || 3 || 2/4/6 || This passive ability reduces the chance of failing Tailoring recipes by 10/25/?%. Requirements: Level 1.
+| Tailoring Mastery || 3 || 2/4/6 || This passive ability reduces the chance of failing Tailoring recipes by 10/25/50%. Requirements: Level 1.
 |}
 
 == Archetype AAs ==
@@ -88,7 +88,7 @@ Every class in EQL has Archetype AAs, some classes have more than others. The Ar
 |-
 | Ambidexterity || 1 || 9 || This passive ability increases your chance to successfully dual wield by 32%. Requirements: Level 1.
 |-
-| Burst of Power || 3 || 3/6/9 || This passive ability increases your flurry chance (up to two extra attacks after a primary slot triple attack) by 7/11/?%. Requirements: Level 46.
+| Burst of Power || 3 || 3/6/9 || This passive ability increases your flurry chance (up to two extra attacks after a primary slot triple attack) by 7/11/15%. Requirements: Level 46.
 |-
 | Companion's Discipline || 1 || 2 || This passive ability allows you to give your pet advanced commands. Hotkeys for these commands can be created using the pet control window. Hold and Greater Hold - /pet hold -or- /pet ghold. When your pet is in the hold state, your pet will only attack something when you tell it to, and your pet will continue to attack anything on its hate list after that point. Once the encounter is finished, your pet will automatically go back to a held state. If your pet is never told to exclusively attack anything, your pet will never attack anything, even if something is attacking it. The greater hold state forces your pet to not add anything to its hatelist unless specifically added by you. You can add a target to your pet's hatelist with either /pet attack or /pet qattack. Requirements: Level 1.
 |-
@@ -150,7 +150,7 @@ Every class in EQL has Archetype AAs, some classes have more than others. The Ar
 |-
 | Spell Casting Subtlety || 6 || 2/0/4/0/6/0 || Ability Activation ID: 25 - Refresh Time: 0:00:01 - Ability Timer(s): 0. This ability is DISABLED. Purchase the 0 cost rank to enable its effects. When enabled, this passive ability reduces the amount of hate generated by your attacks and spells by 5/10/20%. Requirements: Level 1.
 |-
-| Thief's Intuition || 4 || 3/?/?/? || This passive ability reduces the reuse time of your Sense Traps and Disarm Traps skills by 1/?/?/? seconds. Requirements: Level 1.
+| Thief's Intuition || 4 || 3/6/?/? || This passive ability reduces the reuse time of your Sense Traps and Disarm Traps skills by 1/3/?/? seconds. Requirements: Level 1.
 |}
 
 == Class AAs ==
@@ -225,7 +225,7 @@ Every class gets access to a unique Class AA list. The full set of Class AAs ava
 |-
 | Turn Undead || 1 || 3 || Ability Activation ID:558 - Refresh Time: 0:02:00 - Ability Timer(s): 6. Turn Undead I, when activated, infuses your undead target with holy energy which deals 200 damage every 6 seconds for 0:00:24 and has a 10% chance to trigger Infusion of Holy Light I which critically deals 1000 damage. Requirements: Level 40.
 |-
-| Unbound Boon || 3 || 0 || This passive ability grants your healing spells a 2/?/?% chance to score an exceptional heal. An exceptional heal doubles the healing value of the spell. Requirements: Level 12/30/50.
+| Unbound Boon || 3 || 0 || This passive ability grants your healing spells a 2/4/?% chance to score an exceptional heal. An exceptional heal doubles the healing value of the spell. Requirements: Level 12/30/50.
 |}
 
 === Druid Class AAs ===
@@ -236,7 +236,7 @@ Every class gets access to a unique Class AA list. The full set of Class AAs ava
 |-
 | Enhanced Root || 1 || 5 || This passive ability reduces the chance that an NPC target entangled by your root spells will break free when struck by a non-melee attack by 50%. Requirements: Level 1.
 |-
-| Quick Evacuation || 3 || 3/?/? || This passive ability reduces the cast time of your evacuation and succor spells and abilities by 10%. Requirements: Level 1.
+| Quick Evacuation || 3 || 3/6/9 || This passive ability reduces the cast time of your evacuation and succor spells and abilities by 10%. Requirements: Level 1.
 |-
 | Unbound Nature || 3 || 0 || This passive ability increases the chance that you will land a critical hit with a spell by 2/3/4%. Requirements: Level 12/30/50.
 |}
@@ -260,7 +260,7 @@ Every class gets access to a unique Class AA list. The full set of Class AAs ava
 |-
 | Companion's Fury || 1 || 6 || Ability Activation ID: 60 - Refresh Time: 0:01:30 - Ability Timer(s): 14. Frenzied Burnout I, when activated, increases your pet's combat prowess for 0:01:06. Frenzied Burnout I increases your pet's armor class by 75 points, overhaste by 15%, strength by 20 points, attack power by 200 points, chance to perform a flurry of attacks on a successful double attack by 5%, and accuracy by 10%. Requirements: Level 15.
 |-
-| Conjurer's Efficiency || 5 || 3/?/?/?/? || This passive ability prevents components used in the summoning of pets from being expended. Requirements: Level 1.
+| Conjurer's Efficiency || 5 || 3/5/6/6/6 || Rank 1: This passive ability prevents components used in the summoning of pets from being expended.<br>Rank 2: Reduces cast time of your summon item, summon pet and summon target spells by 10% and of your summon swarm pet spells and abilities by 2%.<br>Rank 3: Reduces cast time of your summon item, summon pet and summon target spells by 25% and of your summon swarm pet spells and abilities by 5%.<br>Rank 4: Reduces cast time of your summon item, summon pet and summon target spells by 50% and of your summon swarm pet spells and abilities by 10%.<br>Rank 5: Allows reclaim energy to return 95% of the base mana cost of your current pet<br><br>Requirements: Level 1.
 |-
 | Elemental Form || 1 || 3 || Ability Activation ID: 61 - Refresh Time: 0:00:01 - Ability Timer(s): 0. Elemental Form I, when activated, transforms you into either an Air, Earth, Fire, or Water Elemental. Increases the maximum that your strength, stamina, agility, dexterity, wisdom, intelligence, and charisma can be raised to by 5 points. Increases the casting level of your spells by 1. Grants a 10 point damage shield. Requirements: Level 40.
 |-
@@ -321,7 +321,7 @@ Every class gets access to a unique Class AA list. The full set of Class AAs ava
 |-
 | Unbound Life || 3 || 0 || Gives a passive 2/4/6% increase to your direct healing spells. Requirements: Level 12/30/50.
 |-
-| Valiant Steed || 1 || 9 || Ability Activation ID: 570 - Refresh Time: 0:00:01 - Ability Timer(s): 0. This ability, when activated, summons the bridle of a very fast Valiant Unicorn. Requirements: Level 50, Holy Steed at Level 1.
+| <s>Valiant Steed</s>|| 1 || 9 || <s>Ability Activation ID: 570 - Refresh Time: 0:00:01 - Ability Timer(s): 0. This ability, when activated, summons the bridle of a very fast Valiant Unicorn. Requirements: Level 50, Holy Steed at Level 1.</s> This AA has been removed.
 |}
 
 === Ranger Class AAs ===
@@ -364,7 +364,7 @@ Every class gets access to a unique Class AA list. The full set of Class AAs ava
 |-
 ! Name !! Ranks !! Cost !! Description
 |-
-| Abyssal Steed || 1 || 9 || Ability Activation ID: 571 - Refresh Time: 0:00:01 - Ability Timer(s): 0. This ability, when activated, summons the bridle of a very fast Abyssal Nightmare. Requirements: Level 50, Unholy Steed at Level 1.
+| <s>Abyssal Steed</s>|| 1 || 9 || <s>Ability Activation ID: 571 - Refresh Time: 0:00:01 - Ability Timer(s): 0. This ability, when activated, summons the bridle of a very fast Abyssal Nightmare. Requirements: Level 50, Unholy Steed at Level 1.</s> This AA has been removed.
 |-
 | Harm Touch || 10 || 0 || Ability Activation ID: 6000 - Refresh Time: 0:20:00 - Ability Timer(s): 2. Harm Touch II, when activated, grips a non-player target with agony, instantly dealing up to 751 damage based on your current level. Ranks 9 and 10 add a Damage Over Time effect to the target. Requirements: Level 1/6/11/16/21/26/31/36/41/46.
 |-

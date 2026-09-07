@@ -29,7 +29,7 @@
 
 == Walkthrough ==
 
-:''NOTE AMIABLE [[faction]] or better is required''
+:''NOTE: AMIABLE [[faction]] or better is required.''
 
 Leraena is located directly inside the Temple of Light, a Quellious-based Cleric/Paladin guild. Her specific location is -651, -84.
 
@@ -47,7 +47,7 @@ You say, 'I will slay the kobold shaman.'*
 
 : Leraena Shelyrak says 'You are so young... Go to Toxxulia and find these kobold shamans. Cut off their paws and return them to me. I require three paws as proof of your worth to our temple.'
 
-Hand in three Odd Kobold Paws.
+Hand in three [[Odd Kobold Paw]]s.
 
 : Leraena Shelyrak says 'Fine work. They shall never lay hands upon another kobold again. I mean paws. Here is a small reward for a fine job. Unfortunatly we have recently learned that the shamen in the forest are merely underlings to more [powerful kobold shamen] that reside in the kobold warrens. Continue the work of Quellious.'
 

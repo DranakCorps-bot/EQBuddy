@@ -52,8 +52,8 @@ You say, 'Who is Rognarog?'
 : Shazda Kaekwon says, 'By slaying Rognarog you have spared the lives of those who would have crossed his path. I thank you for your assistance, the spirits have noticed your actions and are pleased.'
 
 <div class=facblock>
-* Your faction standing with [[Kejek Village]] got better.
-* Your faction standing with [[Peace Keepers]] got better.
+* Your faction standing with [[Kejek Village]] has been adjusted by 5.
+* Your faction standing with [[Peace Keepers]] has been adjusted by 5.
 </div>
 
 {{YouGainExperience}}

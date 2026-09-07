@@ -17,8 +17,8 @@ The Estate of Unrest was once the home of a dwarven noble, in ages past. Followi
 ! ''' Types of Monsters: '''
 |Death Beetles, Tormented Dead, Greater Skeletons, Jack-O-Lanterns, Ghouls, Dark Boned Skeletons, Lurking Mummies, Gnomish Spelunker, Lesser Blade Fiends, Blade Fiends, Dry Bones Skeletons, Carrion Ghouls, Skeletal Monks, Zombie of an Unrest Noble, Undead Barkeep, Reanimated Hands, Barbed Bone Skeletons, Dusty Werebats, Werebats, Greater Dark Bones, Undead Knight of Unrest, Mortuary Fungus, Festering Hags, Dark Terrors, Tentacle Terrors 
 |-
-! ''' Notable NPCs: '''
-|[[Garanel Rucksif]], [[a priest of najena]], [[Khrix Fritchoff]], [[Khrix's Abomination]], [[Torklar Battlemaster]], [[Shadowpincer]], [[reclusive ghoul magus]]
+! ''' Rare NPCs: '''
+|[[a priest of najena]], [[a gnomish spelunker]], [[A_reanimated_hand_(Unrest)|a reanimated hand]], [[an undead barkeep]], [[An Undead Brewer|an undead brewer]], [[an undead knight of Unrest]], [[Garanel Rucksif]],  [[Khrix Fritchoff]], [[Lesser Blade Fiend]], [[reclusive ghoul magus]], [[Torklar Battlemaster]], [[Zombie of an Unrest Noble|a zombie of an Unrest noble]]
 |-
 ! ''' Unique Items: '''
 | [[Damask Armor]], [[Gossamer Armor]], {{:Ancient Spurned Ferraiolo}}, {{:Ancient Spurned Waistcoat}}, {{:Bloodstained Mantle}}, {{:Bloodstained Tunic}}, {{:Brewer's Bracer}}, {{:Brewer's Mittens}}, {{:Brittle Staff}}, {{:Cursed Blade}}, {{:Dark Boned Bracelet}}, {{:Dark Plate Leggings}}, {{:Dusty Bloodstained Gloves}}, {{:Dwarven Work Boots}}, {{:Festering Cloak}}, {{:Gladius}}, {{:Ivory Bracelet}}, {{:Jagged Band}}, {{:Opalline Earring}}, {{:Pugius}}, {{:Repurposed Pickaxe}}, {{:Rhodium Band}}, {{:Rotted Chestwraps}}, {{:Savant's Cap}}, {{:Scaredy Cap}}, {{:Shawl of Less-Than Invisibility}}, {{:Spelunker's Headlamp}}, {{:Thick Leather Apron}} 
@@ -49,13 +49,14 @@ The Estate of Unrest was once the home of a dwarven noble, in ages past. Followi
 |style="padding:10px;"|
 [[File:Unrest.jpg|right|border]]
 '''Estate of Unrest<br>
-1. Underground cave with a gnomish spelunker<br>
+1. Underground cave with [[a gnomish spelunker]] who drops {{:Repurposed Pickaxe}} (Common) {{:Spelunker's Headlamp}} (Rare) <br>
 2. The Gazebo<br>
 
-A. Back Room area with the nearby rare spawn [[Lesser Blade Fiend|lesser blade fiend]] who drops {{:Gladius}} (Rare) and {{:Pugius}} (Rare)<br>
+A. Back Room area with the nearby rare spawn [[Lesser Blade Fiend|lesser blade fiend]] who drops {{:Gladius}} (Rare) and {{:Pugius}} (Common)<br>
 B. To Basement.<br>
 C. Main Room or MR, and stairs to second floor.<br>
-
+<ul></li><li> East of the main room there is [[Torklar Battlemaster]] (Rare) who drops {{:Torklar's Battle Hammer}}
+</ul>
 The lettered stairs lead to each other.
 |}
 
@@ -65,16 +66,20 @@ The lettered stairs lead to each other.
 [[File:Unrestmanor.jpg|right|border]]
 '''Unrest Manor<br>
 1. Room that spawns [[reclusive ghoul magus]] who drops {{:Savant's Cap}} (Common) and {{:Dusty Bloodstained Gloves}} (Rare)<br>
-2. Barroom where spawns: [[an undead barkeep]] who drops {{:Opalline Earring}} (Common) and {{:Thick Leather Apron}} (Rare), and Zombie of Unrest Noble<br>
-3. Room with [[a reanimated hand (Unrest)|a reanimated hand]] which drops {{:Ivory Bracelet}}<br>
-4. Tower that spawns [[a priest of najena]] who drops Tarnished Bronze Key<br>
+2. Barroom where [[an undead barkeep]] who drops {{:Opalline Earring}} (Common) and {{:Thick Leather Apron}} (Rare) spawns as well as a [[Zombie of an Unrest Noble|a zombie of an Unrest noble]] who drops {{:Cursed Blade}} and {{:Dark Plate Leggings}}<br>
+3. Room with [[a reanimated hand (Unrest)|a reanimated hand]] which drops {{:Ivory Bracelet}}, {{:Brittle Staff}}, and {{:Rhodium Band}}<br>
+4. Tower that spawns [[a priest of najena]] who drops [[Tarnished Bronze Key]], {{:Ancient Spurned Ferraiolo}}, and {{:Ancient Spurned Waistcoat}}<br>
 5. Tower Room<br>
 6. "Tower" with [[an undead knight of Unrest]] who drops {{:Bloodstained Mantle}} (Common) and {{:Bloodstained Tunic}} (Rare)<br>
 7. Main Basement Room, filled with Werebats and Festering Hags<br>
 8. Blood Trap, be sure to walk *through* the lava, going around it will make you fall in pits<br>
 9. "Dwarf Room" with [[Garanel Rucksif]] who drops {{:Jagged Band}} (Common) and {{:Dwarven Work Boots}} (Rare), also has Tentacle Terrors who drop {{:Tentacle Whip}}, and Dark Terrors<br>
 
-A. Fireplace or FP, and stairs to first and second floors.
+A. Fireplace or FP, and stairs to first and second floors. <br>
+
+<strong>Note:</strong> On the second floor west of the stairs notated <strong>C</strong> in one of the closets is [[Khrix Fritchoff]] who drops {{:Scaredy Cap}} and {{:Shawl of Less-Than Invisibility}}
+<ul></li><li> As part of [[The Summoning of Dread]] quest, Khrix will summon [[Khrix Abomination]] who drops {{:Rotted Chestwraps}} and {{:Fistwraps of Raw Flesh}}
+
 |}
 
 == Dangers ==

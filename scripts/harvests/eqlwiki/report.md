@@ -99,12 +99,12 @@ Keyword scan (case-insensitive) of effect text for: duration, extend, mesmeri, c
   > This passive ability increases the duration of beneficial spells that you cast by 5/15/30/50%.
   - Per-rank numbers: 5/15/30/50%
 
-### Thief's Intuition (Archetype; 4 rank(s), cost 3/?/?/?)
+### Thief's Intuition (Archetype; 4 rank(s), cost 3/6/?/?)
 *Requirements: Level 1.*
 
 - Keywords `reuse`:
-  > This passive ability reduces the reuse time of your Sense Traps and Disarm Traps skills by 1/?/?/?
-  - Per-rank numbers: 1/?/?/?
+  > This passive ability reduces the reuse time of your Sense Traps and Disarm Traps skills by 1/3/?/?
+  - Per-rank numbers: 1/3/?/?
 
 ### Reaching Notes (Bard; 6 rank(s), cost 2/4/6/?/?/?)
 *Requirements: Level 1.*

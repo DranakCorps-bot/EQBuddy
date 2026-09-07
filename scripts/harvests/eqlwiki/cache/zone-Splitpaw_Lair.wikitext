@@ -52,7 +52,8 @@ Respawn time for The Ishva Mal is 28 minutes. Respawn time for Tesch Val Deval'N
 </li><li>6. Prison with the [[Brother Hayle]]
 </li><li>7. [[Tesch Val Kadvem]] who drops {{:Vacra Av Svim}} (Rare)
 </li><li>8. [[The Ishva Mal]] who drops [[Summon_Corpse|Scroll: Summon Corpse]] (Common), {{:Brain of the Ishva Mal}} (common) and {{:Robe of the Ishva}} (Rare).
-</li><li>({{Loc|Splitpaw Lair|1150, -180}}) Small safe room located directly north of number four.  Stay out of the doorway.
+</li><li>A. Small corner with [[a one-eyed gnoll]]
+</li><li>B. Room with [[A Lteth Val Scribe]]
 </li></ul>
 |}
 

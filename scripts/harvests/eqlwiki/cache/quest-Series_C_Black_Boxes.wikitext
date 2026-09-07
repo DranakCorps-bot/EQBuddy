@@ -1,6 +1,6 @@
 {{Classic Era}}
 __NOTOC__
-[[File:npc_manik_compolten.png|frame|Manik Compolten]]
+[[File:npc_manik_compolten.png|thumb|Manik Compolten]]
 {| class="questTopTable"
 ! ''' Start Zone: '''
 | [[Ak'Anon]]
