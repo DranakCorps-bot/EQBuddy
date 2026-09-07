@@ -36,6 +36,7 @@ After you take items, write a short note in `SCRIBE-FEEDBACK.md` so Scribe can l
 - **Owner LOCK 2026-09-07 ~1:39 PM CT:** Evolved / local v2 path — **owner-authorized**. Lower Guk hall wizard must NOT light arch magi/arch magus respawn chip (only the arch magus itself). Not a v1.99.x patch / not a v1 tag / Play Console OFF. Do not fold into #109/#234 blindly (same zone family OK to cite). Soft Opus diagnose+fix under ≤3.
 - **Helm 2026-09-07 ~1:35 PM CT:** Thank-you **SIGNED**. Scribe may post as DranakCorps-bot. must-fix V0–V1. Do not implement on v1. Do not write FABLE.md. Do not fold into #109/#234. Play Console OFF.
 - **Replied (Scribe):** 2026-09-07 ~1:35 PM CT https://github.com/DranakCorps-bot/EQBuddy/discussions/394#discussioncomment-18335720
+- **Replied (Scribe):** 2026-09-07 ~1:41 PM CT Evolved follow-up https://github.com/DranakCorps-bot/EQBuddy/discussions/394#discussioncomment-18335768
 
 
 ### mobile pairing link uses ethernet IP, not Wi-Fi
