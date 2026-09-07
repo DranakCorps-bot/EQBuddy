@@ -90,47 +90,21 @@ back as the fix. Noted in `BEVEL-FEEDBACK.md`.
 
 ---
 
-### 3. Home / shell recovery — real gap, but it is bigger than Home: `must-fix`
+### ~~3. Home / shell recovery — real gap, but it is bigger than Home~~ — TAKEN 2026-09-06 (OE-2)
 
-**Place:** `src/EQBuddy/IShellRoom.cs:18-24` (*"A room is a CONTROL, not a window"*),
-`ShellWindow.xaml.cs:81,163,232-291,303-333`, `src/EQBuddy/ShellHost.cs` (whole file),
-`src/EQBuddy.UI.Shared/ShellPages.cs:45-118`.
-
-**Verified: Home itself cannot be "closed" independently — the report is naming the right
-symptom at the wrong scope.** Home is a `Grid`-derived `IShellRoom`, not a window; navigating
-away just swaps `RoomHost.Content` and the `HomeRoom` instance stays cached in `_rooms`
-(`ShellWindow.xaml.cs:112,303-333`), one rail click away for as long as the shell window is
-open. All seven `ShellPage` rows are in `Landed` as of SR-5 (`ShellPages.cs:114-118`, own
-comment: *"the list is now the whole enum"*) — so nothing about the rail can strand a landed
-room; that part is safe by construction and `ShellNavigationTests` holds it.
-
-**What actually closed, and doesn't come back, is the whole `ShellWindow`.** It's native chrome
-(`ShellWindow.xaml:1-46`, *"a normal Windows window... no hand-rolled close button"*) — closing
-it via ✕/Alt-F4 releases the rooms and nulls `main._shellWindow`
-(`ShellHost.cs:38`, `ShellWindow.xaml.cs:163`). **Verified: `ShellHost.Show` — the only
-constructor for a new `ShellWindow` — has exactly one caller in the whole app,
-`ShellHost.ApplyEnvHook` (`ShellHost.cs:62-71`), gated on the `EQBUDDY_SHELL` env var.** There is
-no menu item, hotkey, or button anywhere in `src/EQBuddy` that reopens it. `ShellHost.cs:14-23`
-says this is deliberate, not an oversight: *"The shell has no player-facing door yet... The
-door for players lands with the HUD's 'Open EQBuddy', which is the PR after this one."*
-`DECISIONS.md:938-944` records the same call and gives the reason it was deferred: *"the rail
-has one row, Evolved is local-only... a door into a one-room shell is the unexplained empty the
-Phase 2 gate forbids."*
-
-**The finding: that premise is no longer true, and nobody has come back to re-check it.** The
-rail had one row at PR 1. It has **all seven**, landed, as of SR-5 today — `ShellPages.cs`'s own
-words. The stated reason for withholding the door was explicitly tied to the rail's size at the
-time, and the rail's size is exactly what changed since. This isn't Bevel inventing a new
-decision or proposing a player door from scratch — the door is already named three times in
-comments (`ShellHost.cs:23`, `ShellWindow.xaml.cs:252`, `ShellPages.cs:271`) as "the PR after this
-one." **The owner hitting this now, closing Home with no way back short of restart, is that
-already-planned PR arriving as a live bug report instead of as a roadmap item — which is the
-`must-fix` class, and it needs no new IA: build the HUD's "Open EQBuddy" door the comments
-already describe, now that the premise for deferring it has expired.**
-**Not deciding here:** what exact HUD affordance ("Open EQBuddy" button vs. tray vs. hotkey) — that's
-implementation, and the comments already point at "the HUD's 'Open EQBuddy'" as the named
-target; Fable/Claude pick the concrete control. Bevel's job here is confirming the premise
-collapsed and naming it loudly enough that it isn't re-deferred on the old reasoning.
+Built on `claude/oe2-open-eqbuddy-20260906`. Every source claim held on inspection, including
+the one that set the priority: `ShellHost.Show` had exactly one caller in the whole app, gated
+on `EQBUDDY_SHELL`. **The re-scoping is what made the fix right** — Home cannot be closed
+independently, so a Home-recovery affordance would have fixed nothing; what closed was the
+whole `ShellWindow`. The door is the widget's `Open EQBuddy…` context-menu row (first in the
+menu, above `EQBuddy Mobile`), through `ShellHost.OpenDoor` — a row rather than a hotkey
+because nothing is bound by default (trap 59), and not a HUD-bar control because lane W owns
+`HudBarView` while OE-1/OE-3/OE-4 run. It names no address, so it comes back on **Home** and
+FRONTS an already-open shell rather than sending a reading player there. The three comments
+that promised the door, and four more claims of the same family, are updated in the same
+change. **One premise you own moved underneath a signed rule** — `RetiredCardsTests`' reason
+for refusing to name an Evolved room was "`EQBUDDY_SHELL` is the only way into one today" —
+and the question is in `BEVEL-FEEDBACK.md`; the rule itself is untouched.
 
 ---
 

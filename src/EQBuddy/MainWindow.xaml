@@ -24,8 +24,17 @@
                 <MenuItem Header="Options…" Click="OnOptions"
                           ToolTip="Size, theme, alerts, watch rules, cards, hotkeys — now in tabs"/>
                 <Separator/>
-                <!-- First in the windows list because it is the one you reach for at the
-                     start of a session, not a setting you visit once. -->
+                <!-- OE-2, the Evolved shell's player door (Bevel item 3, Helm-signed #347
+                     item 3). It is FIRST because of what it recovers: the shell has native
+                     chrome, so ✕ closes it like any window, and until this row existed
+                     EQBUDDY_SHELL was the only way back in — a player who closed it was
+                     stranded until they restarted EQBuddy. A row is the door rather than a
+                     hotkey because nothing is bound by default (trap 59), and it sits with
+                     World… and Quests… below for the same reason those two are there. -->
+                <MenuItem x:Name="OpenShellItem" Header="Open EQBuddy…" Click="OnOpenShell"
+                          ToolTip="The Evolved window — Home, Live, Progress, Quests, Gear, World and Settings in one place, with Ctrl+K to jump. Closing it is not permanent; this row brings it back, and leaves it where you were if it is already open."/>
+                <!-- First of the SATELLITE windows because it is the one you reach for at
+                     the start of a session, not a setting you visit once. -->
                 <MenuItem x:Name="MobileMenuItem" Header="EQBuddy Mobile (Beta)…" Click="OnCompanion"
                           ToolTip="Show EQBuddy on a phone or tablet on your Wi-Fi — scan the code, pick which windows that device shows. LAN-only; nothing leaves your network."/>
                 <!-- The WORLD theme (docs/Themes.md theme 6, World PR 2): Zone map, Travel

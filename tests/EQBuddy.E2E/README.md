@@ -125,6 +125,17 @@ with `Wait.Until` — every assertion is an observable condition with a timeout 
 reason; there are no bare sleeps. Timeouts fold in the dump content and the profile's
 `error.log` tail.
 
+**One channel runs the other way: `EQBUDDY_DOORPROBE=1` plus a trigger file** (OE-2). The
+dump is one-way — the app writes, the suite reads — and every other `EQBUDDY_*` hook fires
+once at `Loaded`, which cannot reach a state that only exists MID-run: "the player has closed
+the shell". The probe polls the profile for `door.trigger` and drives the widget's
+`Open EQBuddy…` handler, the same one the menu row drives, so what is proved is the row's
+own path. `AppHarness.ClickOpenEqbuddyDoor` drops the file and returns on
+`doorProbeClicks`, which the probe raises AFTER the handler returns — an assertion that
+nothing MOVED has to be made on the far side of the decision, or it passes with the feature
+deleted (trap 62). `CloseShellWindow` is the other half: a real `WM_CLOSE`, matched on the
+shell's exact title, leaving the app running.
+
 ## What v1 covers
 
 1. Live session + fresh melee kill updates the kill surface.
@@ -136,7 +147,8 @@ reason; there are no bare sleeps. Timeouts fold in the dump content and the prof
 
 - **UI Automation** — no clicks, no visual-tree reads. `debug.txt` proved sufficient
   for v1, so no FlaUI/UIA dependency was taken. v2 candidate if a scenario needs
-  interaction (Options, breakouts, satellite windows).
+  interaction (Options, breakouts, satellite windows). *The OE-2 door probe above is not
+  an exception to this: nothing presses a menu row, the app invokes its own handler.*
 - **Avalonia app** — it has its own headless render tests; a Linux E2E lane is separate work.
 - **Installer / updater** — `UpdateFolder` is pointed at an empty dir on purpose.
 - **Spawn timers, mez/slow chips, buff timers, alerts firing** (sound/speech/banners),

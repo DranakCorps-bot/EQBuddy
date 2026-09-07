@@ -268,8 +268,8 @@ public static class ShellPages
     /// <summary>
     /// THE ONE NAVIGATION ADDRESS, parsed. <c>progress</c> or <c>progress:raids</c> —
     /// the grammar <c>EQBUDDY_EXPAND</c> has taken since 2026-08-26, reused rather than
-    /// reinvented so the rail, the Ctrl+K palette, a future HUD "Open EQBuddy" button and
-    /// "Guide me there" all resolve to one destination spelling.
+    /// reinvented so the rail, the Ctrl+K palette, the widget's "Open EQBuddy…" row (OE-2)
+    /// and "Guide me there" all resolve to one destination spelling.
     ///
     /// **Two ways to land on a room is trap 33 one level up from data into navigation**:
     /// two callers with different arguments do not produce a stale answer and a fresh

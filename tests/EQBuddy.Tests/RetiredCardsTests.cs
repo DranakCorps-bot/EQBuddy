@@ -183,10 +183,13 @@ public sealed class RetiredCardsTests
     }
 
     /// <summary>
-    /// The heading and the blurb are player words. The Evolved shell's rooms are deliberately
-    /// unmentioned — `EQBUDDY_SHELL` is the only way into one today, so naming a room here
-    /// would send a player looking for something they cannot open, which is the mirror of the
-    /// defect this list exists to fix.
+    /// The heading and the blurb are player words. The Evolved shell's rooms stay deliberately
+    /// unmentioned. The premise MOVED with OE-2 and the rule did not: the shell now has a
+    /// player door (the widget's `Open EQBuddy…` row), so "a player cannot open one" is no
+    /// longer the reason — the reason is that a retired CARD's row names the door that opens
+    /// that surface, and the shell's door opens the shell, not a room. Whether a row may name
+    /// a room reachable in two steps is Bevel's ruling to make (I-11 §4 is Helm-signed as
+    /// written); filed in `BEVEL-FEEDBACK.md` rather than decided here.
     /// </summary>
     [Fact]
     public void TheListPointsOnlyAtDoorsAPlayerActuallyHas()

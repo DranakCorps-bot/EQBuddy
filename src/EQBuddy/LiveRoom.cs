@@ -548,9 +548,10 @@ internal sealed class LiveRoom : Grid, IShellRoom
     /// <c>AppSettings.BreakoutDamageScope</c> and friends; writing those from here would
     /// make two writers of one settings key, which is trap 13's loaded gun — a save writes
     /// the WHOLE file from the snapshot loaded at startup, so the second writer's changes
-    /// go back silently with nothing on screen. The Evolved shell is behind
-    /// <c>EQBUDDY_SHELL</c> with no player door, so a preference it forgets on close costs
-    /// nobody anything; a preference it fights the widget over would cost a bug report.
+    /// go back silently with nothing on screen. A preference the shell forgets on close
+    /// costs nobody anything; a preference it fights the widget over would cost a bug
+    /// report — and that trade did not change when the shell gained its door (OE-2), it
+    /// only stopped being an argument about how few people could see it.
     /// </summary>
     private sealed class MeterPane
     {

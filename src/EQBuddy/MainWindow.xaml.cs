@@ -1936,10 +1936,6 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
 
     internal ProgressWindow? _progressWindow;
 
-    /// <summary>The Evolved shell, when it is open (E-3 PR 1). Opened by
-    /// <see cref="ShellHost"/>, never from here — the widget does not own it.</summary>
-    internal ShellWindow? _shellWindow;
-
     /// <summary>Who owns the Progress body right now — the card, the window, or neither.
     ///
     /// Introduced while the launcher is still a plain Button that can only ever reach
@@ -2089,6 +2085,9 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
         _settings.Save();
         _breakoutHost.Update(CurrentSnapshot());
     }
+
+    // internal (not private): the OE-2 door probe in DebugHooks drives this exact handler.
+    internal void OnOpenShell(object sender, RoutedEventArgs e) => ShellHost.OpenDoor(this);
 
     private void OnQuestsWindow(object sender, RoutedEventArgs e) => ShowQuestsWindow();
 

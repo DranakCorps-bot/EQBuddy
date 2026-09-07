@@ -29,6 +29,11 @@ namespace EQBuddy;
 /// </summary>
 internal static class DebugHooks
 {
+    /// <summary>How many times the OE-2 door probe has driven the widget's
+    /// <c>Open EQBuddy…</c> row. Reported in the <c>EQBUDDY_EXPAND</c> dump so the suite has
+    /// a positive event to wait on; 0 forever unless <c>EQBUDDY_DOORPROBE=1</c> armed it.</summary>
+    internal static int DoorProbeClicks;
+
     /// <summary>Called once from the widget's constructor, at the point the block used to
     /// sit — after the tray icon and the item-catalog warm, before the What's-new notes.
     /// </summary>
@@ -213,9 +218,50 @@ internal static class DebugHooks
                 m.IsOpen = true;
             };
 
-        // The Evolved shell (E-3 PR 1) — newest member of the family, and the one whose
-        // surface has no player-facing door yet, which makes the hook the only way it can
-        // be photographed or asserted at all.
+        // THE DOOR PROBE (OE-2), and it is the one hook in this file that does not fire at
+        // startup — because the state it has to reach does not exist at startup. The claim
+        // under test is "the Open EQBuddy row brings back a shell the player CLOSED", and
+        // the close has to happen in the middle: a startup hook could only ever prove the
+        // door opens a shell that was never opened, which is a reading of the code (the ✕
+        // nulls the same field) dressed up as a measurement. Trap 62's shape — a guard
+        // asking the right question at the wrong moment reads as coverage either way.
+        //
+        // The rendezvous is a file in the profile, dropped by `tests/EQBuddy.E2E`, because
+        // the E2E channel is one-way (the app writes `debug.txt`, the suite reads it) and
+        // the suite has no other way to say "now". It drives the SAME handler the menu row
+        // drives — as `EQBUDDY_HUDEDIT` does for Edit HUD — so what it proves is the row's
+        // own path, not a private one built for the test.
+        if (Environment.GetEnvironmentVariable("EQBUDDY_DOORPROBE") == "1")
+            w.Loaded += (_, _) =>
+            {
+                var trigger = AppPaths.File("door.trigger");
+                var poll = new System.Windows.Threading.DispatcherTimer(
+                    System.Windows.Threading.DispatcherPriority.Background)
+                { Interval = TimeSpan.FromMilliseconds(200) };
+                poll.Tick += (_, _) =>
+                {
+                    if (!System.IO.File.Exists(trigger)) return;
+                    // Deleted BEFORE the click, so a door that throws cannot spin the timer
+                    // on one trigger forever — and so the suite's next drop is a new event
+                    // rather than a leftover.
+                    try { System.IO.File.Delete(trigger); }
+                    catch (System.IO.IOException) { return; }
+                    w.OnOpenShell(w, new RoutedEventArgs());
+                    // AFTER the handler, and that ordering is the whole value of the
+                    // counter: the file leaving says the probe SAW the trigger, and only
+                    // this says the door has finished being asked. A suite that asserted
+                    // "and the room did not change" off the first of those two would be
+                    // asking one moment too early — trap 62, which passed a test with the
+                    // feature under it deleted.
+                    DoorProbeClicks++;
+                };
+                poll.Start();
+            };
+
+        // The Evolved shell (E-3 PR 1). Its player door is the widget's "Open EQBuddy…"
+        // context-menu row since OE-2; this hook stays beside it, because a row a human has
+        // to click cannot land a capture on a NAMED room and a shot of the default one
+        // proves nothing about the other six (trap 22).
         ShellHost.ApplyEnvHook(w);
     }
 }

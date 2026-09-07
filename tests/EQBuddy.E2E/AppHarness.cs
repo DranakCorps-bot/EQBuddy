@@ -502,6 +502,62 @@ internal sealed class AppHarness : IDisposable
             "(debug.txt logPending back to 0)");
     }
 
+    /// <summary>
+    /// Closes the EVOLVED SHELL the way a player does — WM_CLOSE, which is what its ✕ and
+    /// Alt-F4 post — and leaves the app running. The widget stays up: only its
+    /// <c>OnClosed</c> shuts the application down, which is why <see cref="CloseGracefully"/>
+    /// asks for that window by name and this one asks for a different name.
+    ///
+    /// **The title is the identity here too, and the shell's carries its room** ("EQBuddy —
+    /// Home"), which is the naming <c>HistoryWindow</c> already used and the thing that keeps
+    /// two same-process windows apart when <c>-OwnerPid</c> cannot (trap 24). The caller
+    /// passes the room's label rather than a prefix so a satellite window that also begins
+    /// "EQBuddy — " can never be the one that gets closed.
+    /// </summary>
+    public void CloseShellWindow(string roomLabel) =>
+        PostToShell(roomLabel, Native.WmClose, 0, "WM_CLOSE", "closing");
+
+    /// <summary>Minimizes the shell the way its minimise button does — the other "gone"
+    /// the door has to answer for: <c>Activate</c> does not restore a minimized window, so
+    /// a door that only fronted would do visibly nothing here.</summary>
+    public void MinimizeShellWindow(string roomLabel) =>
+        PostToShell(roomLabel, Native.WmSysCommand, Native.ScMinimize, "SC_MINIMIZE", "minimizing");
+
+    private void PostToShell(string roomLabel, uint message, nint wparam, string what, string doing)
+    {
+        var p = _process ?? throw new InvalidOperationException("App not launched.");
+        var title = $"EQBuddy — {roomLabel}";
+        var shell = IntPtr.Zero;
+        Wait.Until(() => (shell = WindowTitled(p.Id, title)) != IntPtr.Zero,
+            AssertTimeout, $"the shell window (title exactly \"{title}\") to exist before {doing}",
+            Artifacts, WhyTheAppCannotAnswer);
+        Wait.Until(() => Native.PostMessage(shell, message, wparam, 0),
+            AssertTimeout, $"{what} to be accepted by the shell window", Artifacts);
+    }
+
+    /// <summary>
+    /// Clicks the widget's <c>Open EQBuddy…</c> context-menu row — the OE-2 door — through
+    /// the <c>EQBUDDY_DOORPROBE</c> rendezvous, which the scenario must have asked for.
+    ///
+    /// **There is no way to press a menu row from out here, and asserting the SCREEN is
+    /// forbidden anyway** (a hosted runner is 1024×768). So the app polls for this file and
+    /// invokes the row's own handler.
+    ///
+    /// **It returns on `doorProbeClicks`, which the probe raises AFTER that handler has
+    /// run** — not on the trigger file disappearing, which only says the probe SAW it. An
+    /// assertion that nothing MOVED has to be made on the far side of the decision or it
+    /// passes with the feature deleted (trap 62). A probe that was never armed times out
+    /// HERE, naming the rendezvous, rather than later as a shell that would not open.
+    /// </summary>
+    public void ClickOpenEqbuddyDoor()
+    {
+        var before = DumpValue("doorProbeClicks");
+        File.WriteAllText(Path.Combine(ProfileDir, "door.trigger"), "open");
+        Until(() => DumpValue("doorProbeClicks") > before, AssertTimeout,
+            $"the door probe to drive the Open EQBuddy row (debug.txt doorProbeClicks past " +
+            $"{before}; is EQBUDDY_DOORPROBE=1 set on this scenario?)");
+    }
+
     /// <summary>Current value of a debug.txt "key=value" field, or -1 while the dump is
     /// missing, mid-write, or lacks the key — callers poll via <see cref="WaitForDump"/>.</summary>
     public int DumpValue(string key)
@@ -603,7 +659,13 @@ internal sealed class AppHarness : IDisposable
     /// which is the naming `HistoryWindow` already used and which is what keeps these two
     /// apart. If the widget ever gains a suffix of its own, this is the line that says so
     /// — loudly, by finding nothing — rather than by closing the wrong window.</summary>
-    private static IntPtr WidgetWindow(int processId)
+    private static IntPtr WidgetWindow(int processId) => WindowTitled(processId, "EQBuddy");
+
+    /// <summary>The one enumeration both closers use: a process's visible top-level window
+    /// whose title is EXACTLY this, or zero. Exact, not "starts with" — "EQBuddy" is a
+    /// prefix of every satellite's title, so a loose match would hand the widget back for
+    /// every request and close the app instead of the window asked for.</summary>
+    private static IntPtr WindowTitled(int processId, string exactTitle)
     {
         var found = IntPtr.Zero;
         Native.EnumWindows((hwnd, _) =>
@@ -614,7 +676,7 @@ internal sealed class AppHarness : IDisposable
             if (owner != processId) return true;
             var title = new StringBuilder(256);
             Native.GetWindowText(hwnd, title, title.Capacity);
-            if (title.ToString() != "EQBuddy") return true;
+            if (title.ToString() != exactTitle) return true;
             found = hwnd;
             return false;
         }, IntPtr.Zero);
@@ -624,6 +686,8 @@ internal sealed class AppHarness : IDisposable
     private static class Native
     {
         public const uint WmClose = 0x0010;
+        public const uint WmSysCommand = 0x0112;
+        public const nint ScMinimize = 0xF020;
 
         public delegate bool EnumProc(IntPtr hwnd, IntPtr lparam);
 

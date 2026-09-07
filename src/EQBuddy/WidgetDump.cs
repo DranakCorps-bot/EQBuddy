@@ -490,15 +490,30 @@ internal static class WidgetDump
                     // unit tests, so this is the only thing that can say it still opens
                     // beside the room rather than being quietly retired by a cleanup.
                     (w._historyWindow is { IsLoaded: true } hwin ? hwin.DebugFacts() + " " : "") +
-                    // The EVOLVED SHELL, when EQBUDDY_SHELL opened one (E-3 PR 1). It has
-                    // no player-facing door yet, so this is the only thing besides a
+                    // THE EVOLVED SHELL'S DOOR (OE-2), and it is a fact about the widget
+                    // rather than about the shell — which is why it is reported whether or
+                    // not one is open. `menuOpenShell` is 1 only when the row is present,
+                    // VISIBLE and enabled: the title-bar Mobile button shipped
+                    // `Visibility="Collapsed"` for six days through several releases, a
+                    // compile, a test run and a diff, because an absent control photographs
+                    // as an unremarkable title bar (trap 29) and `IsEnabled=false` renders
+                    // exactly like a live control under this app's styles (trap 17). The
+                    // door is the whole point of OE-2, so "it exists on a default profile"
+                    // is the assertion that has to survive a later cleanup.
+                    $"menuOpenShell={(w.OpenShellItem is { Visibility: Visibility.Visible, IsEnabled: true } ? 1 : 0)} " +
+                    // Times the row's handler has been driven by EQBUDDY_DOORPROBE — the
+                    // suite's synchronisation point on the far side of the click, and 0 on
+                    // every profile that did not ask for the probe.
+                    $"doorProbeClicks={DebugHooks.DoorProbeClicks} " +
+
+                    // The EVOLVED SHELL, when one is open. This is the only thing besides a
                     // screenshot that can say the rail drew, the Search affordance exists
                     // and the room painted — and an absent control photographs as an
                     // unremarkable window (trap 29), so a picture alone would not.
                     // Its Progress numbers come out under shellProgress* BESIDE the
                     // window's progress* keys on purpose: two hosts of one room is
                     // exactly where a silent divergence would live.
-                    (w._shellWindow is { IsLoaded: true } shwin ? shwin.DebugFacts() + " " : "") +
+                    (ShellHost.Window is { IsLoaded: true } shwin ? shwin.DebugFacts() + " " : "") +
                     // The v1 OPTIONS window, when EQBUDDY_OPTIONS opened one. Added at SR-5,
                     // the PR that landed the shell's Settings room, and it exists for exactly
                     // one reason: the room composes the SAME four blocks this window

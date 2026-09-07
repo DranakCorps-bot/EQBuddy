@@ -49,7 +49,7 @@ internal static class FollowingSurfaces
         // chrome — but it hosts live surfaces off the same snapshot, so the tick and the
         // dump's surfacesBehind count both have to see it or the dump describes two
         // moments again (trap 56).
-        if (w._shellWindow is { IsLoaded: true, IsVisible: true } sh) yield return sh;
+        if (ShellHost.Window is { IsLoaded: true, IsVisible: true } sh) yield return sh;
     }
 
     /// <summary>The widget's once-a-second follow tick. Lives here rather than in
@@ -80,6 +80,6 @@ internal static class FollowingSurfaces
     public static void InventoryChanged(MainWindow w)
     {
         w._gearLootWindow?.InventoryChanged();
-        w._shellWindow?.InventoryChanged();
+        ShellHost.Window?.InventoryChanged();
     }
 }
