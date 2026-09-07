@@ -325,6 +325,23 @@ internal static class WidgetDump
                     // per pinned watch rule. Zero while the widget is expanded, because
                     // UpdateMiniChips only runs while MiniRoot is visible.
                     $"hudCells={w._hudBar.CellCount} " +
+                    // …and WHICH chips, in WHAT ORDER (#191 drag-to-reorder). The count
+                    // above proves membership; this proves PLACE, and place is the whole
+                    // feature — a bar that drew the right chips in the canonical order
+                    // while the player's saved order sat unread would satisfy hudCells
+                    // exactly.
+                    //
+                    // Read off what the bar DREW rather than by asking ResolveOrder a
+                    // second time (trap 42): "the app would resolve money-first if asked"
+                    // and "the bar drew money first" are different claims, and only the
+                    // second one is the feature. Comma-joined and "-" for an empty bar,
+                    // because the dump is space-separated key=value.
+                    $"hudCellOrder={w._hudBar.CellOrderKey} " +
+                    // Presses seen, drops written — the instrument, not the assertion. When
+                    // a harness reports "a chip drag reordered nothing", these separate the
+                    // pointer never reaching a chip (0,0) from the move never crossing the
+                    // threshold (1,0) from the whole gesture running with no write (trap 56).
+                    $"hudCellGrip={w._hudBar.GripKey} " +
                     // …and WHICH number the glance's third slot currently is: "xp" or
                     // "hps". A word, not a count, because the dump is space-separated
                     // key=value and the suite has a string wait for exactly this shape.

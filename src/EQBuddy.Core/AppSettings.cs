@@ -25,6 +25,36 @@ public sealed class AppSettings
     /// removes the toggle. <see cref="MigratePromotedHudStats"/> strips them from
     /// existing profiles; the default lost "dps" for the same reason.</summary>
     public List<string> MiniStats { get; set; } = ["kills"];
+
+    /// <summary>
+    /// The order the minimized bar's chips sit in, left to right — the player's own, set by
+    /// dragging one chip past another (#191, TheMegaSage; owner lock 2026-09-07 ~4:44 PM CT).
+    ///
+    /// **EMPTY — the default — means the canonical order**, which is
+    /// <c>MiniBarPresentation.CanonicalOrder</c> and is byte-for-byte the bar every profile
+    /// has drawn until now. The floor IS the default, exactly as NaN is for
+    /// <see cref="HudPanelParkLeft"/>: an untouched profile gets today's bar, a profile
+    /// reset restores it, and there is no migration to get wrong because there is nothing
+    /// to migrate.
+    ///
+    /// **Written at DROP and nowhere else.** Not per-move (a drag is not twenty file
+    /// writes), not in a <c>Closed</c> handler (trap 2). Of the actors that can change this
+    /// bar only the player's drag has an END, so only the player reaches the write — the
+    /// same construction OE-8's park pair uses instead of a <c>selfSet</c> flag (trap 49).
+    ///
+    /// **A key this list OMITS is appended in its canonical place, never dropped**, and a
+    /// key it does not recognise is skipped — a stale file, or a profile written by a
+    /// release before a stat existed, must not leave a hole in the bar or lose a cell with
+    /// nothing naming the loss (trap 20's shape). <c>MiniBarPresentation.ResolveOrder</c> is
+    /// the one place that reconciles the two.
+    ///
+    /// **NOT <see cref="MiniStats"/> re-purposed.** Membership and order are two verbs and
+    /// stay two settings — the rule <c>HudChipOrder</c> already states — because an order
+    /// that also removed a stat would make toggling a ★ reshuffle the bar, which is the
+    /// re-read cost <c>MiniBarPresentation.Order</c>'s own doc forbids.
+    /// </summary>
+    public List<string> MiniBarOrder { get; set; } = [];
+
     public double WindowLeft { get; set; } = double.NaN;
     public double WindowTop { get; set; } = double.NaN;
     public double Opacity { get; set; } = 0.96;

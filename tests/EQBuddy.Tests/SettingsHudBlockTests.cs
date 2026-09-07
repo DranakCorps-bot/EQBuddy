@@ -68,6 +68,16 @@ public class SettingsHudBlockTests
         ("MiniStatsPanel", "HUD block", "HudStatsHeading"),
         ("MiniStatsPanel", "HUD block", "HudStatsBlurb"),
         ("MiniStatsPanel", "HUD block", "PromotedStatsNote"),
+        // The way back from a chip drag (#191; Bevel's face, Helm-signed 2026-09-07). It is
+        // NOT a lifted control — nothing in `OptionsWindow.xaml` ever named it — but it earns
+        // the same row for the same reason the rest have one: the mini bar's order is set by
+        // a gesture with nothing on screen to say it happened, so a build that quietly stopped
+        // drawing this button would leave the setting with no undo and an absent control
+        // photographs as an unremarkable list (traps 29/34).
+        ("MiniStatsPanel", "HUD block", "_restoreOrder"),
+        ("MiniStatsPanel", "HUD block", "RestoreOrderLabel"),
+        ("MiniStatsPanel", "HUD block", "MiniBarOrder.Clear()"),
+        ("MiniStatsPanel", "HUD block", "MiniBarPresentation.CanonicalOrder"),
 
         // ---- the floating-window tick boxes
         ("BreakoutsPanel", "HUD block", "_breakouts"),

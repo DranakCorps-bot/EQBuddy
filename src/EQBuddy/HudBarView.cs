@@ -41,6 +41,18 @@ internal sealed class HudBarView
     private readonly HudExpandBar _expand;
     private readonly Func<int?> _trackedLevel;
     private readonly Func<int> _activeBuffs;
+    private readonly HudBarReorder _reorder;
+
+    /// <summary>The single click a chip is still owed, armed on its mouse-DOWN and fired on
+    /// the UP that never became a drag.
+    ///
+    /// **The click moved from down to up, and that is the whole gesture split.** A chip acted
+    /// on the press before drag-reorder existed, which cannot survive a press that might turn
+    /// into a carry — a peek would pin itself the instant the player took hold of the chip.
+    /// It is a VIEW-level field for <see cref="AttachGestures"/>'s own reason: the panels are
+    /// rebuilt every second, so the element that saw the down may not be the element that
+    /// sees the up.</summary>
+    private Action? _pendingClick;
 
     // Double-click state for the breakout chips, at the level of THIS view rather than of
     // an element: the chips are rebuilt every tick, so a rebuild landing between the two
@@ -58,6 +70,21 @@ internal sealed class HudBarView
     /// suite asserts on. Recorded by <see cref="Render"/> rather than read back off the
     /// panel, because a panel count would include the trio's own separator chrome.</summary>
     public int CellCount { get; private set; }
+
+    /// <summary>The reorderable chips' keys as DRAWN, left to right — the <c>hudCellOrder</c>
+    /// dump fact.
+    ///
+    /// **Recorded on the way past rather than recomputed for the dump** (trap 42). The whole
+    /// feature is that a saved order reaches the control, so a dump that asked
+    /// <c>MiniBarPresentation.ResolveOrder</c> again would report it working on a tree where
+    /// the bar had gone on drawing the canonical order. It names only the chips the order
+    /// governs: the trio is fixed leftmost and the pinned watch chips are a block after
+    /// these, and neither is in the setting.</summary>
+    public string CellOrderKey { get; private set; } = "-";
+
+    /// <summary>Chip presses seen and drops written — see <see cref="HudBarReorder.PressCount"/>.
+    /// One dump fact, because the two numbers are only ever read together.</summary>
+    public string GripKey => $"{_reorder.PressCount},{_reorder.DropCount}";
 
     // ---- WHICH CHIP THE PANEL HANGS UNDER (the ~3:50 PM CT anchor fix) ----
     //
@@ -146,10 +173,12 @@ internal sealed class HudBarView
     /// <see cref="StatsSnapshot"/> at all, so unlike every other cell this one cannot be
     /// formatted by <see cref="MiniBarPresentation"/> — which is also why "buffs" has never
     /// had a row in that table.</param>
+    /// <param name="persist">Save the profile. Reached by exactly one path — the DROP of a
+    /// chip drag, which is the only thing on this bar that writes a setting.</param>
     public HudBarView(Panel host, AppSettings settings,
         Func<DateTime, IReadOnlyDictionary<string, DateTime>> cuesDue,
         Action<BreakoutKind> toggleBreakout, Action openProgress, HudExpandBar expand,
-        Func<int?> trackedLevel, Func<int> activeBuffs)
+        Func<int?> trackedLevel, Func<int> activeBuffs, Action persist)
     {
         _host = host;
         _settings = settings;
@@ -159,7 +188,25 @@ internal sealed class HudBarView
         _expand = expand;
         _trackedLevel = trackedLevel;
         _activeBuffs = activeBuffs;
+        _reorder = new HudBarReorder(host, settings,
+            // THE DROP: persist, then redraw in the new order. The redraw is what the render
+            // deferral above was holding back, so it happens here rather than a tick later —
+            // a chip that snapped into place a second after the player let go would read as
+            // a drag that did not take.
+            onDropped: () => { persist(); Redraw(); },
+            // A carry begins: let an unpinned peek go, so a panel does not flicker under a
+            // moving chip. A pinned one stays and re-anchors on the next render (#404).
+            onGestureStart: () => _expand.Away());
     }
+
+    // The last numbers the bar drew, so a DROP can repaint immediately instead of waiting
+    // for the next tick — a chip that snapped into place a second after the player let go
+    // would read as a drag that did not take. Nothing else reads these: the tick brings its
+    // own snapshot.
+    private StatsSnapshot? _last;
+    private string? _lastName;
+
+    private void Redraw() { if (_last is { } s) Render(s, _lastName); }
 
     /// <summary>One mini-dashboard stat (2026-08-11, take two — David: no ovals):
     /// glyph + semibold tabular value as clean text, separated from its neighbor by
@@ -177,9 +224,13 @@ internal sealed class HudBarView
     /// float with no door for anyone who has never opened Settings (trap 59).</param>
     /// <param name="tip">A hover the cell writes itself, when its title alone would not say
     /// what the number means. The opt-in gesture is appended to it either way.</param>
+    /// <param name="reorderable">This chip is one the player can carry (#191) — every starred
+    /// cell and the buff set, and nothing else. The pinned watch chips pass false: they are a
+    /// BLOCK after the cells this pass, their internal order is the rule list's, and a
+    /// tooltip promising a drag they do not answer would be worse than silence.</param>
     private FrameworkElement Chip(string iconName, string value, string valueBrush,
         string? edgeBrush = null, BreakoutKind? breakout = null,
-        HudExpandTarget? expand = null, string? tip = null)
+        HudExpandTarget? expand = null, string? tip = null, bool reorderable = false)
     {
         var panel = new StackPanel
         {
@@ -206,8 +257,16 @@ internal sealed class HudBarView
         // child of the last StackPanel, so a divider inside a chip would be the thing it
         // collapsed when the bar's last cell is an expansion chip.
         if (expand is { } target)
-            return ExpandChip(panel, target,
-                tip is { } own ? WithDoubleClick(own) : PeekTip(target), act);
+        {
+            // The three clauses in the order Bevel's face pass settled: what it is and the
+            // click, then the drag if this chip can be dragged, then the opt-in
+            // double-click LAST — `WithDoubleClick` has always been the tail of the
+            // sentence, and a reorder clause after it would read as a qualifier on the
+            // gesture a player had to go and switch on.
+            var hover = tip ?? PeekTip(target);
+            if (reorderable) hover = WithDragToReorder(hover);
+            return ExpandChip(panel, target, WithDoubleClick(hover), act);
+        }
         var divider = new Border
         {
             Width = 1,
@@ -225,8 +284,27 @@ internal sealed class HudBarView
     /// per-tracker exception the lock forbids, and there are seven of them now. The DPS and
     /// HPS slots keep their own richer first halves (what the number MEANS) and pass a
     /// <c>tip</c>; everything else has a title and nothing to add.</summary>
-    private string PeekTip(HudExpandTarget target) =>
-        WithDoubleClick($"{HudExpand.Title(target)} — hover to peek, click to keep it open");
+    ///
+    /// **It no longer appends the double-click itself** (Bevel's face pass, #418): `Chip` adds
+    /// that clause last, after the reorder one, so the three sentences arrive in one place in
+    /// a fixed order instead of two of them being wrapped around the third.
+    private static string PeekTip(HudExpandTarget target) =>
+        $"{HudExpand.Title(target)} — hover to peek, click to keep it open";
+
+    /// <summary>The reorder sentence, appended to whatever a reorderable chip's hover already
+    /// says (#191).
+    ///
+    /// **A gesture with no tell is a gesture nobody finds**, and drag-to-reorder is invisible
+    /// by nature: there is no arrow, no handle and no shape on the bar that says a chip can be
+    /// carried. Same words on every chip that can be, for the same reason
+    /// <see cref="PeekTip"/> says the same words on every chip that peeks — a chip describing
+    /// its own private gesture is the per-tracker exception lock 9 forbids.
+    ///
+    /// It is NOT under an opt-in the way the double-click is: that gesture competes with a
+    /// click and had to be asked for, while a drag is dead space on this bar and costs a
+    /// player who never uses it nothing. The wording is Bevel's to settle at the face
+    /// review.</summary>
+    private static string WithDragToReorder(string tip) => tip + ", drag to reorder";
 
     /// <summary>Append the opt-in gesture, and only for players who have opted in.
     ///
@@ -290,8 +368,21 @@ internal sealed class HudBarView
             var isDouble = _lastChipClickKey == key && now - _lastChipClickAt <= DoubleClickWindow;
             _lastChipClickKey = isDouble ? null : key;   // consume, so a third click starts fresh
             _lastChipClickAt = now;
-            if (isDouble && doubleClick is not null) doubleClick();
-            else single?.Invoke();
+            // The DOUBLE-click still fires on the second press, exactly as it did: it is a
+            // gesture the player opted into and it must not start costing them an extra
+            // mouse-up. It cancels any single the first press armed.
+            if (isDouble && doubleClick is not null) { _pendingClick = null; doubleClick(); }
+            else _pendingClick = single;
+        };
+        // THE SINGLE CLICK NOW FIRES HERE, and only if the press did not become something
+        // else. `Consumed` is read while HudBarReorder is still mid-gesture — its own handler
+        // on the host bubbles and therefore runs after this one, which is what makes the
+        // question answerable at all.
+        element.MouseLeftButtonUp += (_, _) =>
+        {
+            var pending = _pendingClick;
+            _pendingClick = null;
+            if (pending is not null && !_reorder.Consumed) pending();
         };
     }
 
@@ -461,12 +552,47 @@ internal sealed class HudBarView
                 expand: HudExpandTarget.Progress));
     }
 
+    /// <summary>
+    /// THE BUFF SET'S CHIP (OE-7), and the one chip on this bar that
+    /// <see cref="MiniBarPresentation"/> cannot format. "buffs" has always been a valid
+    /// <c>MiniStats</c> key that gated the Buffs window and drew nothing — so that window's
+    /// only doors were Options and an opt-in double-click on a chip that did not exist. Once
+    /// the ✕ became a transient close it needed a real one (trap 59: a hotkey is not a door,
+    /// and neither is a Settings tick). The count comes from the buff tracker because no
+    /// snapshot field carries it; the star is unchanged, so nobody who has not asked for the
+    /// window gets a new chip.
+    ///
+    /// **It is called from inside the ordered walk since #191**, so it can be dragged past
+    /// its neighbours like any other chip: its PLACE is a member of
+    /// <see cref="MiniBarPresentation.CanonicalOrder"/> even though its FACE is built here.
+    /// </summary>
+    private void RenderBuffs()
+    {
+        var up = _activeBuffs();
+        var chip = Chip(
+            BreakoutPresentation.Icon(BreakoutPresentation.Buffs), $"{up}", "AccentBrush",
+            breakout: BreakoutKind.Buffs, expand: HudExpandTarget.Buffs,
+            tip: $"{up} buff{(up == 1 ? "" : "s")} up — hover to peek, click to keep it open",
+            reorderable: true);
+        _host.Children.Add(chip);
+        _reorder.Register(MiniBarPresentation.BuffsKey, chip);
+    }
+
     /// <param name="characterName">Whoever the log is naming. Handed in rather than taken
     /// off the snapshot because the snapshot does not carry it — the session does, and the
     /// widget already passes it the same way to EQBuddy Mobile.</param>
     public void Render(StatsSnapshot s, string? characterName)
     {
+        _last = s;
+        _lastName = characterName;
+        // A LIVE CARRY OWNS THE BAR. The row rebuilds every second, and replacing the
+        // elements under a captured drag takes the chip out of the player's hand mid-gesture
+        // — the chip-row's own "no re-sort under the cursor" rule, one gesture deeper.
+        // Everything else on the widget goes on ticking; this one panel defers until the
+        // drop, which repaints it immediately.
+        if (_reorder.Dragging) return;
         _host.Children.Clear();
+        _reorder.Clear();
         // The anchors belong to the elements this render is about to replace: a chip from
         // last tick is detached and can only answer NaN, which would drop the panel back to
         // the widget's edge for one tick every second.
@@ -477,8 +603,26 @@ internal sealed class HudBarView
         // Which cells, in which order, with which icon and what each reads: all from
         // UI.Shared. Both widgets carried this table by hand, identically, comments and
         // all — and the Avalonia one is the lane that historically drifted.
-        foreach (var cell in UI.Shared.MiniBarPresentation.Cells(s, _settings.MiniStats))
+        //
+        // **WHICH ORDER, SINCE #191: the player's.** `DrawnKeys` is `MiniBarOrder`
+        // reconciled against the canonical list and filtered to the stats with a ★ — one
+        // membership decision, so the bar cannot draw a chip the order does not know about
+        // (trap 4). An untouched profile's empty setting resolves to exactly the bar that
+        // shipped before it existed.
+        //
+        // **"buffs" is IN this walk now**, which is the one thing that changes about it
+        // besides the order: it used to be appended after the loop, because it is the one
+        // cell `MiniBarPresentation` cannot format. A chip drawn outside the ordered walk is
+        // a chip that can never be dragged past its neighbours, so its PLACE is in the list
+        // (`CanonicalOrder`) while its FACE is still built here.
+        var drawn = UI.Shared.MiniBarPresentation.DrawnKeys(_settings);
+        foreach (var key in drawn)
         {
+            if (key == UI.Shared.MiniBarPresentation.BuffsKey) { RenderBuffs(); continue; }
+            // Non-null by construction: `DrawnKeys` has already refused any key this table
+            // cannot put a face on, which is how a settings file from a later version leaves
+            // no hole in the bar.
+            var cell = UI.Shared.MiniBarPresentation.Cell(s, key)!;
             // **EVERY CELL IS AN EXPANSION CHIP AS OF OE-9** — the owner's ~1:29 PM CT amend
             // (2026-09-07): *"Everything on the minimized bar MUST have hover peek +
             // pop-out"*. The hand switch that used to pick a target per cell is gone: the
@@ -503,26 +647,12 @@ internal sealed class HudBarView
                 target is { } t && HudExpand.DestinationOf(t).BreakoutName is { } name
                     ? Enum.Parse<BreakoutKind>(name)
                     : null;
-            _host.Children.Add(Chip(cell.Icon, cell.Text, "AccentBrush", breakout: breakout,
-                expand: target));
+            var chip = Chip(cell.Icon, cell.Text, "AccentBrush", breakout: breakout,
+                expand: target, reorderable: true);
+            _host.Children.Add(chip);
+            _reorder.Register(key, chip);
         }
-
-        // THE BUFF SET'S CHIP (OE-7), and the one cell on this bar that is not in
-        // MiniBarPresentation. "buffs" has always been a valid MiniStats key that gated the
-        // Buffs window and drew nothing — so that window's only doors were Options and an
-        // opt-in double-click on a chip that did not exist. Once the ✕ became a transient
-        // close it needed a real one (trap 59: a hotkey is not a door, and neither is a
-        // Settings tick). The count comes from the buff tracker because no snapshot field
-        // carries it; the star is unchanged, so nobody who has not asked for the window gets
-        // a new cell.
-        if (_settings.MiniStats.Contains("buffs"))
-        {
-            var up = _activeBuffs();
-            _host.Children.Add(Chip(
-                BreakoutPresentation.Icon(BreakoutPresentation.Buffs), $"{up}", "AccentBrush",
-                breakout: BreakoutKind.Buffs, expand: HudExpandTarget.Buffs,
-                tip: $"{up} buff{(up == 1 ? "" : "s")} up — hover to peek, click to keep it open"));
-        }
+        CellOrderKey = UI.Shared.MiniBarPresentation.OrderKey(drawn);
 
         // Per-rule pins: only the rules you picked (📌 in Options), not every enabled one.
         //
@@ -532,6 +662,20 @@ internal sealed class HudBarView
         // shell's Alerts tab carries. Helm's #341 sign was to reduce them to one, and the
         // pin is the survivor. `WatchPinMigration.RetireGroupPin` translates an unticked
         // master into per-rule unpins once, so nobody's bar changes under them.
+        //
+        // **THEY ARE A BLOCK, AFTER THE CELLS, AND NOT REORDERABLE** (#191's stated scope,
+        // Helm-signed 2026-09-07: the block is confirmed). `MiniBarOrder` is keyed by STAT
+        // KEY and these are keyed by rule id, so per-rule placement widens that setting
+        // rather than reusing it — the seam is named in the setting's own doc and not built.
+        // Their chips pass `reorderable: false`, so no tooltip here promises a drag that
+        // does not answer.
+        //
+        // **The order is the RULE LIST's, which is not `WatchSortMode`'s** (Helm's item 3,
+        // same sign: a note, not a block). That setting sorts the Watch surface; this loop
+        // has always walked `TrackedRules` as stored, and the two have never agreed by
+        // construction. Left alone deliberately — making the chips follow a sort the player
+        // picked for a WINDOW would be one setting answering two questions, and the What's-new
+        // entry says the two are separate rather than leaving it to be discovered.
         var due = _cuesDue(DateTime.Now);
         foreach (var rule in _settings.TrackedRules.Where(r => r.Enabled && r.Pinned))
         {

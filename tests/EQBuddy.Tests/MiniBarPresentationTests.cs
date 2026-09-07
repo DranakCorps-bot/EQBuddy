@@ -25,19 +25,25 @@ public class MiniBarPresentationTests
         CombatSeconds = 120,
     };
 
+    /// <summary>A profile with these stats starred and no order of its own — the shape every
+    /// assertion below is about, since <c>DrawnKeys</c> answers from settings rather than
+    /// from a bare list.</summary>
+    private static AppSettings Starred(params string[] stats) =>
+        new() { MiniStats = [.. stats] };
+
     [Fact]
     public void OnlyTheStatsYouStarredAppear()
-    {
-        var cells = MiniBarPresentation.Cells(Snapshot(), ["kills", "loot"]);
-        Assert.Equal(["kills", "loot"], cells.Select(c => c.Key));
-    }
+        => Assert.Equal(["kills", "loot"],
+            MiniBarPresentation.DrawnKeys(Starred("kills", "loot")));
 
     [Fact]
     public void CellsFollowTheFixedOrderNotTheOrderYouPickedThem()
     {
-        // A bar that reshuffles as you toggle stats is a bar you re-read every time.
-        var cells = MiniBarPresentation.Cells(Snapshot(), ["money", "kills", "loot"]);
-        Assert.Equal(["kills", "loot", "money"], cells.Select(c => c.Key));
+        // A bar that reshuffles as you toggle stats is a bar you re-read every time. Since
+        // #191 the fixed order is the CANONICAL one rather than the only one — but MiniStats
+        // is still not where order comes from, which is what this says.
+        Assert.Equal(["kills", "loot", "money"],
+            MiniBarPresentation.DrawnKeys(Starred("money", "kills", "loot")));
     }
 
     [Fact]
@@ -45,8 +51,9 @@ public class MiniBarPresentationTests
     {
         // The whole point of the conversion: a name that IconPaths does not know would
         // fall back to a blank shape, which on the minimized bar reads as nothing at all.
-        Assert.All(MiniBarPresentation.Cells(Snapshot(), MiniBarPresentation.Order),
-            c => Assert.Contains(c.Icon, IconPaths.Names));
+        Assert.All(MiniBarPresentation.Order,
+            key => Assert.Contains(MiniBarPresentation.Cell(Snapshot(), key)!.Icon,
+                IconPaths.Names));
     }
 
     [Fact]
@@ -59,20 +66,104 @@ public class MiniBarPresentationTests
                 $"'{name}' is a glyph, not an IconPaths name.")));
     }
 
+    /// <summary>"buffs" has a PLACE on the bar and no FACE in this table, and the two lists
+    /// say so separately.
+    ///
+    /// It used to have neither: the key gated the Buffs window and drew nothing at all. OE-7
+    /// gave it a chip whose face <c>HudBarView</c> builds from the buff tracker's own count —
+    /// there is no buff state on a snapshot for this class to format — and #191 gave it a
+    /// slot in the order, because a chip drawn outside the ordered walk is a chip nobody can
+    /// drag past its neighbours.</summary>
     [Fact]
-    public void BuffsIsAValidStatAndNeverDrawsACell()
+    public void BuffsHasAPlaceInTheOrderAndNoFaceInThisTable()
     {
-        // It gates the Buffs breakout window and nothing else. Drawing it would put an
-        // empty cell on the bar.
-        Assert.DoesNotContain("buffs", MiniBarPresentation.Order);
-        Assert.Empty(MiniBarPresentation.Cells(Snapshot(), ["buffs"]));
+        Assert.DoesNotContain(MiniBarPresentation.BuffsKey, MiniBarPresentation.Order);
+        Assert.Null(MiniBarPresentation.Cell(Snapshot(), MiniBarPresentation.BuffsKey));
+        Assert.Contains(MiniBarPresentation.BuffsKey, MiniBarPresentation.CanonicalOrder);
+        Assert.Equal([MiniBarPresentation.BuffsKey],
+            MiniBarPresentation.DrawnKeys(Starred(MiniBarPresentation.BuffsKey)));
     }
+
+    /// <summary>Its canonical slot is where it has always drawn — last, after "deaths". A
+    /// negative of the pair above (trap 39): every assertion there would still pass with
+    /// "buffs" leading the bar on every profile that never dragged anything.</summary>
+    [Fact]
+    public void BuffsSitsLastInTheCanonicalOrder()
+        => Assert.Equal(MiniBarPresentation.BuffsKey, MiniBarPresentation.CanonicalOrder[^1]);
 
     [Fact]
     public void AKeyFromALaterVersionIsSkippedRatherThanDrawnBlank()
     {
-        var cells = MiniBarPresentation.Cells(Snapshot(), ["kills", "somethingNew"]);
-        Assert.Equal(["kills"], cells.Select(c => c.Key));
+        Assert.Equal(["kills"], MiniBarPresentation.DrawnKeys(Starred("kills", "somethingNew")));
+        Assert.Null(MiniBarPresentation.Cell(Snapshot(), "somethingNew"));
+    }
+
+    // ---- THE PLAYER'S ORDER (#191, TheMegaSage; owner lock 2026-09-07) ----------------
+
+    /// <summary>The FLOOR, and it is the default: an untouched profile draws exactly the bar
+    /// every release before this one drew. Empty means canonical — the same construction OE-8
+    /// gave the park pair, where NaN means slaved.</summary>
+    [Fact]
+    public void AnEmptyOrderIsTheCanonicalOne()
+    {
+        Assert.Empty(new AppSettings().MiniBarOrder);
+        Assert.Equal(MiniBarPresentation.CanonicalOrder,
+            MiniBarPresentation.ResolveOrder(new AppSettings()));
+    }
+
+    [Fact]
+    public void TheSavedOrderIsTheOrder()
+        => Assert.Equal(["money", "kills", "loot"],
+            MiniBarPresentation.DrawnKeys(new AppSettings
+            {
+                MiniStats = ["kills", "loot", "money"],
+                MiniBarOrder = ["money", "kills", "loot", "deaths", "pet", "procs", "motes", "buffs"],
+            }));
+
+    /// <summary>A key the saved order omits is APPENDED in its canonical place, never
+    /// dropped. An omission is a stale file or a stat a later release added, and a chip with
+    /// no way back would be a cell lost with nothing naming the loss (trap 20's shape).</summary>
+    [Fact]
+    public void AKeyTheSavedOrderOmitsIsAppendedRatherThanDropped()
+    {
+        var order = MiniBarPresentation.ResolveOrder(new AppSettings { MiniBarOrder = ["money"] });
+        Assert.Equal("money", order[0]);
+        Assert.Equal(MiniBarPresentation.CanonicalOrder.Count, order.Count);
+        Assert.All(MiniBarPresentation.CanonicalOrder, key => Assert.Contains(key, order));
+    }
+
+    /// <summary>A hand-edited file cannot make the bar draw one chip twice, and a name from a
+    /// later version is skipped rather than carried.</summary>
+    [Fact]
+    public void DuplicatesCollapseAndUnknownNamesAreSkipped()
+    {
+        var order = MiniBarPresentation.ResolveOrder(
+            new AppSettings { MiniBarOrder = ["money", "money", "somethingNew", "kills"] });
+        Assert.Equal(["money", "kills"], order.Take(2));
+        Assert.DoesNotContain("somethingNew", order);
+        Assert.Equal(order.Count, order.Distinct().Count());
+    }
+
+    /// <summary>The WRITER half, shipping in the same change as its reader — the
+    /// <c>DeadSettingTests</c> posture.</summary>
+    [Fact]
+    public void SetOrderWritesTheKeysTheReaderReads()
+    {
+        var settings = new AppSettings();
+        MiniBarPresentation.SetOrder(settings, ["money", "kills"]);
+        Assert.Equal(["money", "kills"], settings.MiniBarOrder);
+        Assert.Equal(["money", "kills"], MiniBarPresentation.ResolveOrder(settings).Take(2));
+    }
+
+    /// <summary>The dump token: comma-joined, never spaced, and "-" for a bar with no chips —
+    /// the dump is space-separated key=value, so a value with a space in it would silently
+    /// become two keys and a key with an empty value cannot be waited on.</summary>
+    [Fact]
+    public void TheOrderKeyIsOneWord()
+    {
+        Assert.Equal("money,kills", MiniBarPresentation.OrderKey(["money", "kills"]));
+        Assert.Equal("-", MiniBarPresentation.OrderKey([]));
+        Assert.DoesNotContain(' ', MiniBarPresentation.OrderKey(MiniBarPresentation.CanonicalOrder));
     }
 
     /// <summary>The three keys Surface A / SA-1 PROMOTED draw no cell here at all.
@@ -89,7 +180,12 @@ public class MiniBarPresentationTests
     public void ThePromotedHudNumbersDrawNoCellHere(string key)
     {
         Assert.DoesNotContain(key, MiniBarPresentation.Order);
-        Assert.Empty(MiniBarPresentation.Cells(Snapshot(), [key]));
+        // …and no PLACE either, which is the #191 half: the trio is fixed leftmost, and its
+        // third slot swaps identity mid-session, so a drag target there would change meaning
+        // under the cursor.
+        Assert.DoesNotContain(key, MiniBarPresentation.CanonicalOrder);
+        Assert.Null(MiniBarPresentation.Cell(Snapshot(), key));
+        Assert.Empty(MiniBarPresentation.DrawnKeys(Starred(key)));
         Assert.Equal("", MiniBarPresentation.Text(Snapshot(), key));
     }
 

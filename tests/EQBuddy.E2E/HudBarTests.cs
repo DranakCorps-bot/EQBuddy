@@ -234,4 +234,80 @@ public sealed class HudBarTests
 
         app.WaitForDump("hudCells", 4, "the trio and the kills cell, and no buff cell");
     }
+
+    /// <summary>
+    /// A SAVED ORDER IS THE ORDER THE BAR DRAWS (#191, TheMegaSage; owner lock 2026-09-07).
+    ///
+    /// **"Present in the build" and "in effect at runtime" are different claims** (trap 42),
+    /// and this feature is unusually easy to half-ship: `MiniBarPresentation.ResolveOrder` is
+    /// unit-tested and would go on answering correctly while `HudBarView` walked the
+    /// canonical list beside it, drawing every chip the player asked for in the order they
+    /// did not. `hudCells` cannot tell those two apart — it is the same count either way —
+    /// which is why `hudCellOrder` reports what was DRAWN rather than what would be resolved.
+    ///
+    /// **The prediction, written before it ran** (trap 23). Four stars, one of them "buffs",
+    /// and a saved order that puts money first and kills third: the bar reads
+    /// money, buffs, kills, loot. The un-starred keys in the seed exist to prove they are
+    /// carried without drawing — a settings file is a whole order, not just the visible part.
+    ///
+    /// The trio is not in this token and must not be: it is fixed leftmost, and its third
+    /// slot swaps identity mid-session.
+    /// </summary>
+    [Fact]
+    public void TheBarDrawsTheOrderTheProfileSaved()
+    {
+        using var app = new AppHarness(settings =>
+        {
+            settings.Minimized = true;
+            settings.MiniStats = ["kills", "loot", "money", "buffs"];
+            settings.MiniBarOrder =
+                ["money", "buffs", "kills", "loot", "pet", "procs", "motes", "deaths"];
+            settings.DisabledBreakouts =
+                ["Damage", "Healing", "Pet", "Watch", "Loot", "Buffs"];
+            settings.DefaultRulesVersion = int.MaxValue;
+            settings.TrackedRules.Clear();
+        });
+        app.Launch();
+
+        app.WaitForDump("hudCellOrder", "money,buffs,kills,loot",
+            "the bar to draw the chips in the order the profile saved");
+        // …and the count still agrees, so this is a REORDER rather than a bar that dropped
+        // a chip on the way: the trio plus four.
+        app.WaitForDump("hudCells", 7, "the trio and all four starred chips");
+        // Nothing was dragged in this session, so nothing was written. `hudCellGrip` is the
+        // instrument for the day a harness does drive a real chip drag (trap 56); zero
+        // presses here is also the assertion that a launch cannot write this setting.
+        app.WaitForDump("hudCellGrip", "0,0", "no press and no write on a launch alone");
+    }
+
+    /// <summary>
+    /// THE FLOOR, and it is the other half of the pair above: an untouched profile draws
+    /// exactly the bar every release before this one drew.
+    ///
+    /// **A separate launch, because a single seeded assertion is reachable by a bar that
+    /// ignores the canonical list entirely** — one that simply drew `MiniStats` in the order
+    /// the file happens to list them would satisfy the test above and shuffle every existing
+    /// player's bar. The stars are seeded deliberately out of canonical order to catch that.
+    ///
+    /// Empty means canonical is the whole migration story: there is no `ApplyMigrations`
+    /// entry, and a profile reset restores the shipped bar by construction.
+    /// </summary>
+    [Fact]
+    public void AProfileThatNeverDraggedAnythingDrawsTheCanonicalOrder()
+    {
+        using var app = new AppHarness(settings =>
+        {
+            settings.Minimized = true;
+            settings.MiniStats = ["money", "kills", "loot"];   // NOT canonical order
+            settings.MiniBarOrder.Clear();
+            settings.DisabledBreakouts =
+                ["Damage", "Healing", "Pet", "Watch", "Loot", "Buffs"];
+            settings.DefaultRulesVersion = int.MaxValue;
+            settings.TrackedRules.Clear();
+        });
+        app.Launch();
+
+        app.WaitForDump("hudCellOrder", "kills,loot,money",
+            "an empty MiniBarOrder to mean the canonical bar, whatever order the stars list in");
+    }
 }

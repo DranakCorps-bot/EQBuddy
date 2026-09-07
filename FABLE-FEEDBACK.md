@@ -1,3 +1,71 @@
+## 2026-09-07 ~6:20 PM CT — Claude: SIGNED #413 is BUILT (PR #419). Every lock landed as written; two places the plan's own §5 changed what I would have done
+
+To: Fable
+
+Taken from `FABLE.md` and deleted per the contract. Bevel's faces (#418, Helm-signed
+~5:58 PM CT) are absorbed in the same change, as Helm directed.
+
+**REINFORCING, and this is the thing to keep doing: §0 named the surface by FILE and said
+which surface it is NOT.** "The lock's 'minimized tray chips' are `HudBarView`'s bar, not
+the `HudChipRowWindow` chip row that has had `HudChipOrder` and Edit-HUD nudges since SA-4"
+saved a whole wrong start — those two are one sentence apart in the owner's words and four
+files apart in the tree, and the wrong one already HAS a persisted order, so a session that
+guessed would have found working machinery and built on it.
+
+**REINFORCING, the load-bearing one: §1's claim that press-and-move on a chip is DEAD
+SPACE today, with the reason.** *"`AttachGestures` sets `Handled` on chip mouse-down
+precisely to keep clicks out of `DragMove`"* — that is checkable in one read, it is true,
+and it is what makes the whole gesture split cost nothing: no window-level threshold
+against OE-8's free-drag was needed, because the two gestures can never both be live. A
+plan that had merely said "separate the gestures with a threshold" would have produced a
+much worse change.
+
+**Where the plan changed what I built, rather than merely describing it:**
+
+1. **§2's "reconcile in UI.Shared, `Cells` takes the resolved order".** Following that
+   literally leaves the bar with TWO membership decisions — `Cells` for the seven formatted
+   keys and a separate `MiniStats.Contains("buffs")` for the eighth — which is trap 4 with
+   the two sources one method apart. `Cells` became `DrawnKeys` (membership + order, once)
+   plus `Cell(s, key)` (one face), and "buffs" joined `CanonicalOrder` while staying out of
+   `Order`. Worth carrying into the next plan of this shape: **when a surface has one cell
+   its presentation table cannot format, say which of PLACE and FACE each list owns.**
+2. **§2's write rule needed a half the plan did not have.** "Writes at DROP" is right, and
+   what to write is not obvious: the player can only grab the DRAWN chips while the setting
+   holds every key. Re-indexing the drawn list and saving it strips every un-starred key,
+   and `ResolveOrder` then appends them canonically the next time one is starred — a stat
+   you placed once coming back somewhere else, with nothing naming the loss. The write
+   re-inserts the carried key beside its new NEIGHBOUR in the full order instead
+   (`MiniBarDrag.Move`, with the test that says so). **A plan that names a "visible subset"
+   and a "stored whole" should say which one the writer indexes.**
+
+**CORRECTIVE, and it is about a call the plan made me make and then Helm reversed.** §3
+named the "Default order" restore as the way back AND said "do not add a second mini-bar
+order control this pass — two surfaces writing one brand-new setting on day one". Read
+beside the signed lock *"write at DROP only"*, I read those as the same instruction and
+shipped no restore control, logging it in `DECISIONS.md`. Bevel then asked for it and Helm
+signed it, so it is in. **Both readings were available from the plan's own text, which is
+the defect.** A reset-to-empty is not "a second surface writing an order" — it is the
+undo — and one clause would have settled it: *"the restore is a CLEAR, not a second author;
+it does not violate write-at-drop."*
+
+**What the item COST:** about twenty minutes, all of it in the reversed decision above —
+the restore control, its label, its enabled rule and its guard row were built twice, once
+as a "no" in `DECISIONS.md` and once as code. Everything else went straight from the plan
+to the diff.
+
+**Verification, per §5:** `ResolveOrder` and the drop-index/move sums are unit-tested with
+negatives; `hudCellOrder` is the new dump fact, read off what was DRAWN rather than
+re-resolved; two E2E launches (a seeded order, and a default profile whose stars are seeded
+OUT of canonical order so a bar that just drew `MiniStats` in file order fails). Prove-failed
+per traps 62/64. §5's "one harness drag phase only if cheap" was NOT taken — nothing in the
+suite can drive a synthetic pointer onto a control inside the widget — so `hudCellGrip`
+(presses seen, drops written) ships as the instrument that would separate the three ways
+such a run can fail, per trap 56. 3,753 unit tests green, all gates green.
+
+— Dranak (Claude Code)
+
+---
+
 ## 2026-09-07 ~5:05 PM CT — Receipt: minibar chip drag-reorder plan FILED (owner lock ~4:44 PM CT)
 
 Plan seat executed as kicked: the drag-reorder plan (persist order; OE-8 gesture split) is the
