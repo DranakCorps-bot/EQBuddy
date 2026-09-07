@@ -1,3 +1,23 @@
+## 2026-09-07 ~4:50 PM CT — PR #410 Money peek Share gauges (SIGNED; merge-when-green)
+
+- **When / who:** 2026-09-07 ~4:50 PM CT — Helm last-look (webhook: HELM-FEEDBACK.md LIVE ASK: PR #410 Money peek Share gauges; tip `c3bfedaf`).
+- **Thread / subject:** PR #410 https://github.com/DranakCorps-bot/EQBuddy/pull/410 (`claude/opus-money-peek-share-gauges-20260907` → `main`) — Soft Opus fix for owner ~4:32 PM CT shot (Share gauges empty / left dots only). Product + channel tip + measured `hud-expand-money.png`. Ahead of `main` by 3; behind 0. At look: `build-and-test` SUCCESS; `e2e-windows` IN PROGRESS (run 34164454173).
+- **Ruling:** **SIGNED.** Soft merge when `build-and-test` + `e2e-windows` green. Drop LIVE ASK tip at merge (prefer this Helm land / companion SSC). Live Holds empty. Play Console OFF. Not needs-david.
+- **Asks answered:**
+  1. Last-look / merge-when-green — **SIGNED**.
+  2. Root cause (`Share = 0` + `BreakdownRows.Row` clamps `frac` to `[0.01, 1]`) — **ACK / SIGNED**. Spot-checked host: `BreakdownRows.cs` `Math.Clamp(frac, 0.01, 1.0)` — the owner's left dots ARE that floor, not a missing brush.
+  3. Formula — **SIGNED:** Looted `looted/total`, Sold `vendor/total`, Total `1.0`, Per hour `0`. Denominator is **session total** (Core `Copper = CorpseCopper + VendorCopper`), not share-of-biggest — parts fill the Total bar between them. `CoinShare` clamps `[0,1]`.
+  4. Per hour keeps **no gauge** — **SIGNED** as written (rate ≠ part of total; `total/perHour` would be session length wearing a coin label). Tooltip states the reason so the 1% stub reads deliberate. Soft one-liner later if owner wants a bar on that row — **not a merge gate**.
+  5. No FIXED What's-new — **ACK / SIGNED** (2.0.0 unreleased; latest tag `v1.99.18`; tray-sweep entry gained the bar). Soft LEAVE.
+  6. Turquoise / "teal + grey" palette note + other ten `hud-expand-*` shots still pre-lock — **ACK** soft; **not this PR** (TR-1 / #399 territory).
+- **Spot-check (tip `c3bfedaf`):**
+  - `HudExpandPeek.Money` rows: CoinShare on Looted/Sold; Total `1.0`; Per hour `0` + rate tooltip; empty-state unchanged.
+  - Tests: `MoneyPeek`, `MoneyPeekPartsAddUpToTheTotalBar` (theory), `MoneyPeekDrawsNoGaugeForARate`, `MoneyPeekTooltipsStateTheShareTheBarDraws` (75%/25%), `MoneyPeekClampsAShareThatWouldOverflowItsTrack`, sold-item negative, empty coin.
+  - Shot claim measured (279px track) ACK as filed; no pixel re-measure from this seat.
+- **Posture / Soft max ≤3:** (1) soft merge #410 when both CI green. (2) soft merge #408 Helm R5 SSC when its e2e green (#407 already on main). (3) soft #409 Deaths strip / remaining Soft seats as already authorized — do not invent a fourth. Soft LEAVE #380/#356. Soft LEAVE palette re-shot pile.
+- **Claude kick via Dranak:** Soft merge #410 when `build-and-test` + `e2e-windows` green (drop LIVE ASK tip). Soft merge #408 when green. Soft continue #409 Deaths strip path if still owed for OE-9. Probe `claude models` first on any new seat. No TEL / Version / `v1.99.19` / Play Console / tag / publish / signing / prod secrets / Evolved wide publish.
+- **Scope hygiene:** Not a hold. Not needs-david. Live Holds empty. Play Console OFF.
+
 ## 2026-09-07 ~5:05 PM CT — PR #414 R5 buff-duration minimal fix (SIGNED; (b) BaseName clause clarified; 54 ranked PARK)
 
 - **When / who:** 2026-09-07 ~5:05 PM CT — Helm last-look (webhook: HELM-FEEDBACK.md LIVE ASK: R5 buff-duration minimal fix implemented — PR #414 tip `913cc592`; regenerate beat the hand-edit; one departure from signed (b) needs a ruling). Product tip `99ef01a4` on `claude/opus-r5-buff-hygiene-20260907` off `main` `9e759c90` (now behind current `main` `cce59f71` by 5).
