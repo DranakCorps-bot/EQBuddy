@@ -1,3 +1,33 @@
+## 2026-09-07 ~6:25 PM CT — PR #419 mini-bar chip drag-reorder implement (SIGNED; #418 restore ACK; ActionButton departure ACK)
+
+- **When / who:** 2026-09-07 ~6:25 PM CT — Helm last-look (webhook: HELM-FEEDBACK.md LIVE ASK: PR #419 minibar chip drag-reorder implemented (SIGNED #413 + #418 faces); one Helm sign RESTORED from a worktree-only write). Tip `7bf5f5b9` on `claude/opus-minibar-chip-reorder-413-20260907` off `main` `a68d2afc` (#418 merge). Product + channel.
+- **Thread / subject:** PR #419 https://github.com/DranakCorps-bot/EQBuddy/pull/419 — Soft Opus implement of SIGNED #413 (Fable plan `a8e147b3`) + owner lock ~4:44 PM CT, with **SIGNED #418 faces absorbed**. At look: `build-and-test` SUCCESS; `e2e-windows` IN PROGRESS (run 34169173409). MERGEABLE / UNSTABLE (e2e). Ahead of `main` by 1; behind 0.
+- **Ruling:** **SIGNED.** Soft merge #419 when `build-and-test` + `e2e-windows` green. Drop LIVE ASK tip at merge (prefer this Helm land / companion SSC). Live Holds empty. Play Console OFF. **Not needs-david.**
+- **Asks answered:**
+  1. Last-look / merge-when-green — **SIGNED** against signed #413 locks + #418 faces.
+  2. Restored ~5:58 PM CT #418 Helm block (worktree-only write; missing from `origin/main` channel at `a68d2afc`) — **ACK / CONFIRMED as the sign.** Top copy carried verbatim on tip is correct; dropping the BOM + duplicate tail copy **ACK / KEEP**. Also land #418 onto `HELM.md` this turn (it was never on main state). Soft entry ~5:40 PM CT *"No Bevel/Opus chip-reorder implement"* is **superseded** by this land.
+  3. Restore control STYLE `ActionButton` instead of Bevel's link-styled / `SectionLink` — **SIGNED / ACK as the correct call.** Placement, label ("Restore default order"), enable-when-resolved≠canonical, and CLEAR-not-literal all match #418. `SectionLink` is a full-width nav panel with ↗ and **no `IsEnabled` visual** — disabled would look live and swallow clicks (trap 17). `ActionButton` is the light weight Bevel asked for and dims. Do **not** reverse to `SectionLink`.
+- **Spot-check (tip `7bf5f5b9`):**
+  - `AppSettings.MiniBarOrder` `List<string>` empty = canonical; no migration.
+  - `MiniBarPresentation.CanonicalOrder` = Order + `buffs`; SA-1 trio absent from Order; `ResolveOrder` / `DrawnKeys` / `SetOrder` / `OrderKey`.
+  - `MiniBarDrag.Classify` — mostly-vertical = `Dead` (not `Pending`); system thresholds passed in; `DropIndex` / `Move` against full-order neighbour.
+  - `HudBarReorder` — chip = handle; `CaptureMode.SubTree`; write at `Finish`/`SetOrder` only; SizeWE at threshold; carry = RenderTransform; insertion = adorner.
+  - Faces: call-site `, drag to reorder` via `WithDragToReorder`; Watch pins `reorderable: false`; restore under checklist after `PromotedStatsNote`, clears list.
+  - Proof claims ACK as filed (unit/E2E/prove-fail/dump facts); no local re-run from this seat.
+- **Posture / Soft max ≤3:** (1) soft merge #419 when both CI green (HIGH owner lock / #191). (2) soft merge this SSC. (3) Soft LEAVE #409 Deaths strip / #380/#356. Soft LEAVE Evolved republish unless Soft already owns one. Do **not** invent Edit-HUD unify / WatchSortMode pin-order fix.
+- **Claude kick via Dranak:** Soft: **merge #419 when `build-and-test` + `e2e-windows` green** (drop LIVE ASK tip). Soft land this SSC (`helm/ssc-419`) if not already on main. Soft: no new seat from this ruling. Probe `claude models` only if a later kick. No TEL / Version / `v1.99.19` / Play Console / tag / publish / signing / prod secrets / Evolved wide publish.
+- **Scope hygiene:** Not a hold. Not needs-david. Live Holds empty. Play Console OFF.
+
+## 2026-09-07 ~5:58 PM CT — PR #418 Bevel mini-bar chip drag-reorder faces (SIGNED; absorb into MiniBarOrder implement) — landed late (was worktree-only)
+
+- **When / who:** 2026-09-07 ~5:58 PM CT sign (channel); **landed on HELM.md ~6:25 PM CT** with #419 — prior write never reached `origin/main` (trap 60 / worktree-only). Tip then `65475d5d` on `claude/bevel-chip-reorder-faces-413-20260907`; #418 since MERGED `a68d2afc`.
+- **Thread / subject:** PR #418 https://github.com/DranakCorps-bot/EQBuddy/pull/418 — Soft Bevel faces one-liner for SIGNED #413. Docs/UX only.
+- **Ruling:** **SIGNED** (retrospective land). Opus MiniBarOrder implement **MUST absorb** (done in #419):
+  1. Cursor Hand→SizeWE at reorder threshold; reorder tooltip at **call site** (not blanket PeekTip — Watch chips out; buffs literal tip gets clause).
+  2. "Restore default order" under HUD stats checklist / after `PromotedStatsNote`; enabled only when order ≠ canonical.
+  3. Watch-pin-block **CONFIRMED**; WatchSortMode vs rule-list mismatch → WhatsNew/implement note, **not a block**.
+- **Scope hygiene:** Not a hold. Not needs-david. Live Holds empty. Play Console OFF. Restored channel block on #419 tip **CONFIRMED** as this sign.
+
 ## 2026-09-07 ~4:50 PM CT — PR #410 Money peek Share gauges (SIGNED; merge-when-green)
 
 - **When / who:** 2026-09-07 ~4:50 PM CT — Helm last-look (webhook: HELM-FEEDBACK.md LIVE ASK: PR #410 Money peek Share gauges; tip `c3bfedaf`).
