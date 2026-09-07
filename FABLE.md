@@ -1,3 +1,223 @@
+## 2026-09-07 ~2:00 PM CT — Fable: V1 (MIT) → EQBUDDY EVOLVED (Windows) TRANSITION PRODUCT plan (owner ask ~1:44 PM CT / PR #397)
+
+To: Helm (last-look), Claude (TR-1/TR-2 on sign), Bevel (follow-on one-pager), David (§6 doors only)
+
+- **Priority:** plan for Helm sign. On sign, **TR-1 and TR-2 are `ready`** — both are local-only
+  and open no channel. **TR-3 executes ONLY on the channel-open go** and is `needs-david` by
+  construction.
+- **needs-david:** §6 doors only — D1 channel open (the release go, standing), D2 import consent
+  model (consequence #8), D3 optional Windows bridge release (release go), D4 Play listing (OFF
+  now). TR-1/TR-2 carry no door: TR-1 builds the conservative consent default as a **stated
+  assumption** David can flip from `DECISIONS.md` or at the release gate. Nothing in this plan
+  publishes, tags, or widens Evolved's audience.
+- **Class:** V2 — migration of player profiles, a one-way installer identity decision, and the
+  update-channel promise in `LEGACY-V1.md` all in one product. Exactly the routing table's row.
+- **Source:** owner ask ~1:44 PM CT (PR #397); `LEGACY-V1.md` (public promises); `scripts/
+  install-local.ps1` + `scripts/evolved-channel-guard.ps1` (the local-only mechanism);
+  `Core/UpdateChecker.cs` + `UI.Shared/LegacyPlatformUpdatePolicy.cs` (the frozen v1 contract);
+  #385/#388 torn-write (trap 65); trap 13 (two writers, one profile).
+
+### §0 The standing state — three facts the whole plan hangs off
+
+1. **Evolved is local-only by MECHANISM, and this plan does not loosen it.** `release.ps1`
+   refuses a 2.x tree without `-EvolvedLocal`, `-EvolvedLocal` refuses `-Tag`/`-Prerelease`,
+   and `evolved-channel-guard.ps1` fails the build if any family-reaching statement escapes the
+   guarded region or a 2.x setup appears in the live update folder. Opening the channel is a
+   deliberate future edit (TR-3), made on D1 and never before.
+2. **The Evolved/v1 profile split is a LAUNCHER property today, not a product one.**
+   `AppPaths.Dir` hardcodes `"EQBuddy"`; the `EQBuddy Evolved` directory exists only because
+   `install-local.ps1 -Evolved` and `Launch-Evolved-Shell.cmd` set `EQBUDDY_APPDATA`. A player
+   who double-clicks a published Evolved exe — any door that bypasses our two scripts — runs
+   Evolved **on the v1 profile**, and `ApplyMigrations` rewrites it on first load. This is
+   trap 42's shape (present in the script ≠ in effect at runtime) sitting in front of a
+   player's data, and it is TR-1's first change, before any transition surface exists.
+3. **v1 is FROZEN, so its updater is a CONTRACT, not an API.** Every already-shipped Windows
+   v1 stages exactly one asset name (`EQBuddySetup.exe`, sha256 fail-closed), falls back to
+   linking the release page when that asset or its hash is absent, and checks at startup and
+   every 6 h. The transition must be designed against that behaviour as shipped in `v1.99.18`
+   binaries — nothing we merge now reaches those installs. `LegacyPlatformUpdatePolicy` rule 1
+   means Windows copies WILL be told a 2.x release is newer; the only lever we hold is what
+   the release carries.
+
+### §1 Discovery — how a v1 Windows player finds and gets Evolved
+
+- **The discovery surface is v1's own update banner, unmodified.** The moment D1 opens the
+  channel and a 2.0.0 GitHub release exists, every Windows v1 install learns of it within 6 h.
+  Because the release carries **no asset named `EQBuddySetup.exe`** (§3), `ParseRelease`
+  returns no download URL and the banner offers the **release page** — a deliberate, informed
+  click, not a silent major-line swap. (§8 verifies this null-asset path against the shipped
+  1.99.18 binary FIRST; if the frozen behaviour differs, the design moves to fit it — we
+  cannot fix a binary that is already on people's machines.)
+- **The release page and README carry the story.** `scripts/legacy-notice-guard.ps1` already
+  refuses a 2.x release whose notes lack the Legacy Linux/macOS section; TR-3 extends it with
+  a required **"Moving from EQBuddy 1.x on Windows"** section — what installs where, what
+  happens to your settings, that v1 keeps working. The #233 "X is now Y" rule applied to a
+  whole product line.
+- **The OneDrive family channel gets the Evolved installer under its own name** — v1's local
+  `Check()` reads only `EQBuddySetup.exe` by name, so family v1 widgets cannot silently
+  auto-install Evolved from the shared folder either. Same reserved-name rule, second channel.
+- **Not Mac/iOS/Linux:** nothing here changes `LegacyPlatformUpdatePolicy` rules 2–3. A
+  non-Windows v1 copy still gets the one-time final-legacy notice and the `v1.99.18` page,
+  never a Windows installer. The transition product is Windows-to-Windows only.
+- **Optional, named, not planned:** a final Windows bridge `1.99.x` whose banner names Evolved
+  in-app with better wording than the generic "newer version" banner (D3). It is a v1 tag —
+  the release go — and the design above works without it.
+
+### §2 Profile migration — `%AppData%\EQBuddy` → `%AppData%\EQBuddy Evolved`
+
+- **A one-time IMPORT that copies and never moves.** The v1 profile is untouched, byte for
+  byte — `LEGACY-V1.md`'s "your profile is yours" and "we will not force a migration" made
+  mechanical. Undo is structural: start-fresh = clear the Evolved profile; v1 still has
+  everything.
+- **Whole-directory copy, not a hand list** (trap 30 — a file list stops covering the profile
+  the day the profile grows). A short transient EXCLUSION list instead: `debug.txt`,
+  `error.log`, `door.trigger`, `*.corrupt` — a stale exclusion over-copies harmlessly where a
+  stale include-list silently drops a ledger. `.bak` files copy (they are ProfileJson's net).
+  The game's log folder and its `archive/` subfolder live beside the game (`EqConfig`), are
+  shared by both lines, and are never part of this.
+- **Into an EMPTY Evolved profile only.** A non-empty target names what is there and requires
+  an explicit confirm; there is no merge path, ever — merging two settings.json files is
+  trap 13 with extra steps.
+- **Refuse while v1 is RUNNING.** v1 writes `settings.json` whole-file and unflushed (the
+  exact torn shape trap 65 describes, on a binary we cannot fix) and holds `history.db` open —
+  a live copy is a corrupt import wearing a progress bar. Detect via the profile's
+  `SingleInstance` lock and say so by name: "Close EQBuddy 1.x first."
+- **Torn-write lessons applied to the import itself:** stage into a temp directory inside the
+  Evolved profile, verify the copied `settings.json` parses, then move into place; write a
+  `migrated-from.json` marker **last** (source path, v1 version, timestamp, manifest). The
+  marker is the idempotence key — the offer never auto-repeats (trap 55's launch-loop shape) —
+  and the report's data.
+- **The import runs BEFORE the first save and REPORTS itself** (trap 43): the imported
+  settings go through `ApplyMigrations` as an ordinary old profile (the chain is already
+  idempotence-guarded), and the first-run Setup room (OE-6) shows what was brought over, with
+  the start-fresh alternative beside it. `ImportReportReachesASurfaceTests` gets its row.
+- **Consent BEFORE any copy** (trap 47 — a consent gate is only as good as its slowest path;
+  nothing copies on a code path the consent question has not reached). Recommended model:
+  first-run Setup offers "Bring my EQBuddy 1.x settings and history" **default-checked**, one
+  click to accept, visible to decline. Auto-vs-opt-in is D2 — David's, consequence #8 — and
+  this is the stated assumption TR-1 builds while the door is open.
+
+### §3 Updater vs separate download — DECIDED by the frozen contract: separate download
+
+- **`EQBuddyEvolvedSetup.exe`, a NEW Inno AppId, install dir `{autopf}\EQBuddy Evolved`, its
+  own Start-menu shortcut** — the "heavier version" `install-local.ps1` already names as the
+  right move when Evolved becomes the daily driver. Signed and verified exactly like
+  everything else; the signing rule does not bend for a transition.
+- **Why not the v1 updater staging it:** (a) an asset named `EQBuddySetup.exe` on the v2
+  release would be downloaded and run by every Windows v1 install's existing update flow — a
+  major-line replacement with no consent moment; (b) with v1's AppId it would install over
+  `{autopf}\EQBuddy` and inherit the v1 profile in place, which `LEGACY-V1.md` publicly
+  promises we will not do; (c) v1 cannot be patched to behave differently — the contract is
+  frozen.
+- **`EQBuddySetup.exe` is therefore a RESERVED NAME belonging to the v1 line forever.** The
+  deployed updaters match on it the way `shot.ps1` matched on window titles (trap 53) — the
+  name is the identity, and only one side of it has a compiler. Guard row (TR-2):
+  `evolved-channel-guard.ps1` fails any 2.x path that produces an artifact with that name, and
+  asserts the installer script's AppId is the NEW one (its existing check-1 fourth member
+  flips from "never build the installer" to "only ever build it under the new identity").
+- **Accepted, named cost:** a kept v1 install's banner will say a newer version exists,
+  permanently, linking the release page. That is honest — a newer version does exist — and
+  the only lever on its wording is D3.
+- **Dual-install is a FEATURE of this decision, not a defect:** the player who tries Evolved
+  keeps a working v1 to fall back to, which is what makes the transition low-stakes enough to
+  say yes to. The costs it creates are §5's dual-run risks, handled there.
+
+### §4 What stays on MIT 1.x (LEGACY)
+
+- Published 1.x stays MIT; `legacy-v1` + `v1.99.18` remain exactly as `LEGACY-V1.md` promises.
+  **This plan ships NOTHING to the 1.x line** — no v1 tag, no v1 code change, no bridge
+  release unless D3 opens one (and that would be a LEGACY patch cut from `legacy-v1` under the
+  existing rules, offerable on every platform per `LegacyPlatformUpdatePolicy` rule 3).
+- **The importer is Evolved code** (proprietary, 2.x `Core`) reading the PLAYER'S OWN data
+  files. A profile is the player's data, not MIT-licensed code — no licensing entanglement in
+  reading it, and no v1 source is copied into Evolved by this plan.
+- The v1 fork invitation stays LEGACY-only; nothing in the transition wording may read as
+  inviting an Evolved fork (values line).
+
+### §5 Risks, each with its owner
+
+1. **Launcher-owned profile split** (§0.2) — the sharpest standing risk; TR-1 closes it before
+   any player path exists.
+2. **Same-AppId clobber** — a 2.x installer under v1's AppId replaces v1 in place and inherits
+   its profile. Today mitigated by "never build the installer" (guard check 1); TR-2 replaces
+   the mitigation with the new identity + reserved-name guard row.
+3. **Import clobber / torn import** — §2's empty-target rule, refuse-while-running, and
+   stage-verify-commit ordering.
+4. **Dual-run collisions** (v1 and Evolved up at once): both tail one game log read-only
+   (fine); **both want the Companion port** — Evolved's bind failure must NAME the running v1
+   ("EQBuddy 1.x is serving EQBuddy Mobile; close it or change the port"), never a silent
+   no-op; **two log janitors on one folder** — consent-gated on both sides and
+   `GameWrittenLog`-bounded, but TR-1 verifies truncation-under-tail behaviour with both up;
+   two always-on-top widgets is visual, the player's call. Evolved's first-run page detects a
+   running/installed v1 (process path or `{autopf}\EQBuddy`) and SAYS so — information, not
+   enforcement.
+5. **Play Console later** — OFF now (owner, PR #397). A Play listing is a new public
+   distribution surface: consequence #3/#8, David's door (D4) if mobile packaging ever
+   becomes real. Nothing in TR-1..3 depends on it.
+6. **The §1 discovery path is unverified against the shipped binary** until §8's first check
+   runs — the design leans on frozen behaviour we have read but not exercised.
+
+### §6 Doors — named for Helm/David, decided by nobody else
+
+- **D1 — open the Evolved channel** (first public 2.x release + TR-3 edits). The release go,
+  David's, standing. Everything in TR-1/TR-2 is built and field-tested behind it.
+- **D2 — import consent model:** opt-in default-checked (recommended, built as TR-1's stated
+  assumption) vs auto-import-with-notice. Touches player profiles → consequence #8, David's.
+  One sentence flips it; the code difference is one boolean's default.
+- **D3 — final Windows bridge 1.99.x** with in-app Evolved wording. A v1 tag → release go,
+  David's. Recommendation: skip unless the generic banner proves inadequate in the field.
+- **D4 — Play listing** for anything mobile. OFF; David's, later.
+- **D5 — announcement and README wording at channel open** — consequence #3; Helm rules the
+  moment, David the words that promise anything.
+
+### §7 Seats and sequencing (soft ≤3 respected — nothing kicked from this PR)
+
+- **TR-1 (Opus, `ready` on Helm sign; no door):** product-owned profile split — `AppPaths`
+  defaults to `EQBuddy Evolved` when the product line is 2.x (keyed the way
+  `LegacyPlatformUpdatePolicy.WindowsOnlyMajor` is named, `EQBUDDY_APPDATA` still overrides;
+  `install-local.ps1`/`Launch-Evolved-Shell.cmd` keep working unchanged) — plus the §2
+  importer, the first-run Setup import surface, the report, and every §8 test. Fully
+  local-testable via `install-local.ps1 -Evolved` against a seeded fake v1 profile.
+- **TR-2 (Opus, `ready` on Helm sign; builds local-only, publish stays locked):** installer
+  identity split — new AppId, `{autopf}\EQBuddy Evolved`, `EQBuddyEvolvedSetup.exe`, own
+  shortcut; `release.ps1 -EvolvedLocal` builds under the new identity; the §3 guard rows,
+  prove-failed against the pre-change tree.
+- **TR-3 (channel-open checklist; executes ONLY on D1):** the deliberate `release.ps1` edit
+  that opens the guarded region for 2.x, the `legacy-notice-guard.ps1` Windows-transition
+  section, OneDrive asset naming, and the §8 discovery verify re-run against the real release.
+  Written as a checklist in the TR-2 PR so opening the door is an edit with a script, not an
+  improvisation.
+- **Bevel one-pager AFTER this plan is signed** (owner's sequencing): first-run import consent
+  wording, the Windows-only gate messaging, the dual-install page, and the release-page
+  transition section — the §1/§2 copy is theirs to adjust without reopening this plan.
+
+### §8 Verification, named before any diff
+
+- **FIRST, before TR-1 relies on §1:** drive the shipped `v1.99.18` `EQBuddy.exe` (or its
+  `UpdateChecker` via a stub feed) against a mock 2.0.0 release JSON carrying no
+  `EQBuddySetup.exe` asset; confirm the banner offers the release page and stages nothing.
+  The binary that matters is the frozen one, not this tree (trap 64's lesson inverted).
+- Importer unit tests in Core: exclusion list, empty-target refusal, refuse-while-running,
+  stage-verify-commit ordering, marker-written-last, offer-never-repeats — each negative
+  prove-failed (trap 62: a negative that cannot fail reads as coverage).
+- `ImportReportReachesASurfaceTests` row for the migration report; `DeadSettingTests` sweep
+  after the fold of any v1-only setting the import carries across.
+- E2E: `migrationOffered` / `migrationImported` / `migrationRefusedReason` into the
+  `EQBUDDY_EXPAND` dump, asserted from `tests/EQBuddy.E2E` with a seeded fake v1 profile.
+- `shoot.ps1` shot of the first-run import page against that seeded profile, in the same PR
+  as the surface (the illustration lock).
+- Guard rows (`evolved-channel-guard.ps1` reserved-name + AppId) prove-failed on the
+  pre-change tree.
+
+**ASKS (LIVE ASK in `HELM-FEEDBACK.md`, same push):** (1) sign this plan so TR-1/TR-2 become
+`ready`; (2) confirm the §3 separate-download decision and the reserved-name rule as posture;
+(3) confirm D2's stated-assumption handling (build opt-in default-checked, door stays open) or
+route D2 to David now; (4) sequence the Bevel one-pager per the owner ask.
+
+— Fable (planning seat, `claude-fable-5`), 2026-09-07 ~2:00 PM CT
+
+---
+
 ## 2026-09-07 ~1:05 PM CT — Fable: OE-9 EXPAND-FOR-ALL PEEKS + Loot peek re-scope — implement plan from the owner's ~12:54 PM CT content locks (PR #385)
 
 - **Priority:** `ready` on Helm's sign — **no OE-9 Opus kick until Helm signs this plan**, which

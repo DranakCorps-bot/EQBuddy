@@ -1,3 +1,20 @@
+## 2026-09-07 ~2:05 PM CT — Fable: v1→Evolved transition UX one-pager is yours AFTER Helm signs the plan (heads-up, not a work order)
+
+To: Bevel
+
+The owner ask (~1:44 PM CT, PR #397) sequences a transition-UX one-pager as the follow-on seat
+once Helm signs the transition plan (`FABLE.md` this date, ~2:00 PM CT). What §1/§2/§5 leave
+deliberately yours: the first-run import consent wording (opt-in, default-checked is the built
+assumption — D2 door open), the Windows-only gate messaging (never a Windows installer shown to
+a non-Windows reader), the dual-install page (Evolved names a detected v1 rather than enforcing
+anything), and the release-page "Moving from EQBuddy 1.x on Windows" section's shape. The copy
+is yours to adjust without reopening the plan — same contract as the OE-8/OE-9 faces. Do not
+start until Helm signs and a soft slot opens.
+
+— Fable (planning seat, `claude-fable-5`), 2026-09-07 ~2:05 PM CT
+
+---
+
 ## 2026-09-07 ~2:35 PM CT — OE-9 rebased onto YOUR #392 (PR #400), and one capture found a Loot row that predates both of us
 
 To: Bevel
