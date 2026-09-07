@@ -5,7 +5,12 @@ namespace EQBuddy.UI.Shared;
 /// <summary>One row of an under-bar peek: a name, the value beside it, and how full its
 /// gauge is.</summary>
 /// <param name="Share">0–1, for the row's under-bar. It is a SHARE of the biggest row
-/// rather than of the total, which is what every other breakdown list in the app draws.</param>
+/// rather than of the total, which is what every other breakdown list in the app draws —
+/// EXCEPT <see cref="HudExpandPeek.Money"/>, whose rows are parts of one figure and are
+/// therefore drawn against the session total. That difference is named on the builder, and
+/// a builder that draws no gauge at all says 0 there: the host clamps a bar to a 1% floor,
+/// so **0 is a visible sliver rather than nothing** and is only honest when the row has no
+/// share to state.</param>
 public sealed record PeekRow(string Name, string Value, double Share, string? Tooltip = null);
 
 /// <summary>
@@ -295,9 +300,27 @@ public static class HudExpandPeek
     /// <summary>
     /// The Money peek: the Wealth tab's coin facts — looted, vendor, total, per hour.
     ///
-    /// **FOUR FACTS, NOT A RANKING, so there is no gauge.** Every other peek here is a list
-    /// of comparable things; this is one figure broken into its parts, and a bar under "per
-    /// hour" would be comparing a rate against a total.
+    /// **THE GAUGE IS A SHARE OF THE SESSION TOTAL, not of the biggest row** (the owner's
+    /// ~4:32 PM CT shot, 2026-09-07). This builder shipped with every row at
+    /// <c>Share = 0</c> and a comment arguing that four facts are not a ranking, so no bar
+    /// belonged — but the host floors a bar at 1% (<c>BreakdownRows.Row</c>), so "no gauge"
+    /// did not render as nothing. It rendered as four identical stubs on the left of four
+    /// rows that plainly are parts of one figure, which reads as a broken gauge rather than
+    /// as an absent one. The owner's call: they draw.
+    ///
+    /// **The denominator is <paramref name="total"/>, and it is the right one because Core
+    /// makes it exact.** <c>StatsSnapshot.Copper</c> is <c>_copper + _vendorCopper</c> —
+    /// looted plus sold, by construction — so Looted and Sold are true parts of it and their
+    /// two bars fill the Total bar between them. Share-of-the-biggest (what <see cref="Gauged"/>
+    /// draws everywhere else) would have made the LARGER of the two full and Total full as
+    /// well, saying "these are equal" about a part and its whole.
+    ///
+    /// **Per hour keeps no gauge, and that is the honest answer rather than the tidy one.**
+    /// It is a RATE: it has no share of a total, it is not bounded by one, and on any session
+    /// under an hour it exceeds it. Drawing it against <paramref name="total"/> would assert
+    /// a comparison that does not exist (<see cref="Loot"/>'s flat gauge is refused for the
+    /// same reason, one dimension over). Its tooltip says so, so the one row without a bar
+    /// answers "why" on hover instead of looking like the bug this change fixes.
     ///
     /// **The per-item <c>SoldItems</c> breakdown stays in the window.** The peek is row-capped
     /// at five and the ⧉ is one click from the full Wealth tab, which is what "the same
@@ -313,13 +336,35 @@ public static class HudExpandPeek
 
         List<PeekRow> rows =
         [
-            new("Looted", StatsSnapshot.FormatCoin(looted), 0),
-            new("Sold to vendors", StatsSnapshot.FormatCoin(vendor), 0),
-            new("Total", StatsSnapshot.FormatCoin(total), 0),
-            new("Per hour", StatsSnapshot.FormatCoin(perHour), 0),
+            new("Looted", StatsSnapshot.FormatCoin(looted), CoinShare(looted, total),
+                $"Looted from corpses — {Percent(looted, total)} of this session's coin"),
+            new("Sold to vendors", StatsSnapshot.FormatCoin(vendor), CoinShare(vendor, total),
+                $"Sold to vendors — {Percent(vendor, total)} of this session's coin"),
+            // The whole, and the reference the two bars above are drawn against.
+            new("Total", StatsSnapshot.FormatCoin(total), 1.0,
+                "Looted + sold — the whole the shares above are drawn against"),
+            new("Per hour", StatsSnapshot.FormatCoin(perHour), 0,
+                "A rate, not a part of the total — there is no share to draw"),
         ];
         return new PeekBody(subtext, rows, null, $"money|{looted}|{vendor}|{total}|{perHour}");
     }
+
+    /// <summary>One coin row's fraction of the session total, clamped.
+    ///
+    /// **The clamp is not decoration.** Core makes <c>Copper = CorpseCopper + VendorCopper</c>,
+    /// so a part can never exceed the whole today — but this builder takes four independent
+    /// longs from a caller, and a bar is drawn from whatever it is handed. A second producer
+    /// of those numbers (a replay, a history row, a future surface) that disagreed by a copper
+    /// would otherwise paint a gauge past its own track, which is the kind of thing nothing
+    /// notices until it is in a screenshot.</summary>
+    private static double CoinShare(long part, long total) =>
+        total <= 0 ? 0 : Math.Clamp((double)part / total, 0, 1);
+
+    /// <summary>The same fraction as a percentage, for the row's hover. Whole numbers: the
+    /// gauge carries the comparison and the tooltip is there to name it, so a decimal point
+    /// would be precision the bar cannot show.</summary>
+    private static string Percent(long part, long total) =>
+        $"{CoinShare(part, total) * 100:0}%";
 
     /// <summary>
     /// The Deaths peek: what killed you and when, newest first.

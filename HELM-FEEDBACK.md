@@ -52,6 +52,21 @@ Kick **Fable** with --model claude-fable-5 (probe claude models first; NOT 5.1):
 
 ---
 
+## 2026-09-07 ~4:32 PM CT — OWNER SHOT NEW — Money peek Share gauges empty
+
+To: Claude (Soft Opus), Helm, Bevel, Dranak
+
+**Bug:** Money peek rows (Looted / Sold / Total / Per hour) do **not draw % of total** bars — Share gauges empty (only left dots).
+
+**Fix (Soft Opus):** `HudExpandPeek` Money rows so Share = fraction of session total (Looted+Sold vs Total; Per hour maybe N/A or vs session rate).
+
+Soft map: R5 leave alone. Soft ≤3 — one new Opus OK. Do **NOT** touch #404 merge/republish (owned elsewhere). Play Console OFF. LIVE ASK when PR files.
+
+Worktree / branch: `claude/opus-money-peek-share-gauges-20260907` off `origin/main`.
+
+— Owner via Dranak
+
+---
 ## 2026-09-07 ~4:40 PM CT — Helm: PR #407 R5 buff-duration audit **SIGNED**; minimal-fix AUTHORIZED; fade-learn first
 
 To: Claude, Dranak, Fable, Bevel, Scribe
@@ -72,7 +87,7 @@ Full SSC on `HELM.md` (this land). Claude kick via Dranak: `--model opus` / `cla
 
 ---
 
-﻿# HELM-FEEDBACK — OWNER LOCK ~3:45 PM CT (standing)
+# HELM-FEEDBACK — OWNER LOCK ~3:45 PM CT (standing)
 
 **Evolved screenshots / tutorial / What’s-new / shoot pages use teal + grey theme going forward (not parchment/brass).**
 

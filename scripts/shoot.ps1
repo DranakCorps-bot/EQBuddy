@@ -1509,6 +1509,41 @@ $Shots = [ordered]@{
     #     own de-duplication and predates OE-9 — the Loot card and the float have always shown
     #     it. Filed for Bevel rather than fixed here.
     #   * `hud-expand-loot-notarget` 300x89 — held exactly: "No target" and the one dim line.
+    #
+    # RE-SHOT 2026-09-07 (`hud-expand-money` only, the owner's ~4:32 PM CT shot). THE
+    # NO-GAUGE CALL RECORDED ABOVE WAS WRONG, and the committed picture is what said so:
+    # `BreakdownRows.Row` floors a bar at 1%, so "no gauge" did not render as nothing — it
+    # rendered as four identical stubs under four rows that plainly are parts of one figure.
+    # The shares draw now. PREDICTION, written before the run and off the numbers this shot
+    # already recorded (1p 3g 4s 1c + 3p 8g 7c = 5p 1g 4s 8c, which is 1341 + 3807 = 5148
+    # copper — Core's own `Copper = CorpseCopper + VendorCopper`):
+    #   * Still 300 wide and the same height — the bar row was always drawn, so nothing about
+    #     the layout moves. A different height is a finding, not a detail.
+    #   * Looted ~26% of the track, Sold to vendors ~74%, and the two together filling the
+    #     width of Total's FULL bar directly under them. Per hour keeps the 1% stub, which is
+    #     the one row where "no gauge" is the honest answer — worth LOOKING at, because that
+    #     stub is what the owner reported and it has to read as deliberate beside three real
+    #     bars rather than as the same bug on one row.
+    #   * Every value string unchanged: the percentage is in the HOVER, not in the row (300
+    #     wide, and `hud-expand-procs` above is what a coin string plus a percentage would do).
+    # RESULT: held, and MEASURED rather than eyeballed — a bar's width is arithmetic, so a
+    # look is not the check (trap 41's lesson at a smaller size). 300x159, values unchanged.
+    # Against a full track of 279px: Looted 72px (25.8% vs the predicted 26.05%), Sold 206px
+    # (73.8% vs 73.95%), Total the full 279, Per hour a 2px stub at the left edge — the 1%
+    # floor, which is the row where "no gauge" is the honest answer. Beside three real bars
+    # it reads as an absence rather than as a fourth bar that failed; that was the thing to
+    # look at and it is the reason the row carries a tooltip saying so.
+    # TWO CORRECTIONS TO THE RECORD ABOVE, neither about this change:
+    #   * The "300x137" recorded for this shot on 2026-09-07 was never true — the committed
+    #     PNG it describes is 300x159, and so is this one. The prediction was written against
+    #     that number and the height did not move.
+    #   * The old picture is ParchmentBrass and this one is Turquoise, because TR-1 (#399)
+    #     moved this script's `-Theme` default at ~3:59 PM CT for the Helm OWNER LOCK of
+    #     ~3:45 PM CT — teal + grey for Evolved captures. No palette NAMED "teal + grey"
+    #     exists in `ThemePalettes`, so the lock is being served by the closest shipped one.
+    #     The palette change is the lock arriving, not this change's doing; the other ten
+    #     `hud-expand-*` shots are still pre-lock and will re-shoot into it when they are
+    #     next touched.
     'hud-expand-kills' = @{ Title = 'EQBuddy HUD Panel'
                            Env = @{ EQBUDDY_HUDEXPAND = 'kills' }
                            Set = @{ Minimized = $true
