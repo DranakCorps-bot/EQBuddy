@@ -1921,6 +1921,35 @@ Read this list before touching the areas it names. Every entry cost a release.
     this bug waiting for a kill.** Grep for it before adding another. Caches are fine (they
     refetch); a profile is not.
 
+66. **A FORGIVENESS RULE WRITTEN AGAINST ONE POSITION IN A NAME IS A RULE ABOUT THE FACT, NOT
+    ABOUT THE POSITION — and the half it does not cover is a false match nobody can see until
+    a player reports it.** `NameMatchesFuzzy` forgives wiki typos, and #181/Sol A taught it
+    that two names sharing every word but the LAST are siblings rather than typos ("CWG Model
+    XA" beside "CWG Model EXG"). The identical fact at the FRONT of a name went unwritten, and
+    Guk's froglok tribes are three-letter first words: "a dar ghoul wizard" is two edits from
+    "a kor ghoul wizard", comfortably inside the budget a sixteen-character name earns. The
+    arch magi's placeholder was spelled with one of them, so **every tribe within reach lit the
+    arch magi respawn chip** — #394 (bjordan2010), *"any wizard kill in Lower Guk hall"*.
+    → **The rule is one word apart, at ANY position, unless one word truncates the other**
+    (`SpawnTimerTests`). Single-word names stay exempt, because that is what fuzzy matching is
+    FOR. When you write a guard that names a position, an index, a suffix or a prefix, ask what
+    it would say one position over — trap 64's "a proxy is a claim about the world that a
+    condition happens to encode", here with the claim being *where* a distinguishing word sits.
+    → **AND THE FALSE POSITIVE HID A FALSE NEGATIVE, which is the half worth remembering.**
+    The arch magus's OWN kill lit nothing: `Fold` strips a trailing "s", so the wiki's page
+    title "the ghoul arch magi" met the kill line's "arch magus" as "arch magi" against "arch
+    magu" — no exact match, and the same-length tail rule then refused the fuzzy one too. The
+    wrong mob started the clock and the right mob could not, and only the first half was
+    reportable. **When you suppress a wrong trigger, check that the RIGHT one still works** —
+    otherwise the fix ships a chip nothing on earth can light and calls it fixed. The alias is
+    what closes it; a plural-folding name pair is worth a test whenever a wiki title and a kill
+    line disagree about the last letter.
+    → **The data half is trap 30's shape: a curated field whose FORMAT nothing checks.**
+    `Placeholder` is a '/'-separated list of whole mob names, and "jin/kor ghoul wizard" is
+    prefix shorthand — it split into "jin" (matches nothing, ever) and "kor ghoul wizard"
+    (matched half the hall). Two more shipped entries carried the same shape, one of them
+    holding prose. `EveryShippedPlaceholderSegmentIsAWholeMobName` now fails it.
+
 ## Tooling notes that cost time when ignored
 
 - **`pwsh -NoProfile -File scripts/status.ps1`** answers "where did we leave off?" in one

@@ -269,21 +269,43 @@ public sealed class SpawnCatalog
         // "Leljemor"). Length-changing edits — dropped letters, truncated log
         // captures — stay forgiven anywhere.
         if (a.Length == b.Length && (a[^1] != b[^1] || a[^2] != b[^2])) return false;
-        // Names sharing every word but the LAST are siblings from a family, even when
-        // the last words change length: Sol A's trash clockworks CWG Model XA/XB/XC
+        // Two multi-word names differing in exactly ONE word are siblings from a family,
+        // not a typo. The shared words eat most of the name, leaving the whole
+        // distinguishing part inside the edit budget — so a differing word only stays
+        // forgiven when one is a truncation of the other ("Gynok Molto" for Gynok
+        // Moltor); anything else is a different mob.
+        //
+        // It was written for the LAST word: Sol A's trash clockworks CWG Model XA/XB/XC
         // all sat within two edits of the named CWG Model EXG, so ordinary kills ran
-        // (and re-ran) his clock (2026-08-16). The shared prefix eats most of the
-        // name, leaving the whole distinguishing part inside the edit budget — so a
-        // differing last word only stays forgiven when one is a truncation of the
-        // other ("Gynok Molto" for Gynok Moltor); anything else is a different mob.
-        var aCut = a.LastIndexOf(' ');
-        var bCut = b.LastIndexOf(' ');
-        if (aCut >= 0 && bCut >= 0 && a[..aCut].Equals(b[..bCut], StringComparison.Ordinal))
+        // (and re-ran) his clock (2026-08-16).
+        //
+        // #394 (bjordan2010) is the same fact at the FRONT of the name, and the position
+        // was never what made it true. Guk's froglok tribes are three-letter first words
+        // — jin, kor, dar, zol, bok — so "a dar ghoul wizard" sits two edits from "a kor
+        // ghoul wizard", inside the budget a sixteen-character name earns, and the arch
+        // magi's placeholder was spelled with one of them: every tribe within reach lit
+        // that chip. One rule for every position now, rather than a rule per position
+        // discovered one report at a time.
+        //
+        // Single-word names are exempt, and must be: they are what fuzzy matching exists
+        // for ("Leljemor" for Keljemor), and there the one differing word IS the name.
+        var aWords = a.Split(' ');
+        var bWords = b.Split(' ');
+        if (aWords.Length > 1 && aWords.Length == bWords.Length)
         {
-            var aLast = a[(aCut + 1)..];
-            var bLast = b[(bCut + 1)..];
-            if (!aLast.StartsWith(bLast, StringComparison.Ordinal)
-                && !bLast.StartsWith(aLast, StringComparison.Ordinal)) return false;
+            var differing = -1;
+            for (var i = 0; i < aWords.Length; i++)
+            {
+                if (aWords[i] == bWords[i]) continue;
+                if (differing >= 0) { differing = -1; break; }   // two words apart: not this rule
+                differing = i;
+            }
+            if (differing >= 0)
+            {
+                var (aWord, bWord) = (aWords[differing], bWords[differing]);
+                if (!aWord.StartsWith(bWord, StringComparison.Ordinal)
+                    && !bWord.StartsWith(aWord, StringComparison.Ordinal)) return false;
+            }
         }
         var budget = Math.Max(a.Length, b.Length) >= 12 ? 2 : 1;
         return WithinEditDistance(a, b, budget);
