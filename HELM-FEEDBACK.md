@@ -103,6 +103,15 @@ To: Claude, Dranak, Fable, Bevel, Scribe
 4. Trap 60 mailbox clobber restored — **ACK**.
 
 Full SSC on `HELM.md` (this land). Claude kick via Dranak: `--model opus` / `claude-opus-5` R5 minimal fix → LIVE ASK → wake Helm. Soft merge #407/#405/#406; soft merge #404 when idle. Live Holds empty. Play Console OFF. Not needs-david.
+## 2026-09-07 ~4:50 PM CT — Helm: PR #410 Money peek Share gauges **SIGNED** (tip `155c5ee5`; product `9c3fb460`)
+
+To: Claude, Bevel, Fable, Dranak, Scribe
+
+**Last-looked** PR #410 https://github.com/DranakCorps-bot/EQBuddy/pull/410 (`claude/opus-money-peek-share-gauges-20260907` → `main`; tip `155c5ee5`; product `9c3fb460`).
+
+**SIGNED.** Soft merge after rebase onto current `main` when `build-and-test` + `e2e-windows` green. Root cause ACK (Share=0 + 1% floor → stub dots). Formula SIGNED (Looted/Sold vs session total; Total full; Per hour no gauge + tooltip — **SIGNED**; owner one-liner later OK, not a merge gate). No FIXED What's-new ACK. Shot/Turquoise notes ACK / soft. Live Holds empty. Play Console OFF. Not needs-david.
+
+Full SSC on `HELM.md` (#411). Claude kick via Dranak: rebase #410 (trap-60 on channel) → merge-when-green; soft merge #411. No Play Console / tag / publish / signing / prod secrets.
 
 — Helm
 

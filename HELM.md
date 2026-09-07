@@ -87,6 +87,25 @@
 - **Claude kick via Dranak:** Soft: **merge #405 when `build-and-test` + `e2e-windows` green**; soft merge this SSC when green. Soft: leave #404 peek-anchor LIVE. No new Opus/Fable/Bevel kick from this ruling. Probe `claude models` only if a later seat needs a kick. No TEL / Version / `v1.99.19` / Play Console / tag / publish / signing / prod secrets.
 - **Scope hygiene:** Scripts + installer + docs/channel. Not a hold. Not needs-david. Live Holds empty. Play Console OFF.
 
+## 2026-09-07 ~4:50 PM CT — PR #410 Money peek Share gauges (SIGNED; rebase then merge-when-green)
+
+- **When / who:** 2026-09-07 ~4:50 PM CT — Helm last-look (webhook: HELM-FEEDBACK.md LIVE ASK: PR #410 Money peek Share gauges; tip `155c5ee5`; product `9c3fb460`).
+- **Thread / subject:** PR #410 https://github.com/DranakCorps-bot/EQBuddy/pull/410 (`claude/opus-money-peek-share-gauges-20260907` → `main`) — Soft Opus fix for owner ~4:32 PM CT shot (Share gauges empty / left dots only). Product + channel tip. At look: tip **CONFLICTING / behind `main` by 2** (`#407` R5 audit merged after rebase onto `#404`/`5c027fb0`); **no CI checks yet** on tip.
+- **Ruling:** **SIGNED.** Spot-checked against owner brief + host floor: root cause ACK (`Share = 0` + `BreakdownRows.Row` clamp `[0.01, 1]` → four identical ~2px stubs, not absent gauges). Formula SIGNED: Looted/Sold = `part/total` via `CoinShare` clamp; Total = `1.0`; denominator = session total (Core `Copper = CorpseCopper + VendorCopper`) — **not** share-of-the-biggest (`Gauged`). Soft merge after **rebase onto current `main`**, when `build-and-test` + `e2e-windows` green on the rebased head. Drop LIVE ASK tip at merge (prefer this Helm land / #411 for SSC). Live Holds empty. Play Console OFF. Not needs-david.
+- **Asks answered:**
+  1. Last-look / merge-when-green — **SIGNED** (after rebase; both CI).
+  2. **Per hour keeps no gauge** — **SIGNED as written.** Rate has no share of a total; tooltip names why so the 1% floor stub reads deliberate. Owner one-line override later if wanted — **not a merge gate**.
+  3. No FIXED What's-new (unreleased `2.0.0` / latest tag `v1.99.18`) — **ACK / SIGNED** (tray-sweep entry gained the bar; FIXED would credit a player-invisible bug).
+  4. Shot measured vs 279px track + shot-record corrections (height 300×159; Turquoise = TR-1 `#399` closest to ~3:45 teal+grey lock) — **ACK**. Named-palette gap soft-owed, **not this PR**.
+  5. `#404` merge/republish + R5 untouched — **ACK**. Soft ≤3 respected.
+- **Spot-check (product `9c3fb460`):**
+  - `HudExpandPeek.Money`: `CoinShare`/`Percent`; Looted+Sold+Total+Per hour rows; empty state unchanged.
+  - Tests: `MoneyPeek`, `MoneyPeekPartsAddUpToTheTotalBar` (theory), `MoneyPeekDrawsNoGaugeForARate` (negative + tooltip), tooltip/bar agreement, clamp overflow, SoldItems stay in window.
+  - Files: `HudExpandPeek.cs`, `HudExpandPeekTests.cs`, `hud-expand-money.png`, `shoot.ps1`, `WhatsNew.json`, `TestPlan.md`, `DECISIONS.md`, channel tip.
+- **Posture / Soft max ≤3:** (1) rebase #410 onto `main` → CI → merge-when-green. (2) Soft merge this SSC (#411). (3) Soft leave R5 follow-ups / named teal+grey palette if any — **not** ahead of #410 land. Soft LEAVE #380/#356. Live Holds empty.
+- **Claude kick via Dranak:** `--model opus` / `claude-opus-5`: **rebase #410 onto current `main`** (trap-60 byte-safe on `HELM-FEEDBACK.md` — tip carries LIVE ASK + owner shot; main tip is post-#407 R5) → CI → **merge when `build-and-test` + `e2e-windows` green**. Soft merge this SSC when green. Prefer this Helm main land for SSC (`helm/ssc-410`). No TEL / Version / `v1.99.19` / Play Console / tag / publish / signing / prod secrets / Evolved wide publish. Do not expand scope (no Per-hour bar invent; no palette rename).
+- **Scope hygiene:** Not a hold. Not needs-david. Live Holds empty. Play Console OFF.
+
 ## 2026-09-07 ~2:25 PM CT — PR #400 OE-9 every-tray peek/pop-out implement (SIGNED with Deaths gate; rebase then merge-when-green)
 
 - **When / who:** 2026-09-07 ~2:25 PM CT — Helm last-look (webhook: HELM-FEEDBACK.md LIVE ASK: OE-9 PR #400 tip `3f50d660` needs last-look; one open question — the ~1:30 DPS lock read as DPS only). Corrects the ~2:20 SSC draft that treated Deaths IN as already-signed.
