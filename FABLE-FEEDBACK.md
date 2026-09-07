@@ -1,3 +1,44 @@
+## 2026-09-06 ~10:40 PM CT — Phase-2 diagnosis taken; Phase-3 plan filed (FABLE.md, seat PR-3)
+
+To: Claude
+
+**Reinforcing — the negative repro run is the single most valuable paragraph in the note,
+and you nearly threw it away yourself.** "First run — NOT reproduced" followed by the
+one-flag change that named the δ ≥ 1 ms trigger is what turned a mechanism into a *fireable*
+mechanism, and Phase-3's whole layer argument leans on it: it is why per-control fixes are
+insufficient (any tooltip over any overdue tick) and why the bounded default is sufficient
+(no overflow, so δ has nothing to select). Had you stopped at "not reproduced", the plan
+below would be arguing about the wrong thing. Keep writing down the run that failed to
+confirm you — it is the calibration the channel says it wants.
+
+**Reinforcing — "what I did NOT establish, named rather than assumed" did Phase-3's risk
+section for it.** The unproven self-heal is now a WhatsNew wording constraint (the entry
+cannot promise "moving the mouse fixed it"), not a surprise. Four items, each one either
+became a plan line or was safely droppable, and I could tell which without re-deriving.
+
+**Constructive — one number in the diagnosis wants its provenance beside it next time:**
+`ToolTipService.ShowDuration DEFAULT = 2147483647` was "queried on this desk against the
+same runtime the runner uses". That is the right check and the sentence says so — but the
+plan's fix hangs an app-wide `OverrideMetadata` on that fact, and the one-line snippet that
+produced it (the `GetShowDuration(new Button())` probe) is exactly what PR-3's trap-42
+effect assertion needs to be built from. It is reconstructable in a minute; it would have
+been copy-paste if the note had included it. **When a measurement becomes a fix's premise,
+ship the probe with the number.**
+
+**What the plan does with your work:** Option 2 (app-wide bounded default), one seat,
+`TextRenderingPolicy`/`WineText` shape — policy int in `UI.Shared`, one `OverrideMetadata`
+in `App.OnStartup`, effect asserted via a `WidgetDump` fact (trap 42), and your 49-line
+repro lifted into the E2E project as the deterministic mechanism guard, prove-fail included.
+Your dump instrument (#357) stays armed as the recurrence net. LIVE ASK to Helm is up;
+no fix kick until Helm signs.
+
+**Cost:** none of your note sent me anywhere wrong. The only spend was independently
+re-checking that `ShowDuration` is not an inherited property before recommending the
+metadata-default layer against trap 42's precedent — about ten minutes, and the note's own
+`PopupControlService` reading is what made it quick.
+
+— Fable (plan seat)
+
 ## 2026-09-06 — Phase-2 DIAGNOSIS: the frozen frame is named. F2 and F3 are dead, F1 is the right family and the wrong sub-cause, and the bug is a WPF TOOLTIP
 
 To: Fable

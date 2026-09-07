@@ -1,3 +1,125 @@
+## 2026-09-06 ~10:40 PM CT — GearCard tick-freeze Phase-3 FIX: bound the tooltip timer app-wide (seat PR-3)
+
+- **Priority:** `ready` — **kick gated on Helm last-look of this plan** (per #359 SSC: "Do not
+  kick Opus fix yet… Phase 3 waits Fable plan + Helm last-look"). LIVE ASK is in
+  `HELM-FEEDBACK.md`, same date.
+- **Class:** V2 — release-gate exit, and the fix is an app-wide default change whose blast
+  radius is every tooltip in the product, not the one control the failing test touches.
+- **Source:** PR #359 Phase-2 diagnosis (`FABLE-FEEDBACK.md`, 2026-09-06, tip `1f5b7639`;
+  Helm SIGNED ~10:05 PM CT); run
+  [`34075983046`](https://github.com/DranakCorps-bot/EQBuddy/actions/runs/34075983046)
+  minidump `freeze-tick3`; HELM.md #359 / #354 SSC blocks.
+
+### The mechanism this plan is built on (from #359, signed)
+
+WPF's `ToolTipService.ShowDuration` defaults to **`int.MaxValue` ms**. When a tooltip opens,
+`PopupControlService` arms a `DispatcherTimer` with that interval; `DispatcherTimer.Restart`
+computes `TickCount + interval` in int32 and **overflows negative**; the dispatcher's
+wrap-safe minimum then lets the overflowed due time win — but **only when some other
+registered timer is already ≥ 1 ms overdue** (the δ trigger, which is the intermittency) —
+and `SetWin32Timer` arms the **one shared Win32 timer** ~24 days out. Every
+`DispatcherTimer` on the thread dies with it: `_uiTimer`, `_companionPump`, everything. The
+thread sleeps in `GetMessage`, `Responding=True`. We set `ShowDuration` **nowhere**
+(`grep -rn "ShowDuration" src/` is empty), so every tooltip in EQBuddy is the same loaded
+gun, and the player-facing shape is *"EQBuddy stopped updating but I can still use it"*.
+
+### Layer choice — Option 2, app-wide default. One seat.
+
+- **Not Option 1 (per-control `ShowDuration` on the GearCard path).** That fixes the test,
+  not the product. The diagnosis is explicit that the trigger is *any* tooltip over an
+  overdue tick — dozens exist and none are special. A hand-maintained list of "the tooltips
+  that matter" is trap 30's shape: it stops covering the set the day someone adds a tooltip,
+  and the failure mode is a player freeze, not a test red.
+- **Not Option 3 (dispatcher defense).** The overflow is in WindowsBase
+  (`DispatcherTimer.Restart` / `UpdateWin32Timer`) — not our code. A defense is either
+  reflection into private dispatcher state (fragile across runtime updates) or a watchdog,
+  and a `DispatcherTimer` watchdog **dies with the same shared Win32 timer it would guard** —
+  a guard inside the failure domain guards nothing. A non-dispatcher watchdog (raw Win32
+  timer, thread-pool poke) is a second timer system permanently poking the first, invented
+  to tolerate a state Option 2 simply makes unreachable: with a bounded interval,
+  `TickCount + interval` cannot overflow, so step 1 of the mechanism never happens and the
+  δ precondition has nothing to select.
+- **Option 2:** one `OverrideMetadata` giving `ShowDuration` a bounded app-wide default.
+  Removes the poisoned operand for every current and future tooltip, zero per-control edits,
+  and the visible behaviour change is only that a tooltip auto-dismisses after ~30 s instead
+  of never — a "default" no design ever chose (`int.MaxValue` is "forever" by accident).
+
+### Seat PR-3 — decomposition
+
+1. **`src/EQBuddy.UI.Shared/ToolTipPolicy.cs`** — framework-free, the `TextRenderingPolicy`
+   precedent: the bounded ShowDuration in ms (**recommend 30 000; executor may pick within
+   15 000–60 000 and log it in `DECISIONS.md`**), with a doc comment carrying the overflow
+   arithmetic and the δ ≥ 1 ms trigger so the constant can never be "tidied" back up.
+   Unit tests: positive, ≤ 60 000, and the overflow-safety claim stated as arithmetic.
+2. **WPF applier** — one call in `App.OnStartup` beside `WineText.ApplyIfNeeded`
+   (`App.xaml.cs:113`), before any window is constructed:
+   `ToolTipService.ShowDurationProperty.OverrideMetadata(typeof(DependencyObject),
+   new FrameworkPropertyMetadata(ToolTipPolicy.ShowDurationMs))`. **Not** in `MainWindow`.
+3. **Trap 42 binds this exactly, and the plan does not trust the happy reading.** An
+   `OverrideMetadata`-shaped fix has shipped before and done nothing at runtime.
+   `ShowDuration` is *not* an inherited property — `PopupControlService` reads
+   `ToolTipService.GetShowDuration(owner)` directly, so a metadata default should apply
+   where trap 42's inheritance case did not — but "should" is the word trap 42 exists for:
+   **assert the EFFECT.** A dump fact in `src/EQBuddy/WidgetDump.cs` (not `MainWindow`):
+   `tooltipShowDurationMs=` read via `ToolTipService.GetShowDuration(new Button())` at
+   runtime, asserted from `tests/EQBuddy.E2E` to equal `ToolTipPolicy.ShowDurationMs`.
+4. **Mechanism regression test** — lift the diagnosis's 49-line repro into
+   `tests/EQBuddy.E2E` as a dispatcher-only fact (no app launch, no screen, no screen
+   lock): arm a 250 ms `DispatcherTimer`, block the thread 300 ms so it is overdue, arm a
+   second timer with `ToolTipPolicy.ShowDurationMs`, assert the fast timer ticks again
+   within a deadline. **Prove-fail is mandatory** (trap 62's argument, and there is a
+   pre-fix value to run): substitute `int.MaxValue` and watch the fast timer starve.
+   **Guards run eight times** before the seat reports green.
+5. Nothing else. No per-control tooltip edits, no `GearLootWindow` changes, no harness
+   changes (#357 already owns that side).
+
+### Verification and gate exit (proposed; Helm signs)
+
+- PR-3's own tip: `build-and-test` + `e2e-windows` green. No waive, no blind re-runs.
+- The freeze is intermittent (needs δ ≥ 1 ms at tooltip open), so a single green e2e run is
+  weak evidence *by itself*; the deterministic evidence is the mechanism regression test +
+  the dump-fact assertion. Proposed gate exit stays Helm's signed definition: **fix merged
+  on main + main green + OE tips rebased and green.** Open question to Helm: given the
+  deterministic guards, does one green main run suffice, or name N.
+- #357's instrument stays armed after the fix — a recurrence names itself with a minidump.
+
+### Sequencing vs #357 (recommendation, not a change to Helm's signed disposition)
+
+No code dependency in either direction: #357 is harness/instrument, PR-3 is product+policy.
+Either merges first; PR-3 branches from `main` and neither includes nor rebases #357. If
+#357's tip keeps going red on this now-named bug, the honest order is **PR-3 lands first**
+and #357 rebases onto fixed main — its e2e then goes green on the merits rather than on
+dice. #357 remains merge-when-own-tip-green as signed.
+
+### OE park and kick order
+
+Park stands untouched (#353/#351 + OE-4 + OE-5/OE-6) until gate exit. After Helm signs this
+plan: **PR-3 outranks OE-6/OE-5 PR-1** under Soft max ≤3 — it is the release gate.
+
+### WhatsNew / severity — plan questions for Helm, not decided here
+
+1. Two candidate player-facing facts: (a) the defect — *"EQBuddy could stop updating (clock,
+   DPS, Mobile) after a tooltip opened at a busy moment, until restart"* (the self-heal on
+   mouse-move is a reading the diagnosis explicitly did not prove); (b) the fix's visible
+   edge — tooltips now dismiss after ~30 s. Recommend one `WhatsNew.json` entry in the
+   release that ships it, worded to (a); no reporter to credit — CI found it (worth saying
+   so in the entry rather than crediting nobody silently). Whether this earns its own
+   release / `v1.99.19` is release posture — Helm's ask to carry, David's go.
+2. **Upstream:** the 49-line repro is a clean dotnet/wpf bug report. Filing publicly under
+   the project's name is consequence-list #3 — David's door, routed by Helm if judged worth
+   it. Not part of PR-3.
+
+- **Bevel pre-design:** no, because no surface, layout, copy or door changes; the only
+  visible delta is tooltip auto-dismiss at ~30 s, replacing an accidental "never". If Helm
+  reads that as a UX call, it is one line for Bevel, not a design pass.
+- **Shot offline:** n/a — no staged screenshot.
+- **Column budgets:** n/a — no new strings on any surface.
+- **What clamps it:** `MainWindow*.xaml.cs` glob is at its ratchet limit — PR-3 makes no
+  net-positive edits there (applier in `App.xaml.cs`, fact in `WidgetDump.cs`, policy in
+  `UI.Shared`, which stays framework-free: the policy holds an int and its reasoning, no
+  WPF types).
+- **Must-list rows on this surface:** none — no surface is reshaped.
+
 ## 2026-09-07 ~2:50 AM CT — Owner LOCK seats named: OE-5 buff-timer data path · OE-6 first-run Setup (Fable, on `631bd7f5`)
 
 Executes the Helm-signed #355 owner PRODUCT LOCK (~8:55 PM CT 09-06; `HELM.md` PR #355
