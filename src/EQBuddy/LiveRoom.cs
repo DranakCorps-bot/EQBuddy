@@ -449,10 +449,15 @@ internal sealed class LiveRoom : Grid, IShellRoom
                          (x.MaxTargets > x.AvgTargets + 0.05 ? $" (best {x.MaxTargets})" : "")))));
         // Procs per combat-MINUTE (#85, Kerdude): the same denominator as DPS, so downtime
         // does not flatter the weapon.
-        var combatMinutes = Math.Max(1.0 / 60, s.CombatSeconds / 60.0);
+        //
+        // **The row's WORDS come from `HudExpandPeek.Procs` as of OE-9, not from here.** This
+        // line and the Combat card's were two producers of "what does a proc row say", both
+        // current, that the next change to that denominator would have to be taught twice
+        // (trap 33) — and OE-9 was about to add a third when the Procs chip's ⧉ gave the
+        // Damage float a procs block of its own. One builder, three hosts.
         _procs.Fill(s.Procs.Count > 0,
-            () => BreakdownRows.FillPairRows(this, _procs.List, s.Procs.Select(x =>
-                (x.Name, $"×{x.Count} · {x.Damage:N0} dmg · {x.Count / combatMinutes:0.#}/min"))));
+            () => BreakdownRows.FillPairRows(this, _procs.List,
+                HudExpandPeek.Procs(s.Procs, s.CombatSeconds).Rows.Select(r => (r.Name, r.Value))));
         _stances.Fill(s.Stances.Count > 0,
             () => BreakdownRows.FillPairRows(this, _stances.List, s.Stances.Select(x =>
                 (x.Name, $"{x.Damage:N0} dmg · {(int)x.CombatSeconds}s · {x.Dps:0.#} dps"))));
