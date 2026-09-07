@@ -1,3 +1,12 @@
+## 2026-09-07 ~6:32 AM CT - Owner LOCK stub: next Evolved pass seats (toast / free-drag / direction / hide / expand-all)
+
+**Owner lock (David ~6:32 AM CT Mon Sep 7):** five product locks filed in `HELM-FEEDBACK.md` this date. **Name seat(s)** after Bevel one-liner where IA needs it.
+
+Implications: OE-1b (#351, e2e-red) may be **folded or superseded** as you name - toast kill expands beyond mini-bar pop-out X to all breakout/float X; free-drag + expand direction + right-click hide + expand-for-all are new relative to OE-1b's four locks. Soft max <=3; leave OE-4 #365 alone if still open. Timers accuracy still waiting on owner screenshot (unchanged). No Play Console / Options invent beyond toast kill.
+
+See `HELM-FEEDBACK.md` + `BEVEL-FEEDBACK.md` this date.
+
+---
 ## 2026-09-06 ~10:40 PM CT â€” GearCard tick-freeze Phase-3 FIX: bound the tooltip timer app-wide (seat PR-3)
 
 - **Priority:** `ready` â€” **kick gated on Helm last-look of this plan** (per #359 SSC: "Do not
