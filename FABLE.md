@@ -1,3 +1,121 @@
+## 2026-09-07 ~6:45 AM CT — Owner LOCK seats named: OE-7 toast kill, OE-8 park-anywhere, OE-9 expand-for-all (supersedes OE-1b #351)
+
+- **Priority:** OE-7 `ready` — kick gated on Helm sign of this plan + the main e2e triage below.
+  OE-8/OE-9 `provisional` — **Bevel-gated**: named now so Bevel's one-liner (asked in #366)
+  answers the four questions at the bottom; they firm to `ready` when it lands. LIVE ASK in
+  `HELM-FEEDBACK.md`, same date.
+- **Class:** V1 each. Every direction-setting decision is the owner's (five locks, ~6:32 AM CT
+  Mon Sep 7, `HELM-FEEDBACK.md` / PR #366); what remains is execution against machinery this
+  plan names by file. OE-8 is the widest (it deliberately reintroduces persisted HUD geometry)
+  but its direction is locked; anything that would make it V2 is exactly what the Bevel
+  dependency exists to surface first.
+- **Source:** owner PRODUCT LOCK ~6:32 AM CT (#366, `channel/owner-next-evolved-pass-20260907`);
+  OE-1b bundle signs on #351 (tips `427b1ef2` and priors); OE-1's shipped locks 1–10
+  (`HudExpandTests`); BEVEL.md 2026-09-06 §1 (buff surfaces are two different jobs).
+
+### Seat OE-7 — toast kill complete, and ✕ stops being a trapdoor (lock 1)
+
+The owner's lock is bigger than deleting a message. Today a breakout ✕ is a PERSISTENT
+disable: `BreakoutHost.cs:92` announces *"{kind} breakout hidden — re-enable in
+{BreakoutPresentation.ReEnableRoute}"*, `BreakoutPresentation.cs:123` (`HiddenChrome`) promises
+the same route in the chrome tooltip, and the ✕ writes `AppSettings.DisabledBreakouts`. The
+lock replaces the semantic: **✕ = transient close; the chip/bar stays available; hover (or
+click, per the OE-1 model) restores; no Options round-trip on any breakout/float path** — the
+mini-bar pop-out half is OE-1b's toast lock, absorbed here and broadened by the owner to every
+✕. Decomposition:
+
+1. ✕ stops writing `DisabledBreakouts`; the alert-banner toast and both re-enable strings go.
+   Options' Breakout-windows checkboxes stay as the one deliberate persistent off-switch — the
+   lock says no Options *invent*, not no Options; a kind switched off there still owes trap
+   17's dimmed visual.
+2. `DisabledBreakouts` then has Options as its ONLY writer — a trap 20/26 moment by
+   construction. `DeadSettingTests`' row gets the new reason in the same change, or the setting
+   retires with a migration; executor's call, logged in `DECISIONS.md`.
+3. The mini-bar path: `HudExpandBar.cs:55`'s `Dismissed` wiring already maps a float ✕ back to
+   its expand target; verify the restore path holds with no toast, and that `WhatsNew.json`
+   credits the owner-reported path ("closing a pop-out no longer tells you to visit Options").
+4. E2E: the "no toast" assertion is a NEGATIVE — trap 62 binds. Pair it with a positive on the
+   same dispatcher pass (the chip's restored availability) rather than a sleep.
+
+File-disjoint from OE-4 #365 (buff roster render vs breakout chrome); can run beside it.
+
+### Seat OE-8 — chips and panels park anywhere: free-drag + expand direction + right-click hide-the-kind (locks 2–4; supersedes OE-1b)
+
+One placement model for the HUD's parked satellites, not three features. Machinery:
+`HudChipRowWindow.cs` (the chip row — today recomputed from the widget's position every tick,
+**zero persisted geometry**, which is SA-2's deliberate design; free-drag reverses that on an
+owner lock, so the persistence comes back by design and not by drift), `HudExpandWindow.cs` /
+`HudExpandBar.cs` (the under-bar panel), `HudExpand.cs` (the UI.Shared state machine — grows a
+placement field, not a new machine). Inherited from OE-1b, restated in the supersede block
+below: grip anywhere on the panel box, drag-to-place primary / pop-out secondary, resize from
+any edge or corner. New from the ~6:32 lock: chips (spawn, buffs-about-to-expire, the row
+generally) park **anywhere**; from a parked placement the player picks expand direction
+**up / down / left / right**; right-click hides a chip KIND.
+
+Traps that bind, named before the diff: **1** (all px↔unit sums in `WidgetMetrics`, never
+inline), **2** (the tombstoned rule still holds — capture geometry while the window is alive,
+never in `Closed`), **49** (placement attribution has THREE actors — follower / toolkit /
+player — put them in the test names; `scripts/drag-verify.ps1` is the harness precedent and
+runs before this ships), **25** (any strip that reflows is a `WrapPanel`). Right-click today
+already means dismiss-this-chip (`HudChip.cs:147`, and the tooltip says so) — lock 4 adds
+hide-the-kind on the same gesture; the split is Bevel question 3, not an executor guess. A
+hidden kind owes a visible way back (silent no-ops are broken) — Bevel names the door.
+
+### Seat OE-9 — every bar tracker expands, same peek/pin/pop (lock 5; serial behind OE-8)
+
+`HudExpandTarget`'s own doc comment promised this pass: *"this enum grows and nothing else
+about the model does"* (OE-1 lock 9 forbids per-tracker exceptions). Per kind — motes, procs,
+money, watch, kills, pet, loot, deaths, spawn, mez/slow, buffs — the seat adds the enum member,
+an under-bar panel body (each host builds its own instance, trap 45; no control re-parenting),
+and a pop destination: existing floats cover Damage/Healing/Pet/Watch/Loot/Buffs; motes/money
+follow the Progress-window precedent (the signed fold rule: reuse the theme window on its
+tab); **kills, deaths, procs, spawn, mez/slow have no float today** — whether they get one
+(`BreakoutKind` grows: `DocumentationSizeTests` pins the list, and trap 30 means grepping
+`scripts/` for the `mini-bar` staging in the same commit) or stay panel-only is Bevel question
+4 / the owner's invited carve-out. Serial behind OE-8 because every new panel takes OE-8's
+placement + direction API; building eleven bodies against the fixed under-bar line first would
+be rework by construction.
+
+### #351 / OE-1b — SUPERSEDED; recommend close WITHOUT merge
+
+All four OE-1b locks survive, carried by the seats above and restated here verbatim as the
+durable record (the branch was their only home):
+
+1. **Grip LOCK** — drag starts anywhere on the expanded under-bar panel box. → OE-8.
+2. Path priority — drag-to-place primary; pop-out secondary. → OE-8.
+3. **Resize LOCK** — parked/dragged panel resizes from any corner or any edge. → OE-8.
+4. **Toast LOCK** — after mini-bar pop-out ✕, remove the v1 Options re-enable message
+   entirely; close → chip available; hover/click restores. → OE-7, broadened by the ~6:32
+   lock 1 to every breakout/float ✕.
+
+Why close rather than rebase: the tip is e2e-red (no waive), and the branch's diff against
+main is **not additions-only** — it re-encodes ~85 existing lines of `BEVEL-FEEDBACK.md` into
+mojibake and its own added `HELM-FEEDBACK.md` entries are already mangled (trap 60(b): a
+whole-file rewrite freezes the corruption into the tree). A rebase keeps those bytes; a merge
+commits them. Helm's earlier sign was merge-when-green; green never came and the content is
+now superseded. Close needs Helm's sign — asked in the LIVE ASK.
+
+### Sequencing / soft max ≤3
+
+In flight: **OE-4 #365** (open, untouched per the owner lock) + **OE-7** (kick on Helm sign +
+main triage) + **OE-8** (kick after Bevel's one-liner, ~1 PM CT run). **OE-9 waits for a
+slot** and for OE-8's API. Flag, not this plan's to fix: main tip `06e469f5` (the #361 merge)
+is e2e-red — run 34084789306, `EndToEndTests.TheWikiPackWindowDrawsRowsAndCarriesTheRecheck`,
+`build-and-test` green. Triage before OE-7's implement kick; posture says no blind re-runs.
+Timers accuracy: unchanged — still waiting on the owner screenshot (BEVEL.md 2026-09-06 §1).
+
+### Questions the Bevel one-liner should answer (asked in #366; narrowed here)
+
+1. **Granularity** — does the chip row park as ONE unit, or as per-kind clusters? The owner
+   names spawn and buffs separately, which reads as at least two independently parkable things.
+2. **Direction affordance** — where does up/down/left/right live (inferred from drag? an
+   edit-mode control?) with no Options invent.
+3. **Right-click collision** — right-click already dismisses THIS chip; lock 4 wants
+   hide-the-KIND. Name the split, and name the way back for a hidden kind.
+4. **Expand-for-all carve-outs** — which kinds get which pop destination; do the five
+   float-less kinds earn floats (`BreakoutKind` grows) or stay panel-only?
+
+---
 ## 2026-09-06 ~10:40 PM CT â€” GearCard tick-freeze Phase-3 FIX: bound the tooltip timer app-wide (seat PR-3)
 
 - **Priority:** `ready` â€” **kick gated on Helm last-look of this plan** (per #359 SSC: "Do not
