@@ -15,6 +15,23 @@ something new.
 After you take items, write a short note in `SCRIBE-FEEDBACK.md` so Scribe can learn.
 
 ---
+### Lower Guk hall: wizard kills fire the arch magi respawn chip
+- **Priority:** must-fix (player-facing false chip) — **waiting / not authorized** (new thread; need one literal kill line that wrongly starts the chip before a confident fix path). Helm 2026-09-07 ~1:35 PM CT: keep waiting; do not open V0–V1 code yet; PH-as-designed vs compact-slash still two readings.
+- **Place:** Spawn timer / respawn chip for Lower Guk named `the ghoul arch magi` (`SpawnCatalog.json` + `SpawnTimers` kill→timer). Player session timer, not a group meter. Catalog row is eqlwiki-sourced shared game truth (PH note), but the filed ask is a false chip on this player’s kills — not a new wiki place-option. Nearby: #109 spawn-timer accuracy (instances / learning), not the same report. Do not fold. Not #208.
+- **Source:** #394 bjordan2010 Sep 7, 1:16 PM CT (18:16 UTC). https://github.com/DranakCorps-bot/EQBuddy/discussions/394 New thread. Category: Q&A. Footer: EQBuddy 1.99.18 · Windows 26200.
+- **Replied:** 2026-09-07 ~1:35 PM CT (Scribe) https://github.com/DranakCorps-bot/EQBuddy/discussions/394#discussioncomment-18335720 — different wording than Helm’s later SIGNED draft; includes Scribe/Grok signature. Do not edit posted comments.
+- **Ask (verbatim, the whole entry):** "Any wizard kill in Lower Guk hall triggers an arch magi respawn chip. It should only trigger if you kill the arch magus itself."
+- **Already shipped (quoted on local WC / catalog on disk this run):** Lower Guk entry `name`: `the ghoul arch magi`; `placeholder`: `jin/kor ghoul wizard`; `note`: `25% spawn; PH jin/kor ghoul wizard; … eqlwiki map spells 'arch magus'…` (`src/EQBuddy.Core/Data/SpawnCatalog.json`). Kill matching uses `Matches` / `MatchesAnyPlaceholder` in `SpawnTimers.cs` — placeholders are `'/'`-separated and any one dying restarts the named’s clock (comment cites spaced multi-PH forms like `crystal webmaster / crystal lurker / crystal purifier`). Latest release tag still `v1.99.18` (reporter is on it).
+- **Checked:** GitHub discussion body via API. WINDOW / WIDGET / PHONE — no (no live session). Grepped catalog + `SpawnTimers` / `SpawnCatalog` match helpers on David’s PC working copy. I did NOT run the app or replay a combat log.
+- **Hypothesis, checked against catalog string + match helpers, unchecked against his combat log (two readings — do not pick one without a kill line):**
+  1. **PH-clock as designed:** jin/kor ghoul wizard are the catalog PHs; if his “wizard kills” are those PH NPCs in the hall, the chip starting is current PH behavior, and the ask is named-only (arch magus/magi) vs PH-start — product call, not a silent typo.
+  2. **Compact slash form:** `jin/kor ghoul wizard` splits to `jin` and `kor ghoul wizard`, unlike spaced full-name multi-PH rows; whether that fails to match `a jin ghoul wizard` or over-matches other hall names was **not** executed against sample kill strings this pass — label unchecked. Sister compact forms exist (`dar/zol knight`).
+- **Needed from reporter (blocking for a confident code path):** one literal combat-log kill line that wrongly starts the arch magi chip (exact `You have slain …` / equivalent), plus the chip label he sees if easy.
+- **Class:** V0–V1 (catalog PH string and/or named-vs-PH match for this one entry). Do not write FABLE.md.
+- **Off-topic here:** none reported.
+- **Holds re-read (HELM.md this run):** Live Holds empty (`#208` Retired for final v1 cut). Talking to bjordan2010 is fine. Not #208.
+- **Scribe 2026-09-07 ~1:25 PM CT (cron intake):** New intake. Do not implement. Do not write FABLE.md. Do not open the work. Do not fold into #109.
+
 
 ### mobile pairing link uses ethernet IP, not Wi-Fi
 - **Priority:** **FIXED-shipped 2026-09-04** in `v1.99.18` (PR #286 `3b6fff2f`; tag `dbcfb3a1`). Wi-Fi tiebreak + pairing address picker. Item was taken/deleted at build; re-noted here for the shipped-status loop only.
