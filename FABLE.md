@@ -237,6 +237,139 @@ next loop, not a reopening of the plan.
 
 ---
 
+## GearCard e2e tick-freeze / app-stopped-ticking — RELEASE-GATE investigation (Fable, 2026-09-06 ~8:55 PM CT, on `a93e09e7`)
+
+**This gate outranks OE-4** (Helm sign, ~8:45 PM CT). OE merges (#352 / #353 / #351, then
+OE-4) are PARKED while `TheGearCardDrawsItsGroupsAndPivotsBetweenSlotAndZone` fails on the
+tip. Blind re-runs are exhausted (4× across main + branch) and STOPPED by Helm — this is not
+a flake to outlast, it is the thing in front of every merge.
+
+- **Priority:** `ready` — with one ordering rule that is Helm's, not mine: PR-1 (instrument)
+  may be executed on this word after Helm's last-look of THIS plan; Phase 3 (the fix) waits
+  for the Phase-2 diagnosis to come back through Fable + Helm. Nobody invents a freeze fix
+  from this item alone.
+- **Class:** V2 — ambiguous root cause. Two hypothesis families fit every observation
+  (below), they live in different layers (WPF dispatcher vs. the dump seam), and the wrong
+  guess ships a sleep-shaped bandaid on the one suite that gates every merge. Trap 56 spent
+  four rounds on exactly this ambiguity; the lesson it bought — *ship the instrument before
+  the third theory* — is the plan.
+- **Source:** Helm sign `HELM.md` / `HELM-FEEDBACK.md` 2026-09-06 ~8:45 PM CT; PR #352
+  comment (~8:43 PM CT). CI: run `34071753526` (main `68d7d072`, #350 merge — **no OE-3
+  code**, so not OE-3-reachable) and `34072733350` + re-run (#352 tip `4c86ae27`); empty
+  re-trigger `4594877a` the same. 274/1 and 275/1 — always this one test.
+
+### Evidence (checked, this seat — from `gh run view 34071753526 --log-failed`, verbatim)
+
+- Failing wait: `lootSummaryLen` to reach 29; last seen **18** — aborted by the harness
+  liveness check: *"the app STOPPED TICKING: debug.txt tick has read 5 for 30s (process
+  alive, Responding=True)"*. Stuck tick was 4/5/6 across the four failures.
+- The frozen dump is otherwise COMPLETE and CORRECT: `ingestDone=1 logPending=0
+  killsTotal=82 gearTotal=4 gearAcquired=1 gearRows=6 gearByZone=0 gearPivotShown=1
+  lootWindowOpen=1 shellPage=home surfacesBehind=0`. Every earlier wait in the test was
+  satisfied *by the frozen file*; only the one whose frozen value mismatched surfaced the
+  stall. The app died (or went dark) ~5s in, before the launcher summary updated.
+- **No `error.log (tail):` section in the artifact.** `AppHarness.Artifacts()` folds it in
+  whenever the file exists (`AppHarness.cs:564`), and `App.xaml.cs:133`'s
+  `DispatcherUnhandledException` handler logs everything it swallows — so **no
+  dispatcher-delivered exception fired**. That kills "RefreshUi throws and the app handler
+  eats it" outright.
+- **`WidgetDump.MaybeWrite` wraps the entire dump build — including `PaintOneMoment`'s
+  satellite paints — in a try with a bare `catch { }`** (`WidgetDump.cs:115` … `:486`). An
+  exception anywhere in there, every tick, is silent: the FILE freezes while `_uiTicks`
+  advances in memory and the app lives on. From outside, indistinguishable from a dead app.
+- `companionPumpTicks=24` beside `tick=5`. Both are DispatcherTimers (50 ms at `Send`
+  priority vs 1 s at default/`Background` — `MainWindow.xaml.cs:514/522`); a free dispatcher
+  would show ~20:1, this shows ~5:1. *Hypothesis-grade only* (startup replay is legitimately
+  heavy), but it says the UI thread was already saturated between timer services.
+- Timing: tick 4–6 is when `DebugHooks` opens the Gear & Loot window and the shell at
+  `ApplicationIdle` — both are OPEN in the frozen dump. And this is the only test in the
+  suite that seeds a `GearChecklist` carrying an `IsExaltation` row (`EndToEndTests.cs:57`);
+  four out of four failures landing on the same test says its fixture or its window set is
+  implicated, not the suite's dice.
+
+### Hypotheses (labeled as such — the instrument decides, not this list)
+
+- **F2 (slightly favored): a silent per-tick exception inside `MaybeWrite`'s try.**
+  `PaintOneMoment` paints the just-opened Gear & Loot satellite from inside the dump path;
+  a throw there (or in any fact-read) is eaten by `catch { }`, RefreshUi keeps running,
+  the file freezes at the tick the throw began — which matches the freeze landing exactly
+  when the satellites open, `Responding=True`, and the empty error.log. The bare catch on
+  the WPF layer's ONLY test seam is trap 34's shape: a diagnostic that cannot report its
+  own failure reads as a dead app.
+- **F1: dispatcher starvation/livelock above `Background` priority.** A layout/measure storm
+  (SizeToContent widget + shell + satellite on a 1024×768 runner — trap 12's geometry
+  coupling) services the message pump (`Responding=True`) while the 1 s Background-priority
+  timer never runs again. The pump/tick ratio leans this way; the empty error.log does not
+  contradict it.
+- **F3 (named to be dismissed by the same instrument): persistent share-violation on the
+  `debug.txt` write** — same silent catch, same frozen-file signature. Unlikely to persist
+  30 s, but the PR-1 catch-logging discriminates it for free.
+
+### Plan
+
+**PR-1 — INSTRUMENT (V1-sized, its own worktree and PR; never on #351/#352/#353):**
+
+1. **The dump's catch stops being silent.** On throw: `App.LogError(ex)`, plus a
+   best-effort minimal fallback write of `tick=<_uiTicks> dumpError=<ex.GetType().Name>`
+   so the artifact of the NEXT red names F2 in one line (an advancing tick beside a
+   `dumpError` is F2/F3 proven; a frozen tick with no `dumpError` is F1). The fallback
+   write is inside its own try — a logger that can throw is the bug it reports.
+2. **The harness captures the frozen process before giving up.** In
+   `WhyTheAppCannotAnswer` (`AppHarness.cs:245`), when STOPPED TICKING is about to be
+   declared: write a minidump of the pid (`MiniDumpWriteDump` P/Invoke, or `dotnet-dump
+   collect` if present on the runner) into the test results directory, and have the
+   e2e-windows workflow upload it as an artifact on failure. One stack capture answers
+   F1's sub-causes definitively — it is trap 33/49's "ship the instrument before the
+   third theory" made literal.
+3. **No heartbeat thread.** A second writer to one file from another thread is trap 4/13's
+   shape; instruments 1+2 discriminate all three families without it. Revisit only if a
+   red arrives that 1+2 cannot read.
+
+   *Verification:* PR-1 merges under the standing gate — its own tip's `build-and-test` +
+   `e2e-windows` green, **no waiver**. A green tip does NOT clear the release gate (the
+   freeze is intermittent); it just arms the next red. "Guards run eight times" does not
+   apply — PR-1 claims no fix.
+
+**Phase 2 — DIAGNOSE.** Local repro loop on a Windows seat (the single test ×20; it takes
+the trap-61 screen lock like any other E2E run). If local repro: attach and read stacks
+directly. If not: wait for the next CI red, which now carries the error.log line, the
+`dumpError` fallback, and the minidump. Name the frozen frame. Diagnosis goes to
+`FABLE-FEEDBACK.md` + a Helm wake — **not** straight into a fix.
+
+**Phase 3 — FIX (Opus, only after Fable reviews the diagnosis and Helm last-looks).**
+Root cause only: if it is a sum, it goes to `UI.Shared` with unit tests; if it is a WPF
+layout loop, it is fixed in the window that loops. No sleeps, no retry-wrappers, no
+loosening `StallTimeout`, no weakening or deleting the test — the liveness abort is the
+thing that caught this and it stays exactly as suspicious as it is. Any new guard runs
+eight times.
+
+**Gate exit:** mechanism named with stack/log evidence + fix landed + `e2e-windows` green
+on main and on the rebased OE tips → Helm un-parks the OE merges. Rebasing #353/#351 is
+Helm's "after gate clears or on Fable direction"; this plan does not direct it yet.
+
+### Item-shape lines
+
+- **Bevel pre-design:** no, because PR-1 changes nothing a player can see; a Phase-3 fix
+  that touches a player surface re-asks this question then.
+- **Shot offline:** n/a — no staged screenshot.
+- **Column budgets:** n/a — the new strings go to `error.log`/`debug.txt`, not a surface.
+- **What clamps it:** n/a — no persisted setting is a plan input.
+- **Must-list rows on this surface:** none touched; the test's `gearCopyCmd`/`gearImport`
+  assertions stay byte-identical.
+- **Already shipped / must not fight:** the trap-56 machinery (`PaintOneMoment`,
+  `surfacesBehind`, `tick`, the liveness abort) — PR-1 extends it, never bypasses it; the
+  trap-61 screen lock (the repro loop takes it); `Artifacts()` already folds error.log —
+  instrument 1 rides that existing channel rather than adding one.
+- **Checked:** HELM.md sign + HELM-FEEDBACK ~8:45 entry; run `34071753526` `--log-failed`
+  (frozen dump quoted above); `EndToEndTests.cs:39–104`; `AppHarness.cs:245–275, 564–577`;
+  `WidgetDump.cs:82–130, 486`; `App.xaml.cs:129–143`; `MainWindow.xaml.cs:514–526,
+  550–552, 587–593, 2377–2379, 2675`. Everything not in that list is a hypothesis and is
+  labeled one.
+- **Decided without asking:** filed `ready`, not `needs-david` (Helm's sign says so; the
+  release go is untouched). Instrument ships as its own PR rather than riding an OE PR
+  (Helm rule 3). No heartbeat thread in PR-1 (second writer to one file). These go to
+  `DECISIONS.md` when taken.
+
 ## Owner Evolved seats — OE-1…OE-4 (Fable, 2026-09-06 ~11:30 PM CT, on `e2cf4a07`) — OWNER-OVERRIDE kick order
 
 **This list SUPERSEDES the #347 sign's "Seat order (Fable after merge)"**
