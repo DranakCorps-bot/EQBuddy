@@ -1,5 +1,14 @@
 ﻿# Helm inbox
 
+### GearCard e2e tick-freeze — release-gate posture (SIGNED; Fable next)
+- **Kind:** sign-off / posture / gate
+- **Thread / subject:** PR #352 comment (Dranak/Claude ~8:43 PM CT) + webhook — `e2e-windows` red on `main` `68d7d072` (#350 merge) and on #352 tips; same `TheGearCardDrawsItsGroupsAndPivotsBetweenSlotAndZone` / **STOPPED TICKING** (tick stuck 4/5/6 for 30s; process alive, Responding=True). Runs: `34071753526` (main), `34072733350` (+ re-run), empty re-trigger `4594877a`. Not OE-3 reachable (`EQBUDDY_GEARLOOT=gear`, never minimises; HudBar path dead).
+- **Ruling:** **ACK evidence. Product signs for #352/#353/#351 STAND.** Tip-drop ACK for #352 (head `0b6f9d3a`). **STOP blind re-run loops** on OE tips for this failure (4× across main+branch; soft flake framing exhausted). **Do NOT expand** #352/#353/#351 with a GearCard freeze fix. **Do NOT waive** the merge gate — OE merges still need that PR tip's own `build-and-test` + `e2e-windows` green. Park OE merges while this test fails on the tip. **AUTHORIZE Fable stub** on `FABLE.md` for GearCard tick-freeze / app-stopped-ticking as release-gate investigation (ambiguous root cause; V2-shaped). Include run IDs + trap-56 stillness lesson. Fable plans; Opus does not invent a fix until Fable + Helm last-look.
+- **Soft:** #353/#351 currently CONFLICTING — rebase only after gate clears or on Fable direction; Soft max ≤3 (this Fable seat outranks OE-4 kick). #332 batch still soft-owed.
+- **Scope hygiene:** No OptionsWindow retirement / TEL / Version / `v1.99.19` / Play Console / tag / publish / signing / prod secrets. Not a Holds line. **Not needs-david** (Fable first). Live Holds empty. Play Console OFF. Claude kick via Dranak (`--model claude-fable-5`): file Fable stub + plan from the PR #352 evidence; wake Helm when LIVE ASK tip ready. Do not kick Opus GearCard fix yet.
+- **Condition:** n/a (process, not a hold)
+- **Signed:** Helm, 2026-09-06 ~8:45 PM CT
+
 ### PR #353 — OE-2 Open EQBuddy door / shell recover (SIGNED)
 - **Kind:** sign-off / posture / gate
 - **Thread / subject:** PR #353 https://github.com/DranakCorps-bot/EQBuddy/pull/353 (`claude/oe2-open-eqbuddy-20260906` → `main`; product `ff1d1ab6`; tip `7b785763`) — Fable OE-2 / Bevel item 3 / #347 item 3; widget `Open EQBuddy…` recovers shell after ✕.
