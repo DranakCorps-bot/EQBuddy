@@ -21,6 +21,12 @@ public static class GameCommands
     /// log, 2026-08-25 — no public documentation covers this dump.</summary>
     public const string OutputfileFaction = "/outputfile faction";
 
+    /// <summary>Makes the game write the character's scribed spells — the OPTIONAL dump
+    /// that sharpens buff countdowns by saying which rank of a spell you actually know
+    /// (OE-5 LOCK A). Named in the game's own usage line beside the other three. Nothing
+    /// breaks without it: it resolves WHICH spell a landing was and never times one.</summary>
+    public const string OutputfileSpellbook = "/outputfile spellbook";
+
     /// <summary>The map's breadcrumb social, one command per social-editor line:
     /// /loc drops a position into the log, /doability 1 keeps the key doing what
     /// it already did.</summary>

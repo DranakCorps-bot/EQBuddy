@@ -46,9 +46,14 @@ public class OutputfileAutoImportTests
     //   Outputfile Complete: Hateborne_neriak-ENC-Factions.txt
     [InlineData("Hateborne_neriak-ENC-Factions.txt", OutputfileKind.Factions)]
     [InlineData("Dranak_freeport-Factions.txt", OutputfileKind.Factions)]
+    // The spellbook dump gained a reader on 2026-09-07 (OE-5 LOCK A) and this row moved
+    // off Unknown with it. Suffix again, and for the faction dump's exact reason: a
+    // spellbook is class-specific, so the class code may well be spliced in here too.
+    [InlineData("Dranak_freeport-Spellbook.txt", OutputfileKind.Spellbook)]
+    [InlineData("Hateborne_neriak-ENC-Spellbook.txt", OutputfileKind.Spellbook)]
     // A dump EQBuddy has no reader for is named as such, not silently treated as one of
     // the ones it does read — guessing here would apply the wrong importer to a real file.
-    [InlineData("Dranak_freeport-Spellbook.txt", OutputfileKind.Unknown)]
+    [InlineData("Dranak_freeport-Recipes.txt", OutputfileKind.Unknown)]
     [InlineData("", OutputfileKind.Unknown)]
     public void TheFilenameDecidesWhichImporterRuns(string file, OutputfileKind expected) =>
         Assert.Equal(expected, OutputfileAutoImport.KindOf(file));

@@ -116,6 +116,12 @@ public class GameCommandsTests
             "the Achievements readiness row asks for what Sky turn-ins and raid clears read"),
         ("EQBuddy/ReadinessRows.cs", nameof(GameCommands.OutputfileFaction),
             "the Factions readiness row asks for standings the log can never see"),
+        // Four rows now, since OE-5 added the optional spellbook dump. Its row is the one
+        // most in need of a ⧉: the other three name a command a player may have met on
+        // another surface, and this one appears nowhere else in the app at all — an ask
+        // with no way to answer it would be the whole of what a player could do about it.
+        ("EQBuddy/HomeRoom.cs", nameof(GameCommands.OutputfileSpellbook),
+            "the Spellbook readiness row asks for the optional dump that sharpens buff countdowns"),
         ("EQBuddy/RaidsCardView.cs", nameof(GameCommands.OutputfileAchievements),
             "clears from before EQBuddy come from the achievements dump — the worked example"),
         ("EQBuddy/QuestChecklistView.cs", nameof(GameCommands.OutputfileAchievements),

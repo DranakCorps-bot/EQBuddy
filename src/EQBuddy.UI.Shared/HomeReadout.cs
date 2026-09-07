@@ -34,7 +34,10 @@ public enum ReadinessState
 /// filename, which is EQBuddy's problem and not theirs.</param>
 /// <param name="Address">The <c>page:room</c> the dump's surface lives at, so the row can
 /// be a deep link through the SAME <c>Navigate</c> the rail uses. Empty when the room has
-/// not landed yet — see <see cref="HomeReadout.Links"/>.</param>
+/// not landed yet — see <see cref="HomeReadout.Links"/> — and equally empty when the dump's
+/// surface is not a ROOM at all, which is the spellbook's case: buff countdowns are drawn
+/// on the widget's HUD, and pointing "Open" at some room that does not show them would be
+/// the dead affordance <c>ShellPages.Landed</c> exists one level up to refuse.</param>
 public sealed record ReadinessRow(
     OutputfileKind Kind, string Name, string Feeds, ReadinessState State,
     DateTime? ScannedAt, string Address);
@@ -105,14 +108,24 @@ public static class HomeReadout
     // ---- readiness --------------------------------------------------------------
 
     /// <summary>
-    /// The three dumps Home reports on, in the order they matter to a player who is about
-    /// to play: bags first (it is the one that changes every session), then the two that
-    /// answer "what have I already finished".
+    /// The dumps Home reports on, in the order they matter to a player who is about to
+    /// play: bags first (it is the one that changes every session), then the two that
+    /// answer "what have I already finished", then the optional one.
     ///
     /// **The list is here and not in the room** so a fourth dump joins it in one place —
     /// and so the addresses can be filtered against <see cref="ShellPages.Landed"/> rather
     /// than hand-checked, which is the rail's own refusal to draw a dead affordance applied
-    /// inside a room's body.
+    /// inside a room's body. The fourth one arrived on 2026-09-07 (OE-5) and the promise
+    /// held: one row here, and both hosts of this list — Home and the first-run Setup that
+    /// OE-6 builds on top of it — got it without either of them being edited.
+    ///
+    /// **The spellbook row is LAST and it is worded as optional**, which is a decision and
+    /// not a default. The other three are things EQBuddy cannot work out any other way: a
+    /// hand-in never appears in the log, a standing never appears in the log, and bags are
+    /// invisible until you dump them. The spellbook only SHARPENS something that already
+    /// works — buff countdowns run off landing and fade lines whether you ever run it or
+    /// not — so a row that asked for it in the same voice as the other three would be
+    /// telling a player something is missing when nothing is.
     /// </summary>
     public static IReadOnlyList<ReadinessRow> Readiness(
         (string Server, string Character) identity,
@@ -130,14 +143,18 @@ public static class HomeReadout
             Row(OutputfileKind.Factions, "Factions",
                 "where you stand — the log only ever sees faction changes, never a standing",
                 ShellPage.Quests, "unlocks"),
+            Row(OutputfileKind.Spellbook, "Spellbook",
+                "optional — sharpens buff countdowns by telling EQBuddy which rank of a "
+                + "spell you know. Countdowns work without it",
+                null, ""),
         ];
 
-        ReadinessRow Row(OutputfileKind kind, string name, string feeds, ShellPage page, string room)
+        ReadinessRow Row(OutputfileKind kind, string name, string feeds, ShellPage? page, string room)
         {
             var at = writtenAt(kind);
             return new ReadinessRow(kind, name, feeds,
                 at is null ? ReadinessState.NeverScanned : ReadinessState.Scanned, at,
-                ShellPages.Landed.Contains(page) ? ShellPages.Address(page, room) : "");
+                page is { } p && ShellPages.Landed.Contains(p) ? ShellPages.Address(p, room) : "");
         }
     }
 

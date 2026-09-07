@@ -68,6 +68,32 @@ public sealed record BuffState(
 {
     public double? RemainingSeconds(DateTime now) =>
         ExpiresAt is { } e ? Math.Max(0, (e - now).TotalSeconds) : null;
+
+    /// <summary>
+    /// The landing's FULL candidate set, kept only when a `/outputfile spellbook` dump
+    /// narrowed <see cref="Candidates"/> — empty otherwise, which is every buff the log
+    /// alone accounted for.
+    ///
+    /// **One property rather than three, on purpose.** It answers "did the dump decide
+    /// this" (<see cref="DumpNarrowed"/>) and "what may a fade line call it"
+    /// (<see cref="FadeNames"/>) from a single stored fact; two fields agreeing about one
+    /// event is trap 4, and these two questions are only ever asked together.
+    /// </summary>
+    public string[] NarrowedFrom { get; init; } = [];
+
+    /// <summary>A spellbook dump — not the log — decided which candidates stand. Blocks
+    /// fade-teaching: <see cref="BuffTracker"/> learns a real duration only from a landing
+    /// the LOG resolved, and a dump-narrowed set of one is not that. Without this gate the
+    /// spellbook would become a timer source through the back door, which is exactly the
+    /// thing the owner lock rules out.</summary>
+    public bool DumpNarrowed => NarrowedFrom.Length > 0;
+
+    /// <summary>Every name a fade line may use for this buff. **The dump must never cost
+    /// us a fade**: narrowing to "Rune V" and then meeting a "Rune IV" fade line would
+    /// leave the chip hanging until its linger expired, which is a stale spellbook
+    /// erasing something the log plainly said. Fades match the wider set; only the
+    /// countdown and the tooltip use the narrower one.</summary>
+    public string[] FadeNames => DumpNarrowed ? NarrowedFrom : Candidates;
 }
 
 /// <summary>
@@ -116,6 +142,48 @@ public sealed class BuffTracker
     public BuffTracker(BuffDurationCatalog? catalog = null) =>
         _catalog = catalog ?? BuffDurationCatalog.Default;
 
+    // ---- the optional spellbook (OE-5 LOCK A) -----------------------------------
+
+    private SpellbookFile.Snapshot? _spellbook;
+    private string? _spellbookFolder;
+    private string _spellbookCharacter = "";
+
+    /// <summary>
+    /// Point the tracker at this character's `/outputfile spellbook` dump, if there is
+    /// one. Optional in every sense: a character who has never run the command, a folder
+    /// that does not exist and an unreadable file all leave the tracker doing exactly what
+    /// it did before this existed.
+    ///
+    /// <see cref="LogWatcher.Select"/> calls it, because Select is the one place that
+    /// knows both the log folder and the character — the same moment it resets the
+    /// session for the newly selected log. The folder and character are remembered so a
+    /// `/outputfile spellbook` run mid-session can re-read on its own announcement.
+    /// </summary>
+    public void AttachSpellbook(string? logFolder, string character)
+    {
+        _spellbookFolder = logFolder;
+        _spellbookCharacter = character ?? "";
+        ReloadSpellbook();
+    }
+
+    /// <summary>What the attached dump said, or null when there is none. For tests and for
+    /// anything that wants to report the dump's age; nothing in the tracker's own path
+    /// needs it.</summary>
+    public SpellbookFile.Snapshot? Spellbook
+    {
+        get { lock (_lock) return _spellbook; }
+    }
+
+    /// <summary>Read the dump for the attached character. File I/O deliberately OUTSIDE
+    /// the lock — the ingest thread calls this from <see cref="Apply"/> when a dump is
+    /// announced, and a slow disk must not stall a landing.</summary>
+    private void ReloadSpellbook()
+    {
+        if (_spellbookCharacter.Length == 0) { lock (_lock) _spellbook = null; return; }
+        var book = SpellbookFile.FindLatest(_spellbookFolder, _spellbookCharacter);
+        lock (_lock) _spellbook = book;
+    }
+
     /// <summary>Learned durations persist per character (mez-store pattern).</summary>
     public void AttachStore(string path)
     {
@@ -134,6 +202,14 @@ public sealed class BuffTracker
 
     public void Apply(GameEvent evt)
     {
+        // The dump's own announcement, read here on the ingest thread the same way the
+        // quest reconcile reads the inventory one (#241): running /outputfile spellbook
+        // mid-session sharpens the NEXT landing rather than the next launch. Outside the
+        // lock, because it is file I/O and it opens no buff state.
+        if (evt is OutputfileEvent dump
+            && OutputfileAutoImport.KindOf(dump.FileName) == OutputfileKind.Spellbook)
+            ReloadSpellbook();
+
         var changed = false;
         lock (_lock)
         {
@@ -211,9 +287,23 @@ public sealed class BuffTracker
         var label = resolved ? SpellCatalog.BaseName(cast.Spell) : entry.Label;
         var candidates = resolved ? new[] { label } : entry.Spells.Select(s => s.Name).ToArray();
 
+        // THE DUMP ONLY EVER SPEAKS WHERE THE LOG DID NOT. A cast line names the spell and
+        // its caster outright, so a resolved landing is untouched here — including one the
+        // spellbook does not list, which is a stale dump and not a wrong log.
+        var narrowedFrom = Array.Empty<string>();
+        if (!resolved && NarrowBySpellbook(candidates) is { } narrowed)
+        {
+            narrowedFrom = candidates;
+            candidates = narrowed;
+        }
+
         var baseSeconds = resolved
             ? entry.Spells.First(s => s.Name.Equals(label, StringComparison.OrdinalIgnoreCase)).DurationSeconds
-            : entry.Spells.Max(s => s.DurationSeconds);
+            // The longest of what is STILL standing. Narrowing "Rune IV or Rune V" down to
+            // the rank this character has scribed is the whole accuracy win: the estimate
+            // stops being the longest rank in the game and becomes the longest rank you own.
+            : entry.Spells.Where(s => candidates.Contains(s.Name, StringComparer.OrdinalIgnoreCase))
+                .Max(s => s.DurationSeconds);
         // Your own cast gets your Spell Casting Reinforcement applied to the estimate;
         // someone else's caster AAs are invisible to your log, so their base stands.
         if (resolved && cast.Caster == "You"
@@ -223,16 +313,56 @@ public sealed class BuffTracker
         var estimated = !resolved || learned is null;
 
         _active[label] = new BuffState(label, candidates, resolved ? cast.Caster : "",
-            time, time.AddSeconds(learned ?? baseSeconds), estimated);
+            time, time.AddSeconds(learned ?? baseSeconds), estimated)
+        {
+            NarrowedFrom = narrowedFrom,
+        };
         _seenLandings.Add(SpellCatalog.BaseName(label));
-        foreach (var c in candidates) _seenLandings.Add(SpellCatalog.BaseName(c));
+        // The sights are the LOG's claim about what this session showed (#120's honesty
+        // states), so they mark the whole landing — a dump that narrowed the countdown has
+        // not made the other candidates un-seen.
+        foreach (var c in narrowedFrom.Length > 0 ? narrowedFrom : candidates)
+            _seenLandings.Add(SpellCatalog.BaseName(c));
         return true;
+    }
+
+    /// <summary>
+    /// The candidates this character has actually scribed, or null when the dump narrows
+    /// nothing — no spellbook attached, or one that recognises none of them.
+    ///
+    /// **A dump that knows none of the candidates narrows NOTHING, and that is the load
+    /// bearing line.** A spellbook written before the character learned the spell, a
+    /// clicky item, a rank spelled some way this dump does not use — every one of those is
+    /// a reason the log is right and the dump is behind, and none of them is a reason to
+    /// shrink a landing the log observed. Returning the whole set unchanged is what "the
+    /// log outranks the dump" means in code.
+    ///
+    /// Two tiers, in this order. **Exact** first, because that is the match that buys a
+    /// per-rank duration — `BuffDurations.json` carries "Rune IV" at 5,400s beside "Rune V"
+    /// at 6,600s. **Line** (rank-folded) second, so a dump that writes its ranks in a shape
+    /// we have not seen still separates two DIFFERENT spells sharing one landing message
+    /// (Boon of the Clear Mind vs Clarity) instead of giving up.
+    /// </summary>
+    private string[]? NarrowBySpellbook(string[] candidates)
+    {
+        if (candidates.Length < 2) return null;
+        SpellbookFile.Snapshot? book;
+        lock (_lock) book = _spellbook;
+        if (book is null) return null;
+
+        var exact = candidates.Where(book.Knows).ToArray();
+        if (exact.Length > 0) return exact.Length < candidates.Length ? exact : null;
+        var line = candidates.Where(book.KnowsLine).ToArray();
+        return line.Length > 0 && line.Length < candidates.Length ? line : null;
     }
 
     private bool OnFade(string[] spells, DateTime time)
     {
+        // FadeNames, not Candidates: where a spellbook narrowed the set, the fade line may
+        // still name a candidate the dump ruled out, and dropping the match would leave a
+        // chip hanging that the log had plainly ended. The dump never costs us a fade.
         var doomed = _active.Values.Where(b =>
-            b.Candidates.Intersect(spells, StringComparer.OrdinalIgnoreCase).Any()).ToList();
+            b.FadeNames.Intersect(spells, StringComparer.OrdinalIgnoreCase).Any()).ToList();
         foreach (var b in doomed)
         {
             _active.Remove(b.Label);
@@ -240,7 +370,13 @@ public sealed class BuffTracker
             // landing measures anything; a re-cast since landing means this fade may
             // span a chain; and ranks only LENGTHEN, so an observation short of the
             // current belief is a dispel or a click-off, not a duration.
-            if (b.Candidates.Length != 1) continue;
+            //
+            // `DumpNarrowed` is the second half of that first clause, and it is the gate
+            // that keeps the spellbook out of the timer. A set of one used to mean "the
+            // LOG named this spell"; a dump can now produce one too, and teaching a real
+            // per-character duration off a dump-guessed identity is precisely the
+            // back-door the owner lock forbids. Learned durations stay log-taught.
+            if (b.Candidates.Length != 1 || b.DumpNarrowed) continue;
             var spell = b.Candidates[0];
             if (_lastCastOf.TryGetValue(spell, out var lastCast) && lastCast > b.LandedAt.AddSeconds(1))
                 continue;

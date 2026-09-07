@@ -689,14 +689,16 @@ public class ShellHostTests
         app.Launch();
 
         app.WaitForDump("shellPage", "home", "the shell to land on the Home room");
-        // Three dumps reported on: bags, achievements, factions.
-        Assert.Equal(3, app.DumpValue("shellHomeReadiness"));
-        // Bags landed; the other two never have. **The equality is the assertion** — a room
+        // Four dumps reported on: bags, achievements, factions, and the optional spellbook
+        // OE-5 added — one row, in `HomeReadout.Readiness`, which is what this count is
+        // really asserting: the ONE place both hosts of that list read.
+        Assert.Equal(4, app.DumpValue("shellHomeReadiness"));
+        // Bags landed; the other three never have. **The equality is the assertion** — a room
         // that had silently lost the affordance entirely would report 0 waiting and 0
         // buttons and pass a "some are missing" check.
-        Assert.True(app.DumpValue("shellHomeReadinessWaiting") == 2,
+        Assert.True(app.DumpValue("shellHomeReadinessWaiting") == 3,
             $"the staged inventory dump was not seen; dump was: {app.Artifacts()}");
-        Assert.Equal(2, app.DumpValue("shellHomeCopyCmd"));
+        Assert.Equal(3, app.DumpValue("shellHomeCopyCmd"));
     }
 
     /// <summary>

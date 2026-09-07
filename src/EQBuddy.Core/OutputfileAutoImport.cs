@@ -15,6 +15,23 @@ public enum OutputfileKind
     /// the Unlocks tab's race progress reads; the log can only see faction CHANGES, never
     /// a standing.</summary>
     Factions,
+
+    /// <summary>
+    /// `/outputfile spellbook` — the character's scribed spells, and the one kind here
+    /// whose reader is NOT the widget's import handler.
+    ///
+    /// It is read by <see cref="BuffTracker"/> through <see cref="LogWatcher"/>, which is
+    /// the only place that knows both the log folder and the character at the moment a
+    /// character is selected; the widget's <c>OnOutputfileWritten</c> switch has nothing to
+    /// do for it and correctly falls to its default. That is not the "silent no-op" this
+    /// codebase refuses — the dump IS read, on the ingest side, and the announcement
+    /// reaches the tracker as an ordinary <see cref="OutputfileEvent"/>.
+    ///
+    /// **Never a timer source** (owner lock, OE-5 LOCK A): it resolves WHICH spell a
+    /// landing was and never starts, ends or times a countdown. See
+    /// <see cref="SpellbookFile"/>.
+    /// </summary>
+    Spellbook,
 }
 
 /// <summary>
@@ -61,6 +78,10 @@ public static class OutputfileAutoImport
         // refuse a legitimate dump forever, which is trap 48's lesson wearing a different
         // filename.
         if (FactionsFile.IsFactionDump(name)) return OutputfileKind.Factions;
+        // Suffix again, and for the faction dump's exact reason: a spellbook is
+        // class-specific, so the class code may well be spliced into the middle of this
+        // one too. Matching the tail costs nothing if it is not.
+        if (name.EndsWith("-Spellbook", StringComparison.OrdinalIgnoreCase)) return OutputfileKind.Spellbook;
         return OutputfileKind.Unknown;
     }
 
@@ -94,6 +115,7 @@ public static class OutputfileAutoImport
             OutputfileKind.Inventory => $"{character}_*-Inventory.txt",
             OutputfileKind.Achievements => $"{character}_*-Achievements.txt",
             OutputfileKind.Factions => $"{character}_*-Factions.txt",
+            OutputfileKind.Spellbook => $"{character}_*-Spellbook.txt",
             _ => null,
         };
     }
