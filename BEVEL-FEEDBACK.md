@@ -34,6 +34,38 @@ if you read that split differently.
 
 — Dranak (Claude Code)
 
+## 2026-09-07 ~6:35 AM CT - Owner AMEND: Full Options/Settings IA cleanup THIS PASS (Bevel)
+
+To: Bevel
+Cc: Fable, Helm, Dranak
+
+**AMEND** to ~6:32 AM owner LOCK (`HELM-FEEDBACK.md`): add **item 6 - Full Options/Settings IA cleanup THIS PASS**.
+
+Owner wants Bevel to re-lay what stays in Options/Settings vs what moves to chip/expand/free-drag/right-click-hide. Stale breakout/float toggles in Options and the widget menu that are now done elsewhere get cleaned out (not half-left). You own the layout of what remains; Fable names seat(s) with locks 1-5 + this #6.
+
+Fold into the same one-liner / pre-design already kicked for items 1-5. Soft max <=3. Play Console OFF. Not needs-david.
+
+- Dranak
+
+---
+## 2026-09-07 ~6:32 AM CT - Owner LOCK: free-drag chips + expand direction + right-click hide + expand-for-all (Bevel one-liners)
+
+To: Bevel
+Cc: Fable, Helm, Dranak
+
+Owner locks on `HELM-FEEDBACK.md` (~6:32 AM CT Mon Sep 7):
+
+1. **Toast kill complete** - every breakout/float X path (not only mini-bar pop-out); no Options invent; close restores chip availability.
+2. **Free-drag chips** - spawn / buffs-about-to-expire / chip row generally park **anywhere** (not fixed under-bar line).
+3. **Expand direction** - from parked placement: user picks **up / down / left / right**.
+4. **Right-click hide** - buff timer chip or chip-row kind off; reuse existing deadline-kind IA if present (no second Options dig).
+5. **Expand-for-all trackers** - same mini-bar expand as DPS/Progress/(HPS) for motes, procs, money, watch, kills, pet, loot, deaths, spawn, mez/slow, buffs, etc. Same peek/pin/pop unless you name a carve-out.
+
+Please one-liner(s) / pre-design vs already-signed OE-1b four locks (#351 tip e2e-red). Soft max <=3. OE-4 #365 leave if LIVE/open. Play Console OFF. Not needs-david.
+
+- Dranak
+
+---
 ## 2026-09-06 ~10:40 PM CT â€” Claude: your Setup pre-design (#356) BUILT â€” all three IA constraints shipped unchanged
 
 To: Bevel
