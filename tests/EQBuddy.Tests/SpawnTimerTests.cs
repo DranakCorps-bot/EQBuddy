@@ -188,8 +188,103 @@ public class SpawnTimerTests
     [InlineData("CWG Model EXG", "CWG Model XB", false)]
     [InlineData("CWG Model EXG", "CWG Model XA", false)]
     [InlineData("CWG Model EXG", "CWG Model XC", false)]
+    // Guk's froglok TRIBES are three-letter first words — jin, kor, dar, zol, bok — so
+    // two different hall mobs sit two edits apart inside a sixteen-character name, well
+    // inside the budget a long name earns. That is #394 (bjordan2010): "a dar ghoul
+    // wizard" read as a typo'd "kor ghoul wizard" and lit the arch magi chip. A word
+    // that differs outright is a different mob at the FRONT of a name exactly as it is
+    // at the end — the two rules are the same rule.
+    [InlineData("kor ghoul wizard", "a dar ghoul wizard", false)]
+    [InlineData("kor ghoul wizard", "a zol ghoul wizard", false)]
+    [InlineData("kor ghoul wizard", "a bok ghoul wizard", false)]
+    [InlineData("a froglok shin knight", "a froglok dar knight", false)]
+    // …and the forgiveness that survives is truncation, at the front as at the end
+    // (the Gynok Molto row above): one word apart is only fatal when neither word
+    // starts the other.
+    [InlineData("Sir Lucan D`Lere", "Si Lucan D`Lere", true)]
+    [InlineData("kor ghoul wizard", "a kor ghoul wizard", true)]
     public void FuzzyMatchingToleratesTyposWithoutInventingThem(string a, string b, bool expected) =>
         Assert.Equal(expected, SpawnCatalog.NameMatchesFuzzy(a, b));
+
+    // ---- #394: the Lower Guk hall wizard and the arch magus ----
+
+    private static SpawnTimers Shipped() =>
+        new(SpawnCatalog.LoadEmbedded(), new SpawnOverrides()) { Server = "freeport" };
+
+    private static bool IsArchMagi(SpawnTimerState t) =>
+        t.Name.Contains("arch magi", StringComparison.OrdinalIgnoreCase);
+
+    /// <summary>
+    /// #394 (bjordan2010): *"Any wizard kill in Lower Guk hall triggers an arch magi
+    /// respawn chip. It should only trigger if you kill the arch magus itself."*
+    ///
+    /// Two mechanisms put it there, and the owner's ruling (2026-09-07) settles both:
+    /// the hall wizard is not the door to that chip, at all. The catalog's
+    /// "jin/kor ghoul wizard" placeholder is gone, so no wizard's death runs the clock;
+    /// and the fuzzy matcher no longer reads a different TRIBE as a typo, which is what
+    /// let dar/zol/bok wizards in behind the one placeholder that was spelled out.
+    ///
+    /// Against the SHIPPED catalog on purpose: the hand-built fixture above pairs the
+    /// same two names, so a fixture-only assertion would prove nothing about what a
+    /// player's install actually does.
+    /// </summary>
+    [Theory]
+    [InlineData("a kor ghoul wizard")]
+    [InlineData("a jin ghoul wizard")]
+    [InlineData("a dar ghoul wizard")]
+    [InlineData("a zol ghoul wizard")]
+    [InlineData("a bok ghoul wizard")]
+    [InlineData("a tal ghoul wizard")]
+    public void NoLowerGukHallWizardLightsTheArchMagiChip(string killed)
+    {
+        var t = Shipped();
+        t.Apply(new ZoneEvent(T0, "The Ruins of Old Guk"));
+        t.Apply(new KillEvent(T0.AddMinutes(1), killed, "You"));
+
+        Assert.DoesNotContain(t.Snapshot(T0.AddMinutes(1)), IsArchMagi);
+    }
+
+    /// <summary>The other half, and the half a suppression alone would have left broken:
+    /// the arch magus's OWN death has to light it. The wiki titles the page "the ghoul
+    /// arch magi" while the map — and the kill line — say "arch magus", and the two do
+    /// not match each other: folding strips the trailing "s", leaving "arch magu"
+    /// against "arch magi". So before #394 the wrong mob started the clock and the right
+    /// one could not. The alias is what closes that.</summary>
+    [Theory]
+    [InlineData("the ghoul arch magus")]
+    [InlineData("a ghoul arch magus")]
+    [InlineData("the ghoul arch magi")]
+    public void TheArchMagusItselfStillLightsIt(string killed)
+    {
+        var t = Shipped();
+        t.Apply(new ZoneEvent(T0, "The Ruins of Old Guk"));
+        t.Apply(new KillEvent(T0.AddMinutes(1), killed, "You"));
+
+        var timer = Assert.Single(t.Snapshot(T0.AddMinutes(1)), IsArchMagi);
+        Assert.Equal("the ghoul arch magi", timer.Name);
+        Assert.Equal(T0.AddMinutes(1).AddSeconds(660), timer.DueAt);   // Lower Guk's zone clock
+    }
+
+    /// <summary>A placeholder field is a list of NAMES, '/'-separated — and the shorthand
+    /// "jin/kor ghoul wizard" is not that: it splits into "jin" and "kor ghoul wizard",
+    /// which is one placeholder nothing can ever match and one that matches half the
+    /// hall. #394 is what that costs, so no shipped entry may carry the shape again.</summary>
+    [Fact]
+    public void EveryShippedPlaceholderSegmentIsAWholeMobName()
+    {
+        var bad = new List<string>();
+        foreach (var zone in SpawnCatalog.LoadEmbedded().Zones)
+        foreach (var entry in zone.Named)
+        {
+            if (!entry.Placeholder.Contains('/')) continue;
+            var segments = entry.Placeholder.Split('/').Select(s => s.Trim()).ToList();
+            // A one-word segment beside a multi-word one is the prefix-alternation
+            // shorthand ("dar/zol knight"), not two mob names.
+            if (segments.Any(s => !s.Contains(' ')) && segments.Any(s => s.Contains(' ')))
+                bad.Add($"{zone.Zone} / {entry.Name}: \"{entry.Placeholder}\"");
+        }
+        Assert.Empty(bad);
+    }
 
     [Fact]
     public void ExactCatalogEntriesAlwaysBeatFuzzyOnes()

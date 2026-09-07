@@ -2008,9 +2008,9 @@
           "name": "Emhu Mucktail",
           "respawnSeconds": null,
           "variance": "",
-          "placeholder": "for Vexven/Grenix",
+          "placeholder": "",
           "source": "eqlwiki",
-          "note": "Also serves as a PH for Vexven/Grenix"
+          "note": "Also serves as a PH for Vexven/Grenix — which is the note, not a placeholder OF Emhu: the field held the prose 'for Vexven/Grenix', splitting into 'for Vexven' and 'Grenix' (#394). Cleared; the relationship runs the other way and belongs on those two entries if it is ever confirmed"
         },
         {
           "name": "Chief Sanre`Rexsa",
@@ -5334,11 +5334,12 @@
         },
         {
           "name": "the ghoul arch magi",
+          "aliases": ["the ghoul arch magus"],
           "respawnSeconds": null,
           "variance": "",
-          "placeholder": "jin/kor ghoul wizard",
+          "placeholder": "",
           "source": "eqlwiki",
-          "note": "25% spawn; PH jin/kor ghoul wizard; guarded by 2 dars; high MR; eqlwiki map spells 'arch magus'; rides zone clock (wiki retuned 28:00->11:00, 2026-08-02)"
+          "note": "25% spawn; guarded by 2 dars; high MR; wiki titles it 'arch magi' and its map spells 'arch magus' — the alias is what makes the kill line light its own chip, since folding leaves 'arch magu' against 'arch magi'. NO placeholder: the wiki's PHs (a jin / a kor ghoul wizard) are ordinary hall wizards, and only the arch magus itself may light this chip (owner ruling 2026-09-07, #394 bjordan2010). Rides zone clock (wiki retuned 28:00->11:00, 2026-08-02)"
         },
         {
           "name": "a ghoul assassin",
@@ -5472,9 +5473,9 @@
           "name": "a froglok crusader",
           "respawnSeconds": null,
           "variance": "",
-          "placeholder": "dar/zol knight",
+          "placeholder": "",
           "source": "eqlwiki",
-          "note": "Live Keep bottom floor; PH dar/zol knight; ~42 paladin; rides zone clock (wiki retuned 28:00->11:00, 2026-08-02)"
+          "note": "Live Keep bottom floor; ~42 paladin; wiki names its PHs as the dar and zol knights, whose real kill lines are 'a dar ghoul knight' / 'a zol ghoul knight' — the old 'dar/zol knight' shorthand split into 'dar' and 'zol knight' and matched neither, so clearing it costs no match (#394); spelling them out would newly bridge hall trash onto a named's chip, which is the thing #394 asked us to stop. Rides zone clock (wiki retuned 28:00->11:00, 2026-08-02)"
         },
         {
           "name": "a froglok herbalist",
