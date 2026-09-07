@@ -576,7 +576,7 @@ internal sealed class HudExpandWindow : Window
     private PeekBody? Peek(StatsSnapshot s, HudExpandTarget target) => target switch
     {
         HudExpandTarget.Watch => HudExpandPeek.Watch(_settings.TrackedRules, s.Tracked),
-        HudExpandTarget.Loot => HudExpandPeek.Loot(s.Loot, s.LootTotal),
+        HudExpandTarget.Loot => LootPeek(s),
         // ActiveCount first, so a run with no buffs never allocates a snapshot list — this
         // is on the widget's one-second tick, and BuffsCardView guards it the same way.
         HudExpandTarget.Buffs => HudExpandPeek.Buffs(
@@ -584,6 +584,17 @@ internal sealed class HudExpandWindow : Window
             DateTime.Now),
         _ => null,
     };
+
+    /// <summary>The Loot peek's target-drops read — the SAME <c>MainWindow</c> calls
+    /// <see cref="LootBreakoutView.Render"/> makes for that window's own Target scope, so the
+    /// chip and its pop-out describe your target's drops identically rather than one of them
+    /// re-deriving "what can this creature drop" a second time (trap 33).</summary>
+    private PeekBody LootPeek(StatsSnapshot s)
+    {
+        var (names, detail, rows) = _main.TargetDropsContent(s);
+        var emptyNote = names.Length > 0 ? _main.TargetEmptyNote(s) : "";
+        return HudExpandPeek.Loot(names, detail, rows, emptyNote);
+    }
 
     /// <summary>Draw a <see cref="PeekBody"/>. The subtext is set on EVERY tick and the rows
     /// only when the signature moves — the same split the meter path uses, and it is what

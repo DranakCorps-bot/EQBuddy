@@ -137,7 +137,7 @@ internal sealed class LootBreakoutView
             rows = targetRows.Select(t => new LootRow(t.Name, t.Value, null)).ToList();
             emptyText = hasTarget
                 ? _w.Main?.TargetEmptyNote(s) ?? "Nothing known for this creature yet."
-                : "Swing at something — or /consider it — and its\npossible drops appear here.";
+                : LootPresentation.NoTargetNote;
         }
         else
         {

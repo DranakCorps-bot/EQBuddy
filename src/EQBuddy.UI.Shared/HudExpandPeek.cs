@@ -32,10 +32,12 @@ public sealed record PeekBody(
 /// has no unit tests (docs/TestPlan.md §5), so a rule that only exists in a window is a rule
 /// nothing can check.
 ///
-/// <see cref="Watch"/> is therefore read by the FLOAT as well as by the panel, which is what
-/// makes it a shared decision rather than a second copy with a shorter list.
-/// <see cref="Loot"/> and <see cref="Buffs"/> are deliberately NOT what their floats draw,
-/// and that is named rather than implied — see each one.
+/// <see cref="Watch"/> is read by the FLOAT as well as by the panel, which is what makes it
+/// a shared decision rather than a second copy with a shorter list. <see cref="Loot"/> reads
+/// the same <c>MainWindow.TargetDropsContent</c>/<c>TargetEmptyNote</c> calls the float's own
+/// Target scope makes, for the same reason — a mini-bar chip and its pop-out must answer
+/// "what can this creature drop" identically. Only <see cref="Buffs"/> is deliberately NOT
+/// what its float draws, and that is named rather than implied — see it below.
 ///
 /// **Framework-free**, like everything else in this folder: rows are data, and the host
 /// turns them into controls.
@@ -87,25 +89,45 @@ public static class HudExpandPeek
     }
 
     /// <summary>
-    /// The Loot peek: what has dropped this session, most-picked-up first.
+    /// The Loot peek: what your CURRENT TARGET can drop — your observed counts leading,
+    /// the wiki's behind — never the session list.
     ///
-    /// **Not what the float draws, on purpose.** <c>LootBreakoutView</c> carries view and
-    /// sort strips, target drops and provenance notes; this is the unconfigured top slice
-    /// and nothing else, because a peek that had a second axis the player can see but not
-    /// change would be a state with no switch. The ⧉ is one click away and carries the
-    /// strips — which is lock 6's whole point, "the float carries the detail".
+    /// **This used to be session loot, and that was the wrong fact for a bar chip named
+    /// "Loot" to answer.** <c>LootBreakoutView</c>'s own pop-out already defaults to Target
+    /// scope (David's spec for that window from the start), so a peek that showed Session
+    /// while its float defaults to Target was the same chip naming two different questions
+    /// depending on which surface you opened — trap 33's shape one level up, and the reason
+    /// the three parameters below come from the SAME <c>MainWindow.TargetDropsContent</c>
+    /// call <c>LootBreakoutView.Render</c> makes for its own Target scope, rather than
+    /// re-deriving "what can this creature drop" a second time.
+    ///
+    /// The gauge is deliberately flat (every row shares 1.0): an observed count
+    /// ("4 this session · 30%") and a wiki rarity word ("common") are not one unit, and
+    /// drawing a proportional bar across them would assert a comparison that is not there —
+    /// the same reasoning <see cref="Buffs"/> uses to sort an unknown duration last rather
+    /// than guess it forward.
     /// </summary>
-    public static PeekBody Loot(IReadOnlyList<LootDetail> loot, int lootTotal)
+    /// <param name="names">Who you're fighting (or last considered), or "" for no target —
+    /// <c>MainWindow.TargetDropsContent</c>'s own shape.</param>
+    /// <param name="detail">The kill count / wiki-state suffix beside <paramref name="names"/>.</param>
+    /// <param name="rows">Observed counts first, then the wiki's known drops.</param>
+    /// <param name="emptyNote">What to say when there IS a target but nothing is known yet —
+    /// <c>MainWindow.TargetEmptyNote</c>'s own wording, so a wiki-offline or no-page state
+    /// reads the same here as it does on the float.</param>
+    public static PeekBody Loot(
+        string names, string detail, IReadOnlyList<(string Name, string Value)> rows,
+        string emptyNote)
     {
-        var subtext = $"Session · {lootTotal} item{(lootTotal == 1 ? "" : "s")} · "
-            + $"{loot.Count} kind{(loot.Count == 1 ? "" : "s")}";
-        if (loot.Count == 0)
-            return new PeekBody(subtext, [], "No loot yet this session.", "loot|empty");
+        if (names.Length == 0)
+            return new PeekBody("No target", [], LootPresentation.NoTargetNote, "loot|empty");
 
-        var rows = Gauged(loot, l => l.Count, l => l.Item, l => $"{l.Count}",
-            l => l.LastSource is { Length: > 0 } src ? $"last from: {src}" : null);
-        return new PeekBody(subtext, rows, null,
-            "loot|" + string.Join(",", loot.Select(l => $"{l.Item}:{l.Count}")));
+        var subtext = LootPresentation.TargetSubtitle(names, detail);
+        if (rows.Count == 0)
+            return new PeekBody(subtext, [], emptyNote, "loot|" + subtext + "|empty");
+
+        var peekRows = rows.Select(r => new PeekRow(r.Name, r.Value, 1.0)).ToList();
+        return new PeekBody(subtext, peekRows, null,
+            "loot|" + subtext + "|" + string.Join(",", rows.Select(r => $"{r.Name}:{r.Value}")));
     }
 
     /// <summary>
