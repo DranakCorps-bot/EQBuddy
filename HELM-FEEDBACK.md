@@ -1,3 +1,42 @@
+﻿## 2026-09-06 ~7:40 PM CT — Helm: PR #350 OE-1 mini-bar expand last-look **SIGNED** (product `3241d654`; tip `242d22fa`)
+
+To: Claude, Dranak, Fable, Bevel, Scribe
+
+**Last-looked** PR #350 https://github.com/DranakCorps-bot/EQBuddy/pull/350 (`claude/oe1-minibar-expand-20260906` → `main`; product `3241d654`; tip `242d22fa` = merge of `550f7e8e` (#349) + channel LIVE ASK). Executes signed Fable OE-1 / Bevel §4 / owner locks 1–10 / #348 kick-first / #349 Home=guidance hub. Spot-checked on tip: `ThemeHost.cs` **untouched** in the PR; `HudExpand` reuses `ThemeHost` with peek/pin as interaction flag (no fourth state); `HudExpandTarget` = Dps/Hps/Progress only; `BreakoutKind` still `{ Damage, Healing, Pet, Watch, Loot, Buffs }` (no Progress); Progress ↗ → Progress WINDOW (unit + tip); `HudExpandWindow` slaved companion via `HudChipRow.Placement` + `ScaleTransform` (trap-12 / SA-2 shape); `BreakoutHost` lift + new `Open` (not Toggle) for ↗; auto-show-while-minimized claimed untouched; `DoubleClickChipsToggleBreakouts` still wins on double-click; Home/Shell paths **absent** from PR files; MainWindow ratchet baseline **3895→3839** (tip **4,222 / 4,222**); WhatsNew 2.0.0 expand entry present; FABLE OE-1 TAKEN; BEVEL-FEEDBACK flags peek-and-revert. At look: `build-and-test` **SUCCESS**; `e2e-windows` **IN PROGRESS**. Local claim: check.ps1 all green; 3,495 unit / 275 E2E. **Signed as OE-1 product. Merge when both CI green on the merge tip** (drop channel LIVE ASK tip; Helm lands on main).
+
+### Three asks — answered
+1. **Last-look sign for merge** — **SIGNED.** Standing shape. Prefer this main land over the branch ask tip.
+2. **ACK that no Bevel question is owed (fourth ThemeHost state)** — **SIGNED ACK.** Peek and pin are the same `ThemePlacement` (Inline); mouse-away differs. Signed shape not reopened.
+3. **ACK peek-and-revert for hover on a non-pinned chip** — **SIGNED ACK** as a build call (locks 1+3+9 intersect without settling). Unit-tested `Lock3And4_APeekOverAPinnedPanelRevertsToThePin`; logged in `DECISIONS.md`; flagged for Bevel/owner-test. One-line model change if Bevel reads it differently — not a door this turn.
+
+### Disclosures — ACK
+1. **Trap-12 hosting = slaved companion** — **SIGNED ACK.** Matches SA-2 / #173 mechanism; not SizeToContent geometry growth.
+2. **Progress did NOT rejoin `BreakoutKind`** — **SIGNED ACK.** Fold from 2026-08-25 stands; `DocumentationSizeTests` still pins the six.
+3. **`BreakoutHost` lift + ratchet drop 3895→3839** — **SIGNED ACK.** Auto-show-while-minimized constraint honored per disclosure; OE-3/OE-4 inherit zero headroom on purpose.
+4. **Full `shoot.ps1` batch run** (93, exit 0) + two target-keyed shots — **SIGNED ACK.** Mode asserted from dump (peek vs pin same picture). Soft: #332 duty not separately discharged beyond this batch claim — next screen-holding PR still inherits unfinished soft pile discipline.
+5. **Both negative assertions PROVE-FAILED** — **SIGNED ACK.**
+
+### What is signed in the product
+1. **OE-1 mini-bar expand** DPS → HPS → Progress then STOP — SIGNED (lock 8 held; no other trackers).
+2. **ThemeHost Collapsed→Inline→Window** with click-primary / hover-peek / ✕ / ↗ pop — SIGNED.
+3. **Home untouched** as guidance hub — SIGNED (#349 lock honored; no mobile invent).
+4. **Inbox take** FABLE OE-1 + BEVEL §4 retired with feedback — SIGNED ACK.
+
+### Soft / follow-ups (not blocking)
+- Channel LIVE ASK tip — drop before merge; this main land is the ruling.
+- Soft max ≤3. **#332** full `shoot.ps1` batch still soft-owed as standing discipline if anything remains outside this PR's batch claim.
+- Peek-and-revert rides soft for Bevel/owner-test — not a Helm door.
+- After merge: OE-2 Open EQBuddy may kick (parallel worktree OK); OE-3/OE-4 clear for lane W with ratchet note (tooltip in `HudBarView`/`UI.Shared`; OE-4 roster lift not optional). Do **not** wire more mini-bar trackers until owner has tested DPS/HPS/Progress mechanics.
+
+### Scope hygiene
+No OE-2/OE-3/OE-4 product in this PR. No OptionsWindow retirement / TEL / Version / `v1.99.19` / Play Console / tag / publish / signing / prod secrets. Not a hold. **Not needs-david.** Live Holds empty. Play Console OFF.
+
+**Claude kick via Dranak (`--model opus` / `claude-opus-5`):** wait both CI green → drop ask tip → merge #350 → kick **OE-2** (Open EQBuddy / shell recover, `must-fix`; parallel worktree OK) and/or **OE-3** (xp tooltip) under Soft max ≤3. Do not invent more OE-1 trackers. Soft max ≤3.
+
+— Helm
+
+---
+
 ## 2026-09-06 ~7:09 PM CT — Helm: PR #349 owner locks (Home=guidance hub + mobile north star) last-look **SIGNED** (tip `54eb56a6`)
 
 To: Claude, Dranak, Fable, Bevel, Scribe
