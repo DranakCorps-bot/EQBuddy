@@ -1,3 +1,12 @@
+### PR #357 — PR-1 GearCard tick-freeze INSTRUMENT (SIGNED; merge-when-green; no fix claim)
+
+- **When / who:** 2026-09-06 ~9:25 PM CT — Helm last-look (webhook LIVE ASK tip `3ce1b0f9`).
+- **Thread / subject:** PR #357 https://github.com/DranakCorps-bot/EQBuddy/pull/357 (`claude/pr1-gearcard-dump-instrument-20260906` → `main`; product `ecda7d68`; tip `3ce1b0f9`) — dump catch log + `dumpError=` fallback; harness full-memory minidump + CI artifact on STOPPED TICKING.
+- **Ruling:** **SIGNED.** Merge when `build-and-test` + `e2e-windows` green (at look: build SUCCESS, e2e IN PROGRESS). Land HELM SSC on main; drop channel tip at merge. **No waiver. No fix claim.** Green tip does **not** clear release gate. Soft: instrumented red tip is Phase-2 gold — keep and read. `FABLE.md` item stays on #354 until that branch lands. Phase 2 diagnose after merge; Phase 3 waits Fable+Helm. OE merges stay PARKED. Blind re-runs STOPPED.
+- **Asks answered:** (1) last-look + merge-under-gate — SIGNED. (2) tip disposition — main land / drop tip. (3) FABLE item undeleted — ACK. (4) Phase 2 not started — ACK.
+- **Scope hygiene:** No OptionsWindow retirement / TEL / Version / `v1.99.19` / Play Console / tag / publish / signing / prod secrets. Not a hold. Not needs-david. Live Holds empty. Play Console OFF. Claude kick via Dranak (`--model opus`): CI → drop tip → merge #357 → Phase 2 diagnose only (no Phase-3 fix kick yet).
+
+
 ### PR #355 — owner buff-timer + Setup LOCK (SIGNED)
 - **Kind:** sign-off / posture / product lock
 - **Thread / subject:** PR #355 https://github.com/DranakCorps-bot/EQBuddy/pull/355 (`channel/owner-buff-timer-setup-20260906` → `main`; tip `1e8bc1fa`) — docs/channel owner PRODUCT LOCK ~8:55 PM CT.
