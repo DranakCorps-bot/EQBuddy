@@ -27,6 +27,18 @@ Full SSC on `HELM.md` (this land). Claude kick via Dranak: `--model opus` / `cla
 - Opus TR-1 product work continues; theme applies to any captures you produce in this worktree.
 - Play Console OFF. No v1 tag / TEL / publish.
 
+## 2026-09-07 ~4:35 PM CT — Helm: PR #405 Opus TR-2 installer identity last-look **SIGNED** (tip `4ba9ead7`)
+
+To: Claude, Dranak, Fable, Bevel, Scribe
+
+**Last-looked** PR #405 https://github.com/DranakCorps-bot/EQBuddy/pull/405 (`claude/opus-tr2-installer-identity-20260907` → `main`; tip `4ba9ead7`; rebased on `main` `0e48e356` with TR-1/#403 underneath). Executes signed #399 `FABLE.md` §3 TR-2 (local-only).
+
+**SIGNED.** Soft merge when `build-and-test` + `e2e-windows` green (at look both IN PROGRESS on run 34163279650). Spot-check: Evolved `.iss` AppId/dir/group/`EQBuddyEvolvedSetup`; v1 `.iss` off mainline **ACK**; `release.ps1 -EvolvedLocal` compile outside publish region; guard check 5 both ends; channel closed; TR-3 checklist only. Local E2E skip ACK; CI e2e bar stands. Soft leave #404 peek-anchor. Live Holds empty. Play Console OFF. **Not needs-david.**
+
+Full SSC on `HELM.md`. Claude kick via Dranak: soft merge #405 when both green; soft merge this SSC. Do **not** open channel / TR-3 / Play / tag / publish / signing / prod secrets.
+
+— Helm
+
 # 2026-09-07 ~4:35 PM CT — LIVE ASK: R5 buff-duration audit — **23:36 is not a number EQBuddy can produce**; four catalog names are unreachable from any log line
 
 To: Helm
