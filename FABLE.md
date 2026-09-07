@@ -1,3 +1,156 @@
+## 2026-09-07 ~9:10 AM CT — Fable: OE-8 free-drag PERSISTENCE/REOPEN PLAN (the trap-2 / SA-2 reopen) — discharges the plan #372 owes before any Opus kick
+
+- **Priority:** `ready` — **OE-8's Opus implement kick stays gated on Helm last-look of THIS
+  plan** (#372's constraint, verbatim). LIVE ASK in `HELM-FEEDBACK.md`, same time. Soft max ≤3
+  respected: nothing is kicked from this PR; in flight stays OE-4 #365 + this plan.
+- **Class:** V1 — the direction is owner-locked (~6:32 AM CT lock 2) and Helm-signed (#372);
+  what follows is execution shape against machinery named by file. The reason it is a PLAN and
+  not a paragraph is Bevel's own (#371): free placement deliberately reopens the Helm-signed
+  SA-2 architecture, and every edge it reopens is one #122/#152 already paid for once.
+- **Source:** owner lock ~6:32 AM CT; Bevel #371 (tip `9663a3b6`); Helm SIGNED #372; the seat
+  amend #373; Seat OE-8 below; trap 2 (the tombstone), trap 49 (the `4548e10` revert and
+  `scripts/drag-verify.ps1`); and `Core/WindowPlacement.cs`, which turns out to already hold
+  most of the policy this plan needs.
+
+### §0 The decision that shapes everything: NaN means SLAVED, and the default IS today's app
+
+One new settings pair per companion window (§2.5 says how many windows), `double.NaN` by
+default. **NaN = slaved**: `HudChipRow.Placement` recomputed from the widget every tick —
+byte-for-byte the shipped SA-2 behaviour, so an untouched profile gets exactly today's app,
+the same "the floor IS the default" rule `WidgetMetrics.ThemeBodyCap` already states for #250.
+**A finite pair = parked**: the player free-dragged the window there, and the pair is the
+anchored corner (§2.3) it reopens at.
+
+**Persistence happens at DRAG END, and nowhere else.** Not per-move (a drag is not twenty
+file writes), not in `Closed` (trap 2 — and with drag-end persistence there is nothing left
+for a `Closed` handler to want), not from any code path the window itself initiates. That is
+trap 49's fix BY CONSTRUCTION rather than by flag: of the three actors — follower, toolkit,
+player — only the player's drag has an END, so only the player can reach the write. The
+toolkit's `SizeToContent` resizes and the follower's ticks never touch the setting, and there
+is no `selfSet` boolean to get wrong because there is no shared write path to guard. Resize
+(OE-1b lock 3, panel) persists by the same rule: the taken size writes at resize end and
+restores through the same reachability check — `drag-verify.ps1`'s phases D/E are the shipped
+precedent. (The panel's one-width rule from OE-7 was about CONTENT-driven wobble on a tick;
+a player-driven resize is the kind of geometry change trap 12 explicitly permits.)
+
+### §1 Reuse `Core/WindowPlacement` — the policy exists, is unit-tested, and outlived its callers
+
+`WindowPlacement.IsReachable` (a 40px grab area against the VIRTUAL screen, all monitors),
+`PositionToPersist` (#117's transient-topology rule: a fallback placement is never persisted
+over a saved point the monitors may bring back), and `ScreenGuard` (the WPF adapter) are what
+the widget and every satellite window restore through today. The `userMoved` overload's own
+doc comment says it was written for *"windows that MOVE THEMSELVES (the grow-up chip
+stacks)"* — the ancestors of this exact row. A second stale-point policy beside this one
+would be trap 4/33's two-producers shape; three of the five questions below are answered by
+"the rule Core already states, applied to two more windows."
+
+### §2 The five questions #372 names
+
+**1. Stale point.** At restore (settings load, and any later Show), the parked pair runs
+through `ScreenGuard.OnScreen` with the window's last-known size (NaN width conservatively
+shrinks to the grab area — `IsReachable`'s documented rule). Reachable → park there.
+Unreachable → the window runs SLAVED for the session and **the setting is not rewritten**.
+"Behind something" is not a failure state — both windows are `Topmost` and the 40px grab bar
+is the same reachability standard every other saved position already meets.
+
+**2. Missing monitor.** The same rule, which is why it is the virtual screen and not the
+primary work area: a parked point on a detached monitor fails `IsReachable`, the window
+rehomes to slaved FOR THE SESSION, and the pair survives untouched so the monitors coming
+back bring the park back — #117 (Snagglefern's four-screen rig), reused not reinvented.
+Permanent moves are the player's alone: drag again, or un-park (§2.5's way back). One named
+implement check: `Park()` today clamps `MaxWidth` off `SystemParameters.WorkArea` (the
+primary); a PARKED window's wrap clamp and any flip arithmetic must read the parked point's
+own monitor's area. That sum goes where trap 1 puts all of them — `HudChipRow`/
+`WidgetMetrics`, unit-tested, never inline in the window.
+
+**3. Widget moves while parked.** Parked is **screen-ABSOLUTE**: the row stays where it was
+put, and the follower actor RETIRES for that window. Grounded in the retired
+`MezChipsWindow`'s own doc — *"mez chips get parked next to the fight, spawn chips are
+ambient"* — and in the lock's words ("park anywhere, not stuck in a fixed line"): the park is
+about where the FIGHT is on screen, not where the widget is. A widget-relative offset would
+quietly drag the row off the fight the first time the player moved the bar. What remains
+per-tick for a parked window is the toolkit resizing `SizeToContent` as chips arrive and
+leave — so the parked pair pins the ANCHORED corner and growth runs away from it. That corner
+is exactly where #122/#152 lived (a self-moving window rewriting its own anchor); here the
+anchor has one writer (drag end) and the toolkit cannot reach it.
+
+**4. Profile reset.** Reset or delete `settings.json` → NaN → slaved: a reset restores the
+Helm-signed SA-2 behaviour BY CONSTRUCTION, with no migration step, no `ApplyMigrations`
+entry, and nothing for trap 55's class of bug to chew — and §4 asserts the tell explicitly
+(zero settings writes on an untouched launch, migration chain run twice). The new fields gain
+their writer and their reader in the same implement PR, so `DeadSettingTests` stays silent by
+construction; if free-drag is ever cut, the cut PR deletes the fields — Bevel's own note on
+the eight retired stack fields (2026-09-05) is the precedent for scheduling removal with the
+last writer.
+
+**5. Granularity — whole row vs per-kind vs per-family** (Bevel's question, deferred into
+this plan by #371/#372; options surfaced, one recommended, none guessed as new product):
+
+- **(A) Per-WINDOW — one pair for the chip row, one for the under-bar panel. RECOMMENDED
+  default.** It is the minimum that satisfies the lock ("the row generally" parks anywhere;
+  the panel gets the grip via OE-1b lock 1), it keeps SA-2's one-row consolidation intact,
+  and the old mez-next-to-the-fight job is served by parking the ONE row near the fight.
+- **(B) Per-family — rejected as the default.** It is the debt SA-2 was signed to end,
+  returning N-wide: `SpawnChipsWindow`/`MezChipsWindow` were "two floats, two saved
+  positions, two grow-up settings" and the fix was ONE row. Independently parked families are
+  independently positioned floats again — §0's "floating-widget proliferation" anti-pattern
+  with a nicer name.
+- **(C) Per-chip — rejected outright.** Unbounded settings for ephemeral, self-dismissing
+  objects; nothing in any lock asks for it.
+
+If players ask for per-family after shipping, the setting widens by FAMILY KEY (the
+`MutedChipFamilies` shape) without migrating the per-window pair — the seam is named here so
+the implement PR does not have to leave room for it by guessing. **Bevel signs or adjusts
+this default at the same Helm last-look**; the affordance faces (where the drag grab lives on
+the live row; the un-park control's face) are Bevel's in the implement PR review.
+
+**The way back is Edit-HUD, beside mute and order:** a "Follow the HUD again" control clears
+the pair to NaN. Same door as the Buff-hide rider's unmute — one editor answers every "how do
+I undo what I did to the row" question — and the findability-when-empty check that rider
+already owes covers this control in the same pass.
+
+### §3 The riders — boundary only, per the firming; nothing designed here
+
+- **Expand direction (up/down/left/right).** If free-drag ships first: direction is ONE MORE
+  ARGUMENT to the same `Placement` call — the anchored corner of §2.3 and "which way the
+  panel grows" are the same fact, so the API is one enum, not a second placement function. If
+  free-drag waits: direction ships alone as Bevel's four screen-edge-aware flip rules from
+  the current fixed anchor (#371 item 3, written the day free-drag's fate is decided). Either
+  way OE-9's panels take the SAME signature — which is what "serial behind OE-8's API" buys.
+- **Buff-only right-click hide.** Unchanged from the firming (Mez/Spawn/WatchFire keep
+  per-instance dismiss). The only interplay this plan adds: Edit-HUD is now the shared way
+  back for a hidden KIND and a parked WINDOW.
+
+### §4 Verification, named before the diff
+
+- The restore decision is a SUM → it lives in `UI.Shared`/Core and is unit-tested there (the
+  standing move); `WindowPlacement`'s tests already cover reachability, and the new tests
+  name the ACTORS — follower / toolkit / player — in their names (trap 49's closing rule).
+- E2E dump facts: `hudRowPark` / `hudPanelPark` reporting `slaved` or `left,top` — the EFFECT
+  (where the window is), beside what the setting says, because "in the profile" and "on the
+  screen" are different claims (trap 42). Prefixed per host if a second host ever arrives
+  (trap 58).
+- `scripts/drag-verify.ps1`'s five-phase model extends to the row: (a) untouched profile →
+  slaved, zero settings writes on launch; (b) drag → parked at drag end; (c) close/reopen
+  undragged → the parked point restores exactly (the #152 assertion, inverted); (d)/(e)
+  user-take sticks and restores. The missing-monitor half stays a unit test — a harness
+  cannot detach a display, and pretending it can would be a guess about the machine.
+- Every "did NOT write" / "did NOT move" assertion is trap-62-shaped: paired with a positive
+  event on the far side of the decision, never a bare zero after an append.
+- Trap 64: build `EQBuddy.slnx -c Release` before any prove-fail E2E run.
+- Trap 25: the parked row stays a `WrapPanel`, its `MaxWidth` re-derived from the parked
+  monitor (§2.2's named check).
+
+### §5 Sequencing, and what this plan does not do
+
+No `src/` here; no Opus kick from this PR; soft max ≤3 holds. The implement PR carries: the
+per-window settings pairs, drag capture on both companion windows, restore through
+`ScreenGuard`, the Edit-HUD un-park, the dump facts and tests above, lock 6's one-grep
+Options line, and the WhatsNew entry (player-visible: chips can be parked anywhere; Edit
+HUD puts them back). **OE-8 stays FIRMED/`ready`; the Opus kick waits only on Helm's sign of
+this plan.**
+
+---
 ## 2026-09-07 ~6:45 AM CT — Owner LOCK seats named: OE-7 toast kill, OE-8 park-anywhere, OE-9 expand-for-all (supersedes OE-1b #351) — AMENDED ~7:30 AM CT per Helm #372 SIGNED over Bevel #371
 
 - **Priority:** the Bevel gate is CLEARED — Bevel's six-item one-liners landed (#371, BEVEL.md
@@ -65,6 +218,9 @@ per-kind vs per-family — Bevel pre-designs it inside that plan, per #371). And
 direction ships as a one-liner RIDER if free-drag waits**: four screen-edge-aware flip rules
 from the current fixed anchor (`HudChipRow.Placement` today only ever flips above/below), cheap
 either way free-drag's fate goes.
+
+→ **Plan DELIVERED ~9:10 AM CT this date — the block at the top of this file.** The Opus kick
+now waits only on Helm's last-look of it (LIVE ASK in `HELM-FEEDBACK.md`, same time).
 
 ### Seat OE-9 — every bar tracker expands, same peek/pin/pop (lock 5 minus its BreakoutKind half; serial behind OE-8; FIRMED to ready per #372, with carve-outs)
 
