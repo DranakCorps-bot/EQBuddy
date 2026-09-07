@@ -1261,12 +1261,145 @@ public class ShellHostTests
     }
 
     /// <summary>
+    /// **THE DOOR EXISTS ON A PROFILE NOBODY HAS CONFIGURED — trap 59's floor, asserted.**
+    ///
+    /// The widget's <c>Open EQBuddy…</c> row is the shell's only player entrance (OE-2), and
+    /// the two ways it could stop being one are both invisible: a control that is not drawn
+    /// photographs as an unremarkable menu (trap 29, six days of an invisible Mobile button),
+    /// and `IsEnabled=false` renders exactly like a live row under this app's styles
+    /// (trap 17). `menuOpenShell` is 1 only when the row is present, visible AND enabled.
+    ///
+    /// **It is asserted on the launch with NO shell**, which is the state a stranded player
+    /// is actually in: they closed it, and the row has to be there when nothing else is.
+    /// </summary>
+    [Fact]
+    public void TheWidgetMenuCarriesTheOpenEqbuddyDoorWithNoShellOpen()
+    {
+        using var app = new AppHarness(
+            environment: new Dictionary<string, string> { ["EQBUDDY_SHELL"] = "" });
+        app.Launch();
+
+        app.WaitForDump("menuOpenShell", 1,
+            "the widget's Open EQBuddy row to be present, visible and enabled");
+        Assert.Equal("", app.DumpText("shellPage"));
+    }
+
+    /// <summary>
+    /// **THE RECOVERY, END TO END: open → ✕ → stranded → the row → back.**
+    ///
+    /// This is the bug OE-2 exists for, walked rather than reasoned about. The shell has
+    /// native chrome, so ✕ is an ordinary WM_CLOSE; before this row landed,
+    /// <c>EQBUDDY_SHELL</c> was the only entrance and a player who closed the window had no
+    /// way back short of restarting EQBuddy — a window you can close and cannot reopen,
+    /// which is "silent no-ops are broken" with the switch on the other side.
+    ///
+    /// **The close is real and the middle state is ASSERTED, not assumed.** A test that
+    /// opened the shell from a launch where none existed would prove the same thing about a
+    /// state it reached by a different road, and "the ✕ leaves the same state as never
+    /// opening it" is a reading of the code — which is the kind of step trap 49 spent
+    /// thirteen green tests on. `shellPage` going empty is the app saying it is stranded.
+    ///
+    /// It comes back on **Home**, the guidance hub (#349's owner lock): the door names no
+    /// address at all, so the window's constructor decides, and there is exactly one place
+    /// that answer lives.
+    /// </summary>
+    [Fact]
+    public void TheOpenEqbuddyDoorBringsBackAShellTheCloseButtonTook()
+    {
+        using var app = new AppHarness(environment: new Dictionary<string, string>
+        {
+            ["EQBUDDY_SHELL"] = "1",
+            ["EQBUDDY_DOORPROBE"] = "1",
+        });
+        app.Launch();
+        app.WaitForDump("shellPage", "home", "the shell to open on its default room");
+
+        app.CloseShellWindow(ShellPages.Label(ShellPage.Home));
+        app.WaitForDump("shellPage", "",
+            "the ✕ to take the shell away — the state this door exists to recover from");
+
+        app.ClickOpenEqbuddyDoor();
+        app.WaitForDump("shellPage", "home", "the Open EQBuddy row to bring the shell back");
+        // Back as a WORKING window, not merely a window: the rail is whole and the room
+        // painted. A shell that reopened blank would satisfy `shellPage` alone.
+        Assert.Equal(ShellPages.Landed.Count, app.DumpValue("shellRail"));
+        Assert.Equal(4, app.DumpValue("shellHomeBlocks"));
+    }
+
+    /// <summary>
+    /// **THE OTHER "GONE": a MINIMIZED shell, which `Activate` does not undo.**
+    ///
+    /// The ✕ is the reported bug and it is not the only way the window leaves the screen.
+    /// A door built as "open it if it is closed, otherwise front it" is a visible no-op for
+    /// the player who minimized it instead — the same defect class as the bug, reached from
+    /// a state that already has a taskbar button, which is exactly why it would never be
+    /// reported as one.
+    ///
+    /// `shellMinimized` is a STATE, not a size, so nothing here asserts the desk this was
+    /// written on — and it is asserted at 1 first, because a test that only checked it was
+    /// 0 at the end would pass against a window that was never minimized at all.
+    /// </summary>
+    [Fact]
+    public void TheOpenEqbuddyDoorRestoresAShellTheMinimiseButtonTook()
+    {
+        using var app = new AppHarness(environment: new Dictionary<string, string>
+        {
+            ["EQBUDDY_SHELL"] = "1",
+            ["EQBUDDY_DOORPROBE"] = "1",
+        });
+        app.Launch();
+        app.WaitForDump("shellPage", "home", "the shell to open on its default room");
+
+        app.MinimizeShellWindow(ShellPages.Label(ShellPage.Home));
+        app.WaitForDump("shellMinimized", 1, "the shell to go to the taskbar");
+
+        app.ClickOpenEqbuddyDoor();
+        app.WaitForDump("shellMinimized", 0, "the Open EQBuddy row to bring it back up");
+        // Still the same window on the same room — restored, not rebuilt.
+        Assert.Equal("home", app.DumpText("shellPage"));
+    }
+
+    /// <summary>
+    /// **The door FRONTS an open shell and leaves the player where they were.**
+    ///
+    /// "Recover the guidance hub" is about getting Home back when it is gone, not about
+    /// going Home — a row that snapped a player out of the room they were reading would be
+    /// a second defect wearing the fix's clothes. <c>ShellHost.OpenDoor</c> passes no
+    /// address, and <c>Navigate</c> is only reached when one is given.
+    ///
+    /// **The assertion is that nothing moved, so the moment it is made at is the whole
+    /// question** (trap 62): `ClickOpenEqbuddyDoor` returns on `doorProbeClicks`, which the
+    /// probe raises AFTER the handler has run, so "still on Faction" is being asked of an app
+    /// that has already been through the door.
+    /// </summary>
+    [Fact]
+    public void TheOpenEqbuddyDoorFrontsAnOpenShellWithoutSendingItHome()
+    {
+        using var app = new AppHarness(environment: new Dictionary<string, string>
+        {
+            ["EQBUDDY_SHELL"] = "progress:faction",
+            ["EQBUDDY_DOORPROBE"] = "1",
+        });
+        app.Launch();
+        app.WaitForDump("shellProgressTab", "faction", "the shell to open on Progress → Faction");
+
+        app.ClickOpenEqbuddyDoor();
+
+        // Both halves of "fronted, not re-opened": a door that skipped the `IsLoaded` check
+        // would build a SECOND shell, and a second shell is constructed with no address —
+        // so it would land on Home and this pair would read `home` / empty, not the room
+        // the player left open.
+        Assert.Equal("progress", app.DumpText("shellPage"));
+        Assert.Equal("faction", app.DumpText("shellProgressTab"));
+    }
+
+    /// <summary>
     /// **`OptionsWindow` is not retired by this PR, and its door still works** — the signed
     /// out-list, asserted rather than assumed, and the same row the History studio already
     /// carries beside the Progress room's career tab. I-9's standing rule is that landing a
     /// room is separate from, and earlier than, retiring the surface it replaces; a PR that
     /// quietly broke the v1 window would take every player's only real settings screen with
-    /// it, because the shell has no player door at all (`EQBUDDY_SHELL` is the only way in).
+    /// it — and the shell's own door is one context-menu row old (OE-2).
     /// </summary>
     [Fact]
     public void TheV1OptionsWindowStillOpensBesideTheSettingsRoom()

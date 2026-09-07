@@ -326,8 +326,9 @@ public partial class ShellWindow : Window, IFollowingSurface
     ///
     /// Two ways to land on a room is trap 33 lifted from data into navigation: not a
     /// stale answer and a fresh one, but two answers a later change has to be taught
-    /// twice. When the HUD grows an "Open EQBuddy" button and Search grows a real index,
-    /// they resolve here or they are a second product.
+    /// twice. The widget's "Open EQBuddy…" row (OE-2) resolves through here — through
+    /// <c>ShellHost.OpenDoor</c>, which names no room at all — and when Search grows a real
+    /// index it does too, or it is a second product.
     ///
     /// An unrecognised address is left alone rather than snapped to a default: silently
     /// showing the wrong room is worse than showing the one already open, which is the
@@ -653,6 +654,10 @@ public partial class ShellWindow : Window, IFollowingSurface
         $"shellPage={ShellPages.Key(_page)} " +
         $"shellRail={_rows.Count} " +
         $"shellRooms={_rooms.Count} " +
+        // Minimized is the one "gone" the ✕ does not produce, and `Activate` does not undo
+        // it — so the OE-2 door has a second thing to get right and this is what says it
+        // did. It is a state, not a size: no monitor is being asserted.
+        $"shellMinimized={(WindowState == WindowState.Minimized ? 1 : 0)} " +
         // The INPUT beside the ANSWER. A hosted CI runner is 1024×768, so an E2E test
         // that asserted "the rail shows labels" would be asserting the desk it was
         // written on; asserting that the answer follows from the width it was computed

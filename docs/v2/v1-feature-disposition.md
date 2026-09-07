@@ -191,7 +191,7 @@ is not a window (it is the Ctrl+wheel zoom helper) — the one false positive in
 | Feature | Today's door(s) | v2 room | Class | Why | What writes it |
 |---|---|---|---|---|---|
 | `MainWindow` | Launch | **HUD** (Surface A) | Replace | The widget becomes the HUD: collapsed/expanded, Edit on the HUD, chips, toasts. The long pole. | `WindowLeft/Top`, `Opacity`, `UiScale`, `BackgroundOpacity`, `ContentHeight`, `Minimized`, `SectionOrder`, `HiddenSections`, `MiniStats`. |
-| `ShellWindow` | `EQBUDDY_SHELL=1` (local-only; the player door is parked) | **is** the shell | Keep | Already the destination. | Shell geometry, per `ShellLayoutPolicy`. |
+| `ShellWindow` | Context menu **Open EQBuddy…** (OE-2), plus `EQBUDDY_SHELL=1` as the review hook | **is** the shell | Keep | Already the destination. The door landed when the "rail has one row" premise expired at SR-5; ✕ on native chrome is what made it `must-fix`. | Shell geometry, per `ShellLayoutPolicy`. |
 | `ProgressWindow` | Card ⧉; mini bar xp chip | **Progress** | Merge → retire | Retirement is gated on star rehoming (it owns three `MiniStats` writers) and is later than the room. | `ProgressLeft/Top`, `WindowZooms`/`WindowBaseWidths`/`WindowHeights` keyed for it. |
 | `QuestsWindow` | Context menu **Quests…**; `toggleQuests` | **Quests** | Merge → retire | Already a thin host over `QuestsView`. | `QuestsLeft/Top`. |
 | `GearLootWindow` | Card ⧉ | **Gear** | Merge → retire | Owns the `loot` star writer; carries a `SurfaceOwnershipTests` exemption. | `GearLootLeft/Top`. |

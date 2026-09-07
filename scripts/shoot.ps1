@@ -162,8 +162,9 @@ $Shots = [ordered]@{
     #
     # The illustration lock (Helm-signed 2026-09-04) says an illustration of our own UI is
     # a capture WITH A RECIPE or it does not ship, so these land in the same change as the
-    # window. The shell has no player-facing door yet — EQBUDDY_SHELL is the only way in,
-    # which is exactly trap 22's condition and the reason the hook exists at all.
+    # window. The shell's player door is the widget's "Open EQBuddy…" context-menu row
+    # (OE-2), and a capture cannot click one — EQBUDDY_SHELL is how a shot lands on a NAMED
+    # room, which is trap 22's condition and the reason the hook stays beside the row.
     #
     # Title is 'EQBuddy — Progress'. NOT the theme windows' 'EQBuddy Progress': this is
     # a normal Windows window with native chrome, which is the whole product point of the
