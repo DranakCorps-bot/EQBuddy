@@ -106,21 +106,33 @@ public static class BreakoutPresentation
     /// v1 <c>OptionsWindow</c>, so it has ONE string set and that set has to pass in shell
     /// scope. "Floating windows" is the blurb's own first two words.
     ///
-    /// It is a const rather than a literal in the block because it is also a ROUTE: three
-    /// other surfaces tell a player where to re-enable a window they dismissed, and a heading
-    /// renamed without them is #219's mechanism inside a sentence (SR-2 caught the identical
-    /// thing in <c>GearChecklistPresentation.EmptyRoute</c>). See <see cref="ReEnableRoute"/>.
+    /// It is a const rather than a literal in the block because it is also a ROUTE: the ✕'s
+    /// own tooltip names this list as the place a player makes a window stop opening by
+    /// itself, and a heading renamed without it is #219's mechanism inside a sentence (SR-2
+    /// caught the identical thing in <c>GearChecklistPresentation.EmptyRoute</c>). See
+    /// <see cref="DismissTip"/>.
     /// </summary>
     public const string Heading = "Floating windows";
 
-    /// <summary>Where a ✕-dismissed window comes back from, in the words the screen actually
-    /// shows. Named from <see cref="Heading"/> so the two cannot drift: the alert banner, the
-    /// error log and the ✕ tooltip all print this, and none of them can see the heading.</summary>
-    public const string ReEnableRoute = "Options → " + Heading;
-
-    /// <summary>The ✕'s own tooltip, on every one of these windows.</summary>
+    /// <summary>
+    /// The ✕'s own tooltip, on every one of these windows.
+    ///
+    /// **`ReEnableRoute` used to live beside this and is gone (OE-7).** It read
+    /// "Options → {Heading}" and this tooltip promised a window was being hidden *for good*,
+    /// because that is what the ✕ did: it wrote <c>AppSettings.DisabledBreakouts</c>, and
+    /// the tick list was genuinely the only way back. The ✕ writes nothing now — every kind
+    /// has a HUD chip that summons it — so both halves of that sentence had stopped being
+    /// true, and a route naming a control the change replaced is precisely what lock 6 asks
+    /// each of these PRs to sweep.
+    ///
+    /// **The list is still named, and that is not the same sentence.** It is now where a
+    /// player decides whether a window opens ON ITS OWN, which is a real switch and the one
+    /// deliberate persistent one; the route stays derived from <see cref="Heading"/> for the
+    /// #219 reason that never depended on what the ✕ did.
+    /// </summary>
     public const string DismissTip =
-        "Hide this window for good (its star chip stays; re-enable under " + ReEnableRoute + ")";
+        "Close this for now — its HUD chip brings it straight back. "
+        + "Options → " + Heading + " is where you stop it opening on its own.";
 
     /// <summary>The row's hover text on the Settings HUD block, keyed on the kind
     /// rather than inferred from whether a star exists (see
@@ -135,14 +147,14 @@ public static class BreakoutPresentation
     /// <summary>For a kind that still has a ★. Says the second thing the tick does, since
     /// it is doing it on the player's behalf.</summary>
     public const string StarNote =
-        "Opens while EQBuddy is minimised. Ticking this also stars the stat, so it "
+        "Opens by itself while EQBuddy is minimised. Ticking this also stars the stat, so it "
         + "shows on the HUD too.";
 
     /// <summary>For Damage and Healing, whose stats are on the HUD whatever this says.
     /// Naming the removed toggle rather than only the replacement is the #233 rule.</summary>
     public const string PromotedNote =
-        "Opens while EQBuddy is minimised. DPS and HPS are always-on HUD numbers now, "
-        + "so there is no star to set and this tick is the whole switch.";
+        "Opens by itself while EQBuddy is minimised. DPS and HPS are always-on HUD numbers "
+        + "now, so there is no star to set and this tick is the whole switch.";
 
     /// <summary>The kind for a <c>BreakoutKind</c> member, whichever UI's enum it came
     /// from. The two enums disagree about membership but not about spelling.</summary>
@@ -154,12 +166,18 @@ public static class BreakoutPresentation
 
     /// <summary>What to say under the list. Names the one condition Options cannot set
     /// for you, rather than the old blanket "each still needs its ⭐ star" — which was
-    /// true of every row and therefore explained none of them.</summary>
+    /// true of every row and therefore explained none of them.
+    ///
+    /// **Reworded by OE-7 to say "by itself", which is the whole change in three words.**
+    /// Unticking used to mean "this window cannot appear"; it now means "do not open it
+    /// without being asked", because every one of these has a HUD chip that asks. Leaving
+    /// the old sentence would have been the tick box lying again — this time by claiming a
+    /// finality it no longer has.</summary>
     public const string Blurb =
-        "Floating windows that open while EQBuddy is minimised. Ticking one turns it "
-        + "on — where the stat still has a star, it sets that too, so it appears on the "
-        + "HUD as well. Untick to stop the window opening; the star stays, so anything "
-        + "you keep on the HUD stays put.";
+        "Floating windows that open by themselves while EQBuddy is minimised. Ticking one "
+        + "turns that on — where the stat still has a star, it sets that too, so it appears "
+        + "on the HUD as well. Untick to stop it opening on its own; the star stays, and you "
+        + "can still summon the window from its HUD chip whenever you want it.";
 
     /// <summary>The Watch row's extra sentence: the one window a tick cannot finish
     /// switching on.</summary>

@@ -19,41 +19,15 @@
   OE-1's shipped locks 1–10 (`HudExpandTests`); BEVEL.md 2026-09-06 §1 (buff surfaces are two
   different jobs).
 
-### Seat OE-7 — toast kill complete via chip summon: lock 1 + the BreakoutKind half of lock 5, ONE seat (AMENDED per #372)
+### Seat OE-7 — TAKEN and BUILT 2026-09-07 (branch `claude/oe7-toast-breakoutkind-20260907`)
 
-The owner's lock is bigger than deleting a message — and Bevel's pre-design (#371, Helm-signed
-#372) showed the seat as first filed was unsafe as a string-delete. Today a breakout ✕ is a
-PERSISTENT disable: `BreakoutHost.cs:92` announces *"{kind} breakout hidden — re-enable in
-{BreakoutPresentation.ReEnableRoute}"*, `BreakoutPresentation.cs:123` (`HiddenChrome`) promises
-the same route in the chrome tooltip, and the ✕ writes `AppSettings.DisabledBreakouts`. That
-disable is not a nag to delete: the six `BreakoutKind` floats AUTO-SHOW while minimized — they
-are not summoned from a bar chip the way DPS/HPS/Progress are — so the flag is currently the
-only honest place "closed" can persist. Drop it alone and discussion #45's whack-a-mole comes
-back for anyone with `DoubleClickChipsToggleBreakouts` off, which is the default. **Helm's
-amend: toast-alone is unsafe — lock 1 and the BreakoutKind half of lock 5 are the same change
-described from two ends, and they ship as ONE seat.** Give the six kinds the OE-1 chip summon
-model (hover to peek / click to pin / ⧉ to pop) and ✕ = transient close falls out of it; the
-expand-for-all half for these six kinds moves out of OE-9 and into this seat. Decomposition:
-
-1. The six `BreakoutKind`s get bar-chip summon on the OE-1 model, so a closed float has a
-   visible way back that is not Options. ✕ then stops writing `DisabledBreakouts` and becomes
-   transient close — matching `HudExpand.cs`'s `WindowClosed` semantics (no disable, ever).
-2. Same PR (lock 6's ride-along, and Bevel's concrete stale pair): delete
-   `BreakoutPresentation.ReEnableRoute`/`HideTooltip` and both toast format strings in
-   `BreakoutHost.cs:92-93` — they name a route ✕ no longer writes to. Options' Breakout-windows
-   checkboxes (`SettingsHudView.BuildBreakouts`) **stay**: same `DisabledBreakouts` setting,
-   and it becomes the one deliberate persistent off-switch — the lock says no Options *invent*,
-   not no Options; a kind switched off there still owes trap 17's dimmed visual.
-3. `DisabledBreakouts` then has Options as its ONLY writer — a trap 20/26 moment by
-   construction. `DeadSettingTests`' row gets the new reason in the same change, or the setting
-   retires with a migration; executor's call, logged in `DECISIONS.md`.
-4. The mini-bar path: `HudExpandBar.cs:55`'s `Dismissed` wiring already maps a float ✕ back to
-   its expand target; verify the restore path holds with no toast, and that `WhatsNew.json`
-   credits the owner-reported path ("closing a pop-out no longer tells you to visit Options").
-5. E2E: the "no toast" assertion is a NEGATIVE — trap 62 binds. Pair it with a positive on the
-   same dispatcher pass (the chip's restored availability) rather than a sleep.
-
-File-disjoint from OE-4 #365 (buff roster render vs breakout chrome); can run beside it.
+Both halves shipped in one PR, as the amend required: `HudExpandTarget` grew to seven (Pet,
+Watch, Loot, Buffs joined DPS/HPS/Progress), the ✕ is a transient close held in
+`BreakoutHost` for the run, `ReEnableRoute` and both toast strings are gone, the Options
+checklist stays and is now the ONLY writer of `DisabledBreakouts`. Lock 6's grep ran and
+found two more stale things beyond the pair the seat named — both cleaned in the same diff.
+Executor's call on item 3 (keep the setting, no migration, no `DeadSettingTests` row) and
+six others are in `DECISIONS.md`, 2026-09-07. Feedback in `FABLE-FEEDBACK.md`.
 
 ### Seat OE-8 — chips and panels park anywhere: free-drag + expand direction + right-click hide (locks 2–4; supersedes OE-1b; FIRMED to ready per #372, with constraints)
 
@@ -150,9 +124,8 @@ OE-5 revert risk in #371, matching the signed close-without-merge. Do not reopen
 
 ### Sequencing / soft max ≤3
 
-In flight: **OE-4 #365** (open, untouched per the owner lock) + **amended OE-7** (implement
-kick still gated on the main wiki-pack e2e named look — standing from #370/#372, no blind
-re-runs) + **OE-8** (Fable's persistence plan owed before its Opus kick). **OE-9 waits for a
+In flight: **OE-4 #365** (open, untouched per the owner lock) + **OE-8** (Fable's persistence
+plan owed before its Opus kick). **OE-7 is BUILT** — see its block above. **OE-9 waits for a
 slot** and for OE-8's API. Helm's count of the round (#372, ACKing Bevel's): **two real seats
 + riders, not four** — amended OE-7 (lock 1 + lock 5's BreakoutKind half) and OE-8, with
 direction/right-click as riders and lock 6 riding every implement PR.

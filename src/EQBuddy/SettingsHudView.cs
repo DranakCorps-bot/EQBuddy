@@ -151,12 +151,17 @@ internal sealed class SettingsHudView
     internal const string DoubleClickChipsLabel =
         "Double-click a HUD chip to open or close its window";
 
+    /// <summary>Reworded by OE-7. It used to end "…closing one with its ✕ stays quiet, since
+    /// a double-click brings it right back", which described the ONE case in which the ✕ was
+    /// silent; the ✕ is a plain close for everybody now, and a chip answers a single click
+    /// without this box being ticked at all. What survives is what this switch still buys:
+    /// one gesture instead of two.</summary>
     internal const string DoubleClickChipsBlurb =
-        "With this on, double-click the 🎒 Loot, 🐾 pet or 🎯 watch chip to pop its window up "
-        + "or dismiss it — and closing one with its ✕ stays quiet, since a double-click brings "
-        + "it right back. The always-on XP number opens the Progress window the same way; "
-        + "Damage and Healing no longer have a chip of their own, so their windows are "
-        + "switched on above.";
+        "Every HUD chip already peeks its panel on hover and keeps it open on a click, and "
+        + "↗ from there pops the floating window out. With this on, a double-click on the "
+        + "chip pops that window straight up — or dismisses it — in one gesture. Closing a "
+        + "floating window with its ✕ only closes it for now, whatever this says: its chip "
+        + "brings it back, and the list above is where you stop one opening on its own.";
 
     /// <summary>Was "🎯 Show target drops in the Loot card".</summary>
     internal const string TargetDropsLabel = "🎯 Show target drops in the Loot panel";

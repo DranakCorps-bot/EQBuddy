@@ -1183,6 +1183,15 @@ $Shots = [ordered]@{
     #   * hairline dividers between all ten, none after the last.
     # The three metric slots are FIXED WIDTH (HudGlance), so the bar's width must not
     # change between takes of the same seed — a wobble there is trap 12 arriving.
+    #
+    # AMENDED FOR OE-7, and the last line above is the one that moved: **the divider is no
+    # longer between all ten.** Every cell whose stat owns a floating window is an expansion
+    # chip now — button chrome, no divider — because the ✕ on a float stopped writing
+    # `DisabledBreakouts` and the chip is the only way back. So expect DPS, XP%/hr, PET and
+    # LOOT bordered, and KILLS, PROCS, MOTES, MONEY and DEATHS as plain cells with hairline
+    # dividers, none after the last. Re-shot 2026-09-07 at 907x40 and every element held,
+    # including the width: the trio is still fixed-width, and a chip's border adds no
+    # measured jitter because it is a constant.
     'mini-bar'        = @{ Title = 'EQBuddy'
                            Env = @{}
                            # Every breakout OFF: starring dps/hps/pet/loot while minimized
@@ -1234,6 +1243,154 @@ $Shots = [ordered]@{
                            Set = @{ Minimized = $true
                                     DisabledBreakouts = @('Damage','Healing','Pet','Watch','Loot','Buffs')
                                     MiniStats = @('kills','loot') } }
+    # THE FOUR PANELS OE-7 ADDED. `HudExpandTarget` went from three members to seven, so
+    # every floating-window kind can be summoned back from a chip and the ✕ on a float can
+    # stop writing `DisabledBreakouts`. Three of them draw a body nothing else in this file
+    # photographs, and an unreviewable surface reads as reviewed (trap 22).
+    #
+    # **Pet has NO shot on purpose.** Its rows come from `LivePresentation.Meter`, the same
+    # builder `hud-expand-dps` already photographs, so a picture of it would only re-confirm
+    # a layout that shot already covers. What a picture could NOT settle for Pet is whether
+    # the target is wired to the right builder at all — "Pet damage" over the Damage meter is
+    # a correct-looking panel (trap 24, one layer in) — and that is the `hudExpandBody` dump
+    # fact, asserted in `tests/EQBuddy.E2E/HudExpandTests`.
+    #
+    # PREDICTIONS, written before the first run (trap 23):
+    #   * `hud-expand-loot` — Bag vector, "Loot", ↗ and ✕; subtext "Session · 39 items ·
+    #     15 kinds" off the melee fixture; FIVE bar rows, most-picked-up first, each value a
+    #     bare count with the gauge a share of the biggest; then "…and 10 more — ↗ for the
+    #     full list". It is the UNCONFIGURED top slice on purpose: the float carries the view
+    #     and sort strips (lock 6), and a peek with a second axis the player can see but not
+    #     change would be a state with no switch.
+    #   * `hud-expand-watch` — Target vector, "Watch list"; the same three seeded rules as
+    #     `watch-solo`, all of which the fixture matches, so "Session · 3 pinned rules ·
+    #     N total" and THREE rows with "count · N.N/hr", no overflow line. `TrackedRules` is
+    #     seeded and `DefaultRulesVersion` pinned for the reason `HudBarTests` gives: the
+    #     built-ins ship PINNED, so letting them apply would make the row count track however
+    #     many the current version happens to carry rather than what this shot is about.
+    #   * `hud-expand-buffs` — Timer vector, "Buff set"; subtext "8 buffs up"; FIVE rows,
+    #     SOONEST TO FADE FIRST, which is the opposite order to every other panel here (the
+    #     rest are biggest-first, and the urgent buff is the one with the least left). Off
+    #     `buffs-card`'s own eight-buff staging that means Insight, Brilliance, Spirit of Ox,
+    #     Symbol of Pinzarn, Valor — each face a countdown with " est", each gauge nearly
+    #     FULL because these have just landed and the gauge draws what is LEFT — then
+    #     "…and 3 more — ↗ for the full list".
+    # A panel that is all empty-state text on any of the three is a staging bug until proven
+    # otherwise: the fixture has loot, the rules match it, and the appended lines land buffs.
+    #
+    # The panel is ONE fixed width (300) as of OE-7, so all five `hud-expand-*` shots must
+    # come back the same width. A difference between them is trap 12 arriving — the buff
+    # countdown is what forced the fixed width, since a content-driven one would resize an
+    # always-on-top window once a second.
+    #
+    # SHOT 2026-09-07. All five came back 300 wide, which is the fixed-width claim holding.
+    #   * `hud-expand-loot` 300x201 — every element of the prediction held, numbers included:
+    #     "Session · 39 items · 15 kinds", Bone Chips 11 / Spider Silk 8 / Spider Legs 4 /
+    #     Ruined Cat Pelt 3 / Chunk of Meat 2, then "…and 10 more — ↗ for the full list".
+    #   * `hud-expand-watch` 300x133 — "Session · 3 pinned rules · 30 total" and exactly the
+    #     three seeded rules, biggest first, each "N.N/hr  count". No overflow line, as
+    #     predicted, because three rules cannot reach the five-row cap.
+    #   * `hud-expand-buffs` 300x201 — "8 buffs up", five rows, " est" on every face, gauges
+    #     nearly full, "…and 3 more". **The ORDER was mispredicted and the code is right:**
+    #     the five are Brilliance and Insight (both 39:52), Spirit of Ox and Symbol of Pinzarn
+    #     (both 44:52), then Health (53:52) — Valor is in the "3 more" because it ties Health
+    #     at 53:52 and loses the alphabetical tiebreak. The prediction listed Valor fifth off
+    #     the per-buff durations quoted in `buffs-card`'s own comment, which are that shot's
+    #     PREDICTION rather than what it captured; its recorded result already says the first
+    #     clock came back 39:51 instead. **A prediction copied from another prediction is not
+    #     a prediction** — read the result line, not the expectation above it.
+    # `hud-expand-dps` and `-progress` were re-shot in the same pass (300x201 and 300x132)
+    # because the fixed width changes them: both were previously content-sized inside the old
+    # 260–340 band. Contents unchanged.
+    'hud-expand-loot' = @{ Title = 'EQBuddy HUD Panel'
+                           Env = @{ EQBUDDY_HUDEXPAND = 'loot' }
+                           Set = @{ Minimized = $true
+                                    DisabledBreakouts = @('Damage','Healing','Pet','Watch','Loot','Buffs')
+                                    MiniStats = @('kills','loot') } }
+    'hud-expand-watch' = @{ Title = 'EQBuddy HUD Panel'
+                           Env = @{ EQBUDDY_HUDEXPAND = 'watch' }
+                           Set = @{ Minimized = $true
+                                    DisabledBreakouts = @('Damage','Healing','Pet','Watch','Loot','Buffs')
+                                    MiniStats = @('kills','loot')
+                                    DefaultRulesVersion = 2147483647
+                                    TrackedRules = @(
+                                        @{ Id = 'shot-spider'; Name = 'Spider parts'
+                                           Pattern = 'Spider'; Kind = 0 }
+                                        @{ Id = 'shot-bone'; Name = 'Bone chips'
+                                           Pattern = 'Bone Chips'; Kind = 0 }
+                                        @{ Id = 'shot-kills'; Name = 'Giant spiders'
+                                           Pattern = 'giant spider'; Kind = 1 }
+                                    ) } }
+    'hud-expand-buffs' = @{ Title = 'EQBuddy HUD Panel'
+                           Env = @{ EQBUDDY_HUDEXPAND = 'buffs' }
+                           Set = @{ Minimized = $true
+                                    DisabledBreakouts = @('Damage','Healing','Pet','Watch','Loot','Buffs')
+                                    MiniStats = @('kills','loot') }
+                           # `buffs-card`'s staging verbatim — one producer for one set of
+                           # eight buffs, so the roster and the peek cannot be photographed
+                           # against different sessions and read as disagreeing.
+                           AppendLive = @(
+                               'Sanctari begins casting Insight.'
+                               'Your mind fills with wisdom.'
+                               'Sanctari begins casting Brilliance.'
+                               'Your mind clears.'
+                               'Sanctari begins casting Spirit of Ox.'
+                               'You feel the spirit of ox enter you.'
+                               'Sanctari begins casting Symbol of Pinzarn.'
+                               'The symbol of Pinzarn flashes before your eyes.'
+                               'Sanctari begins casting Valor.'
+                               'You feel valorous.'
+                               'Sanctari begins casting Health.'
+                               'You feel healthy.'
+                               "Sanctari begins casting Riftwind's Protection."
+                               'Your skin glows with a pale greenish tint.'
+                               'Sanctari begins casting Aegolism.'
+                               'You are filled with the power of Aegolism.') }
+    # THE BAR ITSELF, with OE-7's chips on it — `mini-bar` above photographs the pre-promotion
+    # ten-cell profile and does not carry the buff star, which is the one cell that had never
+    # existed before this seat.
+    #
+    # PREDICTION, written before the first run (trap 23): left to right, the always-on trio
+    # (Testchar, a Swords + dps reading, a Chart + %/hr reading), then Kills, then Pet, then
+    # Loot, then the buff set's own cell reading 8. **Every cell except the name and Kills
+    # wears BUTTON CHROME now** — a rounded hairline border, no divider beside it — because
+    # every one of them owns a floating window and is therefore an expansion chip; Kills has
+    # no window, so it keeps its hairline divider and no border. That mix is the picture this
+    # shot exists to check: it is the only place the two chip shapes appear side by side, and
+    # nothing in a diff, a test or a build can say whether the bar reads as one row or as two
+    # kinds of thing jostling.
+    #
+    # SHOT 2026-09-07, 635x40. Every element held: Testchar · 13 dps · 14.2%/hr · 💀 82 ·
+    # 🐾 1.6 dps · 🎒 39 · ⏱ 8, with borders on the four windowed cells and a divider only
+    # after Kills. **Reviewed at 2× first and then re-shot at 100%**, because at 100% the
+    # hairline border is a single dim pixel and the two shapes were genuinely not tellable
+    # apart in the capture — which is the reading a reviewer would also get, and the reason
+    # it is worth saying here rather than leaving the next person to squint. The mix reads as
+    # one row; the borders group without shouting.
+    'mini-bar-chips'  = @{ Title = 'EQBuddy'
+                           Env = @{}
+                           Set = @{ Minimized = $true
+                                    DisabledBreakouts = @('Damage','Healing','Pet','Watch','Loot','Buffs')
+                                    DefaultRulesVersion = 2147483647
+                                    TrackedRules = @()
+                                    MiniStats = @('kills','pet','loot','buffs') }
+                           AppendLive = @(
+                               'Sanctari begins casting Insight.'
+                               'Your mind fills with wisdom.'
+                               'Sanctari begins casting Brilliance.'
+                               'Your mind clears.'
+                               'Sanctari begins casting Spirit of Ox.'
+                               'You feel the spirit of ox enter you.'
+                               'Sanctari begins casting Symbol of Pinzarn.'
+                               'The symbol of Pinzarn flashes before your eyes.'
+                               'Sanctari begins casting Valor.'
+                               'You feel valorous.'
+                               'Sanctari begins casting Health.'
+                               'You feel healthy.'
+                               "Sanctari begins casting Riftwind's Protection."
+                               'Your skin glows with a pale greenish tint.'
+                               'Sanctari begins casting Aegolism.'
+                               'You are filled with the power of Aegolism.') }
     # The Watch card with rules that the fixture session actually matches — without them
     # the card is a one-line empty state and its sort strip does not exist at all (it
     # appears only above two or more rules). "Spider parts" is deliberately a rule with

@@ -39,6 +39,7 @@ namespace EQBuddy;
 internal sealed class HudExpandWindow : Window
 {
     private readonly MainWindow _main;
+    private readonly AppSettings _settings;
     private readonly HudExpandBar _bar;
     private readonly Border _chrome;
     private readonly ScaleTransform _grow = new(1, 0);
@@ -58,6 +59,22 @@ internal sealed class HudExpandWindow : Window
     /// shape: the thing you are looking for is what is not there).</summary>
     public int RowCount { get; private set; }
 
+    /// <summary>
+    /// WHICH SURFACE the rows below the header came from — the <c>hudExpandBody</c> dump
+    /// fact, and the one that stops <c>hudExpand</c> being a claim about the HEADER alone.
+    ///
+    /// The header's title and vector come from the target; the rows come from whichever
+    /// builder <see cref="Render"/> picked. Those are two decisions, and OE-7 turned a
+    /// two-way pick into a seven-way one — so a target routed to the wrong body renders a
+    /// panel that says "Pet damage" over the Damage meter's rows, which is correct-looking
+    /// on screen, correct in a screenshot, and correct on every count assertion. Trap 24's
+    /// lesson (a title is not an identity) one layer in.
+    ///
+    /// Recorded where the rows are BUILT rather than derived from the target, or it would
+    /// agree with the header by construction and prove nothing (trap 39).
+    /// </summary>
+    public string BodyKind { get; private set; } = "none";
+
     /// <summary>The pointer is over the panel itself. A peek must survive the trip from the
     /// chip to the panel — otherwise the panel collapses out from under the cursor that is
     /// reaching for its ⧉, which is a hover expand that cannot be used.</summary>
@@ -66,6 +83,7 @@ internal sealed class HudExpandWindow : Window
     public HudExpandWindow(MainWindow main, AppSettings settings, HudExpandBar bar)
     {
         _main = main;
+        _settings = settings;
         _bar = bar;
         // The title is an IDENTITY the screenshot harness matches on (trap 24), so it must
         // not collide with a sibling window of the same process: the widget is "EQBuddy",
@@ -87,8 +105,7 @@ internal sealed class HudExpandWindow : Window
             CornerRadius = new CornerRadius(Tok.RadiusCard),
             BorderThickness = new Thickness(1),
             Padding = new Thickness(Tok.SpaceM, Tok.SpaceS, Tok.SpaceM, Tok.SpaceS),
-            MinWidth = PanelMinWidth,
-            MaxWidth = PanelMaxWidth,
+            Width = PanelWidth,
             RenderTransform = _grow,
             RenderTransformOrigin = new Point(0.5, 0),
         };
@@ -158,13 +175,20 @@ internal sealed class HudExpandWindow : Window
         WindowZoom.Route(this, () => settings.ChipScale, main.SetChipScale);
     }
 
-    /// <summary>Narrow enough to sit under a bare bar without looking detached, wide enough
-    /// that an ability name and its number are not both ellipsed. A FIXED pair rather than a
-    /// content-driven width: the panel is redrawn on the widget's one-second tick, and a
-    /// window whose width tracks its longest row would jitter under the cursor every time a
-    /// new ability landed.</summary>
-    private const double PanelMinWidth = 260;
-    private const double PanelMaxWidth = 340;
+    /// <summary>
+    /// Narrow enough to sit under a bare bar without looking detached, wide enough that an
+    /// ability name and its number are not both ellipsed.
+    ///
+    /// **ONE width, not a 260–340 band (OE-7).** The band was already content-driven inside
+    /// its limits, so the panel moved every time a longer ability name arrived — on a
+    /// one-second tick, on an always-on-top transparent window over a fullscreen game, which
+    /// is #173's mechanism at a smaller amplitude (trap 12). OE-7's buff peek is what forced
+    /// the question: its value is a COUNTDOWN, so "9:59" → "10:00" would have resized the
+    /// window once a second for as long as the peek was pinned. A single width means every
+    /// tick repaints identical geometry, which is the same guarantee <c>HudGlance</c>'s
+    /// reserved widths give the bar this panel hangs from.
+    /// </summary>
+    private const double PanelWidth = 300;
 
     /// <summary>How many rows the panel shows. It is a PEEK, not the float: the ⧉ is one
     /// click away and carries the whole list, and a panel that grew past the bar it hangs
@@ -279,13 +303,19 @@ internal sealed class HudExpandWindow : Window
     /// <c>BreakoutKind</c> by a signed fold on 2026-08-25 for exactly this reason — "reuse
     /// the existing theme window on its current tab" — and a panel that rebuilt those rooms
     /// would be the tab-less float coming back under a new name.
+    ///
+    /// **Watch, Loot and Buffs (OE-7) go through <see cref="HudExpandPeek"/> for the same
+    /// reason Damage/Healing/Pet go through <see cref="LivePresentation"/>**: the choice of
+    /// rows is a decision, this file cannot be unit-tested, and Watch's is a decision the
+    /// float already makes. Everything below the <c>switch</c> is drawing.
     /// </summary>
     private void Render(StatsSnapshot s, HudExpandTarget target)
     {
         if (target == HudExpandTarget.Progress) { RenderProgress(s); return; }
+        if (Peek(s, target) is { } body) { RenderPeek(body, HudExpand.KindOf(target)); return; }
 
-        var kind = target == HudExpandTarget.Hps
-            ? BreakoutPresentation.Healing : BreakoutPresentation.Damage;
+        var kind = HudExpand.KindOf(target);
+        BodyKind = kind;
         // SESSION scope, always. The float carries the Fight/Session toggle and this does
         // not: a peek needs one number that means one thing, and a second scope axis on a
         // panel with no room for a strip would be a state the player cannot see or change.
@@ -323,11 +353,58 @@ internal sealed class HudExpandWindow : Window
             _rows.Children.Add(EmptyLine($"…and {meter.Rows.Count - rows.Count} more — ↗ for the full list"));
     }
 
+    /// <summary>The three OE-7 targets that are not a meter, or null for the ones that are.
+    /// Pet is deliberately NOT here — <see cref="LivePresentation.Meter"/> has always known
+    /// it, and giving it a peek builder of its own would be a second producer of the rows
+    /// its float draws (trap 33).</summary>
+    private PeekBody? Peek(StatsSnapshot s, HudExpandTarget target) => target switch
+    {
+        HudExpandTarget.Watch => HudExpandPeek.Watch(_settings.TrackedRules, s.Tracked),
+        HudExpandTarget.Loot => HudExpandPeek.Loot(s.Loot, s.LootTotal),
+        // ActiveCount first, so a run with no buffs never allocates a snapshot list — this
+        // is on the widget's one-second tick, and BuffsCardView guards it the same way.
+        HudExpandTarget.Buffs => HudExpandPeek.Buffs(
+            _main._buffTracker.ActiveCount > 0 ? _main._buffTracker.Snapshot(DateTime.Now) : [],
+            DateTime.Now),
+        _ => null,
+    };
+
+    /// <summary>Draw a <see cref="PeekBody"/>. The subtext is set on EVERY tick and the rows
+    /// only when the signature moves — the same split the meter path uses, and it is what
+    /// keeps a buff countdown out of the element tree (trap 8).</summary>
+    private void RenderPeek(PeekBody body, string kind)
+    {
+        BodyKind = kind;
+        _subtext.Text = body.Subtext;
+        if (body.Signature == _signature) return;
+        _signature = body.Signature;
+
+        _rows.Children.Clear();
+        if (body.Empty is { } empty)
+        {
+            RowCount = 0;
+            _rows.Children.Add(EmptyLine(empty));
+            return;
+        }
+        var shown = body.Rows.Take(MaxRows).ToList();
+        RowCount = shown.Count;
+        var bar = BreakdownRows.BarBrush(this);
+        foreach (var row in shown)
+            _rows.Children.Add(BreakdownRows.Row(this, row.Name, row.Value, row.Share, bar,
+                row.Tooltip));
+        // Same no-silent-cap rule as the meter path above (trap 50), and the same "↗"
+        // because it is the button in this panel's own header.
+        if (body.Rows.Count > shown.Count)
+            _rows.Children.Add(EmptyLine(
+                $"…and {body.Rows.Count - shown.Count} more — ↗ for the full list"));
+    }
+
     /// <summary>The Progress glance: the launcher line the folded card already carries, plus
     /// the Experience room's own summary. One source for each, so the panel cannot say
     /// something the card and the window do not.</summary>
     private void RenderProgress(StatsSnapshot s)
     {
+        BodyKind = BreakoutPresentation.Progress;
         _subtext.Text = ProgressTheme.LauncherSummary(s);
         var lines = ProgressPresentation.SummaryLines(s).Take(MaxRows).ToList();
         var sig = "progress|" + _subtext.Text + "|" + string.Join("|", lines);

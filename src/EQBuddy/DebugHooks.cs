@@ -208,6 +208,40 @@ internal static class DebugHooks
                 else w._hudExpandBar.Click(target);
             }, System.Windows.Threading.DispatcherPriority.ApplicationIdle);
 
+        // THE ✕ ON A FLOATING WINDOW (OE-7), for the same reason as the hook above: the only
+        // way to reach it is a pointer on a 11px glyph, and this suite has no pointer. It
+        // drives `BreakoutWindow.Dismiss` — the method the mouse handler itself calls — so
+        // what is asserted afterwards is the real close path and not a state a test set.
+        //
+        // **It has to run LATER than the rest of this file**, at Background priority behind
+        // one more idle turn: a float only exists once `BreakoutHost.Update` has been given a
+        // snapshot, which is the widget's first tick, and `Dismiss` on a window that has not
+        // been built yet would be a hook that silently did nothing — the shape trap 62 warns
+        // about, an assertion asking its question one moment too early. It retries until the
+        // window is there rather than assuming, and gives up after a few seconds so a
+        // genuinely-never-opening float fails the test's own wait instead of hanging here.
+        if (Environment.GetEnvironmentVariable("EQBUDDY_BREAKOUTCLOSE") is { Length: > 0 } closeKind
+            && Enum.TryParse<BreakoutKind>(closeKind, ignoreCase: true, out var toClose))
+            w.Loaded += (_, _) =>
+            {
+                var tries = 0;
+                var timer = new System.Windows.Threading.DispatcherTimer
+                {
+                    Interval = TimeSpan.FromMilliseconds(200),
+                };
+                timer.Tick += (s, _) =>
+                {
+                    if (w._breakoutHost.Visible(toClose) is { } win)
+                    {
+                        ((System.Windows.Threading.DispatcherTimer)s!).Stop();
+                        win.Dismiss();
+                    }
+                    else if (++tries > 25)
+                        ((System.Windows.Threading.DispatcherTimer)s!).Stop();
+                };
+                timer.Start();
+            };
+
         if (Environment.GetEnvironmentVariable("EQBUDDY_MENU") == "1")
             w.Loaded += (_, _) =>
             {

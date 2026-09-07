@@ -34,9 +34,12 @@ public partial class BreakoutWindow : Window
     /// click/hover behavior through it (same shared builder the Loot card uses).</summary>
     public MainWindow? Main { get; set; }
 
-    /// <summary>Raised when the user ✕-dismisses the window — the owner disables this
-    /// kind persistently (re-enabled under <see cref="BreakoutPresentation.ReEnableRoute"/>,
-    /// discussion #45).</summary>
+    /// <summary>Raised when the user ✕-dismisses the window. <c>BreakoutHost</c> records it
+    /// as a TRANSIENT close for this run (OE-7) — it used to write
+    /// <c>AppSettings.DisabledBreakouts</c>, because until every kind had a HUD chip to
+    /// summon it back a dismissal with a shorter life was discussion #45's whack-a-mole.
+    /// See <see cref="BreakoutPresentation.DismissTip"/>, which is what the ✕ now promises.
+    /// </summary>
     public event Action<BreakoutKind>? Dismissed;
 
     private bool _fightScope;
@@ -490,43 +493,39 @@ public partial class BreakoutWindow : Window
     /// <summary>The Watch breakout: every 📌-pinned rule as a bar row — count, last match,
     /// per-hour rate. "Search an item and add it to the window" is exactly what adding and
     /// pinning a watch rule already does, so the window rides that instead of inventing a
-    /// second tracking system (CrispyPigeon131's mote window, discussion #44).</summary>
+    /// second tracking system (CrispyPigeon131's mote window, discussion #44).
+    ///
+    /// **The rows, the subtext and the empty line moved to <c>HudExpandPeek.Watch</c> in
+    /// OE-7** — not because this file was crowded, but because the under-bar panel draws the
+    /// same surface now and two builders for one list is trap 33's shape: not a stale answer
+    /// and a fresh one, but two answers, each current, that the next change to the pin rule
+    /// has to be taught twice. SA-R changed that rule once already.</summary>
     private void UpdateWatch(StatsSnapshot s)
     {
         TitleText.Text = BreakoutPresentation.Title(BreakoutPresentation.Watch);
         TitleIcon.Glyph = BreakoutPresentation.Icon(BreakoutPresentation.Watch);
-        var pinnedIds = _settings.TrackedRules
-            .Where(r => r.Enabled && r.Pinned).Select(r => r.Id)
-            .ToHashSet(StringComparer.Ordinal);
-        var rows = s.Tracked.Where(t => pinnedIds.Contains(t.Id)).ToList();
+        var body = HudExpandPeek.Watch(_settings.TrackedRules, s.Tracked);
+        SubText.Text = body.Subtext;
 
-        var total = rows.Sum(r => r.TotalQuantity);
-        SubText.Text = $"Session · {rows.Count} pinned rule{(rows.Count == 1 ? "" : "s")} · {total} total";
-
-        var empty = rows.Count == 0;
-        EmptyText.Visibility = empty ? Visibility.Visible : Visibility.Collapsed;
-        if (empty)
+        EmptyText.Visibility = body.Empty is null ? Visibility.Collapsed : Visibility.Visible;
+        if (body.Empty is { } empty)
         {
-            EmptyText.Text = "Pin a watch rule in Options to track it here.";
+            EmptyText.Text = empty;
             Rows.Items.Clear();
             _signature = "";
             return;
         }
 
-        var sig = "watch|" + string.Join(",", rows.Select(r => $"{r.Id}:{r.TotalQuantity}:{r.LastItem}"));
-        if (sig == _signature) return;
-        _signature = sig;
+        if (body.Signature == _signature) return;
+        _signature = body.Signature;
 
         Rows.Items.Clear();
-        var top = Math.Max(1, rows.Max(r => r.TotalQuantity));
         var barBrush = BreakdownRows.BarBrush(this);
-        foreach (var r in rows.OrderByDescending(x => x.TotalQuantity))
-        {
-            var value = $"{r.TotalQuantity} · {r.PerHour:0.#}/hr";
-            var tooltip = r.LastItem is { Length: > 0 } li ? $"last: {li}" : null;
-            Rows.Items.Add(BreakdownRows.Row(this, r.Name, value,
-                (double)r.TotalQuantity / top, barBrush, tooltip));
-        }
+        // The FULL list, uncapped — the float is where "the whole list" lives (lock 6). The
+        // panel's own MaxRows and its "…and N more" line are the peek's, not this window's.
+        foreach (var row in body.Rows)
+            Rows.Items.Add(BreakdownRows.Row(this, row.Name, row.Value, row.Share, barBrush,
+                row.Tooltip));
     }
 
     /// <summary>The Loot kind. The title is chrome — every kind writes one here — and
@@ -931,6 +930,16 @@ public partial class BreakoutWindow : Window
     private void OnDismiss(object sender, MouseButtonEventArgs e)
     {
         e.Handled = true;
+        Dismiss();
+    }
+
+    /// <summary>The ✕, without the mouse. <c>EQBUDDY_BREAKOUTCLOSE</c> drives THIS rather
+    /// than reaching into <c>BreakoutHost</c>, so an E2E assertion about what a close does
+    /// is made against the close a player performs — a hook that set the host's state
+    /// directly would prove the hook (trap 42's shape: "in the build" and "what the button
+    /// does" are different claims).</summary>
+    internal void Dismiss()
+    {
         SavePosition();
         Hide();
         Dismissed?.Invoke(_kind);
