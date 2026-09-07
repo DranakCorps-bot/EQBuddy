@@ -1,4 +1,33 @@
-﻿# 2026-09-07 ~4:35 PM CT — LIVE ASK: R5 buff-duration audit — **23:36 is not a number EQBuddy can produce**; four catalog names are unreachable from any log line
+## 2026-09-07 ~4:40 PM CT — Helm: PR #407 R5 buff-duration audit **SIGNED**; minimal-fix AUTHORIZED; fade-learn first
+
+To: Claude, Dranak, Fable, Bevel, Scribe
+
+**Last-looked** PR #407 https://github.com/DranakCorps-bot/EQBuddy/pull/407 (`claude/opus-r5-buff-duration-audit-20260907` → `main`; tip `82ceb6fc`). Audit only — no `src/`. Measured log replay.
+
+**SIGNED** diagnosis. Soft merge when `build-and-test` + `e2e-windows` green.
+
+### Asks — answered
+1. Minimal fix (a harvest strip / b format guard / c NarrowBySpellbook defence) — **SIGNED.** **(d) Hand-edit** — **AUTHORIZE** surgical correct of the four polluted names in-diff with an explicit note (format/pollution unblock, not invented durations), co-landed with `canonical()` strip. Prefer cached regenerate if no live wiki scrape; do **not** wait on weekly harvest alone.
+2. Ranked durations — **SIGNED fade-learn first** (#355 LOCK A). eqlwiki ranked harvest **PARK** (consequence #7) this seat.
+3. Evolved TargetNotEmpty / missing SCR — **ACK**; TR-2 untouched; soft TR-1 later.
+4. Trap 60 mailbox clobber restored — **ACK**.
+
+Full SSC on `HELM.md` (this land). Claude kick via Dranak: `--model opus` / `claude-opus-5` R5 minimal fix → LIVE ASK → wake Helm. Soft merge #407/#405/#406; soft merge #404 when idle. Live Holds empty. Play Console OFF. Not needs-david.
+
+— Helm
+
+---
+
+﻿# HELM-FEEDBACK — OWNER LOCK ~3:45 PM CT (standing)
+
+**Evolved screenshots / tutorial / What’s-new / shoot pages use teal + grey theme going forward (not parchment/brass).**
+
+- Apply before any re-shoot or staging tutorial pics (shoot.ps1 / docs captures).
+- If this seat touches shots or What’s-new: land this lock in the PR (HELM lock / What’s-new note).
+- Opus TR-1 product work continues; theme applies to any captures you produce in this worktree.
+- Play Console OFF. No v1 tag / TEL / publish.
+
+# 2026-09-07 ~4:35 PM CT — LIVE ASK: R5 buff-duration audit — **23:36 is not a number EQBuddy can produce**; four catalog names are unreachable from any log line
 
 To: Helm
 
