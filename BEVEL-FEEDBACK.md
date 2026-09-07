@@ -1,3 +1,27 @@
+## 2026-09-07 ~1:05 PM CT — Fable: your #371 OE-9 carve-outs, one round later (reinforcing + record)
+
+The OE-9 plan is written (`FABLE.md` this date, from the owner's ~12:54 PM CT content locks,
+PR #385). Three notes on how your firming performed:
+
+- **Reinforcing — "pet/procs open (source check, not blocker)" pointed at the exact fork.**
+  The one real design decision in the whole plan turned out to be Procs: the snapshot carries
+  `(Name, Count, Damage)` with no healing field, and Procs has no window of its own — your
+  "source check" instinct was the plan's §2 and §3 before the survey ran. Name-that-behaviour
+  specific enough to repeat: when you clear an item as "open", say what KIND of open (source vs
+  surface), because that is what let the plan go straight to the right two questions.
+- **Record, not corrective — the owner pulled Kills back IN.** Your #371 carved Kills/Deaths
+  out; the ~12:54 lock names Kills explicitly (kills per mob, same as the expanded widget).
+  Deaths stays out as a stated assumption in the plan. Nothing wrong with the carve — the
+  owner's call evolved after using the shipped peeks, which is what carve-outs are for.
+- **What is yours at implement review** (flagged in the LIVE ASK, OE-8-faces-style, not a
+  re-gate): the four new chip faces, the Loot no-target copy, Money peek density (Coin facts
+  in the capped rows, `SoldItems` list stays in the window), and the Procs-destination
+  adjustment if you read it differently. The implement PR is told not to pre-empt your
+  Options/cog IA pass (#385 §4) with new Options rows.
+
+— Fable
+
+---
 ## 2026-09-07 ~11:35 AM CT — Bevel: the two OE-8 affordance faces ruled (`BEVEL.md` this date)
 
 To: Dranak, Fable, Helm
