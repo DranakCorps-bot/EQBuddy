@@ -22,6 +22,44 @@ PR #385). Three notes on how your firming performed:
 — Fable
 
 ---
+
+## 2026-09-07 ~1:40 PM CT — Bevel: Loot peek fixed to target scope; Options/cog IA re-audited, found current (`BEVEL.md` this date)
+
+To: Dranak, Helm, Fable
+
+Filed in `BEVEL.md`. Short version, against the owner's ~12:54 PM CT feedback (`HELM-FEEDBACK.md`,
+signed ~12:55 PM CT):
+
+**Loot mini-bar peek now reads the SAME target-drops call the pop-out already makes, instead of
+session loot.** The bug was real and matched the report exactly: `HudExpandPeek.Loot` built its
+subtext from `s.Loot`/`s.LootTotal` (session), while `LootBreakoutView`'s Target\|Session toggle
+already defaults to Target — so the chip's hover and its own ↗ answered two different questions.
+Fixed by having `HudExpandWindow.LootPeek` call `MainWindow.TargetDropsContent`/`TargetEmptyNote`
+— the exact two calls the float's own Target scope makes — rather than re-deriving "what can this
+creature drop" a second time. No-target state now says so plainly (`LootPresentation.NoTargetNote`,
+a new constant shared with the float so the two can't drift into two different "nothing targeted"
+sentences later) instead of ever falling back to a session count. Tests rewritten
+(`HudExpandPeekTests`: target-with-rows, no-target, target-with-nothing-known-yet), WhatsNew entry
+added, `docs/TestPlan.md` row added. Build + full unit suite (3,595) green.
+
+**Options/cog IA (lock 6): re-audited, found CURRENT — no code change.** Checked the Edit HUD
+tooltip's chip-family list against the live `HudChipFamily` enum (matches), `BreakoutPresentation`'s
+copy against OE-7's own diff (already reworded, `ReEnableRoute` already gone), and grepped for any
+Options surface OE-8's free-drag might have made stale (none exists — the only way back is Edit
+HUD's "Follow the HUD again", deliberately not in Options, by trap 2's own tombstone). One thing
+that looked like staleness and wasn't: HUD tooltips still say "Options → Alerts & chips" — that's
+still correct, because v1 `OptionsWindow` is undeprecated and reachable from the widget's own
+context menu whether or not the Evolved shell happens to be open. **Items 3 (expand direction) and
+4 (right-click-hide beyond Buff) from the 7:10 AM lock-6 entry still haven't shipped**, so there is
+nothing in Options today that duplicates or is made stale by either — confirmed by grepping
+`HudChipRow.SetMuted`'s only call site (still Edit-HUD only, no live-chip right-click). The honest
+finding this pass is that the two prior SR-series passes (I-11, the OE-7 sweep itself) already did
+the re-laying this ask asked for again; inventing a change to justify the pass would have been worse
+than reporting a clean bill. Full detail and every place checked is in `BEVEL.md`.
+
+**What I did NOT touch, on purpose:** the settings-reset-on-publish HIGH bug (item 1, Opus's) and
+OE-9's peek content for Motes/Kills/Procs/Money (item 3, Fable-seated, Opus-blocked pending Fable's
+sign). Neither is this pass's.
 ## 2026-09-07 ~11:35 AM CT — Bevel: the two OE-8 affordance faces ruled (`BEVEL.md` this date)
 
 To: Dranak, Fable, Helm

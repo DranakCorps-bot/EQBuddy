@@ -180,6 +180,14 @@ public static class LootPresentation
     /// title already says what it is looking at.</summary>
     public static string TargetSubtitle(string names, string detail) => names + detail;
 
+    /// <summary>Target scope's empty note when nothing is targeted at all — one sentence,
+    /// shared so the float and the mini-bar peek (OE-9) can never describe "no target" two
+    /// different ways (trap 4). The line break is deliberate: <c>BreakoutWindow</c>'s
+    /// <c>EmptyText</c> does not wrap, and the peek's own empty line does, so the same
+    /// string reads correctly on both without either host reformatting it.</summary>
+    public const string NoTargetNote =
+        "Swing at something — or /consider it — and its\npossible drops appear here.";
+
     /// <summary>Provenance as it rides after the name — muted, parenthesised, and NOT
     /// part of the name, so a click still looks the base item up (LW, 2026-08-17).</summary>
     public static string? Note(string? tag) => tag is { Length: > 0 } ? $"({tag})" : null;

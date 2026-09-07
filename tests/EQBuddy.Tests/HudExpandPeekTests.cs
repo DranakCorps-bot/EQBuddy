@@ -73,31 +73,47 @@ public class HudExpandPeekTests
 
     // ----------------------------------------------------------------- loot ----
 
+    /// <summary>A target with rows: the subtext is the float's own Target-scope line, and
+    /// every row shares the flat 1.0 gauge (mixed units — observed counts and wiki rarity
+    /// words are not one scale, so no proportional bar is drawn).</summary>
     [Fact]
-    public void LootPeek()
+    public void LootPeekShowsTheTargetNotTheSession()
     {
-        var body = HudExpandPeek.Loot(
-            [new LootDetail("Bone Chips", 4, "a skeleton"), new LootDetail("Rusty Sword", 1, "")],
-            lootTotal: 5);
+        var body = HudExpandPeek.Loot("a skeleton", " — 3 kills this session",
+            [("Bone Chips", "4 this session · 40%"), ("Rusty Sword", "common")], "");
 
         Assert.Null(body.Empty);
         Assert.Equal(["Bone Chips", "Rusty Sword"], body.Rows.Select(r => r.Name));
-        Assert.Equal("4", body.Rows[0].Value);
-        Assert.Equal("last from: a skeleton", body.Rows[0].Tooltip);
-        // No source recorded is no tooltip, not "last from: ".
-        Assert.Null(body.Rows[1].Tooltip);
-        Assert.Contains("5 items", body.Subtext);
-        Assert.Contains("2 kinds", body.Subtext);
+        Assert.Equal("4 this session · 40%", body.Rows[0].Value);
+        Assert.Equal(1, body.Rows[0].Share);
+        Assert.Equal(1, body.Rows[1].Share);
+        Assert.Contains("a skeleton", body.Subtext);
+        Assert.Contains("3 kills this session", body.Subtext);
     }
 
+    /// <summary>No target at all — the ask this test guards: the peek must say a target
+    /// needs to be picked, never fall back to a session summary.</summary>
     [Fact]
-    public void LootPeekWithNoDropsSaysSo()
+    public void LootPeekWithNoTargetSaysSoRatherThanShowingSession()
     {
-        var body = HudExpandPeek.Loot([], 0);
+        var body = HudExpandPeek.Loot("", "", [], "");
 
         Assert.NotNull(body.Empty);
+        Assert.Equal(LootPresentation.NoTargetNote, body.Empty);
         Assert.Empty(body.Rows);
-        Assert.Contains("0 items", body.Subtext);
+        Assert.Equal("No target", body.Subtext);
+    }
+
+    /// <summary>A real target, nothing known about it yet — the caller's own
+    /// <c>TargetEmptyNote</c> wording rides through unchanged, not a second "no loot" line.</summary>
+    [Fact]
+    public void LootPeekWithATargetButNothingKnownUsesTheCallersEmptyNote()
+    {
+        var body = HudExpandPeek.Loot("a bat", "", [], "Looking up on eqlwiki…");
+
+        Assert.Equal("Looking up on eqlwiki…", body.Empty);
+        Assert.Empty(body.Rows);
+        Assert.Equal("a bat", body.Subtext);
     }
 
     // ---------------------------------------------------------------- buffs ----

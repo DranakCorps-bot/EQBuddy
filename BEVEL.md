@@ -1,5 +1,50 @@
 # Bevel inbox
 
+## 2026-09-07 ~1:40 PM CT — Loot mini-bar peek fixed to target scope; Options/cog IA re-audit (lock 6): current, nothing further to strip (Bevel)
+
+**Priority:** `approved` — owner-locked (`HELM-FEEDBACK.md` ~12:55 PM CT SIGN, on the owner's ~12:54 PM CT feedback testing Evolved Desktop `2.0.0+3a1e8654`). Soft Bevel seat, soft max ≤3, Play Console OFF, not needs-david. Item 1 of that feedback (settings-reset on publish, HIGH) is Opus's, not this pass's; item 3 (OE-9 peek content — Motes/Kills/Procs/Money) is Fable-seated and explicitly blocked from Opus until signed — neither touched here.
+**Place:** `src/EQBuddy.UI.Shared/HudExpandPeek.cs` (`Loot`), `src/EQBuddy.UI.Shared/LootPresentation.cs` (`NoTargetNote`, new), `src/EQBuddy/HudExpandWindow.cs` (`LootPeek`, new — the `_main.TargetDropsContent`/`TargetEmptyNote` read), `src/EQBuddy/LootBreakoutView.cs` (one-line: shares the new constant instead of its own literal), `tests/EQBuddy.Tests/HudExpandPeekTests.cs` (Loot tests rewritten for the new signature), `docs/TestPlan.md` (new row beside the other OE-7 peek rows), `src/EQBuddy.Core/Data/WhatsNew.json` (new 2.0.0 highlight), `DECISIONS.md`.
+**Source:** `HELM-FEEDBACK.md` ~12:54–12:55 PM CT (owner: *"Hover/peek must show target loot drops (same scope as pop-out), not session. If no target: peek states that a target needs to be selected... Pop-out already defaults to target — peek must match."*), and the same message's item 4 (*"Options/cog full IA pass... lock-6 style — not half-left"*). Verified against tip `3a1e8654` before edits; branch merged forward to `36c3664a` (HELM-FEEDBACK/HELM.md only) before this entry.
+
+---
+
+### 1. Loot peek — was session, now target; fixed, tested, WhatsNew'd
+
+**Verified the bug first, against the owner's own words.** `HudExpandPeek.Loot(s.Loot, s.LootTotal)` built its subtext as `"Session · N items · M kinds"` from the same session list the Loot CARD already shows in full — never touching `MainWindow.TargetDropsContent`, the method `LootBreakoutView.Render` calls for that window's Target scope (confirmed: `_w.TargetScope` defaults true via `ScopeSetting() != "session"`, matching the owner's "pop-out already defaults to target"). So the chip's hover and its own ↗ genuinely described two different things — the exact defect reported.
+
+**Fixed by reading the SAME source the float reads**, not a second derivation (trap 33): `HudExpandWindow.LootPeek` now calls `_main.TargetDropsContent(s)`/`TargetEmptyNote(s)` — the identical two calls `LootBreakoutView.Render` makes — and `HudExpandPeek.Loot` takes `(names, detail, rows, emptyNote)` instead of the session list. Three states, matching the ask's own three: a target with known rows; a target with nothing known yet (the caller's own `TargetEmptyNote` wording — wiki-offline, no-page, looking-up, all ride through unchanged); and no target at all, which now says `LootPresentation.NoTargetNote` (**"Swing at something — or /consider it — and its↵possible drops appear here."**) instead of ever falling back to a session count. That constant is shared with `LootBreakoutView`'s own no-target line (was a private literal there) so the two surfaces cannot describe "nothing targeted" two different ways later (trap 4) — the `\n` in it is deliberate and pre-existing: the float's `EmptyText` doesn't wrap, the peek's own empty line does, and the same string is correct on both without either host reformatting it.
+
+**The gauge bar is deliberately flat (`Share = 1.0`) for every target row**, not computed. Target rows mix an observed count ("4 this session · 40%") with a bare wiki rarity word ("common") — two units in one list — and a proportional bar across them would assert a comparison neither number supports. Same reasoning `HudExpandPeek.Buffs` already uses to sort an unknown duration last rather than guess it forward; named here as a decision rather than an oversight, since a future editor could otherwise "improve" it into a misleading bar.
+
+**Verified:** build green; full unit suite 3,595/3,595 (3 new/rewritten `HudExpandPeekTests` cases: target-with-rows, no-target, target-with-nothing-known-yet). Not run against the live app this pass (no screenshot — the fixture's target-drops path needs a live `/consider` or a kill, which `shoot.ps1`'s standard fixture doesn't stage; flagging per trap 22/23 rather than claiming a look I didn't take).
+
+---
+
+### 2. Options/cog IA (lock 6) — re-audited against the now-landed OE-7 + OE-8; found CURRENT, not stale
+
+**Read this as a verification pass, not a fresh design** — the ask's own premise ("much of Settings/cog is redundant under the shell now") predates a lot of cleanup that already happened inside OE-7 and OE-8 themselves, and the honest finding is that most of what the ask worried about has already been swept by the PRs that created the redundancy in the first place.
+
+**Checked and found CURRENT (already reworded/removed in OE-7's own diff, not left behind):**
+- `BreakoutPresentation.Heading`/`DismissTip`/`Blurb`/`Note` — all rewritten "by itself" language, `ReEnableRoute` and both toast strings already deleted (confirmed by reading the class doc, which narrates its own history accurately: *"`ReEnableRoute` used to live beside this and is gone (OE-7)"*).
+- `SettingsHudView.DoubleClickChipsBlurb` — already describes hover-peek/click-pin/↗-pop, not the old "double-click brings it back" wording that predates OE-1/OE-7.
+- The Edit HUD context-menu tooltip's family list (mez/slow, spawn, watch alerts, buffs) — grepped `HudChipFamily` (four members: Mez, Spawn, WatchFire, Buffs) against the tooltip text in `MainWindow.xaml:68`. Matches exactly; not stale.
+
+**Checked and confirmed correct, not stale despite looking suspicious at first pass:** HUD-adjacent tooltips (`HudEditChip.cs`, `HudChipRowWindow.cs`) still say "Options → Alerts & chips". This looked like a shell-era staleness candidate (the shell's own Settings room calls itself "Settings", four tabs, no "Cards & windows" tab name) — but `SettingsRoom`'s own doc comment is explicit that `OptionsWindow` is "not retired, not renamed and not reshaped" by the shell's existence, and it stays reachable from the widget's own context menu (which is what a player minimized to the HUD chip row actually right-clicks) regardless of whether the Evolved shell happens to also be open. The v1 destination these tooltips name is real and current; I did not change them. Recorded so the next pass doesn't re-open the same question from scratch.
+
+**Free-drag (OE-8) added NO Options surface to reconcile, by design.** Grepped for any settings row or checkbox referencing HUD row/panel position — none exists, and none should: the only way back from a parked chip row is Edit HUD's "Follow the HUD again" control, which is deliberately NOT in Options (trap 2's tombstone: nothing is persisted that a settings screen would ever need a row for — NaN-means-slaved is the whole state).
+
+**Not yet applicable, and said so rather than invented:** the 7:10 AM lock-6 entry (below, same file) named items 3 (expand direction) and 4 (right-click-hide beyond Buff) as blocking a full ruling. Neither has shipped as of tip `3a1e8654` — grepped `HudChipRow.SetMuted` call sites: still only `HudChipRowWindow.cs`'s Edit-HUD wiring, no live-chip right-click hook. So there is nothing in Options today that duplicates or is made stale by either — when they ship, the sweep this ask asks for applies to them, and doesn't today.
+
+**No code change made for this half of the ask.** The honest ruling is "checked thoroughly, found current" — inventing a change to justify the pass would be worse than reporting a clean bill, and the two prior SR-series passes (I-11, the OE-7 sweep itself) already did the actual re-laying this ask is asking for a second time.
+
+---
+
+**Not filed to `HELM-FEEDBACK.md`:** nothing here is a LIVE ASK — the Loot peek fix is a bounded, tested, in-scope fix on an owner-signed lock, and the IA half found nothing to change. Logged in `DECISIONS.md` and `docs/TestPlan.md` per the standing rule.
+
+— Bevel (Claude Sonnet 5)
+
+---
+
 ## 2026-09-07 ~11:35 AM CT — OE-8 affordance faces, ruled: cursor+tooltip drag tell, un-park chicklet ships as built (Bevel)
 
 **Priority:** `approved` — soft face-only round, PR #381's review item; not a re-gate on the
