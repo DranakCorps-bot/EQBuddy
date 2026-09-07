@@ -277,8 +277,17 @@ public static class HudExpandPeek
 
         // Gauged by COUNT, because "/min" is the headline this surface exists for — a bar
         // drawn off damage would rank a rare heavy proc above the one actually firing.
+        //
+        // **The tooltip carries the untruncated row, and the first shot is why.** A proc's
+        // name is "<spell> · <item>" whenever an item-proc line named the vehicle, and that
+        // plus three facts does not fit the panel's one fixed 300 width — `hud-expand-procs`
+        // came back "Exaltation Strike · Polished Mithril…" over "0.1/min · 42 d…". The ⧉
+        // is the real answer (the Damage float's procs block draws these at full width), but
+        // a hover costs nothing and a row a player cannot read is trap 14's family: correct,
+        // clipped, and invisible to every test. Nothing but the picture says so.
         var rows = Gauged(procs, p => p.Count, p => p.Name,
-            p => $"×{p.Count} · {p.Count / minutes:0.#}/min · {p.Damage:N0} dmg");
+            p => $"×{p.Count} · {p.Count / minutes:0.#}/min · {p.Damage:N0} dmg",
+            p => $"{p.Name} — ×{p.Count} · {p.Count / minutes:0.#}/min · {p.Damage:N0} damage");
         return new PeekBody(subtext, rows, null,
             "procs|" + string.Join(",", procs.Select(p => $"{p.Name}:{p.Count}:{p.Damage}")));
     }

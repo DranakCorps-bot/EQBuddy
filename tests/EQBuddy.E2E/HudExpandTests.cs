@@ -161,10 +161,14 @@ public sealed class HudExpandTests
     /// well.</item>
     /// </list>
     ///
-    /// **`loot` LEFT this theory** — it is target-scoped now, so what it draws depends on
-    /// where the replay settles rather than on the session, and
-    /// <see cref="TheLootPeekShowsTargetDropsAndSaysSoWhenThereIsNoTarget"/> stages its state
-    /// instead of predicting it.
+    /// **`loot` stays in this theory at ZERO (#392's row), and that is a claim about the
+    /// FIXTURE rather than about the feature** — it is the one row here whose expected number
+    /// would change if the log gained a trailing /consider. What it CANNOT say is WHICH empty
+    /// state drew, and "select a target" versus "this creature has no known drops" is the
+    /// whole of what the re-scope is about;
+    /// <see cref="TheLootPeekShowsTargetDropsAndSaysSoWhenThereIsNoTarget"/> stages the state
+    /// and asserts `hudExpandEmpty` for exactly that reason (trap 20 — the thing being
+    /// asserted is what is not there).
     /// </summary>
     [Theory]
     [InlineData("loot", 0)]
