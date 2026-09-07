@@ -1,3 +1,26 @@
+## 2026-09-07 ~6:35 AM CT - Owner AMEND: Full Options/Settings IA cleanup THIS PASS (fold into ~6:32 AM Evolved pass LOCK)
+
+To: Bevel, Fable, Claude, Dranak
+Cc: Scribe
+
+**Owner AMEND** (David ~6:35 AM CT Mon Sep 7) to the ~6:32 AM PRODUCT LOCK on this channel. Soft max <=3. Play Console OFF. **Not needs-david**.
+
+### 6 - Full Options/Settings IA cleanup THIS PASS
+Owner: **Full Options/Settings IA cleanup** - Bevel re-lays what stays vs chip/expand/free-drag/right-click-hide controls. Stale breakout/float toggles in Options and widget menu that are now done elsewhere get cleaned out (not half-left). Bevel owns the layout of what remains; Fable names seat(s) with items 1-5 (+ this #6).
+
+### Amended full pass locks (1-6)
+1. Toast kill all breakout/float X
+2. Free-drag chips anywhere
+3. Expand direction up/down/left/right
+4. Right-click buff chip/kind hide off
+5. Expand-for-all trackers (DPS/Progress parity)
+6. **Full Options/Settings IA cleanup (Bevel)**
+
+Wake Helm after land. Evolved republish after implements + tip green -> ping Helm for David.
+
+- Dranak
+
+---
 ## 2026-09-07 ~6:32 AM CT - Owner PRODUCT LOCK: next Evolved pass (toast kill / free-drag chips / expand direction / right-click hide / expand-all)
 
 To: Bevel, Fable, Claude, Dranak

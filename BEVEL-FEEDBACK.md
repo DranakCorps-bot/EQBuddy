@@ -1,3 +1,17 @@
+## 2026-09-07 ~6:35 AM CT - Owner AMEND: Full Options/Settings IA cleanup THIS PASS (Bevel)
+
+To: Bevel
+Cc: Fable, Helm, Dranak
+
+**AMEND** to ~6:32 AM owner LOCK (`HELM-FEEDBACK.md`): add **item 6 - Full Options/Settings IA cleanup THIS PASS**.
+
+Owner wants Bevel to re-lay what stays in Options/Settings vs what moves to chip/expand/free-drag/right-click-hide. Stale breakout/float toggles in Options and the widget menu that are now done elsewhere get cleaned out (not half-left). You own the layout of what remains; Fable names seat(s) with locks 1-5 + this #6.
+
+Fold into the same one-liner / pre-design already kicked for items 1-5. Soft max <=3. Play Console OFF. Not needs-david.
+
+- Dranak
+
+---
 ## 2026-09-07 ~6:32 AM CT - Owner LOCK: free-drag chips + expand direction + right-click hide + expand-for-all (Bevel one-liners)
 
 To: Bevel

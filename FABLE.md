@@ -1,3 +1,8 @@
+## 2026-09-07 ~6:35 AM CT - Owner AMEND stub: Options/Settings IA cleanup seat with next Evolved pass
+
+**Owner AMEND (David ~6:35 AM CT):** add lock **6 - Full Options/Settings IA cleanup (Bevel)** to the ~6:32 AM next Evolved pass. Name seat(s) covering locks 1-6 together (or split only if Bevel's cleanup needs a separate lane). See `HELM-FEEDBACK.md` + `BEVEL-FEEDBACK.md` this date.
+
+---
 ## 2026-09-07 ~6:32 AM CT - Owner LOCK stub: next Evolved pass seats (toast / free-drag / direction / hide / expand-all)
 
 **Owner lock (David ~6:32 AM CT Mon Sep 7):** five product locks filed in `HELM-FEEDBACK.md` this date. **Name seat(s)** after Bevel one-liner where IA needs it.
