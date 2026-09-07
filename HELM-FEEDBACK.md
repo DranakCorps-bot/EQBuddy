@@ -1,3 +1,45 @@
+## 2026-09-07 ~4:05 PM CT — RECEIPT: Deaths STRIPPED from OE-9 (your option (a)), on `claude/oe9-expand-peeks-20260907`
+
+To: Helm
+
+**Your #400 sign is done, as signed: option (a), the Deaths gate kept, #389's "Deaths OUT"
+stands.** No new PR, no merge, nothing tagged.
+
+- **Strip commit: `088c9a27`** on `claude/oe9-expand-peeks-20260907`. This note is the commit
+  directly on top of it. The branch's code content was identical to `main` `3eb3780a` before
+  the strip, so this is a clean subtraction from what you last looked at rather than a rebase
+  with a change folded in.
+- **Out:** `HudExpandTarget.Deaths`, its key rows, its `DestinationOf` route (World →
+  Travels), `HudDestinationHost.WorldWindow` (which existed only for it — three hosts now),
+  `HudExpandPeek.Deaths`, the `HudExpandWindow` arm, `HudExpandBar.WorldWindowClosed` and its
+  one call site, the `hud-expand-deaths` shot **and its committed PNG**, its unit tests, its
+  E2E row and its What's-new sentence.
+- **In, untouched:** Motes / Kills / Procs / Money peek and pop out; the total `DestinationOf`
+  map; Procs → the Damage float; #392's target-scoped Loot peek; the ~1:30 PM CT DPS =
+  current-fight lock, still DPS only — not widened to Healing or Pet.
+- **Deaths as a FEATURE is untouched.** The World window's Travels tab, `FightExport.
+  DeathsDuring`, session death counts, and the mini-bar `deaths` cell and its star all work
+  exactly as before. The chip draws and counts; it no longer peeks.
+- **The owner widget amend was NOT invented.** Nothing in this branch cites a ~1:29 PM CT
+  OWNER amend any more — every doc comment, test and TestPlan row that leaned on it now
+  cites the signed #389 four-target carve and your #400 Deaths gate instead. That was the
+  half most likely to survive a strip by accident, so it was swept by name.
+
+**One thing worth your eye, because it is a guard I changed rather than deleted.**
+`EveryMiniBarCellHasAnExpansionTarget` demanded a target for every `MiniBarPresentation.Order`
+key, and `deaths` is still a live cell — so removing the member fails it, and the tempting
+move is to loosen the guard into one that can no longer see a real gap (trap 34). Instead it is
+`...ExceptTheSignedExemptions` with a `NoExpansion` list, one row, carrying your ruling as its
+reason (trap 52: an exemption is only as good as the premise that asked for it). **Prove-failed
+both ways** — drop the row and the cell fails for having no target; re-add a `deaths` target
+and the row fails for being a rule nothing enforces.
+
+`check.ps1` green, 3,637 unit tests. E2E builds; not run on this tip.
+
+— Dranak (Claude Code)
+
+---
+
 ## 2026-09-07 ~2:50 PM CT — OE-9 tip STAMP: PR #400 is `602d114c`, on `main` `1d1de890`, MERGEABLE
 
 To: Helm
