@@ -1,3 +1,24 @@
+## 2026-09-07 ~6:20 PM CT — PR #419 mini-bar chip drag-reorder (SIGNED; rebase then merge-when-green) + #418 faces ACK
+
+- **When / who:** 2026-09-07 ~6:20 PM CT — Helm last-look (webhook: HELM-FEEDBACK.md LIVE ASK: PR #419 minibar chip drag-reorder implemented (SIGNED #413 + #418 faces); one Helm sign RESTORED from a worktree-only write). Tip `7bf5f5b9` on `claude/opus-minibar-chip-reorder-413-20260907`. Channel tip on main still carries Bevel faces LIVE ASK (~6:00 PM); product LIVE ASK tip was worktree-only and restored — this Helm land is the sign.
+- **Thread / subject:** PR #419 https://github.com/DranakCorps-bot/EQBuddy/pull/419 (`claude/opus-minibar-chip-reorder-413-20260907` → `main`) — Opus implement of owner ~4:44 PM CT lock through **SIGNED #413** plan, absorbing **#418** Bevel faces in the same change. Also retrospective ACK of already-merged #413 (`a8e147b3`) + #418 (`a68d2afc`). At look: tip **MERGEABLE / diverged** (ahead 1 / behind 1 — main tip is #418 faces docs); `build-and-test` SUCCESS; `e2e-windows` IN PROGRESS (run 34169173409). Companion SSC this land.
+- **Ruling:** **SIGNED.** Soft merge #419 after **rebase onto current `main`**, when `build-and-test` + `e2e-windows` green on the rebased head. Drop LIVE ASK / Bevel faces tip at merge (prefer this Helm land for SSC). Live Holds empty. Play Console OFF. **Not needs-david.**
+- **Spot-check (tip `7bf5f5b9`):**
+  1. `AppSettings.MiniBarOrder` — `List<string>`, empty = canonical; sole product write at drop via `HudBarReorder.Finish` → `MiniBarPresentation.SetOrder`; restore clears (not rewrites) — **ACK / KEEP**.
+  2. `MiniBarPresentation.CanonicalOrder` = Order + `buffs`; trio absent; `ResolveOrder` append/skip/dedupe; `DrawnKeys` membership once — **ACK / KEEP**.
+  3. `MiniBarDrag.Classify` — system thresholds; horizontal = Reorder; mostly-vertical = **Dead** (not Pending) — **ACK / KEEP**. `DropIndex` midpoints; `Move` re-insert beside neighbour in FULL order (unstarred places kept) — **ACK / KEEP**.
+  4. `HudBarReorder` — chip = handle (dead-space claim); SubTree capture; RenderTransform + adorner mark (trap 12); write only on drop; `Dragging` defers rebuild — **ACK / KEEP**.
+  5. Bevel faces absorbed: `SizeWE` at threshold; reorder clause at **call site** (`reorderable: true` on cells + buffs; Watch `false`); restore under `PromotedStatsNote`, enabled when resolved ≠ canonical; WatchSortMode mismatch named in WhatsNew + loop comment — **ACK / SIGNED**. Label/button vs Bevel's "link-styled Restore default order" — **ACK as implementer call** (clear + enabled-when-needed stands).
+  6. Proof: unit `MiniBarDragTests` / `MiniBarPresentationTests`; E2E `TheBarDrawsTheOrderTheProfileSaved` + `…CanonicalOrder`; dump `hudCellOrder` / `hudCellGrip` — **ACK**.
+- **Asks answered:**
+  1. Last-look / merge-when-green — **SIGNED** (after rebase; both CI).
+  2. Bevel faces LIVE ASK (~6:00 PM / #418) — **SIGNED / ACK** (already merged docs; faces absorbed in #419 product).
+  3. #413 plan — **SIGNED** (already merged; this land is the standing SSC).
+  4. Worktree-only Helm sign restore — **ACK**; this main land replaces it.
+- **Posture / Soft max ≤3:** (1) rebase + merge #419 when both CI green. (2) soft merge this SSC. (3) Soft LEAVE #409 Deaths strip / #380/#356. Soft LEAVE WatchSortMode↔pin-order follow-up (named, not invented). Do **not** invent Edit-HUD ◀▶ unify / per-rule pin drag / trio drag.
+- **Claude kick via Dranak:** `--model opus` / `claude-opus-5` soft path (or Soft merge without new seat): **rebase #419 onto current `main`** (trap-60 byte-safe on channel — main tip still has Bevel faces LIVE ASK; tip may lack it) → CI → **merge when `build-and-test` + `e2e-windows` green**. Soft merge this SSC (`helm/ssc-419`) when green. Prefer this Helm main land for SSC. Probe `claude models` only if a fresh seat is needed. No TEL / Version / `v1.99.19` / Play Console / tag / publish / signing / prod secrets / Evolved wide publish.
+- **Scope hygiene:** Not a hold. Not needs-david. Live Holds empty. Play Console OFF.
+
 ## 2026-09-07 ~4:50 PM CT — PR #410 Money peek Share gauges (SIGNED; merge-when-green)
 
 - **When / who:** 2026-09-07 ~4:50 PM CT — Helm last-look (webhook: HELM-FEEDBACK.md LIVE ASK: PR #410 Money peek Share gauges; tip `c3bfedaf`).
