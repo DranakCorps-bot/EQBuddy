@@ -373,10 +373,17 @@ public static class HudChipRow
     /// <summary>
     /// Where the slaved companion goes, given where the HUD is.
     ///
-    /// **The row has NO geometry of its own and nothing is persisted** (the SA-2 hosting
-    /// amendment, Helm-signed 2026-09-05). It is recomputed from the widget every tick, so
+    /// **This is the DEFAULT and it is still the whole of an untouched profile** (the SA-2
+    /// hosting amendment, Helm-signed 2026-09-05). Recomputed from the widget every tick, so
     /// there is no saved x/y to walk up the screen across reopens — which is what trap 2
     /// (#122/#152) was about, and why <c>ChipStackAnchor</c> retires with the two windows.
+    ///
+    /// **OE-8 adds the other branch and does not change this one.** A player who drags a
+    /// companion window parks it (<see cref="ParkedPlacement"/>); until they do, the pair in
+    /// the profile is NaN and this method is the only thing that places the window. The one
+    /// writer of that pair is the end of the player's drag, so neither the follower nor the
+    /// toolkit can reach it — trap 49's three actors, separated by construction rather than
+    /// by a <c>selfSet</c> flag.
     ///
     /// Directly under the widget by default, left edges aligned. If the row would hang off
     /// the bottom of the work area it goes ABOVE the widget instead: a chicklet half off
@@ -409,6 +416,175 @@ public static class HudChipRow
     }
 
     private static double Real(double v) => double.IsFinite(v) ? v : 0;
+
+    // ---- FREE PLACEMENT (OE-8): NaN means SLAVED, a finite pair means PARKED ----
+    //
+    // Everything below is the OTHER BRANCH of the question Placement above answers —
+    // "where does this companion window go this tick" — and it lives beside it for that
+    // reason rather than in a file of its own. Two homes for one question is trap 4's shape,
+    // and the parked branch has to agree with the slaved one about units (DIPs, the caller's,
+    // trap 1) and about the fact that neither of them may touch a setting.
+    //
+    // **The default IS today's app.** An untouched profile carries NaN, answers
+    // HudParkMode.Slaved, and runs Placement byte-for-byte — the Helm-signed SA-2 behaviour,
+    // with no migration step and nothing for trap 55's class of bug to chew.
+
+    /// <summary>
+    /// Which rule is placing a companion window — THREE states, not two, and the third is
+    /// the one that matters (trap 20's shape: the thing you are looking for is what is not
+    /// there).
+    ///
+    /// <list type="bullet">
+    /// <item><see cref="Slaved"/> — the profile holds no park. Recomputed from the widget
+    /// every tick, which is the shipped SA-2 behaviour and the default.</item>
+    /// <item><see cref="Parked"/> — the player dropped it somewhere and that point is
+    /// reachable. Screen-ABSOLUTE: the follower actor retires for this window.</item>
+    /// <item><see cref="Unreachable"/> — the profile holds a park the desk cannot show right
+    /// now (a detached monitor, an RDP hop, a resolution change). The window runs SLAVED FOR
+    /// THE SESSION and **the setting survives untouched**, so the monitors coming back bring
+    /// the park back — #117's rule, reused rather than reinvented. Reporting it as a third
+    /// state is what lets a test say "it ran slaved AND the point is still in the profile",
+    /// which is the whole assertion.</item>
+    /// </list>
+    /// </summary>
+    public enum HudParkMode
+    {
+        /// <summary>No park in the profile: follow the widget, as SA-2 shipped.</summary>
+        Slaved,
+        /// <summary>Parked at a reachable point: screen-absolute, the follower retires.</summary>
+        Parked,
+        /// <summary>Parked at a point this desk cannot show: slaved for the session, setting
+        /// kept.</summary>
+        Unreachable,
+    }
+
+    /// <summary>Is this settings pair a park at all? A pair is parked only when BOTH halves
+    /// are finite — a half-written pair (a hand-edited file, an interrupted write) is not a
+    /// position, and treating it as one would put a window at NaN, which WPF renders
+    /// nowhere.</summary>
+    public static bool IsParked(double left, double top) =>
+        double.IsFinite(left) && double.IsFinite(top);
+
+    /// <summary>
+    /// THE RESTORE DECISION, and it is a sum so it can be asserted without a window (the
+    /// standing move — the WPF layer has no unit tests, docs/TestPlan.md §5).
+    ///
+    /// <paramref name="reachable"/> is the caller's <c>ScreenGuard.OnScreen</c> answer —
+    /// <c>WindowPlacement.IsReachable</c>'s 40px grab area against the VIRTUAL screen, all
+    /// monitors. It is asked of the caller rather than computed here because this project is
+    /// framework-free and <c>SystemParameters</c> is not.
+    /// </summary>
+    public static HudParkMode ParkMode(double savedLeft, double savedTop, bool reachable) =>
+        !IsParked(savedLeft, savedTop) ? HudParkMode.Slaved
+        : reachable ? HudParkMode.Parked
+        : HudParkMode.Unreachable;
+
+    /// <summary>
+    /// Where a PARKED companion window sits, given the corner the player dropped it at and
+    /// the work area of THE MONITOR THAT POINT IS ON (§2.2's named implement check — the
+    /// primary monitor's area would yank a secondary-monitor park, which is the same reason
+    /// <see cref="WidgetMetrics.RightAnchoredLeft"/> refuses to clamp at all).
+    ///
+    /// **The pair pins the ANCHORED CORNER and growth runs away from it.** A chicklet
+    /// arriving makes the toolkit widen a <c>SizeToContent</c> window; the anchor does not
+    /// move, so the row grows right and down from where it was put. That corner is exactly
+    /// where #122/#152 lived — a self-moving window rewriting its own anchor — and here the
+    /// anchor has ONE writer (drag end) and the toolkit cannot reach it.
+    ///
+    /// **It CLAMPS rather than flips, and the difference is the point.** The slaved rule
+    /// flips above the widget because the widget is occupying the space below; a parked
+    /// window has nothing to avoid, so the honest rule is "stay where you were put until the
+    /// monitor's edge stops you". A flip would teleport a window a full width away from a
+    /// corner the player deliberately chose.
+    ///
+    /// A size that is not real yet — 0 on the first layout pass, NaN — answers "draw at the
+    /// anchor": "we cannot tell yet" and "draw where you were put" are the same instruction,
+    /// exactly as they are in <see cref="Placement"/>.
+    /// </summary>
+    public static (double Left, double Top) ParkedPlacement(
+        double parkLeft, double parkTop, double width, double height,
+        double areaLeft, double areaTop, double areaRight, double areaBottom) =>
+        (Fit(parkLeft, width, areaLeft, areaRight), Fit(parkTop, height, areaTop, areaBottom));
+
+    private static double Fit(double anchor, double extent, double min, double max)
+    {
+        if (!double.IsFinite(anchor)) return anchor;
+        if (!double.IsFinite(extent) || extent <= 0) return anchor;
+        if (!double.IsFinite(min) || !double.IsFinite(max) || max <= min) return anchor;
+        // Bigger than the monitor it is parked on: the leading edge wins, because the corner
+        // the player can still grab is the one they parked at.
+        if (max - min < extent) return min;
+        return Math.Clamp(anchor, min, max - extent);
+    }
+
+    /// <summary>
+    /// The <c>MaxWidth</c> that makes the row's <c>WrapPanel</c> WRAP instead of growing a
+    /// window wider than the screen (trap 25 — a strip whose contents are not fixed-width
+    /// belongs in a WrapPanel, and a WrapPanel with no cap never reaches one).
+    ///
+    /// One function so the slaved and parked paths cannot answer it differently: the slaved
+    /// row passes the widget's monitor, the parked row passes the parked point's, and both
+    /// get the same arithmetic. The floor exists because a work area measured as zero (a
+    /// half-initialised host, a headless run) would otherwise cap the row at nothing.
+    /// </summary>
+    public static double WrapWidth(double areaWidth) =>
+        double.IsFinite(areaWidth) ? Math.Max(MinWrapWidth, areaWidth) : MinWrapWidth;
+
+    /// <summary>The narrowest the row is ever capped at — one chicklet's worth. It was an
+    /// inline 120 in <c>HudChipRowWindow.Park</c> before OE-8 gave the cap two callers.
+    /// </summary>
+    public const double MinWrapWidth = 120;
+
+    /// <summary>
+    /// A companion window's park as the <c>EQBUDDY_EXPAND</c> dump reports it: "slaved", or
+    /// "left,top" rounded to whole units.
+    ///
+    /// **The dump carries this twice per window — the EFFECT and the SETTING — because "in
+    /// the profile" and "on the screen" are different claims (trap 42), and OE-8's whole
+    /// unreachable rule is a disagreement between them.** No space in the value: the dump is
+    /// space-separated key=value, so a value with a space in it would silently become two
+    /// keys.
+    /// </summary>
+    public static string ParkKey(double left, double top) =>
+        IsParked(left, top) ? $"{Math.Round(left)},{Math.Round(top)}" : "slaved";
+
+    /// <summary>
+    /// The under-bar panel's width after a player has taken one (OE-1b lock 3), or the
+    /// shipped single width when they have not.
+    ///
+    /// **NaN means "the OE-7 width", the same way a NaN park means "slaved"** — one sentinel
+    /// convention for the whole feature, so a reset profile gets today's app by construction
+    /// rather than by a migration. A taken width is clamped to the monitor it is being drawn
+    /// on and to a floor a header can still render in; OE-7's one-width rule is untouched by
+    /// this, because that rule was about CONTENT-driven wobble on a tick and this width only
+    /// ever changes when a player drags an edge (trap 12 permits exactly that).
+    /// </summary>
+    public static double PanelWidth(double savedWidth, double defaultWidth, double areaWidth)
+    {
+        if (!double.IsFinite(savedWidth) || savedWidth <= 0) return defaultWidth;
+        var ceiling = double.IsFinite(areaWidth) && areaWidth > MinPanelWidth
+            ? areaWidth : Math.Max(MinPanelWidth, defaultWidth);
+        return Math.Clamp(savedWidth, MinPanelWidth, ceiling);
+    }
+
+    /// <summary>The narrowest the under-bar panel may be dragged to. Below this the header's
+    /// icon, title and two buttons stop being a header and start being an ellipsis.</summary>
+    public const double MinPanelWidth = 180;
+
+    /// <summary>
+    /// An edge drag turned into a panel width. The cursor travels in SCREEN units while the
+    /// panel's chrome lives under <c>ChipScale</c>'s <c>LayoutTransform</c>, so the delta is
+    /// divided rather than added raw — trap 1, and the same shape as
+    /// <see cref="WidgetMetrics.ContentHeightFromDrag"/>, which is the precedent this
+    /// deliberately copies.
+    /// </summary>
+    /// <param name="grip">+1 when the RIGHT edge is being dragged (moving right widens),
+    /// -1 for the LEFT edge (moving right narrows). The window's own Left is moved by the
+    /// caller on a left-edge drag, which is what makes that edge feel anchored.</param>
+    public static double PanelWidthFromDrag(
+        double startWidth, double cursorDelta, double chipScale, int grip) =>
+        Math.Max(MinPanelWidth,
+            startWidth + grip * cursorDelta / WidgetMetrics.SafeScale(chipScale));
 
     /// <summary>
     /// The fight family's mez half: who is asleep and the wake-up countdown ("?" until the

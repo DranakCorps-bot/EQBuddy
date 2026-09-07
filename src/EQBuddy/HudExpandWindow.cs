@@ -21,9 +21,18 @@ namespace EQBuddy;
 /// That mechanism cost KoboldCoterie EverQuest's keyboard. <see cref="HudChipRowWindow"/>
 /// (Surface A / SA-2, Helm-signed 2026-09-05) is the precedent and this is the second user
 /// of it: same chrome family, same <see cref="HudChipRow.Placement"/> arithmetic, and the
-/// same promise — **no geometry of its own and nothing persisted.** Where it goes is
-/// recomputed from the widget every tick, so there is no saved position to go stale and
-/// nothing for a <c>Closed</c> handler to record (trap 2).
+/// same default — **slaved, with no geometry of its own.** Where it goes is recomputed from
+/// the widget every tick, so there is no saved position to go stale and nothing for a
+/// <c>Closed</c> handler to record (trap 2).
+///
+/// **OE-8 gives it a park and OE-1b lock 3 gives it a width, and both are the PLAYER's.**
+/// <c>AppSettings.HudPanelParkLeft</c>/<c>Top</c> and <c>HudPanelWidth</c> are NaN until a
+/// drag ends, and NaN means "slaved" and "the OE-7 width" respectively — so a reset profile
+/// is today's app by construction, with no migration to run twice (trap 55). Both are written
+/// at the END of a gesture and by nothing else: of trap 49's three actors, only the player's
+/// has an end. The grip is the whole box (lock 1), the two vertical edges resize (lock 3),
+/// and <see cref="HudDragGrip"/> holds the first while <see cref="OnEdgePress"/> claims the
+/// press before it on an edge.
 ///
 /// **The motion is a RenderTransform, deliberately** (owner lock 10 — "slick, smooth,
 /// professional"). A <see cref="ScaleTransform"/> is post-layout: it changes what is painted
@@ -173,6 +182,164 @@ internal sealed class HudExpandWindow : Window
 
         ChipScale.Apply(this, settings.ChipScale);
         WindowZoom.Route(this, () => settings.ChipScale, main.SetChipScale);
+
+        // ORDER IS THE INTERLOCK between the two gestures (OE-1b locks 1 and 3). The edge
+        // handler is attached FIRST and sets Handled on an edge press, and a Preview handler
+        // registered afterwards with handledEventsToo:false is skipped once that has
+        // happened — so a press on a vertical edge resizes and a press anywhere else moves,
+        // with no shared flag between them. ResizeZones' own doc drew this line ("edges are
+        // deliberately thin so the title row still drags"); this is that line, one window
+        // over.
+        PreviewMouseLeftButtonDown += OnEdgePress;
+        PreviewMouseMove += OnEdgeMove;
+        PreviewMouseLeftButtonUp += OnEdgeRelease;
+        _grip = HudDragGrip.Attach(this, (left, top) =>
+        {
+            _settings.HudPanelParkLeft = left;
+            _settings.HudPanelParkTop = top;
+            _mode = HudChipRow.HudParkMode.Parked;
+            // Clamp first, then record where it landed — see HudChipRowWindow's grip for the
+            // park this order exists to prevent (a corner above the work area that the
+            // restore rule then correctly refuses, so the park never comes back).
+            Park();
+            _settings.HudPanelParkLeft = Left;
+            _settings.HudPanelParkTop = Top;
+            _main.PersistSettings();
+            // The chip row sits BELOW this panel while both are slaved. A panel that has just
+            // left that line frees the space, so the row has to be told on the same gesture
+            // rather than a tick later.
+            _main.RefreshHudChips();
+        });
+        ApplyWidth();
+    }
+
+    private readonly HudDragGrip _grip;
+
+    // ---- FREE PLACEMENT (OE-8) -------------------------------------------------------
+
+    /// <summary>Slaved / parked / parked-where-this-desk-cannot-show, resolved once from the
+    /// profile and afterwards only by a drag. <see cref="HudChipRowWindow"/> carries the same
+    /// three states for the same reasons; the two windows park independently because they are
+    /// two windows, and per-WINDOW is the granularity the plan settled on (per-family would
+    /// be the independently-positioned floats SA-2 was signed to end).</summary>
+    private HudChipRow.HudParkMode? _mode;
+
+    private HudChipRow.HudParkMode Mode => _mode ??= HudChipRow.ParkMode(
+        _settings.HudPanelParkLeft, _settings.HudPanelParkTop,
+        ScreenGuard.OnScreen(_settings.HudPanelParkLeft, _settings.HudPanelParkTop,
+            ActualWidth, ActualHeight));
+
+    /// <summary>The <c>hudPanelPark</c> dump fact — the EFFECT, off the window.</summary>
+    public string ParkKey => Mode == HudChipRow.HudParkMode.Parked
+        ? HudChipRow.ParkKey(Left, Top) : "slaved";
+
+    /// <summary>The <c>hudPanelParkSaved</c> fact — what the PROFILE holds, which is a
+    /// different claim (trap 42) and the only way to see the unreachable rule working.
+    /// </summary>
+    public string ParkSavedKey =>
+        HudChipRow.ParkKey(_settings.HudPanelParkLeft, _settings.HudPanelParkTop);
+
+    public bool IsParked => Mode == HudChipRow.HudParkMode.Parked;
+
+    /// <summary>The grip's presses and finished drags, as "P,D" — the <c>hudPanelGrip</c>
+    /// dump fact, for the reason <see cref="HudDragGrip.PressCount"/> gives.</summary>
+    public string GripKey => $"{_grip.PressCount},{_grip.DragCount}";
+
+    /// <summary>"Follow the HUD again" — clears the pair to NaN, which IS slaved, so the
+    /// panel goes back to being recomputed from the bar rather than parked at wherever the
+    /// bar happens to be standing this second.</summary>
+    public void Unpark()
+    {
+        _settings.HudPanelParkLeft = double.NaN;
+        _settings.HudPanelParkTop = double.NaN;
+        _mode = HudChipRow.HudParkMode.Slaved;
+        Park();
+    }
+
+    // ---- THE TAKEN WIDTH (OE-1b lock 3) ----------------------------------------------
+
+    private int _edge;                 // ResizeZones.Left / .Right while a resize is running
+    private double _edgeStartWidth;
+    private double _edgeStartLeft;
+    private Point _edgeStartScreen;
+
+    /// <summary>The width the panel is actually drawing at — the <c>hudPanelWidth</c> dump
+    /// fact. Read off the chrome rather than off the setting, because "a width is in the
+    /// profile" and "the panel is that wide" are different claims (trap 42) and the clamp
+    /// against the monitor sits between them.</summary>
+    public double DrawnWidth => _chrome.Width;
+
+    /// <summary>The setting, clamped to the monitor this panel is on, applied to the chrome.
+    /// The window is <c>SizeToContent</c>, so setting the chrome's width IS resizing the
+    /// window — and it is the only way to do it that leaves the height content-driven.
+    /// </summary>
+    private void ApplyWidth()
+    {
+        var area = Mode == HudChipRow.HudParkMode.Parked
+            ? ScreenGuard.WorkAreaAt(this, _settings.HudPanelParkLeft, _settings.HudPanelParkTop)
+            : SystemParameters.WorkArea;
+        _chrome.Width = HudChipRow.PanelWidth(_settings.HudPanelWidth, PanelWidth, area.Width);
+    }
+
+    /// <summary>A press on a vertical edge starts a width drag and takes the press away from
+    /// the move grip. The HORIZONTAL edges are deliberately not offered: this panel's height
+    /// is its rows, capped at <see cref="MaxRows"/> because it is a peek and the ↗ carries
+    /// the full list — a height a player could take would be a promise of more rows that the
+    /// body has no way to keep.</summary>
+    private void OnEdgePress(object sender, MouseButtonEventArgs e)
+    {
+        if (e.ClickCount > 1) return;
+        var at = e.GetPosition(this);
+        var zone = ResizeZones.Hit(at.X, at.Y, ActualWidth, ActualHeight);
+        _edge = zone is ResizeZones.Left or ResizeZones.TopLeft or ResizeZones.BottomLeft
+            ? ResizeZones.Left
+            : zone is ResizeZones.Right or ResizeZones.TopRight or ResizeZones.BottomRight
+                ? ResizeZones.Right : ResizeZones.None;
+        if (_edge == ResizeZones.None) return;
+        _edgeStartWidth = _chrome.Width;
+        _edgeStartLeft = Left;
+        _edgeStartScreen = PointToScreen(at);
+        CaptureMouse();
+        e.Handled = true;   // the interlock: HudDragGrip never sees this press
+    }
+
+    private void OnEdgeMove(object sender, MouseEventArgs e)
+    {
+        if (_edge == ResizeZones.None) return;
+        if (e.LeftButton != MouseButtonState.Pressed) { OnEdgeRelease(sender, null!); return; }
+        var delta = PointToScreen(e.GetPosition(this)).X - _edgeStartScreen.X;
+        var width = HudChipRow.PanelWidthFromDrag(_edgeStartWidth, delta, _settings.ChipScale,
+            _edge == ResizeZones.Right ? 1 : -1);
+        _chrome.Width = width;
+        // A left-edge drag anchors the RIGHT edge, which is what makes that edge feel like
+        // the one being held. Only meaningful while parked: a slaved panel's Left is the
+        // widget's and Park() puts it straight back next tick.
+        if (_edge == ResizeZones.Left && Mode == HudChipRow.HudParkMode.Parked)
+            Left = _edgeStartLeft + (_edgeStartWidth - width) * _settings.ChipScale;
+        e.Handled = true;
+    }
+
+    /// <summary>RESIZE END — the one moment a width may be written, for the same reason drag
+    /// end is the one moment a park may be (trap 49 by construction: the toolkit's
+    /// <c>SizeToContent</c> and the tick's re-render have no end to fire on).</summary>
+    private void OnEdgeRelease(object sender, MouseButtonEventArgs? e)
+    {
+        if (_edge == ResizeZones.None) return;
+        _edge = ResizeZones.None;
+        if (IsMouseCaptured) ReleaseMouseCapture();
+        _settings.HudPanelWidth = _chrome.Width;
+        // Clamp first, record second — the same order the drag end uses, and for the same
+        // reason: a left-edge drag moves the window as it narrows, so the corner it ends at
+        // is a corner the monitor clamp has not judged yet.
+        Park();
+        if (Mode == HudChipRow.HudParkMode.Parked)
+        {
+            _settings.HudPanelParkLeft = Left;
+            _settings.HudPanelParkTop = Top;
+        }
+        _main.PersistSettings();
+        if (e is not null) e.Handled = true;
+        _main.RefreshHudChips();   // the row sits under this panel; it just changed shape
     }
 
     /// <summary>
@@ -217,13 +384,30 @@ internal sealed class HudExpandWindow : Window
         Park();
     }
 
-    /// <summary>Where the panel goes, from the widget, this tick — <see cref="HudChipRow.Placement"/>
-    /// verbatim, so the panel and the chip row cannot disagree about what "under the HUD"
-    /// means or about when there is no room below it.</summary>
+    /// <summary>Where the panel goes this tick — <see cref="HudChipRow.Placement"/> verbatim
+    /// while slaved, so the panel and the chip row cannot disagree about what "under the HUD"
+    /// means or about when there is no room below it; and
+    /// <see cref="HudChipRow.ParkedPlacement"/> at the player's own corner once it has been
+    /// dragged, read against THAT point's monitor rather than the primary (the plan's §2.2
+    /// implement check).</summary>
     private void Park()
     {
-        var area = SystemParameters.WorkArea;
+        // A drag or a resize in progress owns the window: the follower re-placing it
+        // mid-gesture is the follower actor reaching for geometry the player is holding.
+        if (_grip.Dragging || _edge != ResizeZones.None) return;
         UpdateLayout();
+        if (Mode == HudChipRow.HudParkMode.Parked)
+        {
+            var parked = ScreenGuard.WorkAreaAt(
+                this, _settings.HudPanelParkLeft, _settings.HudPanelParkTop);
+            var (pl, pt) = HudChipRow.ParkedPlacement(
+                _settings.HudPanelParkLeft, _settings.HudPanelParkTop,
+                ActualWidth, ActualHeight, parked.Left, parked.Top, parked.Right, parked.Bottom);
+            if (Left != pl) Left = pl;
+            if (Top != pt) Top = pt;
+            return;
+        }
+        var area = SystemParameters.WorkArea;
         var (left, top) = HudChipRow.Placement(
             _main.Left, _main.Top, _main.ActualHeight, ActualHeight, area.Top, area.Bottom);
         if (Left != left) Left = left;
@@ -233,9 +417,16 @@ internal sealed class HudExpandWindow : Window
     /// <summary>The panel's own height plus its gap, for the chip row to park BELOW rather
     /// than on top of. Zero while the panel is hidden or mid-collapse, so the row goes
     /// straight back under the bar the moment the panel is no longer claiming the space.
-    /// </summary>
-    public double OccupiedHeight =>
-        IsVisible && !_closing && double.IsFinite(ActualHeight) ? ActualHeight + HudChipRow.HudGap : 0;
+    ///
+    /// **Zero while PARKED too** — the row asks this question to find out how much of the
+    /// line under the widget is already taken, and a panel the player has dragged to a corner
+    /// is not on that line at all. Answering with its height would leave the row floating
+    /// below a gap with nothing in it, which is a defect nobody could explain from the screen.
+    /// The name says which question it answers, so a future caller cannot read it as "how
+    /// tall is the panel".</summary>
+    public double SlavedOccupiedHeight =>
+        IsVisible && !_closing && !IsParked && double.IsFinite(ActualHeight)
+            ? ActualHeight + HudChipRow.HudGap : 0;
 
     /// <summary>Grow down (owner lock 10). A <see cref="ScaleTransform"/>, never the window's
     /// Height — see this class's own header for why that distinction is the feature rather

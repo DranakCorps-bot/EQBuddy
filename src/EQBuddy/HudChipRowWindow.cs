@@ -22,11 +22,20 @@ namespace EQBuddy;
 /// independently-positioned float, no saved x/y) and leaves the widget's measured size
 /// alone. Helm signed the amendment on 2026-09-05.
 ///
-/// **NO GEOMETRY OF ITS OWN, AND NOTHING PERSISTED.** <see cref="HudChipRow.Placement"/>
-/// recomputes where it goes from the widget every tick. That is what retires
-/// <c>ChipStackAnchor</c>, <c>ChipAnchor</c> and eight settings with it: the whole subject
-/// of that machinery was persisting a chip stack's own position across reopens, which is
-/// where #122 and #152 both lived, and there is no longer a position to persist.
+/// **SLAVED BY DEFAULT, AND THAT DEFAULT IS THE WHOLE OF AN UNTOUCHED PROFILE.**
+/// <see cref="HudChipRow.Placement"/> recomputes where it goes from the widget every tick.
+/// That is what retired <c>ChipStackAnchor</c>, <c>ChipAnchor</c> and eight settings with it:
+/// the whole subject of that machinery was persisting a chip stack's own position across
+/// reopens, which is where #122 and #152 both lived.
+///
+/// **OE-8 lets the player PARK it, and deliberately reopens that architecture — on one
+/// condition.** <c>AppSettings.HudRowParkLeft</c>/<c>Top</c> is NaN until a player drags the
+/// row; NaN is slaved, so a reset or a fresh profile gets the SA-2 app back by construction,
+/// with no migration to run twice (trap 55). What made #122/#152 was a window that MOVED
+/// ITSELF and rewrote its own anchor as it went; here the anchor has exactly one writer —
+/// <see cref="HudDragGrip"/>'s drag end — and neither the follower's tick nor the toolkit's
+/// <c>SizeToContent</c> can reach it. Trap 49's three actors, separated by construction
+/// rather than by a flag.
 ///
 /// **Visible whenever chips exist, in BOTH HUD states.** The two stacks were visible
 /// regardless of whether the widget was minimized — "the stack exists exactly while timers
@@ -97,7 +106,80 @@ internal sealed class HudChipRowWindow : Window
         Content = _panel;
         ChipScale.Apply(this, main.Settings.ChipScale);
         WindowZoom.Route(this, () => main.Settings.ChipScale, main.SetChipScale);
+
+        // OE-8: the grip is the whole box. The drag END is the only thing in this app that
+        // writes the park pair — see HudDragGrip.
+        _grip = HudDragGrip.Attach(this, (left, top) =>
+        {
+            _main.Settings.HudRowParkLeft = left;
+            _main.Settings.HudRowParkTop = top;
+            _mode = HudChipRow.HudParkMode.Parked;
+            // CLAMP FIRST, THEN RECORD WHERE IT LANDED. The pair is where the window IS, not
+            // where the cursor let go, and the difference is a park that cannot come back:
+            // `drag-verify.ps1 -Mode park` dropped the row at Top = -15.71 (above the work
+            // area), the drag-end write kept that number, and on reopen ScreenGuard
+            // CORRECTLY refused it — under 40 units of grab area on screen — so the row went
+            // slaved and the reporter would have blamed the restore. Two answers to one
+            // question, twenty lines apart (trap 4). The dump's two keys are what showed it:
+            // `hudRowPark=1780,0` beside `HudRowParkTop=-15.71`, the effect and the setting
+            // disagreeing in one line.
+            Park();
+            _main.Settings.HudRowParkLeft = Left;
+            _main.Settings.HudRowParkTop = Top;
+            _main.PersistSettings();
+        });
     }
+
+    private readonly HudDragGrip _grip;
+
+    /// <summary>
+    /// Slaved / parked / parked-somewhere-this-desk-cannot-show, decided ONCE per window
+    /// lifetime from the profile and then only ever by a drag.
+    ///
+    /// Resolved lazily rather than in the constructor because the reachability question needs
+    /// the window's own presentation source to convert units, and this window is built before
+    /// it is shown. <see cref="HudChipRow.HudParkMode.Unreachable"/> runs slaved FOR THE
+    /// SESSION and leaves the setting alone — #117's rule: the monitors come back, and a
+    /// fallback persisted over a carefully chosen point teleports it permanently.
+    /// </summary>
+    private HudChipRow.HudParkMode? _mode;
+
+    private HudChipRow.HudParkMode Mode => _mode ??= HudChipRow.ParkMode(
+        _main.Settings.HudRowParkLeft, _main.Settings.HudRowParkTop,
+        ScreenGuard.OnScreen(_main.Settings.HudRowParkLeft, _main.Settings.HudRowParkTop,
+            ActualWidth, ActualHeight));
+
+    /// <summary>The <c>hudRowPark</c> dump fact — the EFFECT, read off the window: where the
+    /// row actually is, or "slaved". Beside it <see cref="ParkSavedKey"/> reports what the
+    /// PROFILE says, because OE-8's unreachable rule is precisely a disagreement between the
+    /// two and one key could never show it (trap 42).</summary>
+    public string ParkKey => Mode == HudChipRow.HudParkMode.Parked
+        ? HudChipRow.ParkKey(Left, Top) : "slaved";
+
+    /// <summary>The grip's presses and finished drags, as "P,D" — the <c>hudRowGrip</c> dump
+    /// fact. See <see cref="HudDragGrip.PressCount"/> for why a harness reporting "the drag
+    /// persisted nothing" needs these two numbers to mean anything.</summary>
+    public string GripKey => $"{_grip.PressCount},{_grip.DragCount}";
+
+    /// <summary>What the profile holds, whether or not this desk can honour it.</summary>
+    public string ParkSavedKey =>
+        HudChipRow.ParkKey(_main.Settings.HudRowParkLeft, _main.Settings.HudRowParkTop);
+
+    /// <summary>"Follow the HUD again" (Edit HUD) — the way back from a park, and the only
+    /// other writer of the pair. It clears to NaN rather than to a computed position: NaN IS
+    /// slaved, so the row goes back to being recomputed from the widget every tick instead of
+    /// being parked where the widget happens to be standing right now.</summary>
+    public void Unpark()
+    {
+        _main.Settings.HudRowParkLeft = double.NaN;
+        _main.Settings.HudRowParkTop = double.NaN;
+        _mode = HudChipRow.HudParkMode.Slaved;
+        Park();
+    }
+
+    /// <summary>Is this window parked right now — what the Edit-HUD un-park control reads to
+    /// decide whether it has anything to undo.</summary>
+    public bool IsParked => Mode == HudChipRow.HudParkMode.Parked;
 
     /// <summary>
     /// One tick: draw <paramref name="row"/> and park under the widget.
@@ -139,26 +221,62 @@ internal sealed class HudChipRowWindow : Window
         Park();
     }
 
-    /// <summary>Recompute where the slaved companion sits, from the widget, this tick. Shared
-    /// by the live path and the edit path: the row follows the HUD in both, because a row you
-    /// are reordering that stopped following the window it belongs to would be a fifth
-    /// independently-placed float for as long as the mode is open.</summary>
+    /// <summary>Where the companion sits this tick — slaved to the widget, or held at the
+    /// corner the player parked it at. Shared by the live path and the edit path: the row
+    /// keeps whichever placement it has in both, because a row you are reordering that jumped
+    /// somewhere else for the duration of the mode would be answering a question nobody
+    /// asked.</summary>
     private void Park()
     {
+        // A drag in progress owns the window. The follower re-placing it mid-gesture would
+        // fight the cursor once a second, which reads as a window that will not be dragged —
+        // and it is the follower actor reaching for geometry the player is holding.
+        if (_grip.Dragging) return;
+
+        if (Mode == HudChipRow.HudParkMode.Parked) { ParkAtAnchor(); return; }
+
         // The row may not run off the monitor the widget is on. MaxWidth makes the
         // WrapPanel wrap instead of growing a window wider than the screen; the arithmetic
         // for WHERE it goes is HudChipRow.Placement's, tested without a window.
         var area = SystemParameters.WorkArea;
-        MaxWidth = Math.Max(120, area.Width);
+        MaxWidth = HudChipRow.WrapWidth(area.Width);
         UpdateLayout();
         // THE UNDER-BAR PANEL IS SLAVED TO THE SAME EDGE (OE-1), so the row parks below it
         // rather than on top of it. Handed to Placement as part of the HUD's own height
         // because that is exactly what it is to a chicklet: the widget and whatever is
         // hanging off it are one block, and the flip-above-the-widget rule has to treat them
         // as one or it will flip the row into the panel. Zero whenever no panel is up.
-        var occupied = _main.ActualHeight + _main._hudExpandBar.OccupiedHeight;
+        //
+        // **A PARKED panel is no longer under the bar, so it no longer occupies that space**
+        // — asking the bar for a height the panel is not standing in would leave a gap the
+        // player can see and cannot explain.
+        var occupied = _main.ActualHeight + _main._hudExpandBar.SlavedOccupiedHeight;
         var (left, top) = HudChipRow.Placement(
             _main.Left, _main.Top, occupied, ActualHeight, area.Top, area.Bottom);
+        if (Left != left) Left = left;
+        if (Top != top) Top = top;
+    }
+
+    /// <summary>
+    /// Screen-ABSOLUTE placement at the player's corner (OE-8 §2.3). The widget is not
+    /// consulted at all: the park is about where the FIGHT is on screen, not where the bar
+    /// is, and a widget-relative offset would quietly drag the row off the fight the first
+    /// time someone moved the bar.
+    ///
+    /// The wrap cap and the clamp read THE PARKED POINT'S OWN MONITOR (the plan's named
+    /// implement check), not <c>SystemParameters.WorkArea</c>'s primary — a row parked on a
+    /// second display would otherwise be yanked back the first time a chicklet arrived.
+    /// </summary>
+    private void ParkAtAnchor()
+    {
+        var anchorLeft = _main.Settings.HudRowParkLeft;
+        var anchorTop = _main.Settings.HudRowParkTop;
+        var area = ScreenGuard.WorkAreaAt(this, anchorLeft, anchorTop);
+        MaxWidth = HudChipRow.WrapWidth(area.Width);
+        UpdateLayout();
+        var (left, top) = HudChipRow.ParkedPlacement(
+            anchorLeft, anchorTop, ActualWidth, ActualHeight,
+            area.Left, area.Top, area.Right, area.Bottom);
         if (Left != left) Left = left;
         if (Top != top) Top = top;
     }
@@ -209,6 +327,19 @@ internal sealed class HudChipRowWindow : Window
                 onMute: () => Apply(() => HudChipRow.SetMuted(
                     _main.Settings, family, !HudChipRow.IsMuted(_main.Settings, family)))));
         }
+        // "Follow the HUD again" (OE-8) — the way back from a free-drag, beside mute and
+        // order because one editor answers every "how do I undo what I did to the row"
+        // question. It is drawn ALWAYS, disabled when there is nothing parked: a control that
+        // only exists once you are lost is a control nobody has seen before they need it, and
+        // Edit HUD is the one door this row has.
+        //
+        // It un-parks BOTH companion windows. The panel has no editor of its own, and to a
+        // player "the stuff hanging off my HUD" is one object — an under-bar panel stranded
+        // in a corner with no door would be the capability-with-no-way-back that trap 59
+        // names.
+        _panel.Children.Add(HudEditChip.Unpark(
+            IsParked || _main._hudExpandBar.IsParked,
+            () => Apply(() => { Unpark(); _main._hudExpandBar.Unpark(); })));
         _panel.Children.Add(HudEditChip.Hint());
     }
 

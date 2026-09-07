@@ -93,6 +93,70 @@ internal static class HudEditChip
         return border;
     }
 
+    /// <summary>
+    /// "FOLLOW THE HUD AGAIN" (OE-8) — the way back from a free-drag, in the shape of the
+    /// chicklets beside it.
+    ///
+    /// **Drawn even when nothing is parked**, dimmed and disabled with the tooltip saying so.
+    /// The alternative — appear only once a window is loose — is a control whose first
+    /// appearance is at the moment a player has already lost something, on the one surface
+    /// that is supposed to be the answer to "what did I do to my row". <c>IsEnabled</c> alone
+    /// is invisible in this app's styles, so the ink is dimmed with it (trap 17).
+    ///
+    /// **<c>Pin</c> as the emblem, <c>Undo</c> as the control**, and they are deliberately
+    /// two different vectors: the emblem says what the STATE is (something is pinned to a
+    /// spot on the screen) and the button says what the CLICK does. Two identical shapes on
+    /// one chicklet is #148/#166's three-identical-boxes failure, which is also why neither
+    /// borrows the mute toggle's <c>Check</c>/<c>Close</c> or the order nudges' chevrons —
+    /// every one of those is already a live verb on this same row.
+    /// </summary>
+    /// <param name="parked">Anything is parked — the row, the under-bar panel, or both.</param>
+    public static Border Unpark(bool parked, Action onUnpark)
+    {
+        var row = new StackPanel { Orientation = Orientation.Horizontal };
+        var icon = DesignSystem.Icon("Pin", parked ? "TextBrush" : "DimBrush",
+            size: Tok.IconInline);
+        icon.Margin = new Thickness(Tok.SpaceXs, 0, Tok.SpaceXs, 0);
+        icon.VerticalAlignment = VerticalAlignment.Center;
+        row.Children.Add(icon);
+
+        var name = new TextBlock
+        {
+            Text = "Follow the HUD again",
+            FontSize = 11, FontWeight = FontWeights.SemiBold,
+            VerticalAlignment = VerticalAlignment.Center,
+            Margin = new Thickness(0, 0, Tok.SpaceXs, 0),
+        };
+        name.SetResourceReference(TextBlock.ForegroundProperty, parked ? "TextBrush" : "DimBrush");
+        row.Children.Add(name);
+
+        var button = DesignSystem.InlineIconButton("Undo",
+            parked
+                ? "Puts the chip row and the under-bar panel back under EQBuddy, where they "
+                  + "move with it. Drag either one anywhere to park it again."
+                : "Nothing is parked — the chip row and the under-bar panel are already "
+                  + "following EQBuddy. Drag either one anywhere on the screen to park it, "
+                  + "and this puts it back.",
+            (_, _) => onUnpark(), parked ? "AccentBrush" : "DimBrush");
+        button.IsEnabled = parked;
+        if (!parked) button.Opacity = 0.35;
+        row.Children.Add(button);
+
+        var border = new Border
+        {
+            Child = row,
+            CornerRadius = new CornerRadius(7),
+            Padding = new Thickness(4, 3, 4, 4),
+            Margin = new Thickness(0, 0, 3, 0),
+            BorderThickness = new Thickness(1),
+            Tag = "unpark",
+        };
+        border.SetResourceReference(Border.BackgroundProperty, "BgBrush");
+        border.SetResourceReference(Border.BorderBrushProperty, "AccentBrush");
+        if (!parked) border.Opacity = 0.55;
+        return border;
+    }
+
     private static Button Nudge(string icon, string tip, bool enabled, Action act)
     {
         var button = DesignSystem.InlineIconButton(icon, tip, (_, _) => act(),

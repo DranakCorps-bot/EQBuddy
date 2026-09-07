@@ -61,6 +61,62 @@ public sealed class AppSettings
     /// and its trackers keep running — unmute mid-linger and the chip is there. The HUD owns
     /// what is on screen right now, which is the split the signed spec draws.</summary>
     public List<string> MutedChipFamilies { get; set; } = [];
+
+    /// <summary>
+    /// WHERE THE PLAYER PARKED THE HUD CHIP ROW (OE-8 free placement) — the anchored corner
+    /// it reopens at, in the same DIP space as <see cref="WindowLeft"/>.
+    ///
+    /// **NaN — the default — means SLAVED, and slaved is byte-for-byte the shipped SA-2
+    /// behaviour**: <c>HudChipRow.Placement</c> recomputed from the widget every tick, with
+    /// no geometry of its own. A finite pair means the player free-dragged the row somewhere
+    /// and it is screen-ABSOLUTE from then on: the follower actor retires for this window,
+    /// because the park is about where the FIGHT is on screen and not where the widget is
+    /// (the retired <c>MezChipsWindow</c>'s own doc — "mez chips get parked next to the
+    /// fight, spawn chips are ambient").
+    ///
+    /// **Written at DRAG END and nowhere else.** Not per-move (a drag is not twenty file
+    /// writes), not in a <c>Closed</c> handler (trap 2), and by no path the window itself
+    /// initiates. Of trap 49's three actors — follower, toolkit, player — only the player's
+    /// drag has an END, so only the player can reach this pair. There is no <c>selfSet</c>
+    /// flag to get wrong because there is no shared write path to guard.
+    ///
+    /// **A park this desk cannot show is kept, not corrected.** At restore the pair goes
+    /// through <c>ScreenGuard.OnScreen</c> (a 40px grab area against the VIRTUAL screen);
+    /// unreachable means the row runs slaved FOR THE SESSION and this pair survives
+    /// untouched, so the monitors coming back bring the park back — #117, Snagglefern's
+    /// four-screen rig, reused rather than reinvented. The way back is Edit HUD's "Follow the
+    /// HUD again", which clears the pair to NaN.
+    ///
+    /// **Per WINDOW, not per family or per chip** (the plan's §2.5, Bevel pre-designed):
+    /// per-family would be the debt SA-2 was signed to end — independently parked families
+    /// are independently positioned floats again. If players ask for it later the setting
+    /// widens by family key (<see cref="MutedChipFamilies"/>' shape) without migrating this
+    /// pair.
+    /// </summary>
+    public double HudRowParkLeft { get; set; } = double.NaN;
+    public double HudRowParkTop { get; set; } = double.NaN;
+
+    /// <summary>Where the player parked the UNDER-BAR PANEL (OE-1's companion window), by
+    /// exactly the rules <see cref="HudRowParkLeft"/> states — one pair per window, and the
+    /// two windows park independently because they are two windows, not two families.
+    /// </summary>
+    public double HudPanelParkLeft { get; set; } = double.NaN;
+    public double HudPanelParkTop { get; set; } = double.NaN;
+
+    /// <summary>
+    /// The width the player dragged the under-bar panel to (OE-1b lock 3), or NaN for the
+    /// single shipped width — the same sentinel convention the park pairs use, so a reset
+    /// profile gets today's app with no migration step.
+    ///
+    /// **This does not reopen OE-7's one-width rule.** That rule was about CONTENT-driven
+    /// wobble: a longer ability name resizing an always-on-top transparent window on a
+    /// one-second tick is #173's mechanism at a small amplitude (trap 12). A player dragging
+    /// an edge is the kind of geometry change trap 12 explicitly permits, and it happens
+    /// once. Written at RESIZE END only, for the same reason the pairs above are written at
+    /// drag end.
+    /// </summary>
+    public double HudPanelWidth { get; set; } = double.NaN;
+
     public double QuestsLeft { get; set; } = double.NaN;
     public double QuestsTop { get; set; } = double.NaN;
     /// <summary>The Progress window's saved spot (the PROGRESS THEME, docs/Themes.md).
