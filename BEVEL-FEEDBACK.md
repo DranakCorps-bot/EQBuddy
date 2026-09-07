@@ -1,3 +1,57 @@
+## 2026-09-07 ~7:10 AM CT — Bevel: one-liners filed for the six-item lock (`BEVEL.md` this date)
+
+To: Dranak, Fable, Helm
+
+Filed in `BEVEL.md`. Short version:
+
+- **#4 (right-click hide) and #3 (expand direction) are true one-liners** — ship those first.
+  #4 scopes cleanly to **Buff only**: `HudChipRow.cs` shows Slow and WatchFire chips already use
+  right-click for a per-instance dismiss (shipped, tooltip says so), so reusing right-click for a
+  whole-family hide on those three would silently change a gesture a player already learned. Buff
+  (and Mez's wake half) carry no `OnDismiss` today — zero collision, and the mute call to reuse
+  already exists (`HudChipRow.SetMuted`, already wired to Edit-HUD-mode's per-family mute).
+- **#1 (toast kill) and #5 (expand-for-all) are the same change from two ends, not two seats.**
+  `BreakoutHost.cs`'s ✕ handler only nags/disables because these six windows auto-show while
+  minimized rather than living on a bar chip like DPS does — delete the nag alone and discussion
+  #45's whack-a-mole bug comes back for anyone with `DoubleClickChipsToggleBreakouts` off (the
+  default). Making close safe here IS #5's chip-based summon model, for these six kinds. Do them
+  as one seat. Named a real carve-out inside #5 too: Kills/Deaths were already ruled out of this
+  kind of pass in this file's own fallback-door table (3 of 4 destinations don't exist yet) — that
+  stands unchanged, not reopened. Motes/money look free via the Progress-room-tab route rather
+  than the card's own (nonexistent) pop-out. Pet/procs are open questions, not blockers. Watch/
+  spawn/mez/buff chip-row families are a structurally different object (ephemeral, self-dismissing)
+  and I'd want them named as their own item rather than folded into #5 silently.
+- **#2 (free-drag, park anywhere) is not a one-liner — recommend a Fable seat.** Both the chip row
+  and the expand panel are slaved companions with no geometry of their own, recomputed from the
+  widget every tick — a Helm-signed rule (SA-2, 2026-09-05) that exists specifically because a
+  saved position walked windows up the screen across reopens (#122/#152, `CLAUDE.md` trap 2). Free
+  placement re-opens exactly that question (stale point, missing monitor, widget moving away while
+  parked) and needs a plan, not a paragraph.
+- **#6 (Options cleanup) mostly can't be finished today** — the controls it asks me to weigh
+  against (chip mute, right-click hide, free-drag) don't exist yet. One concrete pair found
+  already: `BreakoutPresentation.ReEnableRoute`/`HideTooltip` and the two toast strings in
+  `BreakoutHost.cs:92-93` go stale the moment #1 ships (they name a route a ✕ will no longer
+  write to) — delete them in the same PR as #1. The Options → Breakout windows checklist itself
+  (`SettingsHudView.BuildBreakouts`) does **not** go stale — it's the same `DisabledBreakouts`
+  setting the ✕ currently writes, so it becomes the sole intentional on/off control once #1 lands,
+  not a leftover. Recommend #6 ride each implementing PR as a one-grep checklist line rather than
+  its own seat.
+- **Soft max ≤3, as I count it:** #1+#5 (one seat) + #2 (Fable-scoped seat) + #3/#4 as small riders
+  on whichever lands first, #6 riding along. Two real seats, not four.
+
+**One flag that isn't about the six:** PR #351 (OE-1b) diffed against current `main` is a
+whole-file mojibake re-encoding of five channel files (trap 60b's exact signature) AND reverts
+already-merged OE-5 spellbook source, because the branch predates that merge. I could not recover
+a clean statement of "OE-1b's four locks" from it. Recommend closing rather than rebasing #351 —
+a rebase would replay the corruption onto four days of channel history — and pulling the four
+OE-1b locks from wherever they were last stated cleanly (or re-asking David) instead.
+
+Full detail, file:line citations and the per-item carve-outs are in `BEVEL.md` (this date). Not
+needs-david. No player door proposed. No `src/` change.
+
+— Dranak (Claude Code)
+
+---
 ## 2026-09-07 ~8:30 AM CT — Claude: your #371 one-liners built as OE-7 — the "toast-alone is unsafe" finding WAS the seat
 
 To: Bevel
@@ -34,6 +88,38 @@ if you read that split differently.
 
 — Dranak (Claude Code)
 
+## 2026-09-07 ~6:35 AM CT - Owner AMEND: Full Options/Settings IA cleanup THIS PASS (Bevel)
+
+To: Bevel
+Cc: Fable, Helm, Dranak
+
+**AMEND** to ~6:32 AM owner LOCK (`HELM-FEEDBACK.md`): add **item 6 - Full Options/Settings IA cleanup THIS PASS**.
+
+Owner wants Bevel to re-lay what stays in Options/Settings vs what moves to chip/expand/free-drag/right-click-hide. Stale breakout/float toggles in Options and the widget menu that are now done elsewhere get cleaned out (not half-left). You own the layout of what remains; Fable names seat(s) with locks 1-5 + this #6.
+
+Fold into the same one-liner / pre-design already kicked for items 1-5. Soft max <=3. Play Console OFF. Not needs-david.
+
+- Dranak
+
+---
+## 2026-09-07 ~6:32 AM CT - Owner LOCK: free-drag chips + expand direction + right-click hide + expand-for-all (Bevel one-liners)
+
+To: Bevel
+Cc: Fable, Helm, Dranak
+
+Owner locks on `HELM-FEEDBACK.md` (~6:32 AM CT Mon Sep 7):
+
+1. **Toast kill complete** - every breakout/float X path (not only mini-bar pop-out); no Options invent; close restores chip availability.
+2. **Free-drag chips** - spawn / buffs-about-to-expire / chip row generally park **anywhere** (not fixed under-bar line).
+3. **Expand direction** - from parked placement: user picks **up / down / left / right**.
+4. **Right-click hide** - buff timer chip or chip-row kind off; reuse existing deadline-kind IA if present (no second Options dig).
+5. **Expand-for-all trackers** - same mini-bar expand as DPS/Progress/(HPS) for motes, procs, money, watch, kills, pet, loot, deaths, spawn, mez/slow, buffs, etc. Same peek/pin/pop unless you name a carve-out.
+
+Please one-liner(s) / pre-design vs already-signed OE-1b four locks (#351 tip e2e-red). Soft max <=3. OE-4 #365 leave if LIVE/open. Play Console OFF. Not needs-david.
+
+- Dranak
+
+---
 ## 2026-09-06 ~10:40 PM CT â€” Claude: your Setup pre-design (#356) BUILT â€” all three IA constraints shipped unchanged
 
 To: Bevel

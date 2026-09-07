@@ -1,5 +1,209 @@
 # Bevel inbox
 
+## 2026-09-07 ~7:10 AM CT — Owner LOCK (six, amended): toast kill / free-drag / expand direction / right-click hide / expand-for-all / Options cleanup — one-liners vs OE-1 (Bevel)
+
+**Priority:** #4 (Buff only) and #3 (if #2 is deferred) = `approved`, ship as one-liners; #1 and
+#5 = `approved` IA but ONE seat together, not two (see §1); #2 = **not a one-liner — recommend a
+Fable seat**, it reopens a Helm-signed architecture; #6 = `waiting` on #1/#4/#5 landing (I can lay
+out what survives, not finalize it, until those ship). None of the six is `needs-david`.
+**Source:** `HELM-FEEDBACK.md` ~6:32 AM CT lock (items 1–5) + ~6:35 AM CT amend (item 6), both on
+`channel/owner-next-evolved-pass-20260907` tip `e3680dc5`; `BEVEL-FEEDBACK.md` this date, same
+tip. OE-1 built (`claude/oe1-minibar-expand-20260906`, this file's item 4, owner locks 1–10 in
+`HudExpandTests`). OE-1b is PR #351 (e2e-red) — see the flag at the bottom of this entry; I could
+not read a clean statement of "OE-1b's four locks" from its own diff.
+**Checked:** `src/EQBuddy.UI.Shared/HudExpand.cs` (whole file), `HudChipRow.cs` (whole file),
+`src/EQBuddy/HudChip.cs:147`, `HudChipRowWindow.cs:196-212`, `HudExpandWindow.cs:196-206`,
+`HudEditChip.cs`, `src/EQBuddy/BreakoutHost.cs` (whole file), `src/EQBuddy.UI.Shared/
+BreakoutPresentation.cs:105-123`, `src/EQBuddy/SettingsHudView.cs:447-529`, `AppSettings.cs`
+(`DisabledBreakouts`, `DoubleClickChipsToggleBreakouts`, `MiniStats`, `HudChipOrder`,
+`MutedChipFamilies`), `WhatsNew.json:1143`, and this file's own item-4 fallback-door table (the
+Live pre-design, tip `54fc1dc3`) for the Motes/Loot/Kills destinations item 5 names. **Not run
+against the live app** — this is a source-read pre-design, same caveat as the 2026-09-06 round.
+**Out (confirmed honored below):** no OptionsWindow retirement invented beyond what items 1/6
+name, no TEL, no Play Console, no player-door code, no seat naming (that's Fable's).
+
+---
+
+### 1. Toast kill — the real scope is bigger than deleting a string, and it is the same change as #5
+
+**Place:** `src/EQBuddy/BreakoutHost.cs:74-94` — the six `BreakoutKind` floats' ✕ handler adds
+the kind to `settings.DisabledBreakouts` (persistent) and, when `DoubleClickChipsToggleBreakouts`
+is off (the default), fires `main.AlertTile.ShowAlert($"{k} breakout hidden — re-enable in
+{BreakoutPresentation.ReEnableRoute}")` — a shipped, `WhatsNew.json:1143`-documented feature.
+Compare `src/EQBuddy.UI.Shared/HudExpand.cs:236-241` (`WindowClosed`, OE-1's float close): no
+disable, ever — the chip just goes back to hover/click, which is verbatim the ask's own words
+("close → chip/bar available; hover/click restores").
+
+**The nag is not universal today** — `BreakoutHost.cs:91` already suppresses it when
+`DoubleClickChipsToggleBreakouts` is on, because a double-click already undoes the close. The
+persistent-disable-on-✕ exists to fix discussion #45 (a float that silently reappeared every
+minimize after being explicitly closed — "whack-a-mole"). **Delete the disable without changing
+anything else and #45 comes back** for anyone who leaves that setting off (the default): the six
+breakout windows auto-show while minimized, they are not summoned from a bar chip the way DPS/
+HPS/Progress are, so "closed" currently has nowhere honest to persist except that flag.
+
+Making close safe here, the way OE-1 made it safe, means these six get the SAME summon model
+item 5 asks for — a bar chip you hover to peek / click to pin / ⧉ to pop — not a one-line delete.
+**Items 1 and 5 are the same change described from two ends.** Do #5's plumbing for a
+`BreakoutKind` and #1 falls out of it for free; do #1 as a string-delete alone and #45 reopens.
+
+---
+
+### 2. Free-drag chips — reopens a Helm-signed architecture, not a UI tweak
+
+**Place:** `HudChipRow.Placement` (`src/EQBuddy.UI.Shared/HudChipRow.cs:400-409`) and
+`HudExpandWindow`'s positioning (`src/EQBuddy/HudExpandWindow.cs:196-206`, its own comment: "same
+`HudChipRow.Placement` arithmetic"). **Both windows are slaved companions with no geometry of
+their own and nothing persisted, recomputed from the widget's position every tick** — the SA-2
+hosting amendment, Helm-signed 2026-09-05, and `CLAUDE.md` trap 2's tombstone names exactly this:
+"there is nothing left to save in a `Closed` handler... the three files retired together." That
+rule exists **because of** #122/#152 — a saved x/y walking a window up the screen across reopens.
+
+"Park anywhere" asks for a saved position again, on the surface built specifically to need none.
+Re-solving that safely means re-answering trap 2's whole question set for these two windows: what
+happens on reopen with a stale or off-screen point, a monitor that's gone, the widget moving away
+while the row is parked, a profile reset. That is design work with real edge cases, not a drag
+handle. **Zero drag code exists in either file today** (grepped `Drag`/`MouseMove`/
+`MouseLeftButtonDown`/`CaptureMouse` — no hits), so there's no partial implementation to extend.
+
+Vs OE-1b: its own title ("drag-to-place under-bar panel") reads as scoped to placing the panel
+near/under the bar, not arbitrary screen position; this ask's "not stuck in a fixed horizontal
+under-bar line" removes the anchor rule entirely, which is wider. **Recommend a Fable seat, not a
+Bevel one-liner** — the product question ("one saved spot for the whole row, or one per chip? one
+per family?") is mine to pre-design once it's scoped as its own item; the persistence/reopen
+mechanics need a plan.
+
+---
+
+### 3. Expand direction (up/down/left/right) — same placement code as #2; shrinks to a one-liner if #2 waits
+
+**Place:** the same `HudChipRow.Placement` call site, `HudExpandWindow.cs:203-206`. Today it is
+**always** directly under the widget, left edges aligned, flipping ABOVE only when it would run
+off the bottom of the work area (`HudChipRow.cs:404-408`) — there is no left/right concept
+anywhere in this arithmetic.
+
+If #2 ships free placement, direction is naturally "which way the panel opens from wherever it's
+parked" — one more argument to the same function, cheap once a parked point exists. If #2 is
+deferred (my recommendation), direction from the CURRENT fixed anchor is a small, real pre-design
+on its own: four screen-edge-aware flip rules instead of today's one (up must not paint into the
+widget; left/right need a horizontal work-area check `Placement` doesn't do today). **This is the
+one item of the five that is genuinely one-liner-sized on its own** — I'll write the four-rule
+version the same day #2's fate is decided, whichever way that goes.
+
+---
+
+### 4. Right-click hide — Buff is a clean reuse; Mez/Spawn/WatchFire collide with a shipped gesture
+
+**Place:** `src/EQBuddy/HudChip.cs:147` — `MouseRightButtonUp` is already wired to `onDismiss` for
+any chip that carries one. `HudChipRow.cs:453-474` (Slow) and `:497-511` (WatchFire) chips DO
+carry a per-instance `OnDismiss` today — **right-click on those already means "dismiss this one
+instance,"** shipped and tested (the Slow tooltip literally says "· right-click to dismiss").
+`HudChipRow.cs:546-572` (Buff) and the wake half of Mez (`:422-447`) carry **no** `OnDismiss` —
+right-click on those chips does nothing today.
+
+The mute mechanism the ask wants reused already exists, keyed at exactly the right grain:
+`HudChipRow.SetMuted`/`IsMuted`/`MutedChipFamilies` (`:226-274`), already wired to a live control —
+`HudEditChip.Build(family, ..., onMute: () => HudChipRow.SetMuted(...))` inside "Edit HUD…" mode
+(`HudChipRowWindow.cs:204-212`). So the ask is precisely "call that same `SetMuted` from a live
+chip's right-click, not only from inside Edit mode" — **clean and small for Buff**, because
+nothing on that chip owns right-click yet.
+
+Doing the identical thing on Mez, Spawn or WatchFire would silently change what right-click means
+on a chip a player already learned — a per-instance dismiss becoming, or competing with, a
+whole-family hide. That's "silent no-ops are broken" with the switch flipped: the gesture used to
+do one thing and now maybe does another, with nothing in a diff or a screenshot to show it.
+**Carve-out: ship right-click-hide on Buff first** (zero collision); Mez/Spawn/WatchFire need
+either a second gesture (a small ⋯ affordance, or a modifier key) or an explicit owner call that
+knowingly trades away per-instance dismiss for kind-hide on those three. Also confirm the way
+back: `HudEditChip`'s unmute row already exists for this, but it lives in Edit HUD mode, which a
+player who has just hidden their only Buff chip needs a way to *find* with nothing left on the row
+to click into it from — worth a one-line check before shipping, not a redesign.
+
+---
+
+### 5. Expand-for-all trackers — the enum already promises this; the destinations are the real work
+
+**Place:** `HudExpandTarget` (`src/EQBuddy.UI.Shared/HudExpand.cs:8-21`) is written to grow — its
+own doc comment: "this enum grows and nothing else about the model does" (owner locks 8/9). So
+the peek/pin/pop **mechanism** is not new work per target; a **destination to pop to** is. Checked
+against this file's own fallback-door table (item 4 below this one, the Live pre-design, tip
+`54fc1dc3`) for the exact list the ask names:
+
+- **Motes, money** — land in the Progress room's Wealth tab, the same shape Progress/xp already
+  uses (a room TAB destination, not a card's own window). Should be clean **if built via the room-
+  tab route.** The earlier "no fallback door exists, full stop" finding for Motes was about
+  `MotesCardView` having no `OpenWindow` of its own — a different question (removing the v1 card),
+  not this one — but the executor should re-confirm rather than assume it's free.
+- **Kills, deaths — named carve-out, keep OUT of this pass.** This file's own table already
+  blocks Kills & Drops for an unrelated reason: 3 of the 4 real destinations (World's Drops tab,
+  a search/disposition lookup, Gear's "what dropped for you") don't exist yet, in as many words.
+  Nothing about this pass changes that.
+- **Loot** — same shape as Kills: one destination (`GearRoom`), plausible, not verified this pass.
+- **Pet, procs** — no destination named anywhere I read this pass. Flag as **open, not blocked** —
+  needs a source check before promising either way.
+- **Watch, spawn, mez/slow, buffs — the one place I'd push back on doing this verbatim.** These
+  are `HudChipRow` families, not `HudExpandTarget` mini-bar slots, and they are a different kind
+  of object already: ephemeral, self-dismissing chicklets that exist only while the alert is live,
+  not an always-on glance number with a persistent detail behind it. "Pop" for these would open a
+  RULES screen (Settings → Alerts) or nothing, never a live-data float — mapping the identical
+  three verbs onto them is plausible but is its own small design question, not a slot in a growing
+  enum. Worth its own one-liner once named as its own item, not folded into this one silently.
+
+---
+
+### 6. Options/Settings cleanup — mostly waits on 1/4/5; one concrete stale pair found already
+
+**Place:** `src/EQBuddy/SettingsHudView.cs:463-529` (`BuildBreakouts`) is "Options → Breakout
+windows" — one checkbox per `BreakoutKind`, ticked = "this floating window may open while
+minimized." **This does NOT go stale.** Reading `BreakoutHost.cs`'s ✕ handler against it: closing
+a float today calls `settings.DisabledBreakouts.Add(k)`, which is exactly what unticking this same
+checkbox does — the ✕ and the Options row are **one setting today**, not two. If item 1 removes
+the ✕'s write to that flag, this checklist becomes the ONLY intentional on/off control for these
+six windows, which is item 6's own framing ("what remains") applied correctly — **keep it,
+unchanged**, once #1 lands.
+
+**What IS stale, and only once #1 ships:** `BreakoutPresentation.ReEnableRoute`/`HideTooltip`
+(`:110-123`) and the two format strings in `BreakoutHost.cs:92-93` — they exist only to name the
+Options row a ✕ just silently wrote to, and that write is exactly what #1 removes. Delete them in
+the same PR as #1, not later; a leftover tooltip pointing at a route nothing writes to any more is
+`SCRIBE.md`'s own trap-20 shape (a sentence describing a reader that no longer exists).
+
+**Checked and found no other stale artifact:** the widget's context menu (`MainWindow.xaml`) has
+no per-breakout toggle to clean — Options is the only home for `DisabledBreakouts`. `SA-4`'s
+`MutedChipFamilies` (the chip-row mute) has no Options row at all today, only the Edit-HUD-mode
+control — so items 4/5 add no NEW Options surface to reconcile, only the in-context one already
+built. **I cannot finish this item today.** #6's own ask is to re-lay what stays "vs chip/expand/
+free-drag/right-click-hide controls" — those controls don't exist yet, so there is nothing to lay
+out against beyond the one pair above. Recommend #6 rides as a checklist item on whichever PR(s)
+implement #1/#4/#5, not its own seat: "does this PR leave an Options row or a tooltip describing a
+control this PR just replaced?" — answerable in one grep per PR, the way I answered it here.
+
+---
+
+### Soft max ≤3 — my read
+
+**#4 (Buff only) and #3 (if #2 waits) are true one-liners today** — small, no architecture
+reopened, ship those first. **#1 cannot ship safely as a one-liner without doing #5's plumbing for
+at least the six `BreakoutKind` stars** (minus Kills/Deaths, minus the four chip-row families) —
+treat #1+#5 as ONE seat, not two. **#2 is the one I'd hand to Fable as its own plan** — it reopens
+a Helm-signed no-persisted-geometry rule and needs its own trap-2 re-solve, not a paragraph here.
+**#6 rides along on #1/#4/#5's PRs as a checklist line**, per above — it is not a fourth seat.
+That reads as two real seats (the #1+#5 combo, and #2 once Fable scopes it) plus #3/#4 as small
+riders on whichever lands first — inside soft max ≤3 without inventing a fourth.
+
+**Flagging separately, not one of the six:** PR #351 (OE-1b, e2e-red) is not just stale — diffed
+against current `origin/main` it is a whole-file mojibake re-encoding of `BEVEL-FEEDBACK.md`,
+`HELM-FEEDBACK.md`, `FABLE.md`, `HELM.md` and `DECISIONS.md` (every em dash → `ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â`,
+trap 60b's exact signature), and it also reverts real, already-merged source
+(`SpellbookFile.cs`, `SpellbookBuffTests.cs`, parts of `BuffTracker.cs` — OE-5's spellbook-buff
+work, merged in #361) because the branch predates that merge. I could not read a clean statement
+of "OE-1b's four locks" out of it. **Recommend closing #351 rather than rebasing it** — a rebase
+would try to replay a whole-file corruption onto four days of channel history — and that Fable/
+Helm re-derive the four OE-1b locks from wherever they were last stated cleanly, or re-ask David,
+rather than from this PR's diff.
+
+---
+
 ## 2026-09-06 ~5:49 PM CT — Owner Evolved iterative feedback (David) — four pre-designs (Bevel)
 
 **Priority:** (3) Home/shell recovery = `must-fix`; (1) buff density = `approved` IA, (1) timer
