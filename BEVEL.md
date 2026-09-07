@@ -1,5 +1,44 @@
 # Bevel inbox
 
+## 2026-09-07 ~3:15 PM CT — Ruling: the leading-article dedupe finding (`hud-expand-loot.png`) is real, small, and V0–V1 — not filed to Fable (Bevel)
+
+**Priority:** ruling only, no code in this pass (this session is docs/UX-only, per its own
+scope — see the transition one-pager above this entry). Filed so the next seat that opens
+`MainWindow.TargetDropsContent` doesn't have to re-derive what Dranak already found in
+`HELM-FEEDBACK.md` (~2:35 PM CT) and flagged to this seat.
+
+**The finding, confirmed by reading the source, not just the screenshot:**
+`EqlWikiItemService.NormalizeTitle` (`src/EQBuddy.Core/EqlWikiItems.cs:62`) strips only the
+in-game "+N" upgrade suffix — it does not strip a leading "A "/"An "/"The ". The wiki's own
+page titles carry that article for some mobs' drop tables; the player's observed loot line
+does not. `TargetDropsContent`'s fold-to-base-name dedupe runs on that same normaliser, so
+"Spider Venom Sac" (your kill) and "A Spider Venom Sac" (the wiki's row) look like two
+different items and both draw — three lines apart in the 300-wide HUD peek, further apart
+and easier to miss on the Loot card and the Loot float's Target view, which have carried the
+same bug since they were built. **Confirmed still open on `main` at this tip
+(`e08c6f0a`)** — nothing since #392/#400 touched `NormalizeTitle` or the dedupe call site.
+
+**Ruling: this is V0–V1, not a `FABLE.md` item.** It is a one-line fix in one shared method
+(strip a leading article before the dedupe key, same place the "+N" strip already lives) that
+corrects all three surfaces at once, per Dranak's own read. It is mechanical, localized, and
+the only judgment call — whether the DISPLAYED text also drops its article, or only the
+dedupe KEY does — is small enough to decide inline rather than plan: **keep the displayed
+wiki row exactly as the wiki writes it (articles are part of a proper mob/item name on that
+page and stripping them from the shown text would be an unasked-for content edit); strip the
+article only for the comparison key that decides whether two rows are "the same item."** That
+keeps `WikiContribution`'s "match the wiki" rule (`CLAUDE.md`) intact for anything actually
+shown, and fixes only the false-duplicate.
+
+**Not done here, on purpose:** this session's scope is docs/UX only (no `src/`), so the fix
+itself is left for the next available V0–V1 pass — it needs no plan, no design call beyond
+the one above, and a shipped fix earns its own `WhatsNew.json` line (a player-visible content
+correction) plus a `docs/screenshots/hud-expand-loot.png` re-shoot once fixed, since the
+current committed shot is evidence of the bug it will no longer reproduce.
+
+— Bevel, 2026-09-07 ~3:15 PM CT
+
+---
+
 ## 2026-09-07 ~1:40 PM CT — Loot mini-bar peek fixed to target scope; Options/cog IA re-audit (lock 6): current, nothing further to strip (Bevel)
 
 **Priority:** `approved` — owner-locked (`HELM-FEEDBACK.md` ~12:55 PM CT SIGN, on the owner's ~12:54 PM CT feedback testing Evolved Desktop `2.0.0+3a1e8654`). Soft Bevel seat, soft max ≤3, Play Console OFF, not needs-david. Item 1 of that feedback (settings-reset on publish, HIGH) is Opus's, not this pass's; item 3 (OE-9 peek content — Motes/Kills/Procs/Money) is Fable-seated and explicitly blocked from Opus until signed — neither touched here.
