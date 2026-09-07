@@ -38,14 +38,23 @@
          that re-adds a copy outside the region fails the build rather than the family's
          widgets. In LogJanitorPolicyTests' shape: the guard reads the script text.
 
-         Since 2026-09-05 that list has a fourth member which reaches NOBODY and is on it
+         Since 2026-09-05 that list had a fourth member which reached NOBODY and was on it
          anyway: compiling, signing or hashing EQBuddySetup.exe. The other three are about
-         a file leaving the machine; the installer only has to EXIST. It carries v1's
-         AppId and {autopf}\EQBuddy, so a signed 2.0.0 one sitting in dist\ is one
+         a file leaving the machine; the installer only had to EXIST. It carried v1's
+         AppId and {autopf}\EQBuddy, so a signed 2.0.0 one sitting in dist\ was one
          double-click from replacing the v1 install and inheriting its profile - and
-         check 3 watches the family's update folder, never dist\. release.ps1
-         -EvolvedLocal built and signed one on every run while install-local.ps1 -Evolved
-         refused to; two loops disagreeing about a one-way door is what this row ends.
+         check 3 watches the family's update folder, never dist\.
+
+         ON 2026-09-07 (TR-2, FABLE.md §3, signed #399) THAT MEMBER FLIPPED: from "never
+         build the installer" to "only ever build it under the NEW IDENTITY". The
+         mitigation was never the point - the AppId was. installer\EQBuddyEvolved.iss has
+         its own AppId, installs into {autopf}\EQBuddy Evolved with its own Start-menu
+         entry, and is named EQBuddyEvolvedSetup.exe, so the artifact cannot do the thing
+         "build none" was avoiding. Check 5 below is the flipped row, and it is TWO facts
+         that must both hold: the reserved name is never produced anywhere on a 2.x tree,
+         and the script that IS compiled carries the Evolved identity. A negative alone
+         would pass on a tree that builds no installer at all, which is trap 34's shape -
+         so the positive is asserted beside it.
       2. `gh release create` is unreachable on a 2.x tree, by two independent locks -
          it is inside the region above, and -EvolvedLocal refuses -Tag and -Prerelease
          outright. There is deliberately NO switch that re-enables it.
@@ -71,6 +80,28 @@
          Same shape as check 1's fourth token: deleting the thing without guarding the
          shape leaves the mechanism exactly as blind as it was.
 
+      5. THE INSTALLER IDENTITY (TR-2, 2026-09-07), which is check 1's fourth member after
+         the flip described above, and is stated as its own check because it reads two
+         files rather than one region:
+
+           * EQBuddySetup.exe is a RESERVED NAME belonging to the v1 line FOREVER. Every
+             deployed 1.x updater matches on it (UpdateChecker.SetupName) and the v1
+             contract is frozen - an asset of that name on a 2.x release would be
+             downloaded and run by every Windows v1 install's existing update flow, a
+             major-line replacement with no consent moment. So no 2.x path may PRODUCE
+             one: not release.ps1, not install-local.ps1, and not a .iss sitting in the
+             tree that anyone could hand-compile. Reading the name is fine and is the
+             point - release.ps1 still warns about a pre-TR-2 leftover in dist\.
+           * The installer script release.ps1 compiles is the Evolved one, and carries all
+             four halves of the identity: the new AppId (and NOT v1's), the
+             {autopf}\EQBuddy Evolved directory, its own Start-menu group, and the
+             EQBuddyEvolvedSetup output name.
+
+         The AppId literals are written HERE as well as in the .iss on purpose: this is
+         the ScreenLockTests shape - two files that must agree, neither with a compiler
+         that can see the other. The v1 literal is carried as the thing that must never
+         come back.
+
     Exits non-zero on a violation. The tree is 1.99.x until E-1's third commit lands, so
     -AssumeVersion exists purely so this can be PROVEN to fail before it can ever fire
     (traps 34, 39: a guard that has never failed has not been shown to guard anything).
@@ -86,6 +117,7 @@
     pwsh -NoProfile -File scripts/evolved-channel-guard.ps1 -AssumeVersion 2.0.0        # prove 1 and 2 fail
     pwsh -NoProfile -File scripts/evolved-channel-guard.ps1 -AssumeVersion 2.0.0 -AssumeUpdateFolder C:\tmp\fake  # prove 3 fails
     pwsh -NoProfile -File scripts/evolved-channel-guard.ps1 -AssumeVersion 2.0.0 -Repo <pre-E-2c worktree>        # prove 4 fails
+    pwsh -NoProfile -File scripts/evolved-channel-guard.ps1 -AssumeVersion 2.0.0 -Repo <pre-TR-2 worktree>        # prove 5 fails
 #>
 [CmdletBinding()]
 param(
@@ -196,27 +228,19 @@ if ($refusalLine -ge 0 -and $regionStart -ge 0 -and $refusalLine -gt $regionStar
 # Comment lines are exempt on purpose: a comment cannot copy a file, and the region
 # needs the prose that explains what the channel IS. Every executable line is read.
 #
-# The fourth token is a different KIND of hazard from the first three and carries its own
-# Why for that reason. The first three describe things that LEAVE the machine; the
-# installer never has to leave anything to do its damage. Compiling it is enough: a signed
-# 2.0.0 EQBuddySetup.exe in dist\ carries v1's AppId and {autopf}\EQBuddy, so one
-# double-click replaces the v1 install in place and inherits its profile. Check 3 watches
-# the family's update folder and has never watched dist\, which is exactly how the two
-# Evolved loops came to disagree - install-local.ps1 -Evolved refused to build one and
-# release.ps1 -EvolvedLocal built and signed one on every run (Fable 5, E-0/E-1 review).
-#
-# It matches the ACTS - compile, sign, hash - and not the filename, deliberately. The
-# -EvolvedLocal summary block names EQBuddySetup.exe in prose to tell David what was NOT
-# built, and a token that fired on the sentence explaining the fix would be the guard
-# arguing with its own reason for existing.
+# THE FOURTH TOKEN IS GONE, and its absence is the TR-2 flip rather than a relaxation.
+# It matched the ACTS - compile, sign, hash - because at the time the installer's mere
+# existence was the hazard: it carried v1's AppId, so a signed 2.0.0 EQBuddySetup.exe in
+# dist\ was one double-click from replacing the v1 install in place. That is now false by
+# construction (installer\EQBuddyEvolved.iss), and the compile deliberately sits OUTSIDE
+# the region so that -EvolvedLocal builds one. Check 5 replaces it, and it is strictly
+# stronger: the acts were a proxy for an identity, and check 5 asserts the identity
+# (trap 64 - name the fact, not the thing that stood in for it).
 $channelReach = 'At 2.x that line is reachable, and reachable means the family''s widgets take an Evolved build within six hours.'
 $channelTokens = @(
     @{ Rx = 'EQBuddyDownload|\$oneDrive'; What = 'names the family update folder';                Why = $channelReach },
     @{ Rx = 'gh\s+release\s+create';      What = 'creates a GitHub release';                      Why = $channelReach },
-    @{ Rx = '/SILENT';                    What = 'installs over this machine''s v1 install';      Why = $channelReach },
-    @{ Rx = 'ISCC|EQBuddy\.iss|(Invoke-EqSign|Get-FileHash|Set-Content).*EQBuddySetup'
-       What = 'builds, signs or hashes the INSTALLER'
-       Why  = 'At 2.x that leaves a signed 2.0.0 EQBuddySetup.exe in dist\ carrying v1''s AppId and {autopf}\EQBuddy - one double-click replaces this machine''s v1 install in place and inherits its profile (settings.json, history.db, archives), and #158''s rollback gives back the binary, not the profile. Nothing scans dist\: check 3 watches the update folder. scripts/install-local.ps1 -Evolved builds no installer, and these two loops must not disagree about a one-way door.' }
+    @{ Rx = '/SILENT';                    What = 'installs this build on this machine';           Why = $channelReach }
 )
 
 for ($i = 0; $i -lt $lines.Count; $i++) {
@@ -249,6 +273,107 @@ foreach ($line in $lines) {
 }
 if (-not $prereleaseRefusal) {
     $problems += 'scripts/release.ps1 does not refuse -Prerelease under -EvolvedLocal. -Prerelease is a flag on a GitHub release, so under a switch that cannot make one it is a switch that silently does nothing - the exact defect the -Prerelease/-Tag refusal at the top of that script was written for.'
+}
+
+# ---- 5: the installer identity (check 1's fourth member, flipped by TR-2) -----------
+
+# The two literals this check exists to keep apart. They are written HERE as well as in
+# the .iss because that is the only way two files with no compiler between them can be
+# held to one fact - ScreenLockTests' shape. The v1 one is carried as the thing that must
+# never come back, not as something to match.
+$v1AppId      = '{7E1B6A94-3C2D-4B77-9F41-EQBUDDY10000}'
+$evolvedAppId = '{B3D71F58-6E2A-4C90-A7D4-EQBUDDY20000}'
+$evolvedIss   = 'installer/EQBuddyEvolved.iss'
+
+# (a) THE NEGATIVE - nothing on a 2.x tree PRODUCES the reserved name.
+#
+# Matched on the acts, and the list is every verb that can put a file of that name on disk
+# or hand one to somebody. A READ is deliberately absent: release.ps1's -EvolvedLocal
+# summary uses Test-Path/Get-Item to warn about a pre-TR-2 leftover in dist\, which is this
+# rule said out loud, and a token that fired on it would be the guard arguing with its own
+# reason for existing. "EQBuddyEvolvedSetup" does not contain "EQBuddySetup", so the new
+# name needs no exemption - that is half of why it was chosen.
+$producers = 'Invoke-EqSign|Get-FileHash|Set-Content|Out-File|Copy-Item|Move-Item|Rename-Item|Compress-Archive|Start-Process|gh\s+release\s+create'
+foreach ($rel in @('scripts/release.ps1', 'scripts/install-local.ps1')) {
+    $text = Read-Utf8 $rel
+    if (-not $text) { continue }
+    $n = 0
+    foreach ($line in ($text -split "`r?`n")) {
+        $n++
+        if ($line -match '^\s*#') { continue }
+        if ($line -match 'EQBuddySetup' -and $line -match $producers) {
+            $problems += "$rel line $n produces or hands on an artifact named EQBuddySetup.exe: $($line.Trim()). That name is RESERVED to the v1 line forever - every deployed 1.x updater matches on it (UpdateChecker.SetupName) and the v1 contract is frozen, so a 2.x artifact wearing it is downloaded and run by every Windows v1 install's existing update flow: a major-line replacement with no consent moment. The 2.x installer is $evolvedIss and it is called EQBuddyEvolvedSetup.exe."
+        }
+    }
+}
+
+# ...and the same negative about the TREE rather than about a script. A .iss whose output
+# is the reserved name is one hand-run ISCC from the hazard, and nothing else in this repo
+# would notice; the same argument that put the compile on check 1's list in the first
+# place. It also catches v1's AppId coming back under any filename, which is the identity
+# half stated as a negative.
+$installerDir = Join-Path $Repo 'installer'
+if (Test-Path $installerDir) {
+    foreach ($iss in Get-ChildItem -Path $installerDir -Filter '*.iss' -File) {
+        # Inno comments start with ';', and they are exempt for the same reason PowerShell
+        # comments are above: the Evolved .iss NAMES v1's AppId in a comment, to say what
+        # it is deliberately not. A guard that read that as a violation would forbid the
+        # file from explaining itself.
+        $text = (([IO.File]::ReadAllText($iss.FullName) -split "`r?`n") |
+                 Where-Object { $_ -notmatch '^\s*;' }) -join "`n"
+        if ($text -match '(?m)^\s*OutputBaseFilename\s*=\s*EQBuddySetup\s*$') {
+            $problems += "installer/$($iss.Name) produces EQBuddySetup.exe. On a 2.x tree that file is one hand-run ISCC from the reserved name, whatever release.ps1 does or does not compile - the v1 installer belongs to the v1 tree (it is on ``legacy-v1``, which builds from its own tree, exactly as LEGACY-004 keeps release-assets.yml alive there)."
+        }
+        if ($text -match [regex]::Escape($v1AppId)) {
+            $problems += "installer/$($iss.Name) carries EQBuddy 1.x's AppId $v1AppId. An installer with that AppId replaces a v1 install IN PLACE and inherits its profile - settings.json, history.db, archives - and #158's rollback gives back the binary, not the profile. The Evolved identity is $evolvedAppId."
+        }
+    }
+}
+
+# (b) THE POSITIVE - and it is the half a negative alone cannot cover (trap 34). "No .iss
+# makes the reserved name" is equally true of a tree that has no installer at all, which is
+# where this repo was yesterday; the row flipped precisely because -EvolvedLocal now has to
+# BUILD one. So: release.ps1 compiles an .iss, every .iss it names is the Evolved one, and
+# that file carries all four halves of the identity.
+$issLines = @()
+for ($i = 0; $i -lt $lines.Count; $i++) {
+    if ($lines[$i] -match '^\s*#') { continue }
+    if ($lines[$i] -match '\.iss\b') { $issLines += , @($i, $lines[$i]) }
+}
+if ($issLines.Count -eq 0) {
+    $problems += "scripts/release.ps1 compiles no installer script. Since TR-2 the Evolved line HAS an installer story - $evolvedIss, its own AppId, {autopf}\EQBuddy Evolved - and -EvolvedLocal builds it. A tree that builds none passes every negative in this check while shipping nothing a player can install, which is why this row is asserted from both ends."
+}
+foreach ($entry in $issLines) {
+    if ($entry[1] -notmatch 'EQBuddyEvolved\.iss') {
+        $problems += "scripts/release.ps1 line $($entry[0] + 1) names an installer script that is not $($evolvedIss): $($entry[1].Trim()). At 2.x there is exactly one, and it is the one carrying the Evolved AppId."
+    }
+}
+
+$issText = Read-Utf8 $evolvedIss
+if (-not $issText) {
+    $problems += "$evolvedIss is missing. It is the 2.x installer and the only place the Evolved AppId, install directory and output name are written; a guard that cannot find it has not checked the identity."
+}
+else {
+    # Comments stripped here too, and for the opposite reason to the negative above: a
+    # comment naming the Evolved AppId must not SATISFY the check either. Every assertion
+    # below is anchored to a real directive line for the same reason.
+    $issText = (($issText -split "`r?`n") | Where-Object { $_ -notmatch '^\s*;' }) -join "`n"
+
+    # Four facts, four messages. They fail for four different reasons and a merged one
+    # would name the wrong half of the identity.
+    if ($issText -notmatch ('(?m)^\s*AppId\s*=\s*\{*' + [regex]::Escape($evolvedAppId))) {
+        $problems += "$evolvedIss does not carry the Evolved AppId $evolvedAppId. Inno keys the install, the uninstall entry and the upgrade-in-place decision on AppId, so that literal IS 'this never replaces an EQBuddy 1.x install'."
+    }
+    if ($issText -notmatch '(?m)^\s*DefaultDirName\s*=\s*\{autopf\}\\EQBuddy Evolved\s*$') {
+        $problems += "$evolvedIss does not install into {autopf}\EQBuddy Evolved. Beside {autopf}\EQBuddy, never on top of it: dual install is the feature that makes trying Evolved low-stakes, and it is the directory that makes falling back to 1.x possible."
+    }
+    if ($issText -notmatch '(?m)^\s*OutputBaseFilename\s*=\s*EQBuddyEvolvedSetup\s*$') {
+        $problems += "$evolvedIss does not output EQBuddyEvolvedSetup. The artifact name is the other half of the reserved-name rule: the negative above stops EQBuddySetup.exe being produced, and this is what says which name IS produced."
+    }
+    if ($issText -notmatch '(?m)^\s*DefaultGroupName\s*=\s*EQBuddy Evolved\s*$' -or
+        $issText -notmatch '(?m)^\s*Name:\s*"\{group\}\\EQBuddy Evolved"') {
+        $problems += "$evolvedIss does not give Evolved its own Start-menu group and shortcut named 'EQBuddy Evolved'. Two Start-menu rows both reading 'EQBuddy' is a dual install the player cannot steer, which turns the fallback this design is built on into a coin toss."
+    }
 }
 
 # ---- 3: the live channel is clean --------------------------------------------------
@@ -341,6 +466,6 @@ if ($problems.Count -gt 0) {
 # The scope line names what was ACTUALLY read, because a reassuring summary over a check
 # that saw nothing is how this guard could have been green on the installer hole (#297).
 # Workflows are always readable, so they are always in scope; the live channel is not.
-$scope = if ($looked.Count -gt 0) { "script + workflows + live channel ($($looked -join ', '))" } else { 'script + workflows only - live channel not inspected' }
+$scope = if ($looked.Count -gt 0) { "scripts + installer identity + workflows + live channel ($($looked -join ', '))" } else { 'scripts + installer identity + workflows only - live channel not inspected' }
 Write-Host "evolved-channel-guard: ok  (version $version; $scope)" -ForegroundColor Green
 exit 0

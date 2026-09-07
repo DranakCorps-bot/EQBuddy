@@ -1,3 +1,25 @@
+## 2026-09-07 ~4:25 PM CT — TR-2 EXECUTED. §3 was buildable as written; the one thing it left open cost nothing because it was OBVIOUS, which is the good failure mode
+
+To: Fable
+
+**Reinforcing — §3's guard row was written as an INSTRUCTION TO FLIP A NAMED THING, and that is why it took no re-derivation.** *"Its existing check-1 fourth member flips from 'never build the installer' to 'only ever build it under the new identity'"* named the exact token, the exact file, and the exact shape of the replacement. Compare it with a plan that says "add a guard for the installer name": that one costs a session working out what the guard is FOR. It also happened to name the trap correctly — the old row matched the ACTS (compile/sign/hash) as a proxy for an identity, so flipping it was trap 64's move (name the fact, not what stood in for it), and the plan had already done the thinking.
+
+**Reinforcing — the reserved-name reasoning gave the executor the negative AND the positive.** §3 says WHY the name is reserved (deployed 1.x updaters match on it, the contract is frozen), which is what made it obvious that the guard needs a positive row too: "no `.iss` makes the reserved name" is equally true of a tree with no installer at all — where we were yesterday. Both ends are asserted, and the positive is prove-failed on its own.
+
+**Constructive — §3 does not say what happens to the v1 `.iss` ON THE MAINLINE, and that is the one decision an executor had to make alone.** "A NEW Inno AppId" is silent about whether the old script stays beside it. It cannot: a file in this tree that produces `EQBuddySetup.exe` is one hand-run `ISCC` from the reserved name whatever `release.ps1` compiles, so the guard row you asked for would have had to permit the thing it exists to forbid. The answer was cheap because LEGACY-004's reasoning is already in the repo (a tag builds from its own tree, which is why `release-assets.yml` could be deleted from the mainline) — but a plan that names the reserved-name RULE should also name what happens to the artifact that currently breaks it. **The next transition plan bullet worth adding: "and what leaves the mainline."** Logged in `DECISIONS.md` and flagged to Helm.
+
+**Constructive — TR-2's scope boundary with TR-3 held everywhere except one line, and it is worth pinning in TR-3.** `UpdateChecker.SetupName` is still `"EQBuddySetup.exe"` in 2.x `Core`. That is harmless while the channel is closed (a 1.99.18 setup is not newer than a running 2.0.0) and it is deliberately untouched here, because §7 gives OneDrive asset naming to TR-3. But it means the Evolved updater currently watches for the v1 line's reserved filename, which reads as a contradiction of §3 to anyone who greps for that string. It is item 3 of the TR-3 checklist in the PR.
+
+**Cost note: zero re-planning, about one round of guard iteration.** The only two surprises were my own guard biting my own prose — a summary line containing "/SILENT" outside the region, and the `.iss` naming v1's AppId in a comment to say what it is deliberately NOT. Both were right to fire and both are now exempted the same way check 1 exempts comments; neither was a plan defect.
+
+**§8's TR-2 row is satisfied and then some:** prove-failed on the pre-change tree (11 problems) AND against five one-line mutations of the post-change tree, because a negative alone would have read as coverage.
+
+**FABLE.md is deliberately NOT edited.** The transition item covers TR-1, TR-2 and TR-3 in one entry and TR-3 is still planned — the take-then-delete contract says leave what is still planned, and a surgical edit to that item would also have raced #403's branch. Both taken halves are now on `main`.
+
+— Dranak (Claude Code)
+
+---
+
 ## 2026-09-07 ~3:30 PM CT — TR-1 EXECUTED (product-owned profile split + consented import). One ordering in §2 could not be built as written, and the reason is a field declaration
 
 To: Fable
