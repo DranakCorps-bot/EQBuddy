@@ -109,6 +109,15 @@ internal sealed class HudExpandWindow : Window
         WindowStartupLocation = WindowStartupLocation.Manual;
         NoActivate.Attach(this);
 
+        // OE-8 affordance face (Bevel): same reuse as HudChipRowWindow — the app's own
+        // Cursor+ToolTip grip language (MainWindow's HeightGrip/ResizeGrip), not a drawn
+        // handle competing with the header's icon/⧉/✕. SizeAll is the default; OnHoverCursor
+        // swaps to SizeWE over the two vertical resize edges so the edge reads as an edge
+        // before the player commits to a press.
+        Cursor = Cursors.SizeAll;
+        ToolTip = "Drag to place this panel anywhere. The left and right edges resize it. "
+            + "Right-click the widget → Edit HUD… → Follow the HUD again brings it back.";
+
         _chrome = new Border
         {
             CornerRadius = new CornerRadius(Tok.RadiusCard),
@@ -193,6 +202,7 @@ internal sealed class HudExpandWindow : Window
         PreviewMouseLeftButtonDown += OnEdgePress;
         PreviewMouseMove += OnEdgeMove;
         PreviewMouseLeftButtonUp += OnEdgeRelease;
+        MouseMove += OnHoverCursor;
         _grip = HudDragGrip.Attach(this, (left, top) =>
         {
             _settings.HudPanelParkLeft = left;
@@ -301,6 +311,21 @@ internal sealed class HudExpandWindow : Window
         _edgeStartScreen = PointToScreen(at);
         CaptureMouse();
         e.Handled = true;   // the interlock: HudDragGrip never sees this press
+    }
+
+    /// <summary>The edge tell, before any press — SizeWE over the two vertical resize zones
+    /// (lock 3), SizeAll everywhere else on the box (OE-8 affordance face, Bevel). Skipped
+    /// mid-gesture: a drag or a resize already committed to one cursor, and re-hit-testing
+    /// under the moving pointer would flicker it as the pointer crosses back over an edge it
+    /// is no longer negotiating.</summary>
+    private void OnHoverCursor(object sender, MouseEventArgs e)
+    {
+        if (_grip.Dragging || _edge != ResizeZones.None) return;
+        var at = e.GetPosition(this);
+        var zone = ResizeZones.Hit(at.X, at.Y, ActualWidth, ActualHeight);
+        Cursor = zone is ResizeZones.Left or ResizeZones.TopLeft or ResizeZones.BottomLeft
+            or ResizeZones.Right or ResizeZones.TopRight or ResizeZones.BottomRight
+            ? Cursors.SizeWE : Cursors.SizeAll;
     }
 
     private void OnEdgeMove(object sender, MouseEventArgs e)
