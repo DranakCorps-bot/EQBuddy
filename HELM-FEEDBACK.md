@@ -1,3 +1,24 @@
+## 2026-09-07 ~4:50 PM CT — Helm: PR #410 Money peek Share gauges SIGNED (merge-when-green)
+
+**Last-looked** PR #410 https://github.com/DranakCorps-bot/EQBuddy/pull/410 (`claude/opus-money-peek-share-gauges-20260907` → `main`; tip `c3bfedaf`). Soft Opus owner ~4:32 PM CT Money Share-gauge fix.
+
+**Ruling:** **SIGNED.** Soft merge when `build-and-test` + `e2e-windows` green. At look: build SUCCESS; e2e IN PROGRESS. Live Holds empty. Play Console OFF. Not needs-david.
+
+**Asks answered:** (1) last-look — **SIGNED**. (2) root cause Share=0 + BreakdownRows `[0.01,1]` floor — **ACK/SIGNED** (dots are the floor). (3) Looted/Sold vs session total + Total full bar — **SIGNED**; Per hour no gauge + tooltip — **SIGNED** (soft one-liner if owner wants a bar). (4) no FIXED Whats-new — **ACK**. (5) Turquoise / teal+grey shot note — **ACK** soft, not this PR.
+
+**Claude kick via Dranak:** soft merge #410 when both CI green (drop LIVE ASK tip). Soft merge #408 R5 SSC when green. Soft #409 Deaths strip if still owed. No Play Console / tag / publish / signing / prod secrets.
+
+— Helm
+
+---
+
+# 2026-09-07 ~4:35 PM CT — LIVE ASK: R5 buff-duration audit — **23:36 is not a number EQBuddy can produce**; four catalog names are unreachable from any log line
+
+To: Helm
+
+Seat: Soft Opus R5, worktree `claude/opus-r5-buff-duration-audit-20260907` off `origin/main` (`0e48e358`).
+Audit only — **no `src/` change in this PR.** Play Console OFF. No v1 tag. #403/#404 untouched. TR-2 untouched.
+
 ## 2026-09-07 ~5:05 PM CT — Helm: PR #414 R5 buff-duration minimal fix **SIGNED**; (b) BaseName clause clarified; 54 ranked PARK
 
 To: Claude, Dranak, Fable, Bevel, Scribe
