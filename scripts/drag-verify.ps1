@@ -17,12 +17,28 @@
 # INCONCLUSIVE and still runs A, C1, D and E — which is the persistence-and-ownership half,
 # and the half nobody had measured. Saying "inconclusive" is the point: a harness that
 # quietly skipped the check would read as a pass (trap 34's shape).
+#
+# -Mode park is OE-8's half, and it asks a DIFFERENT question of DIFFERENT windows. The
+# phases above are about a window taking ownership of its HEIGHT from its content; free
+# placement is about a companion window taking ownership of its POSITION from the widget it
+# follows. Same five-phase shape, same reason for existing — the automated stand-in for a
+# hand-done drag/reopen check, on the only two windows in the app that are placed by a
+# follower rather than by a saved point:
+#   (P0) untouched profile -> slaved, and NOTHING in settings.json    <- the default is SA-2
+#   (P1) a real drag parks it, at drag end                            <- the one writer
+#   (P2) close+reopen -> the parked point comes back exactly          <- #152 inverted
+#   (P3) "Follow the HUD again" clears it back to slaved              <- the way back
+# The MISSING-MONITOR half stays a unit test (`HudParkTests`): a harness cannot detach a
+# display, and pretending it can would be a guess about the machine.
 param(
     # Omit to get a throwaway root with a seeded profile (the 2026-08-25 rewrite's
     # self-contained setup, kept through the #238 merge so one command answers the
     # question). Pass an existing root to re-enter a previous run's profile.
     [string] $Root,
-    [ValidateSet('progress', 'quests', 'gearloot', 'drops', 'spawns', 'travel', 'history', 'timeline')]
+    [ValidateSet('height', 'park')]
+    [string] $Mode = 'height',
+    [ValidateSet('progress', 'quests', 'gearloot', 'drops', 'spawns', 'travel', 'history', 'timeline',
+                 'hudrow', 'hudpanel')]
     [string] $Window = 'progress',
     [string[]] $Tabs
 )
@@ -45,7 +61,25 @@ if (-not $Root) {
         TruncateLogs = $false; UpdateFolder = (Join-Path $Root 'updates'); Theme = 'Midnight'
         # The one-time junk-heights clear must not fire mid-run and eat phase D's entry.
         WindowHeightsReset = $true
+        # -Mode park: the chip row is up exactly while a timer is running, and the under-bar
+        # panel exists only on the COLLAPSED bar. Neither is a state this harness can reach
+        # from outside the app, so both are seeded — trap 22's rule (a surface with no
+        # fixture state cannot be reviewed, and reads as reviewed anyway).
+        TrackSpawns = $true
+        Minimized = ($Mode -eq 'park')
+        # Deliberately NOT seeded: HudRowPark*/HudPanelPark*/HudPanelWidth. Phase P0's whole
+        # assertion is that an untouched profile has no park in it AT ALL, and a key written
+        # here — even a null one — would be the thing it was looking for.
     } | ConvertTo-Json -Depth 6 | Set-Content (Join-Path $newProfile 'settings.json') -Encoding utf8
+    if ($Mode -eq 'park') {
+        # One long countdown, so the row is up for the whole run and never flips to DUE and
+        # gets clicked away by a phase aiming at the window behind it.
+        @(@{
+            Server = 'test'; Zone = 'Runnyeye Citadel'; Name = 'Kizdean Gix'
+            KilledAt = (Get-Date).AddSeconds(-60); DurationSeconds = 1800
+        }) | ConvertTo-Json -Depth 6 -AsArray |
+            Set-Content (Join-Path $newProfile 'spawn-timers.json') -Encoding utf8
+    }
     Write-Host "ROOT $Root"
 }
 
@@ -64,10 +98,28 @@ $Targets = @{
     timeline = @{ Env = 'EQBUDDY_TIMELINE'; Title = 'EQBuddy fight timeline';      Key = 'timeline'; Tabs = @() }
 }
 
-$target = $Targets[$Window]
-if ($Tabs) { $target.Tabs = $Tabs }
+# OE-8's two companion windows. Left/Top are the settings keys the park pair lives under;
+# Dump is the EFFECT key in the EQBUDDY_EXPAND dump, which is a different claim from the
+# setting (trap 42) and the reason both are read below. The TITLES are identities the window
+# itself owns — change one in the source and this table is what goes stale, silently, which
+# is exactly how three shot rows went dark for six days (trap 53). Grep scripts/ before
+# renaming either window.
+$ParkTargets = @{
+    hudrow   = @{ Title = 'EQBuddy HUD Chips'; Left = 'HudRowParkLeft';   Top = 'HudRowParkTop';   Dump = 'hudRowPark' }
+    hudpanel = @{ Title = 'EQBuddy HUD Panel'; Left = 'HudPanelParkLeft'; Top = 'HudPanelParkTop'; Dump = 'hudPanelPark' }
+}
+
+if ($Mode -eq 'park' -and -not $ParkTargets.ContainsKey($Window)) {
+    throw "-Mode park takes -Window hudrow or hudpanel; '$Window' is a height-mode window."
+}
+if ($Mode -ne 'park' -and $ParkTargets.ContainsKey($Window)) {
+    throw "-Window $Window is a companion window with no height of its own - use -Mode park."
+}
+
+$target = if ($Mode -eq 'park') { $ParkTargets[$Window] } else { $Targets[$Window] }
+if ($Tabs -and $Mode -ne 'park') { $target.Tabs = $Tabs }
 $winTitle = $target.Title
-$winKey = $target.Key
+$winKey = if ($Mode -eq 'park') { $Window } else { $target.Key }
 $exe = Join-Path $repo 'src/EQBuddy/bin/Release/net10.0-windows/EQBuddy.exe'
 $profileDir = Join-Path $Root 'profile'
 $settingsPath = Join-Path $profileDir 'settings.json'
@@ -105,7 +157,17 @@ function Start-App {
     $psi.UseShellExecute = $false
     $psi.EnvironmentVariables['EQBUDDY_APPDATA'] = $profileDir
     $psi.EnvironmentVariables['EQBUDDY_OPAQUE'] = '1'
-    $psi.EnvironmentVariables[$target.Env] = '1'
+    if ($Mode -eq 'park') {
+        # The two companion windows have no env hook of their own and never will: they are
+        # not doors, they are windows the app puts up when it has something to say. The row
+        # comes up because a seeded timer is running; the panel because EQBUDDY_HUDEXPAND
+        # PINS it (`dps`, not `dps:peek` — a peek collapses the moment the pointer leaves,
+        # and every phase below moves the pointer).
+        $psi.EnvironmentVariables['EQBUDDY_EXPAND'] = '1'
+        if ($Window -eq 'hudpanel') { $psi.EnvironmentVariables['EQBUDDY_HUDEXPAND'] = 'dps' }
+    } else {
+        $psi.EnvironmentVariables[$target.Env] = '1'
+    }
     [Diagnostics.Process]::Start($psi)
 }
 
@@ -168,6 +230,89 @@ function HeightsEntry {
     } else { $null }
 }
 
+# ---- -Mode park helpers ------------------------------------------------------------------
+
+# The park pair AS THE PROFILE HOLDS IT, or $null when there is none. A key that is absent
+# and a key that is present-and-null are the same answer here (slaved), and both are what an
+# untouched profile looks like — the app writes the pair only at drag end.
+function ParkEntry {
+    $j = Get-Content $settingsPath -Raw | ConvertFrom-Json
+    $l = $target.Left; $t = $target.Top
+    if (-not $j.PSObject.Properties[$l] -or $null -eq $j.$l) { return $null }
+    if (-not $j.PSObject.Properties[$t] -or $null -eq $j.$t) { return $null }
+    # System.Text.Json writes NaN as the string "NaN"; ConvertFrom-Json gives it back as one.
+    if ("$($j.$l)" -eq 'NaN' -or "$($j.$t)" -eq 'NaN') { return $null }
+    @{ Left = [double]$j.$l; Top = [double]$j.$t }
+}
+
+# The EFFECT, off the running app's own dump — "slaved" or "left,top". Read BESIDE the
+# setting above because they are different claims (trap 42) and OE-8's unreachable rule is
+# precisely a disagreement between them.
+function DumpKey([string]$key) {
+    $path = Join-Path $profileDir 'debug.txt'
+    if (-not (Test-Path $path)) { return '(no dump)' }
+    $text = Get-Content $path -Raw
+    if ($text -match "(?<![A-Za-z])$key=(\S+)") { $Matches[1] } else { '(key absent)' }
+}
+
+function ParkDump { DumpKey $target.Dump }
+
+# The GRIP's own "presses,drags" for this window. Printed on every phase because the three
+# ways a park phase can fail are indistinguishable without it: "0,0" means the synthetic
+# pointer never reached the window at all, "1,0" means the press arrived and never became a
+# drag, and "1,1" means the gesture completed and the write is what is wrong.
+function GripDump { DumpKey "$(if ($Window -eq 'hudrow') { 'hudRowGrip' } else { 'hudPanelGrip' })" }
+
+function WindowOrigin([IntPtr]$h) {
+    $r = New-Object W.U+RECT; [W.U]::GetWindowRect($h, [ref]$r) | Out-Null
+    @{ X = $r.L; Y = $r.T }
+}
+
+# A REAL move: press somewhere in the BODY of the companion window and drag. Not
+# SetWindowPos — the app writes a park only at the end of a pointer gesture that crossed the
+# system drag threshold, which is the whole of trap 49's fix, so a harness that moved the
+# window programmatically and then asserted a park would be testing a path no player can take
+# and would report FAIL for correct behaviour (the same sentence Drag-BottomEdge carries).
+#
+# The press lands one third of the way in rather than at the centre: the panel's centre is
+# its rows and its edges are the resize zones, and a third across the top strip is body on
+# both windows.
+function Drag-Body([IntPtr]$hwnd, [int]$dx, [int]$dy) {
+    $rect = New-Object W.U+RECT
+    [W.U]::GetWindowRect($hwnd, [ref]$rect) | Out-Null
+    # SEARCH for a point that belongs to this window rather than assuming its middle does.
+    # Both of these are per-pixel-alpha layered windows stacked among other Topmost ones, so
+    # "the centre of the rect" is a guess about compositing: the panel's own centre came back
+    # owned by a different hwnd (its body is a ScaleTransform over a rounded Border, and the
+    # chip row is Topmost beside it). A scan is a fact. Same move Drag-BottomEdge already
+    # makes when it probes inward for a border it can actually grab.
+    $x = -1; $y = -1
+    foreach ($fy in 0.25, 0.15, 0.5, 0.75) {
+        foreach ($fx in 0.5, 0.35, 0.65, 0.2) {
+            $px = [int]($rect.L + ($rect.R - $rect.L) * $fx)
+            $py = [int]($rect.T + ($rect.B - $rect.T) * $fy)
+            $owner = [W.U]::GetAncestor([W.U]::WindowFromPoint((New-Object W.U+POINT($px, $py))), 2)
+            if ($owner -eq $hwnd) { $x = $px; $y = $py; break }
+        }
+        if ($x -ge 0) { break }
+    }
+    if ($x -lt 0) {
+        Write-Host "  (no point inside $($rect.L),$($rect.T)-$($rect.R),$($rect.B) belongs to hwnd $hwnd)"
+        return $null
+    }
+    [W.U]::SetCursorPos($x, $y) | Out-Null; Start-Sleep -Milliseconds 200
+    [W.U]::mouse_event(2, 0, 0, 0, [IntPtr]::Zero)   # down
+    Start-Sleep -Milliseconds 150
+    foreach ($i in 1..8) {
+        [W.U]::SetCursorPos($x + [int]($dx * $i / 8), $y + [int]($dy * $i / 8)) | Out-Null
+        [W.U]::mouse_event(1, 0, 0, 0, [IntPtr]::Zero)
+        Start-Sleep -Milliseconds 60
+    }
+    [W.U]::mouse_event(4, 0, 0, 0, [IntPtr]::Zero)   # up — THE DRAG END, and the one write
+    Start-Sleep -Milliseconds 800
+    WindowOrigin $hwnd
+}
+
 # A REAL border drag: press the bottom edge and move. SetWindowPos is not this — the app
 # now records a height as the player's only on WM_EXITSIZEMOVE after a resize hit code,
 # which is the native size loop and nothing else. A harness that resized programmatically
@@ -205,6 +350,79 @@ function Note([string]$s) { Write-Host $s; $null = $results.Add($s) }
 
 $app = $null
 try {
+if ($Mode -eq 'park') {
+    # ===================== -Mode park: OE-8 free placement ==========================
+    # Four phases, and the ORDER is the argument: P0 has to run on a profile no phase has
+    # touched yet, so it goes first and asserts an ABSENCE — which is only meaningful
+    # because P1 immediately afterwards produces the presence (trap 62: every "did not
+    # write" needs a positive on the far side of the same decision, or it is satisfied by
+    # the state that was already there).
+
+    # ---- P0: an untouched profile is SLAVED, and nothing is in the file -----------
+    $app = Start-App
+    $win = Find-Target $app.Id
+    $hwnd = [IntPtr]$win.Current.NativeWindowHandle
+    Start-Sleep -Milliseconds 1200
+    $before = WindowOrigin $hwnd
+    $entry0 = ParkEntry
+    $dump0 = ParkDump
+    Note "P0: $Window opened at $($before.X),$($before.Y); dump $($target.Dump)=$dump0 grip=$(GripDump); settings pair = $(if ($null -eq $entry0) { '(none)' } else { "$($entry0.Left),$($entry0.Top)" })"
+    if ($null -eq $entry0 -and $dump0 -eq 'slaved') {
+        Note "P0: PASS - untouched profile follows the widget and holds no park (NaN is slaved)"
+    } elseif ($null -ne $entry0) {
+        Note "P0: FAIL - a launch with no drag wrote a park ($($entry0.Left),$($entry0.Top)). Something other than a drag end can reach the setting."
+    } else {
+        Note "P0: FAIL - the dump says '$dump0', expected 'slaved'"
+    }
+
+    # ---- P1: a real drag parks it, AT DRAG END ------------------------------------
+    $moved = Drag-Body $hwnd 220 -140
+    if ($null -eq $moved) {
+        Note "P1: INCONCLUSIVE - could not aim at the body of $winTitle"
+    } else {
+        $entry1 = ParkEntry
+        $dump1 = ParkDump
+        Note "P1: dragged to $($moved.X),$($moved.Y); dump $($target.Dump)=$dump1 grip=$(GripDump); settings pair = $(if ($null -eq $entry1) { '(none)' } else { "$($entry1.Left),$($entry1.Top)" })"
+        if ($null -ne $entry1 -and $dump1 -ne 'slaved') {
+            Note 'P1: PASS - the drag END wrote the park and the window is running parked'
+        } elseif ($null -eq $entry1) {
+            Note "P1: FAIL - a real body drag persisted nothing"
+        } else {
+            Note "P1: FAIL - the park is in the file but the dump still says '$dump1'"
+        }
+    }
+
+    # ---- P2: close + reopen restores the parked point exactly (#152, inverted) ----
+    # #152 was chips that WALKED up the screen one row per reopen off a saved position.
+    # The same assertion with the sign flipped: a point the player chose comes back, to the
+    # pixel, and does not drift.
+    Stop-App $app
+    $app = Start-App
+    $win = Find-Target $app.Id
+    $hwnd = [IntPtr]$win.Current.NativeWindowHandle
+    Start-Sleep -Milliseconds 1500
+    $reopened = WindowOrigin $hwnd
+    $entry2 = ParkEntry
+    if ($null -eq $entry2) {
+        Note 'P2: INCONCLUSIVE - no park in the file to restore (see P1)'
+    } else {
+        Note "P2: reopened at $($reopened.X),$($reopened.Y) (parked pair $($entry2.Left),$($entry2.Top))"
+        if ([Math]::Abs($reopened.X - $entry2.Left) -le 4 -and [Math]::Abs($reopened.Y - $entry2.Top) -le 4) {
+            Note 'P2: PASS - the parked point restored, and did not walk'
+        } else {
+            Note "P2: FAIL - expected ~$($entry2.Left),$($entry2.Top)"
+        }
+    }
+
+    # ---- P3: "Follow the HUD again" clears it back to slaved ----------------------
+    # Edit HUD is reached by a right-click menu row on the WIDGET, which this harness has no
+    # way to drive — EQBUDDY_HUDEDIT opens the mode but there is no hook that clicks a
+    # control inside it. Reported as INCONCLUSIVE rather than skipped: a harness that quietly
+    # left a phase out reads as a pass (trap 34's shape). The un-park is covered by
+    # HudParkTests' un-park assertion and by hand at review.
+    Note 'P3: INCONCLUSIVE - "Follow the HUD again" is a click inside Edit HUD, and no hook drives a control in that mode'
+    return
+}
     # ---- Phase A: launch, find window, park it in a clear region -----------------
     $app = Start-App
     $win = Find-Target $app.Id

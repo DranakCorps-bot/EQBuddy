@@ -79,10 +79,41 @@ internal sealed class HudExpandBar
     /// cannot disagree (one fact, one source — trap 4).</summary>
     public HudExpandTarget? Shown => _model.IsInline ? _model.Target : null;
 
-    /// <summary>The panel's height plus its gap, for <see cref="HudChipRowWindow"/> to park
-    /// BELOW rather than on top of. Both are slaved to the same widget edge, so without this
-    /// the deadline chicklets and the panel would occupy the same strip of screen.</summary>
-    public double OccupiedHeight => _panel?.OccupiedHeight ?? 0;
+    /// <summary>How much of the line under the widget the panel is taking, for
+    /// <see cref="HudChipRowWindow"/> to park BELOW rather than on top of. While both are
+    /// slaved to the same widget edge, without this the deadline chicklets and the panel
+    /// would occupy the same strip of screen; a panel the player has PARKED elsewhere (OE-8)
+    /// answers zero, because it is not on that line at all.</summary>
+    public double SlavedOccupiedHeight => _panel?.SlavedOccupiedHeight ?? 0;
+
+    /// <summary>The <c>hudPanelPark</c> / <c>hudPanelParkSaved</c> dump facts and the
+    /// Edit-HUD un-park's reach into this window (OE-8). "slaved" whenever there is no panel:
+    /// a key that disappears with its window is a key a test cannot assert (trap 62), and a
+    /// panel that has never been built has never been parked.</summary>
+    public string ParkKey => _panel?.ParkKey ?? "slaved";
+    public string ParkSavedKey =>
+        _panel?.ParkSavedKey
+        ?? UI.Shared.HudChipRow.ParkKey(_settings.HudPanelParkLeft, _settings.HudPanelParkTop);
+    public double DrawnWidth => _panel?.DrawnWidth ?? 0;
+    public string GripKey => _panel?.GripKey ?? "0,0";
+
+    /// <summary>Is the panel parked — read by Edit HUD's "Follow the HUD again" to decide
+    /// whether it has anything to undo. **The SETTING, not the window, when no panel exists
+    /// yet**: the pair outlives every panel instance, and an un-park control that went dead
+    /// because the player had not hovered a chip this session would be a way back that is
+    /// only there when you do not need it.</summary>
+    public bool IsParked => _panel?.IsParked
+        ?? UI.Shared.HudChipRow.IsParked(_settings.HudPanelParkLeft, _settings.HudPanelParkTop);
+
+    /// <summary>"Follow the HUD again", reaching the panel through its bar. Clears the pair
+    /// whether or not a panel is on screen, so the next one built is slaved — otherwise the
+    /// undo would silently do nothing at exactly the moment the panel was hidden.</summary>
+    public void Unpark()
+    {
+        if (_panel is { } panel) { panel.Unpark(); return; }
+        _settings.HudPanelParkLeft = double.NaN;
+        _settings.HudPanelParkTop = double.NaN;
+    }
 
     /// <summary>Lock 3, arriving side: a chip is under the pointer.</summary>
     public void Hover(HudExpandTarget target)

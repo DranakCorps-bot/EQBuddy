@@ -153,20 +153,24 @@ internal static class HudChip
         border.SetResourceReference(Border.BorderBrushProperty,
             chip.IsDue ? "WarnBrush" : "BorderBrush");
 
-        if (onClick is not null || onDoubleClick is not null)
+        // A DOUBLE-click is still decided on the way DOWN — the count only exists there — but
+        // the single click moved to the way UP when OE-8 made the row draggable. A press is
+        // not yet a click while it could still become a drag (HudDragGrip only knows which
+        // once the pointer has travelled), and acting on the down would have cleared a timer
+        // under a player who was reaching to move the row. The gesture a player performs is
+        // unchanged: a click is still a press and a release in one place.
+        if (onDoubleClick is not null)
             border.MouseLeftButtonDown += (_, e) =>
             {
-                if (e.ClickCount == 2 && onDoubleClick is not null)
-                {
-                    onDoubleClick();
-                    e.Handled = true;
-                    return;
-                }
-                if (e.ClickCount == 1 && onClick is not null)
-                {
-                    onClick();
-                    e.Handled = true;
-                }
+                if (e.ClickCount != 2) return;
+                onDoubleClick();
+                e.Handled = true;
+            };
+        if (onClick is not null)
+            border.MouseLeftButtonUp += (_, e) =>
+            {
+                onClick();
+                e.Handled = true;
             };
         if (onDismiss is not null)
             border.MouseRightButtonUp += (_, e) => { e.Handled = true; onDismiss(); };

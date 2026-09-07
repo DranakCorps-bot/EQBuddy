@@ -638,8 +638,10 @@ internal sealed class SettingsAlertsView
         panel.Children.Add(_trackSpawns);
         panel.Children.Add(Dim(
             "Kill a named — or its placeholder — and a small countdown chicklet appears "
-            + "(⏳ Asaka L`Rei 3:12). Chicklets sit in one row under EQBuddy and move with it, "
-            + "show every timer you have running in any zone, and flip to DUE for a minute "
+            + "(⏳ Asaka L`Rei 3:12). Chicklets sit in one row under EQBuddy and move with it "
+            + "until you drag the row somewhere else, in which case it stays where you put it "
+            + "(right-click → Edit HUD… → Follow the HUD again puts it back). They show every "
+            + "timer you have running in any zone, and flip to DUE for a minute "
             + "(click to dismiss sooner). Double-click one (or right-click → Spawn timers…) "
             + "for the full zone list, which follows you zone to zone. We captured the respawn "
             + "times we could from community sources — if you notice a discrepancy in game, "
@@ -649,8 +651,15 @@ internal sealed class SettingsAlertsView
         // The two "grow upward" tick-boxes retired in Surface A / SA-2, with the two
         // separately-placed stacks they arbitrated between (#95: "park boss timers above mez
         // timers and each grows away from the other"). Spawn and mez chips are ONE row now,
-        // under EQBuddy, so there is no second stack to grow away from and no saved position
-        // for either.
+        // so there is no second stack to grow away from and nothing for those boxes to
+        // arbitrate.
+        //
+        // **OE-8 gave that ONE row a saved position again, and it is not those settings
+        // coming back.** The park is per WINDOW rather than per family — the whole of #95's
+        // ask was two families growing away from each other, which is the debt SA-2 was
+        // signed to end — and it is written only at the end of a player's drag. There is no
+        // tick box for it here on purpose: the control is the drag, and the way back is Edit
+        // HUD's "Follow the HUD again", which is where the row's other verbs already live.
         return panel;
     }
 

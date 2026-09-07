@@ -1,5 +1,6 @@
 ﻿using System.Windows;
 using EQBuddy.Core;
+using EQBuddy.UI.Shared;
 
 namespace EQBuddy;
 
@@ -372,6 +373,41 @@ internal static class WidgetDump
                     //                  count — trap 24's "a title is not an identity" one
                     //                  layer in.
                     $"hudExpandBody={w._hudExpandBar.BodyKind} " +
+                    // FREE PLACEMENT (OE-8). FIVE keys, and the pairing is the whole design:
+                    //
+                    //   hudRowPark   / hudPanelPark        the EFFECT — where the window
+                    //                                      actually is ("left,top"), or
+                    //                                      "slaved" when it is following
+                    //                                      the widget.
+                    //   hudRowParkSaved / hudPanelParkSaved  what the PROFILE holds.
+                    //   hudPanelWidth                      the width the panel is DRAWING at
+                    //                                      (OE-1b lock 3), not the setting.
+                    //
+                    // **Two keys per window because OE-8's unreachable rule IS a
+                    // disagreement between them.** A park on a monitor that is not attached
+                    // right now runs SLAVED for the session and the setting survives
+                    // untouched (#117) — so the assertion is "hudRowPark=slaved AND
+                    // hudRowParkSaved is still the seeded point", read off ONE dump line and
+                    // therefore one moment (trap 56). One key could report either half and
+                    // never the relationship, and "in the profile" and "on the screen" are
+                    // different claims anyway (trap 42).
+                    //
+                    // Emitted whether or not either companion window exists, for the reason
+                    // every other hud* key is: a key that disappears with its window cannot
+                    // be asserted as "slaved" (trap 62).
+                    $"hudRowPark={w._hudChips?.ParkKey ?? "slaved"} " +
+                    $"hudRowParkSaved={HudChipRow.ParkKey(w._settings.HudRowParkLeft, w._settings.HudRowParkTop)} " +
+                    $"hudPanelPark={w._hudExpandBar.ParkKey} " +
+                    $"hudPanelParkSaved={w._hudExpandBar.ParkSavedKey} " +
+                    $"hudPanelWidth={Math.Round(w._hudExpandBar.DrawnWidth)} " +
+                    // The GRIP's own count of presses seen and drags finished, "P,D" per
+                    // window. Three failures look identical from outside the app — the
+                    // pointer never reached the window, the press arrived and never became a
+                    // drag, and the whole gesture ran and the write did not — and only the
+                    // app can tell them apart (trap 56: ship the instrument before the third
+                    // theory). `scripts/drag-verify.ps1` reads these when a park phase fails.
+                    $"hudRowGrip={w._hudChips?.GripKey ?? "0,0"} " +
+                    $"hudPanelGrip={w._hudExpandBar.GripKey} " +
                     // THE TRANSIENT CLOSE (OE-7), and it takes TWO keys because the whole
                     // seat is that one of them stopped moving when the other one does.
                     //

@@ -65,7 +65,7 @@
                      no dialog, which is why this row is the only door and why the row
                      carries its own "choose Edit HUD… again when you are done" line. -->
                 <MenuItem Header="Edit HUD…" Click="OnEditHud"
-                          ToolTip="Reorder the chip row under the widget, or mute a whole kind of chip — mez and slow, spawn timers, watch alerts, buffs. Sounds and alerts are not affected; those stay in Options → Alerts &amp; chips."/>
+                          ToolTip="Reorder the chip row, mute a whole kind of chip — mez and slow, spawn timers, watch alerts, buffs — or put a row you have dragged away back under EQBuddy. Sounds and alerts are not affected; those stay in Options → Alerts &amp; chips."/>
                 <Separator/>
                 <MenuItem Header="Data &amp; imports">
                     <MenuItem Header="Wiki contribution pack…" Click="OnWikiPackWindow"
