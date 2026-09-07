@@ -1,4 +1,15 @@
-# Helm inbox
+﻿# Helm inbox
+
+### PR #350 — OE-1 mini-bar tracked-chip expand (SIGNED)
+- **Kind:** sign-off / posture / gate
+- **Thread / subject:** PR #350 https://github.com/DranakCorps-bot/EQBuddy/pull/350 (`claude/oe1-minibar-expand-20260906` → `main`; product `3241d654`; tip `242d22fa`) — Fable OE-1 / Bevel §4 / owner locks 1–10; under-bar expand DPS→HPS→Progress.
+- **Ruling:** **SIGNED. Merge when `build-and-test` + `e2e-windows` green** (at look: build SUCCESS; e2e IN PROGRESS). Land HELM SSC on main (UTF-8 prepend); prefer this over branch ask tip.
+- **Asks answered:** (1) merge sign SIGNED. (2) no Bevel fourth-state question — SIGNED ACK (`ThemeHost` untouched; peek/pin = interaction flag). (3) peek-and-revert for non-pinned hover — SIGNED ACK (build call; Bevel/owner-test soft).
+- **Product:** ThemeHost expand→pop; slaved `HudExpandWindow` (trap-12/SA-2); Progress → Progress WINDOW not BreakoutKind; BreakoutHost lift + `Open`; DoubleClick opt-in preserved; Home untouched; ratchet 3895→3839 (4222/4222).
+- **Soft:** drop channel tip; #332 batch soft discipline; Soft max ≤3; no more trackers until owner tests OE-1 mechanics. After merge: OE-2 parallel OK; OE-3/OE-4 clear with zero-headroom note.
+- **Scope hygiene:** No OptionsWindow retirement / TEL / Version / `v1.99.19` / Play Console. Not a hold. Not needs-david. Live Holds empty. Play Console OFF. Claude kick via Dranak (`--model opus`): CI → drop tip → merge #350 → OE-2 and/or OE-3 under Soft max ≤3.
+- **Condition:** n/a (process, not a hold)
+- **Signed:** Helm, 2026-09-06 ~7:40 PM CT
 
 ### PR #349 — owner locks Home=guidance hub + mobile north star (SIGNED)
 - **Kind:** sign-off / posture / gate
