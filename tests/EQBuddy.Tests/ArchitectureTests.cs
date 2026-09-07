@@ -215,7 +215,22 @@ public class ArchitectureTests
         // deletions rather than an edit that squeezes under the bar. Set to the MINIMUM
         // that fits, by the same "one line and no more" rule as every entry above:
         // 3895 × 1.1 = 4,284.5 against 4,284 lines.
-        (@"EQBuddy/MainWindow*.xaml.cs", 3895),
+        //
+        // 3895 → 3839 on 2026-09-06 (OE-1, the mini-bar expand). **A LIFT, in the same
+        // commit, because the entry had ONE line of headroom** — 4,283 against 4,284 — and
+        // the feature needed six lines of widget-side wiring. `UpdateBreakouts`,
+        // `ToggleBreakout` and the `_breakouts` dictionary went to `BreakoutHost.cs`
+        // verbatim: it is the surface OE-1 extends (the under-bar panel's ⧉ pops into one of
+        // those windows), which is what makes it the honest one to take rather than whatever
+        // block happened to be longest. Everything OE-1 adds went to `HudExpand` (UI.Shared,
+        // unit-tested), `HudExpandBar` and `HudExpandWindow`.
+        //
+        // Set to the MINIMUM that fits by the same "one line and no more" rule as every
+        // entry above: 3839 × 1.1 = 4,222.9 against 4,222 lines. OE-3 and OE-4 are queued
+        // behind this in the same lane and both touch this file — so they inherit zero
+        // headroom on purpose, and OE-4's plan already names the roster lift that pays for
+        // it. A baseline left high is headroom nobody argued for.
+        (@"EQBuddy/MainWindow*.xaml.cs", 3839),
         // A GLOB, like MainWindow's above, and for the same reason — but this one was a
         // literal path until 2026-08-18 and SessionStats is a partial class, so
         // SessionStats.Tracked.cs (207 lines) was never counted at all. The entry read

@@ -1,3 +1,56 @@
+## 2026-09-06 (OE-1 — the mini-bar tracked-chip expand)
+
+- **The under-bar panel is a SLAVED COMPANION WINDOW, not a panel inside the widget** · the
+  owner's words are "expand under the bar", and the obvious reading is a body in the widget's
+  own visual tree · companion, because the widget is `SizeToContent`: a body that appears on a
+  HOVER and grows on a TIMER is a geometry change on an always-on-top transparent window over
+  a fullscreen game, which is trap 12 / #173's exact mechanism and cost KoboldCoterie the
+  keyboard. `HudChipRowWindow` (SA-2, Helm-signed 2026-09-05) is the precedent and this is its
+  second user — same `HudChipRow.Placement` arithmetic, no geometry of its own, nothing
+  persisted. Fable's OE-1 plan names this hypothesis; it is verified rather than assumed.
+- **Peek and pin are ONE placement plus a flag, not a fourth `ThemePlacement`** · Fable's own
+  labelled hypothesis was that they fit as a transient Inline, with "if the executor finds it
+  needs a fourth state, that is a Bevel question before it ships" · they fit. A peek and a pin
+  render the identical panel and differ only in what mouse-away does, which is an interaction
+  rule ON the signed shape rather than a new state IN it. `ThemeHost` is unchanged. **No Bevel
+  question is owed.**
+- **`WindowClosed` is KEYED on the tracker** · lock 7 says "close floated window → just the
+  mini-bar, nothing expanded", which reads as a keyless call · keyed, because a ✕ on a float
+  the bar has since moved on from would otherwise collapse whatever the player is looking at
+  now. Nothing in a diff or a screenshot tells the two apart; a unit test does.
+- **`BreakoutHost.Open` is a new member rather than a reuse of `Toggle`** · one method for
+  "the chip wants this window" is tidier · separate, because the default profile ships
+  `DisabledBreakouts = ["Healing"]`, so a minimized widget already has the Damage float up —
+  and the first ⧉ on it would have CLOSED it. The common case, silently wrong.
+- **Only the DPS and third slots wear button chrome in this PR** · lock 2 says "chips must
+  look like buttons", full stop, and a bar where two of ten look like buttons is uneven ·
+  two, because lock 8 is explicit that the PR stops at DPS / HPS / Progress for the owner to
+  test the mechanics. Lock 9 makes the rest a later PR, not a never. Called out in the
+  What's-new so a player meets the unevenness as a stated stage rather than as a defect.
+- **The panel shows SESSION scope with no Fight/Session strip** · the float carries that
+  toggle and parity argues for it · session only, because a peek needs one number that means
+  one thing, and a second scope axis with no room for a visible strip is a state the player
+  can neither see nor change. The ⧉ is one click away and carries the toggle.
+- **The double-click gesture keeps priority on the two expansion chips** · the new single
+  click is the primary path Bevel's §4 asked for, so it could reasonably win · double-click
+  wins where the player opted into it (`DoubleClickChipsToggleBreakouts`, off by default),
+  because OE-1 was told to leave that setting untouched and silently changing what an opt-in
+  does is worse than an unused gesture. Both ride ONE mouse-down handler: WPF skips later
+  handlers on an element once one sets `Handled`, and this element must set it or the bar's
+  `DragMove` eats the click — so a second `+=` would simply never run.
+- **The chip row parks BELOW the panel** · both are slaved to the same widget edge · the
+  panel's height plus its gap is handed to `HudChipRow.Placement` as part of the HUD's own
+  height, because to a chicklet the widget and whatever hangs off it are one block — and the
+  flip-above-the-widget rule has to treat them as one or it flips the row into the panel.
+- **Two screenshots, not four** · the four modes are peek / pinned / window / collapsed ·
+  two, keyed on the TARGET, because a peek and a pin are the same picture. Two identical
+  committed PNGs would read as coverage of a distinction neither can show (trap 34's shape in
+  a screenshot). The mode is asserted from the dump instead.
+- **The ratchet baseline came down to 3,839 in this commit** · a lift could bank into the old
+  baseline under the KEEP-IF-IT-FITS convention · lowered to the minimum that fits, because
+  that convention is about not RAISING a ceiling; room that is freed and not claimed quietly
+  refills, and OE-3/OE-4 are queued behind this in the same lane on the same file.
+
 ## 2026-09-06 (F3 / SR-5 — the Settings room lands)
 
 - **The room does NOT enter the ★ alert-banner's placement mode, although the v1 window

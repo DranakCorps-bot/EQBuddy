@@ -158,65 +158,15 @@ collapsed and naming it loudly enough that it isn't re-deferred on the old reaso
 
 ---
 
-### 4. Mini-bar tracked item → anchored expand → still-poppable window (owner-locked intent — IA below is the shape, not a re-litigation)
+### ~~4. Mini-bar tracked item → anchored expand → still-poppable window~~ — TAKEN 2026-09-06 (OE-1)
 
-**Place:** `src/EQBuddy/BreakoutWindow.xaml.cs:14` (`BreakoutKind` enum — `Damage, Healing, Pet,
-Watch, Loot, Buffs`), `MainWindow.xaml.cs:3441-3505` (`UpdateBreakouts`, `ToggleBreakout`),
-`src/EQBuddy/HudBarView.cs:71-332` (mini-bar chips, `AttachDoubleClick`),
-`src/EQBuddy.UI.Shared/ThemeHost.cs` (whole file).
-
-**Verified: today a tracked mini-bar stat only ever goes straight to a separate floating
-`BreakoutWindow`, or nothing.** Two triggers, neither of them an inline expand: (1) while
-minimized, any starred `BreakoutKind` auto-shows its window (`UpdateBreakouts`,
-`MainWindow.xaml.cs:3441-3491`); (2) a mini-bar chip's double-click toggles that same window on/
-off (`HudBarView.cs:155-176`→`ToggleBreakout`), gated on `DoubleClickChipsToggleBreakouts`
-(default `false`, same setting flagged in item 2). Only `pet` and `loot` cells currently carry a
-`breakout:` at all (`HudBarView.cs:280-284`) — `kills/procs/motes/money/deaths` have none. There
-is no `Inline` placement anywhere in this path today.
-
-**The model to extend already exists, one file over, and it's built for exactly this shape.**
-`ThemeHost<TTab>` (`src/EQBuddy.UI.Shared/ThemeHost.cs`) is the state machine Progress/Kills
-cards already use: `Collapsed → Inline (expanded under its card) → Window (own floating window,
-card collapses)`, with `ToggleCard()` driving Collapsed↔Inline, `PopOut()` taking an Inline body
-into its own window and collapsing the card, and `WindowClosed()` returning to Collapsed (never
-silently back to Inline — deliberate, per its own doc comment: *"exactly one owner of the
-body"*). This is precisely "click to expand anchored under where you clicked, with a further
-pop-to-window from there" — the owner's ask, already built, just not wired to the mini-bar.
-
-**Recommended shape:** give each starred/breakout-capable mini-bar chip a `ThemeHost`-style
-three-state cycle instead of today's Collapsed/Window-only: click (not double-click — the
-owner's ask is a **primary**, discoverable path, and hiding it behind the same opt-in gesture
-item 2 already flagged as under-discovered would repeat that mistake) expands the breakout's
-body anchored **below the mini-bar**, in place; a ⧉ on that expanded body pops it to a real
-floating `BreakoutWindow` exactly as `PopOut()` already does for Progress; closing that window
-returns to Collapsed, not back to Inline, matching `WindowClosed()`'s existing rule. **This adds
-a state to the existing `BreakoutKind` machine — it does not replace `UpdateBreakouts`'s
-auto-show-while-minimized behavior**, which is the owner's explicit constraint ("does not replace
-breakout"). The auto-show path and the new click-to-expand path both still resolve to the same
-`BreakoutWindow` instance when popped, so there is exactly one owner of each breakout's body at
-any time, the same invariant `ThemeHost` already enforces elsewhere.
-
-**Owner interview COMPLETE — locked interaction model (David 2026-09-06 ~6:04 PM CT).** Appended by Dranak; not a re-litigation of the ThemeHost shape above — these are the signed interaction rules for item 4:
-
-1. One under-bar expansion at a time.
-2. Chips must look like buttons.
-3. Hover = smooth peek expand; mouse-away = smooth collapse.
-4. Click = stay open.
-5. X on under-bar panel = collapse back to bar.
-6. Pop-out from expanded → under-bar collapses (float is the detail).
-7. Close floated window → just the mini-bar (nothing expanded).
-8. First ship: DPS, then HPS, then Progress. Owner tests. Then every other tracker once those mechanics are locked — all same pattern.
-9. No exceptions: every tracker uses this pattern. Bar = anything the player cares about for quick mouseover or click — no digging through Options/menus.
-10. Motion quality: slick, smooth, professional; expand/collapse in a natural flow.
-
-Fable/Claude: treat (1)–(10) as build constraints once Helm signs. Ship order in (8) gates the first seats; (9) forbids one-off tracker exceptions.
-
-**Not designed here (implementation, for Fable/Claude once this IA is signed):** which exact
-mini-bar chips beyond `pet`/`loot` gain a breakout anchor (the owner's example is DPS —
-`Damage` — which today has no `breakout:` wired on any chip at all per `HudBarView.cs:280-284`,
-so wiring `Damage`'s chip to a breakout is itself new, not a rewire); the exact visual anchoring
-(does the expanded body push the widget taller, or overlay?) needs a screenshot pass against the
-widget's `SizeToContent` behavior (trap 12) before it's built.
+Built on `claude/oe1-minibar-expand-20260906`: the `ThemeHost` read was right and needed no
+fourth state, the hosting is a slaved companion window (`HudChipRowWindow`'s SA-2 shape —
+neither of the two options your "not designed here" named, because both of them measure), and
+single-click is the primary path with the opt-in double-click untouched. Owner locks 1–10 are
+asserted one-test-per-lock in `HudExpandTests`. One intersection the locks do not cover — a
+hover on a chip that is NOT the pinned one — was decided as peek-and-revert and is flagged for
+your look in `BEVEL-FEEDBACK.md`.
 
 ---
 Findings for Claude, not a work order. **Claude: take an item, then delete it** (or leave only what is still planned).

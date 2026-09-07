@@ -38,6 +38,7 @@ internal sealed class HudBarView
     private readonly Func<DateTime, IReadOnlyDictionary<string, DateTime>> _cuesDue;
     private readonly Action<BreakoutKind> _toggleBreakout;
     private readonly Action _openProgress;
+    private readonly HudExpandBar _expand;
 
     // Double-click state for the breakout chips, at the level of THIS view rather than of
     // an element: the chips are rebuilt every tick, so a rebuild landing between the two
@@ -72,15 +73,19 @@ internal sealed class HudBarView
     /// double-click.</param>
     /// <param name="openProgress">Open the Progress window; the xp chip's
     /// double-click.</param>
+    /// <param name="expand">OE-1's under-bar expansion. The bar reports gestures to it and
+    /// asks it which chip is lit; every decision about WHAT that means is
+    /// <see cref="HudExpand"/>'s, unit-tested with no window.</param>
     public HudBarView(Panel host, AppSettings settings,
         Func<DateTime, IReadOnlyDictionary<string, DateTime>> cuesDue,
-        Action<BreakoutKind> toggleBreakout, Action openProgress)
+        Action<BreakoutKind> toggleBreakout, Action openProgress, HudExpandBar expand)
     {
         _host = host;
         _settings = settings;
         _cuesDue = cuesDue;
         _toggleBreakout = toggleBreakout;
         _openProgress = openProgress;
+        _expand = expand;
     }
 
     /// <summary>One mini-dashboard stat (2026-08-11, take two — David: no ovals):
@@ -155,24 +160,86 @@ internal sealed class HudBarView
     private void AttachDoubleClick(Panel element, string? key, Action? act, string? hint)
     {
         if (key is null || act is null || !_settings.DoubleClickChipsToggleBreakouts) return;
-        element.Background = System.Windows.Media.Brushes.Transparent;
-        element.Cursor = Cursors.Hand;
         element.ToolTip = hint ?? $"Double-click to show or hide the {key} breakout";
+        AttachGestures(element, key, single: null, doubleClick: act);
+    }
+
+    /// <summary>
+    /// **ONE mouse-down handler per element, whatever gestures it carries** (OE-1).
+    ///
+    /// WPF stops calling handlers once one sets <c>Handled</c>, including later ones on the
+    /// SAME element — and this element must set it, or the bar's <c>OnDrag</c> starts a modal
+    /// <c>DragMove</c> on the first click and eats the sequence (the note above). So a second
+    /// `+=` for the single click would simply never run, silently, with nothing in a diff to
+    /// say so. The two gestures share one handler instead, and the double-click keeps
+    /// priority: <c>DoubleClickChipsToggleBreakouts</c> is untouched by OE-1 and a player who
+    /// opted into it must not lose it to the new primary path.
+    /// </summary>
+    private void AttachGestures(FrameworkElement element, string key, Action? single, Action? doubleClick)
+    {
+        // Transparent, not null, so the gaps between glyph and value are hit-testable too.
+        // A Border already has a ground of its own (ExpandChip paints one).
+        if (element is Panel panel) panel.Background = System.Windows.Media.Brushes.Transparent;
+        element.Cursor = Cursors.Hand;
         element.MouseLeftButtonDown += (_, e) =>
         {
             e.Handled = true;
             var now = DateTime.Now;
-            if (_lastChipClickKey == key && now - _lastChipClickAt <= DoubleClickWindow)
-            {
-                _lastChipClickKey = null;   // consume, so a third click starts fresh
-                act();
-            }
-            else
-            {
-                _lastChipClickKey = key;
-                _lastChipClickAt = now;
-            }
+            var isDouble = _lastChipClickKey == key && now - _lastChipClickAt <= DoubleClickWindow;
+            _lastChipClickKey = isDouble ? null : key;   // consume, so a third click starts fresh
+            _lastChipClickAt = now;
+            if (isDouble && doubleClick is not null) doubleClick();
+            else single?.Invoke();
         };
+    }
+
+    /// <summary>
+    /// A glance slot that EXPANDS — owner locks 2, 3 and 4 on one control.
+    ///
+    /// **Lock 2 ("chips must look like buttons") is the border, and it is drawn from
+    /// <see cref="ChipStyle"/> rather than invented**: the standing pill rule says there is
+    /// one selectable-pill vocabulary in this app and sixteen hand-built copies is how it got
+    /// one. The COMPACT variant, because this sits on the bar that is on screen the whole
+    /// time a player farms and the card pill's weight would double the HUD's height.
+    ///
+    /// **The chrome is fixed-size and only its INK changes** (trap 12). Padding, radius and
+    /// border thickness are constants and the value keeps its reserved width, so a hover, a
+    /// pin and a new sample all repaint identical pixels and measure identically — which is
+    /// the whole reason the widget can be <c>SizeToContent</c> over a fullscreen game.
+    ///
+    /// **Only the two expandable slots wear it in this PR**, which is lock 8: DPS, HPS and
+    /// Progress ship first and the owner tests the mechanics before every other tracker
+    /// follows on the same pattern (lock 9 — no exceptions, later, not never).
+    /// </summary>
+    private Border ExpandChip(UIElement content, HudExpandTarget target, string tip,
+        Action? doubleClick)
+    {
+        var chip = new Border
+        {
+            CornerRadius = new CornerRadius(ChipStyle.CompactRadius),
+            BorderThickness = new Thickness(ChipStyle.BorderThickness),
+            Padding = new Thickness(ChipStyle.CompactPadding.Left, ChipStyle.CompactPadding.Top,
+                ChipStyle.CompactPadding.Right, ChipStyle.CompactPadding.Bottom),
+            Margin = new Thickness(0, 0, ChipStyle.Gap.Right, 0),
+            Child = content,
+            ToolTip = tip,
+        };
+        // Lit while THIS tracker's panel is the one on screen. Read off the model on every
+        // rebuild, never remembered here: "the chip is lit" and "the panel is up" are one
+        // fact and a second copy of it is trap 4.
+        var lit = _expand.Shown == target;
+        if (lit) chip.SetResourceReference(Border.BackgroundProperty, "ToggleHighlightBrush");
+        else chip.Background = System.Windows.Media.Brushes.Transparent;
+        chip.SetResourceReference(Border.BorderBrushProperty,
+            lit ? "AccentBrush" : "HairlineBrush");
+        chip.MouseEnter += (_, _) => _expand.Hover(target);
+        chip.MouseLeave += (_, _) => _expand.Away();
+        // The double-click stays behind its own opt-in, exactly as it was: OE-1 does not
+        // touch DoubleClickChipsToggleBreakouts, and honouring the gesture for a player who
+        // never turned it on would be this PR changing a setting's meaning by accident.
+        AttachGestures(chip, HudExpand.Key(target), single: () => _expand.Click(target),
+            doubleClick: _settings.DoubleClickChipsToggleBreakouts ? doubleClick : null);
+        return chip;
     }
 
     /// <summary>The last chip's divider has nothing to divide — trim it.</summary>
@@ -192,16 +259,20 @@ internal sealed class HudBarView
     /// (#173, KoboldCoterie). <see cref="HudGlance"/> pads every string to one length and
     /// this pins the control to one width; both together mean a new sample changes pixels
     /// and nothing else. <c>PerfReadout</c>'s label is the worked example.</summary>
-    private StackPanel GlanceSlot(string? iconName, string text, double width, string? tip,
-        string? clickKey = null, Action? onDoubleClick = null, string? doubleClickHint = null)
+    /// <param name="expand">When set, the slot is an OE-1 expansion chip: it wears button
+    /// chrome (lock 2), peeks on hover (lock 3) and pins on click (lock 4), and it carries no
+    /// hairline divider — a button separates itself from its neighbour.</param>
+    private FrameworkElement GlanceSlot(string? iconName, string text, double width, string? tip,
+        string? clickKey = null, Action? onDoubleClick = null, string? doubleClickHint = null,
+        HudExpandTarget? expand = null)
     {
         var panel = new StackPanel
         {
             Orientation = Orientation.Horizontal,
-            Margin = new Thickness(0, 0, Tok.SpaceL, 0),
-            ToolTip = tip,
+            Margin = expand is null ? new Thickness(0, 0, Tok.SpaceL, 0) : default,
+            ToolTip = expand is null ? tip : null,
         };
-        AttachDoubleClick(panel, clickKey, onDoubleClick, doubleClickHint);
+        if (expand is null) AttachDoubleClick(panel, clickKey, onDoubleClick, doubleClickHint);
         if (iconName is not null)
         {
             // A vector, never a glyph (#148, #166) — same rule as the starred cells below.
@@ -221,6 +292,12 @@ internal sealed class HudBarView
         };
         value.SetResourceReference(TextBlock.ForegroundProperty, "AccentBrush");
         panel.Children.Add(value);
+        // A button gets no divider, and it must not get one: TrimLastDivider walks the LAST
+        // child of the last StackPanel, so a divider inside a chip would be the thing it
+        // collapsed when the bar has no starred cells at all.
+        if (expand is { } target)
+            return ExpandChip(panel, target, doubleClickHint ?? tip ?? HudExpand.Title(target),
+                onDoubleClick);
         var divider = new Border
         {
             Width = 1,
@@ -244,19 +321,30 @@ internal sealed class HudBarView
         Third = glance.Third;
         _host.Children.Add(GlanceSlot(null, glance.Name, HudGlance.NameReservedWidth,
             glance.Name.Length > 0 ? null : HudGlance.EmptyNameTooltip));
+        // THE TWO EXPANSION CHIPS (OE-1). DPS is always slot two; slot three is HPS or the
+        // XP rate, and the tracker the panel opens FOLLOWS that swap — which is why the
+        // target is decided here, from the glance's own answer, rather than by the panel
+        // guessing what the third slot currently means.
         _host.Children.Add(GlanceSlot(HudGlance.DpsIcon, glance.Dps,
-            HudGlance.MetricReservedWidth, "Damage per second"));
+            HudGlance.MetricReservedWidth,
+            "Damage per second — hover to peek, click to keep it open",
+            expand: HudExpandTarget.Dps));
         // The xp cell's double-click SURVIVES the promotion, on the slot that replaced it.
         // While the widget is minimized it was the only door to the Progress window — the
         // Progress card is on the expanded widget, so it is not one — and a promotion must
         // not shut a door (trap 59). It is attached only while the slot IS the xp number:
         // a gesture that silently means something else half the time is worse than none.
+        // The opt-in double-click is untouched by OE-1 and keeps priority on this chip; the
+        // single click is the primary, discoverable path Bevel's §4 asked for.
         _host.Children.Add(glance.Third == HudThird.Healing
             ? GlanceSlot(glance.ThirdIcon, glance.ThirdText, HudGlance.MetricReservedWidth,
-                "Healing per second — while healing is the weight of the last half-minute")
+                "Healing per second — while healing is the weight of the last half-minute; "
+                + "hover to peek, click to keep it open",
+                expand: HudExpandTarget.Hps)
             : GlanceSlot(glance.ThirdIcon, glance.ThirdText, HudGlance.MetricReservedWidth,
                 tip: null, clickKey: "xp", onDoubleClick: _openProgress,
-                doubleClickHint: "Experience per hour — double-click to open the Progress window"));
+                doubleClickHint: "Experience per hour — hover to peek, click to keep it open",
+                expand: HudExpandTarget.Progress));
     }
 
     /// <param name="characterName">Whoever the log is naming. Handed in rather than taken
