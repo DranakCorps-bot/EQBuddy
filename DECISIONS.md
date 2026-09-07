@@ -1,3 +1,33 @@
+## 2026-09-06 (Phase-2 — GearCard tick-freeze diagnosis)
+
+- **The local ×20 repro loop was SKIPPED** · Fable's Phase-2 plan offers it first ("Local repro
+  loop on a Windows seat… If not: wait for the next CI red") · skipped, because the red had
+  already arrived carrying the minidump, and the mechanism reproduced deterministically in a
+  49-line standalone console app in seven seconds. Looping the real suite would have taken the
+  trap-61 screen lock for ~15 minutes to reproduce something already reproduced, on the one
+  machine that also has to be free for shots. The plan's own words make the non-repro the
+  expected case on this desk.
+- **The diagnosis PR is based on current `main` (`078080f3`), not on the instrumented tip
+  `3ce1b0f9` it diagnoses** · the seat was scoped off #357's tip and the obvious move was to
+  stack on it · based on main, because #357's branch is BEHIND main on all five channel files
+  (`HELM-FEEDBACK.md` alone is 19 lines behind), and prepending a mailbox entry onto a stale
+  base is trap 60(a) exactly — the failure that deleted Helm's #323 and #324 signs. The
+  diagnosis references #357 by number instead; nothing about it needs that branch's code.
+- **No fix was written, and no fix was sketched** · the mechanism is named precisely enough
+  that a one-line change suggests itself · not written, because Helm's sign and Fable's plan
+  both put Phase 3 behind a Fable review and a Helm last-look, and the layer this belongs in is
+  a real decision (a per-control setter, an app-wide default, or defending the dispatcher) that
+  is not the executor's to make. Recorded because the temptation was concrete.
+- **`dotnet-dump` was installed as a global tool on this machine** · the alternative was a
+  Windows SDK / WinDbg install for native frames · installed the smaller one, because the
+  dispatcher's own managed fields answered the question and no native frame was needed. The
+  gap is named in the Fable note rather than papered over: nothing below the `IL_STUB_CLRtoCOM`
+  was walked.
+- **The player-facing implication is REPORTED, not acted on** · the same evidence says every
+  tooltip in the app carries this, which would ordinarily suggest a `WhatsNew` entry and a
+  severity call · reported to Helm only, because "what players are told" and the release go are
+  consequence-list decisions, and Phase 3 has not been scoped.
+
 ## 2026-09-06 (OE-3 — the xp-chip tooltip: ETA + level)
 
 - **The level readout goes on the TOOLTIP, not on the Progress window's Experience header**
