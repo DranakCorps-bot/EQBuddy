@@ -138,4 +138,46 @@ public sealed class HudBarTests
         app.AppendLogLines("You crush a training dummy for 25 points of damage.");
         app.WaitForDump("hudGlance", "xp", "one swing to bring the XP rate back");
     }
+
+    /// <summary>
+    /// The xp chip's hover carries the next-level ETA and the tracked level (OE-3).
+    ///
+    /// **"Present in the build" and "in effect at runtime" are different claims** (trap 42),
+    /// and here they are unusually easy to confuse: both numbers have existed in
+    /// `SessionStats` all along and `ProgressPresentation` has worded the forecast all
+    /// along. `HudXpTooltipTests` proves the sentence; this proves it reaches the chip. A
+    /// dump fact that re-asked the session instead of reading what was DRAWN would have
+    /// reported this feature working on the tree that does not have it.
+    ///
+    /// **The prediction, written before it ran** (trap 23). The fixture is a full session
+    /// with 16 `You gain experience!` lines over roughly two hours, so it is far above the
+    /// 0.05%/hr floor below which `HoursToLevel` is null — `hudXpEta=1` at launch. It
+    /// contains no ding at all, so the ledger has nothing and the snapshot has nothing:
+    /// `hudXpLevel=0`, the tooltip's "not seen yet" line, which is a DRAWN sentence rather
+    /// than a missing one. Appending one ding then has to move it to 12 through the ledger
+    /// the widget writes at the same tick.
+    /// </summary>
+    [Fact]
+    public void TheXpChipsHoverCarriesTheEtaAndTheTrackedLevel()
+    {
+        using var app = new AppHarness(settings =>
+        {
+            settings.Minimized = true;   // the bar only draws while MiniRoot is visible
+            settings.MiniStats = ["kills"];
+            settings.DisabledBreakouts =
+                ["Damage", "Healing", "Pet", "Watch", "Loot", "Buffs"];
+            settings.DefaultRulesVersion = int.MaxValue;
+            settings.TrackedRules.Clear();
+        });
+        app.Launch();
+
+        // The fixture is melee, so the third slot is the xp one and there IS a chip to
+        // hover — the -1 reading (swapped to HPS) would make both facts below meaningless.
+        app.WaitForDump("hudGlance", "xp", "the third slot to be the XP rate");
+        app.WaitForDump("hudXpEta", 1, "the fixture's xp rate to put a forecast on the hover");
+        app.WaitForDump("hudXpLevel", 0, "no level known before any ding — stated, not omitted");
+
+        app.AppendLogLines("You have gained a level! Welcome to level 12!");
+        app.WaitForDump("hudXpLevel", 12, "the announced level to reach the hover");
+    }
 }

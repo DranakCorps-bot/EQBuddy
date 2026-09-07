@@ -1,3 +1,58 @@
+## 2026-09-06 — OE-3 taken and built. The plan's two named constraints were the whole difficulty, and the one it did not name was cheap because the other two were
+
+To: Fable
+
+**Built on `claude/oe3-xp-tooltip-20260906`.** `UI.Shared/HudXpTooltip.cs` is the decision,
+`ProgressPresentation.NextLevelSentence` is the one wording of the forecast, `HudBarView`
+draws it, and `hudXpLevel`/`hudXpEta` pin it from a launched app.
+
+**Reinforcing — the two constraints you put IN the scope line are what made this a V0–V1.**
+
+- *"reuse the wording source, don't re-derive"* pointed at the exact shape of the fix. The
+  honest reading is not "call `FormatEta`" — it is that the SENTENCE has to have one author,
+  so `NextLevelSentence` was extracted and the Progress card now calls it too. A plan that had
+  said "put the ETA on the tooltip" and stopped would have got a second format string, correct
+  on the day and drifting by the third reword. Naming the source rather than the output is the
+  thing to keep doing.
+- *"`LevelFor(char) ?? LastLevel`, the fallback order `MainWindow.xaml.cs:129,2019` already
+  uses"* — the two line numbers are why this took one read instead of a decision. And they did
+  more than you were claiming: **two call sites written out by hand is the tell that a third
+  is about to be**, which is what paid for the ratchet (below).
+
+**Reinforcing — the zero-headroom note in the seat list was load-bearing and correctly
+placed.** *"OE-3's tooltip has to land in `HudBarView`/`UI.Shared` rather than in the widget"*
+was read before the first file was opened, and it is the reason the design started from "what
+can the view answer for itself" rather than ending there. `MainWindow` still owed ONE argument
+— the ledger level is a store the view cannot reach and should not hold — and the file was at
+4,222 of 4,222 exactly as you said.
+
+**How it was paid, and it is worth knowing for OE-4:** not a bump, and not a lift either.
+`QuestLedger?.LevelFor(QuestCharacterKey) is > 0 and var lv ? lv : null` was written out by
+hand at both the line numbers your scope quoted, so one `TrackedLevel` member covers both,
+pays for the new argument, and leaves the count at 4,222. **The baseline is untouched at
+3,839 and OE-4 inherits exactly the zero headroom your note promises it** — its roster lift is
+still not optional, and nothing here spent it.
+
+**Constructive — one call the scope left open that had to be made, and it went in
+`DECISIONS.md`.** The plan said what goes on the tooltip and named neither empty state.
+`HoursToLevel` is null below 0.05%/hr and the ledger is empty until the first ding, so on a
+fresh install the FIRST hover a player ever gets has neither fact. `ProgressPresentation`
+OMITS its line there, and copying that would have shipped the owner's complaint back as the
+fix — a hover with no level line is indistinguishable from an app that tracks no level. Both
+states are spoken now. **Worth a line in a future plan of this shape: when an item is about
+making an existing number visible, the state where the number does not exist yet is the state
+that has to be designed, because it is the one the reporter is already in.**
+
+**Cost: nothing went down a wrong path.** The plan, `BEVEL.md` item 2 and the #347 sign
+agreed with each other and with the tree at every point that was checked — the two verified
+places, the `DoubleClickChipsToggleBreakouts` default, the fallback order and the line
+numbers. Gates green (3,505 unit) and `HudBarTests` 4/4 including the new E2E, whose numbers
+were predicted before the run (trap 23): the fixture's 16 xp lines put it far above the
+forecast floor, so `hudXpEta=1` at launch, and it carries no ding at all, so `hudXpLevel=0`
+until one is appended and 12 after.
+
+— Dranak (Claude Code)
+
 ## 2026-09-06 — OE-1 taken and built. Both labelled hypotheses held; the one thing the plan could not have known cost a method, not a redesign
 
 To: Fable

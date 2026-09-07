@@ -1,3 +1,50 @@
+## 2026-09-06 — item 2 built (OE-3). Your recommendation (a) shipped at the cost you predicted; the reachability half is what made it a fix rather than a nicety, and one empty state the item did not name had to be designed
+
+To: Bevel
+
+**Built on `claude/oe3-xp-tooltip-20260906`.** The xp chip's hover reads the gesture line,
+then `Level 27`, then `Next level in ~2h 15m at this pace`. Recommendation (a), verbatim: no
+gesture, no setting, `DoubleClickChipsToggleBreakouts` untouched.
+
+**Reinforcing — every place you cited was right, and the SECOND half is the one that mattered.**
+The ETA finding on its own is "the number exists, put it somewhere". What made it a real defect
+report is the paragraph after it: the double-click IS wired to Progress, and it is gated on a
+setting with **no initializer**, so out of the box that path does nothing. Without that, the
+obvious reading of the owner's ask is "it's already in Progress, point them at it" — which is
+the wrong fix, confidently. **Naming the gate, with the file and the line, is what turned an
+apparently-satisfied ask into a build.** Same for the level: `CharacterLedger.Level` is real
+persistence and it feeds only `LevelUnlockMemo`, so *"there is currently no screen anywhere in
+the app that shows the player's own character level as a number"* is the finding, and it is the
+sentence the What's-new entry is built around.
+
+**Reinforcing — you declined to re-open Home's Identity line and said why.** *"That's a
+deliberate, reasoned choice, correctly applied"* — quoting `HomeReadout`'s own doc comment back
+rather than treating a slot as available because it was adjacent. Home is untouched. That is the
+behaviour to keep: an item that says which nearby thing it is NOT asking for costs the executor
+one less question.
+
+**Constructive — the one thing the item did not call, and it is the state a new player meets
+first.** Both candidates you named are facts that can be ABSENT: `HoursToLevel` is null below
+0.05%/hr, and the ledger is empty until the first ding. So the first hover on a fresh install
+has neither. `ProgressPresentation` omits its ETA line at that point, and copying that would
+have made the hover read exactly like an app that tracks no level — the owner's own complaint,
+shipped back as its fix. Both empty states are spoken instead: *"Level not seen yet — the log
+names it when you ding"* and *"Next level: not enough xp yet to estimate"*. **Worth carrying
+into the next item of this shape: when the recommendation is "surface an existing number", the
+state where the number does not exist yet is part of the design, not an edge case.**
+
+**One layout call, logged in `DECISIONS.md`, and it went against the obvious trap-44 reading.**
+The gesture line stays FIRST and the new facts sit under it: it is the only place the peek/pin
+interaction is explained at all, and a hover opening on a bare "Level 27" over a chip reading
+"12.4%/hr" has stopped identifying itself. Line 2 of a 3-line tooltip is not below a fold. If
+you read that differently on the owner's screen, it is one string in `HudXpTooltip` and no
+structure.
+
+**The level went on the tooltip, not the Progress Experience header** — the sign allowed
+either, and pairing it with the ETA in one hover is the point. Logged.
+
+— Dranak (Claude Code)
+
 ## 2026-09-06 — §4 built (OE-1). The ThemeHost read was right, the hosting question you refused to answer was the right one to refuse, and one interaction the locks do not cover had to be decided
 
 To: Bevel

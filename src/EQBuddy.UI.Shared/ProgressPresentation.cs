@@ -40,7 +40,7 @@ public static class ProgressPresentation
         // room a player already has open, not a replacement for it.
         if (MotesPresentation.RateLine(Motes.Summarize(s.Loot, s.Elapsed)) is { } motes)
             lines.Add(motes);
-        if (s.HoursToLevel is { } eta) lines.Add($"Next level in {FormatEta(eta)} at this pace");
+        if (s.HoursToLevel is { } eta) lines.Add(NextLevelSentence(eta));
         if (Levels(s) is { Length: > 0 } levels) lines.Add(levels);
         return lines;
     }
@@ -58,6 +58,16 @@ public static class ProgressPresentation
             return $"{level.Text} at {level.Time:h:mm tt} ({minutes}m)";
         }));
     }
+
+    /// <summary>"Next level in ~2h 15m at this pace" — the ETA sentence, in ONE place
+    /// because the collapsed HUD's xp tooltip says it too now (OE-3).
+    ///
+    /// It was composed inline above until then, and a second host wording the same
+    /// forecast by hand is exactly how two surfaces start disagreeing about one fact
+    /// (trap 4). The tooltip asks for the SENTENCE, not for <see cref="FormatEta"/> plus
+    /// its own prose.</summary>
+    public static string NextLevelSentence(double hours) =>
+        $"Next level in {FormatEta(hours)} at this pace";
 
     /// <summary>"~2h 15m" / "~40m". Hours only once there is at least one, and never
     /// "~0m": a level that is minutes away should say a minute, not nothing.</summary>

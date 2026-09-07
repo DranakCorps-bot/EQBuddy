@@ -123,7 +123,14 @@ order:
    lifted to `BreakoutHost.cs` to pay the ratchet. Both of its labelled hypotheses held —
    **no Bevel question is owed on a fourth state.** Feedback in `FABLE-FEEDBACK.md`.
 2. **OE-2 — Open EQBuddy / shell recover** (`must-fix`) — parallel lane or next.
-3. **OE-3 — xp-chip tooltip** (ETA + level).
+3. ~~**OE-3 — xp-chip tooltip** (ETA + level).~~ **TAKEN 2026-09-06 and built**
+   (`claude/oe3-xp-tooltip-20260906`). The item is deleted per the take-then-delete
+   contract; what it planned is now `UI.Shared/HudXpTooltip.cs` (+
+   `ProgressPresentation.NextLevelSentence` as the ONE wording of the forecast), drawn by
+   `HudBarView` and pinned by `hudXpLevel`/`hudXpEta`. **The ratchet is untouched at
+   3,839** — the one argument the widget owed was paid for by a `TrackedLevel` member
+   replacing two hand-written copies of the same fallback, so OE-4 inherits exactly the
+   zero headroom the note below promises it. Feedback in `FABLE-FEEDBACK.md`.
 4. **OE-4 — buff wrap-chip density** (timers stay `waiting`).
 
 ~~Do NOT kick OE-2 ahead of OE-1.~~ **Spent — OE-1 is built.** OE-3 and OE-4 are serial in
@@ -153,21 +160,6 @@ parallel in its own worktree as it always could. **Note for whoever takes OE-3 o
   the screen after OE-1 releases it.
 - **Out:** any new shell room work; OptionsWindow retirement; `EQBUDDY_SHELL` removal (the
   debug hook stays).
-
-### OE-3 — xp-chip tooltip: ETA + level
-
-- **Priority:** `ready` — after OE-1 in lane W (touches the same `HudBarView`/`HudGlance`).
-- **Class:** `V0–V1.`
-- **Source:** `BEVEL.md` item 2, Helm-signed #347 item 2.
-- **Scope:** the xp chip's tooltip carries the ETA sentence (already computed —
-  `SessionStats.XpPerHour`/`HoursToLevel`, worded by `ProgressPresentation`; reuse the
-  wording source, don't re-derive) plus the tracked level (`LevelFor(char) ?? LastLevel`,
-  the fallback order `MainWindow.xaml.cs:129,2019` already uses). No gesture, no setting,
-  no `DoubleClickChipsToggleBreakouts` default change, **not** Home's Identity line
-  (zone-over-level stays, per the sign).
-- **Out:** the double-click default flip (stays a soft named decision); Progress-window
-  header level readout (the sign allows it as an alternative — tooltip is the pick; log the
-  call in `DECISIONS.md`).
 
 ### OE-4 — Buff roster wrap-chip density
 

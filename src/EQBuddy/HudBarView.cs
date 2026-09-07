@@ -39,6 +39,7 @@ internal sealed class HudBarView
     private readonly Action<BreakoutKind> _toggleBreakout;
     private readonly Action _openProgress;
     private readonly HudExpandBar _expand;
+    private readonly Func<int?> _trackedLevel;
 
     // Double-click state for the breakout chips, at the level of THIS view rather than of
     // an element: the chips are rebuilt every tick, so a rebuild landing between the two
@@ -66,6 +67,16 @@ internal sealed class HudBarView
     /// <c>key=value</c>, so this is one word.</summary>
     public string GlanceKey => Third == HudThird.Healing ? "hps" : "xp";
 
+    /// <summary>The xp chip's hover text as it was last DRAWN, or null while the third
+    /// slot is HPS and there is no xp chip to hover (OE-3).
+    ///
+    /// Recorded at the point the string is handed to the control rather than recomputed
+    /// for the dump: "the tooltip says level 27" and "the app would compute 27 if asked"
+    /// are different claims, and only the first one is the feature (trap 42). Null is the
+    /// honest answer for the swapped-away state — a stale last-known level would read as a
+    /// chip that is on the bar.</summary>
+    public HudXpTip? XpTip { get; private set; }
+
     /// <param name="cuesDue">The alert scheduler's "when does each rule's cue fire" map.
     /// The bar cannot derive this from a snapshot — a cue is scheduled by the alert path,
     /// not by the session — so it is handed in rather than reached for.</param>
@@ -76,9 +87,15 @@ internal sealed class HudBarView
     /// <param name="expand">OE-1's under-bar expansion. The bar reports gestures to it and
     /// asks it which chip is lit; every decision about WHAT that means is
     /// <see cref="HudExpand"/>'s, unit-tested with no window.</param>
+    /// <param name="trackedLevel">The durable per-character level from the quest ledger, or
+    /// null when it has never recorded one (OE-3). Handed in for the same reason
+    /// <paramref name="cuesDue"/> is: the bar cannot derive it from a snapshot — the ledger
+    /// is the half that survives a restart and a truncated log — and reaching for the
+    /// widget's store from here would put a service on a view that has none.</param>
     public HudBarView(Panel host, AppSettings settings,
         Func<DateTime, IReadOnlyDictionary<string, DateTime>> cuesDue,
-        Action<BreakoutKind> toggleBreakout, Action openProgress, HudExpandBar expand)
+        Action<BreakoutKind> toggleBreakout, Action openProgress, HudExpandBar expand,
+        Func<int?> trackedLevel)
     {
         _host = host;
         _settings = settings;
@@ -86,6 +103,7 @@ internal sealed class HudBarView
         _toggleBreakout = toggleBreakout;
         _openProgress = openProgress;
         _expand = expand;
+        _trackedLevel = trackedLevel;
     }
 
     /// <summary>One mini-dashboard stat (2026-08-11, take two — David: no ovals):
@@ -336,6 +354,13 @@ internal sealed class HudBarView
         // a gesture that silently means something else half the time is worse than none.
         // The opt-in double-click is untouched by OE-1 and keeps priority on this chip; the
         // single click is the primary, discoverable path Bevel's §4 asked for.
+        // OE-3: the xp slot's hover now carries the next-level ETA and the tracked level —
+        // both of which the app has always had and neither of which was on any screen (see
+        // HudXpTooltip). The wording is UI.Shared's and the ETA sentence is the Progress
+        // room's own, so the two surfaces cannot forecast one session differently (trap 4).
+        // Recorded on the way past for the dump: what was DRAWN, not what could be
+        // computed (trap 42). Null while the slot is HPS — there is no xp chip then.
+        XpTip = glance.Third == HudThird.Healing ? null : HudXpTooltip.For(s, _trackedLevel());
         _host.Children.Add(glance.Third == HudThird.Healing
             ? GlanceSlot(glance.ThirdIcon, glance.ThirdText, HudGlance.MetricReservedWidth,
                 "Healing per second — while healing is the weight of the last half-minute; "
@@ -343,7 +368,7 @@ internal sealed class HudBarView
                 expand: HudExpandTarget.Hps)
             : GlanceSlot(glance.ThirdIcon, glance.ThirdText, HudGlance.MetricReservedWidth,
                 tip: null, clickKey: "xp", onDoubleClick: _openProgress,
-                doubleClickHint: "Experience per hour — hover to peek, click to keep it open",
+                doubleClickHint: XpTip!.Value.Text,
                 expand: HudExpandTarget.Progress));
     }
 
