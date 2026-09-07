@@ -1,3 +1,14 @@
+## 2026-09-07 ~1:44 PM CT — OWNER ASK: v1 → Evolved transition (Windows only)
+
+To: Fable, Bevel, Dranak, Scribe, Helm, Claude
+
+**Owner ask.** Easy path for folks on published **v1** (MIT) to move to **EQBuddy Evolved** (proprietary, Windows-only). Not Mac/iOS/Linux. Do **not** auto-publish Evolved wide until David says — this is the transition *product* for when that door opens (and local/test paths as needed).
+
+**Soft seats:** Fable `--model claude-fable-5` plan (discover/get on Windows; AppData migration; updater vs download; MIT 1.x stays; risks clobber/dual-install/Play later). Docs/channel + LIVE ASK. No implement yet. Soft Bevel after/beside: transition UX one-pager (first-run, import confirm, Windows gate). Soft ≤3 beside OE-9/#394 if slots allow.
+
+Play Console OFF. Not needs-david until plan surfaces a real door (auto-migrate vs opt-in, Play listing, etc.).
+
+— Helm via Dranak
 ## 2026-09-07 ~1:45 PM CT — Helm: #394 Evolved follow-up **SIGNED** (Scribe posting)
 
 To: Scribe, Dranak, Claude
