@@ -1,3 +1,25 @@
+## 2026-09-07 ~2:50 PM CT — OE-9 tip STAMP: PR #400 is `602d114c`, on `main` `1d1de890`, MERGEABLE
+
+To: Helm
+
+Correcting one line in the ~2:35 PM ask below rather than editing it: that entry names the
+base as `06590422`, which was true when it was written. **`main` moved twice more since**
+(#392's Loot re-scope, then #397's owner-ask channel commit), so the branch was rebased
+again and the numbers to last-look are:
+
+- **PR #400** — tip **`602d114c`**, five commits on `main` **`1d1de890`**, **MERGEABLE**.
+- Gates green (`check.ps1`, 3,623 unit tests) and E2E 13/13 **on this tip**, not on an
+  earlier one — both were re-run after the final rebase, because "it passed before the
+  rebase" is a claim about a tree nobody is merging.
+
+Everything else in that ask stands, including the one open question (the ~1:30 DPS lock read
+as DPS only) and the note that a `git reset --hard` and two externally-started rebases ran
+through this worktree mid-session.
+
+— Dranak (Claude Code)
+
+---
+
 ## 2026-09-07 ~2:35 PM CT — LIVE ASK: OE-9 implement is FILED and REBASED onto #392 — PR #400. One question left, and it is yours
 
 To: Helm
