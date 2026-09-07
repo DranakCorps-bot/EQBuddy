@@ -153,4 +153,71 @@ public class BuffTrackerTests
         var b = Assert.Single(t.Snapshot(T0.AddSeconds(103)));
         Assert.Equal(T0.AddSeconds(102), b.LandedAt);
     }
+
+    // ---- Shield of Thorns: the row that could not be reached (PR #407) ----------
+    //
+    // Every line below is the owner's own, off `eqlog_Dranak_freeport.txt`. For as long
+    // as `BuffDurations.json` carried the wiki page title `Shield of Thorns (Spell)`,
+    // all three of these were impossible at once: the landing never resolved, so the
+    // label was the line's ("Thorns damage shield"), SCR was gated on `resolved` and
+    // never applied, and fade-learn is gated on a single candidate so it could never
+    // fire. His chip read 15:00 on all 28 landings of a shield his log measures at
+    // ~24 minutes. These three are the audit's prove list, as assertions.
+
+    /// <summary>PROVE 1 — the cast resolves: the log's ranked spelling meets the
+    /// catalog's name through <see cref="SpellCatalog.BaseName"/>.</summary>
+    [Fact]
+    public void ThornsResolvesFromTheOwnersOwnCastLine()
+    {
+        var t = Replay(
+            Ev(0, "You begin casting Shield of Thorns V."),
+            Ev(3, "You are surrounded by a thorny barrier."));
+
+        var b = Assert.Single(t.Snapshot(T0.AddSeconds(4)));
+        Assert.Equal("Shield of Thorns", b.Label);          // not "Thorns damage shield"
+        Assert.Equal("You", b.Caster);
+        Assert.Equal(["Shield of Thorns"], b.Candidates);
+    }
+
+    /// <summary>PROVE 2 — Spell Casting Reinforcement rank 1 (+5%, the owner's real rank
+    /// from his own AA export; there is no SCR-max and no invented per-rank number)
+    /// reaches the spell now that the landing resolves. 900 → 945.</summary>
+    [Fact]
+    public void ScrRankOneReachesThornsOnceItResolves()
+    {
+        var t = new BuffTracker { ReinforcementRank = () => 1 };
+        t.Apply(Ev(0, "You begin casting Shield of Thorns V."));
+        t.Apply(Ev(3, "You are surrounded by a thorny barrier."));
+
+        var b = Assert.Single(t.Snapshot(T0.AddSeconds(4)));
+        Assert.Equal(900 * 1.05 - 1, b.RemainingSeconds(T0.AddSeconds(4))!.Value, 0);
+        Assert.True(b.Estimated);   // the wiki base, scaled — still not the real number
+    }
+
+    /// <summary>
+    /// PROVE 3 — fade-learn can fire, which is the mechanism that closes the 9-minute
+    /// under-read without anyone inventing a duration. The interval is one of the two
+    /// clean landing→fade pairs measured in his log (13:54:40 → 14:19:08 = 1,468s),
+    /// floored to the server tick: 1,464s / 24:24, taught from the log alone.
+    /// </summary>
+    [Fact]
+    public void AThornsFadeTeachesTheRealDurationFromTheOwnersOwnLog()
+    {
+        var t = new BuffTracker { ReinforcementRank = () => 1 };
+        t.Apply(Ev(0, "You begin casting Shield of Thorns V."));
+        t.Apply(Ev(3, "You are surrounded by a thorny barrier."));
+        t.Apply(Ev(3 + 1468, "The brambles fall away."));
+
+        var learned = Assert.Single(t.LearnedDurations);
+        Assert.Equal("Shield of Thorns", learned.Key);
+        Assert.Equal(1464, learned.Value, 0);
+
+        // And the next landing opens on the learned number rather than the wiki base —
+        // no longer an estimate, because the log measured it.
+        t.Apply(Ev(2000, "You begin casting Shield of Thorns V."));
+        t.Apply(Ev(2003, "You are surrounded by a thorny barrier."));
+        var b = Assert.Single(t.Snapshot(T0.AddSeconds(2004)));
+        Assert.Equal(1464 - 1, b.RemainingSeconds(T0.AddSeconds(2004))!.Value, 0);
+        Assert.False(b.Estimated);
+    }
 }

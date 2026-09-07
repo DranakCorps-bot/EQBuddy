@@ -263,6 +263,78 @@ public class SpellbookBuffTests : IDisposable
     }
 
     /// <summary>
+    /// **A dump that recognises MOST of the candidates narrows nothing either, and this is
+    /// the half LOCK A did not have.** Its doc comment reasons carefully about a dump that
+    /// knows *none* of them; PR #407 measured what happens when one candidate is a name no
+    /// spellbook on earth can carry. The owner's real dump kept the five thorns spells he
+    /// does not cast and dropped `Shield of Thorns (Spell)` — the only one he does — because
+    /// his book says "Shield of Thorns" and the catalog said "(Spell)".
+    ///
+    /// `exact.Length &gt; 0` reads as "the dump recognised these names". That was only ever
+    /// true while every candidate WAS a name a book can hold, so it is trap 64's shape: a
+    /// gate written as a proxy stops being that proxy the day a second producer arrives.
+    /// The format guard (`SpellNameHygieneTests`) keeps the shipped catalogs clean; this
+    /// keeps a future polluted row from costing a player the spell they actually cast.
+    ///
+    /// Both halves of the test data are the real ones: the catalog row is the pre-fix
+    /// shipped row reconstructed, and the book holds what his dump holds — the five he
+    /// does not cast AND the one he does. A fixture listing only "Shield of Thorns" would
+    /// pass with the guard deleted, because neither tier would match anything and the
+    /// existing knows-nothing rule would have covered it; that version was written first
+    /// and the prove-fail is what caught it.
+    ///
+    /// Prove-fail: drop the `IsLogWritableName` check from `NarrowBySpellbook` and the
+    /// candidate set comes back as the five, without "Shield of Thorns (Spell)".
+    /// </summary>
+    [Fact]
+    public void ACandidateNoDumpCouldEverMatchVetoesTheWholeNarrowing()
+    {
+        WriteSpellbook("Testchar", "Legacy of Spike", "Shield of Barbs", "Shield of Brambles",
+            "Shield of Spikes", "Shield of Thistles", "Shield of Thorns");
+        var polluted = new BuffDurationCatalog([
+            new BuffDurationCatalog.Entry
+            {
+                Message = "You are surrounded by a thorny barrier.",
+                Label = "Thorns damage shield",
+                Spells =
+                [
+                    new() { Name = "Legacy of Spike", DurationSeconds = 900 },
+                    new() { Name = "Shield of Barbs", DurationSeconds = 900 },
+                    new() { Name = "Shield of Brambles", DurationSeconds = 900 },
+                    new() { Name = "Shield of Spikes", DurationSeconds = 900 },
+                    new() { Name = "Shield of Thistles", DurationSeconds = 900 },
+                    new() { Name = "Shield of Thorns (Spell)", DurationSeconds = 900 },
+                ],
+            },
+        ]);
+        var t = new BuffTracker(polluted);
+        t.AttachSpellbook(LogFolder, "Testchar");
+        t.Apply(Ev(0, "You are surrounded by a thorny barrier."));
+
+        var b = Assert.Single(t.Snapshot(T0.AddSeconds(1)));
+        Assert.False(b.DumpNarrowed);
+        Assert.Equal(6, b.Candidates.Length);
+        Assert.Contains("Shield of Thorns (Spell)", b.Candidates);
+    }
+
+    /// <summary>The veto is about the CANDIDATE the dump could not match, not about giving
+    /// up on narrowing — with every name log-writable, a dump that knows a subset still
+    /// narrows to it. Without this, the assertion above would be satisfied by a
+    /// `NarrowBySpellbook` that had simply stopped working (trap 34: a guard that forbids
+    /// the wrong thing reads as coverage).</summary>
+    [Fact]
+    public void ADumpKnowingASubsetStillNarrowsOnceTheNameIsTheOneTheGameWrites()
+    {
+        WriteSpellbook("Testchar", "Shield of Thorns");
+        var t = Tracker();   // the SHIPPED catalog, corrected
+        t.Apply(Ev(0, "You are surrounded by a thorny barrier."));
+
+        var b = Assert.Single(t.Snapshot(T0.AddSeconds(1)));
+        Assert.True(b.DumpNarrowed);
+        Assert.Equal(["Shield of Thorns"], b.Candidates);
+    }
+
+    /// <summary>
     /// **The back door the owner lock closes.** Fade-teaching used to be gated on "one
     /// candidate", which meant "the LOG named this spell" — a dump can now produce a set of
     /// one too, and learning a real per-character duration off a dump-guessed identity

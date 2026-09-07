@@ -30,6 +30,8 @@ import json
 import re
 from pathlib import Path
 
+import spellnames
+
 HERE = Path(__file__).resolve().parent
 SPELLS = HERE / "spells.json"
 CURATED = HERE / "fades-curated.json"
@@ -77,6 +79,17 @@ def base_name(spell):
     return stripped if stripped else spell.strip()
 
 
+def canonical(name: str) -> str:
+    """The wiki's page-title disambiguator, gone — see spellnames.py.
+
+    `strip_disambiguator` alone, deliberately: this promotion has never folded the
+    wiki's two apostrophe styles the way buffs/debuffs/slows do, 22 harvested names
+    carry a backtick, and changing how those meet a log line is a separate call from
+    unblocking a name no log line can ever reach.
+    """
+    return spellnames.strip_disambiguator(name)
+
+
 def main():
     spells = json.loads(SPELLS.read_text(encoding="utf-8"))
     curated = json.loads(CURATED.read_text(encoding="utf-8"))
@@ -105,7 +118,7 @@ def main():
             excluded["cast_collision"].append((msg, s["name"]))
             continue
         g = groups.setdefault(key, {"message": msg, "spells": set(), "types": set()})
-        g["spells"].add(s["name"])
+        g["spells"].add(canonical(s["name"]))
         g["types"].add(s.get("spell_type_raw") or "")
 
     curated_by_msg = {e["message"].lower(): e for e in curated}
