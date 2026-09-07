@@ -1,3 +1,21 @@
+## 2026-09-07 ~1:00 PM CT — PR #385 owner Evolved feedback 12:54 (SIGNED; soft seats AUTHORIZED)
+
+- **When / who:** 2026-09-07 ~1:00 PM CT — Helm last-look (webhook: OWNER FEEDBACK 12:54 CT Evolved `3a1e8654`; tip `e4d51c6d`; PR #385).
+- **Thread / subject:** PR #385 https://github.com/DranakCorps-bot/EQBuddy/pull/385 (`channel/owner-feedback-1254-evolved-20260907` → `main`) — docs/channel only (`HELM-FEEDBACK.md`). Owner tested Evolved Desktop ProductVersion `2.0.0+3a1e8654` (OE-7 + OE-8 + Bevel faces already on main). Soft max ≤3. Play Console OFF.
+- **Ruling:** **SIGNED.** Soft merge #385 when `build-and-test` + `e2e-windows` green (at look: build SUCCESS; e2e IN PROGRESS). Prefer this Helm main land for SSC; drop nothing product-critical from the channel tip. Live Holds empty. Play Console OFF. **Not needs-david** unless settings-reset root is a consequence-list door after diagnose.
+- **Locks answered:**
+  1. **Settings reset on every Evolved publish (HIGH)** — **SIGNED as HIGH bug.** Soft Opus diagnose→fix AUTHORIZED. Survive `install-local -Evolved` republish (theme / default Watch rule / Watch-on must stick). Not a hold. Page David only if root is a real door.
+  2. **Loot mini-bar peek = target (not session)** — **SIGNED.** No-target peek says select a target; do not show session. Pop-out already target — peek must match.
+  3. **OE-9 expand-for-all peek content** — **SIGNED.** Motes (count each + per/hr each); Kills (per mob, same as expanded); Procs (frequency + damage/healing/pertinent); Money (Wealth / Progress). DPS/Progress ACK. Loot via lock 2. **Owner override:** Kills **IN** this pass — supersedes Bevel #371 "Kills/Deaths OUT" for **Kills** peek/breakout content. **Deaths** still OUT (not named here).
+  4. **Full Options/cog IA pass** — **SIGNED** (lock-6 style). Bevel re-lays what stays vs chip/expand/free-drag/right-click; strip/merge stale — not half-left.
+- **Posture / Soft max ≤3 soft seats (AUTHORIZED):**
+  1. **Priority — Opus** (`--model opus` / `claude-opus-5`): diagnose + fix settings-reset-on-publish (HIGH).
+  2. **Bevel** (`--model sonnet` / `claude-sonnet-5`): Options/cog IA pass + Loot peek empty-state copy if needed (docs/`BEVEL.md`; do not implement).
+  3. **Fable** (`--model claude-fable-5`): seat OE-9 (+ Loot peek fix seat if separate) from locks 2–3. **No OE-9 Opus until Fable + Helm signed.**
+- **Soft:** #380 wiki refresh LEAVE; #356 Setup LEAVE (e2e-red). OE-8/#381/#383/#384 already on main — ACK. Soft max ≤3.
+- **Claude kick via Dranak:** soft seats above in that order under Soft max ≤3; merge #385 when both CI green; land this SSC. Do **not** kick OE-9 Opus yet. No TEL / Version / `v1.99.19` / Play Console / tag / publish / signing / prod secrets.
+- **Scope hygiene:** Not a hold. Not needs-david. Live Holds empty. Play Console OFF.
+
 ## 2026-09-07 ~10:35 AM CT — PR #381 OE-8 free placement implement (SIGNED)
 
 - **When / who:** 2026-09-07 ~10:35 AM CT — Helm last-look (webhook: HELM-FEEDBACK.md LIVE ASK; tip `8e33b181`; product `a0a82076`).
