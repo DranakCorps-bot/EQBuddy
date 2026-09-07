@@ -1,5 +1,103 @@
 # Bevel inbox
 
+## 2026-09-07 ~5:55 PM CT — Faces one-liner: mini-bar chip drag-reorder (SIGNED #413, `a8e147b3`) — drag tell, restore-row placement, watch-pin-block check (Bevel)
+
+**Priority:** Soft face-only note, per §6 of the signed plan (`FABLE.md` top block, ~5:05 PM CT —
+*"Soft Bevel faces one-liner (drag tell wording, restore-row placement, and a check on §0's
+watch-pin-block assumption) — noted per the owner lock, NOT kicked from this PR"*). Docs/UX only;
+no `src/` in this pass. The three asks, in the plan's own order, against the source as it stands
+today (`HudBarView.cs`, `MiniBarPresentation.cs`, `SettingsHudView.cs`).
+
+---
+
+### 1. The drag tell — reuse `Cursors.SizeWE` at threshold; the tooltip clause is NOT one sentence for every chip
+
+**Cursor:** don't invent a fourth visual vocabulary. `Cursors.Hand` already means "click this" on
+every chip (`HudBarView.AttachGestures`); OE-8's own affordance pass (#383) already taught this app
+that a horizontal drag reads as `Cursors.SizeWE` (`HudExpandWindow.OnHoverCursor`, the two vertical
+resize zones). Reordering is horizontal motion on a horizontal row — the same fact OE-8 named,
+not a new one. Recommend: hover stays `Hand` (the click affordance must not be given up for a
+gesture that hasn't started yet); swap to `SizeWE` only once the drag threshold is crossed, which
+is what the plan's own §3 already says ("cursor tell **at threshold**") and costs nothing new to
+build or to explain.
+
+**Tooltip — this is the finding, not just a wording pass.** Lock 9 ("same words for every chip")
+was written for chips that all share ONE capability; it does not license adding a capability's
+sentence to a chip that lacks the capability — that is exactly trap 35's shape ("an affordance the
+player cannot honour is not parity, it is a lie with the right shape"), here arriving as a tooltip
+rather than a button. Read against `HudBarView.cs` as it stands:
+
+- `PeekTip(target)` is the DEFAULT tip for any `Chip(...)` call that passes no explicit `tip:`.
+  Two different populations fall through it today: the seven `MiniBarPresentation.Order` cells
+  (reorderable, per §0) **and** the pinned watch-rule chips (`expand: HudExpandTarget.Watch` —
+  explicitly OUT of the setting this pass, §2: "move as one block… internal order stays rule-list
+  order"). A drag clause added inside `PeekTip` unconditionally lands on both, and the Watch chip
+  would then tell a player to drag-reorder a chip that cannot move.
+- The buffs chip is NOT reached through `PeekTip` — it passes its own literal `tip:` string
+  (`"{up} buff{s} up — hover to peek, click to keep it open"`). It IS reorderable (§0), so it
+  needs the same clause added at ITS call site too, or the one chip the plan explicitly promotes
+  into the order is the one that never gets told about it.
+- The fixed trio (`Dps`, `Hps`, `Progress`) never reaches `PeekTip` at all — `GlanceSlot` always
+  supplies its own literal tip — so they need no exclusion; they were already never going to get
+  the clause. Worth naming so nobody "fixes" `PeekTip` in a way that then has to carve them back
+  out.
+
+**Recommended shape, not code:** the reorder clause is decided at the CALL SITE, not baked into
+`PeekTip`'s shared string — e.g. `PeekTip(target, reorderable: target != HudExpandTarget.Watch)`
+for the cells loop (all seven keys go through the same `Chip(...)` call, so one flag covers all of
+them and the Watch loop's calls pass `false`), and the buffs chip's own literal tip gets the same
+clause appended by hand at its one call site. Placement in the sentence: before the double-click
+clause, since `WithDoubleClick` appends last — `"{Title} — hover to peek, click to keep it open,
+drag to reorder[, or double-click to open its window straight away]"`. This is a shape for the
+implementer to verify against, not a mandate on the exact method signature.
+
+---
+
+### 2. "Default order" restore — lives under the HUD stats checklist in Options, not beside the bar
+
+Confirmed in `SettingsHudView.Build()`: the exact block the plan points at exists today —
+`Heading(HudStatsHeading)` → `Dim(HudStatsBlurb)` → the `_miniStats` `WrapPanel` (one checkbox per
+`MiniBarPresentation.Order` key, canonical order, built by `BuildMiniStats()`) → `Dim
+(PromotedStatsNote)`. That trailing dim line is already doing the job of "one more fact about this
+checklist" (it explains the promoted trio isn't listed here) — the restore control is the same
+kind of fact and belongs right after it, not woven into the checklist itself.
+
+**Recommend a link-styled action** (not a full button — this screen's checkbox rows already carry
+the visual weight) reading **"Restore default order"**, placed directly under `PromotedStatsNote`,
+enabled only once `MiniBarOrder` differs from empty/canonical (so it doesn't sit there as a no-op
+on every untouched profile — "silent no-ops are broken" cuts both ways: a control with nothing to
+do should not invite a click). Two things this is NOT, on purpose, per the plan's own §3 close:
+the checklist stays a **catalog** (membership — which stats show) and must not start rendering in
+`MiniBarOrder`'s order and calling that a preview of the bar; and this is not a second place that
+writes `MiniBarOrder` beyond the one clear action of resetting it to empty.
+
+---
+
+### 3. The watch-pin-block assumption — CONFIRMED as drawn, but flagging a real order mismatch it inherits
+
+**Confirmed:** `HudBarView.Render` draws pinned watch-rule chips in a trailing `foreach` over
+`_settings.TrackedRules.Where(r => r.Enabled && r.Pinned)`, after the cells loop and the buffs
+chip, each rule its own chip — visually a contiguous run at the tail of the bar today, which is
+what "one block after the cells" describes. Nothing here disagrees with §0.
+
+**Flagging, not blocking:** "internal order stays rule-list order" is being treated as a stable,
+meaningful order, and it is stable but it is not the same order the player may already be looking
+at. `_settings.TrackedRules` has no reorder UI anywhere (`OptionsViewModel.Rules` is that exact
+list — `AddRule` appends, nothing moves an entry once added), so "rule-list order" is really
+"creation order," silently. That's fine as a floor. What's worth a name before the implement PR
+assumes it reads naturally: the **Watch card itself** (`WatchCardView.Render`) can display those
+same rules sorted **alpha / total / recent** via `WatchSortMode` — a player who set their Watch
+card to alphabetical will see the pinned HUD chips in a DIFFERENT order than the card sitting one
+click away, because the HUD block never consults `WatchSortMode`. Not a defect to fix in this
+pass (§2 explicitly parks per-rule ordering for later), but worth one sentence in the implement
+PR or the `WhatsNew.json` entry so it doesn't read as a bug report the first time someone notices
+their pinned chips don't match their sorted Watch card — the two are allowed to disagree, they
+should just not look like an accident.
+
+— Bevel (Claude Sonnet 5), 2026-09-07 ~5:55 PM CT
+
+---
+
 ## 2026-09-07 ~3:50 PM CT — HELM OWNER LOCK folded into the transition one-pager: Evolved captures use teal + grey (not parchment/brass) (Bevel)
 
 **Priority:** docs-only amend, no code, no re-shoot, same branch/PR (#402). Folding
