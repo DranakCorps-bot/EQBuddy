@@ -190,11 +190,11 @@ internal sealed class HudExpandBar
     /// <summary>
     /// Lock 6: ⧉ — the under-bar panel collapses and the destination carries the detail.
     ///
-    /// **FOUR destinations since OE-9, and the routing is a total map rather than a
+    /// **THREE destinations since OE-9, and the routing is a total map rather than a
     /// fallback.** This method used to read *"no breakout kind → the Progress window"*, which
     /// was exact while Progress was the only non-float destination and would have sent Kills
-    /// and Deaths there with no line of it changing (trap 64 — the second proxy in this
-    /// lineage; see <see cref="HudExpand.DestinationOf"/>).
+    /// there with no line of it changing (trap 64 — the second proxy in this lineage; see
+    /// <see cref="HudExpand.DestinationOf"/>).
     /// </summary>
     public void PopOut()
     {
@@ -219,9 +219,6 @@ internal sealed class HudExpandBar
             case HudDestinationHost.CreatureWindow:
                 _main.ShowCreatureWindow(CreatureSurface.TabForKey(destination.Tab));
                 break;
-            case HudDestinationHost.WorldWindow:
-                _main.ShowWorldWindow(WorldSurface.TabForKey(destination.Tab));
-                break;
             default:
                 var kind = Enum.Parse<BreakoutKind>(destination.BreakoutName!);
                 if (bringForward) _breakouts.Visible(kind)?.Activate();
@@ -232,17 +229,13 @@ internal sealed class HudExpandBar
 
     /// <summary>The Progress window closed. Lock 7 for the destinations that are not a
     /// <c>BreakoutKind</c> and therefore never reach <c>BreakoutHost.Dismissed</c> —
-    /// there are three of them now, and each one needs a hook where its window is built.
+    /// there are two of them now, and each one needs a hook where its window is built.
     /// </summary>
     public void ProgressWindowClosed() => WindowClosed(HudDestinationHost.ProgressWindow);
 
     /// <summary>The Kills &amp; Drops window closed — the hook OE-9 had to add, because
     /// <see cref="HudExpandTarget.Kills"/> is the first target that pops to it.</summary>
     public void CreatureWindowClosed() => WindowClosed(HudDestinationHost.CreatureWindow);
-
-    /// <summary>The World window closed — <see cref="HudExpandTarget.Deaths"/>'s
-    /// destination.</summary>
-    public void WorldWindowClosed() => WindowClosed(HudDestinationHost.WorldWindow);
 
     /// <summary>The widget left (or re-entered) the collapsed HUD. The panel is the BAR's,
     /// and a slaved companion left parked under an expanded widget is trap 12's mechanism

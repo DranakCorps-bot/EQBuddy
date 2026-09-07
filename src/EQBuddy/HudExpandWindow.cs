@@ -573,7 +573,7 @@ internal sealed class HudExpandWindow : Window
     /// the existing theme window on its current tab" — and a panel that rebuilt those rooms
     /// would be the tab-less float coming back under a new name.
     ///
-    /// **Watch, Loot and Buffs (OE-7) — and Motes, Kills, Procs, Money and Deaths (OE-9) —
+    /// **Watch, Loot and Buffs (OE-7) — and Motes, Kills, Procs and Money (OE-9) —
     /// go through <see cref="HudExpandPeek"/> for the same reason Damage/Healing/Pet go
     /// through <see cref="LivePresentation"/>**: the choice of rows is a decision, this file
     /// cannot be unit-tested, and Watch's and Procs' are decisions a float already makes.
@@ -645,13 +645,14 @@ internal sealed class HudExpandWindow : Window
         HudExpandTarget.Buffs => HudExpandPeek.Buffs(
             _main._buffTracker.ActiveCount > 0 ? _main._buffTracker.Snapshot(DateTime.Now) : [],
             DateTime.Now),
-        // OE-9's five, each off the SAME snapshot fields its full surface reads.
+        // OE-9's four, each off the SAME snapshot fields its full surface reads. There is no
+        // `Deaths` arm: that target was stripped on Helm's #400 sign (2026-09-07, "#389
+        // Deaths OUT stands"), so the deaths cell never reaches this switch at all.
         HudExpandTarget.Motes => HudExpandPeek.Motes(Motes.Summarize(s.Loot, s.Elapsed)),
         HudExpandTarget.Kills => HudExpandPeek.Kills(s.YourKills, s.YourKillCount, s.KillsPerHour),
         HudExpandTarget.Procs => HudExpandPeek.Procs(s.Procs, s.CombatSeconds),
         HudExpandTarget.Money => HudExpandPeek.Money(
             s.Copper, s.CorpseCopper, s.VendorCopper, s.CopperPerHour),
-        HudExpandTarget.Deaths => HudExpandPeek.Deaths(s.Deaths),
         _ => null,
     };
 
@@ -659,7 +660,7 @@ internal sealed class HudExpandWindow : Window
     /// The <c>hudExpandBody</c> value for a peek target: the float's presentation kind where
     /// there is one, and otherwise the target's own key.
     ///
-    /// The five OE-9 targets have no <see cref="BreakoutPresentation"/> kind — that is what
+    /// The four OE-9 targets have no <see cref="BreakoutPresentation"/> kind — that is what
     /// <see cref="HudExpand.KindOf"/>'s null MEANS — so the body fact takes their key, which
     /// is what the <c>EQBUDDY_HUDEXPAND</c> hook and the E2E assertions already speak. The
     /// two vocabularies agree for every kind that has both.
