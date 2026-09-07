@@ -1,5 +1,110 @@
 # Bevel inbox
 
+## 2026-09-07 ~11:35 AM CT — OE-8 affordance faces, ruled: cursor+tooltip drag tell, un-park chicklet ships as built (Bevel)
+
+**Priority:** `approved` — soft face-only round, PR #381's review item; not a re-gate on the
+Helm-signed OE-8 mechanism (`a0a82076`).
+**Place:** `src/EQBuddy/HudChipRowWindow.cs` (constructor, the `Cursor`/`ToolTip` lines just
+above the `WrapPanel`), `src/EQBuddy/HudExpandWindow.cs` (constructor `Cursor`/`ToolTip`
+lines above `_chrome`, plus the new `OnHoverCursor` method beside `OnEdgeMove`),
+`src/EQBuddy/HudEditChip.cs:96-158` (`Unpark` — read, not changed), `MainWindow.xaml:697-724`
+(`ResizeGrip`/`HeightGrip`, the precedent this reuses), `src/EQBuddy/FramelessResize.cs` (the
+other place this app already answers "how does a player discover a drag/resize edge").
+**Source:** `BEVEL-FEEDBACK.md` ~11:10 AM CT ("OE-8 free placement is BUILT; two affordance
+faces are yours at PR #381's review, and one scope call is flagged for you"), against tip
+`f413ac87`. Verified in source and run through `dotnet build`, the unit suite (3,594) and
+`scripts/check.ps1` (all green) on this branch.
+
+---
+
+### 1. The drag tell — `Cursor` + `ToolTip`, not a drawn handle, and it is now built (small, face-only diff)
+
+The ask named three options: a cursor change on hover, a grip dot on the panel's header, or a
+one-time Edit-HUD hint. **A cursor change is the right one, and it isn't actually a new idea in
+this app** — `MainWindow.xaml`'s `HeightGrip` (`Cursor="SizeNS"` + a static `ToolTip`) and
+`ResizeGrip` (`Cursor="SizeNWSE"` + a static `ToolTip`) already answer "how does a player
+discover this drags/resizes" exactly this way, and `FramelessResize`'s own doc comment cites
+that pair as precedent for every other frameless window in the app. A grip dot or a hint line
+would be a THIRD visual vocabulary for the same fact on a row that already carries chicklets —
+competing with them for the same few pixels, which the widget's own chrome never asks a grip to
+do. Cursor + tooltip costs nothing drawn and matches what a player who has used the widget's
+edges has already learned.
+
+**Shipped, in the two files, in the same shape as the precedent:**
+- `HudChipRowWindow`: static `Cursor = Cursors.SizeAll` (the whole box is one drag target, lock
+  1) and a `ToolTip` naming the gesture and the way back, in the same words
+  `SettingsAlertsView.cs:643` already uses for the spawn-chip explanation ("Edit HUD… → Follow
+  the HUD again").
+- `HudExpandWindow`: the same default, plus `OnHoverCursor` — a plain (bubbling) `MouseMove`
+  handler that calls the SAME `ResizeZones.Hit` the press handler (`OnEdgePress`) already uses,
+  and swaps to `Cursors.SizeWE` over the two vertical zones, `Cursors.SizeAll` elsewhere. Guarded
+  on `_grip.Dragging`/`_edge != None` so an active gesture doesn't flicker as the pointer crosses
+  back over an edge it's no longer negotiating.
+
+**Why this needed a tiny code change rather than staying a paragraph here:** the tell has to
+exist to be reviewable at all — "nothing" was the finding, and a cursor is not something Options
+copy or a doc can stand in for. It touches zero persistence: no new field, no new write, no
+change to `HudDragGrip`'s park/write mechanism or `ScreenGuard`. Verified: build green, all 3,594
+unit tests green, `check.ps1` all green.
+
+**Not built, and flagged rather than assumed free:** an automated assertion for the cursor swap.
+This suite has no synthetic-pointer-hover harness that reaches WPF's cursor resolution (the
+existing `drag-verify.ps1` drives real drags/resizes, not hover-only moves), so this is `Manual`
+in `docs/TestPlan.md`, the same tier as the un-park chicklet's own P3 phase below. If a future
+pass wants this automated, `WidgetDump` could carry the resolved `Cursor` as a fact the way it
+already carries `hudRowGrip`/`hudPanelGrip` — named here as a follow-up, not built.
+
+---
+
+### 2. The un-park chicklet — ships exactly as built, no face change
+
+Read `HudEditChip.Unpark` in full against this app's own standing rules rather than against
+taste, and it already clears every bar a review would apply:
+
+- **Two DIFFERENT vectors for state vs. click** (`Pin` emblem, `Undo` button) — not a repeated
+  shape, which is #148/#166's failure and the reason the doc comment explicitly rules out
+  reusing the mute toggle's `Check`/`Close` or the order nudges' chevrons.
+- **Drawn always, dimmed via `IsEnabled` + `Opacity` when nothing is parked** — trap 17 (an
+  `IsEnabled` with no visual is invisible in this app's styles) and trap 59 (a way back that only
+  appears once you're already lost is one nobody has seen before they need it) are both honored
+  by construction, not by afterthought.
+- **`Pin` is also `QuestsView`'s tracked/untracked vector, and that is not a collision.** The two
+  never appear on screen together, and the underlying idea — something is anchored to a place —
+  is the same fact told twice, not a contradiction (unlike #148/#166's failure, which was two
+  identical shapes claiming two different things on ONE surface at once).
+
+**No change recommended.** The mechanism is face-agnostic per the ask's own framing, and the face
+it already wears is the one this review would have designed from scratch.
+
+---
+
+### 3. Scope call on lock 3 (vertical edges only) — agreed as shipped
+
+The panel's body is a peek capped at five rows with the ↗ carrying the full list; a height a
+player could take by dragging a horizontal edge would promise rows the panel has no way to
+deliver. Reading "any corner or any edge" against what the body actually is, vertical-only is the
+correct reading, not a shortfall — closing the flag raised at review rather than filing it as a
+gap.
+
+### 4. Mouse-down→up click move — no design question here
+
+Disclosed, not asked. It protects a chicklet's own due-timer from a reach-past-to-drag, which is
+the row's own correctness concern, not a face one; nothing about which edge of the click a
+gesture lands on changes what a player sees or learns.
+
+---
+
+**Not filed to `HELM-FEEDBACK.md`:** nothing here changes a signed default — the OE-8
+persistence/park/resize mechanism (`a0a82076`, Helm-signed plan #377/#378) is untouched byte for
+byte. This is a face-only PR on top of it.
+
+**Logged:** `DECISIONS.md` (today, "Bevel — OE-8 affordance faces"), `docs/TestPlan.md` (new row
+under the OE-8 rows), reply filed in `BEVEL-FEEDBACK.md` this date.
+
+— Bevel (Claude Sonnet 5)
+
+---
+
 ## 2026-09-07 ~7:10 AM CT — Owner LOCK (six, amended): toast kill / free-drag / expand direction / right-click hide / expand-for-all / Options cleanup — one-liners vs OE-1 (Bevel)
 
 **Priority:** #4 (Buff only) and #3 (if #2 is deferred) = `approved`, ship as one-liners; #1 and

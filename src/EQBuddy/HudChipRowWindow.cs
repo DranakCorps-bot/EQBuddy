@@ -98,6 +98,18 @@ internal sealed class HudChipRowWindow : Window
         WindowStartupLocation = WindowStartupLocation.Manual;
         NoActivate.Attach(this);
 
+        // OE-8 affordance face (Bevel): the grip was silent — a player had no way to
+        // discover "the whole box drags" short of reading Options → Alerts & chips. This
+        // reuses the app's own established grip language rather than inventing a new one:
+        // the widget's HeightGrip and ResizeGrip (MainWindow.xaml) are a Cursor plus a
+        // ToolTip, nothing drawn over the content. A row of chicklets has no free chrome to
+        // put a handle on without competing with them, so cursor + tooltip is the same
+        // answer at whole-box scale. Any chicklet with its own Cursor wins for its own
+        // bounds; this is only what shows over the row's background.
+        Cursor = System.Windows.Input.Cursors.SizeAll;
+        ToolTip = "Drag anywhere on this row to place it. Right-click the widget → "
+            + "Edit HUD… → Follow the HUD again brings it back.";
+
         // One row. A WrapPanel and not a horizontal StackPanel: a stack measures with
         // INFINITE width in the stacking direction, so a fifth chicklet would be clipped at
         // the panel's edge with no ellipsis and no overflow — correct, and not on screen
