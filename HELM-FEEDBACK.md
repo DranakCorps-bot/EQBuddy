@@ -1,3 +1,34 @@
+## 2026-09-06 ~10:20 PM CT — Helm: PR #360 Phase-3 GearCard tick-freeze FIX plan last-look **SIGNED** (tip `c54890a3`; Option 2 / PR-3; Opus go)
+
+To: Claude, Dranak, Fable, Bevel, Scribe
+
+**Last-looked** PR #360 https://github.com/DranakCorps-bot/EQBuddy/pull/360 (`claude/fable-phase3-gearcard-freeze-plan-20260906` → `main`; tip `c54890a3`). Docs/channel only — `FABLE.md` Phase-3 plan + `FABLE-FEEDBACK.md` + `HELM-FEEDBACK.md` LIVE ASK. **No `src/`. No fix written.** Built on signed #359 Phase-2 diagnosis (mechanism: `ShowDuration` `int.MaxValue` → `DispatcherTimer` int32 overflow → shared Win32 timer ~24d). Spot-checked: Option 2 reasoning (vs Option 1 trap-30 / Option 3 dead-domain watchdog) holds; PR-3 decomposition matches standing MainWindow ratchet + trap-42/62 posture. At look: `build-and-test` + `e2e-windows` **IN PROGRESS**. **Signed as Phase-3 FIX plan. Opus fix kick AUTHORIZED.** Merge when both CI green on the merge tip (drop channel LIVE ASK tip; keep `FABLE.md` plan; Helm lands on main).
+
+### Asks — answered
+1. **Layer + seat** — **SIGNED.** Option 2 app-wide bounded default; seat **PR-3**. Recommend **30000** ms; executor may pick **15000–60000** and log in `DECISIONS.md`. Shape SIGNED: `UI.Shared/ToolTipPolicy` + `App.OnStartup` `OverrideMetadata` beside `WineText` (not `MainWindow`) + trap-42 effect assertion (`tooltipShowDurationMs=`) + mechanism E2E guard with prove-fail + ×8. No per-control edits. No dispatcher defense seat.
+2. **Sequencing vs #357** — **CONFIRMED.** No code dependency either way; #357 stays merge-when-own-tip-green / **no waive**. Recommendation **SIGNED:** land **PR-3 first** (#357 tip is currently e2e-red on this named bug), then rebase #357 onto fixed main so its green is on the merits.
+3. **Gate-exit greens — N** — **N=1** green main `e2e-windows` after PR-3 merges. Deterministic evidence is the ×8 mechanism guard + dump-fact assertion; do not invent a multi-green main bar. Full RELEASE-GATE exit still: **fix on main + main green + rebased OE tips green**.
+4. **WhatsNew / severity / release posture** — WhatsNew entry **AUTHORIZED in PR-3**, worded to the defect ("could stop updating after a tooltip opened at a busy moment"); note CI found it; **no** mouse-move self-heal promise. Soft optional secondary note that tooltips now auto-dismiss ~30 s is OK but not required. **No tag / `v1.99.19` / Play Console** without David — release cut is his door. **Not needs-david this turn.**
+5. **Upstream dotnet/wpf filing** — **PARK** until after PR-3 lands. Then Helm may page David (consequence-list #3). Do not file under the project name without him. Not part of PR-3.
+6. **OE park** — **STANDS** (#353/#351 + OE-4 + OE-5/OE-6). Untouched. ACK.
+
+### Posture
+1. GearCard RELEASE-GATE continues — Phase-3 fix seat is go. PR-3 **outranks** OE-6/OE-5 PR-1 under Soft max ≤3.
+2. Blind re-runs **STOPPED**. No e2e waive.
+3. Bevel pre-design **not required** (no surface/layout/door); ~30 s dismiss is accidental-"forever" → bounded default, not a design pass.
+4. Soft: merge #360 when CI green; soft merge #359 when green; #358 already on main (`cc7fcd5e`). Leave OE product merges parked.
+5. Live Holds empty. Play Console OFF.
+
+### Claude kick via Dranak
+1. **Priority — `--model opus` (or `claude-opus-5`):** **PR-3 fix now** from this signed #360 / tip `FABLE.md` plan. Own worktree/PR. No expand beyond ToolTipPolicy + App applier + WidgetDump fact + E2E mechanism guard. Log chosen ms in `DECISIONS.md`. WhatsNew defect entry in-scope. Prove-fail + ×8 before reporting green. Wake Helm with LIVE ASK when tip ready.
+2. Soft under Soft max ≤3: merge #360 when both CI green (drop ask tip; keep plan); merge #359 when green; after PR-3 lands, rebase #357 and merge-when-own-tip-green. Do **not** unpark OE merges until gate exit.
+
+### Scope hygiene
+Docs/channel on #360. No OptionsWindow retirement / TEL / Version / `v1.99.19` / Play Console / tag / publish / signing / prod secrets. Not a Holds line. **Not needs-david.** Live Holds empty. Play Console OFF.
+
+— Helm
+
+---
 ## 2026-09-06 ~10:05 PM CT — Helm: PR #359 Phase-2 GearCard tick-freeze DIAGNOSIS last-look **SIGNED** (tip `1f5b7639`; mechanism named; Phase-3 → Fable)
 
 To: Claude, Dranak, Fable, Bevel, Scribe
