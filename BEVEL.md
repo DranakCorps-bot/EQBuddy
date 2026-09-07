@@ -1,5 +1,91 @@
 # Bevel inbox
 
+## 2026-09-06 ~9:15 PM CT — First-run Setup / `/outputfile` guide — one-liner pre-design (Bevel)
+
+**Priority:** `ready` — owner-locked intent (Helm-signed #355, `HELM.md` PR #355 / `HELM-FEEDBACK.md`
+2026-09-06 ~9:00 PM CT: *"(B) first-run Setup in Evolved Settings / Setup room (not
+OptionsWindow); auto-launch once on first install / empty profile; dismissible; re-openable
+from Settings"*). This item is the shape, not a re-litigation — Fable names the seat next.
+**Source:** owner ask via Helm, PR #355. **Checked:** full read of `HomeReadout.cs` (UI.Shared),
+`HomeRoom.cs`, `SettingsRoom.cs`, `Core/SettingsSurface.cs`, `UI.Shared/GameCommands.cs`,
+`Core/OutputfileAutoImport.cs`, `Core/FactionsFile.cs`, `ShellPages.cs`; `FABLE.md`'s OE-4 item
+and the OE seat-order note (`MainWindow*` ratchet zero-headroom); `HELM.md`/`HELM-FEEDBACK.md`
+#355. Not run against the live app — no product code on this branch.
+
+**Already shipped, and this is the finding that reshapes the ask: the checklist already
+exists.** `HomeReadout.Readiness()` + `HomeRoom.ReadinessRowView` (`src/EQBuddy/HomeRoom.cs:259-333`)
+is, right now, a per-dump onboarding row — name, what it feeds, last-scanned answer, and (only
+in the empty state) the exact ⧉ copy pattern the LOCK asks Setup to reuse
+(`Theming.WireCopyCommand(Theming.Button(""), CommandFor(row.Kind))`). It already covers every
+`/outputfile` dump Evolved actually consumes: **Inventory, Achievements, Factions** — the three
+non-`Unknown` `OutputfileKind` values (`Core/OutputfileAutoImport.cs:5-17`). There is no fourth
+row today; `/outputfile spellbook` is named only as an *optional future source* in the (A) half
+of #355's lock (buff duration), and nothing reads it yet — so a Setup checklist scoped to "what
+Evolved actually consumes" is three rows, not four, until a spellbook reader ships.
+
+**The design: Setup is a modal PRESENTATION of the same data Home already computes, not a
+second list.** Concretely:
+- **Source of truth stays `HomeReadout.Readiness()`.** Setup renders the same `ReadinessRow`
+  list with the same `ReadinessRowView`-shaped copy/open treatment (copy button on
+  `NeverScanned`, "Open <room>" on `Scanned`), reusing `CommandFor(OutputfileKind)` rather than
+  a second switch. If a spellbook row is ever added, it is added to `Readiness()` once and both
+  surfaces gain it — never re-derived per host.
+- **Auto-launch predicate = the same one Home already computes**, not a new "first ever launch"
+  flag: all three rows `NeverScanned` (`_readiness.Count(NeverScanned) == 3`). "Empty profile"
+  is a fact about the dumps, not a new boolean nobody re-derives (trap 20's shape — a written-
+  once flag with a lone reader is exactly the kind of setting `DeadSettingTests` exists to
+  catch later).
+- **"Until dumps satisfied or dismissed"**: stop auto-showing once the count reaches 0
+  (satisfied) OR the player dismisses (a persisted `SetupDismissed`-shaped flag, same family as
+  the tutorial's own dismiss). Re-open lives as a row/button on Settings' **Behavior tab**
+  (`SettingsBehaviorView`, `SettingsTab.Behavior` — its own doc comment already claims "the
+  tutorial" as its territory; Setup is the same job, onboarding, for a different gap).
+
+**IA tension #1 — do NOT add a fifth `SettingsTab`.** `Core/SettingsSurface.cs`'s own doc
+comment: *"The count is FOUR and the v1 `OptionsWindow` keeps FIVE, deliberately"* (I-11,
+Helm-signed #331) — `SettingsTabHeader`/`TabForKey` and `SettingsRoomTests`' disjointness
+assertion are all built against exactly four. A literal "Setup room" as a new `SettingsTab`
+member would contradict a signed IA decision for a feature the LOCK never asked to be a tab —
+it asked for "Settings / Setup room" meaning **hosted from Settings**, not **a new tab of it**.
+Land the re-open entry inside `SettingsTab.Behavior`'s block; the auto-launch itself is a modal
+the shell shows over whatever room is active, the same way a first-run tutorial would, not a
+navigable address.
+
+**IA tension #2 — two producers of one checklist is trap 33's shape waiting to happen.** Home's
+Readiness block is not going away (it is the "where did I leave off" surface's own onboarding,
+and #219/#251-class removals need David, not this ask) — so Setup and Home will show the same
+three rows in two places at once. That is fine ONLY if both read `HomeReadout.Readiness()`
+verbatim; a hand-rolled second copy of "Inventory / Achievements / Factions" inside a new Setup
+class is the exact shape that drifted twice already (trap 20, trap 30) the day a fourth kind is
+added. Whoever takes this seat should add zero new enums or switches over `OutputfileKind` —
+only a second HOST of the existing rows.
+
+**IA tension #3 — scheduling, not design: OE-4 is fighting for the same zero-headroom budget
+Setup must not touch.** `FABLE.md`'s OE seat note: `MainWindow*` ratchet is at **zero
+headroom** (4,222 of 4,222) and OE-4's buff-roster lift is not optional against it. Setup's
+pieces (`HomeReadout.cs`, `SettingsRoom.cs`/`SettingsBehaviorView`, a new dialog/room class) do
+not touch `MainWindow.xaml.cs` at all if built this way, so there is no file collision and no
+ratchet competition with OE-4 — but both are landing in the Settings/HUD neighborhood from
+different seats around the same time. Worth a line in Fable's seat naming so Setup and OE-4
+are sequenced (or at minimum, so whichever lands second rebases cleanly) rather than treated as
+unrelated just because neither touches the other's file.
+
+**Buff-timer LOCK (A) is a product/data-source lock, not a surface lock — flagging so it is not
+conflated with this item.** (A) is about where duration numbers come from (log land/fade live,
+Spell DB base, optional spellbook/inventory-focus-extend, no invented live buff-bar), and it
+says nothing about where anything is DRAWN. It has no IA content for Setup to inherit or
+collide with; the only connection is that if a future seat adds `/outputfile spellbook` as a
+LOCK-(A) data source, `Readiness()` gaining a fourth row is the one place Setup needs to notice
+it, per the "source of truth" note above.
+
+**Not decided here (Fable/executor's call):** exact modal chrome (dialog vs. slide-over vs.
+first-run room-shaped overlay); precise dismiss-flag name and its default; whether the
+Behavior-tab re-open entry is a button or a row matching the tutorial's own affordance. Bevel's
+job in this one-liner is the placement call (no fifth tab, one data source, no `MainWindow`
+collision) and naming the two tensions above before a seat locks a shape in.
+
+---
+
 ## 2026-09-06 ~5:49 PM CT — Owner Evolved iterative feedback (David) — four pre-designs (Bevel)
 
 **Priority:** (3) Home/shell recovery = `must-fix`; (1) buff density = `approved` IA, (1) timer
