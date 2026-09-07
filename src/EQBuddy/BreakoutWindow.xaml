@@ -92,6 +92,25 @@
                 <StackPanel>
                     <ItemsControl x:Name="Rows"/>
                     <TextBlock x:Name="EmptyText" FontSize="{DynamicResource FontCaption}" Margin="1,1,0,0" Visibility="Collapsed"/>
+                    <!-- THE PROCS BLOCK (OE-9). The Procs chip's ⧉ opens THIS window, so
+                         this window has to carry the detail — that is lock 6, and a
+                         pop-out that landed on a surface without the rows would be the
+                         silent no-op rule with the switch on the other side. It is a
+                         block inside the damage float rather than a tenth always-on-top
+                         window: procs are a damage-surface fact everywhere else in the
+                         app (the Combat card, the shell's Live room), and a new float
+                         for five rows is the proliferation SA-2 was signed to end.
+
+                         Heading and list appear and disappear TOGETHER, which is the
+                         pair LiveRoom.Block exists for: a heading with no visual for its
+                         empty state photographs as a section that lost its contents
+                         (trap 17). "Procs" over nothing would read as a proc list that
+                         broke, when the honest fact is that this character has none. -->
+                    <TextBlock x:Name="ProcsLabel" Text="Procs" Visibility="Collapsed"
+                               FontSize="{DynamicResource FontMetadata}" FontWeight="SemiBold"
+                               Foreground="{DynamicResource DimBrush}"
+                               Margin="{DynamicResource RowTightLeft}"/>
+                    <ItemsControl x:Name="ProcsRows" Visibility="Collapsed"/>
                 </StackPanel>
             </ScrollViewer>
             <!-- Buffs kind only (#120 stage 2, Frankthetankk): the in-place editor —

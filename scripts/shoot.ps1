@@ -1306,7 +1306,33 @@ $Shots = [ordered]@{
                            Env = @{ EQBUDDY_HUDEXPAND = 'loot' }
                            Set = @{ Minimized = $true
                                     DisabledBreakouts = @('Damage','Healing','Pet','Watch','Loot','Buffs')
-                                    MiniStats = @('kills','loot') } }
+                                    MiniStats = @('kills','loot') }
+                           # **THE TARGET IS STAGED, and the first run is why.** Left alone
+                           # this came back byte-identical to `hud-expand-loot-notarget`: the
+                           # fixture's trailing lines are past `TargetLinger` (45s from the
+                           # log's last event), so the session ends with no target at all and
+                           # two shots photographed one state. `ConsiderRx`'s exact shape —
+                           # a /consider is a target for the same 45 seconds a finished fight
+                           # is, and it is the affordance the peek's own empty line names.
+                           # "a giant spider" is a creature the fixture actually killed, so
+                           # the OBSERVED half of the row list is real session data rather
+                           # than a name the wiki has to answer for (trap 23).
+                           AppendLive = @(
+                               'a giant spider scowls at you, ready to attack -- what would you like your tombstone to say? (Lvl: 12)') }
+    # OE-9 lock 2's OTHER empty state, and the one nothing else in this file can reach: with
+    # no target the peek asks for one rather than falling back to the session. `ShowTargetDrops
+    # = $false` is what stages it — the same gate the float's Target view passes through — so
+    # the picture does not depend on where in the fixture's pull the replay settles (trap 51's
+    # lesson one door over: a shot whose state is inherited is a shot of whatever ran before).
+    # PREDICTION: Bag vector, "Loot", ↗ and ✕; a dim "No target" subtext; ONE dim line,
+    # "Select a target — /consider a creature to see its drops here."; no rows, no overflow
+    # line. A picture with loot rows on it is the session fallback the lock forbids.
+    'hud-expand-loot-notarget' = @{ Title = 'EQBuddy HUD Panel'
+                           Env = @{ EQBUDDY_HUDEXPAND = 'loot' }
+                           Set = @{ Minimized = $true
+                                    DisabledBreakouts = @('Damage','Healing','Pet','Watch','Loot','Buffs')
+                                    MiniStats = @('kills','loot')
+                                    ShowTargetDrops = $false } }
     'hud-expand-watch' = @{ Title = 'EQBuddy HUD Panel'
                            Env = @{ EQBUDDY_HUDEXPAND = 'watch' }
                            Set = @{ Minimized = $true
@@ -1346,6 +1372,132 @@ $Shots = [ordered]@{
                                'Your skin glows with a pale greenish tint.'
                                'Sanctari begins casting Aegolism.'
                                'You are filled with the power of Aegolism.') }
+    # ============================ OE-9: THE REST OF THE TRAY ==========================
+    # `HudExpandTarget` went from seven members to twelve — the owner's ~1:29 PM CT amend
+    # (2026-09-07): everything on the minimized bar peeks and pops out. Five surfaces that
+    # nothing else in this file photographs, so five shots (trap 22: a surface with no
+    # fixture state cannot be reviewed and reads as reviewed anyway).
+    #
+    # **Two of them are STAGED rather than inherited, because the fixture has neither.** A
+    # `grep` for "feels alive with power" (the item-proc line `ItemProcRx` matches) and for
+    # "have been slain" both come back ZERO — so left alone, `hud-expand-procs` and
+    # `-deaths` would be two more pictures of the empty-state layout `hud-expand-watch`
+    # already covers, which is the reviewable half missing exactly where the new code is.
+    # `AppendLive` supplies the lines.
+    #
+    # PREDICTIONS, written before the first run (trap 23) — each number grepped out of the
+    # fixture rather than assumed:
+    #   * `hud-expand-kills` — Skull vector, "Kills"; subtext "Session · 82 kills · N.N/hr"
+    #     (the mini bar's own Kills cell reads 82 in `mini-bar-chips`' recorded result, so
+    #     this is a cross-check as well as a prediction); FIVE bar rows, biggest first, each
+    #     value a bare count, then "…and N more — ↗ for the full list".
+    #   * `hud-expand-money` — Coin vector, "Coin"; subtext "Session · <coin> · <coin>/hr";
+    #     FOUR rows and no fifth — Looted / Sold to vendors / Total / Per hour — with NO
+    #     gauge on any of them, because this is one figure broken into its parts rather than
+    #     a ranking. There is coin: thirty "You receive N silver … from the corpse" lines.
+    #   * `hud-expand-motes` — Sparkle vector, "Motes"; ONE row, "Mote of Infinitesimal
+    #     Potential", because the fixture carries exactly one mote line. Its gauge is full
+    #     (it is the only tier) and the subtext carries #154's potency/hr.
+    #   * `hud-expand-procs` — Bolt vector, "Weapon procs"; ONE row for the staged
+    #     "Polished Mithril Mask (Exaltation)" proc, "×1 · N/min · 0 dmg" — zero damage
+    #     because the staged line has no damage line behind it, which is a true state and
+    #     the honest thing to photograph rather than faking a hit.
+    #   * `hud-expand-deaths` — Skull vector (deaths share it with kills — worth LOOKING at,
+    #     since the two panels are then told apart only by their titles), "Deaths"; subtext
+    #     "Session · 2 deaths"; TWO rows, newest first, each a killer name and a wall clock.
+    # A panel that is all empty-state text on any of the five is a staging bug until proven
+    # otherwise.
+    #
+    # SHOT 2026-09-07. All five came back 300 wide, which is the fixed-width claim still
+    # holding at twelve targets. Three predictions held exactly and TWO STAGINGS WERE WRONG,
+    # which is the whole return on writing them down:
+    #   * `hud-expand-kills` 300x201 — held. "Session · 82 kills · 74.6/hr"; Puma 21, Orc
+    #     pawn 17, Giant spider 15, Skeleton 10, Asp 5; "…and 8 more — ↗ for the full list".
+    #     The 82 cross-checks `mini-bar-chips`' own recorded Kills cell.
+    #   * `hud-expand-money` 300x137 — held, including the no-gauge call: "Session · 5p 1g 4s
+    #     8c · 4p 6g 8s 3c/hr" over Looted 1p 3g 4s 1c / Sold to vendors 3p 8g 7c / Total /
+    #     Per hour, four rows and no fifth.
+    #   * `hud-expand-motes` 300x89 — held. One row, full gauge, "Session · 1 · 0.9/hr · 0.9
+    #     potency/hr".
+    #   * `hud-expand-deaths` 300x113 — held with ONE correction to the prediction, which is
+    #     the app being right: the killer-less "You died." row reads **"Something"**, not a
+    #     name, because that is what EQBuddy calls a death with no killer named. Both rows
+    #     landed in the same minute (2:01 PM), so this picture does NOT show the newest-first
+    #     order — `DeathsPeekPutsTheNewestFirst` is where that lives.
+    #   * `hud-expand-procs` — **WRONG TWICE, and both were staging.** (1) The proc line alone
+    #     gave "0 procs · 0/min · 0 dmg": it only NAMES the vehicle, and a proc is recorded
+    #     when spell damage arrives whose spell was never cast. (2) Adding a bare "points of
+    #     non-melee damage" line gave the same empty panel: that parses with the source
+    #     "Direct spell", which the proc rule explicitly excludes. The named-spell form works
+    #     — 300x89, "Session · 1 proc · 0.1/min · 42 dmg", one row. **Both times the panel was
+    #     a correct picture of a real state** (trap 23's second half), which is exactly how a
+    #     wrong fixture reads as a working feature.
+    #     → AND THE PICTURE FOUND SOMETHING NO TEST COULD: the row came back
+    #     "Exaltation Strike · Polished Mithril…" over "0.1/min · 42 d…". A proc's name is
+    #     "<spell> · <item>" whenever an item line named the vehicle, and that plus three
+    #     facts does not fit 300 (trap 14's family). The rows now carry the untruncated line
+    #     as a HOVER; the ↗ to the Damage float's procs block is the real answer.
+    #   * `hud-expand-loot` — **also wrong, and the fix is the interesting one.** Left
+    #     unstaged it came back byte-identical to `hud-expand-loot-notarget`: the fixture's
+    #     trailing lines are past `TargetLinger` (45s from the log's last event), so the
+    #     session ends with NO target and two shots photographed one state. With a /consider
+    #     staged it is 300x161 — "Giant spider — 15 kills this session · drops (eqlwiki ·
+    #     LIVE)" over Spider Silk 5 / Spider Legs 4 / Spider Venom Sac 2 (your observations,
+    #     with percentages) and then "A Spider Venom Sac 22.8%" from the wiki. That last row
+    #     is a DUPLICATE of the third under a leading article, which is `TargetDropsContent`'s
+    #     own de-duplication and predates OE-9 — the Loot card and the float have always shown
+    #     it. Filed for Bevel rather than fixed here.
+    #   * `hud-expand-loot-notarget` 300x89 — held exactly: "No target" and the one dim line.
+    'hud-expand-kills' = @{ Title = 'EQBuddy HUD Panel'
+                           Env = @{ EQBUDDY_HUDEXPAND = 'kills' }
+                           Set = @{ Minimized = $true
+                                    DisabledBreakouts = @('Damage','Healing','Pet','Watch','Loot','Buffs')
+                                    MiniStats = @('kills','loot') } }
+    'hud-expand-money' = @{ Title = 'EQBuddy HUD Panel'
+                           Env = @{ EQBUDDY_HUDEXPAND = 'money' }
+                           Set = @{ Minimized = $true
+                                    DisabledBreakouts = @('Damage','Healing','Pet','Watch','Loot','Buffs')
+                                    MiniStats = @('kills','money') } }
+    'hud-expand-motes' = @{ Title = 'EQBuddy HUD Panel'
+                           Env = @{ EQBUDDY_HUDEXPAND = 'motes' }
+                           Set = @{ Minimized = $true
+                                    DisabledBreakouts = @('Damage','Healing','Pet','Watch','Loot','Buffs')
+                                    MiniStats = @('kills','motes') } }
+    'hud-expand-procs' = @{ Title = 'EQBuddy HUD Panel'
+                           Env = @{ EQBUDDY_HUDEXPAND = 'procs' }
+                           Set = @{ Minimized = $true
+                                    DisabledBreakouts = @('Damage','Healing','Pet','Watch','Loot','Buffs')
+                                    MiniStats = @('kills','procs') }
+                           # **TWO lines, and the first run proved why.** The proc line only
+                           # NAMES the vehicle; `SessionStats` records a proc when SPELL
+                           # DAMAGE arrives whose spell was never cast ("a proc IS the
+                           # absence" — Kerdude's Bolt of Flame, #85), and it labels it
+                           # "<source> · <item>" when an item-proc line landed just before.
+                           # Staged with the proc line alone the panel came back "0 procs ·
+                           # 0/min · 0 dmg" — a REAL state, correctly drawn, and a picture of
+                           # something else (trap 23's second half). The damage line is
+                           # The damage line is `SchoolNukeOutRx`'s shape and NOT
+                           # `NukeOutRx`'s: a bare "points of non-melee damage" line parses
+                           # with the source "Direct spell", which the proc rule explicitly
+                           # excludes ("the generic label can't name a proc, so it stays
+                           # out"). Staged that way the panel came back empty a SECOND time —
+                           # so the spell has to be NAMED, and the name is what the row is
+                           # labelled with beside the item.
+                           AppendLive = @(
+                               'Your Polished Mithril Mask (Exaltation) feels alive with power.'
+                               'You hit a giant spider for 42 points of magic damage by Exaltation Strike.') }
+    'hud-expand-deaths' = @{ Title = 'EQBuddy HUD Panel'
+                           Env = @{ EQBUDDY_HUDEXPAND = 'deaths' }
+                           Set = @{ Minimized = $true
+                                    DisabledBreakouts = @('Damage','Healing','Pet','Watch','Loot','Buffs')
+                                    MiniStats = @('kills','deaths') }
+                           # BOTH death shapes EQ Legends writes (LogParser's own note): the
+                           # named killer and the killer-less DoT form, which is the one that
+                           # went uncounted entirely until it was parsed. Two rows also mean
+                           # the newest-first order is visible, which one row could not show.
+                           AppendLive = @(
+                               'You have been slain by a giant spider!'
+                               'You died.') }
     # THE BAR ITSELF, with OE-7's chips on it — `mini-bar` above photographs the pre-promotion
     # ten-cell profile and does not carry the buff star, which is the one cell that had never
     # existed before this seat.
@@ -1367,6 +1519,15 @@ $Shots = [ordered]@{
     # apart in the capture — which is the reading a reviewer would also get, and the reason
     # it is worth saying here rather than leaving the next person to squint. The mix reads as
     # one row; the borders group without shouting.
+    #
+    # **OE-9 RETIRES THE MIX, so both paragraphs above are the record of what the committed
+    # image shows rather than a live prediction.** Every cell on the bar is an expansion chip
+    # now (the owner's ~1:29 PM CT amend), so there is no un-bordered cell left for Kills to
+    # be: NEW PREDICTION is the name slot, then six bordered chips and NO hairline divider
+    # anywhere. That is a real question for this shot rather than a formality — the reason
+    # the old mix was worth photographing was that two shapes might jostle, and the reason
+    # this one is, is that six borders in a row might read as a toolbar. It needs re-shooting
+    # and LOOKING at, not just re-running.
     'mini-bar-chips'  = @{ Title = 'EQBuddy'
                            Env = @{}
                            Set = @{ Minimized = $true

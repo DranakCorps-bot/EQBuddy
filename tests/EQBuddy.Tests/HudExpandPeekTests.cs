@@ -194,4 +194,223 @@ public class HudExpandPeekTests
         Assert.Empty(body.Rows);
         Assert.Contains("0 buffs up", body.Subtext);
     }
+
+    // ---------------------------------------------------------------- motes ----
+
+    /// <summary>
+    /// One row per tier, count AND per-hour each, with #154's weighting on the subtext.
+    ///
+    /// **The per-tier rate is apportioned from the summary's own <c>PerHour</c>, so it is the
+    /// summary's denominator by construction** — the arithmetic check here is that four of a
+    /// six-mote hour reads 4/hr and not 4 divided by something this file guessed.
+    /// </summary>
+    [Fact]
+    public void MotesPeek()
+    {
+        var body = HudExpandPeek.Motes(Motes.Summarize(
+            [new LootDetail("Mote of Minor Potential", 4, ""),
+             new LootDetail("Mote of Greater Potential", 2, "")],
+            TimeSpan.FromHours(1)));
+
+        Assert.Null(body.Empty);
+        Assert.Equal(["Mote of Minor Potential", "Mote of Greater Potential"],
+            body.Rows.Select(r => r.Name));
+        Assert.Equal("4 · 4/hr", body.Rows[0].Value);
+        Assert.Equal("2 · 2/hr", body.Rows[1].Value);
+        Assert.Equal(0.5, body.Rows[1].Share, 6);
+        // #154: potency, not just a count — 4×1 + 2×6 = 16 in one hour.
+        Assert.Contains("16 potency/hr", body.Subtext);
+    }
+
+    /// <summary>A NAMED mote is an ordinary item and stays in Loot — the ladder is the
+    /// "Mote of X Potential" family and nothing else. The negative that keeps this from
+    /// going vacuous (trap 39): a Crystallized Fire Mote in the same loot list must not
+    /// appear, or the peek would be quietly disagreeing with the Motes card beside it.
+    /// </summary>
+    [Fact]
+    public void MotesPeekLeavesNamedMotesInLoot()
+    {
+        var body = HudExpandPeek.Motes(Motes.Summarize(
+            [new LootDetail("Mote of Minor Potential", 1, ""),
+             new LootDetail("Crystallized Fire Mote", 9, "")],
+            TimeSpan.FromHours(1)));
+
+        Assert.Single(body.Rows);
+        Assert.DoesNotContain("Crystallized Fire Mote", body.Rows.Select(r => r.Name));
+    }
+
+    [Fact]
+    public void MotesPeekWithNoneSaysWhereTheyComeFrom()
+    {
+        var body = HudExpandPeek.Motes(Motes.Summarize([], TimeSpan.FromHours(1)));
+
+        Assert.NotNull(body.Empty);
+        Assert.Contains("as you loot them", body.Empty);
+        Assert.Empty(body.Rows);
+    }
+
+    // ---------------------------------------------------------------- kills ----
+
+    /// <summary>The list the expanded Kills card fills, verbatim — Core has already ordered
+    /// it — with the session's OWN <c>KillsPerHour</c> on the subtext rather than a division
+    /// performed here.</summary>
+    [Fact]
+    public void KillsPeek()
+    {
+        var body = HudExpandPeek.Kills(
+            [new NameCount("a giant spider", 9), new NameCount("a skeleton", 3)],
+            total: 12, perHour: 24);
+
+        Assert.Null(body.Empty);
+        Assert.Equal(["a giant spider", "a skeleton"], body.Rows.Select(r => r.Name));
+        Assert.Equal("9", body.Rows[0].Value);
+        Assert.Equal(3 / 9.0, body.Rows[1].Share, 6);
+        Assert.Contains("12 kills", body.Subtext);
+        Assert.Contains("24/hr", body.Subtext);
+    }
+
+    /// <summary>The negative (trap 39): a creature that is NOT in <c>YourKills</c> is not in
+    /// the peek. "Same as the main widget" is literal — this list is your kills, not every
+    /// mob the session saw die, and the two differ in a group.</summary>
+    [Fact]
+    public void KillsPeekShowsOnlyWhatIsInYourKills()
+    {
+        var body = HudExpandPeek.Kills([new NameCount("a giant spider", 2)], 2, 4);
+
+        Assert.Single(body.Rows);
+        Assert.DoesNotContain("a skeleton", body.Rows.Select(r => r.Name));
+    }
+
+    [Fact]
+    public void KillsPeekWithNoneSaysSo()
+    {
+        var body = HudExpandPeek.Kills([], 0, 0);
+
+        Assert.NotNull(body.Empty);
+        Assert.Empty(body.Rows);
+        Assert.Contains("0 kills", body.Subtext);
+    }
+
+    // ---------------------------------------------------------------- procs ----
+
+    /// <summary>
+    /// Count, rate and damage per proc — and the RATE is per combat MINUTE (#85, Kerdude),
+    /// the denominator the Procs block and the mini-bar cell already use.
+    ///
+    /// The arithmetic is the assertion: six procs over 120 combat seconds is 3/min, not 3/hr
+    /// and not 0.05/s. A peek that divided by wall-clock elapsed would flatter the weapon
+    /// exactly as much as the downtime, which is the bug #85 was filed about.
+    /// </summary>
+    [Fact]
+    public void ProcsPeekRatesPerCombatMinute()
+    {
+        var body = HudExpandPeek.Procs(
+            [("Lifetap Strike", 6, 900), ("Frost Bite", 2, 400)], combatSeconds: 120);
+
+        Assert.Null(body.Empty);
+        Assert.Equal(["Lifetap Strike", "Frost Bite"], body.Rows.Select(r => r.Name));
+        Assert.Equal("×6 · 3/min · 900 dmg", body.Rows[0].Value);
+        Assert.Equal("×2 · 1/min · 400 dmg", body.Rows[1].Value);
+        Assert.Equal(2 / 6.0, body.Rows[1].Share, 6);
+        Assert.Contains("8 procs", body.Subtext);
+        Assert.Contains("4/min", body.Subtext);
+        Assert.Contains("1,300 dmg", body.Subtext);
+    }
+
+    /// <summary>**The source check Bevel's #371 asked for, as a test.**
+    /// <c>StatsSnapshot.Procs</c> is <c>(Name, Count, Damage)</c> — there is no healing field
+    /// on it — so what ships is the stats the app tracks, which is exactly what the Procs
+    /// card shows. This asserts the peek does not invent a heal figure it cannot have; if
+    /// Core ever learns healing procs, this row is what has to be revisited on purpose
+    /// rather than a silent ride-along.</summary>
+    [Fact]
+    public void ProcsPeekReportsOnlyWhatCoreTracks()
+    {
+        var body = HudExpandPeek.Procs([("Lifetap Strike", 1, 100)], 60);
+
+        Assert.DoesNotContain("heal", body.Rows[0].Value, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain("heal", body.Subtext, StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Fact]
+    public void ProcsPeekWithNoneSaysSo()
+    {
+        var body = HudExpandPeek.Procs([], 60);
+
+        Assert.NotNull(body.Empty);
+        Assert.Empty(body.Rows);
+    }
+
+    // ---------------------------------------------------------------- money ----
+
+    /// <summary>The Wealth tab's four coin facts, formatted by <c>StatsSnapshot.FormatCoin</c>
+    /// so the peek and the tab cannot render one number two ways. NO gauge: this is one figure
+    /// broken into its parts, and a bar under "per hour" would compare a rate to a total.
+    /// </summary>
+    [Fact]
+    public void MoneyPeek()
+    {
+        var body = HudExpandPeek.Money(total: 1234, looted: 1000, vendor: 234, perHour: 2468);
+
+        Assert.Null(body.Empty);
+        Assert.Equal(["Looted", "Sold to vendors", "Total", "Per hour"],
+            body.Rows.Select(r => r.Name));
+        Assert.Equal(StatsSnapshot.FormatCoin(1000), body.Rows[0].Value);
+        Assert.Equal(StatsSnapshot.FormatCoin(2468), body.Rows[3].Value);
+        Assert.All(body.Rows, r => Assert.Equal(0, r.Share));
+        Assert.Contains(StatsSnapshot.FormatCoin(1234), body.Subtext);
+    }
+
+    /// <summary>The per-item breakdown stays in the WINDOW (the negative): the peek is
+    /// row-capped and the ⧉ is one click from the full Wealth tab, so a sold item's name has
+    /// no business here — that is what "the float carries the detail" means for a surface
+    /// whose detail is a list of everything you vendored.</summary>
+    [Fact]
+    public void MoneyPeekLeavesTheSoldItemBreakdownInTheWindow()
+    {
+        var body = HudExpandPeek.Money(500, 300, 200, 1000);
+
+        Assert.Equal(4, body.Rows.Count);
+        // Four FACTS, not a list that could grow with the session.
+        Assert.All(body.Rows, r => Assert.DoesNotContain("Rusty", r.Name));
+    }
+
+    [Fact]
+    public void MoneyPeekWithNoCoinSaysSo()
+    {
+        var body = HudExpandPeek.Money(0, 0, 0, 0);
+
+        Assert.NotNull(body.Empty);
+        Assert.Empty(body.Rows);
+    }
+
+    // --------------------------------------------------------------- deaths ----
+
+    /// <summary>Newest first — the opposite of Core's own order for this list, and
+    /// deliberately: the death you want to read is the one that just happened. The value is a
+    /// WALL time rather than "3 minutes ago", so nothing in the signature ticks (trap 8).
+    /// </summary>
+    [Fact]
+    public void DeathsPeekPutsTheNewestFirst()
+    {
+        var at = new DateTime(2026, 9, 7, 13, 5, 0);
+        var body = HudExpandPeek.Deaths(
+            [new TimedDetail(at, "a giant spider"), new TimedDetail(at.AddMinutes(20), "a skeleton")]);
+
+        Assert.Null(body.Empty);
+        Assert.Equal(["a skeleton", "a giant spider"], body.Rows.Select(r => r.Name));
+        Assert.Equal("1:05 PM", body.Rows[1].Value);
+        Assert.All(body.Rows, r => Assert.Equal(0, r.Share));
+        Assert.Contains("2 deaths", body.Subtext);
+    }
+
+    [Fact]
+    public void DeathsPeekWithNoneSaysSo()
+    {
+        var body = HudExpandPeek.Deaths([]);
+
+        Assert.Equal("No deaths this session.", body.Empty);
+        Assert.Empty(body.Rows);
+        Assert.Contains("0 deaths", body.Subtext);
+    }
 }

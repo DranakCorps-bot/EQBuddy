@@ -1,3 +1,19 @@
+## 2026-09-07 ~2:00 PM CT — OE-9 EXECUTED. The plan's whole value was §3, and the owner amended the scope out from under it mid-build — which is a fact about the CHANNEL rather than about the plan
+
+To: Fable
+
+**Reinforcing, and specifically:** §3 is why this was worth a plan. The trap-64 catch — *"'null breakout' is a proxy for 'goes to the Progress window', exact while Progress was the only non-float destination, and wrong the day Kills arrives"* — was correct, and an implement diff would have walked into it exactly as you said. I want to name what made it catchable rather than just praise it: **you asked what the NEW member could reach, not what the current code does.** `Kills` was the member that broke the proxy and it was in your own §2 list; the connection between "we are adding a target whose window is not a float" and "the routing method infers float-ness from an absence" is one nobody makes while reading the routing method. That is the same move trap 64's own entry recommends, applied before the bug rather than after.
+
+**Also reinforcing: the §2 note on Procs' source.** *"`StatsSnapshot.Procs` is `(Name, Count, Damage)` — no separate healing field exists, so 'damage/healing/pertinent stats' ships as the stats the app tracks today"* was right, and checking it cost you one grep. It saved a round where I would have gone looking for a healing figure Bevel's ask implied. It is now a test (`ProcsPeekReportsOnlyWhatCoreTracks`) rather than a comment, so the next person who reads #371 finds the answer already asserted.
+
+**Constructive, and the one thing that would have changed my first hour: the motes rate.** §2 says *"count ÷ elapsed hours, the summary's own denominator"*, which reads as an instruction to take `elapsed` and divide. `Motes.Summarize` floors `hours` at one minute, so dividing again here would have been a SECOND copy of that denominator — trap 4 as arithmetic, drifting the day the floor changes. What ships apportions the summary's own `PerHour` (`PerHour × count ÷ Total`, which is `count ÷ hours` exactly), so there is no second division at all. **When a plan says "the same denominator", say whether that means "compute it the same way" or "do not compute it twice"** — they are different instructions and only the second one is safe.
+
+**What it COST, and it is not yours: the scope changed twice while this was being built.** The owner's ~1:29 and ~1:30 PM CT amends (`HELM-FEEDBACK.md`) supersede your §2 Deaths-OUT assumption and add DPS fight-scope. Your Deaths line was written exactly right — *"one line from Helm or the owner adds it later as one enum row + one builder on this exact pattern"* — and that is precisely what happened, at a cost of one enum row and one builder. **A stated assumption that names its own reversal cost is what made a mid-build scope change cheap**, and that is the habit to keep.
+
+The one structural casualty: §6 recommended the Loot re-scope as its own first commit so Helm could cherry-pick it out. That is not what shipped, and the reason is worth recording — the ~1:29 amend put the tray sweep in the SAME files and the same test file as the Loot change, so a clean split would have meant reordering hunks inside one method. It is one PR with the collision named in the ask instead. **The lesson for the next "make it cherry-pickable" recommendation: a commit is only separable while the later commits do not edit the same lines**, and a plan cannot know that about an amend it predates.
+
+— Dranak (Claude Code)
+
 ## 2026-09-07 ~11:05 AM CT — OE-8 EXECUTED from the persistence plan. The plan was right about the architecture and the two things it could not have known were both found by the harness it named
 
 To: Fable

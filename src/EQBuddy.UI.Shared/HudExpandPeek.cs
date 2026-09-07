@@ -36,8 +36,19 @@ public sealed record PeekBody(
 /// a shared decision rather than a second copy with a shorter list. <see cref="Loot"/> reads
 /// the same <c>MainWindow.TargetDropsContent</c>/<c>TargetEmptyNote</c> calls the float's own
 /// Target scope makes, for the same reason — a mini-bar chip and its pop-out must answer
-/// "what can this creature drop" identically. Only <see cref="Buffs"/> is deliberately NOT
-/// what its float draws, and that is named rather than implied — see it below.
+/// "what can this creature drop" identically (#392, which landed the target re-scope while
+/// OE-9 was building — that half is Bevel's and this seat took it as it stands). And
+/// <see cref="Procs"/> is read by the Damage float's new procs block. Only
+/// <see cref="Buffs"/> is deliberately NOT what its float draws, and that is named rather
+/// than implied — see it below.
+///
+/// **OE-9 added five more, and none of them has a float of its own.** Motes, Kills, Procs,
+/// Money and Deaths are the rest of <see cref="MiniBarPresentation.Order"/>, and the owner's
+/// ~1:29 PM CT amend (2026-09-07) is that every cell on the bar peeks and pops out. Each one
+/// takes the SAME numbers its full surface already shows and the SAME denominators — the
+/// motes summary's own hours, the Procs card's combat minutes (#85), the Wealth tab's coin
+/// facts — because a peek that computed a rate its own ⧉ then disagreed with would be trap
+/// 4 across two windows a click apart.
 ///
 /// **Framework-free**, like everything else in this folder: rows are data, and the host
 /// turns them into controls.
@@ -176,5 +187,162 @@ public static class HudExpandPeek
 
         return new PeekBody(subtext, rows, null,
             "buffs|" + string.Join(",", rows.Select(r => $"{r.Name}:{r.Value}")));
+    }
+
+    // ================================================================== OE-9 ====
+    // The rest of the tray. Every cell on the minimized bar peeks and pops out now
+    // (the owner's ~1:29 PM CT amend, 2026-09-07), and these five are the ones that
+    // had no builder because they had no float to borrow one from.
+
+    /// <summary>
+    /// The Motes peek: one row per tier, count and rate, with #154's weighting on the
+    /// subtext.
+    ///
+    /// **The per-tier rate is derived from the summary's OWN denominator rather than from a
+    /// second division.** <c>Motes.Summarize</c> computes <c>PerHour = Total / hours</c> with
+    /// a floor of one minute on <c>hours</c>; <c>PerHour × count ÷ Total</c> is
+    /// <c>count ÷ hours</c> exactly, so this cannot drift from the card's rate the day that
+    /// floor changes — which is what taking <c>elapsed</c> here and dividing again would have
+    /// risked (trap 4 as arithmetic).
+    ///
+    /// **The signature is tier COUNTS only** (trap 8). The rates are in the values and the
+    /// events are in the key, which is the shipped Watch-peek precedent: a per-hour figure
+    /// drifts on every tick, so a key that carried one would rebuild the panel every second
+    /// and throw away whatever the pointer was over.
+    /// </summary>
+    public static PeekBody Motes(MotesSummary motes)
+    {
+        var subtext = $"Session · {motes.Total} · {motes.PerHour:0.#}/hr"
+            + (motes.PotencyPerHour > 0 ? $" · {motes.PotencyPerHour:0.#} potency/hr" : "");
+        if (motes.Total == 0)
+            return new PeekBody(subtext, [],
+                "No motes yet this session. They appear here as you loot them.", "motes|empty");
+
+        var rows = Gauged(motes.Tiers, t => t.Count, t => t.Item,
+            t => $"{t.Count} · {Share(motes.PerHour, t.Count, motes.Total):0.#}/hr");
+        return new PeekBody(subtext, rows, null,
+            "motes|" + string.Join(",", motes.Tiers.Select(t => $"{t.Item}:{t.Count}")));
+    }
+
+    /// <summary>One row's share of a whole-list rate — see <see cref="Motes"/> for why the
+    /// rate is apportioned rather than recomputed.</summary>
+    private static double Share(double wholeRate, int part, int whole) =>
+        whole <= 0 ? 0 : wholeRate * part / whole;
+
+    /// <summary>
+    /// The Kills peek: kills per creature, biggest first — literally the list the expanded
+    /// Kills card fills (<c>StatsSnapshot.YourKills</c>, already ordered by Core).
+    ///
+    /// The rate on the subtext is <c>StatsSnapshot.KillsPerHour</c>, the session's own, and
+    /// not a division performed here: the Kills card, the session summary and this must not
+    /// be able to quote three numbers for one session.
+    /// </summary>
+    public static PeekBody Kills(IReadOnlyList<NameCount> kills, int total, double perHour)
+    {
+        var subtext = $"Session · {total} kill{(total == 1 ? "" : "s")} · {perHour:0.#}/hr";
+        if (kills.Count == 0)
+            return new PeekBody(subtext, [], "Nothing has died yet this session.", "kills|empty");
+
+        var rows = Gauged(kills, k => k.Count, k => k.Name, k => $"{k.Count}");
+        return new PeekBody(subtext, rows, null,
+            "kills|" + string.Join(",", kills.Select(k => $"{k.Name}:{k.Count}")));
+    }
+
+    /// <summary>
+    /// The Procs peek: each proc's count, its rate and its damage.
+    ///
+    /// **THE DENOMINATOR IS COMBAT MINUTES (#85, Kerdude), the same one the Procs block and
+    /// the mini-bar cell already use** — so downtime does not flatter the weapon, and the
+    /// three places a player can read a proc rate cannot disagree. That is also why this
+    /// builder is what the DAMAGE FLOAT's new procs block reads: the card and the Live room
+    /// each built proc rows inline, which was two producers before this made it one.
+    ///
+    /// **There is no healing here, and that is a fact about Core rather than a scope call.**
+    /// <c>StatsSnapshot.Procs</c> is <c>(Name, Count, Damage)</c> — no healing field exists.
+    /// Bevel #371 asked for "damage/healing/pertinent stats"; what ships is the stats the app
+    /// tracks today, which is exactly what the Procs card shows. If the log distinguishes
+    /// healing procs, teaching Core that is its own item and never a silent ride-along here.
+    /// </summary>
+    public static PeekBody Procs(
+        IReadOnlyList<(string Name, int Count, long Damage)> procs, double combatSeconds)
+    {
+        var minutes = Math.Max(1.0 / 60, combatSeconds / 60.0);
+        var count = procs.Sum(p => p.Count);
+        var damage = procs.Sum(p => p.Damage);
+        var subtext = $"Session · {count} proc{(count == 1 ? "" : "s")} · "
+            + $"{count / minutes:0.#}/min · {damage:N0} dmg";
+        if (procs.Count == 0)
+            return new PeekBody(subtext, [],
+                "No weapon procs yet this session.", "procs|empty");
+
+        // Gauged by COUNT, because "/min" is the headline this surface exists for — a bar
+        // drawn off damage would rank a rare heavy proc above the one actually firing.
+        //
+        // **The tooltip carries the untruncated row, and the first shot is why.** A proc's
+        // name is "<spell> · <item>" whenever an item-proc line named the vehicle, and that
+        // plus three facts does not fit the panel's one fixed 300 width — `hud-expand-procs`
+        // came back "Exaltation Strike · Polished Mithril…" over "0.1/min · 42 d…". The ⧉
+        // is the real answer (the Damage float's procs block draws these at full width), but
+        // a hover costs nothing and a row a player cannot read is trap 14's family: correct,
+        // clipped, and invisible to every test. Nothing but the picture says so.
+        var rows = Gauged(procs, p => p.Count, p => p.Name,
+            p => $"×{p.Count} · {p.Count / minutes:0.#}/min · {p.Damage:N0} dmg",
+            p => $"{p.Name} — ×{p.Count} · {p.Count / minutes:0.#}/min · {p.Damage:N0} damage");
+        return new PeekBody(subtext, rows, null,
+            "procs|" + string.Join(",", procs.Select(p => $"{p.Name}:{p.Count}:{p.Damage}")));
+    }
+
+    /// <summary>
+    /// The Money peek: the Wealth tab's coin facts — looted, vendor, total, per hour.
+    ///
+    /// **FOUR FACTS, NOT A RANKING, so there is no gauge.** Every other peek here is a list
+    /// of comparable things; this is one figure broken into its parts, and a bar under "per
+    /// hour" would be comparing a rate against a total.
+    ///
+    /// **The per-item <c>SoldItems</c> breakdown stays in the window.** The peek is row-capped
+    /// at five and the ⧉ is one click from the full Wealth tab, which is what "the same
+    /// content" can honestly mean at peek density — flagged rather than assumed.
+    /// </summary>
+    public static PeekBody Money(long total, long looted, long vendor, long perHour)
+    {
+        var subtext = $"Session · {StatsSnapshot.FormatCoin(total)} · "
+            + $"{StatsSnapshot.FormatCoin(perHour)}/hr";
+        if (total == 0)
+            return new PeekBody(subtext, [],
+                "No coin yet this session — looted or sold.", "money|empty");
+
+        List<PeekRow> rows =
+        [
+            new("Looted", StatsSnapshot.FormatCoin(looted), 0),
+            new("Sold to vendors", StatsSnapshot.FormatCoin(vendor), 0),
+            new("Total", StatsSnapshot.FormatCoin(total), 0),
+            new("Per hour", StatsSnapshot.FormatCoin(perHour), 0),
+        ];
+        return new PeekBody(subtext, rows, null, $"money|{looted}|{vendor}|{total}|{perHour}");
+    }
+
+    /// <summary>
+    /// The Deaths peek: what killed you and when, newest first.
+    ///
+    /// **The one target the signed #389 plan left out, and the owner put back** (~1:29 PM CT
+    /// amend). It is the same list the World window's Travels tab draws, in the same order,
+    /// and its ⧉ opens that tab.
+    ///
+    /// No gauge: a death is not a quantity. The value is the clock time, which is the only
+    /// thing that distinguishes two deaths to the same creature — and it is a WALL time
+    /// rather than a countdown, so nothing in the signature ticks (trap 8).
+    /// </summary>
+    public static PeekBody Deaths(IReadOnlyList<TimedDetail> deaths)
+    {
+        var subtext = $"Session · {deaths.Count} death{(deaths.Count == 1 ? "" : "s")}";
+        if (deaths.Count == 0)
+            return new PeekBody(subtext, [], "No deaths this session.", "deaths|empty");
+
+        var newest = deaths.OrderByDescending(d => d.Time).ToList();
+        var rows = newest
+            .Select(d => new PeekRow(d.Text, d.Time.ToString("h:mm tt"), 0))
+            .ToList();
+        return new PeekBody(subtext, rows, null,
+            "deaths|" + string.Join(",", newest.Select(d => $"{d.Time:O}:{d.Text}")));
     }
 }

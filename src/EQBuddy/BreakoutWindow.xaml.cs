@@ -420,6 +420,11 @@ public partial class BreakoutWindow : Window
         // each current, that a later change has to be taught twice. The decision moved; the
         // drawing stayed here, which is the split every window sum in this repo takes.
         var kind = MeterKind();
+        // BEFORE the empty branch and before the signature gate, both of which return: the
+        // procs block is a session tally on its own clock, and hanging it off the meter's
+        // repaint would leave it blank on a window whose damage rows had not moved — which
+        // is the state a player opening this from the Procs chip lands in.
+        UpdateProcs(s);
         var meter = LivePresentation.Meter(kind, s, _fightScope, DateTime.Now);
         TitleText.Text = meter.Title;
         TitleIcon.Glyph = BreakoutPresentation.Icon(kind);
@@ -446,6 +451,38 @@ public partial class BreakoutWindow : Window
         BreakdownRows.FillAbilityRowsSorted(this, Rows, meter.Rows, _sort,
             Math.Max(1, meter.Seconds), meter.RateLabel,
             max: 10, resists: resists, blockedBy: resists is null ? null : _blockedBy);
+    }
+
+    /// <summary>
+    /// The procs block, on the DAMAGE float only (OE-9).
+    ///
+    /// **It exists because the Procs chip's ⧉ opens this window.** Lock 6 is "the float
+    /// carries the detail", so routing a target to a window that could not draw its rows
+    /// would have been a pop-out that silently changed the subject — and the alternative, a
+    /// tenth always-on-top window for five rows, is the floating-window proliferation SA-2
+    /// was signed to end. Procs are a damage-surface fact everywhere else in the app.
+    ///
+    /// **Off <see cref="HudExpandPeek.Procs"/>, which is the point rather than convenience.**
+    /// The Combat card and the Evolved shell's Live room each built proc rows inline — two
+    /// producers of "what does a proc row say", both current, that the next change to the
+    /// #85 denominator would have to be taught twice (trap 33). The peek builder is the one
+    /// now, and this window and the under-bar panel cannot quote different rates.
+    ///
+    /// SESSION scope always, unlike the meter above it: <c>StatsSnapshot.Procs</c> is a
+    /// session tally and there is no per-fight proc breakdown to switch to, so a block that
+    /// followed the Fight/Session strip would be a control that changed nothing.
+    /// </summary>
+    private void UpdateProcs(StatsSnapshot s)
+    {
+        var show = _kind == BreakoutKind.Damage && s.Procs.Count > 0;
+        // Both, always — a heading whose list is empty photographs as a section that lost
+        // its contents (trap 17), and there is no second switch here to forget.
+        ProcsLabel.Visibility = ProcsRows.Visibility =
+            show ? Visibility.Visible : Visibility.Collapsed;
+        if (!show) { ProcsRows.Items.Clear(); return; }
+        var body = HudExpandPeek.Procs(s.Procs, s.CombatSeconds);
+        BreakdownRows.FillPairRows(this, ProcsRows,
+            body.Rows.Select(r => (r.Name, r.Value)));
     }
 
     /// <summary>This window's kind as the shared decision spells it. <c>BreakoutKind</c> is

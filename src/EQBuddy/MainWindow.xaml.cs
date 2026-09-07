@@ -1690,6 +1690,7 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
             {
                 _creatureWindow = null;
                 _creatureHost.WindowClosed();
+                _hudExpandBar.CreatureWindowClosed();   // OE-9: the Kills chip's pop-out lands here
                 _killsCard?.Sync();
             };
         }
@@ -2426,11 +2427,13 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
                 (x.Name, $"{x.DamagePerCast:N0}/cast · ×{x.Casts} · {x.AvgTargets:0.#} targets" +
                          (x.MaxTargets > x.AvgTargets + 0.05 ? $" (best {x.MaxTargets})" : ""))));
             // Procs per combat-minute (#85, Kerdude): same denominator as DPS, so
-            // downtime doesn't flatter the weapon.
+            // downtime doesn't flatter the weapon. The row's WORDS are
+            // `HudExpandPeek.Procs`' as of OE-9 — this card, the shell's Live room and the
+            // Damage float's new procs block were about to be three producers of one row
+            // (trap 33), and the peek builder is the one they all read now.
             ProcLabel.Visibility = s.Procs.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
-            var combatMinutes = Math.Max(1.0 / 60, s.CombatSeconds / 60.0);
-            FillList(ProcList, s.Procs.Select(x =>
-                (x.Name, $"×{x.Count} · {x.Damage:N0} dmg · {x.Count / combatMinutes:0.#}/min")));
+            FillList(ProcList, UI.Shared.HudExpandPeek.Procs(s.Procs, s.CombatSeconds)
+                .Rows.Select(r => (r.Name, r.Value)));
             StanceLabel.Visibility = s.Stances.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
             FillList(StanceList, s.Stances.Select(x =>
                 (x.Name, $"{x.Damage:N0} dmg · {(int)x.CombatSeconds}s · {x.Dps:0.#} dps")));
@@ -3908,7 +3911,11 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
         var w = new WorldWindow(this, spawnZone) { Owner = this };
         w.TabChanged += t2 => _worldHost.SelectTab(t2);
         w.Closed += (_, _) =>
-            { if (ReferenceEquals(_worldWindow, w)) _worldWindow = null; _worldHost.WindowClosed(); };
+        {
+            if (ReferenceEquals(_worldWindow, w)) _worldWindow = null;
+            _worldHost.WindowClosed();
+            _hudExpandBar.WorldWindowClosed();   // OE-9: the Deaths chip's pop-out lands here
+        };
         _worldWindow = w;
         if (tab is { } t3) w.SetTab(t3);
         w.Show();
