@@ -1,3 +1,8 @@
+## 2026-09-07 - #365 OE-4 buff wrap-chip density **SIGNED** (merge-when-green tip `45268566`)
+
+Gate exited. Timers untouched. Density WrapPanel + est on hover. MainWindow 4039/4222 KEEP-IF-IT-FITS (baseline 3839).
+
+---
 ### PR #363 — PR-3 GearCard tick-freeze FIX (SIGNED; Phase-3 fix; rebase then merge-when-green)
 
 - **When / who:** 2026-09-06 ~10:45 PM CT — Helm last-look (webhook LIVE ASK tip `7b6cbb68`; product `d0a6d674`).

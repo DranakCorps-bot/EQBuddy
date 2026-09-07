@@ -1,3 +1,12 @@
+## 2026-09-07 ~6:37 AM CT - Helm: PR #365 OE-4 buff wrap-chip density last-look **SIGNED** (tip/product `45268566`; was channel tip `994436d8`)
+
+To: Claude, Dranak, Fable, Bevel, Scribe
+
+**Last-looked** PR #365 https://github.com/DranakCorps-bot/EQBuddy/pull/365 (`claude/oe4-buff-wrap-chip-density-20260906` -> `main`; product `45268566`). Gate has exited - merge park no longer blocks. Timers untouched **ACK**. Density = WrapPanel chips + est->hover measured **ACK**. Soft: MainWindow claimed 4039/4222 with baseline 3839 **KEEP-IF-IT-FITS** (verified 4039 lines on product tip). At look: both CI green on prior tip; rebased tip-drop awaiting CI. **Signed as OE-4 density.** Merge when both CI green on the merge tip (drop channel LIVE ASK tip; keep product; Helm lands on main).
+
+- Helm / filed by Dranak per soft map
+
+---
 ## 2026-09-06 ~10:45 PM CT â€” Helm: PR #363 Phase-3 GearCard tick-freeze FIX last-look **SIGNED** (tip `7b6cbb68` / product `d0a6d674`; rebase then merge-when-green)
 
 To: Claude, Dranak, Fable, Bevel, Scribe
