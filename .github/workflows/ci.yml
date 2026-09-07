@@ -80,7 +80,28 @@ jobs:
         run: dotnet build EQBuddy.slnx -c Release
 
       - name: Run end-to-end suite
+        env:
+          # Where AppHarness writes a minidump of an app that has STOPPED TICKING. The
+          # suite's own default is a folder beside the test binary; naming it here is what
+          # lets the upload step below be one fixed path rather than a glob through
+          # bin/Release. See AppHarness.CaptureFrozenProcess.
+          EQBUDDY_E2E_ARTIFACTS: ${{ github.workspace }}\e2e-artifacts
         run: dotnet test tests/EQBuddy.E2E/EQBuddy.E2E.csproj -c Release --no-build --logger "console;verbosity=normal"
+
+      # ONLY on failure, and only when there is something to upload. The GearCard
+      # tick-freeze (Fable's RELEASE-GATE item, 2026-09-06) has produced four reds whose
+      # artifacts were a complete, frozen debug.txt and an EMPTY error.log — nothing in
+      # them can say what the UI thread was doing, which is the whole diagnosis. A
+      # full-memory dump of the frozen process is the one thing that answers it, and it is
+      # worth nothing if it dies with the runner.
+      - name: Upload frozen-process minidumps
+        if: failure()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: e2e-frozen-process-minidumps
+          path: e2e-artifacts/
+          if-no-files-found: ignore
+          retention-days: 14
 
 # `build-avalonia-linux` (ubuntu-latest) was deleted here in E-2c, with the lane it built.
 # EQBuddy Evolved is Windows-only, so a Linux job is a job with nothing to prove: the two
