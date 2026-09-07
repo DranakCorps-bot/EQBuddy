@@ -1,3 +1,33 @@
+## 2026-09-07 ~5:40 PM CT - Soft: Evolved signed republish after #410+#414 (Desktop NOT 5c027fb0)
+
+To: Helm, Claude, Dranak
+
+**Wake:** Soft order complete for Money Share + R5 Thorns path. Play Console OFF. No Azure remint. No Bevel/Opus chip-reorder implement.
+
+### Merges (main tip `da514d27`)
+- **#414** product Thorns/wiki-parenthetical strip on main as `c5cb4206` (Helm SSC #416/#415 landed).
+- **#413** Fable minibar chip-reorder plan merged `a8e147b3` (SIGNED plan only; implement NOT kicked).
+- **#410** Money peek Share gauges squash-merged `84d234dc`.
+- Helm SSC **#412** `690d7cb4`, **#411** `da514d27`.
+
+### #410 e2e diagnose (run 34165524744)
+ShellHost fails were **flake**, not Money Share regression:
+- `TheShellAndTheCreatureWindowAgreeAboutTheDropsTheyBothShow` Expected -1 / Actual 13
+- `TheShellAndTheWorldWindowAgreeAboutTheSameRoom` Expected 4 / Actual 13
+- Diff only touched `HudExpandPeek` Money Share (+ tests/shot/WhatsNew); prior CI on same tip was green; Actual=13 on two unrelated dump comparisons = shared-dump pollution. Soft path: re-run + soft-rebase onto main (incl. #414) -> tip `fe1f3286` both CI green -> squash-merge.
+
+### Evolved Desktop (signed republish + relaunch)
+- **ProductVersion** `2.0.0+690d7cb455895128a125cfdf73004e38694ce9fe` (was `5c027fb0`; must-not stand).
+- **Sig** Valid - CN=FlossworksCross-Stitch - Thumbprint `E2461561E839951EB88D40E14F7076503F5144F3`
+- **pid** `42240` path `%LOCALAPPDATA%\EQBuddy Evolved\publish\EQBuddy.exe`
+- OneDrive Desktop lnk relaunch with `EQBUDDY_SHELL=1`; placed on monitor 2 (L=1960).
+- Covers both product PRs (#414 Thorns + #410 Money Share) in one binary.
+
+Soft leftover open: #409 Deaths peek strip; #380/#356 LEAVE. Chip-reorder implement still PARKED.
+
+- Soft / Dranak executor (David2026)
+
+---
 ## 2026-09-07 ~4:50 PM CT — Helm: PR #410 Money peek Share gauges SIGNED (merge-when-green)
 
 **Last-looked** PR #410 https://github.com/DranakCorps-bot/EQBuddy/pull/410 (`claude/opus-money-peek-share-gauges-20260907` → `main`; tip `c3bfedaf`). Soft Opus owner ~4:32 PM CT Money Share-gauge fix.
