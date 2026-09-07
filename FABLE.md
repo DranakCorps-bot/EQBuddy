@@ -1,3 +1,133 @@
+## 2026-09-07 ~2:50 AM CT — Owner LOCK seats named: OE-5 buff-timer data path · OE-6 first-run Setup (Fable, on `631bd7f5`)
+
+Executes the Helm-signed #355 owner PRODUCT LOCK (~8:55 PM CT 09-06; `HELM.md` PR #355
+entry) and Bevel's Setup pre-design (PR #356 tip `52981085` — unmerged, read from the
+branch). The `FABLE.md` stub riding unmerged PR #355 (the "To: Bevel" one-liner ask) is
+ANSWERED by that pre-design and by this naming — whoever lands #355 should treat its stub
+as spent, not pending. Two seats, not three; soft max ≤3 respected.
+
+**Sequencing, before the seats.** The GearCard tick-freeze RELEASE-GATE (#354/#357, Helm
+~9:25 PM CT 09-06) still outranks everything OE: Phase-2 diagnose is the priority kick, and
+**merges of both seats below join the standing OE merge PARK** until gate exit (named
+mechanism + fix + green on main/rebased tips — Helm un-parks). Building is NOT parked:
+both seats are parallel-worktree safe, need no screen, and touch no OE tip. Neither blocks,
+amends, or waits on #357 / Phase 2. Against OE-4: **OE-5 has NO dependency on OE-4** (see
+its "no PR-3" line — zero `MainWindow*` contact), so the old "timers behind density" serial
+assumption is dead; they can land in either order. OE-6 shares only the Settings
+neighborhood — whichever of OE-6 / any Settings seat lands second rebases, nothing more.
+
+### OE-5 — Buff-timer data path: dump-assisted duration resolution (LOCK A)
+
+- **Priority:** `ready` — Core-only, parallel worktree, no screen. Merge parked under the
+  release gate like every OE tip.
+- **Class:** `V2` — not for size but because the two obvious wrong moves are wrong for
+  product reasons an executor cannot see locally, and the owner locked both out: the
+  spellbook dump LOOKS like a timer source and must never be one, and a live buff-bar dump
+  LOOKS like the clean fix and is an invent (no such `/outputfile` exists). Plus one
+  whole-system rule (the double-apply hazard below) that spans two PRs.
+- **Source:** owner lock via Helm, #355 (A) (`HELM-FEEDBACK.md` 2026-09-06 ~9:00 PM CT);
+  `BEVEL.md` item 1's "est"/duration-source flag; the OE-4 seat's ratchet note.
+- **Already shipped — the finding that shapes the whole seat: LOCK (A) parts (1) and (2)
+  are ALREADY BUILT.** `Core/BuffTracker.cs` is land/fade live (cast window → cast-on-you
+  starts the countdown, fade line ends it, a natural fade TEACHES the character's real
+  duration, persisted per character in the mez-store pattern, `ReinforcementRank` AA %
+  applied to wiki-base estimates only). `BuffDurationCatalog` is the Spell DB base
+  (buffs-harvest.py, embedded `BuffDurations.json`). `RenderBuffs`
+  (`MainWindow.xaml.cs:1425`, per-tick at `:2662` — "the countdowns ARE the content")
+  already draws the countdowns with the `est` label. **This seat is exactly the LOCK's two
+  OPTIONAL sources, (3) and (4) — an accuracy upgrade to a working path, not a build.**
+- **Plan:**
+  - **PR-1 — `/outputfile spellbook` rank/known match.** Core reader (`SpellbookFile`,
+    on the `InventoryFile` pattern) + `OutputfileKind.Spellbook` + the
+    `OutputfileAutoImport` seam (its own doc already names `spellbook` in the game's usage
+    line; nothing reads it today — grep-verified). Consumption: narrow
+    `BuffState.Candidates` to spells the character actually knows, and where the catalog
+    carries a rank-resolved duration, use the KNOWN rank's base. **Spellbook ≠ timer
+    source (locked):** it never starts, ends, or times a countdown — it only resolves
+    WHICH spell a landing was. **The log outranks the dump:** a stale spellbook that lacks
+    an observed landing must never erase or shrink it — the candidate set stays. Learned
+    durations outrank anything dump-derived. Same PR adds the fourth
+    `HomeReadout.Readiness()` row (the ONE place, per Bevel's source-of-truth rule — Home
+    and OE-6 Setup both inherit it), worded as optional ("sharpens buff countdowns"), plus
+    its `GameCommandsTests.SurfacesNeedingACommand` row (trap 34).
+  - **PR-2 — inventory focus extend.** Read the ALREADY-auto-imported inventory for
+    duration-focus items and apply the extension to wiki-base estimates only — **never to
+    a learned duration** (BuffTracker's own `ReinforcementRank` doc states the rule: a
+    learned number already includes the character's real extensions; applying twice
+    overshoots every countdown). Focus-item → extension% is game truth: harvest it where
+    eqlwiki carries it, flag gaps, never auto-write a curated catalog.
+  - **No PR-3.** No surface work of any kind: the existing `RenderBuffs` countdowns and
+    OE-4's density rewrap both consume the improved data unchanged. Zero `MainWindow*`
+    lines, which is what makes this seat parallel to OE-4 rather than behind it.
+- **Bevel pre-design: no, because** there is no presentation PR — the roster's presentation
+  is OE-4's signed item. If execution wants any new visible string on the roster, that is a
+  Bevel question before it ships.
+- **Guards run eight times:** Core unit tests; prove-fail the "log outranks dump" rule on
+  the pre-fix shape (a spellbook missing the candidate must NOT drop the landing).
+- **What clamps it:** `MainWindow*` ratchet at zero headroom — untouched by design (no
+  PR-3). Learned-duration store is its own per-character file (mez-store pattern), never
+  `settings.json` (trap 13).
+- **Checked:** `BuffTracker.cs` full read; `OutputfileAutoImport.cs`; `RenderBuffs` call
+  sites; grep for any spellbook reader (none); `BuffDurationCatalog.LoadEmbedded`.
+  **Hypothesis, labelled:** whether `BuffDurations.json` carries per-rank durations is
+  UNVERIFIED — if the harvest is rank-less, PR-1 degrades gracefully to known-spell
+  narrowing and the harvest gains ranks in its own weekly-refresh change (flagged, never
+  auto-written). The executor checks the JSON before promising rank match in a What's-new.
+- **Decided without asking** (→ `DECISIONS.md` when taken): (1) the `est` label survives
+  dump resolution — only a learned (fade-taught) duration drops it; a dump-resolved base is
+  still an estimate. (2) The log outranks the dump (stale-dump honesty). (3) The Readiness
+  row is worded optional. (4) No PR-3 / no OE-4 dependency.
+- **Out:** any live buff-bar invent (locked out); OE-4's density work (its own seat,
+  untouched); the owner's original countdown-vs-actual complaint — `BEVEL.md` item 1's
+  four-source bisect checklist stays the diagnostic for when that screenshot arrives; this
+  seat improves the estimate and claims no fix for a complaint that has no evidence yet.
+
+### OE-6 — First-run Setup / `/outputfile` guide (LOCK B)
+
+- **Priority:** `ready`.
+- **Class:** `V1` — named here because the owner lock routed seat-naming through Fable, not
+  because it needs a V2 plan: Bevel's PR #356 pre-design IS the design pass, and execution
+  is localized (a second host of an existing list).
+- **Source:** owner lock via Helm, #355 (B); Bevel pre-design (PR #356 tip `52981085`),
+  **adopted in full — all three IA tensions are plan constraints:**
+  - **One data source.** `HomeReadout.Readiness()` stays the source of truth; Setup is a
+    second HOST of the same `ReadinessRow` list with the `ReadinessRowView` treatment
+    (⧉ copy via `CommandFor(row.Kind)` on `NeverScanned`, "Open <room>" on `Scanned`).
+    Zero new enums or switches over `OutputfileKind` (traps 20/30/33).
+  - **No fifth `SettingsTab`** (four is Helm-signed I-11/#331; `SettingsRoomTests` pins
+    it). Auto-launch is a modal the shell shows over the active room; the re-open entry is
+    a row in `SettingsTab.Behavior`'s block (its doc comment already claims onboarding).
+  - **Auto-launch predicate is a fact about the dumps**, not a new first-run boolean:
+    every Readiness row `NeverScanned`. Stops when satisfied (count 0) or dismissed —
+    dismiss flag persisted with writer AND reader in the same PR (`DeadSettingTests`).
+- **Must-list rows:** Setup names `/outputfile` commands ⇒ its
+  `GameCommandsTests.SurfacesNeedingACommand` row lands in the same PR (trap 34).
+- **Shot offline: yes** — but the batch's seeded profile has dumps imported, so Setup will
+  never auto-show there: the shot needs a dedicated UNSEEDED-dumps staging variant, with
+  the prediction written before shooting (trap 23) and the BATCH run after (trap 53). The
+  illustration lock binds it.
+- **Verification:** E2E facts (`EQBUDDY_EXPAND`/shell dump): auto-shows once on an
+  empty-dumps profile; does not re-show after dismiss (assert at a moment on the far side
+  of the decision, trap 62); Behavior-tab row reopens it.
+- **What clamps it:** nothing on `MainWindow` (Bevel verified, re-verified this pass —
+  pieces are `HomeReadout`/`SettingsRoom`/a new modal class). Settings-neighborhood rebase
+  note only.
+- **Bevel pre-design: yes** — PR #356. Residuals Bevel left open (modal chrome; dismiss
+  flag name; button vs row on Behavior) are executor calls logged in `DECISIONS.md`; a
+  departure from the no-fifth-tab or one-source rulings is a Bevel question BEFORE ship.
+- **Decided without asking:** seats continue the OE series (OE-5/OE-6) rather than opening
+  a new one; Setup is a modal, not a `page:room` address (adopting Bevel's placement as the
+  plan — a navigable room was the plausible other reading of the lock's "Setup room").
+- **Out:** anything OptionsWindow (the lock says Evolved Settings; OptionsWindow stays per
+  the SR-5 sign); inventing the spellbook Readiness row here (that is OE-5 PR-1's single
+  place); removing or demoting Home's Readiness block.
+
+**Kick-order recommendation (Helm's call to confirm):** Phase-2 diagnose keeps the
+priority kick. Then OE-6 and OE-5 PR-1 in parallel worktrees under soft max ≤3 — OE-6
+first if serial (smallest, owner-visible, zero gate-file contact). OE-4 stays `ready` in
+lane W, independent of both.
+
+---
 ## 2026-09-06 ~6:38 PM CT — Mobile companion north star (later; not OE-1)
 
 Owner direction: mini-bar glance model copies to phone/tablet later (no obstruct PC session); Home guidance stays mobile-accessible with game data; proactive quest-loot notifies (e.g. epic piece → “want to track?”) post-glance. **Do not expand OE-1 for mobile.** No second mobile door. See `HELM-FEEDBACK.md` this date.
