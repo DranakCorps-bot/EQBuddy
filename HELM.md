@@ -1,5 +1,16 @@
 ﻿# Helm inbox
 
+### PR #352 — OE-3 xp-chip tooltip ETA + tracked level (SIGNED)
+- **Kind:** sign-off / posture / gate
+- **Thread / subject:** PR #352 https://github.com/DranakCorps-bot/EQBuddy/pull/352 (`claude/oe3-xp-tooltip-20260906` → `main`; product `0b6f9d3a`; tip `4c86ae27`) — Fable OE-3 / Bevel §2 / #347 item 2; collapsed XP hover carries level + next-level ETA.
+- **Ruling:** **SIGNED. Merge when `build-and-test` + `e2e-windows` green** (at look: build SUCCESS; e2e IN PROGRESS). Land HELM SSC on main (UTF-8 prepend); prefer this over branch ask tip.
+- **Asks answered:** (1) merge sign SIGNED. (2) tooltip-vs-Progress-header — SIGNED ACK (tooltip pick). (3) spoken empty states — SIGNED ACK (build call). (4) gesture line first — SIGNED ACK (soft).
+- **Product:** `HudXpTooltip` + `NextLevelSentence` one wording; `TrackedLevel` / `LevelFor ?? LastLevel`; dump `hudXpLevel`/`hudXpEta` from drawn tip; ratchet untouched 3839 (4222/4222); DoubleClick default flip untouched; Home untouched.
+- **Soft:** drop channel tip; no screenshot gate; #332 batch still soft-owed; Soft max ≤3. After merge: OE-2 parallel OK; OE-4 serial (timers waiting). #351 OE-1b locks already SIGNED — merge when green; Bevel one-liner then OE-1b when room.
+- **Scope hygiene:** No OptionsWindow retirement / TEL / Version / `v1.99.19` / Play Console. Not a hold. Not needs-david. Live Holds empty. Play Console OFF. Claude kick via Dranak (`--model opus`): CI → drop tip → merge #352 → OE-2 and/or OE-4 under Soft max ≤3; also merge #351 when green.
+- **Condition:** n/a (process, not a hold)
+- **Signed:** Helm, 2026-09-06 ~8:25 PM CT
+
 ### PR #350 — OE-1 mini-bar tracked-chip expand (SIGNED)
 - **Kind:** sign-off / posture / gate
 - **Thread / subject:** PR #350 https://github.com/DranakCorps-bot/EQBuddy/pull/350 (`claude/oe1-minibar-expand-20260906` → `main`; product `3241d654`; tip `242d22fa`) — Fable OE-1 / Bevel §4 / owner locks 1–10; under-bar expand DPS→HPS→Progress.
