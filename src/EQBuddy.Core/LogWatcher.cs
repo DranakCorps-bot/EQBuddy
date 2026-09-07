@@ -277,12 +277,13 @@ public sealed class LogWatcher : IDisposable
     public void Select(string path, long startOffset, long endOffset)
     {
         long gen;
+        CharacterLog? charInfo;
         lock (_lock)
         {
             _timer.Stop();
             gen = ++_selectGen;
             _path = path;
-            var charInfo = CharacterLog.FromPath(path);
+            charInfo = CharacterLog.FromPath(path);
             _stats.CharacterName = charInfo?.Character;
             _stats.ServerName = charInfo?.Server;
             if (Spawns is { } sp) sp.Server = charInfo?.Server ?? "";
@@ -305,6 +306,15 @@ public sealed class LogWatcher : IDisposable
             // first-look rule for the replay below.
             BuffLosses?.ResetSession();
         }
+        // The newly selected character's scribed spells, if they have ever run
+        // `/outputfile spellbook` (OE-5 LOCK A). HERE because Select is the one place that
+        // knows both halves of the answer — the log folder is this path's own directory,
+        // the character comes off the filename — and OUTSIDE the lock because it is file
+        // I/O and nothing above it is waiting on the result. An attach that always runs
+        // cannot leave the previous character's book behind: no dump for this one sets it
+        // back to null. It is not a timer source and never becomes one (see BuffTracker's
+        // own rules), and it is optional in every direction, so a failure here is silence.
+        Buffs?.AttachSpellbook(Path.GetDirectoryName(path), charInfo?.Character ?? "");
         if (!DeferIngestForTests) Task.Run(() => FinishInitialIngest(gen));
         // Note (finding 5, scoped out): Select still blocks its caller only for the
         // state reset above, but the ingest itself stays a background task — making

@@ -133,12 +133,13 @@ internal static class ReadinessRows
     ///
     /// The switch is HERE rather than on <c>GameCommands</c> on purpose: the must-list scan
     /// asserts that a surface which needs a command NAMES it, and a helper in UI.Shared
-    /// would satisfy the compiler while making these three rows unverifiable.
+    /// would satisfy the compiler while making these readiness rows unverifiable.
     /// </summary>
     public static string CommandFor(OutputfileKind kind) => kind switch
     {
         OutputfileKind.Achievements => GameCommands.OutputfileAchievements,
         OutputfileKind.Factions => GameCommands.OutputfileFaction,
+        OutputfileKind.Spellbook => GameCommands.OutputfileSpellbook,
         _ => GameCommands.OutputfileInventory,
     };
 

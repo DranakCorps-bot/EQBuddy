@@ -268,7 +268,7 @@ public class HomeRoomTests
     {
         Assert.Equal("Readiness", HomeReadout.ReadinessHeadline(
             HomeReadout.Readiness(Me, _ => DateTime.Now)));
-        Assert.Equal("Readiness — 3 not run yet", HomeReadout.ReadinessHeadline(
+        Assert.Equal("Readiness — 4 not run yet", HomeReadout.ReadinessHeadline(
             HomeReadout.Readiness(Me, _ => null)));
         Assert.Equal("Readiness — 1 not run yet", HomeReadout.ReadinessHeadline(
             HomeReadout.Readiness(Me,
@@ -281,7 +281,7 @@ public class HomeRoomTests
     public void EveryReadinessRowNamesADumpAndWhatItFeeds()
     {
         var rows = HomeReadout.Readiness(Me, _ => null);
-        Assert.Equal(3, rows.Count);
+        Assert.Equal(4, rows.Count);
         Assert.Equal(rows.Count, rows.Select(r => r.Kind).Distinct().Count());
         Assert.DoesNotContain(rows, r => r.Kind == OutputfileKind.Unknown);
         Assert.All(rows, r =>
@@ -290,6 +290,46 @@ public class HomeRoomTests
             Assert.NotEmpty(r.Feeds);
             Assert.DoesNotContain(".txt", r.Feeds);
         });
+    }
+
+    /// <summary>
+    /// **The fourth row is the OPTIONAL one, and it says so in the player's words.** The
+    /// other three name something EQBuddy cannot work out any other way; the spellbook only
+    /// sharpens buff countdowns that already run off landing and fade lines. A row that
+    /// asked for it in the same voice as the other three would be telling a player
+    /// something is missing when nothing is — which is the nag Bevel's two-states rule
+    /// exists to refuse, arriving through the wording instead of through the state.
+    /// </summary>
+    [Fact]
+    public void TheSpellbookRowSaysItIsOptionalAndThatCountdownsWorkWithoutIt()
+    {
+        var row = Assert.Single(HomeReadout.Readiness(Me, _ => null),
+            r => r.Kind == OutputfileKind.Spellbook);
+        Assert.Contains("optional", row.Feeds, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("without it", row.Feeds, StringComparison.OrdinalIgnoreCase);
+        // It is last: the three that name a real gap are read first.
+        Assert.Equal(OutputfileKind.Spellbook, HomeReadout.Readiness(Me, _ => null)[^1].Kind);
+    }
+
+    /// <summary>
+    /// **A row whose surface is not a ROOM offers no "Open", and that is the rail's own
+    /// rule one level in.** Buff countdowns are drawn on the widget's HUD; there is no
+    /// `page:room` that shows them, so pointing the link at some room that does not would
+    /// be the dead affordance `ShellPages.Landed` exists to refuse. Asserted on a SCANNED
+    /// row, because that is the only state where the link would have been drawn at all.
+    /// </summary>
+    [Fact]
+    public void TheSpellbookRowOffersNoOpenBecauseItsSurfaceIsNotARoom()
+    {
+        var row = Assert.Single(HomeReadout.Readiness(Me, _ => DateTime.Now),
+            r => r.Kind == OutputfileKind.Spellbook);
+        Assert.Equal(ReadinessState.Scanned, row.State);
+        Assert.Equal("", row.Address);
+        // And the other three still have theirs — an empty address must not become the
+        // way every row answers.
+        Assert.All(HomeReadout.Readiness(Me, _ => DateTime.Now)
+                .Where(r => r.Kind != OutputfileKind.Spellbook),
+            r => Assert.NotEqual("", r.Address));
     }
 
     // ---- 4. deep links, and the affordance that must not open nothing ----------

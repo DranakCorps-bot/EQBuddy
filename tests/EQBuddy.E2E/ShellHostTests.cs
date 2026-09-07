@@ -689,14 +689,16 @@ public class ShellHostTests
         app.Launch();
 
         app.WaitForDump("shellPage", "home", "the shell to land on the Home room");
-        // Three dumps reported on: bags, achievements, factions.
-        Assert.Equal(3, app.DumpValue("shellHomeReadiness"));
-        // Bags landed; the other two never have. **The equality is the assertion** — a room
+        // Four dumps reported on: bags, achievements, factions, and the optional spellbook
+        // OE-5 added — one row, in `HomeReadout.Readiness`, which is what this count is
+        // really asserting: the ONE place both hosts of that list read.
+        Assert.Equal(4, app.DumpValue("shellHomeReadiness"));
+        // Bags landed; the other three never have. **The equality is the assertion** — a room
         // that had silently lost the affordance entirely would report 0 waiting and 0
         // buttons and pass a "some are missing" check.
-        Assert.True(app.DumpValue("shellHomeReadinessWaiting") == 2,
+        Assert.True(app.DumpValue("shellHomeReadinessWaiting") == 3,
             $"the staged inventory dump was not seen; dump was: {app.Artifacts()}");
-        Assert.Equal(2, app.DumpValue("shellHomeCopyCmd"));
+        Assert.Equal(3, app.DumpValue("shellHomeCopyCmd"));
     }
 
     /// <summary>
@@ -1446,8 +1448,12 @@ public class ShellHostTests
         app.WaitForDump("shellPage", "home", "the shell to open");
         Assert.Equal(1, app.DumpValue("shellSetup"));
         Assert.Equal(1, app.DumpValue("shellSetupAuto"));
-        Assert.Equal(3, app.DumpValue("shellSetupRows"));
-        Assert.Equal(3, app.DumpValue("shellSetupCopyCmd"));
+        // FOUR since OE-5 added the optional spellbook row, and the pair of numbers is the
+        // point: Setup renders whatever `HomeReadout.Readiness` returns, so these two moved
+        // together with `shellHomeReadiness` above and no code in `SetupView` was touched.
+        // A hand-rolled second list would have left them at three (trap 33, two hosts).
+        Assert.Equal(4, app.DumpValue("shellSetupRows"));
+        Assert.Equal(4, app.DumpValue("shellSetupCopyCmd"));
         // The room underneath is still the room: Setup is a layer over it, not a navigation.
         app.WaitForDump("shellPage", "home", "the room under the screen to be untouched");
     }
@@ -1476,7 +1482,8 @@ public class ShellHostTests
         app.Launch();
 
         app.WaitForDump("shellPage", "home", "the shell to open");
-        Assert.True(app.DumpValue("shellHomeReadinessWaiting") == 2,
+        // Three of four still waiting, since OE-5's optional spellbook row joined the list.
+        Assert.True(app.DumpValue("shellHomeReadinessWaiting") == 3,
             $"the staged inventory dump was not seen; dump was: {app.Artifacts()}");
         Assert.Equal(0, app.DumpValue("shellSetupAuto"));
         Assert.Equal(0, app.DumpValue("shellSetup"));
@@ -1529,7 +1536,7 @@ public class ShellHostTests
         app.WaitForDump("shellSetup", 1, "the hook to open the first-run screen");
         Assert.Equal(0, app.DumpValue("shellSetupAuto"));
         Assert.Equal(1, app.DumpValue("shellSetupDismissed"));
-        Assert.Equal(3, app.DumpValue("shellSetupCopyCmd"));
+        Assert.Equal(4, app.DumpValue("shellSetupCopyCmd"));
     }
 
     /// <summary>

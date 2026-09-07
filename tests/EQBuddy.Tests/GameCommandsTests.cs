@@ -91,7 +91,7 @@ public class GameCommandsTests
             "the Unlocks tab's race progress is faction standings, which the log never sees"),
         // E-3 PR 4's Home room. Its READINESS block exists to answer "what has EQBuddy not
         // been told yet", and every row of it that says "Not run yet" is a surface naming a
-        // command — three of them, which is why there are three rows here rather than one.
+        // command — four of them, which is why there are four rows here rather than one.
         // This is the room a brand-new player's shell OPENS on, so it is the surface where
         // an ask with no ⧉ beside it costs the most: the empty state is the only state a new
         // player sees, and it is the whole state of this block on a fresh profile.
@@ -103,7 +103,7 @@ public class GameCommandsTests
         // that ASKS is the shared row builder now: Bevel's signed ruling has Setup reuse
         // `CommandFor(OutputfileKind)` rather than grow a second switch (trap 33 with the
         // two producers being two hosts), so a copy of these rows keyed on `SetupView.cs`
-        // would be asking a file that correctly names no command to name three.
+        // would be asking a file that correctly names no command to name all of them.
         //
         // **What the move costs, said out loud: the count of HOSTS is no longer in this
         // list.** It never was the thing this rule guards — trap 34 is about a surface with
@@ -116,6 +116,19 @@ public class GameCommandsTests
             "the Achievements readiness row asks for what Sky turn-ins and raid clears read"),
         ("EQBuddy/ReadinessRows.cs", nameof(GameCommands.OutputfileFaction),
             "the Factions readiness row asks for standings the log can never see"),
+        // FOUR rows now, since OE-5 added the optional spellbook dump — and the fourth one
+        // is keyed on `ReadinessRows.cs` like the three above it rather than on the room,
+        // which is the whole promise OE-6's shared builder was written to keep: a fourth
+        // dump joins both hosts in one place and neither host's file learns a command.
+        // (It was written against `HomeRoom.cs` while OE-5 was based pre-OE-6, and rebasing
+        // over the lift is exactly the move this list exists to notice.)
+        //
+        // Its row is the one most in need of a ⧉: the other three name a command a player
+        // may have met on another surface, and this one appears nowhere else in the app at
+        // all — an ask with no way to answer it would be the whole of what a player could
+        // do about it.
+        ("EQBuddy/ReadinessRows.cs", nameof(GameCommands.OutputfileSpellbook),
+            "the Spellbook readiness row asks for the optional dump that sharpens buff countdowns"),
         ("EQBuddy/RaidsCardView.cs", nameof(GameCommands.OutputfileAchievements),
             "clears from before EQBuddy come from the achievements dump — the worked example"),
         ("EQBuddy/QuestChecklistView.cs", nameof(GameCommands.OutputfileAchievements),

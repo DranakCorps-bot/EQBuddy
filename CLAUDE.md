@@ -1853,6 +1853,30 @@ Read this list before touching the areas it names. Every entry cost a release.
     The README's "prerequisite: the exe under test" line is the same fact stated as a
     happy-path instruction; this entry is what it looks like when it bites.
 
+64. **A GATE WRITTEN AS A PROXY STOPS BEING THAT PROXY THE DAY A SECOND PRODUCER ARRIVES —
+    and the gate does not change, so nothing in the diff shows it.** `BuffTracker.OnFade`
+    learns a spell's real duration only from a cleanly identified landing, and it asked that
+    question as `Candidates.Length == 1`. That was EXACT for as long as a set of one was
+    reachable only through a cast line: one candidate *meant* "the log named this spell".
+    OE-5 taught the tracker to narrow candidates from a `/outputfile spellbook` dump, which
+    can also leave one — so with no edit to that gate, a dump-GUESSED identity would have
+    taught a real, persisted, per-character duration. **The seat's whole product lock is
+    "the spellbook is never a timer source", and this is the one route by which it becomes
+    one**, arriving through a line nobody touched.
+    → **Nothing routine sees it.** The gate compiles, reads correctly, and every existing
+    buff test passes — they were all written in the one-producer world, which is trap 49's
+    lesson (*"a test suite is only as complete as the model it encodes"*) with the missing
+    participant being a data SOURCE rather than an actor. Found by asking what the new source
+    could reach, not by a failure; the fix is `BuffState.DumpNarrowed`, prove-failed.
+    → **The general move, and it is cheap: when you add a second producer of a value, grep
+    every condition that reads that value and ask what each one MEANT when it was written.**
+    A proxy is a claim about the world that a condition happens to encode. "One candidate",
+    "no caster", "count is zero", "the list is empty" are all proxies for something, and the
+    something is usually written nowhere. Trap 20's shape once more — the thing you are
+    looking for is what is *not there*, here being the sentence that says what the test was
+    standing in for. Name the fact instead (`DumpNarrowed`, not a length), which is also
+    trap 49's *"put the participants in the test names"* one level down.
+
 ## Tooling notes that cost time when ignored
 
 - **`pwsh -NoProfile -File scripts/status.ps1`** answers "where did we leave off?" in one
