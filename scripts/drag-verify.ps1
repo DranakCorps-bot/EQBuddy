@@ -40,7 +40,10 @@ param(
     [ValidateSet('progress', 'quests', 'gearloot', 'drops', 'spawns', 'travel', 'history', 'timeline',
                  'hudrow', 'hudpanel')]
     [string] $Window = 'progress',
-    [string[]] $Tabs
+    [string[]] $Tabs,
+    # Mirror shoot.ps1 / EQBUDDY_SCREEN_FORCE: override the eqbuddy-screen.lock refusal
+    # only when the holder is known gone. Does not touch another harness's app.
+    [switch] $Force
 )
 
 $ErrorActionPreference = 'Stop'
@@ -348,6 +351,35 @@ function Drag-BottomEdge([IntPtr]$hwnd, [int]$delta) {
 $results = [Collections.ArrayList]::new()
 function Note([string]$s) { Write-Host $s; $null = $results.Add($s) }
 
+# Trap 61 — third pointer participant. shoot.ps1 and tests/EQBuddy.E2E already hold
+# %TEMP%\eqbuddy-screen.lock for exclusive desktop ownership (FABLE.md §4). This script
+# also drives the real pointer (height and park modes); without taking the same mutex it
+# is a convention with extra steps. Held for the whole run; handle dies with the process.
+$screenLockPath = Join-Path ([IO.Path]::GetTempPath()) 'eqbuddy-screen.lock'
+$screenLock = $null
+try {
+    $screenLock = [IO.File]::Open($screenLockPath, [IO.FileMode]::OpenOrCreate,
+        [IO.FileAccess]::Write, [IO.FileShare]::Read)
+}
+catch [IO.IOException] {
+    $holder = try { (Get-Content $screenLockPath -Raw -ErrorAction Stop).Trim() } catch { '(unreadable)' }
+    $msg = "Another screen job holds $screenLockPath - $holder. " +
+           "drag-verify.ps1, shoot.ps1 and the E2E suite own the desktop exclusively (FABLE.md §4; CLAUDE.md trap 61); " +
+           "running anyway kills that job's fixture app and fails a random row of BOTH batches. " +
+           "Wait for it, or pass -Force if you know the holder is gone."
+    if (-not $Force) { throw $msg }
+    Write-Warning "$msg`n-Force given; continuing."
+}
+if ($screenLock) {
+    $screenLock.SetLength(0)
+    # ASCII only, deliberately: read back by another process with Get-Content under
+    # Windows PowerShell 5.1 (ANSI code page). Trap 54 — a holder line nobody can read.
+    $stamp = [Text.Encoding]::UTF8.GetBytes(
+        "pid $PID | $(Get-Date -Format o) | scripts/drag-verify.ps1")
+    $screenLock.Write($stamp, 0, $stamp.Length)
+    $screenLock.Flush()
+}
+
 $app = $null
 try {
 if ($Mode -eq 'park') {
@@ -540,6 +572,7 @@ if ($Mode -eq 'park') {
 }
 finally {
     Stop-App $app
+    if ($screenLock) { $screenLock.Dispose() }
     Write-Host '--- SUMMARY ---'
     $results | ForEach-Object { Write-Host $_ }
 }
