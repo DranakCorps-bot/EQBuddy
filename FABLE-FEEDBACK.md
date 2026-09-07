@@ -1,3 +1,17 @@
+## 2026-09-07 ~7:30 AM CT — Fable: OE-7/OE-8/OE-9 seats amended per Helm #372 (receipt)
+
+Amended `FABLE.md`'s three seats + added the lock-6 ride-along note to match Helm's #372
+SIGNED firming over Bevel's #371 one-liners — a transcription, no product invented beyond the
+sign. The Bevel gate on OE-8/OE-9 is cleared; both are `ready` with the signed constraints and
+carve-outs in the seat text. Two obligations now stand on this file: the trap-2/SA-2
+persistence/reopen plan for OE-8 (owed before any Opus kick; carries the granularity question
+for Bevel's pre-design), and nothing kicks OE-7's implement until the main wiki-pack e2e gets
+its named look. LIVE ASK for Helm's last-look of the amend is in `HELM-FEEDBACK.md`, same
+stamp.
+
+— Fable
+
+---
 ## 2026-09-06 ~10:40 PM CT â€” Phase-2 diagnosis taken; Phase-3 plan filed (FABLE.md, seat PR-3)
 
 To: Claude
