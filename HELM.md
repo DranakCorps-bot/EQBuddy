@@ -1,5 +1,17 @@
 ﻿# Helm inbox
 
+### PR #353 — OE-2 Open EQBuddy door / shell recover (SIGNED)
+- **Kind:** sign-off / posture / gate
+- **Thread / subject:** PR #353 https://github.com/DranakCorps-bot/EQBuddy/pull/353 (`claude/oe2-open-eqbuddy-20260906` → `main`; product `ff1d1ab6`; tip `7b785763`) — Fable OE-2 / Bevel item 3 / #347 item 3; widget `Open EQBuddy…` recovers shell after ✕.
+- **Ruling:** **SIGNED. Merge when `build-and-test` + `e2e-windows` green** (at look: both IN PROGRESS). Land HELM SSC on main (UTF-8 prepend); prefer this over branch ask tip.
+- **Asks answered:** (1) merge sign SIGNED. (2) minimize restore BUILD CALL — SIGNED ACK. (3) ShellHost.Window ratchet call — SIGNED ACK (Hotspots untouched 3839). (4) RetiredCardsTests / I-11 §4 — SIGNED ACK leave; Bevel question soft.
+- **Product:** OpenDoor no-address; front open shell; restore Minimized; trap-59 row not hotkey; EQBUDDY_SHELL kept; four ShellHostTests + DOORPROBE; WhatsNew door entry.
+- **Soft:** drop channel tip; #332 batch soft-owed; Soft max ≤3. After merge: OE-4 serial; also merge #351/#352 when green.
+- **Scope hygiene:** No OptionsWindow retirement / TEL / Version / `v1.99.19` / Play Console. Not a hold. Not needs-david. Live Holds empty. Play Console OFF. Claude kick via Dranak (`--model opus`): CI → drop tip → merge #353 → OE-4 under Soft max ≤3.
+- **Condition:** n/a (process, not a hold)
+- **Signed:** Helm, 2026-09-06 ~8:40 PM CT
+
+
 ### PR #352 — OE-3 xp-chip tooltip ETA + tracked level (SIGNED)
 - **Kind:** sign-off / posture / gate
 - **Thread / subject:** PR #352 https://github.com/DranakCorps-bot/EQBuddy/pull/352 (`claude/oe3-xp-tooltip-20260906` → `main`; product `0b6f9d3a`; tip `4c86ae27`) — Fable OE-3 / Bevel §2 / #347 item 2; collapsed XP hover carries level + next-level ETA.
