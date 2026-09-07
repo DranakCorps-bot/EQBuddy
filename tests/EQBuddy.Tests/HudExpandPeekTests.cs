@@ -344,9 +344,10 @@ public class HudExpandPeekTests
     // ---------------------------------------------------------------- money ----
 
     /// <summary>The Wealth tab's four coin facts, formatted by <c>StatsSnapshot.FormatCoin</c>
-    /// so the peek and the tab cannot render one number two ways. NO gauge: this is one figure
-    /// broken into its parts, and a bar under "per hour" would compare a rate to a total.
-    /// </summary>
+    /// so the peek and the tab cannot render one number two ways. The gauge is a share of the
+    /// SESSION TOTAL (the owner's ~4:32 PM CT shot, 2026-09-07): these rows are parts of one
+    /// figure, so share-of-the-biggest — what every other peek here draws — would say a part
+    /// and its whole are equal.</summary>
     [Fact]
     public void MoneyPeek()
     {
@@ -357,8 +358,69 @@ public class HudExpandPeekTests
             body.Rows.Select(r => r.Name));
         Assert.Equal(StatsSnapshot.FormatCoin(1000), body.Rows[0].Value);
         Assert.Equal(StatsSnapshot.FormatCoin(2468), body.Rows[3].Value);
-        Assert.All(body.Rows, r => Assert.Equal(0, r.Share));
+        Assert.Equal(1000 / 1234.0, body.Rows[0].Share, 6);
+        Assert.Equal(234 / 1234.0, body.Rows[1].Share, 6);
         Assert.Contains(StatsSnapshot.FormatCoin(1234), body.Subtext);
+    }
+
+    /// <summary>The whole is a FULL bar, and the two parts fill it between them — the
+    /// relationship the gauge exists to draw. Core guarantees the arithmetic
+    /// (<c>StatsSnapshot.Copper = CorpseCopper + VendorCopper</c>), so this is the peek
+    /// agreeing with Core rather than a coincidence of one fixture.</summary>
+    [Theory]
+    [InlineData(1000, 234)]
+    [InlineData(1, 0)]
+    [InlineData(0, 5000)]
+    [InlineData(7, 7)]
+    public void MoneyPeekPartsAddUpToTheTotalBar(long looted, long vendor)
+    {
+        var total = looted + vendor;
+        var body = HudExpandPeek.Money(total, looted, vendor, perHour: total * 3);
+
+        Assert.Equal(1.0, body.Rows[2].Share);
+        Assert.Equal(1.0, body.Rows[0].Share + body.Rows[1].Share, 6);
+    }
+
+    /// <summary>Per hour is a RATE and keeps no gauge — the one row that is deliberately
+    /// empty, and the negative that stops "make the gauges draw" from being read as "give
+    /// every row a bar". Its tooltip carries the reason, because the host floors a bar at 1%
+    /// so an absent gauge is a visible stub either way.</summary>
+    [Fact]
+    public void MoneyPeekDrawsNoGaugeForARate()
+    {
+        var body = HudExpandPeek.Money(total: 1234, looted: 1000, vendor: 234, perHour: 2468);
+
+        var perHour = body.Rows[3];
+        Assert.Equal(0, perHour.Share);
+        Assert.NotNull(perHour.Tooltip);
+        Assert.Contains("rate", perHour.Tooltip, StringComparison.OrdinalIgnoreCase);
+        // And the rows that DO have a share are not empty — the bug this row's 0 is not.
+        Assert.All(body.Rows.Take(3), r => Assert.True(r.Share > 0));
+    }
+
+    /// <summary>The percentage a row's hover states is the percentage its bar draws — one
+    /// producer for both, so a tooltip can never disagree with the gauge beside it (trap 4).
+    /// </summary>
+    [Fact]
+    public void MoneyPeekTooltipsStateTheShareTheBarDraws()
+    {
+        var body = HudExpandPeek.Money(total: 1000, looted: 750, vendor: 250, perHour: 4000);
+
+        Assert.Contains("75%", body.Rows[0].Tooltip);
+        Assert.Contains("25%", body.Rows[1].Tooltip);
+    }
+
+    /// <summary>A caller that hands over parts exceeding the whole gets a clamped bar rather
+    /// than one drawn past its own track. Core cannot produce this today; a bar is drawn from
+    /// whatever it is handed, and a second producer of these four longs is exactly the kind of
+    /// thing nobody notices until it is in a screenshot.</summary>
+    [Fact]
+    public void MoneyPeekClampsAShareThatWouldOverflowItsTrack()
+    {
+        var body = HudExpandPeek.Money(total: 100, looted: 400, vendor: -20, perHour: 0);
+
+        Assert.Equal(1.0, body.Rows[0].Share);
+        Assert.Equal(0.0, body.Rows[1].Share);
     }
 
     /// <summary>The per-item breakdown stays in the WINDOW (the negative): the peek is
