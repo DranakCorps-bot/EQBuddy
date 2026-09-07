@@ -54,6 +54,46 @@ public static class SingleInstance
         }
     }
 
+    /// <summary>
+    /// Is a live EQBuddy holding <paramref name="profileDir"/> right now?
+    ///
+    /// **Asked by the v1 profile IMPORT, and the reason it lives here is trap 4.** The lock
+    /// is a file with a name, and <c>Core.ProfileImport</c> needs to know whether v1 is
+    /// running before it copies a profile that v1 writes whole-file and unflushed (trap 65,
+    /// on a binary that is frozen and cannot be fixed). Core cannot reference this
+    /// assembly, so the choice was a second spelling of <see cref="LockFileName"/> over
+    /// there or this method here — and two spellings of one filename is one entry with two
+    /// sources for one fact, which would agree until the day one of them moved.
+    ///
+    /// **It answers NO on anything unexpected, and that is the safe direction for its ONE
+    /// caller and would be the wrong one for a different caller.** A profile we cannot
+    /// probe is reported as free, which for the import means the copy goes ahead and its
+    /// own file reads fail loudly; if this ever gains a caller for which "held" is the safe
+    /// answer, it needs its own method rather than a flag. Note the asymmetry with
+    /// <see cref="TryClaim"/>, which treats the same unexpected failure as "claimed" —
+    /// there, never blocking a launch is what matters.
+    /// </summary>
+    public static bool IsHeldByAnotherCopy(string profileDir)
+    {
+        var path = Path.Combine(profileDir, LockFileName);
+        try
+        {
+            if (!File.Exists(path)) return false;
+            // The same share mode the holder took. Opening succeeds iff nobody holds it.
+            using var probe = new FileStream(path, FileMode.Open, FileAccess.ReadWrite,
+                FileShare.None);
+            return false;
+        }
+        catch (IOException)
+        {
+            return true;    // held, or a filesystem that refuses to lock
+        }
+        catch (Exception)
+        {
+            return false;
+        }
+    }
+
     private static readonly IDisposable AlwaysClaimed = new NoLock();
 
     private sealed class NoLock : IDisposable

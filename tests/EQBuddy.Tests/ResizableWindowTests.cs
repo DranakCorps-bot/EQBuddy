@@ -143,6 +143,11 @@ public class ResizableWindowTests
             // to remember.
             "HudChipRowWindow", "HudExpandWindow", "MainWindow", "TutorialWindow",
             "WhatsNewWindow", "FeedbackWindow", "CompanionWindow", "TextProbeWindow",
+            // The one-time EQBuddy 1.x import question (TR-1). A startup MODAL, built in
+            // code, that asks one thing and closes — it is SizeToContent.Height over a
+            // fixed column, so there is no size for a player to choose and none to
+            // remember. It is also shown before any settings exist to persist one in.
+            "ProfileImportWindow",
             // Not a window: the helper that ASSIGNS ResizeMode for the ones above.
             "WindowZoom",
         };

@@ -98,6 +98,59 @@ public partial class App : Application
             Shutdown();
             return;
         }
+        // The design tokens (type roles, spacing, radii, control sizes) composed from
+        // EQBuddy.UI.Shared.DesignTokens. Static — a theme switch repaints, it does not
+        // re-scale — so this is merged once rather than swapped like the palette, and it
+        // must land before any window is built: Theme.xaml's Eq* components resolve their
+        // sizes out of it.
+        //
+        // **It sits ABOVE the settings load since TR-1**, because the profile-import
+        // question is a window and it is asked before there are any settings to load. It
+        // reads no setting, so nothing about the move is conditional.
+        try { Resources.MergedDictionaries.Add(DesignSystem.Tokens()); }
+        catch (Exception ex) { LogError(ex); }
+        // Bound how long a tooltip may stay up, before any window exists. WPF's own default
+        // for it is int.MaxValue ms, which overflows the int32 arithmetic behind
+        // DispatcherTimer and hands the ONE Win32 timer every DispatcherTimer on this
+        // thread shares to a due date 24 days out — killing the 1 s tick and the 50 ms
+        // Mobile pump while the window goes on painting and answering clicks. See
+        // ToolTipPolicy for the arithmetic and CLAUDE.md trap 63 for how CI caught it.
+        // Reads no setting, which is what lets it sit up here with the tokens rather than
+        // after the load.
+        ToolTipDefaults.ApplyOnce();
+        // THE ONE-TIME EQBuddy 1.x PROFILE IMPORT, and its position in this method is the
+        // design rather than an accident (Fable's transition plan §2 / TR-1).
+        //
+        // It must run BEFORE the load below, because the load is also the first SAVE — and
+        // because MainWindow's settings are a readonly field shared by reference into every
+        // view, so a settings.json arriving after it would be reverted by the app's own next
+        // write (trap 13, presenting as "the import did nothing"). Consent comes before any
+        // copy (trap 47), so the question is asked here too. See ProfileImportStartup: on
+        // any profile that is not this product's own — every test, every shot, every E2E
+        // run — it does nothing at all.
+        if (!probing)
+            ProfileImportStartup.AskAndImport(this, prepareForDialog: legacyTheme =>
+            {
+                // A palette, so the question is READABLE — Theme.xaml resolves every colour
+                // through DynamicResource against a palette dictionary that is still the
+                // empty placeholder at this point in startup, and an unresolved
+                // DynamicResource is not an error, it is a black-on-transparent window.
+                //
+                // It is the SOURCE profile's theme where there is one: ThemeManager.Apply
+                // needs settings and this runs in front of the load, so the player's own
+                // EQBuddy 1.x is the only place a palette can honestly come from at this
+                // moment — and it is the right one, on a screen whose whole job is to say
+                // "you already have EQBuddy 1.x". Falls back to the default; an unknown
+                // name falls through ThemeManager's own fallback. Passed as a callback
+                // rather than run above, so a launch with nothing to ask pays nothing.
+                try
+                {
+                    var forDialog = new Core.AppSettings();
+                    if (legacyTheme is { Length: > 0 }) forDialog.Theme = legacyTheme;
+                    ThemeManager.Apply(forDialog);
+                }
+                catch (Exception ex) { LogError(ex); }
+            });
         // The probe runs WITHOUT the single-instance lock, so it must not write: Load
         // persists migrations and generated rule ids, which is a whole-file Save under a
         // live widget — trap 13 exactly. Narrow (only when the probe exe is newer than the
@@ -111,15 +164,6 @@ public partial class App : Application
         // load; it must still come before any window is constructed, and MainWindow is
         // built at the bottom of this method.
         WineText.ApplyIfNeeded(settings);
-        // And on every platform: bound how long a tooltip may stay up. WPF's own default
-        // for it is int.MaxValue ms, which overflows the int32 arithmetic behind
-        // DispatcherTimer and hands the ONE Win32 timer every DispatcherTimer on this
-        // thread shares to a due date 24 days out — killing the 1 s tick and the 50 ms
-        // Mobile pump while the window goes on painting and answering clicks. See
-        // ToolTipPolicy for the arithmetic and CLAUDE.md trap 63 for how CI caught it.
-        // Reads no setting, so it could sit higher up; it is here because it belongs to
-        // the same "decide it once, before any window exists" group as the two above.
-        ToolTipDefaults.ApplyOnce();
         // Under Wine only, and only when opted in: float the widget over a fullscreen
         // game and stop clicks from foregrounding the Wine process — see WineOverlay.cs.
         // Inert on Windows and off by default.
@@ -129,14 +173,9 @@ public partial class App : Application
         // us — WPF queues a StartupUri window's construction independently of OnStartup, so
         // it could still land even after the ClaimSingleInstance() bailout above, crashing
         // on a theme that was never applied. Building it explicitly here, only on the
-        // success path, closes that race.
-        // The design tokens (type roles, spacing, radii, control sizes) composed from
-        // EQBuddy.UI.Shared.DesignTokens. Static — a theme switch repaints, it does not
-        // re-scale — so this is merged once here rather than swapped like the palette,
-        // and it must land before any window is built: Theme.xaml's Eq* components
-        // resolve their sizes out of it.
-        try { Resources.MergedDictionaries.Add(DesignSystem.Tokens()); }
-        catch (Exception ex) { LogError(ex); }
+        // success path, closes that race. (The design tokens are merged at the top of this
+        // method since TR-1 — see the note there. This is the PLAYER'S palette landing over
+        // whatever the import question was drawn in.)
         try { ThemeManager.Apply(settings); }
         catch (Exception ex) { LogError(ex); }
         DispatcherUnhandledException += (_, args) =>

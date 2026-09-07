@@ -1,5 +1,6 @@
 using System.Windows;
 using System.Windows.Controls;
+using EQBuddy.Core;
 using EQBuddy.UI.Shared;
 using Role = EQBuddy.UI.Shared.DesignTokens.TypeRole;
 using Tok = EQBuddy.UI.Shared.DesignTokens;
@@ -47,6 +48,7 @@ internal sealed class SetupView
 
     private IReadOnlyList<ReadinessRow> _rows = [];
     private int _copyCommands;
+    private bool _importReported;
 
     public UIElement Body => _body;
 
@@ -84,6 +86,8 @@ internal sealed class SetupView
         _body.Children.Add(head);
         _body.Children.Add(Line(SetupReadout.Lead, Role.Body, Tok.SpaceS));
 
+        AddImportReport();
+
         _body.Children.Add(CardParts.BlockLabel(SetupReadout.RowsHeadline, hidden: false));
         foreach (var row in _rows)
         {
@@ -102,6 +106,39 @@ internal sealed class SetupView
         // player wants to know BEFORE they press it, and a tooltip is read by nobody who is
         // already reaching for the mouse.
         _body.Children.Add(Line(SetupReadout.ReopenNote, Role.Metadata, Tok.SpaceXs));
+    }
+
+    /// <summary>
+    /// **What the v1 profile import brought over, and the start-fresh alternative beside
+    /// it** — Fable's transition plan §2 (TR-1). Setup is where the plan puts it, and the
+    /// reason is trap 43: the copy happens at startup, before <c>AppSettings.Load</c> and
+    /// before any window exists, so an import that reported nowhere would be
+    /// indistinguishable from an import that never ran — which is the exact defect the
+    /// achievements dump shipped with for two days.
+    ///
+    /// **Read off the MARKER, not off a variable the importer kept.** The marker is the
+    /// record and the idempotence key; reading it here is what lets the report survive the
+    /// launches after the one that did the copying, and it is the same file
+    /// <c>ProfileImport</c> writes last.
+    ///
+    /// **ABOVE the rows** (trap 44): a report about something that just happened, appended
+    /// after a list, is below the fold — and the Raids import report proved that by
+    /// rendering correctly behind a scrollbar on a surface nobody scrolls.
+    /// </summary>
+    private void AddImportReport()
+    {
+        _importReported = false;
+        if (ProfileImport.ReadMarker(AppPaths.Dir) is not { } marker) return;
+        _importReported = true;
+
+        _body.Children.Add(CardParts.BlockLabel(
+            ProfileImportReadout.ReportHeadline(marker), hidden: false));
+        var line = Line(ProfileImportReadout.Report(marker), Role.Body, Tok.SpaceXxs);
+        // Ink by what it SAYS: an import that landed is good news, a start-fresh is a
+        // statement of fact rather than a success.
+        line.Ink(marker.Decision == "imported" ? "GoodBrush" : "TextBrush");
+        _body.Children.Add(line);
+        _body.Children.Add(Line(ProfileImportReadout.ReportUndo, Role.Metadata, Tok.SpaceXxs));
     }
 
     private static TextBlock Line(string text, Role role, double top)
@@ -124,6 +161,12 @@ internal sealed class SetupView
     /// would report zero buttons and agree with a "no missing affordance" reading perfectly
     /// (trap 39).
     /// </summary>
+    /// <remarks><c>setupImportReport</c> is the same kind of row as <c>setupCopyCmd</c> and
+    /// for the same reason: a source scan can prove this file MENTIONS the import marker,
+    /// and only a launched app can say the block was drawn — an absent control photographs
+    /// as an unremarkable panel (trap 29), and this one is the only place a player is ever
+    /// told a copy of their 1.x profile happened.</remarks>
     public string DebugFacts() =>
-        $"setupRows={_rows.Count} setupCopyCmd={_copyCommands}";
+        $"setupRows={_rows.Count} setupCopyCmd={_copyCommands} " +
+        $"setupImportReport={(_importReported ? 1 : 0)}";
 }

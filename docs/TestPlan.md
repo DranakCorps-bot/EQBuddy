@@ -562,6 +562,37 @@ new and saved defaults over it: theme, watch rules and hidden cards all reset at
 | A write leaves no `.new` behind, and is UTF-8 with no BOM | **Auto** — `ProfileJsonTornWriteTests` |
 | The AA, quest, stacking, spawn-cycle and buff-duration ledgers are written the same way — all five were corrupted alongside settings.json in the reported incident | **Auto** — covered by their own store tests through `ProfileJson`; **Manual** — republish while the app is running and check `error.log` for `0x00` |
 
+### 4d-i. Which profile, and the one-time import from EQBuddy 1.x (TR-1)
+
+**EQBuddy Evolved owns its own profile directory** — `%AppData%\EQBuddy Evolved` on the 2.x
+line, `%AppData%\EQBuddy` on 1.x. Until TR-1 that split was a property of the two local
+launch scripts rather than of the product: `AppPaths.Dir` hardcoded `"EQBuddy"`, so an
+Evolved build started any other way ran on a v1 player's profile and rewrote it on the first
+load. `EQBUDDY_APPDATA` still overrides, unchanged — it is what keeps the suite off the real
+profile — and an override that points AT the product directory (which is what
+`install-local.ps1 -Evolved` sets) is not a redirect.
+
+The import is **one-time, consented, and copies without ever moving**: `LEGACY-V1.md`'s
+"your profile is yours" made mechanical. Undo is structural — clear the Evolved profile and
+v1 still has everything — which is why there is no Undo button.
+
+| Expectation | Held by |
+|---|---|
+| The profile directory is decided by the product's major version, not by a launcher | **Auto** — `ProfileSplitTests` |
+| `EvolvedMajor` and `LegacyPlatformUpdatePolicy.WindowsOnlyMajor` are ONE number | **Auto** — `ProfileSplitTests` |
+| An isolated `EQBUDDY_APPDATA` profile is never offered an import — no test, shot or E2E run can copy a real v1 profile into a throwaway one | **Auto** — `ProfileImportTests` (unit + E2E) |
+| Consent comes before any copy; the box is opt-in and default-CHECKED (door D2's stated assumption) | **Auto** — `ProfileImportReadoutTests`; **Manual** — first run against a fake v1 profile |
+| The whole directory copies, minus a short transient exclusion list — never a hand-written include list | **Auto** — `ProfileImportTests` |
+| `instance.lock`, `show.request`, `debug.txt`, `error.log`, `door.trigger` and `*.corrupt` do not travel; `.bak` does | **Auto** — `ProfileImportTests` |
+| The running app's own transient files do not make its empty profile look occupied | **Auto** — `ProfileImportTests` |
+| A non-empty Evolved profile is refused and NAMES what is in it. There is no merge path, ever | **Auto** — `ProfileImportTests` (unit + E2E) |
+| A running EQBuddy 1.x refuses the import, says so by name, and does NOT spend the one-time offer | **Auto** — `ProfileImportTests`, driven against the real `SingleInstance` lock |
+| The copy is staged, the copied `settings.json` is parsed, and only then committed — a corrupt source aborts the whole import and leaves the offer open | **Auto** — `ProfileImportTests` |
+| The marker is written LAST, and is what makes the offer one-time — for a decline as well as an import | **Auto** — `ProfileImportTests` |
+| The v1 profile is byte-for-byte unchanged afterwards | **Auto** — `ProfileImportTests` (unit + E2E) |
+| The import runs at startup BEFORE `AppSettings.Load`, so the app's own first save cannot revert it | **Auto** — `ProfileImportTests` (E2E: the app only replays the fixture if the imported settings are the ones it loaded) |
+| What came over is REPORTED on the first-run Setup screen, above the rows, with the start-fresh alternative beside it | **Auto** — `ImportReportReachesASurfaceTests`, E2E `shellSetupImportReport`; **Shot** — `import-consent` |
+
 ## 4c. Alert sounds
 
 Which clip an alert plays, and at what volume, is decided in `UI.Shared/AlertSoundPlan.cs`
