@@ -1,3 +1,21 @@
+## 2026-09-07 ~6:50 AM CT — PR #369 Fable owner-lock seats OE-7/OE-8/OE-9 (SIGNED; #351 close WITHOUT merge)
+
+- **When / who:** 2026-09-07 ~6:50 AM CT — Helm last-look (webhook LIVE ASK tip `d80d74b4`).
+- **Thread / subject:** PR #369 https://github.com/DranakCorps-bot/EQBuddy/pull/369 (`claude/fable-owner-next-pass-seats-20260907` → `main`) — Fable names OE-7 toast kill, OE-8 park-anywhere, OE-9 expand-for-all; supersedes OE-1b #351.
+- **Ruling:** **SIGNED.** OE-7 ready (implement gated on main e2e named look). OE-8/OE-9 provisional / Bevel-gated. Lock 6 still Bevel's (Fable may name OE-10 after). **#351 close WITHOUT merge SIGNED** (trap 60(b) + superseded). Main `06e469f5` e2e-red ACK (run 34084789306 wiki-pack) — no blind re-run; OE-7 kick waits. Bevel sonnet one-liner now (locks 1–6 + four Fable Qs). Soft max ≤3: #365 + OE-7 + OE-8. Live Holds empty. Play Console OFF. Not needs-david.
+- **Claude kick via Dranak:** `--model sonnet` / `claude-sonnet-5` Bevel; soft close #351; soft merge #369/#368/#366 when green; soft main e2e diagnose.
+- **Scope hygiene:** Docs/channel. No Play Console / tag / publish / signing / prod secrets. Not a hold.
+
+---
+## 2026-09-07 ~6:40 AM CT — PR #366 owner next Evolved pass LOCK + AMEND (SIGNED)
+
+- **When / who:** 2026-09-07 ~6:40 AM CT — Helm last-look (webhook; tip `e3680dc5`).
+- **Thread / subject:** PR #366 https://github.com/DranakCorps-bot/EQBuddy/pull/366 (`channel/owner-next-evolved-pass-20260907` → `main`) — owner PRODUCT LOCK items 1–5 + AMEND item 6 (Full Options/Settings IA cleanup THIS PASS).
+- **Ruling:** **SIGNED.** Bevel one-liner first (locks 1–6) → Fable seats → Opus under Soft max ≤3. After implements + tip green: Evolved republish → ping Helm for David. **#365 OE-4 LEAVE** (spot-check ACK WrapPanel + est→hover; MW 4039 KEEP-IF-IT-FITS; merge-when-own-tip-green / no waive). **#351** fold/supersede as Fable names. **#367 soft-map VOID/CLOSED** (not a Helm sign; main e2e still red on `06e469f5`). Live Holds empty. Play Console OFF. Not needs-david.
+- **Claude kick via Dranak:** `--model sonnet` / `claude-sonnet-5` Bevel one-liner for 1–6; then Fable seats. Soft: main e2e standing fix path.
+- **Scope hygiene:** Docs/channel. No Play Console / tag / publish / signing / prod secrets. Not a hold.
+
+---
 ### PR #363 — PR-3 GearCard tick-freeze FIX (SIGNED; Phase-3 fix; rebase then merge-when-green)
 
 - **When / who:** 2026-09-06 ~10:45 PM CT — Helm last-look (webhook LIVE ASK tip `7b6cbb68`; product `d0a6d674`).
