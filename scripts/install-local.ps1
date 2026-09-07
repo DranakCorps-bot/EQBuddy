@@ -9,15 +9,17 @@
 # -Evolved is the 2.x loop, and it does NOT install. EQBuddy Evolved is under
 # construction: it builds and signs the same way, then runs PORTABLE out of dist\publish
 # against its own profile directory, so David keeps a working v1 install and an untouched
-# v1 profile the whole time it is being built. That matters because the installer uses one
-# AppId and {autopf}\EQBuddy — installing an Evolved build would REPLACE v1 in place and
-# inherit its settings.json, history.db and archives, and #158's EQBuddy.previous.exe
-# rollback gives back the binary, not the profile. It is DATA-003's intent arriving before
-# there is anything destructive to back up, and it costs one switch.
+# v1 profile the whole time it is being built.
 #
-# The heavier version — a second AppId, an "EQBuddy Evolved" install directory and its own
-# shortcut — is the right move when Evolved becomes the daily driver. Named here so the
-# next session does not re-derive it.
+# The reason for that changed on 2026-09-07 and the behaviour deliberately did not. It
+# used to be that installing an Evolved build would REPLACE v1 in place — one AppId, one
+# {autopf}\EQBuddy — and inherit its settings.json, history.db and archives. TR-2 closed
+# that: installer\EQBuddyEvolved.iss has its own AppId, its own install directory and its
+# own shortcut, so the "heavier version" this comment used to name as a future move now
+# exists and installs BESIDE v1. What keeps this loop portable is what it is FOR: a fast
+# build-and-run against an isolated profile with the shell's review door open, which is a
+# smoke rather than a deployment. Switching David's Evolved testing to an installed copy
+# is the daily-driver call, and it is his; nothing here presumes it.
 #
 # -Evolved also opens the SHELL (EQBUDDY_SHELL=1), because a local Evolved smoke that does
 # not show the thing E-3 is building is a smoke of the half that has not changed. It is a
@@ -142,12 +144,17 @@ if ($Evolved) {
     return
 }
 
-$iscc = @("$env:LOCALAPPDATA\Programs\Inno Setup 6\ISCC.exe",
-          "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe") | Where-Object { Test-Path $_ } | Select-Object -First 1
-if (-not $iscc) { throw 'Inno Setup (ISCC.exe) not found' }
-& $iscc "/DAppVersion=$version" "$repo\installer\EQBuddy.iss" | Select-Object -Last 1
-if ($LASTEXITCODE -ne 0) { throw 'installer compile failed' }
-Invoke-EqSign "$repo\dist\EQBuddySetup.exe"
-
-Start-Process "$repo\dist\EQBuddySetup.exe" -ArgumentList '/SILENT'
-Write-Host "Installer launched (/SILENT); EQBuddy relaunches itself when it finishes."
+# ---- the 1.x install loop is not on this tree --------------------------------------
+#
+# Everything above returns or throws: 2.x needs -Evolved (and -Evolved returns), and
+# -Evolved on a 1.x tree is refused. What used to be here was the v1 loop - compile
+# installer\EQBuddy.iss, sign EQBuddySetup.exe, /SILENT it - and both of those names are
+# the v1 line's, which is finished and lives on `legacy-v1` with its own copy of this
+# script and its own installer (the same reasoning that let E-2c delete release-assets.yml
+# from the mainline: a tag builds from the tag's tree). Leaving the block here after TR-2
+# renamed the .iss would have left a script pointing at a file that does not exist, which
+# is trap 53 exactly - a stale name in a harness, with no compiler to catch it.
+#
+# The throw is unreachable on this tree and is here anyway, because falling off the end of
+# a script that says it installs is a silent no-op.
+throw "EQBuddy $version is 1.x and this is the Evolved mainline: the v1 install loop lives on the ``legacy-v1`` branch, with the v1 installer. Nothing was installed."
