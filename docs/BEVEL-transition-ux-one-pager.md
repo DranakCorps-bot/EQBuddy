@@ -161,6 +161,24 @@ D1, D3, D4, D5 are untouched and not this file's business.
 
 ---
 
+## 6. HELM lock — capture theme for anything this file's copy gets staged into (teal + grey)
+
+**`HELM-FEEDBACK.md`'s OWNER LOCK (2026-09-07 ~3:45 PM CT, standing):** Evolved screenshots,
+tutorial pages, What's-new entries and `shoot.ps1` captures use **teal + grey** going forward —
+not `ParchmentBrass`, the tone every other capture in this repo has used to date. This binds
+every future staging of §1–§4's surfaces (the first-run import screen, the dual-install page,
+the release-page section) the moment any of them is captured for docs, a tutorial, or a
+What's-new entry.
+
+Nothing here is staged or re-shot in this pass — this file is copy and shape only, no
+committed images. The note exists so the next seat that stages one of these surfaces sets the
+theme **before** capture rather than after (trap 31 — a capture surface must pin its own
+theme). As of this writing `UI.Shared/DesignTokens.cs`'s `ThemePalettes` has no palette named
+for teal + grey; whoever stages first should check there and flag Helm if none exists yet
+rather than guessing at the nearest dark theme.
+
+---
+
 ## What this file is not
 
 - **Not a hold.** Nothing here restrains TR-1 or TR-2, which are `ready` on Helm's sign

@@ -1,5 +1,28 @@
 # Bevel inbox
 
+## 2026-09-07 ~3:50 PM CT — HELM OWNER LOCK folded into the transition one-pager: Evolved captures use teal + grey (not parchment/brass) (Bevel)
+
+**Priority:** docs-only amend, no code, no re-shoot, same branch/PR (#402). Folding
+`HELM-FEEDBACK.md`'s ~3:45 PM CT OWNER LOCK (standing) into `docs/BEVEL-transition-ux-one-pager.md`
+so the next seat that stages any of §1–§4's surfaces (first-run import screen, dual-install
+page, release-page section) doesn't reach for `ParchmentBrass` out of habit.
+
+**The lock:** Evolved screenshots / tutorial pages / What's-new entries / `shoot.ps1` captures
+use **teal + grey** going forward, not parchment/brass. Added as a new §6 in the one-pager,
+right before "What this file is not," so it reads alongside the surfaces it will eventually
+bind rather than living only in the mailbox.
+
+**Nothing staged or re-shot in this pass** — the one-pager is copy/shape only and carries no
+committed images, so there is nothing to re-shoot yet. The note is there so the theme gets set
+**before** the first capture of these surfaces, not corrected after (trap 31). Flagged in the
+new section: no palette named for teal + grey exists yet in `UI.Shared/DesignTokens.cs`'s
+`ThemePalettes` — whoever stages first should check and raise it to Helm rather than guess at
+the nearest dark theme.
+
+— Bevel, 2026-09-07 ~3:50 PM CT
+
+---
+
 ## 2026-09-07 ~3:15 PM CT — Ruling: the leading-article dedupe finding (`hud-expand-loot.png`) is real, small, and V0–V1 — not filed to Fable (Bevel)
 
 **Priority:** ruling only, no code in this pass (this session is docs/UX-only, per its own
