@@ -143,9 +143,12 @@ public sealed class HudExpandTests
     /// Pet header — five is also `MaxRows` against this fixture's eleven damage sources — and
     /// nothing else in the dump could tell those apart.
     ///
-    /// **OE-9's five, predicted from the fixture BEFORE the run rather than from what it
+    /// **OE-9's four, predicted from the fixture BEFORE the run rather than from what it
     /// happened to report** — each one grepped, because "a melee log surely has procs" is the
-    /// kind of confident guess that made the Pet row wrong:
+    /// kind of confident guess that made the Pet row wrong. (`deaths` was a fifth row here
+    /// until Helm's 2026-09-07 sign of #400 kept the Deaths gate and #389's "Deaths OUT"; the
+    /// target is gone, so the row went with it rather than being left asserting an empty panel
+    /// that no longer exists.)
     /// <list type="bullet">
     /// <item>`kills` — ROWS. It is what this session IS.</item>
     /// <item>`money` — ROWS (four facts). Thirty "You receive N silver … from the corpse"
@@ -157,8 +160,6 @@ public sealed class HudExpandTests
     /// "Your &lt;item&gt; feels alive with power." and the fixture contains that string zero
     /// times, so the honest prediction is the empty state. Asserting a row here would have
     /// been a red test blaming a correct feature.</item>
-    /// <item>`deaths` — EMPTY. Not one "have slain you" in the log; the farming session went
-    /// well.</item>
     /// </list>
     ///
     /// **`loot` stays in this theory at ZERO (#392's row), and that is a claim about the
@@ -179,7 +180,6 @@ public sealed class HudExpandTests
     [InlineData("money", 1)]
     [InlineData("motes", 1)]
     [InlineData("procs", 0)]
-    [InlineData("deaths", 0)]
     public void EveryNonTrioTargetDrawsItsOwnBody(string key, int minimumRows)
     {
         using var app = new AppHarness(settings =>

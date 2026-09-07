@@ -3914,7 +3914,6 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
         {
             if (ReferenceEquals(_worldWindow, w)) _worldWindow = null;
             _worldHost.WindowClosed();
-            _hudExpandBar.WorldWindowClosed();   // OE-9: the Deaths chip's pop-out lands here
         };
         _worldWindow = w;
         if (tab is { } t3) w.SetTab(t3);

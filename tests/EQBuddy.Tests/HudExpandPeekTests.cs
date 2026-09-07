@@ -384,33 +384,12 @@ public class HudExpandPeekTests
         Assert.Empty(body.Rows);
     }
 
-    // --------------------------------------------------------------- deaths ----
-
-    /// <summary>Newest first — the opposite of Core's own order for this list, and
-    /// deliberately: the death you want to read is the one that just happened. The value is a
-    /// WALL time rather than "3 minutes ago", so nothing in the signature ticks (trap 8).
-    /// </summary>
-    [Fact]
-    public void DeathsPeekPutsTheNewestFirst()
-    {
-        var at = new DateTime(2026, 9, 7, 13, 5, 0);
-        var body = HudExpandPeek.Deaths(
-            [new TimedDetail(at, "a giant spider"), new TimedDetail(at.AddMinutes(20), "a skeleton")]);
-
-        Assert.Null(body.Empty);
-        Assert.Equal(["a skeleton", "a giant spider"], body.Rows.Select(r => r.Name));
-        Assert.Equal("1:05 PM", body.Rows[1].Value);
-        Assert.All(body.Rows, r => Assert.Equal(0, r.Share));
-        Assert.Contains("2 deaths", body.Subtext);
-    }
-
-    [Fact]
-    public void DeathsPeekWithNoneSaysSo()
-    {
-        var body = HudExpandPeek.Deaths([]);
-
-        Assert.Equal("No deaths this session.", body.Empty);
-        Assert.Empty(body.Rows);
-        Assert.Contains("0 deaths", body.Subtext);
-    }
+    // ---------------------------------------------------- there is no deaths ----
+    //
+    // A `Deaths` builder was written and then STRIPPED on Helm's #400 sign (2026-09-07,
+    // "#389 Deaths OUT stands"). Its two tests went with it rather than being left asserting
+    // against a method nobody calls. The absence is stated in this file's own header and in
+    // `HudExpand`'s enum, because a builder that is missing looks identical to a builder
+    // nobody got round to (trap 20), and `HudExpandTests.EveryMiniBarCellHasAnExpansion
+    // Target` is what holds the decision as an assertion rather than as a comment.
 }
