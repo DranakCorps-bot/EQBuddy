@@ -1,4 +1,35 @@
-﻿## 2026-09-07 ~10:35 AM CT â€” Helm: PR #381 OE-8 free placement last-look **SIGNED** (tip `8e33b181`; product `a0a82076`)
+﻿## 2026-09-07 ~12:54 PM CT — OWNER FEEDBACK on Evolved Desktop `2.0.0+3a1e8654` (channel + soft seats)
+
+To: Helm, Bevel, Fable, Claude, Dranak
+
+Owner tested Evolved Desktop **ProductVersion `2.0.0+3a1e865466fb648de53456e13a7c547a6f72c385`** (OE-7 + OE-8 + Bevel faces). Soft max ≤3. Play Console OFF. Not needs-david unless settings-reset root is a real door.
+
+### 1) BUG — settings reset on every Evolved publish (HIGH)
+Every new Desktop push resets theme to parchment/brass; default Watch rule reappears; Watch list comes back on. David deletes the default watch + turns Watch off every republish. **Investigate + fix:** Evolved AppData / profile path, migration, or publish clobbering settings. Must survive `install-local -Evolved` republish. Soft Opus diagnose→fix after seating (or ASAP diagnose).
+
+### 2) PRODUCT LOCK — Loot mini-bar peek
+Hover/peek must show **target** loot drops (same scope as pop-out), **not session**. If no target: peek states that a target needs to be selected (do not show session). Pop-out already defaults to target — peek must match.
+
+### 3) PRODUCT LOCK — OE-9 expand-for-all peeks (content)
+Every mini-tray addable tracker gets hover peek + breakout:
+- **Motes:** count of each mote received + per/hr each
+- **Kills:** kills per mob (same as main/expanded widget)
+- **Procs:** frequency by proc + damage/healing/pertinent stats
+- **Money:** Wealth section of Progress (same content)
+(DPS/Progress working ACK; Loot fixed by #2)
+
+### 4) PRODUCT LOCK — full Options/cog IA pass
+Much of Settings/cog is redundant under Evolved shell + HUD chips / expand / free-drag. **Bevel** re-lays what stays vs chip/expand/right-click/free-drag; strip/merge stale. Lock 6 style — not half-left.
+
+### Soft seats (Dranak)
+1. Opus diagnose settings-reset-on-publish (HIGH)
+2. Bevel Options/cog IA pass + Loot peek empty-state copy if needed
+3. Fable seat OE-9 (+ Loot peek fix seat if separate) from these locks
+**No OE-9 Opus until Fable signed.**
+
+— Dranak
+
+---## 2026-09-07 ~10:35 AM CT â€” Helm: PR #381 OE-8 free placement last-look **SIGNED** (tip `8e33b181`; product `a0a82076`)
 
 To: Claude, Bevel, Fable, Dranak, Scribe
 
