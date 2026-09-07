@@ -69,6 +69,11 @@ internal sealed class HudExpandBar
     public bool PanelVisible => _panel is { IsVisible: true };
     public int RowCount => _panel?.RowCount ?? 0;
 
+    /// <summary>The <c>hudExpandBody</c> fact — which surface's rows the panel last drew.
+    /// See <c>HudExpandWindow.BodyKind</c>: <see cref="TargetKey"/> is the header's claim
+    /// and this is the body's, and OE-7 made them two decisions rather than one.</summary>
+    public string BodyKind => _panel?.BodyKind ?? "none";
+
     /// <summary>What the bar's chips light for: the tracker whose panel is on screen, or
     /// null. Read by <see cref="HudBarView"/> every tick, so the lit chip and the panel
     /// cannot disagree (one fact, one source — trap 4).</summary>
@@ -134,8 +139,8 @@ internal sealed class HudExpandBar
         var target = _model.Target;
         _model.PopOut();
         Apply();
-        if (target == HudExpandTarget.Progress) { _main.ShowProgressWindow(); return; }
-        _breakouts.Open(BreakoutFor(target));
+        if (BreakoutFor(target) is not { } kind) { _main.ShowProgressWindow(); return; }
+        _breakouts.Open(kind);
     }
 
     /// <summary>The Progress window closed. Lock 7's other half — the one destination that
@@ -184,13 +189,25 @@ internal sealed class HudExpandBar
 
     private void BringForward(HudExpandTarget target)
     {
-        if (target == HudExpandTarget.Progress) { _main.ShowProgressWindow(); return; }
-        _breakouts.Visible(BreakoutFor(target))?.Activate();
+        if (BreakoutFor(target) is not { } kind) { _main.ShowProgressWindow(); return; }
+        _breakouts.Visible(kind)?.Activate();
     }
 
-    /// <summary>DPS and HPS are Damage and Healing. Progress is neither and never reaches
-    /// here — <see cref="PopOut"/> and <see cref="BringForward"/> both branch on it first,
-    /// so this method has no case that could quietly re-add it to the enum.</summary>
-    private static BreakoutKind BreakoutFor(HudExpandTarget target) =>
-        target == HudExpandTarget.Hps ? BreakoutKind.Healing : BreakoutKind.Damage;
+    /// <summary>
+    /// The float a target pops to, or null for Progress — which goes to the Progress WINDOW.
+    ///
+    /// **It reads <see cref="HudExpand.BreakoutName"/> rather than deciding here**, and that
+    /// is the trap-64 fix rather than tidiness: this method used to be
+    /// <c>target == Hps ? Healing : Damage</c>, which was EXACT while the enum held Dps, Hps
+    /// and Progress — the ternary was standing in for "there are only two floats" — and
+    /// would have routed all four of OE-7's new targets to the Damage window without a
+    /// single line of it changing. The name comes from UI.Shared, where a test can hold it
+    /// against <see cref="HudExpand.TargetForBreakout"/> in both directions;
+    /// <see cref="Enum.Parse{TEnum}(string)"/> then fails loudly on a name
+    /// <c>BreakoutKind</c> does not have, instead of silently picking a default.
+    /// </summary>
+    private static BreakoutKind? BreakoutFor(HudExpandTarget target) =>
+        HudExpand.BreakoutName(target) is { } name
+            ? Enum.Parse<BreakoutKind>(name)
+            : null;
 }

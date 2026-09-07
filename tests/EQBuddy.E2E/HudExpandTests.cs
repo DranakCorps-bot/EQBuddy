@@ -113,4 +113,62 @@ public sealed class HudExpandTests
         app.WaitForDump("hudExpandPanel", 0, "no companion panel on screen");
         app.WaitForDump("hudExpandRows", 0, "and nothing drawn in one");
     }
+
+    /// <summary>
+    /// OE-7's four new targets reach the screen, on the same model as the three that shipped.
+    ///
+    /// **The panel BODY is what is asserted, not just that a panel appeared.** Each of these
+    /// four draws through a different builder — <c>LivePresentation.Meter</c> for Pet,
+    /// <c>HudExpandPeek</c> for the other three — and a target wired to the wrong body is
+    /// exactly the failure that renders perfectly and photographs as a correct screenshot of
+    /// the wrong feature (trap 24's shape one layer in). `hudExpandRows` at 1 or more tells a
+    /// drawn row from the empty state, which is the half a picture cannot settle.
+    ///
+    /// The prediction, written before it ran (trap 23) — **and the Pet row is here because it
+    /// was WRONG the first time, which is the point of writing one down.** Loot and Pet have
+    /// rows: the fixture is a melee session with 39 drops, and it has a CHARMED pet (the
+    /// `hud-expand-dps` capture carries a "Pet (Giant spider)" row, which is what settled it).
+    /// A `grep -i pet` over the fixture finds nothing but "You cannot have more than one pet
+    /// at a time" and reads as "no pet", because a pet is named rather than called one — and
+    /// that is what the first version of this test asserted. Watch and Buffs genuinely have
+    /// none: nothing is pinned in this profile and no buff is up.
+    ///
+    /// The mismatch was settled by the `hudExpandBody` fact rather than by re-reasoning
+    /// (trap 33's closing line: ship the instrument before the third theory). "Pet drew five
+    /// rows" is equally consistent with a correct Pet panel and with the Damage meter under a
+    /// Pet header — five is also `MaxRows` against this fixture's eleven damage sources — and
+    /// nothing else in the dump could tell those apart.
+    /// </summary>
+    [Theory]
+    [InlineData("loot", 1)]
+    [InlineData("pet", 1)]
+    [InlineData("watch", 0)]
+    [InlineData("buffs", 0)]
+    public void TheFourNewTargetsDrawTheirOwnBody(string key, int minimumRows)
+    {
+        using var app = new AppHarness(settings =>
+        {
+            settings.Minimized = true;
+            settings.MiniStats = ["kills"];
+            settings.DisabledBreakouts =
+                ["Damage", "Healing", "Pet", "Watch", "Loot", "Buffs"];
+            settings.DefaultRulesVersion = int.MaxValue;
+            settings.TrackedRules.Clear();
+        }, new Dictionary<string, string> { ["EQBUDDY_HUDEXPAND"] = key });
+        app.Launch();
+
+        app.WaitForDump("hudExpand", key, $"the {key} chip's panel to be the one showing");
+        app.WaitForDump("hudExpandMode", "pinned", "a click to pin rather than peek");
+        app.WaitForDump("hudExpandPanel", 1, "the companion window to be on screen");
+        // The BODY, which is the assertion the row count cannot make: "pet" and "dps" both
+        // come back with five rows against this fixture, and a panel headed "Pet damage"
+        // over the Damage meter is indistinguishable from a correct one everywhere else.
+        app.WaitForDump("hudExpandBody", key, $"the {key} panel's ROWS to be {key}'s");
+        if (minimumRows > 0)
+            app.WaitForDumpAtLeast("hudExpandRows", minimumRows,
+                $"the {key} panel to draw the fixture's rows");
+        else
+            app.WaitForDump("hudExpandRows", 0,
+                $"the {key} panel to draw its empty state — the fixture has no {key}");
+    }
 }

@@ -202,13 +202,21 @@ public class HudExpandTests
     }
 
     /// <summary>Lock 8's membership, said out loud, plus the key round trip. A key that
-    /// reads one way only is how <c>EQBUDDY_HUDEXPAND=hps</c> silently opens DPS.</summary>
+    /// reads one way only is how <c>EQBUDDY_HUDEXPAND=hps</c> silently opens DPS.
+    ///
+    /// **Seven since OE-7**, which is lock 9 arriving rather than lock 8 being broken: the
+    /// enum was always going to grow, and the four that joined are the four floating-window
+    /// kinds whose ✕ had nowhere else to record a dismissal.</summary>
     [Fact]
     public void EveryTargetHasAKeyThatReadsBackToIt()
     {
         var targets = Enum.GetValues<HudExpandTarget>();
         Assert.Equal(
-            [HudExpandTarget.Dps, HudExpandTarget.Hps, HudExpandTarget.Progress],
+            [
+                HudExpandTarget.Dps, HudExpandTarget.Hps, HudExpandTarget.Progress,
+                HudExpandTarget.Pet, HudExpandTarget.Watch, HudExpandTarget.Loot,
+                HudExpandTarget.Buffs,
+            ],
             targets);
 
         foreach (var target in targets)
@@ -238,5 +246,85 @@ public class HudExpandTests
         Assert.Contains("Progress window", HudExpand.PopOutTip(HudExpandTarget.Progress));
         Assert.Contains("floating", HudExpand.PopOutTip(HudExpandTarget.Dps));
         Assert.Contains("floating", HudExpand.PopOutTip(HudExpandTarget.Hps));
+    }
+
+    /// <summary>
+    /// **THE OE-7 SEAT, AS ONE ASSERTION: every floating-window kind has a chip, and every
+    /// chip knows which window it pops to.**
+    ///
+    /// It is the premise the transient ✕ is built on. A ✕ that stops writing
+    /// <c>DisabledBreakouts</c> is safe exactly as long as the kind it closed can be summoned
+    /// back from the bar; a kind that answered <see cref="HudExpand.TargetForBreakout"/> with
+    /// null would be a float with no door, which is discussion #45's whack-a-mole reached from
+    /// the other direction. Nothing else in the repo can say this: the enum lives in the WPF
+    /// layer, which has no unit tests, so the membership is read out of it by reflection here
+    /// rather than typed out again.
+    ///
+    /// The pairing is asserted in BOTH directions on purpose. <c>HudExpandBar</c> routes a ⧉
+    /// through <see cref="HudExpand.BreakoutName"/>, and a name that mapped forward but not
+    /// back is how a Loot chip's ⧉ opens the Damage float — a wrong window that renders
+    /// perfectly, which is what the ternary it replaced would have done for all four of
+    /// these (trap 64).
+    ///
+    /// The kinds are read out of the WPF SOURCE, the way <c>DocumentationSizeTests</c> reads
+    /// them: this project does not reference the widget (it is a Windows-only WPF exe), and a
+    /// list retyped here would stop covering the enum the day it grows, which is the one
+    /// thing trap 30 says about this exact enum.
+    /// </summary>
+    [Fact]
+    public void EveryFloatingWindowKindHasAChipAndEveryChipKnowsItsWindow()
+    {
+        var names = BreakoutKindNames();
+        Assert.Equal(["Damage", "Healing", "Pet", "Watch", "Loot", "Buffs"], names);
+
+        foreach (var name in names)
+        {
+            var target = HudExpand.TargetForBreakout(name);
+            Assert.True(target is not null,
+                $"{name} has no HUD chip to be summoned from, so its ✕ would be a one-way trap");
+            Assert.Equal(name, HudExpand.BreakoutName(target!.Value));
+        }
+
+        // Progress is the one target that is NOT a float, and the negative is what keeps the
+        // pair from going vacuous: it left BreakoutKind by a signed fold on 2026-08-25, and a
+        // BreakoutName for it would be the first step back toward reverting that.
+        Assert.Null(HudExpand.BreakoutName(HudExpandTarget.Progress));
+        Assert.Null(HudExpand.TargetForBreakout("Progress"));
+    }
+
+    /// <summary>Title, icon and pop-out tip all read ONE kind mapping, so a target cannot be
+    /// named as one surface and drawn as another. They were three parallel switches until
+    /// OE-7 — which is fine at three members and is three chances to miss one at seven.</summary>
+    [Fact]
+    public void EveryTargetsWordsAndVectorComeFromTheSameKind()
+    {
+        foreach (var target in Enum.GetValues<HudExpandTarget>())
+        {
+            var kind = HudExpand.KindOf(target);
+            Assert.Equal(BreakoutPresentation.Title(kind), HudExpand.Title(target));
+            Assert.Equal(BreakoutPresentation.Icon(kind), HudExpand.Icon(target));
+            // The fallback both of those switches carry is Damage, so a target the mapping
+            // forgot would silently answer "Your damage" with a sword on it. Only Dps may.
+            if (target != HudExpandTarget.Dps)
+                Assert.NotEqual(BreakoutPresentation.Damage, kind);
+        }
+    }
+
+    /// <summary><c>BreakoutKind</c>'s members, out of the WPF source. Same regex
+    /// <c>DocumentationSizeTests</c> uses, and it fails loudly rather than returning an empty
+    /// set if the enum moves — a scan that silently found nothing would make the assertions
+    /// above pass over zero kinds (trap 34).</summary>
+    private static string[] BreakoutKindNames()
+    {
+        var repo = Path.GetFullPath(Path.Combine(
+            AppContext.BaseDirectory, "..", "..", "..", "..", ".."));
+        var source = File.ReadAllText(
+            Path.Combine(repo, "src", "EQBuddy", "BreakoutWindow.xaml.cs"));
+        var match = System.Text.RegularExpressions.Regex.Match(
+            source, @"enum\s+BreakoutKind\s*\{(?<members>[^}]*)\}");
+        Assert.True(match.Success,
+            "BreakoutKind is no longer declared in EQBuddy/BreakoutWindow.xaml.cs");
+        return [.. match.Groups["members"].Value
+            .Split(',').Select(p => p.Trim()).Where(p => p.Length > 0)];
     }
 }

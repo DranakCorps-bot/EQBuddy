@@ -180,4 +180,58 @@ public sealed class HudBarTests
         app.AppendLogLines("You have gained a level! Welcome to level 12!");
         app.WaitForDump("hudXpLevel", 12, "the announced level to reach the hover");
     }
+
+    /// <summary>
+    /// THE BUFF SET GETS A CELL (OE-7), and it is the only one on this bar that
+    /// <c>MiniBarPresentation</c> does not know about.
+    ///
+    /// "buffs" has always been a valid <c>MiniStats</c> key that gated the Buff set window
+    /// and drew nothing — <c>MiniBarPresentation.Order</c> says so in its own comment — so
+    /// that window's only doors were the Settings tick and an opt-in double-click on a chip
+    /// that did not exist. **The seat could not make the ✕ transient without giving it one**
+    /// (trap 59: a Settings row is not a door either, and a float with no way back is
+    /// discussion #45 again).
+    ///
+    /// **A missing cell photographs as an unremarkable bar** (trap 29), which is why this is
+    /// an assertion and not a screenshot. The prediction, written before it ran (trap 23):
+    /// the trio is always three, "kills" is one, and "buffs" is the one under test — 5 with
+    /// it and 4 without, so the pair below fails in EITHER direction. The count does not
+    /// depend on any buff being up: the chip reads zero and is still a door.
+    /// </summary>
+    [Fact]
+    public void TheBuffStarPutsACellOnTheBarAndNothingElseDoes()
+    {
+        using var app = new AppHarness(settings =>
+        {
+            settings.Minimized = true;
+            settings.MiniStats = ["kills", "buffs"];
+            settings.DisabledBreakouts =
+                ["Damage", "Healing", "Pet", "Watch", "Loot", "Buffs"];
+            settings.DefaultRulesVersion = int.MaxValue;
+            settings.TrackedRules.Clear();
+        });
+        app.Launch();
+
+        app.WaitForDump("hudCells", 5, "the trio, the kills cell and the buff set's own");
+    }
+
+    /// <summary>The other half of the pair above, and the reason it is a separate launch: a
+    /// single count can be reached by a bar that draws the buff cell unconditionally, which
+    /// would put a stat on the HUD of every player who never asked for it.</summary>
+    [Fact]
+    public void WithoutTheBuffStarThereIsNoBuffCell()
+    {
+        using var app = new AppHarness(settings =>
+        {
+            settings.Minimized = true;
+            settings.MiniStats = ["kills"];
+            settings.DisabledBreakouts =
+                ["Damage", "Healing", "Pet", "Watch", "Loot", "Buffs"];
+            settings.DefaultRulesVersion = int.MaxValue;
+            settings.TrackedRules.Clear();
+        });
+        app.Launch();
+
+        app.WaitForDump("hudCells", 4, "the trio and the kills cell, and no buff cell");
+    }
 }

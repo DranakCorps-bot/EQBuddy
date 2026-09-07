@@ -363,6 +363,31 @@ internal static class WidgetDump
                     $"hudExpandMode={w._hudExpandBar.ModeKey} " +
                     $"hudExpandPanel={(w._hudExpandBar.PanelVisible ? 1 : 0)} " +
                     $"hudExpandRows={w._hudExpandBar.RowCount} " +
+                    //   hudExpandBody  WHICH surface's rows are under that header. The
+                    //                  header is the target's; the rows are whichever
+                    //                  builder Render picked, and OE-7 turned that from a
+                    //                  two-way pick into a seven-way one. A panel titled
+                    //                  "Pet damage" over the Damage meter is right on
+                    //                  screen, right in a screenshot and right on every
+                    //                  count — trap 24's "a title is not an identity" one
+                    //                  layer in.
+                    $"hudExpandBody={w._hudExpandBar.BodyKind} " +
+                    // THE TRANSIENT CLOSE (OE-7), and it takes TWO keys because the whole
+                    // seat is that one of them stopped moving when the other one does.
+                    //
+                    //   breakoutsClosed    floats the ✕ has closed THIS RUN. In memory,
+                    //                      never persisted.
+                    //   breakoutsDisabled  entries in AppSettings.DisabledBreakouts, which
+                    //                      Options is now the only writer of.
+                    //
+                    // A ✕ that raised the first and left the second alone is the claim, and
+                    // it is a claim about what did NOT happen — so it needs a number that is
+                    // read on the same tick as the one that DID (trap 62). Counting the
+                    // setting rather than naming the kinds is deliberate: the assertion is
+                    // "no write reached it", and a count of 1 against a seeded 1 says that in
+                    // a way a list a test would have to spell out does not.
+                    $"breakoutsClosed={w._breakoutHost.ClosedCount} " +
+                    $"breakoutsDisabled={w._settings.DisabledBreakouts.Count} " +
                     // THE ONE CHIP ROW (Surface A / SA-2). Four keys, because the fold has
                     // four separable ways to go wrong and a single "is the row up" could
                     // not tell them apart: the row's presence, each family's contribution,

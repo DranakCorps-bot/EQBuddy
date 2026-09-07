@@ -40,6 +40,7 @@ internal sealed class HudBarView
     private readonly Action _openProgress;
     private readonly HudExpandBar _expand;
     private readonly Func<int?> _trackedLevel;
+    private readonly Func<int> _activeBuffs;
 
     // Double-click state for the breakout chips, at the level of THIS view rather than of
     // an element: the chips are rebuilt every tick, so a rebuild landing between the two
@@ -92,10 +93,15 @@ internal sealed class HudBarView
     /// <paramref name="cuesDue"/> is: the bar cannot derive it from a snapshot — the ledger
     /// is the half that survives a restart and a truncated log — and reaching for the
     /// widget's store from here would put a service on a view that has none.</param>
+    /// <param name="activeBuffs">How many buffs are up right now (OE-7's Buffs chip). Handed
+    /// in for a reason the other two do not share: there is NO buff state on
+    /// <see cref="StatsSnapshot"/> at all, so unlike every other cell this one cannot be
+    /// formatted by <see cref="MiniBarPresentation"/> — which is also why "buffs" has never
+    /// had a row in that table.</param>
     public HudBarView(Panel host, AppSettings settings,
         Func<DateTime, IReadOnlyDictionary<string, DateTime>> cuesDue,
         Action<BreakoutKind> toggleBreakout, Action openProgress, HudExpandBar expand,
-        Func<int?> trackedLevel)
+        Func<int?> trackedLevel, Func<int> activeBuffs)
     {
         _host = host;
         _settings = settings;
@@ -104,6 +110,7 @@ internal sealed class HudBarView
         _openProgress = openProgress;
         _expand = expand;
         _trackedLevel = trackedLevel;
+        _activeBuffs = activeBuffs;
     }
 
     /// <summary>One mini-dashboard stat (2026-08-11, take two — David: no ovals):
@@ -111,25 +118,27 @@ internal sealed class HudBarView
     /// a thin hairline divider rather than any chip chrome. A counting-down watch
     /// rule still announces itself by color alone. A chip whose stat has a breakout
     /// window takes a double-click to toggle it.</summary>
-    /// <summary>
-    /// <paramref name="onDoubleClick"/> is what the gesture DOES, and it is pluggable because
-    /// not every chip toggles a breakout any more: the xp chip opens the Progress WINDOW, which
-    /// has the tabs (Bevel's fold, Helm-signed — "reuse existing theme window on current tab …
-    /// retire tab-less 272×135 float"). The gesture is keyed on <paramref name="clickKey"/>
-    /// rather than on a BreakoutKind so a chip with no breakout can still own a double-click.
-    /// </summary>
-    private StackPanel Chip(string iconName, string value, string valueBrush, string? edgeBrush = null,
-        BreakoutKind? breakout = null, string? clickKey = null, Action? onDoubleClick = null,
-        string? doubleClickHint = null)
+    /// <param name="expand">When set, the cell is an expansion chip on the OE-1 model —
+    /// button chrome (lock 2), peek on hover (lock 3), pin on click (lock 4) — and it
+    /// carries no hairline divider, because a button separates itself from its neighbour.
+    ///
+    /// **Every cell whose stat owns a floating window passes one, as of OE-7**, and that is
+    /// the seat rather than a flourish: the ✕ on a float stopped writing
+    /// <c>DisabledBreakouts</c>, so the chip is now the ONLY way back to a window a player
+    /// has closed. A cell that took the old opt-in double-click and no target would be a
+    /// float with no door for anyone who has never opened Settings (trap 59).</param>
+    /// <param name="tip">A hover the cell writes itself, when its title alone would not say
+    /// what the number means. The opt-in gesture is appended to it either way.</param>
+    private FrameworkElement Chip(string iconName, string value, string valueBrush,
+        string? edgeBrush = null, BreakoutKind? breakout = null,
+        HudExpandTarget? expand = null, string? tip = null)
     {
         var panel = new StackPanel
         {
             Orientation = Orientation.Horizontal,
-            Margin = new Thickness(0, 0, Tok.SpaceL, 0),
+            Margin = expand is null ? new Thickness(0, 0, Tok.SpaceL, 0) : default,
         };
-        AttachDoubleClick(panel, clickKey ?? breakout?.ToString(),
-            onDoubleClick ?? (breakout is { } bk ? () => _toggleBreakout(bk) : null),
-            doubleClickHint);
+        var act = breakout is { } bk ? () => _toggleBreakout(bk) : (Action?)null;
         // A vector, not a glyph (#148, #166): the collapsed bar is on screen the whole
         // time a player farms, and it is exactly where a box instead of a skull would go
         // unnoticed on a Wine prefix.
@@ -145,6 +154,12 @@ internal sealed class HudBarView
         };
         v.SetResourceReference(TextBlock.ForegroundProperty, edgeBrush ?? valueBrush);
         panel.Children.Add(v);
+        // A button gets no divider, and it must not get one: TrimLastDivider walks the LAST
+        // child of the last StackPanel, so a divider inside a chip would be the thing it
+        // collapsed when the bar's last cell is an expansion chip.
+        if (expand is { } target)
+            return ExpandChip(panel, target,
+                tip is { } own ? WithDoubleClick(own) : PeekTip(target), act);
         var divider = new Border
         {
             Width = 1,
@@ -155,12 +170,43 @@ internal sealed class HudBarView
         return panel;
     }
 
-    /// <summary>Give an element the bar's opt-in double-click gesture.
+    /// <summary>An expansion chip's hover text: what it is, then the gesture.
     ///
-    /// Lifted out of the chip builder in SA-1 so the always-on XP slot can carry it too:
-    /// while the widget is minimized the xp cell was the ONLY door to the Progress window,
-    /// and promoting the number must not shut a door (trap 59 — enumerate the entrances
-    /// before you subtract a surface).
+    /// **The gesture sentence is the same words for every chip on the bar**, which is lock
+    /// 9 in a tooltip — a chip that described its own private way of opening would be the
+    /// per-tracker exception the lock forbids, and there are seven of them now. The DPS and
+    /// HPS slots keep their own richer first halves (what the number MEANS) and pass a
+    /// <c>tip</c>; everything else has a title and nothing to add.</summary>
+    private string PeekTip(HudExpandTarget target) =>
+        WithDoubleClick($"{HudExpand.Title(target)} — hover to peek, click to keep it open");
+
+    /// <summary>Append the opt-in gesture, and only for players who have opted in.
+    ///
+    /// It is the sentence the deleted <c>AttachDoubleClick</c> used to carry, and it is here
+    /// rather than gone because that helper's tooltip was the ONLY place on the bar the
+    /// double-click was advertised (traps 20/26 — a fold owes an account of every control it
+    /// absorbed, and the account for this one is this method). Silent off, so a bar nobody
+    /// configured does not describe a gesture that does nothing.</summary>
+    private string WithDoubleClick(string tip) => _settings.DoubleClickChipsToggleBreakouts
+        ? tip + ", or double-click to open its window straight away"
+        : tip;
+
+    // `AttachDoubleClick` LIVED HERE AND IS GONE (OE-7), which is lock 6's sweep rather than
+    // tidying: every cell that owned a floating window is an ExpandChip now, and ExpandChip
+    // attaches the opt-in double-click itself alongside the single click. The old helper's
+    // last two callers both stopped passing it a key, so it was a method that could no longer
+    // fire — trap 43's polarity (a producer with no consumer), and the kind of thing that
+    // reads as coverage while doing nothing.
+    //
+    // **What it also carried was a SENTENCE, and that is the half a deletion loses silently**
+    // (traps 20/26): its tooltip was the only place the double-click gesture was advertised on
+    // the bar. It moved into `PeekTip`, which appends it under the same opt-in — so a player
+    // who turned the gesture on is still told about it, on the chip, where they were before.
+    //
+    // Its two hard-won notes belong to `AttachGestures` below and are stated there.
+
+    /// <summary>
+    /// **ONE mouse-down handler per element, whatever gestures it carries** (OE-1).
     ///
     /// Transparent (not null) so the gaps between glyph and value are hit-testable too.
     /// Two things conspired against WPF's own double-click here, so it is detected on the
@@ -173,17 +219,7 @@ internal sealed class HudBarView
     ///      to 1 — an intermittent miss.
     /// Keying on (key, time) at this level survives both: the panel can be replaced
     /// mid-gesture and the second click still lands. The widget is still dragged from any
-    /// non-chip part of the bar; with the opt-in off the cell stays inert and a
-    /// double-click expands the widget as before.</summary>
-    private void AttachDoubleClick(Panel element, string? key, Action? act, string? hint)
-    {
-        if (key is null || act is null || !_settings.DoubleClickChipsToggleBreakouts) return;
-        element.ToolTip = hint ?? $"Double-click to show or hide the {key} breakout";
-        AttachGestures(element, key, single: null, doubleClick: act);
-    }
-
-    /// <summary>
-    /// **ONE mouse-down handler per element, whatever gestures it carries** (OE-1).
+    /// non-chip part of the bar.
     ///
     /// WPF stops calling handlers once one sets <c>Handled</c>, including later ones on the
     /// SAME element — and this element must set it, or the bar's <c>OnDrag</c> starts a modal
@@ -281,7 +317,7 @@ internal sealed class HudBarView
     /// chrome (lock 2), peeks on hover (lock 3) and pins on click (lock 4), and it carries no
     /// hairline divider — a button separates itself from its neighbour.</param>
     private FrameworkElement GlanceSlot(string? iconName, string text, double width, string? tip,
-        string? clickKey = null, Action? onDoubleClick = null, string? doubleClickHint = null,
+        Action? onDoubleClick = null, string? doubleClickHint = null,
         HudExpandTarget? expand = null)
     {
         var panel = new StackPanel
@@ -290,7 +326,6 @@ internal sealed class HudBarView
             Margin = expand is null ? new Thickness(0, 0, Tok.SpaceL, 0) : default,
             ToolTip = expand is null ? tip : null,
         };
-        if (expand is null) AttachDoubleClick(panel, clickKey, onDoubleClick, doubleClickHint);
         if (iconName is not null)
         {
             // A vector, never a glyph (#148, #166) — same rule as the starred cells below.
@@ -314,7 +349,8 @@ internal sealed class HudBarView
         // child of the last StackPanel, so a divider inside a chip would be the thing it
         // collapsed when the bar has no starred cells at all.
         if (expand is { } target)
-            return ExpandChip(panel, target, doubleClickHint ?? tip ?? HudExpand.Title(target),
+            return ExpandChip(panel, target,
+                WithDoubleClick(doubleClickHint ?? tip ?? HudExpand.Title(target)),
                 onDoubleClick);
         var divider = new Border
         {
@@ -367,7 +403,7 @@ internal sealed class HudBarView
                 + "hover to peek, click to keep it open",
                 expand: HudExpandTarget.Hps)
             : GlanceSlot(glance.ThirdIcon, glance.ThirdText, HudGlance.MetricReservedWidth,
-                tip: null, clickKey: "xp", onDoubleClick: _openProgress,
+                tip: null, onDoubleClick: _openProgress,
                 doubleClickHint: XpTip!.Value.Text,
                 expand: HudExpandTarget.Progress));
     }
@@ -402,7 +438,31 @@ internal sealed class HudBarView
             // "reuse existing theme window on current tab … retire tab-less 272x135
             // float"). A branch for a key MiniBarPresentation.Order no longer contains
             // would be unreachable code claiming to be a feature.
-            _host.Children.Add(Chip(cell.Icon, cell.Text, "AccentBrush", breakout: breakout));
+            //
+            // OE-7: a cell whose stat owns a float is an EXPANSION chip. The target comes
+            // from HudExpand rather than from a second switch beside the one above — one
+            // fact, one source (trap 4), and it is the same table BreakoutHost's ⧉ routes
+            // through, so the chip and the pop-out cannot disagree about which window this
+            // cell means.
+            _host.Children.Add(Chip(cell.Icon, cell.Text, "AccentBrush", breakout: breakout,
+                expand: breakout is { } k ? HudExpand.TargetForBreakout(k.ToString()) : null));
+        }
+
+        // THE BUFF SET'S CHIP (OE-7), and the one cell on this bar that is not in
+        // MiniBarPresentation. "buffs" has always been a valid MiniStats key that gated the
+        // Buffs window and drew nothing — so that window's only doors were Options and an
+        // opt-in double-click on a chip that did not exist. Once the ✕ became a transient
+        // close it needed a real one (trap 59: a hotkey is not a door, and neither is a
+        // Settings tick). The count comes from the buff tracker because no snapshot field
+        // carries it; the star is unchanged, so nobody who has not asked for the window gets
+        // a new cell.
+        if (_settings.MiniStats.Contains("buffs"))
+        {
+            var up = _activeBuffs();
+            _host.Children.Add(Chip(
+                BreakoutPresentation.Icon(BreakoutPresentation.Buffs), $"{up}", "AccentBrush",
+                breakout: BreakoutKind.Buffs, expand: HudExpandTarget.Buffs,
+                tip: $"{up} buff{(up == 1 ? "" : "s")} up — hover to peek, click to keep it open"));
         }
 
         // Per-rule pins: only the rules you picked (📌 in Options), not every enabled one.
@@ -422,11 +482,17 @@ internal sealed class HudBarView
             // something is counting down, when it fires is the only thing you want to know.
             var counting = due.TryGetValue(rule.Id, out var at);
             // A counting-down chip wears the warn edge too — state has a shape.
+            //
+            // OE-7: every pinned rule's chip expands, and every one of them expands the SAME
+            // target — the Watch float is a list of all of them, so a per-rule target would
+            // be four names for one window. Lock 1 then does the rest: hovering a second
+            // rule's chip replaces the peek rather than stacking a second panel.
             _host.Children.Add(counting
                 ? Chip("Timer", $"{name} {EQBuddy.UI.Shared.Countdown.Format(at - DateTime.Now)}",
-                    "WarnBrush", edgeBrush: "WarnBrush", breakout: BreakoutKind.Watch)
+                    "WarnBrush", edgeBrush: "WarnBrush", breakout: BreakoutKind.Watch,
+                    expand: HudExpandTarget.Watch)
                 : Chip("Target", $"{name} {result?.TotalQuantity ?? 0}", "AccentBrush",
-                    breakout: BreakoutKind.Watch));
+                    breakout: BreakoutKind.Watch, expand: HudExpandTarget.Watch));
         }
 
         TrimLastDivider();

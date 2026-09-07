@@ -225,23 +225,34 @@ public class SettingsHudBlockTests
     }
 
     /// <summary>
-    /// **The renamed heading is also a ROUTE, and three surfaces print it.** "Breakout windows"
-    /// became <see cref="BreakoutPresentation.Heading"/> in this PR; the ✕ tooltip on every
-    /// floating window, the alert banner that fires when one is dismissed, and the error-log
-    /// line beside it all tell a player where to switch it back on. A heading renamed without
-    /// them is #219's mechanism inside a single sentence — the same defect SR-2 caught one PR
-    /// earlier in `GearChecklistPresentation.EmptyRoute`, which is why it was looked for.
+    /// **The renamed heading is also a ROUTE, and the ✕ tooltip prints it.** "Breakout windows"
+    /// became <see cref="BreakoutPresentation.Heading"/> in SR-3; a heading renamed without the
+    /// surface that names it is #219's mechanism inside a single sentence — the same defect SR-2
+    /// caught one PR earlier in `GearChecklistPresentation.EmptyRoute`, which is why it was
+    /// looked for.
     ///
-    /// The assertion is that the route is DERIVED, not that the three strings happen to agree
-    /// today: two hand-maintained copies of one sentence is how they agreed yesterday.
+    /// The assertion is that the route is DERIVED, not that the strings happen to agree today:
+    /// two hand-maintained copies of one sentence is how they agreed yesterday.
+    ///
+    /// **Two of the three printers are GONE (OE-7), and the const between them with it.** The
+    /// ✕ used to write <c>DisabledBreakouts</c>, so it raised an alert banner and an error-log
+    /// line telling the player where to get the window back, and all three read a
+    /// <c>ReEnableRoute</c> const. The ✕ writes nothing now — every kind has a HUD chip that
+    /// summons it — so a route promising a way BACK named a control this change replaced, which
+    /// is lock 6's sweep. What is left is one printer making a different and still-true claim:
+    /// the list is where a player stops a window opening on its own. **The derivation is the
+    /// part that had to survive**, and it is what this still holds.
     /// </summary>
     [Fact]
     public void TheReEnableRouteIsDerivedFromTheHeadingEverywhereItIsPrinted()
     {
-        Assert.Contains(BreakoutPresentation.Heading, BreakoutPresentation.ReEnableRoute,
-            StringComparison.Ordinal);
-        Assert.Contains(BreakoutPresentation.ReEnableRoute, BreakoutPresentation.DismissTip,
-            StringComparison.Ordinal);
+        Assert.Contains("Options → " + BreakoutPresentation.Heading,
+            BreakoutPresentation.DismissTip, StringComparison.Ordinal);
+        // The negative that keeps the OE-7 sweep from growing back: the ✕ is a transient
+        // close, so its tooltip must not promise a permanent one. "for good" is the exact
+        // phrase it shipped with, and it is the claim the seat deleted.
+        Assert.DoesNotContain("for good", BreakoutPresentation.DismissTip,
+            StringComparison.OrdinalIgnoreCase);
 
         // `BreakoutHost.cs`, not `MainWindow.xaml.cs`, since OE-1 (2026-09-06): the gate,
         // the ✕'s nag and the chip's toggle lifted out of the widget to pay for the mini-bar

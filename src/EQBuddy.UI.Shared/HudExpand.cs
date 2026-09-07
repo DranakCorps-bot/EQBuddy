@@ -1,10 +1,22 @@
 namespace EQBuddy.UI.Shared;
 
-/// <summary>Which tracker the mini bar is expanding. The FIRST SHIP is these three and
-/// only these three (owner lock 8, `BEVEL.md` §4 / `FABLE.md` OE-1): the owner tests the
-/// mechanics on DPS, HPS and Progress before every other tracker follows on the same
-/// pattern. Lock 9 forbids a one-off exception for any of the ones that come later, so
-/// this enum grows and nothing else about the model does.</summary>
+/// <summary>
+/// Which tracker the mini bar is expanding.
+///
+/// OE-1 shipped three (owner lock 8): the owner tested the mechanics on DPS, HPS and
+/// Progress before every other tracker followed on the same pattern. Lock 9 forbids a
+/// one-off exception for any of the ones that come later, so **this enum grows and nothing
+/// else about the model does** — which is exactly what OE-7 does to it.
+///
+/// **OE-7 adds the other four floating-window kinds, and the reason is not symmetry.** A
+/// float's ✕ used to write <c>AppSettings.DisabledBreakouts</c>, because auto-show-while-
+/// minimized was the only thing that could ever bring one back and a dismissal had nowhere
+/// else to live — that is discussion #45's whack-a-mole, solved by making the ✕ permanent.
+/// A bar chip is a SUMMON, so once every kind has one the ✕ can be a transient close and
+/// the persistent flag goes back to being what Options means by it. **A kind with no chip
+/// could not have made that trade**, which is why the four arrive together rather than one
+/// per release.
+/// </summary>
 public enum HudExpandTarget
 {
     /// <summary>The HUD glance's always-on DPS slot.</summary>
@@ -18,6 +30,24 @@ public enum HudExpandTarget
     /// 2026-08-25 by a signed fold ("reuse the existing theme window on its current tab"),
     /// and re-adding it would revert that fold.</summary>
     Progress,
+
+    /// <summary>The 🐾 pet cell, while its star is set.</summary>
+    Pet,
+
+    /// <summary>The 🎯 watch chips — one per 📌-pinned rule, all of them summoning the one
+    /// Watch window. Several chips, one target: the float is a list of every pinned rule,
+    /// so a per-rule target would be four names for one window.</summary>
+    Watch,
+
+    /// <summary>The 🎒 loot cell, while its star is set.</summary>
+    Loot,
+
+    /// <summary>The buff set. **The one kind whose chip did not exist before OE-7** —
+    /// <c>MiniBarPresentation.Order</c> has never drawn a "buffs" cell, so its window's only
+    /// door was Options plus an opt-in double-click on a chip that was not there. The chip
+    /// is drawn by <c>HudBarView</c> from the buff tracker's own count rather than from a
+    /// snapshot field, because there is no buff state on <c>StatsSnapshot</c> at all.</summary>
+    Buffs,
 }
 
 /// <summary>
@@ -102,6 +132,10 @@ public sealed class HudExpand
     {
         HudExpandTarget.Hps => "hps",
         HudExpandTarget.Progress => "progress",
+        HudExpandTarget.Pet => "pet",
+        HudExpandTarget.Watch => "watch",
+        HudExpandTarget.Loot => "loot",
+        HudExpandTarget.Buffs => "buffs",
         _ => "dps",
     };
 
@@ -112,43 +146,89 @@ public sealed class HudExpand
         "dps" => HudExpandTarget.Dps,
         "hps" => HudExpandTarget.Hps,
         "progress" or "xp" => HudExpandTarget.Progress,
+        "pet" => HudExpandTarget.Pet,
+        "watch" => HudExpandTarget.Watch,
+        "loot" => HudExpandTarget.Loot,
+        "buffs" => HudExpandTarget.Buffs,
         _ => null,
     };
 
     /// <summary>
-    /// The tracker a <c>BreakoutKind</c> member belongs to, or null for the four kinds the
-    /// bar does not expand.
+    /// The tracker a <c>BreakoutKind</c> member belongs to, or null for a name that is not
+    /// one.
     ///
     /// **Keyed by the enum member's NAME, for the reason <see cref="BreakoutPresentation"/>
     /// already gives**: the breakout enum is a WPF type, so taking it here would put a
     /// decision back inside the layer that cannot test it. Progress is deliberately absent
     /// on both sides — it left <c>BreakoutKind</c> by a signed fold on 2026-08-25.
+    ///
+    /// Since OE-7 every one of the six kinds answers, which is the whole seat: a kind with
+    /// no target here is a float whose ✕ has no way back, and that is the state the
+    /// persistent disable existed to paper over.
     /// </summary>
     public static HudExpandTarget? TargetForBreakout(string enumMemberName) => enumMemberName switch
     {
         "Damage" => HudExpandTarget.Dps,
         "Healing" => HudExpandTarget.Hps,
+        "Pet" => HudExpandTarget.Pet,
+        "Watch" => HudExpandTarget.Watch,
+        "Loot" => HudExpandTarget.Loot,
+        "Buffs" => HudExpandTarget.Buffs,
         _ => null,
+    };
+
+    /// <summary>
+    /// The inverse: the <c>BreakoutKind</c> member NAME a target pops to, or null for
+    /// Progress — which pops to the Progress WINDOW and is not a float at all.
+    ///
+    /// **It exists because the thing it replaced was a PROXY that had stopped being one**
+    /// (trap 64). <c>HudExpandBar</c> chose the float with
+    /// <c>target == Hps ? Healing : Damage</c>, which was exact while the enum held exactly
+    /// three members and silently routes Pet, Watch, Loot and Buffs to the Damage window the
+    /// moment it does not — with nothing in a diff to say so, because the line never
+    /// changes. A total mapping asserted against <see cref="TargetForBreakout"/> is the
+    /// version a new member cannot slip past.
+    /// </summary>
+    public static string? BreakoutName(HudExpandTarget target) => target switch
+    {
+        HudExpandTarget.Dps => "Damage",
+        HudExpandTarget.Hps => "Healing",
+        HudExpandTarget.Pet => "Pet",
+        HudExpandTarget.Watch => "Watch",
+        HudExpandTarget.Loot => "Loot",
+        HudExpandTarget.Buffs => "Buffs",
+        _ => null,
+    };
+
+    /// <summary>
+    /// The <see cref="BreakoutPresentation"/> kind a target's words and vector come from.
+    ///
+    /// ONE switch, so <see cref="Title"/>, <see cref="Icon"/> and <see cref="PopOutTip"/>
+    /// cannot disagree about which surface a target means (trap 4). They were three parallel
+    /// switches when the enum had three members, which is exactly how many members it takes
+    /// for three copies to look like no risk at all.
+    /// </summary>
+    public static string KindOf(HudExpandTarget target) => target switch
+    {
+        HudExpandTarget.Hps => BreakoutPresentation.Healing,
+        HudExpandTarget.Progress => BreakoutPresentation.Progress,
+        HudExpandTarget.Pet => BreakoutPresentation.Pet,
+        HudExpandTarget.Watch => BreakoutPresentation.Watch,
+        HudExpandTarget.Loot => BreakoutPresentation.Loot,
+        HudExpandTarget.Buffs => BreakoutPresentation.Buffs,
+        _ => BreakoutPresentation.Damage,
     };
 
     /// <summary>What the panel calls itself. The pop-out's tooltip names the destination in
     /// the "X is now Y" spirit — a player who pops the panel out should already know which
     /// window is about to appear.</summary>
-    public static string Title(HudExpandTarget target) => target switch
-    {
-        HudExpandTarget.Hps => BreakoutPresentation.Title(BreakoutPresentation.Healing),
-        HudExpandTarget.Progress => BreakoutPresentation.Title(BreakoutPresentation.Progress),
-        _ => BreakoutPresentation.Title(BreakoutPresentation.Damage),
-    };
+    public static string Title(HudExpandTarget target) =>
+        BreakoutPresentation.Title(KindOf(target));
 
     /// <summary>The panel header's vector — the same one the bar's own chip wears, so the
     /// panel and the chip that opened it cannot be read as two different things.</summary>
-    public static string Icon(HudExpandTarget target) => target switch
-    {
-        HudExpandTarget.Hps => BreakoutPresentation.Icon(BreakoutPresentation.Healing),
-        HudExpandTarget.Progress => BreakoutPresentation.Icon(BreakoutPresentation.Progress),
-        _ => BreakoutPresentation.Icon(BreakoutPresentation.Damage),
-    };
+    public static string Icon(HudExpandTarget target) =>
+        BreakoutPresentation.Icon(KindOf(target));
 
     /// <summary>Where ⧉ sends this tracker's detail, in words, for the pop-out's tooltip.
     /// Progress names a WINDOW rather than a float on purpose: it is a different destination

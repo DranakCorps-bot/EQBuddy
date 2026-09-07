@@ -568,10 +568,24 @@ public sealed class AppSettings
     // Breakout stat windows (BREAKOUT-*): one position + Fight/Session scope per kind.
     // They open while the widget is minimized with the matching star set.
 
-    /// <summary>Breakout kinds the player ✕-closed for good ("Damage", "Loot", …): the
-    /// star keeps its HUD cell, the window stays away until re-enabled in Options
-    /// (Frankthetankk, discussion #45 — ✕-until-next-minimize made the window a
-    /// whack-a-mole).
+    /// <summary>Breakout kinds that do NOT open by themselves while the widget is minimized
+    /// ("Damage", "Loot", …): the star keeps its HUD cell, and the window waits to be asked
+    /// for.
+    ///
+    /// **OPTIONS IS THE ONLY WRITER, as of OE-7 (2026-09-07), and that is the whole shape of
+    /// this setting now.** It used to be written by three things — the Settings tick list,
+    /// the ✕ on a float, and a HUD chip's opt-in double-click — because until every kind had
+    /// a chip to summon it back, a ✕ that did not persist was discussion #45's whack-a-mole
+    /// (Frankthetankk: the window came straight back on the next minimize). Every kind has a
+    /// chip now (<c>HudExpandTarget</c>), so the ✕ and the double-click record a transient
+    /// close in <c>BreakoutHost</c> — in memory, never here — and this list means one thing
+    /// again: "open without being asked".
+    ///
+    /// **It therefore has a writer and is not <c>DeadSettingTests</c>' problem**, which is
+    /// the outcome that seat's decomposition asked to be logged either way
+    /// (<c>DECISIONS.md</c>, 2026-09-07): retiring it with a migration was the alternative,
+    /// and it would have deleted the one deliberate persistent off-switch a player has.
+    /// Both readers are <c>BreakoutHost.AutoWants</c> and <c>SettingsHudView.BuildBreakouts</c>.
     ///
     /// **"Healing" is in the default since SA-1, and that is a preserved behaviour rather
     /// than a new opinion.** Damage and Healing used to need BOTH this list and their ★;
@@ -582,16 +596,19 @@ public sealed class AppSettings
     /// default.</summary>
     public List<string> DisabledBreakouts { get; set; } = ["Healing"];
 
-    /// <summary>Double-click a HUD chip (pet, loot, watch — and the always-on XP number,
-    /// which opens the Progress window) to open or close its window on demand. Opt-in, off
-    /// by default. While it's on, a breakout closed with its ✕ stays silent — no "hidden,
-    /// re-enable in Options" alert — because a double-click brings it right back (asked
-    /// for: pop the Loot window up only when you want it, without the nag).
+    /// <summary>Double-click a HUD chip to open or close its window in ONE gesture. Opt-in,
+    /// off by default.
     ///
-    /// dps and hps left this list in SA-1 with their chips: they are always-on HUD numbers
-    /// now, so there is no chip to double-click. Their windows are unchanged and Options →
-    /// Cards &amp; windows is their switch — which is the door a default profile has
-    /// anyway, since this gesture is off out of the box.</summary>
+    /// **It stopped being the way IN and became a shortcut, in OE-7.** Every chip on the bar
+    /// peeks its panel on hover and pins it on a click without this being on, and ↗ from
+    /// there pops the window out — so the gesture this switch buys is the same destination in
+    /// one move rather than two. It also stopped being what makes the ✕ quiet: the ✕ used to
+    /// fire a "hidden, re-enable in Options" alert UNLESS this was on, on the grounds that a
+    /// double-click could bring the window back. That is now true unconditionally, so the
+    /// alert is gone for everyone and this switch no longer has a second meaning.
+    ///
+    /// dps and hps left the HUD's star list in SA-1 but kept their chips: they are always-on
+    /// numbers in the trio, and the trio's slots expand like every other chip.</summary>
     public bool DoubleClickChipsToggleBreakouts { get; set; }
 
     public double BreakoutDamageLeft { get; set; } = double.NaN;
