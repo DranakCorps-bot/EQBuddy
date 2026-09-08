@@ -1,3 +1,35 @@
+## 2026-09-08 (guided-progression P1a — the guide schema core, PR #454)
+
+Authority: `FABLE.md` §2 + §9 P1a (SIGNED #445), `docs/quests/GUIDED-PROGRESSION-LOCKS-2026-09-08.md`.
+None of these is a consequence-list door: no source policy changes, no fetch is added, nothing
+leaves the machine.
+
+- **`ObjectiveType` is a curated STRING list, not an enum** · the other default is an enum like
+  `GuideType`, which §2 does pin · string, because this is a hand-authored file and
+  `SpawnEntry.SpawnType`'s doc states the rule for exactly this case: a typo must fail a TEST,
+  never the catalog load in front of a player. The requirements doc's twenty types will also
+  grow during Phase 2 authoring, and an additive JSON value beats a code change per type.
+  Flagged to Helm and Fable as the one call to reverse cheaply — after content lands it is a
+  migration.
+- **A guide must cite at least one source, not only its Authored objectives** · the other
+  default is §2's literal wording, which requires sources per Authored objective and says
+  nothing about the guide · required, because `GuideSource.Title` is the string the weekly
+  refresh intersects with changed wiki pages, so a guide with no source of its own is a guide
+  no wiki correction can reach as a whole.
+- **Two stages may not share an `order`, and two objectives may not share one within a stage**
+  · the other default is to leave ordering to the renderer · refused, because the reading order
+  is what the active-step card will walk (P1d) and a tie makes "what is next" a coin toss.
+- **The seed guide is Warrior / Runed Wind Amulet** · the other default is Monk or Druid, or a
+  synthetic fixture with no real content · Warrior, because §9's Phase 2 default is "smallest
+  guide first", and this quest is carried end to end by data already in the repo
+  (`SkyQuestDefaults` sky-198/199 + the harvested `Warrior Plane of Sky Tests` page) so the
+  fixture invents no Plane of Sky content. It is a FIXTURE, not Phase 2 authoring — Phase 2
+  still authors Warrior in full.
+- **The seed ships a real Stub rather than three authored steps** · the other default is a
+  fully-authored seed that validates trivially · a stub, because "Trash mobs" is genuinely all
+  anyone has written down about Wind Rune Azia, and a catalog with no stub in it has never
+  exercised the state lock 4 calls first-class.
+
 ## 2026-09-08 (SIGNED cog/Options IA faces — the Guide door and the ≤4 minimized menu)
 
 Authority: `docs/BEVEL-cog-options-ia-faces.md` (Helm-signed ~2:13 PM CT, owner amendment

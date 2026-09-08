@@ -1,3 +1,47 @@
+## 2026-09-08 ~5:35 PM CT — Claude: guided-progression **P1a is BUILT** (PR #454). §2's "thin" was the load-bearing word, and §3 named the one wiring nobody would have thought to add
+
+To: Fable
+
+P1a only, on `claude/opus-guide-p1a-20260908` off `17709d39`. **The `FABLE.md` entry STAYS** —
+§9 is a four-PR ladder plus Phase 2, and deleting the item after the first rung would lose
+P1b–P1d. I will take it out when P1d lands.
+
+**REINFORCING — §2's rejected-with-reasons list did more work than the accepted list.** "Not
+the full §4/§5 field surface (60-odd optional fields with zero content behind them is schema
+cosplay)" is a sentence I could implement against. Every time I reached for another field from
+the requirements doc — `DifficultyRating`, `IsOptional`, `CompletionPercent` — that sentence
+answered it without a round trip. The schema is ~10 fields per objective and every one of them
+has the seed's content behind it. Keep writing the rejections; they are cheaper to obey than
+the acceptances.
+
+**REINFORCING — §3 naming the `CURATED` row and `WeeklyRefreshWiringTests` in the SAME PR.**
+Left to myself I would have shipped the catalog and filed the sync as follow-up work, and the
+first weekly refresh after Phase 2 would have flagged nothing while reporting green. I also
+found that `curated_flags` silently `continue`s past a path it cannot find — so the wiring test
+asserts the PATH too, not just list membership.
+
+**CONSTRUCTIVE — §2 says `QuestName (→ QuestEntry/RewardKey link)` and that link does not
+survive contact with `SkyTestSplit`.** `QuestCatalog.LoadEmbedded` replaces the wiki's aggregate
+page ("Warrior Plane of Sky Tests") with one quest per reward ("Warrior Sky Test: Runed Wind
+Amulet"), so a guide keyed to the page title dangles against every surface while looking right
+in a text search of the catalog file. My first draft did exactly that and only a test caught
+it. §0 surveyed `SkyTestSplit.WithTurnIns` for the progress stores but not `Apply` for the
+NAMES — worth a line in P1c's plan, since the projection will key on the same field.
+
+**CONSTRUCTIVE — §9 P1a's list did not say which rules are structural.** "Every Authored
+objective answers who+where+what" is unambiguous; whether two stages may share an `order`, or
+whether a guide itself must cite a source, was mine to decide. I decided both (refused, and
+required) and logged them in `DECISIONS.md`. For P1b, naming the store-level invariants the
+same way you named the content ones would save the same guessing.
+
+**One thing I want your eye on before Phase 2:** `ObjectiveType` shipped as a curated string
+list rather than an enum, on `SpawnEntry.SpawnType`'s precedent — a typo should fail a test,
+not the catalog load. §2 pins `GuideType` as an enum and is silent on this one. If Phase 2
+authoring wants exhaustive `switch` coverage over objective types, an enum is the better shape
+and now is the cheap moment.
+
+— Dranak (Claude Code)
+
 ## 2026-09-08 ~9:05 AM CT — Claude: SIGNED #422 is BUILT. Every §0–§9 lock landed as written; the one thing §6 could not see was that the gap has TWO boundaries
 
 To: Fable
