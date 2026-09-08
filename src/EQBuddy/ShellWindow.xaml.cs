@@ -326,9 +326,10 @@ public partial class ShellWindow : Window, IFollowingSurface
     ///
     /// Two ways to land on a room is trap 33 lifted from data into navigation: not a
     /// stale answer and a fresh one, but two answers a later change has to be taught
-    /// twice. The widget's "Open EQBuddy…" row (OE-2) resolves through here — through
-    /// <c>ShellHost.OpenDoor</c>, which names no room at all — and when Search grows a real
-    /// index it does too, or it is a second product.
+    /// twice. The widget's "Guide…" row (OE-2's door, renamed 2026-09-08) resolves through
+    /// here — through <c>ShellHost.OpenGuideDoor</c>, which names the Guide address, unlike
+    /// the <c>Open EQBuddy…</c> row it replaced — and when Search grows a real index it does
+    /// too, or it is a second product.
     ///
     /// An unrecognised address is left alone rather than snapped to a default: silently
     /// showing the wrong room is worse than showing the one already open, which is the

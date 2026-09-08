@@ -128,7 +128,7 @@ internal sealed class HudExpandWindow : Window
         // before the player commits to a press.
         Cursor = Cursors.SizeAll;
         ToolTip = "Drag to place this panel anywhere. The left and right edges resize it. "
-            + "Right-click the widget → Edit HUD… → Follow the HUD again brings it back.";
+            + "The pencil on EQBuddy → Follow the HUD again brings it back.";
 
         _chrome = new Border
         {

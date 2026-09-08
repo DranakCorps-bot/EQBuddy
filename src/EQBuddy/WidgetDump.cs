@@ -557,6 +557,19 @@ internal static class WidgetDump
                     // The MODE, not the setting behind it: Edit HUD has no setting at all,
                     // it is a live state of the row window.
                     $"hudEdit={(w._hudChips is { Editing: true } ? 1 : 0)} " +
+                    // THE MODE'S ADVERTISED EXIT (faces §C, 2026-09-08) — the Done chicklet,
+                    // counted off the ROW rather than inferred from `hudEdit`. The hint text
+                    // names Done, and a hint naming a control that is not drawn is the exact
+                    // shape of the defect §C was fixing, one turn further on. It is 0 when
+                    // the mode is off, so it can be asserted in both directions.
+                    $"hudEditDone={(w._hudChips is { Editing: true } chips ? chips.DoneChicklets : 0)} " +
+                    // THE ≤1-CLICK WAY IN (faces §C) — the expanded title bar's pencil,
+                    // present, VISIBLE and enabled. The title-bar Mobile button shipped
+                    // `Visibility="Collapsed"` for six days through several releases because
+                    // an absent control photographs as an unremarkable title bar (trap 29)
+                    // and `IsEnabled=false` renders exactly like a live one (trap 17). This
+                    // is the second control on that bar to be worth the same assertion.
+                    $"titleEditHud={(w.EditHudBtn is { Visibility: Visibility.Visible, IsEnabled: true } ? 1 : 0)} " +
                     // The DATA behind the buff family, beside the family's rendered count —
                     // so "no chip because nothing is expiring" and "no chip because nothing
                     // landed" are two readings rather than one absence. Without it the
@@ -659,7 +672,7 @@ internal static class WidgetDump
                     (w._historyWindow is { IsLoaded: true } hwin ? hwin.DebugFacts() + " " : "") +
                     // THE EVOLVED SHELL'S DOOR (OE-2), and it is a fact about the widget
                     // rather than about the shell — which is why it is reported whether or
-                    // not one is open. `menuOpenShell` is 1 only when the row is present,
+                    // not one is open. `menuGuide` is 1 only when the row is present,
                     // VISIBLE and enabled: the title-bar Mobile button shipped
                     // `Visibility="Collapsed"` for six days through several releases, a
                     // compile, a test run and a diff, because an absent control photographs
@@ -667,7 +680,18 @@ internal static class WidgetDump
                     // exactly like a live control under this app's styles (trap 17). The
                     // door is the whole point of OE-2, so "it exists on a default profile"
                     // is the assertion that has to survive a later cleanup.
-                    $"menuOpenShell={(w.OpenShellItem is { Visibility: Visibility.Visible, IsEnabled: true } ? 1 : 0)} " +
+                    //
+                    // It was `menuOpenShell` until 2026-09-08, when the row it names became
+                    // `Guide…` (Bevel's cog/Options IA faces §D, owner amendment). RENAMED
+                    // rather than kept: a dump key that goes on calling a row by a name the
+                    // menu no longer uses is the next reader's wrong turn.
+                    $"menuGuide={(w.GuideItem is { Visibility: Visibility.Visible, IsEnabled: true } ? 1 : 0)} " +
+                    // THE ≤4 LOCK, MEASURED (faces §B). The count of top-level rows the menu
+                    // would show RIGHT NOW — read off each item's real `Visibility`, not
+                    // recomputed from the policy, because "the list says four" and "four
+                    // reached the screen" are different claims and only the second is the
+                    // feature (trap 42). Four while minimized, all of them while expanded.
+                    $"menuRows={MenuRows(w)} " +
                     // Times the row's handler has been driven by EQBUDDY_DOORPROBE — the
                     // suite's synchronisation point on the far side of the click, and 0 on
                     // every profile that did not ask for the probe.
@@ -748,4 +772,20 @@ internal static class WidgetDump
     private static string MutedKey(MainWindow w) => UI.Shared.HudChipRow.OrderKey(
         UI.Shared.HudChipRow.ResolveOrder(w._settings)
             .Where(family => UI.Shared.HudChipRow.IsMuted(w._settings, family)));
+
+    /// <summary>
+    /// Top-level rows the context menu would show right now — the ≤4 lock, measured
+    /// (Bevel's cog/Options IA faces §B).
+    ///
+    /// **It counts <c>Visibility</c> on the real items** rather than asking
+    /// <c>WidgetMenuPolicy</c> how many there should be. A count derived from the policy
+    /// would agree with the policy by construction and say nothing at all about the app —
+    /// trap 42, "present in the build" and "in effect at runtime" being different claims.
+    /// Separators are excluded because a rule is not a row a player can choose; they carry
+    /// the same tag and are hidden by the same pass.
+    /// </summary>
+    private static int MenuRows(MainWindow w) =>
+        w.RootBorder().ContextMenu is not { } menu ? -1
+            : menu.Items.OfType<System.Windows.Controls.MenuItem>()
+                .Count(item => item.Visibility == Visibility.Visible);
 }

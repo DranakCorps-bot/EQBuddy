@@ -150,6 +150,11 @@ public sealed class RetiredCardsTests
         var quests = OverlaySections.Retired.Single(r => r.Key == "quests");
         Assert.Equal("Quests", quests.Title);
         Assert.Equal(["Sky Quest", "Epics"], quests.Answered);
+        // Re-pointed 2026-09-08: the row it used to name ("Quests…") no longer exists, and
+        // `EveryRetiredRowNamesAContextMenuRowThatStillExists` is what would have caught it
+        // silently pointing at nothing. Pinned here as well, because that test would go on
+        // passing if this row were quietly deleted instead of repointed.
+        Assert.Equal(WidgetMenuPolicy.GuideRow, quests.MenuHeader);
 
         // "misc" is the oldest key in the file — the Travels & Deaths card's own name, kept
         // through the World fold so nobody's slot moved, and it left with the card.
@@ -184,12 +189,16 @@ public sealed class RetiredCardsTests
 
     /// <summary>
     /// The heading and the blurb are player words. The Evolved shell's rooms stay deliberately
-    /// unmentioned. The premise MOVED with OE-2 and the rule did not: the shell now has a
-    /// player door (the widget's `Open EQBuddy…` row), so "a player cannot open one" is no
-    /// longer the reason — the reason is that a retired CARD's row names the door that opens
-    /// that surface, and the shell's door opens the shell, not a room. Whether a row may name
-    /// a room reachable in two steps is Bevel's ruling to make (I-11 §4 is Helm-signed as
-    /// written); filed in `BEVEL-FEEDBACK.md` rather than decided here.
+    /// unmentioned, and the premise under that rule has now moved TWICE while the rule held.
+    ///
+    /// It was "a player cannot open a room at all" (EQBUDDY_SHELL only). OE-2 gave the shell
+    /// a door, so it became "the shell's door opens the shell, not a room". On 2026-09-08 the
+    /// owner's amendment to Bevel's cog/Options IA faces made `Guide…` open a room directly —
+    /// so that reading is spent too, and what survives is the half that was always the point:
+    /// **a line here names the DOOR a player chooses, in the words printed on the menu.**
+    /// "Room" is our word for what is behind it, and a player hunting a vanished card is
+    /// scanning for the row they have to click. The `quests` row's destination is now spelt
+    /// "the Guide" for exactly that reason.
     /// </summary>
     [Fact]
     public void TheListPointsOnlyAtDoorsAPlayerActuallyHas()

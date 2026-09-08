@@ -597,8 +597,10 @@ internal sealed class AppHarness : IDisposable
     }
 
     /// <summary>
-    /// Clicks the widget's <c>Open EQBuddy…</c> context-menu row — the OE-2 door — through
-    /// the <c>EQBUDDY_DOORPROBE</c> rendezvous, which the scenario must have asked for.
+    /// Clicks the widget's <c>Guide…</c> context-menu row — the OE-2 door — through the
+    /// <c>EQBUDDY_DOORPROBE</c> rendezvous, which the scenario must have asked for. The row
+    /// was <c>Open EQBuddy…</c> until 2026-09-08, when Bevel's cog/Options IA faces folded
+    /// it and <c>Quests…</c> into one row named for where it goes.
     ///
     /// **There is no way to press a menu row from out here, and asserting the SCREEN is
     /// forbidden anyway** (a hosted runner is 1024×768). So the app polls for this file and
@@ -606,16 +608,16 @@ internal sealed class AppHarness : IDisposable
     ///
     /// **It returns on `doorProbeClicks`, which the probe raises AFTER that handler has
     /// run** — not on the trigger file disappearing, which only says the probe SAW it. An
-    /// assertion that nothing MOVED has to be made on the far side of the decision or it
-    /// passes with the feature deleted (trap 62). A probe that was never armed times out
-    /// HERE, naming the rendezvous, rather than later as a shell that would not open.
+    /// assertion about where the door LANDED has to be made on the far side of the decision
+    /// or it passes with the feature deleted (trap 62). A probe that was never armed times
+    /// out HERE, naming the rendezvous, rather than later as a shell that would not open.
     /// </summary>
-    public void ClickOpenEqbuddyDoor()
+    public void ClickGuideDoor()
     {
         var before = DumpValue("doorProbeClicks");
         File.WriteAllText(Path.Combine(ProfileDir, "door.trigger"), "open");
         Until(() => DumpValue("doorProbeClicks") > before, AssertTimeout,
-            $"the door probe to drive the Open EQBuddy row (debug.txt doorProbeClicks past " +
+            $"the door probe to drive the Guide row (debug.txt doorProbeClicks past " +
             $"{before}; is EQBUDDY_DOORPROBE=1 set on this scenario?)");
     }
 
@@ -629,8 +631,7 @@ internal sealed class AppHarness : IDisposable
     /// screen at all. So the probe drives the same <c>HudBarReorder.Land</c> a mouse-up
     /// drives — the real write path — while the pointer arithmetic it skips
     /// (<c>MiniBarDrag.PetDropIndex</c> / <c>DropKind</c>) is unit-tested with no window.
-    /// The same split, and the same rendezvous shape, as
-    /// <see cref="ClickOpenEqbuddyDoor"/>.
+    /// The same split, and the same rendezvous shape, as <see cref="ClickGuideDoor"/>.
     ///
     /// **It returns on <c>hudPetProbeDrops</c>, which the probe raises AFTER the drop has
     /// run** — not on the trigger file disappearing, which only says the probe saw it. An

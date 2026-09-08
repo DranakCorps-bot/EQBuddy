@@ -202,14 +202,22 @@ public static class ShellPages
     };
 
     /// <summary>The rail's label. Short nouns on purpose: the rail grows DOWN, but a
-    /// long label is what forces the collapsed state early.</summary>
+    /// long label is what forces the collapsed state early.
+    ///
+    /// **<see cref="ShellPage.Quests"/> reads "Guide" since 2026-09-08** — the owner's
+    /// amendment to Bevel's cog/Options IA faces (~2:15 PM CT, on top of the ~2:13 PM CT
+    /// SIGN): the progression surface is the interactive Guide, and Quests rolls into it.
+    /// **The enum member and the wire <see cref="Key"/> did NOT move with it**, and that is
+    /// this file's own rule rather than laziness: <c>page:room</c> is persisted, arrives in
+    /// <c>EQBUDDY_SHELL</c> and in every dump the E2E suite reads, and a room the shell
+    /// re-spells is one every stored address stops finding.</summary>
     public static string Label(ShellPage page) => page switch
     {
         ShellPage.Home => "Home",
         ShellPage.Live => "Live",
         ShellPage.Progress => "Progress",
         ShellPage.Gear => "Gear",
-        ShellPage.Quests => "Quests",
+        ShellPage.Quests => "Guide",
         ShellPage.World => "World",
         ShellPage.Settings => "Settings",
         _ => "",
@@ -238,7 +246,11 @@ public static class ShellPages
         ShellPage.Live => "This sitting: damage, healing, pet, kills and what you cleared.",
         ShellPage.Progress => "Experience, wealth, faction and raid targets.",
         ShellPage.Gear => "Your bags, your wishlist, and what dropped for you.",
-        ShellPage.Quests => "Your quest tracker, Epic 1.0 and Plane of Sky.",
+        // Relabelled Guide 2026-09-08 with the room. The sentence still names the four tabs'
+        // subjects rather than the word "guide" twice: the rail's tooltip is the room's only
+        // copy once the rail collapses to icons, and a player arriving from the widget's
+        // Guide… row needs to recognise what is inside, not be told the name again.
+        ShellPage.Quests => "Every quest, your Epic 1.0 and Plane of Sky, and what is ready to turn in.",
         // Five clauses for five tabs since S2. The rail's tooltip is the room's only copy
         // once the rail collapses to icons, so a tab that arrives and is not named here is
         // a room that quietly stops describing itself.
@@ -268,8 +280,10 @@ public static class ShellPages
     /// <summary>
     /// THE ONE NAVIGATION ADDRESS, parsed. <c>progress</c> or <c>progress:raids</c> —
     /// the grammar <c>EQBUDDY_EXPAND</c> has taken since 2026-08-26, reused rather than
-    /// reinvented so the rail, the Ctrl+K palette, the widget's "Open EQBuddy…" row (OE-2)
-    /// and "Guide me there" all resolve to one destination spelling.
+    /// reinvented so the rail, the Ctrl+K palette, the widget's "Guide…" row (OE-2's door)
+    /// and "Guide me there" all resolve to one destination spelling. The row is a caller of
+    /// this grammar as of 2026-09-08 rather than a caller that deliberately passed no
+    /// address — see <c>ShellHost.OpenGuideDoor</c> for why that reversed.
     ///
     /// **Two ways to land on a room is trap 33 one level up from data into navigation**:
     /// two callers with different arguments do not produce a stale answer and a fresh

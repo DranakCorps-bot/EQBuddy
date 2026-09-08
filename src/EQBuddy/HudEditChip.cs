@@ -261,18 +261,66 @@ internal static class HudEditChip
         return button;
     }
 
+    /// <summary>
+    /// **DONE — the mode's own way out** (Bevel's cog/Options IA faces §C, Helm-signed
+    /// 2026-09-08).
+    ///
+    /// Until this landed, leaving edit mode meant the right-click and the menu row that
+    /// entered it, a second time: an asymmetric door, and the hint below was a sentence
+    /// apologising for a missing control rather than describing one. Esc does the same
+    /// thing, and so does the pencil on the expanded widget — three exits, of which this is
+    /// the only one visible from the row itself, which is why the hint names it first.
+    ///
+    /// It is drawn in the Grow/Unpark chicklet's shape rather than as a button, because the
+    /// whole mode is chicklets: a dialog-looking control here would say the row had become
+    /// a dialog. Its border is the ACCENT, like every other chicklet in the mode.
+    /// </summary>
+    public static Border Done(Action onDone)
+    {
+        var row = new StackPanel { Orientation = Orientation.Horizontal };
+        row.Children.Add(DesignSystem.InlineIconButton(
+            "Check", HudEditText.DoneTip, (_, _) => onDone(), "AccentBrush"));
+
+        var name = new TextBlock
+        {
+            Text = HudEditText.DoneLabel,
+            FontSize = 11, FontWeight = FontWeights.SemiBold,
+            VerticalAlignment = VerticalAlignment.Center,
+            Margin = new Thickness(Tok.SpaceXs, 0, Tok.SpaceXs, 0),
+        };
+        name.SetResourceReference(TextBlock.ForegroundProperty, "AccentBrush");
+        row.Children.Add(name);
+
+        var border = new Border
+        {
+            Child = row,
+            CornerRadius = new CornerRadius(7),
+            Padding = new Thickness(4, 3, 4, 4),
+            // Bottom, not right: the stack is a COLUMN (#425).
+            Margin = new Thickness(0, 0, 0, 3),
+            BorderThickness = new Thickness(1),
+            // The dump reads this (hudEditDone): a control that is the mode's advertised
+            // exit going missing is exactly the kind of absence a screenshot cannot see
+            // (trap 29), and the hint would go on naming it.
+            Tag = "done",
+            ToolTip = HudEditText.DoneTip,
+        };
+        border.SetResourceReference(Border.BackgroundProperty, "BgBrush");
+        border.SetResourceReference(Border.BorderBrushProperty, "AccentBrush");
+        return border;
+    }
+
     /// <summary>The one-line instruction that sits at the end of the edit row. Edit mode has
     /// no chrome of its own — it is the row, in place — so the sentence that says how to
     /// leave it has to be ON the row, or the mode is a state a player can enter and not
-    /// obviously exit.</summary>
+    /// obviously exit. The words are <see cref="HudEditText.Hint"/>'s, in UI.Shared, because
+    /// a hint that goes back to naming the menu row as the only exit is a regression a unit
+    /// test can refuse and the WPF layer cannot.</summary>
     public static Border Hint()
     {
         var text = new TextBlock
         {
-            Text = "Editing the HUD row — the arrows move a kind of chip up or down the "
-                 + "stack, the tick puts it on or off. \"Stack grows\" turns the whole "
-                 + "column around. Sounds and alerts are not affected. Right-click the "
-                 + "widget and choose Edit HUD… again when you are done.",
+            Text = HudEditText.Hint,
             FontSize = 11, VerticalAlignment = VerticalAlignment.Center,
             TextWrapping = TextWrapping.Wrap, MaxWidth = 320,
         };

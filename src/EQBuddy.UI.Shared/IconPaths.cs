@@ -90,6 +90,12 @@ public static class IconPaths
         ["Book"] = "M18 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2Zm0 18H6V4h1v9l2.5-1.75L12 13V4h6v16Z",
         ["Filter"] = "M10 18h4v-2h-4v2ZM3 6v2h18V6H3Zm3 7h12v-2H6v2Z",
         ["Warning"] = "M1 21h22L12 2 1 21Zm12-3h-2v-2h2v2Zm0-4h-2v-4h2v4Z",
+        // The EDIT HUD pencil (Bevel's cog/Options IA faces §C, 2026-09-08) — the widget's
+        // persistent way into placement mode. A vector, like everything else on that title
+        // bar: the one control there that shipped as an emoji rendered as an untinted
+        // dingbat while its neighbours followed the theme (#148/#166), and this bar is the
+        // surface that is always on screen.
+        ["Pencil"] = "M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25ZM20.71 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83Z",
 
         // Gate 3 (Spawns + timers). Replaces ▶ 🔔 🔕 ✕ 🗑 🕒 — and the bell pair is the
         // reason a vector set matters: an emoji bell ignores Foreground entirely, so

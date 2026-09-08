@@ -79,6 +79,14 @@ internal sealed class HudChipRowWindow : Window
     /// live path checks, set by entering the mode and cleared by leaving it.</summary>
     public bool Editing { get; private set; }
 
+    /// <summary>Done chicklets actually on the row — the <c>hudEditDone</c> dump fact
+    /// (faces §C). Counted off the PANEL, by the tag <see cref="HudEditChip.Done"/> stamps,
+    /// rather than returning 1 whenever <see cref="Editing"/> is true: identity is a
+    /// property you put on the object (trap 39), and "the mode is on" is exactly the claim
+    /// that would still be true with the exit control deleted.</summary>
+    public int DoneChicklets =>
+        _panel.Children.OfType<Border>().Count(b => b.Tag as string == "done");
+
     public HudChipRowWindow(MainWindow main, SpawnsViewModel spawns)
     {
         _main = main;
@@ -107,8 +115,8 @@ internal sealed class HudChipRowWindow : Window
         // answer at whole-box scale. Any chicklet with its own Cursor wins for its own
         // bounds; this is only what shows over the row's background.
         Cursor = System.Windows.Input.Cursors.SizeAll;
-        ToolTip = "Drag anywhere on this row to place it. Right-click the widget → "
-            + "Edit HUD… → Follow the HUD again brings it back.";
+        ToolTip = "Drag anywhere on this row to place it. The pencil on EQBuddy → "
+            + "Follow the HUD again brings it back.";
 
         // ONE COLUMN (#425, owner lock). The chicklets stack VERTICALLY — which is the shape
         // v1's two timer floats had, and the shape the owner asked for back. Nothing about an
@@ -426,6 +434,12 @@ internal sealed class HudChipRowWindow : Window
         // same kind of thing as "Follow the HUD again" beside it, not a durable preference
         // about sound or timing. One editor answers every "what did I do to my row" question.
         _panel.Children.Add(HudEditChip.Grow(GrowUp, IsParked, () => Apply(ToggleGrow)));
+        // DONE (faces §C, 2026-09-08) — the mode's own exit, beside the other verbs rather
+        // than after the paragraph, because it is a verb on the row and the paragraph is
+        // the explanation of them. It is NOT routed through Apply: Apply redraws the editor,
+        // and redrawing an editor that is being torn down would rebuild the chicklets one
+        // frame before the live row replaces them.
+        _panel.Children.Add(HudEditChip.Done(() => _main.OnEditHud(this, new RoutedEventArgs())));
         _panel.Children.Add(HudEditChip.Hint());
     }
 

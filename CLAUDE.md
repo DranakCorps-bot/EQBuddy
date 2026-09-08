@@ -403,11 +403,12 @@ Use the **question tool**, not a paragraph in a long message.
      made it a card again in 1.99 (see trap 55). **A SUBTRACTED card takes
      a SECOND list:** `OverlaySections.Retired`, keyed by the OLD TITLE,
      rendered as *"No longer on the widget"* in the same "X is now Y"
-     form, naming the CONTEXT-MENU row — a hotkey is not a door (trap 59),
-     and an Evolved room is not one either while `EQBUDDY_SHELL` is the
-     only way in. Helm signed 2026-09-05 (Bevel I-11 §4). Every future HUD
-     cut adds its row. `RetiredCardsTests` fails a row that names a card
-     which is still live.
+     form, naming the CONTEXT-MENU row — a hotkey is not a door (trap 59).
+     Helm signed 2026-09-05 (Bevel I-11 §4). Every future HUD cut adds its
+     row. `RetiredCardsTests` fails a row that names a card which is still
+     live, or one naming a menu row that is not in `MainWindow.xaml`
+     verbatim — which is what re-pointed `quests` at `Guide…` when the
+     2026-09-08 faces cut `Quests…`.
   2. **A merged card keeps the slot its parts had.**
   3. **Every card header's ↗ pops the surface out** into its own window.
 
@@ -517,8 +518,9 @@ they live on `legacy-v1`.)
 | Spawn points / timers | `Core/SpawnPointLedger.cs`, `Core/SpawnTimers.cs` |
 | Wiki lookups + contribution packs | `Core/EqlWikiMobs.cs`, `Core/WikiContribution.cs` |
 | The widget itself | `EQBuddy/MainWindow.xaml.cs` (~4.5k lines — the hotspot) |
-| Quest surface (all four tabs) | `EQBuddy/QuestsView.xaml.cs`. `QuestsWindow` is a thin host; `QuestsRoom` is the shell's. **Both build their own instance** |
-| The Evolved shell | `EQBuddy/ShellWindow.xaml.cs` + one `*Room.cs` per room; `UI.Shared/ShellPages.cs`, `ShellLayout.cs`. Player door: widget context-menu `Open EQBuddy…` through `ShellHost.OpenDoor`; `EQBUDDY_SHELL` is the review hook |
+| Quest surface (all four tabs) | `EQBuddy/QuestsView.xaml.cs`. `QuestsWindow` is a thin host; `QuestsRoom` is the shell's **Guide** room (label only — the wire key is still `quests`). **Both build their own instance** |
+| What the widget's right-click menu shows minimized | `UI.Shared/WidgetMenuPolicy.cs` — the ≤4 lock. `Tag="expanded"` in `MainWindow.xaml` hides the rest; `WidgetMenuTests` reads the XAML against the list |
+| The Evolved shell | `EQBuddy/ShellWindow.xaml.cs` + one `*Room.cs` per room; `UI.Shared/ShellPages.cs`, `ShellLayout.cs`. Player door: widget context-menu `Guide…` through `ShellHost.OpenGuideDoor` (opens the Guide room, and recovers a shell the ✕ took); `EQBUDDY_SHELL` is the review hook |
 | Auto-ticking Epic/Sky from loot, achievements import | `EQBuddy/QuestChecklistView.cs` |
 | Desktop World theme | `EQBuddy/WorldWindow.xaml.cs` |
 | Mobile server + projection | `Companion/CompanionHost.cs`, `CompanionProjection*.cs` |

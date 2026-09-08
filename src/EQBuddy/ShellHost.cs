@@ -11,11 +11,13 @@ namespace EQBuddy;
 /// decomposition budget. Opening a window the widget does not own is not window logic,
 /// the same argument <c>FollowingSurfaces</c> and <c>WidgetDump</c> already carry.
 ///
-/// **The shell's player door is the widget's context-menu row "Open EQBuddy…", and it
+/// **The shell's player door is the widget's context-menu row "Guide…", and the door
 /// landed here in OE-2** (Bevel item 3, Helm-signed #347 item 3; the decision and its
 /// reversal are both in DECISIONS.md). It used to have no door at all, deliberately: at
 /// PR 1 the rail had ONE row, Evolved was local-only, and a menu entry into a one-room
-/// shell is the unexplained-empty the Phase 2 gate forbids.
+/// shell is the unexplained-empty the Phase 2 gate forbids. The row was called
+/// "Open EQBuddy…" until 2026-09-08, when Bevel's cog/Options IA faces folded it and
+/// "Quests…" into one row named for where it goes (see <see cref="OpenGuideDoor"/>).
 ///
 /// **That premise expired at SR-5 and nobody came back to re-check it** —
 /// <see cref="EQBuddy.UI.Shared.ShellPages.Landed"/> is the whole seven-room enum now. What
@@ -27,8 +29,9 @@ namespace EQBuddy;
 ///
 /// **The door is a CONTEXT-MENU ROW because a hotkey is not a door** (trap 59): nothing is
 /// bound by default, so an affordance that exists only once the player has configured
-/// something is absent on the profile every player starts with. The row sits with
-/// <c>World…</c> and <c>Quests…</c>, which are there for the same reason.
+/// something is absent on the profile every player starts with. It sits with <c>World…</c>,
+/// which is there for the same reason, on a minimized menu that is now four rows long
+/// (<see cref="EQBuddy.UI.Shared.WidgetMenuPolicy"/>).
 ///
 /// <c>EQBUDDY_SHELL</c> stays beside it and is not replaced by it — a surface nobody can
 /// reach in a test or a shot reads as reviewed anyway (trap 22), and an absent control
@@ -77,20 +80,35 @@ internal static class ShellHost
     }
 
     /// <summary>
-    /// THE PLAYER'S DOOR — the widget's <c>Open EQBuddy…</c> context-menu row (OE-2).
+    /// THE PLAYER'S DOOR — the widget's <c>Guide…</c> context-menu row.
     ///
-    /// **It passes NO address, and that is the same fix <see cref="ApplyEnvHook"/>'s bare
-    /// form carries**: a caller that means "open it" must not know what the default room
-    /// is, or the answer exists in two places and only one of them gets taught when it
-    /// changes. The window's constructor is the only place it lives.
+    /// **It was <c>Open EQBuddy…</c> and it passed NO address; both of those changed on
+    /// 2026-09-08** (Bevel's cog/Options IA faces §B/§D, Helm-signed ~2:13 PM CT, owner
+    /// amendment ~2:15 PM CT). The old row's job — recover a shell the ✕ took — is
+    /// unchanged and is still the reason this method exists. What changed is what the row
+    /// SAYS: <c>Quests…</c> and <c>Open EQBuddy…</c> were two rows meaning "leave the
+    /// overlay and go read something", and they are one row now, named for the destination.
     ///
-    /// **On an already-open shell this FRONTS it and changes nothing else** — no address,
-    /// so <see cref="Show"/> reaches <c>Activate</c> without navigating. A door that
-    /// snapped a player back to Home from the room they were reading would be a second
-    /// defect wearing the fix's clothes, and it is what "recover the guidance hub" would
-    /// mean if it were read as "go to Home".
+    /// **So it names an address, and the earlier reasoning for passing none does not carry
+    /// over.** That argument was about a caller that means "open it" not knowing what the
+    /// DEFAULT room is — still true, and <see cref="ApplyEnvHook"/>'s bare form still
+    /// honours it. This caller does not mean "open it": it means "take me to Guide", and a
+    /// row called <c>Guide…</c> that landed the player on Gear because that is where they
+    /// last were would be an affordance lying about itself (trap 35's shape, in a menu).
+    /// The address is <see cref="WidgetMenuPolicy.GuideAddress"/> — the Quests page's WIRE
+    /// key, which did not move when the room was relabelled, because <c>page:room</c> is
+    /// persisted and the shell must never re-spell a room.
+    ///
+    /// **On an already-open shell this fronts it AND navigates**, which is the deliberate
+    /// reversal of OE-2's "leaves it where you were". A player who wants the window fronted
+    /// without moving has the taskbar button — native chrome is the shell's product point —
+    /// and no menu row promises that any more.
+    ///
+    /// The minimize case is unchanged and is still the half nothing else covers:
+    /// <c>Activate</c> does not restore a minimized window, so <see cref="Show"/> raises it.
     /// </summary>
-    public static void OpenDoor(MainWindow main) => Show(main);
+    public static void OpenGuideDoor(MainWindow main)
+        => Show(main, EQBuddy.UI.Shared.WidgetMenuPolicy.GuideAddress);
 
     /// <summary>
     /// The review hook. <c>EQBUDDY_SHELL=1</c> opens the shell on its default room;

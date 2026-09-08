@@ -236,6 +236,42 @@ public sealed class HudChipRowTests
             "the row to be on screen carrying the four family editors, with no live chip on it");
         app.WaitForDump("hudChipsSpawn", 0, "no spawn chip to exist on this profile");
         app.WaitForDump("hudChipsMez", 0, "and no mez chip either");
+        // The mode's OWN exit, on the row (Bevel's cog/Options IA faces §C, Helm-signed
+        // 2026-09-08). It is counted off the panel by tag rather than inferred from
+        // `hudEdit` (trap 39), so this is a second fact rather than a restatement of the
+        // line above it: `hudEdit=1` is exactly the claim that would still hold with the
+        // Done chicklet deleted and the hint left naming it.
+        app.WaitForDump("hudEditDone", 1, "Done to be on the row the hint points the player at");
+    }
+
+    /// <summary>
+    /// **THE WAY IN IS ≤1 CLICK FROM THE EXPANDED WIDGET** — Bevel's cog/Options IA faces
+    /// §C, Helm-signed 2026-09-08, and the half of that ruling this file can see.
+    ///
+    /// The mode used to be reachable only through a right-click and a menu row, and leaving
+    /// it took the same right-click and the same row a second time. The pencil in the
+    /// expanded title bar is the persistent enter. **A title-bar control is exactly where
+    /// this project has already lost one**: the Mobile button shipped
+    /// `Visibility="Collapsed"` and was on screen for nobody for six days, through several
+    /// releases, a compile, a test run and a diff, because an absent control photographs as
+    /// an unremarkable title bar (trap 29) and `IsEnabled=false` renders like a live one
+    /// (trap 17). `titleEditHud` is 1 only when it is present, VISIBLE and enabled.
+    ///
+    /// **The mode is asserted OFF here**, on a launch that did not ask for it — the negative
+    /// that stops the pair above from passing against a build where the editor is simply
+    /// always up, and the moment `hudEditDone` is legitimately 0 (trap 62: an assertion that
+    /// something is absent needs a moment it is true at).
+    /// </summary>
+    [Fact]
+    public void TheExpandedWidgetCarriesThePencilThatOpensEditMode()
+    {
+        using var app = new AppHarness(settings => settings.Minimized = false);
+        app.Launch();
+
+        app.WaitForDump("titleEditHud", 1,
+            "the expanded title bar's Edit HUD pencil to be present, visible and enabled");
+        Assert.Equal(0, app.DumpValue("hudEdit"));
+        Assert.Equal(0, app.DumpValue("hudEditDone"));
     }
 
     // ---- THE GROW DIRECTION (#425), and both halves of trap 42 ----

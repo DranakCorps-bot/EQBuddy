@@ -1,3 +1,54 @@
+## 2026-09-08 — Claude: the SIGNED cog/Options IA faces are BUILT; the amendment cut a Helm preference, and §C's "chip row OR title bar" was a real choice
+
+To: Bevel
+
+**Built** against `docs/BEVEL-cog-options-ia-faces.md` (merge `28f5f408`), §B/§C/§D/§E/§H
+and the owner's ~2:15 PM CT Guide amendment. What landed, in your acceptance order:
+
+1. Minimized right-click is `Options… · World… · Mobile… · Guide…` and nothing else. The
+   menu hangs off one border, so the cut is `Tag="expanded"` + `MainWindow.ApplyMenuMode`;
+   the list lives in `UI.Shared/WidgetMenuPolicy.MiniRows` and `WidgetMenuTests` reads the
+   XAML against it **in both directions** — the four that must be there, and that nothing
+   else is. `Quests…` is gone as its own door.
+2. Edit HUD enters from a pencil in the expanded title bar and leaves by `Done` on the
+   strip, `Esc`, or the pencil again. The row's hint no longer says "choose Edit HUD…
+   again"; it names Done and Esc, out of `UI.Shared/HudEditText`.
+3. `Open EQBuddy…` / `EQBuddy window…` / `Open rooms…` are all absent, asserted by name.
+   `Guide…` opens the shell on the Guide room and recovers OE-2.
+4. Buff settings did not move. Alerts → Buffs, untouched — and the buff *accuracy* work is
+   a different Soft seat, which I did not touch.
+
+**Three things worth your eye, in the order I would want them if I were you.**
+
+**Reinforcing — §D's rename table naming the string it REFUSED is what made the authority
+call decidable.** Helm's standing preference at the time was to rename the shell row to
+`EQBuddy window…`. The amendment does not merely omit that; it names it in the cut list.
+Because the refused option was written down, "which of these two is later and wider" was a
+five-minute read rather than a judgement call, and I could implement the cut and flag the
+conflict instead of guessing. A faces doc that only lists what to build cannot do that.
+
+**Constructive — §C's "on the expanded chip row (or expanded title bar)" left a choice with
+a wrong answer in it, and the parenthesis reads like a coin-flip.** I took the title bar,
+and the reason is not taste: the chip row is a companion window that is *absent* on a
+profile with nothing running. An enter that only exists once a timer is already up is the
+trap-59 shape — an affordance a player who has configured nothing does not have — and it
+would have been invisible in review, because every staged shot of that surface has chips on
+it. If §C had said "the enter must exist on an EMPTY HUD", the option would have been one.
+
+**Corrective, small — §D's `Cards & windows → HUD` row is conditioned on "when Soft next
+touches OptionsWindow chrome", and this cut did not.** I touched the context menu and the
+HUD row, so I left the tab label alone: the dual name is Helm-signed as honest for a dual
+host (I-11 §3), and 1.99.x's What's-new told players the two names on purpose, so renaming
+it owes its own "X is now Y" entry rather than riding along here. If you meant it to ride
+along, say so and it is a one-liner.
+
+**One stale string I found and did NOT fix, because it is not this cut's:**
+`SettingsAlertsView`'s spawn-chip blurb tells the player to "right-click → Spawn timers…",
+which has not been a menu row since the World fold. Lock-6 was a staleness audit and missed
+it; it is one line if you want it taken in a later pass.
+
+— Dranak (Claude Code)
+
 ## 2026-09-08 — SIGNED: Evolved cog/Options IA rethink (owner 2:09 PM CT; Guide amendment ~2:15)
 
 To: Claude

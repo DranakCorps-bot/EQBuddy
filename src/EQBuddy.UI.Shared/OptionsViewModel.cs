@@ -128,9 +128,12 @@ public static class OverlaySections
         // Quest Tracker window it used to open survives on doors of its own.
         //
         // Where it went, in the words the What's-new uses: THE QUESTS CARD IS NOW THE
-        // QUEST TRACKER WINDOW (right-click the widget → Quests…, or the "Quest tracker"
-        // hotkey) AND THE QUESTS ROOM in the Evolved shell. Nothing about the quest
-        // surfaces themselves changed — only the widget's copy of the launcher.
+        // GUIDE (right-click the widget → Guide…, or the "Quest tracker" hotkey for the
+        // standalone window). Nothing about the quest surfaces themselves changed — only
+        // the widget's copy of the launcher. The row was "Quests…" until 2026-09-08, when
+        // the owner's amendment to Bevel's cog/Options IA faces folded it and
+        // "Open EQBuddy…" into one Guide… row; `Retired` below carries the new spelling
+        // and `RetiredCardsTests` fails if the two disagree.
         //
         // A subtraction has the same obligation as a fold (CLAUDE.md's "three ways back"):
         // the ⧉ on the card header was one of them and it is the one being removed, so the
@@ -351,15 +354,26 @@ public static class OverlaySections
     /// **The door is named, not implied.** A hotkey is not a door — nothing is bound by
     /// default (trap 59) — so the sentence names the context-menu row, and
     /// <c>RetiredCardsTests</c> checks that row still exists in <c>MainWindow.xaml</c>. The
-    /// Evolved shell's rooms are deliberately NOT named: <c>EQBUDDY_SHELL</c> is the only way
-    /// in today, so telling a player about a room they cannot open would be the mirror of the
-    /// defect this list exists to fix.
+    /// Evolved shell's ROOMS are still deliberately not named, and the reason has changed
+    /// under it: it used to be that <c>EQBUDDY_SHELL</c> was the only way in, so naming a
+    /// room would point at something a player could not open. Since 2026-09-08 the
+    /// <c>Guide…</c> row opens a room directly. The rule survives on the OTHER half of its
+    /// original argument — a line here names the DOOR a player chooses, in the words on the
+    /// menu, and "room" is our word for what is behind it.
     /// </summary>
     public static readonly IReadOnlyList<RetiredCard> Retired =
     [
         // HUD subtraction cut 1, 2026-09-05. The names are the ones the Quests card's own
         // AbsorbedTitles row carried until it left with the card.
-        new("quests", "Quests", "the Quest Tracker window", "Quests…", ["Sky Quest", "Epics"]),
+        //
+        // **Re-pointed 2026-09-08** (owner amendment to Bevel's cog/Options IA faces): the
+        // row it named, "Quests…", no longer exists — the door is "Guide…". A retired card's
+        // line names a context-menu row VERBATIM and `RetiredCardsTests` checks the row is
+        // still in MainWindow.xaml, which is precisely so a menu rename cannot leave this
+        // screen telling people to choose something that is not there. It says "the Guide"
+        // rather than naming a ROOM, which is the rule below holding rather than bending:
+        // the sentence points at the door, and where the door leads is the door's business.
+        new("quests", "Quests", "the Guide", "Guide…", ["Sky Quest", "Epics"]),
         // HUD subtraction cut 2, 2026-09-05. Four names — the biggest hole either cut left,
         // and the reason this list is worth its own screen space rather than a docs line.
         new("misc", "World", "the World window", "World…",
