@@ -47,6 +47,7 @@ param(
 )
 
 $ErrorActionPreference = 'Stop'
+. (Join-Path $PSScriptRoot 'isolated-profile.ps1')
 # Derived, not hardcoded: this said C:\Users\david\source\EQBuddy and did not resolve on
 # any other checkout, so the script could only ever run on one machine.
 $repo = Split-Path -Parent $PSScriptRoot
@@ -125,6 +126,7 @@ $winTitle = $target.Title
 $winKey = if ($Mode -eq 'park') { $Window } else { $target.Key }
 $exe = Join-Path $repo 'src/EQBuddy/bin/Release/net10.0-windows/EQBuddy.exe'
 $profileDir = Join-Path $Root 'profile'
+Assert-EqIsolatedProfile $profileDir 'drag-verify.ps1'
 $settingsPath = Join-Path $profileDir 'settings.json'
 
 Add-Type -AssemblyName UIAutomationClient, UIAutomationTypes

@@ -54,6 +54,7 @@ param(
     [switch]$List
 )
 $ErrorActionPreference = 'Stop'
+. (Join-Path $PSScriptRoot 'isolated-profile.ps1')
 
 $repo = Split-Path $PSScriptRoot -Parent
 if ($Out -eq '') { $Out = Join-Path $repo 'docs/screenshots' }
@@ -2407,6 +2408,7 @@ $version = ([xml](Get-Content (Join-Path $repo 'Directory.Build.props'))).Projec
 # --- the isolated profile ----------------------------------------------------------
 $root = Join-Path ([IO.Path]::GetTempPath()) "eqbuddy-shoot-$([Guid]::NewGuid().ToString('N').Substring(0,8))"
 $profileDir = New-Item -ItemType Directory -Force (Join-Path $root 'profile')
+Assert-EqIsolatedProfile $profileDir.FullName 'shoot.ps1'
 $logsDir = New-Item -ItemType Directory -Force (Join-Path $root 'game/Logs')
 # Existing but empty: UpdateChecker reads "configured folder, no EQBuddySetup.exe" as
 # "no update", so no OneDrive scan and no GitHub call during a shoot.
@@ -2973,6 +2975,7 @@ function Invoke-PrimeRun([object[]]$runs) {
         }
         $psi = New-Object Diagnostics.ProcessStartInfo $exe
         $psi.UseShellExecute = $false
+        Assert-EqIsolatedProfile $profileDir.FullName 'shoot.ps1 prime'
         $psi.EnvironmentVariables['EQBUDDY_APPDATA'] = $profileDir.FullName
         $psi.EnvironmentVariables['EQBUDDY_OPAQUE'] = '1'
         # A prime run is a launch like any other, so it opens the shell like any other —
@@ -3090,6 +3093,8 @@ try {
 
         $psi = New-Object Diagnostics.ProcessStartInfo $exe
         $psi.UseShellExecute = $false
+        Assert-EqIsolatedProfile $profileDir.FullName 'shoot.ps1'
+        if ($v1Profile) { Assert-EqIsolatedProfile $v1Profile 'shoot.ps1 v1 source' }
         $psi.EnvironmentVariables['EQBUDDY_APPDATA'] = $profileDir.FullName
         $psi.EnvironmentVariables['EQBUDDY_OPAQUE'] = '1'
         # THE EVOLVED SHELL COMES UP FOR EVERY SHOT, not just the shell-* ones. The owner's
@@ -3227,15 +3232,21 @@ finally {
     $backdropForm.Dispose()
     if ($KeepProfile) { Write-Host "`nProfile kept at $root" }
     else { Remove-Item -Recurse -Force $root -ErrorAction SilentlyContinue }
-    # In the finally, so a thrown shot or a Ctrl+C still gives the app back. Start-Process
-    # inherits THIS process's environment, and nothing here sets EQBUDDY_APPDATA globally
-    # — the throwaway profile rides on each child's ProcessStartInfo — so the relaunched
-    # app finds the real profile. If that ever changes, this line starts pointing the live
-    # app at a directory that is deleted three lines above.
+    # In the finally, so a thrown shot or a Ctrl+C still gives the app back.
+    # UseShellExecute=false so we can STRIP harness redirects: an inherited
+    # EQBUDDY_APPDATA=%AppData%\EQBuddy Evolved (the Evolved launcher's export)
+    # would otherwise point the restored widget at Evolved even when the
+    # stood-down exe was v1. Clearing the vars lets AppPaths pick the product
+    # directory for that binary. IsolatedLaunchPolicy.ClearHarnessOverrides
+    # is the C# twin.
     foreach ($path in $relaunch) {
         if (Test-Path $path) {
             Write-Host "Relaunching $path"
-            Start-Process $path
+            $re = New-Object Diagnostics.ProcessStartInfo $path
+            $re.UseShellExecute = $false
+            $re.WorkingDirectory = Split-Path $path
+            Clear-EqHarnessProfileOverrides $re
+            [Diagnostics.Process]::Start($re) | Out-Null
         }
     }
 }

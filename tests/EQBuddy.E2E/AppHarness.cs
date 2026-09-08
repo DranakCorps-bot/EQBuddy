@@ -11,6 +11,8 @@ namespace EQBuddy.E2E;
 /// One launch-to-teardown lifetime of the REAL EQBuddy.exe against an isolated profile:
 /// a temp EQBUDDY_APPDATA dir (settings.json pre-seeded, so no UI interaction is ever
 /// needed for setup) and a temp "game install" whose Logs\ holds the shifted fixture.
+/// <see cref="IsolatedLaunchPolicy.PinChildProfile"/> is the LAST write of that
+/// variable, so a caller dictionary cannot point the child at a live profile.
 /// EQBUDDY_EXPAND=1 makes the app expand every card and write a debug.txt state dump
 /// each UI tick — that dump is the suite's assertion channel.
 ///
@@ -258,7 +260,6 @@ internal sealed class AppHarness : IDisposable
         _tickMovedAt = DateTime.UtcNow;
 
         var psi = new ProcessStartInfo(ExePath) { UseShellExecute = false };
-        psi.Environment["EQBUDDY_APPDATA"] = ProfileDir;
         psi.Environment["EQBUDDY_EXPAND"] = "1";
         // THE EVOLVED SHELL COMES UP WITH EVERY LAUNCH, and the default is the point.
         // David's order while E-3 is being built: a suite run must not pop a bare v1
@@ -280,6 +281,12 @@ internal sealed class AppHarness : IDisposable
         // widget's, which is where a second-host divergence would show (trap 58).
         psi.Environment["EQBUDDY_SHELL"] = "1";
         foreach (var (name, value) in _environment) psi.Environment[name] = value;
+        // LAST write of EQBUDDY_APPDATA: a caller dictionary applied after the
+        // isolated assignment used to be able to point this child at a live
+        // profile (trap 69). PinChildProfile overwrites that key and refuses
+        // a live v1 import source. No opt-in — an E2E seat that "needs" a
+        // player profile is the accident.
+        IsolatedLaunchPolicy.PinChildProfile(psi.Environment, ProfileDir);
         _process = Process.Start(psi)
             ?? throw new InvalidOperationException($"Process.Start returned null for {ExePath}");
 

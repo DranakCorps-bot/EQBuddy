@@ -5,6 +5,7 @@
 param([string] $Root)
 
 $ErrorActionPreference = 'Stop'
+. (Join-Path $PSScriptRoot 'isolated-profile.ps1')
 $repo = 'C:\Users\david\source\EQBuddy'
 $exe = Join-Path $repo 'src/EQBuddy/bin/Release/net10.0-windows/EQBuddy.exe'
 
@@ -37,6 +38,7 @@ Write-Host "PROFILE   $profileDir"
 
 $psi = New-Object Diagnostics.ProcessStartInfo $exe
 $psi.UseShellExecute = $false
+Assert-EqIsolatedProfile $profileDir.FullName 'drag-check.ps1'
 $psi.EnvironmentVariables['EQBUDDY_APPDATA'] = $profileDir.FullName
 $psi.EnvironmentVariables['EQBUDDY_OPAQUE'] = '1'
 $proc = [Diagnostics.Process]::Start($psi)

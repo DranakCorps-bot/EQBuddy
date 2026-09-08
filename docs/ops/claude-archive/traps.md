@@ -1,6 +1,6 @@
 # Archived trap novels — moved out of always-loaded CLAUDE.md
 
-This is the pre-split incident record for traps 1–68. Live rules stay in
+This is the incident record for traps 1–69. Live rules stay in
 [CLAUDE.md](../../../CLAUDE.md). Link here when the novel still explains *why*.
 
 Progression: incident → verified lesson → executable test/guard → compact live rule.
@@ -1438,3 +1438,27 @@ Read this list before touching the areas it names. Every entry cost a release.
     typed. If the answer is "a script three layers up", the condition is measuring history,
     not intent — name the intent (an opt-out that exists for no other purpose) and make
     everything else redirect.
+
+### Trap 69
+
+69. **A HARNESS THAT SETS `EQBUDDY_APPDATA` AND THEN APPLIES THE CALLER DICTIONARY HAS A
+    HOLE THE SIZE OF ONE KEY.** `TestProfileIsolation` isolates the HOST. E2E and
+    `shoot.ps1` write on the CHILD. `AppHarness.Launch` set the isolated profile, then
+    `foreach (_environment) psi.Environment[name] = value` — so a scenario (or a helper
+    that copied the parent env) could point the real exe at `%AppData%\EQBuddy Evolved`
+    or hand it `EQBUDDY_V1_APPDATA` aimed at a real v1 tree. Every host isolation test
+    still passed, because they never look at the child. The same inheritance bit
+    `shoot.ps1`'s relaunch: `Start-Process $path` cannot strip env, so an Evolved export
+    on the seat redirected the restored widget.
+    → **Now guarded (EQBuddy lab experiment, E′ 2026-09-08):** `UI.Shared/IsolatedLaunchPolicy.PinChildProfile` is the LAST write
+    of the profile key and refuses both live lines as a v1 import source. No opt-in —
+    an automated seat that "needs" a player profile is the accident. `shoot.ps1` relaunch
+    uses `UseShellExecute=false` and `Clear-EqHarnessProfileOverrides`.
+    `IsolatedLaunchPolicyTests` / `IsolatedLaunchScriptTests` prove-fail the rule and the
+    script rendezvous. Product launches (`install-local.ps1 -Evolved`,
+    `Launch-Evolved-Shell.cmd`) do not call this; they are how the owner runs Evolved.
+    This is verification in the EQBuddy lab, not a Corps-wide standard; the formal
+    proposal lives on the control-plane.
+    → **The general move: when two processes share one job, say which process the guard
+    is about.** A host redirect does not cover a child `ProcessStartInfo`. Apply the
+    isolated value AFTER the caller dictionary, or the dictionary is the hole.
