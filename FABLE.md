@@ -1,3 +1,244 @@
+## 2026-09-08 ~12:30 PM CT — Fable: GUIDED PROGRESSION plan — Phase 1 guide engine + Phase 2 PoS WAR/MNK/DRU authoring (Founder locks 2026-09-08)
+
+To: Helm (last-look/sign), Claude (implement per §9 ladder after sign), Bevel (faces for §5's active-step card before P1d)
+
+- **Priority:** `ready` on Helm sign. Answers the To:Fable block below (left in place as the
+  durable ask — this entry is its answer). Sources, binding, newest-first:
+  `docs/quests/GUIDED-PROGRESSION-LOCKS-2026-09-08.md` (Founder locks + Helm carry),
+  `docs/quests/GUIDED-PROGRESSION-REQUIREMENTS.md` (Founder draft §§4–5, 21, 26, 32–35).
+- **needs-david: none.** Checked against the consequence list: sources are Founder-locked
+  (eqlwiki + other online + user corrections — lock 2); wiki request rates unchanged (the
+  weekly pipeline already exists and this plan adds no fetch); share-back sends nothing off
+  the machine except a browser URL the player reads before posting (same trust shape as
+  `FeedbackWindow` — consequence-8 untouched); direction IS the Founder's. Everything below
+  is implementation shape, logged not asked.
+- **Posture:** Soft max ≤3; this seat is docs/channel only. Soft Opus #442 Pet DPS is a
+  separate LIVE ASK — untouched. Play Console OFF; Evolved local-only.
+
+### §0 Standing state — what exists, measured (surveyed this seat, 2026-09-08)
+
+1. **No guide engine exists.** No `GuideType`, `Objective`, `Stage`, or engine type anywhere
+   in `src/` — the names live only in the requirements doc. The nearest existing shapes:
+   `EpicQuestChecklistRow` (`Core/EpicQuestChecklistCatalog.cs` — the only ordered,
+   sectioned, prose-carrying per-step record; ~193 KB embedded JSON) and
+   `QuestChecklistGroup`/`QuestChecklistRow` (`Core/QuestChecklistLayout.cs` — a two-level
+   group→row model with an open/ready/done state machine but no who/where/what/next).
+2. **`QuestEntry` (`Core/QuestCatalog.cs`) is flat**: name, url, giver, items, rewards,
+   zones, era. No steps, no prerequisites, no provenance beyond `Url`. It feeds search,
+   loot badging (`IsTurnInItem`), and the Companion index — those jobs stay.
+3. **`Core/SkyQuestDefaults.cs` is 222 pipe-delimited literals** (`"sky-007|Bard|Npc|
+   Reward|Item|Isle 6: …"`) — and the pipe format is load-bearing OUTSIDE the app:
+   `scripts/harvests/refresh.py` `CURATED_SOURCES` regexes the C# string literals and
+   splits on `|` to flag wiki changes. Its provenance comments (the bard #139/#150
+   match-the-wiki story, the Paladin #176 Isle-7 correction) are game truth that must not
+   be lost in any conversion.
+4. **Progress is split across two stores**: Sky/Epic ticks per PROFILE in `AppSettings`
+   (`SkyQuestChecklist`, `SkyQuestCompleted` keyed `Class|Reward`), general completion per
+   CHARACTER in `QuestLedgerStore` (`quest-ledger.json`). `SkyTestSplit.WithTurnIns`
+   read-merges them; `QuestsView.ToggleCompleted` routes writes by name pattern so each
+   fact keeps one store.
+5. **Lock 3 is mostly already built**: `refresh.py` + `quests-promote.py` +
+   `knowledge-refresh.yml` (cron Mondays) + `WeeklyRefreshWiringTests` are the weekly
+   local-catalog sync. A guide catalog needs only a `CURATED` row.
+6. **Lock 4's door family exists**: `QuestsView.ReportUrl` (per-quest prefilled
+   discussion, wiki-first framing) and `FeedbackWindow` (nothing auto-attached, ever).
+   `WatchRuleShare`/`ZoneShare` are the paste-string precedents if volume ever warrants.
+7. **Parity machinery exists**: `SurfaceParityTests` asserts phone ≡ desktop against
+   `QuestChecklistLayout`, not against each other. Anything the guide engine renders must
+   project through that module or parity coverage silently ends.
+
+### §1 The shape in one paragraph
+
+A **curated guide catalog** (embedded JSON, never auto-written, weekly-flagged) sits
+BESIDE `QuestCatalog`, keyed to it by quest name/url — not a rewrite of it. A **thin
+schema core** (Guide → Stage → Objective, with authoring completeness and source
+provenance as first-class fields) renders through the EXISTING
+`QuestChecklistLayout` group/row projection on the EXISTING Sky tab in both hosts and the
+phone, so parity and the `quests:sky` address grammar are inherited, not rebuilt. Player
+progress on objectives is **manual, per character, one writer**; reward turn-ins keep
+their existing store and toggles. Classes without guides render exactly today's checklist
+— that is the progressive cutover of lock 5, and nothing is deleted to start.
+
+### §2 Schema core — thin, in `Core/GuideCatalog.cs` (Helm carry: optional fields earn their keep in PoS content)
+
+**Required now:**
+
+- `Guide { Id, Name, GuideType, QuestName (→ QuestEntry/RewardKey link), ZoneNames[],
+  ApplicableClasses[], MinLevel?, Stages[], Sources[] }`
+- `GuideStage { Id, Name, Order, ArrivalNote?, Objectives[] }` — PoS islands are stages.
+- `GuideObjective { Id, Order, ObjectiveType, Title, ShortInstruction, Who? (npc/mob
+  names), Where? (zone + prose directions; never coordinates alone), What? (action +
+  item names/qty), PrerequisiteObjectiveIds[], RewardKey? (Sky turn-ins), ItemNames[]
+  (the Phase-5 auto-tick hook — same key family `SkyLootAutoCheck` matches today),
+  Authoring, StubNote?, EffortNote?, Sources[] }`
+- `enum GuideType { NormalQuest, EpicQuest, PlaneOfSkyQuest, ZoneProgression,
+  KeyingAccess, ClassQuest }` — the requirements doc's set minus the three nobody authors
+  at MVP; adding members later is additive.
+- `enum GuideAuthoring { Authored, Stub }` and `GuideSource { Url, Title, RetrievedAt }`.
+  Every **Authored** objective carries at least one source; a **Stub** carries `StubNote`
+  instead. `SourceTitle` doubles as the string `refresh.py`'s `curated_flags` intersects
+  with changed wiki page titles — provenance IS the weekly-sync hook, one field two jobs.
+
+**Two axes, never conflated:** *authoring completeness* (Authored/Stub — a fact about our
+data) and *player progress* (open/ready/done — a fact about the character). A guide can be
+100% done while half-stubbed, and fully authored at 0%. The progress badge stays
+`QuestPresentation`'s; the stub banner is `GuidePresentation`'s (§5). A hollow guide can
+NEVER render as fully-guided — that is a validation test with a prove-fail fixture, not a
+convention (Founder lock 4a; trap 34: the must-list is "every objective answers
+who+where+what or says Stub").
+
+**Rejected, with reasons:** the full §4/§5 field surface of the requirements doc now
+(60-odd optional fields with zero content behind them is schema cosplay — fields land when
+PoS authoring needs them, and the JSON shape makes them additive); a difficulty component
+vector + ★ ratings (Helm carry: authors must not invent stars — one optional free-text
+`EffortNote` until real ratings earn a model); a database or per-guide files (embedded
+compact JSON like every sibling catalog, stable key order per `quests-promote.py`'s own
+rule so diffs stay about data); auto-derived `NextObjectiveIds` fields (Order +
+prerequisites already answer "next"; a second producer of sequence is trap 4's shape).
+
+### §3 Data + weekly sync (lock 3)
+
+- `src/EQBuddy.Core/Data/GuideCatalog.json`, embedded resource, **CURATED — hand-authored,
+  never auto-written**, exactly like `SpawnCatalog.json`. Add it to `refresh.py`'s
+  `CURATED` list in the same PR that creates it, and extend `WeeklyRefreshWiringTests`
+  to pin the wiring. Changed eqlwiki pages then FLAG the guide rows for review in
+  `refresh-report.md`; a human re-authors. No live fetch anywhere in the engine — it reads
+  the embedded catalog only; `EqlWikiMobs`' on-demand item/mob paths are untouched.
+- **`SkyQuestDefaults.cs` is NOT touched at MVP.** All 222 rows stay; guides reference the
+  same `QuestChecklistLayout.RewardKey(class, reward)` keys, so the checklist, the phone,
+  achievements import and loot auto-tick all stay true while guides layer on top. Its
+  eventual retirement (Phase 3+, when all sixteen classes are guide-backed) must update
+  `CURATED_SOURCES` in the same change — named here because `WeeklyRefreshWiringTests`
+  catches a missing file, not a format change, and the flag would otherwise die silently.
+- Wiki-conflict rule carried into authoring: match the wiki when unresolved (David,
+  2026-08-14); other sources where it is silent, marked as such via `GuideSource`; a
+  departure needs decisive evidence and a comment — the `SkyQuestDefaults` bard block is
+  the template and its stories migrate into guide `Sources`/comments, never get dropped.
+
+### §4 Progress — manual first, per character, one writer per fact (Helm carry)
+
+- `QuestLedgerStore.CharacterLedger` gains `Dictionary<string, GuideProgress> Guides`,
+  `GuideProgress { List<string> DoneObjectiveIds; List<string> SkippedObjectiveIds;
+  DateTime LastUpdated }`. Per character — where progress always belonged (the per-profile
+  Sky ticks are a known wart this does not copy). Tick/untick/skip are player verbs on the
+  objective row and the active-step card; manual state beats weak inference by
+  construction because there IS no inference at MVP.
+- **Reward turn-ins keep their store.** An objective carrying `RewardKey` renders its
+  state FROM and writes THROUGH the existing `MarkRewardTurnedIn`/`SkyCompleteToggle`
+  path (`AppSettings.SkyQuestCompleted` + checklist `Acquired`). One fact, one store
+  (trap 4): the guide never duplicates a turn-in tick into `GuideProgress`, so a reward
+  turned in on the classic checklist, the phone, or via achievements import is turned in
+  inside the guide the same tick — and `SurfaceParityTests`'
+  `ARewardTurnedInOnEitherScreenIsTurnedInOnBoth` extends to cover it.
+- No key migration at MVP (nothing moves stores). The Phase-3 consolidation of the
+  per-profile Sky lists into the ledger is real future work and gets its own plan;
+  `MigrateSkyRewardRenames` is the named precedent for moving keys without losing ticks.
+- **Auto-detect is Phase 5, not an MVP gate** (Helm carry). `ItemNames[]` on objectives is
+  the entire Phase-5 surface area paid for now: `SkyLootAutoCheck`-family matching can
+  tick non-reward objectives later without a schema change. Nothing else is pre-built.
+
+### §5 UI — evolve Evolved Quests in place (lock 5)
+
+- **Projection, not new surface:** new pure `Core/GuideChecklistProjection.cs` maps
+  stage→`QuestChecklistGroup`, objective→`QuestChecklistRow` (stage heading via the
+  existing `IslandHeading` axis; step identity stays distinct from row identity — the
+  `DistinctBy(Id)` lesson is load-bearing). Because it emits the shared shape, the phone
+  renders guides the same day through `CompanionProjection.Checklists` and
+  `SurfaceParityTests` covers it — parity by shared module, per the standing rule.
+- **Where it appears:** the Sky tab, both hosts (`QuestsView` under `QuestsWindow` AND
+  `QuestsRoom`) and the phone. A class lens with a guide gets the guide-backed grouping +
+  the active-step card; the thirteen classes without guides render exactly today's
+  checklist. `quests:sky` addresses keep resolving; `QuestsWindow` retirement stays out of
+  scope (the `QuestsRoom` doc-comment blocker stands); `SkyTestSplit` and
+  `ToggleCompleted`'s name-pattern routing stay until the Phase-3 consolidation.
+- **Active-step card** ("NEXT: … / Where / What / Why / ⚠ before leaving" — requirements
+  §12): words and selection rule in new `UI.Shared/GuidePresentation.cs` (next = first
+  non-done objective whose prerequisites are done; stub banner text; share-back button
+  label), rendered by WPF and projected to the phone. **Bevel faces this card before P1d**
+  — copy, progressive disclosure, and how the stub banner reads sit with Bevel, not
+  invented in the implement PR.
+- **Stub is a first-class state** (lock 4a): a Stub objective renders its `StubNote`
+  ("eqlwiki's page for X does not say which isle drops this") + the share-back button, in
+  the row AND on the card. It is never mapped onto `QuestPresentation.State` — Done/Ready
+  describe the player, Stub describes us. No fake "complete" badge exists to render.
+
+### §6 Share-back — 1-click, mail/log-an-issue family, nothing personal by default (lock 4b)
+
+- **"Improve this step"** on every objective (stub AND authored): the `ReportUrl` family —
+  `discussions/new?category=q-a&title=Guide step: {guide} / {objective}` prefilled with
+  guide id, objective id, what EQBuddy currently shows, the stub note, a blank "What you
+  saw in game:", and the wiki-first sentence + `WikiContribution.EditUrl` link when a
+  `SourceTitle` exists (the strongest fix is the wiki page; the weekly flag brings it
+  back to us).
+- **Privacy default:** nothing auto-attached — no logs, no character name, no inventory.
+  The whole payload is visible in the browser URL/body before the player posts, same
+  trust shape as `FeedbackWindow`'s own doc comment. Opt-in scoped detail = whatever the
+  player types. This is why needs-david is not triggered: no new data leaves the machine.
+- **Intake:** corrections arrive as discussions; the next authoring PR takes them with
+  reporter credit by name and number (the What's-new crediting rule applies when a
+  release ships the correction).
+- **Rejected:** an `EQB1.`-style paste-string patch format for guide corrections —
+  over-built before there is volume; `WatchRuleShare`'s rebuild-field-by-field discipline
+  is the named template if it is ever wanted. Also rejected: auto-applying a correction
+  from a discussion (curated catalogs are never auto-written — the same rule that binds
+  the harvest binds the community door).
+
+### §7 Gear recommendation — Phase 6 hooks only (Helm carry)
+
+Rewards on guides/objectives are item NAMES (linkable into the item catalog later),
+`GuideType` and stages exist, difficulty stays a free-text `EffortNote`. **No scoring, no
+comparison, no recommendation code, no schema built "for" it beyond those links.** Named
+so nobody builds it early and nobody strips the links that make it possible later.
+
+### §8 Migrate vs replace — the explicit table (Helm carry)
+
+| Surface | Verdict | Shape |
+|---|---|---|
+| `QuestCatalog` / `QuestEntry` | **Keep as harvested index** | Guides layer beside, keyed by quest name/url. Search, loot badging, Companion index unchanged. |
+| `Core/SkyQuestDefaults.cs` | **Keep at MVP; replace in Phase 3+** | Guides reference its `RewardKey`s. Retirement must move the provenance comments into guide `Sources` and update `refresh.py CURATED_SOURCES` in the same change. |
+| Sky/Epic tick stores (`AppSettings`) | **Keep at MVP** | Guide reads/writes turn-ins through the existing one-writer path. Phase-3 consolidation into `QuestLedgerStore` is its own plan. |
+| `QuestLedgerStore` | **Extend** | + `Guides` objective-progress map, per character. |
+| `QuestChecklistLayout` / `SurfaceParityTests` | **Reuse — mandatory** | The projection emits its shapes; parity is inherited. |
+| Home/Setup readiness (`HomeReadout`/`SetupReadout`) | **Migrate untouched at MVP** | Rows are derived from dumps, two already deep-link `quests:sky`/`unlocks`; at most a `Feeds` sentence changes later. |
+| `QuestPresentation.State` | **Keep; do not extend with Stub** | Authoring state lives in `GuidePresentation`. |
+| `EpicQuestChecklistCatalog` | **Untouched at MVP** | It is Phase 4's conversion input, not this plan's. |
+
+### §9 Phases, PR ladder, verification, acceptance
+
+**Phase 1 — foundation (each PR lands dark until P1c):**
+- **P1a** `Core/GuideCatalog.cs` + `Data/GuideCatalog.json` (one thin seed guide as
+  fixture) + validation tests (`GuideCatalogTests`: every Authored objective answers
+  who+where+what and carries a source; Stub carries a note; no prerequisite cycles; every
+  `RewardKey` resolves against `SkyQuestDefaults`; **prove-fail: a hollow guide fixture
+  must fail the fully-authored claim**). V2 verify.
+- **P1b** `QuestLedgerStore.Guides` + one-writer routing + tests (tick survives restart
+  and the `CountingRulesVersion` reset — manual state is not a log-derived counter). V2.
+- **P1c** `GuideChecklistProjection` + Sky-tab rendering both hosts + phone +
+  `SurfaceParityTests` extensions + E2E dump facts (`questsGuide=`, stub count) +
+  `shoot.ps1` staging for the guide state (traps 22/23: seed through the real keys) +
+  screenshots incl. `shell-quests-sky`. V2 + E2E.
+- **P1d** active-step card + stub banner + "Improve this step" (desktop, shell, phone),
+  from Bevel's faces. V2 + E2E + screenshots.
+- **Phase 2 — authoring:** three PRs, WAR → MNK → DRU (Founder-verifiable order is
+  David's to walk; smallest guide first is the stated default). Each: full PoS
+  progression for that class from eqlwiki — islands as stages, keys, spawn procedure,
+  hazards, turn-ins — with a **stub inventory in the PR body** (every hollow spot named,
+  not smoothed over), validation green, `verify-quests.ps1`-style spot audit of items
+  against the harvest.
+- **MVP acceptance** (requirements §33, sized to David's reach): David completes — or
+  walks as far as a level-29-verifiable path allows — a PoS quest per class using only
+  EQBuddy; every point where he'd need a browser is either fixed or becomes a named Stub.
+  Wiki-silent facts stay stubs, honestly. Player-noticeable ship gets its `WhatsNew.json`
+  entry in the release that ships it (not before).
+- **Sequencing:** Helm sign → Claude implements P1a/P1b (may parallel under Soft ≤3) →
+  Bevel faces the card → P1c/P1d → Phase 2 authoring. Phase 3 (normal-quest conversion +
+  store consolidation), Phase 4 (Epics), Phase 5 (auto-detect), Phase 6 (gear) each get
+  their own plan when their turn comes — this plan deliberately does not spend them.
+
+— Fable 5, 2026-09-08 ~12:30 PM CT
+
+---
+
 ## To: Fable — Guided progression / Quests rebuild (2026-09-08)
 
 **From:** Helm (Founder locks + requirements landed)
