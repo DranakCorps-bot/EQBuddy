@@ -1950,6 +1950,39 @@ Read this list before touching the areas it names. Every entry cost a release.
     (matched half the hall). Two more shipped entries carried the same shape, one of them
     holding prose. `EveryShippedPlaceholderSegmentIsAWholeMobName` now fails it.
 
+67. **A DEFAULT THAT MEANS "EVERYTHING" IS ONLY SAFE IF THE CLIENT ALWAYS NARROWS — and
+    the narrowing lived in a branch a FIRST-RUN client could never take.** EQBuddy Mobile's
+    server treats a device with no subscription as wanting every surface, which is correct
+    and necessary: the page cannot know what the PC offers until the first snapshot arrives.
+    The page is then supposed to say what it actually wants. Its only two `sendSubscribe()`
+    calls were `if (choice) sendSubscribe()` on open — and `choice` is built FROM the first
+    snapshot, so it is null on a device that has never paired — and the ⚙ picker. **A phone
+    that has just scanned the QR is neither**, so it stayed on "everything" for the life of
+    the connection: 724 KB on connect and 186 KB per push against 2.2 KB for the two panels
+    it actually draws, arriving as fast as `PumpCompanion` moves, each one a `JSON.parse` on
+    the phone's only thread. The page wedges, and the ⚙ that would have narrowed it is behind
+    the page that will not respond (the owner, 2026-09-07: *"scanned QR, got a page that hung
+    forever"*).
+    → **Every layer was innocent and every layer looked innocent.** The QR decoded, the
+    address ranking picked the right NIC, `GET /` answered 200 in 6 ms, the upgrade answered
+    101, the protocol numbers matched, and nothing was logged on either side. Six honest
+    hypotheses died before the first measurement, and **the measurement — one frame's byte
+    count — settled it in a single line**. Trap 33/49's "ship the instrument before the third
+    theory" again: a raw RFC6455 client against the owner's own running app, twenty lines.
+    → **The assumption was written down and had never been true.** `CompanionQuestsTests`
+    says in its own comment *"the connect push (unsubscribed = everything) spends the catalog
+    before the page narrows"*. It narrowed for a RETURNING device and for no other kind, and
+    that sentence is what made it invisible. Trap 20's shape — the thing to look for is the
+    call that is NOT there — with the missing call sitting behind a truthy check that reads
+    like a guard and is a branch.
+    → **The general move: when a server has a permissive default for "the client has not
+    spoken yet", find the code that speaks and ask what state it needs in order to run.** If
+    that state is produced by the very message the default was serving, the default is
+    permanent for the client that needed it most. Guarded by `CompanionFirstPairingTests`
+    (3 of 5 fail pre-fix), and behaviourally by `scripts/mobile-harness.ps1` +
+    `window.__SENT` — **on a CLEAN browser profile**, because a second run inherits
+    `localStorage`, takes the returning-device path, and makes the broken page look correct.
+
 ## Tooling notes that cost time when ignored
 
 - **`pwsh -NoProfile -File scripts/status.ps1`** answers "where did we leave off?" in one

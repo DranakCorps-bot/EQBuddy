@@ -610,6 +610,16 @@ function boot() {
   let receivedAt = 0;        // ms clock when latest arrived
   let lastMsgAt = 0;         // any message (heartbeats count as freshness)
   let ws = null, backoff = 1000, everConnected = false, refusals = 0;
+  // What this SOCKET has told the PC it wants, as the JSON of the picks we sent. Per
+  // socket, because the subscription lives on the connection: a reconnect starts a
+  // fresh server-side client with no subscription at all, so this resets with it.
+  //
+  // A device that has never subscribed is served EVERYTHING the PC offers, forever —
+  // which is what a freshly-scanned phone was, because the only two sendSubscribe()
+  // calls were "returning device, on open" and "the player touched the ⚙". On the
+  // owner's profile that is 186 KB of JSON per push against 2.2 KB for the two panels
+  // a phone actually opens with, and the pump pushes as fast as the session moves.
+  let subscribedTo = null;
   const panels = {};         // surface -> { section, body }
   const painted = {};        // surface -> JSON of what that panel currently shows
   const scope = {};          // combat board -> "fight" | "session"
@@ -744,6 +754,7 @@ function boot() {
 
   // ---------- websocket ----------
   function connect() {
+    subscribedTo = null;   // a new socket is a new server-side client: nothing asked yet
     ws = new WebSocket("ws://" + location.host + "/ws?token=" + encodeURIComponent(token));
     ws.onopen = () => {
       backoff = 1000; everConnected = true;
@@ -751,7 +762,13 @@ function boot() {
       // The PC accepted this code, so it is worth remembering for a chrome-free
       // Home Screen launch, which arrives without the fragment.
       try { localStorage.setItem(TOKEN_KEY, token); } catch {}
-      if (choice) sendSubscribe(); // returning device: ask for its picks up front
+      // Returning device: its picks. FIRST PAIRING: the picks it is ABOUT to make, which
+      // is the whole point — the connect push is served against whatever the PC has been
+      // told, and a device that says nothing is served all eleven surfaces. The ask does
+      // not have to intersect `offered` (unknown until the first snapshot); the server
+      // answers gated names with notOffered, and the envelope carries `offered` whatever
+      // is subscribed, so the ⚙ picker is built from the same list either way.
+      sendSubscribe(choice ? picked() : FIRST_RUN);
     };
     ws.onmessage = e => {
       lastMsgAt = Date.now();
@@ -781,6 +798,11 @@ function boot() {
       offered = msg.offered || [];
       ensureChoice();
       if (offerChanged) { renderScreens(); saveChoice(); }
+      // ensureChoice() is where a first-run device FIRST has picks to state — the open
+      // handler could only guess at them. Narrowing to them here is what stops a newly
+      // paired phone being served all eleven surfaces for the life of the connection;
+      // it is a no-op on every later snapshot, because the key has not moved.
+      sendSubscribe();
       render();
     };
     ws.onclose = () => {
@@ -801,9 +823,17 @@ function boot() {
     };
     ws.onerror = () => ws.close();
   }
-  function sendSubscribe() {
-    if (ws && ws.readyState === 1)
-      ws.send(JSON.stringify({ kind: "subscribe", surfaces: picked() }));
+  // `surfaces` defaults to this device's picks; the open handler passes FIRST_RUN before
+  // a choice exists. Records what THIS socket has asked for so the caller after every
+  // snapshot can tell "already asked" from "never asked", and so a no-op re-ask cannot
+  // bounce a re-projection back and forth with the PC.
+  function sendSubscribe(surfaces) {
+    const want = surfaces || picked();
+    const key = JSON.stringify(want);
+    if (key === subscribedTo) return;
+    if (!ws || ws.readyState !== 1) return;
+    ws.send(JSON.stringify({ kind: "subscribe", surfaces: want }));
+    subscribedTo = key;
   }
   function sendTick(surface, id, done) {
     if (ws && ws.readyState === 1)
