@@ -48,6 +48,24 @@ namespace EQBuddy;
 /// their source for the same reason a shared const the block PRINTS is a string the block shows
 /// (SR-1's <c>AltTabPolicy</c> precedent).
 ///
+/// **The prose-to-hover pass ran here too (Pass 1; Bevel's faces, Helm-signed 2026-09-08).**
+/// The owner's complaint is the SHAPE of the screen rather than its words: a paragraph under
+/// every control turns a screen whose job is "find your switch and flip it" into an essay you
+/// scroll past. Five explanations moved onto an ⓘ beside the thing they explain — the panel
+/// list's, the mini dashboard's, the floating-window list's, and the two under the
+/// double-click and target-drops switches. **Not one word was rewritten**; the consts below
+/// are the strings that shipped, hanging somewhere else. <see cref="SettingsProsePolicy"/> is
+/// the rule that decided which, and <see cref="RecentRateBlurb"/> is the negative that keeps
+/// it from meaning "hide everything": ten words is a caption, and it stayed in the body.
+///
+/// **Two paragraphs deliberately did NOT move, and that is the whole judgement in this pass.**
+/// <see cref="PromotedStatsNote"/> and <see cref="GlancePetNote"/> answer "where did my switch
+/// GO", which is a question asked by somebody SCANNING a list for a row that is not in it —
+/// they have no control of their own to hover, and an ⓘ nobody knows to hover is the same
+/// thing as deleting them (traps 29/34, and #233's complaint in the first place). They are
+/// enumerated with that reason in `SettingsProsePolicyTests` so the next pass does not "finish
+/// the job" by hiding them.
+///
 /// **What the sweep deliberately did NOT touch, so the gap is named rather than silent:**
 /// <c>OverlaySections</c>' retired list (<c>RetiredHeading</c>, <c>RetiredBlurb</c>,
 /// <c>RetiredCard.Line</c>) and the fold notes beside it. That copy was signed as-is at #335
@@ -93,18 +111,33 @@ internal sealed class SettingsHudView
     /// naming six surfaces that left the HUD, and an absent panel photographs as an
     /// unremarkable list (trap 29/34). A comparison of the two hosts is what says the room
     /// kept it.
+    ///
+    /// <c>hudHints</c> joins it for the same reason and is the newer half of it: since the
+    /// prose pass, five explanations on this screen exist ONLY behind an ⓘ, so an ⓘ that
+    /// failed to build is a paragraph that has left the product with nothing on screen —
+    /// and nothing in a diff, a build or a screenshot — to say so. Counted off BUILT
+    /// buttons rather than off a list of the five, which is the difference between a fact
+    /// and a restatement of the source (trap 34/39).
     /// </summary>
     public string DebugFacts() => _block is null
         ? ""
         : $"hudPanels={_cards.Children.Count} " +
           $"hudRetired={_retiredRows} " +
           $"hudStats={_miniStats.Children.Count} " +
-          $"hudWindows={_breakouts.Children.Count}";
+          $"hudWindows={_breakouts.Children.Count} " +
+          $"hudHints={_hints}";
 
     private StackPanel _cards = null!;
     private WrapPanel _miniStats = null!;
     private WrapPanel _breakouts = null!;
-    private TextBlock _breakoutsBlurb = null!;
+
+    /// <summary>The floating-window list's explanation, which is an ⓘ rather than a line of
+    /// body prose since the prose pass. It kept its rebuild-on-render behaviour with its
+    /// text: <see cref="BuildBreakouts"/> re-points it at <see cref="BreakoutPresentation.Blurb"/>
+    /// every time it redraws the list, the way it re-pointed the TextBlock this replaced,
+    /// so a blurb that ever becomes conditional cannot go stale here.</summary>
+    private Button _breakoutsHint = null!;
+
     private Button _restoreOrder = null!;
     private CheckBox _doubleClickChips = null!;
     private CheckBox _targetDrops = null!;
@@ -231,8 +264,7 @@ internal sealed class SettingsHudView
     {
         var panel = new StackPanel();
 
-        panel.Children.Add(Heading(PanelsHeading, new Thickness(0, 0, 0, 2)));
-        panel.Children.Add(Dim(PanelsBlurb, new Thickness(0, 0, 0, 2)));
+        panel.Children.Add(HeadingHint(PanelsHeading, PanelsBlurb, new Thickness(0, 0, 0, 2)));
         // THE GEAR CHECKLIST IMPORT BLOCK LEFT THIS TAB on 2026-09-05 (SR-2), one PR before
         // the rest of it moved into this file. Its heading, its explanation, the three
         // buttons and the status line are on the GEAR & LOOT card's Wishlist tab now, in both
@@ -240,8 +272,7 @@ internal sealed class SettingsHudView
         _cards = new StackPanel();
         panel.Children.Add(_cards);
 
-        panel.Children.Add(Heading(HudStatsHeading, new Thickness(0, 14, 0, 2)));
-        panel.Children.Add(Dim(HudStatsBlurb, new Thickness(0, 0, 0, 2)));
+        panel.Children.Add(HeadingHint(HudStatsHeading, HudStatsBlurb, new Thickness(0, 14, 0, 2)));
         _miniStats = new WrapPanel();
         panel.Children.Add(_miniStats);
         panel.Children.Add(Dim(PromotedStatsNote, new Thickness(0, 4, 0, 2)));
@@ -285,14 +316,17 @@ internal sealed class SettingsHudView
         };
         panel.Children.Add(_restoreOrder);
 
-        panel.Children.Add(Heading(BreakoutPresentation.Heading, new Thickness(0, 14, 0, 2)));
-        _breakoutsBlurb = Dim("", new Thickness(0, 0, 0, 2));
-        panel.Children.Add(_breakoutsBlurb);
+        _breakoutsHint = Hint(BreakoutPresentation.Blurb);
+        panel.Children.Add(HeadingRow(BreakoutPresentation.Heading, _breakoutsHint,
+            new Thickness(0, 14, 0, 2)));
         _breakouts = new WrapPanel();
         panel.Children.Add(_breakouts);
 
+        // The two switches keep their own margins on the ROW rather than on the box: a
+        // checkbox offset ten units down inside the row would sit ten units below its own ⓘ,
+        // which is the one thing an explanation attached to a control must not look like.
         _doubleClickChips = Check(DoubleClickChipsLabel,
-            _main.Settings.DoubleClickChipsToggleBreakouts, new Thickness(0, 10, 0, 0),
+            _main.Settings.DoubleClickChipsToggleBreakouts, new Thickness(0),
             () =>
             {
                 if (!Ready) return;
@@ -300,13 +334,12 @@ internal sealed class SettingsHudView
                     _doubleClickChips.IsChecked == true;
                 _main.Settings.Save();
             });
-        panel.Children.Add(_doubleClickChips);
-        panel.Children.Add(Dim(DoubleClickChipsBlurb, new Thickness(0, 0, 0, 2)));
+        panel.Children.Add(HintRow(_doubleClickChips, DoubleClickChipsBlurb,
+            new Thickness(0, 10, 0, 2)));
 
-        _targetDrops = Check(TargetDropsLabel, _vm.ShowTargetDrops, new Thickness(0, 12, 0, 0),
+        _targetDrops = Check(TargetDropsLabel, _vm.ShowTargetDrops, new Thickness(0),
             () => { if (Ready) _vm.ShowTargetDrops = _targetDrops.IsChecked == true; });
-        panel.Children.Add(_targetDrops);
-        panel.Children.Add(Dim(TargetDropsBlurb, new Thickness(20, 2, 0, 0)));
+        panel.Children.Add(HintRow(_targetDrops, TargetDropsBlurb, new Thickness(0, 12, 0, 0)));
 
         panel.Children.Add(BuildRecentRate());
         panel.Children.Add(Dim(RecentRateBlurb, new Thickness(0, 0, 0, 0)));
@@ -555,7 +588,7 @@ internal sealed class SettingsHudView
     public void BuildBreakouts()
     {
         _breakouts.Children.Clear();
-        _breakoutsBlurb.Text = BreakoutPresentation.Blurb;
+        DesignSystem.SetHintProse(_breakoutsHint, BreakoutPresentation.Blurb);
         foreach (var kind in Enum.GetValues<BreakoutKind>())
         {
             var name = kind.ToString();               // the DisabledBreakouts key
@@ -632,6 +665,55 @@ internal sealed class SettingsHudView
         block.SetResourceReference(TextBlock.ForegroundProperty, "AccentBrush");
         return block;
     }
+
+    /// <summary>
+    /// A heading and the paragraph that used to sit under it, now on an ⓘ beside it.
+    ///
+    /// **A WrapPanel, not a horizontal StackPanel** (trap 25): both children have
+    /// content-driven widths, and a horizontal stack measures with infinite width in its
+    /// stacking direction — so at this window's 390-unit minimum a long label would push the
+    /// ⓘ past the edge with no ellipsis and no error, which is precisely how the Progress
+    /// window once shipped three visible tabs out of four. Wrapping puts it on the next line
+    /// instead, where it is still there to hover.
+    /// </summary>
+    private UIElement HeadingHint(string heading, string prose, Thickness margin) =>
+        HeadingRow(heading, Hint(prose), margin);
+
+    /// <summary>Same, for a hint the surface holds a reference to and re-points later.</summary>
+    private UIElement HeadingRow(string heading, Button hint, Thickness margin)
+    {
+        var row = new WrapPanel { Margin = margin };
+        var head = Heading(heading, new Thickness(0));
+        head.VerticalAlignment = VerticalAlignment.Center;
+        row.Children.Add(head);
+        row.Children.Add(hint);
+        return row;
+    }
+
+    /// <summary>A control and its explanation, in the same shape — see
+    /// <see cref="HeadingHint"/> for why this wraps.</summary>
+    private UIElement HintRow(FrameworkElement control, string prose, Thickness margin)
+    {
+        var row = new WrapPanel { Margin = margin };
+        control.VerticalAlignment = VerticalAlignment.Center;
+        row.Children.Add(control);
+        row.Children.Add(Hint(prose));
+        return row;
+    }
+
+    /// <summary>The ⓘ itself, and the only place this block counts one — see
+    /// <see cref="DebugFacts"/>, which reports what was BUILT rather than how many the
+    /// source names.</summary>
+    private Button Hint(string prose)
+    {
+        var hint = DesignSystem.InfoHint(prose);
+        hint.Margin = new Thickness(DesignTokens.SpaceXs, 0, 0, 0);
+        _hints++;
+        return hint;
+    }
+
+    /// <summary>How many ⓘ affordances this instance has built.</summary>
+    private int _hints;
 
     private TextBlock Dim(string text, Thickness margin) => new()
     {

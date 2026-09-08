@@ -1,4 +1,5 @@
 using System.Windows;
+using System.Windows.Automation;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
@@ -234,6 +235,44 @@ internal static class DesignSystem
         button.Width = button.Height = DesignTokens.IconInlineHit;
         if (button.Content is Path icon) icon.Width = icon.Height = size;
         return button;
+    }
+
+    /// <summary>
+    /// **The ⓘ that carries a paragraph Settings used to print underneath a control**
+    /// (<see cref="SettingsProsePolicy"/>). One builder rather than a hand-built icon per
+    /// surface, because the prose-to-hover pass reaches every Settings tab in turn and the
+    /// second copy of this shape is where the two start disagreeing about hit size, ink and
+    /// what a click does.
+    ///
+    /// **The click is not decoration.** A drawn button that answers only a hover is a
+    /// silent no-op for anybody clicking it — touch, a trackpad user who taps, or the
+    /// keyboard, which cannot hover at all — so the click OPENS the same tooltip the hover
+    /// shows. It is one paragraph with two ways in, never a second copy of the text.
+    ///
+    /// The tooltip is a real <see cref="ToolTip"/> rather than a bare string precisely so
+    /// the click has something to open; its duration is still the app-wide bounded one
+    /// (<c>ToolTipDefaults</c>, trap 63), because that is a metadata default on
+    /// <see cref="DependencyObject"/> and this is one.
+    /// </summary>
+    public static Button InfoHint(string prose, string colorKey = "DimBrush")
+    {
+        // StaysOpen=false so the click-opened one is dismissed by the next click anywhere,
+        // the way a menu is. Without it a tooltip opened by hand outlives the hover rules
+        // that would have closed it.
+        var tip = new ToolTip { Content = prose, StaysOpen = false };
+        var button = InlineIconButton("Info", prose, (_, _) => tip.IsOpen = true, colorKey);
+        button.ToolTip = tip;
+        button.VerticalAlignment = VerticalAlignment.Center;
+        AutomationProperties.SetName(button, SettingsProsePolicy.HoverAffordanceName);
+        return button;
+    }
+
+    /// <summary>Re-points an <see cref="InfoHint"/> at a different paragraph, for the ones
+    /// whose text a surface rebuilds rather than declares once. Both ways in read the SAME
+    /// <see cref="ToolTip"/>, so there is no second copy to leave behind.</summary>
+    public static void SetHintProse(Button hint, string prose)
+    {
+        if (hint.ToolTip is ToolTip tip) tip.Content = prose;
     }
 }
 
