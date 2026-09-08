@@ -43,7 +43,7 @@ namespace EQBuddy;
 ///    <see cref="WorldRoom"/>.
 ///  * **…except the CHARACTER, which is the one thing that title row said and no other
 ///    room's did.** "Quest Tracker — Dranak" names whose quests these are, and the shell's
-///    native title bar reads "EQBuddy — Quests" and cannot. So it is not dropped: the view
+///    native title bar reads "EQBuddy — Guide" and cannot. So it is not dropped: the view
 ///    composes the string (one producer) and this room draws it as a caption above the
 ///    tabs. That is the whole visible difference between the two hosts, and it exists
 ///    because losing it would be trap 26's sentence — the data survived the move and the
@@ -64,9 +64,11 @@ namespace EQBuddy;
 /// Gear loot-star pattern, and Helm's per-item gate of 2026-09-04): this PR does not
 /// retire <see cref="QuestsWindow"/>. It may only go once this room is on the rail (it is),
 /// a screenshot proves parity (`shell-quests`, `shell-quests-sky`, `shell-quests-narrow`),
-/// and the widget's Quests LAUNCHER card has somewhere to point — that card is the only
-/// door a player has to this surface today, and `MainWindow.ShowQuestsWindow` is what the
-/// map badge in the Loot views calls. **Nothing here writes a `MiniStats` key**, so unlike
+/// and the widget's Quests LAUNCHER card has somewhere to point — that card is gone (HUD
+/// subtraction cut 1) and since 2026-09-08 the widget's `Guide…` row points HERE rather than
+/// at the window. What still reaches `MainWindow.ShowQuestsWindow` is the map badge in the
+/// Loot views and the `toggleQuests` hotkey, so the window is not orphaned — but it no
+/// longer has a menu row, which is the condition the rest of this paragraph was waiting on. **Nothing here writes a `MiniStats` key**, so unlike
 /// World and Gear this room takes no last-writer with it.
 /// </summary>
 internal sealed class QuestsRoom : Grid, IShellRoom

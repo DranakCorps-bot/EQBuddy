@@ -640,7 +640,7 @@ internal sealed class SettingsAlertsView
             "Kill a named — or its placeholder — and a small countdown chicklet appears "
             + "(⏳ Asaka L`Rei 3:12). Chicklets sit in one row under EQBuddy and move with it "
             + "until you drag the row somewhere else, in which case it stays where you put it "
-            + "(right-click → Edit HUD… → Follow the HUD again puts it back). They show every "
+            + "(the pencil on EQBuddy → Follow the HUD again puts it back). They show every "
             + "timer you have running in any zone, and flip to DUE for a minute "
             + "(click to dismiss sooner). Double-click one (or right-click → Spawn timers…) "
             + "for the full zone list, which follows you zone to zone. We captured the respawn "

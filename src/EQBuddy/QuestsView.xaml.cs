@@ -134,7 +134,7 @@ public partial class QuestsView : UserControl
     /// <summary>
     /// Hide this view's own title row and close button, for a host that supplies its own
     /// chrome. <c>SpawnsView.HideOwnTitleBar</c> is the precedent, word for word: the shell
-    /// draws a native title bar reading "EQBuddy — Quests" and a rail, so drawing this
+    /// draws a native title bar reading "EQBuddy — Guide" and a rail, so drawing this
     /// view's copies too would put two title rows and two close buttons on screen at once.
     /// Collapsing the ROW rather than the two controls, so the Auto row height follows and
     /// nothing leaves a gap.
@@ -669,7 +669,7 @@ public partial class QuestsView : UserControl
         var character = key.Length > 0 ? key.Split('_')[0] : "";
         // ONE place this string is composed, and two consumers: this view's own title row
         // (the v1 window) and QuestsRoom's caption (the shell, whose native title bar says
-        // "EQBuddy — Quests" and cannot name the character). Two hosts spelling one
+        // "EQBuddy — Guide" and cannot name the character). Two hosts spelling one
         // heading is trap 33's shape, so neither of them spells it.
         var heading = character.Length > 0
             ? $"Quest Tracker — {char.ToUpper(character[0])}{character[1..]}"

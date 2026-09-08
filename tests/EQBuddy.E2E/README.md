@@ -129,11 +129,11 @@ reason; there are no bare sleeps. Timeouts fold in the dump content and the prof
 dump is one-way — the app writes, the suite reads — and every other `EQBUDDY_*` hook fires
 once at `Loaded`, which cannot reach a state that only exists MID-run: "the player has closed
 the shell". The probe polls the profile for `door.trigger` and drives the widget's
-`Open EQBuddy…` handler, the same one the menu row drives, so what is proved is the row's
-own path. `AppHarness.ClickOpenEqbuddyDoor` drops the file and returns on
-`doorProbeClicks`, which the probe raises AFTER the handler returns — an assertion that
-nothing MOVED has to be made on the far side of the decision, or it passes with the feature
-deleted (trap 62). `CloseShellWindow` is the other half: a real `WM_CLOSE`, matched on the
+`Guide…` handler (`Open EQBuddy…` until 2026-09-08), the same one the menu row drives, so
+what is proved is the row's own path. `AppHarness.ClickGuideDoor` drops the file and
+returns on `doorProbeClicks`, which the probe raises AFTER the handler returns — an
+assertion about where the door LANDED has to be made on the far side of the decision, or it
+passes with the feature deleted (trap 62). `CloseShellWindow` is the other half: a real `WM_CLOSE`, matched on the
 shell's exact title, leaving the app running.
 
 ## What v1 covers

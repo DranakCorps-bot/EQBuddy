@@ -379,6 +379,9 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
             star.IsChecked = _settings.MiniStats.Contains(key);
         ApplySectionLayout();
         SetMode(_settings.Minimized);
+        // The pencil's hover is UI.Shared copy, not a XAML literal — one source for the
+        // words, and it is the tooltip that says what the mode's exits are.
+        RefreshEditHudButton();
 
         FollowActiveCharacter();
 
@@ -1614,9 +1617,73 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
     /// <summary>The row window, made on first need — a chip arriving, or Edit HUD.</summary>
     private HudChipRowWindow EnsureHudChips() => _hudChips ??= new HudChipRowWindow(this, _spawnsVm);
 
-    /// <summary>"Edit HUD…" (SA-4): Place and Mute, on the row itself. The mode, the
-    /// affordances and the writes live in <see cref="HudChipRowWindow"/>; this is the door.</summary>
-    internal void OnEditHud(object sender, RoutedEventArgs e) => EnsureHudChips().ToggleEdit();
+    /// <summary>"Edit HUD" (SA-4): Place and Mute, on the row itself. The mode, the
+    /// affordances and the writes live in <see cref="HudChipRowWindow"/>; this is the door —
+    /// the title-bar pencil AND the expanded menu row both land here, and so does
+    /// <c>EQBUDDY_HUDEDIT</c>.</summary>
+    internal void OnEditHud(object sender, RoutedEventArgs e)
+    {
+        EnsureHudChips().ToggleEdit();
+        RefreshEditHudButton();
+    }
+
+    /// <summary>
+    /// **Esc leaves Edit HUD** (Bevel's cog/Options IA faces §C, Helm-signed 2026-09-08).
+    ///
+    /// The mode's exits are Done on the strip, this key, and re-pressing the pencil. Esc is
+    /// the third of the three deliberately: the row window is <c>ShowActivated = false</c>
+    /// with <c>NoActivate</c> attached, so it can never hold keyboard focus — the widget is
+    /// the window that CAN, and it is the window the player just clicked the pencil on.
+    /// **That is the limit and it is honest**: Esc works from the widget, not from the game.
+    /// Done is the exit that works from anywhere the strip is visible, which is why the
+    /// hint names it first (<see cref="EQBuddy.UI.Shared.HudEditText.Hint"/>).
+    ///
+    /// Handled is set only when the mode was actually on, so Esc keeps whatever meaning it
+    /// has for anything else focused inside the widget.
+    /// </summary>
+    private void OnWidgetKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+    {
+        if (e.Key != System.Windows.Input.Key.Escape) return;
+        if (_hudChips is not { Editing: true }) return;
+        OnEditHud(this, new RoutedEventArgs());
+        e.Handled = true;
+    }
+
+    /// <summary>The pencil lights while the mode is on. <c>IsEnabled</c>/state with no
+    /// visual is invisible under this app's styles (trap 17), and a toggle that looks
+    /// identical in both states is a control a player cannot tell they have pressed.</summary>
+    private void RefreshEditHudButton()
+    {
+        var on = _hudChips is { Editing: true };
+        EditHudIcon.Ink = on ? "AccentBrush" : "DimBrush";
+        EditHudBtn.ToolTip = on ? HudEditText.DoneTip : HudEditText.EnterTip;
+    }
+
+    /// <summary>
+    /// **The ≤4 lock, applied** (Bevel's cog/Options IA faces §B). Everything carrying
+    /// <see cref="WidgetMenuPolicy.ExpandedOnlyTag"/> — rows AND separators — is collapsed
+    /// while the widget is minimized, leaving the four doors
+    /// <see cref="WidgetMenuPolicy.MiniRows"/> names.
+    ///
+    /// **It is applied on every mode change rather than only when the menu opens**, so the
+    /// items' <c>Visibility</c> is a true answer at any moment the dump is written. A
+    /// visibility that only became correct inside the opening handler would make
+    /// <c>menuMiniRows</c> a fact about when it was asked rather than about the menu
+    /// (trap 42's shape: present in the build vs in effect at runtime). The
+    /// <c>ContextMenu.Opened</c> hook is belt-and-braces for anything that reaches the menu
+    /// without going through <see cref="SetMode"/> — <c>EQBUDDY_MENU</c> opens it directly.
+    /// </summary>
+    private void ApplyMenuMode()
+    {
+        if (RootBorderElement.ContextMenu is not { } menu) return;
+        var mini = MiniRoot.Visibility == Visibility.Visible;
+        foreach (var item in menu.Items)
+            if (item is FrameworkElement { Tag: string tag } fe
+                && tag == WidgetMenuPolicy.ExpandedOnlyTag)
+                fe.Visibility = mini ? Visibility.Collapsed : Visibility.Visible;
+    }
+
+    private void OnContextMenuOpened(object sender, RoutedEventArgs e) => ApplyMenuMode();
 
     /// <summary>
     /// A slow landed on the player, straight off the ingest thread. Speaks once per
@@ -1906,10 +1973,20 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
         _breakoutHost.Update(CurrentSnapshot());
     }
 
-    // internal (not private): the OE-2 door probe in DebugHooks drives this exact handler.
-    internal void OnOpenShell(object sender, RoutedEventArgs e) => ShellHost.OpenDoor(this);
-
-    private void OnQuestsWindow(object sender, RoutedEventArgs e) => ShowQuestsWindow();
+    /// <summary>
+    /// **"Guide…" — the one row where there were two** (Bevel's cog/Options IA faces §B/§D,
+    /// Helm-signed 2026-09-08 ~2:13 PM CT, owner amendment ~2:15 PM CT).
+    ///
+    /// It replaces <c>Open EQBuddy…</c> (OE-2's shell recovery) and <c>Quests…</c> (HUD
+    /// subtraction cut 1's door) with a single row that names its DESTINATION rather than
+    /// the window it lives in. The OE-2 job is unchanged — a shell the ✕ took comes back
+    /// when this is chosen — and <see cref="ShellHost.OpenGuideDoor"/> is where the reason
+    /// it now carries an address is written down.
+    ///
+    /// internal (not private): the OE-2 door probe in <see cref="DebugHooks"/> drives this
+    /// exact handler, so what the E2E suite walks is the row's own path.
+    /// </summary>
+    internal void OnGuideDoor(object sender, RoutedEventArgs e) => ShellHost.OpenGuideDoor(this);
 
     /// <summary>Open (or front) the Quest Tracker; with an item, jump straight to that
     /// item's quests — the 🗺 badge path from the Loot views.</summary>
@@ -3243,6 +3320,10 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
         NormalRoot.Visibility = mini ? Visibility.Collapsed : Visibility.Visible;
         ResizeGrip.Visibility = mini ? Visibility.Collapsed : Visibility.Visible;
         HeightGrip.Visibility = mini ? Visibility.Collapsed : Visibility.Visible;
+        // The ≤4 lock (faces §B). Here rather than only in the menu's own Opened handler
+        // because the widget's mode is what decides it, and a Visibility that is only made
+        // true on the way into the menu is a fact nothing outside that moment can read.
+        ApplyMenuMode();
         _settings.Save();
         var snap = _stats.Snapshot();
         _hudExpandBar.SetBarVisible(mini);   // OE-1: no bar, no under-bar panel
@@ -3794,10 +3875,16 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
                     else if (_worldWindow is { IsLoaded: true } wmap) { wmap.SetTab(WorldTab.Map); wmap.Show(); }
                     else ShowWorldWindow(WorldTab.Map);
                     break;
+                // The Quest Tracker WINDOW kept this hotkey when its context-menu row became
+                // "Guide…" and started opening the shell's Guide room instead (faces §D,
+                // 2026-09-08). Two surfaces render the same QuestsView; this key still
+                // reaches the standalone one, which is why the row's removal subtracted no
+                // capability. It is not a DOOR — nothing is bound by default (trap 59) —
+                // which is exactly why the Guide row had to keep the checklists reachable.
                 case "toggleQuests":
                     if (_questsWindow is { IsLoaded: true, IsVisible: true }) _questsWindow.Hide();
                     else if (_questsWindow is { IsLoaded: true }) _questsWindow.Show();
-                    else OnQuestsWindow(this, new RoutedEventArgs());
+                    else ShowQuestsWindow();
                     break;
                 case "toggleSpawns":
                     if (_worldWindow is { IsLoaded: true, IsVisible: true }) _worldWindow.Hide();

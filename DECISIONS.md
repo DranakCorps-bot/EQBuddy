@@ -1,3 +1,61 @@
+## 2026-09-08 (SIGNED cog/Options IA faces — the Guide door and the ≤4 minimized menu)
+
+Authority: `docs/BEVEL-cog-options-ia-faces.md` (Helm-signed ~2:13 PM CT, owner amendment
+~2:15 PM CT, merge `28f5f408`).
+
+- **Helm's `EQBuddy window…` rename preference is NOT implemented; the row is CUT** · the
+  other default is to rename `Open EQBuddy…` to `EQBuddy window…` as Helm preferred at the
+  time · cut, because the owner's ~2:15 PM CT amendment names that exact string in its cut
+  list (`docs/BEVEL-cog-options-ia-faces.md` §D/§E/§G) and post-dates the preference, and
+  the signed doc is authority 1. Flagged to Helm in the LIVE ASK rather than resolved
+  quietly — if the preference was meant to survive the amendment, this is the one line to
+  reverse.
+- **`Guide…` NAVIGATES an already-open shell instead of fronting it where it stood** · the
+  default is OE-2's signed behaviour, which passed no address precisely so it would not
+  move a reading player · navigate, because the row is named for a destination now and
+  §H acceptance 3 says it "opens the Evolved shell to the Guide room". A row called
+  `Guide…` that lands on Gear is trap 35 in a menu. **This reverses a previously-signed
+  sub-behaviour** and `ShellHostTests.TheGuideDoorTakesAnOpenShellToGuideFromWhereverItWas`
+  is the old test rewritten rather than deleted, with the reversal argued in its doc
+  comment. What replaces "front without moving" is the shell's own taskbar button; §E cut
+  every parallel recovery label deliberately.
+- **The shell room is RELABELLED `Guide`; the wire key stays `quests`** · the default is
+  renaming `ShellPage.Quests` and its key together · label only, because `page:room` is
+  persisted, arrives in `EQBUDDY_SHELL` and in every dump, and `ShellPages`' own rule is
+  that the shell never re-spells a room. `WidgetMenuPolicy.GuideAddress` reads the key so
+  the two cannot drift.
+- **`QuestsWindow` is NOT retired, and its context-menu row is gone** · the default is to
+  retire the window with its door, or to keep a second row for it · neither: the room
+  renders the same `QuestsView`, so no capability left, and the window keeps the
+  `toggleQuests` hotkey, the Loot views' 🗺 badge and `EQBUDDY_QUESTS`. The faces cut its
+  ROW, not the window; retiring the window is `QuestsRoom`'s own subtraction blocker and a
+  separate change.
+- **Edit HUD's ≤1-click enter is a title-bar PENCIL, not a control on the chip row** · §C
+  offered either ("expanded chip row (or expanded title bar)") · title bar, because the
+  chip row is `ShowActivated=false` with `NoActivate` attached and is *absent* on a profile
+  with no timers running — an enter that only exists once something is already on the row
+  is the trap 59 shape the mode's own editor exists to avoid.
+- **Esc exits from the WIDGET only, and that limit is written down rather than papered
+  over** · the default is a global hotkey · widget-scoped `PreviewKeyDown`, because the
+  chip row can never hold focus by construction and a global key would be a binding on a
+  profile that binds nothing (trap 59, from the other side). Done is the exit that works
+  from wherever the row is, which is why `HudEditText.Hint` names it first.
+- **Options → `Cards & windows` was NOT renamed to `HUD`** · faces §D says "align copy
+  toward HUD **when Soft next touches OptionsWindow chrome**" · deferred, because this cut
+  touched the context menu and the HUD row, not that window's chrome, and the dual name is
+  Helm-signed as honest for a dual host (I-11 §3, and 1.99.x's What's-new told players the
+  two names on purpose). Renaming it is a player-visible move that owes its own "X is now
+  Y" entry.
+- **`menuOpenShell` was RENAMED to `menuGuide` in the dump rather than kept** · the default
+  is to leave a stable key so no E2E churns · renamed, because a dump key that goes on
+  calling a row by a name the menu no longer uses is the next reader's wrong turn, and the
+  suite is the only reader.
+- **`WhatsNew.json` gains two entries** under the unreleased 2.0.0 block · both moves are
+  player-visible and both are "X is now Y": the menu note names `Quests…`, `Open EQBuddy…`
+  and `EQBuddy Mobile (Beta)…` alongside what each is now, and says plainly that the door
+  always arrives on Guide where the old one left you where you were.
+- **No Play Console / tag / publish / signing / prod secrets / Evolved settings restore.**
+  Buff duration and alert code untouched (parallel Soft Opus seat on `buff-alerts`).
 ## 2026-09-08 (buff alerts armed minutes early on ranked spells — owner report)
 
 - **A measured ranked-duration LEDGER, not a rank formula and not a mote multiplier** · the default it could have gone the other way on is deriving rank N from the wiki base and a per-rank percentage, which would have covered every spell at once · a ledger, because the owner's two measurements sit at **+50%** (Shield of Thorns V) and **+25%** (Chloroplast V) over their wiki bases — no formula fits both, so any formula that fit one would silently mis-time the other. Helm's #414 posture (*do not invent ranked durations / mote multipliers*) is kept by construction rather than by memory: every row stores the observation it came from and `RankedBuffDurationTests` re-derives it, so a row typed from a hunch cannot pass.

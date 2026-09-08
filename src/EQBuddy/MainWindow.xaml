@@ -4,7 +4,8 @@
         xmlns:local="clr-namespace:EQBuddy"
         Title="EQBuddy" SizeToContent="WidthAndHeight"
         WindowStyle="None" AllowsTransparency="True" Background="Transparent"
-        Topmost="True" ShowInTaskbar="True" ResizeMode="NoResize">
+        Topmost="True" ShowInTaskbar="True" ResizeMode="NoResize"
+        PreviewKeyDown="OnWidgetKeyDown">
 
     <!-- WindowStyle=None + AllowsTransparency means there's no native resize border, so
          ResizeGrip below drives UiScale (not Width/Height directly) from drag distance —
@@ -19,55 +20,87 @@
                  Options got). Windows lead — they're the daily drivers — then the two
                  in-play actions, then submenus for data chores and help. Set-and-forget
                  toggles (track spawns, grid overlay, cursor ring) moved to Options tabs;
-                 click-through stays, because flipping it mid-pull is what it's FOR. -->
-            <ContextMenu>
+                 click-through stays, because flipping it mid-pull is what it's FOR.
+
+                 CUT DOWN AGAIN 2026-09-08 — Bevel's cog/Options IA faces §B, Helm-signed
+                 ~2:13 PM CT and amended by the owner ~2:15 PM CT. THIS IS ONE MENU FOR TWO
+                 STATES: it hangs off the shared root border, so every row here used to be
+                 on the MINIMIZED bar too, and the path a minimized player walked to reach
+                 Edit HUD was expand → hunt → choose → the same again to get back. The
+                 minimized bar now shows FOUR rows and they are all doors —
+                 UI.Shared/WidgetMenuPolicy.MiniRows, which WidgetMenuTests reads this file
+                 against in both directions. Everything else carries Tag="expanded" and is
+                 hidden by MainWindow.ApplyMenuMode while the widget is minimized; the tag
+                 is on the SEPARATORS too, or the mini menu opens with a rule floating
+                 under its last row. -->
+            <ContextMenu Opened="OnContextMenuOpened">
                 <MenuItem Header="Options…" Click="OnOptions"
                           ToolTip="Size, theme, alerts, watch rules, cards, hotkeys — now in tabs"/>
-                <Separator/>
-                <!-- OE-2, the Evolved shell's player door (Bevel item 3, Helm-signed #347
-                     item 3). It is FIRST because of what it recovers: the shell has native
-                     chrome, so ✕ closes it like any window, and until this row existed
-                     EQBUDDY_SHELL was the only way back in — a player who closed it was
-                     stranded until they restarted EQBuddy. A row is the door rather than a
-                     hotkey because nothing is bound by default (trap 59), and it sits with
-                     World… and Quests… below for the same reason those two are there. -->
-                <MenuItem x:Name="OpenShellItem" Header="Open EQBuddy…" Click="OnOpenShell"
-                          ToolTip="The Evolved window — Home, Live, Progress, Quests, Gear, World and Settings in one place, with Ctrl+K to jump. Closing it is not permanent; this row brings it back, and leaves it where you were if it is already open."/>
-                <!-- First of the SATELLITE windows because it is the one you reach for at
-                     the start of a session, not a setting you visit once. -->
-                <MenuItem x:Name="MobileMenuItem" Header="EQBuddy Mobile (Beta)…" Click="OnCompanion"
-                          ToolTip="Show EQBuddy on a phone or tablet on your Wi-Fi — scan the code, pick which windows that device shows. LAN-only; nothing leaves your network."/>
                 <!-- The WORLD theme (docs/Themes.md theme 6, World PR 2): Zone map, Travel
                      route, Spawn timers and Drop camp marker all retire as separate entries
                      here — one door onto the four World tabs, the same shape Gear & Loot's
                      cog entries took when that theme's card became the only door. Drop
                      camp marker's replacement is the button in the World window's own
-                     chrome (every tab), not a cog entry at all. -->
+                     chrome (every tab), not a cog entry at all.
+
+                     It stays a BREAKOUT and is deliberately not folded into Guide… below
+                     (faces §E) — a map you are reading mid-travel is not progression. -->
                 <MenuItem Header="World…" Click="OnWorldWindow"
                           ToolTip="Zone map, camp timers, travel routes, deaths and zone markers — one window, four tabs"/>
-                <!-- HUD subtraction cut 1 (2026-09-05): this row exists because the Quests
-                     CARD does not. Its ⧉ was the way into the Quest Tracker for anyone who
-                     had not bound the hotkey — and nothing is bound by default
-                     (HotkeyManager's own rule) — so removing the card without this row
-                     would have made the window unreachable on a default profile, which is
-                     the #219 shape CLAUDE.md's "three ways back" exists to refuse. Same
-                     shape as World… above, which is why it sits beside it. -->
-                <MenuItem Header="Quests…" Click="OnQuestsWindow"
-                          ToolTip="The Quest Tracker — search every quest, your Epic 1.0 and Plane of Sky checklists, and what is ready to turn in"/>
-                <MenuItem Header="Session history…" Click="OnHistory"/>
-                <Separator/>
-                <MenuItem x:Name="ClickThroughItem" Header="Click-through (game clicks pass through)"
+                <!-- The one you reach for at the START of a session, not a setting you visit
+                     once. Shortened from "EQBuddy Mobile (Beta)…" on 2026-09-08 (faces §D):
+                     on a menu hanging off EQBuddy, "EQBuddy" in the row is the word the row
+                     shares with every other row, and the beta tag was doing no work the
+                     screen it opens does not do better. -->
+                <MenuItem x:Name="MobileMenuItem" Header="Mobile…" Click="OnCompanion"
+                          ToolTip="Show EQBuddy on a phone or tablet on your Wi-Fi — scan the code, pick which windows that device shows. LAN-only; nothing leaves your network."/>
+                <!-- GUIDE — ONE ROW WHERE THERE WERE TWO (owner amendment 2026-09-08
+                     ~2:15 PM CT, on top of the ~2:13 PM CT SIGN).
+
+                     It replaces BOTH "Quests…" (HUD subtraction cut 1's door, 2026-09-05)
+                     and "Open EQBuddy…" (OE-2's shell recovery, Helm-signed #347 item 3).
+                     Those were two rows that meant the same thing to a player — leave the
+                     overlay and go read something — and one of them was a second "open the
+                     app" label on a bar that already IS the app.
+
+                     WHAT IT MUST KEEP DOING, because OE-2 is what made the old row a
+                     must-fix: the shell has native chrome, so ✕ closes it like any window,
+                     and while EQBUDDY_SHELL was the only entrance a player who closed it
+                     was stranded until they restarted EQBuddy. This row is still that
+                     recovery — it opens the shell when none is up. What CHANGED is that it
+                     now names an address: a row called Guide… that fronted the shell on
+                     whatever room you left open would be an affordance lying about itself,
+                     so it navigates to Guide every time (ShellHost.OpenGuideDoor).
+
+                     A row and not a hotkey, because nothing is bound by default (trap 59).
+                     The Quest Tracker WINDOW is not retired by this and keeps its own
+                     entrances (the toggleQuests hotkey, the loot deep-link, EQBUDDY_QUESTS);
+                     what left is its context-menu row, and the Guide room renders the same
+                     QuestsView it does. -->
+                <MenuItem x:Name="GuideItem" Header="Guide…" Click="OnGuideDoor"
+                          ToolTip="Your progression, in the EQBuddy window — every quest, your Epic 1.0 and Plane of Sky checklists, and what is ready to turn in. Closing that window is not permanent; this row brings it back."/>
+                <Separator Tag="expanded"/>
+                <MenuItem Tag="expanded" Header="Session history…" Click="OnHistory"/>
+                <Separator Tag="expanded"/>
+                <MenuItem x:Name="ClickThroughItem" Tag="expanded"
+                          Header="Click-through (game clicks pass through)"
                           IsCheckable="True" Click="OnClickThrough"/>
                 <!-- Surface A / SA-4. It sits with click-through rather than with the
-                     windows above because it is the same kind of thing: an in-play switch
+                     doors above because it is the same kind of thing: an in-play switch
                      for what the HUD is doing right now, not a settings visit. The mode
                      lives on the chip row itself (HudChipRowWindow.ToggleEdit) — there is
-                     no dialog, which is why this row is the only door and why the row
-                     carries its own "choose Edit HUD… again when you are done" line. -->
-                <MenuItem Header="Edit HUD…" Click="OnEditHud"
+                     no dialog.
+
+                     NO LONGER THE ONLY DOOR (faces §C, 2026-09-08). The pencil in the
+                     expanded title bar is the ≤1-click way in, and the mode's own Done
+                     chicklet plus Esc are the way out — this row is the secondary enter and
+                     it stays off the MINIMIZED menu, because placing chips is not something
+                     you do from the bar mid-pull. The ellipsis went with the dialog it never
+                     opened. -->
+                <MenuItem Tag="expanded" Header="Edit HUD" Click="OnEditHud"
                           ToolTip="Reorder the chip row, mute a whole kind of chip — mez and slow, spawn timers, watch alerts, buffs — or put a row you have dragged away back under EQBuddy. Sounds and alerts are not affected; those stay in Options → Alerts &amp; chips."/>
-                <Separator/>
-                <MenuItem Header="Data &amp; imports">
+                <Separator Tag="expanded"/>
+                <MenuItem Tag="expanded" Header="Data &amp; imports">
                     <MenuItem Header="Wiki contribution pack…" Click="OnWikiPackWindow"
                               ToolTip="Paste-ready eqlwiki edits built from your own loot log — creatures with no page, pages that list no loot, and drops missing from a page. Nothing publishes automatically; you open each edit link, review and save."/>
                     <MenuItem Header="Import achievements…" Click="OnImportAchievements"
@@ -79,7 +112,7 @@
                     <MenuItem x:Name="ChooseLogFolderItem" Header="Choose log folder…" Click="OnChooseLogFolder"/>
                     <MenuItem Header="Auto-detect log folder" Click="OnAutoDetectLogFolder"/>
                 </MenuItem>
-                <MenuItem Header="Help">
+                <MenuItem Tag="expanded" Header="Help">
                     <MenuItem x:Name="VersionMenuItem" Header="EQBuddy" Click="OnOpenWebsite"
                               ToolTip="Open the EQBuddy page — downloads, guides, and a link to share"/>
                     <MenuItem Header="Quick tutorial…" Click="OnTutorial"/>
@@ -117,6 +150,7 @@
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="Auto"/>
@@ -184,19 +218,38 @@
                      dingbat while every other control on this bar follows the theme, and
                      it is the #148/#166 failure sitting on the always-on-screen surface.
                      The Avalonia twin has drawn this one all along. -->
-                <Button x:Name="GearBtn" Grid.Column="5" Style="{StaticResource IconButton}"
+                <!-- EDIT HUD, ≤1 CLICK FROM THE EXPANDED WIDGET (Bevel's cog/Options IA
+                     faces §C, Helm-signed 2026-09-08). The mode used to be reachable only
+                     by right-click → a menu row, and leaving it took the same right-click
+                     and the same row again — an asymmetric door whose missing control the
+                     hint text on the row was apologising for. This is the persistent enter;
+                     Done on the edit strip and Esc are the exits.
+
+                     It sits BESIDE the gear rather than in Options because placing chips is
+                     a mode on the HUD, not a setting (faces §C's out-list: "Edit HUD stays
+                     out of Options tabs"). Expanded only — it is inside NormalRoot, so the
+                     minimized bar never draws it, which is the same ≤4 rule the menu keeps.
+
+                     Its tooltip is set in code from UI.Shared/HudEditText.EnterTip so the
+                     words have one source; the button lights its ink while the mode is on,
+                     because IsEnabled/state with no visual is trap 17. -->
+                <Button x:Name="EditHudBtn" Grid.Column="5" Style="{StaticResource IconButton}"
+                        Click="OnEditHud">
+                    <local:EqIcon x:Name="EditHudIcon" Glyph="Pencil" Size="13"/>
+                </Button>
+                <Button x:Name="GearBtn" Grid.Column="6" Style="{StaticResource IconButton}"
                         ToolTip="Settings" Click="OnGear">
                     <local:EqIcon Glyph="Settings" Size="13"/>
                 </Button>
                 <!-- Tooltip is set in code (ResetPrompt): what this button does to your
                      log depends on whether archiving is on, and "Reset session stats"
                      hid that it touches a file at all (#159). -->
-                <Button x:Name="ResetButton" Grid.Column="6" Style="{StaticResource IconButton}"
+                <Button x:Name="ResetButton" Grid.Column="7" Style="{StaticResource IconButton}"
                         Content="&#x21BB;" ToolTipOpening="OnResetToolTipOpening"
                         ToolTip="Start a new session" Click="OnReset"/>
-                <Button Grid.Column="7" Style="{StaticResource IconButton}" Content="&#x2013;"
+                <Button Grid.Column="8" Style="{StaticResource IconButton}" Content="&#x2013;"
                         ToolTip="Minimize to dashboard (starred stats only)" Click="OnMinimize"/>
-                <Button Grid.Column="8" Style="{StaticResource IconButton}" Content="&#x2715;"
+                <Button Grid.Column="9" Style="{StaticResource IconButton}" Content="&#x2715;"
                         ToolTip="Close" Click="OnClose"/>
             </Grid>
 
@@ -570,9 +623,11 @@
             </Expander>
 
             <!-- THE QUESTS CARD IS GONE (HUD subtraction cut 1, 2026-09-05). Nine cards
-                 here now. The Quest Tracker window it launched is unchanged and is
-                 reached by the "Quests…" context-menu row above, by the "Quest tracker"
-                 hotkey, and by the Evolved shell's Quests room. -->
+                 here now. The checklists it drew are unchanged and are reached by the
+                 "Guide…" context-menu row above — the Evolved shell's Guide room, which
+                 renders the same QuestsView — by the "Quest tracker" hotkey, and by the
+                 loot deep-link, both of which still open the standalone Quest Tracker
+                 window. The row was called "Quests…" until 2026-09-08 (faces §D). -->
 
             <Expander x:Name="TrackedSection" Style="{StaticResource Section}" Visibility="Collapsed">
                 <Expander.Header>

@@ -1265,26 +1265,66 @@ public class ShellHostTests
     /// <summary>
     /// **THE DOOR EXISTS ON A PROFILE NOBODY HAS CONFIGURED — trap 59's floor, asserted.**
     ///
-    /// The widget's <c>Open EQBuddy…</c> row is the shell's only player entrance (OE-2), and
-    /// the two ways it could stop being one are both invisible: a control that is not drawn
-    /// photographs as an unremarkable menu (trap 29, six days of an invisible Mobile button),
-    /// and `IsEnabled=false` renders exactly like a live row under this app's styles
-    /// (trap 17). `menuOpenShell` is 1 only when the row is present, visible AND enabled.
+    /// The widget's <c>Guide…</c> row is the shell's only player entrance (OE-2; the row was
+    /// <c>Open EQBuddy…</c> until the 2026-09-08 faces folded it and <c>Quests…</c> into
+    /// one), and the two ways it could stop being one are both invisible: a control that is
+    /// not drawn photographs as an unremarkable menu (trap 29, six days of an invisible
+    /// Mobile button), and `IsEnabled=false` renders exactly like a live row under this
+    /// app's styles (trap 17). `menuGuide` is 1 only when the row is present, visible AND
+    /// enabled.
     ///
     /// **It is asserted on the launch with NO shell**, which is the state a stranded player
     /// is actually in: they closed it, and the row has to be there when nothing else is.
     /// </summary>
     [Fact]
-    public void TheWidgetMenuCarriesTheOpenEqbuddyDoorWithNoShellOpen()
+    public void TheWidgetMenuCarriesTheGuideDoorWithNoShellOpen()
     {
         using var app = new AppHarness(
             environment: new Dictionary<string, string> { ["EQBUDDY_SHELL"] = "" });
         app.Launch();
 
-        app.WaitForDump("menuOpenShell", 1,
-            "the widget's Open EQBuddy row to be present, visible and enabled");
+        app.WaitForDump("menuGuide", 1,
+            "the widget's Guide row to be present, visible and enabled");
         Assert.Equal("", app.DumpText("shellPage"));
     }
+
+    /// <summary>
+    /// **THE ≤4 LOCK, IN EFFECT RATHER THAN DECLARED** (Bevel's cog/Options IA faces §B,
+    /// Helm-signed 2026-09-08).
+    ///
+    /// `WidgetMenuTests` reads the XAML and proves the four rows are the four that are not
+    /// tagged expanded-only. That is a claim about the FILE. This is the other half and the
+    /// one trap 42 exists for: the tag has to be ACTED on, by `MainWindow.ApplyMenuMode`,
+    /// against the widget's real mode — a declaration nothing applies renders eleven rows
+    /// over the game and passes every unit test in the suite.
+    ///
+    /// **Two launches, because one number proves nothing on its own.** A menu that showed
+    /// four rows in both states would satisfy a minimized-only assertion while having
+    /// quietly subtracted click-through, Edit HUD, the data chores and Help from the
+    /// expanded widget too — which is the surface those rows were MOVED to, not removed
+    /// from. So the expanded count is asserted to be larger, and the minimized one exact.
+    /// </summary>
+    [Fact]
+    public void TheMinimizedWidgetMenuShowsTheFourDoorsAndTheExpandedOneShowsMore()
+    {
+        using (var mini = new AppHarness(settings => settings.Minimized = true))
+        {
+            mini.Launch();
+            mini.WaitForDump("menuRows", WidgetMenuPolicy.MiniRows.Count,
+                "the minimized widget's menu to be cut to the four doors");
+            // The door among them is the one with a job beyond opening a window, so it is
+            // asserted by name as well as by count.
+            Assert.Equal(1, mini.DumpValue("menuGuide"));
+        }
+
+        using var full = new AppHarness(settings => settings.Minimized = false);
+        full.Launch();
+        full.WaitForDump("menuGuide", 1, "the expanded widget's menu to be built");
+        Assert.True(full.DumpValue("menuRows") > WidgetMenuPolicy.MiniRows.Count,
+            "the expanded menu keeps the rows the minimized one hides; "
+            + $"dump was: {full.Artifacts()}");
+    }
+
 
     /// <summary>
     /// **THE RECOVERY, END TO END: open → ✕ → stranded → the row → back.**
@@ -1301,12 +1341,13 @@ public class ShellHostTests
     /// opening it" is a reading of the code — which is the kind of step trap 49 spent
     /// thirteen green tests on. `shellPage` going empty is the app saying it is stranded.
     ///
-    /// It comes back on **Home**, the guidance hub (#349's owner lock): the door names no
-    /// address at all, so the window's constructor decides, and there is exactly one place
-    /// that answer lives.
+    /// **It comes back on GUIDE, and that is the 2026-09-08 reversal**: the door used to
+    /// pass no address, so the window's constructor decided and it landed on Home. The row
+    /// is called `Guide…` now, and a row named for a room that lands somewhere else is an
+    /// affordance lying about itself. The recovery — the whole of OE-2 — is unchanged.
     /// </summary>
     [Fact]
-    public void TheOpenEqbuddyDoorBringsBackAShellTheCloseButtonTook()
+    public void TheGuideDoorBringsBackAShellTheCloseButtonTook()
     {
         using var app = new AppHarness(environment: new Dictionary<string, string>
         {
@@ -1320,12 +1361,14 @@ public class ShellHostTests
         app.WaitForDump("shellPage", "",
             "the ✕ to take the shell away — the state this door exists to recover from");
 
-        app.ClickOpenEqbuddyDoor();
-        app.WaitForDump("shellPage", "home", "the Open EQBuddy row to bring the shell back");
+        app.ClickGuideDoor();
+        app.WaitForDump("shellPage", ShellPages.Key(ShellPage.Quests),
+            "the Guide row to bring the shell back, on the room it is named for");
         // Back as a WORKING window, not merely a window: the rail is whole and the room
-        // painted. A shell that reopened blank would satisfy `shellPage` alone.
+        // painted. A shell that reopened blank would satisfy `shellPage` alone. The Home
+        // block count went with the landing room — it is Home's fact, and this door no
+        // longer lands there.
         Assert.Equal(ShellPages.Landed.Count, app.DumpValue("shellRail"));
-        Assert.Equal(4, app.DumpValue("shellHomeBlocks"));
     }
 
     /// <summary>
@@ -1342,7 +1385,7 @@ public class ShellHostTests
     /// 0 at the end would pass against a window that was never minimized at all.
     /// </summary>
     [Fact]
-    public void TheOpenEqbuddyDoorRestoresAShellTheMinimiseButtonTook()
+    public void TheGuideDoorRestoresAShellTheMinimiseButtonTook()
     {
         using var app = new AppHarness(environment: new Dictionary<string, string>
         {
@@ -1355,27 +1398,35 @@ public class ShellHostTests
         app.MinimizeShellWindow(ShellPages.Label(ShellPage.Home));
         app.WaitForDump("shellMinimized", 1, "the shell to go to the taskbar");
 
-        app.ClickOpenEqbuddyDoor();
-        app.WaitForDump("shellMinimized", 0, "the Open EQBuddy row to bring it back up");
-        // Still the same window on the same room — restored, not rebuilt.
-        Assert.Equal("home", app.DumpText("shellPage"));
+        app.ClickGuideDoor();
+        app.WaitForDump("shellMinimized", 0, "the Guide row to bring it back up");
+        // Still the SAME window — restored, not rebuilt. It has moved to Guide, which is
+        // what the row is named for; what this test is about is the raise, and `Activate`
+        // is what does not do it.
+        Assert.Equal(ShellPages.Key(ShellPage.Quests), app.DumpText("shellPage"));
     }
 
     /// <summary>
-    /// **The door FRONTS an open shell and leaves the player where they were.**
+    /// **The door TAKES an open shell to Guide, and that is the deliberate reversal.**
     ///
-    /// "Recover the guidance hub" is about getting Home back when it is gone, not about
-    /// going Home — a row that snapped a player out of the room they were reading would be
-    /// a second defect wearing the fix's clothes. <c>ShellHost.OpenDoor</c> passes no
-    /// address, and <c>Navigate</c> is only reached when one is given.
+    /// This test used to assert the opposite, and the reason it did was sound for the row it
+    /// was written about: <c>Open EQBuddy…</c> meant "open the app", so snapping a player
+    /// out of the room they were reading would have been a second defect wearing the fix's
+    /// clothes. The owner's 2026-09-08 amendment cut that row. What is left is
+    /// <c>Guide…</c> — a row that names a destination — and the same argument now runs the
+    /// other way: a named door that lands somewhere else is trap 35's shape in a menu.
     ///
-    /// **The assertion is that nothing moved, so the moment it is made at is the whole
-    /// question** (trap 62): `ClickOpenEqbuddyDoor` returns on `doorProbeClicks`, which the
-    /// probe raises AFTER the handler has run, so "still on Faction" is being asked of an app
-    /// that has already been through the door.
+    /// The "front it without moving" behaviour was not replaced by another row, and that is
+    /// on purpose (faces §E cuts every parallel recovery label). The shell has native
+    /// chrome, so its taskbar button is what fronts it — which is the product point the ✕
+    /// that made OE-2 a must-fix comes from.
+    ///
+    /// **The moment the assertion is made at is still the whole question** (trap 62):
+    /// `ClickGuideDoor` returns on `doorProbeClicks`, which the probe raises AFTER the
+    /// handler has run, so this is asked of an app that has already been through the door.
     /// </summary>
     [Fact]
-    public void TheOpenEqbuddyDoorFrontsAnOpenShellWithoutSendingItHome()
+    public void TheGuideDoorTakesAnOpenShellToGuideFromWhereverItWas()
     {
         using var app = new AppHarness(environment: new Dictionary<string, string>
         {
@@ -1384,15 +1435,27 @@ public class ShellHostTests
         });
         app.Launch();
         app.WaitForDump("shellProgressTab", "faction", "the shell to open on Progress → Faction");
+        // ONE room built so far, and this is the before-half of the discriminator below.
+        Assert.Equal(1, app.DumpValue("shellRooms"));
 
-        app.ClickOpenEqbuddyDoor();
+        app.ClickGuideDoor();
 
-        // Both halves of "fronted, not re-opened": a door that skipped the `IsLoaded` check
-        // would build a SECOND shell, and a second shell is constructed with no address —
-        // so it would land on Home and this pair would read `home` / empty, not the room
-        // the player left open.
-        Assert.Equal("progress", app.DumpText("shellPage"));
-        Assert.Equal("faction", app.DumpText("shellProgressTab"));
+        app.WaitForDump("shellPage", ShellPages.Key(ShellPage.Quests),
+            "the Guide row to take the open shell to the room it names");
+
+        // **NAVIGATED, not rebuilt — and `shellRooms` is what separates those two readings.**
+        // The rooms a shell has built are its own, so two of them says the window that
+        // answered is the one that already had Progress in it. A door that skipped the
+        // `IsLoaded` check and constructed a SECOND shell would report ONE: a fresh window
+        // builds only the room it was addressed to.
+        //
+        // The first attempt at this assertion used `shellProgressTab`, on the reasoning that
+        // a rebuilt shell would have no remembered tab. It does not survive contact: the tab
+        // fact is reported by the Progress ROOM, so it goes empty the moment the shell
+        // navigates away from it, and the test failed against a perfectly healthy build.
+        // Left written down because the mistake is the useful part — a dump key can stop
+        // being reported for a reason that has nothing to do with the claim being made.
+        Assert.Equal(2, app.DumpValue("shellRooms"));
     }
 
     /// <summary>

@@ -242,8 +242,9 @@ $Shots = [ordered]@{
     #
     # The illustration lock (Helm-signed 2026-09-04) says an illustration of our own UI is
     # a capture WITH A RECIPE or it does not ship, so these land in the same change as the
-    # window. The shell's player door is the widget's "Open EQBuddy…" context-menu row
-    # (OE-2), and a capture cannot click one — EQBUDDY_SHELL is how a shot lands on a NAMED
+    # window. The shell's player door is the widget's "Guide…" context-menu row (OE-2;
+    # "Open EQBuddy…" until 2026-09-08), and a capture cannot click one — EQBUDDY_SHELL is
+    # how a shot lands on a NAMED
     # room, which is trap 22's condition and the reason the hook stays beside the row.
     #
     # Title is 'EQBuddy — Progress'. NOT the theme windows' 'EQBuddy Progress': this is
@@ -351,8 +352,12 @@ $Shots = [ordered]@{
     # ---- E-3 PR 3: the Quests room, and the split threshold ---------------------------
     #
     # Same illustration lock: a room's shot lands in the PR that lands the room. Title is
-    # 'EQBuddy — Quests', derived from ShellPages.Label — trap 53 applies, and it should
-    # indeed fail rather than photograph something else if the room is renamed.
+    # 'EQBuddy — Guide' since 2026-09-08 — the room was relabelled by the owner's amendment
+    # to Bevel's cog/Options IA faces (the WIRE key is still `quests`, which is why the
+    # EQBUDDY_SHELL addresses below did not move). Derived from ShellPages.Label, so trap 53
+    # applies and these rows should indeed fail rather than photograph something else if the
+    # room is renamed again. The SHOT NAMES stay `shell-quests*`: a shot name is a filename
+    # the docs already point at (trap 21), and renaming one is its own change.
     #
     # PREDICTIONS, written before the shots (trap 23):
     #
@@ -406,14 +411,14 @@ $Shots = [ordered]@{
     #     yet (there is nothing to come back from until a row is clicked). The rail must
     #     still show its labels in BOTH — if it collapses in one of them, the two axes are
     #     not independent and it is the arithmetic that moves, not this shot.
-    'shell-quests'    = @{ Title = 'EQBuddy — Quests'
+    'shell-quests'    = @{ Title = 'EQBuddy — Guide'
                            Env = @{ EQBUDDY_SHELL = 'quests:general' }; Set = @{} }
-    'shell-quests-sky' = @{ Title = 'EQBuddy — Quests'
+    'shell-quests-sky' = @{ Title = 'EQBuddy — Guide'
                            Env = @{ EQBUDDY_SHELL = 'quests:sky' }; Set = @{} }
-    'shell-quests-split' = @{ Title = 'EQBuddy — Quests'
+    'shell-quests-split' = @{ Title = 'EQBuddy — Guide'
                            Env = @{ EQBUDDY_SHELL = 'quests:general'
                                     EQBUDDY_SHELL_SIZE = '900x640' }; Set = @{} }
-    'shell-quests-narrow' = @{ Title = 'EQBuddy — Quests'
+    'shell-quests-narrow' = @{ Title = 'EQBuddy — Guide'
                            Env = @{ EQBUDDY_SHELL = 'quests:general'
                                     EQBUDDY_SHELL_SIZE = '899x640' }; Set = @{} }
     # ---- E-3 PR 4: the HOME room, and the default landing ----------------------------

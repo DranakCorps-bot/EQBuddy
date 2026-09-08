@@ -1,4 +1,4 @@
-using System.Windows;
+﻿using System.Windows;
 using EQBuddy.Core;
 
 namespace EQBuddy;
@@ -29,9 +29,10 @@ namespace EQBuddy;
 /// </summary>
 internal static class DebugHooks
 {
-    /// <summary>How many times the OE-2 door probe has driven the widget's
-    /// <c>Open EQBuddy…</c> row. Reported in the <c>EQBUDDY_EXPAND</c> dump so the suite has
-    /// a positive event to wait on; 0 forever unless <c>EQBUDDY_DOORPROBE=1</c> armed it.</summary>
+    /// <summary>How many times the OE-2 door probe has driven the widget's <c>Guide…</c>
+    /// row — <c>Open EQBuddy…</c> until 2026-09-08, when the faces folded the two shell/quest
+    /// rows into one. Reported in the <c>EQBUDDY_EXPAND</c> dump so the suite has a positive
+    /// event to wait on; 0 forever unless <c>EQBUDDY_DOORPROBE=1</c> armed it.</summary>
     internal static int DoorProbeClicks;
 
     /// <summary>How many times the pet-drop probe has driven a real DROP on the mini bar
@@ -183,8 +184,9 @@ internal static class DebugHooks
                 System.Windows.Threading.DispatcherPriority.ApplicationIdle);
 
         // Edit HUD mode (Surface A / SA-4). Same family, same reason as the rest: the mode
-        // is reached only by a human opening the widget's context menu and clicking a row,
-        // so without this the four Place/Mute chicklets could not be photographed or
+        // is reached only by a human clicking the pencil on the expanded title bar (faces
+        // §C, 2026-09-08) or the expanded menu's row behind it, so without this the four
+        // Place/Mute chicklets and the Done exit could not be photographed or
         // asserted at all — trap 22, a surface with no way to reach its state reading as
         // reviewed anyway. It is deliberately NOT staged from a setting: "the profile says
         // edit mode" and "the affordances are on screen" are different claims (trap 42).
@@ -259,7 +261,7 @@ internal static class DebugHooks
 
         // THE DOOR PROBE (OE-2), and it is the one hook in this file that does not fire at
         // startup — because the state it has to reach does not exist at startup. The claim
-        // under test is "the Open EQBuddy row brings back a shell the player CLOSED", and
+        // under test is "the Guide row brings back a shell the player CLOSED", and
         // the close has to happen in the middle: a startup hook could only ever prove the
         // door opens a shell that was never opened, which is a reading of the code (the ✕
         // nulls the same field) dressed up as a measurement. Trap 62's shape — a guard
@@ -285,7 +287,7 @@ internal static class DebugHooks
                     // rather than a leftover.
                     try { System.IO.File.Delete(trigger); }
                     catch (System.IO.IOException) { return; }
-                    w.OnOpenShell(w, new RoutedEventArgs());
+                    w.OnGuideDoor(w, new RoutedEventArgs());
                     // AFTER the handler, and that ordering is the whole value of the
                     // counter: the file leaving says the probe SAW the trigger, and only
                     // this says the door has finished being asked. A suite that asserted
@@ -345,7 +347,7 @@ internal static class DebugHooks
                 poll.Start();
             };
 
-        // The Evolved shell (E-3 PR 1). Its player door is the widget's "Open EQBuddy…"
+        // The Evolved shell (E-3 PR 1). Its player door is the widget's "Guide…"
         // context-menu row since OE-2; this hook stays beside it, because a row a human has
         // to click cannot land a capture on a NAMED room and a shot of the default one
         // proves nothing about the other six (trap 22).
