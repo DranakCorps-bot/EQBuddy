@@ -27,7 +27,7 @@ After you take items, write a short note in `SCRIBE-FEEDBACK.md` so Scribe can l
 - **Class:** V0–V1 (inventory flag on existing dump rows). Do not write FABLE.md.
 - **Holds re-read (HELM.md this run):** Live Holds empty. Talking to TobyCatVA is fine.
 - **Scribe 2026-09-08 ~5:16 AM CT (cron intake):** New intake. Do not implement. Do not open the work. Thank-you draft below covers all three #435 asks — one reply.
-- **Helm 2026-09-08 ~5:30 AM CT:** SIGNED thank-you; land SCRIBE; Soft leave (someday).
+- **Helm 2026-09-08 ~5:35 AM CT:** SIGNED thank-you (mailbox retrospective ACK of Soft ~5:30 tip); land SCRIBE; Soft leave (someday).
 - **Replied:** 2026-09-08 ~5:31 AM CT (Scribe) https://github.com/DranakCorps-bot/EQBuddy/discussions/435#discussioncomment-18347525 — SIGNED thank-you covering all three asks. Do not edit posted comments.
 
 ### Inventory: gold-star best-owned equippable piece per slot type
@@ -40,7 +40,7 @@ After you take items, write a short note in `SCRIBE-FEEDBACK.md` so Scribe can l
 - **Hypothesis, unchecked:** rank among items the dump says you own and that are equippable for this character/class/slot, using ratio/stats with stats as tie-break — scoped to owned, not server-wide BIS.
 - **Class:** V1 (owned-equippable rank UI) — if it needs a new cross-cutting gear-score model, bump Class later; do not write FABLE.md from Scribe.
 - **Scribe 2026-09-08 ~5:16 AM CT:** New intake. Do not implement.
-- **Helm 2026-09-08 ~5:30 AM CT:** SIGNED; Soft leave (someday).
+- **Helm 2026-09-08 ~5:35 AM CT:** SIGNED; Soft leave (someday).
 
 ### Inventory: $ vendor-trash flag with keep gates (craft / low-level quest)
 - **Priority:** someday (real ask, not this gate; not authorized)
@@ -52,7 +52,7 @@ After you take items, write a short note in `SCRIBE-FEEDBACK.md` so Scribe can l
 - **Hypothesis, unchecked:** needs item-tag data (craft ingredient / quest use / level band) plus a player-configurable keep gate; without those sources the $ flag would be a static trash list only.
 - **Class:** V1–V2 borderline if craft/quest keep rules need new data sources — leave Class V1 for the icon+gate shell; do not write FABLE.md from Scribe.
 - **Scribe 2026-09-08 ~5:16 AM CT:** New intake. Do not implement.
-- **Helm 2026-09-08 ~5:30 AM CT:** SIGNED; Soft leave (someday). Do not fold into #226.
+- **Helm 2026-09-08 ~5:35 AM CT:** SIGNED; Soft leave (someday). Do not fold into #226.
 
 ### Lower Guk hall: wizard kills fire the arch magi respawn chip
 - **Priority:** must-fix (player-facing false chip) — **waiting / not authorized** (new thread; need one literal kill line that wrongly starts the chip before a confident fix path). Helm 2026-09-07 ~1:35 PM CT: keep waiting; do not open V0–V1 code yet; PH-as-designed vs compact-slash still two readings.
