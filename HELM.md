@@ -1,3 +1,16 @@
+## 2026-09-08 ~2:30 PM CT — PR #446 cog/Options IA faces SIGNED + Guide amend; #447 CLOSE WITHOUT MERGE (superseded)
+
+- **When / who:** 2026-09-08 ~2:30 PM CT — Helm mailbox (webhook: HELM-FEEDBACK.md changed — Bevel Options/cog IA faces LIVE ASK, PR #447). Parent already SIGNED #446 tip `803cc766` (~2:13 + owner Guide amend ~2:15), closed #447 as superseded, and Soft merged #446 (`28f5f408`) with both CI green. This land is the HELM.md / channel SSC.
+- **Thread / subject:** PR #447 https://github.com/DranakCorps-bot/EQBuddy/pull/447 — Soft Bevel faces (Quests / EQBuddy window still in draft) — **CLOSED WITHOUT MERGE**. Prefer merged #446 https://github.com/DranakCorps-bot/EQBuddy/pull/446 — Helm-SIGNED faces + owner Guide amendment (`docs/BEVEL-cog-options-ia-faces.md`, `BEVEL.md`, `BEVEL-FEEDBACK.md`).
+- **Ruling:** **SIGNED** #446 (retrospective mailbox ACK). **CLOSE #447 WITHOUT MERGE** (superseded — still had Quests / EQBuddy window; #446 carries Guide door). Live Holds empty. Play Console OFF. **Not needs-david.** Evolved profile restore **needs-david STANDS** (already paged — not re-paged).
+- **Asks answered:**
+  1. Bevel Options/cog IA faces / last-look — **SIGNED** on #446. Mini menu = **Options… · World… · Mobile… · Guide…** only. Quests rolls into Guide (do not keep both). **Cut** Open EQBuddy… / EQBuddy window… / Open rooms…. **Guide…** opens Evolved shell to Guide room and recovers OE-2. World stays a breakout. Edit HUD = expanded direct control + Done/Esc (not mini menu). Buff settings stay Alerts → Buffs. H1–H5 ACK.
+  2. Soft #447 parallel face PR — **REJECT merge / close without merge.** Prefer signed #446.
+  3. Soft Opus implement — **AUTHORIZED after docs** (now on main) under Soft ≤3, **queued behind** #442→#444→Desktop and early buff-alert fix. Do **not** kick Opus from this wake.
+- **Posture / Soft max ≤3:** (1) Soft LEAVE Opus Options IA implement until queue clears (#442 Pet DPS / #444 / Desktop / buff-alert). (2) Soft LEAVE invent beyond signed faces. (3) Soft LEAVE #435 invent. Do **not** invent TEL / Version / `v1.99.19` / Play Console / tag / publish / signing / prod secrets / Evolved settings restore.
+- **Claude kick via Dranak:** Soft: **no new seat from this ruling.** Soft Opus Options/cog implement only when Soft ≤3 has room after #442/#444/Desktop/buff-alert — then `--model sonnet` faces already landed; `--model opus` / `claude-opus-5` implement from `docs/BEVEL-cog-options-ia-faces.md` → LIVE ASK → wake Helm. Probe `claude models` first. No Play Console / tag / publish / signing / prod secrets / settings restore.
+- **Scope hygiene:** Docs already on main via #446. This SSC only. Not a hold. Not needs-david. Live Holds empty. Play Console OFF.
+
 ## 2026-09-08 ~12:05 PM CT — PR #442 Pet DPS glance insert (SIGNED; SIGNED-#422-complete; #437 faces ACK; rebase then merge-when-green)
 
 - **When / who:** 2026-09-08 ~12:05 PM CT — Helm last-look (webhook: HELM-FEEDBACK.md LIVE ASK: SIGNED #422 pet DPS glance insert is BUILT, PR #442). Tip `f0e9d7ef` on `claude/opus-pet-dps-glance-20260908` off `e9e25e25` (#437). Diverged from `main` `817704fa` (#409) — ahead 1 / behind 1.
