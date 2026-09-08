@@ -1,3 +1,136 @@
+## 2026-09-07 ~8:10 PM CT — Fable: PET DPS INSERT into the glance row, between DPS and HPS/XP% (owner lock ~7:36 PM CT — widen glance membership)
+
+To: Helm (last-look/sign), Bevel (faces one-pager AFTER sign), Claude (implement after Bevel's faces, from this block)
+
+- **Priority:** plan for Helm sign. On sign: **Soft Bevel faces first, Soft Opus implement
+  second**, both under Soft max ≤3 and neither kicked from this seat. Play Console OFF.
+  **Not needs-david** — the direction IS the owner's (~7:36 PM CT lock, carried verbatim in
+  the LIVE ASK beside this); everything below is implementation shape, logged not asked.
+- **Source:** owner lock ~7:36 PM CT (override of the SA-1 "fixed trio only" posture #413
+  restated); signed #413 plan + #418 faces + shipped #419 (`8dd6482a`, MiniBarOrder chip
+  drag-reorder — **still stands** for the starred row); `UI.Shared/HudGlance.cs` (the trio),
+  `UI.Shared/MiniBarPresentation.cs` (cells), `UI.Shared/HudExpand.cs`
+  (`HudExpandTarget.Pet`), `EQBuddy/HudBarView.cs` (`RenderGlance` ahead of cells),
+  `EQBuddy/HudBarReorder.cs`, `Core/AppSettings.cs` (`MiniBarOrder`, `MiniStats`).
+
+### §0 Standing state — what the lock changes and what it leaves signed
+
+1. Since SA-1 the collapsed HUD draws a **fixed trio** ahead of every cell: Name · DPS ·
+   Third, where Third swaps XP%/hr ↔ HPS on `HudGlance`'s hysteresis. #413 kept the trio
+   out of reorder for a reason that is still right: **the third slot swaps identity
+   mid-session, so a drop landing ON it would change meaning under the cursor.**
+2. Pet damage today is the starred `"pet"` cell (`Paw`, "N dps"), gated by `MiniStats`,
+   placed by `MiniBarOrder`, carrying `HudExpandTarget.Pet` (hover peek, click pin, opt-in
+   double-click → the Pet breakout).
+3. **The lock widens glance MEMBERSHIP, not glance ORDER.** Pet DPS gets one fixed
+   insertion POINT — between DPS and Third. No fixed slot becomes a drag target, so #413's
+   reasoning is not reopened; it is routed around.
+
+### §1 The model — one optional slot, not a reorderable trio
+
+Inserted, the glance reads **Name · DPS · Pet DPS · Third**. The insertion point sits
+BETWEEN two fixed slots and does not move when Third swaps, so it is stable in exactly the
+way #413 said a fixed slot is not. Pet DPS is the only insertable member this pass — the
+seam is named (one optional glance slot, occupied or empty), not generalized into a
+glance-order list nobody asked for.
+
+| Slot | Kind |
+|---|---|
+| Name | fixed, always-on |
+| DPS | fixed, always-on |
+| **Pet DPS** | **insertable — present iff the new setting says so; always-on while present** |
+| Third (XP%↔HPS) | fixed, always-on, swap unchanged |
+| starred cells + buffs | reorderable (#419, unchanged) |
+| pinned watch chips | trailing block (unchanged) |
+
+### §2 Membership arithmetic — never drawn twice, never lost
+
+- While inserted, `"pet"` must leave the cells: SA-1's own sentence — *"a key that is
+  drawn unconditionally has no business in a table whose whole job is 'which subset did
+  the player switch on'"* — now applies to pet conditionally. The exclusion goes into
+  **`MiniBarPresentation.DrawnKeys`** (its own doc calls itself "the one membership
+  decision"), never into the view.
+- `MiniBarOrder` keeps `"pet"`'s slot while it is away (`ResolveOrder` untouched), so
+  ejecting restores the chip to the player's remembered position, not to canonical.
+- **The ★ stays the CELL's verb; the glance slot ignores it.** Inserted pet is always-on
+  like its trio neighbours. Un-starring pet while inserted changes the cells and nothing
+  else (stated assumption — the Options wording for that state is a Bevel face).
+
+### §3 Persist shape — one bool, one writer, no migration
+
+- **`AppSettings.HudGlancePet`** (bool, default `false`). False/absent = today's trio
+  byte-for-byte — the `MiniBarOrder`-empty / `HudPanelParkLeft`-NaN family: the floor IS
+  the default and there is nothing to migrate.
+- **Written at DROP and nowhere else** (#419's rule, and #252's "no second writer on a
+  brand-new setting on day one"). An eject-drop that also lands at a new cell index writes
+  both facts in the one `Finish` — one gesture, one write moment.
+- **Rejected:** a `HudGlanceOrder` list (over-general — exactly one slot can move; a list
+  invites reordering fixed slots and buys a migration surface for nothing) and
+  re-purposing `MiniStats`/`MiniBarOrder` (membership of two different rows; the glance
+  flag is a third verb, so a third setting — the same two-verbs rule `MiniBarOrder`'s own
+  doc states).
+
+### §4 The number — one source (trap 4 / trap 33)
+
+The pet cell's formula lives inline in `MiniBarPresentation.Text`
+(`PetAbilities.Sum(Total) / max(1, CombatSeconds)`). A second formatter in `HudGlance`
+copying it is two sources for one number — the very thing `Text`'s own dps/hps comment
+forbids. **Lift the VALUE to one place** (`StatsSnapshot.PetDps`, beside
+`SessionDps`/`Hps`) and let both surfaces format it: the cell keeps its compact `0.#`
+shape, the glance pads it through `Metric(value, "dps")` into the fixed 10-char shape.
+
+### §5 Shape and width (trap 12)
+
+- The glance slot is `Metric(petDps, "dps")` at `MetricReservedWidth` (66), Paw icon —
+  two "N dps" slots on one bar are told apart by their vectors (Swords vs Paw), exactly
+  how the third slot is told apart today (Chart vs Heal).
+- Insert/eject changes measured width **once, on a player's drop** — a player-driven
+  resize, which trap 12 permits; every tick after it repaints in place at the reserved
+  width.
+
+### §6 Gesture — extend the #419 carry, do not reopen OE-8
+
+- Insert: carry the pet chip left past the trio boundary; the #419 insertion adorner shows
+  in the DPS↔Third gap; drop writes `HudGlancePet = true`. Eject: carry the glance pet
+  chip right into the cells; drop writes `false` (plus the reorder write when it lands at
+  a new index). Same chip-reorder gesture family — `CaptureMode.SubTree`, same threshold,
+  SizeWE — **OE-8 free-drag untouched, not reopened.**
+- **Named limit, and the one open face question for Bevel:** with pet un-starred there is
+  no chip to carry, so drag-only means "star it, drag it in, un-star if you like."
+  Stated default: **drag stays the only writer this pass** (a second writer on a new
+  setting is #252's shape); whether Options' HUD block earns an affordance of its own, or
+  just a `PromotedStatsNote`-style sentence naming the drag, is Bevel's to face after
+  sign.
+
+### §7 Doors (trap 59)
+
+The slot carries `HudExpandTarget.Pet` unchanged — hover peek, click pin, opt-in
+double-click to the Pet breakout — so insertion costs no entrance. `HudExpandTarget.Pet`'s
+doc ("while its star is set") and the SA-1 "fixed trio" wording in `HudGlance` /
+`MiniBarPresentation.Order` / `CanonicalOrder` docs get the sweep in the implement PR;
+`DocumentationTests` holds the file cites.
+
+### §8 Tests + dump
+
+- `HudGlanceTests`: the four-slot readout keeps every fixed-shape invariant
+  (`MetricFixedLength` on the pet string; Third's swap unmoved by insertion).
+- `MiniBarPresentationTests`: inserted ⇒ `"pet"` absent from `DrawnKeys` whatever the ★;
+  eject restores the remembered `MiniBarOrder` slot; canonical floor unchanged with the
+  flag off.
+- E2E: new `hudGlancePet` dump fact (0/1) beside `hudGlance`; insert-drop writes the
+  setting; the "not drawn twice" negative gets a same-tick positive to wait on (trap 62);
+  both new guards get a prove-fail run — with the app rebuilt first (trap 64).
+
+### §9 Sequencing
+
+Helm sign → **Soft Bevel faces** (insertion-gap adorner tell, the new slot's tooltip
+words, the §6 Options question, the §2 un-star wording) → **Soft Opus implement** from
+this block plus Bevel's page. Soft ≤3 throughout; nothing kicked from this seat.
+
+— Fable, 2026-09-07 ~8:10 PM CT
+
+---
+
 ## 2026-09-07 ~2:00 PM CT — Fable: V1 (MIT) → EQBUDDY EVOLVED (Windows) TRANSITION PRODUCT plan (owner ask ~1:44 PM CT / PR #397)
 
 To: Helm (last-look), Claude (TR-1/TR-2 on sign), Bevel (follow-on one-pager), David (§6 doors only)
