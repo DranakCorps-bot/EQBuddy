@@ -42,8 +42,29 @@ public class DocumentationTests
         return null;
     }
 
-    public static TheoryData<string> DocFiles() =>
-        ["CLAUDE.md", "docs/Architecture.md", "docs/TestPlan.md"];
+    public static TheoryData<string> DocFiles()
+    {
+        // Live manuals plus the 2026-09-08 ops split (verification ladder, flake
+        // ledger, CLAUDE archive). Archive novels stay true the same way CLAUDE.md
+        // does — a confidently wrong map is worse than no map.
+        var files = new List<string>
+        {
+            "CLAUDE.md",
+            "docs/Architecture.md",
+            "docs/TestPlan.md",
+        };
+        var ops = Path.Combine(Repo, "docs", "ops");
+        if (Directory.Exists(ops))
+        {
+            files.AddRange(Directory
+                .EnumerateFiles(ops, "*.md", SearchOption.AllDirectories)
+                .Select(p => Path.GetRelativePath(Repo, p).Replace('\\', '/'))
+                .OrderBy(p => p, StringComparer.Ordinal));
+        }
+        var data = new TheoryData<string>();
+        foreach (var f in files) data.Add(f);
+        return data;
+    }
 
     [Theory]
     [MemberData(nameof(DocFiles))]
@@ -145,5 +166,35 @@ public class DocumentationTests
         Assert.Contains("docs/Architecture.md", claude);
         Assert.Contains("docs/TestPlan.md", claude);
         Assert.Contains("scripts/check.ps1", claude);
+        // C′ + Context (2026-09-08): the live file is the pointer set.
+        Assert.Contains("docs/ops/verification-ladder.md", claude);
+        Assert.Contains("docs/ops/flake-ledger.md", claude);
+        Assert.Contains("docs/ops/claude-archive/", claude);
+    }
+
+    [Fact]
+    public void FlakeLedgerNamesTheRequiredColumnsAndTheRerunRule()
+    {
+        var text = Read(Path.Combine("docs", "ops", "flake-ledger.md"));
+        Assert.Contains("| Signature |", text);
+        Assert.Contains("| Occurrences |", text);
+        Assert.Contains("| Affected test |", text);
+        Assert.Contains("| Environment |", text);
+        Assert.Contains("| Disposition |", text);
+        Assert.Contains("Passed on rerun", text);
+        Assert.Contains("not a resolution", text);
+    }
+
+    [Fact]
+    public void ClaudeArchiveKeepsThePreSplitSnapshot()
+    {
+        // Reversibility: the novels are not deleted, they moved. A missing
+        // snapshot is a split that cannot be undone from the tree.
+        var snapshot = Path.Combine(Repo, "docs", "ops", "claude-archive", "claude-2026-09-08.md");
+        var traps = Path.Combine(Repo, "docs", "ops", "claude-archive", "traps.md");
+        Assert.True(File.Exists(snapshot), "pre-split CLAUDE.md snapshot missing");
+        Assert.True(File.Exists(traps), "anchored trap novels missing");
+        Assert.True(new FileInfo(snapshot).Length > 100_000,
+            "snapshot is too small to be the pre-split CLAUDE.md");
     }
 }
