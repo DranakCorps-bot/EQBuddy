@@ -87,7 +87,12 @@ public class SettingsHudBlockTests
 
         // ---- the floating-window tick boxes
         ("BreakoutsPanel", "HUD block", "_breakouts"),
-        ("BreakoutsBlurb", "HUD block", "_breakoutsBlurb"),
+        // `_breakoutsBlurb` until the prose pass (2026-09-08), when this explanation became an
+        // ⓘ beside the heading instead of a line under it. The row follows the CONTROL rather
+        // than the field name — a row still naming the TextBlock would have gone green on a
+        // build where the paragraph had been deleted outright, which is the one failure this
+        // enumeration exists to catch. What it hangs on is `SettingsProsePolicyTests`.
+        ("BreakoutsBlurb", "HUD block", "_breakoutsHint"),
         ("BreakoutsPanel", "HUD block", "BreakoutPresentation.Blurb"),
         ("BreakoutsPanel", "HUD block", "BreakoutPresentation.Note("),
         ("BreakoutsPanel", "HUD block", "BreakoutPresentation.StarKey("),

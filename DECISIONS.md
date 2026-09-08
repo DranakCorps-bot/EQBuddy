@@ -30,6 +30,42 @@ leaves the machine.
   anyone has written down about Wind Rune Azia, and a catalog with no stub in it has never
   exercised the state lock 4 calls first-class.
 
+## 2026-09-08 (prose-to-hover pass 1 — the HUD block / Options → Cards & windows)
+
+Authority: Bevel's prose-to-tooltip faces, Helm-signed 2026-09-08 (chat SIGN); the owner's
+ask under it — nearly every Options tab has long instructional paragraphs that should be
+hovers rather than body prose. Faces md is not on this tip, so the pass reuses the patterns
+already in-tree (`ToolTipPolicy` / `ToolTipDefaults`, `DesignSystem.InlineIconButton`) and
+converts existing sentences without writing new product copy.
+
+- **Two paragraphs were deliberately NOT converted** · the default is to convert every
+  paragraph over the ceiling, which is what the ask says on its face · kept in the body,
+  because `PromotedStatsNote` and `GlancePetNote` answer "where did my switch GO" for
+  somebody SCANNING the tick-box list for a row that is not in it. They have no control of
+  their own to hover, and an ⓘ nobody knows to hover is deleting them for exactly the
+  player they were written for (traps 29/34; #233's complaint in the first place). Named as
+  rows in `SettingsProsePolicyTests` rather than as a comment, so Pass 2 cannot "finish the
+  job" silently. **If Bevel wants them converted anyway, this is the one line to reverse.**
+- **The rule is a word count in `UI.Shared`, not a judgement re-made per tab** · the default
+  is to eyeball each paragraph as its surface comes up · `SettingsProsePolicy`, because the
+  pass reaches every Settings tab in turn and a taste call made four times is four different
+  screens. Over 20 words is an explanation rather than a caption; a hover must be readable
+  inside `ToolTipPolicy.ShowDurationMs`, which is derived rather than a second number to
+  keep in step (trap 4). The short recent-rate line staying put is the policy's own negative.
+- **The ⓘ answers a CLICK as well as a hover** · the default is hover-only, which is what
+  every other tooltip on this screen does · click too, because a drawn button that answers
+  only a hover is a silent no-op for touch and for the keyboard, which cannot hover at all.
+  One paragraph, two ways in, never a second copy of the text.
+- **`options-cards` and `shell-settings-hud` were RE-SHOT, into the Turquoise lock** · the
+  default is TR-1's "the 105 pre-lock captures wait for a theme pass of their own" · re-shot,
+  because this change makes both pictures FALSE about the surface, and a stale illustration
+  is worse than a docs folder this file already records as mixed. Predictions written before
+  the capture; the shoot.ps1 recipe carries them, amended in-commit.
+- **Pass 2 (the remaining Options tabs) was NOT started** · the default is to carry on while
+  the pattern is warm · stopped, because the seat is scoped to Pass 1 and the two-paragraph
+  exemption above is a judgement Bevel should see applied once before it is applied four
+  times.
+
 ## 2026-09-08 (SIGNED cog/Options IA faces — the Guide door and the ≤4 minimized menu)
 
 Authority: `docs/BEVEL-cog-options-ia-faces.md` (Helm-signed ~2:13 PM CT, owner amendment

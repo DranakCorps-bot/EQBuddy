@@ -848,6 +848,13 @@ $Shots = [ordered]@{
     #     list. **This is the same body 'options-cards' photographs, in a second host** —
     #     shot at 100% here rather than that shot's 0.55 zoom, because the shell window is
     #     tall enough not to need it. The two pictures side by side are the parity claim.
+    #     RE-SHOT 2026-09-08 for the prose-to-hover pass. **Each of the three headings now
+    #     carries an ⓘ and NO paragraph under it** — the panel-list, mini-dashboard and
+    #     floating-window explanations are hovers, and this picture is the only thing that
+    #     can say the affordance rendered at all. **The two long notes under the tick boxes
+    #     are STILL PRINTED IN FULL** (XP/DPS/HPS, and pet damage's always-on row); they were
+    #     deliberately not moved, and a picture missing them is the defect rather than the
+    #     tidier screen it would look like.
     #
     #   'shell-settings-behavior' — Behavior lit, no sub-strip. Body: "EQBuddy Mobile (Beta)"
     #     and its button first (NOT buried at the bottom), the three hide-when rules with the
@@ -2119,6 +2126,18 @@ $Shots = [ordered]@{
     # because SR-2 moved the gear-checklist import block off this Options tab onto GearCardView
     # — that chrome is gone here (standing: soft re-shoot amends its own shoot.ps1 prediction
     # in-commit). The rest of the tab is unchanged.
+    #
+    # RE-SHOT 2026-09-08 for the prose-to-hover pass (Bevel's faces, Helm-signed). PREDICTED
+    # BEFORE THE CAPTURE: the three headings ("What EQBuddy shows", "Mini dashboard",
+    # "Floating windows") each carry an ⓘ with NO paragraph beneath, the double-click and
+    # target-drops rows carry an ⓘ at the end of the row with their paragraphs gone, the two
+    # notes under the mini-dashboard tick boxes and the short recent-rate line are STILL
+    # PRINTED, and the window is materially SHORTER at the same 420 width.
+    # SHOT: 420x392, down from 420x439, and every clause above held. The height is the
+    # reviewable number here — five paragraphs left the body and the window sizes to its
+    # content, so a re-shoot that came back the same height would mean the conversion had
+    # only ADDED affordances and left the prose behind it (the duplicate half of
+    # `SettingsProsePolicyTests`, which a source scan can see but a player cannot).
     'options-cards'   = @{ Title = 'Options'
                            Env = @{ EQBUDDY_OPTIONS = '1' }
                            Set = @{ OptionsTab = 'cards'
