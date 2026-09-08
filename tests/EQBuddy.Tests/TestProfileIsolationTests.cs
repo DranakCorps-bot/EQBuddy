@@ -3,163 +3,129 @@ using EQBuddy.Core;
 namespace EQBuddy.Tests;
 
 /// <summary>
-/// **The guard that keeps the suite off a real profile, tested rather than trusted.**
+/// **The suite asserting that it cannot reach a player's profile.**
 ///
-/// <see cref="TestProfileIsolation"/> exists because a test once overwrote David's live
-/// settings.json (2026-08-14). On 2026-09-07 it happened twice more — ~390 KB down to
-/// ~4.9 KB, which is a defaults file — and NOT because the redirect was wrong: because the
-/// initializer's first line handed the decision to an inherited environment variable
-/// (<c>if (EQBUDDY_APPDATA is set) return;</c>), and the shell the suite was started from
-/// was pointing at <c>%AppData%\EQBuddy Evolved</c> to drive the real app. Isolation opted
-/// out of itself, in silence, and every assertion in the suite went on passing.
+/// <see cref="TestProfileIsolation"/> is the only thing between ~2,900 tests and
+/// <c>%AppData%\EQBuddy Evolved</c>, and until 2026-09-07 it stepped aside whenever
+/// <c>EQBUDDY_APPDATA</c> was already set — so an agent seat that had inherited the
+/// Evolved launcher's export ran the whole suite against the live profile and truncated
+/// David's <c>settings.json</c> (390 KB → 4.8 KB). Nothing in the tree said a word: every
+/// test passed, because they were all writing somewhere writable.
 ///
-/// That is trap 34's shape at the root of the tree: a guard that cannot fail reads as
-/// coverage. Nothing in 2,900 tests could see it, because the thing that was wrong was the
-/// guard's own premise — "a preset means somebody meant it" — and no test asked what the
-/// premise was standing in for (trap 64).
-///
-/// Asked of the pure <see cref="TestProfileIsolation.Decide"/> rather than by setting
-/// EQBUDDY_APPDATA: the module initializer has long since run, and this assembly runs its
-/// collections in parallel, so a test that mutated the variable would move every other
-/// test's profile out from under it (trap 57). <c>AppPaths.IsProductOwned</c> is separated
-/// from <c>AppPaths.IsProductOwnedProfile</c> for exactly this reason, and the live half is
-/// covered below by asserting what this process actually did.
-///
-/// This file is in the settings.json collection because it calls
-/// <c>AppSettings.Load()</c>/<c>Save()</c> on the shared throwaway profile.
+/// So the guard is asserted rather than assumed, from two directions. The pure rule
+/// (<see cref="TestProfileIsolation.ShouldRedirect"/>) says what the module initializer
+/// decides; the environment assertions below say what it actually DID to this run — trap
+/// 42's distinction, and the reason the second kind exists at all: "the redirect is in the
+/// source" and "the redirect is in force" are different claims, and only the second one is
+/// the guard.
 /// </summary>
-[Collection(SettingsFileCollection.Name)]
 public class TestProfileIsolationTests
 {
-    /// <summary>A preset that is not a player profile but is unmistakably somebody's
-    /// deliberate-looking choice — the exact shape the old early-return honoured.</summary>
-    private static string FakeEvolved =>
-        Path.Combine(Path.GetTempPath(), "eqbuddy-isolation-decoy", "EQBuddy Evolved");
+    private static string Full(string path) =>
+        Path.TrimEndingDirectorySeparator(Path.GetFullPath(path));
 
-    /// <summary>**The prove-fail.** A preset with no opt-in is overridden, full stop. Under
-    /// the pre-fix rule this answers "keep the preset" and the suite writes wherever the
-    /// parent shell was pointing.</summary>
-    [Fact]
-    public void APresetWithNoOptInIsOverridden() =>
-        Assert.Equal(IsolationChoice.OverrodePreset, Decide(FakeEvolved, allowPreset: null));
-
-    /// <summary>Nothing set at all is the ordinary case: CI, <c>check.ps1</c> and a plain
-    /// <c>dotnet test</c> all arrive here, and the redirect fills the gap.</summary>
-    [Theory]
-    [InlineData(null)]
-    [InlineData("")]
-    public void NoPresetAtAllIsFilledIn(string? preset) =>
-        Assert.Equal(IsolationChoice.FilledTheGap, Decide(preset, allowPreset: null));
-
-    /// <summary>Exactly one spelling means "keep my override". A half-spelled opt-in
-    /// isolates, because the direction a typo must fail in is the one where the player's
-    /// data survives.</summary>
-    [Theory]
-    [InlineData(null)]
-    [InlineData("")]
-    [InlineData("0")]
-    [InlineData("true")]
-    [InlineData("yes")]
-    [InlineData(" 1")]
-    public void OnlyTheExactOptInValueKeepsAPreset(string? allowPreset) =>
-        Assert.Equal(IsolationChoice.OverrodePreset, Decide(FakeEvolved, allowPreset));
-
-    /// <summary>And the opt-in does work — otherwise it is not an opt-in, it is a comment.
-    /// A harness that has already made its own throwaway directory keeps it.</summary>
-    [Fact]
-    public void TheOptInKeepsAPresetThatIsNotAPlayersProfile() =>
-        Assert.Equal(IsolationChoice.KeptPresetByOptIn,
-            Decide(FakeEvolved, TestProfileIsolation.AllowPresetValue));
+    private static string Roaming =>
+        Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
 
     /// <summary>
-    /// **The belt the opt-in wears.** An opt-in may move the suite to another throwaway
-    /// directory; it may not point it at the data this whole guard exists to protect. Both
-    /// lines count — an Evolved build's own profile AND the v1 one beside it, which is just
-    /// as much somebody's install — and every spelling of a directory is that directory.
+    /// **Only the exact string <c>"1"</c> lets a live profile through.** Every other value
+    /// — unset, empty, "0", "false", a stray space — redirects, because the cost of the two
+    /// mistakes is not symmetric: refusing to honour a malformed opt-out wastes a
+    /// developer's minute, and honouring one destroys a profile that cannot be rebuilt
+    /// (trap 65).
+    /// </summary>
+    [Theory]
+    [InlineData(null, true)]
+    [InlineData("", true)]
+    [InlineData("0", true)]
+    [InlineData("true", true)]
+    [InlineData("yes", true)]
+    [InlineData(" 1", true)]
+    [InlineData("1 ", true)]
+    [InlineData("1", false)]
+    public void OnlyTheExactOptOutLetsALiveProfileThrough(string? optOut, bool redirects) =>
+        Assert.Equal(redirects, TestProfileIsolation.ShouldRedirect(optOut));
+
+    /// <summary>
+    /// **An inherited <c>EQBUDDY_APPDATA</c> is not a decision, so it does not win.** This
+    /// is the whole change: the old rule asked "is a profile already chosen?", which the
+    /// launcher's export answers yes to on every seat that has ever run Evolved.
     /// </summary>
     [Fact]
-    public void EvenTheOptInWillNotPointTheSuiteAtAPlayersProfile()
-    {
-        foreach (var profile in TestProfileIsolation.PlayerProfiles)
-        {
-            Assert.Equal(IsolationChoice.RefusedPlayerProfile,
-                Decide(profile, TestProfileIsolation.AllowPresetValue));
-            Assert.Equal(IsolationChoice.RefusedPlayerProfile,
-                Decide(profile + Path.DirectorySeparatorChar,
-                    TestProfileIsolation.AllowPresetValue));
-            Assert.Equal(IsolationChoice.RefusedPlayerProfile,
-                Decide(profile.ToUpperInvariant(), TestProfileIsolation.AllowPresetValue));
-        }
+    public void AnAlreadySetProfileVariableDoesNotStopTheRedirect() =>
+        Assert.True(TestProfileIsolation.ShouldRedirect(optOut: null));
 
-        // The pair is the point: %AppData%\EQBuddy Evolved is what the 2026-09-07 sessions
-        // exported, and %AppData%\EQBuddy is the v1 profile the transition imports FROM.
-        Assert.Equal(2, TestProfileIsolation.PlayerProfiles.Count);
-        Assert.Contains(AppPaths.ProductDir, TestProfileIsolation.PlayerProfiles);
-        Assert.Contains(AppPaths.LegacyDir, TestProfileIsolation.PlayerProfiles);
-    }
-
-    /// <summary>An unusable preset never throws out of the decision — this question gates
-    /// the isolation of the whole suite, so it has to have an answer for every string. With
-    /// no opt-in it is overridden like any other; with one it is the caller's problem, and
-    /// the failure is a save that cannot find its directory rather than one that finds
-    /// somebody's.</summary>
-    [Theory]
-    [InlineData("\0:://not a path")]
-    [InlineData("   ")]
-    [InlineData("|<>")]
-    public void AnUnusablePresetIsOverriddenRatherThanThrown(string preset)
+    /// <summary>
+    /// The profile this run is actually using is a throwaway one this assembly created —
+    /// asked of the environment, not of the source.
+    ///
+    /// **This is the test the opt-out turns red, on purpose.** A run under
+    /// <c>EQBUDDY_ALLOW_LIVE_APPDATA=1</c> is not isolated and the suite says so rather
+    /// than passing quietly; the message names the variable, so the failure reads as the
+    /// door somebody opened rather than as a defect in whatever they were reviewing.
+    /// </summary>
+    [Fact]
+    public void TheProfileInForceIsAThrowawayTempDirectory()
     {
-        Assert.Equal(IsolationChoice.OverrodePreset, Decide(preset, allowPreset: null));
-        _ = Decide(preset, TestProfileIsolation.AllowPresetValue);
+        var dir = Full(AppPaths.Dir);
+        var temp = Full(Path.Combine(Path.GetTempPath(), "eqbuddy-tests"));
+
+        Assert.True(dir.StartsWith(temp, StringComparison.OrdinalIgnoreCase),
+            $"the profile in force is {dir}, not a throwaway under {temp}. " +
+            $"{TestProfileIsolation.OptOutVar}=" +
+            $"{Environment.GetEnvironmentVariable(TestProfileIsolation.OptOutVar) ?? "(unset)"}" +
+            " — with the opt-out set this suite writes wherever the environment points it, " +
+            "including a player's live profile.");
+        Assert.True(Directory.Exists(dir), $"the isolated profile {dir} was never created");
     }
 
     /// <summary>
-    /// **The live half: what THIS process actually did**, rather than what the rule reads
-    /// like. The rule being right and the initializer not calling it is trap 42's shape
-    /// (present in the source ≠ in effect at runtime), and it is the half that would have
-    /// let 2026-09-07 happen anyway.
+    /// **The claim that matters: neither line's real profile is in force.** Evolved
+    /// (<c>AppPaths.ProductDir</c>) is what the 2026-09-07 truncation hit; v1
+    /// (<c>AppPaths.LegacyDir</c>) is the import SOURCE and is equally a player's data. The
+    /// roaming check is the general form — it fails for any future directory either of
+    /// them grows, rather than only for the two we can name today.
     /// </summary>
     [Fact]
-    public void ThisProcessIsRunningOnAThrowawayProfile()
+    public void NoRealProfileDirectoryIsInForce()
     {
-        Assert.NotEqual(IsolationChoice.RefusedPlayerProfile, TestProfileIsolation.Choice);
+        var dir = Full(AppPaths.Dir);
 
-        // The invariant, true in every branch: whatever the environment said, the suite is
-        // not pointed at anybody's install.
-        foreach (var profile in TestProfileIsolation.PlayerProfiles)
-            Assert.False(TestProfileIsolation.SameDirectory(AppPaths.Dir, profile),
-                $"the suite is writing to a real profile: {AppPaths.Dir}");
-
-        // And unless a caller explicitly opted in, it is under our own temp root.
-        if (TestProfileIsolation.Choice != IsolationChoice.KeptPresetByOptIn)
-            Assert.StartsWith(
-                Path.GetFullPath(Path.Combine(Path.GetTempPath(), TestProfileIsolation.TempRoot)),
-                Path.GetFullPath(AppPaths.Dir), StringComparison.OrdinalIgnoreCase);
+        Assert.NotEqual(Full(AppPaths.ProductDir), dir, StringComparer.OrdinalIgnoreCase);
+        Assert.NotEqual(Full(AppPaths.LegacyDir), dir, StringComparer.OrdinalIgnoreCase);
+        Assert.False(dir.StartsWith(Full(Roaming), StringComparison.OrdinalIgnoreCase),
+            $"the suite is writing inside %AppData% ({dir})");
     }
 
     /// <summary>
-    /// The whole point, stated as the thing that went wrong: a save lands in the throwaway
-    /// profile. `AppPaths.Dir` being right is the rule; a file appearing there is the
-    /// product of it, and it is what the two clobbers were.
+    /// And because the profile is isolated, <c>ProfileImport</c> refuses to run in it — so
+    /// a suite run can never copy a real v1 profile into a throwaway one either.
+    /// <c>ProfileImportTests.AnIsolatedProfileIsNeverOfferedAnImport</c> holds the rule;
+    /// this holds that THIS run satisfies its premise.
     /// </summary>
     [Fact]
-    public void ASaveLandsInTheThrowawayProfileAndNowhereElse()
+    public void TheIsolatedProfileIsNotProductOwned() =>
+        Assert.False(AppPaths.IsProductOwnedProfile);
+
+    /// <summary>
+    /// **What a displaced override proves, and it is the assertion the prove-run drives.**
+    /// Run the suite with <c>EQBUDDY_APPDATA</c> pointing anywhere — including at a live
+    /// profile — and the variable is recorded here and NOT used. On an ordinary run nothing
+    /// was inherited and this test has nothing to say, which is exactly the shape trap 34
+    /// warns about: **so it is not the guard.** The guard is
+    /// <see cref="NoRealProfileDirectoryIsInForce"/>, which asserts unconditionally; this
+    /// one is what makes the displaced value legible when a run DID inherit one, and it is
+    /// what the prove-run in the PR drives.
+    /// </summary>
+    [Fact]
+    public void AnInheritedOverrideWasDisplacedRatherThanTrusted()
     {
-        var path = AppPaths.File("settings.json");
-        foreach (var profile in TestProfileIsolation.PlayerProfiles)
-            Assert.False(
-                Path.GetFullPath(path).StartsWith(
-                    Path.GetFullPath(profile) + Path.DirectorySeparatorChar,
-                    StringComparison.OrdinalIgnoreCase),
-                $"a save would land in a real profile: {path}");
+        var displaced = Environment.GetEnvironmentVariable(TestProfileIsolation.DisplacedVar);
 
-        var settings = AppSettings.Load();
-        settings.UiScale = 1.05;
-        settings.Save();
+        // Nothing inherited: there is nothing to displace, and the temp-directory
+        // assertions above are already the whole of this run's story.
+        if (displaced is not { Length: > 0 }) return;
 
-        Assert.True(File.Exists(path), $"the save did not reach the isolated profile: {path}");
+        Assert.NotEqual(Full(displaced), Full(AppPaths.Dir), StringComparer.OrdinalIgnoreCase);
     }
-
-    private static IsolationChoice Decide(string? preset, string? allowPreset) =>
-        TestProfileIsolation.Decide(preset, allowPreset, TestProfileIsolation.PlayerProfiles);
 }
