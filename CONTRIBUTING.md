@@ -72,6 +72,10 @@ You don't need Windows, the game, or an account:
 ## Quality bar
 
 - `dotnet build EQBuddy.slnx -c Release` and `dotnet test` green before every PR/push.
+  Soft/local loops may climb the C′ ladder in `docs/lab/VerificationLadder.md`
+  (lab experiment, 2026-09-08 — not a Corps-wide standard). CI on the PR stays
+  authoritative. A red that goes green on rerun is a `docs/lab/FlakeLedger.md`
+  occurrence, not a close.
 - Parser changes include the raw log line as a test fixture.
 - UI-visible changes update `docs/FeatureGuide.md` (and screenshots when the look
   changes — regenerate via the fixture recipe, don't hand-mock them).

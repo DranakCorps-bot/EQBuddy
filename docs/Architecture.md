@@ -1,8 +1,11 @@
 ﻿# EQBuddy architecture
 
 Orientation for anyone — human or agent — changing this codebase. Companion to
-[../CLAUDE.md](../CLAUDE.md) (loaded every session, deliberately short) and
-[TestPlan.md](TestPlan.md) (what the behaviour is supposed to be).
+[../CLAUDE.md](../CLAUDE.md) (loaded every session, the live manual — novels
+live in [archive/](archive/README.md)) and
+[TestPlan.md](TestPlan.md) (what the behaviour is supposed to be). Soft/local
+verification is the C′ ladder in [lab/VerificationLadder.md](lab/VerificationLadder.md)
+(lab experiment, 2026-09-08; CI / `main` stay authoritative).
 
 Measured 2026-08-14 at v1.82.0.
 
