@@ -1462,3 +1462,22 @@ Read this list before touching the areas it names. Every entry cost a release.
     → **The general move: when two processes share one job, say which process the guard
     is about.** A host redirect does not cover a child `ProcessStartInfo`. Apply the
     isolated value AFTER the caller dictionary, or the dictionary is the hole.
+
+### Trap 70
+
+70. **SOFT MAX ≤3 IS A COUNT, NOT A MUTEX.** Helm SSC + `Get-Process claude`
+    refuses nothing — a fourth `claude.exe` starts, and a second default seat
+    on the same issue starts. `scheduled_tasks.lock` and
+    `%TEMP%\eqbuddy-screen.lock` are other mutexes; they do not claim a work
+    item. (E′ took trap 69 on this same day for the child-profile hole.)
+    → **Experiment A′ on EQBuddy (the lab), not a Corps standard.** Claim
+    before kick: `scripts/claim-seat.ps1` refuses a second default claim on
+    the same work item. `-Mode challenger|disjoint|replacement` is the
+    explicit override; `scripts/release-seat.ps1 -ForceStale` recovers a dead
+    holder. The store is local (gitignored `.claude/soft-seats/`) so it
+    cannot become a mailbox rebase war. Soft/Dranak:
+    `run-seat-PROMPT-only.cmd` runs the claim first and never writes
+    `HELM-FEEDBACK.md`. How-to: `.claude/soft-seats/README.md`.
+    → **Evidence before graduation:** duplicate starts prevented, stale
+    claims, false blocks, recovery. Formal proposal lives in the
+    control-plane `proposals/` tree, not here.

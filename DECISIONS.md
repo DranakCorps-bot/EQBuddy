@@ -1,3 +1,12 @@
+## 2026-09-08 (Soft seat claims — Experiment A′ on EQBuddy, the lab)
+
+- **This is the EQBuddy verification implementation, not a Corps standard** · the other default is to write the rule as if every Corps repo already owed a claim before kick · lab-only, because enhancements are proposed in the control-plane repo and implemented here to gather evidence (duplicate starts prevented, stale claims, false blocks, recovery). A separate PR lands the formal proposal under that repo's `proposals/` tree; nothing graduates until the evidence is in.
+- **Live claims live in a gitignored JSON file, not in git and not in HELM-FEEDBACK.md** · the alternative is a tracked table or a mailbox row so every machine can see the holder · local file, because a tracked claim is a git conflict on every kick (trap 60's rebase war) and a mailbox row is the thing this experiment was told not to migrate. Resolved to the main worktree via `git-common-dir` so ad-hoc `.claude/worktrees/<seat>/` checkouts share one store.
+- **Default second claim is refused; challenger / disjoint / replacement are named overrides** · a silent steal, or a lock that also blocks Helm-approved split seats, are the two other shapes · refuse-by-default, because #428's two isolation seats were the cost, and a mode you have to type is the difference between an accident and a decision.
+- **`-ForceStale` needs age ≥ 8 h or a recorded dead pid — a missing pid is not "dead"** · treating "no pid" as stale would let anyone take a claim the launcher never stamped · age is the recovery that works without a long-lived pid (the claim script exits immediately, so defaulting to `$PID` would make every claim look dead). The CLI flag is `-ExecutorPid` because `$Pid` is read-only in PowerShell; the JSON field stays `pid`.
+- **Trap number is 70, not 69** · E′ (#439) landed first and took trap 69 for the child-profile hole · 70, so the live pointer set does not steal a number that already has a novel.
+- **No WhatsNew entry** · tooling only; nothing a player can run changed.
+
 ## 2026-09-08 (E′ live-state isolation audit — EQBuddy lab, child-process refuse)
 
 - **This is an EQBuddy lab verification, not a Corps-wide standard** · the default it could have gone the other way on is writing the operating-model proposal into this tree · lab only, because David (2026-09-08) placed enhancements as *proposed* on the control-plane and *implemented + verified* here. Formal proposal is a separate control-plane PR. Evidence first; graduate later.
