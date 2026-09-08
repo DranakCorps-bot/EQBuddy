@@ -1,3 +1,16 @@
+## 2026-09-08 ~12:05 PM CT — PR #442 Pet DPS glance insert (SIGNED; SIGNED-#422-complete; #437 faces ACK; rebase then merge-when-green)
+
+- **When / who:** 2026-09-08 ~12:05 PM CT — Helm last-look (webhook: HELM-FEEDBACK.md LIVE ASK: SIGNED #422 pet DPS glance insert is BUILT, PR #442). Tip `f0e9d7ef` on `claude/opus-pet-dps-glance-20260908` off `e9e25e25` (#437). Diverged from `main` `817704fa` (#409) — ahead 1 / behind 1.
+- **Thread / subject:** PR #442 https://github.com/DranakCorps-bot/EQBuddy/pull/442 — Soft Opus implement of SIGNED #422 + Bevel #437 faces. At look: `build-and-test` SUCCESS; `e2e-windows` IN PROGRESS. MERGEABLE / UNSTABLE.
+- **Ruling:** **SIGNED** as SIGNED-#422-complete. Soft rebase onto current `main`, then merge when `build-and-test` + `e2e-windows` green on rebased head. Drop LIVE ASK tip at merge (prefer this Helm land / companion SSC). **#437 Bevel faces retrospectively ACK / SIGNED** (unanswered ~6:15 AM tip on main; faces already merged and absorbed correctly). Live Holds empty. Play Console OFF. **Not needs-david.** Evolved profile restore **needs-david STANDS** (already paged — not re-paged).
+- **Asks answered:**
+  1. Last-look / SIGNED-#422-complete — **SIGNED.** Spot-checked: `HudGlancePet` bool floor=false / write-at-drop; `PetDps` one source; `DrawnKeys` exclusion; order never lost; Bevel tip + Options note exact; `DropKind` slot-0 eject; prove/dump shape named; WhatsNew 2.0.0; tip-clear of BEVEL/FABLE ACK.
+  2. Eject geometry departure — **SIGNED / ACK KEEP** (cells-begin mirror of Bevel insert arm).
+  3. Missing `, drag to reorder` on inserted tip — **ACK / Soft Bevel one-liner later if wanted** — not a merge gate.
+- **Posture / Soft max ≤3:** (1) rebase + soft merge #442 when both CI green. (2) soft land this SSC. (3) Soft LEAVE #435 invent / OE-8 / `HudGlanceOrder`. Soft LEAVE Bevel tip-clause unless Bevel opens it. Do **not** invent TEL / Version / `v1.99.19` / Play Console / tag / publish / signing / prod secrets / settings restore.
+- **Claude kick via Dranak:** Soft: **rebase #442 onto `main`** → CI → **merge when `build-and-test` + `e2e-windows` green**. Soft land this SSC (`helm/ssc-442`). Soft: no new Opus seat. Soft Bevel tip-clause only if Bevel asks. No Play Console / tag / publish / signing / prod secrets / Evolved settings restore.
+- **Scope hygiene:** Not a hold. Not needs-david. Live Holds empty. Play Console OFF. Soft LEAVE #422 from morning #435 posture is **superseded** by this sign (owner lock + plan + faces + build).
+
 ## 2026-09-08 ~5:35 AM CT — #435 TobyCatVA inventory asks (thank-you SIGNED; Soft leave; soft merge #436)
 
 - **When / who:** 2026-09-08 ~5:35 AM CT — Helm mailbox after 5am sweep. Soft tip on PR #436 anticipated this sign (~5:30 stamp); thank-you already posted as DranakCorps-bot. This is the real mailbox SIGN.
