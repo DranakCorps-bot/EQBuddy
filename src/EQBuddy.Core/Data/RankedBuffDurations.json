@@ -1,0 +1,27 @@
+{
+  "note": "MEASURED ranked buff durations, one row per EXACT ranked spell name. Nothing here is derived from a rank formula or a mote multiplier - every row cites the observation it came from, and RankedBuffDurationTests fails a row whose baseSeconds does not reproduce its own observedSeconds through BuffDurationModel.WithReinforcement. Curated: never auto-written by the wiki refresh (a wrong duration is worse than none). baseSeconds is the PRE-AA length; the tracker applies the caster's own Spell Casting Reinforcement rank on top, so a player with a different rank gets their own number rather than the measurer's.",
+  "spells": [
+    {
+      "name": "Shield of Thorns V",
+      "baseSeconds": 1350.0,
+      "measured": {
+        "by": "David (owner)",
+        "on": "2026-09-08",
+        "character": "level 50 Druid",
+        "observedSeconds": 1416.0,
+        "reinforcementRank": 1
+      }
+    },
+    {
+      "name": "Chloroplast V",
+      "baseSeconds": 1200.0,
+      "measured": {
+        "by": "David (owner)",
+        "on": "2026-09-08",
+        "character": "level 50 Druid",
+        "observedSeconds": 1260.0,
+        "reinforcementRank": 1
+      }
+    }
+  ]
+}

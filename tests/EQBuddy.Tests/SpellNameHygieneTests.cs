@@ -40,6 +40,7 @@ public class SpellNameHygieneTests
     private static readonly Dictionary<string, string> SpellNameCatalogs = new()
     {
         ["BuffDurations.json"] = "buff countdown candidates — the four polluted rows lived here and in the two below (#407)",
+        ["RankedBuffDurations.json"] = "measured per-RANK durations, keyed on the exact ranked name a cast line writes — a disambiguated title here could never be reached at all",
         ["FadeMessages.json"] = "fade candidates; a name here is matched against the spell a fade line names",
         ["DebuffLandings.json"] = "debuff landing candidates, matched against BaseName of a cast",
         ["SlowSpells.json"] = "slow candidates plus fadeOf (the colliding haste spells), all matched against log spellings",

@@ -114,7 +114,12 @@ public static class BuffRosterPresentation
         b.Candidates.Length > 1 ? "One of: " + string.Join(", ", b.Candidates) : b.Label,
         b.Caster.Length > 0 ? $"cast by {b.Caster}" : "",
         $"landed {b.LandedAt:h:mm:ss tt}",
-        b.Estimated ? "est = wiki base; a natural fade teaches your real duration" : "",
+        // "catalog length", not "wiki base": for a ranked spell somebody has MEASURED
+        // (RankedBuffDurationLedger) the number is no longer the wiki's, and a tooltip that
+        // names its own source wrongly is the kind of small lie that outlives the code it
+        // described. What "est" still means is unchanged — this is a shipped length plus
+        // your own SCR, not a length your log has timed.
+        b.Estimated ? "est = catalog length; a natural fade teaches your real duration" : "",
     }.Where(part => part.Length > 0));
 
     /// <summary>Is this buff urgent — warn ink on the countdown and a warn border on the

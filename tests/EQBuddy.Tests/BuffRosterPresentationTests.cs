@@ -154,7 +154,7 @@ public class BuffRosterPresentationTests
         Assert.Equal("0:45", BuffRosterPresentation.RosterFace(buff, T0));
         Assert.Equal("0:45", Assert.Single(
             BuffRosterPresentation.Chips([buff], T0, 60)).Chip.CountdownText);
-        Assert.Contains("est = wiki base", BuffRosterPresentation.Detail(buff));
+        Assert.Contains("est = catalog length", BuffRosterPresentation.Detail(buff));
 
         // The real parser and the real tracker, so this reads the shipped catalog's own
         // 3,240 s Valor: landed at +3 s and read at +6 s, the chicklet has 53:57 left.
@@ -178,7 +178,7 @@ public class BuffRosterPresentationTests
         Assert.StartsWith("Riftwind's Protection", detail);
         Assert.Contains("cast by Sanctari", detail);
         Assert.Contains("landed", detail);
-        Assert.Contains("est = wiki base", detail);
+        Assert.Contains("est = catalog length", detail);
     }
 
     /// <summary>An unresolved landing names every candidate instead of the label — the honest

@@ -687,6 +687,36 @@ public class HudChipRowTests
         Assert.Single(HudChipRow.BuffChips(t, T0.AddSeconds(3750), warnSeconds: 60));
     }
 
+    /// <summary>
+    /// THE EARLY ALERT, at the surface the player actually sees (owner report, 2026-09-08).
+    ///
+    /// His Shield of Thorns V runs 23:36 with Spell Casting Reinforcement rank 1, so with the
+    /// default 60 s window the chicklet belongs from 22:36 in — and nowhere near it at 14:57.
+    ///
+    /// PREDICTION, and both halves fail against the folded wiki base (900 s → 942 s armed):
+    ///  - at +900 s the countdown then read 0:42 and the chicklet was ALREADY UP, seven and a
+    ///    half minutes before the shield was anywhere near falling;
+    ///  - at +1,400 s — 19 s from the real end — the chip that IS up reads "0:00 est", the
+    ///    countdown having bottomed out four hundred seconds earlier and sat there.
+    ///
+    /// Presence alone would not catch the second half: an expired buff lingers at 0:00 rather
+    /// than vanishing (estimates are floors), so the chip is there either way and it is the
+    /// FACE that tells the truth apart from the lie.
+    /// </summary>
+    [Fact]
+    public void AThornsChickletWaitsForTheDurationTheOwnerMeasured()
+    {
+        var t = new BuffTracker { ReinforcementRank = () => 1 };
+        t.Apply(Ev(0, "You begin casting Shield of Thorns V."));
+        t.Apply(Ev(3, "You are surrounded by a thorny barrier."));
+
+        Assert.Empty(HudChipRow.BuffChips(t, T0.AddSeconds(900), warnSeconds: 60));
+
+        var chip = Assert.Single(HudChipRow.BuffChips(t, T0.AddSeconds(1400), warnSeconds: 60));
+        Assert.Equal("Shield of Thorns", chip.Name);
+        Assert.Equal("0:19 est", chip.CountdownText);
+    }
+
     /// <summary>Widen the player's window and the same buff earns its chip earlier. This is
     /// the assertion that the threshold is READ rather than pinned: a hard-coded 60 would
     /// pass every test above and fail this one.</summary>

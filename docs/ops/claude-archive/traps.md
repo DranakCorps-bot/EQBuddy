@@ -1481,3 +1481,43 @@ Read this list before touching the areas it names. Every entry cost a release.
     → **Evidence before graduation:** duplicate starts prevented, stale
     claims, false blocks, recovery. Formal proposal lives in the
     control-plane `proposals/` tree, not here.
+
+### Trap 71
+
+71. **A FOLD THAT IS RIGHT FOR IDENTITY IS NOT AUTOMATICALLY RIGHT FOR
+    QUANTITY.** `SpellCatalog.BaseName` strips a rank so "Shield of Thorns V"
+    and "Shield of Thorns" are the same spell — correct, and load-bearing:
+    only one of them can be up on you, one fade line ends either, one active
+    entry holds both. `BuffTracker` then reached through that same fold for
+    the spell's DURATION, which is the one property the rank decides. eqlwiki
+    carries a single duration per spell page (the unranked number), so a level
+    50 Druid casting rank V got rank I's 15 minutes for a 23:36 shield.
+    → **The cost was not the countdown; it was every alert armed off it.**
+    `BuffState.ExpiresAt` is a single producer read by the HUD's expiring
+    chicklet, the Buffs card's warn tint and expiring-only mode, so all three
+    fired **7:54** early on Shield of Thorns V and **4:12** early on
+    Chloroplast V. Nothing looked wrong from the inside: valid JSON, resolved
+    landing, SCR applied, a chip drawn with a perfectly ordinary countdown on
+    it. The owner found it with a stopwatch.
+    → **`ExpiryLinger` hid the other end of it.** Past its expiry a chip holds
+    at 0:00 for five minutes rather than vanishing, because an estimate is a
+    floor. So a test that asserted only PRESENCE would have passed on the
+    broken code at both ends of the window — the chip is there either way, and
+    it is the FACE ("0:19 est" versus a bottomed-out "0:00 est") that tells
+    the truth apart from the lie. **When a surface degrades gracefully, assert
+    what it SAYS, not that it is there.**
+    → **The fix keeps the fold and adds a second key.**
+    `RankedBuffDurations.json` is keyed on the EXACT ranked name; identity
+    still folds. Learned durations moved to the ranked key for the same
+    reason, with the folded key as a read fallback so no player loses a
+    measurement their own log paid for.
+    → **A measured ledger is not an invented one, and the difference has to be
+    checkable.** Helm's posture from #414 is *do not invent ranked durations /
+    mote multipliers*, and the two measured rows sit at +50% and +25% over
+    their wiki bases — no formula fits both, which is the evidence rather than
+    an excuse. Every row stores the observation it came from, and
+    `RankedBuffDurationTests` re-derives that observation from the stored
+    base, so a row somebody typed from a hunch has nothing to land on. Guards:
+    `BuffTrackerTests`, `HudChipRowTests.AThornsChickletWaitsForTheDurationTheOwnerMeasured`,
+    `RankedBuffDurationTests`. Prove-failed against the folded base: 8 red,
+    the HUD one reporting a chicklet already up at "0:48 est".

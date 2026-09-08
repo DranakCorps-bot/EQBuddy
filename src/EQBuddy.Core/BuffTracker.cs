@@ -94,6 +94,19 @@ public sealed record BuffState(
     /// erasing something the log plainly said. Fades match the wider set; only the
     /// countdown and the tooltip use the narrower one.</summary>
     public string[] FadeNames => DumpNarrowed ? NarrowedFrom : Candidates;
+
+    /// <summary>
+    /// The EXACT ranked name the cast line used - "Shield of Thorns V" where
+    /// <see cref="Label"/> is the rank-folded "Shield of Thorns". Empty when the log named
+    /// no caster, which is every landing the log alone could not attribute.
+    ///
+    /// **Kept because the rank decides the LENGTH.** The fold is right for identity (one
+    /// Shield of Thorns is up on you, whichever rank it is) and wrong for duration - ranks
+    /// lengthen buffs, and throwing the rank away while looking up a duration is looking up
+    /// rank I's number for a rank V cast. <see cref="RankedBuffDurationLedger"/> and the
+    /// learned-duration store are both keyed on this, not on <see cref="Label"/>.
+    /// </summary>
+    public string Spell { get; init; } = "";
 }
 
 /// <summary>
@@ -137,10 +150,13 @@ public sealed class BuffTracker
     /// real extensions, and applying it twice would overshoot every countdown.</summary>
     public Func<int>? ReinforcementRank { get; set; }
 
-    private static readonly double[] ReinforcementBonus = [0, 0.05, 0.15, 0.30, 0.50];
+    private readonly RankedBuffDurationLedger _ranked;
 
-    public BuffTracker(BuffDurationCatalog? catalog = null) =>
+    public BuffTracker(BuffDurationCatalog? catalog = null, RankedBuffDurationLedger? ranked = null)
+    {
         _catalog = catalog ?? BuffDurationCatalog.Default;
+        _ranked = ranked ?? RankedBuffDurationLedger.Default;
+    }
 
     // ---- the optional spellbook (OE-5 LOCK A) -----------------------------------
 
@@ -297,25 +313,44 @@ public sealed class BuffTracker
             candidates = narrowed;
         }
 
-        var baseSeconds = resolved
-            ? entry.Spells.First(s => s.Name.Equals(label, StringComparison.OrdinalIgnoreCase)).DurationSeconds
-            // The longest of what is STILL standing. Narrowing "Rune IV or Rune V" down to
-            // the rank this character has scribed is the whole accuracy win: the estimate
-            // stops being the longest rank in the game and becomes the longest rank you own.
-            : entry.Spells.Where(s => candidates.Contains(s.Name, StringComparer.OrdinalIgnoreCase))
-                .Max(s => s.DurationSeconds);
+        // The RANKED name, kept whole. The catalog lookup below still folds it - eqlwiki
+        // holds one page per spell line - but the rank is what decides the LENGTH, so
+        // everything that answers "how long" is keyed on this instead.
+        var ranked = resolved ? cast.Spell.Trim() : "";
+
+        // A MEASURED length for this exact rank beats the wiki's rank-I number. This is
+        // the whole fix: "Shield of Thorns V" is 1,350 s base where the folded page says
+        // 900, so every surface armed off the folded number fired nearly eight minutes
+        // early. A rank nobody has measured is absent from the ledger and falls straight
+        // through to the wiki base, exactly as before.
+        var baseSeconds = _ranked.BaseSeconds(ranked)
+            ?? (resolved
+                ? entry.Spells.First(s => s.Name.Equals(label, StringComparison.OrdinalIgnoreCase)).DurationSeconds
+                // The longest of what is STILL standing. Narrowing "Rune IV or Rune V" down to
+                // the rank this character has scribed is the whole accuracy win: the estimate
+                // stops being the longest rank in the game and becomes the longest rank you own.
+                : entry.Spells.Where(s => candidates.Contains(s.Name, StringComparer.OrdinalIgnoreCase))
+                    .Max(s => s.DurationSeconds));
         // Your own cast gets your Spell Casting Reinforcement applied to the estimate;
-        // someone else's caster AAs are invisible to your log, so their base stands.
-        if (resolved && cast.Caster == "You"
-            && ReinforcementRank?.Invoke() is > 0 and <= 4 and var rank)
-            baseSeconds *= 1 + ReinforcementBonus[rank];
-        var learned = resolved && _learned.TryGetValue(label, out var known) ? known : (double?)null;
+        // someone else's caster AAs are invisible to your log, so their base stands. ONE
+        // application, of the rank the AA ledger reports and no other - the ledger above
+        // stores pre-AA lengths precisely so this can stay the only place SCR is spent.
+        if (resolved && cast.Caster == "You")
+            baseSeconds = BuffDurationModel.WithReinforcement(
+                baseSeconds, ReinforcementRank?.Invoke() ?? 0);
+
+        // Learned beats measured-elsewhere: a fade this character's own log timed is the
+        // only number that already carries THEIR ranks and THEIR AAs. Ranked key first,
+        // because a duration learned at rank II is not this rank's duration; the folded key
+        // is the fallback that keeps every value learned before ranks were keyed at all.
+        var learned = resolved ? LearnedFor(ranked, label) : null;
         var estimated = !resolved || learned is null;
 
         _active[label] = new BuffState(label, candidates, resolved ? cast.Caster : "",
             time, time.AddSeconds(learned ?? baseSeconds), estimated)
         {
             NarrowedFrom = narrowedFrom,
+            Spell = ranked,
         };
         _seenLandings.Add(SpellCatalog.BaseName(label));
         // The sights are the LOG's claim about what this session showed (#120's honesty
@@ -324,6 +359,24 @@ public sealed class BuffTracker
         foreach (var c in narrowedFrom.Length > 0 ? narrowedFrom : candidates)
             _seenLandings.Add(SpellCatalog.BaseName(c));
         return true;
+    }
+
+    /// <summary>
+    /// What this character's own log has timed for this spell: the exact ranked name first,
+    /// the rank-folded name second, null when neither has been seen.
+    ///
+    /// **Two keys because the store predates the rank.** New learns are written under the
+    /// ranked name (<see cref="OnFade"/>) - a duration measured at rank II is not rank V's
+    /// duration, and one key for both is the same conflation that made the wiki base wrong
+    /// here in the first place. Every value learned before that is keyed on the folded name,
+    /// and dropping it would silently throw away a real measurement to fix a rarer one, so
+    /// it stays as the fallback. Unranked spells resolve to the same string twice and are
+    /// unaffected either way. Callers hold _lock.
+    /// </summary>
+    private double? LearnedFor(string ranked, string label)
+    {
+        if (ranked.Length > 0 && _learned.TryGetValue(ranked, out var exact)) return exact;
+        return _learned.TryGetValue(label, out var folded) ? folded : null;
     }
 
     /// <summary>
@@ -394,12 +447,16 @@ public sealed class BuffTracker
             var spell = b.Candidates[0];
             if (_lastCastOf.TryGetValue(spell, out var lastCast) && lastCast > b.LandedAt.AddSeconds(1))
                 continue;
+            // Keyed on the RANKED name the cast used, so upgrading Shield of Thorns IV to V
+            // does not inherit IV's length and start the alert early all over again. Falls
+            // back to the folded name only where the log named no rank to key on.
+            var key = b.Spell.Length > 0 ? b.Spell : spell;
             var observed = Math.Floor((time - b.LandedAt).TotalSeconds / ServerTickSeconds) * ServerTickSeconds;
             var floor = b.ExpiresAt is { } e ? (e - b.LandedAt).TotalSeconds : 0;
             if (observed >= floor && observed is > 30 and < 4 * 3600
-                && (!_learned.TryGetValue(spell, out var known) || Math.Abs(observed - known) > 0.5))
+                && (!_learned.TryGetValue(key, out var known) || Math.Abs(observed - known) > 0.5))
             {
-                _learned[spell] = observed;
+                _learned[key] = observed;
                 SaveStore();
             }
         }
