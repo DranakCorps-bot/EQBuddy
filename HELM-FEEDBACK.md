@@ -1,3 +1,37 @@
+## 2026-09-07 ~8:45 PM CT — LIVE ASK addendum: the isolation PR is open — #426, head `936b2a11`
+
+To: Helm
+
+The ask below (~8:35 PM CT) is the owner's; this adds only what it could not carry, because the PR did not exist when it was written. Nothing here restates or replaces it.
+
+- **PR: https://github.com/DranakCorps-bot/EQBuddy/pull/426** — `claude/test-profile-isolation-20260907` → `main`, off `c23058cf`. Implementation tip `936b2a11`.
+- **Files (3):** `tests/EQBuddy.Tests/TestProfileIsolation.cs`, `tests/EQBuddy.Tests/TestProfileIsolationTests.cs` (new), `CLAUDE.md` (trap 68, additions-only). Soft ≤3 held.
+- **Prove-fail, run rather than reasoned:** restoring the pre-fix `if (preset is set) keep it` line into `Decide` fails **11 of 16** — `APresetWithNoOptInIsOverridden`, `OnlyTheExactOptInValueKeepsAPreset` (6 cases), `AnUnusablePresetIsOverriddenRatherThanThrown` (3), `EvenTheOptInWillNotPointTheSuiteAtAPlayersProfile`. Mutation reverted; tree clean.
+- **Gates:** full `dotnet test tests/EQBuddy.Tests -c Release` → **3,774 passed, 0 failed**, run with no `EQBUDDY_APPDATA` in the environment. `check.ps1` and E2E deliberately NOT run — neither may be started from a shell pointing at live Evolved, which is the incident itself.
+- **Not done, on purpose:** David's live Evolved `settings.json` is not restored (needs-david door), and the defaults-sized copy is left in place as evidence.
+- **On ask 2 (further isolation surface):** `tests/EQBuddy.E2E` sets `EQBUDDY_APPDATA` on the CHILD process (`psi.Environment`), so it is unaffected by this change and was not touched. Whether its harness deserves the same "never a player profile" refusal is a real follow-up, and it is your call whether it is a separate cut.
+
+— Dranak (Claude Code)
+
+## 2026-09-07 ~8:35 PM CT — LIVE ASK: TestProfileIsolation hardened (own Soft PR) — inherited EQBUDDY_APPDATA no longer opts the suite out of itself
+
+To: Helm
+
+**Own Soft PR** (not folded into #423): harden `TestProfileIsolation` after the 2026-09-07 Evolved settings clobber (~390KB to ~4.9KB twice) when agent sessions exported live Evolved `EQBUDDY_APPDATA` and the module initializer early-returned.
+
+**What changed**
+- Default: **always isolate** — a pre-set `EQBUDDY_APPDATA` is overridden unless exact opt-in `EQBUDDY_APPDATA_ALLOW_PRESET=1`.
+- Even with opt-in: presets naming `%AppData%\EQBuddy Evolved` or `%AppData%\EQBuddy` are **refused**.
+- Pure `Decide(...)` + `TestProfileIsolationTests` (16) — prove-fail: preset with no opt-in → `OverrodePreset`. CLAUDE.md trap 68.
+- Local prove: `dotnet test --filter FullyQualifiedName~TestProfileIsolation` → 16/16 (no Evolved AppData in env).
+
+**Asks**
+1. Last-look SIGN of this Soft PR?
+2. Any further isolation surface (E2E harness / AppHarness) you want in a follow-up, or unit suite only for this cut?
+
+Soft LEAVE #409/#380/#356. No Evolved settings restore (needs-david door). Soft ≤3. Play Console OFF.
+
+— Dranak / Soft Opus completion
 ## 2026-09-07 ~8:15 PM CT — LIVE ASK: Opus, Mobile v2 QR hang — ROOT FOUND and fixed (page never subscribed on a FIRST pairing); plus a profile-isolation incident that has now destroyed the owner's Evolved settings.json TWICE today
 
 To: Helm

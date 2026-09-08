@@ -1983,6 +1983,36 @@ Read this list before touching the areas it names. Every entry cost a release.
     `window.__SENT` — **on a CLEAN browser profile**, because a second run inherits
     `localStorage`, takes the returning-device path, and makes the broken page look correct.
 
+68. **AN ENVIRONMENT VARIABLE IS INHERITED, SO "SOMEBODY SET THIS DELIBERATELY" IS NOT A
+    THING A GUARD CAN READ OFF ONE — and the test-profile guard opened by handing its whole
+    decision to exactly that.** `tests/EQBuddy.Tests/TestProfileIsolation.cs` is the module
+    initializer this file already calls non-negotiable ("tests must never touch the real
+    profile"), written after a test overwrote David's live `settings.json` in 2026-08-14. Its
+    first line was `if (EQBUDDY_APPDATA is set) return;`, on the reasoning that a harness or a
+    developer who had named a directory meant it. But nobody in the room types that variable —
+    it arrives from whatever shell the suite is started from, and on **2026-09-07 that was an
+    agent session exporting `%AppData%\EQBuddy Evolved`** to drive the real app. Isolation
+    opted out of itself, in silence, and David's live Evolved `settings.json` went from ~390 KB
+    to ~4.9 KB **twice in one day**. 4,697 bytes IS a defaults file (trap 65 says so in as many
+    words), and the shape on screen is trap 55's: theme reset, watch rules re-seeded, hidden
+    cards back — a profile read as brand new, not three bugs.
+    → **The guard never failed. It was asked politely to stand aside, and every one of 3,769
+    assertions went on passing** — trap 34's shape at the root of the tree, since the thing
+    that was wrong was the guard's own PREMISE. That premise ("a preset means somebody meant
+    it") is trap 64's proxy, and nothing had ever asked what it was standing in for.
+    → **Now guarded:** the redirect ALWAYS isolates. `EQBUDDY_APPDATA_ALLOW_PRESET=1` is the
+    explicit opt-in and nothing else spells it (a typo isolates, because that is the direction
+    a half-spelled flag must fail in) — and **even with the opt-in a preset naming a real
+    player profile is refused**, both lines, since running the unit suite against a live
+    profile is never the thing anyone wanted. `TestProfileIsolationTests` holds it, prove-failed
+    against the old rule: 11 of 16 fail there. The decision is a pure function for the same
+    reason `AppPaths.IsProductOwned` is (trap 57 — a test that mutated the variable would move
+    every parallel test's profile), with the live half asserting what THIS process actually did
+    rather than what the rule reads like (trap 42).
+    → **The general move: when a guard's first line is an early return, ask who supplies the
+    value it returns on.** An inherited variable, a file another process writes, a default that
+    means "unset" — each is a stranger holding the switch on a guard nobody will notice is off.
+
 ## Tooling notes that cost time when ignored
 
 - **`pwsh -NoProfile -File scripts/status.ps1`** answers "where did we leave off?" in one
