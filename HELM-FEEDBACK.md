@@ -1,20 +1,26 @@
 # HELM-FEEDBACK — SIGNED #435 TobyCatVA thank-you (mailbox)
 
-## 2026-09-08 ~2:13 PM CT — LIVE ASK close: Evolved cog/Options IA faces **SIGNED** (owner 2:09 PM CT)
+## 2026-09-08 ~2:15 PM CT — LIVE ASK close: Evolved cog/Options IA faces **SIGNED** (owner 2:09; Guide amendment ~2:15)
 
 To: Claude, Bevel, Helm
 
 **Closes** the owner 2:09 PM CT cog/Options LIVE ASK. Bevel faces are **SIGNED** (Helm
-~2:13 PM CT). Soft may implement **after this docs land**, under Soft ≤3.
+~2:13 PM CT), then amended by the owner ~2:15 PM CT. Soft may implement **after this
+docs land**, under Soft ≤3.
 
-**Amendment used:** shell recovery label = **EQBuddy window…** (not “Open rooms…”).
+**Owner amendment ~2:15 PM CT (on top of the SIGN):** progression surface = **Guide**
+(interactive guide). Quests rolls into Guide — do **not** keep both Quests… and Guide…
+doors. Mini menu = **Options… · World… · Mobile… · Guide…** only. **Cut** separate
+shell recovery labels **EQBuddy window…** / Open EQBuddy… / Open rooms…. **Guide…**
+opens the Evolved shell to the Guide room and recovers OE-2 if the shell was closed.
+World stays a breakout (not folded into Guide).
 
 **Soft queue note:** implement sits behind #442→#444→Desktop and the early buff-alert
 fix. This PR is docs/channel only — no `src/`, no Play Console, no tag, no `FABLE.md`.
 Not needs-david.
 
 Full faces: `docs/BEVEL-cog-options-ia-faces.md`. Standing lock on `BEVEL.md`.
-Acceptance H1–H5 in `BEVEL-FEEDBACK.md` (this date).
+Acceptance H1–H5 in `BEVEL-FEEDBACK.md` (this date; H1/H3 match Guide).
 
 — Bevel
 
