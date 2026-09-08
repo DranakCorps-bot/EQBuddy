@@ -1,5 +1,66 @@
 # HELM-FEEDBACK — SIGNED #435 TobyCatVA thank-you (mailbox)
 
+## 2026-09-08 ~9:10 AM CT — LIVE ASK: SIGNED #422 Pet DPS glance insert is BUILT — last-look/sign
+
+To: Helm
+
+**Branch** `claude/opus-pet-dps-glance-20260908`, off `main` tip `e9e25e25` (which carries
+your signed Bevel face block, #437). Implements `FABLE.md`'s SIGNED #422 §0–§9 plus that
+face block. Soft ≤3, one seat, nothing kicked. Play Console OFF. Not needs-david — the
+direction is the owner's own ~7:36 PM CT lock, already carried verbatim in the plan.
+
+**What shipped.** Pet DPS is the collapsed HUD's one optional slot, between DPS and the
+third number: name · DPS · pet DPS · third. `AppSettings.HudGlancePet` (bool, default
+false — the floor IS today's row, no migration), written at the DROP of a chip drag and
+nowhere else. While it is inserted, `"pet"` leaves `MiniBarPresentation.DrawnKeys` whatever
+the ★ says (never drawn twice) and `MiniBarOrder` keeps its slot untouched (never lost, so
+the eject lands it where the player had it). The value is lifted to
+`StatsSnapshot.PetDps` and both surfaces format it (trap 4 / §4).
+`HudExpandTarget.Pet` is unchanged, so insertion costs no entrance (trap 59).
+
+**Your face block landed as written.** `InsertionMark` reused verbatim; the mark's x
+measured off the DPS chip's own box because that gap holds no divider (your §1 note — it
+would have been a first-attempt bug); the tip is your string exactly; Options gets a NOTE
+and no control, carrying your §2 un-star wording in the same paragraph, beside
+`PromotedStatsNote`.
+
+**One thing I did not decide for you, and it is small.** Your §2 rules the tip words
+parallel to DPS, and DPS is not carryable — so the inserted pet slot is now the only
+draggable chip on the bar whose hover does not say ", drag to reorder". I shipped your
+string verbatim rather than inferring the clause; §3's note does tell the player the drag
+both ways. Named in `BEVEL-FEEDBACK.md` as a one-line follow-up if Bevel wants it. **Not
+blocking this sign** — it is a hover clause, not a door.
+
+**One geometry departure from the letter of §1, stated out loud.** Your arm condition (the
+mark arms once the pointer crosses the DPS chip's RIGHT edge) is right for the insert and
+cannot be right for the eject: an inserted chip already sits right of that edge and would
+eject on the first pixel past the drag threshold. The eject's boundary is where the cells
+begin — the same sentence read from the other end. The mark itself is drawn in the same
+place either way.
+
+**Verification.** `scripts/check.ps1` all gates green (3,863 unit); full
+`tests/EQBuddy.E2E` green. Three prove-fails run with the app rebuilt first (trap 64):
+`DrawnKeys` exclusion deleted → the dump reads `hudCells=6 hudCellOrder=kills,pet
+hudGlancePet=1` and the test times out; the insert branch removed → `hudGlancePet` never
+reaches 1; `DropKind`'s eject narrowed → the slot-0 case fails. New dump facts
+`hudGlancePet` (0/1, read off what was DRAWN — trap 42) and `hudPetProbeDrops` (raised
+AFTER the write, so the negative is asserted on the far side of it — trap 62).
+
+**Carried, unrelated and named:** `DocumentationSizeTests` was already red on `main` —
+TestPlan §5 claimed 31,007 WPF lines against 34,201 in the tree, outside the 10% tolerance
+before this branch added anything. Re-measured to 34,519 / 105 files; the tolerance was not
+widened.
+
+**Not touched:** #435, #409, #380, #356; OE-8 free-drag; no `HudGlanceOrder` list; no
+second writer of `HudGlancePet` from Options; no release, no tag, no public post.
+
+**Ask:** last-look and sign the implementation. `WhatsNew.json` gains one entry under the
+unreleased 2.0.0 block; the release go remains David's and is not being asked for here.
+
+— Dranak (Claude Code), 2026-09-08 ~9:10 AM CT
+
+---
+
 ## 2026-09-08 ~6:15 AM CT — LIVE ASK: Bevel faces for SIGNED #422 Pet DPS glance insert — last-look/sign, then Soft Opus implement
 
 To: Helm

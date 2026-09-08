@@ -619,6 +619,34 @@ internal sealed class AppHarness : IDisposable
             $"{before}; is EQBUDDY_DOORPROBE=1 set on this scenario?)");
     }
 
+    /// <summary>
+    /// Drops a mini-bar chip at a landing slot through the <c>EQBUDDY_PETDROP</c>
+    /// rendezvous, which the scenario must have asked for — SIGNED #422's insert
+    /// (<c>slot = -1</c>, the always-on row's gap) and eject (any cell index).
+    ///
+    /// **A drop is the END of a gesture this suite cannot perform**: nothing here can put a
+    /// synthetic pointer on a control inside the widget, and the suite may not assert the
+    /// screen at all. So the probe drives the same <c>HudBarReorder.Land</c> a mouse-up
+    /// drives — the real write path — while the pointer arithmetic it skips
+    /// (<c>MiniBarDrag.PetDropIndex</c> / <c>DropKind</c>) is unit-tested with no window.
+    /// The same split, and the same rendezvous shape, as
+    /// <see cref="ClickOpenEqbuddyDoor"/>.
+    ///
+    /// **It returns on <c>hudPetProbeDrops</c>, which the probe raises AFTER the drop has
+    /// run** — not on the trigger file disappearing, which only says the probe saw it. An
+    /// assertion that a key LEFT the bar has to be made on the far side of the write or it
+    /// passes with the feature deleted (trap 62).
+    /// </summary>
+    public void DropHudChip(string key, int slot)
+    {
+        var before = DumpValue("hudPetProbeDrops");
+        File.WriteAllText(Path.Combine(ProfileDir, "hud-drop.trigger"), $"{key} {slot}");
+        Until(() => DumpValue("hudPetProbeDrops") > before, AssertTimeout,
+            $"the pet-drop probe to land \"{key}\" at slot {slot} (debug.txt " +
+            $"hudPetProbeDrops past {before}; is EQBUDDY_PETDROP=1 set on this scenario, " +
+            "and is the bar drawing that chip?)");
+    }
+
     /// <summary>Current value of a debug.txt "key=value" field, or -1 while the dump is
     /// missing, mid-write, or lacks the key — callers poll via <see cref="WaitForDump"/>.</summary>
     public int DumpValue(string key)

@@ -197,6 +197,109 @@ public class MiniBarPresentationTests
             key => Assert.NotEqual("", MiniBarPresentation.Text(Snapshot(), key)));
     }
 
+    // ---- PET DPS ON THE ALWAYS-ON ROW (SIGNED #422) ----------------------------------
+
+    /// <summary>A snapshot with pet damage in it, so the assertions below are about a real
+    /// number rather than about zero. 10,560 over 120 combat seconds is 88 dps.</summary>
+    private static StatsSnapshot WithPet() => new()
+    {
+        CombatSeconds = 120,
+        PetAbilities = [new SourceDamage("Pet (Gnoll Pup)", 40, 10_560)],
+    };
+
+    /// <summary>The floor: with the setting off — the default — nothing about the cells
+    /// changes, and pet draws exactly where it always did.</summary>
+    [Fact]
+    public void WithTheSettingOffThePetCellIsWhereItAlwaysWas()
+    {
+        Assert.False(new AppSettings().HudGlancePet);
+        Assert.Equal(["kills", "pet", "loot"],
+            MiniBarPresentation.DrawnKeys(Starred("kills", "pet", "loot")));
+        Assert.Equal(MiniBarPresentation.CanonicalOrder,
+            MiniBarPresentation.ResolveOrder(new AppSettings()));
+    }
+
+    /// <summary>**Never drawn twice.** While the slot is inserted, "pet" leaves the cells —
+    /// the membership decision is this class's and not the view's, which is the only thing
+    /// standing between a player and two pet-damage numbers on one bar.</summary>
+    [Fact]
+    public void AnInsertedPetLeavesTheCells()
+    {
+        var settings = new AppSettings
+        {
+            MiniStats = ["kills", "pet", "loot"],
+            HudGlancePet = true,
+        };
+        Assert.Equal(["kills", "loot"], MiniBarPresentation.DrawnKeys(settings));
+    }
+
+    /// <summary>**And the ★ gets no vote while it is up there** (§2). Un-starring pet with
+    /// the slot inserted changes the cells and nothing else — which is exactly why Options
+    /// carries a sentence saying so: a tick with no visible effect otherwise reads as broken.
+    /// A Theory over both ★ states, because either one alone would pass with the rule
+    /// written the other way round.</summary>
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public void TheStarDoesNotDecideAnInsertedPetSlot(bool starred)
+    {
+        var settings = new AppSettings
+        {
+            MiniStats = starred ? ["kills", "pet"] : ["kills"],
+            HudGlancePet = true,
+        };
+        Assert.Equal(["kills"], MiniBarPresentation.DrawnKeys(settings));
+    }
+
+    /// <summary>**Never lost, either.** `MiniBarOrder` keeps pet's slot while the chip is
+    /// away — `ResolveOrder` is untouched by the flag — so an eject puts it back where the
+    /// player left it rather than where the canonical list would. The negative is the half
+    /// that matters (trap 39): the assertion above would still pass if the insert had
+    /// stripped "pet" out of the saved order on its way up.</summary>
+    [Fact]
+    public void AnInsertedPetKeepsItsRememberedSlotForTheEject()
+    {
+        var settings = new AppSettings
+        {
+            MiniStats = ["kills", "pet", "loot"],
+            MiniBarOrder = ["loot", "pet", "kills", "procs", "motes", "money", "deaths", "buffs"],
+            HudGlancePet = true,
+        };
+        Assert.Equal(["loot", "pet", "kills"], MiniBarPresentation.ResolveOrder(settings).Take(3));
+        Assert.Equal(["loot", "kills"], MiniBarPresentation.DrawnKeys(settings));
+
+        // The eject, which is one bool: the chip comes back BETWEEN loot and kills, not on
+        // the end and not in canonical position.
+        settings.HudGlancePet = false;
+        Assert.Equal(["loot", "pet", "kills"], MiniBarPresentation.DrawnKeys(settings));
+    }
+
+    /// <summary>The key still has a FACE while it is inserted — the moment the player drags
+    /// it back down it is a cell again, so a table that had stopped being able to format it
+    /// would draw a hole in the bar.</summary>
+    [Fact]
+    public void ThePetKeyStillFormatsWhileItIsInserted()
+    {
+        Assert.Contains(MiniBarPresentation.PetKey, MiniBarPresentation.Order);
+        Assert.Equal("88 dps",
+            MiniBarPresentation.Text(WithPet(), MiniBarPresentation.PetKey));
+    }
+
+    /// <summary>ONE source for the number (§4 / trap 4). The cell formats
+    /// <c>StatsSnapshot.PetDps</c> and does not carry its own copy of the expression — the
+    /// glance formats the same value into its own fixed shape, and the day one of them gains
+    /// a decimal both move.</summary>
+    [Fact]
+    public void ThePetCellReadsTheSnapshotsOwnRate()
+    {
+        var s = WithPet();
+        Assert.Equal(88, s.PetDps);
+        Assert.Equal($"{s.PetDps:0.#} dps", MiniBarPresentation.Text(s, MiniBarPresentation.PetKey));
+        // A session with no combat seconds yet is a rate of zero rather than an infinity:
+        // the denominator is floored at one second.
+        Assert.Equal(0, new StatsSnapshot().PetDps);
+    }
+
     [Fact]
     public void KillsAndDeathsShareTheirIconAndThatIsDeliberate()
     {

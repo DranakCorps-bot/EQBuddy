@@ -55,6 +55,39 @@ public sealed class AppSettings
     /// </summary>
     public List<string> MiniBarOrder { get; set; } = [];
 
+    /// <summary>
+    /// Pet DPS sits in the collapsed HUD's always-on row, between DPS and the third number
+    /// (SIGNED #422, owner lock 2026-09-07 ~7:36 PM CT — the lock widens glance MEMBERSHIP,
+    /// not glance ORDER).
+    ///
+    /// **FALSE — the default — is today's row byte for byte**, the same floor-is-the-default
+    /// construction <see cref="MiniBarOrder"/>'s empty list and
+    /// <see cref="HudPanelParkLeft"/>'s NaN use: an untouched profile draws name · DPS ·
+    /// third, a reset restores it, and there is no <c>ApplyMigrations</c> entry to get wrong
+    /// because there is nothing to migrate.
+    ///
+    /// **Written at the DROP of a chip drag and nowhere else** — #191's rule, and #252's
+    /// "no second writer on a brand-new setting on day one". Options carries a NOTE beside
+    /// <c>SettingsHudView.PromotedStatsNote</c> naming the gesture, deliberately not a
+    /// control: a button that set this would be a second AUTHOR of the fact the drag already
+    /// authors, which is what makes it different from "Restore default order" (that one only
+    /// ever CLEARS to canonical). An eject-drop that also lands at a new cell index writes
+    /// this and <see cref="MiniBarOrder"/> in the one gesture, at the one moment.
+    ///
+    /// **One optional slot, not a glance ORDER.** A <c>HudGlanceOrder</c> list was rejected
+    /// as over-general: exactly one slot can move, a list invites reordering the fixed slots
+    /// (#413's reasoning — the third slot swaps identity mid-session, so a drop landing ON it
+    /// would change meaning under the cursor) and it buys a migration surface for nothing.
+    ///
+    /// **It is a THIRD verb, so it is a third setting.** <see cref="MiniStats"/> is the ★
+    /// (may this stat show at all) and <see cref="MiniBarOrder"/> is the place among the
+    /// cells; this is which ROW pet damage is on. While it is true, "pet" leaves
+    /// <c>MiniBarPresentation.DrawnKeys</c> whatever the ★ says — never drawn twice — and
+    /// <see cref="MiniBarOrder"/> keeps its slot untouched, so ejecting returns the chip to
+    /// the place the player left it rather than to canonical.
+    /// </summary>
+    public bool HudGlancePet { get; set; }
+
     public double WindowLeft { get; set; } = double.NaN;
     public double WindowTop { get; set; } = double.NaN;
     public double Opacity { get; set; } = 0.96;
@@ -721,7 +754,8 @@ public sealed class AppSettings
     /// alert is gone for everyone and this switch no longer has a second meaning.
     ///
     /// dps and hps left the HUD's star list in SA-1 but kept their chips: they are always-on
-    /// numbers in the trio, and the trio's slots expand like every other chip.</summary>
+    /// numbers on the collapsed row, and that row's slots expand like every other chip —
+    /// including the optional pet one <see cref="HudGlancePet"/> inserts.</summary>
     public bool DoubleClickChipsToggleBreakouts { get; set; }
 
     public double BreakoutDamageLeft { get; set; } = double.NaN;

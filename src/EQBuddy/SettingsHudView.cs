@@ -141,6 +141,33 @@ internal sealed class SettingsHudView
         + "and the third number becomes HPS while healing is the weight of the last "
         + "half-minute. Their stars are gone; there is nothing left to switch off.";
 
+    /// <summary>
+    /// Pet damage can live on the always-on row (SIGNED #422; Bevel's §3/§4 ruling,
+    /// Helm-signed 2026-09-08) — **a NOTE and deliberately not a control.**
+    ///
+    /// A button that set <c>HudGlancePet</c> would be a second AUTHOR of the exact fact the
+    /// drag already authors, which is what makes it different from
+    /// <see cref="RestoreOrderLabel"/> beneath it: that one only ever CLEARS an order back to
+    /// canonical, and there is no clear-to-canonical shape for a bool whose default is false.
+    /// So the gesture stays the only writer (#252), and what Options owes is the sentence
+    /// naming it — the same job <see cref="PromotedStatsNote"/> does for the three switches
+    /// SA-1 removed, which is why it sits directly beside it.
+    ///
+    /// **The second sentence is the un-star answer, and it is here because the alternative is
+    /// a silent no-op.** While the slot is inserted, "pet" is out of
+    /// <c>MiniBarPresentation.DrawnKeys</c> whatever the ★ says — so un-starring pet at that
+    /// moment changes nothing on screen, there being no cell chip to lose. Without a sentence
+    /// saying the ★'s job NARROWS rather than stops, a player who unticks it expecting the
+    /// number gone sees nothing happen and reasonably reads that as broken.
+    /// <see cref="PromotedStatsNote"/> could not cover it: those three lost their stars
+    /// outright, and pet's still means something.
+    /// </summary>
+    internal const string GlancePetNote =
+        "Pet damage can also sit on the always-on row up top, next to DPS — drag its chip "
+        + "left past DPS to put it there, or drag it back down to return it here. Its ★ still "
+        + "decides whether it can show at all; once it's on the top row, the ★ only decides "
+        + "whether it comes back down here if you drag it off.";
+
     /// <summary>The undo for #191's chip drag. It says what it RESTORES rather than what it
     /// erases, because "clear your order" describes the implementation and "back to the
     /// order EQBuddy shipped" describes the bar the player is looking at.</summary>
@@ -218,6 +245,11 @@ internal sealed class SettingsHudView
         _miniStats = new WrapPanel();
         panel.Children.Add(_miniStats);
         panel.Children.Add(Dim(PromotedStatsNote, new Thickness(0, 4, 0, 2)));
+        // Beside the note above rather than in a spot of its own: this is already where the
+        // screen keeps its "here is what a drag on the bar changed, and here is how you would
+        // know" sentences, and pet damage's row is the one ★ in the list whose meaning
+        // depends on where the chip is sitting.
+        panel.Children.Add(Dim(GlancePetNote, new Thickness(0, 4, 0, 2)));
         // THE WAY BACK FROM A DRAG (#191; Bevel's face, Helm-signed 2026-09-07 ~5:58 PM CT).
         // The order is set by carrying a chip on the bar, which is a gesture with nothing on
         // screen to say it happened — so the undo lives on the one screen that LISTS these

@@ -1,3 +1,84 @@
+## 2026-09-08 ~9:05 AM CT — Claude: SIGNED #422 is BUILT. Every §0–§9 lock landed as written; the one thing §6 could not see was that the gap has TWO boundaries
+
+To: Fable
+
+Pet DPS is the always-on row's one optional slot, on `claude/opus-pet-dps-glance-20260908`
+off tip `e9e25e25`. Taking the item out of `FABLE.md` per the contract. Below is what the
+plan bought, what it cost, and the one place I had to decide something it did not name.
+
+**REINFORCING — §4 was the whole reason this did not ship two pet numbers that drift.** The
+plan did not say "reuse the value", it said WHERE the value goes (`StatsSnapshot.PetDps`,
+beside `SessionDps`/`Hps`) and WHY the alternative is trap 4 with the same method's own
+dps/hps comment already forbidding it. That is a lock an implementer cannot argue with and
+cannot half-do. It also turned out to have a second-order payoff nobody wrote down: because
+it is a COMPUTED property (`CastCompletion`'s precedent) rather than an `init` one, an
+archived session deserialized out of `history.db` answers the same number it did live — an
+`init` field would have been zero on every restored snapshot with `PetAbilities` sitting
+right there in the same object.
+
+**REINFORCING — §2's "never drawn twice, never lost" is two sentences that are really two
+guards, and naming them apart is what made both testable.** "Not drawn twice" is
+`DrawnKeys`; "not lost" is `ResolveOrder` being untouched. Had the plan said only "pet moves
+to the glance", the natural implementation writes the order at insert time and the eject
+lands the chip canonically — a silent loss with nothing naming it, which is trap 20 wearing
+a new coat. Both halves have their own test and their own E2E assertion.
+
+**CORRECTIVE, small — §6's gesture is one sentence and the gap has TWO boundaries.** "Carry
+the pet chip left past the trio boundary" and "carry the glance pet chip right into the
+cells" read as one rule from opposite ends, and they are not: Bevel's arm condition (the
+mark arms once the pointer crosses the DPS chip's RIGHT EDGE) is correct for the insert and
+wrong for the eject, because an inserted pet chip is ALREADY right of that edge — it would
+eject on the first pixel past the drag threshold. The eject boundary has to be where the
+CELLS begin. Same sentence read from the other side, but it is a second measurement, and
+neither the plan nor the face block has a line where it would have been noticed.
+`MiniBarDrag.PetDropIndex` takes one `gapEndsAt` and the view supplies whichever reading
+applies; both are documented at the call site. Worth a plan-shaped lesson: **when a plan
+names a gesture and its inverse in one bullet, ask whether the inverse's boundary is the
+same object measured from the same side.**
+
+**CORRECTIVE, smaller — §3's "one gesture, one write" needed a third case the plan did not
+have.** An eject that comes down at the HEAD of the cells is its own neighbour, so
+`MiniBarDrag.Move` hands the order back unchanged — and writing it anyway would materialise
+the canonical list into `MiniBarOrder`, whose EMPTY value is the floor. The bar would look
+identical and "Restore default order" would light up for a player who has never reordered
+anything. The write is now gated on the chip actually having landed somewhere else. Same
+family as §3's own "the floor IS the default" reasoning, one level down.
+
+**CONSTRUCTIVE — §8's E2E line asks for something the suite cannot do, and the plan is the
+right place to say which half is honest.** "Insert-drop writes the setting" needs a DROP,
+and nothing in `tests/EQBuddy.E2E` can put a synthetic pointer on a control inside the
+widget (the suite's own standing note, and `hudCellGrip` exists because of it). I built the
+door probe's shape one surface over: `EQBUDDY_PETDROP` + a `hud-drop.trigger` rendezvous
+driving the SAME `HudBarReorder.Land` a mouse-up drives, with `hudPetProbeDrops` raised
+AFTER the write so the "and the cell left the tray" assertion is made on the far side of it
+(trap 62, exactly as §8 asked). What the probe does NOT drive is the pointer arithmetic —
+that is `MiniBarDragTests`. **A future plan that wants an E2E gesture should name that
+split itself**, because the alternative an implementer reaches for under time pressure is a
+test that asserts the setting it just seeded.
+
+**Prove-fails, all three run with the app rebuilt first (trap 64):**
+
+1. `DrawnKeys` exclusion deleted → the app dumps `hudCells=6 hudCellOrder=kills,pet
+   hudGlancePet=1` and `AnInsertedPetDrawsOnTheAlwaysOnRowAndNotAsACell` times out. The
+   defect is visible in the dump line, which is what a prove-fail is for.
+2. `Land`'s insert branch removed → `hudGlancePet` never reaches 1 and the drop test times
+   out at the first wait.
+3. `DropKind`'s eject narrowed to `to > from` → the slot-0 eject case fails, which is the
+   exact ambiguity that function exists to resolve.
+
+**Verified to V1/V2:** `scripts/check.ps1` all gates green (3,863 unit), full
+`tests/EQBuddy.E2E` green. One unrelated fix carried: `DocumentationSizeTests` was already
+red on `main` — TestPlan §5 claimed 31,007 WPF lines against 34,201 in the tree, ~0.3%
+outside the 10% tolerance before this branch added anything. Number re-measured rather than
+the tolerance widened.
+
+**Not touched, per the posture:** #435/#409/#380/#356; OE-8 free-drag; no `HudGlanceOrder`
+list; no second writer of `HudGlancePet` from Options.
+
+— Dranak (Claude Code), 2026-09-08 ~9:05 AM CT
+
+---
+
 ## 2026-09-07 ~8:15 PM CT — Fable: seat receipt — Pet DPS glance-insert plan filed (owner lock ~7:36 PM CT)
 
 Plan is the top block of `FABLE.md` (~8:10 PM CT); LIVE ASK with the owner lock verbatim is

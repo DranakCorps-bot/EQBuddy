@@ -352,6 +352,20 @@ internal static class WidgetDump
                     // with no window; this proves the decision reaches the control, which
                     // is the half a unit test cannot see (trap 42).
                     $"hudGlance={w._hudBar.GlanceKey} " +
+                    // …and whether the always-on row is drawing the OPTIONAL pet slot
+                    // (SIGNED #422): 1 or 0, read off what the row DREW rather than off
+                    // HudGlancePet (trap 42) — "the profile says so" and "the row drew it"
+                    // are different claims and only the second is the feature.
+                    //
+                    // It is also the same-tick POSITIVE the "pet is not drawn twice"
+                    // negative is asserted at (trap 62): `hudCellOrder` losing "pet" means
+                    // nothing at a moment when the insert may simply not have happened yet.
+                    $"hudGlancePet={w._hudBar.GlancePetKey} " +
+                    // Times the pet-drop probe has driven a real DROP through
+                    // HudBarReorder.Land — 0 forever unless EQBUDDY_PETDROP=1 armed it.
+                    // Raised AFTER the drop returns, so a wait on it is a wait on the far
+                    // side of the write rather than on the trigger file being noticed.
+                    $"hudPetProbeDrops={DebugHooks.PetProbeDrops} " +
                     // THE XP CHIP'S HOVER (OE-3). Two keys, because the tooltip carries two
                     // facts that fail independently — the level can be right while the ETA
                     // is missing, and either alone is the whole feature to the player who
