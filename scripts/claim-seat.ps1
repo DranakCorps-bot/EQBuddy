@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
     Claim a Soft / Claude seat for one work item, or refuse a duplicate default claim.
 
@@ -12,14 +12,16 @@
     replacement) already holds the work item. -Mode challenger|disjoint|replacement
     is the explicit override. Same-seat re-claim is idempotent.
 
+    Optional -PaperclipIssue DRA-n: on successful claim, Soft worker updates the
+    Paperclip card to in_progress (Phase 0 EXO-HARDEN-AGENTS / DRA-18).
+
     scheduled_tasks.lock and %TEMP%\eqbuddy-screen.lock are NOT Soft seat claims.
     Not a scheduler, not a control plane, never writes HELM-FEEDBACK.md.
     Formal proposal lands in the control-plane repo; this file only verifies.
 
 .EXAMPLE
     pwsh -NoProfile -File scripts/claim-seat.ps1 -WorkItem 428 -SeatId opus-isolation
-    pwsh -NoProfile -File scripts/claim-seat.ps1 -WorkItem 428 -SeatId docs-ssc -Mode disjoint
-    pwsh -NoProfile -File scripts/claim-seat.ps1 -List
+    pwsh -NoProfile -File scripts/claim-seat.ps1 -WorkItem options-ia-impl -SeatId x -PaperclipIssue DRA-7
 #>
 [CmdletBinding()]
 param(
@@ -32,6 +34,7 @@ param(
     [int] $ExecutorPid,
     [string] $StoreDir,
     [string] $Repo,
+    [string] $PaperclipIssue,
     [switch] $List,
     [switch] $Check,
     [switch] $Json
@@ -52,7 +55,7 @@ if ($List) {
 }
 
 if (-not $WorkItem -or -not $SeatId) {
-    Write-Error 'Usage: claim-seat.ps1 -WorkItem <issue# or id> -SeatId <name> [-Mode active|challenger|disjoint|replacement] [-Branch <ref>] [-Worktree <path>] [-ExecutorPid <n>]'
+    Write-Error 'Usage: claim-seat.ps1 -WorkItem <issue# or id> -SeatId <name> [-Mode active|challenger|disjoint|replacement] [-Branch <ref>] [-Worktree <path>] [-ExecutorPid <n>] [-PaperclipIssue DRA-n]'
     exit 1
 }
 
@@ -70,5 +73,16 @@ catch {
 
 if ($Json) { $result | ConvertTo-Json -Depth 6 }
 else { Write-Host $result.message }
+
+if ($result.ok -and $PaperclipIssue -and -not $Check) {
+    $cardScript = Join-Path $PSScriptRoot 'paperclip-card.ps1'
+    if (Test-Path $cardScript) {
+        try {
+            & $cardScript -Issue $PaperclipIssue -Status in_progress -Comment "claim-seat: $SeatId on $WorkItem"
+        } catch {
+            Write-Host "paperclip-card warn: $($_.Exception.Message)"
+        }
+    }
+}
 
 if ($result.ok) { exit 0 } else { exit 1 }
