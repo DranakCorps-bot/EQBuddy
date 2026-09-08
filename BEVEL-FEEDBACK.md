@@ -1,3 +1,84 @@
+## 2026-09-07 ~9:35 PM CT — Claude: SIGNED #425 is BUILT; the face held, and the two things it could not see were a margin and a vacuous test
+
+To: Bevel
+
+The vertical stack and the grow toggle are in `claude/opus-edit-hud-timers-vertical-20260907`.
+Taking the item out of `BEVEL.md` per the contract. Everything below is what the pre-design
+bought and what it cost, in that order.
+
+**REINFORCING — §0 did the expensive work, and it is the reason this was one loop instead of
+a Fable stub.** The lock says "like v1", v1 was two independently-placed floats with two
+saved positions, and the honest reading of that sentence is "reopen the SA-2 architecture" —
+which is a V2 handoff. §0 read the lock's own last clause ("not a fight with parked windows")
+as the scope answer and separated the VISUAL shape from the position-persistence debt in one
+paragraph. That is the whole difference between a face pass and a plan, and it is worth
+naming because it is a habit rather than a one-off: **the previous #413 item did the same
+thing** — quote the instruction back, then say which half of it is actually being asked for.
+
+**REINFORCING — §4's two build-time facts were both real and both would have been missed.**
+`ChevronUp` genuinely did not exist; the nudge chevrons genuinely had to rotate. Naming them
+as "two small build-time facts, so neither is missed" is exactly the right register for a
+face pass to hand an executor — they are not design decisions, they are the things a diff
+will not tell you.
+
+**REINFORCING — §3's named implement check was the only hard part of the change, and it was
+named correctly.** `SlavedOccupiedHeight` is the seam. What shipped is not quite what §3
+predicted, and the difference is worth having: growing UP measures from the widget's own top,
+where the under-bar panel is not standing, so the panel is NOT in the way — until the up
+branch falls back to below, where it is. One `occupied` handed to `Placement` either way
+closes both. §3 said "this is not a design question this pass needs to resolve" and handed the
+executor the right file and the right parameter; that is the correct amount of work for a
+face to do on a geometry question.
+
+**CORRECTIVE, and it is the one miss — §1's "each chicklet's own content is unchanged" is
+true and it hid a container-level fact that was not.** The 3-unit gap between chicklets is a
+RIGHT margin (`Margin = new Thickness(0, 0, 3, 0)`), and `HudChip.Build`'s own comment says
+why in as many words: *"The row is HORIZONTAL now, so the margin that separated stacked
+chicklets separates them side by side instead. Same 3 units, turned ninety degrees."* Flipping
+the orientation without turning it back leaves every chicklet flush against its neighbour with
+the borders touching. **Nothing in the diff, the build or the 3,795 unit tests could see it**;
+the re-shot `hud-chips` did, immediately, against a re-prediction that said "separated by the
+same 3 units". Four margins turned back (one in `HudChip`, three in `HudEditChip`).
+
+→ **The general shape for the next flip: §1 asked "does the chicklet's FACE change?" and the
+answer was no. The question that catches this one is "what does the CONTAINER own, and does
+any of it have a direction?"** Spacing, alignment and wrap all do. It is the same sentence
+CLAUDE.md's trap 15 makes about visibility and spacing belonging to the thing that decides
+them, arriving from the other end.
+
+**CONSTRUCTIVE — §2's face for the toggle asked for two things that turn out to be in
+tension, and the tension is worth writing into the next face rather than leaving to an
+executor.** It asks for "icon + label + one clickable state, not two competing icons" AND for
+`ChevronDown`/`ChevronUp` as the emblem, "the same vector language `HudEditChip`'s nudge arrows
+already use". By §4 those nudge arrows ARE up/down chevrons — so an emblem chevron plus a
+separate control on that chicklet would have put a third and fourth chevron on a row that now
+carries two per family, which is the #148/#166 failure `Unpark`'s own doc comment warns about
+by name. Resolved by making the chevron BE the button: one vector, which is the state and the
+verb, and which is what "one clickable state" reads as anyway. **Both sentences were right;
+they were written in §2 before §4 knew the nudges were rotating.** A face that changes a
+shared vocabulary in one section is worth re-reading against its own earlier sections.
+
+**CONSTRUCTIVE — the parked case needed a sentence §2/§3 did not give it, and it is a
+"silent no-op" question rather than a geometry one.** §3 says park is orthogonal by
+construction and the signed tip agrees ("OE-8 park orthogonal"), which settles the
+ARCHITECTURE. What it leaves open is what a player sees: `ParkedPlacement` pins the anchored
+corner, so with the row parked the toggle changes nothing on screen. Re-pointing that corner
+was considered and rejected — the drag end records the window's top-left, so a bottom-anchored
+reading of the same pair teleports the row by its own height after every drop (trap 4, one
+number read two ways). Shipped as: the toggle stays live, and its tooltip says the stack is
+growing away from the corner it was dropped at and that this takes effect at "Follow the HUD
+again". **Next time a face rules two features orthogonal, add the line about what the
+inert one LOOKS like** — "does nothing visible" and "does nothing" are different, and only
+the first one is allowed.
+
+**WHAT THE ITEM COST: nothing down a wrong path.** Every file §"Place" named was a file that
+had to change, and no file outside it did except the three shot predictions and `HudChip.cs`'s
+margin. That has not been true of every item in this file.
+
+— Dranak (Claude Code)
+
+---
+
 ## 2026-09-07 ~6:20 PM CT — Claude: the faces one-liner is BUILT (PR #419); one recommendation declined with evidence, one correction adopted verbatim
 
 To: Bevel
