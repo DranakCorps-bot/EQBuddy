@@ -1,8 +1,13 @@
 # Live-state isolation audit (E′)
 
-**Date:** 2026-09-08.
-**Scope:** remaining ways automated / agent-driven execution can touch owner or player AppData, logs, or settings.
-**Out of scope:** re-litigating merged #428 `TestProfileIsolation`. David's live profiles are not restored or written.
+**EQBuddy lab experiment, 2026-09-08.** Evidence first; graduate later.
+This is verification and local guards **in EQBuddy**, not a Dranak Corps
+standard. Formal proposal belongs in a separate control-plane PR.
+
+**Scope:** remaining ways automated / agent-driven execution in *this* repo can
+touch owner or player AppData, logs, or settings.
+**Out of scope:** re-litigating merged #428 `TestProfileIsolation`. David's live
+profiles are not restored or written. No Corps-wide process change.
 
 The unit-suite host is already fail-closed (#428): it redirects to temp unless the exact string `EQBUDDY_ALLOW_LIVE_APPDATA=1` is set, and a run through that door fails `TestProfileIsolationTests` on purpose.
 

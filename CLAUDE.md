@@ -420,7 +420,8 @@ Use the **question tool**, not a paragraph in a long message.
   fails `TestProfileIsolationTests` by design.
   **The child-process half is `UI.Shared/IsolatedLaunchPolicy`** (E2E,
   `shoot.ps1`, drag-verify) — a host that is isolated can still launch
-  `EQBuddy.exe` against a live profile (trap 69). Audit:
+  `EQBuddy.exe` against a live profile (trap 69). EQBuddy lab
+  experiment, not a Corps-wide standard. Audit:
   `docs/ops/live-state-isolation-audit.md`.
 - **Curated catalogs are never auto-written** (spawn timers, AAs, CC
   lists). The weekly wiki refresh only *flags* them. A wrong respawn timer
@@ -752,7 +753,8 @@ after the named guard left with its surface.
 69. **A host redirect does not cover a child `ProcessStartInfo`.** Pin
     `EQBUDDY_APPDATA` AFTER the caller dictionary; refuse both live
     lines. Guard: `UI.Shared/IsolatedLaunchPolicy` /
-    `IsolatedLaunchPolicyTests`. Audit:
+    `IsolatedLaunchPolicyTests`. EQBuddy lab experiment, not a
+    Corps-wide standard. Audit:
     `docs/ops/live-state-isolation-audit.md`. [Novel](docs/ops/claude-archive/traps.md#trap-69)
 
 New trap discovered the hard way? Add the compact rule here and the novel

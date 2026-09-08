@@ -11,6 +11,7 @@ namespace EQBuddy.Tests;
 /// dictionary applied after <c>EQBUDDY_APPDATA = ProfileDir</c> could point
 /// that child at a live profile, and every host isolation test would still
 /// pass. Helm authorized the refuse follow-up after #426; this is it.
+/// EQBuddy lab experiment (E′ 2026-09-08): evidence first; graduate later.
 ///
 /// Pure functions only: this assembly runs collections in parallel, and a
 /// test that mutated <c>EQBUDDY_APPDATA</c> would move every other test's

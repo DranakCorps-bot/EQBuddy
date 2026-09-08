@@ -17,6 +17,10 @@ namespace EQBuddy.UI.Shared;
 /// this exists to refuse. Product launches
 /// (<c>install-local.ps1 -Evolved</c>, <c>Launch-Evolved-Shell.cmd</c>) do not
 /// call this; they are how the owner runs Evolved.
+///
+/// EQBuddy lab experiment (E′ 2026-09-08): evidence first; graduate later.
+/// This is not a Corps-wide standard. The formal proposal lives on the
+/// control-plane.
 /// </summary>
 public static class IsolatedLaunchPolicy
 {
