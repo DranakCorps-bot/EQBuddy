@@ -240,6 +240,166 @@ public class HudChipRowTests
             hudLeft: -1400, hudTop: 100, hudHeight: 60, rowHeight: 24,
             workAreaTop: 0, workAreaBottom: 1000).Left);
 
+    // ---- THE VERTICAL STACK AND ITS GROW DIRECTION (#425, owner lock) ----
+    //
+    // The stack is a COLUMN now, so it can have a direction; a horizontal row's was always
+    // "right". Down is the default and is byte-for-byte the answer every row above gets, and
+    // the first test here is that claim rather than an assumption underneath the others.
+
+    /// <summary>Down is what an untouched profile does, and it is the arithmetic that
+    /// shipped: the column's TOP goes under the widget. Asserted as the same tuple
+    /// <see cref="TheRowParksUnderTheWidget"/> demands, so a change to one branch that
+    /// silently moved the other would fail twice.</summary>
+    [Fact]
+    public void GrowingDownIsTodaysPlacementUnchanged()
+        => Assert.Equal((100, 200 + 60 + HudChipRow.HudGap), HudChipRow.Placement(
+            hudLeft: 100, hudTop: 200, hudHeight: 60, rowHeight: 24,
+            workAreaTop: 0, workAreaBottom: 1000, growUp: false));
+
+    /// <summary>Up pins the column's BOTTOM just above the widget, so an arriving chicklet
+    /// pushes the top edge upward and the stack stays welded to the HUD. That is v1's "each
+    /// growing away from the other" applied to the one row SA-2 left.</summary>
+    [Fact]
+    public void GrowingUpPutsTheStackAboveTheWidget()
+        => Assert.Equal((100, 200 - HudChipRow.HudGap - 24), HudChipRow.Placement(
+            hudLeft: 100, hudTop: 200, hudHeight: 60, rowHeight: 24,
+            workAreaTop: 0, workAreaBottom: 1000, growUp: true));
+
+    /// <summary>**The bottom edge is what stays put, which is the whole meaning of "grows
+    /// up".** Two heights, one anchor: a taller stack starts higher and ends in the same
+    /// place. A test on one height cannot tell "above the widget" from "growing upward".
+    /// </summary>
+    [Fact]
+    public void GrowingUpKeepsTheBottomEdgeStillAsTheStackGetsTaller()
+    {
+        var shortStack = HudChipRow.Placement(
+            hudLeft: 100, hudTop: 400, hudHeight: 60, rowHeight: 30,
+            workAreaTop: 0, workAreaBottom: 1000, growUp: true);
+        var tallStack = HudChipRow.Placement(
+            hudLeft: 100, hudTop: 400, hudHeight: 60, rowHeight: 90,
+            workAreaTop: 0, workAreaBottom: 1000, growUp: true);
+        Assert.Equal(shortStack.Top + 30, tallStack.Top + 90);
+        Assert.True(tallStack.Top < shortStack.Top, "a taller stack must start HIGHER, not lower.");
+    }
+
+    /// <summary>**Growing up does not measure around the under-bar panel, because the panel
+    /// hangs BELOW the widget** — the space above it is clear. <c>hudHeight</c> is the widget
+    /// plus whatever is under it, and the up branch must ignore that sum entirely: two
+    /// different occupied heights answer the same Top.</summary>
+    [Theory]
+    [InlineData(60d)]
+    [InlineData(260d)]
+    public void GrowingUpIgnoresWhatIsHangingUnderTheWidget(double occupied)
+        => Assert.Equal(400 - HudChipRow.HudGap - 24, HudChipRow.Placement(
+            hudLeft: 100, hudTop: 400, hudHeight: occupied, rowHeight: 24,
+            workAreaTop: 0, workAreaBottom: 1000, growUp: true).Top);
+
+    /// <summary>
+    /// **THE SEAM #425 §3 NAMED: when there is no room above, the up branch falls back to
+    /// BELOW — and below still clears the under-bar panel.** A chicklet the monitor cannot
+    /// show is the same defect as one that never drew, and the fallback goes through the same
+    /// <c>below</c> every other path uses rather than a second sum that would be right until
+    /// someone edited one of them (trap 4).
+    /// </summary>
+    [Fact]
+    public void GrowingUpFallsBackBelowTheWidgetAndTheBarWhenTheTopOfTheScreenIsInTheWay()
+        => Assert.Equal((100, 10 + 260 + HudChipRow.HudGap), HudChipRow.Placement(
+            hudLeft: 100, hudTop: 10, hudHeight: 260, rowHeight: 400,
+            workAreaTop: 0, workAreaBottom: 2000, growUp: true));
+
+    /// <summary>A height that is not real yet takes the space below whichever way it is
+    /// growing: "we cannot tell yet" and "draw where you always draw" are one instruction,
+    /// and they were before the toggle existed too.</summary>
+    [Theory]
+    [InlineData(0d, true)]
+    [InlineData(double.NaN, true)]
+    [InlineData(0d, false)]
+    [InlineData(double.NaN, false)]
+    public void AnUnmeasuredStackTakesTheSpaceBelowInEitherDirection(double rowHeight, bool growUp)
+        => Assert.Equal((100, 200 + 60 + HudChipRow.HudGap), HudChipRow.Placement(
+            hudLeft: 100, hudTop: 200, hudHeight: 60, rowHeight: rowHeight,
+            workAreaTop: 0, workAreaBottom: 210, growUp: growUp));
+
+    /// <summary>The toggle NEVER moves the stack sideways. It is a direction, not a position,
+    /// and a negative Left is still legitimate on a multi-monitor desk.</summary>
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public void TheGrowDirectionLeavesTheHorizontalPositionAlone(bool growUp)
+        => Assert.Equal(-1400d, HudChipRow.Placement(
+            hudLeft: -1400, hudTop: 300, hudHeight: 60, rowHeight: 24,
+            workAreaTop: 0, workAreaBottom: 1000, growUp: growUp).Left);
+
+    // ---- The vertical wrap cap (trap 25's other axis) ----
+
+    /// <summary>The MaxHeight mirror of <see cref="HudChipRow.WrapWidth"/>: the work area's
+    /// own height, so a column wraps into a second column instead of growing a window taller
+    /// than the screen.</summary>
+    [Fact]
+    public void TheStackWrapsAtTheWorkAreasHeight()
+        => Assert.Equal(900d, HudChipRow.WrapHeight(900));
+
+    /// <summary>…with a floor, for a work area measured as zero (a half-initialised host, a
+    /// headless run) — and the floor is a real COLUMN rather than one chicklet's height,
+    /// because a one-chicklet cap would put every chicklet in its own column and hand back
+    /// the horizontal row wearing a vertical panel's clothes.</summary>
+    [Theory]
+    [InlineData(0d)]
+    [InlineData(-40d)]
+    [InlineData(double.NaN)]
+    public void AnUnusableWorkAreaHeightStillLeavesAColumn(double areaHeight)
+    {
+        Assert.Equal(HudChipRow.MinWrapHeight, HudChipRow.WrapHeight(areaHeight));
+        Assert.True(HudChipRow.MinWrapHeight >= 120,
+            "the floor has to hold several chicklets, or the stack is a row again.");
+    }
+
+    // ---- The words the toggle uses (#425 §3: never a bare "grow down") ----
+
+    /// <summary>The label reads the STATE, the way the mute tick says "muted" rather than
+    /// "mute": a player who never clicks it can still read what their row is doing.</summary>
+    [Theory]
+    [InlineData(true, "Stack grows: Up")]
+    [InlineData(false, "Stack grows: Down")]
+    public void TheGrowLabelNamesTheDirectionItIsIn(bool growUp, string expected)
+        => Assert.Equal(expected, HudChipRow.GrowLabel(growUp));
+
+    /// <summary>
+    /// **THE COLLISION THIS EXISTS TO PREVENT.** <c>HudExpandWindow.Reveal</c> owns an
+    /// unrelated, owner-locked "grow down" — the peek panel's reveal animation — and a player
+    /// meeting the same two words on two surfaces will reasonably assume one control governs
+    /// both. The word "Stack" is what keeps them apart, so it is asserted rather than trusted
+    /// to a comment.
+    /// </summary>
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public void TheGrowLabelNeverSaysABareGrowUpOrGrowDown(bool growUp)
+    {
+        var label = HudChipRow.GrowLabel(growUp);
+        Assert.StartsWith("Stack grows", label, StringComparison.Ordinal);
+        Assert.DoesNotContain("Grow down", label, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain("Grow up", label, StringComparison.OrdinalIgnoreCase);
+    }
+
+    /// <summary>The dump's value, space-free like every other value on a space-separated
+    /// key=value line — a value with a space in it would silently become two keys.</summary>
+    [Theory]
+    [InlineData(true, "up")]
+    [InlineData(false, "down")]
+    public void TheGrowKeyIsOneSpaceFreeToken(bool growUp, string expected)
+    {
+        Assert.Equal(expected, HudChipRow.GrowKey(growUp));
+        Assert.DoesNotContain(" ", HudChipRow.GrowKey(growUp), StringComparison.Ordinal);
+    }
+
+    /// <summary>An untouched profile grows DOWN — the whole of the safety argument for
+    /// flipping the panel's orientation under every existing player, so it gets an assertion
+    /// rather than being assumed.</summary>
+    [Fact]
+    public void AFreshProfileGrowsDown()
+        => Assert.False(new AppSettings().HudChipRowGrowUp);
+
     // ---- The under-bar panel's X anchor (owner repro, 2026-09-07 ~3:50 PM CT) ----
     //
     // THE BUG THESE PIN: the panel took its Left from `Placement`, which answers with the

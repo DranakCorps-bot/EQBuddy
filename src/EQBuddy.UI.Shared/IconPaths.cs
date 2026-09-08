@@ -52,6 +52,12 @@ public static class IconPaths
         // ‹ it would otherwise have been (#148, #166).
         ["ChevronLeft"] = "M15.41 16.59 10.83 12l4.58-4.59L14 6l-6 6 6 6 1.41-1.41Z",
         ["ChevronDown"] = "M7.41 8.59 12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41Z",
+        // ChevronDown mirrored about y=12, the same construction the left/right pair uses,
+        // so the vertical pair reads at one optical weight too. Added for the HUD chip
+        // row's vertical stack (#425): once the row stacks top-to-bottom the order nudges
+        // mean up/down rather than left/right, and a control with no vector is invisible in
+        // a screenshot rather than an error (trap 29).
+        ["ChevronUp"] = "M7.41 15.41 12 10.83l4.59 4.58L18 14l-6-6-6 6 1.41 1.41Z",
         ["Map"] = "M20.5 3l-.16.03L15 5.1 9 3 3.36 4.9c-.21.07-.36.25-.36.48V20.5c0 .28.22.5.5.5l.16-.03L9 18.9l6 2.1 5.64-1.9c.21-.07.36-.25.36-.48V3.5c0-.28-.22-.5-.5-.5ZM15 19l-6-2.11V5l6 2.11V19Z",
         ["Quest"] = "M14.4 6 14 4H5v17h2v-7h5.6l.4 2h7V6h-5.6Z",
         ["Gear"] = "M12 1 3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4Zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8Z",

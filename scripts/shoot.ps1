@@ -1950,6 +1950,13 @@ $Shots = [ordered]@{
     # seed list instead of from the family's order; corrected above rather than quietly
     # accepted (trap 23 — a mismatch is a fixture bug until proven otherwise, and this one
     # was proven a prediction bug in one read of Snapshot).
+    #
+    # RE-PREDICTION for #425, written BEFORE the re-shoot: the SAME four chicklets, the same
+    # order, the same faces and the same gauges — stacked VERTICALLY instead of left to
+    # right, one per line, separated by the same 3 units. The owner's lock flips the
+    # container's orientation and nothing else, so anything about an individual chicklet
+    # that changes in this picture is a bug in the flip rather than the point of it. The
+    # capture becomes tall and narrow: roughly one chicklet wide, four tall.
     'hud-chips'       = @{ Title = 'EQBuddy HUD Chips'
                            Env = @{}
                            Set = @{ TrackSpawns = $true; MezChipsEnabled = $true }
@@ -1997,6 +2004,10 @@ $Shots = [ordered]@{
     # DUE" (warn ink, warn border), "Kizdean Gix 28:50", "Assist call 0:22", "Stalwart
     # Regeneration 0:51 est". The prediction is recorded unamended because nothing needed
     # amending, which has not been true of the last three shots added to this file.
+    #
+    # RE-PREDICTION for #425, written BEFORE the re-shoot: the same FIVE chicklets, the same
+    # five distinct vectors, the same order and the same numbers — as a vertical COLUMN
+    # rather than a row. Five lines, one chicklet each, roughly one chicklet wide.
     'hud-chips-deadlines' = @{ Title = 'EQBuddy HUD Chips'
                            Env = @{}
                            Set = @{ TrackSpawns = $true; MezChipsEnabled = $true
@@ -2043,6 +2054,19 @@ $Shots = [ordered]@{
     # Two chicklets reading as the same shape, or an end arrow drawn as though it were live
     # (trap 17 — IsEnabled has no disabled visual in this app's styles), is what this picture
     # exists to catch and what no diff shows.
+    #
+    # RE-PREDICTION for #425, written BEFORE the re-shoot. The four editors are the same four
+    # in the same order, stacked VERTICALLY — and three things about them change with the
+    # column, all of them deliberate:
+    #   • The nudges are CHEVRON UP and CHEVRON DOWN, not left and right. An arrow pointing
+    #     left on a column describes a row that is not there. "Mez & slow" has its UP arrow
+    #     dimmed and disabled (it is topmost); "Buffs" has its DOWN arrow dimmed (bottom).
+    #   • A FIFTH editor chicklet after "Follow the HUD again": a chevron button and the
+    #     words "Stack grows: Down" — the owner's toggle, reading the STATE. Its chevron
+    #     points DOWN on this profile, matching the word beside it. A chevron that disagrees
+    #     with the label is the one thing on this chicklet no test can see.
+    #   • The hint line's wording follows: "up or down the stack", and it names the toggle.
+    # "Spawn timers" stays muted, so the dim/live pair is still carried by one picture.
     'hud-edit'        = @{ Title = 'EQBuddy HUD Chips'
                            Env = @{ EQBUDDY_HUDEDIT = '1' }
                            Set = @{ MutedChipFamilies = @('Spawn') } }

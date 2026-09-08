@@ -143,9 +143,16 @@ internal static class HudChip
             ToolTip = Tip(chip, onDoubleClick is not null, onDismiss is not null),
             CornerRadius = new CornerRadius(7),
             Padding = new Thickness(8, 3, 8, 4),
-            // The row is HORIZONTAL now, so the margin that separated stacked chicklets
-            // separates them side by side instead. Same 3 units, turned ninety degrees.
-            Margin = new Thickness(0, 0, 3, 0),
+            // The stack is VERTICAL again (#425), so the margin that separated chicklets side
+            // by side separates them one above the other. Same 3 units, turned back through
+            // the ninety degrees SA-2 turned them. **This is not cosmetics and it is not a
+            // free-standing decision: the gap belongs to the ORIENTATION**, so an orientation
+            // that flips and a margin that does not leaves every chicklet flush against its
+            // neighbour with the borders touching — which is what the first re-shoot of
+            // `hud-chips` showed, against a prediction that said "separated by the same 3
+            // units". Nothing else could have caught it: the layout is valid, the tests pass,
+            // and a diff of a flipped enum says nothing about spacing.
+            Margin = new Thickness(0, 0, 0, 3),
             BorderThickness = new Thickness(1),
             Tag = entry,
         };
