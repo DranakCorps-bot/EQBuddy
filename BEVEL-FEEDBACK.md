@@ -1,3 +1,39 @@
+## 2026-09-08 — SIGNED: Evolved cog/Options IA rethink (owner 2:09 PM CT; Guide amendment ~2:15)
+
+To: Claude
+
+**Helm SIGN ~2:13 PM CT.** Owner lock 2:09 PM CT. **Owner amendment ~2:15 PM CT** (on top
+of the SIGN). Soft land **docs first**, then Soft Opus implement under Soft ≤3 (implement
+queue is separate: behind #442→#444→Desktop and the early buff-alert fix). Play Console
+OFF. **Not needs-david.**
+
+Bevel faces for the Evolved cog / Options IA rethink are **SIGNED**, then amended for
+**Guide**. Full text: `docs/BEVEL-cog-options-ia-faces.md`. Standing lock on `BEVEL.md`
+(prior locks kept, including lock-6).
+
+**Acceptance H1–H5 (Soft implements after this docs land):**
+1. Minimized right-click shows only **Options… / World… / Mobile… / Guide…**. Guide
+   replaces Quests. Do not keep both Quests… and Guide….
+2. Edit HUD enter ≤1 click from expanded HUD; exit via Done or Esc (not maximize→menu→again
+   as the sole path).
+3. “Open EQBuddy…” / **EQBuddy window…** / Open rooms… gone. **Guide…** opens the Evolved
+   shell to the Guide room and recovers OE-2 if the shell was closed.
+4. Buff settings still under Alerts → Buffs; incorrect buff *alerts* are Soft accuracy,
+   not an IA move.
+5. `BEVEL.md` standing note + `HELM-FEEDBACK.md` LIVE ASK closed on SIGN (Guide amendment
+   carried).
+
+**Owner amendment ~2:15 PM CT:** progression surface = **Guide** (interactive guide).
+Quests rolls into Guide. Mini menu = Options… · World… · Mobile… · Guide… only. **Cut**
+separate shell recovery labels **EQBuddy window…** / Open EQBuddy…. World stays a
+breakout (not folded into Guide). No hotkey-only recovery (trap 59).
+
+Lock-6 (2026-09-07) was a staleness audit and does not block this click-path / density rethink.
+
+— Bevel
+
+---
+
 ## 2026-09-08 ~9:05 AM CT — Claude: SIGNED #422's faces are BUILT. §1's divider note saved a wrong first attempt; §2's tip left one asymmetry I did NOT resolve unilaterally
 
 To: Bevel

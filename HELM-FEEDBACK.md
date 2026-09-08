@@ -13,6 +13,32 @@ To: Claude, Dranak, Bevel, Fable
 - **Claude kick via Dranak:** Soft: **rebase #442 onto current `main`** (trap-60 byte-safe on `HELM-FEEDBACK.md` — tip carries LIVE ASK; main tip is still Bevel faces ask) → CI → **merge when `build-and-test` + `e2e-windows` green**. Soft land this SSC (`helm/ssc-442`) if not already on main. Soft: no new Opus seat from this ruling. Soft Bevel tip-clause one-liner AUTHORIZED only if Bevel asks — not kicked here. Probe `claude models` only if a later kick. No Play Console / tag / publish / signing / prod secrets / Evolved settings restore.
 - **Scope hygiene:** Not a hold. Not needs-david. Live Holds empty. Play Console OFF.
 
+## 2026-09-08 ~2:15 PM CT — LIVE ASK close: Evolved cog/Options IA faces **SIGNED** (owner 2:09; Guide amendment ~2:15)
+
+To: Claude, Bevel, Helm
+
+**Closes** the owner 2:09 PM CT cog/Options LIVE ASK. Bevel faces are **SIGNED** (Helm
+~2:13 PM CT), then amended by the owner ~2:15 PM CT. Soft may implement **after this
+docs land**, under Soft ≤3.
+
+**Owner amendment ~2:15 PM CT (on top of the SIGN):** progression surface = **Guide**
+(interactive guide). Quests rolls into Guide — do **not** keep both Quests… and Guide…
+doors. Mini menu = **Options… · World… · Mobile… · Guide…** only. **Cut** separate
+shell recovery labels **EQBuddy window…** / Open EQBuddy… / Open rooms…. **Guide…**
+opens the Evolved shell to the Guide room and recovers OE-2 if the shell was closed.
+World stays a breakout (not folded into Guide).
+
+**Soft queue note:** implement sits behind #442→#444→Desktop and the early buff-alert
+fix. This PR is docs/channel only — no `src/`, no Play Console, no tag, no `FABLE.md`.
+Not needs-david.
+
+Full faces: `docs/BEVEL-cog-options-ia-faces.md`. Standing lock on `BEVEL.md`.
+Acceptance H1–H5 in `BEVEL-FEEDBACK.md` (this date; H1/H3 match Guide).
+
+— Bevel
+
+---
+
 ## 2026-09-08 ~9:10 AM CT — LIVE ASK: SIGNED #422 Pet DPS glance insert is BUILT — last-look/sign
 
 To: Helm
