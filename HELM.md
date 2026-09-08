@@ -1,3 +1,19 @@
+## 2026-09-08 ~6:30 PM CT — PR #458 prose-to-hover Pass 2 (SIGNED; merge-when-green; DOOR exemption STANDING)
+
+- **When / who:** 2026-09-08 ~6:30 PM CT — Helm last-look (webhook: HELM-FEEDBACK.md LIVE ASK: prose-to-hover Pass 2 BUILT, PR #458). Tip `5e86b1ac` on `claude/opus-prose-tooltips-pass2-20260908` off `main` `a6983a91` (#457 / helm/ssc-456). Ahead 1 / behind 0. MERGEABLE; at look `build-and-test` + `e2e-windows` PENDING.
+- **Thread / subject:** PR #458 https://github.com/DranakCorps-bot/EQBuddy/pull/458 — Soft Opus Pass 2 under ~5:54 PM #456 SSC (Pass 2 AUTHORIZED; Pass 1 exemptions KEPT; no Bevel seat). Twelve paragraphs onto ⓘ across Look · Alerts & chips · Watch rules · Behavior; SEVEN deliberately stayed. `SettingsProsePolicy` unchanged (spent, not edited). Shared `DesignSystem.HintRow`; HUD re-pointed (Pass 1 call sites byte-identical). Behavior 420×505 → 420×379.
+- **Ruling:** **SIGNED.** Soft merge #458 when `build-and-test` + `e2e-windows` green. Drop LIVE ASK tip at merge (prefer this Helm land / companion SSC). Live Holds empty. Play Console OFF. **Not needs-david.** Evolved profile restore **needs-david STANDS** (already paged — not re-paged).
+- **Asks answered:**
+  1. Last-look / SIGN Pass 2 — **SIGNED.** Spot-checked: twelve conversions; shared HintRow; Pass 1 exemptions still asserted; prove-failed four ways; `behaviorHints` DIFFERENCE vs `behaviorSetup` KEEP; turquoise re-shots ACK; wrong eight-ⓘ prediction corrected in recipe KEEP.
+  2. DOOR exemption kind (Alt+Tab / hide-while-game-off Start-menu / Mobile two lines) — **SIGNED / STANDING.** Trap 59: enumerate entrances before subtracting one. Twin "hide while not focused" correctly converted. Do **not** convert the three door paragraphs.
+  3. Watch-block orphan (+ alert-banner orphan) — **KEEP printed / Soft LEAVE guide-toggle-row hang.** Same no-control exemption as Pass 1; hanging on `▸ Show examples` would mis-own the explanation.
+  4. Two over-budget paragraphs (buff-set 109 / spawn-chicklet 118) — **KEEP body.** `Assert.False(FitsOneHover)` KEEP. Soft LEAVE inventing a Bevel split seat from this ruling — Soft/Bevel may open a split later; not a merge gate.
+  5. WhatsNew entry — **KEEP.** #456 posture "do not invent WhatsNew for tip-only Settings prose" bound the SSC land (`helm/ssc-456`), not Pass product. Pass 1 already shipped WhatsNew; four tabs player-noticeable; CLAUDE.md convention STANDS.
+  6. David — **ACK not needed.**
+- **Posture / Soft max ≤3:** (1) soft merge #458 when both CI green (HIGH owner Settings scan). (2) soft land this SSC. (3) Soft LEAVE invent beyond Pass 1/2 / Bevel copy-split seat / door convert. Do **not** invent TEL / Version / `v1.99.19` / Play Console / tag / publish / signing / prod secrets / Evolved settings restore.
+- **Claude kick via Dranak:** Soft: **merge #458 when `build-and-test` + `e2e-windows` green** (drop LIVE ASK tip). Soft land this SSC (`helm/ssc-458`) when green. Soft: no new Opus/Bevel seat from this ruling. Soft LEAVE door convert / Watch guide-toggle hang / over-budget rewrite. Probe `claude models` only if a later kick. No Play Console / tag / publish / signing / prod secrets / Evolved settings restore.
+- **Scope hygiene:** Not a hold. Not needs-david. Live Holds empty. Play Console OFF. Pass 2 AUTHORIZED from #456 **discharged** by this build.
+
 ## 2026-09-08 ~5:54 PM CT — PR #456 prose-to-hover Pass 1 (SIGNED; MERGED `c930222c`; Pass 2 AUTHORIZED)
 
 - **When / who:** 2026-09-08 ~5:25 PM CT last-look (webhook LIVE ASK) → Soft merged #456 `c930222c` ~5:49 PM CT after rebase onto `7731bcb1` (#454). This land is the channel SSC Soft was blocked on (`helm/ssc-456` was missing — Soft correctly did not invent SSC text).
