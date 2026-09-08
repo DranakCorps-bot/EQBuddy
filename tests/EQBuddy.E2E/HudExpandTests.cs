@@ -143,9 +143,12 @@ public sealed class HudExpandTests
     /// Pet header — five is also `MaxRows` against this fixture's eleven damage sources — and
     /// nothing else in the dump could tell those apart.
     ///
-    /// **OE-9's five, predicted from the fixture BEFORE the run rather than from what it
+    /// **OE-9's four, predicted from the fixture BEFORE the run rather than from what it
     /// happened to report** — each one grepped, because "a melee log surely has procs" is the
-    /// kind of confident guess that made the Pet row wrong:
+    /// kind of confident guess that made the Pet row wrong. (`deaths` was a fifth row here
+    /// until Helm's 2026-09-07 sign of #400 kept the Deaths gate and #389's "Deaths OUT"; the
+    /// target is gone, so the row went with it rather than being left asserting an empty panel
+    /// that no longer exists.)
     /// <list type="bullet">
     /// <item>`kills` — ROWS. It is what this session IS.</item>
     /// <item>`money` — ROWS (four facts). Thirty "You receive N silver … from the corpse"
@@ -157,8 +160,6 @@ public sealed class HudExpandTests
     /// "Your &lt;item&gt; feels alive with power." and the fixture contains that string zero
     /// times, so the honest prediction is the empty state. Asserting a row here would have
     /// been a red test blaming a correct feature.</item>
-    /// <item>`deaths` — EMPTY. Not one "have slain you" in the log; the farming session went
-    /// well.</item>
     /// </list>
     ///
     /// **`loot` stays in this theory at ZERO (#392's row), and that is a claim about the
@@ -179,7 +180,6 @@ public sealed class HudExpandTests
     [InlineData("money", 1)]
     [InlineData("motes", 1)]
     [InlineData("procs", 0)]
-    [InlineData("deaths", 0)]
     public void EveryNonTrioTargetDrawsItsOwnBody(string key, int minimumRows)
     {
         using var app = new AppHarness(settings =>
@@ -272,8 +272,9 @@ public sealed class HudExpandTests
     /// 20 — what is being asserted is the thing that is not there). Both are read off ONE
     /// dump line, so the two numbers come from one moment (trap 56).
     ///
-    /// THE PREDICTION, written before it ran: three starred cells put the Deaths chip at the
+    /// THE PREDICTION, written before it ran: three starred cells put the Coin (money) chip at the
     /// right-hand end of the bar, well past the DPS chip that sits second in the trio.
+    /// (Deaths used to be the rightmost probe here; with Deaths OUT / no peek it cannot open.)
     /// </summary>
     [Fact]
     public void PeekingARightHandChipDocksThePanelUnderThatChipAndNotTheFirstOne()
@@ -282,24 +283,24 @@ public sealed class HudExpandTests
         {
             settings.Minimized = true;
             // Three cells, so the hovered chip is nowhere near the bar's left edge — the
-            // whole point of the repro. Deaths is last in MiniBarPresentation.Order.
-            settings.MiniStats = ["kills", "loot", "deaths"];
+            // whole point of the repro. money is near the right end of MiniBarPresentation.Order (Deaths has no peek).
+            settings.MiniStats = ["kills", "loot", "money"];
             settings.DisabledBreakouts =
                 ["Damage", "Healing", "Pet", "Watch", "Loot", "Buffs"];
             settings.DefaultRulesVersion = int.MaxValue;
             settings.TrackedRules.Clear();
             settings.WindowLeft = 20;
             settings.WindowTop = 20;
-        }, new Dictionary<string, string> { ["EQBUDDY_HUDEXPAND"] = "deaths:peek" });
+        }, new Dictionary<string, string> { ["EQBUDDY_HUDEXPAND"] = "money:peek" });
         app.Launch();
 
-        app.WaitForDump("hudExpand", "deaths", "the deaths chip's panel to be the one showing");
+        app.WaitForDump("hudExpand", "money", "the money chip's panel to be the one showing");
         app.WaitForDump("hudExpandPanel", 1, "the companion window to be on screen");
         // The positive events on the far side of the decision: the bar has measured the chip
         // and the panel has been placed. Waiting for these rather than reading straight after
         // Launch is what keeps the comparison below from being asked a moment too early
         // (trap 62) — a panel that has not been parked yet reports -1, not a wrong number.
-        app.WaitForDumpAtLeast("hudChipAnchor", 1, "the bar to report where the Deaths chip is");
+        app.WaitForDumpAtLeast("hudChipAnchor", 1, "the bar to report where the money chip is");
         app.WaitForDumpAtLeast("hudPanelAnchor", 1, "the panel to have been placed");
 
         var facts = app.DumpValues("hudPanelAnchor", "hudChipAnchor", "hudChipAnchorFirst");
@@ -328,7 +329,7 @@ public sealed class HudExpandTests
         using var app = new AppHarness(settings =>
         {
             settings.Minimized = true;
-            settings.MiniStats = ["kills", "loot", "deaths"];
+            settings.MiniStats = ["kills", "loot", "money"];
             settings.DisabledBreakouts =
                 ["Damage", "Healing", "Pet", "Watch", "Loot", "Buffs"];
             settings.DefaultRulesVersion = int.MaxValue;

@@ -1435,17 +1435,24 @@ $Shots = [ordered]@{
                                'Sanctari begins casting Aegolism.'
                                'You are filled with the power of Aegolism.') }
     # ============================ OE-9: THE REST OF THE TRAY ==========================
-    # `HudExpandTarget` went from seven members to twelve — the owner's ~1:29 PM CT amend
-    # (2026-09-07): everything on the minimized bar peeks and pops out. Five surfaces that
-    # nothing else in this file photographs, so five shots (trap 22: a surface with no
-    # fixture state cannot be reviewed and reads as reviewed anyway).
+    # `HudExpandTarget` went from seven members to eleven — the signed #389 plan's
+    # four-target carve of the minimized bar. Four surfaces that nothing else in this file
+    # photographs, so four shots (trap 22: a surface with no fixture state cannot be
+    # reviewed and reads as reviewed anyway).
     #
-    # **Two of them are STAGED rather than inherited, because the fixture has neither.** A
-    # `grep` for "feels alive with power" (the item-proc line `ItemProcRx` matches) and for
-    # "have been slain" both come back ZERO — so left alone, `hud-expand-procs` and
-    # `-deaths` would be two more pictures of the empty-state layout `hud-expand-watch`
-    # already covers, which is the reviewable half missing exactly where the new code is.
-    # `AppendLive` supplies the lines.
+    # **THERE IS NO `hud-expand-deaths` ROW, AND ITS PNG IS GONE WITH IT.** A Deaths target,
+    # peek and shot were built, shot and then stripped on Helm's 2026-09-07 sign of #400 —
+    # the Deaths gate, "#389 Deaths OUT stands". A recipe for a surface that no longer
+    # exists stops the batch at that row under `$ErrorActionPreference = 'Stop'` (trap 53),
+    # and a committed capture with no recipe is exactly what the illustration lock forbids,
+    # so both halves left together. The deaths CELL still draws on the bar; `mini-bar` and
+    # `world-travels` are where it and its star are photographed.
+    #
+    # **`hud-expand-procs` is STAGED rather than inherited, because the fixture has none.** A
+    # `grep` for "feels alive with power" (the item-proc line `ItemProcRx` matches) comes
+    # back ZERO — so left alone it would be one more picture of the empty-state layout
+    # `hud-expand-watch` already covers, which is the reviewable half missing exactly where
+    # the new code is. `AppendLive` supplies the lines.
     #
     # PREDICTIONS, written before the first run (trap 23) — each number grepped out of the
     # fixture rather than assumed:
@@ -1464,15 +1471,12 @@ $Shots = [ordered]@{
     #     "Polished Mithril Mask (Exaltation)" proc, "×1 · N/min · 0 dmg" — zero damage
     #     because the staged line has no damage line behind it, which is a true state and
     #     the honest thing to photograph rather than faking a hit.
-    #   * `hud-expand-deaths` — Skull vector (deaths share it with kills — worth LOOKING at,
-    #     since the two panels are then told apart only by their titles), "Deaths"; subtext
-    #     "Session · 2 deaths"; TWO rows, newest first, each a killer name and a wall clock.
-    # A panel that is all empty-state text on any of the five is a staging bug until proven
+    # A panel that is all empty-state text on any of the four is a staging bug until proven
     # otherwise.
     #
-    # SHOT 2026-09-07. All five came back 300 wide, which is the fixed-width claim still
-    # holding at twelve targets. Three predictions held exactly and TWO STAGINGS WERE WRONG,
-    # which is the whole return on writing them down:
+    # SHOT 2026-09-07. All came back 300 wide, which is the fixed-width claim still holding
+    # at eleven targets. Three predictions held exactly and TWO STAGINGS WERE WRONG, which
+    # is the whole return on writing them down:
     #   * `hud-expand-kills` 300x201 — held. "Session · 82 kills · 74.6/hr"; Puma 21, Orc
     #     pawn 17, Giant spider 15, Skeleton 10, Asp 5; "…and 8 more — ↗ for the full list".
     #     The 82 cross-checks `mini-bar-chips`' own recorded Kills cell.
@@ -1481,11 +1485,6 @@ $Shots = [ordered]@{
     #     Per hour, four rows and no fifth.
     #   * `hud-expand-motes` 300x89 — held. One row, full gauge, "Session · 1 · 0.9/hr · 0.9
     #     potency/hr".
-    #   * `hud-expand-deaths` 300x113 — held with ONE correction to the prediction, which is
-    #     the app being right: the killer-less "You died." row reads **"Something"**, not a
-    #     name, because that is what EQBuddy calls a death with no killer named. Both rows
-    #     landed in the same minute (2:01 PM), so this picture does NOT show the newest-first
-    #     order — `DeathsPeekPutsTheNewestFirst` is where that lives.
     #   * `hud-expand-procs` — **WRONG TWICE, and both were staging.** (1) The proc line alone
     #     gave "0 procs · 0/min · 0 dmg": it only NAMES the vehicle, and a proc is recorded
     #     when spell damage arrives whose spell was never cast. (2) Adding a bare "points of
@@ -1583,18 +1582,6 @@ $Shots = [ordered]@{
                            AppendLive = @(
                                'Your Polished Mithril Mask (Exaltation) feels alive with power.'
                                'You hit a giant spider for 42 points of magic damage by Exaltation Strike.') }
-    'hud-expand-deaths' = @{ Title = 'EQBuddy HUD Panel'
-                           Env = @{ EQBUDDY_HUDEXPAND = 'deaths' }
-                           Set = @{ Minimized = $true
-                                    DisabledBreakouts = @('Damage','Healing','Pet','Watch','Loot','Buffs')
-                                    MiniStats = @('kills','deaths') }
-                           # BOTH death shapes EQ Legends writes (LogParser's own note): the
-                           # named killer and the killer-less DoT form, which is the one that
-                           # went uncounted entirely until it was parsed. Two rows also mean
-                           # the newest-first order is visible, which one row could not show.
-                           AppendLive = @(
-                               'You have been slain by a giant spider!'
-                               'You died.') }
     # THE BAR ITSELF, with OE-7's chips on it — `mini-bar` above photographs the pre-promotion
     # ten-cell profile and does not carry the buff star, which is the one cell that had never
     # existed before this seat.

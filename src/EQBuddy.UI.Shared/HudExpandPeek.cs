@@ -48,7 +48,7 @@ public sealed record PeekBody(
 /// than implied — see it below.
 ///
 /// **OE-9 added five more, and none of them has a float of its own.** Motes, Kills, Procs,
-/// Money and Deaths are the rest of <see cref="MiniBarPresentation.Order"/>, and the owner's
+/// Money is the rest of <see cref="MiniBarPresentation.Order"/>, and the owner's
 /// ~1:29 PM CT amend (2026-09-07) is that every cell on the bar peeks and pops out. Each one
 /// takes the SAME numbers its full surface already shows and the SAME denominators — the
 /// motes summary's own hours, the Procs card's combat minutes (#85), the Wealth tab's coin
@@ -366,28 +366,4 @@ public static class HudExpandPeek
     private static string Percent(long part, long total) =>
         $"{CoinShare(part, total) * 100:0}%";
 
-    /// <summary>
-    /// The Deaths peek: what killed you and when, newest first.
-    ///
-    /// **The one target the signed #389 plan left out, and the owner put back** (~1:29 PM CT
-    /// amend). It is the same list the World window's Travels tab draws, in the same order,
-    /// and its ⧉ opens that tab.
-    ///
-    /// No gauge: a death is not a quantity. The value is the clock time, which is the only
-    /// thing that distinguishes two deaths to the same creature — and it is a WALL time
-    /// rather than a countdown, so nothing in the signature ticks (trap 8).
-    /// </summary>
-    public static PeekBody Deaths(IReadOnlyList<TimedDetail> deaths)
-    {
-        var subtext = $"Session · {deaths.Count} death{(deaths.Count == 1 ? "" : "s")}";
-        if (deaths.Count == 0)
-            return new PeekBody(subtext, [], "No deaths this session.", "deaths|empty");
-
-        var newest = deaths.OrderByDescending(d => d.Time).ToList();
-        var rows = newest
-            .Select(d => new PeekRow(d.Text, d.Time.ToString("h:mm tt"), 0))
-            .ToList();
-        return new PeekBody(subtext, rows, null,
-            "deaths|" + string.Join(",", newest.Select(d => $"{d.Time:O}:{d.Text}")));
-    }
 }

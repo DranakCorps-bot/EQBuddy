@@ -49,15 +49,23 @@ public enum HudExpandTarget
     /// snapshot field, because there is no buff state on <c>StatsSnapshot</c> at all.</summary>
     Buffs,
 
-    // ---- OE-9: THE REST OF THE TRAY ------------------------------------------------
+    // ---- OE-9: THE REST OF THE TRAY, LESS DEATHS -----------------------------------
     //
-    // The five below are every remaining cell of `MiniBarPresentation.Order`, and they
-    // arrive TOGETHER for the reason the owner's ~1:29 PM CT amend (2026-09-07) gives:
-    // *"Everything on the minimized bar MUST have hover peek + pop-out"*. That amend
-    // supersedes the signed #389 plan's four-target carve — which had left Deaths out on
-    // Bevel #371's reading — and it closes lock 9's last hole. A bar where five of the
-    // twelve chips answered a hover and the rest did not is exactly the per-tracker
-    // exception lock 9 forbids, and there is no longer a cell that cannot say what it is.
+    // The four below are the signed #389 plan's four-target carve, on Bevel #371's
+    // reading, and they arrive together rather than one per release: a bar where some
+    // chips answered a hover and the rest did not is the per-tracker exception lock 9
+    // forbids, and these four are what the plan authorises closing it with.
+    //
+    // **`deaths` IS DELIBERATELY NOT HERE.** A Deaths target, peek and World → Travels
+    // route were built and then STRIPPED on Helm's 2026-09-07 sign of #400 — "#389 Deaths
+    // OUT stands", the Deaths gate — so the absence is a product decision rather than the
+    // gap trap 20 describes, and it is written down here because nothing else can say so:
+    // `deaths` is still a live `MiniBarPresentation.Order` cell and its chip still draws.
+    // What it does not do is peek or pop out, and the `NoExpansion` row in
+    // `HudExpandTests.EveryMiniBarCellHasAnExpansionTargetExceptTheSignedExemptions`
+    // carries the ruling so the decision is an assertion rather than this comment. Adding
+    // the member back is a product change, not a fix — and that test fails either way
+    // round until the row goes with it.
 
     /// <summary>The ✨ motes cell. Its ⧉ is the Progress window's WEALTH tab, not a float
     /// of its own — <c>ProgressSurface.TabForKey</c> already answered "motes" with Wealth
@@ -82,16 +90,9 @@ public enum HudExpandTarget
     /// what makes a SECTION of an existing window a destination this vocabulary allows.
     /// </summary>
     Money,
-
-    /// <summary>The deaths cell, and the one the signed plan left out. Its ⧉ is the World
-    /// window's Travels tab — the old Travels &amp; Deaths card's body, which is where the
-    /// death list has lived since the World fold. The fourth destination host, and the
-    /// reason the map below is worth having as a map rather than as three special cases.
-    /// </summary>
-    Deaths,
 }
 
-/// <summary>Which WINDOW a target's ⧉ opens. Four, since OE-9 — and the count is the
+/// <summary>Which WINDOW a target's ⧉ opens. Three, since OE-9 — and the count is the
 /// argument for <see cref="HudDestination"/> existing at all.</summary>
 public enum HudDestinationHost
 {
@@ -103,9 +104,6 @@ public enum HudDestinationHost
 
     /// <summary>The Kills &amp; Drops window.</summary>
     CreatureWindow,
-
-    /// <summary>The World window (Map / Camps / Routes / Travels).</summary>
-    WorldWindow,
 }
 
 /// <summary>
@@ -222,7 +220,6 @@ public sealed class HudExpand
         HudExpandTarget.Kills => "kills",
         HudExpandTarget.Procs => "procs",
         HudExpandTarget.Money => "money",
-        HudExpandTarget.Deaths => "deaths",
         _ => "dps",
     };
 
@@ -242,7 +239,10 @@ public sealed class HudExpand
         "kills" => HudExpandTarget.Kills,
         "procs" => HudExpandTarget.Procs,
         "money" => HudExpandTarget.Money,
-        "deaths" => HudExpandTarget.Deaths,
+        // No "deaths": the Deaths target was stripped on Helm's #400 sign (2026-09-07,
+        // "#389 Deaths OUT stands"). `HudBarView` reads this to turn a cell into an
+        // expansion chip, so the null here is what leaves the deaths cell a plain chip —
+        // it is the mechanism of that decision, not an omission.
         _ => null,
     };
 
@@ -258,8 +258,9 @@ public sealed class HudExpand
     /// read *"no breakout name → the Progress window"*, which was exact while Progress was
     /// the only non-float destination. <see cref="HudExpandTarget.Kills"/> is the member that
     /// makes it wrong, and it would have gone to Progress with **no line of that method
-    /// changing**. There are four destination hosts now, so the fact is named instead of
-    /// being inferred from an absence.
+    /// changing**. There are three destination hosts now, so the fact is named instead of
+    /// being inferred from an absence — and the count being three rather than four is the
+    /// Deaths strip (Helm's #400 sign, 2026-09-07), not the proxy coming back.
     ///
     /// **A destination is not a per-target special case — it is a WINDOW and a TAB**, which
     /// is what lets two targets share one (Dps and Procs both mean the Damage float; Money
@@ -283,11 +284,6 @@ public sealed class HudExpand
             new(HudDestinationHost.ProgressWindow, null, null, "wealth"),
         HudExpandTarget.Kills =>
             new(HudDestinationHost.CreatureWindow, null, null, "kills"),
-        // The old Travels & Deaths card's body, which is the World window's Travels tab
-        // since the World fold. A HOTKEY would not have counted (trap 59) and neither would
-        // an Options tick; this is a window the ⧉ opens.
-        HudExpandTarget.Deaths =>
-            new(HudDestinationHost.WorldWindow, null, null, "travels"),
         // PROCS SHARES THE DAMAGE FLOAT rather than getting a tenth always-on-top window.
         // Procs are a damage-surface fact everywhere else in the app, and the float carries
         // the detail (lock 6) — so the float GAINS the procs block the Live room already
@@ -325,7 +321,7 @@ public sealed class HudExpand
 
     /// <summary>
     /// The <see cref="BreakoutPresentation"/> kind a target's words and vector come from, or
-    /// **null for the five tray cells whose surface has no float** — in which case
+    /// **null for the four tray cells whose surface has no float** — in which case
     /// <see cref="MiniBarPresentation"/> supplies both, keyed by the same
     /// <see cref="Key"/> the cell already had.
     ///
@@ -347,7 +343,7 @@ public sealed class HudExpand
         _ => null,
     };
 
-    /// <summary>What the panel calls itself. The five tray cells take the name their CELL
+    /// <summary>What the panel calls itself. The four tray cells take the name their CELL
     /// already has (<see cref="MiniBarPresentation.Names"/>) rather than a third naming table
     /// — the chip and the panel it opens must not be two different words for one stat.
     /// </summary>
@@ -368,7 +364,7 @@ public sealed class HudExpand
     /// Where ⧉ sends this tracker's detail, in words, for the pop-out's tooltip.
     ///
     /// **It reads the DESTINATION, never the target's own title** — which matters more since
-    /// OE-9 than it did when it was written, because three of the five new chips do not go to
+    /// OE-9 than it did when it was written, because three of the four new chips do not go to
     /// a window named after themselves and one of them (Procs) goes to a float called
     /// something else entirely. A tooltip built from the chip's name would have promised a
     /// "Weapon procs window" that does not exist. That is the #233 "X is now Y" rule inside a
@@ -385,8 +381,7 @@ public sealed class HudExpand
         HudDestinationHost.ProgressWindow => destination.Tab is { Length: > 0 } tab
             ? $"the Progress window ({char.ToUpperInvariant(tab[0]) + tab[1..]})"
             : "the Progress window",
-        HudDestinationHost.CreatureWindow => "the Kills & Drops window",
-        _ => "the World window (Travels & Deaths)",
+        _ => "the Kills & Drops window",
     };
 
     /// <summary>

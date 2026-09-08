@@ -204,12 +204,15 @@ public class HudExpandTests
     /// <summary>Lock 8's membership, said out loud, plus the key round trip. A key that
     /// reads one way only is how <c>EQBUDDY_HUDEXPAND=hps</c> silently opens DPS.
     ///
-    /// **TWELVE since OE-9**, which is lock 9 arriving in full rather than lock 8 being
-    /// broken: three shipped first so the owner could test the mechanics, OE-7 added the four
-    /// floating-window kinds whose ✕ had nowhere else to record a dismissal, and the owner's
-    /// ~1:29 PM CT amend (2026-09-07) added the rest of the tray — *"everything on the
-    /// minimized bar MUST have hover peek + pop-out"*. There is no cell left that answers a
-    /// hover with nothing, which is the state lock 9 forbids.</summary>
+    /// **ELEVEN since OE-9**: three shipped first so the owner could test the mechanics, OE-7
+    /// added the four floating-window kinds whose ✕ had nowhere else to record a dismissal,
+    /// and OE-9 added the signed #389 plan's four-target carve of the tray.
+    ///
+    /// **Eleven and not twelve, and the missing one is `deaths` on purpose.** A Deaths target
+    /// was built and then stripped on Helm's 2026-09-07 sign of #400 — the Deaths gate, "#389
+    /// Deaths OUT stands". This list is spelled out rather than counted so that member coming
+    /// back has to be a deliberate edit here, which is the only thing standing between a
+    /// product decision and someone re-adding it as a tidy-up.</summary>
     [Fact]
     public void EveryTargetHasAKeyThatReadsBackToIt()
     {
@@ -219,9 +222,13 @@ public class HudExpandTests
                 HudExpandTarget.Dps, HudExpandTarget.Hps, HudExpandTarget.Progress,
                 HudExpandTarget.Pet, HudExpandTarget.Watch, HudExpandTarget.Loot,
                 HudExpandTarget.Buffs, HudExpandTarget.Motes, HudExpandTarget.Kills,
-                HudExpandTarget.Procs, HudExpandTarget.Money, HudExpandTarget.Deaths,
+                HudExpandTarget.Procs, HudExpandTarget.Money,
             ],
             targets);
+        // The negative, or the list above is just a restatement of the enum: "deaths" is a
+        // live MiniBarPresentation cell whose key reads back to NOTHING, which is what the
+        // Deaths gate means in code.
+        Assert.Null(HudExpand.TargetForKey("deaths"));
 
         foreach (var target in targets)
         {
@@ -241,46 +248,77 @@ public class HudExpandTests
     }
 
     /// <summary>
-    /// **THE OWNER'S ~1:29 PM CT AMEND AS ONE ASSERTION: every cell on the minimized bar
-    /// expands.**
+    /// **EVERY CELL ON THE MINIMIZED BAR EXPANDS, EXCEPT THE ONE A SIGN SAYS DOES NOT.**
     ///
     /// <c>TargetForKey</c> is the BRIDGE <c>HudBarView</c> crosses to turn a
     /// <see cref="MiniBarCell"/> into an expansion chip, and the hand switch it replaced is
-    /// what made this checkable at all: a cell key with no target is now a chip with no hover,
-    /// no ⧉ and nothing to say what it is. Read out of
-    /// <see cref="MiniBarPresentation.Order"/> rather than typed out again, because a list
-    /// retyped here would stop covering that table the day it grows (trap 30) — which is
-    /// exactly how "deaths" came to be the one cell the signed plan left behind.
+    /// what made this checkable at all: a cell key with no target is a chip with no hover, no
+    /// ⧉ and nothing to say what it is. Read out of <see cref="MiniBarPresentation.Order"/>
+    /// rather than typed out again, because a list retyped here would stop covering that table
+    /// the day it grows (trap 30).
+    ///
+    /// **<see cref="NoExpansion"/> IS THE ONE EXEMPTION LIST, AND IT CARRIES ITS REASON** —
+    /// trap 34's shape, and trap 52's warning about what an exemption costs when its premise
+    /// is wrong. `deaths` is on it because Helm's 2026-09-07 sign of #400 kept the Deaths gate
+    /// and #389's "Deaths OUT", not because anything was forgotten. An exemption nobody can
+    /// see is a blind spot rather than an exemption, so the list is asserted NON-VACUOUS in
+    /// both directions: a row for a key that does expand fails, and a cell that quietly stops
+    /// expanding without earning a row fails too.
     ///
     /// The TITLE and ICON are asserted against the cell's own, not merely as non-empty: the
     /// panel a chip opens must not be a different word for the same stat.
     /// </summary>
     [Fact]
-    public void EveryMiniBarCellHasAnExpansionTarget()
+    public void EveryMiniBarCellHasAnExpansionTargetExceptTheSignedExemptions()
     {
         Assert.NotEmpty(MiniBarPresentation.Order);
         foreach (var key in MiniBarPresentation.Order)
         {
             var target = HudExpand.TargetForKey(key);
+            if (NoExpansion.TryGetValue(key, out var why))
+            {
+                Assert.True(target is null,
+                    $"'{key}' is exempted from expanding ({why}) but now HAS a target — "
+                    + "delete the row rather than leaving a rule nothing enforces");
+                continue;
+            }
             Assert.True(target is not null,
                 $"the '{key}' cell has no HudExpandTarget, so its chip cannot peek or pop out");
             Assert.Equal(key, HudExpand.Key(target!.Value));
             Assert.Equal(MiniBarPresentation.Names[key], HudExpand.Title(target.Value));
             Assert.Equal(MiniBarPresentation.Icons[key], HudExpand.Icon(target.Value));
         }
+
+        // The rows are about CELLS, so a row naming something that is not one is a rule
+        // pointing at nothing — the way a stale `AbsorbedTitles` entry pointed at a card that
+        // had come back (trap 55).
+        foreach (var key in NoExpansion.Keys)
+            Assert.Contains(key, MiniBarPresentation.Order);
     }
+
+    /// <summary>The cells that deliberately do NOT peek or pop out, each with the ruling that
+    /// took it out. One row today; the list exists so the second one cannot arrive as a silent
+    /// null.</summary>
+    private static readonly IReadOnlyDictionary<string, string> NoExpansion =
+        new Dictionary<string, string>(StringComparer.Ordinal)
+        {
+            ["deaths"] =
+                "Helm SIGNED #400 with the Deaths gate, 2026-09-07 — #389's \"Deaths OUT\" "
+                + "stands. The target, its peek and its World → Travels route were built and "
+                + "then stripped; the chip still draws and still counts.",
+        };
 
     /// <summary>
     /// **THE TRAP-64 MAP, TOTAL OVER THE ENUM.**
     ///
     /// <c>HudExpandBar</c> used to route a ⧉ by reading *"no breakout name → the Progress
     /// window"*, which was EXACT while Progress was the only non-float destination — the
-    /// absence was standing in for a fact — and would have sent Kills and Deaths to Progress
-    /// with no line of that method changing. That is the same shape as the ternary OE-7
-    /// replaced, one level up, in the same file whose own doc comment tells the first story.
+    /// absence was standing in for a fact — and would have sent Kills to Progress with no line
+    /// of that method changing. That is the same shape as the ternary OE-7 replaced, one level
+    /// up, in the same file whose own doc comment tells the first story.
     ///
     /// A destination that answered NOTHING is the failure this asserts against: a target with
-    /// no window is a chip whose ⧉ is a silent no-op, and every one of the five OE-9 members
+    /// no window is a chip whose ⧉ is a silent no-op, and every one of the four OE-9 members
     /// arrived without a float to fall back on.
     /// </summary>
     [Fact]
@@ -307,7 +345,7 @@ public class HudExpandTests
             Assert.Equal($"Open {HudExpand.Words(destination)}", HudExpand.PopOutTip(target));
         }
 
-        // The five routes OE-9 decided, spelled out — a map is only worth having if the rows
+        // The four routes OE-9 decided, spelled out — a map is only worth having if the rows
         // someone has to argue about are legible.
         Assert.Equal(HudDestinationHost.ProgressWindow,
             HudExpand.DestinationOf(HudExpandTarget.Motes).Host);
@@ -318,8 +356,12 @@ public class HudExpandTests
         Assert.Null(HudExpand.DestinationOf(HudExpandTarget.Progress).Tab);
         Assert.Equal(HudDestinationHost.CreatureWindow,
             HudExpand.DestinationOf(HudExpandTarget.Kills).Host);
-        Assert.Equal(HudDestinationHost.WorldWindow,
-            HudExpand.DestinationOf(HudExpandTarget.Deaths).Host);
+        // There is no World destination: it existed only for Deaths, and both went out
+        // together on Helm's #400 sign (2026-09-07). Three hosts, and the enum says so.
+        Assert.Equal(
+            [HudDestinationHost.Float, HudDestinationHost.ProgressWindow,
+             HudDestinationHost.CreatureWindow],
+            Enum.GetValues<HudDestinationHost>());
         // Procs shares the DAMAGE float rather than getting a tenth always-on-top window.
         Assert.Equal("Damage", HudExpand.DestinationOf(HudExpandTarget.Procs).BreakoutName);
     }
@@ -414,11 +456,10 @@ public class HudExpandTests
 
         // Progress is a target that is NOT a float, and the negative is what keeps this from
         // going vacuous: it left BreakoutKind by a signed fold on 2026-08-25, and a
-        // BreakoutName for it would be the first step back toward reverting that. Kills and
-        // Deaths join it for a different reason — their windows never were floats.
+        // BreakoutName for it would be the first step back toward reverting that. Kills joins
+        // it for a different reason — its window never was a float.
         Assert.Null(HudExpand.BreakoutName(HudExpandTarget.Progress));
         Assert.Null(HudExpand.BreakoutName(HudExpandTarget.Kills));
-        Assert.Null(HudExpand.BreakoutName(HudExpandTarget.Deaths));
         Assert.DoesNotContain("Progress", names);
     }
 
@@ -426,7 +467,7 @@ public class HudExpandTests
     /// surface and drawn as another. They were three parallel switches until OE-7 — which is
     /// fine at three members and is three chances to miss one at twelve.
     ///
-    /// **The five OE-9 targets answer null and take the CELL's words instead**
+    /// **The four OE-9 targets answer null and take the CELL's words instead**
     /// (<see cref="EveryMiniBarCellHasAnExpansionTarget"/> asserts that half). The null is
     /// load-bearing: Procs pops to the Damage float, so reading its words off its DESTINATION
     /// would have put "Your damage" and a sword on the weapon-procs chip.</summary>
@@ -450,12 +491,12 @@ public class HudExpandTests
                 Assert.NotEqual(BreakoutPresentation.Damage, kind);
         }
 
-        // And the five that answer null are exactly the five, so a future target cannot join
+        // And the four that answer null are exactly the four, so a future target cannot join
         // them by being forgotten (trap 20 — the thing you are looking for is what is not
         // there).
         Assert.Equal(
             [HudExpandTarget.Motes, HudExpandTarget.Kills, HudExpandTarget.Procs,
-             HudExpandTarget.Money, HudExpandTarget.Deaths],
+             HudExpandTarget.Money],
             Enum.GetValues<HudExpandTarget>().Where(t => HudExpand.KindOf(t) is null));
     }
 
