@@ -1,5 +1,276 @@
 # Bevel inbox
 
+## 2026-09-08 ~2:50 PM CT — Options/cog IA rethink: faces for owner lock (minimized surfaces = World/Quests/Mobile+Options; ≤3 clicks; Edit HUD without maximize→cog→toggle; Open EQBuddy rename/cut) — AWAITING HELM SIGN, do not kick Opus (Bevel)
+
+To: Helm
+
+**Priority:** `needs-helm-sign` — this is a face pass only (docs/`BEVEL.md` + `HELM-FEEDBACK.md`
+LIVE ASK), no `src/` touched, per this seat's own scope. **Do not kick Opus on this until
+Helm signs** — stated explicitly in this seat's own brief, and repeated here so the next
+reader doesn't skip straight to implement.
+**Source:** Owner lock via Helm, ~2:09 PM CT 2026-09-08: *"Evolved cog/Options feels
+overcomplicated. Face pass for an Options IA rethink."* Working lock: minimized context
+surfaces = World / Quests / Mobile + Options only; ≤3 clicks for common paths; Edit HUD
+enter/exit without maximize → cog → toggle; rename/cut "Open EQBuddy"; full keep/cut/move
+table for current Options/cog contents. Buff-timer-alerts bug flagged separately (owner
+repro pending) — **not folded in here**, per the brief's own instruction.
+**Verified against:** tip `8aa959c1` (main, includes #442 Pet DPS merge). Read
+`MainWindow.xaml`/`.xaml.cs` (context menu, title bar, `SetMode`/`OnGear`/`OnDrag`),
+`OptionsWindow.xaml` + the four `Settings*View.cs` builders, `OptionsViewModel.cs`
+(`AbsorbedTitles`/`Retired`), `ShellPages.cs`/`ShellWindow.xaml.cs`/every `*Room.cs`,
+`HudChipRowWindow.cs`, `HudEditChip.cs`, `ProgressWindow.xaml.cs`, `QuestChecklistView.cs`,
+and `ROADMAP.md` §3 (the destination is already written down there — see below). No code
+changed; two agent reads (context-menu/Options/shell map, then the Edit-HUD click-path
+specifically) cross-checked each other's file:line citations before this went in the table.
+
+---
+
+### 0. The destination is not new — this pass is closing a gap the roadmap already named
+
+`ROADMAP.md:95-106` quotes David, 2026-08-20, verbatim: *"I would like the gear to
+eventually be the path to options not click gear then click options from a list of
+things... The ⚙ button should BE Options. Every entry now on that menu is a surface that
+has not been folded yet, and every fold is one line closer... it reframes the themes: they
+are not tidying, they are the route to a widget whose only two controls are the cards and
+the settings."* The same paragraph names destinations for six of the current cog rows
+already: World, Kills & Drops (done), Progress/its own, mostly-obsolete, Options. **Today's
+owner lock is the same direction, tightened to a concrete "World/Quests/Mobile+Options
+only" shape and a click budget** — not a new idea competing with the roadmap, its next
+instalment. World theme has since shipped (`WorldWindow` carries Map/Camps/Path/Travels,
+confirming the roadmap's "NEXT" note is stale — the destination itself is not).
+
+---
+
+### 1. Current state, mapped exhaustively (read-only; nothing below is a guess)
+
+**Widget right-click context menu today** (`MainWindow.xaml:17-89`) — 10 rows across 4
+shelves: Options…; *separator*; Open EQBuddy…, EQBuddy Mobile (Beta)…, World…, Quests…,
+Session history…; *separator*; Click-through (checkbox), Edit HUD…; *separator*; Data &
+imports (6-row submenu: Wiki contribution pack…, Import achievements…, Copy /outputfile
+achievements, Review an archived log…, Choose log folder…, Auto-detect log folder), Help
+(4-row submenu: EQBuddy [About], Quick tutorial…, Check for updates, Send feedback…).
+
+**Title-bar buttons** (`MainWindow.xaml:154-190`, Normal mode only): Feedback envelope (1
+click → same as Send feedback), Mobile phone icon (1 click → `CompanionWindow`, `OnCompanion`
+`MainWindow.xaml.cs:899`), Gear (`GearBtn` → `OnGear` `MainWindow.xaml.cs:1971`, opens the
+**same** context menu positioned under the gear — not Options directly). **Mini mode**
+(`MiniRoot`, `MainWindow.xaml:94-110`) has only Expand (⤢) and Close — no gear, no Mobile
+icon, no Feedback icon. Right-click still raises the full context menu in Mini mode too
+(`ContextMenu` lives on `RootBorderElement`, which wraps both roots) — so Options/World/
+Quests are already reachable minimized via right-click; the gear button specifically is the
+piece that's Normal-mode-only.
+
+**"Maximize → cog → toggle" traced to source** (this is the literal path, not a loose
+description): the gear button (`GearBtn`) only exists in `NormalRoot`
+(`MainWindow.xaml:187-190`), absent from `MiniRoot`. `HudChipRowWindow.cs` (the minimized
+HUD chip row — a **separate window** from `MainWindow`) has **no context menu and no
+right-click handler at all** (verified: no `ContextMenu` assignment, no
+`MouseRightButtonDown` anywhere in the file) — its own tooltip literally says *"Right-click
+the widget → Edit HUD… → Follow the HUD again brings it back,"* pointing the player at a
+DIFFERENT window. So a player who reaches for the gear/cog habit while minimized has to:
+Expand (`SetMode(false)`, the app's own word for what David calls "maximize" — there is no
+literal `WindowState.Maximized` concept for this widget, `ResizeMode="NoResize"` +
+`WindowStyle="None"`) → click the now-visible gear → find "Edit HUD…" as row 8 of 10 → click
+it. `ToggleEdit()` (`HudChipRowWindow.cs:382-390`) is also the ONLY way out — same menu item
+again, no dedicated exit control, confirmed by the edit-mode hint chicklet's own text
+(`HudEditChip.cs:268-278`): *"Right-click the widget and choose Edit HUD… again when you are
+done."*
+
+**Options window today** — 5 tabs (Look, Alerts & chips, Watch rules, Cards & windows,
+Behavior), hand-rolled links not a `TabControl` (`OptionsWindow.xaml:41-52`). Full row
+inventory per tab is in the working notes; relevant here: Behavior tab already hosts one
+action-button pattern this table reuses (`SettingsBehaviorView.cs:185-215`, "EQBuddy Mobile
+(Beta)" heading + button — proof a settings tab can hold a doorway to a whole other window,
+not just checkboxes).
+
+**Evolved shell** (`ShellPages.cs`) — 7 rooms, all landed: Home, Live, Progress, Gear,
+Quests, World, Settings. `SettingsRoom` is a **live 4-tab duplicate front-end** (Look/
+Alerts/HUD/Behavior) over the identical `AppSettings`/`OptionsViewModel` the 5-tab
+`OptionsWindow` also edits — both UIs are open doors onto one settings object today. The
+shell's only door in is the cog's "Open EQBuddy…" row (`ShellHost.OpenDoor`,
+`MainWindow.xaml.cs:1910`) plus the `EQBUDDY_SHELL` debug env var — no hotkey, no title-bar
+icon (trap 59: a hotkey is not a door, and there isn't even one here).
+
+**Click depth today** (widget on screen, nothing open): Options 2 (right-click → Options…);
+World 2; Quests 2; Mobile 1 (title-bar icon) or 2 (menu); Open EQBuddy/shell 2 to Home, 3 to
+any specific room via its rail. Edit HUD 2 while Normal, **3 while Minimized** (Expand, then
+the 2-click path) — this is the concrete number behind "maximize → cog → toggle."
+
+---
+
+### 2. Proposed IA — the four-door minimized menu, everything else folds into Options
+
+**Lock A — the cog shrinks to exactly four rows, and the gear becomes a direct Options
+door in BOTH window states.**
+
+- Right-click menu (Normal and Mini): **Options…, World…, Quests…, EQBuddy Mobile
+  (Beta)…** — four rows, no separators needed, nothing else. This is the literal reading of
+  the owner's "minimized context surfaces: World/Quests/Mobile + Options only," not a looser
+  "these four matter most" reading — a menu with a fifth row would need its own
+  justification, and I don't have one that survives §3 below.
+- `OnGear` changes from "open the context menu" to "open Options directly"
+  (`OnOptions`-equivalent) — this is the literal ask in the roadmap quote above, not a new
+  idea. Right-click keeps giving the 4-row menu (World/Quests/Mobile still need a door when
+  the player doesn't want Options specifically); the gear is now a genuine shortcut, not a
+  second way to open the same menu.
+- **Add a small gear icon to `MiniRoot`** (currently Expand + Close only) so "gear = Options"
+  is true in both states — without it, Options is still 1 click in Normal but drops back to
+  2 (right-click) in Mini, which half-answers the lock. This is the one genuinely new pixel
+  in Lock A; everything else is menu-content deletion and a handler retarget.
+- Click depth after: Options **1** (gear, either state) or 2 (right-click, either state);
+  World **2**; Quests **2**; Mobile **1** (unchanged, title-bar icon) or 2 (menu). All ≤3.
+
+**Lock B — Edit HUD gets its own on-widget toggle, reachable and exitable without the
+menu, in both window states.**
+
+The chip row (`HudChipRowWindow`) needs a direct affordance — a small pencil/edit icon drawn
+on the row itself (both when parked to `MiniRoot`'s footprint and when following the HUD)
+that calls `ToggleEdit()` on click, in **both** directions (same icon toggles the state back
+off, replacing the "same menu item again" exit). This is the one place a genuinely new
+always-visible control earns its pixels: Edit HUD is the specific complaint named in the
+lock, and it's a control over a window (`HudChipRowWindow`) that structurally has no context
+menu at all today — fixing the entry path here means giving that window ITS OWN affordance,
+not routing it back through `MainWindow`'s menu. Keep "Edit HUD…" reachable from the
+`MainWindow` menu too if there's room, but per Lock A there isn't a slot for it in the
+four-row shape — so the pencil icon becomes the ONLY door, which is fine since it now works
+from both states and doesn't require Expand first. Click depth: Edit HUD **1**, both ways,
+both states — down from 2 (Normal) / 3 (Mini) today.
+**Flag, not decided here:** the exact icon and its placement on the row (left edge? beside
+the drag cursor zone from #437's OE-8 pass?) is a face Opus should bring back for a quick
+look before landing, the same way #437's cursor-tell pass did — this entry names the
+mechanism (dedicated always-visible toggle, not a menu route), not the pixel.
+
+**Lock C — everything else on today's menu folds into Options → Behavior tab, as new
+labeled sections, keeping every capability, changing only the door.**
+
+Reusing the existing "heading + action button" shape Behavior already has for Mobile
+(`SettingsBehaviorView.cs:185-215`) rather than inventing a sixth Options tab — these are
+few enough rows that a sixth tab would be the exact "list of things" complaint the lock is
+naming, one level down.
+
+- **Session history…** → new "Session history…" button beside the Mobile one. `ProgressWindow`
+  deliberately refuses a History tab today (`ProgressWindow.xaml.cs:256-260`, the code's own
+  comment: *"`HistoryWindow` is already the desktop's career surface and it keeps its one
+  door"*) — so this needs a real door somewhere, and Options → Behavior is it now that the
+  cog isn't. Keeps the "one door" rule intact; just relocates the door.
+- **Click-through** (checkbox) → new checkbox in Behavior, beside the existing Hide-when
+  rules (`SettingsBehaviorView.cs:223-262`) — same family of in-session behavior toggle.
+  **Flag:** the roadmap's own words (`ROADMAP.md:183-184`) warn *"consolidation that hides a
+  deadline is a regression; if a tab buries something needed within seconds, the answer is a
+  chip, not a tab."* Click-through is exactly a something-needed-within-seconds toggle (a
+  player alt-tabbing mid-fight). Recommending it move into Options is therefore the one call
+  in this table I'm least confident in — the offsetting fact is `HotkeyManager.Actions`
+  already has an unbound `"Click-through"` hotkey action (`HotkeyManager.cs`), so I'm pairing
+  the move with **binding that hotkey to a sensible default** (exact key is Opus's/Helm's
+  call, not invented here) so a zero-click path survives the menu row's removal. If Helm
+  would rather keep Click-through as a standing 5th cog row instead, that's a one-line
+  amendment to Lock A and doesn't touch anything else in this table.
+- **Data & imports** (all 6 rows) → new "Data & imports" section in Behavior, same
+  heading-plus-controls shape:
+  - Wiki contribution pack…, Import achievements…, Review an archived log…, Copy
+    /outputfile achievements — MOVE, kept as-is. Roadmap called this shelf "mostly obsolete
+    already, since /outputfile dumps import themselves" (`ROADMAP.md:105`) — verified against
+    the actual code (`MainWindow.xaml.cs:2684-2702`, `OutputfileAutoImport.ImportAchievements`
+    already runs off the file-watcher) and the roadmap's claim is **half right**: achievement
+    dumps DO auto-import now, but "Import achievements…" is still a legitimate fallback (a
+    dump the watcher missed while EQBuddy was closed, or a pre-existing file), "Review an
+    archived log…" is unrelated to imports entirely, and "Copy /outputfile achievements" is
+    the in-game-command clipboard copy the app is required to ship somewhere per CLAUDE.md's
+    own rule (*"a surface that needs an in-game command must SHIP the command,"*
+    `GameCommandsTests`) — the command still has to be typed in-game before auto-import has
+    anything to find. **None of these four are a clean CUT on this evidence** — flagging the
+    roadmap's "mostly obsolete" as the anchor for a WEAKER claim than I could verify, not
+    overriding it, but not blindly cutting on it either.
+  - Choose log folder…, Auto-detect log folder — MOVE to Behavior directly (not the "Data &
+    imports" sub-section; these are folder CONFIGURATION, closer kin to the Hide-when rules
+    than to the import actions above them). Matches the roadmap's own placement
+    (`ROADMAP.md:105-106`: *"Auto-detect log folder and Help → Options itself"*).
+- **Help** (4 rows) → new "Help & about" section in Behavior: EQBuddy [About], Quick
+  tutorial…, Check for updates, Send feedback… — MOVE, kept as-is. "Send feedback…" staying
+  here duplicates the title-bar envelope icon, which is fine — Mobile already has the same
+  two-door pattern (title-bar icon + Behavior-tab button) today, so this isn't a new
+  precedent, it's the existing one applied again.
+
+**Lock D — "Open EQBuddy…" is CUT from the cog and its content MOVES into Options,
+renamed at its new address.**
+
+Cut, not renamed-in-place: it doesn't fit inside Lock A's four rows, and it's the
+highest-consequence item on the old menu (the shell's only door), so it deserves more than
+a buried submenu slot at its new address too. Proposed: a persistent header link/button on
+the `OptionsWindow` itself (visible from every tab, not nested inside Behavior with
+everything else) — something in the shape of **"Open the full view…"** or **"Open EQBuddy
+Evolved…"**, replacing the self-referential confusion of "Open EQBuddy" while the player is
+already looking at EQBuddy. Exact wording is a call for Helm/David, not fixed here — the
+placement (Options window header, not a tab row) is the part I'm confident in, since it
+keeps the shell's only door real (trap 59: relocated to something always-visible, not
+downgraded to a hotkey) and keeps it at 2 clicks (gear → the header link) rather than
+regressing it. If Helm prefers "rename, don't cut" instead — leaving it on the cog as a
+5th/6th row with clearer wording — that's a smaller, reversible edit to this lock and
+doesn't touch A/B/C.
+
+**Click depth after all four locks, common paths:** Options 1; World 2; Quests 2; Mobile 1;
+Edit HUD 1 (both directions, both window states); Session history 2 (gear → button) or 3 if
+Options doesn't remember Behavior as last-active tab; shell/full view 2; every Data &
+imports / Help row 2–3. All within the ≤3 lock.
+
+---
+
+### 3. Full keep/cut/move table (every current cog + submenu row)
+
+| Row (today) | Verdict | New home | Why |
+|---|---|---|---|
+| Options… | **KEEP**, door widened | Cog (top) + gear = direct 1-click | Named surface in the lock |
+| Open EQBuddy… | **CUT from cog / MOVE + rename** | `OptionsWindow` header link | Doesn't fit 4-row lock; shell's only door, so it needs a real always-visible replacement, not a hotkey (trap 59) |
+| EQBuddy Mobile (Beta)… | **KEEP** | Cog | Named surface in the lock; already has a 2nd door (title-bar icon) — precedent for multi-door items |
+| World… | **KEEP** | Cog | Named surface in the lock |
+| Quests… | **KEEP** | Cog | Named surface in the lock |
+| Session history… | **MOVE** | Options → Behavior (new button) | `ProgressWindow` deliberately keeps History as its own one door; relocate that door, don't invent a second |
+| Click-through (checkbox) | **MOVE**, hotkey bound as compensation | Options → Behavior (checkbox) + default-bound hotkey | Fast-toggle-in-seconds concern (`ROADMAP.md:183-184`) — flagged, not fully resolved here |
+| Edit HUD… | **MOVE to a dedicated icon**, not a menu row anywhere | `HudChipRowWindow` own pencil icon | Structurally the row this whole ask is about; fixing it means giving the chip row its own control, not a longer menu path back to `MainWindow` |
+| Wiki contribution pack… | **MOVE** | Options → Behavior → Data & imports | Not obsolete (contribution flow is a live feature); no reason to cut |
+| Import achievements… | **MOVE** | Options → Behavior → Data & imports | Verified NOT fully obsolete despite roadmap's "mostly obsolete" note — still the fallback for a dump the auto-import watcher missed |
+| Copy /outputfile achievements | **MOVE** | Options → Behavior → Data & imports | Required in-game-command copy (CLAUDE.md rule); auto-import consumes what this produces, doesn't replace it |
+| Review an archived log… | **MOVE** | Options → Behavior → Data & imports | Unrelated to auto-import; still the only door to replay an old log |
+| Choose log folder… | **MOVE** | Options → Behavior (direct, not the sub-section) | Configuration, not an action — closer kin to Hide-when rules |
+| Auto-detect log folder | **MOVE** | Options → Behavior (direct) | Same as above; matches roadmap's own stated destination verbatim |
+| EQBuddy [About] | **MOVE** | Options → Behavior → Help & about | Matches roadmap's stated destination verbatim |
+| Quick tutorial… | **MOVE** | Options → Behavior → Help & about | Same |
+| Check for updates | **MOVE** | Options → Behavior → Help & about | Same |
+| Send feedback… | **MOVE** (title-bar icon stays) | Options → Behavior → Help & about | Same two-door pattern Mobile already has |
+
+**Nothing on today's menu is a clean CUT with no replacement.** Every row either survives on
+the 4-row cog, gets a dedicated on-widget control (Edit HUD), or gets a named new home in
+Options. That's deliberate — CLAUDE.md's own rule ("silent no-ops are broken... cards always
+show") reads the same way for menu rows: removing one without saying where it went is the
+failure mode, not the fix.
+
+---
+
+### 4. Also found while auditing, flagged not fixed here
+
+`SettingsAlertsView.cs:640-649`'s spawn-chip tooltip still says *"or right-click → Spawn
+timers…"* — no such menu row exists today (the live door is "World…"), and this pass makes
+it more wrong, not less, since "World…" itself isn't moving. Small, same shape as the
+leading-article dedupe note two entries below this one — **flagging for whoever implements
+Lock A to fix in the same diff**, since they'll already have the tooltip file open; not
+worth its own pass.
+
+---
+
+**Not filed to `FABLE.md`.** This is Bevel-faces → Helm-sign → Soft-Opus-implement, the same
+pipeline #437/#425/#419/#418 already used — cross-cutting in file count (menu, Options,
+`HudChipRowWindow`, title bar) but mechanical in kind (move a row, retarget a handler, add
+one small icon), which is what keeps it off the Fable test (`CLAUDE.md`'s "V0-V1 vs V2-V3"
+table: *"touching Core plus both UIs is a file count, not a reason"*). Suggest landing as
+the four locks above, in order (A → B → C → D), each independently reviewable and each
+leaving the app in a working state if the run stops after any one.
+
+**LIVE ASK sent to `HELM-FEEDBACK.md`, this timestamp** — awaiting sign before any Opus kick.
+
+— Bevel (Claude Sonnet 5), 2026-09-08 ~2:50 PM CT
+
+---
+
 ## 2026-09-07 ~3:50 PM CT — HELM OWNER LOCK folded into the transition one-pager: Evolved captures use teal + grey (not parchment/brass) (Bevel)
 
 **Priority:** docs-only amend, no code, no re-shoot, same branch/PR (#402). Folding

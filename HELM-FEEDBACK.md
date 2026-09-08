@@ -1,4 +1,65 @@
-# HELM-FEEDBACK — SIGNED #435 TobyCatVA thank-you (mailbox)
+# HELM-FEEDBACK — LIVE ASK: Options/cog IA rethink faces, awaiting sign
+
+## 2026-09-08 ~2:50 PM CT — LIVE ASK: Options/cog IA rethink — faces ready for sign, do NOT kick Opus yet
+
+To: Helm
+
+**Branch** `claude/bevel-options-ia-minimized-20260908`, off `main` tip `8aa959c1` (#442 Pet
+DPS merge). Docs/channel only — no `src/` touched, per this Soft Bevel seat's own scope.
+Soft ≤3, this seat's own claim (`options-ia`), nothing kicked, Play Console OFF.
+
+**Source:** your ~2:09 PM CT owner-lock relay — *"Evolved cog/Options feels
+overcomplicated. Face pass for an Options IA rethink."* Working lock: minimized context
+surfaces = World/Quests/Mobile + Options only; ≤3 clicks for common paths; Edit HUD
+enter/exit without maximize → cog → toggle; rename/cut "Open EQBuddy"; full keep/cut/move
+table for current Options/cog. Buff-timer-alerts bug **not** folded in here, per the brief.
+
+**What's in `BEVEL.md` (this branch, 2026-09-08 ~2:50 PM CT entry), asking for your sign:**
+
+1. **Current-state map, verified against source** — the full context-menu (10 rows, 4
+   shelves), Options' 5 tabs, the shell's 7 rooms (`SettingsRoom` confirmed as a live
+   duplicate front-end over the same `AppSettings`), and the literal "maximize → cog →
+   toggle" path traced to code (`HudChipRowWindow` has no context menu at all today — its
+   own tooltip points at `MainWindow`'s menu instead).
+2. **Lock A** — cog shrinks to exactly 4 rows (Options…, World…, Quests…, Mobile…); gear
+   icon becomes a direct 1-click Options door (matches `ROADMAP.md:95-106`'s own quoted
+   destination, David 2026-08-20: *"The ⚙ button should BE Options"*); a small gear icon
+   gets added to `MiniRoot` (today Expand+Close only) so the shortcut works minimized too.
+3. **Lock B** — Edit HUD gets its own always-visible pencil-icon toggle drawn on
+   `HudChipRowWindow` itself, both directions (enter AND exit), no menu route — the
+   structural fix for "maximize → cog → toggle," since that window has no context menu to
+   put a shorter path on.
+4. **Lock C** — Session history, Click-through, Data & imports (6 rows) and Help (4 rows)
+   all fold into Options → Behavior as new labeled sections, reusing the existing
+   heading+button shape already there for Mobile. One flagged judgment call: Click-through
+   is a needs-it-in-seconds toggle per the roadmap's own warning
+   (`ROADMAP.md:183-184`) — I'm pairing its move with binding its already-existing unbound
+   hotkey as a zero-click compensation, but named this as my least-confident call in the
+   table; a one-line amendment (keep it as a 5th cog row instead) doesn't touch anything else.
+5. **Lock D** — "Open EQBuddy…" is CUT from the cog (doesn't fit the 4-row shape) and its
+   door MOVES to a persistent header link on `OptionsWindow` itself, renamed at the new
+   address (proposed: "Open the full view…" or "Open EQBuddy Evolved…" — wording is Helm's/
+   David's call, not fixed here). Trap 59 checked: this keeps the shell's only door real and
+   always-visible, not downgraded to a hotkey.
+6. **Full keep/cut/move table**, every row from today's menu, with file:line justification.
+   **Nothing is a clean cut with no replacement** — every row either stays on the 4-row cog,
+   gets Lock B's dedicated icon, or gets a named seat in Options.
+7. One small pre-existing bug flagged in passing (stale tooltip, `SettingsAlertsView.cs:640`,
+   names a menu row that doesn't exist) — not fixed here, flagged for whoever lands Lock A
+   since they'll have the file open anyway.
+
+**Ask:** sign or amend the four locks (independently landable, in order A→B→C→D). **Do not
+kick Opus from this seat** — that's this brief's own instruction, repeated here so it isn't
+missed. Once signed, recommend a Soft Opus seat per lock (or one seat covering all four if
+Helm prefers a single PR) — not opened by this seat.
+
+**Posture / Soft max ≤3:** this is the only item this seat is carrying. Not needs-david —
+the direction is already the owner's own written destination in `ROADMAP.md`; today's lock
+just tightens the shape and adds the click budget. Two wording calls (Click-through's fast-
+path compensation; "Open EQBuddy…"'s replacement label) are flagged as open, not needs-david
+— cosmetic, not consequence-list.
+
+— Bevel (Claude Sonnet 5), 2026-09-08 ~2:50 PM CT
 
 ## 2026-09-08 ~9:10 AM CT — LIVE ASK: SIGNED #422 Pet DPS glance insert is BUILT — last-look/sign
 
