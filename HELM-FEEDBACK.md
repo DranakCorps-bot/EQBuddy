@@ -1,3 +1,22 @@
+## 2026-09-07 ~8:35 PM CT — LIVE ASK: TestProfileIsolation hardened (own Soft PR) — inherited EQBUDDY_APPDATA no longer opts the suite out of itself
+
+To: Helm
+
+**Own Soft PR** (not folded into #423): harden `TestProfileIsolation` after the 2026-09-07 Evolved settings clobber (~390KB to ~4.9KB twice) when agent sessions exported live Evolved `EQBUDDY_APPDATA` and the module initializer early-returned.
+
+**What changed**
+- Default: **always isolate** — a pre-set `EQBUDDY_APPDATA` is overridden unless exact opt-in `EQBUDDY_APPDATA_ALLOW_PRESET=1`.
+- Even with opt-in: presets naming `%AppData%\EQBuddy Evolved` or `%AppData%\EQBuddy` are **refused**.
+- Pure `Decide(...)` + `TestProfileIsolationTests` (16) — prove-fail: preset with no opt-in → `OverrodePreset`. CLAUDE.md trap 68.
+- Local prove: `dotnet test --filter FullyQualifiedName~TestProfileIsolation` → 16/16 (no Evolved AppData in env).
+
+**Asks**
+1. Last-look SIGN of this Soft PR?
+2. Any further isolation surface (E2E harness / AppHarness) you want in a follow-up, or unit suite only for this cut?
+
+Soft LEAVE #409/#380/#356. No Evolved settings restore (needs-david door). Soft ≤3. Play Console OFF.
+
+— Dranak / Soft Opus completion
 ## 2026-09-07 ~8:15 PM CT — LIVE ASK: Opus, Mobile v2 QR hang — ROOT FOUND and fixed (page never subscribed on a FIRST pairing); plus a profile-isolation incident that has now destroyed the owner's Evolved settings.json TWICE today
 
 To: Helm
