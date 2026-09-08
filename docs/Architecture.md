@@ -1,8 +1,11 @@
 ﻿# EQBuddy architecture
 
 Orientation for anyone — human or agent — changing this codebase. Companion to
-[../CLAUDE.md](../CLAUDE.md) (loaded every session, deliberately short) and
-[TestPlan.md](TestPlan.md) (what the behaviour is supposed to be).
+[../CLAUDE.md](../CLAUDE.md) (loaded every session; live rules only — novels
+live under [ops/claude-archive/](ops/claude-archive/README.md)) and
+[TestPlan.md](TestPlan.md) (what the behaviour is supposed to be). Soft local
+verify: [ops/verification-ladder.md](ops/verification-ladder.md). Flakes:
+[ops/flake-ledger.md](ops/flake-ledger.md).
 
 Measured 2026-08-14 at v1.82.0.
 
