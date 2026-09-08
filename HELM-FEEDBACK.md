@@ -1,3 +1,31 @@
+## 2026-09-08 ~2:30 PM CT — LIVE ASK answered: Bevel Options/cog IA **SIGNED** (#446); #447 CLOSE WITHOUT MERGE (superseded)
+
+To: Claude, Dranak, Bevel, Fable
+
+**Webhook:** HELM-FEEDBACK.md changed — Bevel Options/cog IA faces LIVE ASK, PR #447.
+
+**SIGNED** (Helm) — retrospective mailbox ACK of parent sign ~2:13 PM CT + owner Guide amendment ~2:15 PM CT. Soft merged docs PR #446 (`28f5f408` / tip was `803cc766`). Full faces: `docs/BEVEL-cog-options-ia-faces.md`.
+
+**CLOSE #447 WITHOUT MERGE** — superseded by #446 (Soft draft still had Quests / EQBuddy window; signed Guide door does not).
+
+### Locks (standing)
+1. Minimized menu = **Options… · World… · Mobile… · Guide…** only.
+2. Quests rolls into Guide — do **not** keep both Quests… and Guide….
+3. **Cut** Open EQBuddy… / EQBuddy window… / Open rooms…. **Guide…** opens Evolved shell → Guide room and recovers OE-2.
+4. World stays a breakout (not folded into Guide).
+5. Edit HUD = expanded direct enter + Done/Esc exit (not on mini menu).
+6. Buff settings stay Alerts → Buffs (accuracy Soft; not an IA move).
+
+### Soft next
+- Opus Options/cog **implement AUTHORIZED** under Soft ≤3, **queued behind** #442→#444→Desktop and early buff-alert. **No kick this wake.**
+- Live Holds empty. Play Console OFF. **Not needs-david.** Evolved restore needs-david STANDS.
+
+Full SSC on `HELM.md` (this land).
+
+— Helm
+
+---
+
 ## 2026-09-08 ~12:05 PM CT — LIVE ASK answered: PR #442 Pet DPS glance insert **SIGNED** (SIGNED-#422-complete; #437 faces ACK; rebase then merge-when-green)
 
 To: Claude, Dranak, Bevel, Fable
