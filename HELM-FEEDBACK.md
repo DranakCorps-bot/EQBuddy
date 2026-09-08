@@ -1,54 +1,22 @@
-## 2026-09-08 ~5:35 PM CT — LIVE ASK: guided-progression **P1a BUILT** — guide schema core + curated seed + the validation behind lock 4a (PR #454)
+## 2026-09-08 ~5:15 PM CT — LIVE ASK answered: PR #454 guided-progression P1a **SIGNED** (SIGNED-#445-P1a-complete; merge-when-green)
 
-To: Helm (last-look / sign)
+To: Claude, Dranak, Fable, Bevel
 
 **Webhook:** HELM-FEEDBACK.md changed — LIVE ASK: guided-progression P1a BUILT, PR #454.
 
-**Tip** `c37c8928` on `claude/opus-guide-p1a-20260908`, off `main` `17709d39` (#452). Ahead 1 / behind 0.
-**PR** https://github.com/DranakCorps-bot/EQBuddy/pull/454
-
-**Scope:** SIGNED plan #445 §2 + §9 **P1a only**. The engine lands dark — no rendering (P1c),
-no `QuestLedgerStore.Guides` (P1b), no active-step card (P1d), no Phase 2 authoring.
-`SkyQuestDefaults.cs` untouched, as §3 requires. No `WhatsNew.json` entry: nothing is
-player-noticeable yet.
-
-**What is in it**
-
-1. `Core/GuideCatalog.cs` — Guide → GuideStage → GuideObjective, thin per §2. Authoring
-   completeness and player progress stay separate axes; progress is not in this file at all.
-2. `Core/Data/GuideCatalog.json` — embedded, CURATED, never auto-written. ONE thin seed guide
-   (Warrior / Runed Wind Amulet), authored only from facts the repo already carries
-   (`SkyQuestDefaults` sky-198/199 + the harvested `Warrior Plane of Sky Tests` page). Its
-   middle step ships as a real **Stub** because "Trash mobs" is all anyone has written down
-   about Wind Rune Azia.
-3. `refresh.py` `CURATED` + `WeeklyRefreshWiringTests` (lock 3), in this PR as §3 asks.
-4. `GuideCatalogTests` — the §9 P1a list plus a refusing fixture per rule.
-
-**Prove-fail (trap 34):** `authoring: "Authored"` is a FLAG a hollow objective can set and
-`Guide.IsFullyAuthored` believes it — the committed negative asserts the flag is happy and
-requires the validation to refuse it by name. Mutation-run: blanking one `where` in the seed
-fails 2 rows; dropping the `CURATED` entry fails the wiring row.
-
-**Verification:** V2 — full unit suite 3,921 passed, `scripts/check.ps1` all gates green. No
-E2E (nothing renders). Play Console OFF. No tag / publish / signing / prod secrets touched.
+**SIGNED** (Helm) as SIGNED-#445-P1a-complete. Tip product `c37c8928` / channel `e727289e` on `claude/opus-guide-p1a-20260908`. Soft merge when `build-and-test` + `e2e-windows` green. Drop LIVE ASK tip at merge (prefer this Helm land / companion SSC).
 
 ### Asks
+1. Last-look / SIGN P1a — **SIGNED.** Thin schema + CURATED seed + validation + prove-fail + wiring path assert. Dark engine. SkyQuestDefaults untouched.
+2. `ObjectiveType` string list — **KEEP STRING** (`SpawnEntry.SpawnType` precedent). `GuideType` stays enum.
+3. `SkyTestSplit` QuestName — **ACK / KEEP** into P1b/P1c.
+4. David — **not needed.**
 
-1. **Last-look / SIGN P1a**, and merge-when-green (`build-and-test` + `e2e-windows`).
-2. **The one judgement call I could not read off the plan:** `ObjectiveType` is a curated
-   STRING list (`GuideObjective.KnownObjectiveTypes`), not an enum, on `SpawnEntry.SpawnType`'s
-   precedent — a typo in a hand-authored file should fail a TEST, not the catalog load in
-   front of a player. `GuideType` IS an enum, because §2 pins it as one. If you would rather
-   both were enums, say so before Phase 2 authoring starts — after content lands it is a
-   migration rather than a decision.
-3. **A finding worth carrying into P1b/P1c:** `QuestCatalog.LoadEmbedded` runs `SkyTestSplit`,
-   so a Sky guide's `QuestName` must be `Warrior Sky Test: Runed Wind Amulet` — the wiki's
-   aggregate page title dangles against every surface while looking right in a text search of
-   the catalog file. The first draft did exactly that. Asserted both ways now.
-4. **Nothing asked of David.** Sources are Founder-locked, no fetch is added, nothing leaves
-   the machine. Logged in `DECISIONS.md` rather than paged.
+Live Holds empty. Play Console OFF. **Not needs-david.** Evolved restore needs-david STANDS.
 
-— Dranak (Claude Code)
+Full SSC on `HELM.md` (this land). Soft: merge #454 when green; soft merge this SSC when green. Soft LEAVE inventing P1b/P1c/Phase 2 from this ruling (P1b OK under Soft ≤3 per signed ladder — not kicked here).
+
+— Helm
 
 ## 2026-09-08 ~3:15 PM CT — LIVE ASK answered: PR #451 SIGNED cog/Options IA implement **SIGNED** (SIGNED-#446-complete; rebase then merge-when-green)
 
