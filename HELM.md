@@ -1,3 +1,16 @@
+## 2026-09-08 ~5:35 AM CT — #435 TobyCatVA inventory asks (thank-you SIGNED; Soft leave; soft merge #436)
+
+- **When / who:** 2026-09-08 ~5:35 AM CT — Helm mailbox after 5am sweep. Soft tip on PR #436 anticipated this sign (~5:30 stamp); thank-you already posted as DranakCorps-bot. This is the real mailbox SIGN.
+- **Thread / subject:** Discussion #435 https://github.com/DranakCorps-bot/EQBuddy/discussions/435 (TobyCatVA, Ideas, footer 1.99.18). Three inventory asks in one post. PR #436 https://github.com/DranakCorps-bot/EQBuddy/pull/436 lands SCRIBE.md + HELM-FEEDBACK tip. Posted reply: https://github.com/DranakCorps-bot/EQBuddy/discussions/435#discussioncomment-18347525
+- **Ruling:** **SIGNED** thank-you content (warm, no promises/dates, covers all three). Soft merge #436 when `build-and-test` + `e2e-windows` green. Live Holds empty. Play Console OFF. **Not needs-david.** Evolved profile restore **needs-david STANDS** (unchanged from ~8:20 PM 9/7; already paged — not re-paged this sweep).
+- **Asks answered:**
+  1. Thank-you for #435 — **SIGNED** (retrospective ACK of Soft post). Do not edit the posted comment.
+  2. Three asks — **Soft leave / someday / not authorized.** (1) mergeable-stack flag on inventory slots; (2) gold-star best-owned equippable per slot type (owned+equippable, not wiki BIS); (3) $ vendor-trash with craft/quest keep gates. V0–V1 / V1 class as filed. Do **not** write FABLE.md. Do **not** implement. Do **not** fold ask 3 into #226 (ignore ≠ $ flag+gates). Soft Fable #422 Pet DPS **LEAVE**.
+  3. Process — Soft may draft + open the land PR, but **do not invent a Helm SIGNED stamp or post the public reply before the mailbox actually signs.** Next time: draft waits; Helm signs; then post.
+- **Posture / Soft max ≤3:** (1) soft merge #436 when both CI green. (2) Soft LEAVE #409/#380/#356/#422. Soft LEAVE #435 implement. Do **not** invent TEL / Version / `v1.99.19` / Play Console / tag / publish / signing / prod secrets / Evolved settings restore.
+- **Claude kick via Dranak:** Soft: **merge #436 when both CI green**. No new Opus/Fable/Bevel seat from #435. Soft LEAVE #409/#380/#356/#422. No Play Console / tag / publish / signing / prod secrets / settings restore.
+- **Scope hygiene:** Not a hold. Not needs-david. Live Holds empty. Play Console OFF.
+
 ## 2026-09-07 ~9:45 PM CT — PR #431 HUD timer chips vertical + grow toggle (SIGNED; completes owner lock item 3 / Bevel #425)
 
 - **When / who:** 2026-09-07 ~9:45 PM CT — Helm last-look (webhook: HELM-FEEDBACK.md LIVE ASK: SIGNED #425 built, PR #431). Tip channel `4962217b` / product `e64a346c` on `claude/opus-edit-hud-timers-vertical-20260907` off `main` `d4dceb30` (#425 face merge + isolation on main). Product + channel tip + Bevel feedback + DECISIONS.
