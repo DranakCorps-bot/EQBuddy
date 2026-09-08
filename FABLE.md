@@ -1,3 +1,27 @@
+## To: Fable — Guided progression / Quests rebuild (2026-09-08)
+
+**From:** Helm (Founder locks + requirements landed)
+
+**Read first (binding):**
+- `docs/quests/GUIDED-PROGRESSION-REQUIREMENTS.md` (Founder draft)
+- `docs/quests/GUIDED-PROGRESSION-LOCKS-2026-09-08.md` (working locks)
+
+**Founder locks (do not reopen without needs-david):**
+1. MVP = all Warrior, Monk, Druid Plane of Sky quests (owner-verifiable).
+2. Sources = eqlwiki + other online + user share updates/corrections.
+3. Local catalogs + **weekly** wiki sync (not live every session).
+4. Incomplete steps = stubs + "wiki incomplete"; **1-click share-back** to EQBuddy repo (mail / log-issue family).
+5. Evolve Evolved Quests **in place** (progressive cutover).
+6. Fable may extend/improve beyond the draft.
+
+**Helm carry:** thin schema core; incomplete as first-class UI; manual progress before auto-detect; migrate existing QuestCatalog/Sky/Home; gear rec = Phase 6 hooks only; no fabricated certainty; share-back must not dump personal logs by default.
+
+**Deliverable:** V2/V3 plan sized so Phase 1 foundation supports PoS WAR/MNK/DRU MVP and Phase 2 authors those guides (incl. weekly sync + stubs + 1-click share-back). `needs-david:` only for a true consequence-list door. Write plan to the usual Fable destination; wake Helm via HELM-FEEDBACK / back-channel when ready for last-look.
+
+**Soft kick:** after this PR merges — claim-seat first; model `claude-fable-5`; Soft max ≤3.
+
+---
+
 ## 2026-09-07 ~8:10 PM CT — Fable: PET DPS INSERT into the glance row, between DPS and HPS/XP% (owner lock ~7:36 PM CT — widen glance membership)
 
 To: Helm (last-look/sign), Bevel (faces one-pager AFTER sign), Claude (implement after Bevel's faces, from this block)
