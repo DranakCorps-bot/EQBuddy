@@ -1252,6 +1252,15 @@ public class ShellHostTests
             app.DumpValue("shellSettingsLookPalettes"));
         Assert.Equal(app.DumpValue("optionsLookSwatches"),
             app.DumpValue("shellSettingsLookSwatches"));
+        // `lookHints` — the prose pass reached this tab in Pass 2 (2026-09-08). Exactly one
+        // paragraph moved (the grid overlay's), and one is enough for the row to be worth
+        // having: an ⓘ that failed to build on one host is that explanation gone from the
+        // product on that host, with nothing on screen to say so. Floor first, then equality,
+        // because two hosts that had both built none would agree perfectly (trap 39).
+        Assert.True(app.DumpValue("shellSettingsLookHints") >= 1,
+            $"the room built no ⓘ on Look; dump was: {app.Artifacts()}");
+        Assert.Equal(app.DumpValue("optionsLookHints"),
+            app.DumpValue("shellSettingsLookHints"));
 
         // The Behavior block — and `behaviorHotkeys` is the one with a wiring behind it: the
         // hotkey rows are the only piece of this surface a HOST has to help with (the key
@@ -1261,6 +1270,20 @@ public class ShellHostTests
             $"the room drew no hotkey rows; dump was: {app.Artifacts()}");
         Assert.Equal(app.DumpValue("optionsBehaviorHotkeys"),
             app.DumpValue("shellSettingsBehaviorHotkeys"));
+
+        // **`behaviorHints` is the prose pass's row here, and it is deliberately NOT an
+        // equality** — this is the one block whose two hosts legitimately hold a different
+        // number of ⓘ. Eight explanations moved onto a hover in Pass 2 and one of them is
+        // Setup's, which only the SHELL draws (`OptionsWindow` has nowhere to put the
+        // screen). So the honest statement is that the difference is EXACTLY the Setup row:
+        // written as an equality against a plain 8 it would have failed on the window and
+        // been "fixed" by dropping the assertion, and written as a bare >= it could not see
+        // seven ⓘ silently becoming three.
+        Assert.True(app.DumpValue("shellSettingsBehaviorHints") >= 8,
+            $"the room built fewer than the eight ⓘ this block hangs; dump was: {app.Artifacts()}");
+        Assert.Equal(
+            app.DumpValue("shellSettingsBehaviorHints") - app.DumpValue("optionsBehaviorHints"),
+            app.DumpValue("shellSettingsBehaviorSetup") - app.DumpValue("optionsBehaviorSetup"));
 
         // The Alerts block, all four families built on both hosts — the window stacks them
         // across two tabs and the room pages them behind one sub-strip, and they agree on
@@ -1272,6 +1295,13 @@ public class ShellHostTests
             app.DumpValue("shellSettingsAlertsRuleRows"));
         Assert.Equal(app.DumpValue("optionsAlertsRules"),
             app.DumpValue("shellSettingsAlertsRules"));
+        // `alertsHints` — three explanations here exist ONLY behind an ⓘ since Pass 2 (two in
+        // the shared header, one on the Buffs block). The equality is only meaningful because
+        // `alertsBlocks` above has already said both hosts composed the whole surface.
+        Assert.True(app.DumpValue("shellSettingsAlertsHints") >= 3,
+            $"the room built fewer than the three ⓘ this view hangs; dump was: {app.Artifacts()}");
+        Assert.Equal(app.DumpValue("optionsAlertsHints"),
+            app.DumpValue("shellSettingsAlertsHints"));
     }
 
     /// <summary>

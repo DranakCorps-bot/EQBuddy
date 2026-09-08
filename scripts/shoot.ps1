@@ -887,6 +887,46 @@ $Shots = [ordered]@{
     #     target is a named blocker on the commit that retires `OptionsWindow`
     #     (`SettingsRoom.cs`, `SettingsRoomTests`, flagged to Bevel). If a later pass gives
     #     the shell a placement affordance, this sentence and this shot both change with it.
+    #
+    # RE-SHOT 2026-09-08 for the prose-to-hover PASS 2, which reaches the three tabs the HUD
+    # pass did not. These windows are a fixed 946x633, so unlike 'options-*' there is no
+    # height to read — the CONTENT is the whole evidence, and each clause below is written
+    # before the capture. **This is also the parity claim in a second host**: every paragraph
+    # named here left the v1 window in the same commit, and the two pictures side by side are
+    # what says one block serves both.
+    #
+    #   * 'shell-settings-look' — the grid-overlay tick box carries an ⓘ at the end of its row
+    #     and NO paragraph under it. Everything else on the tab is unchanged, INCLUDING the
+    #     four short lines under the sliders and the cursor ring's two sentences: they are
+    #     under the twenty-word ceiling and a picture missing one of them is the defect.
+    #   * 'shell-settings-alerts' — an ⓘ on "Slow alert…" and on "Only during raids", with
+    #     their two paragraphs gone. **The shared header's alert-banner sentence is STILL
+    #     PRINTED** (the known divergence above still stands, and it is now also a Pass 2
+    #     exemption: the banner tile has no control on this screen to hang an ⓘ beside).
+    #     **So is the Watch block's opening paragraph** — the sub-strip lands on Watch rules,
+    #     and that explanation stayed for the same reason: the block's only heading belongs to
+    #     the host, so there is nothing inside it to hang on.
+    #   * 'shell-settings-behavior' — EIGHT ⓘ, one more than the v1 window has, because this
+    #     host is the one that draws the Setup row and its note moved too. Gone from the body:
+    #     the two hide/keep-above explanations, the hotkeys paragraph (its ⓘ is on the
+    #     HEADING), the regen override's, auto-empty's, the archive's, the CPU/memory one, and
+    #     Setup's. **STILL PRINTED IN FULL: the Alt+Tab note, the "hide while the game isn't
+    #     running" note, and EQBuddy Mobile's two lines** — each names a door or a default.
+    #     The log-archive explanation still appears ONCE, on its ⓘ rather than twice.
+    #
+    # SHOT 2026-09-08, all three 946x633. Every clause above held, with ONE amendment to the
+    # PREDICTION rather than to the app:
+    #
+    #   * 'shell-settings-behavior' — **"EIGHT ⓘ" is not a claim this picture can make.** The
+    #     room is a fixed-height window that scrolls, and the tab ends below the fold: the
+    #     shot reaches the regen row, so auto-empty, the archive, the tutorial toggle, the
+    #     CPU/memory line and the Setup row are all off the bottom, along with four of the
+    #     eight ⓘ. What it DOES show is the half that matters here — the four conversions and
+    #     all three exemptions are above the fold together, which is the comparison. The
+    #     eight-versus-seven claim is `ShellHostTests`' (`behaviorHints` minus
+    #     `behaviorSetup`), and it was always going to be, because a scrolling room cannot
+    #     photograph a count. The prediction should have said so; a picture asked for a number
+    #     it cannot hold is trap 22's shape wearing an assertion.
     'shell-settings-look' = @{ Title = 'EQBuddy — Settings'
                            Env = @{ EQBUDDY_SHELL = 'settings:look' }; Set = @{} }
     'shell-settings-alerts' = @{ Title = 'EQBuddy — Settings'
@@ -2085,6 +2125,22 @@ $Shots = [ordered]@{
     # catalog did not change; the prediction was written short.
     # Nothing is seeded: the rows ARE the shipped catalog, which is the point.
     'spawns-sky'      = @{ Title = 'EQBuddy World'; Env = @{ EQBUDDY_SPAWNS = 'Plane of Sky' }; Set = @{ TrackSpawns = $true } }
+    # Options on its DEFAULT tab, which is Look.
+    #
+    # RE-SHOT 2026-09-08 for the prose-to-hover pass 2 (Bevel's faces, Helm-signed).
+    # PREDICTED BEFORE THE CAPTURE: exactly ONE paragraph leaves this tab — the grid
+    # overlay's — replaced by an ⓘ at the end of its tick-box row, so the window comes back
+    # SHORTER than 420x556 by roughly the two-or-three wrapped lines that paragraph occupied.
+    # **The four short lines under the sliders are STILL PRINTED IN FULL** ("Only the dark
+    # panel fades", "Fades everything, text included", the cursor ring's two sentences, and
+    # the closing "Size also scales all text"); they are all under the ceiling and a picture
+    # missing any of them is the defect rather than the tidier screen it would look like.
+    # One paragraph is the finding rather than a shortfall — this tab is already mostly
+    # sliders with a caption each, which is the shape the whole pass is trying to produce.
+    # SHOT: 420x511, down from 420x556, and every clause above held — the ⓘ sits at the end
+    # of the grid-overlay row, its paragraph is gone, and all four short lines are still
+    # printed. The height is the reviewable number: a re-shoot at 556 would have meant the
+    # affordance was ADDED and the prose left behind it.
     'options-window'  = @{ Title = 'Options'; Env = @{ EQBUDDY_OPTIONS = '1' }; Set = @{} }
     # Options → Cards & windows, which is the screen a player opens when a card has gone
     # missing — #219 (typical-usual-chaos) went looking for Motes here and found nothing
@@ -2097,6 +2153,21 @@ $Shots = [ordered]@{
     # text. Neither shows in a diff or a render test.
     # Zoomed out, because the rows sit below the fold of a tab this long and the window
     # scrolls: at 100% the shot is a picture of the buff-set editor above them.
+    #
+    # RE-SHOT 2026-09-08 for the prose-to-hover pass 2. PREDICTED BEFORE THE CAPTURE: THREE
+    # paragraphs leave this tab — the slow chip's, the raid-detection one under "Only during
+    # raids", and the buff-list one under "only show buffs about to fade" — each replaced by
+    # an ⓘ at the end of its tick-box row, so the window comes back materially shorter than
+    # 420x830. **The buff-set paragraph ("Pick the buffs this character never camps
+    # without…") is STILL PRINTED IN FULL**, and that is the reviewable half: it is 109 words,
+    # past what the bounded tooltip can be read in, so it stayed by policy rather than by
+    # oversight (`SettingsProsePass2Tests`). So is the alert-banner sentence near the top,
+    # which the recipe below already asserts. The mez-duration rows this shot exists for are
+    # untouched — if the picture no longer reaches them, the zoom needs revisiting, not the
+    # conversion.
+    # SHOT: 420x796, down from 420x830, and every clause held — three ⓘ with no paragraphs
+    # under them, the alert-banner sentence and BOTH kept paragraphs printed in full, and the
+    # mez-duration rows still reached at the same 0.55 zoom.
     'options-mez'     = @{ Title = 'Options'
                            Env = @{ EQBUDDY_OPTIONS = '1' }
                            Set = @{ OptionsTab = 'alerts'
@@ -2310,6 +2381,29 @@ $Shots = [ordered]@{
     # of #238 the home of the Alt+Tab opt-out with its taskbar-cost warning. Zoomed out
     # like its siblings — the tab is one of the two longest and at 100% the shot is a
     # picture of its top third.
+    #
+    # RE-SHOT 2026-09-08 for the prose-to-hover pass 2, and this is the tab that loses the
+    # most. PREDICTED BEFORE THE CAPTURE: SEVEN paragraphs leave — the two under "Hide
+    # EQBuddy while the game is running but not focused" and "Keep EQBuddy above fullscreen
+    # overlays", the one under "Global hotkeys" (its ⓘ is on the HEADING, since the rows
+    # under it are rebuilt on every click), the regen-override one, the two under auto-empty
+    # and its archive, and the CPU/memory one at the bottom. Setup's note is the eighth and
+    # is NOT here: `OptionsWindow` has nowhere to put the first-run screen, so it draws no
+    # Setup row at all — which is exactly why `ShellHostTests` compares `behaviorHints`
+    # across the hosts as a DIFFERENCE rather than an equality. The window comes back much
+    # shorter than 420x505.
+    #
+    # **THREE paragraphs are STILL PRINTED IN FULL, and a picture missing any of them is the
+    # defect rather than the tidier screen it would look like**: the Alt+Tab note (*"the tray
+    # icon is how you get EQBuddy back"* — this shot exists for #238's taskbar-cost warning
+    # in the first place), the "hide while the game isn't running" note (*"Launch EQBuddy
+    # again from the Start menu"*), and EQBuddy Mobile's two lines at the top. Each names a
+    # DOOR or a default, and each is a row with its reason in `SettingsProsePass2Tests`.
+    # SHOT: 420x379, down from 420x505 — the biggest drop of the pass, and the whole tab now
+    # fits at 0.55 where it used to run past the fold. All seven ⓘ present with their
+    # paragraphs gone, no Setup row (as predicted), and the three kept paragraphs printed in
+    # full: EQBuddy Mobile's two lines, the "hide while the game isn't running" note, and the
+    # Alt+Tab note ending "The tray icon is how you get EQBuddy back."
     'options-behavior' = @{ Title = 'Options'
                             Env = @{ EQBUDDY_OPTIONS = '1' }
                             Set = @{ OptionsTab = 'behavior'
