@@ -579,6 +579,14 @@ load. `EQBUDDY_APPDATA` still overrides, unchanged — it is what keeps the suit
 profile — and an override that points AT the product directory (which is what
 `install-local.ps1 -Evolved` sets) is not a redirect.
 
+**Which is exactly why the unit suite may not read that variable as permission.** Since
+2026-09-07 `TestProfileIsolation` redirects to a throwaway directory on EVERY run, including
+one that inherited `EQBUDDY_APPDATA` — because the two scripts above export it, and a shell
+that has launched Evolved once carries it into `dotnet test`. The old "an already-set value
+wins" rule handed the whole suite a live profile on precisely the machines it was written to
+protect, and truncated one (trap 68). `EQBUDDY_ALLOW_LIVE_APPDATA=1` is the only door, and a
+run through it is meant to fail an isolation test rather than pass quietly.
+
 The import is **one-time, consented, and copies without ever moving**: `LEGACY-V1.md`'s
 "your profile is yours" made mechanical. Undo is structural — clear the Evolved profile and
 v1 still has everything — which is why there is no Undo button.
@@ -588,6 +596,8 @@ v1 still has everything — which is why there is no Undo button.
 | The profile directory is decided by the product's major version, not by a launcher | **Auto** — `ProfileSplitTests` |
 | `EvolvedMajor` and `LegacyPlatformUpdatePolicy.WindowsOnlyMajor` are ONE number | **Auto** — `ProfileSplitTests` |
 | An isolated `EQBUDDY_APPDATA` profile is never offered an import — no test, shot or E2E run can copy a real v1 profile into a throwaway one | **Auto** — `ProfileImportTests` (unit + E2E) |
+| The unit suite redirects to a throwaway profile even when `EQBUDDY_APPDATA` is ALREADY SET, and the profile in force is never `%AppData%` | **Auto** — `TestProfileIsolationTests`, asked of the environment the run is actually in |
+| Only the exact string `EQBUDDY_ALLOW_LIVE_APPDATA=1` lets a live profile through; a displaced override is recorded rather than silently ignored | **Auto** — `TestProfileIsolationTests`; **Manual** — run the suite with `EQBUDDY_APPDATA` at a seeded decoy and check the decoy is untouched |
 | Consent comes before any copy; the box is opt-in and default-CHECKED (door D2's stated assumption) | **Auto** — `ProfileImportReadoutTests`; **Manual** — first run against a fake v1 profile |
 | The whole directory copies, minus a short transient exclusion list — never a hand-written include list | **Auto** — `ProfileImportTests` |
 | `instance.lock`, `show.request`, `debug.txt`, `error.log`, `door.trigger` and `*.corrupt` do not travel; `.bak` does | **Auto** — `ProfileImportTests` |

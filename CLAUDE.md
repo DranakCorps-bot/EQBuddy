@@ -564,9 +564,14 @@ a guess, and the guess is discovered three commits later.
   Options â†’ Cards & windows"*, which the catalog has never done. It does not prejudge #251
   (Faction's card back) either way â€” if that lands, Faction gets a row because it is a card
   again, not because the fold rule was wrong.
-- **Tests must never touch the real profile.** A module initializer redirects
-  `EQBUDDY_APPDATA` to temp; it exists because a test once overwrote David's live
-  `settings.json`. Do not weaken it.
+- **Tests must never touch the real profile.** A module initializer
+  (`tests/EQBuddy.Tests/TestProfileIsolation.cs`) redirects `EQBUDDY_APPDATA` to temp; it
+  exists because a test once overwrote David's live `settings.json`. Do not weaken it.
+  **The redirect is UNCONDITIONAL since 2026-09-07** — it used to stand aside whenever
+  `EQBUDDY_APPDATA` was already set, and an inherited variable is not a decision: a seat
+  launched under the Evolved launcher's own export ran the suite against the live profile
+  and truncated it (trap 68). The single door is `EQBUDDY_ALLOW_LIVE_APPDATA=1`, exactly
+  that string, and a run through it fails `TestProfileIsolationTests` by design.
 - **Curated catalogs are never auto-written** (spawn timers, AAs, CC lists). The weekly
   wiki refresh only *flags* them. A wrong respawn timer is worse than none.
 - **When quest/catalog data conflicts and cannot be resolved, match the wiki** (David,
@@ -1983,35 +1988,38 @@ Read this list before touching the areas it names. Every entry cost a release.
     `window.__SENT` — **on a CLEAN browser profile**, because a second run inherits
     `localStorage`, takes the returning-device path, and makes the broken page look correct.
 
-68. **AN ENVIRONMENT VARIABLE IS INHERITED, SO "SOMEBODY SET THIS DELIBERATELY" IS NOT A
-    THING A GUARD CAN READ OFF ONE — and the test-profile guard opened by handing its whole
-    decision to exactly that.** `tests/EQBuddy.Tests/TestProfileIsolation.cs` is the module
-    initializer this file already calls non-negotiable ("tests must never touch the real
-    profile"), written after a test overwrote David's live `settings.json` in 2026-08-14. Its
-    first line was `if (EQBUDDY_APPDATA is set) return;`, on the reasoning that a harness or a
-    developer who had named a directory meant it. But nobody in the room types that variable —
-    it arrives from whatever shell the suite is started from, and on **2026-09-07 that was an
-    agent session exporting `%AppData%\EQBuddy Evolved`** to drive the real app. Isolation
-    opted out of itself, in silence, and David's live Evolved `settings.json` went from ~390 KB
-    to ~4.9 KB **twice in one day**. 4,697 bytes IS a defaults file (trap 65 says so in as many
-    words), and the shape on screen is trap 55's: theme reset, watch rules re-seeded, hidden
-    cards back — a profile read as brand new, not three bugs.
-    → **The guard never failed. It was asked politely to stand aside, and every one of 3,769
-    assertions went on passing** — trap 34's shape at the root of the tree, since the thing
-    that was wrong was the guard's own PREMISE. That premise ("a preset means somebody meant
-    it") is trap 64's proxy, and nothing had ever asked what it was standing in for.
-    → **Now guarded:** the redirect ALWAYS isolates. `EQBUDDY_APPDATA_ALLOW_PRESET=1` is the
-    explicit opt-in and nothing else spells it (a typo isolates, because that is the direction
-    a half-spelled flag must fail in) — and **even with the opt-in a preset naming a real
-    player profile is refused**, both lines, since running the unit suite against a live
-    profile is never the thing anyone wanted. `TestProfileIsolationTests` holds it, prove-failed
-    against the old rule: 11 of 16 fail there. The decision is a pure function for the same
-    reason `AppPaths.IsProductOwned` is (trap 57 — a test that mutated the variable would move
-    every parallel test's profile), with the live half asserting what THIS process actually did
-    rather than what the rule reads like (trap 42).
-    → **The general move: when a guard's first line is an early return, ask who supplies the
-    value it returns on.** An inherited variable, a file another process writes, a default that
-    means "unset" — each is a stranger holding the switch on a guard nobody will notice is off.
+68. **A GUARD WRITTEN AS "FILL THE GAP" STEPS ASIDE FOR EXACTLY THE VALUE IT WAS BUILT TO
+    OVERRIDE — and a set environment variable is not a decision, it is an inheritance.**
+    `TestProfileIsolation` is the module initializer that keeps ~3,770 tests off a player's
+    profile, and its whole rule was `if (EQBUDDY_APPDATA is set) return;` with a comment
+    saying an already-set value "wins — this only fills the gap". True of a developer typing
+    it; false of a shell, and a shell is what runs the suite. `scripts/Launch-Evolved-Shell.
+    cmd` and `install-local.ps1 -Evolved` export `EQBUDDY_APPDATA=%AppData%\EQBuddy
+    Evolved`, so any seat that had ever launched Evolved carried it into `dotnet test`, the
+    guard deferred **because** the value was set, and the suite wrote to the live profile.
+    2026-09-07: David's Evolved `settings.json` went from ~390 KB to ~4.8 KB — a defaults
+    file, which is trap 65's own signature and the same 4,697-byte shape recorded there.
+    → **The guard was strongest when nothing was at stake and absent when something was.**
+    Nothing routine sees it: every test passes either way (they were all writing somewhere
+    writable), the initializer's own comment reads as deliberate, and the damage lands in a
+    file nobody diffs. Trap 20's shape with the missing thing being a REASON — "already set"
+    stood in for "somebody chose this", and that sentence was written nowhere because it was
+    never true.
+    → **Now guarded:** the redirect is unconditional, the single door is
+    `EQBUDDY_ALLOW_LIVE_APPDATA=1` (exact string — "0", "true" and a stray space all still
+    redirect, because the two mistakes are not symmetric), the displaced value is recorded
+    in `EQBUDDY_APPDATA_DISPLACED` so an override that was ignored says so, and
+    `TestProfileIsolationTests` asserts the ENVIRONMENT rather than the source (trap 42:
+    "the redirect is in the file" and "the redirect is in force" are different claims).
+    Prove-failed by running the suite with the opt-out set against a seeded decoy profile:
+    the decoy's 27-byte sentinel comes back as a 4,889-byte defaults file, and one isolation
+    test goes red naming the variable that let it.
+    → **The general move: when a guard's condition is "unless somebody already X", ask who
+    else can X, and whether they meant it.** An environment variable, a settings key, a
+    marker file and a command-line flag are all inherited by something; only the last is
+    typed. If the answer is "a script three layers up", the condition is measuring history,
+    not intent — name the intent (an opt-out that exists for no other purpose) and make
+    everything else redirect.
 
 ## Tooling notes that cost time when ignored
 
