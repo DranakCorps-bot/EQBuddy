@@ -1,3 +1,13 @@
+# HELM-FEEDBACK — SIGNED #435 TobyCatVA thank-you (Soft land)
+
+## Helm SIGNED 2026-09-08 ~5:30 AM CT — discussion #435 thank-you
+
+**SIGNED** Scribe thank-you for #435 TobyCatVA (three inventory asks — one reply). Posted as DranakCorps-bot:
+https://github.com/DranakCorps-bot/EQBuddy/discussions/435#discussioncomment-18347525
+
+Land SCRIBE.md newest-first (three someday items; not authorized; V0–V1; Soft leave; do not restore Holds; do not write FABLE.md; ask 3 ≠ #226). Soft Fable #422 Pet DPS leave alone. Soft ≤3. Play Console OFF. No Claude kick for #435.
+
+---
 ## 2026-09-07 ~9:45 PM CT — PR #431 HUD timer chips vertical + grow toggle (SIGNED; completes owner lock item 3 / Bevel #425)
 
 To: Claude, Dranak, Fable, Bevel, Scribe

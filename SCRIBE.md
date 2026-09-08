@@ -15,6 +15,45 @@ something new.
 After you take items, write a short note in `SCRIBE-FEEDBACK.md` so Scribe can learn.
 
 ---
+
+### Inventory: flag items that can merge into one stack/slot
+- **Priority:** someday (real ask, not this gate; not authorized)
+- **Place:** Inventory / Gear & Loot — personal bag/slot view. Player inventory, not shared game truth / eqlwiki. Not a group meter. Not #208.
+- **Source:** #435 TobyCatVA Sep 8, 1:51 AM CT (06:51 UTC). https://github.com/DranakCorps-bot/EQBuddy/discussions/435 New thread. Category: Ideas. 0 comments. Footer: EQBuddy 1.99.18 · Windows 26200. Three asks in one post — this is ask 1 of 3.
+- **Ask (verbatim, ask 1):** "Flagging inventory items which can be merged together, instead of occupying multiple inventory slots."
+- **Already shipped (quoted main `src` this run):** `InventoryFile` parses `/outputfile inventory` into per-location `Entry` rows (Location / Name / Count) and also folds base-name → count for quest turn-in math; stack counts are honored when aggregating. `InventoryView` has by-slot and by-container renders. **No** grepped `Mergeable` / merge-flag UI symbol on main `src\EQBuddy*.cs` this run.
+- **Checked:** DISCUSSION body via GraphQL. WINDOW/WIDGET/PHONE — no. Grepped main `src\EQBuddy.Core\InventoryFile.cs` + `InventoryView.cs` headers/symbols only (not full inventory UX pass).
+- **Hypothesis, unchecked against live bag UI:** dump already knows per-slot rows of the same stackable; the ask is a visible flag when two+ occupied slots could collapse into one stack, not a new dump parser.
+- **Class:** V0–V1 (inventory flag on existing dump rows). Do not write FABLE.md.
+- **Holds re-read (HELM.md this run):** Live Holds empty. Talking to TobyCatVA is fine.
+- **Scribe 2026-09-08 ~5:16 AM CT (cron intake):** New intake. Do not implement. Do not open the work. Thank-you draft below covers all three #435 asks — one reply.
+- **Helm 2026-09-08 ~5:30 AM CT:** SIGNED thank-you; land SCRIBE; Soft leave (someday).
+- **Replied:** 2026-09-08 ~5:31 AM CT (Scribe) https://github.com/DranakCorps-bot/EQBuddy/discussions/435#discussioncomment-18347525 — SIGNED thank-you covering all three asks. Do not edit posted comments.
+
+### Inventory: gold-star best-owned equippable piece per slot type
+- **Priority:** someday (real ask, not this gate; not authorized)
+- **Place:** Inventory / gear compare — personal owned+equippable ranking. Player gear, not shared eqlwiki BIS list (wiki-feed bar for SUGGEST stays higher). Not a group meter.
+- **Source:** #435 TobyCatVA Sep 8, 1:51 AM CT. https://github.com/DranakCorps-bot/EQBuddy/discussions/435 Same Ideas thread. Ask 2 of 3.
+- **Ask (verbatim, ask 2):** "A gold star for BIS(that you currently own and can equip in each slot for each type. Basically giving the player feedback as to what is the best the player currently owns: best 1 hand blunt, best 2 hander, best 1 hand slash... this is based off of stats or ratio or ratio with stats as tie breakers."
+- **Already shipped:** Inventory/Gear Locker surfaces exist; tip text on Inventory mentions swap/vendor framing. **No** grepped owned-BIS / gold-star / BestOwned marker on main `src` this run. Global wiki BIS is a different Place (shared game truth → eqlwiki first).
+- **Checked:** DISCUSSION body. WINDOW/WIDGET/PHONE — no. Symbol grep on main Inventory/Gear sources only.
+- **Hypothesis, unchecked:** rank among items the dump says you own and that are equippable for this character/class/slot, using ratio/stats with stats as tie-break — scoped to owned, not server-wide BIS.
+- **Class:** V1 (owned-equippable rank UI) — if it needs a new cross-cutting gear-score model, bump Class later; do not write FABLE.md from Scribe.
+- **Scribe 2026-09-08 ~5:16 AM CT:** New intake. Do not implement.
+- **Helm 2026-09-08 ~5:30 AM CT:** SIGNED; Soft leave (someday).
+
+### Inventory: $ vendor-trash flag with keep gates (craft / low-level quest)
+- **Priority:** someday (real ask, not this gate; not authorized)
+- **Place:** Inventory flag / vendor advice — personal bag. Related-but-not-same as #226 global client-side ignore of vendor trash (ignore ≠ $ flag with keep rules). Not shared eqlwiki. Not a group meter.
+- **Source:** #435 TobyCatVA Sep 8, 1:51 AM CT. https://github.com/DranakCorps-bot/EQBuddy/discussions/435 Same Ideas thread. Ask 3 of 3.
+- **Ask (verbatim, ask 3):** "A dollar sign icon showing us the vendor trash with configurable gates like keep if used in X?X?X?X crafting, or keep if used in quests recomended for level 20 and under."
+- **Already shipped:** Inventory tip mentions “what to vendor”; #226 follow-up asked global ignore for vendor trash/gems (different control). **No** grepped VendorTrash / dollar-sign keep-gate control on main `src` this run.
+- **Checked:** DISCUSSION body. WINDOW/WIDGET/PHONE — no. Prior SCRIBE #226 vendor-trash ignore note only.
+- **Hypothesis, unchecked:** needs item-tag data (craft ingredient / quest use / level band) plus a player-configurable keep gate; without those sources the $ flag would be a static trash list only.
+- **Class:** V1–V2 borderline if craft/quest keep rules need new data sources — leave Class V1 for the icon+gate shell; do not write FABLE.md from Scribe.
+- **Scribe 2026-09-08 ~5:16 AM CT:** New intake. Do not implement.
+- **Helm 2026-09-08 ~5:30 AM CT:** SIGNED; Soft leave (someday). Do not fold into #226.
+
 ### Lower Guk hall: wizard kills fire the arch magi respawn chip
 - **Priority:** must-fix (player-facing false chip) — **waiting / not authorized** (new thread; need one literal kill line that wrongly starts the chip before a confident fix path). Helm 2026-09-07 ~1:35 PM CT: keep waiting; do not open V0–V1 code yet; PH-as-designed vs compact-slash still two readings.
 - **Place:** Spawn timer / respawn chip for Lower Guk named `the ghoul arch magi` (`SpawnCatalog.json` + `SpawnTimers` kill→timer). Player session timer, not a group meter. Catalog row is eqlwiki-sourced shared game truth (PH note), but the filed ask is a false chip on this player’s kills — not a new wiki place-option. Nearby: #109 spawn-timer accuracy (instances / learning), not the same report. Do not fold. Not #208.
