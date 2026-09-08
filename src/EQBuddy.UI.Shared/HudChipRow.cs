@@ -408,15 +408,37 @@ public static class HudChipRow
     /// A height that is not real yet — 0 on the first layout pass, NaN — takes the space
     /// below the widget without a flip: "we cannot tell yet" and "draw where you always
     /// draw" are the same instruction.
+    ///
+    /// **<paramref name="growUp"/> (#425) flips WHICH END OF THE STACK touches the widget,
+    /// and it is the whole of the owner's "toggle grow up or down".** The stack is a column
+    /// now, so a direction is a thing it can have; a horizontal row's was always "right".
+    /// Down — the default and today's app — pins the column's TOP under the widget, so a
+    /// chicklet arriving pushes the column further down the screen. Up pins its BOTTOM just
+    /// above the widget, so an arriving chicklet moves the top edge upward and the row stays
+    /// welded to the widget. That is v1's "boss timers above mez timers, each growing away
+    /// from the other" applied to the one row SA-2 left.
+    ///
+    /// **Both directions FALL BACK to below rather than half off the screen**, which is the
+    /// same rule the flip has always had in the other direction: a chicklet the monitor
+    /// cannot show is the same defect as one that never drew. Below is the fallback in both
+    /// cases because below is the direction that has the widget's own space to give.
+    ///
+    /// **<paramref name="hudHeight"/> is the widget AND whatever hangs under it** (the
+    /// under-bar panel's <c>SlavedOccupiedHeight</c>) and that is exactly why the up branch
+    /// measures from <paramref name="hudTop"/> instead: the panel hangs BELOW the widget, so
+    /// it is not in the space above it — but the moment the up branch falls back it is, and
+    /// the fallback uses the same <c>below</c> every other path does. One arithmetic knows
+    /// both, which is the seam #425's §3 named.
     /// </summary>
     public static (double Left, double Top) Placement(
         double hudLeft, double hudTop, double hudHeight, double rowHeight,
-        double workAreaTop, double workAreaBottom)
+        double workAreaTop, double workAreaBottom, bool growUp = false)
     {
         var below = hudTop + Math.Max(0, Real(hudHeight)) + HudGap;
         if (!double.IsFinite(rowHeight) || rowHeight <= 0) return (hudLeft, below);
-        if (below + rowHeight <= workAreaBottom) return (hudLeft, below);
         var above = hudTop - HudGap - rowHeight;
+        if (growUp) return (hudLeft, above >= workAreaTop ? above : below);
+        if (below + rowHeight <= workAreaBottom) return (hudLeft, below);
         return (hudLeft, above >= workAreaTop ? above : below);
     }
 
@@ -592,6 +614,48 @@ public static class HudChipRow
     /// inline 120 in <c>HudChipRowWindow.Park</c> before OE-8 gave the cap two callers.
     /// </summary>
     public const double MinWrapWidth = 120;
+
+    /// <summary>
+    /// The <c>MaxHeight</c> that makes the VERTICAL stack wrap into a second column instead
+    /// of growing a window taller than the screen (#425) — the exact mirror of
+    /// <see cref="WrapWidth"/>, and mirrored rather than re-derived so the two axes cannot
+    /// answer trap 25 differently.
+    ///
+    /// The stack is a <c>WrapPanel</c> and not a vertical <c>StackPanel</c> for the reason
+    /// traps 14 and 25 already state: a stack measures INFINITE in the stacking direction, so
+    /// a long list of countdowns would run off the bottom of the monitor with no ellipsis and
+    /// no overflow — correct, and not on screen. A wrap without a cap never reaches one.
+    /// </summary>
+    public static double WrapHeight(double areaHeight) =>
+        double.IsFinite(areaHeight) ? Math.Max(MinWrapHeight, areaHeight) : MinWrapHeight;
+
+    /// <summary>The shortest the stack is ever capped at, and it is the same 120 as
+    /// <see cref="MinWrapWidth"/> on purpose: the floor exists for a work area measured as
+    /// zero (a half-initialised host, a headless run), and a floor of one chicklet's HEIGHT
+    /// would put every chicklet in its own column — the horizontal row wearing a vertical
+    /// panel's clothes, which is the one outcome this change is not allowed to produce.
+    /// </summary>
+    public const double MinWrapHeight = 120;
+
+    /// <summary>
+    /// What the Edit-HUD toggle says about <c>AppSettings.HudChipRowGrowUp</c>, and the ONE
+    /// place this direction is put into words.
+    ///
+    /// **It reads the STATE rather than commanding an action** — "Stack grows: Down", not
+    /// "Grow up" — the same way the mute tick says "muted" rather than "mute", so a player
+    /// who never clicks it can still read what their row is doing.
+    ///
+    /// **And it never says a bare "grow down".** <c>HudExpandWindow.Reveal</c> owns an
+    /// unrelated, owner-locked "grow down" (the peek panel's reveal animation) and a player
+    /// meeting the same two words on two surfaces will reasonably assume one control governs
+    /// both. The word "Stack" is what keeps them apart, so it is in the string rather than
+    /// in a tooltip beside it.
+    /// </summary>
+    public static string GrowLabel(bool growUp) => growUp ? "Stack grows: Up" : "Stack grows: Down";
+
+    /// <summary>The direction as the <c>EQBUDDY_EXPAND</c> dump reports it. Space-free, like
+    /// every other value on a space-separated key=value line.</summary>
+    public static string GrowKey(bool growUp) => growUp ? "up" : "down";
 
     /// <summary>
     /// A companion window's park as the <c>EQBUDDY_EXPAND</c> dump reports it: "slaved", or

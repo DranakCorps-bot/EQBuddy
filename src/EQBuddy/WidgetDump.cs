@@ -520,6 +520,26 @@ internal static class WidgetDump
                     // whole assertion.
                     $"hudChipOrder={w._hudChips?.RowOrderKey ?? "-"} " +
                     $"hudMuted={MutedKey(w)} " +
+                    // THE GROW DIRECTION (#425), and it takes TWO keys for the reason the
+                    // park pair above does — "the direction is in the profile" and "the
+                    // stack is on the other side of the widget" are different claims and
+                    // trap 42 cost two builds to learn it.
+                    //
+                    //   hudChipGrow   the SETTING as the window read it, "up" / "down".
+                    //   hudRowAbove   the EFFECT — the stack's bottom edge is at or above
+                    //                 the widget's top. A RELATIONSHIP between two windows,
+                    //                 never a coordinate: a hosted runner is 1024×768 and a
+                    //                 test that demands a position is asserting the desk it
+                    //                 was written on.
+                    //
+                    // Both are emitted whether or not the row window exists, like every
+                    // other hud* key: a key that disappears with its window cannot be
+                    // asserted as "down" (trap 62). `hudRowAbove` is 0 when the row is
+                    // parked — a parked row is not placed against the widget at all — which
+                    // is exactly the pairing that lets a test say "grow up is in force AND
+                    // the park is what is placing it".
+                    $"hudChipGrow={w._hudChips?.GrowKey ?? HudChipRow.GrowKey(w._settings.HudChipRowGrowUp)} " +
+                    $"hudRowAbove={(w._hudChips is { AboveTheWidget: true } ? 1 : 0)} " +
                     // The MODE, not the setting behind it: Edit HUD has no setting at all,
                     // it is a live state of the row window.
                     $"hudEdit={(w._hudChips is { Editing: true } ? 1 : 0)} " +

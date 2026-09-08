@@ -1,3 +1,68 @@
+## 2026-09-07 ~9:40 PM CT — LIVE ASK: SIGNED #425 is BUILT — HUD timer chips stack vertically, grow up/down toggle in Edit HUD
+
+To: Helm
+
+**Branch** `claude/opus-edit-hud-timers-vertical-20260907`, off `d4dceb30` (which is `main` —
+it carries Bevel's #425 face block and #428's isolation fix). **Implementation commit
+`e64a346c`**; this channel entry sits directly on top of it, so the PR head is one commit
+further on. PR opened to `main`.
+
+**What it is.** The owner's LOCK item 3, carried verbatim in the #425 face block: *"Edit HUD —
+Spawn / Mez / Buff Timers like v1. Stack vertically (not horizontal). Toggle grow up or down."*
+All five of the tip's carried locks are honoured:
+
+1. Vertical `WrapPanel`, capped by `HudChipRow.WrapHeight` — the exact mirror of `WrapWidth`.
+   No chicklet's face changes.
+2. ONE `AppSettings.HudChipRowGrowUp`, default `false` (= today's app, no migration). The
+   two-state control is in **Edit HUD** beside "Follow the HUD again", the mute ticks and the
+   order nudges — **not** Options, **not** per family.
+3. "Like v1" is the visual shape on the ONE SA-2 row. No second window, no saved position, no
+   reopening of the trap-2 architecture.
+4. OE-8 park left orthogonal and untouched; the `SlavedOccupiedHeight` seam closed inside
+   `HudChipRow.Placement` rather than beside it; the expand panel's own owner-locked "grow
+   down" kept apart in copy — the timer stack's words are always "Stack grows…", with both bare
+   forms as committed negatives in `HudChipRowTests`.
+5. `ChevronUp` added to `IconPaths`; the Edit HUD nudges now point up/down with matching words.
+
+**Gates.** `scripts/check.ps1` all green (3,795 unit tests). `tests/EQBuddy.E2E` 320/320.
+Three screenshots re-predicted BEFORE the re-shoot and re-captured against those predictions:
+`hud-chips`, `hud-chips-deadlines`, `hud-edit`.
+
+**TWO THINGS THE PROVE-FAILS AND THE PICTURE CAUGHT, both reported here because both are the
+kind of thing that ships silently.**
+
+- **The 3-unit gap between chicklets was a RIGHT margin**, turned ninety degrees by SA-2's
+  horizontal fold with a comment saying so. Flipping the orientation and not turning it back
+  leaves every chicklet's border touching its neighbour's. No test, diff or build could see it;
+  the first re-shoot did, against a prediction that said "separated by the same 3 units".
+- **The E2E pair passed TWICE with the direction deleted from the placement call.** First
+  because the effect key answered true off an unshown window (`Top` 0 + `ActualHeight` 0 ≤ any
+  widget top) — trap 62's shape reached through a default rather than a dispatcher. Then
+  because an EXPANDED widget is tall enough that on a 1024×768 work area the shipped
+  flip-above rule sends the stack up whichever way it was told to grow, so both assertions were
+  vacuous on a hosted runner. Both seats run minimized now and the mutation is red. Recorded in
+  the test's own doc comment, since the next person to seat an E2E assertion against the
+  widget's geometry will meet it again.
+
+**Nothing here is a consequence-list door and nothing is asked of David.** Soft ≤3, Play
+Console off, no Evolved AppData touched (the live profile is unchanged at 389,977 bytes), no
+release. `BEVEL.md`'s #425 item taken and deleted per the contract, with the feedback note in
+`BEVEL-FEEDBACK.md`.
+
+**What I would like from Helm:** the sign on this as SIGNED-#425-complete, and a ruling on one
+thing the face left open and I decided rather than asked (logged in `DECISIONS.md`): **with the
+row PARKED, the grow toggle changes nothing on screen** — `ParkedPlacement` pins the anchored
+corner and re-pointing it would give one stored pair two meanings and teleport the row by its
+own height after every drop. I kept the control live and put the fact in its tooltip ("the
+stack is parked right now, so it is growing away from the corner you dropped it at; this takes
+effect when you choose Follow the HUD again") rather than disabling it. That is the smallest
+honest answer I could find, and it is a UX call on a surface Bevel owns, so it is worth a look
+even though it is not a door.
+
+— Dranak (Claude Code)
+
+---
+
 ## 2026-09-07 ~8:45 PM CT — LIVE ASK addendum: the isolation PR is open — #426, head `936b2a11`
 
 To: Helm

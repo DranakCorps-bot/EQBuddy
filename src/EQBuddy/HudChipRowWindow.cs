@@ -110,11 +110,18 @@ internal sealed class HudChipRowWindow : Window
         ToolTip = "Drag anywhere on this row to place it. Right-click the widget → "
             + "Edit HUD… → Follow the HUD again brings it back.";
 
-        // One row. A WrapPanel and not a horizontal StackPanel: a stack measures with
-        // INFINITE width in the stacking direction, so a fifth chicklet would be clipped at
-        // the panel's edge with no ellipsis and no overflow — correct, and not on screen
-        // (trap 25, which shipped the Progress window's fourth tab invisible).
-        _panel = new WrapPanel { Orientation = Orientation.Horizontal };
+        // ONE COLUMN (#425, owner lock). The chicklets stack VERTICALLY — which is the shape
+        // v1's two timer floats had, and the shape the owner asked for back. Nothing about an
+        // individual chicklet's face changes: HudChip.Build draws one icon + name + clock row
+        // whatever the container's orientation is, so this is the whole of the visual change.
+        //
+        // A WrapPanel and not a vertical StackPanel, for the reason it was not a horizontal
+        // one either: a stack measures with INFINITE extent in the stacking direction, so the
+        // chicklet that overflows is clipped at the panel's edge with no ellipsis and no
+        // overflow — correct, and not on screen (trap 25, which shipped the Progress window's
+        // fourth tab invisible). The cap is HudChipRow.WrapHeight now instead of WrapWidth;
+        // see Park.
+        _panel = new WrapPanel { Orientation = Orientation.Vertical };
         Content = _panel;
         ChipScale.Apply(this, main.Settings.ChipScale);
         WindowZoom.Route(this, () => main.Settings.ChipScale, main.SetChipScale);
@@ -247,10 +254,14 @@ internal sealed class HudChipRowWindow : Window
 
         if (Mode == HudChipRow.HudParkMode.Parked) { ParkAtAnchor(); return; }
 
-        // The row may not run off the monitor the widget is on. MaxWidth makes the
-        // WrapPanel wrap instead of growing a window wider than the screen; the arithmetic
-        // for WHERE it goes is HudChipRow.Placement's, tested without a window.
+        // The row may not run off the monitor the widget is on. The stack is VERTICAL, so
+        // MaxHeight is the cap that makes the WrapPanel wrap into a second column instead of
+        // growing a window taller than the screen; MaxWidth stays as the guard on the other
+        // axis, because a stack that HAS wrapped is as wide as its columns and nothing else
+        // would stop it. The arithmetic for WHERE it goes is HudChipRow.Placement's, tested
+        // without a window.
         var area = SystemParameters.WorkArea;
+        MaxHeight = HudChipRow.WrapHeight(area.Height);
         MaxWidth = HudChipRow.WrapWidth(area.Width);
         UpdateLayout();
         // THE UNDER-BAR PANEL IS SLAVED TO THE SAME EDGE (OE-1), so the row parks below it
@@ -262,12 +273,58 @@ internal sealed class HudChipRowWindow : Window
         // **A PARKED panel is no longer under the bar, so it no longer occupies that space**
         // — asking the bar for a height the panel is not standing in would leave a gap the
         // player can see and cannot explain.
+        //
+        // **AND IT IS THE SEAM THE GROW TOGGLE HAD TO CLOSE** (#425 §3). Growing UP measures
+        // from the widget's own top, where the panel is not standing — but the up branch
+        // FALLS BACK to `below` when the monitor has no room above, and there the panel is
+        // back in the way. Handing `occupied` to Placement either way is what makes one
+        // arithmetic answer both, rather than a second sum that would be right until someone
+        // edited one of them (trap 4).
         var occupied = _main.ActualHeight + _main._hudExpandBar.SlavedOccupiedHeight;
         var (left, top) = HudChipRow.Placement(
-            _main.Left, _main.Top, occupied, ActualHeight, area.Top, area.Bottom);
+            _main.Left, _main.Top, occupied, ActualHeight, area.Top, area.Bottom,
+            growUp: GrowUp);
         if (Left != left) Left = left;
         if (Top != top) Top = top;
     }
+
+    /// <summary>Which way the stack grows away from the widget (#425) — the profile's
+    /// <c>HudChipRowGrowUp</c>, read every tick rather than cached, because Edit HUD writes it
+    /// while this window is up.</summary>
+    public bool GrowUp => _main.Settings.HudChipRowGrowUp;
+
+    /// <summary>The <c>hudChipGrow</c> dump fact — the SETTING reaching the window.
+    /// <see cref="AboveTheWidget"/> is its effect half (trap 42).</summary>
+    public string GrowKey => HudChipRow.GrowKey(GrowUp);
+
+    /// <summary>
+    /// The EFFECT: is the stack actually sitting above the widget right now? Read off the two
+    /// windows rather than recomputed, so "grow up is in the profile" and "the stack is above
+    /// the HUD" are two claims and not one (trap 42) — and expressed as a RELATIONSHIP
+    /// between two windows rather than as a coordinate, because a hosted runner is
+    /// 1024×768 and a test that demands a position is asserting the desk it was written on.
+    ///
+    /// **False whenever the row is parked**: a parked row is not placed relative to the widget
+    /// at all.
+    ///
+    /// **AND FALSE UNTIL THE WINDOW HAS BEEN MEASURED AND PLACED, WHICH IS THE HALF A
+    /// PROVE-FAIL CAUGHT.** An unshown window answers <c>Top</c> 0 and <c>ActualHeight</c> 0,
+    /// and <c>0 + 0 &lt;= 320</c> is TRUE — so a poll that ran on any early tick would have
+    /// been satisfied by a window that had not been anywhere yet, and the E2E assertion passed
+    /// with the direction deleted from the placement call. That is trap 62's shape (a guard
+    /// asking the right question one moment too early) reached through a default rather than
+    /// through a dispatcher, and the fix is the same one: name the moment the answer is true
+    /// AT. A row that is not on screen, or has no height, has no side of the widget to be on.
+    /// </summary>
+    public bool AboveTheWidget =>
+        !IsParked && IsVisible && ActualHeight > 0 && Top + ActualHeight <= _main.Top;
+
+    /// <summary>Edit HUD's grow toggle — the ONE writer of <c>HudChipRowGrowUp</c>, shipping
+    /// in the same change as its reader (the <c>DeadSettingTests</c> posture: three
+    /// player-facing bugs came from data that survived a move and a write path that did
+    /// not).</summary>
+    public void ToggleGrow() =>
+        _main.Settings.HudChipRowGrowUp = !_main.Settings.HudChipRowGrowUp;
 
     /// <summary>
     /// Screen-ABSOLUTE placement at the player's corner (OE-8 §2.3). The widget is not
@@ -278,12 +335,23 @@ internal sealed class HudChipRowWindow : Window
     /// The wrap cap and the clamp read THE PARKED POINT'S OWN MONITOR (the plan's named
     /// implement check), not <c>SystemParameters.WorkArea</c>'s primary — a row parked on a
     /// second display would otherwise be yanked back the first time a chicklet arrived.
+    ///
+    /// **THE GROW TOGGLE (#425) DOES NOT REACH HERE, AND THE SIGNED TIP SAYS SO** ("OE-8 park
+    /// orthogonal"). A parked row already has a growth direction and it is the park's own:
+    /// the pair pins the anchored corner and the stack runs away from it, which is this
+    /// method's whole doc above. Making the toggle re-point that corner would give one stored
+    /// pair two meanings — the drag end records the window's top-left, so a bottom-anchored
+    /// reading of it would teleport the row by its own height after every drop (trap 4, with
+    /// the two sources being one number read two ways). The toggle governs the SLAVED
+    /// placement; <c>HudEditChip.Grow</c>'s tooltip says which, because a control that
+    /// silently does nothing is the defect this project calls a silent no-op.
     /// </summary>
     private void ParkAtAnchor()
     {
         var anchorLeft = _main.Settings.HudRowParkLeft;
         var anchorTop = _main.Settings.HudRowParkTop;
         var area = ScreenGuard.WorkAreaAt(this, anchorLeft, anchorTop);
+        MaxHeight = HudChipRow.WrapHeight(area.Height);
         MaxWidth = HudChipRow.WrapWidth(area.Width);
         UpdateLayout();
         var (left, top) = HudChipRow.ParkedPlacement(
@@ -333,7 +401,7 @@ internal sealed class HudChipRowWindow : Window
             var family = order[i];
             _panel.Children.Add(HudEditChip.Build(family,
                 muted: HudChipRow.IsMuted(_main.Settings, family),
-                canLeft: i > 0, canRight: i < order.Count - 1,
+                canUp: i > 0, canDown: i < order.Count - 1,
                 onNudge: delta => Apply(() => HudChipRow.SetOrder(
                     _main.Settings, HudChipRow.Nudge(HudChipRow.ResolveOrder(_main.Settings), family, delta))),
                 onMute: () => Apply(() => HudChipRow.SetMuted(
@@ -352,6 +420,12 @@ internal sealed class HudChipRowWindow : Window
         _panel.Children.Add(HudEditChip.Unpark(
             IsParked || _main._hudExpandBar.IsParked,
             () => Apply(() => { Unpark(); _main._hudExpandBar.Unpark(); })));
+        // "Stack grows: Up/Down" (#425) — here rather than in Options → Alerts & chips, and
+        // for the reason SettingsAlertsView already gives for the two grow-up tick boxes that
+        // LEFT Options when SA-2 shipped: this is a live verb on the row's own shape, the
+        // same kind of thing as "Follow the HUD again" beside it, not a durable preference
+        // about sound or timing. One editor answers every "what did I do to my row" question.
+        _panel.Children.Add(HudEditChip.Grow(GrowUp, IsParked, () => Apply(ToggleGrow)));
         _panel.Children.Add(HudEditChip.Hint());
     }
 

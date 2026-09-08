@@ -237,4 +237,88 @@ public sealed class HudChipRowTests
         app.WaitForDump("hudChipsSpawn", 0, "no spawn chip to exist on this profile");
         app.WaitForDump("hudChipsMez", 0, "and no mez chip either");
     }
+
+    // ---- THE GROW DIRECTION (#425), and both halves of trap 42 ----
+    //
+    // `HudChipRowTests` in EQBuddy.Tests proves the arithmetic with no window. These two
+    // prove the setting reaches the SCREEN — which is the claim that has cost this project
+    // two builds to learn is separate.
+    //
+    // **Neither one asserts a POSITION.** `hudRowAbove` is a RELATIONSHIP between two
+    // windows (the stack's bottom edge against the widget's top), so it holds on a 1024×768
+    // hosted runner and on David's desk alike. The widget is seeded at a Top with room above
+    // it on the smallest monitor this ever runs on, because "grow up" legitimately falls
+    // back to below when the top of the screen is in the way and a test that did not seed
+    // the widget would be asserting where the widget happened to restore to.
+
+    /// <summary>A Top with room above it AND below it on the smallest monitor this ever runs
+    /// on. Only the TOP is seeded: the horizontal seat is the harness's own (it prefers a
+    /// secondary display, deliberately) and a direction has nothing to do with it.</summary>
+    private const double SeatTop = 320;
+
+    /// <summary>
+    /// **BOTH SEATS RUN MINIMIZED, AND THAT IS THE ASSERTION WORKING RATHER THAN A
+    /// CONVENIENCE.** The EXPANDED widget is several hundred units tall, so on a 1024×768
+    /// hosted runner "under the widget" does not fit under the work area at all and the
+    /// shipped flip-above rule sends the stack up whichever way it was told to grow — which
+    /// makes `hudRowAbove` the same on both sides of the toggle and the pair of tests below
+    /// vacuous. A prove-fail found exactly that: with the direction deleted from the placement
+    /// call, both still passed. The mini bar is short enough that the two directions land on
+    /// two different sides of the widget on every desk this runs on, and the row is on screen
+    /// while minimized anyway (<see cref="TheRowIsOnScreenWhileTheWidgetIsMinimizedToo"/>).
+    /// </summary>
+    private static void Seat(EQBuddy.Core.AppSettings settings)
+    {
+        settings.TrackSpawns = true;
+        settings.Minimized = true;
+        settings.WindowTop = SeatTop;
+    }
+
+    /// <summary>
+    /// **DOWN IS AN UNTOUCHED PROFILE, and that is the whole safety argument for flipping
+    /// every existing player's row to a column** — so it gets the first assertion rather
+    /// than being assumed by the one below.
+    ///
+    /// THE PREDICTION, written before it ran (trap 23): with one seeded timer the row is up,
+    /// `hudChipGrow=down`, and `hudRowAbove=0` — the stack is under the widget, where it has
+    /// always been.
+    /// </summary>
+    [Fact]
+    public void AnUntouchedProfileGrowsTheStackDownwardUnderTheWidget()
+    {
+        using var app = new AppHarness(Seat);
+        app.SeedSpawnTimers(("Runnyeye Citadel", "Kizdean Gix", 60, 1800));
+        app.Launch();
+
+        app.WaitForDump("hudChipsRow", 1, "the chip row to be on screen while a timer runs");
+        app.WaitForDump("hudChipGrow", "down", "an untouched profile to grow the stack down");
+        app.WaitForDump("hudRowAbove", 0, "the stack to sit under the widget, as it always has");
+    }
+
+    /// <summary>
+    /// The owner's toggle, reaching the screen: the stack moves to the other side of the
+    /// widget and grows away from it.
+    ///
+    /// THE PREDICTION: `hudChipGrow=up` AND `hudRowAbove=1`, read off ONE dump line and
+    /// therefore one moment (trap 56). Two keys, because "the direction is in the profile"
+    /// and "the stack is above the HUD" are different claims — the setting alone would pass
+    /// against a build that stored the bool and never handed it to the placement, which is
+    /// trap 42's exact failure and the reason the effect key exists at all.
+    /// </summary>
+    [Fact]
+    public void GrowUpPutsTheStackOnTheOtherSideOfTheWidget()
+    {
+        using var app = new AppHarness(settings =>
+        {
+            Seat(settings);
+            settings.HudChipRowGrowUp = true;
+        });
+        app.SeedSpawnTimers(("Runnyeye Citadel", "Kizdean Gix", 60, 1800));
+        app.Launch();
+
+        app.WaitForDump("hudChipsRow", 1, "the chip row to be on screen while a timer runs");
+        app.WaitForDump("hudChipGrow", "up", "the profile's direction to be the one the row read");
+        app.WaitForDump("hudRowAbove", 1,
+            "the stack to actually be above the widget, not merely to have the setting");
+    }
 }

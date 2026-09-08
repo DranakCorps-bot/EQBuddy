@@ -93,6 +93,33 @@ public sealed class AppSettings
     public List<string> MutedChipFamilies { get; set; } = [];
 
     /// <summary>
+    /// WHICH WAY THE HUD CHIP STACK GROWS AWAY FROM THE WIDGET — down (the default, and
+    /// today's app) or up. The owner's #425 ask, beside the vertical stack it only means
+    /// anything with: a column that always ran downward is a column with one direction.
+    ///
+    /// **ONE bool for the whole row, not one per family.** v1 had two — <c>SpawnChipsGrowUp</c>
+    /// and <c>MezChipsGrowUp</c> — because it had two independently-placed stacks to grow away
+    /// from each other (#95). SA-2 folded those into ONE row, so a second direction would have
+    /// nothing to be second to; reviving the pair would be reviving the architecture the fold
+    /// was signed to end.
+    ///
+    /// **<c>false</c> is today's app, so an untouched profile is unchanged** and there is no
+    /// migration for trap 55's class of bug to chew.
+    ///
+    /// **It is the SLAVED direction.** A parked row (<see cref="HudRowParkLeft"/>) grows away
+    /// from the corner the player dropped it at, which is the park's own rule and is
+    /// deliberately orthogonal to this one — the signed #425 tip says so in as many words.
+    /// <c>HudChipRow.Placement</c> is the one reader.
+    ///
+    /// **Never described to a player as a bare "grow down".** <c>HudExpandWindow.Reveal</c>
+    /// owns an unrelated, owner-locked "grow down" (the peek panel's reveal animation), and
+    /// one word for two controls is one control in a player's head.
+    /// <c>HudChipRow.GrowLabel</c> is the only copy that names this, and it always says
+    /// "Stack grows…".
+    /// </summary>
+    public bool HudChipRowGrowUp { get; set; }
+
+    /// <summary>
     /// WHERE THE PLAYER PARKED THE HUD CHIP ROW (OE-8 free placement) — the anchored corner
     /// it reopens at, in the same DIP space as <see cref="WindowLeft"/>.
     ///
