@@ -1,3 +1,17 @@
+## 2026-09-08 ~5:54 PM CT — PR #456 prose-to-hover Pass 1 (SIGNED; MERGED `c930222c`; Pass 2 AUTHORIZED)
+
+- **When / who:** 2026-09-08 ~5:25 PM CT last-look (webhook LIVE ASK) → Soft merged #456 `c930222c` ~5:49 PM CT after rebase onto `7731bcb1` (#454). This land is the channel SSC Soft was blocked on (`helm/ssc-456` was missing — Soft correctly did not invent SSC text).
+- **Thread / subject:** PR #456 https://github.com/DranakCorps-bot/EQBuddy/pull/456 — Soft Opus Pass 1 of prose→ⓘ (Bevel faces, Helm chat SIGN). Five HUD-block explanations moved verbatim onto ⓘ (click+hover via `ToolTipPolicy` / DesignSystem icon-button). `options-cards` height 420×392 vs 420×439. `SettingsProsePolicy` (>20 words = explanation; hover duration derived from ShowDurationMs). Prove-fails + exemption rows.
+- **Ruling:** **SIGNED** (retrospective channel land). Already on main. Soft merge this SSC when `build-and-test` + `e2e-windows` green. `HELM-FEEDBACK.md` already empty — KEEP empty (no LIVE ASK tip to drop). Live Holds empty. Play Console OFF. **Not needs-david.** Evolved profile restore **needs-david STANDS** (already paged — not re-paged).
+- **Asks answered:**
+  1. Pass 1 last-look / merge-when-green — **SIGNED.** Spot-checked: five HUD moves; policy arithmetic; prove-fail shape; no duplicate body+hint.
+  2. Body exemptions `PromotedStatsNote` + `GlancePetNote` — **SIGNED / KEEP in body.** They answer "where did my switch GO" for scanners; no control of their own to hover. Pass 2 must not silently tip them. Short recent-rate line KEEP too.
+  3. Pass 2 remaining Settings tabs (Look · Alerts & chips · Watch rules · Behavior) — **AUTHORIZED** Soft Opus re-kick after this land (already LIVE as `opus-prose-tooltips-pass2` / DRA-23). Flag orphan-control judgements in LIVE ASK. Do **not** invent a Bevel seat from this ruling.
+  4. Turquoise re-shot — **ACK / KEEP** (height is the reviewable number).
+- **Posture / Soft max ≤3:** (1) soft merge this SSC when both CI green. (2) Soft Pass 2 Opus already kicked — finish → LIVE ASK → wake Helm. (3) Soft LEAVE invent beyond Pass 1/2. Soft LEAVE P1b from this land. Do **not** invent TEL / Version / `v1.99.19` / Play Console / tag / publish / signing / prod secrets / Evolved settings restore / WhatsNew for tip-only Settings prose.
+- **Claude kick via Dranak:** Soft: **merge `helm/ssc-456` when both CI green.** Soft: Pass 2 continue (KEEP exemptions). Soft LEAVE invent beyond Pass 2. Soft LEAVE Bevel seat. No Play Console / tag / publish / signing / prod secrets / Evolved settings restore.
+- **Scope hygiene:** Not a hold. Not needs-david. Live Holds empty. Play Console OFF. Soft blocker "no helm/ssc-456" **discharged** by this PR.
+
 ## 2026-09-08 ~5:15 PM CT — PR #454 guided-progression P1a (SIGNED; SIGNED-#445-P1a-complete; merge-when-green)
 
 - **When / who:** 2026-09-08 ~5:15 PM CT — Helm last-look (webhook: HELM-FEEDBACK.md LIVE ASK: guided-progression P1a BUILT, PR #454). Tip product `c37c8928` / channel `e727289e` on `claude/opus-guide-p1a-20260908` off `main` `17709d39` (#452). Ahead 2 / behind 0. MERGEABLE; at look `build-and-test` + `e2e-windows` IN PROGRESS.
