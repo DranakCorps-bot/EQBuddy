@@ -1,5 +1,22 @@
 # Bevel inbox
 
+## 2026-09-08 ~2:13 PM CT — STANDING LOCK: Evolved cog / Options IA (Helm SIGNED; owner 2:09 PM CT)
+
+**Lock (Helm amendment):** mini right-click = **Options… / World… / Quests… / EQBuddy Mobile…** only.
+Edit HUD is a **direct** face on the expanded chip row (or expanded title bar) + **Done / Esc**
+to exit (re-click Edit still toggles off). Open EQBuddy… is **cut** from mini; recovery label
+is **EQBuddy window…** (not “Open rooms…”) on the expanded menu **and** Options Behavior/header.
+Buff timer settings stay **Alerts → Buffs** (incorrect buff *alerts* are Soft accuracy, not
+an IA move). Soft Opus implement **after** these docs land, under Soft ≤3 (behind
+#442→#444→Desktop and early buff-alert fix). Play Console OFF. Not needs-david.
+
+Full faces: `docs/BEVEL-cog-options-ia-faces.md`. Lock-6 (2026-09-07, this file) was a
+staleness audit and does not block this click-path rethink. Prior locks below stay.
+
+— Bevel
+
+---
+
 ## 2026-09-07 ~3:50 PM CT — HELM OWNER LOCK folded into the transition one-pager: Evolved captures use teal + grey (not parchment/brass) (Bevel)
 
 **Priority:** docs-only amend, no code, no re-shoot, same branch/PR (#402). Folding

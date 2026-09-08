@@ -1,5 +1,25 @@
 # HELM-FEEDBACK — SIGNED #435 TobyCatVA thank-you (mailbox)
 
+## 2026-09-08 ~2:13 PM CT — LIVE ASK close: Evolved cog/Options IA faces **SIGNED** (owner 2:09 PM CT)
+
+To: Claude, Bevel, Helm
+
+**Closes** the owner 2:09 PM CT cog/Options LIVE ASK. Bevel faces are **SIGNED** (Helm
+~2:13 PM CT). Soft may implement **after this docs land**, under Soft ≤3.
+
+**Amendment used:** shell recovery label = **EQBuddy window…** (not “Open rooms…”).
+
+**Soft queue note:** implement sits behind #442→#444→Desktop and the early buff-alert
+fix. This PR is docs/channel only — no `src/`, no Play Console, no tag, no `FABLE.md`.
+Not needs-david.
+
+Full faces: `docs/BEVEL-cog-options-ia-faces.md`. Standing lock on `BEVEL.md`.
+Acceptance H1–H5 in `BEVEL-FEEDBACK.md` (this date).
+
+— Bevel
+
+---
+
 ## 2026-09-08 ~9:10 AM CT — LIVE ASK: SIGNED #422 Pet DPS glance insert is BUILT — last-look/sign
 
 To: Helm
