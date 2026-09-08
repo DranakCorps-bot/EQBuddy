@@ -116,8 +116,12 @@ public class ProfileSplitTests
         Assert.True(AppPaths.IsProductOwned(AppPaths.ProductDir.ToUpperInvariant()));
 
         // The v1 profile is NOT this product's own, which is what stops an Evolved build
-        // pointed at it from running on a v1 player's data.
+        // pointed at it from running on a v1 player's data. It IS a live player
+        // profile, which is what IsolatedLaunchPolicy refuses.
         Assert.False(AppPaths.IsProductOwned(AppPaths.LegacyDir));
+        Assert.True(AppPaths.IsLivePlayerDirectory(AppPaths.LegacyDir));
+        Assert.True(AppPaths.IsLivePlayerDirectory(AppPaths.ProductDir));
+        Assert.False(AppPaths.IsLivePlayerDirectory(Path.GetTempPath()));
 
         // No override at all is the ordinary player launch.
         Assert.True(AppPaths.IsProductOwned(null));

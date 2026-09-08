@@ -126,17 +126,38 @@ public static class AppPaths
     public static bool IsProductOwned(string? overrideDir)
     {
         if (overrideDir is not { Length: > 0 }) return true;
+        return SameDirectory(overrideDir, ProductDir);
+    }
+
+    /// <summary>
+    /// Is this directory one of the two live player profiles on this machine —
+    /// Evolved (<see cref="ProductDir"/>) or v1 (<see cref="LegacyDir"/>)?
+    ///
+    /// Automated launches (E2E, <c>shoot.ps1</c>, drag-verify) refuse both. An
+    /// empty or unusable path is not a live profile: never throw from a path
+    /// question that gates a write.
+    /// </summary>
+    public static bool IsLivePlayerDirectory(string? path) =>
+        SameDirectory(path, ProductDir) || SameDirectory(path, LegacyDir);
+
+    /// <summary>Two spellings of one directory — trailing separator, case,
+    /// relative segments — are the same directory. The comparison
+    /// <see cref="IsProductOwned"/> already made, extracted so the live-profile
+    /// refuse cannot drift from it (trap 4).</summary>
+    public static bool SameDirectory(string? a, string? b)
+    {
+        if (a is not { Length: > 0 } || b is not { Length: > 0 }) return false;
         try
         {
             return string.Equals(
-                Path.TrimEndingDirectorySeparator(Path.GetFullPath(overrideDir)),
-                Path.TrimEndingDirectorySeparator(Path.GetFullPath(ProductDir)),
+                Path.TrimEndingDirectorySeparator(Path.GetFullPath(a)),
+                Path.TrimEndingDirectorySeparator(Path.GetFullPath(b)),
                 StringComparison.OrdinalIgnoreCase);
         }
         catch (Exception)
         {
-            // An unusable path is not a product profile. Never throw from a path question
-            // that gates a copy.
+            // An unusable path is not a match. Never throw from a path question
+            // that gates a copy or a refuse.
             return false;
         }
     }

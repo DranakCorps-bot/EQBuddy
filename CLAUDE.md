@@ -418,6 +418,11 @@ Use the **question tool**, not a paragraph in a long message.
   inherited variable is not a decision (trap 68). The single door is
   `EQBUDDY_ALLOW_LIVE_APPDATA=1`, exactly that string. A run through it
   fails `TestProfileIsolationTests` by design.
+  **The child-process half is `UI.Shared/IsolatedLaunchPolicy`** (E2E,
+  `shoot.ps1`, drag-verify) — a host that is isolated can still launch
+  `EQBuddy.exe` against a live profile (trap 69). EQBuddy lab
+  experiment, not a Corps-wide standard. Audit:
+  `docs/ops/live-state-isolation-audit.md`.
 - **Curated catalogs are never auto-written** (spawn timers, AAs, CC
   lists). The weekly wiki refresh only *flags* them. A wrong respawn timer
   is worse than none.
@@ -505,6 +510,7 @@ they live on `legacy-v1`.)
 | Which class the log looks like | `Core/ClassInference.cs` |
 | Tail the file | `Core/LogWatcher.cs` — 150 ms polls, offset-based |
 | Settings + profile paths | `Core/AppSettings.cs`, `Core/AppPaths.cs` (`EQBUDDY_APPDATA`) |
+| Automated launch vs live profile | `UI.Shared/IsolatedLaunchPolicy.cs` + `scripts/isolated-profile.ps1` — pin the child last, refuse both live lines. Audit: `docs/ops/live-state-isolation-audit.md` |
 | Zone map geometry, aliases | `Core/ZoneMap.cs` |
 | Spawn points / timers | `Core/SpawnPointLedger.cs`, `Core/SpawnTimers.cs` |
 | Wiki lookups + contribution packs | `Core/EqlWikiMobs.cs`, `Core/WikiContribution.cs` |
@@ -744,6 +750,12 @@ after the named guard left with its surface.
     value it was built to override.** Redirect is unconditional; door is
     `EQBUDDY_ALLOW_LIVE_APPDATA=1`. Guard: `TestProfileIsolationTests`
     asserts the ENVIRONMENT. [Novel](docs/ops/claude-archive/traps.md#trap-68)
+69. **A host redirect does not cover a child `ProcessStartInfo`.** Pin
+    `EQBUDDY_APPDATA` AFTER the caller dictionary; refuse both live
+    lines. Guard: `UI.Shared/IsolatedLaunchPolicy` /
+    `IsolatedLaunchPolicyTests`. EQBuddy lab experiment, not a
+    Corps-wide standard. Audit:
+    `docs/ops/live-state-isolation-audit.md`. [Novel](docs/ops/claude-archive/traps.md#trap-69)
 
 New trap discovered the hard way? Add the compact rule here and the novel
 under `docs/ops/claude-archive/traps.md`. That is the whole point.

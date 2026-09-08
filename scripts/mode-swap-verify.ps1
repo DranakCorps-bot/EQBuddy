@@ -11,6 +11,7 @@
 # sees (the bar's width IS its chips), and walked the window 230px right. The harness
 # found it in one run; thirteen green unit tests could not have (trap 49's lesson).
 $ErrorActionPreference = 'Stop'
+. (Join-Path $PSScriptRoot 'isolated-profile.ps1')
 $repo = 'C:\Users\david\source\EQBuddy'
 $exe = Join-Path $repo 'src/EQBuddy/bin/Release/net10.0-windows/EQBuddy.exe'
 
@@ -58,6 +59,7 @@ function ButtonFromRight($winEl, [int]$n) {
 
 $psi = New-Object Diagnostics.ProcessStartInfo $exe
 $psi.UseShellExecute = $false
+Assert-EqIsolatedProfile $profileDir.FullName 'mode-swap-verify.ps1'
 $psi.EnvironmentVariables['EQBUDDY_APPDATA'] = $profileDir.FullName
 $psi.EnvironmentVariables['EQBUDDY_OPAQUE'] = '1'
 # The Evolved shell comes up with it, on the same second display, for the same reason

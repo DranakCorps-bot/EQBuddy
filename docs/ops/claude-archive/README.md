@@ -29,7 +29,7 @@ ratchet; truth outranks brevity.
 | File | What it is |
 |---|---|
 | [claude-2026-09-08.md](claude-2026-09-08.md) | Byte-exact pre-split `CLAUDE.md` (171,685 bytes). Reversible. |
-| [traps.md](traps.md) | Traps 1–68 with `### Trap N` anchors for live links. |
+| [traps.md](traps.md) | Traps 1–69 with `### Trap N` anchors for live links. |
 | [operating-history.md](operating-history.md) | Scribe two-machines, stale-hold examples, question-tool closing-paragraph novel, illustration-lock debt. |
 
 ## How to archive the next novel

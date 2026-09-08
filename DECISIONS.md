@@ -1,3 +1,12 @@
+## 2026-09-08 (E′ live-state isolation audit — EQBuddy lab, child-process refuse)
+
+- **This is an EQBuddy lab verification, not a Corps-wide standard** · the default it could have gone the other way on is writing the operating-model proposal into this tree · lab only, because David (2026-09-08) placed enhancements as *proposed* on the control-plane and *implemented + verified* here. Formal proposal is a separate control-plane PR. Evidence first; graduate later.
+- **E2E / shoot / drag get a refuse with NO opt-in, unlike the unit suite's `EQBUDDY_ALLOW_LIVE_APPDATA=1` door** · the default it could have gone the other way on is copying #428's exact-`"1"` opt-out onto the child · none, because an automated seat that "needs" a live profile is the accident Helm authorized this follow-up to close, and a second door would be trap 68 one process out. Product launches (`install-local.ps1 -Evolved`, `Launch-Evolved-Shell.cmd`) do not call `IsolatedLaunchPolicy`; they remain the owner's Evolved driver.
+- **`AppHarness` pins `EQBUDDY_APPDATA` AFTER the caller dictionary, rather than before** · before was the existing order and "a scenario still wins" is how `EQBUDDY_SHELL` is documented · after for the profile key only, because that is the hole: one caller key pointed the real exe at a player tree while every host isolation test stayed green (trap 69).
+- **`shoot.ps1` relaunch strips harness overrides via `UseShellExecute=false` rather than `Start-Process $path`** · the comment said inheriting the process env was how the restored app found the real profile · strip, because an inherited Evolved export is not the product default — it is the launcher's override, and it would send a stood-down v1 widget to the Evolved directory. `AppPaths` picks the product directory once the vars are gone.
+- **No `WhatsNew.json` entry** · nothing a player can run changed.
+- **David's live profiles were not restored or written.** Consequence-list #8 stands.
+
 ## 2026-09-08 (C′ + Context — local verify ladder, flake ledger, CLAUDE live/archive)
 
 - **CLAUDE.md is the live pointer set; novels move under `docs/ops/claude-archive/`** · the default it could have gone the other way on is leaving the 171 KB always-loaded file intact, or cutting it to an arbitrary word count · split, because Helm/David/ChatGPT aligned that the tax is the novels a guard already replaced, not the contracts. Pre-split file kept byte-exact as `docs/ops/claude-archive/claude-2026-09-08.md` so the move is reversible. No word-count ratchet.
