@@ -181,7 +181,12 @@ public class BuffTrackerTests
 
     /// <summary>PROVE 2 — Spell Casting Reinforcement rank 1 (+5%, the owner's real rank
     /// from his own AA export; there is no SCR-max and no invented per-rank number)
-    /// reaches the spell now that the landing resolves. 900 → 945.</summary>
+    /// reaches the spell now that the landing resolves, and it is spent exactly once.
+    ///
+    /// The length it is spent ON is the RANKED one: 1,350 s for Shield of Thorns V, not the
+    /// 900 s the wiki page carries for the folded line. That correction is
+    /// <see cref="ThornsVArmsAtTheDurationTheOwnerMeasured"/> below; this test's job is that
+    /// rank 1 and only rank 1 is applied to whatever length is picked.</summary>
     [Fact]
     public void ScrRankOneReachesThornsOnceItResolves()
     {
@@ -190,8 +195,95 @@ public class BuffTrackerTests
         t.Apply(Ev(3, "You are surrounded by a thorny barrier."));
 
         var b = Assert.Single(t.Snapshot(T0.AddSeconds(4)));
-        Assert.Equal(900 * 1.05 - 1, b.RemainingSeconds(T0.AddSeconds(4))!.Value, 0);
-        Assert.True(b.Estimated);   // the wiki base, scaled — still not the real number
+        Assert.Equal(BuffDurationModel.WithReinforcement(1350, 1) - 1,
+            b.RemainingSeconds(T0.AddSeconds(4))!.Value, 0);
+        // Rank 4's number would be 2,025 s — nine and a half minutes longer. He has rank 1.
+        Assert.NotEqual(BuffDurationModel.WithReinforcement(1350, 4) - 1,
+            b.RemainingSeconds(T0.AddSeconds(4))!.Value, 0);
+        Assert.True(b.Estimated);   // a shipped length, scaled — still not HIS measured number
+    }
+
+    // ---- The early alert: the owner's measured lengths (2026-09-08) ------------------
+    //
+    // Level 50 Druid, Spell Casting Reinforcement rank 1 of 4, stopwatch on his own client:
+    // Shield of Thorns V runs 23:36 and Chloroplast V runs 21:00. Every buff surface arms off
+    // BuffState.ExpiresAt — the HUD's expiring chicklet, the Buffs card's warn tint,
+    // expiring-only mode — so these two assertions are where "the alert fires several minutes
+    // early" lives, and there is one producer to fix.
+    //
+    // PROVE-FAIL: against the folded wiki bases these read 942 s and 1,008 s, so the first
+    // fails by 7:54 and the second by 4:12.
+
+    /// <summary>Shield of Thorns V: 1,350 s base × SCR 1 → 1,416 s = 23:36, as measured.</summary>
+    [Fact]
+    public void ThornsVArmsAtTheDurationTheOwnerMeasured()
+    {
+        var t = new BuffTracker { ReinforcementRank = () => 1 };
+        t.Apply(Ev(0, "You begin casting Shield of Thorns V."));
+        t.Apply(Ev(3, "You are surrounded by a thorny barrier."));
+
+        var b = Assert.Single(t.Snapshot(T0.AddSeconds(4)));
+        Assert.Equal(T0.AddSeconds(3), b.LandedAt);
+        Assert.Equal(1416, (b.ExpiresAt!.Value - b.LandedAt).TotalSeconds, 0);
+        Assert.Equal("Shield of Thorns V", b.Spell);   // the rank is kept, not folded away
+        Assert.Equal("Shield of Thorns", b.Label);     // …while identity still folds
+    }
+
+    /// <summary>Chloroplast V: 1,200 s base × SCR 1 → 1,260 s = 21:00, as measured. A second
+    /// spell because one row proves a lookup and two prove there is no formula hiding in it —
+    /// these sit at +50% and +25% over their wiki bases, so nothing derives both.</summary>
+    [Fact]
+    public void ChloroplastVArmsAtTheDurationTheOwnerMeasured()
+    {
+        var t = new BuffTracker { ReinforcementRank = () => 1 };
+        t.Apply(Ev(0, "You begin casting Chloroplast V."));
+        t.Apply(Ev(3, "You begin to regenerate."));
+
+        var b = Assert.Single(t.Snapshot(T0.AddSeconds(4)));
+        Assert.Equal(1260, (b.ExpiresAt!.Value - b.LandedAt).TotalSeconds, 0);
+        Assert.Equal("Chloroplast V", b.Spell);
+    }
+
+    /// <summary>A rank nobody has measured borrows nothing: Shield of Thorns II falls back to
+    /// the wiki base for the line, which is the honest floor it has always been. Handing it
+    /// rank V's 1,350 s would be the same conflation in the other direction.</summary>
+    [Fact]
+    public void AnUnmeasuredRankFallsBackToTheWikiBase()
+    {
+        var t = new BuffTracker { ReinforcementRank = () => 1 };
+        t.Apply(Ev(0, "You begin casting Shield of Thorns II."));
+        t.Apply(Ev(3, "You are surrounded by a thorny barrier."));
+
+        var b = Assert.Single(t.Snapshot(T0.AddSeconds(4)));
+        Assert.Equal(BuffDurationModel.WithReinforcement(900, 1),
+            (b.ExpiresAt!.Value - b.LandedAt).TotalSeconds, 0);
+    }
+
+    /// <summary>Someone ELSE casting Shield of Thorns V on you still gets the ranked length —
+    /// the rank is on their cast line — but not your SCR, because their AAs are invisible to
+    /// your log. 1,350 s flat.</summary>
+    [Fact]
+    public void AnotherCastersRankedThornsGetsTheLengthButNotYourAas()
+    {
+        var t = new BuffTracker { ReinforcementRank = () => 1 };
+        t.Apply(Ev(0, "Sanctari begins casting Shield of Thorns V."));
+        t.Apply(Ev(3, "You are surrounded by a thorny barrier."));
+
+        var b = Assert.Single(t.Snapshot(T0.AddSeconds(4)));
+        Assert.Equal(1350, (b.ExpiresAt!.Value - b.LandedAt).TotalSeconds, 0);
+    }
+
+    /// <summary>An UNRESOLVED landing — a clicky, a caster out of range — names no rank, so
+    /// there is nothing to look up and the candidate set's longest wiki base stands. The
+    /// ledger is reached through the cast line or not at all.</summary>
+    [Fact]
+    public void AnUnresolvedThornsLandingNeverReachesTheRankedLedger()
+    {
+        var b = Assert.Single(Replay(Ev(0, "You are surrounded by a thorny barrier."))
+            .Snapshot(T0.AddSeconds(1)));
+
+        Assert.Equal("", b.Spell);
+        Assert.Equal(900, (b.ExpiresAt!.Value - b.LandedAt).TotalSeconds, 0);
     }
 
     /// <summary>
@@ -209,7 +301,10 @@ public class BuffTrackerTests
         t.Apply(Ev(3 + 1468, "The brambles fall away."));
 
         var learned = Assert.Single(t.LearnedDurations);
-        Assert.Equal("Shield of Thorns", learned.Key);
+        // Keyed on the RANK he cast, not the folded line: ranks lengthen buffs, so a duration
+        // measured at V is not IV's, and one key for both is the conflation that put a
+        // 15-minute countdown on a 23-minute shield in the first place.
+        Assert.Equal("Shield of Thorns V", learned.Key);
         Assert.Equal(1464, learned.Value, 0);
 
         // And the next landing opens on the learned number rather than the wiki base —
@@ -219,5 +314,57 @@ public class BuffTrackerTests
         var b = Assert.Single(t.Snapshot(T0.AddSeconds(2004)));
         Assert.Equal(1464 - 1, b.RemainingSeconds(T0.AddSeconds(2004))!.Value, 0);
         Assert.False(b.Estimated);
+    }
+
+    /// <summary>
+    /// A rank UPGRADE does not inherit the old rank's measured length. Learn Shield of Thorns
+    /// IV at 1,200 s, scribe V, and the countdown moves to V's — the ledger's, since nothing
+    /// has timed V on this character yet.
+    ///
+    /// Without the ranked key this is the early alert coming back by the other door: the day
+    /// he upgrades a rank, his own store hands the new spell the old spell's number.
+    /// </summary>
+    [Fact]
+    public void LearningARankDoesNotSetTheLengthOfADifferentRank()
+    {
+        var t = new BuffTracker { ReinforcementRank = () => 1 };
+        t.Apply(Ev(0, "You begin casting Shield of Thorns IV."));
+        t.Apply(Ev(3, "You are surrounded by a thorny barrier."));
+        t.Apply(Ev(3 + 1200, "The brambles fall away."));
+        Assert.Equal("Shield of Thorns IV", Assert.Single(t.LearnedDurations).Key);
+
+        t.Apply(Ev(2000, "You begin casting Shield of Thorns V."));
+        t.Apply(Ev(2003, "You are surrounded by a thorny barrier."));
+        var b = Assert.Single(t.Snapshot(T0.AddSeconds(2004)));
+        Assert.Equal(1416, (b.ExpiresAt!.Value - b.LandedAt).TotalSeconds, 0);
+        Assert.NotEqual(1200, (b.ExpiresAt.Value - b.LandedAt).TotalSeconds, 0);
+    }
+
+    /// <summary>
+    /// A duration learned BEFORE ranks were keyed is still honoured. The store is install-wide
+    /// and survives upgrades, so dropping the folded key would silently throw away a real
+    /// measurement off the player's own log in order to fix a rarer one — and this
+    /// character's own timing outranks any length we ship, whichever key it arrived under.
+    /// </summary>
+    [Fact]
+    public void ALegacyFoldedLearnedDurationStillWins()
+    {
+        var dir = Path.Combine(Path.GetTempPath(), "eqb-buff-" + Guid.NewGuid().ToString("N"));
+        var store = Path.Combine(dir, "buffs.json");
+        Directory.CreateDirectory(dir);
+        try
+        {
+            // Exactly what a pre-rank store looks like: the folded line name.
+            File.WriteAllText(store, "{\"Shield of Thorns\":1500}");
+            var t = new BuffTracker { ReinforcementRank = () => 1 };
+            t.AttachStore(store);
+            t.Apply(Ev(0, "You begin casting Shield of Thorns V."));
+            t.Apply(Ev(3, "You are surrounded by a thorny barrier."));
+
+            var b = Assert.Single(t.Snapshot(T0.AddSeconds(4)));
+            Assert.Equal(1500, (b.ExpiresAt!.Value - b.LandedAt).TotalSeconds, 0);
+            Assert.False(b.Estimated);   // his log measured it, whatever the key
+        }
+        finally { Directory.Delete(dir, recursive: true); }
     }
 }

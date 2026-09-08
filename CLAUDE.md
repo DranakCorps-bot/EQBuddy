@@ -765,6 +765,17 @@ after the named guard left with its surface.
     `scripts/release-seat.ps1 -ForceStale` recovers a dead holder.
     Store is gitignored `.claude/soft-seats/`. Evidence before
     graduation. [Novel](docs/ops/claude-archive/traps.md#trap-70)
+71. **A fold that is right for IDENTITY is not automatically right for a
+    QUANTITY the fold decides.** `BaseName` folds ranks — correct for "which
+    buff is up", wrong for "how long", so rank V got rank I's wiki duration
+    and every alert armed off `BuffState.ExpiresAt` fired ~8 min early.
+    Ranked lengths are MEASURED, per exact ranked name
+    (`Core/Data/RankedBuffDurations.json`) — never derived from a rank
+    formula or a mote multiplier; every row re-derives its own observation
+    (`RankedBuffDurationTests`). SCR is spent ONCE, on the ranked length,
+    floored to a server tick (`BuffDurationModel`). **A surface that degrades
+    gracefully must be asserted on what it SAYS** — an expired chip lingers at
+    0:00, so presence passes on the broken code. [Novel](docs/ops/claude-archive/traps.md#trap-71)
 
 New trap discovered the hard way? Add the compact rule here and the novel
 under `docs/ops/claude-archive/traps.md`. That is the whole point.

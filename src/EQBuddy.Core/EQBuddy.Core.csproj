@@ -34,6 +34,7 @@
     <EmbeddedResource Include="Data\RegenSpells.json" />
     <EmbeddedResource Include="Data\SlowSpells.json" />
     <EmbeddedResource Include="Data\BuffDurations.json" />
+    <EmbeddedResource Include="Data\RankedBuffDurations.json" />
     <EmbeddedResource Include="Data\RaidTargets.json" />
     <EmbeddedResource Include="Data\QuestCatalog.json" />
     <EmbeddedResource Include="Data\EpicQuestChecklist.json" />
