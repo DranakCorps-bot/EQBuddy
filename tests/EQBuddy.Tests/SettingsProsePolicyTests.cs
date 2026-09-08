@@ -1,4 +1,3 @@
-using System.Text;
 using EQBuddy.UI.Shared;
 using Xunit;
 
@@ -229,41 +228,20 @@ public class SettingsProsePolicyTests
     /// project does not reference the WPF assembly (docs/TestPlan.md §5), and measuring the
     /// IDENTIFIER instead of the sentence would be a word count of nothing.
     ///
-    /// It walks the literal rather than matching to the first <c>;</c>, because two of these
-    /// paragraphs contain a semicolon INSIDE the string — a regex that stopped there would
-    /// silently measure half a sentence and pass.
+    /// **The scanner itself moved to <see cref="SettingsProseSource"/> in Pass 2**, which
+    /// needed the same answer about three more files. A second copy of it would be two
+    /// producers of one fact whose disagreement nobody would ever see (trap 4). Its floor —
+    /// the escaped quote and the semicolon INSIDE a literal, both of which live in the
+    /// paragraphs this file measures — went with it.
     /// </summary>
-    private static string Prose(string name)
-    {
-        var src = Block;
-        var at = src.IndexOf("const string " + name, StringComparison.Ordinal);
-        Assert.True(at >= 0,
-            $"SettingsHudView.cs no longer declares a const named {name}. If it was renamed, "
-            + "point this file at the new name rather than deleting the row — a row that "
-            + "cannot find its sentence is the only way this guard goes quiet.");
-
-        var text = new StringBuilder();
-        for (var i = src.IndexOf('=', at) + 1; i < src.Length; i++)
-        {
-            if (src[i] == ';') break;
-            if (src[i] != '"') continue;
-            for (i++; i < src.Length && src[i] != '"'; i++)
-            {
-                if (src[i] != '\\') { text.Append(src[i]); continue; }
-                i++;
-                text.Append(src[i] switch { 'n' => '\n', 't' => '\t', var c => c });
-            }
-        }
-        return text.ToString();
-    }
+    private static string Prose(string name) => SettingsProseSource.Prose(Block, name);
 
     /// <summary>
-    /// **The reader's own floor.** Every measurement above is only as good as this scanner,
-    /// and a scanner that returned "" would make every `FitsOneHover` pass and every
-    /// `BelongsOnHover` fail with a message about copy rather than about itself. So it is
-    /// checked against sentences that are asserted verbatim elsewhere (`SettingsHudBlockTests`
-    /// pins them against the vocabulary ban), including the one carrying an escaped quote and
-    /// the one carrying a semicolon.
+    /// **Both halves of what Pass 1 moved really are what a player sees**, checked against
+    /// the sentences `SettingsHudBlockTests` pins against the vocabulary ban. Not the
+    /// reader's floor any more — that is
+    /// <see cref="SettingsProseSourceTests.TheReaderReallyReadsTheSentence"/> — but the
+    /// claim that THIS file is still pointed at the right sentences after the move.
     /// </summary>
     [Fact]
     public void TheSourceReaderReallyReadsTheSentence()

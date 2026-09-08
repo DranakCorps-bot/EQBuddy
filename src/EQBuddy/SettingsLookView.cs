@@ -43,6 +43,16 @@ namespace EQBuddy;
 /// on (<see cref="ThemeCatalog"/>). Bevel flagged the collision before anyone could run a
 /// mechanical rewrite over it (BEVEL.md I-11 §5), and the exemption is written down in
 /// <c>ShellTerminologyTests.Exempt</c> where the next reader will find it.
+///
+/// **The prose-to-hover pass reached this tab in Pass 2** (Bevel's faces, Helm-signed
+/// 2026-09-08; <see cref="SettingsProsePolicy"/> is the arithmetic). Exactly ONE paragraph
+/// moved — <see cref="GridOverlayBlurb"/>, onto an ⓘ beside its tick box — and that small
+/// number is the finding rather than a shortfall: this tab is mostly sliders with a caption
+/// each, which is the shape the whole pass is trying to produce everywhere else. The three
+/// short lines that stayed ("Only the dark panel fades", "Fades everything, text included",
+/// and the closing "Size also scales all text") are all under the ceiling, and the cursor
+/// ring's is eighteen words — one of the negatives that stops "convert the prose" turning
+/// into "hide the prose".
 /// </summary>
 internal sealed class SettingsLookView
 {
@@ -99,7 +109,23 @@ internal sealed class SettingsLookView
         ? ""
         : $"lookPalettes={_themeCombo.Items.Count} " +
           $"lookCustomShown={(_customColors.Visibility == Visibility.Visible ? 1 : 0)} " +
-          $"lookSwatches={_customColors.Children.Count}";
+          $"lookSwatches={_customColors.Children.Count} " +
+          // Since the prose pass this tab's grid-overlay explanation exists ONLY behind an ⓘ,
+          // so an ⓘ that failed to build is a paragraph that has left the product with
+          // nothing in a diff, a build or a screenshot to say so. Counted off BUILT buttons
+          // rather than off a list of them, which is the difference between a fact and a
+          // restatement of the source (traps 34/39).
+          $"lookHints={_hints}";
+
+    /// <summary>The grid overlay's explanation — the ONE paragraph on this tab the prose pass
+    /// moved, hanging on the ⓘ beside the tick box rather than printed under it. A const
+    /// rather than a literal at the call site for the same reason the HUD block's are:
+    /// `SettingsProsePass2Tests` measures the SENTENCE against
+    /// <see cref="SettingsProsePolicy"/>, and it can only do that if the sentence has a
+    /// name. Not one word of it was rewritten.</summary>
+    private const string GridOverlayBlurb =
+        "A faint click-through grid over the whole desk — line up your game windows, then "
+        + "toggle it off here or in the right-click menu. Stronger lines every fourth square.";
 
     private ComboBox _themeCombo = null!;
     private StackPanel _customColors = null!;
@@ -201,14 +227,11 @@ internal sealed class SettingsLookView
 
         // ---- the alignment grid ----
 
+        // The margin is the ROW's, not the box's — see DesignSystem.HintRow.
         _gridOverlayCheck = Check("▦ Grid overlay for aligning your game UI",
-            _main.Settings.ShowGridOverlay, new Thickness(0, 10, 0, 0),
+            _main.Settings.ShowGridOverlay, new Thickness(0),
             () => { if (Ready) _main.SetGridOverlay(_gridOverlayCheck.IsChecked == true); });
-        panel.Children.Add(_gridOverlayCheck);
-        panel.Children.Add(Dim(
-            "A faint click-through grid over the whole desk — line up your game windows, then "
-            + "toggle it off here or in the right-click menu. Stronger lines every fourth square.",
-            new Thickness(20, 2, 0, 0)));
+        panel.Children.Add(HintRow(_gridOverlayCheck, GridOverlayBlurb, new Thickness(0, 10, 0, 0)));
 
         _gridSpacingLabel = AccentValue("32 px");
         panel.Children.Add(LabelledValue("Grid spacing", _gridSpacingLabel, new Thickness(20, 4, 0, 0)));
@@ -355,6 +378,27 @@ internal sealed class SettingsLookView
         Text = text, Style = (Style)_resource("Dim"),
         TextWrapping = TextWrapping.Wrap, Margin = margin,
     };
+
+    /// <summary>A control and the explanation that used to be printed under it, now on an ⓘ
+    /// beside it. The row is <see cref="DesignSystem.HintRow"/> so this block, the HUD
+    /// block's and the other two Pass 2 blocks' cannot come to different ideas about how it
+    /// wraps (trap 25).</summary>
+    private UIElement HintRow(FrameworkElement control, string prose, Thickness margin) =>
+        DesignSystem.HintRow(control, Hint(prose), margin);
+
+    /// <summary>The ⓘ itself, and the only place this block counts one — see
+    /// <see cref="DebugFacts"/>, which reports what was BUILT rather than how many the
+    /// source names.</summary>
+    private Button Hint(string prose)
+    {
+        var hint = DesignSystem.InfoHint(prose);
+        hint.Margin = new Thickness(DesignTokens.SpaceXs, 0, 0, 0);
+        _hints++;
+        return hint;
+    }
+
+    /// <summary>How many ⓘ affordances this instance has built.</summary>
+    private int _hints;
 
     private static TextBlock AccentValue(string text)
     {

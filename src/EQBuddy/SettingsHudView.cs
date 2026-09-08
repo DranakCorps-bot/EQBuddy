@@ -669,37 +669,22 @@ internal sealed class SettingsHudView
     /// <summary>
     /// A heading and the paragraph that used to sit under it, now on an ⓘ beside it.
     ///
-    /// **A WrapPanel, not a horizontal StackPanel** (trap 25): both children have
-    /// content-driven widths, and a horizontal stack measures with infinite width in its
-    /// stacking direction — so at this window's 390-unit minimum a long label would push the
-    /// ⓘ past the edge with no ellipsis and no error, which is precisely how the Progress
-    /// window once shipped three visible tabs out of four. Wrapping puts it on the next line
-    /// instead, where it is still there to hover.
+    /// The row itself is <see cref="DesignSystem.HintRow"/> — Pass 2 lifted the WrapPanel
+    /// (trap 25) out of here so the three blocks it converted could not build a second,
+    /// slightly different one. What stays here is the only part that is this block's: which
+    /// TextBlock the heading is.
     /// </summary>
     private UIElement HeadingHint(string heading, string prose, Thickness margin) =>
         HeadingRow(heading, Hint(prose), margin);
 
     /// <summary>Same, for a hint the surface holds a reference to and re-points later.</summary>
-    private UIElement HeadingRow(string heading, Button hint, Thickness margin)
-    {
-        var row = new WrapPanel { Margin = margin };
-        var head = Heading(heading, new Thickness(0));
-        head.VerticalAlignment = VerticalAlignment.Center;
-        row.Children.Add(head);
-        row.Children.Add(hint);
-        return row;
-    }
+    private UIElement HeadingRow(string heading, Button hint, Thickness margin) =>
+        DesignSystem.HintRow(Heading(heading, new Thickness(0)), hint, margin);
 
     /// <summary>A control and its explanation, in the same shape — see
     /// <see cref="HeadingHint"/> for why this wraps.</summary>
-    private UIElement HintRow(FrameworkElement control, string prose, Thickness margin)
-    {
-        var row = new WrapPanel { Margin = margin };
-        control.VerticalAlignment = VerticalAlignment.Center;
-        row.Children.Add(control);
-        row.Children.Add(Hint(prose));
-        return row;
-    }
+    private UIElement HintRow(FrameworkElement control, string prose, Thickness margin) =>
+        DesignSystem.HintRow(control, Hint(prose), margin);
 
     /// <summary>The ⓘ itself, and the only place this block counts one — see
     /// <see cref="DebugFacts"/>, which reports what was BUILT rather than how many the

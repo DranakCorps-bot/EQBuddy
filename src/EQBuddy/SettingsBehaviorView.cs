@@ -43,6 +43,40 @@ namespace EQBuddy;
 /// own name now. <see cref="AltTabPolicy.TaskbarWarning"/> was reworded at its source in
 /// UI.Shared for the same reason — a shared const this block prints is a string the block shows,
 /// wherever it is declared.
+///
+/// **The prose-to-hover pass reached this block in Pass 2** (Bevel's faces, Helm-signed
+/// 2026-09-08; <see cref="SettingsProsePolicy"/> is the arithmetic). This is the heaviest tab
+/// in Settings and it lost the most: EIGHT explanations moved onto an ⓘ beside the thing they
+/// explain — <see cref="HideUnfocusedBlurb"/>, <see cref="KeepAboveBlurb"/>,
+/// <see cref="HotkeysBlurb"/>, <see cref="RegenOverrideBlurb"/>,
+/// <see cref="AutoEmptyBlurb"/>, <see cref="ArchiveBlurb"/>,
+/// <see cref="PerfReadoutBlurb"/> and <see cref="SetupReadout.BehaviorNote"/>. Not one word
+/// was rewritten; the consts above are the strings that shipped, hanging somewhere else.
+///
+/// **THREE paragraphs deliberately did NOT move, and they are this block's judgement.** Each
+/// is a row with its reason in `SettingsProsePass2Tests` so a later pass cannot "finish the
+/// job" silently:
+///
+/// <list type="number">
+/// <item><b>The Alt+Tab note</b> (<see cref="AltTabPolicy.TaskbarWarning"/>). It is the one
+///   printed sentence in the product that names the tray icon as the way back to a hidden
+///   EQBuddy — a DOOR, and the switch it sits under is the switch that closes the other two.
+///   Behind an ⓘ, a player who ticks the box without hovering has lost the only place they
+///   were told (traps 29/34/59). It is also 21 words, one over the ceiling, and the string
+///   this block actually prints is <c>TaskbarWarning + UnavailableNote</c>, whose length is
+///   decided at RUNTIME by the platform — so the policy cannot answer for it either way.</item>
+/// <item><b>The "hide while the game isn't running" note.</b> Same reason, different door:
+///   "Launch EQBuddy again from the Start menu" appears nowhere else in the product, and it
+///   is the answer to the question that switch creates. Its twin above it DID move, because
+///   alt-tabbing back to the game is automatic rather than a door anybody has to find.</item>
+/// <item><b>EQBuddy Mobile's two lines.</b> The panel's own is the standing record of
+///   CLAUDE.md's carve-out — the title-bar 📱 button is a second door, and the comment above
+///   <see cref="BuildSecondScreen"/> has always said the line names it on purpose. The sounds
+///   switch's helper is <see cref="MobileAlertSounds.HelperText"/>, which exists to say the
+///   DEFAULT out loud so nobody has to flip a switch to discover it; hiding it behind a hover
+///   is that reason with the answer removed. It reaches the ceiling only because the block
+///   prints it joined to <see cref="MobileAlertSounds.ScopeNote"/> — twelve words and eleven.</item>
+/// </list>
 /// </summary>
 internal sealed class SettingsBehaviorView
 {
@@ -105,7 +139,86 @@ internal sealed class SettingsBehaviorView
           // to open Setup" and "the row is on screen" are different claims, and only the
           // second one is the feature (trap 42). It is the one row of this block a host may
           // legitimately not have, so it is also the one worth reporting.
-          $"behaviorSetup={(_setupBtn is null ? 0 : 1)}";
+          $"behaviorSetup={(_setupBtn is null ? 0 : 1)} " +
+          // Since the prose pass eight of this block's explanations exist ONLY behind an ⓘ,
+          // so an ⓘ that failed to build is a paragraph that has left the product with
+          // nothing in a diff, a build or a screenshot to say so. Counted off BUILT buttons
+          // rather than off a list of the eight (traps 34/39) — and it MOVES with
+          // `behaviorSetup`, because Setup's own note is one of the eight and a host without
+          // the row does not build its ⓘ either.
+          $"behaviorHints={_hints}";
+
+    // -------------------------------------------------- the paragraphs on an ⓘ ----
+    //
+    // Pass 2 of the prose-to-hover conversion (Bevel's faces, Helm-signed 2026-09-08;
+    // SettingsProsePolicy is the arithmetic). These are the sentences that used to be
+    // PRINTED under their control and are now the content of the ⓘ beside it — consts
+    // rather than literals at the call site so `SettingsProsePass2Tests` can measure the
+    // SENTENCE rather than an identifier. Not one word of any of them was rewritten.
+    //
+    // `SetupReadout.BehaviorNote` is the fifth and lives in UI.Shared, so it has no const
+    // here; it hangs on `_setupBtn`.
+
+    /// <summary>What alt-tabbing away does with the switch on. Hangs on
+    /// <c>_hideUnfocused</c> — and it is the pair to the note under the NEXT box, which
+    /// stayed in the body because it names a door (see the class comment).</summary>
+    private const string HideUnfocusedBlurb =
+        "Alt-tab to a browser and EQBuddy — with its chips and every window it has open — "
+        + "gets out of the way; alt-tab back to the game and everything returns. This one "
+        + "always shows EQBuddy when the game isn't running — the next box covers that.";
+
+    /// <summary>Why the re-lift exists and when to turn it off. Hangs on
+    /// <c>_keepAbove</c>.</summary>
+    private const string KeepAboveBlurb =
+        "Overlay apps created after EQBuddy land above it in Windows' always-on-top pile, "
+        + "hiding it; this quietly re-lifts every EQBuddy window every few seconds. Untick "
+        + "if your screen-capture setup shows EQBuddy twice (a real copy plus the captured "
+        + "one).";
+
+    /// <summary>What binding a global key costs, and how to bind one. Hangs on the "Global
+    /// hotkeys" HEADING — the rows underneath are built and rebuilt by
+    /// <see cref="BuildHotkeyRows"/>, so the heading is the one anchor in this section that
+    /// survives a rebuild.</summary>
+    private const string HotkeysBlurb =
+        "Nothing is bound until you bind it. A bound key is claimed system-wide while "
+        + "EQBuddy runs — it will stop reaching the game and every other app — so pick "
+        + "combos nothing else uses (Ctrl+Alt+… is usually safe). Click a box, press your "
+        + "keys; ✕ unbinds.";
+
+    /// <summary>Why the regen number is a guess and how to correct it. Hangs on the ROW,
+    /// which is the whole "Regen heals about [ ] hp per tick" sentence.</summary>
+    private const string RegenOverrideBlurb =
+        "Hymn of Restoration and similar regen ticks never log an amount, so their healing "
+        + "is estimated. The wiki knows the unamplified base (Hymn: 9), but instruments and "
+        + "ranks raise the real number — read yours off the heal text over your head and "
+        + "type it here. Your number wins.";
+
+    /// <summary>Who should turn auto-empty off. Hangs on <c>_truncate</c>.</summary>
+    private const string AutoEmptyBlurb =
+        "Turn off if you use GINA/GamParse or upload your log files elsewhere — they will "
+        + "grow forever, so clean them up yourself occasionally. (Cleanup already stands "
+        + "down whenever the game, GINA, or GamParse is running.)";
+
+    /// <summary>What an archive is and what EQBuddy will never do to it. Hangs on
+    /// <c>_archive</c>.
+    ///
+    /// ONE paragraph, not two. The window declared this explanation twice — the second copy
+    /// was a strict subset of the first and rendered directly under it, which is a
+    /// duplication a diff shows and a screenshot shows better. Carrying it into a block that
+    /// serves two hosts would have shipped it twice in two places.</summary>
+    private const string ArchiveBlurb =
+        "On by default: each finished session is saved as "
+        + "eqlog_name_server_YYYYMMDDHHMMSS.txt — the stamp is when the session ended — and "
+        + "Reset session splits the log here rather than letting it run on. Archives are "
+        + "yours to keep or clean up; EQBuddy never deletes them. Untick if you would rather "
+        + "have the disk space back.";
+
+    /// <summary>What the title-bar readout is and why it exists. Hangs on
+    /// <c>_perfStats</c>.</summary>
+    private const string PerfReadoutBlurb =
+        "A small dim readout (\"0.3% · 84 MB\") refreshed every few seconds — CPU is the "
+        + "share of ALL cores. Diagnostic honesty: if EQBuddy ever hogs your machine, this "
+        + "is how you catch it and tell us.";
 
     private CheckBox _mobileSounds = null!, _hideUnfocused = null!, _hideNotRunning = null!;
     private CheckBox _hideAltTab = null!, _keepAbove = null!;
@@ -135,19 +248,14 @@ internal sealed class SettingsBehaviorView
         if (_openSetup is not null) panel.Children.Add(BuildSetupReopen());
 
         _perfStats = Check("Show EQBuddy's own CPU & memory in the title bar",
-            _main.Settings.ShowPerfStats, new Thickness(0, 10, 0, 0),
+            _main.Settings.ShowPerfStats, new Thickness(0),
             () =>
             {
                 if (!Ready) return;
                 _main.Settings.ShowPerfStats = _perfStats.IsChecked == true;
                 _main.Settings.Save();
             });
-        panel.Children.Add(_perfStats);
-        panel.Children.Add(Dim(
-            "A small dim readout (\"0.3% · 84 MB\") refreshed every few seconds — CPU is the "
-            + "share of ALL cores. Diagnostic honesty: if EQBuddy ever hogs your machine, this "
-            + "is how you catch it and tell us.",
-            new Thickness(20, 2, 0, 0)));
+        panel.Children.Add(HintRow(_perfStats, PerfReadoutBlurb, new Thickness(0, 10, 0, 0)));
 
         return panel;
     }
@@ -163,16 +271,16 @@ internal sealed class SettingsBehaviorView
     /// screen it opens cannot come to different ideas about what it is for.</summary>
     private UIElement BuildSetupReopen()
     {
-        var panel = new StackPanel { Margin = new Thickness(0, 10, 0, 0) };
         _setupBtn = new Button
         {
             Content = SetupReadout.BehaviorLabel, Style = (Style)_resource("ActionButton"),
             HorizontalAlignment = HorizontalAlignment.Left,
         };
         _setupBtn.Click += (_, _) => _openSetup?.Invoke();
-        panel.Children.Add(_setupBtn);
-        panel.Children.Add(Dim(SetupReadout.BehaviorNote, new Thickness(0, 2, 0, 0)));
-        return panel;
+        // The prose pass: `BehaviorNote` is what the ⓘ beside the button says, rather than a
+        // paragraph under it. The row IS the panel now — a StackPanel wrapping one row would
+        // be a box that decides nothing (trap 15).
+        return HintRow(_setupBtn, SetupReadout.BehaviorNote, new Thickness(0, 10, 0, 0));
     }
 
     // ============================================================ EQBuddy Mobile ====
@@ -223,12 +331,7 @@ internal sealed class SettingsBehaviorView
         _hideUnfocused = Check("Hide EQBuddy while the game is running but not focused",
             _vm.HideWhenGameUnfocused, new Thickness(0),
             () => { if (Ready) _vm.HideWhenGameUnfocused = _hideUnfocused.IsChecked == true; });
-        panel.Children.Add(_hideUnfocused);
-        panel.Children.Add(Dim(
-            "Alt-tab to a browser and EQBuddy — with its chips and every window it has open — "
-            + "gets out of the way; alt-tab back to the game and everything returns. This one "
-            + "always shows EQBuddy when the game isn't running — the next box covers that.",
-            new Thickness(20, 2, 0, 0)));
+        panel.Children.Add(HintRow(_hideUnfocused, HideUnfocusedBlurb, new Thickness(0)));
 
         _hideNotRunning = Check("Hide EQBuddy while the game isn't running at all",
             _vm.HideWhenGameNotRunning, new Thickness(0, 8, 0, 0),
@@ -260,15 +363,9 @@ internal sealed class SettingsBehaviorView
             new Thickness(20, 2, 0, 0)));
 
         _keepAbove = Check("Keep EQBuddy above fullscreen overlays (Lossless Scaling and kin)",
-            _vm.KeepAboveOverlays, new Thickness(0, 10, 0, 0),
+            _vm.KeepAboveOverlays, new Thickness(0),
             () => { if (Ready) _vm.KeepAboveOverlays = _keepAbove.IsChecked == true; });
-        panel.Children.Add(_keepAbove);
-        panel.Children.Add(Dim(
-            "Overlay apps created after EQBuddy land above it in Windows' always-on-top pile, "
-            + "hiding it; this quietly re-lifts every EQBuddy window every few seconds. Untick "
-            + "if your screen-capture setup shows EQBuddy twice (a real copy plus the captured "
-            + "one).",
-            new Thickness(20, 2, 0, 0)));
+        panel.Children.Add(HintRow(_keepAbove, KeepAboveBlurb, new Thickness(0, 10, 0, 0)));
 
         return panel;
     }
@@ -284,13 +381,8 @@ internal sealed class SettingsBehaviorView
     private UIElement BuildHotkeys()
     {
         var panel = new StackPanel();
-        panel.Children.Add(Heading("Global hotkeys", "TextBrush", new Thickness(0, 14, 0, 0)));
-        panel.Children.Add(Dim(
-            "Nothing is bound until you bind it. A bound key is claimed system-wide while "
-            + "EQBuddy runs — it will stop reaching the game and every other app — so pick "
-            + "combos nothing else uses (Ctrl+Alt+… is usually safe). Click a box, press your "
-            + "keys; ✕ unbinds.",
-            new Thickness(0, 2, 0, 4)));
+        panel.Children.Add(HintRow(Heading("Global hotkeys", "TextBrush"), HotkeysBlurb,
+            new Thickness(0, 14, 0, 4)));
 
         _hotkeysPanel = new StackPanel { Margin = new Thickness(0, 2, 0, 0) };
         panel.Children.Add(_hotkeysPanel);
@@ -425,14 +517,12 @@ internal sealed class SettingsBehaviorView
         };
         row.Children.Add(_regenPerTickBox);
         row.Children.Add(Body("hp per tick (blank = wiki base)"));
-        panel.Children.Add(row);
-
-        panel.Children.Add(Dim(
-            "Hymn of Restoration and similar regen ticks never log an amount, so their healing "
-            + "is estimated. The wiki knows the unamplified base (Hymn: 9), but instruments and "
-            + "ranks raise the real number — read yours off the heal text over your head and "
-            + "type it here. Your number wins.",
-            new Thickness(20, 2, 0, 0)));
+        // The explained thing is the whole SENTENCE-with-a-box, so the ⓘ hangs on the row
+        // rather than on the TextBox: an ⓘ between "about" and "hp per tick" would read as
+        // part of the sentence. The horizontal stack goes INSIDE HintRow's WrapPanel so the
+        // ⓘ wraps to the next line at a narrow width instead of being clipped (trap 25).
+        row.Margin = new Thickness(0);
+        panel.Children.Add(HintRow(row, RegenOverrideBlurb, new Thickness(0, 10, 0, 0)));
         return panel;
     }
 
@@ -443,35 +533,39 @@ internal sealed class SettingsBehaviorView
         var panel = new StackPanel();
 
         _truncate = Check("Auto-empty finished-session logs", _vm.TruncateLogs,
-            new Thickness(0, 12, 0, 0),
+            new Thickness(0),
             () => { if (Ready) _vm.TruncateLogs = _truncate.IsChecked == true; });
-        panel.Children.Add(_truncate);
-        panel.Children.Add(Dim(
-            "Turn off if you use GINA/GamParse or upload your log files elsewhere — they will "
-            + "grow forever, so clean them up yourself occasionally. (Cleanup already stands "
-            + "down whenever the game, GINA, or GamParse is running.)",
-            new Thickness(20, 2, 0, 0)));
+        panel.Children.Add(HintRow(_truncate, AutoEmptyBlurb, new Thickness(0, 12, 0, 0)));
 
         _archive = Check("Keep a timestamped copy before emptying (Logs\\archive)",
-            _vm.ArchiveLogs, new Thickness(20, 6, 0, 0),
+            _vm.ArchiveLogs, new Thickness(0),
             () => { if (Ready) _vm.ArchiveLogs = _archive.IsChecked == true; });
-        panel.Children.Add(_archive);
-        // ONE paragraph, not two. The window declared this explanation twice — the second copy
-        // was a strict subset of the first and rendered directly under it, which is a
-        // duplication a diff shows and a screenshot shows better. Carrying it into a block that
-        // serves two hosts would have shipped it twice in two places.
-        panel.Children.Add(Dim(
-            "On by default: each finished session is saved as "
-            + "eqlog_name_server_YYYYMMDDHHMMSS.txt — the stamp is when the session ended — and "
-            + "Reset session splits the log here rather than letting it run on. Archives are "
-            + "yours to keep or clean up; EQBuddy never deletes them. Untick if you would rather "
-            + "have the disk space back.",
-            new Thickness(40, 2, 0, 0)));
+        panel.Children.Add(HintRow(_archive, ArchiveBlurb, new Thickness(20, 6, 0, 0)));
 
         return panel;
     }
 
     // ================================================================== plumbing ====
+
+    /// <summary>A control (or a heading) and the explanation that used to be printed under
+    /// it, now on an ⓘ beside it. The row is <see cref="DesignSystem.HintRow"/> so the four
+    /// Settings blocks cannot come to different ideas about how it wraps (trap 25).</summary>
+    private UIElement HintRow(FrameworkElement control, string prose, Thickness margin) =>
+        DesignSystem.HintRow(control, Hint(prose), margin);
+
+    /// <summary>The ⓘ itself, and the only place this block counts one — see
+    /// <see cref="DebugFacts"/>, which reports what was BUILT rather than how many the
+    /// source names.</summary>
+    private Button Hint(string prose)
+    {
+        var hint = DesignSystem.InfoHint(prose);
+        hint.Margin = new Thickness(DesignTokens.SpaceXs, 0, 0, 0);
+        _hints++;
+        return hint;
+    }
+
+    /// <summary>How many ⓘ affordances this instance has built.</summary>
+    private int _hints;
 
     private static TextBlock Heading(string text, string brush = "AccentBrush", Thickness margin = default)
     {

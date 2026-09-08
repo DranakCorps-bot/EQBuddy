@@ -44,6 +44,25 @@ namespace EQBuddy;
 /// presence switch: the master left the v1 window instead, and
 /// <c>UI.Shared.WatchPinMigration</c> translates an unticked master into per-rule unpins once
 /// so nobody's HUD changes under them.
+///
+/// **The prose-to-hover pass reached this file in Pass 2** (Bevel's faces, Helm-signed
+/// 2026-09-08). Three explanations moved onto an ⓘ beside their tick box —
+/// <see cref="SlowChipBlurb"/>, <see cref="RaidDetectionBlurb"/> and
+/// <see cref="BuffExpiringOnlyBlurb"/> — with not one word rewritten.
+///
+/// **FOUR paragraphs on these two tabs deliberately did NOT move, and they are the whole
+/// judgement in this pass. Each is a row with its reason in `SettingsProsePass2Tests`, so a
+/// later pass cannot "finish the job" silently.** Two of them fail the policy's OTHER end
+/// rather than its ceiling: the Spawns block's chicklet paragraph and the buff-set
+/// paragraph are both past what <see cref="ToolTipPolicy.ShowDurationMs"/> can be read in
+/// (<see cref="SettingsProsePolicy.FitsOneHover"/>), so hanging either on one ⓘ would close
+/// it mid-sentence with no way to ask for the rest — they need SPLITTING across the controls
+/// they are about, which is a copy decision and therefore Bevel's rather than an executor's.
+/// The other two have no control of their own to hang on, which is Pass 1's
+/// <c>PromotedStatsNote</c> exemption in a new place: the shared header's alert-banner
+/// sentence is about a tile that appears on the DESK while Options is open and has no switch
+/// on this screen at all, and the Watch block opens with an explanation of a rules table
+/// whose only heading belongs to the HOST (the shell room's label IS the tab).
 /// </summary>
 internal sealed class SettingsAlertsView
 {
@@ -69,6 +88,33 @@ internal sealed class SettingsAlertsView
         _resource = resource;
         _owner = owner;
     }
+
+    // ------------------------------------------------- the paragraphs on an ⓘ ----
+    //
+    // Pass 2 of the prose-to-hover conversion (Bevel's faces, Helm-signed 2026-09-08;
+    // SettingsProsePolicy is the arithmetic). These are the sentences that used to be
+    // PRINTED under their control and are now the content of the ⓘ beside it — consts
+    // rather than literals at the call site so `SettingsProsePass2Tests` can measure the
+    // SENTENCE rather than an identifier. Not one word of any of them was rewritten.
+
+    /// <summary>What ticking the slow alert gets you. Hangs on <c>_slowAlert</c>.</summary>
+    private const string SlowChipBlurb =
+        "A 🐌 chip shows the slow's % and its counters; hover it for the cure line. "
+        + "A silent 40% slow quietly doubles a fight.";
+
+    /// <summary>How "Only during raids" knows it is a raid. Hangs on
+    /// <c>_slowRaidOnly</c> — the box whose accuracy the answer decides.</summary>
+    private const string RaidDetectionBlurb =
+        "Raids are detected from raid-channel chat — the log's only raid signal. "
+        + "A raid nobody has typed in for 10 minutes counts as over.";
+
+    /// <summary>Ticked versus unticked, for the buff list. Hangs on
+    /// <c>_buffExpiringOnly</c>.</summary>
+    private const string BuffExpiringOnlyBlurb =
+        "Unticked, your buff list counts down everything that's running. Ticked, it stays "
+        + "quiet (with an honest count) until a buff is inside the warning window — tell me "
+        + "when it matters. Your own casts already include your Spell Casting Reinforcement "
+        + "rank; a buff's first natural fade teaches its exact duration either way.";
 
     // ---------------------------------------------------------------- the strip ----
 
@@ -158,7 +204,14 @@ internal sealed class SettingsAlertsView
           $"alertsBlocks={new[] { _watch, _buffs, _spawns, _crowd }.Count(b => b is not null)} " +
           $"alertsRuleRows={(_watch is null ? 0 : _rulesPanel.Children.Count)} " +
           $"alertsRules={_vm.Rules.Count} " +
-          $"alertsBuffSets={BuffSetBucketCount()}";
+          $"alertsBuffSets={BuffSetBucketCount()} " +
+          // Since the prose pass three of this surface's explanations exist ONLY behind an
+          // ⓘ, so an ⓘ that failed to build is a paragraph that has left the product with
+          // nothing in a diff, a build or a screenshot to say so. Counted off BUILT buttons
+          // rather than off a list of the three (traps 34/39) — and it necessarily moves
+          // with `alertsBlocks`, because two of the three live in blocks a host may not
+          // have composed yet.
+          $"alertsHints={_hints}";
 
     // ================================================================ shared header ====
 
@@ -272,23 +325,17 @@ internal sealed class SettingsAlertsView
         // fixed, undeletable row in the middle of an editor whose whole grammar is "these are
         // yours"; filing it here says what it is: a built-in alert, configured beside the
         // voice that speaks it.
+        // The prose pass: both explanations here hang on the box they explain, and the
+        // margins moved onto the ROWS (DesignSystem.HintRow) so no box sits below its own ⓘ.
         _slowAlert = Check("Slow alert (an attack-speed debuff lands on you)",
-            _main.Settings.SlowAlertEnabled, new Thickness(0, 12, 0, 0), OnSlowAlertToggled);
-        panel.Children.Add(_slowAlert);
-        panel.Children.Add(Dim(
-            "A 🐌 chip shows the slow's % and its counters; hover it for the cure line. "
-            + "A silent 40% slow quietly doubles a fight.",
-            new Thickness(20, 2, 0, 0)));
+            _main.Settings.SlowAlertEnabled, new Thickness(0), OnSlowAlertToggled);
+        panel.Children.Add(HintRow(_slowAlert, SlowChipBlurb, new Thickness(0, 12, 0, 0)));
         _slowSpoken = Check("Speak it when it lands (\"Slowed 40 percent\")",
             _main.Settings.SlowAlertSpoken, new Thickness(20, 6, 0, 0), OnSlowAlertToggled);
         panel.Children.Add(_slowSpoken);
         _slowRaidOnly = Check("Only during raids",
-            _main.Settings.SlowAlertRaidOnly, new Thickness(20, 6, 0, 0), OnSlowAlertToggled);
-        panel.Children.Add(_slowRaidOnly);
-        panel.Children.Add(Dim(
-            "Raids are detected from raid-channel chat — the log's only raid signal. "
-            + "A raid nobody has typed in for 10 minutes counts as over.",
-            new Thickness(40, 2, 0, 0)));
+            _main.Settings.SlowAlertRaidOnly, new Thickness(0), OnSlowAlertToggled);
+        panel.Children.Add(HintRow(_slowRaidOnly, RaidDetectionBlurb, new Thickness(20, 6, 0, 0)));
 
         return panel;
     }
@@ -359,7 +406,10 @@ internal sealed class SettingsAlertsView
             // No top margin: a block owns nothing above its first control. Its host supplies the
             // separation — a heading here, a tab strip in the shell (trap 15).
             _main.Settings.BuffTimersExpiringOnly, new Thickness(0), OnBuffDisplayChanged);
-        panel.Children.Add(_buffExpiringOnly);
+        // The prose pass: the tick box's own explanation is the ⓘ beside it. The warn-window
+        // row below keeps its place — the paragraph is about the SWITCH, and it says "inside
+        // the warning window" about the row it sits above.
+        panel.Children.Add(HintRow(_buffExpiringOnly, BuffExpiringOnlyBlurb, new Thickness(0)));
 
         // Two columns rather than a horizontal StackPanel would be wrong here — this row is
         // three fixed pieces around one 44px box, which is exactly what a stack is for.
@@ -378,13 +428,6 @@ internal sealed class SettingsAlertsView
         warnRow.Children.Add(_buffWarnBox);
         warnRow.Children.Add(Body("seconds left"));
         panel.Children.Add(warnRow);
-
-        panel.Children.Add(Dim(
-            "Unticked, your buff list counts down everything that's running. Ticked, it stays "
-            + "quiet (with an honest count) until a buff is inside the warning window — tell me "
-            + "when it matters. Your own casts already include your Spell Casting Reinforcement "
-            + "rank; a buff's first natural fade teaches its exact duration either way.",
-            new Thickness(20, 2, 0, 0)));
 
         // ---- buff set (#120, Frankthetankk — the missing line's editor) ----
         // Stage 2: the set lives PER CLASS in Settings.BuffSetsByClass (BuffSetStore owns the
@@ -1454,6 +1497,26 @@ internal sealed class SettingsAlertsView
         Text = text, Style = (Style)_resource("Dim"),
         TextWrapping = TextWrapping.Wrap, Margin = margin,
     };
+
+    /// <summary>A control and the explanation that used to be printed under it, now on an ⓘ
+    /// beside it. The row is <see cref="DesignSystem.HintRow"/> so the four Settings blocks
+    /// cannot come to different ideas about how it wraps (trap 25).</summary>
+    private UIElement HintRow(FrameworkElement control, string prose, Thickness margin) =>
+        DesignSystem.HintRow(control, Hint(prose), margin);
+
+    /// <summary>The ⓘ itself, and the only place this view counts one — see
+    /// <see cref="DebugFacts"/>, which reports what was BUILT rather than how many the
+    /// source names.</summary>
+    private Button Hint(string prose)
+    {
+        var hint = DesignSystem.InfoHint(prose);
+        hint.Margin = new Thickness(DesignTokens.SpaceXs, 0, 0, 0);
+        _hints++;
+        return hint;
+    }
+
+    /// <summary>How many ⓘ affordances this instance has built.</summary>
+    private int _hints;
 
     private static TextBlock AccentValue(string text)
     {

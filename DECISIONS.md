@@ -1,3 +1,57 @@
+## 2026-09-08 (prose-to-hover pass 2 — Look · Alerts & chips · Watch rules · Behavior)
+
+Authority: the same Helm chat SIGN of Bevel's prose-to-tooltip faces that Pass 1 ran under,
+and Pass 1 itself (#456, `c930222c`), whose exemptions this pass was told to keep. None of it
+is a consequence-list door: no copy was written, no sentence was reworded, nothing changes what
+leaves the machine. **Twelve paragraphs moved onto an ⓘ; SEVEN deliberately did not**, and the
+seven are the judgement in this pass rather than an appendix to it.
+
+- **Pass 1's two exemptions stand, untouched** · the default, and the obvious move for whoever
+  runs Pass 2, is to "finish the job" on the two longest paragraphs left on the HUD tab · kept
+  printed, because Helm signed them there and the reason has not changed. `SettingsProsePolicy`
+  is unchanged too — this pass spends the rule rather than editing it.
+- **A paragraph past the HOVER BUDGET stays in the body** · the default is that "over the
+  ceiling" means "convert it" · kept, because the policy has an other end: the buff-set
+  paragraph (109 words) and the spawn-chicklet paragraph (118) are past what
+  `ToolTipPolicy.ShowDurationMs` can be read in, so an ⓘ would close mid-sentence with no way
+  to ask for the rest. Both are long because each explains several controls at once, so the
+  fix is to SPLIT them across those controls — which is writing copy, and this pass had no
+  Bevel seat. **Rows asserting `False(FitsOneHover)`, so shortening either one fails the guard
+  and asks for the conversion rather than sitting green.**
+- **A paragraph that names a DOOR stays in the body** · the default is that a control is
+  enough to hang an ⓘ on, and all three of these have one · kept, because trap 59's rule is to
+  enumerate the entrances a player actually has before subtracting one. The Alt+Tab note is
+  the only printed sentence naming the tray icon as the way back to a hidden EQBuddy, and the
+  switch it sits under is the switch that closes the other ways in; "hide while the game isn't
+  running" is the only place "Launch EQBuddy again from the Start menu" appears; EQBuddy
+  Mobile's panel line is the standing record of CLAUDE.md's title-bar carve-out, and the
+  sounds switch's helper exists to say the DEFAULT out loud so nobody has to flip a switch to
+  discover it. **This is a NEW exemption kind that Pass 1 did not have, and it is the one line
+  in this pass most worth a veto.** Its twin DID convert: "hide while not focused" explains a
+  switch whose way back is alt-tabbing to the game, which nobody has to be told.
+- **Two orphan paragraphs are FLAGGED rather than converted** · the default is to hang them on
+  the nearest control and move on · flagged to Helm, because the alert-banner sentence is
+  about a tile that appears on the DESK and has no switch on that screen, and the Watch block's
+  opening paragraph explains a rules table whose only heading belongs to the HOST. The Watch
+  one is the biggest single paragraph the pass leaves behind and it is on the tab most likely
+  to have prompted the ask, so the LIVE ASK names a concrete option (an ⓘ in the guide-toggle
+  row) instead of asking an abstract question.
+- **`DesignSystem.HintRow` is shared and the HUD block was re-pointed at it** · the default is
+  to leave a signed pass alone and copy the private helper · one implementation, because
+  `InfoHint`'s own comment warns that the second copy is where two Settings tabs start
+  disagreeing about how the ⓘ wraps beside a long label (trap 25). Pass 1's call sites are
+  byte-identical, so its assertions are untouched.
+- **`behaviorHints` is compared across hosts as a DIFFERENCE, not an equality** · the default
+  is the equality every other row in that E2E uses · a difference, because Setup's note is one
+  of the eight and only the SHELL draws the Setup row. An equality would have failed on the
+  window and been "fixed" by dropping the assertion.
+- **Six captures RE-SHOT, into the Turquoise lock** · the default is TR-1's "the pre-lock
+  captures wait for a theme pass of their own" · re-shot, for Pass 1's reason: this change
+  makes all six FALSE about the surface. Predictions written before the capture; the recipes
+  carry them, amended in-commit.
+- **Pass 3 was NOT invented** · the default is to carry on into the surfaces the ask did not
+  name · stopped at the four tabs the seat is scoped to.
+
 ## 2026-09-08 (guided-progression P1a — the guide schema core, PR #454)
 
 Authority: `FABLE.md` §2 + §9 P1a (SIGNED #445), `docs/quests/GUIDED-PROGRESSION-LOCKS-2026-09-08.md`.

@@ -274,6 +274,34 @@ internal static class DesignSystem
     {
         if (hint.ToolTip is ToolTip tip) tip.Content = prose;
     }
+
+    /// <summary>
+    /// **The row an <see cref="InfoHint"/> sits in: the thing it explains, then the ⓘ.**
+    /// Pass 1 built this shape privately inside the HUD block; Pass 2 reaches three more
+    /// blocks, and a fourth hand-built copy is exactly what <see cref="InfoHint"/>'s own
+    /// comment warns about — the place two surfaces start disagreeing about alignment and
+    /// wrapping. The HUD block's private helpers now delegate here, so there is ONE
+    /// implementation rather than a Pass 1 shape and a Pass 2 shape.
+    ///
+    /// **A WrapPanel, not a horizontal StackPanel** (trap 25). Both children have
+    /// content-driven widths, and a horizontal stack measures with infinite width in its
+    /// stacking direction — so at Settings' 390-unit minimum a long label pushes the ⓘ past
+    /// the edge with no ellipsis and no error, which is precisely how the Progress window
+    /// once shipped three visible tabs out of four. Wrapping puts it on the next line, where
+    /// it is still there to hover.
+    ///
+    /// **The margin belongs to the ROW, never to the explained control.** A checkbox offset
+    /// ten units down inside the row would sit ten units below its own ⓘ, which is the one
+    /// thing an explanation attached to a control must not look like.
+    /// </summary>
+    public static UIElement HintRow(FrameworkElement explained, Button hint, Thickness margin)
+    {
+        var row = new WrapPanel { Margin = margin };
+        explained.VerticalAlignment = VerticalAlignment.Center;
+        row.Children.Add(explained);
+        row.Children.Add(hint);
+        return row;
+    }
 }
 
 /// <summary>
