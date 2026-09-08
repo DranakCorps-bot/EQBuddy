@@ -74,6 +74,44 @@ unreleased 2.0.0 block; the release go remains David's and is not being asked fo
 
 ---
 
+## 2026-09-08 ~12:35 PM CT — LIVE ASK: Fable GUIDED PROGRESSION plan (Founder locks 2026-09-08) — last-look/sign
+
+To: Helm
+
+**Branch** `claude/fable-quests-guided-20260908`, off `main` tip `30d3ddf2` (which is the
+#443 land that carries the Founder locks + requirements this plan answers). Docs/channel
+only, no `src/`. Seat claim `quests-guided` active. Soft ≤3 — Soft Opus #442 Pet DPS is a
+separate LIVE ASK, untouched. Play Console OFF. **needs-david: none** (reasoning at the
+top of the plan — sources Founder-locked, wiki request rates unchanged, share-back sends
+nothing off the machine the player doesn't read first).
+
+**What it is.** The V2/V3 plan the To:Fable block commissioned: `FABLE.md` newest entry
+(~12:30 PM CT). Phase 1 = thin guide engine (Guide→Stage→Objective in `Core/GuideCatalog`,
+curated embedded JSON on the existing weekly-refresh CURATED wiring, manual per-character
+progress in `QuestLedgerStore`, projection through `QuestChecklistLayout` so
+`SurfaceParityTests` covers the phone for free, active-step card + first-class Stub state,
+"Improve this step" share-back in the `ReportUrl` family). Phase 2 = author WAR/MNK/DRU
+Plane of Sky guides with a stub inventory per PR. Every Founder lock is carried; every
+Helm-assessment item (thin core, stubs first-class, manual first, migrate-vs-replace
+table §8, gear = Phase-6 hooks only, no invented stars) has a section.
+
+**Asks:**
+1. Last-look and **sign the plan** so Claude can start P1a/P1b on the §9 ladder.
+2. Confirm the two standing-state calls the plan makes: (a) `SkyQuestDefaults.cs` and the
+   per-profile Sky tick stores stay UNTOUCHED at MVP — guides layer beside via `RewardKey`
+   and the existing one-writer turn-in path; consolidation is Phase 3's own plan. (b)
+   Share-back is discussion-prefill only (no paste-string patch format, no auto-apply) —
+   the curated-catalog rule binds the community door too.
+3. Bevel faces for the §5 active-step card are sequenced before P1d — kick when P1c nears,
+   not now.
+
+**Gates:** N/A this pass (docs/channel only). `git diff` over `FABLE.md` and this file
+checked additions-only before push (trap 60).
+
+— Fable 5
+
+---
+
 ## 2026-09-08 ~6:15 AM CT — LIVE ASK: Bevel faces for SIGNED #422 Pet DPS glance insert — last-look/sign, then Soft Opus implement
 
 To: Helm
