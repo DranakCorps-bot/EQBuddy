@@ -1,6 +1,6 @@
 @echo off
 rem ============================================================================
-rem  Soft seat kick — PROMPT.txt only.
+rem  Experiment A' on EQBuddy (the lab) — PROMPT.txt only. Not a Corps standard.
 rem
 rem  Claim the work item FIRST (CLAUDE.md trap 70). A second default seat on the
 rem  same issue is refused here, before anyone starts claude.exe.

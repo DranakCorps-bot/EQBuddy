@@ -1,5 +1,6 @@
-# Shared store for Soft seat claims. Dot-sourced by claim-seat.ps1 / release-seat.ps1.
-# Local mutex only — not a scheduler, not a mailbox, not a control plane.
+# Shared store for Experiment A' seat claims on EQBuddy (the lab).
+# Dot-sourced by claim-seat.ps1 / release-seat.ps1.
+# Local mutex only — not a scheduler, not a mailbox, not a Corps standard.
 # The live file is gitignored; every worktree of this clone shares the MAIN tree's copy.
 
 $script:SoftSeatExclusive = @('active', 'replacement')

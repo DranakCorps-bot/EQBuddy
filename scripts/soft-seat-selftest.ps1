@@ -1,10 +1,11 @@
 <#
 .SYNOPSIS
-    Prove the Soft seat claim store: default refuse, explicit modes, stale recovery.
+    Experiment A' on EQBuddy: prove default refuse, explicit modes, stale recovery.
 
 .DESCRIPTION
-    Uses a throwaway -StoreDir. Never touches the machine's live claims.json.
-    Called from scripts/check.ps1 and CI so a broken refuse cannot read as coverage.
+    Lab check, not a Corps-standard suite. Uses a throwaway -StoreDir. Never
+    touches the machine's live claims.json. Called from scripts/check.ps1 and CI
+    so a broken refuse cannot read as coverage.
 
 .EXAMPLE
     pwsh -NoProfile -File scripts/soft-seat-selftest.ps1

@@ -3,9 +3,10 @@
     Release or abandon a Soft seat claim. Recover a dead holder with -ForceStale.
 
 .DESCRIPTION
-    Own-seat release is always allowed. Releasing someone else's claim requires
-    -ForceStale AND (age ≥ -StaleAfterHours, default 8, OR a recorded pid that is
-    no longer running). A missing pid does not count as dead — only age does.
+    Experiment A' on EQBuddy (the lab) — not a Corps standard. Own-seat release
+    is always allowed. Releasing someone else's claim requires -ForceStale AND
+    (age ≥ -StaleAfterHours, default 8, OR a recorded pid that is no longer
+    running). A missing pid does not count as dead — only age does.
 
     Does not write HELM-FEEDBACK.md. Does not touch scheduled_tasks.lock or the
     screen lock. Local store only (see scripts/soft-seat-store.ps1).

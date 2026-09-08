@@ -3,16 +3,18 @@
     Claim a Soft / Claude seat for one work item, or refuse a duplicate default claim.
 
 .DESCRIPTION
-    Operating-model experiment A' (2026-09-08): Soft max ≤3 is a count, not a mutex.
-    This is the smallest mechanical refuse — one JSON store on the machine, shared by
-    every worktree of this clone, gitignored so it cannot become a mailbox rebase war.
+    Experiment A' on EQBuddy (the lab), 2026-09-08 — not a Corps standard.
+    Soft max ≤3 is a count, not a mutex. This is the smallest mechanical refuse
+    so we can measure it: one JSON store on the machine, shared by every worktree
+    of this clone, gitignored so it cannot become a mailbox rebase war.
 
     Default (-Mode active) fails when another live exclusive claim (active or
     replacement) already holds the work item. -Mode challenger|disjoint|replacement
     is the explicit override. Same-seat re-claim is idempotent.
 
     scheduled_tasks.lock and %TEMP%\eqbuddy-screen.lock are NOT Soft seat claims.
-    This file is not a scheduler, not a control plane, and never writes HELM-FEEDBACK.md.
+    Not a scheduler, not a control plane, never writes HELM-FEEDBACK.md.
+    Formal proposal lands in the control-plane repo; this file only verifies.
 
 .EXAMPLE
     pwsh -NoProfile -File scripts/claim-seat.ps1 -WorkItem 428 -SeatId opus-isolation
