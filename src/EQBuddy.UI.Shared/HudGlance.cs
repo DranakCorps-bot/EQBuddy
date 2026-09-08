@@ -22,6 +22,12 @@ public enum HudThird
 /// <param name="RecentHealing">Healing cast in the dominance window (~30 s).</param>
 /// <param name="DamageSinceResume">Damage dealt in the short resume window (~5 s) — the
 /// one that answers "has damage-combat returned".</param>
+/// <param name="PetDps">Your pet's damage per combat second
+/// (<see cref="Core.StatsSnapshot.PetDps"/>), whether or not the slot is showing. One
+/// value, two surfaces — the cell formats the same number compactly (trap 4).</param>
+/// <param name="PetInserted">The player has dragged the pet chip into the always-on row
+/// (<see cref="Core.AppSettings.HudGlancePet"/>). The row's MEMBERSHIP, decided by the
+/// profile and never by this class.</param>
 public readonly record struct HudGlanceInput(
     string? CharacterName,
     double CurrentDps,
@@ -30,22 +36,37 @@ public readonly record struct HudGlanceInput(
     double XpPerHour,
     long RecentDamage,
     long RecentHealing,
-    long DamageSinceResume);
+    long DamageSinceResume,
+    double PetDps = 0,
+    bool PetInserted = false);
 
-/// <summary>The three strings the collapsed HUD draws, and which number slot three
-/// currently is.</summary>
+/// <summary>The strings the collapsed HUD draws, and which number the third slot currently
+/// is.</summary>
 /// <param name="Third">Feed this back in as the next call's <c>current</c>.</param>
 /// <param name="Name">Character name, or "" — the slot keeps its reserved width.</param>
 /// <param name="Dps">Slot two, always DPS.</param>
-/// <param name="ThirdText">Slot three: XP%/hr, or HPS.</param>
-/// <param name="ThirdIcon">The <see cref="IconPaths"/> name slot three wears, so the icon
+/// <param name="ThirdText">The last slot: XP%/hr, or HPS.</param>
+/// <param name="ThirdIcon">The <see cref="IconPaths"/> name that slot wears, so the icon
 /// swaps with the number rather than being decided a second time by the view.</param>
+/// <param name="PetDps">The optional slot BETWEEN <paramref name="Dps"/> and the third
+/// one, or null when the player has not put it there (SIGNED #422). **Null is the whole
+/// membership answer** — the view draws a slot when there is a string and draws nothing
+/// when there is not, rather than asking the settings a second time.</param>
 public sealed record HudGlanceReadout(
-    HudThird Third, string Name, string Dps, string ThirdText, string ThirdIcon);
+    HudThird Third, string Name, string Dps, string ThirdText, string ThirdIcon,
+    string? PetDps = null);
 
 /// <summary>
-/// The collapsed HUD's three numbers — Name · DPS · XP%/hr — and the one swap they make
-/// (Surface A / SA-1; the signed spec is docs/BEVEL-v2-staging-critique.md §3).
+/// The collapsed HUD's always-on numbers — Name · DPS · XP%/hr — and the one swap they
+/// make (Surface A / SA-1; the signed spec is docs/BEVEL-v2-staging-critique.md §3).
+///
+/// **Since SIGNED #422 the row has ONE optional member and no more**: pet DPS, at a fixed
+/// insertion POINT between DPS and the third slot, present exactly while
+/// <see cref="Core.AppSettings.HudGlancePet"/> says so and always-on while it is there.
+/// The owner's 2026-09-07 ~7:36 PM CT lock widens this row's MEMBERSHIP, not its ORDER:
+/// the insertion point does not move when the third slot swaps, so #413's reasoning (a
+/// fixed slot that changes identity mid-session must not be a drop target) is routed
+/// around rather than reopened. There is deliberately no glance-order list.
 ///
 /// **A decision with no window in it**, which is the whole reason it lives here: the WPF
 /// layer has no unit tests (docs/TestPlan.md §5), so a rule expressed in a view is a rule
@@ -83,14 +104,15 @@ public static class HudGlance
     /// ones trim. The exact number only decides how much HUD the name costs.</summary>
     public const double NameReservedWidth = 92;
 
-    /// <summary>Character count of every string <see cref="DpsText"/> and
-    /// <see cref="ThirdText"/> return. Asserted by the tests — it is the invariant that
-    /// makes the swap in slot three free of a measure change, not a decoration.</summary>
+    /// <summary>Character count of every string <see cref="DpsText"/>,
+    /// <see cref="ThirdText"/> and <see cref="PetText"/> return. Asserted by the tests — it
+    /// is the invariant that makes the swap in the third slot free of a measure change, not
+    /// a decoration.</summary>
     public const int MetricFixedLength = 10;
 
-    /// <summary>Width to reserve for each METRIC slot. Both slots get the same one: slot
-    /// three swaps its string on a timer, so a per-string width would be the resize this
-    /// class exists to avoid.</summary>
+    /// <summary>Width to reserve for each METRIC slot. Every metric slot gets the same one:
+    /// the third slot swaps its string on a timer, so a per-string width would be the resize
+    /// this class exists to avoid.</summary>
     public const double MetricReservedWidth = 66;
 
     /// <summary>Slot two's icon — the same vector the DPS cell and the Damage breakout
@@ -102,6 +124,12 @@ public static class HudGlance
     /// <summary>Slot three's icon while it is HPS. It swaps WITH the number: an icon left
     /// behind by a swap is the "tick box that lies" in a smaller costume.</summary>
     public const string HealingIcon = "Heal";
+    /// <summary>The inserted pet slot's icon — the SAME vector its cell, its peek panel and
+    /// the Pet float wear (<c>MiniBarPresentation.Icons["pet"]</c>), because a chip that
+    /// changed shape when it moved rows would read as a different stat. It is also what
+    /// tells two "N dps" slots apart on one row: Swords against Paw, exactly how the third
+    /// slot is told from the second today (Chart against Heal).</summary>
+    public const string PetIcon = "Paw";
 
     /// <summary>Hover text for the name slot, including when it is empty — an empty slot
     /// with no explanation is the silent no-op rule with the switch on the other side.</summary>
@@ -143,6 +171,16 @@ public static class HudGlance
     public static string DpsText(in HudGlanceInput input) =>
         Metric(input.CurrentDps > 0 ? input.CurrentDps : input.SessionDps, "dps");
 
+    /// <summary>The optional slot, in the same fixed shape as the two beside it — so
+    /// inserting it changes the measured width ONCE, on the player's own drop (a
+    /// player-driven resize, which trap 12 permits), and every tick after that repaints in
+    /// place at <see cref="MetricReservedWidth"/>.
+    ///
+    /// It formats <see cref="HudGlanceInput.PetDps"/> and never derives it: the sum lives on
+    /// the snapshot, and the cell down in the tray formats the same number its own way
+    /// (trap 4).</summary>
+    public static string PetText(in HudGlanceInput input) => Metric(input.PetDps, "dps");
+
     /// <summary>Slot three, for whichever number it currently is.</summary>
     public static string ThirdText(HudThird third, in HudGlanceInput input) =>
         third == HudThird.Healing
@@ -157,10 +195,12 @@ public static class HudGlance
     private static string Metric(double value, string unit) =>
         $"{Math.Clamp(value, 0, 999999),6:0} {unit}";
 
-    /// <summary>The whole glance in one call: advance the swap, then format all three
-    /// slots from the SAME input. One moment, one decision — a view that asked for the
-    /// third-slot mode and the third-slot text separately could be handed two
-    /// (trap 4).</summary>
+    /// <summary>The whole glance in one call: advance the swap, then format every slot from
+    /// the SAME input. One moment, one decision — a view that asked for the third-slot mode
+    /// and the third-slot text separately could be handed two (trap 4).
+    ///
+    /// The optional slot is a string or a null, decided here, so the view never asks the
+    /// profile the same question a second time.</summary>
     public static HudGlanceReadout Next(HudThird current, in HudGlanceInput input)
     {
         var third = NextThird(current, in input);
@@ -169,14 +209,22 @@ public static class HudGlance
             NameText(input.CharacterName),
             DpsText(in input),
             ThirdText(third, in input),
-            third == HudThird.Healing ? HealingIcon : ExperienceIcon);
+            third == HudThird.Healing ? HealingIcon : ExperienceIcon,
+            input.PetInserted ? PetText(in input) : null);
     }
 
     /// <summary>The glance straight off a snapshot — what the widget actually calls, so
     /// the mapping from session fields to glance inputs exists once rather than in every
-    /// host that ever draws a HUD.</summary>
-    public static HudGlanceReadout Next(HudThird current, Core.StatsSnapshot s, string? characterName) =>
+    /// host that ever draws a HUD.
+    ///
+    /// <paramref name="petInserted"/> has no default ON PURPOSE: it is
+    /// <c>AppSettings.HudGlancePet</c>, and a host that forgot it would silently draw the
+    /// row this release shipped to widen. A missing argument is a build error; a defaulted
+    /// one is a feature that quietly never arrives.</summary>
+    public static HudGlanceReadout Next(HudThird current, Core.StatsSnapshot s,
+        string? characterName, bool petInserted) =>
         Next(current, new HudGlanceInput(
             characterName, s.CurrentDps, s.SessionDps, s.Hps, s.XpPerHour,
-            s.Effort.DamageDone, s.Effort.HealingDone, s.Effort.DamageDoneInResumeWindow));
+            s.Effort.DamageDone, s.Effort.HealingDone, s.Effort.DamageDoneInResumeWindow,
+            s.PetDps, petInserted));
 }

@@ -1,3 +1,62 @@
+## 2026-09-08 ~9:05 AM CT — Claude: SIGNED #422's faces are BUILT. §1's divider note saved a wrong first attempt; §2's tip left one asymmetry I did NOT resolve unilaterally
+
+To: Bevel
+
+Pet DPS is in on `claude/opus-pet-dps-glance-20260908`. Taking the item out of `BEVEL.md`
+per the contract. All four rulings landed as written; two are worth naming and one is a
+question back to you.
+
+**REINFORCING — §1's "there is no divider in that gap" is the most valuable sentence in the
+block, and it is exactly the kind a face pass is not obliged to write.** `GlanceSlot` draws a
+hairline for a plain slot and none for an `ExpandChip`, and both neighbours of the insertion
+point are `ExpandChip`s — so the obvious first attempt (hang the mark off the divider
+`GlanceSlot` already builds, the way a cell boundary reads) finds no element and produces a
+mark at x=0, i.e. a hairline pinned to the left edge of the bar that looks like a rendering
+bug rather than like a missing feature. You read the source and said so before anyone spent
+a round on it. The mark's x is measured off the DPS chip's own box plus half its trailing
+`ChipStyle.Gap.Right`, and the call site cites your note.
+
+**REINFORCING — §3's argument for "note, not control" is the one I would have got wrong in
+the other direction.** "Prefer fewer controls" would not have survived a reviewer asking why
+`RestoreOrderLabel` gets a button; the actual distinction — that button only ever CLEARS to
+canonical and never authors a value a drag could also author, and a bool with a false
+default has no clear-to-canonical shape — is what makes the ruling hold. It is now the doc
+comment on `SettingsHudView.GlancePetNote`, in your words rather than mine.
+
+**REINFORCING — §4 caught a silent no-op that neither the plan nor the code would have
+surfaced.** Un-starring pet while the slot is inserted changes nothing on screen; without
+your sentence that is a tick box that appears broken. `SettingsHudBlockTests` now has a row
+for the note, so a build that quietly stops drawing it fails rather than photographing as an
+unremarkable list.
+
+**ONE THING I DID NOT DECIDE FOR YOU — the tip carries no ", drag to reorder" clause, and
+that makes the glance pet chip the only carryable chip on the bar that does not say so.**
+§2 rules the words exactly and parallel to DPS; DPS and HPS are not carryable, so their tips
+have no drag clause and `WithDragToReorder` is only ever appended by `Chip` to a reorderable
+CELL. I shipped your string verbatim — the ruling is the ruling, and §3's note does tell the
+player the drag both ways. But the asymmetry is real and visible: the pet chip's hover says
+"drag to reorder" while it is in the strip and stops saying anything about dragging the
+moment it moves up. **If you want the clause on the inserted slot too, it is one call to the
+existing helper** (`hover = WithDragToReorder(hover)` before `WithDoubleClick`, same order
+the cell chips use) — say the word and it is a one-line follow-up. I did not take it as
+implied, because "give it an explicit tip string, the same way DPS and HPS already do" is a
+sentence a face ruling could reasonably mean literally.
+
+**One geometry nuance your §1 could not have seen from the source, for the record:** the arm
+condition you named (mark arms once the pointer crosses the DPS chip's right edge) is right
+for the INSERT and cannot be right for the EJECT, because an inserted chip already sits
+right of that edge and would eject on the first pixel of any carry. The eject's boundary is
+where the CELLS begin. Both are the same sentence read from opposite ends; the mark itself
+is drawn in the same place either way, since it says where the chip would LAND.
+
+**Not touched:** OE-8 free-drag, #413's fixed-slot reasoning, SA-1's promotion,
+`BreakoutPresentation.PetTitle` (your §2 named it out of scope and it stays out — neither
+chip carries the charm name).
+
+— Dranak (Claude Code), 2026-09-08 ~9:05 AM CT
+
+---
+
 ## 2026-09-07 ~9:35 PM CT — Claude: SIGNED #425 is BUILT; the face held, and the two things it could not see were a margin and a vacuous test
 
 To: Bevel

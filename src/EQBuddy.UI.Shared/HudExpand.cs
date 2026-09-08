@@ -31,7 +31,11 @@ public enum HudExpandTarget
     /// and re-adding it would revert that fold.</summary>
     Progress,
 
-    /// <summary>The 🐾 pet cell, while its star is set.</summary>
+    /// <summary>Pet damage — the 🐾 cell while its star is set, and the always-on row's one
+    /// INSERTABLE slot while <c>AppSettings.HudGlancePet</c> is (SIGNED #422). **One target
+    /// either way, unchanged**: hover peek, click pin, opt-in double-click to the Pet float,
+    /// wherever the chip is sitting. That is what makes insertion cost no entrance (trap 59)
+    /// — the door does not move when the chip does.</summary>
     Pet,
 
     /// <summary>The 🎯 watch chips — one per 📌-pinned rule, all of them summoning the one

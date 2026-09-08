@@ -68,6 +68,12 @@ public class SettingsHudBlockTests
         ("MiniStatsPanel", "HUD block", "HudStatsHeading"),
         ("MiniStatsPanel", "HUD block", "HudStatsBlurb"),
         ("MiniStatsPanel", "HUD block", "PromotedStatsNote"),
+        // Pet damage's own note (SIGNED #422; Bevel's §3/§4, Helm-signed 2026-09-08). Same
+        // reason as the row above and one more: it is the ONLY place the app says that
+        // un-starring pet while its slot is on the always-on row does nothing visible. A
+        // build that quietly stopped drawing it leaves that click reading as broken, and an
+        // absent sentence photographs as an unremarkable list (traps 29/34).
+        ("MiniStatsPanel", "HUD block", "GlancePetNote"),
         // The way back from a chip drag (#191; Bevel's face, Helm-signed 2026-09-07). It is
         // NOT a lifted control — nothing in `OptionsWindow.xaml` ever named it — but it earns
         // the same row for the same reason the rest have one: the mini bar's order is set by

@@ -310,4 +310,108 @@ public sealed class HudBarTests
         app.WaitForDump("hudCellOrder", "kills,loot,money",
             "an empty MiniBarOrder to mean the canonical bar, whatever order the stars list in");
     }
+
+    // ---- PET DPS ON THE ALWAYS-ON ROW (SIGNED #422) ----------------------------------
+
+    /// <summary>A minimized widget with kills and pet starred, nothing else on the bar, and
+    /// no floating window opening behind it. <paramref name="inserted"/> is the one thing
+    /// each scenario below varies.</summary>
+    private static AppHarness PetBar(bool inserted, bool probe = false) =>
+        new(settings =>
+        {
+            settings.Minimized = true;
+            settings.MiniStats = ["kills", "pet"];
+            settings.HudGlancePet = inserted;
+            settings.DisabledBreakouts =
+                ["Damage", "Healing", "Pet", "Watch", "Loot", "Buffs"];
+            settings.DefaultRulesVersion = int.MaxValue;
+            settings.TrackedRules.Clear();
+        },
+        probe ? new Dictionary<string, string> { ["EQBUDDY_PETDROP"] = "1" } : null);
+
+    /// <summary>
+    /// THE FLOOR: a profile that has never dragged the pet chip anywhere draws exactly the
+    /// bar every release before this one drew — three always-on numbers, and pet as a CELL.
+    ///
+    /// **The prediction, written before it ran** (trap 23): `hudGlancePet=0`, the cell order
+    /// reads "kills,pet" in canonical order, and the bar holds five children — the three
+    /// always-on slots plus two cells.
+    /// </summary>
+    [Fact]
+    public void WithoutTheSettingPetDamageIsACellExactlyAsItWas()
+    {
+        using var app = PetBar(inserted: false);
+        app.Launch();
+
+        app.WaitForDump("hudGlancePet", 0, "the always-on row to draw no pet slot by default");
+        app.WaitForDump("hudCellOrder", "kills,pet", "pet to be an ordinary starred cell");
+        app.WaitForDump("hudCells", 5, "the three always-on numbers and two cells");
+    }
+
+    /// <summary>
+    /// INSERTED, THE PET NUMBER IS ON THE ALWAYS-ON ROW AND NOT IN THE CELLS — the negative
+    /// this whole change turns on, since a bar that drew both would show one player two
+    /// different pet-damage numbers side by side.
+    ///
+    /// **The negative is asserted at a moment the positive names** (trap 62): "pet" being
+    /// absent from `hudCellOrder` is equally true of a bar that has not drawn the insert
+    /// yet, or of one where the setting never reached the view at all. `hudGlancePet=1` is
+    /// what says the row DREW the slot, in the same dump — one moment, two facts.
+    ///
+    /// **The prediction** (trap 23): the count is FIVE either way, which is the point —
+    /// name, DPS, pet, third, kills. Six would be the chip drawn twice; four would be it
+    /// lost on the way. The pair with the test above therefore fails in both directions.
+    /// </summary>
+    [Fact]
+    public void AnInsertedPetDrawsOnTheAlwaysOnRowAndNotAsACell()
+    {
+        using var app = PetBar(inserted: true);
+        app.Launch();
+
+        app.WaitForDump("hudGlancePet", 1, "the always-on row to draw the pet slot");
+        app.WaitForDump("hudCellOrder", "kills", "the pet cell to leave the tray while it is up there");
+        app.WaitForDump("hudCells", 5,
+            "name, DPS, pet and the third number, plus the one remaining cell — never six");
+    }
+
+    /// <summary>
+    /// **THE DROP WRITES THE SETTING, AND THE DROP IS THE ONLY THING THAT DOES** (§3/§6) —
+    /// insert and eject in one launch, because what the pair proves is that the gesture moves
+    /// the chip BOTH ways rather than that a seeded profile renders.
+    ///
+    /// A launch alone writes nothing: `hudCellGrip` reads 0,0 until the first drop, and it is
+    /// the instrument that separates "the drop never happened" from "it happened and wrote
+    /// nothing" (trap 56).
+    ///
+    /// **What this drives and what it does not.** The probe enters `HudBarReorder.Land`, the
+    /// same method a mouse-up enters, so the write path, the persist and the redraw are the
+    /// real ones. It does not drive the pointer arithmetic — which x lands in the gap, and
+    /// what a landing MEANS — because nothing in this suite can move a pointer onto a control
+    /// inside the widget; those two sums are `MiniBarDragTests`'.
+    ///
+    /// **The prediction** (trap 23): after the insert, `hudGlancePet=1` with the cells down
+    /// to "kills"; after the eject at the head of the cells, `hudGlancePet=0` with the cells
+    /// back to "kills,pet" — pet in its REMEMBERED canonical place rather than in front of
+    /// kills, because an eject that lands beside no new neighbour writes no order at all.
+    /// </summary>
+    [Fact]
+    public void ADropCarriesThePetChipOntoTheAlwaysOnRowAndBackOffIt()
+    {
+        using var app = PetBar(inserted: false, probe: true);
+        app.Launch();
+
+        app.WaitForDump("hudGlancePet", 0, "the pet chip to start in the cells");
+        app.WaitForDump("hudCellGrip", "0,0", "no drop written by a launch alone");
+
+        app.DropHudChip("pet", -1);
+        app.WaitForDump("hudGlancePet", 1, "the drop to put the pet slot on the always-on row");
+        app.WaitForDump("hudCellOrder", "kills", "and to take its cell out of the tray");
+        app.WaitForDump("hudCellGrip", "0,1", "exactly one drop written");
+
+        app.DropHudChip("pet", 0);
+        app.WaitForDump("hudGlancePet", 0, "the second drop to bring the pet chip back down");
+        app.WaitForDump("hudCellOrder", "kills,pet",
+            "and to land it in the slot MiniBarOrder remembered for it");
+        app.WaitForDump("hudCellGrip", "0,2", "two drops written, and no press faked by either");
+    }
 }

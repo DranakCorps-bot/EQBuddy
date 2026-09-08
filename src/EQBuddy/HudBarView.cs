@@ -68,7 +68,9 @@ internal sealed class HudBarView
 
     /// <summary>Cells currently on the bar, for the <c>EQBUDDY_EXPAND</c> dump the E2E
     /// suite asserts on. Recorded by <see cref="Render"/> rather than read back off the
-    /// panel, because a panel count would include the trio's own separator chrome.</summary>
+    /// panel, because a panel count would include the always-on row's own separator
+    /// chrome. It counts every child: the always-on slots (four while the optional pet one
+    /// is inserted, three otherwise), one per starred cell, one per pinned rule.</summary>
     public int CellCount { get; private set; }
 
     /// <summary>The reorderable chips' keys as DRAWN, left to right — the <c>hudCellOrder</c>
@@ -78,13 +80,28 @@ internal sealed class HudBarView
     /// feature is that a saved order reaches the control, so a dump that asked
     /// <c>MiniBarPresentation.ResolveOrder</c> again would report it working on a tree where
     /// the bar had gone on drawing the canonical order. It names only the chips the order
-    /// governs: the trio is fixed leftmost and the pinned watch chips are a block after
-    /// these, and neither is in the setting.</summary>
+    /// governs: the always-on slots are fixed leftmost and the pinned watch chips are a
+    /// block after these, and neither is in the setting. **An INSERTED pet chip is drawn up
+    /// there and is therefore not in this token either** (SIGNED #422) — which is the
+    /// "never drawn twice" half, asserted against `hudGlancePet` in the same dump.</summary>
     public string CellOrderKey { get; private set; } = "-";
 
     /// <summary>Chip presses seen and drops written — see <see cref="HudBarReorder.PressCount"/>.
     /// One dump fact, because the two numbers are only ever read together.</summary>
     public string GripKey => $"{_reorder.PressCount},{_reorder.DropCount}";
+
+    /// <summary>Drives the DROP of a carried chip without a pointer — the
+    /// <c>EQBUDDY_PETDROP</c> rendezvous, and nothing else calls it.
+    ///
+    /// **It is the real write path and deliberately not the whole gesture.** Nothing in
+    /// <c>tests/EQBuddy.E2E</c> can put a synthetic pointer on a control inside the widget,
+    /// and the suite may not assert the screen — so what a probe can honestly prove is that a
+    /// landing slot reaches the setting, the profile and the next render. The pointer half
+    /// (which slot an x lands in, what the landing MEANS) is <c>MiniBarDrag</c>'s arithmetic
+    /// and is unit-tested with no window; this drives the same <see cref="HudBarReorder"/>
+    /// method a mouse-up drives, so what it exercises is that path rather than a private one
+    /// built for the test.</summary>
+    public bool ProbeDrop(string key, int slot) => _reorder.ProbeDrop(key, slot);
 
     // ---- WHICH CHIP THE PANEL HANGS UNDER (the ~3:50 PM CT anchor fix) ----
     //
@@ -142,6 +159,18 @@ internal sealed class HudBarView
     /// <summary>The <c>hudGlance</c> dump value — the dump is space-separated
     /// <c>key=value</c>, so this is one word.</summary>
     public string GlanceKey => Third == HudThird.Healing ? "hps" : "xp";
+
+    /// <summary>Was the optional PET slot drawn in the always-on row this render — the
+    /// <c>hudGlancePet</c> dump fact (SIGNED #422 §8), 1 or 0.
+    ///
+    /// **Recorded on the way past, never read back off the setting** (trap 42). "The profile
+    /// says HudGlancePet" and "the row drew a pet slot" are different claims and only the
+    /// second one is the feature — a dump that asked <c>_settings</c> again would report this
+    /// working on a tree where <see cref="RenderGlance"/> had gone on drawing three slots. It
+    /// is also the same-tick POSITIVE that the "pet is not drawn twice" negative waits on
+    /// (trap 62): <c>hudCellOrder</c> losing "pet" is only evidence at a moment this says the
+    /// insert had actually happened.</summary>
+    public int GlancePetKey { get; private set; }
 
     /// <summary>The xp chip's hover text as it was last DRAWN, or null while the third
     /// slot is HPS and there is no xp chip to hover (OE-3).
@@ -276,6 +305,25 @@ internal sealed class HudBarView
         panel.Children.Add(divider);
         return panel;
     }
+
+    /// <summary>The inserted pet slot's hover (Bevel's §2 ruling, Helm-signed 2026-09-08).
+    ///
+    /// **An explicit tip, the way DPS and HPS have one — not the plainer fallback its CELL
+    /// wears.** Every other starred chip resolves to <see cref="PeekTip"/>, which for pet is
+    /// the bare breakout title; drawn by the same <see cref="GlanceSlot"/> call as its two
+    /// neighbours, this slot should carry the same family of sentence. Parallel to the DPS
+    /// line and with no conditional clause: that clause is HPS's job, explaining why the
+    /// third slot is showing healing at this moment, and pet does not swap in and out on a
+    /// timer.
+    ///
+    /// **The charmed pet's NAME is deliberately not in it.**
+    /// <c>BreakoutPresentation.PetTitle</c> enriches the FLOAT's title ("Pet damage — Gnoll
+    /// Pup (held 2:14)") and nothing reads it into any chip today, the cell's tooltip
+    /// included. Putting it here would make the glance chip richer than the cell chip for
+    /// one stat, which is an asymmetry nobody asked for — if the charm name is ever wanted
+    /// on a hover it is one ask against both surfaces at once (trap 4).</summary>
+    internal const string PetGlanceTip =
+        "Pet damage per second — hover to peek, click to keep it open";
 
     /// <summary>An expansion chip's hover text: what it is, then the gesture.
     ///
@@ -506,8 +554,9 @@ internal sealed class HudBarView
         return panel;
     }
 
-    /// <summary>The always-on trio — character name, DPS, and XP%/hr or HPS — ahead of
-    /// every starred cell (Surface A / SA-1, spec §3).
+    /// <summary>The always-on row — character name, DPS, and XP%/hr or HPS — ahead of
+    /// every starred cell (Surface A / SA-1, spec §3), plus the ONE optional slot SIGNED
+    /// #422 gave it: pet DPS, between DPS and the third number.
     ///
     /// The DECISION is <see cref="HudGlance"/>'s and is unit-tested with no window; what
     /// happens here is drawing. The name slot carries no icon: it is a label, not a
@@ -515,18 +564,44 @@ internal sealed class HudBarView
     /// for.</summary>
     private void RenderGlance(StatsSnapshot s, string? characterName)
     {
-        var glance = HudGlance.Next(Third, s, characterName);
+        var glance = HudGlance.Next(Third, s, characterName, _settings.HudGlancePet);
         Third = glance.Third;
         _host.Children.Add(GlanceSlot(null, glance.Name, HudGlance.NameReservedWidth,
             glance.Name.Length > 0 ? null : HudGlance.EmptyNameTooltip));
-        // THE TWO EXPANSION CHIPS (OE-1). DPS is always slot two; slot three is HPS or the
+        // THE TWO EXPANSION CHIPS (OE-1). DPS is always slot two; the last slot is HPS or the
         // XP rate, and the tracker the panel opens FOLLOWS that swap — which is why the
         // target is decided here, from the glance's own answer, rather than by the panel
-        // guessing what the third slot currently means.
-        _host.Children.Add(GlanceSlot(HudGlance.DpsIcon, glance.Dps,
+        // guessing what that slot currently means.
+        var dps = GlanceSlot(HudGlance.DpsIcon, glance.Dps,
             HudGlance.MetricReservedWidth,
             "Damage per second — hover to peek, click to keep it open",
-            expand: HudExpandTarget.Dps));
+            expand: HudExpandTarget.Dps);
+        _host.Children.Add(dps);
+        // THE INSERTION POINT (SIGNED #422). It sits BETWEEN two fixed slots and does not
+        // move when the third one swaps, which is what makes it stable in exactly the way
+        // #413 said a fixed slot is not — so no fixed slot becomes a drop target and that
+        // reasoning is routed around rather than reopened.
+        //
+        // Membership is the glance's answer (a string or a null), never a second read of the
+        // setting from here; the ★ deliberately has no say while it is up here, and
+        // `MiniBarPresentation.DrawnKeys` is what keeps the cell from drawing the same number
+        // a second time.
+        GlancePetKey = glance.PetDps is null ? 0 : 1;
+        if (glance.PetDps is { } petDps)
+        {
+            // Registered with the reorder, and it is the ONLY slot on this row that is: the
+            // way back down is to carry it. `HudExpandTarget.Pet` is unchanged, so the peek,
+            // the pin and the opt-in double-click cost nothing to move (trap 59).
+            var pet = GlanceSlot(HudGlance.PetIcon, petDps, HudGlance.MetricReservedWidth,
+                PetGlanceTip, expand: HudExpandTarget.Pet);
+            _host.Children.Add(pet);
+            _reorder.Register(MiniBarPresentation.PetKey, pet);
+        }
+        // WHERE THE INSERTION MARK HANGS. There is no divider element in this gap to read an
+        // x off — both neighbours are ExpandChips and that branch draws none — so the drag
+        // is handed the DPS chip itself and measures its own box, the way `LeftOf` already
+        // does for a cell boundary (Bevel's §1 note, Helm-signed 2026-09-08).
+        _reorder.SetGlanceGap(dps);
         // The xp cell's double-click SURVIVES the promotion, on the slot that replaced it.
         // While the widget is minimized it was the only door to the Progress window — the
         // Progress card is on the expanded widget, so it is not one — and a promotion must
@@ -631,7 +706,7 @@ internal sealed class HudBarView
             // now mean a cell HudExpand has never heard of, which is a settings file from a
             // later version — and it gets the old plain chip rather than a hole in the bar.
             //
-            // There is no "xp" case here any more: xp is an always-on trio slot since
+            // There is no "xp" case here any more: xp is an always-on row slot since
             // SA-1, and RenderGlance above carries both its number and the double-click
             // that opens the Progress window (Bevel's fold, Helm-signed 2026-08-24 —
             // "reuse existing theme window on current tab … retire tab-less 272x135

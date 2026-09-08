@@ -34,6 +34,11 @@ internal static class DebugHooks
     /// a positive event to wait on; 0 forever unless <c>EQBUDDY_DOORPROBE=1</c> armed it.</summary>
     internal static int DoorProbeClicks;
 
+    /// <summary>How many times the pet-drop probe has driven a real DROP on the mini bar
+    /// (SIGNED #422 §8). Reported in the <c>EQBUDDY_EXPAND</c> dump so the suite has a
+    /// positive event to wait on; 0 forever unless <c>EQBUDDY_PETDROP=1</c> armed it.</summary>
+    internal static int PetProbeDrops;
+
     /// <summary>Called once from the widget's constructor, at the point the block used to
     /// sit — after the tray icon and the item-catalog warm, before the What's-new notes.
     /// </summary>
@@ -288,6 +293,54 @@ internal static class DebugHooks
                     // asking one moment too early — trap 62, which passed a test with the
                     // feature under it deleted.
                     DoorProbeClicks++;
+                };
+                poll.Start();
+            };
+
+        // THE PET-DROP PROBE (SIGNED #422), the door probe's shape one surface over and for
+        // the same reason: the state under test does not exist at startup. The claim is "a
+        // DROP writes HudGlancePet and the bar redraws with the pet on the other row", and a
+        // drop is the END of a gesture nothing in `tests/EQBuddy.E2E` can perform — the suite
+        // cannot put a synthetic pointer on a control inside the widget and may not assert
+        // the screen at all.
+        //
+        // So the rendezvous is a file in the profile, and it drives the SAME method a
+        // mouse-up drives (`HudBarReorder.Land`), never a private path built for the test.
+        // What it deliberately does NOT drive is the pointer arithmetic — which slot an x
+        // lands in and what that landing MEANS are `MiniBarDrag.PetDropIndex` /
+        // `DropKind`, unit-tested with no window.
+        //
+        // The trigger's content is "<key> <slot>" — "pet -1" inserts into the always-on row,
+        // "pet 0" ejects to the head of the cells. A slot the bar cannot honour raises
+        // nothing, so a staging mistake times out naming the probe instead of reading as a
+        // feature that did not fire.
+        if (Environment.GetEnvironmentVariable("EQBUDDY_PETDROP") == "1")
+            w.Loaded += (_, _) =>
+            {
+                var trigger = AppPaths.File("hud-drop.trigger");
+                var poll = new System.Windows.Threading.DispatcherTimer(
+                    System.Windows.Threading.DispatcherPriority.Background)
+                { Interval = TimeSpan.FromMilliseconds(200) };
+                poll.Tick += (_, _) =>
+                {
+                    if (!System.IO.File.Exists(trigger)) return;
+                    string text;
+                    // READ before DELETE, and delete before the drop for the door probe's
+                    // reason: a drop that throws must not spin the timer on one trigger
+                    // forever, and the suite's next write must be a new event.
+                    try
+                    {
+                        text = System.IO.File.ReadAllText(trigger);
+                        System.IO.File.Delete(trigger);
+                    }
+                    catch (System.IO.IOException) { return; }
+                    var parts = text.Trim().Split(' ',
+                        StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+                    if (parts.Length != 2 || !int.TryParse(parts[1], out var slot)) return;
+                    if (!w._hudBar.ProbeDrop(parts[0], slot)) return;
+                    // AFTER the drop, so a wait on this is a wait on the far side of the
+                    // write (trap 62) rather than on the trigger file being noticed.
+                    PetProbeDrops++;
                 };
                 poll.Start();
             };

@@ -171,4 +171,91 @@ public class MiniBarDragTests
     [InlineData(1, 1)]
     public void ANoOpMoveChangesNothing(int from, int to)
         => Assert.Equal(Canonical, MiniBarDrag.Move(Canonical, Canonical, from, to));
+
+    // ---- THE ONE SLOT BEYOND THE CELLS (SIGNED #422) ---------------------------------
+    //
+    // Pet damage can be carried into the always-on row's insertion gap and back out again.
+    // Two sums: where the pointer says the chip landed, and what that landing MEANS.
+
+    /// <summary>Three chips at 10 / 30 / 50, with the gap ending at 5 — the pointer is in it
+    /// only while it is left of that.</summary>
+    private static readonly double[] Row = [10, 30, 50];
+
+    [Theory]
+    // Left of the boundary: the gap, whichever cell the chip started from.
+    [InlineData(0, 0, MiniBarDrag.GlanceSlot)]
+    [InlineData(4.9, 2, MiniBarDrag.GlanceSlot)]
+    // On or past it: an ordinary cell landing, exactly as DropIndex answers.
+    [InlineData(5, 2, 0)]
+    // …and the carried chip never counts itself, exactly as DropIndex has always answered:
+    // the same pointer lands at 2 from the last slot and at 1 from the first.
+    [InlineData(35, 2, 2)]
+    [InlineData(35, 0, 1)]
+    [InlineData(99, 0, 2)]
+    public void APetChipHasOneSlotBeyondTheLeftmostCell(double x, int from, int expected)
+        => Assert.Equal(expected, MiniBarDrag.PetDropIndex(Row, from, x, gapEndsAt: 5));
+
+    /// <summary>**NaN means "this row cannot say where its gap is"** — nothing has been laid
+    /// out yet, or the chip the boundary is measured off could not answer — and it has to
+    /// degrade to the ordinary cell landing rather than to an accidental insert. Every
+    /// comparison against NaN is false, so the fallthrough is the construction rather than a
+    /// branch someone has to remember.</summary>
+    [Fact]
+    public void WithNoMeasurableGapAPetChipBehavesLikeAnyOtherChip()
+    {
+        Assert.Equal(0, MiniBarDrag.PetDropIndex(Row, 1, 0, double.NaN));
+        Assert.Equal(MiniBarDrag.DropIndex(Row, 1, 40),
+            MiniBarDrag.PetDropIndex(Row, 1, 40, double.NaN));
+    }
+
+    /// <summary>The gap is the PET's and nobody else's: a landing there from any other chip
+    /// is nothing at all, rather than a reorder that quietly clamped to slot 0.</summary>
+    [Fact]
+    public void NoOtherChipMayTakeTheGap()
+        => Assert.Equal(MiniBarDrop.None,
+            MiniBarDrag.DropKind(carriedIsPet: false, petInserted: false,
+                from: 2, to: MiniBarDrag.GlanceSlot));
+
+    [Fact]
+    public void ThePetChipCarriedIntoTheGapIsAnInsert()
+        => Assert.Equal(MiniBarDrop.Insert,
+            MiniBarDrag.DropKind(carriedIsPet: true, petInserted: false,
+                from: 1, to: MiniBarDrag.GlanceSlot));
+
+    /// <summary>
+    /// **The assertion this function exists for.** An inserted pet slot is drawn first, so
+    /// it is index 0 of the carried list — the same number that means "the leftmost cell" for
+    /// every other chip. A caller comparing indices alone would read `to == from` as "nothing
+    /// happened" and make the eject silently do nothing, which is the one gesture that gets a
+    /// player's pet chip back off the always-on row.
+    /// </summary>
+    [Theory]
+    [InlineData(0)]
+    [InlineData(1)]
+    [InlineData(4)]
+    public void AnInsertedPetLandingAnywhereAmongTheCellsIsAnEject(int to)
+        => Assert.Equal(MiniBarDrop.Eject,
+            MiniBarDrag.DropKind(carriedIsPet: true, petInserted: true, from: 0, to: to));
+
+    /// <summary>…and one that never left the gap it was already in writes nothing. The
+    /// negative of the row above: without it, "any carry of the inserted chip ejects" would
+    /// pass every assertion here.</summary>
+    [Fact]
+    public void AnInsertedPetThatStayedInTheGapWritesNothing()
+        => Assert.Equal(MiniBarDrop.None,
+            MiniBarDrag.DropKind(carriedIsPet: true, petInserted: true,
+                from: 0, to: MiniBarDrag.GlanceSlot));
+
+    /// <summary>Ordinary cell reorders are untouched by any of it — including a pet chip
+    /// carried from one cell slot to another, which is a reorder and not an insert.</summary>
+    [Theory]
+    [InlineData(true, 1, 3, MiniBarDrop.Reorder)]
+    [InlineData(false, 1, 3, MiniBarDrop.Reorder)]
+    [InlineData(false, 2, 2, MiniBarDrop.None)]
+    [InlineData(true, 2, 2, MiniBarDrop.None)]
+    [InlineData(false, -1, 0, MiniBarDrop.None)]
+    public void EveryOtherLandingMeansWhatItAlwaysDid(
+        bool carriedIsPet, int from, int to, MiniBarDrop expected)
+        => Assert.Equal(expected,
+            MiniBarDrag.DropKind(carriedIsPet, petInserted: false, from, to));
 }

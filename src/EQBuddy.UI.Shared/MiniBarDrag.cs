@@ -18,6 +18,29 @@ public enum MiniBarGesture
     Dead,
 }
 
+/// <summary>What a completed carry turned out to MEAN — which settings it writes (SIGNED
+/// #422 §3/§6).</summary>
+public enum MiniBarDrop
+{
+    /// <summary>Nothing to write. The chip is where it started, or the carry was a pet chip
+    /// that never left the insertion gap it was already in.</summary>
+    None,
+
+    /// <summary>An ordinary reorder among the cells — <c>MiniBarOrder</c> only.</summary>
+    Reorder,
+
+    /// <summary>The pet chip was carried out of the cells and into the always-on row's
+    /// insertion gap: <c>HudGlancePet</c> becomes true and <c>MiniBarOrder</c> is left
+    /// ALONE, which is what makes the eject land the chip back where the player had it.
+    /// </summary>
+    Insert,
+
+    /// <summary>The inserted pet slot was carried back down among the cells:
+    /// <c>HudGlancePet</c> becomes false, and if it landed beside a different neighbour the
+    /// order is written in the SAME moment — one gesture, one write.</summary>
+    Eject,
+}
+
 /// <summary>
 /// THE MINI BAR'S REORDER, AS ARITHMETIC — which gesture a press became, where a carried
 /// chip lands, and what the order reads afterwards.
@@ -80,6 +103,64 @@ public static class MiniBarDrag
         for (var i = 0; i < midpoints.Count; i++)
             if (i != from && midpoints[i] < x) to++;
         return Math.Clamp(to, 0, midpoints.Count - 1);
+    }
+
+    /// <summary>The landing slot that means "the always-on row's insertion gap", one step
+    /// further left than any cell drag could reach before SIGNED #422. Negative because it is
+    /// not an index into the drawn chips at all — it is the one place a carried chip can land
+    /// that is not among them.</summary>
+    public const int GlanceSlot = -1;
+
+    /// <summary>
+    /// WHERE A CARRIED **PET** CHIP LANDS — <see cref="DropIndex"/> plus the one slot beyond
+    /// index 0 (SIGNED #422 §6; Bevel's arm condition, Helm-signed 2026-09-08).
+    ///
+    /// <paramref name="gapEndsAt"/> is the x at which the gap stops and the cells begin, in
+    /// the same space as <paramref name="midpoints"/> and <paramref name="x"/>. **An edge and
+    /// not a midpoint**, because this boundary is not "which side of a neighbour am I on" —
+    /// it is "have I left the cells at all", and the caller measures the two readings of it
+    /// off real chips:
+    /// <list type="bullet">
+    /// <item>Carrying pet UP from the cells, it is the DPS chip's own right edge — Bevel's
+    /// arm condition, so the mark appears for that one slot rather than smearing across the
+    /// whole always-on row.</item>
+    /// <item>Carrying an INSERTED pet back DOWN, it is where the cells start, which is the
+    /// mirror of the same sentence: the chip is in the gap until the pointer reaches
+    /// them.</item>
+    /// </list>
+    ///
+    /// **NaN is the honest "there is no gap"** — the row has not laid out yet, or the chip it
+    /// is measured off could not answer — and it falls through to <see cref="DropIndex"/> by
+    /// construction, since every comparison with NaN is false. A pet chip carried on a bar
+    /// that cannot say where its own slots are behaves exactly like any other chip.
+    /// </summary>
+    public static int PetDropIndex(
+        IReadOnlyList<double> midpoints, int from, double x, double gapEndsAt) =>
+        x < gapEndsAt ? GlanceSlot : DropIndex(midpoints, from, x);
+
+    /// <summary>
+    /// WHAT A COMPLETED CARRY MEANS, given the chip and where it was let go.
+    ///
+    /// **The pet chip's index cannot answer this on its own, which is the whole reason this
+    /// is a function.** An inserted pet slot is drawn FIRST, so it is index 0 of the carried
+    /// list — the same number that means "the leftmost cell" for every other chip. `to ==
+    /// from` is therefore a no-op for a cell chip and an EJECT for the inserted one, and a
+    /// caller comparing indices alone would silently make the one gesture this release exists
+    /// for do nothing.
+    ///
+    /// <paramref name="carriedIsPet"/> gates every pet answer: no other chip may take the
+    /// gap, so a landing there from anything else is <see cref="MiniBarDrop.None"/> rather
+    /// than a quietly-clamped reorder.
+    /// </summary>
+    public static MiniBarDrop DropKind(bool carriedIsPet, bool petInserted, int from, int to)
+    {
+        if (from < 0) return MiniBarDrop.None;
+        if (carriedIsPet && petInserted)
+            // Anywhere among the cells is an eject, INCLUDING slot 0 — see the note above.
+            return to >= 0 ? MiniBarDrop.Eject : MiniBarDrop.None;
+        if (to == GlanceSlot)
+            return carriedIsPet ? MiniBarDrop.Insert : MiniBarDrop.None;
+        return to < 0 || to == from ? MiniBarDrop.None : MiniBarDrop.Reorder;
     }
 
     /// <summary>

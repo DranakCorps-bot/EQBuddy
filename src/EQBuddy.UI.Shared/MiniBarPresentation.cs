@@ -39,11 +39,18 @@ public static class MiniBarPresentation
     /// entry that gates the Buffs breakout window and never draws a cell here.
     ///
     /// **"xp", "dps" and "hps" are absent for the opposite reason since Surface A / SA-1:
-    /// they are always ON.** They were promoted to the collapsed HUD's fixed trio (name,
+    /// they are always ON.** They were promoted to the collapsed HUD's always-on row (name,
     /// DPS, XP%/hr — HPS taking the third slot while healing dominates), which is drawn by
     /// <see cref="HudGlance"/> ahead of every cell in this list. A key that is drawn
     /// unconditionally has no business in a table whose whole job is "which subset did the
-    /// player switch on", and leaving one here would have drawn it twice.</summary>
+    /// player switch on", and leaving one here would have drawn it twice.
+    ///
+    /// **<see cref="PetKey"/> is here and stays here, because pet damage is drawn
+    /// unconditionally only SOMETIMES** (SIGNED #422). It is the one insertable member of
+    /// that row: while <see cref="AppSettings.HudGlancePet"/> is set it draws up there
+    /// instead, and the exclusion is <see cref="DrawnKeys"/>'s — this table still has to be
+    /// able to put a face on the key, because the moment the player drags it back down it
+    /// is a cell again.</summary>
     public static readonly IReadOnlyList<string> Order =
         ["kills", "pet", "procs", "loot", "motes", "money", "deaths"];
 
@@ -52,6 +59,12 @@ public static class MiniBarPresentation
     /// <see cref="Order"/> — see <see cref="CanonicalOrder"/> for why it has a PLACE here
     /// without having a row in any table above.</summary>
     public const string BuffsKey = "buffs";
+
+    /// <summary>Pet damage — the one key that can be drawn by the always-on row INSTEAD of
+    /// by a cell (SIGNED #422). Named rather than spelled at each of the four places that
+    /// ask about it, because "pet" is also a <see cref="HudExpand.Key"/>, a
+    /// <c>MiniBarOrder</c> entry and a ★, and a literal cannot say which one is meant.</summary>
+    public const string PetKey = "pet";
 
     /// <summary>
     /// Every key that can sit on the bar, in the order an untouched profile draws them —
@@ -65,12 +78,17 @@ public static class MiniBarPresentation
     /// like any other, so it has a PLACE, and a place is what an order is about. Its
     /// canonical slot is where it has always drawn: after "deaths".
     ///
-    /// The trio (name, DPS, XP%/HPS) is absent for the reason SA-1 promoted it: those three
-    /// are drawn unconditionally ahead of every cell here, and the third slot swaps identity
-    /// mid-session (<see cref="HudGlance"/>), so a drag target there would change meaning
-    /// under the cursor. Pinned watch chips are absent too — they are a BLOCK after the
-    /// cells, one per rule, and per-rule placement would widen this list by rule id rather
-    /// than by stat key. Both seams are named rather than built.
+    /// The always-on row's own slots (name, DPS, XP%/HPS) are absent for the reason SA-1
+    /// promoted them: those three are drawn unconditionally ahead of every cell here, and the
+    /// third slot swaps identity mid-session (<see cref="HudGlance"/>), so a drag target
+    /// there would change meaning under the cursor. Pinned watch chips are absent too — they
+    /// are a BLOCK after the cells, one per rule, and per-rule placement would widen this
+    /// list by rule id rather than by stat key. Both seams are named rather than built.
+    ///
+    /// **<see cref="PetKey"/> keeps its place here even while it is drawn up there** (SIGNED
+    /// #422). That is the whole of "never lost": <see cref="ResolveOrder"/> is untouched by
+    /// <see cref="AppSettings.HudGlancePet"/>, so a pet chip ejected back into the cells
+    /// lands where the player last left it rather than where the canonical list would put it.
     /// </summary>
     public static readonly IReadOnlyList<string> CanonicalOrder = [.. Order, BuffsKey];
 
@@ -115,6 +133,19 @@ public static class MiniBarPresentation
     /// **The one membership decision, so the bar cannot draw a chip the order does not
     /// know about** (trap 4). <c>HudBarView</c> walks this list and asks <see cref="Cell"/>
     /// for each face, except <see cref="BuffsKey"/>, whose face it builds itself.
+    ///
+    /// **…minus <see cref="PetKey"/> while it is INSERTED into the always-on row** (SIGNED
+    /// #422 §2). SA-1's own sentence — *"a key that is drawn unconditionally has no business
+    /// in a table whose whole job is 'which subset did the player switch on'"* — now applies
+    /// to pet conditionally, and it applies HERE rather than in the view: a view that skipped
+    /// the key itself would be a second membership decision beside this one (trap 4, one
+    /// layer up), and it is the only thing standing between a player and a bar that draws
+    /// their pet's damage twice.
+    ///
+    /// **The ★ gets no vote while it is inserted, and the asymmetry is deliberate** (§2): an
+    /// inserted pet slot is always-on like its neighbours, so un-starring pet changes the
+    /// cells and nothing else. Options says so in a sentence, because a click with no visible
+    /// effect otherwise reads as broken.
     /// </summary>
     public static IReadOnlyList<string> DrawnKeys(AppSettings settings)
     {
@@ -122,6 +153,7 @@ public static class MiniBarPresentation
         return
         [
             .. ResolveOrder(settings)
+                .Where(key => !(settings.HudGlancePet && key == PetKey))
                 .Where(on.Contains)
                 .Where(key => key == BuffsKey || Icons.ContainsKey(key)),
         ];
@@ -188,7 +220,11 @@ public static class MiniBarPresentation
         // HudGlance formats them. Leaving a second formatter here would be two sources for
         // one number (trap 4), and the day one of them gained a decimal only the other
         // would move.
-        "pet" => $"{s.PetAbilities.Sum(p => p.Total) / Math.Max(1, s.CombatSeconds):0.#} dps",
+        // The VALUE is StatsSnapshot's since SIGNED #422 and the SHAPE is this table's: the
+        // always-on row can draw pet damage too now, and two copies of one expression is
+        // the very thing the comment above forbids for dps/hps. Compact here, padded into
+        // HudGlance's fixed 10-character shape up there.
+        PetKey => $"{s.PetDps:0.#} dps",
         // Same denominator as the Procs card: combat minutes, so downtime doesn't
         // flatter the weapon.
         "procs" => $"{s.Procs.Sum(p => p.Count) / Math.Max(1.0 / 60, s.CombatSeconds / 60.0):0.#}/min",

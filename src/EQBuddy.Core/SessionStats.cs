@@ -2166,6 +2166,23 @@ public sealed class StatsSnapshot
     public double SessionDps { get; init; }
     public double CurrentDps { get; init; }
     public double CombatSeconds { get; init; }
+    /// <summary>Your PET's damage per combat second — <see cref="PetAbilities"/> over
+    /// <see cref="CombatSeconds"/>, floored at one second so a first swing is a rate rather
+    /// than an infinity.
+    ///
+    /// **Derived here rather than formatted twice** (trap 4 / trap 33). The number had one
+    /// home — an inline sum inside <c>MiniBarPresentation.Text("pet")</c> — until SIGNED
+    /// #422 put pet damage on the collapsed HUD's always-on row as well, and a second
+    /// formatter copying that expression is exactly what the same method's own dps/hps
+    /// comment forbids: the day one of them gained a decimal, only the other would move.
+    /// Both surfaces read this and format it their own way — the cell compact (<c>0.#</c>),
+    /// the glance padded into <c>HudGlance</c>'s fixed 10-character shape.
+    ///
+    /// Computed rather than stored, for <see cref="CastCompletion"/>'s reason: an archived
+    /// session deserialized out of <c>history.db</c> carries the two inputs, so it answers
+    /// the same number it did live without an init-only field that a hand-built snapshot
+    /// could leave at zero.</summary>
+    public double PetDps => PetAbilities.Sum(p => p.Total) / Math.Max(1, CombatSeconds);
     public long DamageTaken { get; init; }
     public int AvoidedIncoming { get; init; }
     public int MeleeHitsTaken { get; init; }
