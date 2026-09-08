@@ -1,0 +1,106 @@
+{
+  "note": "CURATED guide catalog - hand-authored, never auto-written. The weekly wiki refresh FLAGS a guide whose source page changed (by intersecting the sources' page titles with the week's edits) and a human re-authors it; nothing here is generated. Every Authored objective answers who + where + what and cites the page it came from; every Stub says out loud what the wiki does not tell us, because a wrong instruction costs a player an evening and a stub costs them a browser tab. Guides layer BESIDE the harvested QuestCatalog and ON TOP of the Sky checklist: an objective's rewardKey is an existing QuestChecklistLayout.RewardKey ('Class|Reward'), so a turn-in stays one fact in one store. GuideCatalogTests holds all of that.",
+  "guides": [
+    {
+      "id": "pos-warrior-runed-wind-amulet",
+      "name": "Runed Wind Amulet - Warrior, Plane of Sky",
+      "guideType": "PlaneOfSkyQuest",
+      "questName": "Warrior Sky Test: Runed Wind Amulet",
+      "zoneNames": ["Plane of Sky"],
+      "applicableClasses": ["Warrior"],
+      "stages": [
+        {
+          "id": "isle-4",
+          "name": "Isle 4: Keeper of Souls",
+          "order": 1,
+          "arrivalNote": "",
+          "objectives": [
+            {
+              "id": "stone-amulet",
+              "order": 1,
+              "objectiveType": "Loot",
+              "title": "Loot the Stone Amulet from the Keeper of Souls",
+              "shortInstruction": "Kill the Keeper of Souls on Isle 4 and loot the Stone Amulet.",
+              "who": "Keeper of Souls",
+              "where": "Plane of Sky - Isle 4, the Keeper of Souls island.",
+              "what": "Kill the Keeper of Souls and loot Stone Amulet (1). It is one of the two turn-ins for the Runed Wind Amulet.",
+              "itemNames": ["Stone Amulet"],
+              "authoring": "Authored",
+              "sources": [
+                {
+                  "url": "https://eqlwiki.com/Warrior_Plane_of_Sky_Tests",
+                  "title": "Warrior Plane of Sky Tests",
+                  "retrievedAt": "2026-08-31"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "wind-runes",
+          "name": "The wind rune",
+          "order": 2,
+          "arrivalNote": "",
+          "objectives": [
+            {
+              "id": "wind-rune-azia",
+              "order": 1,
+              "objectiveType": "Farm",
+              "title": "Collect Wind Rune Azia",
+              "shortInstruction": "Loot a Wind Rune Azia from Plane of Sky trash.",
+              "who": "",
+              "where": "",
+              "what": "Loot Wind Rune Azia (1). It is the second of the two turn-ins for the Runed Wind Amulet.",
+              "itemNames": ["Wind Rune Azia"],
+              "authoring": "Stub",
+              "stubNote": "EQBuddy's Sky checklist records only \"Trash mobs\" for Wind Rune Azia, and eqlwiki's Warrior Plane of Sky Tests page does not say which isle or which mobs drop it. If you have looted one, tell us the isle and the mob - that is what turns this step from a stub into directions.",
+              "sources": [
+                {
+                  "url": "https://eqlwiki.com/Warrior_Plane_of_Sky_Tests",
+                  "title": "Warrior Plane of Sky Tests",
+                  "retrievedAt": "2026-08-31"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "turn-in",
+          "name": "Turn in to Torgon Blademaster",
+          "order": 3,
+          "arrivalNote": "",
+          "objectives": [
+            {
+              "id": "turn-in-runed-wind-amulet",
+              "order": 1,
+              "objectiveType": "TurnIn",
+              "title": "Hand in the Stone Amulet and Wind Rune Azia",
+              "shortInstruction": "Give Torgon Blademaster the Stone Amulet and the Wind Rune Azia.",
+              "who": "Torgon Blademaster",
+              "where": "Plane of Sky - back to Torgon Blademaster, the Warrior quest giver you took the tests from.",
+              "what": "Hand Torgon Blademaster Stone Amulet (1) and Wind Rune Azia (1) to receive the Runed Wind Amulet.",
+              "prerequisiteObjectiveIds": ["stone-amulet", "wind-rune-azia"],
+              "rewardKey": "Warrior|Runed Wind Amulet",
+              "itemNames": ["Stone Amulet", "Wind Rune Azia", "Runed Wind Amulet"],
+              "authoring": "Authored",
+              "sources": [
+                {
+                  "url": "https://eqlwiki.com/Warrior_Plane_of_Sky_Tests",
+                  "title": "Warrior Plane of Sky Tests",
+                  "retrievedAt": "2026-08-31"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://eqlwiki.com/Warrior_Plane_of_Sky_Tests",
+          "title": "Warrior Plane of Sky Tests",
+          "retrievedAt": "2026-08-31"
+        }
+      ]
+    }
+  ]
+}

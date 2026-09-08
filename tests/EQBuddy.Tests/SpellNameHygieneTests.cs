@@ -63,6 +63,7 @@ public class SpellNameHygieneTests
         ["QuestCatalog.json"] = "quest and item names; real ones carry parentheses ('Journeyman Boots (Quest)')",
         ["SpawnCatalog.json"] = "mob names and placeholder prose — guarded by trap 66's placeholder test instead",
         ["EpicQuestChecklist.json"] = "quest step prose",
+        ["GuideCatalog.json"] = "guide, stage and objective names — a step's `name` is prose we write for a player, never a token the game casts; its item and mob names are guarded by GuideCatalogTests instead",
         ["RaidTargets.json"] = "boss names",
         ["ZoneGraph.json"] = "zone names and connections",
         ["WhatsNew.json"] = "release notes — prose written by us, for players",

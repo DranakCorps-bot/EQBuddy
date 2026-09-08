@@ -124,4 +124,29 @@ public class WeeklyRefreshWiringTests
         // which is why the refresh only ever flags it (CLAUDE.md).
         Assert.Contains("AaCatalog.json", curated);
     }
+
+    /// <summary>
+    /// The guide catalog is on the weekly cadence as CURATED, and the file the refresh looks
+    /// for is the file that exists.
+    ///
+    /// Both halves, and the second is the one that bites: `curated_flags` silently
+    /// `continue`s past a path it cannot find, so a renamed or moved catalog produces a
+    /// green refresh that flags nothing, forever. A guide is prose about the world — when
+    /// eqlwiki's page for a step changes, this flag is the ONLY way that correction reaches
+    /// the person who has to re-author it (plan §3; the same shape as trap 20).
+    /// </summary>
+    [Fact]
+    public void TheGuideCatalogIsCuratedAndTheRefreshCanFindIt()
+    {
+        var refresh = Read("scripts/harvests/refresh.py");
+        var promoted = Regex.Match(refresh, @"PROMOTED = \[(.*?)\]", RegexOptions.Singleline).Groups[1].Value;
+        var curated = Regex.Match(refresh, @"CURATED = \[(.*?)\]", RegexOptions.Singleline).Groups[1].Value;
+
+        Assert.Contains("GuideCatalog.json", curated);
+        Assert.DoesNotContain("GuideCatalog.json", promoted);
+
+        // `DATA / name` in refresh.py — the flag reads the shipped file itself.
+        Assert.True(File.Exists(Path.Combine(Root, "src", "EQBuddy.Core", "Data", "GuideCatalog.json")),
+            "refresh.py flags Data/GuideCatalog.json; it is not there, so the weekly flag is a no-op.");
+    }
 }
