@@ -36,8 +36,8 @@ What one run does:
      gap this closes: 170 new alchemy potion/spell pages landed on the wiki
      and no scheduled run would ever have carried them into BuffDurations.
   5. flags CURATED catalogs whose source pages changed (SpawnCatalog, AaCatalog,
-     MezSpells, CcSpells, RegenSpells) — those carry human judgment and are
-     never auto-written; the flag goes in the report for a person to act on
+     MezSpells, CcSpells, RegenSpells, GuideCatalog) — those carry human judgment
+     and are never auto-written; the flag goes in the report for a person to act on
   6. writes eqlwiki/refresh-report.md and updates eqlwiki/refresh-state.json
 
 Run it by hand any time, or let .github/workflows/knowledge-refresh.yml run it
@@ -99,7 +99,7 @@ PROMOTED = ["FadeMessages.json", "SlowSpells.json", "BuffDurations.json", "Debuf
             "SpellLevels.json"]
 # Human-curated; never auto-written, only flagged when their sources move.
 CURATED = ["SpawnCatalog.json", "AaCatalog.json", "MezSpells.json",
-           "CcSpells.json", "RegenSpells.json"]
+           "CcSpells.json", "RegenSpells.json", "GuideCatalog.json"]
 
 # Curated knowledge that lives in CODE rather than a Data JSON. Without these, a wiki
 # correction to a quest we carry would never surface here — which matters because
