@@ -1,3 +1,49 @@
+## 2026-09-09 ~11:20 AM CT — LOOP CLOSED: P1b (DRA-28) fully landed — #472 merged, #473 closed, SSC #474 landed
+
+To: Helm
+
+All three Soft-next items from your ~10:50 AM CT SSC are discharged.
+
+- **#472 MERGED** to `main` (`511d221c`) on both gates green — `QuestLedgerStore.GuideProgress`,
+  `UI.Shared/GuideProgressRouter`, `GuideProgressStoreTests`, `GuideProgressRoutingTests`.
+  Lands dark; no `WhatsNew.json` entry, per the sign.
+- **#473 CLOSED WITHOUT MERGE.** Nothing ported out of it beyond the store refusal that was
+  already in `bee69a9e` before the ruling.
+- **SSC `helm/ssc-472` landed.** Answered LIVE ASK tip KEPT beneath your SIGNED answer, per the
+  2026-09-08 tip-drop semantics — no answered history deleted.
+
+**CONSTRUCTIVE — an SSC that signs a PR will always conflict with it, by construction.** `helm/ssc-472`
+came back `CONFLICTING` the moment #472 merged: your SSC prepends to `HELM-FEEDBACK.md` and `HELM.md`
+at line 1, and so did #472's LIVE ASK tip. Whichever lands second always collides at line 1. This is
+not a mistake in the ruling — it is a property of a top-prepending channel file plus two branches cut
+from the same base. I resolved it by merging `main` into the SSC branch and keeping both entries
+(0 deleted lines across both files, markers gone, backticked identifiers read back — trap 60 a/b/c).
+Worth making standing: **the SSC lands after the PR it signs, and takes a `main` merge on the way in.**
+
+**CORRECTIVE, small — "Drop LIVE ASK tip at merge (additions-only KEEP)" reads as two opposing
+instructions.** Taken literally the first half deletes the tip and the second half forbids it. I
+resolved it against your 2026-09-08 signed semantics ("does not mean delete answered history …
+or leaves the tip once Helm's SIGNED answer sits above it") and kept the tip. If that is the
+intent every time, the phrase "drop the tip" is now doing no work and is worth retiring — it costs
+a re-derivation from the archive on each land.
+
+**One fact that sharpens ask 2's diagnosis, and it is stronger than my hypothesis was.** I guessed
+the mutex keyed two spellings of one scope (`#445` vs `DRA-28`) as two claims. The live gitignored
+`claims.json` shows something more basic: it holds **exactly one claim ever** — `work_item 445 /
+seat dra-28-p1b`, now `abandoned`. The second seat never appears in it **at all**. So the failure is
+not (only) two keys colliding-by-not-colliding; at least one seat **kicked without its claim ever
+reaching the store**. Your naming-hygiene ruling still stands and I am not acting past it — but a
+canonical key does not fix a claim that was never written. Labelled as a fact about the store's
+contents, not yet a diagnosis of which path skipped the write.
+
+**Soft LEAVE kept.** No mutex-script rewrite. No P1c/P1d, no Phase 2. No fourth seat, no reviving
+#473. No TEL / Version / `v1.99.19` / Play Console / tag / publish / signing / prod secrets /
+Evolved settings restore.
+
+**Nothing is asked of you here.** This is a close, not an ask.
+
+— Dranak (Claude Code)
+
 ## 2026-09-09 ~10:50 AM CT — LIVE ASK answered: P1b duplicate Soft seats — **SIGNED #472** / **CLOSE #473 WITHOUT MERGE** (seat-key hygiene)
 
 To: Claude, Dranak, Soft, Fable
