@@ -40,6 +40,9 @@ public sealed record CompanionMapAction(CompanionMapEdit Edit, string Zone, doub
 /// </summary>
 public static class CompanionActions
 {
+    /// <summary>What a "strike this step out" tap prefixes its row id with.</summary>
+    public const string SkipVerb = "skip|";
+
     /// <summary>Apply one action. False when nothing matched (a stale id from a phone
     /// that was showing an old checklist) or the surface accepts no ticks — the caller
     /// then saves nothing and repaints nothing.</summary>
@@ -60,11 +63,33 @@ public static class CompanionActions
         // A guide row's id belongs to no settings list, so it has to be resolved before the
         // switch below goes looking for one and reports a stale id.
         if (string.Equals(action.Surface, CompanionSurfaces.Sky, StringComparison.OrdinalIgnoreCase)
-            && GuideChecklistProjection.IsGuideRowId(action.Id))
+            && (GuideChecklistProjection.IsGuideRowId(action.Id)
+                || action.Id.StartsWith(SkipVerb, StringComparison.Ordinal)))
         {
             if (ledger is null) return false;
-            if (GuideChecklistProjection.Resolve(GuideCatalog.Default, action.Id)
+            // "skip|<row id>" is the card's second verb. Verb-prefixed like the general
+            // tab's "track|"/"classes|" ids, so one surface key carries two edits without a
+            // second action type — and it routes to SetSkipped, never to the ledger direct.
+            var id = action.Id;
+            var skipping = false;
+            if (id.StartsWith(SkipVerb, StringComparison.Ordinal))
+            {
+                skipping = true;
+                id = id[SkipVerb.Length..];
+            }
+            if (GuideChecklistProjection.Resolve(GuideCatalog.Default, id)
                 is not var (guide, objective)) return false;
+
+            if (skipping)
+            {
+                if (GuideProgressRouter.IsSkipped(ledger, characterKey, guide.Id, objective)
+                    == action.Done)
+                    return false;
+                GuideProgressRouter.SetSkipped(
+                    ledger, characterKey, guide.Id, objective, action.Done);
+                return true;
+            }
+
             var items = GuideChecklistProjection.ItemsFor(
                 settings, GuideChecklistProjection.RewardKeyOf(guide));
             if (GuideProgressRouter.IsDone(settings, ledger, characterKey, guide.Id, objective, items)

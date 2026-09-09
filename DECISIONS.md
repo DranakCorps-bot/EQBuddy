@@ -1,3 +1,53 @@
+## 2026-09-09 (DRA-44 + DRA-36 — the calls I made alone)
+
+Cards: DRA-44 (wind runes on the zone page, provenance) and DRA-36 (the active-step card).
+Founder kicked the seat; Helm SIGNs the PR. Fable's #485 last-look is the source of DRA-44.
+
+**1. All 95 wind runes read identically, and none of them carries a WHEN.** The card said
+when/how EMPTY for the 73 newly authored, and that the 22 already authored on a class page
+"keep that source and ADD the zone page". I kept their SOURCE and dropped their WHEN, so all
+95 render the same. The default it could have gone the other way on: leaving the 22 with
+"eqlwiki's Monk page says the wind runes are a random drop…" while 73 identical steps said
+nothing about timing. Two rows describing ONE drop rule would then differ by which class page
+happened to repeat it, which is a distinction the player cannot act on. The fact now lives in
+WHERE for all 95. Reversal: Helm or Fable asking for the timing sentence back.
+
+**2. The Efreeti Chamber WHERE gained the Efreeti's Key, which the card did not ask for.**
+The same wikitext the card sent me to (Plane_of_Sky 211-217) says you buy a free Efreeti's Key
+from the Key Master before the pad works. The old sentence sent a player to a pad they cannot
+use. I was already rewriting those 48 rows' sources; leaving a WHERE that costs a trip while
+citing the page that fixes it was the worse option. Named in the PR body and the LIVE ASK
+rather than folded in silently. Reversal: Helm REJECT — it is one string in the generator.
+
+**3. Two Efreeti Statuette rows stopped asserting "Isle 4".** Found by READING THE SHOT, not
+the diff: the row said "Loot the Efreeti Statuette on Isle 4." one line above its own note
+saying the page does not give an isle. Neither the Druid nor the Wizard page places that
+piece; "Isle 4" is our checklist's grouping. The rows now say "Loot the Efreeti Statuette."
+under a "Not placed" stage. The default was to leave it — it is two rows — but a row that
+contradicts its own stub note in the same frame is the trap-73 failure in miniature.
+
+**4. `questsGuideNext` is the SUM of every card's next-row-id length, not the first card's.**
+The card's spec said "objective id LENGTH, not text". With six Warrior cards in view the
+FIRST card is not stable across a tick, because the Sky layout re-sorts groups by how close
+each is to done — so a first-card fact would change for two different reasons and the E2E
+could not tell them apart. A sum is order-independent and still moves when any card moves.
+
+**5. "Before leaving" ships as a correct rule that cannot fire yet, and a test says so.**
+No Sky objective waits on a LATER stage, so the signed precondition ("the next objective is
+on another stage and this stage still has open objectives") is unreachable in this data —
+measured, 0 backward prerequisites across 95 guides. I kept the rule because Delivery 2/3
+bring quests that reach backward, and added
+`NoShippedSkyGuideCanTriggerTheBeforeLeavingWarningYet` so the absent line is never read as a
+bug and so it fails loudly the day authoring makes it reachable. The default was to ship it
+silently and let someone wonder why they never see it.
+
+**6. The card's shot uses the DRUID lens, not the Warrior one the card specified.** DRA-44
+authored every Warrior wind rune, so no Warrior reward has a stub left to photograph — and
+the card explicitly asked for a frame with a visible stub row. The Druid's Efreeti Statuette
+is the one remaining stub that fits in a frame with its card. The window is also taller than
+the default: the first attempt put the card in and pushed every row off the bottom, which is
+the same below-the-fold miss the earlier two guide shots had.
+
 ## 2026-09-09 (The Quests rewrite delivery plan — the calls Fable made alone, and the three the Founder made in session)
 
 Plan: `docs/quests/WEEKEND-SHIP-BAG-2026-09-12.md`. **Founder, in session, three direction

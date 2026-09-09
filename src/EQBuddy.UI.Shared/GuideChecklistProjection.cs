@@ -132,6 +132,8 @@ public static class GuideChecklistProjection
             var home = GuideProgressRouter.HomeFor(objective, items, out var backing);
             var done = GuideProgressRouter.IsDone(
                 settings, ledger, characterKey, guide.Id, objective, items);
+            var skipped = !done
+                && GuideProgressRouter.IsSkipped(ledger, characterKey, guide.Id, objective);
             if (objective.Authoring == GuideAuthoring.Stub) stubs++;
 
             rows.Add(new QuestChecklistRow(
@@ -149,7 +151,8 @@ public static class GuideChecklistProjection
                 objective.Authoring == GuideAuthoring.Stub ? objective.StubNote : "",
                 guide.Id,
                 home == GuideProgressHome.SkyTurnIn,
-                GuidePresentation.RowTooltip(objective)));
+                GuidePresentation.RowTooltip(objective),
+                skipped));
         }
 
         var counts = GuideProgressRouter.Counts(settings, ledger, characterKey, guide, items);
@@ -159,7 +162,45 @@ public static class GuideChecklistProjection
             GuideId = guide.Id,
             GuideCaption = GuidePresentation.GuidedCaption(
                 counts.Done, counts.Skipped, counts.Total, stubs),
+            GuideCard = Card(group, guide, settings, ledger, characterKey, items),
         };
+    }
+
+    /// <summary>
+    /// The active-step card for one guided group — one producer of "what is next", read by
+    /// the desktop, the shell and the phone alike.
+    ///
+    /// <para>Every string is already worded here. A surface picks layout; it never decides
+    /// what the card SAYS, which is the only way three renderers stay honest about one
+    /// answer.</para></summary>
+    private static QuestChecklistCard Card(
+        QuestChecklistGroup group, Guide guide, AppSettings settings,
+        QuestLedgerStore ledger, string characterKey, IReadOnlyList<SkyQuestChecklistItem> items)
+    {
+        bool Done(GuideObjective o) =>
+            GuideProgressRouter.IsDone(settings, ledger, characterKey, guide.Id, o, items);
+        bool Skipped(GuideObjective o) =>
+            GuideProgressRouter.IsSkipped(ledger, characterKey, guide.Id, o);
+
+        var next = GuidePresentation.NextObjective(guide, Done, Skipped);
+        if (next is null)
+            return new QuestChecklistCard("", GuidePresentation.NoNextStep(guide, Done, Skipped));
+
+        // A stub's banner REPLACES where/what: "we cannot say where" and "here is where"
+        // must not both be on the card.
+        var stub = next.Authoring == GuideAuthoring.Stub;
+        return new QuestChecklistCard(
+            RowId(guide.Id, next.Id),
+            next.ShortInstruction.Length > 0 ? next.ShortInstruction : next.Title,
+            Where: stub ? "" : next.Where,
+            What: stub ? "" : next.What,
+            // Only the questions this step actually answers — never an empty label, which
+            // reads as a broken card rather than an honest one.
+            Who: stub ? "" : next.Who,
+            Why: GuidePresentation.CardWhy(group.Title),
+            BeforeLeaving: GuidePresentation.BeforeLeaving(guide, next, Done, Skipped),
+            StubNote: stub ? next.StubNote : "",
+            ImproveUrl: GuidePresentation.ImproveUrl(guide, next));
     }
 
     /// <summary>The dim line under a row. Who and where for an ordinary step; for a turn-in

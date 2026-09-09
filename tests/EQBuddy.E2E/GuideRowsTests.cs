@@ -126,6 +126,49 @@ public class GuideRowsTests
     }
 
     /// <summary>
+    /// The active-step card names the next step, and MOVES when that step is done.
+    ///
+    /// <para><c>questsGuideNext</c> is the next row id's LENGTH, never its text: the dump is
+    /// one flat space-separated namespace (trap 58), and the assertion is that the answer
+    /// CHANGED, which a length carries. The two ids differ in length by construction here —
+    /// <c>stone-amulet</c> against <c>wind-rune-azia</c>.</para>
+    ///
+    /// <para>The wait is on the length changing, a positive event that can only happen after
+    /// the loot line has been read AND the card re-selected (trap 62).</para>
+    /// </summary>
+    [Fact]
+    public void TheCardNamesTheNextStepAndMovesWhenItIsDone()
+    {
+        using var app = Fixture();
+        app.Launch();
+
+        app.WaitForDump("shellQuestsGuideRows", WarriorRows, "the guide steps");
+        app.WaitForDumpAtLeast("shellQuestsGuideCards", 1, "a card per guided group in view");
+        Assert.Equal(WarriorGuides.Count, app.DumpValue("shellQuestsGuideCards"));
+        Assert.Equal(0, app.DumpValue("shellQuestsGuideSkipped"));
+
+        var before = app.DumpValue("shellQuestsGuideNext");
+        Assert.True(before > 0, $"no card named a next step; dump was: {app.Artifacts()}");
+
+        // PREDICTED before the run: the Runed Wind Amulet card moves from "stone-amulet" to
+        // "wind-rune-azia", so the summed length grows by exactly the difference between
+        // those two ids. Derived from the catalog rather than typed, so re-authoring the
+        // guide fails this loudly instead of drifting past it (trap 23).
+        var amulet = GuideCatalog.Default.Guides
+            .Single(g => g.Id == "pos-warrior-runed-wind-amulet");
+        var delta = amulet.AllObjectives.Single(o => o.Id == "wind-rune-azia").Id.Length
+            - amulet.AllObjectives.Single(o => o.Id == "stone-amulet").Id.Length;
+        Assert.Equal(2, delta);
+
+        app.AppendLogLines(
+            "--You have looted a Stone Amulet from a sky drake's corpse.--");
+
+        app.WaitForDump("shellQuestsGuideNext", before + delta,
+            "the card to move from the amulet to the wind rune");
+        Assert.Equal(1, app.DumpValue("shellQuestsGuideDone"));
+    }
+
+    /// <summary>
     /// Both hosts draw the same guide. On WPF a shared view does not throw — it silently
     /// vanishes from whichever host drew it first (trap 45), and these counts are what would
     /// catch a guide surface handed between the two instead of built twice.
@@ -142,7 +185,8 @@ public class GuideRowsTests
         app.WaitForDump("questsGuideRows", WarriorRows, "the window's guide rows");
 
         foreach (var key in new[]
-                 { "GuideGroups", "GuideRows", "GuideStubs", "GuideDone", "GuideImprove", "SkyRows" })
+                 { "GuideGroups", "GuideRows", "GuideStubs", "GuideDone", "GuideImprove",
+                   "SkyRows", "GuideCards", "GuideNext", "GuideSkipped" })
             Assert.Equal(app.DumpValue("quests" + key), app.DumpValue("shellQuests" + key));
     }
 }

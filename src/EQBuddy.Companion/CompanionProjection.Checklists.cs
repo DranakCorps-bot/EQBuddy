@@ -159,12 +159,30 @@ public static partial class CompanionProjection
                     && GuideChecklistProjection.Resolve(GuideCatalog.Default, r.Id)
                         is var (guide, objective)
                     ? GuidePresentation.ImproveUrl(guide, objective)
-                    : null))],
+                    : null,
+                r.IsSkipped))],
             Class: g.ClassName,
-            Title: g.Title)));
+            Title: g.Title,
+            Card: GuideCard(g))));
 
         return new CompanionChecklistSection(
             scoped.Sum(g => g.Done), scoped.Sum(g => g.Total), groups);
+    }
+
+    /// <summary>The active-step card for the phone — the SAME card the desktop draws, from
+    /// the same projection. Nothing here decides what is next; it re-labels one already-worded
+    /// record into the wire shape and drops the questions this step does not answer.</summary>
+    private static CompanionGuideCard? GuideCard(QuestChecklistGroup group)
+    {
+        if (group.GuideCard is not { } card) return null;
+        static string? OrNull(string s) => s.Length > 0 ? s : null;
+        return new CompanionGuideCard(
+            card.RowId,
+            GuidePresentation.NextLead,
+            card.Instruction,
+            OrNull(card.Where), OrNull(card.What), OrNull(card.Who), OrNull(card.Why),
+            OrNull(card.BeforeLeaving), OrNull(card.StubNote), OrNull(card.ImproveUrl),
+            GuidePresentation.DoneLabel, GuidePresentation.SkipLabel);
     }
 
     /// <summary>

@@ -3805,8 +3805,8 @@
       ],
       "stages": [
         {
-          "id": "isle-4",
-          "name": "Isle 4",
+          "id": "not-placed",
+          "name": "Not placed",
           "order": 1,
           "arrivalNote": "",
           "objectives": [
@@ -3825,7 +3825,7 @@
                 }
               ],
               "objectiveType": "Loot",
-              "shortInstruction": "Loot the Efreeti Statuette on Isle 4.",
+              "shortInstruction": "Loot the Efreeti Statuette.",
               "who": "",
               "where": "",
               "what": "Loot Efreeti Statuette (1).",
@@ -13103,8 +13103,8 @@
       ],
       "stages": [
         {
-          "id": "isle-4",
-          "name": "Isle 4",
+          "id": "not-placed",
+          "name": "Not placed",
           "order": 1,
           "arrivalNote": "",
           "objectives": [
@@ -13123,7 +13123,7 @@
                 }
               ],
               "objectiveType": "Loot",
-              "shortInstruction": "Loot the Efreeti Statuette on Isle 4.",
+              "shortInstruction": "Loot the Efreeti Statuette.",
               "who": "",
               "where": "",
               "what": "Loot Efreeti Statuette (1).",

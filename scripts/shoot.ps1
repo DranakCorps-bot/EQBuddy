@@ -446,6 +446,45 @@ $Shots = [ordered]@{
     'shell-quests-narrow' = @{ Title = 'EQBuddy — Guide'
                            Env = @{ EQBUDDY_SHELL = 'quests:general'
                                     EQBUDDY_SHELL_SIZE = '899x640' }; Set = @{} }
+    # The ACTIVE-STEP CARD (P1d / DRA-36), and the frame both earlier guide shots missed:
+    # one with a STUB ROW ABOVE THE FOLD.
+    #
+    # The lens is DRUID, not Warrior. It had to move: DRA-44 authored all 95 wind runes on
+    # the zone page, so no Warrior reward has a stub left to photograph. The five that remain
+    # are the isle-only ones, and the Druid's Efreeti Statuette is the one that sits in a
+    # reward small enough to fit a card and its rows in one frame.
+    #
+    # The Statuette is ticked so the card is NOT sitting on the stub: that shows the ordinary
+    # card (Where / What / Who) and the stub ROW in the same picture, which is what the
+    # earlier two frames could not do. The stub-BANNER path is the untouched state of the
+    # same group and is covered by GuidePresentation tests rather than by a second shot.
+    #
+    # PREDICTED before shooting (trap 23), from the catalog and the one tick below:
+    #   * Druid lens; the six Druid rewards render as guides.
+    #   * "Druid - Shillelagh" reads "Guide - 1 of 4 - 1 stub" under its heading.
+    #   * Its card leads "NEXT:" + "Kill The Spiroc Lord on Isle 5 and loot the Spiroc
+    #     Battle Staff.", then Where "Plane of Sky - Isle 5.", What, Who "The Spiroc Lord",
+    #     then "for: Shillelagh", then Done / Skip / the pencil.
+    #   * No "Before leaving" line anywhere: no Sky objective waits on a later stage, so that
+    #     warning cannot fire on this data (NoShippedSkyGuideCanTriggerTheBeforeLeavingWarningYet).
+    #   * BELOW the card, the rows: "Loot the Efreeti Statuette." TICKED and carrying the
+    #     wrapped "Wiki incomplete -" caption naming what the Druid page does not say, under
+    #     a "Not placed" stage heading - the page gives neither an isle nor a mob for that
+    #     piece, so the row does not assert one (the first capture of this frame said "on
+    #     Isle 4" one line above a note saying the page gives no isle).
+    # TALLER THAN THE DEFAULT ON PURPOSE. The first attempt at this frame put the card in
+    # and pushed the rows off the bottom - the same below-the-fold miss the two earlier guide
+    # shots had, just caused by the thing being added. A shot that cannot show the card AND
+    # a row together is not evidence about how they read together.
+    'shell-quests-sky-guide-card' = @{ Title = 'EQBuddy — Guide'
+                           Env = @{ EQBUDDY_SHELL = 'quests:sky'
+                                    EQBUDDY_SHELL_SIZE = '1000x900' }
+                           Ledger = @{ Classes = @('Druid') }
+                           Set = @{
+                               SkyQuestChecklist = @(
+                                   @{ Id = 'sky-060'; Acquired = $true }   # Efreeti Statuette
+                               )
+                           } }
     # ---- E-3 PR 4: the HOME room, and the default landing ----------------------------
     #
     # **`EQBUDDY_SHELL = '1'` is deliberate and is half of what these shots prove.** Every

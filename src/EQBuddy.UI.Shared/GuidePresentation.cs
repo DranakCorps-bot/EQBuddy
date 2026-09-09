@@ -91,6 +91,97 @@ public static class GuidePresentation
     private static string Join(params string[] parts) =>
         string.Join(" · ", parts.Select(p => p.Trim()).Where(p => p.Length > 0));
 
+    // ---- the active-step card (P1d, requirements §12) --------------------------------
+
+    /// <summary>The card's lead-in. Upper-case in the mock and kept that way: it is the one
+    /// thing on the tab that says "do this next" rather than "here is everything".</summary>
+    public const string NextLead = "NEXT:";
+
+    /// <summary>What the card says when the guide has no step left to name.</summary>
+    public const string AllDone = "Every step is done.";
+
+    /// <summary>Every remaining step struck out. Distinct from done on purpose: the player
+    /// said "not doing these", and a card claiming completion would be putting words in
+    /// their mouth.</summary>
+    public const string AllSkipped = "Every step left is skipped.";
+
+    public const string DoneLabel = "Done";
+    public const string SkipLabel = "Skip";
+    public const string SkipTip =
+        "Not doing this one. It strikes through and the card moves on; you can take it back.";
+    public const string BeforeLeavingLead = "⚠ Before leaving:";
+
+    /// <summary>
+    /// The next step: the first objective in reading order that is not done, not skipped, and
+    /// whose prerequisites are all done.
+    ///
+    /// <para>Reading order and prerequisites answer this BETWEEN them, which is why the schema
+    /// has no derived <c>NextObjectiveIds</c> — a second producer of sequence is trap 4's
+    /// shape. <c>Validate()</c> guarantees the prerequisite graph is acyclic, so a guide can
+    /// always name a next step or say why it has none.</para>
+    ///
+    /// <para>A step whose prerequisites are SKIPPED rather than done is deliberately not
+    /// offered: skipping "loot the amulet" does not make "hand in the amulet" doable, and a
+    /// card that walked you to a turn-in you cannot make is worse than one that says
+    /// nothing.</para></summary>
+    public static GuideObjective? NextObjective(
+        Guide guide, Func<GuideObjective, bool> isDone, Func<GuideObjective, bool> isSkipped)
+    {
+        var done = new HashSet<string>(
+            guide.AllObjectives.Where(isDone).Select(o => o.Id), StringComparer.OrdinalIgnoreCase);
+
+        foreach (var objective in guide.AllObjectives)
+        {
+            if (done.Contains(objective.Id) || isSkipped(objective)) continue;
+            if (objective.PrerequisiteObjectiveIds.All(done.Contains)) return objective;
+        }
+        return null;
+    }
+
+    /// <summary>What the card says when <see cref="NextObjective"/> names nothing: whether the
+    /// guide is finished or merely put down. A guide with steps left that are all blocked by
+    /// skipped prerequisites reads as skipped, because that is what the player chose.</summary>
+    public static string NoNextStep(
+        Guide guide, Func<GuideObjective, bool> isDone, Func<GuideObjective, bool> isSkipped) =>
+        guide.AllObjectives.All(isDone) ? AllDone : AllSkipped;
+
+    /// <summary>"for: Runed Wind Amulet" — WHY, in the card's terms. The reward name and not
+    /// the step's own <see cref="GuideObjective.Why"/>: the card is lifted OUT of its group,
+    /// so the heading that would have said which reward this is for is not beside it.</summary>
+    public static string CardWhy(string reward) => "for: " + reward;
+
+    /// <summary>
+    /// The "you are about to strand yourself" line, and the one piece of card logic that is
+    /// about the STAGE rather than the step.
+    ///
+    /// <para>Shown only when the next step is on a DIFFERENT stage while this one still has
+    /// open steps — which on Plane of Sky means the next thing to do is on another island and
+    /// you have unfinished business on this one. Empty otherwise; a warning that is always on
+    /// is furniture.</para>
+    ///
+    /// <para>This is §5.5's <c>DoBeforeLeaving</c> intent without a new field: the stages and
+    /// the open steps already say it, and a hand-authored per-stage warning would be a second
+    /// producer of a fact the structure already carries.</para></summary>
+    public static string BeforeLeaving(
+        Guide guide, GuideObjective next, Func<GuideObjective, bool> isDone,
+        Func<GuideObjective, bool> isSkipped)
+    {
+        var nextStage = guide.Stages.FirstOrDefault(s => s.Objectives.Any(o =>
+            string.Equals(o.Id, next.Id, StringComparison.OrdinalIgnoreCase)));
+        if (nextStage is null) return "";
+
+        var stranded = guide.Stages
+            .Where(s => s.Order < nextStage.Order)
+            .SelectMany(s => s.Objectives)
+            .Where(o => !isDone(o) && !isSkipped(o))
+            .Select(o => o.Title)
+            .ToList();
+
+        return stranded.Count == 0
+            ? ""
+            : BeforeLeavingLead + " " + string.Join(", ", stranded);
+    }
+
     /// <summary>What a turn-in row says while its pieces are still outstanding. Names the
     /// steps rather than counting them: "2 steps first" tells a player nothing they can act
     /// on, and the whole point of the guide is that the next thing to do has a name.</summary>

@@ -236,6 +236,84 @@ public sealed class GuideSurfaceParityTests : IDisposable
             new CompanionAction(CompanionSurfaces.Sky, rowId, Done: true)));
     }
 
+    /// <summary>The card is ONE answer to "what is next", carried on the group — so the two
+    /// screens cannot run the selection rule separately and disagree.</summary>
+    [Fact]
+    public void ThePhoneNamesTheSameNextStepAsTheDesktop()
+    {
+        var settings = Settings();
+        var ledger = Store();
+
+        var desktop = Desktop(settings, ledger).Single(g => g.CompletionKey == RewardKey);
+        var phone = PhoneGroup(Phone(settings, ledger), desktop.Heading);
+
+        var card = desktop.GuideCard!;
+        Assert.NotEqual("", card.RowId);
+        Assert.Equal(card.RowId, phone.Card!.RowId);
+        Assert.Equal(card.Instruction, phone.Card.Instruction);
+        Assert.Equal(card.Why, phone.Card.Why);
+        Assert.Equal(GuidePresentation.NextLead, phone.Card.Lead);
+
+        // And it MOVES together: tick the named step and both name the next one.
+        Assert.True(CompanionActions.Apply(settings, ledger, Dranak,
+            new CompanionAction(CompanionSurfaces.Sky, card.RowId, Done: true)));
+
+        var movedDesktop = Desktop(settings, ledger).Single(g => g.CompletionKey == RewardKey);
+        var movedPhone = PhoneGroup(Phone(settings, ledger), desktop.Heading);
+        Assert.NotEqual(card.RowId, movedDesktop.GuideCard!.RowId);
+        Assert.Equal(movedDesktop.GuideCard.RowId, movedPhone.Card!.RowId);
+    }
+
+    /// <summary>A skip made on either screen is the same skip — it goes through the router
+    /// into the guide ledger, which is the only store that holds "not doing this one".</summary>
+    [Fact]
+    public void ASkipOnEitherScreenIsTheSameSkip()
+    {
+        var settings = Settings();
+        var ledger = Store();
+        var first = Desktop(settings, ledger)
+            .Single(g => g.CompletionKey == RewardKey).GuideCard!.RowId;
+
+        // The PHONE strikes it out, through the real action path.
+        Assert.True(CompanionActions.Apply(settings, ledger, Dranak,
+            new CompanionAction(CompanionSurfaces.Sky, CompanionActions.SkipVerb + first, Done: true)));
+
+        var desktop = Desktop(settings, ledger).Single(g => g.CompletionKey == RewardKey);
+        Assert.True(desktop.Rows.Single(r => r.Id == first).IsSkipped);
+        // The card moved past it rather than sitting on a struck-out step.
+        Assert.NotEqual(first, desktop.GuideCard!.RowId);
+
+        var phone = PhoneGroup(Phone(settings, ledger), desktop.Heading);
+        Assert.True(phone.Rows.Single(r => r.Id == first).Skipped);
+        Assert.Equal(desktop.GuideCard.RowId, phone.Card!.RowId);
+
+        // And back: taking the skip off restores it as the next step.
+        Assert.True(CompanionActions.Apply(settings, ledger, Dranak,
+            new CompanionAction(CompanionSurfaces.Sky, CompanionActions.SkipVerb + first, Done: false)));
+        var restored = Desktop(settings, ledger).Single(g => g.CompletionKey == RewardKey);
+        Assert.False(restored.Rows.Single(r => r.Id == first).IsSkipped);
+        Assert.Equal(first, restored.GuideCard!.RowId);
+    }
+
+    /// <summary>A guide with nothing left says which of the two finished states it is in, and
+    /// offers no verbs — a Done button with nothing to do is a silent no-op wearing an
+    /// affordance.</summary>
+    [Fact]
+    public void AFinishedGuidesCardNamesTheStateAndCarriesNoVerbs()
+    {
+        var settings = Settings();
+        var ledger = Store();
+
+        foreach (var row in Desktop(settings, ledger)
+                     .Single(g => g.CompletionKey == RewardKey).Rows)
+            CompanionActions.Apply(settings, ledger, Dranak,
+                new CompanionAction(CompanionSurfaces.Sky, CompanionActions.SkipVerb + row.Id, Done: true));
+
+        var card = Desktop(settings, ledger).Single(g => g.CompletionKey == RewardKey).GuideCard!;
+        Assert.Equal("", card.RowId);
+        Assert.Equal(GuidePresentation.AllSkipped, card.Instruction);
+    }
+
     [Fact]
     public void AClassWithNoGuideIsUnchangedOnThePhoneToo()
     {

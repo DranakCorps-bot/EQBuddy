@@ -207,6 +207,17 @@
      the block is one labelled line per question. */
   .rows .facts { display:block; font-size:11px; color:var(--dim); margin-top:2px;
                  white-space:pre-line; }
+  .rows li.skipped .rn { text-decoration:line-through; opacity:.6; }
+  /* The active-step card. Above the group's rows and under its heading, because the one
+     thing that says "do this next" belongs where the eye lands. */
+  .gcard { border:1px solid var(--hairline); border-radius:8px; padding:10px 12px; margin:6px 0 10px; }
+  .gcard .lead { font-size:11px; color:var(--accent); letter-spacing:.06em; }
+  .gcard .inst { font-weight:600; margin:2px 0 6px; }
+  .gcard .gl { display:block; font-size:12px; color:var(--dim); margin-top:2px; }
+  .gcard .warn { display:block; font-size:12px; margin-top:6px; }
+  .gcard .verbs { margin-top:10px; display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+  .gcard button { font:inherit; padding:6px 14px; border-radius:6px; border:1px solid var(--hairline);
+                  background:transparent; color:inherit; }
   .rows li.active .rn { color:var(--good); }
   .rows li.expiring .rn { color:var(--accent); }
   .rows li.missing .rn { color:var(--warn); }
@@ -1617,6 +1628,36 @@ function boot() {
   }
 
   // ---------- checklists (gear, and the quest surface's Epic/Sky tabs) ----------
+  // The active-step card. A phone has no hover, so what the desktop puts on one is drawn
+  // here; and only the questions the step actually answers get a line - an empty "Where:"
+  // reads as a broken card rather than an honest one.
+  function guideCard(surface, c) {
+    const box = el("div", "gcard");
+    box.appendChild(el("div", "lead", c.lead));
+    box.appendChild(el("div", "inst", c.instruction));
+    if (c.stub) box.appendChild(el("span", "warn", c.stub));
+    for (const [label, value] of [["Where: ", c.where], ["What: ", c.what], ["Who: ", c.who]])
+      if (value) box.appendChild(el("span", "gl", label + value));
+    if (c.why) box.appendChild(el("span", "gl", c.why));
+    if (c.beforeLeaving) box.appendChild(el("span", "warn", c.beforeLeaving));
+    // No next step: the finished sentence and no verbs. A button with nothing to do is a
+    // silent no-op wearing an affordance.
+    if (!c.rowId) return box;
+    const verbs = el("div", "verbs");
+    const done = el("button", null, c.doneLabel);
+    done.onclick = () => sendTick(surface, c.rowId, true);
+    const skip = el("button", null, c.skipLabel);
+    skip.onclick = () => sendTick(surface, "skip|" + c.rowId, true);
+    verbs.append(done, skip);
+    if (c.improve) {
+      const a = el("a", "improve", IMPROVE_LABEL);
+      a.href = c.improve; a.target = "_blank"; a.rel = "noopener";
+      verbs.appendChild(a);
+    }
+    box.appendChild(verbs);
+    return box;
+  }
+
   // One card builder for every checklist shape. opts.tickable draws the checkboxes,
   // with ticks sent under `surface` — the quest tabs pass "epics"/"sky", the old
   // names the desktop still applies. opts.filter narrows rows by text and
@@ -1735,13 +1776,17 @@ function boot() {
       h.append(el("span", null, g.heading));
       if (g.note) h.append(el("span", "note", g.note));
       wrap.appendChild(h);
+      // The active-step card, between the heading and the rows. Every string arrives
+      // worded from GuidePresentation; this decides layout only.
+      if (g.card) wrap.appendChild(guideCard(surface, g.card));
       const ul = el("ul", "rows");
       // A SUMMARY group's rows are not items — the Sky ready band names rewards, and its
       // ids are reward keys no tick accepts. It drew checkboxes anyway, so every tap was
       // a silent no-op (#212, bjstrange).
       const tickable = opts.tickable && g.tickable !== false;
       for (const r of rows) {
-        const li = el("li", (r.done ? "done " : "") + (tickable ? "tickable" : ""));
+        const li = el("li", (r.done ? "done " : "") + (r.skipped ? "skipped " : "")
+          + (tickable ? "tickable" : ""));
         const rn = el("div", "rn", r.text);
         if (r.detail) rn.appendChild(el("span", "sub", r.detail));
         if (r.stub) rn.appendChild(el("span", "stub", r.stub));
