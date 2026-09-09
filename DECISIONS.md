@@ -1,4 +1,27 @@
-## 2026-09-08 (the prose policy's hover side — a ceiling built, and a copy rule NOT written)
+## 2026-09-09 (guided progression P1b — the progress store, and three defaults the plan left open)
+
+Authority: the reporting duty, not an asking one. No consequence-list door — nothing leaves the
+machine, nothing is player-visible (P1b lands dark, per Fable's §9 ladder), no values line and
+no release. Helm authorised P1b ~10:18 AM CT. Plan: FABLE.md 2026-09-08 §4.
+
+- **A SKIP is allowed on a Sky turn-in; a DONE is refused** · the plan says the guide never
+  duplicates a turn-in tick, and the tidy reading is "a reward objective is read-only to the
+  ledger" · **decided the other way for skip**, because done and skipped are different
+  statements and only one of them has a second home. `SkyQuestCompleted` has no way to say "I
+  am not doing this", so refusing the skip would leave the player unable to fold the step away
+  at all — a silent no-op on the one verb the guide invented. Skipping a turn-in does NOT
+  reopen or touch it, the same asymmetry `SkyCompleteToggle.Reopen` already keeps when it
+  declines to untick a reward's items. Could go the other way at P1c if the card reads oddly.
+- **The refusal is enforced on the WRITE and ignored on the READ** · the default is a refusing
+  setter and a read that trusts the store · **both**, because a caller that ignores the refusal
+  (or a hand-edited `quest-ledger.json`) would otherwise leave a turn-in tick sitting in a file
+  that four other surfaces disagree with. `GuideProgressRouting.IsDone` routes on the reward key
+  and never reads the ledger for one, so the copy is not merely discouraged — it is unreadable.
+- **A guide back at zero keeps no row** · the default is to leave the emptied record with its
+  timestamp · **removed instead**: an empty record carrying a `LastUpdated` claims progress that
+  was undone, and `SetManual`'s "zero removes an entry" is the store's own precedent.
+
+
 
 Authority: the reporting duty, not an asking one. Nothing here is a consequence-list door —
 test-only, no copy written or reworded, no product file touched, nothing player-visible

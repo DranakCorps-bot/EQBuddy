@@ -43,6 +43,34 @@ public sealed class QuestLedgerStore
         public int Total => Math.Max(0, Verified + Looted + Manual - Consumed);
     }
 
+    /// <summary>
+    /// One character's MANUAL progress through one guide (<see cref="GuideCatalog"/>).
+    ///
+    /// <para><b>Manual, and only manual.</b> There is no inference at MVP — a step is done
+    /// because the player said so, which beats weak inference by construction. The Phase-5
+    /// auto-tick will offer events into the same lists; it does not get its own.</para>
+    ///
+    /// <para><b>Done and Skipped are different statements</b> — "I did this" and "I am not
+    /// doing this" — so they are different lists, and an id never sits in both.
+    /// <see cref="LastUpdated"/> is UTC: it stamps a player click, not a log line, and
+    /// nothing derives from it.</para>
+    ///
+    /// <para><b>What is NOT here: a Sky turn-in.</b> An objective carrying a
+    /// <see cref="GuideObjective.RewardKey"/> is done when the existing turn-in store says
+    /// it is (<c>AppSettings.SkyQuestCompleted</c>, written by the checklist, the phone and
+    /// the achievements import). The guide reads that fact; it never keeps a second copy
+    /// (trap 4). <see cref="SetGuideObjectiveDone"/> refuses one, and
+    /// <see cref="GuideProgressRouting.IsDone"/> would ignore it if a hand edit put one
+    /// here anyway.</para>
+    /// </summary>
+    public sealed class GuideProgress
+    {
+        public List<string> DoneObjectiveIds { get; set; } = [];
+        public List<string> SkippedObjectiveIds { get; set; } = [];
+        /// <summary>UTC of the last tick/untick/skip. 0001-01-01 = never touched.</summary>
+        public DateTime LastUpdated { get; set; }
+    }
+
     /// <summary>One character's slice: owned items plus the quests they chose to 📌-track
     /// (tracked quests show in the Quest Tracker even before any item overlaps).</summary>
     public sealed class CharacterLedger
@@ -72,6 +100,12 @@ public sealed class QuestLedgerStore
         /// preview needs this to survive restarts (and log truncation).</summary>
         public int Level { get; set; }
 
+        /// <summary>Guide id → the player's manual progress through it. Per CHARACTER,
+        /// where progress belongs: the per-PROFILE Sky/Epic tick lists in
+        /// <c>AppSettings</c> are a known wart this deliberately does not copy (Fable's
+        /// guided-progression plan §4; their consolidation is Phase 3's own work).</summary>
+        public Dictionary<string, GuideProgress> Guides { get; set; } = new(StringComparer.OrdinalIgnoreCase);
+
         /// <summary>The <c>writtenAt</c> of the last inventory dump reconciled onto this
         /// character — the watermark <see cref="ReconcileInventory"/> checks so a replayed
         /// or repeated announcement (launch replay, a second `/outputfile inventory` with
@@ -97,7 +131,9 @@ public sealed class QuestLedgerStore
     /// 2026-08-07: "ready ×17" counted every merge-consumed belt). On mismatch the
     /// LOG-DERIVED counters reset (Looted/Consumed/LastTime) so the next full-log
     /// replay rebuilds them under the current rules; manual counts, pins, hides,
-    /// completions, and classes are user statements and always survive.</summary>
+    /// completions, classes, and guide progress are user statements and always survive —
+    /// a counting rule is about what the LOG meant, and nothing here was derived from a
+    /// log line in the first place.</summary>
     private const int CountingRulesVersion = 2;
 
     public QuestLedgerStore(string path)
@@ -140,11 +176,21 @@ public sealed class QuestLedgerStore
                 // WITHOUT error — unknown item-name properties are silently ignored,
                 // leaving every character empty. Empty-but-nonempty-file means old shape:
                 // reparse it and carry the items over (no tracked quests existed yet).
+                //
+                // EVERY field of the new shape has to be listed here, guide progress
+                // included: a character whose only content is a `Guides` map looks
+                // "empty" to a short list, and the reparse below then reads `Guides` as
+                // an ITEM NAME (unknown Entry properties are ignored the same way), so
+                // `old.Values.Any(items => items.Count > 0)` is true and the guide
+                // progress is replaced by a phantom item entry. That is trap 20's shape
+                // — a new field, an old reader not updated — and it fails silently,
+                // which is why `AGuideOnlyLedgerReloadsAsGuideProgress` exists.
                 if (stored.Count > 0
                     && stored.Values.All(c => c.Items.Count == 0 && c.Tracked.Count == 0
                                               && c.Hidden.Count == 0 && c.Completed.Count == 0
                                               && c.Classes.Count == 0 && c.Level == 0
-                                              && c.UnlockedClasses.Count == 0))
+                                              && c.UnlockedClasses.Count == 0
+                                              && c.Guides.Count == 0))
                 {
                     try
                     {
@@ -172,6 +218,7 @@ public sealed class QuestLedgerStore
                         Completed = new Dictionary<string, int>(kv.Value.Completed, StringComparer.OrdinalIgnoreCase),
                         Classes = kv.Value.Classes,
                         UnlockedClasses = kv.Value.UnlockedClasses,
+                        Guides = new Dictionary<string, GuideProgress>(kv.Value.Guides, StringComparer.OrdinalIgnoreCase),
                         Level = kv.Value.Level,
                         LastInventoryReconcile = kv.Value.LastInventoryReconcile,
                     }),
@@ -444,6 +491,105 @@ public sealed class QuestLedgerStore
             if (done) c.Completed[questName] = Math.Max(1, c.Completed.GetValueOrDefault(questName));
             else c.Completed.Remove(questName);
             Save();
+        }
+    }
+
+    /// <summary>This character's manual progress through one guide (copy; an untouched
+    /// guide reads as an empty <see cref="GuideProgress"/>, never null — "no progress" is a
+    /// real answer and every caller has to render it).</summary>
+    public GuideProgress GuideProgressFor(string characterKey, string guideId)
+    {
+        lock (_lock)
+            return _byCharacter.TryGetValue(characterKey, out var c)
+                   && c.Guides.TryGetValue(guideId, out var p)
+                ? new GuideProgress
+                {
+                    DoneObjectiveIds = [.. p.DoneObjectiveIds],
+                    SkippedObjectiveIds = [.. p.SkippedObjectiveIds],
+                    LastUpdated = p.LastUpdated,
+                }
+                : new GuideProgress();
+    }
+
+    /// <summary>
+    /// "I did this step" / "no I didn't" — the player's own statement, per character.
+    ///
+    /// <para><b>Returns false when this store does not own the fact.</b> An objective
+    /// carrying a <see cref="GuideObjective.RewardKey"/> is a Sky turn-in: its tick lives in
+    /// <c>AppSettings.SkyQuestCompleted</c>, where the classic checklist, EQBuddy Mobile and
+    /// the achievements import all already write it. Ticking it here as well would make one
+    /// fact disagree with itself on four surfaces (trap 4), so the write is REFUSED rather
+    /// than quietly accepted — the caller routes it with
+    /// <see cref="GuideProgressRouting.WriterFor"/> and marks it through
+    /// <c>SkyCompleteToggle.MarkTurnedIn</c> instead. Nothing is written on a refusal.</para>
+    ///
+    /// <para>True means the ledger owns it and the store is now in the asked-for state,
+    /// including when it already was — a re-render or a double click is not a change.
+    /// Marking done clears any skip: they contradict.</para>
+    /// </summary>
+    public bool SetGuideObjectiveDone(
+        string characterKey, string guideId, GuideObjective objective, bool done)
+    {
+        if (GuideProgressRouting.WriterFor(objective) != GuideProgressWriter.GuideLedger)
+            return false;
+        return SetGuideMembership(characterKey, guideId, objective.Id, done,
+            p => p.DoneObjectiveIds, contradicts: p => p.SkippedObjectiveIds);
+    }
+
+    /// <summary>
+    /// "I am not doing this step" — folded away rather than ticked.
+    ///
+    /// <para>Allowed on EVERY objective, turn-ins included, because unlike done it has no
+    /// second home: the Sky store has no way to say "skipped", so refusing it here would
+    /// leave the player unable to fold a step away at all. It is a different fact from a
+    /// turn-in, not a copy of one — skipping a reward objective does NOT reopen or alter the
+    /// turn-in, the same asymmetry <c>SkyCompleteToggle.Reopen</c> keeps when it declines to
+    /// untick a reward's items. Marking skipped clears any done tick this store holds.</para>
+    /// </summary>
+    public bool SetGuideObjectiveSkipped(
+        string characterKey, string guideId, GuideObjective objective, bool skipped)
+        => SetGuideMembership(characterKey, guideId, objective.Id, skipped,
+            p => p.SkippedObjectiveIds, contradicts: p => p.DoneObjectiveIds);
+
+    private bool SetGuideMembership(string characterKey, string guideId, string objectiveId,
+        bool member, Func<GuideProgress, List<string>> list,
+        Func<GuideProgress, List<string>> contradicts)
+    {
+        if (characterKey.Length == 0 || guideId.Length == 0 || objectiveId.Length == 0)
+            return false;
+        lock (_lock)
+        {
+            var c = CharacterFor(characterKey);
+            if (!c.Guides.TryGetValue(guideId, out var progress))
+            {
+                // Nothing to un-tick, and an empty record is not progress: unticking a
+                // guide nobody has started must not put a row in the file.
+                if (!member) return true;
+                c.Guides[guideId] = progress = new GuideProgress();
+            }
+
+            var target = list(progress);
+            var other = contradicts(progress);
+            var has = target.Contains(objectiveId, StringComparer.OrdinalIgnoreCase);
+            var contradicted = member && other.Contains(objectiveId, StringComparer.OrdinalIgnoreCase);
+            if (member == has && !contradicted) return true;
+
+            if (member)
+            {
+                if (!has) target.Add(objectiveId);
+                other.RemoveAll(Same);
+            }
+            else target.RemoveAll(Same);
+
+            progress.LastUpdated = DateTime.UtcNow;
+            // A guide back at zero holds nothing worth a row — and an empty record with a
+            // timestamp on it would claim progress that was undone.
+            if (progress.DoneObjectiveIds.Count == 0 && progress.SkippedObjectiveIds.Count == 0)
+                c.Guides.Remove(guideId);
+            Save();
+            return true;
+
+            bool Same(string id) => id.Equals(objectiveId, StringComparison.OrdinalIgnoreCase);
         }
     }
 
