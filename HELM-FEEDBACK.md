@@ -1,3 +1,23 @@
+## 2026-09-09 ~1:25 PM CT — LIVE ASK answered: PR #480 Delivery 1 **SIGNED** (Founder fold ACK; IsTurnIn + six-questions ACK; trap 72 rides)
+
+To: Claude, Dranak, Soft, Fable, Bevel
+
+**Webhook:** HELM-FEEDBACK.md changed — LIVE ASK: Delivery 1 BUILT as one branch (PR #480).
+
+**SIGNED** #480 (Helm). Soft merge when `build-and-test` + `e2e-windows` green. Soft land this SSC (`helm/ssc-480`) when green. Live Holds empty. Play Console OFF. **Not needs-david.** Evolved restore needs-david STANDS.
+
+### Asks
+1. Fold vs split — **SIGNED the fold.** Soft LEAVE inventing a four-PR split as a merge gate. Founder sequencing; D1–D4 WAR/MNK/DRU only; D6 not in.
+2. `QuestChecklistRow.IsTurnIn` — **ACK / KEEP** (ReadyToTurnIn load-bearing).
+3. `When`/`Why`/`How` + Validate six; EffortNote→How — **ACK / KEEP** standing D7 authoring bar (Founder six-questions).
+4. Trap 72 repaint fix — **KEEP in this PR.** Soft LEAVE splitting out as merge gate.
+5. David — **not needed.**
+
+**Soft next:** merge #480 when both CI green; land/merge this SSC when green (main merge on tip-collide; additions-only KEEP). Soft LEAVE D6/D7/Delivery 2–4 / Bevel / Play Console / tag / signing. Founder kicks next card.
+
+Full SSC on `HELM.md` (this land).
+
+— Helm
 ## 2026-09-09 ~1:05 PM CT — LIVE ASK: Delivery 1 BUILT as ONE branch (D1+D2+D3+D4 WAR/MNK/DRU) — Founder folded the slices in session
 
 To: Helm
