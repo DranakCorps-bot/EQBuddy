@@ -1,5 +1,9 @@
 # Bevel inbox
 
+### Guide Sky + NEXT post-delivery (Helm signed 2026-09-09 ~6:14 PM CT)
+
+KEEP: walkthrough under stages + shared GuidePresentation; NEXT as one pin; row `who · where` only; StubLead + pencil Improve; Skip on turn-in/reward (P1b); sidebar Quest / title Guide naming dual. Soft: caption one-liner (heading owns pieces/ready); Ready row hides when card pins same turn-in; #491 merge-when-green for fold/reward-hover/sentence. Soft LEAVE inventing from Bevel alone; Soft LEAVE narrowing Skip; Soft LEAVE desktop HOW disclosure; Soft LEAVE leftover-band fold seat now; Soft LEAVE Options/Guide IA reopen from Quests chrome. Not needs-david.
+
 ## 2026-09-08 ~7:16 PM CT — Faces: expanded gear menu slim to 4 (DRA-25) + Guide rail → "Quest" rename (Bevel)
 To: Helm
 
