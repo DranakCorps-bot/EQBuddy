@@ -10479,3 +10479,57 @@ belongs to the release that ships the surface.
 **Asking for:** SIGN or reject PR #472. Nothing else is held on this.
 
 — Dranak (Claude Code)
+
+## 2026-09-09 — LIVE ASK: Isle-2 Protector sweep BUILT — 2 KEPT, 0 corrected, 4 pinned
+To: Helm
+
+Your SSC #484 ask 3 authorized the remaining `Isle two - Protector of Sky` hygiene sweep
+under Soft ≤3 once #483 was on main. #484 is on main (`735fe11f`). One seat claimed,
+`isle-two-protector-sweep`. **The sweep is done and the answer is KEEP — no data changed.**
+
+**Inventory — the whole remaining population is two rows**, both in `SkyQuestDefaults.cs`,
+and no `GuideCatalog` step reads either (the catalog is Warrior/Monk/Druid only from D4, so
+trap 4 had no second producer to move):
+
+| Row | Class / item | Ships as | Wiki says | Verdict |
+|---|---|---|---|---|
+| `sky-015` | Beastlord — Azarack Skin | `Isle 2: Protector of Sky` | `2-PoS` | **KEEP — true** |
+| `sky-027` | Berserker — Azarack Blood | `Isle 2: Protector of Sky` | `2-PoS` | **KEEP — true** |
+
+**The evidence, and why the code is decodable rather than guessed.** The wiki's Plane of Sky
+class test tables tag every piece `<island>-<source>`: `8-EoV`, `5-SL`, `7-SotS`, `6-BZ`,
+`3-Gorga`, `4-KoS`, `7-Trash`, `2-PoS`. I did not take that reading on faith — **both rows
+already corrected by other means read `7-Trash`**, which is exactly what they were corrected
+TO (`sky-128` Golden Hilt via #176's four-way check; `sky-204` Gem of Invigoration via #483).
+Two independently-verified rows confirming the decoding is the second source before acting
+(trap 52). Corroborating on the same page: island 2 *is* "Azarack Island", its boss *is* the
+Protector of Sky, he "drops the key to Island 3 and some quest pieces", and the two quests
+are "Beastlord Test of Azarack" and "Berserker Test of Blood". Cached dump only — **no live
+eqlwiki fetch**, per your Soft LEAVE.
+
+**The finding that changed what I built.** Two corrections in a row make "an Isle 2 Protector
+row is a harvest bug" look like a rule, and the third look was as likely to be over-applied
+as under-applied — correcting `sky-015`/`sky-027` for consistency would have made EQBuddy
+*uniquely* wrong on two rows that are currently right, which is the exact failure the
+match-the-wiki rule exists to prevent. **And nothing executable stood behind either earlier
+correction — both rested on a code comment.** So the deliverable is the guard, not a data
+edit: `SkyIsleTwoHarvestTests` pins all four rows from one table (trap 4), deny-list and
+must-list together because a deny-list alone cannot see the two rows that would break
+(trap 34). Prove-failed both directions — reintroducing the defect on `sky-204` fails three
+assertions naming it; "fixing" `sky-015` to Isle 7 fails two. I also discharged the standing
+"worth a look next time anyone is in this file" comment, so a fourth sweep is not commissioned.
+
+**Scope kept.** No product/data change — `SkyQuestDefaults` rows are byte-identical, comment
+aside. No guide, projection, phone, shot or surface work. No D6/D7/Delivery 2–4 invent. No
+Play Console, tag, `release.ps1`, signing, prod secrets or Evolved settings restore. **No
+`WhatsNew.json` entry** — nothing is player-noticeable (test + comment + TestPlan row), on the
+#466 test-only precedent. One PR, one seat, no parallel claim.
+
+Local: build clean, `check.ps1` all gates green, 4109 unit tests pass.
+
+**Asking for:** SIGN or reject the PR. One judgement call inside it if you want to overturn
+it: I read "when wiki agrees Isle 2 is correct, KEEP" as also licensing the **guard** over
+those true rows, since leaving them unpinned is what leaves the fourth look available.
+Nothing else is held on this.
+
+— Dranak (Claude Code)
