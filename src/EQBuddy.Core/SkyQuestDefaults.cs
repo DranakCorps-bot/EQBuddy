@@ -223,7 +223,22 @@ internal static class SkyQuestDefaults
         SkyLine("sky-201|Warrior|Torgon Blademaster|Belt of the Four Winds|Wind Tablet|Isle 6: Bazzt Zzzt"),
         SkyLine("sky-202|Warrior|Torgon Blademaster|Belt of the Four Winds|Wind Rune Fana|Trash mobs"),
         SkyLine("sky-203|Warrior|Torgon Blademaster|Dagas|Djinni War Blade|Isle 7: Sister of the Spire"),
-        SkyLine("sky-204|Warrior|Torgon Blademaster|Dagas|Gem of Invigoration|Isle two - Protector of Sky"),
+        // Isle 7 trash, not Isle 2's Protector of Sky (corrected 2026-09-09, PR #480's
+        // last-look). "Warrior Plane of Sky Tests" lists this piece as "7-Trash"; the
+        // "Isle two - Protector of Sky" reading is from the original #70 harvest and has
+        // no reporter and no hand-in behind it. David's standing rule decides it: WHEN WE
+        // CANNOT RESOLVE A CONFLICT, MATCH THE WIKI — departing needs a confirmed turn-in
+        // and there is none either way.
+        //
+        // SECOND INSTANCE OF ONE HARVEST DEFECT: sky-128 above was the same mistake, the
+        // same wrong isle and the same wrong named (#176, Fennec-Halas, corrected
+        // 2026-08-16). Worth a look at every remaining "Isle two - Protector of Sky" row
+        // the next time anyone is in this file.
+        //
+        // The guide's step reads from this row, so both had to move together — one fact,
+        // one producer (trap 4). It stays AUTHORED rather than a both-sides stub: hedging
+        // where the wiki has an answer is how EQBuddy becomes uniquely wrong.
+        SkyLine("sky-204|Warrior|Torgon Blademaster|Dagas|Gem of Invigoration|Isle 7: trash"),
         SkyLine("sky-205|Warrior|Torgon Blademaster|Dagas|Wind Rune Jaka|Trash mobs"),
         SkyLine("sky-206|Warrior|Torgon Blademaster|Fangol|Efreeti Battle Axe|Isle eight: the Hand of Veeshan; Isle four: Overseer of Air; Isle 1.5: Noble Dojorn"),
         SkyLine("sky-207|Warrior|Torgon Blademaster|Fangol|Ethereal Emerald|Isle 8: Eye of Veeshan"),

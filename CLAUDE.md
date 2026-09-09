@@ -518,7 +518,7 @@ they live on `legacy-v1`.)
 | Spawn points / timers | `Core/SpawnPointLedger.cs`, `Core/SpawnTimers.cs` |
 | Wiki lookups + contribution packs | `Core/EqlWikiMobs.cs`, `Core/WikiContribution.cs` |
 | The widget itself | `EQBuddy/MainWindow.xaml.cs` (~4.5k lines — the hotspot) |
-| A guide's stages, objectives, and how complete OUR data is | `Core/GuideCatalog.cs` + `Core/Data/GuideCatalog.json` — CURATED, never auto-written. `Validate()` is lock 4a executable: an `Authored` objective answers **all six questions — who, what, where, when, why, how** (David, 2026-09-09) and cites a source, a `Stub` says what is missing, a `RewardKey` is one the Sky checklist already owns |
+| A guide's stages, objectives, and how complete OUR data is | `Core/GuideCatalog.cs` + `Core/Data/GuideCatalog.json` — CURATED, never auto-written. `Validate()` is lock 4a executable: an `Authored` objective answers **who + where + what** and cites a source, a `Stub` says what is missing, a `RewardKey` is one the Sky checklist already owns. **The six questions are the SCHEMA, not a fill-in bar** — `When`/`Why`/`How` are optional and stay EMPTY where no source answers them (`GuideCatalog.FabricatedProse` refuses the sentences we invented once; trap 73) |
 | Turning a guide into the rows every surface draws | `UI.Shared/GuideChecklistProjection.cs` — a guided reward's item rows are REPLACED by its objectives; an unguided one comes back the same object (lock 5). `UI.Shared/GuidePresentation.cs` owns every word, and **each of the six is drawn in exactly one place**: WHAT is the row title, who·where·when the row's line, why+how the hover (the phone has no hover, so they ride the row — trap 35) |
 | Where a guide step's tick lives | `UI.Shared/GuideProgressRouter.cs` — THREE homes, one writer each: `SkyTurnIn` (a `RewardKey`), **`SkyItem`** (an acquire-shaped step naming exactly one of ITS reward's checklist rows → that row's own box, so the loot auto-tick lights it), else the guide ledger. Group-scoped: one class's Wind Rune is never another's |
 | Quest surface (all four tabs) | `EQBuddy/QuestsView.xaml.cs`. `QuestsWindow` is a thin host; `QuestsRoom` is the shell's **Guide** room (label only — the wire key is still `quests`). **Both build their own instance** |
@@ -799,6 +799,19 @@ after the named guard left with its surface.
     before the fix and passes in 4 s after. Dump both numbers from one moment
     (`questsSkyAcquired` beside `questsGuideDone`) — "the store says so" and
     "the screen says so" are different claims (trap 56).
+
+73. **A schema that has a field for every question becomes a licence to
+    ANSWER every question.** "All six must be addressed" was read as
+    validation, so 48 authored steps got ten template sentences — nineteen
+    asserting spawn cycles and group size against wiki pages that say
+    neither — each cited to that page and then piped into the share-back
+    draft as "EQBuddy shows:", asking players to correct our own guess.
+    Optional fields, and a curated deny-list of the invented sentences
+    (`GuideCatalog.FabricatedProse` + `NoShippedStepCarriesAnyOfTheInventedSentences`);
+    a filled `When`/`How` must name what it rests on. **The tell is
+    DISTINCT-COUNT: 48 rows carrying 10 distinct values for a per-row fact
+    is a template, not research.** Survey a curated file before believing
+    it — Fable's #480 last-look found this by counting, not by reading.
 
 New trap discovered the hard way? Add the compact rule here and the novel
 under `docs/ops/claude-archive/traps.md`. That is the whole point.
