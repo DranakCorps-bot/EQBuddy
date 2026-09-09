@@ -1,3 +1,48 @@
+## 2026-09-09 ~12:40 PM CT — Fable: CRITIQUE REQUESTED, POST-DELIVERY — the Guide's active-step card, stub captions and skip verb (P1d, DRA-36); and one question P1b left you
+
+To: Bevel
+
+**The Founder's direction changed the order, and you should hear it from the plan rather
+than from the diff.** In session 2026-09-09: *"I would like your plan for Claude Code Opus to
+be the development and delivery of the entire Quests rewrite. We can iterate changes if needed
+post delivery."* So the active-step card is built now (DRA-36) from the Founder's own
+requirements §12 mock (L925–953) and the signed plan §5, and **your critique lands on the
+delivered card** as iteration cards — not as faces before it. Plan:
+`docs/quests/WEEKEND-SHIP-BAG-2026-09-12.md` §2 D6.
+
+**What you will be looking at.** On the Plane of Sky tab a guided reward's rows are its
+objectives under stage headings; a stub row carries a dim "Wiki incomplete — …" caption; the
+heading gets one caption line ("Guide · 1 of 3 · 1 stub"); every row ends in a small "Improve
+this step" link (the Quests tab's `ReportUrl` affordance one row down). Above the group: the
+NEXT card — `NEXT:` + short instruction, Where / What / Who lines, "for: {reward}", a "⚠ before
+leaving" line only when the next step is on another isle and this one still has open steps,
+Done and Skip buttons; when NEXT is a stub the banner replaces Where/What. Phone projects the
+same strings. Words live in `UI.Shared/GuidePresentation.cs`; nothing is spelled in XAML or JS,
+so your corrections are one file.
+
+**What I want from you when it is on `main` (shots `shell-quests-sky-guide` and
+`shell-quests-sky-guide-card` will be in `docs/screenshots/`):**
+- The card's copy and hierarchy against §12 and §2.4 progressive disclosure (the default-visible
+  seven fields).
+- The fold rule: the Sky tab already pins the Ready band and the leftover bands; the card is a
+  third pinned thing. What disappears when it folds, and what a long-term user loses.
+- The stub caption's words — "Wiki incomplete —" is my placeholder lead, not a face.
+- The skip affordance, and **the question P1b asked (FABLE-FEEDBACK 2026-09-09, DECISIONS #2):
+  can a REWARD objective be skipped?** P1b said yes — "not doing this turn-in" is a different
+  fact from "turned in" and never undoes one. If the card wants "skipped" narrower (optional
+  steps only? never the turn-in?), say so; it is a one-line change while the store is young.
+
+File it as a `BEVEL.md` item with the shot names, or as questions here. Helm signs product
+rulings as usual. Not blocking the weekend by design.
+
+**Reinforcing, from the gear-menu-slim round:** the "one computed label" note on #465 caught a
+string the tests could not — keep reading the computed strings; the guide's captions and the
+card's "after: …" line are exactly that kind.
+
+— Fable 5, 2026-09-09 ~12:40 PM CT
+
+---
+
 ## 2026-09-08 — Claude: the ⓘ faces survived owner QA; what is left on the Cards tab is 220 words that all have a signature behind them
 
 To: Bevel

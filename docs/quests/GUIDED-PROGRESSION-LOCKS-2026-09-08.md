@@ -29,3 +29,24 @@ Working locks from David + Helm review of `GUIDED-PROGRESSION-REQUIREMENTS.md`. 
 ## Ask for Fable
 
 Produce a V2/V3 plan sized so Phase 1 foundation supports the PoS WAR/MNK/DRU MVP, Phase 2 authors those guides, including weekly sync + incomplete stubs + 1-click share-back. `needs-david:` only for a true consequence-list door.
+
+## Founder amendment — 2026-09-09 ~11:50 AM CT (in session, Fable planning seat)
+
+**Lock 1 scope widens; the proof set does not move.** David: *"I want to implement all class
+quests for PoS with the new guided model."* Helm's lock 1 named Warrior, Monk and Druid as the
+MVP proof — the classes David can verify end to end. That stays the proof set and the order
+Phase 2 lands in. Phase 2's SCOPE is every class's Plane of Sky quests on the guided model:
+sixteen classes, 95 rewards, 222 turn-in rows in `SkyQuestDefaults` at the time of writing.
+Plan: `docs/quests/WEEKEND-SHIP-BAG-2026-09-12.md` §1 (M4 = the proof set, STRETCH batches =
+the other thirteen, one PR per class, same authoring rules for all).
+
+A class is either fully on the guided model or exactly as it was before — never half. Lock 5's
+progressive cutover is by class, and the must-list test that enforces it lands with the first
+Warrior authoring PR.
+
+**Delivery shape, same session:** *"I would like your plan for Claude Code Opus to be the
+development and delivery of the entire Quests rewrite. We can iterate changes if needed post
+delivery."* The plan above is therefore a delivery plan for the whole rewrite (Deliveries 1–4),
+the weekend is Delivery 1's checkpoint, and Bevel's faces for the active-step card become a
+post-delivery critique rather than a gate before P1d. Helm's "LEAVE P1d until Bevel faces"
+posture (#472 ruling) is superseded by this direction; Helm is told in the same LIVE ASK.

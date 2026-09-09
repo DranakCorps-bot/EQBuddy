@@ -1,3 +1,62 @@
+## 2026-09-09 (The Quests rewrite delivery plan — the calls Fable made alone, and the three the Founder made in session)
+
+Plan: `docs/quests/WEEKEND-SHIP-BAG-2026-09-12.md`. **Founder, in session, three direction
+calls (consequence 5, his — recorded, not decided here):** all sixteen classes' PoS quests on
+the guided model; WAR/MNK/DRU is the proof set not the scope; *"the development and delivery of
+the entire Quests rewrite… iterate post delivery."* The third one moves the active-step card
+from "after Bevel faces" to "built now from the Founder's §12 mock, Bevel critiques after";
+Helm is told as a ruling to ACK.
+
+**1. `GuideChecklistProjection` lands in `UI.Shared`, not `Core` as §5 wrote.** Its read side
+is `GuideProgressRouter.IsDone`, which P1b put in UI.Shared because the write side needs
+`SkyCompleteToggle`. Core cannot reference up; the phone already references UI.Shared. The
+default it could have gone the other way on: a Core projection that reads the ledger and the
+Sky list itself — a second reader of "is this done" beside the router. What would reverse it:
+`SkyCompleteToggle` moving into Core, which Delivery 2's consolidation does; the projection and
+router may follow it then.
+
+**2. A third progress home, `SkyItem`, in D1 rather than a duplicate tick.** An objective naming
+exactly one of its group's turn-in item rows reads that item's `Acquired` and writes through the
+item's existing setter; the raw item row is not drawn a second time. The default was to append
+guide rows under the item rows and accept two ticks for one item until Phase 5. I did not,
+because the first thing a Warrior sees would be "Stone Amulet" twice with two boxes, and trap 4
+is the plan's own rule. Not inference: the loot auto-tick already writes the item; the guide
+row only reads it. What would reverse it: Helm REJECT on ask 1.
+
+**3. P1d in two slices, lite before card.** "Improve this step" as a row-end link (D3) needs no
+face under any reading and is lock 4's 1-click share-back; the card (D6) follows D1–D3 so its
+NEXT rule has rows to select from. Order only; the Founder decided that both build now.
+
+**4. ONE WhatsNew entry, added by D1 to the unreleased 2.0.0 block, extended by later
+Delivery-1 slices.** P1b's #4 named "P1c in the same release" as the reversal; 2.0.0 is untagged,
+so that is now. The class authoring PRs and the card do not each add one.
+
+**5. Cards created in `backlog` with no assignee.** A `todo` card assigned to the Executor is an
+automation wake (DRA-28's run was `invocationSource: automation`), and the Founder said the
+Founder kicks Opus. The role is named in each card body. Reversal: the Founder assigns at kick.
+
+**6. Phase 2 lands one PR per class, WAR → MNK → DRU, then three batches of the other thirteen
+(smallest reward count first within a batch).** The default was one PR for the proof set; one
+file, sequential PRs is the same merge cost and lets a class page's authoring surprises land
+before the next class starts. A class is fully guided or exactly as before — the must-list test
+lands with WAR.
+
+**7. Deliveries 2–4 are planned now at the level §9 deferred, and Phases 5/6 stop at scope.**
+The Founder asked for the whole rewrite; §7 of the document gives Phase 3 (consolidation, then
+normal-quest conversion) and Phase 4 (Epics) enough shape for an Opus card, and says out loud
+that Phase 5/6 plans wait for the consolidated store to exist. The default was "own plan when
+its turn comes" for all four; I kept it only where the plan would be invented rather than
+derived.
+
+**8. `ObjectiveType` string → enum stays open until batch 3 lands.** P1a asked; sixteen class
+files are the evidence and there is no `switch` over it yet.
+
+**9. The plan lives in `docs/quests/` with a FABLE.md pointer, and DRA-27's `weekend-ship-bag`
+document is revision 2 of the same text.** The 10:34 AM draft in the abandoned Planner
+worktree stays untracked; it predates P1b and could not read the locks doc, and its own annex
+already said so. The filename keeps the weekend date because DRA-27 is the weekend card; the
+title inside says what it became.
+
 ## 2026-09-09 (P1b was built twice — what I decided on my own, and what I did not)
 
 Two Soft seats independently built the whole of guided-progression P1b and both opened a

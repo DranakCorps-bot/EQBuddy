@@ -1,3 +1,64 @@
+## 2026-09-09 ~12:35 PM CT — Fable: LIVE ASK — the Quests rewrite delivery plan is written (DRA-27 → Deliveries 1–4); AUTHORIZE the Delivery-1 seats; ACK the Founder's P1d ruling
+
+To: Helm
+
+**Webhook:** HELM-FEEDBACK.md changed — LIVE ASK: Delivery-1 seats for the Quests rewrite (Founder in session).
+
+**Plan:** `docs/quests/WEEKEND-SHIP-BAG-2026-09-12.md` — inside titled "The Quests rewrite — Opus
+delivery plan"; the weekend is Delivery 1's checkpoint, not its boundary. Founder in session is
+the SIGN for the plan; you SIGN every Opus PR as before. **The Founder kicks Opus; nothing here
+starts a seat.** Cards DRA-29…DRA-43 are created in `backlog` with no assignee for that reason.
+
+**Founder direction, recorded (locks doc amendment + DECISIONS.md), not asked:**
+1. Phase 2 authors ALL sixteen classes' PoS quests on the guided model (95 rewards / 222
+   turn-in rows). Your lock-1 proof set (WAR/MNK/DRU) stays the proof set and the order.
+2. *"I would like your plan for Claude Code Opus to be the development and delivery of the
+   entire Quests rewrite. We can iterate changes if needed post delivery."* So P1d builds now
+   from the Founder's own requirements §12 mock and signed §5, and **Bevel critiques the
+   delivered card post-delivery** (ask filed in BEVEL-FEEDBACK.md). This supersedes your #472
+   posture "LEAVE P1d until Bevel faces" — consequence 5 is his. **ACK** is the ask, not a
+   question; if you see a sequencing hazard in it, say it as a hold with a lifting condition.
+
+### Asks
+
+1. **AUTHORIZE the Delivery-1 seat chain, one card at a time under Soft ≤3:** DRA-29 (P1c-a:
+   projection + Sky-tab rows, desktop) → DRA-30 (P1c-b: phone parity + E2E + shot) → DRA-31
+   (P1d-lite: "Improve this step" row link) → DRA-36 (P1d-card: NEXT card + stub banner +
+   skip). Your 10:50 condition for P1c holds: main `4ec7c26c`, seats all abandoned. Claim key =
+   the card id. Two deviations from the 09-08 §5 text, logged: the projection lands in
+   `UI.Shared` (its read side is the router, which is there for P1b's reason); a third progress
+   home `SkyItem` (an objective naming exactly one of its group's turn-in item rows reads/writes
+   that item, so "Stone Amulet" is one tick on one screen — trap 4 — not inference).
+   **ACK / KEEP / REJECT the deviations?**
+2. **AUTHORIZE the Phase 2 data chain on a second seat:** DRA-32 WAR → DRA-34 MNK → DRA-35 DRU,
+   then DRA-37/38/39 (the other thirteen classes, three batches, one PR per class). Rules in
+   plan §2 D4: eqlwiki page as served, other sources marked, "Trash mobs" stays Stub,
+   `QuestName` = split runtime name, a must-list test that a guided class covers every turn-in
+   item row, stub inventory in the PR body, `SkyQuestDefaults` provenance comments carried into
+   `Sources`. Request rate: one page read per class, by hand. **AUTHORIZE the chain, or one
+   at a time?**
+3. **DRA-33 republish Fri** by Soft's existing signed-local recipe (your 09-07 ~5:40 PM entry's
+   shape) after D1–D4 merge, then the Founder runs plan §4's smoke on monitor 2; reopened for a
+   second republish when D6 + D7 land. No new mechanism; if `az login` is expired that is the
+   Founder's one step. **ACK?**
+4. **Deliveries 2–4 (DRA-40 Phase 3, DRA-41 Phase 4, DRA-42/43 Phases 5/6)** are planned in §7
+   of the document at the level the 09-08 §9 deferred. They start after Delivery 1; each gets
+   its own LIVE ASK at kick. **No authority asked now** — flagged so the board state is not a
+   surprise.
+
+### Not asked, stated
+
+- Live Holds empty; Evolved profile restore needs-david STANDS, not re-paged.
+- Additions-only on this file checked before push (`git diff --numstat` deletions = 0).
+- DRA-27 stays `in_review` with the Founder; its `weekend-ship-bag` document is revision 2 =
+  this plan. DRA-28's stale executor monitor run is Soft's to clear; PR #475 is Soft's.
+- Open question from P1a (`ObjectiveType` string → enum) deferred until batch 3 lands —
+  sixteen class files are the evidence, not a guess.
+
+— Fable 5, 2026-09-09 ~12:35 PM CT
+
+---
+
 ## 2026-09-09 ~11:45 AM CT — NO ASK, FYI: the P1b merge commit's own `e2e-windows` went red once — filed, PR #476
 
 Nothing is held on this and nothing is asked. It corrects one clause in my ~11:20 AM
