@@ -1,3 +1,46 @@
+## 2026-09-08 (owner QA on Options → Cards & windows — a census and a ceiling, and no conversion)
+
+Authority: the reporting duty, not an asking one. Nothing here is a consequence-list door — no
+copy was written or reworded, nothing player-visible changed, nothing leaves the machine
+differently. The owner's QA capture
+(`.claude/soft-captures/20260908-owner-qa/options-cards-live-189220.png`, publish
+`2.0.0+ed989e52`) shows the converted tab still carrying two full paragraphs and a four-line
+retired block, and the obvious reading of that shot is "Pass 1 missed some". **It did not**, and
+the three calls below are what that finding turned into.
+
+- **Nothing was converted, and the shot was answered with arithmetic instead** · the default,
+  with an owner shot in hand and a seat named `prose-cards-fix`, is to convert the two longest
+  paragraphs on the screen and show a shorter window · **not done**, because all 220 words of
+  that tab's residual body prose already carry a signature: 120 are the `PromotedStatsNote` /
+  `GlancePetNote` exemptions Helm signed at #456 (*"Pass 2 must not silently tip them"*), 66 are
+  the #335 retired block consumed as-is, 24 are #219's absorbed notes, and 10 are the
+  recent-rate caption the policy's own negative keeps. Converting any of them reverses a
+  signature, so it is a LIVE ASK (PR #461) rather than a diff. **The measurement is the
+  deliverable**: the disagreement was never about taste, it was about whether anything had been
+  missed, and 220 words split five ways settles that in one table.
+- **The guard is a RATCHET on the total, not another per-paragraph rule** · the default is a
+  row per paragraph, which is what every other prose guard in this repo is · a ceiling as well,
+  because the owner's complaint is about VOLUME and a per-paragraph rule cannot see a screen
+  filling back up one under-ceiling line at a time — which is exactly how this tab filled up the
+  first time. The cost is a number that a future HUD subtraction MUST raise: every cut owes the
+  retired list a row, so the ceiling fails on an edit that is correct. That is written into the
+  failure message with the instruction (raise it in the same commit, name the cut that spent the
+  words), because a ratchet whose escape route is undocumented gets deleted by the next person
+  who hits it.
+- **The visible half of "where did my card go" is now asserted, which nothing did before** ·
+  the default is that `RetiredCardsTests` covering the list's CONTENT is enough · it is not:
+  `RetiredBlurb` is 21 words and the World row 23, both over `BodyWordCeiling`, so a future pass
+  reading `SettingsProsePolicy` alone would tip them onto an ⓘ **while following the rule** and
+  delete #219's own answer for the one player who does not know an ⓘ is there. Two of
+  CLAUDE.md's three ways back are body prose on that tab and neither had a guard. Prove-failed
+  by simulating the tidy-up itself — `Meta(gone.Line)` → `Hint(gone.Line)` fails both halves.
+- **The Guide rail rename was NOT built here** · the default, with the owner's label ruling in
+  the same manifest as the shot, is to fix the one-line label while in the area · left alone,
+  because re-reading the ref at splice time (trap 60) surfaced Helm's ~7:35 PM SSC signing it as
+  #460's faces with the Opus implement authorized in that lane — `Label` stays on the window
+  title, `RailLabel` is the new nav string. Two seats building one rename is worse than a slow
+  rename.
+
 ## 2026-09-08 (prose-to-hover pass 2 — Look · Alerts & chips · Watch rules · Behavior)
 
 Authority: the same Helm chat SIGN of Bevel's prose-to-tooltip faces that Pass 1 ran under,
