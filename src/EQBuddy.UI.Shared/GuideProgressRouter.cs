@@ -91,7 +91,10 @@ public static class GuideProgressRouter
             return;
         }
 
-        ledger.SetObjectiveDone(characterKey, guideId, objective.Id, done);
+        // The objective, not its id: the store refuses a reward-keyed one and writes nothing,
+        // so the routing rule is enforced on both sides of the call rather than trusted on
+        // this one. Unreachable here by construction — HomeFor already sent those above.
+        ledger.SetObjectiveDone(characterKey, guideId, objective, done);
     }
 
     /// <summary>Is this objective struck out? Always the guide ledger — see the class

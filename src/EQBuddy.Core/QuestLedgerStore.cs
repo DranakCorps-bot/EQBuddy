@@ -569,14 +569,34 @@ public sealed class QuestLedgerStore
             return _byCharacter.TryGetValue(characterKey, out var c) ? [.. c.Guides.Keys] : [];
     }
 
-    /// <summary>Tick or untick a non-reward objective. Ticking clears any skip on the same
-    /// objective — see <see cref="GuideProgress"/>.
+    /// <summary>Tick or untick an objective the ledger owns, REFUSING one it does not.
     ///
-    /// <para><b>Not for an objective carrying a <c>RewardKey</c>.</b> Route through
-    /// <c>GuideProgressRouter</c>, which sends those to the Sky turn-in store instead; this
-    /// method cannot tell, because the store does not read the catalog and should not start
-    /// (a second producer of "what kind of objective is this" is the trap it would
-    /// introduce).</para></summary>
+    /// <para>Returns false — writing nothing — for an objective carrying a
+    /// <c>RewardKey</c>, because that fact is a Sky turn-in and already has a store with four
+    /// writers behind it (trap 4). The caller marks those through
+    /// <c>GuideProgressRouter.SetDone</c>, which turns them in for real.</para>
+    ///
+    /// <para><b>Why this overload can tell and the id one cannot.</b> The objective is handed
+    /// IN, so the store still never reads the catalog — no second producer of "what kind of
+    /// objective is this", which is the trap that kept this refusal out of the store at
+    /// first. Prefer this overload; the id form below is the primitive it delegates to.</para>
+    ///
+    /// <para>True means the ledger owns it and the store now holds the asked-for state,
+    /// including when it already did — a repaint is not a change.</para></summary>
+    public bool SetObjectiveDone(string characterKey, string guideId, GuideObjective objective, bool done)
+    {
+        if (objective.RewardKey.Length > 0) return false;
+        SetObjectiveDone(characterKey, guideId, objective.Id, done);
+        return true;
+    }
+
+    /// <summary>Tick or untick a non-reward objective by id. Ticking clears any skip on the
+    /// same objective — see <see cref="GuideProgress"/>.
+    ///
+    /// <para><b>Not for an objective carrying a <c>RewardKey</c>.</b> This form takes only an
+    /// id, so it cannot tell; the overload above can, and the read side never reads the
+    /// ledger for a reward objective anyway, so a tick that lands here by mistake is
+    /// unreadable rather than merely wrong. Route through <c>GuideProgressRouter</c>.</para></summary>
     public void SetObjectiveDone(string characterKey, string guideId, string objectiveId, bool done)
         => SetObjectiveMembership(characterKey, guideId, objectiveId, done,
             g => g.DoneObjectiveIds, removeFrom: g => g.SkippedObjectiveIds);

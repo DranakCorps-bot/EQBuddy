@@ -147,6 +147,53 @@ public sealed class GuideProgressStoreTests : IDisposable
         Assert.Empty(store.GuideProgressFor(Dranak, Guide).SkippedObjectiveIds);
     }
 
+    /// <summary>The store REFUSES a fact it does not own. An objective carrying a
+    /// <c>RewardKey</c> is a Sky turn-in, and that already has a store with four writers
+    /// (classic checklist, Evolved shell, phone, achievements import) — a copy here is trap 4
+    /// with a second screen to disagree with. The read side never reads the ledger for one
+    /// either, so this is the belt to that brace: nothing is written at all.</summary>
+    [Fact]
+    public void TheStoreRefusesAnObjectiveTheSkyTurnInStoreOwns()
+    {
+        var store = Store();
+
+        var accepted = store.SetObjectiveDone(Dranak, Guide,
+            new GuideObjective { Id = "isle1-turnin", RewardKey = "WAR|Breastplate of Vigor" }, true);
+
+        Assert.False(accepted);
+        Assert.Empty(store.GuideProgressFor(Dranak, Guide).DoneObjectiveIds);
+        // Refused means nothing was written — not even the guide's row.
+        Assert.Empty(store.GuidesTouchedBy(Dranak));
+    }
+
+    /// <summary>The same overload ACCEPTS one the ledger does own. Pairing the refusal with
+    /// the acceptance is the point: a guard that only ever says no would pass while refusing
+    /// everything (trap 34).</summary>
+    [Fact]
+    public void TheStoreAcceptsAnObjectiveWithNoRewardKey()
+    {
+        var store = Store();
+
+        var accepted = store.SetObjectiveDone(Dranak, Guide,
+            new GuideObjective { Id = "isle1-key" }, true);
+
+        Assert.True(accepted);
+        Assert.Equal(["isle1-key"], store.GuideProgressFor(Dranak, Guide).DoneObjectiveIds);
+    }
+
+    /// <summary>A SKIP is allowed on a turn-in, and that asymmetry is deliberate: "I am not
+    /// doing this step" has no home in the Sky store, so refusing it here would leave the
+    /// player unable to fold the step away at all.</summary>
+    [Fact]
+    public void ASkipIsStillAllowedOnATurnIn()
+    {
+        var store = Store();
+
+        store.SetObjectiveSkipped(Dranak, Guide, "isle1-turnin", true);
+
+        Assert.Equal(["isle1-turnin"], store.GuideProgressFor(Dranak, Guide).SkippedObjectiveIds);
+    }
+
     /// <summary>Ticking twice is one entry, not two — the rows re-render and the phone and
     /// the desktop can both send the same verb.</summary>
     [Fact]
