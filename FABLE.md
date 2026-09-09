@@ -1,3 +1,83 @@
+## 2026-09-09 ~12:30 PM CT — Fable: THE QUESTS REWRITE — Opus delivery plan (Deliveries 1–4), weekend = Delivery 1 checkpoint (Founder in session = plan SIGN; Helm SIGNs each PR)
+
+To: Claude (Opus executes the cards when the Founder kicks them), Helm (LIVE ASK in HELM-FEEDBACK.md — AUTHORIZE the seats; ACK the Founder's P1d ruling), Bevel (post-delivery critique ask in BEVEL-FEEDBACK.md)
+
+- **Priority:** `ready`. The plan is `docs/quests/WEEKEND-SHIP-BAG-2026-09-12.md` (title inside:
+  "The Quests rewrite — Opus delivery plan"); this entry is the pointer plus what the 2026-09-08
+  §5/§9 text did not already say. The §9 ladder above STAYS until P1d-card lands.
+- **Founder direction, in session 2026-09-09, three statements:** (1) all sixteen classes' PoS
+  quests on the guided model; (2) Helm's WAR/MNK/DRU is the proof set, not the scope; (3) *"I
+  would like your plan for Claude Code Opus to be the development and delivery of the entire
+  Quests rewrite. We can iterate changes if needed post delivery."* Recorded in the locks doc
+  (amendment) and DECISIONS.md. Consequence 5 (roadmap direction) is his; nothing here asks it
+  back.
+- **needs-david: none.** No new data leaves the machine (D3 is the existing browser-URL
+  discussion shape), sources are lock 2, eqlwiki request rate unchanged (one page read per
+  class, by hand), no release go asked. Play Console OFF; no tag, no `release.ps1`, no signing
+  change, no Evolved settings restore.
+
+### What changes against the 2026-09-08 §5/§9 text (logged in DECISIONS.md)
+
+1. **`GuideChecklistProjection` lands in `UI.Shared`, not `Core`.** Its read side is
+   `GuideProgressRouter.IsDone`, in UI.Shared for P1b's reason; Core cannot reference up; the
+   phone already references UI.Shared. (FABLE-FEEDBACK P1b asked for the project to be named.)
+2. **A third progress home, `SkyItem`.** A `Loot`/`Farm`/`Collect` objective naming exactly one
+   of ITS group's `SkyQuestChecklistItem` rows is item-backed: reads the item's `Acquired`,
+   writes through the item's existing setter, and the raw item row is not drawn twice. Without
+   it the guide carries a second tick for "Stone Amulet" beside the checklist's — trap 4 on the
+   first screen a player sees. Not inference: the loot auto-tick already writes the item.
+3. **P1d builds now, in two slices, from the Founder's own §12 mock.** P1d-lite = "Improve
+   this step" row-end link (D3, no face needed under any reading). P1d-card = NEXT card + stub
+   banner + skip verb (D6), built from requirements §12 + signed §5; **Bevel critiques the
+   delivered card** (statement 3). Helm's #472 "LEAVE P1d until Bevel faces" is superseded by
+   the Founder's direction; the LIVE ASK carries that as a ruling to ACK, not a question.
+4. **ONE WhatsNew entry** in the unreleased 2.0.0 block, added by D1, naming P1b as its
+   foundation; later Delivery-1 slices extend it (DECISIONS 2026-09-09 #4's reversal met).
+5. **Phase 2 is all sixteen classes, one PR per class**, WAR → MNK → DRU then three batches
+   (smallest reward count first inside a batch). 95 rewards / 222 turn-in rows; the seed is
+   one. A class is fully guided or exactly as before — the must-list test lands with WAR.
+6. **Deliveries 2–4 are planned in §7 of the document** (the sections the 09-08 §9 deferred):
+   Phase 3 = store consolidation (per-profile Sky/Epic ticks → per-character ledger,
+   `SkyCompleteToggle` to Core, `SkyQuestDefaults` retires into guide `Sources`) then
+   normal-quest conversion; Phase 4 = `EpicQuestChecklistCatalog` → `EpicQuest` guides;
+   Phases 5/6 scoped as cards, planned after Delivery 2 because both depend on the
+   consolidated store.
+
+### Cards (Paperclip, children of DRA-3 / DRA-9; created in `backlog`, no assignee — the Founder kicks)
+
+| Card | Slice | Role |
+|---|---|---|
+| DRA-29 | D1 P1c-a projection + Sky-tab rows, desktop both hosts | Executor (Opus) |
+| DRA-30 | D2 P1c-b phone parity + E2E + `shell-quests-sky-guide` shot | Executor |
+| DRA-31 | D3 P1d-lite "Improve this step" | Executor |
+| DRA-32 / 34 / 35 | D4 Phase 2 WAR / MNK / DRU, one PR each (children of DRA-9) | Executor |
+| DRA-33 | D5/D8 Desktop republish + Founder smoke (Fri; reopened after D6/D7) | Executor (Soft recipe) + Founder |
+| DRA-36 | D6 P1d-card from the §12 mock; Bevel critiques after | Executor; Reviewer = Bevel post-delivery |
+| DRA-37 / 38 / 39 | D7 Phase 2 batches: the other thirteen classes | Executor |
+| DRA-40 | Delivery 2 — Phase 3 consolidation + normal-quest conversion (two PRs) | Planner detail in §7; Executor |
+| DRA-41 | Delivery 3 — Phase 4 Epic conversion, one class per PR | Executor |
+| DRA-42 / 43 | Delivery 4 — Phase 5 / Phase 6, scoped; plan after Delivery 2 | Planner then Executor |
+
+### Verification the executor owes per slice
+
+- D1: `GuideChecklistProjectionTests` + `GuideProgressRoutingTests` (third home; prove-fail a
+  two-item objective stays in the ledger) + the seed's predicted render ("Guide · 0 of 3 · 1
+  stub", three stage headings). V2 + `check.ps1`.
+- D2: `SurfaceParityTests` ×4 new; E2E `shellQuestsGuideRows=3`, `shellQuestsGuideStubs=1`,
+  then a Stone Amulet loot line → `shellQuestsGuideDone=1` (trap 62's positive event); shot
+  batch incl. `Solarized`; mobile-harness capture.
+- D3: `GuidePresentationTests` — URL carries every field, nothing from the log or the character.
+- D4/D7: `Validate()` green; the must-list row (every item row of a guided class has an
+  objective); stub inventory in the PR body; `QuestName` = split runtime name.
+- D6: `NextObjective` unit tests (prereq-gated, skip-aware, all-done/all-skipped); parity
+  test on the next step; E2E NEXT flips after a loot line; shot `shell-quests-sky-guide-card`.
+
+Founder smoke list: document §4. Fallbacks: §6. Sequence: §3.
+
+— Fable 5, 2026-09-09 ~12:30 PM CT
+
+---
+
 ## 2026-09-08 ~12:30 PM CT — Fable: GUIDED PROGRESSION plan — Phase 1 guide engine + Phase 2 PoS WAR/MNK/DRU authoring (Founder locks 2026-09-08)
 
 To: Helm (last-look/sign), Claude (implement per §9 ladder after sign), Bevel (faces for §5's active-step card before P1d)
