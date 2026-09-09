@@ -232,8 +232,16 @@ internal static class SkyQuestDefaults
         //
         // SECOND INSTANCE OF ONE HARVEST DEFECT: sky-128 above was the same mistake, the
         // same wrong isle and the same wrong named (#176, Fennec-Halas, corrected
-        // 2026-08-16). Worth a look at every remaining "Isle two - Protector of Sky" row
-        // the next time anyone is in this file.
+        // 2026-08-16).
+        //
+        // THAT SWEEP HAS NOW HAPPENED (2026-09-09, SSC #484) — do not run it a fourth time.
+        // The two remaining Isle 2 rows are sky-015 (Azarack Skin) and sky-027 (Azarack
+        // Blood), and the wiki says BOTH ARE CORRECT: its Plane of Sky test table marks
+        // them "2-PoS" where these two read "7-Trash", island 2 is Azarack Island, and its
+        // boss the Protector of Sky is the one who "drops the key to Island 3 and some
+        // quest pieces". Two corrections in a row make a tempting pattern; applying it to
+        // those two by eye would break rows that are right. `SkyIsleTwoHarvestTests` now
+        // pins all four in both directions so nobody has to re-derive this from the wiki.
         //
         // The guide's step reads from this row, so both had to move together — one fact,
         // one producer (trap 4). It stays AUTHORED rather than a both-sides stub: hedging

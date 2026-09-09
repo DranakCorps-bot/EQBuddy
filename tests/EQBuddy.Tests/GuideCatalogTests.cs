@@ -158,7 +158,7 @@ public class GuideCatalogTests
         var allowed = new[]
         {
             "the guide's own prerequisites say so",
-            "eqlwiki's Monk page says",
+            "page says the wind runes are a random drop",
             "that is EQBuddy's own limit",
         };
 
@@ -266,8 +266,31 @@ public class GuideCatalogTests
     public void AClassWithNoGuideGetsNothingRatherThanSomethingElse()
     {
         Assert.NotEmpty(Shipped.ForClass("Warrior"));
-        Assert.Empty(Shipped.ForClass("Necromancer"));
+        // Every PLAYABLE class is authored as of 2026-09-09, so the "no guide" side of this
+        // is asked with names the catalog genuinely does not have. The rule still binds: it
+        // is what a NormalQuest or EpicQuest guide will land beside (lock 5), and ForClass
+        // returning empty rather than something-close is the whole contract.
+        Assert.Empty(Shipped.ForClass("Bartender"));
+        Assert.Empty(Shipped.ForClass("Warri"));
         Assert.Empty(Shipped.ForClass(""));
+    }
+
+    /// <summary>All sixteen playable classes have a Plane of Sky guide (2026-09-09, D7). The
+    /// floor under every coverage rule: they are enumerated from <see cref="SkyQuestDefaults"/>
+    /// rather than typed here, so a class added to the game fails this rather than silently
+    /// falling outside the guided set.</summary>
+    [Fact]
+    public void EveryClassTheSkyChecklistKnowsHasGuides()
+    {
+        var classes = SkyQuestDefaults.Items
+            .Select(i => i.ClassName)
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .Order(StringComparer.OrdinalIgnoreCase)
+            .ToList();
+
+        Assert.Equal(16, classes.Count);
+        foreach (var className in classes)
+            Assert.True(Shipped.ForClass(className).Count > 0, $"{className} has no guide");
     }
 
     // ---- Prove-fail: the claim a hollow guide must not be able to make ---------------
