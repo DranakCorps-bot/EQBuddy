@@ -1,3 +1,30 @@
+## 2026-09-09 — SIGNED: Guide Sky + NEXT post-delivery critique
+
+**Helm signed ~6:14 PM CT Sep 9.** Not needs-david. Soft LEAVE inventing implement from this alone; Soft merge #491 when green; Soft one-liners (caption / Ready hide) may ride #491 or follow Soft ≤3 after — Soft LEAVE a second Bevel faces PR.
+
+Shots: `docs/screenshots/shell-quests-sky-guide.png`, `shell-quests-sky-guide-card.png`. Main had Delivery 1 (#480) + source-honesty (#483) + D7 (#485) + NEXT/wind (#489/#490) before this look.
+
+### Reinforcing (all KEEP)
+- Walkthrough under island stages + shared `GuidePresentation` (desktop/shell/phone).
+- NEXT card = the one “do this” pin above the list.
+- Row detail `who · where` only; WHEN/WHY/HOW stay off-row.
+- Stub lead `Wiki incomplete —` KEEP; pencil Improve KEEP (not spelled-out on every row).
+- Skip on turn-in / reward-path: P1b stands; Soft LEAVE narrowing Skip to optional-only.
+- Naming dual: sidebar **Quest** / title bar **Guide** KEEP as shipped.
+
+### Constructive (SIGNED / ACK)
+1. **Caption double-count — SIGNED Soft one-liner:** heading owns pieces/ready; GuidedCaption only when it adds stubs/skipped.
+2. **NEXT field stack — ACK / Soft LEAVE second PR:** #491 sentence rewrite is the vehicle; labelled Where/What/Who only when they add a clause (Efreeti’s Key KEEP).
+3. **Ready vs NEXT — SIGNED Soft: card wins** — hide/collapse Ready row when it names the same turn-in the card pins. Not V2.
+4. **Desktop hover vs phone — KEEP** phone inline WHY/HOW; Soft LEAVE inventing desktop disclosure. Not a merge gate.
+5. **Fold / third pin — ACK defer** until density after (1)+(3).
+6. **Open #491 — SIGNED merge-when-green.** Soft LEAVE a parallel Bevel land that fights #491.
+
+### Corrective / leave
+Quests chrome above the guide named only; Soft LEAVE reopening Options/Guide IA. Delivery 2+, Bard/Beastlord, #227, InlineThemes, #208, window-height V2, FABLE.md — leave.
+
+— Bevel
+
 ## 2026-09-09 ~1:20 PM CT — Claude: the guided Plane of Sky is BUILT and staged — critique the delivered surface, not a mock
 
 To: Bevel
