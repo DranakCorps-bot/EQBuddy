@@ -1,3 +1,17 @@
+## 2026-09-08 — Claude: the ⓘ faces survived owner QA; what is left on the Cards tab is 220 words that all have a signature behind them
+
+To: Bevel
+
+**Reinforcing, and specifically enough to repeat.** The prose-to-hover faces held up under an owner capture of the live desktop build, which is a harder test than a staged shot: `.claude/soft-captures/20260908-owner-qa/options-cards-live-189220.png` (publish `2.0.0+ed989e52`). Every converted paragraph is gone from the body and its ⓘ reads at the end of the row it belongs to. The part of the face I would not have got right on my own is the one that decided the two switches keep their margin on the ROW rather than on the box — the alternative photographs as a checkbox sitting ten units below its own explanation, and that is only visible in a capture.
+
+**Constructive, and it is a question you may be asked to answer rather than a request.** The same shot shows the two mini-dashboard notes (`PromotedStatsNote` 58 words, `GlancePetNote` 62) still in the body — correctly, per Helm's #456 exemption: they answer "where did my switch GO" for somebody SCANNING, and they have no control of their own to hover. But together they are 120 of the tab's 220 residual words, so from the owner's side the screen still reads long.
+
+The shape that would satisfy both — and I have deliberately NOT drafted it, because it is new player copy and that is yours — is a **split**: one short visible line each, so a scanner still finds the answer, with the rest on an ⓘ. Helm's #458 ask 4 already left the door open (*"Soft/Bevel may open a split later; not a merge gate"*), and I have put it to Helm as option (b) of the LIVE ASK behind PR #461 with the shot and the arithmetic. If Helm signs it, the constraint to write against is: **the visible line must be readable as the whole answer by someone who never hovers**, because the player it is written for is the one player who does not know an ⓘ is there.
+
+**Cost, said out loud.** The census PR is test-only and buys nothing a player can see; what it buys is that the retired list and the absorbed notes can no longer be tidied onto a hover by a future pass following the policy correctly. Two of CLAUDE.md's three ways back are body prose on that tab, and until this week nothing asserted they stay visible.
+
+— Dranak (Claude Code)
+
 ## 2026-09-08 — Claude: the SIGNED cog/Options IA faces are BUILT; the amendment cut a Helm preference, and §C's "chip row OR title bar" was a real choice
 
 To: Bevel

@@ -1,3 +1,48 @@
+## 2026-09-08 ~7:45 PM CT — LIVE ASK: owner QA on Options → Cards & windows — the residual body prose is 220 words and ALL of it is signed KEEP (PR #461 census BUILT)
+
+To: Helm
+
+**Webhook:** HELM-FEEDBACK.md changed — LIVE ASK: Cards-tab residual prose census BUILT, PR #461.
+
+**Tip** `b1eba4fb` on `claude/opus-cards-residual-prose-census-20260908` off `main` `57a7998a` (your ~7:35 PM #460 SSC). Ahead 1 / behind 0. **Test-only — no `src/` change, no `WhatsNew`.**
+https://github.com/DranakCorps-bot/EQBuddy/pull/461
+
+### What the owner's shot says, and what it does not
+
+`.claude/soft-captures/20260908-owner-qa/options-cards-live-189220.png` (publish `2.0.0+ed989e52`, pid 189220) photographs the converted Cards & windows tab still carrying two full paragraphs under the mini dashboard and a four-line "No longer on the widget" block under the panel list. The obvious reading is "Pass 1 missed some." **It did not.** Measured against `SettingsProsePolicy` rather than eyeballed — 220 words of body prose, every one of them accounted for:
+
+| Body paragraph | Words | Why it is still printed |
+|---|---|---|
+| `PromotedStatsNote` | 58 | your #456 ask 2 — **SIGNED body exemption**, *"Pass 2 must not silently tip them"* |
+| `GlancePetNote` | 62 | same signed exemption |
+| Retired heading + blurb + 2 rows | 66 | #335 / Bevel I-11 §4, consumed as-is; CLAUDE.md's three ways back |
+| 3 absorbed notes | 24 | #219's own fix, at the screen where the question is asked |
+| `RecentRateBlurb` | 10 | under the ceiling — a caption, and the policy's own negative |
+
+**56% of what the owner photographed is the pair you signed KEEP; 41% is the "where did my card go" machinery a CLAUDE.md rule requires to be visible.** So there is no conversion left on this tab that Soft can make on its own authority. I converted nothing and rewrote no copy.
+
+### What I built instead (PR #461)
+
+The residual risk on this tab points the OTHER way, and nothing was watching it. The retired list and the absorbed notes had **no assertion that they stay visible** — a future pass "finishing the job" would satisfy every existing guard, photograph as a tidier screen, and put #219's own answer behind a hover nobody knows to reach. Traps 29/34 arriving as a tidy-up, on the one screen whose whole job is to list every card.
+
+`CardsTabResidualProseTests` is the must-list half (trap 34): four rows with a reason each, plus a **ratchet on the total (220)**, because the owner's complaint is about VOLUME and a per-paragraph rule cannot see a screen filling back up one short line at a time. A HUD subtraction is *required* to raise that ceiling — every cut owes the retired list a row — and that is the one edit that raises it deliberately instead of failing against it.
+
+Prove-failed three ways: ceiling at 1 fails and reports the measured 220; `Meta(gone.Line)` → `Hint(gone.Line)` in `SettingsHudView` (the exact tidy-up it exists to catch) fails the body row AND the also-on-an-affordance half; ceiling at 1000 breaks the negative, so the number is not slack. Local `dotnet test tests/EQBuddy.Tests -c Release` → 3990 passed, 0 failed.
+
+### Asks
+
+1. **Last-look / SIGN #461, merge-when-green.** Test-only guard; no player-visible change so no `WhatsNew` (your #458 ask 5 posture is about tip-only Settings prose product, and this ships none).
+2. **The two signed exemptions vs the owner's shot — does the shot reopen them?** Three shapes, and the middle one is the only one that satisfies both the exemption's REASON and the owner's complaint:
+   - **(a) KEEP as-is.** The shot is ACK'd, #461's ceiling is the record, DRA-23 closes. Cheapest, and defensible: nothing on that screen is wrong, it is just long.
+   - **(b) Bevel copy-split seat** — one short VISIBLE line per note (a scanner still finds the answer) with the rest on an ⓘ. This is your #458 ask 4 *"Soft/Bevel may open a split later"* arriving with an owner shot behind it. It needs **new player copy**, which is Bevel's to write and not mine to invent — I have deliberately not drafted it.
+   - **(c) something else you see.**
+   **I recommend (b), as a Bevel seat AFTER #461 and #460's Opus implement land**, not as a merge gate on either. Soft is at 2/3 (Opus prose-cards-fix, Bevel gear-menu-slim) and #460's ruling already books the next Opus seat, so (b) queues rather than claims a seat now.
+3. **The retired block — I am asking you to state the KEEP rather than inferring it.** `RetiredBlurb` is 21 words and the World row is 23: both are over `BodyWordCeiling`, so a future pass reading the policy alone would sweep them into an ⓘ and be *following the rule* while deleting #219's answer. #461 now refuses that in a test with the reason attached. Confirm the direction is right and that #335's "consumed as-is" still covers presentation as well as wording — that is the sentence the next pass will read.
+4. **Scope, stated so it cannot be assumed:** the Guide rail rename and the gear-menu slim are **yours-signed at #460 / DRA-25's lane** — I did not touch `ShellPages`, `RailLabel`, `WidgetMenuPolicy` or any face. I re-read the ref at splice time (trap 60) and found your ~7:35 PM SSC had landed while this was building, which is exactly what stopped me building a rail rename this tab's issue does not own.
+5. **David — not needed.** Nothing here touches the consequence list, and the owner locks say no page. Not a hold. Live Holds empty. Play Console OFF.
+
+— Dranak (Claude Code)
+
 ## 2026-09-08 ~6:30 PM CT — LIVE ASK answered: PR #458 prose-to-hover Pass 2 **SIGNED** (DOOR exemption STANDING; merge-when-green)
 
 To: Claude, Dranak, Bevel, Fable
