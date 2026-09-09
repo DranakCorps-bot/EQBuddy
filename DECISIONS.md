@@ -2958,3 +2958,55 @@ one genuinely does. Each line below is a decision I made instead of a question I
   wrong before today. It is one of the 42 recipe-less captures Bevel inventoried on
   2026-09-04. Fixing it needs a capture recipe that does not exist, which is the standing
   illustration debt and not this cut's scope; flagged to Helm with that evidence.
+
+## 2026-09-08 ~9:00 PM CT — gear-menu-slim (DRA-25): two calls made inside the implement PR
+
+**Assumption stated at the top:** both are reporting-duty calls, not consequence-list
+doors. Neither touches the values line, a release, anything public under the project's
+name, money, roadmap direction, eqlwiki policy, a third party, or a player's privacy.
+Both are flagged to Helm in the same LIVE ASK, because Helm rules on posture even where
+David does not need paging.
+
+### 1. I corrected two ALREADY-WRITTEN 2.0.0 WhatsNew highlights instead of only appending
+
+**The default it could have gone the other way on:** append the new "X is now Y" entries
+and leave the existing ones alone. Channel files are additions-only (trap 60), the
+release notes are somebody's written words, and "never rewrite" is the safer habit.
+
+**Where it landed:** corrected. `WhatsNew.json` is not a channel file — the additions-only
+rule protects a file two agents write concurrently, not a data file one PR owns. And
+2.0.0 is **untagged**, so nothing in it has reached a player. Highlight #29 said the five
+expanded-only rows are "still there, unchanged and in the same order"; #30 said the Edit
+HUD row "IS STILL THERE on the expanded right-click menu". This branch makes both false.
+Shipping them would break the 1.99.6 public promise that "you should never have to hunt
+for something EQBuddy relocated, and if you do, that is a bug in this list" — a note that
+tells you a row is still on a menu it has been cut from is worse than no note, because it
+sends you to look.
+
+**The reversal path is real:** the corrections are two edits inside two strings and lift
+out of the PR cleanly if Helm rules the other way. That is why they went in the same
+commit as the new entries and were named in the commit message rather than slipped in.
+
+### 2. The Desktop soft-captures are COMMITTED, not cited as a path
+
+**The default it could have gone the other way on:** cite them the way this lock's
+earlier shots are cited — `C:\Users\david\source\EQBuddy\.claude\soft-captures\
+20260908-owner-qa\expanded-gear-menu-screen.png` — and keep binaries out of a product PR.
+
+**Where it landed:** committed, at `.claude/soft-captures/20260909-gear-menu-slim/`, with
+a README carrying the exact `shoot.ps1` command and each prediction read against the
+picture. ~300 KB for four PNGs. A path on one machine is evidence only that machine's
+owner can check; every other reader is taking the description on trust, which is the
+thing "evidence before confidence" exists to stop. The illustration lock already says an
+illustration of our own UI is a capture with a recipe or it does not ship — this is that
+rule applied to review evidence rather than to docs.
+
+**What would reverse it:** Helm saying soft-captures stay out of product PRs. Then they
+come out and the paths get cited. The README stays useful either way, because the recipe
+is the part that was missing.
+
+**One thing the README records that is worth having outside it:** `shoot.ps1 -Shot` with
+several names needs `pwsh -Command` and a real array. Under `-File` the whole list arrives
+as ONE string and the script throws `Unknown shot '...'`. Cost about ten minutes.
+
+— Dranak (Claude Code)
