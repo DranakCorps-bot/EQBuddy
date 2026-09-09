@@ -140,8 +140,23 @@ public sealed class GuideSurfaceParityTests : IDisposable
         var desktop = Desktop(settings, ledger).Single(g => g.CompletionKey == RewardKey);
         var phone = PhoneGroup(Phone(settings, ledger), desktop.Heading);
 
-        Assert.NotEqual("", desktop.GuideCaption);
-        Assert.StartsWith(desktop.GuideCaption, phone.Note!, StringComparison.Ordinal);
+        // With nothing to add beyond the heading's own count, the caption draws on NEITHER
+        // screen — parity of an absence is the half that would rot silently, because the
+        // phone composes its note from the caption and would happily keep saying "Guide ·
+        // 1 of 2" under a heading that already said it.
+        Assert.Equal("", desktop.GuideCaption);
+        Assert.Equal(desktop.Note, phone.Note);
+
+        // Strike a step out and the caption earns its line again — same words, both screens.
+        var row = desktop.Rows.First(r => !r.IsTurnIn);
+        Assert.True(CompanionActions.Apply(settings, ledger, Dranak,
+            new CompanionAction(CompanionSurfaces.Sky,
+                CompanionActions.SkipVerb + row.Id, Done: true)));
+
+        var withSkip = Desktop(settings, ledger).Single(g => g.CompletionKey == RewardKey);
+        var phoneWithSkip = PhoneGroup(Phone(settings, ledger), withSkip.Heading);
+        Assert.Contains("1 skipped", withSkip.GuideCaption, StringComparison.Ordinal);
+        Assert.StartsWith(withSkip.GuideCaption, phoneWithSkip.Note!, StringComparison.Ordinal);
     }
 
     [Fact]
@@ -345,8 +360,14 @@ public sealed class GuideSurfaceParityTests : IDisposable
 
         var setAside = Desktop(settings, ledger).Single(g => g.CompletionKey == RewardKey);
         Assert.Equal("set aside", setAside.Note);
-        // ...and the card is saying the same thing rather than a different one.
-        Assert.Equal(GuidePresentation.AllSkipped, setAside.GuideCard!.Instruction);
+        // ...and the card is saying the same thing rather than a different one. On REAL Sky
+        // data that sentence is the blocked one, not "every step left is skipped": the
+        // turn-in is untouched and merely gated on the pieces that were struck out, which is
+        // exactly the case Fable's #491 defect 1 was about. The heading says the quest was
+        // put down; the card names the skip to take back to pick it up again.
+        Assert.StartsWith(GuidePresentation.BlockedBySkipLead,
+            setAside.GuideCard!.Instruction, StringComparison.Ordinal);
+        Assert.Contains(rows[1].Title, setAside.GuideCard!.Instruction, StringComparison.Ordinal);
 
         // Taking one skip back puts the work — and the word — back.
         Assert.True(CompanionActions.Apply(settings, ledger, Dranak,

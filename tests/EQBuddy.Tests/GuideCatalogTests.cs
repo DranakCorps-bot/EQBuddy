@@ -1,3 +1,4 @@
+using EQBuddy.UI.Shared;
 using EQBuddy.Core;
 
 namespace EQBuddy.Tests;
@@ -533,6 +534,54 @@ public class GuideCatalogTests
             Assert.NotEmpty(s.Title);
             Assert.True(DateOnly.TryParseExact(s.RetrievedAt, "yyyy-MM-dd", out _), s.Title);
         }
+    }
+
+    /// <summary>
+    /// Every prerequisite in the shipped catalog sits on a TURN-IN — which is what entitles
+    /// <see cref="GuidePresentation.BlockedBySkipLead"/> to say "the hand-in waits on…".
+    ///
+    /// <para>This is a licence, not a preference: the card names the blocked step by a noun
+    /// the data has to earn. The day Delivery 3 gives a mid-chain step a prerequisite — an
+    /// epic section gated on the one before it is the obvious case — that sentence starts
+    /// calling a fetch step a hand-in, and this fails rather than the player being lied to.
+    /// Trap 73's lesson in the other direction: the words we ship are a claim about the
+    /// data.</para></summary>
+    [Fact]
+    public void OnlyATurnInCarriesPrerequisitesSoTheBlockedSentenceCanNameTheHandIn()
+    {
+        var withPrerequisites = GuideCatalog.Default.Guides
+            .SelectMany(g => g.AllObjectives)
+            .Where(o => o.PrerequisiteObjectiveIds.Count > 0)
+            .ToList();
+
+        Assert.NotEmpty(withPrerequisites);
+        var notTurnIns = withPrerequisites
+            .Where(o => !string.Equals(o.ObjectiveType, "TurnIn", StringComparison.Ordinal))
+            .Select(o => o.Id + " is a " + o.ObjectiveType)
+            .ToList();
+        Assert.Empty(notTurnIns);
+    }
+
+    /// <summary>
+    /// A stage that says "we could not place this" is never the FIRST thing a player reads.
+    ///
+    /// <para>Fable's #491 defect 2, found in the card frame rather than the diff: Druid ·
+    /// Shillelagh opened on the unplaced Efreeti Statuette, above Isle 5. Where a piece goes
+    /// is exactly what that stage cannot tell you, so leading with it puts our gap where the
+    /// first real step belongs. Reading order is the stage's <c>Order</c> — the one producer
+    /// of sequence (<c>Guide.AllObjectives</c>) — so this asserts the field the screen
+    /// actually reads.</para></summary>
+    [Fact]
+    public void NoGuideOpensWithTheStageThatSaysWeCouldNotPlaceIt()
+    {
+        var opening = GuideCatalog.Default.Guides
+            .Where(g => g.Stages.Count > 1)
+            .Select(g => (g.Id, First: g.Stages.OrderBy(s => s.Order).First()))
+            .Where(p => p.First.Name.Contains("not placed", StringComparison.OrdinalIgnoreCase))
+            .Select(p => p.Id + " opens on " + p.First.Name)
+            .ToList();
+
+        Assert.Empty(opening);
     }
 
     // ---- Fixture ----------------------------------------------------------------------

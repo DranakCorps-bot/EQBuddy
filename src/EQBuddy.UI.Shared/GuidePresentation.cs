@@ -75,6 +75,13 @@ public static class GuidePresentation
     /// overwhelming majority of rows.</para></summary>
     public static string GuidedCaption(int done, int skipped, int total, int stubs)
     {
+        // NOTHING when the caption would only repeat the heading (Bevel's SIGNED one-liner,
+        // Fable's #491 defect 3). The heading already carries "1/4 · in progress"; folding
+        // put the two one line apart saying the same number twice, on every heading. The
+        // caption survives only where it ADDS a fact the heading has no room for — how many
+        // steps were struck out, and how hollow our data is.
+        if (skipped == 0 && stubs == 0) return "";
+
         var caption = $"Guide · {done} of {total}";
         if (skipped > 0) caption += $" · {skipped} skipped";
         if (stubs > 0) caption += $" · {stubs} {(stubs == 1 ? "stub" : "stubs")}";
@@ -176,12 +183,58 @@ public static class GuidePresentation
         return null;
     }
 
-    /// <summary>What the card says when <see cref="NextObjective"/> names nothing: whether the
-    /// guide is finished or merely put down. A guide with steps left that are all blocked by
-    /// skipped prerequisites reads as skipped, because that is what the player chose.</summary>
+    /// <summary>The lead of the third sentence: a step is OPEN, and the only thing stopping
+    /// the card offering it is a prerequisite the player struck out.</summary>
+    public const string BlockedBySkipLead = "The hand-in waits on a step you skipped: ";
+
+    /// <summary>
+    /// What a step is CALLED on screen — its instruction where it has one, its title where it
+    /// does not.
+    ///
+    /// <para>One producer (trap 4). The projection drew this expression for the row and again
+    /// for the card, and <see cref="NoNextStep"/> wanted it a third time; naming a skipped
+    /// step by <c>Title</c> while the row it refers to shows <c>ShortInstruction</c> sends
+    /// the player looking for a line that is not on the page.</para></summary>
+    public static string StepTitle(GuideObjective objective) =>
+        objective.ShortInstruction.Length > 0 ? objective.ShortInstruction : objective.Title;
+
+    /// <summary>
+    /// What the card says when <see cref="NextObjective"/> names nothing. THREE answers, not
+    /// two: finished, put down, or blocked.
+    ///
+    /// <para><b>Why the third exists</b> (Fable, #491 last-look): this returned
+    /// <see cref="AllSkipped"/> for anything that was not all-done, so a guide whose turn-in
+    /// was still OPEN and merely gated on a skipped piece told the player "every step left is
+    /// skipped" — about a step they had not skipped. The turn-in is the one objective in the
+    /// shipped catalog that carries prerequisites at all (95 of 95;
+    /// <c>OnlyATurnInCarriesPrerequisitesSoTheBlockedSentenceCanNameTheHandIn</c> holds that
+    /// invariant open for Delivery 3), which is what lets the sentence name it.</para>
+    ///
+    /// <para>The blockers are the skipped prerequisites themselves, by title, so the player is
+    /// told what to take back rather than merely that something is stuck.</para></summary>
     public static string NoNextStep(
-        Guide guide, Func<GuideObjective, bool> isDone, Func<GuideObjective, bool> isSkipped) =>
-        guide.AllObjectives.All(isDone) ? AllDone : AllSkipped;
+        Guide guide, Func<GuideObjective, bool> isDone, Func<GuideObjective, bool> isSkipped)
+    {
+        if (guide.AllObjectives.All(isDone)) return AllDone;
+
+        var done = new HashSet<string>(
+            guide.AllObjectives.Where(isDone).Select(o => o.Id), StringComparer.OrdinalIgnoreCase);
+        var byId = new Dictionary<string, GuideObjective>(StringComparer.OrdinalIgnoreCase);
+        foreach (var objective in guide.AllObjectives) byId[objective.Id] = objective;
+
+        var blockers = guide.AllObjectives
+            .Where(o => !done.Contains(o.Id) && !isSkipped(o))
+            .SelectMany(o => o.PrerequisiteObjectiveIds)
+            .Where(id => !done.Contains(id)
+                && byId.TryGetValue(id, out var prerequisite) && isSkipped(prerequisite))
+            .Select(id => StepTitle(byId[id]))
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToList();
+
+        return blockers.Count > 0
+            ? BlockedBySkipLead + string.Join(", ", blockers) + "."
+            : AllSkipped;
+    }
 
     /// <summary>WHY, in the card's terms — the reward this step is working toward, said as a
     /// sentence. The reward name and not the step's own <see cref="GuideObjective.Why"/>: the

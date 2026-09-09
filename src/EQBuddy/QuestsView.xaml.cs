@@ -1104,7 +1104,11 @@ public partial class QuestsView : UserControl
         // The floor under the guide facts: "no guide chrome" over an empty tab is the
         // vacuous pass an unguided-class assertion is most likely to become.
         $"questsSkyRows={ClassicRowsOnScreen()} " +
-        $"questsGuideGroups={GuideElementsOnScreen<TextBlock>(GuideCaptionTag)} " +
+        // Counted off the FOLD control, not the caption: the caption is now suppressed when
+        // it would only repeat the heading (Bevel's SIGNED one-liner), so it is no longer one
+        // per guided group. The fold control is — every guided group draws exactly one,
+        // folded or open — which is what makes it the group's identity on screen (trap 39).
+        $"questsGuideGroups={GuideElementsOnScreen<Button>(GuideFoldTag)} " +
         $"questsGuideRows={GuideRowsOnScreen().Count()} " +
         $"questsGuideStubs={GuideStubsOnScreen()} " +
         $"questsGuideDone={GuideRowsOnScreen().Count(c => c.IsChecked == true)} " +

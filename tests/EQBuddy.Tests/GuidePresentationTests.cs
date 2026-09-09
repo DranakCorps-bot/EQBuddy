@@ -64,11 +64,21 @@ public sealed class GuidePresentationTests
 
     // ---- the caption -----------------------------------------------------------------
 
+    /// <summary>
+    /// The caption says what the HEADING cannot, and otherwise says nothing.
+    ///
+    /// <para>It used to lead with progress unconditionally, which put "Guide · 2 of 3" one
+    /// line under a heading already reading "2/3 · in progress" — the same number twice, on
+    /// every guided quest. Folding made it worse rather than better: with the rows away, those
+    /// two lines were most of what was on screen. Bevel's SIGNED one-liner, and Fable's #491
+    /// defect 3 off the folded frame.</para></summary>
     [Theory]
     [InlineData(0, 0, 3, 1, "Guide · 0 of 3 · 1 stub")]
-    [InlineData(2, 0, 3, 0, "Guide · 2 of 3")]
     [InlineData(1, 1, 4, 2, "Guide · 1 of 4 · 1 skipped · 2 stubs")]
-    [InlineData(3, 0, 3, 0, "Guide · 3 of 3")]
+    // Nothing to add beyond the heading's own count: the caption draws nothing at all.
+    [InlineData(2, 0, 3, 0, "")]
+    [InlineData(3, 0, 3, 0, "")]
+    [InlineData(0, 0, 3, 0, "")]
     public void TheCaptionSaysProgressAndHowHonestTheDataIs(
         int done, int skipped, int total, int stubs, string expected) =>
         Assert.Equal(expected, GuidePresentation.GuidedCaption(done, skipped, total, stubs));
@@ -303,6 +313,39 @@ public sealed class GuidePresentationTests
         // that is what the player chose.
         Assert.Equal(GuidePresentation.AllSkipped,
             GuidePresentation.NoNextStep(g, In("a"), In("b", "c", "turn-in")));
+    }
+
+    /// <summary>
+    /// THE THIRD SENTENCE: the turn-in is OPEN — the player skipped none of it — and the only
+    /// thing stopping the card offering it is a piece they struck out. Saying "every step
+    /// left is skipped" here is false about the one step they did not skip.
+    ///
+    /// <para>Found by Fable in the #491 last-look, from the code rather than the screen:
+    /// <c>AllObjectives.All(isDone) ? AllDone : AllSkipped</c> has no third answer, and
+    /// <see cref="AllDoneAndAllSkippedAreDifferentSentences"/> above never staged an open
+    /// turn-in, so the gap passed green.</para>
+    ///
+    /// <para>The sentence names WHAT TO TAKE BACK, not merely that something is stuck — the
+    /// skip is reversible and the card is the only place the player would learn which one to
+    /// reverse.</para></summary>
+    [Fact]
+    public void TheCardNamesTheSkippedStepTheHandInIsWaitingOn()
+    {
+        var g = TwoStages();
+
+        // a and c done, b struck out, turn-in untouched and gated on all three.
+        Assert.Null(GuidePresentation.NextObjective(g, In("a", "c"), In("b")));
+        Assert.Equal(GuidePresentation.BlockedBySkipLead + "do b.",
+            GuidePresentation.NoNextStep(g, In("a", "c"), In("b")));
+
+        // Two skipped prerequisites are both named, in reading order, and by the words the
+        // ROW shows (its instruction) rather than its title, so the player can find them.
+        Assert.Equal(GuidePresentation.BlockedBySkipLead + "do a, do b.",
+            GuidePresentation.NoNextStep(g, In("c"), In("a", "b")));
+
+        // THE NEGATIVE the old code could not tell apart: take the skip back and the card
+        // stops talking about skips entirely — it has a step to name again.
+        Assert.Equal("b", GuidePresentation.NextObjective(g, In("a", "c"), In())!.Id);
     }
 
     /// <summary>
