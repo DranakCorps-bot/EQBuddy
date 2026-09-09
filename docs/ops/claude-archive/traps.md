@@ -1117,6 +1117,31 @@ Read this list before touching the areas it names. Every entry cost a release.
     on the 446 lines already committed, which is the argument for building it and the reason it
     is a follow-up rather than this change.
 
+**2026-09-08 — the third hit, and it is the one the stated check CANNOT see.** Appending a
+LIVE ASK to `BEVEL-FEEDBACK.md` through `python -c "…"` from Bash: the note is markdown, so it
+is full of backticked identifiers, and Bash command-substitutes every backtick pair inside a
+double-quoted string before Python ever runs. Four spans vanished. Bash said so — four
+`command not found` lines on stderr — and then **Python wrote the file and reported `appended`**,
+because from Python's side the string it received was simply shorter.
+
+→ **The append succeeded. It was additions-only. It was 47 lines. And it was missing every
+backticked span in the note** — `SettingsHoverProseTests`, `ToolTip = "…"`, `BodyWordCeiling`,
+`SettingsAlertsView` — leaving sentences that read as finished English with the identifier
+removed. `git diff --numstat` said `47 0`. The trap-60 check passes on it. **A rule that says
+"a channel diff is additions-only" cannot see a truncated addition**, and the failure is
+invisible in exactly the place the reader looks: the diff.
+→ **The fix is the tooling note that was already in `CLAUDE.md`, and this is the case that
+shows why it is not stylistic:** *write file content with the editing tools, not shell
+heredocs.* The recovery was `git checkout -- BEVEL-FEEDBACK.md` (the append was uncommitted)
+and a re-do with the editing tool, anchored on the file's tail. Where the tail's own bytes are
+mojibake from an earlier append and will not round-trip through an anchor, write the note to a
+scratch file with the editing tool and let Python concatenate two FILES — the note never passes
+through a shell string, so there is nothing for the shell to eat.
+→ **What to check, since the diff cannot tell you:** read back a distinctive identifier from
+the note after appending. `stderr` from a `python -c` that "worked" is evidence, not noise —
+a `command not found` beside a success line means the string you thought you sent is not the
+string that arrived.
+
 ### Trap 61
 
 61. **THE SCREEN IS A MUTEX NOTHING ENFORCED, AND `shoot.ps1`'S OWN STAND-DOWN IS WHAT TURNS A

@@ -73,6 +73,41 @@ internal static class SettingsProseSource
         }
     }
 
+    /// <summary>
+    /// **Every explanation a block hangs on a bare <c>ToolTip</c>**, in source order: the
+    /// right-hand side of each <c>ToolTip = "…"</c> whose text is written at the assignment.
+    ///
+    /// The mirror image of <see cref="PrintedLiterals"/>, and it exists because the passes
+    /// only ever measured the paragraphs they MOVED. "Every paragraph we converted fits one
+    /// hover" is a rule about the ones we touched; it says nothing about the hover text that
+    /// was already there, or the hover text that arrives next — which is trap 34's shape seen
+    /// from the other side, a must-list with no ceiling over it.
+    ///
+    /// Like <see cref="PrintedLiterals"/> it reads only what is written AT the assignment: a
+    /// <c>ToolTip = SomeConst</c>, a <c>$"…"</c> whose value the runtime decides, and a
+    /// <c>ToolTip = tip</c> parameter are all skipped rather than guessed at. Skipping is the
+    /// honest answer for those — the file that assigns them is not the file that knows what
+    /// they say — and it is why <see cref="SettingsHoverProseTests"/> carries a reader floor
+    /// asserting this sweep can tell the two apart.
+    /// </summary>
+    public static IEnumerable<string> HoverLiterals(string source)
+    {
+        for (var i = 0; (i = source.IndexOf("ToolTip", i, StringComparison.Ordinal)) >= 0;)
+        {
+            var j = i + "ToolTip".Length;
+            i = j;
+            while (j < source.Length && char.IsWhiteSpace(source[j])) j++;
+            if (j >= source.Length || source[j] != '=') continue;
+            // '==' is a comparison, not an assignment — and a '=>' is a property body.
+            if (j + 1 < source.Length && (source[j + 1] == '=' || source[j + 1] == '>')) continue;
+            for (j++; j < source.Length && char.IsWhiteSpace(source[j]); j++) { }
+            if (j >= source.Length || source[j] != '"') continue;
+            var text = Literal(source, j, out var end);
+            i = end;
+            if (text.Length > 0) yield return text;
+        }
+    }
+
     /// <summary>A C# string literal — or a chain of them joined by <c>+</c> across lines,
     /// which is how every paragraph on these screens is written — starting at or after
     /// <paramref name="from"/>. <paramref name="end"/> is the index just past it.</summary>

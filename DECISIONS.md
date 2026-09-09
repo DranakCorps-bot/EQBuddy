@@ -1,3 +1,39 @@
+## 2026-09-08 (the prose policy's hover side — a ceiling built, and a copy rule NOT written)
+
+Authority: the reporting duty, not an asking one. Nothing here is a consequence-list door —
+test-only, no copy written or reworded, no product file touched, nothing player-visible
+changed. PR #466, LIVE ASK to Helm on the #461 precedent.
+
+- **DRA-23 was not called finished when its stated scope was** · Passes 1 and 2 and the Cards
+  census are all merged, so the honest default was "Pass 1 and Pass 2 are done, close it" ·
+  **not done**, because the guards those passes left are all about the BODY: they measure every
+  paragraph that MOVED, and Pass 2's sweep catches an eighteenth arriving in the body. Nothing
+  measured the hover text already on those tabs, or the hover text that arrives next — trap 34's
+  shape seen from the other side, a must-list of what we touched with no ceiling over what we
+  did not. The evidence it was live rather than tidy: the #460 gear-menu-slim implement landed a
+  35-word tooltip on Behavior — a tab two passes had already cleared — DURING this work, and it
+  arrived measured by nothing. A tab whose body is now empty is exactly where the next
+  explanation goes, and the tooltip is the only container left on it.
+- **The census found four explanations on bare tooltips and the guard says NOTHING about them**
+  · the default, holding a census that four strings are over `BodyWordCeiling`, is to assert
+  they belong on an ⓘ — the policy already calls them explanations and the passes already moved
+  seventeen · **not done.** Three of the four are on ICON buttons, where the tooltip is the only
+  way to learn what the glyph does at all; an ⓘ beside every glyph is a different screen with a
+  real cost, and that is a COPY decision. A guard asserting it would have looked like a Bevel
+  ruling nobody made — the same defect as an executor picking the copy, and inside Helm's
+  standing *"Soft LEAVE inventing Bevel split copy / silently tip exemptions"* from #461/#458.
+  **The cost of the restraint is named out loud:** those four stay unruled until Bevel answers,
+  and the guard is green over them. The question went to `BEVEL-FEEDBACK.md` as one line — is
+  "an explanation belongs on an ⓘ" a rule about paragraphs that used to be BODY, or about every
+  explanation on the tab? — rather than being settled by a test that would look settled.
+- **The reader SKIPS what it cannot read, rather than guessing** · the default for a source
+  scanner is to resolve same-file consts so the sweep covers more · **not done**: a const, a
+  `$"…"` and a parameter are skipped, which is `PrintedLiterals`' own stance ("does not pretend
+  to"). The cost is real coverage — SettingsHudView sweeps to ZERO because every one of its
+  tooltips is a named const — and it is paid because a reader that fell through onto the next
+  quoted string in the file would report a confident word count for the wrong sentence with
+  every row above it green. The zero is asserted as a FACT rather than left as an empty result.
+
 ## 2026-09-08 (owner QA on Options → Cards & windows — a census and a ceiling, and no conversion)
 
 Authority: the reporting duty, not an asking one. Nothing here is a consequence-list door — no

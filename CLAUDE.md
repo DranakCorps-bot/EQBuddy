@@ -713,7 +713,12 @@ after the named guard left with its surface.
 60. **A channel file is shared state another agent is writing while you
     write it.** (a) Re-read the ref at splice time. (b) APPEND in
     explicit UTF-8 — never whole-file rewrite. A channel diff is
-    additions-only. **No guard yet; that is a named hole.** [Novel](docs/ops/claude-archive/traps.md#trap-60)
+    additions-only. (c) **Additions-only passes on a SILENTLY TRUNCATED
+    append** — Bash eats backticks inside `python -c "…"`, so a markdown
+    note loses every backticked identifier and still diffs clean. Write
+    the note with the editing tools; if the tail is mojibake and will not
+    anchor, concatenate two FILES. Read an identifier back. **No guard
+    yet; that is a named hole.** [Novel](docs/ops/claude-archive/traps.md#trap-60)
 61. **The SCREEN is a mutex both harnesses must acquire.**
     `scripts/shoot.ps1` and `tests/EQBuddy.E2E` (`AppHarness.Launch`) take
     the same lock. Guard: `ScreenLockTests`. Wait for the window
