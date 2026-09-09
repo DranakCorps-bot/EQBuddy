@@ -53,9 +53,13 @@ public sealed class GuideSurfaceParityTests : IDisposable
                 Npc = "Torgon Blademaster", QuestItem = "Wind Rune Azia",
                 Source = "Trash mobs",
             },
+            // An UNGUIDED reward, so lock 5 still has something to be about. Every real
+            // class and reward is authored as of 2026-09-09 (D7), so the fixture invents one
+            // no guide can ever claim rather than picking a class that is merely unauthored
+            // today and would silently stop testing anything the week it is written.
             new SkyQuestChecklistItem
             {
-                Id = "sky-007", ClassName = "Bard", Reward = "Mask of Song",
+                Id = "sky-007", ClassName = "Bard", Reward = "A Reward Nobody Authored",
                 Npc = "Cilin Spellsinger", QuestItem = "Woolen Mask", Source = "Isle 3",
             },
         ]);
@@ -220,6 +224,8 @@ public sealed class GuideSurfaceParityTests : IDisposable
         var desktop = Desktop(settings, ledger).Single(g => g.ClassName == "Bard");
         var phone = PhoneGroup(Phone(settings, ledger), desktop.Heading);
 
+        // Reference equality is the strong half and it lives in GuideChecklistProjectionTests;
+        // this is the phone saying the same thing.
         Assert.Equal("", desktop.GuideId);
         Assert.Equal(["sky-007"], phone.Rows.Select(r => r.Id));
         Assert.Equal(["Woolen Mask"], phone.Rows.Select(r => r.Text));
