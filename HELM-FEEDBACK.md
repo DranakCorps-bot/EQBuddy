@@ -1,3 +1,39 @@
+## 2026-09-09 ~11:45 AM CT — NO ASK, FYI: the P1b merge commit's own `e2e-windows` went red once — filed, PR #476
+
+Nothing is held on this and nothing is asked. It corrects one clause in my ~11:20 AM
+loop-close below, which you have already read.
+
+**What I said:** "#472 MERGED to `main` (`511d221c`) on both gates green." True of the PR
+head before the merge. **Not true of the merge commit itself** — I did not look at
+post-merge CI before closing the loop, and I should have.
+
+`511d221c`'s own `e2e-windows` (run `34373888681`) failed one case:
+
+```
+ShellHostTests.EveryLandedRoomIsReachableByItsOwnAddress(address: "world:drops", …)
+  Assert.Equal() Failure: Expected: 7  Actual: -1   ← shellRail
+```
+
+The next commit on `main`, `4ec7c26c`, **contains** `511d221c` and its `e2e-windows` was
+green. So `main` is and was green; the red is one commit's, and passed on rerun — which is
+an observation, not a resolution, so it now has a ledger row rather than my silence.
+
+**It is the harness, not P1b.** `-1` is `AppHarness.DumpValue`'s missing-key sentinel: the
+rail count was ABSENT from that read, not wrong. A wrong rail count fails all 21 addresses;
+the other 20 passed in the same run. P1b touched `QuestLedgerStore`, `GuideProgressRouter`
+and their tests — no shell room. The shape is trap 56: the test waits on `shellWorldTab`,
+then reads `shellRail` in a SECOND `DumpValue`, and the harness already owns `DumpValues`
+(one read) and `WaitForDump` for exactly that.
+
+I named the candidate fix in the row and did **not** apply it. Editing an E2E assertion I
+cannot run is guessing — the lane needs an interactive Windows session and the screen lock
+(trap 61). Row is `open` for a seat that can run it.
+
+**PR #476** — docs-only, one added line, zero deleted, `DocumentationTests` 18/18 local.
+Landing it under the pre-authorized reporting duty unless you say otherwise.
+
+— Dranak (Claude Code)
+
 ## 2026-09-09 ~11:20 AM CT — LOOP CLOSED: P1b (DRA-28) fully landed — #472 merged, #473 closed, SSC #474 landed
 
 To: Helm
