@@ -76,20 +76,41 @@ public sealed class GuidePresentationTests
     // ---- row prose -------------------------------------------------------------------
 
     /// <summary>Each of the six is drawn in exactly ONE place (David, 2026-09-09: "we don't
-    /// want to be redundant, but all must be addressed"). The row line carries the three that
-    /// decide whether you can do this step right now; WHAT is the row's own title, and WHY
-    /// and HOW are on the hover.</summary>
+    /// want to be redundant, but all must be addressed"). The row line carries WHO and WHERE
+    /// — the two an authored step always answers; WHAT is the row's own title, and WHEN, WHY
+    /// and HOW are on the hover, where an empty one simply does not appear.</summary>
     [Fact]
-    public void TheRowLineCarriesWhoWhereAndWhenAndNothingElse()
+    public void TheRowLineCarriesWhoAndWhereAndNothingElse()
     {
         var objective = Authored();
 
         var detail = GuidePresentation.RowDetail(objective);
 
-        Assert.Equal("Keeper of Souls · Plane of Sky - Isle 4. · Whenever it is up.", detail);
+        Assert.Equal("Keeper of Souls · Plane of Sky - Isle 4.", detail);
+        Assert.DoesNotContain(objective.When, detail, StringComparison.Ordinal);
         Assert.DoesNotContain(objective.Why, detail, StringComparison.Ordinal);
         Assert.DoesNotContain(objective.How, detail, StringComparison.Ordinal);
         Assert.DoesNotContain(objective.What, detail, StringComparison.Ordinal);
+    }
+
+    /// <summary>A step the sources could not answer WHEN or HOW for still renders — the row
+    /// line is unchanged and the hover simply carries fewer questions. This is the shape the
+    /// shipped catalog is mostly in now, so it is the case worth pinning.</summary>
+    [Fact]
+    public void AStepWithNoWhenOrHowStillRendersAndTheHoverJustSaysLess()
+    {
+        var objective = Authored();
+        objective.When = "";
+        objective.How = "";
+
+        Assert.Equal("Keeper of Souls · Plane of Sky - Isle 4.",
+            GuidePresentation.RowDetail(objective));
+
+        var tip = GuidePresentation.RowTooltip(objective);
+        Assert.Contains("What:", tip, StringComparison.Ordinal);
+        Assert.Contains("Why:", tip, StringComparison.Ordinal);
+        Assert.DoesNotContain("When:", tip, StringComparison.Ordinal);
+        Assert.DoesNotContain("How:", tip, StringComparison.Ordinal);
     }
 
     [Fact]
@@ -97,12 +118,10 @@ public sealed class GuidePresentationTests
     {
         var whoOnly = Authored();
         whoOnly.Where = "";
-        whoOnly.When = "";
         Assert.Equal("Keeper of Souls", GuidePresentation.RowDetail(whoOnly));
 
         var whereOnly = Authored();
         whereOnly.Who = "";
-        whereOnly.When = "";
         Assert.Equal("Plane of Sky - Isle 4.", GuidePresentation.RowDetail(whereOnly));
 
         Assert.Equal("", GuidePresentation.RowDetail(Stub()));

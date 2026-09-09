@@ -47,21 +47,19 @@ public static class GuidePresentation
     }
 
     /// <summary>
-    /// The dim line under a guide row's title: WHO, WHERE, WHEN — the three that decide
-    /// whether you can do this step right now, joined the way the classic checklist already
-    /// joins its NPC and drop location.
+    /// The dim line under a guide row's title: WHO and WHERE, joined the way the classic
+    /// checklist already joins its NPC and drop location.
     ///
-    /// <para><b>Why only three of the six here.</b> Each question is drawn in exactly one
-    /// place (David, 2026-09-09: *"we don't want to be redundant, but all must be
-    /// addressed"*). WHAT is the row's own title. WHY and HOW are on the hover, where a
-    /// player who has decided to do the step goes for the method — putting them inline made
-    /// one row read as three sentences saying one thing, which is what the first staged shot
-    /// of this surface showed.</para>
+    /// <para><b>Why only two of the six here.</b> Each question is drawn in exactly one place
+    /// (David, 2026-09-09: *"we don't want to be redundant, but all must be addressed"*).
+    /// WHAT is the row's own title; WHEN, WHY and HOW are on the hover. WHEN was on this line
+    /// until Fable's #480 last-look: it is optional and usually empty now, and a row line that
+    /// sometimes has a third clause and usually does not reads as a rendering bug.</para>
     ///
     /// <para>An empty part is dropped rather than leaving a dangling separator; a Stub has
     /// none of them and gets its note instead.</para></summary>
     public static string RowDetail(GuideObjective objective) =>
-        Join(objective.Who, objective.Where, objective.When);
+        Join(objective.Who, objective.Where);
 
     /// <summary>
     /// The hover: all six questions, labelled, for one step. The row shows what you need to

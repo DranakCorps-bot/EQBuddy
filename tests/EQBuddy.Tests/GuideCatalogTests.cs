@@ -47,19 +47,17 @@ public class GuideCatalogTests
     }
 
     /// <summary>
-    /// The must-list, stated positively (trap 34): every Authored objective ANSWERS all six
-    /// questions and says where that came from. Asserted here as well as inside
-    /// <c>Validate</c> because the rule is the product promise — if the validation is ever
-    /// loosened, this is the test that has to be argued with.
+    /// The must-list, stated positively (trap 34): every Authored objective ANSWERS who,
+    /// where and what, and says where that came from.
     ///
-    /// <para><b>Six, since 2026-09-09</b> (David: *"who, what, where, when, why, how should be
-    /// the maximal number of things. We don't want to be redundant, but all must be
-    /// addressed."*). A step whose WHEN is genuinely "any time you are in the zone" says that
-    /// — the field is never left blank as a way of not answering, which is exactly the
-    /// difference between an authored step and a hollow one wearing its clothes (lock 4a).</para>
+    /// <para><b>Three required, not six.</b> The 2026-09-09 six-questions direction is the
+    /// SCHEMA — every step has a place for each answer. It briefly became a validation bar,
+    /// and the result was 48 authored steps carrying ten template sentences that no cited
+    /// page contains (Fable last-look, #480). WHEN/WHY/HOW are optional; the guard against
+    /// filling them with invention is <see cref="AnInventedSentenceIsRefusedEvenWhereTheFieldIsOptional"/>.</para>
     /// </summary>
     [Fact]
-    public void EveryAuthoredObjectiveAnswersAllSixQuestionsAndCitesASource()
+    public void EveryAuthoredObjectiveAnswersWhoWhereAndWhatAndCitesASource()
     {
         var authored = Shipped.Guides.SelectMany(g => g.AllObjectives)
             .Where(o => o.Authoring == GuideAuthoring.Authored).ToList();
@@ -70,46 +68,37 @@ public class GuideCatalogTests
             Assert.False(string.IsNullOrWhiteSpace(o.Who), $"{o.Id}: authored, no WHO");
             Assert.False(string.IsNullOrWhiteSpace(o.What), $"{o.Id}: authored, no WHAT");
             Assert.False(string.IsNullOrWhiteSpace(o.Where), $"{o.Id}: authored, no WHERE");
-            Assert.False(string.IsNullOrWhiteSpace(o.When), $"{o.Id}: authored, no WHEN");
-            Assert.False(string.IsNullOrWhiteSpace(o.Why), $"{o.Id}: authored, no WHY");
-            Assert.False(string.IsNullOrWhiteSpace(o.How), $"{o.Id}: authored, no HOW");
             Assert.NotEmpty(o.Sources);
-            foreach (var s in o.Sources)
+            foreach (var src in o.Sources)
             {
-                Assert.NotEmpty(s.Url);
-                Assert.NotEmpty(s.Title);
+                Assert.NotEmpty(src.Url);
+                Assert.NotEmpty(src.Title);
             }
         }
     }
 
-    /// <summary>Prove-fail for the three questions added on 2026-09-09: a step answering the
-    /// original who/where/what and NOTHING ELSE is refused. Green-only coverage of a widened
-    /// rule is vacuous — the rule has to be shown rejecting what it newly forbids.</summary>
-    [Theory]
-    [InlineData("when")]
-    [InlineData("why")]
-    [InlineData("how")]
-    public void AnAuthoredStepMissingAnyOneOfTheSixIsRefused(string missing)
+    /// <summary>
+    /// The regression guard for what #480 shipped: a sentence this catalog invented once is
+    /// refused wherever it reappears, even though the field it sits in is optional.
+    ///
+    /// <para>Optional does not mean unpoliced. The failure was never a MISSING answer — it
+    /// was a CONFIDENT one with a citation to a page that does not contain it, fed into the
+    /// share-back draft as the thing a player is asked to correct.</para>
+    /// </summary>
+    [Fact]
+    public void AnInventedSentenceIsRefusedEvenWhereTheFieldIsOptional()
     {
         var objective = new GuideObjective
         {
             Id = "step", Order = 1, ObjectiveType = "Loot", Title = "Loot it",
             ShortInstruction = "Loot it.",
             Who = "a named", Where = "an isle", What = "loot one",
-            When = "when it is up", Why = "it is a turn-in piece", How = "kill and loot",
             Authoring = GuideAuthoring.Authored,
             Sources = [new GuideSource
             {
                 Url = "https://eqlwiki.com/X", Title = "X", RetrievedAt = "2026-09-09",
             }],
         };
-        switch (missing)
-        {
-            case "when": objective.When = ""; break;
-            case "why": objective.Why = ""; break;
-            case "how": objective.How = ""; break;
-        }
-
         var catalog = new GuideCatalog
         {
             Guides =
@@ -119,26 +108,65 @@ public class GuideCatalogTests
                     Id = "g", Name = "G", ApplicableClasses = ["Warrior"],
                     ZoneNames = ["Plane of Sky"],
                     Sources = [.. objective.Sources],
-                    Stages =
-                    [
-                        new GuideStage
-                        {
-                            Id = "s", Name = "S", Order = 1, Objectives = [objective],
-                        },
-                    ],
+                    Stages = [new GuideStage
+                    {
+                        Id = "s", Name = "S", Order = 1, Objectives = [objective],
+                    }],
                 },
             ],
         };
 
-        var problems = catalog.Validate([]);
-
-        Assert.Contains(problems, p => p.Contains(missing.ToUpperInvariant(), StringComparison.Ordinal));
-        // And the same step with every field filled is shippable, so the refusal above is
-        // about the missing one and not about the fixture.
-        objective.When = "when it is up";
-        objective.Why = "it is a turn-in piece";
-        objective.How = "kill and loot";
+        // Empty WHEN/WHY/HOW is shippable — that is the whole point of them being optional.
         Assert.Empty(catalog.Validate([]));
+
+        // The exact sentence #480 shipped on nineteen steps.
+        objective.How = "Kill it and loot it. One named on a spawn cycle, so the wait is the "
+            + "cycle rather than a drop rate.";
+        Assert.Contains(catalog.Validate([]), p => p.Contains("spawn cycle", StringComparison.Ordinal));
+
+        // And it is caught in WHEN too, not only in HOW.
+        objective.How = "";
+        objective.When = "Whenever it is up - nobody has recorded a solo kill for us.";
+        Assert.NotEmpty(catalog.Validate([]));
+    }
+
+    /// <summary>Every sentence on the deny-list is actually gone from the shipped catalog —
+    /// the positive half of the guard above, which would otherwise only prove that a fixture
+    /// can be made to fail.</summary>
+    [Fact]
+    public void NoShippedStepCarriesAnyOfTheInventedSentences()
+    {
+        var offenders = Shipped.Guides.SelectMany(g => g.AllObjectives)
+            .SelectMany(o => new[] { o.When, o.Why, o.How }
+                .SelectMany(claim => GuideCatalog.FabricatedProse
+                    .Where(b => claim.Contains(b, StringComparison.OrdinalIgnoreCase))
+                    .Select(b => $"{o.Id}: \"{b}\"")))
+            .ToList();
+
+        Assert.Empty(offenders);
+    }
+
+    /// <summary>
+    /// A WHEN or HOW that IS filled in must be traceable, and the shipped catalog's are: the
+    /// only three shapes left are the turn-in's own prerequisites, eqlwiki's Monk page
+    /// answering where wind runes drop, and one statement about EQBuddy itself (the log never
+    /// records a hand-in). Anything else is an author reaching past the sources again.
+    /// </summary>
+    [Fact]
+    public void EveryFilledWhenOrHowNamesItsBasis()
+    {
+        var allowed = new[]
+        {
+            "the guide's own prerequisites say so",
+            "eqlwiki's Monk page says",
+            "that is EQBuddy's own limit",
+        };
+
+        foreach (var o in Shipped.Guides.SelectMany(g => g.AllObjectives))
+            foreach (var claim in new[] { o.When, o.How })
+                if (claim.Trim().Length > 0)
+                    Assert.True(allowed.Any(a => claim.Contains(a, StringComparison.Ordinal)),
+                        $"{o.Id}: \"{claim}\" — a filled WHEN/HOW has to say what it rests on");
     }
 
     /// <summary>A stub says what is missing, in the player's terms. "Incomplete" with no

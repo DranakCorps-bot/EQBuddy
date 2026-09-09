@@ -28,9 +28,9 @@
               "who": "Gorgalosk",
               "where": "Plane of Sky - Isle 3.",
               "what": "Kill Gorgalosk and loot Azure Ring (1).",
-              "when": "Whenever Gorgalosk is up.",
+              "when": "",
               "why": "Azure Ring is one of the turn-in pieces for the Azure Ruby Ring.",
-              "how": "Kill Gorgalosk and loot it. One named on a spawn cycle, so the wait is the cycle rather than a drop rate. Bring whatever it takes to hold a Sky named - nobody has recorded a solo kill for us.",
+              "how": "",
               "itemNames": [
                 "Azure Ring"
               ],
@@ -93,9 +93,9 @@
               "who": "Torgon Blademaster",
               "where": "Plane of Sky - the Efreeti Chamber, through the teleport pad at roughly 1600, 520 on Isle 1.",
               "what": "Hand Torgon Blademaster Azure Ring (1), Wind Rune Neza (1) to receive the Azure Ruby Ring.",
-              "when": "Once every piece above is in your bags.",
+              "when": "Once every piece above is in your bags - the guide's own prerequisites say so.",
               "why": "This is the step that actually gives you the Azure Ruby Ring.",
-              "how": "A hand-in, not a fight - it is the last step and nothing else gates it. The log never records a turn-in, so tick it yourself when it is done.",
+              "how": "The log never records a hand-in, so tick this one yourself when it is done - that is EQBuddy's own limit, not something the wiki says.",
               "prerequisiteObjectiveIds": [
                 "azure-ring",
                 "wind-rune-neza"
@@ -153,9 +153,9 @@
               "who": "Noble Dojorn, the Overseer of Air, or the Hand of Veeshan",
               "where": "Plane of Sky - Isles 1.5, 4 and 8 respectively.",
               "what": "Loot Efreeti Belt (1) from any one of the three Efreeti-drop mobs.",
-              "when": "Whichever of the three is up first.",
+              "when": "",
               "why": "Efreeti Belt is one of the turn-in pieces for the Belt of the Four Winds.",
-              "how": "Kill any one of the three and loot it. They drop the same item, so this step waits on the earliest of three spawns rather than on one - which is why it is usually not the step that holds a reward up.",
+              "how": "",
               "itemNames": [
                 "Efreeti Belt"
               ],
@@ -185,9 +185,9 @@
               "who": "Bazzt Zzzt",
               "where": "Plane of Sky - Isle 6.",
               "what": "Kill Bazzt Zzzt and loot Wind Tablet (1).",
-              "when": "Whenever Bazzt Zzzt is up.",
+              "when": "",
               "why": "Wind Tablet is one of the turn-in pieces for the Belt of the Four Winds.",
-              "how": "Kill Bazzt Zzzt and loot it. One named on a spawn cycle, so the wait is the cycle rather than a drop rate. Bring whatever it takes to hold a Sky named - nobody has recorded a solo kill for us.",
+              "how": "",
               "itemNames": [
                 "Wind Tablet"
               ],
@@ -250,9 +250,9 @@
               "who": "Torgon Blademaster",
               "where": "Plane of Sky - the Efreeti Chamber, through the teleport pad at roughly 1600, 520 on Isle 1.",
               "what": "Hand Torgon Blademaster Efreeti Belt (1), Wind Tablet (1), Wind Rune Fana (1) to receive the Belt of the Four Winds.",
-              "when": "Once every piece above is in your bags.",
+              "when": "Once every piece above is in your bags - the guide's own prerequisites say so.",
               "why": "This is the step that actually gives you the Belt of the Four Winds.",
-              "how": "A hand-in, not a fight - it is the last step and nothing else gates it. The log never records a turn-in, so tick it yourself when it is done.",
+              "how": "The log never records a hand-in, so tick this one yourself when it is done - that is EQBuddy's own limit, not something the wiki says.",
               "prerequisiteObjectiveIds": [
                 "efreeti-belt",
                 "wind-tablet",
@@ -312,9 +312,9 @@
               "who": "Sister of the Spire",
               "where": "Plane of Sky - Isle 7.",
               "what": "Kill Sister of the Spire and loot Djinni War Blade (1).",
-              "when": "Whenever Sister of the Spire is up.",
+              "when": "",
               "why": "Djinni War Blade is one of the turn-in pieces for the Dagas.",
-              "how": "Kill Sister of the Spire and loot it. One named on a spawn cycle, so the wait is the cycle rather than a drop rate. Bring whatever it takes to hold a Sky named - nobody has recorded a solo kill for us.",
+              "how": "",
               "itemNames": [
                 "Djinni War Blade"
               ],
@@ -326,15 +326,23 @@
                   "retrievedAt": "2026-09-09"
                 }
               ]
-            },
+            }
+          ]
+        },
+        {
+          "id": "isle-7-trash",
+          "name": "Isle 7: trash",
+          "order": 2,
+          "arrivalNote": "",
+          "objectives": [
             {
               "id": "gem-of-invigoration",
-              "order": 2,
+              "order": 1,
               "objectiveType": "Loot",
-              "title": "Collect the Gem of Invigoration",
-              "shortInstruction": "Loot a Gem of Invigoration.",
-              "who": "",
-              "where": "",
+              "title": "Loot the Gem of Invigoration",
+              "shortInstruction": "Loot a Gem of Invigoration from Isle 7 trash.",
+              "who": "Plane of Sky trash on Isle 7",
+              "where": "Plane of Sky - Isle 7.",
               "what": "Loot Gem of Invigoration (1).",
               "when": "",
               "why": "Gem of Invigoration is one of the turn-in pieces for the Dagas.",
@@ -342,22 +350,21 @@
               "itemNames": [
                 "Gem of Invigoration"
               ],
-              "authoring": "Stub",
+              "authoring": "Authored",
               "sources": [
                 {
                   "url": "https://eqlwiki.com/Warrior_Plane_of_Sky_Tests",
                   "title": "Warrior Plane of Sky Tests",
                   "retrievedAt": "2026-09-09"
                 }
-              ],
-              "stubNote": "Our two sources disagree about this one and we will not guess. EQBuddy's Sky checklist records it as Isle 2, the Protector of Sky; eqlwiki's Warrior Plane of Sky Tests page records it as Isle 7 trash. If you have looted it, tell us which isle and which mob and we will correct whichever of the two is wrong."
+              ]
             }
           ]
         },
         {
           "id": "the-wind-rune",
           "name": "The wind rune",
-          "order": 2,
+          "order": 3,
           "arrivalNote": "",
           "objectives": [
             {
@@ -390,7 +397,7 @@
         {
           "id": "turn-in-to-torgon-blademaster",
           "name": "Turn in to Torgon Blademaster",
-          "order": 3,
+          "order": 4,
           "arrivalNote": "",
           "objectives": [
             {
@@ -402,9 +409,9 @@
               "who": "Torgon Blademaster",
               "where": "Plane of Sky - the Efreeti Chamber, through the teleport pad at roughly 1600, 520 on Isle 1.",
               "what": "Hand Torgon Blademaster Djinni War Blade (1), Gem of Invigoration (1), Wind Rune Jaka (1) to receive the Dagas.",
-              "when": "Once every piece above is in your bags.",
+              "when": "Once every piece above is in your bags - the guide's own prerequisites say so.",
               "why": "This is the step that actually gives you the Dagas.",
-              "how": "A hand-in, not a fight - it is the last step and nothing else gates it. The log never records a turn-in, so tick it yourself when it is done.",
+              "how": "The log never records a hand-in, so tick this one yourself when it is done - that is EQBuddy's own limit, not something the wiki says.",
               "prerequisiteObjectiveIds": [
                 "djinni-war-blade",
                 "gem-of-invigoration",
@@ -464,9 +471,9 @@
               "who": "Noble Dojorn, the Overseer of Air, or the Hand of Veeshan",
               "where": "Plane of Sky - Isles 1.5, 4 and 8 respectively.",
               "what": "Loot Efreeti Battle Axe (1) from any one of the three Efreeti-drop mobs.",
-              "when": "Whichever of the three is up first.",
+              "when": "",
               "why": "Efreeti Battle Axe is one of the turn-in pieces for the Fangol.",
-              "how": "Kill any one of the three and loot it. They drop the same item, so this step waits on the earliest of three spawns rather than on one - which is why it is usually not the step that holds a reward up.",
+              "how": "",
               "itemNames": [
                 "Efreeti Battle Axe"
               ],
@@ -496,9 +503,9 @@
               "who": "Eye of Veeshan",
               "where": "Plane of Sky - Isle 8.",
               "what": "Kill Eye of Veeshan and loot Ethereal Emerald (1).",
-              "when": "Whenever Eye of Veeshan is up.",
+              "when": "",
               "why": "Ethereal Emerald is one of the turn-in pieces for the Fangol.",
-              "how": "Kill Eye of Veeshan and loot it. One named on a spawn cycle, so the wait is the cycle rather than a drop rate. Bring whatever it takes to hold a Sky named - nobody has recorded a solo kill for us.",
+              "how": "",
               "itemNames": [
                 "Ethereal Emerald"
               ],
@@ -561,9 +568,9 @@
               "who": "Torgon Blademaster",
               "where": "Plane of Sky - the Efreeti Chamber, through the teleport pad at roughly 1600, 520 on Isle 1.",
               "what": "Hand Torgon Blademaster Efreeti Battle Axe (1), Ethereal Emerald (1), Wind Rune Dena (1) to receive the Fangol.",
-              "when": "Once every piece above is in your bags.",
+              "when": "Once every piece above is in your bags - the guide's own prerequisites say so.",
               "why": "This is the step that actually gives you the Fangol.",
-              "how": "A hand-in, not a fight - it is the last step and nothing else gates it. The log never records a turn-in, so tick it yourself when it is done.",
+              "how": "The log never records a hand-in, so tick this one yourself when it is done - that is EQBuddy's own limit, not something the wiki says.",
               "prerequisiteObjectiveIds": [
                 "efreeti-battle-axe",
                 "ethereal-emerald",
@@ -623,9 +630,9 @@
               "who": "The Spiroc Lord",
               "where": "Plane of Sky - Isle 5.",
               "what": "Kill The Spiroc Lord and loot Spiroc Air Totem (1).",
-              "when": "Whenever The Spiroc Lord is up.",
+              "when": "",
               "why": "Spiroc Air Totem is one of the turn-in pieces for the Pauldrons of the Blue Sky.",
-              "how": "Kill The Spiroc Lord and loot it. One named on a spawn cycle, so the wait is the cycle rather than a drop rate. Bring whatever it takes to hold a Sky named - nobody has recorded a solo kill for us.",
+              "how": "",
               "itemNames": [
                 "Spiroc Air Totem"
               ],
@@ -688,9 +695,9 @@
               "who": "Torgon Blademaster",
               "where": "Plane of Sky - the Efreeti Chamber, through the teleport pad at roughly 1600, 520 on Isle 1.",
               "what": "Hand Torgon Blademaster Spiroc Air Totem (1), Wind Rune Beza (1) to receive the Pauldrons of the Blue Sky.",
-              "when": "Once every piece above is in your bags.",
+              "when": "Once every piece above is in your bags - the guide's own prerequisites say so.",
               "why": "This is the step that actually gives you the Pauldrons of the Blue Sky.",
-              "how": "A hand-in, not a fight - it is the last step and nothing else gates it. The log never records a turn-in, so tick it yourself when it is done.",
+              "how": "The log never records a hand-in, so tick this one yourself when it is done - that is EQBuddy's own limit, not something the wiki says.",
               "prerequisiteObjectiveIds": [
                 "spiroc-air-totem",
                 "wind-rune-beza"
@@ -748,9 +755,9 @@
               "who": "Keeper of Souls",
               "where": "Plane of Sky - Isle 4.",
               "what": "Kill Keeper of Souls and loot Stone Amulet (1).",
-              "when": "Whenever Keeper of Souls is up.",
+              "when": "",
               "why": "Stone Amulet is one of the turn-in pieces for the Runed Wind Amulet.",
-              "how": "Kill Keeper of Souls and loot it. One named on a spawn cycle, so the wait is the cycle rather than a drop rate. Bring whatever it takes to hold a Sky named - nobody has recorded a solo kill for us.",
+              "how": "",
               "itemNames": [
                 "Stone Amulet"
               ],
@@ -813,9 +820,9 @@
               "who": "Torgon Blademaster",
               "where": "Plane of Sky - the Efreeti Chamber, through the teleport pad at roughly 1600, 520 on Isle 1.",
               "what": "Hand Torgon Blademaster Stone Amulet (1), Wind Rune Azia (1) to receive the Runed Wind Amulet.",
-              "when": "Once every piece above is in your bags.",
+              "when": "Once every piece above is in your bags - the guide's own prerequisites say so.",
               "why": "This is the step that actually gives you the Runed Wind Amulet.",
-              "how": "A hand-in, not a fight - it is the last step and nothing else gates it. The log never records a turn-in, so tick it yourself when it is done.",
+              "how": "The log never records a hand-in, so tick this one yourself when it is done - that is EQBuddy's own limit, not something the wiki says.",
               "prerequisiteObjectiveIds": [
                 "stone-amulet",
                 "wind-rune-azia"
@@ -873,9 +880,9 @@
               "who": "Gorgalosk",
               "where": "Plane of Sky - Isle 3.",
               "what": "Kill Gorgalosk and loot Silken Strands (1).",
-              "when": "Whenever Gorgalosk is up.",
+              "when": "",
               "why": "Silken Strands is one of the turn-in pieces for the Back Straps of Mastery.",
-              "how": "Kill Gorgalosk and loot it. One named on a spawn cycle, so the wait is the cycle rather than a drop rate. Bring whatever it takes to hold a Sky named - nobody has recorded a solo kill for us.",
+              "how": "",
               "itemNames": [
                 "Silken Strands"
               ],
@@ -905,9 +912,9 @@
               "who": "any Plane of Sky mob",
               "where": "Plane of Sky - no fixed isle. eqlwiki's Monk Plane of Sky Tests page says the wind runes are a random drop from any mob in the zone.",
               "what": "Loot Wind Rune Caza (1).",
-              "when": "Any time you are in the zone.",
+              "when": "Any time you are in the zone - eqlwiki's Monk page says the wind runes are a random drop from any mob in the Plane of Sky.",
               "why": "Wind Rune Caza is one of the turn-in pieces for the Back Straps of Mastery.",
-              "how": "Kill trash and loot. A random drop with no named attached and no spawn to wait for, so it is the step that finishes itself while you work the others - patience rather than a fight you have to plan.",
+              "how": "",
               "itemNames": [
                 "Wind Rune Caza"
               ],
@@ -937,9 +944,9 @@
               "who": "Holwin",
               "where": "Plane of Sky - eqlwiki's Monk page does not say where in the zone Holwin stands.",
               "what": "Hand Holwin Silken Strands (1), Wind Rune Caza (1) to receive the Back Straps of Mastery.",
-              "when": "Once every piece above is in your bags.",
+              "when": "Once every piece above is in your bags - the guide's own prerequisites say so.",
               "why": "This is the step that actually gives you the Back Straps of Mastery.",
-              "how": "A hand-in, not a fight - it is the last step and nothing else gates it. The log never records a turn-in, so tick it yourself when it is done.",
+              "how": "The log never records a hand-in, so tick this one yourself when it is done - that is EQBuddy's own limit, not something the wiki says.",
               "prerequisiteObjectiveIds": [
                 "silken-strands",
                 "wind-rune-caza"
@@ -997,9 +1004,9 @@
               "who": "Eye of Veeshan",
               "where": "Plane of Sky - Isle 8.",
               "what": "Kill Eye of Veeshan and loot Tear of Quellious (1).",
-              "when": "Whenever Eye of Veeshan is up.",
+              "when": "",
               "why": "Tear of Quellious is one of the turn-in pieces for the Golden Sash of Tranquility.",
-              "how": "Kill Eye of Veeshan and loot it. One named on a spawn cycle, so the wait is the cycle rather than a drop rate. Bring whatever it takes to hold a Sky named - nobody has recorded a solo kill for us.",
+              "how": "",
               "itemNames": [
                 "Tear of Quellious"
               ],
@@ -1029,9 +1036,9 @@
               "who": "any Plane of Sky mob",
               "where": "Plane of Sky - no fixed isle. eqlwiki's Monk Plane of Sky Tests page says the wind runes are a random drop from any mob in the zone.",
               "what": "Loot Wind Rune Lena (1).",
-              "when": "Any time you are in the zone.",
+              "when": "Any time you are in the zone - eqlwiki's Monk page says the wind runes are a random drop from any mob in the Plane of Sky.",
               "why": "Wind Rune Lena is one of the turn-in pieces for the Golden Sash of Tranquility.",
-              "how": "Kill trash and loot. A random drop with no named attached and no spawn to wait for, so it is the step that finishes itself while you work the others - patience rather than a fight you have to plan.",
+              "how": "",
               "itemNames": [
                 "Wind Rune Lena"
               ],
@@ -1061,9 +1068,9 @@
               "who": "Holwin",
               "where": "Plane of Sky - eqlwiki's Monk page does not say where in the zone Holwin stands.",
               "what": "Hand Holwin Tear of Quellious (1), Wind Rune Lena (1) to receive the Golden Sash of Tranquility.",
-              "when": "Once every piece above is in your bags.",
+              "when": "Once every piece above is in your bags - the guide's own prerequisites say so.",
               "why": "This is the step that actually gives you the Golden Sash of Tranquility.",
-              "how": "A hand-in, not a fight - it is the last step and nothing else gates it. The log never records a turn-in, so tick it yourself when it is done.",
+              "how": "The log never records a hand-in, so tick this one yourself when it is done - that is EQBuddy's own limit, not something the wiki says.",
               "prerequisiteObjectiveIds": [
                 "tear-of-quellious",
                 "wind-rune-lena"
@@ -1121,9 +1128,9 @@
               "who": "The Spiroc Lord",
               "where": "Plane of Sky - Isle 5.",
               "what": "Kill The Spiroc Lord and loot Dove Slippers (1).",
-              "when": "Whenever The Spiroc Lord is up.",
+              "when": "",
               "why": "Dove Slippers is one of the turn-in pieces for the Sandals of Alacrity.",
-              "how": "Kill The Spiroc Lord and loot it. One named on a spawn cycle, so the wait is the cycle rather than a drop rate. Bring whatever it takes to hold a Sky named - nobody has recorded a solo kill for us.",
+              "how": "",
               "itemNames": [
                 "Dove Slippers"
               ],
@@ -1153,9 +1160,9 @@
               "who": "any Plane of Sky mob",
               "where": "Plane of Sky - no fixed isle. eqlwiki's Monk Plane of Sky Tests page says the wind runes are a random drop from any mob in the zone.",
               "what": "Loot Wind Rune Jaka (1).",
-              "when": "Any time you are in the zone.",
+              "when": "Any time you are in the zone - eqlwiki's Monk page says the wind runes are a random drop from any mob in the Plane of Sky.",
               "why": "Wind Rune Jaka is one of the turn-in pieces for the Sandals of Alacrity.",
-              "how": "Kill trash and loot. A random drop with no named attached and no spawn to wait for, so it is the step that finishes itself while you work the others - patience rather than a fight you have to plan.",
+              "how": "",
               "itemNames": [
                 "Wind Rune Jaka"
               ],
@@ -1185,9 +1192,9 @@
               "who": "Holwin",
               "where": "Plane of Sky - eqlwiki's Monk page does not say where in the zone Holwin stands.",
               "what": "Hand Holwin Dove Slippers (1), Wind Rune Jaka (1) to receive the Sandals of Alacrity.",
-              "when": "Once every piece above is in your bags.",
+              "when": "Once every piece above is in your bags - the guide's own prerequisites say so.",
               "why": "This is the step that actually gives you the Sandals of Alacrity.",
-              "how": "A hand-in, not a fight - it is the last step and nothing else gates it. The log never records a turn-in, so tick it yourself when it is done.",
+              "how": "The log never records a hand-in, so tick this one yourself when it is done - that is EQBuddy's own limit, not something the wiki says.",
               "prerequisiteObjectiveIds": [
                 "dove-slippers",
                 "wind-rune-jaka"
@@ -1245,9 +1252,9 @@
               "who": "Keeper of Souls",
               "where": "Plane of Sky - Isle 4.",
               "what": "Kill Keeper of Souls and loot Cracked Leather Eyepatch (1).",
-              "when": "Whenever Keeper of Souls is up.",
+              "when": "",
               "why": "Cracked Leather Eyepatch is one of the turn-in pieces for the Ton Po's Eye Patch.",
-              "how": "Kill Keeper of Souls and loot it. One named on a spawn cycle, so the wait is the cycle rather than a drop rate. Bring whatever it takes to hold a Sky named - nobody has recorded a solo kill for us.",
+              "how": "",
               "itemNames": [
                 "Cracked Leather Eyepatch"
               ],
@@ -1277,9 +1284,9 @@
               "who": "any Plane of Sky mob",
               "where": "Plane of Sky - no fixed isle. eqlwiki's Monk Plane of Sky Tests page says the wind runes are a random drop from any mob in the zone.",
               "what": "Loot Wind Rune Geza (1).",
-              "when": "Any time you are in the zone.",
+              "when": "Any time you are in the zone - eqlwiki's Monk page says the wind runes are a random drop from any mob in the Plane of Sky.",
               "why": "Wind Rune Geza is one of the turn-in pieces for the Ton Po's Eye Patch.",
-              "how": "Kill trash and loot. A random drop with no named attached and no spawn to wait for, so it is the step that finishes itself while you work the others - patience rather than a fight you have to plan.",
+              "how": "",
               "itemNames": [
                 "Wind Rune Geza"
               ],
@@ -1309,9 +1316,9 @@
               "who": "Holwin",
               "where": "Plane of Sky - eqlwiki's Monk page does not say where in the zone Holwin stands.",
               "what": "Hand Holwin Cracked Leather Eyepatch (1), Wind Rune Geza (1) to receive the Ton Po's Eye Patch.",
-              "when": "Once every piece above is in your bags.",
+              "when": "Once every piece above is in your bags - the guide's own prerequisites say so.",
               "why": "This is the step that actually gives you the Ton Po's Eye Patch.",
-              "how": "A hand-in, not a fight - it is the last step and nothing else gates it. The log never records a turn-in, so tick it yourself when it is done.",
+              "how": "The log never records a hand-in, so tick this one yourself when it is done - that is EQBuddy's own limit, not something the wiki says.",
               "prerequisiteObjectiveIds": [
                 "cracked-leather-eyepatch",
                 "wind-rune-geza"
@@ -1369,9 +1376,9 @@
               "who": "Bazzt Zzzt",
               "where": "Plane of Sky - Isle 6.",
               "what": "Kill Bazzt Zzzt and loot Silken Wrap (1).",
-              "when": "Whenever Bazzt Zzzt is up.",
+              "when": "",
               "why": "Silken Wrap is one of the turn-in pieces for the Ton Po's Shoulder Wraps.",
-              "how": "Kill Bazzt Zzzt and loot it. One named on a spawn cycle, so the wait is the cycle rather than a drop rate. Bring whatever it takes to hold a Sky named - nobody has recorded a solo kill for us.",
+              "how": "",
               "itemNames": [
                 "Silken Wrap"
               ],
@@ -1401,9 +1408,9 @@
               "who": "any Plane of Sky mob",
               "where": "Plane of Sky - no fixed isle. eqlwiki's Monk Plane of Sky Tests page says the wind runes are a random drop from any mob in the zone.",
               "what": "Loot Wind Rune Beza (1).",
-              "when": "Any time you are in the zone.",
+              "when": "Any time you are in the zone - eqlwiki's Monk page says the wind runes are a random drop from any mob in the Plane of Sky.",
               "why": "Wind Rune Beza is one of the turn-in pieces for the Ton Po's Shoulder Wraps.",
-              "how": "Kill trash and loot. A random drop with no named attached and no spawn to wait for, so it is the step that finishes itself while you work the others - patience rather than a fight you have to plan.",
+              "how": "",
               "itemNames": [
                 "Wind Rune Beza"
               ],
@@ -1433,9 +1440,9 @@
               "who": "Holwin",
               "where": "Plane of Sky - eqlwiki's Monk page does not say where in the zone Holwin stands.",
               "what": "Hand Holwin Silken Wrap (1), Wind Rune Beza (1) to receive the Ton Po's Shoulder Wraps.",
-              "when": "Once every piece above is in your bags.",
+              "when": "Once every piece above is in your bags - the guide's own prerequisites say so.",
               "why": "This is the step that actually gives you the Ton Po's Shoulder Wraps.",
-              "how": "A hand-in, not a fight - it is the last step and nothing else gates it. The log never records a turn-in, so tick it yourself when it is done.",
+              "how": "The log never records a hand-in, so tick this one yourself when it is done - that is EQBuddy's own limit, not something the wiki says.",
               "prerequisiteObjectiveIds": [
                 "silken-wrap",
                 "wind-rune-beza"
@@ -1493,9 +1500,9 @@
               "who": "Noble Dojorn, the Overseer of Air, or the Hand of Veeshan",
               "where": "Plane of Sky - Isles 1.5, 4 and 8 respectively.",
               "what": "Loot Brass Knuckles (1) from any one of the three Efreeti-drop mobs.",
-              "when": "Whichever of the three is up first.",
+              "when": "",
               "why": "Brass Knuckles is one of the turn-in pieces for the Wu's Fist of Mastery.",
-              "how": "Kill any one of the three and loot it. They drop the same item, so this step waits on the earliest of three spawns rather than on one - which is why it is usually not the step that holds a reward up.",
+              "how": "",
               "itemNames": [
                 "Brass Knuckles"
               ],
@@ -1525,9 +1532,9 @@
               "who": "Sister of the Spire",
               "where": "Plane of Sky - Isle 7.",
               "what": "Kill Sister of the Spire and loot Nebulous Sapphire (1).",
-              "when": "Whenever Sister of the Spire is up.",
+              "when": "",
               "why": "Nebulous Sapphire is one of the turn-in pieces for the Wu's Fist of Mastery.",
-              "how": "Kill Sister of the Spire and loot it. One named on a spawn cycle, so the wait is the cycle rather than a drop rate. Bring whatever it takes to hold a Sky named - nobody has recorded a solo kill for us.",
+              "how": "",
               "itemNames": [
                 "Nebulous Sapphire"
               ],
@@ -1557,9 +1564,9 @@
               "who": "any Plane of Sky mob",
               "where": "Plane of Sky - no fixed isle. eqlwiki's Monk Plane of Sky Tests page says the wind runes are a random drop from any mob in the zone.",
               "what": "Loot Wind Rune Neza (1).",
-              "when": "Any time you are in the zone.",
+              "when": "Any time you are in the zone - eqlwiki's Monk page says the wind runes are a random drop from any mob in the Plane of Sky.",
               "why": "Wind Rune Neza is one of the turn-in pieces for the Wu's Fist of Mastery.",
-              "how": "Kill trash and loot. A random drop with no named attached and no spawn to wait for, so it is the step that finishes itself while you work the others - patience rather than a fight you have to plan.",
+              "how": "",
               "itemNames": [
                 "Wind Rune Neza"
               ],
@@ -1589,9 +1596,9 @@
               "who": "Holwin",
               "where": "Plane of Sky - eqlwiki's Monk page does not say where in the zone Holwin stands.",
               "what": "Hand Holwin Brass Knuckles (1), Nebulous Sapphire (1), Wind Rune Neza (1) to receive the Wu's Fist of Mastery.",
-              "when": "Once every piece above is in your bags.",
+              "when": "Once every piece above is in your bags - the guide's own prerequisites say so.",
               "why": "This is the step that actually gives you the Wu's Fist of Mastery.",
-              "how": "A hand-in, not a fight - it is the last step and nothing else gates it. The log never records a turn-in, so tick it yourself when it is done.",
+              "how": "The log never records a hand-in, so tick this one yourself when it is done - that is EQBuddy's own limit, not something the wiki says.",
               "prerequisiteObjectiveIds": [
                 "brass-knuckles",
                 "nebulous-sapphire",
@@ -1651,9 +1658,9 @@
               "who": "Gorgalosk",
               "where": "Plane of Sky - Isle 3.",
               "what": "Kill Gorgalosk and loot Worn Leather Mask (1).",
-              "when": "Whenever Gorgalosk is up.",
+              "when": "",
               "why": "Worn Leather Mask is one of the turn-in pieces for the Drake-Hide Mask.",
-              "how": "Kill Gorgalosk and loot it. One named on a spawn cycle, so the wait is the cycle rather than a drop rate. Bring whatever it takes to hold a Sky named - nobody has recorded a solo kill for us.",
+              "how": "",
               "itemNames": [
                 "Worn Leather Mask"
               ],
@@ -1716,9 +1723,9 @@
               "who": "Strandar Pinemist",
               "where": "Plane of Sky - the Efreeti Chamber, through the teleport pad at roughly 1600, 520 on Isle 1.",
               "what": "Hand Strandar Pinemist Worn Leather Mask (1), Wind Rune Meda (1) to receive the Drake-Hide Mask.",
-              "when": "Once every piece above is in your bags.",
+              "when": "Once every piece above is in your bags - the guide's own prerequisites say so.",
               "why": "This is the step that actually gives you the Drake-Hide Mask.",
-              "how": "A hand-in, not a fight - it is the last step and nothing else gates it. The log never records a turn-in, so tick it yourself when it is done.",
+              "how": "The log never records a hand-in, so tick this one yourself when it is done - that is EQBuddy's own limit, not something the wiki says.",
               "prerequisiteObjectiveIds": [
                 "worn-leather-mask",
                 "wind-rune-meda"
@@ -1776,9 +1783,9 @@
               "who": "Noble Dojorn, the Overseer of Air, or the Hand of Veeshan",
               "where": "Plane of Sky - Isles 1.5, 4 and 8 respectively.",
               "what": "Loot Efreeti Scimitar (1) from any one of the three Efreeti-drop mobs.",
-              "when": "Whichever of the three is up first.",
+              "when": "",
               "why": "Efreeti Scimitar is one of the turn-in pieces for the Espri.",
-              "how": "Kill any one of the three and loot it. They drop the same item, so this step waits on the earliest of three spawns rather than on one - which is why it is usually not the step that holds a reward up.",
+              "how": "",
               "itemNames": [
                 "Efreeti Scimitar"
               ],
@@ -1808,9 +1815,9 @@
               "who": "Eye of Veeshan",
               "where": "Plane of Sky - Isle 8.",
               "what": "Kill Eye of Veeshan and loot Storm Sky Opal (1).",
-              "when": "Whenever Eye of Veeshan is up.",
+              "when": "",
               "why": "Storm Sky Opal is one of the turn-in pieces for the Espri.",
-              "how": "Kill Eye of Veeshan and loot it. One named on a spawn cycle, so the wait is the cycle rather than a drop rate. Bring whatever it takes to hold a Sky named - nobody has recorded a solo kill for us.",
+              "how": "",
               "itemNames": [
                 "Storm Sky Opal"
               ],
@@ -1873,9 +1880,9 @@
               "who": "Strandar Pinemist",
               "where": "Plane of Sky - the Efreeti Chamber, through the teleport pad at roughly 1600, 520 on Isle 1.",
               "what": "Hand Strandar Pinemist Efreeti Scimitar (1), Storm Sky Opal (1), Wind Rune Izah (1) to receive the Espri.",
-              "when": "Once every piece above is in your bags.",
+              "when": "Once every piece above is in your bags - the guide's own prerequisites say so.",
               "why": "This is the step that actually gives you the Espri.",
-              "how": "A hand-in, not a fight - it is the last step and nothing else gates it. The log never records a turn-in, so tick it yourself when it is done.",
+              "how": "The log never records a hand-in, so tick this one yourself when it is done - that is EQBuddy's own limit, not something the wiki says.",
               "prerequisiteObjectiveIds": [
                 "efreeti-scimitar",
                 "storm-sky-opal",
@@ -1935,9 +1942,9 @@
               "who": "Bazzt Zzzt",
               "where": "Plane of Sky - Isle 6.",
               "what": "Kill Bazzt Zzzt and loot Divine Honeycomb (1).",
-              "when": "Whenever Bazzt Zzzt is up.",
+              "when": "",
               "why": "Divine Honeycomb is one of the turn-in pieces for the Honeycomb Belt.",
-              "how": "Kill Bazzt Zzzt and loot it. One named on a spawn cycle, so the wait is the cycle rather than a drop rate. Bring whatever it takes to hold a Sky named - nobody has recorded a solo kill for us.",
+              "how": "",
               "itemNames": [
                 "Divine Honeycomb"
               ],
@@ -2000,9 +2007,9 @@
               "who": "Strandar Pinemist",
               "where": "Plane of Sky - the Efreeti Chamber, through the teleport pad at roughly 1600, 520 on Isle 1.",
               "what": "Hand Strandar Pinemist Divine Honeycomb (1), Wind Rune Dena (1) to receive the Honeycomb Belt.",
-              "when": "Once every piece above is in your bags.",
+              "when": "Once every piece above is in your bags - the guide's own prerequisites say so.",
               "why": "This is the step that actually gives you the Honeycomb Belt.",
-              "how": "A hand-in, not a fight - it is the last step and nothing else gates it. The log never records a turn-in, so tick it yourself when it is done.",
+              "how": "The log never records a hand-in, so tick this one yourself when it is done - that is EQBuddy's own limit, not something the wiki says.",
               "prerequisiteObjectiveIds": [
                 "divine-honeycomb",
                 "wind-rune-dena"
@@ -2060,9 +2067,9 @@
               "who": "Keeper of Souls",
               "where": "Plane of Sky - Isle 4.",
               "what": "Kill Keeper of Souls and loot Mantle of Woven Grass (1).",
-              "when": "Whenever Keeper of Souls is up.",
+              "when": "",
               "why": "Mantle of Woven Grass is one of the turn-in pieces for the Nature Walker's Mantle.",
-              "how": "Kill Keeper of Souls and loot it. One named on a spawn cycle, so the wait is the cycle rather than a drop rate. Bring whatever it takes to hold a Sky named - nobody has recorded a solo kill for us.",
+              "how": "",
               "itemNames": [
                 "Mantle of Woven Grass"
               ],
@@ -2125,9 +2132,9 @@
               "who": "Strandar Pinemist",
               "where": "Plane of Sky - the Efreeti Chamber, through the teleport pad at roughly 1600, 520 on Isle 1.",
               "what": "Hand Strandar Pinemist Mantle of Woven Grass (1), Wind Rune Kala (1) to receive the Nature Walker's Mantle.",
-              "when": "Once every piece above is in your bags.",
+              "when": "Once every piece above is in your bags - the guide's own prerequisites say so.",
               "why": "This is the step that actually gives you the Nature Walker's Mantle.",
-              "how": "A hand-in, not a fight - it is the last step and nothing else gates it. The log never records a turn-in, so tick it yourself when it is done.",
+              "how": "The log never records a hand-in, so tick this one yourself when it is done - that is EQBuddy's own limit, not something the wiki says.",
               "prerequisiteObjectiveIds": [
                 "mantle-of-woven-grass",
                 "wind-rune-kala"
@@ -2185,9 +2192,9 @@
               "who": "The Spiroc Lord",
               "where": "Plane of Sky - Isle 5.",
               "what": "Kill The Spiroc Lord and loot Spiroc Battle Staff (1).",
-              "when": "Whenever The Spiroc Lord is up.",
+              "when": "",
               "why": "Spiroc Battle Staff is one of the turn-in pieces for the Shillelagh.",
-              "how": "Kill The Spiroc Lord and loot it. One named on a spawn cycle, so the wait is the cycle rather than a drop rate. Bring whatever it takes to hold a Sky named - nobody has recorded a solo kill for us.",
+              "how": "",
               "itemNames": [
                 "Spiroc Battle Staff"
               ],
@@ -2217,9 +2224,9 @@
               "who": "the griffons and pegasus (not a named mob)",
               "where": "Plane of Sky - Isle 4.",
               "what": "Loot Efreeti Statuette (1) from the Isle 4 griffons and pegasus.",
-              "when": "Any time you are on Isle 4.",
+              "when": "",
               "why": "Efreeti Statuette is one of the turn-in pieces for the Shillelagh.",
-              "how": "Kill griffons and pegasus and loot. Ordinary spawns rather than a named on a cycle, so this is a drop rate rather than a spawn wait.",
+              "how": "",
               "itemNames": [
                 "Efreeti Statuette"
               ],
@@ -2282,9 +2289,9 @@
               "who": "Strandar Pinemist",
               "where": "Plane of Sky - the Efreeti Chamber, through the teleport pad at roughly 1600, 520 on Isle 1.",
               "what": "Hand Strandar Pinemist Spiroc Battle Staff (1), Efreeti Statuette (1), Wind Rune Azia (1) to receive the Shillelagh.",
-              "when": "Once every piece above is in your bags.",
+              "when": "Once every piece above is in your bags - the guide's own prerequisites say so.",
               "why": "This is the step that actually gives you the Shillelagh.",
-              "how": "A hand-in, not a fight - it is the last step and nothing else gates it. The log never records a turn-in, so tick it yourself when it is done.",
+              "how": "The log never records a hand-in, so tick this one yourself when it is done - that is EQBuddy's own limit, not something the wiki says.",
               "prerequisiteObjectiveIds": [
                 "spiroc-battle-staff",
                 "efreeti-statuette",
@@ -2344,9 +2351,9 @@
               "who": "Sister of the Spire",
               "where": "Plane of Sky - Isle 7.",
               "what": "Kill Sister of the Spire and loot Ethereal Ruby (1).",
-              "when": "Whenever Sister of the Spire is up.",
+              "when": "",
               "why": "Ethereal Ruby is one of the turn-in pieces for the Spiroc Banisher Focus.",
-              "how": "Kill Sister of the Spire and loot it. One named on a spawn cycle, so the wait is the cycle rather than a drop rate. Bring whatever it takes to hold a Sky named - nobody has recorded a solo kill for us.",
+              "how": "",
               "itemNames": [
                 "Ethereal Ruby"
               ],
@@ -2376,9 +2383,9 @@
               "who": "The Spiroc Lord",
               "where": "Plane of Sky - Isle 5.",
               "what": "Kill The Spiroc Lord and loot Spiroc Elder's Totem (1).",
-              "when": "Whenever The Spiroc Lord is up.",
+              "when": "",
               "why": "Spiroc Elder's Totem is one of the turn-in pieces for the Spiroc Banisher Focus.",
-              "how": "Kill The Spiroc Lord and loot it. One named on a spawn cycle, so the wait is the cycle rather than a drop rate. Bring whatever it takes to hold a Sky named - nobody has recorded a solo kill for us.",
+              "how": "",
               "itemNames": [
                 "Spiroc Elder's Totem"
               ],
@@ -2441,9 +2448,9 @@
               "who": "Strandar Pinemist",
               "where": "Plane of Sky - the Efreeti Chamber, through the teleport pad at roughly 1600, 520 on Isle 1.",
               "what": "Hand Strandar Pinemist Ethereal Ruby (1), Spiroc Elder's Totem (1), Wind Rune Ena (1) to receive the Spiroc Banisher Focus.",
-              "when": "Once every piece above is in your bags.",
+              "when": "Once every piece above is in your bags - the guide's own prerequisites say so.",
               "why": "This is the step that actually gives you the Spiroc Banisher Focus.",
-              "how": "A hand-in, not a fight - it is the last step and nothing else gates it. The log never records a turn-in, so tick it yourself when it is done.",
+              "how": "The log never records a hand-in, so tick this one yourself when it is done - that is EQBuddy's own limit, not something the wiki says.",
               "prerequisiteObjectiveIds": [
                 "ethereal-ruby",
                 "spiroc-elder-s-totem",

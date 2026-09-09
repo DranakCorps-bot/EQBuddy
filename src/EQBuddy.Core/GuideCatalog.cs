@@ -80,9 +80,22 @@ public sealed class GuideObjective
 
     // THE SIX QUESTIONS (David, 2026-09-09): *"who, what, where, when, why, how should be
     // the maximal number of things. We don't want to be redundant, but all must be
-    // addressed."* An Authored objective answers ALL SIX — validation holds it to that — and
-    // each one is DRAWN in exactly one place, because a row that says the same fact three
-    // ways is the failure the first staged shot of this surface actually showed.
+    // addressed."* Each one is DRAWN in exactly one place, because a row that says the same
+    // fact three ways is the failure the first staged shot of this surface actually showed.
+    //
+    // **The six are a SCHEMA, not a licence to fill a blank** (Fable last-look, #480, and it
+    // was catching a real one). The first cut of this catalog answered all six on all 48
+    // authored steps — and did it with ten template sentences, nineteen of them asserting
+    // *"one named on a spawn cycle … nobody has recorded a solo kill for us"* against a wiki
+    // page that says nothing about spawn cycles, group size or soloing. Cited to that page.
+    // Then fed verbatim into the share-back draft as "EQBuddy shows:", asking players to
+    // correct our own invention. That is fabricated certainty wearing provenance, which is
+    // the one thing this catalog exists to prevent.
+    //
+    // So: WHO, WHERE and WHAT are required of an Authored step, exactly as the signed §2 had
+    // it. WHEN, WHY and HOW are OPTIONAL, and a step that leaves one empty simply does not
+    // draw that line. Answering a question the sources do not answer is worse than leaving
+    // it open — the share-back door is how it gets answered, by someone who was there.
 
     /// <summary>WHO: the npc, mob or mobs this step is about.</summary>
     public string Who { get; set; } = "";
@@ -261,6 +274,31 @@ public sealed class GuideCatalog
             SkyQuestDefaults.Items.Select(i => QuestChecklistLayout.RewardKey(i.ClassName, i.Reward)),
             StringComparer.OrdinalIgnoreCase);
 
+    /// <summary>
+    /// Sentences this catalog invented once and must never carry again.
+    ///
+    /// <para>Every one of these was written into 48 authored steps on 2026-09-09, cited to an
+    /// eqlwiki page that says nothing of the kind, and then fed into the share-back draft as
+    /// "EQBuddy shows:" — asking players to correct our own guess. Fable's last-look on #480
+    /// caught it; the survey that proved it was ten distinct <c>when</c> values across 48
+    /// steps.</para>
+    ///
+    /// <para>Substrings, matched case-insensitively, so a reworded template still trips. This
+    /// is a NAMED and deliberately incomplete list: it stops these from coming back, it
+    /// cannot stop the next invention, and the thing that actually prevents that is leaving a
+    /// question empty when no source answers it.</para>
+    /// </summary>
+    public static readonly string[] FabricatedProse =
+    [
+        "on a spawn cycle",
+        "nobody has recorded a solo kill",
+        "Bring whatever it takes to hold a Sky named",
+        "rather than a drop rate",
+        "waits on the earliest of three spawns",
+        "usually not the step that holds a reward up",
+        "patience rather than a fight you have to plan",
+    ];
+
     /// <summary>Everything wrong with this catalog, in the words a reviewer needs. Empty is
     /// the only shippable answer.</summary>
     public IReadOnlyList<string> Validate() => Validate(SkyRewardKeys);
@@ -358,17 +396,23 @@ public sealed class GuideCatalog
     {
         if (objective.Authoring == GuideAuthoring.Authored)
         {
-            // ALL SIX, or it is a stub. David, 2026-09-09: "who, what, where, when, why, how
-            // should be the maximal number of things … all must be addressed." A step whose
-            // WHEN is genuinely "any time you are on the isle" says that; the field is never
-            // blank as a way of avoiding the question, which is the whole difference between
-            // an authored step and a hollow one wearing its clothes (lock 4a).
+            // WHO, WHERE, WHAT — required, as the signed §2 had it. WHEN/WHY/HOW are the
+            // schema's other three and stay OPTIONAL: see the note on the six questions.
             if (objective.Who.Length == 0) yield return $"{who}: authored but does not say WHO";
             if (objective.Where.Length == 0) yield return $"{who}: authored but does not say WHERE";
             if (objective.What.Length == 0) yield return $"{who}: authored but does not say WHAT";
-            if (objective.When.Length == 0) yield return $"{who}: authored but does not say WHEN";
-            if (objective.Why.Length == 0) yield return $"{who}: authored but does not say WHY";
-            if (objective.How.Length == 0) yield return $"{who}: authored but does not say HOW";
+
+            // The regression guard for what went wrong on #480 — a curated must-NOT list,
+            // paired with the must-list above (trap 34 works in both directions). These are
+            // the exact sentences the first cut invented and cited to pages that do not
+            // contain them; a template that reappears on 19 steps is the SHAPE of the bug,
+            // and naming the strings is the only version of it a test can be sure about.
+            foreach (var claim in new[] { objective.When, objective.How, objective.Why })
+                foreach (var banned in FabricatedProse)
+                    if (claim.Contains(banned, StringComparison.OrdinalIgnoreCase))
+                        yield return $"{who}: says \"{banned}\" — no source we cite says it. "
+                            + "WHEN/HOW are optional; an unanswerable one is left empty and the "
+                            + "share-back door is how it gets filled in (Fable last-look, #480)";
             if (objective.Sources.Count == 0)
                 yield return $"{who}: authored but cites no source — provenance is what separates "
                     + "curation from invention, and it is the weekly refresh's flag";
