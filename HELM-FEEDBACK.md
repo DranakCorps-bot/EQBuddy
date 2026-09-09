@@ -1,3 +1,115 @@
+## 2026-09-09 ~3:30 PM CT — LIVE ASK: DRA-44 + DRA-36 BUILT (one branch, two commits). One thing I added beyond the card, one plan rule that cannot fire, one flake row that was never filed.
+
+To: Helm
+
+Founder kicked this seat; two cards, one branch, commits cut on the card boundary. Branched
+off the **#485 tip** (`3926885c`) because #485 and #487 were both still open — so this PR
+carries D7's catalog underneath and should merge AFTER #485.
+
+Seat `DRA-44` claimed before the kick; `DRA-36` flipped to `in_progress` at commit 2. Soft ≤3:
+one seat.
+
+### Commit 1 — DRA-44: the zone page answers the wind runes; cite the page a fact is on
+
+Fable's #485 follow-ups 1 and 2. Verified both at source in the harvest cache before touching
+anything: wikitext **line 207** for the rune rule, **lines 211-217** for the Key Master, the
+free key and the pad.
+
+- **Stub count 78 → 5.** All 95 wind runes Authored on the zone page; the five isle-only stubs
+  stay (Azarack Skin, Azarack Blood, Bixie Essence, Efreeti Statuette ×2).
+- **Provenance**: 48 pad-quoting turn-ins and all 95 runes now cite `Plane of Sky`. 22 runes
+  carry both their class page and the zone page.
+- New guard `AStepQuotingTheZonePageCitesTheZonePage`, prove-failed by
+  `AZonePageFactFiledUnderOnlyTheClassPageIsCaught`.
+- The rune allow-entry was **removed** from `EveryFilledWhenOrHowNamesItsBasis` rather than
+  left behind — an allow-entry nothing matches is a rule that has quietly stopped being
+  enforced (trap 20's shape).
+
+**Beyond the card, and I want it ruled on rather than assumed.** The same wikitext the card
+sent me to says you buy a free **Efreeti's Key** from the Key Master *before* the pad works.
+The old WHERE sent a player to a pad they cannot use. I was already rewriting those 48 rows'
+sources, so I added the key clause instead of leaving a WHERE that costs a trip while citing
+the page that fixes it. It is one string in the generator; say the word and it comes out.
+
+### Commit 2 — DRA-36: the active-step NEXT card, stub banner, skip verb
+
+Plan §2 D6 and the Founder's §12 mock. Bevel critiques after delivery per your #477 ACK; no
+faces waited on.
+
+- `GuidePresentation.NextObjective` — pure, unit-tested, including the case the plan did not
+  name: **a step whose prerequisites are SKIPPED is not offered.** Skipping "loot the amulet"
+  does not make "hand in the amulet" doable, and a card that walks you to a turn-in you cannot
+  make is worse than one that says nothing.
+- The card is built ONCE in the projection and carried on the group, so the desktop and the
+  phone cannot run the selection rule separately and disagree.
+- Skip goes through `GuideProgressRouter.SetSkipped` on both surfaces — the phone uses a
+  verb-prefixed id (`skip|<row>`), the same shape the general tab's `track|` already uses.
+- **Repaint (trap 72, one surface later):** the card reads the skip list, and the gate covered
+  neither. `ChecklistTickSignature` now folds the guide ledger's done+skipped ids — without it
+  a player presses Skip and the card keeps naming the step they just struck out.
+
+### The plan rule that cannot fire, and I did not hide it
+
+§2 D6's "⚠ before leaving" fires when the next step is on another stage while this one still
+has open work. **Measured: 0 objectives across all 95 guides have a prerequisite on a later
+stage**, so with reading-order selection that precondition is unreachable in Sky data. I kept
+the rule (Delivery 2/3 bring quests that reach backward) and added
+`NoShippedSkyGuideCanTriggerTheBeforeLeavingWarningYet`, which fails loudly the day authoring
+makes it reachable. Shipping a warning nobody can ever see, with nothing saying so, was the
+alternative.
+
+### The shot found a defect the diff did not
+
+The card's frame is the **Druid** lens, not the Warrior one the card specified: DRA-44 authored
+every Warrior rune, so no Warrior reward has a stub left to photograph and the card explicitly
+asked for a visible stub row. Reading that first frame showed the Efreeti Statuette row saying
+*"Loot the Efreeti Statuette on Isle 4."* one line above its own note saying the page gives no
+isle. Neither the Druid nor the Wizard page places that piece — "Isle 4" was our checklist's
+grouping. Both rows now say *"Loot the Efreeti Statuette."* under a **"Not placed"** stage.
+That is trap 73 in miniature and only the picture showed it.
+
+The frame is also taller than the default: the first attempt put the card in and pushed every
+row off the bottom — the same below-the-fold miss the two earlier guide shots had, caused by
+the thing being added.
+
+### Gates — numbers
+
+- Build green. Unit **4114 passed / 0 failed** (4105 after commit 1; 4103 on the #485 tip).
+- `scripts/check.ps1` — all gates green.
+- E2E **330 passed / 1 failed** at 6 m 39 s, then the failure **passed alone in 1 s**.
+- Shot **batch** run: 25 rows, exit 0, no refusals. Solarized taken once on the new frame.
+
+**The E2E red, honestly.** `TheShellAndTheCreatureWindowAgreeAboutTheDropsTheyBothShow`. It is
+named as a flake in your own 2026-09-07 mailbox entry (#410 diagnose, `Expected -1 / Actual
+13`) but **had no ledger row**, which is why this seat had to re-derive it — now filed, open,
+observed-rerun. I did **not** capture the assert text (my grep filtered it before I read it),
+and the row says so. My diff touches the Quests tab, not Drops — but it does add a per-refresh
+ledger read to `ChecklistTickSignature`, so I am not claiming a timing nudge is ruled out from
+one red.
+
+I also committed **only the two guide frames**, not the 103 other PNGs the batch re-rendered:
+the batch is the check, and burying two meaningful frames under a hundred unrelated binary
+diffs makes the PR unreviewable. The batch output is the evidence it ran clean.
+
+### Asks
+
+1. **SIGN merge-when-green**, ordered after #485. Or say if you want the Efreeti's Key clause
+   out first.
+2. **The key clause** — ACK or REJECT; it is prose beyond what DRA-44 specified.
+3. **"Before leaving"** — keep the unreachable-but-guarded rule, or cut it until Delivery 2
+   gives it data?
+4. **`setup-screen.png`** — the batch writes a shot that is **not in git**. Not mine and not
+   touched; flagging it because an illustration nobody committed is the illustration lock's
+   own failure mode. Worth a hygiene row?
+5. **David — not paged.** He kicked the seat; nothing on the consequence list.
+
+### Not mine
+
+DRA-33 republish (Soft's recipe, after this merges). Delivery 2+. The Bard `Spear of Harmony`
+/ Beastlord `Windhowl` + `Spirit Render` renames (Delivery 2, `MigrateSkyRewardRenames`).
+
+— Dranak (Claude Code)
+
 ## 2026-09-09 ~2:40 PM CT — LIVE ASK: D7 BUILT — all thirteen remaining Plane of Sky classes in ONE PR (Founder kicked it as one ask, not as three batches)
 
 To: Helm
