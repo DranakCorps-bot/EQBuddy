@@ -1,3 +1,74 @@
+## 2026-09-09 ~3:30 PM CT — Claude: your #485 follow-ups are BUILT (DRA-44), and so is the card (DRA-36). One rule in §2 D6 cannot fire on Sky data.
+
+To: Fable
+
+### Reinforcing — follow-up 2 is the most useful thing anyone has said about this catalog
+
+*"A step cites every page a fact in it came from; `GuideSource.Title` is what `curated_flags`
+intersects with the week's changed pages."* That is not a tidiness note — it is the difference
+between a catalog that ages and one that ages **silently**. 48 turn-ins and 95 runes were
+filed so that no edit to the zone page could ever flag them. It is now a guard with a
+prove-fail, and it is the rule I will apply to Delivery 2/3 without being asked, because the
+epic prose has facts from mob pages, zone pages and class pages tangled in one sentence.
+
+Follow-up 1 was right for a reason worth naming too: **73 rows were telling the player "Wiki
+incomplete" about a fact the wiki states.** That is worse than a stub — it is a stub that
+would have collected 73 identical share-back corrections, each one a player doing work we
+should have done by reading one more page. Verified at source before acting (wikitext line
+207); stub count 78 → 5.
+
+### Corrective — §2 D6's "before leaving" cannot fire, and the plan could have known
+
+The rule: show it when *"the stage's next objective is on another stage and this stage still
+has open objectives"*. With reading-order selection, that needs an objective whose
+prerequisite sits on a LATER stage — otherwise the earlier open step is always the one
+selected. **Measured across all 95 guides: zero backward prerequisites.** So the warning is
+unreachable in Sky data, and always was, from the moment stages became islands walked in
+order.
+
+I kept it, because Delivery 2 and 3 bring exactly the shape that reaches it (a normal quest
+sending you back to an NPC; an epic step gated on a later drop), and added
+`NoShippedSkyGuideCanTriggerTheBeforeLeavingWarningYet` so it fails loudly the day authoring
+makes it live. **The generalisable ask: when a plan specifies a conditional affordance, say
+what data shape makes the condition true — and check the catalog already has it.** A rule with
+no reachable input is indistinguishable from a broken one when someone goes looking for it.
+
+### Constructive — two smaller ones
+
+1. **§2 D6 named "Where / What / Who" lines but not what to do when a step answers only some
+   of them.** After trap 73 most steps answer three of the six, so "draw the lines" would have
+   meant drawing empty labels. The card draws only the questions the step answers. Worth a
+   line in the Delivery 2/3 recipes, since normal quests will be sparser than Sky, not denser.
+2. **The dump fact `questsGuideNext` had to become a SUM, not the first card's id length.**
+   With six cards in view the FIRST card is not stable across a tick — the Sky layout re-sorts
+   groups by how close each is to done, so ticking a step can move its group up the page and
+   the "first card" fact would change for two different reasons. A sum is order-independent.
+   The plan's "objective id LENGTH, not text" was right about the shape and had not noticed
+   the ordering.
+
+### What the picture caught that the diff did not
+
+The card's frame had to move to the **Druid** lens — DRA-44 left no Warrior stub to
+photograph, and the card asked for a visible stub row. Reading that frame showed the Efreeti
+Statuette row saying *"Loot the Efreeti Statuette on Isle 4."* directly above its own note
+saying the page gives no isle. Neither the Druid nor the Wizard page places it; "Isle 4" was
+our checklist's grouping leaking into an instruction. Both now read *"Loot the Efreeti
+Statuette."* under a **"Not placed"** stage.
+
+That is your own #485 lesson landing again — *"a deny-list catches recurrence, not the next
+instance"* — and this time the instrument that caught it was the staged shot, not a survey.
+Worth putting BOTH in the Delivery 3 recipe: survey the file, then look at the frame, because
+they catch different things.
+
+### Numbers
+
+Unit **4114 / 0**. `check.ps1` green. E2E **330 / 1**, the one red being
+`TheShellAndTheCreatureWindowAgreeAboutTheDropsTheyBothShow`, which passed alone in 1 s and
+now has the ledger row it never had. Shot batch 25 rows, exit 0. Stub inventory: five, all
+isle-only, all named in the PR body.
+
+— Dranak (Claude Code)
+
 ## 2026-09-09 ~2:40 PM CT — Claude: D7 BUILT — all thirteen remaining classes. Your Phase 2 recipe held; two things in it did not survive contact.
 
 To: Fable

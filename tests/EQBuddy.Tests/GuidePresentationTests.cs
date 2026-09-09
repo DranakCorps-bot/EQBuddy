@@ -162,6 +162,144 @@ public sealed class GuidePresentationTests
         Assert.Equal("", GuidePresentation.AfterDetail(["", "  "]));
     }
 
+    // ---- the NEXT rule (P1d) ----------------------------------------------------------
+
+    private static Guide TwoStages()
+    {
+        GuideObjective Step(string id, int order, params string[] prereqs) => new()
+        {
+            Id = id, Order = order, ObjectiveType = "Loot", Title = id,
+            ShortInstruction = "do " + id, Who = "someone", Where = "somewhere",
+            What = "do it", Authoring = GuideAuthoring.Authored,
+            PrerequisiteObjectiveIds = [.. prereqs],
+            Sources = [new GuideSource { Url = "u", Title = "t", RetrievedAt = "2026-09-09" }],
+        };
+        return new Guide
+        {
+            Id = "g", Name = "G", ApplicableClasses = ["Warrior"], ZoneNames = ["Plane of Sky"],
+            Stages =
+            [
+                new GuideStage { Id = "s1", Name = "Isle 3", Order = 1,
+                    Objectives = [Step("a", 1), Step("b", 2)] },
+                new GuideStage { Id = "s2", Name = "Isle 4", Order = 2,
+                    Objectives = [Step("c", 1)] },
+                new GuideStage { Id = "s3", Name = "Turn in", Order = 3,
+                    Objectives = [Step("turn-in", 1, "a", "b", "c")] },
+            ],
+        };
+    }
+
+    private static Func<GuideObjective, bool> In(params string[] ids) =>
+        o => ids.Contains(o.Id, StringComparer.OrdinalIgnoreCase);
+
+    [Fact]
+    public void NextIsTheFirstStepInReadingOrderThatIsNotDoneOrSkipped()
+    {
+        var g = TwoStages();
+        Assert.Equal("a", GuidePresentation.NextObjective(g, In(), In())!.Id);
+        Assert.Equal("b", GuidePresentation.NextObjective(g, In("a"), In())!.Id);
+        Assert.Equal("c", GuidePresentation.NextObjective(g, In("a"), In("b"))!.Id);
+    }
+
+    /// <summary>A turn-in whose pieces are not all done is not offered, even though nothing
+    /// earlier is left: walking a player to a hand-in they cannot make is worse than saying
+    /// nothing. Prerequisites gate it, not position.</summary>
+    [Fact]
+    public void AStepWhoseePrerequisitesAreNotDoneIsSkippedOverRatherThanOffered()
+    {
+        var g = TwoStages();
+
+        // Everything but the turn-in is SKIPPED, so the turn-in is next in reading order and
+        // still must not be named: skipping "loot it" does not make "hand it in" doable.
+        Assert.Null(GuidePresentation.NextObjective(g, In(), In("a", "b", "c")));
+        // Done rather than skipped, and it IS offered.
+        Assert.Equal("turn-in", GuidePresentation.NextObjective(g, In("a", "b", "c"), In())!.Id);
+    }
+
+    [Fact]
+    public void AllDoneAndAllSkippedAreDifferentSentences()
+    {
+        var g = TwoStages();
+        Assert.Equal(GuidePresentation.AllDone,
+            GuidePresentation.NoNextStep(g, In("a", "b", "c", "turn-in"), In()));
+        Assert.Equal(GuidePresentation.AllSkipped,
+            GuidePresentation.NoNextStep(g, In(), In("a", "b", "c", "turn-in")));
+        // A guide with steps left that are all blocked by skips reads as skipped, because
+        // that is what the player chose.
+        Assert.Equal(GuidePresentation.AllSkipped,
+            GuidePresentation.NoNextStep(g, In("a"), In("b", "c", "turn-in")));
+    }
+
+    /// <summary>
+    /// The warning fires only when the next step is on a LATER stage while an EARLIER one
+    /// still has open work — on Plane of Sky, "you are about to leave this island with
+    /// something on it". A warning that is always on is furniture.
+    ///
+    /// <para>Skipped steps are not stranded work: the player said they are not doing those,
+    /// and nagging about them would be arguing with a decision they made.</para>
+    ///
+    /// <para><b>The fixture needs a BACKWARD prerequisite to reach this at all</b> — see
+    /// <see cref="NoShippedSkyGuideCanTriggerTheBeforeLeavingWarningYet"/>.</para>
+    /// </summary>
+    [Fact]
+    public void BeforeLeavingNamesOnlyTheWorkStrandedOnAnEarlierStage()
+    {
+        var g = TwoStages();
+        // "b" (Isle 3) now waits on "c" (Isle 4), so the player is sent forward with work
+        // behind them — the only shape that reaches this warning.
+        g.Stages[0].Objectives[1].PrerequisiteObjectiveIds = ["c"];
+
+        var next = GuidePresentation.NextObjective(g, In("a"), In())!;
+        Assert.Equal("c", next.Id);
+
+        var warning = GuidePresentation.BeforeLeaving(g, next, In("a"), In());
+        Assert.StartsWith(GuidePresentation.BeforeLeavingLead, warning, StringComparison.Ordinal);
+        Assert.Contains("b", warning, StringComparison.Ordinal);
+
+        // The same shape with "b" SKIPPED is silent: a step the player struck out is not
+        // work they are stranding.
+        Assert.Equal("", GuidePresentation.BeforeLeaving(g, next, In("a"), In("b")));
+
+        // And a next step on the CURRENT stage never warns, whatever else is open.
+        Assert.Equal("", GuidePresentation.BeforeLeaving(
+            g, GuidePresentation.NextObjective(g, In(), In())!, In(), In()));
+    }
+
+    /// <summary>
+    /// <b>No shipped Plane of Sky guide can show that warning today, and that is expected.</b>
+    ///
+    /// <para>Selection is reading order, and no Sky objective has a prerequisite on a LATER
+    /// stage — the isles are walked in order and only the turn-in waits on anything. So the
+    /// precondition the signed plan wrote ("the next objective is on another stage and this
+    /// stage still has open objectives") cannot occur in this data.</para>
+    ///
+    /// <para>The rule is kept because Delivery 2 and 3 bring quests that DO reach backward
+    /// (a normal quest sending you back to an NPC, an epic step gated on a later drop). This
+    /// test exists so nobody reads the missing line as a bug, and so it fails loudly the day
+    /// authoring adds a backward prerequisite and the warning starts appearing for real.</para>
+    /// </summary>
+    [Fact]
+    public void NoShippedSkyGuideCanTriggerTheBeforeLeavingWarningYet()
+    {
+        foreach (var guide in GuideCatalog.Default.Guides)
+        {
+            var stageOf = guide.Stages
+                .SelectMany(s => s.Objectives.Select(o => (o.Id, s.Order)))
+                .ToDictionary(x => x.Id, x => x.Order, StringComparer.OrdinalIgnoreCase);
+
+            foreach (var stage in guide.Stages)
+                foreach (var objective in stage.Objectives)
+                    foreach (var prerequisite in objective.PrerequisiteObjectiveIds)
+                        Assert.True(stageOf[prerequisite] <= stage.Order,
+                            $"{guide.Id}/{objective.Id} waits on a LATER stage — the "
+                            + "before-leaving warning is now reachable and wants a shot");
+        }
+    }
+
+    [Fact]
+    public void TheCardsWhyNamesTheRewardBecauseTheHeadingIsNotBesideIt() =>
+        Assert.Equal("for: Runed Wind Amulet", GuidePresentation.CardWhy("Runed Wind Amulet"));
+
     // ---- the share-back door ---------------------------------------------------------
 
     [Fact]

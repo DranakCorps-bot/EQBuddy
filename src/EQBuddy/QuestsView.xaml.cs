@@ -742,6 +742,7 @@ public partial class QuestsView : UserControl
         _signature = sig;
 
         QuestsPanel.Children.Clear();
+        _lastGuideCards.Clear();
         _rows.Clear();
         _renderedCount = 0;
         _suppressed = 0;
@@ -1107,7 +1108,33 @@ public partial class QuestsView : UserControl
         $"questsGuideRows={GuideRowsOnScreen().Count()} " +
         $"questsGuideStubs={GuideStubsOnScreen()} " +
         $"questsGuideDone={GuideRowsOnScreen().Count(c => c.IsChecked == true)} " +
-        $"questsGuideImprove={GuideImproveDoorsOnScreen()}";
+        $"questsGuideImprove={GuideImproveDoorsOnScreen()} " +
+        // The card, counted off the real tree. questsGuideNext is the LENGTH of the next
+        // step's row id and never the text: the E2E compares dumps, and an id with a space
+        // in it would split the flat namespace (trap 58). Length moves when the step moves,
+        // which is the whole assertion.
+        $"questsGuideCards={GuideElementsOnScreen<Border>(GuideCardTag)} " +
+        $"questsGuideNext={NextRowIdLengths()} " +
+        $"questsGuideSkipped={GuideRowsOnScreen().Count(c => Struck(c))}";
+
+    /// <summary>
+    /// The SUM of every drawn card's next-row-id length.
+    ///
+    /// <para>A sum rather than the first card's, because group ORDER is not stable across a
+    /// tick: the Sky layout sorts by how close each reward is to done, so ticking a step can
+    /// move its whole group up the page. "The first card's next step" would then change for
+    /// two different reasons and the assertion could not tell them apart. A sum is
+    /// order-independent and still moves when any one card moves.</para>
+    ///
+    /// <para>Lengths, never the ids: the dump is one flat space-separated namespace
+    /// (trap 58). Read from the projection's own answer, because the card deliberately does
+    /// not print the id anywhere a test could read back.</para></summary>
+    private int NextRowIdLengths() => _lastGuideCards.Sum(c => c.RowId.Length);
+
+    private static bool Struck(CheckBox row) =>
+        row.Content is StackPanel p
+            ? p.Children.OfType<TextBlock>().Any(t => t.TextDecorations?.Count > 0)
+            : row.Content is TextBlock t2 && t2.TextDecorations?.Count > 0;
 
     /// <summary>
     /// Which boxes are ticked, folded to one short value for the repaint gate.
@@ -1134,14 +1161,157 @@ public partial class QuestsView : UserControl
         foreach (var item in _settings.EpicQuestChecklist)
             if (item.Acquired) { epic ^= item.Id.GetHashCode(StringComparison.Ordinal); epicOn++; }
 
+        // AND THE GUIDE LEDGER. The active-step card reads the skip list to decide which
+        // step is next, and a skip lives in neither list above — so without this the player
+        // would press Skip and the card would keep naming the step they just struck out.
+        // Trap 72, one surface later: when you add a READER of a store, put that store in
+        // what makes the surface redraw.
+        var guide = 0;
+        var guideOn = 0;
+        if (_main.QuestLedger is { } ledger && _main.QuestCharacterKey is { Length: > 0 } key)
+            foreach (var guideId in ledger.GuidesTouchedBy(key))
+            {
+                var progress = ledger.GuideProgressFor(key, guideId);
+                foreach (var id in progress.SkippedObjectiveIds.Concat(progress.DoneObjectiveIds))
+                {
+                    guide ^= (guideId + "/" + id).GetHashCode(StringComparison.Ordinal);
+                    guideOn++;
+                }
+            }
+
         // The turn-in stores too: a reward marked complete on the phone or by the
         // achievements import changes what this tab draws and lives in neither list above.
         return $"{skyOn}.{sky:x8}/{epicOn}.{epic:x8}"
-            + $"/{_settings.SkyQuestCompleted.Count}.{_settings.EpicQuestCompleted.Count}";
+            + $"/{_settings.SkyQuestCompleted.Count}.{_settings.EpicQuestCompleted.Count}"
+            + $"/g{guideOn}.{guide:x8}";
     }
+
+    /// <summary>
+    /// The active-step card. Every string comes from the projection already worded — this
+    /// method decides layout and nothing else, which is what keeps the phone's version of the
+    /// same card saying the same thing.
+    ///
+    /// <para>Only the questions the step ANSWERS get a line. An empty "Where:" label reads as
+    /// a broken card, and most steps outside Plane of Sky will answer three of the six.</para>
+    /// </summary>
+    private UIElement GuideCardView(
+        QuestChecklistGroup group, QuestChecklistCard card,
+        Dictionary<string, Action<bool>> setters)
+    {
+        var body = new StackPanel();
+        var border = new Border
+        {
+            Child = body,
+            Padding = new Thickness(DesignTokens.SpaceM),
+            Margin = new Thickness(DesignTokens.SpaceXxs, 0, 0, DesignTokens.SpaceS),
+            CornerRadius = new CornerRadius(DesignTokens.RadiusCard),
+            Tag = GuideCardTag,
+        };
+        border.SetResourceReference(Border.BackgroundProperty, "CardBrush");
+
+        // No next step: the card says which of the two finished states this is and offers no
+        // verbs. A Done button with nothing to do is the silent no-op rule inverted.
+        if (card.RowId.Length == 0)
+        {
+            body.Children.Add(Line(Role.Body, card.Instruction, "DimBrush"));
+            return border;
+        }
+
+        body.Children.Add(Line(Role.Caption, GuidePresentation.NextLead, "AccentBrush"));
+        var lead = Line(Role.TitleSection, card.Instruction, "TextBrush");
+        lead.FontWeight = FontWeights.SemiBold;
+        body.Children.Add(lead);
+
+        if (card.StubNote.Length > 0)
+        {
+            // The banner REPLACES where/what — the projection already blanked them.
+            var stub = Line(Role.Body, GuidePresentation.StubLead + " " + card.StubNote, "WarnBrush");
+            stub.Tag = GuideStubTag;
+            body.Children.Add(stub);
+        }
+        foreach (var (label, value) in new[]
+                 {
+                     ("Where: ", card.Where), ("What: ", card.What), ("Who: ", card.Who),
+                 })
+            if (value.Length > 0) body.Children.Add(Line(Role.Body, label + value, "DimBrush"));
+
+        if (card.Why.Length > 0) body.Children.Add(Line(Role.Caption, card.Why, "DimBrush"));
+        if (card.BeforeLeaving.Length > 0)
+            body.Children.Add(Line(Role.Caption, card.BeforeLeaving, "WarnBrush"));
+
+        var verbs = new WrapPanel { Margin = new Thickness(0, DesignTokens.SpaceS, 0, 0) };
+        verbs.Children.Add(CardVerb(GuidePresentation.DoneLabel, "EqPrimaryButton", null, () =>
+        {
+            if (setters.TryGetValue(card.RowId, out var set)) { set(true); Save(); }
+        }));
+        verbs.Children.Add(CardVerb(GuidePresentation.SkipLabel, "ActionButton",
+            GuidePresentation.SkipTip, () => SkipGuideRow(group, card.RowId)));
+        if (card.ImproveUrl.Length > 0)
+        {
+            var improve = DesignSystem.InlineIconButton("Pencil", GuidePresentation.ImproveTip,
+                (_, _) => OpenUrl(card.ImproveUrl));
+            improve.Margin = new Thickness(DesignTokens.SpaceS, 0, 0, 0);
+            improve.Tag = GuideImproveTag;
+            verbs.Children.Add(improve);
+        }
+        body.Children.Add(verbs);
+        return border;
+
+        TextBlock Line(Role role, string text, string ink)
+        {
+            var t = DesignSystem.Text(role, text);
+            t.TextWrapping = TextWrapping.Wrap;
+            t.Ink(ink);
+            return t;
+        }
+    }
+
+    private Button CardVerb(string label, string style, string? tip, Action act)
+    {
+        var b = new Button
+        {
+            Style = (Style)FindResource(style),
+            Content = label,
+            Margin = new Thickness(0, 0, DesignTokens.SpaceS, 0),
+            ToolTip = tip,
+            Tag = GuideVerbTag,
+        };
+        b.Click += (_, _) => act();
+        return b;
+    }
+
+    /// <summary>Strike a guide step out, through the router — never the ledger directly, which
+    /// is what the one-writer source scan is looking for.</summary>
+    private void SkipGuideRow(QuestChecklistGroup group, string rowId)
+    {
+        if (_main.QuestLedger is not { } ledger) return;
+        if (GuideChecklistProjection.Resolve(GuideCatalog.Default, rowId)
+            is not var (guide, objective)) return;
+        var already = GuideProgressRouter.IsSkipped(
+            ledger, _main.QuestCharacterKey, guide.Id, objective);
+        GuideProgressRouter.SetSkipped(
+            ledger, _main.QuestCharacterKey, guide.Id, objective, !already);
+        Save();
+    }
+
+    private void Save()
+    {
+        _settings.Save();
+        Refresh(force: true);
+    }
+
+    /// <summary>The cards this render drew, in order. Cleared at the top of every render
+    /// beside the panel itself, so it can never report a card that is no longer on screen —
+    /// a flag nobody resets is the failure the Tag-counted facts avoid, and this one is
+    /// reset with the thing it describes.</summary>
+    private readonly List<QuestChecklistCard> _lastGuideCards = [];
 
     /// <summary>The tag a guided group's caption line carries.</summary>
     private const string GuideCaptionTag = "guideCaption";
+    /// <summary>The tag the active-step card's border carries.</summary>
+    private const string GuideCardTag = "guideCard";
+    /// <summary>The tag each of the card's two verbs carries.</summary>
+    private const string GuideVerbTag = "guideVerb";
     /// <summary>The tag every guide objective's row carries.</summary>
     private const string GuideRowTag = "guideRow";
     /// <summary>The tag a stub row's "Wiki incomplete —" caption carries.</summary>
@@ -2549,6 +2719,15 @@ public partial class QuestsView : UserControl
                 QuestsPanel.Children.Add(guideCaption);
             }
 
+            // The active-step card, ABOVE this group's rows: the one thing on the tab that
+            // says "do this next" rather than "here is everything" belongs where the eye
+            // lands, not under the list it summarises (trap 44, requirements §12).
+            if (group.GuideCard is { } card && group.GuideId.Length > 0)
+            {
+                _lastGuideCards.Add(card);
+                QuestsPanel.Children.Add(GuideCardView(group, card, setters));
+            }
+
             // Island sub-headings (David, 2026-08-23, from a Reddit ask): "a player should
             // see the work for one island together, not a flat list that jumps islands."
             // Core hands the rows over already ordered and already labelled, so this draws a
@@ -2585,7 +2764,10 @@ public partial class QuestsView : UserControl
                     mark.SetResourceReference(System.Windows.Documents.Run.ForegroundProperty, "WarnBrush");
                     text.Inlines.Add(mark);
                 }
-                text.Ink(row.Acquired ? "DimBrush" : "TextBrush");
+                text.Ink(row.Acquired || row.IsSkipped ? "DimBrush" : "TextBrush");
+                // "Not doing this one." Struck through and dimmed, so a skipped step reads as
+                // deliberately set aside rather than as merely unfinished.
+                if (row.IsSkipped) text.TextDecorations = TextDecorations.Strikethrough;
 
                 // A stub step says so, in the player's words, under its own title. It stays
                 // fully tickable — manual state beats weak inference, and "we could not find

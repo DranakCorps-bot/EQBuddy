@@ -294,7 +294,30 @@ public sealed record CompanionChecklistGroup(
     IReadOnlyList<CompanionChecklistRow> Rows,
     string? Class = null,
     bool Tickable = true,
-    string? Title = null);
+    string? Title = null,
+    /// <summary>The active-step card for a guided group, already worded by
+    /// <c>GuidePresentation</c>. The page decides layout and nothing else — the desktop and
+    /// the phone must not run the "what is next" rule separately (parity by shared module).</summary>
+    CompanionGuideCard? Card = null);
+
+/// <summary>The phone's half of the active-step card. Every field arrives worded; a null or
+/// empty one simply is not drawn, so a step that answers three of the six questions shows
+/// three lines rather than three empty labels.</summary>
+/// <param name="RowId">The step the two verbs act on, or "" when the guide has none left —
+/// which is how the page knows to draw the finished sentence and no buttons.</param>
+public sealed record CompanionGuideCard(
+    string RowId,
+    string Lead,
+    string Instruction,
+    string? Where = null,
+    string? What = null,
+    string? Who = null,
+    string? Why = null,
+    string? BeforeLeaving = null,
+    string? Stub = null,
+    string? Improve = null,
+    string DoneLabel = "",
+    string SkipLabel = "");
 
 /// <summary><see cref="Id"/> is what a tap sends back to tick the row — the stored
 /// item's own id for Epics/Sky, slot|item for Gear (which has no id of its own).</summary>
@@ -318,7 +341,10 @@ public sealed record CompanionChecklistRow(
     /// A URL and nothing else — the body is composed from the CATALOG, carries nothing from
     /// the log or the character, and is on screen in the player's own browser before
     /// anything is posted.</summary>
-    string? Improve = null);
+    string? Improve = null,
+    /// <summary>The player struck this step out. The page strikes it through, the same way
+    /// the desktop does.</summary>
+    bool Skipped = false);
 
 // ---------------- quests (General · Epic 1.0 · Plane of Sky) ----------------
 

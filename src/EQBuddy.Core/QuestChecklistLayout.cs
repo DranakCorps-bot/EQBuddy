@@ -47,7 +47,42 @@ public sealed record QuestChecklistRow(
     /// <para>ONE field with two renderings rather than one field per surface: the six are one
     /// fact about the step, and splitting them by who draws them is how the two screens start
     /// answering differently.</para></summary>
-    string GuideFacts = "");
+    string GuideFacts = "",
+    /// <summary>The player said "not doing this one". Struck through wherever it is drawn.
+    ///
+    /// <para>A different fact from <see cref="Acquired"/> and stored somewhere else — the
+    /// per-character guide ledger, for every objective including reward ones, because a skip
+    /// has no home in the Sky turn-in store and is a statement about the future rather than
+    /// the past (P1b's asymmetry).</para></summary>
+    bool IsSkipped = false);
+
+/// <summary>
+/// The active-step card: what the player should do NEXT in one guided reward, lifted out of
+/// the rows and put above them (requirements §12, signed plan §5).
+///
+/// <para>Built by <c>GuideChecklistProjection</c> and carried on the group so the desktop, the
+/// shell and the phone draw one answer. The alternative — each surface running the selection
+/// rule itself — is three producers of "what is next", which is the same shape as the drift
+/// <see cref="QuestChecklistLayout"/> exists to stop.</para>
+///
+/// <para>Every field is already WORDED. A surface decides layout and nothing else; there is
+/// no string in XAML or in <c>index.html</c> for this card.</para>
+/// </summary>
+/// <param name="RowId">The next step's row id, or "" when there is none — which is how a
+/// surface knows to draw the finished state and to offer no verbs.</param>
+/// <param name="StubNote">Non-empty when the next step is a Stub: the banner REPLACES
+/// <paramref name="Where"/> and <paramref name="What"/> rather than sitting under them,
+/// because "we do not know where" and "here is where" cannot both be on screen.</param>
+public sealed record QuestChecklistCard(
+    string RowId,
+    string Instruction,
+    string Where = "",
+    string What = "",
+    string Who = "",
+    string Why = "",
+    string BeforeLeaving = "",
+    string StubNote = "",
+    string ImproveUrl = "");
 
 /// <summary>A group of rows under one heading, with the state of the reward as a whole.</summary>
 /// <param name="Title">The reward (Sky) or section (Epic) on its own, WITHOUT the class.
@@ -79,7 +114,11 @@ public sealed record QuestChecklistGroup(
     /// <summary>The one line under a guided group's heading ("Guide · 0 of 3 · 1 stub"),
     /// already worded by <c>GuidePresentation.GuidedCaption</c>. Carried so the desktop, the
     /// shell and the phone say it identically and none of them spells it themselves.</summary>
-    string GuideCaption = "")
+    string GuideCaption = "",
+    /// <summary>The active-step card for this guided group, or null when no guide backs it.
+    /// Drawn ABOVE the rows and under the tab chrome — a thing that says what to do next
+    /// belongs where the eye lands, not below the list it is summarising (trap 44).</summary>
+    QuestChecklistCard? GuideCard = null)
 {
     /// <summary>"Bard · Mask of Song" — what a heading reads as.</summary>
     public string Heading => ClassName + " · " + Title;
