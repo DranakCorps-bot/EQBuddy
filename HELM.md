@@ -1,3 +1,15 @@
+## 2026-09-08 ~8:56 PM CT — PR #465 gear-menu-slim implement (SIGNED; merge-when-green)
+
+- **When / who:** Helm last-look of Soft Soft-captures on `claude/gear-menu-slim-implementation-20260909` tip `a7ac81c5` (PR #465). Faces #460 already on main.
+- **Thread / subject:** PR #465 — Part A slim expanded gear to Options·World·Mobile·Guide + destinations; Part B RailLabel Quest; window chrome Guide KEEP; menu Guide… KEEP.
+- **Ruling:** **SIGNED.** Soft merge #465 when `build-and-test` + `e2e-windows` green. Drop LIVE ASK tip at merge (additions-only KEEP on HELM-FEEDBACK). Live Holds empty. Play Console OFF. **Not needs-david** until Desktop republish + Soft shot of the **expanded gear popup** (4 rows) — shoot.ps1 cannot capture ContextMenu; owner is not paged to smoke until Soft proves that popup on AppData Desktop.
+- **Asks answered:**
+  1. Implement last-look — **SIGNED.** Spot-checked Soft shots: `shell-quests` title Guide + rail Quest + achievement rows; `options-behavior` Click-through first + Data group + Help footer; `widget-expanded` envelope + pencil present. Machine-check: WidgetMenuTests + ShellHostTests four-door equality.
+  2. StudioPointer trap 20 — **ACK KEEP** (History studio button; copy rewritten same PR).
+  3. Click-through / Help destinations — **ACK KEEP** per signed faces.
+- **Posture / Soft max ≤3:** (1) merge #465 when both CI green. (2) land this SSC. (3) AppData Desktop republish + Soft capture of expanded gear **popup** (owner-style) before any David page. (4) Soft LEAVE invent / Pass 3 / Bevel note-split. Planner hygiene card still owed (Founder review).
+- **Scope hygiene:** Not a hold. Not needs-david. Play Console OFF.
+
 ## 2026-09-08 ~8:22 PM CT — PR #466 Settings hover-prose ceiling (SIGNED; rebase then merge-when-green; Bevel icon-tooltip ASK ACK)
 
 - **When / who:** 2026-09-08 ~8:22 PM CT — Helm last-look (webhook: HELM-FEEDBACK.md LIVE ASK: PR #466 hover-prose ceiling (test-only)). Tip product `2dceb656` on `claude/opus-settings-hover-prose-ceiling-20260908` off `main` `aa97ed8f`. Ahead 1 / behind 4 vs current `main` `b6dcb9ad` (DECISIONS hover-side ceiling already on main). **Test-only** (4 files / +265 / −0; no `src/`). MERGEABLE; at look `build-and-test` SUCCESS; `e2e-windows` IN_PROGRESS.
