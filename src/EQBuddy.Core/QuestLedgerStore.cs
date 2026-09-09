@@ -43,6 +43,39 @@ public sealed class QuestLedgerStore
         public int Total => Math.Max(0, Verified + Looted + Manual - Consumed);
     }
 
+    /// <summary>
+    /// One character's manual progress through one <see cref="Guide"/> — the player's own
+    /// statement about steps that no log line and no inventory dump can decide.
+    ///
+    /// <para><b>What is NOT in here is the point.</b> An objective carrying a
+    /// <c>RewardKey</c> is a Sky turn-in, and its tick lives where it has always lived
+    /// (<c>AppSettings.SkyQuestCompleted</c>, through <c>QuestChecklistLayout.MarkRewardTurnedIn</c>).
+    /// The guide reads that store and writes through it; it never copies the tick down here,
+    /// because one fact with two sources is trap 4 and the losing side would be whichever
+    /// screen the player used second. <c>UI.Shared/GuideProgressRouter</c> is the one door
+    /// that decides which store a verb lands in — see its remarks (Fable plan §4).</para>
+    ///
+    /// <para><b>Done and Skipped contradict.</b> "I did this" and "I am not doing this" are
+    /// answers to the same question, so setting either clears the other — the same rule as
+    /// <see cref="CharacterLedger.Tracked"/>/<see cref="CharacterLedger.Hidden"/>.</para>
+    /// </summary>
+    public sealed class GuideProgress
+    {
+        /// <summary>Objectives the player ticked. Non-reward objectives only.</summary>
+        public List<string> DoneObjectiveIds { get; set; } = [];
+
+        /// <summary>Objectives the player struck out — "not doing this one". Kept for reward
+        /// objectives TOO, and that is not a duplicate of the turn-in tick: "turned in" and
+        /// "skipping this step" are different facts, and only one of them has another
+        /// home.</summary>
+        public List<string> SkippedObjectiveIds { get; set; } = [];
+
+        /// <summary>When this guide's progress last changed, <b>UTC</b> — a player action's
+        /// wall-clock, not a log timestamp like <see cref="Entry.LastTime"/>. Anything that
+        /// renders it converts; 0001-01-01 means never touched.</summary>
+        public DateTime LastUpdated { get; set; }
+    }
+
     /// <summary>One character's slice: owned items plus the quests they chose to 📌-track
     /// (tracked quests show in the Quest Tracker even before any item overlaps).</summary>
     public sealed class CharacterLedger
@@ -72,6 +105,11 @@ public sealed class QuestLedgerStore
         /// preview needs this to survive restarts (and log truncation).</summary>
         public int Level { get; set; }
 
+        /// <summary>Guide id → that guide's manual progress for this character. <b>Per
+        /// character</b>, which is where progress always belonged — the per-profile Sky ticks
+        /// are a known wart this deliberately does not copy (Fable plan §4).</summary>
+        public Dictionary<string, GuideProgress> Guides { get; set; } = new(StringComparer.OrdinalIgnoreCase);
+
         /// <summary>The <c>writtenAt</c> of the last inventory dump reconciled onto this
         /// character — the watermark <see cref="ReconcileInventory"/> checks so a replayed
         /// or repeated announcement (launch replay, a second `/outputfile inventory` with
@@ -97,7 +135,10 @@ public sealed class QuestLedgerStore
     /// 2026-08-07: "ready ×17" counted every merge-consumed belt). On mismatch the
     /// LOG-DERIVED counters reset (Looted/Consumed/LastTime) so the next full-log
     /// replay rebuilds them under the current rules; manual counts, pins, hides,
-    /// completions, and classes are user statements and always survive.</summary>
+    /// completions, classes and guide progress are user statements and always survive.
+    /// A guide tick is not a counter the replay can rebuild — nothing in the log knows
+    /// the player walked to the isle — so a rules bump that erased one would be a
+    /// silent loss with no way back.</summary>
     private const int CountingRulesVersion = 2;
 
     public QuestLedgerStore(string path)
@@ -144,7 +185,8 @@ public sealed class QuestLedgerStore
                     && stored.Values.All(c => c.Items.Count == 0 && c.Tracked.Count == 0
                                               && c.Hidden.Count == 0 && c.Completed.Count == 0
                                               && c.Classes.Count == 0 && c.Level == 0
-                                              && c.UnlockedClasses.Count == 0))
+                                              && c.UnlockedClasses.Count == 0
+                                              && c.Guides.Count == 0))
                 {
                     try
                     {
@@ -161,6 +203,11 @@ public sealed class QuestLedgerStore
         catch (Exception ex) { CoreLog.Error(ex); }   // corrupt store: start over, don't crash
         return new(StringComparer.OrdinalIgnoreCase);
 
+        // Rebuilds every character so the name-keyed dictionaries become case-insensitive
+        // ones. It is a HAND-WRITTEN copy, which means a property added to CharacterLedger
+        // and forgotten here is silently dropped on the next launch — the player's tick
+        // "just not there" after a restart, with nothing logged. LedgerRoundTripTests walks
+        // the type by reflection so the next field cannot go missing quietly.
         static Dictionary<string, CharacterLedger> Rekey(Dictionary<string, CharacterLedger> stored) =>
             new(stored.ToDictionary(
                     kv => kv.Key,
@@ -173,6 +220,7 @@ public sealed class QuestLedgerStore
                         Classes = kv.Value.Classes,
                         UnlockedClasses = kv.Value.UnlockedClasses,
                         Level = kv.Value.Level,
+                        Guides = new Dictionary<string, GuideProgress>(kv.Value.Guides, StringComparer.OrdinalIgnoreCase),
                         LastInventoryReconcile = kv.Value.LastInventoryReconcile,
                     }),
                 StringComparer.OrdinalIgnoreCase);
@@ -484,6 +532,110 @@ public sealed class QuestLedgerStore
         {
             CharacterFor(characterKey).Classes =
                 classes.Distinct(StringComparer.OrdinalIgnoreCase).ToList();
+            Save();
+        }
+    }
+
+    // ---- Guided progression: manual objective state (Fable plan §4, P1b) --------------
+    //
+    // The low-level store half. Everything here is written by ONE caller,
+    // UI.Shared/GuideProgressRouter, which is where the "does this verb belong to the
+    // guide ledger or to the Sky turn-in store?" question is answered. Calling
+    // SetObjectiveDone directly from a surface would put a reward objective's tick in two
+    // places, and the second screen the player touched would be the one telling the truth.
+    // GuideProgressRoutingTests scans for that, in both directions (trap 34).
+
+    /// <summary>This character's progress through one guide (copy; an untouched guide comes
+    /// back empty rather than null — "no progress" is a state, not an absence).</summary>
+    public GuideProgress GuideProgressFor(string characterKey, string guideId)
+    {
+        lock (_lock)
+            return _byCharacter.TryGetValue(characterKey, out var c)
+                   && c.Guides.TryGetValue(guideId, out var g)
+                ? new GuideProgress
+                {
+                    DoneObjectiveIds = [.. g.DoneObjectiveIds],
+                    SkippedObjectiveIds = [.. g.SkippedObjectiveIds],
+                    LastUpdated = g.LastUpdated,
+                }
+                : new GuideProgress();
+    }
+
+    /// <summary>Every guide this character has touched (copy of the ids; empty when
+    /// unknown). The catalog decides what exists — this only says where they have been.</summary>
+    public IReadOnlyList<string> GuidesTouchedBy(string characterKey)
+    {
+        lock (_lock)
+            return _byCharacter.TryGetValue(characterKey, out var c) ? [.. c.Guides.Keys] : [];
+    }
+
+    /// <summary>Tick or untick an objective the ledger owns, REFUSING one it does not.
+    ///
+    /// <para>Returns false — writing nothing — for an objective carrying a
+    /// <c>RewardKey</c>, because that fact is a Sky turn-in and already has a store with four
+    /// writers behind it (trap 4). The caller marks those through
+    /// <c>GuideProgressRouter.SetDone</c>, which turns them in for real.</para>
+    ///
+    /// <para><b>Why this overload can tell and the id one cannot.</b> The objective is handed
+    /// IN, so the store still never reads the catalog — no second producer of "what kind of
+    /// objective is this", which is the trap that kept this refusal out of the store at
+    /// first. Prefer this overload; the id form below is the primitive it delegates to.</para>
+    ///
+    /// <para>True means the ledger owns it and the store now holds the asked-for state,
+    /// including when it already did — a repaint is not a change.</para></summary>
+    public bool SetObjectiveDone(string characterKey, string guideId, GuideObjective objective, bool done)
+    {
+        if (objective.RewardKey.Length > 0) return false;
+        SetObjectiveDone(characterKey, guideId, objective.Id, done);
+        return true;
+    }
+
+    /// <summary>Tick or untick a non-reward objective by id. Ticking clears any skip on the
+    /// same objective — see <see cref="GuideProgress"/>.
+    ///
+    /// <para><b>Not for an objective carrying a <c>RewardKey</c>.</b> This form takes only an
+    /// id, so it cannot tell; the overload above can, and the read side never reads the
+    /// ledger for a reward objective anyway, so a tick that lands here by mistake is
+    /// unreadable rather than merely wrong. Route through <c>GuideProgressRouter</c>.</para></summary>
+    public void SetObjectiveDone(string characterKey, string guideId, string objectiveId, bool done)
+        => SetObjectiveMembership(characterKey, guideId, objectiveId, done,
+            g => g.DoneObjectiveIds, removeFrom: g => g.SkippedObjectiveIds);
+
+    /// <summary>Strike an objective out — "not doing this one" — or take the strike back.
+    /// Skipping clears any tick. Legitimate on reward objectives too: the skip has no other
+    /// home, and it is a different fact from the turn-in.</summary>
+    public void SetObjectiveSkipped(string characterKey, string guideId, string objectiveId, bool skipped)
+        => SetObjectiveMembership(characterKey, guideId, objectiveId, skipped,
+            g => g.SkippedObjectiveIds, removeFrom: g => g.DoneObjectiveIds);
+
+    private void SetObjectiveMembership(
+        string characterKey, string guideId, string objectiveId, bool member,
+        Func<GuideProgress, List<string>> list, Func<GuideProgress, List<string>> removeFrom)
+    {
+        if (characterKey.Length == 0 || guideId.Length == 0 || objectiveId.Length == 0) return;
+        lock (_lock)
+        {
+            var c = CharacterFor(characterKey);
+            if (!c.Guides.TryGetValue(guideId, out var g))
+            {
+                // Only a real change may CREATE the guide's row: un-ticking something that
+                // was never ticked must leave the file exactly as it was, so a render pass
+                // that reasserts state cannot grow the ledger a row per guide on screen.
+                if (!member) return;
+                c.Guides[guideId] = g = new GuideProgress();
+            }
+
+            var target = list(g);
+            var contradiction = removeFrom(g);
+            var has = target.Contains(objectiveId, StringComparer.OrdinalIgnoreCase);
+            var contradicted = member
+                && contradiction.RemoveAll(o => o.Equals(objectiveId, StringComparison.OrdinalIgnoreCase)) > 0;
+            if (member == has && !contradicted) return;
+
+            if (member) { if (!has) target.Add(objectiveId); }
+            else target.RemoveAll(o => o.Equals(objectiveId, StringComparison.OrdinalIgnoreCase));
+
+            g.LastUpdated = DateTime.UtcNow;
             Save();
         }
     }
