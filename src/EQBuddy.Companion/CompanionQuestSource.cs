@@ -42,6 +42,18 @@ public sealed record CompanionQuestRequest
 
     public ClassSource ClassSource { get; init; } = ClassSource.Unknown;
 
+    /// <summary>The per-character guide ledger, for the Sky tab's guided rows — a step
+    /// nothing else in EQBuddy has an opinion about lives here, and the phone has to read
+    /// the SAME store the desktop wrote it to or the two screens disagree about a tick.
+    /// Null is the honest answer before a character is known; the projection then leaves the
+    /// classic checklist alone rather than showing a guide it cannot record progress in.</summary>
+    public QuestLedgerStore? Ledger { get; init; }
+
+    /// <summary>Which character's guide progress. Empty means "not known yet" and the
+    /// ledger is never written under it — <see cref="QuestLedgerStore"/> refuses an empty
+    /// key rather than inventing a shared one.</summary>
+    public string CharacterKey { get; init; } = "";
+
     /// <summary>The newest <c>/outputfile inventory</c> dump, exactly as the desktop quest
     /// window reads it (<c>LatestInventory()</c>) — the second half of the #243 join, and
     /// the only input the Sky tab's leftover bands need that settings cannot supply.

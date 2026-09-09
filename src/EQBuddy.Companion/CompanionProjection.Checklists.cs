@@ -82,6 +82,13 @@ public static partial class CompanionProjection
         var all = QuestChecklistLayout.Sky(items, settings?.SkyQuestCompleted,
             settings?.SkyStepsUnderEveryIsland ?? false);
 
+        // The guide projection, from the same point in the same order QuestsView applies it.
+        // This is the whole of "the phone got guides": not a port, one call to the module
+        // both screens already share (David, 2026-08-18 — parity by shared module).
+        if (settings is not null && req.Ledger is not null)
+            all = GuideChecklistProjection.Apply(all, GuideCatalog.Default,
+                settings, req.Ledger, req.CharacterKey);
+
         var groups = new List<CompanionChecklistGroup>();
 
         // The cross-class ready view first — every reward whose pieces are all in hand,
@@ -130,12 +137,26 @@ public static partial class CompanionProjection
 
         groups.AddRange(scoped.Select(g => new CompanionChecklistGroup(
             g.Heading,
-            g.Note,
+            // A guided group leads with its guide caption ("Guide · 0 of 3 · 1 stub") and
+            // keeps the state word after it. Both, not one: the caption says how far along
+            // and how honest the data is, the note says whether it can be turned in — and
+            // the desktop shows both, one above the other.
+            g.GuideCaption.Length > 0
+                ? g.Note is { } note ? g.GuideCaption + " · " + note : g.GuideCaption
+                : g.Note,
             [.. g.Rows.Select(r => new CompanionChecklistRow(
                 r.Id,
                 r.Title,
                 r.Unassigned ? r.Detail + UnassignedMark : r.Detail,
-                r.Acquired))],
+                r.Acquired,
+                r.StubNote.Length > 0 ? GuidePresentation.StubLead + " " + r.StubNote : null,
+                // The same share-back door the desktop's pencil opens. A plain link, because
+                // the phone's browser honours it natively — no substitute needed (trap 35).
+                r.GuideRowKey.Length > 0
+                    && GuideChecklistProjection.Resolve(GuideCatalog.Default, r.Id)
+                        is var (guide, objective)
+                    ? GuidePresentation.ImproveUrl(guide, objective)
+                    : null))],
             Class: g.ClassName,
             Title: g.Title)));
 

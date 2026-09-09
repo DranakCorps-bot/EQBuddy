@@ -465,7 +465,8 @@ public sealed class CompanionHost : IDisposable
                         && CompanionActions.Apply(ledger, key, action))
                         edited.Add(action.Surface);
                 }
-                else if (CompanionActions.Apply(_settings, action))
+                else if (CompanionActions.Apply(_settings, _sources.QuestLedger,
+                    _sources.QuestCharacterKey?.Invoke() ?? "", action))
                 {
                     edited.Add(action.Surface);
                     settingsTouched = true;
