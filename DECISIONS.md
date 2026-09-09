@@ -1,3 +1,43 @@
+## 2026-09-09 (P1b was built twice — what I decided on my own, and what I did not)
+
+Two Soft seats independently built the whole of guided-progression P1b and both opened a
+green PR: #472 (this seat) and #473. One authorised scope, two implementations that both
+rewrite `QuestLedgerStore.cs` in the same region. They cannot both merge.
+
+**Decided, and logged rather than asked: I ported #473's store-level refusal into #472
+before any ruling, instead of waiting to find out which PR survives.**
+
+The default it could have gone the other way on: leave both PRs untouched, let Helm pick,
+and accept that whichever loses takes its good ideas with it. That is the tidier process
+answer, and it is what I would do if the two PRs disagreed about the RULE. They do not —
+both reached "one fact, one store", and the only real asymmetry was that #473 enforced it
+one layer lower. Porting the one thing #472 lacked costs a small commit and makes the
+ruling cheap: whichever way Helm goes, nothing of value is lost. Leaving it would have
+meant either a worse merged result or a second round of work after the ruling.
+
+Concretely: this branch had REJECTED a store-level refusal in a comment, reasoning that the
+store would have to read the catalog to tell a turn-in from a step — a second producer of
+"what kind of objective is this" (trap 4, again). That objection is real but does not apply
+to #473's shape, because the objective is handed IN rather than looked up. So `QuestLedgerStore`
+now has an overload taking the `GuideObjective` that refuses a reward-keyed one and writes
+nothing, not even the guide's row. The router calls that one; the id form stays the primitive.
+Prove-failed (trap 34): neutering the refusal fails `TheStoreRefusesAnObjectiveTheSkyTurnInStoreOwns`,
+and it is paired with an acceptance case so a guard that refused everything could not pass.
+
+**NOT decided by me, and filed as a LIVE ASK instead:** which PR proceeds, and whether #473
+is closed. Closing another seat's PR is not mine to do unasked, so #473 is untouched. The
+recommendation on the ask is SIGN #472 / CLOSE #473, on the grounds that #472 is now a
+superset — it additionally carries the write door through `SkyCompleteToggle` (the real
+turn-in, item consume and all) and `GuideProgressCounts`, neither of which #473 has.
+
+**Also not decided: the process hole.** The seat mutex did not prevent this. I checked the
+obvious explanation and it is wrong — `soft-seat-store.ps1` resolves through `--git-common-dir`
+specifically so every worktree shares the main tree's `claims.json`. The live store holds one
+claim (`work_item 445` / `dra-28-p1b`, now `abandoned`) and the other seat never appears in it.
+My hypothesis, labelled as one and not acted on: the mutex keys on a free-text work item and
+this scope has two names (`#445` and `DRA-28`), so two claims under two spellings would not
+collide. A fix there is posture, not code, so it went to Helm rather than into a script.
+
 ## 2026-09-08 (the prose policy's hover side — a ceiling built, and a copy rule NOT written)
 
 Authority: the reporting duty, not an asking one. Nothing here is a consequence-list door —
