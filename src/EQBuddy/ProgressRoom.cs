@@ -177,8 +177,15 @@ internal sealed class ProgressRoom : Grid, IShellRoom
         // repository lives on `MainWindow` and only the widget knows which (server,
         // character) its rows are keyed by, which is the same shape `LevelHistoryMemo`
         // already takes for the expensive half.
+        //
+        // `main.OnHistory` is the fourth argument — the studio door the widget's own
+        // context menu used to carry as "Session history…" before gear-menu-slim (DRA-25)
+        // cut it. `OnHistory` already does the right thing with no shell-specific branch
+        // (activate the existing HistoryWindow or build one), so the room forwards to it
+        // rather than re-deciding anything.
         _career = new CareerHistoryView(
-            main.StoredSessions, main.StoredLevelDings, () => main.QuestCharacterKey);
+            main.StoredSessions, main.StoredLevelDings, () => main.QuestCharacterKey,
+            () => main.OnHistory(main, new RoutedEventArgs()));
     }
 
     /// <summary>Land on a tab by its wire key — the second half of a <c>page:room</c>

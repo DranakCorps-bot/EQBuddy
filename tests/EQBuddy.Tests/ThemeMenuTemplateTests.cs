@@ -43,17 +43,15 @@ public class ThemeMenuTemplateTests
             s => (string?)s.Attribute("Property") == "Template");
     }
 
-    [Fact]
-    public void GearMenuStillHasTheNestedShelves()
-    {
-        var main = XDocument.Load(Path.Combine(AppContext.BaseDirectory,
-            "..", "..", "..", "..", "..", "src", "EQBuddy", "MainWindow.xaml"));
-        var nestedHeaders = main.Descendants(P + "ContextMenu").First()
-            .Elements(P + "MenuItem")
-            .Where(m => m.Elements(P + "MenuItem").Any())
-            .Select(m => (string?)m.Attribute("Header"))
-            .ToList();
-        Assert.Contains("Data & imports", nestedHeaders);
-        Assert.Contains("Help", nestedHeaders);
-    }
+    // GearMenuStillHasTheNestedShelves RETIRED (gear-menu-slim, DRA-25, 2026-09-08). It
+    // pinned "Data & imports" and "Help" as nested MenuItem shelves inside the widget's
+    // context menu — the surface #110's bug actually shipped on. The owner's lock cut both
+    // submenus off that menu entirely (their rows moved to Options → Behavior, the Guide
+    // room and an Options footer; see MainWindow.xaml's own comment above the ContextMenu),
+    // and a grep across every XAML file in src/EQBuddy confirms MainWindow.xaml is the only
+    // one that ever used <MenuItem> at all — so there is now no live nested-submenu surface
+    // in the shipped app to point this test at. The two tests above it are untouched and
+    // still pin the underlying mechanism (the Theme.xaml template and style, not any one
+    // menu's content), so #110 stays guarded: the day a nested MenuItem submenu returns
+    // anywhere, it inherits a template that already opens.
 }

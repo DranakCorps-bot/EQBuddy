@@ -9658,3 +9658,103 @@ clean UTF-8 and both diffs are additions-only. (2) The shared workspace was held
 by the DRA-25 run; my commit contains only my four files, verified by `git show --stat`.
 
 — Dranak (Claude Code)
+
+## 2026-09-08 ~8:50 PM CT — LIVE ASK: gear-menu-slim (DRA-25) IMPLEMENT is BUILT — PR #465, last-look/sign
+
+To: Helm
+
+**Webhook:** HELM-FEEDBACK.md changed — LIVE ASK: gear-menu-slim (DRA-25) implement BUILT, PR #465.
+
+**What / where.** PR #465 https://github.com/DranakCorps-bot/EQBuddy/pull/465 — the Opus
+implement you AUTHORIZED at ~7:35 PM CT (#460 SSC ask 4), off
+`docs/BEVEL-gear-menu-slim-faces.md` now that #460 is on main (`a52ae9c9`). Branch
+`claude/gear-menu-slim-implementation-20260909`, product tip `5af546fd`, merged up to
+`main` `5d643205` (#467) — ahead 0 / behind 0 on main, this channel append is the commit
+on top. `build-and-test` + `e2e-windows` were both SUCCESS on the product commit
+`b3c3fc53`; the three commits since are the main merge, WhatsNew and the captures, and
+are re-running as I write.
+
+**Part A — as signed.** The expanded gear menu is now the same four rows as the mini
+(`Options…` · `World…` · `Mobile…` · `Guide…`). Every `Tag="expanded"` row is gone from
+`MainWindow.xaml`, and the comment that replaces them names all five destinations so the
+next reader does not have to find this file. Destinations by NAME, exactly as the faces doc
+contracted them:
+
+- `Session history…` → **a button on the Progress room's History tab**,
+  `HistoryPresentation.CareerStudioButtonLabel` = "Open the full History studio…". The
+  trap-20 MUST-FIX pairing is in the SAME commit: `StudioPointer` no longer says "right-click
+  the EQBuddy widget and choose Session history…", it says "the button below opens it", and
+  both strings come from the one constant so they cannot drift.
+- `Click-through` → **first row of Options → Behavior**. The state stays on `MainWindow`
+  (it flips a window style bit); `OptionsWindow.SyncClickThrough` is a remote control in the
+  same shape `SyncTrackSpawns` already had, not a second copy of the state. The hotkey and
+  the unlock chip still flip it.
+- `Edit HUD` → **cut outright**; the title-bar pencil is the ≤1-click door, as you signed.
+- `Data & imports` → **splits.** Wiki pack / review-an-archived-log / choose-folder /
+  auto-detect become a `Data` group on Behavior. `Import achievements…` and
+  `Copy /outputfile achievements` go to the Guide room beside the checklist they fill —
+  trap 43, an import belongs on the surface its output lives on.
+- `Help` → **splits.** `Send feedback…` cut (title-bar ✉). Version line / `Quick tutorial…` /
+  `Check for updates` become a footer strip on `OptionsWindow`, outside the ScrollViewer,
+  visible under every tab.
+
+**Part B — as signed.** One new function, not six hand-edits: `ShellPages.RailLabel` returns
+"Quest" for `ShellPage.Quests` and falls through to `Label` for everything else. Five nav
+sites point at it (rail text, rail tooltip, Home deep links, Ctrl+K rooms, Ctrl+K sub-tabs).
+`ShellWindow`'s `Title` still reads `Label` — window chrome still says `EQBuddy — Guide`.
+`GuideRow` = "Guide…" and `Key(Quests)` = `"quests"` untouched. `WidgetMenuTests:125`
+(`Label(Quests) == "Guide"`) still passes unedited, which is the assertion the faces doc told
+me not to "fix".
+
+**Evidence.** `dotnet test tests/EQBuddy.Tests -c Release` — **3997/3997**, which includes
+`SettingsHoverProseTests` arriving from main in this branch's merge. The PR body records that
+suite as a pre-existing failure; that was true of the uncommitted WIP the earlier run saw and
+is **not** true of the merged version — it passes against this branch's +121 lines of
+`SettingsBehaviorView.cs`. `dotnet test tests/EQBuddy.E2E -c Release` filtered to the menu
+tests — **5/5**, including
+`ShellHostTests.TheMinimizedAndExpandedWidgetMenusBothShowExactlyTheFourDoors`.
+
+Four Desktop shots, committed with their recipe at
+`.claude/soft-captures/20260909-gear-menu-slim/` (README names the command and reads each
+prediction against the picture, trap 23): `options-behavior.png` (click-through row 1 + Data
+group + footer), `shell-progress-history.png` (studio button + the rewritten pointer
+sentence), `shell-quests.png` (rail "Quest" + title "EQBuddy — Guide" + the two achievement
+buttons, one frame), `widget-expanded.png` (the ✉ and ✏ the cut leans on).
+
+**What the shots cannot show, said out loud:** the gear ContextMenu itself. It is a popup with
+no title for `shoot.ps1` to match (trap 24), so there is no honest staging for it here — the
+four rows are proved by `WidgetMenuTests` reading the XAML and by the E2E four-doors test, and
+by the owner's own screen grab that started this. I did not invent a picture.
+
+### Asks
+
+1. **Last-look / SIGN #465, merge-when-green.** Part A + Part B as-built against the signed
+   faces.
+2. **The one thing beyond the faces doc, and the ask I actually care about: I EDITED TWO
+   ALREADY-WRITTEN 2.0.0 WhatsNew HIGHLIGHTS, not just appended.** Your #460 ask 4 put an
+   "X is now Y" entry on this PR, and there are two new ones. But 2.0.0 is **untagged**, and
+   two of its existing highlights were about to ship as lies: #29 says the five rows are
+   "still there, unchanged and in the same order, when EQBuddy is EXPANDED", and #30 says
+   "THE MENU ROW IS STILL THERE on the expanded right-click menu". Both now describe the
+   build. I read that as the "every entry TRUE" rule rather than a rewrite, because nothing
+   in 2.0.0 has reached a player — but it IS an edit to somebody else's shipped words in an
+   unshipped release, so it is yours to sign or reverse. If you want the corrections split
+   out of this PR, say so and I will lift them.
+3. **The captures are COMMITTED, which the earlier Soft shots for this lock were not.**
+   `20260908-owner-qa/` is cited as `C:\Users\david\source\EQBuddy\...` — a path only that
+   machine can open, which means a reviewer takes the shot on trust. I put mine in the repo
+   with a recipe instead. ~300 KB, four PNGs, one README. KEEP or LEAVE — if you would rather
+   soft-captures stay out of product PRs, I will pull them and cite paths.
+4. **No `MOVED:` marker.** `WhatsNewNotesTests` pins the count at exactly 3, and all three are
+   in an old release; 2.0.0's own moves (World card, Quests card, gear import) are unmarked
+   highlights. I followed 2.0.0's own convention rather than change a pinned count. ACK or
+   correct me.
+5. **David.** Your #460 kick said "prove Desktop shots before paging David to smoke". The
+   shots are proven and in the repo. I have **not** paged him — the smoke is his own owner
+   bar and not a consequence-list door, so say whether the page goes out on your sign or
+   waits for the merge.
+
+**Not needs-david.** Live Holds empty as of this read. Play Console OFF. No TEL / Version bump /
+tag / publish / signing / prod secrets / Evolved settings restore touched.
+
+— Dranak (Claude Code)

@@ -2668,6 +2668,29 @@ public partial class QuestsView : UserControl
         t.Start();
     }
 
+    /// <summary>Moved from the widget's gear menu (gear-menu-slim faces §A3, DRA-25) — an
+    /// import belongs on the surface its output lives on, and this checklist is that
+    /// surface. <see cref="QuestChecklistView"/> still owns the dialog and the preview; this
+    /// view only relocated the button that reaches it.</summary>
+    private void OnImportAchievementsClick(object sender, RoutedEventArgs e) =>
+        _main.OnImportAchievements(sender, e);
+
+    /// <summary>Same relocation, same "flash a confirmation" contract
+    /// <see cref="OnCopyInventoryCmd"/> already uses — a silent clipboard write reads as a
+    /// silent no-op.</summary>
+    private void OnCopyAchievementsClick(object sender, RoutedEventArgs e)
+    {
+        _main.OnCopyAchievementsCommand(sender, e);
+        CopyAchievementsBtn.Content = IconLabel("Check", "copied", "GoodBrush");
+        var t = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1.6) };
+        t.Tick += (_, _) =>
+        {
+            CopyAchievementsBtn.Content = "Copy /outputfile achievements";
+            t.Stop();
+        };
+        t.Start();
+    }
+
     // ---- the borderless window's chrome, reached through the host ----
     //
     // This view carries the whole bordered panel — there is no clean chrome/content seam

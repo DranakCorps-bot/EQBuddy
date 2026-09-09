@@ -289,7 +289,15 @@ public class ArchitectureTests
         // construction and its doc block arrived. **The last tenant is gone**: what is left in
         // this file is window chrome — width persistence, the monitor clamp, the tab links, the
         // resize grips — plus the four block constructions and the one key-press route.
-        (@"EQBuddy/OptionsWindow.xaml.cs", 326),
+        //
+        // Raised 326 → 372 on 2026-09-08 with gear-menu-slim (DRA-25): three of the cut
+        // expanded gear menu's Help rows (the website link, Quick tutorial…, Check for
+        // updates) gained a home here — a footer strip below the tab content, visible under
+        // every tab, because none of the five Options tabs is "about the app" rather than
+        // "configures the tool". This IS window chrome, the same category the row above
+        // already carves out, so it grows this file rather than a block — there is no
+        // surface for three about-the-app links to lift into.
+        (@"EQBuddy/OptionsWindow.xaml.cs", 372),
         (@"EQBuddy.Core/LogParser.cs", 853),
         // ---- The Avalonia widget's row (5,229 lines) left this table with the platform
         // in E-2 (2026-09-04). It was the largest file in the repo and it carried the

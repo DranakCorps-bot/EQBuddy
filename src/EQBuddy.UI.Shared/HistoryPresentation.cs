@@ -442,6 +442,11 @@ public static class HistoryPresentation
     public static string BuildCareerHeading(SessionRow row) =>
         $"{row.Character} ({row.Server}) — {row.StartLocal:dddd MMM d, h:mm tt}";
 
+    /// <summary>The label the room's own button carries — read by <see cref="StudioPointer"/>
+    /// so the two cannot drift, and by the room itself so it needs no second copy of the
+    /// words (trap 4).</summary>
+    public const string CareerStudioButtonLabel = "Open the full History studio…";
+
     /// <summary>
     /// **The one sentence that keeps this tab from being a silent no-op.**
     ///
@@ -451,11 +456,17 @@ public static class HistoryPresentation
     /// thin surface. So the surface says which one it is and where the rest is, and the
     /// door it names is real: <c>HistoryWindow</c> keeps its context-menu entry this pass
     /// (Helm, 2026-09-05, item 5).
+    ///
+    /// **Re-worded for gear-menu-slim (DRA-25, 2026-09-08).** The widget's context menu no
+    /// longer carries "Session history…" — the row moved here, onto the room the studio's
+    /// data already deepens (Bevel's faces doc §A5), which is a MUST-FIX pairing rather than
+    /// a follow-up: a sentence naming a control the player can no longer find is trap 20's
+    /// exact shape, landing in the same change that removed the control.
     /// </summary>
     public const string StudioPointer =
         "This is the browse. The full breakdown, the pull-by-pull review, session "
-        + "comparison, notes, export and delete are in the History studio — right-click "
-        + "the EQBuddy widget and choose “Session history…”.";
+        + "comparison, notes, export and delete are in the History studio — the button "
+        + "below opens it.";
 
     /// <summary>What the career tab says with nothing stored. Not "no data": a sitting is
     /// recorded when it ENDS, so the honest fact for a first-time player is that the one

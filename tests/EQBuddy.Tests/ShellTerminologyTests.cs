@@ -143,7 +143,28 @@ public class ShellTerminologyTests
         foreach (var page in Enum.GetValues<ShellPage>())
         {
             AssertClean(ShellPages.Label(page), $"ShellPages.Label({page})");
+            AssertClean(ShellPages.RailLabel(page), $"ShellPages.RailLabel({page})");
             AssertClean(ShellPages.Describe(page), $"ShellPages.Describe({page})");
+        }
+    }
+
+    /// <summary>
+    /// **The rail's own spelling agrees with <see cref="ShellPages.Label"/> everywhere except
+    /// the one page the owner named** (gear-menu-slim faces Part B, 2026-09-08). Written as a
+    /// round trip rather than a single <c>Assert.Equal("Quest", ...)</c> so a future rename
+    /// elsewhere in <see cref="ShellPages.Label"/> cannot silently stop being mirrored onto
+    /// the rail for every OTHER page — the same shape <c>ShellNavigationTests</c> already
+    /// uses for <c>Rooms</c>/<c>TabForKey</c>.
+    /// </summary>
+    [Fact]
+    public void TheRailLabelMatchesLabelExceptForTheGuideRoom()
+    {
+        Assert.Equal("Quest", ShellPages.RailLabel(ShellPage.Quests));
+        Assert.Equal("Guide", ShellPages.Label(ShellPage.Quests));
+        foreach (var page in Enum.GetValues<ShellPage>())
+        {
+            if (page == ShellPage.Quests) continue;
+            Assert.Equal(ShellPages.Label(page), ShellPages.RailLabel(page));
         }
     }
 

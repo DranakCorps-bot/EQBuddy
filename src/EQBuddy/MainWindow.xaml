@@ -79,46 +79,30 @@
                      QuestsView it does. -->
                 <MenuItem x:Name="GuideItem" Header="Guide…" Click="OnGuideDoor"
                           ToolTip="Your progression, in the EQBuddy window — every quest, your Epic 1.0 and Plane of Sky checklists, and what is ready to turn in. Closing that window is not permanent; this row brings it back."/>
-                <Separator Tag="expanded"/>
-                <MenuItem Tag="expanded" Header="Session history…" Click="OnHistory"/>
-                <Separator Tag="expanded"/>
-                <MenuItem x:Name="ClickThroughItem" Tag="expanded"
-                          Header="Click-through (game clicks pass through)"
-                          IsCheckable="True" Click="OnClickThrough"/>
-                <!-- Surface A / SA-4. It sits with click-through rather than with the
-                     doors above because it is the same kind of thing: an in-play switch
-                     for what the HUD is doing right now, not a settings visit. The mode
-                     lives on the chip row itself (HudChipRowWindow.ToggleEdit) — there is
-                     no dialog.
+                <!-- CUT TO EXACTLY THE FOUR ABOVE — owner lock 2026-09-08 ~7:01 PM CT,
+                     Bevel's faces doc `docs/BEVEL-gear-menu-slim-faces.md` Part A,
+                     Helm-signed (PR #460). The five rows that used to carry Tag="expanded"
+                     below this line — Session history…, Click-through, Edit HUD, Data &amp;
+                     imports, Help — are not removed from the app, only from THIS menu; each
+                     has a named destination the faces doc records:
 
-                     NO LONGER THE ONLY DOOR (faces §C, 2026-09-08). The pencil in the
-                     expanded title bar is the ≤1-click way in, and the mode's own Done
-                     chicklet plus Esc are the way out — this row is the secondary enter and
-                     it stays off the MINIMIZED menu, because placing chips is not something
-                     you do from the bar mid-pull. The ellipsis went with the dialog it never
-                     opened. -->
-                <MenuItem Tag="expanded" Header="Edit HUD" Click="OnEditHud"
-                          ToolTip="Reorder the chip row, mute a whole kind of chip — mez and slow, spawn timers, watch alerts, buffs — or put a row you have dragged away back under EQBuddy. Sounds and alerts are not affected; those stay in Options → Alerts &amp; chips."/>
-                <Separator Tag="expanded"/>
-                <MenuItem Tag="expanded" Header="Data &amp; imports">
-                    <MenuItem Header="Wiki contribution pack…" Click="OnWikiPackWindow"
-                              ToolTip="Paste-ready eqlwiki edits built from your own loot log — creatures with no page, pages that list no loot, and drops missing from a page. Nothing publishes automatically; you open each edit link, review and save."/>
-                    <MenuItem Header="Import achievements…" Click="OnImportAchievements"
-                              ToolTip="Read the game's /outputfile achievements dump and pre-mark Sky quest rewards (and raid clears) you completed before EQBuddy — preview first, adds only, never unticks"/>
-                    <MenuItem Header="Copy /outputfile achievements" Click="OnCopyAchievementsCommand"
-                              ToolTip="Puts the command on your clipboard — paste it into the game's chat, the game writes its achievements dump, then Import achievements… reads it"/>
-                    <MenuItem x:Name="ReviewLogItem" Header="Review an archived log…" Click="OnReviewLog"
-                              ToolTip="Replay a saved log read-only — Drops by Creature and the wiki contribution pack work against that session"/>
-                    <MenuItem x:Name="ChooseLogFolderItem" Header="Choose log folder…" Click="OnChooseLogFolder"/>
-                    <MenuItem Header="Auto-detect log folder" Click="OnAutoDetectLogFolder"/>
-                </MenuItem>
-                <MenuItem Tag="expanded" Header="Help">
-                    <MenuItem x:Name="VersionMenuItem" Header="EQBuddy" Click="OnOpenWebsite"
-                              ToolTip="Open the EQBuddy page — downloads, guides, and a link to share"/>
-                    <MenuItem Header="Quick tutorial…" Click="OnTutorial"/>
-                    <MenuItem Header="Check for updates" Click="OnCheckUpdates"/>
-                    <MenuItem Header="Send feedback…" Click="OnFeedback"/>
-                </MenuItem>
+                       * Session history…  → Progress room's History tab (a new studio
+                         button under the career browse; see CareerHistoryView).
+                       * Click-through     → Options → Behavior, top of the list.
+                       * Edit HUD          → cut outright — the title-bar pencil
+                         (EditHudBtn, Click="OnEditHud") already does this in ≤1 click.
+                       * Data & imports    → splits: the wiki pack, review-an-archived-log
+                         and the two log-folder rows join Options → Behavior's new "Data"
+                         group; Import achievements… and Copy /outputfile achievements move
+                         to the Guide room (QuestsView), beside the checklist they feed.
+                       * Help              → splits: Send feedback… is cut outright (the
+                         title-bar envelope, Click="OnFeedback", already opens it); EQBuddy
+                         (website), Quick tutorial… and Check for updates move to a footer
+                         strip on OptionsWindow, visible under every tab.
+
+                     This supersedes `docs/BEVEL-cog-options-ia-faces.md` §E, which kept
+                     Click-through and Edit HUD on the expanded menu deliberately — the
+                     owner has now decided expanded and minimized should match exactly. -->
             </ContextMenu>
         </Border.ContextMenu>
         <StackPanel Margin="{DynamicResource PadWidget}">

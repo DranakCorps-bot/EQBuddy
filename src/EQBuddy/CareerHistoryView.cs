@@ -49,6 +49,7 @@ internal sealed class CareerHistoryView : Grid
     private readonly Func<IReadOnlyList<SessionRow>> _stored;
     private readonly Func<IReadOnlyList<SessionRepository.ProgressPoint>> _ladders;
     private readonly Func<string> _characterKey;
+    private readonly Action _openStudio;
 
     private readonly ColumnDefinition _masterColumn = new() { Width = new GridLength(MasterWidth) };
     private readonly ColumnDefinition _detailColumn = new() { Width = new GridLength(1, GridUnitType.Star) };
@@ -112,11 +113,13 @@ internal sealed class CareerHistoryView : Grid
     public CareerHistoryView(
         Func<IReadOnlyList<SessionRow>> stored,
         Func<IReadOnlyList<SessionRepository.ProgressPoint>> ladders,
-        Func<string> characterKey)
+        Func<string> characterKey,
+        Action openStudio)
     {
         _stored = stored;
         _ladders = ladders;
         _characterKey = characterKey;
+        _openStudio = openStudio;
 
         ColumnDefinitions.Add(_masterColumn);
         ColumnDefinitions.Add(_detailColumn);
@@ -202,6 +205,20 @@ internal sealed class CareerHistoryView : Grid
         _pointer.Ink("DimBrush");
         _pointer.Margin = new Thickness(0, Tok.SpaceL, 0, 0);
         bodyStack.Children.Add(_pointer);
+
+        // THE REAL DOOR the pointer sentence above names (gear-menu-slim, DRA-25). The
+        // widget's context menu no longer has "Session history…" to right-click, so this
+        // button is the studio's only entrance from the shell — same window, same call
+        // (`MainWindow.OnHistory`), just reached from the room instead of a menu row.
+        var studioBtn = new Button
+        {
+            Style = (Style)FindResource("ActionButton"),
+            Content = HistoryPresentation.CareerStudioButtonLabel,
+            HorizontalAlignment = HorizontalAlignment.Left,
+            Margin = new Thickness(0, Tok.SpaceXs, 0, 0),
+        };
+        studioBtn.Click += (_, _) => _openStudio();
+        bodyStack.Children.Add(studioBtn);
 
         var detailScroll = new ScrollViewer
         {

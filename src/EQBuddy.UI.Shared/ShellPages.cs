@@ -223,6 +223,24 @@ public static class ShellPages
         _ => "",
     };
 
+    /// <summary>
+    /// **The rail's own spelling — "Quest" for <see cref="ShellPage.Quests"/>, since the
+    /// owner's second correction (~7:16 PM CT, 2026-09-08, `docs/BEVEL-gear-menu-slim-faces.md`
+    /// Part B) on top of the ~2:15 PM CT amendment that first renamed it to "Guide."** The
+    /// window's title bar keeps saying "Guide" — <c>ShellWindow.xaml.cs</c> reads
+    /// <see cref="Label"/> for that, unchanged — but the rail row, its tooltip, Home's deep
+    /// link and the Ctrl+K palette all read THIS function instead.
+    ///
+    /// One new function rather than six hand-edits: every other page's rail spelling is
+    /// identical to its <see cref="Label"/>, so falling through avoids a second
+    /// hand-maintained list that would silently stop covering a page the day a seventh room
+    /// arrives (trap 55's shape, which cost #252). <see cref="ShellTerminologyTests"/> walks
+    /// this the same way it walks <see cref="Label"/>, and a round-trip assertion pins the
+    /// fall-through for every page but this one.
+    /// </summary>
+    public static string RailLabel(ShellPage page) =>
+        page == ShellPage.Quests ? "Quest" : Label(page);
+
     /// <summary>The rail's icon, by name in <see cref="IconPaths"/> — never a glyph
     /// (#148, #166), and never a name the table does not hold, which
     /// <c>ShellNavigationTests</c> asserts rather than trusts.</summary>
