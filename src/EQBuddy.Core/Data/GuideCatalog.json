@@ -60,8 +60,8 @@
               "title": "Collect Wind Rune Caza",
               "sources": [
                 {
-                  "url": "https://eqlwiki.com/Bard_Plane_of_Sky_Tests",
-                  "title": "Bard Plane of Sky Tests",
+                  "url": "https://eqlwiki.com/Plane_of_Sky",
+                  "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
                 }
               ],
@@ -71,10 +71,9 @@
               "when": "",
               "why": "Wind Rune Caza is one of the turn-in pieces for the Amulet of the Fae.",
               "how": "",
-              "who": "",
-              "where": "",
-              "authoring": "Stub",
-              "stubNote": "eqlwiki's Bard Plane of Sky Tests page does not say which isle or which mob drops Wind Rune Caza, and EQBuddy's Sky checklist records only \"Trash mobs\". Four class pages (Monk, Enchanter, Necromancer, Paladin) describe wind runes as a random drop from any mob in the Plane of Sky, which is the closest thing to an answer we have for this one. If you have looted it, tell us the isle and the mob."
+              "who": "any Plane of Sky mob",
+              "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
+              "authoring": "Authored"
             }
           ]
         },
@@ -91,7 +90,7 @@
               "title": "Hand in Amulet of Woven Hair, Wind Rune Caza",
               "shortInstruction": "Give Cilin Spellsinger the 2 pieces to receive the Amulet of the Fae.",
               "who": "Cilin Spellsinger",
-              "where": "Plane of Sky - the Efreeti Chamber, through the teleport pad at roughly 1600, 520 on Isle 1.",
+              "where": "Plane of Sky - the Efreeti Chamber. Buy an Efreeti's Key from the Key Master near where you zone in on Isle 1 (it is free), then take the teleport pad at the North point of that isle, around 1600, 520.",
               "what": "Hand Cilin Spellsinger Amulet of Woven Hair (1), Wind Rune Caza (1) to receive the Amulet of the Fae.",
               "when": "Once every piece above is in your bags - the guide's own prerequisites say so.",
               "why": "This is the step that actually gives you the Amulet of the Fae.",
@@ -111,6 +110,11 @@
                 {
                   "url": "https://eqlwiki.com/Bard_Plane_of_Sky_Tests",
                   "title": "Bard Plane of Sky Tests",
+                  "retrievedAt": "2026-09-09"
+                },
+                {
+                  "url": "https://eqlwiki.com/Plane_of_Sky",
+                  "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
                 }
               ]
@@ -217,8 +221,8 @@
               "title": "Collect Wind Rune Fana",
               "sources": [
                 {
-                  "url": "https://eqlwiki.com/Bard_Plane_of_Sky_Tests",
-                  "title": "Bard Plane of Sky Tests",
+                  "url": "https://eqlwiki.com/Plane_of_Sky",
+                  "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
                 }
               ],
@@ -228,10 +232,9 @@
               "when": "",
               "why": "Wind Rune Fana is one of the turn-in pieces for the Denon's Horn of Disaster.",
               "how": "",
-              "who": "",
-              "where": "",
-              "authoring": "Stub",
-              "stubNote": "eqlwiki's Bard Plane of Sky Tests page does not say which isle or which mob drops Wind Rune Fana, and EQBuddy's Sky checklist records only \"Trash mobs\". Four class pages (Monk, Enchanter, Necromancer, Paladin) describe wind runes as a random drop from any mob in the Plane of Sky, which is the closest thing to an answer we have for this one. If you have looted it, tell us the isle and the mob."
+              "who": "any Plane of Sky mob",
+              "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
+              "authoring": "Authored"
             }
           ]
         },
@@ -248,7 +251,7 @@
               "title": "Hand in Glowing Diamond, Efreeti War Horn, Wind Rune Fana",
               "shortInstruction": "Give Cilin Spellsinger the 3 pieces to receive the Denon's Horn of Disaster.",
               "who": "Cilin Spellsinger",
-              "where": "Plane of Sky - the Efreeti Chamber, through the teleport pad at roughly 1600, 520 on Isle 1.",
+              "where": "Plane of Sky - the Efreeti Chamber. Buy an Efreeti's Key from the Key Master near where you zone in on Isle 1 (it is free), then take the teleport pad at the North point of that isle, around 1600, 520.",
               "what": "Hand Cilin Spellsinger Glowing Diamond (1), Efreeti War Horn (1), Wind Rune Fana (1) to receive the Denon's Horn of Disaster.",
               "when": "Once every piece above is in your bags - the guide's own prerequisites say so.",
               "why": "This is the step that actually gives you the Denon's Horn of Disaster.",
@@ -270,6 +273,11 @@
                 {
                   "url": "https://eqlwiki.com/Bard_Plane_of_Sky_Tests",
                   "title": "Bard Plane of Sky Tests",
+                  "retrievedAt": "2026-09-09"
+                },
+                {
+                  "url": "https://eqlwiki.com/Plane_of_Sky",
+                  "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
                 }
               ]
@@ -344,8 +352,8 @@
               "title": "Collect Wind Rune Azia",
               "sources": [
                 {
-                  "url": "https://eqlwiki.com/Bard_Plane_of_Sky_Tests",
-                  "title": "Bard Plane of Sky Tests",
+                  "url": "https://eqlwiki.com/Plane_of_Sky",
+                  "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
                 }
               ],
@@ -355,10 +363,9 @@
               "when": "",
               "why": "Wind Rune Azia is one of the turn-in pieces for the Ervaj's Flute of Flight.",
               "how": "",
-              "who": "",
-              "where": "",
-              "authoring": "Stub",
-              "stubNote": "eqlwiki's Bard Plane of Sky Tests page does not say which isle or which mob drops Wind Rune Azia, and EQBuddy's Sky checklist records only \"Trash mobs\". Four class pages (Monk, Enchanter, Necromancer, Paladin) describe wind runes as a random drop from any mob in the Plane of Sky, which is the closest thing to an answer we have for this one. If you have looted it, tell us the isle and the mob."
+              "who": "any Plane of Sky mob",
+              "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
+              "authoring": "Authored"
             }
           ]
         },
@@ -375,7 +382,7 @@
               "title": "Hand in Crude Wooden Flute, Wind Rune Azia",
               "shortInstruction": "Give Cilin Spellsinger the 2 pieces to receive the Ervaj's Flute of Flight.",
               "who": "Cilin Spellsinger",
-              "where": "Plane of Sky - the Efreeti Chamber, through the teleport pad at roughly 1600, 520 on Isle 1.",
+              "where": "Plane of Sky - the Efreeti Chamber. Buy an Efreeti's Key from the Key Master near where you zone in on Isle 1 (it is free), then take the teleport pad at the North point of that isle, around 1600, 520.",
               "what": "Hand Cilin Spellsinger Crude Wooden Flute (1), Wind Rune Azia (1) to receive the Ervaj's Flute of Flight.",
               "when": "Once every piece above is in your bags - the guide's own prerequisites say so.",
               "why": "This is the step that actually gives you the Ervaj's Flute of Flight.",
@@ -395,6 +402,11 @@
                 {
                   "url": "https://eqlwiki.com/Bard_Plane_of_Sky_Tests",
                   "title": "Bard Plane of Sky Tests",
+                  "retrievedAt": "2026-09-09"
+                },
+                {
+                  "url": "https://eqlwiki.com/Plane_of_Sky",
+                  "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
                 }
               ]
@@ -501,8 +513,8 @@
               "title": "Collect Wind Rune Heda",
               "sources": [
                 {
-                  "url": "https://eqlwiki.com/Bard_Plane_of_Sky_Tests",
-                  "title": "Bard Plane of Sky Tests",
+                  "url": "https://eqlwiki.com/Plane_of_Sky",
+                  "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
                 }
               ],
@@ -512,10 +524,9 @@
               "when": "",
               "why": "Wind Rune Heda is one of the turn-in pieces for the Harmonic Spear.",
               "how": "",
-              "who": "",
-              "where": "",
-              "authoring": "Stub",
-              "stubNote": "eqlwiki's Bard Plane of Sky Tests page does not say which isle or which mob drops Wind Rune Heda, and EQBuddy's Sky checklist records only \"Trash mobs\". Four class pages (Monk, Enchanter, Necromancer, Paladin) describe wind runes as a random drop from any mob in the Plane of Sky, which is the closest thing to an answer we have for this one. If you have looted it, tell us the isle and the mob."
+              "who": "any Plane of Sky mob",
+              "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
+              "authoring": "Authored"
             }
           ]
         },
@@ -532,7 +543,7 @@
               "title": "Hand in Nebulous Diamond, Efreeti War Spear, Wind Rune Heda",
               "shortInstruction": "Give Cilin Spellsinger the 3 pieces to receive the Harmonic Spear.",
               "who": "Cilin Spellsinger",
-              "where": "Plane of Sky - the Efreeti Chamber, through the teleport pad at roughly 1600, 520 on Isle 1.",
+              "where": "Plane of Sky - the Efreeti Chamber. Buy an Efreeti's Key from the Key Master near where you zone in on Isle 1 (it is free), then take the teleport pad at the North point of that isle, around 1600, 520.",
               "what": "Hand Cilin Spellsinger Nebulous Diamond (1), Efreeti War Spear (1), Wind Rune Heda (1) to receive the Harmonic Spear.",
               "when": "Once every piece above is in your bags - the guide's own prerequisites say so.",
               "why": "This is the step that actually gives you the Harmonic Spear.",
@@ -554,6 +565,11 @@
                 {
                   "url": "https://eqlwiki.com/Bard_Plane_of_Sky_Tests",
                   "title": "Bard Plane of Sky Tests",
+                  "retrievedAt": "2026-09-09"
+                },
+                {
+                  "url": "https://eqlwiki.com/Plane_of_Sky",
+                  "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
                 }
               ]
@@ -628,8 +644,8 @@
               "title": "Collect Wind Rune Kala",
               "sources": [
                 {
-                  "url": "https://eqlwiki.com/Bard_Plane_of_Sky_Tests",
-                  "title": "Bard Plane of Sky Tests",
+                  "url": "https://eqlwiki.com/Plane_of_Sky",
+                  "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
                 }
               ],
@@ -639,10 +655,9 @@
               "when": "",
               "why": "Wind Rune Kala is one of the turn-in pieces for the Mantle of the Songweaver.",
               "how": "",
-              "who": "",
-              "where": "",
-              "authoring": "Stub",
-              "stubNote": "eqlwiki's Bard Plane of Sky Tests page does not say which isle or which mob drops Wind Rune Kala, and EQBuddy's Sky checklist records only \"Trash mobs\". Four class pages (Monk, Enchanter, Necromancer, Paladin) describe wind runes as a random drop from any mob in the Plane of Sky, which is the closest thing to an answer we have for this one. If you have looted it, tell us the isle and the mob."
+              "who": "any Plane of Sky mob",
+              "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
+              "authoring": "Authored"
             }
           ]
         },
@@ -659,7 +674,7 @@
               "title": "Hand in Light Woolen Mantle, Wind Rune Kala",
               "shortInstruction": "Give Cilin Spellsinger the 2 pieces to receive the Mantle of the Songweaver.",
               "who": "Cilin Spellsinger",
-              "where": "Plane of Sky - the Efreeti Chamber, through the teleport pad at roughly 1600, 520 on Isle 1.",
+              "where": "Plane of Sky - the Efreeti Chamber. Buy an Efreeti's Key from the Key Master near where you zone in on Isle 1 (it is free), then take the teleport pad at the North point of that isle, around 1600, 520.",
               "what": "Hand Cilin Spellsinger Light Woolen Mantle (1), Wind Rune Kala (1) to receive the Mantle of the Songweaver.",
               "when": "Once every piece above is in your bags - the guide's own prerequisites say so.",
               "why": "This is the step that actually gives you the Mantle of the Songweaver.",
@@ -679,6 +694,11 @@
                 {
                   "url": "https://eqlwiki.com/Bard_Plane_of_Sky_Tests",
                   "title": "Bard Plane of Sky Tests",
+                  "retrievedAt": "2026-09-09"
+                },
+                {
+                  "url": "https://eqlwiki.com/Plane_of_Sky",
+                  "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
                 }
               ]
@@ -753,8 +773,8 @@
               "title": "Collect Wind Rune Meda",
               "sources": [
                 {
-                  "url": "https://eqlwiki.com/Bard_Plane_of_Sky_Tests",
-                  "title": "Bard Plane of Sky Tests",
+                  "url": "https://eqlwiki.com/Plane_of_Sky",
+                  "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
                 }
               ],
@@ -764,10 +784,9 @@
               "when": "",
               "why": "Wind Rune Meda is one of the turn-in pieces for the Mask of Song.",
               "how": "",
-              "who": "",
-              "where": "",
-              "authoring": "Stub",
-              "stubNote": "eqlwiki's Bard Plane of Sky Tests page does not say which isle or which mob drops Wind Rune Meda, and EQBuddy's Sky checklist records only \"Trash mobs\". Four class pages (Monk, Enchanter, Necromancer, Paladin) describe wind runes as a random drop from any mob in the Plane of Sky, which is the closest thing to an answer we have for this one. If you have looted it, tell us the isle and the mob."
+              "who": "any Plane of Sky mob",
+              "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
+              "authoring": "Authored"
             }
           ]
         },
@@ -784,7 +803,7 @@
               "title": "Hand in Light Woolen Mask, Wind Rune Meda",
               "shortInstruction": "Give Cilin Spellsinger the 2 pieces to receive the Mask of Song.",
               "who": "Cilin Spellsinger",
-              "where": "Plane of Sky - the Efreeti Chamber, through the teleport pad at roughly 1600, 520 on Isle 1.",
+              "where": "Plane of Sky - the Efreeti Chamber. Buy an Efreeti's Key from the Key Master near where you zone in on Isle 1 (it is free), then take the teleport pad at the North point of that isle, around 1600, 520.",
               "what": "Hand Cilin Spellsinger Light Woolen Mask (1), Wind Rune Meda (1) to receive the Mask of Song.",
               "when": "Once every piece above is in your bags - the guide's own prerequisites say so.",
               "why": "This is the step that actually gives you the Mask of Song.",
@@ -804,6 +823,11 @@
                 {
                   "url": "https://eqlwiki.com/Bard_Plane_of_Sky_Tests",
                   "title": "Bard Plane of Sky Tests",
+                  "retrievedAt": "2026-09-09"
+                },
+                {
+                  "url": "https://eqlwiki.com/Plane_of_Sky",
+                  "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
                 }
               ]
@@ -879,8 +903,8 @@
               "title": "Collect Wind Rune Heda",
               "sources": [
                 {
-                  "url": "https://eqlwiki.com/Beastlord_Plane_of_Sky_Tests",
-                  "title": "Beastlord Plane of Sky Tests",
+                  "url": "https://eqlwiki.com/Plane_of_Sky",
+                  "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
                 }
               ],
@@ -890,10 +914,9 @@
               "when": "",
               "why": "Wind Rune Heda is one of the turn-in pieces for the Azarack Skin Wristwraps.",
               "how": "",
-              "who": "",
-              "where": "",
-              "authoring": "Stub",
-              "stubNote": "eqlwiki's Beastlord Plane of Sky Tests page does not say which isle or which mob drops Wind Rune Heda, and EQBuddy's Sky checklist records only \"Trash mobs\". Four class pages (Monk, Enchanter, Necromancer, Paladin) describe wind runes as a random drop from any mob in the Plane of Sky, which is the closest thing to an answer we have for this one. If you have looted it, tell us the isle and the mob."
+              "who": "any Plane of Sky mob",
+              "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
+              "authoring": "Authored"
             }
           ]
         },
@@ -910,7 +933,7 @@
               "title": "Hand in Azarack Skin, Wind Rune Heda",
               "shortInstruction": "Give Animist Kratho the 2 pieces to receive the Azarack Skin Wristwraps.",
               "who": "Animist Kratho",
-              "where": "Plane of Sky - the Efreeti Chamber, through the teleport pad at roughly 1600, 520 on Isle 1.",
+              "where": "Plane of Sky - the Efreeti Chamber. Buy an Efreeti's Key from the Key Master near where you zone in on Isle 1 (it is free), then take the teleport pad at the North point of that isle, around 1600, 520.",
               "what": "Hand Animist Kratho Azarack Skin (1), Wind Rune Heda (1) to receive the Azarack Skin Wristwraps.",
               "when": "Once every piece above is in your bags - the guide's own prerequisites say so.",
               "why": "This is the step that actually gives you the Azarack Skin Wristwraps.",
@@ -930,6 +953,11 @@
                 {
                   "url": "https://eqlwiki.com/Beastlord_Plane_of_Sky_Tests",
                   "title": "Beastlord Plane of Sky Tests",
+                  "retrievedAt": "2026-09-09"
+                },
+                {
+                  "url": "https://eqlwiki.com/Plane_of_Sky",
+                  "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
                 }
               ]
@@ -1004,8 +1032,8 @@
               "title": "Collect Wind Rune Geza",
               "sources": [
                 {
-                  "url": "https://eqlwiki.com/Beastlord_Plane_of_Sky_Tests",
-                  "title": "Beastlord Plane of Sky Tests",
+                  "url": "https://eqlwiki.com/Plane_of_Sky",
+                  "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
                 }
               ],
@@ -1015,10 +1043,9 @@
               "when": "",
               "why": "Wind Rune Geza is one of the turn-in pieces for the Diaphonous Waistband.",
               "how": "",
-              "who": "",
-              "where": "",
-              "authoring": "Stub",
-              "stubNote": "eqlwiki's Beastlord Plane of Sky Tests page does not say which isle or which mob drops Wind Rune Geza, and EQBuddy's Sky checklist records only \"Trash mobs\". Four class pages (Monk, Enchanter, Necromancer, Paladin) describe wind runes as a random drop from any mob in the Plane of Sky, which is the closest thing to an answer we have for this one. If you have looted it, tell us the isle and the mob."
+              "who": "any Plane of Sky mob",
+              "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
+              "authoring": "Authored"
             }
           ]
         },
@@ -1035,7 +1062,7 @@
               "title": "Hand in Silken Wrap, Wind Rune Geza",
               "shortInstruction": "Give Animist Kratho the 2 pieces to receive the Diaphonous Waistband.",
               "who": "Animist Kratho",
-              "where": "Plane of Sky - the Efreeti Chamber, through the teleport pad at roughly 1600, 520 on Isle 1.",
+              "where": "Plane of Sky - the Efreeti Chamber. Buy an Efreeti's Key from the Key Master near where you zone in on Isle 1 (it is free), then take the teleport pad at the North point of that isle, around 1600, 520.",
               "what": "Hand Animist Kratho Silken Wrap (1), Wind Rune Geza (1) to receive the Diaphonous Waistband.",
               "when": "Once every piece above is in your bags - the guide's own prerequisites say so.",
               "why": "This is the step that actually gives you the Diaphonous Waistband.",
@@ -1055,6 +1082,11 @@
                 {
                   "url": "https://eqlwiki.com/Beastlord_Plane_of_Sky_Tests",
                   "title": "Beastlord Plane of Sky Tests",
+                  "retrievedAt": "2026-09-09"
+                },
+                {
+                  "url": "https://eqlwiki.com/Plane_of_Sky",
+                  "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
                 }
               ]
@@ -1129,8 +1161,8 @@
               "title": "Collect Wind Rune Kala",
               "sources": [
                 {
-                  "url": "https://eqlwiki.com/Beastlord_Plane_of_Sky_Tests",
-                  "title": "Beastlord Plane of Sky Tests",
+                  "url": "https://eqlwiki.com/Plane_of_Sky",
+                  "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
                 }
               ],
@@ -1140,10 +1172,9 @@
               "when": "",
               "why": "Wind Rune Kala is one of the turn-in pieces for the Griffin-Hide Armguards.",
               "how": "",
-              "who": "",
-              "where": "",
-              "authoring": "Stub",
-              "stubNote": "eqlwiki's Beastlord Plane of Sky Tests page does not say which isle or which mob drops Wind Rune Kala, and EQBuddy's Sky checklist records only \"Trash mobs\". Four class pages (Monk, Enchanter, Necromancer, Paladin) describe wind runes as a random drop from any mob in the Plane of Sky, which is the closest thing to an answer we have for this one. If you have looted it, tell us the isle and the mob."
+              "who": "any Plane of Sky mob",
+              "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
+              "authoring": "Authored"
             }
           ]
         },
@@ -1160,7 +1191,7 @@
               "title": "Hand in Leather Cord, Wind Rune Kala",
               "shortInstruction": "Give Animist Kratho the 2 pieces to receive the Griffin-Hide Armguards.",
               "who": "Animist Kratho",
-              "where": "Plane of Sky - the Efreeti Chamber, through the teleport pad at roughly 1600, 520 on Isle 1.",
+              "where": "Plane of Sky - the Efreeti Chamber. Buy an Efreeti's Key from the Key Master near where you zone in on Isle 1 (it is free), then take the teleport pad at the North point of that isle, around 1600, 520.",
               "what": "Hand Animist Kratho Leather Cord (1), Wind Rune Kala (1) to receive the Griffin-Hide Armguards.",
               "when": "Once every piece above is in your bags - the guide's own prerequisites say so.",
               "why": "This is the step that actually gives you the Griffin-Hide Armguards.",
@@ -1180,6 +1211,11 @@
                 {
                   "url": "https://eqlwiki.com/Beastlord_Plane_of_Sky_Tests",
                   "title": "Beastlord Plane of Sky Tests",
+                  "retrievedAt": "2026-09-09"
+                },
+                {
+                  "url": "https://eqlwiki.com/Plane_of_Sky",
+                  "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
                 }
               ]
@@ -1254,8 +1290,8 @@
               "title": "Collect Wind Rune Beza",
               "sources": [
                 {
-                  "url": "https://eqlwiki.com/Beastlord_Plane_of_Sky_Tests",
-                  "title": "Beastlord Plane of Sky Tests",
+                  "url": "https://eqlwiki.com/Plane_of_Sky",
+                  "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
                 }
               ],
@@ -1265,10 +1301,9 @@
               "when": "",
               "why": "Wind Rune Beza is one of the turn-in pieces for the Spiroc Beak Earcuff.",
               "how": "",
-              "who": "",
-              "where": "",
-              "authoring": "Stub",
-              "stubNote": "eqlwiki's Beastlord Plane of Sky Tests page does not say which isle or which mob drops Wind Rune Beza, and EQBuddy's Sky checklist records only \"Trash mobs\". Four class pages (Monk, Enchanter, Necromancer, Paladin) describe wind runes as a random drop from any mob in the Plane of Sky, which is the closest thing to an answer we have for this one. If you have looted it, tell us the isle and the mob."
+              "who": "any Plane of Sky mob",
+              "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
+              "authoring": "Authored"
             }
           ]
         },
@@ -1285,7 +1320,7 @@
               "title": "Hand in Spiroc Elder's Totem, Wind Rune Beza",
               "shortInstruction": "Give Animist Kratho the 2 pieces to receive the Spiroc Beak Earcuff.",
               "who": "Animist Kratho",
-              "where": "Plane of Sky - the Efreeti Chamber, through the teleport pad at roughly 1600, 520 on Isle 1.",
+              "where": "Plane of Sky - the Efreeti Chamber. Buy an Efreeti's Key from the Key Master near where you zone in on Isle 1 (it is free), then take the teleport pad at the North point of that isle, around 1600, 520.",
               "what": "Hand Animist Kratho Spiroc Elder's Totem (1), Wind Rune Beza (1) to receive the Spiroc Beak Earcuff.",
               "when": "Once every piece above is in your bags - the guide's own prerequisites say so.",
               "why": "This is the step that actually gives you the Spiroc Beak Earcuff.",
@@ -1305,6 +1340,11 @@
                 {
                   "url": "https://eqlwiki.com/Beastlord_Plane_of_Sky_Tests",
                   "title": "Beastlord Plane of Sky Tests",
+                  "retrievedAt": "2026-09-09"
+                },
+                {
+                  "url": "https://eqlwiki.com/Plane_of_Sky",
+                  "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
                 }
               ]
@@ -1443,8 +1483,8 @@
               "title": "Collect Wind Rune Izah",
               "sources": [
                 {
-                  "url": "https://eqlwiki.com/Beastlord_Plane_of_Sky_Tests",
-                  "title": "Beastlord Plane of Sky Tests",
+                  "url": "https://eqlwiki.com/Plane_of_Sky",
+                  "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
                 }
               ],
@@ -1454,10 +1494,9 @@
               "when": "",
               "why": "Wind Rune Izah is one of the turn-in pieces for the Windhowl/Spirit Render.",
               "how": "",
-              "who": "",
-              "where": "",
-              "authoring": "Stub",
-              "stubNote": "eqlwiki's Beastlord Plane of Sky Tests page does not say which isle or which mob drops Wind Rune Izah, and EQBuddy's Sky checklist records only \"Trash mobs\". Four class pages (Monk, Enchanter, Necromancer, Paladin) describe wind runes as a random drop from any mob in the Plane of Sky, which is the closest thing to an answer we have for this one. If you have looted it, tell us the isle and the mob."
+              "who": "any Plane of Sky mob",
+              "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
+              "authoring": "Authored"
             }
           ]
         },
@@ -1474,7 +1513,7 @@
               "title": "Hand in Sphinx Claw, Mithril Bands, Brass Knuckles, Wind Rune Izah",
               "shortInstruction": "Give Animist Kratho the 4 pieces to receive the Windhowl/Spirit Render.",
               "who": "Animist Kratho",
-              "where": "Plane of Sky - the Efreeti Chamber, through the teleport pad at roughly 1600, 520 on Isle 1.",
+              "where": "Plane of Sky - the Efreeti Chamber. Buy an Efreeti's Key from the Key Master near where you zone in on Isle 1 (it is free), then take the teleport pad at the North point of that isle, around 1600, 520.",
               "what": "Hand Animist Kratho Sphinx Claw (1), Mithril Bands (1), Brass Knuckles (1), Wind Rune Izah (1) to receive the Windhowl/Spirit Render.",
               "when": "Once every piece above is in your bags - the guide's own prerequisites say so.",
               "why": "This is the step that actually gives you the Windhowl/Spirit Render.",
@@ -1498,6 +1537,11 @@
                 {
                   "url": "https://eqlwiki.com/Beastlord_Plane_of_Sky_Tests",
                   "title": "Beastlord Plane of Sky Tests",
+                  "retrievedAt": "2026-09-09"
+                },
+                {
+                  "url": "https://eqlwiki.com/Plane_of_Sky",
+                  "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
                 }
               ]
@@ -1573,8 +1617,8 @@
               "title": "Collect Wind Rune Lena",
               "sources": [
                 {
-                  "url": "https://eqlwiki.com/Berserker_Plane_of_Sky_Tests",
-                  "title": "Berserker Plane of Sky Tests",
+                  "url": "https://eqlwiki.com/Plane_of_Sky",
+                  "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
                 }
               ],
@@ -1584,10 +1628,9 @@
               "when": "",
               "why": "Wind Rune Lena is one of the turn-in pieces for the Blood-Drawn Runes.",
               "how": "",
-              "who": "",
-              "where": "",
-              "authoring": "Stub",
-              "stubNote": "eqlwiki's Berserker Plane of Sky Tests page does not say which isle or which mob drops Wind Rune Lena, and EQBuddy's Sky checklist records only \"Trash mobs\". Four class pages (Monk, Enchanter, Necromancer, Paladin) describe wind runes as a random drop from any mob in the Plane of Sky, which is the closest thing to an answer we have for this one. If you have looted it, tell us the isle and the mob."
+              "who": "any Plane of Sky mob",
+              "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
+              "authoring": "Authored"
             }
           ]
         },
@@ -1624,6 +1667,11 @@
                 {
                   "url": "https://eqlwiki.com/Berserker_Plane_of_Sky_Tests",
                   "title": "Berserker Plane of Sky Tests",
+                  "retrievedAt": "2026-09-09"
+                },
+                {
+                  "url": "https://eqlwiki.com/Plane_of_Sky",
+                  "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
                 }
               ]
@@ -1730,8 +1778,8 @@
               "title": "Collect Wind Rune Dena",
               "sources": [
                 {
-                  "url": "https://eqlwiki.com/Berserker_Plane_of_Sky_Tests",
-                  "title": "Berserker Plane of Sky Tests",
+                  "url": "https://eqlwiki.com/Plane_of_Sky",
+                  "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
                 }
               ],
@@ -1741,10 +1789,9 @@
               "when": "",
               "why": "Wind Rune Dena is one of the turn-in pieces for the Cudgel of the Fool.",
               "how": "",
-              "who": "",
-              "where": "",
-              "authoring": "Stub",
-              "stubNote": "eqlwiki's Berserker Plane of Sky Tests page does not say which isle or which mob drops Wind Rune Dena, and EQBuddy's Sky checklist records only \"Trash mobs\". Four class pages (Monk, Enchanter, Necromancer, Paladin) describe wind runes as a random drop from any mob in the Plane of Sky, which is the closest thing to an answer we have for this one. If you have looted it, tell us the isle and the mob."
+              "who": "any Plane of Sky mob",
+              "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
+              "authoring": "Authored"
             }
           ]
         },
@@ -1783,6 +1830,11 @@
                 {
                   "url": "https://eqlwiki.com/Berserker_Plane_of_Sky_Tests",
                   "title": "Berserker Plane of Sky Tests",
+                  "retrievedAt": "2026-09-09"
+                },
+                {
+                  "url": "https://eqlwiki.com/Plane_of_Sky",
+                  "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
                 }
               ]
@@ -1857,8 +1909,8 @@
               "title": "Collect Wind Rune Ena",
               "sources": [
                 {
-                  "url": "https://eqlwiki.com/Berserker_Plane_of_Sky_Tests",
-                  "title": "Berserker Plane of Sky Tests",
+                  "url": "https://eqlwiki.com/Plane_of_Sky",
+                  "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
                 }
               ],
@@ -1868,10 +1920,9 @@
               "when": "",
               "why": "Wind Rune Ena is one of the turn-in pieces for the Molten Coil.",
               "how": "",
-              "who": "",
-              "where": "",
-              "authoring": "Stub",
-              "stubNote": "eqlwiki's Berserker Plane of Sky Tests page does not say which isle or which mob drops Wind Rune Ena, and EQBuddy's Sky checklist records only \"Trash mobs\". Four class pages (Monk, Enchanter, Necromancer, Paladin) describe wind runes as a random drop from any mob in the Plane of Sky, which is the closest thing to an answer we have for this one. If you have looted it, tell us the isle and the mob."
+              "who": "any Plane of Sky mob",
+              "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
+              "authoring": "Authored"
             }
           ]
         },
@@ -1908,6 +1959,11 @@
                 {
                   "url": "https://eqlwiki.com/Berserker_Plane_of_Sky_Tests",
                   "title": "Berserker Plane of Sky Tests",
+                  "retrievedAt": "2026-09-09"
+                },
+                {
+                  "url": "https://eqlwiki.com/Plane_of_Sky",
+                  "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
                 }
               ]
@@ -1982,8 +2038,8 @@
               "title": "Collect Wind Rune Ozah",
               "sources": [
                 {
-                  "url": "https://eqlwiki.com/Berserker_Plane_of_Sky_Tests",
-                  "title": "Berserker Plane of Sky Tests",
+                  "url": "https://eqlwiki.com/Plane_of_Sky",
+                  "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
                 }
               ],
@@ -1993,10 +2049,9 @@
               "when": "",
               "why": "Wind Rune Ozah is one of the turn-in pieces for the Sash of Ferocity.",
               "how": "",
-              "who": "",
-              "where": "",
-              "authoring": "Stub",
-              "stubNote": "eqlwiki's Berserker Plane of Sky Tests page does not say which isle or which mob drops Wind Rune Ozah, and EQBuddy's Sky checklist records only \"Trash mobs\". Four class pages (Monk, Enchanter, Necromancer, Paladin) describe wind runes as a random drop from any mob in the Plane of Sky, which is the closest thing to an answer we have for this one. If you have looted it, tell us the isle and the mob."
+              "who": "any Plane of Sky mob",
+              "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
+              "authoring": "Authored"
             }
           ]
         },
@@ -2033,6 +2088,11 @@
                 {
                   "url": "https://eqlwiki.com/Berserker_Plane_of_Sky_Tests",
                   "title": "Berserker Plane of Sky Tests",
+                  "retrievedAt": "2026-09-09"
+                },
+                {
+                  "url": "https://eqlwiki.com/Plane_of_Sky",
+                  "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
                 }
               ]
@@ -2107,8 +2167,8 @@
               "title": "Collect Wind Rune Azia",
               "sources": [
                 {
-                  "url": "https://eqlwiki.com/Berserker_Plane_of_Sky_Tests",
-                  "title": "Berserker Plane of Sky Tests",
+                  "url": "https://eqlwiki.com/Plane_of_Sky",
+                  "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
                 }
               ],
@@ -2118,10 +2178,9 @@
               "when": "",
               "why": "Wind Rune Azia is one of the turn-in pieces for the Shroud of the Sky.",
               "how": "",
-              "who": "",
-              "where": "",
-              "authoring": "Stub",
-              "stubNote": "eqlwiki's Berserker Plane of Sky Tests page does not say which isle or which mob drops Wind Rune Azia, and EQBuddy's Sky checklist records only \"Trash mobs\". Four class pages (Monk, Enchanter, Necromancer, Paladin) describe wind runes as a random drop from any mob in the Plane of Sky, which is the closest thing to an answer we have for this one. If you have looted it, tell us the isle and the mob."
+              "who": "any Plane of Sky mob",
+              "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
+              "authoring": "Authored"
             }
           ]
         },
@@ -2158,6 +2217,11 @@
                 {
                   "url": "https://eqlwiki.com/Berserker_Plane_of_Sky_Tests",
                   "title": "Berserker Plane of Sky Tests",
+                  "retrievedAt": "2026-09-09"
+                },
+                {
+                  "url": "https://eqlwiki.com/Plane_of_Sky",
+                  "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
                 }
               ]
@@ -2264,8 +2328,8 @@
               "title": "Collect Wind Rune Jaka",
               "sources": [
                 {
-                  "url": "https://eqlwiki.com/Berserker_Plane_of_Sky_Tests",
-                  "title": "Berserker Plane of Sky Tests",
+                  "url": "https://eqlwiki.com/Plane_of_Sky",
+                  "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
                 }
               ],
@@ -2275,10 +2339,9 @@
               "when": "",
               "why": "Wind Rune Jaka is one of the turn-in pieces for the Skycleaver.",
               "how": "",
-              "who": "",
-              "where": "",
-              "authoring": "Stub",
-              "stubNote": "eqlwiki's Berserker Plane of Sky Tests page does not say which isle or which mob drops Wind Rune Jaka, and EQBuddy's Sky checklist records only \"Trash mobs\". Four class pages (Monk, Enchanter, Necromancer, Paladin) describe wind runes as a random drop from any mob in the Plane of Sky, which is the closest thing to an answer we have for this one. If you have looted it, tell us the isle and the mob."
+              "who": "any Plane of Sky mob",
+              "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
+              "authoring": "Authored"
             }
           ]
         },
@@ -2317,6 +2380,11 @@
                 {
                   "url": "https://eqlwiki.com/Berserker_Plane_of_Sky_Tests",
                   "title": "Berserker Plane of Sky Tests",
+                  "retrievedAt": "2026-09-09"
+                },
+                {
+                  "url": "https://eqlwiki.com/Plane_of_Sky",
+                  "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
                 }
               ]
@@ -2391,8 +2459,8 @@
               "title": "Collect Wind Rune Meda",
               "sources": [
                 {
-                  "url": "https://eqlwiki.com/Cleric_Plane_of_Sky_Tests",
-                  "title": "Cleric Plane of Sky Tests",
+                  "url": "https://eqlwiki.com/Plane_of_Sky",
+                  "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
                 }
               ],
@@ -2402,10 +2470,9 @@
               "when": "",
               "why": "Wind Rune Meda is one of the turn-in pieces for the Aegis of the Wind.",
               "how": "",
-              "who": "",
-              "where": "",
-              "authoring": "Stub",
-              "stubNote": "eqlwiki's Cleric Plane of Sky Tests page does not say which isle or which mob drops Wind Rune Meda, and EQBuddy's Sky checklist records only \"Trash mobs\". Four class pages (Monk, Enchanter, Necromancer, Paladin) describe wind runes as a random drop from any mob in the Plane of Sky, which is the closest thing to an answer we have for this one. If you have looted it, tell us the isle and the mob."
+              "who": "any Plane of Sky mob",
+              "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
+              "authoring": "Authored"
             }
           ]
         },
@@ -2422,7 +2489,7 @@
               "title": "Hand in Small Shield, Wind Rune Meda",
               "shortInstruction": "Give Josin Faithbringer the 2 pieces to receive the Aegis of the Wind.",
               "who": "Josin Faithbringer",
-              "where": "Plane of Sky - the Efreeti Chamber, through the teleport pad at roughly 1600, 520 on Isle 1.",
+              "where": "Plane of Sky - the Efreeti Chamber. Buy an Efreeti's Key from the Key Master near where you zone in on Isle 1 (it is free), then take the teleport pad at the North point of that isle, around 1600, 520.",
               "what": "Hand Josin Faithbringer Small Shield (1), Wind Rune Meda (1) to receive the Aegis of the Wind.",
               "when": "Once every piece above is in your bags - the guide's own prerequisites say so.",
               "why": "This is the step that actually gives you the Aegis of the Wind.",
@@ -2442,6 +2509,11 @@
                 {
                   "url": "https://eqlwiki.com/Cleric_Plane_of_Sky_Tests",
                   "title": "Cleric Plane of Sky Tests",
+                  "retrievedAt": "2026-09-09"
+                },
+                {
+                  "url": "https://eqlwiki.com/Plane_of_Sky",
+                  "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
                 }
               ]
@@ -2548,8 +2620,8 @@
               "title": "Collect Wind Rune Ena",
               "sources": [
                 {
-                  "url": "https://eqlwiki.com/Cleric_Plane_of_Sky_Tests",
-                  "title": "Cleric Plane of Sky Tests",
+                  "url": "https://eqlwiki.com/Plane_of_Sky",
+                  "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
                 }
               ],
@@ -2559,10 +2631,9 @@
               "when": "",
               "why": "Wind Rune Ena is one of the turn-in pieces for the Baton of the Sky.",
               "how": "",
-              "who": "",
-              "where": "",
-              "authoring": "Stub",
-              "stubNote": "eqlwiki's Cleric Plane of Sky Tests page does not say which isle or which mob drops Wind Rune Ena, and EQBuddy's Sky checklist records only \"Trash mobs\". Four class pages (Monk, Enchanter, Necromancer, Paladin) describe wind runes as a random drop from any mob in the Plane of Sky, which is the closest thing to an answer we have for this one. If you have looted it, tell us the isle and the mob."
+              "who": "any Plane of Sky mob",
+              "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
+              "authoring": "Authored"
             }
           ]
         },
@@ -2579,7 +2650,7 @@
               "title": "Hand in Mithril Bands, Efreeti Standard, Wind Rune Ena",
               "shortInstruction": "Give Josin Faithbringer the 3 pieces to receive the Baton of the Sky.",
               "who": "Josin Faithbringer",
-              "where": "Plane of Sky - the Efreeti Chamber, through the teleport pad at roughly 1600, 520 on Isle 1.",
+              "where": "Plane of Sky - the Efreeti Chamber. Buy an Efreeti's Key from the Key Master near where you zone in on Isle 1 (it is free), then take the teleport pad at the North point of that isle, around 1600, 520.",
               "what": "Hand Josin Faithbringer Mithril Bands (1), Efreeti Standard (1), Wind Rune Ena (1) to receive the Baton of the Sky.",
               "when": "Once every piece above is in your bags - the guide's own prerequisites say so.",
               "why": "This is the step that actually gives you the Baton of the Sky.",
@@ -2601,6 +2672,11 @@
                 {
                   "url": "https://eqlwiki.com/Cleric_Plane_of_Sky_Tests",
                   "title": "Cleric Plane of Sky Tests",
+                  "retrievedAt": "2026-09-09"
+                },
+                {
+                  "url": "https://eqlwiki.com/Plane_of_Sky",
+                  "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
                 }
               ]
@@ -2675,8 +2751,8 @@
               "title": "Collect Wind Rune Neza",
               "sources": [
                 {
-                  "url": "https://eqlwiki.com/Cleric_Plane_of_Sky_Tests",
-                  "title": "Cleric Plane of Sky Tests",
+                  "url": "https://eqlwiki.com/Plane_of_Sky",
+                  "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
                 }
               ],
@@ -2686,10 +2762,9 @@
               "when": "",
               "why": "Wind Rune Neza is one of the turn-in pieces for the Necklace of Resolution.",
               "how": "",
-              "who": "",
-              "where": "",
-              "authoring": "Stub",
-              "stubNote": "eqlwiki's Cleric Plane of Sky Tests page does not say which isle or which mob drops Wind Rune Neza, and EQBuddy's Sky checklist records only \"Trash mobs\". Four class pages (Monk, Enchanter, Necromancer, Paladin) describe wind runes as a random drop from any mob in the Plane of Sky, which is the closest thing to an answer we have for this one. If you have looted it, tell us the isle and the mob."
+              "who": "any Plane of Sky mob",
+              "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
+              "authoring": "Authored"
             }
           ]
         },
@@ -2706,7 +2781,7 @@
               "title": "Hand in Silvered Spiroc Necklace, Wind Rune Neza",
               "shortInstruction": "Give Josin Faithbringer the 2 pieces to receive the Necklace of Resolution.",
               "who": "Josin Faithbringer",
-              "where": "Plane of Sky - the Efreeti Chamber, through the teleport pad at roughly 1600, 520 on Isle 1.",
+              "where": "Plane of Sky - the Efreeti Chamber. Buy an Efreeti's Key from the Key Master near where you zone in on Isle 1 (it is free), then take the teleport pad at the North point of that isle, around 1600, 520.",
               "what": "Hand Josin Faithbringer Silvered Spiroc Necklace (1), Wind Rune Neza (1) to receive the Necklace of Resolution.",
               "when": "Once every piece above is in your bags - the guide's own prerequisites say so.",
               "why": "This is the step that actually gives you the Necklace of Resolution.",
@@ -2726,6 +2801,11 @@
                 {
                   "url": "https://eqlwiki.com/Cleric_Plane_of_Sky_Tests",
                   "title": "Cleric Plane of Sky Tests",
+                  "retrievedAt": "2026-09-09"
+                },
+                {
+                  "url": "https://eqlwiki.com/Plane_of_Sky",
+                  "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
                 }
               ]
@@ -2800,8 +2880,8 @@
               "title": "Collect Wind Rune Caza",
               "sources": [
                 {
-                  "url": "https://eqlwiki.com/Cleric_Plane_of_Sky_Tests",
-                  "title": "Cleric Plane of Sky Tests",
+                  "url": "https://eqlwiki.com/Plane_of_Sky",
+                  "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
                 }
               ],
@@ -2811,10 +2891,9 @@
               "when": "",
               "why": "Wind Rune Caza is one of the turn-in pieces for the Pauldrons of Piety.",
               "how": "",
-              "who": "",
-              "where": "",
-              "authoring": "Stub",
-              "stubNote": "eqlwiki's Cleric Plane of Sky Tests page does not say which isle or which mob drops Wind Rune Caza, and EQBuddy's Sky checklist records only \"Trash mobs\". Four class pages (Monk, Enchanter, Necromancer, Paladin) describe wind runes as a random drop from any mob in the Plane of Sky, which is the closest thing to an answer we have for this one. If you have looted it, tell us the isle and the mob."
+              "who": "any Plane of Sky mob",
+              "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
+              "authoring": "Authored"
             }
           ]
         },
@@ -2831,7 +2910,7 @@
               "title": "Hand in Shiny Pauldrons, Wind Rune Caza",
               "shortInstruction": "Give Josin Faithbringer the 2 pieces to receive the Pauldrons of Piety.",
               "who": "Josin Faithbringer",
-              "where": "Plane of Sky - the Efreeti Chamber, through the teleport pad at roughly 1600, 520 on Isle 1.",
+              "where": "Plane of Sky - the Efreeti Chamber. Buy an Efreeti's Key from the Key Master near where you zone in on Isle 1 (it is free), then take the teleport pad at the North point of that isle, around 1600, 520.",
               "what": "Hand Josin Faithbringer Shiny Pauldrons (1), Wind Rune Caza (1) to receive the Pauldrons of Piety.",
               "when": "Once every piece above is in your bags - the guide's own prerequisites say so.",
               "why": "This is the step that actually gives you the Pauldrons of Piety.",
@@ -2851,6 +2930,11 @@
                 {
                   "url": "https://eqlwiki.com/Cleric_Plane_of_Sky_Tests",
                   "title": "Cleric Plane of Sky Tests",
+                  "retrievedAt": "2026-09-09"
+                },
+                {
+                  "url": "https://eqlwiki.com/Plane_of_Sky",
+                  "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
                 }
               ]
@@ -2957,8 +3041,8 @@
               "title": "Collect Wind Rune Kala",
               "sources": [
                 {
-                  "url": "https://eqlwiki.com/Cleric_Plane_of_Sky_Tests",
-                  "title": "Cleric Plane of Sky Tests",
+                  "url": "https://eqlwiki.com/Plane_of_Sky",
+                  "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
                 }
               ],
@@ -2968,10 +3052,9 @@
               "when": "",
               "why": "Wind Rune Kala is one of the turn-in pieces for the Theurgist's Star.",
               "how": "",
-              "who": "",
-              "where": "",
-              "authoring": "Stub",
-              "stubNote": "eqlwiki's Cleric Plane of Sky Tests page does not say which isle or which mob drops Wind Rune Kala, and EQBuddy's Sky checklist records only \"Trash mobs\". Four class pages (Monk, Enchanter, Necromancer, Paladin) describe wind runes as a random drop from any mob in the Plane of Sky, which is the closest thing to an answer we have for this one. If you have looted it, tell us the isle and the mob."
+              "who": "any Plane of Sky mob",
+              "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
+              "authoring": "Authored"
             }
           ]
         },
@@ -2988,7 +3071,7 @@
               "title": "Hand in Djinni Aura, Efreeti Mace, Wind Rune Kala",
               "shortInstruction": "Give Josin Faithbringer the 3 pieces to receive the Theurgist's Star.",
               "who": "Josin Faithbringer",
-              "where": "Plane of Sky - the Efreeti Chamber, through the teleport pad at roughly 1600, 520 on Isle 1.",
+              "where": "Plane of Sky - the Efreeti Chamber. Buy an Efreeti's Key from the Key Master near where you zone in on Isle 1 (it is free), then take the teleport pad at the North point of that isle, around 1600, 520.",
               "what": "Hand Josin Faithbringer Djinni Aura (1), Efreeti Mace (1), Wind Rune Kala (1) to receive the Theurgist's Star.",
               "when": "Once every piece above is in your bags - the guide's own prerequisites say so.",
               "why": "This is the step that actually gives you the Theurgist's Star.",
@@ -3010,6 +3093,11 @@
                 {
                   "url": "https://eqlwiki.com/Cleric_Plane_of_Sky_Tests",
                   "title": "Cleric Plane of Sky Tests",
+                  "retrievedAt": "2026-09-09"
+                },
+                {
+                  "url": "https://eqlwiki.com/Plane_of_Sky",
+                  "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
                 }
               ]
@@ -3084,8 +3172,8 @@
               "title": "Collect Wind Rune Lena",
               "sources": [
                 {
-                  "url": "https://eqlwiki.com/Cleric_Plane_of_Sky_Tests",
-                  "title": "Cleric Plane of Sky Tests",
+                  "url": "https://eqlwiki.com/Plane_of_Sky",
+                  "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
                 }
               ],
@@ -3095,10 +3183,9 @@
               "when": "",
               "why": "Wind Rune Lena is one of the turn-in pieces for the Truewind Earring.",
               "how": "",
-              "who": "",
-              "where": "",
-              "authoring": "Stub",
-              "stubNote": "eqlwiki's Cleric Plane of Sky Tests page does not say which isle or which mob drops Wind Rune Lena, and EQBuddy's Sky checklist records only \"Trash mobs\". Four class pages (Monk, Enchanter, Necromancer, Paladin) describe wind runes as a random drop from any mob in the Plane of Sky, which is the closest thing to an answer we have for this one. If you have looted it, tell us the isle and the mob."
+              "who": "any Plane of Sky mob",
+              "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
+              "authoring": "Authored"
             }
           ]
         },
@@ -3115,7 +3202,7 @@
               "title": "Hand in Silver Hoop, Wind Rune Lena",
               "shortInstruction": "Give Josin Faithbringer the 2 pieces to receive the Truewind Earring.",
               "who": "Josin Faithbringer",
-              "where": "Plane of Sky - the Efreeti Chamber, through the teleport pad at roughly 1600, 520 on Isle 1.",
+              "where": "Plane of Sky - the Efreeti Chamber. Buy an Efreeti's Key from the Key Master near where you zone in on Isle 1 (it is free), then take the teleport pad at the North point of that isle, around 1600, 520.",
               "what": "Hand Josin Faithbringer Silver Hoop (1), Wind Rune Lena (1) to receive the Truewind Earring.",
               "when": "Once every piece above is in your bags - the guide's own prerequisites say so.",
               "why": "This is the step that actually gives you the Truewind Earring.",
@@ -3135,6 +3222,11 @@
                 {
                   "url": "https://eqlwiki.com/Cleric_Plane_of_Sky_Tests",
                   "title": "Cleric Plane of Sky Tests",
+                  "retrievedAt": "2026-09-09"
+                },
+                {
+                  "url": "https://eqlwiki.com/Plane_of_Sky",
+                  "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
                 }
               ]
@@ -3209,8 +3301,8 @@
               "title": "Collect Wind Rune Meda",
               "sources": [
                 {
-                  "url": "https://eqlwiki.com/Druid_Plane_of_Sky_Tests",
-                  "title": "Druid Plane of Sky Tests",
+                  "url": "https://eqlwiki.com/Plane_of_Sky",
+                  "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
                 }
               ],
@@ -3220,10 +3312,9 @@
               "when": "",
               "why": "Wind Rune Meda is one of the turn-in pieces for the Drake-Hide Mask.",
               "how": "",
-              "who": "",
-              "where": "",
-              "authoring": "Stub",
-              "stubNote": "eqlwiki's Druid Plane of Sky Tests page does not say which isle or which mob drops Wind Rune Meda, and EQBuddy's Sky checklist records only \"Trash mobs\". Four class pages (Monk, Enchanter, Necromancer, Paladin) describe wind runes as a random drop from any mob in the Plane of Sky, which is the closest thing to an answer we have for this one. If you have looted it, tell us the isle and the mob."
+              "who": "any Plane of Sky mob",
+              "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
+              "authoring": "Authored"
             }
           ]
         },
@@ -3240,7 +3331,7 @@
               "title": "Hand in Worn Leather Mask, Wind Rune Meda",
               "shortInstruction": "Give Strandar Pinemist the 2 pieces to receive the Drake-Hide Mask.",
               "who": "Strandar Pinemist",
-              "where": "Plane of Sky - the Efreeti Chamber, through the teleport pad at roughly 1600, 520 on Isle 1.",
+              "where": "Plane of Sky - the Efreeti Chamber. Buy an Efreeti's Key from the Key Master near where you zone in on Isle 1 (it is free), then take the teleport pad at the North point of that isle, around 1600, 520.",
               "what": "Hand Strandar Pinemist Worn Leather Mask (1), Wind Rune Meda (1) to receive the Drake-Hide Mask.",
               "when": "Once every piece above is in your bags - the guide's own prerequisites say so.",
               "why": "This is the step that actually gives you the Drake-Hide Mask.",
@@ -3260,6 +3351,11 @@
                 {
                   "url": "https://eqlwiki.com/Druid_Plane_of_Sky_Tests",
                   "title": "Druid Plane of Sky Tests",
+                  "retrievedAt": "2026-09-09"
+                },
+                {
+                  "url": "https://eqlwiki.com/Plane_of_Sky",
+                  "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
                 }
               ]
@@ -3366,8 +3462,8 @@
               "title": "Collect Wind Rune Izah",
               "sources": [
                 {
-                  "url": "https://eqlwiki.com/Druid_Plane_of_Sky_Tests",
-                  "title": "Druid Plane of Sky Tests",
+                  "url": "https://eqlwiki.com/Plane_of_Sky",
+                  "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
                 }
               ],
@@ -3377,10 +3473,9 @@
               "when": "",
               "why": "Wind Rune Izah is one of the turn-in pieces for the Espri.",
               "how": "",
-              "who": "",
-              "where": "",
-              "authoring": "Stub",
-              "stubNote": "eqlwiki's Druid Plane of Sky Tests page does not say which isle or which mob drops Wind Rune Izah, and EQBuddy's Sky checklist records only \"Trash mobs\". Four class pages (Monk, Enchanter, Necromancer, Paladin) describe wind runes as a random drop from any mob in the Plane of Sky, which is the closest thing to an answer we have for this one. If you have looted it, tell us the isle and the mob."
+              "who": "any Plane of Sky mob",
+              "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
+              "authoring": "Authored"
             }
           ]
         },
@@ -3397,7 +3492,7 @@
               "title": "Hand in Storm Sky Opal, Efreeti Scimitar, Wind Rune Izah",
               "shortInstruction": "Give Strandar Pinemist the 3 pieces to receive the Espri.",
               "who": "Strandar Pinemist",
-              "where": "Plane of Sky - the Efreeti Chamber, through the teleport pad at roughly 1600, 520 on Isle 1.",
+              "where": "Plane of Sky - the Efreeti Chamber. Buy an Efreeti's Key from the Key Master near where you zone in on Isle 1 (it is free), then take the teleport pad at the North point of that isle, around 1600, 520.",
               "what": "Hand Strandar Pinemist Storm Sky Opal (1), Efreeti Scimitar (1), Wind Rune Izah (1) to receive the Espri.",
               "when": "Once every piece above is in your bags - the guide's own prerequisites say so.",
               "why": "This is the step that actually gives you the Espri.",
@@ -3419,6 +3514,11 @@
                 {
                   "url": "https://eqlwiki.com/Druid_Plane_of_Sky_Tests",
                   "title": "Druid Plane of Sky Tests",
+                  "retrievedAt": "2026-09-09"
+                },
+                {
+                  "url": "https://eqlwiki.com/Plane_of_Sky",
+                  "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
                 }
               ]
@@ -3493,8 +3593,8 @@
               "title": "Collect Wind Rune Dena",
               "sources": [
                 {
-                  "url": "https://eqlwiki.com/Druid_Plane_of_Sky_Tests",
-                  "title": "Druid Plane of Sky Tests",
+                  "url": "https://eqlwiki.com/Plane_of_Sky",
+                  "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
                 }
               ],
@@ -3504,10 +3604,9 @@
               "when": "",
               "why": "Wind Rune Dena is one of the turn-in pieces for the Honeycomb Belt.",
               "how": "",
-              "who": "",
-              "where": "",
-              "authoring": "Stub",
-              "stubNote": "eqlwiki's Druid Plane of Sky Tests page does not say which isle or which mob drops Wind Rune Dena, and EQBuddy's Sky checklist records only \"Trash mobs\". Four class pages (Monk, Enchanter, Necromancer, Paladin) describe wind runes as a random drop from any mob in the Plane of Sky, which is the closest thing to an answer we have for this one. If you have looted it, tell us the isle and the mob."
+              "who": "any Plane of Sky mob",
+              "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
+              "authoring": "Authored"
             }
           ]
         },
@@ -3524,7 +3623,7 @@
               "title": "Hand in Divine Honeycomb, Wind Rune Dena",
               "shortInstruction": "Give Strandar Pinemist the 2 pieces to receive the Honeycomb Belt.",
               "who": "Strandar Pinemist",
-              "where": "Plane of Sky - the Efreeti Chamber, through the teleport pad at roughly 1600, 520 on Isle 1.",
+              "where": "Plane of Sky - the Efreeti Chamber. Buy an Efreeti's Key from the Key Master near where you zone in on Isle 1 (it is free), then take the teleport pad at the North point of that isle, around 1600, 520.",
               "what": "Hand Strandar Pinemist Divine Honeycomb (1), Wind Rune Dena (1) to receive the Honeycomb Belt.",
               "when": "Once every piece above is in your bags - the guide's own prerequisites say so.",
               "why": "This is the step that actually gives you the Honeycomb Belt.",
@@ -3544,6 +3643,11 @@
                 {
                   "url": "https://eqlwiki.com/Druid_Plane_of_Sky_Tests",
                   "title": "Druid Plane of Sky Tests",
+                  "retrievedAt": "2026-09-09"
+                },
+                {
+                  "url": "https://eqlwiki.com/Plane_of_Sky",
+                  "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
                 }
               ]
@@ -3618,8 +3722,8 @@
               "title": "Collect Wind Rune Kala",
               "sources": [
                 {
-                  "url": "https://eqlwiki.com/Druid_Plane_of_Sky_Tests",
-                  "title": "Druid Plane of Sky Tests",
+                  "url": "https://eqlwiki.com/Plane_of_Sky",
+                  "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
                 }
               ],
@@ -3629,10 +3733,9 @@
               "when": "",
               "why": "Wind Rune Kala is one of the turn-in pieces for the Nature Walker's Mantle.",
               "how": "",
-              "who": "",
-              "where": "",
-              "authoring": "Stub",
-              "stubNote": "eqlwiki's Druid Plane of Sky Tests page does not say which isle or which mob drops Wind Rune Kala, and EQBuddy's Sky checklist records only \"Trash mobs\". Four class pages (Monk, Enchanter, Necromancer, Paladin) describe wind runes as a random drop from any mob in the Plane of Sky, which is the closest thing to an answer we have for this one. If you have looted it, tell us the isle and the mob."
+              "who": "any Plane of Sky mob",
+              "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
+              "authoring": "Authored"
             }
           ]
         },
@@ -3649,7 +3752,7 @@
               "title": "Hand in Mantle of Woven Grass, Wind Rune Kala",
               "shortInstruction": "Give Strandar Pinemist the 2 pieces to receive the Nature Walker's Mantle.",
               "who": "Strandar Pinemist",
-              "where": "Plane of Sky - the Efreeti Chamber, through the teleport pad at roughly 1600, 520 on Isle 1.",
+              "where": "Plane of Sky - the Efreeti Chamber. Buy an Efreeti's Key from the Key Master near where you zone in on Isle 1 (it is free), then take the teleport pad at the North point of that isle, around 1600, 520.",
               "what": "Hand Strandar Pinemist Mantle of Woven Grass (1), Wind Rune Kala (1) to receive the Nature Walker's Mantle.",
               "when": "Once every piece above is in your bags - the guide's own prerequisites say so.",
               "why": "This is the step that actually gives you the Nature Walker's Mantle.",
@@ -3669,6 +3772,11 @@
                 {
                   "url": "https://eqlwiki.com/Druid_Plane_of_Sky_Tests",
                   "title": "Druid Plane of Sky Tests",
+                  "retrievedAt": "2026-09-09"
+                },
+                {
+                  "url": "https://eqlwiki.com/Plane_of_Sky",
+                  "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
                 }
               ]
@@ -3776,8 +3884,8 @@
               "title": "Collect Wind Rune Azia",
               "sources": [
                 {
-                  "url": "https://eqlwiki.com/Druid_Plane_of_Sky_Tests",
-                  "title": "Druid Plane of Sky Tests",
+                  "url": "https://eqlwiki.com/Plane_of_Sky",
+                  "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
                 }
               ],
@@ -3787,10 +3895,9 @@
               "when": "",
               "why": "Wind Rune Azia is one of the turn-in pieces for the Shillelagh.",
               "how": "",
-              "who": "",
-              "where": "",
-              "authoring": "Stub",
-              "stubNote": "eqlwiki's Druid Plane of Sky Tests page does not say which isle or which mob drops Wind Rune Azia, and EQBuddy's Sky checklist records only \"Trash mobs\". Four class pages (Monk, Enchanter, Necromancer, Paladin) describe wind runes as a random drop from any mob in the Plane of Sky, which is the closest thing to an answer we have for this one. If you have looted it, tell us the isle and the mob."
+              "who": "any Plane of Sky mob",
+              "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
+              "authoring": "Authored"
             }
           ]
         },
@@ -3807,7 +3914,7 @@
               "title": "Hand in Efreeti Statuette, Spiroc Battle Staff, Wind Rune Azia",
               "shortInstruction": "Give Strandar Pinemist the 3 pieces to receive the Shillelagh.",
               "who": "Strandar Pinemist",
-              "where": "Plane of Sky - the Efreeti Chamber, through the teleport pad at roughly 1600, 520 on Isle 1.",
+              "where": "Plane of Sky - the Efreeti Chamber. Buy an Efreeti's Key from the Key Master near where you zone in on Isle 1 (it is free), then take the teleport pad at the North point of that isle, around 1600, 520.",
               "what": "Hand Strandar Pinemist Efreeti Statuette (1), Spiroc Battle Staff (1), Wind Rune Azia (1) to receive the Shillelagh.",
               "when": "Once every piece above is in your bags - the guide's own prerequisites say so.",
               "why": "This is the step that actually gives you the Shillelagh.",
@@ -3829,6 +3936,11 @@
                 {
                   "url": "https://eqlwiki.com/Druid_Plane_of_Sky_Tests",
                   "title": "Druid Plane of Sky Tests",
+                  "retrievedAt": "2026-09-09"
+                },
+                {
+                  "url": "https://eqlwiki.com/Plane_of_Sky",
+                  "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
                 }
               ]
@@ -3935,8 +4047,8 @@
               "title": "Collect Wind Rune Ena",
               "sources": [
                 {
-                  "url": "https://eqlwiki.com/Druid_Plane_of_Sky_Tests",
-                  "title": "Druid Plane of Sky Tests",
+                  "url": "https://eqlwiki.com/Plane_of_Sky",
+                  "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
                 }
               ],
@@ -3946,10 +4058,9 @@
               "when": "",
               "why": "Wind Rune Ena is one of the turn-in pieces for the Spiroc Banisher Focus.",
               "how": "",
-              "who": "",
-              "where": "",
-              "authoring": "Stub",
-              "stubNote": "eqlwiki's Druid Plane of Sky Tests page does not say which isle or which mob drops Wind Rune Ena, and EQBuddy's Sky checklist records only \"Trash mobs\". Four class pages (Monk, Enchanter, Necromancer, Paladin) describe wind runes as a random drop from any mob in the Plane of Sky, which is the closest thing to an answer we have for this one. If you have looted it, tell us the isle and the mob."
+              "who": "any Plane of Sky mob",
+              "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
+              "authoring": "Authored"
             }
           ]
         },
@@ -3966,7 +4077,7 @@
               "title": "Hand in Spiroc Elder's Totem, Ethereal Ruby, Wind Rune Ena",
               "shortInstruction": "Give Strandar Pinemist the 3 pieces to receive the Spiroc Banisher Focus.",
               "who": "Strandar Pinemist",
-              "where": "Plane of Sky - the Efreeti Chamber, through the teleport pad at roughly 1600, 520 on Isle 1.",
+              "where": "Plane of Sky - the Efreeti Chamber. Buy an Efreeti's Key from the Key Master near where you zone in on Isle 1 (it is free), then take the teleport pad at the North point of that isle, around 1600, 520.",
               "what": "Hand Strandar Pinemist Spiroc Elder's Totem (1), Ethereal Ruby (1), Wind Rune Ena (1) to receive the Spiroc Banisher Focus.",
               "when": "Once every piece above is in your bags - the guide's own prerequisites say so.",
               "why": "This is the step that actually gives you the Spiroc Banisher Focus.",
@@ -3988,6 +4099,11 @@
                 {
                   "url": "https://eqlwiki.com/Druid_Plane_of_Sky_Tests",
                   "title": "Druid Plane of Sky Tests",
+                  "retrievedAt": "2026-09-09"
+                },
+                {
+                  "url": "https://eqlwiki.com/Plane_of_Sky",
+                  "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
                 }
               ]
@@ -4065,16 +4181,21 @@
                   "url": "https://eqlwiki.com/Enchanter_Plane_of_Sky_Tests",
                   "title": "Enchanter Plane of Sky Tests",
                   "retrievedAt": "2026-09-09"
+                },
+                {
+                  "url": "https://eqlwiki.com/Plane_of_Sky",
+                  "title": "Plane of Sky",
+                  "retrievedAt": "2026-09-09"
                 }
               ],
               "objectiveType": "Farm",
               "shortInstruction": "Loot a Wind Rune Caza from Plane of Sky trash.",
               "what": "Loot Wind Rune Caza (1).",
-              "when": "Any time you are in the zone - eqlwiki's Enchanter Plane of Sky Tests page says the wind runes are a random drop from any mob in the Plane of Sky.",
+              "when": "",
               "why": "Wind Rune Caza is one of the turn-in pieces for the Earring of Displacement.",
               "how": "",
               "who": "any Plane of Sky mob",
-              "where": "Plane of Sky - no fixed isle.",
+              "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
               "authoring": "Authored"
             }
           ]
@@ -4189,16 +4310,21 @@
                   "url": "https://eqlwiki.com/Enchanter_Plane_of_Sky_Tests",
                   "title": "Enchanter Plane of Sky Tests",
                   "retrievedAt": "2026-09-09"
+                },
+                {
+                  "url": "https://eqlwiki.com/Plane_of_Sky",
+                  "title": "Plane of Sky",
+                  "retrievedAt": "2026-09-09"
                 }
               ],
               "objectiveType": "Farm",
               "shortInstruction": "Loot a Wind Rune Beza from Plane of Sky trash.",
               "what": "Loot Wind Rune Beza (1).",
-              "when": "Any time you are in the zone - eqlwiki's Enchanter Plane of Sky Tests page says the wind runes are a random drop from any mob in the Plane of Sky.",
+              "when": "",
               "why": "Wind Rune Beza is one of the turn-in pieces for the Ivory Mask.",
               "how": "",
               "who": "any Plane of Sky mob",
-              "where": "Plane of Sky - no fixed isle.",
+              "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
               "authoring": "Authored"
             }
           ]
@@ -4313,16 +4439,21 @@
                   "url": "https://eqlwiki.com/Enchanter_Plane_of_Sky_Tests",
                   "title": "Enchanter Plane of Sky Tests",
                   "retrievedAt": "2026-09-09"
+                },
+                {
+                  "url": "https://eqlwiki.com/Plane_of_Sky",
+                  "title": "Plane of Sky",
+                  "retrievedAt": "2026-09-09"
                 }
               ],
               "objectiveType": "Farm",
               "shortInstruction": "Loot a Wind Rune Fana from Plane of Sky trash.",
               "what": "Loot Wind Rune Fana (1).",
-              "when": "Any time you are in the zone - eqlwiki's Enchanter Plane of Sky Tests page says the wind runes are a random drop from any mob in the Plane of Sky.",
+              "when": "",
               "why": "Wind Rune Fana is one of the turn-in pieces for the Necklace of Whispering Winds.",
               "how": "",
               "who": "any Plane of Sky mob",
-              "where": "Plane of Sky - no fixed isle.",
+              "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
               "authoring": "Authored"
             }
           ]
@@ -4469,16 +4600,21 @@
                   "url": "https://eqlwiki.com/Enchanter_Plane_of_Sky_Tests",
                   "title": "Enchanter Plane of Sky Tests",
                   "retrievedAt": "2026-09-09"
+                },
+                {
+                  "url": "https://eqlwiki.com/Plane_of_Sky",
+                  "title": "Plane of Sky",
+                  "retrievedAt": "2026-09-09"
                 }
               ],
               "objectiveType": "Farm",
               "shortInstruction": "Loot a Wind Rune Izah from Plane of Sky trash.",
               "what": "Loot Wind Rune Izah (1).",
-              "when": "Any time you are in the zone - eqlwiki's Enchanter Plane of Sky Tests page says the wind runes are a random drop from any mob in the Plane of Sky.",
+              "when": "",
               "why": "Wind Rune Izah is one of the turn-in pieces for the Rod of the Protecting Winds.",
               "how": "",
               "who": "any Plane of Sky mob",
-              "where": "Plane of Sky - no fixed isle.",
+              "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
               "authoring": "Authored"
             }
           ]
@@ -4595,16 +4731,21 @@
                   "url": "https://eqlwiki.com/Enchanter_Plane_of_Sky_Tests",
                   "title": "Enchanter Plane of Sky Tests",
                   "retrievedAt": "2026-09-09"
+                },
+                {
+                  "url": "https://eqlwiki.com/Plane_of_Sky",
+                  "title": "Plane of Sky",
+                  "retrievedAt": "2026-09-09"
                 }
               ],
               "objectiveType": "Farm",
               "shortInstruction": "Loot a Wind Rune Meda from Plane of Sky trash.",
               "what": "Loot Wind Rune Meda (1).",
-              "when": "Any time you are in the zone - eqlwiki's Enchanter Plane of Sky Tests page says the wind runes are a random drop from any mob in the Plane of Sky.",
+              "when": "",
               "why": "Wind Rune Meda is one of the turn-in pieces for the Sphinx Hair Cord.",
               "how": "",
               "who": "any Plane of Sky mob",
-              "where": "Plane of Sky - no fixed isle.",
+              "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
               "authoring": "Authored"
             }
           ]
@@ -4719,16 +4860,21 @@
                   "url": "https://eqlwiki.com/Enchanter_Plane_of_Sky_Tests",
                   "title": "Enchanter Plane of Sky Tests",
                   "retrievedAt": "2026-09-09"
+                },
+                {
+                  "url": "https://eqlwiki.com/Plane_of_Sky",
+                  "title": "Plane of Sky",
+                  "retrievedAt": "2026-09-09"
                 }
               ],
               "objectiveType": "Farm",
               "shortInstruction": "Loot a Wind Rune Ozah from Plane of Sky trash.",
               "what": "Loot Wind Rune Ozah (1).",
-              "when": "Any time you are in the zone - eqlwiki's Enchanter Plane of Sky Tests page says the wind runes are a random drop from any mob in the Plane of Sky.",
+              "when": "",
               "why": "Wind Rune Ozah is one of the turn-in pieces for the Wind Walker's Mantle.",
               "how": "",
               "who": "any Plane of Sky mob",
-              "where": "Plane of Sky - no fixed isle.",
+              "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
               "authoring": "Authored"
             }
           ]
@@ -4840,8 +4986,8 @@
               "title": "Collect Wind Rune Lena",
               "sources": [
                 {
-                  "url": "https://eqlwiki.com/Magician_Plane_of_Sky_Tests",
-                  "title": "Magician Plane of Sky Tests",
+                  "url": "https://eqlwiki.com/Plane_of_Sky",
+                  "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
                 }
               ],
@@ -4851,10 +4997,9 @@
               "when": "",
               "why": "Wind Rune Lena is one of the turn-in pieces for the Bracelet of Clarification.",
               "how": "",
-              "who": "",
-              "where": "",
-              "authoring": "Stub",
-              "stubNote": "eqlwiki's Magician Plane of Sky Tests page does not say which isle or which mob drops Wind Rune Lena, and EQBuddy's Sky checklist records only \"Trash mobs\". Four class pages (Monk, Enchanter, Necromancer, Paladin) describe wind runes as a random drop from any mob in the Plane of Sky, which is the closest thing to an answer we have for this one. If you have looted it, tell us the isle and the mob."
+              "who": "any Plane of Sky mob",
+              "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
+              "authoring": "Authored"
             }
           ]
         },
@@ -4871,7 +5016,7 @@
               "title": "Hand in Feathered Cape, Wind Rune Lena",
               "shortInstruction": "Give Magus Frinon the 2 pieces to receive the Bracelet of Clarification.",
               "who": "Magus Frinon",
-              "where": "Plane of Sky - the Efreeti Chamber, through the teleport pad at roughly 1600, 520 on Isle 1.",
+              "where": "Plane of Sky - the Efreeti Chamber. Buy an Efreeti's Key from the Key Master near where you zone in on Isle 1 (it is free), then take the teleport pad at the North point of that isle, around 1600, 520.",
               "what": "Hand Magus Frinon Feathered Cape (1), Wind Rune Lena (1) to receive the Bracelet of Clarification.",
               "when": "Once every piece above is in your bags - the guide's own prerequisites say so.",
               "why": "This is the step that actually gives you the Bracelet of Clarification.",
@@ -4891,6 +5036,11 @@
                 {
                   "url": "https://eqlwiki.com/Magician_Plane_of_Sky_Tests",
                   "title": "Magician Plane of Sky Tests",
+                  "retrievedAt": "2026-09-09"
+                },
+                {
+                  "url": "https://eqlwiki.com/Plane_of_Sky",
+                  "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
                 }
               ]
@@ -4965,8 +5115,8 @@
               "title": "Collect Wind Rune Dena",
               "sources": [
                 {
-                  "url": "https://eqlwiki.com/Magician_Plane_of_Sky_Tests",
-                  "title": "Magician Plane of Sky Tests",
+                  "url": "https://eqlwiki.com/Plane_of_Sky",
+                  "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
                 }
               ],
@@ -4976,10 +5126,9 @@
               "when": "",
               "why": "Wind Rune Dena is one of the turn-in pieces for the Drake-Hide Amice.",
               "how": "",
-              "who": "",
-              "where": "",
-              "authoring": "Stub",
-              "stubNote": "eqlwiki's Magician Plane of Sky Tests page does not say which isle or which mob drops Wind Rune Dena, and EQBuddy's Sky checklist records only \"Trash mobs\". Four class pages (Monk, Enchanter, Necromancer, Paladin) describe wind runes as a random drop from any mob in the Plane of Sky, which is the closest thing to an answer we have for this one. If you have looted it, tell us the isle and the mob."
+              "who": "any Plane of Sky mob",
+              "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
+              "authoring": "Authored"
             }
           ]
         },
@@ -4996,7 +5145,7 @@
               "title": "Hand in Large Diamond, Wind Rune Dena",
               "shortInstruction": "Give Magus Frinon the 2 pieces to receive the Drake-Hide Amice.",
               "who": "Magus Frinon",
-              "where": "Plane of Sky - the Efreeti Chamber, through the teleport pad at roughly 1600, 520 on Isle 1.",
+              "where": "Plane of Sky - the Efreeti Chamber. Buy an Efreeti's Key from the Key Master near where you zone in on Isle 1 (it is free), then take the teleport pad at the North point of that isle, around 1600, 520.",
               "what": "Hand Magus Frinon Large Diamond (1), Wind Rune Dena (1) to receive the Drake-Hide Amice.",
               "when": "Once every piece above is in your bags - the guide's own prerequisites say so.",
               "why": "This is the step that actually gives you the Drake-Hide Amice.",
@@ -5016,6 +5165,11 @@
                 {
                   "url": "https://eqlwiki.com/Magician_Plane_of_Sky_Tests",
                   "title": "Magician Plane of Sky Tests",
+                  "retrievedAt": "2026-09-09"
+                },
+                {
+                  "url": "https://eqlwiki.com/Plane_of_Sky",
+                  "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
                 }
               ]
@@ -5090,8 +5244,8 @@
               "title": "Collect Wind Rune Ena",
               "sources": [
                 {
-                  "url": "https://eqlwiki.com/Magician_Plane_of_Sky_Tests",
-                  "title": "Magician Plane of Sky Tests",
+                  "url": "https://eqlwiki.com/Plane_of_Sky",
+                  "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
                 }
               ],
@@ -5101,10 +5255,9 @@
               "when": "",
               "why": "Wind Rune Ena is one of the turn-in pieces for the Duennan Shielding Ring.",
               "how": "",
-              "who": "",
-              "where": "",
-              "authoring": "Stub",
-              "stubNote": "eqlwiki's Magician Plane of Sky Tests page does not say which isle or which mob drops Wind Rune Ena, and EQBuddy's Sky checklist records only \"Trash mobs\". Four class pages (Monk, Enchanter, Necromancer, Paladin) describe wind runes as a random drop from any mob in the Plane of Sky, which is the closest thing to an answer we have for this one. If you have looted it, tell us the isle and the mob."
+              "who": "any Plane of Sky mob",
+              "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
+              "authoring": "Authored"
             }
           ]
         },
@@ -5121,7 +5274,7 @@
               "title": "Hand in Golden Efreeti Ring, Wind Rune Ena",
               "shortInstruction": "Give Magus Frinon the 2 pieces to receive the Duennan Shielding Ring.",
               "who": "Magus Frinon",
-              "where": "Plane of Sky - the Efreeti Chamber, through the teleport pad at roughly 1600, 520 on Isle 1.",
+              "where": "Plane of Sky - the Efreeti Chamber. Buy an Efreeti's Key from the Key Master near where you zone in on Isle 1 (it is free), then take the teleport pad at the North point of that isle, around 1600, 520.",
               "what": "Hand Magus Frinon Golden Efreeti Ring (1), Wind Rune Ena (1) to receive the Duennan Shielding Ring.",
               "when": "Once every piece above is in your bags - the guide's own prerequisites say so.",
               "why": "This is the step that actually gives you the Duennan Shielding Ring.",
@@ -5141,6 +5294,11 @@
                 {
                   "url": "https://eqlwiki.com/Magician_Plane_of_Sky_Tests",
                   "title": "Magician Plane of Sky Tests",
+                  "retrievedAt": "2026-09-09"
+                },
+                {
+                  "url": "https://eqlwiki.com/Plane_of_Sky",
+                  "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
                 }
               ]
@@ -5215,8 +5373,8 @@
               "title": "Collect Wind Rune Azia",
               "sources": [
                 {
-                  "url": "https://eqlwiki.com/Magician_Plane_of_Sky_Tests",
-                  "title": "Magician Plane of Sky Tests",
+                  "url": "https://eqlwiki.com/Plane_of_Sky",
+                  "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
                 }
               ],
@@ -5226,10 +5384,9 @@
               "when": "",
               "why": "Wind Rune Azia is one of the turn-in pieces for the Gold White Pendant.",
               "how": "",
-              "who": "",
-              "where": "",
-              "authoring": "Stub",
-              "stubNote": "eqlwiki's Magician Plane of Sky Tests page does not say which isle or which mob drops Wind Rune Azia, and EQBuddy's Sky checklist records only \"Trash mobs\". Four class pages (Monk, Enchanter, Necromancer, Paladin) describe wind runes as a random drop from any mob in the Plane of Sky, which is the closest thing to an answer we have for this one. If you have looted it, tell us the isle and the mob."
+              "who": "any Plane of Sky mob",
+              "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
+              "authoring": "Authored"
             }
           ]
         },
@@ -5246,7 +5403,7 @@
               "title": "Hand in Golden Coffer, Wind Rune Azia",
               "shortInstruction": "Give Magus Frinon the 2 pieces to receive the Gold White Pendant.",
               "who": "Magus Frinon",
-              "where": "Plane of Sky - the Efreeti Chamber, through the teleport pad at roughly 1600, 520 on Isle 1.",
+              "where": "Plane of Sky - the Efreeti Chamber. Buy an Efreeti's Key from the Key Master near where you zone in on Isle 1 (it is free), then take the teleport pad at the North point of that isle, around 1600, 520.",
               "what": "Hand Magus Frinon Golden Coffer (1), Wind Rune Azia (1) to receive the Gold White Pendant.",
               "when": "Once every piece above is in your bags - the guide's own prerequisites say so.",
               "why": "This is the step that actually gives you the Gold White Pendant.",
@@ -5266,6 +5423,11 @@
                 {
                   "url": "https://eqlwiki.com/Magician_Plane_of_Sky_Tests",
                   "title": "Magician Plane of Sky Tests",
+                  "retrievedAt": "2026-09-09"
+                },
+                {
+                  "url": "https://eqlwiki.com/Plane_of_Sky",
+                  "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
                 }
               ]
@@ -5340,8 +5502,8 @@
               "title": "Collect Wind Rune Neza",
               "sources": [
                 {
-                  "url": "https://eqlwiki.com/Magician_Plane_of_Sky_Tests",
-                  "title": "Magician Plane of Sky Tests",
+                  "url": "https://eqlwiki.com/Plane_of_Sky",
+                  "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
                 }
               ],
@@ -5351,10 +5513,9 @@
               "when": "",
               "why": "Wind Rune Neza is one of the turn-in pieces for the Mask of Empowerment.",
               "how": "",
-              "who": "",
-              "where": "",
-              "authoring": "Stub",
-              "stubNote": "eqlwiki's Magician Plane of Sky Tests page does not say which isle or which mob drops Wind Rune Neza, and EQBuddy's Sky checklist records only \"Trash mobs\". Four class pages (Monk, Enchanter, Necromancer, Paladin) describe wind runes as a random drop from any mob in the Plane of Sky, which is the closest thing to an answer we have for this one. If you have looted it, tell us the isle and the mob."
+              "who": "any Plane of Sky mob",
+              "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
+              "authoring": "Authored"
             }
           ]
         },
@@ -5371,7 +5532,7 @@
               "title": "Hand in Ceramic Mask, Wind Rune Neza",
               "shortInstruction": "Give Magus Frinon the 2 pieces to receive the Mask of Empowerment.",
               "who": "Magus Frinon",
-              "where": "Plane of Sky - the Efreeti Chamber, through the teleport pad at roughly 1600, 520 on Isle 1.",
+              "where": "Plane of Sky - the Efreeti Chamber. Buy an Efreeti's Key from the Key Master near where you zone in on Isle 1 (it is free), then take the teleport pad at the North point of that isle, around 1600, 520.",
               "what": "Hand Magus Frinon Ceramic Mask (1), Wind Rune Neza (1) to receive the Mask of Empowerment.",
               "when": "Once every piece above is in your bags - the guide's own prerequisites say so.",
               "why": "This is the step that actually gives you the Mask of Empowerment.",
@@ -5391,6 +5552,11 @@
                 {
                   "url": "https://eqlwiki.com/Magician_Plane_of_Sky_Tests",
                   "title": "Magician Plane of Sky Tests",
+                  "retrievedAt": "2026-09-09"
+                },
+                {
+                  "url": "https://eqlwiki.com/Plane_of_Sky",
+                  "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
                 }
               ]
@@ -5529,8 +5695,8 @@
               "title": "Collect Wind Rune Heda",
               "sources": [
                 {
-                  "url": "https://eqlwiki.com/Magician_Plane_of_Sky_Tests",
-                  "title": "Magician Plane of Sky Tests",
+                  "url": "https://eqlwiki.com/Plane_of_Sky",
+                  "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
                 }
               ],
@@ -5540,10 +5706,9 @@
               "when": "",
               "why": "Wind Rune Heda is one of the turn-in pieces for the Staff of Elemental Mastery: Air.",
               "how": "",
-              "who": "",
-              "where": "",
-              "authoring": "Stub",
-              "stubNote": "eqlwiki's Magician Plane of Sky Tests page does not say which isle or which mob drops Wind Rune Heda, and EQBuddy's Sky checklist records only \"Trash mobs\". Four class pages (Monk, Enchanter, Necromancer, Paladin) describe wind runes as a random drop from any mob in the Plane of Sky, which is the closest thing to an answer we have for this one. If you have looted it, tell us the isle and the mob."
+              "who": "any Plane of Sky mob",
+              "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
+              "authoring": "Authored"
             }
           ]
         },
@@ -5560,7 +5725,7 @@
               "title": "Hand in Crown of Elemental Mastery, Djinni Stave, Large Opal, Wind Rune Heda",
               "shortInstruction": "Give Magus Frinon the 4 pieces to receive the Staff of Elemental Mastery: Air.",
               "who": "Magus Frinon",
-              "where": "Plane of Sky - the Efreeti Chamber, through the teleport pad at roughly 1600, 520 on Isle 1.",
+              "where": "Plane of Sky - the Efreeti Chamber. Buy an Efreeti's Key from the Key Master near where you zone in on Isle 1 (it is free), then take the teleport pad at the North point of that isle, around 1600, 520.",
               "what": "Hand Magus Frinon Crown of Elemental Mastery (1), Djinni Stave (1), Large Opal (1), Wind Rune Heda (1) to receive the Staff of Elemental Mastery: Air.",
               "when": "Once every piece above is in your bags - the guide's own prerequisites say so.",
               "why": "This is the step that actually gives you the Staff of Elemental Mastery: Air.",
@@ -5584,6 +5749,11 @@
                 {
                   "url": "https://eqlwiki.com/Magician_Plane_of_Sky_Tests",
                   "title": "Magician Plane of Sky Tests",
+                  "retrievedAt": "2026-09-09"
+                },
+                {
+                  "url": "https://eqlwiki.com/Plane_of_Sky",
+                  "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
                 }
               ]
@@ -5690,8 +5860,8 @@
               "title": "Collect Wind Rune Jaka",
               "sources": [
                 {
-                  "url": "https://eqlwiki.com/Magician_Plane_of_Sky_Tests",
-                  "title": "Magician Plane of Sky Tests",
+                  "url": "https://eqlwiki.com/Plane_of_Sky",
+                  "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
                 }
               ],
@@ -5701,10 +5871,9 @@
               "when": "",
               "why": "Wind Rune Jaka is one of the turn-in pieces for the Staff of The Magister.",
               "how": "",
-              "who": "",
-              "where": "",
-              "authoring": "Stub",
-              "stubNote": "eqlwiki's Magician Plane of Sky Tests page does not say which isle or which mob drops Wind Rune Jaka, and EQBuddy's Sky checklist records only \"Trash mobs\". Four class pages (Monk, Enchanter, Necromancer, Paladin) describe wind runes as a random drop from any mob in the Plane of Sky, which is the closest thing to an answer we have for this one. If you have looted it, tell us the isle and the mob."
+              "who": "any Plane of Sky mob",
+              "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
+              "authoring": "Authored"
             }
           ]
         },
@@ -5721,7 +5890,7 @@
               "title": "Hand in Hazy Opal, Efreeti Magi Staff, Wind Rune Jaka",
               "shortInstruction": "Give Magus Frinon the 3 pieces to receive the Staff of The Magister.",
               "who": "Magus Frinon",
-              "where": "Plane of Sky - the Efreeti Chamber, through the teleport pad at roughly 1600, 520 on Isle 1.",
+              "where": "Plane of Sky - the Efreeti Chamber. Buy an Efreeti's Key from the Key Master near where you zone in on Isle 1 (it is free), then take the teleport pad at the North point of that isle, around 1600, 520.",
               "what": "Hand Magus Frinon Hazy Opal (1), Efreeti Magi Staff (1), Wind Rune Jaka (1) to receive the Staff of The Magister.",
               "when": "Once every piece above is in your bags - the guide's own prerequisites say so.",
               "why": "This is the step that actually gives you the Staff of The Magister.",
@@ -5743,6 +5912,11 @@
                 {
                   "url": "https://eqlwiki.com/Magician_Plane_of_Sky_Tests",
                   "title": "Magician Plane of Sky Tests",
+                  "retrievedAt": "2026-09-09"
+                },
+                {
+                  "url": "https://eqlwiki.com/Plane_of_Sky",
+                  "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
                 }
               ]
@@ -5820,16 +5994,21 @@
                   "url": "https://eqlwiki.com/Monk_Plane_of_Sky_Tests",
                   "title": "Monk Plane of Sky Tests",
                   "retrievedAt": "2026-09-09"
+                },
+                {
+                  "url": "https://eqlwiki.com/Plane_of_Sky",
+                  "title": "Plane of Sky",
+                  "retrievedAt": "2026-09-09"
                 }
               ],
               "objectiveType": "Farm",
               "shortInstruction": "Loot a Wind Rune Caza from Plane of Sky trash.",
               "what": "Loot Wind Rune Caza (1).",
-              "when": "Any time you are in the zone - eqlwiki's Monk Plane of Sky Tests page says the wind runes are a random drop from any mob in the Plane of Sky.",
+              "when": "",
               "why": "Wind Rune Caza is one of the turn-in pieces for the Back Straps of Mastery.",
               "how": "",
               "who": "any Plane of Sky mob",
-              "where": "Plane of Sky - no fixed isle.",
+              "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
               "authoring": "Authored"
             }
           ]
@@ -5944,16 +6123,21 @@
                   "url": "https://eqlwiki.com/Monk_Plane_of_Sky_Tests",
                   "title": "Monk Plane of Sky Tests",
                   "retrievedAt": "2026-09-09"
+                },
+                {
+                  "url": "https://eqlwiki.com/Plane_of_Sky",
+                  "title": "Plane of Sky",
+                  "retrievedAt": "2026-09-09"
                 }
               ],
               "objectiveType": "Farm",
               "shortInstruction": "Loot a Wind Rune Lena from Plane of Sky trash.",
               "what": "Loot Wind Rune Lena (1).",
-              "when": "Any time you are in the zone - eqlwiki's Monk Plane of Sky Tests page says the wind runes are a random drop from any mob in the Plane of Sky.",
+              "when": "",
               "why": "Wind Rune Lena is one of the turn-in pieces for the Golden Sash of Tranquility.",
               "how": "",
               "who": "any Plane of Sky mob",
-              "where": "Plane of Sky - no fixed isle.",
+              "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
               "authoring": "Authored"
             }
           ]
@@ -6068,16 +6252,21 @@
                   "url": "https://eqlwiki.com/Monk_Plane_of_Sky_Tests",
                   "title": "Monk Plane of Sky Tests",
                   "retrievedAt": "2026-09-09"
+                },
+                {
+                  "url": "https://eqlwiki.com/Plane_of_Sky",
+                  "title": "Plane of Sky",
+                  "retrievedAt": "2026-09-09"
                 }
               ],
               "objectiveType": "Farm",
               "shortInstruction": "Loot a Wind Rune Jaka from Plane of Sky trash.",
               "what": "Loot Wind Rune Jaka (1).",
-              "when": "Any time you are in the zone - eqlwiki's Monk Plane of Sky Tests page says the wind runes are a random drop from any mob in the Plane of Sky.",
+              "when": "",
               "why": "Wind Rune Jaka is one of the turn-in pieces for the Sandals of Alacrity.",
               "how": "",
               "who": "any Plane of Sky mob",
-              "where": "Plane of Sky - no fixed isle.",
+              "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
               "authoring": "Authored"
             }
           ]
@@ -6192,16 +6381,21 @@
                   "url": "https://eqlwiki.com/Monk_Plane_of_Sky_Tests",
                   "title": "Monk Plane of Sky Tests",
                   "retrievedAt": "2026-09-09"
+                },
+                {
+                  "url": "https://eqlwiki.com/Plane_of_Sky",
+                  "title": "Plane of Sky",
+                  "retrievedAt": "2026-09-09"
                 }
               ],
               "objectiveType": "Farm",
               "shortInstruction": "Loot a Wind Rune Geza from Plane of Sky trash.",
               "what": "Loot Wind Rune Geza (1).",
-              "when": "Any time you are in the zone - eqlwiki's Monk Plane of Sky Tests page says the wind runes are a random drop from any mob in the Plane of Sky.",
+              "when": "",
               "why": "Wind Rune Geza is one of the turn-in pieces for the Ton Po's Eye Patch.",
               "how": "",
               "who": "any Plane of Sky mob",
-              "where": "Plane of Sky - no fixed isle.",
+              "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
               "authoring": "Authored"
             }
           ]
@@ -6316,16 +6510,21 @@
                   "url": "https://eqlwiki.com/Monk_Plane_of_Sky_Tests",
                   "title": "Monk Plane of Sky Tests",
                   "retrievedAt": "2026-09-09"
+                },
+                {
+                  "url": "https://eqlwiki.com/Plane_of_Sky",
+                  "title": "Plane of Sky",
+                  "retrievedAt": "2026-09-09"
                 }
               ],
               "objectiveType": "Farm",
               "shortInstruction": "Loot a Wind Rune Beza from Plane of Sky trash.",
               "what": "Loot Wind Rune Beza (1).",
-              "when": "Any time you are in the zone - eqlwiki's Monk Plane of Sky Tests page says the wind runes are a random drop from any mob in the Plane of Sky.",
+              "when": "",
               "why": "Wind Rune Beza is one of the turn-in pieces for the Ton Po's Shoulder Wraps.",
               "how": "",
               "who": "any Plane of Sky mob",
-              "where": "Plane of Sky - no fixed isle.",
+              "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
               "authoring": "Authored"
             }
           ]
@@ -6472,16 +6671,21 @@
                   "url": "https://eqlwiki.com/Monk_Plane_of_Sky_Tests",
                   "title": "Monk Plane of Sky Tests",
                   "retrievedAt": "2026-09-09"
+                },
+                {
+                  "url": "https://eqlwiki.com/Plane_of_Sky",
+                  "title": "Plane of Sky",
+                  "retrievedAt": "2026-09-09"
                 }
               ],
               "objectiveType": "Farm",
               "shortInstruction": "Loot a Wind Rune Neza from Plane of Sky trash.",
               "what": "Loot Wind Rune Neza (1).",
-              "when": "Any time you are in the zone - eqlwiki's Monk Plane of Sky Tests page says the wind runes are a random drop from any mob in the Plane of Sky.",
+              "when": "",
               "why": "Wind Rune Neza is one of the turn-in pieces for the Wu's Fist of Mastery.",
               "how": "",
               "who": "any Plane of Sky mob",
-              "where": "Plane of Sky - no fixed isle.",
+              "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
               "authoring": "Authored"
             }
           ]
@@ -6598,16 +6802,21 @@
                   "url": "https://eqlwiki.com/Necromancer_Plane_of_Sky_Tests",
                   "title": "Necromancer Plane of Sky Tests",
                   "retrievedAt": "2026-09-09"
+                },
+                {
+                  "url": "https://eqlwiki.com/Plane_of_Sky",
+                  "title": "Plane of Sky",
+                  "retrievedAt": "2026-09-09"
                 }
               ],
               "objectiveType": "Farm",
               "shortInstruction": "Loot a Wind Rune Caza from Plane of Sky trash.",
               "what": "Loot Wind Rune Caza (1).",
-              "when": "Any time you are in the zone - eqlwiki's Necromancer Plane of Sky Tests page says the wind runes are a random drop from any mob in the Plane of Sky.",
+              "when": "",
               "why": "Wind Rune Caza is one of the turn-in pieces for the Band of Wailing Winds.",
               "how": "",
               "who": "any Plane of Sky mob",
-              "where": "Plane of Sky - no fixed isle.",
+              "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
               "authoring": "Authored"
             }
           ]
@@ -6625,7 +6834,7 @@
               "title": "Hand in Ring of Veeshan, Wind Rune Caza",
               "shortInstruction": "Give Drakis Bloodcaster the 2 pieces to receive the Band of Wailing Winds.",
               "who": "Drakis Bloodcaster",
-              "where": "Plane of Sky - the Efreeti Chamber, through the teleport pad at roughly 1600, 520 on Isle 1.",
+              "where": "Plane of Sky - the Efreeti Chamber. Buy an Efreeti's Key from the Key Master near where you zone in on Isle 1 (it is free), then take the teleport pad at the North point of that isle, around 1600, 520.",
               "what": "Hand Drakis Bloodcaster Ring of Veeshan (1), Wind Rune Caza (1) to receive the Band of Wailing Winds.",
               "when": "Once every piece above is in your bags - the guide's own prerequisites say so.",
               "why": "This is the step that actually gives you the Band of Wailing Winds.",
@@ -6645,6 +6854,11 @@
                 {
                   "url": "https://eqlwiki.com/Necromancer_Plane_of_Sky_Tests",
                   "title": "Necromancer Plane of Sky Tests",
+                  "retrievedAt": "2026-09-09"
+                },
+                {
+                  "url": "https://eqlwiki.com/Plane_of_Sky",
+                  "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
                 }
               ]
@@ -6722,16 +6936,21 @@
                   "url": "https://eqlwiki.com/Necromancer_Plane_of_Sky_Tests",
                   "title": "Necromancer Plane of Sky Tests",
                   "retrievedAt": "2026-09-09"
+                },
+                {
+                  "url": "https://eqlwiki.com/Plane_of_Sky",
+                  "title": "Plane of Sky",
+                  "retrievedAt": "2026-09-09"
                 }
               ],
               "objectiveType": "Farm",
               "shortInstruction": "Loot a Wind Rune Ozah from Plane of Sky trash.",
               "what": "Loot Wind Rune Ozah (1).",
-              "when": "Any time you are in the zone - eqlwiki's Necromancer Plane of Sky Tests page says the wind runes are a random drop from any mob in the Plane of Sky.",
+              "when": "",
               "why": "Wind Rune Ozah is one of the turn-in pieces for the Bloodsoaked Raiment.",
               "how": "",
               "who": "any Plane of Sky mob",
-              "where": "Plane of Sky - no fixed isle.",
+              "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
               "authoring": "Authored"
             }
           ]
@@ -6749,7 +6968,7 @@
               "title": "Hand in Fine Cloth Raiment, Wind Rune Ozah",
               "shortInstruction": "Give Drakis Bloodcaster the 2 pieces to receive the Bloodsoaked Raiment.",
               "who": "Drakis Bloodcaster",
-              "where": "Plane of Sky - the Efreeti Chamber, through the teleport pad at roughly 1600, 520 on Isle 1.",
+              "where": "Plane of Sky - the Efreeti Chamber. Buy an Efreeti's Key from the Key Master near where you zone in on Isle 1 (it is free), then take the teleport pad at the North point of that isle, around 1600, 520.",
               "what": "Hand Drakis Bloodcaster Fine Cloth Raiment (1), Wind Rune Ozah (1) to receive the Bloodsoaked Raiment.",
               "when": "Once every piece above is in your bags - the guide's own prerequisites say so.",
               "why": "This is the step that actually gives you the Bloodsoaked Raiment.",
@@ -6769,6 +6988,11 @@
                 {
                   "url": "https://eqlwiki.com/Necromancer_Plane_of_Sky_Tests",
                   "title": "Necromancer Plane of Sky Tests",
+                  "retrievedAt": "2026-09-09"
+                },
+                {
+                  "url": "https://eqlwiki.com/Plane_of_Sky",
+                  "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
                 }
               ]
@@ -6846,16 +7070,21 @@
                   "url": "https://eqlwiki.com/Necromancer_Plane_of_Sky_Tests",
                   "title": "Necromancer Plane of Sky Tests",
                   "retrievedAt": "2026-09-09"
+                },
+                {
+                  "url": "https://eqlwiki.com/Plane_of_Sky",
+                  "title": "Plane of Sky",
+                  "retrievedAt": "2026-09-09"
                 }
               ],
               "objectiveType": "Farm",
               "shortInstruction": "Loot a Wind Rune Lena from Plane of Sky trash.",
               "what": "Loot Wind Rune Lena (1).",
-              "when": "Any time you are in the zone - eqlwiki's Necromancer Plane of Sky Tests page says the wind runes are a random drop from any mob in the Plane of Sky.",
+              "when": "",
               "why": "Wind Rune Lena is one of the turn-in pieces for the Bloody Griffon-Hide Wrist Guard.",
               "how": "",
               "who": "any Plane of Sky mob",
-              "where": "Plane of Sky - no fixed isle.",
+              "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
               "authoring": "Authored"
             }
           ]
@@ -6873,7 +7102,7 @@
               "title": "Hand in Griffon's Beak, Wind Rune Lena",
               "shortInstruction": "Give Drakis Bloodcaster the 2 pieces to receive the Bloody Griffon-Hide Wrist Guard.",
               "who": "Drakis Bloodcaster",
-              "where": "Plane of Sky - the Efreeti Chamber, through the teleport pad at roughly 1600, 520 on Isle 1.",
+              "where": "Plane of Sky - the Efreeti Chamber. Buy an Efreeti's Key from the Key Master near where you zone in on Isle 1 (it is free), then take the teleport pad at the North point of that isle, around 1600, 520.",
               "what": "Hand Drakis Bloodcaster Griffon's Beak (1), Wind Rune Lena (1) to receive the Bloody Griffon-Hide Wrist Guard.",
               "when": "Once every piece above is in your bags - the guide's own prerequisites say so.",
               "why": "This is the step that actually gives you the Bloody Griffon-Hide Wrist Guard.",
@@ -6893,6 +7122,11 @@
                 {
                   "url": "https://eqlwiki.com/Necromancer_Plane_of_Sky_Tests",
                   "title": "Necromancer Plane of Sky Tests",
+                  "retrievedAt": "2026-09-09"
+                },
+                {
+                  "url": "https://eqlwiki.com/Plane_of_Sky",
+                  "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
                 }
               ]
@@ -6970,16 +7204,21 @@
                   "url": "https://eqlwiki.com/Necromancer_Plane_of_Sky_Tests",
                   "title": "Necromancer Plane of Sky Tests",
                   "retrievedAt": "2026-09-09"
+                },
+                {
+                  "url": "https://eqlwiki.com/Plane_of_Sky",
+                  "title": "Plane of Sky",
+                  "retrievedAt": "2026-09-09"
                 }
               ],
               "objectiveType": "Farm",
               "shortInstruction": "Loot a Wind Rune Neza from Plane of Sky trash.",
               "what": "Loot Wind Rune Neza (1).",
-              "when": "Any time you are in the zone - eqlwiki's Necromancer Plane of Sky Tests page says the wind runes are a random drop from any mob in the Plane of Sky.",
+              "when": "",
               "why": "Wind Rune Neza is one of the turn-in pieces for the Cloak of Spiroc Feathers.",
               "how": "",
               "who": "any Plane of Sky mob",
-              "where": "Plane of Sky - no fixed isle.",
+              "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
               "authoring": "Authored"
             }
           ]
@@ -6997,7 +7236,7 @@
               "title": "Hand in Black Silk Cape, Wind Rune Neza",
               "shortInstruction": "Give Drakis Bloodcaster the 2 pieces to receive the Cloak of Spiroc Feathers.",
               "who": "Drakis Bloodcaster",
-              "where": "Plane of Sky - the Efreeti Chamber, through the teleport pad at roughly 1600, 520 on Isle 1.",
+              "where": "Plane of Sky - the Efreeti Chamber. Buy an Efreeti's Key from the Key Master near where you zone in on Isle 1 (it is free), then take the teleport pad at the North point of that isle, around 1600, 520.",
               "what": "Hand Drakis Bloodcaster Black Silk Cape (1), Wind Rune Neza (1) to receive the Cloak of Spiroc Feathers.",
               "when": "Once every piece above is in your bags - the guide's own prerequisites say so.",
               "why": "This is the step that actually gives you the Cloak of Spiroc Feathers.",
@@ -7017,6 +7256,11 @@
                 {
                   "url": "https://eqlwiki.com/Necromancer_Plane_of_Sky_Tests",
                   "title": "Necromancer Plane of Sky Tests",
+                  "retrievedAt": "2026-09-09"
+                },
+                {
+                  "url": "https://eqlwiki.com/Plane_of_Sky",
+                  "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
                 }
               ]
@@ -7126,16 +7370,21 @@
                   "url": "https://eqlwiki.com/Necromancer_Plane_of_Sky_Tests",
                   "title": "Necromancer Plane of Sky Tests",
                   "retrievedAt": "2026-09-09"
+                },
+                {
+                  "url": "https://eqlwiki.com/Plane_of_Sky",
+                  "title": "Plane of Sky",
+                  "retrievedAt": "2026-09-09"
                 }
               ],
               "objectiveType": "Farm",
               "shortInstruction": "Loot a Wind Rune Fana from Plane of Sky trash.",
               "what": "Loot Wind Rune Fana (1).",
-              "when": "Any time you are in the zone - eqlwiki's Necromancer Plane of Sky Tests page says the wind runes are a random drop from any mob in the Plane of Sky.",
+              "when": "",
               "why": "Wind Rune Fana is one of the turn-in pieces for the Gorgon Head Staff.",
               "how": "",
               "who": "any Plane of Sky mob",
-              "where": "Plane of Sky - no fixed isle.",
+              "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
               "authoring": "Authored"
             }
           ]
@@ -7153,7 +7402,7 @@
               "title": "Hand in Gorgon Head, Efreeti Great Staff, Wind Rune Fana",
               "shortInstruction": "Give Drakis Bloodcaster the 3 pieces to receive the Gorgon Head Staff.",
               "who": "Drakis Bloodcaster",
-              "where": "Plane of Sky - the Efreeti Chamber, through the teleport pad at roughly 1600, 520 on Isle 1.",
+              "where": "Plane of Sky - the Efreeti Chamber. Buy an Efreeti's Key from the Key Master near where you zone in on Isle 1 (it is free), then take the teleport pad at the North point of that isle, around 1600, 520.",
               "what": "Hand Drakis Bloodcaster Gorgon Head (1), Efreeti Great Staff (1), Wind Rune Fana (1) to receive the Gorgon Head Staff.",
               "when": "Once every piece above is in your bags - the guide's own prerequisites say so.",
               "why": "This is the step that actually gives you the Gorgon Head Staff.",
@@ -7175,6 +7424,11 @@
                 {
                   "url": "https://eqlwiki.com/Necromancer_Plane_of_Sky_Tests",
                   "title": "Necromancer Plane of Sky Tests",
+                  "retrievedAt": "2026-09-09"
+                },
+                {
+                  "url": "https://eqlwiki.com/Plane_of_Sky",
+                  "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
                 }
               ]
@@ -7252,16 +7506,21 @@
                   "url": "https://eqlwiki.com/Necromancer_Plane_of_Sky_Tests",
                   "title": "Necromancer Plane of Sky Tests",
                   "retrievedAt": "2026-09-09"
+                },
+                {
+                  "url": "https://eqlwiki.com/Plane_of_Sky",
+                  "title": "Plane of Sky",
+                  "retrievedAt": "2026-09-09"
                 }
               ],
               "objectiveType": "Farm",
               "shortInstruction": "Loot a Wind Rune Azia from Plane of Sky trash.",
               "what": "Loot Wind Rune Azia (1).",
-              "when": "Any time you are in the zone - eqlwiki's Necromancer Plane of Sky Tests page says the wind runes are a random drop from any mob in the Plane of Sky.",
+              "when": "",
               "why": "Wind Rune Azia is one of the turn-in pieces for the Sphinx Heart Amulet.",
               "how": "",
               "who": "any Plane of Sky mob",
-              "where": "Plane of Sky - no fixed isle.",
+              "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
               "authoring": "Authored"
             }
           ]
@@ -7279,7 +7538,7 @@
               "title": "Hand in Pulsating Ruby, Wind Rune Azia",
               "shortInstruction": "Give Drakis Bloodcaster the 2 pieces to receive the Sphinx Heart Amulet.",
               "who": "Drakis Bloodcaster",
-              "where": "Plane of Sky - the Efreeti Chamber, through the teleport pad at roughly 1600, 520 on Isle 1.",
+              "where": "Plane of Sky - the Efreeti Chamber. Buy an Efreeti's Key from the Key Master near where you zone in on Isle 1 (it is free), then take the teleport pad at the North point of that isle, around 1600, 520.",
               "what": "Hand Drakis Bloodcaster Pulsating Ruby (1), Wind Rune Azia (1) to receive the Sphinx Heart Amulet.",
               "when": "Once every piece above is in your bags - the guide's own prerequisites say so.",
               "why": "This is the step that actually gives you the Sphinx Heart Amulet.",
@@ -7299,6 +7558,11 @@
                 {
                   "url": "https://eqlwiki.com/Necromancer_Plane_of_Sky_Tests",
                   "title": "Necromancer Plane of Sky Tests",
+                  "retrievedAt": "2026-09-09"
+                },
+                {
+                  "url": "https://eqlwiki.com/Plane_of_Sky",
+                  "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
                 }
               ]
@@ -7376,16 +7640,21 @@
                   "url": "https://eqlwiki.com/Paladin_Plane_of_Sky_Tests",
                   "title": "Paladin Plane of Sky Tests",
                   "retrievedAt": "2026-09-09"
+                },
+                {
+                  "url": "https://eqlwiki.com/Plane_of_Sky",
+                  "title": "Plane of Sky",
+                  "retrievedAt": "2026-09-09"
                 }
               ],
               "objectiveType": "Farm",
               "shortInstruction": "Loot a Wind Rune Ozah from Plane of Sky trash.",
               "what": "Loot Wind Rune Ozah (1).",
-              "when": "Any time you are in the zone - eqlwiki's Paladin Plane of Sky Tests page says the wind runes are a random drop from any mob in the Plane of Sky.",
+              "when": "",
               "why": "Wind Rune Ozah is one of the turn-in pieces for the Aldryn, Blade of the Ocean.",
               "how": "",
               "who": "any Plane of Sky mob",
-              "where": "Plane of Sky - no fixed isle.",
+              "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
               "authoring": "Authored"
             }
           ]
@@ -7500,16 +7769,21 @@
                   "url": "https://eqlwiki.com/Paladin_Plane_of_Sky_Tests",
                   "title": "Paladin Plane of Sky Tests",
                   "retrievedAt": "2026-09-09"
+                },
+                {
+                  "url": "https://eqlwiki.com/Plane_of_Sky",
+                  "title": "Plane of Sky",
+                  "retrievedAt": "2026-09-09"
                 }
               ],
               "objectiveType": "Farm",
               "shortInstruction": "Loot a Wind Rune Lena from Plane of Sky trash.",
               "what": "Loot Wind Rune Lena (1).",
-              "when": "Any time you are in the zone - eqlwiki's Paladin Plane of Sky Tests page says the wind runes are a random drop from any mob in the Plane of Sky.",
+              "when": "",
               "why": "Wind Rune Lena is one of the turn-in pieces for the Girdle of Faith.",
               "how": "",
               "who": "any Plane of Sky mob",
-              "where": "Plane of Sky - no fixed isle.",
+              "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
               "authoring": "Authored"
             }
           ]
@@ -7656,16 +7930,21 @@
                   "url": "https://eqlwiki.com/Paladin_Plane_of_Sky_Tests",
                   "title": "Paladin Plane of Sky Tests",
                   "retrievedAt": "2026-09-09"
+                },
+                {
+                  "url": "https://eqlwiki.com/Plane_of_Sky",
+                  "title": "Plane of Sky",
+                  "retrievedAt": "2026-09-09"
                 }
               ],
               "objectiveType": "Farm",
               "shortInstruction": "Loot a Wind Rune Geza from Plane of Sky trash.",
               "what": "Loot Wind Rune Geza (1).",
-              "when": "Any time you are in the zone - eqlwiki's Paladin Plane of Sky Tests page says the wind runes are a random drop from any mob in the Plane of Sky.",
+              "when": "",
               "why": "Wind Rune Geza is one of the turn-in pieces for the Thelvorn, Blade of Light.",
               "how": "",
               "who": "any Plane of Sky mob",
-              "where": "Plane of Sky - no fixed isle.",
+              "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
               "authoring": "Authored"
             }
           ]
@@ -7814,16 +8093,21 @@
                   "url": "https://eqlwiki.com/Paladin_Plane_of_Sky_Tests",
                   "title": "Paladin Plane of Sky Tests",
                   "retrievedAt": "2026-09-09"
+                },
+                {
+                  "url": "https://eqlwiki.com/Plane_of_Sky",
+                  "title": "Plane of Sky",
+                  "retrievedAt": "2026-09-09"
                 }
               ],
               "objectiveType": "Farm",
               "shortInstruction": "Loot a Wind Rune Izah from Plane of Sky trash.",
               "what": "Loot Wind Rune Izah (1).",
-              "when": "Any time you are in the zone - eqlwiki's Paladin Plane of Sky Tests page says the wind runes are a random drop from any mob in the Plane of Sky.",
+              "when": "",
               "why": "Wind Rune Izah is one of the turn-in pieces for the Truvinan.",
               "how": "",
               "who": "any Plane of Sky mob",
-              "where": "Plane of Sky - no fixed isle.",
+              "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
               "authoring": "Authored"
             }
           ]
@@ -7969,8 +8253,8 @@
               "title": "Collect Wind Rune Ena",
               "sources": [
                 {
-                  "url": "https://eqlwiki.com/Ranger_Plane_of_Sky_Tests",
-                  "title": "Ranger Plane of Sky Tests",
+                  "url": "https://eqlwiki.com/Plane_of_Sky",
+                  "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
                 }
               ],
@@ -7980,10 +8264,9 @@
               "when": "",
               "why": "Wind Rune Ena is one of the turn-in pieces for the Arydryidriyorn.",
               "how": "",
-              "who": "",
-              "where": "",
-              "authoring": "Stub",
-              "stubNote": "eqlwiki's Ranger Plane of Sky Tests page does not say which isle or which mob drops Wind Rune Ena, and EQBuddy's Sky checklist records only \"Trash mobs\". Four class pages (Monk, Enchanter, Necromancer, Paladin) describe wind runes as a random drop from any mob in the Plane of Sky, which is the closest thing to an answer we have for this one. If you have looted it, tell us the isle and the mob."
+              "who": "any Plane of Sky mob",
+              "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
+              "authoring": "Authored"
             }
           ]
         },
@@ -8096,8 +8379,8 @@
               "title": "Collect Wind Rune Neza",
               "sources": [
                 {
-                  "url": "https://eqlwiki.com/Ranger_Plane_of_Sky_Tests",
-                  "title": "Ranger Plane of Sky Tests",
+                  "url": "https://eqlwiki.com/Plane_of_Sky",
+                  "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
                 }
               ],
@@ -8107,10 +8390,9 @@
               "when": "",
               "why": "Wind Rune Neza is one of the turn-in pieces for the Dark Cloak of the Sky.",
               "how": "",
-              "who": "",
-              "where": "",
-              "authoring": "Stub",
-              "stubNote": "eqlwiki's Ranger Plane of Sky Tests page does not say which isle or which mob drops Wind Rune Neza, and EQBuddy's Sky checklist records only \"Trash mobs\". Four class pages (Monk, Enchanter, Necromancer, Paladin) describe wind runes as a random drop from any mob in the Plane of Sky, which is the closest thing to an answer we have for this one. If you have looted it, tell us the isle and the mob."
+              "who": "any Plane of Sky mob",
+              "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
+              "authoring": "Authored"
             }
           ]
         },
@@ -8221,8 +8503,8 @@
               "title": "Collect Wind Rune Kala",
               "sources": [
                 {
-                  "url": "https://eqlwiki.com/Ranger_Plane_of_Sky_Tests",
-                  "title": "Ranger Plane of Sky Tests",
+                  "url": "https://eqlwiki.com/Plane_of_Sky",
+                  "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
                 }
               ],
@@ -8232,10 +8514,9 @@
               "when": "",
               "why": "Wind Rune Kala is one of the turn-in pieces for the Earthshaker's Mantle.",
               "how": "",
-              "who": "",
-              "where": "",
-              "authoring": "Stub",
-              "stubNote": "eqlwiki's Ranger Plane of Sky Tests page does not say which isle or which mob drops Wind Rune Kala, and EQBuddy's Sky checklist records only \"Trash mobs\". Four class pages (Monk, Enchanter, Necromancer, Paladin) describe wind runes as a random drop from any mob in the Plane of Sky, which is the closest thing to an answer we have for this one. If you have looted it, tell us the isle and the mob."
+              "who": "any Plane of Sky mob",
+              "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
+              "authoring": "Authored"
             }
           ]
         },
@@ -8346,8 +8627,8 @@
               "title": "Collect Wind Rune Meda",
               "sources": [
                 {
-                  "url": "https://eqlwiki.com/Ranger_Plane_of_Sky_Tests",
-                  "title": "Ranger Plane of Sky Tests",
+                  "url": "https://eqlwiki.com/Plane_of_Sky",
+                  "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
                 }
               ],
@@ -8357,10 +8638,9 @@
               "when": "",
               "why": "Wind Rune Meda is one of the turn-in pieces for the Griffon Talon Necklace.",
               "how": "",
-              "who": "",
-              "where": "",
-              "authoring": "Stub",
-              "stubNote": "eqlwiki's Ranger Plane of Sky Tests page does not say which isle or which mob drops Wind Rune Meda, and EQBuddy's Sky checklist records only \"Trash mobs\". Four class pages (Monk, Enchanter, Necromancer, Paladin) describe wind runes as a random drop from any mob in the Plane of Sky, which is the closest thing to an answer we have for this one. If you have looted it, tell us the isle and the mob."
+              "who": "any Plane of Sky mob",
+              "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
+              "authoring": "Authored"
             }
           ]
         },
@@ -8471,8 +8751,8 @@
               "title": "Collect Wind Rune Azia",
               "sources": [
                 {
-                  "url": "https://eqlwiki.com/Ranger_Plane_of_Sky_Tests",
-                  "title": "Ranger Plane of Sky Tests",
+                  "url": "https://eqlwiki.com/Plane_of_Sky",
+                  "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
                 }
               ],
@@ -8482,10 +8762,9 @@
               "when": "",
               "why": "Wind Rune Azia is one of the turn-in pieces for the Thunderforged Earring.",
               "how": "",
-              "who": "",
-              "where": "",
-              "authoring": "Stub",
-              "stubNote": "eqlwiki's Ranger Plane of Sky Tests page does not say which isle or which mob drops Wind Rune Azia, and EQBuddy's Sky checklist records only \"Trash mobs\". Four class pages (Monk, Enchanter, Necromancer, Paladin) describe wind runes as a random drop from any mob in the Plane of Sky, which is the closest thing to an answer we have for this one. If you have looted it, tell us the isle and the mob."
+              "who": "any Plane of Sky mob",
+              "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
+              "authoring": "Authored"
             }
           ]
         },
@@ -8628,8 +8907,8 @@
               "title": "Collect Wind Rune Heda",
               "sources": [
                 {
-                  "url": "https://eqlwiki.com/Ranger_Plane_of_Sky_Tests",
-                  "title": "Ranger Plane of Sky Tests",
+                  "url": "https://eqlwiki.com/Plane_of_Sky",
+                  "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
                 }
               ],
@@ -8639,10 +8918,9 @@
               "when": "",
               "why": "Wind Rune Heda is one of the turn-in pieces for the Windstriker.",
               "how": "",
-              "who": "",
-              "where": "",
-              "authoring": "Stub",
-              "stubNote": "eqlwiki's Ranger Plane of Sky Tests page does not say which isle or which mob drops Wind Rune Heda, and EQBuddy's Sky checklist records only \"Trash mobs\". Four class pages (Monk, Enchanter, Necromancer, Paladin) describe wind runes as a random drop from any mob in the Plane of Sky, which is the closest thing to an answer we have for this one. If you have looted it, tell us the isle and the mob."
+              "who": "any Plane of Sky mob",
+              "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
+              "authoring": "Authored"
             }
           ]
         },
@@ -8755,8 +9033,8 @@
               "title": "Collect Wind Rune Dena",
               "sources": [
                 {
-                  "url": "https://eqlwiki.com/Rogue_Plane_of_Sky_Tests",
-                  "title": "Rogue Plane of Sky Tests",
+                  "url": "https://eqlwiki.com/Plane_of_Sky",
+                  "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
                 }
               ],
@@ -8766,10 +9044,9 @@
               "when": "",
               "why": "Wind Rune Dena is one of the turn-in pieces for the Crystal Mask.",
               "how": "",
-              "who": "",
-              "where": "",
-              "authoring": "Stub",
-              "stubNote": "eqlwiki's Rogue Plane of Sky Tests page does not say which isle or which mob drops Wind Rune Dena, and EQBuddy's Sky checklist records only \"Trash mobs\". Four class pages (Monk, Enchanter, Necromancer, Paladin) describe wind runes as a random drop from any mob in the Plane of Sky, which is the closest thing to an answer we have for this one. If you have looted it, tell us the isle and the mob."
+              "who": "any Plane of Sky mob",
+              "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
+              "authoring": "Authored"
             }
           ]
         },
@@ -8880,8 +9157,8 @@
               "title": "Collect Wind Rune Ena",
               "sources": [
                 {
-                  "url": "https://eqlwiki.com/Rogue_Plane_of_Sky_Tests",
-                  "title": "Rogue Plane of Sky Tests",
+                  "url": "https://eqlwiki.com/Plane_of_Sky",
+                  "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
                 }
               ],
@@ -8891,10 +9168,9 @@
               "when": "",
               "why": "Wind Rune Ena is one of the turn-in pieces for the Griffon Wing Spaulders.",
               "how": "",
-              "who": "",
-              "where": "",
-              "authoring": "Stub",
-              "stubNote": "eqlwiki's Rogue Plane of Sky Tests page does not say which isle or which mob drops Wind Rune Ena, and EQBuddy's Sky checklist records only \"Trash mobs\". Four class pages (Monk, Enchanter, Necromancer, Paladin) describe wind runes as a random drop from any mob in the Plane of Sky, which is the closest thing to an answer we have for this one. If you have looted it, tell us the isle and the mob."
+              "who": "any Plane of Sky mob",
+              "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
+              "authoring": "Authored"
             }
           ]
         },
@@ -9005,8 +9281,8 @@
               "title": "Collect Wind Rune Izah",
               "sources": [
                 {
-                  "url": "https://eqlwiki.com/Rogue_Plane_of_Sky_Tests",
-                  "title": "Rogue Plane of Sky Tests",
+                  "url": "https://eqlwiki.com/Plane_of_Sky",
+                  "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
                 }
               ],
@@ -9016,10 +9292,9 @@
               "when": "",
               "why": "Wind Rune Izah is one of the turn-in pieces for the Renard's Belt of Quickness.",
               "how": "",
-              "who": "",
-              "where": "",
-              "authoring": "Stub",
-              "stubNote": "eqlwiki's Rogue Plane of Sky Tests page does not say which isle or which mob drops Wind Rune Izah, and EQBuddy's Sky checklist records only \"Trash mobs\". Four class pages (Monk, Enchanter, Necromancer, Paladin) describe wind runes as a random drop from any mob in the Plane of Sky, which is the closest thing to an answer we have for this one. If you have looted it, tell us the isle and the mob."
+              "who": "any Plane of Sky mob",
+              "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
+              "authoring": "Authored"
             }
           ]
         },
@@ -9130,8 +9405,8 @@
               "title": "Collect Wind Rune Geza",
               "sources": [
                 {
-                  "url": "https://eqlwiki.com/Rogue_Plane_of_Sky_Tests",
-                  "title": "Rogue Plane of Sky Tests",
+                  "url": "https://eqlwiki.com/Plane_of_Sky",
+                  "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
                 }
               ],
@@ -9141,10 +9416,9 @@
               "when": "",
               "why": "Wind Rune Geza is one of the turn-in pieces for the Shimmering Bracer of Protection.",
               "how": "",
-              "who": "",
-              "where": "",
-              "authoring": "Stub",
-              "stubNote": "eqlwiki's Rogue Plane of Sky Tests page does not say which isle or which mob drops Wind Rune Geza, and EQBuddy's Sky checklist records only \"Trash mobs\". Four class pages (Monk, Enchanter, Necromancer, Paladin) describe wind runes as a random drop from any mob in the Plane of Sky, which is the closest thing to an answer we have for this one. If you have looted it, tell us the isle and the mob."
+              "who": "any Plane of Sky mob",
+              "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
+              "authoring": "Authored"
             }
           ]
         },
@@ -9287,8 +9561,8 @@
               "title": "Collect Wind Rune Jaka",
               "sources": [
                 {
-                  "url": "https://eqlwiki.com/Rogue_Plane_of_Sky_Tests",
-                  "title": "Rogue Plane of Sky Tests",
+                  "url": "https://eqlwiki.com/Plane_of_Sky",
+                  "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
                 }
               ],
@@ -9298,10 +9572,9 @@
               "when": "",
               "why": "Wind Rune Jaka is one of the turn-in pieces for the Thornstinger.",
               "how": "",
-              "who": "",
-              "where": "",
-              "authoring": "Stub",
-              "stubNote": "eqlwiki's Rogue Plane of Sky Tests page does not say which isle or which mob drops Wind Rune Jaka, and EQBuddy's Sky checklist records only \"Trash mobs\". Four class pages (Monk, Enchanter, Necromancer, Paladin) describe wind runes as a random drop from any mob in the Plane of Sky, which is the closest thing to an answer we have for this one. If you have looted it, tell us the isle and the mob."
+              "who": "any Plane of Sky mob",
+              "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
+              "authoring": "Authored"
             }
           ]
         },
@@ -9414,8 +9687,8 @@
               "title": "Collect Wind Rune Ozah",
               "sources": [
                 {
-                  "url": "https://eqlwiki.com/Rogue_Plane_of_Sky_Tests",
-                  "title": "Rogue Plane of Sky Tests",
+                  "url": "https://eqlwiki.com/Plane_of_Sky",
+                  "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
                 }
               ],
@@ -9425,10 +9698,9 @@
               "when": "",
               "why": "Wind Rune Ozah is one of the turn-in pieces for the Wispy Choker of Vigor.",
               "how": "",
-              "who": "",
-              "where": "",
-              "authoring": "Stub",
-              "stubNote": "eqlwiki's Rogue Plane of Sky Tests page does not say which isle or which mob drops Wind Rune Ozah, and EQBuddy's Sky checklist records only \"Trash mobs\". Four class pages (Monk, Enchanter, Necromancer, Paladin) describe wind runes as a random drop from any mob in the Plane of Sky, which is the closest thing to an answer we have for this one. If you have looted it, tell us the isle and the mob."
+              "who": "any Plane of Sky mob",
+              "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
+              "authoring": "Authored"
             }
           ]
         },
@@ -9539,8 +9811,8 @@
               "title": "Collect Wind Rune Ozah",
               "sources": [
                 {
-                  "url": "https://eqlwiki.com/Shadow_Knight_Plane_of_Sky_Tests",
-                  "title": "Shadow Knight Plane of Sky Tests",
+                  "url": "https://eqlwiki.com/Plane_of_Sky",
+                  "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
                 }
               ],
@@ -9550,10 +9822,9 @@
               "when": "",
               "why": "Wind Rune Ozah is one of the turn-in pieces for the Amulet of the Sphinx Eye.",
               "how": "",
-              "who": "",
-              "where": "",
-              "authoring": "Stub",
-              "stubNote": "eqlwiki's Shadow Knight Plane of Sky Tests page does not say which isle or which mob drops Wind Rune Ozah, and EQBuddy's Sky checklist records only \"Trash mobs\". Four class pages (Monk, Enchanter, Necromancer, Paladin) describe wind runes as a random drop from any mob in the Plane of Sky, which is the closest thing to an answer we have for this one. If you have looted it, tell us the isle and the mob."
+              "who": "any Plane of Sky mob",
+              "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
+              "authoring": "Authored"
             }
           ]
         },
@@ -9664,8 +9935,8 @@
               "title": "Collect Wind Rune Fana",
               "sources": [
                 {
-                  "url": "https://eqlwiki.com/Shadow_Knight_Plane_of_Sky_Tests",
-                  "title": "Shadow Knight Plane of Sky Tests",
+                  "url": "https://eqlwiki.com/Plane_of_Sky",
+                  "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
                 }
               ],
@@ -9675,10 +9946,9 @@
               "when": "",
               "why": "Wind Rune Fana is one of the turn-in pieces for the Blood Sky Face Plate.",
               "how": "",
-              "who": "",
-              "where": "",
-              "authoring": "Stub",
-              "stubNote": "eqlwiki's Shadow Knight Plane of Sky Tests page does not say which isle or which mob drops Wind Rune Fana, and EQBuddy's Sky checklist records only \"Trash mobs\". Four class pages (Monk, Enchanter, Necromancer, Paladin) describe wind runes as a random drop from any mob in the Plane of Sky, which is the closest thing to an answer we have for this one. If you have looted it, tell us the isle and the mob."
+              "who": "any Plane of Sky mob",
+              "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
+              "authoring": "Authored"
             }
           ]
         },
@@ -9789,8 +10059,8 @@
               "title": "Collect Wind Rune Beza",
               "sources": [
                 {
-                  "url": "https://eqlwiki.com/Shadow_Knight_Plane_of_Sky_Tests",
-                  "title": "Shadow Knight Plane of Sky Tests",
+                  "url": "https://eqlwiki.com/Plane_of_Sky",
+                  "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
                 }
               ],
@@ -9800,10 +10070,9 @@
               "when": "",
               "why": "Wind Rune Beza is one of the turn-in pieces for the Crimson Ring of the Djinni.",
               "how": "",
-              "who": "",
-              "where": "",
-              "authoring": "Stub",
-              "stubNote": "eqlwiki's Shadow Knight Plane of Sky Tests page does not say which isle or which mob drops Wind Rune Beza, and EQBuddy's Sky checklist records only \"Trash mobs\". Four class pages (Monk, Enchanter, Necromancer, Paladin) describe wind runes as a random drop from any mob in the Plane of Sky, which is the closest thing to an answer we have for this one. If you have looted it, tell us the isle and the mob."
+              "who": "any Plane of Sky mob",
+              "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
+              "authoring": "Authored"
             }
           ]
         },
@@ -9946,8 +10215,8 @@
               "title": "Collect Wind Rune Kala",
               "sources": [
                 {
-                  "url": "https://eqlwiki.com/Shadow_Knight_Plane_of_Sky_Tests",
-                  "title": "Shadow Knight Plane of Sky Tests",
+                  "url": "https://eqlwiki.com/Plane_of_Sky",
+                  "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
                 }
               ],
@@ -9957,10 +10226,9 @@
               "when": "",
               "why": "Wind Rune Kala is one of the turn-in pieces for the Khyldorn the Blood Drinker.",
               "how": "",
-              "who": "",
-              "where": "",
-              "authoring": "Stub",
-              "stubNote": "eqlwiki's Shadow Knight Plane of Sky Tests page does not say which isle or which mob drops Wind Rune Kala, and EQBuddy's Sky checklist records only \"Trash mobs\". Four class pages (Monk, Enchanter, Necromancer, Paladin) describe wind runes as a random drop from any mob in the Plane of Sky, which is the closest thing to an answer we have for this one. If you have looted it, tell us the isle and the mob."
+              "who": "any Plane of Sky mob",
+              "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
+              "authoring": "Authored"
             }
           ]
         },
@@ -10073,8 +10341,8 @@
               "title": "Collect Wind Rune Heda",
               "sources": [
                 {
-                  "url": "https://eqlwiki.com/Shadow_Knight_Plane_of_Sky_Tests",
-                  "title": "Shadow Knight Plane of Sky Tests",
+                  "url": "https://eqlwiki.com/Plane_of_Sky",
+                  "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
                 }
               ],
@@ -10084,10 +10352,9 @@
               "when": "",
               "why": "Wind Rune Heda is one of the turn-in pieces for the Obtenebrate Mithril Guard.",
               "how": "",
-              "who": "",
-              "where": "",
-              "authoring": "Stub",
-              "stubNote": "eqlwiki's Shadow Knight Plane of Sky Tests page does not say which isle or which mob drops Wind Rune Heda, and EQBuddy's Sky checklist records only \"Trash mobs\". Four class pages (Monk, Enchanter, Necromancer, Paladin) describe wind runes as a random drop from any mob in the Plane of Sky, which is the closest thing to an answer we have for this one. If you have looted it, tell us the isle and the mob."
+              "who": "any Plane of Sky mob",
+              "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
+              "authoring": "Authored"
             }
           ]
         },
@@ -10230,8 +10497,8 @@
               "title": "Collect Wind Rune Izah",
               "sources": [
                 {
-                  "url": "https://eqlwiki.com/Shadow_Knight_Plane_of_Sky_Tests",
-                  "title": "Shadow Knight Plane of Sky Tests",
+                  "url": "https://eqlwiki.com/Plane_of_Sky",
+                  "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
                 }
               ],
@@ -10241,10 +10508,9 @@
               "when": "",
               "why": "Wind Rune Izah is one of the turn-in pieces for the Pearlescent Pauldrons.",
               "how": "",
-              "who": "",
-              "where": "",
-              "authoring": "Stub",
-              "stubNote": "eqlwiki's Shadow Knight Plane of Sky Tests page does not say which isle or which mob drops Wind Rune Izah, and EQBuddy's Sky checklist records only \"Trash mobs\". Four class pages (Monk, Enchanter, Necromancer, Paladin) describe wind runes as a random drop from any mob in the Plane of Sky, which is the closest thing to an answer we have for this one. If you have looted it, tell us the isle and the mob."
+              "who": "any Plane of Sky mob",
+              "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
+              "authoring": "Authored"
             }
           ]
         },
@@ -10357,8 +10623,8 @@
               "title": "Collect Wind Rune Dena",
               "sources": [
                 {
-                  "url": "https://eqlwiki.com/Shadow_Knight_Plane_of_Sky_Tests",
-                  "title": "Shadow Knight Plane of Sky Tests",
+                  "url": "https://eqlwiki.com/Plane_of_Sky",
+                  "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
                 }
               ],
@@ -10368,10 +10634,9 @@
               "when": "",
               "why": "Wind Rune Dena is one of the turn-in pieces for the Pegasus-Hide Belt.",
               "how": "",
-              "who": "",
-              "where": "",
-              "authoring": "Stub",
-              "stubNote": "eqlwiki's Shadow Knight Plane of Sky Tests page does not say which isle or which mob drops Wind Rune Dena, and EQBuddy's Sky checklist records only \"Trash mobs\". Four class pages (Monk, Enchanter, Necromancer, Paladin) describe wind runes as a random drop from any mob in the Plane of Sky, which is the closest thing to an answer we have for this one. If you have looted it, tell us the isle and the mob."
+              "who": "any Plane of Sky mob",
+              "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
+              "authoring": "Authored"
             }
           ]
         },
@@ -10482,8 +10747,8 @@
               "title": "Collect Wind Rune Meda",
               "sources": [
                 {
-                  "url": "https://eqlwiki.com/Shaman_Plane_of_Sky_Tests",
-                  "title": "Shaman Plane of Sky Tests",
+                  "url": "https://eqlwiki.com/Plane_of_Sky",
+                  "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
                 }
               ],
@@ -10493,10 +10758,9 @@
               "when": "",
               "why": "Wind Rune Meda is one of the turn-in pieces for the Amulet of the Fang.",
               "how": "",
-              "who": "",
-              "where": "",
-              "authoring": "Stub",
-              "stubNote": "eqlwiki's Shaman Plane of Sky Tests page does not say which isle or which mob drops Wind Rune Meda, and EQBuddy's Sky checklist records only \"Trash mobs\". Four class pages (Monk, Enchanter, Necromancer, Paladin) describe wind runes as a random drop from any mob in the Plane of Sky, which is the closest thing to an answer we have for this one. If you have looted it, tell us the isle and the mob."
+              "who": "any Plane of Sky mob",
+              "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
+              "authoring": "Authored"
             }
           ]
         },
@@ -10607,8 +10871,8 @@
               "title": "Collect Wind Rune Kala",
               "sources": [
                 {
-                  "url": "https://eqlwiki.com/Shaman_Plane_of_Sky_Tests",
-                  "title": "Shaman Plane of Sky Tests",
+                  "url": "https://eqlwiki.com/Plane_of_Sky",
+                  "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
                 }
               ],
@@ -10618,10 +10882,9 @@
               "when": "",
               "why": "Wind Rune Kala is one of the turn-in pieces for the Bracelet of the Spirits.",
               "how": "",
-              "who": "",
-              "where": "",
-              "authoring": "Stub",
-              "stubNote": "eqlwiki's Shaman Plane of Sky Tests page does not say which isle or which mob drops Wind Rune Kala, and EQBuddy's Sky checklist records only \"Trash mobs\". Four class pages (Monk, Enchanter, Necromancer, Paladin) describe wind runes as a random drop from any mob in the Plane of Sky, which is the closest thing to an answer we have for this one. If you have looted it, tell us the isle and the mob."
+              "who": "any Plane of Sky mob",
+              "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
+              "authoring": "Authored"
             }
           ]
         },
@@ -10732,8 +10995,8 @@
               "title": "Collect Wind Rune Beza",
               "sources": [
                 {
-                  "url": "https://eqlwiki.com/Shaman_Plane_of_Sky_Tests",
-                  "title": "Shaman Plane of Sky Tests",
+                  "url": "https://eqlwiki.com/Plane_of_Sky",
+                  "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
                 }
               ],
@@ -10743,10 +11006,9 @@
               "when": "",
               "why": "Wind Rune Beza is one of the turn-in pieces for the Fairy-Hide Mantle.",
               "how": "",
-              "who": "",
-              "where": "",
-              "authoring": "Stub",
-              "stubNote": "eqlwiki's Shaman Plane of Sky Tests page does not say which isle or which mob drops Wind Rune Beza, and EQBuddy's Sky checklist records only \"Trash mobs\". Four class pages (Monk, Enchanter, Necromancer, Paladin) describe wind runes as a random drop from any mob in the Plane of Sky, which is the closest thing to an answer we have for this one. If you have looted it, tell us the isle and the mob."
+              "who": "any Plane of Sky mob",
+              "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
+              "authoring": "Authored"
             }
           ]
         },
@@ -10889,8 +11151,8 @@
               "title": "Collect Wind Rune Geza",
               "sources": [
                 {
-                  "url": "https://eqlwiki.com/Shaman_Plane_of_Sky_Tests",
-                  "title": "Shaman Plane of Sky Tests",
+                  "url": "https://eqlwiki.com/Plane_of_Sky",
+                  "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
                 }
               ],
@@ -10900,10 +11162,9 @@
               "when": "",
               "why": "Wind Rune Geza is one of the turn-in pieces for the Garduk.",
               "how": "",
-              "who": "",
-              "where": "",
-              "authoring": "Stub",
-              "stubNote": "eqlwiki's Shaman Plane of Sky Tests page does not say which isle or which mob drops Wind Rune Geza, and EQBuddy's Sky checklist records only \"Trash mobs\". Four class pages (Monk, Enchanter, Necromancer, Paladin) describe wind runes as a random drop from any mob in the Plane of Sky, which is the closest thing to an answer we have for this one. If you have looted it, tell us the isle and the mob."
+              "who": "any Plane of Sky mob",
+              "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
+              "authoring": "Authored"
             }
           ]
         },
@@ -11049,8 +11310,8 @@
               "title": "Collect Wind Rune Heda",
               "sources": [
                 {
-                  "url": "https://eqlwiki.com/Shaman_Plane_of_Sky_Tests",
-                  "title": "Shaman Plane of Sky Tests",
+                  "url": "https://eqlwiki.com/Plane_of_Sky",
+                  "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
                 }
               ],
@@ -11060,10 +11321,9 @@
               "when": "",
               "why": "Wind Rune Heda is one of the turn-in pieces for the Vermilion Sky Ring.",
               "how": "",
-              "who": "",
-              "where": "",
-              "authoring": "Stub",
-              "stubNote": "eqlwiki's Shaman Plane of Sky Tests page does not say which isle or which mob drops Wind Rune Heda, and EQBuddy's Sky checklist records only \"Trash mobs\". Four class pages (Monk, Enchanter, Necromancer, Paladin) describe wind runes as a random drop from any mob in the Plane of Sky, which is the closest thing to an answer we have for this one. If you have looted it, tell us the isle and the mob."
+              "who": "any Plane of Sky mob",
+              "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
+              "authoring": "Authored"
             }
           ]
         },
@@ -11208,8 +11468,8 @@
               "title": "Collect Wind Rune Ena",
               "sources": [
                 {
-                  "url": "https://eqlwiki.com/Shaman_Plane_of_Sky_Tests",
-                  "title": "Shaman Plane of Sky Tests",
+                  "url": "https://eqlwiki.com/Plane_of_Sky",
+                  "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
                 }
               ],
@@ -11219,10 +11479,9 @@
               "when": "",
               "why": "Wind Rune Ena is one of the turn-in pieces for the Warhammer of the Wind.",
               "how": "",
-              "who": "",
-              "where": "",
-              "authoring": "Stub",
-              "stubNote": "eqlwiki's Shaman Plane of Sky Tests page does not say which isle or which mob drops Wind Rune Ena, and EQBuddy's Sky checklist records only \"Trash mobs\". Four class pages (Monk, Enchanter, Necromancer, Paladin) describe wind runes as a random drop from any mob in the Plane of Sky, which is the closest thing to an answer we have for this one. If you have looted it, tell us the isle and the mob."
+              "who": "any Plane of Sky mob",
+              "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
+              "authoring": "Authored"
             }
           ]
         },
@@ -11335,8 +11594,8 @@
               "title": "Collect Wind Rune Neza",
               "sources": [
                 {
-                  "url": "https://eqlwiki.com/Warrior_Plane_of_Sky_Tests",
-                  "title": "Warrior Plane of Sky Tests",
+                  "url": "https://eqlwiki.com/Plane_of_Sky",
+                  "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
                 }
               ],
@@ -11346,10 +11605,9 @@
               "when": "",
               "why": "Wind Rune Neza is one of the turn-in pieces for the Azure Ruby Ring.",
               "how": "",
-              "who": "",
-              "where": "",
-              "authoring": "Stub",
-              "stubNote": "eqlwiki's Warrior Plane of Sky Tests page does not say which isle or which mob drops Wind Rune Neza, and EQBuddy's Sky checklist records only \"Trash mobs\". Four class pages (Monk, Enchanter, Necromancer, Paladin) describe wind runes as a random drop from any mob in the Plane of Sky, which is the closest thing to an answer we have for this one. If you have looted it, tell us the isle and the mob."
+              "who": "any Plane of Sky mob",
+              "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
+              "authoring": "Authored"
             }
           ]
         },
@@ -11366,7 +11624,7 @@
               "title": "Hand in Azure Ring, Wind Rune Neza",
               "shortInstruction": "Give Torgon Blademaster the 2 pieces to receive the Azure Ruby Ring.",
               "who": "Torgon Blademaster",
-              "where": "Plane of Sky - the Efreeti Chamber, through the teleport pad at roughly 1600, 520 on Isle 1.",
+              "where": "Plane of Sky - the Efreeti Chamber. Buy an Efreeti's Key from the Key Master near where you zone in on Isle 1 (it is free), then take the teleport pad at the North point of that isle, around 1600, 520.",
               "what": "Hand Torgon Blademaster Azure Ring (1), Wind Rune Neza (1) to receive the Azure Ruby Ring.",
               "when": "Once every piece above is in your bags - the guide's own prerequisites say so.",
               "why": "This is the step that actually gives you the Azure Ruby Ring.",
@@ -11386,6 +11644,11 @@
                 {
                   "url": "https://eqlwiki.com/Warrior_Plane_of_Sky_Tests",
                   "title": "Warrior Plane of Sky Tests",
+                  "retrievedAt": "2026-09-09"
+                },
+                {
+                  "url": "https://eqlwiki.com/Plane_of_Sky",
+                  "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
                 }
               ]
@@ -11492,8 +11755,8 @@
               "title": "Collect Wind Rune Fana",
               "sources": [
                 {
-                  "url": "https://eqlwiki.com/Warrior_Plane_of_Sky_Tests",
-                  "title": "Warrior Plane of Sky Tests",
+                  "url": "https://eqlwiki.com/Plane_of_Sky",
+                  "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
                 }
               ],
@@ -11503,10 +11766,9 @@
               "when": "",
               "why": "Wind Rune Fana is one of the turn-in pieces for the Belt of the Four Winds.",
               "how": "",
-              "who": "",
-              "where": "",
-              "authoring": "Stub",
-              "stubNote": "eqlwiki's Warrior Plane of Sky Tests page does not say which isle or which mob drops Wind Rune Fana, and EQBuddy's Sky checklist records only \"Trash mobs\". Four class pages (Monk, Enchanter, Necromancer, Paladin) describe wind runes as a random drop from any mob in the Plane of Sky, which is the closest thing to an answer we have for this one. If you have looted it, tell us the isle and the mob."
+              "who": "any Plane of Sky mob",
+              "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
+              "authoring": "Authored"
             }
           ]
         },
@@ -11523,7 +11785,7 @@
               "title": "Hand in Wind Tablet, Efreeti Belt, Wind Rune Fana",
               "shortInstruction": "Give Torgon Blademaster the 3 pieces to receive the Belt of the Four Winds.",
               "who": "Torgon Blademaster",
-              "where": "Plane of Sky - the Efreeti Chamber, through the teleport pad at roughly 1600, 520 on Isle 1.",
+              "where": "Plane of Sky - the Efreeti Chamber. Buy an Efreeti's Key from the Key Master near where you zone in on Isle 1 (it is free), then take the teleport pad at the North point of that isle, around 1600, 520.",
               "what": "Hand Torgon Blademaster Wind Tablet (1), Efreeti Belt (1), Wind Rune Fana (1) to receive the Belt of the Four Winds.",
               "when": "Once every piece above is in your bags - the guide's own prerequisites say so.",
               "why": "This is the step that actually gives you the Belt of the Four Winds.",
@@ -11545,6 +11807,11 @@
                 {
                   "url": "https://eqlwiki.com/Warrior_Plane_of_Sky_Tests",
                   "title": "Warrior Plane of Sky Tests",
+                  "retrievedAt": "2026-09-09"
+                },
+                {
+                  "url": "https://eqlwiki.com/Plane_of_Sky",
+                  "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
                 }
               ]
@@ -11651,8 +11918,8 @@
               "title": "Collect Wind Rune Jaka",
               "sources": [
                 {
-                  "url": "https://eqlwiki.com/Warrior_Plane_of_Sky_Tests",
-                  "title": "Warrior Plane of Sky Tests",
+                  "url": "https://eqlwiki.com/Plane_of_Sky",
+                  "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
                 }
               ],
@@ -11662,10 +11929,9 @@
               "when": "",
               "why": "Wind Rune Jaka is one of the turn-in pieces for the Dagas.",
               "how": "",
-              "who": "",
-              "where": "",
-              "authoring": "Stub",
-              "stubNote": "eqlwiki's Warrior Plane of Sky Tests page does not say which isle or which mob drops Wind Rune Jaka, and EQBuddy's Sky checklist records only \"Trash mobs\". Four class pages (Monk, Enchanter, Necromancer, Paladin) describe wind runes as a random drop from any mob in the Plane of Sky, which is the closest thing to an answer we have for this one. If you have looted it, tell us the isle and the mob."
+              "who": "any Plane of Sky mob",
+              "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
+              "authoring": "Authored"
             }
           ]
         },
@@ -11682,7 +11948,7 @@
               "title": "Hand in Djinni War Blade, Gem of Invigoration, Wind Rune Jaka",
               "shortInstruction": "Give Torgon Blademaster the 3 pieces to receive the Dagas.",
               "who": "Torgon Blademaster",
-              "where": "Plane of Sky - the Efreeti Chamber, through the teleport pad at roughly 1600, 520 on Isle 1.",
+              "where": "Plane of Sky - the Efreeti Chamber. Buy an Efreeti's Key from the Key Master near where you zone in on Isle 1 (it is free), then take the teleport pad at the North point of that isle, around 1600, 520.",
               "what": "Hand Torgon Blademaster Djinni War Blade (1), Gem of Invigoration (1), Wind Rune Jaka (1) to receive the Dagas.",
               "when": "Once every piece above is in your bags - the guide's own prerequisites say so.",
               "why": "This is the step that actually gives you the Dagas.",
@@ -11704,6 +11970,11 @@
                 {
                   "url": "https://eqlwiki.com/Warrior_Plane_of_Sky_Tests",
                   "title": "Warrior Plane of Sky Tests",
+                  "retrievedAt": "2026-09-09"
+                },
+                {
+                  "url": "https://eqlwiki.com/Plane_of_Sky",
+                  "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
                 }
               ]
@@ -11810,8 +12081,8 @@
               "title": "Collect Wind Rune Dena",
               "sources": [
                 {
-                  "url": "https://eqlwiki.com/Warrior_Plane_of_Sky_Tests",
-                  "title": "Warrior Plane of Sky Tests",
+                  "url": "https://eqlwiki.com/Plane_of_Sky",
+                  "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
                 }
               ],
@@ -11821,10 +12092,9 @@
               "when": "",
               "why": "Wind Rune Dena is one of the turn-in pieces for the Fangol.",
               "how": "",
-              "who": "",
-              "where": "",
-              "authoring": "Stub",
-              "stubNote": "eqlwiki's Warrior Plane of Sky Tests page does not say which isle or which mob drops Wind Rune Dena, and EQBuddy's Sky checklist records only \"Trash mobs\". Four class pages (Monk, Enchanter, Necromancer, Paladin) describe wind runes as a random drop from any mob in the Plane of Sky, which is the closest thing to an answer we have for this one. If you have looted it, tell us the isle and the mob."
+              "who": "any Plane of Sky mob",
+              "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
+              "authoring": "Authored"
             }
           ]
         },
@@ -11841,7 +12111,7 @@
               "title": "Hand in Ethereal Emerald, Efreeti Battle Axe, Wind Rune Dena",
               "shortInstruction": "Give Torgon Blademaster the 3 pieces to receive the Fangol.",
               "who": "Torgon Blademaster",
-              "where": "Plane of Sky - the Efreeti Chamber, through the teleport pad at roughly 1600, 520 on Isle 1.",
+              "where": "Plane of Sky - the Efreeti Chamber. Buy an Efreeti's Key from the Key Master near where you zone in on Isle 1 (it is free), then take the teleport pad at the North point of that isle, around 1600, 520.",
               "what": "Hand Torgon Blademaster Ethereal Emerald (1), Efreeti Battle Axe (1), Wind Rune Dena (1) to receive the Fangol.",
               "when": "Once every piece above is in your bags - the guide's own prerequisites say so.",
               "why": "This is the step that actually gives you the Fangol.",
@@ -11863,6 +12133,11 @@
                 {
                   "url": "https://eqlwiki.com/Warrior_Plane_of_Sky_Tests",
                   "title": "Warrior Plane of Sky Tests",
+                  "retrievedAt": "2026-09-09"
+                },
+                {
+                  "url": "https://eqlwiki.com/Plane_of_Sky",
+                  "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
                 }
               ]
@@ -11937,8 +12212,8 @@
               "title": "Collect Wind Rune Beza",
               "sources": [
                 {
-                  "url": "https://eqlwiki.com/Warrior_Plane_of_Sky_Tests",
-                  "title": "Warrior Plane of Sky Tests",
+                  "url": "https://eqlwiki.com/Plane_of_Sky",
+                  "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
                 }
               ],
@@ -11948,10 +12223,9 @@
               "when": "",
               "why": "Wind Rune Beza is one of the turn-in pieces for the Pauldrons of the Blue Sky.",
               "how": "",
-              "who": "",
-              "where": "",
-              "authoring": "Stub",
-              "stubNote": "eqlwiki's Warrior Plane of Sky Tests page does not say which isle or which mob drops Wind Rune Beza, and EQBuddy's Sky checklist records only \"Trash mobs\". Four class pages (Monk, Enchanter, Necromancer, Paladin) describe wind runes as a random drop from any mob in the Plane of Sky, which is the closest thing to an answer we have for this one. If you have looted it, tell us the isle and the mob."
+              "who": "any Plane of Sky mob",
+              "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
+              "authoring": "Authored"
             }
           ]
         },
@@ -11968,7 +12242,7 @@
               "title": "Hand in Spiroc Air Totem, Wind Rune Beza",
               "shortInstruction": "Give Torgon Blademaster the 2 pieces to receive the Pauldrons of the Blue Sky.",
               "who": "Torgon Blademaster",
-              "where": "Plane of Sky - the Efreeti Chamber, through the teleport pad at roughly 1600, 520 on Isle 1.",
+              "where": "Plane of Sky - the Efreeti Chamber. Buy an Efreeti's Key from the Key Master near where you zone in on Isle 1 (it is free), then take the teleport pad at the North point of that isle, around 1600, 520.",
               "what": "Hand Torgon Blademaster Spiroc Air Totem (1), Wind Rune Beza (1) to receive the Pauldrons of the Blue Sky.",
               "when": "Once every piece above is in your bags - the guide's own prerequisites say so.",
               "why": "This is the step that actually gives you the Pauldrons of the Blue Sky.",
@@ -11988,6 +12262,11 @@
                 {
                   "url": "https://eqlwiki.com/Warrior_Plane_of_Sky_Tests",
                   "title": "Warrior Plane of Sky Tests",
+                  "retrievedAt": "2026-09-09"
+                },
+                {
+                  "url": "https://eqlwiki.com/Plane_of_Sky",
+                  "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
                 }
               ]
@@ -12062,8 +12341,8 @@
               "title": "Collect Wind Rune Azia",
               "sources": [
                 {
-                  "url": "https://eqlwiki.com/Warrior_Plane_of_Sky_Tests",
-                  "title": "Warrior Plane of Sky Tests",
+                  "url": "https://eqlwiki.com/Plane_of_Sky",
+                  "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
                 }
               ],
@@ -12073,10 +12352,9 @@
               "when": "",
               "why": "Wind Rune Azia is one of the turn-in pieces for the Runed Wind Amulet.",
               "how": "",
-              "who": "",
-              "where": "",
-              "authoring": "Stub",
-              "stubNote": "eqlwiki's Warrior Plane of Sky Tests page does not say which isle or which mob drops Wind Rune Azia, and EQBuddy's Sky checklist records only \"Trash mobs\". Four class pages (Monk, Enchanter, Necromancer, Paladin) describe wind runes as a random drop from any mob in the Plane of Sky, which is the closest thing to an answer we have for this one. If you have looted it, tell us the isle and the mob."
+              "who": "any Plane of Sky mob",
+              "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
+              "authoring": "Authored"
             }
           ]
         },
@@ -12093,7 +12371,7 @@
               "title": "Hand in Stone Amulet, Wind Rune Azia",
               "shortInstruction": "Give Torgon Blademaster the 2 pieces to receive the Runed Wind Amulet.",
               "who": "Torgon Blademaster",
-              "where": "Plane of Sky - the Efreeti Chamber, through the teleport pad at roughly 1600, 520 on Isle 1.",
+              "where": "Plane of Sky - the Efreeti Chamber. Buy an Efreeti's Key from the Key Master near where you zone in on Isle 1 (it is free), then take the teleport pad at the North point of that isle, around 1600, 520.",
               "what": "Hand Torgon Blademaster Stone Amulet (1), Wind Rune Azia (1) to receive the Runed Wind Amulet.",
               "when": "Once every piece above is in your bags - the guide's own prerequisites say so.",
               "why": "This is the step that actually gives you the Runed Wind Amulet.",
@@ -12113,6 +12391,11 @@
                 {
                   "url": "https://eqlwiki.com/Warrior_Plane_of_Sky_Tests",
                   "title": "Warrior Plane of Sky Tests",
+                  "retrievedAt": "2026-09-09"
+                },
+                {
+                  "url": "https://eqlwiki.com/Plane_of_Sky",
+                  "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
                 }
               ]
@@ -12187,8 +12470,8 @@
               "title": "Collect Wind Rune Fana",
               "sources": [
                 {
-                  "url": "https://eqlwiki.com/Wizard_Plane_of_Sky_Tests",
-                  "title": "Wizard Plane of Sky Tests",
+                  "url": "https://eqlwiki.com/Plane_of_Sky",
+                  "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
                 }
               ],
@@ -12198,10 +12481,9 @@
               "when": "",
               "why": "Wind Rune Fana is one of the turn-in pieces for the Al`Kabor's Cap of Binding.",
               "how": "",
-              "who": "",
-              "where": "",
-              "authoring": "Stub",
-              "stubNote": "eqlwiki's Wizard Plane of Sky Tests page does not say which isle or which mob drops Wind Rune Fana, and EQBuddy's Sky checklist records only \"Trash mobs\". Four class pages (Monk, Enchanter, Necromancer, Paladin) describe wind runes as a random drop from any mob in the Plane of Sky, which is the closest thing to an answer we have for this one. If you have looted it, tell us the isle and the mob."
+              "who": "any Plane of Sky mob",
+              "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
+              "authoring": "Authored"
             }
           ]
         },
@@ -12218,7 +12500,7 @@
               "title": "Hand in Woven Skull Cap, Wind Rune Fana",
               "shortInstruction": "Give Wizard Schrock the 2 pieces to receive the Al`Kabor's Cap of Binding.",
               "who": "Wizard Schrock",
-              "where": "Plane of Sky - the Efreeti Chamber, through the teleport pad at roughly 1600, 520 on Isle 1.",
+              "where": "Plane of Sky - the Efreeti Chamber. Buy an Efreeti's Key from the Key Master near where you zone in on Isle 1 (it is free), then take the teleport pad at the North point of that isle, around 1600, 520.",
               "what": "Hand Wizard Schrock Woven Skull Cap (1), Wind Rune Fana (1) to receive the Al`Kabor's Cap of Binding.",
               "when": "Once every piece above is in your bags - the guide's own prerequisites say so.",
               "why": "This is the step that actually gives you the Al`Kabor's Cap of Binding.",
@@ -12238,6 +12520,11 @@
                 {
                   "url": "https://eqlwiki.com/Wizard_Plane_of_Sky_Tests",
                   "title": "Wizard Plane of Sky Tests",
+                  "retrievedAt": "2026-09-09"
+                },
+                {
+                  "url": "https://eqlwiki.com/Plane_of_Sky",
+                  "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
                 }
               ]
@@ -12312,8 +12599,8 @@
               "title": "Collect Wind Rune Jaka",
               "sources": [
                 {
-                  "url": "https://eqlwiki.com/Wizard_Plane_of_Sky_Tests",
-                  "title": "Wizard Plane of Sky Tests",
+                  "url": "https://eqlwiki.com/Plane_of_Sky",
+                  "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
                 }
               ],
@@ -12323,10 +12610,9 @@
               "when": "",
               "why": "Wind Rune Jaka is one of the turn-in pieces for the Amulet of the Void.",
               "how": "",
-              "who": "",
-              "where": "",
-              "authoring": "Stub",
-              "stubNote": "eqlwiki's Wizard Plane of Sky Tests page does not say which isle or which mob drops Wind Rune Jaka, and EQBuddy's Sky checklist records only \"Trash mobs\". Four class pages (Monk, Enchanter, Necromancer, Paladin) describe wind runes as a random drop from any mob in the Plane of Sky, which is the closest thing to an answer we have for this one. If you have looted it, tell us the isle and the mob."
+              "who": "any Plane of Sky mob",
+              "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
+              "authoring": "Authored"
             }
           ]
         },
@@ -12343,7 +12629,7 @@
               "title": "Hand in Amethyst Amulet, Wind Rune Jaka",
               "shortInstruction": "Give Wizard Schrock the 2 pieces to receive the Amulet of the Void.",
               "who": "Wizard Schrock",
-              "where": "Plane of Sky - the Efreeti Chamber, through the teleport pad at roughly 1600, 520 on Isle 1.",
+              "where": "Plane of Sky - the Efreeti Chamber. Buy an Efreeti's Key from the Key Master near where you zone in on Isle 1 (it is free), then take the teleport pad at the North point of that isle, around 1600, 520.",
               "what": "Hand Wizard Schrock Amethyst Amulet (1), Wind Rune Jaka (1) to receive the Amulet of the Void.",
               "when": "Once every piece above is in your bags - the guide's own prerequisites say so.",
               "why": "This is the step that actually gives you the Amulet of the Void.",
@@ -12363,6 +12649,11 @@
                 {
                   "url": "https://eqlwiki.com/Wizard_Plane_of_Sky_Tests",
                   "title": "Wizard Plane of Sky Tests",
+                  "retrievedAt": "2026-09-09"
+                },
+                {
+                  "url": "https://eqlwiki.com/Plane_of_Sky",
+                  "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
                 }
               ]
@@ -12437,8 +12728,8 @@
               "title": "Collect Wind Rune Dena",
               "sources": [
                 {
-                  "url": "https://eqlwiki.com/Wizard_Plane_of_Sky_Tests",
-                  "title": "Wizard Plane of Sky Tests",
+                  "url": "https://eqlwiki.com/Plane_of_Sky",
+                  "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
                 }
               ],
@@ -12448,10 +12739,9 @@
               "when": "",
               "why": "Wind Rune Dena is one of the turn-in pieces for the Augmentor's Mask.",
               "how": "",
-              "who": "",
-              "where": "",
-              "authoring": "Stub",
-              "stubNote": "eqlwiki's Wizard Plane of Sky Tests page does not say which isle or which mob drops Wind Rune Dena, and EQBuddy's Sky checklist records only \"Trash mobs\". Four class pages (Monk, Enchanter, Necromancer, Paladin) describe wind runes as a random drop from any mob in the Plane of Sky, which is the closest thing to an answer we have for this one. If you have looted it, tell us the isle and the mob."
+              "who": "any Plane of Sky mob",
+              "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
+              "authoring": "Authored"
             }
           ]
         },
@@ -12468,7 +12758,7 @@
               "title": "Hand in Grey Damask Cloak, Wind Rune Dena",
               "shortInstruction": "Give Wizard Schrock the 2 pieces to receive the Augmentor's Mask.",
               "who": "Wizard Schrock",
-              "where": "Plane of Sky - the Efreeti Chamber, through the teleport pad at roughly 1600, 520 on Isle 1.",
+              "where": "Plane of Sky - the Efreeti Chamber. Buy an Efreeti's Key from the Key Master near where you zone in on Isle 1 (it is free), then take the teleport pad at the North point of that isle, around 1600, 520.",
               "what": "Hand Wizard Schrock Grey Damask Cloak (1), Wind Rune Dena (1) to receive the Augmentor's Mask.",
               "when": "Once every piece above is in your bags - the guide's own prerequisites say so.",
               "why": "This is the step that actually gives you the Augmentor's Mask.",
@@ -12488,6 +12778,11 @@
                 {
                   "url": "https://eqlwiki.com/Wizard_Plane_of_Sky_Tests",
                   "title": "Wizard Plane of Sky Tests",
+                  "retrievedAt": "2026-09-09"
+                },
+                {
+                  "url": "https://eqlwiki.com/Plane_of_Sky",
+                  "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
                 }
               ]
@@ -12594,8 +12889,8 @@
               "title": "Collect Wind Rune Caza",
               "sources": [
                 {
-                  "url": "https://eqlwiki.com/Wizard_Plane_of_Sky_Tests",
-                  "title": "Wizard Plane of Sky Tests",
+                  "url": "https://eqlwiki.com/Plane_of_Sky",
+                  "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
                 }
               ],
@@ -12605,10 +12900,9 @@
               "when": "",
               "why": "Wind Rune Caza is one of the turn-in pieces for the Nargon's Staff.",
               "how": "",
-              "who": "",
-              "where": "",
-              "authoring": "Stub",
-              "stubNote": "eqlwiki's Wizard Plane of Sky Tests page does not say which isle or which mob drops Wind Rune Caza, and EQBuddy's Sky checklist records only \"Trash mobs\". Four class pages (Monk, Enchanter, Necromancer, Paladin) describe wind runes as a random drop from any mob in the Plane of Sky, which is the closest thing to an answer we have for this one. If you have looted it, tell us the isle and the mob."
+              "who": "any Plane of Sky mob",
+              "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
+              "authoring": "Authored"
             }
           ]
         },
@@ -12625,7 +12919,7 @@
               "title": "Hand in Large Sky Lapis, Efreeti War Staff, Wind Rune Caza",
               "shortInstruction": "Give Wizard Schrock the 3 pieces to receive the Nargon's Staff.",
               "who": "Wizard Schrock",
-              "where": "Plane of Sky - the Efreeti Chamber, through the teleport pad at roughly 1600, 520 on Isle 1.",
+              "where": "Plane of Sky - the Efreeti Chamber. Buy an Efreeti's Key from the Key Master near where you zone in on Isle 1 (it is free), then take the teleport pad at the North point of that isle, around 1600, 520.",
               "what": "Hand Wizard Schrock Large Sky Lapis (1), Efreeti War Staff (1), Wind Rune Caza (1) to receive the Nargon's Staff.",
               "when": "Once every piece above is in your bags - the guide's own prerequisites say so.",
               "why": "This is the step that actually gives you the Nargon's Staff.",
@@ -12647,6 +12941,11 @@
                 {
                   "url": "https://eqlwiki.com/Wizard_Plane_of_Sky_Tests",
                   "title": "Wizard Plane of Sky Tests",
+                  "retrievedAt": "2026-09-09"
+                },
+                {
+                  "url": "https://eqlwiki.com/Plane_of_Sky",
+                  "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
                 }
               ]
@@ -12721,8 +13020,8 @@
               "title": "Collect Wind Rune Geza",
               "sources": [
                 {
-                  "url": "https://eqlwiki.com/Wizard_Plane_of_Sky_Tests",
-                  "title": "Wizard Plane of Sky Tests",
+                  "url": "https://eqlwiki.com/Plane_of_Sky",
+                  "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
                 }
               ],
@@ -12732,10 +13031,9 @@
               "when": "",
               "why": "Wind Rune Geza is one of the turn-in pieces for the Raiment of Thunder.",
               "how": "",
-              "who": "",
-              "where": "",
-              "authoring": "Stub",
-              "stubNote": "eqlwiki's Wizard Plane of Sky Tests page does not say which isle or which mob drops Wind Rune Geza, and EQBuddy's Sky checklist records only \"Trash mobs\". Four class pages (Monk, Enchanter, Necromancer, Paladin) describe wind runes as a random drop from any mob in the Plane of Sky, which is the closest thing to an answer we have for this one. If you have looted it, tell us the isle and the mob."
+              "who": "any Plane of Sky mob",
+              "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
+              "authoring": "Authored"
             }
           ]
         },
@@ -12752,7 +13050,7 @@
               "title": "Hand in High Quality Raiment, Wind Rune Geza",
               "shortInstruction": "Give Wizard Schrock the 2 pieces to receive the Raiment of Thunder.",
               "who": "Wizard Schrock",
-              "where": "Plane of Sky - the Efreeti Chamber, through the teleport pad at roughly 1600, 520 on Isle 1.",
+              "where": "Plane of Sky - the Efreeti Chamber. Buy an Efreeti's Key from the Key Master near where you zone in on Isle 1 (it is free), then take the teleport pad at the North point of that isle, around 1600, 520.",
               "what": "Hand Wizard Schrock High Quality Raiment (1), Wind Rune Geza (1) to receive the Raiment of Thunder.",
               "when": "Once every piece above is in your bags - the guide's own prerequisites say so.",
               "why": "This is the step that actually gives you the Raiment of Thunder.",
@@ -12772,6 +13070,11 @@
                 {
                   "url": "https://eqlwiki.com/Wizard_Plane_of_Sky_Tests",
                   "title": "Wizard Plane of Sky Tests",
+                  "retrievedAt": "2026-09-09"
+                },
+                {
+                  "url": "https://eqlwiki.com/Plane_of_Sky",
+                  "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
                 }
               ]
@@ -12879,8 +13182,8 @@
               "title": "Collect Wind Rune Izah",
               "sources": [
                 {
-                  "url": "https://eqlwiki.com/Wizard_Plane_of_Sky_Tests",
-                  "title": "Wizard Plane of Sky Tests",
+                  "url": "https://eqlwiki.com/Plane_of_Sky",
+                  "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
                 }
               ],
@@ -12890,10 +13193,9 @@
               "when": "",
               "why": "Wind Rune Izah is one of the turn-in pieces for the Solidate Mithril Ring.",
               "how": "",
-              "who": "",
-              "where": "",
-              "authoring": "Stub",
-              "stubNote": "eqlwiki's Wizard Plane of Sky Tests page does not say which isle or which mob drops Wind Rune Izah, and EQBuddy's Sky checklist records only \"Trash mobs\". Four class pages (Monk, Enchanter, Necromancer, Paladin) describe wind runes as a random drop from any mob in the Plane of Sky, which is the closest thing to an answer we have for this one. If you have looted it, tell us the isle and the mob."
+              "who": "any Plane of Sky mob",
+              "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
+              "authoring": "Authored"
             }
           ]
         },
@@ -12910,7 +13212,7 @@
               "title": "Hand in Efreeti Statuette, Box of Winds, Wind Rune Izah",
               "shortInstruction": "Give Wizard Schrock the 3 pieces to receive the Solidate Mithril Ring.",
               "who": "Wizard Schrock",
-              "where": "Plane of Sky - the Efreeti Chamber, through the teleport pad at roughly 1600, 520 on Isle 1.",
+              "where": "Plane of Sky - the Efreeti Chamber. Buy an Efreeti's Key from the Key Master near where you zone in on Isle 1 (it is free), then take the teleport pad at the North point of that isle, around 1600, 520.",
               "what": "Hand Wizard Schrock Efreeti Statuette (1), Box of Winds (1), Wind Rune Izah (1) to receive the Solidate Mithril Ring.",
               "when": "Once every piece above is in your bags - the guide's own prerequisites say so.",
               "why": "This is the step that actually gives you the Solidate Mithril Ring.",
@@ -12932,6 +13234,11 @@
                 {
                   "url": "https://eqlwiki.com/Wizard_Plane_of_Sky_Tests",
                   "title": "Wizard Plane of Sky Tests",
+                  "retrievedAt": "2026-09-09"
+                },
+                {
+                  "url": "https://eqlwiki.com/Plane_of_Sky",
+                  "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
                 }
               ]

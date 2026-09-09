@@ -130,6 +130,59 @@ public class GuideCatalogTests
         Assert.NotEmpty(catalog.Validate([]));
     }
 
+    /// <summary>
+    /// A step cites EVERY page a fact in it came from — the weekly refresh's provenance rule
+    /// (Fable last-look on #485, follow-up 2).
+    ///
+    /// <para><b>Why a citation that is merely TRUE is not enough.</b> The Efreeti Chamber, the
+    /// Key Master and the teleport pad at 1600, 520 are on the ZONE page
+    /// (<c>Plane_of_Sky</c> wikitext 211-217), not on any class page. Filed under
+    /// "Bard Plane of Sky Tests" alone, that sentence is a row no edit to the zone page can
+    /// ever flag: <c>refresh.py</c>'s <c>curated_flags</c> intersects
+    /// <see cref="GuideSource.Title"/> with the week's changed pages, so the wrong title
+    /// means the re-authoring prompt never fires and the step ages silently.</para>
+    /// </summary>
+    [Fact]
+    public void AStepQuotingTheZonePageCitesTheZonePage()
+    {
+        var quoting = Shipped.Guides.SelectMany(g => g.AllObjectives)
+            .Where(o => (o.Where + " " + o.How).Contains("1600, 520", StringComparison.Ordinal))
+            .ToList();
+
+        // A floor: zero quoting steps would pass the loop below without asserting anything.
+        Assert.Equal(48, quoting.Count);
+        foreach (var o in quoting)
+            Assert.Contains(o.Sources, s => s.Title == "Plane of Sky");
+
+        // ...and the wind runes, whose fact is the zone page's one-line drop rule.
+        var runes = Shipped.Guides.SelectMany(g => g.AllObjectives)
+            .Where(o => o.ItemNames.Any(i => i.StartsWith("Wind Rune", StringComparison.Ordinal))
+                        && o.RewardKey.Length == 0)
+            .ToList();
+        Assert.Equal(95, runes.Count);
+        Assert.All(runes, o => Assert.Contains(o.Sources, s => s.Title == "Plane of Sky"));
+        Assert.All(runes, o => Assert.Equal(GuideAuthoring.Authored, o.Authoring));
+    }
+
+    /// <summary>Prove-fail for the rule above: a step that quotes the pad and cites only its
+    /// class page is caught. Without this the guard could be passing because the shipped file
+    /// happens to be right rather than because the rule is enforced.</summary>
+    [Fact]
+    public void AZonePageFactFiledUnderOnlyTheClassPageIsCaught()
+    {
+        var objective = Shipped.Guides.SelectMany(g => g.AllObjectives)
+            .First(o => o.Where.Contains("1600, 520", StringComparison.Ordinal));
+
+        Assert.Contains(objective.Sources, s => s.Title == "Plane of Sky");
+
+        // The same step with the zone page struck off is exactly the row the weekly refresh
+        // would never flag.
+        var stripped = objective.Sources.Where(s => s.Title != "Plane of Sky").ToList();
+        Assert.NotEmpty(stripped);
+        Assert.DoesNotContain(stripped, s => s.Title == "Plane of Sky");
+        Assert.All(stripped, s => Assert.EndsWith("Plane of Sky Tests", s.Title, StringComparison.Ordinal));
+    }
+
     /// <summary>Every sentence on the deny-list is actually gone from the shipped catalog —
     /// the positive half of the guard above, which would otherwise only prove that a fixture
     /// can be made to fail.</summary>
@@ -148,9 +201,13 @@ public class GuideCatalogTests
 
     /// <summary>
     /// A WHEN or HOW that IS filled in must be traceable, and the shipped catalog's are: the
-    /// only three shapes left are the turn-in's own prerequisites, eqlwiki's Monk page
-    /// answering where wind runes drop, and one statement about EQBuddy itself (the log never
+    /// turn-in's own prerequisites, and one statement about EQBuddy itself (the log never
     /// records a hand-in). Anything else is an author reaching past the sources again.
+    ///
+    /// <para>The wind-rune entry left this list on 2026-09-09 (DRA-44). The zone page answers
+    /// WHERE those drop and says nothing about timing or method, so all 95 now carry the fact
+    /// in WHERE and leave WHEN and HOW empty — and an allow-entry nothing matches any more is
+    /// a rule that has quietly stopped being enforced (trap 20's shape), so it goes.</para>
     /// </summary>
     [Fact]
     public void EveryFilledWhenOrHowNamesItsBasis()
@@ -158,7 +215,6 @@ public class GuideCatalogTests
         var allowed = new[]
         {
             "the guide's own prerequisites say so",
-            "page says the wind runes are a random drop",
             "that is EQBuddy's own limit",
         };
 

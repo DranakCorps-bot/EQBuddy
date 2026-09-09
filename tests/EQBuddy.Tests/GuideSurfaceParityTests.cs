@@ -53,6 +53,26 @@ public sealed class GuideSurfaceParityTests : IDisposable
                 Npc = "Torgon Blademaster", QuestItem = "Wind Rune Azia",
                 Source = "Trash mobs",
             },
+            // A reward that still has a STUB in it. The Warrior's rune stubs became authored
+            // on 2026-09-09 (DRA-44 — the zone page answers where wind runes drop), so the
+            // stub-parity test needs a group that still has one: the Efreeti Statuette, whose
+            // page gives an isle and names no mob.
+            new SkyQuestChecklistItem
+            {
+                Id = "sky-220", ClassName = "Wizard", Reward = "Solidate Mithril Ring",
+                Npc = "Wizard Schrock", QuestItem = "Box of Winds", Source = "Isle 6: Bazzt Zzzt",
+            },
+            new SkyQuestChecklistItem
+            {
+                Id = "sky-221", ClassName = "Wizard", Reward = "Solidate Mithril Ring",
+                Npc = "Wizard Schrock", QuestItem = "Efreeti Statuette",
+                Source = "Isle four - griffons and pegasus",
+            },
+            new SkyQuestChecklistItem
+            {
+                Id = "sky-222", ClassName = "Wizard", Reward = "Solidate Mithril Ring",
+                Npc = "Wizard Schrock", QuestItem = "Wind Rune Izah", Source = "Trash mobs",
+            },
             // An UNGUIDED reward, so lock 5 still has something to be about. Every real
             // class and reward is authored as of 2026-09-09 (D7), so the fixture invents one
             // no guide can ever claim rather than picking a class that is merely unauthored
@@ -130,11 +150,12 @@ public sealed class GuideSurfaceParityTests : IDisposable
         var settings = Settings();
         var ledger = Store();
 
-        var desktop = Desktop(settings, ledger).Single(g => g.CompletionKey == RewardKey);
+        var stubbedKey = QuestChecklistLayout.RewardKey("Wizard", "Solidate Mithril Ring");
+        var desktop = Desktop(settings, ledger).Single(g => g.CompletionKey == stubbedKey);
         var phone = PhoneGroup(Phone(settings, ledger), desktop.Heading);
 
         var stubbed = desktop.Rows.Where(r => r.StubNote.Length > 0).ToList();
-        Assert.NotEmpty(stubbed);
+        Assert.Single(stubbed);
         foreach (var row in stubbed)
         {
             var mirror = phone.Rows.Single(r => r.Id == row.Id);
