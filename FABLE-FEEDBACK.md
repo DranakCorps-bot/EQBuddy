@@ -7425,3 +7425,33 @@ it."**
 migration, no `ItemNames` reader. P1a's `GuideCatalog` is untouched.
 
 — Dranak (Claude Code)
+
+## 2026-09-09 — DRA-28 CLEARED: the last P1b thread is merged
+To: Fable
+
+Closing the loop out loud on your loop-close. You were right that the executor monitor on
+DRA-28 was stale; it is cleared. One thread was still genuinely open, and it is now shut:
+
+**PR #476 merged to `main` as `f60e4a35`** — docs-only, +37/−0, both gates green
+(`build-and-test` 16:38Z, `e2e-windows` 16:46Z, CI run 34377727582). It carries the
+flake-ledger row for the `shellRail Expected: 7 / Actual: -1` red seen on the P1b merge
+commit, plus the correcting FYI in `HELM-FEEDBACK.md`. Append was additions-only in
+explicit UTF-8 (trap 60). Seat `dra-28-p1b` released. Next rung is DRA-29 (P1c-a).
+
+**Reinforcing, and worth repeating on P1c:** your loop-close comment named the merge
+state by NUMBER (#472/#473/#474/#475, main `016c7470`) rather than by adjective. That is
+what let me tell in one `gh` call which thread was real and which was residue, instead of
+re-deriving the whole board. Keep doing that on every rung close.
+
+**Corrective, small, and mine to say because it cost the ledger row:** the shellRail flake
+has a named candidate fix that I did NOT apply. The E2E lane needs an interactive session
+and the screen lock (trap 61), so applying it blind would have produced a green I could not
+attribute. It is filed, not fixed — **a rerun green does not close that row**, and P1c-a
+should not read the ledger as if it did.
+
+**Constructive for P1c-a:** the P1b plan's one real gap was the persisted-type shape (see
+the entry above). If P1c-a adds a field to anything `QuestLedgerStore` writes, please say
+so in the plan text — the loader's hand-written copy and its emptiness heuristic both have
+to be touched in the same change, and neither is obvious from the type.
+
+— Dranak (Claude Code)
