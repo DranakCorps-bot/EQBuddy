@@ -53,7 +53,8 @@ namespace EQBuddy;
 /// every control turns a screen whose job is "find your switch and flip it" into an essay you
 /// scroll past. Five explanations moved onto an ⓘ beside the thing they explain — the panel
 /// list's, the mini dashboard's, the floating-window list's, and the two under the
-/// double-click and target-drops switches. **Not one word was rewritten**; the consts below
+/// double-click and target-drops switches; **Pass 3 added the sixth**, the "no longer on the
+/// widget" blurb below. **Not one word was rewritten**; the consts below
 /// are the strings that shipped, hanging somewhere else. <see cref="SettingsProsePolicy"/> is
 /// the rule that decided which, and <see cref="RecentRateBlurb"/> is the negative that keeps
 /// it from meaning "hide everything": ten words is a caption, and it stayed in the body.
@@ -66,15 +67,26 @@ namespace EQBuddy;
 /// enumerated with that reason in `SettingsProsePolicyTests` so the next pass does not "finish
 /// the job" by hiding them.
 ///
-/// **What the sweep deliberately did NOT touch, so the gap is named rather than silent:**
-/// <c>OverlaySections</c>' retired list (<c>RetiredHeading</c>, <c>RetiredBlurb</c>,
-/// <c>RetiredCard.Line</c>) and the fold notes beside it. That copy was signed as-is at #335
-/// eleven hours before this lift, and Fable's SR series carries an explicit "no re-opening
-/// #335 — the Retired list is consumed as-is (SR-3 re-hosts, never redesigns)". It says "card"
-/// and "widget" on purpose, in the words a player who has just failed to find something is
-/// scanning for. It is therefore NOT on <c>ShellTerminologyTests.ShellStringSources</c>, and
-/// that is a decision with a signature behind it rather than an oversight — whoever lands the
-/// Settings room re-asks the question with #335's author in the room.
+/// **The VOCABULARY sweep deliberately did not touch <c>OverlaySections</c>' retired list**
+/// (<c>RetiredHeading</c>, <c>RetiredBlurb</c>, <c>RetiredCard.Line</c>) or the fold notes
+/// beside it. That copy was signed as-is at #335 eleven hours before this lift, and Fable's SR
+/// series carries an explicit "no re-opening #335 — the Retired list is consumed as-is (SR-3
+/// re-hosts, never redesigns)". It says "card" and "widget" on purpose, in the words a player
+/// who has just failed to find something is scanning for. It is therefore NOT on
+/// <c>ShellTerminologyTests.ShellStringSources</c>, and that is a decision with a signature
+/// behind it rather than an oversight — whoever lands the Settings room re-asks the question
+/// with #335's author in the room.
+///
+/// **Pass 3 (2026-09-08) reached that list all the same, and the two are not in conflict — a
+/// prose-to-hover move rewrites nothing.** The owner ran the finished Pass 1 + Pass 2 build
+/// against a live profile and this tab still opened on body prose, because the Pass 2 sweep
+/// reads <c>Dim("…")</c> LITERALS and these paragraphs are consts declared in UI.Shared: a
+/// guard that forbids the wrong thing cannot see a missing thing (trap 34).
+/// <c>RetiredBlurb</c> is now the ⓘ beside the heading, WORD FOR WORD as #335 wrote it, and
+/// the rows below it are still printed because each one NAMES A DOOR (trap 59; Pass 2's third
+/// exemption kind, Helm-signed #458/#459). <see cref="BuildRetiredHeading"/> holds the line
+/// between the two, and `SettingsProsePass3Tests` sweeps this block BY IDENTIFIER so the next
+/// paragraph to arrive through a const is ruled on rather than invisible.
 /// </summary>
 internal sealed class SettingsHudView
 {
@@ -113,7 +125,7 @@ internal sealed class SettingsHudView
     /// kept it.
     ///
     /// <c>hudHints</c> joins it for the same reason and is the newer half of it: since the
-    /// prose pass, five explanations on this screen exist ONLY behind an ⓘ, so an ⓘ that
+    /// prose pass, six explanations on this screen exist ONLY behind an ⓘ, so an ⓘ that
     /// failed to build is a paragraph that has left the product with nothing on screen —
     /// and nothing in a diff, a build or a screenshot — to say so. Counted off BUILT
     /// buttons rather than off a list of the five, which is the difference between a fact
@@ -448,8 +460,10 @@ internal sealed class SettingsHudView
     /// player is reading when they discover the row they came for is missing, and an answer
     /// one heading below where the question is asked is an answer they will find.
     ///
-    /// **Consumed as-is by this lift, on the sign.** Every string here is
-    /// <c>OverlaySections</c>' — see the note on this class about why they are not swept.
+    /// **Every string here is <c>OverlaySections</c>', and not one of them was reworded by the
+    /// lift or by the prose pass.** Pass 3 moved <c>RetiredBlurb</c> onto the heading's ⓘ
+    /// and left the ROWS printed — see <see cref="BuildRetiredHeading"/> for the line between
+    /// the two.
     /// </summary>
     private void BuildRetired()
     {
@@ -459,22 +473,61 @@ internal sealed class SettingsHudView
         _retiredRows = 0;
         if (OverlaySections.Retired.Count == 0) return;
 
-        var heading = new TextBlock
-        {
-            Text = OverlaySections.RetiredHeading,
-            FontSize = 12, FontWeight = FontWeights.SemiBold,
-            Margin = new Thickness(0, 12, 0, 2),
-        };
-        heading.SetResourceReference(TextBlock.ForegroundProperty, "AccentBrush");
-        _cards.Children.Add(heading);
-        _cards.Children.Add(Meta(OverlaySections.RetiredBlurb, top: 0));
+        _cards.Children.Add(_retiredRow ??= BuildRetiredHeading());
 
+        // **THE ROWS STAY PRINTED, and that is Pass 3's whole judgement.** Each one ends
+        // "Right-click EQBuddy and choose “World…”" — it NAMES A DOOR, which is the third
+        // exemption kind Helm signed at #458/#459. Nothing is bound by default (trap 59), this
+        // is the screen a player opens at the moment they have failed to find a card, and an ⓘ
+        // nobody knows to hover is the same thing as deleting the only printed answer to "how
+        // do I get it back". `SettingsProsePass3Tests` holds the row and re-checks the door
+        // against the record, so the seven cuts queued behind Surface A are covered the day
+        // they land rather than the day somebody remembers this comment.
         foreach (var gone in OverlaySections.Retired)
         {
             _cards.Children.Add(Meta(gone.Line, top: 2));
             _retiredRows++;
         }
     }
+
+    /// <summary>
+    /// **"No longer on the widget", and the paragraph that used to sit under it — now on an ⓘ
+    /// beside it (Pass 3, 2026-09-08).**
+    ///
+    /// The owner ran the finished Pass 1 + Pass 2 build and this tab still opened on body
+    /// prose, with every row of both passes green: the Pass 2 sweep reads <c>Dim("…")</c>
+    /// LITERALS, and this block prints a const declared in UI.Shared, so the paragraph was
+    /// covered by nothing (trap 34, and why Pass 3's sweep asks what is PRINTED rather than
+    /// what is written here).
+    ///
+    /// <c>RetiredBlurb</c> converts and the rows below it do not, because they are not the same
+    /// kind of sentence. The blurb says the features are intact; the rows name the way back in.
+    ///
+    /// **Built ONCE and re-shown.** <see cref="BuildRetired"/> runs inside
+    /// <see cref="BuildCards"/>, which runs on every panel move, every hide and every palette
+    /// swap — a hint constructed there would push <c>hudHints</c> up on each redraw and turn
+    /// the dump's only runtime check on this pass into a number that cannot fail its floor.
+    /// It would also throw: <c>_cards.Children.Clear()</c> detaches this ROW but leaves the
+    /// button parented to it, and a WPF element has exactly one parent.
+    /// <see cref="_breakoutsHint"/> is the same answer to the same question.
+    /// </summary>
+    private UIElement BuildRetiredHeading()
+    {
+        var heading = new TextBlock
+        {
+            Text = OverlaySections.RetiredHeading,
+            FontSize = 12, FontWeight = FontWeights.SemiBold,
+        };
+        heading.SetResourceReference(TextBlock.ForegroundProperty, "AccentBrush");
+        // The margin belongs to the ROW, never to the heading inside it — a heading offset
+        // twelve units down would sit twelve units below its own ⓘ (DesignSystem.HintRow).
+        return DesignSystem.HintRow(heading, Hint(OverlaySections.RetiredBlurb),
+            new Thickness(0, 12, 0, 2));
+    }
+
+    /// <summary>The retired heading and its ⓘ, built on the first render that has rows to show
+    /// and re-added on every one after it — see <see cref="BuildRetiredHeading"/>.</summary>
+    private UIElement? _retiredRow;
 
     /// <summary>How many "no longer on the widget" rows this instance last DREW. See
     /// <see cref="DebugFacts"/>.</summary>

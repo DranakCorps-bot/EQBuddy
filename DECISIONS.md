@@ -1,3 +1,57 @@
+## 2026-09-08 (prose-to-hover pass 3 — the residual on Cards & windows, and the hole that hid it)
+
+Authority: the owner's ~7:01 PM CT lock through Soft/Helm — *every* Options tab's
+instructional blurbs hang on an ⓘ, KEEP being only `PromotedStatsNote`, `GlancePetNote`, the
+DOOR exemption and the two over-budget paragraphs Pass 2 signed. Nothing here is a
+consequence-list door: no copy was written, no sentence was reworded, nothing changes what
+leaves the machine.
+
+**The finding is a guard hole, not a wrong judgement.** The owner ran the finished Pass 1 +
+Pass 2 build against a live profile and Options → Cards & windows still opened on body prose,
+with every row of both passes green. `SettingsProseSource.PrintedLiterals` reads `Dim("…")`
+LITERALS and says so in as many words; the HUD block prints its last paragraphs from consts
+declared in UI.Shared, and Pass 1 had named rows but no sweep at all — so a paragraph that was
+neither a literal nor a named Pass 1 row was covered by **nothing**. Trap 34 exactly: a guard
+that forbids the wrong thing cannot see a missing thing. Pass 3's sweep therefore asks the
+question the other way round — *what does this block hand to a body-prose builder at all* —
+and rules BY IDENTIFIER, so a paragraph arriving through a const is ruled on exactly like one
+arriving through a string.
+
+**Decided, and it could have gone the other way: `RetiredBlurb` converts, the retired ROWS do
+not.** The owner's lock names the Retired block, and the default it could have gone the other
+way on is "convert the whole section, it is all instructional prose". It is not all one kind
+of sentence:
+
+* **`OverlaySections.RetiredBlurb`** ("These are not cards any more…") is 21 words, has the
+  section heading to hang an ⓘ beside, names no door, and says the features are intact. It is
+  the Pass 1 `HeadingHint` shape and it moved — **verbatim**.
+* **Each `RetiredCard.Line`** ends *"Right-click EQBuddy and choose “World…”"*. It **names a
+  door** — Pass 2's third exemption kind, Helm-signed at #458/#459 — and nothing is bound by
+  default (trap 59). This is the screen a player opens at the moment they have failed to find
+  a card, so an ⓘ nobody knows to hover is the same thing as deleting the only printed answer
+  to "how do I get it back". Kept in the body, and flagged to Helm in the LIVE ASK rather than
+  converted silently, because it is the one call in this pass that reads against the lock's
+  literal words while following the exemption the lock itself preserves.
+
+**#335's "consumed as-is" sign and this conversion are not in conflict.** That sign is about
+the WORDS — the vocabulary sweep deliberately skips the retired list because it says "card"
+and "widget" on purpose. A prose-to-hover move rewrites nothing; the sentence on the ⓘ is
+#335's sentence, character for character.
+
+Two smaller calls, logged because both are the kind that gets made silently:
+
+* **The ⓘ is built ONCE and re-shown.** `BuildRetired` runs inside `BuildCards`, which reruns
+  on every panel move, hide and palette swap. A hint built there would push `hudHints` up on
+  each redraw — turning the dump's only runtime check on this pass into a number that cannot
+  fail its floor — and would throw besides, since `Children.Clear()` detaches the row while
+  leaving the button parented to it. `_breakoutsHint` is the same answer to the same question.
+* **The `hudHints` E2E floor rose 5 → 6** rather than being left as a bare `>=`. A floor that
+  never moves stops seeing the thing it was written for.
+
+**No `WhatsNew.json` entry**, on the owner's lock: the What's-new line waits until the owner
+smokes the build green. Flagged as an ask in the LIVE ASK so it is Helm's to release rather
+than something quietly skipped.
+
 ## 2026-09-08 (prose-to-hover pass 2 — Look · Alerts & chips · Watch rules · Behavior)
 
 Authority: the same Helm chat SIGN of Bevel's prose-to-tooltip faces that Pass 1 ran under,

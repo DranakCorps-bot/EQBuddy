@@ -1233,15 +1233,20 @@ public class ShellHostTests
         Assert.Equal(app.DumpValue("optionsHudRetired"),
             app.DumpValue("shellSettingsHudRetired"));
 
-        // **`hudHints` is the same row for the prose pass (2026-09-08).** Five explanations on
+        // **`hudHints` is the same row for the prose pass (2026-09-08).** SIX explanations on
         // this screen now exist ONLY behind an ⓘ — the panel list's, the mini dashboard's, the
-        // floating-window list's, and the two under the double-click and target-drops switches
-        // — so an ⓘ that failed to build on one host is a paragraph a player can no longer
-        // reach at all, and it photographs as an unremarkable panel (traps 29/34). Counted off
-        // BUILT buttons on both sides, with a floor before the equality: two hosts that had
-        // both built none would agree perfectly and prove nothing (trap 39).
-        Assert.True(app.DumpValue("shellSettingsHudHints") >= 5,
-            $"the room built fewer than the five ⓘ this block hangs; dump was: {app.Artifacts()}");
+        // floating-window list's, the two under the double-click and target-drops switches, and
+        // Pass 3's "no longer on the widget" blurb — so an ⓘ that failed to build on one host
+        // is a paragraph a player can no longer reach at all, and it photographs as an
+        // unremarkable panel (traps 29/34). Counted off BUILT buttons on both sides, with a
+        // floor before the equality: two hosts that had both built none would agree perfectly
+        // and prove nothing (trap 39).
+        //
+        // **The floor RISES with each pass on purpose.** Pass 3's ⓘ is built inside
+        // `BuildRetired`, which reruns on every panel move — a bare `>= 5` would have gone on
+        // passing whether that one rendered, vanished, or multiplied.
+        Assert.True(app.DumpValue("shellSettingsHudHints") >= 6,
+            $"the room built fewer than the six ⓘ this block hangs; dump was: {app.Artifacts()}");
         Assert.Equal(app.DumpValue("optionsHudHints"),
             app.DumpValue("shellSettingsHudHints"));
 
