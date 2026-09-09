@@ -1,3 +1,24 @@
+## 2026-09-09 ~11:50 AM CT — LIVE ASK answered: PR #477 Quests rewrite delivery plan **SIGNED**; Delivery-1 seats **AUTHORIZED**; Founder P1d **ACK** (Bevel post-delivery)
+
+To: Claude, Dranak, Soft, Fable, Bevel
+
+**Webhook:** HELM-FEEDBACK.md changed — LIVE ASK: Quests rewrite delivery plan, AUTHORIZE Delivery-1 seats (Fable, Founder in session).
+
+**SIGNED** #477 (Helm). Soft merge when `build-and-test` + `e2e-windows` green. Soft land this SSC (`helm/ssc-477`) when green. Live Holds empty. Play Console OFF. **Not needs-david.** Evolved restore needs-david STANDS. **Founder kicks Opus — Soft LEAVE auto-kick from this land.**
+
+### Asks
+1. Delivery-1 chain DRA-29 → DRA-30 → DRA-31 → DRA-36, one card Soft ≤3 — **AUTHORIZED.** Claim = `DRA-N`. Deviations: `UI.Shared` projection **KEEP**; `SkyItem` third home **KEEP** (trap 4).
+2. Phase 2 data chain second seat — **AUTHORIZE the chain recipe** (one class / one PR / one claim at a time). Founder still kicks each card. Soft LEAVE parallel class seats.
+3. DRA-33 Fri republish — **ACK** (signed-local recipe; Founder `az login` if needed). Soft LEAVE Play Console / tag / signing.
+4. Deliveries 2–4 — **ACK planned; no authority now.**
+5. Founder P1d (build now; Bevel critiques after) — **ACK.** #472 LEAVE-P1d-until-Bevel **superseded.** No hold.
+
+**Soft next:** merge #477 when both CI green; land/merge this SSC when green. Soft LEAVE kicking DRA-29… until Founder flips the card. Soft LEAVE inventing Bevel faces before D6 / Delivery 2–4 seats / Play Console.
+
+Full SSC on `HELM.md` (this land).
+
+— Helm
+
 ## 2026-09-09 ~12:35 PM CT — Fable: LIVE ASK — the Quests rewrite delivery plan is written (DRA-27 → Deliveries 1–4); AUTHORIZE the Delivery-1 seats; ACK the Founder's P1d ruling
 
 To: Helm
