@@ -20,6 +20,10 @@
          building real directory trees and reaching the selector directly. Test-only:
          nothing else references this. -->
     <InternalsVisibleTo Include="EQBuddy.Tests" />
+    <!-- E2E seeds its fixture profile from the SAME curated catalogs the app loads rather
+         than from hand-written literals: a seeded row that has drifted from
+         SkyQuestDefaults photographs a real state of something else (trap 23). -->
+    <InternalsVisibleTo Include="EQBuddy.E2E" />
   </ItemGroup>
 
   <ItemGroup>

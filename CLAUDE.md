@@ -518,7 +518,9 @@ they live on `legacy-v1`.)
 | Spawn points / timers | `Core/SpawnPointLedger.cs`, `Core/SpawnTimers.cs` |
 | Wiki lookups + contribution packs | `Core/EqlWikiMobs.cs`, `Core/WikiContribution.cs` |
 | The widget itself | `EQBuddy/MainWindow.xaml.cs` (~4.5k lines — the hotspot) |
-| A guide's stages, objectives, and how complete OUR data is | `Core/GuideCatalog.cs` + `Core/Data/GuideCatalog.json` — CURATED, never auto-written. `Validate()` is lock 4a executable: an `Authored` objective answers who+where+what and cites a source, a `Stub` says what is missing, a `RewardKey` is one the Sky checklist already owns. Nothing renders it yet (P1a) |
+| A guide's stages, objectives, and how complete OUR data is | `Core/GuideCatalog.cs` + `Core/Data/GuideCatalog.json` — CURATED, never auto-written. `Validate()` is lock 4a executable: an `Authored` objective answers **all six questions — who, what, where, when, why, how** (David, 2026-09-09) and cites a source, a `Stub` says what is missing, a `RewardKey` is one the Sky checklist already owns |
+| Turning a guide into the rows every surface draws | `UI.Shared/GuideChecklistProjection.cs` — a guided reward's item rows are REPLACED by its objectives; an unguided one comes back the same object (lock 5). `UI.Shared/GuidePresentation.cs` owns every word, and **each of the six is drawn in exactly one place**: WHAT is the row title, who·where·when the row's line, why+how the hover (the phone has no hover, so they ride the row — trap 35) |
+| Where a guide step's tick lives | `UI.Shared/GuideProgressRouter.cs` — THREE homes, one writer each: `SkyTurnIn` (a `RewardKey`), **`SkyItem`** (an acquire-shaped step naming exactly one of ITS reward's checklist rows → that row's own box, so the loot auto-tick lights it), else the guide ledger. Group-scoped: one class's Wind Rune is never another's |
 | Quest surface (all four tabs) | `EQBuddy/QuestsView.xaml.cs`. `QuestsWindow` is a thin host; `QuestsRoom` is the shell's **Guide** room (label only — the wire key is still `quests`). **Both build their own instance** |
 | What the widget's right-click menu shows minimized | `UI.Shared/WidgetMenuPolicy.cs` — the ≤4 lock. `Tag="expanded"` in `MainWindow.xaml` hides the rest; `WidgetMenuTests` reads the XAML against the list |
 | The Evolved shell | `EQBuddy/ShellWindow.xaml.cs` + one `*Room.cs` per room; `UI.Shared/ShellPages.cs`, `ShellLayout.cs`. Player door: widget context-menu `Guide…` through `ShellHost.OpenGuideDoor` (opens the Guide room, and recovers a shell the ✕ took); `EQBUDDY_SHELL` is the review hook |
@@ -784,6 +786,19 @@ after the named guard left with its surface.
     floored to a server tick (`BuffDurationModel`). **A surface that degrades
     gracefully must be asserted on what it SAYS** — an expired chip lingers at
     0:00, so presence passes on the broken code. [Novel](docs/ops/claude-archive/traps.md#trap-71)
+
+72. **A repaint gate keyed on everything EXCEPT the store the feature writes.**
+    The Quests tab's signature carried the quest ledger, the turn-ins, the
+    inventory stamp — and neither checklist LIST, which is what
+    `SkyLootAutoCheck`/`EpicLootAutoCheck` actually write. So the box was
+    ticked and the tab kept drawing the moment before, for the whole session.
+    When you add a reader of a store, grep what makes its surface REDRAW and
+    check that store is in it. A count is not enough (a swap leaves it
+    unmoved) — fold the ids that are set. Guard:
+    `QuestsView.ChecklistTickSignature` + the E2E loot row, which timed out
+    before the fix and passes in 4 s after. Dump both numbers from one moment
+    (`questsSkyAcquired` beside `questsGuideDone`) — "the store says so" and
+    "the screen says so" are different claims (trap 56).
 
 New trap discovered the hard way? Add the compact rule here and the novel
 under `docs/ops/claude-archive/traps.md`. That is the whole point.

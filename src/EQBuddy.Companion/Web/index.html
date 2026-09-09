@@ -197,6 +197,16 @@
   .rows .rv { flex:none; font-size:12px; color:var(--dim); font-variant-numeric:tabular-nums; }
   .rows .bar { position:absolute; left:0; bottom:0; height:2px; background:var(--chart-you); opacity:.75; }
   .rows .sub { display:block; font-size:11px; color:var(--dim); overflow:hidden; text-overflow:ellipsis; }
+  /* A guide step we could not fully write down says so in a whole sentence, so unlike
+     .sub it WRAPS rather than ellipsing - the words are the entire content, and half of
+     "eqlwiki does not say which isle" tells a player nothing. */
+  .rows .stub { display:block; font-size:11px; color:var(--dim); margin-top:2px; }
+  .rows .improve { display:inline-block; font-size:11px; color:var(--accent); margin-top:2px; }
+  /* The six questions. A phone has no hover, so what the desktop hangs on one is drawn
+     here instead - the intent ported, not the affordance (trap 35). Pre-wrapped because
+     the block is one labelled line per question. */
+  .rows .facts { display:block; font-size:11px; color:var(--dim); margin-top:2px;
+                 white-space:pre-line; }
   .rows li.active .rn { color:var(--good); }
   .rows li.expiring .rn { color:var(--accent); }
   .rows li.missing .rn { color:var(--warn); }
@@ -894,6 +904,11 @@ function boot() {
   // footer. Now a change from the version this page booted with reloads it once.
   let bootVersion = null;
   const RELOADED_FOR = "eqb-reloaded-for";
+  // The share-back door's words. The ONE place the page spells them, and
+  // GuidePresentationTests pins this literal to GuidePresentation.ImproveLabel so the
+  // phone and the desktop cannot start calling the same door two things (#184's rule
+  // applied to a string the wire would otherwise repeat on every guide row).
+  const IMPROVE_LABEL = "Improve this step";
   function staleAfterUpdate(version) {
     if (!version) return false;
     if (bootVersion === null) { bootVersion = version; return false; }
@@ -1621,7 +1636,7 @@ function boot() {
       if (g.tickable === false) continue;
       const groupHit = hit(g.title) || hit(g.heading);
       for (const r of g.rows || []) {
-        if (!(groupHit || hit(r.text) || hit(r.detail))) continue;
+        if (!(groupHit || hit(r.text) || hit(r.detail) || hit(r.stub) || hit(r.facts))) continue;
         const key = (r.text || "").toLowerCase();
         let m = byItem.get(key);
         if (!m) byItem.set(key, m = { title: r.text, wanters: [] });
@@ -1663,6 +1678,17 @@ function boot() {
         const li = el("li", (r.done ? "done " : "") + (tickable ? "tickable" : ""));
         const rn = el("div", "rn", (w.cls ? w.cls + " · " : "") + w.reward);
         if (r.detail) rn.appendChild(el("span", "sub", r.detail));
+        if (r.stub) rn.appendChild(el("span", "stub", r.stub));
+        if (r.facts) rn.appendChild(el("span", "facts", r.facts));
+        if (r.improve) {
+          // A plain link: the phone's browser opens the prefilled draft natively, so the
+          // desktop's pencil ports as itself rather than as a "do this on your PC" note.
+          const a = el("a", "improve", IMPROVE_LABEL);
+          a.href = r.improve; a.target = "_blank"; a.rel = "noopener";
+          // The row itself ticks on tap; the link must not also toggle the box.
+          a.onclick = (e) => e.stopPropagation();
+          rn.appendChild(a);
+        }
         if (tickable) {
           const cb = el("input");
           cb.type = "checkbox"; cb.checked = !!r.done;
@@ -1700,6 +1726,8 @@ function boot() {
       const rows = !filter ? g.rows : g.rows.filter(r =>
         (r.text || "").toLowerCase().includes(filter)
         || (r.detail || "").toLowerCase().includes(filter)
+        || (r.stub || "").toLowerCase().includes(filter)
+        || (r.facts || "").toLowerCase().includes(filter)
         || (g.heading || "").toLowerCase().includes(filter));
       if (!rows.length) continue;
       any = true;
@@ -1716,6 +1744,17 @@ function boot() {
         const li = el("li", (r.done ? "done " : "") + (tickable ? "tickable" : ""));
         const rn = el("div", "rn", r.text);
         if (r.detail) rn.appendChild(el("span", "sub", r.detail));
+        if (r.stub) rn.appendChild(el("span", "stub", r.stub));
+        if (r.facts) rn.appendChild(el("span", "facts", r.facts));
+        if (r.improve) {
+          // A plain link: the phone's browser opens the prefilled draft natively, so the
+          // desktop's pencil ports as itself rather than as a "do this on your PC" note.
+          const a = el("a", "improve", IMPROVE_LABEL);
+          a.href = r.improve; a.target = "_blank"; a.rel = "noopener";
+          // The row itself ticks on tap; the link must not also toggle the box.
+          a.onclick = (e) => e.stopPropagation();
+          rn.appendChild(a);
+        }
         if (tickable) {
           const cb = el("input");
           cb.type = "checkbox"; cb.checked = !!r.done;

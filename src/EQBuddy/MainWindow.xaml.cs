@@ -316,6 +316,10 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
                         UnlockedClasses = QuestLedger?.UnlockedClassesFor(QuestCharacterKey) ?? [],
                         // The Sky leftover bands' dump (#243): the quest window's own call.
                         Inventory = LatestInventory(),
+                        // The guided Sky rows read and write the same three stores the
+                        // desktop does; these two are the guide ledger's half of that.
+                        Ledger = QuestLedger,
+                        CharacterKey = QuestCharacterKey,
                     };
                 },
                 QuestLedger = QuestLedger,

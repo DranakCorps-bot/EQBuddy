@@ -18,7 +18,36 @@ public sealed record QuestChecklistRow(
     /// Rows arrive already ORDERED by it, so a surface draws a heading whenever this changes
     /// from the previous row and needs no grouping logic of its own — the same reason the
     /// rows themselves come pre-ordered (#184).</summary>
-    string IslandHeading = "");
+    string IslandHeading = "",
+    /// <summary>On a guide row whose data is a <c>GuideAuthoring.Stub</c>: what the wiki does
+    /// NOT tell us, in the player's words. Empty on every other row.
+    ///
+    /// This is a fact about OUR DATA, never about the player's progress — a stub row ticks
+    /// like any other. That is why it rides here and is never mapped onto
+    /// <c>QuestPresentation.State</c> (Founder lock 4a).</summary>
+    string StubNote = "",
+    /// <summary>The <c>Guide.Id</c> a guide row came from; empty on a classic checklist row.
+    /// Carried rather than parsed back out of <see cref="Id"/>: a surface with the row in
+    /// hand knows its guide without splitting a string that could contain the separator
+    /// (trap 4's shape, and the reason <c>QuestChecklistGroup.Title</c> is carried too).</summary>
+    string GuideRowKey = "",
+    /// <summary>This row IS the hand-in, not a piece to gather — only a guide's turn-in
+    /// objective is.
+    ///
+    /// <para>Load-bearing, not decoration. "Ready to turn in" means every piece is in hand
+    /// and the hand-in has NOT happened; once the turn-in is a row of its own, counting it
+    /// among the pieces makes that state unreachable — a Warrior holding both drops would
+    /// silently stop appearing in the cross-class Ready band and lose the "Mark turned in"
+    /// button on their own heading. See <see cref="QuestChecklistGroup.ReadyToTurnIn"/>.</para></summary>
+    bool IsTurnIn = false,
+    /// <summary>All six questions about this step, labelled — what the desktop hangs on the
+    /// row's hover and the phone draws as a small block, because a phone has no hover and an
+    /// affordance it cannot honour is a lie with the right shape (trap 35).
+    ///
+    /// <para>ONE field with two renderings rather than one field per surface: the six are one
+    /// fact about the step, and splitting them by who draws them is how the two screens start
+    /// answering differently.</para></summary>
+    string GuideFacts = "");
 
 /// <summary>A group of rows under one heading, with the state of the reward as a whole.</summary>
 /// <param name="Title">The reward (Sky) or section (Epic) on its own, WITHOUT the class.
@@ -42,14 +71,32 @@ public sealed record QuestChecklistGroup(
     IReadOnlyList<QuestChecklistRow> Rows,
     string? CompletionKey = null,
     bool Completed = false,
-    string? TurnInNpc = null)
+    string? TurnInNpc = null,
+    /// <summary>The <c>Guide.Id</c> whose objectives replaced this group's item rows, or ""
+    /// when no guide is authored for it. A class with no guide is untouched — that is the
+    /// progressive cutover, and this empty string is how a surface tells.</summary>
+    string GuideId = "",
+    /// <summary>The one line under a guided group's heading ("Guide · 0 of 3 · 1 stub"),
+    /// already worded by <c>GuidePresentation.GuidedCaption</c>. Carried so the desktop, the
+    /// shell and the phone say it identically and none of them spells it themselves.</summary>
+    string GuideCaption = "")
 {
     /// <summary>"Bard · Mask of Song" — what a heading reads as.</summary>
     public string Heading => ClassName + " · " + Title;
 
+    /// <summary>Every piece the player has to GATHER is in hand.
+    ///
+    /// <para>One predicate, three readers (<see cref="ReadyToTurnIn"/>, <see cref="State"/>,
+    /// <see cref="Note"/>) — they were three copies of the same expression, which is how the
+    /// guide projection's turn-in row would have desynchronised them one at a time.</para>
+    ///
+    /// <para><see cref="QuestChecklistRow.IsTurnIn"/> rows are excluded: the hand-in is the
+    /// thing being gated, never one of the things gating it.</para></summary>
+    private bool AllPiecesInHand => Rows.Count > 0 && Rows.All(r => r.Acquired || r.IsTurnIn);
+
     /// <summary>Every item in hand, and not yet turned in — the moment the turn-in
     /// control is worth offering.</summary>
-    public bool ReadyToTurnIn => !Completed && Rows.Count > 0 && Rows.All(r => r.Acquired);
+    public bool ReadyToTurnIn => !Completed && AllPiecesInHand;
 
     /// <summary>Progress counts DISTINCT steps, not rendered rows.
     ///
@@ -73,7 +120,7 @@ public sealed record QuestChecklistGroup(
     /// and telling those two apart is the entire job of this screen.</summary>
     public string State =>
         Completed ? QuestChecklistLayout.StateDone
-        : Rows.Count > 0 && Rows.All(r => r.Acquired)
+        : AllPiecesInHand
             ? CompletionKey is null ? QuestChecklistLayout.StateDone : QuestChecklistLayout.StateReady
         : QuestChecklistLayout.StateOpen;
 
@@ -83,7 +130,7 @@ public sealed record QuestChecklistGroup(
     /// <see cref="State"/> so the label and the filter cannot disagree.</summary>
     public string? Note =>
         Completed ? "done"
-        : Rows.Count > 0 && Rows.All(r => r.Acquired) ? "ready"
+        : AllPiecesInHand ? "ready"
         : Rows.Any(r => r.Acquired) ? "in progress"
         : null;
 

@@ -1,4 +1,5 @@
 using EQBuddy.Core;
+using EQBuddy.UI.Shared;
 
 namespace EQBuddy.Companion;
 
@@ -42,9 +43,37 @@ public static class CompanionActions
     /// <summary>Apply one action. False when nothing matched (a stale id from a phone
     /// that was showing an old checklist) or the surface accepts no ticks — the caller
     /// then saves nothing and repaints nothing.</summary>
-    public static bool Apply(AppSettings settings, CompanionAction action)
+    public static bool Apply(AppSettings settings, CompanionAction action) =>
+        Apply(settings, null, "", action);
+
+    /// <summary>Apply one action, with the guide ledger in hand so a tap on a guided Sky row
+    /// reaches the right one of the THREE stores.
+    ///
+    /// <para>The phone never writes the guide ledger itself: it hands the objective to
+    /// <see cref="GuideProgressRouter"/>, which is the same door the desktop's click goes
+    /// through. That is what makes "tick it on the phone, see it on the PC" structural rather
+    /// than two write paths that happen to agree.</para></summary>
+    public static bool Apply(
+        AppSettings settings, QuestLedgerStore? ledger, string characterKey, CompanionAction action)
     {
         if (!CompanionSurfaces.AcceptsTicks(action.Surface)) return false;
+        // A guide row's id belongs to no settings list, so it has to be resolved before the
+        // switch below goes looking for one and reports a stale id.
+        if (string.Equals(action.Surface, CompanionSurfaces.Sky, StringComparison.OrdinalIgnoreCase)
+            && GuideChecklistProjection.IsGuideRowId(action.Id))
+        {
+            if (ledger is null) return false;
+            if (GuideChecklistProjection.Resolve(GuideCatalog.Default, action.Id)
+                is not var (guide, objective)) return false;
+            var items = GuideChecklistProjection.ItemsFor(
+                settings, GuideChecklistProjection.RewardKeyOf(guide));
+            if (GuideProgressRouter.IsDone(settings, ledger, characterKey, guide.Id, objective, items)
+                == action.Done)
+                return false;
+            GuideProgressRouter.SetDone(
+                settings, ledger, characterKey, guide.Id, objective, items, action.Done);
+            return true;
+        }
         switch (action.Surface)
         {
             case CompanionSurfaces.Epics:

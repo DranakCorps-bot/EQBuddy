@@ -1,16 +1,740 @@
 {
-  "note": "CURATED guide catalog - hand-authored, never auto-written. The weekly wiki refresh FLAGS a guide whose source page changed (by intersecting the sources' page titles with the week's edits) and a human re-authors it; nothing here is generated. Every Authored objective answers who + where + what and cites the page it came from; every Stub says out loud what the wiki does not tell us, because a wrong instruction costs a player an evening and a stub costs them a browser tab. Guides layer BESIDE the harvested QuestCatalog and ON TOP of the Sky checklist: an objective's rewardKey is an existing QuestChecklistLayout.RewardKey ('Class|Reward'), so a turn-in stays one fact in one store. GuideCatalogTests holds all of that.",
+  "note": "CURATED guide catalog - hand-authored, never auto-written. The weekly wiki refresh FLAGS a guide whose source page changed (by intersecting the sources' page titles with the week's edits) and a human re-authors it; nothing here is generated. Every Authored objective answers who + where + what and cites the page it came from; every Stub says out loud what the wiki does not tell us, because a wrong instruction costs a player an evening and a stub costs them a browser tab. Guides layer BESIDE the harvested QuestCatalog and ON TOP of the Sky checklist: an objective's rewardKey is an existing QuestChecklistLayout.RewardKey ('Class|Reward'), so a turn-in stays one fact in one store. GuideCatalogTests holds all of that. Warrior, Monk and Druid authored 2026-09-09 from each class's own eqlwiki Plane of Sky Tests page; the item rows are exactly the ones SkyQuestDefaults already curates, so every box a player has ticked still counts.",
   "guides": [
+    {
+      "id": "pos-warrior-azure-ruby-ring",
+      "name": "Azure Ruby Ring - Warrior, Plane of Sky",
+      "guideType": "PlaneOfSkyQuest",
+      "questName": "Warrior Sky Test: Azure Ruby Ring",
+      "zoneNames": [
+        "Plane of Sky"
+      ],
+      "applicableClasses": [
+        "Warrior"
+      ],
+      "stages": [
+        {
+          "id": "isle-3-gorgalosk",
+          "name": "Isle 3: Gorgalosk",
+          "order": 1,
+          "arrivalNote": "",
+          "objectives": [
+            {
+              "id": "azure-ring",
+              "order": 1,
+              "objectiveType": "Loot",
+              "title": "Loot the Azure Ring from Gorgalosk",
+              "shortInstruction": "Kill Gorgalosk on Isle 3 and loot the Azure Ring.",
+              "who": "Gorgalosk",
+              "where": "Plane of Sky - Isle 3.",
+              "what": "Kill Gorgalosk and loot Azure Ring (1).",
+              "when": "Whenever Gorgalosk is up.",
+              "why": "Azure Ring is one of the turn-in pieces for the Azure Ruby Ring.",
+              "how": "Kill Gorgalosk and loot it. One named on a spawn cycle, so the wait is the cycle rather than a drop rate. Bring whatever it takes to hold a Sky named - nobody has recorded a solo kill for us.",
+              "itemNames": [
+                "Azure Ring"
+              ],
+              "authoring": "Authored",
+              "sources": [
+                {
+                  "url": "https://eqlwiki.com/Warrior_Plane_of_Sky_Tests",
+                  "title": "Warrior Plane of Sky Tests",
+                  "retrievedAt": "2026-09-09"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "the-wind-rune",
+          "name": "The wind rune",
+          "order": 2,
+          "arrivalNote": "",
+          "objectives": [
+            {
+              "id": "wind-rune-neza",
+              "order": 1,
+              "objectiveType": "Farm",
+              "title": "Collect Wind Rune Neza",
+              "shortInstruction": "Loot a Wind Rune Neza from Plane of Sky trash.",
+              "who": "",
+              "where": "",
+              "what": "Loot Wind Rune Neza (1).",
+              "when": "",
+              "why": "Wind Rune Neza is one of the turn-in pieces for the Azure Ruby Ring.",
+              "how": "",
+              "itemNames": [
+                "Wind Rune Neza"
+              ],
+              "authoring": "Stub",
+              "sources": [
+                {
+                  "url": "https://eqlwiki.com/Warrior_Plane_of_Sky_Tests",
+                  "title": "Warrior Plane of Sky Tests",
+                  "retrievedAt": "2026-09-09"
+                }
+              ],
+              "stubNote": "eqlwiki's Warrior Plane of Sky Tests page does not say which isle or which mob drops Wind Rune Neza, and EQBuddy's Sky checklist records only \"Trash mobs\". eqlwiki's Monk Plane of Sky Tests page describes wind runes as a random drop from any mob in the Plane of Sky, which is the closest thing to an answer we have for this one. If you have looted it, tell us the isle and the mob - that is what turns this step from a stub into directions."
+            }
+          ]
+        },
+        {
+          "id": "turn-in-to-torgon-blademaster",
+          "name": "Turn in to Torgon Blademaster",
+          "order": 3,
+          "arrivalNote": "",
+          "objectives": [
+            {
+              "id": "turn-in-azure-ruby-ring",
+              "order": 1,
+              "objectiveType": "TurnIn",
+              "title": "Hand in Azure Ring, Wind Rune Neza",
+              "shortInstruction": "Give Torgon Blademaster the 2 pieces to receive the Azure Ruby Ring.",
+              "who": "Torgon Blademaster",
+              "where": "Plane of Sky - the Efreeti Chamber, through the teleport pad at roughly 1600, 520 on Isle 1.",
+              "what": "Hand Torgon Blademaster Azure Ring (1), Wind Rune Neza (1) to receive the Azure Ruby Ring.",
+              "when": "Once every piece above is in your bags.",
+              "why": "This is the step that actually gives you the Azure Ruby Ring.",
+              "how": "A hand-in, not a fight - it is the last step and nothing else gates it. The log never records a turn-in, so tick it yourself when it is done.",
+              "prerequisiteObjectiveIds": [
+                "azure-ring",
+                "wind-rune-neza"
+              ],
+              "rewardKey": "Warrior|Azure Ruby Ring",
+              "itemNames": [
+                "Azure Ring",
+                "Wind Rune Neza",
+                "Azure Ruby Ring"
+              ],
+              "authoring": "Authored",
+              "sources": [
+                {
+                  "url": "https://eqlwiki.com/Warrior_Plane_of_Sky_Tests",
+                  "title": "Warrior Plane of Sky Tests",
+                  "retrievedAt": "2026-09-09"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://eqlwiki.com/Warrior_Plane_of_Sky_Tests",
+          "title": "Warrior Plane of Sky Tests",
+          "retrievedAt": "2026-09-09"
+        }
+      ]
+    },
+    {
+      "id": "pos-warrior-belt-of-the-four-winds",
+      "name": "Belt of the Four Winds - Warrior, Plane of Sky",
+      "guideType": "PlaneOfSkyQuest",
+      "questName": "Warrior Sky Test: Belt of the Four Winds",
+      "zoneNames": [
+        "Plane of Sky"
+      ],
+      "applicableClasses": [
+        "Warrior"
+      ],
+      "stages": [
+        {
+          "id": "the-efreeti-drop",
+          "name": "The Efreeti drop",
+          "order": 1,
+          "arrivalNote": "",
+          "objectives": [
+            {
+              "id": "efreeti-belt",
+              "order": 1,
+              "objectiveType": "Loot",
+              "title": "Loot the Efreeti Belt",
+              "shortInstruction": "Loot the Efreeti Belt from any of the three Efreeti-drop mobs.",
+              "who": "Noble Dojorn, the Overseer of Air, or the Hand of Veeshan",
+              "where": "Plane of Sky - Isles 1.5, 4 and 8 respectively.",
+              "what": "Loot Efreeti Belt (1) from any one of the three Efreeti-drop mobs.",
+              "when": "Whichever of the three is up first.",
+              "why": "Efreeti Belt is one of the turn-in pieces for the Belt of the Four Winds.",
+              "how": "Kill any one of the three and loot it. They drop the same item, so this step waits on the earliest of three spawns rather than on one - which is why it is usually not the step that holds a reward up.",
+              "itemNames": [
+                "Efreeti Belt"
+              ],
+              "authoring": "Authored",
+              "sources": [
+                {
+                  "url": "https://eqlwiki.com/Warrior_Plane_of_Sky_Tests",
+                  "title": "Warrior Plane of Sky Tests",
+                  "retrievedAt": "2026-09-09"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "isle-6-bazzt-zzzt",
+          "name": "Isle 6: Bazzt Zzzt",
+          "order": 2,
+          "arrivalNote": "",
+          "objectives": [
+            {
+              "id": "wind-tablet",
+              "order": 1,
+              "objectiveType": "Loot",
+              "title": "Loot the Wind Tablet from Bazzt Zzzt",
+              "shortInstruction": "Kill Bazzt Zzzt on Isle 6 and loot the Wind Tablet.",
+              "who": "Bazzt Zzzt",
+              "where": "Plane of Sky - Isle 6.",
+              "what": "Kill Bazzt Zzzt and loot Wind Tablet (1).",
+              "when": "Whenever Bazzt Zzzt is up.",
+              "why": "Wind Tablet is one of the turn-in pieces for the Belt of the Four Winds.",
+              "how": "Kill Bazzt Zzzt and loot it. One named on a spawn cycle, so the wait is the cycle rather than a drop rate. Bring whatever it takes to hold a Sky named - nobody has recorded a solo kill for us.",
+              "itemNames": [
+                "Wind Tablet"
+              ],
+              "authoring": "Authored",
+              "sources": [
+                {
+                  "url": "https://eqlwiki.com/Warrior_Plane_of_Sky_Tests",
+                  "title": "Warrior Plane of Sky Tests",
+                  "retrievedAt": "2026-09-09"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "the-wind-rune",
+          "name": "The wind rune",
+          "order": 3,
+          "arrivalNote": "",
+          "objectives": [
+            {
+              "id": "wind-rune-fana",
+              "order": 1,
+              "objectiveType": "Farm",
+              "title": "Collect Wind Rune Fana",
+              "shortInstruction": "Loot a Wind Rune Fana from Plane of Sky trash.",
+              "who": "",
+              "where": "",
+              "what": "Loot Wind Rune Fana (1).",
+              "when": "",
+              "why": "Wind Rune Fana is one of the turn-in pieces for the Belt of the Four Winds.",
+              "how": "",
+              "itemNames": [
+                "Wind Rune Fana"
+              ],
+              "authoring": "Stub",
+              "sources": [
+                {
+                  "url": "https://eqlwiki.com/Warrior_Plane_of_Sky_Tests",
+                  "title": "Warrior Plane of Sky Tests",
+                  "retrievedAt": "2026-09-09"
+                }
+              ],
+              "stubNote": "eqlwiki's Warrior Plane of Sky Tests page does not say which isle or which mob drops Wind Rune Fana, and EQBuddy's Sky checklist records only \"Trash mobs\". eqlwiki's Monk Plane of Sky Tests page describes wind runes as a random drop from any mob in the Plane of Sky, which is the closest thing to an answer we have for this one. If you have looted it, tell us the isle and the mob - that is what turns this step from a stub into directions."
+            }
+          ]
+        },
+        {
+          "id": "turn-in-to-torgon-blademaster",
+          "name": "Turn in to Torgon Blademaster",
+          "order": 4,
+          "arrivalNote": "",
+          "objectives": [
+            {
+              "id": "turn-in-belt-of-the-four-winds",
+              "order": 1,
+              "objectiveType": "TurnIn",
+              "title": "Hand in Efreeti Belt, Wind Tablet, Wind Rune Fana",
+              "shortInstruction": "Give Torgon Blademaster the 3 pieces to receive the Belt of the Four Winds.",
+              "who": "Torgon Blademaster",
+              "where": "Plane of Sky - the Efreeti Chamber, through the teleport pad at roughly 1600, 520 on Isle 1.",
+              "what": "Hand Torgon Blademaster Efreeti Belt (1), Wind Tablet (1), Wind Rune Fana (1) to receive the Belt of the Four Winds.",
+              "when": "Once every piece above is in your bags.",
+              "why": "This is the step that actually gives you the Belt of the Four Winds.",
+              "how": "A hand-in, not a fight - it is the last step and nothing else gates it. The log never records a turn-in, so tick it yourself when it is done.",
+              "prerequisiteObjectiveIds": [
+                "efreeti-belt",
+                "wind-tablet",
+                "wind-rune-fana"
+              ],
+              "rewardKey": "Warrior|Belt of the Four Winds",
+              "itemNames": [
+                "Efreeti Belt",
+                "Wind Tablet",
+                "Wind Rune Fana",
+                "Belt of the Four Winds"
+              ],
+              "authoring": "Authored",
+              "sources": [
+                {
+                  "url": "https://eqlwiki.com/Warrior_Plane_of_Sky_Tests",
+                  "title": "Warrior Plane of Sky Tests",
+                  "retrievedAt": "2026-09-09"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://eqlwiki.com/Warrior_Plane_of_Sky_Tests",
+          "title": "Warrior Plane of Sky Tests",
+          "retrievedAt": "2026-09-09"
+        }
+      ]
+    },
+    {
+      "id": "pos-warrior-dagas",
+      "name": "Dagas - Warrior, Plane of Sky",
+      "guideType": "PlaneOfSkyQuest",
+      "questName": "Warrior Sky Test: Dagas",
+      "zoneNames": [
+        "Plane of Sky"
+      ],
+      "applicableClasses": [
+        "Warrior"
+      ],
+      "stages": [
+        {
+          "id": "isle-7-sister-of-the-spire",
+          "name": "Isle 7: Sister of the Spire",
+          "order": 1,
+          "arrivalNote": "",
+          "objectives": [
+            {
+              "id": "djinni-war-blade",
+              "order": 1,
+              "objectiveType": "Loot",
+              "title": "Loot the Djinni War Blade from Sister of the Spire",
+              "shortInstruction": "Kill Sister of the Spire on Isle 7 and loot the Djinni War Blade.",
+              "who": "Sister of the Spire",
+              "where": "Plane of Sky - Isle 7.",
+              "what": "Kill Sister of the Spire and loot Djinni War Blade (1).",
+              "when": "Whenever Sister of the Spire is up.",
+              "why": "Djinni War Blade is one of the turn-in pieces for the Dagas.",
+              "how": "Kill Sister of the Spire and loot it. One named on a spawn cycle, so the wait is the cycle rather than a drop rate. Bring whatever it takes to hold a Sky named - nobody has recorded a solo kill for us.",
+              "itemNames": [
+                "Djinni War Blade"
+              ],
+              "authoring": "Authored",
+              "sources": [
+                {
+                  "url": "https://eqlwiki.com/Warrior_Plane_of_Sky_Tests",
+                  "title": "Warrior Plane of Sky Tests",
+                  "retrievedAt": "2026-09-09"
+                }
+              ]
+            },
+            {
+              "id": "gem-of-invigoration",
+              "order": 2,
+              "objectiveType": "Loot",
+              "title": "Collect the Gem of Invigoration",
+              "shortInstruction": "Loot a Gem of Invigoration.",
+              "who": "",
+              "where": "",
+              "what": "Loot Gem of Invigoration (1).",
+              "when": "",
+              "why": "Gem of Invigoration is one of the turn-in pieces for the Dagas.",
+              "how": "",
+              "itemNames": [
+                "Gem of Invigoration"
+              ],
+              "authoring": "Stub",
+              "sources": [
+                {
+                  "url": "https://eqlwiki.com/Warrior_Plane_of_Sky_Tests",
+                  "title": "Warrior Plane of Sky Tests",
+                  "retrievedAt": "2026-09-09"
+                }
+              ],
+              "stubNote": "Our two sources disagree about this one and we will not guess. EQBuddy's Sky checklist records it as Isle 2, the Protector of Sky; eqlwiki's Warrior Plane of Sky Tests page records it as Isle 7 trash. If you have looted it, tell us which isle and which mob and we will correct whichever of the two is wrong."
+            }
+          ]
+        },
+        {
+          "id": "the-wind-rune",
+          "name": "The wind rune",
+          "order": 2,
+          "arrivalNote": "",
+          "objectives": [
+            {
+              "id": "wind-rune-jaka",
+              "order": 1,
+              "objectiveType": "Farm",
+              "title": "Collect Wind Rune Jaka",
+              "shortInstruction": "Loot a Wind Rune Jaka from Plane of Sky trash.",
+              "who": "",
+              "where": "",
+              "what": "Loot Wind Rune Jaka (1).",
+              "when": "",
+              "why": "Wind Rune Jaka is one of the turn-in pieces for the Dagas.",
+              "how": "",
+              "itemNames": [
+                "Wind Rune Jaka"
+              ],
+              "authoring": "Stub",
+              "sources": [
+                {
+                  "url": "https://eqlwiki.com/Warrior_Plane_of_Sky_Tests",
+                  "title": "Warrior Plane of Sky Tests",
+                  "retrievedAt": "2026-09-09"
+                }
+              ],
+              "stubNote": "eqlwiki's Warrior Plane of Sky Tests page does not say which isle or which mob drops Wind Rune Jaka, and EQBuddy's Sky checklist records only \"Trash mobs\". eqlwiki's Monk Plane of Sky Tests page describes wind runes as a random drop from any mob in the Plane of Sky, which is the closest thing to an answer we have for this one. If you have looted it, tell us the isle and the mob - that is what turns this step from a stub into directions."
+            }
+          ]
+        },
+        {
+          "id": "turn-in-to-torgon-blademaster",
+          "name": "Turn in to Torgon Blademaster",
+          "order": 3,
+          "arrivalNote": "",
+          "objectives": [
+            {
+              "id": "turn-in-dagas",
+              "order": 1,
+              "objectiveType": "TurnIn",
+              "title": "Hand in Djinni War Blade, Gem of Invigoration, Wind Rune Jaka",
+              "shortInstruction": "Give Torgon Blademaster the 3 pieces to receive the Dagas.",
+              "who": "Torgon Blademaster",
+              "where": "Plane of Sky - the Efreeti Chamber, through the teleport pad at roughly 1600, 520 on Isle 1.",
+              "what": "Hand Torgon Blademaster Djinni War Blade (1), Gem of Invigoration (1), Wind Rune Jaka (1) to receive the Dagas.",
+              "when": "Once every piece above is in your bags.",
+              "why": "This is the step that actually gives you the Dagas.",
+              "how": "A hand-in, not a fight - it is the last step and nothing else gates it. The log never records a turn-in, so tick it yourself when it is done.",
+              "prerequisiteObjectiveIds": [
+                "djinni-war-blade",
+                "gem-of-invigoration",
+                "wind-rune-jaka"
+              ],
+              "rewardKey": "Warrior|Dagas",
+              "itemNames": [
+                "Djinni War Blade",
+                "Gem of Invigoration",
+                "Wind Rune Jaka",
+                "Dagas"
+              ],
+              "authoring": "Authored",
+              "sources": [
+                {
+                  "url": "https://eqlwiki.com/Warrior_Plane_of_Sky_Tests",
+                  "title": "Warrior Plane of Sky Tests",
+                  "retrievedAt": "2026-09-09"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://eqlwiki.com/Warrior_Plane_of_Sky_Tests",
+          "title": "Warrior Plane of Sky Tests",
+          "retrievedAt": "2026-09-09"
+        }
+      ]
+    },
+    {
+      "id": "pos-warrior-fangol",
+      "name": "Fangol - Warrior, Plane of Sky",
+      "guideType": "PlaneOfSkyQuest",
+      "questName": "Warrior Sky Test: Fangol",
+      "zoneNames": [
+        "Plane of Sky"
+      ],
+      "applicableClasses": [
+        "Warrior"
+      ],
+      "stages": [
+        {
+          "id": "the-efreeti-drop",
+          "name": "The Efreeti drop",
+          "order": 1,
+          "arrivalNote": "",
+          "objectives": [
+            {
+              "id": "efreeti-battle-axe",
+              "order": 1,
+              "objectiveType": "Loot",
+              "title": "Loot the Efreeti Battle Axe",
+              "shortInstruction": "Loot the Efreeti Battle Axe from any of the three Efreeti-drop mobs.",
+              "who": "Noble Dojorn, the Overseer of Air, or the Hand of Veeshan",
+              "where": "Plane of Sky - Isles 1.5, 4 and 8 respectively.",
+              "what": "Loot Efreeti Battle Axe (1) from any one of the three Efreeti-drop mobs.",
+              "when": "Whichever of the three is up first.",
+              "why": "Efreeti Battle Axe is one of the turn-in pieces for the Fangol.",
+              "how": "Kill any one of the three and loot it. They drop the same item, so this step waits on the earliest of three spawns rather than on one - which is why it is usually not the step that holds a reward up.",
+              "itemNames": [
+                "Efreeti Battle Axe"
+              ],
+              "authoring": "Authored",
+              "sources": [
+                {
+                  "url": "https://eqlwiki.com/Warrior_Plane_of_Sky_Tests",
+                  "title": "Warrior Plane of Sky Tests",
+                  "retrievedAt": "2026-09-09"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "isle-8-eye-of-veeshan",
+          "name": "Isle 8: Eye of Veeshan",
+          "order": 2,
+          "arrivalNote": "",
+          "objectives": [
+            {
+              "id": "ethereal-emerald",
+              "order": 1,
+              "objectiveType": "Loot",
+              "title": "Loot the Ethereal Emerald from Eye of Veeshan",
+              "shortInstruction": "Kill Eye of Veeshan on Isle 8 and loot the Ethereal Emerald.",
+              "who": "Eye of Veeshan",
+              "where": "Plane of Sky - Isle 8.",
+              "what": "Kill Eye of Veeshan and loot Ethereal Emerald (1).",
+              "when": "Whenever Eye of Veeshan is up.",
+              "why": "Ethereal Emerald is one of the turn-in pieces for the Fangol.",
+              "how": "Kill Eye of Veeshan and loot it. One named on a spawn cycle, so the wait is the cycle rather than a drop rate. Bring whatever it takes to hold a Sky named - nobody has recorded a solo kill for us.",
+              "itemNames": [
+                "Ethereal Emerald"
+              ],
+              "authoring": "Authored",
+              "sources": [
+                {
+                  "url": "https://eqlwiki.com/Warrior_Plane_of_Sky_Tests",
+                  "title": "Warrior Plane of Sky Tests",
+                  "retrievedAt": "2026-09-09"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "the-wind-rune",
+          "name": "The wind rune",
+          "order": 3,
+          "arrivalNote": "",
+          "objectives": [
+            {
+              "id": "wind-rune-dena",
+              "order": 1,
+              "objectiveType": "Farm",
+              "title": "Collect Wind Rune Dena",
+              "shortInstruction": "Loot a Wind Rune Dena from Plane of Sky trash.",
+              "who": "",
+              "where": "",
+              "what": "Loot Wind Rune Dena (1).",
+              "when": "",
+              "why": "Wind Rune Dena is one of the turn-in pieces for the Fangol.",
+              "how": "",
+              "itemNames": [
+                "Wind Rune Dena"
+              ],
+              "authoring": "Stub",
+              "sources": [
+                {
+                  "url": "https://eqlwiki.com/Warrior_Plane_of_Sky_Tests",
+                  "title": "Warrior Plane of Sky Tests",
+                  "retrievedAt": "2026-09-09"
+                }
+              ],
+              "stubNote": "eqlwiki's Warrior Plane of Sky Tests page does not say which isle or which mob drops Wind Rune Dena, and EQBuddy's Sky checklist records only \"Trash mobs\". eqlwiki's Monk Plane of Sky Tests page describes wind runes as a random drop from any mob in the Plane of Sky, which is the closest thing to an answer we have for this one. If you have looted it, tell us the isle and the mob - that is what turns this step from a stub into directions."
+            }
+          ]
+        },
+        {
+          "id": "turn-in-to-torgon-blademaster",
+          "name": "Turn in to Torgon Blademaster",
+          "order": 4,
+          "arrivalNote": "",
+          "objectives": [
+            {
+              "id": "turn-in-fangol",
+              "order": 1,
+              "objectiveType": "TurnIn",
+              "title": "Hand in Efreeti Battle Axe, Ethereal Emerald, Wind Rune Dena",
+              "shortInstruction": "Give Torgon Blademaster the 3 pieces to receive the Fangol.",
+              "who": "Torgon Blademaster",
+              "where": "Plane of Sky - the Efreeti Chamber, through the teleport pad at roughly 1600, 520 on Isle 1.",
+              "what": "Hand Torgon Blademaster Efreeti Battle Axe (1), Ethereal Emerald (1), Wind Rune Dena (1) to receive the Fangol.",
+              "when": "Once every piece above is in your bags.",
+              "why": "This is the step that actually gives you the Fangol.",
+              "how": "A hand-in, not a fight - it is the last step and nothing else gates it. The log never records a turn-in, so tick it yourself when it is done.",
+              "prerequisiteObjectiveIds": [
+                "efreeti-battle-axe",
+                "ethereal-emerald",
+                "wind-rune-dena"
+              ],
+              "rewardKey": "Warrior|Fangol",
+              "itemNames": [
+                "Efreeti Battle Axe",
+                "Ethereal Emerald",
+                "Wind Rune Dena",
+                "Fangol"
+              ],
+              "authoring": "Authored",
+              "sources": [
+                {
+                  "url": "https://eqlwiki.com/Warrior_Plane_of_Sky_Tests",
+                  "title": "Warrior Plane of Sky Tests",
+                  "retrievedAt": "2026-09-09"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://eqlwiki.com/Warrior_Plane_of_Sky_Tests",
+          "title": "Warrior Plane of Sky Tests",
+          "retrievedAt": "2026-09-09"
+        }
+      ]
+    },
+    {
+      "id": "pos-warrior-pauldrons-of-the-blue-sky",
+      "name": "Pauldrons of the Blue Sky - Warrior, Plane of Sky",
+      "guideType": "PlaneOfSkyQuest",
+      "questName": "Warrior Sky Test: Pauldrons of the Blue Sky",
+      "zoneNames": [
+        "Plane of Sky"
+      ],
+      "applicableClasses": [
+        "Warrior"
+      ],
+      "stages": [
+        {
+          "id": "isle-5-the-spiroc-lord",
+          "name": "Isle 5: The Spiroc Lord",
+          "order": 1,
+          "arrivalNote": "",
+          "objectives": [
+            {
+              "id": "spiroc-air-totem",
+              "order": 1,
+              "objectiveType": "Loot",
+              "title": "Loot the Spiroc Air Totem from The Spiroc Lord",
+              "shortInstruction": "Kill The Spiroc Lord on Isle 5 and loot the Spiroc Air Totem.",
+              "who": "The Spiroc Lord",
+              "where": "Plane of Sky - Isle 5.",
+              "what": "Kill The Spiroc Lord and loot Spiroc Air Totem (1).",
+              "when": "Whenever The Spiroc Lord is up.",
+              "why": "Spiroc Air Totem is one of the turn-in pieces for the Pauldrons of the Blue Sky.",
+              "how": "Kill The Spiroc Lord and loot it. One named on a spawn cycle, so the wait is the cycle rather than a drop rate. Bring whatever it takes to hold a Sky named - nobody has recorded a solo kill for us.",
+              "itemNames": [
+                "Spiroc Air Totem"
+              ],
+              "authoring": "Authored",
+              "sources": [
+                {
+                  "url": "https://eqlwiki.com/Warrior_Plane_of_Sky_Tests",
+                  "title": "Warrior Plane of Sky Tests",
+                  "retrievedAt": "2026-09-09"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "the-wind-rune",
+          "name": "The wind rune",
+          "order": 2,
+          "arrivalNote": "",
+          "objectives": [
+            {
+              "id": "wind-rune-beza",
+              "order": 1,
+              "objectiveType": "Farm",
+              "title": "Collect Wind Rune Beza",
+              "shortInstruction": "Loot a Wind Rune Beza from Plane of Sky trash.",
+              "who": "",
+              "where": "",
+              "what": "Loot Wind Rune Beza (1).",
+              "when": "",
+              "why": "Wind Rune Beza is one of the turn-in pieces for the Pauldrons of the Blue Sky.",
+              "how": "",
+              "itemNames": [
+                "Wind Rune Beza"
+              ],
+              "authoring": "Stub",
+              "sources": [
+                {
+                  "url": "https://eqlwiki.com/Warrior_Plane_of_Sky_Tests",
+                  "title": "Warrior Plane of Sky Tests",
+                  "retrievedAt": "2026-09-09"
+                }
+              ],
+              "stubNote": "eqlwiki's Warrior Plane of Sky Tests page does not say which isle or which mob drops Wind Rune Beza, and EQBuddy's Sky checklist records only \"Trash mobs\". eqlwiki's Monk Plane of Sky Tests page describes wind runes as a random drop from any mob in the Plane of Sky, which is the closest thing to an answer we have for this one. If you have looted it, tell us the isle and the mob - that is what turns this step from a stub into directions."
+            }
+          ]
+        },
+        {
+          "id": "turn-in-to-torgon-blademaster",
+          "name": "Turn in to Torgon Blademaster",
+          "order": 3,
+          "arrivalNote": "",
+          "objectives": [
+            {
+              "id": "turn-in-pauldrons-of-the-blue-sky",
+              "order": 1,
+              "objectiveType": "TurnIn",
+              "title": "Hand in Spiroc Air Totem, Wind Rune Beza",
+              "shortInstruction": "Give Torgon Blademaster the 2 pieces to receive the Pauldrons of the Blue Sky.",
+              "who": "Torgon Blademaster",
+              "where": "Plane of Sky - the Efreeti Chamber, through the teleport pad at roughly 1600, 520 on Isle 1.",
+              "what": "Hand Torgon Blademaster Spiroc Air Totem (1), Wind Rune Beza (1) to receive the Pauldrons of the Blue Sky.",
+              "when": "Once every piece above is in your bags.",
+              "why": "This is the step that actually gives you the Pauldrons of the Blue Sky.",
+              "how": "A hand-in, not a fight - it is the last step and nothing else gates it. The log never records a turn-in, so tick it yourself when it is done.",
+              "prerequisiteObjectiveIds": [
+                "spiroc-air-totem",
+                "wind-rune-beza"
+              ],
+              "rewardKey": "Warrior|Pauldrons of the Blue Sky",
+              "itemNames": [
+                "Spiroc Air Totem",
+                "Wind Rune Beza",
+                "Pauldrons of the Blue Sky"
+              ],
+              "authoring": "Authored",
+              "sources": [
+                {
+                  "url": "https://eqlwiki.com/Warrior_Plane_of_Sky_Tests",
+                  "title": "Warrior Plane of Sky Tests",
+                  "retrievedAt": "2026-09-09"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://eqlwiki.com/Warrior_Plane_of_Sky_Tests",
+          "title": "Warrior Plane of Sky Tests",
+          "retrievedAt": "2026-09-09"
+        }
+      ]
+    },
     {
       "id": "pos-warrior-runed-wind-amulet",
       "name": "Runed Wind Amulet - Warrior, Plane of Sky",
       "guideType": "PlaneOfSkyQuest",
       "questName": "Warrior Sky Test: Runed Wind Amulet",
-      "zoneNames": ["Plane of Sky"],
-      "applicableClasses": ["Warrior"],
+      "zoneNames": [
+        "Plane of Sky"
+      ],
+      "applicableClasses": [
+        "Warrior"
+      ],
       "stages": [
         {
-          "id": "isle-4",
+          "id": "isle-4-keeper-of-souls",
           "name": "Isle 4: Keeper of Souls",
           "order": 1,
           "arrivalNote": "",
@@ -19,25 +743,30 @@
               "id": "stone-amulet",
               "order": 1,
               "objectiveType": "Loot",
-              "title": "Loot the Stone Amulet from the Keeper of Souls",
-              "shortInstruction": "Kill the Keeper of Souls on Isle 4 and loot the Stone Amulet.",
+              "title": "Loot the Stone Amulet from Keeper of Souls",
+              "shortInstruction": "Kill Keeper of Souls on Isle 4 and loot the Stone Amulet.",
               "who": "Keeper of Souls",
-              "where": "Plane of Sky - Isle 4, the Keeper of Souls island.",
-              "what": "Kill the Keeper of Souls and loot Stone Amulet (1). It is one of the two turn-ins for the Runed Wind Amulet.",
-              "itemNames": ["Stone Amulet"],
+              "where": "Plane of Sky - Isle 4.",
+              "what": "Kill Keeper of Souls and loot Stone Amulet (1).",
+              "when": "Whenever Keeper of Souls is up.",
+              "why": "Stone Amulet is one of the turn-in pieces for the Runed Wind Amulet.",
+              "how": "Kill Keeper of Souls and loot it. One named on a spawn cycle, so the wait is the cycle rather than a drop rate. Bring whatever it takes to hold a Sky named - nobody has recorded a solo kill for us.",
+              "itemNames": [
+                "Stone Amulet"
+              ],
               "authoring": "Authored",
               "sources": [
                 {
                   "url": "https://eqlwiki.com/Warrior_Plane_of_Sky_Tests",
                   "title": "Warrior Plane of Sky Tests",
-                  "retrievedAt": "2026-08-31"
+                  "retrievedAt": "2026-09-09"
                 }
               ]
             }
           ]
         },
         {
-          "id": "wind-runes",
+          "id": "the-wind-rune",
           "name": "The wind rune",
           "order": 2,
           "arrivalNote": "",
@@ -50,22 +779,27 @@
               "shortInstruction": "Loot a Wind Rune Azia from Plane of Sky trash.",
               "who": "",
               "where": "",
-              "what": "Loot Wind Rune Azia (1). It is the second of the two turn-ins for the Runed Wind Amulet.",
-              "itemNames": ["Wind Rune Azia"],
+              "what": "Loot Wind Rune Azia (1).",
+              "when": "",
+              "why": "Wind Rune Azia is one of the turn-in pieces for the Runed Wind Amulet.",
+              "how": "",
+              "itemNames": [
+                "Wind Rune Azia"
+              ],
               "authoring": "Stub",
-              "stubNote": "EQBuddy's Sky checklist records only \"Trash mobs\" for Wind Rune Azia, and eqlwiki's Warrior Plane of Sky Tests page does not say which isle or which mobs drop it. If you have looted one, tell us the isle and the mob - that is what turns this step from a stub into directions.",
               "sources": [
                 {
                   "url": "https://eqlwiki.com/Warrior_Plane_of_Sky_Tests",
                   "title": "Warrior Plane of Sky Tests",
-                  "retrievedAt": "2026-08-31"
+                  "retrievedAt": "2026-09-09"
                 }
-              ]
+              ],
+              "stubNote": "eqlwiki's Warrior Plane of Sky Tests page does not say which isle or which mob drops Wind Rune Azia, and EQBuddy's Sky checklist records only \"Trash mobs\". eqlwiki's Monk Plane of Sky Tests page describes wind runes as a random drop from any mob in the Plane of Sky, which is the closest thing to an answer we have for this one. If you have looted it, tell us the isle and the mob - that is what turns this step from a stub into directions."
             }
           ]
         },
         {
-          "id": "turn-in",
+          "id": "turn-in-to-torgon-blademaster",
           "name": "Turn in to Torgon Blademaster",
           "order": 3,
           "arrivalNote": "",
@@ -74,20 +808,30 @@
               "id": "turn-in-runed-wind-amulet",
               "order": 1,
               "objectiveType": "TurnIn",
-              "title": "Hand in the Stone Amulet and Wind Rune Azia",
-              "shortInstruction": "Give Torgon Blademaster the Stone Amulet and the Wind Rune Azia.",
+              "title": "Hand in Stone Amulet, Wind Rune Azia",
+              "shortInstruction": "Give Torgon Blademaster the 2 pieces to receive the Runed Wind Amulet.",
               "who": "Torgon Blademaster",
-              "where": "Plane of Sky - back to Torgon Blademaster, the Warrior quest giver you took the tests from.",
-              "what": "Hand Torgon Blademaster Stone Amulet (1) and Wind Rune Azia (1) to receive the Runed Wind Amulet.",
-              "prerequisiteObjectiveIds": ["stone-amulet", "wind-rune-azia"],
+              "where": "Plane of Sky - the Efreeti Chamber, through the teleport pad at roughly 1600, 520 on Isle 1.",
+              "what": "Hand Torgon Blademaster Stone Amulet (1), Wind Rune Azia (1) to receive the Runed Wind Amulet.",
+              "when": "Once every piece above is in your bags.",
+              "why": "This is the step that actually gives you the Runed Wind Amulet.",
+              "how": "A hand-in, not a fight - it is the last step and nothing else gates it. The log never records a turn-in, so tick it yourself when it is done.",
+              "prerequisiteObjectiveIds": [
+                "stone-amulet",
+                "wind-rune-azia"
+              ],
               "rewardKey": "Warrior|Runed Wind Amulet",
-              "itemNames": ["Stone Amulet", "Wind Rune Azia", "Runed Wind Amulet"],
+              "itemNames": [
+                "Stone Amulet",
+                "Wind Rune Azia",
+                "Runed Wind Amulet"
+              ],
               "authoring": "Authored",
               "sources": [
                 {
                   "url": "https://eqlwiki.com/Warrior_Plane_of_Sky_Tests",
                   "title": "Warrior Plane of Sky Tests",
-                  "retrievedAt": "2026-08-31"
+                  "retrievedAt": "2026-09-09"
                 }
               ]
             }
@@ -98,7 +842,1637 @@
         {
           "url": "https://eqlwiki.com/Warrior_Plane_of_Sky_Tests",
           "title": "Warrior Plane of Sky Tests",
-          "retrievedAt": "2026-08-31"
+          "retrievedAt": "2026-09-09"
+        }
+      ]
+    },
+    {
+      "id": "pos-monk-back-straps-of-mastery",
+      "name": "Back Straps of Mastery - Monk, Plane of Sky",
+      "guideType": "PlaneOfSkyQuest",
+      "questName": "Monk Sky Test: Back Straps of Mastery",
+      "zoneNames": [
+        "Plane of Sky"
+      ],
+      "applicableClasses": [
+        "Monk"
+      ],
+      "stages": [
+        {
+          "id": "isle-3-gorgalosk",
+          "name": "Isle 3: Gorgalosk",
+          "order": 1,
+          "arrivalNote": "",
+          "objectives": [
+            {
+              "id": "silken-strands",
+              "order": 1,
+              "objectiveType": "Loot",
+              "title": "Loot the Silken Strands from Gorgalosk",
+              "shortInstruction": "Kill Gorgalosk on Isle 3 and loot the Silken Strands.",
+              "who": "Gorgalosk",
+              "where": "Plane of Sky - Isle 3.",
+              "what": "Kill Gorgalosk and loot Silken Strands (1).",
+              "when": "Whenever Gorgalosk is up.",
+              "why": "Silken Strands is one of the turn-in pieces for the Back Straps of Mastery.",
+              "how": "Kill Gorgalosk and loot it. One named on a spawn cycle, so the wait is the cycle rather than a drop rate. Bring whatever it takes to hold a Sky named - nobody has recorded a solo kill for us.",
+              "itemNames": [
+                "Silken Strands"
+              ],
+              "authoring": "Authored",
+              "sources": [
+                {
+                  "url": "https://eqlwiki.com/Monk_Plane_of_Sky_Tests",
+                  "title": "Monk Plane of Sky Tests",
+                  "retrievedAt": "2026-09-09"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "the-wind-rune",
+          "name": "The wind rune",
+          "order": 2,
+          "arrivalNote": "",
+          "objectives": [
+            {
+              "id": "wind-rune-caza",
+              "order": 1,
+              "objectiveType": "Farm",
+              "title": "Collect Wind Rune Caza",
+              "shortInstruction": "Loot a Wind Rune Caza from Plane of Sky trash.",
+              "who": "any Plane of Sky mob",
+              "where": "Plane of Sky - no fixed isle. eqlwiki's Monk Plane of Sky Tests page says the wind runes are a random drop from any mob in the zone.",
+              "what": "Loot Wind Rune Caza (1).",
+              "when": "Any time you are in the zone.",
+              "why": "Wind Rune Caza is one of the turn-in pieces for the Back Straps of Mastery.",
+              "how": "Kill trash and loot. A random drop with no named attached and no spawn to wait for, so it is the step that finishes itself while you work the others - patience rather than a fight you have to plan.",
+              "itemNames": [
+                "Wind Rune Caza"
+              ],
+              "authoring": "Authored",
+              "sources": [
+                {
+                  "url": "https://eqlwiki.com/Monk_Plane_of_Sky_Tests",
+                  "title": "Monk Plane of Sky Tests",
+                  "retrievedAt": "2026-09-09"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "turn-in-to-holwin",
+          "name": "Turn in to Holwin",
+          "order": 3,
+          "arrivalNote": "",
+          "objectives": [
+            {
+              "id": "turn-in-back-straps-of-mastery",
+              "order": 1,
+              "objectiveType": "TurnIn",
+              "title": "Hand in Silken Strands, Wind Rune Caza",
+              "shortInstruction": "Give Holwin the 2 pieces to receive the Back Straps of Mastery.",
+              "who": "Holwin",
+              "where": "Plane of Sky - eqlwiki's Monk page does not say where in the zone Holwin stands.",
+              "what": "Hand Holwin Silken Strands (1), Wind Rune Caza (1) to receive the Back Straps of Mastery.",
+              "when": "Once every piece above is in your bags.",
+              "why": "This is the step that actually gives you the Back Straps of Mastery.",
+              "how": "A hand-in, not a fight - it is the last step and nothing else gates it. The log never records a turn-in, so tick it yourself when it is done.",
+              "prerequisiteObjectiveIds": [
+                "silken-strands",
+                "wind-rune-caza"
+              ],
+              "rewardKey": "Monk|Back Straps of Mastery",
+              "itemNames": [
+                "Silken Strands",
+                "Wind Rune Caza",
+                "Back Straps of Mastery"
+              ],
+              "authoring": "Authored",
+              "sources": [
+                {
+                  "url": "https://eqlwiki.com/Monk_Plane_of_Sky_Tests",
+                  "title": "Monk Plane of Sky Tests",
+                  "retrievedAt": "2026-09-09"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://eqlwiki.com/Monk_Plane_of_Sky_Tests",
+          "title": "Monk Plane of Sky Tests",
+          "retrievedAt": "2026-09-09"
+        }
+      ]
+    },
+    {
+      "id": "pos-monk-golden-sash-of-tranquility",
+      "name": "Golden Sash of Tranquility - Monk, Plane of Sky",
+      "guideType": "PlaneOfSkyQuest",
+      "questName": "Monk Sky Test: Golden Sash of Tranquility",
+      "zoneNames": [
+        "Plane of Sky"
+      ],
+      "applicableClasses": [
+        "Monk"
+      ],
+      "stages": [
+        {
+          "id": "isle-8-eye-of-veeshan",
+          "name": "Isle 8: Eye of Veeshan",
+          "order": 1,
+          "arrivalNote": "",
+          "objectives": [
+            {
+              "id": "tear-of-quellious",
+              "order": 1,
+              "objectiveType": "Loot",
+              "title": "Loot the Tear of Quellious from Eye of Veeshan",
+              "shortInstruction": "Kill Eye of Veeshan on Isle 8 and loot the Tear of Quellious.",
+              "who": "Eye of Veeshan",
+              "where": "Plane of Sky - Isle 8.",
+              "what": "Kill Eye of Veeshan and loot Tear of Quellious (1).",
+              "when": "Whenever Eye of Veeshan is up.",
+              "why": "Tear of Quellious is one of the turn-in pieces for the Golden Sash of Tranquility.",
+              "how": "Kill Eye of Veeshan and loot it. One named on a spawn cycle, so the wait is the cycle rather than a drop rate. Bring whatever it takes to hold a Sky named - nobody has recorded a solo kill for us.",
+              "itemNames": [
+                "Tear of Quellious"
+              ],
+              "authoring": "Authored",
+              "sources": [
+                {
+                  "url": "https://eqlwiki.com/Monk_Plane_of_Sky_Tests",
+                  "title": "Monk Plane of Sky Tests",
+                  "retrievedAt": "2026-09-09"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "the-wind-rune",
+          "name": "The wind rune",
+          "order": 2,
+          "arrivalNote": "",
+          "objectives": [
+            {
+              "id": "wind-rune-lena",
+              "order": 1,
+              "objectiveType": "Farm",
+              "title": "Collect Wind Rune Lena",
+              "shortInstruction": "Loot a Wind Rune Lena from Plane of Sky trash.",
+              "who": "any Plane of Sky mob",
+              "where": "Plane of Sky - no fixed isle. eqlwiki's Monk Plane of Sky Tests page says the wind runes are a random drop from any mob in the zone.",
+              "what": "Loot Wind Rune Lena (1).",
+              "when": "Any time you are in the zone.",
+              "why": "Wind Rune Lena is one of the turn-in pieces for the Golden Sash of Tranquility.",
+              "how": "Kill trash and loot. A random drop with no named attached and no spawn to wait for, so it is the step that finishes itself while you work the others - patience rather than a fight you have to plan.",
+              "itemNames": [
+                "Wind Rune Lena"
+              ],
+              "authoring": "Authored",
+              "sources": [
+                {
+                  "url": "https://eqlwiki.com/Monk_Plane_of_Sky_Tests",
+                  "title": "Monk Plane of Sky Tests",
+                  "retrievedAt": "2026-09-09"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "turn-in-to-holwin",
+          "name": "Turn in to Holwin",
+          "order": 3,
+          "arrivalNote": "",
+          "objectives": [
+            {
+              "id": "turn-in-golden-sash-of-tranquility",
+              "order": 1,
+              "objectiveType": "TurnIn",
+              "title": "Hand in Tear of Quellious, Wind Rune Lena",
+              "shortInstruction": "Give Holwin the 2 pieces to receive the Golden Sash of Tranquility.",
+              "who": "Holwin",
+              "where": "Plane of Sky - eqlwiki's Monk page does not say where in the zone Holwin stands.",
+              "what": "Hand Holwin Tear of Quellious (1), Wind Rune Lena (1) to receive the Golden Sash of Tranquility.",
+              "when": "Once every piece above is in your bags.",
+              "why": "This is the step that actually gives you the Golden Sash of Tranquility.",
+              "how": "A hand-in, not a fight - it is the last step and nothing else gates it. The log never records a turn-in, so tick it yourself when it is done.",
+              "prerequisiteObjectiveIds": [
+                "tear-of-quellious",
+                "wind-rune-lena"
+              ],
+              "rewardKey": "Monk|Golden Sash of Tranquility",
+              "itemNames": [
+                "Tear of Quellious",
+                "Wind Rune Lena",
+                "Golden Sash of Tranquility"
+              ],
+              "authoring": "Authored",
+              "sources": [
+                {
+                  "url": "https://eqlwiki.com/Monk_Plane_of_Sky_Tests",
+                  "title": "Monk Plane of Sky Tests",
+                  "retrievedAt": "2026-09-09"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://eqlwiki.com/Monk_Plane_of_Sky_Tests",
+          "title": "Monk Plane of Sky Tests",
+          "retrievedAt": "2026-09-09"
+        }
+      ]
+    },
+    {
+      "id": "pos-monk-sandals-of-alacrity",
+      "name": "Sandals of Alacrity - Monk, Plane of Sky",
+      "guideType": "PlaneOfSkyQuest",
+      "questName": "Monk Sky Test: Sandals of Alacrity",
+      "zoneNames": [
+        "Plane of Sky"
+      ],
+      "applicableClasses": [
+        "Monk"
+      ],
+      "stages": [
+        {
+          "id": "isle-5-the-spiroc-lord",
+          "name": "Isle 5: The Spiroc Lord",
+          "order": 1,
+          "arrivalNote": "",
+          "objectives": [
+            {
+              "id": "dove-slippers",
+              "order": 1,
+              "objectiveType": "Loot",
+              "title": "Loot the Dove Slippers from The Spiroc Lord",
+              "shortInstruction": "Kill The Spiroc Lord on Isle 5 and loot the Dove Slippers.",
+              "who": "The Spiroc Lord",
+              "where": "Plane of Sky - Isle 5.",
+              "what": "Kill The Spiroc Lord and loot Dove Slippers (1).",
+              "when": "Whenever The Spiroc Lord is up.",
+              "why": "Dove Slippers is one of the turn-in pieces for the Sandals of Alacrity.",
+              "how": "Kill The Spiroc Lord and loot it. One named on a spawn cycle, so the wait is the cycle rather than a drop rate. Bring whatever it takes to hold a Sky named - nobody has recorded a solo kill for us.",
+              "itemNames": [
+                "Dove Slippers"
+              ],
+              "authoring": "Authored",
+              "sources": [
+                {
+                  "url": "https://eqlwiki.com/Monk_Plane_of_Sky_Tests",
+                  "title": "Monk Plane of Sky Tests",
+                  "retrievedAt": "2026-09-09"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "the-wind-rune",
+          "name": "The wind rune",
+          "order": 2,
+          "arrivalNote": "",
+          "objectives": [
+            {
+              "id": "wind-rune-jaka",
+              "order": 1,
+              "objectiveType": "Farm",
+              "title": "Collect Wind Rune Jaka",
+              "shortInstruction": "Loot a Wind Rune Jaka from Plane of Sky trash.",
+              "who": "any Plane of Sky mob",
+              "where": "Plane of Sky - no fixed isle. eqlwiki's Monk Plane of Sky Tests page says the wind runes are a random drop from any mob in the zone.",
+              "what": "Loot Wind Rune Jaka (1).",
+              "when": "Any time you are in the zone.",
+              "why": "Wind Rune Jaka is one of the turn-in pieces for the Sandals of Alacrity.",
+              "how": "Kill trash and loot. A random drop with no named attached and no spawn to wait for, so it is the step that finishes itself while you work the others - patience rather than a fight you have to plan.",
+              "itemNames": [
+                "Wind Rune Jaka"
+              ],
+              "authoring": "Authored",
+              "sources": [
+                {
+                  "url": "https://eqlwiki.com/Monk_Plane_of_Sky_Tests",
+                  "title": "Monk Plane of Sky Tests",
+                  "retrievedAt": "2026-09-09"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "turn-in-to-holwin",
+          "name": "Turn in to Holwin",
+          "order": 3,
+          "arrivalNote": "",
+          "objectives": [
+            {
+              "id": "turn-in-sandals-of-alacrity",
+              "order": 1,
+              "objectiveType": "TurnIn",
+              "title": "Hand in Dove Slippers, Wind Rune Jaka",
+              "shortInstruction": "Give Holwin the 2 pieces to receive the Sandals of Alacrity.",
+              "who": "Holwin",
+              "where": "Plane of Sky - eqlwiki's Monk page does not say where in the zone Holwin stands.",
+              "what": "Hand Holwin Dove Slippers (1), Wind Rune Jaka (1) to receive the Sandals of Alacrity.",
+              "when": "Once every piece above is in your bags.",
+              "why": "This is the step that actually gives you the Sandals of Alacrity.",
+              "how": "A hand-in, not a fight - it is the last step and nothing else gates it. The log never records a turn-in, so tick it yourself when it is done.",
+              "prerequisiteObjectiveIds": [
+                "dove-slippers",
+                "wind-rune-jaka"
+              ],
+              "rewardKey": "Monk|Sandals of Alacrity",
+              "itemNames": [
+                "Dove Slippers",
+                "Wind Rune Jaka",
+                "Sandals of Alacrity"
+              ],
+              "authoring": "Authored",
+              "sources": [
+                {
+                  "url": "https://eqlwiki.com/Monk_Plane_of_Sky_Tests",
+                  "title": "Monk Plane of Sky Tests",
+                  "retrievedAt": "2026-09-09"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://eqlwiki.com/Monk_Plane_of_Sky_Tests",
+          "title": "Monk Plane of Sky Tests",
+          "retrievedAt": "2026-09-09"
+        }
+      ]
+    },
+    {
+      "id": "pos-monk-ton-po-s-eye-patch",
+      "name": "Ton Po's Eye Patch - Monk, Plane of Sky",
+      "guideType": "PlaneOfSkyQuest",
+      "questName": "Monk Sky Test: Ton Po's Eye Patch",
+      "zoneNames": [
+        "Plane of Sky"
+      ],
+      "applicableClasses": [
+        "Monk"
+      ],
+      "stages": [
+        {
+          "id": "isle-4-keeper-of-souls",
+          "name": "Isle 4: Keeper of Souls",
+          "order": 1,
+          "arrivalNote": "",
+          "objectives": [
+            {
+              "id": "cracked-leather-eyepatch",
+              "order": 1,
+              "objectiveType": "Loot",
+              "title": "Loot the Cracked Leather Eyepatch from Keeper of Souls",
+              "shortInstruction": "Kill Keeper of Souls on Isle 4 and loot the Cracked Leather Eyepatch.",
+              "who": "Keeper of Souls",
+              "where": "Plane of Sky - Isle 4.",
+              "what": "Kill Keeper of Souls and loot Cracked Leather Eyepatch (1).",
+              "when": "Whenever Keeper of Souls is up.",
+              "why": "Cracked Leather Eyepatch is one of the turn-in pieces for the Ton Po's Eye Patch.",
+              "how": "Kill Keeper of Souls and loot it. One named on a spawn cycle, so the wait is the cycle rather than a drop rate. Bring whatever it takes to hold a Sky named - nobody has recorded a solo kill for us.",
+              "itemNames": [
+                "Cracked Leather Eyepatch"
+              ],
+              "authoring": "Authored",
+              "sources": [
+                {
+                  "url": "https://eqlwiki.com/Monk_Plane_of_Sky_Tests",
+                  "title": "Monk Plane of Sky Tests",
+                  "retrievedAt": "2026-09-09"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "the-wind-rune",
+          "name": "The wind rune",
+          "order": 2,
+          "arrivalNote": "",
+          "objectives": [
+            {
+              "id": "wind-rune-geza",
+              "order": 1,
+              "objectiveType": "Farm",
+              "title": "Collect Wind Rune Geza",
+              "shortInstruction": "Loot a Wind Rune Geza from Plane of Sky trash.",
+              "who": "any Plane of Sky mob",
+              "where": "Plane of Sky - no fixed isle. eqlwiki's Monk Plane of Sky Tests page says the wind runes are a random drop from any mob in the zone.",
+              "what": "Loot Wind Rune Geza (1).",
+              "when": "Any time you are in the zone.",
+              "why": "Wind Rune Geza is one of the turn-in pieces for the Ton Po's Eye Patch.",
+              "how": "Kill trash and loot. A random drop with no named attached and no spawn to wait for, so it is the step that finishes itself while you work the others - patience rather than a fight you have to plan.",
+              "itemNames": [
+                "Wind Rune Geza"
+              ],
+              "authoring": "Authored",
+              "sources": [
+                {
+                  "url": "https://eqlwiki.com/Monk_Plane_of_Sky_Tests",
+                  "title": "Monk Plane of Sky Tests",
+                  "retrievedAt": "2026-09-09"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "turn-in-to-holwin",
+          "name": "Turn in to Holwin",
+          "order": 3,
+          "arrivalNote": "",
+          "objectives": [
+            {
+              "id": "turn-in-ton-po-s-eye-patch",
+              "order": 1,
+              "objectiveType": "TurnIn",
+              "title": "Hand in Cracked Leather Eyepatch, Wind Rune Geza",
+              "shortInstruction": "Give Holwin the 2 pieces to receive the Ton Po's Eye Patch.",
+              "who": "Holwin",
+              "where": "Plane of Sky - eqlwiki's Monk page does not say where in the zone Holwin stands.",
+              "what": "Hand Holwin Cracked Leather Eyepatch (1), Wind Rune Geza (1) to receive the Ton Po's Eye Patch.",
+              "when": "Once every piece above is in your bags.",
+              "why": "This is the step that actually gives you the Ton Po's Eye Patch.",
+              "how": "A hand-in, not a fight - it is the last step and nothing else gates it. The log never records a turn-in, so tick it yourself when it is done.",
+              "prerequisiteObjectiveIds": [
+                "cracked-leather-eyepatch",
+                "wind-rune-geza"
+              ],
+              "rewardKey": "Monk|Ton Po's Eye Patch",
+              "itemNames": [
+                "Cracked Leather Eyepatch",
+                "Wind Rune Geza",
+                "Ton Po's Eye Patch"
+              ],
+              "authoring": "Authored",
+              "sources": [
+                {
+                  "url": "https://eqlwiki.com/Monk_Plane_of_Sky_Tests",
+                  "title": "Monk Plane of Sky Tests",
+                  "retrievedAt": "2026-09-09"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://eqlwiki.com/Monk_Plane_of_Sky_Tests",
+          "title": "Monk Plane of Sky Tests",
+          "retrievedAt": "2026-09-09"
+        }
+      ]
+    },
+    {
+      "id": "pos-monk-ton-po-s-shoulder-wraps",
+      "name": "Ton Po's Shoulder Wraps - Monk, Plane of Sky",
+      "guideType": "PlaneOfSkyQuest",
+      "questName": "Monk Sky Test: Ton Po's Shoulder Wraps",
+      "zoneNames": [
+        "Plane of Sky"
+      ],
+      "applicableClasses": [
+        "Monk"
+      ],
+      "stages": [
+        {
+          "id": "isle-6-bazzt-zzzt",
+          "name": "Isle 6: Bazzt Zzzt",
+          "order": 1,
+          "arrivalNote": "",
+          "objectives": [
+            {
+              "id": "silken-wrap",
+              "order": 1,
+              "objectiveType": "Loot",
+              "title": "Loot the Silken Wrap from Bazzt Zzzt",
+              "shortInstruction": "Kill Bazzt Zzzt on Isle 6 and loot the Silken Wrap.",
+              "who": "Bazzt Zzzt",
+              "where": "Plane of Sky - Isle 6.",
+              "what": "Kill Bazzt Zzzt and loot Silken Wrap (1).",
+              "when": "Whenever Bazzt Zzzt is up.",
+              "why": "Silken Wrap is one of the turn-in pieces for the Ton Po's Shoulder Wraps.",
+              "how": "Kill Bazzt Zzzt and loot it. One named on a spawn cycle, so the wait is the cycle rather than a drop rate. Bring whatever it takes to hold a Sky named - nobody has recorded a solo kill for us.",
+              "itemNames": [
+                "Silken Wrap"
+              ],
+              "authoring": "Authored",
+              "sources": [
+                {
+                  "url": "https://eqlwiki.com/Monk_Plane_of_Sky_Tests",
+                  "title": "Monk Plane of Sky Tests",
+                  "retrievedAt": "2026-09-09"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "the-wind-rune",
+          "name": "The wind rune",
+          "order": 2,
+          "arrivalNote": "",
+          "objectives": [
+            {
+              "id": "wind-rune-beza",
+              "order": 1,
+              "objectiveType": "Farm",
+              "title": "Collect Wind Rune Beza",
+              "shortInstruction": "Loot a Wind Rune Beza from Plane of Sky trash.",
+              "who": "any Plane of Sky mob",
+              "where": "Plane of Sky - no fixed isle. eqlwiki's Monk Plane of Sky Tests page says the wind runes are a random drop from any mob in the zone.",
+              "what": "Loot Wind Rune Beza (1).",
+              "when": "Any time you are in the zone.",
+              "why": "Wind Rune Beza is one of the turn-in pieces for the Ton Po's Shoulder Wraps.",
+              "how": "Kill trash and loot. A random drop with no named attached and no spawn to wait for, so it is the step that finishes itself while you work the others - patience rather than a fight you have to plan.",
+              "itemNames": [
+                "Wind Rune Beza"
+              ],
+              "authoring": "Authored",
+              "sources": [
+                {
+                  "url": "https://eqlwiki.com/Monk_Plane_of_Sky_Tests",
+                  "title": "Monk Plane of Sky Tests",
+                  "retrievedAt": "2026-09-09"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "turn-in-to-holwin",
+          "name": "Turn in to Holwin",
+          "order": 3,
+          "arrivalNote": "",
+          "objectives": [
+            {
+              "id": "turn-in-ton-po-s-shoulder-wraps",
+              "order": 1,
+              "objectiveType": "TurnIn",
+              "title": "Hand in Silken Wrap, Wind Rune Beza",
+              "shortInstruction": "Give Holwin the 2 pieces to receive the Ton Po's Shoulder Wraps.",
+              "who": "Holwin",
+              "where": "Plane of Sky - eqlwiki's Monk page does not say where in the zone Holwin stands.",
+              "what": "Hand Holwin Silken Wrap (1), Wind Rune Beza (1) to receive the Ton Po's Shoulder Wraps.",
+              "when": "Once every piece above is in your bags.",
+              "why": "This is the step that actually gives you the Ton Po's Shoulder Wraps.",
+              "how": "A hand-in, not a fight - it is the last step and nothing else gates it. The log never records a turn-in, so tick it yourself when it is done.",
+              "prerequisiteObjectiveIds": [
+                "silken-wrap",
+                "wind-rune-beza"
+              ],
+              "rewardKey": "Monk|Ton Po's Shoulder Wraps",
+              "itemNames": [
+                "Silken Wrap",
+                "Wind Rune Beza",
+                "Ton Po's Shoulder Wraps"
+              ],
+              "authoring": "Authored",
+              "sources": [
+                {
+                  "url": "https://eqlwiki.com/Monk_Plane_of_Sky_Tests",
+                  "title": "Monk Plane of Sky Tests",
+                  "retrievedAt": "2026-09-09"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://eqlwiki.com/Monk_Plane_of_Sky_Tests",
+          "title": "Monk Plane of Sky Tests",
+          "retrievedAt": "2026-09-09"
+        }
+      ]
+    },
+    {
+      "id": "pos-monk-wu-s-fist-of-mastery",
+      "name": "Wu's Fist of Mastery - Monk, Plane of Sky",
+      "guideType": "PlaneOfSkyQuest",
+      "questName": "Monk Sky Test: Wu's Fist of Mastery",
+      "zoneNames": [
+        "Plane of Sky"
+      ],
+      "applicableClasses": [
+        "Monk"
+      ],
+      "stages": [
+        {
+          "id": "the-efreeti-drop",
+          "name": "The Efreeti drop",
+          "order": 1,
+          "arrivalNote": "",
+          "objectives": [
+            {
+              "id": "brass-knuckles",
+              "order": 1,
+              "objectiveType": "Loot",
+              "title": "Loot the Brass Knuckles",
+              "shortInstruction": "Loot the Brass Knuckles from any of the three Efreeti-drop mobs.",
+              "who": "Noble Dojorn, the Overseer of Air, or the Hand of Veeshan",
+              "where": "Plane of Sky - Isles 1.5, 4 and 8 respectively.",
+              "what": "Loot Brass Knuckles (1) from any one of the three Efreeti-drop mobs.",
+              "when": "Whichever of the three is up first.",
+              "why": "Brass Knuckles is one of the turn-in pieces for the Wu's Fist of Mastery.",
+              "how": "Kill any one of the three and loot it. They drop the same item, so this step waits on the earliest of three spawns rather than on one - which is why it is usually not the step that holds a reward up.",
+              "itemNames": [
+                "Brass Knuckles"
+              ],
+              "authoring": "Authored",
+              "sources": [
+                {
+                  "url": "https://eqlwiki.com/Monk_Plane_of_Sky_Tests",
+                  "title": "Monk Plane of Sky Tests",
+                  "retrievedAt": "2026-09-09"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "isle-7-sister-of-the-spire",
+          "name": "Isle 7: Sister of the Spire",
+          "order": 2,
+          "arrivalNote": "",
+          "objectives": [
+            {
+              "id": "nebulous-sapphire",
+              "order": 1,
+              "objectiveType": "Loot",
+              "title": "Loot the Nebulous Sapphire from Sister of the Spire",
+              "shortInstruction": "Kill Sister of the Spire on Isle 7 and loot the Nebulous Sapphire.",
+              "who": "Sister of the Spire",
+              "where": "Plane of Sky - Isle 7.",
+              "what": "Kill Sister of the Spire and loot Nebulous Sapphire (1).",
+              "when": "Whenever Sister of the Spire is up.",
+              "why": "Nebulous Sapphire is one of the turn-in pieces for the Wu's Fist of Mastery.",
+              "how": "Kill Sister of the Spire and loot it. One named on a spawn cycle, so the wait is the cycle rather than a drop rate. Bring whatever it takes to hold a Sky named - nobody has recorded a solo kill for us.",
+              "itemNames": [
+                "Nebulous Sapphire"
+              ],
+              "authoring": "Authored",
+              "sources": [
+                {
+                  "url": "https://eqlwiki.com/Monk_Plane_of_Sky_Tests",
+                  "title": "Monk Plane of Sky Tests",
+                  "retrievedAt": "2026-09-09"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "the-wind-rune",
+          "name": "The wind rune",
+          "order": 3,
+          "arrivalNote": "",
+          "objectives": [
+            {
+              "id": "wind-rune-neza",
+              "order": 1,
+              "objectiveType": "Farm",
+              "title": "Collect Wind Rune Neza",
+              "shortInstruction": "Loot a Wind Rune Neza from Plane of Sky trash.",
+              "who": "any Plane of Sky mob",
+              "where": "Plane of Sky - no fixed isle. eqlwiki's Monk Plane of Sky Tests page says the wind runes are a random drop from any mob in the zone.",
+              "what": "Loot Wind Rune Neza (1).",
+              "when": "Any time you are in the zone.",
+              "why": "Wind Rune Neza is one of the turn-in pieces for the Wu's Fist of Mastery.",
+              "how": "Kill trash and loot. A random drop with no named attached and no spawn to wait for, so it is the step that finishes itself while you work the others - patience rather than a fight you have to plan.",
+              "itemNames": [
+                "Wind Rune Neza"
+              ],
+              "authoring": "Authored",
+              "sources": [
+                {
+                  "url": "https://eqlwiki.com/Monk_Plane_of_Sky_Tests",
+                  "title": "Monk Plane of Sky Tests",
+                  "retrievedAt": "2026-09-09"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "turn-in-to-holwin",
+          "name": "Turn in to Holwin",
+          "order": 4,
+          "arrivalNote": "",
+          "objectives": [
+            {
+              "id": "turn-in-wu-s-fist-of-mastery",
+              "order": 1,
+              "objectiveType": "TurnIn",
+              "title": "Hand in Brass Knuckles, Nebulous Sapphire, Wind Rune Neza",
+              "shortInstruction": "Give Holwin the 3 pieces to receive the Wu's Fist of Mastery.",
+              "who": "Holwin",
+              "where": "Plane of Sky - eqlwiki's Monk page does not say where in the zone Holwin stands.",
+              "what": "Hand Holwin Brass Knuckles (1), Nebulous Sapphire (1), Wind Rune Neza (1) to receive the Wu's Fist of Mastery.",
+              "when": "Once every piece above is in your bags.",
+              "why": "This is the step that actually gives you the Wu's Fist of Mastery.",
+              "how": "A hand-in, not a fight - it is the last step and nothing else gates it. The log never records a turn-in, so tick it yourself when it is done.",
+              "prerequisiteObjectiveIds": [
+                "brass-knuckles",
+                "nebulous-sapphire",
+                "wind-rune-neza"
+              ],
+              "rewardKey": "Monk|Wu's Fist of Mastery",
+              "itemNames": [
+                "Brass Knuckles",
+                "Nebulous Sapphire",
+                "Wind Rune Neza",
+                "Wu's Fist of Mastery"
+              ],
+              "authoring": "Authored",
+              "sources": [
+                {
+                  "url": "https://eqlwiki.com/Monk_Plane_of_Sky_Tests",
+                  "title": "Monk Plane of Sky Tests",
+                  "retrievedAt": "2026-09-09"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://eqlwiki.com/Monk_Plane_of_Sky_Tests",
+          "title": "Monk Plane of Sky Tests",
+          "retrievedAt": "2026-09-09"
+        }
+      ]
+    },
+    {
+      "id": "pos-druid-drake-hide-mask",
+      "name": "Drake-Hide Mask - Druid, Plane of Sky",
+      "guideType": "PlaneOfSkyQuest",
+      "questName": "Druid Sky Test: Drake-Hide Mask",
+      "zoneNames": [
+        "Plane of Sky"
+      ],
+      "applicableClasses": [
+        "Druid"
+      ],
+      "stages": [
+        {
+          "id": "isle-3-gorgalosk",
+          "name": "Isle 3: Gorgalosk",
+          "order": 1,
+          "arrivalNote": "",
+          "objectives": [
+            {
+              "id": "worn-leather-mask",
+              "order": 1,
+              "objectiveType": "Loot",
+              "title": "Loot the Worn Leather Mask from Gorgalosk",
+              "shortInstruction": "Kill Gorgalosk on Isle 3 and loot the Worn Leather Mask.",
+              "who": "Gorgalosk",
+              "where": "Plane of Sky - Isle 3.",
+              "what": "Kill Gorgalosk and loot Worn Leather Mask (1).",
+              "when": "Whenever Gorgalosk is up.",
+              "why": "Worn Leather Mask is one of the turn-in pieces for the Drake-Hide Mask.",
+              "how": "Kill Gorgalosk and loot it. One named on a spawn cycle, so the wait is the cycle rather than a drop rate. Bring whatever it takes to hold a Sky named - nobody has recorded a solo kill for us.",
+              "itemNames": [
+                "Worn Leather Mask"
+              ],
+              "authoring": "Authored",
+              "sources": [
+                {
+                  "url": "https://eqlwiki.com/Druid_Plane_of_Sky_Tests",
+                  "title": "Druid Plane of Sky Tests",
+                  "retrievedAt": "2026-09-09"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "the-wind-rune",
+          "name": "The wind rune",
+          "order": 2,
+          "arrivalNote": "",
+          "objectives": [
+            {
+              "id": "wind-rune-meda",
+              "order": 1,
+              "objectiveType": "Farm",
+              "title": "Collect Wind Rune Meda",
+              "shortInstruction": "Loot a Wind Rune Meda from Plane of Sky trash.",
+              "who": "",
+              "where": "",
+              "what": "Loot Wind Rune Meda (1).",
+              "when": "",
+              "why": "Wind Rune Meda is one of the turn-in pieces for the Drake-Hide Mask.",
+              "how": "",
+              "itemNames": [
+                "Wind Rune Meda"
+              ],
+              "authoring": "Stub",
+              "sources": [
+                {
+                  "url": "https://eqlwiki.com/Druid_Plane_of_Sky_Tests",
+                  "title": "Druid Plane of Sky Tests",
+                  "retrievedAt": "2026-09-09"
+                }
+              ],
+              "stubNote": "eqlwiki's Druid Plane of Sky Tests page does not say which isle or which mob drops Wind Rune Meda, and EQBuddy's Sky checklist records only \"Trash mobs\". eqlwiki's Monk Plane of Sky Tests page describes wind runes as a random drop from any mob in the Plane of Sky, which is the closest thing to an answer we have for this one. If you have looted it, tell us the isle and the mob - that is what turns this step from a stub into directions."
+            }
+          ]
+        },
+        {
+          "id": "turn-in-to-strandar-pinemist",
+          "name": "Turn in to Strandar Pinemist",
+          "order": 3,
+          "arrivalNote": "",
+          "objectives": [
+            {
+              "id": "turn-in-drake-hide-mask",
+              "order": 1,
+              "objectiveType": "TurnIn",
+              "title": "Hand in Worn Leather Mask, Wind Rune Meda",
+              "shortInstruction": "Give Strandar Pinemist the 2 pieces to receive the Drake-Hide Mask.",
+              "who": "Strandar Pinemist",
+              "where": "Plane of Sky - the Efreeti Chamber, through the teleport pad at roughly 1600, 520 on Isle 1.",
+              "what": "Hand Strandar Pinemist Worn Leather Mask (1), Wind Rune Meda (1) to receive the Drake-Hide Mask.",
+              "when": "Once every piece above is in your bags.",
+              "why": "This is the step that actually gives you the Drake-Hide Mask.",
+              "how": "A hand-in, not a fight - it is the last step and nothing else gates it. The log never records a turn-in, so tick it yourself when it is done.",
+              "prerequisiteObjectiveIds": [
+                "worn-leather-mask",
+                "wind-rune-meda"
+              ],
+              "rewardKey": "Druid|Drake-Hide Mask",
+              "itemNames": [
+                "Worn Leather Mask",
+                "Wind Rune Meda",
+                "Drake-Hide Mask"
+              ],
+              "authoring": "Authored",
+              "sources": [
+                {
+                  "url": "https://eqlwiki.com/Druid_Plane_of_Sky_Tests",
+                  "title": "Druid Plane of Sky Tests",
+                  "retrievedAt": "2026-09-09"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://eqlwiki.com/Druid_Plane_of_Sky_Tests",
+          "title": "Druid Plane of Sky Tests",
+          "retrievedAt": "2026-09-09"
+        }
+      ]
+    },
+    {
+      "id": "pos-druid-espri",
+      "name": "Espri - Druid, Plane of Sky",
+      "guideType": "PlaneOfSkyQuest",
+      "questName": "Druid Sky Test: Espri",
+      "zoneNames": [
+        "Plane of Sky"
+      ],
+      "applicableClasses": [
+        "Druid"
+      ],
+      "stages": [
+        {
+          "id": "the-efreeti-drop",
+          "name": "The Efreeti drop",
+          "order": 1,
+          "arrivalNote": "",
+          "objectives": [
+            {
+              "id": "efreeti-scimitar",
+              "order": 1,
+              "objectiveType": "Loot",
+              "title": "Loot the Efreeti Scimitar",
+              "shortInstruction": "Loot the Efreeti Scimitar from any of the three Efreeti-drop mobs.",
+              "who": "Noble Dojorn, the Overseer of Air, or the Hand of Veeshan",
+              "where": "Plane of Sky - Isles 1.5, 4 and 8 respectively.",
+              "what": "Loot Efreeti Scimitar (1) from any one of the three Efreeti-drop mobs.",
+              "when": "Whichever of the three is up first.",
+              "why": "Efreeti Scimitar is one of the turn-in pieces for the Espri.",
+              "how": "Kill any one of the three and loot it. They drop the same item, so this step waits on the earliest of three spawns rather than on one - which is why it is usually not the step that holds a reward up.",
+              "itemNames": [
+                "Efreeti Scimitar"
+              ],
+              "authoring": "Authored",
+              "sources": [
+                {
+                  "url": "https://eqlwiki.com/Druid_Plane_of_Sky_Tests",
+                  "title": "Druid Plane of Sky Tests",
+                  "retrievedAt": "2026-09-09"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "isle-8-eye-of-veeshan",
+          "name": "Isle 8: Eye of Veeshan",
+          "order": 2,
+          "arrivalNote": "",
+          "objectives": [
+            {
+              "id": "storm-sky-opal",
+              "order": 1,
+              "objectiveType": "Loot",
+              "title": "Loot the Storm Sky Opal from Eye of Veeshan",
+              "shortInstruction": "Kill Eye of Veeshan on Isle 8 and loot the Storm Sky Opal.",
+              "who": "Eye of Veeshan",
+              "where": "Plane of Sky - Isle 8.",
+              "what": "Kill Eye of Veeshan and loot Storm Sky Opal (1).",
+              "when": "Whenever Eye of Veeshan is up.",
+              "why": "Storm Sky Opal is one of the turn-in pieces for the Espri.",
+              "how": "Kill Eye of Veeshan and loot it. One named on a spawn cycle, so the wait is the cycle rather than a drop rate. Bring whatever it takes to hold a Sky named - nobody has recorded a solo kill for us.",
+              "itemNames": [
+                "Storm Sky Opal"
+              ],
+              "authoring": "Authored",
+              "sources": [
+                {
+                  "url": "https://eqlwiki.com/Druid_Plane_of_Sky_Tests",
+                  "title": "Druid Plane of Sky Tests",
+                  "retrievedAt": "2026-09-09"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "the-wind-rune",
+          "name": "The wind rune",
+          "order": 3,
+          "arrivalNote": "",
+          "objectives": [
+            {
+              "id": "wind-rune-izah",
+              "order": 1,
+              "objectiveType": "Farm",
+              "title": "Collect Wind Rune Izah",
+              "shortInstruction": "Loot a Wind Rune Izah from Plane of Sky trash.",
+              "who": "",
+              "where": "",
+              "what": "Loot Wind Rune Izah (1).",
+              "when": "",
+              "why": "Wind Rune Izah is one of the turn-in pieces for the Espri.",
+              "how": "",
+              "itemNames": [
+                "Wind Rune Izah"
+              ],
+              "authoring": "Stub",
+              "sources": [
+                {
+                  "url": "https://eqlwiki.com/Druid_Plane_of_Sky_Tests",
+                  "title": "Druid Plane of Sky Tests",
+                  "retrievedAt": "2026-09-09"
+                }
+              ],
+              "stubNote": "eqlwiki's Druid Plane of Sky Tests page does not say which isle or which mob drops Wind Rune Izah, and EQBuddy's Sky checklist records only \"Trash mobs\". eqlwiki's Monk Plane of Sky Tests page describes wind runes as a random drop from any mob in the Plane of Sky, which is the closest thing to an answer we have for this one. If you have looted it, tell us the isle and the mob - that is what turns this step from a stub into directions."
+            }
+          ]
+        },
+        {
+          "id": "turn-in-to-strandar-pinemist",
+          "name": "Turn in to Strandar Pinemist",
+          "order": 4,
+          "arrivalNote": "",
+          "objectives": [
+            {
+              "id": "turn-in-espri",
+              "order": 1,
+              "objectiveType": "TurnIn",
+              "title": "Hand in Efreeti Scimitar, Storm Sky Opal, Wind Rune Izah",
+              "shortInstruction": "Give Strandar Pinemist the 3 pieces to receive the Espri.",
+              "who": "Strandar Pinemist",
+              "where": "Plane of Sky - the Efreeti Chamber, through the teleport pad at roughly 1600, 520 on Isle 1.",
+              "what": "Hand Strandar Pinemist Efreeti Scimitar (1), Storm Sky Opal (1), Wind Rune Izah (1) to receive the Espri.",
+              "when": "Once every piece above is in your bags.",
+              "why": "This is the step that actually gives you the Espri.",
+              "how": "A hand-in, not a fight - it is the last step and nothing else gates it. The log never records a turn-in, so tick it yourself when it is done.",
+              "prerequisiteObjectiveIds": [
+                "efreeti-scimitar",
+                "storm-sky-opal",
+                "wind-rune-izah"
+              ],
+              "rewardKey": "Druid|Espri",
+              "itemNames": [
+                "Efreeti Scimitar",
+                "Storm Sky Opal",
+                "Wind Rune Izah",
+                "Espri"
+              ],
+              "authoring": "Authored",
+              "sources": [
+                {
+                  "url": "https://eqlwiki.com/Druid_Plane_of_Sky_Tests",
+                  "title": "Druid Plane of Sky Tests",
+                  "retrievedAt": "2026-09-09"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://eqlwiki.com/Druid_Plane_of_Sky_Tests",
+          "title": "Druid Plane of Sky Tests",
+          "retrievedAt": "2026-09-09"
+        }
+      ]
+    },
+    {
+      "id": "pos-druid-honeycomb-belt",
+      "name": "Honeycomb Belt - Druid, Plane of Sky",
+      "guideType": "PlaneOfSkyQuest",
+      "questName": "Druid Sky Test: Honeycomb Belt",
+      "zoneNames": [
+        "Plane of Sky"
+      ],
+      "applicableClasses": [
+        "Druid"
+      ],
+      "stages": [
+        {
+          "id": "isle-6-bazzt-zzzt",
+          "name": "Isle 6: Bazzt Zzzt",
+          "order": 1,
+          "arrivalNote": "",
+          "objectives": [
+            {
+              "id": "divine-honeycomb",
+              "order": 1,
+              "objectiveType": "Loot",
+              "title": "Loot the Divine Honeycomb from Bazzt Zzzt",
+              "shortInstruction": "Kill Bazzt Zzzt on Isle 6 and loot the Divine Honeycomb.",
+              "who": "Bazzt Zzzt",
+              "where": "Plane of Sky - Isle 6.",
+              "what": "Kill Bazzt Zzzt and loot Divine Honeycomb (1).",
+              "when": "Whenever Bazzt Zzzt is up.",
+              "why": "Divine Honeycomb is one of the turn-in pieces for the Honeycomb Belt.",
+              "how": "Kill Bazzt Zzzt and loot it. One named on a spawn cycle, so the wait is the cycle rather than a drop rate. Bring whatever it takes to hold a Sky named - nobody has recorded a solo kill for us.",
+              "itemNames": [
+                "Divine Honeycomb"
+              ],
+              "authoring": "Authored",
+              "sources": [
+                {
+                  "url": "https://eqlwiki.com/Druid_Plane_of_Sky_Tests",
+                  "title": "Druid Plane of Sky Tests",
+                  "retrievedAt": "2026-09-09"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "the-wind-rune",
+          "name": "The wind rune",
+          "order": 2,
+          "arrivalNote": "",
+          "objectives": [
+            {
+              "id": "wind-rune-dena",
+              "order": 1,
+              "objectiveType": "Farm",
+              "title": "Collect Wind Rune Dena",
+              "shortInstruction": "Loot a Wind Rune Dena from Plane of Sky trash.",
+              "who": "",
+              "where": "",
+              "what": "Loot Wind Rune Dena (1).",
+              "when": "",
+              "why": "Wind Rune Dena is one of the turn-in pieces for the Honeycomb Belt.",
+              "how": "",
+              "itemNames": [
+                "Wind Rune Dena"
+              ],
+              "authoring": "Stub",
+              "sources": [
+                {
+                  "url": "https://eqlwiki.com/Druid_Plane_of_Sky_Tests",
+                  "title": "Druid Plane of Sky Tests",
+                  "retrievedAt": "2026-09-09"
+                }
+              ],
+              "stubNote": "eqlwiki's Druid Plane of Sky Tests page does not say which isle or which mob drops Wind Rune Dena, and EQBuddy's Sky checklist records only \"Trash mobs\". eqlwiki's Monk Plane of Sky Tests page describes wind runes as a random drop from any mob in the Plane of Sky, which is the closest thing to an answer we have for this one. If you have looted it, tell us the isle and the mob - that is what turns this step from a stub into directions."
+            }
+          ]
+        },
+        {
+          "id": "turn-in-to-strandar-pinemist",
+          "name": "Turn in to Strandar Pinemist",
+          "order": 3,
+          "arrivalNote": "",
+          "objectives": [
+            {
+              "id": "turn-in-honeycomb-belt",
+              "order": 1,
+              "objectiveType": "TurnIn",
+              "title": "Hand in Divine Honeycomb, Wind Rune Dena",
+              "shortInstruction": "Give Strandar Pinemist the 2 pieces to receive the Honeycomb Belt.",
+              "who": "Strandar Pinemist",
+              "where": "Plane of Sky - the Efreeti Chamber, through the teleport pad at roughly 1600, 520 on Isle 1.",
+              "what": "Hand Strandar Pinemist Divine Honeycomb (1), Wind Rune Dena (1) to receive the Honeycomb Belt.",
+              "when": "Once every piece above is in your bags.",
+              "why": "This is the step that actually gives you the Honeycomb Belt.",
+              "how": "A hand-in, not a fight - it is the last step and nothing else gates it. The log never records a turn-in, so tick it yourself when it is done.",
+              "prerequisiteObjectiveIds": [
+                "divine-honeycomb",
+                "wind-rune-dena"
+              ],
+              "rewardKey": "Druid|Honeycomb Belt",
+              "itemNames": [
+                "Divine Honeycomb",
+                "Wind Rune Dena",
+                "Honeycomb Belt"
+              ],
+              "authoring": "Authored",
+              "sources": [
+                {
+                  "url": "https://eqlwiki.com/Druid_Plane_of_Sky_Tests",
+                  "title": "Druid Plane of Sky Tests",
+                  "retrievedAt": "2026-09-09"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://eqlwiki.com/Druid_Plane_of_Sky_Tests",
+          "title": "Druid Plane of Sky Tests",
+          "retrievedAt": "2026-09-09"
+        }
+      ]
+    },
+    {
+      "id": "pos-druid-nature-walker-s-mantle",
+      "name": "Nature Walker's Mantle - Druid, Plane of Sky",
+      "guideType": "PlaneOfSkyQuest",
+      "questName": "Druid Sky Test: Nature Walker's Mantle",
+      "zoneNames": [
+        "Plane of Sky"
+      ],
+      "applicableClasses": [
+        "Druid"
+      ],
+      "stages": [
+        {
+          "id": "isle-4-keeper-of-souls",
+          "name": "Isle 4: Keeper of Souls",
+          "order": 1,
+          "arrivalNote": "",
+          "objectives": [
+            {
+              "id": "mantle-of-woven-grass",
+              "order": 1,
+              "objectiveType": "Loot",
+              "title": "Loot the Mantle of Woven Grass from Keeper of Souls",
+              "shortInstruction": "Kill Keeper of Souls on Isle 4 and loot the Mantle of Woven Grass.",
+              "who": "Keeper of Souls",
+              "where": "Plane of Sky - Isle 4.",
+              "what": "Kill Keeper of Souls and loot Mantle of Woven Grass (1).",
+              "when": "Whenever Keeper of Souls is up.",
+              "why": "Mantle of Woven Grass is one of the turn-in pieces for the Nature Walker's Mantle.",
+              "how": "Kill Keeper of Souls and loot it. One named on a spawn cycle, so the wait is the cycle rather than a drop rate. Bring whatever it takes to hold a Sky named - nobody has recorded a solo kill for us.",
+              "itemNames": [
+                "Mantle of Woven Grass"
+              ],
+              "authoring": "Authored",
+              "sources": [
+                {
+                  "url": "https://eqlwiki.com/Druid_Plane_of_Sky_Tests",
+                  "title": "Druid Plane of Sky Tests",
+                  "retrievedAt": "2026-09-09"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "the-wind-rune",
+          "name": "The wind rune",
+          "order": 2,
+          "arrivalNote": "",
+          "objectives": [
+            {
+              "id": "wind-rune-kala",
+              "order": 1,
+              "objectiveType": "Farm",
+              "title": "Collect Wind Rune Kala",
+              "shortInstruction": "Loot a Wind Rune Kala from Plane of Sky trash.",
+              "who": "",
+              "where": "",
+              "what": "Loot Wind Rune Kala (1).",
+              "when": "",
+              "why": "Wind Rune Kala is one of the turn-in pieces for the Nature Walker's Mantle.",
+              "how": "",
+              "itemNames": [
+                "Wind Rune Kala"
+              ],
+              "authoring": "Stub",
+              "sources": [
+                {
+                  "url": "https://eqlwiki.com/Druid_Plane_of_Sky_Tests",
+                  "title": "Druid Plane of Sky Tests",
+                  "retrievedAt": "2026-09-09"
+                }
+              ],
+              "stubNote": "eqlwiki's Druid Plane of Sky Tests page does not say which isle or which mob drops Wind Rune Kala, and EQBuddy's Sky checklist records only \"Trash mobs\". eqlwiki's Monk Plane of Sky Tests page describes wind runes as a random drop from any mob in the Plane of Sky, which is the closest thing to an answer we have for this one. If you have looted it, tell us the isle and the mob - that is what turns this step from a stub into directions."
+            }
+          ]
+        },
+        {
+          "id": "turn-in-to-strandar-pinemist",
+          "name": "Turn in to Strandar Pinemist",
+          "order": 3,
+          "arrivalNote": "",
+          "objectives": [
+            {
+              "id": "turn-in-nature-walker-s-mantle",
+              "order": 1,
+              "objectiveType": "TurnIn",
+              "title": "Hand in Mantle of Woven Grass, Wind Rune Kala",
+              "shortInstruction": "Give Strandar Pinemist the 2 pieces to receive the Nature Walker's Mantle.",
+              "who": "Strandar Pinemist",
+              "where": "Plane of Sky - the Efreeti Chamber, through the teleport pad at roughly 1600, 520 on Isle 1.",
+              "what": "Hand Strandar Pinemist Mantle of Woven Grass (1), Wind Rune Kala (1) to receive the Nature Walker's Mantle.",
+              "when": "Once every piece above is in your bags.",
+              "why": "This is the step that actually gives you the Nature Walker's Mantle.",
+              "how": "A hand-in, not a fight - it is the last step and nothing else gates it. The log never records a turn-in, so tick it yourself when it is done.",
+              "prerequisiteObjectiveIds": [
+                "mantle-of-woven-grass",
+                "wind-rune-kala"
+              ],
+              "rewardKey": "Druid|Nature Walker's Mantle",
+              "itemNames": [
+                "Mantle of Woven Grass",
+                "Wind Rune Kala",
+                "Nature Walker's Mantle"
+              ],
+              "authoring": "Authored",
+              "sources": [
+                {
+                  "url": "https://eqlwiki.com/Druid_Plane_of_Sky_Tests",
+                  "title": "Druid Plane of Sky Tests",
+                  "retrievedAt": "2026-09-09"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://eqlwiki.com/Druid_Plane_of_Sky_Tests",
+          "title": "Druid Plane of Sky Tests",
+          "retrievedAt": "2026-09-09"
+        }
+      ]
+    },
+    {
+      "id": "pos-druid-shillelagh",
+      "name": "Shillelagh - Druid, Plane of Sky",
+      "guideType": "PlaneOfSkyQuest",
+      "questName": "Druid Sky Test: Shillelagh",
+      "zoneNames": [
+        "Plane of Sky"
+      ],
+      "applicableClasses": [
+        "Druid"
+      ],
+      "stages": [
+        {
+          "id": "isle-5-the-spiroc-lord",
+          "name": "Isle 5: The Spiroc Lord",
+          "order": 1,
+          "arrivalNote": "",
+          "objectives": [
+            {
+              "id": "spiroc-battle-staff",
+              "order": 1,
+              "objectiveType": "Loot",
+              "title": "Loot the Spiroc Battle Staff from The Spiroc Lord",
+              "shortInstruction": "Kill The Spiroc Lord on Isle 5 and loot the Spiroc Battle Staff.",
+              "who": "The Spiroc Lord",
+              "where": "Plane of Sky - Isle 5.",
+              "what": "Kill The Spiroc Lord and loot Spiroc Battle Staff (1).",
+              "when": "Whenever The Spiroc Lord is up.",
+              "why": "Spiroc Battle Staff is one of the turn-in pieces for the Shillelagh.",
+              "how": "Kill The Spiroc Lord and loot it. One named on a spawn cycle, so the wait is the cycle rather than a drop rate. Bring whatever it takes to hold a Sky named - nobody has recorded a solo kill for us.",
+              "itemNames": [
+                "Spiroc Battle Staff"
+              ],
+              "authoring": "Authored",
+              "sources": [
+                {
+                  "url": "https://eqlwiki.com/Druid_Plane_of_Sky_Tests",
+                  "title": "Druid Plane of Sky Tests",
+                  "retrievedAt": "2026-09-09"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "isle-4-griffons-and-pegasus",
+          "name": "Isle 4: griffons and pegasus",
+          "order": 2,
+          "arrivalNote": "",
+          "objectives": [
+            {
+              "id": "efreeti-statuette",
+              "order": 1,
+              "objectiveType": "Loot",
+              "title": "Loot the Efreeti Statuette",
+              "shortInstruction": "Loot an Efreeti Statuette from the Isle 4 griffons and pegasus.",
+              "who": "the griffons and pegasus (not a named mob)",
+              "where": "Plane of Sky - Isle 4.",
+              "what": "Loot Efreeti Statuette (1) from the Isle 4 griffons and pegasus.",
+              "when": "Any time you are on Isle 4.",
+              "why": "Efreeti Statuette is one of the turn-in pieces for the Shillelagh.",
+              "how": "Kill griffons and pegasus and loot. Ordinary spawns rather than a named on a cycle, so this is a drop rate rather than a spawn wait.",
+              "itemNames": [
+                "Efreeti Statuette"
+              ],
+              "authoring": "Authored",
+              "sources": [
+                {
+                  "url": "https://eqlwiki.com/Druid_Plane_of_Sky_Tests",
+                  "title": "Druid Plane of Sky Tests",
+                  "retrievedAt": "2026-09-09"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "the-wind-rune",
+          "name": "The wind rune",
+          "order": 3,
+          "arrivalNote": "",
+          "objectives": [
+            {
+              "id": "wind-rune-azia",
+              "order": 1,
+              "objectiveType": "Farm",
+              "title": "Collect Wind Rune Azia",
+              "shortInstruction": "Loot a Wind Rune Azia from Plane of Sky trash.",
+              "who": "",
+              "where": "",
+              "what": "Loot Wind Rune Azia (1).",
+              "when": "",
+              "why": "Wind Rune Azia is one of the turn-in pieces for the Shillelagh.",
+              "how": "",
+              "itemNames": [
+                "Wind Rune Azia"
+              ],
+              "authoring": "Stub",
+              "sources": [
+                {
+                  "url": "https://eqlwiki.com/Druid_Plane_of_Sky_Tests",
+                  "title": "Druid Plane of Sky Tests",
+                  "retrievedAt": "2026-09-09"
+                }
+              ],
+              "stubNote": "eqlwiki's Druid Plane of Sky Tests page does not say which isle or which mob drops Wind Rune Azia, and EQBuddy's Sky checklist records only \"Trash mobs\". eqlwiki's Monk Plane of Sky Tests page describes wind runes as a random drop from any mob in the Plane of Sky, which is the closest thing to an answer we have for this one. If you have looted it, tell us the isle and the mob - that is what turns this step from a stub into directions."
+            }
+          ]
+        },
+        {
+          "id": "turn-in-to-strandar-pinemist",
+          "name": "Turn in to Strandar Pinemist",
+          "order": 4,
+          "arrivalNote": "",
+          "objectives": [
+            {
+              "id": "turn-in-shillelagh",
+              "order": 1,
+              "objectiveType": "TurnIn",
+              "title": "Hand in Spiroc Battle Staff, Efreeti Statuette, Wind Rune Azia",
+              "shortInstruction": "Give Strandar Pinemist the 3 pieces to receive the Shillelagh.",
+              "who": "Strandar Pinemist",
+              "where": "Plane of Sky - the Efreeti Chamber, through the teleport pad at roughly 1600, 520 on Isle 1.",
+              "what": "Hand Strandar Pinemist Spiroc Battle Staff (1), Efreeti Statuette (1), Wind Rune Azia (1) to receive the Shillelagh.",
+              "when": "Once every piece above is in your bags.",
+              "why": "This is the step that actually gives you the Shillelagh.",
+              "how": "A hand-in, not a fight - it is the last step and nothing else gates it. The log never records a turn-in, so tick it yourself when it is done.",
+              "prerequisiteObjectiveIds": [
+                "spiroc-battle-staff",
+                "efreeti-statuette",
+                "wind-rune-azia"
+              ],
+              "rewardKey": "Druid|Shillelagh",
+              "itemNames": [
+                "Spiroc Battle Staff",
+                "Efreeti Statuette",
+                "Wind Rune Azia",
+                "Shillelagh"
+              ],
+              "authoring": "Authored",
+              "sources": [
+                {
+                  "url": "https://eqlwiki.com/Druid_Plane_of_Sky_Tests",
+                  "title": "Druid Plane of Sky Tests",
+                  "retrievedAt": "2026-09-09"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://eqlwiki.com/Druid_Plane_of_Sky_Tests",
+          "title": "Druid Plane of Sky Tests",
+          "retrievedAt": "2026-09-09"
+        }
+      ]
+    },
+    {
+      "id": "pos-druid-spiroc-banisher-focus",
+      "name": "Spiroc Banisher Focus - Druid, Plane of Sky",
+      "guideType": "PlaneOfSkyQuest",
+      "questName": "Druid Sky Test: Spiroc Banisher Focus",
+      "zoneNames": [
+        "Plane of Sky"
+      ],
+      "applicableClasses": [
+        "Druid"
+      ],
+      "stages": [
+        {
+          "id": "isle-7-sister-of-the-spire",
+          "name": "Isle 7: Sister of the Spire",
+          "order": 1,
+          "arrivalNote": "",
+          "objectives": [
+            {
+              "id": "ethereal-ruby",
+              "order": 1,
+              "objectiveType": "Loot",
+              "title": "Loot the Ethereal Ruby from Sister of the Spire",
+              "shortInstruction": "Kill Sister of the Spire on Isle 7 and loot the Ethereal Ruby.",
+              "who": "Sister of the Spire",
+              "where": "Plane of Sky - Isle 7.",
+              "what": "Kill Sister of the Spire and loot Ethereal Ruby (1).",
+              "when": "Whenever Sister of the Spire is up.",
+              "why": "Ethereal Ruby is one of the turn-in pieces for the Spiroc Banisher Focus.",
+              "how": "Kill Sister of the Spire and loot it. One named on a spawn cycle, so the wait is the cycle rather than a drop rate. Bring whatever it takes to hold a Sky named - nobody has recorded a solo kill for us.",
+              "itemNames": [
+                "Ethereal Ruby"
+              ],
+              "authoring": "Authored",
+              "sources": [
+                {
+                  "url": "https://eqlwiki.com/Druid_Plane_of_Sky_Tests",
+                  "title": "Druid Plane of Sky Tests",
+                  "retrievedAt": "2026-09-09"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "isle-5-the-spiroc-lord",
+          "name": "Isle 5: The Spiroc Lord",
+          "order": 2,
+          "arrivalNote": "",
+          "objectives": [
+            {
+              "id": "spiroc-elder-s-totem",
+              "order": 1,
+              "objectiveType": "Loot",
+              "title": "Loot the Spiroc Elder's Totem from The Spiroc Lord",
+              "shortInstruction": "Kill The Spiroc Lord on Isle 5 and loot the Spiroc Elder's Totem.",
+              "who": "The Spiroc Lord",
+              "where": "Plane of Sky - Isle 5.",
+              "what": "Kill The Spiroc Lord and loot Spiroc Elder's Totem (1).",
+              "when": "Whenever The Spiroc Lord is up.",
+              "why": "Spiroc Elder's Totem is one of the turn-in pieces for the Spiroc Banisher Focus.",
+              "how": "Kill The Spiroc Lord and loot it. One named on a spawn cycle, so the wait is the cycle rather than a drop rate. Bring whatever it takes to hold a Sky named - nobody has recorded a solo kill for us.",
+              "itemNames": [
+                "Spiroc Elder's Totem"
+              ],
+              "authoring": "Authored",
+              "sources": [
+                {
+                  "url": "https://eqlwiki.com/Druid_Plane_of_Sky_Tests",
+                  "title": "Druid Plane of Sky Tests",
+                  "retrievedAt": "2026-09-09"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "the-wind-rune",
+          "name": "The wind rune",
+          "order": 3,
+          "arrivalNote": "",
+          "objectives": [
+            {
+              "id": "wind-rune-ena",
+              "order": 1,
+              "objectiveType": "Farm",
+              "title": "Collect Wind Rune Ena",
+              "shortInstruction": "Loot a Wind Rune Ena from Plane of Sky trash.",
+              "who": "",
+              "where": "",
+              "what": "Loot Wind Rune Ena (1).",
+              "when": "",
+              "why": "Wind Rune Ena is one of the turn-in pieces for the Spiroc Banisher Focus.",
+              "how": "",
+              "itemNames": [
+                "Wind Rune Ena"
+              ],
+              "authoring": "Stub",
+              "sources": [
+                {
+                  "url": "https://eqlwiki.com/Druid_Plane_of_Sky_Tests",
+                  "title": "Druid Plane of Sky Tests",
+                  "retrievedAt": "2026-09-09"
+                }
+              ],
+              "stubNote": "eqlwiki's Druid Plane of Sky Tests page does not say which isle or which mob drops Wind Rune Ena, and EQBuddy's Sky checklist records only \"Trash mobs\". eqlwiki's Monk Plane of Sky Tests page describes wind runes as a random drop from any mob in the Plane of Sky, which is the closest thing to an answer we have for this one. If you have looted it, tell us the isle and the mob - that is what turns this step from a stub into directions."
+            }
+          ]
+        },
+        {
+          "id": "turn-in-to-strandar-pinemist",
+          "name": "Turn in to Strandar Pinemist",
+          "order": 4,
+          "arrivalNote": "",
+          "objectives": [
+            {
+              "id": "turn-in-spiroc-banisher-focus",
+              "order": 1,
+              "objectiveType": "TurnIn",
+              "title": "Hand in Ethereal Ruby, Spiroc Elder's Totem, Wind Rune Ena",
+              "shortInstruction": "Give Strandar Pinemist the 3 pieces to receive the Spiroc Banisher Focus.",
+              "who": "Strandar Pinemist",
+              "where": "Plane of Sky - the Efreeti Chamber, through the teleport pad at roughly 1600, 520 on Isle 1.",
+              "what": "Hand Strandar Pinemist Ethereal Ruby (1), Spiroc Elder's Totem (1), Wind Rune Ena (1) to receive the Spiroc Banisher Focus.",
+              "when": "Once every piece above is in your bags.",
+              "why": "This is the step that actually gives you the Spiroc Banisher Focus.",
+              "how": "A hand-in, not a fight - it is the last step and nothing else gates it. The log never records a turn-in, so tick it yourself when it is done.",
+              "prerequisiteObjectiveIds": [
+                "ethereal-ruby",
+                "spiroc-elder-s-totem",
+                "wind-rune-ena"
+              ],
+              "rewardKey": "Druid|Spiroc Banisher Focus",
+              "itemNames": [
+                "Ethereal Ruby",
+                "Spiroc Elder's Totem",
+                "Wind Rune Ena",
+                "Spiroc Banisher Focus"
+              ],
+              "authoring": "Authored",
+              "sources": [
+                {
+                  "url": "https://eqlwiki.com/Druid_Plane_of_Sky_Tests",
+                  "title": "Druid Plane of Sky Tests",
+                  "retrievedAt": "2026-09-09"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "sources": [
+        {
+          "url": "https://eqlwiki.com/Druid_Plane_of_Sky_Tests",
+          "title": "Druid Plane of Sky Tests",
+          "retrievedAt": "2026-09-09"
         }
       ]
     }
