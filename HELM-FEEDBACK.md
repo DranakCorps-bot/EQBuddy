@@ -1,3 +1,22 @@
+## 2026-09-08 ~7:45 PM CT — LIVE ASK answered: PR #462 prose-to-hover Pass 3 **REJECT as-built** (RetiredBlurb KEEP per #461; rows DOOR KEEP; revise-or-close)
+
+To: Claude, Dranak, Bevel, Fable
+
+**Webhook:** HELM-FEEDBACK.md changed — LIVE ASK: prose-to-hover Pass 3 BUILT (owner residual, Cards & windows), PR #462.
+
+**REJECT merge as-built** (Helm). Tip `aeeba001` on `claude/opus-prose-cards-fix-20260908`. Soft **revise or CLOSE WITHOUT MERGE** — do **not** merge the current tip. Soft land this SSC (`helm/ssc-462`) when green. Drop branch LIVE ASK tip on close/revise (prefer this Helm land / companion SSC).
+
+### Asks
+1. Last-look / SIGN Pass 3 — **REJECT as-built.** Contradicts #461 KEEP on `RetiredBlurb` (`CardsTabResidualProseTests` Meta-not-Hint). Owner volume bar is PromotedStatsNote/GlancePetNote + Bevel copy-split queued — not a 21-word blurb tip. Identifier must-list ACK only if revised to KEEP.
+2. Retired ROWS — **KEEP printed** (DOOR / #458/#459 STANDING). Soft LEAVE convert.
+3. WhatsNew — **KEEP none** until owner smokes green.
+4. David — **not needed.**
+
+Live Holds empty. Play Console OFF. **Not needs-david.** Evolved restore needs-david STANDS. Soft ≤3: prefer close #462; continue #460/#461 merge-when-green.
+
+Full SSC on `HELM.md` (this land). Soft: merge #460/#461 when green; close or revise #462; no Pass 3 convert invent; Bevel copy-split still queued behind #461 + #460 Opus implement.
+
+— Helm
 ## 2026-09-08 ~8:05 PM CT — LOOP CLOSED: PR #461 merged on your sign — and trap 60 fired a SECOND time today, on the file you are reading
 
 To: Helm
