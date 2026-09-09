@@ -16,6 +16,38 @@ After you take items, write a short note in `SCRIBE-FEEDBACK.md` so Scribe can l
 
 ---
 
+### Inventory dump → flag which quests each item belongs to (+ Excel/DB export)
+- **Priority:** someday (real ask; not authorized). Core “flag quest affiliation from `/outputfile inventory`” is largely in EQBuddy’s shipped lane; the Excel/DB export half is the new gap. Soft leave unless owner opens.
+- **Place:** Inventory / Quest Tracker — personal bag+bank from the game dump. Player inventory, not shared eqlwiki-first SUGGEST. Not a group meter. Not #208. Nearby: #243 Sky leftover audit (shipped path), #435 inventory flags (someday) — do not fold; different asks.
+- **Source:** Reddit r/EQLegends u/medullah Sep 9, 8:10 AM CT (13:10 UTC). https://www.reddit.com/r/EQLegends/comments/1wbl5sk/any_exportable_database_of_items_or_easy_way_to/ Title: “Any exportable database of items or easy way to look at an inventory list for quest items/stats?” Harvest-only (no Scribe reply).
+- **Ask (scoped):** From a `/outputfile inventory` dump, review the full bag/bank list and flag which quest(s) each item belongs to. Prefer an Excel/database export for lookups across stashes; a tool that accepts an uploaded `inventory.txt` is acceptable to the reporter if no DB export exists.
+- **Reporter example (verbatim colour, not a second Ask):** Elemental Binder from the Hole → Magician Epic (not in game yet); wants to hold it for a possible Kunark-era epic — future-expansion hold is context, not a request that EQBuddy invent unreleased quest data.
+- **Thread colour (own lines, not the Ask):**
+  - u/walletinsurance: “Literally what EQ companion and eq buddy do”
+  - u/Tamalor: points at Companion App + wiki link button
+  - u/AppleBottmBeans: Codex/Claude + `/output inventory` × eqlwiki (third-party workflow; not ours)
+  - u/medullah follow-up: “couldn’t find a way to get a dump of all my items, just look at them one at a time” → discoverability of the in-game `/outputfile inventory` command / EQBuddy’s read path (see separate line below)
+- **Already shipped (quoted local WC `src` this run):** `InventoryFile` summary: game’s `/outputfile inventory` dump parsed “into base-name → count so the quest tracker can answer \"what could I turn in with what I’m already carrying\"” (`src/EQBuddy.Core/InventoryFile.cs`). Prior SCRIBE/#241 path: inventory dump trues Quest Tracker have-counts to bags+bank (1.99.14). EQBuddy is log-local — not a web app you upload a dump into (prior SCRIBE note). Latest tag still `v1.99.18`.
+- **Checked:** Reddit post + nested comments via arctic-shift. WINDOW/WIDGET/PHONE — no. Grepped `InventoryFile.cs` header on David’s PC WC. **No** grepped Excel/CSV “inventory + quest affiliation export” surface on main `src` this run (unchecked against every export path outside Inventory/Loot/Quest-named files).
+- **Hypothesis, unchecked against live Quests UI:** have-counts and turn-in readiness are shipped; a player-facing “this item → these quest names” export or spreadsheet may not be. Discoverability of `/outputfile inventory` may be the whole miss for this reporter.
+- **Class:** V0–V1 for discoverability / docs; V1 if Excel/CSV export of dump×quest map. Do not write FABLE.md.
+- **Holds re-read (HELM.md this run):** Live Holds empty. Talking on Reddit is still harvest-only unless Helm/David authorize a reply.
+- **Scribe 2026-09-09 ~1:10 PM CT (cron intake):** New Reddit intake. Do not implement. Do not open the work. Do not reply on Reddit.
+- **Helm 2026-09-09 ~1:16 PM CT:** SIGNED someday / Soft leave. No Reddit reply (thread already named EQBuddy). Do not fold into #243 / #435. Weekend Evolved Guide work is a different lane.
+
+### Discoverability: how to dump the full inventory list for EQBuddy
+- **Priority:** someday / waiting on product call (may be docs or in-app tip only — not authorized).
+- **Place:** onboarding / Inventory import tip — how to run `/outputfile inventory` so EQBuddy (or any local tool) can see every bag/bank row. Player session. Not shared game truth.
+- **Source:** same thread as above — u/medullah nested reply on https://www.reddit.com/r/EQLegends/comments/1wbl5sk/any_exportable_database_of_items_or_easy_way_to/ (~after community named EQBuddy/Companion).
+- **Ask (verbatim):** “Ah I’ll have to look, couldn’t find a way to get a dump of all my items, just look at them one at a time.”
+- **Already shipped:** WhatsNew/README path historically taught “Type `/outputfile inventory` in game and EQBuddy reads the file” (quoted on prior SCRIBE #243 evidence). Whether that tip is visible enough on first run — **not checked on a live widget this pass**.
+- **Checked:** Reddit nested comment only. WINDOW — no.
+- **Hypothesis, unchecked:** reporter does not know the game command; not that EQBuddy lacks a parser.
+- **Class:** V0 (copy / first-run tip). Do not write FABLE.md.
+- **Scribe 2026-09-09 ~1:10 PM CT:** Filed as its own line (not thread colour). No Reddit reply.
+- **Helm 2026-09-09 ~1:16 PM CT:** SIGNED someday / Soft leave. No Reddit reply.
+
+
 ### Inventory: flag items that can merge into one stack/slot
 - **Priority:** someday (real ask, not this gate; not authorized)
 - **Place:** Inventory / Gear & Loot — personal bag/slot view. Player inventory, not shared game truth / eqlwiki. Not a group meter. Not #208.
