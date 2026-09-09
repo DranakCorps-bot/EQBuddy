@@ -415,6 +415,31 @@ $Shots = [ordered]@{
                            Env = @{ EQBUDDY_SHELL = 'quests:general' }; Set = @{} }
     'shell-quests-sky' = @{ Title = 'EQBuddy — Guide'
                            Env = @{ EQBUDDY_SHELL = 'quests:sky' }; Set = @{} }
+    # The GUIDED Plane of Sky (P1c). The fixture log infers Warrior and every Warrior
+    # reward is authored, so this frame is the guide engine's own acceptance criterion:
+    # the item rows are GONE and the walkthrough is in their place.
+    #
+    # PREDICTED before shooting (trap 23), from the shipped catalog and the ticks below:
+    #   * six headings, each with a "Guide · n of m · k stub(s)" caption under it;
+    #   * "Runed Wind Amulet" reads 'Guide · 1 of 3 · 1 stub' — the Stone Amulet ticked
+    #     below, the wind rune stubbed, the turn-in still open;
+    #   * the wind-rune rows carry a wrapped dim second line starting "Wiki incomplete —",
+    #     and so does Dagas' Gem of Invigoration, whose two sources disagree;
+    #   * the turn-in row of every unfinished reward reads "after: …" naming the steps
+    #     that still gate it;
+    #   * a pencil at the end of EVERY row, not only the stubs;
+    #   * "Belt of the Four Winds" offers "Mark turned in" on its heading — every piece
+    #     held, and the turn-in row does NOT count itself among the pieces.
+    'shell-quests-sky-guide' = @{ Title = 'EQBuddy — Guide'
+                           Env = @{ EQBUDDY_SHELL = 'quests:sky' }
+                           Set = @{
+                               SkyQuestChecklist = @(
+                                   @{ Id = 'sky-198'; Acquired = $true }   # Stone Amulet
+                                   @{ Id = 'sky-200'; Acquired = $true }   # Belt: every
+                                   @{ Id = 'sky-201'; Acquired = $true }   # piece held,
+                                   @{ Id = 'sky-202'; Acquired = $true }   # so: ready
+                               )
+                           } }
     'shell-quests-split' = @{ Title = 'EQBuddy — Guide'
                            Env = @{ EQBUDDY_SHELL = 'quests:general'
                                     EQBUDDY_SHELL_SIZE = '900x640' }; Set = @{} }

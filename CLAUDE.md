@@ -785,6 +785,19 @@ after the named guard left with its surface.
     gracefully must be asserted on what it SAYS** — an expired chip lingers at
     0:00, so presence passes on the broken code. [Novel](docs/ops/claude-archive/traps.md#trap-71)
 
+72. **A repaint gate keyed on everything EXCEPT the store the feature writes.**
+    The Quests tab's signature carried the quest ledger, the turn-ins, the
+    inventory stamp — and neither checklist LIST, which is what
+    `SkyLootAutoCheck`/`EpicLootAutoCheck` actually write. So the box was
+    ticked and the tab kept drawing the moment before, for the whole session.
+    When you add a reader of a store, grep what makes its surface REDRAW and
+    check that store is in it. A count is not enough (a swap leaves it
+    unmoved) — fold the ids that are set. Guard:
+    `QuestsView.ChecklistTickSignature` + the E2E loot row, which timed out
+    before the fix and passes in 4 s after. Dump both numbers from one moment
+    (`questsSkyAcquired` beside `questsGuideDone`) — "the store says so" and
+    "the screen says so" are different claims (trap 56).
+
 New trap discovered the hard way? Add the compact rule here and the novel
 under `docs/ops/claude-archive/traps.md`. That is the whole point.
 

@@ -39,7 +39,15 @@ public sealed record QuestChecklistRow(
     /// among the pieces makes that state unreachable — a Warrior holding both drops would
     /// silently stop appearing in the cross-class Ready band and lose the "Mark turned in"
     /// button on their own heading. See <see cref="QuestChecklistGroup.ReadyToTurnIn"/>.</para></summary>
-    bool IsTurnIn = false);
+    bool IsTurnIn = false,
+    /// <summary>All six questions about this step, labelled — what the desktop hangs on the
+    /// row's hover and the phone draws as a small block, because a phone has no hover and an
+    /// affordance it cannot honour is a lie with the right shape (trap 35).
+    ///
+    /// <para>ONE field with two renderings rather than one field per surface: the six are one
+    /// fact about the step, and splitting them by who draws them is how the two screens start
+    /// answering differently.</para></summary>
+    string GuideFacts = "");
 
 /// <summary>A group of rows under one heading, with the state of the reward as a whole.</summary>
 /// <param name="Title">The reward (Sky) or section (Epic) on its own, WITHOUT the class.

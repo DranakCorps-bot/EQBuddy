@@ -46,18 +46,52 @@ public static class GuidePresentation
         return caption;
     }
 
-    /// <summary>The dim line under a guide row's title: who, then where, joined the way the
-    /// classic checklist already joins its NPC and drop location. Either half alone is a
-    /// complete answer to a smaller question, so a missing one is dropped rather than
-    /// leaving a dangling separator.</summary>
-    public static string RowDetail(GuideObjective objective)
+    /// <summary>
+    /// The dim line under a guide row's title: WHO, WHERE, WHEN — the three that decide
+    /// whether you can do this step right now, joined the way the classic checklist already
+    /// joins its NPC and drop location.
+    ///
+    /// <para><b>Why only three of the six here.</b> Each question is drawn in exactly one
+    /// place (David, 2026-09-09: *"we don't want to be redundant, but all must be
+    /// addressed"*). WHAT is the row's own title. WHY and HOW are on the hover, where a
+    /// player who has decided to do the step goes for the method — putting them inline made
+    /// one row read as three sentences saying one thing, which is what the first staged shot
+    /// of this surface showed.</para>
+    ///
+    /// <para>An empty part is dropped rather than leaving a dangling separator; a Stub has
+    /// none of them and gets its note instead.</para></summary>
+    public static string RowDetail(GuideObjective objective) =>
+        Join(objective.Who, objective.Where, objective.When);
+
+    /// <summary>
+    /// The hover: all six questions, labelled, for one step. The row shows what you need to
+    /// decide; this is where the rest lives, so nothing is unanswerable and nothing is said
+    /// twice on screen.
+    ///
+    /// <para>A Stub answers the one question it can — what we do not know — because a
+    /// labelled list of blanks reads as a broken row rather than an honest one.</para></summary>
+    public static string RowTooltip(GuideObjective objective)
     {
-        var who = objective.Who.Trim();
-        var where = objective.Where.Trim();
-        if (who.Length == 0) return where;
-        if (where.Length == 0) return who;
-        return who + " · " + where;
+        if (objective.Authoring == GuideAuthoring.Stub)
+            return StubLead + " " + objective.StubNote;
+
+        var lines = new List<string>();
+        Add("What", objective.What);
+        Add("Who", objective.Who);
+        Add("Where", objective.Where);
+        Add("When", objective.When);
+        Add("Why", objective.Why);
+        Add("How", objective.How);
+        return string.Join("\n", lines);
+
+        void Add(string label, string value)
+        {
+            if (value.Trim().Length > 0) lines.Add(label + ": " + value.Trim());
+        }
     }
+
+    private static string Join(params string[] parts) =>
+        string.Join(" · ", parts.Select(p => p.Trim()).Where(p => p.Length > 0));
 
     /// <summary>What a turn-in row says while its pieces are still outstanding. Names the
     /// steps rather than counting them: "2 steps first" tells a player nothing they can act
@@ -88,9 +122,9 @@ public static class GuidePresentation
         var source = objective.Sources.Count > 0 ? objective.Sources[0]
             : guide.Sources.Count > 0 ? guide.Sources[0] : null;
 
-        var shows = objective.Authoring == GuideAuthoring.Stub
-            ? StubLead + " " + objective.StubNote
-            : $"Who: {objective.Who}\nWhere: {objective.Where}\nWhat: {objective.What}";
+        // All six, labelled, so the reporter can see exactly which one is wrong — and so the
+        // draft says the same thing the row's hover said, rather than a summary of it.
+        var shows = RowTooltip(objective);
 
         var body =
             $"Guide: {guide.Name}\nStep: {objective.Title}\n" +

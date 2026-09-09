@@ -309,6 +309,11 @@ public sealed record CompanionChecklistRow(
     /// <c>JsonIgnoreCondition.WhenWritingNull</c> — which matters because a first pairing
     /// ships every row (trap 67).</summary>
     string? Stub = null,
+    /// <summary>On an authored guide step: the six questions, labelled. The desktop hangs
+    /// these on the row's hover; a phone has no hover, so they ride the row and the page
+    /// draws them as a small block — porting the INTENT rather than an affordance the phone
+    /// cannot honour (trap 35).</summary>
+    string? Facts = null,
     /// <summary>On a guide step: the prefilled discussion draft the desktop's pencil opens.
     /// A URL and nothing else — the body is composed from the CATALOG, carries nothing from
     /// the log or the character, and is on screen in the player's own browser before

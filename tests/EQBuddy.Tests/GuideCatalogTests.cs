@@ -47,13 +47,19 @@ public class GuideCatalogTests
     }
 
     /// <summary>
-    /// The must-list, stated positively (trap 34): every Authored objective ANSWERS who,
-    /// where and what, and says where that came from. Asserted here as well as inside
+    /// The must-list, stated positively (trap 34): every Authored objective ANSWERS all six
+    /// questions and says where that came from. Asserted here as well as inside
     /// <c>Validate</c> because the rule is the product promise — if the validation is ever
     /// loosened, this is the test that has to be argued with.
+    ///
+    /// <para><b>Six, since 2026-09-09</b> (David: *"who, what, where, when, why, how should be
+    /// the maximal number of things. We don't want to be redundant, but all must be
+    /// addressed."*). A step whose WHEN is genuinely "any time you are in the zone" says that
+    /// — the field is never left blank as a way of not answering, which is exactly the
+    /// difference between an authored step and a hollow one wearing its clothes (lock 4a).</para>
     /// </summary>
     [Fact]
-    public void EveryAuthoredObjectiveAnswersWhoWhereAndWhatAndCitesASource()
+    public void EveryAuthoredObjectiveAnswersAllSixQuestionsAndCitesASource()
     {
         var authored = Shipped.Guides.SelectMany(g => g.AllObjectives)
             .Where(o => o.Authoring == GuideAuthoring.Authored).ToList();
@@ -62,8 +68,11 @@ public class GuideCatalogTests
         foreach (var o in authored)
         {
             Assert.False(string.IsNullOrWhiteSpace(o.Who), $"{o.Id}: authored, no WHO");
-            Assert.False(string.IsNullOrWhiteSpace(o.Where), $"{o.Id}: authored, no WHERE");
             Assert.False(string.IsNullOrWhiteSpace(o.What), $"{o.Id}: authored, no WHAT");
+            Assert.False(string.IsNullOrWhiteSpace(o.Where), $"{o.Id}: authored, no WHERE");
+            Assert.False(string.IsNullOrWhiteSpace(o.When), $"{o.Id}: authored, no WHEN");
+            Assert.False(string.IsNullOrWhiteSpace(o.Why), $"{o.Id}: authored, no WHY");
+            Assert.False(string.IsNullOrWhiteSpace(o.How), $"{o.Id}: authored, no HOW");
             Assert.NotEmpty(o.Sources);
             foreach (var s in o.Sources)
             {
@@ -71,6 +80,65 @@ public class GuideCatalogTests
                 Assert.NotEmpty(s.Title);
             }
         }
+    }
+
+    /// <summary>Prove-fail for the three questions added on 2026-09-09: a step answering the
+    /// original who/where/what and NOTHING ELSE is refused. Green-only coverage of a widened
+    /// rule is vacuous — the rule has to be shown rejecting what it newly forbids.</summary>
+    [Theory]
+    [InlineData("when")]
+    [InlineData("why")]
+    [InlineData("how")]
+    public void AnAuthoredStepMissingAnyOneOfTheSixIsRefused(string missing)
+    {
+        var objective = new GuideObjective
+        {
+            Id = "step", Order = 1, ObjectiveType = "Loot", Title = "Loot it",
+            ShortInstruction = "Loot it.",
+            Who = "a named", Where = "an isle", What = "loot one",
+            When = "when it is up", Why = "it is a turn-in piece", How = "kill and loot",
+            Authoring = GuideAuthoring.Authored,
+            Sources = [new GuideSource
+            {
+                Url = "https://eqlwiki.com/X", Title = "X", RetrievedAt = "2026-09-09",
+            }],
+        };
+        switch (missing)
+        {
+            case "when": objective.When = ""; break;
+            case "why": objective.Why = ""; break;
+            case "how": objective.How = ""; break;
+        }
+
+        var catalog = new GuideCatalog
+        {
+            Guides =
+            [
+                new Guide
+                {
+                    Id = "g", Name = "G", ApplicableClasses = ["Warrior"],
+                    ZoneNames = ["Plane of Sky"],
+                    Sources = [.. objective.Sources],
+                    Stages =
+                    [
+                        new GuideStage
+                        {
+                            Id = "s", Name = "S", Order = 1, Objectives = [objective],
+                        },
+                    ],
+                },
+            ],
+        };
+
+        var problems = catalog.Validate([]);
+
+        Assert.Contains(problems, p => p.Contains(missing.ToUpperInvariant(), StringComparison.Ordinal));
+        // And the same step with every field filled is shippable, so the refusal above is
+        // about the missing one and not about the fixture.
+        objective.When = "when it is up";
+        objective.Why = "it is a turn-in piece";
+        objective.How = "kill and loot";
+        Assert.Empty(catalog.Validate([]));
     }
 
     /// <summary>A stub says what is missing, in the player's terms. "Incomplete" with no

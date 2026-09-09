@@ -150,6 +150,9 @@ public static partial class CompanionProjection
                 r.Unassigned ? r.Detail + UnassignedMark : r.Detail,
                 r.Acquired,
                 r.StubNote.Length > 0 ? GuidePresentation.StubLead + " " + r.StubNote : null,
+                // A phone has no hover, so the six questions the desktop hangs on one ride
+                // the row itself. Porting the INTENT rather than the control (trap 35).
+                r.GuideFacts.Length > 0 && r.StubNote.Length == 0 ? r.GuideFacts : null,
                 // The same share-back door the desktop's pencil opens. A plain link, because
                 // the phone's browser honours it natively — no substitute needed (trap 35).
                 r.GuideRowKey.Length > 0

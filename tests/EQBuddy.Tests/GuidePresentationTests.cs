@@ -23,8 +23,11 @@ public sealed class GuidePresentationTests
         Title = "Loot the Stone Amulet from the Keeper of Souls",
         ShortInstruction = "Kill the Keeper of Souls and loot the Stone Amulet.",
         Who = "Keeper of Souls",
-        Where = "Plane of Sky - Isle 4, the Keeper of Souls island.",
+        Where = "Plane of Sky - Isle 4.",
         What = "Loot Stone Amulet (1).",
+        When = "Whenever it is up.",
+        Why = "Stone Amulet is one of the turn-in pieces for the Runed Wind Amulet.",
+        How = "Kill the named and loot it.",
         ItemNames = ["Stone Amulet"],
         Authoring = GuideAuthoring.Authored,
         Sources =
@@ -72,26 +75,63 @@ public sealed class GuidePresentationTests
 
     // ---- row prose -------------------------------------------------------------------
 
+    /// <summary>Each of the six is drawn in exactly ONE place (David, 2026-09-09: "we don't
+    /// want to be redundant, but all must be addressed"). The row line carries the three that
+    /// decide whether you can do this step right now; WHAT is the row's own title, and WHY
+    /// and HOW are on the hover.</summary>
     [Fact]
-    public void RowDetailIsWhoThenWhere() =>
-        Assert.Equal(
-            "Keeper of Souls · Plane of Sky - Isle 4, the Keeper of Souls island.",
-            GuidePresentation.RowDetail(Authored()));
+    public void TheRowLineCarriesWhoWhereAndWhenAndNothingElse()
+    {
+        var objective = Authored();
+
+        var detail = GuidePresentation.RowDetail(objective);
+
+        Assert.Equal("Keeper of Souls · Plane of Sky - Isle 4. · Whenever it is up.", detail);
+        Assert.DoesNotContain(objective.Why, detail, StringComparison.Ordinal);
+        Assert.DoesNotContain(objective.How, detail, StringComparison.Ordinal);
+        Assert.DoesNotContain(objective.What, detail, StringComparison.Ordinal);
+    }
 
     [Fact]
     public void AHalfAnsweredRowLeavesNoDanglingSeparator()
     {
         var whoOnly = Authored();
         whoOnly.Where = "";
+        whoOnly.When = "";
         Assert.Equal("Keeper of Souls", GuidePresentation.RowDetail(whoOnly));
 
         var whereOnly = Authored();
         whereOnly.Who = "";
-        Assert.Equal(
-            "Plane of Sky - Isle 4, the Keeper of Souls island.",
-            GuidePresentation.RowDetail(whereOnly));
+        whereOnly.When = "";
+        Assert.Equal("Plane of Sky - Isle 4.", GuidePresentation.RowDetail(whereOnly));
 
         Assert.Equal("", GuidePresentation.RowDetail(Stub()));
+    }
+
+    /// <summary>The hover answers ALL SIX, labelled — so nothing is unanswerable even though
+    /// nothing is said twice on the row itself.</summary>
+    [Fact]
+    public void TheHoverAnswersAllSixQuestions()
+    {
+        var tip = GuidePresentation.RowTooltip(Authored());
+
+        foreach (var label in new[] { "What:", "Who:", "Where:", "When:", "Why:", "How:" })
+            Assert.Contains(label, tip, StringComparison.Ordinal);
+        // One line each, in the order a player asks them.
+        Assert.Equal(6, tip.Split('\n').Length);
+        Assert.StartsWith("What:", tip, StringComparison.Ordinal);
+    }
+
+    /// <summary>A stub answers the one question it can. A labelled list of blanks reads as a
+    /// broken row rather than an honest one.</summary>
+    [Fact]
+    public void AStubsHoverIsItsNoteAndNotSixEmptyLabels()
+    {
+        var tip = GuidePresentation.RowTooltip(Stub());
+
+        Assert.StartsWith(GuidePresentation.StubLead, tip, StringComparison.Ordinal);
+        Assert.DoesNotContain("Who:", tip, StringComparison.Ordinal);
+        Assert.DoesNotContain("When:", tip, StringComparison.Ordinal);
     }
 
     [Fact]
@@ -128,6 +168,8 @@ public sealed class GuidePresentationTests
 
         Assert.Contains("Who: Keeper of Souls", body, StringComparison.Ordinal);
         Assert.Contains("Where: Plane of Sky - Isle 4", body, StringComparison.Ordinal);
+        Assert.Contains("When: Whenever it is up.", body, StringComparison.Ordinal);
+        Assert.Contains("How: Kill the named and loot it.", body, StringComparison.Ordinal);
         Assert.Contains("What: Loot Stone Amulet (1).", body, StringComparison.Ordinal);
         Assert.DoesNotContain(GuidePresentation.StubLead, body, StringComparison.Ordinal);
     }

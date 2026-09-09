@@ -148,7 +148,8 @@ public static class GuideChecklistProjection
                 stageOf.GetValueOrDefault(objective.Id, ""),
                 objective.Authoring == GuideAuthoring.Stub ? objective.StubNote : "",
                 guide.Id,
-                home == GuideProgressHome.SkyTurnIn));
+                home == GuideProgressHome.SkyTurnIn,
+                GuidePresentation.RowTooltip(objective)));
         }
 
         var counts = GuideProgressRouter.Counts(settings, ledger, characterKey, guide, items);

@@ -2612,11 +2612,14 @@ public partial class QuestsView : UserControl
                     Content = content,
                     IsChecked = row.Acquired,
                     Margin = new Thickness(DesignTokens.SpaceM, 1, 0, 1),
+                    // The six questions live on the hover for a guide row: the row itself
+                    // says what to do and where, and repeating why and how inline is the
+                    // redundancy the six are meant to remove (David, 2026-09-09).
                     ToolTip = row.Unassigned
                         ? "EQBuddy ticked this itself — several classes want this item and the "
                           + "log couldn't say which one earned it. Move the tick if it's on the "
                           + "wrong class; either way, toggling it settles the question."
-                        : null,
+                        : row.GuideFacts.Length > 0 ? row.GuideFacts : null,
                 };
                 if (locked)
                 {
