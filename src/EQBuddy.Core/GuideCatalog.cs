@@ -78,6 +78,12 @@ public sealed class GuideObjective
     /// <summary>The one line the active-step card leads with.</summary>
     public string ShortInstruction { get; set; } = "";
 
+    // THE SIX QUESTIONS (David, 2026-09-09): *"who, what, where, when, why, how should be
+    // the maximal number of things. We don't want to be redundant, but all must be
+    // addressed."* An Authored objective answers ALL SIX — validation holds it to that — and
+    // each one is DRAWN in exactly one place, because a row that says the same fact three
+    // ways is the failure the first staged shot of this surface actually showed.
+
     /// <summary>WHO: the npc, mob or mobs this step is about.</summary>
     public string Who { get; set; } = "";
     /// <summary>WHERE: zone plus prose directions. Never coordinates alone — a number pair
@@ -85,6 +91,21 @@ public sealed class GuideObjective
     public string Where { get; set; } = "";
     /// <summary>WHAT: the action, with item names and quantities.</summary>
     public string What { get; set; } = "";
+    /// <summary>WHEN: the timing that decides whether this step can be done NOW — a spawn
+    /// cycle, an ordering against the guide's other steps, a thing to finish before leaving
+    /// an island. Not a clock: "any time you are on the isle" is a real answer and the most
+    /// common one.</summary>
+    public string When { get; set; } = "";
+    /// <summary>WHY: what this step BUYS, in the guide's own terms — which piece of which
+    /// reward, or what it unlocks. Per STEP and not per guide: the reward's name is already
+    /// the heading above the rows, and repeating it on each of them is the redundancy the
+    /// six questions are supposed to remove.</summary>
+    public string Why { get; set; } = "";
+    /// <summary>HOW: the method, and what it costs — kill and loot, a hand-in with no
+    /// combat, a long camp, a full group. Absorbed the old <c>EffortNote</c>, which had no
+    /// reader and asked half of this question. Still deliberately NOT a ★ rating: authors
+    /// must not invent stars before real ratings earn a model (Helm carry).</summary>
+    public string How { get; set; } = "";
 
     /// <summary>Objectives IN THE SAME GUIDE that must be done first. Cross-stage is fine —
     /// PoS islands are stages and a turn-in depends on drops from several.</summary>
@@ -107,11 +128,6 @@ public sealed class GuideObjective
     /// can say it and offer the share-back door. "Incomplete" with no sentence behind it is
     /// the fabricated certainty the locks forbid, wearing a humble face.</summary>
     public string StubNote { get; set; } = "";
-
-    /// <summary>Free text, optional: "needs a full group", "the spawn is a long camp".
-    /// Deliberately NOT a ★ rating — authors must not invent stars before real ratings earn
-    /// a model (Helm carry, plan §2).</summary>
-    public string EffortNote { get; set; } = "";
 
     public List<GuideSource> Sources { get; set; } = [];
 
@@ -342,9 +358,17 @@ public sealed class GuideCatalog
     {
         if (objective.Authoring == GuideAuthoring.Authored)
         {
+            // ALL SIX, or it is a stub. David, 2026-09-09: "who, what, where, when, why, how
+            // should be the maximal number of things … all must be addressed." A step whose
+            // WHEN is genuinely "any time you are on the isle" says that; the field is never
+            // blank as a way of avoiding the question, which is the whole difference between
+            // an authored step and a hollow one wearing its clothes (lock 4a).
             if (objective.Who.Length == 0) yield return $"{who}: authored but does not say WHO";
             if (objective.Where.Length == 0) yield return $"{who}: authored but does not say WHERE";
             if (objective.What.Length == 0) yield return $"{who}: authored but does not say WHAT";
+            if (objective.When.Length == 0) yield return $"{who}: authored but does not say WHEN";
+            if (objective.Why.Length == 0) yield return $"{who}: authored but does not say WHY";
+            if (objective.How.Length == 0) yield return $"{who}: authored but does not say HOW";
             if (objective.Sources.Count == 0)
                 yield return $"{who}: authored but cites no source — provenance is what separates "
                     + "curation from invention, and it is the weekly refresh's flag";

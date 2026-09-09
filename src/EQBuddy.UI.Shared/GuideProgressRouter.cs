@@ -12,6 +12,17 @@ public enum GuideProgressHome
     /// <summary>The Sky turn-in store the classic checklist, the phone and the achievements
     /// import have always shared (<c>AppSettings.SkyQuestCompleted</c>).</summary>
     SkyTurnIn,
+
+    /// <summary>One <see cref="SkyQuestChecklistItem"/> row of the guide's own reward group -
+    /// the box the classic checklist has always drawn for "do I hold the Stone Amulet".
+    ///
+    /// <para>An objective that is about acquiring exactly one of its group's turn-in items is
+    /// not a new fact either: it is that item's <c>Acquired</c> flag, which the loot
+    /// auto-tick already writes and four surfaces already read. Without this home the guide
+    /// would carry a second tick beside the checklist's for one item - trap 4 on the first
+    /// screen a Warrior sees - and the loot auto-tick would light one of them and not the
+    /// other.</para></summary>
+    SkyItem,
 }
 
 /// <summary>
@@ -44,10 +55,52 @@ public enum GuideProgressHome
 /// </summary>
 public static class GuideProgressRouter
 {
-    /// <summary>Which store owns this objective's done state. The whole routing decision,
-    /// pure and separately testable: a reward key means the Sky store owns it.</summary>
+    /// <summary>The objective types whose whole content is "get hold of this item", and so
+    /// the only ones that may read a checklist item's box. A Travel or TalkToNpc step that
+    /// happens to mention an item name in passing is not that item's tick.</summary>
+    public static readonly string[] ItemBackedObjectiveTypes = ["Loot", "Farm", "Collect"];
+
+    /// <summary>Which store owns this objective's done state, with no Sky group in hand -
+    /// the answer for a guide that does not layer on the Sky checklist at all. Never
+    /// <see cref="GuideProgressHome.SkyItem"/>, because that home is a row of a specific
+    /// group and there is no group here.</summary>
     public static GuideProgressHome HomeFor(GuideObjective objective) =>
-        objective.RewardKey.Length > 0 ? GuideProgressHome.SkyTurnIn : GuideProgressHome.GuideLedger;
+        HomeFor(objective, [], out _);
+
+    /// <summary>Which store owns this objective's done state - the whole routing decision,
+    /// pure and separately testable, and the ONE producer of it (both overloads land here).
+    ///
+    /// <para>A reward key means the Sky turn-in store owns it. Otherwise an acquire-shaped
+    /// objective (<see cref="ItemBackedObjectiveTypes"/>) naming <b>exactly one</b> of
+    /// <paramref name="groupItems"/> is that item's box - <paramref name="backingItem"/> hands
+    /// it back so the caller never re-derives the match. Two matches, none, or the wrong
+    /// objective type all fall to the guide ledger: an ambiguous claim on a shared store is
+    /// worse than a private tick.</para>
+    ///
+    /// <para><paramref name="groupItems"/> is the reward group's OWN rows and nothing wider.
+    /// "Wind Rune Azia" is a row for the Bard and a row for the Warrior; they are two facts
+    /// about two quests and must never resolve to each other.</para></summary>
+    public static GuideProgressHome HomeFor(GuideObjective objective,
+        IReadOnlyList<SkyQuestChecklistItem> groupItems, out SkyQuestChecklistItem? backingItem)
+    {
+        backingItem = null;
+        if (objective.RewardKey.Length > 0) return GuideProgressHome.SkyTurnIn;
+        if (!ItemBackedObjectiveTypes.Contains(objective.ObjectiveType, StringComparer.Ordinal))
+            return GuideProgressHome.GuideLedger;
+
+        SkyQuestChecklistItem? only = null;
+        foreach (var item in groupItems)
+        {
+            if (!objective.ItemNames.Contains(item.QuestItem, StringComparer.OrdinalIgnoreCase))
+                continue;
+            if (only is not null) return GuideProgressHome.GuideLedger;
+            only = item;
+        }
+
+        if (only is null) return GuideProgressHome.GuideLedger;
+        backingItem = only;
+        return GuideProgressHome.SkyItem;
+    }
 
     /// <summary>Has the player done this objective? Reward objectives answer from the Sky
     /// turn-in store, so a turn-in recorded anywhere — the classic checklist, the phone, the
@@ -55,10 +108,22 @@ public static class GuideProgressRouter
     /// guide the same tick.</summary>
     public static bool IsDone(AppSettings settings, QuestLedgerStore ledger,
         string characterKey, string guideId, GuideObjective objective) =>
-        HomeFor(objective) == GuideProgressHome.SkyTurnIn
-            ? SkyCompleteToggle.IsTurnedIn(settings, objective.RewardKey)
-            : ledger.GuideProgressFor(characterKey, guideId).DoneObjectiveIds
-                .Contains(objective.Id, StringComparer.OrdinalIgnoreCase);
+        IsDone(settings, ledger, characterKey, guideId, objective, []);
+
+    /// <summary>Has the player done this objective? Reward objectives answer from the Sky
+    /// turn-in store and item-backed ones from their own checklist row, so a turn-in or a
+    /// looted piece recorded anywhere - the classic checklist, the phone, the achievements
+    /// import, the loot auto-tick - reads as done inside the guide the same tick.</summary>
+    public static bool IsDone(AppSettings settings, QuestLedgerStore ledger,
+        string characterKey, string guideId, GuideObjective objective,
+        IReadOnlyList<SkyQuestChecklistItem> groupItems) =>
+        HomeFor(objective, groupItems, out var item) switch
+        {
+            GuideProgressHome.SkyTurnIn => SkyCompleteToggle.IsTurnedIn(settings, objective.RewardKey),
+            GuideProgressHome.SkyItem => item!.Acquired,
+            _ => ledger.GuideProgressFor(characterKey, guideId).DoneObjectiveIds
+                .Contains(objective.Id, StringComparer.OrdinalIgnoreCase),
+        };
 
     /// <summary>Tick or untick an objective, into whichever store owns it.
     ///
@@ -72,9 +137,23 @@ public static class GuideProgressRouter
     /// <para>Ticking clears a skip on the same objective, whichever store the tick went to —
     /// the guide row cannot show struck-out and done at once.</para></summary>
     public static void SetDone(AppSettings settings, QuestLedgerStore ledger,
-        string characterKey, string guideId, GuideObjective objective, bool done)
+        string characterKey, string guideId, GuideObjective objective, bool done) =>
+        SetDone(settings, ledger, characterKey, guideId, objective, [], done);
+
+    /// <summary>Tick or untick an objective, into whichever of the THREE stores owns it —
+    /// see the one-argument form for the Sky turn-in rules, which are unchanged.
+    ///
+    /// <para>An item-backed objective writes the two lines a click on the classic checklist
+    /// writes: the box, and the "we guessed which class earned this" flag that the player
+    /// deciding always clears. Same store, same setter, same row — so ticking the guide step
+    /// and ticking the old checklist row are one action, not two that agree by luck.</para></summary>
+    public static void SetDone(AppSettings settings, QuestLedgerStore ledger,
+        string characterKey, string guideId, GuideObjective objective,
+        IReadOnlyList<SkyQuestChecklistItem> groupItems, bool done)
     {
-        if (HomeFor(objective) == GuideProgressHome.SkyTurnIn)
+        var home = HomeFor(objective, groupItems, out var item);
+
+        if (home == GuideProgressHome.SkyTurnIn)
         {
             if (done)
                 SkyCompleteToggle.MarkTurnedIn(settings, objective.RewardKey,
@@ -82,19 +161,28 @@ public static class GuideProgressRouter
                     ledger, characterKey);
             else
                 SkyCompleteToggle.Reopen(settings, objective.RewardKey);
-
-            // The done fact stayed in the Sky store; only the contradicting skip is ours to
-            // clear, and only when there is one — an untouched guide must not gain a row
-            // because a reward was turned in on another screen.
-            if (done && IsSkipped(ledger, characterKey, guideId, objective))
-                ledger.SetObjectiveSkipped(characterKey, guideId, objective.Id, false);
+        }
+        else if (home == GuideProgressHome.SkyItem)
+        {
+            item!.Acquired = done;
+            // The player deciding IS the resolution of an unassigned auto-tick — the same
+            // line QuestsView and the phone already run on the raw checklist row.
+            item.AcquiredUnassigned = false;
+        }
+        else
+        {
+            // The objective, not its id: the store refuses a reward-keyed one and writes
+            // nothing, so the routing rule is enforced on both sides of the call rather than
+            // trusted on this one. Unreachable here by construction.
+            ledger.SetObjectiveDone(characterKey, guideId, objective, done);
             return;
         }
 
-        // The objective, not its id: the store refuses a reward-keyed one and writes nothing,
-        // so the routing rule is enforced on both sides of the call rather than trusted on
-        // this one. Unreachable here by construction — HomeFor already sent those above.
-        ledger.SetObjectiveDone(characterKey, guideId, objective, done);
+        // The done fact stayed in a Sky store; only the contradicting skip is ours to clear,
+        // and only when there is one — an untouched guide must not gain a row because a
+        // reward was turned in, or a piece looted, on another screen.
+        if (done && IsSkipped(ledger, characterKey, guideId, objective))
+            ledger.SetObjectiveSkipped(characterKey, guideId, objective.Id, false);
     }
 
     /// <summary>Is this objective struck out? Always the guide ledger — see the class
@@ -116,7 +204,15 @@ public static class GuideProgressRouter
     /// and the total. Counts through <see cref="IsDone"/>, so the Sky-owned rows count from
     /// the Sky store rather than from a copy that could disagree with it.</summary>
     public static GuideProgressCounts Counts(AppSettings settings, QuestLedgerStore ledger,
-        string characterKey, Guide guide)
+        string characterKey, Guide guide) =>
+        Counts(settings, ledger, characterKey, guide, []);
+
+    /// <summary>How far through a guide the player is, with the reward group's rows in hand
+    /// so item-backed steps count from their own boxes. Same <see cref="IsDone"/> the rows
+    /// are drawn from, so the caption under a heading and the ticks under it cannot
+    /// disagree — one producer, two readers.</summary>
+    public static GuideProgressCounts Counts(AppSettings settings, QuestLedgerStore ledger,
+        string characterKey, Guide guide, IReadOnlyList<SkyQuestChecklistItem> groupItems)
     {
         var done = 0;
         var skipped = 0;
@@ -124,7 +220,7 @@ public static class GuideProgressRouter
         foreach (var objective in guide.AllObjectives)
         {
             total++;
-            if (IsDone(settings, ledger, characterKey, guide.Id, objective)) done++;
+            if (IsDone(settings, ledger, characterKey, guide.Id, objective, groupItems)) done++;
             else if (IsSkipped(ledger, characterKey, guide.Id, objective)) skipped++;
         }
         return new GuideProgressCounts(done, skipped, total);

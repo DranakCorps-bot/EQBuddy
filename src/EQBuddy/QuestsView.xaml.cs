@@ -731,7 +731,13 @@ public partial class QuestsView : UserControl
             // The leftover bands are a join against the DUMP, and nothing else in this
             // signature moves when a newer one is read — so without this the bands would
             // keep answering from the dump that was current when the window opened.
-            $"|inv:{_main.LatestInventory()?.WrittenAt.Ticks ?? 0}";
+            $"|inv:{_main.LatestInventory()?.WrittenAt.Ticks ?? 0}" +
+            // THE CHECKLISTS' OWN TICKS. Nothing else here moves when the loot auto-tick
+            // writes a box: `owned` is the quest ledger and `completed` is turn-ins, and
+            // neither is where SkyLootAutoCheck / EpicLootAutoCheck put an acquired item.
+            // So the store said "you have the Stone Amulet" and this tab went on drawing
+            // the moment before — measured in E2E, not theorised.
+            $"|ck:{ChecklistTickSignature()}";
         if (!force && sig == _signature) return;
         _signature = sig;
 
@@ -1088,7 +1094,122 @@ public partial class QuestsView : UserControl
         $"questsSkyLeftoverB={BandRowsOnScreen("skyLeftoverB")} " +
         $"questsSkyReadyOpen={(BandOpen("skyReady") ? 1 : 0)} " +
         $"questsSkyLeftoverAOpen={(BandOpen("skyLeftoverA") ? 1 : 0)} " +
-        $"questsSkyLeftoverBOpen={(BandOpen("skyLeftoverB") ? 1 : 0)}";
+        $"questsSkyLeftoverBOpen={(BandOpen("skyLeftoverB") ? 1 : 0)} " +
+        // The guided surface, counted off the REAL visual tree by the Tag each element
+        // carries (trap 39) rather than from the projection's own return — the question
+        // these answer is "did the rows reach the screen", and a count taken from the thing
+        // that produced them cannot fail the way the screen can.
+        // The CLASSIC checklist's own rows — every tickable box that is not a guide step.
+        // The floor under the guide facts: "no guide chrome" over an empty tab is the
+        // vacuous pass an unguided-class assertion is most likely to become.
+        $"questsSkyRows={ClassicRowsOnScreen()} " +
+        $"questsGuideGroups={GuideElementsOnScreen<TextBlock>(GuideCaptionTag)} " +
+        $"questsGuideRows={GuideRowsOnScreen().Count()} " +
+        $"questsGuideStubs={GuideStubsOnScreen()} " +
+        $"questsGuideDone={GuideRowsOnScreen().Count(c => c.IsChecked == true)} " +
+        $"questsGuideImprove={GuideImproveDoorsOnScreen()}";
+
+    /// <summary>
+    /// Which boxes are ticked, folded to one short value for the repaint gate.
+    ///
+    /// <para>A COUNT would not do it: unticking one row and ticking another in the same tick
+    /// leaves the count where it was, and the screen would keep the stale pair. So the fold
+    /// is order-independent over the ids that are actually ticked — two different sets give
+    /// two different values, and the same set always gives the same one (trap 8's rule from
+    /// the other side: a fingerprint must include everything that decides the picture, and
+    /// nothing that merely drifts).</para>
+    ///
+    /// <para>Cheap on purpose — this runs on every repaint gate, and the checklists are a few
+    /// hundred rows.</para>
+    /// </summary>
+    private string ChecklistTickSignature()
+    {
+        var sky = 0;
+        var skyOn = 0;
+        foreach (var item in _settings.SkyQuestChecklist)
+            if (item.Acquired) { sky ^= item.Id.GetHashCode(StringComparison.Ordinal); skyOn++; }
+
+        var epic = 0;
+        var epicOn = 0;
+        foreach (var item in _settings.EpicQuestChecklist)
+            if (item.Acquired) { epic ^= item.Id.GetHashCode(StringComparison.Ordinal); epicOn++; }
+
+        // The turn-in stores too: a reward marked complete on the phone or by the
+        // achievements import changes what this tab draws and lives in neither list above.
+        return $"{skyOn}.{sky:x8}/{epicOn}.{epic:x8}"
+            + $"/{_settings.SkyQuestCompleted.Count}.{_settings.EpicQuestCompleted.Count}";
+    }
+
+    /// <summary>The tag a guided group's caption line carries.</summary>
+    private const string GuideCaptionTag = "guideCaption";
+    /// <summary>The tag every guide objective's row carries.</summary>
+    private const string GuideRowTag = "guideRow";
+    /// <summary>The tag a stub row's "Wiki incomplete —" caption carries.</summary>
+    private const string GuideStubTag = "guideStub";
+    /// <summary>The tag the row-end "Improve this step" door carries.</summary>
+    private const string GuideImproveTag = "guideImprove";
+
+    private int GuideElementsOnScreen<T>(string tag) where T : FrameworkElement =>
+        QuestsPanel.Children.OfType<T>().Count(e => e.Tag as string == tag);
+
+    // A guide row is a CheckBox, and a guide row WITH its share-back door is that CheckBox
+    // inside a two-column Grid — so both arrangements have to be swept or the door's
+    // presence would silently halve the row count.
+    private IEnumerable<CheckBox> GuideRowsOnScreen() =>
+        RowBoxesOnScreen().Where(c => c.Tag as string == GuideRowTag);
+
+    private int ClassicRowsOnScreen() =>
+        RowBoxesOnScreen().Count(c => c.Tag as string != GuideRowTag);
+
+    private IEnumerable<CheckBox> RowBoxesOnScreen() => QuestsPanel.Children
+        .OfType<FrameworkElement>()
+        .SelectMany(e => e is Grid g ? g.Children.OfType<CheckBox>() : [.. Loose(e)]);
+
+    private static IEnumerable<CheckBox> Loose(FrameworkElement e) =>
+        e is CheckBox c ? [c] : [];
+
+    private int GuideImproveDoorsOnScreen() => QuestsPanel.Children.OfType<Grid>()
+        .SelectMany(g => g.Children.OfType<Button>())
+        .Count(b => b.Tag as string == GuideImproveTag);
+
+    // Nested one level down: the stub caption lives inside the row's own StackPanel, which
+    // is what a wrapped second line requires (trap 14).
+    private int GuideStubsOnScreen() => GuideRowsOnScreen()
+        .Select(c => c.Content).OfType<StackPanel>()
+        .SelectMany(p => p.Children.OfType<TextBlock>())
+        .Count(t => t.Tag as string == GuideStubTag);
+
+    /// <summary>
+    /// A guide row, with the one-click share-back door at its end. Every other row is
+    /// handed straight back — the door belongs to steps we authored and can be wrong about.
+    ///
+    /// <para>Lock 4's 1-click share-back. It is a real <see cref="DesignSystem.InlineIconButton"/>
+    /// and not a handled glyph, because a vector only hit-tests where it is PAINTED and a
+    /// pencil is mostly empty space (trap 16); the button widens the target to
+    /// <see cref="DesignTokens.IconInlineHit"/> without redrawing the icon bigger.</para>
+    ///
+    /// <para>A two-column Grid, not a horizontal StackPanel: the row's title wraps, and
+    /// wrapping does nothing inside a horizontal stack (trap 14).</para>
+    /// </summary>
+    private UIElement WithImproveDoor(CheckBox check, QuestChecklistRow row)
+    {
+        if (row.GuideRowKey.Length == 0) return check;
+        if (GuideChecklistProjection.Resolve(GuideCatalog.Default, row.Id)
+            is not var (guide, objective)) return check;
+
+        var grid = new Grid();
+        grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+        grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+        grid.Children.Add(check);
+
+        var improve = DesignSystem.InlineIconButton("Pencil", GuidePresentation.ImproveTip,
+            (_, _) => OpenUrl(GuidePresentation.ImproveUrl(guide, objective)));
+        improve.VerticalAlignment = VerticalAlignment.Top;
+        improve.Tag = GuideImproveTag;
+        Grid.SetColumn(improve, 1);
+        grid.Children.Add(improve);
+        return grid;
+    }
 
     private int BandRowsOnScreen(string tag) => QuestsPanel.Children.OfType<Border>()
         .Where(b => b.Tag as string == tag)
@@ -2256,6 +2377,33 @@ public partial class QuestsView : UserControl
                 i.AcquiredUnassigned = false;
             }), StringComparer.Ordinal);
 
+        // A reward with an authored guide stops being a flat list of drops and becomes the
+        // walkthrough, in reading order, under its stage names. Applied HERE — the one place
+        // this window gets its groups — because EQBuddy Mobile calls the same projection from
+        // the same point in CompanionProjection.BuildSky. Parity by shared module, not by
+        // feature list (David, 2026-08-18). A class nobody has authored is untouched.
+        if (tab == QuestTab.Sky && _main.QuestLedger is { } guideLedger)
+        {
+            groups = GuideChecklistProjection.Apply(groups, GuideCatalog.Default,
+                _settings, guideLedger, _main.QuestCharacterKey);
+
+            // Guide rows tick through the router, which decides per objective whether the
+            // fact belongs to the Sky turn-in store, to one of THIS reward's item boxes, or
+            // to the guide ledger. Never a second copy of a tick the checklist already owns.
+            foreach (var guided in groups.Where(g => g.GuideId.Length > 0))
+            {
+                if (GuideCatalog.Default.Find(guided.GuideId) is not { } guide) continue;
+                var rewardItems = GuideChecklistProjection.ItemsFor(_settings, guided.CompletionKey);
+                foreach (var objective in guide.AllObjectives)
+                {
+                    var step = objective;
+                    setters[GuideChecklistProjection.RowId(guide.Id, step.Id)] = done =>
+                        GuideProgressRouter.SetDone(_settings, guideLedger,
+                            _main.QuestCharacterKey, guide.Id, step, rewardItems, done);
+                }
+            }
+        }
+
         // The class picker chooses WHICH classes are in view — including ones you don't
         // play, because "we may be helping a friend" (David, 2026-08-15). The chips then
         // narrow to one of them. An empty pick means every class, never an empty window.
@@ -2384,6 +2532,23 @@ public partial class QuestsView : UserControl
             }
             else QuestsPanel.Children.Add(headingText);
 
+            // "Guide · 0 of 3 · 1 stub" — how far along, and how many of these steps we could
+            // not fully write down. The stub count rides the same line as the progress on
+            // purpose: a hollow guide must never read as a finished one (Founder lock 4a).
+            // Worded in GuidePresentation so the phone says it identically.
+            if (group.GuideCaption.Length > 0)
+            {
+                var guideCaption = DesignSystem.Text(Role.Caption, group.GuideCaption);
+                guideCaption.TextWrapping = TextWrapping.Wrap;
+                guideCaption.Margin = new Thickness(DesignTokens.SpaceXxs, 0, 0, DesignTokens.SpaceXs);
+                guideCaption.Ink("DimBrush");
+                // Identity is a property you PUT on the object (trap 39) — the dump counts
+                // guided groups off this tag rather than off a flag the render sets, because
+                // a flag nobody resets goes stale without anything noticing.
+                guideCaption.Tag = GuideCaptionTag;
+                QuestsPanel.Children.Add(guideCaption);
+            }
+
             // Island sub-headings (David, 2026-08-23, from a Reddit ask): "a player should
             // see the work for one island together, not a flat list that jumps islands."
             // Core hands the rows over already ordered and already labelled, so this draws a
@@ -2421,16 +2586,40 @@ public partial class QuestsView : UserControl
                     text.Inlines.Add(mark);
                 }
                 text.Ink(row.Acquired ? "DimBrush" : "TextBrush");
+
+                // A stub step says so, in the player's words, under its own title. It stays
+                // fully tickable — manual state beats weak inference, and "we could not find
+                // directions" is a fact about US, not about how far the player has got.
+                // A VERTICAL StackPanel: TextWrapping does nothing in a horizontal one (trap 14).
+                FrameworkElement content = text;
+                if (row.StubNote.Length > 0)
+                {
+                    var stub = DesignSystem.Text(Role.Caption,
+                        GuidePresentation.StubLead + " " + row.StubNote);
+                    stub.TextWrapping = TextWrapping.Wrap;
+                    stub.Margin = new Thickness(0, DesignTokens.SpaceXxs, 0, 0);
+                    stub.Ink("DimBrush");
+                    stub.Tag = GuideStubTag;
+                    var stack = new StackPanel();
+                    stack.Children.Add(text);
+                    stack.Children.Add(stub);
+                    content = stack;
+                }
+
                 var check = new CheckBox
                 {
-                    Content = text,
+                    Tag = row.GuideRowKey.Length > 0 ? GuideRowTag : null,
+                    Content = content,
                     IsChecked = row.Acquired,
                     Margin = new Thickness(DesignTokens.SpaceM, 1, 0, 1),
+                    // The six questions live on the hover for a guide row: the row itself
+                    // says what to do and where, and repeating why and how inline is the
+                    // redundancy the six are meant to remove (David, 2026-09-09).
                     ToolTip = row.Unassigned
                         ? "EQBuddy ticked this itself — several classes want this item and the "
                           + "log couldn't say which one earned it. Move the tick if it's on the "
                           + "wrong class; either way, toggling it settles the question."
-                        : null,
+                        : row.GuideFacts.Length > 0 ? row.GuideFacts : null,
                 };
                 if (locked)
                 {
@@ -2446,7 +2635,7 @@ public partial class QuestsView : UserControl
                 if (!setters.TryGetValue(row.Id, out var set)) continue;
                 check.Checked += (_, _) => Tick(true);
                 check.Unchecked += (_, _) => Tick(false);
-                QuestsPanel.Children.Add(check);
+                QuestsPanel.Children.Add(WithImproveDoor(check, row));
 
                 void Tick(bool done)
                 {

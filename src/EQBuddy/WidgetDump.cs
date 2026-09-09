@@ -633,6 +633,11 @@ internal static class WidgetDump
                     // launcher line is gone.
                     $"questsEpicTotal={w._settings.EpicQuestChecklist.Count} " +
                     $"questsSkyTotal={w._settings.SkyQuestChecklist.Count} " +
+                    // The STORE's own count, beside the tab's rendered one. Two numbers
+                    // about one thing from the same moment (trap 56): "the box is ticked"
+                    // and "the screen shows it ticked" are different claims, and the loot
+                    // auto-tick can satisfy the first without the second.
+                    $"questsSkyAcquired={w._settings.SkyQuestChecklist.Count(i => i.Acquired)} " +
                     // The Quest Tracker WINDOW, when EQBUDDY_QUESTS opened one. The WPF
                     // layer has no unit tests (docs/TestPlan.md §5), so the Gate 2
                     // rebuild's structure — list rows, a selection, a populated detail

@@ -302,7 +302,23 @@ public sealed record CompanionChecklistRow(
     string Id,
     string Text,
     string? Detail,
-    bool Done);
+    bool Done,
+    /// <summary>On a guide step we could not fully write down: what the wiki does not say.
+    /// The page draws it as the same dim second caption the desktop draws, led by the same
+    /// words. Null everywhere else, so it costs nothing on the wire —
+    /// <c>JsonIgnoreCondition.WhenWritingNull</c> — which matters because a first pairing
+    /// ships every row (trap 67).</summary>
+    string? Stub = null,
+    /// <summary>On an authored guide step: the six questions, labelled. The desktop hangs
+    /// these on the row's hover; a phone has no hover, so they ride the row and the page
+    /// draws them as a small block — porting the INTENT rather than an affordance the phone
+    /// cannot honour (trap 35).</summary>
+    string? Facts = null,
+    /// <summary>On a guide step: the prefilled discussion draft the desktop's pencil opens.
+    /// A URL and nothing else — the body is composed from the CATALOG, carries nothing from
+    /// the log or the character, and is on screen in the player's own browser before
+    /// anything is posted.</summary>
+    string? Improve = null);
 
 // ---------------- quests (General · Epic 1.0 · Plane of Sky) ----------------
 
