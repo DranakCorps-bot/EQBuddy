@@ -29,6 +29,7 @@
           <RowDefinition Height="Auto"/>
           <RowDefinition Height="Auto"/>
           <RowDefinition Height="*"/>
+          <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
         <Grid Grid.Row="0" Margin="16,16,16,6">
@@ -146,10 +147,33 @@
         </Grid>
         </ScrollViewer>
 
+        <!-- ============================ FOOTER ============================
+             gear-menu-slim faces §A4 (DRA-25, Helm-signed PR #460): three rows the cut
+             expanded gear menu's Help submenu used to carry — EQBuddy (website), Quick
+             tutorial… and Check for updates — none of which is Look/Alerts/Watch/HUD/
+             Behavior content, so no ONE tab above is the right home for them. A footer
+             below the scroller, visible under every tab, is this app's own precedent for
+             splitting "configures the tool" from "about the tool"
+             (see ShellPages.cs's own doc comment on the same split). Send feedback… is NOT
+             here — it was a straight cut, the title-bar envelope already opens it in one
+             click. OUTSIDE the ScrollViewer on purpose, the same reason the tab strip is:
+             always reachable regardless of scroll position. -->
+        <StackPanel Grid.Row="3" Orientation="Horizontal" Margin="16,8,16,14"
+                    HorizontalAlignment="Center">
+            <TextBlock x:Name="FooterVersion" Text="EQBuddy" Cursor="Hand" FontSize="11"
+                       MouseLeftButtonDown="OnFooterWebsite" Style="{StaticResource Dim}"/>
+            <TextBlock Text="  ·  " FontSize="11" Style="{StaticResource Dim}"/>
+            <TextBlock Text="Quick tutorial…" Cursor="Hand" FontSize="11"
+                       MouseLeftButtonDown="OnFooterTutorial" Style="{StaticResource Dim}"/>
+            <TextBlock Text="  ·  " FontSize="11" Style="{StaticResource Dim}"/>
+            <TextBlock Text="Check for updates" Cursor="Hand" FontSize="11"
+                       MouseLeftButtonDown="OnFooterCheckUpdates" Style="{StaticResource Dim}"/>
+        </StackPanel>
+
         <!-- Width handles on both edges. Transparent template so they read as bare edges;
              the cursor is the affordance. Dragging the left edge moves Left as well as
              Width so the right edge stays put. Width is persisted on release. -->
-        <Thumb x:Name="LeftGrip" Grid.RowSpan="3" Width="8"
+        <Thumb x:Name="LeftGrip" Grid.RowSpan="4" Width="8"
                HorizontalAlignment="Left" VerticalAlignment="Stretch"
                Cursor="SizeWE" ToolTip="Drag to resize"
                DragStarted="OnResizeStarted" DragDelta="OnResizeLeftDelta"
@@ -159,7 +183,7 @@
           </Thumb.Template>
         </Thumb>
 
-        <Thumb x:Name="RightGrip" Grid.RowSpan="3" Width="8"
+        <Thumb x:Name="RightGrip" Grid.RowSpan="4" Width="8"
                HorizontalAlignment="Right" VerticalAlignment="Stretch"
                Cursor="SizeWE" ToolTip="Drag to resize"
                DragStarted="OnResizeStarted" DragDelta="OnResizeRightDelta"

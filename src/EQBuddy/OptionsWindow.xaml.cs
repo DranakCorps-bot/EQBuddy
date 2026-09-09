@@ -36,6 +36,7 @@ public partial class OptionsWindow : Window
         BuildHudTab();
         BuildAlertsTabs();
         BuildLookAndBehaviour();
+        FooterVersion.Text = MainWindow.VersionLabel;
 
         _ready = true;
 
@@ -209,6 +210,16 @@ public partial class OptionsWindow : Window
     /// block that owns it.</summary>
     internal void SyncTrackSpawns(bool on) => _alerts?.SyncTrackSpawns(on);
 
+    /// <summary>Forwarded the same way: click-through moved to the Behavior block
+    /// (gear-menu-slim, DRA-25) but keeps two OTHER doors (a hotkey, the unlock chip), so
+    /// MainWindow pushes here whenever either of those flips it while this window is up.
+    /// </summary>
+    internal void SyncClickThrough(bool on) => _behavior?.SyncClickThrough(on);
+
+    /// <summary>Same shape again: the archived-log review button also moved to Behavior,
+    /// and CharLabel on the widget is the other door out of a review.</summary>
+    internal void SyncReviewState() => _behavior?.SyncReviewState();
+
 
     // OnPinChipsChanged retired with PinChipsCheck in Surface A / SA-R — see the Watch tab's
     // comment in OptionsWindow.xaml for where that switch went.
@@ -344,4 +355,18 @@ public partial class OptionsWindow : Window
     }
 
     private void OnClose(object sender, RoutedEventArgs e) => Close();
+
+    // ================================================================== footer ====
+    // Three of the six rows the cut expanded gear menu's Help submenu used to carry
+    // (gear-menu-slim faces §A4, DRA-25) — plain forwards to the handlers MainWindow
+    // already had, which is why they moved rather than being rewritten.
+
+    private void OnFooterWebsite(object sender, MouseButtonEventArgs e) =>
+        _main.OnOpenWebsite(sender, e);
+
+    private void OnFooterTutorial(object sender, MouseButtonEventArgs e) =>
+        _main.OnTutorial(sender, e);
+
+    private void OnFooterCheckUpdates(object sender, MouseButtonEventArgs e) =>
+        _main.OnCheckUpdates(sender, e);
 }

@@ -114,7 +114,12 @@ public class CareerHistoryTests
     {
         var pointer = HistoryPresentation.StudioPointer;
 
-        Assert.Contains("Session history", pointer);
+        // Re-worded for gear-menu-slim (DRA-25): the widget's context menu no longer carries
+        // "Session history…", so the pointer must not send a player looking for a row that
+        // is gone — it names the room's own button instead (trap 20's exact shape, avoided).
+        Assert.DoesNotContain("Session history", pointer);
+        Assert.DoesNotContain("right-click", pointer, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("button below", pointer, StringComparison.OrdinalIgnoreCase);
         foreach (var job in new[] { "comparison", "notes", "export", "delete" })
             Assert.Contains(job, pointer, StringComparison.OrdinalIgnoreCase);
     }

@@ -221,20 +221,34 @@ internal sealed class SettingsBehaviorView
         + "is how you catch it and tell us.";
 
     private CheckBox _mobileSounds = null!, _hideUnfocused = null!, _hideNotRunning = null!;
-    private CheckBox _hideAltTab = null!, _keepAbove = null!;
+    private CheckBox _hideAltTab = null!, _keepAbove = null!, _clickThrough = null!;
     private CheckBox _truncate = null!, _archive = null!, _tutorial = null!, _perfStats = null!;
     private StackPanel _hotkeysPanel = null!;
     private TextBox _regenPerTickBox = null!;
+    private Button _reviewLogBtn = null!;
+
+    /// <summary>Guards the checkbox's own <c>Checked</c>/<c>Unchecked</c> handler while THIS
+    /// class is the one pushing the value (from <see cref="MainWindow.ClickThroughChanged"/>)
+    /// rather than the player clicking it — click-through has two OTHER doors
+    /// (the "toggleClickThrough" hotkey, the unlock chip), so without the guard a push from
+    /// either of those would immediately call back into <see cref="MainWindow.SetClickThrough"/>
+    /// a second time.</summary>
+    private bool _syncingClickThrough;
 
     private UIElement Build()
     {
         var panel = new StackPanel();
 
+        // TOP OF THE LIST (gear-menu-slim faces §A2): the control this block gained from the
+        // cut expanded gear menu, placed above the hide-policies so it stays the fastest
+        // thing to find here even though it used to be one right-click away.
+        panel.Children.Add(BuildClickThrough());
         panel.Children.Add(BuildSecondScreen());
         panel.Children.Add(BuildHideRules());
         panel.Children.Add(BuildHotkeys());
         panel.Children.Add(BuildRegenOverride());
         panel.Children.Add(BuildLogHousekeeping());
+        panel.Children.Add(BuildDataGroup());
 
         _tutorial = Check("Show quick tutorial at launch", _vm.ShowTutorial,
             new Thickness(0, 10, 0, 0),
@@ -320,6 +334,36 @@ internal sealed class SettingsBehaviorView
             new Thickness(20, 2, 0, 0)));
 
         return panel;
+    }
+
+    // ============================================================ click-through ====
+    // Moved here from the expanded gear menu (gear-menu-slim faces §A2, DRA-25): the
+    // control still lives on MainWindow (it flips a window style bit) — this is a REMOTE
+    // control for it, not a second copy of the state.
+
+    private UIElement BuildClickThrough()
+    {
+        _clickThrough = Check("Click-through (game clicks pass through)",
+            _main.ClickThroughEnabled, new Thickness(0, 0, 0, 14),
+            () =>
+            {
+                if (!Ready || _syncingClickThrough) return;
+                _main.SetClickThrough(_clickThrough.IsChecked == true);
+            });
+        return _clickThrough;
+    }
+
+    /// <summary>Called by <c>OptionsWindow.SyncClickThrough</c> — see
+    /// <see cref="MainWindow.SetClickThrough"/> — when the hotkey or the unlock chip flips
+    /// it while this block is on screen. Guarded so the resulting <c>Checked</c>/
+    /// <c>Unchecked</c> event does not call back into <c>SetClickThrough</c> a second time.
+    /// </summary>
+    internal void SyncClickThrough(bool on)
+    {
+        if (_block is null || _clickThrough.IsChecked == on) return;
+        _syncingClickThrough = true;
+        _clickThrough.IsChecked = on;
+        _syncingClickThrough = false;
     }
 
     // ============================================================== when to hide ====
@@ -543,6 +587,81 @@ internal sealed class SettingsBehaviorView
         panel.Children.Add(HintRow(_archive, ArchiveBlurb, new Thickness(20, 6, 0, 0)));
 
         return panel;
+    }
+
+    // ==================================================================== data ====
+    // Four of the six rows the expanded gear menu's "Data & imports" submenu used to carry
+    // (gear-menu-slim faces §A3, DRA-25), grouped as one labeled cluster rather than four
+    // loose rows — the same shape AlertSurface.AlertTab already gives the Alerts tab's four
+    // families. The other two, Import achievements… and Copy /outputfile achievements, feed
+    // the Guide checklist directly and moved to QuestsView instead — an import belongs on
+    // the surface its output lives on (trap 43), and that surface is not this one.
+
+    private UIElement BuildDataGroup()
+    {
+        var panel = new StackPanel();
+        panel.Children.Add(Heading("Data", margin: new Thickness(0, 14, 0, 4)));
+
+        var wikiPack = new Button
+        {
+            Content = "Wiki contribution pack…", Style = (Style)_resource("ActionButton"),
+            HorizontalAlignment = HorizontalAlignment.Left, Margin = new Thickness(0, 4, 0, 0),
+            ToolTip = "Paste-ready eqlwiki edits built from your own loot log — creatures "
+                + "with no page, pages that list no loot, and drops missing from a page. "
+                + "Nothing publishes automatically; you open each edit link, review and save.",
+        };
+        wikiPack.Click += (_, _) => _main.ShowWikiPackWindow();
+        panel.Children.Add(wikiPack);
+
+        _reviewLogBtn = new Button
+        {
+            Style = (Style)_resource("ActionButton"),
+            HorizontalAlignment = HorizontalAlignment.Left, Margin = new Thickness(0, 6, 0, 0),
+            ToolTip = "Replay a saved log read-only — Drops by Creature and the wiki "
+                + "contribution pack work against that session",
+        };
+        _reviewLogBtn.Click += (_, _) => _main.OnReviewLog(_reviewLogBtn, new RoutedEventArgs());
+        PaintReviewLogButton();
+        panel.Children.Add(_reviewLogBtn);
+
+        var chooseFolder = new Button
+        {
+            Content = "Choose log folder…", Style = (Style)_resource("ActionButton"),
+            HorizontalAlignment = HorizontalAlignment.Left, Margin = new Thickness(0, 6, 0, 0),
+            // Computed on hover rather than kept in sync from outside (OnResetToolTipOpening's
+            // pattern) — simpler than pushing a value nobody but a tooltip ever reads.
+            ToolTip = _main.Settings.LogFolder ?? "(no folder found)",
+        };
+        chooseFolder.ToolTipOpening += (_, _) =>
+            chooseFolder.ToolTip = _main.Settings.LogFolder ?? "(no folder found)";
+        chooseFolder.Click += (_, _) => _main.OnChooseLogFolder(chooseFolder, new RoutedEventArgs());
+        panel.Children.Add(chooseFolder);
+
+        var autoDetect = new Button
+        {
+            Content = "Auto-detect log folder", Style = (Style)_resource("ActionButton"),
+            HorizontalAlignment = HorizontalAlignment.Left, Margin = new Thickness(0, 6, 0, 0),
+        };
+        autoDetect.Click += (_, _) => _main.OnAutoDetectLogFolder(autoDetect, new RoutedEventArgs());
+        panel.Children.Add(autoDetect);
+
+        return panel;
+    }
+
+    /// <summary>The review-log button's live label — the old <c>ReviewLogItem</c> had an
+    /// <c>Icon</c> slot for the "reviewing now" tick; a Button's <c>Content</c> carries the
+    /// same fact as text instead. Called at build time and by <see cref="SyncReviewState"/>.
+    /// </summary>
+    private void PaintReviewLogButton() => _reviewLogBtn.Content = _main.IsReviewingArchive
+        ? "Reviewing an archive — return to live log"
+        : "Review an archived log…";
+
+    /// <summary>Called by <c>OptionsWindow.SyncReviewState</c> when the OTHER door out of a
+    /// review — clicking the widget's CharLabel — fires while this block is on screen.
+    /// </summary>
+    internal void SyncReviewState()
+    {
+        if (_block is not null) PaintReviewLogButton();
     }
 
     // ================================================================== plumbing ====

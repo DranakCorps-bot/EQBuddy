@@ -88,6 +88,25 @@
                         ToolTip="Copy /outputfile inventory — paste it in the game's chat, and EQBuddy reads what your bags and bank already hold. The held tab then shows every quest you could turn in right now."/>
             </Grid>
 
+            <!-- MOVED FROM THE WIDGET'S GEAR MENU (gear-menu-slim faces §A3, DRA-25): an
+                 import belongs on the surface its output lives on (trap 43), and what this
+                 pair feeds — pre-marked Sky quest rewards and raid clears — is this
+                 checklist, not a Data settings shelf. Beside the checklist's own header
+                 rather than gated to one tab, matching what the menu row did before (it
+                 showed regardless of which tab was open). -->
+            <WrapPanel Margin="{DynamicResource StackS}">
+                <Button x:Name="ImportAchievementsBtn" Content="Import achievements…"
+                        Style="{StaticResource ActionButton}"
+                        FontSize="{DynamicResource FontCaption}"
+                        Margin="{DynamicResource GapS}" Click="OnImportAchievementsClick"
+                        ToolTip="Read the game's /outputfile achievements dump and pre-mark Sky quest rewards (and raid clears) you completed before EQBuddy — preview first, adds only, never unticks"/>
+                <Button x:Name="CopyAchievementsBtn" Content="Copy /outputfile achievements"
+                        Style="{StaticResource ActionButton}"
+                        FontSize="{DynamicResource FontCaption}"
+                        Margin="{DynamicResource GapS}" Click="OnCopyAchievementsClick"
+                        ToolTip="Puts the command on your clipboard — paste it into the game's chat, the game writes its achievements dump, then Import achievements… reads it"/>
+            </WrapPanel>
+
             <Grid x:Name="FilterRow">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>

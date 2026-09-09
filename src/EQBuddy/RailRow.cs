@@ -35,8 +35,10 @@ internal sealed class RailRow : Border
         Margin = new Thickness(Tok.SpaceXs, Tok.SpaceXxs, Tok.SpaceXs, Tok.SpaceXxs);
         Padding = new Thickness(Tok.SpaceS, 0, Tok.SpaceS, 0);
         // The label names the room and the tooltip says what the room is FOR — the second
-        // is what carries the row once the first is hidden.
-        ToolTip = $"{ShellPages.Label(page)} — {ShellPages.Describe(page)}";
+        // is what carries the row once the first is hidden. RailLabel, not Label: the rail
+        // spells the Guide room "Quest" (owner's second correction, 2026-09-08) while the
+        // window's own title bar keeps saying "Guide" — see ShellPages.RailLabel.
+        ToolTip = $"{ShellPages.RailLabel(page)} — {ShellPages.Describe(page)}";
 
         var row = new StackPanel
         {
@@ -46,7 +48,7 @@ internal sealed class RailRow : Border
         _icon = DesignSystem.Icon(ShellPages.IconName(page), size: Tok.IconInlineHit);
         row.Children.Add(_icon);
 
-        _label = DesignSystem.Text(Role.Body, ShellPages.Label(page));
+        _label = DesignSystem.Text(Role.Body, ShellPages.RailLabel(page));
         _label.Margin = new Thickness(Tok.SpaceM, 0, 0, 0);
         _label.VerticalAlignment = VerticalAlignment.Center;
         row.Children.Add(_label);

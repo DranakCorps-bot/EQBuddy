@@ -207,7 +207,10 @@ public static class HomeReadout
             .Where(page => ShellPages.Landed.Contains(page)
                 && page != ShellPage.Home
                 && !ShellPages.BelowTheGap(page))
-            .Select(page => new HomeLink(page, ShellPages.Label(page),
+            // RailLabel, not Label: this is a nav affordance, same category as the rail
+            // (gear-menu-slim faces Part B, 2026-09-08) — it reads "Quest" for the Guide
+            // room while the window's own title bar keeps saying "Guide".
+            .Select(page => new HomeLink(page, ShellPages.RailLabel(page),
                 ShellPages.Describe(page), ShellPages.Address(page))),
     ];
 

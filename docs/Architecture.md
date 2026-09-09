@@ -137,7 +137,7 @@ the lift came first, and the baseline came down in the same commit.**
 |---|---:|---:|---:|---:|
 | `EQBuddy/MainWindow*.xaml.cs` | 3,839 | 4,222 | 4,222 | 0 |
 | `EQBuddy.Core/SessionStats*.cs` | 2,375 | 2,444 | 2,612 | 168 |
-| `EQBuddy/OptionsWindow.xaml.cs` | 326 | 326 | 358 | 32 |
+| `EQBuddy/OptionsWindow.xaml.cs` | 372 | 372 | 409 | 37 |
 | `EQBuddy.Core/LogParser.cs` | 853 | 933 | 938 | 5 |
 
 **Lowered 1,547 → 689 on 2026-09-05 (E-3 lane D, SR-4), in the same commit as the lift.**
@@ -194,6 +194,16 @@ beside a live `OptionsWindow`, is two copies of ~40 control wirings drifting unt
 day, which is #210's mechanism with a bigger surface. Four tabs here against the window's five
 (Bevel §2: *"Watch and Alerts were never two subjects"*), and **`OptionsWindow` is not retired,
 not renamed and not reshaped** — I-9's standing rule, so the two strips differ on purpose.
+
+**Raised 326 → 372 on 2026-09-08 with gear-menu-slim (DRA-25).** The owner's lock cut the
+expanded widget's gear menu to the same four doors the minimized bar already carried
+(Options…/World…/Mobile…/Guide…), and three of the cut Help submenu's rows — the website
+link, Quick tutorial…, Check for updates — had no settings tab to lift into: none of them
+configures the tool, they are all "about the tool." `OptionsWindow` gained a footer strip
+below the tab content, visible under every tab, for exactly that category — the same split
+`ShellPages.cs`'s own doc comment already cites this app as using elsewhere. This is window
+chrome by the same test the paragraphs above already apply (about the WINDOW, not a setting),
+so it grows this file rather than a fifth block.
 
 **This block is transitional and is deliberately not built as though it will stay this size.**
 Surface A's SA-R star-retirement empties the mini-dashboard grid and the floating-window list a

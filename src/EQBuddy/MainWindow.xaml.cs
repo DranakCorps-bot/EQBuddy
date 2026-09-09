@@ -372,8 +372,6 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
         ApplyUiScale(_settings.UiScale);
         ApplyBackgroundOpacity(_settings.BackgroundOpacity);
 
-        VersionMenuItem.Header = $"EQBuddy v{UpdateChecker.CurrentVersion}";
-
         WindowZoom.Route(this, () => _settings.UiScale, SetUiScale);
         foreach (var (key, star) in StarButtons())
             star.IsChecked = _settings.MiniStats.Contains(key);
@@ -1420,7 +1418,7 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
     internal static Action<string> UnlockClick(LevelUnlockSet set) =>
         name => OpenWikiPage(LevelUnlockRows.WikiPageFor(set, name));
 
-    private void OnOpenWebsite(object sender, RoutedEventArgs e) =>
+    internal void OnOpenWebsite(object sender, RoutedEventArgs e) =>
         System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(
             "https://github.com/DranakCorps-bot/EQBuddy") { UseShellExecute = true });
 
@@ -1767,12 +1765,6 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
         _creatureWindow.Activate();
     }
 
-    /// <summary>#217 Ask 1 (Frankthetankk): the contribution pack is its own surface under
-    /// Data &amp; imports now, not a button inside Drops by Creature. Drops keeps its live
-    /// view — "is this trip worth it" is a different question from "what can I give the
-    /// wiki".</summary>
-    private void OnWikiPackWindow(object sender, RoutedEventArgs e) => ShowWikiPackWindow();
-
     /// <summary>The pack's history pool reads these (#217 ask 2): every stored session's
     /// mob aggregates, and the live session's own checkpointed row id so it is excluded
     /// from the fold rather than counted twice.</summary>
@@ -2057,7 +2049,7 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
 
     internal System.Windows.Controls.Border RootBorder() => RootBorderElement;
 
-    private void OnChooseLogFolder(object sender, RoutedEventArgs e)
+    internal void OnChooseLogFolder(object sender, RoutedEventArgs e)
     {
         var dlg = new Microsoft.Win32.OpenFolderDialog
         {
@@ -2080,7 +2072,7 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
         FollowActiveCharacter();
     }
 
-    private void OnAutoDetectLogFolder(object sender, RoutedEventArgs e)
+    internal void OnAutoDetectLogFolder(object sender, RoutedEventArgs e)
     {
         _settings.LogFolder = LogWatcher.FindDefaultLogFolder();
         _settings.Save();
@@ -2095,7 +2087,15 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
     /// window onto the past, not a new session.</summary>
     private string? _reviewPath;
 
-    private void OnReviewLog(object sender, RoutedEventArgs e)
+    /// <summary>Whether an archive is being replayed right now — read once, at build time,
+    /// by the Options → Behavior "Review an archived log…" button this control moved to
+    /// (gear-menu-slim, DRA-25). <see cref="EnterReview"/> and <see cref="ExitReview"/> push
+    /// to <c>_optionsWindow</c> when it changes — the same forward-to-the-loaded-host shape
+    /// <c>SyncTrackSpawns</c> uses — so the button's label stays in sync even when the OTHER
+    /// door out of review, clicking the widget's CharLabel, is the one that fired.</summary>
+    internal bool IsReviewingArchive => _reviewPath is not null;
+
+    internal void OnReviewLog(object sender, RoutedEventArgs e)
     {
         if (_reviewPath is not null) { ExitReview(); return; }
         var archive = _settings.LogFolder is { } lf ? Path.Combine(lf, "archive") : null;
@@ -2144,11 +2144,7 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
         ClearGearAutoCheckSeen();
         if (pick is not null) _watcher.Select(path, pick.StartOffset, pick.EndOffset);
         else _watcher.Select(path);
-        // A MenuItem has an Icon slot; the tick belongs in it rather than typed onto the
-        // front of the header, where it is a glyph in a string and reads as part of the
-        // words on a screen reader.
-        ReviewLogItem.Header = "Reviewing an archive — return to live log";
-        ReviewLogItem.Icon = DesignSystem.Icon("Check", "GoodBrush", size: Tok.IconInline);
+        if (_optionsWindow is { IsLoaded: true } reviewHost) reviewHost.SyncReviewState();
         var when = pick is not null ? $" ({pick.Start:MMM d HH:mm})" : "";
         CharLabel.Text = $"REVIEWING {Path.GetFileName(path)}{when} — click here to go live";
         CharLabel.Foreground = (Brush)FindResource("WarnBrush");
@@ -2159,8 +2155,6 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
 
     private void ExitReview()
     {
-        ReviewLogItem.Header = "Review an archived log…";
-        ReviewLogItem.Icon = null;
         CharLabel.Foreground = (Brush)FindResource("DimBrush");
         CharLabel.Cursor = null;
         CharLabel.ToolTip = "Follows whoever is actively playing (log file growth)";
@@ -2188,6 +2182,7 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
         // must stay armed while the archive replay can still roll a session over —
         // clearing first let those rollovers mint duplicate history rows.
         _reviewPath = null;
+        if (_optionsWindow is { IsLoaded: true } reviewHost) reviewHost.SyncReviewState();
     }
 
     // Mouse DOWN, and handled: the title bar's OnDrag starts a DragMove on the same
@@ -2203,7 +2198,6 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
     private void FollowActiveCharacter()
     {
         if (_reviewPath is not null) return;   // reviewing an archive — stay put (#74)
-        ChooseLogFolderItem.ToolTip = _settings.LogFolder ?? "(no folder found)";
         if (_settings.LogFolder is null)
         {
             CharLabel.Text = "logs not found — right-click, Choose log folder";
@@ -2855,9 +2849,9 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
     private void UpdateEpicQuestChecklist(StatsSnapshot s) => _quests.UpdateEpicQuestChecklist(s);
     private void UpdateSkyQuestChecklist(StatsSnapshot s) => _quests.UpdateSkyQuestChecklist(s);
 
-    private void OnImportAchievements(object sender, RoutedEventArgs e) =>
+    internal void OnImportAchievements(object sender, RoutedEventArgs e) =>
         _quests.OnImportAchievements(sender, e);
-    private void OnCopyAchievementsCommand(object sender, RoutedEventArgs e) =>
+    internal void OnCopyAchievementsCommand(object sender, RoutedEventArgs e) =>
         _quests.OnCopyAchievementsCommand(sender, e);
 
 
@@ -3207,7 +3201,7 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
         AlertTile.ShowAlert(message);
     }
 
-    private void OnTutorial(object sender, RoutedEventArgs e) => new TutorialWindow(this).Show();
+    internal void OnTutorial(object sender, RoutedEventArgs e) => new TutorialWindow(this).Show();
 
     internal void OnFeedback(object sender, RoutedEventArgs e) =>
         new FeedbackWindow { Owner = this }.Show();
@@ -3356,11 +3350,16 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
     private void OnMinimize(object sender, RoutedEventArgs e) => SetMode(true);
     private void OnRestore(object sender, RoutedEventArgs e) => SetMode(false);
 
-    private void OnCheckUpdates(object sender, RoutedEventArgs e)
+    internal void OnCheckUpdates(object sender, RoutedEventArgs e)
     {
         _lastUpdateCheck = DateTime.Now;
         CheckForUpdates(manual: true);
     }
+
+    /// <summary>The version line for the Options footer's website link (gear-menu-slim,
+    /// DRA-25) — the same string <c>VersionMenuItem</c> used to carry on the now-cut Help
+    /// submenu.</summary>
+    internal static string VersionLabel => $"EQBuddy v{UpdateChecker.CurrentVersion}";
 
     private void CheckForUpdates(bool manual)
     {
@@ -3748,6 +3747,15 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
     private System.Windows.Interop.HwndSource? _hwndSource;
     private bool _clickThrough;
 
+    /// <summary>Whether click-through is on right now — read once, at build time, by the
+    /// Options → Behavior checkbox this control moved to (gear-menu-slim, DRA-25). The
+    /// control has THREE entry points (this checkbox, the "toggleClickThrough" hotkey and
+    /// the unlock chip), so the checkbox alone cannot own the state — see
+    /// <see cref="SetClickThrough"/>'s push to <c>_optionsWindow</c>, the same
+    /// forward-to-the-loaded-host shape <c>SyncTrackSpawns</c> already uses, for how it
+    /// stays in sync with the other two while Options sits open.</summary>
+    internal bool ClickThroughEnabled => _clickThrough;
+
     private static class Native
     {
         [System.Runtime.InteropServices.DllImport("user32.dll")]
@@ -4031,10 +4039,10 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
         }
     }
 
-    private void OnClickThrough(object sender, RoutedEventArgs e) =>
+    internal void OnClickThrough(object sender, RoutedEventArgs e) =>
         SetClickThrough(!_clickThrough);
 
-    private void SetClickThrough(bool on)
+    internal void SetClickThrough(bool on)
     {
         if (_hwndSource is null) return;
         _clickThrough = on;
@@ -4046,7 +4054,12 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
         RootBorder().ToolTip = _clickThrough
             ? "Click-through ON — click the padlock chip beside the widget to interact again"
             : null;
-        ClickThroughItem.IsChecked = _clickThrough;
+        // The checkbox lives in Options → Behavior now. Pushed only if Options is loaded
+        // right now — the same "forward to whichever host is up" shape SyncTrackSpawns
+        // already uses — so this method still works from the hotkey or the unlock chip
+        // with no Options window open at all.
+        if (_optionsWindow is { IsLoaded: true } clickThroughHost)
+            clickThroughHost.SyncClickThrough(_clickThrough);
         // The way back: a transparent widget can't be clicked, so a tiny normal-hit-test
         // chip parks beside it while click-through is on.
         if (_clickThrough)

@@ -1340,14 +1340,16 @@ public class ShellHostTests
     /// against the widget's real mode — a declaration nothing applies renders eleven rows
     /// over the game and passes every unit test in the suite.
     ///
-    /// **Two launches, because one number proves nothing on its own.** A menu that showed
-    /// four rows in both states would satisfy a minimized-only assertion while having
-    /// quietly subtracted click-through, Edit HUD, the data chores and Help from the
-    /// expanded widget too — which is the surface those rows were MOVED to, not removed
-    /// from. So the expanded count is asserted to be larger, and the minimized one exact.
+    /// **Two launches, and the two counts now agree exactly** — the owner's later lock
+    /// (`docs/BEVEL-gear-menu-slim-faces.md` Part A, Helm-signed, PR #460) cut click-through,
+    /// Edit HUD, the data chores and Help OFF the expanded menu too, superseding the earlier
+    /// call (§E) that kept them there. Both states show precisely the four doors now, so a
+    /// stray fifth row on either one — a leftover left un-tagged, or a row someone re-adds
+    /// without a destination — fails here on the surface that would actually show it, rather
+    /// than only on `WidgetMenuTests`' read of the file.
     /// </summary>
     [Fact]
-    public void TheMinimizedWidgetMenuShowsTheFourDoorsAndTheExpandedOneShowsMore()
+    public void TheMinimizedAndExpandedWidgetMenusBothShowExactlyTheFourDoors()
     {
         using (var mini = new AppHarness(settings => settings.Minimized = true))
         {
@@ -1362,9 +1364,7 @@ public class ShellHostTests
         using var full = new AppHarness(settings => settings.Minimized = false);
         full.Launch();
         full.WaitForDump("menuGuide", 1, "the expanded widget's menu to be built");
-        Assert.True(full.DumpValue("menuRows") > WidgetMenuPolicy.MiniRows.Count,
-            "the expanded menu keeps the rows the minimized one hides; "
-            + $"dump was: {full.Artifacts()}");
+        Assert.Equal(WidgetMenuPolicy.MiniRows.Count, full.DumpValue("menuRows"));
     }
 
 

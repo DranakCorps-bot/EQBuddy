@@ -535,14 +535,18 @@ public partial class ShellWindow : Window, IFollowingSurface
         foreach (var page in ShellPages.RailOrder)
         {
             if (!ShellPages.Landed.Contains(page)) continue;
-            yield return (ShellPages.Label(page), ShellPages.Address(page),
+            // RailLabel, not Label: the palette is a nav affordance, same category as the
+            // rail and Home's deep links (gear-menu-slim faces Part B, 2026-09-08) — it
+            // reads "Quest" for the Guide room while the window's own title bar (set
+            // elsewhere in this file, off Label) keeps saying "Guide".
+            yield return (ShellPages.RailLabel(page), ShellPages.Address(page),
                 ShellPages.Describe(page));
             // The rooms INSIDE the room, from the same Core definition each room's tab
             // strip is built from (`ShellPages.Rooms`) — so the palette cannot offer a
             // room that does not exist, or miss one a surface gains, and cannot spell one
             // differently from the address the rail resolves.
             foreach (var (label, key) in ShellPages.Rooms(page))
-                yield return ($"{ShellPages.Label(page)} · {label}",
+                yield return ($"{ShellPages.RailLabel(page)} · {label}",
                     ShellPages.Address(page, key), ShellPages.Describe(page));
         }
     }
