@@ -3783,3 +3783,50 @@ this. On this one the answer was "no picture exists", and the thing hiding in th
 real.
 
 â€” Dranak (Claude Code)
+
+## 2026-09-08 — ASK: four explanations that live on a bare tooltip, not on an ⓘ
+To: Bevel
+
+Passes 1 and 2 moved seventeen paragraphs off the Settings body and onto the ⓘ, against your
+prose-to-tooltip faces. I have just closed the hole on the other side of that: the passes
+measured every paragraph they MOVED, and nothing measured the hover text that was already on
+those tabs, or the hover text that arrives next. `SettingsHoverProseTests` now sweeps every
+`ToolTip = "…"` on the four converted blocks against the same policy.
+
+**The ceiling half is mine and it is done.** Nothing today is close to it — the longest hover
+string is 35 words against a budget near 100 — and the guard is prove-failed three ways,
+including a real 400-word tooltip planted in `SettingsAlertsView`.
+
+**The half I did NOT decide, because it is copy and copy is yours.** The census found four
+strings over `BodyWordCeiling`, so the policy calls them explanations, yet they hang on the
+control's own tooltip rather than on an ⓘ:
+
+| Where | Words | Opens |
+|---|---|---|
+| Alerts, ⤴ share button | 26 | "Copy this rule as a share string — paste it in guild chat…" |
+| Alerts, rule-class combo | 22 | "Spell class: watch one named spell ("By name" + match text)…" |
+| Alerts, from-log button | 22 | "Pick a line that just happened in your log — it becomes a Text rule…" |
+| Behavior, wiki-pack button | 35 | "Paste-ready eqlwiki edits built from your own loot log…" |
+
+**I did not convert these, and I did not write a rule saying they must convert.** Three of the
+four are on ICON buttons, where the tooltip is the only way to learn what the glyph does at
+all — an ⓘ beside every glyph is a different screen, and that is a taste call with a real
+cost. The fourth is a labelled button. A guard that quietly demanded the conversion would have
+looked like a ruling you never made, which is the same defect as an executor picking the copy.
+
+**The ask is one line: is "an explanation over the ceiling belongs on an ⓘ" a rule about
+paragraphs that used to be BODY, or a rule about every explanation on the tab?** If the first,
+these four are correct as they stand and I will record them as such. If the second, three of
+them need an ⓘ next to an icon button, and that is a screen you should see before I build it.
+
+**Reinforcing, and it is the specific one:** the faces were written as a POLICY with a number
+in it rather than as a list of paragraphs to move. That is the only reason this sweep could
+exist — I could point new arithmetic at text nobody had ruled on and get an answer, instead of
+coming back to you for seventeen more judgements. Keep writing them that way.
+
+**One cost, honestly.** The 35-word Behavior row above arrived DURING this work, from the
+gear-menu-slim fold landing on a tab two passes had already cleared. Nothing caught it,
+because until today nothing measured that side. A converted tab is exactly where the next
+explanation goes, and the fold that puts it there will not know it is doing it.
+
+— Dranak (Claude Code)
