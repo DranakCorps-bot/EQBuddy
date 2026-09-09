@@ -476,16 +476,20 @@ $Shots = [ordered]@{
     # the quests for my class while they're collapsed and then dig into the details for each
     # by expanding the ones I want"). Druid, so the one expanded quest has a stub in it.
     #
+    # NOTHING is expanded here, deliberately: this is the state a player LANDS on, and the
+    # claim being photographed is "a whole class fits on one screen". The expanded state has
+    # its own frame (shell-quests-sky-guide-card); a shot with one quest open spends most of
+    # its height on that quest and proves the opposite of what this row is for.
+    #
     # PREDICTED before shooting: six "Druid - <reward>" headings, each with its counts, its
-    # "Guide - n of m" caption and a "Show steps" button, and NOTHING between them - all six
-    # rewards readable without scrolling. Shillelagh is the exception: it is in
-    # GuideExpanded, so it alone shows "Hide steps", its NEXT card and its rows.
-    'shell-quests-sky-guide-folded' = @{ Title = 'EQBuddy - Guide'
+    # "Guide - n of m" caption and a small "+" button, and NOTHING between them - all six
+    # readable without scrolling. The face is +/- rather than words because six "Show steps"
+    # stacked down a folded list is more text than the headings they sit under.
+    'shell-quests-sky-guide-folded' = @{ Title = 'EQBuddy — Guide'
                            Env = @{ EQBUDDY_SHELL = 'quests:sky'
                                     EQBUDDY_SHELL_SIZE = '1000x900' }
                            Ledger = @{ Classes = @('Druid') }
                            Set = @{
-                               GuideExpanded = @('Druid|Shillelagh')
                                SkyQuestChecklist = @(
                                    @{ Id = 'sky-060'; Acquired = $true }
                                )

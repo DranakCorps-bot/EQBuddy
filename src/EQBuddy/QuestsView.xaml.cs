@@ -1315,10 +1315,12 @@ public partial class QuestsView : UserControl
         var b = new Button
         {
             Style = (Style)FindResource("ActionButton"),
-            Content = group.Collapsed ? "Show steps" : "Hide steps",
-            FontSize = DesignTokens.Spec(Role.Caption).Size,
+            Content = GuidePresentation.FoldFace(group.Collapsed),
+            FontSize = DesignTokens.Spec(Role.Body).Size,
+            MinWidth = DesignTokens.IconButtonSize,
             HorizontalAlignment = HorizontalAlignment.Left,
             Margin = new Thickness(DesignTokens.SpaceXxs, 0, 0, DesignTokens.SpaceXs),
+            // The words the face dropped live here, where they cost no width.
             ToolTip = GuidePresentation.FoldTip(group.Collapsed),
             Tag = GuideFoldTag,
         };
@@ -2691,9 +2693,11 @@ public partial class QuestsView : UserControl
             headingText.Cursor = Cursors.Hand;
             // What this quest PAYS, on the heading's hover: on a folded list the item rows
             // that used to answer "what do I get" are not on screen (David, 2026-09-09).
+            // The hover says what the quest PAYS and nothing else (David, 2026-09-09). It
+            // used to append "Click to open the wiki page" — narrating an affordance the
+            // cursor already shows, in the space the answer was supposed to occupy.
             headingText.ToolTip = group.RewardSummary.Length > 0
-                ? group.RewardSummary + Environment.NewLine + Environment.NewLine
-                    + "Click to open the wiki page for this quest."
+                ? group.RewardSummary
                 : "Open the wiki page for this quest";
             headingText.Ink("AccentBrush");
             var rewardName = group.Title;

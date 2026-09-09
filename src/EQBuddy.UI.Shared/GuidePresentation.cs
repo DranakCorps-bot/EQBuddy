@@ -48,6 +48,13 @@ public static class GuidePresentation
         ? "Show this quest's steps"
         : "Fold this quest away — the heading, its count and its caption stay";
 
+    /// <summary>The fold control's face: a plus to open, a minus to close (David,
+    /// 2026-09-09). A symbol rather than "Show steps" / "Hide steps" — six of those stacked
+    /// down a folded class list is more text than the headings they sit under, and the whole
+    /// point of folding is that the list reads at a glance. The words survive on the hover,
+    /// where they cost nothing.</summary>
+    public static string FoldFace(bool collapsed) => collapsed ? "+" : "−";
+
     /// <summary>The label on the row-end share-back door, and the whole promise it makes.</summary>
     public const string ImproveLabel = "Improve this step";
 
