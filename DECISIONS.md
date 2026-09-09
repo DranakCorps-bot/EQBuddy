@@ -1,3 +1,45 @@
+## 2026-09-09 (DRA-45 guide UX — the calls I made alone)
+
+**1. Guided quests start FOLDED, and the EXPANDED set is what persists.** The Founder asked to
+see a class's quests collapsed and open the ones he wants; starting expanded would have meant
+the feature does nothing until he folds 95 things by hand. Stored as `AppSettings.GuideExpanded`
+(the exception) rather than a collapsed list, because an opt-out list gains 95 entries the first
+time anyone scrolls and a newly authored class would arrive open. The default it could have gone
+the other way on: leave everything expanded and let folding be opt-in. Reversal: one line.
+
+**2. The fold control is "+" / "-", not "Show steps" / "Hide steps".** The Founder asked for
+this directly after seeing the words. Worth recording WHY it is right rather than just that he
+asked: six "Show steps" buttons stacked down a folded class list is more text than the headings
+they sit under, and the whole point of folding is that the list reads at a glance. The words
+survive on the hover, where they cost no width.
+
+**3. The heading's hover says ONLY what the quest pays.** It briefly also appended "Click to
+open the wiki page for this quest." The Founder cut it, and he was right: it narrated an
+affordance the cursor already shows, inside the space the answer was supposed to occupy.
+
+**4. Who and Where fused into one sentence rather than Who surviving as its own line.** Bevel's
+finding 1 recommended keeping Who as the identity anchor and cutting Where and What. I kept the
+information and changed the shape — "Travel to Plane of Sky - Isle 5, then find The Spiroc Lord."
+— because the Founder's ask was for prose, not for fewer fields. Named in BEVEL-FEEDBACK as a
+deviation from Bevel's own recommendation so it can be argued with.
+
+**5. "set aside" is the heading's new state token, and it fires on a NARROWER trigger than the
+caption's.** Bevel found that the heading vocabulary (done / ready / in progress) had no word for
+"the player put this down", so a quest whose remaining steps were all skipped read "in progress"
+while the card said "Every step left is skipped". Bevel left the word to us. I picked "set
+aside": it reads as a decision rather than a failure, which "skipped" on a whole quest does not,
+and it is distinct from the step-level word so the two cannot be confused. The trigger is "at
+least one skip AND nothing left that is neither done nor skipped", not the caption's
+`skipped > 0` — with the looser trigger a quest that is half done, half skipped and still has
+real work would say "set aside" while the player was actively working it. What would reverse it:
+Bevel or Helm preferring the looser trigger, or a better word.
+
+**6. The E2E fixtures now expand what they assert on.** Folding by default made three of them
+fail — they assert 21 rows and a folded quest draws none. The fixtures expand through the same
+`Class|Reward` key the UI writes, derived from the catalog rather than typed. Added
+`WithNothingExpandedAGuidedClassDrawsHeadingsAndNoSteps` so the LANDING state is itself guarded:
+the next person to see zero rows learns it is the fold, not a broken guide.
+
 ## 2026-09-09 (DRA-44 + DRA-36 — the calls I made alone)
 
 Cards: DRA-44 (wind runes on the zone page, provenance) and DRA-36 (the active-step card).

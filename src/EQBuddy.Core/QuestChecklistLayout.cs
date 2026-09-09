@@ -184,8 +184,30 @@ public sealed record QuestChecklistGroup(
     public string? Note =>
         Completed ? "done"
         : AllPiecesInHand ? "ready"
+        : SetAside ? "set aside"
         : Rows.Any(r => r.Acquired) ? "in progress"
         : null;
+
+    /// <summary>
+    /// Nothing left that the player has not either done or struck out.
+    ///
+    /// <para><b>Why the heading needs its own word for this</b> (Bevel, 2026-09-09, finding 2).
+    /// The state vocabulary was <c>done</c> / <c>ready</c> / <c>in progress</c> / nothing —
+    /// no token for "the player put this down". So a quest whose remaining steps were all
+    /// skipped read "in progress" on the heading while the card underneath said "Every step
+    /// left is skipped": the surface contradicting itself, with the heading committing to the
+    /// wrong word first.</para>
+    ///
+    /// <para>It got sharper when guided quests started folding by default — the heading is now
+    /// often the ONLY thing on screen for a quest, so the one word it carries has to be true.
+    /// "in progress" survives where work genuinely remains; this fires only when none does,
+    /// which is exactly when <c>GuidePresentation.NoNextStep</c> says the same thing.</para>
+    ///
+    /// <para>The turn-in is excluded for the reason it always is: it is the thing being
+    /// gated, never one of the things gating it.</para></summary>
+    private bool SetAside =>
+        Rows.Any(r => r.IsSkipped)
+        && Rows.All(r => r.Acquired || r.IsSkipped || r.IsTurnIn);
 
     /// <summary>How close to finished, for the actionability sort. Untouched is 0 and
     /// every piece held is 1.</summary>

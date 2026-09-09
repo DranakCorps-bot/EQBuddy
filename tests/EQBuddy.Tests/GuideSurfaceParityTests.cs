@@ -314,6 +314,48 @@ public sealed class GuideSurfaceParityTests : IDisposable
         Assert.Equal(GuidePresentation.AllSkipped, card.Instruction);
     }
 
+    /// <summary>
+    /// A quest with nothing left but skips says so ON THE HEADING, not only on the card
+    /// (Bevel, 2026-09-09, finding 2).
+    ///
+    /// <para>The heading's vocabulary had no word for "the player put this down", so it said
+    /// "in progress" while the card said "Every step left is skipped" — the surface
+    /// contradicting itself. Folding made it sharper: the heading is now often the only thing
+    /// on screen for a quest.</para></summary>
+    [Fact]
+    public void AQuestWithNothingLeftButSkipsSaysSoOnTheHeadingAndNotOnlyOnTheCard()
+    {
+        var settings = Settings();
+        var ledger = Store();
+        var group = Desktop(settings, ledger).Single(g => g.CompletionKey == RewardKey);
+
+        // Half-done, half-skipped: work remains, so "in progress" is still the true word.
+        var rows = group.Rows.Where(r => !r.IsTurnIn).ToList();
+        Assert.True(rows.Count >= 2);
+        Assert.True(CompanionActions.Apply(settings, ledger, Dranak,
+            new CompanionAction(CompanionSurfaces.Sky, rows[0].Id, Done: true)));
+        Assert.Equal("in progress",
+            Desktop(settings, ledger).Single(g => g.CompletionKey == RewardKey).Note);
+
+        // Strike the rest out and nothing is left that is neither done nor put down.
+        foreach (var row in rows.Skip(1))
+            Assert.True(CompanionActions.Apply(settings, ledger, Dranak,
+                new CompanionAction(CompanionSurfaces.Sky,
+                    CompanionActions.SkipVerb + row.Id, Done: true)));
+
+        var setAside = Desktop(settings, ledger).Single(g => g.CompletionKey == RewardKey);
+        Assert.Equal("set aside", setAside.Note);
+        // ...and the card is saying the same thing rather than a different one.
+        Assert.Equal(GuidePresentation.AllSkipped, setAside.GuideCard!.Instruction);
+
+        // Taking one skip back puts the work — and the word — back.
+        Assert.True(CompanionActions.Apply(settings, ledger, Dranak,
+            new CompanionAction(CompanionSurfaces.Sky,
+                CompanionActions.SkipVerb + rows[1].Id, Done: false)));
+        Assert.Equal("in progress",
+            Desktop(settings, ledger).Single(g => g.CompletionKey == RewardKey).Note);
+    }
+
     [Fact]
     public void AClassWithNoGuideIsUnchangedOnThePhoneToo()
     {

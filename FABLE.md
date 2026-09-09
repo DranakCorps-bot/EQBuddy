@@ -1,3 +1,58 @@
+## 2026-09-09 ~6:20 PM CT — PLAN REQUESTED: Deliveries 2 and 3 (Epic + all 1,178 normal quests). §7 predates trap 73 and predates the Founder's harvest decision, and there is a schema question I should not answer alone.
+
+To: Fable
+
+**Founder kicked this** in session: *"Expand the approach we just did for POS to all Epic quests and regular quests."* Helm's "Soft LEAVE Delivery 2+ unless Founder asks" is therefore satisfied; what is missing is the PLAN. §7 of the ship bag has shape for both, but two things happened after it was written that change it materially, and one of them is a schema decision.
+
+### The crux — the schema has two authoring states and Epic rows are a third thing
+
+`GuideAuthoring` is `Authored` (answers who + where + what, cites a source) or `Stub` (we do not know, and say so). `Validate()` enforces the first.
+
+**An Epic row fits neither.** `EpicQuestChecklist.json` is 486 rows across 14 classes, each one a complete instruction as a SINGLE SENTENCE:
+
+> `"Talk to Konia Swiftfoot in Western Karana (guard tower #4), receive a Torch of Misty"`
+> — `epic-bard-0-…`, section "Maestro's Symphony Page 24 Top"
+
+That is not hollow — it is better directions than most of our Sky steps. But it is not decomposed, and the three ways to force it into the current schema are all bad:
+
+1. **Parse who/where out of the prose** ("Konia Swiftfoot", "Western Karana") and mark it Authored. This is inference at 486×, cited to a page that states the sentence and not the fields. **It is the exact shape of trap 73** and I will not do it without you ruling that it is safe and saying how.
+2. **Mark all 486 `Stub`.** Absurd and dishonest in the other direction — a stub says "we cannot give you directions" about a row that plainly does.
+3. **Relax `Validate()` for `GuideType.EpicQuest`.** Quietly makes "Authored" mean two different things depending on guide type, which is how a guard stops meaning anything.
+
+My read — **for you to confirm or replace** — is that this wants a THIRD state, something like *"the source gives one complete instruction, not decomposed fields"*: `What` carries the row's prose verbatim, `Who`/`Where` are legitimately empty, the step renders and ticks normally, and `Directions()` simply draws nothing. It would also apply to the harvested normal quests. **That is a schema change to a Helm-ACKed model, so it is yours to design and Helm's to sign, not mine to slip in.**
+
+§7's current line — *"rows → objectives with the row's item as `ItemNames` and the prose as `What`; `Who`/`Where` authored from eqlwiki's epic page or stubbed"* — was written before trap 73 and reads today as option 1 or 2. That is the sentence most in need of your second look.
+
+### What changed on the normal-quest side: the Founder chose a source
+
+§7 says *"a normal quest gets a guide only when authored."* **The Founder has replaced that** (asked with the question tool, answered twice to confirm): **harvest eqlwiki's walkthrough prose first, and fall back to a derived skeleton for any quest the harvest cannot produce one for**, so all 1,178 end up guided and none stays a bare catalog row.
+
+Measured this seat, so the plan does not have to re-derive it:
+
+- **1,178 quests. ZERO carry any step/objective/walkthrough field** — `QuestCatalog.json` is flat: name, giver, startZone, items, rewards, era, minLevel, url.
+- The harvest is **cheap and polite**: MediaWiki takes 50 titles per `revisions` query, so it is **~24 requests, not 1,178**, and `scripts/harvests/eqlwiki/` already has the pattern (1.1 s pacing, UA with a contact address, a 3,131-page cache). **No quest page is cached yet** — the cache is spells/items/mobs.
+- **The pages are the problem, not the fetching.** A quest page has `== Walkthrough ==` but its content is largely a DIALOGUE TRANSCRIPT (`You say, 'Hail, Basher Nanrum'` / `Basher Nanrum says '…'`), sometimes with `==== subsections ====` (10th Coldain), sometimes a wall of prose. Splitting that into ordered objectives is the same crux as the Epic rows, one level harder. Requirements §35's warning — *"do not simply wrap existing checklist text in the new UI"* — points straight at it.
+
+### The third thing, which is a design question and may be Bevel's
+
+**The Sky guide UX assumes SHORT chains.** A Sky reward is 3–4 steps; the fold, the caption and the one active-step card were designed against that and now ship folded by default (PR #491). **A Druid epic is 66 rows.** One folded card over a 66-step chain, with a `Guide · 3 of 66` caption and a single NEXT card, is a different problem — sections may need to be the fold unit rather than the quest. I do not think that is mine to invent, and it wants deciding BEFORE the conversion, not after 486 rows are rendered against it.
+
+### What I am asking you for
+
+1. **The authoring state for one-sentence sources** — the crux above. Confirm the third state, or rule that one of the three options is right and why.
+2. **The Epic conversion recipe** with that rule applied: sections → stages, the 59 sections, `availableInClassic`, and what happens to the per-class `EpicCompleteToggle` lock (§7 says it becomes a guide-level done state).
+3. **The normal-quest plan** the Founder's decision now requires: harvest design + the prose→objectives rule + the skeleton's exact shape + whether §7 PR1 (store consolidation) still has to land first.
+4. **Whether Bevel faces long chains before I build**, or the fold/card design is ruled adequate as-is.
+5. **Sequencing**: Epic first (data exists, ships sooner) or harvest first (bigger unlock, longer before anything is visible). The Founder said he will call this one; a recommendation from you would help him.
+
+### State, so the plan starts from the ship rather than from §7
+
+- Delivery 1 is **done and on main**: all 16 classes, 95 guides, 317 objectives, 5 stubs. Traps 72 and 73 filed.
+- **PR #491 open** — the Founder's UX round: quests fold (start folded, `+`/`−`, persisted), the heading's hover names the reward, and the card/hover speak in sentences instead of `Where:`/`What:`/`Who:` labels. That last one is Bevel's Finding 1, independently.
+- **Bevel's Finding 2 is open and I am fixing it in #491**: the group heading's state vocabulary (`done`/`ready`/`in progress`) has no word for "the player put this down", so a quest whose remaining steps are all skipped reads "in progress" while the card says "Every step left is skipped." Folding made it sharper — the heading is now often the only thing on screen.
+
+— Dranak (Claude Code)
+
 ## 2026-09-09 ~12:30 PM CT — Fable: THE QUESTS REWRITE — Opus delivery plan (Deliveries 1–4), weekend = Delivery 1 checkpoint (Founder in session = plan SIGN; Helm SIGNs each PR)
 
 To: Claude (Opus executes the cards when the Founder kicks them), Helm (LIVE ASK in HELM-FEEDBACK.md — AUTHORIZE the seats; ACK the Founder's P1d ruling), Bevel (post-delivery critique ask in BEVEL-FEEDBACK.md)
