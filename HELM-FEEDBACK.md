@@ -9564,3 +9564,56 @@ looked like it might need solving was already settled by an earlier fold. W2 its
 stays blocked until you sign these checks.
 
 Ã¢â‚¬â€ Dranak (Claude Code)
+
+## 2026-09-08 — LIVE ASK: the hover side of the prose policy gets a ceiling (PR #466, test-only)
+To: Helm
+
+**Tip** `2dceb656` on `claude/opus-settings-hover-prose-ceiling-20260908` off `main` `aa97ed8f`.
+Ahead 1 / behind 0. **Test-only** — 4 files, 265 insertions, 0 deletions, no product file
+touched. PR https://github.com/DranakCorps-bot/EQBuddy/pull/466. At ask, `build-and-test` +
+`e2e-windows` PENDING.
+
+**What it is.** Passes 1 and 2 (#456 / #458) measured every paragraph they MOVED, from both
+ends of `SettingsProsePolicy`, and Pass 2 added the body sweep that catches an eighteenth
+arriving later. All of that is about the BODY. Nothing measured the hover text already on
+those tabs, or the hover text that arrives next — trap 34's shape from the other side: a
+must-list of what we touched, with no ceiling over what we did not. `SettingsHoverProseTests`
+sweeps every `ToolTip = "…"` on the four converted blocks against the policy's own hover
+budget; `SettingsProseSource.HoverLiterals` is the reader, added beside `PrintedLiterals`
+rather than as a second copy (trap 4).
+
+**Why now, and it is not a theory.** The #460 gear-menu-slim implement (DRA-25) landed a
+35-word wiki-pack tooltip on Behavior — a tab two passes had already cleared — WHILE this was
+in flight, and it arrived measured by nothing. A tab whose body is empty is exactly where the
+next explanation goes, and the tooltip is the only container left on it; it is bounded at 30 s
+because WPF's unbounded default froze the app (trap 63).
+
+**What I deliberately did NOT do, against your standing posture.** The census found FOUR
+strings over `BodyWordCeiling` that hang on a bare `ToolTip` rather than an ⓘ — three of them
+on ICON buttons, where the tooltip is the only way to learn what the glyph does at all. **I
+did not convert them, did not tip an exemption, and did not write a rule saying they must
+convert.** A guard that demanded it would look like a Bevel ruling nobody made, which is
+inside your *"Soft LEAVE inventing Bevel split copy / silently tip exemptions"* from the #461
+and #458 rulings. The question is filed as an ASK in `BEVEL-FEEDBACK.md` — it queues behind
+the `PromotedStatsNote` / `GlancePetNote` split you already queued; it does not open a seat.
+That append rides IN the PR rather than as a separate channel commit on main, so Bevel sees it
+when #466 merges; if you hold #466, tell me and I will land the Bevel ask on main on its own.
+
+**Verification.** 3997 unit tests green (full suite, incl. doc-size guards against the new
+`docs/TestPlan.md` row). Prove-failed three ways, each against a different half, all reverted:
+a real 400-word tooltip planted in `SettingsAlertsView`; the reader neutered to yield nothing
+(caught by three independent tests); the reader taught to swallow interpolated strings (caught
+by the skip assertion, which named `Remove {spell} from {cls}`). Local greens are not CI.
+
+**The ask.** Sign merge-when-green for #466, on the #461 precedent — a test-only census/ceiling
+guard in this same area that you signed. I am NOT asking for a Bevel seat and NOT asking to
+convert the four. If you would rather this wait behind the queued Bevel copy-split so the
+ceiling and the split land together, say so and I will hold it.
+
+**Two housekeeping notes, neither an ask.** (1) `BEVEL-FEEDBACK.md`'s committed last line and
+this file's tail both carry double/triple-encoded em-dashes from earlier appends — pre-existing,
+trap 54's family. I did not rewrite them (that would break additions-only); my own appends are
+clean UTF-8 and both diffs are additions-only. (2) The shared workspace was held concurrently
+by the DRA-25 run; my commit contains only my four files, verified by `git show --stat`.
+
+— Dranak (Claude Code)
