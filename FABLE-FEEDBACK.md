@@ -1,3 +1,94 @@
+## 2026-09-09 ~1:20 PM CT — Claude: Delivery 1 BUILT (D1+D2+D3+D4). The plan was executable as written; three places where it was not, and why
+
+To: Fable
+
+`docs/quests/WEEKEND-SHIP-BAG-2026-09-12.md` executed on one branch —
+`claude/opus-delivery1-guide-rows-20260909`. **The `FABLE.md` entry STAYS**: D6, D7 and
+Deliveries 2–4 are still ahead of it, and deleting the item after Delivery 1 would lose the
+ladder the same way P1a's would have.
+
+### Reinforcing — name these, because they are what made it executable
+
+- **§2 D1 point 4, "three homes, one writer each", with the `SkyItem` rule spelled out to
+  the case.** *"a `Loot`/`Farm`/`Collect` objective whose `ItemNames` names exactly one of
+  THIS group's rows"* — type list, cardinality and scope, all three in one sentence. I
+  implemented it without a decision to make, and every one of the eight routing tests is a
+  restatement of that sentence. Compare it with a plan that had said "item-backed where
+  sensible."
+- **Naming the PROJECT a mechanism lands in** (§2 D1's opening line: UI.Shared, not Core,
+  with the reason). That closed the exact question P1b's feedback asked you to close, and it
+  saved a round trip to Helm because the deviation was already argued.
+- **The predicted render** (*"three rows … the caption 'Guide · 0 of 3 · 1 stub'"*). I wrote
+  it as a test before running anything, and it passed on the first build. A plan that
+  predicts its own output makes trap 23 nearly impossible to fall into.
+- **Naming the traps inline** (62 on the E2E wait, 58 on the shell re-key, 4 on the duplicate
+  tick). I did not have to rediscover which ones applied.
+
+### Corrective — one place the plan was wrong, and it would have shipped a regression
+
+**§2 D1 named two new row fields (`StubNote`, `GuideRowKey`). It needed a third, and the
+missing one was load-bearing.** The plan has the turn-in rendering as a row (§2 D1 point 6)
+AND the heading keeping its "Turned in" button. Both are right. But
+`QuestChecklistGroup.ReadyToTurnIn` is `!Completed && Rows.All(r => r.Acquired)` — so once
+the turn-in is itself a row, "ready" needs the turn-in already done, which means completed,
+which means not ready. **Unreachable state.** A Warrior holding both drops would have
+silently dropped out of the cross-class Ready band and lost the "Mark turned in" button on
+his own heading, and nothing in the guide would have looked wrong.
+
+Added `QuestChecklistRow.IsTurnIn` and folded the three copies of that predicate
+(`ReadyToTurnIn`, `State`, `Note`) into one `AllPiecesInHand`. The staged shot is the
+evidence it works: *Belt of the Four Winds — 3/4 · ready*, button live.
+
+**What would have caught it in planning:** the plan changed what a group's ROWS are without
+walking the properties DERIVED from those rows. `QuestChecklistGroup` has five. A line in §2
+D1 saying "Done/Total/State/Note/ReadyToTurnIn are computed from Rows — say what each becomes
+under a guided group" would have found it at desk time. That is the generalisable ask: **when
+a slice changes what a collection CONTAINS, enumerate what is computed FROM it.**
+
+### Constructive — two smaller ones
+
+1. **§2 D1 point 6's "after: Stone Amulet, Wind Rune Azia" does not match its own rule.** The
+   parenthetical says *"names from the prerequisite objectives' titles"*, but those titles are
+   "Loot the Stone Amulet from the Keeper of Souls", not "Stone Amulet". I followed the RULE
+   (titles) rather than the EXAMPLE, because titles always exist and `ItemNames` is empty on a
+   Travel or TalkToNpc prerequisite — but an example that contradicts its rule is a coin-toss
+   for the next executor. Worth one pass over illustrative strings asking whether they are
+   derivable from the rule beside them.
+2. **The plan had no repaint step, and the feature's headline promise depended on one.** §2 D1
+   says the loot auto-tick "lights the guide row for free". It did not: the tab's refresh
+   signature keyed on the quest ledger and the turn-in stores and on NEITHER of the two lists
+   `SkyLootAutoCheck` writes, so the box was ticked and the screen kept drawing the moment
+   before. Pre-existing, and it hit the classic checklist too. Filed as trap 72, fixed here,
+   prove-failed (the E2E row timed out before and passes in 4 s after). **The generalisable
+   ask: when a plan says a value is read somewhere new, it should also say what makes that
+   surface REDRAW.**
+
+### What the Founder changed mid-build
+
+Two things, both recorded in `DECISIONS.md` and in the Helm LIVE ASK:
+
+- **One branch, one LIVE ASK for the whole of Delivery 1** rather than the four-PR chain (I
+  asked with the question tool; he chose the fold). Then: *"get the MVP 1st pass of the whole
+  rework done and then address issues."*
+- **The six questions.** *"who, what, where, when, why, how should be the maximal number of
+  things. We don't want to be redundant, but all must be addressed."* `GuideObjective` gained
+  `When`/`Why`/`How`, `EffortNote` retired into `How`, and `Validate()` now refuses an Authored
+  step missing any of the six. **This raises the authoring bar for D7's thirteen classes** —
+  worth reflecting in the plan's D7 recipe before those batches start, because "answers who,
+  where and what" is now three questions short.
+
+### Delivered
+
+18 guides (WAR/MNK/DRU), 43 item objectives — the exact must-list count §0 predicted — and 13
+honest stubs: twelve wind runes plus Dagas' Gem of Invigoration, where our checklist says Isle
+2 / Protector of Sky and eqlwiki says Isle 7 trash. I did not pick one. Gates: 4101 unit
+(4031 before), `check.ps1` all green, 4 E2E, shot taken and reviewed twice — the first capture
+is what sent me back to cut the prose, which no assertion would have caught.
+
+D6 and D7 not built, deliberately.
+
+— Dranak (Claude Code)
+
 ## 2026-09-08 ~5:35 PM CT — Claude: guided-progression **P1a is BUILT** (PR #454). §2's "thin" was the load-bearing word, and §3 named the one wiring nobody would have thought to add
 
 To: Fable
