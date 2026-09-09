@@ -20,6 +20,34 @@ public static class GuidePresentation
     /// ours rather than the player's.</summary>
     public const string StubLead = "Wiki incomplete —";
 
+    /// <summary>
+    /// What a reward PAYS, for the heading's hover: the item you end up with and the pieces
+    /// it costs.
+    ///
+    /// <para>The question a player scanning a folded list is actually asking is "what do I
+    /// get" (David, 2026-09-09), and on a collapsed heading the item rows that used to answer
+    /// it are not on screen. Built from the reward's own checklist rows, so it says what the
+    /// quest costs rather than a number.</para></summary>
+    public static string RewardSummary(string reward, IReadOnlyList<SkyQuestChecklistItem> items)
+    {
+        var pieces = items
+            .Select(i => i.QuestItem.Trim())
+            .Where(n => n.Length > 0)
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToList();
+
+        var head = "Rewards the " + reward + ".";
+        return pieces.Count == 0
+            ? head
+            : head + " Needs " + string.Join(", ", pieces) + ".";
+    }
+
+    /// <summary>What the fold control says it will do. A collapsed quest shows its heading,
+    /// its counts and its caption; expanding it brings back the card and the steps.</summary>
+    public static string FoldTip(bool collapsed) => collapsed
+        ? "Show this quest's steps"
+        : "Fold this quest away — the heading, its count and its caption stay";
+
     /// <summary>The label on the row-end share-back door, and the whole promise it makes.</summary>
     public const string ImproveLabel = "Improve this step";
 
@@ -73,18 +101,21 @@ public static class GuidePresentation
         if (objective.Authoring == GuideAuthoring.Stub)
             return StubLead + " " + objective.StubNote;
 
+        // SENTENCES, not labels (David, 2026-09-09). Every field in the schema is already
+        // written as prose, so the labels added nothing but the shape of a form. All six
+        // questions are still here and still each drawn once — the reader is told rather
+        // than shown a table.
         var lines = new List<string>();
-        Add("What", objective.What);
-        Add("Who", objective.Who);
-        Add("Where", objective.Where);
-        Add("When", objective.When);
-        Add("Why", objective.Why);
-        Add("How", objective.How);
+        Add(Directions(objective));
+        Add(objective.What);
+        Add(objective.Why);
+        Add(objective.When);
+        Add(objective.How);
         return string.Join("\n", lines);
 
-        void Add(string label, string value)
+        void Add(string value)
         {
-            if (value.Trim().Length > 0) lines.Add(label + ": " + value.Trim());
+            if (value.Trim().Length > 0) lines.Add(value.Trim());
         }
     }
 
@@ -145,10 +176,64 @@ public static class GuidePresentation
         Guide guide, Func<GuideObjective, bool> isDone, Func<GuideObjective, bool> isSkipped) =>
         guide.AllObjectives.All(isDone) ? AllDone : AllSkipped;
 
-    /// <summary>"for: Runed Wind Amulet" — WHY, in the card's terms. The reward name and not
-    /// the step's own <see cref="GuideObjective.Why"/>: the card is lifted OUT of its group,
-    /// so the heading that would have said which reward this is for is not beside it.</summary>
-    public static string CardWhy(string reward) => "for: " + reward;
+    /// <summary>WHY, in the card's terms — the reward this step is working toward, said as a
+    /// sentence. The reward name and not the step's own <see cref="GuideObjective.Why"/>: the
+    /// card is lifted OUT of its group, so the heading that would have named the reward is not
+    /// beside it.</summary>
+    public static string CardWhy(string reward) => "Works toward the " + reward + ".";
+
+    /// <summary>
+    /// WHERE and WHO as one natural sentence — "Travel to Plane of Sky - Isle 5, then find
+    /// The Spiroc Lord."
+    ///
+    /// <para><b>Why this replaced labelled fields</b> (David, 2026-09-09): the card read as a
+    /// form — <c>Where:</c> / <c>What:</c> / <c>Who:</c> stacked under an instruction that had
+    /// already said most of it. Labels are how the DATA is shaped; they are not how a person
+    /// tells you where to go. The verb follows the objective type, because "find" is wrong for
+    /// an NPC you are meant to talk to and "travel to" is wrong when you are already there.</para>
+    ///
+    /// <para>Empty when the step answers neither, and it drops the half it does not have
+    /// rather than composing round a blank.</para></summary>
+    public static string Directions(GuideObjective objective)
+    {
+        var where = objective.Where.Trim().TrimEnd('.');
+        var who = objective.Who.Trim().TrimEnd('.');
+        var verb = objective.ObjectiveType switch
+        {
+            "TalkToNpc" or "ReturnToNpc" or "TurnIn" => "speak to",
+            "Kill" or "SpawnNamed" or "SurviveEncounter" => "fight",
+            _ => "find",
+        };
+
+        if (where.Length > 0 && who.Length > 0) return $"Travel to {where}, then {verb} {who}.";
+        if (where.Length > 0) return $"Travel to {where}.";
+        return who.Length > 0 ? $"{char.ToUpperInvariant(verb[0])}{verb[1..]} {who}." : "";
+    }
+
+    /// <summary>
+    /// WHAT, but only when it says something the instruction did not.
+    ///
+    /// <para>A guide's <c>ShortInstruction</c> and its <c>What</c> usually describe one action
+    /// twice — "Kill The Spiroc Lord on Isle 5 and loot the Spiroc Battle Staff." against
+    /// "Kill The Spiroc Lord and loot Spiroc Battle Staff (1)." Printing both is how the card
+    /// became a form. So the detail line appears only when it is not already covered, judged
+    /// on the words that carry meaning rather than on an exact match.</para></summary>
+    public static string ExtraDetail(GuideObjective objective)
+    {
+        var what = objective.What.Trim();
+        if (what.Length == 0) return "";
+
+        var said = new HashSet<string>(
+            Words(objective.ShortInstruction), StringComparer.OrdinalIgnoreCase);
+        var novel = Words(what).Where(w => !said.Contains(w)).ToList();
+        // A handful of new words is a quantity or a caveat worth showing; one or two is
+        // punctuation noise dressed as news.
+        return novel.Count >= 3 ? what : "";
+
+        static IEnumerable<string> Words(string text) =>
+            text.Split([' ', ',', '.', '(', ')', ';', ':'], StringSplitOptions.RemoveEmptyEntries)
+                .Where(w => w.Length > 2);
+    }
 
     /// <summary>
     /// The "you are about to strand yourself" line, and the one piece of card logic that is

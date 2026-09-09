@@ -107,10 +107,10 @@ public sealed class GuidePresentationTests
             GuidePresentation.RowDetail(objective));
 
         var tip = GuidePresentation.RowTooltip(objective);
-        Assert.Contains("What:", tip, StringComparison.Ordinal);
-        Assert.Contains("Why:", tip, StringComparison.Ordinal);
-        Assert.DoesNotContain("When:", tip, StringComparison.Ordinal);
-        Assert.DoesNotContain("How:", tip, StringComparison.Ordinal);
+        Assert.Contains(objective.What, tip, StringComparison.Ordinal);
+        Assert.Contains(objective.Why, tip, StringComparison.Ordinal);
+        // Two fewer lines, and no blank one left where they were.
+        Assert.Equal(3, tip.Split('\n').Length);
     }
 
     [Fact]
@@ -127,18 +127,93 @@ public sealed class GuidePresentationTests
         Assert.Equal("", GuidePresentation.RowDetail(Stub()));
     }
 
-    /// <summary>The hover answers ALL SIX, labelled — so nothing is unanswerable even though
-    /// nothing is said twice on the row itself.</summary>
+    /// <summary>The hover still answers all six — as SENTENCES. Labels are how the DATA is
+    /// shaped, not how a person tells you where to go (David, 2026-09-09); the card and the
+    /// hover both read as a form until they went.</summary>
     [Fact]
-    public void TheHoverAnswersAllSixQuestions()
+    public void TheHoverAnswersAllSixQuestionsWithoutLabellingThem()
     {
-        var tip = GuidePresentation.RowTooltip(Authored());
+        var o = Authored();
+        var tip = GuidePresentation.RowTooltip(o);
 
         foreach (var label in new[] { "What:", "Who:", "Where:", "When:", "Why:", "How:" })
-            Assert.Contains(label, tip, StringComparison.Ordinal);
-        // One line each, in the order a player asks them.
-        Assert.Equal(6, tip.Split('\n').Length);
-        Assert.StartsWith("What:", tip, StringComparison.Ordinal);
+            Assert.DoesNotContain(label, tip, StringComparison.Ordinal);
+
+        // Who and where fused into one direction sentence; the rest in their own words.
+        Assert.Contains("Travel to Plane of Sky - Isle 4, then find Keeper of Souls.",
+            tip, StringComparison.Ordinal);
+        Assert.Contains(o.What, tip, StringComparison.Ordinal);
+        Assert.Contains(o.Why, tip, StringComparison.Ordinal);
+        Assert.Contains(o.When, tip, StringComparison.Ordinal);
+        Assert.Contains(o.How, tip, StringComparison.Ordinal);
+    }
+
+    /// <summary>The direction verb follows the objective type: you do not "find" an NPC you
+    /// are meant to talk to, and you do not "travel to" a mob.</summary>
+    [Theory]
+    [InlineData("Loot", "find")]
+    [InlineData("Kill", "fight")]
+    [InlineData("TalkToNpc", "speak to")]
+    [InlineData("TurnIn", "speak to")]
+    public void TheDirectionVerbFollowsWhatTheStepActuallyIs(string type, string verb)
+    {
+        var o = Authored();
+        o.ObjectiveType = type;
+        Assert.Contains($", then {verb} Keeper of Souls.",
+            GuidePresentation.Directions(o), StringComparison.Ordinal);
+    }
+
+    /// <summary>A step answering only one half still reads as a sentence, not a fragment
+    /// composed round a blank.</summary>
+    [Fact]
+    public void DirectionsDropTheHalfTheStepDoesNotHave()
+    {
+        var whereOnly = Authored();
+        whereOnly.Who = "";
+        Assert.Equal("Travel to Plane of Sky - Isle 4.", GuidePresentation.Directions(whereOnly));
+
+        var whoOnly = Authored();
+        whoOnly.Where = "";
+        Assert.Equal("Find Keeper of Souls.", GuidePresentation.Directions(whoOnly));
+
+        var neither = Authored();
+        neither.Who = neither.Where = "";
+        Assert.Equal("", GuidePresentation.Directions(neither));
+    }
+
+    /// <summary>The detail line is suppressed when it restates the instruction — "Kill X on
+    /// Isle 5 and loot Y." above "Kill X and loot Y (1)." is one action printed twice, and
+    /// that is what made the card read as a form.</summary>
+    [Fact]
+    public void TheDetailLineOnlyAppearsWhenItSaysSomethingNew()
+    {
+        var restating = Authored();
+        restating.ShortInstruction = "Kill the Keeper of Souls and loot the Stone Amulet.";
+        restating.What = "Kill the Keeper of Souls and loot Stone Amulet.";
+        Assert.Equal("", GuidePresentation.ExtraDetail(restating));
+
+        var adds = Authored();
+        adds.ShortInstruction = "Loot the Stone Amulet.";
+        adds.What = "Loot Stone Amulet (1). It is one of the two turn-ins and does not stack.";
+        Assert.NotEqual("", GuidePresentation.ExtraDetail(adds));
+    }
+
+    /// <summary>What a quest PAYS, for the heading's hover — the question a player scanning a
+    /// folded list is actually asking (David, 2026-09-09).</summary>
+    [Fact]
+    public void TheRewardSummaryNamesWhatYouGetAndWhatItCosts()
+    {
+        var items = new List<SkyQuestChecklistItem>
+        {
+            new() { QuestItem = "Stone Amulet" },
+            new() { QuestItem = "Wind Rune Azia" },
+        };
+
+        Assert.Equal("Rewards the Runed Wind Amulet. Needs Stone Amulet, Wind Rune Azia.",
+            GuidePresentation.RewardSummary("Runed Wind Amulet", items));
+        // A reward with no pieces recorded still says what it pays.
+        Assert.Equal("Rewards the Runed Wind Amulet.",
+            GuidePresentation.RewardSummary("Runed Wind Amulet", []));
     }
 
     /// <summary>A stub answers the one question it can. A labelled list of blanks reads as a
@@ -298,7 +373,8 @@ public sealed class GuidePresentationTests
 
     [Fact]
     public void TheCardsWhyNamesTheRewardBecauseTheHeadingIsNotBesideIt() =>
-        Assert.Equal("for: Runed Wind Amulet", GuidePresentation.CardWhy("Runed Wind Amulet"));
+        Assert.Equal("Works toward the Runed Wind Amulet.",
+            GuidePresentation.CardWhy("Runed Wind Amulet"));
 
     // ---- the share-back door ---------------------------------------------------------
 
@@ -323,11 +399,11 @@ public sealed class GuidePresentationTests
 
         var body = Body(GuidePresentation.ImproveUrl(Guide(objective), objective));
 
-        Assert.Contains("Who: Keeper of Souls", body, StringComparison.Ordinal);
-        Assert.Contains("Where: Plane of Sky - Isle 4", body, StringComparison.Ordinal);
-        Assert.Contains("When: Whenever it is up.", body, StringComparison.Ordinal);
-        Assert.Contains("How: Kill the named and loot it.", body, StringComparison.Ordinal);
-        Assert.Contains("What: Loot Stone Amulet (1).", body, StringComparison.Ordinal);
+        Assert.Contains("Travel to Plane of Sky - Isle 4, then find Keeper of Souls.",
+            body, StringComparison.Ordinal);
+        Assert.Contains("Whenever it is up.", body, StringComparison.Ordinal);
+        Assert.Contains("Kill the named and loot it.", body, StringComparison.Ordinal);
+        Assert.Contains("Loot Stone Amulet (1).", body, StringComparison.Ordinal);
         Assert.DoesNotContain(GuidePresentation.StubLead, body, StringComparison.Ordinal);
     }
 

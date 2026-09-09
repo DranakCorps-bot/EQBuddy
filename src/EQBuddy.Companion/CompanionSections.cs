@@ -298,7 +298,14 @@ public sealed record CompanionChecklistGroup(
     /// <summary>The active-step card for a guided group, already worded by
     /// <c>GuidePresentation</c>. The page decides layout and nothing else — the desktop and
     /// the phone must not run the "what is next" rule separately (parity by shared module).</summary>
-    CompanionGuideCard? Card = null);
+    CompanionGuideCard? Card = null,
+    /// <summary>Folded away — the page draws the heading, its note and the reward line, and
+    /// a tap opens it. Guided quests start folded so a class fits on one screen.</summary>
+    bool Collapsed = false,
+    /// <summary>What this quest pays. The desktop puts it on the heading's hover; a phone has
+    /// no hover, so it is drawn (trap 35) — and on a folded row it is the only thing that
+    /// answers "what do I get".</summary>
+    string? Reward = null);
 
 /// <summary>The phone's half of the active-step card. Every field arrives worded; a null or
 /// empty one simply is not drawn, so a step that answers three of the six questions shows
@@ -309,9 +316,8 @@ public sealed record CompanionGuideCard(
     string RowId,
     string Lead,
     string Instruction,
-    string? Where = null,
-    string? What = null,
-    string? Who = null,
+    string? Directions = null,
+    string? Detail = null,
     string? Why = null,
     string? BeforeLeaving = null,
     string? Stub = null,

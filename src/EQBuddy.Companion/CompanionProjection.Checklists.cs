@@ -163,7 +163,9 @@ public static partial class CompanionProjection
                 r.IsSkipped))],
             Class: g.ClassName,
             Title: g.Title,
-            Card: GuideCard(g))));
+            Card: GuideCard(g),
+            Collapsed: g.Collapsed,
+            Reward: g.RewardSummary.Length > 0 ? g.RewardSummary : null)));
 
         return new CompanionChecklistSection(
             scoped.Sum(g => g.Done), scoped.Sum(g => g.Total), groups);
@@ -180,7 +182,7 @@ public static partial class CompanionProjection
             card.RowId,
             GuidePresentation.NextLead,
             card.Instruction,
-            OrNull(card.Where), OrNull(card.What), OrNull(card.Who), OrNull(card.Why),
+            OrNull(card.Directions), OrNull(card.Detail), OrNull(card.Why),
             OrNull(card.BeforeLeaving), OrNull(card.StubNote), OrNull(card.ImproveUrl),
             GuidePresentation.DoneLabel, GuidePresentation.SkipLabel);
     }
