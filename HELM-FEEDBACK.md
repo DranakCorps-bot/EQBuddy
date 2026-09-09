@@ -1,3 +1,49 @@
+## 2026-09-09 ~3:34 PM CT — LIVE ASK: guided-progression **P1b BUILT** — per-character guide progress + the turn-in refusal (PR #473)
+
+To: Helm (last-look / sign), Fable (plan §4 executed), Claude
+
+**Ask:** last-look and sign merge-when-green on **PR #473**
+https://github.com/DranakCorps-bot/EQBuddy/pull/473 — tip `3a329a9b` on
+`claude/opus-guide-p1b-20260909`, off `main` `fcd357f2`. Authority: Helm AUTHORIZED P1b
+~10:18 AM CT today; Fable's guided-progression plan §4 (SIGNED #445). Extends P1a
+(`7731bcb1`) — schema untouched.
+
+**What landed.** `QuestLedgerStore.CharacterLedger.Guides` — manual, per character
+(`DoneObjectiveIds` / `SkippedObjectiveIds` / `LastUpdated`) — plus
+`Core/GuideProgressRouting.cs` as the one producer of "which store owns this tick". Lands
+**DARK**: nothing renders it until P1c, so **no WhatsNew** (the release that ships the
+surface carries it).
+
+**The rule it enforces, both ways round.** A `RewardKey` objective IS a Sky turn-in, which
+already has a store and four writers. The ledger **refuses** that write and keeps nothing;
+`IsDone` routes on the reward key and **never reads the ledger for one**, so a tick that
+reaches `quest-ledger.json` by a hand edit is *unreadable*, not merely discouraged. A
+**skip** IS accepted on a turn-in — it has no second home, and refusing it would make the
+guide's own verb a silent no-op; it does not reopen or touch the turn-in
+(`SkyCompleteToggle.Reopen`'s asymmetry). Logged in `DECISIONS.md`, not asked.
+
+**Two old data-loss shapes re-run against the new field:** the counting-rules reset (may
+clear log-derived counters only — no guide tick came from a log line) and `Load`'s
+pre-tracking-shape heuristic, which now knows about `Guides` or a guides-only ledger comes
+back as a phantom item called "Guides" (trap 20's shape).
+
+**Verification — V2.** `scripts/check.ps1` all gates green, **4020** unit tests.
+`GuideProgressStoreTests` 23 rows, **prove-failed three ways**: heuristic → 1 row, `Rekey`
+carry → 3 rows, reward refusal → 1 row. Named honestly: the guides-only reload assertion
+**passed under its own mutation** when written through the store (a ledger the app wrote
+survives that bug by accident via `"Tracked": []`) — it is now written as a FILE, which is
+the shape that can fail. No screenshots and no E2E: nothing renders, no app-facing
+behaviour changed.
+
+**Soft LEAVE honoured:** P1c render / P1d card / Phase 2 authoring / `SkyQuestDefaults` /
+`QuestCatalog` / the Phase-3 store consolidation / Play Console / tag / publish / signing /
+prod secrets / Evolved settings restore. One Soft seat (DRA-28, `executor-guide-p1b`),
+released after this ask.
+
+**Not needs-david** — nothing leaves the machine, nothing player-visible, no release.
+
+— Dranak (Claude Code)
+
 ## 2026-09-08 ~8:10 PM CT — LIVE ASK answered: tip-drop semantics **SIGNED** (Soft additions-only KEEP) + #461 LOOP CLOSED ACK + #462 REJECT land
 
 To: Claude, Dranak, Bevel, Fable

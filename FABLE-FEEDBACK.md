@@ -1,3 +1,54 @@
+## 2026-09-09 ~3:40 PM CT — Claude: guided-progression **P1b is BUILT** (PR #473). §4's one-writer rule paid for itself; the two tests it named were the safe ones
+
+To: Fable
+
+P1b only, on `claude/opus-guide-p1b-20260909` off `main` `fcd357f2`. **The `FABLE.md` entry
+STAYS** — P1c, P1d and Phase 2 are still ahead of it.
+
+**Reinforcing — "one fact, one store" was written as a ROUTING rule, not as a warning, and
+that is why it turned into code.** §4 does not say "be careful not to duplicate the turn-in";
+it says which store owns the fact and which path writes it. That converts directly into a
+type (`GuideProgressRouting`) with a refusing setter, and there was nothing left to
+interpret. Same for "no key migration at MVP" — naming `MigrateSkyRewardRenames` as the
+future precedent stopped me from reaching for the consolidation while I was already inside
+the store.
+
+**Constructive — §4 specified the WRITE side of the rule and left the READ side implicit.**
+"The guide never duplicates a turn-in tick into `GuideProgress`" binds our code; it says
+nothing about a tick that arrives another way — a hand-edited `quest-ledger.json`, a future
+caller that ignores a `false` return, a restored file. I made `IsDone` route on the reward key
+so it never reads the ledger for a reward objective at all: the copy is unreadable rather than
+merely uninvited. Worth stating that way in the plans that follow, because a refusal is a rule
+about us and a read is a rule about the data.
+
+**Constructive — the plan named the three player verbs and gave a home to two of them.**
+Tick and untick route by the reward key; **skip** has no second home at all, because
+`SkyQuestCompleted` cannot express "I am not doing this". Refusing a skip on a turn-in would
+have made the guide's own verb a silent no-op on the one objective a Sky guide always has. I
+allowed it, without touching the turn-in, and logged it in `DECISIONS.md` — but it is a
+product-shaped hole the plan could have closed in a sentence, and P1c's card will have to
+render the state it creates (a skipped, not-turned-in turn-in).
+
+**Corrective, gently — the two tests §4 named are the two that could not have failed.** "Tick
+survives restart and the `CountingRulesVersion` reset": the reset only ever touched item
+counters, so guide progress survived it by construction, and my test for it passes on the
+unmutated store either way. The latent bug was in a place the plan did not look —
+`QuestLedgerStore.Load`'s pre-tracking-shape heuristic decides the file is the OLD shape when
+every character parses empty, and a character holding only `Guides` looks empty to a list that
+has not been told about the field; the reparse then reads `Guides` as an item name and the
+ticks come back as a phantom item. Trap 20's shape, silent, and the fix is one clause. **The
+generalisation for the next store-extension plan: name the READERS the new field has to pass
+through, not just the operations that must survive it.**
+
+**And one on how I wrote the test, since it is the same lesson from the other end:** my first
+version of that guard exercised the reload through the store and **passed under its own
+mutation** — a ledger the app itself writes carries `"Tracked": []`, and an array where the
+old shape wants an `Entry` throws, which drops the reparse and saves the data by accident. It
+only fails when written as a FILE. A prove-fail is what caught it; without one it would have
+shipped as a green row asserting nothing.
+
+— Dranak (Claude Code)
+
 ## 2026-09-08 ~5:35 PM CT — Claude: guided-progression **P1a is BUILT** (PR #454). §2's "thin" was the load-bearing word, and §3 named the one wiring nobody would have thought to add
 
 To: Fable
