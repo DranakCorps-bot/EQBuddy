@@ -731,7 +731,13 @@ public partial class QuestsView : UserControl
             // The leftover bands are a join against the DUMP, and nothing else in this
             // signature moves when a newer one is read — so without this the bands would
             // keep answering from the dump that was current when the window opened.
-            $"|inv:{_main.LatestInventory()?.WrittenAt.Ticks ?? 0}";
+            $"|inv:{_main.LatestInventory()?.WrittenAt.Ticks ?? 0}" +
+            // THE CHECKLISTS' OWN TICKS. Nothing else here moves when the loot auto-tick
+            // writes a box: `owned` is the quest ledger and `completed` is turn-ins, and
+            // neither is where SkyLootAutoCheck / EpicLootAutoCheck put an acquired item.
+            // So the store said "you have the Stone Amulet" and this tab went on drawing
+            // the moment before — measured in E2E, not theorised.
+            $"|ck:{ChecklistTickSignature()}";
         if (!force && sig == _signature) return;
         _signature = sig;
 
@@ -1093,11 +1099,46 @@ public partial class QuestsView : UserControl
         // carries (trap 39) rather than from the projection's own return — the question
         // these answer is "did the rows reach the screen", and a count taken from the thing
         // that produced them cannot fail the way the screen can.
+        // The CLASSIC checklist's own rows — every tickable box that is not a guide step.
+        // The floor under the guide facts: "no guide chrome" over an empty tab is the
+        // vacuous pass an unguided-class assertion is most likely to become.
+        $"questsSkyRows={ClassicRowsOnScreen()} " +
         $"questsGuideGroups={GuideElementsOnScreen<TextBlock>(GuideCaptionTag)} " +
         $"questsGuideRows={GuideRowsOnScreen().Count()} " +
         $"questsGuideStubs={GuideStubsOnScreen()} " +
         $"questsGuideDone={GuideRowsOnScreen().Count(c => c.IsChecked == true)} " +
         $"questsGuideImprove={GuideImproveDoorsOnScreen()}";
+
+    /// <summary>
+    /// Which boxes are ticked, folded to one short value for the repaint gate.
+    ///
+    /// <para>A COUNT would not do it: unticking one row and ticking another in the same tick
+    /// leaves the count where it was, and the screen would keep the stale pair. So the fold
+    /// is order-independent over the ids that are actually ticked — two different sets give
+    /// two different values, and the same set always gives the same one (trap 8's rule from
+    /// the other side: a fingerprint must include everything that decides the picture, and
+    /// nothing that merely drifts).</para>
+    ///
+    /// <para>Cheap on purpose — this runs on every repaint gate, and the checklists are a few
+    /// hundred rows.</para>
+    /// </summary>
+    private string ChecklistTickSignature()
+    {
+        var sky = 0;
+        var skyOn = 0;
+        foreach (var item in _settings.SkyQuestChecklist)
+            if (item.Acquired) { sky ^= item.Id.GetHashCode(StringComparison.Ordinal); skyOn++; }
+
+        var epic = 0;
+        var epicOn = 0;
+        foreach (var item in _settings.EpicQuestChecklist)
+            if (item.Acquired) { epic ^= item.Id.GetHashCode(StringComparison.Ordinal); epicOn++; }
+
+        // The turn-in stores too: a reward marked complete on the phone or by the
+        // achievements import changes what this tab draws and lives in neither list above.
+        return $"{skyOn}.{sky:x8}/{epicOn}.{epic:x8}"
+            + $"/{_settings.SkyQuestCompleted.Count}.{_settings.EpicQuestCompleted.Count}";
+    }
 
     /// <summary>The tag a guided group's caption line carries.</summary>
     private const string GuideCaptionTag = "guideCaption";
@@ -1114,10 +1155,15 @@ public partial class QuestsView : UserControl
     // A guide row is a CheckBox, and a guide row WITH its share-back door is that CheckBox
     // inside a two-column Grid — so both arrangements have to be swept or the door's
     // presence would silently halve the row count.
-    private IEnumerable<CheckBox> GuideRowsOnScreen() => QuestsPanel.Children
+    private IEnumerable<CheckBox> GuideRowsOnScreen() =>
+        RowBoxesOnScreen().Where(c => c.Tag as string == GuideRowTag);
+
+    private int ClassicRowsOnScreen() =>
+        RowBoxesOnScreen().Count(c => c.Tag as string != GuideRowTag);
+
+    private IEnumerable<CheckBox> RowBoxesOnScreen() => QuestsPanel.Children
         .OfType<FrameworkElement>()
-        .SelectMany(e => e is Grid g ? g.Children.OfType<CheckBox>() : [.. Loose(e)])
-        .Where(c => c.Tag as string == GuideRowTag);
+        .SelectMany(e => e is Grid g ? g.Children.OfType<CheckBox>() : [.. Loose(e)]);
 
     private static IEnumerable<CheckBox> Loose(FrameworkElement e) =>
         e is CheckBox c ? [c] : [];
