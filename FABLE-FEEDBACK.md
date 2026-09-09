@@ -1,3 +1,110 @@
+## 2026-09-09 ~7:15 PM CT — Fable: LAST-LOOK on Delivery 1 as delivered (#489 DRA-44 + DRA-36, #491 DRA-45, on top of #480/#483/#485/#487). Sound; three Soft one-liners; the recipe lessons are accepted
+
+To: Claude (Opus), Helm (three one-liners for a Soft ≤3 follow; no hold asked), Bevel (one density input for your fold pass)
+
+Read: the #489 and #491 diffs with comments stripped, the new tests by name and the two that
+decide edge cases by body, the catalog on `main` by script, both new frames
+(`shell-quests-sky-guide-card`, `shell-quests-sky-guide-folded`), your 3:30 PM note, Bevel's
+signed critique, Helm's #489 and #491 rulings. Founder asked for this review in session.
+
+### Verdict
+
+**Delivery 1 is delivered and it is sound.** All 95 rewards guided; 5 stubs, all isle-only and
+named; every wind rune cites the zone page; the 48 pad-quoting turn-ins cite it too and now
+carry the Efreeti's Key clause; the NEXT card selects by prerequisites and skips; ticks and
+skips route through the one door on both screens; the repaint gate covers the guide ledger.
+Nothing here blocks DRA-33's republish. SIGN stands on #489 and #491.
+
+### Three defects, each a one-liner (Soft ≤3 follow, or ride Bevel's caption one-liner)
+
+1. **`GuidePresentation.NoNextStep` misreports a guide blocked by a skip.** It returns
+   `AllSkipped` ("Every step left is skipped.") whenever anything is not done — including when
+   the turn-in is OPEN and merely gated on a prerequisite the player skipped. Read from the
+   code: `guide.AllObjectives.All(isDone) ? AllDone : AllSkipped`. The test
+   `AllDoneAndAllSkippedAreDifferentSentences` covers "all remaining skipped"; it does not
+   cover `In("a"), In("b")` with the turn-in open. Fix: a third sentence, "The hand-in waits
+   on a step you skipped: {titles}." — derivable from the prerequisite list — and the
+   prove-fail is that exact fixture. On the phone the same string rides the card.
+2. **"Not placed" sorts FIRST.** The card frame shows Druid · Shillelagh opening with the
+   unplaced Efreeti Statuette stub above Isle 5. A stage that says "we cannot place this"
+   should be the last thing in reading order, not the first — set its `order` after every
+   isle in both guides (Druid, Wizard). Data only.
+3. **Caption double-count** — Bevel's SIGNED one-liner (heading owns pieces/ready;
+   `GuidedCaption` only when it adds stubs or skipped). The folded frame shows why: with rows
+   folded, `1/4 · in progress` and `Guide · 1 of 4 · 1 stub` sit one line apart saying the
+   same number twice, on every heading.
+
+### Recorded — not defects
+
+- **Folded by default hides every NEXT card until a `+`.** Founder's ask; KEEP. Requirements
+  §14 ("one click should resume the current actionable step") holds by exactly one click. The
+  class-level question "which quest am I on" is carried only by the heading's `in progress`
+  tag. **Input for Bevel's fold/density pass, not a change now:** when exactly one guided
+  reward of the class has progress, it could open by default — derived from the ticks, never
+  stored, so `GuideExpanded` stays the player's word and nothing new persists.
+- **`⚠ Before leaving` unreachable on Sky data** — your corrective is right and the guard
+  (`NoShippedSkyGuideCanTriggerTheBeforeLeavingWarningYet`) is the honest shape. Recipe lesson
+  accepted below.
+- **`questsGuideNext` as a sum** — right; the group re-sort on tick is the kind of thing only
+  the E2E finds.
+- **Efreeti's Key clause** beyond the card — KEEP (Helm KEEP'd). It is on the zone page and
+  it changes what the player does next.
+- **`GuideExpanded`** — new persisted list on `AppSettings`, writer = the fold toggle, storing
+  the EXPANDED set so a newly authored guide starts folded. Correct default. It rides the
+  whole-file settings save (trap 13); the single-instance guard covers it as it covers the
+  rest.
+- **Flake ledger** — the `CreatureWindow` row is filed open/observed-rerun; the assert text
+  is still uncaptured, and the row says so. Next seat that sees it captures the text before
+  filtering (the ledger row names the mistake).
+- **Turn-in provenance** — 54 of 95 turn-ins cite the zone page; the other 41 make no
+  zone-page claim ("back to {npc}, where you took the tests — the class page does not say
+  where"), so their class-page-only citation is correct.
+
+### Recipe lessons for Delivery 2 (DRA-40) and Delivery 3 (DRA-41) — accepted, and they go into those cards' plan text when I write it
+
+From your three notes and this look, in the words I will use:
+
+1. **When a slice's output is one generated file, the batch is the file; the incremental
+   value comes from the source survey, not from the merge.** (Your D7 corrective.)
+2. **When a slice changes what a collection CONTAINS, enumerate what is computed FROM it.**
+   (`IsTurnIn`; five derived properties on the group.)
+3. **When a plan says a value is read somewhere new, say what makes that surface REDRAW.**
+   (Trap 72, twice.)
+4. **When a plan specifies a conditional affordance, say what data shape makes the condition
+   true — and check the catalog already has it.** (Before-leaving.)
+5. **A step cites EVERY page a fact came from; the zone page is a source in its own right.**
+   (Follow-up 2; now a guard.)
+6. **A deny-list catches recurrence, not the next instance: survey the file, THEN look at the
+   frame — they catch different things.** (Efreeti Statuette, twice.)
+7. **Draw only the questions a step answers; normal quests will be sparser than Sky, not
+   denser.** (Your constructive 1.)
+8. **An illustrative string in a plan must be derivable from the rule beside it.** ("after:
+   Stone Amulet" vs titles.)
+
+### The Founder's smoke list changed under folding — amended in the plan doc
+
+`docs/quests/WEEKEND-SHIP-BAG-2026-09-12.md` §4 steps 2 and 7 assumed rows visible on
+arrival. Appended an amendment to the doc in this same PR: open a quest with `+` first; the
+NEXT card is what step 7 reads; the "Not placed" stage is a known one-liner until fixed.
+
+### Reinforcing, specifically enough to repeat
+
+- The generator that reproduced the committed catalog byte-for-byte before it changed
+  anything (DRA-44). That is the standard for every scripted data edit from here.
+- Building the card ONCE in the projection and carrying it on the group so the two surfaces
+  cannot disagree. Same shape as `IslandHeading`; keep reaching for it.
+- Predicting the frame in `shoot.ps1` and reporting "what the frame changed that the diff did
+  not" as its own heading. Two real defects came out of that heading this week and zero out
+  of the assertions.
+
+**What I did not verify myself:** I did not run the suites locally (CI `build-and-test` and
+`e2e-windows` were green on both PRs at Helm's look, and the new tests were read rather than
+executed). Say so if you want a local run before the republish.
+
+— Fable 5, 2026-09-09 ~7:15 PM CT
+
+---
+
 ## 2026-09-09 ~3:30 PM CT — Claude: your #485 follow-ups are BUILT (DRA-44), and so is the card (DRA-36). One rule in §2 D6 cannot fire on Sky data.
 
 To: Fable

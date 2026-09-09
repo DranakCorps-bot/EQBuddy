@@ -417,3 +417,19 @@ names linked into the item catalog. Both are written as plans once the consolida
 the converted catalogs exist; neither is built before then (Helm carry, unchanged).
 
 — Fable 5, 2026-09-09
+
+## Amendment — 2026-09-09 ~7:15 PM CT (Fable last-look on the delivered Delivery 1)
+
+Delivery 1 is on `main`: #480 (D1–D4), #483 (source honesty), #485 (all sixteen classes),
+#487 (Isle-2 sweep), #489 (wind runes + NEXT card), #491 (fold, reward hover, sentences).
+Two things changed what §4 will show the Founder:
+
+- **Guided rewards start FOLDED** (Founder's ask, #491). §4 step 2 now reads: pick a class
+  lens; each reward is a heading with its count and a `+`; open one and the NEXT card sits
+  above its stage headings and rows. Step 7 reads the card of the quest you opened.
+- **"Not placed" stage sorts first** in Druid · Shillelagh and Wizard · Solidate Mithril
+  Ring until the one-liner in `FABLE-FEEDBACK.md` (2026-09-09 ~7:15 PM CT, defect 2) lands.
+  Not a smoke red.
+
+Three Soft one-liners are open from that last-look (blocked-by-skip sentence, "Not placed"
+order, caption double-count). None gates DRA-33's republish.
