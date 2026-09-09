@@ -9,6 +9,9 @@ label renames to "Quest," and a prior "rename the window title to Quests" instru
 superseded). Faces/docs only — no `src/` touched, no WhatsNew, Play Console OFF. Soft seat
 `gear-menu-slim-faces` / `bevel-gear-menu-slim`.
 
+**PR:** https://github.com/DranakCorps-bot/EQBuddy/pull/460 (docs/faces only, branch
+`claude/bevel-gear-menu-slim-faces-20260908`).
+
 Full faces: `docs/BEVEL-gear-menu-slim-faces.md` (new). Standing note:
 `BEVEL.md` (this date, ~7:16 PM CT). **Soft shots** backing this ask, all three from this
 session's owner QA:
