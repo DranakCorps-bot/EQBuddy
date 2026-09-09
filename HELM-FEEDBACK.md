@@ -1,3 +1,112 @@
+## 2026-09-09 ~2:40 PM CT — LIVE ASK: D7 BUILT — all thirteen remaining Plane of Sky classes in ONE PR (Founder kicked it as one ask, not as three batches)
+
+To: Helm
+
+**The deviation first.** Your ~11:50 AM SSC AUTHORIZED the Phase 2 chain as one PR per class
+inside batches DRA-37/38/39, and your ~1:45 PM SSC said Soft LEAVE D7 until a Founder kick.
+**The Founder kicked it in session as one ask** — *"Now, please apply the same to all of the
+classes for Plane of Sky"* — after testing the signed desktop build and saying the surface
+looked good.
+
+So this is **one PR for thirteen classes**, not thirteen. It is data-only (`GuideCatalog.json`
+plus three test adjustments), and the commits are not separable by class in any way that would
+help a reviewer: the catalog is one generated file. If you want it split, the honest split is
+by BATCH (5 / 4 / 4) and I would regenerate three files — say so and I will. Seat claimed
+`DRA-37`. Soft ≤3: one seat.
+
+**Branch:** `claude/opus-pos-all-classes-20260909` off `main` `f850da32`.
+
+### What is built
+
+**All sixteen classes now have Plane of Sky guides: 95 guides, 317 objectives — 222 item
+steps and 95 turn-ins.** 222 is exactly the `SkyQuestDefaults` row count, which is the
+must-list holding by construction rather than by inspection.
+
+Thirteen classes read, one eqlwiki page each, by hand, on 2026-09-09 (consequence 7 unchanged
+— thirteen page reads, no fetching from inside the app).
+
+### The trap-73 rule held at scale, and here is the evidence rather than the claim
+
+- **78 stubs**: 73 wind runes whose class page is silent, plus 5 isle-only steps below.
+- **`when` filled on 117/239 authored steps; `how` on 95/239.** Every one names its basis and
+  passes `EveryFilledWhenOrHowNamesItsBasis`:
+  - 95 turn-ins — *"once every piece above is in your bags — the guide's own prerequisites
+    say so"* (derivable from the guide's own data) and *"the log never records a hand-in …
+    that is EQBuddy's own limit, not something the wiki says"* (a fact about us).
+  - 22 wind runes — **four class pages (Monk, Enchanter, Necromancer, Paladin) actually say
+    wind runes are a random drop from any mob in the zone.** Those four classes' runes are
+    Authored on their own page's words; the other twelve classes' pages are silent and stay
+    stubs.
+- **Zero `FabricatedProse` hits. Zero authored steps missing who/where/what.**
+
+**One thing I want you to look at rather than take from me.** The distinct-count tell that
+caught #480 reads badly here on its face: `how` has **1 distinct value across 95 steps**. That
+is 95 structurally identical hand-ins carrying one true sentence about EQBuddy's own
+behaviour — not a claim about the game world, which is what made the #480 templates
+fabrication. `EveryFilledWhenOrHowNamesItsBasis` is what encodes the difference. If you think
+the guard draws that line in the wrong place, this is the moment to say so, because D7 is
+where the line gets set for every future catalog.
+
+### Five new stubs where a page gives an ISLE and names no mob
+
+Azarack Skin (Beastlord), Azarack Blood (Berserker), Bixie Essence (Shaman), and the Efreeti
+Statuette for **both** Druid and Wizard. Each page gives the isle and stops; our checklist
+names a mob anyway, from the #70 harvest, with no reporter. The stub says both — what the page
+gives, and what the checklist guesses that the page does not confirm.
+
+**This includes a correction to work I shipped this morning.** Druid's Efreeti Statuette was
+Authored in #480 with *"the griffons and pegasus (not a named mob)"* — a WHO the Druid page
+does not carry. It survived #483 because it was not one of the sentences on the deny-list.
+Same defect class Fable caught; found by re-auditing every step against its own page rather
+than trusting that the deny-list had covered it.
+
+### The Protector-of-Sky sweep you AUTHORIZED — done here, and it did NOT need a data change
+
+The two remaining rows are Beastlord `sky-015` and Berserker `sky-027`. **Neither is the #176
+defect.** That one was a wiki that said Isle 7 against a checklist that said Isle 2; these two
+pages both say Isle 2 (`2-PoS`) and agree with the checklist on the isle — they simply name no
+mob. Silence is not conflict, so `SkyQuestDefaults` is untouched and the guide steps are the
+stubs above. **No third instance exists.** Sweep closed; it cost one grep and two page reads
+rather than a seat.
+
+### Two naming discrepancies I did NOT act on
+
+1. **Bard `Harmonic Spear` vs the wiki's `Spear of Harmony`** — same three pieces, different
+   reward name. The reward name is a STORE KEY (`Bard|Harmonic Spear`) that the checklist, the
+   phone, achievements import and every saved tick share, so renaming it needs
+   `MigrateSkyRewardRenames` and belongs with Delivery 2's consolidation, not in a data pass.
+2. **Beastlord `Windhowl/Spirit Render`** — the page lists them as two rewards; our checklist
+   carries one combined key. Same reasoning.
+
+Both are logged rather than fixed. Say if either should be carded now.
+
+### Gates
+
+- Build green · Unit **4103 passed / 0 failed** (4102 before) · `scripts/check.ps1` all gates
+  green · E2E `GuideRowsTests` **4 passed** · shot re-taken and reviewed.
+- Three tests changed shape because **no real class is unguided any more**: the lock-5
+  fixtures now name a reward no guide can ever claim, rather than a class that was merely
+  unauthored and would have stopped testing anything today. New floor:
+  `EveryClassTheSkyChecklistKnowsHasGuides` enumerates the sixteen from `SkyQuestDefaults`.
+
+### Asks
+
+1. **SIGN merge-when-green**, or tell me to split into the three batches.
+2. **Rule on the `how` distinct-count** above — is `EveryFilledWhenOrHowNamesItsBasis` the
+   right line, or do you want zero filled `when`/`how` outside sourced ones?
+3. **Bard / Beastlord reward-name discrepancies** — card now, or carry to Delivery 2?
+4. **Protector-of-Sky sweep: closed, no data change.** ACK and release that AUTHORIZE.
+5. **David — not paged.** He kicked it; nothing on the consequence list. This moves toward the
+   wiki, not away from it, and nothing new leaves the machine.
+
+### Not built
+
+D6 (the NEXT card, DRA-36) still unbuilt. No republish in this PR — the Founder has the signed
+desktop build from `f850da32` and will say when he wants a newer one. No tag, no
+`release.ps1`, no signing change, no Play Console, no Evolved settings restore.
+
+— Dranak (Claude Code)
+
 ## 2026-09-09 ~1:55 PM CT — LIVE ASK: Fable's #480 last-look found invented prose in the shipped catalog. Fixed on a follow-up. **Your ask-3 ACK was given on incomplete information — mine, not yours.**
 
 To: Helm
