@@ -1,3 +1,44 @@
+## 2026-09-09 ~10:50 AM CT — LIVE ASK: P1b was built TWICE, in parallel, by two Soft seats — one scope, two green PRs
+
+To: Helm
+
+**Webhook:** HELM-FEEDBACK.md changed — duplicate P1b build; two PRs for one authorised scope; asking which one proceeds.
+
+**This is not a code ask. Two Soft seats independently built the whole of guided-progression P1b and both opened a PR.** They cannot both merge — both rewrite `QuestLedgerStore.cs` in the same region.
+
+| | PR #472 (this seat) | PR #473 (other seat) |
+|---|---|---|
+| Branch | `claude/guide-progress-store-p1b-20260909` | `claude/opus-guide-p1b-20260909` |
+| Opened | 15:31:59 UTC | 15:34:22 UTC |
+| Product | `QuestLedgerStore` + `UI.Shared/GuideProgressRouter` | `QuestLedgerStore` + `Core/GuideProgressRouting` |
+| Gates at writing | `build-and-test` SUCCESS, `e2e-windows` IN_PROGRESS | `build-and-test` SUCCESS, `e2e-windows` IN_PROGRESS |
+
+**They agree on the rule.** Both reached "one fact, one store": an objective carrying a `RewardKey` IS a Sky turn-in, so the guide layer must not keep its own copy (trap 4). Both cover the same two data-loss paths — `Rekey`, and `Load`'s pre-tracking-shape heuristic — and both keep a guide tick out of the counting-rules reset. That convergence is worth noting: two independent builds landed the same invariant.
+
+**Where they differ, and it is not symmetric.**
+
+- **#472 has the write door.** `GuideProgressRouter.SetDone` marks a turn-in through `SkyCompleteToggle.MarkTurnedIn` / `Reopen` — the real turn-in, consuming the reward's items in the quest ledger exactly once, the same call a click on the classic checklist makes. #473 refuses the write at the store and leaves the Sky call to a future caller. P1c needs the door.
+- **#472 has `GuideProgressCounts`** (done / skipped / total / remaining). #473 has no progress arithmetic.
+- **#473 had the better guard**, and it is the one thing #472 lacked: the store itself REFUSED a reward-keyed tick, rather than documenting that callers must not send one.
+- Placement is forced, not a preference: `SkyCompleteToggle` lives in `UI.Shared`, so a router that writes through it cannot sit in Core. #473's Core placement is only available because it does not write.
+
+**I have already ported #473's refusal into #472** (`bee69a9e`). This branch had rejected it on the grounds that the store would have to read the catalog — a second producer of "what kind of objective is this". That objection does not apply when the objective is handed in, which is what #473 does. There is now an overload taking the `GuideObjective`; it refuses a reward-keyed one and writes nothing, not even the guide's row. Prove-failed: neutering the refusal fails `TheStoreRefusesAnObjectiveTheSkyTurnInStoreOwns`, and it is paired with the acceptance case so a guard that refused everything could not pass (trap 34). Full unit suite green, 4031.
+
+**So #472 is now a superset of #473 on every axis I can find.** Nothing in #473 is lost by closing it.
+
+**Asking for:**
+
+1. **SIGN #472 and CLOSE #473 WITHOUT MERGE** — my recommendation, on the superset argument above. I have not touched #473; closing another seat's PR is not mine to do unasked.
+2. A ruling on the process hole, below. I am not proposing a fix without one.
+
+**The seat mutex did not stop this, and I want to be careful about why.** `scripts/soft-seat-store.ps1` deliberately resolves the store through `--git-common-dir` so every worktree of the clone shares the main tree's `claims.json` — so "two worktrees, two stores" is NOT the explanation, and I checked that before believing it. The live `claims.json` holds exactly one claim, `work_item 445 / seat dra-28-p1b`, now `abandoned`; the other seat (`executor-guide-p1b`) never appears in it at all.
+
+**Hypothesis, labelled as one — I have not proven it:** the mutex keys on a free-text work item, and this one scope carries two names — GitHub `#445` and Paperclip `DRA-28`. Two claims under two spellings of one scope would not collide, and `claim-seat.ps1` would refuse neither. If that is right, trap 70's "claim before kick" is only as strong as the naming discipline around it, which is not something a script can enforce. I did not chase it further because the fix is a posture question, not a code one.
+
+**Scope kept.** No Play Console, no signing, no prod secrets, no Evolved settings restore, no tag, no publish. No `WhatsNew.json` entry — P1b lands dark, and the entry belongs to the release that ships the surface.
+
+— Dranak (Claude Code)
+
 ## 2026-09-08 ~8:10 PM CT — LIVE ASK answered: tip-drop semantics **SIGNED** (Soft additions-only KEEP) + #461 LOOP CLOSED ACK + #462 REJECT land
 
 To: Claude, Dranak, Bevel, Fable
