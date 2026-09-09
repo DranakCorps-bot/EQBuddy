@@ -1,5 +1,47 @@
 # Bevel inbox
 
+## 2026-09-08 ~7:16 PM CT — Faces: expanded gear menu slim to 4 (DRA-25) + Guide rail → "Quest" rename (Bevel)
+To: Helm
+
+**Priority:** `approved` (owner lock ~7:01 PM CT + correction ~7:16 PM CT) — faces only,
+Helm SIGN required before Soft Opus implements.
+**Place:** `docs/BEVEL-gear-menu-slim-faces.md` (new, full faces). `MainWindow.xaml:82-121`
+(the five expanded-only rows to cut); `HistoryPresentation.cs:455-458` (`StudioPointer`,
+the stale-text risk if Session history's row is cut without a replacement door);
+`ShellPages.cs:214-224` (`Label`, six call sites, only one of which — the window
+`Title` — should keep saying "Guide"); `RailRow.cs`, `HomeReadout.cs:210`,
+`ShellWindow.xaml.cs:360,538,545`.
+**Source:** owner live QA this session, both via `HELM-FEEDBACK.md`/session lock text and
+three shots in `C:\Users\david\source\EQBuddy\.claude\soft-captures\20260908-owner-qa\`
+(`expanded-gear-menu-screen.png`, `expanded-gear-full-menu.png`,
+`options-cards-live-desktop.png`).
+
+**The lock, in one line:** expanded gear becomes **Options… · World… · Mobile… ·
+Guide…** only, matching the mini bar (#451). Cutting **Session history…,
+Click-through, Edit HUD, Data & imports, Help** from the expanded menu — Edit HUD is a
+straight cut (the title-bar pencil already does its job); the other four get real
+destinations, not just a deletion. Separately, the Evolved shell's **sidebar rail** label
+for the Guide/Quests room renames **"Guide" → "Quest"**; the window title
+(`EQBuddy — Guide`) and the menu door (`Guide…`) are both unaffected — a prior "rename the
+window title to Quests" instruction is superseded.
+
+**Worth flagging on its own:** `HistoryPresentation.StudioPointer` tells a player today to
+"right-click the EQBuddy widget and choose 'Session history…'" to reach the History
+studio's deeper jobs (compare, export, delete, notes). That row is one of the five this
+lock cuts. Shipping the cut without also giving the studio a new door and rewriting that
+sentence would land a trap-20-shaped defect (a sentence naming a control that no longer
+exists) in the SAME PR that removes the control — flagged as a MUST-FIX pairing in the
+faces doc, not a follow-up.
+
+**Not built:** no `src/` change this pass. No WhatsNew (both moves are player-visible and
+each earns an "X is now Y" line when Opus implements, drafted in the faces doc for that
+PR to lift). Soft LEAVE re-opening `docs/BEVEL-cog-options-ia-faces.md` §E's other calls —
+only the rows this new lock names are in scope.
+
+— Bevel, 2026-09-08 ~7:16 PM CT
+
+---
+
 ## 2026-09-08 ~2:15 PM CT — STANDING LOCK: Evolved cog / Options IA (Helm SIGNED ~2:13; owner Guide amendment ~2:15)
 
 **Lock (owner amendment ~2:15 PM CT, on top of Helm SIGN ~2:13):** mini right-click =
