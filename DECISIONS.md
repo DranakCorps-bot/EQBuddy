@@ -1,3 +1,43 @@
+## 2026-09-09 (P1b was built twice — what I decided on my own, and what I did not)
+
+Two Soft seats independently built the whole of guided-progression P1b and both opened a
+green PR: #472 (this seat) and #473. One authorised scope, two implementations that both
+rewrite `QuestLedgerStore.cs` in the same region. They cannot both merge.
+
+**Decided, and logged rather than asked: I ported #473's store-level refusal into #472
+before any ruling, instead of waiting to find out which PR survives.**
+
+The default it could have gone the other way on: leave both PRs untouched, let Helm pick,
+and accept that whichever loses takes its good ideas with it. That is the tidier process
+answer, and it is what I would do if the two PRs disagreed about the RULE. They do not —
+both reached "one fact, one store", and the only real asymmetry was that #473 enforced it
+one layer lower. Porting the one thing #472 lacked costs a small commit and makes the
+ruling cheap: whichever way Helm goes, nothing of value is lost. Leaving it would have
+meant either a worse merged result or a second round of work after the ruling.
+
+Concretely: this branch had REJECTED a store-level refusal in a comment, reasoning that the
+store would have to read the catalog to tell a turn-in from a step — a second producer of
+"what kind of objective is this" (trap 4, again). That objection is real but does not apply
+to #473's shape, because the objective is handed IN rather than looked up. So `QuestLedgerStore`
+now has an overload taking the `GuideObjective` that refuses a reward-keyed one and writes
+nothing, not even the guide's row. The router calls that one; the id form stays the primitive.
+Prove-failed (trap 34): neutering the refusal fails `TheStoreRefusesAnObjectiveTheSkyTurnInStoreOwns`,
+and it is paired with an acceptance case so a guard that refused everything could not pass.
+
+**NOT decided by me, and filed as a LIVE ASK instead:** which PR proceeds, and whether #473
+is closed. Closing another seat's PR is not mine to do unasked, so #473 is untouched. The
+recommendation on the ask is SIGN #472 / CLOSE #473, on the grounds that #472 is now a
+superset — it additionally carries the write door through `SkyCompleteToggle` (the real
+turn-in, item consume and all) and `GuideProgressCounts`, neither of which #473 has.
+
+**Also not decided: the process hole.** The seat mutex did not prevent this. I checked the
+obvious explanation and it is wrong — `soft-seat-store.ps1` resolves through `--git-common-dir`
+specifically so every worktree shares the main tree's `claims.json`. The live store holds one
+claim (`work_item 445` / `dra-28-p1b`, now `abandoned`) and the other seat never appears in it.
+My hypothesis, labelled as one and not acted on: the mutex keys on a free-text work item and
+this scope has two names (`#445` and `DRA-28`), so two claims under two spellings would not
+collide. A fix there is posture, not code, so it went to Helm rather than into a script.
+
 ## 2026-09-08 (the prose policy's hover side — a ceiling built, and a copy rule NOT written)
 
 Authority: the reporting duty, not an asking one. Nothing here is a consequence-list door —
@@ -3008,5 +3048,55 @@ is the part that was missing.
 **One thing the README records that is worth having outside it:** `shoot.ps1 -Shot` with
 several names needs `pwsh -Command` and a real array. Under `-File` the whole list arrives
 as ONE string and the script throws `Unknown shot '...'`. Cost about ten minutes.
+
+— Dranak (Claude Code)
+
+## 2026-09-09 — Guided-progression P1b: four calls made under pre-authorization
+
+Signed #445 P1b (DRA-28, PR #472). None of these touch the consequence list: no player
+privacy, no values line, no roadmap direction, no release, nothing public. Logged rather
+than asked, per the reporting duty.
+
+**1. The router lives in `UI.Shared`, not Core.** The plan named the mechanism
+("one-writer routing") without naming a project. The write side has to call
+`SkyCompleteToggle.MarkTurnedIn` — that is where "turning in acquires every item in the
+reward" lives, and it is the same call the classic checklist's own button makes. Core
+cannot reference UI.Shared, so the only Core-resident alternative was to call
+`QuestChecklistLayout.MarkRewardTurnedIn` directly and skip the ledger's completion
+record, which is a SECOND definition of "turned in" — the exact thing
+`MarkRewardTurnedIn`'s own doc comment says it was extracted to prevent. **The default it
+could have gone the other way on:** "stores live in Core, so the store's router should
+too." **What would reverse it:** moving `SkyCompleteToggle` into Core, which is a
+Phase-3-consolidation-sized change and not this PR's.
+
+**2. A reward objective CAN be skipped, and the skip lives in the guide ledger.** Done
+routes to the Sky turn-in store; skip has no home there. The plan's §4 did not decide it.
+"I am not doing this step" is a different fact from "I turned this in" — only one of them
+has another home — so storing it in the guide ledger is not the trap-4 duplication the
+whole router exists to prevent. Skipping never undoes a turn-in that already happened: a
+hand-in is a fact about the past, a skip is a statement about the future. **The default it
+could have gone the other way on:** refusing skip on reward rows entirely, which is
+tidier and takes an affordance away from the player for a reason that is ours and not
+theirs. **What would reverse it:** Bevel's P1d faces wanting "skipped" to mean something
+narrower, e.g. "not this session". One-line change now, a migration later.
+
+**3. `LastUpdated` is UTC.** Every other time in this store is a LOG timestamp, which is
+local. This one is a player action's wall clock and nothing in the log produces it, so
+storing local would make a profile that crossed a DST boundary or a machine disagree with
+itself. Written into the field's doc comment, because the renderer that eventually prints
+it has to convert. **What would reverse it:** nothing likely; if a surface ever needs to
+say "you did this at 9pm", it converts.
+
+**4. No `WhatsNew.json` entry, and the P1b PR says so out loud.** P1b lands dark — nothing
+renders it until P1c. The rule is that every player-noticeable change needs an entry *in
+the release that ships it*; an entry now would describe a capability no player can reach,
+which is the untrue-entry failure the release review exists to catch. **What would reverse
+it:** P1c/P1d shipping in the same release, in which case ONE entry covers the guide
+surface and names this as its foundation, not four entries for four PRs.
+
+**One thing not decided, and deliberately left open:** whether the per-profile Sky ticks
+ever move into this per-character store. That is §8's Phase-3 consolidation, it has its
+own plan coming, and `MigrateSkyRewardRenames` is the named precedent for moving keys
+without losing ticks. P1b copies the wart rather than curing it, knowingly.
 
 — Dranak (Claude Code)

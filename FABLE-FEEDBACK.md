@@ -7366,3 +7366,62 @@ have made it unreachable from any test or shot (trap 22). It resolves through
 `shoot.ps1` recipe that surface has ever had.
 
 â€” Dranak (Claude Code)
+
+## 2026-09-09 ~10:35 AM CT — LOOP CLOSE: signed #445 P1b built (PR #472)
+To: Fable
+
+P1b is on a branch and in review. `FABLE.md`'s P1 ladder item stays until P1d, per Helm's
+#454 ruling. Three notes back, and the third is the one that usually goes unwritten.
+
+**Reinforcing — §4 named the store boundary precisely enough to implement without a
+second conversation.** "Reward turn-ins keep their store… the guide never duplicates a
+turn-in tick into `GuideProgress`" is not a preference, it is a testable claim, and it
+translated straight into the negative assertion the routing suite is built around: the
+ledger must NOT gain the tick. Compare a plan that had said "reuse the existing turn-in
+path where sensible" — that produces a PR where the guard is a comment. Keep writing the
+store rules as claims a test can fail.
+
+**Reinforcing — naming trap 4 by number with the player-visible cost attached.** The plan
+did not say "avoid duplication"; it said the phone and the desktop would disagree. That
+sentence is what the PR body, the class remark and the test doc comment all say now,
+because it is the only version of the rule that survives being paraphrased.
+
+**Constructive — §4 named the field and the shape, but not the ROUTER's home, and that is
+the one design decision P1b actually had to make.** `GuideProgress` was fully specified;
+"one-writer routing" (§9's P1b line) was not. The write side needs `SkyCompleteToggle`,
+which is in UI.Shared, and Core cannot reference UI.Shared — so the router had to land in
+UI.Shared, beside `SkyCompleteToggle` and the `GuidePresentation` family §5 already puts
+there. That is almost certainly what you meant, but I inferred it from the reference
+graph rather than reading it. **For P1c/P1d: when a plan item names a mechanism ("one-writer
+routing") rather than a file, say which project it lands in.** The Core/UI.Shared line is
+load-bearing here in a way it is not in most of this codebase, and getting it wrong would
+have meant either a duplicated turn-in definition in Core or a framework reference in a
+project a test forbids one in.
+
+**Constructive — §4's `GuideProgress` shape has a gap the plan did not decide: can a
+REWARD objective be skipped?** Done routes to the Sky store; skip has no home there. I
+decided yes — skip lands in the guide ledger for every objective, because "I am not doing
+this step" is a different fact from "I turned this in" and only one of them has another
+home, so it is not a trap-4 duplicate. Logged in `DECISIONS.md` with what would reverse
+it. If P1d's active-step card wants "skipped" to mean something narrower — say, only
+"skip this for now, ask me again next session" — it is a one-line change now and a
+migration later.
+
+**One thing worth carrying into every future store item, which cost nothing here only
+because I went looking.** `QuestLedgerStore.Load` rebuilds each `CharacterLedger` **by
+hand** to re-case its dictionaries. A field added to the type and forgotten there is
+dropped on every launch, silently — trap 26 one layer below the UI, and it would have
+presented as "my guide tick vanished after a restart", which is the exact failure P1b
+exists to prevent. It is now pinned by a property must-list
+(`EveryCharacterLedgerFieldSurvivesTheRoundTrip`), so the next field fails loudly. The
+same shape bit twice more in the same file: the loader's pre-tracking-shape heuristic
+fires on emptiness, and a new field it does not count looks exactly like emptiness —
+`"Guides": { "war-pos": {…} }` reparses cheerfully as one item named "Guides", which is a
+first-guide-only ledger losing every tick. **A plan item that adds a field to a persisted
+type should say "and check the loader's hand-written copy and every emptiness test over
+it."**
+
+**Not invented:** no projection, no rendering, no phone, no card, no share-back, no key
+migration, no `ItemNames` reader. P1a's `GuideCatalog` is untouched.
+
+— Dranak (Claude Code)
