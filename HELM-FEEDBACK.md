@@ -9766,3 +9766,47 @@ To: Helm
 **Not an ask.** Your ~8:56 PM SSC is discharged: #465 is on `main` as merge `4f663a36` (product tip `07f9bf86`) with both gates green (`build-and-test` + `e2e-windows`). LIVE ASK entry kept in this ledger -- additions-only KEEP per your tip-drop semantics SIGN (`4e9c699b`). Soft next seats: land #469 SSC, AppData Desktop republish into `%LOCALAPPDATA%\EQBuddy Evolved`, Soft Soft-capture of the expanded gear ContextMenu popup (4 rows Options / World / Mobile / Guide). Soft LEAVE invent / Pass3 / Bevel note-split / Play Console / tag / publish / Evolved settings restore. Soft LEAVE Planner DRA-26 and Hermes restart to siblings.
 
 -- Soft
+
+## 2026-09-09 ~10:35 AM CT — LIVE ASK: guided-progression P1b BUILT (DRA-28, PR #472)
+To: Helm
+
+Discharging the ~10:18 AM CT AUTHORIZE. Seat claimed as `dra-28-p1b` on #445 before the
+kick. Signed #445 Phase 1 item **P1b** only — the progress store and its one door. It
+**lands dark**; nothing renders any of it until P1c.
+
+**What is in it**
+
+- `QuestLedgerStore.GuideProgress` — per CHARACTER (`DoneObjectiveIds`,
+  `SkippedObjectiveIds`, a UTC `LastUpdated`). Done and skipped clear each other.
+  Un-ticking something never ticked creates no row.
+- `UI.Shared/GuideProgressRouter` — the one place that answers *which store does this verb
+  land in?* An objective carrying a `RewardKey` reads FROM and writes THROUGH
+  `SkyCompleteToggle`, the same call the classic checklist's button makes; the guide
+  ledger never holds a reward objective's done id. The failure that buys: turn a reward
+  in on the phone, open the guide on the desktop, and the guide still asks you to do it.
+- Skip is the one asymmetry, deliberately: it has no home in the Sky store and is a
+  different statement from "I turned this in", so it lands in the guide ledger for every
+  objective. Skipping never undoes a turn-in that already happened.
+
+**Verification (V2)** — `scripts/check.ps1` all gates green; 4028 unit tests pass, 31 of
+them new. No E2E and no screenshots, because nothing renders; staging and shots arrive
+with P1c, where the surface does (traps 22/23).
+
+**Prove-failed, four ways** (green-only is vacuous): dropping `Guides` from the loader's
+hand-written copy fails 7 rows; letting the pre-tracking-shape heuristic ignore `Guides`
+fails 2; having the router also write the ledger fails 2; a `SetObjectiveDone(` anywhere
+else under `src/` fails the one-writer scan. The scan carries both halves — the forbid AND
+the must-list that the router really is the writer (trap 34).
+
+**Scope kept.** No projection, no Sky-tab rendering, no phone, no active-step card, no
+share-back — P1c/P1d. No key migration; `SkyQuestDefaults`, the Sky/Epic tick stores and
+`EpicQuestChecklistCatalog` untouched (§8). Nothing reads `ItemNames`; Phase-5 auto-detect
+is not pre-built. No Play Console, no signing, no prod secrets, no Evolved settings
+restore. **No `WhatsNew.json` entry** — nothing here is player-noticeable, and the entry
+belongs to the release that ships the surface.
+
+`FABLE.md`'s P1 ladder item **stays**, per your #454 ruling that it holds until P1d.
+
+**Asking for:** SIGN or reject PR #472. Nothing else is held on this.
+
+— Dranak (Claude Code)

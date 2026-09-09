@@ -3010,3 +3010,53 @@ several names needs `pwsh -Command` and a real array. Under `-File` the whole li
 as ONE string and the script throws `Unknown shot '...'`. Cost about ten minutes.
 
 — Dranak (Claude Code)
+
+## 2026-09-09 — Guided-progression P1b: four calls made under pre-authorization
+
+Signed #445 P1b (DRA-28, PR #472). None of these touch the consequence list: no player
+privacy, no values line, no roadmap direction, no release, nothing public. Logged rather
+than asked, per the reporting duty.
+
+**1. The router lives in `UI.Shared`, not Core.** The plan named the mechanism
+("one-writer routing") without naming a project. The write side has to call
+`SkyCompleteToggle.MarkTurnedIn` — that is where "turning in acquires every item in the
+reward" lives, and it is the same call the classic checklist's own button makes. Core
+cannot reference UI.Shared, so the only Core-resident alternative was to call
+`QuestChecklistLayout.MarkRewardTurnedIn` directly and skip the ledger's completion
+record, which is a SECOND definition of "turned in" — the exact thing
+`MarkRewardTurnedIn`'s own doc comment says it was extracted to prevent. **The default it
+could have gone the other way on:** "stores live in Core, so the store's router should
+too." **What would reverse it:** moving `SkyCompleteToggle` into Core, which is a
+Phase-3-consolidation-sized change and not this PR's.
+
+**2. A reward objective CAN be skipped, and the skip lives in the guide ledger.** Done
+routes to the Sky turn-in store; skip has no home there. The plan's §4 did not decide it.
+"I am not doing this step" is a different fact from "I turned this in" — only one of them
+has another home — so storing it in the guide ledger is not the trap-4 duplication the
+whole router exists to prevent. Skipping never undoes a turn-in that already happened: a
+hand-in is a fact about the past, a skip is a statement about the future. **The default it
+could have gone the other way on:** refusing skip on reward rows entirely, which is
+tidier and takes an affordance away from the player for a reason that is ours and not
+theirs. **What would reverse it:** Bevel's P1d faces wanting "skipped" to mean something
+narrower, e.g. "not this session". One-line change now, a migration later.
+
+**3. `LastUpdated` is UTC.** Every other time in this store is a LOG timestamp, which is
+local. This one is a player action's wall clock and nothing in the log produces it, so
+storing local would make a profile that crossed a DST boundary or a machine disagree with
+itself. Written into the field's doc comment, because the renderer that eventually prints
+it has to convert. **What would reverse it:** nothing likely; if a surface ever needs to
+say "you did this at 9pm", it converts.
+
+**4. No `WhatsNew.json` entry, and the P1b PR says so out loud.** P1b lands dark — nothing
+renders it until P1c. The rule is that every player-noticeable change needs an entry *in
+the release that ships it*; an entry now would describe a capability no player can reach,
+which is the untrue-entry failure the release review exists to catch. **What would reverse
+it:** P1c/P1d shipping in the same release, in which case ONE entry covers the guide
+surface and names this as its foundation, not four entries for four PRs.
+
+**One thing not decided, and deliberately left open:** whether the per-profile Sky ticks
+ever move into this per-character store. That is §8's Phase-3 consolidation, it has its
+own plan coming, and `MigrateSkyRewardRenames` is the named precedent for moving keys
+without losing ticks. P1b copies the wart rather than curing it, knowingly.
+
+— Dranak (Claude Code)
