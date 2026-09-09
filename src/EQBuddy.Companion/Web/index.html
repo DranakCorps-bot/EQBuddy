@@ -212,6 +212,7 @@
      thing that says "do this next" belongs where the eye lands. */
   .gcard { border:1px solid var(--hairline); border-radius:8px; padding:10px 12px; margin:6px 0 10px; }
   .gcard .lead { font-size:11px; color:var(--accent); letter-spacing:.06em; }
+  .reward { font-size:12px; color:var(--dim); margin:2px 0 6px; }
   .gcard .inst { font-weight:600; margin:2px 0 6px; }
   .gcard .gl { display:block; font-size:12px; color:var(--dim); margin-top:2px; }
   .gcard .warn { display:block; font-size:12px; margin-top:6px; }
@@ -1636,8 +1637,10 @@ function boot() {
     box.appendChild(el("div", "lead", c.lead));
     box.appendChild(el("div", "inst", c.instruction));
     if (c.stub) box.appendChild(el("span", "warn", c.stub));
-    for (const [label, value] of [["Where: ", c.where], ["What: ", c.what], ["Who: ", c.who]])
-      if (value) box.appendChild(el("span", "gl", label + value));
+    // Sentences, not labelled fields. The detail line appears only when it says something
+    // the instruction did not.
+    for (const line of [c.directions, c.detail])
+      if (line) box.appendChild(el("span", "gl", line));
     if (c.why) box.appendChild(el("span", "gl", c.why));
     if (c.beforeLeaving) box.appendChild(el("span", "warn", c.beforeLeaving));
     // No next step: the finished sentence and no verbs. A button with nothing to do is a
@@ -1776,6 +1779,13 @@ function boot() {
       h.append(el("span", null, g.heading));
       if (g.note) h.append(el("span", "note", g.note));
       wrap.appendChild(h);
+      // What this quest pays. The desktop hangs it on the heading's hover; a phone has no
+      // hover, so it is drawn - and on a folded quest it is the only thing that answers
+      // "what do I get" (trap 35).
+      if (g.reward) wrap.appendChild(el("div", "reward", g.reward));
+      // FOLDED: heading, note and reward, and nothing else. A whole class fits on one
+      // screen and you open the one you are working on.
+      if (g.collapsed) continue;
       // The active-step card, between the heading and the rows. Every string arrives
       // worded from GuidePresentation; this decides layout only.
       if (g.card) wrap.appendChild(guideCard(surface, g.card));

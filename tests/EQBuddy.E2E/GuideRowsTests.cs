@@ -45,6 +45,9 @@ public class GuideRowsTests
             {
                 s.SkyQuestChecklist.AddRange(SkyQuestDefaults.Items.Select(i => i.Clone()));
                 s.SkyQuestChecklist.Single(i => i.Id == "sky-198").Acquired = true;
+                // Folded quests draw no rows, so a fixture about a ROW has to open them.
+                s.GuideExpanded.AddRange(WarriorGuides.Select(
+                    GuideChecklistProjection.RewardKeyOf));
             },
             new Dictionary<string, string> { ["EQBUDDY_SHELL"] = "quests:sky" });
         app.Launch();
@@ -54,12 +57,25 @@ public class GuideRowsTests
         Assert.Equal(1, app.DumpValue("questsSkyAcquired"));
     }
 
+    /// <summary>
+    /// The fixture, with the Warrior's rewards EXPANDED.
+    ///
+    /// <para>Guided quests start folded as of 2026-09-09 (DRA-45) so a class fits on one
+    /// screen — which means a fixture that expands nothing renders no rows and no card, and
+    /// every count below would be asserting the fold rather than the guide. The tests here
+    /// are about what a quest shows when you open it, so the fixture opens them.</para>
+    ///
+    /// <para>Expanded through the SAME key the UI writes (<c>Class|Reward</c>), derived from
+    /// the catalog rather than typed, so re-authoring a class cannot leave this seeding
+    /// silently pointing at nothing (trap 23).</para></summary>
     private static AppHarness Fixture() =>
-        new(environment: new Dictionary<string, string>
-        {
-            ["EQBUDDY_SHELL"] = "quests:sky",
-            ["EQBUDDY_QUESTS"] = "sky",
-        });
+        new(s => s.GuideExpanded.AddRange(WarriorGuides.Select(
+                g => GuideChecklistProjection.RewardKeyOf(g))),
+            new Dictionary<string, string>
+            {
+                ["EQBUDDY_SHELL"] = "quests:sky",
+                ["EQBUDDY_QUESTS"] = "sky",
+            });
 
     /// <summary>
     /// The Warrior's six Plane of Sky rewards draw as guides, and every hollow step says so.
@@ -166,6 +182,35 @@ public class GuideRowsTests
         app.WaitForDump("shellQuestsGuideNext", before + delta,
             "the card to move from the amulet to the wind rune");
         Assert.Equal(1, app.DumpValue("shellQuestsGuideDone"));
+    }
+
+    /// <summary>
+    /// THE LANDING STATE: with nothing expanded, a guided class draws its headings and
+    /// captions and NO steps and NO cards — which is what lets the whole class be read at a
+    /// glance (David, 2026-09-09).
+    ///
+    /// <para>This is the default every other test in this file has to opt out of, and it is
+    /// the change that made three of them fail when it landed. Asserting it here means the
+    /// next person to see zero rows learns it is the fold rather than a broken guide.</para>
+    /// </summary>
+    [Fact]
+    public void WithNothingExpandedAGuidedClassDrawsHeadingsAndNoSteps()
+    {
+        using var app = new AppHarness(environment: new Dictionary<string, string>
+        {
+            ["EQBUDDY_SHELL"] = "quests:sky",
+        });
+        app.Launch();
+
+        app.WaitForDump("shellQuestsTab", "sky", "the shell to reach the Plane of Sky tab");
+        app.WaitForDump("shellQuestsGuideGroups", WarriorGuides.Count,
+            "every guided reward to draw its heading");
+
+        Assert.Equal(0, app.DumpValue("shellQuestsGuideRows"));
+        Assert.Equal(0, app.DumpValue("shellQuestsGuideCards"));
+        // ...and the classic item rows are not drawn in their place either: a folded guided
+        // quest shows its heading, not the list the guide replaced.
+        Assert.Equal(0, app.DumpValue("shellQuestsSkyRows"));
     }
 
     /// <summary>

@@ -610,6 +610,14 @@ public sealed class AppSettings
     /// we know a step is on a specific island"* — and a step on three islands is not on a
     /// specific one.</summary>
     public bool SkyStepsUnderEveryIsland { get; set; }
+
+    /// <summary>Reward keys ("Class|Reward") the player has EXPANDED on a guided checklist.
+    ///
+    /// <para>Stored as the exception rather than the rule, and guided quests start folded:
+    /// the whole point is that a class's rewards fit on one screen and you open the ones you
+    /// are working on (David, 2026-09-09). An opt-OUT list would grow to 95 entries the first
+    /// time somebody scrolled, and would mean a newly authored class arrived expanded.</para></summary>
+    public List<string> GuideExpanded { get; set; } = [];
     /// <summary>Color theme key (see EQBuddy.UI.Shared.ThemeCatalog); defaults to the
     /// original parchment-and-brass look so existing installs don't change on upgrade.</summary>
     public string Theme { get; set; } = "ParchmentBrass";

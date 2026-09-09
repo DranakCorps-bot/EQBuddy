@@ -76,9 +76,14 @@ public sealed record QuestChecklistRow(
 public sealed record QuestChecklistCard(
     string RowId,
     string Instruction,
-    string Where = "",
-    string What = "",
-    string Who = "",
+    /// <summary>Where to go and who to see, as ONE sentence — "Travel to Plane of Sky -
+    /// Isle 5, then fight The Spiroc Lord." Labelled fields (<c>Where:</c> / <c>Who:</c>)
+    /// made the card read as a form under an instruction that had already said most of it
+    /// (David, 2026-09-09).</summary>
+    string Directions = "",
+    /// <summary>The action detail, and only when it says something <see cref="Instruction"/>
+    /// did not — see <c>GuidePresentation.ExtraDetail</c>.</summary>
+    string Detail = "",
     string Why = "",
     string BeforeLeaving = "",
     string StubNote = "",
@@ -118,7 +123,16 @@ public sealed record QuestChecklistGroup(
     /// <summary>The active-step card for this guided group, or null when no guide backs it.
     /// Drawn ABOVE the rows and under the tab chrome — a thing that says what to do next
     /// belongs where the eye lands, not below the list it is summarising (trap 44).</summary>
-    QuestChecklistCard? GuideCard = null)
+    QuestChecklistCard? GuideCard = null,
+    /// <summary>The player folded this reward away. Collapsed shows the heading, its counts
+    /// and its caption and nothing else — which is what lets a whole class fit on one screen
+    /// (David, 2026-09-09: "see all the quests for my class while they're collapsed and then
+    /// dig into the details for each by expanding the ones I want").</summary>
+    bool Collapsed = false,
+    /// <summary>What this quest PAYS, for the heading's hover: the reward and the pieces it
+    /// costs. A player scanning a collapsed list is deciding what to work on next, and
+    /// "what do I get" is the question that decides it.</summary>
+    string RewardSummary = "")
 {
     /// <summary>"Bard · Mask of Song" — what a heading reads as.</summary>
     public string Heading => ClassName + " · " + Title;

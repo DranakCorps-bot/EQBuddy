@@ -472,6 +472,28 @@ $Shots = [ordered]@{
     #     a "Not placed" stage heading - the page gives neither an isle nor a mob for that
     #     piece, so the row does not assert one (the first capture of this frame said "on
     #     Isle 4" one line above a note saying the page gives no isle).
+    # A class's quests FOLDED - the state a player now lands on (David, 2026-09-09: "see all
+    # the quests for my class while they're collapsed and then dig into the details for each
+    # by expanding the ones I want"). Druid, so the one expanded quest has a stub in it.
+    #
+    # NOTHING is expanded here, deliberately: this is the state a player LANDS on, and the
+    # claim being photographed is "a whole class fits on one screen". The expanded state has
+    # its own frame (shell-quests-sky-guide-card); a shot with one quest open spends most of
+    # its height on that quest and proves the opposite of what this row is for.
+    #
+    # PREDICTED before shooting: six "Druid - <reward>" headings, each with its counts, its
+    # "Guide - n of m" caption and a small "+" button, and NOTHING between them - all six
+    # readable without scrolling. The face is +/- rather than words because six "Show steps"
+    # stacked down a folded list is more text than the headings they sit under.
+    'shell-quests-sky-guide-folded' = @{ Title = 'EQBuddy — Guide'
+                           Env = @{ EQBUDDY_SHELL = 'quests:sky'
+                                    EQBUDDY_SHELL_SIZE = '1000x900' }
+                           Ledger = @{ Classes = @('Druid') }
+                           Set = @{
+                               SkyQuestChecklist = @(
+                                   @{ Id = 'sky-060'; Acquired = $true }
+                               )
+                           } }
     # TALLER THAN THE DEFAULT ON PURPOSE. The first attempt at this frame put the card in
     # and pushed the rows off the bottom - the same below-the-fold miss the two earlier guide
     # shots had, just caused by the thing being added. A shot that cannot show the card AND
@@ -481,6 +503,9 @@ $Shots = [ordered]@{
                                     EQBUDDY_SHELL_SIZE = '1000x900' }
                            Ledger = @{ Classes = @('Druid') }
                            Set = @{
+                               # Guided quests now start FOLDED, so the frame that is about
+                               # the card has to open the one it is about.
+                               GuideExpanded = @('Druid|Shillelagh')
                                SkyQuestChecklist = @(
                                    @{ Id = 'sky-060'; Acquired = $true }   # Efreeti Statuette
                                )

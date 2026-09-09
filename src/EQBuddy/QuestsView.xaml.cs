@@ -1229,11 +1229,10 @@ public partial class QuestsView : UserControl
             stub.Tag = GuideStubTag;
             body.Children.Add(stub);
         }
-        foreach (var (label, value) in new[]
-                 {
-                     ("Where: ", card.Where), ("What: ", card.What), ("Who: ", card.Who),
-                 })
-            if (value.Length > 0) body.Children.Add(Line(Role.Body, label + value, "DimBrush"));
+        // Sentences, not labelled fields (David, 2026-09-09) — and the detail line only when
+        // it says something the instruction above did not.
+        foreach (var line in new[] { card.Directions, card.Detail })
+            if (line.Length > 0) body.Children.Add(Line(Role.Body, line, "DimBrush"));
 
         if (card.Why.Length > 0) body.Children.Add(Line(Role.Caption, card.Why, "DimBrush"));
         if (card.BeforeLeaving.Length > 0)
@@ -1306,8 +1305,44 @@ public partial class QuestsView : UserControl
     /// reset with the thing it describes.</summary>
     private readonly List<QuestChecklistCard> _lastGuideCards = [];
 
+    /// <summary>
+    /// The fold control for one guided quest. Its own row under the caption rather than a
+    /// glyph on the heading, because the heading is already a link to the wiki page and a
+    /// control that does two things on one click is how a surface gets a silent no-op.
+    /// </summary>
+    private UIElement FoldToggle(QuestChecklistGroup group)
+    {
+        var b = new Button
+        {
+            Style = (Style)FindResource("ActionButton"),
+            Content = GuidePresentation.FoldFace(group.Collapsed),
+            FontSize = DesignTokens.Spec(Role.Body).Size,
+            MinWidth = DesignTokens.IconButtonSize,
+            HorizontalAlignment = HorizontalAlignment.Left,
+            Margin = new Thickness(DesignTokens.SpaceXxs, 0, 0, DesignTokens.SpaceXs),
+            // The words the face dropped live here, where they cost no width.
+            ToolTip = GuidePresentation.FoldTip(group.Collapsed),
+            Tag = GuideFoldTag,
+        };
+        var key = group.CompletionKey ?? "";
+        b.Click += (_, _) =>
+        {
+            if (key.Length == 0) return;
+            // Stored as the EXPANDED exception: guided quests start folded, so an opt-out
+            // list would gain 95 entries the first time anyone scrolled, and a newly
+            // authored class would arrive open.
+            var removed = _settings.GuideExpanded.RemoveAll(
+                k => k.Equals(key, StringComparison.OrdinalIgnoreCase));
+            if (removed == 0) _settings.GuideExpanded.Add(key);
+            Save();
+        };
+        return b;
+    }
+
     /// <summary>The tag a guided group's caption line carries.</summary>
     private const string GuideCaptionTag = "guideCaption";
+    /// <summary>The tag a guided quest's fold control carries.</summary>
+    private const string GuideFoldTag = "guideFold";
     /// <summary>The tag the active-step card's border carries.</summary>
     private const string GuideCardTag = "guideCard";
     /// <summary>The tag each of the card's two verbs carries.</summary>
@@ -2656,7 +2691,14 @@ public partial class QuestsView : UserControl
             headingText.Margin = new Thickness(DesignTokens.SpaceXxs, DesignTokens.SpaceL,
                 0, DesignTokens.SpaceXs);
             headingText.Cursor = Cursors.Hand;
-            headingText.ToolTip = "Open the wiki page for this quest";
+            // What this quest PAYS, on the heading's hover: on a folded list the item rows
+            // that used to answer "what do I get" are not on screen (David, 2026-09-09).
+            // The hover says what the quest PAYS and nothing else (David, 2026-09-09). It
+            // used to append "Click to open the wiki page" — narrating an affordance the
+            // cursor already shows, in the space the answer was supposed to occupy.
+            headingText.ToolTip = group.RewardSummary.Length > 0
+                ? group.RewardSummary
+                : "Open the wiki page for this quest";
             headingText.Ink("AccentBrush");
             var rewardName = group.Title;
             headingText.MouseLeftButtonUp += (_, e) =>
@@ -2718,6 +2760,15 @@ public partial class QuestsView : UserControl
                 guideCaption.Tag = GuideCaptionTag;
                 QuestsPanel.Children.Add(guideCaption);
             }
+
+            // FOLDED: the heading, its counts and its caption, and nothing else. That is
+            // what lets a whole class fit on one screen and be dug into one quest at a time.
+            if (group.GuideId.Length > 0 && group.Collapsed)
+            {
+                QuestsPanel.Children.Add(FoldToggle(group));
+                continue;
+            }
+            if (group.GuideId.Length > 0) QuestsPanel.Children.Add(FoldToggle(group));
 
             // The active-step card, ABOVE this group's rows: the one thing on the tab that
             // says "do this next" rather than "here is everything" belongs where the eye

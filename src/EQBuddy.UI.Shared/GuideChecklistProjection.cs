@@ -156,8 +156,12 @@ public static class GuideChecklistProjection
         }
 
         var counts = GuideProgressRouter.Counts(settings, ledger, characterKey, guide, items);
+        var expanded = group.CompletionKey is { } key
+            && settings.GuideExpanded.Contains(key, StringComparer.OrdinalIgnoreCase);
         return group with
         {
+            Collapsed = !expanded,
+            RewardSummary = GuidePresentation.RewardSummary(group.Title, items),
             Rows = rows,
             GuideId = guide.Id,
             GuideCaption = GuidePresentation.GuidedCaption(
@@ -192,11 +196,10 @@ public static class GuideChecklistProjection
         return new QuestChecklistCard(
             RowId(guide.Id, next.Id),
             next.ShortInstruction.Length > 0 ? next.ShortInstruction : next.Title,
-            Where: stub ? "" : next.Where,
-            What: stub ? "" : next.What,
-            // Only the questions this step actually answers — never an empty label, which
-            // reads as a broken card rather than an honest one.
-            Who: stub ? "" : next.Who,
+            // One sentence for where-and-who, and the detail only when it is not already
+            // in the instruction. A step that answers neither draws neither line.
+            Directions: stub ? "" : GuidePresentation.Directions(next),
+            Detail: stub ? "" : GuidePresentation.ExtraDetail(next),
             Why: GuidePresentation.CardWhy(group.Title),
             BeforeLeaving: GuidePresentation.BeforeLeaving(guide, next, Done, Skipped),
             StubNote: stub ? next.StubNote : "",
