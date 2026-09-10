@@ -19,6 +19,7 @@
   <a class="nav" href="#guide">The Guide</a>
   <a class="nav" href="#hud">The HUD</a>
   <a class="nav" href="#features">Features</a>
+  <a class="nav" href="#dive">Deep dive</a>
   <a class="nav" href="#principles">Principles</a>
   <a class="nav" href="#today">Get it</a>
   <a class="nav gh" href="https://github.com/DranakCorps-bot/EQBuddy">GitHub</a>
@@ -31,8 +32,9 @@
   <a href="#guide"><span>03 · The Guide</span></a>
   <a href="#hud"><span>04 · The HUD</span></a>
   <a href="#features"><span>05 · Feature tour</span></a>
-  <a href="#principles"><span>06 · Principles</span></a>
-  <a href="#today"><span>07 · Today, honestly</span></a>
+  <a href="#dive"><span>06 · The deep dive</span></a>
+  <a href="#principles"><span>07 · Principles</span></a>
+  <a href="#today"><span>08 · Today, honestly</span></a>
   <a href="#closing"><span>North star</span></a>
 </nav>
 
@@ -302,9 +304,197 @@
   </div>
 </section>
 
-<!-- ================= 06 Principles ================= -->
-<section id="principles">
+<!-- ================= 06 The deep dive (DRA-48 T4 hybrid: Example-2 chrome region) ================= -->
+<section id="dive">
   <div class="kicker"><span class="num">06</span><div class="rule"></div></div>
+  <h2>The deep dive — <span class="grad">how it actually helps</span></h2>
+  <p class="sub">Everything above is the overview. This is the long-form version: two
+  real questions a player asks, walked through the product step by step, with the
+  screenshots as evidence and an honest account of where each answer comes from.</p>
+
+  <div class="dive-shell">
+    <nav class="dive-toc" aria-label="Deep dive contents">
+      <div class="toc-head">In this deep dive</div>
+      <a href="#dive-read"><span class="tnum">06.1</span>How to read it</a>
+      <a href="#dive-mainhand"><span class="tnum">06.2</span>“How do I upgrade my main hand?”</a>
+      <a href="#dive-exp"><span class="tnum">06.3</span>“Where should I hunt next for EXP?”</a>
+      <a href="#dive-scorecard"><span class="tnum">06.4</span>Where each answer comes from</a>
+      <a href="#dive-limits"><span class="tnum">06.5</span>The honest limits</a>
+    </nav>
+
+    <div class="dive-main">
+
+      <article class="dive-sec" id="dive-read">
+        <span class="secnum">06.1 · Orientation</span>
+        <h3>How to read this</h3>
+        <p class="lede">EQBuddy’s own rule is <strong>evidence before confidence</strong>,
+        so this page holds itself to it.</p>
+        <p>Everything marked <span class="badge observed">observed</span> is a number
+        EQBuddy counted in your log — your kills, your drops, your xp. Everything marked
+        <span class="badge estimated">estimated</span> is inference and says so. Every
+        screenshot on this page is a real capture from the repo’s screenshot harness
+        against a staged test profile — no mockups, no composites. Character names are
+        test fixtures.</p>
+        <div class="callout info reveal">
+          <span class="ct">The shape of every answer</span>
+          Who you are playing → what you own → what you are working on →
+          <strong>what to do next</strong>. Both walkthroughs below are that one shape.
+        </div>
+      </article>
+
+      <article class="dive-sec" id="dive-mainhand">
+        <span class="secnum">06.2 · Worked example</span>
+        <h3>“How do I upgrade my main hand?”</h3>
+        <p class="lede">The question every player actually has, and the one a generic
+        “best in slot” list answers worst — because it doesn’t know what you own, what
+        you can reach, or what you’ve already half-finished.</p>
+
+        <h4><span class="wstep">1</span>Start from what you own</h4>
+        <p>The Gear Locker reads your inventory dump and compares every wearable you own,
+        slot by slot, against the wiki’s base stats. When something you are carrying is
+        at least as good on every stat and better on one, the weaker item is marked
+        <em>outclassed</em> — “a dump candidate by arithmetic, not taste.”</p>
+        <figure class="shot reveal" style="max-width:470px"><img src="assets/img/gear-locker.png" loading="lazy"
+          width="470" height="640" alt="The Gear Locker window comparing primary and secondary weapon slots: the worn Fine Steel Long Sword against a Rusty Broad Sword marked outclassed, with an item whose stats are not fetched yet listed separately"></figure>
+        <p class="cap">Primary and secondary slots compared from a real inventory dump.
+        An item whose stats aren’t known yet is listed as exactly that — not guessed.
+        <span class="badge observed">observed</span></p>
+
+        <h4><span class="wstep">2</span>Name the upgrade and find its source</h4>
+        <p>The Quest tracker’s search takes a reward, an item, a quest or an NPC. Type
+        the weapon you want and you land on the quest that provides it — with your own
+        progress against it already counted, because EQBuddy imported your achievements
+        and scanned your bags.</p>
+
+        <h4><span class="wstep">3</span>Let the Guide run the middle</h4>
+        <p>From there it is <a href="#guide">section 03</a>: the reward breaks into
+        steps, <strong>NEXT</strong> names the one that matters now — <em>kill The
+        Spiroc Lord on Isle 5 and loot the Spiroc Battle Staff</em> — and looting the
+        item ticks the box from the log by itself.</p>
+
+        <h4><span class="wstep">4</span>Camp on your own clock</h4>
+        <p>If the source is a named mob, the World map shows the camp with a spawn timer
+        learned from <em>your</em> kills — counting down next to the map, distinct from
+        wiki averages, and honest about being an estimate until it has seen the cycle.</p>
+
+        <h4><span class="wstep">5</span>Get there with what you have</h4>
+        <p>The route uses travel you have actually unlocked — not the teleport network
+        of a character you don’t play.</p>
+
+        <div class="callout info reveal">
+          <span class="ct">Why this beats a spreadsheet</span>
+          Each step is fed by the previous surface: the Locker knows your slots, the
+          tracker knows your turn-ins, the Guide knows your loot, the map knows your
+          kills. You never re-enter a fact EQBuddy already read from the log.
+        </div>
+      </article>
+
+      <article class="dive-sec" id="dive-exp">
+        <span class="secnum">06.3 · Worked example</span>
+        <h3>“Where should I hunt next for EXP?”</h3>
+        <p class="lede">EQBuddy won’t pretend there is one global best answer. What it
+        has — and a forum thread doesn’t — is what <em>this character</em> actually
+        earns, camp by camp.</p>
+
+        <h4><span class="wstep">1</span>What is this camp paying right now?</h4>
+        <p>Kills &amp; Drops keeps the running answer during the sitting: kills per
+        hour, and per creature the average kill time, the coin, and the experience each
+        one is worth to you.</p>
+        <figure class="shot reveal"><img src="assets/img/creature-kills.png" loading="lazy"
+          width="880" height="877" alt="The Kills and Drops window: 74.6 kills per hour this session, a per-creature kill list, and a farming section showing each creature's average kill time, coin and experience percentage alongside observed drop rates"></figure>
+        <p class="cap">One session’s evidence: this character kills asps slowly but they
+        pay 5.1% xp each, while orc pawns die in 2 seconds for coin and no xp. That is a
+        hunting decision, made from your own numbers.
+        <span class="badge observed">observed</span></p>
+
+        <h4><span class="wstep">2</span>Compare against your own history</h4>
+        <p>Progress keeps every stored sitting — xp/hr, levels, AA — so “was the new
+        zone actually better than the old camp?” is a chart, not a feeling. The World
+        page’s Drops tab remembers what each creature paid across sessions, not just
+        tonight.</p>
+
+        <h4><span class="wstep">3</span>Cross-check the shared truth</h4>
+        <p>Zone level ranges and spawn mechanics are the community’s shared knowledge,
+        and eqlwiki is its home. EQBuddy links you to the page rather than paraphrasing
+        it — and when your log shows something the wiki doesn’t know, it drafts the
+        page edit for you to paste.</p>
+
+        <div class="callout info reveal">
+          <span class="ct">This-character, not best-character</span>
+          A druid who roots and rots clears a camp at a different rate than the wiki’s
+          median visitor. Your kills/hr and xp-per-creature are the only numbers that
+          were measured on <em>you</em> — that is why they are the ones EQBuddy shows.
+        </div>
+      </article>
+
+      <article class="dive-sec" id="dive-scorecard">
+        <span class="secnum">06.4 · Judgement</span>
+        <h3>Where each answer comes from</h3>
+        <p class="lede">An honest scorecard. EQBuddy is not a replacement for the wiki —
+        it is the tool that connects the wiki’s shared truth to your private evidence,
+        and sends corrections back.</p>
+
+        <div class="tbl-wrap reveal">
+        <table>
+          <thead><tr><th>The question</th><th>A wiki tab alone</th><th>EQBuddy over your log</th><th>Net</th></tr></thead>
+          <tbody>
+            <tr><td><strong>What does the quest need?</strong></td>
+              <td>The source of truth</td>
+              <td>Mirrors eqlwiki item-for-item, re-harvested weekly; the wiki stays the tie-breaker</td>
+              <td class="tick">Same truth, in the tool</td></tr>
+            <tr><td><strong>What have I already done?</strong></td>
+              <td>—</td>
+              <td>Achievements import + bag scan + the log since; turn-ins and half-collected steps counted</td>
+              <td class="tick">Only your machine knows</td></tr>
+            <tr><td><strong>What actually drops here, how often — for me?</strong></td>
+              <td>Lists what drops</td>
+              <td>Observed rates with your kill count as the denominator</td>
+              <td class="tick">And unknown drops become paste-ready wiki edits</td></tr>
+            <tr><td><strong>When is my camp due?</strong></td>
+              <td>Respawn notes</td>
+              <td>Timers learned from your own kills, counting down beside the map</td>
+              <td class="tick">Your clock, not an average</td></tr>
+            <tr><td><strong>Was tonight better than last week?</strong></td>
+              <td>—</td>
+              <td>Stored session history with level and AA charts</td>
+              <td class="tick">Memory a browser doesn’t have</td></tr>
+            <tr><td><strong>Endgame mechanics nobody has confirmed</strong></td>
+              <td>Sometimes silent</td>
+              <td>A stub that says what is missing and asks the player who knows</td>
+              <td class="part">Honesty, not coverage</td></tr>
+            <tr><td><strong>How good are the other players?</strong></td>
+              <td>—</td>
+              <td>Never — by principle, not by gap</td>
+              <td class="cross">Not a feature. Not ever.</td></tr>
+          </tbody>
+        </table>
+        </div>
+      </article>
+
+      <article class="dive-sec" id="dive-limits">
+        <span class="secnum">06.5 · Judgement</span>
+        <h3>The honest limits</h3>
+        <div class="callout warn reveal">
+          <span class="ct">A precise-looking wrong number is worse than none</span>
+          Curated game data — spawn timers, quest catalogs — is never auto-written from
+          a scrape. The weekly wiki refresh <em>flags</em> conflicts for a person to
+          resolve, and where quest data conflicts and can’t be resolved, EQBuddy matches
+          the wiki on purpose: being wrong the same way as the community’s own reference
+          is recoverable; being uniquely wrong is not.
+        </div>
+        <p>The same rule shapes the Guide’s stubs (a step without a source says so
+        instead of inventing one), the Locker’s “stats not fetched yet” bucket, and the
+        observed/estimated badges you saw above. If EQBuddy tells you something about
+        Norrath, you should be able to ask it how it knows — and get a real answer.</p>
+      </article>
+
+    </div>
+  </div>
+</section>
+
+<!-- ================= 07 Principles ================= -->
+<section id="principles">
+  <div class="kicker"><span class="num">07</span><div class="rule"></div></div>
   <h2>Hard lines — <span class="grad">these do not move</span></h2>
   <p class="sub">The product is private, local, personal and non-judgmental. These are
   not settings; they are what EQBuddy is.</p>
@@ -337,9 +527,9 @@
   </div>
 </section>
 
-<!-- ================= 07 Today, honestly ================= -->
+<!-- ================= 08 Today, honestly ================= -->
 <section id="today">
-  <div class="kicker"><span class="num">07</span><div class="rule"></div></div>
+  <div class="kicker"><span class="num">08</span><div class="rule"></div></div>
   <h2>Today, <span class="grad">honestly</span></h2>
   <p class="sub">Evolved is the direction, not a download yet. Here is exactly what you
   can get right now, and under which license.</p>
