@@ -16,6 +16,8 @@
   <a class="brand" href="#top"><img src="assets/favicon.svg" alt="" width="20" height="20">EQBuddy&nbsp;Evolved</a>
   <a class="nav" href="#chain">The chain</a>
   <a class="nav" href="#surfaces">Surfaces</a>
+  <a class="nav" href="#guide">The Guide</a>
+  <a class="nav" href="#hud">The HUD</a>
   <a class="nav" href="#features">Features</a>
   <a class="nav" href="#principles">Principles</a>
   <a class="nav" href="#today">Get it</a>
@@ -26,9 +28,11 @@
   <a href="#top"><span>Top</span></a>
   <a href="#chain"><span>01 · The chain</span></a>
   <a href="#surfaces"><span>02 · Three surfaces</span></a>
-  <a href="#features"><span>03 · Feature tour</span></a>
-  <a href="#principles"><span>04 · Principles</span></a>
-  <a href="#today"><span>05 · Today, honestly</span></a>
+  <a href="#guide"><span>03 · The Guide</span></a>
+  <a href="#hud"><span>04 · The HUD</span></a>
+  <a href="#features"><span>05 · Feature tour</span></a>
+  <a href="#principles"><span>06 · Principles</span></a>
+  <a href="#today"><span>07 · Today, honestly</span></a>
   <a href="#closing"><span>North star</span></a>
 </nav>
 
@@ -139,23 +143,126 @@
   live detail</b><span class="sep">→</span><b>full application for analysis</b></p>
 </section>
 
-<!-- ================= 03 Feature tour ================= -->
-<section id="features">
+<!-- ================= 03 The Guide (DRA-48 T4 revise: elevated out of the tour grid) ================= -->
+<section id="guide">
   <div class="kicker"><span class="num">03</span><div class="rule"></div></div>
+  <h2>Guided walkthroughs that answer<br><span class="grad">“what should I do next?”</span></h2>
+  <p class="sub">The Guide is the chain made concrete. Open a reward you care about and
+  every step says <strong>who, where and what</strong>; one step is pinned as
+  <strong>NEXT</strong>; and anything you already earned is flagged
+  <strong>ready to turn in</strong> before you think to ask. Every capture on this page
+  is a real build photographed by the repo’s own screenshot harness — character names
+  are test fixtures.</p>
+
+  <div class="guidehero reveal">
+    <figure class="shot"><img src="assets/img/shell-quests-sky-guide.png"
+      width="986" height="893" alt="The Guide room: a Ready-to-turn-in banner naming the Belt of the Four Winds with a Mark-turned-in button, and below it the Runed Wind Amulet opened with its NEXT step pinned — Loot a Wind Rune Azia from Plane of Sky trash — with Done and Skip controls"></figure>
+    <div class="guidepoints">
+      <div class="gp">
+        <span class="stage">Next, pinned</span>
+        <p>One step at the top: what to do, where to go, and what it works toward —
+        with <strong>Done</strong> and <strong>Skip</strong>, because you play in your
+        order, not the wiki’s.</p>
+      </div>
+      <div class="gp">
+        <span class="stage">Who · where · what</span>
+        <p>Every step names the mob or NPC, the isle or zone, and the item —
+        <em>“Kill Keeper of Souls on Isle 4 and loot the Stone Amulet.”</em> No step
+        assumes you already know the route.</p>
+      </div>
+      <div class="gp">
+        <span class="stage">Ready to turn in</span>
+        <p>Loot in your log ticks the checklist by itself, and a bag scan counts what
+        you collected before EQBuddy. When the pieces are together, the reward is
+        flagged — one click marks it turned in.</p>
+      </div>
+      <div class="gp">
+        <span class="stage">Honest where the wiki is</span>
+        <p>Every quest mirrors eqlwiki, item for item. A step the wiki cannot answer
+        says exactly what is missing — and your own discoveries flow back as
+        paste-ready wiki edits, so the first player who knows fixes it for everyone.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid cols2">
+    <figure class="shot reveal"><img src="assets/img/shell-quests-sky-guide-folded.png" loading="lazy"
+      width="986" height="893" alt="The Guide with six Druid Plane of Sky rewards folded to their heading lines, each showing pieces collected and state">
+      <figcaption class="cap">Folded, the Guide is a quiet list — name, pieces and state
+      on one line per reward. Open only the one you are working.</figcaption></figure>
+    <figure class="shot reveal"><img src="assets/img/shell-quests-sky-guide-card.png" loading="lazy"
+      width="986" height="893" alt="One reward opened: the NEXT step pinned with Done and Skip, then grouped steps — one of which states the wiki does not confirm which mob drops the Effreeti Statuette and asks whoever learns it to tell the wiki">
+      <figcaption class="cap">One reward opened. Note the step that admits eqlwiki does
+      not name the drop yet — a guess in confident type is the one thing the Guide
+      refuses to print.</figcaption></figure>
+  </div>
+</section>
+
+<!-- ================= 04 The HUD story (DRA-48 T4 revise) ================= -->
+<section id="hud">
+  <div class="kicker"><span class="num">04</span><div class="rule"></div></div>
+  <h2>While you play: <span class="grad">small enough to ignore</span></h2>
+  <p class="sub">During a fight the entire HUD can be one thin bar. Glance at a chip,
+  hover it to peek, and one more click opens a live window — three depths, and every
+  one of them is opt-in. Nothing interrupts, ever.</p>
+
+  <div class="hudstory">
+    <div class="hudstep reveal">
+      <div class="hudlabel">
+        <span class="stage">01 · Glance</span>
+        <h3>One thin bar</h3>
+        <p>Minimized, EQBuddy is a strip of chips — DPS, XP rate, kills, pet, loot,
+        coin. You pick which chips ride the bar, so it shows your session, not ours.</p>
+      </div>
+      <div class="stripstack">
+        <figure class="shot strip"><img src="assets/img/mini-bar.png"
+          width="907" height="40" alt="The minimized HUD bar: a presence dot and character name, then chips for melee DPS, XP rate, kill count, pet DPS, proc rate, loot count, coin and a session timer, with expand and close buttons"></figure>
+        <figure class="shot strip"><img src="assets/img/widget-mini-chips.png" loading="lazy"
+          width="537" height="44" alt="The same bar with a different chip loadout: kills, DPS, loot count, XP per hour with a time-to-level estimate, and a crowd-control break counter">
+          <figcaption class="cap">A different loadout — down to a time-to-level estimate
+          and a “CC broke” counter, if that is what you watch.</figcaption></figure>
+      </div>
+    </div>
+    <div class="hudstep reveal">
+      <div class="hudlabel">
+        <span class="stage">02 · Peek on hover</span>
+        <h3>Mouse over for the detail</h3>
+        <p>Hovering a chip answers the next question without opening anything — what
+        dropped and at what rate, which buffs are up and for roughly how long. Move the
+        mouse away and it is gone.</p>
+      </div>
+      <div class="peekrow">
+        <figure class="shot"><img src="assets/img/hud-expand-loot.png" loading="lazy"
+          width="300" height="159" alt="The Loot hover peek for Giant spider after 15 kills this session: each drop with eqlwiki's live rate and this session's count"></figure>
+        <figure class="shot"><img src="assets/img/hud-expand-buffs.png" loading="lazy"
+          width="300" height="201" alt="The Buff set hover peek: eight buffs up, each with an estimated time remaining"></figure>
+      </div>
+    </div>
+    <div class="hudstep reveal">
+      <div class="hudlabel">
+        <span class="stage">03 · Break out</span>
+        <h3>One more click for live detail</h3>
+        <p>A chip’s window breaks out into its own live surface — this fight or the
+        whole session, updating as you play, and only for as long as you want it
+        there. Your numbers, nobody else’s.</p>
+      </div>
+      <div class="peekrow">
+        <figure class="shot"><img src="assets/img/breakout-windows.png" loading="lazy"
+          width="272" height="148" alt="The Your damage breakout window with Fight and Session tabs and per-ability rows showing count, average and DPS"></figure>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 05 Feature tour ================= -->
+<section id="features">
+  <div class="kicker"><span class="num">05</span><div class="rule"></div></div>
   <h2>What it already <span class="grad">does</span></h2>
   <p class="sub">Captured from real builds with the repo’s own screenshot harness —
-  EQBuddy ships several palettes, so you will see the Turquoise and Gold themes below.
-  Character names are test fixtures.</p>
+  EQBuddy ships several palettes, so the themes vary below. Character names are test
+  fixtures.</p>
 
   <div class="grid cols3">
-    <div class="card teal reveal">
-      <figure class="shot"><img src="assets/img/shell-quests-sky-guide.png" loading="lazy"
-        width="986" height="893" alt="The Quests page in Guide mode: a Plane of Sky reward broken into steps, with a ready-to-turn-in banner and per-step Done and Skip controls"></figure>
-      <h3>Quests &amp; Guide</h3>
-      <p>A tracker that flags what you are ready to turn in, with guided steps that say
-      who, where and what — every quest mirrors eqlwiki, and your discoveries flow back
-      as paste-ready wiki edits.</p>
-    </div>
     <div class="card teal reveal">
       <figure class="shot"><img src="assets/img/shell-gear.png" loading="lazy"
         width="946" height="633" alt="The Gear page's Loot tab listing this session's drops with counts, alongside Wishlist and Inventory tabs"></figure>
@@ -195,9 +302,9 @@
   </div>
 </section>
 
-<!-- ================= 04 Principles ================= -->
+<!-- ================= 06 Principles ================= -->
 <section id="principles">
-  <div class="kicker"><span class="num">04</span><div class="rule"></div></div>
+  <div class="kicker"><span class="num">06</span><div class="rule"></div></div>
   <h2>Hard lines — <span class="grad">these do not move</span></h2>
   <p class="sub">The product is private, local, personal and non-judgmental. These are
   not settings; they are what EQBuddy is.</p>
@@ -230,9 +337,9 @@
   </div>
 </section>
 
-<!-- ================= 05 Today, honestly ================= -->
+<!-- ================= 07 Today, honestly ================= -->
 <section id="today">
-  <div class="kicker"><span class="num">05</span><div class="rule"></div></div>
+  <div class="kicker"><span class="num">07</span><div class="rule"></div></div>
   <h2>Today, <span class="grad">honestly</span></h2>
   <p class="sub">Evolved is the direction, not a download yet. Here is exactly what you
   can get right now, and under which license.</p>
