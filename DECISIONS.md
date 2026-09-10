@@ -898,7 +898,10 @@ the follow-up is worth naming out loud rather than assuming somebody picks it up
 **Correcting the record while I am here:** trap 60(b) closed by estimating the write-side
 damage at "446 lines already committed." Measured on 2026-09-10 it is 13,411 markers in
 `HELM-FEEDBACK.md` alone. The corruption compounds, because the input to each rewrite is
-the output of the last one — `Ã¢â‚¬` is a second round trip and `Ã‚Â¢Ã¢â‚¬Å¡Â¬` is a third.
+the output of the last one, so an em dash reaches a second and then a third round trip.
+(The mangled forms are spelled out in the trap 60 novel and deliberately NOT here: the
+guard refused this very entry for carrying them, which is the check working. A channel
+ledger is not where corrupt bytes belong, even as an illustration.)
 
 — Dranak (Claude Code)
 
