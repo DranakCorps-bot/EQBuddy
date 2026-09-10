@@ -719,8 +719,13 @@ after the named guard left with its surface.
     append** — Bash eats backticks inside `python -c "…"`, so a markdown
     note loses every backticked identifier and still diffs clean. Write
     the note with the editing tools; if the tail is mojibake and will not
-    anchor, concatenate two FILES. Read an identifier back. **No guard
-    yet; that is a named hole.** [Novel](docs/ops/claude-archive/traps.md#trap-60)
+    anchor, concatenate two FILES. Read an identifier back. Guard:
+    `scripts/channel-wipe-guard.ps1` (check.ps1 + CI) refuses a branch that
+    DELETES, empties, extremely shrinks or full-replaces a ledger against
+    the merge-base — it caught #493 and #502 when run against them. It is
+    a catastrophe stop, not an additions-only enforcer: losing a few
+    entries is still yours to catch in the diff.
+    [Novel](docs/ops/claude-archive/traps.md#trap-60)
 61. **The SCREEN is a mutex both harnesses must acquire.**
     `scripts/shoot.ps1` and `tests/EQBuddy.E2E` (`AppHarness.Launch`) take
     the same lock. Guard: `ScreenLockTests`. Wait for the window

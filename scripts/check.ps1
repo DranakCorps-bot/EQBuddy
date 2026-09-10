@@ -45,7 +45,7 @@ function Step([string] $name, [scriptblock] $body) {
     if ($LASTEXITCODE -ne 0) {
         Write-Host "FAILED" -ForegroundColor Red
         # Only the lines that say why — a full MSBuild log buries the one that matters.
-        $output | Select-String -Pattern 'error |Failed!|\[FAIL\]|Assert\.|whatsnew-guard|legacy-notice-guard|evolved-channel-guard|soft-seat-selftest' |
+        $output | Select-String -Pattern 'error |Failed!|\[FAIL\]|Assert\.|whatsnew-guard|legacy-notice-guard|evolved-channel-guard|channel-wipe-guard|soft-seat-selftest' |
             Select-Object -First 15 | ForEach-Object { Write-Host "   $_" }
         Write-Host "   full log: $log" -ForegroundColor Yellow
         $script:failed += $name
@@ -71,6 +71,16 @@ Step 'legacy notice' { & "$PSScriptRoot\legacy-notice-guard.ps1" 6>&1 }
 # <Version> reaching 2.0.0 — and the one that reads the world as well as the tree, since
 # the family's update folder is where the promise is actually kept or broken.
 Step 'evolved     ' { & "$PSScriptRoot\evolved-channel-guard.ps1" 6>&1 }
+# The channel ledgers are append-only history, and twice in two days a merge deleted
+# HELM.md and HELM-FEEDBACK.md outright (#493, #502 — 12,208 and 12,444 lines, both
+# restored by hand). Unlike the three above this one is armed NOW, at 1.x: it compares the
+# ledgers against the merge-base with origin/main, so it is the gate that catches the wipe
+# on the box that made it, before the PR exists. CLAUDE.md trap 60 called this a named
+# hole; it is not one any more.
+Step 'channels    ' { & "$PSScriptRoot\channel-wipe-guard.ps1" 6>&1 }
+# ...and the guard's own prove-fail, for the reason every guard here needs one: this one is
+# silent on a healthy tree, so nothing else would notice if it stopped being able to bite.
+Step 'channel test' { & "$PSScriptRoot\channel-wipe-guard.selftest.ps1" 6>&1 }
 # Experiment A′ self-test (trap 70, EQBuddy lab): a second default seat on the
 # same work item must refuse. Throwaway StoreDir; not the machine's live claims.
 Step 'soft seats  ' { & "$PSScriptRoot\soft-seat-selftest.ps1" 6>&1 }

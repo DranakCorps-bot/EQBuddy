@@ -41,6 +41,30 @@ jobs:
       - name: Evolved 2.x stays local-only
         run: pwsh -NoProfile -File scripts/evolved-channel-guard.ps1
 
+      # The channel ledgers (HELM/FABLE/BEVEL/SCRIBE/CLAUDE .md and -FEEDBACK.md) are
+      # append-only history. PR #493 merged with HELM.md and HELM-FEEDBACK.md DELETED —
+      # 12,208 lines — and #502 did it again the next day: 12,444 more. Both were restored
+      # by hand, and both times every check on this workflow was green, because nothing
+      # here reads markdown. This is the gate that answers that.
+      #
+      # It needs the base branch, which is why it lives in THIS job: the checkout above is
+      # fetch-depth: 0. The guard reads $GITHUB_BASE_REF on a pull_request and falls back
+      # to origin/main on a push, then compares against the merge-base — so on a push to
+      # main it has nothing to say, and on a PR it sees exactly what that PR proposes.
+      #
+      # Fails open with a loud SKIPPED line if the base cannot be resolved, rather than
+      # passing quietly: a gate that reads as coverage while seeing nothing is the shape
+      # this repo keeps getting caught by (traps 34, 39).
+      - name: Channel ledgers are not wiped
+        run: pwsh -NoProfile -File scripts/channel-wipe-guard.ps1
+
+      # The guard above is silent on every healthy tree, so it could stop working and no
+      # PR would ever notice. This builds four throwaway repos — delete, empty, extreme
+      # shrink, full-replace — asserts it refuses each, and asserts it still PASSES an
+      # append-only land whose text was re-encoded on the way in.
+      - name: Channel wipe guard can still fail
+        run: pwsh -NoProfile -File scripts/channel-wipe-guard.selftest.ps1
+
       # Experiment A′ self-test (trap 70, EQBuddy lab): default second claim on
       # one work item must refuse. Throwaway StoreDir; not the live claims.
       - name: Soft seat claims refuse a duplicate default
