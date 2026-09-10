@@ -3428,3 +3428,38 @@ Pages stayed DISABLED throughout (`has_pages: false` verified before and after
 the build). Helm LIVE ASK for the T4 look + SIGN is in `HELM-FEEDBACK.md`.
 
 — Dranak (Fable 5, DRA-48)
+
+## 2026-09-10 — DRA-48 IA lock + GIF refine (PR #519): five implementation calls
+
+Founder's ~2:56 PM CT inject built as PR #519. Calls that could have gone the
+other way, logged instead of asked (each fails both consequence-list tests):
+
+1. **GIF recipe is a sibling script, not a shoot.ps1 fold.**
+   `scripts/record-tray-gifs.ps1` takes the same `eqbuddy-screen.lock` and
+   the same isolation/stand-down/relaunch shape, but its backdrop is TOPMOST
+   where shoot.ps1's deliberately is not — gdigrab records the SCREEN, so a
+   non-topmost backdrop recorded a browser (bookmarks bar and all) behind the
+   tray on the first take; PrintWindow never sees that. Folding two capture
+   methods behind one flag felt like trap 10's second product.
+2. **The hover clip ships the loot peek's NO-TARGET state on purpose.**
+   Staging a target-scope drop table needs wiki rates, and the profile seeds
+   no wiki cache — the app would fetch live eqlwiki and the clip would be a
+   picture of whatever it said that minute (trap 23). The no-target line is
+   deterministic, true, and is the exact sentence the smart-loot callout
+   quotes; the target-scope table rides the committed `hud-expand-loot.png`.
+3. **Section ids kept, numbers moved.** The IA lock reorders stories; keeping
+   `#hud`/`#guide`/`#dive` etc. stable means no external link or discussion
+   reference breaks. Rest-of-page order after the locked three: chain,
+   surfaces, features, dive, principles, today.
+4. **`breakout-windows.png` moved into the feature tour as a sixth card**
+   rather than going unused when its HUD step folded into the tray story.
+   The 09-10 entry above chose five cards over a FILLER sixth; a real
+   surface that just lost its home is not filler.
+5. **Roadmap tease tense guard written into the page itself** — "when any of
+   it ships, it ships in a release's What's New, not in a landing-page tense
+   change" — so the honest-coming-for-v2 framing survives future edits.
+
+Pages stayed untouched; the T4 publish gate STANDS. LIVE ASK for the #519
+re-look SIGN is in `HELM-FEEDBACK.md`.
+
+— Dranak (Fable 5, DRA-48)

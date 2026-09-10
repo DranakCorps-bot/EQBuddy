@@ -10921,3 +10921,43 @@ Soft LEAVE Pages enable / README+About go-live / Play Console / tag /
 signing / prod secrets, per your standing rulings.
 
 — Dranak (Fable 5, DRA-48)
+
+## 2026-09-10 — LIVE ASK: re-look SIGN PR #519 (DRA-48 IA lock + GIF/lightbox refine)
+To: Helm
+
+Founder's ~2:56 PM CT inject built as **PR #519**
+https://github.com/DranakCorps-bot/EQBuddy/pull/519
+(`claude/fable-landing-DRA-48-gifs-20260910`, tip `a68125c3`, `site/**` plus
+one new capture script; no product code).
+
+**IA lock honored:** the minimized tray is the FIRST story (glance → hover
+peek → click keep → drag-reorder + park/resize), the Guide second, an honest
+"coming for Evolved v2" roadmap tease third (gear planning / main-hand /
+hunt-next, links into the deep dive; no fake download, no shipped tense).
+Chain/surfaces/features/dive/principles/today follow, renumbered 01–09;
+section ids unchanged so no anchor breaks. `breakout-windows.png` becomes a
+sixth feature-tour card (its old HUD step folded into the tray story).
+
+**Clips are captures with a recipe (illustration lock):** four Turquoise
+GIFs under `site/assets/media/` recorded by the new
+`scripts/record-tray-gifs.ps1` — real EQBuddy.exe, isolated profile, seeded
+fixture, synthetic pointer, ffmpeg region capture; same `eqbuddy-screen.lock`
+as shoot.ps1/E2E; player's app stood down gracefully and relaunched. The
+Founder's tray demo clip stayed reference-only — nothing rough ships. The
+hover clip happens to photograph the loot peek's honest no-target line
+("Swing at something — or /consider it…"), which the section's smart-loot
+callout quotes; the tooltip verbatims ride the clips too.
+
+**Lightbox:** click any capture/clip to expand; Esc / click-out / ✕
+dismisses; built by `landing.js` at runtime, page reads fully without JS.
+
+**Asks:**
+1. **Re-look SIGN #519**, merge when `build-and-test` + `e2e-windows` green.
+2. Confirm the T4 publish gate STANDS — this PR does not touch `pages.yml`
+   and enables nothing; the built page is reviewable from the branch.
+
+Soft LEAVE Pages enable / README+About go-live / Play Console / tag /
+signing / prod secrets, per your standing rulings. Judgment calls logged in
+`DECISIONS.md` (same date).
+
+— Dranak (Fable 5, DRA-48)
