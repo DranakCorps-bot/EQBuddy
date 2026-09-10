@@ -461,8 +461,8 @@ $Shots = [ordered]@{
     #
     # PREDICTED before shooting (trap 23), from the catalog and the one tick below:
     #   * Druid lens; the six Druid rewards render as guides.
-    #   * "Druid - Shillelagh" reads "1/4 - in progress" on the heading and "Guide - 1 stub"
-    #     under it. The caption no longer repeats the count - the heading owns progress, the
+    #   * "Druid - Shillelagh" reads "- Druid - Shillelagh  1/4 - in progress" on one line,
+    #     the "-" being the fold control OPEN, and "Guide - 1 stub" under it. The caption no longer repeats the count - the heading owns progress, the
     #     caption owns only what the heading has no room for - and Shillelagh is the ONLY
     #     Druid heading that carries one at all, DRA-44 having left the other five rewards
     #     with no stubs and nothing skipped.
@@ -489,10 +489,14 @@ $Shots = [ordered]@{
     # its own frame (shell-quests-sky-guide-card); a shot with one quest open spends most of
     # its height on that quest and proves the opposite of what this row is for.
     #
-    # PREDICTED before shooting: six "Druid - <reward>" headings, each with its counts and a
-    # small "+" button, and NOTHING between them - all six readable without scrolling. The
-    # face is +/- rather than words because six "Show steps" stacked down a folded list is
-    # more text than the headings they sit under.
+    # PREDICTED before shooting: six "Druid - <reward>" heading LINES, each one a small "+"
+    # followed on the SAME line by the name and its counts, and NOTHING between them - all
+    # six readable without scrolling, in six lines rather than twelve. The + leads the name
+    # rather than sitting under it (David, 2026-09-09: "I imagined the + would be next to the
+    # quest name, not wasting space between each quest name"), which is also where a
+    # disclosure control belongs - the eye reads the + and then the thing it opens. The face
+    # is +/- rather than words because six "Show steps" stacked down a folded list is more
+    # text than the headings they sit under.
     #
     # EXACTLY ONE of the six carries a caption line, and it reads "Guide - 1 stub":
     # Shillelagh, which has the unplaced Efreeti Statuette stub in it. The other five draw no
