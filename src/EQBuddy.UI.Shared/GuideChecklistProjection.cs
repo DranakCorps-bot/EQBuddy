@@ -140,7 +140,7 @@ public static class GuideChecklistProjection
                 RowId(guide.Id, objective.Id),
                 group.ClassName,
                 // The short instruction, not the title: the row IS the instruction now.
-                objective.ShortInstruction.Length > 0 ? objective.ShortInstruction : objective.Title,
+                GuidePresentation.StepTitle(objective),
                 DetailFor(objective, byId, settings, ledger, characterKey, guide, items, done),
                 done,
                 // An item-backed row inherits the "we guessed which class earned this" mark
@@ -164,8 +164,7 @@ public static class GuideChecklistProjection
             RewardSummary = GuidePresentation.RewardSummary(group.Title, items),
             Rows = rows,
             GuideId = guide.Id,
-            GuideCaption = GuidePresentation.GuidedCaption(
-                counts.Done, counts.Skipped, counts.Total, stubs),
+            GuideCaption = GuidePresentation.GuidedCaption(counts.Skipped, stubs),
             GuideCard = Card(group, guide, settings, ledger, characterKey, items),
         };
     }
@@ -195,7 +194,7 @@ public static class GuideChecklistProjection
         var stub = next.Authoring == GuideAuthoring.Stub;
         return new QuestChecklistCard(
             RowId(guide.Id, next.Id),
-            next.ShortInstruction.Length > 0 ? next.ShortInstruction : next.Title,
+            GuidePresentation.StepTitle(next),
             // One sentence for where-and-who, and the detail only when it is not already
             // in the instruction. A step that answers neither draws neither line.
             Directions: stub ? "" : GuidePresentation.Directions(next),

@@ -1,3 +1,81 @@
+## 2026-09-09 (Fable's three #491 defects — the calls I made alone)
+
+**1. The blocked card names the skip by the objective's TITLE, and that is a rule about
+cross-references rather than about this sentence.** Fable's fix said "derivable from the
+prerequisite list", which gives ids; an objective has two names, and the ROW draws the other
+one (`ShortInstruction`). I built it against the row first, on the argument that a player told
+"take back X" should find X verbatim on the page. **The re-shot card frame overruled me:** the
+turn-in row five lines above the card already says "after: Collect Wind Rune Azia", and
+`⚠ Before leaving` names steps the same way — so the instruction-shaped sentence would have
+made this the only place on the surface calling a step by a third name. A cross-reference is a
+NAME; a row is a rendering. The default it could have gone the other way on is the one I
+actually shipped first. `GuidePresentation.StepTitle` still exists and still folds the
+projection's two copies of "instruction, else title" (trap 4) — it is now explicitly the
+DRAWING name, with the doc comment saying so.
+
+**2. "The hand-in waits on…" is allowed to say "hand-in" because a test holds the data to
+it.** The sentence names a noun the catalog has to earn: all 95 prerequisites in the shipped
+catalog sit on a `TurnIn`. Rather than write a second code path for the general case that no
+data reaches, I pinned the invariant — `OnlyATurnInCarriesPrerequisitesSoTheBlockedSentence
+CanNameTheHandIn`. The day Delivery 3 gates an epic section on the one before it, that fails
+loudly instead of the card calling a fetch step a hand-in. Trap 73's lesson pointed the other
+way: the words we ship are a claim about the data.
+
+**3. "Not placed" goes AFTER the isles and the wind rune, and BEFORE the turn-in — not
+last.** Fable said "after every isle"; Bevel's frame said "not the first thing in reading
+order". Strictly last would put it after the hand-in it is a prerequisite for. The default it
+could have gone the other way on: absolute last. Six lines of `order` in two guides.
+
+**4. The caption gave up progress entirely, not just when it was redundant.** My first cut
+suppressed the whole caption when it added nothing — which fixed five of the six Druid
+headings and left the double-count on the sixth, exactly the one Fable's frame pointed at.
+The re-shoot showed it. `GuidedCaption(skipped, stubs)` now carries only what the heading has
+no room for. The default it could have gone the other way on: keep "Guide · 1 of 4 · 1 stub"
+where a caption survives at all, on the grounds that a stub count with no denominator is
+harder to read. Founder lock 4a is satisfied either way — the stub count is still on screen.
+
+## 2026-09-09 (DRA-45 guide UX — the calls I made alone)
+
+**1. Guided quests start FOLDED, and the EXPANDED set is what persists.** The Founder asked to
+see a class's quests collapsed and open the ones he wants; starting expanded would have meant
+the feature does nothing until he folds 95 things by hand. Stored as `AppSettings.GuideExpanded`
+(the exception) rather than a collapsed list, because an opt-out list gains 95 entries the first
+time anyone scrolls and a newly authored class would arrive open. The default it could have gone
+the other way on: leave everything expanded and let folding be opt-in. Reversal: one line.
+
+**2. The fold control is "+" / "-", not "Show steps" / "Hide steps".** The Founder asked for
+this directly after seeing the words. Worth recording WHY it is right rather than just that he
+asked: six "Show steps" buttons stacked down a folded class list is more text than the headings
+they sit under, and the whole point of folding is that the list reads at a glance. The words
+survive on the hover, where they cost no width.
+
+**3. The heading's hover says ONLY what the quest pays.** It briefly also appended "Click to
+open the wiki page for this quest." The Founder cut it, and he was right: it narrated an
+affordance the cursor already shows, inside the space the answer was supposed to occupy.
+
+**4. Who and Where fused into one sentence rather than Who surviving as its own line.** Bevel's
+finding 1 recommended keeping Who as the identity anchor and cutting Where and What. I kept the
+information and changed the shape — "Travel to Plane of Sky - Isle 5, then find The Spiroc Lord."
+— because the Founder's ask was for prose, not for fewer fields. Named in BEVEL-FEEDBACK as a
+deviation from Bevel's own recommendation so it can be argued with.
+
+**5. "set aside" is the heading's new state token, and it fires on a NARROWER trigger than the
+caption's.** Bevel found that the heading vocabulary (done / ready / in progress) had no word for
+"the player put this down", so a quest whose remaining steps were all skipped read "in progress"
+while the card said "Every step left is skipped". Bevel left the word to us. I picked "set
+aside": it reads as a decision rather than a failure, which "skipped" on a whole quest does not,
+and it is distinct from the step-level word so the two cannot be confused. The trigger is "at
+least one skip AND nothing left that is neither done nor skipped", not the caption's
+`skipped > 0` — with the looser trigger a quest that is half done, half skipped and still has
+real work would say "set aside" while the player was actively working it. What would reverse it:
+Bevel or Helm preferring the looser trigger, or a better word.
+
+**6. The E2E fixtures now expand what they assert on.** Folding by default made three of them
+fail — they assert 21 rows and a folded quest draws none. The fixtures expand through the same
+`Class|Reward` key the UI writes, derived from the catalog rather than typed. Added
+`WithNothingExpandedAGuidedClassDrawsHeadingsAndNoSteps` so the LANDING state is itself guarded:
+the next person to see zero rows learns it is the fold, not a broken guide.
+
 ## 2026-09-09 (DRA-44 + DRA-36 — the calls I made alone)
 
 Cards: DRA-44 (wind runes on the zone page, provenance) and DRA-36 (the active-step card).

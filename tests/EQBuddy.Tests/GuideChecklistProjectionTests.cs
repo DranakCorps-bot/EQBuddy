@@ -222,22 +222,40 @@ public sealed class GuideChecklistProjectionTests : IDisposable
         Assert.All(group.Rows.Where(r => r != stub), r => Assert.Equal("", r.StubNote));
     }
 
+    /// <summary>The caption says how hollow the data is and NOTHING the heading already
+    /// says. Progress left it when folding turned "Guide · 0 of 3" into a second copy of the
+    /// heading's own "0/3" with nothing between them (Bevel SIGNED; Fable #491 defect 3).</summary>
     [Fact]
     public void TheCaptionCountsTheStepsAndSaysHowManyAreStubs()
     {
-        Assert.Equal("Guide · 0 of 3 · 1 stub", Guided(Settings()).GuideCaption);
+        var group = Guided(Settings());
+
+        Assert.Equal("Guide · 1 stub", group.GuideCaption);
+        // The count the caption gave up is still ON the group — it moved home, it did not go.
+        Assert.Equal(0, group.Done);
+        Assert.Equal(3, group.Total);
     }
 
+    /// <summary>
+    /// A tick moves the HEADING's count, and leaves the caption exactly where it was.
+    ///
+    /// <para>That split is the fix, stated as behaviour: progress belongs to the heading, and
+    /// the caption is only there to say what the heading has no room for. Both still read one
+    /// <c>IsDone</c> — this asserts the ROW moved too, so "the caption did not change" can
+    /// never pass because nothing happened at all.</para></summary>
     [Fact]
-    public void TheCaptionMovesWhenAnItemBackedStepIsTicked()
+    public void ATickMovesTheHeadingsCountAndLeavesTheCaptionAlone()
     {
         var settings = Settings();
+        var before = Guided(settings);
         settings.SkyQuestChecklist.Single(i => i.Id == "sky-198").Acquired = true;
 
         var group = Guided(settings);
 
-        Assert.Equal("Guide · 1 of 3 · 1 stub", group.GuideCaption);
-        // And the ROW agrees — caption and ticks are two readers of one IsDone.
+        Assert.Equal(0, before.Done);
+        Assert.Equal(1, group.Done);
+        Assert.Equal(before.GuideCaption, group.GuideCaption);
+        // And the ROW agrees — heading and ticks are two readers of one IsDone.
         Assert.True(group.Rows.Single(r => r.Id.EndsWith("stone-amulet", StringComparison.Ordinal)).Acquired);
     }
 

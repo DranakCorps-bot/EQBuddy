@@ -140,8 +140,23 @@ public sealed class GuideSurfaceParityTests : IDisposable
         var desktop = Desktop(settings, ledger).Single(g => g.CompletionKey == RewardKey);
         var phone = PhoneGroup(Phone(settings, ledger), desktop.Heading);
 
-        Assert.NotEqual("", desktop.GuideCaption);
-        Assert.StartsWith(desktop.GuideCaption, phone.Note!, StringComparison.Ordinal);
+        // With nothing to add beyond the heading's own count, the caption draws on NEITHER
+        // screen — parity of an absence is the half that would rot silently, because the
+        // phone composes its note from the caption and would happily keep saying "Guide ·
+        // 1 of 2" under a heading that already said it.
+        Assert.Equal("", desktop.GuideCaption);
+        Assert.Equal(desktop.Note, phone.Note);
+
+        // Strike a step out and the caption earns its line again — same words, both screens.
+        var row = desktop.Rows.First(r => !r.IsTurnIn);
+        Assert.True(CompanionActions.Apply(settings, ledger, Dranak,
+            new CompanionAction(CompanionSurfaces.Sky,
+                CompanionActions.SkipVerb + row.Id, Done: true)));
+
+        var withSkip = Desktop(settings, ledger).Single(g => g.CompletionKey == RewardKey);
+        var phoneWithSkip = PhoneGroup(Phone(settings, ledger), withSkip.Heading);
+        Assert.Contains("1 skipped", withSkip.GuideCaption, StringComparison.Ordinal);
+        Assert.StartsWith(withSkip.GuideCaption, phoneWithSkip.Note!, StringComparison.Ordinal);
     }
 
     [Fact]
@@ -312,6 +327,58 @@ public sealed class GuideSurfaceParityTests : IDisposable
         var card = Desktop(settings, ledger).Single(g => g.CompletionKey == RewardKey).GuideCard!;
         Assert.Equal("", card.RowId);
         Assert.Equal(GuidePresentation.AllSkipped, card.Instruction);
+    }
+
+    /// <summary>
+    /// A quest with nothing left but skips says so ON THE HEADING, not only on the card
+    /// (Bevel, 2026-09-09, finding 2).
+    ///
+    /// <para>The heading's vocabulary had no word for "the player put this down", so it said
+    /// "in progress" while the card said "Every step left is skipped" — the surface
+    /// contradicting itself. Folding made it sharper: the heading is now often the only thing
+    /// on screen for a quest.</para></summary>
+    [Fact]
+    public void AQuestWithNothingLeftButSkipsSaysSoOnTheHeadingAndNotOnlyOnTheCard()
+    {
+        var settings = Settings();
+        var ledger = Store();
+        var group = Desktop(settings, ledger).Single(g => g.CompletionKey == RewardKey);
+
+        // Half-done, half-skipped: work remains, so "in progress" is still the true word.
+        var rows = group.Rows.Where(r => !r.IsTurnIn).ToList();
+        Assert.True(rows.Count >= 2);
+        Assert.True(CompanionActions.Apply(settings, ledger, Dranak,
+            new CompanionAction(CompanionSurfaces.Sky, rows[0].Id, Done: true)));
+        Assert.Equal("in progress",
+            Desktop(settings, ledger).Single(g => g.CompletionKey == RewardKey).Note);
+
+        // Strike the rest out and nothing is left that is neither done nor put down.
+        foreach (var row in rows.Skip(1))
+            Assert.True(CompanionActions.Apply(settings, ledger, Dranak,
+                new CompanionAction(CompanionSurfaces.Sky,
+                    CompanionActions.SkipVerb + row.Id, Done: true)));
+
+        var setAside = Desktop(settings, ledger).Single(g => g.CompletionKey == RewardKey);
+        Assert.Equal("set aside", setAside.Note);
+        // ...and the card is saying the same thing rather than a different one. On REAL Sky
+        // data that sentence is the blocked one, not "every step left is skipped": the
+        // turn-in is untouched and merely gated on the pieces that were struck out, which is
+        // exactly the case Fable's #491 defect 1 was about. The heading says the quest was
+        // put down; the card names the skip to take back to pick it up again.
+        Assert.StartsWith(GuidePresentation.BlockedBySkipLead,
+            setAside.GuideCard!.Instruction, StringComparison.Ordinal);
+        // Named by the OBJECTIVE's title, the way "after:" and "Before leaving" name a step,
+        // rather than by the instruction the row draws — one cross-referencing vocabulary.
+        var blocked = GuideCatalog.Default.Guides.Single(g => g.Id == setAside.GuideId)
+            .AllObjectives.Single(o => setAside.Rows[1].Id.EndsWith(o.Id, StringComparison.Ordinal));
+        Assert.Contains(blocked.Title, setAside.GuideCard!.Instruction, StringComparison.Ordinal);
+
+        // Taking one skip back puts the work — and the word — back.
+        Assert.True(CompanionActions.Apply(settings, ledger, Dranak,
+            new CompanionAction(CompanionSurfaces.Sky,
+                CompanionActions.SkipVerb + rows[1].Id, Done: false)));
+        Assert.Equal("in progress",
+            Desktop(settings, ledger).Single(g => g.CompletionKey == RewardKey).Note);
     }
 
     [Fact]

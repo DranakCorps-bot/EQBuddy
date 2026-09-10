@@ -208,6 +208,12 @@ public class GuideRowsTests
 
         Assert.Equal(0, app.DumpValue("shellQuestsGuideRows"));
         Assert.Equal(0, app.DumpValue("shellQuestsGuideCards"));
+        // SIX headings and NO caption lines. The caption draws only where it adds stubs or
+        // skipped (Bevel SIGNED), and the Warrior's six rewards have neither since DRA-44 —
+        // so this is the whole fix, on the real screen, in two numbers that differ. While
+        // the dump counted groups off the CAPTION's tag these could not have disagreed.
+        Assert.Equal(0, WarriorStubs);
+        Assert.Equal(0, app.DumpValue("shellQuestsGuideCaptions"));
         // ...and the classic item rows are not drawn in their place either: a folded guided
         // quest shows its heading, not the list the guide replaced.
         Assert.Equal(0, app.DumpValue("shellQuestsSkyRows"));
@@ -230,8 +236,8 @@ public class GuideRowsTests
         app.WaitForDump("questsGuideRows", WarriorRows, "the window's guide rows");
 
         foreach (var key in new[]
-                 { "GuideGroups", "GuideRows", "GuideStubs", "GuideDone", "GuideImprove",
-                   "SkyRows", "GuideCards", "GuideNext", "GuideSkipped" })
+                 { "GuideGroups", "GuideCaptions", "GuideRows", "GuideStubs", "GuideDone",
+                   "GuideImprove", "SkyRows", "GuideCards", "GuideNext", "GuideSkipped" })
             Assert.Equal(app.DumpValue("quests" + key), app.DumpValue("shellQuests" + key));
     }
 }

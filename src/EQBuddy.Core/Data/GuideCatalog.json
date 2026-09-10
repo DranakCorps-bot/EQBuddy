@@ -3807,7 +3807,7 @@
         {
           "id": "not-placed",
           "name": "Not placed",
-          "order": 1,
+          "order": 3,
           "arrivalNote": "",
           "objectives": [
             {
@@ -3840,7 +3840,7 @@
         {
           "id": "isle-5-the-spiroc-lord",
           "name": "Isle 5: The Spiroc Lord",
-          "order": 2,
+          "order": 1,
           "arrivalNote": "",
           "objectives": [
             {
@@ -3872,7 +3872,7 @@
         {
           "id": "the-wind-rune",
           "name": "The wind rune",
-          "order": 3,
+          "order": 2,
           "arrivalNote": "",
           "objectives": [
             {
@@ -13105,7 +13105,7 @@
         {
           "id": "not-placed",
           "name": "Not placed",
-          "order": 1,
+          "order": 3,
           "arrivalNote": "",
           "objectives": [
             {
@@ -13138,7 +13138,7 @@
         {
           "id": "isle-6-bazzt-zzzt",
           "name": "Isle 6: Bazzt Zzzt",
-          "order": 2,
+          "order": 1,
           "arrivalNote": "",
           "objectives": [
             {
@@ -13170,7 +13170,7 @@
         {
           "id": "the-wind-rune",
           "name": "The wind rune",
-          "order": 3,
+          "order": 2,
           "arrivalNote": "",
           "objectives": [
             {

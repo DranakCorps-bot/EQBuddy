@@ -419,20 +419,37 @@ $Shots = [ordered]@{
     # reward is authored, so this frame is the guide engine's own acceptance criterion:
     # the item rows are GONE and the walkthrough is in their place.
     #
+    # IT HAD STOPPED BEING THAT, AND THE RECIPE DID NOT NOTICE. Folding landed in #491 and
+    # this shot expands nothing, so from that day it photographed six folded headings and
+    # NO rows - a duplicate of shell-quests-sky-guide-folded, under a comment claiming to
+    # be the walkthrough's acceptance criterion. Trap 22's other half: staging that stops
+    # matching what the recipe SAYS it shows fails silently, because the picture is still
+    # a real state of something. It now expands the one reward it is about.
+    #
     # PREDICTED before shooting (trap 23), from the shipped catalog and the ticks below:
-    #   * six headings, each with a "Guide · n of m · k stub(s)" caption under it;
-    #   * "Runed Wind Amulet" reads 'Guide · 1 of 3 · 1 stub' — the Stone Amulet ticked
-    #     below, the wind rune stubbed, the turn-in still open;
-    #   * the wind-rune rows carry a wrapped dim second line starting "Wiki incomplete —",
-    #     and so does Dagas' Gem of Invigoration, whose two sources disagree;
-    #   * the turn-in row of every unfinished reward reads "after: …" naming the steps
-    #     that still gate it;
-    #   * a pencil at the end of EVERY row, not only the stubs;
-    #   * "Belt of the Four Winds" offers "Mark turned in" on its heading — every piece
-    #     held, and the turn-in row does NOT count itself among the pieces.
+    #   * six heading LINES, each a "+" then the name and its counts - except "Runed Wind
+    #     Amulet", which shows "-" and its steps;
+    #   * NO caption line on any of the six. Every Warrior reward has been fully authored
+    #     since DRA-44 and none is skipped here, and the caption now draws only where it
+    #     adds stubs or skipped. (This prediction used to promise "Guide - n of m - k
+    #     stub(s)" under all six, and both halves of that stopped being true.)
+    #   * under the open one: its NEXT card, then "Isle 4: Keeper of Souls" with the Stone
+    #     Amulet row TICKED, "The wind rune"
+    #     then the Wind Rune Azia row - authored, NOT stubbed, carrying the zone page's
+    #     "any Plane of Sky mob" line - then "Turn in to Torgon Blademaster" and its row
+    #     reading "after: ..." naming the step that still gates it. TALLER THAN THE DEFAULT
+    #     so that last row is IN the frame: the first take of this restaging clipped it one
+    #     line below the fold, which is the same below-the-fold miss the card shot had.
+
+    #   * a pencil at the end of EVERY row, not only hollow ones;
+    #   * "Belt of the Four Winds" reads "3/4 - ready" and offers "Mark turned in" on its
+    #     heading - every piece held, and the turn-in row does NOT count itself among the
+    #     pieces. That is the claim this shot keeps that the folded one cannot.
     'shell-quests-sky-guide' = @{ Title = 'EQBuddy — Guide'
-                           Env = @{ EQBUDDY_SHELL = 'quests:sky' }
+                           Env = @{ EQBUDDY_SHELL = 'quests:sky'
+                                    EQBUDDY_SHELL_SIZE = '1000x900' }
                            Set = @{
+                               GuideExpanded = @('Warrior|Runed Wind Amulet')
                                SkyQuestChecklist = @(
                                    @{ Id = 'sky-198'; Acquired = $true }   # Stone Amulet
                                    @{ Id = 'sky-200'; Acquired = $true }   # Belt: every
@@ -461,17 +478,25 @@ $Shots = [ordered]@{
     #
     # PREDICTED before shooting (trap 23), from the catalog and the one tick below:
     #   * Druid lens; the six Druid rewards render as guides.
-    #   * "Druid - Shillelagh" reads "Guide - 1 of 4 - 1 stub" under its heading.
+    #   * "Druid - Shillelagh" reads "- Druid - Shillelagh  1/4 - in progress" on one line,
+    #     the "-" being the fold control OPEN, and "Guide - 1 stub" under it. The caption no longer repeats the count - the heading owns progress, the
+    #     caption owns only what the heading has no room for - and Shillelagh is the ONLY
+    #     Druid heading that carries one at all, DRA-44 having left the other five rewards
+    #     with no stubs and nothing skipped.
     #   * Its card leads "NEXT:" + "Kill The Spiroc Lord on Isle 5 and loot the Spiroc
-    #     Battle Staff.", then Where "Plane of Sky - Isle 5.", What, Who "The Spiroc Lord",
-    #     then "for: Shillelagh", then Done / Skip / the pencil.
+    #     Battle Staff.", then the direction sentence "Travel to Plane of Sky - Isle 5, then
+    #     fight The Spiroc Lord.", then "Works toward the Shillelagh." - SENTENCES, not
+    #     Where/What/Who labels (David, 2026-09-09) - then Done / Skip / the pencil.
     #   * No "Before leaving" line anywhere: no Sky objective waits on a later stage, so that
     #     warning cannot fire on this data (NoShippedSkyGuideCanTriggerTheBeforeLeavingWarningYet).
-    #   * BELOW the card, the rows: "Loot the Efreeti Statuette." TICKED and carrying the
-    #     wrapped "Wiki incomplete -" caption naming what the Druid page does not say, under
-    #     a "Not placed" stage heading - the page gives neither an isle nor a mob for that
-    #     piece, so the row does not assert one (the first capture of this frame said "on
-    #     Isle 4" one line above a note saying the page gives no isle).
+    #   * BELOW the card, the rows in stage order: Isle 5, the wind rune, THEN "Not placed",
+    #     then the turn-in. "Loot the Efreeti Statuette." is TICKED and carries the wrapped
+    #     "Wiki incomplete -" caption naming what the Druid page does not say - the page gives
+    #     neither an isle nor a mob for that piece, so the row does not assert one (the first
+    #     capture of this frame said "on Isle 4" one line above a note saying the page gives
+    #     no isle). "Not placed" is now the LAST collection stage rather than the first: a
+    #     stage whose whole content is "we could not place this" is the wrong thing for a
+    #     class to open on (Fable's #491 defect 2), and this frame is where that was seen.
     # A class's quests FOLDED - the state a player now lands on (David, 2026-09-09: "see all
     # the quests for my class while they're collapsed and then dig into the details for each
     # by expanding the ones I want"). Druid, so the one expanded quest has a stub in it.
@@ -481,10 +506,21 @@ $Shots = [ordered]@{
     # its own frame (shell-quests-sky-guide-card); a shot with one quest open spends most of
     # its height on that quest and proves the opposite of what this row is for.
     #
-    # PREDICTED before shooting: six "Druid - <reward>" headings, each with its counts, its
-    # "Guide - n of m" caption and a small "+" button, and NOTHING between them - all six
-    # readable without scrolling. The face is +/- rather than words because six "Show steps"
-    # stacked down a folded list is more text than the headings they sit under.
+    # PREDICTED before shooting: six "Druid - <reward>" heading LINES, each one a small "+"
+    # followed on the SAME line by the name and its counts, and NOTHING between them - all
+    # six readable without scrolling, in six lines rather than twelve. The + leads the name
+    # rather than sitting under it (David, 2026-09-09: "I imagined the + would be next to the
+    # quest name, not wasting space between each quest name"), which is also where a
+    # disclosure control belongs - the eye reads the + and then the thing it opens. The face
+    # is +/- rather than words because six "Show steps" stacked down a folded list is more
+    # text than the headings they sit under.
+    #
+    # EXACTLY ONE of the six carries a caption line, and it reads "Guide - 1 stub":
+    # Shillelagh, which has the unplaced Efreeti Statuette stub in it. The other five draw no
+    # caption at all. Both halves are Bevel's SIGNED one-liner and Fable's #491 defect 3 -
+    # the heading owns pieces/ready, the caption draws only when it ADDS stubs or skipped -
+    # and this frame is where it was seen: with the rows folded away, "Guide - 1 of 4" one
+    # line under a heading reading "1/4 - in progress" was most of what was on screen.
     'shell-quests-sky-guide-folded' = @{ Title = 'EQBuddy — Guide'
                            Env = @{ EQBUDDY_SHELL = 'quests:sky'
                                     EQBUDDY_SHELL_SIZE = '1000x900' }

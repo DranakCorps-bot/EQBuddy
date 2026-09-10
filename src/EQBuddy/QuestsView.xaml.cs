@@ -1104,7 +1104,16 @@ public partial class QuestsView : UserControl
         // The floor under the guide facts: "no guide chrome" over an empty tab is the
         // vacuous pass an unguided-class assertion is most likely to become.
         $"questsSkyRows={ClassicRowsOnScreen()} " +
-        $"questsGuideGroups={GuideElementsOnScreen<TextBlock>(GuideCaptionTag)} " +
+        // Counted off the FOLD control, not the caption: the caption is now suppressed when
+        // it would only repeat the heading (Bevel's SIGNED one-liner), so it is no longer one
+        // per guided group. The fold control is — every guided group draws exactly one,
+        // folded or open — which is what makes it the group's identity on screen (trap 39).
+        $"questsGuideGroups={GuideElementsOnScreen<Button>(GuideFoldTag)} " +
+        // ...and the caption counted SEPARATELY, because "how many groups drew one" is now a
+        // real question with a real answer. It is drawn only where it adds stubs or skipped,
+        // so a class with neither shows six headings and NO caption lines — an assertion that
+        // could not exist while the two were the same tag.
+        $"questsGuideCaptions={GuideElementsOnScreen<TextBlock>(GuideCaptionTag)} " +
         $"questsGuideRows={GuideRowsOnScreen().Count()} " +
         $"questsGuideStubs={GuideStubsOnScreen()} " +
         $"questsGuideDone={GuideRowsOnScreen().Count(c => c.IsChecked == true)} " +
@@ -1319,7 +1328,12 @@ public partial class QuestsView : UserControl
             FontSize = DesignTokens.Spec(Role.Body).Size,
             MinWidth = DesignTokens.IconButtonSize,
             HorizontalAlignment = HorizontalAlignment.Left,
-            Margin = new Thickness(DesignTokens.SpaceXxs, 0, 0, DesignTokens.SpaceXs),
+            // Centred on the heading's own line and carrying its vertical margins, so the
+            // glyph sits level with the name it opens rather than under it (David,
+            // 2026-09-09).
+            VerticalAlignment = VerticalAlignment.Center,
+            Margin = new Thickness(DesignTokens.SpaceXxs, DesignTokens.SpaceL,
+                0, DesignTokens.SpaceXs),
             // The words the face dropped live here, where they cost no width.
             ToolTip = GuidePresentation.FoldTip(group.Collapsed),
             Tag = GuideFoldTag,
@@ -1354,8 +1368,25 @@ public partial class QuestsView : UserControl
     /// <summary>The tag the row-end "Improve this step" door carries.</summary>
     private const string GuideImproveTag = "guideImprove";
 
+    /// <summary>
+    /// Everything the panel draws, one level of <see cref="Grid"/> included.
+    ///
+    /// <para>The panel holds a mix: some things are laid straight in, and anything that
+    /// shares a LINE with something else is wrapped in a Grid. Which of the two a given
+    /// element is arrives with the layout and changes when the layout does — the heading's
+    /// fold control moved from its own row into the heading's Grid the day the "+" went
+    /// beside the name (David, 2026-09-09), and a direct-children sweep reported zero guided
+    /// groups for a tab that was drawing six. <c>RowBoxesOnScreen</c> already had to sweep
+    /// both; this is the same rule for every other tagged element rather than a second
+    /// hand-written copy of it.</para></summary>
+    private IEnumerable<FrameworkElement> PanelElements() =>
+        QuestsPanel.Children.OfType<FrameworkElement>()
+            .SelectMany(e => e is Grid g
+                ? g.Children.OfType<FrameworkElement>().Prepend(e)
+                : [e]);
+
     private int GuideElementsOnScreen<T>(string tag) where T : FrameworkElement =>
-        QuestsPanel.Children.OfType<T>().Count(e => e.Tag as string == tag);
+        PanelElements().OfType<T>().Count(e => e.Tag as string == tag);
 
     // A guide row is a CheckBox, and a guide row WITH its share-back door is that CheckBox
     // inside a two-column Grid — so both arrangements have to be swept or the door's
@@ -2711,13 +2742,40 @@ public partial class QuestsView : UserControl
             // across: SkyQuestCompleted kept being READ by both desktops and the phone
             // while nothing but the achievements import could WRITE it. Holding the pieces
             // and having handed them over are different states.
+            // THE HEADING LINE: the fold control, the name, and the turn-in button when there
+            // is one — all on one row.
+            //
+            // The "+" sits BESIDE the name, not under it (David, 2026-09-09): *"I imagined
+            // the + would be next to the quest name, not wasting space between each quest
+            // name… similarly to how the main EQBuddy window works when you click on a card
+            // and it expands below."* A folded list exists to fit a class on one screen, and
+            // a control on its own row spent a line per quest doing what a leading glyph does
+            // for free. Leading, because that is where a disclosure control lives — the eye
+            // reads the + then the thing it opens.
+            //
+            // Column 0 is empty and therefore zero-wide for an UNGUIDED group (the Epic tab,
+            // and any Sky reward with no guide), so those headings sit exactly where they did.
+            var headingRow = new Grid();
+            headingRow.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+            headingRow.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+            headingRow.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+            // A second row for the caption, so it lines up under the NAME rather than under
+            // the fold control. The grid answers that, not arithmetic on the control's width.
+            headingRow.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
+            headingRow.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
+
+            if (group.GuideId.Length > 0)
+            {
+                headingRow.Children.Add(FoldToggle(group));
+                // The name moves off the panel's own left edge to sit after the control.
+                headingText.Margin = new Thickness(DesignTokens.SpaceXs, DesignTokens.SpaceL,
+                    0, DesignTokens.SpaceXs);
+            }
+            Grid.SetColumn(headingText, 1);
+            headingRow.Children.Add(headingText);
+
             if (group.CompletionKey is { } rewardKey && (group.Completed || group.ReadyToTurnIn))
             {
-                var row = new Grid();
-                row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
-                row.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
-                row.Children.Add(headingText);
-
                 var turnIn = new Button
                 {
                     Style = (Style)FindResource("EqPrimaryButton"),
@@ -2738,11 +2796,10 @@ public partial class QuestsView : UserControl
                     _settings.Save();
                     Refresh(force: true);
                 };
-                Grid.SetColumn(turnIn, 1);
-                row.Children.Add(turnIn);
-                QuestsPanel.Children.Add(row);
+                Grid.SetColumn(turnIn, 2);
+                headingRow.Children.Add(turnIn);
             }
-            else QuestsPanel.Children.Add(headingText);
+            QuestsPanel.Children.Add(headingRow);
 
             // "Guide · 0 of 3 · 1 stub" — how far along, and how many of these steps we could
             // not fully write down. The stub count rides the same line as the progress on
@@ -2752,23 +2809,19 @@ public partial class QuestsView : UserControl
             {
                 var guideCaption = DesignSystem.Text(Role.Caption, group.GuideCaption);
                 guideCaption.TextWrapping = TextWrapping.Wrap;
-                guideCaption.Margin = new Thickness(DesignTokens.SpaceXxs, 0, 0, DesignTokens.SpaceXs);
+                guideCaption.Margin = new Thickness(DesignTokens.SpaceXs, 0, 0, DesignTokens.SpaceXs);
                 guideCaption.Ink("DimBrush");
-                // Identity is a property you PUT on the object (trap 39) — the dump counts
-                // guided groups off this tag rather than off a flag the render sets, because
-                // a flag nobody resets goes stale without anything noticing.
                 guideCaption.Tag = GuideCaptionTag;
-                QuestsPanel.Children.Add(guideCaption);
+                // Row 1, column 1: under the name, not under the "+".
+                Grid.SetRow(guideCaption, 1);
+                Grid.SetColumn(guideCaption, 1);
+                headingRow.Children.Add(guideCaption);
             }
 
-            // FOLDED: the heading, its counts and its caption, and nothing else. That is
-            // what lets a whole class fit on one screen and be dug into one quest at a time.
-            if (group.GuideId.Length > 0 && group.Collapsed)
-            {
-                QuestsPanel.Children.Add(FoldToggle(group));
-                continue;
-            }
-            if (group.GuideId.Length > 0) QuestsPanel.Children.Add(FoldToggle(group));
+            // FOLDED: the heading line — which now carries the fold control itself — its
+            // counts and its caption, and nothing else. That is what lets a whole class fit
+            // on one screen and be dug into one quest at a time.
+            if (group.GuideId.Length > 0 && group.Collapsed) continue;
 
             // The active-step card, ABOVE this group's rows: the one thing on the tab that
             // says "do this next" rather than "here is everything" belongs where the eye
