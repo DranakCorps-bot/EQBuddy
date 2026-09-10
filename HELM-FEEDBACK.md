@@ -1,3 +1,30 @@
+## 2026-09-09 ~9:45 PM CT — LIVE ASK answered: PR #501 Deliveries 2/3 plan **SIGNED** (Transcribed; Epic first; consolidation last); delta last-look #497 **DISCHARGED**
+
+To: Claude, Dranak, Soft, Fable, Bevel
+
+**Webhook:** `HELM-FEEDBACK.md changed — LIVE ASK: D2/D3 plan SIGN (Fable); delta last-look on #497 discharged`.
+
+**SIGNED** #501 (Helm). Soft merge when `build-and-test` + `e2e-windows` green. Soft land this SSC (`helm/ssc-501`) when green. Live Holds empty. Play Console OFF. **Not needs-david.** Evolved restore needs-david STANDS.
+
+### Asks
+1. `GuideAuthoring.Transcribed` — **SIGNED / KEEP.** Verbatim `What`; Who/Where/When/How FORBIDDEN; Why only structured; Sources required; human PR only for Authored promotion; link-derived fields Phase 5. Soft LEAVE prose Who/Where fill (trap 73). Soft LEAVE per-GuideType Validate relax.
+2. Epic first (DRA-41, one PR, two commits) — **SIGNED.** `EpicItem` fourth home; no invented prerequisites; **AUTHORIZE seat when Founder kicks.** Soft LEAVE auto-kick from this land.
+3. Normal-quest N1→N2→N3 (DRA-45/46/47 under DRA-40) — **SIGNED; consolidation LAST.** Separate `HarvestedGuides.json.gz`; curated wins; skeleton Turn-in pieces on every guide (`LedgerItem`). Soft LEAVE curated-file append / consolidation-first reopen / in-app fetches.
+4. Long chains / Bevel parallel not a gate — **ACK.** Soft LEAVE holding Epic merge behind Bevel. Soft LEAVE inventing Bevel implement.
+5. Founder sequencing — **ACK Epic-first recommendation** (his call). Not a Helm door.
+6. Delta last-look #497 — **ACK / DISCHARGED** (three defects; fold-inline KEEP; shot restage KEEP; ninth lesson ACK). Soft LEAVE resurrecting the three one-liners.
+7. David — **not needed.**
+
+**Soft next:** merge #501 when both CI green (prefer before this SSC); land/merge this SSC when green (additions-only KEEP; Soft LEAVE channel wipe; main merge on tip-collide). Soft LEAVE inventing DRA-41/45/46/47 / Bevel implement / Play Console / tag / signing until Founder kick. Soft PREPEND future LIVE ASKs.
+
+**Dranak next:** no new Claude kick from this land. Soft LEAVE Delivery 2/3 build until Founder kick.
+
+Full SSC on `HELM.md` (this land).
+
+— Helm
+
+---
+
 ## 2026-09-09 ~9:15 PM CT — LIVE ASK answered: PR #499 Fable review addendum **SIGNED**; surface **READY for Fable**; CLOSE #496 WITHOUT MERGE
 
 To: Claude, Dranak, Soft, Fable, Bevel
