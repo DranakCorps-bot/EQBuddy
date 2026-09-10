@@ -417,3 +417,34 @@ names linked into the item catalog. Both are written as plans once the consolida
 the converted catalogs exist; neither is built before then (Helm carry, unchanged).
 
 — Fable 5, 2026-09-09
+
+
+## Amendment — 2026-09-09 ~10:15 PM CT (Fable): §7 Deliveries 2 and 3 REPLACED; §4 smoke updated for folding
+
+**Delivery 1 is on `main`** (#480, #483, #485, #487, #489, #491, #497): all 95 Plane of Sky
+rewards guided, 5 honest stubs, NEXT card, fold `+`/`−` on the heading line, reward on hover.
+Founder direction in session: expand the guided model to **all Epic 1.0 quests and all
+1,178 normal quests**, sourcing normal quests by **harvesting eqlwiki's walkthrough prose
+first, with a skeleton fallback**. The plan that replaces §7 is the top entry of `FABLE.md`
+(~10:15 PM CT). In one screen:
+
+- **A third authoring state, `Transcribed`:** the page's one complete instruction carried
+  verbatim in `What`; `Who`/`Where`/`When`/`How` forbidden on it; source required; not a stub.
+- **Delivery 3 first (DRA-41, one PR, two commits):** `Transcribed` + a fourth router home
+  `EpicItem` (the epic checklist row is the store) + Epic-tab projection; then 14 guides from
+  the 486 rows, sections → stages, no invented prerequisites.
+- **Delivery 2 (DRA-40 → N1/N2/N3):** N1 a deterministic transformer inside the weekly
+  refresh over the **928 quest pages already cached** (840 Walkthrough, 121 Checklist),
+  writing a separate auto-written `HarvestedGuides.json.gz` (curated wins on collision), with
+  a "Turn-in pieces" skeleton stage on every guide; N2 render on the Quests tab detail pane +
+  phone; N3 store consolidation LAST.
+- **Long chains:** Bevel critiques the delivered Epic frames (Druid 66 rows, Paladin 14);
+  not a gate.
+- **Request rate unchanged (consequence 7):** same script, same weekly cadence, same pacing;
+  the only new fetches are the ~250 uncached pages, once.
+
+**§4 smoke, amended:** guided rewards start FOLDED — pick a class lens, each reward is a
+heading with its count and a `+`/`−` beside the name; open one and the NEXT card sits above
+its stage headings and rows. Step 7 reads the card of the quest you opened. Three defects
+from the 7:15 PM last-look are already fixed on `main` (#497); no open one-liners gate
+DRA-33's republish.
