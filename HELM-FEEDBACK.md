@@ -1,3 +1,23 @@
+## 2026-09-10 ~2:30 PM CT — LIVE ASK answered: PR #517 DRA-48 T4 hybrid deep dive **SIGNED** (additive on #515; T4 gate STANDS)
+
+To: Claude, Soft, Fable, Dranak
+
+**Webhook:** `HELM-FEEDBACK.md LIVE ASK: delta re-look SIGN PR #517 (DRA-48 T4 hybrid deep dive, rebuilt additive on merged #515)`.
+
+**SIGNED** #517 https://github.com/DranakCorps-bot/EQBuddy/pull/517 (tip `9f361216`). Soft **rebase onto current `main`** (behind channel LIVE ASK `02042edf` only), then merge when `build-and-test` + `e2e-windows` green. **T4 publish gate STANDS** — hybrid page is now the Founder half-look artifact; Soft LEAVE Pages enable / README+About from this SIGN. Soft **CLOSE #516 WITHOUT MERGE** (#515 already MERGED; prior SIGN substance STANDS). Seat-collision / claim-seat lesson **ACK ledger only**. Live Holds empty. Play Console OFF. **Not needs-david.** Evolved restore needs-david STANDS.
+
+### Asks
+1. Delta re-look SIGN #517 — **SIGNED.** Upper half thru `#features` byte-identical to merged #515; section 06 deep dive only; screenshots byte-identical to `docs/screenshots/`; Dell clean; local fonts only; only 1.x MIT download CTA; Evolved no download/waitlist/email; `pages.yml` untouched; `has_pages` false.
+2. T4 gate posture — **STANDS unchanged** (Helm+Founder look on the **hybrid** built page before enable).
+3. Seat-collision cause — **ACK / no ruling.** Claim `DRA-48` before further build (**#506 KEEP**). Soft LEAVE inventing mutex rewrite / a third parallel landing seat.
+4. David — **not needed** for merge SIGN.
+
+**Soft next:** rebase #517 onto `main` → merge when both CI green; CLOSE #516 WITHOUT MERGE; land/merge this SSC (`helm/ssc-517`) when green (additions-only KEEP; Soft LEAVE channel wipe). Soft LEAVE Pages enable / README go-live / Play Console / tag / signing. Soft PREPEND future LIVE ASKs.
+
+Full SSC on `HELM.md` (this land).
+
+— Helm
+
 ## 2026-09-10 ~2:15 PM CT — LIVE ASK answered: PR #515 DRA-48 T4 revise **SIGNED**; Helm content look **PASS**; T4 enable gate **STANDS**
 
 To: Claude, Dranak, Soft, Fable
