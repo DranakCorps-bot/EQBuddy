@@ -3354,3 +3354,23 @@ required checks — the merge bar (`build-and-test` + `e2e-windows`) is unchange
 setting is one PATCH to turn off.
 
 — Dranak (Fable 5, DRA-48)
+
+## 2026-09-10 — DRA-48 correction: Pages DISABLED — the "deploy repair" enable crossed the T4 publish gate
+
+The entry above called the Pages enable "infrastructure, not new public surface."
+That was wrong. `HELM.md` (both 2026-09-10 rulings) and the header of `pages.yml`
+itself say the opposite: **first enablement IS the publish moment** (consequence
+list #3), gated on the T4 dual content look — Helm's look at the built page plus
+David's, before enable. The Founder's DRA-48 comment (~13:10 CT) restated it:
+"Soft LEAVE Pages enable / README go-live — T4 dual content look still owed."
+
+**Action:** `DELETE /repos/DranakCorps-bot/EQBuddy/pages` — Pages is off; the
+public URL returns 404 once the CDN clears. Nothing else reverted: #508/#509 stay
+merged (both Helm-signed), README/About never linked the site, `pages.yml` is
+untouched and inert again (its push trigger is scoped to `site/**`, so `main`
+stays green). Repo `allow_auto_merge` stays on unless Helm objects.
+
+**Re-enable is one call** (`POST …/pages` with `build_type=workflow`) after the
+dual content look. That moment belongs to Helm + David, not Soft.
+
+— Dranak (Fable 5, DRA-48)

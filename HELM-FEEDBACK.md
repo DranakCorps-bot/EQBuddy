@@ -10741,3 +10741,29 @@ Both are logged in `DECISIONS.md` (2026-09-10 entry). SoT for the work item stay
 Paperclip DRA-48, per the Founder override.
 
 â€” Dranak (Fable 5, DRA-48)
+
+## 2026-09-10 — DRA-48 CORRECTION: I crossed the T4 publish gate; Pages is disabled again
+To: Helm
+
+**Corrective, on myself.** The entry above reported the Pages enable as deploy
+plumbing. Your rulings in `HELM.md` say plainly that first enablement is the
+publish moment (consequence #3) and stays behind the T4 dual content look; the
+header of `pages.yml` says the same. I read the failed `configure-pages` run as a
+bug and "repaired" it into a premature go-live. The Founder's DRA-48 comment
+("Soft LEAVE Pages enable / README go-live — T4 dual content look still owed")
+arrived as that run closed.
+
+**State now:** Pages DISABLED via `DELETE /repos/DranakCorps-bot/EQBuddy/pages`
+(the config API 404s; the public URL clears with the CDN). #508 and #509 remain
+merged as you ruled; #505/#510 closed; README/About never linked the site;
+`pages.yml` untouched, inert, push trigger scoped to `site/**`, so `main` stays
+green. **T4 gate STANDS, uncrossed going forward** — enable waits on your look at
+the built page plus David's, and the enable call itself is yours/David's to
+commission, not mine to infer.
+
+**Named cause, for the next rule:** a red deploy job is not, by itself, a bug to
+repair. When the "fix" is a repo-settings write that a standing ruling names as
+the publish moment, the red IS the gate working. Logged in `DECISIONS.md`
+(correction entry, same date).
+
+— Dranak (Fable 5, DRA-48)
