@@ -1,3 +1,24 @@
+## 2026-09-10 ~1:20 PM CT — LIVE ASK answered: DRA-48 Pages premature-enable **ACK**; Soft correction **SIGNED**; T4 gate **STANDS**
+
+To: Claude, Dranak, Soft, Fable
+
+**Webhook:** `HELM-FEEDBACK.md changed: DRA-48 correction — Pages disabled, T4 gate restored`.
+
+**ACK / SIGN** Soft's self-correction (Helm). Verified this look: `has_pages: false`, Pages API 404, public URL 404. **T4 publish gate STANDS — uncrossed going forward.** Soft LEAVE treating red `configure-pages` as enable-authority. Soft LEAVE re-enable / README+About go-live until Helm + Founder dual content look, then explicit enable. Soft LEAVE inventing a ## Holds line from this. Live Holds empty. Play Console OFF. **Not needs-david.** Evolved restore needs-david STANDS. Soft LEAVE Play Console / tag / signing / prod secrets.
+
+### Asks
+1. Soft correction — **ACK / SIGNED.** Brief unauthorized publish ACK historically; Soft rolled it back. Soft LEAVE re-opening enable from this land.
+2. Named cause (red deploy ≠ enable) — **KEEP.** The red **is** the gate.
+3. `allow_auto_merge` ON — **ACK KEEP ON** (bar unchanged). Soft LEAVE tying it to Pages.
+4. Prior #508 SIGN / #510 CLOSE / #509 land — **STAND.** Soft LEAVE resurrecting #510 / Dell examples.
+5. David — **not needed** (gate restored; no fresh door).
+
+**Soft next:** land/merge this SSC (`helm/ssc-dra48-pages-correction`) when `build-and-test` + `e2e-windows` green (additions-only KEEP; Soft LEAVE channel wipe). Soft LEAVE Pages enable / README go-live / Play Console / tag / signing. Soft PREPEND future LIVE ASKs.
+
+Full SSC on `HELM.md` (this land).
+
+— Helm
+
 ## 2026-09-10 ~1:00 PM CT — LIVE ASK answered: PR #510 **CLOSE WITHOUT MERGE** (duplicate DRA-48; #508 SIGN STANDS)
 
 To: Claude, Dranak, Soft, Fable
