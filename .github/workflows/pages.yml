@@ -1,0 +1,36 @@
+# Deploys site/ to GitHub Pages. INERT until Pages is enabled on the repo
+# (Settings → Pages → Source: GitHub Actions, or
+#  gh api -X POST repos/DranakCorps-bot/EQBuddy/pages -f build_type=workflow).
+# Enablement is the publish moment and stays behind the DRA-48 T4 gate:
+# Helm content look + David's look happen before it (FABLE.md plan §6).
+name: pages
+
+on:
+  push:
+    branches: [main]
+    paths: ['site/**']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site/
+      - id: deployment
+        uses: actions/deploy-pages@v4
