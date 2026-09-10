@@ -1,0 +1,2609 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Concept Layer vs Semantic Layer &mdash; MDR / ASU Worked Example</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg-primary:#0b0f19; --bg-secondary:#111827;
+  --bg-card:rgba(17,24,39,.75); --bg-card-hover:rgba(31,41,55,.85);
+  --border-color:rgba(255,255,255,.08); --border-glow:rgba(59,130,246,.3);
+  --text-main:#f3f4f6; --text-muted:#9ca3af; --text-dim:#6b7280;
+  --cyan:#06b6d4; --blue:#3b82f6; --purple:#8b5cf6; --pink:#ec4899;
+  --amber:#f59e0b; --emerald:#10b981; --rose:#f43f5e;
+  --grad-primary:linear-gradient(135deg,#06b6d4,#3b82f6);
+  --grad-purple:linear-gradient(135deg,#8b5cf6,#ec4899);
+  --grad-amber:linear-gradient(135deg,#f59e0b,#f43f5e);
+  --grad-emerald:linear-gradient(135deg,#10b981,#06b6d4);
+  --toc-w:290px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;scroll-padding-top:90px}
+body{
+  font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;
+  background-color:var(--bg-primary); color:var(--text-main);
+  line-height:1.65; overflow-x:hidden;
+  background-image:
+    radial-gradient(circle at 15% 10%,rgba(6,182,212,.08) 0%,transparent 40%),
+    radial-gradient(circle at 85% 30%,rgba(139,92,246,.08) 0%,transparent 40%),
+    radial-gradient(circle at 50% 70%,rgba(16,185,129,.06) 0%,transparent 50%);
+  background-attachment:fixed;
+}
+code,pre{font-family:'Fira Code',monospace}
+
+/* progress bar */
+#progress{position:fixed;top:0;left:0;height:3px;width:0;z-index:200;
+  background:linear-gradient(90deg,var(--cyan),var(--blue),var(--purple),var(--amber),var(--emerald));
+  box-shadow:0 0 12px rgba(6,182,212,.6);transition:width .1s linear}
+
+/* layout */
+.shell{max-width:1560px;margin:0 auto;display:flex;gap:2.5rem;padding:0 1.5rem}
+.toc{width:var(--toc-w);flex:0 0 var(--toc-w);position:sticky;top:0;align-self:flex-start;
+  height:100vh;overflow-y:auto;padding:2.5rem 0 4rem;scrollbar-width:thin}
+.toc::-webkit-scrollbar{width:6px}
+.toc::-webkit-scrollbar-thumb{background:rgba(255,255,255,.12);border-radius:3px}
+.toc-head{font-size:.7rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--text-dim);margin-bottom:1rem;padding-left:.9rem}
+.toc a{display:block;color:var(--text-dim);text-decoration:none;font-size:.83rem;
+  padding:.42rem .9rem;border-left:2px solid transparent;line-height:1.4;transition:all .18s ease}
+.toc a:hover{color:var(--text-main);background:rgba(255,255,255,.03)}
+.toc a.active{color:var(--cyan);border-left-color:var(--cyan);background:rgba(6,182,212,.07);font-weight:600}
+.toc a .num{font-family:'Fira Code',monospace;font-size:.72rem;opacity:.55;margin-right:.5rem}
+.toc-group{font-size:.68rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--purple);margin:1.4rem 0 .4rem;padding-left:.9rem;opacity:.8}
+.main{flex:1 1 auto;min-width:0;padding:0 0 8rem;max-width:1000px}
+
+/* hero */
+.hero{padding:4.5rem 0 2.5rem}
+.hero-badge{display:inline-flex;align-items:center;gap:.5rem;background:rgba(6,182,212,.1);
+  border:1px solid rgba(6,182,212,.3);color:var(--cyan);padding:.4rem 1.15rem;border-radius:9999px;
+  font-size:.78rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;margin-bottom:1.5rem;
+  box-shadow:0 0 20px rgba(6,182,212,.15)}
+.hero-title{font-size:3.1rem;font-weight:900;letter-spacing:-.03em;line-height:1.1;
+  background:linear-gradient(135deg,#fff 0%,#cbd5e1 55%,#94a3b8 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:1.1rem}
+.hero-title em{font-style:normal;background:var(--grad-primary);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.hero-sub{font-size:1.12rem;color:var(--text-muted);max-width:820px;margin-bottom:2rem}
+.tech-pills{display:flex;flex-wrap:wrap;gap:.55rem;margin-bottom:2.5rem}
+.pill{background:var(--bg-card);border:1px solid var(--border-color);color:var(--text-muted);
+  padding:.32rem .8rem;border-radius:8px;font-size:.76rem;font-weight:500;display:flex;
+  align-items:center;gap:.4rem;backdrop-filter:blur(8px)}
+.pill-dot{width:6px;height:6px;border-radius:50%;background:var(--cyan)}
+.pill.p2 .pill-dot{background:var(--purple)} .pill.p3 .pill-dot{background:var(--amber)}
+.pill.p4 .pill-dot{background:var(--emerald)}
+
+/* sections */
+section{padding:3.5rem 0 1rem;scroll-margin-top:80px}
+.sec-num{font-family:'Fira Code',monospace;font-size:.75rem;font-weight:700;color:var(--cyan);
+  letter-spacing:.14em;text-transform:uppercase;margin-bottom:.6rem;display:block}
+h2{font-size:2rem;font-weight:800;letter-spacing:-.02em;line-height:1.2;margin-bottom:.9rem;
+  background:linear-gradient(135deg,#fff,#94a3b8);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+h3{font-size:1.22rem;font-weight:700;color:#fff;margin:2.2rem 0 .8rem}
+h4{font-size:.95rem;font-weight:700;color:var(--text-main);margin:1.4rem 0 .6rem}
+p{color:var(--text-muted);margin-bottom:1rem;font-size:.97rem}
+p strong,li strong{color:var(--text-main);font-weight:650}
+.lede{font-size:1.06rem;color:#cbd5e1}
+ul,ol{color:var(--text-muted);margin:0 0 1.15rem 1.25rem;font-size:.96rem}
+li{margin-bottom:.5rem}
+a.ext{color:var(--cyan);text-decoration:none;border-bottom:1px dotted rgba(6,182,212,.4)}
+hr.div{border:0;height:1px;background:var(--border-color);margin:3rem 0}
+
+/* cards */
+.card{background:var(--bg-card);border:1px solid var(--border-color);border-radius:16px;
+  padding:1.6rem;backdrop-filter:blur(12px);box-shadow:0 8px 28px rgba(0,0,0,.25);margin-bottom:1.25rem}
+.card h4{margin-top:0}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:1.25rem;margin-bottom:1.5rem}
+.grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:1rem;margin-bottom:1.5rem}
+
+/* metrics */
+.metrics-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:1.1rem;margin:1.5rem 0 2rem}
+.metric-card{background:var(--bg-card);border:1px solid var(--border-color);border-radius:16px;
+  padding:1.3rem;position:relative;overflow:hidden;backdrop-filter:blur(12px);
+  transition:all .3s ease;box-shadow:0 4px 20px rgba(0,0,0,.2)}
+.metric-card:hover{transform:translateY(-4px);border-color:var(--border-glow)}
+.metric-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--grad-primary)}
+.metric-card.purple::before{background:var(--grad-purple)}
+.metric-card.amber::before{background:var(--grad-amber)}
+.metric-card.emerald::before{background:var(--grad-emerald)}
+.metric-value{font-size:2.3rem;font-weight:800;line-height:1;margin-bottom:.35rem;
+  font-family:'Fira Code',monospace;background:var(--grad-primary);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.metric-card.purple .metric-value{background:var(--grad-purple);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.metric-card.amber .metric-value{background:var(--grad-amber);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.metric-card.emerald .metric-value{background:var(--grad-emerald);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.metric-label{font-size:.85rem;font-weight:650;color:var(--text-main);margin-bottom:.15rem}
+.metric-sub{font-size:.73rem;color:var(--text-dim);line-height:1.4}
+
+/* provenance badges */
+.badge{display:inline-flex;align-items:center;gap:.35rem;padding:.2rem .6rem;border-radius:6px;
+  font-size:.68rem;font-weight:800;text-transform:uppercase;letter-spacing:.06em;vertical-align:middle}
+.b-obs{background:rgba(16,185,129,.14);color:var(--emerald);border:1px solid rgba(16,185,129,.32)}
+.b-prop{background:rgba(139,92,246,.14);color:var(--purple);border:1px solid rgba(139,92,246,.32)}
+.b-synth{background:rgba(245,158,11,.14);color:var(--amber);border:1px solid rgba(245,158,11,.32)}
+.b-warn{background:rgba(244,63,94,.14);color:var(--rose);border:1px solid rgba(244,63,94,.32)}
+
+/* callouts */
+.callout{border-radius:12px;padding:1.1rem 1.25rem;margin:1.25rem 0;font-size:.93rem;line-height:1.6}
+.callout .ct{font-weight:800;text-transform:uppercase;font-size:.7rem;letter-spacing:.07em;
+  display:block;margin-bottom:.4rem}
+.c-obs{background:rgba(16,185,129,.07);border-left:3px solid var(--emerald);color:#a7f3d0}
+.c-obs .ct{color:var(--emerald)}
+.c-prop{background:rgba(139,92,246,.07);border-left:3px solid var(--purple);color:#ddd6fe}
+.c-prop .ct{color:var(--purple)}
+.c-warn{background:rgba(244,63,94,.07);border-left:3px solid var(--rose);color:#fecdd3}
+.c-warn .ct{color:var(--rose)}
+.c-synth{background:rgba(245,158,11,.07);border-left:3px solid var(--amber);color:#fde68a}
+.c-synth .ct{color:var(--amber)}
+.c-info{background:rgba(6,182,212,.07);border-left:3px solid var(--cyan);color:#a5f3fc}
+.c-info .ct{color:var(--cyan)}
+.callout code{background:rgba(0,0,0,.3);padding:.1rem .35rem;border-radius:4px;font-size:.86em;color:inherit}
+
+/* code */
+pre{background:#080c14;border:1px solid var(--border-color);border-radius:12px;padding:1.1rem 1.25rem;
+  overflow-x:auto;font-size:.8rem;line-height:1.65;color:#cbd5e1;margin:1rem 0;
+  scrollbar-width:thin}
+pre::-webkit-scrollbar{height:8px}
+pre::-webkit-scrollbar-thumb{background:rgba(255,255,255,.14);border-radius:4px}
+pre .k{color:#c084fc;font-weight:600}   /* keyword */
+pre .f{color:#22d3ee}                    /* function */
+pre .s{color:#86efac}                    /* string */
+pre .c{color:#5b6577;font-style:italic}  /* comment */
+pre .n{color:#fbbf24}                    /* number */
+pre .o{color:#f472b6}                    /* object/table */
+pre .p{color:#94a3b8}                    /* punctuation-ish */
+.code-cap{font-size:.72rem;color:var(--text-dim);font-family:'Fira Code',monospace;
+  margin:-.4rem 0 1.2rem;padding-left:.2rem}
+code.inl{background:rgba(255,255,255,.06);border:1px solid var(--border-color);padding:.08rem .38rem;
+  border-radius:5px;font-size:.83em;color:#a5f3fc;white-space:nowrap}
+
+/* tables */
+.tbl-wrap{overflow-x:auto;margin:1.2rem 0;border:1px solid var(--border-color);border-radius:12px;
+  background:rgba(8,12,20,.5)}
+table{width:100%;border-collapse:collapse;font-size:.85rem;min-width:560px}
+th{text-align:left;padding:.75rem 1rem;background:rgba(255,255,255,.04);color:var(--text-main);
+  font-weight:700;font-size:.75rem;text-transform:uppercase;letter-spacing:.05em;
+  border-bottom:1px solid var(--border-color);white-space:nowrap}
+td{padding:.7rem 1rem;border-bottom:1px solid rgba(255,255,255,.045);color:var(--text-muted);vertical-align:top}
+tr:last-child td{border-bottom:none}
+tbody tr:hover td{background:rgba(255,255,255,.02)}
+td code,th code{font-size:.85em;color:#a5f3fc}
+.tick{color:var(--emerald);font-weight:800}
+.cross{color:var(--rose);font-weight:800}
+.part{color:var(--amber);font-weight:800}
+.num-cell{font-family:'Fira Code',monospace;text-align:right;color:var(--text-main)}
+
+/* tabs */
+.tabs{margin:1.4rem 0 1.6rem}
+.tab-bar{display:flex;flex-wrap:wrap;gap:.4rem;border-bottom:1px solid var(--border-color);margin-bottom:0}
+.tab-btn{background:transparent;border:1px solid transparent;border-bottom:none;color:var(--text-dim);
+  padding:.6rem 1.1rem;font-family:'Inter',sans-serif;font-size:.83rem;font-weight:650;cursor:pointer;
+  border-radius:9px 9px 0 0;transition:all .18s ease}
+.tab-btn:hover{color:var(--text-main);background:rgba(255,255,255,.03)}
+.tab-btn.active{color:var(--cyan);background:rgba(6,182,212,.08);border-color:var(--border-color);
+  border-bottom:1px solid #080c14;margin-bottom:-1px}
+.tab-panel{display:none}
+.tab-panel.active{display:block}
+.tab-panel pre{border-top-left-radius:0;margin-top:0}
+
+/* details */
+details{background:rgba(255,255,255,.025);border:1px solid var(--border-color);border-radius:12px;
+  padding:0;margin:1.2rem 0;overflow:hidden}
+details summary{cursor:pointer;padding:.85rem 1.2rem;font-weight:650;font-size:.88rem;color:var(--cyan);
+  list-style:none;display:flex;align-items:center;gap:.6rem;user-select:none;transition:background .18s ease}
+details summary:hover{background:rgba(6,182,212,.05)}
+details summary::-webkit-details-marker{display:none}
+details summary::before{content:'\25B8';font-size:.8rem;transition:transform .2s ease;display:inline-block}
+details[open] summary::before{transform:rotate(90deg)}
+details summary .dtag{margin-left:auto;font-size:.66rem;font-weight:800;text-transform:uppercase;
+  letter-spacing:.06em;color:var(--text-dim)}
+.details-body{padding:.4rem 1.2rem 1.2rem}
+.details-body > :last-child{margin-bottom:0}
+
+/* svg figure */
+figure{margin:1.6rem 0;background:rgba(8,12,20,.45);border:1px solid var(--border-color);
+  border-radius:14px;padding:1.4rem 1rem .9rem;overflow-x:auto}
+figure svg{display:block;margin:0 auto;max-width:100%;height:auto}
+figcaption{text-align:center;font-size:.76rem;color:var(--text-dim);margin-top:.9rem;
+  font-family:'Fira Code',monospace}
+.svg-l{font-family:'Inter',sans-serif;font-size:11px;font-weight:650;fill:#e5e7eb}
+.svg-s{font-family:'Fira Code',monospace;font-size:9px;fill:#8b97a8}
+.svg-t{font-family:'Inter',sans-serif;font-size:12px;font-weight:800;fill:#fff}
+
+/* glossary tooltips */
+.gl{color:#a5f3fc;border-bottom:1px dashed rgba(6,182,212,.55);cursor:help;outline:none}
+.gl:focus{background:rgba(6,182,212,.12);border-radius:3px}
+.gl-tip{position:fixed;z-index:400;max-width:340px;background:#0d1420;color:#dbe3ee;
+  border:1px solid rgba(6,182,212,.45);border-radius:10px;padding:.7rem .85rem;
+  font-family:'Inter',sans-serif;font-size:.79rem;font-weight:400;line-height:1.55;
+  letter-spacing:0;text-transform:none;text-align:left;white-space:normal;
+  box-shadow:0 14px 38px rgba(0,0,0,.6);opacity:0;visibility:hidden;pointer-events:none;
+  transition:opacity .15s ease}
+.gl-tip.on{opacity:1;visibility:visible}
+.gl-hint{display:inline-flex;align-items:center;gap:.45rem;font-size:.76rem;color:var(--text-dim);
+  background:rgba(255,255,255,.03);border:1px solid var(--border-color);border-radius:8px;
+  padding:.4rem .75rem;margin-bottom:1rem}
+.gl-hint b{color:#a5f3fc;border-bottom:1px dashed rgba(6,182,212,.55);font-weight:500}
+
+/* evidence-class badges */
+.b-struct{background:rgba(59,130,246,.14);color:var(--blue);border:1px solid rgba(59,130,246,.32)}
+.b-obsv{background:rgba(6,182,212,.14);color:var(--cyan);border:1px solid rgba(6,182,212,.32)}
+.b-ratif{background:rgba(16,185,129,.14);color:var(--emerald);border:1px solid rgba(16,185,129,.32)}
+.b-assert{background:rgba(139,92,246,.14);color:var(--purple);border:1px solid rgba(139,92,246,.32)}
+
+/* glossary grid */
+.gloss{display:grid;grid-template-columns:repeat(auto-fit,minmax(330px,1fr));gap:.9rem;margin:1.2rem 0}
+.gloss-item{background:var(--bg-card);border:1px solid var(--border-color);border-radius:12px;
+  padding:.95rem 1.1rem;backdrop-filter:blur(8px)}
+.gloss-item h5{font-size:.86rem;font-weight:600;color:#a5f3fc;margin-bottom:.3rem;
+  font-family:'Fira Code',monospace}
+.gloss-item p{font-size:.83rem;margin:0;color:var(--text-muted);line-height:1.55}
+.gloss-cat{font-size:.7rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--purple);margin:1.8rem 0 .2rem}
+
+/* footer */
+footer.pf{border-top:1px solid var(--border-color);padding-top:2.5rem;margin-top:4rem;
+  color:var(--text-dim);font-size:.83rem}
+footer.pf p{color:var(--text-dim);font-size:.83rem;margin-bottom:.5rem}
+
+/* mobile */
+.toc-toggle{display:none}
+@media (max-width:1180px){
+  .shell{flex-direction:column;gap:0;padding:0 1.1rem}
+  .toc{position:static;width:100%;flex:auto;height:auto;max-height:none;padding:1.5rem 0 0}
+  .toc-inner{display:none}
+  .toc-inner.open{display:block}
+  .toc-toggle{display:block;width:100%;background:var(--bg-card);border:1px solid var(--border-color);
+    color:var(--cyan);padding:.75rem 1rem;border-radius:10px;font-family:'Inter',sans-serif;
+    font-size:.85rem;font-weight:700;cursor:pointer;text-align:left}
+  .main{max-width:none;padding-bottom:5rem}
+  .hero-title{font-size:2.2rem}
+  .hero{padding:2.5rem 0 1.5rem}
+}
+@media print{
+  .toc,#progress{display:none} body{background:#fff;color:#000}
+}
+</style>
+</head>
+<body>
+
+<div id="progress"></div>
+
+<div class="shell">
+
+<!-- ===================== TOC ===================== -->
+<nav class="toc">
+  <button class="toc-toggle" onclick="document.querySelector('.toc-inner').classList.toggle('open')">Contents &#9662;</button>
+  <div class="toc-inner">
+    <div class="toc-head">Contents</div>
+    <div class="toc-group">Orientation</div>
+    <a href="#s1"><span class="num">01</span>The short version</a>
+    <a href="#s2"><span class="num">02</span>What MDR actually is</a>
+    <a href="#s3"><span class="num">03</span>Two ways to describe it</a>
+    <div class="toc-group">What we actually built</div>
+    <a href="#s4"><span class="num">04</span>The semantic layer, as built</a>
+    <a href="#s5"><span class="num">05</span>The warehouse beneath it</a>
+    <div class="toc-group">Three dimensions</div>
+    <a href="#s6"><span class="num">06</span>Product</a>
+    <a href="#s7"><span class="num">07</span>Geography</a>
+    <a href="#s8"><span class="num">08</span>Entitlement</a>
+    <div class="toc-group">The concept layer</div>
+    <a href="#s9"><span class="num">09</span>Same concept, as a Concept Layer</a>
+    <a href="#s10"><span class="num">10</span>Three serializations</a>
+    <a href="#s11"><span class="num">11</span>Worked example</a>
+    <div class="toc-group">Judgement</div>
+    <a href="#s12"><span class="num">12</span>Retrieval scorecard</a>
+    <a href="#s13"><span class="num">13</span>Prompt paths &amp; evaluation</a>
+    <a href="#s14"><span class="num">14</span>Proposed target state</a>
+    <a href="#s15"><span class="num">15</span>Deriving it from evidence</a>
+    <div class="toc-group">Reference</div>
+    <a href="#s16"><span class="num">16</span>Glossary</a>
+    <a href="#s17"><span class="num">17</span>Provenance &amp; governance</a>
+  </div>
+</nav>
+
+<!-- ===================== MAIN ===================== -->
+<main class="main">
+
+<header class="hero">
+  <div class="hero-badge">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="5" r="2.5"/><circle cx="5" cy="19" r="2.5"/><circle cx="19" cy="19" r="2.5"/><path d="M12 7.5v4M12 11.5l-6 5M12 11.5l6 5"/></svg>
+    Bluebook &middot; Concept Explainer
+  </div>
+  <h1 class="hero-title">Concept Layer vs <em>Semantic Layer</em></h1>
+  <p class="hero-sub">
+    A worked comparison built from the <strong>real</strong> Bluebook metadata &mdash; the Julius tabular cube,
+    its Teradata source views, and the macros that populate the warehouse &mdash; using
+    <strong>MDR</strong> (service events that incur warranty cost) expressed as a ratio over
+    <strong>eligible entitled assets (ASUs)</strong>, sliced by Product, Geography, and Entitlement.
+  </p>
+  <div class="tech-pills">
+    <span class="pill"><span class="pill-dot"></span>SSAS Tabular / DAX</span>
+    <span class="pill p2"><span class="pill-dot"></span>Teradata Macros</span>
+    <span class="pill p3"><span class="pill-dot"></span>IOMETE / Iceberg</span>
+    <span class="pill p4"><span class="pill-dot"></span>RDF / OWL</span>
+    <span class="pill"><span class="pill-dot"></span>JSON-LD</span>
+    <span class="pill p2"><span class="pill-dot"></span>Property Graph</span>
+  </div>
+
+  <div class="gl-hint">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#06b6d4" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 16v-4M12 8h.01"/></svg>
+    Jargon like <b>RDF</b>, <b>OWL</b> or <b>non-additive</b> is underlined &mdash; hover or tab to it for a
+    plain-language definition. Full list in the <a class="ext" href="#s16">glossary</a>.
+  </div>
+
+  <div class="callout c-info" style="margin-top:0">
+    <span class="ct">How to read this document</span>
+    Statements marked <span class="badge b-obs">Observed</span> are drawn directly from the captured
+    metadata catalog and quoted verbatim. Statements marked <span class="badge b-prop">Proposed</span>
+    are an architectural argument &mdash; my opinion, not an approved project. Numbers marked
+    <span class="badge b-synth">Synthetic</span> are illustrative and made up. Leadership can read
+    sections 01&ndash;03 and 12&ndash;13 and stop; engineers should expand the deep-dives.
+  </div>
+</header>
+
+<!-- ============ 01 ============ -->
+<section id="s1">
+  <span class="sec-num">Section 01 &middot; Orientation</span>
+  <h2>The short version</h2>
+  <p class="lede">
+    Our semantic layer is very good at computing MDR. It is structurally incapable of explaining it.
+    That gap is what a Concept Layer fills &mdash; and it is the gap that determines whether an AI agent
+    gives a correct answer or a confidently wrong one.
+  </p>
+
+  <div class="metrics-grid">
+    <div class="metric-card"><div class="metric-value">36</div><div class="metric-label">Tables</div><div class="metric-sub">Julius tabular model</div></div>
+    <div class="metric-card purple"><div class="metric-value">203</div><div class="metric-label">Measures</div><div class="metric-sub">197 in <code>_Measures</code></div></div>
+    <div class="metric-card emerald"><div class="metric-value">70</div><div class="metric-label">Relationships</div><div class="metric-sub">All physical key joins</div></div>
+    <div class="metric-card amber"><div class="metric-value">3</div><div class="metric-label">Entitlement dims</div><div class="metric-sub">From one source column</div></div>
+    <div class="metric-card amber"><div class="metric-value">2</div><div class="metric-label">Geography dims</div><div class="metric-sub">Two databases, near-identical</div></div>
+    <div class="metric-card"><div class="metric-value">17</div><div class="metric-label">ASU partitions</div><div class="metric-sub">Logic duplicated per slice</div></div>
+    <div class="metric-card purple"><div class="metric-value">0</div><div class="metric-label">Declared hierarchies</div><div class="metric-sub">On <code>Dim - Product</code>'s 52 cols</div></div>
+    <div class="metric-card emerald"><div class="metric-value">4</div><div class="metric-label">Layers to a definition</div><div class="metric-sub">Measure &rarr; view &rarr; macro &rarr; source</div></div>
+  </div>
+
+  <h3>Five things worth knowing</h3>
+  <ol>
+    <li><strong>A measure name is not a definition.</strong> <code class="inl">MDR (Field ASUs)</code> is one DAX line.
+      What it <em>means</em> lives four layers down, in a Teradata <code class="inl">CASE</code> statement inside
+      a macro almost nobody reads.</li>
+    <li><strong>The model duplicates entities it cannot express as roles.</strong> "Field Entitlement" and
+      "Tech Entitlement" are two physical copies of one Offering entity because DAX needs one table per
+      relationship path. The cube cannot say they are the same thing.</li>
+    <li><strong>Two geographies compete.</strong> Asset country and service country are both modeled, from two
+      different source databases, with no declared distinction. "MDR by region" is ambiguous and nothing in
+      the model says so.</li>
+    <li><strong>MDR is non-additive and nothing declares it.</strong> It is a ratio of two weekly averages.
+      Averaging it across weeks is wrong. The cube will happily let you do it.</li>
+    <li><strong>These are complements, not rivals.</strong> The Concept Layer should <em>annotate and point at</em>
+      the existing Julius measures, not replace them. The cube stays the calculation engine.</li>
+  </ol>
+
+  <div class="callout c-obs">
+    <span class="ct">Observed &middot; the smoking gun</span>
+    <code>Dim - Field Entitlement</code> and <code>Dim - Tech Entitlement</code> are built from
+    <strong>byte-identical SQL</strong> against the same two source objects. They differ only by a
+    column-name prefix. A third copy of the same grain exists as <code>Dim - Monarch Ranking</code>.
+    One real-world concept, three physical tables, zero declared equivalence.
+  </div>
+</section>
+
+<hr class="div">
+
+<!-- ============ 02 ============ -->
+<section id="s2">
+  <span class="sec-num">Section 02 &middot; Orientation</span>
+  <h2>What MDR actually is</h2>
+  <p>
+    <strong>MDR</strong> identifies service events that incur warranty cost &mdash; in practice, a dispatched
+    work order where Dell bears the parts and/or labour cost under an entitlement. On its own the count is
+    meaningless: a bigger installed base produces more dispatches. So MDR is almost always consumed as a
+    <strong>rate</strong>: dispatches divided by the population of assets that were <em>eligible and entitled</em>
+    to generate one.
+  </p>
+
+  <figure>
+    <svg viewBox="0 0 860 220" role="img" aria-label="MDR as a ratio of dispatches over eligible entitled assets">
+      <defs>
+        <linearGradient id="gA" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#f59e0b"/><stop offset="1" stop-color="#f43f5e"/></linearGradient>
+        <linearGradient id="gB" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#10b981"/><stop offset="1" stop-color="#06b6d4"/></linearGradient>
+      </defs>
+      <rect x="30" y="26" width="330" height="62" rx="12" fill="rgba(245,158,11,.09)" stroke="url(#gA)" stroke-width="1.5"/>
+      <text x="195" y="52" text-anchor="middle" class="svg-t">Numerator &mdash; MDR Work Orders</text>
+      <text x="195" y="72" text-anchor="middle" class="svg-s">DISTINCTCOUNT(Work Order Number) WHERE MDR Dispatch Flag</text>
+      <line x1="30" y1="104" x2="360" y2="104" stroke="#64748b" stroke-width="2"/>
+      <rect x="30" y="120" width="330" height="62" rx="12" fill="rgba(16,185,129,.09)" stroke="url(#gB)" stroke-width="1.5"/>
+      <text x="195" y="146" text-anchor="middle" class="svg-t">Denominator &mdash; Field ASUs</text>
+      <text x="195" y="166" text-anchor="middle" class="svg-s">Eligible + entitled assets, counted per fiscal week</text>
+      <text x="396" y="112" class="svg-t" font-size="26">=</text>
+      <rect x="440" y="60" width="180" height="90" rx="14" fill="rgba(6,182,212,.1)" stroke="#06b6d4" stroke-width="1.5"/>
+      <text x="530" y="98" text-anchor="middle" class="svg-t" font-size="15">MDR Rate</text>
+      <text x="530" y="122" text-anchor="middle" class="svg-s">weekly-averaged ratio</text>
+      <path d="M636 105 L676 105" stroke="#8b5cf6" stroke-width="2" marker-end="url(#ar1)"/>
+      <marker id="ar1" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#8b5cf6"/></marker>
+      <rect x="686" y="52" width="150" height="106" rx="12" fill="rgba(139,92,246,.09)" stroke="#8b5cf6" stroke-width="1.5" stroke-dasharray="4 3"/>
+      <text x="761" y="80" text-anchor="middle" class="svg-l">Sliced by</text>
+      <text x="761" y="102" text-anchor="middle" class="svg-l" fill="#22d3ee">Product</text>
+      <text x="761" y="122" text-anchor="middle" class="svg-l" fill="#22d3ee">Geography</text>
+      <text x="761" y="142" text-anchor="middle" class="svg-l" fill="#22d3ee">Entitlement</text>
+    </svg>
+    <figcaption>The concept in one picture. Everything difficult is hidden in the two words "eligible" and "entitled".</figcaption>
+  </figure>
+
+  <h3>"MDR" is not one number &mdash; it is a family</h3>
+  <p>
+    The cube exposes at least ten distinct MDR variants. A human analyst picks the right one from context.
+    An AI agent asked "what is our MDR rate?" has no basis to choose, and the model gives it no help.
+  </p>
+
+  <div class="tbl-wrap">
+  <table>
+    <thead><tr><th>Measure</th><th>Restricts to</th><th>Why it exists</th></tr></thead>
+    <tbody>
+      <tr><td><code>MDR Work Orders</code></td><td><code>MDR Dispatch Flag</code></td><td>The base population</td></tr>
+      <tr><td><code>Parts MDR Work Orders</code></td><td><code>Service Type New</code> in Parts and Labor / Parts Only / Tech Direct Remit</td><td>Excludes labour-only cost events</td></tr>
+      <tr><td><code>MDR Major Part Work Order</code></td><td><code>Major Part Flag</code></td><td>High-value component failures</td></tr>
+      <tr><td><code>Multi-Major Parts MDR Work Orders</code></td><td><code>Work Order MDR Multi-Major Part Flag</code></td><td>Diagnostic-quality signal</td></tr>
+      <tr><td><code>FQM MDR Dispatches</code></td><td><code>FQM Flag</code></td><td>Field quality management carve-out</td></tr>
+      <tr><td><code>Auto Dispatch Volume (MDR)</code></td><td><code>Auto Dispatch Flag = 1</code></td><td>Telemetry-triggered dispatches</td></tr>
+      <tr><td><code>Labor Only Work Orders</code></td><td><code>Service Type New = "Labor Only"</code></td><td>Feeds <code>Labor Only Rate</code></td></tr>
+      <tr><td><code>MDR (Field ASUs)</code></td><td>&mdash;</td><td>The headline rate</td></tr>
+      <tr><td><code>MDR (Field TLSUs)</code></td><td>&mdash;</td><td>Same numerator, TLA-excluded denominator</td></tr>
+      <tr><td><code>Commodity MDR (Field ASUs)</code></td><td>&mdash;</td><td>Parts <em>quantity</em> per ASU, not dispatches</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <div class="callout c-warn">
+    <span class="ct">The disambiguation problem</span>
+    Note the last row. <code>Commodity MDR (Field ASUs)</code> is named like a dispatch rate but is actually
+    <code>DIVIDE([Weekly Avg Item Quanity],[Weekly Avg Field ASU])</code> &mdash; a <em>parts-per-asset</em>
+    figure with a different unit. Nothing in the model distinguishes it. Note also the typo in the
+    dependency <code>Weekly Avg Item Quanity</code>, which is exactly the kind of thing that breaks
+    naive name-matching retrieval.
+  </div>
+</section>
+
+<hr class="div">
+
+<!-- ============ 03 ============ -->
+<section id="s3">
+  <span class="sec-num">Section 03 &middot; Orientation</span>
+  <h2>Two ways to describe the same thing</h2>
+  <p>
+    A semantic layer is an <strong>execution contract</strong>. It guarantees that if you ask for
+    <code class="inl">MDR (Field ASUs)</code> filtered to a region, you get one deterministic, governed number.
+    A Concept Layer is a <strong>meaning contract</strong>. It guarantees you know what that number denotes,
+    where its definition came from, and what you are not allowed to do with it.
+  </p>
+
+  <div class="grid2">
+    <div class="card">
+      <h4 style="color:var(--cyan)">Semantic layer &mdash; what it encodes</h4>
+      <ul style="margin-bottom:0">
+        <li>Physical tables, columns, data types</li>
+        <li>Join paths, cardinality, filter direction</li>
+        <li>One canonical aggregation formula per measure</li>
+        <li>Display folders and format strings</li>
+        <li>Perspectives (curated table subsets)</li>
+        <li>Row-level security boundaries</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4 style="color:var(--purple)">Concept Layer &mdash; what it adds</h4>
+      <ul style="margin-bottom:0">
+        <li>Entities and <em>roles</em>, distinct from tables</li>
+        <li>Human definitions with authorship and effective dates</li>
+        <li>Provenance: which macro derived this flag</li>
+        <li>Additivity and comparability constraints</li>
+        <li>Synonyms, aliases, deprecations</li>
+        <li>Explicit statements of what is <em>not</em> valid</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>Capability comparison</h3>
+  <div class="tbl-wrap">
+  <table>
+    <thead><tr><th style="min-width:300px">Question an analyst or agent might ask</th><th>Semantic layer</th><th>Concept Layer</th></tr></thead>
+    <tbody>
+      <tr><td>What is MDR% for EMEA last quarter?</td><td class="tick">Yes &mdash; and authoritatively</td><td class="cross">No calculation engine</td></tr>
+      <tr><td>Which "region" &mdash; asset location or service location?</td><td class="cross">Both modeled, neither labelled</td><td class="tick">Roles are declared</td></tr>
+      <tr><td>What counts as an "eligible entitled asset"?</td><td class="part">Implied by a filter argument</td><td class="tick">Stated, with provenance</td></tr>
+      <tr><td>Can I average this rate across 13 weeks?</td><td class="cross">Silently permits it</td><td class="tick">Constraint blocks it</td></tr>
+      <tr><td>Is "Field Entitlement" the same as "Tech Entitlement"?</td><td class="cross">Two unrelated tables</td><td class="tick">Two roles, one entity</td></tr>
+      <tr><td>Who owns this definition and when did it change?</td><td class="cross">Not representable</td><td class="tick">First-class metadata</td></tr>
+      <tr><td>Which of ten MDR measures do I want?</td><td class="part">Display folder hints only</td><td class="tick">Typed and differentiated</td></tr>
+      <tr><td>Give me the number, governed and audited.</td><td class="tick">This is its entire job</td><td class="cross">Must delegate</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <div class="callout c-info">
+    <span class="ct">The point</span>
+    Read the last row alongside the first. Neither column is winning. The Concept Layer cannot compute and
+    should never try; the semantic layer cannot explain and will never be able to. The interesting
+    architecture is the one where an agent consults the Concept Layer to <em>plan</em> a question and the cube
+    to <em>answer</em> it.
+  </div>
+</section>
+
+<hr class="div">
+
+<!-- ============ 04 ============ -->
+<section id="s4">
+  <span class="sec-num">Section 04 &middot; What we actually built</span>
+  <h2>The semantic layer, as actually built</h2>
+  <p>
+    Everything below is quoted verbatim from the captured extract of the Julius model. This is not a
+    simplification &mdash; it is the real measure chain. <span class="badge b-obs">Observed</span>
+  </p>
+
+  <figure>
+    <svg viewBox="0 0 880 330" role="img" aria-label="DAX dependency chain for MDR (Field ASUs)">
+      <defs>
+        <marker id="ar" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 z" fill="#64748b"/></marker>
+        <marker id="arc" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 z" fill="#06b6d4"/></marker>
+      </defs>
+      <!-- numerator chain -->
+      <rect x="16" y="22" width="196" height="52" rx="10" fill="rgba(255,255,255,.04)" stroke="#475569"/>
+      <text x="114" y="44" text-anchor="middle" class="svg-l">FACT - Work Order Parts</text>
+      <text x="114" y="61" text-anchor="middle" class="svg-s">171 columns</text>
+
+      <rect x="246" y="22" width="186" height="52" rx="10" fill="rgba(59,130,246,.1)" stroke="#3b82f6"/>
+      <text x="339" y="44" text-anchor="middle" class="svg-l">Total Work Orders</text>
+      <text x="339" y="61" text-anchor="middle" class="svg-s">DISTINCTCOUNT</text>
+
+      <rect x="466" y="22" width="186" height="52" rx="10" fill="rgba(59,130,246,.1)" stroke="#3b82f6"/>
+      <text x="559" y="44" text-anchor="middle" class="svg-l">MDR Work Orders</text>
+      <text x="559" y="61" text-anchor="middle" class="svg-s">+ MDR Dispatch Flag</text>
+
+      <rect x="686" y="22" width="178" height="52" rx="10" fill="rgba(139,92,246,.12)" stroke="#8b5cf6"/>
+      <text x="775" y="44" text-anchor="middle" class="svg-l">Weekly Avg MDR</text>
+      <text x="775" y="61" text-anchor="middle" class="svg-s">AVERAGEX over week</text>
+
+      <line x1="212" y1="48" x2="242" y2="48" stroke="#64748b" stroke-width="1.6" marker-end="url(#ar)"/>
+      <line x1="432" y1="48" x2="462" y2="48" stroke="#64748b" stroke-width="1.6" marker-end="url(#ar)"/>
+      <line x1="652" y1="48" x2="682" y2="48" stroke="#64748b" stroke-width="1.6" marker-end="url(#ar)"/>
+
+      <!-- denominator chain -->
+      <rect x="16" y="212" width="196" height="52" rx="10" fill="rgba(255,255,255,.04)" stroke="#475569"/>
+      <text x="114" y="234" text-anchor="middle" class="svg-l">FACT - ASU</text>
+      <text x="114" y="251" text-anchor="middle" class="svg-s">39 cols &middot; 17 partitions</text>
+
+      <rect x="246" y="212" width="186" height="52" rx="10" fill="rgba(16,185,129,.1)" stroke="#10b981"/>
+      <text x="339" y="234" text-anchor="middle" class="svg-l">Total Field ASUs</text>
+      <text x="339" y="251" text-anchor="middle" class="svg-s">SUM(fld_asus) + 2 filters</text>
+
+      <rect x="466" y="212" width="186" height="52" rx="10" fill="rgba(16,185,129,.1)" stroke="#10b981"/>
+      <text x="559" y="234" text-anchor="middle" class="svg-l">Weekly Field ASUs (ALL)</text>
+      <text x="559" y="251" text-anchor="middle" class="svg-s">LATEST ACTUAL / LASTNONBLANK</text>
+
+      <rect x="686" y="212" width="178" height="52" rx="10" fill="rgba(139,92,246,.12)" stroke="#8b5cf6"/>
+      <text x="775" y="234" text-anchor="middle" class="svg-l">Weekly Avg Field ASU</text>
+      <text x="775" y="251" text-anchor="middle" class="svg-s">AVERAGEX over week</text>
+
+      <line x1="212" y1="238" x2="242" y2="238" stroke="#64748b" stroke-width="1.6" marker-end="url(#ar)"/>
+      <line x1="432" y1="238" x2="462" y2="238" stroke="#64748b" stroke-width="1.6" marker-end="url(#ar)"/>
+      <line x1="652" y1="238" x2="682" y2="238" stroke="#64748b" stroke-width="1.6" marker-end="url(#ar)"/>
+
+      <!-- divide -->
+      <rect x="600" y="118" width="264" height="62" rx="14" fill="rgba(6,182,212,.12)" stroke="#06b6d4" stroke-width="1.8"/>
+      <text x="732" y="143" text-anchor="middle" class="svg-t" font-size="13">MDR (Field ASUs)</text>
+      <text x="732" y="163" text-anchor="middle" class="svg-s">DIVIDE(numerator, denominator)</text>
+      <path d="M775 78 L775 114" stroke="#06b6d4" stroke-width="1.8" marker-end="url(#arc)"/>
+      <path d="M775 208 L775 184" stroke="#06b6d4" stroke-width="1.8" marker-end="url(#arc)"/>
+
+      <text x="300" y="146" class="svg-s" fill="#f43f5e">Both sides weekly-averaged &rarr; the result is NOT additive across weeks</text>
+      <text x="300" y="164" class="svg-s" fill="#f43f5e">Nothing in the model declares this.</text>
+    </svg>
+    <figcaption>The real dependency chain. Four hops on each side before the division.</figcaption>
+  </figure>
+
+  <h3>The numerator</h3>
+<pre><span class="c">-- Total Work Orders (_Measures)</span>
+<span class="f">DISTINCTCOUNT</span>(<span class="o">'FACT - Work Order Parts'</span>[Work Order Number])
+
+<span class="c">-- MDR Work Orders (_Measures) -- Display Folder: Work Orders\MDR</span>
+<span class="f">CALCULATE</span>([Total Work Orders],<span class="o">'FACT - Work Order Parts'</span>[MDR Dispatch Flag])
+
+<span class="c">-- Weekly Avg MDR (_Measures) -- Display Folder: _Weekly_Aggs</span>
+<span class="k">var</span> tbl = <span class="f">SUMMARIZE</span>(<span class="o">'Dim - Fiscal Calendar'</span>,<span class="o">'Dim - Fiscal Calendar'</span>[Fiscal Week],<span class="s">"MDR_CNT"</span>,[MDR Work Orders])
+<span class="k">Return</span>
+<span class="f">AVERAGEX</span>(tbl,[MDR_CNT])</pre>
+  <p class="code-cap">source: data-catalog/tabular/Julius/measures/_measures.md</p>
+
+  <h3>The denominator &mdash; "eligible entitled assets"</h3>
+<pre><span class="c">-- Total Field ASUs (_Measures) -- Display Folder: ASUs\Totals</span>
+<span class="f">CALCULATE</span>(<span class="f">SUM</span>(<span class="o">'FACT - ASU'</span>[fld_asus]),
+  <span class="o">'Dim - Fiscal Calendar'</span>[ASU Actual Decline] &lt;&gt; <span class="s">"DECLINE"</span>,
+  <span class="o">'Dim - Product'</span>[Reporting Product Type] <span class="k">in</span> {<span class="f">BLANK</span>(),<span class="s">"NULL"</span>, <span class="s">"HARDWARE"</span>})
+
+<span class="c">-- Weekly Field ASUs (ALL) -- Display Folder: ASUs\Field;_Forecast_Measures</span>
+<span class="k">var</span> Curr_Week_Val = <span class="f">CALCULATE</span>([Total Field ASUs],<span class="o">'Dim - Fiscal Calendar'</span>[ASU Actual Decline]=<span class="s">"LATEST ACTUAL"</span>)
+<span class="k">var</span> Max_Week_Val  = <span class="f">CALCULATE</span>([Total Field ASUs], <span class="f">LASTNONBLANK</span>(<span class="o">'FACT - ASU'</span>[rpt_fisc_week],[Total Field ASUs]))
+<span class="k">var</span> week_val = <span class="f">IF</span>(<span class="f">ISFILTERED</span>(<span class="o">'Dim - Fiscal Calendar'</span>),Max_Week_Val,Curr_Week_Val)
+<span class="k">return</span> week_val</pre>
+  <p class="code-cap">source: data-catalog/tabular/Julius/measures/_measures.md</p>
+
+  <div class="callout c-warn">
+    <span class="ct">Observed &middot; a definition hiding inside a filter argument</span>
+    Read that first expression again. The business rule <em>"ASU eligibility is hardware-only and excludes
+    forecast/decline weeks"</em> is not documented anywhere. It exists as two filter arguments inside a
+    <code>CALCULATE</code>. Change the product filter and you have silently redefined a board-level KPI.
+  </div>
+
+  <h3>The ratio</h3>
+<pre><span class="c">-- MDR (Field ASUs) -- Display Folder: Work Orders\MDR -- Format: 0.00%;-0.00%;0.00%</span>
+<span class="f">DIVIDE</span>([Weekly Avg MDR],[Weekly Avg Field ASU])</pre>
+  <p class="code-cap">source: data-catalog/tabular/Julius/measures/_measures.md</p>
+
+  <details>
+    <summary>Deep dive: three inconsistencies visible in the extract <span class="dtag">Engineers</span></summary>
+    <div class="details-body">
+      <p>These are things I noticed while reading the extract. I am flagging them as
+        <strong>worth verifying against the live model</strong>, not asserting they are bugs &mdash; the
+        catalog snapshot dates from 2026-08-06 and there may be intent I cannot see.</p>
+
+      <h4>1. Inconsistent <code class="inl">SUMMARIZE</code> anchor table</h4>
+<pre><span class="c">-- Weekly Avg MDR summarises the DIMENSION</span>
+<span class="k">var</span> tbl = <span class="f">SUMMARIZE</span>(<span class="o">'Dim - Fiscal Calendar'</span>,<span class="o">'Dim - Fiscal Calendar'</span>[Fiscal Week],<span class="s">"MDR_CNT"</span>,[MDR Work Orders])
+
+<span class="c">-- Weekly Avg Field ASU summarises the FACT</span>
+<span class="k">var</span> tbl = <span class="f">SUMMARIZE</span>(<span class="o">'FACT - ASU'</span>,<span class="o">'Dim - Fiscal Calendar'</span>[Fiscal Week],<span class="s">"ASUs"</span>,[Weekly Field ASUs (ALL)])</pre>
+      <p>The numerator averages over every fiscal week in the calendar; the denominator averages only over
+        weeks present in the ASU fact. In a period with calendar weeks but no ASU rows, the two averages have
+        different divisors &mdash; and the ratio drifts.</p>
+
+      <h4>2. TLSU exclusion flag used in opposite directions</h4>
+<pre><span class="c">-- Total Tech TLSUs (ALL)</span>
+<span class="f">CALCULATE</span>(<span class="f">SUM</span>(<span class="o">'FACT - ASU'</span>[tech_asus]),<span class="o">'Dim - Fiscal Calendar'</span>[ASU Actual Decline] &lt;&gt; <span class="s">"DECLINE"</span>,
+  <span class="o">'FACT - ASU'</span>[TLA_EXCLSN_FLG]=<span class="n">1</span>,<span class="o">'Dim - Product'</span>[Reporting Product Type] <span class="k">in</span> {<span class="f">BLANK</span>(), <span class="s">"HARDWARE"</span>})
+
+<span class="c">-- Weekly Tech TLSUs / Weekly Field TLSUs</span>
+<span class="f">CALCULATE</span>([Weekly Tech ASUs (ALL)],<span class="o">'FACT - ASU'</span>[TLA_EXCLSN_FLG]&lt;&gt;<span class="n">1</span>)</pre>
+      <p>One filters <code class="inl">= 1</code>, the others <code class="inl">&lt;&gt; 1</code>. These are
+        complementary populations sharing the label "TLSU". Note also that the first omits
+        <code class="inl">"NULL"</code> from its product filter while every ASU measure includes it.</p>
+
+      <h4>3. Two measures, identical body</h4>
+      <p><code class="inl">Total Work Orders</code> and <code class="inl">distinct work orders</code> have the
+        same DAX expression. Only the first is referenced downstream. An agent doing semantic search over
+        measure names has two equally-good hits and no tiebreaker.</p>
+
+      <div class="callout c-prop" style="margin-bottom:0">
+        <span class="ct">Why this matters for the argument</span>
+        None of these are DAX failures. They are <em>knowledge</em> failures &mdash; drift between what a
+        name promises and what a formula does. A semantic layer has no place to record intent, so it
+        cannot detect divergence from it. A Concept Layer with a declared TLSU definition would surface all
+        three as constraint violations at authoring time.
+      </div>
+    </div>
+  </details>
+</section>
+
+<hr class="div">
+
+<!-- ============ 05 ============ -->
+<section id="s5">
+  <span class="sec-num">Section 05 &middot; What we actually built</span>
+  <h2>The warehouse beneath it</h2>
+  <p>
+    The DAX in section 04 consumes flags it does not define. To find out what
+    <code class="inl">MDR Dispatch Flag</code> or <code class="inl">fld_asus</code> actually <em>mean</em>,
+    you have to descend three more layers. <span class="badge b-obs">Observed</span>
+  </p>
+
+  <figure>
+    <svg viewBox="0 0 840 250" role="img" aria-label="Four layers between a measure name and its definition">
+      <defs><marker id="ard" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 z" fill="#8b5cf6"/></marker></defs>
+      <rect x="20" y="20" width="800" height="44" rx="10" fill="rgba(6,182,212,.1)" stroke="#06b6d4"/>
+      <text x="40" y="40" class="svg-l">Layer 1 &mdash; Semantic layer (DAX)</text>
+      <text x="40" y="56" class="svg-s">MDR (Field ASUs) = DIVIDE([Weekly Avg MDR],[Weekly Avg Field ASU])</text>
+      <rect x="20" y="76" width="800" height="44" rx="10" fill="rgba(59,130,246,.09)" stroke="#3b82f6"/>
+      <text x="40" y="96" class="svg-l">Layer 2 &mdash; Import view / partition SQL</text>
+      <text x="40" y="112" class="svg-s">BLUEBK_V_WO_PARTS_IMPORT &middot; MDR.MDR_DSPCH_FLG as "MDR Dispatch Flag"</text>
+      <rect x="20" y="132" width="800" height="44" rx="10" fill="rgba(139,92,246,.09)" stroke="#8b5cf6"/>
+      <text x="40" y="152" class="svg-l">Layer 3 &mdash; Teradata macro (the real definition)</text>
+      <text x="40" y="168" class="svg-s">03_BLUEBK_M_WO_EXT.sql &middot; SVC_TYPE_NEW, PARTS_MDR_FLG, FLD_POC / TECH_POC</text>
+      <rect x="20" y="188" width="800" height="44" rx="10" fill="rgba(244,63,94,.08)" stroke="#f43f5e" stroke-dasharray="4 3"/>
+      <text x="40" y="208" class="svg-l">Layer 4 &mdash; Upstream source (outside Bluebook's control)</text>
+      <text x="40" y="224" class="svg-s">SVC_CDL.USDM_WO_MDR_FACT &rarr; SVC_CDL_T.USDM_WO_MDR_FACT &middot; origin of MDR_DSPCH_FLG</text>
+      <path d="M410 64 L410 74" stroke="#8b5cf6" stroke-width="1.6" marker-end="url(#ard)"/>
+      <path d="M410 120 L410 130" stroke="#8b5cf6" stroke-width="1.6" marker-end="url(#ard)"/>
+      <path d="M410 176 L410 186" stroke="#8b5cf6" stroke-width="1.6" marker-end="url(#ard)"/>
+    </svg>
+    <figcaption>Four layers between the measure name a user sees and the logic that defines it.</figcaption>
+  </figure>
+
+  <h3>Where MDR is really derived</h3>
+  <p>
+    <code class="inl">03_BLUEBK_M_WO_EXT.sql</code> builds <code class="inl">SVC_TYPE_NEW</code> through a
+    long <code class="inl">CASE</code>, then uses it to derive the MDR flags. This is the actual business
+    definition of "a service event that incurs warranty cost":
+  </p>
+<pre><span class="c">/* ---- SVC_TYPE_NEW (abridged) ---- */</span>
+<span class="k">CASE</span>
+  <span class="k">WHEN</span> wof.SVC_TYPE <span class="k">IN</span> (<span class="s">'Parts and Labor'</span>,<span class="s">'Labor Only'</span>)            <span class="k">THEN</span> wof.SVC_TYPE
+  <span class="k">WHEN</span> wof.SVC_TYPE <span class="k">IN</span> (<span class="s">'Mail-In'</span>,<span class="s">'Collect and Return'</span>,<span class="s">'Return to Base'</span>) <span class="k">THEN</span> <span class="s">'Depot'</span>
+  <span class="k">WHEN</span> wof.SVC_TYPE = <span class="s">'Carry-In'</span>                                 <span class="k">THEN</span> <span class="s">'Parts and Labor'</span>
+  <span class="k">WHEN</span> wof.SVC_TYPE = <span class="s">'Parts Only'</span> <span class="k">AND</span> mdr.MDR_LBR_FLG = <span class="n">1</span>      <span class="k">THEN</span> <span class="s">'Tech Direct Remit'</span>
+  <span class="k">WHEN</span> wof.SVC_TYPE = <span class="s">'Parts Only'</span>
+       <span class="k">AND</span> (mdr.MDR_LBR_FLG = <span class="n">0</span> <span class="k">OR</span> mdr.MDR_LBR_FLG <span class="k">IS NULL</span>)     <span class="k">THEN</span> wof.SVC_TYPE
+  <span class="k">WHEN</span> wof.SVC_TYPE <span class="k">NOT IN</span> (<span class="s">'Parts Only'</span>,<span class="s">'Parts and Labor'</span>,<span class="s">'Labor Only'</span>)
+       <span class="k">THEN</span> <span class="k">CASE</span>
+              <span class="k">WHEN</span> mdr.LBR_COST_FLG = <span class="n">1</span> <span class="k">AND</span> mdr.SHIP_COST_FLG = <span class="n">1</span> <span class="k">THEN</span> <span class="s">'Parts and Labor'</span>
+              <span class="k">WHEN</span> mdr.LBR_COST_FLG = <span class="n">1</span> <span class="k">AND</span> mdr.SHIP_COST_FLG = <span class="n">0</span> <span class="k">THEN</span> <span class="s">'Labor Only'</span>
+              <span class="k">WHEN</span> mdr.LBR_COST_FLG = <span class="n">0</span> <span class="k">AND</span> mdr.SHIP_COST_FLG = <span class="n">1</span> <span class="k">THEN</span> <span class="s">'Parts Only'</span>
+              <span class="k">WHEN</span> mdr.LBR_COST_FLG = <span class="n">0</span> <span class="k">AND</span> mdr.SHIP_COST_FLG = <span class="n">0</span> <span class="k">THEN</span> <span class="s">'No Parts No Labor'</span>
+            <span class="k">END</span>
+  <span class="k">ELSE</span> <span class="s">'NA'</span>
+<span class="k">END</span> <span class="k">AS</span> SVC_TYPE_NEW
+
+<span class="c">/* ---- MDR flags ---- */</span>
+<span class="k">CASE WHEN</span> SVC_TYPE_NEW <span class="k">IN</span> (<span class="s">'Parts and Labor'</span>,<span class="s">'Parts Only'</span>,<span class="s">'Tech Direct Remit'</span>)
+          <span class="k">AND</span> mdr.MDR_DSPCH_FLG = <span class="n">1</span>
+     <span class="k">THEN</span> <span class="n">1</span> <span class="k">ELSE</span> <span class="n">0</span> <span class="k">END</span> <span class="k">AS</span> PARTS_MDR_FLG
+
+<span class="k">CASE WHEN</span> SVC_TYPE_NEW <span class="k">IN</span> (<span class="s">'Parts and Labor'</span>,<span class="s">'Parts Only'</span>,<span class="s">'Tech Direct Remit'</span>,<span class="s">'Labor Only'</span>)
+          <span class="k">AND</span> mdr.MDR_DSPCH_FLG = <span class="n">1</span>
+          <span class="k">AND</span> (wof.WO_TYPE <span class="k">IN</span> (<span class="s">'Break Fix'</span>) <span class="k">OR</span> wof.WO_TYPE <span class="k">IS NULL</span>)
+          <span class="k">AND</span> (FQM.FQM_FLG = <span class="n">0</span> <span class="k">OR</span> FQM.FQM_FLG <span class="k">IS NULL</span>)
+     <span class="k">THEN</span> <span class="n">1</span> <span class="k">ELSE</span> <span class="n">0</span> <span class="k">END</span> <span class="k">AS</span> BREAKFIX_MDR_FLG</pre>
+  <p class="code-cap">source: macros/BLUEBK/003_Work_Order/03_BLUEBK_M_WO_EXT.sql</p>
+
+  <h3>Where "eligible entitled asset" is really defined</h3>
+<pre><span class="c">-- 12_BLUEBK_M_FLD_ASU_CURR.sql -- the eligibility predicate</span>
+<span class="k">WHERE</span>
+    a.ASU_XCLSN_FLG &lt;&gt; <span class="n">1</span>
+    <span class="k">AND</span> a.FLD_FLG = <span class="n">1</span>
+
+<span class="c">-- ...and the counting rules</span>
+ <span class="f">COUNT</span>(<span class="k">DISTINCT</span> SRC_CUST_PROD_ID)                                    <span class="k">AS</span> FLD_ASUS
+,<span class="f">COUNT</span>(<span class="k">DISTINCT</span> <span class="k">CASE WHEN</span> HW_HES_FLG = <span class="n">1</span> <span class="k">THEN</span> SRC_CUST_PROD_ID <span class="k">END</span>) <span class="k">AS</span> FLD_HW_ASUS
+,<span class="f">COUNT</span>(<span class="k">DISTINCT</span> ASST_EXP_CNTRCT_CNT)                               <span class="k">AS</span> FLD_EXP_ASST_CNT
+,<span class="f">COUNT</span>(<span class="k">DISTINCT</span> SHIPPED_ASSET_CNT)                                 <span class="k">AS</span> FLD_SHIPD_ASUS</pre>
+  <p class="code-cap">source: macros/BLUEBK/001_Asset_Entitlement/001_ASU/12_BLUEBK_M_FLD_ASU_CURR.sql</p>
+
+  <div class="callout c-obs">
+    <span class="ct">Observed &middot; the grain of an ASU</span>
+    An ASU is a <strong>distinct <code>SRC_CUST_PROD_ID</code> per fiscal week</strong>, excluded if
+    <code>ASU_XCLSN_FLG = 1</code>, and required to carry <code>FLD_FLG = 1</code> for the field variant.
+    That single sentence is the definition of the denominator of a KPI reported to leadership, and it
+    exists nowhere except in a <code>WHERE</code> clause and in the heads of about four people.
+  </div>
+
+  <details>
+    <summary>Deep dive: how entitlement is resolved, including the sentinel values <span class="dtag">Engineers</span></summary>
+    <div class="details-body">
+      <p>The same macro resolves entitlement onto the work order, and encodes two important business
+        states as magic strings:</p>
+<pre><span class="k">CASE WHEN</span> <span class="f">COALESCE</span>(inc_fld.ENTLT_PROD_OFFRG_CD, inc_tech.ENTLT_PROD_OFFRG_CD) <span class="k">IS NULL</span>
+     <span class="k">THEN</span> <span class="n">1</span> <span class="k">ELSE</span> <span class="n">0</span> <span class="k">END</span> <span class="k">AS</span> NULL_POC_FLG
+
+<span class="k">CASE</span>
+   <span class="k">WHEN</span> NULL_ASST_FLG = <span class="n">1</span> <span class="k">AND</span> NULL_POC_FLG = <span class="n">1</span> <span class="k">THEN</span> <span class="s">'N/A'</span>   <span class="c">-- no asset AND no entitlement</span>
+   <span class="k">WHEN</span> NULL_ASST_FLG = <span class="n">0</span> <span class="k">AND</span> NULL_POC_FLG = <span class="n">1</span> <span class="k">THEN</span> <span class="s">'OOW'</span>   <span class="c">-- known asset, out of warranty</span>
+   <span class="k">ELSE</span> inc_fld.ENTLT_PROD_OFFRG_CD
+<span class="k">END</span> <span class="k">AS</span> FLD_POC</pre>
+      <p><code class="inl">'OOW'</code> and <code class="inl">'N/A'</code> flow all the way up into
+        <code class="inl">Dim - Field Entitlement[Field Product Offering Code]</code> as if they were
+        ordinary offering codes. They are not &mdash; they are <em>absence markers</em> with completely
+        different semantics. Downstream, <code class="inl">Dim - Field Entitlement</code> has its own
+        special-case for one of them:</p>
+<pre><span class="k">CASE</span>
+  <span class="k">WHEN</span> POH.PROD_OFRNG_CODE = <span class="s">'OOW'</span>                              <span class="k">THEN</span> <span class="s">'OOW'</span>
+  <span class="k">WHEN</span> UDT.TECHL_SUPP_GRP_DESC <span class="k">LIKE</span> <span class="s">'%ProSupport Plus%'</span>        <span class="k">THEN</span> <span class="s">'ProSupport Plus'</span>
+  <span class="k">WHEN</span> UDT.TECHL_SUPP_TIER_NBR <span class="k">IN</span> (<span class="n">1</span>,<span class="n">2</span>)                        <span class="k">THEN</span> <span class="s">'ProSupport'</span>
+  <span class="k">WHEN</span> UDT.TECHL_SUPP_TIER_NBR <span class="k">IN</span> (<span class="n">3</span>,<span class="n">4</span>,<span class="n">5</span>)                      <span class="k">THEN</span> <span class="s">'Basic'</span>
+  <span class="k">ELSE</span> <span class="s">'NA'</span>
+<span class="k">END</span> <span class="k">AS</span> <span class="s">"Offer Level"</span></pre>
+      <p class="code-cap">source: data-catalog/tabular/Julius/tables/Dim - Field Entitlement.md</p>
+      <p>So we now have <code class="inl">'OOW'</code>, <code class="inl">'N/A'</code> and
+        <code class="inl">'NA'</code> circulating as three different absence markers with overlapping
+        meaning. An agent grouping MDR by Offer Level will produce buckets it cannot interpret, and will
+        not know that <code class="inl">'OOW'</code> is a <em>legitimate business population</em>
+        (out-of-warranty service) while <code class="inl">'N/A'</code> is a <em>data quality artifact</em>
+        (unresolvable asset).</p>
+    </div>
+  </details>
+
+  <div class="callout c-warn">
+    <span class="ct">Scope boundary</span>
+    <code>MDR_DSPCH_FLG</code>, <code>MDR_QUALIFY_FLG</code> and <code>MDR_LBR_FLG</code> originate upstream
+    in <code>SVC_CDL_T.USDM_WO_MDR_FACT</code>, surfaced through a passthrough view. Bluebook
+    <em>consumes</em> them; it does not define them. I have described their consumption precisely and am
+    deliberately not speculating about their upstream derivation.
+  </div>
+</section>
+
+<hr class="div">
+
+<!-- ============ 06 ============ -->
+<section id="s6">
+  <span class="sec-num">Section 06 &middot; Dimension deep-dive</span>
+  <h2>Product &mdash; conformed, but flat</h2>
+  <p>
+    Product is the <em>best-behaved</em> of the three dimensions, and it still cannot answer basic
+    questions. <span class="badge b-obs">Observed</span>
+  </p>
+
+  <div class="tbl-wrap">
+  <table>
+    <thead><tr><th>From</th><th>To</th><th>Cardinality</th><th>Cross-filter</th></tr></thead>
+    <tbody>
+      <tr><td><code>FACT - ASU[ASST_PROD_HIER_KEY]</code></td><td><code>Dim - Product[Product Key]</code></td><td>Many:One</td><td>OneDirection</td></tr>
+      <tr><td><code>FACT - Work Order Parts[ASST_PROD_HIER_KEY]</code></td><td><code>Dim - Product[Product Key]</code></td><td>Many:One</td><td>OneDirection</td></tr>
+      <tr><td><code>FACT - Case[ASST_PROD_HIER_KEY]</code></td><td><code>Dim - Product[Product Key]</code></td><td>Many:One</td><td>OneDirection</td></tr>
+      <tr><td><code>Dim - Product[LOB_BRIDGE_KEY]</code></td><td><code>_Dim - Forecast Product[LOB_BRIDGE_KEY]</code></td><td>Many:One</td><td><span class="part">BothDirections</span></td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p class="code-cap">source: data-catalog/tabular/Julius/relationships/_relationships.md</p>
+
+  <p>
+    Genuinely conformed &mdash; numerator and denominator both join on the same key to the same table, so
+    MDR-by-product is safe. The dimension sources from
+    <code class="inl">LAB_SVC_USDM.USDM_PROD_HIER_VW</code> and carries 52 columns.
+  </p>
+
+  <h3>The problem: hierarchy exists in the data but not in the model</h3>
+  <p>
+    <code class="inl">Dim - Product</code> has an obvious product hierarchy sitting in it as flat columns.
+    The model declares <strong>no hierarchies at all</strong> &mdash; the levels are implicit:
+  </p>
+  <div class="grid3">
+    <div class="card" style="padding:1rem"><h4 style="margin:0 0 .4rem">Global rollup</h4>
+      <p style="font-size:.85rem;margin:0"><code>GBL_LOB_NM</code> &rarr; <code>GBL_BRAND_NM</code> &rarr;
+      <code>GBL_PROD_NM</code> &rarr; <code>GBL_GNRTN_NM</code></p></div>
+    <div class="card" style="padding:1rem"><h4 style="margin:0 0 .4rem">Item rollup</h4>
+      <p style="font-size:.85rem;margin:0"><code>FMLY_GRND_PRNT_NM</code> &rarr; <code>FM_FMLY</code> &rarr;
+      <code>FMLY</code> &rarr; <code>PROD_LN_NM</code> &rarr; <code>ITM_NBR</code></p></div>
+    <div class="card" style="padding:1rem"><h4 style="margin:0 0 .4rem">Service rollup</h4>
+      <p style="font-size:.85rem;margin:0"><code>SVC_PROD_BU_NM</code> &rarr;
+      <code>SVC_PROD_LOB_GRP_NM</code> &rarr; <code>SVC_PROD_GRP_NM</code></p></div>
+  </div>
+  <p>
+    Three parallel, partially-overlapping rollups. An agent asked for "MDR by product line" has at least
+    six plausible columns (<code class="inl">PROD_LN_NM</code>, <code class="inl">PROD_LN</code>,
+    <code class="inl">PROD_LN_CD</code>, <code class="inl">RPTG_LOB_NM</code>,
+    <code class="inl">LOB_DESC</code>, <code class="inl">LOB_DESC_MODERN</code>) and no way to rank them.
+    There is even a <code class="inl">LOB_REBRAND</code> column implying a renaming event with no recorded
+    effective date.
+  </p>
+
+  <div class="callout c-warn">
+    <span class="ct">Observed &middot; the bridge-key workaround</span>
+    Because forecast tables key on a different grain, the model synthesises a join key in DAX:
+<pre style="margin:.7rem 0 0;font-size:.78rem"><span class="f">trim</span>(<span class="f">upper</span>(<span class="f">COMBINEVALUES</span>(<span class="s">"|"</span>,<span class="o">'Dim - Product'</span>[Global LOB Name],<span class="o">'Dim - Product'</span>[Product Business Unit Type])))</pre>
+    <p style="color:inherit;margin:.7rem 0 0;font-size:.9rem">A composite key built by string concatenation,
+    then joined <code>BothDirections</code>. It works, but it encodes a real relationship
+    ("a forecast series applies to an LOB within a business unit") as a delimiter and a trim. The
+    relationship itself is not stated anywhere.</p>
+  </div>
+
+  <div class="callout c-info">
+    <span class="ct">And the filter nobody sees</span>
+    Remember from section 04 that every ASU measure silently filters
+    <code>'Dim - Product'[Reporting Product Type] in {BLANK(),"NULL","HARDWARE"}</code>. So the MDR
+    denominator is <strong>hardware-only</strong>. The numerator has no such restriction. If someone
+    slices MDR by a software product, the denominator collapses and the rate explodes. Nothing warns them.
+  </div>
+</section>
+
+<hr class="div">
+
+<!-- ============ 07 ============ -->
+<section id="s7">
+  <span class="sec-num">Section 07 &middot; Dimension deep-dive</span>
+  <h2>Geography &mdash; two competing truths</h2>
+  <p>
+    Here the model contains a genuine ambiguity that it cannot express, let alone resolve.
+    <span class="badge b-obs">Observed</span>
+  </p>
+
+  <div class="grid2">
+    <div class="card">
+      <h4 style="color:var(--cyan)">Dim - Geo Location</h4>
+      <p style="font-size:.86rem">Source: <code>LAB_SVC_USDM.USDM_GEO_HIER_SRT</code><br>
+      <strong>15 columns</strong> &mdash; includes <code>GSD Geo</code> and <code>GSD Region</code></p>
+      <p style="font-size:.86rem;margin-bottom:0">Joined from: <code>FACT - ASU[ASST_UNIFIED_ISO_CTRY_CD]</code>,
+      <code>FACT - Work Order Parts[ASST_UNIFIED_ISO_CTRY_CD]</code>,
+      <code>FACT - Case[ASST_UNIFIED_ISO_CTRY_CD]</code>, and all four Forecast tables via
+      <code>iso_alpha2_cd</code></p>
+    </div>
+    <div class="card">
+      <h4 style="color:var(--amber)">Dim - Service Location</h4>
+      <p style="font-size:.86rem">Source: <code>SVC_CDL.USDM_GEO_HIER_SRT</code><br>
+      <strong>13 columns</strong> &mdash; <span class="cross">no GSD columns</span></p>
+      <p style="font-size:.86rem;margin-bottom:0">Joined from: <code>FACT - Work Order Parts[Work Order Country Code]</code>
+      &mdash; one relationship, only on the work-order fact</p>
+    </div>
+  </div>
+
+  <p>
+    Same table name. Two different databases. Near-identical column lists. Both keyed on
+    <code class="inl">ISO 2 Code</code>. Both offer <code class="inl">Region Name</code>,
+    <code class="inl">Dell Territory</code>, <code class="inl">Dell Area</code>.
+  </p>
+
+  <figure>
+    <svg viewBox="0 0 800 260" role="img" aria-label="Two geography dimensions reached from the same fact table">
+      <defs><marker id="arg" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 z" fill="#64748b"/></marker></defs>
+      <rect x="250" y="102" width="290" height="58" rx="12" fill="rgba(255,255,255,.05)" stroke="#64748b" stroke-width="1.5"/>
+      <text x="395" y="126" text-anchor="middle" class="svg-t" font-size="12">FACT - Work Order Parts</text>
+      <text x="395" y="145" text-anchor="middle" class="svg-s">one row set, two country columns</text>
+
+      <rect x="20" y="16" width="230" height="66" rx="12" fill="rgba(6,182,212,.1)" stroke="#06b6d4" stroke-width="1.5"/>
+      <text x="135" y="40" text-anchor="middle" class="svg-l">Dim - Geo Location</text>
+      <text x="135" y="57" text-anchor="middle" class="svg-s">LAB_SVC_USDM &middot; 15 cols</text>
+      <text x="135" y="72" text-anchor="middle" class="svg-s" fill="#22d3ee">+ GSD Geo / GSD Region</text>
+
+      <rect x="20" y="180" width="230" height="66" rx="12" fill="rgba(245,158,11,.1)" stroke="#f59e0b" stroke-width="1.5"/>
+      <text x="135" y="204" text-anchor="middle" class="svg-l">Dim - Service Location</text>
+      <text x="135" y="221" text-anchor="middle" class="svg-s">SVC_CDL &middot; 13 cols</text>
+      <text x="135" y="236" text-anchor="middle" class="svg-s" fill="#fbbf24">no GSD columns</text>
+
+      <path d="M248 118 L254 118" stroke="none"/>
+      <path d="M250 116 C190 110 200 70 250 56" stroke="#06b6d4" stroke-width="1.6" fill="none" marker-end="url(#arg)"/>
+      <path d="M250 146 C190 152 200 195 250 210" stroke="#f59e0b" stroke-width="1.6" fill="none" marker-end="url(#arg)"/>
+      <text x="300" y="88" class="svg-s" fill="#06b6d4">ASST_UNIFIED_ISO_CTRY_CD</text>
+      <text x="300" y="186" class="svg-s" fill="#f59e0b">Work Order Country Code</text>
+
+      <rect x="560" y="60" width="220" height="140" rx="12" fill="rgba(244,63,94,.07)" stroke="#f43f5e" stroke-dasharray="4 3"/>
+      <text x="670" y="88" text-anchor="middle" class="svg-l" fill="#fda4af">"MDR by region"</text>
+      <text x="670" y="112" text-anchor="middle" class="svg-s" fill="#fecdd3">Where the broken box sits?</text>
+      <text x="670" y="130" text-anchor="middle" class="svg-s" fill="#fecdd3">Or where the engineer</text>
+      <text x="670" y="146" text-anchor="middle" class="svg-s" fill="#fecdd3">was dispatched from?</text>
+      <text x="670" y="174" text-anchor="middle" class="svg-s" fill="#f43f5e">Model cannot say.</text>
+    </svg>
+    <figcaption>Two legitimate geographies, one ambiguous question, no declared distinction.</figcaption>
+  </figure>
+
+  <h3>Why this breaks MDR specifically</h3>
+  <p>
+    The MDR <strong>numerator</strong> can reach both geographies. The <strong>denominator</strong>
+    (<code class="inl">FACT - ASU</code>) can only reach <code class="inl">Dim - Geo Location</code> &mdash;
+    there is no ASU relationship to <code class="inl">Dim - Service Location</code> at all.
+  </p>
+  <div class="callout c-warn">
+    <span class="ct">The failure mode</span>
+    Slice <code>MDR (Field ASUs)</code> by <code>Dim - Service Location[Region Name]</code> and you get a
+    numerator that respects the filter and a denominator that <strong>ignores it entirely</strong>. Every
+    region returns the same global ASU count. The rate is nonsense in every cell, and it renders without
+    error, correctly formatted as a percentage.
+  </div>
+  <p>
+    This is the single clearest argument in the document. It is not a bug in anyone's DAX. It is a
+    modelling truth that <em>has no expressible form</em> in a tabular model: "these two dimensions are
+    different roles of the same concept, and only one of them is valid as a denominator context."
+  </p>
+
+  <details>
+    <summary>Deep dive: what "region" even means here <span class="dtag">Engineers</span></summary>
+    <div class="details-body">
+      <p>Both dimensions offer at least five competing geographic rollups, none of them declared as a hierarchy:</p>
+      <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>Rollup family</th><th>Columns</th><th>In Geo Location</th><th>In Service Location</th></tr></thead>
+        <tbody>
+          <tr><td>UN / ISO standard</td><td><code>Region Name</code>, <code>Sub-Region Name</code>, <code>M49 Code</code></td><td class="tick">Yes</td><td class="tick">Yes</td></tr>
+          <tr><td>Dell sales</td><td><code>Dell Territory</code>, <code>Dell Sub Territory</code>, <code>Dell Area</code></td><td class="tick">Yes</td><td class="tick">Yes</td></tr>
+          <tr><td>GSD service</td><td><code>GSD Geo</code>, <code>GSD Region</code></td><td class="tick">Yes</td><td class="cross">No</td></tr>
+          <tr><td>Country grouping</td><td><code>Country Group Name</code></td><td class="tick">Yes</td><td class="tick">Yes</td></tr>
+        </tbody>
+      </table>
+      </div>
+      <p style="margin-bottom:0">So "MDR by region" has, conservatively, <strong>eight</strong> defensible
+        interpretations across two dimensions. A human picks by convention. An agent picks by string
+        similarity &mdash; and <code class="inl">Region Name</code> wins on string similarity every time,
+        which is very often the wrong answer for a service metric where GSD Region is the operating unit.</p>
+    </div>
+  </details>
+</section>
+
+<hr class="div">
+
+<!-- ============ 08 ============ -->
+<section id="s8">
+  <span class="sec-num">Section 08 &middot; Dimension deep-dive</span>
+  <h2>Entitlement &mdash; one entity, three tables</h2>
+  <p>
+    Entitlement is where the modelling paradigm most visibly fails to express reality.
+    <span class="badge b-obs">Observed</span>
+  </p>
+
+  <h3>One source column fans out to three dimensions</h3>
+  <div class="tbl-wrap">
+  <table>
+    <thead><tr><th>From</th><th>To</th><th>Cardinality</th></tr></thead>
+    <tbody>
+      <tr><td><code>FACT - ASU[PROD_OFRNG_CD]</code></td><td><code>Dim - Field Entitlement[Field Product Offering Code]</code></td><td>Many:One</td></tr>
+      <tr><td><code>FACT - ASU[PROD_OFRNG_CD]</code></td><td><code>Dim - Tech Entitlement[Tech Product Offering Code]</code></td><td>Many:One</td></tr>
+      <tr><td><code>FACT - ASU[PROD_OFRNG_CD]</code></td><td><code>Dim - Monarch Ranking[Monarch Product Offering Code]</code></td><td>Many:One</td></tr>
+      <tr><td><code>FACT - Work Order Parts[FLD_POC]</code></td><td><code>Dim - Field Entitlement[Field Product Offering Code]</code></td><td>Many:One</td></tr>
+      <tr><td><code>FACT - Work Order Parts[TECH_POC]</code></td><td><code>Dim - Tech Entitlement[Tech Product Offering Code]</code></td><td>Many:One</td></tr>
+      <tr><td><code>FACT - Case[Case Field Offering Code]</code></td><td><code>Dim - Field Entitlement[Field Product Offering Code]</code></td><td>Many:One</td></tr>
+      <tr><td><code>FACT - Case[Case Tech Offering Code]</code></td><td><code>Dim - Tech Entitlement[Tech Product Offering Code]</code></td><td>Many:One</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p class="code-cap">source: data-catalog/tabular/Julius/relationships/_relationships.md</p>
+
+  <h3>Proof that two of them are the same table</h3>
+  <p>
+    These are the partition queries for <code class="inl">Dim - Field Entitlement</code> and
+    <code class="inl">Dim - Tech Entitlement</code>, as captured. They are the same query:
+  </p>
+<pre><span class="c">-- Dim - Field Entitlement                    -- Dim - Tech Entitlement</span>
+<span class="k">SELECT</span>                                        <span class="k">SELECT</span>
+  POH.PROD_OFRNG_CODE  <span class="k">as</span> <span class="s">"Product Offering Code"</span>      <span class="c">[identical]</span>
+ ,POH.PROD_OFRNG_DESC  <span class="k">as</span> <span class="s">"Product Offering Description"</span> <span class="c">[identical]</span>
+ ,POH.ACT_FLAG         <span class="k">as</span> <span class="s">"Offering Active Flag"</span>       <span class="c">[identical]</span>
+ ,<span class="c">... 14 more identical projections ...</span>
+ ,UDT.TECHL_SUPP_TIER_NBR                                    <span class="c">[identical]</span>
+ ,UDT.FLD_GRP_DESC     <span class="k">as</span> <span class="s">"ASU_FLD_GRP_DESC"</span>          <span class="c">[identical]</span>
+<span class="k">FROM</span>                                          <span class="k">FROM</span>
+  CORP_DRM_PKG.PROD_OFRNG_HIER_VW POH           CORP_DRM_PKG.PROD_OFRNG_HIER_VW POH
+<span class="k">LEFT JOIN</span>                                     <span class="k">LEFT JOIN</span>
+  SVC_CDL.USDM_MONARCH_RNKG_UDT_DIM UDT         SVC_CDL.USDM_MONARCH_RNKG_UDT_DIM UDT
+<span class="k">ON</span> UDT.PROD_OFRNG_CD = POH.PROD_OFRNG_CODE    <span class="k">ON</span> UDT.PROD_OFRNG_CD = POH.PROD_OFRNG_CODE</pre>
+  <p class="code-cap">source: data-catalog/tabular/Julius/tables/Dim - Field Entitlement.md &amp; Dim - Tech Entitlement.md</p>
+
+  <p>
+    The <em>only</em> difference is that the tabular layer renames every column with a
+    <code class="inl">Field&nbsp;</code> or <code class="inl">Tech&nbsp;</code> prefix. And
+    <code class="inl">Dim - Monarch Ranking</code> is a third table over
+    <code class="inl">SVC_CDL.USDM_MONARCH_RNKG_UDT_DIM</code> &mdash; one of the two sources the other two
+    already join to.
+  </p>
+
+  <div class="callout c-info">
+    <span class="ct">Why the duplication is not incompetence</span>
+    This is the correct thing to do in a tabular model. DAX resolves filter context through physical
+    relationships; a single table cannot serve two simultaneously-active filter paths from one fact.
+    Duplicating the dimension is the <em>standard, recommended</em> pattern for role-playing dimensions.
+    The point is not that the modeller got it wrong &mdash; it is that the paradigm forces a lossy encoding,
+    and the lost information is exactly the information an agent needs.
+  </div>
+
+  <figure>
+    <svg viewBox="0 0 820 300" role="img" aria-label="Entitlement modeled as duplication versus modeled as roles">
+      <text x="200" y="20" text-anchor="middle" class="svg-t" font-size="12" fill="#f59e0b">SEMANTIC LAYER &mdash; duplication</text>
+      <rect x="120" y="38" width="160" height="42" rx="9" fill="rgba(255,255,255,.05)" stroke="#64748b"/>
+      <text x="200" y="64" text-anchor="middle" class="svg-l">PROD_OFRNG_CD</text>
+      <rect x="16" y="130" width="120" height="52" rx="9" fill="rgba(245,158,11,.1)" stroke="#f59e0b"/>
+      <text x="76" y="152" text-anchor="middle" class="svg-s">Dim - Field</text><text x="76" y="167" text-anchor="middle" class="svg-s">Entitlement</text>
+      <rect x="146" y="130" width="120" height="52" rx="9" fill="rgba(245,158,11,.1)" stroke="#f59e0b"/>
+      <text x="206" y="152" text-anchor="middle" class="svg-s">Dim - Tech</text><text x="206" y="167" text-anchor="middle" class="svg-s">Entitlement</text>
+      <rect x="276" y="130" width="120" height="52" rx="9" fill="rgba(245,158,11,.1)" stroke="#f59e0b"/>
+      <text x="336" y="152" text-anchor="middle" class="svg-s">Dim - Monarch</text><text x="336" y="167" text-anchor="middle" class="svg-s">Ranking</text>
+      <path d="M180 80 L86 126" stroke="#f59e0b" stroke-width="1.4" fill="none"/>
+      <path d="M200 80 L206 126" stroke="#f59e0b" stroke-width="1.4" fill="none"/>
+      <path d="M222 80 L326 126" stroke="#f59e0b" stroke-width="1.4" fill="none"/>
+      <text x="200" y="214" text-anchor="middle" class="svg-s" fill="#fda4af">3 tables &middot; same source &middot; no declared equivalence</text>
+      <text x="200" y="232" text-anchor="middle" class="svg-s" fill="#fda4af">"are these the same?" &rarr; unanswerable</text>
+
+      <line x1="420" y1="10" x2="420" y2="280" stroke="rgba(255,255,255,.1)" stroke-width="1"/>
+
+      <text x="620" y="20" text-anchor="middle" class="svg-t" font-size="12" fill="#10b981">CONCEPT LAYER &mdash; roles</text>
+      <rect x="540" y="38" width="160" height="42" rx="9" fill="rgba(16,185,129,.12)" stroke="#10b981"/>
+      <text x="620" y="64" text-anchor="middle" class="svg-l">bb:ServiceOffering</text>
+      <rect x="452" y="140" width="106" height="44" rx="9" fill="rgba(6,182,212,.1)" stroke="#06b6d4" stroke-dasharray="3 2"/>
+      <text x="505" y="167" text-anchor="middle" class="svg-s">FieldRole</text>
+      <rect x="566" y="140" width="106" height="44" rx="9" fill="rgba(6,182,212,.1)" stroke="#06b6d4" stroke-dasharray="3 2"/>
+      <text x="619" y="167" text-anchor="middle" class="svg-s">TechRole</text>
+      <rect x="680" y="140" width="106" height="44" rx="9" fill="rgba(6,182,212,.1)" stroke="#06b6d4" stroke-dasharray="3 2"/>
+      <text x="733" y="167" text-anchor="middle" class="svg-s">RankingRole</text>
+      <path d="M596 80 L512 136" stroke="#10b981" stroke-width="1.4" fill="none"/>
+      <path d="M620 80 L619 136" stroke="#10b981" stroke-width="1.4" fill="none"/>
+      <path d="M646 80 L726 136" stroke="#10b981" stroke-width="1.4" fill="none"/>
+      <text x="620" y="214" text-anchor="middle" class="svg-s" fill="#6ee7b7">1 entity &middot; 3 roles &middot; equivalence explicit</text>
+      <text x="620" y="232" text-anchor="middle" class="svg-s" fill="#6ee7b7">"are these the same?" &rarr; yes, different role</text>
+    </svg>
+    <figcaption>The same fact, encoded two ways. The right-hand encoding is not "better modelling" &mdash; it is a different job.</figcaption>
+  </figure>
+
+  <h3>What gets lost</h3>
+  <ul>
+    <li><strong>Equivalence.</strong> Nothing states that <code class="inl">Field Product Offering Code</code>
+      and <code class="inl">Tech Product Offering Code</code> draw from the same code set. An agent joining
+      MDR by one and ASU by the other will silently produce a cross-product of two identical domains.</li>
+    <li><strong>Duplicated derivation.</strong> The <code class="inl">SUPPORT_TIER</code> and
+      <code class="inl">Offer Level</code> <code class="inl">CASE</code> logic is copy-pasted into both
+      dimension queries. Two copies, one intent, no link between them.</li>
+    <li><strong>Sentinel semantics.</strong> As shown in section 05, <code class="inl">'OOW'</code> and
+      <code class="inl">'N/A'</code> arrive as offering codes. Only one of the three dimensions
+      special-cases <code class="inl">'OOW'</code>.</li>
+    <li><strong>Tier ordering.</strong> <code class="inl">TECHL_SUPP_TIER_NBR</code> 1&ndash;5 is an ordinal
+      scale where 1 is the richest entitlement. Modeled as <code class="inl">Int64</code>, so a chart sorts
+      it ascending and shows the best coverage first with no indication that this is a rank, not a quantity.</li>
+  </ul>
+</section>
+
+<hr class="div">
+
+<!-- ============ 09 ============ -->
+<section id="s9">
+  <span class="sec-num">Section 09 &middot; The concept layer</span>
+  <h2>The same concept, as a Concept Layer</h2>
+  <p>
+    Everything from here on is an <strong>architectural proposal</strong>, not something that exists.
+    <span class="badge b-prop">Proposed</span> The design goal is deliberately modest: describe what the
+    Julius model already computes, add the facts the model cannot hold, and <em>point at</em> the existing
+    DAX rather than reimplementing it.
+  </p>
+
+  <h3>Four things the Concept Layer adds</h3>
+  <div class="grid2">
+    <div class="card">
+      <h4 style="color:var(--emerald)">1. Roles instead of duplicate tables</h4>
+      <p style="font-size:.88rem;margin-bottom:0">One <code>ServiceOffering</code> entity with
+      <code>FieldRole</code>, <code>TechRole</code>, <code>RankingRole</code>. One <code>Country</code>
+      entity with <code>AssetCountryRole</code> and <code>ServiceCountryRole</code>. The three physical
+      dimension tables become <em>realisations</em> of roles, not separate concepts.</p>
+    </div>
+    <div class="card">
+      <h4 style="color:var(--emerald)">2. Definitions with provenance</h4>
+      <p style="font-size:.88rem;margin-bottom:0">"Eligible entitled asset" gets a prose definition, the
+      literal predicate <code>ASU_XCLSN_FLG &lt;&gt; 1 AND FLD_FLG = 1</code>, and a
+      <code>prov:wasDerivedFrom</code> link to the macro file that owns it. Change the macro, the link
+      goes stale, and drift becomes detectable.</p>
+    </div>
+    <div class="card">
+      <h4 style="color:var(--emerald)">3. Constraints as data</h4>
+      <p style="font-size:.88rem;margin-bottom:0">"MDR Rate is non-additive across weeks." "MDR Rate may
+      only be dimensioned by the asset-country role." "The denominator is hardware-only." Each is a node
+      an agent can retrieve <em>before</em> it composes a query, not a footnote it will never read.</p>
+    </div>
+    <div class="card">
+      <h4 style="color:var(--emerald)">4. A typed measure family</h4>
+      <p style="font-size:.88rem;margin-bottom:0">The ten MDR variants from section 02 become instances
+      with declared restrictions and units, so "which MDR do I want?" is resolvable by traversal instead
+      of by string similarity against a display folder name.</p>
+    </div>
+  </div>
+
+  <figure>
+    <svg viewBox="0 0 860 420" role="img" aria-label="Proposed Concept Layer graph for the MDR concept">
+      <defs>
+        <marker id="are" markerWidth="8" markerHeight="8" refX="7.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#64748b"/></marker>
+        <marker id="arp" markerWidth="8" markerHeight="8" refX="7.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#8b5cf6"/></marker>
+        <marker id="arr" markerWidth="8" markerHeight="8" refX="7.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#f43f5e"/></marker>
+      </defs>
+
+      <!-- metric -->
+      <rect x="320" y="16" width="220" height="54" rx="12" fill="rgba(6,182,212,.14)" stroke="#06b6d4" stroke-width="1.8"/>
+      <text x="430" y="38" text-anchor="middle" class="svg-t" font-size="12">bb:MDRRate</text>
+      <text x="430" y="56" text-anchor="middle" class="svg-s">a bb:RatioMetric</text>
+
+      <!-- numerator / denominator -->
+      <rect x="80" y="122" width="200" height="54" rx="11" fill="rgba(245,158,11,.11)" stroke="#f59e0b"/>
+      <text x="180" y="144" text-anchor="middle" class="svg-l">bb:WarrantyCostEvent</text>
+      <text x="180" y="161" text-anchor="middle" class="svg-s">&larr; MDR Dispatch Flag</text>
+
+      <rect x="580" y="122" width="220" height="54" rx="11" fill="rgba(16,185,129,.11)" stroke="#10b981"/>
+      <text x="690" y="144" text-anchor="middle" class="svg-l">bb:EligibleEntitledAsset</text>
+      <text x="690" y="161" text-anchor="middle" class="svg-s">&larr; ASU_XCLSN_FLG &lt;&gt; 1</text>
+
+      <path d="M362 70 C280 88 240 100 200 118" stroke="#64748b" stroke-width="1.5" fill="none" marker-end="url(#are)"/>
+      <text x="238" y="98" class="svg-s" fill="#94a3b8">bb:numerator</text>
+      <path d="M498 70 C580 88 630 100 668 118" stroke="#64748b" stroke-width="1.5" fill="none" marker-end="url(#are)"/>
+      <text x="588" y="98" class="svg-s" fill="#94a3b8">bb:denominator</text>
+
+      <!-- constraints -->
+      <rect x="316" y="112" width="228" height="72" rx="11" fill="rgba(244,63,94,.09)" stroke="#f43f5e" stroke-dasharray="4 3"/>
+      <text x="430" y="134" text-anchor="middle" class="svg-s" fill="#fda4af">bb:additivity "non-additive"</text>
+      <text x="430" y="151" text-anchor="middle" class="svg-s" fill="#fda4af">bb:validGeographyRole AssetCountry</text>
+      <text x="430" y="168" text-anchor="middle" class="svg-s" fill="#fda4af">bb:productScope HardwareOnly</text>
+      <path d="M430 72 L430 108" stroke="#f43f5e" stroke-width="1.5" marker-end="url(#arr)"/>
+
+      <!-- dimensions row -->
+      <rect x="40" y="248" width="200" height="60" rx="11" fill="rgba(139,92,246,.1)" stroke="#8b5cf6"/>
+      <text x="140" y="270" text-anchor="middle" class="svg-l">bb:Product</text>
+      <text x="140" y="288" text-anchor="middle" class="svg-s">hasLevel: LOB &rarr; Brand &rarr; Family</text>
+
+      <rect x="266" y="248" width="220" height="60" rx="11" fill="rgba(139,92,246,.1)" stroke="#8b5cf6"/>
+      <text x="376" y="266" text-anchor="middle" class="svg-l">bb:Country</text>
+      <text x="376" y="283" text-anchor="middle" class="svg-s">role: AssetCountry (valid)</text>
+      <text x="376" y="298" text-anchor="middle" class="svg-s" fill="#f43f5e">role: ServiceCountry (invalid here)</text>
+
+      <rect x="512" y="248" width="230" height="60" rx="11" fill="rgba(139,92,246,.1)" stroke="#8b5cf6"/>
+      <text x="627" y="266" text-anchor="middle" class="svg-l">bb:ServiceOffering</text>
+      <text x="627" y="283" text-anchor="middle" class="svg-s">role: Field / Tech / Ranking</text>
+      <text x="627" y="298" text-anchor="middle" class="svg-s">tier: ordinal 1..5</text>
+
+      <path d="M170 176 C158 205 150 228 142 244" stroke="#8b5cf6" stroke-width="1.4" fill="none" marker-end="url(#arp)"/>
+      <path d="M200 176 C260 208 320 232 366 244" stroke="#8b5cf6" stroke-width="1.4" fill="none" marker-end="url(#arp)"/>
+      <path d="M660 176 C640 208 636 230 630 244" stroke="#8b5cf6" stroke-width="1.4" fill="none" marker-end="url(#arp)"/>
+      <path d="M640 176 C540 210 460 232 400 244" stroke="#8b5cf6" stroke-width="1.4" fill="none" marker-end="url(#arp)"/>
+      <path d="M620 178 C440 220 260 244 240 262" stroke="#8b5cf6" stroke-width="1.2" fill="none" opacity=".5" marker-end="url(#arp)"/>
+
+      <!-- provenance layer -->
+      <rect x="40" y="348" width="330" height="54" rx="11" fill="rgba(255,255,255,.04)" stroke="#475569" stroke-dasharray="3 3"/>
+      <text x="205" y="370" text-anchor="middle" class="svg-s">prov:wasDerivedFrom</text>
+      <text x="205" y="387" text-anchor="middle" class="svg-s" fill="#22d3ee">03_BLUEBK_M_WO_EXT.sql &middot; 12_..._FLD_ASU_CURR.sql</text>
+
+      <rect x="404" y="348" width="338" height="54" rx="11" fill="rgba(255,255,255,.04)" stroke="#475569" stroke-dasharray="3 3"/>
+      <text x="573" y="370" text-anchor="middle" class="svg-s">bb:implementedBy</text>
+      <text x="573" y="387" text-anchor="middle" class="svg-s" fill="#22d3ee">Julius / _Measures / MDR (Field ASUs)</text>
+
+      <path d="M180 180 C120 250 90 320 130 344" stroke="#475569" stroke-width="1.2" fill="none" stroke-dasharray="3 3"/>
+      <path d="M540 70 C700 130 690 300 620 344" stroke="#475569" stroke-width="1.2" fill="none" stroke-dasharray="3 3"/>
+    </svg>
+    <figcaption>Proposed concept graph. The dashed bottom row is the part that makes it useful: it points back at real artifacts.</figcaption>
+  </figure>
+
+  <div class="callout c-prop">
+    <span class="ct">Design constraint I would insist on</span>
+    The Concept Layer holds <strong>no numbers and no calculation logic</strong>. Its
+    <code>bb:implementedBy</code> edge is a pointer to the Julius measure, and that measure remains the
+    only place a figure is ever produced. The moment a Concept Layer starts recomputing KPIs, you have
+    built a second, unreconciled semantic layer &mdash; which is strictly worse than having one.
+  </div>
+</section>
+
+<hr class="div">
+
+<!-- ============ 10 ============ -->
+<section id="s10">
+  <span class="sec-num">Section 10 &middot; The concept layer</span>
+  <h2>Three serializations, side by side</h2>
+  <p>
+    The same MDR concept, expressed three ways of writing a Concept Layer down. These are directly
+    comparable &mdash; identical entities, identical constraints, identical provenance &mdash; so the
+    differences you see are purely methodological. The first uses <span class="gl" tabindex="0" data-def="The academic/AI-industry name for what this document calls a Concept Layer.">ontology</span>
+    techniques (RDF/OWL) specifically, since that is the most formally rigorous way to build one.
+    <span class="badge b-prop">Proposed</span>
+  </p>
+
+  <div class="tabs">
+    <div class="tab-bar">
+      <button class="tab-btn active">RDF / OWL &mdash; Turtle</button>
+      <button class="tab-btn">JSON-LD</button>
+      <button class="tab-btn">Property graph &mdash; Cypher</button>
+    </div>
+
+    <!-- Turtle -->
+    <div class="tab-panel active">
+<pre><span class="k">@prefix</span> bb:   &lt;https://bluebook.internal/ontology#&gt; .
+<span class="k">@prefix</span> rdfs: &lt;http://www.w3.org/2000/01/rdf-schema#&gt; .
+<span class="k">@prefix</span> owl:  &lt;http://www.w3.org/2002/07/owl#&gt; .
+<span class="k">@prefix</span> skos: &lt;http://www.w3.org/2004/02/skos/core#&gt; .
+<span class="k">@prefix</span> prov: &lt;http://www.w3.org/ns/prov#&gt; .
+
+<span class="c">### ---------- The event we are counting ----------</span>
+bb:WarrantyCostEvent <span class="k">a</span> owl:Class ;
+    rdfs:subClassOf  bb:ServiceEvent ;
+    skos:prefLabel   <span class="s">"MDR Dispatch"</span>@en ;
+    skos:altLabel    <span class="s">"MDR Work Order"</span>@en , <span class="s">"Warranty-Incurring Dispatch"</span>@en ;
+    skos:definition  <span class="s">"""A dispatched work order for which Dell incurs parts and/or
+                        labour cost under a customer entitlement."""</span>@en ;
+    bb:physicalFlag  <span class="s">"FACT - Work Order Parts[MDR Dispatch Flag]"</span> ;
+    prov:wasDerivedFrom &lt;macro:03_BLUEBK_M_WO_EXT.sql#PARTS_MDR_FLG&gt; .
+
+<span class="c">### ---------- The population we divide by ----------</span>
+bb:EligibleEntitledAsset <span class="k">a</span> owl:Class ;
+    skos:prefLabel   <span class="s">"Active Serviced Unit"</span>@en ;
+    skos:altLabel    <span class="s">"ASU"</span>@en , <span class="s">"Eligible Entitled Asset"</span>@en ;
+    skos:definition  <span class="s">"""A distinct customer product, counted once per fiscal week,
+                        that is not ASU-excluded and carries the delivery-arm flag."""</span>@en ;
+    bb:grain         bb:FiscalWeek ;
+    bb:eligibilityRule <span class="s">"ASU_XCLSN_FLG &lt;&gt; 1 AND FLD_FLG = 1"</span> ;
+    bb:countedAs     <span class="s">"COUNT(DISTINCT SRC_CUST_PROD_ID)"</span> ;
+    prov:wasDerivedFrom &lt;macro:12_BLUEBK_M_FLD_ASU_CURR.sql&gt; .
+
+<span class="c">### ---------- Roles, NOT duplicate tables ----------</span>
+bb:ServiceOffering <span class="k">a</span> owl:Class ; skos:prefLabel <span class="s">"Service Offering"</span>@en .
+
+bb:FieldEntitlementRole <span class="k">a</span> bb:Role ;
+    bb:roleOf     bb:ServiceOffering ;
+    bb:realisedAs <span class="s">"Dim - Field Entitlement"</span> ;
+    bb:keyedBy    <span class="s">"Field Product Offering Code"</span> .
+bb:TechEntitlementRole  <span class="k">a</span> bb:Role ;
+    bb:roleOf     bb:ServiceOffering ;
+    bb:realisedAs <span class="s">"Dim - Tech Entitlement"</span> ;
+    bb:keyedBy    <span class="s">"Tech Product Offering Code"</span> .
+bb:FieldEntitlementRole bb:sharesCodeDomainWith bb:TechEntitlementRole .
+
+bb:AssetCountryRole   <span class="k">a</span> bb:Role ; bb:roleOf bb:Country ;
+    bb:realisedAs <span class="s">"Dim - Geo Location"</span>   ; bb:sourcedFrom <span class="s">"LAB_SVC_USDM.USDM_GEO_HIER_SRT"</span> .
+bb:ServiceCountryRole <span class="k">a</span> bb:Role ; bb:roleOf bb:Country ;
+    bb:realisedAs <span class="s">"Dim - Service Location"</span>; bb:sourcedFrom <span class="s">"SVC_CDL.USDM_GEO_HIER_SRT"</span> .
+
+<span class="c">### ---------- The metric, and what you may not do with it ----------</span>
+bb:MDRRateFieldASU <span class="k">a</span> bb:RatioMetric ;
+    skos:prefLabel  <span class="s">"MDR Rate (Field ASUs)"</span>@en ;
+    bb:numerator    bb:WarrantyCostEvent ;
+    bb:denominator  bb:EligibleEntitledAsset ;
+    bb:grain        bb:FiscalWeek ;
+    bb:additivity   <span class="s">"non-additive"</span> ;
+    bb:validGeographyRole bb:AssetCountryRole ;
+    bb:productScope bb:HardwareOnly ;
+    bb:constraint   bb:NoCrossWeekAverage , bb:NoServiceCountrySlice ;
+    bb:implementedBy &lt;dax:Julius/_Measures/MDR-Field-ASUs&gt; .
+
+bb:NoServiceCountrySlice <span class="k">a</span> bb:Constraint ;
+    bb:severity     <span class="s">"error"</span> ;
+    skos:definition <span class="s">"""The denominator has no relationship path to the ServiceCountry
+                       role. Slicing by it filters the numerator only and yields an
+                       invalid ratio that renders without error."""</span>@en .
+
+bb:NoCrossWeekAverage <span class="k">a</span> bb:Constraint ;
+    bb:severity     <span class="s">"error"</span> ;
+    skos:definition <span class="s">"""Both operands are already weekly averages. Re-averaging across
+                       weeks double-averages. Recompute from base counts instead."""</span>@en .</pre>
+      <p class="code-cap">Proposed &mdash; illustrative Concept Layer content, not deployed</p>
+
+      <h4>The retrieval query an agent would run</h4>
+<pre><span class="c"># "What is our MDR rate for ProSupport Plus assets in EMEA on PowerEdge?"</span>
+<span class="c"># Step 1: resolve the concept and collect everything that governs it.</span>
+
+<span class="k">SELECT</span> ?metric ?daxMeasure ?geoDim ?geoCol ?offerDim ?prodScope ?constraintText
+<span class="k">WHERE</span> {
+  ?metric skos:prefLabel        <span class="s">"MDR Rate (Field ASUs)"</span>@en ;
+          bb:implementedBy      ?daxMeasure ;
+          bb:validGeographyRole ?geoRole ;
+          bb:productScope       ?prodScope ;
+          bb:constraint         ?c .
+
+  ?geoRole   bb:realisedAs ?geoDim .
+  ?c         skos:definition ?constraintText .
+
+  <span class="c"># the offering role reachable from BOTH operands</span>
+  ?offerRole bb:roleOf      bb:ServiceOffering ;
+             bb:realisedAs  ?offerDim ;
+             bb:reachableFrom bb:EligibleEntitledAsset , bb:WarrantyCostEvent .
+}
+
+<span class="c"># Returns, among other things:</span>
+<span class="c">#   geoDim        = "Dim - Geo Location"        (NOT Dim - Service Location)</span>
+<span class="c">#   offerDim      = "Dim - Field Entitlement"</span>
+<span class="c">#   prodScope     = bb:HardwareOnly</span>
+<span class="c">#   constraintText= "...yields an invalid ratio that renders without error."</span>
+<span class="c"># The agent now composes ONE correct DAX query instead of guessing.</span></pre>
+    </div>
+
+    <!-- JSON-LD -->
+    <div class="tab-panel">
+<pre>{
+  <span class="s">"@context"</span>: {
+    <span class="s">"bb"</span>:   <span class="s">"https://bluebook.internal/ontology#"</span>,
+    <span class="s">"skos"</span>: <span class="s">"http://www.w3.org/2004/02/skos/core#"</span>,
+    <span class="s">"prov"</span>: <span class="s">"http://www.w3.org/ns/prov#"</span>,
+    <span class="s">"label"</span>:       <span class="s">"skos:prefLabel"</span>,
+    <span class="s">"aliases"</span>:     <span class="s">"skos:altLabel"</span>,
+    <span class="s">"definition"</span>:  <span class="s">"skos:definition"</span>,
+    <span class="s">"derivedFrom"</span>: { <span class="s">"@id"</span>: <span class="s">"prov:wasDerivedFrom"</span>, <span class="s">"@type"</span>: <span class="s">"@id"</span> },
+    <span class="s">"numerator"</span>:   { <span class="s">"@id"</span>: <span class="s">"bb:numerator"</span>,   <span class="s">"@type"</span>: <span class="s">"@id"</span> },
+    <span class="s">"denominator"</span>: { <span class="s">"@id"</span>: <span class="s">"bb:denominator"</span>, <span class="s">"@type"</span>: <span class="s">"@id"</span> }
+  },
+
+  <span class="s">"@id"</span>:   <span class="s">"bb:MDRRateFieldASU"</span>,
+  <span class="s">"@type"</span>: <span class="s">"bb:RatioMetric"</span>,
+  <span class="s">"label"</span>: <span class="s">"MDR Rate (Field ASUs)"</span>,
+  <span class="s">"aliases"</span>: [<span class="s">"MDR%"</span>, <span class="s">"Managed Dispatch Rate"</span>, <span class="s">"MDR over Field ASU"</span>],
+  <span class="s">"definition"</span>: <span class="s">"Weekly-averaged count of warranty-cost dispatches divided by the weekly-averaged count of eligible entitled assets."</span>,
+
+  <span class="s">"numerator"</span>: {
+    <span class="s">"@id"</span>: <span class="s">"bb:WarrantyCostEvent"</span>,
+    <span class="s">"label"</span>: <span class="s">"MDR Dispatch"</span>,
+    <span class="s">"aliases"</span>: [<span class="s">"MDR Work Order"</span>, <span class="s">"Warranty-Incurring Dispatch"</span>],
+    <span class="s">"bb:physicalFlag"</span>: <span class="s">"FACT - Work Order Parts[MDR Dispatch Flag]"</span>,
+    <span class="s">"derivedFrom"</span>: <span class="s">"macro:03_BLUEBK_M_WO_EXT.sql#PARTS_MDR_FLG"</span>
+  },
+
+  <span class="s">"denominator"</span>: {
+    <span class="s">"@id"</span>: <span class="s">"bb:EligibleEntitledAsset"</span>,
+    <span class="s">"label"</span>: <span class="s">"Active Serviced Unit"</span>,
+    <span class="s">"aliases"</span>: [<span class="s">"ASU"</span>, <span class="s">"Eligible Entitled Asset"</span>],
+    <span class="s">"bb:grain"</span>: <span class="s">"bb:FiscalWeek"</span>,
+    <span class="s">"bb:eligibilityRule"</span>: <span class="s">"ASU_XCLSN_FLG &lt;&gt; 1 AND FLD_FLG = 1"</span>,
+    <span class="s">"bb:countedAs"</span>: <span class="s">"COUNT(DISTINCT SRC_CUST_PROD_ID)"</span>,
+    <span class="s">"derivedFrom"</span>: <span class="s">"macro:12_BLUEBK_M_FLD_ASU_CURR.sql"</span>
+  },
+
+  <span class="s">"bb:dimensionableBy"</span>: [
+    { <span class="s">"@id"</span>: <span class="s">"bb:Product"</span>,  <span class="s">"bb:realisedAs"</span>: <span class="s">"Dim - Product"</span>,
+      <span class="s">"bb:joinKey"</span>: <span class="s">"ASST_PROD_HIER_KEY -&gt; Product Key"</span>,
+      <span class="s">"bb:conformed"</span>: <span class="k">true</span>,
+      <span class="s">"bb:levels"</span>: [<span class="s">"Global LOB Name"</span>,<span class="s">"Global Brand Name"</span>,<span class="s">"Family"</span>,<span class="s">"Product Line Name"</span>] },
+
+    { <span class="s">"@id"</span>: <span class="s">"bb:AssetCountryRole"</span>, <span class="s">"bb:realisedAs"</span>: <span class="s">"Dim - Geo Location"</span>,
+      <span class="s">"bb:roleOf"</span>: <span class="s">"bb:Country"</span>, <span class="s">"bb:conformed"</span>: <span class="k">true</span>,
+      <span class="s">"bb:levels"</span>: [<span class="s">"GSD Geo"</span>,<span class="s">"GSD Region"</span>,<span class="s">"Region Name"</span>,<span class="s">"Country Name"</span>] },
+
+    { <span class="s">"@id"</span>: <span class="s">"bb:FieldEntitlementRole"</span>, <span class="s">"bb:realisedAs"</span>: <span class="s">"Dim - Field Entitlement"</span>,
+      <span class="s">"bb:roleOf"</span>: <span class="s">"bb:ServiceOffering"</span>, <span class="s">"bb:conformed"</span>: <span class="k">true</span>,
+      <span class="s">"bb:sharesCodeDomainWith"</span>: <span class="s">"bb:TechEntitlementRole"</span>,
+      <span class="s">"bb:levels"</span>: [<span class="s">"Field Offer Level"</span>,<span class="s">"Field Support Tier"</span>],
+      <span class="s">"bb:sentinelValues"</span>: {
+        <span class="s">"OOW"</span>:  <span class="s">"Legitimate population - asset known, out of warranty"</span>,
+        <span class="s">"N/A"</span>:  <span class="s">"Data quality artifact - asset unresolvable"</span>,
+        <span class="s">"NA"</span>:   <span class="s">"Offer level could not be classified"</span> } }
+  ],
+
+  <span class="s">"bb:notDimensionableBy"</span>: [
+    { <span class="s">"@id"</span>: <span class="s">"bb:ServiceCountryRole"</span>, <span class="s">"bb:realisedAs"</span>: <span class="s">"Dim - Service Location"</span>,
+      <span class="s">"bb:severity"</span>: <span class="s">"error"</span>,
+      <span class="s">"bb:reason"</span>: <span class="s">"No relationship path from FACT - ASU. Filters numerator only; the ratio is invalid but renders cleanly."</span> }
+  ],
+
+  <span class="s">"bb:additivity"</span>: <span class="s">"non-additive"</span>,
+  <span class="s">"bb:productScope"</span>: <span class="s">"HARDWARE only - inherited from the denominator's Reporting Product Type filter"</span>,
+  <span class="s">"bb:implementedBy"</span>: {
+    <span class="s">"@id"</span>: <span class="s">"dax:Julius/_Measures/MDR-Field-ASUs"</span>,
+    <span class="s">"bb:expression"</span>: <span class="s">"DIVIDE([Weekly Avg MDR],[Weekly Avg Field ASU])"</span>,
+    <span class="s">"bb:formatString"</span>: <span class="s">"0.00%;-0.00%;0.00%"</span>
+  },
+  <span class="s">"bb:catalogSnapshot"</span>: <span class="s">"2026-08-06"</span>
+}</pre>
+      <p class="code-cap">Proposed &mdash; illustrative Concept Layer content, not deployed</p>
+      <div class="callout c-info" style="margin-bottom:0">
+        <span class="ct">Why JSON-LD is the pragmatic choice</span>
+        This is a single document an agent can retrieve and drop straight into context. It carries the
+        aliases for semantic search, the join keys for query planning, the sentinel-value glossary, and
+        &mdash; critically &mdash; a <code>notDimensionableBy</code> block. Negative knowledge is the thing
+        most retrieval systems never capture, and it is what prevents the section 07 failure.
+      </div>
+    </div>
+
+    <!-- Cypher -->
+    <div class="tab-panel">
+<pre><span class="c">// ---------- Concept nodes ----------</span>
+<span class="k">MERGE</span> (mdr:Metric {id:<span class="s">'MDRRateFieldASU'</span>})
+  <span class="k">SET</span> mdr.label      = <span class="s">'MDR Rate (Field ASUs)'</span>,
+      mdr.kind       = <span class="s">'ratio'</span>,
+      mdr.additivity = <span class="s">'non-additive'</span>,
+      mdr.grain      = <span class="s">'FiscalWeek'</span>,
+      mdr.dax        = <span class="s">'DIVIDE([Weekly Avg MDR],[Weekly Avg Field ASU])'</span>,
+      mdr.aliases    = [<span class="s">'MDR%'</span>,<span class="s">'Managed Dispatch Rate'</span>];
+
+<span class="k">MERGE</span> (evt:Concept {id:<span class="s">'WarrantyCostEvent'</span>})
+  <span class="k">SET</span> evt.label = <span class="s">'MDR Dispatch'</span>,
+      evt.flag  = <span class="s">'FACT - Work Order Parts[MDR Dispatch Flag]'</span>,
+      evt.macro = <span class="s">'03_BLUEBK_M_WO_EXT.sql#PARTS_MDR_FLG'</span>;
+
+<span class="k">MERGE</span> (asu:Concept {id:<span class="s">'EligibleEntitledAsset'</span>})
+  <span class="k">SET</span> asu.label = <span class="s">'Active Serviced Unit'</span>,
+      asu.rule  = <span class="s">'ASU_XCLSN_FLG &lt;&gt; 1 AND FLD_FLG = 1'</span>,
+      asu.count = <span class="s">'COUNT(DISTINCT SRC_CUST_PROD_ID)'</span>,
+      asu.macro = <span class="s">'12_BLUEBK_M_FLD_ASU_CURR.sql'</span>;
+
+<span class="k">MERGE</span> (mdr)-[:NUMERATOR]-&gt;(evt);
+<span class="k">MERGE</span> (mdr)-[:DENOMINATOR]-&gt;(asu);
+
+<span class="c">// ---------- Entities and their roles ----------</span>
+<span class="k">MERGE</span> (off:Entity  {id:<span class="s">'ServiceOffering'</span>});
+<span class="k">MERGE</span> (fRole:Role {id:<span class="s">'FieldEntitlementRole'</span>, dim:<span class="s">'Dim - Field Entitlement'</span>});
+<span class="k">MERGE</span> (tRole:Role {id:<span class="s">'TechEntitlementRole'</span>,  dim:<span class="s">'Dim - Tech Entitlement'</span>});
+<span class="k">MERGE</span> (fRole)-[:ROLE_OF]-&gt;(off);
+<span class="k">MERGE</span> (tRole)-[:ROLE_OF]-&gt;(off);
+<span class="k">MERGE</span> (fRole)-[:SHARES_CODE_DOMAIN]-&gt;(tRole);
+
+<span class="k">MERGE</span> (ctry:Entity {id:<span class="s">'Country'</span>});
+<span class="k">MERGE</span> (aRole:Role {id:<span class="s">'AssetCountryRole'</span>,   dim:<span class="s">'Dim - Geo Location'</span>});
+<span class="k">MERGE</span> (sRole:Role {id:<span class="s">'ServiceCountryRole'</span>, dim:<span class="s">'Dim - Service Location'</span>});
+<span class="k">MERGE</span> (aRole)-[:ROLE_OF]-&gt;(ctry);
+<span class="k">MERGE</span> (sRole)-[:ROLE_OF]-&gt;(ctry);
+
+<span class="c">// ---------- Reachability is what makes this queryable ----------</span>
+<span class="k">MERGE</span> (evt)-[:DIMENSIONABLE_BY {joinKey:<span class="s">'ASST_UNIFIED_ISO_CTRY_CD'</span>}]-&gt;(aRole);
+<span class="k">MERGE</span> (asu)-[:DIMENSIONABLE_BY {joinKey:<span class="s">'ASST_UNIFIED_ISO_CTRY_CD'</span>}]-&gt;(aRole);
+<span class="k">MERGE</span> (evt)-[:DIMENSIONABLE_BY {joinKey:<span class="s">'Work Order Country Code'</span>}]-&gt;(sRole);
+<span class="c">// NOTE: deliberately NO (asu)-[:DIMENSIONABLE_BY]-&gt;(sRole). That absence IS the constraint.</span>
+
+<span class="k">MERGE</span> (evt)-[:DIMENSIONABLE_BY {joinKey:<span class="s">'FLD_POC'</span>}]-&gt;(fRole);
+<span class="k">MERGE</span> (asu)-[:DIMENSIONABLE_BY {joinKey:<span class="s">'PROD_OFRNG_CD'</span>}]-&gt;(fRole);</pre>
+
+      <h4>The traversal that catches the section 07 bug</h4>
+<pre><span class="c">// "Which dimensions can I VALIDLY slice MDR Rate by?"</span>
+<span class="c">// A dimension is valid only if BOTH operands can reach it.</span>
+
+<span class="k">MATCH</span> (m:Metric {id:<span class="s">'MDRRateFieldASU'</span>})-[:NUMERATOR]-&gt;(num),
+      (m)-[:DENOMINATOR]-&gt;(den)
+<span class="k">MATCH</span> (num)-[:DIMENSIONABLE_BY]-&gt;(d:Role)
+<span class="k">RETURN</span> d.id                                  <span class="k">AS</span> role,
+       d.dim                                 <span class="k">AS</span> dimension,
+       <span class="f">exists</span>((den)-[:DIMENSIONABLE_BY]-&gt;(d)) <span class="k">AS</span> validForRatio
+<span class="k">ORDER BY</span> validForRatio <span class="k">DESC</span>;
+
+<span class="c">// role                  | dimension               | validForRatio</span>
+<span class="c">// ----------------------+-------------------------+--------------</span>
+<span class="c">// AssetCountryRole      | Dim - Geo Location      | true</span>
+<span class="c">// FieldEntitlementRole  | Dim - Field Entitlement | true</span>
+<span class="c">// ServiceCountryRole    | Dim - Service Location  | FALSE   &lt;-- caught</span></pre>
+      <p class="code-cap">Proposed &mdash; illustrative graph model, not deployed</p>
+      <div class="callout c-obs" style="margin-bottom:0">
+        <span class="ct">The most useful three lines in this document</span>
+        That final query is a generic rule &mdash; "a ratio may only be sliced by a dimension both operands
+        can reach" &mdash; and it would flag the Service Location trap automatically, across
+        <em>every</em> ratio measure in the model, without anyone having to know about it in advance.
+        The tabular model contains all the information needed to evaluate it. It just has no way to
+        express the question.
+      </div>
+    </div>
+  </div>
+
+  <h3>Which one would I actually use?</h3>
+  <div class="tbl-wrap">
+  <table>
+    <thead><tr><th>Format</th><th>Best at</th><th>Weak at</th><th>Verdict here</th></tr></thead>
+    <tbody>
+      <tr><td><strong>RDF / OWL</strong></td><td>Formal rigour, inference, standards, federation</td><td>Steep learning curve; needs a triple store nobody currently runs</td><td>Right for the <em>canonical</em> definition, if we ever federate beyond Bluebook</td></tr>
+      <tr><td><strong>JSON-LD</strong></td><td>Direct LLM consumption; one file per concept; trivially diffable in Git</td><td>No inference; constraints are advisory text unless something enforces them</td><td class="tick">Start here &mdash; lowest cost, highest immediate payoff</td></tr>
+      <tr><td><strong>Property graph</strong></td><td>Reachability and path questions; the "both operands" rule above</td><td>Another database to run and keep in sync; no standard semantics</td><td>Compelling for automated <em>validation</em>, harder to justify as the system of record</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p>
+    They are not mutually exclusive. JSON-LD is a serialization of RDF, so the same triples can be emitted
+    as Turtle for rigour and loaded into a graph for path analysis. Authoring once and projecting three
+    ways is the realistic play.
+  </p>
+</section>
+
+<hr class="div">
+
+<!-- ============ 11 ============ -->
+<section id="s11">
+  <span class="sec-num">Section 11 &middot; The concept layer</span>
+  <h2>Worked example</h2>
+
+  <div class="callout c-synth">
+    <span class="ct">Synthetic data notice</span>
+    <strong>Every number in this section is invented.</strong> They are plausible shapes chosen to make the
+    arithmetic legible. They are not Dell figures, are not drawn from any system, and must not be quoted.
+    The <em>structure</em> of the calculation is real; the values are not.
+  </div>
+
+  <p>
+    The question: <em>"What is our MDR rate for ProSupport Plus PowerEdge assets in EMEA?"</em>
+    Let us follow both paths. <span class="badge b-synth">Synthetic</span>
+  </p>
+
+  <h3>Path A &mdash; the semantic layer alone</h3>
+  <p>
+    An agent with only the cube metadata sees measure names and table names. It makes four independent
+    guesses, each individually reasonable:
+  </p>
+  <div class="tbl-wrap">
+  <table>
+    <thead><tr><th>Decision</th><th>Agent's guess</th><th>Correct?</th><th>Consequence</th></tr></thead>
+    <tbody>
+      <tr><td>Which MDR measure?</td><td><code>MDR (Field ASUs)</code></td><td class="tick">Yes</td><td>Best string match, happens to be right</td></tr>
+      <tr><td>Which geography?</td><td><code>Dim - Service Location[Region Name]</code></td><td class="cross">No</td><td>Denominator ignores the filter entirely</td></tr>
+      <tr><td>Which entitlement?</td><td><code>Dim - Tech Entitlement[Tech Offer Level]</code></td><td class="part">Ambiguous</td><td>Valid path, but a different population than Field</td></tr>
+      <tr><td>Time aggregation?</td><td><code>AVERAGE</code> over 13 weeks</td><td class="cross">No</td><td>Double-averages an already-averaged ratio</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <div class="callout c-warn">
+    <span class="ct">Result</span>
+    A cleanly formatted percentage, rendered without a single error or warning, that is wrong in three
+    independent ways. This is the worst possible failure mode: <strong>confidently wrong and
+    indistinguishable from correct.</strong>
+  </div>
+
+  <h4>What the wrong answer looks like <span class="badge b-synth">Synthetic</span></h4>
+  <div class="tbl-wrap">
+  <table>
+    <thead><tr><th>Region (service location)</th><th>MDR Work Orders</th><th>Field ASUs</th><th>MDR Rate</th></tr></thead>
+    <tbody>
+      <tr><td>EMEA</td><td class="num-cell">4,120</td><td class="num-cell">2,480,000</td><td class="num-cell">0.17%</td></tr>
+      <tr><td>Americas</td><td class="num-cell">6,540</td><td class="num-cell">2,480,000</td><td class="num-cell">0.26%</td></tr>
+      <tr><td>APJ</td><td class="num-cell">2,310</td><td class="num-cell">2,480,000</td><td class="num-cell">0.09%</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p>
+    Look at the denominator column. <strong>It never changes.</strong> That is the section 07 bug made
+    visible &mdash; the numerator responds to the region filter, the denominator does not, so every rate is
+    computed against the global asset base. The relative ordering even looks plausible, which is precisely
+    why nobody catches it.
+  </p>
+
+  <h3>Path B &mdash; Concept-Layer-guided planning, then cube execution</h3>
+  <ol>
+    <li><strong>Resolve the concept.</strong> "MDR rate" &rarr; <code class="inl">bb:MDRRateFieldASU</code>
+      via <code class="inl">skos:altLabel</code>. Ten candidate variants narrowed to one by declared type
+      (<code class="inl">bb:RatioMetric</code>) and unit.</li>
+    <li><strong>Check dimensionability.</strong> The reachability query returns
+      <code class="inl">AssetCountryRole</code> as valid and
+      <code class="inl">ServiceCountryRole</code> as <code class="inl">validForRatio = false</code>.
+      The agent uses <code class="inl">Dim - Geo Location</code>.</li>
+    <li><strong>Resolve entitlement.</strong> <code class="inl">sharesCodeDomainWith</code> tells the agent
+      Field and Tech draw the same code set; <code class="inl">bb:reachableFrom</code> on both operands
+      selects the Field role. The sentinel glossary tells it to report
+      <code class="inl">'OOW'</code> separately rather than lump it into "no entitlement".</li>
+    <li><strong>Respect scope.</strong> <code class="inl">bb:productScope = HardwareOnly</code> warns that
+      the denominator is hardware-only, so the agent states this as a caveat rather than silently
+      inheriting it.</li>
+    <li><strong>Respect additivity.</strong> <code class="inl">bb:additivity = "non-additive"</code> plus
+      the <code class="inl">NoCrossWeekAverage</code> constraint stops it from averaging the ratio.
+      It recomputes from base counts.</li>
+    <li><strong>Execute.</strong> One DAX query against the Julius cube &mdash; the same governed engine as
+      always. The Concept Layer never produced a number.</li>
+  </ol>
+
+  <h4>What the right answer looks like <span class="badge b-synth">Synthetic</span></h4>
+  <div class="tbl-wrap">
+  <table>
+    <thead><tr><th>GSD Region (asset)</th><th>Offer Level</th><th>Wkly Avg MDR WOs</th><th>Wkly Avg Field ASUs</th><th>MDR Rate</th></tr></thead>
+    <tbody>
+      <tr><td>EMEA</td><td>ProSupport Plus</td><td class="num-cell">318</td><td class="num-cell">214,600</td><td class="num-cell">0.15%</td></tr>
+      <tr><td>EMEA</td><td>ProSupport</td><td class="num-cell">742</td><td class="num-cell">389,200</td><td class="num-cell">0.19%</td></tr>
+      <tr><td>EMEA</td><td>Basic</td><td class="num-cell">196</td><td class="num-cell">61,400</td><td class="num-cell">0.32%</td></tr>
+      <tr><td>EMEA</td><td><code>OOW</code></td><td class="num-cell">54</td><td class="num-cell">18,900</td><td class="num-cell">0.29%</td></tr>
+      <tr style="background:rgba(244,63,94,.05)"><td>EMEA</td><td><code>N/A</code> <span class="badge b-warn">DQ</span></td><td class="num-cell">31</td><td class="num-cell">&mdash;</td><td class="num-cell">n/a</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <div class="callout c-obs">
+    <span class="ct">The differences that matter</span>
+    The denominator now varies by row. The geography is the asset-location role, which both operands can
+    reach. <code>OOW</code> appears as a real population with its own rate rather than being silently
+    folded into "unknown". <code>N/A</code> is quarantined as a data-quality bucket with no rate computed,
+    because it has no meaningful denominator. And the agent can state, unprompted: <em>"this covers
+    hardware products only, and these rates cannot be averaged together."</em>
+  </div>
+
+  <details>
+    <summary>Deep dive: the additivity trap, with arithmetic <span class="dtag">Engineers</span></summary>
+    <div class="details-body">
+      <p><span class="badge b-synth">Synthetic</span> Three consecutive fiscal weeks, EMEA ProSupport Plus:</p>
+      <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>Week</th><th>MDR WOs</th><th>Field ASUs</th><th>Weekly rate</th></tr></thead>
+        <tbody>
+          <tr><td>FY27 W01</td><td class="num-cell">300</td><td class="num-cell">200,000</td><td class="num-cell">0.150%</td></tr>
+          <tr><td>FY27 W02</td><td class="num-cell">420</td><td class="num-cell">210,000</td><td class="num-cell">0.200%</td></tr>
+          <tr><td>FY27 W03</td><td class="num-cell">234</td><td class="num-cell">234,000</td><td class="num-cell">0.100%</td></tr>
+        </tbody>
+      </table>
+      </div>
+      <p><strong>Wrong &mdash; average the rates:</strong>
+        (0.150% + 0.200% + 0.100%) / 3 = <strong>0.150%</strong></p>
+      <p><strong>Right &mdash; recompute from base counts:</strong>
+        (300 + 420 + 234) / (200,000 + 210,000 + 234,000) = 954 / 644,000 = <strong>0.148%</strong></p>
+      <p>A 1.3% relative error on a made-up three-week window with mild variation. Widen to a quarter with
+        a seasonal spike and a growing installed base and the gap opens considerably &mdash; and it opens
+        <em>in the direction of whichever weeks had the smallest denominators</em>, which is a
+        systematic bias, not noise.</p>
+      <p style="margin-bottom:0">The cube cannot prevent this. <code class="inl">MDR (Field ASUs)</code> is
+        a measure; drop it in a matrix with a quarter on rows and Power BI evaluates it in the quarter's
+        filter context &mdash; which, because of the <code class="inl">AVERAGEX</code> inside
+        <code class="inl">Weekly Avg MDR</code>, is closer to the right answer than a naive average but
+        still depends entirely on the user not manually aggregating. One declared
+        <code class="inl">bb:additivity</code> triple removes the ambiguity for any agent that reads it.</p>
+    </div>
+  </details>
+</section>
+
+<hr class="div">
+
+<!-- ============ 12 ============ -->
+<section id="s12">
+  <span class="sec-num">Section 12 &middot; Judgement</span>
+  <h2>Retrieval scorecard for AI agents</h2>
+  <p>
+    An honest comparison, including where the Concept Layer approach costs more than it returns.
+    <span class="badge b-prop">Proposed</span>
+  </p>
+
+  <div class="tbl-wrap">
+  <table>
+    <thead><tr><th style="min-width:210px">Capability</th><th>Semantic layer only</th><th>+ Concept Layer</th><th>Net</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Measure disambiguation</strong></td><td>String similarity over 203 names in nested display folders</td><td>Typed instances with declared units and restrictions</td><td class="tick">Large gain</td></tr>
+      <tr><td><strong>Definition provenance</strong></td><td>None. The DAX is the only artifact.</td><td><code>prov:wasDerivedFrom</code> to the owning macro</td><td class="tick">Large gain</td></tr>
+      <tr><td><strong>Additivity safety</strong></td><td>Nothing prevents invalid aggregation</td><td>Declared constraint, checkable pre-flight</td><td class="tick">Large gain</td></tr>
+      <tr><td><strong>Role / conformance</strong></td><td>Duplicate tables look like distinct concepts</td><td>Roles declared; reachability queryable</td><td class="tick">Large gain</td></tr>
+      <tr><td><strong>Synonyms &amp; aliases</strong></td><td>Not representable</td><td><code>skos:altLabel</code>, deprecations</td><td class="tick">Gain</td></tr>
+      <tr><td><strong>Drift detection</strong></td><td>Impossible &mdash; no declared intent to diverge from</td><td>Stale provenance links are detectable in CI</td><td class="tick">Gain</td></tr>
+      <tr><td><strong>Numeric execution</strong></td><td>Governed, audited, fast, single source of truth</td><td>None &mdash; must delegate to the cube</td><td class="cross">No change; cube remains essential</td></tr>
+      <tr><td><strong>Token cost per query</strong></td><td>Low &mdash; table and measure names only</td><td>Higher &mdash; concept documents in context</td><td class="part">Cost</td></tr>
+      <tr><td><strong>Authoring burden</strong></td><td>Zero incremental &mdash; it already exists</td><td>Real. Someone must write and curate definitions.</td><td class="cross">Significant cost</td></tr>
+      <tr><td><strong>Staleness risk</strong></td><td>Model is self-describing; extract is always current</td><td>Hand-written definitions rot silently</td><td class="cross">Significant risk</td></tr>
+      <tr><td><strong>Latency</strong></td><td>One metadata call</td><td>Retrieval hop before query planning</td><td class="part">Minor cost</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h3>The honest case against doing this</h3>
+  <div class="callout c-warn">
+    <span class="ct">A wrong Concept Layer is worse than no Concept Layer</span>
+    If <code>bb:validGeographyRole</code> says <code>AssetCountryRole</code> and someone later adds an ASU
+    relationship to <code>Dim - Service Location</code>, the Concept Layer now actively <em>prevents</em> a
+    valid query while projecting total confidence. The semantic layer at least fails honestly &mdash; it
+    just doesn't know. A curated layer that has silently rotted is a liability, and the failure is harder
+    to detect than the one it was built to prevent.
+  </div>
+  <ul>
+    <li><strong>It is a standing commitment, not a project.</strong> Concept definitions need an owner and
+      a review cadence forever. Without that, budget for 18 months of value and then decay.</li>
+    <li><strong>Coverage is all-or-nothing in practice.</strong> An agent that finds Concept Layer context for
+      six of ten concepts will silently fall back to guessing on the other four, and the user cannot tell
+      which mode produced which answer.</li>
+    <li><strong>Much of the benefit is achievable more cheaply.</strong> Adding descriptions to the 30
+      measures people actually use, declaring the Product hierarchies in the model, and renaming
+      <code class="inl">Dim - Service Location</code> to something unambiguous would capture a
+      meaningful share of the value for a fraction of the effort. That should be tried first.</li>
+    <li><strong>Nothing here fixes upstream.</strong> <code class="inl">MDR_DSPCH_FLG</code> is still
+      defined in a system we do not own. The Concept Layer can record that fact &mdash; which is useful &mdash;
+      but it cannot make the definition visible.</li>
+  </ul>
+
+  <div class="callout c-info">
+    <span class="ct">Where I actually land</span>
+    The case is strongest not for "MDR%" in general but for the <strong>specific failure in section 07</strong>
+    &mdash; a query that returns a well-formatted, plausible, wrong number with no error. That class of
+    failure scales badly with agent adoption, because agents will run these queries far more often than
+    humans ever did, and with far less suspicion. That is the argument worth making, and it is narrower
+    and more defensible than "we should build a Concept Layer."
+  </div>
+</section>
+
+<hr class="div">
+
+<!-- ============ 13 ============ -->
+<section id="s13">
+  <span class="sec-num">Section 13 &middot; Judgement</span>
+  <h2>Two prompt paths, two evaluation problems</h2>
+  <p class="lede">The practical enterprise limit is not just how many tokens fit. It is whether the few facts that govern a question are retrieved, ranked above plausible alternatives, and preserved through planning and execution. <span class="badge b-prop">Proposed</span></p>
+
+  <figure>
+    <svg viewBox="0 0 880 430" role="img" aria-label="Unguided discovery compared with Concept-Layer-directed execution">
+      <defs><marker id="p13a" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 z" fill="#f59e0b"/></marker><marker id="p13b" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 z" fill="#10b981"/></marker></defs>
+      <text x="210" y="22" text-anchor="middle" class="svg-t" fill="#fbbf24">PATH A — NO CONCEPT DIRECTION</text>
+      <text x="670" y="22" text-anchor="middle" class="svg-t" fill="#6ee7b7">PATH B — CONCEPT-LAYER-DIRECTED</text>
+      <line x1="440" y1="8" x2="440" y2="414" stroke="rgba(255,255,255,.12)"/>
+      <rect x="75" y="42" width="270" height="48" rx="10" fill="rgba(255,255,255,.05)" stroke="#64748b"/><text x="210" y="62" text-anchor="middle" class="svg-l">“MDR for EMEA, last 13 weeks”</text><text x="210" y="79" text-anchor="middle" class="svg-s">same user intent</text>
+      <rect x="535" y="42" width="270" height="48" rx="10" fill="rgba(255,255,255,.05)" stroke="#64748b"/><text x="670" y="62" text-anchor="middle" class="svg-l">“MDR for EMEA, last 13 weeks”</text><text x="670" y="79" text-anchor="middle" class="svg-s">same user intent</text>
+      <rect x="55" y="118" width="310" height="70" rx="11" fill="rgba(245,158,11,.1)" stroke="#f59e0b"/><text x="210" y="140" text-anchor="middle" class="svg-l">Broad candidate retrieval</text><text x="210" y="158" text-anchor="middle" class="svg-s">schemas · measures · DAX · lineage · reports</text><text x="210" y="175" text-anchor="middle" class="svg-s">many plausible objects compete for attention</text><path d="M210 92 L210 114" stroke="#f59e0b" marker-end="url(#p13a)"/>
+      <rect x="515" y="118" width="310" height="70" rx="11" fill="rgba(139,92,246,.12)" stroke="#8b5cf6"/><text x="670" y="140" text-anchor="middle" class="svg-l">Retrieve one execution contract</text><text x="670" y="158" text-anchor="middle" class="svg-s">certified metric · valid roles · grain · constraints</text><text x="670" y="175" text-anchor="middle" class="svg-s">evidence remains available behind the contract</text><path d="M670 92 L670 114" stroke="#10b981" marker-end="url(#p13b)"/>
+      <rect x="55" y="216" width="310" height="78" rx="11" fill="rgba(244,63,94,.09)" stroke="#f43f5e" stroke-dasharray="4 3"/><text x="210" y="238" text-anchor="middle" class="svg-l">Agent reconstructs meaning</text><text x="210" y="256" text-anchor="middle" class="svg-s">Which MDR? Which EMEA? Field or Tech?</text><text x="210" y="273" text-anchor="middle" class="svg-s">Can it be averaged? Which source is authoritative?</text><text x="210" y="288" text-anchor="middle" class="svg-s" fill="#fda4af">retrieval errors and reasoning errors are entangled</text><path d="M210 190 L210 212" stroke="#f59e0b" marker-end="url(#p13a)"/>
+      <rect x="515" y="216" width="310" height="78" rx="11" fill="rgba(6,182,212,.1)" stroke="#06b6d4"/><text x="670" y="238" text-anchor="middle" class="svg-l">Agent plans inside boundaries</text><text x="670" y="256" text-anchor="middle" class="svg-s">MDR Field ASU · Asset Country · Fiscal Week</text><text x="670" y="273" text-anchor="middle" class="svg-s">recompute operands · hardware-only caveat</text><text x="670" y="288" text-anchor="middle" class="svg-s" fill="#67e8f9">resolution, planning and execution are separable</text><path d="M670 190 L670 212" stroke="#10b981" marker-end="url(#p13b)"/>
+      <rect x="55" y="322" width="310" height="74" rx="11" fill="rgba(244,63,94,.08)" stroke="#f43f5e"/><text x="210" y="345" text-anchor="middle" class="svg-l">Evaluate a plausible answer</text><text x="210" y="363" text-anchor="middle" class="svg-s">query success can hide semantic misuse</text><text x="210" y="380" text-anchor="middle" class="svg-s">gold answer shifts with retrieval and prompt order</text><path d="M210 296 L210 318" stroke="#f59e0b" marker-end="url(#p13a)"/>
+      <rect x="515" y="322" width="310" height="74" rx="11" fill="rgba(16,185,129,.11)" stroke="#10b981"/><text x="670" y="345" text-anchor="middle" class="svg-l">Evaluate against a contract</text><text x="670" y="363" text-anchor="middle" class="svg-s">concept · roles · constraints · result invariants</text><text x="670" y="380" text-anchor="middle" class="svg-s">equivalent SQL may pass; invalid operations must fail</text><path d="M670 296 L670 318" stroke="#10b981" marker-end="url(#p13b)"/>
+    </svg>
+    <figcaption>Both paths use retrieval. One retrieves candidates; the other retrieves the minimum sufficient contract.</figcaption>
+  </figure>
+
+  <h3>Context categories ranked by impact</h3>
+  <div class="tbl-wrap"><table><thead><tr><th>Category</th><th>Impact</th><th>What it prevents or enables</th><th>Prompt treatment</th></tr></thead><tbody>
+    <tr><td><strong>Validity constraints</strong></td><td class="tick">Critical</td><td>Prohibited dimensions, invalid join paths, non-additive aggregation</td><td>Always include as compact, machine-checkable rules</td></tr>
+    <tr><td><strong>Authoritative implementation</strong></td><td class="tick">Critical</td><td>Selects one certified measure, model and effective version</td><td>Resolve before exposing candidates to the planner</td></tr>
+    <tr><td><strong>Business roles and scope</strong></td><td class="tick">Critical</td><td>Asset vs service geography; Field vs Tech entitlement; hardware-only scope</td><td>Include when role or scope terms are present</td></tr>
+    <tr><td><strong>Grain and aggregation</strong></td><td class="tick">Critical</td><td>Fiscal-week handling, ratio recomputation, snapshots and distinct counts</td><td>Always for time, ratio and semi/non-additive metrics</td></tr>
+    <tr><td><strong>Definitions, aliases and units</strong></td><td class="tick">High</td><td>Resolves MDR variants and percent versus count</td><td>Use at concept resolution; keep concise</td></tr>
+    <tr><td><strong>Security, certification and ownership</strong></td><td class="tick">High</td><td>Routes to approved production objects and appropriate detail</td><td>Guide planning; enforce independently in the platform</td></tr>
+    <tr><td><strong>Freshness and effective dates</strong></td><td class="part">Medium-high</td><td>Prevents stale contracts and superseded definitions</td><td>Include version and review status</td></tr>
+    <tr><td><strong>Canonical examples</strong></td><td class="part">Medium</td><td>Improves query shape and tool use</td><td>Retrieve after rules; examples must not override constraints</td></tr>
+    <tr><td><strong>Full lineage and source logic</strong></td><td class="part">Situational</td><td>Explanation, audit, debugging and drift analysis</td><td>Progressive disclosure, not every prompt</td></tr>
+    <tr><td><strong>Usage frequency</strong></td><td class="cross">Potentially harmful</td><td>Prioritizes review but can canonize common misuse</td><td>Never treat popularity as validity</td></tr>
+    <tr><td><strong>Broad catalog dump</strong></td><td class="cross">Low signal</td><td>Adds ambiguity, latency, token cost and “lost in the middle” risk</td><td>Route and filter; never inject wholesale</td></tr>
+  </tbody></table></div>
+  <div class="callout c-info"><span class="ct">Prompt-budget order</span><strong>Constraints → authoritative target → roles and scope → grain and aggregation → definitions → examples → evidence.</strong> Full lineage belongs behind a drill-down. The goal is not maximum context; it is the minimum sufficient contract.</div>
+
+  <h3>Prompt evaluation complications</h3>
+  <div class="grid2">
+    <div class="card"><h4 style="color:var(--amber)">Without direction</h4><ul style="margin-bottom:0"><li>The gold answer is ambiguous when several technical interpretations are defensible.</li><li>Retrieval, routing and reasoning failures are difficult to attribute.</li><li>Prompt ordering or a new schema candidate can silently change the selected measure.</li><li>Execution success and plausible values can hide numerator-only filtering.</li><li>The test space grows across aliases, roles, time grains, identities and model versions.</li></ul></div>
+    <div class="card"><h4 style="color:var(--emerald)">With Concept-Layer direction</h4><ul style="margin-bottom:0"><li>The expected concept and governed implementation are explicit.</li><li>Resolution, planning, execution and explanation can be scored separately.</li><li>Negative tests require rejection of invalid dimensions and aggregations.</li><li>Equivalent query text can pass when it obeys the same contract.</li><li>A changed contract identifies which tests require regression.</li></ul></div>
+  </div>
+
+  <h3>What should be scored</h3>
+  <div class="tbl-wrap"><table><thead><tr><th>Evaluation dimension</th><th>Pass condition</th><th>MDR example</th></tr></thead><tbody>
+    <tr><td><strong>Concept resolution</strong></td><td>Correct governed metric</td><td><code>MDR (Field ASUs)</code>, not Commodity MDR or TLSU</td></tr>
+    <tr><td><strong>Role resolution</strong></td><td>Correct business role</td><td>Asset Country / GSD Region, not Service Location</td></tr>
+    <tr><td><strong>Constraint compliance</strong></td><td>Invalid operations rejected or repaired</td><td>No Service Country slice; no average of weekly rates</td></tr>
+    <tr><td><strong>Execution equivalence</strong></td><td>Maps to certified implementation</td><td>Uses the governed measure or an approved equivalent</td></tr>
+    <tr><td><strong>Result invariants</strong></td><td>Output obeys structural expectations</td><td>Both operands share geography context; denominator varies by valid geography</td></tr>
+    <tr><td><strong>Caveat quality</strong></td><td>Material limits are stated</td><td>Hardware-only and non-additive</td></tr>
+    <tr><td><strong>Provenance and freshness</strong></td><td>Versioned authoritative sources cited</td><td>Concept contract, Julius measure and current snapshot</td></tr>
+    <tr><td><strong>Efficiency</strong></td><td>Bounded tokens, tool calls, retries and latency</td><td>One contract retrieval plus one execution</td></tr>
+    <tr><td><strong>Access control</strong></td><td>User identity and platform policy enforced</td><td>No raw-data fallback after certified-model denial</td></tr>
+  </tbody></table></div>
+
+  <details open><summary>Recommended paired evaluation design <span class="dtag">Practical</span></summary><div class="details-body"><ol><li>Run every held-out question through both paths with the same model, tools, identity and data snapshot.</li><li>Use prompt families: acronym, executive shorthand, ambiguous geography, follow-up and adversarial variants.</li><li>Place plausible competing dimensions and MDR variants close together in retrieval results.</li><li>Score concept resolution, routing, planning, execution, invariants, caveats and provenance separately.</li><li>Compare semantics and result invariants rather than requiring one exact SQL or DAX string.</li><li>Capture input and retrieved tokens, tool calls, retries, elapsed time and warehouse work.</li><li>Test stale and conflicting context; changed structure should produce <code>needs-review</code>, not silent trust.</li><li>If SMEs disagree on the gold answer, classify it as governance backlog rather than model failure.</li></ol></div></details>
+  <div class="callout c-warn"><span class="ct">Do not build the benchmark from popularity</span>If historical prompts frequently pair MDR with Service Location, a usage-derived benchmark will reward the exact defect this work is intended to prevent. Gold cases must be ratified against business intent and structural validity.</div>
+  <div class="callout c-prop"><span class="ct">Proposed success criterion</span>The directed path should materially improve <strong>constraint compliance, role resolution and caveat quality</strong> while reducing median retrieval tokens and tool calls. Numeric correctness alone is insufficient because the Section 07 failure returns a plausible percentage with no execution error.</div>
+  <p class="code-cap">External design references: <a class="ext" href="https://learn.microsoft.com/en-us/agent-framework/agents/rag">Microsoft Agent Framework RAG</a>; <a class="ext" href="https://learn.microsoft.com/en-us/agent-framework/journey/adding-context-providers">Adding Context Providers</a>; <a class="ext" href="https://microsoft.github.io/multi-agent-reference-architecture/docs/reference-architecture/Patterns.html">Multi-agent patterns</a>. Accessed 2026-09-02.</p>
+</section>
+<hr class="div">
+<!-- ============ 14 ============ -->
+<section id="s14">
+  <span class="sec-num">Section 14 &middot; Judgement</span>
+  <h2>Proposed target state</h2>
+  <p>
+    <span class="badge b-prop">Proposed</span> &mdash; a conceptual sketch for discussion. This is not an
+    approved project, has no estimate attached, and proposes no change to the Julius model, the macros,
+    or any deployment process.
+  </p>
+
+  <figure>
+    <svg viewBox="0 0 860 380" role="img" aria-label="Proposed architecture: Concept Layer annotates the existing cube">
+      <defs><marker id="ara" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 z" fill="#06b6d4"/></marker>
+      <marker id="arv" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 z" fill="#8b5cf6"/></marker></defs>
+
+      <rect x="30" y="22" width="220" height="70" rx="12" fill="rgba(255,255,255,.04)" stroke="#475569"/>
+      <text x="140" y="48" text-anchor="middle" class="svg-l">Teradata macros</text>
+      <text x="140" y="66" text-anchor="middle" class="svg-s">BLUEBK_M_* &middot; the real</text>
+      <text x="140" y="81" text-anchor="middle" class="svg-s">business definitions</text>
+
+      <rect x="30" y="118" width="220" height="70" rx="12" fill="rgba(255,255,255,.04)" stroke="#475569"/>
+      <text x="140" y="144" text-anchor="middle" class="svg-l">IOMETE / Iceberg</text>
+      <text x="140" y="162" text-anchor="middle" class="svg-s">wd_debi_dice_usdm</text>
+      <text x="140" y="177" text-anchor="middle" class="svg-s">17 quarter-sliced ASU views</text>
+
+      <rect x="316" y="70" width="230" height="70" rx="12" fill="rgba(6,182,212,.12)" stroke="#06b6d4" stroke-width="1.6"/>
+      <text x="431" y="96" text-anchor="middle" class="svg-t" font-size="12">Julius tabular model</text>
+      <text x="431" y="115" text-anchor="middle" class="svg-s">203 measures &middot; UNCHANGED</text>
+      <text x="431" y="130" text-anchor="middle" class="svg-s">still the only calculation engine</text>
+
+      <path d="M252 62 C285 66 292 74 312 88" stroke="#06b6d4" stroke-width="1.5" fill="none" marker-end="url(#ara)"/>
+      <path d="M252 150 C285 146 292 132 312 120" stroke="#06b6d4" stroke-width="1.5" fill="none" marker-end="url(#ara)"/>
+
+      <rect x="316" y="212" width="230" height="76" rx="12" fill="rgba(139,92,246,.12)" stroke="#8b5cf6" stroke-width="1.6" stroke-dasharray="5 3"/>
+      <text x="431" y="238" text-anchor="middle" class="svg-t" font-size="12" fill="#c4b5fd">Concept layer (new)</text>
+      <text x="431" y="257" text-anchor="middle" class="svg-s">JSON-LD, one file per concept</text>
+      <text x="431" y="272" text-anchor="middle" class="svg-s">curated, versioned, reviewed in Git</text>
+
+      <rect x="30" y="212" width="220" height="76" rx="12" fill="rgba(16,185,129,.1)" stroke="#10b981" stroke-dasharray="4 3"/>
+      <text x="140" y="238" text-anchor="middle" class="svg-l">data-catalog/ extract</text>
+      <text x="140" y="257" text-anchor="middle" class="svg-s">already exists &middot; regenerable</text>
+      <text x="140" y="272" text-anchor="middle" class="svg-s">seeds the structural skeleton</text>
+
+      <path d="M252 250 L312 250" stroke="#10b981" stroke-width="1.5" fill="none" marker-end="url(#arv)"/>
+      <path d="M431 146 L431 208" stroke="#8b5cf6" stroke-width="1.5" fill="none" stroke-dasharray="4 3" marker-end="url(#arv)"/>
+      <text x="446" y="182" class="svg-s" fill="#c4b5fd">annotates &middot; never overrides</text>
+
+      <rect x="612" y="118" width="220" height="140" rx="12" fill="rgba(245,158,11,.1)" stroke="#f59e0b" stroke-width="1.6"/>
+      <text x="722" y="146" text-anchor="middle" class="svg-t" font-size="12">AI Agent</text>
+      <text x="722" y="172" text-anchor="middle" class="svg-s">1. read concept &rarr; plan</text>
+      <text x="722" y="190" text-anchor="middle" class="svg-s">2. validate constraints</text>
+      <text x="722" y="208" text-anchor="middle" class="svg-s">3. execute DAX on cube</text>
+      <text x="722" y="226" text-anchor="middle" class="svg-s">4. answer + caveats</text>
+      <text x="722" y="246" text-anchor="middle" class="svg-s" fill="#fbbf24">numbers only ever from cube</text>
+
+      <path d="M550 250 C580 246 592 220 608 196" stroke="#8b5cf6" stroke-width="1.5" fill="none" marker-end="url(#arv)"/>
+      <path d="M550 104 C580 108 592 140 608 158" stroke="#06b6d4" stroke-width="1.5" fill="none" marker-end="url(#ara)"/>
+
+      <rect x="30" y="318" width="802" height="44" rx="10" fill="rgba(244,63,94,.06)" stroke="#f43f5e" stroke-dasharray="4 3"/>
+      <text x="431" y="338" text-anchor="middle" class="svg-s" fill="#fda4af">CI gate: every bb:implementedBy and prov:wasDerivedFrom must resolve against a current catalog extract</text>
+      <text x="431" y="354" text-anchor="middle" class="svg-s" fill="#fda4af">a broken pointer fails the build &mdash; this is the entire defence against silent rot</text>
+    </svg>
+    <figcaption>Proposed. The cube is untouched; the concept layer annotates it and the CI gate keeps it honest.</figcaption>
+  </figure>
+
+  <h3>Where things would live</h3>
+  <div class="tbl-wrap">
+  <table>
+    <thead><tr><th>Artifact</th><th>Location</th><th>Ownership</th><th>Status</th></tr></thead>
+    <tbody>
+      <tr><td>Structural metadata extract</td><td><code>data-catalog/</code> (gitignored, CI artifact)</td><td>Automated &mdash; existing skills</td><td class="tick">Exists today</td></tr>
+      <tr><td>Concept layer (JSON-LD)</td><td>New, versioned in Git &mdash; small, reviewable, no data</td><td>Data architecture, with domain SME review</td><td class="cross">Would need building</td></tr>
+      <tr><td>Julius tabular model</td><td>Unchanged</td><td>Existing owners</td><td class="tick">No change proposed</td></tr>
+      <tr><td>Teradata macros</td><td>Unchanged</td><td>Existing owners</td><td class="tick">No change proposed</td></tr>
+      <tr><td>Link-integrity CI gate</td><td>Existing pipeline</td><td>Platform</td><td class="cross">Would need building</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h3>A sensible first step</h3>
+  <p>
+    Not "build a Concept Layer". Pick <strong>one</strong> concept &mdash; MDR Rate &mdash; and write a single
+    JSON-LD document for it. Wire one agent to read it before planning. Measure whether it stops making
+    the section 07 mistake. That is a contained experiment with a clear pass/fail, and it costs days
+    rather than quarters.
+  </p>
+  <p>
+    The cheaper interventions in section 12 should run in parallel regardless of the outcome: they are
+    good hygiene whether or not any Concept Layer work ever happens.
+  </p>
+</section>
+
+<hr class="div">
+
+<!-- ============ 14 ============ -->
+<section id="s15">
+  <span class="sec-num">Section 15 &middot; Judgement</span>
+  <h2>Deriving it from evidence</h2>
+  <p class="lede">
+    Section 12's strongest objection to this whole idea was authoring burden and silent rot. The most
+    promising answer is to stop hand-authoring definitions and start <strong>harvesting</strong> them from
+    artifacts the organisation already produces. <span class="badge b-prop">Proposed</span>
+  </p>
+
+  <h3>Assessment of the approach</h3>
+  <p>
+    The proposal &mdash; capture example reports and scorecards alongside meeting transcripts and query
+    statistics from the cubes and Teradata DBC tables &mdash; is, I think,
+    correct in its core intuition, and it decomposes the problem in exactly the right way:
+  </p>
+  <div class="grid2">
+    <div class="card">
+      <h4 style="color:var(--blue)">Each source answers a different question</h4>
+      <ul style="margin-bottom:0;font-size:.9rem">
+        <li><strong>System metadata</strong> tells you what is <em>possible</em>.</li>
+        <li><strong>Query logs</strong> tell you what is <em>practised</em>.</li>
+        <li><strong>Reports and scorecards</strong> tell you what is <em>ratified</em>.</li>
+        <li><strong>Transcripts</strong> tell you what was <em>intended</em>.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4 style="color:var(--emerald)">Why that combination works</h4>
+      <p style="font-size:.9rem;margin-bottom:0">No single source yields meaning. Structure without
+      convention gives you 8 defensible answers to "MDR by region". Convention without intent tells you
+      what people do but not whether it is right. Intent without structure cannot be executed. The union
+      is genuinely more than the parts &mdash; and critically, three of the four sources
+      <em>already exist</em> and cost nothing to start collecting.</p>
+    </div>
+  </div>
+
+  <div class="callout c-warn">
+    <span class="ct">The failure mode this must be designed around</span>
+    <strong>Frequency is not validity.</strong> If MDR has been sliced by
+    <code>Dim - Service Location</code> four hundred times over two years, usage mining will confidently
+    conclude that this is the canonical pattern &mdash; and encode the precise bug the Concept Layer exists to
+    prevent, now carrying the authority of evidence. That is strictly worse than the current situation,
+    because a hand-authored mistake looks like an opinion whereas a mined mistake looks like a fact.
+    <br><br>
+    The design consequence is non-negotiable: <strong>harvesting produces candidates, never assertions.</strong>
+    Every derived statement carries an evidence class, and nothing is enforceable until a human has
+    promoted it.
+  </div>
+
+  <p>
+    A second, subtler problem: <strong>survivorship bias</strong>. Query logs only contain questions
+    someone knew how to ask and had the skill to express in DAX or SQL. The questions that were abandoned,
+    routed to a human, or never attempted leave no trace &mdash; and that silent population is precisely
+    the one an agent is meant to serve. Mining usage optimises the Concept Layer for yesterday's analysts.
+    Worth supplementing with a deliberate capture of <em>failed</em> and <em>escalated</em> questions.
+  </p>
+
+  <h3>Evidence sources, ranked by what they are worth</h3>
+  <p>
+    I would reorder the priority slightly from the proposal. <strong>Published scorecards are the single
+    highest-value artifact</strong> and tend to be under-weighted, because a published report is not just
+    usage &mdash; it is a definition somebody signed their name to. Two sources are also missing from the
+    original list: report <em>footnotes</em> specifically, and GitLab issue/MR history.
+  </p>
+
+  <div class="tbl-wrap">
+  <table>
+    <thead><tr><th>Source</th><th>What <em>only</em> it can tell you</th><th>Populates</th><th>Confidence</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><strong>1. Published reports &amp; scorecards</strong></td>
+        <td>Which measure + dimension combination is the <em>officially blessed</em> one; the caveats that never reached the model</td>
+        <td><code>skos:prefLabel</code>, <code>bb:canonicalSlice</code>, <code>bb:caveat</code>, <code>bb:productScope</code></td>
+        <td><span class="badge b-ratif">Ratified</span></td>
+      </tr>
+      <tr>
+        <td><strong>2. Meeting transcripts &amp; decisions</strong></td>
+        <td><em>Why</em>. Rationale, disputes, deprecations, ownership. No system records intent.</td>
+        <td><code>skos:definition</code>, <code>bb:rationale</code>, <code>bb:owner</code>, <code>bb:decidedOn</code></td>
+        <td><span class="badge b-assert">Asserted</span></td>
+      </tr>
+      <tr>
+        <td><strong>3. Teradata DBQL object usage</strong></td>
+        <td>Which columns and join paths are <em>actually</em> exercised, and which are dead</td>
+        <td><code>bb:joinKey</code>, <code>bb:reachableFrom</code>, <code>bb:columnUsageRank</code></td>
+        <td><span class="badge b-obsv">Observed</span></td>
+      </tr>
+      <tr>
+        <td><strong>4. Cube query logs (DAX text)</strong></td>
+        <td>Measure/dimension co-occurrence; naming people actually use; abandonment signals</td>
+        <td><code>skos:altLabel</code>, <code>bb:frequentlySlicedBy</code>, <code>bb:coOccursWith</code></td>
+        <td><span class="badge b-obsv">Observed</span></td>
+      </tr>
+      <tr>
+        <td><strong>5. GitLab issues &amp; MRs</strong></td>
+        <td>When and why a flag or macro changed; defect vs. deliberate change</td>
+        <td><code>bb:changedOn</code>, <code>prov:wasRevisionOf</code>, deprecation history</td>
+        <td><span class="badge b-assert">Asserted</span></td>
+      </tr>
+      <tr>
+        <td><strong>6. Existing catalog extract</strong></td>
+        <td>The structural skeleton &mdash; tables, columns, relationships, DAX bodies</td>
+        <td>Everything structural; the scaffold the rest hangs on</td>
+        <td><span class="badge b-struct">Structural</span></td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h3>A worked derivation &mdash; how the section 07 constraint would be found</h3>
+  <p>
+    Rather than someone noticing the Service Location trap by reading 70 relationships, here is how each
+    evidence source contributes a distinct piece, and how the assertion earns its way up the confidence
+    ladder.
+  </p>
+
+  <figure>
+    <svg viewBox="0 0 860 400" role="img" aria-label="Evidence sources feeding a candidate pool, a human ratification gate, and the concept layer">
+      <defs><marker id="arh" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 z" fill="#64748b"/></marker>
+      <marker id="arh2" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 z" fill="#10b981"/></marker></defs>
+
+      <text x="112" y="18" text-anchor="middle" class="svg-s" fill="#8b97a8">EVIDENCE (already exists)</text>
+      <rect x="16" y="30" width="192" height="42" rx="9" fill="rgba(16,185,129,.1)" stroke="#10b981"/>
+      <text x="112" y="47" text-anchor="middle" class="svg-s">Scorecards / reports</text>
+      <text x="112" y="62" text-anchor="middle" class="svg-s" fill="#6ee7b7">ratified slices + footnotes</text>
+
+      <rect x="16" y="84" width="192" height="42" rx="9" fill="rgba(139,92,246,.1)" stroke="#8b5cf6"/>
+      <text x="112" y="101" text-anchor="middle" class="svg-s">Meeting transcripts</text>
+      <text x="112" y="116" text-anchor="middle" class="svg-s" fill="#c4b5fd">rationale + decisions</text>
+
+      <rect x="16" y="138" width="192" height="42" rx="9" fill="rgba(6,182,212,.1)" stroke="#06b6d4"/>
+      <text x="112" y="155" text-anchor="middle" class="svg-s">Teradata DBQL</text>
+      <text x="112" y="170" text-anchor="middle" class="svg-s" fill="#67e8f9">real join paths + dead cols</text>
+
+      <rect x="16" y="192" width="192" height="42" rx="9" fill="rgba(6,182,212,.1)" stroke="#06b6d4"/>
+      <text x="112" y="209" text-anchor="middle" class="svg-s">Cube query log (DAX)</text>
+      <text x="112" y="224" text-anchor="middle" class="svg-s" fill="#67e8f9">co-occurrence + aliases</text>
+
+      <rect x="16" y="246" width="192" height="42" rx="9" fill="rgba(59,130,246,.1)" stroke="#3b82f6"/>
+      <text x="112" y="263" text-anchor="middle" class="svg-s">data-catalog extract</text>
+      <text x="112" y="278" text-anchor="middle" class="svg-s" fill="#93c5fd">structural skeleton</text>
+
+      <rect x="272" y="96" width="176" height="128" rx="12" fill="rgba(245,158,11,.1)" stroke="#f59e0b" stroke-width="1.6"/>
+      <text x="360" y="128" text-anchor="middle" class="svg-t" font-size="12">Candidate pool</text>
+      <text x="360" y="152" text-anchor="middle" class="svg-s">machine-generated</text>
+      <text x="360" y="169" text-anchor="middle" class="svg-s">every claim carries</text>
+      <text x="360" y="186" text-anchor="middle" class="svg-s">evidenceClass + count</text>
+      <text x="360" y="207" text-anchor="middle" class="svg-s" fill="#fbbf24">NOT enforceable yet</text>
+
+      <path d="M210 51 C240 60 250 92 268 112" stroke="#64748b" stroke-width="1.3" fill="none" marker-end="url(#arh)"/>
+      <path d="M210 105 C240 110 248 118 268 132" stroke="#64748b" stroke-width="1.3" fill="none" marker-end="url(#arh)"/>
+      <path d="M210 159 C240 160 248 160 268 160" stroke="#64748b" stroke-width="1.3" fill="none" marker-end="url(#arh)"/>
+      <path d="M210 213 C240 208 248 198 268 188" stroke="#64748b" stroke-width="1.3" fill="none" marker-end="url(#arh)"/>
+      <path d="M210 267 C240 254 250 228 268 210" stroke="#64748b" stroke-width="1.3" fill="none" marker-end="url(#arh)"/>
+
+      <rect x="500" y="112" width="150" height="96" rx="12" fill="rgba(244,63,94,.1)" stroke="#f43f5e" stroke-width="1.8"/>
+      <text x="575" y="140" text-anchor="middle" class="svg-t" font-size="11">SME gate</text>
+      <text x="575" y="162" text-anchor="middle" class="svg-s" fill="#fecdd3">human adjudicates</text>
+      <text x="575" y="179" text-anchor="middle" class="svg-s" fill="#fecdd3">frequency is not</text>
+      <text x="575" y="194" text-anchor="middle" class="svg-s" fill="#fecdd3">validity</text>
+      <path d="M450 160 L496 160" stroke="#64748b" stroke-width="1.5" marker-end="url(#arh)"/>
+
+      <rect x="700" y="112" width="146" height="96" rx="12" fill="rgba(139,92,246,.14)" stroke="#8b5cf6" stroke-width="1.8"/>
+      <text x="773" y="146" text-anchor="middle" class="svg-t" font-size="11">Concept layer</text>
+      <text x="773" y="168" text-anchor="middle" class="svg-s" fill="#c4b5fd">ratified &middot; versioned</text>
+      <text x="773" y="185" text-anchor="middle" class="svg-s" fill="#c4b5fd">enforceable</text>
+      <path d="M652 160 L696 160" stroke="#10b981" stroke-width="1.6" marker-end="url(#arh2)"/>
+
+      <path d="M773 212 C773 300 500 330 360 330" stroke="#10b981" stroke-width="1.4" fill="none" stroke-dasharray="4 3" marker-end="url(#arh2)"/>
+      <path d="M300 330 C200 330 120 316 112 296" stroke="#10b981" stroke-width="1.4" fill="none" stroke-dasharray="4 3" marker-end="url(#arh2)"/>
+      <text x="500" y="352" text-anchor="middle" class="svg-s" fill="#6ee7b7">re-harvest on a cadence &rarr; usage that drifts from a ratified claim raises a review flag</text>
+      <text x="500" y="372" text-anchor="middle" class="svg-s" fill="#6ee7b7">this loop is the entire answer to the staleness objection in section 12</text>
+    </svg>
+    <figcaption>Proposed harvesting loop. The red box is the part that cannot be automated, and the part that makes the rest safe.</figcaption>
+  </figure>
+
+  <div class="tbl-wrap">
+  <table>
+    <thead><tr><th style="width:4%">#</th><th>Source</th><th>What it contributes</th><th>Class</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td>Catalog relationship extract</td>
+        <td>Graph analysis finds that <code>FACT - Work Order Parts</code> reaches <code>Dim - Service Location</code> but <code>FACT - ASU</code> does not. Generic rule fires: <em>a ratio may only be sliced by a dimension both operands reach.</em> Candidate constraint auto-created.</td>
+        <td><span class="badge b-struct">Structural</span></td></tr>
+      <tr><td>2</td><td>Cube query log</td>
+        <td>Count of real sessions pairing an MDR measure with a Service Location column. Zero means theoretical; forty means <strong>actively happening</strong> and the candidate jumps the priority queue.</td>
+        <td><span class="badge b-obsv">Observed</span></td></tr>
+      <tr><td>3</td><td>DBQL object usage</td>
+        <td><code>DBC.QryLogObjectsV</code> confirms which country column the warehouse-level queries actually join on, corroborating that asset country is the operative key for the ASU population.</td>
+        <td><span class="badge b-obsv">Observed</span></td></tr>
+      <tr><td>4</td><td>Published MDR scorecard</td>
+        <td>The exec-facing report slices on <code>GSD Region</code> from <code>Dim - Geo Location</code>. That is a ratified choice, and it names the canonical level &mdash; not just the canonical dimension.</td>
+        <td><span class="badge b-ratif">Ratified</span></td></tr>
+      <tr><td>5</td><td>Meeting transcript</td>
+        <td>Supplies the sentence no system holds: <em>"we use asset country for MDR because the ASU base is asset-keyed."</em> This becomes the human-readable rationale on the constraint.</td>
+        <td><span class="badge b-assert">Asserted</span></td></tr>
+      <tr><td>6</td><td><strong>SME review</strong></td>
+        <td>A human confirms the constraint is correct and not merely customary. Promoted from candidate to enforceable.</td>
+        <td><span class="badge b-ratif">Ratified</span></td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h4>The resulting assertion, with its evidence attached</h4>
+<pre>{
+  <span class="s">"@id"</span>: <span class="s">"bb:NoServiceCountrySlice"</span>,
+  <span class="s">"@type"</span>: <span class="s">"bb:Constraint"</span>,
+  <span class="s">"appliesTo"</span>: <span class="s">"bb:MDRRateFieldASU"</span>,
+  <span class="s">"severity"</span>: <span class="s">"error"</span>,
+  <span class="s">"statement"</span>: <span class="s">"MDR Rate may not be dimensioned by the ServiceCountry role."</span>,
+  <span class="s">"rationale"</span>: <span class="s">"The ASU base is asset-keyed, so the denominator has no path to service location. Slicing by it filters the numerator only."</span>,
+
+  <span class="s">"bb:evidence"</span>: [
+    { <span class="s">"class"</span>: <span class="s">"structural"</span>,
+      <span class="s">"source"</span>: <span class="s">"data-catalog/tabular/Julius/relationships/_relationships.md"</span>,
+      <span class="s">"finding"</span>: <span class="s">"no FACT - ASU -&gt; Dim - Service Location relationship exists"</span>,
+      <span class="s">"observedOn"</span>: <span class="s">"2026-08-06"</span> },
+
+    { <span class="s">"class"</span>: <span class="s">"observed"</span>,
+      <span class="s">"source"</span>: <span class="s">"ssas-xevents/QueryEnd"</span>,
+      <span class="s">"finding"</span>: <span class="s">"MDR measure co-occurs with a Dim - Service Location column"</span>,
+      <span class="s">"occurrences"</span>: <span class="n">41</span>, <span class="s">"distinctUsers"</span>: <span class="n">9</span>,
+      <span class="s">"window"</span>: <span class="s">"FY26Q3-FY27Q1"</span>,
+      <span class="s">"note"</span>: <span class="s">"HIGH frequency does NOT imply validity - this is the misuse, not the convention"</span> },
+
+    { <span class="s">"class"</span>: <span class="s">"ratified"</span>,
+      <span class="s">"source"</span>: <span class="s">"report:ISG MDR Scorecard/page 1"</span>,
+      <span class="s">"finding"</span>: <span class="s">"canonical slice is Dim - Geo Location[GSD Region]"</span> },
+
+    { <span class="s">"class"</span>: <span class="s">"asserted"</span>,
+      <span class="s">"source"</span>: <span class="s">"transcript:2026-05-14 Bluebook design review"</span>,
+      <span class="s">"speaker"</span>: <span class="s">"[SME]"</span>,
+      <span class="s">"quote"</span>: <span class="s">"we use asset country for MDR because the ASU base is asset-keyed"</span> }
+  ],
+
+  <span class="s">"bb:status"</span>: <span class="s">"ratified"</span>,
+  <span class="s">"bb:ratifiedBy"</span>: <span class="s">"[data architecture + domain SME]"</span>,
+  <span class="s">"bb:reviewDue"</span>: <span class="s">"2027-02-01"</span>
+}</pre>
+  <p class="code-cap">Proposed &mdash; illustrative. Occurrence counts are synthetic. <span class="badge b-synth">Synthetic</span></p>
+
+  <div class="callout c-obs">
+    <span class="ct">Note what the evidence block buys you</span>
+    An agent reading this does not just get a rule &mdash; it gets a rule it can <em>explain</em>, cite,
+    and date. And when the model changes, a re-harvest that no longer reproduces the structural finding
+    flips the status to <code>needs-review</code> automatically. That single mechanism is a better answer
+    to the staleness objection than any amount of review discipline.
+  </div>
+
+  <h3>What can and cannot be derived</h3>
+  <p>
+    This is the part worth being clear-eyed about, because it determines how much of the burden actually
+    goes away. Roughly half the value is harvestable; the other half still needs a person.
+  </p>
+  <div class="tbl-wrap">
+  <table>
+    <thead><tr><th>Concept-Layer property</th><th>Derivable?</th><th>Why / how</th></tr></thead>
+    <tbody>
+      <tr><td>Join keys, reachability, conformance</td><td class="tick">Yes, fully</td><td>Pure structure. Already in the catalog extract.</td></tr>
+      <tr><td>Synonyms and aliases</td><td class="tick">Yes</td><td>Report titles, transcript phrasings, DAX variable names, slicer captions.</td></tr>
+      <tr><td>Canonical slice / level</td><td class="tick">Yes</td><td>Published scorecards. A ratified report is a ratified choice.</td></tr>
+      <tr><td>Deprecation candidates</td><td class="tick">Yes</td><td>Usage decay plus MR history. Zero queries in 12 months is a strong signal.</td></tr>
+      <tr><td>Dead columns / unused measures</td><td class="tick">Yes</td><td><code>DBQLObjTbl</code> and <code>DISCOVER_OBJECT_ACTIVITY</code> give this cheaply.</td></tr>
+      <tr><td>Sentinel semantics (<code>OOW</code> vs <code>N/A</code>)</td><td class="part">Partly</td><td>Invisible in logs &mdash; both look like ordinary codes. Only transcripts or SME input distinguish a real population from a DQ artifact.</td></tr>
+      <tr><td>Ownership / accountability</td><td class="part">Partly</td><td>MR authors and meeting attendees approximate it. Must be confirmed, not inferred.</td></tr>
+      <tr><td><strong>Additivity</strong></td><td class="cross">No</td><td>A mathematical property of the formula, not of behaviour. Frequent misuse is indistinguishable from correct use in a log. Must be reasoned about or asserted.</td></tr>
+      <tr><td><strong>Whether a convention is correct</strong></td><td class="cross">No</td><td>The central limitation. Mining measures popularity; the Concept Layer needs to encode truth.</td></tr>
+      <tr><td><strong>Rationale / intent</strong></td><td class="cross">No system source</td><td>Transcripts are the only place this exists at all, which is why they are worth the extraction effort despite the noise.</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h3>Specifics worth capturing</h3>
+  <p>
+    Concrete answers to "what should we actually collect". Ordered by value per unit of effort.
+    <span class="badge b-prop">Proposed</span>
+  </p>
+
+  <details open>
+    <summary>Reports &amp; scorecards &mdash; the highest-value source <span class="dtag">Start here</span></summary>
+    <div class="details-body">
+      <p>Capture the report <em>definition</em>, not a screenshot or an export. From PBIP/TMDL or the
+        report JSON:</p>
+      <ul>
+        <li><strong>Visual &rarr; measure mapping.</strong> Which of the 203 measures are actually on a
+          published page. This alone collapses the scope problem: build the Concept Layer for those first.</li>
+        <li><strong>Filter stack at all three levels</strong> &mdash; visual, page, and report. Report-level
+          filters are where unstated scope assumptions hide (the hardware-only restriction from section 06
+          is exactly this shape).</li>
+        <li><strong>Slicer defaults and sort order.</strong> A default is a convention nobody wrote down.</li>
+        <li><strong>Footnotes, subtitles and tooltip text.</strong> Genuinely the richest vein in the whole
+          exercise &mdash; this is where analysts put the caveats that could not be expressed in the model.
+          "Excludes OOW", "13-week rolling", "hardware only" all live here.</li>
+        <li><strong>Audience and distribution.</strong> Distinguishes the exec-facing definition from the
+          seventeen ad-hoc variants.</li>
+        <li><strong>Refresh cadence and as-of convention.</strong> Feeds the grain and latency properties.</li>
+      </ul>
+    </div>
+  </details>
+
+  <details>
+    <summary>Teradata DBC / DBQL &mdash; structural usage <span class="dtag">Partly built already</span></summary>
+    <div class="details-body">
+      <p>The <code class="inl">@teradata-metadata-extractor</code> skill already runs a DBQL lineage pass,
+        so this is an extension rather than a new build. Read-only throughout.</p>
+      <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>Object</th><th>Why it matters</th></tr></thead>
+        <tbody>
+          <tr><td><code>DBC.QryLogObjectsV</code><br><span style="font-size:.78rem">(<code>DBQLObjTbl</code>)</span></td>
+            <td><strong>The single most valuable table here.</strong> Object- and column-level references per query, with frequency of use. Gives you real join paths, column usage ranking, and dead-column detection without parsing any SQL.</td></tr>
+          <tr><td><code>DBC.QryLogSQLV</code><br><span style="font-size:.78rem">(<code>DBQLSQLTbl</code>)</span></td>
+            <td>Full SQL text in chunks. Needed for predicate mining &mdash; which filter values people actually apply, which surfaces implicit scope rules.</td></tr>
+          <tr><td><code>DBC.QryLogV</code><br><span style="font-size:.78rem">(<code>DBQLogTbl</code>)</span></td>
+            <td>Query header: user, timing, row counts, CPU. Use for weighting (an exec-facing nightly job outranks one ad-hoc probe) and for abandonment signals.</td></tr>
+          <tr><td><code>DBC.QryLogStepsV</code></td>
+            <td>Step detail including join types actually chosen. Useful for confirming cardinality assumptions rather than trusting declared ones.</td></tr>
+          <tr><td><code>DBC.TablesV</code>, <code>DBC.ColumnsV</code>, <code>DBC.IndicesV</code>, <code>DBC.All_RI_ParentsV</code></td>
+            <td>Declared structure and referential integrity, where it exists. The skeleton the usage data attaches to.</td></tr>
+        </tbody>
+      </table>
+      </div>
+      <div class="callout c-warn" style="margin-bottom:0">
+        <span class="ct">Governance constraint</span>
+        DBQL rows carry <strong>usernames and full SQL text</strong>, and that SQL can contain literal
+        predicate values. Pseudonymise user identity and strip literals before any of this enters an agent
+        context or leaves the governed environment. Aggregate counts, not raw log rows.
+      </div>
+    </div>
+  </details>
+
+  <details>
+    <summary>Cube query statistics &mdash; convention mining <span class="dtag">Engineers</span></summary>
+    <div class="details-body">
+      <ul>
+        <li><strong>Extended Events <code class="inl">QueryEnd</code></strong> on the SSAS instance
+          (or the legacy <em>Query End</em> trace class). Capture the DAX text, duration, database and
+          user. The DAX text is what makes this valuable &mdash; parsing it yields exact measure and
+          column references, which is a co-occurrence graph for free.</li>
+        <li><strong><code class="inl">$SYSTEM.DISCOVER_OBJECT_ACTIVITY</code></strong> &mdash; per-object
+          read counters. A cheap periodic snapshot, no tracing infrastructure required. Good first move
+          if xEvents needs approval.</li>
+        <li><strong><code class="inl">$SYSTEM.DISCOVER_COMMANDS</code> / <code class="inl">DISCOVER_SESSIONS</code></strong>
+          for live activity and long-running query identification.</li>
+        <li>The repo already has <code class="inl">@dax-query-executor</code> for the execution side, so
+          the connection path exists.</li>
+      </ul>
+      <p><strong>What to derive from it:</strong> measure co-occurrence (which measures appear together
+        &rarr; concept clustering), measure&ndash;dimension pairing frequency (&rarr; candidate canonical
+        slices <em>and</em> candidate misuse), abandonment (long query, no follow-up in session &rarr; the
+        question probably was not answered), and alias discovery from user-defined DAX variable naming.</p>
+      <p style="margin-bottom:0"><strong>What not to do with it:</strong> promote any pairing to a rule
+        without step 6 of the derivation table.</p>
+    </div>
+  </details>
+
+  <details>
+    <summary>Meeting transcripts &mdash; the only source of intent <span class="dtag">Highest noise, highest uniqueness</span></summary>
+    <div class="details-body">
+      <p>Noisy and effortful to extract, and worth it anyway, because nothing else in the estate records
+        <em>why</em>. To make them usable:</p>
+      <ul>
+        <li><strong>Separate decision from discussion.</strong> A transcript is mostly exploration. Extract
+          only resolved statements, and mark them as such.</li>
+        <li><strong>Keep attribution and date.</strong> "Someone said X" is not evidence; "[SME] said X on
+          2026-05-14" is, and it lets you resolve conflicts by recency and authority.</li>
+        <li><strong>Capture disagreements explicitly.</strong> A contested definition is a risk marker
+          worth surfacing to an agent as low confidence, not something to flatten into a single answer.</li>
+        <li><strong>Link to the action.</strong> The <code class="inl">@meeting-notes-issue-sync</code>
+          skill already turns transcripts into GitLab issues &mdash; that link is the bridge from
+          "we decided" to "it was implemented", and it is what makes the rationale verifiable.</li>
+        <li><strong>Quote verbatim, never paraphrase.</strong> A paraphrased rationale is a new assertion
+          with a false provenance claim attached.</li>
+      </ul>
+    </div>
+  </details>
+
+  <h3>Two suggestions on sequencing</h3>
+  <div class="callout c-prop">
+    <span class="ct">1. Do not build the harvester first</span>
+    Derive the MDR concept document <strong>by hand</strong> from these five sources, for one concept, and
+    keep notes on which source actually earned its keep. That takes days. Building the harvesting pipeline
+    first tells you what is <em>easy to harvest</em>, which is emphatically not the same as what is
+    <em>worth harvesting</em> &mdash; and query logs are easy while scorecard footnotes are hard, so
+    automation-first will systematically over-collect the least valuable source.
+  </div>
+  <div class="callout c-prop">
+    <span class="ct">2. Define the success metric before collecting anything</span>
+    Something falsifiable. For example: assemble twenty held-out questions from the transcript corpus,
+    have an agent answer each with and without Concept Layer context, and have an SME score correctness and
+    whether appropriate caveats were stated. If the Concept Layer arm does not clearly win, the finding is
+    genuinely useful and the cost stops there. Without a pre-committed metric this becomes a project that
+    can never be concluded, only abandoned.
+  </div>
+  <p style="margin-bottom:0">
+    One caveat on that metric: score <strong>caveat quality separately from numeric correctness</strong>.
+    The failure this whole document is about &mdash; section 07 &mdash; produces a wrong number that looks
+    right. A scoring rubric that only checks the figure will miss precisely the improvement being tested.
+  </p>
+</section>
+
+<hr class="div">
+
+<!-- ============ 15 ============ -->
+<section id="s16">
+  <span class="sec-num">Section 16 &middot; Reference</span>
+  <h2>Glossary</h2>
+  <p>
+    Terms in the body text carry <span class="gl" tabindex="0" data-def="Like this one. Hover or focus any dotted term to see its definition.">dotted underlines</span>
+    &mdash; hover or tab to them for a definition. Everything is collected here as well, for printing and
+    for anyone who prefers a list.
+  </p>
+
+  <div class="gloss-cat">This document's core term</div>
+  <div class="gloss">
+    <div class="gloss-item"><h5>Concept Layer</h5><p>This document's term for a business-meaning layer that sits above the semantic layer: definitions, relationships, constraints and provenance for the concepts a cube calculates, addressable by an agent before it queries. In AI and knowledge-management literature this is usually called an <strong>ontology</strong> &mdash; the two terms describe the same thing. This document uses "Concept Layer" throughout and reserves "ontology" for the specific W3C technology family (RDF/OWL) shown in section 10.</p></div>
+  </div>
+
+  <div class="gloss-cat">Knowledge representation &amp; the RDF/OWL family</div>
+  <div class="gloss">
+    <div class="gloss-item"><h5>Ontology</h5><p>The academic and AI-industry name for what this document calls a Concept Layer: a formal, machine-readable model of what exists in a domain, what it's called, how it relates, and what rules constrain it. Broader than a data model &mdash; it describes meaning rather than storage.</p></div>
+    <div class="gloss-item"><h5>RDF</h5><p>Resource Description Framework. A W3C standard for describing anything as three-part statements &mdash; subject, predicate, object &mdash; called triples. One of three ways this document shows a Concept Layer being written down.</p></div>
+    <div class="gloss-item"><h5>Triple</h5><p>The atomic unit of RDF. "MDR Rate" / "has denominator" / "ASU" is one triple. A Concept Layer built this way is just a large pile of these.</p></div>
+    <div class="gloss-item"><h5>OWL</h5><p>Web Ontology Language. A W3C standard layered on RDF that adds classes, properties and logical axioms, so software can infer new facts rather than only retrieve stated ones.</p></div>
+    <div class="gloss-item"><h5>Turtle (.ttl)</h5><p>Terse RDF Triple Language. A compact, human-readable text syntax for writing RDF. The format shown in the first serialization tab.</p></div>
+    <div class="gloss-item"><h5>SPARQL</h5><p>The query language for RDF, roughly what SQL is to relational tables. Pronounced "sparkle".</p></div>
+    <div class="gloss-item"><h5>JSON-LD</h5><p>JSON for Linked Data. Ordinary JSON plus an @context block mapping its keys to shared global identifiers &mdash; readable by any JSON parser, and simultaneously valid RDF. The most practical way to hand a Concept Layer to an LLM agent.</p></div>
+    <div class="gloss-item"><h5>SKOS</h5><p>Simple Knowledge Organization System. A small W3C vocabulary for labels, synonyms and plain-language definitions (prefLabel, altLabel, definition). The human-readable layer of a Concept Layer written in RDF.</p></div>
+    <div class="gloss-item"><h5>PROV / PROV-O</h5><p>A W3C vocabulary for recording where something came from &mdash; which file, process or person derived it. Used here to link a concept back to the macro that defines it.</p></div>
+    <div class="gloss-item"><h5>IRI</h5><p>Internationalised Resource Identifier. A globally unique, usually URL-shaped name for a thing. It does not have to resolve to an actual web page.</p></div>
+    <div class="gloss-item"><h5>Property graph</h5><p>A graph database model of nodes and relationships, both able to carry arbitrary key/value properties. Less formal than RDF, often easier for path and reachability questions. Neo4j is the best-known implementation.</p></div>
+    <div class="gloss-item"><h5>Cypher</h5><p>The query language of Neo4j and other property-graph databases, using ASCII-art patterns such as (a)-[:REL]-&gt;(b).</p></div>
+  </div>
+
+  <div class="gloss-cat">BI &amp; dimensional modelling</div>
+  <div class="gloss">
+    <div class="gloss-item"><h5>Semantic layer</h5><p>The business-friendly modelling tier between raw tables and reports &mdash; here, the SSAS Tabular model. It defines measures, join paths and friendly names so report authors never write SQL.</p></div>
+    <div class="gloss-item"><h5>DAX</h5><p>Data Analysis Expressions. The formula language of SSAS Tabular, Power BI and Power Pivot. Every measure quoted in this document is DAX.</p></div>
+    <div class="gloss-item"><h5>Measure</h5><p>A named calculation evaluated dynamically against whatever filters the user has applied, rather than a stored value. MDR (Field ASUs) is a measure.</p></div>
+    <div class="gloss-item"><h5>Grain</h5><p>The level of detail one row represents. An ASU row's grain is "one asset, one fiscal week".</p></div>
+    <div class="gloss-item"><h5>Conformed dimension</h5><p>A dimension that means the same thing and joins the same way across several fact tables, so measures from those facts can safely be compared side by side.</p></div>
+    <div class="gloss-item"><h5>Role-playing dimension</h5><p>One real-world entity used in several capacities &mdash; one Country acting as both "asset country" and "service country". Tabular models normally implement this by physically duplicating the table, which is where the information loss in section 08 comes from.</p></div>
+    <div class="gloss-item"><h5>Cardinality</h5><p>How many rows on each side of a relationship can match. Many:One means many fact rows point at one dimension row.</p></div>
+    <div class="gloss-item"><h5>Cross-filter direction</h5><p>Whether a relationship propagates filters one way (dimension filters fact) or both ways. Bidirectional filtering is powerful but can create ambiguous or circular evaluation.</p></div>
+    <div class="gloss-item"><h5>Additivity</h5><p>Whether a measure can validly be summed or averaged across a dimension. Ratios and distinct counts are typically non-additive: they must be recomputed from base values rather than aggregated.</p></div>
+    <div class="gloss-item"><h5>Sentinel value</h5><p>A special value stored in an ordinary field to mean "absent" or "not applicable" &mdash; here OOW, N/A and NA. They look like data but are really status markers.</p></div>
+    <div class="gloss-item"><h5>Partition</h5><p>A slice of a table loaded by its own query. FACT - ASU has 17, each a separate quarter-scoped view, with its own copy of the load logic.</p></div>
+  </div>
+
+  <div class="gloss-cat">Platform &amp; instrumentation</div>
+  <div class="gloss">
+    <div class="gloss-item"><h5>DBC</h5><p>Teradata's system catalog database. Holds the data dictionary (DBC.TablesV, DBC.ColumnsV) and the query logs.</p></div>
+    <div class="gloss-item"><h5>DBQL</h5><p>Database Query Log. Teradata's built-in query logging, written to DBC tables. Records who ran what, when, how long it took, and which objects and columns it touched.</p></div>
+    <div class="gloss-item"><h5>DMV</h5><p>Dynamic Management View. A system view inside SSAS, addressed as $SYSTEM.*, reporting on model structure and runtime activity.</p></div>
+    <div class="gloss-item"><h5>Extended Events</h5><p>The tracing framework for SQL Server and SSAS. The QueryEnd event captures the full query text, duration and user &mdash; the raw material for usage mining.</p></div>
+    <div class="gloss-item"><h5>Macro (Teradata)</h5><p>A stored, parameterised set of SQL statements executed as a unit. The BLUEBK_M_* macros are where Bluebook's real business logic lives.</p></div>
+    <div class="gloss-item"><h5>Power Query / M</h5><p>The data-loading language used by each tabular partition to fetch rows from a source. Distinct from DAX, which computes over the data once loaded.</p></div>
+  </div>
+
+  <div class="gloss-cat">Bluebook domain terms</div>
+  <div class="gloss">
+    <div class="gloss-item"><h5>MDR</h5><p>The measure family identifying service events that incur warranty cost, usually expressed as a rate over the eligible entitled asset base. The acronym expansion is not recorded in the captured metadata, so it is deliberately not guessed at here.</p></div>
+    <div class="gloss-item"><h5>ASU</h5><p>Active Serviced Unit. A distinct customer product counted once per fiscal week, excluded if ASU_XCLSN_FLG = 1 and required to carry the relevant delivery-arm flag. The denominator of most Bluebook rates.</p></div>
+    <div class="gloss-item"><h5>TLSU</h5><p>A variant of the ASU population defined by the TLA exclusion flag, used as an alternative denominator. Note the inconsistent filter direction flagged in section 04.</p></div>
+    <div class="gloss-item"><h5>POC</h5><p>Product Offering Code. The entitlement code attached to an asset or work order, appearing as FLD_POC and TECH_POC on the work-order fact.</p></div>
+    <div class="gloss-item"><h5>OOW</h5><p>Out Of Warranty. A sentinel written into the offering-code field when the asset is known but carries no entitlement. A legitimate business population, not a data error.</p></div>
+    <div class="gloss-item"><h5>FQM</h5><p>A work-order flag (FQM_FLG) that identifies field-quality-programme dispatches and carves them out of the standard break/fix MDR population. Expansion not recorded in the captured metadata.</p></div>
+    <div class="gloss-item"><h5>RDR</h5><p>Repeat Dispatch Rate. Measured over 7- and 28-day windows, in both a Legacy and a Customer variant.</p></div>
+    <div class="gloss-item"><h5>Fiscal week</h5><p>The reporting grain for ASU and MDR. Both operands of the MDR rate are averaged over fiscal weeks, which is what makes the result non-additive.</p></div>
+  </div>
+</section>
+
+<hr class="div">
+
+<!-- ============ 16 ============ -->
+<section id="s17">
+  <span class="sec-num">Section 17 &middot; Reference</span>
+  <h2>Provenance &amp; governance</h2>
+
+  <h3>Where every factual claim came from</h3>
+  <div class="tbl-wrap">
+  <table>
+    <thead><tr><th>Claim area</th><th>Source artifact</th><th>Snapshot</th></tr></thead>
+    <tbody>
+      <tr><td>Measure DAX, model counts</td><td><code>data-catalog/tabular/Julius/measures/_measures.md</code>, <code>_model-summary.md</code></td><td>2026-08-06</td></tr>
+      <tr><td>Join keys, cardinality, cross-filter</td><td><code>data-catalog/tabular/Julius/relationships/_relationships.md</code></td><td>2026-08-06</td></tr>
+      <tr><td>Dimension source SQL, column lists</td><td><code>data-catalog/tabular/Julius/tables/*.md</code></td><td>2026-08-06</td></tr>
+      <tr><td>ASU partition structure</td><td><code>data-catalog/tabular/Julius/tables/FACT - ASU.md</code></td><td>2026-08-06</td></tr>
+      <tr><td>MDR flag derivation</td><td><code>macros/BLUEBK/003_Work_Order/03_BLUEBK_M_WO_EXT.sql</code></td><td>working copy</td></tr>
+      <tr><td>ASU eligibility predicate</td><td><code>macros/BLUEBK/001_Asset_Entitlement/001_ASU/12_BLUEBK_M_FLD_ASU_CURR.sql</code></td><td>working copy</td></tr>
+      <tr><td>Upstream MDR fact</td><td><code>data-catalog/teradata/SVC_CDL/views/USDM_WO_MDR_FACT.md</code></td><td>2026-07-24</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <div class="callout c-warn">
+    <span class="ct">Staleness caveat &mdash; and a small irony</span>
+    The tabular extract is dated <strong>2026-08-06</strong> and the Teradata extract
+    <strong>2026-07-24</strong>. The live models may have drifted since. Any specific claim in this
+    document &mdash; particularly the identical-SQL finding in section 08 and the three inconsistencies in
+    section 04 &mdash; should be re-verified against the current model before being acted on.
+    <br><br>
+    Which is, of course, exactly the drift problem section 09 argues a Concept Layer should solve. This
+    document has the same weakness as the thing it critiques.
+  </div>
+
+  <div class="callout c-warn">
+    <span class="ct">Handling &mdash; read before sharing</span>
+    This file contains <strong>unsanitized</strong> internal object names, DAX expressions, and macro SQL,
+    drawn from a catalog that is explicitly gitignored. It is deliberately written to a
+    <strong>non-Git location</strong> and must not be committed to any repository or shared outside the
+    team without a sanitization pass.
+    <br><br>
+    It contains <strong>no</strong> credentials, hostnames, connection strings, or row-level data, and
+    every figure in section 11 is synthetic.
+  </div>
+
+  <h3>What this document is not</h3>
+  <ul>
+    <li>Not an approved project, a design authority decision, or a commitment to build anything.</li>
+    <li>Not a criticism of the Julius model's authors. Every pattern flagged is the standard, correct
+      approach for a tabular model &mdash; the argument is about the paradigm's expressive limits, not
+      about execution quality.</li>
+    <li>Not a source of numbers. Nothing in section 11 may be quoted.</li>
+    <li>Not a replacement proposal. The cube remains the single governed calculation engine in every
+      variant discussed.</li>
+  </ul>
+
+  <footer class="pf">
+    <p><strong>Concept Layer vs Semantic Layer &mdash; MDR / ASU Worked Example</strong></p>
+    <p style="font-size:.76rem">(Sometimes called an <span class="gl" tabindex="0" data-def="The academic/AI-industry name for what this document calls a Concept Layer.">ontology</span> in AI and knowledge-management systems &mdash; see the glossary.)</p>
+    <p>Built from the Bluebook master data catalog &middot; tabular extract 2026-08-06 &middot; Teradata extract 2026-07-24</p>
+    <p>Julius model: 36 tables &middot; 203 measures &middot; 70 relationships &middot; 2 perspectives</p>
+    <p style="margin-top:1.25rem;color:var(--rose);font-size:.78rem">
+      UNSANITIZED &middot; NON-GIT &middot; INTERNAL &mdash; do not commit, do not distribute externally.
+      Sections 09&ndash;15 are a proposal, not an approved project. All figures in sections 11 and 14 are synthetic.
+    </p>
+  </footer>
+</section>
+
+</main>
+</div>
+<script>
+// progress bar
+var pb=document.getElementById('progress');
+function upd(){var h=document.documentElement;var s=h.scrollTop||document.body.scrollTop;
+ var m=(h.scrollHeight-h.clientHeight);pb.style.width=(m>0?(s/m)*100:0)+'%';}
+window.addEventListener('scroll',upd,{passive:true});window.addEventListener('resize',upd);upd();
+
+// scroll-spy
+var links=[].slice.call(document.querySelectorAll('.toc a[href^="#"]'));
+var secs=links.map(function(a){return document.getElementById(a.getAttribute('href').slice(1));});
+function spy(){
+  var best=0,y=window.scrollY+120;
+  for(var i=0;i<secs.length;i++){if(secs[i]&&secs[i].offsetTop<=y)best=i;}
+  links.forEach(function(a,i){a.classList.toggle('active',i===best);});
+}
+window.addEventListener('scroll',spy,{passive:true});spy();
+
+// tabs
+function initTabs(){
+  [].slice.call(document.querySelectorAll('.tabs')).forEach(function(t){
+    var btns=[].slice.call(t.querySelectorAll('.tab-btn'));
+    var pans=[].slice.call(t.querySelectorAll('.tab-panel'));
+    btns.forEach(function(b,i){
+      b.addEventListener('click',function(){
+        btns.forEach(function(x){x.classList.remove('active');});
+        pans.forEach(function(x){x.classList.remove('active');});
+        b.classList.add('active');if(pans[i])pans[i].classList.add('active');
+      });
+    });
+  });
+}
+initTabs();
+
+/* ---------- glossary tooltips ---------- */
+(function(){
+  // [term, caseSensitive, definition, maxOccurrencesToWrap]
+  var TERMS=[
+    ["Concept Layer",0,"This document's term for a business-meaning layer above the semantic layer: definitions, relationships, constraints and provenance an agent reads before it queries. Usually called an 'ontology' in AI/knowledge-management literature - same thing, friendlier name.",6],
+    ["RDF",1,"Resource Description Framework. A W3C standard for describing anything as three-part statements - subject, predicate, object - called triples. One of three ways this document shows a Concept Layer being written down.",3],
+    ["OWL",1,"Web Ontology Language. A W3C standard layered on RDF that adds classes, properties and logical axioms, so software can infer new facts rather than only retrieve stated ones.",3],
+    ["Turtle",1,"Terse RDF Triple Language. A compact, human-readable text syntax for writing RDF triples.",2],
+    ["SPARQL",1,"The query language for RDF, roughly what SQL is to relational tables. Pronounced 'sparkle'.",2],
+    ["JSON-LD",1,"JSON for Linked Data. Ordinary JSON plus an @context block mapping its keys to shared global identifiers - readable by any JSON parser, and simultaneously valid RDF. The most practical way to hand a Concept Layer to an LLM agent.",3],
+    ["SKOS",1,"Simple Knowledge Organization System. A small W3C vocabulary for labels, synonyms and plain-language definitions. The human-readable layer of a Concept Layer written in RDF.",2],
+    ["PROV-O",1,"A W3C vocabulary for recording where something came from - which file, process or person derived it.",2],
+    ["ontology",0,"The academic/AI-industry name for what this document calls a Concept Layer. Same concept; this document prefers the friendlier term except when discussing the RDF/OWL technology family specifically.",2],
+    ["triples",0,"The atomic unit of RDF: subject, predicate, object. A Concept Layer built this way is a large pile of these.",1],
+    ["property graph",0,"A graph database model of nodes and relationships, both able to carry arbitrary key/value properties. Less formal than RDF, often easier for path and reachability questions.",2],
+    ["Cypher",1,"The query language of Neo4j and other property-graph databases, using ASCII-art patterns such as (a)-[:REL]->(b).",2],
+    ["Neo4j",1,"The best-known property-graph database.",1],
+    ["semantic layer",0,"The business-friendly modelling tier between raw tables and reports - here the SSAS Tabular model. Defines measures, join paths and friendly names so report authors never write SQL.",2],
+    ["DAX",1,"Data Analysis Expressions. The formula language of SSAS Tabular, Power BI and Power Pivot. Every measure quoted in this document is DAX.",3],
+    ["tabular model",0,"An in-memory analytical model (SSAS Tabular / Power BI) built from tables, relationships and DAX measures.",2],
+    ["grain",0,"The level of detail one row represents. An ASU row's grain is 'one asset, one fiscal week'.",2],
+    ["conformed",0,"A conformed dimension means the same thing and joins the same way across several fact tables, so measures from those facts can safely be compared side by side.",2],
+    ["role-playing",0,"One real-world entity used in several capacities - one Country acting as both asset country and service country. Tabular models normally implement this by physically duplicating the table.",2],
+    ["cardinality",0,"How many rows on each side of a relationship can match. Many:One means many fact rows point at one dimension row.",2],
+    ["cross-filter",0,"Whether a relationship propagates filters one way (dimension filters fact) or both ways. Bidirectional filtering can create ambiguous or circular evaluation.",2],
+    ["non-additive",0,"Cannot validly be summed or averaged across a dimension. Ratios and distinct counts must be recomputed from base values rather than aggregated.",2],
+    ["additivity",0,"Whether a measure can validly be summed or averaged across a dimension.",2],
+    ["sentinel",0,"A special value stored in an ordinary field to mean 'absent' or 'not applicable' - here OOW, N/A and NA. Looks like data, but is really a status marker.",2],
+    ["partitions",0,"Slices of a table each loaded by its own query. FACT - ASU has 17, each with its own copy of the load logic.",1],
+    ["DBQL",1,"Database Query Log. Teradata's built-in query logging, written to DBC tables. Records who ran what, when, how long, and which objects and columns were touched.",3],
+    ["DBC",1,"Teradata's system catalog database. Holds the data dictionary and the query logs.",2],
+    ["DMV",1,"Dynamic Management View. A system view inside SSAS, addressed as $SYSTEM.*, reporting on model structure and runtime activity.",2],
+    ["Extended Events",0,"The tracing framework for SQL Server and SSAS. The QueryEnd event captures full query text, duration and user - the raw material for usage mining.",2],
+    ["macro",0,"In Teradata, a stored parameterised set of SQL statements executed as a unit. The BLUEBK_M_* macros hold Bluebook's real business logic.",2],
+    ["Power Query",0,"The data-loading language (M) used by each tabular partition to fetch rows from a source. Distinct from DAX, which computes over data once loaded.",1],
+    ["MDR",1,"The measure family identifying service events that incur warranty cost, usually expressed as a rate over the eligible entitled asset base. Acronym expansion is not recorded in the captured metadata.",2],
+    ["ASU",1,"Active Serviced Unit. A distinct customer product counted once per fiscal week, excluded if ASU_XCLSN_FLG = 1 and carrying the relevant delivery-arm flag. The denominator of most Bluebook rates.",2],
+    ["ASUs",1,"Active Serviced Units - the eligible, entitled asset population counted per fiscal week.",1],
+    ["TLSU",1,"A variant of the ASU population defined by the TLA exclusion flag, used as an alternative denominator.",2],
+    ["OOW",1,"Out Of Warranty. A sentinel written into the offering-code field when the asset is known but carries no entitlement. A legitimate business population, not a data error.",2],
+    ["FQM",1,"A work-order flag (FQM_FLG) identifying field-quality-programme dispatches, carved out of the standard break/fix MDR population. Expansion not recorded in the captured metadata.",2],
+    ["RDR",1,"Repeat Dispatch Rate. Measured over 7- and 28-day windows, in both a Legacy and a Customer variant.",2],
+    ["POC",1,"Product Offering Code. The entitlement code attached to an asset or work order, appearing as FLD_POC and TECH_POC on the work-order fact.",2]
+  ];
+
+  var SKIP={PRE:1,CODE:1,SCRIPT:1,STYLE:1,H1:1,H2:1,BUTTON:1,SUMMARY:1,FIGCAPTION:1,TEXTAREA:1};
+  var SVGNS="http://www.w3.org/2000/svg";
+
+  function skipped(n){
+    while(n && n!==document.body){
+      if(n.nodeType===1){
+        if(n.namespaceURI===SVGNS) return true;
+        if(SKIP[n.tagName]) return true;
+        if(n.classList&&(n.classList.contains("gl")||n.classList.contains("toc")||
+                         n.classList.contains("gloss-item")||n.classList.contains("code-cap"))) return true;
+      }
+      n=n.parentNode;
+    }
+    return false;
+  }
+
+  var root=document.querySelector("main");
+  if(root){
+    TERMS.forEach(function(t){
+      var term=t[0], cs=t[1], def=t[2], max=t[3]||2, done=0;
+      var esc=term.replace(/[.*+?^${}()|[\]\\]/g,"\\$&");
+      var re=new RegExp("(^|[^\\w-])("+esc+")(?![\\w-])", cs?"":"i");
+      var w=document.createTreeWalker(root,NodeFilter.SHOW_TEXT,null), nodes=[], n;
+      while((n=w.nextNode())) nodes.push(n);
+      for(var i=0;i<nodes.length&&done<max;i++){
+        var node=nodes[i];
+        if(!node.parentNode||skipped(node.parentNode)) continue;
+        var m=re.exec(node.nodeValue);
+        if(!m) continue;
+        var mid=node.splitText(m.index+m[1].length);
+        mid.splitText(m[2].length);
+        var span=document.createElement("span");
+        span.className="gl"; span.setAttribute("tabindex","0");
+        span.setAttribute("data-def",def);
+        span.textContent=mid.nodeValue;
+        mid.parentNode.replaceChild(span,mid);
+        done++;
+      }
+    });
+  }
+
+  var tip=document.createElement("div");
+  tip.className="gl-tip"; document.body.appendChild(tip);
+
+  function show(el){
+    tip.textContent=el.getAttribute("data-def");
+    tip.style.left="0px"; tip.style.top="0px";
+    tip.style.visibility="hidden"; tip.classList.add("on");
+    var r=el.getBoundingClientRect(), tr=tip.getBoundingClientRect();
+    var left=r.left+r.width/2-tr.width/2;
+    left=Math.max(12,Math.min(left,window.innerWidth-tr.width-12));
+    var top=r.top-tr.height-12;
+    if(top<8) top=r.bottom+12;
+    tip.style.left=left+"px"; tip.style.top=top+"px"; tip.style.visibility="visible";
+  }
+  function hide(){ tip.classList.remove("on"); }
+
+  document.addEventListener("mouseover",function(e){
+    var el=e.target&&e.target.closest?e.target.closest(".gl"):null; if(el) show(el);
+  });
+  document.addEventListener("mouseout",function(e){
+    var el=e.target&&e.target.closest?e.target.closest(".gl"):null; if(el) hide();
+  });
+  document.addEventListener("focusin",function(e){
+    if(e.target.classList&&e.target.classList.contains("gl")) show(e.target);
+  });
+  document.addEventListener("focusout",function(e){
+    if(e.target.classList&&e.target.classList.contains("gl")) hide();
+  });
+  document.addEventListener("keydown",function(e){ if(e.key==="Escape") hide(); });
+  window.addEventListener("scroll",hide,{passive:true});
+  window.addEventListener("resize",hide);
+})();
+</script>
+</body>
+</html>

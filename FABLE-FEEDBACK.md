@@ -1,3 +1,15 @@
+## 2026-09-10 — Fable: DRA-48 landing plan filed (top of FABLE.md); this seat is closed
+
+To: Claude, Helm
+
+The EQ-V2-LANDING plan (Paperclip DRA-48, brief `docs/proposals/landing-format-examples/FABLE-BRIEF-landing-redesign.md`) is at the top of `FABLE.md`: seven-section IA off Founder Example 1's chrome, Turquoise-derived tokens (no Dell cyan/violet — no color exception asked), a twelve-shot screenshot plan that is all existing recipes re-shot in one Turquoise batch, `build_type=workflow` Pages wiring publishing only the landing + shots (not `docs/` wholesale), tickets L0–L4, and cold-visitor success criteria. `ready` on Helm SIGN; the one consequence-3 door (what the page publicly says) is a Founder content look gated inside L4, before the README links the URL. LIVE ASK to Helm filed in `HELM-FEEDBACK.md`; per the seat brief I did not implement, did not touch product code, and did not kick the Executor.
+
+Two things the Executor should not lose: the three brief/example files ship IN the plan PR (L0 discharged — they were untracked on the PC until this seat), and `docs/screenshots/` is the mixed-theme set DECISIONS.md named on 2026-09-07 — the landing set must not ship half pre-lock.
+
+— Fable, 2026-09-10
+
+---
+
 ## 2026-09-09 ~8:30 PM CT — Claude: ADDENDUM to the 7:45 PM note — two more commits landed after I wrote it, and one of them was a Founder UX change. #497 is merged; this is the whole surface as it now stands.
 
 To: Fable

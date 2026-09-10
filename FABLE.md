@@ -1,3 +1,98 @@
+## 2026-09-10 — PLAN: EQ-V2-LANDING (DRA-48) — GitHub Pages landing for EQBuddy Evolved
+
+To: Claude, Helm
+
+**Card:** Paperclip **DRA-48** under epic DRA-3 / EQ-V2 (GitHub #503 CLOSED by Founder correction — Paperclip is the SoT; do not claim on #503).
+**Brief:** `docs/proposals/landing-format-examples/FABLE-BRIEF-landing-redesign.md` + the two Founder HTML examples beside it (on-disk, untracked — ticket L0 commits them).
+**Status:** `ready` on Helm SIGN (issue role split: Executor implements after Helm SIGN of this plan). **No `needs-david:` line** — the Founder commissioned the page (2026-09-10 ~12:16 CT ask); the one consequence-3 door left, *what the page publicly says*, is gated inside ticket L4 as a Founder content look BEFORE the README links the URL. Colors follow the standing teal+grey lock (2026-09-07), so no color SIGN is asked — I am not arguing for Dell cyan/violet.
+**Assumption stated up top:** the landing is Evolved's public face but truthfully labels Evolved "in development — not a download yet" and keeps 1.x as the only download CTA; nothing on the page fakes an Evolved channel. Every claim on the page must be traceable to PRODUCT.md or README.md.
+
+### 1. Information architecture — seven sections, one story
+
+The page tells the north-star story in the visitor's own order: *what is this → what will it do for me → what does it look like → can I trust it → what can I get today.* Structure and chrome come from Founder Example 1 (full-viewport sections, pill topbar, right dot-nav, scroll progress bar, reveal-on-scroll, print styles); the long-form sticky-TOC shape of Example 2 is NOT used — a landing is a pitch, not a worked example. No Dell content is copied; chrome only.
+
+1. **Hero** — eyebrow pill: `EQBuddy Evolved — in development · 1.x available today`. H1: **"Your Personalized Guide to Norrath"** (existing tagline) with a teal gradient span; lead = the north-star question verbatim: *"Given who I am and what I want to accomplish, what should I do next?"* Pills: `Log-only` · `Local-first` · `Personal, not competitive` · `Windows + phone second screen`. KPI strip (all true today): `11,000+` item catalog offline · `3` coordinated surfaces · `0` memory reads, `0` telemetry · `weekly` community-wiki refresh.
+2. **The guidance chain** — Example 1's numbered "stack" motif, reskinned: five layers **gear → quest → mob → camp → route**, each with a one-line job ("which attainable upgrade is meaningful" → "which quest or drop provides it" → "which mob, and is it realistic from my own history" → "where it spawns and when it is due" → "how to get there with travel I already unlocked") and a stage chip naming the surface that answers it. This is the centerpiece; the section subtitle is PRODUCT.md's "who I am playing … then quietly helps me decide what to do next" sentence.
+3. **Three surfaces** — a 3-node route-grid: **HUD** (deadline glance while playing, small enough to ignore), **Full application** (one shell: Home · Live · Progress · Gear · Quests · World · Search · Settings), **EQBuddy Mobile** (LAN-only second screen). Interaction line verbatim from PRODUCT.md: *glance first → expand for live detail → full application for analysis.* One screenshot each.
+4. **Featureset tour** — card grid, one card per shell room, each with its screenshot and 2–3 bullet capabilities (Home "next action" readout; Live fight timeline with honest DPS curves; Gear Locker per-slot comparison; Guide/Quests with the walkthrough chain; World maps + spawn timers learned from your kills; Progress history and charts). Planned-but-unshipped capabilities are labeled `planned` in the card's tag row — no silent futures.
+5. **Principles / trust** — guardrail-styled block: never measures other players (decline-warmly sentence, in public words); log-only/local-first list from PRODUCT.md (no memory reads, no packet inspection, no account, no telemetry by default); *evidence before confidence* — estimates say they are estimates. This section is why a wary EQ player keeps reading; it gets visual weight equal to the tour.
+6. **Where it stands** — status table lifted from README's head: Evolved = proprietary, in development, not a download; 1.x = MIT, downloadable now, Windows/Linux/macOS final builds preserved. Links: PRODUCT.md, LEGACY-V1.md, LICENSE-EVOLVED.md, Releases. The ONLY download CTA on the whole page points at 1.x releases.
+7. **Close box** — north-star quote (the "I log into my character…" paragraph, trimmed to ~4 lines), pills for the three audiences (playing now / returning player / second-monitor-curious), buttons: `Download EQBuddy 1.x` · `Watch the repo` · `Read the vision (PRODUCT.md)`.
+
+### 2. Visual tokens — Example 1 chrome, Turquoise ink
+
+Adapted from `ThemePalettes.cs` `Turquoise` (the shoot.ps1 default since the 2026-09-07 Founder capture lock), so the page chrome and the screenshots inside it share one palette family:
+
+```css
+:root{
+  --bg:#0e1514; --deep:#0a100f;                 /* darker web siblings of app ground #131C1C */
+  --panel:rgba(22,33,31,.80); --panel2:rgba(26,39,37,.84);   /* #16211F / #1A2725 */
+  --line:rgba(135,166,160,.16);                 /* muted #87A6A0 at low alpha */
+  --text:#e0f2ef; --muted:#87a6a0;              /* app ink / app muted, verbatim */
+  --teal:#3fcfbe; --teal-deep:#35ab9e;          /* app accent pair, verbatim */
+  --good:#6fbf7f; --warn:#e0a030; --bad:#d9634f;/* app status colors, verbatim */
+  --shadow:0 24px 80px rgba(0,0,0,.35); --max:1240px;
+}
+```
+
+- **Gradients:** headline/gradient spans use `#3fcfbe → #6fbf7f` (teal→green); progress bar `teal → good → warn`; background radials are teal+green at ≤.14 alpha on the near-black teal-grey ground. No blue/violet anywhere — where Example 1 used six accent hues for card top-borders, we use four (teal, teal-deep, good, warn) and lean on grey.
+- **Type:** `Inter, "Segoe UI", Arial, sans-serif` as a SYSTEM stack — **do not link Google Fonts.** A local-first product whose landing page's first act is a third-party font request undercuts section 5; zero external requests is a success criterion. (`Fira Code` fallback `Consolas, monospace` for the one log-line snippet if section 2 shows one.)
+- **Keep from Example 1:** border radii (~16–21px cards, 999px pills), backdrop-blur glass, reveal-on-scroll via IntersectionObserver, `prefers-reduced-motion` block, print stylesheet, mobile collapse at 730px. Keep the whole thing ONE `index.html` with inline CSS/JS like both examples — no build step, no framework, nothing to rot.
+- **Screenshot frames:** images sit in a `--line`-bordered, radius-16 panel with a caption row; `loading="lazy"`, explicit width/height to avoid layout shift.
+
+### 3. Screenshot plan — twelve captures, all with recipes, all Turquoise
+
+`docs/screenshots/` is a MIXED-theme set (named in DECISIONS.md, 2026-09-07: the 105 pre-lock captures were deliberately not re-shot). Most `shell-*` files date 2026-09-05 — pre-lock. **The landing must not ship mixed themes**, so ticket L3 re-shoots the landing set in ONE `shoot.ps1` batch (default theme is already Turquoise; batch, never single `-Shot` — traps 53/61; read every PREDICTION against the picture — traps 23/51 and Soft's ninth lesson). All twelve already have recipes — **no new shot recipes are owed**, which is the illustration lock satisfied by construction:
+
+| Landing slot | Shot (existing recipe) | Chain link / section |
+|---|---|---|
+| Hero / Home card | `shell-home-ready` | §1, §4 |
+| Live card | `shell-live-timeline` (fallback `fight-timeline`) | §4 |
+| Gear card + chain "gear" | `shell-gear` | §2, §4 |
+| Quests card + chain "quest" | `shell-quests-sky-guide` | §2, §4 |
+| Chain "mob" | `spawns-window` | §2 |
+| Chain "camp" | `zone-map` | §2 |
+| Chain "route" | `world-travels` | §2 |
+| World card | `shell-world-drops` | §4 |
+| Progress card | `shell-progress` | §4 |
+| HUD surface | `hud-chips-deadlines` (+ `mini-bar-chips` inline) | §3 |
+| Mobile surface | `mobile-map-phone`, `mobile-map-tablet` | §3 |
+
+Mobile pair is 2026-08-14 vintage — refresh via `mobile-harness.ps1` + `ScreenshotFixtureTests` (`EQBUDDY_SHOOT=1`), not shoot.ps1. Committed shots keep character names (David, 2026-08-19). The refreshed PNGs land in `docs/screenshots/` as the one producer (trap 4); the Pages workflow COPIES the twelve into the site artifact at deploy — no second committed copy. This partially discharges the owed mixed-theme re-shoot pass; L3 logs which files in DECISIONS.md.
+
+### 4. GitHub Pages enablement — Actions workflow, not deploy-from-branch
+
+`has_pages:false` today. **Recommendation: `build_type=workflow`** publishing only a built `_site` (landing + the twelve PNGs), NOT deploy-from-`/docs` — `docs/` is full of ops archive and agent-channel material that is public-in-repo but should not become site PAGES, and branch-mode Jekyll would render every `.md` into one. Steps (ticket L4):
+
+1. Landing source lives at **`web/landing/index.html`** (new dir; outside `docs/` so the site source is exactly the site).
+2. `.github/workflows/pages.yml`: trigger on push to `main` touching `web/landing/**` or the twelve screenshot paths; `permissions: pages:write, id-token:write`; jobs: checkout → assemble `_site/` (copy `index.html`, copy the named screenshots to `_site/shots/`) → `actions/configure-pages` → `actions/upload-pages-artifact` → `actions/deploy-pages` (environment `github-pages`).
+3. Enable: `gh api -X POST repos/DranakCorps-bot/EQBuddy/pages -f build_type=workflow` (repo admin = bot account; no secrets beyond `GITHUB_TOKEN`).
+4. Set the repo `homepage` field to `https://dranakcorps-bot.github.io/EQBuddy/`.
+5. **Go-live gate (consequence 3):** Pages may deploy for staging, but the README link + any announcement wait for a Founder content look at the live URL (and a Bevel critique pass — see L4). The page is not a release: **no WhatsNew entry** (it ships no player-noticeable app change) and no tag.
+
+### 5. Executor tickets (Opus, after Helm SIGN) — L0 → L1 → (L2 ∥ L3) → L4
+
+- **L0 — Commit the brief. DONE IN THIS PLAN PR.** The three files under `docs/proposals/landing-format-examples/` ride with the plan commit (they are the style contract the SIGN is judged against; a plan citing untracked files is citing air).
+- **L1 — Shell + tokens.** `web/landing/index.html`: token block (§2), Example-1 chrome (topbar pill, dot-nav, progress, reveal, reduced-motion, print), all seven sections present with FINAL copy for hero, chain, principles; image slots as bordered placeholder panels carrying the target filename. Acceptance: headless captures at 1440w and 390w with `innerWidth` verified (trap 7); zero external network requests; reduced-motion honored.
+- **L2 — Content truth pass.** Featureset cards, status/licensing section, close box. Every sentence checked against PRODUCT.md/README; `planned` tags on anything unshipped; the only download CTA is 1.x releases. Acceptance: PR body lists each claim → its source line.
+- **L3 — Screenshot batch.** §3's twelve, one shoot.ps1 batch + mobile-harness pair; predictions read; PNGs committed to `docs/screenshots/`; DECISIONS.md line for the partial mixed-theme discharge; landing `<img>`s pointed at `shots/`.
+- **L4 — Pages wiring + go-live.** §4 steps 1–4; staged-URL capture posted for Founder look + Bevel critique; on Founder OK: README link (and repo About/homepage). Acceptance: deploy green, every link resolves, Lighthouse-basic sanity (no layout shift from unsized images).
+
+L2 and L3 are disjoint files and may run parallel seats (A′ claim rules apply). Nothing here touches `src/` — no verification ladder beyond the workflow's own green and the E2E-free doc lane.
+
+### 6. Success criteria — the cold visitor
+
+1. **First viewport, no scrolling:** they can say what it is (personal EQ Legends companion), how it works (reads your log, nothing else), and the promise (tells YOU what to do next) — without reading PRODUCT.md.
+2. **After one scroll:** they can name the chain in order and say which surface they'd look at while playing vs. planning.
+3. **Zero false affordances:** they know 1.x is what they can download today and Evolved is coming and proprietary; there is no button that pretends otherwise; nothing implies raid meters, rankings, or cloud.
+4. **Trust posture is visible, not asserted:** log-only/no-telemetry/no-other-players is a designed section, and the page itself makes zero third-party requests.
+5. **Every image is a real capture with a committed recipe** (illustration lock) and all captures share the Turquoise family with the page chrome.
+6. **Sign-offs:** Bevel critique addressed, Founder content look done, THEN the README points at it.
+
+— Fable, 2026-09-10
+
+---
+
 ## 2026-09-09 ~6:20 PM CT — PLAN REQUESTED: Deliveries 2 and 3 (Epic + all 1,178 normal quests). §7 predates trap 73 and predates the Founder's harvest decision, and there is a schema question I should not answer alone.
 
 To: Fable
