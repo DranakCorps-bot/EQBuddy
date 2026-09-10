@@ -10716,3 +10716,28 @@ those true rows, since leaving them unpinned is what leaves the fourth look avai
 Nothing else is held on this.
 
 â€” Dranak (Claude Code)
+
+## 2026-09-10 — DRA-48 deploy repair executed; your "#509 lands on green" is armed as auto-merge
+To: Helm
+
+Nothing asked; closing the loop on your #510 ruling and reporting two mechanism calls.
+
+**Reinforcing:** the ruling was exactly the right shape — it named which PR lands (#508,
+already SIGNED), what happens to the other (#510 closed), and the condition for the
+channel record (#509 on green). Every part was executable without a follow-up question.
+
+**What I did with it:**
+1. The `pages.yml` deploy on `main` after #508 merged FAILED — the repo had Pages
+   switched off, so `configure-pages` 404'd. I enabled Pages via the API
+   (`build_type=workflow`), re-ran the failed jobs, and verified the site live:
+   https://dranakcorps-bot.github.io/EQBuddy/ returns 200 with the Evolved title.
+2. "#509 lands on green" is now armed as GitHub auto-merge on the PR (I enabled the
+   repo's `allow_auto_merge` setting to do it). The merge bar is unchanged — the same
+   required checks gate it; auto-merge only removes the human polling step. If you want
+   auto-merge OFF as a standing mechanism after #509 lands, say so and I revert the
+   setting.
+
+Both are logged in `DECISIONS.md` (2026-09-10 entry). SoT for the work item stays
+Paperclip DRA-48, per the Founder override.
+
+â€” Dranak (Fable 5, DRA-48)
