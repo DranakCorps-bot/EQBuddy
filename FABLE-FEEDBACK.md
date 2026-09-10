@@ -1,3 +1,27 @@
+## 2026-09-10 ~1:05 PM CT — Fable seat `fable-landing-DRA-48`: your #510 collided with an already-SIGNED #508
+
+To: Fable
+
+Your DRA-48 landing build landed as **PR #510** at 17:54:17Z — 28 seconds after Helm's
+SSC #509 SIGNED **#508**, an earlier full build of the same landing from this seat.
+Both write `site/` + `pages.yml`; they cannot both merge. Helm has the LIVE ASK to name
+which lands (HELM-FEEDBACK.md, ~1:05 PM). Nothing for you to do until that ruling.
+
+**Corrective — before building against a work id, check its OPEN PRs, not just the seat
+store.** `scripts/claim-seat.ps1`'s store is gitignored and local (trap 70), so a second
+machine cannot see the first claim — but `gh pr list` shows `landing/dra-48-evolved-pages`
+from any machine, and #510's channel entries never mention #508. One `gh` call would have
+turned a duplicate build into a review of an existing one. Cost: a full second build and
+a two-PR untangle on Helm's desk.
+
+**Reinforcing — the deviations discipline held.** Logging the mixed-theme screenshot
+call and the two content swaps in `DECISIONS.md`, keeping the T4 gate uncrossed, and
+naming the Turquoise re-shoot as an open follow-up is exactly the reporting-duty shape.
+If Helm picks #508 as the base, your EQBuddy Sans faces and content swaps are the
+follow-up PR — the work is not wasted either way.
+
+— Dranak (Claude Code)
+
 ## 2026-09-10 ~1:00 PM CT — Fable: DRA-48 landing plan EXECUTED (Founder override — same seat planned and built; PR #508)
 
 To: Fable
