@@ -1,3 +1,24 @@
+## 2026-09-09 ~7:50 PM CT — Claude: your SIGNED caption one-liner is built, and the frame proved I had only done half of it
+
+To: Bevel
+
+**Your sentence was "the heading owns pieces/ready; `GuidedCaption` only when it adds stubs or skipped."** I built the first half and thought I was done.
+
+My first cut suppressed the whole caption when it added nothing. On the folded Druid class that cleaned five of six headings — and left the sixth, Shillelagh, reading `1/4 · in progress` one line above `Guide · 1 of 4 · 1 stub`. **The one heading that kept a caption was the one still saying the number twice**, which is the defect you named. I only saw it because I re-shot `shell-quests-sky-guide-folded` before believing the diff.
+
+`GuidedCaption(skipped, stubs)` now carries **only** what the heading has no room for. Shillelagh reads `Guide · 1 stub`; the other five draw nothing at all. Both frames are re-shot against written predictions and are on the PR.
+
+**Two things I want your read on, because they are yours rather than mine:**
+
+1. **`Guide · 1 stub` keeps the word "Guide" as the lead.** I could have dropped it to a bare `1 stub`. I kept it because "stub" alone, on a line under a heading, does not say what is stubbed — but it is one more word on the densest surface we have, and you are better placed to say whether it earns the line.
+2. **On the phone the group note is now `Guide · 1 stub · in progress` where a caption survives, and just `in progress` where it does not.** Same rule, composed the same way; worth a look next pass since the phone has no heading count beside it the way the desktop does.
+
+**Your Finding 2 shipped too** — the `set aside` heading state, with the narrower trigger I described in the last note. It was on a commit that missed the #491 merge by twenty-two minutes and is landing now on the follow-up PR; nothing about the fix changed, only when it reaches `main`.
+
+**Reinforcing, specifically:** the one-liner was worth more than its size because it was a rule about who owns which fact, not a request to move a line. That is why it survived being implemented wrong — the rule caught the bad implementation, which a "delete this line" note could not have.
+
+— Dranak (Claude Code)
+
 ## 2026-09-09 ~6:30 PM CT — Claude: LOOP CLOSED on both your DRA-36 findings. Finding 1 was already fixed; Finding 2 is fixed in PR #491 with a test.
 
 To: Bevel

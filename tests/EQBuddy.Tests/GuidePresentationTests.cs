@@ -73,15 +73,14 @@ public sealed class GuidePresentationTests
     /// two lines were most of what was on screen. Bevel's SIGNED one-liner, and Fable's #491
     /// defect 3 off the folded frame.</para></summary>
     [Theory]
-    [InlineData(0, 0, 3, 1, "Guide · 0 of 3 · 1 stub")]
-    [InlineData(1, 1, 4, 2, "Guide · 1 of 4 · 1 skipped · 2 stubs")]
-    // Nothing to add beyond the heading's own count: the caption draws nothing at all.
-    [InlineData(2, 0, 3, 0, "")]
-    [InlineData(3, 0, 3, 0, "")]
-    [InlineData(0, 0, 3, 0, "")]
-    public void TheCaptionSaysProgressAndHowHonestTheDataIs(
-        int done, int skipped, int total, int stubs, string expected) =>
-        Assert.Equal(expected, GuidePresentation.GuidedCaption(done, skipped, total, stubs));
+    [InlineData(0, 1, "Guide · 1 stub")]
+    [InlineData(1, 2, "Guide · 1 skipped · 2 stubs")]
+    [InlineData(2, 0, "Guide · 2 skipped")]
+    // Nothing the heading does not already say: the caption draws nothing at all.
+    [InlineData(0, 0, "")]
+    public void TheCaptionSaysOnlyWhatTheHeadingCannot(
+        int skipped, int stubs, string expected) =>
+        Assert.Equal(expected, GuidePresentation.GuidedCaption(skipped, stubs));
 
     // ---- row prose -------------------------------------------------------------------
 
@@ -335,12 +334,12 @@ public sealed class GuidePresentationTests
 
         // a and c done, b struck out, turn-in untouched and gated on all three.
         Assert.Null(GuidePresentation.NextObjective(g, In("a", "c"), In("b")));
-        Assert.Equal(GuidePresentation.BlockedBySkipLead + "do b.",
+        Assert.Equal(GuidePresentation.BlockedBySkipLead + "b.",
             GuidePresentation.NoNextStep(g, In("a", "c"), In("b")));
 
-        // Two skipped prerequisites are both named, in reading order, and by the words the
-        // ROW shows (its instruction) rather than its title, so the player can find them.
-        Assert.Equal(GuidePresentation.BlockedBySkipLead + "do a, do b.",
+        // Two skipped prerequisites are both named, in reading order, and by TITLE — the same
+        // way "after:" and "Before leaving" name another step (the fixture's title is its id).
+        Assert.Equal(GuidePresentation.BlockedBySkipLead + "a, b.",
             GuidePresentation.NoNextStep(g, In("c"), In("a", "b")));
 
         // THE NEGATIVE the old code could not tell apart: take the skip back and the card

@@ -367,7 +367,11 @@ public sealed class GuideSurfaceParityTests : IDisposable
         // put down; the card names the skip to take back to pick it up again.
         Assert.StartsWith(GuidePresentation.BlockedBySkipLead,
             setAside.GuideCard!.Instruction, StringComparison.Ordinal);
-        Assert.Contains(rows[1].Title, setAside.GuideCard!.Instruction, StringComparison.Ordinal);
+        // Named by the OBJECTIVE's title, the way "after:" and "Before leaving" name a step,
+        // rather than by the instruction the row draws — one cross-referencing vocabulary.
+        var blocked = GuideCatalog.Default.Guides.Single(g => g.Id == setAside.GuideId)
+            .AllObjectives.Single(o => setAside.Rows[1].Id.EndsWith(o.Id, StringComparison.Ordinal));
+        Assert.Contains(blocked.Title, setAside.GuideCard!.Instruction, StringComparison.Ordinal);
 
         // Taking one skip back puts the work — and the word — back.
         Assert.True(CompanionActions.Apply(settings, ledger, Dranak,

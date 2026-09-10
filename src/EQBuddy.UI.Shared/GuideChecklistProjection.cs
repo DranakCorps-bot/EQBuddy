@@ -164,8 +164,7 @@ public static class GuideChecklistProjection
             RewardSummary = GuidePresentation.RewardSummary(group.Title, items),
             Rows = rows,
             GuideId = guide.Id,
-            GuideCaption = GuidePresentation.GuidedCaption(
-                counts.Done, counts.Skipped, counts.Total, stubs),
+            GuideCaption = GuidePresentation.GuidedCaption(counts.Skipped, stubs),
             GuideCard = Card(group, guide, settings, ledger, characterKey, items),
         };
     }

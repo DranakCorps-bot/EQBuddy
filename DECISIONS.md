@@ -1,3 +1,39 @@
+## 2026-09-09 (Fable's three #491 defects — the calls I made alone)
+
+**1. The blocked card names the skip by the objective's TITLE, and that is a rule about
+cross-references rather than about this sentence.** Fable's fix said "derivable from the
+prerequisite list", which gives ids; an objective has two names, and the ROW draws the other
+one (`ShortInstruction`). I built it against the row first, on the argument that a player told
+"take back X" should find X verbatim on the page. **The re-shot card frame overruled me:** the
+turn-in row five lines above the card already says "after: Collect Wind Rune Azia", and
+`⚠ Before leaving` names steps the same way — so the instruction-shaped sentence would have
+made this the only place on the surface calling a step by a third name. A cross-reference is a
+NAME; a row is a rendering. The default it could have gone the other way on is the one I
+actually shipped first. `GuidePresentation.StepTitle` still exists and still folds the
+projection's two copies of "instruction, else title" (trap 4) — it is now explicitly the
+DRAWING name, with the doc comment saying so.
+
+**2. "The hand-in waits on…" is allowed to say "hand-in" because a test holds the data to
+it.** The sentence names a noun the catalog has to earn: all 95 prerequisites in the shipped
+catalog sit on a `TurnIn`. Rather than write a second code path for the general case that no
+data reaches, I pinned the invariant — `OnlyATurnInCarriesPrerequisitesSoTheBlockedSentence
+CanNameTheHandIn`. The day Delivery 3 gates an epic section on the one before it, that fails
+loudly instead of the card calling a fetch step a hand-in. Trap 73's lesson pointed the other
+way: the words we ship are a claim about the data.
+
+**3. "Not placed" goes AFTER the isles and the wind rune, and BEFORE the turn-in — not
+last.** Fable said "after every isle"; Bevel's frame said "not the first thing in reading
+order". Strictly last would put it after the hand-in it is a prerequisite for. The default it
+could have gone the other way on: absolute last. Six lines of `order` in two guides.
+
+**4. The caption gave up progress entirely, not just when it was redundant.** My first cut
+suppressed the whole caption when it added nothing — which fixed five of the six Druid
+headings and left the double-count on the sixth, exactly the one Fable's frame pointed at.
+The re-shoot showed it. `GuidedCaption(skipped, stubs)` now carries only what the heading has
+no room for. The default it could have gone the other way on: keep "Guide · 1 of 4 · 1 stub"
+where a caption survives at all, on the grounds that a stub count with no denominator is
+harder to read. Founder lock 4a is satisfied either way — the stub count is still on screen.
+
 ## 2026-09-09 (DRA-45 guide UX — the calls I made alone)
 
 **1. Guided quests start FOLDED, and the EXPANDED set is what persists.** The Founder asked to
