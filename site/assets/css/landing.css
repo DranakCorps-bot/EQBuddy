@@ -678,3 +678,45 @@ a { color: var(--accent); }
   .tbl-wrap, .callout { background: #fff; border-color: #ccc; color: #444; }
   .dive-sec p, .dive-sec .cap { color: #444; }
 }
+
+/* ---------- Lightbox (DRA-48 refine): click any capture or clip to expand it.
+   Esc, the ✕, or a click anywhere dismisses. Built by landing.js only when JS
+   runs — without it the images are plain images, per the T1 acceptance. ---------- */
+.js .shot img { cursor: zoom-in; }
+.lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4vh 4vw;
+  background: rgba(6, 10, 10, 0.9);
+}
+.lightbox[hidden] { display: none; }
+.lightbox img {
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
+  height: auto;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  box-shadow: 0 18px 60px rgba(0, 0, 0, 0.55);
+  cursor: zoom-out;
+}
+.lightbox .lb-close {
+  position: absolute;
+  top: 18px;
+  right: 22px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--panel2);
+  color: var(--text);
+  font: inherit;
+  font-size: 14.5px;
+  line-height: 1;
+  padding: 10px 14px;
+  cursor: pointer;
+}
+.lightbox .lb-close:hover,
+.lightbox .lb-close:focus-visible { border-color: var(--accent2); color: var(--accent); }
