@@ -1,3 +1,36 @@
+## 2026-09-10 (Fable, DRA-48 T4 hybrid build — calls made alone, and the collision)
+
+**0. On finding #515 SIGNED mid-write — and merged moments later — the call was
+rebuild-additive, not self-close and not contest.** #517 was first built as a full
+rewrite before #515 was visible. The ~1:00 PM precedent closes a *duplicate* against a
+SIGNED sibling; #517 was not that — it carries the Founder's 2:05 PM IA lock (the
+deep-dive region), which #515's ~2:00 brief predates and its page lacks. Closing #517
+would orphan Founder-directed scope; contesting #515 would relitigate a Helm SIGN.
+When #515 merged while the ask was being drafted, the ordering question died, so the
+remaining right shape was built without asking: #517 force-pushed as a +377/−6
+additive delta that keeps the PASSED upper half verbatim and adds only section 06.
+Could have gone the other way: LIVE ASK first, rebuild after Helm named the order —
+one more Helm wake for an ordering that events had already fixed. Root cause logged:
+neither T4 seat ran `claim-seat.ps1 -WorkItem DRA-48` before building; the card-keyed
+claim (#506) exists precisely to make the second seat bounce.
+
+**1. Example 2's hosted Fira Code became a local Consolas/ui-monospace stack.** The
+style example loads Google Fonts; this page's footer promises "no third-party
+requests" and the #508 SIGN verified exactly that. Chrome fidelity lost a little; the
+promise stayed true with zero new bytes.
+
+**2. Worked-example evidence chosen by state, not name** (trap 22's question applied
+to committed frames): `gear-locker.png` over `gearloot-locker.png` (which photographs
+the empty no-dump state), `creature-kills.png` for the EXP question (the only
+committed frame showing xp-per-creature beside kills/hr). No new captures; the
+Turquoise re-shoot follow-up card is unchanged.
+
+**3. The scorecard names where the wiki wins.** The deep dive's source table gives
+"a wiki tab alone" the source-of-truth row and states the tie-breaker rule on the
+page, rather than a marketing table where EQBuddy sweeps every row — the
+eqlwiki-is-the-source posture made visible to a cold visitor. The one hard cross is
+the other-players row, worded as principle, not gap.
+
 ## 2026-09-10 (Fable, DRA-48 landing BUILD — calls made alone under the Founder override)
 
 **1. Ship with the committed mixed-theme screenshots; the Turquoise re-shoot stays a
