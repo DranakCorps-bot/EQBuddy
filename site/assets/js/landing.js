@@ -38,3 +38,22 @@
     document.querySelectorAll(".reveal").forEach(function (el) { reveal.observe(el); });
   }
 })();
+
+// Deep-dive TOC highlight (T4 hybrid): same pattern as the dot nav, scoped to
+// the dive region. Progressive enhancement only, like everything above.
+(function () {
+  "use strict";
+  var tocLinks = Array.prototype.slice.call(document.querySelectorAll(".dive-toc a"));
+  var tocTargets = tocLinks
+    .map(function (a) { return document.querySelector(a.getAttribute("href")); })
+    .filter(Boolean);
+  var tocSpy = new IntersectionObserver(function (entries) {
+    entries.forEach(function (e) {
+      if (!e.isIntersecting) return;
+      tocLinks.forEach(function (a) {
+        a.classList.toggle("active", a.getAttribute("href") === "#" + e.target.id);
+      });
+    });
+  }, { rootMargin: "-30% 0px -55% 0px" });
+  tocTargets.forEach(function (t) { tocSpy.observe(t); });
+})();
