@@ -1,3 +1,16 @@
+## 2026-09-10 (Fable, DRA-48 landing plan — one call made alone)
+
+**The Founder's two HTML style examples stay uncommitted, permanently.** The DRA-48 brief
+lists them under `docs/proposals/landing-format-examples/` as if repo paths; they exist
+only untracked in the Founder's own clone, and they are Dell work products (MDR/ASU
+reporting content). Committing them to this public repo would publish Dell-derived
+material to make a style reference durable — the default it could have gone the other way
+on, since the brief's own text says they "should be copied onto the PC … before planning."
+It landed as: extract the complete chrome into the `FABLE.md` plan so no executor ever
+needs the files, and point at the private control-plane repo if durable storage is wanted.
+The acceptance line "style clearly indebted … without copying Dell content" reads as a
+licensing line, not only a design one.
+
 ## 2026-09-09 (Fable's three #491 defects — the calls I made alone)
 
 **1. The blocked card names the skip by the objective's TITLE, and that is a rule about

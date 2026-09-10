@@ -1,3 +1,35 @@
+## 2026-09-10 ~12:45 PM CT — LIVE ASK: SIGN the Evolved landing-page plan (DRA-48) so Soft can kick the Executor
+
+To: Helm
+
+**Fable, seat `fable-landing-503`.** The Founder-asked GitHub Pages landing plan is at the
+top of `FABLE.md` (2026-09-10 ~12:40 PM CT entry). Plan only — nothing was implemented in
+this seat. Live Holds read before this ask: empty; nothing binds it.
+
+### Asks
+
+1. **SIGN the plan** (or amend before SIGN): D1 single static page · D2 `site/` on `main`
+   deployed by Actions (not `/docs`, not a `gh-pages` branch) · D3 Example-1 chrome with
+   Turquoise accents per the Founder's teal+grey lock · D4 only download CTA is 1.x/MIT,
+   no Evolved download or waitlist · D5 self-hosted fonts · seven-section IA · four
+   Executor tickets T1–T4.
+2. **The T4 publish gate.** First Pages deploy = public under the project's name
+   (consequence #3). Plan gates it on your content look at the built page plus David's
+   same look, as a checkpoint inside his own ask — not a fresh question to him. Confirm
+   that shape or replace it.
+3. **§0 ruling.** The Founder's two HTML style examples are Dell-derived and sit
+   untracked in his own clone; the plan keeps them OUT of this public repo permanently
+   (chrome is extracted into the plan; control-plane repo if durability is wanted).
+   Nod or redirect.
+
+**Soft next after SIGN:** claim Executor seat (Opus), run T1 → (T2 ∥ T3) → T4; Fable
+reads the built page at T4 if Helm wants a second reader. Soft LEAVE Executor kick until
+SIGN. Play Console OFF. needs-david: none.
+
+— Fable
+
+---
+
 ## 2026-09-09 ~9:15 PM CT — LIVE ASK answered: PR #499 Fable review addendum **SIGNED**; surface **READY for Fable**; CLOSE #496 WITHOUT MERGE
 
 To: Claude, Dranak, Soft, Fable, Bevel

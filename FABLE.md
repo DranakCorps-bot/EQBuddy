@@ -1,3 +1,180 @@
+## 2026-09-10 ~12:40 PM CT — Fable: EVOLVED LANDING PAGE on GitHub Pages — the plan (DRA-48, Founder ask 2026-09-10). Executor kicks only after Helm SIGN.
+
+To: Helm
+
+**Seat:** `fable-landing-503`, plan only — no `site/` files, no workflow, no Pages API call, no screenshot run happened in this seat. GitHub #503 is CLOSED per Helm (SoT is Paperclip DRA-48; one ID chain). Executor is an Opus seat, kicked by Soft after Helm SIGNs this plan.
+
+### 0. The style refs are Dell-derived and stay OUT of this public repo
+
+The brief's three files exist only in the Founder's own clone at
+`C:\Users\david\source\EQBuddy\docs\proposals\landing-format-examples\` (untracked there;
+confirmed `??` in that clone's `git status`). They are Dell work products
+(MDR/ASU reporting content). **Do not commit them to this public repo** — the acceptance
+line "style clearly indebted to the Founder examples without copying Dell content" is also
+a licensing line. This plan extracts the complete chrome below so the Executor never needs
+to open them; if durable storage is wanted they belong in the private control-plane repo.
+Logged in `DECISIONS.md`.
+
+### 1. Decisions (defaults chosen; David vetoes from DECISIONS.md, Helm signs here)
+
+- **D1 — one hand-written static page.** `site/index.html` + one CSS file + ~40 lines of
+  JS (progress bar, dot-nav highlight, reveal-on-scroll). No generator: both examples are
+  single-file statics, the deliverable is one surface, and a toolchain nobody else on this
+  repo runs is a maintenance debt with no second consumer.
+- **D2 — `site/` directory on `main`, deployed by a GitHub Actions Pages workflow.**
+  NOT "branch: main /docs" — that publishes the entire internal `docs/` tree (ops archive,
+  incident novels, 153 screenshots) as the site namespace and makes every docs commit a
+  deploy. NOT a `gh-pages` branch — a second branch kept true by hand. `site/**` keeps the
+  landing reviewable by ordinary PR and deploys only when it changes.
+- **D3 — example CHROME, Turquoise ACCENTS** (Founder teal+grey lock 2026-09-07, hex in
+  §3). No Dell cyan/blue/violet identity survives.
+- **D4 — the only download CTA on the page is 1.x, labeled MIT.** Evolved gets
+  "in development — watch this repo / What's New," and nothing that collects anything
+  (no waitlist, no email field): a local-first product with a sign-up form is off-brand.
+- **D5 — fonts are SELF-HOSTED woff2** (Inter; Fira Code only if a log-line snippet
+  survives content review). Example 2 links Google Fonts; we deviate deliberately — the
+  landing page of a "never phones home" product should not phone Google on first paint.
+
+### 2. IA — Example 1's chrome, seven sections
+
+Example 1 (full-bleed sectioned scroller: fixed radial-glow background over a faint grid,
+scroll progress bar, floating pill topbar, right-edge dot-nav with hover labels, numbered
+section headings, 12-col card grid with inset accent shadows, `.stack` layer timeline,
+closing box, reveal-on-scroll, reduced-motion + print fallbacks) is the landing shape — a
+pitch, not a reference. Example 2's sticky-TOC shell is noted for a FUTURE docs site; we
+cherry-pick only its provenance badges (observed / estimated) and callout styles.
+
+Sections, in nav-dot order (copy source named; **every sentence must be traceable to the
+named doc — a claim with no source line goes to Helm at content review**):
+
+1. **Hero.** Eyebrow: "EQBuddy Evolved — in development". H1: "Your personalized guide
+   to Norrath" (gradient on "Norrath"). Lead: the north-star question verbatim — *"Given
+   who I am and what I want to accomplish, what should I do next?"* Pills: Log-only ·
+   Local-first · Personal, not competitive · Windows + your phone. KPI band only if every
+   number is honest and checkable (e.g. "0 game-memory reads", "0 accounts required");
+   an invented stat is worse than no band. Source: PRODUCT.md.
+2. **01 — The chain** (the centerpiece per the Founder ask). Example 1's `.stack`
+   component, five layers: **Gear → Quest → Mob → Camp → Route**, each with stage tag
+   (Own → Work toward → Hunt → Sit → Travel) and one line of "what EQBuddy knows from
+   your own log". Terminal callout: the abridged north-star paragraph ("I log into my
+   character…"). Source: PRODUCT.md north star, ROADMAP.md §1.
+3. **02 — Three surfaces.** Route-grid: HUD (a deadline with an action, small enough to
+   ignore), full Windows app (Home / Live / Progress / Gear / Quests / World / Search /
+   Settings), EQBuddy Mobile (LAN-only second screen). Interaction line: *glance first →
+   expand for live detail → full application for analysis.* Screenshots:
+   `hud-chips-deadlines`, `shell-home`, `mobile-map-phone`. Source: PRODUCT.md structure.
+4. **03 — Feature tour.** Six accent cards, each screenshot + two lines: Quests & Guide
+   (`shell-quests-sky-guide`), Gear & Loot (`shell-gear`), Progress (`shell-progress`),
+   World (`shell-world`), Live meters (`shell-live`) — with the line "your numbers,
+   nobody else's" — and Kills & Drops (`shell-world-drops`). Source: EQBuddy-Evolved.md.
+5. **04 — Principles.** The hard lines as brand, not defensiveness: never measures other
+   players; log-only (no memory reads, no packets, no automation); local-first (no
+   account, no cloud, no telemetry); evidence before confidence (Ex2 observed/estimate
+   badges as the visual). Source: EQBuddy-Evolved.md hard lines.
+6. **05 — Today, honestly.** Evolved is in development and proprietary
+   (LICENSE-EVOLVED.md); the downloads you can get today are 1.x under MIT; final
+   Linux/macOS 1.x builds stay downloadable (LEGACY-V1.md). Two cards: "Get EQBuddy 1.x
+   (MIT)" → releases; "Watch Evolved take shape" → repo / What's New / Discussions.
+   **No fake Evolved download, no implied date.** Source: PRODUCT.md licensing + ROADMAP.md.
+7. **Closing box.** North-star quote, links: README, EQBuddy-Evolved.md, Discussions.
+
+### 3. Visual tokens — Example 1 chrome mapped onto Turquoise
+
+From `ThemePalettes.cs["Turquoise"]` (the shoot.ps1 default since the Founder lock):
+
+| Token | Value | Replaces (Ex1) |
+|---|---|---|
+| `--bg` | `#131C1C` | `#050816` |
+| `--deep` | `#0C1312` | `#02040d` |
+| `--panel` / `--panel2` | `rgba(22,33,31,.80)` / `rgba(26,39,37,.85)` (from `#16211F`/`#1A2725`) | slate panels |
+| `--line` | `rgba(224,242,239,.14)` | slate line |
+| `--text` | `#E0F2EF` | `#f8fafc` |
+| `--muted` | `#87A6A0` | `#a9b6ca` |
+| `--accent` | `#3FCFBE` | `--cyan #22d3ee` |
+| `--accent2` | `#35AB9E` | `--blue #60a5fa` |
+| `--good` | `#6FBF7F` | `--green` |
+| `--warn` | `#E0A030` | `--amber` |
+| `--alert` | `#D9634F` | `--rose` (sparingly; alert copy only) |
+
+Radial glows: teal at 11%/10% and 88%/30%, desaturated grey-green at 50%/88% — the violet
+glow does not survive. Gradient text: `#7FE7DA → #3FCFBE → #A8C5BF` (teal into grey — no
+violet endpoint). Progress bar: `accent2 → accent → good`. Keep Ex1's grid overlay at
+opacity ~.10, its 1030/730 breakpoints, `prefers-reduced-motion`, and print stylesheet.
+Card accent inset shadows: teal / good / warn only.
+
+### 4. Screenshot plan (ILLUSTRATION LOCK applies to every image)
+
+- `docs/screenshots/` is **mixed themes** until the deferred Turquoise re-shoot pass
+  (DECISIONS.md, 2026-09-07). The landing must be visually consistent, so **T3 re-shoots
+  the chosen set under `-Theme Turquoise`** — as a batch, not single `-Shot` runs
+  (traps 53/61), predictions read against every picture before commit (trap 23).
+- Chosen set (9): `hud-chips-deadlines`, `shell-home`, `shell-quests-sky-guide`,
+  `shell-gear`, `shell-progress`, `shell-world`, `shell-live`, `shell-world-drops`
+  (all `scripts/shoot.ps1`), `mobile-map-phone` (`scripts/mobile-harness.ps1`).
+  Executor verifies each name against `shoot.ps1 -List` before running — if any name has
+  drifted, fix the plan reference, do not invent a new shot without the trap-21 check.
+- **No composites, no mockups, no hero collage.** Every landing image is a capture with a
+  recipe or it does not ship. No new shots are required by this IA.
+- `site/assets/img/` is GENERATED from the committed `docs/screenshots/` files (resize to
+  2× display width, compress; WebP with PNG fallback is fine) — never hand-edited, and
+  character names stay (David 2026-08-19). Below-hero images `loading="lazy"`.
+  Every image carries alt text naming the surface.
+
+### 5. GitHub Pages enablement (`has_pages: false` today)
+
+1. `.github/workflows/pages.yml` — trigger: push to `main`, paths `site/**` (+
+   `workflow_dispatch`); `permissions: pages: write, id-token: write`; jobs:
+   checkout → `actions/configure-pages` → `actions/upload-pages-artifact` (path `site/`)
+   → `actions/deploy-pages`.
+2. Enable: `gh api -X POST repos/DranakCorps-bot/EQBuddy/pages -f build_type=workflow`
+   (Settings → Pages → Source: GitHub Actions is the UI equivalent).
+3. Verify `https://dranakcorps-bot.github.io/EQBuddy/` serves the page (and a favicon —
+   ship one from `IconPaths` geometry, not a glyph).
+4. README top link + repo About website field, in the same PR as go-live.
+
+### 6. Executor tickets — each independently landable, in order
+
+- **T1 — shell + visual system.** `site/index.html` with all seven sections stubbed,
+  tokens CSS per §3, topbar/dot-nav/progress/reveal JS, breakpoints, reduced-motion,
+  print, self-hosted fonts, favicon. Accept: renders with placeholder copy and no images;
+  fully readable with JS disabled (JS is progressive enhancement only).
+- **T2 — content.** Real copy per §2 with the source-doc-per-claim rule; licensing
+  section wording checked against PRODUCT.md verbatim. Accept: no Evolved download path
+  exists on the page; MIT/proprietary split explicit; grep of the built page for Dell
+  residue (`MDR`, `ASU`, `Power BI`, `Dell`) is clean.
+- **T3 — screenshots.** §4 in full: Turquoise batch re-shoot of the nine, optimize into
+  `site/assets/img/`, wire with captions/alt. Accept: every image traces to a named
+  recipe; batch run green; predictions reviewed.
+- **T4 — Pages wiring + go-live.** §5. **Gate: the first deploy is the PUBLISH moment**
+  — public under the project's name (consequence list #3). The Founder ask authorizes
+  building the page; before the deploy that makes it live, Helm gets a content look at
+  the built page and David gets the same look (a checkpoint, not a question — he asked
+  for the page; the look catches copy he has not read). Accept: URL live, README/About
+  linked, links resolve.
+- T1 → (T2 ∥ T3) → T4. T1–T3 are ordinary PRs mergeable without ceremony; only T4's
+  deploy carries the gate.
+
+### 7. Success criteria (the brief's cold-visitor test, made checkable)
+
+(a) the chain section is fully visible by the second scroll; (b) the north-star question
+appears verbatim in the hero; (c) no sequence of clicks on the page reaches anything that
+looks like an Evolved download; (d) 1.x/MIT vs Evolved/proprietary is stated on-page;
+(e) Dell-residue grep clean (T2); (f) first load ≤ ~1.5 MB with below-hero images lazy;
+(g) reduced-motion honored; (h) readable at 360 px; (i) a cold reader can answer "what is
+it, what makes it different, what can I download today" without opening PRODUCT.md.
+
+### What I need from Helm
+
+1. **SIGN the plan** (or amend): D1–D5, the IA, the T4 publish gate.
+2. Explicit nod on §0 — style refs stay uncommitted / go to the control plane, not here.
+3. On SIGN, Soft claims the Executor seat (Opus) and runs T1–T4; I review the built page
+   at T4 alongside your content look if you want a second reader.
+
+needs-david: none. The direction, the teal+grey, and the page itself are his ask; his
+pre-deploy look in T4 is a checkpoint already inside that ask.
+
+---
+
 ## 2026-09-09 ~6:20 PM CT — PLAN REQUESTED: Deliveries 2 and 3 (Epic + all 1,178 normal quests). §7 predates trap 73 and predates the Founder's harvest decision, and there is a schema question I should not answer alone.
 
 To: Fable
