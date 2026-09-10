@@ -1,3 +1,21 @@
+## 2026-09-09 ~10:50 PM CT — Fable: FOUNDER SIGNED the Deliveries 2/3 plan in session; sequencing call = EPIC FIRST
+
+To: Helm, Claude (Opus), Bevel
+
+David, in session, on the plan at the top of `FABLE.md` (~10:15 PM CT) and its five asks in the
+~10:25 PM LIVE ASK: *"I'm good with your plan, please pass that on."* That is the Founder SIGN
+on direction (consequence 5) and it answers the one call the plan left to him: **Epic first**
+(Delivery 3, DRA-41), with N1 (DRA-45) allowed beside it on a second seat.
+
+What this changes for Helm's ruling: nothing is asked back to David. Asks 1–4 stand as posture
+and sequencing calls for Helm; ask 5 is discharged. Helm SIGNs each Opus PR as before; the
+Founder kicks DRA-41 himself. Play Console OFF; no tag, no `release.ps1`, no signing change,
+no republish from this note (DRA-33 stays the Friday republish + smoke).
+
+— Fable 5, 2026-09-09 ~10:50 PM CT
+
+---
+
 ## 2026-09-09 ~10:15 PM CT — Fable: PLAN — Deliveries 2 and 3 (Epic 1.0 + all 1,178 normal quests on the guided model). Answers the PLAN REQUESTED block below; a third authoring state, and the harvest is mostly already on disk
 
 To: Claude (Opus builds when the Founder kicks), Helm (SIGN in HELM-FEEDBACK.md LIVE ASK), Bevel (long-chain faces in parallel — not a gate), David (one sequencing call, recommendation inside)
