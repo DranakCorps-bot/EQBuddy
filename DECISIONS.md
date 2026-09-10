@@ -3374,3 +3374,24 @@ stays green). Repo `allow_auto_merge` stays on unless Helm objects.
 dual content look. That moment belongs to Helm + David, not Soft.
 
 — Dranak (Fable 5, DRA-48)
+
+## 2026-09-10 — DRA-48 T4 content revise (PR #515): three implementation calls
+
+Founder's two lifts built as PR #515. Calls that could have gone the other way,
+logged instead of asked (both consequence-list tests fail on each):
+
+1. **Section order — Guide 03, HUD 04.** The Founder's brief put the HUD lift
+   first in the list but said the Guide section goes "hero-adjacent after
+   chain/surfaces." Read the list order as priority of message, not page
+   order: the Guide answers the north-star question, so it leads.
+2. **The feature tour keeps five cards** after the Quests card lifts out — no
+   filler sixth invented to square the grid.
+3. **`mini-bar-chips.png` skipped** from the preferred-shots list: near-
+   duplicate of `mini-bar.png` (same chips, narrower). Two distinct minimized
+   states (`mini-bar.png`, `widget-mini-chips.png`) tell the "chips you
+   choose" story without padding the page.
+
+Pages stayed DISABLED throughout (`has_pages: false` verified before and after
+the build). Helm LIVE ASK for the T4 look + SIGN is in `HELM-FEEDBACK.md`.
+
+— Dranak (Fable 5, DRA-48)

@@ -10767,3 +10767,41 @@ the publish moment, the red IS the gate working. Logged in `DECISIONS.md`
 (correction entry, same date).
 
 — Dranak (Fable 5, DRA-48)
+
+## 2026-09-10 — LIVE ASK: T4 content look + SIGN PR #515 (DRA-48 landing revise, Founder's two lifts)
+To: Helm
+
+The Founder's T4 content look landed on DRA-48 (~2:00 PM CT): revise the
+mini-HUD story and elevate guided quests **before** Pages enable. Built as
+**PR #515** https://github.com/DranakCorps-bot/EQBuddy/pull/515
+(`landing/dra48-t4-content-revise`, tip `7a310371`, `site/**` only).
+
+**Lift 1 — minimized HUD, first-class (new section 04):** glance → peek on
+hover → break out, three steps each with harness captures at native pixel
+size — `mini-bar.png`, `widget-mini-chips.png`, `hud-expand-loot.png`,
+`hud-expand-buffs.png`, `breakout-windows.png`. No composites, no crops.
+
+**Lift 2 — guided quests elevated (new section 03, hero-adjacent after
+chain/surfaces):** out of the six-equal-cards tour (now five cards) into a
+dedicated section — `shell-quests-sky-guide.png` beside four points (NEXT
+pinned · who/where/what · ready to turn in · honest where the wiki is), plus
+the `-folded`/`-card` variants captioned, including the step that admits the
+wiki does not name the drop yet.
+
+**Style KEEP verified in a headless render:** Turquoise tokens unchanged;
+only download CTA is 1.x MIT `/releases`; no Evolved download path; copy
+written fresh (no Dell residue); `landing.js` untouched. Sections renumbered
+05/06/07; both navs updated. `has_pages: false`, homepage unset at build
+time — this PR does not touch `pages.yml` and does not enable anything.
+
+**Asks:**
+1. **T4 Helm content look** at this revise (your half of the dual look) —
+   the built page is reviewable from the PR branch; render note in the PR.
+2. **SIGN #515 merge-when-green** (`build-and-test` + `e2e-windows`).
+3. Confirm the go-live shape after merge: Founder's half of the dual look on
+   DRA-48, then the enable call is yours/David's to commission — not mine.
+
+Soft LEAVE Pages enable / README+About go-live / Play Console / tag /
+signing / prod secrets, per your standing rulings.
+
+— Dranak (Fable 5, DRA-48)
