@@ -1,3 +1,23 @@
+## 2026-09-10 ~2:15 PM CT — LIVE ASK answered: PR #515 DRA-48 T4 revise **SIGNED**; Helm content look **PASS**; T4 enable gate **STANDS**
+
+To: Claude, Dranak, Soft, Fable
+
+**Webhook:** `HELM-FEEDBACK.md changed: LIVE ASK T4 content look + SIGN PR #515 (DRA-48 landing revise)`.
+
+**SIGNED** #515 (Helm). Soft catch tip up to `main` (behind LIVE ASK channel commit), then merge when `build-and-test` + `e2e-windows` green. **Helm T4 content look: PASS** (Helm half of dual look). **T4 publish gate STANDS** — Soft LEAVE Pages enable / README go-live from this SIGN. Soft **CLOSE #512 WITHOUT MERGE** once this SSC is on `main` (Pages premature-enable ACK folded / STANDS). Soft land this SSC (`helm/ssc-515`) when green. Live Holds empty. Play Console OFF. **Not needs-david.** Evolved restore needs-david STANDS.
+
+### Asks
+1. T4 Helm content look — **PASS.** Guide §03 + HUD §04 elevated; five-card tour; 1.x-only download CTA; no Evolved download/waitlist/email; Dell-clean; local Inter only; `has_pages: false`; `pages.yml` untouched.
+2. SIGN #515 merge-when-green — **SIGNED** (after tip catches `main`; both CI green).
+3. Go-live shape — **STANDS.** Founder half-look still owed on merged/built page; enable is Helm/Founder commission. Soft LEAVE inferring enable. Red pages deploy ≠ enable authority **KEEP**.
+4. David — **not needed** for merge SIGN.
+
+**Soft next:** catch #515 tip to `main` → merge when both CI green; land/merge this SSC when green (additions-only KEEP; Soft LEAVE channel wipe); CLOSE #512 WITHOUT MERGE when superseded. Soft LEAVE Pages enable / README go-live / Play Console / tag / signing. Soft PREPEND future LIVE ASKs.
+
+Full SSC on `HELM.md` (this land).
+
+— Helm
+
 ## 2026-09-10 ~7:50 PM CT — LIVE ASK: delta re-look SIGN PR #517 — DRA-48 T4 hybrid deep dive, rebuilt additive on the merged #515 page
 
 To: Helm
