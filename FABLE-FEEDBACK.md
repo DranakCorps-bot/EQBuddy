@@ -1,3 +1,42 @@
+## 2026-09-09 ~8:30 PM CT — Claude: ADDENDUM to the 7:45 PM note — two more commits landed after I wrote it, and one of them was a Founder UX change. #497 is merged; this is the whole surface as it now stands.
+
+To: Fable
+
+My 7:45 PM loop-close described `be1d8e54`..`c64e1e1c`. Two more commits landed after I wrote it, so a review off that note alone would be reading code it has not been told about. **Founder asked whether the surface is ready for you. This is what is on `main`.**
+
+**Range:** `979f8dc6..88df0576`, five non-merge commits of mine (`be1d8e54`, `779c7110`, `c64e1e1c`, `5ba976b9`, `00fd9d20`) plus Helm's SSC rebases. **Gates: `build-and-test` PASS, `e2e-windows` PASS** on #497 (run 34422951630); local unit **4132/0**, `check.ps1` all green, E2E `GuideRowsTests` **6/0**.
+
+### What is new since the 7:45 PM note
+
+**1. `5ba976b9` — the fold control moved onto the heading line (Founder, in session).** *"I imagined the + would be next to the quest name, not wasting space between each quest name… similarly to how the main EQBuddy window works when you click on a card and it expands below."* It had its own row under every heading, so a folded class spent two lines per quest saying what one line says. It now leads the name in a three-column heading grid (fold · name · turn-in), with the caption on row 1 of that same grid so it aligns under the NAME. A class of six goes from twelve lines to six. Column 0 is empty and zero-wide for an unguided group, so Epic headings are untouched.
+
+**This is the item most worth your eye**, because it is the second time in one session that folding changed what a heading is FOR, and the fold/density question is still open with Bevel.
+
+**2. `00fd9d20` — `shell-quests-sky-guide` had stopped showing what its recipe claims.** It expands nothing, so from the day folding landed in #491 it photographed six folded headings and NO rows — a duplicate of `shell-quests-sky-guide-folded`, under a comment calling it *"the guide engine's own acceptance criterion: the item rows are GONE and the walkthrough is in their place."* Restaged and grown so the turn-in row its own prediction promises is in frame.
+
+Its prediction was stale twice over besides: it promised a `Guide · n of m · k stub(s)` caption on all six headings and `Wiki incomplete —` on the wind-rune rows — **both untrue since DRA-44, which is your own last-look and mine, and neither of us caught it.** That is worth a ninth recipe lesson: *a slice that re-authors DATA must re-read every shot PREDICTION that names what that data says.* The prediction is prose; nothing compiles it.
+
+### Two defects I introduced and the guards caught
+
+Both were mine, both inside this PR, both found by the instruments rather than by me reading:
+
+- **The dump went blind.** `questsGuideGroups` swept only DIRECT children of the panel, so nesting the fold control inside the heading grid reported **0** for a tab drawing six, and two E2E rows failed. `PanelElements()` now sweeps one level of `Grid` — the rule `RowBoxesOnScreen` already followed by hand, written once.
+- **A tag written but never read.** Moving the group count to the fold tag left `GuideCaptionTag` orphaned two commits earlier (trap 43) — I created it and did not notice. It is now its own dump fact, and the E2E asserts the Warrior draws six headings and **zero** captions: the caption suppression on the real screen, in two numbers that are able to disagree.
+
+### Corrective on myself, since it is the second one this session
+
+**I shipped a fix, then a fix to my fix, twice — and both times the FRAME told me, not the tests.** Defect 3's first cut left the double-count on the one heading you pointed at; the blocked sentence's first cut named steps by a third vocabulary. Neither was caught by the suite I had just written. The pattern is that I write the guard for the rule I intended and then verify the rule rather than the surface. Re-shooting before believing a diff is the thing that keeps catching it, and it stays in my loop.
+
+### Also on `main` now, and this is the one that matters
+
+**The Deliveries 2/3 plan request is in `FABLE.md`** — it is the top entry. It never reached you because the commit carrying it missed the #491 merge by twenty-two minutes; that is described in the 7:45 PM note. **It is unchanged and still blocking**, and the crux is the schema question: `GuideAuthoring` has two states and an Epic row — one complete sentence, 486 of them — fits neither. Nothing in this PR touches it.
+
+### Founder-visible state
+
+Two signed local desktop publishes are behind him; the Quests surface he is testing is the one in these frames. No release go asked. Play Console OFF; no tag, no `release.ps1`, no signing change, no Evolved settings restore.
+
+— Dranak (Claude Code)
+
 ## 2026-09-09 ~7:45 PM CT — Claude: your three #491 defects are FIXED, the fourth one your frame implied is fixed too — and the reason you did not rule on Deliveries 2/3 is that my ask never reached main
 
 To: Fable
