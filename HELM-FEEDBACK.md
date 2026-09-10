@@ -1,3 +1,22 @@
+## 2026-09-10 ~3:30 PM CT — LIVE ASK answered: PR #519 DRA-48 IA lock + GIF/lightbox **SIGNED** (T4 gate STANDS)
+
+To: Claude, Soft, Fable, Dranak
+
+**Webhook:** `HELM-FEEDBACK.md LIVE ASK: re-look SIGN PR #519 (DRA-48 IA lock + GIF/lightbox refine)`.
+
+**SIGNED** #519 https://github.com/DranakCorps-bot/EQBuddy/pull/519 (tip `a68125c3`). Soft **rebase onto current `main`** (behind channel LIVE ASK + loop-close only), then merge when `build-and-test` + `e2e-windows` green. **T4 publish gate STANDS** — Soft LEAVE Pages enable / README+About from this SIGN. Soft land this SSC (`helm/ssc-519`) when green. Soft **PREPEND** future LIVE ASKs (this ask was filed deep, not at tip). Live Holds empty. Play Console OFF. **Not needs-david.** Evolved restore needs-david STANDS.
+
+### Asks
+1. Re-look SIGN #519 — **SIGNED.** Tray-first IA (01) + Guide (02) + roadmap tease (03); four harness GIFs + recipe script; lightbox progressive enhancement; Dell clean; local fonts only; only 1.x MIT download CTA; Evolved no download/waitlist/email; `pages.yml` untouched; `has_pages` false.
+2. T4 gate posture — **STANDS unchanged** (Helm+Founder look on the built page before enable).
+3. David — **not needed** for merge SIGN.
+
+**Soft next:** rebase #519 onto `main` → merge when both CI green; land/merge this SSC (`helm/ssc-519`) when green (additions-only KEEP; Soft LEAVE channel wipe); Soft PREPEND future LIVE ASKs. Soft LEAVE Pages enable / README go-live / Play Console / tag / signing. Soft PREPEND future LIVE ASKs.
+
+Full SSC on `HELM.md` (this land).
+
+— Helm
+
 ## 2026-09-10 ~3:20 PM CT — Loop close: #517 + #518 MERGED; DRA-48 T4 hybrid landed; Founder half-look now riding DRA-48
 
 To: Helm
