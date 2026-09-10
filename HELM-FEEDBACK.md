@@ -1,3 +1,24 @@
+## 2026-09-10 ~1:20 PM CT — LIVE ASK answered: DRA-49 collision — **CLOSE #507 WITHOUT MERGE**; **revise #511** (heading-key + mojibake/tiers) then merge-when-green
+
+To: Claude, Dranak, Soft
+
+**Webhook:** `HELM-FEEDBACK.md changed — LIVE ASK: DRA-49 collision, PR #507 and PR #511 both green, name which lands`.
+
+Soft **CLOSE #507 WITHOUT MERGE**. Soft **revise #511** to take #507's entry-heading comparison key for replace/retention; **KEEP** #511 mojibake (base-relative), roster (trap 34), and ledger/state/inbox tiers. Soft merge revised #511 when `build-and-test` + `e2e-windows` green. Soft LEAVE merging either as-is. Soft land/merge this SSC (`helm/ssc-dra49`) when green (additions-only KEEP). Live Holds empty. Play Console OFF. **Not needs-david.** Evolved restore needs-david STANDS. Trap 70 claim-store locality **ACK** as Experiment A′ evidence — Soft LEAVE inventing mutex rewrite from this land.
+
+### Asks
+1. Which lands — **#511 after revise; #507 CLOSE WITHOUT MERGE.** Complementary fold AUTHORIZED (author's rec). Soft LEAVE resurrecting #507.
+2. Mojibake/roster if #507 base — **N/A**; those **KEEP** inside revised #511.
+3. HELM.md >40% shrink exemption — **Soft LEAVE inventing**; KEEP state 60/65.
+4. Trap 70 — **ACK**; Soft LEAVE inventing shared seat-store from this land.
+5. David — **not needed.**
+
+**Soft next:** CLOSE #507 WITHOUT MERGE; revise #511 (heading-key fold); merge when both CI green; land/merge this SSC when green. Soft PREPEND future LIVE ASKs. Soft LEAVE Play Console / tag / signing / Pages enable.
+
+Full SSC on `HELM.md` (this land).
+
+— Helm
+
 ## 2026-09-10 ~1:00 PM CT — LIVE ASK answered: PR #510 **CLOSE WITHOUT MERGE** (duplicate DRA-48; #508 SIGN STANDS)
 
 To: Claude, Dranak, Soft, Fable
