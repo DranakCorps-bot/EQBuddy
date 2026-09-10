@@ -21,25 +21,62 @@ public static class GuidePresentation
     public const string StubLead = "Wiki incomplete —";
 
     /// <summary>
-    /// What a reward PAYS, for the heading's hover: the item you end up with and the pieces
-    /// it costs.
+    /// What a reward PAYS, in ONE LINE: the item you end up with and the pieces it costs.
     ///
     /// <para>The question a player scanning a folded list is actually asking is "what do I
     /// get" (David, 2026-09-09), and on a collapsed heading the item rows that used to answer
     /// it are not on screen. Built from the reward's own checklist rows, so it says what the
-    /// quest costs rather than a number.</para></summary>
+    /// quest costs rather than a number.</para>
+    ///
+    /// <para>This is the SHORT answer, and it survives beside <see cref="RewardCard"/>
+    /// because the two are different facts rather than two copies of one: a line that fits
+    /// under every heading on a phone, and the item's own stats block.</para></summary>
     public static string RewardSummary(string reward, IReadOnlyList<SkyQuestChecklistItem> items)
+    {
+        var head = "Rewards the " + reward + ".";
+        var cost = RewardCost(items);
+        return cost.Length == 0 ? head : head + " " + cost;
+    }
+
+    /// <summary>
+    /// The reward item's OWN STATS BLOCK, and under it the pieces it costs — the answer to
+    /// "is this worth doing".
+    ///
+    /// <para>The Founder, 2026-09-10, on what he had meant by "the hover should show the
+    /// reward": *"show the reward as it does in EQLWiki or when we mouse over any item in
+    /// EQBuddy."* The item window, not a description of it. "AC: 15, STR +16, Class: WAR" is
+    /// what decides whether a Sky quest is worth the evening; "Rewards the Azure Ruby Ring"
+    /// only repeats the heading the cursor is already sitting on.</para>
+    ///
+    /// <para><b>The block is quoted verbatim and never composed.</b> It is the game's own
+    /// item window as wiki editors transcribed it, and the shipped <c>ItemCatalog</c> already
+    /// carries it for exactly this purpose ("stats on hover", 2026-08-13) — so this costs no
+    /// request to eqlwiki, works offline, and cannot drift from what a live lookup of the
+    /// same revision would say. Re-wording it here would be inventing game data with a
+    /// citation attached (trap 73).</para>
+    ///
+    /// <para>Empty when we have no block, and the caller falls back to
+    /// <see cref="RewardSummary"/> rather than showing a blank. Two of the 95 Sky rewards are
+    /// in that state today and both are OUR naming bugs, not gaps in the wiki.</para></summary>
+    public static string RewardCard(string? statsText, IReadOnlyList<SkyQuestChecklistItem> items)
+    {
+        var block = (statsText ?? "").Trim();
+        if (block.Length == 0) return "";
+
+        var cost = RewardCost(items);
+        return cost.Length == 0 ? block : block + "\n\n" + cost;
+    }
+
+    /// <summary>The pieces a reward costs, as a sentence — the one part of the hover that is
+    /// about the QUEST rather than about the item.</summary>
+    private static string RewardCost(IReadOnlyList<SkyQuestChecklistItem> items)
     {
         var pieces = items
             .Select(i => i.QuestItem.Trim())
             .Where(n => n.Length > 0)
             .Distinct(StringComparer.OrdinalIgnoreCase)
             .ToList();
-
-        var head = "Rewards the " + reward + ".";
-        return pieces.Count == 0
-            ? head
-            : head + " Needs " + string.Join(", ", pieces) + ".";
+        return pieces.Count == 0 ? "" : "Needs " + string.Join(", ", pieces) + ".";
     }
 
     /// <summary>What the fold control says it will do. A collapsed quest shows its heading,

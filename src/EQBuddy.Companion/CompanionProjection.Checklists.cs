@@ -165,7 +165,8 @@ public static partial class CompanionProjection
             Title: g.Title,
             Card: GuideCard(g),
             Collapsed: g.Collapsed,
-            Reward: g.RewardSummary.Length > 0 ? g.RewardSummary : null)));
+            Reward: g.RewardSummary.Length > 0 ? g.RewardSummary : null,
+            RewardCard: g.RewardCard.Length > 0 ? g.RewardCard : null)));
 
         return new CompanionChecklistSection(
             scoped.Sum(g => g.Done), scoped.Sum(g => g.Total), groups);

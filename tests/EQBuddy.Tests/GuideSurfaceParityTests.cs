@@ -131,6 +131,56 @@ public sealed class GuideSurfaceParityTests : IDisposable
         Assert.Equal(desktop.Rows.Select(r => r.Acquired), phone.Rows.Select(r => r.Done));
     }
 
+    /// <summary>
+    /// The reward item's stats block reaches BOTH screens, with the SAME words — and on the
+    /// phone it arrives whether the quest is folded or open, because there the PAGE decides
+    /// when to show it.
+    ///
+    /// <para>Trap 35, and the shape of its answer here. The desktop hangs the block on a
+    /// hover, which costs a folded list nothing. A phone cannot hover at all (David,
+    /// 2026-09-10: *"mouse over on mobile won't work well"*), and drawing eight lines of item
+    /// stats under every heading would bury exactly the folded list folding exists to give —
+    /// so the reward LINE became the control and a tap opens the block in place. That is a
+    /// page decision, so the payload carries the block unconditionally and this asserts the
+    /// PAYLOAD; which blocks a reader has opened is a fact about their device, not about the
+    /// character, and never reaches the profile.</para>
+    ///
+    /// <para><b>Independent of the fold on purpose.</b> "What does this pay" and "show me the
+    /// steps" are different questions, and the Founder chose to let the phone answer the
+    /// first without committing to the second.</para></summary>
+    [Fact]
+    public void TheRewardsStatsBlockReachesBothScreensFoldedOrOpen()
+    {
+        var settings = Settings();
+        var ledger = Store();
+
+        var folded = Desktop(settings, ledger).Single(g => g.CompletionKey == RewardKey);
+        var phoneFolded = PhoneGroup(Phone(settings, ledger), folded.Heading);
+
+        // The block is real, and it is the ITEM's own words rather than a sentence about it.
+        Assert.True(folded.Collapsed);
+        Assert.Contains("Slot:", folded.RewardCard, StringComparison.Ordinal);
+        Assert.DoesNotContain("Rewards the", folded.RewardCard, StringComparison.Ordinal);
+        // ...and what it COSTS is on the end, which is the quest's half of the answer.
+        Assert.Contains("Needs Stone Amulet", folded.RewardCard, StringComparison.Ordinal);
+
+        // Same words on the phone, and the one-LINE summary is still there as the control
+        // the reader taps — the two are different facts and both travel.
+        Assert.Equal(folded.RewardCard, phoneFolded.RewardCard);
+        Assert.Equal(folded.RewardSummary, phoneFolded.Reward);
+
+        settings.GuideExpanded.Add(RewardKey);
+
+        var open = Desktop(settings, ledger).Single(g => g.CompletionKey == RewardKey);
+        var phoneOpen = PhoneGroup(Phone(settings, ledger), open.Heading);
+
+        Assert.False(open.Collapsed);
+        // NOTHING about the block moved when the steps opened. That is the independence the
+        // Founder asked for, stated as behaviour rather than as a comment.
+        Assert.Equal(folded.RewardCard, open.RewardCard);
+        Assert.Equal(phoneFolded.RewardCard, phoneOpen.RewardCard);
+    }
+
     [Fact]
     public void TheGuideCaptionReadsTheSameOnBothScreens()
     {

@@ -213,6 +213,13 @@
   .gcard { border:1px solid var(--hairline); border-radius:8px; padding:10px 12px; margin:6px 0 10px; }
   .gcard .lead { font-size:11px; color:var(--accent); letter-spacing:.06em; }
   .reward { font-size:12px; color:var(--dim); margin:2px 0 6px; }
+  /* The reward item's own stats block, as the game prints it: preserved newlines and a
+     monospace face, because "WIS: +9  MANA: +60" is a column and not a sentence. */
+  .rcard { font-size:11.5px; color:var(--text); margin:2px 0 8px; white-space:pre-wrap;
+           font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+           border-left:2px solid var(--hairline); padding-left:8px; }
+  /* The reward line is the control that opens the block, so it has to look pressable. */
+  .reward.tap { cursor:pointer; text-decoration:underline dotted; text-underline-offset:2px; }
   .gcard .inst { font-weight:600; margin:2px 0 6px; }
   .gcard .gl { display:block; font-size:12px; color:var(--dim); margin-top:2px; }
   .gcard .warn { display:block; font-size:12px; margin-top:6px; }
@@ -592,6 +599,12 @@ const FIRST_RUN = innerWidth >= 900
   : ["spawns", "session"];
 
 const $ = id => document.getElementById(id);
+// Which reward stats blocks the reader has tapped open. EPHEMERAL and per-viewer: it is
+// not a fact about the character, so it belongs on this device and not in the profile the
+// way GuideExpanded does. It survives a repaint - the page re-renders on every snapshot,
+// and a block that closed itself every tick would be unusable.
+const rewardCardsOpen = new Set();
+
 const el = (tag, cls, text) => {
   const e = document.createElement(tag);
   if (cls) e.className = cls;
@@ -1782,7 +1795,45 @@ function boot() {
       // What this quest pays. The desktop hangs it on the heading's hover; a phone has no
       // hover, so it is drawn - and on a folded quest it is the only thing that answers
       // "what do I get" (trap 35).
-      if (g.reward) wrap.appendChild(el("div", "reward", g.reward));
+      //
+      // TAP IT for the item's own stats block. The desktop shows that on the same hover;
+      // the phone cannot hover at all (David, 2026-09-10: "mouse over on mobile won't work
+      // well"), and drawing eight lines of stats under every heading would bury exactly the
+      // folded list folding exists to give. So the phone asks: the line is the control, and
+      // it opens IN PLACE, independent of whether the quest's steps are open.
+      if (g.reward) {
+        const line = el("div", "reward", g.reward);
+        if (g.rewardCard) {
+          const key = g.heading || g.title || "";
+          const open = () => rewardCardsOpen.has(key);
+          line.classList.add("tap");
+          line.setAttribute("role", "button");
+          line.setAttribute("tabindex", "0");
+          const card = el("div", "rcard", g.rewardCard);
+          // OPEN, the line shrinks to the item's NAME. The card under it already says what
+          // the quest costs, and the summary would be the same sentence twice, one line
+          // apart - the caption double-count Bevel caught on the desktop, arriving on the
+          // phone by a different door. The line stays because it is the control.
+          const short = g.title || g.heading || g.reward;
+          const sync = () => {
+            card.style.display = open() ? "block" : "none";
+            line.textContent = open() ? short : g.reward;
+            line.setAttribute("aria-expanded", open() ? "true" : "false");
+            line.title = open() ? "Hide the item's stats" : "Show the item's stats";
+          };
+          const toggle = () => {
+            if (open()) rewardCardsOpen.delete(key); else rewardCardsOpen.add(key);
+            sync();
+          };
+          line.onclick = toggle;
+          line.onkeydown = (e) => {
+            if (e.key === "Enter" || e.key === " ") { e.preventDefault(); toggle(); }
+          };
+          sync();
+          wrap.appendChild(line);
+          wrap.appendChild(card);
+        } else wrap.appendChild(line);
+      }
       // FOLDED: heading, note and reward, and nothing else. A whole class fits on one
       // screen and you open the one you are working on.
       if (g.collapsed) continue;
