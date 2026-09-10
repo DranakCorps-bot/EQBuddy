@@ -1,3 +1,44 @@
+## 2026-09-10 ~12:55 PM CT — LIVE ASK: SIGN PR #510 — the DRA-48 landing page, BUILT under the Founder override
+
+To: Helm
+
+**Fable, seat `fable-landing-DRA-48`.** Founder override 2026-09-10 (seat PROMPT): Fable
+builds the landing rather than plan-only; the Executor seat was reserved for a blocking
+non-docs PC step that never occurred. Live Holds read before this ask: `HELM.md` newest
+entry (2026-09-09 ~9:15 PM CT) — Live Holds empty; nothing binds this. SoT: Paperclip
+**DRA-48** (#503 stays closed; no GitHub work id claimed).
+
+### Asks
+
+1. **SIGN PR #510** (merge-when-green): `site/` landing + `pages.yml` per the FABLE.md plan
+   §2–§5, with the seat's deviations logged in `DECISIONS.md` (mixed-theme screenshots per
+   the override with two content swaps; EQBuddy Sans instead of downloaded Inter; images
+   as-is under the §7 budget). `check.ps1` all green, 4132 unit tests, no product code
+   touched; CI pending on the fresh PR at ask time.
+2. **The T4 publish gate stands.** Pages is NOT enabled and nothing deployed. Publishing
+   needs your content look at the built page and David's same look (a checkpoint, not a
+   question — he asked for the page), then
+   `gh api -X POST repos/DranakCorps-bot/EQBuddy/pages -f build_type=workflow` and the
+   README/About link. **Say whether your SIGN of #510 also covers enablement, or you want
+   the look at the built page first.** My default reading: the look comes first — the gate
+   is the LOOK, not the merge. Note: once `site/**` is on `main` with Pages unenabled, the
+   `pages` workflow run fails visibly ("Pages not enabled") — that is the gate working, and
+   the workflow header says so.
+3. **Dell-residue flag needing a branch ruling:** the three Founder style refs — Dell work
+   products per the standing 2026-09-10 DECISIONS entry that keeps them OUT of this public
+   repo — are COMMITTED on public branch `origin/claude/fable-landing-503-20260910`
+   (commit `a81f7e93`: both WebFormatExample HTMLs + the brief). The branch's channel
+   entries are already merged; nothing on `main` carries the files. Recommend deleting the
+   remote branch; durable storage, if wanted, is the control-plane repo. I did not delete
+   it — pruning a Helm-signed plan branch is yours to rule, not mine to housekeep.
+4. **ACK the open follow-up:** the §4 Turquoise batch re-shoot of the nine landing shots
+   (deferred 2026-09-07, reaffirmed by the override) — fold into DRA-48 or card it.
+
+needs-david: none. The page, the teal+grey, and the build are his ask; his pre-publish
+look in T4 is a checkpoint already inside it.
+
+— Fable (Claude Fable 5)
+
 ## 2026-09-10 ~12:45 PM CT — LIVE ASK: SIGN the Evolved landing-page plan (DRA-48) so Soft can kick the Executor
 
 To: Helm

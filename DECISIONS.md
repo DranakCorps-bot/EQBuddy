@@ -1,3 +1,40 @@
+## 2026-09-10 (Fable, DRA-48 landing BUILD under Founder override — the calls made alone)
+
+**The seat built instead of planning** — Founder override in the seat PROMPT ("you build the
+Evolved GitHub HTML landing — not plan-only"), so the 12:40 PM plan's Fable-plans/Executor-
+implements split did not apply to this seat. PR #510. The T4 publish gate was NOT overridden:
+Pages stays unenabled and no deploy happened.
+
+**Screenshots are the committed mixed-theme set, not a Turquoise re-shoot.** The override
+says "Desktop shoots only if critically missing — note gaps." Gap noted: 7 of the 9 landing
+images are the amber theme, 2 are Turquoise; the plan §4 Turquoise batch re-shoot remains
+the open T3 follow-up, and the page says on-face that shots span the app's built-in themes.
+The default it could have gone the other way on: run the batch now — declined because the
+re-shoot was already deferred by the 2026-09-07 decision and the override names it optional.
+
+**Two shots swapped for CONTENT, not theme:** the plan named `shell-world.png` (an
+empty-state capture — "No maps folder found") and `shell-progress.png` (five summary lines).
+The landing uses `map-window.png` (camps + spawn timers drawn on the zone map) and
+`shell-progress-history.png` (stored sittings + level/AA charts) — the same surfaces with
+real state, both existing committed captures with recipes. A landing image of an empty
+surface fails the shot's own purpose (trap 22's lesson applied in reverse).
+
+**Fonts are the repo's own EQBuddy Sans TTFs, not a downloaded Inter woff2.** Plan D5's
+intent is "the landing of a never-phones-home product should not phone Google on first
+paint"; the app's brand font (OFL Noto derivative, `src/EQBuddy/Fonts`) keeps that intent
+with zero new dependencies and one brand voice. `OFL.txt` ships beside the files in
+`site/assets/fonts/` because the OFL travels with the font.
+
+**Images copied as-is — no WebP/resize pipeline.** Total page weight is ~1.3 MB with every
+below-hero image `loading="lazy"`, under the plan §7 ≤1.5 MB budget. An optimization pass
+is later work, not a gate; adding a converter toolchain for 200 KB was the other way it
+could have gone.
+
+**Trap 7 re-confirmed while verifying:** Edge headless floors the CSS viewport at 492 px,
+so a `--window-size=360` capture is a crop, not a 360 px layout. The 360 px claim rests on
+the 730 px-breakpoint arithmetic (2.1–3 rem heading clamp in a 320 px content column) plus
+the 492 px render showing no breakage.
+
 ## 2026-09-10 (Fable, DRA-48 landing plan — one call made alone)
 
 **The Founder's two HTML style examples stay uncommitted, permanently.** The DRA-48 brief

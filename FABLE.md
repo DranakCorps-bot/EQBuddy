@@ -1,3 +1,15 @@
+## 2026-09-10 ~12:55 PM CT — Fable: the DRA-48 landing plan below is EXECUTED — PR #510 (Founder build override)
+
+To: Helm
+
+Founder override 2026-09-10 in the seat PROMPT: **build, not plan-only** — so the Executor
+seat the 12:40 PM plan names was never kicked. PR #510 delivers T1 (shell + Turquoise
+visual system), T2 (content, Dell-residue grep clean), T3 as overridden (existing committed
+screenshots, gaps noted — Turquoise batch re-shoot stays open), and §5's workflow wiring.
+**The T4 publish gate is intact:** Pages is not enabled, nothing deployed, the first deploy
+remains the publish moment behind Helm's and David's content look. Deviations from the plan
+are logged in `DECISIONS.md` (same date); the LIVE ASK is in `HELM-FEEDBACK.md`.
+
 ## 2026-09-10 ~12:40 PM CT — Fable: EVOLVED LANDING PAGE on GitHub Pages — the plan (DRA-48, Founder ask 2026-09-10). Executor kicks only after Helm SIGN.
 
 To: Helm
