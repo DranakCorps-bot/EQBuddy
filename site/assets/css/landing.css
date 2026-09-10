@@ -341,6 +341,90 @@ figcaption.cap, .cap { font-size: 12.5px; color: var(--muted); margin-top: 8px; 
 .badge.observed { background: rgba(111, 191, 127, 0.16); color: var(--good); border: 1px solid rgba(111, 191, 127, 0.4); }
 .badge.estimated { background: rgba(224, 160, 48, 0.14); color: var(--warn); border: 1px solid rgba(224, 160, 48, 0.4); }
 
+/* ---------- 03 The Guide (DRA-48 T4 revise) ---------- */
+.guidehero {
+  display: grid;
+  grid-template-columns: 1.15fr 1fr;
+  gap: 20px;
+  align-items: start;
+  margin-bottom: 20px;
+}
+.guidehero > .shot { margin: 0; }
+.guidepoints { display: flex; flex-direction: column; }
+.gp {
+  padding: 16px 20px;
+  border: 1px solid var(--line);
+  background: var(--panel);
+  position: relative;
+}
+.gp:first-child { border-radius: var(--radius) var(--radius) 0 0; }
+.gp + .gp { border-top: 0; }
+.gp:last-child { border-radius: 0 0 var(--radius) var(--radius); }
+.gp::before {
+  content: "";
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 3px;
+  background: var(--accent2);
+  opacity: 0.65;
+}
+.gp .stage {
+  display: block;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+.gp p { margin: 5px 0 0; color: var(--muted); font-size: 14.5px; }
+.gp p strong, .gp p em { color: var(--text); }
+
+/* ---------- 04 HUD story (DRA-48 T4 revise) ---------- */
+.hudstory { display: flex; flex-direction: column; }
+.hudstep {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  gap: 26px;
+  padding: 22px 24px;
+  border: 1px solid var(--line);
+  background: var(--panel);
+  align-items: center;
+  position: relative;
+}
+.hudstep:first-child { border-radius: var(--radius) var(--radius) 0 0; }
+.hudstep + .hudstep { border-top: 0; }
+.hudstep:last-child { border-radius: 0 0 var(--radius) var(--radius); }
+.hudstep::before {
+  content: "";
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 3px;
+  background: var(--accent2);
+  opacity: 0.65;
+}
+.hudlabel .stage {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+.hudlabel h3 { margin: 5px 0 4px; font-size: 18px; }
+.hudlabel p { margin: 0; color: var(--muted); font-size: 14.5px; }
+/* Harness captures at their native pixel size — never stretched to the column */
+.stripstack { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+.shot.strip { margin: 0; border: 0; border-radius: 0; background: none; overflow: visible; }
+.shot.strip img {
+  width: auto;
+  max-width: 100%;
+  height: auto;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+}
+.peekrow { display: flex; flex-wrap: wrap; gap: 14px; min-width: 0; }
+.peekrow .shot { margin: 0; }
+.peekrow .shot img { width: auto; max-width: 100%; }
+
 /* ---------- Today / downloads ---------- */
 .dl .card h3 { font-size: 19px; }
 .btn {
@@ -410,12 +494,14 @@ a { color: var(--accent); }
   .dotnav { display: none; }
   .grid.cols3 { grid-template-columns: repeat(2, 1fr); }
   .kpis { grid-template-columns: repeat(2, 1fr); }
+  .guidehero { grid-template-columns: 1fr; }
 }
 @media (max-width: 730px) {
   .topbar { max-width: calc(100vw - 20px); overflow-x: auto; }
   .topbar a.nav { padding: 5px 7px; }
   .grid.cols3, .grid.cols2 { grid-template-columns: 1fr; }
   .layer { grid-template-columns: 1fr; gap: 6px; padding: 16px 18px; }
+  .hudstep { grid-template-columns: 1fr; gap: 14px; padding: 16px 18px; }
   section { padding: 64px 0 28px; }
   .hero { padding-top: 130px; min-height: 0; }
   .closing { padding: 30px 22px; }
@@ -425,8 +511,8 @@ a { color: var(--accent); }
 @media print {
   .backdrop, #progress, .topbar, .dotnav { display: none; }
   body { background: #fff; color: #111; }
-  .card, .layer, .closing, .kpi { background: #fff; border-color: #ccc; box-shadow: none; }
-  .card p, .layer p, .sub, .kpi .l, .cap { color: #444; }
+  .card, .layer, .closing, .kpi, .gp, .hudstep { background: #fff; border-color: #ccc; box-shadow: none; }
+  .card p, .layer p, .sub, .kpi .l, .cap, .gp p, .hudlabel p { color: #444; }
   .grad { color: #0a6e63; -webkit-text-fill-color: #0a6e63; }
   a { color: #0a6e63; }
 }
