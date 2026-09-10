@@ -1,3 +1,39 @@
+## 2026-09-10 (the reward hover shows the ITEM — the calls I made alone)
+
+**1. The hover quotes the item's stats block VERBATIM from the shipped `ItemCatalog`, and
+never composes one.** The Founder asked for "the reward as it does in EQLWiki or when we mouse
+over any item in EQBuddy". The catalog already carries the game's own item window as wiki
+editors transcribed it, and its own doc comment says it exists for "stats on hover"
+(2026-08-13) — so this is local, works offline, and **costs eqlwiki nothing**, which matters
+because request-rate policy toward a third party is the Founder's call and not mine. Measured
+before building: **93 of 95 Sky rewards have a block**. The default it could have gone the
+other way on: fetch live through `EqlWikiItemService` on hover, which is prettier for the two
+misses and would have put a network request behind a mouse movement.
+
+**2. The two rewards with no block are NAMED in a test rather than counted.** `Harmonic Spear`
+(eqlwiki titles it `Spear of Harmony`) and `Windhowl/Spirit Render` (two rewards jammed into
+one string). Both are OUR naming bugs, already deferred to Delivery 2. A bare count would let a
+third join them silently; naming them means the day one is fixed the test FAILS and someone
+looks. **These bugs now cost a player something visible for the first time** — a Bard and a
+Beastlord get a sentence where everyone else gets the item window.
+
+**3. `RewardSummary` and `RewardCard` are two fields, not one.** They are different facts: a
+LINE that fits under every heading on a phone, and the item's stats block. Folding one into the
+other would have made the phone choose between burying its own folded list and having no answer
+to "what do I get".
+
+**4. On the phone the reward LINE is the control, and tapping it opens the block in place.**
+The Founder chose this (asked with the question tool) over "desktop only" and over "show it on
+an opened quest". It is independent of the quest's fold on purpose: *what does this pay* and
+*show me the steps* are different questions. Which blocks a reader has opened lives in the PAGE
+and never reaches the profile — it is a fact about that device, not about the character, so
+unlike `GuideExpanded` it is not persisted.
+
+**5. Open, the phone's reward line shrinks to the item NAME.** Caught in the harness, not in
+review: with the block open, the line's "Needs Glowing Diamond, Efreeti War Horn…" and the
+card's own last line said the same sentence one line apart — the caption double-count Bevel
+found on the desktop, arriving on the phone through a different door.
+
 ## 2026-09-10 (Fable, DRA-48 landing BUILD — calls made alone under the Founder override)
 
 **1. Ship with the committed mixed-theme screenshots; the Turquoise re-shoot stays a

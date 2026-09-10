@@ -132,7 +132,17 @@ public sealed record QuestChecklistGroup(
     /// <summary>What this quest PAYS, for the heading's hover: the reward and the pieces it
     /// costs. A player scanning a collapsed list is deciding what to work on next, and
     /// "what do I get" is the question that decides it.</summary>
-    string RewardSummary = "")
+    string RewardSummary = "",
+    /// <summary>The reward item's OWN STATS BLOCK, verbatim from the shipped item catalog,
+    /// with the pieces it costs under it — what the game's item window shows, which is what
+    /// the Founder meant by "the hover should show the reward" (2026-09-10). Empty where we
+    /// have no block for the item, and the surface falls back to
+    /// <see cref="RewardSummary"/> rather than drawing a blank.
+    ///
+    /// <para>Separate from <see cref="RewardSummary"/> because they are different facts, not
+    /// two copies of one: the summary is a LINE that fits under every heading on a phone,
+    /// this is a block that would bury a folded list if it were drawn the same way.</para></summary>
+    string RewardCard = "")
 {
     /// <summary>"Bard · Mask of Song" — what a heading reads as.</summary>
     public string Heading => ClassName + " · " + Title;

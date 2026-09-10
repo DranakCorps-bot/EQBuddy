@@ -305,7 +305,18 @@ public sealed record CompanionChecklistGroup(
     /// <summary>What this quest pays. The desktop puts it on the heading's hover; a phone has
     /// no hover, so it is drawn (trap 35) — and on a folded row it is the only thing that
     /// answers "what do I get".</summary>
-    string? Reward = null);
+    string? Reward = null,
+    /// <summary>The reward item's own stats block — what the desktop hangs on the heading's
+    /// hover.
+    ///
+    /// <para><b>The page decides when to show it, and it starts hidden.</b> A phone cannot
+    /// hover (David, 2026-09-10: "mouse over on mobile won't work well"), and eight lines of
+    /// item stats under every heading would bury exactly the folded list folding exists to
+    /// give — so the reward LINE is the control and a tap opens the block in place, whether
+    /// or not the quest's steps are open. Sent whenever we have one, because which blocks a
+    /// reader has opened is a fact about that device and not about the character: it lives in
+    /// the page, not in the profile the way <c>GuideExpanded</c> does.</para></summary>
+    string? RewardCard = null);
 
 /// <summary>The phone's half of the active-step card. Every field arrives worded; a null or
 /// empty one simply is not drawn, so a step that answers three of the six questions shows

@@ -225,6 +225,46 @@ public sealed class GuidePresentationTests
             GuidePresentation.RewardSummary("Runed Wind Amulet", []));
     }
 
+    /// <summary>
+    /// The hover shows the ITEM, not a sentence about it (David, 2026-09-10: *"show the
+    /// reward as it does in EQLWiki or when we mouse over any item in EQBuddy"*).
+    ///
+    /// <para>The block is quoted VERBATIM — asserted here character for character, including
+    /// the double spaces the game uses to column its stat pairs. Anything that re-flowed or
+    /// re-worded it would be inventing game data behind a citation (trap 73), and the wiki's
+    /// own spacing is the only reason a monospace face makes it read as the item
+    /// window.</para></summary>
+    [Fact]
+    public void TheRewardCardIsTheItemsOwnStatsBlockQuotedVerbatim()
+    {
+        var items = new List<SkyQuestChecklistItem>
+        {
+            new() { QuestItem = "Stone Amulet" },
+            new() { QuestItem = "Wind Rune Azia" },
+        };
+        const string block = "MAGIC ITEM  LORE ITEM  NO DROP\nSlot: FINGERS\nAC: 15\n"
+            + "STR: +16  DEX: +19\nWT: 0.1  Size: TINY\nClass: WAR\nRace: ALL";
+
+        var card = GuidePresentation.RewardCard(block, items);
+
+        Assert.StartsWith(block, card, StringComparison.Ordinal);
+        // The one line that is about the QUEST rather than the item, under a blank line.
+        Assert.EndsWith("\n\nNeeds Stone Amulet, Wind Rune Azia.", card, StringComparison.Ordinal);
+        // Nothing was re-worded into it: no sentence about the reward.
+        Assert.DoesNotContain("Rewards the", card, StringComparison.Ordinal);
+    }
+
+    /// <summary>No block, no card — and the caller falls back rather than drawing a blank
+    /// hover. Two of the 95 Sky rewards are in that state, so this is a shipped path and not
+    /// a defensive branch.</summary>
+    [Fact]
+    public void ARewardWeHaveNoStatsBlockForGetsNoCardAtAll()
+    {
+        Assert.Equal("", GuidePresentation.RewardCard(null, []));
+        Assert.Equal("", GuidePresentation.RewardCard("", []));
+        Assert.Equal("", GuidePresentation.RewardCard("   \n  ", []));
+    }
+
     /// <summary>A stub answers the one question it can. A labelled list of blanks reads as a
     /// broken row rather than an honest one.</summary>
     [Fact]
