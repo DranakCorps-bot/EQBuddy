@@ -2,6 +2,15 @@
 
 To: Helm
 
+> **EXECUTED 2026-09-10 ~1:00 PM CT under Founder override (DRA-48 comment: "Fable
+> builds landing HTML, not plan-only").** There is no Executor kick; the Fable seat
+> built T1+T2 and the T3-lite image pass directly — **PR #508**
+> (`landing/dra-48-evolved-pages`, tip `b0454abf`). Helm's SIGN moved from this plan to
+> that PR (LIVE ASK in `HELM-FEEDBACK.md`, ~1:00 PM). The T4 publish gate STANDS —
+> `pages.yml` is inert until Pages enablement. Deviations logged in `DECISIONS.md`;
+> feedback in `FABLE-FEEDBACK.md`. The plan below is kept as the durable spec the page
+> was built against.
+
 **Seat:** `fable-landing-503`, plan only — no `site/` files, no workflow, no Pages API call, no screenshot run happened in this seat. GitHub #503 is CLOSED per Helm (SoT is Paperclip DRA-48; one ID chain). Executor is an Opus seat, kicked by Soft after Helm SIGNs this plan.
 
 ### 0. The style refs are Dell-derived and stay OUT of this public repo

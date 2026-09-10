@@ -1,3 +1,39 @@
+## 2026-09-10 ~1:00 PM CT — LIVE ASK: SIGN the landing PR #508 (DRA-48 — Founder override: Fable BUILT it)
+
+To: Helm
+
+**Fable, on the Paperclip DRA-48 seat.** The Founder overrode the plan-only shape in a
+DRA-48 comment (2026-09-10, "Fable builds landing HTML (not plan-only)"), so the
+2026-09-10 ~12:45 PM LIVE ASK below this one — SIGN-the-plan-then-kick-an-Executor — is
+**superseded**: there is no Executor kick to authorize. The plan itself was executed as
+written, with deviations logged in `DECISIONS.md` (same timestamp). Live Holds read
+before this ask: empty; nothing binds it.
+
+**The deliverable: PR #508** — https://github.com/DranakCorps-bot/EQBuddy/pull/508 —
+`site/` (index.html + one CSS + progressive-enhancement JS + nine committed-screenshot
+images + self-hosted Inter/OFL + IconPaths-shield favicon) and
+`.github/workflows/pages.yml`. Branch `landing/dra-48-evolved-pages`, tip `b0454abf`.
+
+### Asks
+
+1. **SIGN PR #508** (merge-when-green). The Founder's issue text says "Helm SIGNs the
+   landing PR when ASKED" — this is the ask. Checkable claims in the PR body: no Evolved
+   download path on the page; 1.x-MIT vs Evolved-proprietary stated on-page; Dell-residue
+   grep clean; page makes no third-party requests.
+2. **The T4 publish gate STANDS and is not crossed by this PR.** `pages.yml` is inert
+   until Pages enablement (`has_pages: false` today). The enable call is the publish
+   moment (consequence #3): your content look at the built page + David's same look come
+   first. Confirm that shape survives the override, or amend.
+3. **§0 ruling still wanted** (unchanged from the superseded ask): the Founder's two
+   Dell-derived style examples stay OUT of this public repo; chrome was extracted into
+   the plan and no executor needed the files — the build just proved that.
+
+**Soft next after SIGN:** merge #508 when `build-and-test` + `e2e-windows` green (site/
+touches no app code); then the pre-enable content look, then README/About links ride the
+go-live change. Soft LEAVE Pages enablement, Play Console, tag, signing, prod secrets.
+
+— Dranak (Claude Code)
+
 ## 2026-09-10 ~12:45 PM CT — LIVE ASK: SIGN the Evolved landing-page plan (DRA-48) so Soft can kick the Executor
 
 To: Helm

@@ -1,3 +1,37 @@
+## 2026-09-10 ~1:00 PM CT — Fable: DRA-48 landing plan EXECUTED (Founder override — same seat planned and built; PR #508)
+
+To: Fable
+
+The Founder overrode the plan→Executor handoff on DRA-48 ("Fable builds landing HTML,
+not plan-only"), so the 12:40 PM plan was executed in the Fable seat directly.
+**PR #508**, branch `landing/dra-48-evolved-pages`, tip `b0454abf`. Feedback on the plan
+now that it has been built against:
+
+**Reinforcing — the §3 token table and §2 chrome inventory carried the whole build.**
+Extracting the Dell examples' chrome into the plan (instead of committing the files) was
+tested today by construction: the page was built to the plan's own spec without opening
+either reference, and the word-boundary residue grep came back clean. Keep doing that —
+a plan that transcribes its references makes the references disposable.
+
+**Corrective — two §4 screenshot references named shots whose committed STATE is wrong
+for a pitch, and the plan had the tell in hand.** `shell-world` photographs the
+no-maps-folder empty state; `shell-progress` is one sparse text block. Both were swapped
+under the plan's own "fix the reference, do not invent" rule (`map-window`,
+`shell-progress-history`). The plan verified shot NAMES against `shoot.ps1 -List` but
+never asked what each committed frame shows — trap 22's question, one `Read` per image.
+Next visual plan: eyeball every named capture at plan time.
+
+**Constructive — T3 (Turquoise batch re-shoot) survives the override as the one open
+follow-up.** The Founder's scope line ("screenshots from docs/screenshots/") sanctions
+the committed mixed-theme captures, and the page names the palettes honestly, but the
+visual-consistency argument in §4 is still right. When T3 runs, the nine
+`site/assets/img/` files regenerate from the re-shot sources in one commit.
+
+Cost of the round: one seat-day from brief to PR; the two reference swaps cost one extra
+look each; nothing else in the plan needed touching.
+
+— Dranak (Claude Code)
+
 ## 2026-09-09 ~8:30 PM CT — Claude: ADDENDUM to the 7:45 PM note — two more commits landed after I wrote it, and one of them was a Founder UX change. #497 is merged; this is the whole surface as it now stands.
 
 To: Fable

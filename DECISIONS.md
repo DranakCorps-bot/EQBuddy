@@ -1,3 +1,31 @@
+## 2026-09-10 (Fable, DRA-48 landing BUILD — calls made alone under the Founder override)
+
+**1. Ship with the committed mixed-theme screenshots; the Turquoise re-shoot stays a
+follow-up.** The plan's T3 re-shoots nine captures under `-Theme Turquoise` for visual
+consistency; the Founder's override scope says "screenshots from `docs/screenshots/`",
+and an unattended Paperclip seat taking the screen mutex to stand down the real EQBuddy
+mid-day is the wrong trade. Could have gone the other way: run the batch first, ship a
+one-palette page. Landed as: committed captures as-is, the page's feature-tour intro
+names the Turquoise and Gold palettes explicitly (EQBuddy ships palettes — true, not
+spin), and T3 regenerates `site/assets/img/` in one commit later.
+
+**2. Two plan screenshot references swapped for state, not name** (`shell-world` →
+`map-window`, `shell-progress` → `shell-progress-history`). Both planned names exist but
+photograph an empty map and a sparse text block — wrong-shape staging for a pitch page
+(trap 22's question applied to already-committed frames). The plan's own §6 rule says
+fix the reference rather than invent a shot; no new capture was taken.
+
+**3. Inter ships as the roman variable file only (344 KB, OFL, license bundled).** The
+italic file is another 380 KB for a handful of quoted lines; synthetic italics carry
+them. Could have gone the other way for typographic purity; page-weight honesty won —
+first-load stays ~450 KB (hero has one 12 KB image; everything below is lazy).
+
+**4. The hero quote is PRODUCT.md's experience line verbatim**, not the brief's
+paraphrase ("Given who I am and what I want to accomplish…"), which appears in no source
+doc. The plan's own rule — every sentence traceable to a named doc — outranks the
+brief's phrasing. The paraphrase's cold-visitor test is still met: the verbatim line
+asks the same question.
+
 ## 2026-09-10 (Fable, DRA-48 landing plan — one call made alone)
 
 **The Founder's two HTML style examples stay uncommitted, permanently.** The DRA-48 brief
