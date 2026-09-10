@@ -41,6 +41,28 @@ jobs:
       - name: Evolved 2.x stays local-only
         run: pwsh -NoProfile -File scripts/evolved-channel-guard.ps1
 
+      # The channel ledgers (HELM.md, HELM-FEEDBACK.md and their siblings) may not be
+      # emptied, truncated or wholesale-replaced by a pull request. Three times in six
+      # days a commit whose message said it was signing something destroyed one instead —
+      # PR #493 and the 2026-09-10 amend deleted both HELM files outright, and each needed
+      # a restore commit. CLAUDE.md already carried the rule; trap 60(c) ended "No guard
+      # yet; that is a named hole". THIS is the copy that does not depend on an agent
+      # remembering the rule while its automation lands an empty tree.
+      #
+      # On a pull_request the checkout is the merge result, so the base sha below asks the
+      # only question that matters: what would landing this do to the ledgers? The guard
+      # fails OPEN with a loud SKIPPED line when no base resolves (fetch-depth: 0 above is
+      # what keeps that from being the normal case).
+      - name: Channel ledgers are never wiped, truncated or replaced
+        run: >
+          pwsh -NoProfile -File scripts/channel-wipe-guard.ps1
+          -BaseRef "${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || github.event.before }}"
+
+      # Its prove-fail, in a throwaway repo under RUNNER_TEMP: every check above driven
+      # into the red at least once. A wipe guard nobody has watched refuse is trap 34.
+      - name: Channel wipe guard refuses each violation
+        run: pwsh -NoProfile -File scripts/channel-wipe-guard-selftest.ps1
+
       # Experiment A′ self-test (trap 70, EQBuddy lab): default second claim on
       # one work item must refuse. Throwaway StoreDir; not the live claims.
       - name: Soft seat claims refuse a duplicate default

@@ -841,6 +841,67 @@ page, rather than a marketing table where EQBuddy sweeps every row — the
 eqlwiki-is-the-source posture made visible to a cold visitor. The one hard cross is
 the other-players row, worded as principle, not gap.
 
+## 2026-09-10 (DRA-49 EXO-HARDEN-A1 — the channel wipe guard, calls made alone)
+
+All of these are pre-authorized: tooling and gates, no consequence-list door. Stated as
+assumptions at the top and logged here for the veto.
+
+**1. The guard is TIERED, and the inboxes get no percentage check at all.** The obvious
+build is one rule for "channel files". It is wrong: `*-FEEDBACK.md` files are append-only
+ledgers, `HELM.md` is state whose whole job includes LIFTING holds, and `FABLE.md` /
+`BEVEL.md` / `SCRIBE.md` are inboxes whose documented workflow is *"when you take an item,
+delete it."* A single threshold would have to be loose enough for the loosest of the three,
+which means loose enough to miss `7b804338` — the 2026-09-04 truncation, at 81%. **The
+default it could have gone the other way on:** one rule, one number, simpler to explain.
+It landed tiered because the measurement said the tiers are real — a drained `FABLE.md` is
+9.5% of its former length (`d091939b`) and that is CORRECT, while 81% on a ledger is an
+incident.
+
+**2. The thresholds were measured before they were chosen.** All 1,379 revisions of the
+eleven rostered files were scored for length and line-retention first. This was most of the
+work and none of the deliverable, and it is the reason I will defend the numbers: on the
+ledger tier the only clean revisions below 95% are the truncation and one encoding repair,
+with the nearest legitimate value at 95.5%. **What would reverse it:** any legitimate
+workflow that regularly rewrites a ledger — the archive exemption exists so that the one I
+can foresee does not.
+
+**3. No `-Force`, no `-Skip`, no allow-list.** Same posture as `release.ps1` having no
+`-SkipSign`: an escape hatch on a guard whose entire subject is *"an automated land
+destroyed the file"* is the automated land's next move, and both wipes were landed by
+automation whose commit message said it was signing something. The two legitimate reasons a
+ledger shrinks are MECHANISMS instead — an archive move (the lost lines are found under
+`docs/ops/claude-archive/`) and an encoding repair (fewer mojibake markers at full length).
+You satisfy them by doing the right thing, not by asserting that you did. **The default it
+could have gone the other way on:** a `-Force` switch plus a review convention, which is
+cheaper to add and is exactly what nobody would have been holding at 11pm.
+
+**4. Existing mojibake is NOT re-litigated.** `HELM-FEEDBACK.md` carries 13,411
+double-encoded markers today across 31 commits. A guard that failed on them would be
+unpassable from the first PR and would be turned off within a day, so the check is
+base-relative: only NEW damage fails. **What would reverse it:** a repair pass that cleans
+the file, after which an absolute check becomes affordable. That repair is NOT in this
+change — it is a large, reviewable diff of its own, and doing it here would have hidden the
+guard inside it.
+
+**5. It compares the WORKING TREE by default, not `HEAD`.** So a wipe fails in
+`check.ps1` before it is ever committed, which is where the cheapest possible correction
+is. CI passes the PR base sha explicitly; the merge-result checkout is what makes that the
+right question.
+
+**One thing deliberately NOT done, and it is a named hole rather than an oversight:** trap
+60(c), the silently truncated append, still has no guard. A note that lost every backticked
+identifier to Bash still diffs additions-only and still retains 100% of the base's lines.
+Nothing here can see it. Filing it as a follow-up rather than widening this card is the
+same call trap 60(b) made in September — and that entry sat while three files got wiped, so
+the follow-up is worth naming out loud rather than assuming somebody picks it up.
+
+**Correcting the record while I am here:** trap 60(b) closed by estimating the write-side
+damage at "446 lines already committed." Measured on 2026-09-10 it is 13,411 markers in
+`HELM-FEEDBACK.md` alone. The corruption compounds, because the input to each rewrite is
+the output of the last one — `Ã¢â‚¬` is a second round trip and `Ã‚Â¢Ã¢â‚¬Å¡Â¬` is a third.
+
+— Dranak (Claude Code)
+
 ## 2026-09-10 (Fable, DRA-48 landing BUILD — calls made alone under the Founder override)
 
 **1. Ship with the committed mixed-theme screenshots; the Turquoise re-shoot stays a
