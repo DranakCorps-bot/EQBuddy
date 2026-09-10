@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>EQBuddy Evolved — Your Personalized Guide to Norrath</title>
+<meta name="description" content="EQBuddy Evolved is the personal, log-only companion for EverQuest Legends: private, local-first, and personal — never a way to measure other players. Current public downloads remain EQBuddy 1.x (MIT).">
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+<link rel="stylesheet" href="assets/css/landing.css">
+</head>
+<body>
+<div class="backdrop" aria-hidden="true"></div>
+<div id="progress" aria-hidden="true"></div>
+
+<nav class="topbar" aria-label="Page">
+  <a class="brand" href="#top"><img src="assets/favicon.svg" alt="" width="20" height="20">EQBuddy&nbsp;Evolved</a>
+  <a class="nav" href="#chain">The chain</a>
+  <a class="nav" href="#surfaces">Surfaces</a>
+  <a class="nav" href="#features">Features</a>
+  <a class="nav" href="#principles">Principles</a>
+  <a class="nav" href="#today">Get it</a>
+  <a class="nav gh" href="https://github.com/DranakCorps-bot/EQBuddy">GitHub</a>
+</nav>
+
+<nav class="dotnav" aria-label="Sections">
+  <a href="#top"><span>Top</span></a>
+  <a href="#chain"><span>01 · The chain</span></a>
+  <a href="#surfaces"><span>02 · Three surfaces</span></a>
+  <a href="#features"><span>03 · Feature tour</span></a>
+  <a href="#principles"><span>04 · Principles</span></a>
+  <a href="#today"><span>05 · Today, honestly</span></a>
+  <a href="#closing"><span>North star</span></a>
+</nav>
+
+<main>
+
+<!-- ================= Hero ================= -->
+<section class="hero" id="top">
+  <span class="eyebrow"><span class="pulse" aria-hidden="true"></span>EQBuddy Evolved — in development</span>
+  <h1>Your personalized guide to <span class="grad">Norrath</span></h1>
+  <p class="lead"><em>“EQBuddy understands who I am playing, what I can do, what I own,
+  what I am working on, how I actually perform, and where I have been — then quietly
+  helps me decide what to do next.”</em></p>
+  <div class="pillrow">
+    <span class="pill"><b>Log-only</b> — reads your /log file, nothing else</span>
+    <span class="pill"><b>Local-first</b> — no account, no cloud</span>
+    <span class="pill"><b>Personal</b> — not competitive</span>
+    <span class="pill"><b>Windows</b> + your phone on the LAN</span>
+  </div>
+  <div class="kpis reveal">
+    <div class="kpi"><div class="n">0</div><div class="l">game-memory reads — ever</div></div>
+    <div class="kpi"><div class="n">0</div><div class="l">accounts or cloud services required</div></div>
+    <div class="kpi"><div class="n">0</div><div class="l">telemetry by default</div></div>
+    <div class="kpi"><div class="n">11,000+</div><div class="l">items in the built-in offline catalog</div></div>
+  </div>
+</section>
+
+<!-- ================= 01 The chain ================= -->
+<section id="chain">
+  <div class="kicker"><span class="num">01</span><div class="rule"></div></div>
+  <h2>One question, answered from <span class="grad">your own play</span></h2>
+  <p class="sub">Not a generic “best in slot” list. EQBuddy connects what you already own
+  and have done into one personalized path — <strong>gear → quest → mob → camp →
+  route</strong> — learned from your own log.</p>
+
+  <div class="stack">
+    <div class="layer reveal">
+      <span class="stage">Own · Gear</span>
+      <div><h3>Gear</h3><p>Which attainable upgrades are meaningful for what you are
+      wearing now — and when a candidate becomes better than what you have.</p></div>
+    </div>
+    <div class="layer reveal">
+      <span class="stage">Work toward · Quest</span>
+      <div><h3>Quest</h3><p>Which quest or mob provides it, what you are working on, and
+      what you are already able to turn in.</p></div>
+    </div>
+    <div class="layer reveal">
+      <span class="stage">Hunt · Mob</span>
+      <div><h3>Mob</h3><p>Whether that content is realistic — judged from your own fight
+      history, not someone else’s.</p></div>
+    </div>
+    <div class="layer reveal">
+      <span class="stage">Sit · Camp</span>
+      <div><h3>Camp</h3><p>Spawn timers that learn from your kills — and know the
+      difference between an open-world camp and a raid instance.</p></div>
+    </div>
+    <div class="layer reveal">
+      <span class="stage">Travel · Route</span>
+      <div><h3>Route</h3><p>How to get there with travel you already unlocked.</p></div>
+    </div>
+    <div class="terminal reveal">
+      <p>I log into my character. EQBuddy recognizes the classes I am playing and
+      remembers what I unlocked before. When I want more, I open it — and it can tell me
+      which upgrades are meaningful, which mob or quest provides them, whether that
+      content is realistic from my own history, and how to get there.</p>
+      <span class="src">— the Evolved north star, abridged from
+      <a href="https://github.com/DranakCorps-bot/EQBuddy/blob/main/PRODUCT.md">PRODUCT.md</a></span>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 02 Three surfaces ================= -->
+<section id="surfaces">
+  <div class="kicker"><span class="num">02</span><div class="rule"></div></div>
+  <h2>The game is on your monitor.<br>Everything else goes <span class="grad">somewhere else</span></h2>
+  <p class="sub">Two coordinated desktop surfaces plus an optional mobile second screen.
+  The HUD earns space only for information that may change your next action within
+  seconds or minutes; research and review belong in the full app, or on the phone you
+  look <em>away</em> to.</p>
+
+  <div class="grid cols3">
+    <div class="card teal reveal">
+      <figure class="shot" style="max-width:220px"><img src="assets/img/hud-chips-deadlines.png"
+        width="193" height="171" alt="The EQBuddy HUD chip stack: a mez countdown, a spawn timer due, an assist call and a buff-expiry estimate"></figure>
+      <div class="role">EQBuddy HUD</div>
+      <h3>A glance, not a dashboard</h3>
+      <p>Small, movable, always-on-top while you play. Deadline information only —
+      mez and charm countdowns, spawn-due chips, watch alerts, buff expiry.</p>
+    </div>
+    <div class="card teal reveal">
+      <figure class="shot"><img src="assets/img/shell-home.png" loading="lazy"
+        width="946" height="633" alt="The full EQBuddy Windows application on its Home page, showing character readiness and navigation to Live, Progress, Gear, Quests and World"></figure>
+      <div class="role">Full Windows app</div>
+      <h3>One coherent shell</h3>
+      <p>Persistent primary navigation — Home, Live, Progress, Gear, Quests, World,
+      Search, Settings. One click to the domain; one more to the answer.</p>
+    </div>
+    <div class="card teal reveal">
+      <figure class="shot tall"><img src="assets/img/mobile-map-phone.png" loading="lazy"
+        width="1476" height="2532" alt="EQBuddy Mobile on a phone, showing the zone map for The Lair of the Splitpaw with spawn points and the player's position"></figure>
+      <div class="role">EQBuddy Mobile</div>
+      <h3>The second screen</h3>
+      <p>Optional and LAN-only, hosted by the Windows app — map and camps, tracked
+      quests, item and gear lookup, route guidance. Never a required account.</p>
+    </div>
+  </div>
+
+  <p class="interaction reveal"><b>Glance first</b><span class="sep">→</span><b>expand for
+  live detail</b><span class="sep">→</span><b>full application for analysis</b></p>
+</section>
+
+<!-- ================= 03 Feature tour ================= -->
+<section id="features">
+  <div class="kicker"><span class="num">03</span><div class="rule"></div></div>
+  <h2>What it already <span class="grad">does</span></h2>
+  <p class="sub">Captured from real builds with the repo’s own screenshot harness —
+  EQBuddy ships several palettes, so you will see the Turquoise and Gold themes below.
+  Character names are test fixtures.</p>
+
+  <div class="grid cols3">
+    <div class="card teal reveal">
+      <figure class="shot"><img src="assets/img/shell-quests-sky-guide.png" loading="lazy"
+        width="986" height="893" alt="The Quests page in Guide mode: a Plane of Sky reward broken into steps, with a ready-to-turn-in banner and per-step Done and Skip controls"></figure>
+      <h3>Quests &amp; Guide</h3>
+      <p>A tracker that flags what you are ready to turn in, with guided steps that say
+      who, where and what — every quest mirrors eqlwiki, and your discoveries flow back
+      as paste-ready wiki edits.</p>
+    </div>
+    <div class="card teal reveal">
+      <figure class="shot"><img src="assets/img/shell-gear.png" loading="lazy"
+        width="946" height="633" alt="The Gear page's Loot tab listing this session's drops with counts, alongside Wishlist and Inventory tabs"></figure>
+      <h3>Gear &amp; Loot</h3>
+      <p>A Gear Locker that compares every wearable you own per slot, your loot with
+      personal drop rates, and a wishlist that ticks itself as items arrive.</p>
+    </div>
+    <div class="card good reveal">
+      <figure class="shot"><img src="assets/img/shell-progress-history.png" loading="lazy"
+        width="946" height="633" alt="The Progress page's History tab: stored sessions on the left, level and AA progress charts on the right"></figure>
+      <h3>Progress</h3>
+      <p>Every session lands in a local, searchable history — experience, wealth,
+      faction, and level and AA charts across every sitting you have stored.</p>
+    </div>
+    <div class="card teal reveal">
+      <figure class="shot"><img src="assets/img/map-window.png" loading="lazy"
+        width="1936" height="1048" alt="The zone map for Clan Crushbone with learned spawn points circled and two named camps counting down on the right"></figure>
+      <h3>World</h3>
+      <p>Zone maps with your position from /loc, camps you have marked, and spawn
+      timers learned from your own kills counting down beside the map.</p>
+    </div>
+    <div class="card good reveal">
+      <figure class="shot"><img src="assets/img/shell-live.png" loading="lazy"
+        width="946" height="633" alt="The Live page showing this sitting's damage breakdown: totals, crit and accuracy rates, and per-ability rows with bars"></figure>
+      <h3>Live meters</h3>
+      <p>Damage, healing, pet and a fight timeline that draws every swing on one
+      canvas. Your numbers, nobody else’s — there is no party meter here.</p>
+    </div>
+    <div class="card warn reveal">
+      <figure class="shot"><img src="assets/img/shell-world-drops.png" loading="lazy"
+        width="946" height="633" alt="The World page's Drops tab: per-creature kill counts with observed drop rates, and drops the wiki doesn't know yet marked for contribution"></figure>
+      <h3>Kills &amp; Drops</h3>
+      <p>Observed personal drop rates per creature — the kill count is the denominator —
+      with exports, and drops eqlwiki doesn’t know yet flagged for a paste-ready page
+      edit.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 04 Principles ================= -->
+<section id="principles">
+  <div class="kicker"><span class="num">04</span><div class="rule"></div></div>
+  <h2>Hard lines — <span class="grad">these do not move</span></h2>
+  <p class="sub">The product is private, local, personal and non-judgmental. These are
+  not settings; they are what EQBuddy is.</p>
+
+  <div class="grid cols2">
+    <div class="card teal reveal">
+      <h3>Personal, not competitive</h3>
+      <p>EQBuddy measures the player using it. It is not a party or raid ranking tool,
+      a leaderboard, or a way to judge other people — and it never will be.</p>
+    </div>
+    <div class="card teal reveal">
+      <h3>Log-only and local-first</h3>
+      <p>No game-memory reads, no packet inspection, no gameplay automation, no
+      hidden-information extraction. No required account, no required cloud, no
+      telemetry by default. Your history stays on your machine unless you export it.</p>
+    </div>
+    <div class="card good reveal">
+      <h3>Evidence before confidence</h3>
+      <p>A precise-looking wrong number is worse than a clearly identified estimate.
+      Where a decision depends on it, EQBuddy distinguishes
+      <span class="badge observed">observed</span> from
+      <span class="badge estimated">estimated</span> — in the model first, in the UI
+      where it matters.</p>
+    </div>
+    <div class="card warn reveal">
+      <h3>No modal interruptions</h3>
+      <p>Looting a quest item is a dismissible toast or chip, not a dialog that steals
+      the fight. Proactive where useful, never noisy or intrusive.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 05 Today, honestly ================= -->
+<section id="today">
+  <div class="kicker"><span class="num">05</span><div class="rule"></div></div>
+  <h2>Today, <span class="grad">honestly</span></h2>
+  <p class="sub">Evolved is the direction, not a download yet. Here is exactly what you
+  can get right now, and under which license.</p>
+
+  <div class="grid cols2 dl">
+    <div class="card good reveal">
+      <div class="role">Available now</div>
+      <h3>Get EQBuddy 1.x — MIT</h3>
+      <p>The current public releases are the 1.x line: the always-on-top widget that
+      reads your log live — kills and DPS, fight timeline, loot, spawn timers, quest
+      tracker, Gear Locker and more. Final Linux and macOS 1.x builds stay downloadable
+      and usable (<a href="https://github.com/DranakCorps-bot/EQBuddy/releases/tag/v1.99.18">v1.99.18</a>
+      is the final legacy tag). Every release is code-signed.</p>
+      <a class="btn primary" href="https://github.com/DranakCorps-bot/EQBuddy/releases">Download 1.x from GitHub Releases</a>
+      <p class="lic">Published 1.x is and stays <code>MIT</code>. Nothing about Evolved
+      revokes those grants.</p>
+    </div>
+    <div class="card teal reveal">
+      <div class="role">In development</div>
+      <h3>Watch Evolved take shape</h3>
+      <p>EQBuddy Evolved (v2) is being built in the open in this repository — the shell,
+      the Guide, and the chain above. It is <strong>proprietary</strong>
+      (<a href="https://github.com/DranakCorps-bot/EQBuddy/blob/main/LICENSE-EVOLVED.md">LICENSE-EVOLVED.md</a>):
+      readable so the direction is checkable, not reusable. There is no Evolved download
+      and no date to promise you.</p>
+      <a class="btn ghost" href="https://github.com/DranakCorps-bot/EQBuddy">Watch the repository</a>
+      <a class="btn ghost" href="https://github.com/DranakCorps-bot/EQBuddy/discussions">Join the discussions</a>
+      <p class="lic">When something player-noticeable ships, it is in the release’s
+      What’s&nbsp;New — with the reporter credited by name.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ================= Closing ================= -->
+<section id="closing">
+  <div class="closing reveal">
+    <blockquote>“I should not have to understand EQBuddy’s internal windows, cards,
+    menus, files, or data pipelines to get that answer.”<br>
+    <span style="color:var(--muted);font-size:0.85em">— the last line of the north star.
+    That is EQBuddy Evolved.</span></blockquote>
+    <div class="links">
+      <a class="btn ghost" href="https://github.com/DranakCorps-bot/EQBuddy/blob/main/README.md">README</a>
+      <a class="btn ghost" href="https://github.com/DranakCorps-bot/EQBuddy/blob/main/EQBuddy-Evolved.md">The Evolved vision</a>
+      <a class="btn ghost" href="https://github.com/DranakCorps-bot/EQBuddy/blob/main/LEGACY-V1.md">How 1.x is preserved</a>
+      <a class="btn ghost" href="https://github.com/DranakCorps-bot/EQBuddy/discussions">Discussions</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <p>EQBuddy reads only the log file the game writes. It never reads game memory, never
+  phones home, and never measures other players.</p>
+  <p>EQBuddy Evolved © 2026 David Edwards — proprietary
+  (<a href="https://github.com/DranakCorps-bot/EQBuddy/blob/main/LICENSE-EVOLVED.md">license</a>).
+  Published EQBuddy 1.x remains
+  <a href="https://github.com/DranakCorps-bot/EQBuddy/blob/main/LICENSE">MIT</a>.
+  EQBuddy is a fan-made companion tool and is not affiliated with the publishers of
+  EverQuest Legends. Body text is set in
+  <a href="https://rsms.me/inter/">Inter</a> (SIL OFL, self-hosted — this page makes no
+  third-party requests).</p>
+</footer>
+
+</main>
+<script src="assets/js/landing.js" defer></script>
+</body>
+</html>
