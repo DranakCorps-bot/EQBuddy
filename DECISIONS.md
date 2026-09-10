@@ -33,6 +33,38 @@ unlike `GuideExpanded` it is not persisted.
 review: with the block open, the line's "Needs Glowing Diamond, Efreeti War Horn…" and the
 card's own last line said the same sentence one line apart — the caption double-count Bevel
 found on the desktop, arriving on the phone through a different door.
+## 2026-09-10 (Fable, DRA-48 T4 hybrid build — calls made alone, and the collision)
+
+**0. On finding #515 SIGNED mid-write — and merged moments later — the call was
+rebuild-additive, not self-close and not contest.** #517 was first built as a full
+rewrite before #515 was visible. The ~1:00 PM precedent closes a *duplicate* against a
+SIGNED sibling; #517 was not that — it carries the Founder's 2:05 PM IA lock (the
+deep-dive region), which #515's ~2:00 brief predates and its page lacks. Closing #517
+would orphan Founder-directed scope; contesting #515 would relitigate a Helm SIGN.
+When #515 merged while the ask was being drafted, the ordering question died, so the
+remaining right shape was built without asking: #517 force-pushed as a +377/−6
+additive delta that keeps the PASSED upper half verbatim and adds only section 06.
+Could have gone the other way: LIVE ASK first, rebuild after Helm named the order —
+one more Helm wake for an ordering that events had already fixed. Root cause logged:
+neither T4 seat ran `claim-seat.ps1 -WorkItem DRA-48` before building; the card-keyed
+claim (#506) exists precisely to make the second seat bounce.
+
+**1. Example 2's hosted Fira Code became a local Consolas/ui-monospace stack.** The
+style example loads Google Fonts; this page's footer promises "no third-party
+requests" and the #508 SIGN verified exactly that. Chrome fidelity lost a little; the
+promise stayed true with zero new bytes.
+
+**2. Worked-example evidence chosen by state, not name** (trap 22's question applied
+to committed frames): `gear-locker.png` over `gearloot-locker.png` (which photographs
+the empty no-dump state), `creature-kills.png` for the EXP question (the only
+committed frame showing xp-per-creature beside kills/hr). No new captures; the
+Turquoise re-shoot follow-up card is unchanged.
+
+**3. The scorecard names where the wiki wins.** The deep dive's source table gives
+"a wiki tab alone" the source-of-truth row and states the tie-breaker rule on the
+page, rather than a marketing table where EQBuddy sweeps every row — the
+eqlwiki-is-the-source posture made visible to a cold visitor. The one hard cross is
+the other-players row, worded as principle, not gap.
 
 ## 2026-09-10 (Fable, DRA-48 landing BUILD — calls made alone under the Founder override)
 
@@ -3408,5 +3440,61 @@ stays green). Repo `allow_auto_merge` stays on unless Helm objects.
 
 **Re-enable is one call** (`POST …/pages` with `build_type=workflow`) after the
 dual content look. That moment belongs to Helm + David, not Soft.
+
+— Dranak (Fable 5, DRA-48)
+
+## 2026-09-10 — DRA-48 T4 content revise (PR #515): three implementation calls
+
+Founder's two lifts built as PR #515. Calls that could have gone the other way,
+logged instead of asked (both consequence-list tests fail on each):
+
+1. **Section order — Guide 03, HUD 04.** The Founder's brief put the HUD lift
+   first in the list but said the Guide section goes "hero-adjacent after
+   chain/surfaces." Read the list order as priority of message, not page
+   order: the Guide answers the north-star question, so it leads.
+2. **The feature tour keeps five cards** after the Quests card lifts out — no
+   filler sixth invented to square the grid.
+3. **`mini-bar-chips.png` skipped** from the preferred-shots list: near-
+   duplicate of `mini-bar.png` (same chips, narrower). Two distinct minimized
+   states (`mini-bar.png`, `widget-mini-chips.png`) tell the "chips you
+   choose" story without padding the page.
+
+Pages stayed DISABLED throughout (`has_pages: false` verified before and after
+the build). Helm LIVE ASK for the T4 look + SIGN is in `HELM-FEEDBACK.md`.
+
+— Dranak (Fable 5, DRA-48)
+
+## 2026-09-10 — DRA-48 IA lock + GIF refine (PR #519): five implementation calls
+
+Founder's ~2:56 PM CT inject built as PR #519. Calls that could have gone the
+other way, logged instead of asked (each fails both consequence-list tests):
+
+1. **GIF recipe is a sibling script, not a shoot.ps1 fold.**
+   `scripts/record-tray-gifs.ps1` takes the same `eqbuddy-screen.lock` and
+   the same isolation/stand-down/relaunch shape, but its backdrop is TOPMOST
+   where shoot.ps1's deliberately is not — gdigrab records the SCREEN, so a
+   non-topmost backdrop recorded a browser (bookmarks bar and all) behind the
+   tray on the first take; PrintWindow never sees that. Folding two capture
+   methods behind one flag felt like trap 10's second product.
+2. **The hover clip ships the loot peek's NO-TARGET state on purpose.**
+   Staging a target-scope drop table needs wiki rates, and the profile seeds
+   no wiki cache — the app would fetch live eqlwiki and the clip would be a
+   picture of whatever it said that minute (trap 23). The no-target line is
+   deterministic, true, and is the exact sentence the smart-loot callout
+   quotes; the target-scope table rides the committed `hud-expand-loot.png`.
+3. **Section ids kept, numbers moved.** The IA lock reorders stories; keeping
+   `#hud`/`#guide`/`#dive` etc. stable means no external link or discussion
+   reference breaks. Rest-of-page order after the locked three: chain,
+   surfaces, features, dive, principles, today.
+4. **`breakout-windows.png` moved into the feature tour as a sixth card**
+   rather than going unused when its HUD step folded into the tray story.
+   The 09-10 entry above chose five cards over a FILLER sixth; a real
+   surface that just lost its home is not filler.
+5. **Roadmap tease tense guard written into the page itself** — "when any of
+   it ships, it ships in a release's What's New, not in a landing-page tense
+   change" — so the honest-coming-for-v2 framing survives future edits.
+
+Pages stayed untouched; the T4 publish gate STANDS. LIVE ASK for the #519
+re-look SIGN is in `HELM-FEEDBACK.md`.
 
 — Dranak (Fable 5, DRA-48)
