@@ -1,0 +1,42 @@
+# Deploys site/ (the public landing page) to GitHub Pages.
+#
+# This workflow only runs when site/** changes on main, so ordinary docs and
+# product commits never trigger a deploy. The site does NOT publish from /docs
+# — that would expose the whole internal docs tree as the site namespace.
+#
+# NOTE (DRA-48 / T4 gate): the first successful deploy is the PUBLISH moment.
+# Pages must be enabled with build_type=workflow first:
+#   gh api -X POST repos/DranakCorps-bot/EQBuddy/pages -f build_type=workflow
+# Until that enablement, the deploy job fails with "Pages not enabled" — that
+# is the gate working, not a broken workflow.
+name: pages
+
+on:
+  push:
+    branches: [main]
+    paths: ['site/**']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site/
+      - id: deployment
+        uses: actions/deploy-pages@v4

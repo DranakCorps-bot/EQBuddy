@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="EQBuddy Evolved — your personalized guide to Norrath. A private, log-only companion for EverQuest Legends that turns your own play into your next step.">
+<meta name="theme-color" content="#131C1C">
+<meta property="og:title" content="EQBuddy Evolved — Your personalized guide to Norrath">
+<meta property="og:description" content="Given who I am and what I want to accomplish, what should I do next? A private, log-only, local-first companion for EverQuest Legends.">
+<meta property="og:image" content="https://dranakcorps-bot.github.io/EQBuddy/assets/img/shell-quests-sky-guide.png">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="stylesheet" href="assets/site.css">
+<title>EQBuddy Evolved — Your Personalized Guide to Norrath</title>
+</head>
+<body>
+<div class="bg" aria-hidden="true"></div><div class="progress" id="progress"></div>
+
+<header class="topbar">
+  <div class="brand">
+    <div class="mark" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M20.5 3l-.16.03L15 5.1 9 3 3.36 4.9c-.21.07-.36.25-.36.48V20.5c0 .28.22.5.5.5l.16-.03L9 18.9l6 2.1 5.64-1.9c.21-.07.36-.25.36-.48V3.5c0-.28-.22-.5-.5-.5ZM15 19l-6-2.11V5l6 2.11V19Z"/></svg></div>
+    <span class="brand-text">EQBuddy Evolved</span>
+  </div>
+  <div class="actions">
+    <a class="btn hide-mobile" href="https://github.com/DranakCorps-bot/EQBuddy">GitHub</a>
+    <a class="btn btn-primary" href="https://github.com/DranakCorps-bot/EQBuddy/releases">Get EQBuddy 1.x (MIT)</a>
+  </div>
+</header>
+
+<nav class="nav" aria-label="Page sections">
+  <a href="#overview" data-label="Overview" aria-label="Overview"></a>
+  <a href="#chain" data-label="The chain" aria-label="The chain"></a>
+  <a href="#surfaces" data-label="Three surfaces" aria-label="Three surfaces"></a>
+  <a href="#tour" data-label="Feature tour" aria-label="Feature tour"></a>
+  <a href="#principles" data-label="Principles" aria-label="Principles"></a>
+  <a href="#today" data-label="Today" aria-label="Today"></a>
+  <a href="#close" data-label="Close" aria-label="Close"></a>
+</nav>
+
+<main>
+
+<section class="section hero" id="overview"><div class="inner reveal">
+  <div class="eyebrow"><span class="dot"></span>EQBuddy Evolved — in development</div>
+  <h1>Your personalized <span class="gradient">guide to Norrath</span></h1>
+  <p class="lead"><span class="q">&ldquo;Given who I am and what I want to accomplish, what should I do next?&rdquo;</span><br>
+  EQBuddy Evolved is a companion for EverQuest Legends that answers that question from your own play &mdash; it reads your log file, and nothing else.</p>
+  <div class="pills">
+    <span class="pill">Log-only</span>
+    <span class="pill">Local-first</span>
+    <span class="pill">Personal, not competitive</span>
+    <span class="pill">Windows + your phone</span>
+  </div>
+  <div class="kpis">
+    <div class="kpi"><div class="num">0</div><div class="label">game-memory reads, packet inspections, or automations &mdash; the log is the only input</div></div>
+    <div class="kpi"><div class="num">0</div><div class="label">accounts &mdash; no sign-up, no required cloud service, no telemetry by default</div></div>
+    <div class="kpi"><div class="num">1</div><div class="label">question every surface serves: what should I do next?</div></div>
+    <div class="kpi"><div class="num">3</div><div class="label">surfaces &mdash; a small in-game HUD, the full Windows app, and a phone on your LAN</div></div>
+  </div>
+</div></section>
+
+<section class="section" id="chain"><div class="inner">
+  <div class="heading reveal"><div class="section-no">01</div><div>
+    <div class="kicker">The guidance chain</div>
+    <h2 class="title">One personalized path, learned from your own play</h2>
+    <p class="subtitle">Not a generic best-in-slot list. The useful answer is the upgrade you can actually get, from content that is realistic given <em>your</em> history, reached with travel you already unlocked.</p>
+  </div></div>
+  <div class="stack reveal">
+    <article class="layer" data-step="1"><div class="layer-icon">GE</div><div><h3>Gear</h3><p>What you own and what is worth chasing &mdash; your bags, your wishlist, and what dropped for you, read from the files the game itself writes.</p></div><span class="stage">Own</span></article>
+    <article class="layer" data-step="2"><div class="layer-icon">QU</div><div><h3>Quest</h3><p>The quest that carries the upgrade &mdash; your tracker, Epic 1.0 and Plane of Sky checklists, with turn-ins that tick themselves when the loot lands.</p></div><span class="stage">Work toward</span></article>
+    <article class="layer" data-step="3"><div class="layer-icon">MO</div><div><h3>Mob</h3><p>Who actually drops it &mdash; observed personal drop rates from your own kills, with what eqlwiki doesn&rsquo;t know yet flagged for sharing back.</p></div><span class="stage">Hunt</span></article>
+    <article class="layer" data-step="4"><div class="layer-icon">CA</div><div><h3>Camp</h3><p>Where it spawns and when it&rsquo;s due &mdash; camps you&rsquo;ve marked and spawn timers from your kills, drawn on the zone map.</p></div><span class="stage">Sit</span></article>
+    <article class="layer" data-step="5"><div class="layer-icon">RO</div><div><h3>Route</h3><p>How to get there &mdash; with travel you already unlocked, not a teleport you don&rsquo;t have.</p></div><span class="stage">Travel</span></article>
+  </div>
+  <div class="term reveal"><strong>The north star (PRODUCT.md)</strong>
+    <p>&ldquo;I log into my character. EQBuddy recognizes the classes I am playing and remembers what I unlocked before. &hellip; It can tell me which attainable upgrades are meaningful, which mob or quest provides it, whether that content is realistic from my own history, and how to get there with travel I already unlocked.&rdquo;</p>
+  </div>
+</div></section>
+
+<section class="section" id="surfaces"><div class="inner">
+  <div class="heading reveal"><div class="section-no">02</div><div>
+    <div class="kicker">Three surfaces</div>
+    <h2 class="title">Small while you play. Full when you want the answer.</h2>
+    <p class="subtitle">The HUD earns space only for information that may change the next action within seconds or minutes. Research, comparison, planning, and review belong in the full app. The phone is a second screen you look <em>away</em> to.</p>
+  </div></div>
+  <div class="route-grid reveal">
+    <div class="route-node">
+      <b>EQBuddy HUD</b>
+      <span>A deadline with an action, small enough to ignore: mez/charm chips, spawn-due, watch alerts, buff expiry.</span>
+      <figure class="shot"><img src="assets/img/hud-chips-deadlines.png" alt="EQBuddy HUD chips: a spawn timer counting down, a camp due now, an assist call, and a buff-expiry estimate" loading="lazy" width="192" height="169"><figcaption>The HUD &mdash; timers and alerts, nothing else</figcaption></figure>
+    </div>
+    <div class="route-node">
+      <b>Full Windows application</b>
+      <span>One coherent shell: Home &middot; Live &middot; Progress &middot; Gear &middot; Quests &middot; World &middot; Search &middot; Settings.</span>
+      <figure class="shot"><img src="assets/img/shell-home.png" alt="EQBuddy's Home room: character readiness, one-click /outputfile commands, the recent session, and doors to every other room" loading="lazy" width="946" height="633"><figcaption>Home &mdash; your character, your readiness, your doors</figcaption></figure>
+    </div>
+    <div class="route-node">
+      <b>EQBuddy Mobile</b>
+      <span>A LAN-only second screen hosted by the Windows app &mdash; map and camps, tracked quests, lookups. No account, no cloud.</span>
+      <figure class="shot shot-tall"><img src="assets/img/mobile-map-phone.png" alt="EQBuddy Mobile on a phone: the zone map for The Lair of the Splitpaw with spawn points and the player's position from /loc" loading="lazy" width="1476" height="2532"><figcaption>Your phone, on your LAN &mdash; nothing leaves the house</figcaption></figure>
+    </div>
+  </div>
+  <p class="flowline reveal"><b>Glance first</b><span class="arrow">&rarr;</span><b>expand for live detail</b><span class="arrow">&rarr;</span><b>full application for analysis</b></p>
+</div></section>
+
+<section class="section" id="tour"><div class="inner">
+  <div class="heading reveal"><div class="section-no">03</div><div>
+    <div class="kicker">Feature tour</div>
+    <h2 class="title">Every major capability has one obvious home</h2>
+  </div></div>
+  <div class="grid">
+    <article class="card accent-teal reveal"><h3>Quests &amp; Guide</h3>
+      <p>Epic and Plane of Sky checklists with a guided next step &mdash; who, where, and what, each step cited to eqlwiki. Loot the piece and the box ticks itself.</p>
+      <figure class="shot"><img src="assets/img/shell-quests-sky-guide.png" alt="The Guide room: Plane of Sky quest checklist with a NEXT step card, ready-to-turn-in banner, and per-step who/where directions" loading="lazy" width="986" height="893"><figcaption>Guide &mdash; the next step, not a wall of lore</figcaption></figure>
+    </article>
+    <article class="card accent-good reveal"><h3>Gear &amp; Loot</h3>
+      <p>What you&rsquo;re carrying, what you looted, what you still want &mdash; the wishlist ticks itself and quests know what you can turn in.</p>
+      <figure class="shot"><img src="assets/img/shell-gear.png" alt="The Gear room: this session's loot list with counts, wishlist and inventory tabs" loading="lazy" width="946" height="633"><figcaption>Gear &mdash; loot, wishlist, inventory</figcaption></figure>
+    </article>
+    <article class="card accent-warn reveal"><h3>Progress</h3>
+      <p>Every stored sitting: experience pace, wealth, faction, level-ups &mdash; your history, kept on your machine.</p>
+      <figure class="shot"><img src="assets/img/shell-progress-history.png" alt="The Progress room's History tab: three stored sessions with per-sitting kills, experience and coin, and level/AA charts" loading="lazy" width="946" height="633"><figcaption>Progress &mdash; what a sitting was worth</figcaption></figure>
+    </article>
+    <article class="card accent-teal reveal"><h3>World</h3>
+      <p>The zone map with your camps and spawn timers from your own kills &mdash; position from /loc, because EQBuddy reads only the log.</p>
+      <figure class="shot"><img src="assets/img/map-window.png" alt="The zone map for Crushbone: spawn points, named-mob camps with respawn countdowns, and the exit to Greater Faydark" loading="lazy" width="1936" height="1048"><figcaption>World &mdash; camps and spawn timers on the map</figcaption></figure>
+    </article>
+    <article class="card accent-good reveal"><h3>Live meters</h3>
+      <p>Damage, healing, pet, and the fight timeline &mdash; your numbers, nobody else&rsquo;s.</p>
+      <figure class="shot"><img src="assets/img/shell-live.png" alt="The Live room: this sitting's damage breakdown by ability with crit rates, accuracy, and casts" loading="lazy" width="946" height="633"><figcaption>Live &mdash; your performance, for you</figcaption></figure>
+    </article>
+    <article class="card accent-warn reveal"><h3>Kills &amp; Drops</h3>
+      <p>Observed personal drop rates per creature &mdash; and paste-ready wiki edits for the drops eqlwiki doesn&rsquo;t know yet.</p>
+      <figure class="shot"><img src="assets/img/shell-world-drops.png" alt="The Drops view: per-creature observed drop rates with kill counts as the denominator, and export buttons" loading="lazy" width="946" height="633"><figcaption>Drops &mdash; your evidence, shared back</figcaption></figure>
+    </article>
+  </div>
+  <p class="note reveal">Every image on this page is a real capture of the app, staged by the repository&rsquo;s screenshot scripts. Shots span EQBuddy&rsquo;s built-in themes.</p>
+</div></section>
+
+<section class="section" id="principles"><div class="inner">
+  <div class="heading reveal"><div class="section-no">04</div><div>
+    <div class="kicker">Principles</div>
+    <h2 class="title">Hard lines that do not move</h2>
+  </div></div>
+  <div class="grid">
+    <article class="card span6 accent-teal reveal"><h3>Personal, not competitive</h3>
+      <p>EQBuddy measures and guides the player using it. It is not a party or raid ranking tool, a leaderboard, or a way to judge other people.</p>
+    </article>
+    <article class="card span6 accent-teal reveal"><h3>Log-only</h3>
+      <p>No game-memory reads, no packet inspection, no gameplay automation, no hidden-information extraction. If it isn&rsquo;t in your log, EQBuddy doesn&rsquo;t know it.</p>
+    </article>
+    <article class="card span6 accent-good reveal"><h3>Local-first</h3>
+      <p>No required account, no required cloud service, no telemetry by default. Your history stays on your machine unless you explicitly export or contribute it.</p>
+    </article>
+    <article class="card span6 accent-good reveal"><h3>Evidence before confidence</h3>
+      <p>A precise-looking wrong number is worse than a clearly identified estimate. Where a decision depends on it, EQBuddy says which kind of number you are looking at:</p>
+      <div class="badges">
+        <span class="badge badge-observed">OBSERVED &mdash; 47.6% of 21 kills</span>
+        <span class="badge badge-estimated">ESTIMATED &mdash; 0:51 est</span>
+      </div>
+    </article>
+  </div>
+</div></section>
+
+<section class="section" id="today"><div class="inner">
+  <div class="heading reveal"><div class="section-no">05</div><div>
+    <div class="kicker">Today, honestly</div>
+    <h2 class="title">Evolved is the direction, not a download yet</h2>
+    <p class="subtitle">Current public downloads are the 1.x line. Evolved is in active development and proprietary; the screenshots above are the real app as it takes shape.</p>
+  </div></div>
+  <div class="grid">
+    <article class="card span6 accent-good reveal"><h3>Get EQBuddy 1.x &mdash; free, MIT</h3>
+      <p>Every published 1.x release is free under the MIT license, with signed installers. The final Linux and macOS 1.x builds stay downloadable and usable &mdash; they are not being taken down.</p>
+      <p style="margin-top:16px"><a class="btn btn-primary" href="https://github.com/DranakCorps-bot/EQBuddy/releases">Releases</a>
+      <a class="btn" href="https://github.com/DranakCorps-bot/EQBuddy/blob/main/LEGACY-V1.md">How 1.x is preserved</a></p>
+    </article>
+    <article class="card span6 accent-teal reveal"><h3>Watch Evolved take shape</h3>
+      <p>Evolved (v2) is proprietary &mdash; All Rights Reserved &mdash; and is not published yet. There is nothing to sign up for and nothing to buy; follow the repository to see it land.</p>
+      <p style="margin-top:16px"><a class="btn btn-primary" href="https://github.com/DranakCorps-bot/EQBuddy">Repository</a>
+      <a class="btn" href="https://github.com/DranakCorps-bot/EQBuddy/discussions">Discussions</a></p>
+    </article>
+  </div>
+  <p class="note reveal">Licensing, precisely: already-published 1.x stays MIT (<a href="https://github.com/DranakCorps-bot/EQBuddy/blob/main/LICENSE">LICENSE</a>) &mdash; those grants are not revoked. Evolved is proprietary (<a href="https://github.com/DranakCorps-bot/EQBuddy/blob/main/LICENSE-EVOLVED.md">LICENSE-EVOLVED.md</a>).</p>
+</div></section>
+
+<section class="section closing" id="close"><div class="closebox reveal">
+  <div class="eyebrow"><span class="dot"></span>EQBuddy Evolved</div>
+  <h2>You log in. It already knows <span class="gradient">where you left off.</span></h2>
+  <p>A finished Evolved release should make this feel ordinary: EQBuddy knows the character you are playing, and when you want more than a glance, you get a useful next step &mdash; without having to understand its internal windows, cards, menus, files, or data pipelines.</p>
+  <div class="pills">
+    <a class="pill" href="https://github.com/DranakCorps-bot/EQBuddy#readme">README</a>
+    <a class="pill" href="https://github.com/DranakCorps-bot/EQBuddy/blob/main/EQBuddy-Evolved.md">The vision &mdash; EQBuddy-Evolved.md</a>
+    <a class="pill" href="https://github.com/DranakCorps-bot/EQBuddy/blob/main/PRODUCT.md">Product identity &mdash; PRODUCT.md</a>
+    <a class="pill" href="https://github.com/DranakCorps-bot/EQBuddy/discussions">Discussions</a>
+  </div>
+</div></section>
+
+</main>
+
+<footer>
+  &copy; 2026 David Edwards &middot; published 1.x is MIT &middot; Evolved is All Rights Reserved &middot;
+  <a href="https://github.com/DranakCorps-bot/EQBuddy">github.com/DranakCorps-bot/EQBuddy</a>
+</footer>
+
+<script src="assets/site.js"></script>
+</body>
+</html>
