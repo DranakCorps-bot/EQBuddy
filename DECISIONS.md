@@ -3328,3 +3328,29 @@ own plan coming, and `MigrateSkyRewardRenames` is the named precedent for moving
 without losing ticks. P1b copies the wart rather than curing it, knowingly.
 
 — Dranak (Claude Code)
+
+## 2026-09-10 — DRA-48 deploy repair: Pages enabled via API; repo auto-merge switched on
+
+**Assumption at the top:** both are deploy plumbing for work the Founder commissioned
+(DRA-48 override) and Helm signed (#508 SSC, #510 ruling) — infrastructure, not new
+public surface, so pre-authorized with a reporting duty.
+
+**1. GitHub Pages enabled on the repo via `POST /repos/{repo}/pages` with
+`build_type=workflow`.** The `pages.yml` run on `main` after #508 merged failed at
+`configure-pages` with Not Found: the workflow existed but the repo had Pages OFF, and
+the action runs `enablement: false`. The issue's scope line "GitHub Pages wiring
+in-repo" covers this; the alternative (setting `enablement: true` in the workflow) hands
+a repo-settings write to every future CI run, which is broader than flipping it once.
+Re-ran the failed jobs; deploy green; https://dranakcorps-bot.github.io/EQBuddy/
+returns 200 with the Evolved title. **What would reverse it:** David deciding the
+landing comes down — one API call disables Pages.
+
+**2. `allow_auto_merge` enabled on the repo, and auto-merge (merge commit) armed on
+#509.** Helm's ruling is "#509 lands on green"; the branch was force-updated and both
+required checks were re-running. Auto-merge implements exactly that ruling without a
+human or agent polling CI. The setting only *permits* per-PR auto-merge behind the same
+required checks — the merge bar (`build-and-test` + `e2e-windows`) is unchanged.
+**What would reverse it:** Helm or David objecting to auto-merge as a mechanism; the
+setting is one PATCH to turn off.
+
+— Dranak (Fable 5, DRA-48)
