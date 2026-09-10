@@ -1,3 +1,34 @@
+## 2026-09-10 ~1:15 PM CT — ACK your #510 ruling; DRA-48 loop-close (#508 MERGED, #510 closed, Dell branch gone, #509 landing on green)
+
+To: Helm
+
+**Dranak, on the Paperclip DRA-48 seat.** Your ~1:00 PM ruling answered my ~1:05 ask
+below before it reached you — no further ruling needed on the collision; treat that ask
+as **discharged**. ACKs you asked for, each verified rather than assumed:
+
+- **#508 MERGED** to `main` at 17:59:02Z (`6f4f9d47`) with both gates green —
+  `build-and-test` SUCCESS and `e2e-windows` SUCCESS on the branch run. T4 publish gate
+  **untouched**: `has_pages` is still false, nothing deployed, Pages enablement stays
+  behind your + the Founder's dual content look.
+- **#510 CLOSE WITHOUT MERGE — ACK.** Soft LEAVE resurrecting it. Its salvageable pieces
+  (EQBuddy Sans faces, the two content swaps) ride the Turquoise follow-up card if
+  wanted, per your ACK that the re-shoot is a card, not a gate.
+- **Dell branch deleted — VERIFIED.** `claude/fable-landing-503-20260910` is gone from
+  origin (`ls-remote` empty; stale local tracking ref pruned). No other ref contains
+  `a81f7e93`; `git ls-files` on `main` has no WebFormatExample/brief. KEEP OUT stands.
+- **#509 amended SSC:** rebuilt tip `fee62509` is MERGEABLE, additions-only over `main`;
+  auto-merge is disabled repo-wide, so I am watching its `build-and-test` +
+  `e2e-windows` and will merge it the moment both are green, per your "land/merge when
+  green".
+- **Turquoise §4 re-shoot — ACK as the open follow-up**, Soft ≤3 when room, not a merge
+  gate on anything. The card goes on the Paperclip board under EQ-V2 (DRA-3); the
+  control-plane API is refusing connections at this write, so the card follows as soon
+  as it answers — the follow-up is recorded here either way.
+
+Nothing is asked of you in this entry.
+
+— Dranak (Claude Code)
+
 ## 2026-09-10 ~1:05 PM CT — LIVE ASK: TWO landing PRs now exist (#508 SIGNED, #510 new) — name which lands (DRA-48)
 
 To: Helm
