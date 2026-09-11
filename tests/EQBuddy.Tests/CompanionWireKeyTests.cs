@@ -143,7 +143,13 @@ public class CompanionWireKeyTests
                 CharacterClasses: ["Warrior", "Druid", "Monk"],
                 ClassSourceLabel: "from your achievements",
                 Epics: new CompanionChecklistSection(0, 0, []),
-                Sky: new CompanionChecklistSection(0, 0, [])),
+                Sky: new CompanionChecklistSection(0, 0, []),
+                Guides: [new CompanionQuestGuide("Crude Stein Quest",
+                    new CompanionChecklistGroup("Crude Stein Quest", null,
+                        [new CompanionChecklistRow("guide:g/o", "Collect Crude Stein", "0 of 1 in your bags",
+                            false, Tickable: false)],
+                        Fold: "g"))],
+                GuidesMore: 3),
             CompanionSnapshot.JsonOpts);
 
         Assert.Contains("\"characterClasses\":[\"Warrior\",\"Druid\",\"Monk\"]", json);
@@ -151,6 +157,16 @@ public class CompanionWireKeyTests
         // The old single-class field rides along for one release, because an open phone
         // runs the page it downloaded weeks ago (trap 32) and that page reads it.
         Assert.Contains("\"inferredClass\":\"Druid\"", json);
+
+        // DRA-46's keys, pinned the day they were written for the reason this whole class
+        // exists: the page reads `guides`, `quest`, `group` and `guidesMore`, and a camelCase
+        // slip here is invisible until a player with a pinned quest opens their phone.
+        Assert.Contains("\"guides\":[{\"quest\":\"Crude Stein Quest\",\"group\":{", json);
+        Assert.Contains("\"guidesMore\":3", json);
+        // `tickable:false` must reach the wire — it is what stops the page drawing a
+        // checkbox the PC's router refuses. The DEFAULT must not, for the same reason
+        // `tip` does not: an absent key reads as true on the page.
+        Assert.Contains("\"tickable\":false", json);
     }
 
     /// <summary>Every group-bearing record on this wire spells the class the same way, which

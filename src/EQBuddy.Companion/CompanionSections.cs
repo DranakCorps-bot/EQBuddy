@@ -356,7 +356,12 @@ public sealed record CompanionGuideCard(
     string? Stub = null,
     string? Improve = null,
     string DoneLabel = "",
-    string SkipLabel = "");
+    string SkipLabel = "",
+    /// <summary>Set when this step's "done" is the character's OWNED COUNT rather than a
+    /// button — the words are the count itself. The page draws the line and NO Done verb,
+    /// because the PC's router refuses that tick and a button that does nothing is a silent
+    /// no-op on the guide's most prominent control (DRA-46). Skip still works.</summary>
+    string? Held = null);
 
 /// <summary><see cref="Id"/> is what a tap sends back to tick the row — the stored
 /// item's own id for Epics/Sky, slot|item for Gear (which has no id of its own).</summary>
@@ -383,7 +388,21 @@ public sealed record CompanionChecklistRow(
     string? Improve = null,
     /// <summary>The player struck this step out. The page strikes it through, the same way
     /// the desktop does.</summary>
-    bool Skipped = false);
+    bool Skipped = false,
+    /// <summary>False on a row whose "done" the player cannot move from here — today exactly a
+    /// harvested guide's turn-in piece, whose answer is the character's own owned count
+    /// (<c>GuideProgressHome.LedgerItem</c>) and whose tick the router REFUSES (DRA-46).
+    ///
+    /// <para><b>Per ROW, where <see cref="CompanionChecklistGroup.Tickable"/> is per group.</b>
+    /// Those two are not the same question: the Sky ready band is a whole group of summaries,
+    /// but a guided quest's rows are mostly real steps with one or two counts among them. A
+    /// group-level flag would have to choose between a checklist you cannot tick at all and a
+    /// checkbox that silently ignores every tap on the piece rows — and a control that ignores
+    /// a tap is the broken kind of no-op (#212, bjstrange, on the ready band).</para>
+    ///
+    /// <para>The row's <see cref="Detail"/> carries the count instead, so the row still answers
+    /// "where am I with this" without offering a door that goes nowhere.</para></summary>
+    bool Tickable = true);
 
 // ---------------- quests (General · Epic 1.0 · Plane of Sky) ----------------
 
@@ -432,7 +451,34 @@ public sealed record CompanionQuestsSection(
     IReadOnlyList<string>? CharacterClasses,
     string? ClassSourceLabel,
     CompanionChecklistSection Epics,
-    CompanionChecklistSection Sky);
+    CompanionChecklistSection Sky,
+    /// <summary>
+    /// The guided walkthrough for a General-tab quest, keyed by QUEST NAME — the same
+    /// <c>QuestChecklistGroup</c> the desktop's detail pane draws, through the same
+    /// <c>GuideChecklistProjection.ApplyQuest</c> (DRA-46, Fable §3 N2). Folded by default,
+    /// like Sky.
+    ///
+    /// <para><b>Scoped to the quests the player has PINNED, and that is a measurement rather
+    /// than a preference.</b> A guide serialises to ~6 KB, 84% of it the per-row share-back
+    /// URLs, and the merged catalog holds 1,132 of them — 7 MB if this carried the set, and
+    /// ~370 KB for the 60 cards the page draws. Trap 67's rule is that a payload meaning
+    /// "everything" is only safe if the client always narrows, and a first pairing is the
+    /// client that does not. The pin is the narrowing that already exists and is the
+    /// second-screen contract in the player's own words: keep this one in front of me.</para>
+    ///
+    /// <para>Capped, and never silently — <see cref="GuidesMore"/> is what the page prints.</para>
+    /// </summary>
+    IReadOnlyList<CompanionQuestGuide> Guides,
+    /// <summary>Pinned quests with a guide beyond the shipped cap. The page says how many and
+    /// where to see them, because a walkthrough that is simply absent reads as a quest we have
+    /// nothing for.</summary>
+    int GuidesMore);
+
+/// <summary>One quest's walkthrough on the wire: the quest it belongs to, and the checklist
+/// group shape the page's generic renderer already draws. Keyed by NAME because that is what
+/// the General tab's cards are keyed by — the device joins it the way it joins everything
+/// else about a quest (see <see cref="CompanionQuestsSection.Mine"/>).</summary>
+public sealed record CompanionQuestGuide(string Quest, CompanionChecklistGroup Group);
 
 /// <summary>One tab tile: key/label straight from Core's QuestSurface, and the
 /// "done / total" badge — null on General, which is a catalog you search rather than

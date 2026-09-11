@@ -53,24 +53,7 @@ public static partial class CompanionProjection
                     : $"{g.ClassName} — {g.Title}",
                 Note: g.GuideCaption.Length > 0 ? g.GuideCaption : null,
                 Class: g.ClassName,
-                Rows:
-                [
-                    .. g.Rows.Select(r => new CompanionChecklistRow(
-                        r.Id,
-                        r.Title,
-                        r.Unassigned ? r.Detail + UnassignedMark : r.Detail,
-                        r.Acquired,
-                        r.StubNote.Length > 0 ? GuidePresentation.StubLead + " " + r.StubNote : null,
-                        // A phone has no hover, so what the desktop hangs on one rides the row
-                        // (trap 35). Empty on a transcribed step, whose sentence IS the row.
-                        r.GuideFacts.Length > 0 && r.StubNote.Length == 0 ? r.GuideFacts : null,
-                        r.GuideRowKey.Length > 0
-                            && GuideChecklistProjection.Resolve(GuideCatalog.Default, r.Id)
-                                is var (guide, objective)
-                            ? GuidePresentation.ImproveUrl(guide, objective)
-                            : null,
-                        r.IsSkipped)),
-                ],
+                Rows: GuideRows(g),
                 Title: g.Title,
                 Card: GuideCard(g),
                 Collapsed: g.Collapsed,
@@ -174,23 +157,7 @@ public static partial class CompanionProjection
             g.GuideCaption.Length > 0
                 ? g.Note is { } note ? g.GuideCaption + " · " + note : g.GuideCaption
                 : g.Note,
-            [.. g.Rows.Select(r => new CompanionChecklistRow(
-                r.Id,
-                r.Title,
-                r.Unassigned ? r.Detail + UnassignedMark : r.Detail,
-                r.Acquired,
-                r.StubNote.Length > 0 ? GuidePresentation.StubLead + " " + r.StubNote : null,
-                // A phone has no hover, so the six questions the desktop hangs on one ride
-                // the row itself. Porting the INTENT rather than the control (trap 35).
-                r.GuideFacts.Length > 0 && r.StubNote.Length == 0 ? r.GuideFacts : null,
-                // The same share-back door the desktop's pencil opens. A plain link, because
-                // the phone's browser honours it natively — no substitute needed (trap 35).
-                r.GuideRowKey.Length > 0
-                    && GuideChecklistProjection.Resolve(GuideCatalog.Default, r.Id)
-                        is var (guide, objective)
-                    ? GuidePresentation.ImproveUrl(guide, objective)
-                    : null,
-                r.IsSkipped))],
+            GuideRows(g),
             Class: g.ClassName,
             Title: g.Title,
             Card: GuideCard(g),
@@ -202,6 +169,39 @@ public static partial class CompanionProjection
         return new CompanionChecklistSection(
             scoped.Sum(g => g.Done), scoped.Sum(g => g.Total), groups);
     }
+
+    /// <summary>
+    /// One guided group's rows on the wire — <b>the one producer</b>, which Sky, Epic and the
+    /// General tab's quest guides all call.
+    ///
+    /// <para>These were two copies when only Sky and Epic drew guides, and they had already
+    /// started to differ (the unassigned mark, the stub lead, the improve door and the facts
+    /// rule are four decisions each was making separately). DRA-46 made it three, which is the
+    /// count at which a hand-kept copy stops being kept — so the decisions moved here rather
+    /// than the third caller gaining its own.</para></summary>
+    private static List<CompanionChecklistRow> GuideRows(QuestChecklistGroup group) =>
+    [
+        .. group.Rows.Select(r => new CompanionChecklistRow(
+            r.Id,
+            r.Title,
+            r.Unassigned ? r.Detail + UnassignedMark : r.Detail,
+            r.Acquired,
+            r.StubNote.Length > 0 ? GuidePresentation.StubLead + " " + r.StubNote : null,
+            // A phone has no hover, so what the desktop hangs on one rides the row (trap 35).
+            // Empty on a transcribed step, whose sentence IS the row.
+            r.GuideFacts.Length > 0 && r.StubNote.Length == 0 ? r.GuideFacts : null,
+            // The same share-back door the desktop's pencil opens. A plain link, because the
+            // phone's browser honours it natively — no substitute needed (trap 35).
+            r.GuideRowKey.Length > 0
+                && GuideChecklistProjection.Resolve(GuideCatalog.Default, r.Id)
+                    is var (guide, objective)
+                ? GuidePresentation.ImproveUrl(guide, objective)
+                : null,
+            r.IsSkipped,
+            // A turn-in piece's answer is the bags, and the router refuses a tick of it — so
+            // the page draws the count and no checkbox rather than a box that ignores taps.
+            Tickable: r.LedgerItemName.Length == 0)),
+    ];
 
     /// <summary>What a guided group's fold is keyed on, or null when the group is not guided
     /// and its heading is therefore not a control. The desktop's own fold key, so the two
@@ -223,7 +223,8 @@ public static partial class CompanionProjection
             card.Instruction,
             OrNull(card.Directions), OrNull(card.Detail), OrNull(card.Why),
             OrNull(card.BeforeLeaving), OrNull(card.StubNote), OrNull(card.ImproveUrl),
-            GuidePresentation.DoneLabel, GuidePresentation.SkipLabel);
+            GuidePresentation.DoneLabel, GuidePresentation.SkipLabel,
+            OrNull(card.Held));
     }
 
     /// <summary>

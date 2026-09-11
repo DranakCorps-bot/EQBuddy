@@ -1,3 +1,65 @@
+## 2026-09-11 (DRA-46 Delivery 2 N2 — harvested guides on the General tab; the calls I made alone)
+
+Bosun kick 2026-09-11 ~11:07 AM CT, after DRA-45 N1 landed (#534/#535). Fable's §3 N2 is the
+plan; these are the places it left a choice and I made one rather than paging anybody.
+
+**1. THE PHONE CARRIES GUIDES FOR PINNED QUESTS ONLY, CAPPED AT TWELVE.** The plan says
+`CompanionProjection.Quests` carries the quest-name-keyed group and does not say for which
+quests. Measured before choosing: a projected guide serialises to ~6 KB, of which 84% is the
+per-row share-back URL (the prefilled discussion body, escaped), and the merged catalog holds
+1,132 normal-quest guides — 7 MB for the set, ~740 KB for the 120 `Mine` rows, ~370 KB for
+the 60 cards the page actually draws. Trap 67's rule is that a payload meaning "everything"
+is only safe if the client always narrows, and a first pairing is exactly the client that
+does not. The PIN is a narrowing the player already makes, in their own words ("keep this one
+in front of me"), it costs a player who has pinned nothing zero bytes, and it is bounded by a
+deliberate act rather than by what happens to be in their bags. The cap is stated on screen
+(`GuidesMore`), never silent. **The default it could have gone the other way on:** ship the
+guide for every `Mine` row and accept ~370 KB per push — rejected on the measurement, not on
+taste. **The better answer, filed rather than built:** a request-scoped fetch, so the page
+asks for a guide when the reader opens a card and every card can have one. That is a protocol
+change (`CompanionQuestRequest` is the desktop's input, not a per-device channel) and larger
+than N2; it is in `FABLE-FEEDBACK.md`.
+
+**2. THE REWARD STATS BLOCK IS OFFERED ONLY WHEN A QUEST PAYS EXACTLY ONE ITEM.** Helm
+ACK/FOLDed `RewardCard` for quest-name-keyed groups, and a normal quest's `Rewards` is a list
+the wiki writes — often several items, sometimes coin or faction. Picking one of three to
+show would be EQBuddy deciding which reward a quest is really about, which is the same
+choosing `GuidePresentation.EpicTitle` already refuses on the part of the game David cannot
+check for us (2026-08-14). So the SUMMARY names every reward the page names, and the BLOCK
+appears only where there is one item and the shipped `ItemCatalog` holds its window. **The
+default it could have gone the other way on:** show the first reward's block — rejected.
+
+**3. THE DESKTOP PANE DOES NOT DRAW THE STATS BLOCK AT ALL.** It already puts the game's item
+window on every reward tile's hover (`AttachItemTooltip`), so a second copy under the guide
+would be two producers of one answer on one screen (trap 4). The field is still emitted,
+because the phone has no hover and draws it — which is the field's whole reason for existing
+(trap 35). **The default it could have gone the other way on:** draw it on both, for
+symmetry — rejected; symmetry between surfaces is parity of the ANSWER, not of the control.
+
+**4. AN ITEM THE GUIDE NAMES NO STEP FOR KEEPS ITS ROW, UNDER "Other turn-ins".** The harvest
+writes one `Collect` per catalog item so this is empty today, but a CURATED guide may walk a
+quest without enumerating its pieces, and a fold that silently drops the have/need counts is
+trap 26 on the surface where the counts are the point. Same reason a FOLDED guide brings the
+whole turn-in section back rather than taking it away with the walkthrough.
+
+**5. A COLLECT ROW'S STUB NOTE MOVED TO THE ITEM ROW'S HOVER.** DRA-45 ships every skeleton
+`Collect` as a `Stub` carrying "we have not recorded who drops this or where". Drawing that
+step as an item row leaves the sentence nowhere — an item row has no second line — so it
+rides the hover beside the count-adjust hint, in the same words the checklist tabs draw under
+a stub. Folding two facts into one row is right; losing what the folded one SAID is not.
+
+**6. `AppSettings.GuideExpanded` WENT INTO THE QUESTS REPAINT SIGNATURE.** Not for the fold
+button (it forces its own refresh) but for the OTHER instance: `QuestsWindow` and
+`QuestsRoom` each build their own `QuestsView` (trap 45), so folding a quest in the shell left
+the window drawing it open until something unrelated moved. Trap 72, one store later.
+
+**7. THE PHONE'S FOLD WAS FIXED, NOT INHERITED.** `#530` appended a guided group's rows to the
+card BESIDE the container the fold toggles, so tapping a heading hid the NEXT card and left
+every row on screen under an arrow saying they were away. "Folded by default like Sky" is a
+KEEP on this card and on the phone it meant nothing, so the one-line fix landed here and the
+group renderer was extracted so Sky, Epic and quest guides share one fold to get right.
+**Reported rather than filed:** it is a bug inside the surface N2 builds on, not new scope.
+
 ## 2026-09-11 (DRA-41 Delivery 3 — Epic 1.0 on the guided model; the calls I made alone)
 
 Founder kick 2026-09-11 ~7:30 AM CT. Fable's signed §1/§2 (PR #501) is the plan; these are

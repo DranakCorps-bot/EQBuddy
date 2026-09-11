@@ -54,7 +54,23 @@ public sealed record QuestChecklistRow(
     /// per-character guide ledger, for every objective including reward ones, because a skip
     /// has no home in the Sky turn-in store and is a statement about the future rather than
     /// the past (P1b's asymmetry).</para></summary>
-    bool IsSkipped = false);
+    bool IsSkipped = false,
+    /// <summary>The QUEST TURN-IN ITEM whose owned count answers this row — set exactly on a
+    /// <c>GuideProgressHome.LedgerItem</c> step, empty on every other row (DRA-46).
+    ///
+    /// <para><b>This is what lets a surface draw the guide's "Turn-in pieces" AS the item rows
+    /// it already draws, rather than beside them.</b> The General tab has shown "Blue Orc Head
+    /// — 2/4" with a +1 door since 1.x; a harvested guide's Collect step is that same fact
+    /// wearing a guide row's clothes. Without this the pane would have to re-derive the match
+    /// from <see cref="Title"/>, which is a second producer of a decision
+    /// <c>GuideProgressRouter.HomeFor</c> has already made (trap 4) — and the two would part
+    /// company the first time a transformer worded a Collect title differently.</para>
+    ///
+    /// <para><b>Non-empty also means the row REFUSES a tick.</b> The bags are the answer here
+    /// and the router writes nothing; a box that moved would be a fourth door disagreeing with
+    /// three that already exist. A surface draws the count and its own +1, never a checkbox —
+    /// a checkbox that silently ignores clicks is the broken kind of no-op.</para></summary>
+    string LedgerItemName = "");
 
 /// <summary>
 /// The active-step card: what the player should do NEXT in one guided reward, lifted out of
@@ -87,7 +103,21 @@ public sealed record QuestChecklistCard(
     string Why = "",
     string BeforeLeaving = "",
     string StubNote = "",
-    string ImproveUrl = "");
+    string ImproveUrl = "",
+    /// <summary>Set when this step's "done" is NOT the player's to press — today exactly a
+    /// harvested guide's turn-in piece, whose answer is the character's owned count and whose
+    /// tick <c>GuideProgressRouter.SetDone</c> refuses (DRA-46). The words are the count
+    /// itself ("0 of 1 in your bags"), because that is the whole answer.
+    ///
+    /// <para><b>A surface carrying this draws NO "Done" verb.</b> The card is the one place
+    /// that names a single next step and offers to close it, so a refused step left the button
+    /// there doing nothing at all — a silent no-op on the most prominent control the guide
+    /// has. SKIP survives: "I am not doing this" has no home in the bags and lands in the
+    /// guide ledger like every other skip, which is the router's deliberate asymmetry.</para>
+    ///
+    /// <para>Empty on every other card, so a surface tests it rather than re-deriving the
+    /// routing decision the projection already made (trap 4).</para></summary>
+    string Held = "");
 
 /// <summary>A group of rows under one heading, with the state of the reward as a whole.</summary>
 /// <param name="Title">The reward (Sky) or section (Epic) on its own, WITHOUT the class.

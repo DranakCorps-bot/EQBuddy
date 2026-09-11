@@ -493,4 +493,344 @@ public sealed class GuideSurfaceParityTests : IDisposable
         // The guide ledger holds nothing — the box is the only store for it.
         Assert.Empty(ledger.GuideProgressFor(Dranak, guide.Id).DoneObjectiveIds);
     }
+
+    // ---- DRA-46: the General tab's quest guides, on both screens -----------------------
+
+    /// <summary>A shipped quest that HAS a harvested guide and at least one turn-in item, so
+    /// the "turn-in pieces are the item rows" claim has something to be about. Picked from the
+    /// catalog rather than named, because the harvest is regenerated weekly and a hard-coded
+    /// quest name would make this suite test nothing the week that quest's page changed
+    /// shape — and it throws rather than skipping, so an empty harvest fails loudly.</summary>
+    private static QuestEntry GuidedQuest =>
+        QuestCatalog.LoadEmbedded().Quests
+            .Where(q => q.Items.Count >= 2)
+            .FirstOrDefault(q =>
+                GuideChecklistProjection.QuestGuideFor(GuideCatalog.Default, q.Name) is not null)
+        ?? throw new InvalidOperationException(
+            "no shipped quest with turn-in items has a guide — the N2 fixture needs one");
+
+    private QuestChecklistGroup DesktopQuest(AppSettings s, QuestLedgerStore ledger, QuestEntry quest) =>
+        GuideChecklistProjection.ApplyQuest(quest, GuideCatalog.Default, s, ledger, Dranak)
+        ?? throw new InvalidOperationException($"no guide for {quest.Name}");
+
+    private CompanionQuestsSection PhoneQuests(
+        AppSettings s, QuestLedgerStore ledger, params string[] tracked) =>
+        CompanionProjection.Build(
+            new CompanionInputs
+            {
+                Settings = s,
+                Character = "Dranak",
+                AppVersion = "2.0.0",
+                Offered = CompanionSurfaces.All,
+                Quests = new CompanionQuestRequest
+                {
+                    Ledger = ledger,
+                    CharacterKey = Dranak,
+                    Catalog = QuestCatalog.LoadEmbedded(),
+                    Tracked = new HashSet<string>(tracked, StringComparer.OrdinalIgnoreCase),
+                },
+            },
+            new DateTime(2026, 9, 9, 12, 0, 0, DateTimeKind.Local)).Quests!;
+
+    /// <summary>The phone's pinned-quest walkthrough is the desktop pane's, row for row —
+    /// same ids, same words, same done states. The whole N2 parity claim in one assertion.</summary>
+    [Fact]
+    public void ThePhoneShowsTheQuestGuideTheGeneralPaneShows()
+    {
+        var settings = Settings();
+        var ledger = Store();
+        var quest = GuidedQuest;
+
+        var desktop = DesktopQuest(settings, ledger, quest);
+        var phone = PhoneQuests(settings, ledger, quest.Name).Guides
+            .Single(g => g.Quest == quest.Name).Group;
+
+        Assert.NotEmpty(desktop.Rows);
+        Assert.Equal(desktop.Rows.Select(r => r.Id), phone.Rows.Select(r => r.Id));
+        Assert.Equal(desktop.Rows.Select(r => r.Title), phone.Rows.Select(r => r.Text));
+        Assert.Equal(desktop.Rows.Select(r => r.Acquired), phone.Rows.Select(r => r.Done));
+    }
+
+    /// <summary>
+    /// The N2 rule the row count cannot state: <b>a turn-in piece is the ITEM row, not a
+    /// second tickable copy of one.</b>
+    ///
+    /// <para>Asserted from three sides at once, because each alone passes on a different
+    /// broken build: the step names the quest's own item (so the pane can join it), the
+    /// router refuses its tick (so no store can disagree with the bags), and the phone marks
+    /// it un-tickable (so no checkbox ignores a tap).</para></summary>
+    [Fact]
+    public void AQuestGuidesTurnInPiecesAreTheItemRowsAndRefuseATick()
+    {
+        var settings = Settings();
+        var ledger = Store();
+        var quest = GuidedQuest;
+
+        var desktop = DesktopQuest(settings, ledger, quest);
+        var pieces = desktop.Rows.Where(r => r.LedgerItemName.Length > 0).ToList();
+        Assert.NotEmpty(pieces);
+
+        // Every piece names one of THIS quest's turn-in items, and no other row does.
+        foreach (var row in pieces)
+            Assert.Contains(quest.Items, i =>
+                i.Name.Equals(row.LedgerItemName, StringComparison.OrdinalIgnoreCase));
+
+        // The router refuses the write. Not "it writes somewhere harmless" — nothing moves.
+        var guide = GuideChecklistProjection.QuestGuideFor(GuideCatalog.Default, quest.Name)!;
+        var step = guide.AllObjectives.Single(o =>
+            GuideChecklistProjection.RowId(guide.Id, o.Id) == pieces[0].Id);
+        GuideProgressRouter.SetDone(settings, ledger, Dranak, guide.Id, step,
+            new GuideStores([], [], quest), done: true);
+        Assert.Empty(ledger.GuideProgressFor(Dranak, guide.Id).DoneObjectiveIds);
+        Assert.False(DesktopQuest(settings, ledger, quest).Rows
+            .Single(r => r.Id == pieces[0].Id).Acquired);
+
+        // And the phone is TOLD, rather than drawing a box that swallows the tap.
+        var phone = PhoneQuests(settings, ledger, quest.Name).Guides
+            .Single(g => g.Quest == quest.Name).Group;
+        Assert.Equal(
+            pieces.Select(r => r.Id),
+            phone.Rows.Where(r => !r.Tickable).Select(r => r.Id));
+    }
+
+    /// <summary>The piece lights from the BAGS, on both screens at once, when the owned count
+    /// reaches the need — the loot parser, an inventory reconcile and the count editor all
+    /// arrive by this one door.</summary>
+    [Fact]
+    public void APieceLightsOnBothScreensWhenTheOwnedCountReachesNeed()
+    {
+        var settings = Settings();
+        var ledger = Store();
+        var quest = GuidedQuest;
+        var need = quest.Items[0];
+
+        Assert.DoesNotContain(DesktopQuest(settings, ledger, quest).Rows,
+            r => r.LedgerItemName.Equals(need.Name, StringComparison.OrdinalIgnoreCase) && r.Acquired);
+
+        ledger.SetManual(Dranak, need.Name, Math.Max(1, need.Qty));
+
+        var row = DesktopQuest(settings, ledger, quest).Rows
+            .Single(r => r.LedgerItemName.Equals(need.Name, StringComparison.OrdinalIgnoreCase));
+        Assert.True(row.Acquired);
+
+        var phone = PhoneQuests(settings, ledger, quest.Name).Guides
+            .Single(g => g.Quest == quest.Name).Group;
+        Assert.True(phone.Rows.Single(r => r.Id == row.Id).Done);
+    }
+
+    /// <summary>The hand-in is the quest's own completion record — the same tick the General
+    /// tab's ✓ writes — and it is marked as the turn-in so it never counts itself among the
+    /// pieces it waits on.</summary>
+    [Fact]
+    public void TheHandInRowIsTheQuestsOwnCompletionTickOnBothScreens()
+    {
+        var settings = Settings();
+        var ledger = Store();
+        var quest = GuidedQuest;
+
+        var handIn = DesktopQuest(settings, ledger, quest).Rows.Single(r => r.IsTurnIn);
+        Assert.False(handIn.Acquired);
+
+        // The catch-up line the General tab writes, from the other door.
+        ledger.SetCompleted(Dranak, quest.Name, true);
+
+        Assert.True(DesktopQuest(settings, ledger, quest).Rows.Single(r => r.IsTurnIn).Acquired);
+        var phone = PhoneQuests(settings, ledger, quest.Name).Guides
+            .Single(g => g.Quest == quest.Name).Group;
+        Assert.True(phone.Rows.Single(r => r.Id == handIn.Id).Done);
+    }
+
+    /// <summary>Folded by default, on both screens, and the fold key is the one the desktop's
+    /// "+" writes — so opening it on the PC is the state the phone arrives in.</summary>
+    [Fact]
+    public void AQuestGuideIsFoldedByDefaultOnBothScreensAndSharesTheFoldKey()
+    {
+        var settings = Settings();
+        var ledger = Store();
+        var quest = GuidedQuest;
+
+        var desktop = DesktopQuest(settings, ledger, quest);
+        Assert.True(desktop.Collapsed);
+        var phone = PhoneQuests(settings, ledger, quest.Name).Guides
+            .Single(g => g.Quest == quest.Name).Group;
+        Assert.True(phone.Collapsed);
+        Assert.Equal(GuideChecklistProjection.FoldKey(desktop), phone.Fold);
+
+        // A quest group has no reward key, so its fold key is the guide id — the same string
+        // the "+" writes. Spelled `CompletionKey ?? ""` it would be empty and every "+" on
+        // this surface would be a silent no-op, which is exactly how the Epic fold shipped
+        // broken in #491.
+        settings.GuideExpanded.Add(desktop.GuideId);
+        Assert.False(DesktopQuest(settings, ledger, quest).Collapsed);
+        Assert.False(PhoneQuests(settings, ledger, quest.Name).Guides
+            .Single(g => g.Quest == quest.Name).Group.Collapsed);
+    }
+
+    /// <summary>
+    /// <b>The NEXT card offers no "Done" on a step the bags answer</b> — found by looking at
+    /// the rendered page in <c>scripts/mobile-harness.ps1</c>, not by a unit test.
+    ///
+    /// <para>Every harvested guide opens on its Collect steps, so the card's first named step
+    /// is almost always one the router REFUSES. The button was there and did nothing: a silent
+    /// no-op on the most prominent control the guide has, on both screens, for the whole
+    /// Delivery-2 surface. `Held` carries the count instead, decided once in the projection so
+    /// neither surface re-derives the routing (trap 4).</para>
+    ///
+    /// <para>SKIP is asserted to SURVIVE, because "suppress the verbs" would pass the first
+    /// half and quietly remove the one thing a player can still say about the step.</para></summary>
+    [Fact]
+    public void TheCardOffersNoDoneOnAStepTheBagsAnswerButStillOffersSkip()
+    {
+        var settings = Settings();
+        var ledger = Store();
+        var quest = GuidedQuest;
+
+        var desktop = DesktopQuest(settings, ledger, quest);
+        var card = desktop.GuideCard!;
+        // The fixture's first step IS a held one — if the harvest ever reorders so it is not,
+        // this says so rather than passing on a card that was never the case under test.
+        Assert.Equal(
+            GuideProgressHome.LedgerItem,
+            GuideProgressRouter.HomeFor(
+                GuideChecklistProjection.Resolve(GuideCatalog.Default, card.RowId)!.Value.Objective,
+                new GuideStores([], [], quest), out _));
+        Assert.NotEqual("", card.Held);
+
+        var phone = PhoneQuests(settings, ledger, quest.Name).Guides
+            .Single(g => g.Quest == quest.Name).Group.Card!;
+        Assert.Equal(card.Held, phone.Held);
+        // Skip survives: the label is still sent, because the page draws it unconditionally.
+        Assert.Equal(GuidePresentation.SkipLabel, phone.SkipLabel);
+
+        // ...and a step the bags do NOT answer carries no Held at all, so the Done verb is
+        // not quietly gone everywhere.
+        var sky = Desktop(settings, ledger).Single(g => g.CompletionKey == RewardKey);
+        Assert.Equal("", sky.GuideCard!.Held);
+    }
+
+    /// <summary>
+    /// A quest guide's phone group does NOT repeat the reward line the quest card already
+    /// draws — found in <c>scripts/mobile-harness.ps1</c>, not in a unit test.
+    ///
+    /// <para>The General tab's card draws "Rewards: …" and one line per turn-in item. The
+    /// group's summary is both of those sentences again, so it came out printed twice, a line
+    /// apart — the caption double-count Bevel caught on the desktop, arriving on the phone by
+    /// a different door. What survives is the line as the CONTROL that opens the stats block,
+    /// so it is sent exactly when there is a block behind it.</para>
+    ///
+    /// <para>Asserted on BOTH sides, because "never send it" would pass the first half and
+    /// silently remove the phone's only door to the item window (trap 35).</para></summary>
+    [Fact]
+    public void AQuestGuideRepeatsNoRewardLineThePhoneCardAlreadyDraws()
+    {
+        var settings = Settings();
+        var ledger = Store();
+
+        var withGuides = QuestCatalog.LoadEmbedded().Quests
+            .Where(q => GuideChecklistProjection.QuestGuideFor(GuideCatalog.Default, q.Name) is not null)
+            .ToList();
+
+        // Several rewards, so there is no single item window: no line at all.
+        var many = withGuides.First(q => q.Rewards.Count > 1);
+        var manyGroup = PhoneQuests(settings, ledger, many.Name).Guides
+            .Single(g => g.Quest == many.Name).Group;
+        Assert.Null(manyGroup.RewardCard);
+        Assert.Null(manyGroup.Reward);
+
+        // ...and where a block DOES exist, the line comes with it, because it is the control.
+        var single = withGuides.FirstOrDefault(q =>
+            q.Rewards.Count == 1
+            && GuideChecklistProjection.ShippedItemStats(q.Rewards[0]) is { Length: > 0 });
+        Assert.NotNull(single);
+        var singleGroup = PhoneQuests(settings, ledger, single!.Name).Guides
+            .Single(g => g.Quest == single.Name).Group;
+        Assert.NotNull(singleGroup.RewardCard);
+        Assert.NotNull(singleGroup.Reward);
+    }
+
+    /// <summary>A quest nobody PINNED ships no guide, and a quest with no guide at all returns
+    /// null rather than an empty walkthrough. The cap is stated, never silent.</summary>
+    [Fact]
+    public void ThePhoneCarriesGuidesOnlyForPinnedQuestsAndSaysWhatItLeftOut()
+    {
+        var settings = Settings();
+        var ledger = Store();
+        var quest = GuidedQuest;
+
+        // Not pinned: nothing ships, and nothing claims to have been left out.
+        var none = PhoneQuests(settings, ledger);
+        Assert.Empty(none.Guides);
+        Assert.Equal(0, none.GuidesMore);
+
+        Assert.Single(PhoneQuests(settings, ledger, quest.Name).Guides);
+
+        // Over the cap, the overflow is COUNTED. A walkthrough that is merely absent reads as
+        // a quest we have nothing for, which is the one thing it is not.
+        var many = QuestCatalog.LoadEmbedded().Quests
+            .Where(q => GuideChecklistProjection.QuestGuideFor(GuideCatalog.Default, q.Name) is not null)
+            .Select(q => q.Name)
+            .Take(MaxGuidesForTest + 4)
+            .ToArray();
+        Assert.True(many.Length > MaxGuidesForTest, "the harvest should have more guides than the cap");
+        var capped = PhoneQuests(settings, ledger, many);
+        Assert.Equal(MaxGuidesForTest, capped.Guides.Count);
+        Assert.Equal(many.Length - MaxGuidesForTest, capped.GuidesMore);
+    }
+
+    /// <summary>The shipped cap, read back through the projection rather than copied — a
+    /// hand-typed 12 here would go on passing the day the constant moved.</summary>
+    private static int MaxGuidesForTest
+    {
+        get
+        {
+            var settings = new AppSettings();
+            var path = Path.Combine(Path.GetTempPath(), $"guide-cap-{Guid.NewGuid():N}.json");
+            try
+            {
+                var ledger = new QuestLedgerStore(path) { TrackFilter = _ => true };
+                var all = QuestCatalog.LoadEmbedded().Quests
+                    .Where(q => GuideChecklistProjection.QuestGuideFor(GuideCatalog.Default, q.Name) is not null)
+                    .Select(q => q.Name)
+                    .Take(200)
+                    .ToArray();
+                return CompanionProjection.Build(
+                    new CompanionInputs
+                    {
+                        Settings = settings,
+                        Character = "Dranak",
+                        AppVersion = "2.0.0",
+                        Offered = CompanionSurfaces.All,
+                        Quests = new CompanionQuestRequest
+                        {
+                            Ledger = ledger,
+                            CharacterKey = Dranak,
+                            Catalog = QuestCatalog.LoadEmbedded(),
+                            Tracked = new HashSet<string>(all, StringComparer.OrdinalIgnoreCase),
+                        },
+                    },
+                    new DateTime(2026, 9, 9, 12, 0, 0, DateTimeKind.Local)).Quests!.Guides.Count;
+            }
+            finally { try { File.Delete(path); } catch { } }
+        }
+    }
+
+    /// <summary>A Sky quest is listed on the General tab too, and it must NOT pick up its Sky
+    /// walkthrough there: the Sky tab's guide layers on the Sky CHECKLIST, and this surface's
+    /// item rows are the quest ledger. Two homes for one tick is the whole thing the router
+    /// exists to prevent, so the match is gated on the guide TYPE.</summary>
+    [Fact]
+    public void ASkyGuideNeverAnswersOnTheGeneralTab()
+    {
+        var settings = Settings();
+        var ledger = Store();
+
+        foreach (var guide in GuideCatalog.Default.Guides.Where(g =>
+                     g.GuideType != GuideType.NormalQuest && g.QuestName.Length > 0))
+            Assert.Null(GuideChecklistProjection.QuestGuideFor(GuideCatalog.Default, guide.QuestName));
+
+        // And the negative that makes the above non-vacuous: some non-normal guide really
+        // does carry a quest name the General tab lists.
+        Assert.Contains(GuideCatalog.Default.Guides, g =>
+            g.GuideType != GuideType.NormalQuest && g.QuestName.Length > 0);
+    }
 }
