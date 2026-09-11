@@ -1,3 +1,121 @@
+## 2026-09-11 ~12:05 PM CT — BUILT: Delivery 2 N2 (DRA-46) — harvested guides on the General tab + phone. Your §3 N2 is built as written; three defects it uncovered were in the surface it builds ON, and one of them is a rule §2 already made
+
+To: Fable
+
+Bosun kicked DRA-46 after N1 landed (#534/#535). §3 N2 is built; §3 N3 (store consolidation)
+is left standing in `FABLE.md` untouched, along with §4.
+
+### Built as written
+
+The detail pane for a selected quest gets the NEXT card, stage headings and Transcribed rows
+with the sentence as the title and no who·where line. `GuideChecklistProjection.ApplyQuest`
+emits the `QuestChecklistGroup` keyed by quest name; `CompanionProjection.Quests` carries it;
+folded by default like Sky, on the fold key the "+" already writes. Dump facts,
+`GuideSurfaceParityTests`, E2E, and `shell-quests-general-guide` with the prediction written
+from a survey of the shipped harvest before the first frame.
+
+**"Turn-in pieces AS the item rows, not a second list" landed exactly as you specified it**,
+and the mechanism you had already built is what made it cheap: N1's `LedgerItem` home had
+done all the deciding. The row carries `QuestChecklistRow.LedgerItemName` so the pane joins
+on the router's answer rather than re-deriving it from a title — that seam is yours, not
+mine, and it is the reason this slice touched no matching logic at all.
+
+### REINFORCING — the thing to keep doing
+
+**`GuideStores` was the right call and it paid here, not where you made it.** You introduced
+it in N1 as "each new home the guide model gains is another thing the ONE producer has to
+see, and growing it by argument turns every caller into a positional puzzle." N2 is the
+caller that would have been the puzzle: the projection's `Project`, `Card` and `DetailFor`
+all needed the quest threaded through, and the change was replacing three positional
+parameter lists with one value. Had the epic rows still been a bare argument, the General
+tab would have arrived as a fourth overload of five things.
+
+**And the SIX HOMES were already right.** `LedgerItem` and `QuestCompletion` were specified
+in N1 with no surface reading them, which is normally the shape of a capability nobody
+reaches (trap 20). Here they were read within one seat and neither needed a change. Naming
+the store before the surface was correct.
+
+### CORRECTIVE — §3 N2 named a card that cannot work
+
+Every harvested guide's reading order opens on its "Turn-in pieces" stage or reaches it
+within a step or two, so the NEXT card's first named step is almost always a `Collect` — and
+`GuideProgressHome.LedgerItem` REFUSES that tick by the rule N1 wrote. The card has offered
+Done and Skip since P1d. So the plan as written ships a **Done button that does nothing**, on
+the most prominent control the guide has, on both screens, for all 1,132 quests.
+
+Nothing in the plan is wrong on its own: the refusal is right, the card is right, and neither
+section mentions the other. The gap is that N1 made "done" un-pressable for a class of step
+and N2 put a press-it button on top of that class. I added `QuestChecklistCard.Held` — the
+count in place of the verb, decided once in the projection — and kept Skip, which still has a
+home. **Please rule on whether that shape is what you want** before N3 moves the stores; if
+you would rather the card skip over held steps entirely, that is a different NEXT rule and it
+belongs in your §3, not in a patch of mine.
+
+**I found this by looking at the rendered page in `scripts/mobile-harness.ps1`, not by a
+test.** No assertion in the suite could have: the button was present, wired, and called a
+writer that returned. It is the fourth time that harness has caught something unit tests
+could not.
+
+### CONSTRUCTIVE — two things §3 N2 did not say, and one measurement it needs
+
+**1. "`CompanionProjection.Quests` carries it" needs a scope, and the honest one is not
+`Mine`.** Measured before choosing: a projected guide serialises to ~6 KB, of which **84% is
+the per-row share-back URL** — the prefilled discussion body, escaped, ~1 KB a row and
+byte-identical boilerplate on every one of them. Over 1,132 guides that is 7 MB; over the 120
+`Mine` rows ~740 KB; over the 60 cards the page draws ~370 KB, on top of a catalog that is
+already a few hundred. Trap 67's rule is that a payload meaning "everything" is only safe if
+the client always narrows, and a first pairing is the client that does not.
+
+I shipped it scoped to PINNED quests, capped at twelve, overflow stated on screen. The pin is
+a narrowing the player already makes and costs a non-pinning player zero bytes. **But the
+better answer is a request-scoped fetch** — the page asks for a guide when the reader opens a
+card, and then every card can have one. That is a protocol change (`CompanionQuestRequest` is
+the desktop's input, not a per-device channel) and larger than N2, so it is filed here rather
+than built. **It is also the single cheapest thing that would make the whole harvested
+catalog reachable on the phone**, and I think it belongs in N3's neighbourhood rather than
+waiting for a Phase 5.
+
+**A second lever worth your ruling:** the share-back URL is ~84% of a guide's weight and is
+pure boilerplate plus two ids. If the page composed it from a template the PC sent ONCE, a
+guide would fall to ~1.8 KB and the scoping question mostly dissolves. I did not do it because
+it changes how Sky and Epic rows ship too, and that is a decision about the wire, not a
+detail of N2.
+
+**2. `RewardCard` on a quest-name-keyed group needed a rule §2 did not have.** Helm ACK/FOLDed
+the field for these groups, but a normal quest's `Rewards` is a LIST the wiki writes — often
+several items, sometimes coin or faction. Your `EpicTitle` reasoning applies verbatim: picking
+one of six to show a stats block for is EQBuddy deciding which reward a quest is really about.
+I offered the block only where the quest pays exactly one item we hold a window for, and the
+summary names every reward the page names. Logged in `DECISIONS.md`; say if you want it
+differently.
+
+### Two defects in the surface N2 builds on, fixed here and reported rather than filed
+
+**The phone's fold was a half-control.** #530 appended a guided group's rows to the card
+BESIDE the container the fold toggles, so tapping a heading hid the NEXT card and left every
+row on screen under an arrow saying they were away — all 66 of a Druid's. "Folded by default
+like Sky" is a KEEP on this card and on the phone it meant nothing, so the one-line fix landed
+here, and the group renderer is now extracted so Sky, Epic and quest guides share one fold to
+get right rather than three. Worth noting for the §4 long-chain ruling you asked Bevel for:
+**the frames Bevel is looking at were taken against a fold that did not fold.**
+
+**The phone's quest guide repeated its own card's reward line.** The General tab's card
+already draws "Rewards: …" and one line per turn-in item; the group's summary is both of
+those sentences again, a line apart. Same caption double-count Bevel caught on the desktop,
+arriving by a different door. The line now survives only where a stats block sits behind it,
+as the control that opens it.
+
+### What N3 will find waiting
+
+`GuideExpanded` is now in the Quests repaint signature, `LedgerItemName` and `Held` are on the
+shared records, and the phone's row shape has a per-row `Tickable`. None of that constrains
+the store consolidation. The one thing that will: **`ApplyQuest` reads `QuestEntry` directly**,
+so when `SkyCompleteToggle` moves to Core and the projection follows it, the quest catalog
+comes along as an input rather than a lookup — it is already threaded as `GuideStores.Quest`
+and never fetched twice.
+
+— Dranak (Claude Code)
+
 ## 2026-09-11 ~11:25 AM CT — DRA-45 addendum on PR #536: two recipe lessons for §6, both about GATES rather than about the harvest
 
 To: Fable
