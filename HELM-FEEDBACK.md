@@ -1,3 +1,48 @@
+## 2026-09-11 ~3:50 PM CT — LIVE ASK: SIGN PR #547 — DRA-61 landing tray BUILD-loop GIF BUILT (Founder's full loop; three calls made alone; Pages stays OFF)
+
+To: Helm
+
+**Card:** DRA-61 `EQ-V2-LANDING-TRAY-BUILD-GIF` (parent DRA-3), Founder DRA-48 follow-up: "landing looks amazing; add GIF of building minimized bar FULL LOOP" — expand, select DPS · Progress · Healing · Motes · Money · Pet DPS, minimize, reorder to DPS · Pet DPS · Healing. Planner-then-Executor in one seat per the card. Seat claimed `61` / `dra61-fable-exec`.
+
+**PR:** https://github.com/DranakCorps-bot/EQBuddy/pull/547 — product tip `f6b29fa0` (+ merge of post-#545 `main`, `a27a6b4e`) on `claude/fable-dra61-tray-build-gif-20260911`, plan commit `937aa4c6` one back (authored, then taken per the FABLE.md loop). At write: `build-and-test` + `e2e-windows` pending. `HELM.md` re-read at splice: Live Holds **empty**.
+
+### What shipped
+
+One continuous 19.7 s harness clip, `tray-build-loop` (1230×780, 193 KB), on the landing's tray story as new step **"02 · Build it"** (later stages renumber). The four shipped clips are byte-untouched and their recipes unchanged. The take: pristine tray (trio + coin) → ⤢ expands the widget in place → pet ★ on the Combat header, motes ★ on the Motes card → minimize returns the bar wearing 🐾 · ✦ · 🪙 → the pet chip is carried into the always-on row (the SIGNED #422 insert, the real gesture) → live heal lines swap the third slot and the row closes on **DPS · pet dps · hps** — the Founder's closing frame, by `HudGlance.NextThird`'s own rule.
+
+Illustration lock honoured: the clip ships in the same PR as its recipe (`record-tray-gifs.ps1 -Gif tray-build-loop` re-records it alone). The take is self-verifying (trap 23): it asserts `HudGlancePet` landed in settings.json after the drop and WAITS on the hps cell via UIA, so a take that misses the gesture fails instead of converting.
+
+### Three calls made alone (DECISIONS.md, DRA-61)
+
+1. **DPS / Progress / Healing are shown as what they are — always on.** The SA-1 trio has no toggle; the clip opens with them on the bar and the landing copy says "name, DPS and XP-or-healing are always on". No faked add.
+2. **Coin is seeded already-starred.** Its ★ has lived in the Progress window's Wealth tab since the fold; the honest detour would double a 20-second clip for one tick. The two on-camera adds (pet, motes) are the two stars that live on the widget itself.
+3. **The closing "Healing" is staged with live log lines, not a doctored frame.** Parser-true heals appended to the staged session log (make-test-session.ps1's documented affordance); no damage in the resume window; the swap draws on camera. Same beat stages a pet claim + melee so the pet cells read real arithmetic.
+
+### The card's Soft LEAVEs — all honoured
+
+- **"record-tray-gifs.ps1 already covers this loop"** — LEFT, and it was indeed false: the script covered hover/click/drag/park only; the build loop is a new choreography with per-GIF seed/height/left-slack tables that leave the old recipes untouched.
+- **Pages enable / Play Console / fake gear rec** — untouched. Pages stays DISABLED per your DRA-48 T4 publish-gate correction; nothing publishes from this PR.
+
+### Verification
+
+- Frame review against written predictions (trap 23): frame 1 has no pet/motes cell; post-minimize shows all three chips uncropped; closing frame reads ⚔ 13 dps · 🐾 2 dps · ✚ 5 hps.
+- Take 1 was discarded for a real defect the recipe now encodes: the window keeps its RIGHT edge and grows LEFT as chips arrive, so the name column walked off frame — `$GifLeft` slack + `WindowLeftOffset` seed carry the evidence.
+- Site-only + recording script: no app behavior change, no WhatsNew, no TestPlan row. The staged log gained the trap-51 reset contract (pristine copy restored per launch) now that a clip appends live play to it.
+
+### Asks
+
+1. **SIGN #547 merge-when-green** (`build-and-test` + `e2e-windows`). I will not force-merge while CI is pending.
+2. **The three alone-calls** — ACK, or tell me which to redo (the coin seed is the one that could have gone the other way; a Progress-window detour take is one re-record away).
+3. **Publishing** — none from this PR; the GIF goes live whenever you/the Founder re-enable Pages through the T4 gate. Nothing for me to do there and I will not touch it.
+4. **David** — not needed. The landing is public surface, but this executes the Founder's own DRA-48 follow-up ask verbatim and you sign before anything publishes; no values line, no release go, no roadmap direction, no privacy surface.
+
+### Feedback
+
+- **Reinforcing — the card pre-empted the exact wrong shortcut.** "Existing record-tray-gifs.ps1 covers hover/click/drag/park only — Soft LEAVE claiming it already covers this loop" killed the tempting no-op answer before it could be reached for. Naming the specific false claim to refuse is even better than naming files to leave alone; keep doing that.
+- **Constructive — the Founder's beat list mixed controls with outcomes** ("select DPS" — a stat with no toggle since SA-1). Fine here because the plan step existed to translate it, but a relayed follow-up that flags "names may be outcomes, not controls" would save the next executor the recon pass that decided fake-vs-map.
+
+— Dranak (Claude Code / Planner+Executor, DRA-61)
+
 ## 2026-09-11 ~3:35 PM CT — LIVE ASK: SIGN PR #545 — DRA-59 Founder-smoke Epic button verb BUILT (three Soft LEAVEs honoured; one call made alone)
 
 To: Helm

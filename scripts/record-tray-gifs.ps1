@@ -62,7 +62,43 @@ $Gifs = [ordered]@{
     # Pin the peek, drag its body to park it elsewhere (OE-8), then take its left edge and
     # resize the width (HudExpandWindow's SizeWE zone).
     'tray-peek-park-resize' = 'Invoke-PeekParkResize'
+    # DRA-61 (Founder, DRA-48 follow-up): BUILDING the bar, full loop — expand the tray
+    # into the widget, star pet and motes on their own card headers, minimize back, then
+    # carry the pet chip into the always-on row (SIGNED #422) and let live heals swap the
+    # third slot to HPS: DPS · pet dps · hps. Coin is seeded already-starred — its ★ has
+    # lived in the Progress window since the fold, and a detour there would double the
+    # clip for one tick (DECISIONS.md, DRA-61).
+    'tray-build-loop'       = 'Invoke-BuildLoop'
 }
+
+# Per-GIF settings overrides, merged over Write-RecSettings' base. The four shipped clips
+# take none, and their seed stays byte-identical to what they were recorded from. The
+# build loop starts from a bar that has NOT been built yet: coin only (see above), and
+# the Motes card visible so its ★ is on camera — a fresh profile hides the card
+# (MigrateMotesCard's blanket pass), so the two one-shot flags are pre-set to say the
+# offer already happened and HiddenSections stays empty.
+$GifSeed = @{
+    'tray-build-loop' = @{
+        MiniStats         = @('money')
+        MotesCardRestored = $true
+        MotesCardOffered  = $true
+        # The window keeps its right edge and grows LEFT as chips arrive; start further
+        # right so the grown bar stays on the backdrop screen (WindowLeftOffset is this
+        # recipe's own key, folded into WindowLeft by Write-RecSettings, never written).
+        WindowLeftOffset  = 300
+    }
+}
+
+# Per-GIF capture heights. The four shipped clips frame the BAR with room for the peek
+# panel (470); the build loop has the whole expanded widget on camera, which grows DOWN
+# from the bar's own top-left (the window is top-left anchored), so its frame is taller.
+$GifHeight = @{ 'tray-build-loop' = 780 }
+
+# Per-GIF LEFT slack. The window keeps its RIGHT edge put and grows leftward as chips
+# arrive (first take's evidence: the name column walked off the frame's left edge the
+# moment pet + motes landed), so a clip that ADDS chips needs the growth budgeted on
+# that side. The four shipped clips keep the 120 they were framed with.
+$GifLeft = @{ 'tray-build-loop' = 380 }
 if ($List) { $Gifs.Keys | ForEach-Object { $_ }; return }
 $wanted = if ($Gif.Count -gt 0) { $Gif } else { @($Gifs.Keys) }
 foreach ($name in $wanted) {
@@ -107,8 +143,9 @@ function Get-RecOrigin {
 }
 
 # The same seeded profile shoot.ps1's mini-bar shots use, with the founder's chip set.
-function Write-RecSettings {
-    @{
+# $Overrides is the per-GIF seed from $GifSeed — keys replace the base entry wholesale.
+function Write-RecSettings([hashtable]$Overrides = @{}) {
+    $base = @{
         LogFolder    = $logsDir.FullName
         UpdateFolder = $updateDir.FullName
         Theme        = $Theme
@@ -129,7 +166,13 @@ function Write-RecSettings {
         # The list has to grow with BreakoutKind (trap 30).
         DisabledBreakouts = @('Damage','Healing','Pet','Watch','Loot','Buffs')
         MiniStats = @('dps','xp','procs','loot','motes','money')
-    } | ConvertTo-Json -Depth 6 | Set-Content (Join-Path $profileDir 'settings.json') -Encoding UTF8
+    }
+    foreach ($k in $Overrides.Keys) { $base[$k] = $Overrides[$k] }
+    if ($base.ContainsKey('WindowLeftOffset')) {
+        $base.WindowLeft += $base.WindowLeftOffset
+        $base.Remove('WindowLeftOffset')
+    }
+    $base | ConvertTo-Json -Depth 6 | Set-Content (Join-Path $profileDir 'settings.json') -Encoding UTF8
 }
 
 function Stop-RecHard([Diagnostics.Process]$proc) {
@@ -265,6 +308,71 @@ function Require-Chip([int]$ownerPid, [string]$pattern, [string]$what) {
     $p
 }
 
+# EVERY visible match, for the one place first-match is not an identity: once the pet
+# chip is on the bar there are two cells ending in "dps" (the always-on DPS slot and the
+# pet cell), and which one a walk finds first is tree order, not meaning. The caller
+# picks by POSITION, which is what the gesture is about anyway.
+function Get-ChipPoints([int]$ownerPid, [string]$pattern) {
+    $cond = New-Object Windows.Automation.PropertyCondition(
+        [Windows.Automation.AutomationElement]::ProcessIdProperty, $ownerPid)
+    $wins = [Windows.Automation.AutomationElement]::RootElement.FindAll(
+        [Windows.Automation.TreeScope]::Children, $cond)
+    $points = @()
+    foreach ($w in $wins) {
+        if ($w.Current.Name -ne 'EQBuddy') { continue }
+        $all = $w.FindAll([Windows.Automation.TreeScope]::Descendants,
+            (New-Object Windows.Automation.PropertyCondition(
+                [Windows.Automation.AutomationElement]::IsOffscreenProperty, $false)))
+        foreach ($el in $all) {
+            $n = $el.Current.Name
+            if ($n -and $n -match $pattern) {
+                $b = $el.Current.BoundingRectangle
+                if ($b.Width -gt 0) {
+                    $points += @{ X = [int]($b.X + $b.Width / 2); Y = [int]($b.Y + $b.Height / 2); Name = $n }
+                }
+            }
+        }
+    }
+    $points
+}
+
+# A control by its AutomationId — WPF publishes x:Name there, so the ★ ToggleButtons
+# (StarPet, StarMotes) are addressable without inventing pixel offsets from the header
+# text. Names would not do: a StarToggle draws geometry, not text.
+function Require-AutoId([int]$ownerPid, [string]$autoId, [string]$what) {
+    $cond = New-Object Windows.Automation.PropertyCondition(
+        [Windows.Automation.AutomationElement]::ProcessIdProperty, $ownerPid)
+    $wins = [Windows.Automation.AutomationElement]::RootElement.FindAll(
+        [Windows.Automation.TreeScope]::Children, $cond)
+    foreach ($w in $wins) {
+        if ($w.Current.Name -ne 'EQBuddy') { continue }
+        $el = $w.FindFirst([Windows.Automation.TreeScope]::Descendants,
+            (New-Object Windows.Automation.PropertyCondition(
+                [Windows.Automation.AutomationElement]::AutomationIdProperty, $autoId)))
+        if ($el -and -not $el.Current.IsOffscreen) {
+            $b = $el.Current.BoundingRectangle
+            if ($b.Width -gt 0) {
+                $p = @{ X = [int]($b.X + $b.Width / 2); Y = [int]($b.Y + $b.Height / 2) }
+                Write-Host "  $what ($autoId) at $($p.X),$($p.Y)"
+                return $p
+            }
+        }
+    }
+    throw "No visible control with AutomationId '$autoId' ($what) — is the widget expanded?"
+}
+
+# Live play, the way make-test-session.ps1's own footer suggests: append parser-true
+# lines with NOW timestamps and let the 150 ms tail pick them up. This is how the build
+# loop's closing beat swaps the third slot to HPS — the swap is HudGlance.NextThird's
+# shipped rule, fed real (staged) events, never a doctored frame.
+function Add-RecLogLines([string[]]$messages) {
+    if (-not (Test-Path $script:sessionLog)) { throw "Session log not found at $script:sessionLog" }
+    $ci = [Globalization.CultureInfo]::InvariantCulture
+    $stamp = [DateTime]::Now.ToString('ddd MMM dd HH:mm:ss yyyy', $ci)
+    Add-Content -Path $script:sessionLog -Encoding UTF8 -Value (
+        $messages | ForEach-Object { "[$stamp] $_" })
+}
+
 # --- recording ---------------------------------------------------------------------
 # ffmpeg gdigrab over the region around the bar, -draw_mouse 1 because the cursor IS the
 # story. Recorded to lossless x264, then quantized to GIF in a second pass (palettegen /
@@ -363,6 +471,14 @@ $logsDir = New-Item -ItemType Directory -Force (Join-Path $root 'game/Logs')
 $updateDir = New-Item -ItemType Directory -Force (Join-Path $root 'updates')
 Write-Host "Profile: $profileDir"
 & (Join-Path $PSScriptRoot 'make-test-session.ps1') -Out $logsDir.FullName | Write-Host
+$script:sessionLog = Join-Path $logsDir.FullName 'eqlog_Testchar_test.txt'
+if (-not (Test-Path $script:sessionLog)) { throw "make-test-session did not write $script:sessionLog" }
+# The build loop APPENDS live lines to the staged log, and the log is shared across the
+# batch the way settings.json used to be — same reset contract (trap 51): keep the
+# pristine bytes and restore them before every launch, so no clip replays another clip's
+# appended play.
+$script:pristineLog = Join-Path $root 'pristine-session.txt'
+Copy-Item $script:sessionLog $script:pristineLog -Force
 
 # --- per-GIF choreographies ---------------------------------------------------------
 # Each receives the widget pid and its bar rect; the recording is already rolling.
@@ -435,6 +551,107 @@ function Invoke-PeekParkResize([int]$appPid, [RecW.U+RECT]$bar) {
     Wait-Pump 600
 }
 
+# DRA-61: the FULL build loop. Expand the tray, star pet + motes where their stars live,
+# minimize back to a bar now wearing those chips, carry the pet chip into the always-on
+# row (SIGNED #422), and close on the third slot's real XP→HPS swap fed by live heals.
+# Self-verifying where the pixels alone could lie (trap 23): the drop is confirmed from
+# settings.json (HudGlancePet) and the swap is waited on via UIA, so a take that missed
+# the gesture FAILS instead of shipping a clip of something else.
+function Invoke-BuildLoop([int]$appPid, [RecW.U+RECT]$bar) {
+    $u2922 = [string][char]0x2922   # ⤢ expand;  U+2013 – minimize. Composed, not typed:
+    $u2013 = [string][char]0x2013   # a mangled literal here would grep clean (trap 60c).
+    Wait-Pump 1300                                  # open on the pristine, unbuilt tray
+
+    # (1) Expand. Approach over the top of the bar — a path across the cells would open
+    # hover peeks that are the OTHER clips' story.
+    $expand = Require-Chip $appPid ('^' + $u2922 + '$') 'expand'
+    Move-Smooth $expand.X ($bar.T - 40) 600
+    Move-Smooth $expand.X $expand.Y 350
+    Wait-Pump 200
+    Click-Here
+    # The widget re-lays-out in place; wait for the pet ★ to exist rather than for time.
+    $petStar = $null
+    $deadline = (Get-Date).AddSeconds(12)
+    while ((Get-Date) -lt $deadline -and -not $petStar) {
+        Wait-Pump 250
+        $petStar = try { Require-AutoId $appPid 'StarPet' 'pet star' } catch { $null }
+    }
+    if (-not $petStar) { throw 'Widget did not expand (StarPet never appeared).' }
+    Wait-Pump 900                                   # let the expanded layout read
+
+    # (2) Star pet damage on the Combat header, then motes on its own card.
+    Move-Smooth $petStar.X $petStar.Y 700
+    Wait-Pump 250; Click-Here; Wait-Pump 600
+    # A pet answers on camera — the claim is the parser's own leader line, the hits are
+    # ordinary melee. Garnish, not the story; the numbers stay whatever the session's
+    # arithmetic says they are.
+    Add-RecLogLines @(
+        "Jiberrik says, 'My leader is Testchar.'",
+        'Jiberrik hits a giant spider for 43 points of damage.',
+        'Jiberrik hits a giant spider for 51 points of damage.',
+        'Jiberrik hits a giant spider for 38 points of damage.')
+    $motesStar = Require-AutoId $appPid 'StarMotes' 'motes star'
+    Move-Smooth $motesStar.X $motesStar.Y 800
+    Wait-Pump 250; Click-Here; Wait-Pump 900
+
+    # (3) Minimize back to the tray — it comes back wearing pet · motes · coin.
+    $mini = Require-Chip $appPid ('^' + $u2013 + '$') 'minimize'
+    Move-Smooth $mini.X $mini.Y 600
+    Wait-Pump 200
+    Click-Here
+    # Wait for the BAR, not for time: the pet cell is the state that proves the mode and
+    # the stars both landed. Two "N dps" texts exist now; position picks (see below).
+    $deadline = (Get-Date).AddSeconds(10)
+    $cells = @()
+    while ((Get-Date) -lt $deadline -and $cells.Count -lt 2) {
+        Wait-Pump 250
+        $cells = @(Get-ChipPoints $appPid '^\s*\d+(\.\d+)?\s*dps\s*$')
+    }
+    if ($cells.Count -lt 2) { throw 'Minimized bar never showed the pet cell beside the DPS slot.' }
+    # Park above the bar so nothing under the pointer peeks while the new bar reads.
+    $w = Find-RecWindow 'EQBuddy' $appPid; $nb = Get-RecRect $w
+    Move-Smooth ($nb.R + 60) ($nb.T - 44) 500
+    Wait-Pump 1500
+
+    # (4) The reorder the founder asked for by name: carry the pet chip left past the DPS
+    # slot's right edge and drop it into the always-on row's insertion gap (SIGNED #422).
+    $cells = @(@(Get-ChipPoints $appPid '^\s*\d+(\.\d+)?\s*dps\s*$') | Sort-Object { $_.X })
+    $dps = $cells[0]; $pet = $cells[-1]
+    if ($dps.X -eq $pet.X) { throw 'Could not tell the DPS slot from the pet cell.' }
+    Move-Smooth $pet.X $pet.Y 700
+    Wait-Pump 350
+    Drag-Smooth ($dps.X + 8) $dps.Y 1000
+    # The write is the evidence (trap 23): the drop must have persisted HudGlancePet.
+    $deadline = (Get-Date).AddSeconds(6); $inserted = $false
+    while ((Get-Date) -lt $deadline -and -not $inserted) {
+        Wait-Pump 200
+        $saved = try { Get-Content (Join-Path $profileDir 'settings.json') -Raw | ConvertFrom-Json } catch { $null }
+        $inserted = $saved -and $saved.HudGlancePet
+    }
+    if (-not $inserted) { throw 'Pet drop did not write HudGlancePet — the insert gesture missed.' }
+    $w = Find-RecWindow 'EQBuddy' $appPid; $nb = Get-RecRect $w
+    Move-Smooth ($nb.R + 60) ($nb.T - 44) 500       # off the row before it can peek
+    Wait-Pump 700
+
+    # (5) Live heals land; HudGlance.NextThird swaps the third slot to HPS and the row
+    # reads DPS · pet dps · hps — the founder's closing frame, by the shipped rule.
+    Add-RecLogLines @(
+        'You healed Kaybek for 812 hit points by Superior Healing.',
+        'You healed Kaybek for 764 hit points by Superior Healing.',
+        'You healed Sindl for 903 hit points by Superior Healing.',
+        'You healed Kaybek for 655 hit points by Superior Healing.',
+        'You healed Sindl for 878 hit points by Superior Healing.')
+    $deadline = (Get-Date).AddSeconds(10); $hps = $null
+    while ((Get-Date) -lt $deadline -and -not $hps) {
+        Wait-Pump 250
+        $hps = Get-ChipPoint $appPid '\d\s*hps\s*$'
+    }
+    if (-not $hps) { throw 'Third slot never swapped to HPS after the staged heals.' }
+    Wait-Pump 1800                                  # the finished bar, at rest
+    Move-Smooth ($nb.R + 420) ($nb.T - 44) 400      # exit the frame so the loop closes clean
+    Wait-Pump 600
+}
+
 # --- the run -----------------------------------------------------------------------
 New-Item -ItemType Directory -Force $Out | Out-Null
 $taken = @(); $failed = @()
@@ -442,7 +659,8 @@ try {
     foreach ($name in $wanted) {
       try {
         Write-Host "`n=== $name ==="
-        Write-RecSettings
+        Write-RecSettings ($GifSeed[$name] ?? @{})
+        Copy-Item $script:pristineLog $script:sessionLog -Force
         $psi = New-Object Diagnostics.ProcessStartInfo $exe
         $psi.UseShellExecute = $false
         Assert-EqIsolatedProfile $profileDir.FullName 'record-tray-gifs.ps1'
@@ -477,11 +695,12 @@ try {
             $bar = Get-RecRect $widget
             # The recorded region: the bar with room below-left for the peek panel and
             # slack for a park drag. Even dimensions, for the encoder.
+            $left = $GifLeft[$name] ?? 120
             $rg = @{
-                X = $bar.L - 120
+                X = $bar.L - $left
                 Y = $bar.T - 56
-                W = ($bar.R - $bar.L) + 460   # 120 left; 340 right, for the park + resize
-                H = 470
+                W = ($bar.R - $bar.L) + $left + 340   # 340 right, for the park + resize
+                H = $GifHeight[$name] ?? 470
             }
             $rg.W += $rg.W % 2; $rg.H += $rg.H % 2
             Write-Host "  bar $($bar.L),$($bar.T)-$($bar.R),$($bar.B); region $($rg.X),$($rg.Y) $($rg.W)x$($rg.H)"
