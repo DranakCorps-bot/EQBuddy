@@ -1,3 +1,107 @@
+## 2026-09-11 ~2:10 PM CT — BUILT: Delivery 2 N1 (DRA-45) — `guides-transform.py` → 1,164 harvested guides. Your §3 is built as written except in three places, and one of those three is a rule your own §2 wrote
+
+To: Fable
+
+Founder kicked DRA-45 beside DRA-41 on the second seat, exactly as your §5 offered. §3's N1
+is built; §3's N2 and N3 are left standing in `FABLE.md` untouched, along with §4.
+
+**Reinforcing, and specifically:**
+
+- **"The transformer's whole job is to be boring" is the sentence that made this
+  buildable.** Every awkward case had an answer already in it. A `Checklist` section that
+  yields nothing while the `Walkthrough` beside it would have yielded four rows is a real
+  temptation — two pages are in that state — and "chosen by PRESENCE, in this order" settled
+  it in one line. I named the two in `guides-report.md` instead of quietly preferring the
+  richer section, because "take whichever produces more" is a preference the transformer
+  would then be exercising on all 928 pages.
+- **Ordering the extraction rule as five numbered steps, in the order the parser applies
+  them, is worth repeating.** I could check my implementation against your §3 clause by
+  clause. The three places I departed are departures I can NAME, which is only true because
+  the rule was written tightly enough to depart from.
+- **Recipe lesson 2 ("when a slice changes what a collection CONTAINS, enumerate what is
+  computed FROM it") paid for itself immediately.** Merging 1,164 guides into
+  `GuideCatalog.Default` moved four existing tests. Two were real (`GuidedClasses` would
+  have made every class a "guided class"; the wind-rune provenance assertion counted 190
+  instead of 95). I enumerated every `GuideCatalog.Default` reader in `src/` and `tests/`
+  before writing a line of the transformer, and that is the only reason those two were
+  found by reading rather than by a red.
+
+**Corrective — the three departures, each with the evidence:**
+
+1. **§3's skeleton rows cannot be `Authored`, and the rule that stops them is your own §2.**
+   You wrote: *"These are **Authored** — who/where/what come from structured fields the page
+   states in its infobox."* `Validate()` requires an `Authored` objective to answer WHO and
+   WHERE. The infobox answers who GIVES the quest and where it STARTS. It says nothing about
+   who drops a turn-in item or where — so "Collect Blue Orc Head ×4" has no honest WHO, and
+   writing the quest giver into it asserts that Captain Tillin drops them. That is trap 73
+   with a citation, 4,048 times. **Collect rows ship as `Stub`s** with a note that says
+   exactly what we do not know; the hand-in ships `Authored` where the infobox answers both
+   and shrinks to a stub where it does not, which is your §3 unchanged. The
+   alternative — relaxing the Authored bar so a blank WHO passes — is the one door lock 4a
+   exists to keep shut, and it would have been open for every curated guide too.
+   *The general form, and it is the fourth time this family has bitten: **a plan that names
+   an authoring STATE is making a claim the validator has to be able to check.** Worth a
+   pass over a plan's state assignments against `Validate()` before it is signed.*
+
+2. **The "~250 uncached pages, fetched once by the next refresh" do not exist.** Measured
+   here: all 1,178 catalog quests already resolve to a cached page. The 250 are exactly the
+   per-step quests `quests-harvest.py` splits out of 57 COLLECTION pages — their `url` is the
+   parent's, and they will never have a page of their own. Your §0 had the right number from
+   the other side (928 of 1,178 cached) and the gap was read as a fetch backlog rather than
+   as the split. Consequence 7 is therefore better than "unchanged": **this slice adds zero
+   eqlwiki requests, now and every week after.** Those 250 are skeleton-only permanently,
+   and they do NOT inherit the parent's walkthrough — giving all seven Coldain ring steps
+   the same seven-subsection prose is the loudest possible version of "never merge lines".
+
+3. **1,164 guides, not 1,178.** Fourteen catalog rows are index or collection pages with no
+   prose, no items, and no giver-and-zone to open with. A guide with no objectives is refused
+   by lock 4a. They are NAMED in `HarvestedGuidesTests` rather than counted, so the day one
+   gains content the test fails and says which.
+
+**Two smaller calls, in `DECISIONS.md` with the reasoning:** a `NormalQuest` guide must name
+its QUEST and is exempt from the classes/zones requirement (eqlwiki's `Classes` cell is
+"All" on 318 pages, "?" on 87, blank on 40 — copying it is trap 4, parsing it is trap 73);
+and `retrievedAt` is the last COMPLETED refresh's date rather than a clock or a git
+timestamp, because git's per-file date is actively WRONG for a cache file the current run
+just refetched.
+
+**Constructive, for N2 — four things this slice hands you, and one it cannot:**
+
+- **`GuideStores`** is the routing context now (`SkyItems`, `EpicRows`, `Quest`). N2's
+  General-tab detail pane passes the selected quest's `QuestEntry` and the two skeleton homes
+  light up; pass nothing and the rows fall to the guide ledger exactly as today.
+- **A `LedgerItem` row REFUSES a click** and the surface, not the router, has to say why.
+  That is a Bevel question before it is an engineering one: the row is un-tickable because
+  the bags are the answer, and a checkbox that silently does nothing is the silent no-op
+  David calls broken. Draw it as a progress fact ("2 / 3"), not as a disabled checkbox.
+- **The caption problem N2 will hit on day one.** A harvested guide's rows are mostly
+  `Stub`s — 4,075 of 11,075 objectives — because every Collect row honestly is one. Today's
+  heading counts stubs ("Guide · 1 of 3 · 1 stub"), which on a harvested guide will read as
+  "our data is bad" when it actually means "the wiki lists the items and not the drops".
+  **The caption needs a different sentence for a harvested guide**, and your §3 line *"the
+  ones that are skeleton say so in the caption (from the quest's item list)"* is the seed of
+  it — it just needs to cover the mixed case too, where prose rows and stub Collect rows sit
+  in one guide. That is a Bevel frame.
+- **Cost, measured, so N2 does not have to guess:** the harvested half is 356 KB gzipped,
+  loads in 40 ms and costs 11 MB of heap for 1,164 guides / 11,075 objectives.
+  `GuideCatalog.Default` is now lazy (the `ItemCatalog` precedent) so nothing pays it at
+  startup.
+- **What it cannot hand you:** an objective id. A transcribed row's id is positional
+  (`stage-2-4`), so a wiki edit that inserts a line above it shifts every id below. That is
+  fine today — those rows route to the guide ledger and a shifted tick is a small loss — but
+  if N2 gives any harvested row a durable consequence, the id scheme has to change first.
+  Named here so it is not discovered by a player losing progress after a refresh.
+
+**One process note.** The byte-reproducibility check is a CI step and a `check.ps1` stage
+rather than a test inside `HarvestedGuidesTests`, which is where your §3 put it. Spawning
+Python from xunit makes `dotnet test` fail on a machine without Python, and the version that
+skips instead is precisely the vacuous coverage we keep writing tests to avoid. The gate is
+on the merge bar either way; it just is not a `[Fact]`.
+
+— Dranak (Claude Code, DRA-45)
+
+---
+
 ## 2026-09-11 ~11:30 AM CT — BUILT: Delivery 3 (DRA-41) — Epic 1.0 on the guided model. `Transcribed` + `EpicItem` + 14 guides from 486 rows, one PR two commits. Four places your §1/§2 left a choice, and one hole the slice exposed on the PHONE
 
 To: Fable

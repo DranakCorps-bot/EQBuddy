@@ -41,7 +41,8 @@ public class WeeklyRefreshWiringTests
     public void EveryScriptTheRefreshDrivesExists()
     {
         var refresh = Read("scripts/harvests/refresh.py");
-        var named = Regex.Matches(refresh, @"""([a-z0-9-]+(?:-harvest|-promote|-merge)\.py)""")
+        var named = Regex.Matches(refresh,
+                @"""([a-z0-9-]+(?:-harvest|-promote|-merge|-transform)\.py)""")
             .Select(m => m.Groups[1].Value).Distinct().ToList();
 
         Assert.NotEmpty(named);
@@ -148,5 +149,52 @@ public class WeeklyRefreshWiringTests
         // `DATA / name` in refresh.py — the flag reads the shipped file itself.
         Assert.True(File.Exists(Path.Combine(Root, "src", "EQBuddy.Core", "Data", "GuideCatalog.json")),
             "refresh.py flags Data/GuideCatalog.json; it is not there, so the weekly flag is a no-op.");
+    }
+
+    /// <summary>
+    /// The HARVESTED half is the mirror image and both halves matter (DRA-45):
+    /// `HarvestedGuides.json.gz` is PROMOTED — regenerated every week, diffed for the
+    /// report — and never curated, while `GuideCatalog.json` above is curated and never
+    /// promoted. Swapping either would break the one rule the two files exist to keep
+    /// apart: a machine may write the harvested guide and may never touch the authored one.
+    ///
+    /// <para>And the transform runs AFTER <c>quests-promote.py</c>, because it reads the
+    /// catalog that promotion writes. Listed before it, the week's new quests would be
+    /// harvested a week late while the run reported success — the silent-decay shape this
+    /// whole file guards.</para>
+    /// </summary>
+    [Fact]
+    public void TheHarvestedGuidesArePromotedAfterTheQuestCatalogTheyRead()
+    {
+        var refresh = Read("scripts/harvests/refresh.py");
+        var promoted = Regex.Match(refresh, @"PROMOTED = \[(.*?)\]", RegexOptions.Singleline).Groups[1].Value;
+        var curated = Regex.Match(refresh, @"CURATED = \[(.*?)\]", RegexOptions.Singleline).Groups[1].Value;
+
+        Assert.Contains("HarvestedGuides.json.gz", promoted);
+        Assert.DoesNotContain("HarvestedGuides.json.gz", curated);
+
+        // The RUN ORDER, read off the entries and not off the text. Searching the block for
+        // "quests-promote.py" found it in the COMMENT that explains the ordering — which
+        // sits above guides-transform.py, so the guard passed on a tree where the two had
+        // been swapped. Proved by doing exactly that (2026-09-11). It is the same mistake
+        // `TheClassPageHarvestRunsWeeklyAndItsCacheIsEvicted` documents one test up: a name
+        // present in a file is not the call site.
+        var promotions = Regex.Match(refresh, @"PROMOTIONS = \[(.*?)\]", RegexOptions.Singleline)
+            .Groups[1].Value;
+        var order = promotions.Split('\n')
+            .Select(line => line.Trim())
+            .Where(line => !line.StartsWith('#'))
+            .SelectMany(line => Regex.Matches(line, @"""([a-z0-9-]+\.py)""")
+                .Select(m => m.Groups[1].Value))
+            .ToList();
+        var quests = order.IndexOf("quests-promote.py");
+        var guides = order.IndexOf("guides-transform.py");
+        Assert.True(quests >= 0 && guides > quests,
+            "guides-transform.py reads QuestCatalog.json and must run after quests-promote.py "
+            + $"writes it — the promotion order is [{string.Join(", ", order)}]");
+
+        Assert.True(File.Exists(Path.Combine(Root, "src", "EQBuddy.Core", "Data",
+                "HarvestedGuides.json.gz")),
+            "refresh.py diffs Data/HarvestedGuides.json.gz; it is not there.");
     }
 }

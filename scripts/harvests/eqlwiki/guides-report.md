@@ -1,0 +1,506 @@
+# Harvested guides report
+
+Auto-written by `guides-transform.py`. Nothing here is curated; `GuideCatalog.json` is, and wins on `questName`.
+
+- Catalog quests: 1178
+- Guides written: 1164
+- Objectives: 11075
+- Distinct eqlwiki pages cited: 914
+- Wikitext verified current as of: 2026-08-31 (last completed refresh)
+
+## Per shape
+
+| Shape | Guides |
+|---|---|
+| checklist | 109 |
+| checklist-yielded-nothing | 7 |
+| no-guide | 14 |
+| no-section | 50 |
+| split-step | 250 |
+| walkthrough | 664 |
+| walkthrough-yielded-nothing | 84 |
+
+`split-step` is one of the 250 per-step quests split out of a collection page; its
+page is the parent's, so it never gets the parent's walkthrough (see the script's
+header). `*-yielded-nothing` means the section is there and holds no bullet, bold
+line or `You say`.
+
+### Where the presence rule costs a page rows (2)
+
+A `Checklist` section that yielded nothing, on a page whose `Walkthrough` would
+have. The rule picks by presence, not by yield — see `prose_stages`.
+
+- Darkforge Armor Quests
+- The Restraining Order
+
+## Authoring states
+
+- `Authored`: 5244
+- `Stub`: 27
+- `Transcribed`: 5804
+
+## Objective types
+
+- `Collect`: 4048
+- `Custom`: 5804
+- `TalkToNpc`: 368
+- `TurnIn`: 855
+
+## Transcribed rows per guide
+
+- 0 rows: 391 guides
+- 1 rows: 34 guides
+- 2 rows: 118 guides
+- 3 rows: 117 guides
+- 4 rows: 101 guides
+- 5 rows: 68 guides
+- 6 rows: 59 guides
+- 7 rows: 46 guides
+- 8 rows: 22 guides
+- 9 rows: 23 guides
+- 10 rows: 17 guides
+- 11 rows: 22 guides
+- 12 rows: 15 guides
+- 13 rows: 15 guides
+- 14 rows: 12 guides
+- 15 rows: 8 guides
+- 16 rows: 8 guides
+- 17 rows: 4 guides
+- 18 rows: 3 guides
+- 19 rows: 5 guides
+- 20 rows: 4 guides
+- 21 rows: 45 guides
+- 22 rows: 2 guides
+- 23 rows: 2 guides
+- 24 rows: 4 guides
+- 25 rows: 1 guides
+- 27 rows: 2 guides
+- 28 rows: 1 guides
+- 30 rows: 1 guides
+- 31 rows: 1 guides
+- 32 rows: 1 guides
+- 33 rows: 1 guides
+- 34 rows: 1 guides
+- 35 rows: 2 guides
+- 36 rows: 1 guides
+- 37 rows: 1 guides
+- 42 rows: 1 guides
+- 46 rows: 1 guides
+- 49 rows: 1 guides
+- 53 rows: 1 guides
+- 66 rows: 1 guides
+- 83 rows: 1 guides
+
+## Skeleton-only guides (391)
+
+No walkthrough and no checklist reached these — the 250 collection split-steps,
+whose page is their parent's, plus the pages that carry neither section.
+
+- 10th Coldain Ring Quest
+- A sealed letter
+- Adamantium Coldain Insignia Ring (#7)
+- Aegis of Life Quest
+- Akkirus' Boots of the Risen
+- Akkirus' Gauntlets of the Risen
+- All Positive Faction Quests
+- Animal Skin Armor
+- Arch Mage's Gloves
+- Arch Mage's Robe
+- Arch Mage's Sleeves
+- Armor of Ro Quests
+- Armor of the Priest Quests
+- Bard Mail
+- Bard Plane of Sky Tests
+- Bearskin Gloves Quest
+- Beastlord Plane of Sky Tests
+- Beguile Plants Quest
+- Beguiler's Gloves
+- Beguiler's Robe
+- Beguiler's Sleeves
+- Berserker Plane of Sky Tests
+- Bertoxxulous Symbol Quests
+- Beta Neutral
+- Blackburrow Stout Delivery
+- Blood Ink
+- Blood Lord's Boots
+- Blood Lord's Bracer
+- Blood Lord's Breastplate
+- Blood Lord's Gauntlets
+- Boots of Forbidden Rites
+- Boots of Twilight
+- Boots of the Invoker
+- Boots of the Myrmidon
+- Boots of the Reliant
+- Bracer of Twilight
+- Bracer of the Myrmidon
+- Bracers of Forbidden Rites
+- Bracers of the Reverent
+- Brain Bite (Evil)
+- Bread Shipment Quests
+- Breastplate of Forbidden Rites
+- Breastplate of Twilight
+- Breastplate of the Myrmidon
+- Brell Serilis Symbol Quests
+- Brigand's Boots
+- Brigand's Bracer
+- Brigand's Gauntlets
+- Burlap Coldain Prayer Shawl (#1)
+- Bvellos' Bounty
+- Cabilis Pale Ale (Cabilis)
+- Cazic Thule Symbol Quests
+- Champion's Boots
+- Champion's Bracer
+- Champion's Gauntlets
+- Chestplate of the Constant
+- Class Race Quest List
+- Cleric Plane of Sky Tests
+- Cloth Coldain Prayer Shawl (#2)
+- Clurg's New Creation
+- Clurg's Revenge
+- Coldain Hero's Insignia Ring (#9)
+- Coldain Prayer Shawl Quests
+- Coldain Ring Quests
+- Copper Coldain Insignia Ring (#1)
+- Cougarskin Mask Quest
+- Crest of the Fauns Quest
+- Cromil's Remains
+- Dark Runed Boots
+- Dark Runed Bracer
+- Dark Runed Gauntlets
+- Darkforge Armor Quests
+- Darkforge Boots
+- Darkforge Bracer
+- Darkforge Breastplate
+- Darkforge Gauntlets
+- Darkforge Greaves
+- Darkforge Helm
+- Darkforge Vambraces
+- Dazzling Gloves
+- Dazzling Robe
+- Dazzling Sleeves
+- Deceiver's Boots
+- Deceiver's Bracer
+- Deceiver's Gauntlets
+- Deck of Spontaneous Generation Quest
+- Direwolf Fur Cloak Quest
+- Disciple Symbol of Brell Serilis
+- Disciple Symbol of Innoruuk
+- Disciple Symbol of Quellious
+- Disciple Symbol of Tunare
+- Dreadscale Boots
+- Dreadscale Bracer
+- Dreadscale Breastplate
+- Dreadscale Gauntlets
+- Dreadscale Greaves
+- Dreadscale Mask
+- Dreadscale Vambraces
+- Druid Plane of Sky Tests
+- Embroidered Coldain Prayer Shawl (#6)
+- Enchanter Plane of Sky Tests
+- Exotic Drinks
+- Fleshy Orbs
+- Footman's Pike (#2)
+- Forest Stalker's Boots
+- Forest Stalker's Bracer
+- Forest Stalker's Breastplate
+- Forest Stalker's Gauntlets
+- Fur-Lined Coldain Prayer Shawl (#4)
+- Gauntlets of Forbidden Rites
+- Gauntlets of Twilight
+- Gauntlets of the Ardent
+- Gauntlets of the Myrmidon
+- Gloves of the Invoker
+- Goblin Battlemasters
+- Goblin Raiders
+- Going Postal
+- Gold Coldain Insignia Ring (#3)
+- Golden Leaf Boots
+- Golden Leaf Bracer
+- Golden Leaf Breastplate
+- Golden Leaf Gauntlets
+- Golden Leaf Helm
+- Greaves of Twilight
+- Greaves of the Myrmidon
+- Greaves of the Penitent
+- Greenblood Shadowknight Tunic
+- Guild Summons - Abbey of Deep Musing Cleric
+- Guild Summons - Abbey of Deep Musing Rogue
+- Guild Summons - Cauldron of Hate
+- Guild Summons - Da Bashers
+- Guild Summons - Dark Ones
+- Guild Summons - Dark Reflection Cleric
+- Guild Summons - Dark Reflection Enchanter
+- Guild Summons - Dark Reflection Magician
+- Guild Summons - Dark Reflection Necromancer
+- Guild Summons - Dark Reflection Rogue
+- Guild Summons - Dark Reflection Warrior
+- Guild Summons - Dark Reflection Wizard
+- Guild Summons - Dismal Rage Warrior
+- Guild Summons - Fortress Craknek
+- Guild Summons - Gemchopper Hall
+- Guild Summons - Greenblood Rock
+- Guild Summons - Hall of the Ebon Mask
+- Guild Summons - Libary Mechanimagica Enchanter
+- Guild Summons - Libary Mechanimagica Magician
+- Guild Summons - Libary Mechanimagica Wizard
+- Guild Summons - Murdunk's Palace
+- Guild Summons - Night Keep
+- Guild Summons - Priests of Innoruuk
+- Guild Summons - Rogues of the White Rose
+- Guild Summons - Shamen of Justice
+- Guild Summons - The Dead Necromancer
+- Guild Summons - The Dead Shadowknight
+- Guild Summons - The Spurned Enchanter
+- Guild Summons - The Spurned Magician
+- Guild Summons - The Spurned Wizard
+- Guild Summons - Wolves of the North
+- Helm of Twilight
+- Helms of Giant Warriors
+- Herb Shop
+- Hollow Skull Quest
+- Honeybugger Assassin
+- Icicle Boots
+- Icicle Gloves
+- Icicle Sleeves
+- Illusionist's Gloves
+- Illusionist's Robe
+- Illusionist's Sleeves
+- Illweed Parchment Quest
+- Incandescent Gloves
+- Incandescent Mask
+- Incandescent Mask quest
+- Incandescent Wand
+- Initiate Symbol of Brell Serilis
+- Initiate Symbol of Innoruuk
+- Initiate Symbol of Quellious
+- Initiate Symbol of Tunare
+- Ivy Etched Armor Quests
+- Ivy Etched Boots
+- Ivy Etched Bracer
+- Ivy Etched Gauntlets
+- Ivy Etched Helm
+- Ivy Etched Leggings
+- Ivy Etched Sleeves
+- Keeper Rott's Pages
+- Lambent Armor Quests
+- Lambent Boots
+- Lambent Bracers
+- Lambent Breastplate
+- Lambent Gauntlets
+- Lambent Greaves
+- Lambent Helm
+- Lambent Vambraces
+- Legionnaire's Mancatcher (#5)
+- Lionskin Gloves Quest
+- Lizard Dolls
+- Long Iron Rod Quest
+- Madame Serena Quest
+- Magician Plane of Sky Tests
+- Malevolent Boots
+- Malevolent Bracer
+- Malevolent Breastplate
+- Malevolent Gauntlets
+- Malevolent Greaves
+- Malevolent Vambraces
+- Mercenary Assignments Quest
+- Metal Bits for the New Sebilisian Expedition
+- Militia's Pike (#1)
+- Mithril Coldain Insignia Ring (#6)
+- Monk Epic Quest
+- Monk Headband Quests
+- Monk Sash Quests
+- Mooto's Proof
+- Muffin Quests
+- Nature Walker's Boots
+- Nature Walker's Bracer
+- Nature Walker's Circlet
+- Nature Walker's Gauntlets
+- Necromancer Plane of Sky Tests
+- Necromancer Skullcap Quests
+- Necromancer Words - X`Ta Tompi
+- Newbie Quest: Halfling Druid
+- Newbie Quest: Troll Warrior
+- Obsidian Coldain Insignia Ring (#5)
+- Orange Headband
+- Paladin Plane of Sky Tests
+- Pickled Frogloks
+- Plague Bearer's Boots
+- Plague Bearer's Gloves
+- Plague Bearer's Robe
+- Plague Bearer's Sleeves
+- Plane of Sky Keys
+- Platinum Coldain Insignia Ring (#4)
+- Poacher Leader
+- Prestidigitator's Boots
+- Prestidigitator's Gloves
+- Prestidigitator's Robe
+- Prestidigitator's Sleeves
+- Purple Headband
+- Qeynos Badge Quests
+- Quellious Symbol Quests
+- Quench Lasen's Thirst
+- Rallos Zek Symbol Quests
+- Ranger Epic Quest
+- Ranger Plane of Sky Tests
+- Red Headband
+- Red Sash of Order
+- Regent Symbol of Innoruuk
+- Regent Symbol of Quellious
+- Resonant Boots
+- Resonant Bracer
+- Resonant Gauntlets
+- Robe of Icicles
+- Robe of the Invoker
+- Rogue Epic Quest
+- Rogue Plane of Sky Tests
+- Rotting Boots
+- Rotting Gloves
+- Rotting Robe
+- Rotting Sleeves
+- Rowyl's Boots of Nature
+- Rowyl's Bracer of Nature
+- Rowyl's Circlet of Nature
+- Rune Crafter's Boots
+- Rune Crafter's Helm
+- Runed Coldain Prayer Shawl (#7)
+- Runed Protector's Boots
+- Runed Protector's Bracer
+- Runed Protector's Gauntlets
+- Runed Scout's Boots
+- Runed Scout's Bracer
+- Runed Scout's Gauntlets
+- Sage's Boots
+- Sage's Gloves
+- Sage's Robe
+- Sage's Sleeves
+- Scaled Knight's Boots
+- Scaled Knight's Bracer
+- Scaled Knight's Breastplate
+- Scaled Knight's Gauntlets
+- Scaled Knight's Greaves
+- Scaled Knight's Helm
+- Scaled Knight's Vambraces
+- Scaled Mystic Boots
+- Scaled Mystic Bracers
+- Scaled Mystic Cloak
+- Scaled Mystic Gauntlets
+- Scaled Mystic Greaves
+- Scaled Mystic Helm
+- Scaled Mystic Vambraces
+- Screaming Mace Quest
+- Sebilis and Veeshan's Peak Key Quest
+- Sentry Xyrin Quest
+- Shadow Boots
+- Shadow Bracer
+- Shadow Gauntlets
+- Shadow Knight Plane of Sky Tests
+- Shaman Plane of Sky Tests
+- Shaman Skull Quests
+- Shining Boots
+- Shining Bracer
+- Shining Breastplate
+- Shining Gauntlets
+- Shining Greaves
+- Shining Helm
+- Shiny Robe of the Underfoot Quest
+- Silk Coldain Prayer Shawl (#5)
+- Silver Coldain Insignia Ring (#2)
+- Sleeves of the Invoker
+- Soldier's Brooch Quest
+- Soldier's Pike (#3)
+- Spirit Caller's Boots
+- Spirit Caller's Bracer
+- Spirit Caller's Breastplate
+- Spirit Caller's Gauntlets
+- Spirit Caller's Helm
+- Storm Giant Toes to Sentry Kcor
+- Summoner's Boots
+- Summoner's Gloves
+- Summoner's Robe
+- Summoner's Sleeves
+- Tayla Ironforge
+- Templar's Boots
+- Templar's Bracer
+- Templar's Gauntlets
+- Templar's Vambraces
+- Terrorantula Quest
+- The Bayle List
+- The Bind
+- The Bread Shipment
+- The Broodling
+- The Donations
+- The Grammar Manual
+- The Restraining Order
+- The Telescope
+- The Worldly Path
+- Tibrinn's Quest
+- Tiny Skeletons
+- Totemic Armor Quests
+- Totemic Boots
+- Totemic Bracers
+- Totemic Cloak
+- Totemic Gauntlets
+- Totemic Helm
+- Trooper Scale Armor
+- Trooper Scale Boots
+- Trooper Scale Bracers
+- Trooper Scale Breastplate
+- Trooper Scale Gauntlets
+- Trooper Scale Greaves
+- Trooper Scale Helm
+- Trooper Scale Pauldron
+- Trooper Scale Vambraces
+- Trooper's Pike (#4)
+- Troubadour's Boots
+- Troubadour's Bracer
+- Troubadour's Breastplate
+- Troubadour's Gauntlets
+- Troubadour's Greaves
+- Troubadour's Helm
+- Tunare Symbol Quests
+- Vambraces of Forbidden Rites
+- Vambraces of the Fervent
+- Velium Coldain Insignia Ring (#8)
+- Warden Symbol of Tunare
+- Warlock's Boots
+- Warlock's Gloves
+- Warlock's Robe
+- Warlock's Sleeves
+- Warlord's Boots
+- Warlord's Bracer
+- Warlord's Breastplate
+- Warlord's Gauntlets
+- Warlord's Greaves
+- Warrior Plane of Sky Tests
+- White Headband
+- White Training Sash
+- Wizard Epic Quest
+- Wizard Plane of Sky Tests
+- Wolf Caller's Boots
+- Wolf Caller's Bracer
+- Wolf Caller's Breastplate
+- Wolf Caller's Gauntlets
+- Wolf Caller's Helm
+- Wolfskin Gloves Quest
+- Woven Coldain Prayer Shawl (#3)
+- Woven Grass Boots
+- Woven Grass Bracelet
+- Yellow Headband
+- Yellow Sash of Order
+
+## Quests with no guide
+
+- Bone Chips Quests
+- Burning Soul of the Pestilent
+- Burning Soul of the Pious
+- Burning Soul of the Virtuous
+- Cougarskin Sleeves Quest
+- Dozekar Tear Quests
+- Faction Quests
+- Guild Summons
+- Monk Quests
+- Orc Belt Quests
+- Popular Quests by Level
+- Scroll of G'han
+- Velious Class Armor
+- Velious Class Armor Comparisons

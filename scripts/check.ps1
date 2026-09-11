@@ -74,6 +74,26 @@ Step 'evolved     ' { & "$PSScriptRoot\evolved-channel-guard.ps1" 6>&1 }
 # Experiment A′ self-test (trap 70, EQBuddy lab): a second default seat on the
 # same work item must refuse. Throwaway StoreDir; not the machine's live claims.
 Step 'soft seats  ' { & "$PSScriptRoot\soft-seat-selftest.ps1" 6>&1 }
+# The two generated catalogs against their generators. Neither script fetches — both read
+# the committed cache — so this is free and it is the only thing that makes a weekly
+# refresh PR's diff reviewable.
+#
+# FAILS OPEN, loudly, when there is no python: this is the fast local pass and the repo
+# does not ask a WPF contributor to install a toolchain for a data gate. CI pins python
+# 3.12 and runs the same two commands as a hard gate, so what is optional here is the
+# convenience, not the guard (same shape as the evolved-channel-guard's third check).
+Step 'generated   ' {
+    $py = (Get-Command python -ErrorAction SilentlyContinue) ??
+          (Get-Command python3 -ErrorAction SilentlyContinue)
+    if (-not $py) {
+        Write-Host 'SKIPPED (no python on PATH) — CI runs this as a hard gate' -ForegroundColor Yellow
+        $global:LASTEXITCODE = 0
+        return
+    }
+    & $py.Source "$PSScriptRoot\harvests\eqlwiki\guides-transform.py" --check
+    if ($LASTEXITCODE -ne 0) { return }
+    & $py.Source "$PSScriptRoot\harvests\eqlwiki\epic-guides-build.py" --check
+}
 Step 'build      ' { dotnet build "$repo\EQBuddy.slnx" -c Release --nologo -v q }
 Step 'unit tests  ' { dotnet test "$repo\tests\EQBuddy.Tests\EQBuddy.Tests.csproj" -c Release --nologo }
 
