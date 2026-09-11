@@ -1683,3 +1683,91 @@ out of the source, because the page's message is only honest for as long as they
 hold. Prove-failed against the shipped page: five of the six page assertions are
 red before the fix, and the two server facts were green throughout — which is
 the point, since the server was never the bug.
+
+---
+
+### Trap 76
+
+**A repair gated on "this is the first time" cannot reach a device the BROKEN
+build already wrote state onto.** DRA-64, the follow-up to [trap 75](#trap-75),
+and the second Founder smoke test on the same phone.
+
+#550 shipped and the Desktop was republished. The Founder rescanned the QR. The
+phone was still blank. And the thing that made it look like a network fault for a
+second time: **the same URL, pasted into the PC's own browser, worked.** Same
+build, same token, same server, same `:47859`. One of them painted and one of
+them did not.
+
+→ **It was a CSS breakpoint.** `FIRST_RUN` — the screens a device opens with
+before anyone touches the ⚙ — is chosen off `innerWidth >= 900`:
+`map, spawns, mez, session, quests` on a tablet-or-wider, `spawns, session` on a
+phone. This PC's `CompanionHiddenSurfaces` left `offered` as `quests, gear`. The
+wide list overlaps it on `quests`, so a PC browser paints; the narrow list
+overlaps nothing, so a phone does not. Two surfaces of one build disagreeing
+across a breakpoint is indistinguishable from wrong-Wi-Fi, and both times the
+cheap diagnosis was the network.
+
+→ **And the fix for exactly that could not fire.** #550's rescue read
+`if (firstPairing && offered.length && !offered.some(…))`, with
+`firstPairing = !choice` — "this device has no stored choice". But the phone had
+already paired against the BROKEN build, and the first snapshot of that session
+persisted the all-off choice:
+
+```
+eqbuddy-screens-<token8> = {"order":["quests","gear"],
+                            "enabled":{"quests":false,"gear":false}}
+```
+
+written by `if (offerChanged) { renderScreens(); saveChoice(); }`, which fires on
+every first snapshot because `offered` starts `[]`. So `choice` was non-null,
+`firstPairing` was false, and **the one device that needed the rescue was the
+only device it could not fire for.** Rescanning did nothing, because the saved
+picks are keyed by the token and the token had not changed. Nothing on the PC
+could reach it; no amount of republishing could either.
+
+**Before shipping a repair, ask what the BROKEN build persisted, and whether the
+new condition is still true on a device that ran it.** A fix verified only
+against a clean profile is verified against the one state the bug report is not
+in. (`CompanionFirstPairingTests` made exactly the right point about clean
+browser profiles for trap 67 — and a clean profile is the wrong fixture for this
+one. Both are true: the honest fixture is the state the reporter is actually in.)
+
+→ **`!choice` was a proxy, and the fact was available.** Trap 64b's shape: a
+proxy is a claim about the world. The claim wanted was *"nobody has chosen yet"*,
+and the page can know it — `commitChoice()` is the ONE door a human's screen pick
+comes through (both the checkboxes and the ▲▼ reorder), so it stamps
+`choice.playerPicked`. The gate reads that. An all-off choice a player MADE
+survives; one that only the defaults produced is repaired once. Absent on every
+choice written before DRA-64, which reads as "never touched" — correct, because
+the only other writers were the offer-changed save and the fullscreen flag, and
+neither is a screen pick (trap 4: one fact, one producer).
+
+→ **And it says so.** Turning a device's screens back on behind its owner is a
+settings change, so the page tells them once, naming ⚙ as the way back — but only
+when it overrode picks the device ARRIVED holding (`hadStoredChoice`). On a first
+pairing the same branch is the default, and announcing a default is noise.
+
+→ **What was NOT added, and why.** The empty-state sentence in `render()` looked
+like it needed a third branch for "this device picked screens the PC is not
+sharing" — but `CompanionSnapshot.ForSubscription` puts every subscribed-but-gated
+name into `NotOffered`, and the page draws those as "Not shared by the PC". So
+`wanted` is empty only when `picked()` is empty, and the third sentence would
+have guarded a state the server makes impossible. A branch for an unreachable
+state is vacuous coverage wearing a fix's clothes.
+
+Guards: `CompanionScreenChoiceRecoveryTests` — the gate may not consult whether a
+choice was STORED (both shipped forms committed as negatives), the repair must be
+reported to its caller and persisted, `playerPicked` must have exactly one writer
+and it must not be either of the two saves that are not a pick, the override must
+be announced and a default must not be, and the two `FIRST_RUN` lists are
+asserted against a `quests`/`gear` PC so the explanation above stops being true
+loudly rather than quietly. Prove-failed: five of the six redden against
+`cc020280`'s page; the sixth is the premise anchor and holds on both by design.
+
+Instrument: `node scripts/dra64-choice-probe.mjs [olderPage.html]` lifts the
+shipped `ensureChoice()` out of `index.html` and runs it over a fake
+`localStorage` across six scenarios — the working PC paste, a clean first
+pairing, the Founder's poisoned phone, the same hole reached from a patched
+build, a player's deliberate all-off, and a reopen. Point it at an older page and
+the Founder's two scenarios redden. Not a CI step: Helm ACKed leaving node out of
+CI on #550.

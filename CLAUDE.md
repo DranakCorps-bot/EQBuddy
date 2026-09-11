@@ -853,6 +853,27 @@ after the named guard left with its surface.
     the three statuses and the lockout arithmetic against a real server).
     [Novel](docs/ops/claude-archive/traps.md#trap-75)
 
+76. **A repair gated on "this is the first time" cannot reach a device the BROKEN
+    build already wrote state onto.** DRA-60's fix enabled the offered surfaces when
+    a phone's `FIRST_RUN` missed them — `if (firstPairing …)`, where
+    `firstPairing = !choice`. The Founder's phone had already paired against the
+    broken build, whose first snapshot persisted `{quests:false,gear:false}` to
+    `localStorage` (the `if (offerChanged) saveChoice()` line fires on every first
+    snapshot, because `offered` starts empty). So the one device that needed the
+    rescue was the only device it could not fire for, and rescanning the same QR
+    reloads the same key. **Before shipping a repair, ask what the broken build
+    persisted, and whether the new condition is still true on a device that ran it.**
+    `!choice` was a proxy for "nobody has chosen yet" (trap 64b); the FACT is "a human
+    touched the picker", stamped by `commitChoice()` — the one human door — so a
+    deliberate all-off choice survives and an accidental one is repaired once, out
+    loud. **And the reason it read as a network fault is worth its own line:** the same
+    URL pasted into the PC's browser WORKED, because `FIRST_RUN` is chosen off
+    `innerWidth >= 900` and the wide list contains `quests`. Two surfaces of one build
+    disagreeing across a CSS breakpoint looks exactly like wrong-Wi-Fi. Guard:
+    `CompanionScreenChoiceRecoveryTests` (five of its six redden on the pre-fix page);
+    instrument: `node scripts/dra64-choice-probe.mjs [olderPage.html]`.
+    [Novel](docs/ops/claude-archive/traps.md#trap-76)
+
 New trap discovered the hard way? Add the compact rule here and the novel
 under `docs/ops/claude-archive/traps.md`. That is the whole point.
 
