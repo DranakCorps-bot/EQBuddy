@@ -50,9 +50,17 @@ state, rather than a sentence we made up.
 
 BYTE-REPRODUCIBLE
 -----------------
-Same cache in, same bytes out — no clock, no locale, no dict ordering, no gzip mtime. Run it
-twice and the second run changes nothing; `HarvestedGuidesTests` re-runs it from the test
-host and diffs against the committed file, which is the only check that reads the 1,178.
+Same cache in, same bytes out — no clock, no locale, no dict ordering. Run it twice and the
+second run changes nothing; `HarvestedGuidesTests` re-runs it from the test host and diffs
+against the committed file, which is the only check that reads the 1,178.
+
+What is compared is the catalog's DATA, decompressed, and not the gzip file. A gzip container
+is not reproducible across environments — two zlib builds compress identical input to
+different bytes — so comparing the compressed file would make this gate fail on a Python
+version rather than on a data change. (It did, on the first CI run: 3.12 and 3.14 disagreed
+about a file whose contents were identical.) The write side follows the same rule and leaves
+the committed file alone when the data has not moved, so a refresh PR never carries a 380 KB
+binary diff that says nothing.
 
     python scripts/harvests/eqlwiki/guides-transform.py [--check]
 
@@ -522,10 +530,16 @@ NOTE = ("Auto-written by scripts/harvests/eqlwiki/guides-transform.py from the q
 
 
 def render(guides: list[dict]) -> bytes:
-    """One guide per line, so `gunzip | diff` reads as a data change rather than as one
-    30,000-row line. JSON separators pinned, no ASCII escaping, no sorting (document order
-    IS the product), and a gzip member with no mtime and no filename in its header — the
-    three places a "deterministic" writer usually leaks the clock."""
+    """The catalog's BYTES — one guide per line, so `gunzip | diff` reads as a data change
+    rather than as one 30,000-row line. JSON separators pinned, no ASCII escaping, no sorting
+    (document order IS the product), and no clock anywhere.
+
+    **This, and not the gzip file, is what "byte-reproducible" means here.** A gzip container
+    is not reproducible across environments: two zlib builds compress identical input to
+    different bytes, so comparing the compressed file makes the gate fail on a Python version
+    rather than on a data change. It is the DATA that has to be the same, and the container is
+    an implementation detail of how it is shipped.
+    """
     body = io.StringIO()
     body.write('{"note":')
     body.write(json.dumps(NOTE, ensure_ascii=False))
@@ -534,12 +548,27 @@ def render(guides: list[dict]) -> bytes:
         body.write(json.dumps(guide, ensure_ascii=False, separators=(",", ":")))
         body.write(",\n" if i + 1 < len(guides) else "\n")
     body.write("]}\n")
+    return body.getvalue().encode("utf-8")
 
-    raw = body.getvalue().encode("utf-8")
+
+def compress(payload: bytes) -> bytes:
+    """No mtime and no filename in the header — the two places a gzip writer leaks the clock
+    and the working directory into a committed file."""
     buf = io.BytesIO()
     with gzip.GzipFile(filename="", mode="wb", compresslevel=9, mtime=0, fileobj=buf) as gz:
-        gz.write(raw)
+        gz.write(payload)
     return buf.getvalue()
+
+
+def committed_payload() -> bytes | None:
+    """What the committed file SAYS, or None when there is no readable one."""
+    if not OUT.exists():
+        return None
+    try:
+        with gzip.open(OUT, "rb") as gz:
+            return gz.read()
+    except OSError:
+        return None
 
 
 def report(guides: list[dict], shapes: dict[str, str], skeleton_only: list[str],
@@ -616,20 +645,28 @@ def main() -> int:
     payload = render(guides)
     text = report(guides, shapes, skeleton_only, date)
 
+    committed = committed_payload()
+
     if args.check:
         stale = []
-        if not OUT.exists() or OUT.read_bytes() != payload:
+        if committed != payload:
             stale.append(str(OUT.relative_to(ROOT)))
         if not REPORT.exists() or REPORT.read_text(encoding="utf-8") != text:
             stale.append(str(REPORT.relative_to(ROOT)))
         if stale:
             print("STALE: " + ", ".join(stale))
+            print("Re-run this script without --check and commit the result.")
             return 1
         print(f"OK: {len(guides)} guides reproduce byte-for-byte.")
         return 0
 
-    OUT.write_bytes(payload)
-    REPORT.write_text(text, encoding="utf-8")
+    # Only when the DATA moved. Rewriting an unchanged catalog would put a new gzip member in
+    # every refresh PR — a 380 KB binary diff that says nothing — because two zlib builds
+    # compress identical input differently.
+    if committed != payload:
+        OUT.write_bytes(compress(payload))
+    if not REPORT.exists() or REPORT.read_text(encoding="utf-8") != text:
+        REPORT.write_text(text, encoding="utf-8")
     rows = sum(len(s["objectives"]) for g in guides for s in g["stages"])
     # ASCII only: this runs under refresh.py on a Windows console whose default codec is
     # cp1252, and a decorative arrow there is a traceback after a successful write.

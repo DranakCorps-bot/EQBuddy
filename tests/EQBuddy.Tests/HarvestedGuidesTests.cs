@@ -436,9 +436,17 @@ public class HarvestedGuidesTests
     // ---- The check that a diff cannot give you ---------------------------------------
 
     /// <summary>
-    /// Re-run the transformer and the committed bytes must not move. Everything above reads
+    /// Re-run the transformer and the committed DATA must not move. Everything above reads
     /// the OUTPUT; this is the only assertion that holds the SCRIPT to it, and it is the reason
     /// a reviewer can believe 1,178 guides they will never read.
+    ///
+    /// <para><b>The data, decompressed — not the gzip file.</b> A gzip container is not
+    /// reproducible across environments: two zlib builds compress identical input to different
+    /// bytes, and the first CI run of this gate proved it by failing on a file whose contents
+    /// were identical (runner Python 3.12 against a 3.14 developer box). Comparing the
+    /// compressed file is a gate that fails on a Python version rather than on a data change,
+    /// which is worse than no gate — it teaches the next person to re-run and commit until it
+    /// goes green.</para>
     ///
     /// <para>Shells out because the transformer is Python and re-implementing it in C# would be
     /// a second producer of the very rule under test (trap 4). <c>build-and-test</c> installs
