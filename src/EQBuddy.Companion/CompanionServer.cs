@@ -66,6 +66,11 @@ public sealed class CompanionServer : IDisposable
     private readonly SemaphoreSlim _connectionGate = new(MaxConcurrentConnections);
     private CompanionSnapshot? _latest;
     private bool _started;
+    /// <summary>Every IPv4/IPv6 address this machine holds, captured at Start — what
+    /// <see cref="IsSameMachine"/> measures "not us" against.</summary>
+    private IReadOnlySet<IPAddress> _machineAddresses = new HashSet<IPAddress>();
+    private int _offBoxConnects;
+    private int _sameMachineConnects;
 
     public CompanionServer(CompanionServerOptions options)
     {
@@ -87,8 +92,29 @@ public sealed class CompanionServer : IDisposable
 
     public int ClientCount => _clients.Count;
 
+    /// <summary>Connected clients that are NOT this machine's own browser. DRA-64: the
+    /// pairing window used to report a PC testing its own address as "1 device connected",
+    /// which reads as proof the phone side works and is proof of nothing at all.</summary>
+    public int OffBoxClientCount => _clients.Values.Count(c => !c.FromThisMachine);
+
+    /// <summary>How many connections have ever been accepted from an address that is not
+    /// this machine's. Counted at ACCEPT, before any parsing or auth, because the question
+    /// is whether the packets arrive — a phone presenting a stale token is still a phone
+    /// that got here, and that is the fact which separates "blocked" from "refused".</summary>
+    public int OffBoxConnects => Volatile.Read(ref _offBoxConnects);
+
+    /// <summary>The same count for connections from this machine. Kept rather than
+    /// discarded: it is what lets the window say "that was your own PC" instead of
+    /// leaving the player to conclude their test succeeded.</summary>
+    public int SameMachineConnects => Volatile.Read(ref _sameMachineConnects);
+
     /// <summary>Raised (on a worker thread) when a phone connects or drops.</summary>
     public event Action? ClientsChanged;
+
+    /// <summary>Raised on the accept thread the first time a connection arrives from off
+    /// this machine, so a window showing the "it isn't getting here" checklist can take it
+    /// down the moment it stops being true.</summary>
+    public event Action? ReachabilityChanged;
 
     /// <summary>Raised (on a socket thread) when a device ticks a checklist row. The
     /// host queues it and applies it on the desktop's own tick — nothing here touches
@@ -163,12 +189,48 @@ public sealed class CompanionServer : IDisposable
         return LanAddressRank.Rank(result);
     }
 
+    /// <summary>Every address this machine holds, across every interface and both families
+    /// — loopback and link-local included, because the question here is "is this us", not
+    /// "can a tablet reach this". Broader on purpose than <see cref="LanCandidates"/>.</summary>
+    public static IReadOnlySet<IPAddress> MachineAddresses()
+    {
+        var set = new HashSet<IPAddress> { IPAddress.Loopback, IPAddress.IPv6Loopback };
+        try
+        {
+            foreach (var nic in System.Net.NetworkInformation.NetworkInterface.GetAllNetworkInterfaces())
+                foreach (var addr in nic.GetIPProperties().UnicastAddresses)
+                    set.Add(addr.Address);
+        }
+        catch (Exception ex) { CoreLog.Error(ex); }
+        return set;
+    }
+
+    /// <summary>Did this connection come from the machine the server is running on?
+    ///
+    /// <para>Three tests, because one is not enough on a real PC. Loopback is obvious.
+    /// <paramref name="local"/> equalling <paramref name="remote"/> catches the ordinary
+    /// case — a browser opening this PC's own LAN address gets that address as its source,
+    /// since the route to a local address is the address itself. The address SET catches
+    /// the case the first two miss, and it is not hypothetical: a PC on both Wi-Fi and a
+    /// mesh VPN can reach 10.0.0.84 from 100.118.30.124, which is still this PC and would
+    /// otherwise be counted as a phone.</para>
+    ///
+    /// <para>Pure, so the arithmetic is testable without a second machine — which is the
+    /// only way it CAN be tested here.</para></summary>
+    public static bool IsSameMachine(IPAddress remote, IPAddress? local, IReadOnlySet<IPAddress> machineAddresses)
+    {
+        if (IPAddress.IsLoopback(remote)) return true;
+        if (local is not null && remote.Equals(local)) return true;
+        return machineAddresses.Contains(remote);
+    }
+
     /// <summary>Bind and begin accepting. Throws SocketException if the port is taken
     /// (the host catches it and surfaces the failure in the pairing UI).</summary>
     public void Start()
     {
         if (_started) throw new InvalidOperationException("Already started.");
         _started = true;
+        _machineAddresses = MachineAddresses();
 
         // Candidates rather than bare addresses, so the adapter facts survive the bind
         // and the picker can name each row (#264). A caller that named its own addresses
@@ -282,8 +344,29 @@ public sealed class CompanionServer : IDisposable
             catch (OperationCanceledException) { return; }
             catch (SocketException) { return; }
             catch (ObjectDisposedException) { return; }
+            // Before the gate, before the parse, before auth: the only question this
+            // counter answers is whether the packets arrive at all (DRA-64).
+            RecordArrival(tcp);
             _ = HandleConnectionAsync(tcp, ct);
         }
+    }
+
+    /// <summary>Tally one accepted connection as ours or not, and announce the FIRST
+    /// off-box one — a window telling the player "nothing is getting here" has to stop
+    /// saying it the moment something does, and the next repaint may be a tick away.</summary>
+    private void RecordArrival(TcpClient tcp)
+    {
+        if (!IsOffBox(tcp)) { Interlocked.Increment(ref _sameMachineConnects); return; }
+        if (Interlocked.Increment(ref _offBoxConnects) == 1) ReachabilityChanged?.Invoke();
+    }
+
+    private bool IsOffBox(TcpClient tcp)
+    {
+        // A socket whose endpoints have already gone (an instant RST) tells us nothing;
+        // counting it as a phone would be inventing the one fact this exists to measure.
+        if (tcp.Client.RemoteEndPoint is not IPEndPoint remote) return false;
+        var local = (tcp.Client.LocalEndPoint as IPEndPoint)?.Address;
+        return !IsSameMachine(remote.Address, local, _machineAddresses);
     }
 
     private async Task HandleConnectionAsync(TcpClient tcp, CancellationToken ct)
@@ -450,6 +533,9 @@ public sealed class CompanionServer : IDisposable
     {
         public required TcpClient Tcp { get; init; }
         public required NetworkStream Stream { get; init; }
+        /// <summary>This PC's own browser rather than a device (DRA-64). Decided once, at
+        /// the upgrade, from the same test the arrival counter used.</summary>
+        public required bool FromThisMachine { get; init; }
         public SemaphoreSlim SendLock { get; } = new(1, 1);
         /// <summary>Surfaces this device asked for via a "subscribe" message;
         /// null = everything the desktop offers. Written by the read loop, read by
@@ -497,7 +583,7 @@ public sealed class CompanionServer : IDisposable
             $"Sec-WebSocket-Accept: {accept}\r\n\r\n");
         await stream.WriteAsync(response, ct).ConfigureAwait(false);
 
-        var client = new WsClient { Tcp = tcp, Stream = stream };
+        var client = new WsClient { Tcp = tcp, Stream = stream, FromThisMachine = !IsOffBox(tcp) };
         var id = Guid.NewGuid();
         _clients[id] = client;
         ClientsChanged?.Invoke();

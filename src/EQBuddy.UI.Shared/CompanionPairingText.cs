@@ -83,37 +83,58 @@ public static class CompanionPairingText
 
     /// <summary>What connected devices there are, in words. Both widgets show the same
     /// line, so the pluralization is decided once.</summary>
-    public static string Status(int clients) => clients switch
+    public static string Status(int clients) => Status(clients, clients);
+
+    /// <summary>The same line, told apart by ORIGIN (DRA-64).
+    ///
+    /// <para>A count alone was actively misleading. The companion server binds LAN
+    /// addresses only, so the first thing anybody does when a phone won't load is paste
+    /// the URL into the PC's own browser — and this line then read "1 device connected",
+    /// which is true of a browser and reads as "a device paired". The Founder's smoke
+    /// ended with the PC reporting success while no phone had ever reached the machine.
+    /// A browser on this PC is NEVER counted as a device here; it is named as what it
+    /// is.</para></summary>
+    /// <param name="clients">Total connected browsers.</param>
+    /// <param name="offBox">Of those, the ones that are not this PC's own browser.</param>
+    public static string Status(int clients, int offBox) => (clients, offBox) switch
     {
-        0 => "No device connected yet.",
-        1 => "1 device connected.",
-        var n => $"{n} devices connected.",
+        (0, _) => "No device connected yet.",
+        (_, 0) when clients == 1 => "This PC's own browser is connected — no device yet.",
+        (_, 0) => $"{clients} browsers on this PC connected — no device yet.",
+        (_, 1) when clients == 1 => "1 device connected.",
+        (_, 1) => "1 device connected (plus this PC's own browser).",
+        _ when clients == offBox => $"{offBox} devices connected.",
+        _ => $"{offBox} devices connected (plus this PC's own browser).",
     };
 
     /// <summary>The honest firewall talk (see `CompanionServer`'s header), for the OS the
     /// player is actually on. A first listen prompts on Windows, prompts once and is
     /// remembered on macOS, and on most Linux desktops does not prompt at all — telling
     /// all three the same story is how a player concludes the feature is broken when the
-    /// truth is that nothing asked them anything.</summary>
+    /// truth is that nothing asked them anything.
+    ///
+    /// <para>This paragraph is now only the EXPECTATION — what should happen the first
+    /// time. Everything it used to say about diagnosing a failure was removed in DRA-64,
+    /// for two reasons. It listed causes nobody had measured, when the server can measure
+    /// the only one that matters (<see cref="CompanionReachability"/>). And its concrete
+    /// advice was wrong in the exact case it was written for: "Windows Security →
+    /// Firewall → Allow an app" shows program NAMES, so a player whose EQBuddy moved
+    /// install paths finds an "eqbuddy.exe" already ticked and concludes they are
+    /// covered. Worse, it told the player to test by opening the address on the PC — the
+    /// one test that passes no matter what the firewall does.</para></summary>
     public static string Firewall =>
         OperatingSystem.IsWindows()
             ? "First time on, Windows Firewall usually asks whether to allow EQBuddy — say " +
-              "yes for private networks. If the page never loads on your device: that " +
-              "prompt was missed (Windows Security → Firewall → Allow an app), or your " +
-              "Wi-Fi keeps devices apart (guest networks often do — use the main " +
-              "network). Best check: open the address above in that device's browser " +
-              "right now."
+              "yes, and tick Private networks. If that prompt never appeared, or was " +
+              "dismissed, the phone's connection is dropped with nothing on screen to say " +
+              "so; the line below is EQBuddy watching for exactly that."
         : OperatingSystem.IsMacOS()
             ? "First time on, macOS asks whether to allow incoming connections for " +
               "EQBuddy — say yes, and it remembers (System Settings → Network → Firewall " +
-              "→ Options if you need to change it later). If the page never loads on your " +
-              "device: that prompt was declined, or your Wi-Fi keeps devices apart (guest " +
-              "networks often do — use the main network). Best check: open the address " +
-              "above in that device's browser right now."
+              "→ Options if you need to change it later). If that prompt was declined, the " +
+              "phone's connection is dropped silently; the line below watches for that."
             : "Most Linux desktops will not prompt at all — if a firewall is running " +
               "(ufw, firewalld), the port above has to be opened by hand, and until it is, " +
-              "the page simply never loads with nothing on screen to say why. The other " +
-              "usual cause is a Wi-Fi that keeps devices apart (guest networks often do — " +
-              "use the main network). Best check: open the address above in that device's " +
-              "browser right now.";
+              "the page simply never loads with nothing on screen to say why. The line " +
+              "below is EQBuddy watching for exactly that.";
 }

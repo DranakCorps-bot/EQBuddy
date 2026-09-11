@@ -39,6 +39,34 @@ public sealed class CompanionWindow : Window
     /// indistinguishable from a click and would re-enter through SelectionChanged.</summary>
     private bool _syncingAddress;
 
+    // ---- DRA-64: what has actually reached this PC ----
+    private readonly TextBlock _reachHeadline = new()
+    {
+        FontSize = 12, FontWeight = FontWeights.SemiBold, TextWrapping = TextWrapping.Wrap,
+        Margin = new Thickness(0, 10, 0, 0),
+    };
+    private readonly TextBlock _reachDetail = new()
+    {
+        FontSize = 11.5, TextWrapping = TextWrapping.Wrap, Margin = new Thickness(0, 2, 0, 0),
+    };
+    private readonly TextBlock _reachChecklist = new()
+    {
+        FontSize = 11.5, TextWrapping = TextWrapping.Wrap, Margin = new Thickness(0, 4, 0, 0),
+    };
+    private readonly Button _copyCommand =
+        Theming.Button(EQBuddy.UI.Shared.CompanionReachability.CopyCommandLabel);
+    private readonly TextBlock _copiedNotice = new()
+    {
+        Text = EQBuddy.UI.Shared.CompanionReachability.CopiedNotice,
+        FontSize = 11.5, TextWrapping = TextWrapping.Wrap, Margin = new Thickness(0, 4, 0, 0),
+    };
+    /// <summary>Re-evaluates the verdict while nothing happens — see the note where it is
+    /// started. Field so Closed can stop it.</summary>
+    private System.Windows.Threading.DispatcherTimer? _patience;
+    /// <summary>When the player started looking at this code. The verdict's clock, so a PC
+    /// that has been up all evening is not reported as having failed to pair all evening.</summary>
+    private readonly DateTime _openedUtc = DateTime.UtcNow;
+
     public CompanionWindow(CompanionHost host)
     {
         _host = host;
@@ -156,13 +184,58 @@ public sealed class CompanionWindow : Window
         fw.Margin = new Thickness(0, 12, 0, 0);
         _pairPanel.Children.Add(fw);
 
+        // ---- what has actually reached this PC (DRA-64) ----
+        // The only part of this window that reports a MEASUREMENT rather than a setting.
+        // Everything it says is decided in UI.Shared so the wording cannot drift from the
+        // arithmetic that produced it.
+        _reachHeadline.SetResourceReference(TextBlock.ForegroundProperty, "AccentBrush");
+        _pairPanel.Children.Add(_reachHeadline);
+        _pairPanel.Children.Add(_reachDetail);
+        _pairPanel.Children.Add(_reachChecklist);
+        _copyCommand.Margin = new Thickness(0, 6, 0, 0);
+        _copyCommand.HorizontalAlignment = HorizontalAlignment.Left;
+        _copyCommand.Visibility = Visibility.Collapsed;
+        _copyCommand.Click += (_, _) =>
+        {
+            try
+            {
+                Clipboard.SetText(EQBuddy.UI.Shared.CompanionReachability.FirewallRuleCommand(
+                    ExePath, _host.Port));
+                _copiedNotice.Visibility = Visibility.Visible;
+            }
+            catch (Exception ex) { EQBuddy.Core.CoreLog.Error(ex); }
+        };
+        _pairPanel.Children.Add(_copyCommand);
+        _copiedNotice.Visibility = Visibility.Collapsed;
+        _pairPanel.Children.Add(_copiedNotice);
+
         root.Children.Add(_pairPanel);
         Content = root;
 
         _host.ClientsChanged += OnClientsChanged;
-        Closed += (_, _) => _host.ClientsChanged -= OnClientsChanged;
+        // The verdict turns on a clock as well as on arrivals, so silence has to be able
+        // to repaint itself — a window that only redraws on an event would sit on
+        // "Waiting…" forever precisely when nothing is arriving (trap 72's shape: the
+        // repaint gate has to see the thing the feature decides on).
+        _patience = new System.Windows.Threading.DispatcherTimer
+        {
+            Interval = TimeSpan.FromSeconds(2),
+        };
+        _patience.Tick += (_, _) => UpdateStatus();
+        _patience.Start();
+        Closed += (_, _) =>
+        {
+            _host.ClientsChanged -= OnClientsChanged;
+            _patience?.Stop();
+        };
         Refresh();
     }
+
+    /// <summary>The file the firewall rule has to name. <c>Environment.ProcessPath</c> is
+    /// the running executable, which is the whole point — a rule naming the path EQBuddy
+    /// used to live at is the bug this window now explains.</summary>
+    private static string ExePath =>
+        Environment.ProcessPath ?? System.Reflection.Assembly.GetEntryAssembly()?.Location ?? "EQBuddy.exe";
 
     private void OnClientsChanged() => Dispatcher.BeginInvoke(UpdateStatus);
 
@@ -223,8 +296,36 @@ public sealed class CompanionWindow : Window
         return -1;
     }
 
-    private void UpdateStatus() =>
-        _statusLine.Text = EQBuddy.UI.Shared.CompanionPairingText.Status(_host.ClientCount);
+    private void UpdateStatus()
+    {
+        _statusLine.Text = EQBuddy.UI.Shared.CompanionPairingText.Status(
+            _host.ClientCount, _host.OffBoxClientCount);
+
+        var reach = EQBuddy.UI.Shared.CompanionReachability.Verdict(
+            _host.Running, _host.OffBoxConnects, _host.SameMachineConnects,
+            DateTime.UtcNow - _openedUtc);
+
+        _reachHeadline.Text = EQBuddy.UI.Shared.CompanionReachability.Headline(reach);
+        _reachDetail.Text = EQBuddy.UI.Shared.CompanionReachability.Detail(reach);
+        _reachHeadline.SetResourceReference(TextBlock.ForegroundProperty,
+            reach == EQBuddy.UI.Shared.CompanionReach.Reached ? "GoodBrush" : "AccentBrush");
+        _reachDetail.SetResourceReference(TextBlock.ForegroundProperty, "DimBrush");
+
+        var checklist = EQBuddy.UI.Shared.CompanionReachability.ShowsChecklist(reach);
+        _reachChecklist.Text = checklist
+            ? EQBuddy.UI.Shared.CompanionReachability.FirewallCause(ExePath) + "\n\n" +
+              EQBuddy.UI.Shared.CompanionReachability.OtherCauses
+            : "";
+        _reachChecklist.Visibility = checklist ? Visibility.Visible : Visibility.Collapsed;
+        _reachChecklist.SetResourceReference(TextBlock.ForegroundProperty, "DimBrush");
+
+        // The copy button only exists where the command it copies is the advice — no
+        // firewall command on a verdict that has not named the firewall.
+        var offerCommand = checklist && OperatingSystem.IsWindows();
+        _copyCommand.Visibility = offerCommand ? Visibility.Visible : Visibility.Collapsed;
+        if (!offerCommand) _copiedNotice.Visibility = Visibility.Collapsed;
+        _copiedNotice.SetResourceReference(TextBlock.ForegroundProperty, "DimBrush");
+    }
 
     private static TextBlock Dim(string text)
     {

@@ -1805,3 +1805,109 @@ snapshot push, so it reported `false` again. It now registers immediately and
 reports the latch **and** `textContent` (which survives the hide) side by side:
 two readings of one fact, because a silent miss in an instrument reads as a
 finding about the product.
+
+### Trap 77
+
+**The cheapest reachability test is the one that cannot fail for the reason you
+are investigating — and the PC agreed with it out loud.**
+
+*Sibling of [trap 76](#trap-76), same Founder smoke. Trap 76 is the page-side
+cause (a poisoned screen choice the rescue could not reach); this is the PC-side
+one (nothing can reach the listener at all). They are sequential gates, and the
+reason one incident produced two is that nobody could measure which layer was
+failing — which is the thing this half fixes.*
+
+DRA-64, Founder smoke 2026-09-11. DRA-60 had just landed two rounds of work on
+the phone page (#550's diagnose-connect, #552 running all four pairing-failure
+paths), and the phone still would not load. The report carried what everyone
+treated as the decisive fact: *"PC browser paste of full companion URL works;
+phone still not loading (Kaybek + full 32-char)."* Read that way, the server is
+healthy, the token is good, the page is good — so the bug must be on the phone,
+and the dig goes to browser cache, cellular-vs-Wi-Fi, `CompanionHiddenSurfaces`,
+`firstPairing`, QR-vs-paste.
+
+Every one of those is a fine hypothesis. None of them is what happened, and the
+fact that sent the dig there is not evidence of anything.
+
+`CompanionServer` binds LAN addresses only — never loopback, unless the machine
+has no LAN at all. So "paste the URL into the PC's browser" means the PC
+connecting to the PC's **own LAN address**. Windows routes traffic from a
+machine to an address that machine holds internally; it does not go out the NIC
+and it is not evaluated against the inbound firewall filter. That connection
+succeeds whether the firewall permits EQBuddy or forbids it, whether the router
+isolates clients or not, whether the phone is on the same SSID or in another
+country. **The test passes identically in the world where the bug exists and the
+world where it does not.**
+
+Then the PC confirmed the misreading. `ClientCount` counted that browser and
+`CompanionPairingText.Status` rendered "1 device connected" — a sentence that is
+true of a browser and that a person reads as "a device paired". The smoke ended
+with the PC reporting success while nothing had ever reached the machine.
+
+**What was actually wrong**, measured on the Founder's box:
+
+- Running exe: `C:\Users\david\AppData\Local\EQBuddy Evolved\publish\EQBuddy.exe`.
+- Inbound allow rules naming an EQBuddy: `...\Local\Programs\EQBuddy\eqbuddy.exe`
+  (v1) and `...\source\eqbuddy\dist\publish\eqbuddy.exe` (a dev publish). **None
+  names the running file.**
+- Firewall enabled on all three profiles, `DefaultInboundAction=NotConfigured`
+  (= Block). The Wi-Fi NIC is on the **Private** profile.
+- The only rule that could otherwise have covered it is `Tailscale-In`
+  (Program=Any) — scoped `LocalAddress=100.118.30.124`, the tailnet address alone.
+- The listener holds `10.0.0.84:47859` (Wi-Fi) and `100.118.30.124:47859`
+  (Tailscale). `LanAddressRank` scores Wi-Fi −5 and Tailscale +85, so the QR
+  hands the phone **the one address with no allow rule**, and the only reachable
+  one is ranked last and never offered.
+
+A phone on the house Wi-Fi, with the right address and the right token, SYNs into
+a drop. v1 Mobile worked for years because v1's exe path had a rule; v2 moved
+install directories and inherited none. Nothing on either side can see it: the PC
+never gets an accept, the phone gets a TCP timeout.
+
+**The second half is the one that would have cost another evening.** The pairing
+window's advice told the player to check *"Windows Security → Firewall → Allow an
+app"*. That list is keyed on the executable's **path** and displays only its
+**name**. A player who follows that instruction finds `eqbuddy.exe` sitting there
+already ticked — the v1 rule — concludes the firewall is fine, and goes looking
+somewhere else. The advice does not merely fail to find the bug; it actively
+produces a false negative for it. It also told the player the "best check" was to
+open the address on the PC, which is the test above.
+
+**The fix is not a firewall rule.** EQBuddy still makes no netsh or elevation
+calls — the spike's rule stands. It is that the PC stopped guessing and started
+measuring, and stopped hiding the identity the player needs:
+
+- `CompanionServer.IsSameMachine(remote, local, machineAddresses)` — pure, three
+  tests. Loopback; source equalling destination; and membership of the machine's
+  full address set, which is not belt-and-braces: a PC on both Wi-Fi and Tailscale
+  reaches `10.0.0.84` from `100.118.30.124`, and the first two tests call that a
+  phone.
+- `OffBoxConnects` / `SameMachineConnects`, counted at **accept** — before the
+  connection gate, before the parse, before auth. A phone refused with a stale
+  token is a phone that got here, and that is the fact separating "blocked" from
+  "refused" (the latter being exactly what DRA-60 taught the page to say).
+- `CompanionReachability` turns the two counters and a clock into a verdict. The
+  clock starts when the WINDOW opens, not when the app did, so a PC that has been
+  up all evening is not reported as having failed to pair all evening.
+  `OnlyThisPc` is deliberately decided BEFORE the patience gate: a player holding
+  a result they are about to misread deserves the correction immediately.
+- The connected line names this PC's browser as a browser, at every count.
+- The escalation prints `Environment.ProcessPath` and ships the whole
+  `New-NetFirewallRule` command (CLAUDE.md's "a surface that needs a command must
+  SHIP the command"), scoped to the bound port and the Private profile — a
+  diagnostic aid has no business opening the Public one, and a player whose home
+  network is miscategorised is told to fix the category instead.
+
+**Prove-failed both ways.** Making `IsSameMachine` return false — the pre-DRA-64
+behaviour, every connection is a device — turns 7 red, including all three
+real-socket tests. Restoring the old one-argument `Status` line turns 2 red. The
+real-socket half matters because one box cannot produce a connection from a second
+machine: what IS provable here is the half that actually went wrong, a browser on
+this PC doing exactly what the Founder did.
+
+**The generalisation, which is the reason this is a trap and not a bug report:**
+before spending a measurement, ask whether it can distinguish the hypothesis from
+its negation. "It works from here" almost never can. And when a surface counts
+participants, make ORIGIN part of the count — a local caller is not evidence about
+a remote one, and a count that conflates them will confirm whatever the reader
+already believes.
