@@ -26,8 +26,9 @@ param(
     [string[]]$Gif = @(),
     [string]$Out = '',
     [string]$Backdrop = '#202225',
-    # The OWNER LOCK palette for Evolved captures (see shoot.ps1's -Theme note).
-    [string]$Theme = 'Turquoise',
+    # The landing page's palette — uniform BlueGrey per the Founder T4 look
+    # (2026-09-10 ~6:45 PM CT), superseding the Turquoise these clips first shipped in.
+    [string]$Theme = 'BlueGrey',
     # Seconds for the startup replay to land after the widget appears — a settle, not a
     # handshake (same caveat as shoot.ps1).
     [int]$Settle = 8,
@@ -87,6 +88,7 @@ Add-Type -Namespace RecW -Name U -MemberDefinition @'
 [DllImport("user32.dll")] public static extern void mouse_event(uint f, int dx, int dy, uint d, IntPtr e);
 [DllImport("user32.dll")] public static extern bool ShowWindow(IntPtr h, int cmd);
 [DllImport("user32.dll")] public static extern bool IsWindowVisible(IntPtr h);
+[DllImport("user32.dll")] public static extern bool IsIconic(IntPtr h);
 [DllImport("user32.dll")] public static extern int GetWindowTextLength(IntPtr h);
 [DllImport("user32.dll")] public static extern int GetWindowText(IntPtr h, System.Text.StringBuilder s, int n);
 [DllImport("user32.dll")] public static extern uint GetWindowThreadProcessId(IntPtr h, out uint pid);
@@ -157,6 +159,26 @@ function Get-RecRect([IntPtr]$h) {
     $r = New-Object RecW.U+RECT
     [RecW.U]::GetWindowRect($h, [ref]$r) | Out-Null
     $r
+}
+
+# Minimize every shell room window ('EQBuddy — <room>') the fixture app has up. Matching
+# the prefix rather than one exact title, and CALLING THIS REPEATEDLY through the settle,
+# because the shell can raise AFTER the widget: the 2026-09-10 BlueGrey click-keep clip
+# recorded the Home room behind the whole gesture when a single post-widget check ran
+# before the shell existed.
+function Hide-RecShells([int]$ownerPid) {
+    $cb = [RecW.U+EnumProc]{ param($h, $l)
+        if (-not [RecW.U]::IsWindowVisible($h) -or [RecW.U]::IsIconic($h)) { return $true }
+        $winPid = 0u; [RecW.U]::GetWindowThreadProcessId($h, [ref]$winPid) | Out-Null
+        if ($winPid -ne $ownerPid) { return $true }
+        $n = [RecW.U]::GetWindowTextLength($h)
+        if ($n -le 0) { return $true }
+        $sb = New-Object Text.StringBuilder ($n + 1)
+        [RecW.U]::GetWindowText($h, $sb, $sb.Capacity) | Out-Null
+        if ($sb.ToString() -like 'EQBuddy — *') { [RecW.U]::ShowWindow($h, 6) | Out-Null }  # SW_MINIMIZE
+        return $true
+    }
+    [RecW.U]::EnumWindows($cb, [IntPtr]::Zero) | Out-Null
 }
 
 # --- pointer choreography ----------------------------------------------------------
@@ -440,15 +462,17 @@ try {
                 $widget = Find-RecWindow 'EQBuddy' $proc.Id
             }
             if ($widget -eq [IntPtr]::Zero) { throw 'Widget window never appeared.' }
-            foreach ($shellTitle in @('EQBuddy — Home')) {
-                $sh = Find-RecWindow $shellTitle $proc.Id
-                if ($sh -ne [IntPtr]::Zero) { [RecW.U]::ShowWindow($sh, 6) | Out-Null }  # SW_MINIMIZE
-            }
             # Park the pointer off every window BEFORE the settle (shoot.ps1's rule): the
-            # first frame must not already be a hover.
+            # first frame must not already be a hover. The settle doubles as the shell
+            # sweep — Hide-RecShells runs through it, not once, for the reason on it.
             $vs = [System.Windows.Forms.SystemInformation]::VirtualScreen
             [RecW.U]::SetCursorPos(($vs.Right - 1), ($vs.Bottom - 1)) | Out-Null
-            Start-Sleep -Seconds $Settle
+            $settleUntil = (Get-Date).AddSeconds($Settle)
+            while ((Get-Date) -lt $settleUntil) {
+                Hide-RecShells $proc.Id
+                Start-Sleep -Milliseconds 250
+            }
+            Hide-RecShells $proc.Id
 
             $bar = Get-RecRect $widget
             # The recorded region: the bar with room below-left for the peek panel and
