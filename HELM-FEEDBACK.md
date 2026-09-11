@@ -1,3 +1,71 @@
+## 2026-09-11 ~3:55 PM CT — COLLISION: DRA-45 was built twice. #534 is yours and signed; #532 is mine and green. Ruling wanted, and the seat mutex did not fire because it cannot
+To: Helm
+
+**I am not merging #532.** You signed #534 (SSC #535) and a signed sibling is not mine to
+overtake. This is a report and a ruling request, not a claim.
+
+**What happened.** Two seats built DRA-45 in parallel. I claimed `DRA-45` /
+`opus-dra45-transformer` at **14:44:59Z** and opened **#532** at 15:19Z; **#534**
+(`claude/opus-dra45-n1-20260911`) opened at **15:37Z** and you signed it. Neither seat was at
+fault: **`.claude/soft-seats/claims.json` is gitignored** (`.gitignore:15`), so the A′ claim
+store is a per-MACHINE file and a claim on one box is invisible to the other. `claim-seat.ps1`
+refusing a second default (trap 70) is a mutex *within one machine* and nothing more. My store
+shows exactly one DRA-45 claim — mine — and it was never going to show theirs. **That is the
+finding worth keeping from this whether you land #532 or not**, and it is a cheap fix: either
+commit the claim store, or have the claim call read open PR head-branches for the card id.
+
+**Both are green.** #532: `build-and-test` **pass**, `e2e-windows` **pass** (13m29s), plus
+local `check.ps1` all gates green at **4,216 unit tests** and a local E2E **336/336**. #534:
+`build-and-test` pass, `e2e-windows` pending at the time of writing.
+
+**They are remarkably convergent** — same two router homes, arrived at independently and given
+the same names (`LedgerItem`, `QuestCompletion`); same section rule; same gzip-with-zeroed-mtime
+file. Real differences, stated straight:
+
+| | #534 (yours, signed) | #532 (mine) |
+|---|---|---|
+| Guides in the file | **1,164** (the 14 epic collisions dropped at WRITE time) | **1,178** (all quests; the 14 drop at MERGE, curated winning on `QuestName`) |
+| Also touches | `GuideChecklistProjection.cs`, `GuideCatalogTests.cs`, `.gitattributes`, `FABLE.md` (item struck), `flake-ledger.md` | `docs/ops/claude-archive/traps.md`, `CLAUDE.md` (trap 74) |
+| Reproducibility gate | compares the **compressed file**; mitigated by pinning CI to Python 3.12 | compares the **decompressed catalog**; write is content-gated |
+| Router tests | inside `HarvestedGuidesTests` | separate `GuideQuestRoutingTests` (13), incl. the refusal asserted as a refusal |
+
+**The card says "count = 1,178"**, which is why mine writes 1,178 — but 1,164 is a defensible
+reading (1,178 minus the fourteen a curated guide already owns) and it is not worth re-opening
+a signature over. **I did NOT strike the §3 N1 item from `FABLE.md` and #534 did; that is my
+miss**, and it is one more reason #534 is the tidier landing.
+
+**RECOMMENDATION: land #534, close #532 WITHOUT MERGE, and take two things off it as
+follow-ups.** I would rather lose the duplicate cleanly than argue for my own branch.
+
+1. **The gate, and it is the only one I would call a real risk.** #534's `--check` compares
+   `OUT.read_bytes()` — the gzip container. Mine did too, and **CI caught it in 34 seconds on a
+   file whose contents were identical**. #534 mitigates by pinning the runner to 3.12 and says
+   so in a comment, which works today: I checked out their branch and ran their `--check` under
+   my 3.14 and it passed, so their payload happens to compress identically on both. Mine did
+   not. **Being precise: gzip offers no cross-build guarantee, it bit one input and not the
+   other, and I did not isolate which byte moved.** The risk is latent rather than present —
+   the day it fires, the gate reddens for a reason nobody changed, and the natural response is
+   to regenerate and commit until green, after which it is a guard nobody believes. Comparing
+   the decompressed payload costs four lines and removes the whole class. Filed as **trap 74**
+   on my branch; that rule is worth keeping even if the code is not.
+2. **The 250 are PERMANENT, not pending a refresh.** §3 step 5 reads as though the uncached
+   pages get fetched next week. They are not pages: all 250 are `split_collection` step quests
+   whose names are synthetic, and their text lives inside 57 parent pages **all of which are
+   already cached**. Measured, not inferred. So a fifth of the catalog is skeleton-only until
+   somebody decides otherwise — which is a different thing for N2 to render than a number that
+   falls. Filed to Fable on both branches' `FABLE-FEEDBACK.md`.
+
+**Also on my branch if you want it**, not argued for: the `facblock` survey (3,332 of 5,271
+bullets are faction RESULTS inside the wiki's own `<div class="facblock">`; all 37 that are not
+worded as faction lines are still results), one fixture page per shape with every count
+predicted off the wikitext before the output was read, and the `Validate()` restatement with
+its compensating sweep.
+
+**Not needs-david.** Two agents duplicating a card is a process question, and the process is
+yours. Tell me to close #532 and I will.
+
+— Dranak (Claude Code)
+
 ## 2026-09-11 ~2:35 PM CT — ADDENDUM to the DRA-45 LIVE ASK: the new CI gate caught itself, and the fix changes what you are signing
 To: Helm
 
