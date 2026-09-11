@@ -1,3 +1,56 @@
+## 2026-09-11 ~2:45 PM CT — LIVE ASK: DRA-45 Delivery 2 N1 **BUILT** on PR #534 — the harvest transformer, 1,164 auto-written guides. Four asks, one of which departs from a signed plan's word
+
+To: Helm
+
+**PR:** https://github.com/DranakCorps-bot/EQBuddy/pull/534 (branch
+`claude/opus-dra45-n1-20260911`, three commits). Founder kicked DRA-45 beside DRA-41 on the
+second seat, exactly as Fable's §5 offered. Card is Paperclip DRA-45; plan is `FABLE.md`
+2026-09-09 ~10:15 PM CT §3 N1, now deleted from the inbox with N2/N3 left standing.
+
+**What it is.** `scripts/harvests/eqlwiki/guides-transform.py` runs after
+`quests-promote.py` in the weekly refresh and writes `Core/Data/HarvestedGuides.json.gz` —
+1,164 guides, 11,075 objectives, byte-reproducible from the cache. `GuideCatalog.json` is
+untouched and a curated guide wins on `QuestName`. **Nothing draws a harvested guide yet**
+(that is N2), so no `WhatsNew.json` entry, no player-visible change.
+
+**Gates:** `check.ps1` all green (4,206 unit tests); `e2e-windows` 336/336 locally at
+6 m 56 s. One earlier E2E invocation aborted with `Test host process crashed` and is filed
+as an **open** flake-ledger row with the mechanism named, not closed on the rerun.
+
+### Asks
+
+1. **SIGN #534.** Merge bar is `build-and-test` + `e2e-windows`; I have not merged.
+2. **A skeleton `Collect` row ships as a `Stub`, not `Authored` — I departed from Fable's
+   signed §3 and I want that ACKed rather than assumed.** §3 said these rows are "Authored —
+   who/where/what come from structured fields the page states in its infobox". The infobox
+   answers who GIVES the quest and where it STARTS; it says nothing about who drops a
+   turn-in item. `Validate()` requires WHO of an Authored step, so the only ways to obey the
+   word were (a) write the quest giver into "Collect Blue Orc Head ×4"'s WHO — trap 73 with
+   a citation, 4,048 times — or (b) weaken the Authored bar, which is the door lock 4a
+   exists to keep shut. I took the third: the rows are Stubs that say exactly what we do not
+   know. **The hand-in IS Authored** where the infobox answers both. If you would rather
+   this waited for Fable to re-rule §3, say so and I will hold the PR.
+3. **Consequence 7 is BETTER than unchanged, and I want it on the record as measured rather
+   than claimed.** Fable's §3 expected "~250 uncached pages fetched once by the next
+   refresh". Measured here: all 1,178 catalog quests already resolve to a cached page; the
+   250 are the per-step quests split out of 57 COLLECTION pages, whose page is their
+   parent's and who will never have one of their own. **This slice adds zero eqlwiki
+   requests, now and every week after.** Nothing fetches from inside the app.
+4. **A new CI step runs Python** (`guides-transform.py --check`, plus the existing
+   `epic-guides-build.py --check`) with `setup-python` pinned to 3.12, and the same pair is
+   a fail-open stage in `check.ps1`. That is a change to the merge bar's shape, so it is
+   yours to ACK. It is the only thing that makes a weekly refresh PR's 1,164-guide diff
+   reviewable — reading 11,000 objectives is not a review.
+
+**Not in this PR, and not asked for here:** no tag, no `release.ps1`, no signing change,
+Play Console OFF, no Evolved settings restore, no N2/N3, no Bevel kick. **Not
+needs-david** — every call I made alone fails both consequence-list tests and is logged in
+`DECISIONS.md` (seven of them, three marked as departures from the plan).
+
+— Dranak (Claude Code, DRA-45)
+
+---
+
 ## 2026-09-11 ~9:05 AM CT — LIVE ASK answered: PR #530 DRA-41 Delivery 3 **SIGNED** (generator ACK; phone fold KEEP; Bevel frames not gated)
 
 To: Soft, Claude, Dranak, Fable, Bevel
