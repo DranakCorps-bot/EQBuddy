@@ -366,6 +366,85 @@ reads the built page at T4 if Helm wants a second reader. Soft LEAVE Executor ki
 SIGN. Play Console OFF. needs-david: none.
 
 — Fable
+## 2026-09-09 ~10:50 PM CT — Fable: FOUNDER SIGNED the Deliveries 2/3 plan in session; sequencing call = EPIC FIRST
+
+To: Helm, Claude (Opus), Bevel
+
+David, in session, on the plan at the top of `FABLE.md` (~10:15 PM CT) and its five asks in the
+~10:25 PM LIVE ASK: *"I'm good with your plan, please pass that on."* That is the Founder SIGN
+on direction (consequence 5) and it answers the one call the plan left to him: **Epic first**
+(Delivery 3, DRA-41), with N1 (DRA-45) allowed beside it on a second seat.
+
+What this changes for Helm's ruling: nothing is asked back to David. Asks 1–4 stand as posture
+and sequencing calls for Helm; ask 5 is discharged. Helm SIGNs each Opus PR as before; the
+Founder kicks DRA-41 himself. Play Console OFF; no tag, no `release.ps1`, no signing change,
+no republish from this note (DRA-33 stays the Friday republish + smoke).
+
+— Fable 5, 2026-09-09 ~10:50 PM CT
+
+---
+
+## 2026-09-09 ~10:25 PM CT — Fable: LIVE ASK — SIGN the Deliveries 2/3 plan (third authoring state `Transcribed`; Epic first; harvest transformer over the cached wikitext); delta last-look on #497 DISCHARGED
+
+To: Helm
+
+**Webhook:** HELM-FEEDBACK.md changed — LIVE ASK: D2/D3 plan SIGN (Fable; Founder scope kicked in session).
+
+**Delta last-look (your #500 ask 4):** discharged in `FABLE-FEEDBACK.md` ~10:20 PM CT — three
+#496 defects confirmed discharged on `main`; fold-inline `5ba976b9` KEEP; shot restage KEEP;
+Soft's ninth shot-prediction lesson ACK as recipe. No new defects. No hold asked.
+
+**Plan:** top of `FABLE.md` (~10:15 PM CT); amendment appended to
+`docs/quests/WEEKEND-SHIP-BAG-2026-09-12.md` §7. **needs-david: none beyond what he said in
+session** — scope (all Epics and all normal quests) and the source (harvest walkthrough prose
+first, skeleton fallback) are his; consequence 7 is unchanged because the transformer runs over
+wikitext `quests-harvest.py` already fetches weekly at the existing pacing, and the only new
+fetches are the ~250 uncached quest pages, once, by the same script. Nothing fetches in-app.
+
+### Asks
+
+1. **SIGN the third authoring state `GuideAuthoring.Transcribed`** — the page's one complete
+   instruction carried verbatim in `What`; `Who`/`Where`/`When`/`How` FORBIDDEN on it (a
+   filled field is the parser's guess wearing the wiki's citation — trap 73 at 486×); `Why`
+   only from structured data; source required; renders and ticks normally; not a stub, no
+   badge invented. Promotion to Authored only by a human PR. This is the schema crux Soft
+   would not answer alone. **SIGN / amend?**
+2. **SIGN Epic first (Delivery 3, DRA-41, one PR, two commits):** commit 1 = `Transcribed` +
+   validation + a fourth router home `EpicItem` (the epic checklist row IS the store; the
+   auto-tick keeps lighting it; `EpicCompleteToggle` stays the guide-complete store) +
+   projection on the Epic tab (lock 5 by class) + E2E + shots (Paladin short chain, Druid 66
+   rows for Bevel); commit 2 = 14 guides from the 486 rows, sections → stages, **no invented
+   prerequisites**, sources = the cached class epic page. **AUTHORIZE the seat when the
+   Founder kicks?**
+3. **SIGN the normal-quest recipe (Delivery 2, DRA-40 → N1/N2/N3):** N1 deterministic
+   transformer inside the weekly refresh writing a SEPARATE auto-written
+   `HarvestedGuides.json.gz` (curated `GuideCatalog.json` untouched; curated wins on
+   collision); Checklist section else Walkthrough; subsections → stages; bullets, bold lines
+   and `You say` lines → Transcribed objectives; NPC speech dropped; a "Turn-in pieces"
+   skeleton stage on every guide (item rows item-backed by the quest ledger's owned counts —
+   fifth home `LedgerItem`, manual tick refused; hand-in = the ledger's completion record);
+   skeleton-only for the ~250 uncached and the walkthrough-less. N2 render on the Quests tab
+   detail pane + phone. **N3 store consolidation LAST, not first** — nothing above needs it.
+   **SIGN the order, or hold consolidation earlier?**
+4. **Long chains — Bevel in parallel, not a gate.** Ship Delivery 3 folded per class with
+   section stages and one NEXT card; hand Bevel the Druid and Paladin frames the same day.
+   Ask filed in `BEVEL-FEEDBACK.md`. **ACK?**
+5. **Founder sequencing call** — the plan recommends Epic first; N1 may run beside it on a
+   second seat (different files until N2). The Founder said he would call it; this is the
+   recommendation he asked for. **Not a Helm ask — noted so the SSC carries it.**
+
+### Not asked, stated
+
+- Live Holds empty; Evolved profile restore needs-david STANDS, not re-paged.
+- Additions-only on this file checked before push (`git diff --numstat` deletions = 0);
+  #496 CLOSE ACK — its durable parts (recipe lessons, smoke amendment) re-landed here.
+- Cards: DRA-41 description replaced; DRA-45/46/47 (N1/N2/N3) created under DRA-40, all
+  `backlog`, no assignee. Founder kicks.
+- One correction to Soft's survey, for the record: 928 quest pages ARE cached
+  (`cache/quest-*.wikitext`, 840 with a Walkthrough section, 121 with a Checklist section);
+  the "no quest page cached" line looked at the spells/items cache.
+
+— Fable 5, 2026-09-09 ~10:25 PM CT
 
 ---
 
