@@ -424,9 +424,9 @@
     },
     {
       "id": "pos-bard-harmonic-spear",
-      "name": "Harmonic Spear - Bard, Plane of Sky",
+      "name": "Spear of Harmony - Bard, Plane of Sky",
       "guideType": "PlaneOfSkyQuest",
-      "questName": "Bard Sky Test: Harmonic Spear",
+      "questName": "Bard Sky Test: Spear of Harmony",
       "zoneNames": [
         "Plane of Sky"
       ],
@@ -460,7 +460,7 @@
               "where": "Plane of Sky - Isle 8.",
               "what": "Kill Eye of Veeshan and loot Nebulous Diamond (1).",
               "when": "",
-              "why": "Nebulous Diamond is one of the turn-in pieces for the Harmonic Spear.",
+              "why": "Nebulous Diamond is one of the turn-in pieces for the Spear of Harmony.",
               "how": "",
               "authoring": "Authored"
             }
@@ -492,7 +492,7 @@
               "where": "Plane of Sky - Isles 1.5, 4 and 8 respectively.",
               "what": "Loot Efreeti War Spear (1) from any one of the three Efreeti-drop mobs.",
               "when": "",
-              "why": "Efreeti War Spear is one of the turn-in pieces for the Harmonic Spear.",
+              "why": "Efreeti War Spear is one of the turn-in pieces for the Spear of Harmony.",
               "how": "",
               "authoring": "Authored"
             }
@@ -522,7 +522,7 @@
               "shortInstruction": "Loot a Wind Rune Heda from Plane of Sky trash.",
               "what": "Loot Wind Rune Heda (1).",
               "when": "",
-              "why": "Wind Rune Heda is one of the turn-in pieces for the Harmonic Spear.",
+              "why": "Wind Rune Heda is one of the turn-in pieces for the Spear of Harmony.",
               "how": "",
               "who": "any Plane of Sky mob",
               "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
@@ -541,24 +541,24 @@
               "order": 1,
               "objectiveType": "TurnIn",
               "title": "Hand in Nebulous Diamond, Efreeti War Spear, Wind Rune Heda",
-              "shortInstruction": "Give Cilin Spellsinger the 3 pieces to receive the Harmonic Spear.",
+              "shortInstruction": "Give Cilin Spellsinger the 3 pieces to receive the Spear of Harmony.",
               "who": "Cilin Spellsinger",
               "where": "Plane of Sky - the Efreeti Chamber. Buy an Efreeti's Key from the Key Master near where you zone in on Isle 1 (it is free), then take the teleport pad at the North point of that isle, around 1600, 520.",
-              "what": "Hand Cilin Spellsinger Nebulous Diamond (1), Efreeti War Spear (1), Wind Rune Heda (1) to receive the Harmonic Spear.",
+              "what": "Hand Cilin Spellsinger Nebulous Diamond (1), Efreeti War Spear (1), Wind Rune Heda (1) to receive the Spear of Harmony.",
               "when": "Once every piece above is in your bags - the guide's own prerequisites say so.",
-              "why": "This is the step that actually gives you the Harmonic Spear.",
+              "why": "This is the step that actually gives you the Spear of Harmony.",
               "how": "The log never records a hand-in, so tick this one yourself when it is done - that is EQBuddy's own limit, not something the wiki says.",
               "prerequisiteObjectiveIds": [
                 "nebulous-diamond",
                 "efreeti-war-spear",
                 "wind-rune-heda"
               ],
-              "rewardKey": "Bard|Harmonic Spear",
+              "rewardKey": "Bard|Spear of Harmony",
               "itemNames": [
                 "Nebulous Diamond",
                 "Efreeti War Spear",
                 "Wind Rune Heda",
-                "Harmonic Spear"
+                "Spear of Harmony"
               ],
               "authoring": "Authored",
               "sources": [

@@ -1117,6 +1117,14 @@ public sealed class AppSettings
             // written in settings.json rather than relying on every future reader
             // remembering the comparer.
             ("Magician", "Staff of the Magister", "Staff of The Magister"),
+            // 2026-09-10: eqlwiki titles the ITEM page "Spear of Harmony"; only our Sky rows
+            // said "Harmonic Spear", which made us uniquely wrong — the case CLAUDE.md says
+            // costs the most trust. It sat harmless for weeks and then stopped being
+            // harmless: the reward hover looks the item up BY NAME in the shipped
+            // ItemCatalog, so this Bard was one of two rewards in 95 showing a sentence
+            // where every other reward shows the item's own stats block. A cosmetic data
+            // defect became a visible one the day a surface started reading the field.
+            ("Bard", "Harmonic Spear", "Spear of Harmony"),
         };
 
         var changed = false;
@@ -1130,6 +1138,24 @@ public sealed class AppSettings
             SkyQuestCompleted.RemoveAt(at);
             if (!SkyQuestCompleted.Contains(newKey, StringComparer.OrdinalIgnoreCase))
                 SkyQuestCompleted.Add(newKey);
+            changed = true;
+        }
+
+        // GuideExpanded is keyed the SAME way, and it was added after this migration was
+        // written — so a rename that only moved the turn-in would have quietly re-folded a
+        // quest the player had open (Fable's #514 last-look named the choice; taking the
+        // migration rather than the re-fold). Separate loop on purpose: a player can have an
+        // expanded quest they have NOT turned in, so `continue` above must not skip this.
+        foreach (var (cls, from, to) in renames)
+        {
+            var oldKey = QuestChecklistLayout.RewardKey(cls, from);
+            var newKey = QuestChecklistLayout.RewardKey(cls, to);
+            var at = GuideExpanded.FindIndex(k =>
+                k.Equals(oldKey, StringComparison.OrdinalIgnoreCase));
+            if (at < 0) continue;
+            GuideExpanded.RemoveAt(at);
+            if (!GuideExpanded.Contains(newKey, StringComparer.OrdinalIgnoreCase))
+                GuideExpanded.Add(newKey);
             changed = true;
         }
         return changed;

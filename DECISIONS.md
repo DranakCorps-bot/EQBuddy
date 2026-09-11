@@ -1,3 +1,31 @@
+## 2026-09-10 (Fable's two #514 follow-ups — the calls I made alone)
+
+**1. The Bard's guide ID stays `pos-bard-harmonic-spear` after the rename.** Everything a
+player can SEE now says "Spear of Harmony", but the guide's internal id does not, and that is
+deliberate: `GuideProgressRouter` uses `Guide.Id` as the per-character ledger key for steps
+that belong to no checklist item, so renaming it would silently drop this Bard's recorded skips
+and travel steps to buy a tidier string nobody reads. Fable's blast-radius list did not include
+it either. The default it could have gone the other way on: rename for consistency and accept
+the progress loss. If it ever DOES get renamed, it needs its own ledger migration.
+
+**2. `GuideExpanded` migrates with the rename rather than accepting one re-fold.** Fable named
+this as a choice and asked me to say which I took. Migrating is four lines in a loop that
+already exists and it means a player with that quest open does not find it silently folded on
+next launch. The two loops are separate because an expanded quest is not a completed one — the
+first loop's `continue` would have skipped it. `AnExpandedQuestStaysExpandedThroughARename`
+prove-failed.
+
+**3. `QuestCatalog.json` keeps "Harmonic Spear" and was not touched.** It is HARVESTED wiki
+data, auto-written by the weekly refresh, and that string is a rewards entry on a quest page —
+hand-editing it would be overwritten next refresh and would make us disagree with our own
+harvest. The rename is ours to make in the CURATED rows (`SkyQuestDefaults`, the guide
+catalog); the wiki's quest page saying something different from its item page is the wiki's to
+fix, not ours to paper over.
+
+**4. `AchievementsImport`'s drift-match pair keeps BOTH spellings.** It exists to tolerate the
+game's export and our catalog disagreeing, and the game's export is not renamed by us. Removing
+the old spelling would break the import for anyone whose dump predates this.
+
 ## 2026-09-10 (DRA-33 Evolved republish — the calls I made alone)
 
 **1. "Fable files the look" was treated as satisfied by the pushed channel filing on the seat

@@ -589,23 +589,28 @@ public class GuideCatalogTests
     /// that block IS the heading's hover now (David, 2026-09-10), and a reward that misses it
     /// shows a sentence where every other reward shows the item window.
     ///
-    /// <para><b>The two exceptions are named, and they are OUR bugs rather than the wiki's.</b>
-    /// A bare count would let a third join them silently; naming them means the day one is
-    /// fixed this test says so by failing. Both are known reward-name defects deferred to
-    /// Delivery 2 (<c>MigrateSkyRewardRenames</c>):</para>
-    /// <list type="bullet">
-    /// <item><c>Harmonic Spear</c> — eqlwiki titles the item <c>Spear of Harmony</c>, so the
-    ///   lookup misses. Matching the wiki is the standing rule (David, 2026-08-14).</item>
-    /// <item><c>Windhowl/Spirit Render</c> — TWO rewards jammed into one string by an old
-    ///   import. No item is called that, so no item page can ever match it.</item>
-    /// </list>
-    /// <para>Until then a Beastlord and a Bard get a sentence where everyone else gets the
-    /// item window — which is the first time either bug has cost a player anything
-    /// visible.</para></summary>
+    /// <para><b>The ONE exception is named, and it is OUR bug rather than the wiki's.</b>
+    /// A bare count would let another join it silently; naming it means the day it is fixed
+    /// this test says so by failing — which is exactly what happened to its twin.</para>
+    ///
+    /// <para><c>Windhowl/Spirit Render</c> is TWO rewards jammed into one string by an old
+    /// import, so no item page can ever match it. It is NOT a rename and it stays in
+    /// Delivery 2 (Fable's #514 ruling): the honest fixes are a reward split (95 → 96, new
+    /// checklist structure, a two-key migration) or a compound reward whose card carries two
+    /// stats blocks — and the second is a SHAPE decision about <c>RewardCard</c> that should
+    /// be made once, beside DRA-47's key surgery. The game's own achievements export calls it
+    /// "Windhowl and Spirit Render", which is evidence for the compound reading. A Beastlord
+    /// keeps the sentence fallback until then, and that is honest.</para>
+    ///
+    /// <para><c>Harmonic Spear</c> WAS the other one and is fixed: eqlwiki titles the item
+    /// <c>Spear of Harmony</c>, matching the wiki is the standing rule (David, 2026-08-14),
+    /// and it was a pure rename with every rail already built — so Fable promoted it out of
+    /// Delivery 2 the moment the hover made it visible. This test failing on that fix, and
+    /// the seat editing the list in the same commit, is the guard working.</para></summary>
     [Fact]
-    public void EverySkyRewardsItemIsInTheShippedCatalogExceptTheTwoWeMisname()
+    public void EverySkyRewardsItemIsInTheShippedCatalogExceptTheOneWeMisname()
     {
-        string[] knownMisnamed = ["Harmonic Spear", "Windhowl/Spirit Render"];
+        string[] knownMisnamed = ["Windhowl/Spirit Render"];
 
         var rewards = GuideCatalog.Default.Guides
             .Select(g => g.Name.Split(" - ")[0])
