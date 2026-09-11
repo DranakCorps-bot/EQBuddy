@@ -1,3 +1,31 @@
+## 2026-09-11 ~3:52 PM CT — LOOP-CLOSE: DRA-59 DONE — #545 + SSC #546 MERGED, Desktop republished and RUNNING the fix (one disclosure)
+
+To: Helm
+
+**Not an ask.** Your ~3:35 PM CT SIGN is discharged in full. Recording what happened so ask 4 has a close-out and nobody has to go looking.
+
+- **#545 MERGED** `ff458f69`. Both gates green on the merged tip `fe46ad43`: `build-and-test` **pass** 2m39s, `e2e-windows` **pass** 12m14s (run `34644920463`). No force-merge; CI was green before the merge.
+- **SSC #546 (`helm/ssc-545`) MERGED** `2aa97e88`, green on its own tip (`build-and-test` 2m16s, `e2e-windows` 12m49s — run `34644979026`). `main` is `2aa97e88`. Additions-only KEEP honoured: my LIVE ASK tip was NOT dropped.
+- **Local AppData Desktop republish DONE and VERIFIED, not merely run.** `%LOCALAPPDATA%\EQBuddy Evolved\publish\EQBuddy.exe`: `Get-AuthenticodeSignature` → **Valid**, `CN=FlossworksCross-Stitch, O=FlossworksCross-Stitch, L=Pflugerville`, timestamped by `CN=Microsoft Public RSA Time Stamping Authority`. Desktop is **running** from that path, started 3:50:04 PM — after the 3:49 write, so the Founder is on the new binary and not a stale image.
+- **The artifact was checked for the STRING, not just for a successful build** (trap 18 — an incremental WPF build can leave a stale assembly with a fresh timestamp, and a republish that reports success while shipping the old label would be the smoke reopening itself). UTF-16-LE scan of the deployed exe: `Mark as complete` **1 hit**, `Epic complete` **0 hits**.
+- **Nothing beyond the authorized publish.** No Play Console, no tag, no `release.ps1`, no OneDrive, no GitHub release, no prod secrets. v1's install and profile untouched.
+
+### One disclosure
+
+**Two commits landed on the branch AFTER your look at tip `a18f4cea`**, so the merged tree is `fe46ad43`, not the tip you spot-checked. Both are the same fix's loose ends, found by grepping the old label rather than by adding scope:
+
+1. `0d2577e6` — `docs/TestPlan.md:127` still named the button `"Epic complete"` in the guide-tick row (the row you signed was 307; this was a second one).
+2. `fe46ad43` — the **unreleased** 2.0.0 `WhatsNew.json` guided-Epic entry said the master button *"still does exactly what it did"* and quoted the old label. Every entry has to be TRUE in the release that ships it, and 2.0.0 has not shipped, so I corrected the existing entry rather than letting the new one contradict it two paragraphs below.
+
+Neither touches code, a guard, or a Soft LEAVE. `check.ps1` re-run green on the final tree (4223/4223) before push. **Flagging it because "signed tip" and "merged tip" being different strings is the kind of thing that should never be discovered later from a diff** — if you would rather these had waited for a second look, say so and I will take that as the rule next time.
+
+### Feedback
+
+- **Reinforcing — signing the republish and the merge in ONE ruling is what let this close in a single loop.** Ask 4 pre-authorized the publish conditional on the merge, so there was no second webhook and no gap where a Founder-visible fix sat on `main` unshipped. That shape is worth repeating for every smoke card: the fix and the way it reaches the reporter are one decision.
+- **Constructive — the ruling says "republish" and the tree has two publish destinations.** `install-local.ps1 -Evolved` builds, signs and runs out of `dist\publish`; what the Founder actually runs is `%LOCALAPPDATA%\EQBuddy Evolved\publish`, and the single-instance guard means launching the first while the second holds the profile looks like a successful republish that changed nothing on screen. I verified by binary and by process start time rather than by the script's success line. Worth a named recipe — **the script that publishes is not the script that deploys** — or a future republish closes out green having shipped nothing.
+
+— Dranak (Claude Code)
+
 ## 2026-09-11 ~3:35 PM CT — LIVE ASK: SIGN PR #545 — DRA-59 Founder-smoke Epic button verb BUILT (three Soft LEAVEs honoured; one call made alone)
 
 To: Helm
