@@ -1615,3 +1615,71 @@ bytes against the committed 356,535 — now passes, which is the CI failure abov
 reproduced on demand. The report assertion was prove-failed against `main`'s
 committed report, which fails with *Sub-string not found* for the Stub bucket's
 true count of 4075.
+
+### Trap 75
+
+**When a transport reports three different causes with one code, a client that
+guesses which one it is has written silence for the other two — and a retry loop
+built on that guess can spend the server's own abuse budget on itself.**
+
+DRA-60. A founder smoke test scanned EQBuddy Mobile's pairing QR. The phone
+navigated to `http://10.0.0.84:47859/#<code>`, and hung. Everything the report
+could reach was fine: the bind was real, the PC answered that GET 200 with the
+whole ~155 KB page, and the same URL in the PC's own browser connected and drew.
+The hang was the PAGE's, after navigation — which is the half nobody can see.
+
+`index.html` puts a fragment code straight into `#app` and calls `connect()`.
+`ws.onclose` then fires with code 1006, and **1006 is what a browser reports for
+a refused upgrade, a rate-limited one, and a PC that is switched off alike** —
+the WebSocket never existed, so there is no status for the page to read. The page
+guessed, and it guessed for exactly one of the three: a code produced from
+`localStorage` counted three refusals and then showed the pairing screen. A code
+that arrived in the FRAGMENT — which is every QR scan there has ever been —
+matched no branch, and was re-dialled forever.
+
+→ **The silence was actively produced, once a second.** `refreshStale()` runs on
+a 1 s interval as well as on each heartbeat. Its only never-connected clause was
+`everConnected && !lastMsgAt`, false before the first open, so every tick fell
+through to the `else` and REMOVED the banner. The page was not stuck; it was
+deciding, once a second, to say nothing. Anything the close handler wrote into
+the banner would have been erased within the second — **the news had to live in
+the one producer**, which is the same shape as trap 4.
+
+→ **And the loop ate the remedy.** `CompanionServer` rate-limits an IP at five
+auth failures inside sixty seconds, and the page's 1→2→4→8 s backoff spends all
+five in about fifteen. From then on the device is 429'd for most of every minute
+— so the phone had locked itself out of the CORRECT code the player was on their
+way to rescan, and the rescan looked broken too. **A silent retry against an
+endpoint with an abuse guard is a client DoSing its owner on the owner's
+behalf.** The fix STOPS on a refusal; stopping costs two failures, not five.
+
+→ **The instrument was already there, unasked.** The same origin answers the
+plain GET the socket would have made: 403 (this code is wrong), 429 (this device
+burned the budget), 400 (the code is RIGHT and an upgrade was the only thing
+missing, so the fault is the network). One request separates the three causes
+the transport had flattened into one. **Before writing a sentence that names a
+cause, check whether something on the wire can tell you which cause it is** —
+otherwise the page has trap 35's shape: an affordance with the right form and
+invented content, and "your pairing code is wrong" told to somebody whose PC is
+merely asleep is worse than the blank page, because they will go and regenerate
+a code that was fine.
+
+→ **The other way to look hung, found by pulling the same thread.** A socket
+that OPENS and a snapshot that ARRIVES can still paint nothing: `wanted` is
+`picked() ∩ (offered ∪ notOffered)`, and a PC whose gate does not overlap this
+device's picks leaves it empty. `#screens` is `display:none` until the ⚙, so what
+remains is a header carrying the character's name over a blank page —
+indistinguishable, to the player, from the hang above. A surface that can
+legitimately have nothing in it needs a sentence for that state, and `render()`
+now has one. (Trap 20's family: the state nobody wrote a branch for.)
+
+Guards: `CompanionPairingFailureTests` — the close handler may consult neither
+the code's provenance nor a refusal count (the shipped condition committed as the
+negative), a 403 must stop the loop, the never-connected branch must live inside
+`refreshStale()` and before the clause that hides the banner, and the empty-picks
+sentence must exist. The three wire statuses and the lockout arithmetic are
+asserted against a real `CompanionServer` on a loopback socket rather than read
+out of the source, because the page's message is only honest for as long as they
+hold. Prove-failed against the shipped page: five of the six page assertions are
+red before the fix, and the two server facts were green throughout — which is
+the point, since the server was never the bug.
