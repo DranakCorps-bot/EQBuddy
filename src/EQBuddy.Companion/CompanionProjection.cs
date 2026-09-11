@@ -268,7 +268,17 @@ public static partial class CompanionProjection
                 // class clearing its evidence floor), never a per-tick drift.
                 Join(qs.CharacterClasses ?? [], c => c) + "|" + qs.ClassSourceLabel,
                 ChecklistPrint(qs.Epics),
-                ChecklistPrint(qs.Sky));
+                ChecklistPrint(qs.Sky),
+                // The quest guides (DRA-46). `Tracked`, `Owned` and `Completed` above already
+                // move when a pin, a piece or a hand-in does — but a guide's rows also carry
+                // two facts nothing else in this print holds: the player's SKIP (the guide
+                // ledger) and the FOLD. Without them, striking a step out on the PC would
+                // leave the phone drawing it live until an unrelated term moved, which is
+                // trap 72's exact shape one surface over. Not a bare count — a swap of one
+                // skip for another leaves a count where it was.
+                Join(qs.Guides, g => $"{g.Quest}:{(g.Group.Collapsed ? 'F' : 'O')}="
+                    + Join(g.Group.Rows, r => $"{r.Id}:{(r.Done ? '1' : '0')}{(r.Skipped ? 's' : '-')}"))
+                    + "+" + qs.GuidesMore);
 
         AddChecklist(map, CompanionSurfaces.Gear, snap.Gear);
         return map;

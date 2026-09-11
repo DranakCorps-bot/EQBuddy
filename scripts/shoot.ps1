@@ -524,6 +524,78 @@ $Shots = [ordered]@{
     'shell-quests-narrow' = @{ Title = 'EQBuddy — Guide'
                            Env = @{ EQBUDDY_SHELL = 'quests:general'
                                     EQBUDDY_SHELL_SIZE = '899x640' }; Set = @{} }
+    # ---- Delivery 2 N2 (DRA-46): A HARVESTED GUIDE ON THE GENERAL TAB -----------------
+    #
+    # The frame the whole slice is about, and the one claim no other shot can make: the
+    # guide's "Turn-in pieces" are the ITEM ROWS this pane already drew, not a second list
+    # of checkboxes beside them.
+    #
+    # 'Aviak Talons' is PINNED so it is the pane's selection. Not left to the fixture's
+    # bags: with no pin the list selects whatever happens to overlap, and a picture of the
+    # wrong quest is a real state of something else (trap 23). Chosen off a survey of the
+    # shipped harvest rather than by looking at frames (Fable recipe lesson 6) — it is the
+    # smallest quest carrying BOTH kinds of row plus a prose stage, so the split is legible
+    # in one screen. Expanded through the guide id, which is a quest group's fold key.
+    #
+    # PREDICTED before shooting (trap 23), from the survey of the shipped catalog:
+    #
+    #   * Native shell chrome, the four-row rail with Guide lit, the character caption, the
+    #     four-chip tab strip with Quests lit, search box, filter row, mode strip on 'mine'.
+    #   * The LIST at 400: 'Aviak Talons' FIRST and selected (raised background, accent
+    #     border) — a pinned quest sorts first and stays visible with zero items held.
+    #   * The DETAIL pane, top to bottom:
+    #     - the title 'Aviak Talons' in accent, then four icons: a FILLED pin (accent), and
+    #       Check / Close / Flag dim at 0.55.
+    #     - the status line 'nothing held yet' — 0 of 2 pieces.
+    #     - 'Rewards' and ONE tile reading 'Faction'. The wiki lists no item, so there is no
+    #       item silhouette to speak of and no stats block anywhere on this frame.
+    #     - **the guide block**: a '−' fold control then the word 'Guide', and under it the
+    #       caption 'Guide · 2 stubs'. NOT 'Guide · 0 of 4' — the caption draws only where it
+    #       adds stubs or skipped, and both Collect rows are stubs by DRA-45's rule.
+    #     - the NEXT card: 'NEXT:' then the page's own sentence verbatim ('Hand Bumle
+    #       Reminjar 4 Aviak Talons, randomly looted from a krag elder, …'), then 'Works
+    #       toward Aviak Talons.' and NOTHING BETWEEN THEM. No direction line and no detail
+    #       line: the step is Transcribed, so the card draws no line claiming a who or a
+    #       where the page never stated. Then Done / Skip / the pencil.
+    #     - the stage heading 'Walkthrough' and ONE checkbox row carrying that same sentence,
+    #       with a pencil and NO dim second line.
+    #     - the stage heading 'Turn-in pieces', then the Bag provenance note ONCE (not once
+    #       per item), then **TWO ITEM ROWS** — 'Aviak Chick Talon  0 / 1' and 'Aviak Talon
+    #       0 / 1', dim, each with an item silhouette and a raised pill background. THESE
+    #       ARE THE CLAIM: they are rows, not checkboxes, and there is no third and fourth
+    #       checkbox repeating them. The stub sentence rides their hover, so it is not on
+    #       screen in this frame.
+    #     - then ONE checkbox row 'Hand the pieces to Bumle Reminjar.' with the dim
+    #       'after: Collect Aviak Chick Talon, Collect Aviak Talon' naming what gates it,
+    #       and a pencil.
+    #     - 'Details' with Zone Kaladim, Giver Bumle Reminjar, Level 8+.
+    #   * And one thing that must NOT be there: a 'Turn-ins' section label. The guide
+    #     ABSORBED it — its stage heading is where those rows live now — and both on one
+    #     frame would be the two-lists defect this slice exists to avoid.
+    #   * Nor a 'Mark as turned in' button: nothing is held, so the hand-in is not offered.
+    #
+    # THE FIRST TAKE MISSED ITS OWN LAST LINE, and the prediction is what caught it. At
+    # 1000x900 — the size the two epic frames use — everything above held, and the hand-in
+    # row wrapped one line below the fold with 'Details' off-screen entirely. So the frame
+    # showed the two piece rows and NOT the row they gate, which is half of what "the
+    # turn-in pieces are the item rows" is about. Same below-the-fold miss the Sky card shot
+    # had; the size moves, not the claim. The 900 picture is not committed.
+    #
+    # AND THE SECOND TAKE OVERSHOT THE MONITOR. 1120 is taller than this desk's 1032-high
+    # work area, so the window ran off the bottom and the capture came back with 200 rows of
+    # black under a complete frame — a picture that would look like a rendering bug to
+    # anyone reading the docs. **A shot size is bounded by the smallest desk that has to
+    # take it, not by the content**; 1000 leaves room for the taskbar on a 1080p screen,
+    # which is the floor the rest of this file already assumes.
+    'shell-quests-general-guide' = @{ Title = 'EQBuddy — Guide'
+                           Env = @{ EQBUDDY_SHELL = 'quests:general'
+                                    EQBUDDY_SHELL_SIZE = '1000x1000' }
+                           Ledger = @{ Tracked = @('Aviak Talons') }
+                           Set = @{
+                               # A quest group has no reward key, so its fold key is the
+                               # GUIDE ID — the same string the "+" writes.
+                               GuideExpanded = @('harvested-aviak-talons')
+                           } }
     # The ACTIVE-STEP CARD (P1d / DRA-36), and the frame both earlier guide shots missed:
     # one with a STUB ROW ABOVE THE FOLD.
     #

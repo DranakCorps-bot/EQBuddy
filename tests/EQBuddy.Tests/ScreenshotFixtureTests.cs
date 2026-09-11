@@ -239,6 +239,15 @@ public class ScreenshotFixtureTests
         ledger.SetClasses(key, ["Bard", "Monk"]);
         var pinnable = catalog.Quests.FirstOrDefault(q => q.Items.Count > 0);
         if (pinnable is not null) ledger.SetTracked(key, pinnable.Name, true);
+        // A pin on a GUIDED quest, so the General tab's walkthrough is in the frame at all
+        // (DRA-46). Without one the harness photographs a quest list with no guide under any
+        // card — a real state of something else, and the state every card was in before this
+        // slice (trap 22). Chosen off the catalog rather than named, because the harvest is
+        // regenerated weekly.
+        var guided = catalog.Quests.FirstOrDefault(q =>
+            q.Items.Count >= 2
+            && GuideChecklistProjection.QuestGuideFor(GuideCatalog.Default, q.Name) is not null);
+        if (guided is not null) ledger.SetTracked(key, guided.Name, true);
 
         var settings = new AppSettings
         {
@@ -275,6 +284,14 @@ public class ScreenshotFixtureTests
             Hidden = ledger.HiddenFor(key),
             Completed = ledger.CompletedFor(key),
             Classes = ledger.ClassesFor(key),
+            // THE LEDGER ITSELF, which this fixture never passed. Every guided surface on the
+            // phone is gated on it (`settings is not null && req.Ledger is not null`), so the
+            // harness had been photographing the CLASSIC Sky and Epic lists ever since guides
+            // shipped, and would have shown no quest walkthrough at all. The running app
+            // always passes one; a fixture that does not is staging a state the product does
+            // not have (trap 23).
+            Ledger = ledger,
+            CharacterKey = key,
         };
         var snap = CompanionProjection.Build(new CompanionInputs
         {

@@ -545,6 +545,38 @@ internal sealed class AppHarness : IDisposable
             }, new JsonSerializerOptions { WriteIndented = true }));
     }
 
+    /// <summary>
+    /// Pins quests and seeds owned turn-in counts — the two levers the General tab's guided
+    /// pane needs, and neither is reachable through <c>configureSettings</c> (DRA-46).
+    ///
+    /// <para>Trap 22 in the shape this surface has it: the pane draws whichever quest the list
+    /// SELECTS, and with an empty ledger that is whatever the fixture's bags happen to overlap
+    /// — a real state of something else. A pin is what makes one named quest the first row, so
+    /// the assertions are about the quest the test is about.</para>
+    ///
+    /// <para><paramref name="owned"/> lands in <c>Manual</c> rather than <c>Looted</c>: the
+    /// startup replay recomputes the looted half from the log and would overwrite a seeded
+    /// one, which is the same high-water hazard <see cref="SeedRaids"/> names. Call before
+    /// <see cref="Launch"/>; overwrites anything <see cref="SeedQuestClasses"/> wrote.</para>
+    /// </summary>
+    public void SeedQuestLedger(
+        IReadOnlyList<string>? classes = null,
+        IReadOnlyList<string>? tracked = null,
+        IReadOnlyDictionary<string, int>? owned = null)
+    {
+        File.WriteAllText(Path.Combine(ProfileDir, "quest-ledger.json"),
+            JsonSerializer.Serialize(new Dictionary<string, object>
+            {
+                [$"{Character.ToLowerInvariant()}_{Server}"] = new
+                {
+                    Classes = classes ?? (IReadOnlyList<string>)[],
+                    Tracked = tracked ?? (IReadOnlyList<string>)[],
+                    Items = (owned ?? new Dictionary<string, int>())
+                        .ToDictionary(kv => kv.Key, kv => new { Manual = kv.Value }),
+                },
+            }, new JsonSerializerOptions { WriteIndented = true }));
+    }
+
     /// <summary>Appends messages to the character log with live timestamps, the way the
     /// game would. Latin1 + CRLF, matching what LogWatcher's tail reads.
     ///

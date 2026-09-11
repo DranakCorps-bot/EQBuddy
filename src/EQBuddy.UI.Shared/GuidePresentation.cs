@@ -94,6 +94,71 @@ public static class GuidePresentation
     public static string EpicCardWhy(string className) =>
         className.Trim().Length == 0 ? "" : "Works toward your " + className.Trim() + " epic.";
 
+    /// <summary>What a CATALOG QUEST pays, and what it costs — the General tab's guided
+    /// heading line (DRA-46).
+    ///
+    /// <para>Every reward the page lists, never one picked out, for the reason
+    /// <see cref="EpicRewardSummary"/> lists all of an epic's: choosing which of "Bone Chips,
+    /// 4 gold, Crude Stein" the quest is really about is EQBuddy departing from the wiki on
+    /// game data by preference (David, 2026-08-14). Empty rewards draw no sentence at all,
+    /// which is honest where "Rewards ." is not.</para></summary>
+    public static string QuestRewardSummary(
+        IReadOnlyList<string> rewards, IReadOnlyList<QuestItemNeed> items)
+    {
+        var paid = rewards.Select(r => r.Trim()).Where(r => r.Length > 0).ToList();
+        var head = paid.Count == 0 ? "" : "Rewards " + string.Join(", ", paid) + ".";
+        var cost = QuestCost(items);
+        return cost.Length == 0 ? head
+            : head.Length == 0 ? cost
+            : head + " " + cost;
+    }
+
+    /// <summary>A catalog quest's reward stats block, and the pieces under it.
+    ///
+    /// <para><b>Offered only when the quest pays exactly one item</b> — the caller decides
+    /// that, and hands null otherwise. A quest paying three items has no single item window
+    /// behind it, and showing one of the three would be the same choosing
+    /// <see cref="EpicTitle"/> refuses. Empty when we hold no block, and the surface falls
+    /// back to <see cref="QuestRewardSummary"/> rather than drawing a blank.</para></summary>
+    public static string QuestRewardCard(string? statsText, IReadOnlyList<QuestItemNeed> items)
+    {
+        var block = (statsText ?? "").Trim();
+        if (block.Length == 0) return "";
+
+        var cost = QuestCost(items);
+        return cost.Length == 0 ? block : block + "\n\n" + cost;
+    }
+
+    /// <summary>WHY, for a catalog quest's card. Names the quest rather than "the &lt;reward&gt;"
+    /// <see cref="CardWhy"/> names, because a normal quest's title IS the thing being worked
+    /// toward and its rewards are often several.</summary>
+    public static string QuestCardWhy(string questName) =>
+        questName.Trim().Length == 0 ? "" : "Works toward " + questName.Trim() + ".";
+
+    /// <summary>The line under a step whose answer is the character's own turn-in count —
+    /// what the bags say, and nothing else.
+    ///
+    /// <para>This is what a player sees INSTEAD of a tick they can move
+    /// (<c>GuideProgressHome.LedgerItem</c> refuses the click). So it has to carry the whole
+    /// answer on its own: how many are held, and how many the hand-in wants.</para></summary>
+    public static string HeldDetail(int have, int need) =>
+        have >= need
+            ? $"{have} of {need} — in your bags"
+            : $"{have} of {need} in your bags";
+
+    /// <summary>The pieces a catalog quest costs, as a sentence. The quantity rides along
+    /// where it is more than one, because "Needs Bone Chips" over a hand-in that wants four
+    /// of them is the wrong answer said confidently.</summary>
+    private static string QuestCost(IReadOnlyList<QuestItemNeed> items)
+    {
+        var pieces = items
+            .Where(i => i.Name.Trim().Length > 0)
+            .Select(i => i.Qty > 1 ? $"{i.Name.Trim()} ×{i.Qty}" : i.Name.Trim())
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToList();
+        return pieces.Count == 0 ? "" : "Needs " + string.Join(", ", pieces) + ".";
+    }
+
     /// <summary>The pieces a reward costs, as a sentence — the one part of the hover that is
     /// about the QUEST rather than about the item.</summary>
     private static string RewardCost(IReadOnlyList<SkyQuestChecklistItem> items)

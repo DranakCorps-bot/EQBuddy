@@ -223,6 +223,9 @@
   .gcard .inst { font-weight:600; margin:2px 0 6px; }
   .gcard .gl { display:block; font-size:12px; color:var(--dim); margin-top:2px; }
   .gcard .warn { display:block; font-size:12px; margin-top:6px; }
+  /* The count that stands in for a Done button (DRA-46) — accent, so it reads as the
+     answer rather than as another dim aside. */
+  .gcard .held { font-size:13px; color:var(--accent); margin-top:8px; }
   .gcard .verbs { margin-top:10px; display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
   .gcard button { font:inherit; padding:6px 14px; border-radius:6px; border:1px solid var(--hairline);
                   background:transparent; color:inherit; }
@@ -1666,15 +1669,23 @@ function boot() {
       if (line) box.appendChild(el("span", "gl", line));
     if (c.why) box.appendChild(el("span", "gl", c.why));
     if (c.beforeLeaving) box.appendChild(el("span", "warn", c.beforeLeaving));
+    // A step the BAGS answer says so, in place of the button it does not get: the PC's
+    // router refuses that tick, so a Done here would do nothing at all.
+    if (c.held) box.appendChild(el("div", "held", c.held));
     // No next step: the finished sentence and no verbs. A button with nothing to do is a
     // silent no-op wearing an affordance.
     if (!c.rowId) return box;
     const verbs = el("div", "verbs");
-    const done = el("button", null, c.doneLabel);
-    done.onclick = () => sendTick(surface, c.rowId, true);
+    if (!c.held) {
+      const done = el("button", null, c.doneLabel);
+      done.onclick = () => sendTick(surface, c.rowId, true);
+      verbs.appendChild(done);
+    }
+    // SKIP survives a held step — "I am not doing this" lands in the guide ledger like any
+    // other skip, which is the router's deliberate asymmetry.
     const skip = el("button", null, c.skipLabel);
     skip.onclick = () => sendTick(surface, "skip|" + c.rowId, true);
-    verbs.append(done, skip);
+    verbs.appendChild(skip);
     if (c.improve) {
       const a = el("a", "improve", IMPROVE_LABEL);
       a.href = c.improve; a.target = "_blank"; a.rel = "noopener";
@@ -1798,6 +1809,29 @@ function boot() {
         || (g.heading || "").toLowerCase().includes(filter));
       if (!rows.length) continue;
       any = true;
+      appendChecklistGroup(surface, g, rows, wrap, opts.tickable);
+    }
+    if (!any)
+      wrap.replaceChildren(el("div", "empty", filter
+        ? "Nothing on this checklist matches that search."
+        // data.empty is the SURFACE's own sentence when the generic one would name a
+        // task with no route — Gear's list is a website export behind a named Options
+        // page, and "set it up on the PC" is not directions.
+        : (data.empty || "Nothing on this checklist yet — set it up on the PC.")));
+    // Both states, deliberately. Gear auto-ticks from the inventory dump, and the player
+    // likeliest to need that command is the one whose import has gone stale — whose list
+    // is therefore full. Null prompt (Epics, Sky) draws nothing at all.
+    appendCmdPrompt(wrap, data.prompt);
+    return wrap;
+  }
+
+  // ONE guided group, drawn into `into`. Extracted from checklistBody when the General
+  // tab's quest cards became a third caller (DRA-46): Sky, Epic and a pinned quest's
+  // walkthrough are the same group shape from the same PC projection, and a second copy
+  // of the fold, the reward tap and the row rules here is how the phone starts showing
+  // three different guides for one engine.
+  function appendChecklistGroup(surface, g, rows, wrap, optsTickable) {
+    {
       // A GUIDED group's heading is the fold control. CompanionChecklistGroup.Collapsed has
       // promised "a tap opens it" since guides shipped and there was no tap — so a folded
       // quest showed its heading, its caption and its reward line and offered no way to the
@@ -1890,8 +1924,12 @@ function boot() {
       // A SUMMARY group's rows are not items — the Sky ready band names rewards, and its
       // ids are reward keys no tick accepts. It drew checkboxes anyway, so every tap was
       // a silent no-op (#212, bjstrange).
-      const tickable = opts.tickable && g.tickable !== false;
+      const groupTickable = optsTickable && g.tickable !== false;
       for (const r of rows) {
+        // Per ROW as well as per group: a guided quest's turn-in pieces answer from the
+        // bags and the PC's router refuses their tick, so a checkbox on one would ignore
+        // every tap. The row's sub-line carries the count instead.
+        const tickable = groupTickable && r.tickable !== false;
         const li = el("li", (r.done ? "done " : "") + (r.skipped ? "skipped " : "")
           + (tickable ? "tickable" : ""));
         const rn = el("div", "rn", r.text);
@@ -1922,20 +1960,14 @@ function boot() {
         li.appendChild(rn);
         ul.appendChild(li);
       }
-      wrap.appendChild(ul);
+      // INTO `steps`, which is the thing the fold hides — not into `wrap` beside it.
+      // Appending the rows to `wrap` is what shipped in #530, and it made the fold a
+      // half-control: tapping a heading hid the NEXT card and left all 66 of a Druid's
+      // steps on screen, under a heading whose own arrow said they were away. The desktop
+      // fold `Collapsed` mirrors drops the rows, so the two screens disagreed about what
+      // folding means (DRA-46).
+      steps.appendChild(ul);
     }
-    if (!any)
-      wrap.replaceChildren(el("div", "empty", filter
-        ? "Nothing on this checklist matches that search."
-        // data.empty is the SURFACE's own sentence when the generic one would name a
-        // task with no route — Gear's list is a website export behind a named Options
-        // page, and "set it up on the PC" is not directions.
-        : (data.empty || "Nothing on this checklist yet — set it up on the PC.")));
-    // Both states, deliberately. Gear auto-ticks from the inventory dump, and the player
-    // likeliest to need that command is the one whose import has gone stale — whose list
-    // is therefore full. Null prompt (Epics, Sky) draws nothing at all.
-    appendCmdPrompt(wrap, data.prompt);
-    return wrap;
   }
   function checklist(surface) {
     return function (p, data) {
@@ -1964,6 +1996,10 @@ function boot() {
     // Lookups are lowercased once per push: ledger keys arrive as the log spelled
     // them, catalog names as the wiki spells them, and the join must not care.
     let ownedLower = {}, trackedLower = new Set(), hiddenLower = new Set(), completedLower = {};
+    // Walkthroughs by quest name, lowercased for the same join reason as the four above.
+    // The PC ships these only for PINNED quests — see CompanionQuestsSection.Guides for the
+    // byte measurement behind that — so this is empty for most players and most cards.
+    let guidesByQuest = new Map();
 
     function setCatalog(c) {
       catalog = c;
@@ -2089,6 +2125,17 @@ function boot() {
           (it.have >= it.need ? "✔ " : "• ") + it.n + " — " + it.have + "/" + it.need));
       if (!q.i.length && !q.o)
         c.appendChild(el("div", "qnote", "Dialogue or task chain — steps on the wiki page."));
+
+      // THE WALKTHROUGH (DRA-46), for a quest the player pinned. The same group the
+      // desktop's detail pane draws, through the same PC projection, rendered by the same
+      // function the Sky and Epic tabs use — so the phone did not get its own guide, it got
+      // the one that already existed (David, 2026-08-18: parity by shared module).
+      //
+      // The guide's "Turn-in pieces" are the qitem lines ABOVE this, not rows inside it:
+      // the PC marked those steps un-tickable and put the count on them, so they draw as
+      // text there and the checkbox rows here are the steps you actually tick.
+      const guide = guidesByQuest.get(q.n.toLowerCase());
+      if (guide) appendChecklistGroup("quests", guide.group, guide.group.rows, c, true);
       return c;
     }
 
@@ -2215,6 +2262,14 @@ function boot() {
       if (suppressed > 0)
         out.push(el("div", "qmore", "+" + suppressed + " more — showing the first "
           + rendered + ". Keep typing to narrow it down."));
+      // The guide cap, said the same way. A pinned quest whose walkthrough did not fit
+      // draws its card with no steps under it, and a walkthrough that is merely ABSENT
+      // reads as a quest we have nothing for — which is the one thing it is not.
+      if (d.guidesMore > 0)
+        out.push(el("div", "qmore", "+" + d.guidesMore + " pinned quest"
+          + (d.guidesMore === 1 ? " has its" : "s have their")
+          + " walkthrough on the PC — the phone carries the first "
+          + (guidesByQuest.size) + ". Unpin one to make room."));
       list.replaceChildren(...out);
     }
 
@@ -2242,6 +2297,11 @@ function boot() {
         hiddenLower = new Set((section.hidden || []).map(s => s.toLowerCase()));
         completedLower = {};
         for (const k in (section.completed || {})) completedLower[k.toLowerCase()] = section.completed[k];
+        // `|| []` and not `section.guides` bare: trap 32 says an open phone can be running
+        // the page it downloaded weeks ago against a fresh PC, and the reverse is the same
+        // hazard — a fresh page against a PC that has not restarted into this build yet.
+        guidesByQuest = new Map(
+          (section.guides || []).map(g => [g.quest.toLowerCase(), g]));
         if (!root) p.body.replaceChildren(make());
         else if (p.body.firstChild !== root) p.body.replaceChildren(root);
         // A lens on a class that left the pick is ignored rather than emptying the view.
