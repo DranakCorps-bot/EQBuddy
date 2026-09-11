@@ -81,9 +81,10 @@ public static class ShellPages
     /// host beside it.
     ///
     /// **PR 4 added Home, and it is the first room that is NEITHER a move nor a lift.**
-    /// There was no v1 window to host and no view to extract: the four blocks its signed
-    /// door 1 locks — Identity, Readiness, Recent session, Deep links — are a new surface
-    /// composed from facts the app already had and had never put on one screen. That is also
+    /// There was no v1 window to host and no view to extract: its blocks — Identity,
+    /// Readiness, Recent session, and a "Go to" door list DRA-63 cut once the rail carried
+    /// every room — are a new surface composed from facts the app already had and had never
+    /// put on one screen. That is also
     /// why it is the room the shell now OPENS on: <c>ShellWindow._page</c> had been
     /// <see cref="ShellPage.Progress"/> since PR 1 as an explicit placeholder for the room
     /// designed to answer "where do I stand", and the placeholder outlived its excuse the
@@ -105,7 +106,7 @@ public static class ShellPages
     /// rather than growing a second copy of forty control wirings to drift against it.
     ///
     /// **The list stops being a filter today and it is kept anyway**, because it is the
-    /// thing `BuildRail` and Home's deep links both read: the day a NEW room is added to
+    /// thing `BuildRail` and Home's readiness addresses both read: the day a NEW room is added to
     /// <see cref="ShellPage"/> it must not draw a row before it has a room, and a list that
     /// happens to be complete is not the same as one nobody has to maintain.
     /// <c>ShellNavigationTests</c> asserts the equality out loud rather than deleting the
@@ -228,8 +229,9 @@ public static class ShellPages
     /// owner's second correction (~7:16 PM CT, 2026-09-08, `docs/BEVEL-gear-menu-slim-faces.md`
     /// Part B) on top of the ~2:15 PM CT amendment that first renamed it to "Guide."** The
     /// window's title bar keeps saying "Guide" — <c>ShellWindow.xaml.cs</c> reads
-    /// <see cref="Label"/> for that, unchanged — but the rail row, its tooltip, Home's deep
-    /// link and the Ctrl+K palette all read THIS function instead.
+    /// <see cref="Label"/> for that, unchanged — but the rail row, its tooltip and the
+    /// Ctrl+K palette all read THIS function instead. (Home's "Go to" list was a fourth
+    /// reader until DRA-63 cut the block.)
     ///
     /// One new function rather than six hand-edits: every other page's rail spelling is
     /// identical to its <see cref="Label"/>, so falling through avoids a second

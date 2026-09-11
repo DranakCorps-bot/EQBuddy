@@ -536,7 +536,7 @@ public partial class ShellWindow : Window, IFollowingSurface
         {
             if (!ShellPages.Landed.Contains(page)) continue;
             // RailLabel, not Label: the palette is a nav affordance, same category as the
-            // rail and Home's deep links (gear-menu-slim faces Part B, 2026-09-08) — it
+            // rail (gear-menu-slim faces Part B, 2026-09-08) — it
             // reads "Quest" for the Guide room while the window's own title bar (set
             // elsewhere in this file, off Label) keeps saying "Guide".
             yield return (ShellPages.RailLabel(page), ShellPages.Address(page),

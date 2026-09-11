@@ -6,8 +6,12 @@ namespace EQBuddy.Tests;
 
 /// <summary>
 /// The Evolved shell's HOME room, as far as anything without a window can see it: the
-/// session-summary fact Live will share, the four blocks' state rules, and the two
-/// boundaries Bevel's Helm-signed pre-design (2026-09-05 ~5:20 AM CT) drew around it.
+/// session-summary fact Live shares, the three blocks' state rules, and the two boundaries
+/// Bevel's Helm-signed pre-design (2026-09-05 ~5:20 AM CT) drew around it.
+///
+/// **Three since DRA-63** (Founder smoke 2026-09-11): the "Go to" block was cut, and the ⧉
+/// catch-up copy became unconditional. §4 below carries both — what replaced the deep-link
+/// assertions is in it, rather than the assertions simply leaving with the block.
 ///
 /// The room's own wiring is asserted from a launched app (`ShellHostTests`), because the
 /// WPF layer has no unit tests and a control that is absent photographs as an unremarkable
@@ -332,79 +336,75 @@ public class HomeRoomTests
             r => Assert.NotEqual("", r.Address));
     }
 
-    // ---- 4. deep links, and the affordance that must not open nothing ----------
+    // ---- 4. the catch-up copy, and the affordance that must not open nothing ----
 
     /// <summary>
-    /// **Home's deep links read the SAME `Landed` list the rail reads**, which is what stops
-    /// a "Live" row appearing in a room's body before Live exists — the rail's own forbidden
-    /// shape (*"an affordance that opens nothing is a trap"*) reappearing one level in, where
-    /// the rail's guard cannot see it.
+    /// **DRA-63 ask 1: the ⧉ catch-up is offered in BOTH states** (Founder smoke
+    /// 2026-09-11 — *"always show copy/paste catch-up for Bags, Achievements, Factions,
+    /// Spellbooks from Home"*). The button is WPF and only a launched app can say it exists
+    /// (trap 29, `shellHomeCopyCmd`); what is assertable here is the sentence on it, which
+    /// is the half that has to stay different.
+    ///
+    /// **Both halves, because either alone goes vacuous.** One tooltip for both states
+    /// would satisfy "every row has words" while collapsing never-run and healthy into one
+    /// voice — the exact thing Bevel's two-states rule forbids, arriving through the
+    /// wording instead of through the state (the way the spellbook row nearly did). And a
+    /// scanned row whose sentence never mentions running it again is a button with no
+    /// answer to "why would I".
     /// </summary>
     [Fact]
-    public void EveryLinkOpensARoomThatExists()
+    public void TheCatchUpCopyIsOfferedInBothStatesAndSaysADifferentThingInEach()
     {
-        var links = HomeReadout.Links();
-        Assert.NotEmpty(links);
-        Assert.All(links, link =>
-        {
-            Assert.Contains(link.Page, ShellPages.Landed);
-            Assert.Equal((link.Page, (string?)null), ShellPages.ParseAddress(link.Address));
-            Assert.NotEmpty(link.Label);
-            Assert.NotEmpty(link.Detail);
-        });
+        var never = Assert.Single(HomeReadout.Readiness(Me, _ => null),
+            r => r.Kind == OutputfileKind.Inventory);
+        var scanned = Assert.Single(HomeReadout.Readiness(Me, _ => DateTime.Now),
+            r => r.Kind == OutputfileKind.Inventory);
+
+        Assert.Equal(HomeReadout.CatchUpFirstRun, HomeReadout.CatchUpTooltip(never));
+        Assert.Equal(HomeReadout.CatchUpAgain, HomeReadout.CatchUpTooltip(scanned));
+        Assert.NotEqual(HomeReadout.CatchUpFirstRun, HomeReadout.CatchUpAgain);
+        // The scanned one answers "why would I press this": it names running it AGAIN.
+        Assert.Contains("again", HomeReadout.CatchUpAgain, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain("again", HomeReadout.CatchUpFirstRun, StringComparison.OrdinalIgnoreCase);
+    }
+
+    /// <summary>Every row gets one, including the optional spellbook — the ask names all
+    /// four by name. A per-kind exception would put the row a player is least likely to
+    /// have run back where DRA-63 found it.</summary>
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public void EveryReadinessRowHasACatchUpSentenceWhateverItsState(bool scanned)
+    {
+        var rows = HomeReadout.Readiness(Me, _ => scanned ? DateTime.Now : null);
+        Assert.Equal(4, rows.Count);
+        Assert.All(rows, r => Assert.NotEmpty(HomeReadout.CatchUpTooltip(r)));
     }
 
     /// <summary>
-    /// The negative that keeps the row above from going vacuous, **rewritten by the Live PR
-    /// rather than deleted by it** — which is what the assertion it replaces asked for in as
-    /// many words ("meant to be DELETED by the Live PR, in the same commit that adds Live to
-    /// `Landed`").
+    /// **The "Go to" block is gone and does not come back** (DRA-63 ask 2 — *"sidebar
+    /// already owns those doors"*). Asserted against the TYPE rather than against a habit:
+    /// a room cannot draw a link list whose builder does not exist, which is the same shape
+    /// as `RecentSession` having no combat field to reach for.
     ///
-    /// Deleting it outright would have taken the guard down with the case: Home's links are
-    /// filtered by <c>ShellPages.Landed</c>, and the property worth holding is not "Live is
-    /// absent" but "the list tracks what has landed, in both directions". Settings carried
-    /// the negative next, and its clause said the two reasons apart in advance — *"it has not
-    /// landed AND Home would not link to it if it had"*.
-    ///
-    /// **SR-5 landed Settings, and the SECOND reason is the whole of what is left.** The row
-    /// is rewritten again rather than deleted again, and the rewrite is now the more valuable
-    /// of the two halves: a filter keyed on `Landed` would have started offering Settings the
-    /// moment the room existed, and it did not, because it is also filtered on
-    /// <see cref="ShellPages.BelowTheGap"/> — Home is about the character and Settings
-    /// configures the tool. That distinction was previously untestable, because the only room
-    /// below the gap had not landed.
+    /// **With a positive half**, per trap 39: a reflection that found no members at all
+    /// would pass this forever and read as coverage.
     /// </summary>
     [Fact]
-    public void LiveIsOfferedAndSettingsIsNotEvenNowThatBothHaveLanded()
+    public void HomeHasNoRoomLinkBlockToRebuild()
     {
-        Assert.Contains(ShellPage.Live, ShellPages.Landed);
-        Assert.Contains(HomeReadout.Links(), link => link.Page == ShellPage.Live);
-
-        // Landed — and still not offered, which is the assertion that could not be made
-        // until it was.
-        Assert.Contains(ShellPage.Settings, ShellPages.Landed);
-        Assert.DoesNotContain(HomeReadout.Links(), link => link.Page == ShellPage.Settings);
+        var members = typeof(HomeReadout).GetMembers().Select(m => m.Name).ToList();
+        Assert.DoesNotContain("Links", members);
+        Assert.DoesNotContain("EmptyLinks", members);
+        Assert.Null(typeof(ShellPages).Assembly.GetType("EQBuddy.UI.Shared.HomeLink"));
+        // The three blocks that DID stay, so the sweep above cannot be vacuous.
+        foreach (var kept in new[] { "IdentityHeadline", "Readiness", "CatchUpTooltip" })
+            Assert.Contains(kept, members);
     }
 
-    /// <summary>Home does not link to itself (a no-op wearing an affordance) and does not
-    /// link to Settings, which configures the tool where Home is about the character — the
-    /// same reason Settings sits below the rail's own gap.</summary>
-    [Fact]
-    public void HomeLinksToNeitherItselfNorSettings()
-    {
-        Assert.DoesNotContain(HomeReadout.Links(), l => l.Page == ShellPage.Home);
-        Assert.DoesNotContain(HomeReadout.Links(), l => ShellPages.BelowTheGap(l.Page));
-        // Everything else that has landed IS offered, in rail order.
-        Assert.Equal(
-            ShellPages.RailOrder
-                .Where(p => ShellPages.Landed.Contains(p)
-                    && p != ShellPage.Home && !ShellPages.BelowTheGap(p))
-                .ToArray(),
-            HomeReadout.Links().Select(l => l.Page).ToArray());
-    }
-
-    /// <summary>A readiness row's "Open" is the same grammar, filtered the same way: it
-    /// points at a landed room or it is not offered.</summary>
+    /// <summary>A readiness row's "Open" is the one navigation left in Home's body, and it
+    /// is filtered the way the block that used to sit under it was: it points at a landed
+    /// room or it is not offered.</summary>
     [Fact]
     public void AReadinessRowsAddressIsAlsoFilteredThroughLanded()
     {

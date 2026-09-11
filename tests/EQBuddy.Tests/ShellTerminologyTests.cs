@@ -209,14 +209,15 @@ public class ShellTerminologyTests
             AssertClean(row.Name, "HomeReadout.Readiness name");
             AssertClean(row.Feeds, "HomeReadout.Readiness feeds");
             AssertClean(HomeReadout.ReadinessAnswer(row), "HomeReadout.ReadinessAnswer");
+            // The ⧉ tooltip, swept in BOTH states since DRA-63 made it unconditional. The
+            // const sweep below reaches the two sentences; this reaches the CHOICE between
+            // them, which is where a third state would arrive unread.
+            AssertClean(HomeReadout.CatchUpTooltip(row), "HomeReadout.CatchUpTooltip");
+            AssertClean(
+                HomeReadout.CatchUpTooltip(row with { State = ReadinessState.Scanned }),
+                "HomeReadout.CatchUpTooltip (scanned)");
         }
         AssertClean(HomeReadout.ReadinessHeadline(readiness), "HomeReadout.ReadinessHeadline");
-
-        foreach (var link in HomeReadout.Links())
-        {
-            AssertClean(link.Label, "HomeReadout.Links label");
-            AssertClean(link.Detail, "HomeReadout.Links detail");
-        }
     }
 
     /// <summary>
@@ -284,7 +285,7 @@ public class ShellTerminologyTests
         ("EQBuddy/RoomEmptyState.cs", "the room-level empty wrapper: heading, explanation, action"),
         ("EQBuddy/ShellRoomIdentity.cs", "who the shell says it is following"),
         ("EQBuddy/IShellRoom.cs", "the room contract every room's chrome is built against"),
-        ("EQBuddy/HomeRoom.cs", "identity, readiness and the ⧉ tooltips — the most prose in the shell"),
+        ("EQBuddy/HomeRoom.cs", "identity, readiness and the recent session — the most prose in the shell"),
         // OE-6's two files. `ReadinessRows` carries the ⧉ tooltip that used to sit in
         // HomeRoom — the row moved and its sweep moved with it — and `SetupView` is the
         // first-run screen, which is the only surface in the shell a player meets BEFORE
@@ -367,7 +368,8 @@ public class ShellTerminologyTests
         ("EQBuddy.UI.Shared/ShellPages.cs", "the rail's labels, descriptions and addresses"),
         ("EQBuddy.UI.Shared/ShellLayout.cs", "the two degrade axes — any text they name"),
         ("EQBuddy.UI.Shared/ShellRoomEmpty.cs", "the four data rooms' whole-room empties"),
-        ("EQBuddy.UI.Shared/HomeReadout.cs", "identity, readiness and deep-link sentences"),
+            ("EQBuddy.UI.Shared/HomeReadout.cs",
+            "identity, readiness and the two ⧉ catch-up sentences"),
         ("EQBuddy.UI.Shared/SetupReadout.cs",
             "the first-run screen's headline, lead, close and its Behavior-tab row"),
         ("EQBuddy.UI.Shared/LivePresentation.cs", "Live's words, badge and captions"),

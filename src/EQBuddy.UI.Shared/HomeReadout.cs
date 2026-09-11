@@ -34,28 +34,41 @@ public enum ReadinessState
 /// filename, which is EQBuddy's problem and not theirs.</param>
 /// <param name="Address">The <c>page:room</c> the dump's surface lives at, so the row can
 /// be a deep link through the SAME <c>Navigate</c> the rail uses. Empty when the room has
-/// not landed yet — see <see cref="HomeReadout.Links"/> — and equally empty when the dump's
-/// surface is not a ROOM at all, which is the spellbook's case: buff countdowns are drawn
-/// on the widget's HUD, and pointing "Open" at some room that does not show them would be
-/// the dead affordance <c>ShellPages.Landed</c> exists one level up to refuse.</param>
+/// not landed yet — filtered against <c>ShellPages.Landed</c> in
+/// <see cref="HomeReadout.Readiness"/>, the same list the rail draws from — and equally
+/// empty when the dump's surface is not a ROOM at all, which is the spellbook's case: buff
+/// countdowns are drawn on the widget's HUD, and pointing "Open" at some room that does not
+/// show them would be the dead affordance <c>ShellPages.Landed</c> exists one level up to
+/// refuse.
+///
+/// **Since DRA-63 this is the ONLY navigation Home's body offers**, which raises what it is
+/// worth rather than lowering it: the "Go to" block that used to sit under it was the other
+/// reader of <c>Landed</c> inside a room, and with it gone these addresses are the whole of
+/// what <c>shellHomeDeadLinks</c> is asked about.</param>
 public sealed record ReadinessRow(
     OutputfileKind Kind, string Name, string Feeds, ReadinessState State,
     DateTime? ScannedAt, string Address);
 
-/// <summary>A Home deep link: a room's own label and one-line pitch, at its address.</summary>
-public sealed record HomeLink(ShellPage Page, string Label, string Detail, string Address);
-
 /// <summary>
-/// The words and the arithmetic behind the Evolved shell's HOME room — the four blocks
-/// Bevel's signed door 1 locks: **Identity · Readiness · Recent session · Deep links**.
+/// The words and the arithmetic behind the Evolved shell's HOME room — **three blocks:
+/// Identity · Readiness · Recent session.**
+///
+/// **The fourth was "Deep links", and the Founder cut it on 2026-09-11 (DRA-63 smoke,
+/// through Helm).** Bevel's signed door 1 locked four blocks on a shell whose rail had one
+/// room in it; by the time every room had landed, the block was a second copy of the rail
+/// sitting under the fold, naming the same six doors the rail already draws down the left
+/// edge of the same window. **The room now matches the sentence it has always been
+/// described by** — <c>ShellPages.Describe(Home)</c> is *"Who you are playing, what is
+/// ready, and where you left off"*, three clauses, written before the room existed and
+/// never amended to promise a fourth thing.
 ///
 /// It is here rather than in the room for this repo's standing reason: the WPF layer has
 /// no unit tests, so a sentence or a state rule left inline is one nothing can check. What
 /// the room keeps is the wiring.
 ///
-/// **Each of the four blocks can be empty independently of the other three**, which is why
+/// **Each of the three blocks can be empty independently of the other two**, which is why
 /// there is no single "nothing here yet" for the room. Bevel's table is explicit that a
-/// blanket empty would be wrong: a player with a character and no dumps has three of four
+/// blanket empty would be wrong: a player with a character and no dumps has two of three
 /// blocks full, and telling them the room is empty is a worse answer than telling them
 /// which one thing is missing.
 ///
@@ -167,6 +180,42 @@ public static class HomeReadout
             ? "Not run yet"
             : SessionSummary.Stamp(row.ScannedAt.Value);
 
+    /// <summary>
+    /// **The ⧉ copy is offered on EVERY readiness row, in BOTH states** — the Founder's
+    /// DRA-63 smoke, 2026-09-11: *"always show copy/paste catch-up for Bags, Achievements,
+    /// Factions, Spellbooks from Home."*
+    ///
+    /// It used to be an empty-state affordance only, which read as a onboarding prompt that
+    /// switched itself off the moment it succeeded. **A dump is a SNAPSHOT of a thing that
+    /// keeps changing**: the bags a player is carrying tonight are not the bags the file
+    /// records from last week, and the surfaces downstream of it (the wishlist's own ticks,
+    /// what a quest says you can turn in) are only as current as the last run. So the state
+    /// the copy was hidden in — "you have run this before" — is precisely the state a player
+    /// is in every time they want to run it AGAIN, and the room's answer was to make them go
+    /// and find the command somewhere else.
+    ///
+    /// **The two states still say different things** (Bevel's two-states rule, which this
+    /// does not touch): a never-run row asks, a scanned row offers. What is identical is that
+    /// the command is one click away from both, which is David's 2026-08-14 rule — a surface
+    /// that needs an in-game command SHIPS the command — applied to the state it had been
+    /// quietly exempting.
+    /// </summary>
+    public static string CatchUpTooltip(ReadinessRow row) =>
+        row.State == ReadinessState.NeverScanned ? CatchUpFirstRun : CatchUpAgain;
+
+    /// <summary>The ask, for a dump that has never been produced.</summary>
+    public const string CatchUpFirstRun =
+        "Copies the command — paste it into the game's chat. The game writes the file beside "
+        + "its own folders and EQBuddy reads it by itself.";
+
+    /// <summary>The offer, for a dump that HAS landed. It says what running it again buys,
+    /// because a button on a row that already has a date has to answer "why would I" before
+    /// it answers "how".</summary>
+    public const string CatchUpAgain =
+        "Run it again whenever you want EQBuddy to catch up — paste the command into the "
+        + "game's chat and EQBuddy reads the new file by itself. What it already knows stays "
+        + "until then.";
+
     /// <summary>The Readiness block's own empty state, reached only when there is no
     /// character to have dumps FOR — in which case the Identity block above has already
     /// said the useful thing and this one must not say it again.</summary>
@@ -183,39 +232,24 @@ public static class HomeReadout
         return waiting == 0 ? "Readiness" : $"Readiness — {waiting} not run yet";
     }
 
-    // ---- deep links -------------------------------------------------------------
+    // ---- the block that is NOT here ---------------------------------------------
 
-    /// <summary>
-    /// Home's deep links: every room that has actually LANDED, in rail order, minus Home
-    /// itself and minus Settings.
-    ///
-    /// **It reads <see cref="ShellPages.Landed"/> — the same list the rail reads — and that
-    /// is the point rather than a convenience.** Home ships before Live under the signed
-    /// order, so a hand-written link list here would put a "Live" row in a room's body that
-    /// opens nothing: the rail's own forbidden shape (*"an affordance that opens nothing is
-    /// a trap"*) reappearing one level in, where the rail's guard cannot see it. Reading the
-    /// list means Live's row arrives on the day Live does, in Live's own PR, and cannot
-    /// arrive before.
-    ///
-    /// **Settings is excluded for the reason it sits below the rail's gap**: it configures
-    /// the tool, and Home is about the character. Home itself is excluded because a link to
-    /// the room you are standing in is a no-op wearing an affordance.
-    /// </summary>
-    public static IReadOnlyList<HomeLink> Links() =>
-    [
-        .. ShellPages.RailOrder
-            .Where(page => ShellPages.Landed.Contains(page)
-                && page != ShellPage.Home
-                && !ShellPages.BelowTheGap(page))
-            // RailLabel, not Label: this is a nav affordance, same category as the rail
-            // (gear-menu-slim faces Part B, 2026-09-08) — it reads "Quest" for the Guide
-            // room while the window's own title bar keeps saying "Guide".
-            .Select(page => new HomeLink(page, ShellPages.RailLabel(page),
-                ShellPages.Describe(page), ShellPages.Address(page))),
-    ];
-
-    /// <summary>Unreachable while any room has landed — Home is only ever drawn by a shell
-    /// that has rooms — and written anyway, because the block that renders it must not be
-    /// able to draw a heading over nothing.</summary>
-    public const string EmptyLinks = "The other rooms appear here as they are built.";
+    // **THE "GO TO" BLOCK IS GONE, AND THIS IS ITS TOMBSTONE** (Founder smoke 2026-09-11,
+    // DRA-63 ask 2: *"drop Go to Live/Progress/Gear/Quests/World — sidebar already owns
+    // those doors"*). `Links()` built one row per landed room off `ShellPages.RailOrder`,
+    // filtered by `Landed` and `BelowTheGap`; `HomeLink` and `EmptyLinks` went with it.
+    //
+    // **What the deletion cost, said out loud, because the guard was a good one.** Those
+    // links were the shell's demonstration that a room's BODY is a second navigation
+    // surface where the rail's own filter cannot see it — a hand-written row naming an
+    // unlanded room compiles, renders, photographs perfectly and opens nothing. The rule
+    // does not leave with the block: **Home still navigates**, through the readiness rows'
+    // "Open", and those addresses are filtered through `Landed` in `Readiness()` above.
+    // `shellHomeDeadLinks` was re-pointed at them in the same commit rather than deleted
+    // with the block it was written for — the assertion is about the property, not about
+    // the four rows that happened to be the first thing to have it.
+    //
+    // **Do not rebuild this block.** The rail is the door list, it is on screen in the same
+    // window at the same moment, and a second copy of it under the fold is one more place
+    // that has to be taught the day a seventh room lands.
 }

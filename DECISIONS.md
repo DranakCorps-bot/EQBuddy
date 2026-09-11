@@ -4210,3 +4210,62 @@ staged session log gets the same reset contract settings.json already had
 loop now appends play to it.
 
 — Dranak (Claude Code, DRA-61)
+
+## 2026-09-11 — DRA-63 (Home: always-on catch-up, no door list): four calls I made alone
+
+**Assumption at the top:** the Founder's two smoke items are the whole scope.
+Soft LEAVE said "do not invent more paste targets unless the Founder names
+them", so the four `/outputfile` dumps Home already reports on are the four
+that got the always-on ⧉ — no new command, no new row, and nothing outside
+`HomeReadout.Readiness`.
+
+**1. The "Go to" block was DELETED, not hidden behind a setting.** The other
+reading was a tick box, and it is worse in both directions: an off-by-default
+block is a capability nobody finds, and an on-by-default one leaves the
+duplicate-of-the-rail on the Founder's screen. `OverlaySections.Retired` — the
+"X is now Y" catalog a cut HUD card takes a row in — does NOT apply: that list
+is keyed on widget cards and rendered by the HUD settings block, and a shell
+room's internal block has never been in it. The "where did it go" answer is in
+`WhatsNew.json` in the same "X is now Y" form instead, naming the rail and
+Ctrl+K by name. Could have gone the other way; if Helm wants a Retired-style
+row for shell blocks, that is a list that does not exist yet and a bigger ask
+than this seat.
+
+**2. `shellHomeDeadLinks` was RE-POINTED rather than deleted with its block.**
+It was written for the "Go to" links, and the property it guards — a room's
+BODY is a second navigation surface where the rail's filter cannot see it —
+survives in the readiness rows' "Open". Deleting the key with its first
+subject would have retired a live guard because the example it was born from
+went away (trap 52's shape). The dump key and its name are unchanged, so the
+E2E row reads the same and its meaning moved under it, said out loud in both
+files.
+
+**3. The ⧉ tooltip is now TWO sentences chosen by state, and they live in
+`UI.Shared`.** One sentence for both states would have been less code and
+would have collapsed never-run and healthy into one voice — the failure
+Bevel's two-states rule names, arriving through the wording rather than
+through the state. They went into `HomeReadout` rather than staying inline in
+`ReadinessRows` because the WPF layer has no unit tests: inline, "the scanned
+row says something different" is a claim nothing can check.
+
+**4. `shellHomeCopyCmd` got a STRICT INEQUALITY beside its equality, and that
+is the prove-fail.** While the ⧉ was empty-state-only, that key and
+`shellHomeReadinessWaiting` were the same number by construction — a dump key
+restating the condition it came from (trap 64b). `copies > waiting` is the
+assertion that is false on the old build (3 == 3) and true on this one (4 > 3).
+
+**Named debt, not hidden:** `docs/screenshots/shell-home.png`,
+`shell-home-narrow.png` and `shell-home-ready.png` are STALE — they show the
+"Go to" block and a Bags row with no ⧉. The recipes in `scripts/shoot.ps1` and
+their predictions are updated in this PR, so the acceptance criterion is
+written down and the pictures are one batch away. They were not re-taken here
+because the screen is a mutex (trap 61) and two things held it: the Founder's
+own live `EQBuddy Evolved\publish\EQBuddy.exe` mid-smoke, and a second seat's
+`bin\Release` app out of `opus-dra65-d1`. Standing one of those down to take a
+picture is not a call this seat makes.
+
+E2E was not run locally for the same reason; CI runs it on every push and the
+two Home rows in `ShellHostTests` are the ones that moved. `check.ps1` all
+gates green, 4,263 unit tests.
+
+— Dranak (Claude Code, DRA-63)

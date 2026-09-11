@@ -12,10 +12,15 @@ namespace EQBuddy;
 /// surface rather than a move or a lift. Bevel's Home pre-design, Helm-signed 2026-09-05
 /// ~5:20 AM CT.
 ///
-/// **Four blocks, locked by Bevel's door 1: Identity · Readiness · Recent session · Deep
-/// links.** They answer, in order, who EQBuddy is following, what it is missing, where you
-/// left off, and where to go next — which is <see cref="ShellPages.Describe"/>'s one-line
-/// pitch for this room, written before the room existed and unchanged by it.
+/// **Three blocks: Identity · Readiness · Recent session.** They answer, in order, who
+/// EQBuddy is following, what it is missing, and where you left off — which is
+/// <see cref="ShellPages.Describe"/>'s one-line pitch for this room, three clauses, written
+/// before the room existed and unchanged by it.
+///
+/// **The fourth was "Go to", and the Founder cut it on 2026-09-11 (DRA-63 smoke).** Bevel's
+/// door 1 locked four blocks when the rail had one room on it; once every room had landed it
+/// was a second copy of the rail sitting under the fold in the same window. The rail owns the
+/// doors. See <see cref="HomeReadout"/>'s tombstone for what the deletion cost.
 ///
 /// **This room is now what the shell OPENS on**, which is the other half of this PR:
 /// <c>ShellWindow._page</c> was <c>Progress</c> as an explicit placeholder for a room
@@ -35,15 +40,17 @@ namespace EQBuddy;
 ///
 /// **Nothing here previews Raids or Faction either.** Both are one property read away too,
 /// and Bevel's door 3 already settled where they live (Raids goes to Live; Faction becomes
-/// Advanced under Progress). Home names deep links to rooms; it does not show their
-/// contents.
+/// Advanced under Progress). Home does not show other rooms' contents, and since DRA-63 it
+/// does not list their doors either.
 ///
-/// **The deep links go through the shell's own <see cref="ShellWindow.Navigate"/>**, handed
-/// in rather than re-implemented, and they are built from <see cref="ShellPages.Landed"/> —
-/// the same list the rail draws from. A hand-written link list would put a "Live" row in a
-/// room's body that opens nothing, which is the rail's own forbidden shape (*"an affordance
-/// that opens nothing is a trap"*) reappearing one level in, where the rail's guard cannot
-/// see it. <c>shellHomeDeadLinks</c> is the assertion that says so from outside.
+/// **The one navigation left in this body is a readiness row's "Open"**, and it goes through
+/// the shell's own <see cref="ShellWindow.Navigate"/>, handed in rather than re-implemented,
+/// at an address filtered through <see cref="ShellPages.Landed"/> — the same list the rail
+/// draws from. A hand-written address would put a row in a room's body that opens nothing,
+/// which is the rail's own forbidden shape (*"an affordance that opens nothing is a trap"*)
+/// reappearing one level in, where the rail's guard cannot see it.
+/// <c>shellHomeDeadLinks</c> is the assertion that says so from outside, and it survived the
+/// "Go to" block it was first written for.
 /// </summary>
 internal sealed class HomeRoom : Grid, IShellRoom
 {
@@ -151,7 +158,7 @@ internal sealed class HomeRoom : Grid, IShellRoom
         var identity = Who();
         ReadSources(identity, s);
 
-        // The fingerprint is what the four blocks are BUILT from, so a tick that changed
+        // The fingerprint is what the three blocks are BUILT from, so a tick that changed
         // nothing costs one string compare instead of a torn-down visual tree. It carries no
         // countdown and no age — trap 8's rule, and the reason nothing on this surface says
         // "x ago": a value that ticks makes every tick a rebuild, which is the same defect
@@ -193,8 +200,8 @@ internal sealed class HomeRoom : Grid, IShellRoom
         _deadLinks = 0;
 
         // **The whole-room empty, and the only state that gets one.** With no character
-        // there is nothing for any of the four blocks to be about, and four separate "we do
-        // not know yet" panels would be four ways of saying the one thing that matters. This
+        // there is nothing for any of the three blocks to be about, and three separate "we do
+        // not know yet" panels would be three ways of saying the one thing that matters. This
         // is also the first screen a brand-new player's Evolved shell ever draws, so it is
         // the one place the room hands over the whole answer at once: what is missing, what
         // to do, where, and what happens next.
@@ -203,7 +210,7 @@ internal sealed class HomeRoom : Grid, IShellRoom
         {
             // **INSIDE the scroller here, where the other five rooms make it a sibling of
             // their page, and the difference is content rather than centring.** Home has
-            // no tab strip to collapse — the four blocks ARE the room — so the scroller is
+            // no tab strip to collapse — the three blocks ARE the room — so the scroller is
             // the whole page, and leaving the empty inside it keeps the explanation
             // reachable on a window too short to hold it. It still centres: a ScrollViewer
             // ARRANGES content smaller than its viewport at the viewport's size, so the
@@ -233,10 +240,9 @@ internal sealed class HomeRoom : Grid, IShellRoom
         BuildIdentity(identity, s);
         BuildReadiness();
         BuildRecentSession();
-        BuildLinks();
     }
 
-    // ---- the four blocks --------------------------------------------------------
+    // ---- the three blocks -------------------------------------------------------
 
     private void BuildIdentity((string Server, string Character) identity, StatsSnapshot s)
     {
@@ -266,8 +272,20 @@ internal sealed class HomeRoom : Grid, IShellRoom
         // can say a control exists (trap 29) and two hosts need two counts.
         foreach (var row in _readiness)
         {
-            var (view, copies) = ReadinessRows.Row(row, _navigate);
+            var (view, copies, opens) = ReadinessRows.Row(row, _navigate);
             _copyCommands += copies;
+            _links += opens;
+            // The dead-affordance question, asked of the only navigation left in this room's
+            // body (DRA-63 took the "Go to" block). An address is filtered through
+            // `ShellPages.Landed` in `HomeReadout.Readiness`; this counts the ones that got
+            // past that filter and STILL do not name a landed room, which is what a
+            // hand-written address, a renamed page key or a room leaving `Landed` would each
+            // look like. It is asked of the BUILT link (`opens`), not of the row's data —
+            // trap 29: a control that is absent photographs as an unremarkable panel.
+            if (opens > 0
+                && (ShellPages.ParseAddress(row.Address) is not { } parsed
+                    || !ShellPages.Landed.Contains(parsed.Page)))
+                _deadLinks++;
             block.Children.Add(view);
         }
     }
@@ -281,32 +299,12 @@ internal sealed class HomeRoom : Grid, IShellRoom
         block.Children.Add(Line(SessionSummary.Detail(_session), Role.BodySecondary));
     }
 
-    private void BuildLinks()
-    {
-        var links = HomeReadout.Links();
-        var block = Block("Go to");
-        if (links.Count == 0)
-        {
-            block.Children.Add(Line(HomeReadout.EmptyLinks, Role.BodySecondary));
-            return;
-        }
-        foreach (var link in links)
-        {
-            _links++;
-            if (!ShellPages.Landed.Contains(link.Page)) _deadLinks++;
-
-            var row = new StackPanel { Margin = new Thickness(0, Tok.SpaceS, 0, 0) };
-            var label = DesignSystem.Text(Role.Body, link.Label);
-            label.Ink("AccentBrush");
-            row.Children.Add(label);
-            var detail = DesignSystem.Text(Role.Metadata, link.Detail);
-            detail.TextWrapping = TextWrapping.Wrap;
-            detail.Ink("DimBrush");
-            row.Children.Add(detail);
-            DesignSystem.WireClick(row, () => _navigate(link.Address));
-            block.Children.Add(row);
-        }
-    }
+    // **THERE IS NO "Go to" BLOCK, and that is DRA-63's ask 2** (Founder smoke 2026-09-11:
+    // *"drop Go to Live/Progress/Gear/Quests/World — sidebar already owns those doors"*). It
+    // was written when the rail had one room on it; by the time all seven had landed it was
+    // a second copy of the rail, under the fold, in the same window, needing to be taught
+    // the same thing twice. `HomeReadout.Links` went with it — see the tombstone in that
+    // file for what the deletion cost and why `shellHomeDeadLinks` did NOT go with it.
 
     // ---- furniture --------------------------------------------------------------
 
@@ -337,20 +335,27 @@ internal sealed class HomeRoom : Grid, IShellRoom
     /// two-host equality assertion to write here — every other room's dump exists mostly so
     /// the shell and the window can be checked against each other. What these keys pin
     /// instead is the shape of the room itself, and two of them have real teeth:
-    /// <c>shellHomeDeadLinks</c> (a link into a room that has not landed — the forbidden
-    /// affordance, asserted from outside) and <c>shellHomeCopyCmd</c> (a control that is
-    /// ABSENT photographs as an unremarkable panel, trap 29, so only a launched app can say
-    /// the ⧉ copies are there).
+    /// <c>shellHomeDeadLinks</c> (a row that opens a room which has not landed — the
+    /// forbidden affordance, asserted from outside) and <c>shellHomeCopyCmd</c> (a control
+    /// that is ABSENT photographs as an unremarkable panel, trap 29, so only a launched app
+    /// can say the ⧉ copies are there).
+    ///
+    /// **<c>shellHomeCopyCmd</c> gained its teeth back in DRA-63.** While the ⧉ was an
+    /// empty-state affordance it merely restated <c>shellHomeReadinessWaiting</c>; now the
+    /// copies must equal the ROW count whatever any row's state is, so a scanned row that
+    /// lost its button is a number that no longer matches and not a number that quietly
+    /// agrees with the state it was derived from.
     /// </summary>
     public string DebugFacts() =>
         $"shellHomeEmpty={(_empty ? 1 : 0)} " +
-        $"shellHomeBlocks={(_empty ? 0 : 4)} " +
+        $"shellHomeBlocks={(_empty ? 0 : 3)} " +
         $"shellHomeIdentity={(HomeReadout.Identity(Who()) == IdentityState.Following ? 1 : 0)} " +
         $"shellHomeSession={_session.State.ToString().ToLowerInvariant()} " +
         $"shellHomeReadiness={_readiness.Count} " +
         $"shellHomeReadinessWaiting={_readiness.Count(r => r.State == ReadinessState.NeverScanned)} " +
         $"shellHomeCopyCmd={_copyCommands} " +
+        // The readiness rows' "Open" links since DRA-63 — the only navigation this body has.
         $"shellHomeLinks={_links} " +
-        // Must be 0, always. See BuildLinks.
+        // Must be 0, always. See BuildReadiness.
         $"shellHomeDeadLinks={_deadLinks}";
 }

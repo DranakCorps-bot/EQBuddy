@@ -294,7 +294,7 @@ public class ShellHostTests
     [InlineData("quests:sky", "shellQuestsTab", "sky")]
     [InlineData("quests:unlocks", "shellQuestsTab", "unlocks")]
     // E-3 PR 4's room, and the only one whose page key IS the assertion: Home has no rooms
-    // inside it (`ShellPages.Rooms(Home)` is empty — four blocks on one page IS the room),
+    // inside it (`ShellPages.Rooms(Home)` is empty — three blocks on one page IS the room),
     // so there is no tab key to land on and `shellPage` is what there is to check.
     [InlineData("home", "shellPage", "home")]
     // SR-5's room, and the last row of the rail. The four keys are `SettingsSurface`'s;
@@ -628,61 +628,73 @@ public class ShellHostTests
     // ---- E-3 PR 4: the Home room ------------------------------------------------
 
     /// <summary>
-    /// The four blocks Bevel's door 1 locks, and the deep-links block's own refusal to
-    /// offer a room that does not exist.
+    /// The three blocks Home draws, and its refusal to offer a room that does not exist.
     ///
-    /// **`shellHomeDeadLinks` is the row with teeth, and it is the rail's rule one level
-    /// in.** The rail cannot draw a row for an unlanded room because `BuildRail` filters
-    /// `ShellPages.Landed` — but Home's body is a SECOND navigation surface, inside a room,
-    /// where the rail's guard cannot see it. A hand-written link list with a "Live" row on
-    /// it would compile, render, photograph perfectly and open nothing, which is the exact
-    /// shape this codebase already ruled on (*"an empty class row gets no chevron — an
-    /// affordance that opens nothing is a trap"*). The count comes from `ShellPages` on
-    /// both sides, so the day Live lands it is offered without anyone editing this test.
+    /// **THREE since DRA-63** (Founder smoke 2026-09-11). Bevel's door 1 locked four, the
+    /// fourth being a "Go to" list of every landed room — written when the rail had one row
+    /// on it, and by the time all seven had landed a second copy of the rail under the fold
+    /// in the same window. The rail owns the doors.
     ///
-    /// **A floor before the equalities**, per trap 39: a room that rendered nothing at all
-    /// would report zero links and zero dead links and agree with a naive assertion
-    /// perfectly.
+    /// **`shellHomeDeadLinks` is the row with teeth, and it did NOT leave with the block it
+    /// was written for.** The rail cannot draw a row for an unlanded room because
+    /// `BuildRail` filters `ShellPages.Landed` — but Home's body is a SECOND navigation
+    /// surface, inside a room, where the rail's guard cannot see it, and it still is: a
+    /// readiness row whose dump has landed offers "Open" into the surface that uses it. A
+    /// hand-written address there would compile, render, photograph perfectly and open
+    /// nothing, which is the exact shape this codebase already ruled on (*"an empty class
+    /// row gets no chevron — an affordance that opens nothing is a trap"*). Deleting the
+    /// assertion with the block would have retired a guard whose subject survived it.
+    ///
+    /// **This launch stages no dumps**, so `shellHomeLinks` is 0 here and the teeth are in
+    /// <see cref="ReadinessAsksForTheDumpsThatAreMissingAndStillOffersTheCatchUpForTheOneThatLanded"/>,
+    /// which stages one and asserts the link appears AND is not dead. Both are needed: this
+    /// row is the one that can see a room drawing links out of nothing at all.
     /// </summary>
     [Fact]
-    public void TheHomeRoomDrawsFourBlocksAndOffersNoLinkThatOpensNothing()
+    public void TheHomeRoomDrawsThreeBlocksAndOffersNoLinkThatOpensNothing()
     {
         using var app = new AppHarness(environment: OpenOn("home"));
         app.Launch();
 
         app.WaitForDump("shellPage", "home", "the shell to land on the Home room");
-        Assert.Equal(4, app.DumpValue("shellHomeBlocks"));
+        Assert.Equal(3, app.DumpValue("shellHomeBlocks"));
         // The room-level empty is for a profile with NO character; this one is following.
         Assert.Equal(0, app.DumpValue("shellHomeEmpty"));
         Assert.Equal(1, app.DumpValue("shellHomeIdentity"));
 
-        var expected = ShellPages.RailOrder.Count(page =>
-            ShellPages.Landed.Contains(page)
-            && page != ShellPage.Home
-            && !ShellPages.BelowTheGap(page));
-        Assert.True(app.DumpValue("shellHomeLinks") >= 1,
-            $"the Home room offered no deep links at all; dump was: {app.Artifacts()}");
-        Assert.Equal(expected, app.DumpValue("shellHomeLinks"));
+        // No dump has landed on this profile, so no row has an "Open" to offer — and a room
+        // that grew a second door list would be caught here rather than by the count below.
+        Assert.Equal(0, app.DumpValue("shellHomeLinks"));
         Assert.Equal(0, app.DumpValue("shellHomeDeadLinks"));
+        // The floor that stops the zeroes above reading as coverage (trap 39): the room DID
+        // render, and it rendered the readiness rows the "Open" would have hung off.
+        Assert.Equal(4, app.DumpValue("shellHomeReadiness"));
     }
 
     /// <summary>
-    /// Readiness, and the ⧉ copies that are the whole point of its empty rows.
+    /// Readiness: the ⧉ copies, and the one row whose dump has actually landed.
     ///
     /// **Only a launched app can say a control EXISTS.** A surface that asks the player for
     /// an output file and hands them no way to run it is the defect David reported on
-    /// 2026-08-20, it is worst in the empty state (the only state a new player sees), and an
-    /// absent control photographs as an unremarkable panel (trap 29).
-    /// `GameCommandsTests.SurfacesNeedingACommand` proves this file NAMES the three
-    /// commands; this proves the buttons are on screen — and that they go away for a dump
-    /// that has actually landed, which is the half a "greater than zero" assertion could
-    /// never see.
+    /// 2026-08-20, and an absent control photographs as an unremarkable panel (trap 29).
+    /// `GameCommandsTests.SurfacesNeedingACommand` proves the source NAMES the four
+    /// commands; this proves the buttons are on screen.
     ///
-    /// The inventory dump is staged in the game's own tab-separated shape through the
-    /// harness, so it goes through the real finder and the real parser (trap 23).
+    /// **DRA-63 inverted the half with teeth, and that is the point of this row's new
+    /// shape.** The ⧉ used to be drawn only for a never-scanned row, so `shellHomeCopyCmd`
+    /// and `shellHomeReadinessWaiting` were the same number by construction — a dump key
+    /// restating the condition it was derived from rather than measuring the tree (trap 64b's
+    /// shape: a proxy standing in for the fact). Now the copies must equal the ROW count
+    /// whatever each row's state is, and `copies > waiting` is what could not have been true
+    /// before this change — **the strict inequality is the prove-fail**: against the old
+    /// build it read 3 == 3 and this assertion reddens.
+    ///
+    /// `shellHomeLinks` is the other half the staged dump buys: the landed row offers "Open",
+    /// and the dead count stays 0. The dump is staged in the game's own tab-separated shape
+    /// through the harness, so it goes through the real finder and the real parser (trap 23).
     /// </summary>
     [Fact]
-    public void ReadinessAsksForTheDumpsThatAreMissingAndStopsAskingForTheOneThatLanded()
+    public void ReadinessAsksForTheDumpsThatAreMissingAndStillOffersTheCatchUpForTheOneThatLanded()
     {
         using var app = new AppHarness(environment: OpenOn("home"));
         app.WriteInventoryDump(("General1", "Bone Chips", 12));
@@ -693,12 +705,21 @@ public class ShellHostTests
         // OE-5 added — one row, in `HomeReadout.Readiness`, which is what this count is
         // really asserting: the ONE place both hosts of that list read.
         Assert.Equal(4, app.DumpValue("shellHomeReadiness"));
-        // Bags landed; the other three never have. **The equality is the assertion** — a room
-        // that had silently lost the affordance entirely would report 0 waiting and 0
-        // buttons and pass a "some are missing" check.
+        // Bags landed; the other three never have. This is also the floor that proves the
+        // staged dump was SEEN — without it the numbers below are about a room that never
+        // read the file.
         Assert.True(app.DumpValue("shellHomeReadinessWaiting") == 3,
             $"the staged inventory dump was not seen; dump was: {app.Artifacts()}");
-        Assert.Equal(3, app.DumpValue("shellHomeCopyCmd"));
+
+        // DRA-63 ask 1: every row carries the catch-up, including the one that has landed.
+        Assert.Equal(4, app.DumpValue("shellHomeCopyCmd"));
+        Assert.True(app.DumpValue("shellHomeCopyCmd") > app.DumpValue("shellHomeReadinessWaiting"),
+            "the ⧉ catch-up is still an empty-state-only affordance — a scanned row lost its "
+            + $"button; dump was: {app.Artifacts()}");
+
+        // The one landed row's "Open", and the dead-affordance question asked of it.
+        Assert.Equal(1, app.DumpValue("shellHomeLinks"));
+        Assert.Equal(0, app.DumpValue("shellHomeDeadLinks"));
     }
 
     /// <summary>

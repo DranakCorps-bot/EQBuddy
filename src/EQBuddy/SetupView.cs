@@ -91,7 +91,11 @@ internal sealed class SetupView
         _body.Children.Add(CardParts.BlockLabel(SetupReadout.RowsHeadline, hidden: false));
         foreach (var row in _rows)
         {
-            var (view, copies) = ReadinessRows.Row(row, _navigate);
+            // The third element is the row's "Open" link, which Home counts for its
+            // dead-affordance guard. Setup does not: this screen is drawn over a profile
+            // that has no dumps, so the link is not what it is about, and a count nothing
+            // asserts is a fact with no reader (trap 20's shape, pointed at a dump key).
+            var (view, copies, _) = ReadinessRows.Row(row, _navigate);
             _copyCommands += copies;
             _body.Children.Add(view);
         }

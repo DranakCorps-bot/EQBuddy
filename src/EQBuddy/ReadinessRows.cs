@@ -57,21 +57,29 @@ internal static class ReadinessRows
     }
 
     /// <summary>
-    /// One readiness row: what the dump feeds, when it last landed, and — only when it
-    /// never has — the ⧉ copy of the command that produces it.
+    /// One readiness row: what the dump feeds, when it last landed, the ⧉ copy of the
+    /// command that produces it, and — once it has landed — the way into the surface that
+    /// uses it.
     ///
-    /// **The copy button is the row's whole point in its empty state.** A surface that asks
-    /// the player for an output file and hands them no way to run it is the defect David
-    /// reported on 2026-08-20, and it is worse in the empty state, which is the only state a
-    /// new player sees — and the only state the first-run screen is ever drawn in.
+    /// **The ⧉ is on EVERY row in BOTH states as of DRA-63** (Founder smoke 2026-09-11:
+    /// *"always show copy/paste catch-up for Bags, Achievements, Factions, Spellbooks from
+    /// Home"*). It used to be drawn only for a never-scanned row, which made it an
+    /// onboarding prompt that switched itself off the moment it worked — and left the player
+    /// who wanted to re-run the command hunting for it, in the state they are in every time
+    /// after the first. A surface that asks the player for an output file and hands them no
+    /// way to run it is the defect David reported on 2026-08-20; a surface that hands it
+    /// over once and then takes it back is the same defect with a delay on it. The WORDS
+    /// still differ by state — <see cref="HomeReadout.CatchUpTooltip"/> — because asking and
+    /// offering are different jobs.
     /// </summary>
     /// <param name="navigate">Where an already-landed row's "Open" goes. Home hands in the
     /// shell's own <c>Navigate</c>; Setup hands in one that closes itself first. Never a
     /// second dispatch of its own (trap 33 lifted into navigation).</param>
-    /// <returns>The row, and whether it carried a ⧉ — counted off the BUILT control rather
-    /// than re-derived from the state, so the number in the dump is a fact about the visual
-    /// tree and not a restatement of the condition above it.</returns>
-    public static (FrameworkElement View, int CopyCommands) Row(
+    /// <returns>The row, how many ⧉ copies it carried, and how many "Open" links — all
+    /// counted off the BUILT controls rather than re-derived from the state, so the numbers
+    /// in the dump are facts about the visual tree and not a restatement of the conditions
+    /// above them (trap 29: an absent control photographs as an unremarkable panel).</returns>
+    public static (FrameworkElement View, int CopyCommands, int Opens) Row(
         ReadinessRow row, Action<string> navigate)
     {
         var stack = new StackPanel { Margin = new Thickness(0, Tok.SpaceS, 0, 0) };
@@ -96,23 +104,26 @@ internal static class ReadinessRows
 
         stack.Children.Add(Line(row.Feeds));
 
-        if (row.State == ReadinessState.NeverScanned)
-        {
-            var copy = Theming.WireCopyCommand(Theming.Button(""), CommandFor(row.Kind));
-            copy.FontSize = Tok.Spec(Role.Caption).Size;
-            copy.HorizontalAlignment = HorizontalAlignment.Left;
-            copy.Margin = new Thickness(0, Tok.SpaceXs, 0, 0);
-            copy.ToolTip = "Copies the command — paste it into the game's chat. The game "
-                + "writes the file beside its own folders and EQBuddy reads it by itself.";
-            stack.Children.Add(copy);
-            return (stack, 1);
-        }
+        // UNCONDITIONAL since DRA-63. There is no state in which a row shows the command's
+        // name and no way to take it: see the summary above, and HomeReadout.CatchUpTooltip
+        // for why the sentence on it is not the same sentence in both states.
+        var copy = Theming.WireCopyCommand(Theming.Button(""), CommandFor(row.Kind));
+        copy.FontSize = Tok.Spec(Role.Caption).Size;
+        copy.HorizontalAlignment = HorizontalAlignment.Left;
+        copy.Margin = new Thickness(0, Tok.SpaceXs, 0, 0);
+        copy.ToolTip = HomeReadout.CatchUpTooltip(row);
+        stack.Children.Add(copy);
 
-        if (row.Address.Length > 0)
+        var opens = 0;
+        if (row.State == ReadinessState.Scanned && row.Address.Length > 0)
         {
             // A row whose dump HAS landed is a way into the surface that uses it — through
             // the same Navigate the rail calls, never a second dispatch. Filtered by Landed
             // in HomeReadout, so this cannot offer a room that does not exist.
+            //
+            // **Since DRA-63 this is the only navigation in Home's body**, the "Go to" block
+            // having gone with the rail that already draws those doors. `shellHomeDeadLinks`
+            // asks its question of these rows now.
             var link = DesignSystem.Text(Role.Caption, "Open");
             link.Ink("AccentBrush");
             link.HorizontalAlignment = HorizontalAlignment.Left;
@@ -120,9 +131,10 @@ internal static class ReadinessRows
             var address = row.Address;
             DesignSystem.WireClick(link, () => navigate(address));
             stack.Children.Add(link);
+            opens = 1;
         }
 
-        return (stack, 0);
+        return (stack, 1, opens);
     }
 
     /// <summary>
