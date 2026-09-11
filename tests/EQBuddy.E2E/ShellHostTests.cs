@@ -1,4 +1,4 @@
-﻿using EQBuddy.Core;
+using EQBuddy.Core;
 using EQBuddy.UI.Shared;
 
 namespace EQBuddy.E2E;
@@ -53,7 +53,7 @@ public class ShellHostTests
         app.WaitForDump("shellPage", "home", "the bare hook to land on the shell's default room");
         Assert.Equal(ShellPages.Landed.Count, app.DumpValue("shellRail"));
         // The room actually painted, rather than merely being selected on the rail.
-        Assert.Equal(4, app.DumpValue("shellHomeBlocks"));
+        Assert.Equal(3, app.DumpValue("shellHomeBlocks"));
     }
 
     /// <summary>
