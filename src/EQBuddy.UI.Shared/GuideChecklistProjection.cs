@@ -83,15 +83,33 @@ public static class GuideChecklistProjection
     /// <c>SkyTestSplit</c> runtime name and stays the catalog link) and not on a page title:
     /// the reward key is the string the checklist, the phone, the achievements import and the
     /// loot auto-tick already all speak.</para></summary>
-    public static Guide? GuideFor(GuideCatalog catalog, string? rewardKey)
+    /// <para><b>Indexed, for the reason <see cref="Resolve"/> is</b> (DRA-45).
+    /// <see cref="Apply"/> calls this once per GROUP on every render, and the scan under it
+    /// walked every objective of every guide — each visit re-sorting the guide's stages and
+    /// objectives, because <c>Guide.AllObjectives</c> is two <c>OrderBy</c>s. At 95 Sky
+    /// groups over a 109-guide catalog that was invisible; over the 1,164 harvested guides
+    /// beside them it is a million objective visits per repaint of a surface that paints
+    /// every tick (trap 46). Same per-instance weak table, so a fixture catalog is indexed
+    /// on its own and collected with it.</para>
+    public static Guide? GuideFor(GuideCatalog catalog, string? rewardKey) =>
+        rewardKey is { Length: > 0 }
+        && RewardIndex.GetValue(catalog, BuildRewardIndex).TryGetValue(rewardKey, out var hit)
+            ? hit
+            : null;
+
+    private static readonly System.Runtime.CompilerServices.ConditionalWeakTable<
+        GuideCatalog, Dictionary<string, Guide>> RewardIndex = new();
+
+    private static Dictionary<string, Guide> BuildRewardIndex(GuideCatalog catalog)
     {
-        if (rewardKey is null || rewardKey.Length == 0) return null;
+        var index = new Dictionary<string, Guide>(StringComparer.OrdinalIgnoreCase);
         foreach (var guide in catalog.Guides)
             foreach (var objective in guide.AllObjectives)
-                if (objective.RewardKey.Length > 0
-                    && string.Equals(objective.RewardKey, rewardKey, StringComparison.OrdinalIgnoreCase))
-                    return guide;
-        return null;
+                if (objective.RewardKey.Length > 0)
+                    // First writer wins, which is the scan's own answer, and
+                    // `NoTwoGuidesClaimTheSameReward` refuses a second claimant anyway.
+                    index.TryAdd(objective.RewardKey, guide);
+        return index;
     }
 
     /// <summary>Replace every guided group's rows with its guide's objectives, and hand back

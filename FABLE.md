@@ -238,53 +238,28 @@ a shipped rule is kept true. Feedback, including two things §2 did not say and 
 slice exposed on the phone, is in `FABLE-FEEDBACK.md` (2026-09-11 ~11:30 AM CT); the calls
 made alone are in `DECISIONS.md` (2026-09-11).
 
-§3 below (Delivery 2 — N1 transformer, N2 render, N3 consolidation) is STILL PLANNED and
-stays here. §4 (long chains, Bevel in parallel) is asked in `BEVEL-FEEDBACK.md` with the two
+§3's **N1 is TAKEN AND BUILT 2026-09-11 (DRA-45)** — see the note in its place below; N2
+(render) and N3 (consolidation) are STILL PLANNED and stay here. §4 (long chains, Bevel in parallel) is asked in `BEVEL-FEEDBACK.md` with the two
 frames it needs; §5 (sequencing) is discharged — the Founder chose Epic first and it is done.
 
 ### §3 Delivery 2 — normal quests: transformer, skeleton, render, then consolidation (DRA-40 → three child cards)
 
-**N1 — the walkthrough transformer (`scripts/harvests/eqlwiki/guides-transform.py`), data + tests.**
-Deterministic, runs inside the weekly refresh after `quests-harvest.py`, over the cached
-wikitext, and writes **`src/EQBuddy.Core/Data/HarvestedGuides.json.gz`** — a SEPARATE,
-auto-written file (the `ItemCatalog.json.gz` precedent), compact single-line entries with a
-fixed key order so refresh PRs diff as data. **`GuideCatalog.json` stays curated and is never
-touched by it**; at load the catalog merges both and **a curated guide wins on `QuestName`**.
-`refresh.py CURATED` is unchanged; the harvested file is refresh output like `QuestCatalog.json`.
+**N1 — TAKEN AND BUILT 2026-09-11 (DRA-45).** `scripts/harvests/eqlwiki/guides-transform.py`
+runs after `quests-promote.py` in the weekly refresh and writes
+`src/EQBuddy.Core/Data/HarvestedGuides.json.gz` — **1,164** guides, 11,075 objectives,
+byte-reproducible from the cache, fetching nothing. `GuideCatalog.json` is untouched and
+`GuideCatalog.Merge` lets a curated guide win on `QuestName`. The fifth and sixth router
+homes (`LedgerItem`, `QuestCompletion`) are in. **The rules live in the code,
+`docs/TestPlan.md` and `CLAUDE.md` now** — read them there, because this inbox is not where
+a shipped rule is kept true.
 
-Extraction rule, per page, in this order, and nothing else:
-1. **Section:** `== Checklist ==` when present (121 pages), else `== Walkthrough ==` (840),
-   else no walkthrough.
-2. **Stages:** each `===`/`====` heading inside the section is a stage in order; none → one
-   stage named "Walkthrough" (or "Checklist").
-3. **Objectives, in document order, each Transcribed with `What` = the line's text:**
-   a `*` / `#` / `{{CheckboxList}}` bullet; a bold line `'''…'''` of six or more characters;
-   a `You say, '…'` line. **NPC speech is not an objective** (`X says '…'` lines are dropped);
-   templates, categories and italic editor notes are dropped. Wikilinks become their text.
-4. **Skeleton stage, appended to EVERY guide that has any turn-in items** — "Turn-in pieces":
-   one `Collect` objective per `QuestCatalog` item ("{item} ×{qty}"), **home = the quest
-   ledger's owned count** (a fifth router home, `LedgerItem`: done when `Have ≥ Need`, read
-   from the same `QuestMatch` the General tab draws; a manual tick is refused — bags are the
-   truth here, as today), then one `TurnIn` "Hand the pieces to {giver}" (home = the ledger's
-   completion record, `CompletedFor`, the same store `ToggleCompleted` writes). These are
-   **Authored** — who/where/what come from structured fields the page states in its infobox,
-   not from prose — with the page as source. Where the giver or zone is blank the sentence
-   shrinks ("Hand in the pieces."), never invents.
-5. **Skeleton-only guide** for the 250 uncached pages until the next refresh fetches them,
-   and for pages with no walkthrough and no checklist: stage 4 alone, plus a `TalkToNpc`
-   "Speak to {giver} in {startZone}" first when both are known. So all 1,178 end up guided,
-   as the Founder decided, and the ones that are skeleton say so in the caption ("from the
-   quest's item list").
-6. **Never:** infer Who/Where from prose; reorder; merge lines; drop a bold line because it
-   looks like flavour. The transformer's whole job is to be boring.
-
-Tests (`HarvestedGuidesTests`): the transformer reproduces the committed file byte-for-byte
-from the cache (the DRA-44 standard); every harvested objective is Transcribed or a skeleton
-Authored row and nothing else; no harvested guide claims a Sky reward key or an epic row;
-curated wins on collision (fixture); a fixture page in each shape (Checklist, subsectioned,
-bold-only, dialogue-only, no walkthrough) produces the predicted stages and counts; the
-count is 1,178. A report (`guides-report.md`) lists per-shape counts and the skeleton-only
-set, so the weekly PR shows drift.
+Three places the plan's word did not survive contact, all with evidence in
+`FABLE-FEEDBACK.md` (2026-09-11 ~2:10 PM CT) and `DECISIONS.md`: a skeleton `Collect` row is
+a **`Stub`**, not `Authored` (the infobox answers who GIVES the quest, never who drops an
+item, and `Validate()` requires WHO of an Authored step); the **"~250 uncached pages" do not
+exist** — they are the collection split-steps, permanently skeleton-only, so this adds ZERO
+eqlwiki requests; and the count is **1,164**, with the fourteen index pages that have
+nothing to say named in the test rather than given an invented step.
 
 **N2 — render on the Quests tab + phone.** The General tab's detail pane for a selected
 quest gets the guide: NEXT card, stage headings, rows, "Turn-in pieces" as the item rows the

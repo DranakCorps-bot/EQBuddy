@@ -26,6 +26,10 @@ What one run does:
                                             the CLASS page wins and the spell pages fill
                                             only levels it has no section for)
        quests.json  -> QuestCatalog.json   (quests-promote.py)
+       quest wikitext + QuestCatalog.json
+                    -> HarvestedGuides.json.gz (guides-transform.py; AUTO-written guides,
+                       one per catalog quest that has anything to say. GuideCatalog.json
+                       stays curated and wins on questName — see that script's header)
        zones.json   -> ZoneGraph.json      (../eqltools/zones-merge.py; the
                        eqltools half is a committed extract — browser-fetched,
                        see ../eqltools/README.md — and stays as-is)
@@ -89,6 +93,10 @@ PROMOTIONS = [WIKI / "fades-harvest.py", WIKI / "slows-harvest.py",
               WIKI / "buffs-harvest.py", WIKI / "debuffs-harvest.py",
               WIKI / "charms-harvest.py",
               WIKI / "quests-promote.py",
+              # AFTER quests-promote.py: the transformer reads the promoted QuestCatalog for
+              # its item lists and infobox fields, and the cached wikitext quests-harvest.py
+              # has just refreshed. It fetches nothing.
+              WIKI / "guides-transform.py",
               HERE / "eqltools" / "zones-merge.py",
               WIKI / "items-promote.py",
               WIKI / "spell-levels-promote.py"]
@@ -96,7 +104,7 @@ PROMOTIONS = [WIKI / "fades-harvest.py", WIKI / "slows-harvest.py",
 # Written by promotions above; diffed for the report.
 PROMOTED = ["FadeMessages.json", "SlowSpells.json", "BuffDurations.json", "DebuffLandings.json",
             "CharmSpells.json", "QuestCatalog.json", "ZoneGraph.json", "ItemCatalog.json.gz",
-            "SpellLevels.json"]
+            "SpellLevels.json", "HarvestedGuides.json.gz"]
 # Human-curated; never auto-written, only flagged when their sources move.
 CURATED = ["SpawnCatalog.json", "AaCatalog.json", "MezSpells.json",
            "CcSpells.json", "RegenSpells.json", "GuideCatalog.json"]

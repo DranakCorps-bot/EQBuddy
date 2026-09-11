@@ -1,4 +1,5 @@
 using System.Globalization;
+using System.IO.Compression;
 using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -300,7 +301,8 @@ public sealed class GuideCatalog
         Converters = { new JsonStringEnumConverter() },
     };
 
-    public static GuideCatalog LoadEmbedded()
+    /// <summary>The CURATED file alone — hand-authored, and the only half a human edits.</summary>
+    public static GuideCatalog LoadCurated()
     {
         using var stream = Assembly.GetExecutingAssembly()
             .GetManifestResourceStream("EQBuddy.Core.Data.GuideCatalog.json")
@@ -309,6 +311,75 @@ public sealed class GuideCatalog
             ?? throw new InvalidOperationException("GuideCatalog.json unreadable");
         return new GuideCatalog { Guides = file.Guides };
     }
+
+    /// <summary>
+    /// The HARVESTED file alone — <b>auto-written</b> by
+    /// <c>scripts/harvests/eqlwiki/guides-transform.py</c> inside the weekly refresh, exactly
+    /// as <see cref="QuestCatalog"/> and <see cref="ItemCatalog"/> are (DRA-45).
+    ///
+    /// <para>Gzipped for the same reason <c>ItemCatalog.json.gz</c> is: 1,164 guides and
+    /// 11,000 objectives are ~4 MB of JSON and ~350 KB compressed. One guide per line inside
+    /// it, so <c>gunzip -c | diff</c> reads as data in a refresh PR.</para>
+    /// </summary>
+    public static GuideCatalog LoadHarvested()
+    {
+        using var stream = Assembly.GetExecutingAssembly()
+            .GetManifestResourceStream("EQBuddy.Core.Data.HarvestedGuides.json.gz")
+            ?? throw new InvalidOperationException("HarvestedGuides.json.gz missing from resources");
+        using var gz = new GZipStream(stream, CompressionMode.Decompress);
+        var file = JsonSerializer.Deserialize<CatalogFile>(gz, JsonOpts)
+            ?? throw new InvalidOperationException("HarvestedGuides.json.gz unreadable");
+        return new GuideCatalog { Guides = file.Guides };
+    }
+
+    /// <summary>
+    /// Both halves, curated first — <b>and a curated guide WINS on <see cref="Guide.QuestName"/></b>.
+    ///
+    /// <para>That rule is the whole safety argument for auto-writing guides at all. The
+    /// transformer produces a boring, transcribed walkthrough for every quest eqlwiki
+    /// documents; the day a person AUTHORS one — answering who and where, placing the pieces,
+    /// citing the zone page — their guide replaces the machine's for that quest and the
+    /// machine can never take it back. The fourteen Epic 1.0 guides and the Sky tests are
+    /// already in that position, which is why the harvested file's own rows for those quests
+    /// never reach a surface.</para>
+    ///
+    /// <para>Ids are deduplicated too, and curated wins there as well: <see cref="Find"/> is
+    /// keyed on the id and two guides answering to one is a coin toss, not a merge.</para>
+    ///
+    /// <para><b>And a harvested guide is admitted only for a quest the app actually has.</b>
+    /// <paramref name="knownQuestNames"/> is <see cref="QuestCatalog.LoadEmbedded"/>'s
+    /// answer, which is NOT what the JSON on disk says: it drops the five pure index pages
+    /// (<c>CatalogHygiene</c>) and replaces each "{Class} Plane of Sky Tests" aggregate with
+    /// one quest per reward (<c>SkyTestSplit</c>). The transformer reads the file and cannot
+    /// know either, and re-implementing both rules in Python would be a second producer of
+    /// "which quests exist" (trap 4) that drifts the week someone edits the C# list. So the
+    /// filter reads the one producer, here — and a guide for a quest nothing loads is a
+    /// guide no surface could ever open.</para>
+    /// </summary>
+    public static GuideCatalog Merge(GuideCatalog curated, GuideCatalog harvested,
+        IReadOnlyCollection<string> knownQuestNames)
+    {
+        var known = new HashSet<string>(knownQuestNames, StringComparer.OrdinalIgnoreCase);
+        var claimedQuests = new HashSet<string>(
+            curated.Guides.Select(g => g.QuestName).Where(n => n.Length > 0),
+            StringComparer.OrdinalIgnoreCase);
+        var claimedIds = new HashSet<string>(
+            curated.Guides.Select(g => g.Id), StringComparer.OrdinalIgnoreCase);
+
+        var guides = new List<Guide>(curated.Guides);
+        foreach (var guide in harvested.Guides)
+        {
+            if (!known.Contains(guide.QuestName)) continue;
+            if (!claimedQuests.Add(guide.QuestName)) continue;
+            if (!claimedIds.Add(guide.Id)) continue;
+            guides.Add(guide);
+        }
+        return new GuideCatalog { Guides = guides };
+    }
+
+    public static GuideCatalog LoadEmbedded() =>
+        Merge(LoadCurated(), LoadHarvested(),
+            [.. QuestCatalog.LoadEmbedded().Quests.Select(q => q.Name)]);
 
     /// <summary>Parses catalog JSON in the shipped file's shape. Exists so a test can hold
     /// the validation to a fixture written the way an author would write one — a hollow
@@ -320,7 +391,20 @@ public sealed class GuideCatalog
         return new GuideCatalog { Guides = file.Guides };
     }
 
-    public static GuideCatalog Default { get; } = LoadEmbedded();
+    private static GuideCatalog? _default;
+    private static readonly object DefaultLock = new();
+
+    /// <summary>Lazy, for the reason <see cref="ItemCatalog.Default"/> is: the harvested half
+    /// gunzips to megabytes, and a static-initializer chain would pay for it the first time
+    /// anything on this class is touched — <see cref="FabricatedProse"/> included.</summary>
+    public static GuideCatalog Default
+    {
+        get
+        {
+            if (_default is { } d) return d;
+            lock (DefaultLock) return _default ??= LoadEmbedded();
+        }
+    }
 
     public Guide? Find(string guideId) =>
         Guides.FirstOrDefault(g => string.Equals(g.Id, guideId, StringComparison.OrdinalIgnoreCase));
@@ -386,8 +470,32 @@ public sealed class GuideCatalog
             if (guide.Id.Length == 0) problems.Add($"{who}: no id");
             else if (!guideIds.Add(guide.Id)) problems.Add($"{who}: duplicate guide id");
             if (guide.Name.Length == 0) problems.Add($"{who}: no name");
-            if (guide.ApplicableClasses.Count == 0) problems.Add($"{who}: no applicable classes");
-            if (guide.ZoneNames.Count == 0) problems.Add($"{who}: no zone names");
+
+            // WHO IT IS FOR, stated in the terms the guide's own surface is keyed by — one
+            // requirement, two shapes, never neither (trap 34: the must-list is the half a
+            // "no guide may…" rule cannot see).
+            //
+            // A Sky or Epic guide is reached THROUGH a class: the checklist tab picks the
+            // character's, `ForClass` enumerates them, and a guide naming no class is one no
+            // screen can ever open. A NormalQuest guide is reached through its QUEST, and
+            // the quest is where its classes and zones already live — copying eqlwiki's
+            // free-text `Classes` cell ("All", "?", "Warrior (Iksar)", blank on 40 pages)
+            // onto the guide would be a second producer of a fact `QuestCatalog` owns
+            // (trap 4), and parsing it into a class list would be inference (trap 73). So
+            // the requirement swaps to the stronger one: NAME A QUEST. A dangling questName
+            // looks fine in a text search and is broken on every surface.
+            if (guide.GuideType == GuideType.NormalQuest)
+            {
+                if (guide.QuestName.Length == 0)
+                    problems.Add($"{who}: a NormalQuest guide names no quest — that link is "
+                        + "how it is reached and where its classes and zones live");
+            }
+            else
+            {
+                if (guide.ApplicableClasses.Count == 0) problems.Add($"{who}: no applicable classes");
+                if (guide.ZoneNames.Count == 0) problems.Add($"{who}: no zone names");
+            }
+
             if (guide.Stages.Count == 0) problems.Add($"{who}: no stages");
             problems.AddRange(SourceProblems(guide.Sources, who, requireAtLeastOne: true));
 

@@ -106,8 +106,8 @@ public class GuideCatalogTests
             [
                 new Guide
                 {
-                    Id = "g", Name = "G", ApplicableClasses = ["Warrior"],
-                    ZoneNames = ["Plane of Sky"],
+                    Id = "g", Name = "G", QuestName = "Fixture Quest",
+                    ApplicableClasses = ["Warrior"], ZoneNames = ["Plane of Sky"],
                     Sources = [.. objective.Sources],
                     Stages = [new GuideStage
                     {
@@ -155,8 +155,14 @@ public class GuideCatalogTests
         foreach (var o in quoting)
             Assert.Contains(o.Sources, s => s.Title == "Plane of Sky");
 
-        // ...and the wind runes, whose fact is the zone page's one-line drop rule.
-        var runes = Shipped.Guides.SelectMany(g => g.AllObjectives)
+        // ...and the wind runes, whose fact is the zone page's one-line drop rule. SKY guides
+        // only: the harvested half (DRA-45) also names a Wind Rune on the Collect rows it
+        // builds from a quest's item list, and those cite the quest's own page because that
+        // is the only page they rest on — they make no claim about where a rune drops, which
+        // is exactly why they are stubs.
+        var runes = Shipped.Guides
+            .Where(g => g.GuideType == GuideType.PlaneOfSkyQuest)
+            .SelectMany(g => g.AllObjectives)
             .Where(o => o.ItemNames.Any(i => i.StartsWith("Wind Rune", StringComparison.Ordinal))
                         && o.RewardKey.Length == 0)
             .ToList();
@@ -638,6 +644,7 @@ public class GuideCatalogTests
                   "id": "fixture",
                   "name": "Fixture guide",
                   "guideType": "NormalQuest",
+                  "questName": "Fixture Quest",
                   "zoneNames": ["Somewhere"],
                   "applicableClasses": ["Warrior"],
                   "sources": [{ "url": "https://eqlwiki.com/X", "title": "X", "retrievedAt": "2026-09-08" }],

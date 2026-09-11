@@ -39,6 +39,73 @@ public enum GuideProgressHome
     /// objective-type gate the way <see cref="SkyItem"/> does — there is no guessing to
     /// constrain.</para></summary>
     EpicItem,
+
+    /// <summary>One turn-in item of the guide's own quest, answered from the character's
+    /// QUEST LEDGER — <c>Have ≥ Need</c> against the same <c>QuestMatch</c> the General tab
+    /// draws (DRA-45).
+    ///
+    /// <para><b>The bags are the truth here, so a manual tick is REFUSED.</b> Every other home
+    /// on this enum is a box a player clicks; this one is a count the loot parser, the
+    /// inventory reconcile and the manual-count editor already maintain, and the General tab
+    /// has drawn it as "3 / 5 items" since 1.x. A guide row that could be ticked independently
+    /// would be a second answer to "do I have four Blue Orc Heads" (trap 4) — and the one the
+    /// player clicked would be the one that never noticed the fifth drop.</para>
+    ///
+    /// <para><see cref="GuideProgressRouter.SetSkipped"/> still works: "I am not doing this"
+    /// is a different fact from "I have these", and it lands in the guide ledger like every
+    /// other skip.</para></summary>
+    LedgerItem,
+
+    /// <summary>The quest ledger's completion record for the guide's own quest — the store
+    /// <c>QuestsView.ToggleCompleted</c> writes, and the count the General tab's "done" tick
+    /// shows (DRA-45).
+    ///
+    /// <para>A harvested guide's hand-in row IS that tick. Marking the quest done on the
+    /// General tab and ticking the guide's last step are one gesture, so the guide can never
+    /// go on asking for a hand-in the player has already recorded.</para></summary>
+    QuestCompletion,
+}
+
+/// <summary>
+/// Everything OUTSIDE the objective that the routing decision reads — the three stores a
+/// guide can layer on top of, in one value.
+///
+/// <para>A record rather than three more parameters on a chain that was already four
+/// overloads deep: each new home the guide model gains (Sky rows, then epic rows, then the
+/// quest ledger) is another thing the ONE producer of the decision has to see, and growing
+/// it by argument turns every caller into a positional puzzle.</para>
+/// </summary>
+/// <param name="SkyItems">The reward group's OWN rows and nothing wider.</param>
+/// <param name="EpicRows">The rows the Epic tab is CURRENTLY showing (the classic-era lens).</param>
+/// <param name="Quest">The catalog quest this guide walks, when it walks one — the source of
+/// both the turn-in item list and the completion record.</param>
+public readonly record struct GuideStores(
+    IReadOnlyList<SkyQuestChecklistItem> SkyItems,
+    IReadOnlyList<EpicQuestChecklistItem> EpicRows,
+    QuestEntry? Quest)
+{
+    /// <summary>No store to layer on — the answer for a guide that stands alone.</summary>
+    public static GuideStores None { get; } = new([], [], null);
+
+    public static GuideStores For(IReadOnlyList<SkyQuestChecklistItem> skyItems) =>
+        new(skyItems, [], null);
+
+    public static GuideStores For(IReadOnlyList<SkyQuestChecklistItem> skyItems,
+        IReadOnlyList<EpicQuestChecklistItem> epicRows) => new(skyItems, epicRows, null);
+}
+
+/// <summary>Which ROW of the chosen store an objective resolved to, so a caller never
+/// re-derives the match the router already made.</summary>
+/// <param name="SkyItem">Set for <see cref="GuideProgressHome.SkyItem"/>.</param>
+/// <param name="EpicRow">Set for <see cref="GuideProgressHome.EpicItem"/>.</param>
+/// <param name="QuestItem">Set for <see cref="GuideProgressHome.LedgerItem"/> — the need
+/// (<c>Name</c> and <c>Qty</c>) the owned count is compared against.</param>
+public readonly record struct GuideBacking(
+    SkyQuestChecklistItem? SkyItem,
+    EpicQuestChecklistItem? EpicRow,
+    QuestItemNeed? QuestItem)
+{
+    public static GuideBacking None { get; }
 }
 
 /// <summary>
@@ -83,8 +150,8 @@ public static class GuideProgressRouter
     public static GuideProgressHome HomeFor(GuideObjective objective) =>
         HomeFor(objective, [], [], out _, out _);
 
-    /// <summary>Which store owns this objective's done state - the whole routing decision,
-    /// pure and separately testable, and the ONE producer of it (both overloads land here).
+    /// <summary>Which store owns this objective's done state, with a Sky reward group in
+    /// hand — the Sky callers' shape. Lands in the one producer below.
     ///
     /// <para>A reward key means the Sky turn-in store owns it. Otherwise an acquire-shaped
     /// objective (<see cref="ItemBackedObjectiveTypes"/>) naming <b>exactly one</b> of
@@ -101,40 +168,63 @@ public static class GuideProgressRouter
         HomeFor(objective, groupItems, [], out backingItem, out _);
 
     /// <summary>Which store owns this objective's done state, with the Epic tab's rows in hand
-    /// as well — <b>the one producer</b>, which both shorter overloads land in.
+    /// as well — the Epic callers' shape. Lands in the one producer below.
     ///
     /// <para><paramref name="epicRows"/> is the rows the tab is CURRENTLY showing, which is
     /// what makes the classic-era lens one producer rather than two: a row the filter dropped
     /// is not in this list, so its objective has no home here and the projection does not draw
-    /// it. The guide never re-reads <c>AvailableInClassic</c> itself.</para>
-    ///
-    /// <para>Order matters and is stated rather than implied: a reward key wins (a Sky
-    /// turn-in), then an epic row bearing this objective's id, then the single-item Sky match.
-    /// The three sets are disjoint by construction — an epic objective carries no reward key
-    /// and no item names, and a Sky guide's caller passes no epic rows — so the order is
-    /// belt-and-braces rather than a tie-break anything relies on.</para></summary>
+    /// it. The guide never re-reads <c>AvailableInClassic</c> itself.</para></summary>
     public static GuideProgressHome HomeFor(GuideObjective objective,
         IReadOnlyList<SkyQuestChecklistItem> groupItems,
         IReadOnlyList<EpicQuestChecklistItem> epicRows,
         out SkyQuestChecklistItem? backingItem,
         out EpicQuestChecklistItem? backingRow)
     {
-        backingItem = null;
-        backingRow = null;
+        var home = HomeFor(objective, new GuideStores(groupItems, epicRows, null), out var backing);
+        backingItem = backing.SkyItem;
+        backingRow = backing.EpicRow;
+        return home;
+    }
+
+    /// <summary>Which store owns this objective's done state, with every store a guide can
+    /// layer on in hand — <b>the one producer</b>, which every shorter overload lands in.
+    ///
+    /// <para>Order matters and is stated rather than implied: a reward key wins (a Sky
+    /// turn-in), then an epic row bearing this objective's id, then the single-item Sky
+    /// match, then the guide's own quest — its turn-in item for an acquire-shaped step, its
+    /// completion record for the hand-in. The sets are disjoint by construction (an epic
+    /// objective carries no reward key and no item names; a Sky guide's caller passes no
+    /// quest), so the order is belt-and-braces rather than a tie-break anything relies on.</para>
+    ///
+    /// <para><b>The quest homes need <paramref name="stores"/>.Quest and nothing else.</b> A
+    /// harvested guide's Collect row names exactly one of its quest's turn-in items — the
+    /// transformer put that name there from the catalog's own list, so there is no guessing
+    /// to constrain — and its hand-in is the quest's completion record. Two matches or none
+    /// falls to the guide ledger, exactly as the Sky match does: an ambiguous claim on a
+    /// shared store is worse than a private tick.</para></summary>
+    public static GuideProgressHome HomeFor(GuideObjective objective, GuideStores stores,
+        out GuideBacking backing)
+    {
+        backing = GuideBacking.None;
         if (objective.RewardKey.Length > 0) return GuideProgressHome.SkyTurnIn;
 
-        foreach (var row in epicRows)
+        foreach (var row in stores.EpicRows)
             if (string.Equals(row.Id, objective.Id, StringComparison.OrdinalIgnoreCase))
             {
-                backingRow = row;
+                backing = new GuideBacking(null, row, null);
                 return GuideProgressHome.EpicItem;
             }
+
+        if (stores.Quest is { } quest
+            && string.Equals(objective.ObjectiveType, "TurnIn", StringComparison.Ordinal)
+            && quest.Name.Length > 0)
+            return GuideProgressHome.QuestCompletion;
 
         if (!ItemBackedObjectiveTypes.Contains(objective.ObjectiveType, StringComparer.Ordinal))
             return GuideProgressHome.GuideLedger;
 
         SkyQuestChecklistItem? only = null;
-        foreach (var item in groupItems)
+        foreach (var item in stores.SkyItems)
         {
             if (!objective.ItemNames.Contains(item.QuestItem, StringComparer.OrdinalIgnoreCase))
                 continue;
@@ -142,9 +232,24 @@ public static class GuideProgressRouter
             only = item;
         }
 
-        if (only is null) return GuideProgressHome.GuideLedger;
-        backingItem = only;
-        return GuideProgressHome.SkyItem;
+        if (only is not null)
+        {
+            backing = new GuideBacking(only, null, null);
+            return GuideProgressHome.SkyItem;
+        }
+
+        QuestItemNeed? need = null;
+        foreach (var item in stores.Quest?.Items ?? [])
+        {
+            if (!objective.ItemNames.Contains(item.Name, StringComparer.OrdinalIgnoreCase))
+                continue;
+            if (need is not null) return GuideProgressHome.GuideLedger;
+            need = item;
+        }
+
+        if (need is null) return GuideProgressHome.GuideLedger;
+        backing = new GuideBacking(null, null, need);
+        return GuideProgressHome.LedgerItem;
     }
 
     /// <summary>Has the player done this objective? Reward objectives answer from the Sky
@@ -171,11 +276,31 @@ public static class GuideProgressRouter
         string characterKey, string guideId, GuideObjective objective,
         IReadOnlyList<SkyQuestChecklistItem> groupItems,
         IReadOnlyList<EpicQuestChecklistItem> epicRows) =>
-        HomeFor(objective, groupItems, epicRows, out var item, out var row) switch
+        IsDone(settings, ledger, characterKey, guideId, objective,
+            new GuideStores(groupItems, epicRows, null));
+
+    /// <summary>Has the player done this objective, against every store a guide can layer on
+    /// — <b>the one reader</b>, which every shorter overload lands in.
+    ///
+    /// <para>A <see cref="GuideProgressHome.LedgerItem"/> step answers from the character's
+    /// owned count against the quest's need, so the loot parser, an inventory reconcile and a
+    /// manually edited count all light the row the same tick — and nothing the player clicks
+    /// can make it disagree with the bags. A
+    /// <see cref="GuideProgressHome.QuestCompletion"/> step answers from the same completion
+    /// record the General tab's tick writes.</para></summary>
+    public static bool IsDone(AppSettings settings, QuestLedgerStore ledger,
+        string characterKey, string guideId, GuideObjective objective, GuideStores stores) =>
+        HomeFor(objective, stores, out var backing) switch
         {
             GuideProgressHome.SkyTurnIn => SkyCompleteToggle.IsTurnedIn(settings, objective.RewardKey),
-            GuideProgressHome.SkyItem => item!.Acquired,
-            GuideProgressHome.EpicItem => row!.Acquired,
+            GuideProgressHome.SkyItem => backing.SkyItem!.Acquired,
+            GuideProgressHome.EpicItem => backing.EpicRow!.Acquired,
+            GuideProgressHome.LedgerItem =>
+                ledger.For(characterKey).TryGetValue(backing.QuestItem!.Name, out var owned)
+                && owned.Total >= Math.Max(1, backing.QuestItem!.Qty),
+            GuideProgressHome.QuestCompletion =>
+                ledger.CompletedFor(characterKey).TryGetValue(stores.Quest!.Name, out var times)
+                && times > 0,
             _ => ledger.GuideProgressFor(characterKey, guideId).DoneObjectiveIds
                 .Contains(objective.Id, StringComparer.OrdinalIgnoreCase),
         };
@@ -217,9 +342,37 @@ public static class GuideProgressRouter
     public static void SetDone(AppSettings settings, QuestLedgerStore ledger,
         string characterKey, string guideId, GuideObjective objective,
         IReadOnlyList<SkyQuestChecklistItem> groupItems,
-        IReadOnlyList<EpicQuestChecklistItem> epicRows, bool done)
+        IReadOnlyList<EpicQuestChecklistItem> epicRows, bool done) =>
+        SetDone(settings, ledger, characterKey, guideId, objective,
+            new GuideStores(groupItems, epicRows, null), done);
+
+    /// <summary>Tick or untick an objective, into whichever store owns it — <b>the one
+    /// writer</b>, which every shorter overload lands in. See those for the Sky and Epic
+    /// rules, which are unchanged.
+    ///
+    /// <para><b>A <see cref="GuideProgressHome.LedgerItem"/> row REFUSES the click</b> and
+    /// writes nothing. Its answer is the character's owned count, which the player changes by
+    /// looting, by an inventory reconcile, or on the quest card's own count editor — three
+    /// doors that already exist. A fourth that could say "yes I have four" while the bags say
+    /// two is not a convenience, it is the guide and the General tab disagreeing about one
+    /// fact (trap 4). The refusal is silent here because the row is drawn un-clickable; the
+    /// surface, not this class, is where a player is told why.</para>
+    ///
+    /// <para>A <see cref="GuideProgressHome.QuestCompletion"/> row writes the line
+    /// <c>QuestsView.ToggleCompleted</c> writes for a non-Sky quest —
+    /// <see cref="QuestLedgerStore.SetCompleted"/>, the catch-up marking that consumes no
+    /// turn-in items. Not <c>RecordCompletion</c>: consuming the pieces is what the General
+    /// tab's hand-in button does, and two callers of a destructive write is trap 47's
+    /// shape.</para></summary>
+    public static void SetDone(AppSettings settings, QuestLedgerStore ledger,
+        string characterKey, string guideId, GuideObjective objective,
+        GuideStores stores, bool done)
     {
-        var home = HomeFor(objective, groupItems, epicRows, out var item, out var row);
+        var home = HomeFor(objective, stores, out var backing);
+        var item = backing.SkyItem;
+        var row = backing.EpicRow;
+
+        if (home == GuideProgressHome.LedgerItem) return;
 
         if (home == GuideProgressHome.SkyTurnIn)
         {
@@ -241,6 +394,10 @@ public static class GuideProgressRouter
         {
             row!.Acquired = done;
             row.AcquiredUnassigned = false;
+        }
+        else if (home == GuideProgressHome.QuestCompletion)
+        {
+            ledger.SetCompleted(characterKey, stores.Quest!.Name, done);
         }
         else
         {
@@ -294,15 +451,23 @@ public static class GuideProgressRouter
     /// rows is the same self-contradiction the heading counts exist to prevent.</summary>
     public static GuideProgressCounts Counts(AppSettings settings, QuestLedgerStore ledger,
         string characterKey, Guide guide, IReadOnlyList<SkyQuestChecklistItem> groupItems,
-        IReadOnlyList<EpicQuestChecklistItem> epicRows)
+        IReadOnlyList<EpicQuestChecklistItem> epicRows) =>
+        Counts(settings, ledger, characterKey, guide,
+            new GuideStores(groupItems, epicRows, null));
+
+    /// <summary>How far through a guide the player is, against every store — the one the
+    /// shorter forms land in. Counts through <see cref="IsDone"/> and walks
+    /// <see cref="Drawn"/>, so the caption and the rows under it cannot disagree.</summary>
+    public static GuideProgressCounts Counts(AppSettings settings, QuestLedgerStore ledger,
+        string characterKey, Guide guide, GuideStores stores)
     {
         var done = 0;
         var skipped = 0;
         var total = 0;
-        foreach (var objective in Drawn(guide, epicRows))
+        foreach (var objective in Drawn(guide, stores.EpicRows))
         {
             total++;
-            if (IsDone(settings, ledger, characterKey, guide.Id, objective, groupItems, epicRows)) done++;
+            if (IsDone(settings, ledger, characterKey, guide.Id, objective, stores)) done++;
             else if (IsSkipped(ledger, characterKey, guide.Id, objective)) skipped++;
         }
         return new GuideProgressCounts(done, skipped, total);

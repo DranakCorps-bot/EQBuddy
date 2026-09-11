@@ -3705,3 +3705,90 @@ Pages stayed untouched; the T4 publish gate STANDS. LIVE ASK for the #519
 re-look SIGN is in `HELM-FEEDBACK.md`.
 
 — Dranak (Fable 5, DRA-48)
+
+## 2026-09-11 (DRA-45 — Delivery 2 N1, the harvest transformer): seven calls I made alone
+
+Card: Paperclip DRA-45, Executor seat `opus-dra45-n1`, Founder-kicked beside
+DRA-41. Plan source: `FABLE.md` 2026-09-09 ~10:15 PM CT §3 N1. Each call below
+fails both consequence-list tests — none changes what EQBuddy IS, none is
+irreversible before a tag — so they are logged rather than asked. **Three of
+them depart from the plan's literal word**, and those three are marked ⚑ and
+are also raised in `FABLE-FEEDBACK.md`.
+
+**⚑ 1. A `Collect` row is a `Stub`, not `Authored`.** §3 said the skeleton rows
+are "Authored — who/where/what come from structured fields the page states in
+its infobox". `Validate()` requires an `Authored` objective to answer WHO and
+WHERE. The infobox answers who GIVES the quest and where it STARTS; it says
+nothing about who drops a turn-in item or where. Writing the quest giver into
+"Collect Blue Orc Head ×4"'s WHO would assert that Captain Tillin drops them —
+fabricated certainty wearing provenance, 4,048 times, which is trap 73 at
+scale. `Stub` is the state whose whole meaning is "we cannot tell you where",
+it is TRUE here, and it is the one that opens the share-back door. The
+alternative was weakening the Authored bar for everyone, which is the one thing
+lock 4a exists to stop. **The hand-in IS Authored** where the infobox answers
+both, and shrinks to a stub that says why where it does not — that half is
+exactly as §3 wrote it.
+
+**⚑ 2. The count is 1,164, not 1,178, and the fourteen are NAMED.** Fourteen
+catalog rows are index or collection PAGES with no walkthrough, no checklist,
+no turn-in items and no giver-and-zone to open with. A guide with no objectives
+is refused by lock 4a; inventing a step so the number matched the plan would be
+the invention the whole slice is built to avoid. Naming them
+(`HarvestedGuidesTests`) means the day one gains content the test fails and
+says which — a bare 1,164 would not.
+
+**⚑ 3. The "~250 uncached pages" do not exist, so nothing waits on a fetch.**
+Measured: all 1,178 quests resolve to a cached page today. The 250 are the
+per-step quests `quests-harvest.py` splits out of 57 COLLECTION pages; their
+`url` is the parent's and they will never have a page of their own. They are
+**skeleton-only permanently**, and they do NOT inherit the parent's walkthrough
+— handing all seven Coldain ring steps the same seven-subsection prose is the
+loudest possible version of "never merge lines". Consequence 7 is therefore
+better than unchanged: this slice adds **zero** eqlwiki requests, now or later.
+
+**4. A `NormalQuest` guide must name its QUEST; classes and zones are required
+of the class-keyed types only.** A swap, not a relaxation. eqlwiki's `Classes`
+cell is free text — "All" on 318 pages, "?" on 87, blank on 40 — so copying it
+would be a second producer of a fact `QuestCatalog` owns (trap 4) and parsing
+it into a class list would be inference (trap 73). Both halves are prove-failed.
+This also left `GuideClassCoverageTests` correct untouched: harvested guides
+contribute no classes, so "a guided class" still means a Sky-guided one.
+
+**5. The merge filter reads the app's own quest catalog, in C#.**
+`QuestCatalog.LoadEmbedded` drops five index pages and replaces the Sky
+aggregates; the transformer reads the FILE and cannot know either. Copying
+`CatalogHygiene`'s list and `SkyTestSplit`'s rule into Python would be a second
+producer that drifts the week someone edits the C# (trap 4). So `Merge` takes
+the known quest names and the 32 it turns away are named in the test.
+
+**6. `retrievedAt` is the last COMPLETED refresh's date, one per file.** Not the
+clock (not reproducible), not git's per-file date (actively WRONG for a cache
+file the current run just refetched — git still reports the old commit). The
+refresh evicts and refetches every page edited in its window, so after a run
+finishes every cached page is current as of that run; reading `ranAt` lags one
+cycle, which understates our freshness rather than overstating it, and is
+byte-reproducible from committed files alone.
+
+**7. `<div class="facblock">` content is dropped — one rule beyond the plan's
+list.** 529 of the sections we read carry one, every line inside it is a
+bullet, and "Your faction standing with Clerics of Tunare has been adjusted by
+9" is an OUTCOME, not a step. Structural (a marked block, like a template),
+not a judgement about what a sentence means.
+
+**Also built, because the card names it:** the fifth and sixth router homes,
+`LedgerItem` (a Collect row follows the bags and **refuses** a manual tick) and
+`QuestCompletion` (the hand-in writes `SetCompleted`, the catch-up line, never
+the item-consuming `RecordCompletion` — two callers of a destructive write is
+trap 47). `GuideStores` carries what the decision reads so the one producer
+stays one producer rather than growing a seventh positional argument.
+
+Byte-reproducibility is enforced as a **CI step and a `check.ps1` stage**, not
+from xunit: spawning Python inside `dotnet test` would fail the suite on a
+machine without it, and a test that skips instead is the vacuous coverage the
+rest of the slice is written against. Prove-fail runs are in the PR body.
+
+Nothing player-visible ships here — nothing draws a harvested guide until N2 —
+so no `WhatsNew.json` entry. No tag, no `release.ps1`, no signing change, Play
+Console untouched. LIVE ASK for Helm's SIGN is in `HELM-FEEDBACK.md`.
+
+— Dranak (Claude Code, DRA-45)
