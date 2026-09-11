@@ -82,9 +82,29 @@ public static class EpicCompleteToggle
     ];
 
     /// <summary>What the control says, matching <see cref="SkyCompleteToggle.ButtonLabel"/>
-    /// so the two checklists offer one vocabulary.</summary>
+    /// so the two checklists offer one vocabulary.
+    ///
+    /// **"Epic complete" until the Founder smoke of 2026-09-11.** A green primary button
+    /// reading "Epic complete" is a STATUS, not an act: on a class band showing Bard 0/31
+    /// and Warrior 3/30 it read as a badge claiming the epic WAS complete, next to a
+    /// progress row saying it plainly was not. The label a control carries has to name
+    /// what the CLICK does, because the button's colour cannot — and the green here is
+    /// the primary-action green, which the not-yet state needs too. Sky's twin never had
+    /// the bug because "Mark turned in" was already a verb; this is the same grammar
+    /// (<see cref="LabelIsAnAct"/> now holds both to it).</summary>
     public static string ButtonLabel(bool completed) =>
-        completed ? "Reopen" : "Epic complete";
+        completed ? "Reopen" : "Mark as complete";
+
+    /// <summary>The rule the 2026-09-11 smoke bought, executable: a checklist's
+    /// not-yet-done master button says what the CLICK does. "Mark …" is an imperative a
+    /// player reads as an offer; "Epic complete" / "Turned in" is a state a player reads
+    /// as a verdict — and on a green button beside a 0/31 progress row, the wrong one of
+    /// those two wins. Applied to both checklists by
+    /// <c>EpicCompleteWritePathTests.NeitherMasterButtonNamesAStateItCannotBeIn</c>, which
+    /// is why this predicate lives here rather than in the test: the next checklist to
+    /// grow a master button gets the rule for free.</summary>
+    public static bool LabelIsAnAct(string label) =>
+        label.StartsWith("Mark ", StringComparison.Ordinal);
 
     /// <summary>The confirmation a view must ask before a bulk flip, or null when nothing
     /// would be overwritten — every row already ticked by hand means no dialog. The views

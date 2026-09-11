@@ -180,4 +180,45 @@ public class EpicCompleteWritePathTests
         // days and this one for three. They say the same word for the same act.
         Assert.Equal(SkyCompleteToggle.ButtonLabel(true), EpicCompleteToggle.ButtonLabel(true));
     }
+
+    /// <summary>Founder smoke, 2026-09-11: the Epic band's green primary button said
+    /// "Epic complete" over a progress row reading Bard 0/31 and Warrior 3/30, and it read
+    /// as a badge asserting the epic WAS complete. A master button's not-yet label must
+    /// name the ACT — the styling stays green-as-primary, and the real state stays on the
+    /// progress row, so the verb is the only thing carrying the difference.
+    ///
+    /// Prove-failed against the shipped label: restoring "Epic complete" fails
+    /// <c>NeitherMasterButtonNamesAStateItCannotBeIn</c> on the Epic row (and would fail on
+    /// Sky the day someone shortens "Mark turned in" to "Turned in").</summary>
+    [Theory]
+    [InlineData("Epic complete")]   // the label the smoke caught
+    [InlineData("Turned in")]       // the same mistake, Sky-shaped
+    [InlineData("Complete")]
+    [InlineData("Done")]
+    public void AStateWordIsNotAnAct(string statusShaped) =>
+        Assert.False(EpicCompleteToggle.LabelIsAnAct(statusShaped));
+
+    [Theory]
+    [InlineData("Mark as complete")]
+    [InlineData("Mark turned in")]
+    public void AnImperativeIsAnAct(string verbShaped) =>
+        Assert.True(EpicCompleteToggle.LabelIsAnAct(verbShaped));
+
+    [Fact]
+    public void NeitherMasterButtonNamesAStateItCannotBeIn()
+    {
+        // Both checklists, one rule — the next master button to appear inherits it rather
+        // than re-deciding it, which is the half "one vocabulary" above never asserted.
+        Assert.True(EpicCompleteToggle.LabelIsAnAct(EpicCompleteToggle.ButtonLabel(completed: false)));
+        Assert.True(EpicCompleteToggle.LabelIsAnAct(SkyCompleteToggle.ButtonLabel(completed: false)));
+    }
+
+    [Fact]
+    public void TheEpicMasterButtonSaysMarkAsComplete()
+    {
+        // The exact words, pinned: the shot predictions in scripts/shoot.ps1 and the
+        // What's-new "X is now Y" line both quote this string.
+        Assert.Equal("Mark as complete", EpicCompleteToggle.ButtonLabel(completed: false));
+        Assert.Equal("Reopen", EpicCompleteToggle.ButtonLabel(completed: true));
+    }
 }

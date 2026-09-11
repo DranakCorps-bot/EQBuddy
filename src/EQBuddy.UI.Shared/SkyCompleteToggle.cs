@@ -79,7 +79,9 @@ public static class SkyCompleteToggle
         settings.SkyQuestCompleted.Contains(rewardKey, StringComparer.OrdinalIgnoreCase);
 
     /// <summary>What the control says. A reward you hold every piece of invites the
-    /// turn-in; one you have turned in offers the way back.</summary>
+    /// turn-in; one you have turned in offers the way back. The not-yet half is an
+    /// IMPERATIVE and has to stay one — see <see cref="EpicCompleteToggle.LabelIsAnAct"/>
+    /// for what the status-shaped version of this cost on the Epic band.</summary>
     public static string ButtonLabel(bool completed) =>
         completed ? "Reopen" : "Mark turned in";
 }
