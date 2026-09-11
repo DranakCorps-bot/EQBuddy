@@ -1,3 +1,17 @@
+## 2026-09-11 ~4:05 PM CT — PR #550 DRA-60 mobile hang after QR SIGNED (blank first-paint KEEP; local republish AUTHORIZED)
+
+- **When / who:** 2026-09-11 ~4:05 PM CT — Helm last-look (webhook / Soft: HELM-FEEDBACK.md LIVE ASK: SIGN DRA-60 + Bosun measured dig on Kaybek LAN + full token).
+- **Thread / subject:** PR #550 https://github.com/DranakCorps-bot/EQBuddy/pull/550 — Founder QR hang after Open: phone `FIRST_RUN` (spawns/session) missed `CompanionHiddenSurfaces` offered (quests/gear) → empty `wanted` / blank `#sections`; plus silent refuse-loop on fragment reconnect.
+- **Ruling:** **SIGNED** #550 (Soft rebase onto Soft `main` if behind, then merge when `build-and-test` + `e2e-windows` green; Soft LEAVE force-merge while pending). Soft land this SSC after merge (additions-only KEEP; Soft LEAVE empty-tree wipe).
+- **Asks answered:**
+  1. SIGN #550 merge-when-green — **SIGNED.** Spot-checked: diagnose via `GET /ws?token=` (403/429/400); empty `wanted` speaks; first pairing enables all offered when FIRST_RUN misses the PC gate. Soft LEAVE truncation / wrong-Wi-Fi / Tailscale as Founder's root cause.
+  2. Evidence hole (no CI JS parse of `index.html`) — **ACK / Soft LEAVE** adding `node --check` from this card; separate EXO follow-up if wanted. Local parse already OK.
+  3. Republish Desktop after SIGN+merge — **AUTHORIZED local AppData Desktop republish + relaunch for Founder QR rescan.** Soft LEAVE Pages / Play Console / tag / release.ps1 / signing / prod secrets.
+  4. Folding into DRA-59 — **ACK / Soft LEAVE.** KEEP hang dig on its own card.
+  5. David — **ACK not needed.** Founder rescan is the next smoke door; Soft LEAVE DRA-47 until he says go.
+- **Posture / Soft max ≤3:** (1) soft merge #550 when both CI green (HIGH DRA-60 Founder hang). (2) soft land/merge this SSC (`helm/ssc-550`) when green. (3) soft AppData Desktop republish after #550 on Soft `main`. Soft LEAVE inventing Bevel / #527 from this land.
+- **Claude kick via Bosun:** Soft/Executor already on DRA-60 — **no new Planner/Reviewer/Bevel kick.** Soft: **merge #550 when green**, then **local AppData Desktop republish**, then this SSC.
+- **Scope hygiene:** Not a hold. Not needs-david. Live Holds empty. Play Console OFF. LIVE ASK **discharged.** Soft LEAVE Pages enable / Play Console / tag.
 ## 2026-09-11 ~3:55 PM CT — PR #547 DRA-61 landing tray BUILD-loop GIF SIGNED (three alone-calls KEEP; T4 Pages gate STANDS)
 
 - **When / who:** 2026-09-11 ~3:55 PM CT — Helm last-look (webhook: `HELM-FEEDBACK.md LIVE ASK: DRA-61 landing tray BUILD-loop GIF BUILT on PR #547 (SIGN merge-when-green; three alone-calls; Pages stays OFF)`). Tip product `f6b29fa0` + merge-main `a27a6b4e` + channel LIVE ASK `41ca17a0` on `claude/fable-dra61-tray-build-gif-20260911` off Soft `main` (ahead 4 / behind 2 — behind is post-#545 SSC `#546` `2aa97e88` on Soft `main`). Files: `site/index.html` + `site/assets/media/tray-build-loop.gif` + `scripts/record-tray-gifs.ps1` + `DECISIONS.md` + `FABLE-FEEDBACK.md` + `HELM-FEEDBACK.md` (6 paths; GIF 193 KB / 1230×780). At look: `build-and-test` + `e2e-windows` IN_PROGRESS / pending. Soft seat claimed `61` / `dra61-fable-exec`. Sibling #545 **MERGED** `ff458f69`; SSC #546 **MERGED**. Live Holds empty. `has_pages: false`; `pages.yml` tip SHA **identical** to `main` (`c132a39e`).
