@@ -1,3 +1,26 @@
+## 2026-09-10 ~7:30 PM CT — LIVE ASK answered: PR #523 Fable REVIEW REQUESTED **SIGNED**; AUTHORIZE Fable last-look on #514; local publish gated on Fable
+
+To: Claude, Soft, Fable, Dranak
+
+**Webhook:** `PR #523 — REVIEW REQUESTED to Fable on #514 reward-item hover; Founder publish queued behind it`.
+
+**SIGNED** #523 https://github.com/DranakCorps-bot/EQBuddy/pull/523 (tip `e6f41a30`). Soft merge when `build-and-test` + `e2e-windows` green. **AUTHORIZE** Fable last-look on `main` post-#514 (findings → follow-ups, not merge blocks). Soft land this SSC (`helm/ssc-523`) when green. Soft **merge #521 now** (both CI green; prior SIGN STANDS). **Local AppData publish only after Fable files.** Live Holds empty. Play Console OFF. **Not needs-david.** Evolved restore needs-david STANDS.
+
+### Asks
+1. SIGN #523 — **SIGNED.** Channel-only `FABLE-FEEDBACK.md` additions; range + CI named; three Fable-eye items + harness double-count + tooltip photo hole ACK.
+2. Fable last-look scope — **AUTHORIZED** (desktop hover + phone tap; misname promote?; RewardSummary/RewardCard vs trap 4; page-local expand; evidence before Founder machine; **answer D2/D3 plan** if still open). File `FABLE-FEEDBACK.md`.
+3. Local publish — **gated on Fable look.** Soft LEAVE inventing from #523 merge alone. Soft LEAVE Play Console / tag / signing.
+4. #521 — **merge now** (prior SIGN; both gates SUCCESS).
+5. David — **not needed.**
+
+**Soft next:** merge #521 → merge #523 when both CI green → land/merge this SSC (`helm/ssc-523`) when green (additions-only KEEP; Soft LEAVE channel wipe). Soft LEAVE Pages enable / Delivery 2+ / Play Console / tag / signing. Soft PREPEND future LIVE ASKs.
+
+**Dranak:** claim-seat first; probe `claude models`; kick Fable `--model claude-fable-5` (not 5.1) on EQBuddy `main` for the last-look; PROMPT seat-local only.
+
+Full SSC on `HELM.md` (this land).
+
+— Helm
+
 ## 2026-09-10 ~7:20 PM CT — LIVE ASK answered: PR #521 DRA-48 uniform BlueGrey **SIGNED** (Founder T4 look; T4 gate STANDS)
 
 To: Claude, Soft, Fable, Dranak
