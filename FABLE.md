@@ -1,3 +1,72 @@
+## 2026-09-11 ~4:55 PM CT — Fable: DRA-65 UNLOCKS GUIDED DETAIL + RACE/CLASS FILTER — the plan (Founder ask, parent line DRA-41 Guide/Epic). Executor kicks only after Helm SIGN.
+
+To: Helm
+
+**Seat:** `fable-dra65-unlocks`, plan only — no product code was written in this seat. Founder ask (Paperclip DRA-65): *each Unlock needs more guided detail; filter between race and class unlocks; more guided than now.* Founder soft-leaves honored throughout: no kill-X/loot-Y quest grammar forced onto unlocks (not the same shape), no gear recommender, no DRA-47 / Pages / Play Console / tag work. Executor is one or two Claude/Opus seats, kicked after Helm SIGNs this plan.
+
+### 0. What exists today (evidence, all verified in-tree this session)
+
+- **The Unlocks tab is honest but bare.** `Core/UnlockRequirements.cs` classifies each dump criterion (`MaxFaction` / `Obtain` / `Task` / `Derived` / `Bypass`); `Core/UnlockLayout.cs` resolves a `MaxFaction` row against the faction dump ("1,535 / 2,000 — 465 to go") and everything else against the achievement's own flag. A row says WHERE YOU STAND and never HOW TO MOVE — no door to the guides the app already has, no use of what the player's own log already proved.
+- **The race/class filter already exists on the desktop** — `UnlockLayout.Sections` (All / Races / Classes) behind `UnlockSectionCombo` (`QuestsView.xaml.cs:101,525`). The Founder asking for it anyway is a discoverability verdict on the combo, and a phone verdict (next line).
+- **The phone's Unlocks tab is shipping broken.** The wire sends the four-tab strip (`CompanionQuestsTests:111` pins `unlocks` in it), but `CompanionProjection.Quests.cs:31` builds no unlocks section and never passes `QuestSurface.UnlockCounts` (badge is always blank), and the page's `drawList()` (`index.html` ~2430) handles only `epic`/`sky` and falls through to `drawGeneral()` — **tapping Unlocks on a phone draws the General quest catalog.** Parity by shared module (David, 2026-08-18) says this is exactly the shape that must go through Core.
+- **The personal-guidance seam already exists end to end.** `LogParser.FactionRx` reads faction name + signed delta per event; `SessionStats` attributes each faction hit to the kill inside the reward window (per-creature `Factions` ledger, built for the #65 wiki pack); `MobHistory.Pool` folds those per-mob faction hits across every archived session in `history.db` plus the live one. **"Which mobs move this faction, from your own kills, all-time" is a pure query over data already on disk** — the chain (mob → camp) applied to faction, log-only, nobody else measured.
+- **Class-unlock `Obtain` rows name Sky rewards the app already guides.** Fixture-verified: "Obtain Skycleaver" etc. are the Sky checklist's reward groups (`QuestChecklistLayout.RewardKey(class, reward)`), which now carry the sixteen PoS guides (#485). The unlock row and the guide never point at each other.
+- **`Task` rows carry a quoted quest name** ("Complete the 'Aid the Kerrans of Kerra Isle' Task.") — and that name is NOT in the quest catalog today (verified against `quests.json`); it is a modern server Task, not a classic wiki quest. Any design must degrade to silence, not to a stub.
+- **A wiki DOOR is an existing idiom** — `WikiLinks.Creature` + `MainWindow.OpenWikiUrl` (DropsCardView), player-clicked, no machine fetch.
+
+### 1. Decisions (defaults chosen; David vetoes from DECISIONS.md, Helm signs here)
+
+- **D1 — Guidance is a cross-reference and an arithmetic, never a quest.** One new Core producer, `UnlockGuidance` (framework-free), resolves per-criterion guidance from stores that already exist. Each criterion kind gets its own shape (D2–D4); the kill-X/loot-Y objective grammar is refused per the Founder's soft-leave — an unlock is a grind or a pointer, not a checklist step. DRA-41's *idiom* carries over (every sentence has one producer and is drawn in exactly one place per surface; desktop long-form on hover, phone rides the row — trap 35); its *grammar* does not. Pair the classifier with a must-list (trap 34): a test enumerates `UnlockNeed` and fails on a member with no decided guidance shape.
+- **D2 — `MaxFaction` rows gain "from your own kills."** Invert the `MobHistory` pool for the criterion's faction: mobs the player's own kills moved it with, per-kill delta, and — for positive movers against an un-maxed standing — "≈N more kills at your observed rate" (`PointsToMax / delta`, ceiling, worded as an estimate). Negative movers are named as costs ("your kills of X cost 5 each"). At most 3 movers each way, and a surviving cap says so (trap 50). **A faction with no observed movers draws nothing new** — absence of evidence is silence, never a template sentence (trap 73).
+- **D3 — every faction criterion gets a wiki DOOR, not wiki content.** `WikiLinks.Faction(name)` → the faction's eqlwiki page, opened by the player. No new machine fetch, no harvested prose in this pass — so eqlwiki request policy (consequence 7) is untouched. Harvested "ways to raise" is PARKED with a reopen condition (§4).
+- **D4 — `Obtain` rows gain the Sky checklist's own piece count and a door.** Resolve `(unlock class, reward name)` against the same checklist store and `QuestChecklistLayout` call the Sky tab draws; when the reward group exists, the row adds "3 of 5 pieces in hand — the Plane of Sky tab has the guide" and a door that opens the Sky tab. **The tick stays the achievement's flag** — "obtained" (game's record) and "pieces in hand" (bag evidence) are different facts, worded as such; the count keeps its one producer and the unlock row writes nothing (trap 4). Reward absent from the checklist → row unchanged.
+- **D5 — `Task` rows: extract the quoted name, match the catalog, silence otherwise.** On an exact `QuestCatalog` name match, the row gains a door to the General tab with the quest opened/pinned (and thereby its guide, where one exists). Kerran's task matches nothing today and stays the dump's verbatim sentence — no invented door, no stub row.
+- **D6 — the desktop lens becomes the standard chip strip.** `EqSegmentedStrip` (All | Races | Classes), fed by `UnlockLayout.Sections` — same producer, `UnlockSectionCombo` retired (grep `scripts/` for staging that sets it; trap 53's neighbour). Session-scoped stays (a lens, not a setting — no DeadSetting exposure either way). No new filter axes: state filters and my-race narrowing were not asked for and are not built.
+- **D7 — the phone's Unlocks tab becomes real, by projection.** Desktop-side (the #210 rule): a new `CompanionChecklistSection`-shaped unlocks section built from the SAME `UnlockLayout.Groups` + `Note` + `UnlockGuidance` calls the desktop renders, non-tickable rows (an unlock is the game's answer), section chips from `UnlockLayout.Sections`, both command prompts through the `CommandPrompts` shape (the page never spells a command), and the tab badge wired (`QuestSurface.UnlockCounts` into the third arg at `CompanionProjection.Quests.cs:31`). The section enters the quests fingerprint (traps 8, 72). Page work follows trap 32 (footer version; `CompanionPageUpdateTests`); an old page against a new PC still falls through to General, which is the pre-existing state, and the new page draws an empty state against an old PC.
+- **D8 — recompute on input change, never on tick.** The tab becomes a reader of `history.db` pools and the Sky checklist. The pool inversion is cached, keyed on (faction-dump stamp, latest checkpoint row id, checklist store stamp); the tab's redraw signature folds every store it now reads — trap 72 is the exact bug this invites, and the Executor reads that entry before wiring refresh.
+- **D9 — Founder soft-leaves are scope law for the Executor too.** No gear recommender (GuideAttachment stays empty; `NoShippedGuideCarriesAnAttachmentYet` stands). No release, no tag, no Pages/Play Console work from these seats. No Bevel commission is invented; if the chip strip or row density needs product critique, that is a BEVEL.md stub, not a blocking gate.
+
+### 2. Delivery 1 — desktop guided detail + the visible lens (Executor seat `dra65-d1`)
+
+1. `Core/UnlockGuidance.cs` — the resolver: input `(UnlockCriterion, UnlockProgress, FactionsFile.Snapshot?, pooled mob list, sky checklist items + completed, QuestCatalog)`, output a small record per row: mover lines (capped, signed), estimate line, piece-count line, and a door descriptor (`WikiFaction` / `SkyTab` / `GeneralTabQuest`) the surfaces render as link/button. All words in Core/UI.Shared, one place each.
+2. `WikiLinks.Faction` beside `WikiLinks.Creature`.
+3. `QuestsView.RenderUnlocks` draws the new lines under their rows (two-column Grid rows as now; doors via the existing inline-icon/button idioms — traps 14, 16); combo → `EqSegmentedStrip`.
+4. Tests: resolver unit tests over the hateborne/averaj fixtures with a seeded pool (mover, no-mover, negative mover, capped list, inherited unlock — movers still shown, tick logic untouched); the trap-34 must-list over `UnlockNeed`; prove-fail each new guard before green.
+5. Staging: extend `shoot.ps1`'s existing unlocks staging (~line 2007) so a faction dump + seeded history + checklist make the guided lines photograph with PREDICTED numbers (traps 22, 23); new shot name checked against `docs/screenshots/` first (trap 21); run the batch, Solarized once.
+
+### 3. Delivery 2 — the phone's Unlocks tab (Executor seat `dra65-d2`, after D1 lands)
+
+1. Wire: unlocks section + badge per D7; inputs ride `CompanionQuestRequest`/host the way the Sky leftovers join does.
+2. Page: an `unlocks` branch in `drawList()` rendering through the existing generic `checklistBody` (non-tickable groups already draw), plus the section chips; guidance lines ride the rows (trap 35 — no hover on a phone).
+3. Parity: extend `SurfaceParityTests` to assert the projection against the same `UnlockLayout.Groups` call the windows make; `CompanionQuestsTests` badge assertion; mobile-harness snapshot + screenshot proving the tab no longer draws the catalog.
+
+### 4. PARKED — harvested "ways to raise" per faction
+
+The wiki's faction pages and the cached `All_Positive_Faction_Quests` / `Faction_Quests` pages could feed a harvested, separate-file, wiki-marked "turn-ins that raise this faction" block. **Not in this pass:** it is a new harvest shape carrying trap 73 (template/fabrication) and trap 74 (reproducibility gate) obligations, plus adding per-faction pages to the weekly fetch list — adjacent to consequence 7 even if within the existing cadence. **Reopen condition:** the Founder (or a reporter thread) asks for named turn-in guidance beyond the doors + own-kill movers this plan ships. It then gets its own plan section and its own SIGN.
+
+### 5. Acceptance
+
+- **A1** High Elf / "Keepers of the Art" (fixture): standing arithmetic + wiki door; with a seeded pool naming a mover, the mover + estimate lines; without, nothing new. Negative standing keeps the existing "-950 is 2,950 away" honesty beside the estimate.
+- **A2** The `UnlockNeed` must-list test exists and was proven to fail on an unclassified member.
+- **A3** Obtain row with the reward on the checklist: piece count + door, tick unchanged; reward absent: row byte-identical to today.
+- **A4** Kerran's Task row renders the dump's sentence verbatim, no door; a synthetic catalog-matched task gets the General-tab door.
+- **A5** Desktop lens is `EqSegmentedStrip` offering exactly `UnlockLayout.Sections`; the combo is gone and no second producer of the list exists.
+- **A6** Phone: Unlocks tab draws races + classes groups with notes and guidance; badge equals `QuestSurface.UnlockCounts`; tapping Unlocks never draws the General catalog; parity test pins projection == `UnlockLayout.Groups`.
+- **A7** Shot(s) staged and captured via the batch with predicted numbers; illustration lock satisfied in the same change.
+- **A8** E2E asserts EXPAND-dump facts (e.g. `questsUnlockSection`, a guided-line count), never the screen.
+- **A9** `WhatsNew.json` entry (Founder ask credited, DRA-65) rides whichever release ships it; these seats cut no release.
+- **A10** UI.Shared stays framework-free (existing test); every new sentence has one producer.
+
+### 6. Verification class and traps
+
+V2 per delivery: affected suites + `scripts/check.ps1`; `build-and-test` + `e2e-windows` stay the merge bar; `dotnet build EQBuddy.slnx -c Release` before any E2E (trap 64). Read before executing: traps 4, 8, 14, 16, 21–23, 32, 34, 35, 44, 50, 53, 56, 61, 62, 64, 67, 72, 73.
+
+### 7. needs-david: none
+
+Both tests run and fail. The wiki door is a player-clicked link in an existing idiom (no policy change toward eqlwiki); the movers are the player's own kills from their own log (values line untouched — nothing measures another player); direction is the DRA-41 parent line the Founder named. Defaults logged in `DECISIONS.md` for veto.
+
+---
+
 ## 2026-09-10 ~12:40 PM CT — Fable: EVOLVED LANDING PAGE on GitHub Pages — the plan (DRA-48, Founder ask 2026-09-10). Executor kicks only after Helm SIGN.
 
 To: Helm

@@ -39,7 +39,30 @@ param(
     # JavaScript run once the snapshot has been rendered — how a shot is posed (zoom in,
     # centre on the player, tap a spawn point to raise the action bar). It drives the
     # page's own controls, so what it produces is what a thumb would produce.
-    [string] $After
+    [string] $After,
+    # DRA-60: drive the page's FAILED-CONNECT path — the one a player hits when the QR
+    # arrives truncated, when the PC has issued a new code, or when EQBuddy is not
+    # running. The socket stub CLOSES without ever opening, which is all a browser can
+    # see of any of them (onclose 1006, no readable status), and the page's own
+    # `GET /ws?token=…` probe is answered with the status this names:
+    #
+    #   403         — the PC is there and refused the CODE. The page must STOP dialling
+    #                 and show the pairing explainer with the reason on it.
+    #   429         — this device burned CompanionServer's auth budget. Keep trying, and
+    #                 say which of the two it is.
+    #   400         — the code is RIGHT and only the upgrade was missing (a proxy eating
+    #                 the Upgrade header). Keep trying.
+    #   unreachable — the fetch itself is rejected: EQBuddy is not answering at all.
+    #
+    # There is no JS runner in tests/EQBuddy.Tests, so CompanionPairingFailureTests reads
+    # the shipped source and this is the half that RUNS it. Drive it headless:
+    #
+    #   msedge --headless=new --virtual-time-budget=40000 --dump-dom <harness.html>#somecode
+    #
+    # The fragment matters: the harness hard-codes `token`, but `tokenFromMemory` is still
+    # computed from location.hash, and it is what picks which sentence the player reads.
+    [ValidateSet('403', '429', '400', 'unreachable')]
+    [string] $Refuse
 )
 
 $ErrorActionPreference = 'Stop'
@@ -55,6 +78,54 @@ if (-not $html.Contains($tokenLine)) {
     throw "The page's token line has moved — update scripts/mobile-harness.ps1 to match."
 }
 $html = $html.Replace($tokenLine, 'const token = "harness";')
+
+if ($Refuse) {
+    $answer = if ($Refuse -eq 'unreachable') {
+        'Promise.reject(new TypeError("harness: EQBuddy is not answering"))'
+    } else {
+        # None of 403 / 429 / 400 is ok — the page reads `status`, and a stub that
+        # reported ok:true for an error status would be lying in the one field a
+        # future reader is most likely to trust.
+        "Promise.resolve({ status: $Refuse, ok: false })"
+    }
+    $stub = @"
+<script>
+// Harness only (-Refuse $Refuse): a PC this device cannot connect to. The socket CLOSES
+// without ever opening — all a browser sees of a refused, rate-limited or unanswered
+// upgrade alike — and the page's own GET /ws?token=… probe answers $Refuse.
+//
+// __CLOSES and __PROBES make "it gave up" and "it is still dialling" readable FACTS
+// rather than a judgement about a screenshot: a page that stopped stops counting.
+window.__SOCK = null;
+window.__SENT = [];
+window.__CLOSES = 0;
+window.__PROBES = [];
+window.WebSocket = class {
+  constructor(url) {
+    this.readyState = 3;
+    window.__SOCK = this;
+    setTimeout(() => { window.__CLOSES++; this.onclose && this.onclose({ code: 1006 }); }, 0);
+  }
+  send() {}
+  close() {}
+};
+window.fetch = url => { window.__PROBES.push(String(url)); return $answer; };
+// Read after the run: the page's own account of what it did.
+window.__STATE = () => ({
+  closes: window.__CLOSES,
+  probes: window.__PROBES.length,
+  probedUrl: window.__PROBES[0] || null,
+  banner: document.getElementById("banner").textContent,
+  bannerShown: document.getElementById("banner").classList.contains("show"),
+  pairShown: document.getElementById("pair").classList.contains("show"),
+  pairWhy: (document.getElementById("pairWhy") || {}).textContent || null,
+  appHidden: document.getElementById("app").style.display === "none",
+});
+</script>
+<script>
+"@
+}
+else {
 
 $stub = @'
 <script>
@@ -85,10 +156,28 @@ window.__PUSH = m => {
 <script>
 '@
 
+}
+
 $patched = [regex]::Replace($html, '<script>(\r?\n)"use strict";',
     { param($m) $stub + $m.Groups[1].Value + '"use strict";' }, 1)
 if ($patched -eq $html) {
     throw "The page's main <script> opener has moved — update scripts/mobile-harness.ps1 to match."
+}
+
+if ($Refuse) {
+    # The verdict has to be IN THE DOM, because `--dump-dom` is the whole readout of a
+    # headless run: a value left on `window` is invisible to it. Written late enough for
+    # the page's 1 s banner tick to have had several goes at overwriting whatever the
+    # close handler wrote — which is exactly the shape that hid this bug once already.
+    $verdict = @'
+<div id="harnessState" style="display:none"></div>
+<script>
+setTimeout(() => {
+  document.getElementById("harnessState").textContent = JSON.stringify(window.__STATE(), null, 1);
+}, 20000);
+</script>
+'@
+    $patched = $patched -replace '</body>', ($verdict + "`n</body>")
 }
 
 if ($Snapshot) {
