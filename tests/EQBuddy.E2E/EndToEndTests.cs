@@ -1297,6 +1297,137 @@ public sealed class EndToEndTests
     }
 
     /// <summary>
+    /// **The Unlocks tab's guided detail, on the real app** (DRA-65 acceptance A8).
+    ///
+    /// Everything about this claim is structural, and the WPF layer has no unit test project
+    /// (docs/TestPlan.md §5): <c>UnlockGuidanceTests</c> proves what the resolver SAYS, and
+    /// only a launched app can say the sentences and the doors reached the screen. Nothing here
+    /// asserts a pixel — the dump counts tagged elements off the real visual tree.
+    ///
+    /// **The prediction, from the staging and written before the run.** The dump names a High
+    /// Elf race unlock with two faction criteria (its Bypass line is not work and is not a
+    /// row) and a Warrior class unlock with one Obtain:
+    /// <list type="bullet">
+    /// <item>3 rows — two faction, one Obtain.</item>
+    /// <item>3 doors — a wiki door on each faction row (unconditional; it does not depend on
+    /// having farmed anything) and a Plane of Sky door on the Obtain, because Azure Ruby Ring
+    /// is a real Warrior reward on the shipped checklist.</item>
+    /// <item>1 guided sentence — the Obtain row's piece count. Neither faction has an observed
+    /// mover yet, and a faction nobody has farmed draws NOTHING (trap 73: absence of evidence
+    /// is silence, never a template).</item>
+    /// <item>3 section chips, All selected — the lens the Founder asked to see, and the only
+    /// thing that can say the retired ComboBox is not what is on screen (trap 29).</item>
+    /// </list>
+    /// </summary>
+    [Fact]
+    public void TheUnlocksTabDrawsItsLensAndItsGuidedDetail()
+    {
+        using var app = new AppHarness(
+            environment: new Dictionary<string, string> { ["EQBUDDY_QUESTS"] = "unlocks" });
+        app.WriteAchievementsDump(
+            "Untapped Potential: Races",
+            "I\tRace Unlock - High Elf",
+            "I\t\tGet maximum faction with Clerics of Tunare.",
+            "I\t\tGet maximum faction with Keepers of the Art.",
+            "I\t\tThis achievement can be bypassed using a Race Unlock Token.",
+            "Untapped Potential: Classes",
+            "I\tClass Unlock - Warrior",
+            "I\t\tObtain Azure Ruby Ring.");
+        // One maxed, one a thousand short. Both are in the dump, so both rows show real
+        // arithmetic rather than the "run the faction command" state.
+        app.WriteFactionDump((275, "Keepers of the Art", 1000, 1000), (76, "Clerics of Tunare", 2000, 0));
+        app.Launch();
+
+        // The render that HELD the faction dump, not merely the first one with rows: both
+        // dumps are found lazily off disk, and a read taken between them describes a real
+        // state that is not the one staged (trap 56).
+        Wait.Until(() => app.DumpValue("questsUnlockDrewFactions") == 1, TimeSpan.FromSeconds(45),
+            "the Unlocks tab to render with both dumps in hand", app.Artifacts);
+
+        Assert.Equal(3, app.DumpValue("questsUnlockRows"));
+        Assert.Equal(3, app.DumpValue("questsUnlockDoors"));
+        Assert.Equal(1, app.DumpValue("questsUnlockGuided"));
+        Assert.Equal(3, app.DumpValue("questsUnlockSections"));
+        Assert.Equal("All", app.DumpText("questsUnlockSection"));
+    }
+
+    /// <summary>
+    /// **A kill that moves the faction changes what the tab says, while the tab is open.**
+    ///
+    /// This is trap 72 asserted rather than hoped for. The guided lines are built from the
+    /// pooled per-creature faction hits, and NOTHING else in this surface's repaint signature
+    /// knew that store existed — so the box could be ticked, the pool could be right, and the
+    /// tab would keep drawing the moment before for the whole session. It timed out before the
+    /// signature carried the pool's version.
+    ///
+    /// **Prediction:** one row's guidance goes from nothing to two sentences — the mover and
+    /// the estimate — so the tab's guided count goes 1 → 3. At +5 a kill against the staged
+    /// 1,000 to go the estimate is 200 kills, which is asserted in
+    /// <c>UnlockGuidanceTests</c> arithmetic rather than read off a screen here.
+    ///
+    /// <para>The wait is on the SCREEN's own count and not on a sleep: <c>AppendLogLines</c>
+    /// returns when the tail has read the bytes, not when the app has acted (trap 62), and the
+    /// window's own refresh is throttled to two seconds.</para>
+    /// </summary>
+    [Fact]
+    public void AKillThatMovesAFactionAddsItsMoverToTheOpenUnlocksTab()
+    {
+        using var app = new AppHarness(
+            environment: new Dictionary<string, string> { ["EQBUDDY_QUESTS"] = "unlocks" });
+        app.WriteAchievementsDump(
+            "Untapped Potential: Races",
+            "I\tRace Unlock - High Elf",
+            "I\t\tGet maximum faction with Keepers of the Art.",
+            "I\t\tThis achievement can be bypassed using a Race Unlock Token.");
+        app.WriteFactionDump((275, "Keepers of the Art", 1000, 1000));
+        app.Launch();
+
+        // **THE PRECONDITION IS THE WHOLE TEST.** Both dumps are found lazily off disk, so
+        // waiting only for rows leaves `fac:` still to land in the repaint signature — and a
+        // redraw caused by THAT would show the mover too, which makes the assertion below pass
+        // for a reason it is not about. Measured, not theorised: with the pool deliberately
+        // removed from the signature this test still passed, until the wait moved here.
+        // questsUnlockDrewFactions is the render's own answer, so once it is 1 every other
+        // input this surface reads is already on screen and the pool is the only one left.
+        Wait.Until(() => app.DumpValue("questsUnlockDrewFactions") == 1, TimeSpan.FromSeconds(45),
+            "the Unlocks tab to render WITH the faction dump in hand", app.Artifacts);
+        // The floor: one row, one door, and no guided sentence — nothing has been farmed.
+        // ...and then until nothing else is going to redraw it. Longer than the window's own
+        // two-second refresh throttle, or "still" only means "between two ticks".
+        app.WaitUntilStill("questsRenders", TimeSpan.FromSeconds(3),
+            "the Unlocks tab to stop redrawing on its own before the append");
+        var before = app.DumpValues("questsUnlockRows", "questsUnlockGuided", "questsUnlockPool",
+            "questsRenders");
+        Assert.Equal(1, before[0]);
+        Assert.Equal(0, before[1]);
+
+        // A kill and the faction line that follows it, inside the reward window the
+        // attribution uses — which is what makes this creature a MOVER rather than two
+        // unrelated log lines.
+        app.AppendLogLines(
+            "You have slain a Felwithe guard!",
+            "Your faction standing with Keepers of the Art has been adjusted by 5.");
+
+        Wait.Until(() => app.DumpValue("questsUnlockGuided") == 2, TimeSpan.FromSeconds(30),
+            "the open Unlocks tab to redraw with the mover and its estimate", app.Artifacts);
+        // One read, so the three facts are one moment (trap 56). The row itself did not
+        // multiply — the guidance rides UNDER the row it belongs to — and the POOL's own
+        // version moved, which is the store's answer beside the screen's.
+        var after = app.DumpValues("questsUnlockRows", "questsUnlockDoors", "questsUnlockPool",
+            "questsRenders");
+        Assert.Equal(1, after[0]);
+        Assert.Equal(1, after[1]);
+        Assert.True(after[2] > before[2],
+            $"the pool should have re-folded (was {before[2]}, now {after[2]}); dump was: "
+            + app.Artifacts());
+        // The panel really was rebuilt, and the append is the only thing that could have done
+        // it — everything else had stopped moving before the line went in.
+        Assert.True(after[3] > before[3],
+            $"the panel should have rebuilt (renders were {before[3]}, now {after[3]}); dump was: "
+            + app.Artifacts());
+    }
+
+    /// <summary>
     /// Alt+Tab exclusion is off by default, and the window agrees with the setting.
     ///
     /// Both halves are reported because they are different claims: `altTabWanted` is what

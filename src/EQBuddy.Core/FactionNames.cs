@@ -71,6 +71,36 @@ public static class FactionNames
         return factions.Standings.FirstOrDefault(s => Squash(s.Name) == key);
     }
 
+    /// <summary>
+    /// Do two faction names from DIFFERENT sources mean the same faction?
+    ///
+    /// <para><see cref="Resolve"/> answers that against the faction DUMP, which is the only
+    /// question that existed while the dump was the only other source. A third spelling
+    /// arrived with DRA-65: the LOG's, carried on every
+    /// <c>Your faction standing with X has been adjusted by N</c> line and folded into the
+    /// per-creature pool. Matching it needed the same three passes — exact, the curated
+    /// alias, then the squash — so the rule lives here once rather than being copied into
+    /// <see cref="UnlockGuidance"/> as a fourth comparison that could drift from the aliases
+    /// beside it.</para>
+    ///
+    /// <para>The alias is tried in BOTH directions, because neither side of this comparison
+    /// is known to be the achievements text: the pool's name may be the alias key or its
+    /// value depending on which file the caller is holding.</para>
+    /// </summary>
+    public static bool Same(string? a, string? b)
+    {
+        if (string.IsNullOrWhiteSpace(a) || string.IsNullOrWhiteSpace(b)) return false;
+        var left = a.Trim();
+        var right = b.Trim();
+        if (left.Equals(right, StringComparison.OrdinalIgnoreCase)) return true;
+        if (Aliases.TryGetValue(left, out var aliasLeft)
+            && aliasLeft.Equals(right, StringComparison.OrdinalIgnoreCase)) return true;
+        if (Aliases.TryGetValue(right, out var aliasRight)
+            && aliasRight.Equals(left, StringComparison.OrdinalIgnoreCase)) return true;
+        var key = Squash(left);
+        return key.Length > 0 && key == Squash(right);
+    }
+
     private static string Squash(string s) =>
         new([.. s.Where(char.IsLetterOrDigit).Select(char.ToLowerInvariant)]);
 }

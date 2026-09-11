@@ -37,6 +37,14 @@ public static class UnlockLayout
 
     /// <summary>
     /// Groups for one section.
+    ///
+    /// <para><b>One group per unlock, and one row per <see cref="UnlockProgress.Actionable"/>
+    /// entry, IN ORDER.</b> That is a contract and not an implementation detail: it is how a
+    /// surface pairs a drawn row with the criterion behind it — the Unlocks tab's guided
+    /// detail (DRA-65) needs the criterion to resolve <see cref="UnlockGuidance"/>, and the
+    /// only other way to recover it is splitting <see cref="QuestChecklistRow.Id"/> back
+    /// apart, which reads one fact out of a string that contains the separator it would split
+    /// on (trap 4). Pinned by <c>UnlockSectionLensTests</c>.</para>
     /// </summary>
     /// <param name="factions">The faction dump, or null when the player has not run
     /// `/outputfile faction`. Null is a real state and a different one from "nothing is

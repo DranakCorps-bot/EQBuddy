@@ -216,6 +216,36 @@ internal sealed class AppHarness : IDisposable
             Path.Combine(GameDir, $"{Character}_{Server}-Inventory.txt"), lines.ToString());
     }
 
+    /// <summary>An `/outputfile achievements` dump where the game writes it, lines given
+    /// verbatim in the dump's own tab-separated shape
+    /// (<c>C\tRace Unlock - High Elf</c> / <c>I\t\tGet maximum faction with X.</c>) so it goes
+    /// through the real <c>AchievementsImport.Parse</c>. Trap 23: a fixture-shaped substitute
+    /// renders a state that is real and not the one the assertion is about.
+    ///
+    /// Call BEFORE <see cref="Launch"/>.</summary>
+    public void WriteAchievementsDump(params string[] lines) =>
+        File.WriteAllText(Path.Combine(GameDir, $"{Character}_{Server}-Achievements.txt"),
+            string.Concat(lines.Select(l => l + "\r\n")));
+
+    /// <summary>An `/outputfile faction` dump where the game writes it, in the game's own
+    /// shape: a header row then tab-separated <c>ID Name StandingValue PointsToMax</c>.
+    ///
+    /// <para>The filename carries a CLASS CODE in the middle —
+    /// <c>Testchar_test-WAR-Factions.txt</c> — because the real one does
+    /// (<c>Hateborne_neriak-ENC-Factions.txt</c>) and the finder matches on the suffix rather
+    /// than counting segments. Staging the simpler name would have exercised a shape the game
+    /// never writes.</para>
+    ///
+    /// Call BEFORE <see cref="Launch"/>.</summary>
+    public void WriteFactionDump(params (int Id, string Name, int Value, int ToMax)[] rows)
+    {
+        var text = new StringBuilder("ID\tName\tStandingValue\tPointsToMax\r\n");
+        foreach (var (id, name, value, toMax) in rows)
+            text.Append(CultureInfo.InvariantCulture, $"{id}\t{name}\t{value}\t{toMax}\r\n");
+        File.WriteAllText(
+            Path.Combine(GameDir, $"{Character}_{Server}-WAR-Factions.txt"), text.ToString());
+    }
+
     /// <summary>The Quest Tracker's own class PICKS, which live in quest-ledger.json and
     /// not in settings.json — so a scenario that needs a character to hold more (or fewer)
     /// classes than the fixture log infers has to seed them here. Key is the ledger's own
@@ -746,6 +776,41 @@ internal sealed class AppHarness : IDisposable
     public void WaitForDumpAtLeast(string key, int minimum, string reason) =>
         Until(() => DumpValue(key) >= minimum, AssertTimeout,
             $"{reason} (debug.txt {key} to reach at least {minimum}; last seen {DumpValue(key)})");
+
+    /// <summary>
+    /// Wait until a counter HOLDS STILL for <paramref name="quiet"/> — the narrow stillness
+    /// question, and the only one this harness asks.
+    ///
+    /// <para><b>Not a substitute for <c>WaitForReplayToSettle</c>, which is the opposite
+    /// lesson.</b> "Is the log fully read" is something the app answers outright
+    /// (<c>ingestDone</c>), and inferring it from stillness was wrong for four rounds. This
+    /// answers a different question the app cannot be asked directly: <i>is anything else
+    /// about to redraw this surface.</i> A test that appends a line and watches a count climb
+    /// cannot otherwise tell its own effect from a repaint that was already coming — the
+    /// DRA-65 mover assertion passed with the wiring under test deliberately removed, purely
+    /// because it appended while the surface was still settling after launch.</para>
+    ///
+    /// <para><paramref name="quiet"/> must exceed the surface's own refresh throttle, or
+    /// "still" only means "between two ticks". The Quest Tracker's is two seconds.</para>
+    /// </summary>
+    public void WaitUntilStill(string key, TimeSpan quiet, string reason)
+    {
+        var last = int.MinValue;
+        var since = DateTime.UtcNow;
+        Until(() =>
+        {
+            var now = DumpValue(key);
+            if (now != last)
+            {
+                last = now;
+                since = DateTime.UtcNow;
+                return false;
+            }
+            return DateTime.UtcNow - since >= quiet;
+        }, AssertTimeout,
+            $"{reason} (debug.txt {key} to hold still for {quiet.TotalSeconds:0.#}s; "
+            + $"last seen {DumpValue(key)})");
+    }
 
     public void WaitForDump(string key, int expected, string reason) =>
         Until(() => DumpValue(key) == expected, AssertTimeout,

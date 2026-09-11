@@ -40,4 +40,26 @@ public static class WikiLinks
     /// has already been followed by the time it exists (trap 3).</summary>
     public static string Creature(MobLookupResult? lookup, string name) =>
         lookup?.Mob?.WikiUrl is { Length: > 0 } url ? url : Search(name);
+
+    /// <summary>
+    /// A FACTION's page — the door under every "Get maximum faction with X" row on the
+    /// Unlocks tab (DRA-65). Player-clicked, like the creature one: EQBuddy asks eqlwiki for
+    /// nothing here, so the request policy toward the wiki is untouched.
+    ///
+    /// <para><b>The SEARCH endpoint rather than a built page title, and that is not the
+    /// item rule arriving by accident.</b> MediaWiki's search jumps straight to an exact
+    /// title match and shows results otherwise, so a name the wiki spells our way lands on
+    /// the page and a name it does not lands on candidates instead of a 404. That matters
+    /// here specifically: the achievements text and the faction dump disagree about four of
+    /// these names (<see cref="FactionNames"/>) and nobody has checked which spelling the
+    /// wiki chose. A guessed URL would be confidently wrong on the four we know about and
+    /// silently wrong on any we do not.</para>
+    ///
+    /// <para>It does NOT go through <see cref="Search"/>, whose normalisation is
+    /// item-shaped — it strips a trailing " +N" tier suffix, which is meaningless on a
+    /// faction and would quietly edit a name the player is reading on the row above.</para>
+    /// </summary>
+    public static string Faction(string factionName) =>
+        "https://eqlwiki.com/index.php?search="
+        + Uri.EscapeDataString((factionName ?? "").Trim());
 }

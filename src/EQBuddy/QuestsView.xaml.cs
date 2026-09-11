@@ -86,6 +86,7 @@ public partial class QuestsView : UserControl
         _tabs = new EqSegmentedStrip(TabStrip);
         _classes = new EqSegmentedStrip(ClassStrip);
         _modes = new EqSegmentedStrip(ModeStrip);
+        _unlockPool = new WikiPackPool(main.StoredMobRows);
         BuildStaticChrome();
         EpicClassicOnlyCheck.IsChecked = _settings.EpicQuestClassicOnly;
         SkyIslandRepeatCheck.IsChecked = _settings.SkyStepsUnderEveryIsland;
@@ -98,8 +99,7 @@ public partial class QuestsView : UserControl
         // offering three different vocabularies for one lens.
         foreach (var s in QuestChecklistLayout.States) StateCombo.Items.Add(s);
         StateCombo.SelectedIndex = 0;
-        foreach (var s in UnlockLayout.Sections) UnlockSectionCombo.Items.Add(s);
-        UnlockSectionCombo.SelectedIndex = 0;
+        BuildUnlockSectionStrip();
         BuildModeStrip();
         // Ctrl+Z, because the undo button promises it and a promise in a tooltip is a
         // feature. Not while typing in the search box — there it means undo the text.
@@ -295,6 +295,7 @@ public partial class QuestsView : UserControl
     private EqSegmentedStrip _tabs = null!;
     private EqSegmentedStrip _classes = null!;
     private EqSegmentedStrip _modes = null!;
+    private EqSegmentedStrip _unlockSections = null!;
 
     /// <summary>Build the strip from Core's <see cref="QuestSurface"/> so the desktop and
     /// EQBuddy Mobile cannot disagree about which tabs exist, their order or their
@@ -416,7 +417,7 @@ public partial class QuestsView : UserControl
         // cut hid ClassBtn in an `if` that a later unconditional assignment overwrote,
         // which only a screenshot could catch.
         var unlocks = _tab == QuestTab.Unlocks;
-        UnlockSectionCombo.Visibility = unlocks ? Visibility.Visible : Visibility.Collapsed;
+        UnlockSectionStrip.Visibility = unlocks ? Visibility.Visible : Visibility.Collapsed;
         StateCombo.Visibility = unlocks ? Visibility.Collapsed : Visibility.Visible;
         ClassBtn.Visibility = unlocks ? Visibility.Collapsed : Visibility.Visible;
         // "scan bags" copies /outputfile inventory, which is not what this tab reads.
@@ -520,15 +521,68 @@ public partial class QuestsView : UserControl
         if (_tab == QuestTab.Unlocks) Refresh(force: true);
     }
 
+    /// <summary>
+    /// The pooled per-creature observations the Unlocks tab's faction movers read (DRA-65) —
+    /// the SAME <c>MobHistory.Pool</c> the wiki packs use, through the same memo, so there is
+    /// one pooler in the repo and not a second one written for this tab.
+    ///
+    /// <para><b>Never on a tick.</b> <c>WikiPackPool.Refresh</c> re-folds only when the live
+    /// session's mob set actually moves, and this is asked only while the Unlocks tab is the
+    /// one being drawn — an idle tab costs nothing, and a tab on another surface costs not
+    /// even that.</para>
+    /// </summary>
+    private readonly WikiPackPool _unlockPool;
+
+    /// <summary>Bumped whenever the pool actually re-folded, so the repaint gate has a short
+    /// value that MOVES when the movers do. Trap 72 is the exact bug a new reader invites:
+    /// the guidance lines come out of this pool and nothing else in the signature knows it
+    /// exists, so a kill that changed what the tab should say would have redrawn nothing.</summary>
+    private int _unlockPoolVersion;
+
+    private void RefreshUnlockPool()
+    {
+        var (character, server) = _main.Identity;
+        if (_unlockPool.Refresh(_main.CurrentSnapshot(), character, server, _main.ActiveSessionRowId))
+            _unlockPoolVersion++;
+    }
+
     /// <summary>Which section of the Unlocks tab is in view. Session-scoped, like the
     /// class lens and the search box: a sticky filter reads as a broken tracker tomorrow.</summary>
     private string _unlockSection = UnlockLayout.SectionAll;
 
-    private void OnUnlockSectionChanged(object sender, SelectionChangedEventArgs e)
+    /// <summary>
+    /// All · Races · Classes, from <see cref="UnlockLayout.Sections"/> — the same producer the
+    /// ComboBox read and the same one <see cref="UnlockLayout.InSection"/> filters on, so this
+    /// strip cannot offer a section the tab does not render.
+    ///
+    /// <para>The fourth instance of the one primitive (<c>EqChip</c> / <c>EqSegmentedStrip</c>)
+    /// on this surface, beside the tabs, the class lens and the mode strip. DRA-65's Founder
+    /// ask names a filter that already existed behind a collapsed dropdown; making it the same
+    /// shape as its three neighbours is the whole change, and there is still exactly one list
+    /// of section names in the repo (<c>UnlockSectionLensTests</c> asserts that).</para>
+    /// </summary>
+    private void BuildUnlockSectionStrip()
     {
-        if (UnlockSectionCombo.SelectedItem is string s) _unlockSection = s;
-        Refresh(force: true);
+        _unlockSections = new EqSegmentedStrip(UnlockSectionStrip);
+        foreach (var name in UnlockLayout.Sections)
+        {
+            var section = name;
+            _unlockSections.Add(name, name, tip: UnlockSectionTip(section), onClick: () =>
+            {
+                _unlockSection = section;
+                _unlockSections.Select(section);
+                Refresh(force: true);
+            });
+        }
+        _unlockSections.Select(_unlockSection);
     }
+
+    private static string UnlockSectionTip(string section) => section switch
+    {
+        UnlockLayout.RacesHeading => "Only the race unlocks — faction work, read from your faction dump",
+        UnlockLayout.ClassesHeading => "Only the class unlocks — Plane of Sky rewards and tasks",
+        _ => "Every unlock, races and classes together",
+    };
 
     // ---- multiclass filter (Legends: up to three active classes; David 2026-08-07) ----
 
@@ -722,6 +776,11 @@ public partial class QuestsView : UserControl
         else if (_classLens is not null && !classes.Contains(_classLens, StringComparer.OrdinalIgnoreCase))
             _classLens = null;
 
+        // BEFORE the signature, because the signature reads its version. The pool is the
+        // Unlocks tab's own input and the only expensive one, so it is re-folded exactly when
+        // that tab is drawing and never on another tab's tick.
+        if (_tab == QuestTab.Unlocks) RefreshUnlockPool();
+
         var sig = $"{key}|{filter}|{_mode}|st:{_state}|{string.Join("+", classes)}|id:{identity}|{_settings.QuestEraFilter}|{_main.CurrentZoneName}" +
             $"|sel:{_selected}" +
             $"|{string.Join(";", tracked.Order(StringComparer.OrdinalIgnoreCase))}" +
@@ -745,10 +804,22 @@ public partial class QuestsView : UserControl
             // their own QuestsView (trap 45), so folding a quest in the shell left the window
             // drawing it open until something unrelated moved. Trap 72, one store later.
             $"|gx:{_settings.GuideExpanded.Count}."
-            + $"{string.Join(";", _settings.GuideExpanded.Order(StringComparer.OrdinalIgnoreCase)).GetHashCode(StringComparison.Ordinal):x8}";
+            + $"{string.Join(";", _settings.GuideExpanded.Order(StringComparer.OrdinalIgnoreCase)).GetHashCode(StringComparison.Ordinal):x8}"
+            // THE UNLOCKS TAB'S OWN STORES, and only while that tab is the one drawing — the
+            // pool fold is the one thing here that is not free, and no other tab reads any of
+            // it. Trap 72, third time on this surface: the guidance lines (DRA-65) are built
+            // from a faction dump, a pooled kill history and a section lens, and not one of
+            // those moved anything above. `ck:` already carries the Sky ticks and turn-ins the
+            // piece count reads, so those are deliberately not repeated here.
+            + (_tab == QuestTab.Unlocks
+                ? $"|un:{_unlockSection}|fac:{_main.Unlocks.Factions?.WrittenAt.Ticks ?? 0}"
+                  + $"|ach:{(_main.Unlocks.HasAchievements ? 1 : 0)}|pool:{_unlockPoolVersion}"
+                : "");
         if (!force && sig == _signature) return;
         _signature = sig;
 
+        // Past the gate, so this counts REBUILDS and not ticks — see the field.
+        _renders++;
         QuestsPanel.Children.Clear();
         _lastGuideCards.Clear();
         _rows.Clear();
@@ -1083,6 +1154,39 @@ public partial class QuestsView : UserControl
         $"questsReadySummary={(SummaryRow.Visibility == Visibility.Visible ? 1 : 0)} " +
         $"questsTabs={_tabs.Count} " +
         $"questsModes={_modes.Count} " +
+        // ---- the UNLOCKS tab (DRA-65) -------------------------------------------------
+        // The section lens, counted off the STRIP rather than from UnlockLayout.Sections:
+        // the claim is that the chips reached the screen, and a count taken from the list
+        // that produced them cannot fail the way the screen can. It is also the only thing
+        // that can say the ComboBox is gone — an inert control photographs as an
+        // unremarkable panel (trap 29).
+        $"questsUnlockSections={_unlockSections.Count} " +
+        $"questsUnlockSection={_unlockSection} " +
+        // WHAT THE LAST RENDER HELD, not what the stores hold now — and the difference is the
+        // whole point. Both dumps are found and parsed lazily off disk (UnlockSource re-reads
+        // them when their timestamps move), so "the app has a faction dump" and "the rows on
+        // screen were drawn from one" are different claims, and a test that waits for the
+        // first is asserting against whichever render happened to come after. That is trap 56
+        // exactly: the store says so and the screen says so are two facts, and a wait needs
+        // the one it is actually a precondition for.
+        $"questsUnlockDrewFactions={(_unlockDrewFactions ? 1 : 0)} " +
+        // The pool's own version beside the sentences it produced. It moves only when the
+        // fold actually re-ran, which is what makes it the repaint gate's input (trap 72) and
+        // a readable answer to "did the store move, or only the screen".
+        $"questsUnlockPool={_unlockPoolVersion} " +
+        // How many times this surface REBUILT (past the repaint gate) — the liveness question
+        // beside every value one (trap 56). It is what lets a test wait for the panel to stop
+        // redrawing on its own before claiming that its own append is what redrew it.
+        $"questsRenders={_renders} " +
+
+        // The unlock ROWS on screen, and the guided sentences under them, counted off the
+        // real visual tree by the Tag each carries (trap 39). Both, from one moment: "the
+        // resolver found movers" and "the movers are on the page" are different claims
+        // (trap 56), and the rows are the floor under the guidance — "no guided lines" over
+        // an empty tab is the vacuous pass this assertion is most likely to become.
+        $"questsUnlockRows={PanelElements().OfType<Grid>().Count(g => g.Tag as string == UnlockRowTag)} " +
+        $"questsUnlockGuided={PanelElements().OfType<TextBlock>().Count(t => t.Tag as string == UnlockGuideTag)} " +
+        $"questsUnlockDoors={PanelElements().OfType<Button>().Count(b => b.Tag as string == UnlockDoorTag)} " +
         // The Sky tab's ⧉ copy of /outputfile achievements. Counted off the real visual
         // tree rather than from a flag, for the same reason gearCopyCmd exists: an absent
         // control photographs as an unremarkable panel (trap 29), and a bool that nobody
@@ -2816,6 +2920,7 @@ public partial class QuestsView : UserControl
         var races = _main.Unlocks.Races;
         var classes = _main.Unlocks.Classes;
         var factions = _main.Unlocks.Factions;
+        _unlockDrewFactions = factions is not null;
 
         // BOTH commands, always — not only in the empty states they used to hide behind
         // (Hateborne, 2026-08-25). This tab is built from two dumps and neither is a
@@ -2880,11 +2985,32 @@ public partial class QuestsView : UserControl
                 if (UnlockLayout.Note(u) is { Length: > 0 } note)
                     QuestsPanel.Children.Add(Note(note, "Info"));
 
-                foreach (var row in g.Rows)
+                for (var r = 0; r < g.Rows.Count; r++)
                 {
-                    var line = new Grid { Margin = new Thickness(DesignTokens.SpaceL, 1, 0, 1) };
+                    var row = g.Rows[r];
+                    // The CRITERION behind this row, by position. UnlockLayout.Groups emits
+                    // exactly one row per entry of u.Actionable, in order — its own contract,
+                    // said on the method — so this is reading the list the rows were built
+                    // from rather than splitting the row id back apart, which is the second
+                    // source trap 4 is about (the id contains the separator it would split on).
+                    var criterion = r < u.Actionable.Count ? u.Actionable[r] : null;
+                    var guidance = criterion is null
+                        ? UnlockGuidanceRow.Nothing
+                        : UnlockGuidance.Resolve(u, criterion, factions, _unlockPool.Mobs,
+                            _settings.SkyQuestChecklist, _settings.SkyQuestCompleted,
+                            _main.QuestCatalog);
+
+                    var line = new Grid
+                    {
+                        Margin = new Thickness(DesignTokens.SpaceL, 1, 0, 1),
+                        Tag = UnlockRowTag,
+                    };
                     line.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
                     line.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+                    // The door's column, Auto so it takes only its own width and the wrapping
+                    // text keeps the rest. Added whether or not a door lands in it: a column
+                    // definition costs nothing and a conditional grid shape is a second layout.
+                    line.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
                     // Two columns, never a horizontal StackPanel: a stack measures with
                     // infinite width, so wrapping text beside an icon is clipped with no
                     // ellipsis to say so (trap 14).
@@ -2908,10 +3034,126 @@ public partial class QuestsView : UserControl
                     text.Ink(row.Acquired ? "DimBrush" : "TextBrush");
                     Grid.SetColumn(text, 1);
                     line.Children.Add(text);
+
+                    // THE DOOR, at the end of the row it belongs to (DRA-65). A real
+                    // InlineIconButton and not a handled glyph: a vector only hit-tests where
+                    // it is PAINTED, and an arrow is mostly empty space (trap 16) — the button
+                    // widens the target to IconInlineHit without redrawing the icon bigger.
+                    if (guidance.Door is { } door)
+                    {
+                        var open = DesignSystem.InlineIconButton("ArrowUpRight", door.Tip,
+                            (_, _) => OpenUnlockDoor(door));
+                        open.VerticalAlignment = VerticalAlignment.Center;
+                        open.Tag = UnlockDoorTag;
+                        Grid.SetColumn(open, 2);
+                        line.Children.Add(open);
+                    }
                     QuestsPanel.Children.Add(line);
+
+                    // The guided lines, UNDER the row and indented past its icon. Each is one
+                    // already-worded sentence out of UnlockGuidance — this loop decides
+                    // layout and nothing else, which is what keeps the phone's copy (D2) from
+                    // becoming a second answer.
+                    foreach (var sentence in guidance.Lines)
+                    {
+                        var guided = DesignSystem.Text(Role.Caption, sentence);
+                        guided.TextWrapping = TextWrapping.Wrap;
+                        guided.Margin = new Thickness(
+                            DesignTokens.SpaceL + DesignTokens.IconInlineHit, 0, 0,
+                            DesignTokens.SpaceXxs);
+                        guided.Ink("DimBrush");
+                        guided.Tag = UnlockGuideTag;
+                        QuestsPanel.Children.Add(guided);
+                    }
                 }
             }
         }
+    }
+
+    /// <summary>
+    /// How many times this surface has REBUILT — counted past the repaint gate, so it moves
+    /// when the panel is actually re-populated and not once per tick.
+    ///
+    /// <para>It exists because "the screen changed BECAUSE of this store" is a claim no value
+    /// count can make. A test that appends a log line and watches a row count cannot tell a
+    /// redraw caused by what it appended from a redraw that was coming anyway — and this
+    /// surface keeps rebuilding for a beat after launch as the class inference and the ledger
+    /// settle. Measured, not assumed: the DRA-65 mover assertion passed with the pool
+    /// deliberately REMOVED from the signature, because it appended into that settling window,
+    /// and failed the moment the append waited for this number to hold still.</para>
+    ///
+    /// <para>This is a stillness question on purpose, and a narrow one: it is not
+    /// <c>WaitForReplayToSettle</c>'s job (whether the LOG is fully read — the app answers
+    /// that outright and stillness there was wrong for four rounds). It is "is anything else
+    /// about to redraw this panel", which nothing but the panel can answer.</para></summary>
+    private int _renders;
+
+    /// <summary>Did the LAST render of the Unlocks tab have a faction dump in hand? Dumped so
+    /// a test can wait for the render that actually used one, rather than for the store to
+    /// have one and hope the next repaint was the one it meant (trap 56).</summary>
+    private bool _unlockDrewFactions;
+
+    /// <summary>The tag one unlock criterion's row carries — the floor the guided-line count
+    /// is read against, so "no guided lines" cannot pass over a tab that drew no rows at
+    /// all.</summary>
+    private const string UnlockRowTag = "unlockRow";
+
+    /// <summary>The tag every guided sentence under an unlock row carries, so the
+    /// <c>EQBUDDY_EXPAND</c> dump counts them off the REAL visual tree rather than off the
+    /// resolver that produced them — "the store says so" and "the screen says so" are
+    /// different claims (trap 56).</summary>
+    private const string UnlockGuideTag = "unlockGuide";
+
+    /// <summary>The tag a row-end unlock door carries. Counted the same way and for the same
+    /// reason: an absent control photographs as an unremarkable panel (trap 29).</summary>
+    private const string UnlockDoorTag = "unlockDoor";
+
+    /// <summary>
+    /// Where an unlock row's ↗ leads. Core decides THAT there is a door and what it points
+    /// at; this is the only place that knows what a tab or a browser is.
+    ///
+    /// <para>The wiki arm is player-clicked, like the Drops tab's creature heading: EQBuddy
+    /// asks eqlwiki for nothing here, so the request policy toward the wiki is untouched.</para>
+    /// </summary>
+    private void OpenUnlockDoor(UnlockDoor door)
+    {
+        switch (door.Kind)
+        {
+            case UnlockDoorKind.WikiFaction:
+                MainWindow.OpenWikiUrl(WikiLinks.Faction(door.Target));
+                break;
+            case UnlockDoorKind.SkyTab:
+                // The reward NAME out of the key: the key carries the class too
+                // ("Warrior|Azure Ruby Ring") and the search box takes the words a player
+                // would type. Split on the separator RewardKey itself owns, limit 2, so a
+                // reward containing a pipe keeps its tail.
+                OpenTabFiltered(QuestTab.Sky,
+                    door.Target.Split('|', 2) is [_, var reward] ? reward : door.Target);
+                break;
+            case UnlockDoorKind.GeneralTabQuest:
+                OpenTabFiltered(QuestTab.General, door.Target);
+                break;
+        }
+    }
+
+    /// <summary>
+    /// Land on another tab with the search box already carrying what to look at.
+    ///
+    /// <para>NOT through <see cref="SetTab"/>, which takes <c>tab:state</c> as one string —
+    /// that is the screenshot hook's protocol, and a quest name or reward containing a colon
+    /// would silently fail its two-part split and drop the player on the General tab instead.
+    /// A door that opens the wrong surface is worse than one that opens nothing.</para>
+    ///
+    /// <para><see cref="TabChanged"/> IS raised here, unlike from <see cref="SetTab"/>: the
+    /// player clicked something, so the theme host should follow them.</para>
+    /// </summary>
+    private void OpenTabFiltered(QuestTab tab, string search)
+    {
+        _tab = tab;
+        FilterBox.Text = search;
+        TabChanged?.Invoke(tab);
+        ApplyTabVisual();
+        Refresh(force: true);
     }
 
     /// <summary>

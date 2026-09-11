@@ -68,6 +68,57 @@ touch it. The DPS beat of the same clip still has its tooltip over its header; t
 shipped behaviour this card did not scope, and it is named to Helm rather than fixed.
 
 — Dranak (Claude Code, DRA-62)
+## 2026-09-11 (DRA-65 Delivery 1 — the Unlocks tab's guided detail; the calls I made alone)
+
+Executor seat `opus-dra65-d1`, building Fable's signed DRA-65 plan, Delivery 1 only. D2 (the
+phone's Unlocks tab) is deliberately untouched and still falls through to the General
+catalog — that is the plan's own sequencing, not an oversight. The six calls Fable made in
+the plan stand as written; these are the places EXECUTION left a choice.
+
+**1. THE WIKI DOOR USES THE SEARCH ENDPOINT, NOT A BUILT PAGE TITLE.** `WikiLinks.Faction`
+sends the player to `index.php?search=<faction>`, which MediaWiki resolves straight to the
+page when the title matches exactly and shows candidates when it does not. **The default it
+could have gone the other way on:** `EqlWiki.PageUrl(name)`, the way quest and creature
+pages are built. Rejected because nobody has checked which spelling eqlwiki chose for these
+names, and we KNOW the two dumps disagree about four of them (`FactionNames`) — a guessed
+URL is confidently wrong on those four and silently wrong on any we have not measured. It
+does not reuse `WikiLinks.Search`, whose normalisation strips a trailing " +N" tier suffix:
+item-shaped, and meaningless on a faction.
+
+**2. THE ACHIEVEMENT'S SPELLING IS WHAT THE DOOR CARRIES**, not the faction dump's. The row
+the player is reading says "Coalition of Tradesfolk"; a door that opened a page titled
+something else would read as a bug. The search endpoint above is what makes that safe.
+
+**3. "SEEN ON N OF YOUR KILLS", NOT "N KILLS".** `MobFactionHit.Hits` counts the kills that
+produced a faction LINE, which is not the kill count — a mob killed forty times while the
+faction sat at its cap has forty kills and no hits. The first wording said "12 kills in your
+log" beside a per-kill delta, which is a claim the log never made. **The default it could
+have gone the other way on:** the shorter sentence. Precision won because the whole feature
+is "what your own log actually observed".
+
+**4. MOVERS SURVIVE A MAXED FACTION; ONLY THE ARITHMETIC GOES.** A maxed standing has
+nothing to divide, so there is no estimate — but what your kills did is still true and still
+the answer to "where do I farm this for my next character". The staged shot photographs
+exactly this (Knights of Truth). Same shape as the plan's granted-unlock rule.
+
+**5. THE DOORS OPEN A TAB WITH THE SEARCH BOX FILLED, NOT `SetTab("sky:<name>")`.** That
+string protocol is the screenshot hook's, and it splits on a colon — a reward or quest name
+containing one would silently land the player on the General tab. A door that opens the
+wrong surface is worse than one that opens nothing.
+
+**6. THE UNLOCKS TAB'S STORES JOIN THE REPAINT SIGNATURE ONLY WHILE THAT TAB IS DRAWING.**
+The pooled kill history is the one input here that costs anything to fold, and no other tab
+reads it. Trap 72 is the bug this invites and it is now asserted end to end.
+
+**And one thing the E2E gained that is not a decision but is worth reading.** The mover
+assertion PASSED with the pool deliberately removed from the repaint signature — it appended
+its log lines while the surface was still settling after launch, so a redraw was coming
+anyway and the assertion could not tell the difference. It only started failing once it
+waited for `questsRenders` to hold still first. The surface now reports how many times it has
+rebuilt, and `AppHarness.WaitUntilStill` is the narrow stillness wait that goes with it: not
+"is the log read" (the app answers that outright — inferring it from stillness was wrong for
+four rounds), but "is anything else about to redraw this panel", which nothing but the panel
+can answer.
 
 ## 2026-09-11 (DRA-65 — Unlocks guided detail plan; the calls Fable made alone)
 
