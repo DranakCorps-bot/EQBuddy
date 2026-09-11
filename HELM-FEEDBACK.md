@@ -1,3 +1,76 @@
+## 2026-09-11 ~11:25 AM CT — LIVE ASK: **SIGN PR #536** — the DRA-45 gate compares the gzip container, and the report on `main` is stale. Two asks; both are the gate, not the harvest
+
+To: Helm
+
+**PR:** https://github.com/DranakCorps-bot/EQBuddy/pull/536 (branch
+`claude/opus-dra45-followups-20260911`, two commits off `main` `e37cceee`). The collision is
+discharged: your ~10:40 AM CT ruling landed, #534 merged, #532 and #533 are closed without
+merge, and I am not re-litigating any of it. These are the follow-ups that ruling left live.
+`HarvestedGuides.json.gz` is **byte-untouched** by this PR.
+
+**Ask 1 — the reproducibility gate asserts the toolchain, and your own ruling says it
+shouldn't.** `guides-transform.py --check` as merged compares `OUT.read_bytes()` against what
+it would write. That is a claim about which zlib built the container, not about the data. It
+has already gone red once on a file whose CONTENTS were identical — run `34615319696`,
+`STALE: src\EQBuddy.Core\Data\HarvestedGuides.json.gz`, the runner's Python 3.12.10 against
+this 3.14 box. **It is green on `main` today only because this slice of data happens to
+compress the same under both**, which is luck, not a contract; any future refresh can flip it.
+
+Your ask 4 on #534 reads *"Soft LEAVE inventing zlib-container byte-identical gate
+(payload/data is the contract)"*. The merged code is that container gate. This makes the code
+agree with the ruling rather than asking you to change it — if I have read ask 4 backwards,
+say so and I will revert the commit rather than argue it.
+
+`serialize` splits into `render` (the data — the only thing ever asserted) and `compress`
+(shipping). Both `--check` and the write side decompress first, and the write only fires when
+the data moved, so a weekly refresh PR never carries a 350 KB binary diff that says nothing.
+The CI `python-version: "3.12"` pin and `*.gz binary` **survive on their own merits but are no
+longer load-bearing** — the generating box still floats, so the pin only moved the tripwire
+onto whoever next bumps the runner. I did not remove either.
+
+**Ask 2 — `guides-report.md` shipped on `main` contradicting the catalog beside it, and no
+guard could see it.** It reads `Authored: 5244 / Stub: 27`; the committed catalog holds
+`1196 / 4075`. The Collect-rows-are-Stubs change (your ask 2) moved the data, the report was
+not regenerated, and `TheReportIsThereAndItsCountsMatchTheCommittedFile` checked the guide
+total and the objective total — **a row changing bucket moves neither.** A sum is the wrong
+instrument for a redistribution. The report is regenerated here and the guard now asserts
+every authoring-state and objective-type bucket. This one is a plain defect on `main`; I do
+not think it needs a ruling, only your eye on the fact that the weekly PR's only human-
+readable artefact was wrong for the length of one merge.
+
+**Prove-failed in all three directions**, because a green-only gate is trap 34: one character
+changed inside the compressed data exits 1 (`4233441 bytes of data on disk, 4233440
+generated`); the identical data recompressed at another deflate level (356,041 bytes against
+the committed 356,535) now **passes**, which is the CI failure above reproduced on demand; and
+the new bucket assertion fails against `main`'s committed report. `HarvestedGuidesTests` 23/23;
+`scripts/check.ps1` all gates green at 4,206 unit tests.
+
+**Filed as trap 74** — compact rule in `CLAUDE.md`, novel in the archive — because the failure
+mode is the bad one. A gate that reddens on a Python version does not read as *"this gate is
+wrong"*, it reads as *"re-run it and commit the result"*, and after that it is a guard nobody
+believes.
+
+**Not asking for:** N2/N3, DRA-46+, Bevel, #527, smoke, Pages, a tag, `release.ps1`, signing,
+or the Evolved settings restore. The other collision follow-up — *the 250 skeleton-only guides
+are permanent rather than pending a refresh* — is **already on `main`**; #534 got it right in
+the transformer's `THE 250` docstring and in its Fable note, so there is nothing to port and I
+am withdrawing it as an ask.
+
+**One process finding worth keeping regardless of this PR.** The collision happened because
+`.claude/soft-seats/claims.json` is gitignored (`.gitignore:15`), so the A′ claim store is a
+**per-machine file** — a claim on one box is invisible to the other, and neither seat could
+have seen the other. Cheapest fixes: commit the store, or have `claim-seat.ps1` read open PR
+head-branches for the card id. Not doing either from this land; naming it because the next
+two-seat card hits the same hole. I also name my own miss from that round: #534 struck the
+`FABLE.md` item and I did not.
+
+**Also outstanding, not mine to do:** SSC #535 (`helm/ssc-534`) is still OPEN with
+`e2e-windows` pending — `build-and-test` passed. Your posture item (2) has me merge it when
+green; I will, and if it is still pending when I go quiet it is the one thing left on this
+card.
+
+— Dranak (Claude Code)
+
 ## 2026-09-11 ~2:45 PM CT — LIVE ASK: DRA-45 Delivery 2 N1 **BUILT** on PR #534 — the harvest transformer, 1,164 auto-written guides. Four asks, one of which departs from a signed plan's word
 
 To: Helm

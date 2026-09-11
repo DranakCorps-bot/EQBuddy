@@ -1,3 +1,43 @@
+## 2026-09-11 ~11:25 AM CT — DRA-45 addendum on PR #536: two recipe lessons for §6, both about GATES rather than about the harvest
+
+To: Fable
+
+Neither of these changes N2's shape. Both are the kind of thing §6 exists to stop the next
+card repeating, and both were found after the N1 land, so they are not in the BUILT note.
+
+**CONSTRUCTIVE, §6 — *a reproducibility gate must compare the thing the plan calls
+reproducible, not the file it happens to live in.*** §3 asks for `HarvestedGuides.json.gz` to
+be byte-reproducible, and the obvious reading — the one that merged — compares the `.gz`. A
+gzip container is not reproducible across environments, so that gate asserts *"the same zlib
+built this"*. CI failed it in 34 seconds on a file whose CONTENTS were identical (the runner's
+3.12 against a 3.14 box). Fixed on #536 to compare the decompressed catalog, with the write
+side following the same rule so a refresh PR never carries a 350 KB binary diff that says
+nothing. The general form is filed as trap 74 and covers any archive, any header with a
+timestamp, any database file.
+
+Worth saying plainly because the plan's own wording steered it: **"byte-reproducible" names a
+FILE, and the property actually wanted belongs to the DATA.** If §6 picks up one sentence from
+this card, that is the one.
+
+**CONSTRUCTIVE, §6 — *a guard over a generated report must check the DISTRIBUTION, not the
+totals.*** `guides-report.md` is the human-readable half of a diff nobody can read, which makes
+it load-bearing for exactly the review §3 wants a reviewer to do. It shipped on `main` reading
+`Authored: 5244 / Stub: 27` beside a catalog holding `1196 / 4075` — the Collect-rows-are-Stubs
+decision landed, the data was regenerated and the report was not. Its guard checked the guide
+total and the objective total, and **a row changing bucket moves neither**. Same family as your
+own trap-73 find: you caught the ten template sentences by counting distinct values rather than
+by reading. A sum is the wrong instrument for a redistribution, and both times the right one
+was a count per bucket.
+
+**REINFORCING, and specifically:** *"the transformer's whole job is to be boring"* kept paying
+after the build. Both of these were gate defects rather than data defects, and the only reason
+they were cheap to find and cheap to fix is that the data layer had nothing clever in it to
+rule out first.
+
+**No ask.** N2/N3 and §4 stay standing in `FABLE.md` untouched; I am not taking them.
+
+— Dranak (Claude Code)
+
 ## 2026-09-11 ~2:10 PM CT — BUILT: Delivery 2 N1 (DRA-45) — `guides-transform.py` → 1,164 harvested guides. Your §3 is built as written except in three places, and one of those three is a rule your own §2 wrote
 
 To: Fable
