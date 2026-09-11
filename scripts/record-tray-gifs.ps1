@@ -43,6 +43,9 @@ param(
 )
 $ErrorActionPreference = 'Stop'
 . (Join-Path $PSScriptRoot 'isolated-profile.ps1')
+# The offline eqlwiki seed, shared with shoot.ps1 — see DRA-62 below on why a clip that
+# shows the Loot peek needs it. Nothing in this recipe fetches.
+. (Join-Path $PSScriptRoot 'drops-fixture-wiki.ps1')
 $repo = Split-Path $PSScriptRoot -Parent
 if ($Out -eq '') { $Out = Join-Path $repo 'site/assets/media' }
 
@@ -99,6 +102,35 @@ $GifHeight = @{ 'tray-build-loop' = 780 }
 # moment pet + motes landed), so a clip that ADDS chips needs the growth budgeted on
 # that side. The four shipped clips keep the 120 they were framed with.
 $GifLeft = @{ 'tray-build-loop' = 380 }
+
+# DRA-62 (Founder, DRA-48 landing family): lines appended to the staged log BEFORE the app
+# launches, so the replay has them by the time the pointer moves.
+#
+# **THE HOVER CLIP NEEDS A TARGET, and until this table it did not have one.** The Loot peek
+# is TARGET-scoped (`HudExpandPeek.Loot`): with nothing targeted it draws "No target" and the
+# one-line invitation, which is exactly what the shipped GIF showed while the copy beside it
+# promised "what dropped and at what rate" and the committed `hud-expand-loot.png` two
+# sections below showed a Giant spider drop table. One landing, two answers.
+#
+# A /consider is a target for the same `TargetLinger` 45 seconds a finished fight is
+# (`SessionStats.BuildCurrentTargetsLocked`), and it is the affordance the peek's own empty
+# line names — so it is the honest way to stage one. The window never lapses here: the linger
+# is measured from the log's LAST EVENT, and this line is it, so `last - con.Time` stays 0 for
+# the whole take no matter how long the settle runs.
+#
+# **"a giant spider" rather than a boss, and the reason is evidence.** `Normalize` strips the
+# article to "Giant spider", which is a creature the fixture actually killed twelve times and
+# looted three different things from — so the OBSERVED half of the row list is real session
+# data, and the wiki half is the committed `$DropsFixtureWiki` seed. A name the fixture never
+# fought would put an invented drop table on the public landing page and make the clip depend
+# on what eqlwiki answered that minute (trap 23), which is the very thing the shipped
+# no-target state was chosen to avoid. It is also the creature `hud-expand-loot.png` already
+# shows, so the GIF and the still now tell one story instead of two.
+$GifAppend = @{
+    'tray-hover-peek' = @(
+        'a giant spider scowls at you, ready to attack -- what would you like your tombstone to say? (Lvl: 12)')
+}
+
 if ($List) { $Gifs.Keys | ForEach-Object { $_ }; return }
 $wanted = if ($Gif.Count -gt 0) { $Gif } else { @($Gifs.Keys) }
 foreach ($name in $wanted) {
@@ -336,6 +368,42 @@ function Get-ChipPoints([int]$ownerPid, [string]$pattern) {
     $points
 }
 
+# Every visible text on the under-bar peek panel. The bar helpers above all filter to the
+# window NAMED 'EQBuddy', and the peek is a window of its own — so they cannot see it at all.
+# Resolved FromHandle off the same `Find-RecWindow` the park/resize routine already uses,
+# rather than by walking RootElement's children, because an owned always-on-top window is not
+# something to assume the desktop enumerates for us.
+function Get-PeekTexts([int]$ownerPid) {
+    $h = Find-RecWindow 'EQBuddy HUD Panel' $ownerPid
+    if ($h -eq [IntPtr]::Zero) { return @() }
+    $el = [Windows.Automation.AutomationElement]::FromHandle($h)
+    if (-not $el) { return @() }
+    $all = $el.FindAll([Windows.Automation.TreeScope]::Descendants,
+        (New-Object Windows.Automation.PropertyCondition(
+            [Windows.Automation.AutomationElement]::IsOffscreenProperty, $false)))
+    $texts = @()
+    foreach ($e in $all) { $n = $e.Current.Name; if ($n) { $texts += $n } }
+    $texts
+}
+
+# Wait for the peek to actually SAY something, and fail the take when it never does.
+#
+# TRAP 23, and this clip is the case that proves it: an unstaged Loot peek does not render
+# blank or throw, it renders a correct, handsome panel reading "No target" — so a take that
+# missed its target photographs a real state of something else and ships. That is precisely
+# what the landing carried until DRA-62, past a Founder review and a Helm sign. A picture
+# whose content nothing asserted is a picture nobody checked.
+function Wait-PeekSays([int]$ownerPid, [string]$pattern, [string]$what, [int]$timeoutMs = 8000) {
+    $deadline = (Get-Date).AddMilliseconds($timeoutMs)
+    while ((Get-Date) -lt $deadline) {
+        Wait-Pump 200
+        $hit = @(Get-PeekTexts $ownerPid | Where-Object { $_ -match $pattern })
+        if ($hit.Count -gt 0) { Write-Host "  peek says $what : '$($hit[0])'"; return $hit[0] }
+    }
+    throw "The peek never showed $what (/$pattern/) — the take would be a picture of the " +
+          "empty state. Is the target staged in `$GifAppend and the wiki cache seeded?"
+}
+
 # A control by its AutomationId — WPF publishes x:Name there, so the ★ ToggleButtons
 # (StarPet, StarMotes) are addressable without inventing pixel offsets from the header
 # text. Names would not do: a StarToggle draws geometry, not text.
@@ -483,6 +551,36 @@ Copy-Item $script:sessionLog $script:pristineLog -Force
 # --- per-GIF choreographies ---------------------------------------------------------
 # Each receives the widget pid and its bar rect; the recording is already rolling.
 
+# PREDICTION for the DRA-62 re-take, written before the run (trap 23). The gesture is
+# unchanged; only what the Loot panel CONTAINS should differ from the shipped clip:
+#   * The peek opens 300 wide (the fixed width since OE-7) with the bag vector, "Loot", ↗, ✕.
+#   * Its subtext is no longer "No target". It reads the creature and its provenance —
+#     "Giant spider" then a kill count from the fixture's own twelve slain giant spiders and
+#     "· drops (eqlwiki · CACHED <today>)". CACHED, not LIVE and not OFFLINE: the seed is
+#     written with a FetchedAt of now, so the 7-day lifetime is satisfied from disk and
+#     nothing is fetched. A panel reading OFFLINE or "looking up…" means the seed missed.
+#   * The body is DROP ROWS, not the invitation sentence: Spider Legs, Spider Silk and
+#     Spider Venom Sac, each "N this session · N%" off the fixture's own loot lines, observed
+#     rows leading. The `$DropsFixtureWiki` seed for Giant spider is Spider Silk + Spider
+#     Legs, both of which the fixture already looted, so it should add NO fourth row — its
+#     job here is the state label and the absence of a fetch, not extra rows.
+#   * Then the pointer slides to DPS and the panel follows, as before, and the away-move
+#     collapses it. Those two beats are the shipped clip's and should look like it.
+# A take that still says "No target" cannot reach the GIF: Wait-PeekSays throws first.
+#
+# TAKE 1 (2026-09-11): every content claim above HELD — "Giant spider · 15 kills this session
+# · drops (eqlwiki · CACHED …)" with Spider Silk 5 / Spider Legs 4 / Spider Venom Sac 2, no
+# fourth row, nothing fetched. And the clip was still not shippable: the chip's tooltip sat
+# over the panel's header and subtext for the whole dwell, so the creature line was legible
+# only in fragments. The prediction had nothing to say about occlusion and the assertion
+# could not see it — which is the finding. TAKE 2 adds the move onto the panel below.
+#
+# TAKE 2: subtext confirmed verbatim by the assertion — "Giant spider — 15 kills this session
+# · drops (eqlwiki · CACHED 9/11)". CACHED is the load-bearing word: the seed answered and
+# nothing was fetched. Still not shippable — the rest-point was inside the panel's resize
+# edge, so an edge cursor and an edge tooltip replaced the chip's. TAKE 3 rests dead centre.
+# Three takes, and each defect was found by LOOKING at frames after an assertion had already
+# passed. That is the whole argument for reviewing a clip rather than trusting its exit code.
 function Invoke-HoverPeek([int]$appPid, [RecW.U+RECT]$bar) {
     # The loot cell's UIA name is its bare count — the bag is a drawn vector, not a glyph
     # (IconPaths' rule), so the count is the only pure-number cell on the bar.
@@ -491,6 +589,34 @@ function Invoke-HoverPeek([int]$appPid, [RecW.U+RECT]$bar) {
     Wait-Pump 800
     Move-Smooth $loot.X $loot.Y 700
     Wait-Pump 2300                  # peek opens under the bar
+    # DRA-62: the panel must name the creature the /consider staged, not "No target". This
+    # is the assertion the shipped clip never had — see Wait-PeekSays on why a missing one
+    # is invisible rather than loud. It runs INSIDE the dwell the clip already spends here,
+    # so a passing take is unchanged frame-for-frame; a failing one throws before the GIF
+    # is written and the committed clip is left alone.
+    Wait-PeekSays $appPid 'Giant spider' 'the staged target'
+    # DOWN ONTO THE PANEL, and the first DRA-62 take is why. Resting on the chip shows the
+    # chip's TOOLTIP — which this section's copy quotes on purpose — but it is drawn over the
+    # panel's top two lines, and the second of those is the one naming the creature. The take
+    # came back with three correct Spider rows under a subtext reading "Giant spider — 15
+    # kills this session — drops (eqlwiki - CACHED..." with a tooltip straight through it, so
+    # the clip proved the fix to anyone who already knew what it was looking at and to nobody
+    # else. UIA cannot see occlusion, so Wait-PeekSays passed it; only the frames caught it.
+    # Moving onto the panel dismisses the tooltip and does NOT collapse the peek — that is
+    # `HudExpandBar.PointerOnPanel` stopping the grace timer, the same affordance that lets a
+    # player reach the ⧉. So the tooltip gets its beat, and then the creature does.
+    $panel = Find-RecWindow 'EQBuddy HUD Panel' $appPid
+    if ($panel -eq [IntPtr]::Zero) { throw 'Loot peek window not found while hovering the chip.' }
+    $pr = Get-RecRect $panel
+    # DEAD CENTRE, and not "just inside an edge" — take 2 parked 14px above the bottom and
+    # landed in the panel's own RESIZE ZONE, which has a cursor and a tooltip of its own
+    # (HudExpandWindow's grip language, ResizeZones.Hit). So the chip's tooltip went away and
+    # the EDGE's tooltip took its place, half out of frame, under a four-way resize cursor
+    # sitting on "Spider Venom Sac". Centre is the only point far from all four edges, and no
+    # loot row carries a hover of its own (PeekRow.Tooltip is null for this builder), so the
+    # pointer rests on the card and nothing pops.
+    Move-Smooth ([int](($pr.L + $pr.R) / 2)) ([int](($pr.T + $pr.B) / 2)) 400
+    Wait-Pump 2400                  # the drop table AND its creature line, read clean
     Move-Smooth $dps.X $dps.Y 600
     Wait-Pump 2300                  # panel follows the chip
     Move-Smooth ($bar.R + 70) ($bar.T - 40) 500     # up and away — not through the panel
@@ -661,6 +787,21 @@ try {
         Write-Host "`n=== $name ==="
         Write-RecSettings ($GifSeed[$name] ?? @{})
         Copy-Item $script:pristineLog $script:sessionLog -Force
+        # The offline wiki, re-seeded every take for the same reason the log and settings are
+        # (trap 51): its entries carry a FetchedAt, and a shared profile makes the last
+        # writer's clock the next clip's staging. The whole list goes in, never just the
+        # creature this clip targets — a PARTIAL seed does not fail, it sends the app to the
+        # live wiki for the rest (drops-fixture-wiki.ps1 says why that cost two wrong shots).
+        Write-EqWikiCacheTo $profileDir.FullName $DropsFixtureWiki
+        # Target staging, appended AFTER the pristine restore so the /consider is the log's
+        # last event and the linger never lapses.
+        if ($GifAppend.Contains($name)) {
+            $ci = [Globalization.CultureInfo]::InvariantCulture
+            $stamp = [DateTime]::Now.ToString('ddd MMM dd HH:mm:ss yyyy', $ci)
+            Add-Content -Path $script:sessionLog -Encoding UTF8 -Value (
+                $GifAppend[$name] | ForEach-Object { "[$stamp] $_" })
+            Write-Host "  staged $(@($GifAppend[$name]).Count) live line(s) before launch"
+        }
         $psi = New-Object Diagnostics.ProcessStartInfo $exe
         $psi.UseShellExecute = $false
         Assert-EqIsolatedProfile $profileDir.FullName 'record-tray-gifs.ps1'

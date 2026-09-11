@@ -1,3 +1,74 @@
+## 2026-09-11 — DRA-62 (landing Loot peek had no creature selected): four calls I made alone
+
+Founder card under the DRA-48 landing family: *"Landing Loot peek needs a selected creature
+(Founder: Nagafen)"*. Site-only. The peek in `tray-hover-peek.gif` was drawing
+`HudExpandPeek.Loot`'s **no-target** state — "No target" over *"Swing at something — or
+/consider it — and its possible drops appear here"* — while the copy beside it promised
+"what dropped and at what rate" and the committed `hud-expand-loot.png` two sections below
+showed a Giant spider drop table. One landing, two answers. These are the places the card
+left a choice.
+
+**1. THE CREATURE IS "a giant spider", NOT LORD NAGAFEN.** The default it could have gone
+the other way on is the one the Founder named, so this is the call that most wants his
+veto. The fixture (`tests/fixtures/eqlog_Testchar_fixture.txt`) has no named mobs at all —
+19 pumas, 14 orc pawns, 15 giant spiders — so staging Nagafen means inventing BOTH halves
+of the panel: an observed count and percentage for kills that never happened, and a drop
+table the live wiki would have to answer for at record time. That is endgame loot David
+cannot verify — his highest character is level 29 — published under our own name on the
+marketing page: consequence 6 pointing the wrong way, and trap 73's shape exactly. It would
+also make the clip non-deterministic: `EqlWikiMobService` would fetch, and the GIF becomes
+a picture of whatever eqlwiki said that minute (trap 23) — which is the very reason
+`DECISIONS.md`'s DRA-48 GIF-refine entry chose to ship the empty state in the first place.
+"a giant spider" `Normalize`s to "Giant spider", a creature the fixture killed 15 times and
+looted three different things from, and it is the creature `hud-expand-loot.png` already
+shows — so the GIF and the still now tell one story. **The boss is still reachable and I did
+not close it off:** the honest path is a real eqlwiki page committed as a seed, and it is
+put to Helm as its own ask rather than guessed at here.
+
+**2. THE OFFLINE WIKI SEED MOVED TO A SHARED FILE INSTEAD OF BEING COPIED.**
+`$DropsFixtureWiki` and its cache writer now live in `scripts/drops-fixture-wiki.ps1`,
+dot-sourced by both `shoot.ps1` and `record-tray-gifs.ps1`. The default was to copy the
+13-row table into the GIF recipe, which is two lines of work instead of a new file. Rejected
+on the table's OWN comment: a staging list is code a compiler cannot check (trap 30), and
+this one fails silently — a partial or drifted seed does not go red, it sends the app to the
+live wiki for whatever it is missing, and that already cost two wrong `wiki-pack` shots.
+Two copies would have been two current answers to "what does the fixture's wiki say"
+(trap 33). `shoot.ps1` keeps a one-line `Write-WikiCache` wrapper so no shot's staging
+changed. **Cost:** one more file to dot-source, and `shoot.ps1` now fails outright if it
+goes missing — which is the loud failure, and the one worth having.
+
+**3. TWO FALSE ALT TEXTS WERE CORRECTED, NOT TWO CLIPS RE-RECORDED.** Found while staging
+this: `tray-click-keep.gif` and `tray-peek-park-resize.gif` are both described on the
+landing as the LOOT card, and both recipes drive the **DPS** chip (`Invoke-ClickKeep` and
+`Invoke-PeekParkResize` each `Require-Chip 'dps\s*$'`). The recipe says why in a comment —
+*"the loot peek's no-target state is the hover GIF's story, not this one's"* — so the only
+reason those two departed from their own descriptions is the defect this card fixes, and
+re-pointing them at loot is now possible. I did not: the card says Soft LEAVE inventing new
+peeks beyond this fix, three of four clips showing the same card is worse than the variety,
+and the thing that is actually FALSE is the sentence, not the clip. Corrected to name the
+damage card. **The default it could have gone the other way on:** re-record both against the
+now-populated loot peek and leave the alt text alone. Flagged to Helm as its own ask.
+
+**4. THE ASSERTION IS IN, AND IT IS RECORDED AS NOT SUFFICIENT.** `Wait-PeekSays` fails a
+take whose panel never names the creature, so the empty state can no longer reach a GIF —
+the prove-fail path is real (take 0's panel would have thrown). But **take 1 passed that
+assertion and was still unshippable**: the chip's tooltip sat over the header and the
+creature line for the whole dwell, and UIA cannot see occlusion. Take 2 passed it too, with
+an edge cursor and the resize zone's own tooltip in frame because the rest-point was 14px
+inside the panel's bottom edge. Both were caught by extracting frames and LOOKING. That
+sequence is written into the recipe above `Invoke-HoverPeek` rather than tidied away,
+because the useful lesson is not "assert the panel" — it is that a green recipe and a
+reviewed clip are different claims, one layer under trap 23.
+
+**Not done, deliberately:** no `WhatsNew.json` entry (nothing a player can run changed — the
+app, its behaviour and every shipped surface are byte-untouched; this is the site and two
+capture recipes). No `docs/TestPlan.md` change for the same reason. No Pages enable, no tag,
+no Play Console, no Desktop republish — the T4 publish gate stands and this card does not
+touch it. The DPS beat of the same clip still has its tooltip over its header; that is the
+shipped behaviour this card did not scope, and it is named to Helm rather than fixed.
+
+— Dranak (Claude Code, DRA-62)
+
 ## 2026-09-11 (DRA-65 — Unlocks guided detail plan; the calls Fable made alone)
 
 Fable seat, plan only (`claude/fable-dra65-unlocks-20260911`). The plan itself is the top

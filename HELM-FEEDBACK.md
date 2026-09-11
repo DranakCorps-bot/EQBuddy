@@ -1,3 +1,35 @@
+## 2026-09-11 ~10:15 PM CT — LIVE ASK: **SIGN PR #557** — DRA-62 landing Loot peek now names its creature (Founder said Nagafen; I shipped a giant spider, and that is ask 2)
+
+To: Helm
+
+**PR:** #557 https://github.com/DranakCorps-bot/EQBuddy/pull/557 — tip `74cb9cb9` on `claude/opus-dra62-loot-peek-20260911`, off Soft `main` `1a7fcbb5` (post-#551 SSC; ahead 1 / behind 0). Files: `scripts/drops-fixture-wiki.ps1` (new) + `scripts/shoot.ps1` + `scripts/record-tray-gifs.ps1` + `site/index.html` + `site/assets/media/tray-hover-peek.gif` + `DECISIONS.md` — **6 paths, +299/−56**. Soft seat claimed `62` / `opus-dra62-loot-peek`. Live Holds empty at read. **Site and capture recipes only: no `src/` change, no app behaviour, no `WhatsNew.json`.**
+
+**Gates:** `scripts/check.ps1` **all green**, unit **4232 / 0**, both local. CI not yet reporting at write time.
+
+**What was wrong.** `tray-hover-peek.gif` shipped `HudExpandPeek.Loot`'s **no-target** state — "No target" over *"Swing at something — or /consider it — and its possible drops appear here"* — while the copy beside it promised "what dropped and at what rate" and the committed `hud-expand-loot.png` two sections lower showed a Giant spider drop table. The peek is target-scoped and the fixture's trailing lines are past `TargetLinger` (45 s from the log's **last event**), so the recorded session ended with nothing targeted.
+
+**Measured, not argued.** The recipe's own assertion read the panel back verbatim: `Giant spider — 15 kills this session · drops (eqlwiki · CACHED 9/11)`. **CACHED** is the load-bearing word — the committed seed answered and **nothing was fetched** (consequence 7: zero new eqlwiki requests from this card, by construction rather than by luck). Rows: Spider Silk 5 / Spider Legs 4 / Spider Venom Sac 2, which is what the committed `drops-window.png` independently shows for the same creature.
+
+### Five asks
+
+1. **SIGN #557 merge-when-green.** Spot-check targets: `$GifAppend` stages the `ConsiderRx` line **before launch** and the linger cannot lapse because it is measured from the log's last event and that line is it; `$DropsFixtureWiki` + writer moved to one dot-sourced file with `shoot.ps1` keeping a one-line wrapper; `Wait-PeekSays` throws on a panel that never names the creature; three alt texts corrected. Soft LEAVE force-merge while CI pending.
+
+2. **THE ONE I MOST WANT RULED — the Founder named Nagafen and I did not ship Nagafen.** The fixture has no named mobs at all (19 pumas, 14 orc pawns, 15 giant spiders), so staging him means inventing **both** halves of the panel: an observed count for kills that never happened, and a drop table the live wiki answers for at record time. That is endgame loot David cannot verify, on a public page, under our name — consequence 6 pointing the wrong way and trap 73's shape — and it makes the clip non-deterministic (trap 23), which is the exact reason the DRA-48 GIF-refine entry shipped the empty state to begin with. `"a giant spider"` `Normalize`s to `"Giant spider"`, is a creature the fixture really killed and looted, and is the one `hud-expand-loot.png` already shows, so the GIF and the still now agree. **The boss path is real and open, and it is two pieces of work, not one:** (a) one sourced eqlwiki fetch of Lord Nagafen committed as a seed — one request, and it wants your consequence-7 read — and (b) a decision about the observed half, which is either a fabricated kill count or zero observed rows beside a low-level puma session on the same bar (wrong-shape staging, trap 23). **Does the giant spider KEEP, or do you want the boss path opened as its own card?** I read this as implementation under the card's own "or equivalent named" latitude and therefore **not a consequence-list door** — nothing is published, Pages is OFF, and no wiki departure was made because I declined to invent. But it contradicts the Founder's named example, so **if you think it wants David, page him; I did not.**
+
+3. **Two false alt texts corrected rather than two clips re-recorded.** `tray-click-keep.gif` and `tray-peek-park-resize.gif` are both described on the landing as the **loot** card, and both recipes drive the **dps** chip. The recipe says why in a comment — *"the loot peek's no-target state is the hover GIF's story, not this one's"* — so the only reason they departed from their own descriptions is the defect this card fixes, and re-pointing them at loot is now possible. I corrected the sentences instead: the card says Soft LEAVE inventing new peeks, three of four clips on one card is worse than the variety, and the false thing was the text. **ACK, or do you want the two clips re-recorded against the populated peek?**
+
+4. **The assertion is in, and I have recorded it as NOT sufficient — please let that stand in the file.** `Wait-PeekSays` passed **take 1**, which was unshippable: the chip's tooltip sat over the creature line for the whole dwell and UIA cannot see occlusion. It passed **take 2** as well, with the panel's resize-zone cursor and its own tooltip in frame. Both were caught by pulling frames and looking. The three takes and their defects are written above `Invoke-HoverPeek` rather than tidied away, because the lesson is not "assert the panel" — it is that a green recipe and a reviewed clip are different claims. Soft LEAVE compressing that comment to the happy path.
+
+5. **Publishing — NONE from this PR**, and I did not go near it. T4 enable gate **STANDS**; no Pages enable, no `pages.yml` touch, no tag, no `release.ps1`, no Play Console, no Desktop republish. Soft LEAVE reading this SIGN as enablement authority.
+
+### Two observations, filed not gated
+
+- **`docs/screenshots/drops-window.png` is stale on `main`.** I re-shot it to prove the seed port and **restored it rather than committing** — but the fresh capture differs from the committed PNG in ways that are nothing to do with this card: a different theme, a different height, and an **extra preamble sentence the app now writes** ("…and the pack pools every session you have, so kills from other evenings count toward its rarity labels"). Trap 22's shape: the committed picture has quietly stopped being a picture of the app. Worth a card; not this one.
+- **The DPS beat of the same clip still has its tooltip over its header**, exactly the defect take 1 had on the loot beat. Pre-existing, out of this card's scope, named here so it is not discovered as new.
+
+**Scope hygiene:** not a hold, and I took none. No `src/` change, no WhatsNew, no TestPlan change (nothing a player can run moved). Live Holds empty at read. Soft LEAVE Pages / Play Console / tag / signing / prod secrets / Evolved restore / Founder mail / Bevel kick / #527 from this land.
+
+— Dranak (Claude Code, DRA-62)
 ## 2026-09-11 ~5:00 PM CT — LIVE ASK: **SIGN the DRA-65 PLAN** — Unlocks guided detail + race/class filter (plan only; Executor kicks on your SIGN)
 
 To: Helm
