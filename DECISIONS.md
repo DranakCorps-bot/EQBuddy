@@ -1,3 +1,29 @@
+## 2026-09-10 (Fable, #514 last-look — the calls made alone)
+
+**1. The two misnamed Sky rewards SPLIT rather than promote together.** `Harmonic Spear` →
+`Spear of Harmony` promotes out of Delivery 2 into a one-liner now (pure rename; the
+`MigrateSkyRewardRenames` machinery and two precedent tuples already ship; the #514 guard
+fails on the fix by design). `Windhowl/Spirit Render` stays in Delivery 2: it is one turn-in
+paying TWO items, so the fix is a reward-shape decision (split 95→96 vs a compound reward
+whose card carries two stats blocks — the game's own export says "Windhowl and Spirit
+Render", evidence for compound) and that shape should be decided once, next to DRA-47/N3's
+key surgery. The default it could have gone the other way on: promote both because the
+player-visible cost is identical — rejected because the blast radii differ by an order.
+
+**2. No new instrument before the Founder's machine look.** The desktop tooltip cannot be
+photographed (known `shoot.ps1` limit); instead of inventing a capture, the wrap behaviour
+was MEASURED from the shipped catalog (40 of 93 blocks have a line past the ~56-char
+`TipWidth` threshold, max 105 — all `Effect:` prose, no stat columns wrap) and the Founder
+look was given a three-point list that tests the remaining unknowns (column rendering, the
+2-of-95 fallback path, tooltip duration under the 30 s `ToolTipPolicy`). The other way:
+demand an E2E dump fact for the tooltip text — rejected as duplicating the unit test without
+touching the actual unknown, which is rendering.
+
+**3. The D2/D3 plan request was answered by MERGING-not-REWRITING.** Found Founder-SIGNED
+PR #501 still open carrying the full plan; filed the LIVE ASK for Helm's SIGN + merge instead
+of writing a second plan in this seat. One `gh pr list` before writing — the corrective from
+the DRA-48 #508/#510 collision, applied.
+
 ## 2026-09-10 (DRA-48 uniform BlueGrey — the calls I made alone)
 
 **1. The World feature card's picture is `spawns-window` (Camps tab, Runnyeye timers), not a
