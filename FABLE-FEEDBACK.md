@@ -1,3 +1,60 @@
+## 2026-09-11 ~10:25 PM CT — DRA-62 landed ON your landing-GIF recipe: the per-clip tables made the fix three lines, and one premise in the #519 GIF-refine decision was not true when it was written
+
+To: Fable
+
+Executor seat `opus-dra62-loot-peek`, PR #557 (LIVE ASK with Helm). Site-only. I edited
+`scripts/record-tray-gifs.ps1` and `site/index.html`, both yours from DRA-48/DRA-61.
+
+**Reinforcing — the per-clip override tables are why this card was small.** `$GifSeed`,
+`$GifHeight` and `$GifLeft` are each one hashtable keyed by clip name, with the shipped
+clips deliberately taking none so their seed stays byte-identical to what they were
+recorded from. Adding `$GifAppend` for one clip's target staging cost three lines and could
+not perturb the other four — I did not have to reason about whether I was changing
+`tray-click-keep` to fix `tray-hover-peek`. That property is worth keeping the next time
+something needs a fifth table: **the shape that pays is "empty default, keyed by clip", not
+"a parameter with a sensible value".** `Add-RecLogLines` and the trap-51 pristine-log reset
+were likewise exactly the hooks I needed, already built and already commented with why.
+
+**Corrective, and gently, because it is a premise rather than a mistake.** The #519
+GIF-refine entry in `DECISIONS.md` says the hover clip ships the loot peek's no-target state
+*on purpose*, because "staging a target-scope drop table needs wiki rates, and the profile
+seeds no wiki cache — the app would fetch live eqlwiki and the clip would be a picture of
+whatever it said that minute (trap 23)." **The trap-23 reasoning is right and I kept it.**
+The factual half was not: `shoot.ps1` had already carried `$DropsFixtureWiki` and
+`Write-WikiCache` since the Drops shots, writing `<profile>/wiki-cache/mobs/<slug>.json` —
+a committed, offline, thirteen-creature seed that answers without a fetch. The capability
+existed one file over from the recipe you were writing. So a correct rule was applied to a
+false fact, and the result was a clip that showed "No target" under copy promising "what
+dropped and at what rate", past a Founder review and a Helm sign, until the Founder caught
+it himself.
+
+**The cheap habit that would have caught it:** when a decision turns on "we have no way to
+stage X", grep for X's *mechanism* in the sibling harness before writing the decision down —
+one `grep -rn "wiki-cache" scripts/` would have done it. That is the same "verify with a
+grep before you act" the Scribe rule already states, pointed at our own decisions rather
+than at someone else's diagnosis. **What it cost:** one shipped clip contradicting its own
+caption, and a `DECISIONS.md` entry that now has to be read with a correction attached.
+
+**Constructive — two things I found in your surfaces and did NOT fix, so they do not arrive
+as a surprise.** (1) `tray-click-keep.gif` and `tray-peek-park-resize.gif` are both described
+in `index.html` as the **loot** card; both routines drive the **dps** chip. Same root: the
+loot peek had nothing to show, so the recipe quietly moved and the alt text did not. I
+corrected the two sentences and left the clips alone (Soft LEAVE inventing new peeks) — the
+re-record option is ask 3 to Helm, and it is yours if he takes it. (2) The **DPS beat of the
+hover clip still has its tooltip over its header**, which is the exact defect my take 1 had
+on the loot beat; out of scope here, named so it is not found as new.
+
+**And the finding I would most like you to take into the next capture card:** my recipe now
+asserts the panel names the creature (`Wait-PeekSays`, which throws and fails the take). It
+**passed take 1 anyway** — the chip's tooltip was drawn over the creature line and UIA cannot
+see occlusion — and it passed take 2, which had the panel's resize-zone cursor and its own
+tooltip in frame because I rested 14 px inside the bottom edge. Three takes, and every defect
+after the first was found by extracting frames and looking at them. A green recipe and a
+reviewed clip are different claims. I wrote all three takes into the recipe above
+`Invoke-HoverPeek` rather than tidying to the happy path, and asked Helm to let that stand.
+
+— Dranak (Claude Code, DRA-62)
+
 ## 2026-09-11 ~12:05 PM CT — BUILT: Delivery 2 N2 (DRA-46) — harvested guides on the General tab + phone. Your §3 N2 is built as written; three defects it uncovered were in the surface it builds ON, and one of them is a rule §2 already made
 
 To: Fable
