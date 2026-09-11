@@ -127,6 +127,24 @@ public sealed class CompanionHost : IDisposable
     public bool Running => _server is not null;
     public int ClientCount => _server?.ClientCount ?? 0;
 
+    /// <summary>Of <see cref="ClientCount"/>, the ones that are not this PC's own browser
+    /// (DRA-64) — what the pairing window's connected line must count, so that testing the
+    /// address on the PC never reads as a paired phone.</summary>
+    public int OffBoxClientCount => _server?.OffBoxClientCount ?? 0;
+
+    /// <summary>Connections ever accepted from off this machine, and from this machine.
+    /// The pairing window's whole reachability verdict is these two numbers and a clock
+    /// (<see cref="EQBuddy.UI.Shared.CompanionReachability"/>).</summary>
+    public int OffBoxConnects => _server?.OffBoxConnects ?? 0;
+
+    /// <inheritdoc cref="OffBoxConnects"/>
+    public int SameMachineConnects => _server?.SameMachineConnects ?? 0;
+
+    /// <summary>The port actually BOUND, not the one asked for — Start falls back when the
+    /// configured port is refused, and a firewall rule naming the wrong port is the same
+    /// silent failure this whole surface exists to end. 0 when not running.</summary>
+    public int Port => _server?.Port ?? 0;
+
     /// <summary>Is anyone actually looking? The mobile pump asks this before doing any
     /// work at all, so an unpaired EQBuddy pays one field read per pump and nothing
     /// else — the same "zero cost while idle" contract <see cref="Tick"/> keeps.</summary>
@@ -323,6 +341,11 @@ public sealed class CompanionHost : IDisposable
                 Port = port,
             });
             server.ClientsChanged += () => ClientsChanged?.Invoke();
+            // The first off-box arrival rides the SAME event the connected count does:
+            // the pairing window's verdict is drawn by one repaint path, so a device that
+            // reaches us but never finishes a WebSocket upgrade still takes the
+            // "nothing is getting here" checklist down.
+            server.ReachabilityChanged += () => ClientsChanged?.Invoke();
             server.ActionReceived += action => _actions.Enqueue(action);
             server.MapActionReceived += action => _mapActions.Enqueue(action);
             server.TravelActionReceived += action => _travelActions.Enqueue(action);

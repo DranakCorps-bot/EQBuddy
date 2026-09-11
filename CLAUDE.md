@@ -879,6 +879,32 @@ after the named guard left with its surface.
     `node scripts/dra64-choice-probe.mjs [olderPage.html]`.
     [Novel](docs/ops/claude-archive/traps.md#trap-76)
 
+77. **The cheapest test of "can they reach me" is the one test that cannot fail for
+    the reason you are investigating.** The companion server binds LAN addresses only,
+    so diagnosing a phone that would not load began — every time — with pasting the URL
+    into the PC's own browser. Windows routes a machine's traffic to its own address
+    internally: it never crosses the wire and is never seen by the inbound firewall, so
+    it passes while every phone on earth is being dropped. The PC then *agreed*, because
+    `ClientCount` counted that browser and the window said "1 device connected". Three
+    separate people read that as the server being fine. **Ask whether the measurement can
+    distinguish the hypothesis from its negation before you spend it** — and when a
+    surface counts participants, make ORIGIN part of the count, because a local caller is
+    not evidence about a remote one. Guard: `CompanionReachability` (verdict + words) and
+    `CompanionServer.IsSameMachine` / `OffBoxConnects`, counted at ACCEPT so a refused
+    phone still proves the path is open; `CompanionReachabilityTests` asserts the local
+    browser NEVER reads as Reached, with a real-socket half that prove-fails.
+    **Sibling of trap 76** — same smoke, the other layer; 76 is the page that
+    connects and draws nothing, this is the packets never arriving.
+    **The sibling half is worse.** The advice under it named causes nobody had measured
+    (trap 35's shape) and its one concrete instruction was wrong in the exact case it
+    existed for: Windows' allow-list is keyed on the executable PATH and displayed by
+    NAME, so "check Firewall → Allow an app" sends a player to a list where an
+    `eqbuddy.exe` from an OLD install path is already ticked. DRA-64 was precisely that —
+    v2 runs from `%LOCALAPPDATA%\EQBuddy Evolved\publish\`, every rule on the machine
+    named the v1 path, and the only inbound Allow that fit was scoped to the Tailscale
+    address the QR ranks LAST. **When you tell a player to check a list, check what the
+    list SHOWS them** — identity a UI hides is identity the player cannot verify.
+
 New trap discovered the hard way? Add the compact rule here and the novel
 under `docs/ops/claude-archive/traps.md`. That is the whole point.
 
