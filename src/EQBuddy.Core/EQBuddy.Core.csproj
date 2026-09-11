@@ -47,6 +47,9 @@
     <EmbeddedResource Include="Data\SpellLevels.json" />
     <!-- ~11k items from Category:Items, gzipped (items-harvest.py + itemcatalog-build). -->
     <EmbeddedResource Include="Data\ItemCatalog.json.gz" />
+    <!-- One guide per quest, gzipped and AUTO-WRITTEN by guides-transform.py from the
+         wikitext cache. The curated GuideCatalog.json above wins on questName. -->
+    <EmbeddedResource Include="Data\HarvestedGuides.json.gz" />
   </ItemGroup>
 
 </Project>

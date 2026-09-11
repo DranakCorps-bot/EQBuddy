@@ -46,6 +46,19 @@ jobs:
       - name: Soft seat claims refuse a duplicate default
         run: pwsh -NoProfile -File scripts/soft-seat-selftest.ps1
 
+      # HarvestedGuides.json.gz is auto-written from the wikitext cache by
+      # guides-transform.py, and 1,178 guides are not reviewable by reading a diff — the
+      # review is re-running the script and finding the bytes unchanged (DRA-45). The unit
+      # suite runs the same `--check`, but skips by name when Python is absent; this step is
+      # what keeps the gate from being a guard that reads as coverage without ever having
+      # run (trap 34).
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.12"
+
+      - name: Harvested guides reproduce byte-for-byte from the cache
+        run: python scripts/harvests/eqlwiki/guides-transform.py --check
+
       - uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
         with:
           dotnet-version: 10.0.x

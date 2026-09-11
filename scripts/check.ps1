@@ -74,6 +74,12 @@ Step 'evolved     ' { & "$PSScriptRoot\evolved-channel-guard.ps1" 6>&1 }
 # Experiment A′ self-test (trap 70, EQBuddy lab): a second default seat on the
 # same work item must refuse. Throwaway StoreDir; not the machine's live claims.
 Step 'soft seats  ' { & "$PSScriptRoot\soft-seat-selftest.ps1" 6>&1 }
+# The harvested guide file is auto-written from the wikitext cache, and the only honest
+# review of 1,178 guides is re-running the transformer and finding the bytes unchanged
+# (DRA-45). `--check` writes nothing. The unit suite runs this too, but skips by name when
+# Python is absent — here it fails loudly, because a local tree that cannot run it is a
+# tree that cannot regenerate the file it is about to commit.
+Step 'harvest     ' { python "$repo\scripts\harvests\eqlwiki\guides-transform.py" --check }
 Step 'build      ' { dotnet build "$repo\EQBuddy.slnx" -c Release --nologo -v q }
 Step 'unit tests  ' { dotnet test "$repo\tests\EQBuddy.Tests\EQBuddy.Tests.csproj" -c Release --nologo }
 

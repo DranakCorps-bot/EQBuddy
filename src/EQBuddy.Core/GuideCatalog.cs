@@ -300,6 +300,9 @@ public sealed class GuideCatalog
         Converters = { new JsonStringEnumConverter() },
     };
 
+    /// <summary>The CURATED file alone — every guide a person wrote and last-looked. This is
+    /// the catalog the authoring rules are about; <see cref="Default"/> is what the app
+    /// draws.</summary>
     public static GuideCatalog LoadEmbedded()
     {
         using var stream = Assembly.GetExecutingAssembly()
@@ -308,6 +311,73 @@ public sealed class GuideCatalog
         var file = JsonSerializer.Deserialize<CatalogFile>(stream, JsonOpts)
             ?? throw new InvalidOperationException("GuideCatalog.json unreadable");
         return new GuideCatalog { Guides = file.Guides };
+    }
+
+    /// <summary>
+    /// The AUTO-WRITTEN half: one guide per <see cref="QuestCatalog"/> quest, produced by
+    /// <c>scripts/harvests/eqlwiki/guides-transform.py</c> inside the weekly refresh from
+    /// wikitext already in the cache.
+    ///
+    /// <para>A separate file for the reason <c>ItemCatalog.json.gz</c> is one: it is refresh
+    /// OUTPUT. Merging it into the curated file would mean a scheduled job rewriting a file
+    /// whose whole contract is that no job rewrites it, and one bad week would take 486
+    /// hand-checked epic rows with it. Two files, one merge, and the curated one wins.</para>
+    /// </summary>
+    public static GuideCatalog LoadHarvested()
+    {
+        using var stream = Assembly.GetExecutingAssembly()
+            .GetManifestResourceStream("EQBuddy.Core.Data.HarvestedGuides.json.gz")
+            ?? throw new InvalidOperationException("HarvestedGuides.json.gz missing from resources");
+        using var gz = new System.IO.Compression.GZipStream(
+            stream, System.IO.Compression.CompressionMode.Decompress);
+        var file = JsonSerializer.Deserialize<CatalogFile>(gz, JsonOpts)
+            ?? throw new InvalidOperationException("HarvestedGuides.json.gz unreadable");
+        return new GuideCatalog { Guides = file.Guides };
+    }
+
+    /// <summary>
+    /// Curated first, then every harvested guide whose <see cref="Guide.QuestName"/> no
+    /// curated guide already claims.
+    ///
+    /// <para><b>Curated wins, and it wins on the QUEST rather than on the id.</b> The two
+    /// producers mint ids independently — the transformer's are <c>hq-</c>-prefixed and can
+    /// never collide — so an id match would never fire and the app would draw two guides for
+    /// one quest, which is trap 4 on the surface that is supposed to end it. Today the
+    /// collision set is exactly the fourteen class epic pages: a human transcribed their 486
+    /// rows into sections a transformer cannot see, and that work must not be shadowed by a
+    /// flat re-read of the same page.</para>
+    ///
+    /// <para><b>And a harvested guide only arrives if its quest does.</b>
+    /// <paramref name="loadedQuestNames"/> is the catalog AS THE APP LOADS IT, which is not
+    /// what the JSON on disk says: <c>CatalogHygiene</c> drops five navigation pages outright
+    /// and <c>SkyTestSplit</c> replaces each class's aggregate Sky page with one quest per
+    /// reward. A guide keyed to a name that survived neither is a guide no surface can reach —
+    /// it is exactly the dangling <c>QuestName</c> that
+    /// <c>EveryGuideQuestNameResolvesInTheHarvestedQuestCatalogAsTheAppLoadsIt</c> exists to
+    /// catch, and the transformer cannot see either rule from Python. This is where the guide
+    /// layer stays BESIDE <see cref="QuestCatalog"/> instead of becoming a second, disagreeing
+    /// copy of it.</para>
+    ///
+    /// <para>Curated order is preserved and the harvested guides follow in file order, which
+    /// is <c>QuestCatalog.json</c> order — so nothing about what the Sky and Epic tabs draw
+    /// moves because this exists.</para>
+    /// </summary>
+    public static GuideCatalog Merge(GuideCatalog curated, GuideCatalog harvested,
+        IReadOnlyCollection<string> loadedQuestNames)
+    {
+        var claimed = new HashSet<string>(
+            curated.Guides.Select(g => g.QuestName).Where(n => n.Length > 0),
+            StringComparer.OrdinalIgnoreCase);
+        var reachable = new HashSet<string>(loadedQuestNames, StringComparer.OrdinalIgnoreCase);
+        return new GuideCatalog
+        {
+            Guides =
+            [
+                .. curated.Guides,
+                .. harvested.Guides.Where(g => !claimed.Contains(g.QuestName)
+                                               && reachable.Contains(g.QuestName)),
+            ],
+        };
     }
 
     /// <summary>Parses catalog JSON in the shipped file's shape. Exists so a test can hold
@@ -320,7 +390,29 @@ public sealed class GuideCatalog
         return new GuideCatalog { Guides = file.Guides };
     }
 
-    public static GuideCatalog Default { get; } = LoadEmbedded();
+    /// <summary>The curated file on its own. The authoring bar — every rule about who wrote
+    /// a guide and last-looked it — is held against THIS, not against the merge.</summary>
+    public static GuideCatalog Curated { get; } = LoadEmbedded();
+
+    private static GuideCatalog? _default;
+    private static readonly object DefaultLock = new();
+
+    /// <summary>What the app draws: curated plus harvested, curated winning on
+    /// <see cref="Guide.QuestName"/>.
+    ///
+    /// <para><b>Lazy, like <see cref="ItemCatalog.Default"/> and for the same reason</b> —
+    /// gunzipping and parsing eleven thousand objective rows belongs on first use of a guide
+    /// surface, not in a static initializer that runs before the widget paints.</para></summary>
+    public static GuideCatalog Default
+    {
+        get
+        {
+            if (_default is { } d) return d;
+            lock (DefaultLock)
+                return _default ??= Merge(Curated, LoadHarvested(),
+                    [.. QuestCatalog.LoadEmbedded().Quests.Select(q => q.Name)]);
+        }
+    }
 
     public Guide? Find(string guideId) =>
         Guides.FirstOrDefault(g => string.Equals(g.Id, guideId, StringComparison.OrdinalIgnoreCase));
@@ -386,8 +478,26 @@ public sealed class GuideCatalog
             if (guide.Id.Length == 0) problems.Add($"{who}: no id");
             else if (!guideIds.Add(guide.Id)) problems.Add($"{who}: duplicate guide id");
             if (guide.Name.Length == 0) problems.Add($"{who}: no name");
-            if (guide.ApplicableClasses.Count == 0) problems.Add($"{who}: no applicable classes");
-            if (guide.ZoneNames.Count == 0) problems.Add($"{who}: no zone names");
+            // A guide has to be PLACEABLE — a player has to be able to arrive at it. Zones
+            // and classes are how a guide that stands on its own says where it belongs; a
+            // guide that names a QUEST says it by naming the quest, whose catalog row already
+            // carries both, and re-stating them here would be a second producer of one fact
+            // (trap 4). So the requirement is written as the claim it always was: say where
+            // you belong, or name the quest that does.
+            //
+            // This is not a loosening of the curated bar. `GuideCatalogTests` sweeps the
+            // CURATED file directly for both fields, so every hand-written guide still names
+            // its zones and its classes; what changed is that a harvested guide for a page
+            // whose infobox states no zone no longer has to invent one to load.
+            if (guide.QuestName.Length == 0)
+            {
+                if (guide.ApplicableClasses.Count == 0)
+                    problems.Add($"{who}: no applicable classes and no quest name — nothing "
+                        + "places this guide on a surface");
+                if (guide.ZoneNames.Count == 0)
+                    problems.Add($"{who}: no zone names and no quest name — nothing places "
+                        + "this guide on a surface");
+            }
             if (guide.Stages.Count == 0) problems.Add($"{who}: no stages");
             problems.AddRange(SourceProblems(guide.Sources, who, requireAtLeastOne: true));
 

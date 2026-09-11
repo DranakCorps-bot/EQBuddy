@@ -149,4 +149,48 @@ public class WeeklyRefreshWiringTests
         Assert.True(File.Exists(Path.Combine(Root, "src", "EQBuddy.Core", "Data", "GuideCatalog.json")),
             "refresh.py flags Data/GuideCatalog.json; it is not there, so the weekly flag is a no-op.");
     }
+
+    /// <summary>
+    /// The HARVESTED half is the opposite wiring, and both halves have to be true at once for
+    /// the curated/auto-written split to mean anything: `HarvestedGuides.json.gz` is PROMOTED
+    /// (refresh output, diffed in the weekly PR) and never CURATED, and `guides-transform.py`
+    /// runs AFTER `quests-promote.py` — whose `QuestCatalog.json` is the item list its
+    /// "Turn-in pieces" stage is built from. Reversed, the week's guides would be assembled
+    /// out of last week's quests and nothing would say so.
+    /// </summary>
+    [Fact]
+    public void TheHarvestedGuidesArePromotedAndRunAfterTheQuestPromote()
+    {
+        var refresh = Read("scripts/harvests/refresh.py");
+        var promoted = Regex.Match(refresh, @"PROMOTED = \[(.*?)\]", RegexOptions.Singleline).Groups[1].Value;
+        var curated = Regex.Match(refresh, @"CURATED = \[(.*?)\]", RegexOptions.Singleline).Groups[1].Value;
+
+        Assert.Contains("HarvestedGuides.json.gz", promoted);
+        Assert.DoesNotContain("HarvestedGuides.json.gz", curated);
+
+        var promotions = Regex.Match(refresh, @"PROMOTIONS = \[(.*?)\]", RegexOptions.Singleline).Groups[1].Value;
+        var promote = promotions.IndexOf("quests-promote.py", StringComparison.Ordinal);
+        var transform = promotions.IndexOf("guides-transform.py", StringComparison.Ordinal);
+        Assert.True(promote >= 0, "refresh.py no longer runs quests-promote.py");
+        Assert.True(transform > promote,
+            "guides-transform.py must run AFTER quests-promote.py — it reads the "
+            + "QuestCatalog.json that promote writes");
+
+        Assert.True(File.Exists(Path.Combine(Root, "scripts", "harvests", "eqlwiki",
+                "guides-transform.py")),
+            "refresh.py runs guides-transform.py; it is not there, so the weekly run throws.");
+        Assert.True(File.Exists(Path.Combine(Root, "src", "EQBuddy.Core", "Data",
+                "HarvestedGuides.json.gz")),
+            "the harvested guides are an embedded resource; the file is missing.");
+
+        // Consequence 7, as an assertion rather than a promise: the transformer reads the
+        // cache and never the wiki, so adding it to the weekly run costs eqlwiki nothing. Named
+        // one module at a time and not by the prefix "urllib", because `urllib.parse` is string
+        // work this script does use — a guard that cannot tell those apart gets loosened the
+        // first time it is in the way, and then it guards nothing.
+        var transformer = Read("scripts/harvests/eqlwiki/guides-transform.py");
+        foreach (var networking in new[]
+                 { "urllib.request", "urllib.error", "requests", "http.client", "socket" })
+            Assert.DoesNotContain(networking, transformer, StringComparison.Ordinal);
+    }
 }
