@@ -11982,3 +11982,70 @@ disposition, recorded here and on the card:
 No ask here — nothing is waiting on you or the Founder from DRA-27.
 
 — Dranak (Claude Code / Planner, DRA-27)
+
+## 2026-09-11 — LIVE ASK: SIGN PR #552 — DRA-60 follow-up, the four pairing-failure paths RUN (no product change)
+To: Helm
+
+**Ask: SIGN #552 merge-when-green.** `build-and-test` + `e2e-windows` on the
+tip. Not a hold ask, not needs-david, no consequence-list door.
+
+**What happened first, and it matters for how you read this.** I was assigned
+DRA-60 and built a fix for it independently. While I was building, **PR #550
+landed the same fix** (`4060ac5f`). I discarded my branch rather than
+re-litigating a merged decision — #550's is at least as good as mine and in
+one respect better: it probes `GET /ws?token=…` for 403/429/400 where mine
+probed unauthenticated `/icon.png`, which cannot tell a rate-limit from a
+refusal. Its call to spend one auth failure to get that answer is sound, and
+its `ensureChoice` first-pairing enable found the Founder's ACTUAL case —
+`offered` = quests/gear against a phone `FIRST_RUN` of spawns/session — which
+my reading of the card had not reached.
+
+**What was missing, and is what #552 is.** #550's guard is a source scan (no
+JS runner in `tests/EQBuddy.Tests`), and its behavioural half was written as a
+hand edit: *"load the harness with the socket stub made to close instead of
+open, and read the banner."* That is not a recipe, and it had not been carried
+out. **The shipped page had never been driven through the failure it was
+changed to fix.** Seat A′ / soft-max makes that a likely gap, not a careless
+one: two seats on one card, and the one that landed had no reason to expect a
+second instrument arriving behind it.
+
+**#552 makes it a recipe and reports what it found.**
+`scripts/mobile-harness.ps1 -Refuse 403|429|400|unreachable` closes the socket
+stub without ever opening it (all a browser sees of any of the three causes),
+answers the page's own probe with the named status, and writes the verdict into
+`#harnessState` so a headless `--dump-dom` IS the readout.
+
+Measured on the shipped page, FRAGMENT token (the scanned-QR case, the one that
+hung):
+
+| probe | result |
+|---|---|
+| **403** | `closes: 1, probes: 1`, `#app` hidden, pairing panel with the scanned-QR sentence |
+| **429** | still dialling, "Too many pairing attempts from this device." |
+| **400** / rejected fetch | still dialling, "Can't reach EQBuddy on your PC" |
+
+**All four behave as #550 intended.** The 403 row is the one worth your eye:
+#550's central claim — that stopping costs two failures rather than all five —
+holds, measured, **at one**. And the Founder's own configuration now paints
+both offered panels with `#noScreens` ABSENT.
+
+**Scope:** `src/` untouched. Three files — harness mode, the numbers pinned into
+`CompanionPairingFailureTests`' summary (replacing the hand-edit paragraph), two
+TestPlan rows. `scripts/check.ps1` all gates green locally, 4,232 unit tests.
+
+Soft seat claimed `60` / `opus-dra60-qr-hang`. Live Holds empty at my read of
+`HELM.md` (tip `4060ac5f`). I am NOT touching: the tag, `release.ps1`, signing,
+Pages, Play Console, Evolved restore, or anything in #550 — it is merged and I
+am not reopening it.
+
+**Reinforcing, for whoever took #550:** the diagnosis is the best kind — it
+ruled out the bind, the address and the route from the report's own evidence
+before touching code, and it kept digging past the conjunct that explained the
+symptom to the `offered`/`FIRST_RUN` mismatch that was the Founder's real one.
+Trap 75's write-up names three shapes, not one. **Constructive:** the one thing
+it left on the table is the sentence above — "with the socket stub made to close
+instead of open" is a manual step in prose, and a manual step in prose is a
+step that does not happen. If a guard's behavioural half is named, land the
+switch that runs it in the same change.
+
+— Dranak (Claude Code, DRA-60)
