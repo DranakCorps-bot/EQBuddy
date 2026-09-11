@@ -457,6 +457,67 @@ $Shots = [ordered]@{
                                    @{ Id = 'sky-202'; Acquired = $true }   # so: ready
                                )
                            } }
+    # ---- Delivery 3 (DRA-41): EPIC 1.0 ON THE GUIDED MODEL ---------------------------
+    #
+    # Two frames on purpose, and the pair is the point: the SHORTEST epic chain beside the
+    # LONGEST one. Fable §4 asks Bevel to rule between two answers for long chains (fold at
+    # the stage level, or "step 12 of 66 · section 3 of 5" on the card) and neither can be
+    # judged from the short frame alone.
+    #
+    # PREDICTED before shooting (trap 23), from the shipped catalog and the ticks below:
+    #
+    # 'shell-quests-epic-guide' — PALADIN, 14 rows in 2 sections, expanded.
+    #   * The per-class band at the top: "Paladin" and an "Epic complete" button. Epic
+    #     completion is per CLASS, so that band stays where it was — the guide did not move
+    #     it and did not grow a second control for it.
+    #   * ONE heading line where the classic tab drew TWO (one per section): a "−" fold
+    #     control, then "Paladin · Epic 1.0   0/14". NO "· done/ready/in progress" note —
+    #     nothing is ticked. The heading opens the Paladin Epic Quest wiki page, not a page
+    #     called "Epic 1.0"; its hover lists the reward the page lists ("Rewards Fiery
+    #     Defender.") and shows NO item stats block, because an epic pays several items and
+    #     eqlwiki names none of them "the epic".
+    #   * NO caption line: 0 skipped and 0 stubs. Transcribed is NOT a stub — 486 rows that
+    #     ARE directions must not tell the player we cannot give them directions.
+    #   * The NEXT card under it: "NEXT:" then the page's own first sentence verbatim
+    #     ("Complete quest for The Fiery Avenger, which includes …"), then "Works toward your
+    #     Paladin epic." — and NOTHING ELSE. No direction sentence and no detail line, which
+    #     is the whole visible difference between Transcribed and Authored: the page states a
+    #     sentence, not who and where, so the card draws no line claiming otherwise. Then
+    #     Done / Skip / the pencil.
+    #   * Below it the stage heading "Checklist" and 13 rows, then "Resources" and 1 — the
+    #     page's own sections, in the page's order, as the stage headings.
+    #   * A pencil at the end of EVERY row. The sentence is the page's, so the page is where
+    #     a wrong one gets fixed, and every row is a place that can be wrong.
+    #   * NO dim second line under any row: who and where are empty by rule on a transcribed
+    #     step, and a row line that is sometimes there and usually not reads as a bug.
+    #
+    # 'shell-quests-epic-guide-long' — DRUID, 66 rows in ONE section, expanded. The frame
+    #   Bevel is being asked to rule on.
+    #   * The same class band and ONE heading, "Druid · Epic 1.0   0/66".
+    #   * ONE stage heading, and it reads "Druid Epic Quest" rather than "Checklist": the
+    #     page has no sub-headings, so naming the run after the quest says something where
+    #     "Checklist" over the whole quest says nothing.
+    #   * Then sixty-six rows, which will NOT fit the frame — that is the finding, not a
+    #     staging miss. The card scrolls away with them, so "what do I do next" leaves the
+    #     screen the moment you start reading, and there is no way to fold a SECTION because
+    #     there is only one. Both of Fable's candidate answers address exactly this.
+    'shell-quests-epic-guide' = @{ Title = 'EQBuddy — Guide'
+                           Env = @{ EQBUDDY_SHELL = 'quests:epic'
+                                    EQBUDDY_SHELL_SIZE = '1000x900' }
+                           Ledger = @{ Classes = @('Paladin') }
+                           Set = @{
+                               # The fold key of a guided EPIC group is its GUIDE ID — an
+                               # epic group has no reward key to fold under. Same key the
+                               # "+" writes (GuideChecklistProjection.FoldKey).
+                               GuideExpanded = @('epic-paladin')
+                           } }
+    'shell-quests-epic-guide-long' = @{ Title = 'EQBuddy — Guide'
+                           Env = @{ EQBUDDY_SHELL = 'quests:epic'
+                                    EQBUDDY_SHELL_SIZE = '1000x900' }
+                           Ledger = @{ Classes = @('Druid') }
+                           Set = @{
+                               GuideExpanded = @('epic-druid')
+                           } }
     'shell-quests-split' = @{ Title = 'EQBuddy — Guide'
                            Env = @{ EQBUDDY_SHELL = 'quests:general'
                                     EQBUDDY_SHELL_SIZE = '900x640' }; Set = @{} }
@@ -1396,14 +1457,46 @@ $Shots = [ordered]@{
                            } }
     # The Epic tab's per-class master check (#138, restored for #210). Two classes, so
     # the band is visibly PER CLASS rather than a single header that could be anything.
+    #
+    # RESTAGED AND SPLIT 2026-09-11 (DRA-41), and the split is the finding. One frame used
+    # to carry BOTH claims — "the band is per CLASS" (two bands) and "a complete class's
+    # rows are locked and LOOK locked" (its rows on screen). A guided class is one tall
+    # group where the classic tab drew short sections, so expanding the complete class now
+    # pushes the other class's band off the bottom of a window with no size hook. Keeping
+    # one frame would have meant a picture that no longer shows what the recipe says it
+    # shows, which is trap 22's other half and exactly what happened to
+    # shell-quests-sky-guide when folding landed.
+    #
+    # A guided epic group's fold key is its GUIDE ID — it has no reward key to fold under.
+    #
+    # 'epic-checklist' — THE LOCKED ROWS. One class, expanded.
+    #   PREDICTED before the re-shoot (trap 23):
+    #   * A "Cleric" band with a "Reopen" button — the complete state of the master check.
+    #   * ONE heading where the classic tab drew one per section: "Cleric · Epic 1.0  0/20",
+    #     and under it the NEXT card and the stage heading "Cleric Epic Quest" (the page has
+    #     no sub-headings, so the run is named for the quest rather than "Checklist").
+    #   * Its rows DIMMED and unclickable, each one's hover saying Cleric's epic is marked
+    #     complete. Dimmed and not merely disabled: the CheckBox style carries no disabled
+    #     visual, so IsEnabled alone reads as live and silently ignores clicks (trap 17).
+    #   * The flag is written DIRECTLY, so Cleric reads "complete" at 0/20 — a state the
+    #     app itself never produces, because the real MarkComplete ticks every row on its
+    #     way in. It is here to photograph the locked rows; do not read the count as
+    #     evidence of anything.
     'epic-checklist'  = @{ Title = 'Quest Tracker'
                            Env = @{ EQBUDDY_QUESTS = 'epic' }
+                           Ledger = @{ Classes = @('Cleric') }
+                           Set = @{ EpicQuestCompleted = @('Cleric')
+                                    GuideExpanded = @('epic-cleric') } }
+    # 'epic-checklist-classes' — THE BAND IS PER CLASS. Two classes, NOTHING expanded, which
+    #   is also the state a player lands on.
+    #   PREDICTED before shooting (trap 23): two bands and two headings, in four lines —
+    #   "Cleric" + "Reopen" over "Cleric · Epic 1.0  0/20", then "Warrior" + "Epic complete"
+    #   over "Warrior · Epic 1.0  0/30". Alphabetical, so Cleric leads. That is the claim
+    #   this row exists for: completion is per CLASS and never per section, so the control
+    #   cannot ride a group heading the way the Sky turn-in does.
+    'epic-checklist-classes' = @{ Title = 'Quest Tracker'
+                           Env = @{ EQBUDDY_QUESTS = 'epic' }
                            Ledger = @{ Classes = @('Warrior', 'Cleric') }
-                           # The flag is written DIRECTLY, so Cleric reads "complete" at
-                           # 0/20 — a state the app itself never produces, because the
-                           # real MarkComplete ticks every row on its way in. It is here
-                           # to photograph the band's two states and the locked rows; do
-                           # not read the count as evidence of anything.
                            Set = @{ EpicQuestCompleted = @('Cleric') } }
     # The collapsed HUD with EVERY cell up — the only way to see all the icons at once,
     # and the surface that is on screen for the whole session. Its icons were glyphs

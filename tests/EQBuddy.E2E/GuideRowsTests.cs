@@ -26,8 +26,18 @@ namespace EQBuddy.E2E;
 /// </summary>
 public class GuideRowsTests
 {
+    /// <summary>The Warrior's PLANE OF SKY guides, and the type filter is load-bearing.
+    ///
+    /// <para><c>ForClass</c> answers "every guide that applies to this class" and is
+    /// deliberately type-agnostic — which was indistinguishable from "every Sky guide" for as
+    /// long as Sky was the only kind there was. Delivery 3 gave the Warrior an EpicQuest guide
+    /// too, and every expectation in this file silently grew by its 30 steps while the Sky tab
+    /// went on drawing 21: five tests in this file failed at once, all of them asking the Sky
+    /// tab for a number that included the Epic tab's rows. A helper that names a tab has to
+    /// narrow to that tab.</para></summary>
     private static IReadOnlyList<Guide> WarriorGuides =>
-        GuideCatalog.Default.ForClass("Warrior");
+        [.. GuideCatalog.Default.ForClass("Warrior")
+            .Where(g => g.GuideType == GuideType.PlaneOfSkyQuest)];
 
     /// <summary>Every objective of every Warrior guide — the rows the tab must draw.</summary>
     private static int WarriorRows => WarriorGuides.Sum(g => g.AllObjectives.Count());
