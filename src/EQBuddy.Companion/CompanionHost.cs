@@ -461,20 +461,9 @@ public sealed class CompanionHost : IDisposable
                 if (string.Equals(action.Surface, CompanionSurfaces.Quests, StringComparison.OrdinalIgnoreCase))
                 {
                     if (_sources.QuestLedger is { } ledger
-                        && _sources.QuestCharacterKey?.Invoke() is { Length: > 0 } key)
-                    {
-                        // A guide step or a card verb (DRA-46) goes through the router with
-                        // the QUEST in hand; a pin or a class pick is a ledger verb. Keyed on
-                        // the id's own shape, which is the fact — "guide:…" is a row no list
-                        // on this surface has, and a "skip|" is a verb no other id carries.
-                        var guideTap = GuideChecklistProjection.IsGuideRowId(action.Id)
-                            || action.Id.StartsWith(CompanionActions.SkipVerb, StringComparison.Ordinal);
-                        var applied = guideTap
-                            ? CompanionActions.ApplyQuestGuide(_settings, ledger, key,
-                                _sources.Quests?.Invoke().Catalog, action)
-                            : CompanionActions.Apply(ledger, key, action);
-                        if (applied) edited.Add(action.Surface);
-                    }
+                        && _sources.QuestCharacterKey?.Invoke() is { Length: > 0 } key
+                        && CompanionActions.Apply(ledger, key, action))
+                        edited.Add(action.Surface);
                 }
                 else if (CompanionActions.Apply(_settings, _sources.QuestLedger,
                     _sources.QuestCharacterKey?.Invoke() ?? "", action))

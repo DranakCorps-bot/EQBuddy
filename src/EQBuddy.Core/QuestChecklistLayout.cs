@@ -54,28 +54,7 @@ public sealed record QuestChecklistRow(
     /// per-character guide ledger, for every objective including reward ones, because a skip
     /// has no home in the Sky turn-in store and is a statement about the future rather than
     /// the past (P1b's asymmetry).</para></summary>
-    bool IsSkipped = false,
-    /// <summary>
-    /// The turn-in item whose OWNED COUNT is this row's done state — set on a
-    /// <c>GuideProgressHome.LedgerItem</c> row and empty on every other one (DRA-46).
-    ///
-    /// <para><b>It is the "do not draw me twice" mark.</b> The General tab's detail pane and
-    /// the phone's quest card have drawn a row per turn-in item, with its have/need count and
-    /// its manual count editor, since the tracker existed. A harvested guide's <c>Collect</c>
-    /// step IS that row — the transformer built it from the same catalog item list — so a
-    /// surface that drew both would show one fact as two lines, one of them clickable and one
-    /// of them not (trap 4 on the first screen a player opens). The rows still come through
-    /// the projection, because the card's "what is next" and the guide's counts have to see
-    /// them; what a surface must not do is render them a second time.
-    /// <c>GuideChecklistProjection.WalkthroughRows</c> is the one producer of "which of these
-    /// rows the guide body draws", so the desktop and the phone cannot split the list
-    /// differently.</para>
-    ///
-    /// <para>Empty is not "no item": a Sky <c>SkyItem</c> row is item-backed too, and it is
-    /// NOT this — its box is the checklist's own and a click on it is a real write. This names
-    /// only the home whose answer is the bags, where a click is refused
-    /// (<c>GuideProgressRouter.SetDone</c>).</para></summary>
-    string LedgerItemName = "");
+    bool IsSkipped = false);
 
 /// <summary>
 /// The active-step card: what the player should do NEXT in one guided reward, lifted out of
