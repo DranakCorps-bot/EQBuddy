@@ -73,12 +73,6 @@ public static class GuideChecklistProjection
         return null;
     }
 
-    /// <summary>Replace every guided group's rows with its guide's objectives, and hand back
-    /// every other group untouched.
-    ///
-    /// <para>Called from exactly where <c>QuestsView.RenderChecklist</c> and
-    /// <c>CompanionProjection.BuildSky</c> get their groups, so the two screens cannot show
-    /// different guides — or a guide on one and the classic list on the other.</para></summary>
     /// <summary>
     /// The reward item's stats block, by item name — injected the way
     /// <c>GearLocker</c> already takes its <c>statsFor</c>, so this stays a pure function of
@@ -91,6 +85,12 @@ public static class GuideChecklistProjection
     public static string? ShippedItemStats(string itemName) =>
         ItemCatalog.Default.Find(itemName)?.StatsText;
 
+    /// <summary>Replace every guided group's rows with its guide's objectives, and hand back
+    /// every other group untouched.
+    ///
+    /// <para>Called from exactly where <c>QuestsView.RenderChecklist</c> and
+    /// <c>CompanionProjection.BuildSky</c> get their groups, so the two screens cannot show
+    /// different guides — or a guide on one and the classic list on the other.</para></summary>
     public static IReadOnlyList<QuestChecklistGroup> Apply(
         IReadOnlyList<QuestChecklistGroup> groups,
         GuideCatalog catalog,

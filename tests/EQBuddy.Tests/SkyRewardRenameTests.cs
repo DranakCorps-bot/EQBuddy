@@ -118,4 +118,51 @@ public class SkyRewardRenameTests
         Assert.Contains("Shimmering Bracer of Protection", rogue);
         Assert.DoesNotContain("Scintillating Bracer of Protection", rogue);
     }
+
+    /// <summary>
+    /// The Bard's spear, 2026-09-10 — and the first rename here that a SURFACE made visible
+    /// rather than a reporter.
+    ///
+    /// <para>eqlwiki titles the item page "Spear of Harmony"; only our Sky rows said
+    /// "Harmonic Spear", which made us uniquely wrong. It sat harmless for weeks and stopped
+    /// being harmless the day the reward hover started looking items up BY NAME in the
+    /// shipped <c>ItemCatalog</c>: this Bard became one of two rewards in 95 showing a
+    /// sentence where every other reward shows the item's own stats block. Fable's #514
+    /// last-look promoted it out of Delivery 2 for exactly that reason.</para></summary>
+    [Fact]
+    public void TheBardsSpearTakesTheWikisOwnItemTitle()
+    {
+        var bard = SkyQuestDefaults.Items
+            .Where(i => i.ClassName == "Bard")
+            .Select(i => i.Reward)
+            .Distinct()
+            .ToList();
+
+        Assert.Contains("Spear of Harmony", bard);
+        Assert.DoesNotContain("Harmonic Spear", bard);
+    }
+
+    /// <summary>
+    /// A rename moves the EXPANDED set too, not only the turn-in.
+    ///
+    /// <para><c>AppSettings.GuideExpanded</c> is keyed the same way and was added AFTER this
+    /// migration was written, so a rename that only moved <c>SkyQuestCompleted</c> would
+    /// quietly re-fold a quest the player had open. Fable named the choice in its #514
+    /// last-look — migrate it, or accept the re-fold and say so; this is the migration.</para>
+    ///
+    /// <para>Staged with a turn-in the player has NOT made, because the two loops are
+    /// separate for exactly that case: an expanded quest is not a completed one.</para>
+    /// </summary>
+    [Fact]
+    public void AnExpandedQuestStaysExpandedThroughARename()
+    {
+        var s = new AppSettings();
+        s.GuideExpanded.Add("Bard|Harmonic Spear");
+
+        Assert.True(s.MigrateSkyRewardRenames());
+
+        Assert.Equal(["Bard|Spear of Harmony"], s.GuideExpanded);
+        // ...and it did not invent a turn-in the player never made.
+        Assert.Empty(s.SkyQuestCompleted);
+    }
 }

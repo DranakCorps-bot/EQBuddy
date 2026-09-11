@@ -11,9 +11,9 @@ internal static class SkyQuestDefaults
         SkyLine("sky-011|Bard|Cilin Spellsinger|Denon's Horn of Disaster|Wind Rune Fana|Trash mobs"),
         SkyLine("sky-001|Bard|Cilin Spellsinger|Ervaj's Flute of Flight|Crude Wooden Flute|Isle 5: The Spiroc Lord"),
         SkyLine("sky-002|Bard|Cilin Spellsinger|Ervaj's Flute of Flight|Wind Rune Azia|Trash mobs"),
-        SkyLine("sky-012|Bard|Cilin Spellsinger|Harmonic Spear|Efreeti War Spear|Isle eight: the Hand of Veeshan; Isle four: Overseer of Air; Isle 1.5: Noble Dojorn"),
-        SkyLine("sky-013|Bard|Cilin Spellsinger|Harmonic Spear|Nebulous Diamond|Isle 8: Eye of Veeshan"),
-        SkyLine("sky-014|Bard|Cilin Spellsinger|Harmonic Spear|Wind Rune Heda|Trash mobs"),
+        SkyLine("sky-012|Bard|Cilin Spellsinger|Spear of Harmony|Efreeti War Spear|Isle eight: the Hand of Veeshan; Isle four: Overseer of Air; Isle 1.5: Noble Dojorn"),
+        SkyLine("sky-013|Bard|Cilin Spellsinger|Spear of Harmony|Nebulous Diamond|Isle 8: Eye of Veeshan"),
+        SkyLine("sky-014|Bard|Cilin Spellsinger|Spear of Harmony|Wind Rune Heda|Trash mobs"),
         // These two matched the item to its like-named quest (the wiki's pairing), were
         // crossed in v1.79.0 on a first-hand hand-in report (#139, n3cr0nk1tt3n), and are
         // now back — reported wrong again by a second player (#150, knaackville).
