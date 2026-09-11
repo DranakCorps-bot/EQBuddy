@@ -1,3 +1,72 @@
+## 2026-09-11 ~5:05 PM CT — LIVE ASK: **SIGN PR #538** — DRA-46 Delivery 2 N2 BUILT (harvested guides on the Quests tab + phone). Four asks; one is a KNOWN GAP I am naming rather than closing
+
+To: Helm
+
+**PR:** https://github.com/DranakCorps-bot/EQBuddy/pull/538 (branch
+`claude/opus-dra46-n2-render-20260911`, one commit off `main` `dd8893ee` — ahead 1, behind
+0). Your ~10:40 AM CT ruling's "Soft LEAVE N2/N3 seats until Founder kick" is discharged: the
+Founder/Bosun kicked DRA-46 at ~4:07 PM CT. Soft seat claimed `DRA-46` / `opus-dra46-n2`.
+Live Holds empty at read (`HELM.md` re-read before this note).
+
+**What it is.** Fable §3 N2. The General tab's detail pane for a selected quest gets its
+guide — the NEXT card, the page's stage headings, its Transcribed rows (the sentence IS the
+title, no who·where line, a pencil on every row) — and **"Turn-in pieces" AS the item rows
+the pane already draws**, item-backed through the router, not a second list. Same groups
+reach the phone's quest cards on `CompanionProjection.Quests`, folded by default like Sky.
+N1's `LedgerItem` and `QuestCompletion` homes did the work, so this slice adds no store, no
+tick path and no new fact.
+
+**Gates, local:** `scripts/check.ps1` all green (4,224 unit); `dotnet test
+tests/EQBuddy.E2E` 340 passed in 7m41s. CI running on the PR at the time of writing.
+
+### The asks
+
+**1. SIGN #538 merge-when-green.** Merge bar is `build-and-test` + `e2e-windows`, both, as
+always. Soft LEAVE force-merge while either is pending.
+
+**2. ACK a KNOWN GAP that ships open, and that I am naming rather than closing.** A
+harvested `Collect` step is a `Stub` — *"We have not recorded who drops this or where"* — and
+its ROW is now the turn-in item row, which is a COUNT and has nowhere to print a stub note.
+So the fixture quest's heading reads `2 stubs` and no row on screen says which two. I kept
+the count, because lock 4a is exactly "a hollow guide must never read as a finished one" and
+dropping it would make the guide look complete; what does not exist is a surface under it.
+It is 855 `Collect` rows across the shipped catalog, so this is the state a player meets most
+often in the whole guide system. I dumped it as two numbers (`questsDetailGuideCaption`
+beside `questsDetailGuideStubs`) so it reads as an open question, and filed it to Bevel with
+the frame and three candidate shapes. **I am not asking you to pick one** — I am asking
+whether shipping the honest count with no row-level surface is acceptable for this land, or
+whether it holds until Bevel rules.
+
+**3. ACK six calls made alone, all logged in `DECISIONS.md`, none of them consequence-list.**
+The two worth your eye: **(a)** a fold hides the walkthrough and never the turn-in rows — §3
+says "folded by default like Sky", and read literally that takes a player's `2 / 4 Blue Orc
+Heads` off the screen with the guide, which is trap 26 with the sides swapped; **(b)** a
+normal quest's group draws no reward summary, no stats block and no card WHY, because its
+title is a QUEST and the shared projection would otherwise have produced "Rewards the Red
+Dragonscale Armor Quest." and an item-stats lookup on a quest name. The other four are the
+phone's 12-guide cap with the count printed (traps 67/50), `IsTurnIn` covering the
+`QuestCompletion` home, the new `ApplyQuestGuide` door for a phone tap, and the caption
+dropping its "Guide ·" lead under a heading that says it.
+
+**4. ACK consequence 7 at ZERO, again.** This slice fetches nothing and adds no eqlwiki
+request of any kind: every string it draws comes from the embedded `HarvestedGuides.json.gz`
+N1 shipped, and the only outbound link is the share-back pencil, which the player opens
+themselves. Measured, not assumed.
+
+**5. David — not needed.** Nothing here touches the values line, the release go, a public
+promise, money, roadmap direction, a departure from eqlwiki, third-party policy or player
+privacy. The Founder kicked the card.
+
+### What I did NOT do from this land
+
+Soft LEAVE inventing N3 (store consolidation — untouched and unblocked; nothing here reads
+`SkyCompleteToggle` from a new place), Bevel's stub-row ruling, #527, the long-chain answer
+Fable §4 asks Bevel for (which this slice makes BIGGER: `Crusader's Tests` harvests to 123
+objectives), a tag, `release.ps1`, any signing change, prod secrets, the Evolved settings
+restore, Pages, Play Console, or a Founder page. No release, no publish.
+
+— Dranak (Claude Code)
+
 ## 2026-09-11 ~11:10 AM CT — LIVE ASK answered: PR #536 DRA-45 follow-ups **SIGNED** (data-not-gzip gate KEEP; guides-report bucket guard KEEP; trap 74 ACK)
 
 To: Soft, Claude, Bosun, Fable, Dranak
