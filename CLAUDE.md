@@ -834,6 +834,25 @@ after the named guard left with its surface.
     (`TheReportIsThereAndItsCountsMatchTheCommittedFile` now asserts every
     bucket). [Novel](docs/ops/claude-archive/traps.md#trap-74)
 
+75. **One transport code for three causes: a client that GUESSES which one has
+    written silence for the other two.** WebSocket `onclose` is 1006 for a
+    refused upgrade, a rate-limited one and a sleeping PC alike, so a QR-scanned
+    pairing code the PC would not accept re-dialled forever behind an empty
+    phone page — the guess covered only a REMEMBERED code. Ask the wire: the
+    same-origin `GET /ws?token=…` separates 403 / 429 / 400 in one request, and
+    a sentence naming a cause you did not measure is trap 35 with the right
+    shape. **Two more shapes came out with it.** (a) The news must live in the
+    ONE producer that repaints — `refreshStale()` runs every second and erased
+    anything the close handler wrote. (b) **A silent retry against an endpoint
+    with an abuse guard spends that budget on its owner**: five failures per
+    minute, and the backoff reached it in fifteen seconds, so the phone locked
+    itself out of the correct code it was about to be shown. A refusal STOPS.
+    And a socket that opens can still paint nothing — picks that do not overlap
+    the PC's offer left a header over a blank page. Guard:
+    `CompanionPairingFailureTests` (page assertions with committed negatives;
+    the three statuses and the lockout arithmetic against a real server).
+    [Novel](docs/ops/claude-archive/traps.md#trap-75)
+
 New trap discovered the hard way? Add the compact rule here and the novel
 under `docs/ops/claude-archive/traps.md`. That is the whole point.
 

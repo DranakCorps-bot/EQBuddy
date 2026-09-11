@@ -1,3 +1,5 @@
+## 2026-09-11 ~1:05 PM CT — LIVE ASK: **SIGN DRA-60** — the founder mobile hang is the PAGE, and it was locking the phone out of the rescan. BUILT, but UNVERIFIED LOCALLY — and that is ask 1
+
 ## 2026-09-11 ~3:52 PM CT — LOOP-CLOSE: DRA-59 DONE — #545 + SSC #546 MERGED, Desktop republished and RUNNING the fix (one disclosure)
 
 To: Helm
@@ -74,49 +76,137 @@ Illustration lock honoured: the clip ships in the same PR as its recipe (`record
 
 To: Helm
 
-**Card:** DRA-59 `EQ-V2-EPIC-MARK-COMPLETE` (parent DRA-3), Founder smoke 2026-09-11 ~3:08 PM CT via Helm. Seat claimed `DRA-59` / `opus-dra59-epic-verb`.
+**PR:** _(placeholder — filled at PR creation)_ on branch
+`claude/opus-dra60-mobile-hang`, off `main` `cc3894cf`. `HELM.md` re-read at write
+time: Live Holds empty; nothing holds DRA-60 or EQBuddy Mobile. DRA-60 was kicked to me
+as Executor, separate from DRA-59.
 
-**PR:** https://github.com/DranakCorps-bot/EQBuddy/pull/545 — tip `21d925cf` on `claude/opus-dra59-epic-verb-20260911`, branched off `main` `cc3894cf` (post-#544, the DRA-46-collision SSC). Ahead 1 / behind 0 at write. Ten paths, +139/-19, plus two re-shot PNGs. At write: `build-and-test` + `e2e-windows` both **pending**. `HELM.md` re-read at splice: Live Holds **empty**.
+**THE FIRST ASK IS ABOUT EVIDENCE, NOT PRODUCT, SO IT GOES FIRST.** This session was
+launched non-interactively (`claude.exe -p --permission-mode acceptEdits`), which
+auto-approves file edits and approves NO Bash beyond a read-only allowlist. `dotnet
+build`, `dotnet test`, `pwsh`, `node <file>`, `git add`, `git commit`, `git push` and
+`gh` were each refused. **So I have run nothing: no unit suite, no E2E, no
+`check.ps1`, not even a JS parse of the page I edited** — and I cannot commit, open the
+PR, or fire your back-channel. The tree is complete and the remaining steps are
+mechanical. Everything below is reasoning against the source and against the shipped
+strings, labelled as such. I would rather hand you a measured claim; I do not have one.
 
-**Not** the DRA-46 tree. This PR touches `EpicCompleteToggle` / `SkyCompleteToggle` / the Epic band in `QuestsView` and nothing the #538-revert / #540 path is about, so it neither helps nor hinders that land. Soft's DRA-46 sequence is untouched by this.
+**This is the SECOND hang at this symptom, and it is not a regression of the first.**
+2026-09-07 ~8:15 PM CT, same machine, same port: "phone hangs after the QR", root-caused
+to a first pairing never sending `subscribe` and being served 186 KB per push.
+`CompanionFirstPairingTests` guards that, and it still holds — **that page CONNECTED and
+then drowned; this one never connects at all.** Same symptom, opposite half of the
+socket's life. Worth saying out loud because the obvious read of a repeat report is that
+the earlier fix came undone.
 
-### What shipped
+**What it is.** Founder smoke: scan the pairing QR, phone navigates to
+`http://10.0.0.84:47859/#<code>`, page hangs. The bind was never the bug — the PC
+answered that GET 200 with the whole ~155 KB page, and the same URL on the PC connected.
+**The hang is `index.html`, after navigation.** A fragment code goes straight into `#app`
+and dials; `ws.onclose` is code 1006 for a REFUSED upgrade, a RATE-LIMITED one and a
+sleeping PC alike, because the upgrade never happened and there is no status to read. The
+page guessed — and only for a code recovered from `localStorage`. A code from the
+FRAGMENT, which is every QR scan there has ever been, matched no branch and was
+re-dialled forever. `refreshStale()` runs once a second and its only never-connected
+clause was `everConnected && !lastMsgAt`, false before the first open, so every tick fell
+through and REMOVED the banner. **The page was not stuck. It was deciding, once a second,
+to say nothing.**
 
-The Epic tab's green primary button said **`Epic complete`** over a class band whose progress row said `Bard 0/31` / `Warrior 3/30`. It is **`Mark as complete`** now — the same grammar as Sky's `Mark turned in`, which never had the bug because it was already an imperative. The verb is the whole fix.
+**And the silence had teeth, which is the part I did not expect.** `CompanionServer`
+rate-limits an IP at five auth failures inside sixty seconds, and the page's 1→2→4→8 s
+backoff spends all five in about fifteen. From there the device is 429'd for most of
+every minute — **so the loop had locked the phone out of the CORRECT code the Founder was
+on their way to rescan, and the rescan would have looked broken too.** That is why the
+fix STOPS on a refusal instead of announcing one and carrying on: stopping costs two
+failures and leaves room for the rescan.
 
-Two things came with it that the card did not name, one of which is a call I made alone:
+**The fix.** The page asks instead of guessing: the same-origin `GET /ws?token=…` the
+socket would have made answers **403** (this code is wrong → stop, forget a remembered
+code, show the pairing screen with the reason on it), **429** (this device burned the
+budget → say so, keep retrying), **400** (the code is RIGHT and an upgrade was the only
+thing missing → the fault is the network, so say THAT and never accuse the code), and a
+rejected/timed-out fetch means the PC is not answering. One request separates three
+causes the transport had flattened into one. Bounded at 4 s so the probe can never
+strand the reconnect loop. **No new exposure:** the code is already in the socket's own
+query string; the fragment rule is about the page GET.
 
-1. **The confirmation dialog's caption** now READS `ButtonLabel(completed: false)` instead of repeating the literal. `QuestsView` held a SECOND copy of the string `"Epic complete"` as the `MessageBox` caption, so a player clicking the fixed button would still have got a window titled with the state word — trap 4, on the exact surface the button opens. **This is the one place I departed from a literal reading of the card** ("change wording" names the button). Logged in `DECISIONS.md` with the default it could have gone the other way on (ship the button, file the caption). Not a licence to rewrite dialog copy generally — the caption is quoting the button.
-2. **The rule is an executable predicate, not a pinned string.** `EpicCompleteToggle.LabelIsAnAct` requires an imperative and `NeitherMasterButtonNamesAStateItCannotBeIn` applies it to BOTH checklists, with four status-shaped negatives (`AStateWordIsNotAnAct`) so it cannot go vacuous. A test asserting the new label proves the smoke was answered once; it cannot see the next master button that ships a state word (trap 34).
+**The second hang, found pulling the same thread.** A socket that OPENS and a snapshot
+that ARRIVES can still paint nothing — `wanted` is `picked() ∩ (offered ∪ notOffered)`,
+and a PC whose gate does not overlap this device's picks leaves it empty. `#screens` is
+`display:none` until the ⚙, so what remains is a header carrying the character's name
+over a blank page: indistinguishable, to the player, from the hang above. `render()` now
+has a sentence for it.
 
-### The three Soft LEAVEs — all honoured
+**Gates, local: NONE RUN — see the first paragraph.** CI has not run either, because I
+cannot push.
 
-- **Green-as-done styling** — untouched. The not-yet state needs the primary-action colour too; the verb carries the difference alone.
-- **Status chips for every state** — not built. Verb-only was enough: the heading line under each band already carries the real state (`Warrior · Epic 1.0  0/30`), and a chip would be a second producer of a fact that row owns. Nothing filed for Bevel from this — say so if you would rather have the frame filed.
-- **DRA-47 Pages / Play Console** — untouched.
+### The asks
 
-### Verification
+**1. HOW DO YOU WANT AN UNVERIFIED BUILD HANDLED?** I can see three shapes and I am not
+picking one for you: **(a)** Soft (or the Founder) commits, pushes and opens the PR from
+this tree, and `build-and-test` + `e2e-windows` are the first and only evidence — the
+merge bar is unchanged, which is the argument for it; **(b)** the same, but a seat with
+Bash approval re-runs `scripts/check.ps1` and the E2E suite before you last-look; **(c)**
+hold the land until someone can drive it in a browser through
+`scripts/mobile-harness.ps1` + headless Edge on a CLEAN browser profile with a socket
+stub that closes instead of opening — the same recipe that prove-failed the 2026-09-07
+hang, and the only way the three messages get SEEN rather than argued. **I would take
+(b).** The
+page guards are regexes and would pass on a syntactically broken page (below), so a green
+`build-and-test` is weaker evidence here than it usually is.
 
-- `scripts/check.ps1` **all gates green**, 4223/4223 unit tests.
-- **Prove-failed**: restoring `"Epic complete"` reddens `NeitherMasterButtonNamesAStateItCannotBeIn` + `TheEpicMasterButtonSaysMarkAsComplete`; green again on the fix.
-- **Both shots re-taken and read against their written predictions** (trap 23). Worth one line: `epic-checklist-classes` was **already the smoke defect, staged** — a green Warrior band over `0/30` beside Cleric's completed one — and nobody had read it that way. Its recipe comment now says which claim the picture is for.
+**2. ACK A HOLE I AM NAMING RATHER THAN CLOSING: nothing in either gate PARSES this
+file.** Every page guard we own — `CompanionPageUpdateTests`, `CompanionRepaintGateTests`,
+`CompanionFirstPairingTests`, and the new suite — reads `index.html` as TEXT. A
+syntax error in the ~70 lines I added would ship **green through both gates** and leave
+every paired phone with a dead page, which is strictly worse than DRA-60. CI has no JS
+toolchain (`ci.yml` is dotnet + pwsh only), though `windows-latest` ships node. I did not
+add a `node --check` step, because putting a new toolchain on the merge bar is not mine
+to do from a bug card — and trap 74's lesson is that a gate which reddens on a toolchain
+version is one people learn to re-run. **The ask: do you want that step, and if so on
+which card?** `dist/dra60-check.js` (gitignored) is the parse check itself — it pulls the
+main `<script>` block out of the shipped page and hands it to `vm.Script`. Whoever can run
+Bash should run `node dist/dra60-check.js` before this lands, whatever you rule on the
+standing gate.
 
-### Asks
+**3. ACK the calls I made alone; none is consequence-list.** (a) A refusal STOPS rather
+than retrying — argued from the server's own `AuthFailureLimit` arithmetic above, and
+asserted against real sockets rather than read out of the source. (b) The message names
+**what was measured**, never the likeliest cause — telling somebody whose PC is merely
+asleep that their pairing code is wrong is trap 35 with the right shape, and would send
+them to regenerate a code that was fine. (c) The probe spends one extra auth failure on a
+403; I took that because the loop it replaces spent unbounded failures forever. (d) The
+no-`fetch` fallback keeps the old counting, but now for EVERY code rather than only a
+remembered one — the half of the bug that needs no instrument. (e) The empty-picks
+sentence points at `Options → Behavior → EQBuddy Mobile`, which is the page's own existing
+wording and a real door (`SettingsBehaviorView` line 316).
 
-1. **SIGN #545 merge-when-green** (`build-and-test` + `e2e-windows`). I will not force-merge while CI is pending.
-2. **The dialog caption** — ACK as an authorized departure, or tell me to split it out. It is one line and reverting it is one line.
-3. **Verb-only was enough / no Bevel frame filed** — ACK, or commission the chip.
-4. **Republish Desktop after SIGN+merge**, per the card. I have not touched `release.ps1`, signing, tags or prod secrets and will not until you say so.
-5. **David** — not needed. This is not a consequence-list door: no values line, no release go, nothing public, no roadmap direction, no wiki data, no privacy surface.
+**4. ACK trap 75 and its novel.** One transport code for three causes; the news must live
+in the ONE producer that repaints; and a silent retry against an endpoint with an abuse
+guard spends that budget on its owner. I caught one instance of the middle rule inside my
+own fix during review — `stopAndAskToPair()` hid the banner while `refreshStale()` would
+have put "still trying" back over the pairing screen a second later — and it now retires
+the sentence, with a guard naming that specific disagreement.
 
-### Feedback
+**5. Consequence list — clean.** No fetch to anything outside the player's own PC, no
+data added to any payload, nothing published, no tag, no signing, no release. The only new
+network call is a same-origin GET to the machine the page was served by.
 
-- **Reinforcing — the card carried the NUMBERS, and that is what made it a one-loop fix.** "Bard 0/31 Warrior 3/30" is why this took twenty minutes: I did not have to reconstruct what the Founder was looking at, and the numbers are what identified `epic-checklist-classes` as the frame that had been carrying the defect all along. A smoke card that said only "the button wording is confusing" would have cost a round trip. Keep relaying the observed state verbatim.
-- **Reinforcing — naming the Soft LEAVEs up front is the reason the diff is small.** Three of them, each closing a door I would otherwise have had to weigh and log. "Soft LEAVE status chips **unless verb-only is enough**" in particular is the good shape: it named the escape hatch and the condition, so I could decide it rather than ask.
-- **Constructive — the card named the button and not the dialog behind it.** The same string lived twice; a card written as "the control and everything it opens" would have covered both without me having to make a judgment call (ask 2). Worth a sentence in future smoke cards: *what else says this word?* That is the cheap version of the grep I ran.
-- **Constructive — a smoke finding that a STAGED SHOT already shows is worth flagging as such.** `epic-checklist-classes` has stood the green `0/30` band beside a completed one since it was written, and the defect went out anyway. If Helm has a way to point smoke findings back at the committed frames, the review would catch the next one before a Founder does.
+**6. David — not needed.** A bug fix on a Founder-kicked card. Nothing touches the values
+line, the release go, a public promise, money, roadmap direction, eqlwiki, third-party
+policy or player privacy.
+
+### What I did NOT do from this land
+
+Soft LEAVE the Tailscale reading, Pages, Play Console, and folding this into DRA-59 — as
+scoped. Soft LEAVE a `node --check` CI step (ask 2), a tag, `release.ps1`, signing, prod
+secrets, the Evolved restore, or a Founder page. No release, no publish. **And no
+webhook: I could not fire your back-channel, so this note is waiting on whoever pushes
+it.**
 
 — Dranak (Claude Code)
+
+---
 
 ## 2026-09-11 ~12:20 PM CT — LIVE ASK answered: DRA-46 collision — **REVERT #538, then land #540** (product path STANDS; CLOSE→REVERT; Soft CLOSE #541+#542; process gap ACK card)
 

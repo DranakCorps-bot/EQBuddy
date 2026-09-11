@@ -1,3 +1,69 @@
+## 2026-09-11 (DRA-60 — the mobile hang after the QR; the calls I made alone)
+
+Founder/Bosun kick, DRA-60, separate from DRA-59. The card scoped the likely cause and the
+fix ("surface pairing failure when a fragment code is refused; no silent loop"); these are
+the places it left a choice. **Assumption stated at the top, because it colours all of
+them: this session could run NOTHING** — it was launched `-p --permission-mode acceptEdits`,
+which approves file edits and no Bash beyond a read-only allowlist, so there are no local
+gate results behind any of these. They are arguments from the source and from the server's
+own constants, and they are labelled that way in `HELM-FEEDBACK.md`.
+
+**1. A REFUSAL STOPS THE RECONNECT LOOP INSTEAD OF ANNOUNCING ITSELF AND CARRYING ON.** The
+card asked for the failure to be SURFACED; whether to keep retrying afterwards was open.
+`CompanionServer` rate-limits an IP at five auth failures inside sixty seconds
+(`AuthFailureLimit`), and the page's 1→2→4→8 s backoff reaches that in about fifteen — so a
+looping phone is 429'd for most of every minute, which locks it out of the CORRECT code the
+player is on their way to rescan. Stopping spends two failures (the socket and the probe)
+and leaves the budget with room. **The default it could have gone the other way on:** show
+the pairing screen and keep dialling in the background, so a PC that comes back recovers
+without a rescan — rejected, because the only thing that can change a 403 is a new code, and
+a new code arrives as a fresh navigation that restarts the page anyway. Asserted against
+real sockets in `CompanionPairingFailureTests`, not argued from the constant.
+
+**2. THE PAGE ASKS THE SERVER WHICH FAILURE THIS IS, RATHER THAN ASSUMING THE LIKELIEST.**
+One extra same-origin GET per failed connect. `ws.onclose` is 1006 for a refusal, a
+rate-limit and an unreachable PC alike, so any single sentence would be right by luck.
+Telling somebody whose PC is merely asleep that their pairing code is wrong is trap 35 with
+the right shape — they would go and regenerate a code that was fine. **The default it could
+have gone the other way on:** one honest-but-vague sentence covering all three ("EQBuddy
+isn't answering") and no probe — rejected, because the three have three different remedies
+and naming the wrong one costs more than saying nothing. **The cheaper variant I did not
+take:** probe `/` instead, which proves reachability without spending an auth failure but
+cannot separate 403 from 429.
+
+**3. THE PROBE IS BOUNDED AT FOUR SECONDS AND A THROW IS SWALLOWED.** A `fetch` at an
+unreachable host can hang far longer than the backoff, and the reconnect loop is the thing
+it would be hanging — a fix for a hang must not be able to cause one. Both paths fall back
+to "can't reach your PC", which is what an unanswered probe means anyway.
+
+**4. THE NO-`fetch` FALLBACK KEEPS THE OLD COUNTING, BUT FOR EVERY CODE.** A browser with no
+`fetch` gets the three-refusals-then-pair behaviour that shipped — now applied whatever the
+code's provenance, which is the half of the bug that needs no instrument. **The default it
+could have gone the other way on:** drop the fallback, since every browser with `WebSocket`
+has `fetch` — rejected; it costs four lines and the failure it covers is a dead page.
+
+**5. WHERE THE CODE CAME FROM STILL DECIDES WHAT TO FORGET AND WHAT TO SAY.** A refused
+REMEMBERED code is deleted from `localStorage` (a revoked device) and keeps its old
+sentence; a refused FRAGMENT code is not deleted — it is in the URL bar — and says that a
+scan cut short does this too. Provenance may not decide whether the player is told
+anything, which is the bug; it is still the right input for those two.
+
+**6. AN EMPTY PICKS LIST GETS A SENTENCE, AND IT NAMES A DOOR I CHECKED.** Out of the card's
+literal scope, in its spirit: a connected page whose picks do not overlap the PC's offer
+drew a header over a blank page, which a player cannot tell from the hang. It points at
+`Options → Behavior → EQBuddy Mobile` — the page's own existing wording, and a real door
+(`SettingsBehaviorView` line 316 opens the pairing window, which is where the gate
+checkboxes live).
+
+**7. WHAT I DID NOT BUILD, AND IT IS A REAL HOLE.** No gate PARSES `index.html` — every page
+guard we own reads it as text, so a syntax error in this change would ship green through
+`build-and-test` AND `e2e-windows` and leave every paired phone dead, which is worse than
+DRA-60. CI has no JS toolchain. I did not add a `node --check` step, because putting a new
+toolchain on the merge bar is not mine to do from a bug card, and trap 74's lesson is that a
+gate which reddens on a toolchain version is one people learn to re-run. It is ask 2 to Helm
+in `HELM-FEEDBACK.md`, named rather than closed. `dist/dra60-check.js` (gitignored) is the
+parse check itself, for whoever can run it.
+
 ## 2026-09-11 (DRA-59 — the Epic band's button verb; the calls I made alone)
 
 Founder smoke ~3:08 PM CT via Helm: the Epic tab's green button read "Epic complete" over a

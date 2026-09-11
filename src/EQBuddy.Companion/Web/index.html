@@ -782,6 +782,7 @@ function boot() {
   }
 
   function ensureChoice() {
+    const firstPairing = !choice;
     if (!choice) choice = { order: [], enabled: {} };
     for (const s of offered) {
       if (!choice.order.includes(s)) choice.order.push(s);
@@ -789,6 +790,15 @@ function boot() {
       // glance at, a tablet also opens the map (the reason to prop one up) — and
       // neither opens with eleven panels the owner didn't ask for.
       if (!(s in choice.enabled)) choice.enabled[s] = FIRST_RUN.includes(s);
+    }
+    // DRA-60 (Founder, Kaybek LAN + full token): FIRST_RUN on a phone is
+    // spawns/session, but this PC's CompanionHiddenSurfaces leaves offered as
+    // quests/gear only. Zero overlap → wanted=[] → header over a blank
+    // #sections, which looks hung after a successful Open + snapshot. On the
+    // FIRST pairing only, enable every offered surface so something paints;
+    // a later visit that turned them all off keeps that choice.
+    if (firstPairing && offered.length && !offered.some(s => choice.enabled[s])) {
+      for (const s of offered) choice.enabled[s] = true;
     }
   }
   // What this device picked — the subscribe message deliberately does NOT intersect
@@ -800,12 +810,123 @@ function boot() {
   const visibleSurfaces = () => picked().filter(s =>
     offered.includes(s) || (latest && latest.notOffered && latest.notOffered.includes(s)));
 
+  // ---------- why a socket that never opened, never opened (DRA-60) ----------
+  // `ws.onclose` fires with code 1006 whether the PC REFUSED this pairing code, is
+  // rate-limiting this device, or is simply asleep. The browser will not tell a page
+  // which, because the upgrade never happened — so the page has to ask, or guess.
+  //
+  // It used to guess, and only for a REMEMBERED code: the close handler asked whether
+  // this device had produced the code from memory, counted to three, and otherwise
+  // re-dialled. (The condition is quoted in CompanionPairingFailureTests, which is where
+  // it can live without defeating the guard that forbids it.) A code that arrived in the
+  // FRAGMENT — every QR scan — fell through every branch and was re-dialled forever
+  // behind an empty #app, while refreshStale() ran once a second and took the "no news"
+  // branch each time. The page was not stuck; it was deciding, once a second, to say
+  // nothing at all. A founder smoke test scanned the QR at http://10.0.0.84:47859/#<code>,
+  // got the whole page back (HTTP 200), and sat there.
+  //
+  // AND THE SILENCE HAD TEETH. Five refusals inside sixty seconds rate-limit this device
+  // (CompanionServer.AuthFailureLimit), and the 1→2→4→8 s backoff spends that budget in
+  // about fifteen — so the loop locked the phone out of the CORRECT code it was about to
+  // be shown, and rescanning did nothing. That is why a refusal STOPS here rather than
+  // being announced and retried anyway: stopping costs two failures, not all five.
+  //
+  // The instrument: the same-origin GET the socket would have made. 403 = this code is
+  // wrong, 429 = this device burned the budget, 400 = the code is RIGHT and an upgrade
+  // was the only thing missing, so the fault is the network rather than the pairing.
+  // A rejected fetch means the PC is not answering at all. The code is already on the
+  // wire in the socket's own query string — the fragment rule is about the page GET,
+  // and this adds no exposure the WebSocket handshake did not already have.
+  const REACH_PROBLEM =
+    "Can't reach EQBuddy on your PC — still trying. Check EQBuddy is running, and that " +
+    "this device is on the same Wi-Fi.";
+  // True in every case, including the ones we are about to rule out — so it is what the
+  // page says for the few milliseconds the asking takes, rather than a cause we have not
+  // established yet. Against a PC that is switched off the asking is the slow part.
+  const CHECKING = "Not connected yet — checking why.";
+  let refusedByThePc = false;   // nothing to retry: only a new code changes this
+  let connectionProblem = null; // what refreshStale() says while everConnected is false
+  let diagnosing = false;
+
+  function retryLater() {
+    setTimeout(connect, backoff);
+    backoff = Math.min(backoff * 2, 15000); // 1s → 2s → 4s … 15s cap
+  }
+
+  function diagnoseFailedConnect() {
+    if (diagnosing) return;
+    diagnosing = true;
+    if (typeof fetch !== "function") {
+      // No instrument. Fall back to counting — but count for EVERY code rather than only
+      // a remembered one, which is the half of the bug that does not need an instrument.
+      diagnosing = false;
+      connectionProblem = REACH_PROBLEM;
+      refreshStale();
+      if (++refusals >= 3) { stopAndAskToPair(); return; }
+      retryLater();
+      return;
+    }
+    // Something true to show WHILE we ask, because a page with nothing on it is the bug.
+    if (!connectionProblem) { connectionProblem = CHECKING; refreshStale(); }
+    let asked;
+    try {
+      asked = fetch("/ws?token=" + encodeURIComponent(token), { cache: "no-store" })
+        .then(r => r.status, () => 0);
+    } catch {
+      asked = Promise.resolve(0);   // a throw here must not strand the reconnect loop
+    }
+    // Bounded, because a fetch at an unreachable host can hang far longer than the
+    // backoff — and the reconnect loop is the thing it would be hanging.
+    const gaveUp = new Promise(done => setTimeout(() => done(0), 4000));
+    Promise.race([asked, gaveUp]).then(status => {
+      diagnosing = false;
+      if (status === 403) { stopAndAskToPair(); return; }
+      connectionProblem = status === 429
+        ? "Too many pairing attempts from this device. Waiting a minute, then trying again."
+        : REACH_PROBLEM;
+      refreshStale();
+      retryLater();
+    });
+  }
+
+  // The end of the line: this device cannot connect with the code it has, so it is shown
+  // the pairing explainer with the reason on top, and the dialling stops. Rescanning the
+  // QR is a fresh navigation with a fresh fragment, which starts this page over.
+  function stopAndAskToPair() {
+    refusedByThePc = true;
+    // A remembered code the PC no longer accepts is a revoked device: forget it, or the
+    // next chrome-free Home Screen launch arrives holding the same dead code.
+    if (tokenFromMemory) { try { localStorage.removeItem(TOKEN_KEY); } catch {} }
+    $("app").style.display = "none";
+    // BOTH, and the second one is the one that matters: refreshStale() repaints this
+    // banner once a second from `connectionProblem`, so hiding it without retiring the
+    // sentence would put "still trying" back over the pairing screen a second later,
+    // beside the words saying we have stopped. The page must not disagree with itself.
+    connectionProblem = null;
+    $("banner").classList.remove("show");
+    $("pair").classList.add("show");
+    if (!$("pairWhy")) {
+      const why = el("p", null, tokenFromMemory
+        ? "The code this device remembered isn't accepted any more — the PC has issued a new one."
+        : "EQBuddy on the PC didn't accept this pairing code. A scan that was cut short does "
+          + "this, and so does a code the PC has replaced since.");
+      why.id = "pairWhy";
+      $("pair").insertBefore(why, $("pair").children[1]);
+    }
+  }
+
   // ---------- websocket ----------
   function connect() {
     subscribedTo = null;   // a new socket is a new server-side client: nothing asked yet
     ws = new WebSocket("ws://" + location.host + "/ws?token=" + encodeURIComponent(token));
     ws.onopen = () => {
       backoff = 1000; everConnected = true;
+      // Whatever the page was saying about not being able to connect stopped being true
+      // the moment this fired — and refreshStale() is the one producer of that sentence.
+      // Only when there was something to clear: an ordinary connect must not flash a
+      // banner on its way up.
+      refusals = 0;
+      if (connectionProblem) { connectionProblem = null; refreshStale(); }
       $("dot").classList.add("ok");
       // The PC accepted this code, so it is worth remembering for a chrome-free
       // Home Screen launch, which arrives without the fragment.
@@ -855,19 +976,12 @@ function boot() {
     };
     ws.onclose = () => {
       $("dot").classList.remove("ok");
-      // A remembered code that the PC never accepts has been revoked ("New code").
-      // Forget it and ask to be paired again rather than retrying forever in silence.
-      if (!everConnected && tokenFromMemory && ++refusals >= 3) {
-        try { localStorage.removeItem(TOKEN_KEY); } catch {}
-        $("app").style.display = "none";
-        $("pair").classList.add("show");
-        $("pair").insertBefore(
-          el("p", null, "The code this device remembered isn't accepted any more — the PC has issued a new one."),
-          $("pair").children[1]);
-        return;
-      }
-      setTimeout(connect, backoff);
-      backoff = Math.min(backoff * 2, 15000); // 1s → 2s → 4s … 15s cap
+      if (refusedByThePc) return;               // the loop is over; only a new code helps
+      // A socket that has opened before and dropped is weather: a phone that slept, a PC
+      // that restarted. The staleness banner already has the words for it.
+      if (everConnected) { retryLater(); return; }
+      // One that has NEVER opened is the hang, and the page cannot tell WHY from here.
+      diagnoseFailedConnect();
     };
     ws.onerror = () => ws.close();
   }
@@ -1071,13 +1185,27 @@ function boot() {
 
   // ---------- staleness banner ----------
   function refreshStale() {
-    const silent = (Date.now() - lastMsgAt) / 1000;
     const banner = $("banner");
+    // BEFORE THE FIRST CONNECTION there is no data to be stale, so the only honest thing
+    // this banner can carry is why the socket is not up — and until DRA-60 it carried
+    // nothing, once a second, behind an empty app. `connectionProblem` is null until a
+    // connect has actually failed, so a page that comes up normally shows no banner at
+    // all; the header's "connecting…" is enough for the half-second that takes.
+    if (!everConnected) {
+      if (connectionProblem) {
+        banner.textContent = connectionProblem;
+        banner.classList.add("show");
+      } else {
+        banner.classList.remove("show");
+      }
+      return;
+    }
+    const silent = (Date.now() - lastMsgAt) / 1000;
     if (lastMsgAt && silent > 5) {
       const age = Math.round((Date.now() - receivedAt) / 1000);
       banner.textContent = "reconnecting — data is " + age + "s old";
       banner.classList.add("show");
-    } else if (everConnected && !lastMsgAt) {
+    } else if (!lastMsgAt) {
       banner.classList.add("show");
       banner.textContent = "waiting for data…";
     } else {
@@ -1110,6 +1238,31 @@ function boot() {
     // away scroll position, the map's pan/zoom, and a checkbox mid-tap.
     for (const name in panels)
       if (!wanted.includes(name)) { panels[name].section.remove(); delete panels[name]; delete painted[name]; }
+
+    // NOTHING TO DRAW IS NOT NOTHING TO SAY (DRA-60, the other way to look hung). The
+    // socket is up and the snapshot arrived, but this device's picks and the PC's offer
+    // do not overlap — the PC gates a surface off and that name never reaches notOffered
+    // for a device that did not ask for it, so `wanted` comes back empty. #screens is
+    // display:none until the ⚙, so what is left on screen is a header and a blank page,
+    // which is indistinguishable from the hang above.
+    if (!wanted.length) {
+      const say = offered.length
+        ? "No screens picked on this device. Tap ⚙ at the top to choose what to show."
+        : "Your PC isn't sharing any screens yet. On the PC: EQBuddy → Options → Behavior → EQBuddy Mobile.";
+      // render() runs on a 1 s timer as well as on every push, so this rebuilds only
+      // when the sentence actually changes.
+      const now = $("noScreens");
+      if (!now || now.textContent !== say) {
+        const note = el("div", "empty", say);
+        note.id = "noScreens";
+        host.replaceChildren(note);
+      }
+      return;
+    }
+    // Picks again: the note has to go, or it sits under the panels forever — the removal
+    // loop above only knows about surfaces it built.
+    const blank = $("noScreens");
+    if (blank) blank.remove();
 
     let previous = null;
     for (const name of wanted) {
