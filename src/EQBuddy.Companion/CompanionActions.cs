@@ -62,7 +62,14 @@ public static class CompanionActions
         if (!CompanionSurfaces.AcceptsTicks(action.Surface)) return false;
         // A guide row's id belongs to no settings list, so it has to be resolved before the
         // switch below goes looking for one and reports a stale id.
-        if (string.Equals(action.Surface, CompanionSurfaces.Sky, StringComparison.OrdinalIgnoreCase)
+        //
+        // BOTH guided tabs since Delivery 3. Keyed on the id's own shape and not on the
+        // surface, because that is the fact: "guide:…" is a row no settings list has, wherever
+        // it was drawn. Written as the surface list it was one line from going stale the day
+        // a third tab got guides — and a tap that silently does nothing is the failure the
+        // whole phone contract is written against.
+        if ((string.Equals(action.Surface, CompanionSurfaces.Sky, StringComparison.OrdinalIgnoreCase)
+                || string.Equals(action.Surface, CompanionSurfaces.Epics, StringComparison.OrdinalIgnoreCase))
             && (GuideChecklistProjection.IsGuideRowId(action.Id)
                 || action.Id.StartsWith(SkipVerb, StringComparison.Ordinal)))
         {
@@ -92,11 +99,17 @@ public static class CompanionActions
 
             var items = GuideChecklistProjection.ItemsFor(
                 settings, GuideChecklistProjection.RewardKeyOf(guide));
-            if (GuideProgressRouter.IsDone(settings, ledger, characterKey, guide.Id, objective, items)
+            // The class's epic rows, under the same classic-era lens the phone was showing
+            // them through — the store an epic objective's tick actually lands in. Scoped to
+            // the guide's own class: a row is one class's fact, and handing the router the
+            // whole list would let one class's id resolve inside another's guide.
+            var epicRows = EpicRowsFor(settings, guide);
+            if (GuideProgressRouter.IsDone(
+                    settings, ledger, characterKey, guide.Id, objective, items, epicRows)
                 == action.Done)
                 return false;
             GuideProgressRouter.SetDone(
-                settings, ledger, characterKey, guide.Id, objective, items, action.Done);
+                settings, ledger, characterKey, guide.Id, objective, items, epicRows, action.Done);
             return true;
         }
         switch (action.Surface)
@@ -134,6 +147,16 @@ public static class CompanionActions
                 return false;
         }
     }
+
+    /// <summary>The epic checklist rows a guide's objectives may write into: that guide's own
+    /// classes, honouring the classic-era lens the tab was drawn under. Empty for a guide that
+    /// is not an epic one, so a Sky tap can never reach this store.</summary>
+    private static List<EpicQuestChecklistItem> EpicRowsFor(AppSettings settings, Guide guide) =>
+        guide.GuideType != GuideType.EpicQuest
+            ? []
+            : [.. settings.EpicQuestChecklist
+                .Where(i => !settings.EpicQuestClassicOnly || i.AvailableInClassic)
+                .Where(i => guide.ApplicableClasses.Contains(i.ClassName, StringComparer.OrdinalIgnoreCase))];
 
     /// <summary>Apply a general-quest-tab action to the per-character ledger — the
     /// same store the desktop quest window writes, so a tap and a click are the same

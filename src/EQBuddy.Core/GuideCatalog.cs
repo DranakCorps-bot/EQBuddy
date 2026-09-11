@@ -33,6 +33,31 @@ public enum GuideAuthoring
     /// <summary>We cannot, and <see cref="GuideObjective.StubNote"/> says so out loud. A
     /// hollow step renders as a stub with the share-back door, never as a finished one.</summary>
     Stub,
+
+    /// <summary>
+    /// <b>The source states one complete instruction and we carry it verbatim</b> (Fable §1,
+    /// Helm-signed 2026-09-10; Founder KEEP 2026-09-11).
+    ///
+    /// <para><see cref="GuideObjective.What"/> is the page's own sentence, wikilinks stripped
+    /// to their text and nothing else touched. <see cref="GuideObjective.Who"/>,
+    /// <see cref="GuideObjective.Where"/>, <see cref="GuideObjective.When"/> and
+    /// <see cref="GuideObjective.How"/> are <b>empty by rule</b> and <see cref="GuideCatalog.Validate()"/>
+    /// REFUSES a Transcribed step that fills any of them: parsing who and where out of prose is
+    /// inference wearing the wiki's citation, which is trap 73 at 486×.
+    /// <see cref="GuideObjective.Why"/> may be filled only from STRUCTURED data (the reward
+    /// name, as the card's own "Works toward the …" already is), never from the prose.</para>
+    ///
+    /// <para><b>Not a stub and not a hollow step.</b> A stub says "we cannot tell you where";
+    /// 486 rows that ARE directions would be lying about themselves under that flag. It ticks
+    /// and renders like any other row, the caption does not count it, and no badge is invented
+    /// for it — Bevel may add one after seeing the frames.</para>
+    ///
+    /// <para><b>Promotion is human-only.</b> Transcribed → <see cref="Authored"/> happens in an
+    /// authoring PR where a person answers who/where from the sources, never by a transformer
+    /// and never in bulk. Link-derived fields (a <c>[[Zone]]</c> in the sentence is a
+    /// structural fact) are named as Phase 5 so they are not invented mid-build.</para>
+    /// </summary>
+    Transcribed,
 }
 
 /// <summary>
@@ -49,6 +74,35 @@ public sealed class GuideSource
     /// <summary>ISO date the fact was taken from that page — by an author, or by the harvest
     /// that carried the link. A source with no date cannot be aged, so validation requires it.</summary>
     public string RetrievedAt { get; set; } = "";
+}
+
+/// <summary>
+/// <b>The seam a later system hangs gear upgrades and farm recommendations on</b> (Founder,
+/// 2026-09-11: guides must be able to integrate with gear-upgrade, recommended XP farms and
+/// gear farms — "land schema/hooks so that system can attach later").
+///
+/// <para><b>It carries a REFERENCE and never a recommendation.</b> <see cref="Key"/> is the
+/// identity of a thing that lives in whatever catalog owns it — an item name, a zone, a camp —
+/// and this schema states only "that step relates to this". EQBuddy does not yet have a gear
+/// recommender, an XP-farm ranker or a gear-farm ranker, and a field holding a sentence one of
+/// them would have written is the invention trap 73 exists to stop. <b>The shipped catalog
+/// carries none of these, and <c>NoShippedGuideCarriesAnAttachmentYet</c> holds that open</b>
+/// until the system that owns the answer exists — the day it does, that test changes with it.</para>
+///
+/// <para>A STRING kind rather than an enum, for the same reason
+/// <see cref="GuideObjective.ObjectiveType"/> is one: the list grows as those systems land, and
+/// a typo in a curated file must fail a test rather than the catalog load.</para>
+/// </summary>
+public sealed class GuideAttachment
+{
+    /// <summary>One of <see cref="KnownKinds"/>.</summary>
+    public string Kind { get; set; } = "";
+    /// <summary>What the owning catalog calls the thing — never prose about it.</summary>
+    public string Key { get; set; } = "";
+
+    /// <summary>The three the Founder named, and nothing speculative beside them. A member
+    /// with no content behind it is schema cosplay; these three have a named owner coming.</summary>
+    public static readonly string[] KnownKinds = ["GearUpgrade", "XpFarm", "GearFarm"];
 }
 
 /// <summary>
@@ -135,6 +189,11 @@ public sealed class GuideObjective
     /// later without a schema change. Nothing reads it for detection at MVP.</summary>
     public List<string> ItemNames { get; set; } = [];
 
+    /// <summary>Gear-upgrade / farm references for THIS step — see <see cref="GuideAttachment"/>.
+    /// Empty in the shipped catalog, and that is the honest state until the systems that would
+    /// fill it exist.</summary>
+    public List<GuideAttachment> Attachments { get; set; } = [];
+
     public GuideAuthoring Authoring { get; set; } = GuideAuthoring.Stub;
 
     /// <summary>Required on a Stub: what we do not know, in the player's terms, so the row
@@ -163,6 +222,10 @@ public sealed class GuideStage
     /// <summary>What to know on ARRIVAL — the hazard or the shape of the place — as opposed
     /// to anything the player must do, which is an objective.</summary>
     public string ArrivalNote { get; set; } = "";
+    /// <summary>Gear-upgrade / farm references for the whole STAGE — "by the time you leave
+    /// this island, this is the upgrade worth having". Same rules and same emptiness as
+    /// <see cref="GuideObjective.Attachments"/>.</summary>
+    public List<GuideAttachment> Attachments { get; set; } = [];
     public List<GuideObjective> Objectives { get; set; } = [];
 }
 
@@ -191,6 +254,11 @@ public sealed class Guide
     public IEnumerable<GuideObjective> AllObjectives =>
         Stages.OrderBy(s => s.Order).SelectMany(s => s.Objectives.OrderBy(o => o.Order));
 
+    /// <summary>Every step answers who + where + what. A <see cref="GuideAuthoring.Transcribed"/>
+    /// step does not — it carries the page's sentence and leaves the questions open — so an
+    /// epic guide is honestly NOT fully authored while still being complete enough to walk.
+    /// That asymmetry is the point of the two axes: this is a fact about our DATA, and it is
+    /// not what <see cref="StubCount"/> counts.</summary>
     public bool IsFullyAuthored =>
         AllObjectives.Any() && AllObjectives.All(o => o.Authoring == GuideAuthoring.Authored);
 
@@ -346,6 +414,7 @@ public sealed class GuideCatalog
             // "what is next" a coin toss.
             if (!stageOrders.Add(stage.Order)) problems.Add($"{stageWho}: duplicate stage order {stage.Order}");
             if (stage.Objectives.Count == 0) problems.Add($"{stageWho}: no objectives");
+            problems.AddRange(AttachmentProblems(stage.Attachments, stageWho));
 
             var objectiveOrders = new HashSet<int>();
             foreach (var objective in stage.Objectives)
@@ -363,10 +432,29 @@ public sealed class GuideCatalog
                     problems.Add($"{oWho}: objective type '{objective.ObjectiveType}' is not one of "
                         + string.Join(", ", GuideObjective.KnownObjectiveTypes));
 
-                if (objective.Title.Length == 0) problems.Add($"{oWho}: no title");
-                if (objective.ShortInstruction.Length == 0) problems.Add($"{oWho}: no short instruction");
+                // A TRANSCRIBED step's one sentence lives in WHAT and nowhere else — a title
+                // and a short instruction beside it would be two more copies of the same
+                // string, which is trap 4 inside one record and 486× the file size. Every
+                // surface names it through GuidePresentation.StepTitle, which falls through
+                // to What. So the rule inverts rather than relaxing: carrying one is refused.
+                if (objective.Authoring == GuideAuthoring.Transcribed)
+                {
+                    if (objective.Title.Length > 0)
+                        problems.Add($"{oWho}: transcribed but carries a title — the page's "
+                            + "sentence is WHAT and is drawn from there");
+                    if (objective.ShortInstruction.Length > 0)
+                        problems.Add($"{oWho}: transcribed but carries a short instruction — the "
+                            + "page's sentence is WHAT and is drawn from there");
+                }
+                else
+                {
+                    if (objective.Title.Length == 0) problems.Add($"{oWho}: no title");
+                    if (objective.ShortInstruction.Length == 0)
+                        problems.Add($"{oWho}: no short instruction");
+                }
 
                 problems.AddRange(AuthoringProblems(objective, oWho));
+                problems.AddRange(AttachmentProblems(objective.Attachments, oWho));
 
                 if (objective.RewardKey.Length > 0 && !rewardKeys.Contains(objective.RewardKey))
                     problems.Add($"{oWho}: reward key '{objective.RewardKey}' is not a Sky checklist key "
@@ -394,7 +482,37 @@ public sealed class GuideCatalog
     /// </summary>
     private static IEnumerable<string> AuthoringProblems(GuideObjective objective, string who)
     {
-        if (objective.Authoring == GuideAuthoring.Authored)
+        if (objective.Authoring == GuideAuthoring.Transcribed)
+        {
+            // THE ONE THING IT CLAIMS: the page states this sentence. Nothing else.
+            if (objective.What.Length == 0)
+                yield return $"{who}: transcribed but carries no sentence — WHAT is the page's "
+                    + "own line and is the whole of what this state asserts";
+
+            // The four the parser must never answer. Filled, they read as authored facts and
+            // cite a page that states the sentence and not the fields (trap 73 at 486×). This
+            // is written as a REFUSAL rather than a relaxation on purpose: "not required" would
+            // have let a transformer fill them the first time one looked easy.
+            if (objective.Who.Length > 0) yield return TranscribedForbids(who, "WHO");
+            if (objective.Where.Length > 0) yield return TranscribedForbids(who, "WHERE");
+            if (objective.When.Length > 0) yield return TranscribedForbids(who, "WHEN");
+            if (objective.How.Length > 0) yield return TranscribedForbids(who, "HOW");
+
+            // WHY is allowed, and only from structured data — the reward's own name, the way
+            // the card's "Works toward the …" already is. There is no mechanical test for
+            // "came from a field rather than from the prose", so the deny-list below is what
+            // holds it, and a human authoring PR is what promotes the step.
+            if (objective.Sources.Count == 0)
+                yield return $"{who}: transcribed but cites no page — a verbatim sentence with "
+                    + "no page behind it is an unattributed quote, and the title is the string "
+                    + "the weekly refresh flags on";
+            if (objective.StubNote.Length > 0)
+                yield return $"{who}: transcribed but carries a stub note — the page said "
+                    + "something; a stub says it did not";
+
+            foreach (var problem in InventedProse(objective, who)) yield return problem;
+        }
+        else if (objective.Authoring == GuideAuthoring.Authored)
         {
             // WHO, WHERE, WHAT — required, as the signed §2 had it. WHEN/WHY/HOW are the
             // schema's other three and stay OPTIONAL: see the note on the six questions.
@@ -402,17 +520,7 @@ public sealed class GuideCatalog
             if (objective.Where.Length == 0) yield return $"{who}: authored but does not say WHERE";
             if (objective.What.Length == 0) yield return $"{who}: authored but does not say WHAT";
 
-            // The regression guard for what went wrong on #480 — a curated must-NOT list,
-            // paired with the must-list above (trap 34 works in both directions). These are
-            // the exact sentences the first cut invented and cited to pages that do not
-            // contain them; a template that reappears on 19 steps is the SHAPE of the bug,
-            // and naming the strings is the only version of it a test can be sure about.
-            foreach (var claim in new[] { objective.When, objective.How, objective.Why })
-                foreach (var banned in FabricatedProse)
-                    if (claim.Contains(banned, StringComparison.OrdinalIgnoreCase))
-                        yield return $"{who}: says \"{banned}\" — no source we cite says it. "
-                            + "WHEN/HOW are optional; an unanswerable one is left empty and the "
-                            + "share-back door is how it gets filled in (Fable last-look, #480)";
+            foreach (var problem in InventedProse(objective, who)) yield return problem;
             if (objective.Sources.Count == 0)
                 yield return $"{who}: authored but cites no source — provenance is what separates "
                     + "curation from invention, and it is the weekly refresh's flag";
@@ -428,6 +536,48 @@ public sealed class GuideCatalog
 
         foreach (var problem in SourceProblems(objective.Sources, who, requireAtLeastOne: false))
             yield return problem;
+    }
+
+    private static string TranscribedForbids(string who, string question) =>
+        $"{who}: transcribed but fills {question} — the page states a SENTENCE, not fields, so "
+        + "an answer here is the parser's opinion wearing the page's citation (trap 73). "
+        + "Promotion to Authored is a human authoring PR";
+
+    /// <summary>
+    /// The regression guard for what went wrong on #480 — a curated must-NOT list, paired with
+    /// the must-list above (trap 34 works in both directions). These are the exact sentences
+    /// the first cut invented and cited to pages that do not contain them; a template that
+    /// reappears on 19 steps is the SHAPE of the bug, and naming the strings is the only
+    /// version of it a test can be sure about.
+    ///
+    /// <para>It runs over a TRANSCRIBED step too, where the only field it can reach is WHY —
+    /// the one question that state may answer, and therefore the one place the invention could
+    /// come back.</para></summary>
+    private static IEnumerable<string> InventedProse(GuideObjective objective, string who)
+    {
+        foreach (var claim in new[] { objective.When, objective.How, objective.Why })
+            foreach (var banned in FabricatedProse)
+                if (claim.Contains(banned, StringComparison.OrdinalIgnoreCase))
+                    yield return $"{who}: says \"{banned}\" — no source we cite says it. "
+                        + "WHEN/HOW are optional; an unanswerable one is left empty and the "
+                        + "share-back door is how it gets filled in (Fable last-look, #480)";
+    }
+
+    /// <summary>An attachment names a kind the schema knows and a key some catalog owns. It
+    /// may never carry prose: see <see cref="GuideAttachment"/> for why an empty list is the
+    /// honest state until the system that answers the question exists.</summary>
+    private static IEnumerable<string> AttachmentProblems(List<GuideAttachment> attachments, string who)
+    {
+        foreach (var attachment in attachments)
+        {
+            if (!GuideAttachment.KnownKinds.Contains(attachment.Kind, StringComparer.Ordinal))
+                yield return $"{who}: attachment kind '{attachment.Kind}' is not one of "
+                    + string.Join(", ", GuideAttachment.KnownKinds);
+            if (attachment.Key.Trim().Length == 0)
+                yield return $"{who}: a '{attachment.Kind}' attachment names nothing — an "
+                    + "attachment is a REFERENCE, and one with no key is a recommendation "
+                    + "waiting to be invented";
+        }
     }
 
     private static IEnumerable<string> SourceProblems(

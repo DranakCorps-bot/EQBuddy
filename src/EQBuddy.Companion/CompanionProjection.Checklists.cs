@@ -15,46 +15,76 @@ public static partial class CompanionProjection
     /// surface drawing it, and the desktops silently showed a bare tick (#184).</summary>
     private const string UnassignedMark = QuestChecklistLayout.UnassignedMark;
 
-    private static CompanionChecklistSection BuildEpics(AppSettings? settings)
+    /// <summary>
+    /// Epic 1.0 for the phone — grouping and ordering from <see cref="QuestChecklistLayout"/>
+    /// and the guided walkthrough from <see cref="GuideChecklistProjection"/>, which are the
+    /// same two calls <c>QuestsView.RenderChecklist</c> makes.
+    ///
+    /// <para><b>This used to hand-roll its grouping</b>, exactly as <see cref="BuildSky"/> did
+    /// before #184 — same four decisions (which rows group together, in what order, what the
+    /// heading reads, what the sub-line says) spelled a second time. Delivery 3 is where that
+    /// stopped being free: a guided class is one group rather than one per section, and a copy
+    /// of the old grouping here would have left the phone showing the classic list while the PC
+    /// showed the walkthrough. Porting a feature TO the phone is the signal the logic never
+    /// went through the shared layer (David, 2026-08-18) — so the logic moves rather than the
+    /// feature.</para></summary>
+    private static CompanionChecklistSection BuildEpics(AppSettings? settings, CompanionQuestRequest req)
     {
         var items = settings?.EpicQuestChecklist ?? [];
         // The desktop's class lens and its classic-era lens, both honored: what the
-        // phone lists is what the PC's Epic card lists.
+        // phone lists is what the PC's Epic tab lists.
         var scoped = items
             .Where(i => settings is not { EpicQuestClassicOnly: true } || i.AvailableInClassic)
             .Where(i => settings is not { EpicQuestClass.Length: > 0 }
                 || string.Equals(i.ClassName, settings.EpicQuestClass, StringComparison.OrdinalIgnoreCase))
             .ToList();
 
-        var groups = scoped
-            .GroupBy(i => (i.ClassName, Section: i.Section.Length > 0 ? i.Section : "Checklist"))
-            .OrderBy(g => g.Key.ClassName, StringComparer.OrdinalIgnoreCase)
+        var all = QuestChecklistLayout.Epic(scoped);
+        if (settings is not null && req.Ledger is not null)
+            all = GuideChecklistProjection.ApplyEpic(all, scoped, GuideCatalog.Default,
+                settings, req.Ledger, req.CharacterKey);
+
+        var groups = all
             .Select(g => new CompanionChecklistGroup(
+                // The class lens already narrows to one class, so repeating it on every
+                // heading is the redundancy it was turned on to remove.
                 Heading: settings is { EpicQuestClass.Length: > 0 }
-                    ? g.Key.Section
-                    : $"{g.Key.ClassName} — {g.Key.Section}",
-                Note: null,
-                Class: g.Key.ClassName,
+                    ? g.Title
+                    : $"{g.ClassName} — {g.Title}",
+                Note: g.GuideCaption.Length > 0 ? g.GuideCaption : null,
+                Class: g.ClassName,
                 Rows:
                 [
-                    .. g.OrderBy(i => i.Order).ThenBy(i => i.QuestItem, StringComparer.OrdinalIgnoreCase)
-                        .Select(i => new CompanionChecklistRow(
-                            i.Id,
-                            i.QuestItem.Length > 0 ? i.QuestItem : i.Reward,
-                            Detail(i),
-                            i.Acquired)),
+                    .. g.Rows.Select(r => new CompanionChecklistRow(
+                        r.Id,
+                        r.Title,
+                        r.Unassigned ? r.Detail + UnassignedMark : r.Detail,
+                        r.Acquired,
+                        r.StubNote.Length > 0 ? GuidePresentation.StubLead + " " + r.StubNote : null,
+                        // A phone has no hover, so what the desktop hangs on one rides the row
+                        // (trap 35). Empty on a transcribed step, whose sentence IS the row.
+                        r.GuideFacts.Length > 0 && r.StubNote.Length == 0 ? r.GuideFacts : null,
+                        r.GuideRowKey.Length > 0
+                            && GuideChecklistProjection.Resolve(GuideCatalog.Default, r.Id)
+                                is var (guide, objective)
+                            ? GuidePresentation.ImproveUrl(guide, objective)
+                            : null,
+                        r.IsSkipped)),
                 ],
-                Title: g.Key.Section))
+                Title: g.Title,
+                Card: GuideCard(g),
+                Collapsed: g.Collapsed,
+                Reward: g.RewardSummary.Length > 0 ? g.RewardSummary : null,
+                RewardCard: g.RewardCard.Length > 0 ? g.RewardCard : null,
+                Fold: FoldKey(g)))
             .ToList();
 
-        return new CompanionChecklistSection(scoped.Count(i => i.Acquired), scoped.Count, groups);
-
-        static string? Detail(EpicQuestChecklistItem i)
-        {
-            var text = i.Source.Length > 0 ? i.Source : i.QuestName;
-            if (i.AcquiredUnassigned) text += UnassignedMark;
-            return text.Length > 0 ? text : null;
-        }
+        // Counted off the ROWS the phone is showing rather than off `scoped`: a guided class
+        // draws one row per objective, and an objective is one row (trap 72's neighbour — the
+        // count and the list have to come from the same place or the header lies about the
+        // body).
+        return new CompanionChecklistSection(
+            all.Sum(g => g.Done), all.Sum(g => g.Total), groups);
     }
 
     /// <summary>
@@ -166,11 +196,19 @@ public static partial class CompanionProjection
             Card: GuideCard(g),
             Collapsed: g.Collapsed,
             Reward: g.RewardSummary.Length > 0 ? g.RewardSummary : null,
-            RewardCard: g.RewardCard.Length > 0 ? g.RewardCard : null)));
+            RewardCard: g.RewardCard.Length > 0 ? g.RewardCard : null,
+            Fold: FoldKey(g))));
 
         return new CompanionChecklistSection(
             scoped.Sum(g => g.Done), scoped.Sum(g => g.Total), groups);
     }
+
+    /// <summary>What a guided group's fold is keyed on, or null when the group is not guided
+    /// and its heading is therefore not a control. The desktop's own fold key, so the two
+    /// surfaces fold the same thing by the same name (see <see cref="CompanionChecklistGroup.Fold"/>
+    /// for why only one of them persists it).</summary>
+    private static string? FoldKey(QuestChecklistGroup group) =>
+        group.GuideId.Length > 0 ? GuideChecklistProjection.FoldKey(group) : null;
 
     /// <summary>The active-step card for the phone — the SAME card the desktop draws, from
     /// the same projection. Nothing here decides what is next; it re-labels one already-worded

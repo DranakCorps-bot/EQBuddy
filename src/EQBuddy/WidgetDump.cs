@@ -638,6 +638,11 @@ internal static class WidgetDump
                     // and "the screen shows it ticked" are different claims, and the loot
                     // auto-tick can satisfy the first without the second.
                     $"questsSkyAcquired={w._settings.SkyQuestChecklist.Count(i => i.Acquired)} " +
+                    // And the Epic half of the same pair, which Delivery 3 made a question
+                    // worth asking: an epic guide row IS a checklist row, so the loot
+                    // auto-tick writing this number and the guide row lighting up are two
+                    // claims and a repaint gate sits between them (trap 72's shape).
+                    $"questsEpicAcquired={w._settings.EpicQuestChecklist.Count(i => i.Acquired)} " +
                     // The Quest Tracker WINDOW, when EQBUDDY_QUESTS opened one. The WPF
                     // layer has no unit tests (docs/TestPlan.md §5), so the Gate 2
                     // rebuild's structure — list rows, a selection, a populated detail

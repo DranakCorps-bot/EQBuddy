@@ -143,12 +143,42 @@ public sealed class GuideClassCoverageTests
     [Fact]
     public void NoTwoGuidesClaimTheSameReward()
     {
+        // Over the guides that claim a reward at all. An epic guide claims none — its store is
+        // its own checklist rows — so grouping every guide by the key would have put all
+        // fourteen of them in one "" bucket and failed on a shape that is correct.
         var byKey = GuideCatalog.Default.Guides
-            .GroupBy(GuideChecklistProjection.RewardKeyOf, StringComparer.OrdinalIgnoreCase)
+            .Select(g => (g.Id, Key: GuideChecklistProjection.RewardKeyOf(g)))
+            .Where(g => g.Key.Length > 0)
+            .GroupBy(g => g.Key, StringComparer.OrdinalIgnoreCase)
             .Where(g => g.Count() > 1)
             .Select(g => $"{g.Key} is claimed by {string.Join(", ", g.Select(x => x.Id))}");
 
         Assert.Empty(byKey);
+    }
+
+    /// <summary>The epic half of the same rule, in the terms an epic guide is keyed by: one
+    /// guide per class, and no two guides reaching for the same checklist row. Two guides over
+    /// one class would make <c>EpicGuideFor</c>'s answer depend on catalog order; two claiming
+    /// one row would be two walkthroughs writing one box (trap 4).</summary>
+    [Fact]
+    public void NoTwoEpicGuidesClaimTheSameClassOrTheSameRow()
+    {
+        var epics = GuideCatalog.Default.Guides
+            .Where(g => g.GuideType == GuideType.EpicQuest).ToList();
+
+        var byClass = epics
+            .SelectMany(g => g.ApplicableClasses.Select(c => (Class: c, g.Id)))
+            .GroupBy(x => x.Class, StringComparer.OrdinalIgnoreCase)
+            .Where(g => g.Count() > 1)
+            .Select(g => $"{g.Key} is claimed by {string.Join(", ", g.Select(x => x.Id))}");
+        Assert.Empty(byClass);
+
+        var byRow = epics
+            .SelectMany(g => g.AllObjectives.Select(o => (o.Id, Guide: g.Id)))
+            .GroupBy(x => x.Id, StringComparer.OrdinalIgnoreCase)
+            .Where(g => g.Count() > 1)
+            .Select(g => $"row {g.Key} is claimed by {string.Join(", ", g.Select(x => x.Guide))}");
+        Assert.Empty(byRow);
     }
 
     /// <summary>Prove-fail: the coverage rule actually fails when a drop is left out. Without

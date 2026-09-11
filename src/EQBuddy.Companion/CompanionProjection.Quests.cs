@@ -61,7 +61,7 @@ public static partial class CompanionProjection
             CharacterClasses: req.CharacterClassNames.Count > 0 ? req.CharacterClassNames : null,
             ClassSourceLabel: req.CharacterClassNames.Count > 0
                 ? EQBuddy.Core.CharacterClasses.SourceLabel(req.ClassSource) : null,
-            Epics: BuildEpics(settings),
+            Epics: BuildEpics(settings, req),
             // The Sky tab is the only checklist that reads anything outside settings: its
             // leftover bands (#243) are a join against the inventory dump, the character's
             // classes and the quest catalog, and all three live on the request.

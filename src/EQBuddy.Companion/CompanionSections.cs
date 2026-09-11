@@ -316,7 +316,29 @@ public sealed record CompanionChecklistGroup(
     /// or not the quest's steps are open. Sent whenever we have one, because which blocks a
     /// reader has opened is a fact about that device and not about the character: it lives in
     /// the page, not in the profile the way <c>GuideExpanded</c> does.</para></summary>
-    string? RewardCard = null);
+    string? RewardCard = null,
+    /// <summary>
+    /// The key this group's fold is remembered under <b>on this device</b>, and the page's
+    /// signal that the heading is a control at all. Non-null exactly for a guided group.
+    ///
+    /// <para><b>Why the fold needed a key of its own to work at all.</b>
+    /// <see cref="Collapsed"/> has promised "a tap opens it" since guides shipped and the page
+    /// had no tap — so every guided quest on the phone showed its heading, its caption and its
+    /// reward line, and no route to the steps. On Sky that hid six quests behind a control
+    /// nobody had built; Delivery 3 would have hidden all fourteen epics the same way, which
+    /// is the whole tab. A capability the DATA carries and no surface reaches is trap 20 with
+    /// the sides swapped.</para>
+    ///
+    /// <para><b>Page-local, and deliberately not a write back to the PC.</b> The house ruling
+    /// on a fold is already made twice over — the level-ups fold ("a tap on a phone must not
+    /// reach across the LAN to fold something on the PC while somebody is playing at it") and
+    /// <see cref="RewardCard"/>'s own note. So the PC's <c>GuideExpanded</c> is the state the
+    /// phone ARRIVES in, and a reader's taps live in the page for as long as it is open.</para>
+    ///
+    /// <para>It is <c>GuideChecklistProjection.FoldKey</c> — the same string the desktop's "+"
+    /// writes — so the two surfaces are folding the same thing by the same name even though
+    /// only one of them persists it.</para></summary>
+    string? Fold = null);
 
 /// <summary>The phone's half of the active-step card. Every field arrives worded; a null or
 /// empty one simply is not drawn, so a step that answers three of the six questions shows
