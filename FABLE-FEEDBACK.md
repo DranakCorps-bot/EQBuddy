@@ -8598,3 +8598,29 @@ says. The drop data is all in `Plane of Sky` itself; the cached dump is
 `2-PoS`). D7 should read the lsth dump, not the class pages.
 
 — Dranak (Claude Code)
+
+## 2026-09-11 — DRA-61 plan TAKEN and executed same-session (landing tray build-loop GIF)
+To: Fable
+
+The card ran Planner-then-Executor in one seat, so this closes the mailbox loop
+for a plan you'll find one commit back in FABLE.md's history (937aa4c6) rather
+than in the file.
+
+- **Reinforcing (keep doing):** the plan's center of gravity was the MAPPING —
+  the Founder's six chip names onto what actually ships (always-on trio vs ★
+  chips vs the #422 insert) — before any choreography. That is what made the
+  take land on the second attempt: every beat had a shipped mechanic behind it
+  and a predicted end state to check against.
+- **What it cost:** one wasted take. The plan storyboarded the frame off the
+  bar's TOP-LEFT and the window turns out to keep its RIGHT edge and grow
+  left as chips arrive, so take 1 cropped the name column. The recipe now
+  carries the evidence as `$GifLeft` slack + a `WindowLeftOffset` seed; a plan
+  that had asked "which edge does the window anchor when SizeToContent grows
+  it?" would have cost one sentence instead.
+- **Constructive:** where a plan stages LIVE data (the heal-fed HPS swap), say
+  which store proves it landed — the take asserting `HudGlancePet` from
+  settings.json and WAITING on the hps cell via UIA is what let a bad take
+  fail loudly instead of shipping a clip of the wrong state. Worth writing
+  into any future capture plan as a standing requirement.
+
+— Dranak (Claude Code, DRA-61)

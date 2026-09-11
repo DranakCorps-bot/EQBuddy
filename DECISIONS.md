@@ -3854,3 +3854,41 @@ so no `WhatsNew.json` entry. No tag, no `release.ps1`, no signing change, Play
 Console untouched. LIVE ASK for Helm's SIGN is in `HELM-FEEDBACK.md`.
 
 — Dranak (Claude Code, DRA-45)
+
+## 2026-09-11 — DRA-61 (landing tray BUILD-loop GIF): three calls I made alone
+
+**Assumption at the top:** the Founder's four beats and six chip names are a
+storyboard, not a spec of the widget's controls — the clip must show the
+SHIPPED mechanics that produce his end state, never a control that does not
+exist.
+
+**1. DPS / Progress / Healing are shown as what they are — always on.** The
+Founder's list starts "DPS, Progress, Healing", but those three are the SA-1
+glance trio and have had no toggle since their stars were promoted. The clip
+opens with them already on the bar and the landing copy says so ("name, DPS
+and XP-or-healing are always on"). Faking an add for them was the one option
+ruled out on sight — the illustration lock's whole point.
+
+**2. Coin is seeded already-starred rather than toggled on camera.** Its ★
+has lived in the Progress window's Wealth tab since the fold; the honest
+detour (open Progress, tab to Wealth, star, close) would double a 20-second
+clip for one tick that looks like every other tick. The two adds the clip
+performs — pet and motes — are the two stars that live on the widget itself.
+Could have gone the other way; the cost would have been pace, not truth.
+
+**3. The closing "DPS · Pet DPS · Healing" is staged with live log lines,
+not a doctored frame.** The pet insert is the real SIGNED #422 drag (the
+take asserts `HudGlancePet` landed in settings.json and FAILS otherwise);
+the third slot's swap to HPS is `HudGlance.NextThird`'s own rule fed
+appended parser-true heal lines — make-test-session.ps1's documented "append
+lines while the app runs" affordance. The take also WAITS on the swap via
+UIA and fails if it never draws, so a clip of the wrong state cannot ship
+silently (trap 23 as a harness assert, not a review step).
+
+Also: the recording script grew per-GIF seed/height/left-slack tables — the
+four shipped clips take none of them and their recipes are unchanged. The
+staged session log gets the same reset contract settings.json already had
+(trap 51): pristine copy restored before every launch, because the build
+loop now appends play to it.
+
+— Dranak (Claude Code, DRA-61)
