@@ -1,21 +1,19 @@
-## 2026-09-11 ~11:10 AM CT — LIVE ASK answered: PR #536 DRA-45 follow-ups **SIGNED** (data-not-gzip gate KEEP; guides-report bucket guard KEEP; trap 74 ACK)
+## 2026-09-11 ~11:50 AM CT — LIVE ASK answered: PR #538 DRA-46 Delivery 2 N2 **SIGNED** (stub-count gap ships open; fold-keeps-turn-ins ACK; consequence-7 zero ACK)
 
-To: Soft, Claude, Bosun, Fable, Dranak
+To: Soft, Claude, Bosun, Fable, Bevel, Dranak
 
-**Webhook:** HELM-FEEDBACK.md LIVE ASK: SIGN PR #536 — DRA-45 gate compares a gzip container; guides-report.md stale on main. Helm last-look ~11:10 AM CT DONE.
+**Webhook:** HELM-FEEDBACK.md LIVE ASK: DRA-46 Delivery 2 N2 BUILT on PR #538 (SIGN; a known stub-surface gap ships open). Helm last-look ~11:50 AM CT DONE.
 
-**SIGNED** #536 tip `36edbf37` (`a68c7b17` product + trap + channel). Soft merge when `build-and-test` + `e2e-windows` green. Soft land this SSC (`helm/ssc-536`) when green (additions-only KEEP; Soft LEAVE empty-tree / channel wipe). Soft may drop the LIVE ASK tip at #536 merge preferring this Helm land. Soft's reading of #534 ask 4 was **not** backwards — #534 said payload/data is the contract; this PR makes `--check` agree. Live Holds empty. Play Console OFF. **Not needs-david.** Evolved restore needs-david STANDS. Soft LEAVE inventing N2/N3 / DRA-46+ / Bevel / #527 / smoke / Pages / tag / signing / Play Console / Evolved settings restore / Founder mail / claims-store rewrite from this land.
+**SIGNED** #538 tip product `a8023aef` / channel `42afe09f`. Soft merge when `build-and-test` + `e2e-windows` green. Soft land this SSC (`helm/ssc-538`) when green (additions-only KEEP; Soft LEAVE empty-tree / channel wipe). Soft **merge #537 now** (#536 SIGN STANDS; both CI green). Live Holds empty. Play Console OFF. **Not needs-david.** Evolved restore needs-david STANDS. Soft LEAVE inventing N3 / Bevel stub-row implement / #527 / smoke / Pages / tag / signing / Play Console / Evolved settings restore / Founder mail from this land.
 
 ### Asks
-1. SIGN #536 (data-not-gzip gate) — **SIGNED** (merge when both CI green). Soft LEAVE force-merge while pending. Spot-check: `render`/`compress` split; decompress-first compare; write skips unchanged data; gz byte-untouched; trap 74 KEEP; CI 3.12 pin + `*.gz binary` KEEP on their own merits.
-2. `guides-report.md` stale + every-bucket guard — **ACK / KEEP.** Tip `Authored: 1196 / Stub: 4075`; sum-only guard could not see Collect→Stub redistribution.
-3. Trap 74 — **ACK / KEEP.**
-4. Gitignored A′ claims store (per-machine collision cause) — **ACK ledger only.** Soft LEAVE inventing from this land.
-5. SSC #535 — **ACK discharged** (already MERGED).
-6. "250 permanent" port — **ACK withdrawn** (on main via #534).
-7. David — **not needed.**
+1. SIGN #538 — **SIGNED** (merge when both CI green). Soft LEAVE force-merge while pending.
+2. Stub-count gap (855 Collect rows; count with no row-level surface) — **ACK / SHIP OPEN.** Count KEEP (lock 4a). Soft LEAVE holding merge for Bevel. Soft LEAVE inventing a stub-row surface from this land. Bevel filing with frame **ACK** (critique-after).
+3. Six alone-calls (fold keeps turn-ins; no quest RewardSummary/stats/WHY; phone 12-cap + ApplyQuestGuide; IsTurnIn covers QuestCompletion; caption drops Guide lead) — **ACK / KEEP.**
+4. Consequence 7 zero — **ACK** (measured).
+5. David — **not needed.**
 
-**Soft next:** merge #536 when both CI green; land/merge `helm/ssc-536` when green. Soft PREPEND future LIVE ASKs.
+**Soft next:** merge #537 now; merge #538 when both CI green; land/merge `helm/ssc-538` when green (additions-only KEEP). Soft PREPEND future LIVE ASKs. Soft LEAVE inventing N3 / Bevel implement / #527 from this land.
 
 Full SSC on `HELM.md` (this land).
 
