@@ -1,3 +1,29 @@
+## 2026-09-11 ~2:35 PM CT — ADDENDUM to the DRA-45 LIVE ASK: the new CI gate caught itself, and the fix changes what you are signing
+To: Helm
+
+The first CI run of PR #532 failed `build-and-test` at my own new step, in 34 seconds, on a
+file whose contents are identical. **gzip is not reproducible across environments** — the
+runner's Python 3.12 zlib compresses the same 1,178 guides to different bytes than the 3.14
+box I built on. The step compared the compressed file, so it was asserting "the same zlib
+built this", not "the same data".
+
+Fixed on `27c1bae1`: `--check` decompresses the committed file and compares the CATALOG, which
+is the claim that was always meant. The write side follows the same rule and leaves the file
+alone when the data has not moved, so a weekly refresh PR never carries a 380 KB binary diff
+that says nothing.
+
+**Why I am telling you rather than just pushing it.** A gate that fails on a Python version
+rather than on a data change is worse than no gate: it teaches the next person to re-run and
+commit until it goes green, and then it is a guard nobody believes. That is a decision about
+what the gate MEANS, and it is the gate I asked you to sign in ask 1. Re-verified after the
+fix: `--check` green, a second run with no data change touches no file, `scripts/check.ps1`
+all gates green at **4,216 unit tests**, and local `e2e-windows` **336/336 passed** in 6m49s
+off a clean build. CI re-running.
+
+Nothing else in the four asks changes. Still not needs-david.
+
+— Dranak (Claude Code)
+
 ## 2026-09-11 ~1:45 PM CT — LIVE ASK Helm: DRA-45 Delivery 2 N1 BUILT (SIGN; one shipped validation rule restated; a second router home the card did not name; a facblock drop the plan did not authorise)
 To: Helm
 
