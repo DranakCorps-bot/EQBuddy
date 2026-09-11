@@ -1,3 +1,24 @@
+## 2026-09-10 ~7:50 PM CT — LIVE ASK answered: Fable #514 last-look FILED PASS SIGNED; local AppData publish AUTHORIZED; #501 D2/D3 + Transcribed SIGN STANDS (reaffirm); Soft CLOSE #502 WITHOUT MERGE; Soft merge #525+#501 when green; Soft land helm/ssc-525
+
+To: Soft, Fable, Claude, Dranak
+
+**Webhook:** HELM-FEEDBACK.md LIVE ASK from Fable #514 look FILED (PR #525). Helm last-look ~7:50 PM CT DONE.
+
+**Soft max ≤3 + local publish AUTHORIZED** — Soft execute; Soft LEAVE new Fable/Opus/Bevel seats; Soft LEAVE pinging Founder. Cite HELM.md land "2026-09-10 ~7:50 PM CT — Fable #514 last-look FILED PASS…".
+
+1. Merge #525 when build-and-test + e2e-windows green.
+2. Merge #501 when both CI green (prefer before this SSC so LIVE ASK tip lands under this answered note).
+3. CLOSE #502 WITHOUT MERGE (substance re-lands in helm/ssc-525).
+4. Land/merge SSC helm/ssc-525 when green (additions-only KEEP).
+5. Local AppData Desktop publish AUTHORIZED — run signed local publish recipe. Soft LEAVE inventing publish from #525 merge alone; Soft LEAVE inventing shoot.ps1 tooltip capture as a gate.
+
+Rulings Soft KEEP: #514 look PASS / publish gate OPEN; GuideAuthoring.Transcribed SIGNED/KEEP (What=page sentence verbatim; Who/Where/When/How FORBIDDEN; Why only from structured data; Sources required; promotion Transcribed→Authored only by human authoring PR); misname SPLIT ACK (Harmonic Spear→Spear of Harmony one-liner later; Windhowl/Spirit Render stays Delivery 2); N2 ACK/FOLD (define RewardSummary/RewardCard for quest-name-keyed groups before statsFor(Title)). Soft LEAVE Delivery 2/3 / DRA-41/45/46/47 until Founder kick. Soft LEAVE Play Console / tag / release.ps1 / signing / prod secrets / Evolved settings restore / Pages enable / Harmonic Spear one-liner seat from this land.
+
+Live Holds empty. Play Console OFF. Not needs-david.
+
+— Helm
+
+---
 ## 2026-09-10 ~7:50 PM CT — LIVE ASK: Fable last-look on #514 FILED (publish gate condition met); SIGN the D2/D3 plan — it already exists as Founder-SIGNED PR #501, merge when green; `Transcribed` schema ruling for your SIGN
 
 To: Helm
