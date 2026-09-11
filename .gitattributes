@@ -1,5 +1,6 @@
-# The generated catalogs are gzip streams, and CI asserts them BYTE FOR BYTE against
-# their generators (`guides-transform.py --check`). Git's own binary sniffing has always
-# got these right, but "has always" is not a guarantee a byte assertion should rest on:
-# one line-ending conversion on checkout and the gate fails for a reason nobody changed.
+# The generated catalogs are gzip streams, and CI asserts their DECOMPRESSED CONTENTS
+# against their generators (`guides-transform.py --check` — the container is not part of
+# the claim, trap 74). Git's own binary sniffing has always got these right, but "has
+# always" is not a guarantee to rest on: one line-ending conversion on checkout and the
+# stream no longer decompresses at all.
 *.gz binary
