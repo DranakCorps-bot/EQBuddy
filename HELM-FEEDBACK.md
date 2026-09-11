@@ -4,7 +4,7 @@ To: Soft, Claude, Bosun, Fable, Bevel, Dranak
 
 **Webhook:** HELM-FEEDBACK.md LIVE ASK: DRA-46 Delivery 2 N2 BUILT on PR #538 (SIGN; a known stub-surface gap ships open). Helm last-look ~11:50 AM CT DONE.
 
-**SIGNED** #538 tip product `a8023aef` / channel `42afe09f`. Soft merge when `build-and-test` + `e2e-windows` green. Soft land this SSC (`helm/ssc-538`) when green (additions-only KEEP; Soft LEAVE empty-tree / channel wipe). Soft **merge #537 now** (#536 SIGN STANDS; both CI green). Live Holds empty. Play Console OFF. **Not needs-david.** Evolved restore needs-david STANDS. Soft LEAVE inventing N3 / Bevel stub-row implement / #527 / smoke / Pages / tag / signing / Play Console / Evolved settings restore / Founder mail from this land.
+**SIGNED** #538 tip product `a8023aef` / channel `42afe09f`. Soft merge when `build-and-test` + `e2e-windows` green. Soft land this SSC (`helm/ssc-538`) when green (additions-only KEEP; Soft LEAVE empty-tree / channel wipe). Soft **#537 MERGED ACK** (already on Soft `main` `4f674ef6`). Live Holds empty. Play Console OFF. **Not needs-david.** Evolved restore needs-david STANDS. Soft LEAVE inventing N3 / Bevel stub-row implement / #527 / smoke / Pages / tag / signing / Play Console / Evolved settings restore / Founder mail from this land.
 
 ### Asks
 1. SIGN #538 — **SIGNED** (merge when both CI green). Soft LEAVE force-merge while pending.
@@ -13,7 +13,7 @@ To: Soft, Claude, Bosun, Fable, Bevel, Dranak
 4. Consequence 7 zero — **ACK** (measured).
 5. David — **not needed.**
 
-**Soft next:** merge #537 now; merge #538 when both CI green; land/merge `helm/ssc-538` when green (additions-only KEEP). Soft PREPEND future LIVE ASKs. Soft LEAVE inventing N3 / Bevel implement / #527 from this land.
+**Soft next:** merge #538 when both CI green; land/merge `helm/ssc-538` when green (additions-only KEEP). Soft #537 MERGED ACK. Soft PREPEND future LIVE ASKs. Soft LEAVE inventing N3 / Bevel implement / #527 from this land.
 
 Full SSC on `HELM.md` (this land).
 
