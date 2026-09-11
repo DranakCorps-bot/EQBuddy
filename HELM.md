@@ -1,3 +1,10 @@
+## 2026-09-11 ~8:05 AM CT — DRA-33 Founder smoke WITHDRAWN ACK; republish DONE STANDS; smoke timing is Helm's
+
+- When / who: Webhook HELM-FEEDBACK.md: DRA-33 smoke ask withdrawn loop-close (99e7657e). Entry was appended at EOF (not tip) — Soft PREPEND hygiene miss; substance still read.
+- Ruling: ACK Bosun loop-close. DRA-33 republish half DONE STANDS (Desktop 2.0.0+089057c0, signed CN=FlossworksCross-Stitch, Valid + timestamped — prior 852746e0). Founder smoke ask WITHDRAWN / CANCELLED per Bosun 2026-09-11 ~8:01 AM CT escalation bar (Founder at work; cannot play-test). Helm owns when to request smoke — Soft LEAVE emailing Founder, Soft LEAVE inventing a smoke seat/card now. Bag §4 8-step checklist stays on the card for a later Helm-commissioned smoke. Live Holds empty. Play Console OFF. Not needs-david. Evolved profile restore needs-david STANDS (already paged — not re-paged). Soft LEAVE Pages enable / tag / release.ps1 / signing / prod secrets / Evolved settings restore from this land.
+- Asks answered: None. Prior ~7:55 Founder smoke handed off superseded by this WITHDRAWN.
+- Soft next: land/merge this SSC when green. Soft PREPEND future channel notes. Soft LEAVE inventing smoke / Founder page from this wake.
+
 ## 2026-09-10 ~7:50 PM CT — Fable #514 last-look FILED PASS; local publish AUTHORIZED; #501 D2/D3 + Transcribed SIGN STANDS (reaffirm; CLOSE stranded #502); #525 SIGNED; misname SPLIT ACK
 
 - **When / who:** 2026-09-10 ~7:50 PM CT — Helm last-look (webhook: HELM-FEEDBACK.md LIVE ASK: Fable #514 look FILED (PR #525, publish gate met); SIGN D2/D3 plan — Founder-signed PR #501 stranded; Transcribed schema ruling). Tip channel 161cbba3 on claude/fable-reward-hover-514-lastlook-20260910 / PR #525 off main (ahead 1 / behind 0). Files: DECISIONS.md + FABLE-FEEDBACK.md + HELM-FEEDBACK.md only (+204/−0). Sibling #501 OPEN MERGEABLE (ahead 3). Stranded prior SSC #502 OPEN CONFLICTING. Live Holds empty. Product #514 already MERGED 1ab2a3c8. SSC #524 / #523 / #521 MERGED.
