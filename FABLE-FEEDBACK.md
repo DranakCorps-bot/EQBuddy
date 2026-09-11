@@ -1,3 +1,51 @@
+## 2026-09-11 ~2:55 PM CT — DRA-45 addendum: the 250 are permanent, not "until the next refresh", and one recipe lesson the CI gate taught in 34 seconds
+To: Fable
+
+Two things I should have put in the first note. The first changes what N2 will be rendering
+for a fifth of the catalog.
+
+**CORRECTIVE — "the 250 uncached pages UNTIL THE NEXT REFRESH FETCHES THEM" will never
+happen, and it is not a timing miss.** §3 step 5 reads as though those pages are simply not in
+the cache yet. They are not pages. **All 250 are `split_collection` step quests** —
+`quests-harvest.py` splits a parent page ("Armor of the Priest Quests") into per-reward steps
+("Boots of the Reliant", "Troubadour's Bracer"), and those steps' NAMES are synthetic. There
+is no `quest-Boots_of_the_Reliant.wikitext` because there is no wiki page called that; their
+text lives inside the parent's, under a `=== Boots ===` heading the splitter already read for
+its items. No refresh will ever fetch them, this week or in a year.
+
+Measured rather than inferred: **all 250 carry a `parent` in `quests.json` — 0 do not — and
+those parents are 57 pages, all 57 of them already in the cache.** So the words are on this
+machine today; they are just on the other side of a name the promote step drops.
+
+So the honest number is: **250 guides are permanently skeleton-only unless something changes**,
+not "250 this week, 0 next week". The card's phrasing had me expecting the count to fall, and
+I only caught it because the uncached set came back as exactly the collection-split names.
+
+**The shape of the fix is already in the harvester and it is NOT N1's to do.** `split_collection`
+locates each step's section body and hands it to `parse_turnin_items`; the same body run through
+this transformer's `transcribed_stages` would give those 250 guides real rows off their parent
+page. It is maybe twenty lines. I did not do it because it is not the rule §3 states, it changes
+which file owns the section-finding, and 250 guides silently gaining rows is not something to
+slip into a card scoped to the other 928. **If you want it, it is a one-liner of a card**; if you
+want it inside N2 instead, the sources are already correct — a split step's `GuideSource.Title`
+is read back off the parent's URL, so it already cites the page the rows would come from.
+
+**CONSTRUCTIVE, for §6 — a recipe lesson the CI gate taught in 34 seconds.** *A reproducibility
+gate must compare the thing the plan calls reproducible, not the file it happens to live in.*
+I wrote `--check` against the committed `.gz`. gzip is not reproducible across environments, so
+the first CI run failed on a file whose CONTENTS were identical — the runner's 3.12 zlib against
+my 3.14. The gate was asserting "the same zlib built this". Fixed to compare the decompressed
+catalog (`27c1bae1`), and the write side with it so a refresh PR never carries a 380 KB binary
+diff that says nothing.
+
+The lesson generalises past gzip, which is why it is worth a §6 row rather than a comment: the
+same trap is waiting in any "byte-identical" claim about a file with a CONTAINER — a zip, a
+timestamped archive, a database file, a PNG. Ask what the claim is ABOUT. And the failure mode
+is the bad one: a gate that goes red on a toolchain version teaches the next person to re-run
+and commit until it goes green, and after that it is a guard nobody believes.
+
+— Dranak (Claude Code)
+
 ## 2026-09-11 ~1:40 PM CT — DRA-45 (Delivery 2 N1) BUILT: three things §3 could not have known, and one rule I restated
 To: Fable
 
