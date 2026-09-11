@@ -42,10 +42,33 @@ namespace EQBuddy.Tests;
 ///
 /// <para>There is no JS runner here, so the page half is asserted against the shipped
 /// file the way <see cref="CompanionFirstPairingTests"/> does, with a committed NEGATIVE
-/// each — a regex that cannot fail reads as coverage (trap 39). The behavioural proof is
-/// the harness: <c>pwsh -NoProfile -File scripts/mobile-harness.ps1</c>, then load
-/// <c>dist/mobile-harness/harness.html</c> with the socket stub made to close instead of
-/// open, and read the banner.</para>
+/// each — a regex that cannot fail reads as coverage (trap 39).</para>
+///
+/// <para><b>The behavioural proof is the harness, and it is a RECIPE rather than a hand
+/// edit</b> — <c>scripts/mobile-harness.ps1 -Refuse</c> closes the socket stub without
+/// ever opening it (all a browser sees of any of the three causes) and answers the page's
+/// own probe with the status named. The verdict is written into <c>#harnessState</c>, so
+/// a headless <c>--dump-dom</c> IS the readout and nobody has to judge a screenshot:</para>
+/// <code>
+/// pwsh -NoProfile -File scripts/mobile-harness.ps1 -Refuse 403 -OutDir dist/refuse-403
+/// msedge --headless=new --virtual-time-budget=45000 --dump-dom dist/refuse-403/harness.html#somecode
+/// </code>
+/// <para>Measured against the shipped page on 2026-09-11, all four, with a FRAGMENT token
+/// (the scanned-QR case, which is the one that hung):</para>
+/// <list type="bullet">
+/// <item><b>403</b> — <c>closes: 1, probes: 1</c>, app hidden, pairing panel up carrying
+/// the scanned-QR sentence. <b>One</b> auth failure spent, not five, which is the whole
+/// point of stopping rather than announcing-and-retrying.</item>
+/// <item><b>429</b> — still dialling (5 closes over the run), banner reads
+/// "Too many pairing attempts from this device."</item>
+/// <item><b>400</b> and an outright rejected fetch — still dialling, banner reads
+/// "Can't reach EQBuddy on your PC — still trying."</item>
+/// </list>
+/// <para>And the OTHER blank page, driven the same way with a real snapshot: a PC
+/// offering <c>quests</c>/<c>gear</c> against a phone's <c>FIRST_RUN</c> of
+/// <c>spawns</c>/<c>session</c> — the Founder's actual configuration — now paints both
+/// offered panels instead of nothing. <c>#noScreens</c> is absent, which is the assertion:
+/// the page had something to draw, so it did not have to explain itself.</para>
 /// </summary>
 public class CompanionPairingFailureTests : IDisposable
 {
