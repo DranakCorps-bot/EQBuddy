@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>EQBuddy Evolved — Your Personalized Guide to Norrath</title>
+<meta name="description" content="EQBuddy Evolved is the personal, log-only companion for EverQuest Legends: private, local-first, and personal — never a way to measure other players. Current public downloads remain EQBuddy 1.x (MIT).">
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+<link rel="stylesheet" href="assets/css/landing.css">
+</head>
+<body>
+<div class="backdrop" aria-hidden="true"></div>
+<div id="progress" aria-hidden="true"></div>
+
+<nav class="topbar" aria-label="Page">
+  <a class="brand" href="#top"><img src="assets/favicon.svg" alt="" width="20" height="20">EQBuddy&nbsp;Evolved</a>
+  <a class="nav" href="#hud">The tray</a>
+  <a class="nav" href="#guide">The Guide</a>
+  <a class="nav" href="#roadmap">Roadmap</a>
+  <a class="nav" href="#chain">The chain</a>
+  <a class="nav" href="#surfaces">Surfaces</a>
+  <a class="nav" href="#features">Features</a>
+  <a class="nav" href="#dive">Deep dive</a>
+  <a class="nav" href="#today">Get it</a>
+  <a class="nav gh" href="https://github.com/DranakCorps-bot/EQBuddy">GitHub</a>
+</nav>
+
+<nav class="dotnav" aria-label="Sections">
+  <a href="#top"><span>Top</span></a>
+  <a href="#hud"><span>01 · The tray</span></a>
+  <a href="#guide"><span>02 · The Guide</span></a>
+  <a href="#roadmap"><span>03 · Roadmap</span></a>
+  <a href="#chain"><span>04 · The chain</span></a>
+  <a href="#surfaces"><span>05 · Three surfaces</span></a>
+  <a href="#features"><span>06 · Feature tour</span></a>
+  <a href="#dive"><span>07 · The deep dive</span></a>
+  <a href="#principles"><span>08 · Principles</span></a>
+  <a href="#today"><span>09 · Today, honestly</span></a>
+  <a href="#closing"><span>North star</span></a>
+</nav>
+
+<main>
+
+<!-- ================= Hero ================= -->
+<section class="hero" id="top">
+  <span class="eyebrow"><span class="pulse" aria-hidden="true"></span>EQBuddy Evolved — in development</span>
+  <h1>Your personalized guide to <span class="grad">Norrath</span></h1>
+  <p class="lead"><em>“EQBuddy understands who I am playing, what I can do, what I own,
+  what I am working on, how I actually perform, and where I have been — then quietly
+  helps me decide what to do next.”</em></p>
+  <div class="pillrow">
+    <span class="pill"><b>Log-only</b> — reads your /log file, nothing else</span>
+    <span class="pill"><b>Local-first</b> — no account, no cloud</span>
+    <span class="pill"><b>Personal</b> — not competitive</span>
+    <span class="pill"><b>Windows</b> + your phone on the LAN</span>
+  </div>
+  <div class="kpis reveal">
+    <div class="kpi"><div class="n">0</div><div class="l">game-memory reads — ever</div></div>
+    <div class="kpi"><div class="n">0</div><div class="l">accounts or cloud services required</div></div>
+    <div class="kpi"><div class="n">0</div><div class="l">telemetry by default</div></div>
+    <div class="kpi"><div class="n">11,000+</div><div class="l">items in the built-in offline catalog</div></div>
+  </div>
+</section>
+
+<!-- ================= 01 The tray (DRA-48 IA lock 2026-09-10: the first story on the page) ================= -->
+<section id="hud">
+  <div class="kicker"><span class="num">01</span><div class="rule"></div></div>
+  <h2>While you play, EQBuddy is <span class="grad">one thin tray</span></h2>
+  <p class="sub">Minimized, the whole app is a slim strip of chips — DPS, XP/hr, procs,
+  loot, motes, coin, whichever you star. Everything deeper is one gesture away:
+  <strong>hover a chip to peek</strong>, <strong>click to keep the card open</strong>,
+  drag things where you want them. Nothing interrupts, ever. Every capture and clip on
+  this page is a real build driven by the repo’s own harness — character names are test
+  fixtures.</p>
+
+  <div class="hudstory">
+    <div class="hudstep reveal">
+      <div class="hudlabel">
+        <span class="stage">01 · Glance</span>
+        <h3>A strip of chips, not a dashboard</h3>
+        <p>The tray shows your session across the metrics you pick — damage, experience
+        rate, procs, loot, motes, coin. It stays small enough to sit over the game and
+        be ignored until you want it.</p>
+      </div>
+      <div class="stripstack">
+        <figure class="shot strip"><img src="assets/img/mini-bar.png"
+          width="879" height="40" alt="The minimized tray: a presence dot and character name, then chips for melee DPS, XP rate, kills, pet DPS, proc rate, loot count, mote rate, coin and a death counter, with expand and close buttons"></figure>
+        <figure class="shot strip"><img src="assets/img/mini-bar-chips.png" loading="lazy"
+          width="628" height="40" alt="The same tray with a different chip loadout: DPS, XP per hour, kills, pet DPS, loot count and a buff-set chip reading 8">
+          <figcaption class="cap">A different loadout — down to your pet’s own DPS and a
+          buff-set chip counting what’s up, if that is what you watch.</figcaption></figure>
+      </div>
+    </div>
+    <div class="hudstep reveal">
+      <div class="hudlabel">
+        <span class="stage">02 · Hover to peek</span>
+        <h3>The detail is a hover away</h3>
+        <p>Mouse over a chip and its card opens right under the tray — what dropped and
+        at what rate, this fight’s damage, whatever that chip watches. Slide to another
+        chip and the card follows; move away and it is gone. Every chip’s tooltip says
+        exactly this: <em>“hover to peek, click to keep it open.”</em></p>
+      </div>
+      <figure class="shot gifshot"><img src="assets/media/tray-hover-peek.gif" loading="lazy"
+        width="1176" height="470" alt="Animation: the pointer hovers the tray's loot chip and a detailed loot card opens under the bar, slides to the DPS chip and the card follows, then moves away and the card closes"></figure>
+    </div>
+    <div class="hudstep reveal">
+      <div class="hudlabel">
+        <span class="stage">03 · Click to keep</span>
+        <h3>Click, and the card stays</h3>
+        <p>A peek you want to watch — a camp’s drops, a fight’s numbers — is one click
+        from staying open. The pinned card keeps updating live while you play, and its
+        ✕ puts it away; ⧉ pops the same surface out into a full window.</p>
+      </div>
+      <figure class="shot gifshot"><img src="assets/media/tray-click-keep.gif" loading="lazy"
+        width="1176" height="470" alt="Animation: the pointer hovers the loot chip, clicks it, and then moves far away from the tray while the loot card stays open"></figure>
+    </div>
+    <div class="hudstep reveal">
+      <div class="hudlabel">
+        <span class="stage">04 · Make it yours</span>
+        <h3>Drag chips to reorder — drag the card anywhere</h3>
+        <p>Chips ride the tray in your order: drag one to move it, and the tooltip on
+        every movable chip says so — <em>“drag to reorder.”</em> The peek card can be
+        dragged off the tray and parked where you want it, and its edge resizes it.
+        “Follow the HUD again” in Edit&nbsp;HUD undoes the park whenever you want the
+        default back.</p>
+      </div>
+      <div class="peekrow">
+        <figure class="shot gifshot"><img src="assets/media/tray-drag-reorder.gif" loading="lazy"
+          width="1176" height="470" alt="Animation: the pointer presses the loot chip and carries it left across the tray; on release the chips render in the new order"></figure>
+        <figure class="shot gifshot"><img src="assets/media/tray-peek-park-resize.gif" loading="lazy"
+          width="1176" height="470" alt="Animation: the pointer pins the loot card open, drags it away from the tray to a new spot, then takes its edge and widens it"></figure>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid cols2" style="margin-top:20px">
+    <div class="callout info reveal">
+      <span class="ct">The loot peek knows what you are fighting</span>
+      With nothing targeted it tells you so — <em>“Swing at something — or /consider it —
+      and its possible drops appear here.”</em> Target or /consider a creature and the
+      same card becomes its drop table: eqlwiki’s live rate beside your own observed
+      count, for the thing in front of you right now.
+    </div>
+    <div class="peekrow reveal">
+      <figure class="shot"><img src="assets/img/hud-expand-loot.png" loading="lazy"
+        width="300" height="159" alt="The loot peek for Giant spider after 15 kills this session: each drop with eqlwiki's live rate and this session's count"></figure>
+      <figure class="shot"><img src="assets/img/hud-expand-buffs.png" loading="lazy"
+        width="300" height="201" alt="The buff set peek: eight buffs up, each with an estimated time remaining"></figure>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 02 The Guide (DRA-48 T4 revise; IA lock: second story) ================= -->
+<section id="guide">
+  <div class="kicker"><span class="num">02</span><div class="rule"></div></div>
+  <h2>Guided walkthroughs that answer<br><span class="grad">“what should I do next?”</span></h2>
+  <p class="sub">The Guide is the reworked quest surface. Open a reward you care about and
+  every step says <strong>who, where and what</strong>; one step is pinned as
+  <strong>NEXT</strong>; and anything you already earned is flagged
+  <strong>ready to turn in</strong> before you think to ask.</p>
+
+  <div class="guidehero reveal">
+    <figure class="shot"><img src="assets/img/shell-quests-sky-guide.png" loading="lazy"
+      width="986" height="893" alt="The Guide room: a Ready-to-turn-in banner naming the Belt of the Four Winds with a Mark-turned-in button, and below it the Runed Wind Amulet opened with its NEXT step pinned — Loot a Wind Rune Azia from Plane of Sky trash — with Done and Skip controls"></figure>
+    <div class="guidepoints">
+      <div class="gp">
+        <span class="stage">Next, pinned</span>
+        <p>One step at the top: what to do, where to go, and what it works toward —
+        with <strong>Done</strong> and <strong>Skip</strong>, because you play in your
+        order, not the wiki’s.</p>
+      </div>
+      <div class="gp">
+        <span class="stage">Who · where · what</span>
+        <p>Every step names the mob or NPC, the isle or zone, and the item —
+        <em>“Kill Keeper of Souls on Isle 4 and loot the Stone Amulet.”</em> No step
+        assumes you already know the route.</p>
+      </div>
+      <div class="gp">
+        <span class="stage">Ready to turn in</span>
+        <p>Loot in your log ticks the checklist by itself, and a bag scan counts what
+        you collected before EQBuddy. When the pieces are together, the reward is
+        flagged — one click marks it turned in.</p>
+      </div>
+      <div class="gp">
+        <span class="stage">Honest where the wiki is</span>
+        <p>Every quest mirrors eqlwiki, item for item. A step the wiki cannot answer
+        says exactly what is missing — and your own discoveries flow back as
+        paste-ready wiki edits, so the first player who knows fixes it for everyone.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid cols2">
+    <figure class="shot reveal"><img src="assets/img/shell-quests-sky-guide-folded.png" loading="lazy"
+      width="986" height="893" alt="The Guide with six Druid Plane of Sky rewards folded to their heading lines, each showing pieces collected and state">
+      <figcaption class="cap">Folded, the Guide is a quiet list — name, pieces and state
+      on one line per reward. Open only the one you are working.</figcaption></figure>
+    <figure class="shot reveal"><img src="assets/img/shell-quests-sky-guide-card.png" loading="lazy"
+      width="986" height="893" alt="One reward opened: the NEXT step pinned with Done and Skip, then grouped steps — one of which states the wiki does not confirm which mob drops the Efreeti Statuette and asks whoever learns it to tell the wiki">
+      <figcaption class="cap">One reward opened. Note the step that admits eqlwiki does
+      not name the drop yet — a guess in confident type is the one thing the Guide
+      refuses to print.</figcaption></figure>
+  </div>
+</section>
+
+<!-- ================= 03 Roadmap tease (DRA-48 IA lock: third story — honest "coming for v2") ================= -->
+<section id="roadmap">
+  <div class="kicker"><span class="num">03</span><div class="rule"></div></div>
+  <h2>Where the first Evolved release <span class="grad">is headed</span></h2>
+  <p class="sub">The tray and the Guide are real today. The initial v2 release aims the
+  same chain at the two questions every player actually asks — planned work, said
+  plainly: there is no Evolved download yet and no date to promise.</p>
+
+  <div class="grid cols2">
+    <div class="card accent reveal">
+      <div class="role">Coming for Evolved v2</div>
+      <h3>Gear planning — “How do I upgrade my main hand?”</h3>
+      <p>The Gear Locker already compares every wearable you own, slot by slot. The v2
+      release connects it forward: name the meaningful upgrade for what you are wearing
+      now, the quest or mob that provides it, and your progress against it — already
+      counted from your achievements, bags and log.
+      <a href="#dive-mainhand">The deep dive walks this question end to end.</a></p>
+    </div>
+    <div class="card accent reveal">
+      <div class="role">Coming for Evolved v2</div>
+      <h3>Hunt-next — “Where should I hunt for EXP?”</h3>
+      <p>Kills &amp; Drops already measures what each camp pays <em>you</em> — kills per
+      hour, xp per creature, coin. The v2 release turns that evidence into a suggestion:
+      where your own numbers say the next sitting is best spent, cross-checked against
+      the wiki’s shared truth.
+      <a href="#dive-exp">The deep dive shows the evidence it draws on.</a></p>
+    </div>
+  </div>
+
+  <div class="callout info reveal">
+    <span class="ct">What that promise rests on</span>
+    The evidence surfaces these answers need — the Locker, Kills &amp; Drops, Progress
+    history — are built and shown in the <a href="#features">feature tour</a> below.
+    What v2 adds is the connected answer on top of them. When any of it ships, it ships
+    in a release’s What’s&nbsp;New, not in a landing-page tense change.
+  </div>
+</section>
+
+<!-- ================= 04 The chain ================= -->
+<section id="chain">
+  <div class="kicker"><span class="num">04</span><div class="rule"></div></div>
+  <h2>One question, answered from <span class="grad">your own play</span></h2>
+  <p class="sub">Not a generic “best in slot” list. EQBuddy connects what you already own
+  and have done into one personalized path — <strong>gear → quest → mob → camp →
+  route</strong> — learned from your own log.</p>
+
+  <div class="stack">
+    <div class="layer reveal">
+      <span class="stage">Own · Gear</span>
+      <div><h3>Gear</h3><p>Which attainable upgrades are meaningful for what you are
+      wearing now — and when a candidate becomes better than what you have.</p></div>
+    </div>
+    <div class="layer reveal">
+      <span class="stage">Work toward · Quest</span>
+      <div><h3>Quest</h3><p>Which quest or mob provides it, what you are working on, and
+      what you are already able to turn in.</p></div>
+    </div>
+    <div class="layer reveal">
+      <span class="stage">Hunt · Mob</span>
+      <div><h3>Mob</h3><p>Whether that content is realistic — judged from your own fight
+      history, not someone else’s.</p></div>
+    </div>
+    <div class="layer reveal">
+      <span class="stage">Sit · Camp</span>
+      <div><h3>Camp</h3><p>Spawn timers that learn from your kills — and know the
+      difference between an open-world camp and a raid instance.</p></div>
+    </div>
+    <div class="layer reveal">
+      <span class="stage">Travel · Route</span>
+      <div><h3>Route</h3><p>How to get there with travel you already unlocked.</p></div>
+    </div>
+    <div class="terminal reveal">
+      <p>I log into my character. EQBuddy recognizes the classes I am playing and
+      remembers what I unlocked before. When I want more, I open it — and it can tell me
+      which upgrades are meaningful, which mob or quest provides them, whether that
+      content is realistic from my own history, and how to get there.</p>
+      <span class="src">— the Evolved north star, abridged from
+      <a href="https://github.com/DranakCorps-bot/EQBuddy/blob/main/PRODUCT.md">PRODUCT.md</a></span>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 05 Three surfaces ================= -->
+<section id="surfaces">
+  <div class="kicker"><span class="num">05</span><div class="rule"></div></div>
+  <h2>The game is on your monitor.<br>Everything else goes <span class="grad">somewhere else</span></h2>
+  <p class="sub">Two coordinated desktop surfaces plus an optional mobile second screen.
+  The HUD earns space only for information that may change your next action within
+  seconds or minutes; research and review belong in the full app, or on the phone you
+  look <em>away</em> to.</p>
+
+  <div class="grid cols3">
+    <div class="card accent reveal">
+      <figure class="shot" style="max-width:220px"><img src="assets/img/hud-chips-deadlines.png"
+        width="193" height="171" alt="The EQBuddy HUD chip stack: a mez countdown, a spawn timer due, an assist call and a buff-expiry estimate"></figure>
+      <div class="role">EQBuddy HUD</div>
+      <h3>A glance, not a dashboard</h3>
+      <p>Small, movable, always-on-top while you play. Deadline information only —
+      mez and charm countdowns, spawn-due chips, watch alerts, buff expiry.</p>
+    </div>
+    <div class="card accent reveal">
+      <figure class="shot"><img src="assets/img/shell-home.png" loading="lazy"
+        width="946" height="633" alt="The full EQBuddy Windows application on its Home page, showing character readiness and navigation to Live, Progress, Gear, Quests and World"></figure>
+      <div class="role">Full Windows app</div>
+      <h3>One coherent shell</h3>
+      <p>Persistent primary navigation — Home, Live, Progress, Gear, Quests, World,
+      Search, Settings. One click to the domain; one more to the answer.</p>
+    </div>
+    <div class="card accent reveal">
+      <figure class="shot tall"><img src="assets/img/mobile-map-phone.png" loading="lazy"
+        width="1476" height="2532" alt="EQBuddy Mobile on a phone, showing the zone map for The Lair of the Splitpaw with spawn points and the player's position"></figure>
+      <div class="role">EQBuddy Mobile</div>
+      <h3>The second screen</h3>
+      <p>Optional and LAN-only, hosted by the Windows app — map and camps, tracked
+      quests, item and gear lookup, route guidance. Never a required account.</p>
+    </div>
+  </div>
+
+  <p class="interaction reveal"><b>Glance first</b><span class="sep">→</span><b>expand for
+  live detail</b><span class="sep">→</span><b>full application for analysis</b></p>
+</section>
+
+<!-- ================= 06 Feature tour ================= -->
+<section id="features">
+  <div class="kicker"><span class="num">06</span><div class="rule"></div></div>
+  <h2>What it already <span class="grad">does</span></h2>
+  <p class="sub">Captured from real builds with the repo’s own screenshot harness,
+  all in the Blue-grey palette — one of several themes EQBuddy ships. Character names
+  are test fixtures.</p>
+
+  <div class="grid cols3">
+    <div class="card accent reveal">
+      <figure class="shot"><img src="assets/img/shell-gear.png" loading="lazy"
+        width="946" height="633" alt="The Gear page's Loot tab listing this session's drops with counts, alongside Wishlist and Inventory tabs"></figure>
+      <h3>Gear &amp; Loot</h3>
+      <p>A Gear Locker that compares every wearable you own per slot, your loot with
+      personal drop rates, and a wishlist that ticks itself as items arrive.</p>
+    </div>
+    <div class="card good reveal">
+      <figure class="shot"><img src="assets/img/shell-progress-history.png" loading="lazy"
+        width="946" height="633" alt="The Progress page's History tab: stored sessions on the left, level and AA progress charts on the right"></figure>
+      <h3>Progress</h3>
+      <p>Every session lands in a local, searchable history — experience, wealth,
+      faction, and level and AA charts across every sitting you have stored.</p>
+    </div>
+    <div class="card accent reveal">
+      <figure class="shot"><img src="assets/img/spawns-window.png" loading="lazy"
+        width="640" height="545" alt="The World window's Camps tab: Runnyeye Citadel's named spawns listed with editable respawn timers, a Died column and per-mob alert controls"></figure>
+      <h3>World</h3>
+      <p>Zone maps with your position from /loc, camps you have marked, and spawn
+      timers learned from your own kills counting down beside the map.</p>
+    </div>
+    <div class="card good reveal">
+      <figure class="shot"><img src="assets/img/shell-live.png" loading="lazy"
+        width="946" height="633" alt="The Live page showing this sitting's damage breakdown: totals, crit and accuracy rates, and per-ability rows with bars"></figure>
+      <h3>Live meters</h3>
+      <p>Damage, healing, pet and a fight timeline that draws every swing on one
+      canvas. Your numbers, nobody else’s — there is no party meter here.</p>
+    </div>
+    <div class="card warn reveal">
+      <figure class="shot"><img src="assets/img/shell-world-drops.png" loading="lazy"
+        width="946" height="633" alt="The World page's Drops tab: per-creature kill counts with observed drop rates, and drops the wiki doesn't know yet marked for contribution"></figure>
+      <h3>Kills &amp; Drops</h3>
+      <p>Observed personal drop rates per creature — the kill count is the denominator —
+      with exports, and drops eqlwiki doesn’t know yet flagged for a paste-ready page
+      edit.</p>
+    </div>
+    <div class="card accent reveal">
+      <figure class="shot"><img src="assets/img/damage-breakout.png" loading="lazy"
+        width="272" height="357" alt="The Your damage breakout window with Fight and Session tabs and per-ability rows showing count, average and DPS"></figure>
+      <h3>Breakout windows</h3>
+      <p>Any tray chip’s surface pops out into its own live window — this fight or the
+      whole session, updating as you play, for exactly as long as you want it there.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 07 The deep dive (DRA-48 T4 hybrid: Example-2 chrome region) ================= -->
+<section id="dive">
+  <div class="kicker"><span class="num">07</span><div class="rule"></div></div>
+  <h2>The deep dive — <span class="grad">how it actually helps</span></h2>
+  <p class="sub">Everything above is the overview. This is the long-form version: two
+  real questions a player asks, walked through the product step by step, with the
+  screenshots as evidence and an honest account of where each answer comes from.</p>
+
+  <div class="dive-shell">
+    <nav class="dive-toc" aria-label="Deep dive contents">
+      <div class="toc-head">In this deep dive</div>
+      <a href="#dive-read"><span class="tnum">07.1</span>How to read it</a>
+      <a href="#dive-mainhand"><span class="tnum">07.2</span>“How do I upgrade my main hand?”</a>
+      <a href="#dive-exp"><span class="tnum">07.3</span>“Where should I hunt next for EXP?”</a>
+      <a href="#dive-scorecard"><span class="tnum">07.4</span>Where each answer comes from</a>
+      <a href="#dive-limits"><span class="tnum">07.5</span>The honest limits</a>
+    </nav>
+
+    <div class="dive-main">
+
+      <article class="dive-sec" id="dive-read">
+        <span class="secnum">07.1 · Orientation</span>
+        <h3>How to read this</h3>
+        <p class="lede">EQBuddy’s own rule is <strong>evidence before confidence</strong>,
+        so this page holds itself to it.</p>
+        <p>Everything marked <span class="badge observed">observed</span> is a number
+        EQBuddy counted in your log — your kills, your drops, your xp. Everything marked
+        <span class="badge estimated">estimated</span> is inference and says so. Every
+        screenshot on this page is a real capture from the repo’s screenshot harness
+        against a staged test profile — no mockups, no composites. Character names are
+        test fixtures.</p>
+        <div class="callout info reveal">
+          <span class="ct">The shape of every answer</span>
+          Who you are playing → what you own → what you are working on →
+          <strong>what to do next</strong>. Both walkthroughs below are that one shape.
+        </div>
+      </article>
+
+      <article class="dive-sec" id="dive-mainhand">
+        <span class="secnum">07.2 · Worked example</span>
+        <h3>“How do I upgrade my main hand?”</h3>
+        <p class="lede">The question every player actually has, and the one a generic
+        “best in slot” list answers worst — because it doesn’t know what you own, what
+        you can reach, or what you’ve already half-finished.</p>
+
+        <h4><span class="wstep">1</span>Start from what you own</h4>
+        <p>The Gear Locker reads your inventory dump and compares every wearable you own,
+        slot by slot, against the wiki’s base stats. When something you are carrying is
+        at least as good on every stat and better on one, the weaker item is marked
+        <em>outclassed</em> — “a dump candidate by arithmetic, not taste.”</p>
+
+        <h4><span class="wstep">2</span>Name the upgrade and find its source</h4>
+        <p>The Quest tracker’s search takes a reward, an item, a quest or an NPC. Type
+        the weapon you want and you land on the quest that provides it — with your own
+        progress against it already counted, because EQBuddy imported your achievements
+        and scanned your bags.</p>
+        <figure class="shot reveal" style="max-width:620px"><img src="assets/img/gearloot-gear.png" loading="lazy"
+          width="880" height="535" alt="The Gear &amp; Loot window's Wishlist tab holding a named gear push: five slots from head to neck, each target item listed with its source zone, one already ticked as acquired, and a copy button for the in-game /outputfile inventory command that ticks the rest from your bags"></figure>
+        <p class="cap">A named gear push, slot by slot, each target with its source —
+        one already ticked, and the /outputfile command that ticks the rest shipped as
+        a one-click copy. <span class="badge observed">observed</span></p>
+
+        <h4><span class="wstep">3</span>Let the Guide run the middle</h4>
+        <p>From there it is <a href="#guide">section 02</a>: the reward breaks into
+        steps, <strong>NEXT</strong> names the one that matters now — <em>kill The
+        Spiroc Lord on Isle 5 and loot the Spiroc Battle Staff</em> — and looting the
+        item ticks the box from the log by itself.</p>
+
+        <h4><span class="wstep">4</span>Camp on your own clock</h4>
+        <p>If the source is a named mob, the World map shows the camp with a spawn timer
+        learned from <em>your</em> kills — counting down next to the map, distinct from
+        wiki averages, and honest about being an estimate until it has seen the cycle.</p>
+
+        <h4><span class="wstep">5</span>Get there with what you have</h4>
+        <p>The route uses travel you have actually unlocked — not the teleport network
+        of a character you don’t play.</p>
+
+        <div class="callout info reveal">
+          <span class="ct">Why this beats a spreadsheet</span>
+          Each step is fed by the previous surface: the Locker knows your slots, the
+          tracker knows your turn-ins, the Guide knows your loot, the map knows your
+          kills. You never re-enter a fact EQBuddy already read from the log.
+        </div>
+      </article>
+
+      <article class="dive-sec" id="dive-exp">
+        <span class="secnum">07.3 · Worked example</span>
+        <h3>“Where should I hunt next for EXP?”</h3>
+        <p class="lede">EQBuddy won’t pretend there is one global best answer. What it
+        has — and a forum thread doesn’t — is what <em>this character</em> actually
+        earns, camp by camp.</p>
+
+        <h4><span class="wstep">1</span>What is this camp paying right now?</h4>
+        <p>Kills &amp; Drops keeps the running answer during the sitting: kills per
+        hour, and per creature the average kill time, the coin, and the experience each
+        one is worth to you.</p>
+        <figure class="shot reveal"><img src="assets/img/creature-kills.png" loading="lazy"
+          width="880" height="536" alt="The Kills and Drops window: 74.6 kills per hour this session, a per-creature kill list, and a farming section showing each creature's average kill time, coin and experience alongside observed drop rates"></figure>
+        <p class="cap">One session’s evidence: 74.6 kills an hour, and what each creature
+        actually pays — orc pawns die in 2 seconds for coin, pumas take 5 and pay in
+        pelts at this character’s own observed rates. That is a hunting decision, made
+        from your own numbers.
+        <span class="badge observed">observed</span></p>
+
+        <h4><span class="wstep">2</span>Compare against your own history</h4>
+        <p>Progress keeps every stored sitting — xp/hr, levels, AA — so “was the new
+        zone actually better than the old camp?” is a chart, not a feeling. The World
+        page’s Drops tab remembers what each creature paid across sessions, not just
+        tonight.</p>
+
+        <h4><span class="wstep">3</span>Cross-check the shared truth</h4>
+        <p>Zone level ranges and spawn mechanics are the community’s shared knowledge,
+        and eqlwiki is its home. EQBuddy links you to the page rather than paraphrasing
+        it — and when your log shows something the wiki doesn’t know, it drafts the
+        page edit for you to paste.</p>
+
+        <div class="callout info reveal">
+          <span class="ct">This-character, not best-character</span>
+          A druid who roots and rots clears a camp at a different rate than the wiki’s
+          median visitor. Your kills/hr and xp-per-creature are the only numbers that
+          were measured on <em>you</em> — that is why they are the ones EQBuddy shows.
+        </div>
+      </article>
+
+      <article class="dive-sec" id="dive-scorecard">
+        <span class="secnum">07.4 · Judgement</span>
+        <h3>Where each answer comes from</h3>
+        <p class="lede">An honest scorecard. EQBuddy is not a replacement for the wiki —
+        it is the tool that connects the wiki’s shared truth to your private evidence,
+        and sends corrections back.</p>
+
+        <div class="tbl-wrap reveal">
+        <table>
+          <thead><tr><th>The question</th><th>A wiki tab alone</th><th>EQBuddy over your log</th><th>Net</th></tr></thead>
+          <tbody>
+            <tr><td><strong>What does the quest need?</strong></td>
+              <td>The source of truth</td>
+              <td>Mirrors eqlwiki item-for-item, re-harvested weekly; the wiki stays the tie-breaker</td>
+              <td class="tick">Same truth, in the tool</td></tr>
+            <tr><td><strong>What have I already done?</strong></td>
+              <td>—</td>
+              <td>Achievements import + bag scan + the log since; turn-ins and half-collected steps counted</td>
+              <td class="tick">Only your machine knows</td></tr>
+            <tr><td><strong>What actually drops here, how often — for me?</strong></td>
+              <td>Lists what drops</td>
+              <td>Observed rates with your kill count as the denominator</td>
+              <td class="tick">And unknown drops become paste-ready wiki edits</td></tr>
+            <tr><td><strong>When is my camp due?</strong></td>
+              <td>Respawn notes</td>
+              <td>Timers learned from your own kills, counting down beside the map</td>
+              <td class="tick">Your clock, not an average</td></tr>
+            <tr><td><strong>Was tonight better than last week?</strong></td>
+              <td>—</td>
+              <td>Stored session history with level and AA charts</td>
+              <td class="tick">Memory a browser doesn’t have</td></tr>
+            <tr><td><strong>Endgame mechanics nobody has confirmed</strong></td>
+              <td>Sometimes silent</td>
+              <td>A stub that says what is missing and asks the player who knows</td>
+              <td class="part">Honesty, not coverage</td></tr>
+            <tr><td><strong>How good are the other players?</strong></td>
+              <td>—</td>
+              <td>Never — by principle, not by gap</td>
+              <td class="cross">Not a feature. Not ever.</td></tr>
+          </tbody>
+        </table>
+        </div>
+      </article>
+
+      <article class="dive-sec" id="dive-limits">
+        <span class="secnum">07.5 · Judgement</span>
+        <h3>The honest limits</h3>
+        <div class="callout warn reveal">
+          <span class="ct">A precise-looking wrong number is worse than none</span>
+          Curated game data — spawn timers, quest catalogs — is never auto-written from
+          a scrape. The weekly wiki refresh <em>flags</em> conflicts for a person to
+          resolve, and where quest data conflicts and can’t be resolved, EQBuddy matches
+          the wiki on purpose: being wrong the same way as the community’s own reference
+          is recoverable; being uniquely wrong is not.
+        </div>
+        <p>The same rule shapes the Guide’s stubs (a step without a source says so
+        instead of inventing one), the Locker’s “stats not fetched yet” bucket, and the
+        observed/estimated badges you saw above. If EQBuddy tells you something about
+        Norrath, you should be able to ask it how it knows — and get a real answer.</p>
+      </article>
+
+    </div>
+  </div>
+</section>
+
+<!-- ================= 08 Principles ================= -->
+<section id="principles">
+  <div class="kicker"><span class="num">08</span><div class="rule"></div></div>
+  <h2>Hard lines — <span class="grad">these do not move</span></h2>
+  <p class="sub">The product is private, local, personal and non-judgmental. These are
+  not settings; they are what EQBuddy is.</p>
+
+  <div class="grid cols2">
+    <div class="card accent reveal">
+      <h3>Personal, not competitive</h3>
+      <p>EQBuddy measures the player using it. It is not a party or raid ranking tool,
+      a leaderboard, or a way to judge other people — and it never will be.</p>
+    </div>
+    <div class="card accent reveal">
+      <h3>Log-only and local-first</h3>
+      <p>No game-memory reads, no packet inspection, no gameplay automation, no
+      hidden-information extraction. No required account, no required cloud, no
+      telemetry by default. Your history stays on your machine unless you export it.</p>
+    </div>
+    <div class="card good reveal">
+      <h3>Evidence before confidence</h3>
+      <p>A precise-looking wrong number is worse than a clearly identified estimate.
+      Where a decision depends on it, EQBuddy distinguishes
+      <span class="badge observed">observed</span> from
+      <span class="badge estimated">estimated</span> — in the model first, in the UI
+      where it matters.</p>
+    </div>
+    <div class="card warn reveal">
+      <h3>No modal interruptions</h3>
+      <p>Looting a quest item is a dismissible toast or chip, not a dialog that steals
+      the fight. Proactive where useful, never noisy or intrusive.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 09 Today, honestly ================= -->
+<section id="today">
+  <div class="kicker"><span class="num">09</span><div class="rule"></div></div>
+  <h2>Today, <span class="grad">honestly</span></h2>
+  <p class="sub">Evolved is the direction, not a download yet. Here is exactly what you
+  can get right now, and under which license.</p>
+
+  <div class="grid cols2 dl">
+    <div class="card good reveal">
+      <div class="role">Available now</div>
+      <h3>Get EQBuddy 1.x — MIT</h3>
+      <p>The current public releases are the 1.x line: the always-on-top widget that
+      reads your log live — kills and DPS, fight timeline, loot, spawn timers, quest
+      tracker, Gear Locker and more. Final Linux and macOS 1.x builds stay downloadable
+      and usable (<a href="https://github.com/DranakCorps-bot/EQBuddy/releases/tag/v1.99.18">v1.99.18</a>
+      is the final legacy tag). Every release is code-signed.</p>
+      <a class="btn primary" href="https://github.com/DranakCorps-bot/EQBuddy/releases">Download 1.x from GitHub Releases</a>
+      <p class="lic">Published 1.x is and stays <code>MIT</code>. Nothing about Evolved
+      revokes those grants.</p>
+    </div>
+    <div class="card accent reveal">
+      <div class="role">In development</div>
+      <h3>Watch Evolved take shape</h3>
+      <p>EQBuddy Evolved (v2) is being built in the open in this repository — the shell,
+      the Guide, and the chain above. It is <strong>proprietary</strong>
+      (<a href="https://github.com/DranakCorps-bot/EQBuddy/blob/main/LICENSE-EVOLVED.md">LICENSE-EVOLVED.md</a>):
+      readable so the direction is checkable, not reusable. There is no Evolved download
+      and no date to promise you.</p>
+      <a class="btn ghost" href="https://github.com/DranakCorps-bot/EQBuddy">Watch the repository</a>
+      <a class="btn ghost" href="https://github.com/DranakCorps-bot/EQBuddy/discussions">Join the discussions</a>
+      <p class="lic">When something player-noticeable ships, it is in the release’s
+      What’s&nbsp;New — with the reporter credited by name.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ================= Closing ================= -->
+<section id="closing">
+  <div class="closing reveal">
+    <blockquote>“I should not have to understand EQBuddy’s internal windows, cards,
+    menus, files, or data pipelines to get that answer.”<br>
+    <span style="color:var(--muted);font-size:0.85em">— the last line of the north star.
+    That is EQBuddy Evolved.</span></blockquote>
+    <div class="links">
+      <a class="btn ghost" href="https://github.com/DranakCorps-bot/EQBuddy/blob/main/README.md">README</a>
+      <a class="btn ghost" href="https://github.com/DranakCorps-bot/EQBuddy/blob/main/EQBuddy-Evolved.md">The Evolved vision</a>
+      <a class="btn ghost" href="https://github.com/DranakCorps-bot/EQBuddy/blob/main/LEGACY-V1.md">How 1.x is preserved</a>
+      <a class="btn ghost" href="https://github.com/DranakCorps-bot/EQBuddy/discussions">Discussions</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <p>EQBuddy reads only the log file the game writes. It never reads game memory, never
+  phones home, and never measures other players.</p>
+  <p>EQBuddy Evolved © 2026 David Edwards — proprietary
+  (<a href="https://github.com/DranakCorps-bot/EQBuddy/blob/main/LICENSE-EVOLVED.md">license</a>).
+  Published EQBuddy 1.x remains
+  <a href="https://github.com/DranakCorps-bot/EQBuddy/blob/main/LICENSE">MIT</a>.
+  EQBuddy is a fan-made companion tool and is not affiliated with the publishers of
+  EverQuest Legends. Body text is set in
+  <a href="https://rsms.me/inter/">Inter</a> (SIL OFL, self-hosted — this page makes no
+  third-party requests).</p>
+</footer>
+
+</main>
+<script src="assets/js/landing.js" defer></script>
+</body>
+</html>

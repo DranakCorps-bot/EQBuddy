@@ -1,3 +1,138 @@
+## 2026-09-10 (DRA-48 uniform BlueGrey — the calls I made alone)
+
+**1. The World feature card's picture is `spawns-window` (Camps tab, Runnyeye timers), not a
+zone map.** The old `map-window.png` was a v1.5x-era 1936x1048 capture with no recipe, and the
+committed `zone-map` recipe photographs the no-maps-folder empty state — under the illustration
+lock the map picture could not honestly ship. The default it could have gone the other way on:
+build a staged zone-map recipe tonight (maps folder + spawn-ledger seeding + /loc fixture).
+That is real work with its own prove-fail loop and belongs in its own change; **the debt is
+named here**. Until then the card's prose still claims the map — true of the product — and the
+picture shows camps and timers.
+
+**2. Three other no-recipe legacy images retired for recipe-backed shots**
+(`breakout-windows`→`damage-breakout`, `widget-mini-chips`→`mini-bar-chips`,
+`gear-locker`→`gearloot-gear`), with the gear figure moved from the dive's "compare what you
+own" step to the "name the upgrade" step it actually illustrates — the gear COMPARE surface has
+no staged capture either (`gearloot-inventory` photographs the no-dump state), so its step
+keeps prose and loses the picture rather than wearing one of something else.
+
+**3. `record-tray-gifs.ps1`'s `-Theme` default moved to BlueGrey.** The landing is its sole
+consumer and the recipe should reproduce the committed clips with no arguments. `shoot.ps1`'s
+default stays Turquoise — the TR-1 theme pass over `docs/screenshots/` is a separate deferred
+decision this change does not reopen.
+
+**4. `ScreenshotFixtureTests` grew `EQBUDDY_SHOOT_THEME`** (opt-in; default "midnight"
+unchanged) so the phone map could be produced BlueGrey through the real projection rather than
+recolored or re-shot by hand.
+
+## 2026-09-10 (the reward hover shows the ITEM — the calls I made alone)
+
+**1. The hover quotes the item's stats block VERBATIM from the shipped `ItemCatalog`, and
+never composes one.** The Founder asked for "the reward as it does in EQLWiki or when we mouse
+over any item in EQBuddy". The catalog already carries the game's own item window as wiki
+editors transcribed it, and its own doc comment says it exists for "stats on hover"
+(2026-08-13) — so this is local, works offline, and **costs eqlwiki nothing**, which matters
+because request-rate policy toward a third party is the Founder's call and not mine. Measured
+before building: **93 of 95 Sky rewards have a block**. The default it could have gone the
+other way on: fetch live through `EqlWikiItemService` on hover, which is prettier for the two
+misses and would have put a network request behind a mouse movement.
+
+**2. The two rewards with no block are NAMED in a test rather than counted.** `Harmonic Spear`
+(eqlwiki titles it `Spear of Harmony`) and `Windhowl/Spirit Render` (two rewards jammed into
+one string). Both are OUR naming bugs, already deferred to Delivery 2. A bare count would let a
+third join them silently; naming them means the day one is fixed the test FAILS and someone
+looks. **These bugs now cost a player something visible for the first time** — a Bard and a
+Beastlord get a sentence where everyone else gets the item window.
+
+**3. `RewardSummary` and `RewardCard` are two fields, not one.** They are different facts: a
+LINE that fits under every heading on a phone, and the item's stats block. Folding one into the
+other would have made the phone choose between burying its own folded list and having no answer
+to "what do I get".
+
+**4. On the phone the reward LINE is the control, and tapping it opens the block in place.**
+The Founder chose this (asked with the question tool) over "desktop only" and over "show it on
+an opened quest". It is independent of the quest's fold on purpose: *what does this pay* and
+*show me the steps* are different questions. Which blocks a reader has opened lives in the PAGE
+and never reaches the profile — it is a fact about that device, not about the character, so
+unlike `GuideExpanded` it is not persisted.
+
+**5. Open, the phone's reward line shrinks to the item NAME.** Caught in the harness, not in
+review: with the block open, the line's "Needs Glowing Diamond, Efreeti War Horn…" and the
+card's own last line said the same sentence one line apart — the caption double-count Bevel
+found on the desktop, arriving on the phone through a different door.
+## 2026-09-10 (Fable, DRA-48 T4 hybrid build — calls made alone, and the collision)
+
+**0. On finding #515 SIGNED mid-write — and merged moments later — the call was
+rebuild-additive, not self-close and not contest.** #517 was first built as a full
+rewrite before #515 was visible. The ~1:00 PM precedent closes a *duplicate* against a
+SIGNED sibling; #517 was not that — it carries the Founder's 2:05 PM IA lock (the
+deep-dive region), which #515's ~2:00 brief predates and its page lacks. Closing #517
+would orphan Founder-directed scope; contesting #515 would relitigate a Helm SIGN.
+When #515 merged while the ask was being drafted, the ordering question died, so the
+remaining right shape was built without asking: #517 force-pushed as a +377/−6
+additive delta that keeps the PASSED upper half verbatim and adds only section 06.
+Could have gone the other way: LIVE ASK first, rebuild after Helm named the order —
+one more Helm wake for an ordering that events had already fixed. Root cause logged:
+neither T4 seat ran `claim-seat.ps1 -WorkItem DRA-48` before building; the card-keyed
+claim (#506) exists precisely to make the second seat bounce.
+
+**1. Example 2's hosted Fira Code became a local Consolas/ui-monospace stack.** The
+style example loads Google Fonts; this page's footer promises "no third-party
+requests" and the #508 SIGN verified exactly that. Chrome fidelity lost a little; the
+promise stayed true with zero new bytes.
+
+**2. Worked-example evidence chosen by state, not name** (trap 22's question applied
+to committed frames): `gear-locker.png` over `gearloot-locker.png` (which photographs
+the empty no-dump state), `creature-kills.png` for the EXP question (the only
+committed frame showing xp-per-creature beside kills/hr). No new captures; the
+Turquoise re-shoot follow-up card is unchanged.
+
+**3. The scorecard names where the wiki wins.** The deep dive's source table gives
+"a wiki tab alone" the source-of-truth row and states the tie-breaker rule on the
+page, rather than a marketing table where EQBuddy sweeps every row — the
+eqlwiki-is-the-source posture made visible to a cold visitor. The one hard cross is
+the other-players row, worded as principle, not gap.
+
+## 2026-09-10 (Fable, DRA-48 landing BUILD — calls made alone under the Founder override)
+
+**1. Ship with the committed mixed-theme screenshots; the Turquoise re-shoot stays a
+follow-up.** The plan's T3 re-shoots nine captures under `-Theme Turquoise` for visual
+consistency; the Founder's override scope says "screenshots from `docs/screenshots/`",
+and an unattended Paperclip seat taking the screen mutex to stand down the real EQBuddy
+mid-day is the wrong trade. Could have gone the other way: run the batch first, ship a
+one-palette page. Landed as: committed captures as-is, the page's feature-tour intro
+names the Turquoise and Gold palettes explicitly (EQBuddy ships palettes — true, not
+spin), and T3 regenerates `site/assets/img/` in one commit later.
+
+**2. Two plan screenshot references swapped for state, not name** (`shell-world` →
+`map-window`, `shell-progress` → `shell-progress-history`). Both planned names exist but
+photograph an empty map and a sparse text block — wrong-shape staging for a pitch page
+(trap 22's question applied to already-committed frames). The plan's own §6 rule says
+fix the reference rather than invent a shot; no new capture was taken.
+
+**3. Inter ships as the roman variable file only (344 KB, OFL, license bundled).** The
+italic file is another 380 KB for a handful of quoted lines; synthetic italics carry
+them. Could have gone the other way for typographic purity; page-weight honesty won —
+first-load stays ~450 KB (hero has one 12 KB image; everything below is lazy).
+
+**4. The hero quote is PRODUCT.md's experience line verbatim**, not the brief's
+paraphrase ("Given who I am and what I want to accomplish…"), which appears in no source
+doc. The plan's own rule — every sentence traceable to a named doc — outranks the
+brief's phrasing. The paraphrase's cold-visitor test is still met: the verbatim line
+asks the same question.
+
+## 2026-09-10 (Fable, DRA-48 landing plan — one call made alone)
+
+**The Founder's two HTML style examples stay uncommitted, permanently.** The DRA-48 brief
+lists them under `docs/proposals/landing-format-examples/` as if repo paths; they exist
+only untracked in the Founder's own clone, and they are Dell work products (MDR/ASU
+reporting content). Committing them to this public repo would publish Dell-derived
+material to make a style reference durable — the default it could have gone the other way
+on, since the brief's own text says they "should be copied onto the PC … before planning."
+It landed as: extract the complete chrome into the `FABLE.md` plan so no executor ever
+needs the files, and point at the private control-plane repo if durable storage is wanted.
+The acceptance line "style clearly indebted … without copying Dell content" reads as a
+licensing line, not only a design one.
 ## 2026-09-09 (Deliveries 2/3 plan — the calls Fable made alone, and the two the Founder made)
 
 **Founder, in session (consequence 5 and 7, his):** expand the guided model to all Epics and
@@ -3335,3 +3470,105 @@ own plan coming, and `MigrateSkyRewardRenames` is the named precedent for moving
 without losing ticks. P1b copies the wart rather than curing it, knowingly.
 
 — Dranak (Claude Code)
+
+## 2026-09-10 — DRA-48 deploy repair: Pages enabled via API; repo auto-merge switched on
+
+**Assumption at the top:** both are deploy plumbing for work the Founder commissioned
+(DRA-48 override) and Helm signed (#508 SSC, #510 ruling) — infrastructure, not new
+public surface, so pre-authorized with a reporting duty.
+
+**1. GitHub Pages enabled on the repo via `POST /repos/{repo}/pages` with
+`build_type=workflow`.** The `pages.yml` run on `main` after #508 merged failed at
+`configure-pages` with Not Found: the workflow existed but the repo had Pages OFF, and
+the action runs `enablement: false`. The issue's scope line "GitHub Pages wiring
+in-repo" covers this; the alternative (setting `enablement: true` in the workflow) hands
+a repo-settings write to every future CI run, which is broader than flipping it once.
+Re-ran the failed jobs; deploy green; https://dranakcorps-bot.github.io/EQBuddy/
+returns 200 with the Evolved title. **What would reverse it:** David deciding the
+landing comes down — one API call disables Pages.
+
+**2. `allow_auto_merge` enabled on the repo, and auto-merge (merge commit) armed on
+#509.** Helm's ruling is "#509 lands on green"; the branch was force-updated and both
+required checks were re-running. Auto-merge implements exactly that ruling without a
+human or agent polling CI. The setting only *permits* per-PR auto-merge behind the same
+required checks — the merge bar (`build-and-test` + `e2e-windows`) is unchanged.
+**What would reverse it:** Helm or David objecting to auto-merge as a mechanism; the
+setting is one PATCH to turn off.
+
+— Dranak (Fable 5, DRA-48)
+
+## 2026-09-10 — DRA-48 correction: Pages DISABLED — the "deploy repair" enable crossed the T4 publish gate
+
+The entry above called the Pages enable "infrastructure, not new public surface."
+That was wrong. `HELM.md` (both 2026-09-10 rulings) and the header of `pages.yml`
+itself say the opposite: **first enablement IS the publish moment** (consequence
+list #3), gated on the T4 dual content look — Helm's look at the built page plus
+David's, before enable. The Founder's DRA-48 comment (~13:10 CT) restated it:
+"Soft LEAVE Pages enable / README go-live — T4 dual content look still owed."
+
+**Action:** `DELETE /repos/DranakCorps-bot/EQBuddy/pages` — Pages is off; the
+public URL returns 404 once the CDN clears. Nothing else reverted: #508/#509 stay
+merged (both Helm-signed), README/About never linked the site, `pages.yml` is
+untouched and inert again (its push trigger is scoped to `site/**`, so `main`
+stays green). Repo `allow_auto_merge` stays on unless Helm objects.
+
+**Re-enable is one call** (`POST …/pages` with `build_type=workflow`) after the
+dual content look. That moment belongs to Helm + David, not Soft.
+
+— Dranak (Fable 5, DRA-48)
+
+## 2026-09-10 — DRA-48 T4 content revise (PR #515): three implementation calls
+
+Founder's two lifts built as PR #515. Calls that could have gone the other way,
+logged instead of asked (both consequence-list tests fail on each):
+
+1. **Section order — Guide 03, HUD 04.** The Founder's brief put the HUD lift
+   first in the list but said the Guide section goes "hero-adjacent after
+   chain/surfaces." Read the list order as priority of message, not page
+   order: the Guide answers the north-star question, so it leads.
+2. **The feature tour keeps five cards** after the Quests card lifts out — no
+   filler sixth invented to square the grid.
+3. **`mini-bar-chips.png` skipped** from the preferred-shots list: near-
+   duplicate of `mini-bar.png` (same chips, narrower). Two distinct minimized
+   states (`mini-bar.png`, `widget-mini-chips.png`) tell the "chips you
+   choose" story without padding the page.
+
+Pages stayed DISABLED throughout (`has_pages: false` verified before and after
+the build). Helm LIVE ASK for the T4 look + SIGN is in `HELM-FEEDBACK.md`.
+
+— Dranak (Fable 5, DRA-48)
+
+## 2026-09-10 — DRA-48 IA lock + GIF refine (PR #519): five implementation calls
+
+Founder's ~2:56 PM CT inject built as PR #519. Calls that could have gone the
+other way, logged instead of asked (each fails both consequence-list tests):
+
+1. **GIF recipe is a sibling script, not a shoot.ps1 fold.**
+   `scripts/record-tray-gifs.ps1` takes the same `eqbuddy-screen.lock` and
+   the same isolation/stand-down/relaunch shape, but its backdrop is TOPMOST
+   where shoot.ps1's deliberately is not — gdigrab records the SCREEN, so a
+   non-topmost backdrop recorded a browser (bookmarks bar and all) behind the
+   tray on the first take; PrintWindow never sees that. Folding two capture
+   methods behind one flag felt like trap 10's second product.
+2. **The hover clip ships the loot peek's NO-TARGET state on purpose.**
+   Staging a target-scope drop table needs wiki rates, and the profile seeds
+   no wiki cache — the app would fetch live eqlwiki and the clip would be a
+   picture of whatever it said that minute (trap 23). The no-target line is
+   deterministic, true, and is the exact sentence the smart-loot callout
+   quotes; the target-scope table rides the committed `hud-expand-loot.png`.
+3. **Section ids kept, numbers moved.** The IA lock reorders stories; keeping
+   `#hud`/`#guide`/`#dive` etc. stable means no external link or discussion
+   reference breaks. Rest-of-page order after the locked three: chain,
+   surfaces, features, dive, principles, today.
+4. **`breakout-windows.png` moved into the feature tour as a sixth card**
+   rather than going unused when its HUD step folded into the tray story.
+   The 09-10 entry above chose five cards over a FILLER sixth; a real
+   surface that just lost its home is not filler.
+5. **Roadmap tease tense guard written into the page itself** — "when any of
+   it ships, it ships in a release's What's New, not in a landing-page tense
+   change" — so the honest-coming-for-v2 framing survives future edits.
+
+Pages stayed untouched; the T4 publish gate STANDS. LIVE ASK for the #519
+re-look SIGN is in `HELM-FEEDBACK.md`.
+
+— Dranak (Fable 5, DRA-48)

@@ -79,20 +79,34 @@ public static class GuideChecklistProjection
     /// <para>Called from exactly where <c>QuestsView.RenderChecklist</c> and
     /// <c>CompanionProjection.BuildSky</c> get their groups, so the two screens cannot show
     /// different guides — or a guide on one and the classic list on the other.</para></summary>
+    /// <summary>
+    /// The reward item's stats block, by item name — injected the way
+    /// <c>GearLocker</c> already takes its <c>statsFor</c>, so this stays a pure function of
+    /// its inputs and a test can stage an item the shipped catalog has never heard of.
+    ///
+    /// <para>The default is the embedded <c>ItemCatalog</c>: ~11k eqlwiki item pages parsed
+    /// at build time through the same parsers a live lookup uses. It is local, so a hover
+    /// costs eqlwiki nothing — which is the only reason a hover may show this at all
+    /// (request-rate policy is the Founder's, not ours).</para></summary>
+    public static string? ShippedItemStats(string itemName) =>
+        ItemCatalog.Default.Find(itemName)?.StatsText;
+
     public static IReadOnlyList<QuestChecklistGroup> Apply(
         IReadOnlyList<QuestChecklistGroup> groups,
         GuideCatalog catalog,
         AppSettings settings,
         QuestLedgerStore ledger,
-        string characterKey)
+        string characterKey,
+        Func<string, string?>? statsFor = null)
     {
+        statsFor ??= ShippedItemStats;
         var projected = new List<QuestChecklistGroup>(groups.Count);
         foreach (var group in groups)
         {
             var guide = GuideFor(catalog, group.CompletionKey);
             projected.Add(guide is null
                 ? group
-                : Project(group, guide, settings, ledger, characterKey));
+                : Project(group, guide, settings, ledger, characterKey, statsFor));
         }
         return projected;
     }
@@ -116,7 +130,8 @@ public static class GuideChecklistProjection
 
     private static QuestChecklistGroup Project(
         QuestChecklistGroup group, Guide guide,
-        AppSettings settings, QuestLedgerStore ledger, string characterKey)
+        AppSettings settings, QuestLedgerStore ledger, string characterKey,
+        Func<string, string?> statsFor)
     {
         var items = ItemsFor(settings, group.CompletionKey);
         var byId = guide.AllObjectives.ToDictionary(o => o.Id, StringComparer.OrdinalIgnoreCase);
@@ -162,6 +177,7 @@ public static class GuideChecklistProjection
         {
             Collapsed = !expanded,
             RewardSummary = GuidePresentation.RewardSummary(group.Title, items),
+            RewardCard = GuidePresentation.RewardCard(statsFor(group.Title), items),
             Rows = rows,
             GuideId = guide.Id,
             GuideCaption = GuidePresentation.GuidedCaption(counts.Skipped, stubs),

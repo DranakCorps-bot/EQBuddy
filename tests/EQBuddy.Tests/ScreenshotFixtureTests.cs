@@ -87,6 +87,9 @@ public class ScreenshotFixtureTests
             },
         }, now);
 
+        // EQBUDDY_SHOOT_THEME picks the palette (the DRA-48 landing shoots BlueGrey);
+        // catalog names fall through CustomTheme.PaletteFor to ThemePalettes.For.
+        var themeKey = Environment.GetEnvironmentVariable("EQBUDDY_SHOOT_THEME") ?? "midnight";
         var snap = CompanionProjection.Build(new CompanionInputs
         {
             Character = "Hugzee",
@@ -94,8 +97,8 @@ public class ScreenshotFixtureTests
             Offered = [CompanionSurfaces.Map],
             Stats = new StatsSnapshot { CurrentZone = logZone },
             Map = map,
-            Theme = CompanionTheme.Project("midnight",
-                EQBuddy.UI.Shared.CustomTheme.PaletteFor(new AppSettings { Theme = "midnight" })),
+            Theme = CompanionTheme.Project(themeKey,
+                EQBuddy.UI.Shared.CustomTheme.PaletteFor(new AppSettings { Theme = themeKey })),
         }, now);
 
         var outPath = Environment.GetEnvironmentVariable("EQBUDDY_SHOOT_OUT")

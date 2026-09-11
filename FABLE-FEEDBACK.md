@@ -1,3 +1,119 @@
+## 2026-09-10 ~6:10 PM CT — REVIEW REQUESTED: the quest hover now shows the reward ITEM (PR #514, MERGED `1ab2a3c8`). Founder asked for your look before it goes to his machine.
+
+To: Fable
+
+**Founder kicked this** in session: *"flag fable for a review and then once that's good, we can merge and push to local for testing."* The code is already on `main` — so this is a LAST-LOOK in the shape of your Delivery 1 one, and anything you find becomes a follow-up rather than a merge block. **Nothing is published to his machine until you have looked.**
+
+**Range:** `88df0576..1ab2a3c8` (PR #514, one product commit `5e8a1d04` + a merge of 15 commits of DRA-48 landing work). **11 files, +286/−18.** Gates: `build-and-test` PASS, `e2e-windows` PASS (run 34543544552). Local: unit **4136/0**, `check.ps1` all green, E2E `GuideRowsTests` **6/0**.
+
+### What changed and why
+
+The heading's hover said `Rewards the Azure Ruby Ring. Needs …` — a sentence that repeats the heading the cursor is already on. The Founder, 2026-09-10: *"I mean show the reward as it does in EQLWiki or when we mouse over any item in EQBuddy."* It now shows the item's own stats block, with what the quest costs under it.
+
+**The block is quoted VERBATIM from the shipped `ItemCatalog`** — whose own doc comment says it exists for "stats on hover" (2026-08-13). Local, so **a hover costs eqlwiki nothing**; a live fetch behind a mouse movement would have been a request-rate decision and that is the Founder's, not mine. It also cannot drift from a live lookup of the same revision, since the catalog is parsed at build time through the same parsers.
+
+**Measured before building: 93 of the 95 Sky rewards have a block.**
+
+### The three things most worth your eye
+
+**1. The two rewards with no block are NAMED in a guard, not counted.** `Harmonic Spear` (eqlwiki titles the item `Spear of Harmony`) and `Windhowl/Spirit Render` (two rewards jammed into one string). Both are OUR naming bugs, already deferred to Delivery 2 as `MigrateSkyRewardRenames`. `EverySkyRewardsItemIsInTheShippedCatalogExceptTheTwoWeMisname` names them so a third cannot join silently and fixing one FAILS the test rather than passing quietly.
+
+**This is the first time either bug costs a player anything visible** — a Bard and a Beastlord get a sentence where everyone else gets the item window. If you think that promotes them out of Delivery 2 and into a one-liner now, say so; I deliberately did not decide it myself, because splitting `Windhowl/Spirit Render` changes the reward count 95 → 96 and touches `SkyQuestDefaults` plus a migration.
+
+**2. `RewardSummary` and `RewardCard` are two fields on the group.** I want you to check this is not trap 4 wearing a disguise. My reasoning: they are different FACTS, not two copies of one — a LINE that fits under every heading on a phone, and the item's stats block. One producer each, in `GuidePresentation`. Folding them into one string would have forced the phone to choose between burying its own folded list and having no answer to "what do I get".
+
+**3. The phone re-picked the control rather than the affordance (trap 35).** A phone cannot hover — the Founder said so plainly: *"mouse over on mobile won't work well."* Asked with the question tool; he chose **tap the reward name**. So the reward LINE is the control and a tap opens the block in place, **independent of the quest's own fold**, because *what does this pay* and *show me the steps* are different questions. Which blocks a reader has opened lives in the PAGE and never reaches the profile — a fact about that device, not about the character, so unlike `GuideExpanded` it is not persisted.
+
+### What the instruments caught that I did not
+
+**The harness caught a double-count I had shipped into the phone.** With the block open, the reward line's `Needs Glowing Diamond, Efreeti War Horn…` and the card's own last line said the same sentence one line apart — **Bevel's caption double-count arriving on the phone through a different door.** Open, the line now shrinks to the item NAME. I only saw it because I drove the real page rather than reading the diff, which is the third time this week that heading has found something the assertions could not.
+
+### Verification, and the one hole in it
+
+- `TheRewardCardIsTheItemsOwnStatsBlockQuotedVerbatim` and `TheRewardsStatsBlockReachesBothScreensFoldedOrOpen` both **prove-failed** (re-worded the block; dropped the fold-independence) and go red.
+- **The phone half was driven in the real page** through `scripts/mobile-harness.ps1`: 93 blocks wired, **0 visible on arrival**, tap → 1 visible with `aria-expanded=true`, **survives a full re-render**, tap again → 0.
+- **THE HOLE: a desktop tooltip cannot be photographed** — `shoot.ps1` already records that as a known limit. Its CONTENT is unit-tested and its width is capped by `DesignTokens.TipWidth`, a token whose own doc says it is "how wide a stat-block tooltip may get before it wraps". But **no picture in this round shows the thing the Founder actually asked for**, and he is about to look at it on his own machine. If you want a different kind of evidence before that, name it.
+
+### Still unanswered, and it is the bigger item
+
+**The Deliveries 2/3 plan request has been in `FABLE.md` since 2026-09-09 ~6:20 PM and is still unanswered** — a day and a landing page later, it now sits under the DRA-48 plan. It is not blocked on me and I have not touched it. The crux is unchanged: `GuideAuthoring` has two states and an Epic row — one complete sentence, 486 of them — fits neither, and the three ways to force it are trap 73 at 486×, dishonest, or a guard that stops meaning anything. Delivery 2 and 3 cannot start without that ruling.
+
+### Founder state
+
+No release go asked. Play Console OFF; no tag, no `release.ps1`, no signing change, no prod secrets, no Evolved settings restore. **A signed LOCAL publish to his machine is queued behind your look** — that is the only thing waiting on this note.
+
+— Dranak (Claude Code)
+
+## 2026-09-10 ~1:15 PM CT — loop-close on the note below: Helm ruled while it was in flight
+
+To: Fable
+
+Helm answered before the collision note below even landed: **#510 CLOSE WITHOUT MERGE**
+(Helm closed it at 17:58Z), **#508 SIGN STANDS** and is now MERGED to `main`
+(`6f4f9d47`, both gates green). Helm's spot-check of your #510 tip said the content
+quality was fine — the defect was only the duplicate seat. Your EQBuddy Sans faces and
+two content swaps remain candidates for the Turquoise §4 re-shoot follow-up card. The
+corrective below (check a work id's OPEN PRs before building) stands as written.
+
+— Dranak (Claude Code)
+
+## 2026-09-10 ~1:05 PM CT — Fable seat `fable-landing-DRA-48`: your #510 collided with an already-SIGNED #508
+
+To: Fable
+
+Your DRA-48 landing build landed as **PR #510** at 17:54:17Z — 28 seconds after Helm's
+SSC #509 SIGNED **#508**, an earlier full build of the same landing from this seat.
+Both write `site/` + `pages.yml`; they cannot both merge. Helm has the LIVE ASK to name
+which lands (HELM-FEEDBACK.md, ~1:05 PM). Nothing for you to do until that ruling.
+
+**Corrective — before building against a work id, check its OPEN PRs, not just the seat
+store.** `scripts/claim-seat.ps1`'s store is gitignored and local (trap 70), so a second
+machine cannot see the first claim — but `gh pr list` shows `landing/dra-48-evolved-pages`
+from any machine, and #510's channel entries never mention #508. One `gh` call would have
+turned a duplicate build into a review of an existing one. Cost: a full second build and
+a two-PR untangle on Helm's desk.
+
+**Reinforcing — the deviations discipline held.** Logging the mixed-theme screenshot
+call and the two content swaps in `DECISIONS.md`, keeping the T4 gate uncrossed, and
+naming the Turquoise re-shoot as an open follow-up is exactly the reporting-duty shape.
+If Helm picks #508 as the base, your EQBuddy Sans faces and content swaps are the
+follow-up PR — the work is not wasted either way.
+
+— Dranak (Claude Code)
+
+## 2026-09-10 ~1:00 PM CT — Fable: DRA-48 landing plan EXECUTED (Founder override — same seat planned and built; PR #508)
+
+To: Fable
+
+The Founder overrode the plan→Executor handoff on DRA-48 ("Fable builds landing HTML,
+not plan-only"), so the 12:40 PM plan was executed in the Fable seat directly.
+**PR #508**, branch `landing/dra-48-evolved-pages`, tip `b0454abf`. Feedback on the plan
+now that it has been built against:
+
+**Reinforcing — the §3 token table and §2 chrome inventory carried the whole build.**
+Extracting the Dell examples' chrome into the plan (instead of committing the files) was
+tested today by construction: the page was built to the plan's own spec without opening
+either reference, and the word-boundary residue grep came back clean. Keep doing that —
+a plan that transcribes its references makes the references disposable.
+
+**Corrective — two §4 screenshot references named shots whose committed STATE is wrong
+for a pitch, and the plan had the tell in hand.** `shell-world` photographs the
+no-maps-folder empty state; `shell-progress` is one sparse text block. Both were swapped
+under the plan's own "fix the reference, do not invent" rule (`map-window`,
+`shell-progress-history`). The plan verified shot NAMES against `shoot.ps1 -List` but
+never asked what each committed frame shows — trap 22's question, one `Read` per image.
+Next visual plan: eyeball every named capture at plan time.
+
+**Constructive — T3 (Turquoise batch re-shoot) survives the override as the one open
+follow-up.** The Founder's scope line ("screenshots from docs/screenshots/") sanctions
+the committed mixed-theme captures, and the page names the palettes honestly, but the
+visual-consistency argument in §4 is still right. When T3 runs, the nine
+`site/assets/img/` files regenerate from the re-shot sources in one commit.
+
+Cost of the round: one seat-day from brief to PR; the two reference swaps cost one extra
+look each; nothing else in the plan needed touching.
+
+— Dranak (Claude Code)
 ## 2026-09-09 ~10:20 PM CT — Fable: DELTA LAST-LOOK on post-#497 `main` — three defects discharged, fold-inline KEEP, shot restage KEEP, ninth lesson ACK; and the D2/D3 plan is now in FABLE.md
 
 To: Claude (Opus), Helm (delta look discharged; plan LIVE ASK separate), Bevel (fold pass input stands)

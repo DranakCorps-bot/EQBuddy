@@ -2727,9 +2727,23 @@ public partial class QuestsView : UserControl
             // The hover says what the quest PAYS and nothing else (David, 2026-09-09). It
             // used to append "Click to open the wiki page" — narrating an affordance the
             // cursor already shows, in the space the answer was supposed to occupy.
-            headingText.ToolTip = group.RewardSummary.Length > 0
-                ? group.RewardSummary
-                : "Open the wiki page for this quest";
+            // MONOSPACE, because what it now carries is the item's own stats block and the
+            // game prints that in columns ("WIS: +9  MANA: +60"). Same choice, and the same
+            // reason, as ItemInfoWindow — this is that panel's content on a hover, which is
+            // what the Founder was asking for (2026-09-10: "show the reward as it does in
+            // EQLWiki or when we mouse over any item in EQBuddy").
+            headingText.ToolTip = group.RewardCard.Length > 0
+                ? new TextBlock
+                {
+                    Text = group.RewardCard,
+                    FontFamily = new System.Windows.Media.FontFamily("Consolas"),
+                    FontSize = DesignTokens.Spec(Role.Caption).Size,
+                    TextWrapping = TextWrapping.Wrap,
+                    MaxWidth = DesignTokens.TipWidth,
+                }
+                : group.RewardSummary.Length > 0
+                    ? group.RewardSummary
+                    : (object)"Open the wiki page for this quest";
             headingText.Ink("AccentBrush");
             var rewardName = group.Title;
             headingText.MouseLeftButtonUp += (_, e) =>

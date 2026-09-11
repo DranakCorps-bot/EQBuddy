@@ -584,6 +584,43 @@ public class GuideCatalogTests
         Assert.Empty(opening);
     }
 
+    /// <summary>
+    /// Every Sky reward's item is in the shipped item catalog with a stats block — because
+    /// that block IS the heading's hover now (David, 2026-09-10), and a reward that misses it
+    /// shows a sentence where every other reward shows the item window.
+    ///
+    /// <para><b>The two exceptions are named, and they are OUR bugs rather than the wiki's.</b>
+    /// A bare count would let a third join them silently; naming them means the day one is
+    /// fixed this test says so by failing. Both are known reward-name defects deferred to
+    /// Delivery 2 (<c>MigrateSkyRewardRenames</c>):</para>
+    /// <list type="bullet">
+    /// <item><c>Harmonic Spear</c> — eqlwiki titles the item <c>Spear of Harmony</c>, so the
+    ///   lookup misses. Matching the wiki is the standing rule (David, 2026-08-14).</item>
+    /// <item><c>Windhowl/Spirit Render</c> — TWO rewards jammed into one string by an old
+    ///   import. No item is called that, so no item page can ever match it.</item>
+    /// </list>
+    /// <para>Until then a Beastlord and a Bard get a sentence where everyone else gets the
+    /// item window — which is the first time either bug has cost a player anything
+    /// visible.</para></summary>
+    [Fact]
+    public void EverySkyRewardsItemIsInTheShippedCatalogExceptTheTwoWeMisname()
+    {
+        string[] knownMisnamed = ["Harmonic Spear", "Windhowl/Spirit Render"];
+
+        var rewards = GuideCatalog.Default.Guides
+            .Select(g => g.Name.Split(" - ")[0])
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToList();
+        Assert.Equal(95, rewards.Count);
+
+        var missing = rewards
+            .Where(r => string.IsNullOrWhiteSpace(ItemCatalog.Default.Find(r)?.StatsText))
+            .OrderBy(r => r, StringComparer.Ordinal)
+            .ToList();
+
+        Assert.Equal(knownMisnamed.OrderBy(r => r, StringComparer.Ordinal), missing);
+    }
+
     // ---- Fixture ----------------------------------------------------------------------
 
     /// <summary>A one-stage guide around the given objective JSON, valid in every respect the
