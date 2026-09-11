@@ -467,9 +467,10 @@ $Shots = [ordered]@{
     # PREDICTED before shooting (trap 23), from the shipped catalog and the ticks below:
     #
     # 'shell-quests-epic-guide' — PALADIN, 14 rows in 2 sections, expanded.
-    #   * The per-class band at the top: "Paladin" and an "Epic complete" button. Epic
-    #     completion is per CLASS, so that band stays where it was — the guide did not move
-    #     it and did not grow a second control for it.
+    #   * The per-class band at the top: "Paladin" and a "Mark as complete" button (the
+    #     verb, since the 2026-09-11 Founder smoke — a green "Epic complete" over 0/14 read
+    #     as a done-badge). Epic completion is per CLASS, so that band stays where it was —
+    #     the guide did not move it and did not grow a second control for it.
     #   * ONE heading line where the classic tab drew TWO (one per section): a "−" fold
     #     control, then "Paladin · Epic 1.0   0/14". NO "· done/ready/in progress" note —
     #     nothing is ticked. The heading opens the Paladin Epic Quest wiki page, not a page
@@ -1562,10 +1563,15 @@ $Shots = [ordered]@{
     # 'epic-checklist-classes' — THE BAND IS PER CLASS. Two classes, NOTHING expanded, which
     #   is also the state a player lands on.
     #   PREDICTED before shooting (trap 23): two bands and two headings, in four lines —
-    #   "Cleric" + "Reopen" over "Cleric · Epic 1.0  0/20", then "Warrior" + "Epic complete"
-    #   over "Warrior · Epic 1.0  0/30". Alphabetical, so Cleric leads. That is the claim
-    #   this row exists for: completion is per CLASS and never per section, so the control
-    #   cannot ride a group heading the way the Sky turn-in does.
+    #   "Cleric" + "Reopen" over "Cleric · Epic 1.0  0/20", then "Warrior" + "Mark as
+    #   complete" over "Warrior · Epic 1.0  0/30". Alphabetical, so Cleric leads. That is
+    #   the claim this row exists for: completion is per CLASS and never per section, so the
+    #   control cannot ride a group heading the way the Sky turn-in does.
+    #   THIS FRAME IS ALSO THE 2026-09-11 SMOKE DEFECT, STAGED: Warrior's band is green and
+    #   its heading reads 0/30, which is exactly the pair the Founder read as a claim that
+    #   the epic was done. The verb is what separates them now — "Mark as complete" is an
+    #   offer, "Reopen" above it is the completed one. The green did not move (per the
+    #   DRA-59 ruling) and neither did the progress row that carries the real state.
     'epic-checklist-classes' = @{ Title = 'Quest Tracker'
                            Env = @{ EQBUDDY_QUESTS = 'epic' }
                            Ledger = @{ Classes = @('Warrior', 'Cleric') }

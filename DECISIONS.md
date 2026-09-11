@@ -1,3 +1,46 @@
+## 2026-09-11 (DRA-59 — the Epic band's button verb; the calls I made alone)
+
+Founder smoke ~3:08 PM CT via Helm: the Epic tab's green button read "Epic complete" over a
+class band showing `Bard 0/31` and `Warrior 3/30`, so it looked like a badge asserting the
+epic WAS complete. The card names the fix (**"Mark as complete"**) and three Soft LEAVEs —
+green-as-done styling, per-state status chips, DRA-47 Pages. All three left alone. These are
+the places the card left a choice.
+
+**1. THE CONFIRMATION DIALOG'S CAPTION CHANGED TOO, BY READING THE BUTTON'S LABEL.** The card
+names the button; `QuestsView.ToggleEpicComplete` also passed the literal `"Epic complete"`
+as the `MessageBox` caption, so a player clicking the fixed button still got a window titled
+with the state word. That is the same defect at one remove, and it was a SECOND literal of
+the same string (trap 4) — the caption now reads `EpicCompleteToggle.ButtonLabel(false)`, so
+the next rewording moves both. **The default it could have gone the other way on:** ship the
+button only and file the caption, on the grounds that the card said "button". Rejected: the
+dialog is the same control's own confirmation, the fix is one line, and filing it would have
+left the smoke's exact complaint alive on the surface the button opens. **Not** a licence to
+rewrite dialog copy generally — the caption is quoting the button, nothing more.
+
+**2. THE RULE IS AN EXECUTABLE PREDICATE, NOT A PINNED STRING.** A test asserting
+`"Mark as complete"` proves the smoke was answered once; it cannot see the NEXT master button
+that ships a state word. `EpicCompleteToggle.LabelIsAnAct` holds both checklists to an
+imperative and `NeitherMasterButtonNamesAStateItCannotBeIn` applies it to Epic AND Sky, with
+`AStateWordIsNotAnAct` over the four status-shaped labels so the predicate cannot go vacuous
+(trap 34: a guard that only ever sees the right answer is not a guard). Prove-failed by
+restoring `"Epic complete"` — two tests redden, then green again. The exact-string test stays
+beside it because the shot predictions and the What's-new "X is now Y" line quote it.
+**The default it could have gone the other way on:** one `Assert.Equal` on the new label.
+
+**3. THE SHOT RECIPE NOW SAYS IT IS THE DEFECT, STAGED.** `epic-checklist-classes` already
+stood Warrior's band (green, `0/30`) beside Cleric's completed one — which is exactly the
+pair the Founder read wrong, and nobody had noticed the frame was carrying it. The recipe
+comment says so now, so the next person re-shooting it knows which claim the picture is for.
+Re-shot and reviewed against the prediction (trap 23): "Cleric"/"Reopen" over `0/20`, then
+"Warrior"/"Mark as complete" over `0/30`. `shell-quests-epic-guide` re-shot for the same
+label on the Paladin band.
+
+**4. NO STATUS CHIP, NO STYLING CHANGE.** Both are the card's Soft LEAVEs and I agree with
+them on the evidence: the heading line under each band already carries the real state
+(`Warrior · Epic 1.0  0/30`), and a chip would be a second producer of a fact that row
+already owns (trap 4). Filed nothing for Bevel — the verb is enough until a smoke says
+otherwise.
+
 ## 2026-09-11 (DRA-46 Delivery 2 N2 — harvested guides on the General tab; the calls I made alone)
 
 Bosun kick 2026-09-11 ~11:07 AM CT, after DRA-45 N1 landed (#534/#535). Fable's §3 N2 is the
