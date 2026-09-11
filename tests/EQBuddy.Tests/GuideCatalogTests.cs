@@ -607,7 +607,11 @@ public class GuideCatalogTests
     {
         string[] knownMisnamed = ["Harmonic Spear", "Windhowl/Spirit Render"];
 
+        // SKY guides only. An epic pays several items and eqlwiki names none of them "the
+        // epic" (GuidePresentation.EpicTitle), so an epic guide's name is not a reward name
+        // and there is no single item window for its heading to show.
         var rewards = GuideCatalog.Default.Guides
+            .Where(g => g.GuideType == GuideType.PlaneOfSkyQuest)
             .Select(g => g.Name.Split(" - ")[0])
             .Distinct(StringComparer.OrdinalIgnoreCase)
             .ToList();

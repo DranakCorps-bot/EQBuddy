@@ -23,6 +23,22 @@ public enum GuideProgressHome
     /// screen a Warrior sees - and the loot auto-tick would light one of them and not the
     /// other.</para></summary>
     SkyItem,
+
+    /// <summary>One <see cref="EpicQuestChecklistItem"/> row — the box the Epic tab has drawn
+    /// since 1.x, and the one <c>EpicLootAutoCheck</c> writes.
+    ///
+    /// <para><b>An epic guide's objective IS a checklist row, not a copy of one.</b> Every one
+    /// of the 486 objectives is generated FROM a row and carries that row's id, so the guide
+    /// keeps no tick of its own: the master "Epic complete" button, the loot auto-tick, the
+    /// phone's tap and a click on the guide row all move the same boolean. Without this home
+    /// the Epic tab would have looked guided and quietly stopped agreeing with itself the
+    /// first time a Red Dragon Scale dropped (trap 4).</para>
+    ///
+    /// <para>Matched on the OBJECTIVE'S ID, not on item names: the row's own identity is what
+    /// the generator carried across, and it is unique. That is why this home needs no
+    /// objective-type gate the way <see cref="SkyItem"/> does — there is no guessing to
+    /// constrain.</para></summary>
+    EpicItem,
 }
 
 /// <summary>
@@ -65,7 +81,7 @@ public static class GuideProgressRouter
     /// <see cref="GuideProgressHome.SkyItem"/>, because that home is a row of a specific
     /// group and there is no group here.</summary>
     public static GuideProgressHome HomeFor(GuideObjective objective) =>
-        HomeFor(objective, [], out _);
+        HomeFor(objective, [], [], out _, out _);
 
     /// <summary>Which store owns this objective's done state - the whole routing decision,
     /// pure and separately testable, and the ONE producer of it (both overloads land here).
@@ -81,10 +97,39 @@ public static class GuideProgressRouter
     /// "Wind Rune Azia" is a row for the Bard and a row for the Warrior; they are two facts
     /// about two quests and must never resolve to each other.</para></summary>
     public static GuideProgressHome HomeFor(GuideObjective objective,
-        IReadOnlyList<SkyQuestChecklistItem> groupItems, out SkyQuestChecklistItem? backingItem)
+        IReadOnlyList<SkyQuestChecklistItem> groupItems, out SkyQuestChecklistItem? backingItem) =>
+        HomeFor(objective, groupItems, [], out backingItem, out _);
+
+    /// <summary>Which store owns this objective's done state, with the Epic tab's rows in hand
+    /// as well — <b>the one producer</b>, which both shorter overloads land in.
+    ///
+    /// <para><paramref name="epicRows"/> is the rows the tab is CURRENTLY showing, which is
+    /// what makes the classic-era lens one producer rather than two: a row the filter dropped
+    /// is not in this list, so its objective has no home here and the projection does not draw
+    /// it. The guide never re-reads <c>AvailableInClassic</c> itself.</para>
+    ///
+    /// <para>Order matters and is stated rather than implied: a reward key wins (a Sky
+    /// turn-in), then an epic row bearing this objective's id, then the single-item Sky match.
+    /// The three sets are disjoint by construction — an epic objective carries no reward key
+    /// and no item names, and a Sky guide's caller passes no epic rows — so the order is
+    /// belt-and-braces rather than a tie-break anything relies on.</para></summary>
+    public static GuideProgressHome HomeFor(GuideObjective objective,
+        IReadOnlyList<SkyQuestChecklistItem> groupItems,
+        IReadOnlyList<EpicQuestChecklistItem> epicRows,
+        out SkyQuestChecklistItem? backingItem,
+        out EpicQuestChecklistItem? backingRow)
     {
         backingItem = null;
+        backingRow = null;
         if (objective.RewardKey.Length > 0) return GuideProgressHome.SkyTurnIn;
+
+        foreach (var row in epicRows)
+            if (string.Equals(row.Id, objective.Id, StringComparison.OrdinalIgnoreCase))
+            {
+                backingRow = row;
+                return GuideProgressHome.EpicItem;
+            }
+
         if (!ItemBackedObjectiveTypes.Contains(objective.ObjectiveType, StringComparer.Ordinal))
             return GuideProgressHome.GuideLedger;
 
@@ -117,10 +162,20 @@ public static class GuideProgressRouter
     public static bool IsDone(AppSettings settings, QuestLedgerStore ledger,
         string characterKey, string guideId, GuideObjective objective,
         IReadOnlyList<SkyQuestChecklistItem> groupItems) =>
-        HomeFor(objective, groupItems, out var item) switch
+        IsDone(settings, ledger, characterKey, guideId, objective, groupItems, []);
+
+    /// <summary>Has the player done this objective, with the Epic tab's rows in hand as well?
+    /// An epic step answers from its own checklist row, so the loot auto-tick, the master
+    /// "Epic complete" button and the phone's tap all read through as done the same tick.</summary>
+    public static bool IsDone(AppSettings settings, QuestLedgerStore ledger,
+        string characterKey, string guideId, GuideObjective objective,
+        IReadOnlyList<SkyQuestChecklistItem> groupItems,
+        IReadOnlyList<EpicQuestChecklistItem> epicRows) =>
+        HomeFor(objective, groupItems, epicRows, out var item, out var row) switch
         {
             GuideProgressHome.SkyTurnIn => SkyCompleteToggle.IsTurnedIn(settings, objective.RewardKey),
             GuideProgressHome.SkyItem => item!.Acquired,
+            GuideProgressHome.EpicItem => row!.Acquired,
             _ => ledger.GuideProgressFor(characterKey, guideId).DoneObjectiveIds
                 .Contains(objective.Id, StringComparer.OrdinalIgnoreCase),
         };
@@ -149,9 +204,22 @@ public static class GuideProgressRouter
     /// and ticking the old checklist row are one action, not two that agree by luck.</para></summary>
     public static void SetDone(AppSettings settings, QuestLedgerStore ledger,
         string characterKey, string guideId, GuideObjective objective,
-        IReadOnlyList<SkyQuestChecklistItem> groupItems, bool done)
+        IReadOnlyList<SkyQuestChecklistItem> groupItems, bool done) =>
+        SetDone(settings, ledger, characterKey, guideId, objective, groupItems, [], done);
+
+    /// <summary>Tick or untick an objective, into whichever of the FOUR stores owns it — see
+    /// the shorter forms for the Sky rules, which are unchanged.
+    ///
+    /// <para>An EPIC step writes the two lines the Epic tab's own checkbox writes: the row's
+    /// box, and the "we guessed which class earned this" flag that the player deciding always
+    /// clears. Same store, same row, same setter — so ticking the guide step and ticking the
+    /// classic Epic row are one action rather than two that agree by luck.</para></summary>
+    public static void SetDone(AppSettings settings, QuestLedgerStore ledger,
+        string characterKey, string guideId, GuideObjective objective,
+        IReadOnlyList<SkyQuestChecklistItem> groupItems,
+        IReadOnlyList<EpicQuestChecklistItem> epicRows, bool done)
     {
-        var home = HomeFor(objective, groupItems, out var item);
+        var home = HomeFor(objective, groupItems, epicRows, out var item, out var row);
 
         if (home == GuideProgressHome.SkyTurnIn)
         {
@@ -168,6 +236,11 @@ public static class GuideProgressRouter
             // The player deciding IS the resolution of an unassigned auto-tick — the same
             // line QuestsView and the phone already run on the raw checklist row.
             item.AcquiredUnassigned = false;
+        }
+        else if (home == GuideProgressHome.EpicItem)
+        {
+            row!.Acquired = done;
+            row.AcquiredUnassigned = false;
         }
         else
         {
@@ -212,18 +285,49 @@ public static class GuideProgressRouter
     /// are drawn from, so the caption under a heading and the ticks under it cannot
     /// disagree — one producer, two readers.</summary>
     public static GuideProgressCounts Counts(AppSettings settings, QuestLedgerStore ledger,
-        string characterKey, Guide guide, IReadOnlyList<SkyQuestChecklistItem> groupItems)
+        string characterKey, Guide guide, IReadOnlyList<SkyQuestChecklistItem> groupItems) =>
+        Counts(settings, ledger, characterKey, guide, groupItems, []);
+
+    /// <summary>How far through a guide the player is, counting only the objectives whose rows
+    /// are on screen. <paramref name="epicRows"/> is the tab's CURRENT rows, so a class under
+    /// the classic-era lens counts what it draws — a caption reading "3 of 66" over 14 visible
+    /// rows is the same self-contradiction the heading counts exist to prevent.</summary>
+    public static GuideProgressCounts Counts(AppSettings settings, QuestLedgerStore ledger,
+        string characterKey, Guide guide, IReadOnlyList<SkyQuestChecklistItem> groupItems,
+        IReadOnlyList<EpicQuestChecklistItem> epicRows)
     {
         var done = 0;
         var skipped = 0;
         var total = 0;
-        foreach (var objective in guide.AllObjectives)
+        foreach (var objective in Drawn(guide, epicRows))
         {
             total++;
-            if (IsDone(settings, ledger, characterKey, guide.Id, objective, groupItems)) done++;
+            if (IsDone(settings, ledger, characterKey, guide.Id, objective, groupItems, epicRows)) done++;
             else if (IsSkipped(ledger, characterKey, guide.Id, objective)) skipped++;
         }
         return new GuideProgressCounts(done, skipped, total);
+    }
+
+    /// <summary>
+    /// The objectives a surface actually draws for this guide — <b>the one producer</b> of that
+    /// set, so the rows, the counts, the card's "what is next" and the phone all walk the same
+    /// list.
+    ///
+    /// <para>Everything, except for an <see cref="GuideType.EpicQuest"/> guide: there an
+    /// objective is drawn only when the tab is still showing the row it was generated from.
+    /// That is the whole of the classic-era lens on a guided class, and it reads the ROW's own
+    /// <c>AvailableInClassic</c> flag through the rows the caller already filtered — one
+    /// producer of "is this row in this era", not a second copy of the predicate.</para>
+    ///
+    /// <para>Keyed on the guide TYPE rather than on "were any rows handed in", because those
+    /// two differ in exactly the case that matters: a class the lens has emptied must draw
+    /// nothing, not everything.</para></summary>
+    public static IEnumerable<GuideObjective> Drawn(
+        Guide guide, IReadOnlyList<EpicQuestChecklistItem> epicRows)
+    {
+        if (guide.GuideType != GuideType.EpicQuest) return guide.AllObjectives;
+        var ids = new HashSet<string>(epicRows.Select(r => r.Id), StringComparer.OrdinalIgnoreCase);
+        return guide.AllObjectives.Where(o => ids.Contains(o.Id));
     }
 }
 

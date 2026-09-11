@@ -142,10 +142,26 @@ public sealed record QuestChecklistGroup(
     /// <para>Separate from <see cref="RewardSummary"/> because they are different facts, not
     /// two copies of one: the summary is a LINE that fits under every heading on a phone,
     /// this is a block that would bury a folded list if it were drawn the same way.</para></summary>
-    string RewardCard = "")
+    string RewardCard = "",
+    /// <summary>The eqlwiki page this group's heading opens, when it is not <see cref="Title"/>.
+    ///
+    /// <para>The heading has always been a link to <c>EqlWiki.PageUrl(Title)</c>, which is
+    /// right for a Sky reward (the title IS an item page) and wrong the moment a group's title
+    /// is not a page name — a guided epic group's is "Epic 1.0", and an unguided one's is a
+    /// section heading like "The Blades". Carried rather than guessed at the call site, for
+    /// the reason the group already carries <see cref="Title"/> instead of splitting
+    /// <see cref="Heading"/>: one fact, one place (trap 4).</para>
+    ///
+    /// <para>Empty means "the title is the page", which is every group that existed before
+    /// Delivery 3.</para></summary>
+    string WikiPage = "")
 {
     /// <summary>"Bard · Mask of Song" — what a heading reads as.</summary>
     public string Heading => ClassName + " · " + Title;
+
+    /// <summary>The wiki page the heading opens — <see cref="WikiPage"/> when the group names
+    /// one, the title otherwise. One producer, so a surface never re-derives it.</summary>
+    public string HeadingPage => WikiPage.Length > 0 ? WikiPage : Title;
 
     /// <summary>Every piece the player has to GATHER is in hand.
     ///
@@ -193,7 +209,13 @@ public sealed record QuestChecklistGroup(
     /// <see cref="State"/> so the label and the filter cannot disagree.</summary>
     public string? Note =>
         Completed ? "done"
-        : AllPiecesInHand ? "ready"
+        // The same split <see cref="State"/> makes, and it was NOT made here: a group with no
+        // turn-in of its own (every Epic group) read "ready" on the heading while the state
+        // lens filed it under "done", so the label and the filter disagreed about the same
+        // group. The doc above has claimed since it was written that they are derived from the
+        // same fields; on the Epic tab that was untrue, and guiding the tab is what made it
+        // visible — one heading per class instead of one per section.
+        : AllPiecesInHand ? (CompletionKey is null ? "done" : "ready")
         : SetAside ? "set aside"
         : Rows.Any(r => r.Acquired) ? "in progress"
         : null;

@@ -241,4 +241,43 @@ public class QuestChecklistStateTests
         // separator, which this name would have silently truncated to "of Disaster".
         Assert.Equal("Horn · of Disaster", g.Title);
     }
+
+    /// <summary>
+    /// <b>The heading's word and the state lens agree about the same group.</b>
+    ///
+    /// <para><c>Note</c>'s doc has claimed since it was written that it is derived from the
+    /// same fields as <c>State</c> "so the label and the filter cannot disagree", and on the
+    /// Epic tab that was not true: an Epic group has no turn-in of its own, so every piece
+    /// collected IS its terminal state — <c>State</c> said <c>done</c> and the heading said
+    /// "ready", about a hand-in that does not exist. Guiding the Epic tab is what made it
+    /// visible (one heading per class instead of one per short section), which is why it is
+    /// fixed here rather than noticed here.</para>
+    ///
+    /// <para>The SKY half is asserted beside it, because narrowing the rule to Epic is only
+    /// safe if "ready" still means something where a hand-in genuinely is outstanding.</para>
+    /// </summary>
+    [Fact]
+    public void AGroupWithNoTurnInOfItsOwnReadsDoneRatherThanReadyWhenEveryPieceIsHeld()
+    {
+        var epic = QuestChecklistLayout.Epic([
+            new EpicQuestChecklistItem
+            {
+                Id = "e1", ClassName = "Warrior", Section = "Checklist",
+                QuestItem = "Jagged Blade", Order = 1, Acquired = true,
+            },
+        ]).Single();
+
+        Assert.Null(epic.CompletionKey);
+        Assert.Equal(QuestChecklistLayout.StateDone, epic.State);
+        Assert.Equal("done", epic.Note);
+
+        // Sky, where the hand-in IS a separate act, still reads "ready" — holding the pieces
+        // and having handed them over are different states and telling them apart is the
+        // whole job of that screen.
+        var sky = QuestChecklistLayout.Sky([Item("s", "Bard", "Mask of Song", "Piece", true)]).Single();
+
+        Assert.NotNull(sky.CompletionKey);
+        Assert.Equal(QuestChecklistLayout.StateReady, sky.State);
+        Assert.Equal("ready", sky.Note);
+    }
 }

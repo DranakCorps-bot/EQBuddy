@@ -67,6 +67,33 @@ public static class GuidePresentation
         return cost.Length == 0 ? block : block + "\n\n" + cost;
     }
 
+    /// <summary>
+    /// What a guided EPIC group is called, and the reason it is not a reward name.
+    ///
+    /// <para>A Sky group is one reward, so its heading can be one. <b>An epic is not:</b>
+    /// eqlwiki's own <c>== Rewards ==</c> section lists three items for the Warrior, four for
+    /// the Shadow Knight and six for the Necromancer, and no page names one of them as "the
+    /// epic". Picking one would be EQBuddy departing from the wiki on game data by choosing —
+    /// which is the one thing the standing rule forbids (David, 2026-08-14), and which David
+    /// cannot check for us at level 29.</para>
+    ///
+    /// <para>So the heading says what the tab says, and the hover
+    /// (<see cref="EpicRewardSummary"/>) lists every reward the page does.</para></summary>
+    public const string EpicTitle = "Epic 1.0";
+
+    /// <summary>Every reward the class's epic page lists, verbatim as the catalog joined them —
+    /// not one picked out. Empty when the catalog has none and the hover falls back to
+    /// nothing at all, which is honest where "Rewards ." is not.</summary>
+    public static string EpicRewardSummary(string rewards) =>
+        rewards.Trim().Length == 0 ? "" : "Rewards " + rewards.Trim() + ".";
+
+    /// <summary>WHY, for an epic guide's card. <see cref="CardWhy"/> names the reward, and an
+    /// epic has several (see <see cref="EpicTitle"/>) — so this names the thing every one of
+    /// those rewards belongs to, which is a structural fact about the quest and not a
+    /// choice.</summary>
+    public static string EpicCardWhy(string className) =>
+        className.Trim().Length == 0 ? "" : "Works toward your " + className.Trim() + " epic.";
+
     /// <summary>The pieces a reward costs, as a sentence — the one part of the hover that is
     /// about the QUEST rather than about the item.</summary>
     private static string RewardCost(IReadOnlyList<SkyQuestChecklistItem> items)
@@ -207,12 +234,21 @@ public static class GuidePresentation
     /// card that walked you to a turn-in you cannot make is worse than one that says
     /// nothing.</para></summary>
     public static GuideObjective? NextObjective(
-        Guide guide, Func<GuideObjective, bool> isDone, Func<GuideObjective, bool> isSkipped)
+        Guide guide, Func<GuideObjective, bool> isDone, Func<GuideObjective, bool> isSkipped) =>
+        NextObjective([.. guide.AllObjectives], isDone, isSkipped);
+
+    /// <summary>The next step over an explicit set of objectives — the DRAWN ones
+    /// (<see cref="GuideProgressRouter.Drawn"/>), which on the Epic tab is narrower than the
+    /// guide when the classic-era lens is on. A card naming a step whose row the lens removed
+    /// would be pointing at a box that is not on the screen.</summary>
+    public static GuideObjective? NextObjective(
+        IReadOnlyList<GuideObjective> objectives,
+        Func<GuideObjective, bool> isDone, Func<GuideObjective, bool> isSkipped)
     {
         var done = new HashSet<string>(
-            guide.AllObjectives.Where(isDone).Select(o => o.Id), StringComparer.OrdinalIgnoreCase);
+            objectives.Where(isDone).Select(o => o.Id), StringComparer.OrdinalIgnoreCase);
 
-        foreach (var objective in guide.AllObjectives)
+        foreach (var objective in objectives)
         {
             if (done.Contains(objective.Id) || isSkipped(objective)) continue;
             if (objective.PrerequisiteObjectiveIds.All(done.Contains)) return objective;
@@ -230,10 +266,29 @@ public static class GuidePresentation
     ///
     /// <para>One producer (trap 4): the projection drew this expression for the row and again
     /// for the card's lead. It is what a step is called when it is being DRAWN; a step being
-    /// REFERRED TO from somewhere else is named by its <c>Title</c> — see
-    /// <see cref="NoNextStep"/>.</para></summary>
+    /// REFERRED TO from somewhere else is named by <see cref="StepName"/>.</para>
+    ///
+    /// <para>The last fallback is <c>What</c>, and it is what a
+    /// <see cref="GuideAuthoring.Transcribed"/> step lands on: the page's own sentence is the
+    /// row, so that state carries no title and no short instruction at all rather than two more
+    /// copies of one string (<c>GuideCatalog.Validate</c> refuses them).</para></summary>
     public static string StepTitle(GuideObjective objective) =>
-        objective.ShortInstruction.Length > 0 ? objective.ShortInstruction : objective.Title;
+        objective.ShortInstruction.Length > 0 ? objective.ShortInstruction
+        : objective.Title.Length > 0 ? objective.Title
+        : objective.What;
+
+    /// <summary>
+    /// What a step is called when something ELSE names it — the blocked-by-skip sentence, the
+    /// turn-in row's "after: …", the before-leaving warning.
+    ///
+    /// <para>Its <c>Title</c> where it has one, because a cross-reference is a NAME and not an
+    /// instruction: a card calling the same step "Loot a Wind Rune Azia from Plane of Sky
+    /// trash." would be the surface naming one thing two ways. A step with no title falls
+    /// through to what it is DRAWN as — which for a transcribed step is the page's sentence,
+    /// and a sentence is a great deal better than the empty string these read before this
+    /// existed.</para></summary>
+    public static string StepName(GuideObjective objective) =>
+        objective.Title.Length > 0 ? objective.Title : StepTitle(objective);
 
     /// <summary>
     /// What the card says when <see cref="NextObjective"/> names nothing. THREE answers, not
@@ -255,21 +310,29 @@ public static class GuidePresentation
     /// ways. (The ROW draws the instruction — that is a rendering choice, and
     /// <see cref="StepTitle"/> is where it lives.)</para></summary>
     public static string NoNextStep(
-        Guide guide, Func<GuideObjective, bool> isDone, Func<GuideObjective, bool> isSkipped)
+        Guide guide, Func<GuideObjective, bool> isDone, Func<GuideObjective, bool> isSkipped) =>
+        NoNextStep([.. guide.AllObjectives], isDone, isSkipped);
+
+    /// <summary>The finished-state sentence over an explicit set of objectives — see
+    /// <see cref="NextObjective(IReadOnlyList{GuideObjective}, Func{GuideObjective, bool}, Func{GuideObjective, bool})"/>
+    /// for why the set is passed rather than taken off the guide.</summary>
+    public static string NoNextStep(
+        IReadOnlyList<GuideObjective> objectives,
+        Func<GuideObjective, bool> isDone, Func<GuideObjective, bool> isSkipped)
     {
-        if (guide.AllObjectives.All(isDone)) return AllDone;
+        if (objectives.All(isDone)) return AllDone;
 
         var done = new HashSet<string>(
-            guide.AllObjectives.Where(isDone).Select(o => o.Id), StringComparer.OrdinalIgnoreCase);
+            objectives.Where(isDone).Select(o => o.Id), StringComparer.OrdinalIgnoreCase);
         var byId = new Dictionary<string, GuideObjective>(StringComparer.OrdinalIgnoreCase);
-        foreach (var objective in guide.AllObjectives) byId[objective.Id] = objective;
+        foreach (var objective in objectives) byId[objective.Id] = objective;
 
-        var blockers = guide.AllObjectives
+        var blockers = objectives
             .Where(o => !done.Contains(o.Id) && !isSkipped(o))
             .SelectMany(o => o.PrerequisiteObjectiveIds)
             .Where(id => !done.Contains(id)
                 && byId.TryGetValue(id, out var prerequisite) && isSkipped(prerequisite))
-            .Select(id => byId[id].Title)
+            .Select(id => StepName(byId[id]))
             .Distinct(StringComparer.OrdinalIgnoreCase)
             .ToList();
 
@@ -325,8 +388,12 @@ public static class GuidePresentation
         var what = objective.What.Trim();
         if (what.Length == 0) return "";
 
+        // Against what the card's LEAD actually draws (StepTitle), not against the raw
+        // ShortInstruction field. On a transcribed step those differ: the lead IS the What
+        // sentence, so comparing against the empty ShortInstruction would score every word as
+        // novel and print the same sentence twice, one line apart.
         var said = new HashSet<string>(
-            Words(objective.ShortInstruction), StringComparer.OrdinalIgnoreCase);
+            Words(StepTitle(objective)), StringComparer.OrdinalIgnoreCase);
         var novel = Words(what).Where(w => !said.Contains(w)).ToList();
         // A handful of new words is a quantity or a caveat worth showing; one or two is
         // punctuation noise dressed as news.
@@ -351,17 +418,27 @@ public static class GuidePresentation
     /// producer of a fact the structure already carries.</para></summary>
     public static string BeforeLeaving(
         Guide guide, GuideObjective next, Func<GuideObjective, bool> isDone,
-        Func<GuideObjective, bool> isSkipped)
+        Func<GuideObjective, bool> isSkipped) =>
+        BeforeLeaving(guide, [.. guide.AllObjectives], next, isDone, isSkipped);
+
+    /// <summary>The stranding warning, over the DRAWN objectives. A step the classic-era lens
+    /// removed cannot strand anybody: its row is not on the tab, so a warning naming it would
+    /// send the player looking for a box that is not there.</summary>
+    public static string BeforeLeaving(
+        Guide guide, IReadOnlyList<GuideObjective> drawn, GuideObjective next,
+        Func<GuideObjective, bool> isDone, Func<GuideObjective, bool> isSkipped)
     {
         var nextStage = guide.Stages.FirstOrDefault(s => s.Objectives.Any(o =>
             string.Equals(o.Id, next.Id, StringComparison.OrdinalIgnoreCase)));
         if (nextStage is null) return "";
 
+        var visible = new HashSet<string>(drawn.Select(o => o.Id), StringComparer.OrdinalIgnoreCase);
         var stranded = guide.Stages
             .Where(s => s.Order < nextStage.Order)
             .SelectMany(s => s.Objectives)
+            .Where(o => visible.Contains(o.Id))
             .Where(o => !isDone(o) && !isSkipped(o))
-            .Select(o => o.Title)
+            .Select(StepName)
             .ToList();
 
         return stranded.Count == 0
@@ -416,7 +493,7 @@ public static class GuidePresentation
             body += $"Source page: {source.Title} — edit it here: {WikiContribution.EditUrl(source.Title)}\n";
 
         return "https://github.com/DranakCorps-bot/EQBuddy/discussions/new?category=q-a" +
-            "&title=" + Uri.EscapeDataString($"Guide step: {guide.Name} / {objective.Title}") +
+            "&title=" + Uri.EscapeDataString($"Guide step: {guide.Name} / {StepName(objective)}") +
             "&body=" + Uri.EscapeDataString(body);
     }
 }
