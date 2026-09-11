@@ -44,14 +44,24 @@ describes the whole chain, and handing all seven Coldain steps the same seven-su
 prose would be the loudest possible version of "merge lines you were told not to merge".
 The parent collection page is itself a catalog quest and keeps the walkthrough.
 
-BYTE-REPRODUCIBLE
------------------
-Compact JSON, one guide per line, fixed key order, gzipped with a zeroed mtime, so the same
-cache produces the same bytes on any machine. `HarvestedGuidesTests` asserts exactly that.
+BYTE-REPRODUCIBLE — and what exactly is reproducible
+----------------------------------------------------
+Compact JSON, one guide per line, fixed key order, no clock and no locale, so the same cache
+produces the same DATA on any machine.
+
+The claim is about the catalog, not about the .gz file it ships in. A gzip container is NOT
+reproducible across environments — two zlib builds compress identical input to different
+bytes — so `--check` decompresses the committed file and compares the data. It did once
+compare the container, and the first CI run failed on a file whose contents were identical
+(runner Python 3.12 against a 3.14 box). A gate that reddens on a toolchain version rather
+than on a data change teaches the next person to re-run until green, which is how a guard
+stops guarding. See trap 74 in CLAUDE.md.
 
     python scripts/harvests/eqlwiki/guides-transform.py [--check]
 
-`--check` writes nothing and exits 1 if the committed file is not what this produces.
+`--check` writes nothing and exits 1 if the committed DATA is not what this produces. The
+write side compares the same way and leaves the file alone when the data has not moved, so a
+refresh PR never carries a binary diff that says nothing.
 """
 
 from __future__ import annotations
@@ -501,7 +511,17 @@ def ordered(record: dict, keys: list[str]) -> dict:
     return {k: record[k] for k in keys if k in record}
 
 
-def serialize(guides: list[dict], when: str) -> bytes:
+def render(guides: list[dict], when: str) -> bytes:
+    """The catalog's DATA — one guide per line, so `gunzip | diff` reads as a data change
+    rather than as one 30,000-row line. Fixed key order, pinned separators, no ASCII escaping,
+    no sorting (document order IS the product), and no clock anywhere.
+
+    **This, and not the .gz file, is what "byte-reproducible" means here.** A gzip container
+    is not reproducible across environments: two zlib builds compress identical input to
+    different bytes, so comparing the COMPRESSED file makes the gate fail on a Python version
+    rather than on a data change. It is the data that has to be the same; the container is an
+    implementation detail of how it is shipped (trap 74).
+    """
     lines = []
     for guide in guides:
         record = ordered(guide, GUIDE_KEYS)
@@ -524,13 +544,30 @@ def serialize(guides: list[dict], when: str) -> bytes:
     text = ('{"note":' + json.dumps(note, ensure_ascii=False) + ',"guides":[\n'
             + ",\n".join(lines) + "\n]}\n")
 
+    return text.encode("utf-8")
+
+
+def compress(data: bytes) -> bytes:
+    """Wrap the data for shipping. mtime=0 and no stored filename keep the clock and the
+    working directory out of the header — worth doing, but NOT enough to make the container
+    reproducible, because the deflate stream itself is a property of the zlib build. Nothing
+    is ever asserted about these bytes; see `render`."""
     raw = io.BytesIO()
-    # mtime=0 and no stored filename: a gzip header carrying either would make the bytes
-    # depend on the clock and the path, and "byte-reproducible" is the assertion this file
-    # is checked by.
     with gzip.GzipFile(filename="", mode="wb", fileobj=raw, compresslevel=9, mtime=0) as gz:
-        gz.write(text.encode("utf-8"))
+        gz.write(data)
     return raw.getvalue()
+
+
+def committed_data() -> bytes:
+    """The DATA currently on disk, decompressed. A file that exists but cannot be read as
+    gzip counts as absent rather than raising: the answer to "does this match" is then no,
+    which is what a caller wants to hear."""
+    if not OUT.exists():
+        return b""
+    try:
+        return gzip.decompress(OUT.read_bytes())
+    except (OSError, EOFError, gzip.BadGzipFile):
+        return b""
 
 
 def write_report(guides: list[dict], survey: dict, quests: list[dict], when: str) -> None:
@@ -612,23 +649,33 @@ def main() -> int:
     quests = json.loads(QUEST_CATALOG.read_text(encoding="utf-8"))["quests"]
     when = harvested_at()
     guides, survey = build_guides(quests, when)
-    payload = serialize(guides, when)
+    data = render(guides, when)
 
-    current = OUT.read_bytes() if OUT.exists() else b""
+    # The DATA, both sides — never the .gz bytes. Comparing containers asserts which zlib
+    # built them, which is a gate that reddens on a Python upgrade and teaches everyone to
+    # re-run until green (trap 74).
+    current = committed_data()
     if args.check:
-        if payload != current:
+        if data != current:
             print(f"{OUT.name} differs from what this produces "
-                  f"({len(current)} bytes on disk, {len(payload)} generated).",
+                  f"({len(current)} bytes of data on disk, {len(data)} generated).",
                   file=sys.stderr)
             return 1
-        print(f"{OUT.name} is already what this produces ({len(payload)} bytes).")
+        print(f"{OUT.name} is already what this produces ({len(data)} bytes of data).")
         return 0
 
-    OUT.write_bytes(payload)
+    # Only rewrite when the DATA moved. Recompressing unchanged data would put a fresh
+    # deflate stream in every weekly refresh PR — a 350 KB binary diff a reviewer cannot
+    # tell from a real one.
+    if data == current:
+        print(f"{OUT.name} unchanged ({len(data)} bytes of data) — left alone.")
+    else:
+        OUT.write_bytes(compress(data))
+        print(f"wrote {OUT.name}: {len(guides)} guides, "
+              f"{sum(len(s['objectives']) for g in guides for s in g['stages'])} objectives, "
+              f"{len(data)} bytes of data.")
     write_report(guides, survey, quests, when)
-    print(f"wrote {OUT.name}: {len(guides)} guides, "
-          f"{sum(len(s['objectives']) for g in guides for s in g['stages'])} objectives, "
-          f"{len(payload)} bytes gz. Report: {REPORT.name}")
+    print(f"Report: {REPORT.name}")
     return 0
 
 

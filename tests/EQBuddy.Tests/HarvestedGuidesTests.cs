@@ -619,9 +619,16 @@ public class HarvestedGuidesTests
     /// The weekly PR's reviewable artefact exists and AGREES with the file beside it.
     ///
     /// <para>A report regenerated from a different run than the data is worse than none: a
-    /// reviewer reads the counts and believes them. So this checks the two numbers a reviewer
-    /// acts on — guides and objectives — against the committed catalog, which is the only
-    /// thing that makes the rest of the report worth reading.</para>
+    /// reviewer reads the counts and believes them. So this checks the numbers a reviewer
+    /// acts on against the committed catalog, which is the only thing that makes the rest of
+    /// the report worth reading.</para>
+    ///
+    /// <para>EVERY per-bucket count, not a chosen two. The version of this test that checked
+    /// only guides+objectives shipped a report claiming <c>Authored: 5244 / Stub: 27</c>
+    /// beside a catalog that actually held <c>1196 / 4075</c> — the Collect-rows-are-Stubs
+    /// decision moved the split, the data was regenerated and the report was not. Both totals
+    /// it did check were unmoved by that, because a row changing bucket changes no total.
+    /// A sum is exactly the wrong thing to check a REDISTRIBUTION with.</para>
     /// </summary>
     [Fact]
     public void TheReportIsThereAndItsCountsMatchTheCommittedFile()
@@ -642,6 +649,17 @@ public class HarvestedGuidesTests
         var skeletonOnly = Harvested.Guides.Count(g =>
             g.Stages.All(s => s.Id is "turn-in-pieces" or "start"));
         Assert.Contains($"## Skeleton-only guides ({skeletonOnly})", report, StringComparison.Ordinal);
+
+        // The two distributions. Every bucket the catalog actually has must be reported with
+        // the catalog's own number — this is what catches a report left behind by a rule
+        // change that moved rows between buckets without moving any total.
+        var objectives = Harvested.Guides.SelectMany(g => g.AllObjectives).ToList();
+
+        foreach (var bucket in objectives.GroupBy(o => o.Authoring))
+            Assert.Contains($"- `{bucket.Key}`: {bucket.Count()}", report, StringComparison.Ordinal);
+
+        foreach (var bucket in objectives.GroupBy(o => o.ObjectiveType, StringComparer.Ordinal))
+            Assert.Contains($"- `{bucket.Key}`: {bucket.Count()}", report, StringComparison.Ordinal);
     }
 
     // ---- Fixture -------------------------------------------------------------------------
