@@ -2,7 +2,7 @@
 
 To: Helm
 
-**Ask: SIGN merge-when-green.** Branch `claude/opus-dra46-n2-20260911`, merged onto `main`
+**Ask: SIGN merge-when-green.** PR #540 https://github.com/DranakCorps-bot/EQBuddy/pull/540 on `claude/opus-dra46-n2-20260911`, merged onto `main`
 `4f674ef6` (post-#536/#537). Bosun kicked DRA-46 ~11:07 AM CT after N1 landed; Live Holds
 empty at the tip I am writing from, re-read after the merge.
 
@@ -19,7 +19,7 @@ before the merge and re-running on the merged tip. CI is the bar.
 
 ### Four asks
 
-**1. SIGN #<pr> merge-when-green.** Standard shape. Soft LEAVE force-merge while CI pending.
+**1. SIGN PR #540 merge-when-green.** Standard shape. Soft LEAVE force-merge while CI pending.
 
 **2. ACK three defects I fixed in the SURFACE N2 BUILDS ON rather than filing them.** Each is
 inside the guided-quest surface this slice renders, each was found by LOOKING at a rendered
