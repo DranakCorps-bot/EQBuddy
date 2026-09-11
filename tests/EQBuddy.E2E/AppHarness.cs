@@ -229,6 +229,34 @@ internal sealed class AppHarness : IDisposable
                 [$"{Character}_{Server}".ToLowerInvariant()] = new { Classes = classes },
             }, new JsonSerializerOptions { WriteIndented = true }));
 
+    /// <summary>
+    /// Items this character already HOLDS, as the quest ledger's own "I had this before
+    /// EQBuddy" count — the same field the detail pane's +1 click writes
+    /// (<c>QuestLedgerStore.SetManual</c>).
+    ///
+    /// <para>Written through <see cref="QuestLedgerStore"/> rather than as hand-typed JSON,
+    /// which is the rule <c>WriteInventoryDump</c>'s own note is about: a fixture that
+    /// hand-builds the file it is seeding is one schema change away from staging a
+    /// well-formed state of something else and photographing it (trap 23). Overwrites the
+    /// ledger, so call it INSTEAD of <see cref="WriteLedgerClasses"/>, not after it.</para>
+    ///
+    /// <para>Call BEFORE <see cref="Launch"/>.</para></summary>
+    public void WriteLedgerOwned(params (string Item, int Count)[] items)
+    {
+        var store = new QuestLedgerStore(Path.Combine(ProfileDir, "quest-ledger.json"))
+        {
+            TrackFilter = _ => true,
+        };
+        foreach (var (item, count) in items)
+            store.SetManual($"{Character}_{Server}".ToLowerInvariant(), item, count);
+        // FLUSH, because the store's own Save is debounced two seconds and this object is
+        // gone before the timer fires — a seeded file that is never written is a fixture
+        // that stages nothing and lets the assertion pass or fail against the app's empty
+        // default instead (trap 23's shape, on the writing side). Caught by the E2E it was
+        // written for, which timed out on a row that had nothing to light it.
+        store.Flush();
+    }
+
     /// <summary>Launches EQBuddy.exe on this profile and waits for the startup replay to
     /// finish — first for it to START (the fixture has kills, so a live session shows
     /// killsTotal &gt; 0), then for it to STOP moving.

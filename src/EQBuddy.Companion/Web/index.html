@@ -302,6 +302,11 @@
   .qitem.some { color:var(--text); }
   .qnote { color:var(--dim); font-size:11.5px; font-style:italic; margin:2px 0 0 6px; }
   .qmore { color:var(--dim); font-size:12px; padding:8px 4px; }
+  /* The guided walkthrough inside a quest card (DRA-46). Its heading, card and rows reuse
+     the checklist's own .group / .gcard / .rows styles — one look for one thing — so this
+     rule only has to set it apart from the item rows above it. */
+  .qguide { margin-top:6px; border-top:1px solid var(--border); }
+  .qguide h3.group { margin-top:8px; }
 
   /* ---- map ---- */
   /* The map and its named list, side by side, as the desktop map window docks them.
@@ -1964,6 +1969,10 @@ function boot() {
     // Lookups are lowercased once per push: ledger keys arrive as the log spelled
     // them, catalog names as the wiki spells them, and the join must not care.
     let ownedLower = {}, trackedLower = new Set(), hiddenLower = new Set(), completedLower = {};
+    // Quest name (lowercased) → its guided walkthrough. Keyed on the group's TITLE, which
+    // the PC sets to the quest name; the heading is words and parsing an identity back out
+    // of a label is one fact stored in one place and read out of another (trap 4).
+    let guides = new Map(), guidesMore = 0;
 
     function setCatalog(c) {
       catalog = c;
@@ -2089,7 +2098,88 @@ function boot() {
           (it.have >= it.need ? "✔ " : "• ") + it.n + " — " + it.have + "/" + it.need));
       if (!q.i.length && !q.o)
         c.appendChild(el("div", "qnote", "Dialogue or task chain — steps on the wiki page."));
+      const g = guides.get(key);
+      if (g) c.appendChild(questGuide(g));
       return c;
+    }
+
+    // The guided walkthrough for one quest (DRA-46) — built by the SAME
+    // GuideChecklistProjection.ForQuest call the PC's detail pane makes, so the two screens
+    // cannot show different guides for one quest (David, 2026-08-18).
+    //
+    // THE COLLECT STEPS ARE NOT IN g.rows, and that is decided desktop-side rather than here:
+    // those steps ARE the `qitem` rows drawn just above, with their have/need, and
+    // GuideChecklistProjection.WalkthroughRows is the one producer of the split. A second
+    // rule spelled on this side is how the two surfaces start drawing the list differently —
+    // and trap 32 means a page-side rule can sit on an open phone for weeks after the PC has
+    // moved on.
+    //
+    // Same DOM as a checklist group (h3.group, ul.rows, .gcard) so it inherits every style
+    // those already have and adds no CSS of its own.
+    function questGuide(g) {
+      const box = el("div", "qguide");
+      const shut = () => g.fold && (g.collapsed !== guideFoldFlipped.has(g.fold));
+      const h = el("h3", "group");
+      const name = el("span", null, g.heading);
+      h.append(name);
+      if (g.note) h.append(el("span", "note", g.note));
+      box.appendChild(h);
+      const steps = el("div", "steps");
+      box.appendChild(steps);
+      // Folded by default, exactly as on Sky: a quest card is already several lines, and a
+      // ten-step walkthrough opened on every one of them is the list folding exists to give
+      // back. Page-local — a tap here never reaches across the LAN to fold something on the
+      // PC while somebody is playing at it (the standing fold ruling).
+      if (g.fold) {
+        const sync = () => {
+          steps.style.display = shut() ? "none" : "block";
+          name.textContent = (shut() ? "▸ " : "▾ ") + g.heading;
+          h.setAttribute("aria-expanded", shut() ? "false" : "true");
+          h.title = shut() ? "Show this quest's steps" : "Fold this walkthrough away";
+        };
+        h.style.cursor = "pointer";
+        h.setAttribute("role", "button");
+        h.setAttribute("tabindex", "0");
+        const toggle = () => {
+          if (guideFoldFlipped.has(g.fold)) guideFoldFlipped.delete(g.fold);
+          else guideFoldFlipped.add(g.fold);
+          sync();
+        };
+        h.onclick = (e) => { e.stopPropagation(); toggle(); };
+        h.onkeydown = (e) => {
+          if (e.key === "Enter" || e.key === " ") { e.preventDefault(); toggle(); }
+        };
+        sync();
+      }
+      if (g.card) steps.appendChild(guideCard("quests", g.card));
+      const ul = el("ul", "rows");
+      for (const r of g.rows || []) {
+        const li = el("li", (r.done ? "done " : "") + (r.skipped ? "skipped " : "") + "tickable");
+        const rn = el("div", "rn", r.text);
+        if (r.detail) rn.appendChild(el("span", "sub", r.detail));
+        if (r.stub) rn.appendChild(el("span", "stub", r.stub));
+        if (r.facts) rn.appendChild(el("span", "facts", r.facts));
+        if (r.improve) {
+          const a = el("a", "improve", IMPROVE_LABEL);
+          a.href = r.improve; a.target = "_blank"; a.rel = "noopener";
+          a.onclick = (e) => e.stopPropagation();
+          rn.appendChild(a);
+        }
+        const cb = el("input");
+        cb.type = "checkbox"; cb.checked = !!r.done;
+        cb.onchange = () => {
+          // Optimistic, exactly as the checklist rows are: the row moves under the thumb
+          // now and the PC's next push is the truth (and overrules us if the id was stale).
+          r.done = cb.checked;
+          li.classList.toggle("done", cb.checked);
+          sendTick("quests", r.id, cb.checked);
+        };
+        li.appendChild(cb);
+        li.appendChild(rn);
+        ul.appendChild(li);
+      }
+      steps.appendChild(ul);
+      return box;
     }
 
     function drawTabs() {
@@ -2215,6 +2305,13 @@ function boot() {
       if (suppressed > 0)
         out.push(el("div", "qmore", "+" + suppressed + " more — showing the first "
           + rendered + ". Keep typing to narrow it down."));
+      // …and the guides' own cap, which is a different number about a different thing: a
+      // quest can be on screen with its walkthrough left on the PC (trap 50 — a surviving
+      // cap must SAY so). Pinning a quest moves it to the front of the list the PC picks
+      // from, which is the route back.
+      if (guidesMore > 0)
+        out.push(el("div", "qmore", "+" + guidesMore + " more with a walkthrough — the "
+          + "phone carries the first few. Pin 📌 a quest to bring its steps over."));
       list.replaceChildren(...out);
     }
 
@@ -2238,6 +2335,10 @@ function boot() {
         if (section.catalog) setCatalog(section.catalog);
         ownedLower = {};
         for (const k in (section.owned || {})) ownedLower[k.toLowerCase()] = section.owned[k];
+        guides = new Map();
+        for (const g of (section.guides || []))
+          if (g.title) guides.set(g.title.toLowerCase(), g);
+        guidesMore = section.guidesMore || 0;
         trackedLower = new Set((section.tracked || []).map(s => s.toLowerCase()));
         hiddenLower = new Set((section.hidden || []).map(s => s.toLowerCase()));
         completedLower = {};

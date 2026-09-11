@@ -431,6 +431,26 @@ public sealed record CompanionQuestsSection(
     /// desktop-side. Empty when nothing knows yet.</summary>
     IReadOnlyList<string>? CharacterClasses,
     string? ClassSourceLabel,
+    /// <summary>
+    /// The guided walkthrough for the General tab's quests (DRA-46), one group per quest that
+    /// has one, in <see cref="Mine"/>'s order — <see cref="CompanionChecklistGroup.Title"/> is
+    /// the QUEST NAME, which is the key the page joins a card on.
+    ///
+    /// <para>The same <c>QuestChecklistGroup</c> the desktop's detail pane draws, through the
+    /// same <c>GuideChecklistProjection.ForQuest</c> call. Rows are
+    /// <c>GuideChecklistProjection.WalkthroughRows</c> ALREADY — the <c>Collect</c> steps are
+    /// the card's own turn-in item rows and the page must not draw them a second time, which
+    /// is a decision made desktop-side rather than in <c>index.html</c> so both surfaces split
+    /// the list the same way.</para>
+    ///
+    /// <para>Capped (<see cref="GuidesMore"/>) because a guide is ten-odd rows with prefilled
+    /// share-back URLs on each and a first pairing ships every byte (trap 67). Empty until a
+    /// character is known — the guide ledger is where a step's tick lives, and a walkthrough
+    /// nothing can record progress in is not one.</para></summary>
+    IReadOnlyList<CompanionChecklistGroup> Guides,
+    /// <summary>Quests in <see cref="Mine"/> that HAVE a guide and did not get one shipped.
+    /// Never a silent cap (trap 50): the page prints it.</summary>
+    int GuidesMore,
     CompanionChecklistSection Epics,
     CompanionChecklistSection Sky);
 
