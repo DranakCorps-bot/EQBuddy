@@ -23,6 +23,20 @@ touching the actual unknown, which is rendering.
 PR #501 still open carrying the full plan; filed the LIVE ASK for Helm's SIGN + merge instead
 of writing a second plan in this seat. One `gh pr list` before writing — the corrective from
 the DRA-48 #508/#510 collision, applied.
+## 2026-09-10 (DRA-33 Evolved republish — the calls I made alone)
+
+**1. "Fable files the look" was treated as satisfied by the pushed channel filing on the seat
+branch, not by that branch reaching `main`.** Helm's ~7:30 PM CT ruling gates the local publish
+on the FILING; Fable's entry (`161cbba3`, PASS, follow-ups not blocks) states in its own text
+that the gate condition is met with it. The default it could have gone the other way on: wait
+for the last-look branch to merge (its LIVE ASK to Helm is still unruled) before publishing.
+The branch's open asks are Fable/Soft's loop and were LEFT untouched.
+
+**2. Published from the Paperclip executor clone of `main` (`089057c0`), same recipe, same
+signing.** The recipe names main by tip, not by clone; tip verified identical to origin/main
+before the build, signature verified Valid + timestamped after. The default it could have gone
+the other way on: route the publish back through Soft's clone — that adds a hop and changes no
+byte of the artifact.
 
 ## 2026-09-10 (DRA-48 uniform BlueGrey — the calls I made alone)
 
@@ -159,6 +173,53 @@ It landed as: extract the complete chrome into the `FABLE.md` plan so no executo
 needs the files, and point at the private control-plane repo if durable storage is wanted.
 The acceptance line "style clearly indebted … without copying Dell content" reads as a
 licensing line, not only a design one.
+## 2026-09-09 (Deliveries 2/3 plan — the calls Fable made alone, and the two the Founder made)
+
+**Founder, in session (consequence 5 and 7, his):** expand the guided model to all Epics and
+all 1,178 normal quests; source = harvest eqlwiki's walkthrough prose first, skeleton
+fallback. Recorded; not decided here.
+
+**1. A third authoring state, `Transcribed`, with Who/Where/When/How FORBIDDEN on it.** The
+default it could have gone the other way on: allow the transformer to fill `Where` from a
+`[[Zone]]` wikilink inside the sentence, which is structural rather than prose. I kept that
+out of v1 and named it as Phase 5 shape, because the first version of a 486-row and 1,178-row
+transformer should have exactly one thing it is allowed to do. What would reverse it: a
+Founder or Bevel call that the card needs a Where line on transcribed steps.
+
+**2. Epic before normal quests.** The default was the bag's order (Delivery 2 then 3). Reversed
+because the epic rows are curated and cached, one PR proves the new state on human-checked
+data, and the transformer then produces 1,178 guides of a state that already rendered. The
+Founder said he will call sequencing; this is the recommendation.
+
+**3. Store consolidation moves to LAST in Delivery 2.** §7 had it first. Every new home reads
+the store its fact already lives in (Sky items, epic rows, ledger counts, ledger completion),
+so nothing waits on it, and it gets cheaper when every writer is already the router.
+
+**4. The harvested guides live in a SEPARATE auto-written file, gzipped, merged at load with
+curated winning.** The alternative — appending to `GuideCatalog.json` — would make the weekly
+refresh write a curated file, which CLAUDE.md forbids, and would put 165k JSON lines in a
+hand-reviewed artefact.
+
+**5. NPC speech lines are not objectives; `You say` lines are.** The player types the `You
+say` line, so it is an instruction in the page's own words; what the NPC says back is
+flavour that often contains the next instruction but cannot be split from it without
+inference. The default it could have gone the other way on: keep NPC speech as the
+objective's detail. Rejected for v1; the Improve door on the row is where a player who needs
+the NPC's line says so.
+
+**6. The skeleton stage is appended to EVERY guide, not only to walkthrough-less ones.** The
+item rows are what the General tab draws today and they are the only rows bags can light;
+a transcribed walkthrough with no item-backed rows would lose the one automatic signal the
+tab already has.
+
+**7. No epic prerequisites are invented.** Reading order is the sequence. This keeps the
+`OnlyATurnInCarriesPrerequisites…` invariant true and means the blocked-by-skip sentence can
+never fire on an epic — which is correct, because nothing in the data says a section gates
+the next.
+
+**8. Long chains ship before Bevel faces them.** Founder's post-delivery rule from #477
+applies; Bevel gets the Druid (66 rows) and Paladin (14 rows) frames the same day the Epic PR
+merges.
 
 ## 2026-09-09 (Fable's three #491 defects — the calls I made alone)
 

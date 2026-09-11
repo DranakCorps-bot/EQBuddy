@@ -181,6 +181,219 @@ it, what makes it different, what can I download today" without opening PRODUCT.
 
 needs-david: none. The direction, the teal+grey, and the page itself are his ask; his
 pre-deploy look in T4 is a checkpoint already inside that ask.
+## 2026-09-09 ~10:50 PM CT — Fable: FOUNDER SIGNED the Deliveries 2/3 plan in session; sequencing call = EPIC FIRST
+
+To: Helm, Claude (Opus), Bevel
+
+David, in session, on the plan at the top of `FABLE.md` (~10:15 PM CT) and its five asks in the
+~10:25 PM LIVE ASK: *"I'm good with your plan, please pass that on."* That is the Founder SIGN
+on direction (consequence 5) and it answers the one call the plan left to him: **Epic first**
+(Delivery 3, DRA-41), with N1 (DRA-45) allowed beside it on a second seat.
+
+What this changes for Helm's ruling: nothing is asked back to David. Asks 1–4 stand as posture
+and sequencing calls for Helm; ask 5 is discharged. Helm SIGNs each Opus PR as before; the
+Founder kicks DRA-41 himself. Play Console OFF; no tag, no `release.ps1`, no signing change,
+no republish from this note (DRA-33 stays the Friday republish + smoke).
+
+— Fable 5, 2026-09-09 ~10:50 PM CT
+
+---
+
+## 2026-09-09 ~10:15 PM CT — Fable: PLAN — Deliveries 2 and 3 (Epic 1.0 + all 1,178 normal quests on the guided model). Answers the PLAN REQUESTED block below; a third authoring state, and the harvest is mostly already on disk
+
+To: Claude (Opus builds when the Founder kicks), Helm (SIGN in HELM-FEEDBACK.md LIVE ASK), Bevel (long-chain faces in parallel — not a gate), David (one sequencing call, recommendation inside)
+
+- **Priority:** `ready` on Helm SIGN. Founder kicked the scope in session (*"Expand the approach
+  we just did for POS to all Epic quests and regular quests"*) and chose the normal-quest
+  source (*harvest eqlwiki's walkthrough prose first, skeleton fallback*). Supersedes §7 of
+  `docs/quests/WEEKEND-SHIP-BAG-2026-09-12.md` for Deliveries 2 and 3 (amendment appended there).
+- **needs-david: none beyond what he said.** Consequence 7 (request rate at eqlwiki) is
+  unchanged: the transformer runs over the wikitext `quests-harvest.py` ALREADY fetches into
+  `scripts/harvests/eqlwiki/cache/` every Monday at the existing 1.1 s pacing and UA; the
+  only new fetches are the ~250 quest pages not yet cached, once, by the same script. Nothing
+  fetches from inside the app. Consequence 8 unchanged (share-back is the same browser-URL
+  door). Play Console OFF; no tag, no `release.ps1`, no signing change, no republish here.
+
+### §0 Measured this seat — the request's survey, corrected in two places
+
+| Fact | Number | Note |
+|---|---|---|
+| Epic rows / classes / sections / classic-flagged | 486 / 14 / 64 / 167 | `EpicQuestChecklist.json`; text length 5–504 chars, median 80; 142 rows start "Give", 92 "Kill" |
+| Normal quests in `QuestCatalog.json` | 1,178 | flat: name, url, giver, startZone, items, rewards, era, minLevel; **0** carry steps |
+| **Quest pages already cached locally** | **928 of 1,178** | `cache/quest-*.wikitext` — the request said "no quest page is cached yet"; that is the spells/items cache it looked at. `quests-harvest.py` has cached quest wikitext since #70 |
+| …with a `== Walkthrough ==` section | 840 | 21,804 body lines: 6,373 dialogue, 4,274 list/step, 1,076 bold-step lines on 473 pages, 223 subsection headings on 65 pages; 79 pages are dialogue-only |
+| …with a `== Checklist ==` section | 121 | `{{CheckboxList}}` bullets — the Epic pages and the Kael/Skyshrine/Thurgadin armour sets; the cleanest source there is |
+| Weekly refresh already re-harvests quest pages | yes | `refresh.py HARVESTERS` includes `quests-harvest.py`; `extract_section()` already exists there |
+| Guided-model file cost today | ~140 JSON lines per guide | 95 guides = 13k lines; 1,178 more cannot ship in that shape |
+
+### §1 The crux — ruling: a THIRD authoring state, `Transcribed`
+
+The request's read is confirmed, with the boundary drawn tighter than it proposed.
+
+`GuideAuthoring.Transcribed`: **the source states one complete instruction and we carry it
+verbatim.** `What` = the sentence, exactly as the page has it (wikilinks stripped to their
+text, nothing else touched). `Who`, `Where`, `When`, `How` are **empty by rule**, and
+`Validate()` REFUSES a Transcribed step that fills any of them — a filled field on a
+transcribed step is the parser's opinion wearing the wiki's citation, which is trap 73 at
+486×. `Why` may be filled only from structured data (the reward name, as the Sky card does).
+`Sources` required. `StubNote` empty. Renders and ticks like any row; `Directions()` draws
+nothing; `RowTooltip` is the sentence; the row title IS the sentence (`StepTitle`). The card's
+NEXT reads the sentence and "Works toward the {reward}".
+
+Why not the three options: (1) parsing who/where out of prose is inference cited to a page
+that states the sentence, not the fields — refused for the reason trap 73 exists; (2) 486
+stubs would tell the player "we cannot give you directions" about rows that are directions;
+(3) relaxing `Validate()` per `GuideType` makes "Authored" mean two things. A third state
+keeps lock 4a exact: Authored answers who/where/what, Stub says what is missing, Transcribed
+says "the page said this, in its words". Not "complete", not "hollow" — the caption does not
+count it as a stub, and no badge is invented for it (Bevel may add one after seeing it).
+
+**Promotion rule:** Transcribed → Authored only by a human authoring PR (Phase 2 shape), never
+by the transformer. **Link-derived fields are Phase 5**, not this plan: a `[[Zone]]` link in
+the sentence is a structural fact and could legitimately fill `Where` one day — named so it is
+not invented mid-build.
+
+### §2 Delivery 3 first — Epic 1.0 on the guided model (DRA-41, one PR, two commits)
+
+Recommended before normal quests: the data is already curated and cached, one PR makes the
+Epic tab guided for 14 classes and proves `Transcribed` on 486 real rows before the
+transformer produces 1,178 guides of them.
+
+**Commit 1 — schema + engine generalisation (code).**
+- `GuideAuthoring.Transcribed` + validation above; prove-fail both ways (`Who` filled on a
+  Transcribed step refused; a Transcribed step with empty `What` refused).
+- Fourth progress home in `GuideProgressRouter`: **`EpicItem`** — an objective whose id names
+  an `EpicQuestChecklistRow` reads/writes THAT row's `Acquired` (the same setter the Epic tab
+  runs; `EpicLootAutoCheck` keeps lighting it). One fact, one store; nothing moves store.
+  `HomeFor` takes the group's epic rows the way it takes the Sky items.
+- `GuideChecklistProjection.Apply` for the Epic tab: a class with an `EpicQuest` guide gets
+  its rows replaced by the guide's objectives under section stages; a class without one is
+  handed back the same object (lock 5 by class, as Sky). The per-class `EpicCompleteToggle`
+  lock stays the "guide complete" store — heading button as today; card reads AllDone when
+  it is set; rows disabled under it exactly as the classic tab does.
+- `EpicQuestClassicOnly` filter: the projection drops objectives whose backing row is not
+  `availableInClassic` when the filter is on — the row flag is the one producer.
+- Dump facts under `questsGuide*` already re-prefix; add `questsEpicGuideGroups`. E2E:
+  Epic tab, one class, NEXT names row 0; `AppendLogLines` an epic loot line the auto-tick
+  recognises → the guide row lights (trap 62). Shot `shell-quests-epic-guide` (name to check
+  free), prediction written first, stage a class with a short chain (Paladin, 14 rows) AND
+  one frame of Druid (66 rows) for Bevel.
+
+**Commit 2 — data (scripted, byte-reproducible like DRA-44).**
+- One guide per class: `epic-{class}`, `GuideType.EpicQuest`, `QuestName` = the
+  `QuestCatalog` name for that epic page (`{Class} Epic Quest` — verify each resolves as the
+  app loads it; the existing test does), `ApplicableClasses` = the class.
+- Stages = the class's sections in row order (a class with the single section "Checklist"
+  gets one stage named for the epic). Objectives = rows, id = the epic row id, Transcribed,
+  `What` = `text` verbatim, `ItemNames` empty (the row is the backing; item linkage is Phase
+  5), `Sources` = the class epic page as served (`quest-{Class}_Epic_Quest.wikitext` is in
+  the cache) with the harvest date.
+- **No prerequisites are invented.** Reading order is the only sequence; NEXT = first row
+  not done. The blocked-by-skip sentence's "hand-in" invariant
+  (`OnlyATurnInCarriesPrerequisites…`) therefore keeps holding; the test that pins it must
+  keep passing, which it will because no epic objective carries one.
+- Must-list: every epic row has exactly one objective and every objective names a row
+  (`GuideClassCoverageTests` shape, over the Epic catalog); 486 = 486 by construction.
+- `Validate()` green; `NoShippedStepCarriesAnyOfTheInventedSentences` green; the WhatsNew
+  2.0.0 guide entry gains one sentence ("Epic 1.0 walks the same way").
+
+### §3 Delivery 2 — normal quests: transformer, skeleton, render, then consolidation (DRA-40 → three child cards)
+
+**N1 — the walkthrough transformer (`scripts/harvests/eqlwiki/guides-transform.py`), data + tests.**
+Deterministic, runs inside the weekly refresh after `quests-harvest.py`, over the cached
+wikitext, and writes **`src/EQBuddy.Core/Data/HarvestedGuides.json.gz`** — a SEPARATE,
+auto-written file (the `ItemCatalog.json.gz` precedent), compact single-line entries with a
+fixed key order so refresh PRs diff as data. **`GuideCatalog.json` stays curated and is never
+touched by it**; at load the catalog merges both and **a curated guide wins on `QuestName`**.
+`refresh.py CURATED` is unchanged; the harvested file is refresh output like `QuestCatalog.json`.
+
+Extraction rule, per page, in this order, and nothing else:
+1. **Section:** `== Checklist ==` when present (121 pages), else `== Walkthrough ==` (840),
+   else no walkthrough.
+2. **Stages:** each `===`/`====` heading inside the section is a stage in order; none → one
+   stage named "Walkthrough" (or "Checklist").
+3. **Objectives, in document order, each Transcribed with `What` = the line's text:**
+   a `*` / `#` / `{{CheckboxList}}` bullet; a bold line `'''…'''` of six or more characters;
+   a `You say, '…'` line. **NPC speech is not an objective** (`X says '…'` lines are dropped);
+   templates, categories and italic editor notes are dropped. Wikilinks become their text.
+4. **Skeleton stage, appended to EVERY guide that has any turn-in items** — "Turn-in pieces":
+   one `Collect` objective per `QuestCatalog` item ("{item} ×{qty}"), **home = the quest
+   ledger's owned count** (a fifth router home, `LedgerItem`: done when `Have ≥ Need`, read
+   from the same `QuestMatch` the General tab draws; a manual tick is refused — bags are the
+   truth here, as today), then one `TurnIn` "Hand the pieces to {giver}" (home = the ledger's
+   completion record, `CompletedFor`, the same store `ToggleCompleted` writes). These are
+   **Authored** — who/where/what come from structured fields the page states in its infobox,
+   not from prose — with the page as source. Where the giver or zone is blank the sentence
+   shrinks ("Hand in the pieces."), never invents.
+5. **Skeleton-only guide** for the 250 uncached pages until the next refresh fetches them,
+   and for pages with no walkthrough and no checklist: stage 4 alone, plus a `TalkToNpc`
+   "Speak to {giver} in {startZone}" first when both are known. So all 1,178 end up guided,
+   as the Founder decided, and the ones that are skeleton say so in the caption ("from the
+   quest's item list").
+6. **Never:** infer Who/Where from prose; reorder; merge lines; drop a bold line because it
+   looks like flavour. The transformer's whole job is to be boring.
+
+Tests (`HarvestedGuidesTests`): the transformer reproduces the committed file byte-for-byte
+from the cache (the DRA-44 standard); every harvested objective is Transcribed or a skeleton
+Authored row and nothing else; no harvested guide claims a Sky reward key or an epic row;
+curated wins on collision (fixture); a fixture page in each shape (Checklist, subsectioned,
+bold-only, dialogue-only, no walkthrough) produces the predicted stages and counts; the
+count is 1,178. A report (`guides-report.md`) lists per-shape counts and the skeleton-only
+set, so the weekly PR shows drift.
+
+**N2 — render on the Quests tab + phone.** The General tab's detail pane for a selected
+quest gets the guide: NEXT card, stage headings, rows, "Turn-in pieces" as the item rows the
+pane already draws (they are the same rows, now item-backed through the router — not a
+second list). The projection produces the same `QuestChecklistGroup` shape keyed by quest
+name; `CompanionProjection.Quests` carries it. Folded by default like Sky. The row-level
+Improve door on every Transcribed row is the correction path back to the wiki (the sentence
+is the page's own; the fix is the page). Dump facts, parity tests, E2E (select a quest with
+a Checklist page → rows equal the bullet count; a `Collect` row lights when the ledger's
+owned count reaches Need), shot `shell-quests-general-guide`.
+
+**N3 — store consolidation (§7 PR 1 as written).** Per-profile Sky/Epic ticks →
+per-character ledger, `SkyCompleteToggle` to Core, `SkyQuestDefaults.cs` retires into guide
+`Sources`, `SkyTestSplit.WithTurnIns` and the name-pattern routing deleted. **Last, not
+first:** nothing above needs it (every home reads the store the fact already lives in), and
+it gets cheaper once every writer is the router. Own LIVE ASK; migration with `.bak` and the
+round-trip test (trap 26 one layer down).
+
+### §4 Long chains — Bevel in parallel, not a gate
+
+A Druid epic is 66 rows in one section; a 10th Coldain Ring page is 7 subsections. Ship
+Delivery 3 with what exists (folded per class, section stages, one NEXT card) and give Bevel
+the Druid and Paladin frames the same day. Two candidate answers Bevel can rule between
+without a schema change: fold at the STAGE level too (stage heading as a second `+`), or the
+card carries "step 12 of 66 · section 3 of 5". Nothing in the engine prevents either.
+Bevel ask filed in `BEVEL-FEEDBACK.md` with this plan.
+
+### §5 Sequencing — recommendation for the Founder's call
+
+**Epic first.** Data is curated and cached, one PR, visible on the Epic tab within a day,
+proves `Transcribed` on 486 rows a human curated before the transformer produces 1,178 of
+them unattended. Then N1 (data, one refresh cycle to fill the 250), N2 (render), N3
+(consolidation). If the Founder wants the bigger unlock first, N1 can run beside Delivery 3
+on a second seat — the two touch different files until N2.
+
+### §6 Recipe lessons, carried (from #480/#485/#489/#491/#497 last-looks — nine)
+
+1. One generated file = one PR; value comes from the survey, not the merge.
+2. When a slice changes what a collection CONTAINS, enumerate what is computed FROM it.
+3. When a value is read somewhere new, say what makes that surface REDRAW.
+4. A conditional affordance names the data shape that reaches it — and checks it exists.
+5. A step cites every page a fact came from; the zone page is a source in its own right.
+6. Survey the file, THEN look at the frame; a deny-list catches recurrence, not the next instance.
+7. Draw only the questions a step answers.
+8. An illustrative string in a plan must be derivable from the rule beside it.
+9. When a slice re-words a caption or label, name what COUNTS it on the other side of the dump.
+
+### Cards
+
+DRA-41 (Delivery 3 Epic, one PR, two commits) — description replaced. DRA-40 becomes the
+parent of three new cards: N1 transformer + harvested file, N2 render, N3 consolidation.
+Created in `backlog`, no assignee; the Founder kicks.
+
+— Fable 5, 2026-09-09 ~10:15 PM CT
 
 ---
 
