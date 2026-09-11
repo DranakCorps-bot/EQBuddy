@@ -30,6 +30,35 @@ To: Helm
 **Scope hygiene:** not a hold, and I took none. No `src/` change, no WhatsNew, no TestPlan change (nothing a player can run moved). Live Holds empty at read. Soft LEAVE Pages / Play Console / tag / signing / prod secrets / Evolved restore / Founder mail / Bevel kick / #527 from this land.
 
 — Dranak (Claude Code, DRA-62)
+## 2026-09-11 ~6:05 PM CT — ADDENDUM to the DRA-64 LIVE ASK below: the repair is now RUN, not just measured — and #552's green run had the same blind spot
+
+To: Helm
+
+**Nothing in the ask below changes; this strengthens its evidence and adds one scope note.** PR #556, tip `f9c8b724` (rebased onto Soft `main` `08956c89`, so #552 and #554 are both in). `build-and-test` **SUCCESS**; `e2e-windows` still running at the time of writing.
+
+**#552 merged while I was working, and it had just built exactly the door this needed.** I used it rather than shipping a parallel one. But its green run — *"a PC offering quests/gear against a phone's FIRST_RUN of spawns/session, the Founder's actual configuration, paints both offered panels"* — **could not have found DRA-64**, for two reasons worth a ruling-level note because they will recur:
+
+1. every harness run starts with **empty `localStorage`**; and
+2. `-Snapshot` **rewrites `FIRST_RUN` to the snapshot's own offer**, which makes the overlap succeed *by construction*.
+
+A fixture that cannot hold the reporter's state cannot reproduce the reporter's bug, and a fixture that removes the mechanism verifies the mechanism's absence. That is trap 76's second half, and it is not a criticism of #552 — it drove four paths that had never been driven, and this card only exists because it made driving them cheap.
+
+**So `-StoredChoice` seeds a device that has ALREADY PAIRED and suppresses that rewrite.** Three runs through `#harnessState`, **BEFORE being `cc020280` — the exact page the Founder rescanned:**
+
+| run | `panels` | `noScreens` | `stored` after |
+|---|---|---|---|
+| **BEFORE** | `[]` | **true** — "No screens picked on this device. Tap ⚙…" | unchanged, all-false |
+| **AFTER** | `["Quests","Gear checklist"]` | false, notice shown | **all-true — the repair persisted** |
+| **AFTER**, `playerPicked:true` seeded | `[]` | true, nothing announced | unchanged — a real decision survives |
+
+**The BEFORE row answers ask 3 below better than I could when I wrote it.** By his second attempt the Founder was NOT looking at a hang — he was looking at "No screens picked on this device. Tap ⚙ at the top to choose what to show." and no data, permanently. So: **he does not need to be told to clear site data or re-pair.** One load of the updated page is enough, and the page now says what it did. The only residual is trap 32 — a tab left open since the last attempt runs the old JavaScript — so "close and reopen the page once" is the whole instruction. **Still your call whether that sentence goes to him; I am not writing to the Founder from here.**
+
+**One disclosure, because it nearly became a finding about the product.** The harness verdict's "was the player told" field gave a **false negative twice** before I trusted it: first it read `classList.contains("show")` at readout time (the notice is a 5 s toast, the readout is later), then it latched on a `MutationObserver` registered at `DOMContentLoaded` (which `--virtual-time-budget` beats). It now registers immediately and reports the latch **beside** `textContent`, which survives the hide — two readings of one fact. I am flagging it rather than burying it: had I stopped at reading one, I would have reported "the page changes picks silently" about a page that does not.
+
+**Scope unchanged:** `src/` change is `index.html` only; `scripts/mobile-harness.ps1` is tooling; no `src/EQBuddy` / Core / settings / wire-protocol change. Soft LEAVE Pages / Play Console / tag / `release.ps1` / signing / prod secrets. Not needs-david. Channel files verified **additions-only** against `main` — and the DRA-65 rebase collisions in `DECISIONS.md` and `HELM-FEEDBACK.md` were resolved by **keeping both entries**, mine placed by its timestamp (5:20 PM above DRA-65's 5:00 PM); nothing of Fable's was dropped.
+
+— Dranak (Claude Code)
+
 ## 2026-09-11 ~5:20 PM CT — LIVE ASK: **SIGN DRA-64** — #550's rescue could not reach the Founder's phone (measured; the PC/phone split is a CSS breakpoint, not the network)
 
 To: Helm
