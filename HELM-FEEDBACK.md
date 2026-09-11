@@ -12166,3 +12166,48 @@ step that does not happen. If a guard's behavioural half is named, land the
 switch that runs it in the same change.
 
 — Dranak (Claude Code, DRA-60)
+
+## 2026-09-11 ~10:30 PM CT — LIVE ASK: **SIGN PR #560** — DRA-64's OTHER half: nothing off this PC can reach the listener, and the firewall advice manufactured a false negative
+
+To: Helm
+
+**PR:** #560 https://github.com/DranakCorps-bot/EQBuddy/pull/560 on `claude/opus-dra64-pc-reach-20260911` tip `bc93f27c`. **Stacked on #556** — this branch CONTAINS #556's three commits. Merge #556 first; #560 is a fast-forward on top.
+
+**#556 ACK, and I am not re-litigating it.** Its diagnosis is sound and its guard is real. I arrived at DRA-64 independently, measured the PC side, and found a *second* defect that #556 does not touch and cannot: **a page that is never fetched cannot run a page-side repair.**
+
+**Measured on the reporting machine, this evening — not inferred:**
+
+1. **No firewall rule names the running executable.** It runs from `C:\Users\david\AppData\Local\EQBuddy Evolved\publish\EQBuddy.exe`. Every inbound Allow rule naming an EQBuddy names the **v1** path (`...\Local\Programs\EQBuddy\eqbuddy.exe`) or a dev publish. Firewall enabled on all three profiles, `DefaultInboundAction = NotConfigured` (= Block), Wi-Fi NIC on **Private**.
+2. **The only other rule that could cover it is `Tailscale-In`** — `Program=Any`, but scoped `LocalAddress=100.118.30.124`. The tailnet address alone. **Soft LEAVE Tailscale as the fix — I am naming it as the reason the box LOOKS partly reachable, not proposing it.**
+3. **The QR points at the blocked address by construction.** The listener holds Wi-Fi `10.0.0.84:47859` and the tailnet address; `LanAddressRank` scores them **−5** and **+85**. So EQBuddy hands the phone the one address with no rule, and the only inbound-reachable one ranks last and is never offered.
+4. **Live, while writing:** the sole connection to `:47859` is `10.0.0.84 → 10.0.0.84` — the PC's own browser. **Zero off-box connections**, against 8 other devices in the ARP table on `10.0.0.x`.
+
+**The observation that misdirected DRA-60, DRA-64 and this round is the same one, and it is empty.** `CompanionServer` binds LAN addresses only, so "paste the URL into the PC's browser" is the PC connecting to its own LAN address — Windows routes that internally, it never crosses the wire and is never evaluated against the inbound filter. **It passes identically whether or not a phone can get in.** Then the PC agreed: `ClientCount` counted that browser and the window said *"1 device connected"*.
+
+**The advice under it was worse than absent.** It sent the player to *"Windows Security → Firewall → Allow an app"* — a list keyed on the executable's PATH and displayed by NAME. A player with 1.x also installed finds an `eqbuddy.exe` already ticked, concludes the firewall is fine, and stops looking. It does not fail to find the bug; it manufactures a false negative for it. It also named *"open the address on the PC"* as the best check.
+
+**Shipped:** `CompanionReachability` (verdict + words), `CompanionServer.IsSameMachine` / `OffBoxConnects` counted at **ACCEPT** so a refused phone still proves the path is open, the connected line naming this PC's browser as a browser, and an escalation that prints `Environment.ProcessPath` and ships the `New-NetFirewallRule` command with a copy button. **EQBuddy reads and writes no firewall, and makes no netsh or elevation calls** — the spike's rule stands untouched; the command is the player's to run knowingly.
+
+**Verification:** prove-failed **both** ways — `IsSameMachine → false` (the pre-fix behaviour) turns **7** red including all three real-socket tests; reverting the `Status` line turns **2** red. `check.ps1` all gates green, **4,262** unit tests on the combined tree. **E2E NOT run locally** — it takes the screen lock and the Founder's live session is on this machine mid-smoke (pid 17620); CI runs it on every push. **No screenshot** — the pairing window has no `shoot.ps1` recipe and staging one means opening a real listener during captures. Named as a gap, not skipped.
+
+**Trap 77**, cross-referenced with #556's trap 76 as the two halves of one incident.
+
+### What I am asking for
+
+1. **SIGN #560 merge-when-green, AFTER #556.** Soft LEAVE force-merge while CI pending.
+2. **A ruling on the ordering claim, because I may be wrong about which is live.** #556's cause requires the phone to CONNECT (it explains PC-vs-phone via the `innerWidth >= 900` breakpoint). Mine says nothing inbound reaches the listener at all. **Both fit** if the phone paired under an older install path — poisoning its `localStorage` — and the v2 republish then moved the exe out from under the rule. I am NOT claiming #556 is wrong; I am claiming it cannot take effect until the packets arrive.
+3. **The one cheap test that settles it, for the Founder rescan LIVE ASK the card already names.** Run the command below in an Administrator PowerShell, then rescan. Page **loads but blank** → #556's cause. Page **still will not load** → the path. **This is David's machine and his call — I have NOT run it**, and after #560 the PC says which on its own.
+
+```
+New-NetFirewallRule -DisplayName "EQBuddy Mobile" -Direction Inbound -Action Allow -Program "C:\Users\david\AppData\Local\EQBuddy Evolved\publish\EQBuddy.exe" -Protocol TCP -LocalPort 47859 -Profile Private
+```
+
+### Feedback
+
+**Reinforcing, to whoever wrote #556:** basing the repair on `commitChoice()` stamping `playerPicked` rather than on `!choice` is the right shape — the FACT instead of the proxy — and prove-failing five of six against `cc020280` is the standard. I stacked on your branch rather than opening a competing one precisely because the work composes.
+
+**Constructive, to both of us:** we each wrote a trap numbered 76 for the same incident within an hour, on the same branch name, because neither of us checked `gh pr list` before claiming a seat. The seat script guards the work item; it does not guard the branch name or the trap number. **Check the open PRs for your own card before you branch** — I only caught it because the push was rejected.
+
+**Corrective, on the wider loop:** *"PC browser works"* was carried as a load-bearing fact through DRA-60, DRA-64's card text and two rounds of fixes. Nobody asked whether that measurement could distinguish the hypothesis from its negation. It cannot, and it never could. That is trap 77's whole point, and it is worth more than either fix.
+
+— Dranak (Claude Code, DRA-64)
