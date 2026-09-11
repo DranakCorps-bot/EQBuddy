@@ -148,6 +148,61 @@ public static class CompanionActions
         }
     }
 
+    /// <summary>
+    /// A tap on a GENERAL-tab quest guide's step or card verb (DRA-46) — the same router door
+    /// the desktop's click goes through, with this quest in hand.
+    ///
+    /// <para><b>Its own method, and not a case in the overload above.</b> That one resolves a
+    /// guide against the Sky and Epic stores; a normal quest's steps live in neither, and
+    /// every home they DO land in needs the <see cref="QuestEntry"/> — the turn-in item list
+    /// for a <c>Collect</c> step, the completion record for the hand-in. Handing those calls a
+    /// quest-less <c>GuideStores</c> would route every one of them to the guide ledger, which
+    /// is a second answer to "do I have four Blue Orc Heads" that the bags would never move
+    /// (trap 4). So the catalog is a parameter, and no catalog means no tap rather than a tick
+    /// in the wrong store.</para>
+    ///
+    /// <para>A <c>LedgerItem</c> step is REFUSED by the router and returns false here — no
+    /// save, no repaint. The page draws those rows as the card's own item rows, which carry no
+    /// checkbox, so this is belt-and-braces against a stale page (trap 32) rather than the
+    /// only guard.</para></summary>
+    public static bool ApplyQuestGuide(
+        AppSettings settings, QuestLedgerStore ledger, string characterKey,
+        QuestCatalog? catalog, CompanionAction action)
+    {
+        if (characterKey.Length == 0) return false;
+
+        var id = action.Id;
+        var skipping = id.StartsWith(SkipVerb, StringComparison.Ordinal);
+        if (skipping) id = id[SkipVerb.Length..];
+        if (!GuideChecklistProjection.IsGuideRowId(id)) return false;
+        if (GuideChecklistProjection.Resolve(GuideCatalog.Default, id)
+            is not var (guide, objective)) return false;
+
+        if (skipping)
+        {
+            if (GuideProgressRouter.IsSkipped(ledger, characterKey, guide.Id, objective)
+                == action.Done)
+                return false;
+            GuideProgressRouter.SetSkipped(ledger, characterKey, guide.Id, objective, action.Done);
+            return true;
+        }
+
+        if (catalog is null || guide.QuestName.Length == 0) return false;
+        var quest = catalog.Quests.FirstOrDefault(
+            q => q.Name.Equals(guide.QuestName, StringComparison.OrdinalIgnoreCase));
+        if (quest is null) return false;
+
+        var stores = new GuideStores([], [], quest);
+        if (GuideProgressRouter.HomeFor(objective, stores, out _) == GuideProgressHome.LedgerItem)
+            return false;
+        if (GuideProgressRouter.IsDone(settings, ledger, characterKey, guide.Id, objective, stores)
+            == action.Done)
+            return false;
+        GuideProgressRouter.SetDone(
+            settings, ledger, characterKey, guide.Id, objective, stores, action.Done);
+        return true;
+    }
+
     /// <summary>The epic checklist rows a guide's objectives may write into: that guide's own
     /// classes, honouring the classic-era lens the tab was drawn under. Empty for a guide that
     /// is not an epic one, so a Sky tap can never reach this store.</summary>

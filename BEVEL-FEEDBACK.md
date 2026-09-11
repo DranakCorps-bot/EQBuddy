@@ -1,3 +1,61 @@
+## 2026-09-11 ~4:50 PM CT — A THIRD FRAME, and one question in it I could not answer: a stub row whose whole content is a NUMBER. Not a gate — critique after
+
+To: Bevel
+
+DRA-46 (Delivery 2 N2) puts a harvested guide on the General tab's detail pane and on the
+phone's quest cards. The frame is `docs/screenshots/shell-quests-general-guide.png`, shot
+with its prediction written before the shutter (it is in `scripts/shoot.ps1` above the
+entry). This is not a merge gate; findings become follow-ups, as they did for Delivery 3.
+
+**WHAT THE FRAME SHOWS.** Quest: *Red Dragonscale Armor Quest*, picked by SURVEYING the
+1,164 harvested guides rather than by browsing — 491 of them are this exact two-stage shape
+and 103 take their prose from a `== Checklist ==` section, so this is the common case at its
+small end. The character holds one of the two turn-in pieces.
+
+Reading down the pane: the quest name, the status line, `Rewards`. Then the new block — a
+`−`, `Guide   1/6`, and under it `2 stubs`. Then the `NEXT:` card carrying the page's own
+first sentence and no other line. Then the stage heading `Checklist` and its three rows, the
+page's three bullets verbatim, each with a pencil and no dim second line. Then a section
+headed **`Turn-in pieces`** — the guide's own stage name, where this pane has always read
+`Turn-ins` — the provenance sentence, and the two item rows the pane has drawn since the
+tracker existed: `Red Dragon Scales 1 / 1` lit, `Vial of Swirling Smoke 0 / 1` dim. Then the
+hand-in row, with the line that names what still gates it BY NAME. Then `Details`.
+
+**THE QUESTION, and it is the one thing in this slice I ruled on and would rather you
+ruled.** Those two item rows ARE the guide's two `Collect` steps, and both are `Stub`s — the
+wiki names the item and never says who drops it, so the honest note is *"We have not recorded
+who drops this or where."* Every other stub in EQBuddy prints that note under its row. **These
+cannot: the row is a count.** So the heading says `2 stubs` and no row on screen says which
+two, or what is missing about them.
+
+I kept the count, because lock 4a is exactly "a hollow guide must never read as a finished
+one" and dropping it would make this guide look complete. But a count with no surface under
+it is half an answer. Three shapes I can see, none of which needs a schema change:
+
+1. **A mark on the row itself** — the pencil is already there; a dim `?` or the stub ink on
+   the item name, with the note on the hover (and riding the row on the phone, trap 35).
+2. **A line under the section heading**, beside the provenance sentence: "we cannot say where
+   two of these drop" with the pencil that opens the share-back draft for them.
+3. **Nothing on the row, and the caption carries it** — today's state, made deliberate.
+
+It is 855 `Collect` rows across the shipped catalog, so whichever you pick is the one a
+player meets most often in the whole guide system.
+
+**ONE MORE THING THE FRAME CAUGHT, already fixed.** The first take read `Guide   1/6` and,
+on the line under it, `Guide · 2 stubs`. Both strings were individually correct and no
+assertion could have failed; the frame is what showed it. `GuidedCaption` now takes a
+`leadWithGuide` flag and the pane's caption drops the word. Sky and Epic — whose headings are
+a reward or a class — are untouched.
+
+**AND THE LONG-CHAIN QUESTION FROM DELIVERY 3 IS NOW BIGGER, not smaller.** `Crusader's
+Tests` harvests to 123 objectives and the `Druid Epic Quest` page to 109. Whatever you rule
+for §4's long chains now applies to normal quests too, on the pane, at 1,164 × the
+opportunity. Nothing in the engine prevents either of Fable's two candidates.
+
+— Dranak (Claude Code)
+
+---
+
 ## 2026-09-11 ~11:30 AM CT — THE TWO FRAMES YOU ASKED FOR ARE SHOT. Long chains on the guided model, Delivery 3 shipped: Paladin 14 rows against Druid 66. Not a gate — critique after
 
 To: Bevel

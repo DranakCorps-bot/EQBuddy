@@ -1129,7 +1129,78 @@ public partial class QuestsView : UserControl
         // which is the whole assertion.
         $"questsGuideCards={GuideElementsOnScreen<Border>(GuideCardTag)} " +
         $"questsGuideNext={NextRowIdLengths()} " +
-        $"questsGuideSkipped={GuideRowsOnScreen().Count(c => Struck(c))}";
+        $"questsGuideSkipped={GuideRowsOnScreen().Count(c => Struck(c))} " +
+        // ---- the General tab's detail pane (DRA-46) ----
+        // A SEPARATE set of keys, because every one above sweeps QuestsPanel — the checklist
+        // panel — and the pane is a different visual tree. Read one for the other and an
+        // assertion about the guide on the Sky tab would pass over an empty detail pane.
+        //
+        // Counted off the REAL tree by the Tag each element carries (trap 39) rather than
+        // from the projection's own return: the question is "did the rows reach the screen".
+        // The one exception is questsDetailGuide, which is a fact about the DATA — whether a
+        // guide claims this quest at all — and is 0 for "no guide" where the counts are 0
+        // both for "no guide" and for "folded", which is why the fold is dumped beside them.
+        $"questsDetailGuide={(_detailGuide is null ? 0 : 1)} " +
+        $"questsDetailGuideFolded={(_detailGuide is { Collapsed: true } ? 1 : 0)} " +
+        // The projection's own totals, so an E2E can compare what the guide HAS against what
+        // the pane DREW — "the store says so" and "the screen says so" are different claims
+        // and trap 56 says they must come from one moment, which they do: both are read here.
+        $"questsDetailGuideTotal={_detailGuide?.Total ?? 0} " +
+        $"questsDetailGuideDone={_detailGuide?.Done ?? 0} " +
+        // …and the split the pane draws on: walkthrough rows versus the turn-in item rows
+        // those Collect steps ARE. Their sum is the total above, which is the assertion that
+        // "not a second list" is actually true rather than merely intended.
+        $"questsDetailGuideItemRows={_detailGuide?.Rows.Count(r => r.LedgerItemName.Length > 0) ?? 0} " +
+        $"questsDetailGuideRows={DetailGuideRows().Count()} " +
+        $"questsDetailGuideTicked={DetailGuideRows().Count(c => c.IsChecked == true)} " +
+        // Stub captions the guide BODY drew, beside the caption line that counts the guide's
+        // stubs as a whole. The two differ on purpose and the gap is a real finding rather
+        // than a defect: a harvested Collect step IS a stub ("we have not recorded who drops
+        // this"), and its row is the turn-in item row, which has no place to say so. So the
+        // heading says "2 stubs" and no row does. Dumped as two numbers so the next person
+        // reads it as the open question it is instead of rediscovering it.
+        $"questsDetailGuideStubs={DetailGuideStubs()} " +
+        $"questsDetailGuideCaption={DetailElements<TextBlock>(GuideCaptionTag)} " +
+        $"questsDetailGuideStages={DetailElements<TextBlock>(DetailGuideStageTag)} " +
+        $"questsDetailGuideCards={DetailElements<Border>(GuideCardTag)} " +
+        $"questsDetailGuideImprove={DetailImproveDoors()} " +
+        // The turn-in rows the pane drew, and how many of them are LIT. A Collect row lights
+        // from the router's LedgerItem answer (Have >= Need), so this is where "the ledger
+        // reached the screen" is visible — the same number the item rows and the guide's own
+        // Done both have to agree with.
+        $"questsDetailItemsLit={DetailItemRowsLit()} " +
+        $"questsDetailGuideNext={(_detailGuideCard?.RowId.Length ?? 0)}";
+
+    // The pane's own sweeps. Same two arrangements the checklist's have to cope with — a bare
+    // element, or one inside the Grid its share-back door put it in (trap 16's neighbour).
+    private IEnumerable<FrameworkElement> DetailElements() =>
+        DetailPane.Children.OfType<FrameworkElement>()
+            .SelectMany(e => e is Grid g
+                ? g.Children.OfType<FrameworkElement>().Prepend(e)
+                : [e]);
+
+    private int DetailElements<T>(string tag) where T : FrameworkElement =>
+        DetailElements().OfType<T>().Count(e => e.Tag as string == tag);
+
+    private IEnumerable<CheckBox> DetailGuideRows() =>
+        DetailElements().OfType<CheckBox>().Where(c => c.Tag as string == GuideRowTag);
+
+    private int DetailGuideStubs() => DetailGuideRows()
+        .Select(c => c.Content).OfType<StackPanel>()
+        .SelectMany(p => p.Children.OfType<TextBlock>())
+        .Count(t => t.Tag as string == GuideStubTag);
+
+    private int DetailImproveDoors() => DetailPane.Children.OfType<Grid>()
+        .SelectMany(g => g.Children.OfType<Button>())
+        .Count(b => b.Tag as string == GuideImproveTag);
+
+    /// <summary>Turn-in item rows drawn LIT. An item row is a Border inside the Turn-ins
+    /// section's StackPanel whose count run is inked GoodBrush — so rather than re-deriving
+    /// the predicate here, the row is tagged when it is drawn lit and this counts the tag
+    /// (trap 39: identity is a property you PUT on the object).</summary>
+    private int DetailItemRowsLit() => DetailPane.Children.OfType<StackPanel>()
+        .SelectMany(p => p.Children.OfType<Border>())
+        .Count(b => b.Tag as string == ItemRowMetTag);
 
     /// <summary>
     /// The SUM of every drawn card's next-row-id length.
@@ -1615,6 +1686,8 @@ public partial class QuestsView : UserControl
     private void BuildDetail(RowEntry? entry)
     {
         DetailPane.Children.Clear();
+        _detailGuide = null;
+        _detailGuideCard = null;
         if (entry is null)
         {
             DetailPane.Children.Add(EmptyState("Select a quest to see its rewards, turn-ins and where to go."));
@@ -1702,7 +1775,26 @@ public partial class QuestsView : UserControl
         DetailPane.Children.Add(status);
 
         if (m.Quest.Rewards.Count > 0) DetailPane.Children.Add(Rewards(m));
-        if (m.Items.Count > 0) DetailPane.Children.Add(Objectives(m));
+
+        // THE GUIDE (DRA-46 / Fable §3 N2). One call, the same one EQBuddy Mobile makes, so
+        // the phone and this pane cannot show different walkthroughs for one quest. Null for
+        // a quest nothing has a guide for, and then this pane is exactly what it was.
+        _detailGuide = _main.QuestLedger is { } ledger
+            ? GuideChecklistProjection.ForQuest(
+                m.Quest, GuideCatalog.Default, _settings, ledger, _main.QuestCharacterKey)
+            : null;
+        if (_detailGuide is { } guided)
+        {
+            DetailPane.Children.Add(GuideHeadRow(guided));
+            // FOLDED (the default, as on Sky): the heading, its count and its caption, and
+            // the turn-in rows go back to being the pane's own section. A fold hides the
+            // WALKTHROUGH; it must never hide how many Blue Orc Heads you are carrying, which
+            // is the question this tab has answered since the tracker existed.
+            if (guided.Collapsed) { if (m.Items.Count > 0) DetailPane.Children.Add(Objectives(m, null)); }
+            else RenderQuestGuide(guided, m);
+        }
+        else if (m.Items.Count > 0) DetailPane.Children.Add(Objectives(m, null));
+
         DetailPane.Children.Add(Details(m, entry.CompletedCount));
 
         // THE primary action, and the only one on the surface: "I handed it in". It was
@@ -1724,6 +1816,224 @@ public partial class QuestsView : UserControl
                 l.RecordCompletion(_main.QuestCharacterKey, m.Quest.Name, m.Quest.Items));
             DetailPane.Children.Add(handIn);
         }
+    }
+
+    // ---- the guide, inside the detail pane (DRA-46) ----
+
+    /// <summary>The projected guide for the SELECTED quest, or null. Rebuilt with the pane and
+    /// cleared with it, so it can never describe a quest that is no longer on screen — the
+    /// same reason <see cref="_lastGuideCards"/> is reset beside the panel it describes.</summary>
+    private QuestChecklistGroup? _detailGuide;
+
+    /// <summary>The pane's active-step card, for <see cref="DebugFacts"/>. Its own field and
+    /// NOT <see cref="_lastGuideCards"/>: that list is cleared by a render, and this pane is
+    /// also rebuilt by a bare CLICK on a row, which would have appended a second copy of the
+    /// same card every time the player changed selection without a refresh.</summary>
+    private QuestChecklistCard? _detailGuideCard;
+
+    /// <summary>The tag the pane's guide heading row carries.</summary>
+    private const string DetailGuideHeadTag = "detailGuideHead";
+    /// <summary>The tag each stage heading inside the pane's guide carries.</summary>
+    private const string DetailGuideStageTag = "detailGuideStage";
+
+    /// <summary>The guide's own heading line: the fold control, the word, the count, and the
+    /// caption under it — the same four things a guided Sky heading carries, because it is the
+    /// same projection and the same fold key (<c>GuideChecklistProjection.FoldKey</c>, which is
+    /// the guide id here: a normal quest's group has no completion key).
+    ///
+    /// <para>It is not the quest's NAME: the pane's own title is already that, two lines up,
+    /// and a heading repeating it would spend the line that says how far along you are.</para></summary>
+    private UIElement GuideHeadRow(QuestChecklistGroup group)
+    {
+        var row = new Grid { Tag = DetailGuideHeadTag };
+        row.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+        row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+        row.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
+        row.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
+
+        var fold = FoldToggle(group);
+        if (fold is FrameworkElement fe)
+            fe.Margin = new Thickness(0, DesignTokens.SpaceM, 0, DesignTokens.SpaceXxs);
+        row.Children.Add(fold);
+
+        var title = DesignSystem.Text(Role.TitleSection,
+            $"{GuidePresentation.QuestHeading}   {group.Done}/{group.Total}");
+        title.TextWrapping = TextWrapping.Wrap;
+        title.VerticalAlignment = VerticalAlignment.Center;
+        title.Margin = new Thickness(DesignTokens.SpaceXs, DesignTokens.SpaceM,
+            0, DesignTokens.SpaceXxs);
+        Grid.SetColumn(title, 1);
+        row.Children.Add(title);
+
+        if (group.GuideCaption.Length > 0)
+        {
+            var caption = DesignSystem.Text(Role.Caption, group.GuideCaption);
+            caption.TextWrapping = TextWrapping.Wrap;
+            caption.Ink("DimBrush");
+            caption.Tag = GuideCaptionTag;
+            Grid.SetRow(caption, 1);
+            Grid.SetColumn(caption, 1);
+            row.Children.Add(caption);
+        }
+        return row;
+    }
+
+    /// <summary>
+    /// The open guide: the NEXT card, then the stages, then the rows — and <b>the turn-in item
+    /// rows drawn WHERE THE GUIDE'S OWN "Turn-in pieces" STAGE FALLS</b>, as the rows this pane
+    /// has always drawn rather than a second copy of them under a checkbox (Fable §3 N2).
+    ///
+    /// <para>That is the whole shape of the slice. A harvested guide's <c>Collect</c> steps
+    /// were built from this quest's catalog item list, their done state is the character's
+    /// owned count, and the pane has drawn exactly those rows — with have/need, the live wiki
+    /// hover and the manual count editor — since the tracker existed. Drawing them again as
+    /// guide rows would put one fact on screen twice, once clickable and once refused
+    /// (<c>GuideProgressRouter.SetDone</c> refuses a <c>LedgerItem</c> click), which is trap 4
+    /// on the first screen a player opens. So the guide does not draw them:
+    /// <c>GuideChecklistProjection.WalkthroughRows</c> is the one producer of the split and the
+    /// phone asks it the same question.</para></summary>
+    private void RenderQuestGuide(QuestChecklistGroup group, QuestMatch m)
+    {
+        var setters = QuestGuideSetters(group, m);
+
+        // ABOVE the steps: the one thing here that says "do this next" rather than "here is
+        // everything" belongs where the eye lands (trap 44).
+        if (group.GuideCard is { } card)
+        {
+            _detailGuideCard = card;
+            DetailPane.Children.Add(GuideCardView(group, card, setters, locked: false));
+        }
+
+        // The stage the item rows ARE. Taken from the rows themselves rather than from the
+        // transformer's constant, because the name belongs to the guide: a curated guide may
+        // put its pieces under any heading, and a literal here would be a second producer of
+        // it that drifts the day one does (trap 4).
+        var itemStage = group.Rows
+            .FirstOrDefault(r => r.LedgerItemName.Length > 0)?.IslandHeading ?? "";
+        var itemsDrawn = false;
+        var lastStage = "";
+        foreach (var row in GuideChecklistProjection.WalkthroughRows(group))
+        {
+            if (row.IslandHeading != lastStage)
+            {
+                lastStage = row.IslandHeading;
+                if (itemStage.Length > 0 && row.IslandHeading == itemStage)
+                {
+                    // The stage heading IS this section's label, and the rows under it are
+                    // the item rows. One heading, one list.
+                    DetailPane.Children.Add(Objectives(m, group));
+                    itemsDrawn = true;
+                }
+                else if (row.IslandHeading.Length > 0)
+                {
+                    DetailPane.Children.Add(StageHeading(row.IslandHeading));
+                }
+            }
+            DetailPane.Children.Add(QuestGuideRow(group, row, setters));
+        }
+
+        // A guide whose pieces stage has no walkthrough row of its own (no hand-in) never
+        // reached the branch above, and a quest's turn-ins must not vanish because of how its
+        // guide happens to be shaped.
+        if (!itemsDrawn && m.Items.Count > 0) DetailPane.Children.Add(Objectives(m, group));
+    }
+
+    /// <summary>One tick writer per guide row, through the router with THIS quest in hand —
+    /// so a <c>Collect</c> step answers from the bags, the hand-in writes the same completion
+    /// record the ✓ above writes, and a step nothing else has an opinion about lands in the
+    /// guide ledger. Never a store written directly here; that is what the one-writer source
+    /// scan is looking for.</summary>
+    private Dictionary<string, Action<bool>> QuestGuideSetters(
+        QuestChecklistGroup group, QuestMatch m)
+    {
+        var setters = new Dictionary<string, Action<bool>>(StringComparer.Ordinal);
+        if (_main.QuestLedger is not { } ledger) return setters;
+        if (GuideCatalog.Default.Find(group.GuideId) is not { } guide) return setters;
+        var stores = new GuideStores([], [], m.Quest);
+        foreach (var objective in guide.AllObjectives)
+        {
+            var step = objective;
+            setters[GuideChecklistProjection.RowId(guide.Id, step.Id)] = done =>
+                GuideProgressRouter.SetDone(_settings, ledger,
+                    _main.QuestCharacterKey, guide.Id, step, stores, done);
+        }
+        return setters;
+    }
+
+    private UIElement StageHeading(string name)
+    {
+        var heading = DesignSystem.Text(Role.Caption, name);
+        heading.FontWeight = FontWeights.SemiBold;
+        heading.TextWrapping = TextWrapping.Wrap;
+        heading.Margin = new Thickness(DesignTokens.SpaceXxs, DesignTokens.SpaceM,
+            0, DesignTokens.SpaceXxs);
+        heading.Ink("DimBrush");
+        heading.Tag = DetailGuideStageTag;
+        return heading;
+    }
+
+    /// <summary>One guide step in the pane. The same row the Sky and Epic tabs draw —
+    /// title, dim who·where line, stub caption, strike-through on a skip, the six questions on
+    /// the hover and the pencil at the end — built here rather than shared with
+    /// <see cref="RenderChecklist"/> because that loop also carries islands, the epic lock and
+    /// the undo stack, none of which exist on this surface.
+    ///
+    /// <para><b>A Transcribed row draws no who·where line</b>, and that falls out of the data
+    /// rather than being decided here: those fields are empty by rule and
+    /// <c>GuidePresentation.RowDetail</c> joins nothing.</para></summary>
+    private UIElement QuestGuideRow(
+        QuestChecklistGroup group, QuestChecklistRow row, Dictionary<string, Action<bool>> setters)
+    {
+        var text = DesignSystem.Text(Role.Body, "");
+        text.TextWrapping = TextWrapping.Wrap;
+        text.Inlines.Add(new System.Windows.Documents.Run(row.Title));
+        if (row.Detail.Length > 0)
+        {
+            var detail = new System.Windows.Documents.Run("   " + row.Detail);
+            detail.SetResourceReference(System.Windows.Documents.Run.ForegroundProperty, "DimBrush");
+            text.Inlines.Add(detail);
+        }
+        text.Ink(row.Acquired || row.IsSkipped ? "DimBrush" : "TextBrush");
+        if (row.IsSkipped) text.TextDecorations = TextDecorations.Strikethrough;
+
+        FrameworkElement content = text;
+        if (row.StubNote.Length > 0)
+        {
+            var stub = DesignSystem.Text(Role.Caption,
+                GuidePresentation.StubLead + " " + row.StubNote);
+            stub.TextWrapping = TextWrapping.Wrap;
+            stub.Margin = new Thickness(0, DesignTokens.SpaceXxs, 0, 0);
+            stub.Ink("DimBrush");
+            stub.Tag = GuideStubTag;
+            // A VERTICAL StackPanel: TextWrapping does nothing in a horizontal one (trap 14).
+            var stack = new StackPanel();
+            stack.Children.Add(text);
+            stack.Children.Add(stub);
+            content = stack;
+        }
+
+        var check = new CheckBox
+        {
+            Tag = GuideRowTag,
+            Content = content,
+            IsChecked = row.Acquired,
+            Margin = new Thickness(DesignTokens.SpaceM, 1, 0, 1),
+            ToolTip = row.GuideFacts.Length > 0 ? row.GuideFacts : null,
+        };
+        if (setters.TryGetValue(row.Id, out var set))
+        {
+            check.Checked += (_, _) => Tick(true);
+            check.Unchecked += (_, _) => Tick(false);
+
+            void Tick(bool done)
+            {
+                set(done);
+                _settings.Save();
+                PushUndo(row, done, set);
+                Refresh(force: true);
+            }
+        }
+        return WithImproveDoor(check, row);
     }
 
     /// <summary>The payoff, right under the status (David, 2026-08-07: "Crude Stein Quest
@@ -1789,25 +2099,52 @@ public partial class QuestsView : UserControl
     private const string ItemRowHint =
         "Left-click: +1 (you have one more) · Right-click: clear your count (after a hand-in)";
 
-    private UIElement Objectives(QuestMatch m)
+    /// <summary>The tag a turn-in row carries when every piece it names is in hand.</summary>
+    private const string ItemRowMetTag = "itemRowMet";
+
+    /// <summary>The turn-in rows. <paramref name="guided"/> is the quest's guide when the
+    /// walkthrough is OPEN and these rows are standing in for its "Turn-in pieces" stage; null
+    /// when there is no guide, or when the player has folded it away and this is the pane's
+    /// own section again.
+    ///
+    /// <para>Two things ride on it, and both are "one producer" rather than decoration. The
+    /// LABEL becomes the guide's own stage name, because these rows are that stage. And a
+    /// row's LIT state comes from the guide row's <c>Acquired</c> — which the router answered
+    /// from the ledger — rather than from a second <c>Have >= Need</c> spelled here; the two
+    /// agree today and would be free to stop agreeing the first time either side gained a
+    /// rule (trap 4).</para></summary>
+    private UIElement Objectives(QuestMatch m, QuestChecklistGroup? guided)
     {
+        var byItem = guided is null
+            ? []
+            : guided.Rows.Where(r => r.LedgerItemName.Length > 0)
+                .GroupBy(r => r.LedgerItemName, StringComparer.OrdinalIgnoreCase)
+                .ToDictionary(g => g.Key, g => g.First(), StringComparer.OrdinalIgnoreCase);
+        var label = guided is null
+            ? "Turn-ins"
+            : guided.Rows.FirstOrDefault(r => r.LedgerItemName.Length > 0)?.IslandHeading
+              is { Length: > 0 } stage ? stage : "Turn-ins";
+
         var panel = new StackPanel { Margin = new Thickness(0, 0, 0, DesignTokens.SpaceM) };
         panel.Children.Add(new TextBlock
         {
-            Text = "Turn-ins", Style = (Style)FindResource("SectionLabel"),
+            Text = label, Style = (Style)FindResource("SectionLabel"),
         });
         // One sentence, not one per item (#241 PR 3, Bevel-signed 2026-08-27): where
         // today's have-counts came from — an inventory dump, or a log tally that cannot
         // see hand-ins.
         panel.Children.Add(Note(
             QuestPresentation.TurnInProvenanceText(m.Items, _owned, DateTime.Now), "Bag"));
-        foreach (var item in m.Items) panel.Children.Add(ItemRow(item));
+        foreach (var item in m.Items)
+            panel.Children.Add(ItemRow(item, byItem.GetValueOrDefault(item.Name)));
         return panel;
     }
 
-    private Border ItemRow(QuestItemProgress item)
+    private Border ItemRow(QuestItemProgress item, QuestChecklistRow? guideRow = null)
     {
-        var met = item.Have >= item.Need;
+        // The guide's answer when a guide backs this row, and this pane's own otherwise —
+        // never both, and never two expressions of it (see Objectives).
+        var met = guideRow?.Acquired ?? item.Have >= item.Need;
         var record = ItemCatalog.Default.Find(item.Name);
 
         var grid = new Grid();
@@ -1843,6 +2180,10 @@ public partial class QuestsView : UserControl
                 DesignTokens.SpaceM, DesignTokens.SpaceXs),
             Margin = new Thickness(0, 0, 0, DesignTokens.SpaceXxs),
             Cursor = Cursors.Hand,
+            // "This piece is in hand", stamped ON the row rather than re-derived by a sweep
+            // reading its ink back (trap 39). It is what DebugFacts counts, and it is the same
+            // boolean the guide's Collect step is ticked from.
+            Tag = met ? ItemRowMetTag : null,
         };
         row.SetResourceReference(BackgroundProperty, "RaisedBrush");
         // Same live wiki-stats hover the Loot window has (David, 2026-08-07), with the

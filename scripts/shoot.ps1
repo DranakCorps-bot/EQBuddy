@@ -518,6 +518,72 @@ $Shots = [ordered]@{
                            Set = @{
                                GuideExpanded = @('epic-druid')
                            } }
+    # ---- Delivery 2 N2 (DRA-46): A HARVESTED GUIDE ON THE GENERAL TAB'S DETAIL PANE ----
+    #
+    # The frame the slice is about. The address carries a SEARCH after the tab key
+    # ('quests:general:<query>'), which is the only way to put a chosen quest in the pane:
+    # a search reads the whole catalog, matches one quest, and the pane selects the only
+    # row — no ownership staging needed for the selection itself, so the ledger below is
+    # staging exactly one thing and nothing else can pass because of it (trap 22/23).
+    #
+    # The QUEST was picked by SURVEYING the shipped harvested file rather than by browsing
+    # for one that looked good (2026-09-11; the survey is written out in
+    # QuestGuideProjectionTests): 1,164 guides, of which 491 are the two-stage
+    # prose+skeleton shape and 103 take their prose from a `== Checklist ==` section. This
+    # is the small, total end of that set.
+    #
+    # PREDICTED before shooting (trap 23), from the shipped catalog and the ledger below:
+    #
+    #   * The LIST pane holds ONE row — the search matched one quest — and it is selected.
+    #   * The pane's title, "Red Dragonscale Armor Quest", in accent ink; under it the
+    #     status line "1 of 2 turn-ins started" (one Red Dragon Scale held, no Vial); then
+    #     "Rewards" with the single tile "Red Dragonscale Armor".
+    #   * Then the GUIDE, and it is NEW: a "−" fold control, "Guide   1/6", and under the
+    #     name the caption "2 stubs".
+    #
+    #     THE FIRST TAKE READ "Guide · 2 stubs" THERE, on the line under a heading that had
+    #     just said "Guide" — correct on both sides and redundant on screen, which is the
+    #     class of defect only a frame shows. GuidePresentation.GuidedCaption now takes
+    #     `leadWithGuide`, and the Sky/Epic captions (whose headings are a reward or a class)
+    #     are unchanged.
+    #
+    #     THE CAPTION AND THE ROWS DISAGREE ON PURPOSE, and this frame is where that is
+    #     visible: the two stubs are the Collect steps, and a Collect step's ROW is the
+    #     turn-in item row further down, which has nowhere to print "we have not recorded
+    #     who drops this". So the heading says 2 stubs and no row does. It is the honest
+    #     count (lock 4a — a hollow guide must not read as a finished one) with no surface
+    #     under it, and it is filed to Bevel off this frame rather than answered here.
+    #
+    #   * The NEXT card: "NEXT:" then the page's own first sentence verbatim ("Red Dragon
+    #     Scales from Lord Nagafen or Talendor") and NOTHING ELSE above the verbs — no
+    #     direction line, no detail line, and no "Works toward …": who and where are empty
+    #     by rule on a Transcribed step, and the quest's name is already the pane's title
+    #     two lines up. Then Done / Skip / the pencil.
+    #   * The stage heading "Checklist" and THREE rows, the page's three bullets in the
+    #     page's order, each with a pencil and NO dim second line.
+    #   * Then the section headed "Turn-in pieces" — the guide's own stage name, where this
+    #     pane has always read "Turn-ins" — the #241 provenance sentence, and the TWO item
+    #     rows the pane has drawn since the tracker existed: "Red Dragon Scales  1 / 1" lit
+    #     green, "Vial of Swirling Smoke  0 / 1" dim. They are the Collect steps. There is
+    #     no second copy of them under a checkbox, which is the whole claim of N2.
+    #   * Under them the hand-in row, "Hand the pieces to Karam Dragonforge", with the dim
+    #     line naming what still gates it BY NAME ("after: Collect Vial of Swirling Smoke")
+    #     rather than repeating who and where — the one moment the guide can answer "what
+    #     unlocks this" without the player scrolling.
+    #   * Then "Details" (Zone · Giver · Level · Class), and NO "Mark as turned in" button:
+    #     a piece is still missing, and the button appears only when the set is complete.
+    'shell-quests-general-guide' = @{ Title = 'EQBuddy — Guide'
+                           Env = @{ EQBUDDY_SHELL = 'quests:general:Red Dragonscale Armor Quest'
+                                    EQBUDDY_SHELL_SIZE = '1000x900' }
+                           # The fold key of a guided NORMAL quest is its GUIDE ID — the
+                           # group has no reward key to fold under. Same key the "+" writes
+                           # (GuideChecklistProjection.FoldKey).
+                           Ledger = @{ Items = @{
+                               'Red Dragon Scales' = @{ Manual = 1 }
+                           } }
+                           Set = @{
+                               GuideExpanded = @('harvested-red-dragonscale-armor-quest')
+                           } }
     'shell-quests-split' = @{ Title = 'EQBuddy — Guide'
                            Env = @{ EQBUDDY_SHELL = 'quests:general'
                                     EQBUDDY_SHELL_SIZE = '900x640' }; Set = @{} }

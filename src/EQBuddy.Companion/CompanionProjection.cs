@@ -267,6 +267,17 @@ public static partial class CompanionProjection
                 // The resolved list and its source: step changes (a dump read, a pick, a
                 // class clearing its evidence floor), never a per-tick drift.
                 Join(qs.CharacterClasses ?? [], c => c) + "|" + qs.ClassSourceLabel,
+                // THE GENERAL TAB'S GUIDES (DRA-46). A new reader of the guide ledger on this
+                // surface is a new thing that has to make it REDRAW — the store a feature
+                // writes has to be in the gate that repaints it, which is trap 72 exactly, and
+                // pressing Skip on a quest card would otherwise leave the phone drawing the
+                // card it was showing a moment before for the rest of the session. Headings
+                // carry the done/total count and rows carry their tick, so a step moving is a
+                // key change; nothing here drifts on a clock (trap 8).
+                Join(qs.Guides, g => g.Title + "~" + g.Heading + "~" + g.Note
+                    + "@" + (g.Card?.RowId ?? "-")
+                    + "=" + Join(g.Rows, r => $"{r.Id}:{(r.Done ? '1' : '0')}:{(r.Skipped ? 'S' : '-')}"))
+                    + "+" + qs.GuidesMore,
                 ChecklistPrint(qs.Epics),
                 ChecklistPrint(qs.Sky));
 

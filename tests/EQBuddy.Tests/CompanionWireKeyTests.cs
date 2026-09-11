@@ -142,12 +142,25 @@ public class CompanionWireKeyTests
                 InferredClass: "Druid",
                 CharacterClasses: ["Warrior", "Druid", "Monk"],
                 ClassSourceLabel: "from your achievements",
+                // DRA-46: the General tab's guides, keyed by the QUEST NAME on `title` —
+                // which is what the page joins a card on. Pinned here the day it was
+                // written, for the reason in the summary above.
+                Guides:
+                [
+                    new CompanionChecklistGroup(
+                        Heading: "Guide   1/3", Note: null, Rows: [],
+                        Title: "Blue Orc Head Quest", Fold: "quest-blue-orc-head"),
+                ],
+                GuidesMore: 4,
                 Epics: new CompanionChecklistSection(0, 0, []),
                 Sky: new CompanionChecklistSection(0, 0, [])),
             CompanionSnapshot.JsonOpts);
 
         Assert.Contains("\"characterClasses\":[\"Warrior\",\"Druid\",\"Monk\"]", json);
         Assert.Contains("\"classSourceLabel\":\"from your achievements\"", json);
+        Assert.Contains("\"title\":\"Blue Orc Head Quest\"", json);
+        Assert.Contains("\"fold\":\"quest-blue-orc-head\"", json);
+        Assert.Contains("\"guidesMore\":4", json);
         // The old single-class field rides along for one release, because an open phone
         // runs the page it downloaded weeks ago (trap 32) and that page reads it.
         Assert.Contains("\"inferredClass\":\"Druid\"", json);

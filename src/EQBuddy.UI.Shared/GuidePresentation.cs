@@ -106,6 +106,16 @@ public static class GuidePresentation
         return pieces.Count == 0 ? "" : "Needs " + string.Join(", ", pieces) + ".";
     }
 
+    /// <summary>
+    /// What a NORMAL quest's guide block is headed, on the General tab's detail pane and on
+    /// the phone's quest card (DRA-46).
+    ///
+    /// <para>One word, and deliberately not the quest's name: the pane's title and the phone
+    /// card's title are already that, a line or two above, and a heading that repeated it
+    /// would spend the line that carries the count. It leads with the same word
+    /// <see cref="GuidedCaption"/> does, so the block and its caption read as one thing.</para></summary>
+    public const string QuestHeading = "Guide";
+
     /// <summary>What the fold control says it will do. A collapsed quest shows its heading,
     /// its counts and its caption; expanding it brings back the card and the steps.</summary>
     public static string FoldTip(bool collapsed) => collapsed
@@ -142,14 +152,29 @@ public static class GuidePresentation
     /// — that is Founder lock 4a, and it is the whole reason this line exists at all. Skipped
     /// is named only when there is one, because "0 skipped" is noise on nearly every
     /// row.</para></summary>
-    public static string GuidedCaption(int skipped, int stubs)
+    public static string GuidedCaption(int skipped, int stubs) =>
+        GuidedCaption(skipped, stubs, leadWithGuide: true);
+
+    /// <summary>
+    /// The same caption, for a surface whose HEADING already says "Guide" (DRA-46).
+    ///
+    /// <para>On Sky and Epic the heading is a reward or a class, so the caption's lead is
+    /// what marks the group as guided at all. On the General tab's detail pane the pane's own
+    /// title is the quest and the block's heading is <see cref="QuestHeading"/> — so the lead
+    /// printed the word twice on consecutive lines, which the first staged frame showed
+    /// (<c>shell-quests-general-guide</c>) and no unit test could have.</para>
+    ///
+    /// <para>A parameter rather than a second string: the WORDS stay in one place, and what
+    /// the caller is stating is a fact about its own layout, not a different caption.</para></summary>
+    public static string GuidedCaption(int skipped, int stubs, bool leadWithGuide)
     {
         if (skipped == 0 && stubs == 0) return "";
 
-        var caption = "Guide";
-        if (skipped > 0) caption += $" · {skipped} skipped";
-        if (stubs > 0) caption += $" · {stubs} {(stubs == 1 ? "stub" : "stubs")}";
-        return caption;
+        var parts = new List<string>();
+        if (leadWithGuide) parts.Add("Guide");
+        if (skipped > 0) parts.Add($"{skipped} skipped");
+        if (stubs > 0) parts.Add($"{stubs} {(stubs == 1 ? "stub" : "stubs")}");
+        return string.Join(" · ", parts);
     }
 
     /// <summary>

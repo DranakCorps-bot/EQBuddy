@@ -1,3 +1,83 @@
+## 2026-09-11 (DRA-46 Delivery 2 N2 — harvested guides on the Quests tab + phone; the calls I made alone)
+
+Founder/Helm kick 2026-09-11 ~4:07 PM CT, after N1 (#534) landed. Fable's §3 N2 is the plan;
+these are the places it left a choice and I made one rather than paging anybody.
+
+**1. "'Turn-in pieces' AS the item rows the pane already draws" is enforced in the
+PROJECTION, not in each surface.** `GuideChecklistProjection.WalkthroughRows(group)` is the
+one producer of "which of these rows the guide BODY draws", and it excludes every row
+carrying the new `QuestChecklistRow.LedgerItemName`. Both the desktop pane and
+`CompanionProjection.BuildQuestGuides` call it. The default it could have gone the other way
+on: let each surface filter on the home itself, which is one line of code on each side and
+reads the same today — rejected because two filters over one rule is how the two screens
+start splitting the list differently, and a page-side rule can sit on an open phone for
+weeks after the PC has moved on (trap 32). The rows are still IN `group.Rows`, because the
+NEXT card and the guide's counts have to see them; what a surface must not do is draw them
+twice.
+
+**2. A fold hides the WALKTHROUGH and never the turn-in rows.** The plan says "folded by
+default like Sky", and the item rows are now the guide's own "Turn-in pieces" stage — so the
+literal reading is that folding a guide takes a player's `2 / 4 Blue Orc Heads` off the
+screen. That is the question this tab has answered since the tracker existed, and losing it
+to a fold is trap 26's shape (a fold is where the last writer — or here, the last READER —
+of something goes missing). So a folded guide draws the pane's own `Turn-ins` section
+exactly as it did before N2, and an open one draws the same rows under the guide's stage
+name. Asserted both ways in `QuestGuidePaneTests`.
+
+**3. A normal quest's group carries NO reward summary and NO stats block, and its card draws
+no WHY.** Its `Title` is a quest, not an item, so `GuidePresentation.RewardSummary` would
+have produced "Rewards the Red Dragonscale Armor Quest." and `ShippedItemStats` would have
+been an item lookup on a quest name. The surface that shows this group already draws the
+catalog's own Rewards beside it, in full. The WHY goes for the same reason one step further:
+"Works toward the Red Dragonscale Armor Quest." sits two lines under a pane title that says
+exactly that (recipe lesson 7 — draw only the questions a step answers). The default it
+could have gone the other way on: word a quest-shaped variant of each — rejected because
+neither would have said anything the frame did not already.
+
+**4. The phone's guides are CAPPED at 12, with the count shown.** A `Mine` row is one string
+the device joins against a catalog it already holds; a guide is ten-odd rows each carrying a
+prefilled share-back URL. A hundred and twenty of them is most of a megabyte on a surface
+that pushes whenever anything on it moves, and a first pairing ships every byte (trap 67).
+The cap follows the matcher's own order, which puts PINNED quests first — so "keep this in
+front of me" is what gets the walkthrough, and the page prints "+N more with a walkthrough …
+Pin a quest to bring its steps over" rather than capping silently (trap 50). The default it
+could have gone the other way on: ship all 120 and let the wire cost land — rejected on the
+first-pairing number, not on taste.
+
+**5. `QuestChecklistRow.IsTurnIn` now covers `QuestCompletion` as well as `SkyTurnIn`.** The
+field's own note says the hand-in must never be counted among the pieces that gate it, or
+`AllPiecesInHand` — and therefore "ready to hand in" — becomes unreachable. That was written
+about a Sky reward and is a fact about the ROLE, not about the store, so a harvested guide's
+hand-in gets it too. It is one word of a condition and it would have been silently wrong for
+every one of 1,164 guides.
+
+**6. A guide tap from the phone's GENERAL tab routes through a new
+`CompanionActions.ApplyQuestGuide`, not through the existing overload.** That one resolves a
+guide against the Sky and Epic stores; a normal quest's steps live in neither, and every
+home they do land in needs the `QuestEntry`. Handing those calls a quest-less `GuideStores`
+would route all of them to the guide ledger — a second answer to "do I have four Blue Orc
+Heads" that the bags would never move. So the catalog is a parameter and no catalog means no
+tap, rather than a tick in the wrong store. The host picks between the two on the ID's own
+shape, which is the thing the existing method's comment already said was the fact.
+
+**7. The caption under the pane's guide heading drops its "Guide ·" lead.** Found by looking
+at the first frame, not by a test: the heading said "Guide   1/6" and the caption said
+"Guide · 2 stubs" on the next line, both individually correct.
+`GuidePresentation.GuidedCaption` took a `leadWithGuide` parameter rather than gaining a
+second string, so the words stay in one place; Sky and Epic, whose headings are a reward or a
+class, are untouched.
+
+**8. A KNOWN GAP, named rather than papered over: the caption counts stubs no row can
+show.** A harvested `Collect` step is a `Stub` ("we have not recorded who drops this"), and
+its row is the turn-in item row — which has nowhere to print a stub note. So this quest's
+heading reads "2 stubs" and not one row says so. Counting them is right (lock 4a: a hollow
+guide must not read as a finished one) and the surface under it does not exist yet. It is
+dumped as two numbers (`questsDetailGuideCaption` beside `questsDetailGuideStubs`) and filed
+to Bevel off the frame, because where a stub note belongs on a count-bearing row is a design
+question and not mine.
+
+---
+
 ## 2026-09-11 (DRA-41 Delivery 3 — Epic 1.0 on the guided model; the calls I made alone)
 
 Founder kick 2026-09-11 ~7:30 AM CT. Fable's signed §1/§2 (PR #501) is the plan; these are
