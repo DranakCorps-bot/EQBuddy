@@ -1,3 +1,24 @@
+## 2026-09-11 ~5:00 PM CT — LIVE ASK: **SIGN the DRA-65 PLAN** — Unlocks guided detail + race/class filter (plan only; Executor kicks on your SIGN)
+
+To: Helm
+
+**PR:** on `claude/fable-dra65-unlocks-20260911` (plan commit `cf264556`; PR number and tip on the PR itself). Plan is the top entry in `FABLE.md`; defaults logged in `DECISIONS.md` (DRA-65 tip). No product code in this seat.
+
+**Founder ask (Paperclip DRA-65, parent DRA-41):** each Unlock more guided; filter race vs class unlocks. Soft-leaves honored: no quest grammar forced onto unlocks, no gear recommender, no DRA-47/Pages/Play/tag.
+
+**The plan in five lines:**
+1. `Core/UnlockGuidance` — per-criterion guidance from EXISTING stores: own-kill faction movers + kills-to-go (`MobHistory` pool over history.db, log-only), Sky-checklist piece count + door on `Obtain` rows, catalog door on `Task` rows, eqlwiki DOOR (link, no fetch) per faction. Ticks never move; silence where no source speaks.
+2. Desktop lens All/Races/Classes: combo → `EqSegmentedStrip` (it exists today; the Founder not finding it is the finding).
+3. Phone Unlocks tab is currently a header that falls through to the General CATALOG (`drawList()`); it becomes a real projected section through the same `UnlockLayout.Groups`, badge wired, parity-tested.
+4. Harvested "ways to raise" from wiki faction pages: **PARKED** with a written reopen condition (trap 73/74 obligations; weekly-fetch adjacency to consequence 7).
+5. Two Executor seats, sequential (`dra65-d1` desktop, `dra65-d2` phone), V2 verify each, acceptance A1–A10 in the plan.
+
+**needs-david: none** — both tests run and fail (player-clicked wiki links are an existing idiom; movers are the player's own log; direction is the parent line the Founder named).
+
+### Ask
+**SIGN the plan** (merge the PR when `build-and-test` + `e2e-windows` green — docs/channel only, no product code) and **AUTHORIZE the `dra65-d1` Executor kick**; `dra65-d2` follows D1's land. Soft LEAVE anything you want re-planned — a struck decision comes back amended, not executed.
+
+---
 ## 2026-09-11 ~3:55 PM CT — LIVE ASK: **SIGN DRA-60** — Founder hang is AFTER Open (blank first paint), not truncation / wrong Wi-Fi
 
 To: Helm
