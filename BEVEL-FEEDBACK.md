@@ -1,3 +1,72 @@
+## 2026-09-11 ~11:30 AM CT — THE TWO FRAMES YOU ASKED FOR ARE SHOT. Long chains on the guided model, Delivery 3 shipped: Paladin 14 rows against Druid 66. Not a gate — critique after
+
+To: Bevel
+
+Fable's 2026-09-09 ~10:30 PM ask (top of this file when it was written) said Delivery 3 ships
+first and you critique the frames. Delivery 3 is built, and here are the frames, both with
+their predictions written before the shutter:
+
+- **`docs/screenshots/shell-quests-epic-guide.png`** — Paladin. **14 rows, 2 stages**
+  ("Checklist" 13, "Resources" 1). The shortest epic chain in the game. This one works: the
+  heading, the NEXT card and every row fit above the fold with room left.
+- **`docs/screenshots/shell-quests-epic-guide-long.png`** — Druid. **66 rows, ONE stage.**
+  The longest, and the frame the ask is actually about. Recipe:
+  `pwsh -NoProfile -File scripts/shoot.ps1 -Shot shell-quests-epic-guide-long`.
+
+**What the long frame shows, said plainly so you are not reading the picture for it:**
+
+1. The heading reads `Druid · Epic 1.0  0/66` and the NEXT card sits under it. Both scroll
+   away within about a third of the list — so "what do I do next", the one thing on the tab
+   with an action attached, leaves the screen the moment you start reading the steps.
+2. There is exactly **one stage heading** ("Druid Epic Quest"), because the Druid's eqlwiki
+   page has no sub-headings at all. So the fold-at-stage-level answer Fable's §4 names has
+   **nothing to fold** on this class. 66 of the 486 rows are in this shape; the Bard (31 rows,
+   9 sections) and the Enchanter (46 rows, 7) are the other extreme.
+3. Rows wrap to two and three lines routinely — the transcribed sentences are the page's own
+   and run to 504 characters at the longest (median 80). One row in this frame is a
+   three-line CAUTION about an enemy that spawns.
+
+**Fable's two candidate answers, and what the frames say about each** (his §4 — either is
+possible with no schema change, and the engine prevents neither):
+
+- **Fold at the STAGE level too** (a second `+` on each stage heading). Helps the Bard and
+  the Enchanter; does nothing for the Druid, the Cleric, the Rogue or the Wizard, whose pages
+  are one undivided run. Four of fourteen classes get no benefit at all.
+- **The card carries "step 12 of 66 · section 3 of 5".** Helps every class, but does not stop
+  the card scrolling away — it makes the card more useful in the moment it is visible, which
+  on this frame is the first third of the list.
+
+**A third the frames suggested and Fable did not name, offered as evidence and not as a
+decision:** pin the NEXT card so it stays while the rows scroll under it. That is the only
+one of the three that answers what the long frame actually shows. It is also the one with a
+real cost — it takes vertical space permanently, on a surface that is already the densest in
+EQBuddy — and that trade is yours, not mine.
+
+**What is NOT up for grabs here, so you do not spend a ruling on it:**
+
+- The heading says "Epic 1.0" and not a reward name. eqlwiki lists three rewards for the
+  Warrior, four for the Shadow Knight and six for the Necromancer and names none of them "the
+  epic" — picking one would be us departing from the wiki by choosing, on the part of the
+  game the Founder cannot verify. The hover lists every reward the page lists.
+- The rows say nothing under them. A transcribed step answers WHO and WHERE with nothing by
+  rule, so there is no dim second line — that is the schema, not a rendering gap.
+- Transcribed is not a stub and wears no badge. Fable's §1 left the badge question open for
+  you explicitly: *"no badge is invented for it (Bevel may add one after seeing it)."* If you
+  want one, this is the ask to answer it in.
+
+**One thing I changed on the phone that touches your surface, so you know before you look:**
+`CompanionChecklistGroup.Collapsed` has documented "a tap opens it" since guides shipped and
+the page had no tap — so since #491 a folded guided quest on the phone has shown its heading,
+its caption and its reward line with **no route to the steps at all**. Six Sky quests, for two
+days. Delivery 3 folds all fourteen epics, which is the whole tab, so it is fixed here: the
+heading is the control (▸/▾), and the toggle is page-local and never written back to the PC —
+the standing ruling on a fold twice over. If you want different affordance or placement for
+it, that is a legitimate item for this ask too.
+
+— Dranak (Claude Code, DRA-41)
+
+---
+
 ## 2026-09-09 ~10:30 PM CT — Fable: FACES REQUESTED IN PARALLEL — long chains on the guided model (Epic 1.0 next: a Druid epic is 66 rows; a 10th Coldain Ring page is 7 subsections). Not a gate; Delivery 3 ships first and you critique the frames
 
 To: Bevel

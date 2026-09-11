@@ -1,3 +1,96 @@
+## 2026-09-11 (DRA-41 Delivery 3 — Epic 1.0 on the guided model; the calls I made alone)
+
+Founder kick 2026-09-11 ~7:30 AM CT. Fable's signed §1/§2 (PR #501) is the plan; these are
+the places it left a choice and I made one rather than paging anybody.
+
+**1. THE SCHEMA HOOK IS `GuideAttachment`, and it is EMPTY on purpose — Bevel/Fable, this is
+the name you were told to look for.** The Founder asked that guides be able to integrate
+later with gear-upgrade, recommended XP farms and gear farms, and in the same breath that we
+not fake-ship a gear recommender. So: `GuideObjective.Attachments` and
+`GuideStage.Attachments`, each a list of `{ Kind, Key }` where `Kind` is one of
+`GearUpgrade` / `XpFarm` / `GearFarm` (a STRING, not an enum, for the same reason
+`ObjectiveType` is one) and `Key` is the identity of a thing in whatever catalog owns it. It
+carries a REFERENCE and never prose; `Validate()` refuses an unknown kind and an empty key;
+and `EpicGuideTests.NoShippedGuideCarriesAnAttachmentYet` holds the shipped catalog at zero
+until the system that answers the question exists — the day it does, that test changes with
+it. The default it could have gone the other way on: a richer shape with a reason or score
+field, so the first recommender would not need a schema change — rejected because a field
+with a place for a sentence is a licence to write one, which is exactly what trap 73 cost us
+at 48 rows and would cost at 486.
+
+**2. `ObjectiveType: "Custom"` on all 486, rather than guessing Loot/Kill/TalkToNpc from the
+prose.** The type is READ — it picks the verb in `GuidePresentation.Directions` and gates the
+Sky item-backed routing home — so a wrong one is a visible wrong answer, and inferring it
+from a sentence is the inference `Transcribed` exists to refuse. The other way: a cheap
+keyword classifier ("Kill" → Kill). Rejected on the same ground as the four forbidden
+questions; the schema has a word for "we do not classify this" and it is honest to use it.
+
+**3. The guided epic group's heading is "Epic 1.0", NOT a reward name.** eqlwiki's own
+`== Rewards ==` lists three items for the Warrior, four for the Shadow Knight and six for the
+Necromancer, and names none of them "the epic". Picking one would be EQBuddy departing from
+the wiki by choosing, on the one part of the game the Founder cannot check for us (level 29).
+So the heading says what the tab says, the hover lists every reward the page lists, and there
+is no single item stats block on an epic heading. This cost one small schema addition —
+`QuestChecklistGroup.WikiPage`, because the heading has always linked
+`EqlWiki.PageUrl(Title)` and "Epic 1.0" is not a page; it now opens `{Class} Epic Quest`.
+
+**4. THE PHONE'S FOLD CONTROL — scope I added, and why I did not leave it.**
+`CompanionChecklistGroup.Collapsed` has promised "a tap opens it" since guides shipped and
+the page had no tap: a folded guided quest drew its heading, its caption and its reward line
+and offered no route to the steps. On Sky that has been hiding six quests behind a control
+nobody built; Delivery 3 folds all fourteen epics, which is the whole tab — so shipping the
+projection without this would have made the phone's Epic tab strictly worse, and "silent
+no-ops are broken" is a house rule. It is page-local and never written back to the PC, which
+is the standing ruling on a fold twice over (the level-ups fold, and the reward card's own
+note). The other way: leave epic groups unfolded on the phone only — rejected as exactly the
+per-surface divergence the shared projection exists to prevent.
+
+**5. `BuildEpics` moved onto `QuestChecklistLayout.Epic` + the projection**, which is a
+grouping change on the phone beyond the guide itself: sections now order the way the PC
+orders them. The alternative was to keep the hand-rolled copy and add guides beside it —
+rejected as the #184 defect being re-created knowingly.
+
+**6. `EpicQuestClassicOnly` is honoured through `GuideProgressRouter.Drawn`**, which reads the
+rows the tab was built from rather than re-reading `AvailableInClassic`. One producer of "is
+this row in this era". Keyed on the guide TYPE and not on "were any rows handed in", because
+those two differ in the case that matters: a class the lens has emptied must draw NOTHING,
+not everything.
+
+**7. Three Sky-shaped tests were SCOPED rather than deleted, and each got its epic
+counterpart** (`…AllClaimARewardTheChecklistKnows`, `NoTwoGuidesClaimTheSameReward`,
+`EverySkyRewardsItemIsInTheShippedCatalog…`). A narrowed guard with no positive beside it is
+a guard that quietly stopped covering the new thing (trap 34), so each names what an EPIC
+guide must instead be: no reward key at all, one guide per class, no two guides reaching for
+one row.
+
+**8. THREE THINGS THE SLICE EXPOSED RATHER THAN CAUSED, fixed here because the slice is what
+made them reachable.** (a) The active-step card's Done/Skip were live while a complete class's
+ROWS were locked — the same write through the same setter, so the tick would have been
+silently discarded by `EpicCompleteToggle.Restore`; they now lock and dim with the rows.
+(b) `QuestChecklistGroup.Note` said "ready" where `State` said `done` for any group with no
+turn-in of its own, which is every Epic group — its own doc has claimed since it was written
+that the two are derived from the same fields, and one heading per class instead of one per
+short section is what made the contradiction visible. (c) `GuideChecklistProjection.Resolve`
+scanned the whole catalog per row, which the phone calls once per row per snapshot pass: 222 ×
+222 while only Sky was guided, 486 × 708 now, and 486 × ~11,000 the week Delivery 2's harvested
+guides land. It is indexed per catalog instance, held weakly. The other way on all three: file
+them as follow-ups — rejected because (a) and (b) are wrong ANSWERS on a screen this change
+rebuilds, and (c) is a curve I am the one bending.
+
+**9. `GuideRowsTests`'s `WarriorGuides` helper was SCOPED to Plane of Sky, and the full local
+E2E is what found it.** `GuideCatalog.ForClass` answers across guide TYPES and was
+indistinguishable from "every Sky guide" while Sky was the only kind; the Warrior's epic
+guide grew every expectation in that file by 30 steps and five tests failed at once. Paired
+with a new positive (`ForClassAnswersAcrossGuideTypes`, 6 Sky + 1 Epic = 7) so the method's
+actual contract is asserted rather than inferred from a helper. Recorded because it is the
+clearest evidence for the ninth recipe lesson I sent Fable: a slice that generalises a
+matching rule must enumerate what the old rule was accidentally protecting.
+
+**Not done, deliberately:** no gear recommender, no XP-farm data, no prerequisites invented,
+no `Transcribed` step promoted to `Authored`, no tag, no release, no signing change, no
+Evolved settings restore, no Play Console. Verified locally to V3: `check.ps1`, the full unit
+suite and the full `e2e-windows` suite; CI stays the merge bar.
+
 ## 2026-09-10 (Fable, #514 last-look — the calls made alone)
 
 **1. The two misnamed Sky rewards SPLIT rather than promote together.** `Harmonic Spear` →

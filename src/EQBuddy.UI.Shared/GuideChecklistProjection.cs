@@ -43,16 +43,37 @@ public static class GuideChecklistProjection
     public static bool IsGuideRowId(string rowId) =>
         rowId.StartsWith(RowIdPrefix, StringComparison.Ordinal);
 
-    /// <summary>The guide and objective a row id names, or null. Scans rather than parses:
-    /// see <see cref="RowId"/>.</summary>
+    /// <summary>The guide and objective a row id names, or null. Built rather than parsed:
+    /// see <see cref="RowId"/> — an id containing the separator could never resolve to the
+    /// wrong objective, because the key is the id the producer made.
+    ///
+    /// <para><b>Indexed, and it had to be before Delivery 3 rather than after.</b> The phone
+    /// calls this once per row on every snapshot pass to build that row's share-back link, and
+    /// a scan is O(rows × catalog): 222 × 222 while only Plane of Sky was guided, 486 × 708
+    /// with the epics beside it, and 486 × 11,000 the week Delivery 2's harvested guides land.
+    /// The index is per catalog INSTANCE and held weakly, so a test's fixture catalog is
+    /// indexed on its own and collected with it.</para></summary>
     public static (Guide Guide, GuideObjective Objective)? Resolve(GuideCatalog catalog, string rowId)
     {
         if (!IsGuideRowId(rowId)) return null;
+        return RowIndex.GetValue(catalog, BuildRowIndex).TryGetValue(rowId, out var hit)
+            ? hit
+            : null;
+    }
+
+    private static readonly System.Runtime.CompilerServices.ConditionalWeakTable<
+        GuideCatalog, Dictionary<string, (Guide Guide, GuideObjective Objective)>> RowIndex = new();
+
+    private static Dictionary<string, (Guide, GuideObjective)> BuildRowIndex(GuideCatalog catalog)
+    {
+        var index = new Dictionary<string, (Guide, GuideObjective)>(StringComparer.Ordinal);
         foreach (var guide in catalog.Guides)
             foreach (var objective in guide.AllObjectives)
-                if (string.Equals(RowId(guide.Id, objective.Id), rowId, StringComparison.Ordinal))
-                    return (guide, objective);
-        return null;
+                // First writer wins, which is the scan's own answer — and a duplicate is a
+                // catalog defect `NoTwoEpicGuidesClaimTheSameClassOrTheSameRow` and the
+                // per-guide duplicate-id rule in Validate() already refuse.
+                index.TryAdd(RowId(guide.Id, objective.Id), (guide, objective));
+        return index;
     }
 
     /// <summary>The guide that claims a reward key, or null — the ONE matching rule.
@@ -106,10 +127,130 @@ public static class GuideChecklistProjection
             var guide = GuideFor(catalog, group.CompletionKey);
             projected.Add(guide is null
                 ? group
-                : Project(group, guide, settings, ledger, characterKey, statsFor));
+                : Project(group, guide, settings, ledger, characterKey, [], statsFor));
         }
         return projected;
     }
+
+    /// <summary>The <see cref="GuideType.EpicQuest"/> guide for a class, or null — the ONE
+    /// matching rule for the Epic tab, and deliberately a different one from
+    /// <see cref="GuideFor"/>.
+    ///
+    /// <para>Sky matches on a reward key because a Sky CLASS has six quests. An epic class has
+    /// exactly one, the tab's groups are its SECTIONS, and epic rows carry no reward key at all
+    /// (<c>QuestChecklistGroup.CompletionKey</c> is null for every one of them, which is what
+    /// tells the surface there is no per-section hand-in). So the class name is the key, and
+    /// the guide type is what keeps a Plane of Sky guide from ever answering here.</para></summary>
+    public static Guide? EpicGuideFor(GuideCatalog catalog, string className)
+    {
+        if (className.Length == 0) return null;
+        foreach (var guide in catalog.Guides)
+            if (guide.GuideType == GuideType.EpicQuest
+                && guide.ApplicableClasses.Contains(className, StringComparer.OrdinalIgnoreCase))
+                return guide;
+        return null;
+    }
+
+    /// <summary>
+    /// The Epic tab's cutover: <b>a guided class's SECTION groups collapse into one guided
+    /// group</b>, its rows the guide's objectives under the section names as stage headings.
+    /// An unguided class comes back the same objects it went in as (Founder lock 5, by class
+    /// rather than by reward — an epic class has one quest).
+    ///
+    /// <para><paramref name="rows"/> must be the SAME rows <paramref name="groups"/> was built
+    /// from, classic-era lens and all. Two things hang off that: the objectives drawn are the
+    /// ones whose row is in this list (<see cref="GuideProgressRouter.Drawn"/>), and the ticks
+    /// are written straight into these row objects — the store the loot auto-tick, the master
+    /// "Epic complete" button, the phone and the classic tab have always shared.</para>
+    ///
+    /// <para><b>A class whose rows are all outside the lens is handed back untouched</b>, which
+    /// is also what keeps the projection off a caller holding rows the guides have never heard
+    /// of: no backing row, no guided group, no walkthrough conjured over somebody else's
+    /// list.</para>
+    ///
+    /// <para>Called from where <c>QuestsView.RenderChecklist</c> and
+    /// <c>CompanionProjection.BuildEpics</c> get their groups — the same point, the same order,
+    /// so the two screens cannot show different guides (David, 2026-08-18).</para></summary>
+    public static IReadOnlyList<QuestChecklistGroup> ApplyEpic(
+        IReadOnlyList<QuestChecklistGroup> groups,
+        IReadOnlyList<EpicQuestChecklistItem> rows,
+        GuideCatalog catalog,
+        AppSettings settings,
+        QuestLedgerStore ledger,
+        string characterKey,
+        Func<string, string?>? statsFor = null)
+    {
+        statsFor ??= ShippedItemStats;
+        var projected = new List<QuestChecklistGroup>(groups.Count);
+        var guided = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        // Per CLASS and not per group: the tab hands us one group per section (64 of them
+        // across the shipped catalog), and re-deriving a class's rows for each would be
+        // 64 × 486 × 66 string comparisons on a surface that redraws whenever a box moves.
+        var rowsByClass = new Dictionary<string, List<EpicQuestChecklistItem>>(
+            StringComparer.OrdinalIgnoreCase);
+
+        foreach (var group in groups)
+        {
+            var guide = EpicGuideFor(catalog, group.ClassName);
+            if (guide is null)
+            {
+                projected.Add(group);
+                continue;
+            }
+
+            if (!rowsByClass.TryGetValue(group.ClassName, out var classRows))
+            {
+                var ids = new HashSet<string>(
+                    guide.AllObjectives.Select(o => o.Id), StringComparer.OrdinalIgnoreCase);
+                classRows = [.. rows
+                    .Where(r => r.ClassName.Equals(group.ClassName, StringComparison.OrdinalIgnoreCase))
+                    .Where(r => ids.Contains(r.Id))];
+                rowsByClass[group.ClassName] = classRows;
+            }
+
+            if (classRows.Count == 0)
+            {
+                projected.Add(group);
+                continue;
+            }
+
+            // ONE group per guided class, at the position its first section held — the epic
+            // is the heading now, and the sections are the stage names inside it.
+            if (!guided.Add(group.ClassName)) continue;
+            projected.Add(Project(
+                group with
+                {
+                    Title = GuidePresentation.EpicTitle,
+                    // The class's epic page, so the heading link still opens something real.
+                    // Its title is the guide's own first source, which is the string the
+                    // weekly refresh flags on — one page name, one place (trap 3/trap 4).
+                    WikiPage = guide.Sources.Count > 0 ? guide.Sources[0].Title : "",
+                    // Epic completion is per CLASS and lives in EpicQuestCompleted, never per
+                    // section — the tab's own band carries it, and a group-level turn-in
+                    // control here would be a second writer of it.
+                    CompletionKey = null,
+                },
+                guide, settings, ledger, characterKey, classRows, statsFor));
+        }
+
+        return projected;
+    }
+
+    /// <summary>
+    /// What the player's fold choice is remembered under — a Sky group's reward key, an epic
+    /// group's guide id.
+    ///
+    /// <para>One producer, because the fold control WRITES this list and the projection READS
+    /// it: spelled twice they would drift the first time a group had no completion key, which
+    /// is every group on the Epic tab. (It did: the control returned early on an empty key and
+    /// the "+" was a silent no-op.) The two id spaces cannot collide — a reward key is
+    /// "Class|Reward" and a guide id is a slug.</para></summary>
+    public static string FoldKey(string? completionKey, string guideId) =>
+        completionKey is { Length: > 0 } key ? key : guideId;
+
+    /// <summary>The fold key of a group that has already been through the projection.</summary>
+    public static string FoldKey(QuestChecklistGroup group) =>
+        FoldKey(group.CompletionKey, group.GuideId);
 
     /// <summary>The reward key a guide claims — its turn-in objective's. A guide has exactly
     /// one (<c>GuideCatalog.Validate</c> holds the key to a real Sky reward, and the class
@@ -131,6 +272,7 @@ public static class GuideChecklistProjection
     private static QuestChecklistGroup Project(
         QuestChecklistGroup group, Guide guide,
         AppSettings settings, QuestLedgerStore ledger, string characterKey,
+        IReadOnlyList<EpicQuestChecklistItem> epicRows,
         Func<string, string?> statsFor)
     {
         var items = ItemsFor(settings, group.CompletionKey);
@@ -142,46 +284,65 @@ public static class GuideChecklistProjection
 
         var rows = new List<QuestChecklistRow>();
         var stubs = 0;
-        foreach (var objective in guide.AllObjectives)
+        // Drawn, not AllObjectives: on the Epic tab the classic-era lens has already removed
+        // rows, and an objective whose row is not on the tab has no box to tick.
+        foreach (var objective in GuideProgressRouter.Drawn(guide, epicRows))
         {
-            var home = GuideProgressRouter.HomeFor(objective, items, out var backing);
+            var home = GuideProgressRouter.HomeFor(
+                objective, items, epicRows, out var backing, out var backingRow);
             var done = GuideProgressRouter.IsDone(
-                settings, ledger, characterKey, guide.Id, objective, items);
+                settings, ledger, characterKey, guide.Id, objective, items, epicRows);
             var skipped = !done
                 && GuideProgressRouter.IsSkipped(ledger, characterKey, guide.Id, objective);
             if (objective.Authoring == GuideAuthoring.Stub) stubs++;
+
+            // The row already IS this sentence on a transcribed step, so the hover would be a
+            // second copy of it — and on the phone, where the facts ride the row rather than a
+            // hover it cannot have (trap 35), it would be the same line printed twice.
+            var title = GuidePresentation.StepTitle(objective);
+            var facts = GuidePresentation.RowTooltip(objective);
 
             rows.Add(new QuestChecklistRow(
                 RowId(guide.Id, objective.Id),
                 group.ClassName,
                 // The short instruction, not the title: the row IS the instruction now.
-                GuidePresentation.StepTitle(objective),
-                DetailFor(objective, byId, settings, ledger, characterKey, guide, items, done),
+                title,
+                DetailFor(objective, byId, settings, ledger, characterKey, guide, items, epicRows, done),
                 done,
                 // An item-backed row inherits the "we guessed which class earned this" mark
                 // from the box it reads. Dropping it would lose the one signal that tells a
                 // player a tick was placed by inference and can be moved (#106).
-                home == GuideProgressHome.SkyItem && backing is not null && backing.AcquiredUnassigned,
+                (home == GuideProgressHome.SkyItem && backing is not null && backing.AcquiredUnassigned)
+                    || (home == GuideProgressHome.EpicItem && backingRow is not null
+                        && backingRow.AcquiredUnassigned),
                 stageOf.GetValueOrDefault(objective.Id, ""),
                 objective.Authoring == GuideAuthoring.Stub ? objective.StubNote : "",
                 guide.Id,
                 home == GuideProgressHome.SkyTurnIn,
-                GuidePresentation.RowTooltip(objective),
+                string.Equals(facts, title, StringComparison.Ordinal) ? "" : facts,
                 skipped));
         }
 
-        var counts = GuideProgressRouter.Counts(settings, ledger, characterKey, guide, items);
-        var expanded = group.CompletionKey is { } key
-            && settings.GuideExpanded.Contains(key, StringComparer.OrdinalIgnoreCase);
+        var counts = GuideProgressRouter.Counts(
+            settings, ledger, characterKey, guide, items, epicRows);
+        var expanded = settings.GuideExpanded.Contains(
+            FoldKey(group.CompletionKey, guide.Id), StringComparer.OrdinalIgnoreCase);
+        // An EPIC pays several items and eqlwiki names none of them "the epic" — so the hover
+        // lists what the page lists and there is no single item window to show. A Sky reward
+        // is one item and gets both (GuidePresentation.EpicTitle says why).
+        var epic = guide.GuideType == GuideType.EpicQuest;
         return group with
         {
             Collapsed = !expanded,
-            RewardSummary = GuidePresentation.RewardSummary(group.Title, items),
-            RewardCard = GuidePresentation.RewardCard(statsFor(group.Title), items),
+            RewardSummary = epic
+                ? GuidePresentation.EpicRewardSummary(
+                    epicRows.Select(r => r.Reward.Trim()).FirstOrDefault(r => r.Length > 0) ?? "")
+                : GuidePresentation.RewardSummary(group.Title, items),
+            RewardCard = epic ? "" : GuidePresentation.RewardCard(statsFor(group.Title), items),
             Rows = rows,
             GuideId = guide.Id,
             GuideCaption = GuidePresentation.GuidedCaption(counts.Skipped, stubs),
-            GuideCard = Card(group, guide, settings, ledger, characterKey, items),
+            GuideCard = Card(group, guide, settings, ledger, characterKey, items, epicRows),
         };
     }
 
@@ -194,16 +355,21 @@ public static class GuideChecklistProjection
     /// answer.</para></summary>
     private static QuestChecklistCard Card(
         QuestChecklistGroup group, Guide guide, AppSettings settings,
-        QuestLedgerStore ledger, string characterKey, IReadOnlyList<SkyQuestChecklistItem> items)
+        QuestLedgerStore ledger, string characterKey, IReadOnlyList<SkyQuestChecklistItem> items,
+        IReadOnlyList<EpicQuestChecklistItem> epicRows)
     {
         bool Done(GuideObjective o) =>
-            GuideProgressRouter.IsDone(settings, ledger, characterKey, guide.Id, o, items);
+            GuideProgressRouter.IsDone(settings, ledger, characterKey, guide.Id, o, items, epicRows);
         bool Skipped(GuideObjective o) =>
             GuideProgressRouter.IsSkipped(ledger, characterKey, guide.Id, o);
 
-        var next = GuidePresentation.NextObjective(guide, Done, Skipped);
+        // The same list the rows are drawn from, so "what is next" can never name a step the
+        // tab is not showing — and so AllDone means "every row on this tab is ticked", which is
+        // what the player is looking at.
+        var drawn = GuideProgressRouter.Drawn(guide, epicRows).ToList();
+        var next = GuidePresentation.NextObjective(drawn, Done, Skipped);
         if (next is null)
-            return new QuestChecklistCard("", GuidePresentation.NoNextStep(guide, Done, Skipped));
+            return new QuestChecklistCard("", GuidePresentation.NoNextStep(drawn, Done, Skipped));
 
         // A stub's banner REPLACES where/what: "we cannot say where" and "here is where"
         // must not both be on the card.
@@ -215,8 +381,10 @@ public static class GuideChecklistProjection
             // in the instruction. A step that answers neither draws neither line.
             Directions: stub ? "" : GuidePresentation.Directions(next),
             Detail: stub ? "" : GuidePresentation.ExtraDetail(next),
-            Why: GuidePresentation.CardWhy(group.Title),
-            BeforeLeaving: GuidePresentation.BeforeLeaving(guide, next, Done, Skipped),
+            Why: guide.GuideType == GuideType.EpicQuest
+                ? GuidePresentation.EpicCardWhy(group.ClassName)
+                : GuidePresentation.CardWhy(group.Title),
+            BeforeLeaving: GuidePresentation.BeforeLeaving(guide, drawn, next, Done, Skipped),
             StubNote: stub ? next.StubNote : "",
             ImproveUrl: GuidePresentation.ImproveUrl(guide, next));
     }
@@ -228,7 +396,8 @@ public static class GuideChecklistProjection
     private static string DetailFor(
         GuideObjective objective, Dictionary<string, GuideObjective> byId,
         AppSettings settings, QuestLedgerStore ledger, string characterKey, Guide guide,
-        IReadOnlyList<SkyQuestChecklistItem> items, bool done)
+        IReadOnlyList<SkyQuestChecklistItem> items,
+        IReadOnlyList<EpicQuestChecklistItem> epicRows, bool done)
     {
         if (!done && objective.PrerequisiteObjectiveIds.Count > 0)
         {
@@ -236,8 +405,8 @@ public static class GuideChecklistProjection
                 .Select(id => byId.GetValueOrDefault(id))
                 .Where(p => p is not null)
                 .Where(p => !GuideProgressRouter.IsDone(
-                    settings, ledger, characterKey, guide.Id, p!, items))
-                .Select(p => p!.Title);
+                    settings, ledger, characterKey, guide.Id, p!, items, epicRows))
+                .Select(p => GuidePresentation.StepName(p!));
             var after = GuidePresentation.AfterDetail(outstanding);
             if (after.Length > 0) return after;
         }

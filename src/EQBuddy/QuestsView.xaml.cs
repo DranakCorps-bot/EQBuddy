@@ -1109,6 +1109,11 @@ public partial class QuestsView : UserControl
         // per guided group. The fold control is — every guided group draws exactly one,
         // folded or open — which is what makes it the group's identity on screen (trap 39).
         $"questsGuideGroups={GuideElementsOnScreen<Button>(GuideFoldTag)} " +
+        // The EPIC tab's own guided-group count (Delivery 3). questsGuideGroups is
+        // tab-agnostic — it counts fold controls wherever they are — so an assertion that
+        // never switched tabs could read the Sky number and call it an Epic pass. This is
+        // zero on every other tab by construction, which is what makes it an Epic fact.
+        $"questsEpicGuideGroups={(_tab == QuestTab.Epic ? GuideElementsOnScreen<Button>(GuideFoldTag) : 0)} " +
         // ...and the caption counted SEPARATELY, because "how many groups drew one" is now a
         // real question with a real answer. It is drawn only where it adds stubs or skipped,
         // so a class with neither shows six headings and NO caption lines — an assertion that
@@ -1205,7 +1210,7 @@ public partial class QuestsView : UserControl
     /// </summary>
     private UIElement GuideCardView(
         QuestChecklistGroup group, QuestChecklistCard card,
-        Dictionary<string, Action<bool>> setters)
+        Dictionary<string, Action<bool>> setters, bool locked)
     {
         var body = new StackPanel();
         var border = new Border
@@ -1248,12 +1253,22 @@ public partial class QuestsView : UserControl
             body.Children.Add(Line(Role.Caption, card.BeforeLeaving, "WarnBrush"));
 
         var verbs = new WrapPanel { Margin = new Thickness(0, DesignTokens.SpaceS, 0, 0) };
-        verbs.Children.Add(CardVerb(GuidePresentation.DoneLabel, "EqPrimaryButton", null, () =>
+        // A class whose epic is marked complete has LOCKED rows, and the card's Done is the
+        // same write through the same setter — so it locks with them, or it is a button that
+        // ticks a box the master check's undo will silently discard. Its own tooltip says
+        // why, because "silent no-ops are broken" has a second half: a control that looks
+        // live and is not (trap 17).
+        var lockNote = locked
+            ? $"{group.ClassName}'s epic is marked complete. Reopen it above to change "
+              + "individual steps."
+            : null;
+        verbs.Children.Add(CardVerb(GuidePresentation.DoneLabel, "EqPrimaryButton", lockNote, () =>
         {
             if (setters.TryGetValue(card.RowId, out var set)) { set(true); Save(); }
-        }));
+        }, locked));
         verbs.Children.Add(CardVerb(GuidePresentation.SkipLabel, "ActionButton",
-            GuidePresentation.SkipTip, () => SkipGuideRow(group, card.RowId)));
+            lockNote ?? GuidePresentation.SkipTip,
+            () => SkipGuideRow(group, card.RowId), locked));
         if (card.ImproveUrl.Length > 0)
         {
             var improve = DesignSystem.InlineIconButton("Pencil", GuidePresentation.ImproveTip,
@@ -1274,7 +1289,7 @@ public partial class QuestsView : UserControl
         }
     }
 
-    private Button CardVerb(string label, string style, string? tip, Action act)
+    private Button CardVerb(string label, string style, string? tip, Action act, bool locked = false)
     {
         var b = new Button
         {
@@ -1284,6 +1299,14 @@ public partial class QuestsView : UserControl
             ToolTip = tip,
             Tag = GuideVerbTag,
         };
+        if (locked)
+        {
+            b.IsEnabled = false;
+            // …AND LOOK disabled, the same pairing the locked rows carry: the button styles
+            // have no disabled visual, so IsEnabled alone leaves a control that reads as live
+            // and quietly ignores the click.
+            b.Opacity = 0.5;
+        }
         b.Click += (_, _) => act();
         return b;
     }
@@ -1338,7 +1361,11 @@ public partial class QuestsView : UserControl
             ToolTip = GuidePresentation.FoldTip(group.Collapsed),
             Tag = GuideFoldTag,
         };
-        var key = group.CompletionKey ?? "";
+        // The reward key on Sky, the guide id on Epic — from the projection, which is what
+        // READS the same list to decide whether this group starts open. Spelled here as
+        // `group.CompletionKey ?? ""` it returned early on every Epic group and the "+" was a
+        // silent no-op (trap 20's shape: the control was there, the write path was not).
+        var key = GuideChecklistProjection.FoldKey(group);
         b.Click += (_, _) =>
         {
             if (key.Length == 0) return;
@@ -2593,9 +2620,15 @@ public partial class QuestsView : UserControl
         // Grouping, ordering and the detail line come from Core so this window, the
         // Avalonia one and EQBuddy Mobile cannot disagree about what a checklist row
         // says — they already had (#184).
+        // The rows the Epic tab is SHOWING, captured once: the classic-era lens is applied
+        // here and nowhere else, and the guide projection reads this same list to decide which
+        // objectives have a box on this tab (one producer of "is this row in this era").
+        var epicRows = _settings.EpicQuestChecklist
+            .Where(i => !_settings.EpicQuestClassicOnly || i.AvailableInClassic)
+            .ToList();
+
         var groups = tab == QuestTab.Epic
-            ? QuestChecklistLayout.Epic(_settings.EpicQuestChecklist
-                .Where(i => !_settings.EpicQuestClassicOnly || i.AvailableInClassic))
+            ? QuestChecklistLayout.Epic(epicRows)
             : QuestChecklistLayout.Sky(_settings.SkyQuestChecklist, _settings.SkyQuestCompleted,
                 _settings.SkyStepsUnderEveryIsland);
 
@@ -2618,24 +2651,31 @@ public partial class QuestsView : UserControl
         // this window gets its groups — because EQBuddy Mobile calls the same projection from
         // the same point in CompanionProjection.BuildSky. Parity by shared module, not by
         // feature list (David, 2026-08-18). A class nobody has authored is untouched.
-        if (tab == QuestTab.Sky && _main.QuestLedger is { } guideLedger)
+        if (_main.QuestLedger is { } guideLedger && tab is QuestTab.Sky or QuestTab.Epic)
         {
-            groups = GuideChecklistProjection.Apply(groups, GuideCatalog.Default,
-                _settings, guideLedger, _main.QuestCharacterKey);
+            // The Epic tab's cutover is by CLASS — an epic class has one quest, and the
+            // sections the tab grouped by become its stage headings (Fable §2, Delivery 3).
+            groups = tab == QuestTab.Epic
+                ? GuideChecklistProjection.ApplyEpic(groups, epicRows, GuideCatalog.Default,
+                    _settings, guideLedger, _main.QuestCharacterKey)
+                : GuideChecklistProjection.Apply(groups, GuideCatalog.Default,
+                    _settings, guideLedger, _main.QuestCharacterKey);
 
             // Guide rows tick through the router, which decides per objective whether the
-            // fact belongs to the Sky turn-in store, to one of THIS reward's item boxes, or
-            // to the guide ledger. Never a second copy of a tick the checklist already owns.
+            // fact belongs to the Sky turn-in store, to one of THIS reward's item boxes, to
+            // the epic checklist row the objective was generated from, or to the guide
+            // ledger. Never a second copy of a tick a checklist already owns.
             foreach (var guided in groups.Where(g => g.GuideId.Length > 0))
             {
                 if (GuideCatalog.Default.Find(guided.GuideId) is not { } guide) continue;
                 var rewardItems = GuideChecklistProjection.ItemsFor(_settings, guided.CompletionKey);
+                List<EpicQuestChecklistItem> backingRows = tab == QuestTab.Epic ? epicRows : [];
                 foreach (var objective in guide.AllObjectives)
                 {
                     var step = objective;
                     setters[GuideChecklistProjection.RowId(guide.Id, step.Id)] = done =>
                         GuideProgressRouter.SetDone(_settings, guideLedger,
-                            _main.QuestCharacterKey, guide.Id, step, rewardItems, done);
+                            _main.QuestCharacterKey, guide.Id, step, rewardItems, backingRows, done);
                 }
             }
         }
@@ -2745,7 +2785,11 @@ public partial class QuestsView : UserControl
                     ? group.RewardSummary
                     : (object)"Open the wiki page for this quest";
             headingText.Ink("AccentBrush");
-            var rewardName = group.Title;
+            // The PAGE, not the title: a Sky reward's title is its item page, but a guided
+            // epic group's is "Epic 1.0" and an unguided one's is a section heading. Core
+            // decides which (QuestChecklistGroup.HeadingPage) so this window and the phone
+            // cannot send a player to two different places.
+            var rewardName = group.HeadingPage;
             headingText.MouseLeftButtonUp += (_, e) =>
             {
                 e.Handled = true;
@@ -2843,7 +2887,7 @@ public partial class QuestsView : UserControl
             if (group.GuideCard is { } card && group.GuideId.Length > 0)
             {
                 _lastGuideCards.Add(card);
-                QuestsPanel.Children.Add(GuideCardView(group, card, setters));
+                QuestsPanel.Children.Add(GuideCardView(group, card, setters, locked));
             }
 
             // Island sub-headings (David, 2026-08-23, from a Reddit ask): "a player should

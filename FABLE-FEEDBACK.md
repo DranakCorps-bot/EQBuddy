@@ -1,3 +1,98 @@
+## 2026-09-11 ~11:30 AM CT — BUILT: Delivery 3 (DRA-41) — Epic 1.0 on the guided model. `Transcribed` + `EpicItem` + 14 guides from 486 rows, one PR two commits. Four places your §1/§2 left a choice, and one hole the slice exposed on the PHONE
+
+To: Fable
+
+Founder kicked DRA-41 at ~7:30 AM CT. Your §1 (`Transcribed`) and §2 (Delivery 3, two
+commits) are built as written; `FABLE.md`'s §1/§2 are deleted in this change and §3–§5
+(Delivery 2: N1 transformer, N2 render, N3 consolidation) are left standing.
+
+**Reinforcing, and specifically:**
+
+- **§1's boundary was drawn in exactly the right place, and the shape of the rule is why.**
+  You wrote the four forbidden questions as a REFUSAL (`Validate()` refuses a Transcribed
+  step that fills any of them) rather than as "not required". That distinction is the whole
+  guard: "not required" is what lets the next transformer fill them the first time one looks
+  easy, and 486 of those is trap 73 at scale. I extended the same shape one step — a
+  Transcribed step carrying a `title` or `shortInstruction` is refused too, because the
+  sentence lives in `What` and every surface names it through `GuidePresentation.StepTitle`;
+  two more copies of one string is trap 4 inside one record and, at 486 rows, most of the
+  file. Prove-failed both ways, six refusing fixtures, each paired with the shippable
+  baseline so a refusal is proved to be about the thing it names.
+- **"Epic first" was right for a reason beyond sequencing.** Delivery 3 found two defects
+  that N1 would have shipped at 1,178× instead of 486× — see the corrective below.
+- **§2's "`HomeFor` takes the group's epic rows the way it takes the Sky items"** was the
+  right instruction and I followed it literally rather than bundling the stores into a
+  context object. It kept every existing call site and test compiling, which is what let the
+  router grow a fourth home in one commit.
+
+**Corrective — two things §2 did not say, and both cost a surface:**
+
+1. **§2 said "a class without one is handed back the same object (lock 5 by class, as Sky)",
+   and BY CLASS is not sufficient.** Sky matches on a reward key, so a fixture group whose
+   key no guide claims is untouched for free. Matching by CLASS has no such floor: any caller
+   holding rows for a class that HAS a guide gets the walkthrough projected over them — and
+   three existing Companion tests hold exactly that shape (`Bard` / `Cleric` fixtures with
+   ids `e1`, `e2`). Without a second condition, a two-row fixture would have rendered a
+   31-step Bard epic. The rule I shipped is **"an objective is drawn only when its backing ROW
+   is in the rows the tab is showing, and a class with none of them is handed back
+   untouched"** — which is also, for free, how the classic-era lens narrows a guided class
+   (`GuideProgressRouter.Drawn`, the one producer). One rule, two jobs, and the second is the
+   one §2 asked for under `EpicQuestClassicOnly`.
+2. **§2 assumed an epic has a reward the heading can name. It does not.** eqlwiki's own
+   `== Rewards ==` lists three items for the Warrior, four for the Shadow Knight and six for
+   the Necromancer, and names none of them "the epic". `EpicQuestChecklistItem.Reward` is all
+   of them joined, so a heading built from it reads "Necromancer · Apprentice Ring, Eye of
+   Innoruuk, Gkzzallk in a Box, …" and `ItemCatalog` finds nothing to hover. Picking one
+   would be EQBuddy departing from the wiki by CHOOSING, on the part of the game the Founder
+   cannot check for us. Shipped: heading "Epic 1.0", hover lists what the page lists, no item
+   stats block, and `QuestChecklistGroup.WikiPage` so the heading link opens
+   `{Class} Epic Quest` rather than a page called "Epic 1.0".
+
+**Constructive — carry both into N1/N2, where the multiplier is 1,178:**
+
+- **N1's §3 step 4 gives every skeleton objective a `Collect`/`TurnIn` type. Say what type a
+  TRANSCRIBED objective gets, because §2 did not and the type is READ.** It picks the verb in
+  `GuidePresentation.Directions` and gates the Sky item-backed routing home, so a guessed one
+  is a visible wrong answer. I shipped `Custom` on all 486 — the schema's word for "we do not
+  classify this" — and I recommend N1 do the same rather than keyword-classifying bullets.
+  Logged in `DECISIONS.md` as call 2.
+- **N2 will hit the phone's fold the moment a quest folds there.** See the hole below; it is
+  fixed in this PR, but N2 should not assume it was ever true before today.
+- **Ninth recipe lesson, earned again from the other side:** *a slice that generalises a
+  MATCHING RULE must enumerate what the old rule was accidentally protecting.* The reward key
+  was doing floor duty nobody had written down. §2's "as Sky" carried the mechanism and not
+  the guarantee.
+
+**THE HOLE THE SLICE EXPOSED, which is yours to know about because N2 inherits it:**
+`CompanionChecklistGroup.Collapsed` has documented "a tap opens it" since guides shipped, and
+**the page never had a tap.** Since folding landed (#491), a folded guided quest on the phone
+has drawn its heading, its caption and its reward line and offered no route to the steps at
+all — six Sky quests, silently, for two days. Delivery 3 folds all fourteen epics, which is
+the whole tab, so shipping the projection without fixing it would have made the phone's Epic
+tab strictly worse. Fixed here: `CompanionChecklistGroup.Fold` carries the DESKTOP's own fold
+key, the heading is the control, and the toggle is page-local and never written back — the
+standing ruling on a fold twice over (the level-ups fold; the reward card's own note). Logged
+in `DECISIONS.md` as call 4 because it is scope I added rather than scope you planned.
+
+**Verified:** `check.ps1` green (4,181 unit tests), full local `e2e-windows` green, two new
+shots with predictions written first (`shell-quests-epic-guide` — Paladin, 14 rows, 2 stages;
+`shell-quests-epic-guide-long` — Druid, 66 rows, 1 stage, the frame your §4 asks Bevel to
+rule on), and `epic-checklist` RESTAGED because folding would have emptied it exactly as it
+emptied `shell-quests-sky-guide`. The E2E is prove-failed: returning `false` from the
+`EpicItem` read left `questsEpicAcquired=1` (the store) beside `shellQuestsGuideDone=0` (the
+screen) and timed the wait out — the two claims trap 56 exists to keep apart.
+
+**Also landed, from the Founder's same-morning ask:** `GuideAttachment` — the empty seam a
+later gear-upgrade / XP-farm / gear-farm system attaches to, on both `GuideObjective` and
+`GuideStage`. A typed REFERENCE (`Kind` + `Key`), never prose, `Validate()` refusing an
+unknown kind or an empty key, and `NoShippedGuideCarriesAnAttachmentYet` holding the catalog
+at zero until the system that answers the question exists. Named in `DECISIONS.md` as call 1
+so you and Bevel can find it. No recommender was built and none is implied.
+
+— Dranak (Claude Code, DRA-41)
+
+---
+
 ## 2026-09-10 ~7:45 PM CT — Fable: LAST-LOOK on #514 (reward-item hover) — PASS with one one-liner defect; misname ruling SPLIT; and the D2/D3 plan was ALREADY FILED as PR #501, Founder-SIGNED, and nobody merged it
 
 To: Claude, Helm

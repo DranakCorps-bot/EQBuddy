@@ -604,6 +604,16 @@ const $ = id => document.getElementById(id);
 // way GuideExpanded does. It survives a repaint - the page re-renders on every snapshot,
 // and a block that closed itself every tick would be unusable.
 const rewardCardsOpen = new Set();
+// Guided quests whose fold this reader has FLIPPED, relative to the state the PC sent.
+// Same ephemeral, per-viewer treatment as rewardCardsOpen, and for the reason the level-ups
+// fold already carries: "a tap on a phone must not reach across the LAN to fold something on
+// the PC while somebody is playing at it." So the PC's GuideExpanded is the state this device
+// ARRIVES in, and taps live here for as long as the page is open.
+//
+// Relative rather than absolute, because the PC's answer keeps arriving: an absolute set would
+// have to be reconciled against every snapshot, and a quest the player opened on the PC would
+// snap shut on the phone a tick later.
+const guideFoldFlipped = new Set();
 
 const el = (tag, cls, text) => {
   const e = document.createElement(tag);
@@ -1759,7 +1769,7 @@ function boot() {
         li.appendChild(rn);
         ul.appendChild(li);
       }
-      wrap.appendChild(ul);
+      steps.appendChild(ul);
     }
     return wrap;
   }
@@ -1788,8 +1798,15 @@ function boot() {
         || (g.heading || "").toLowerCase().includes(filter));
       if (!rows.length) continue;
       any = true;
+      // A GUIDED group's heading is the fold control. CompanionChecklistGroup.Collapsed has
+      // promised "a tap opens it" since guides shipped and there was no tap — so a folded
+      // quest showed its heading, its caption and its reward line and offered no way to the
+      // steps. Unguided groups are never folded and their heading stays plain text.
+      const foldable = !!g.fold;
+      const shut = () => foldable && (g.collapsed !== guideFoldFlipped.has(g.fold));
       const h = el("h3", "group");
-      h.append(el("span", null, g.heading));
+      const name = el("span", null, g.heading);
+      h.append(name);
       if (g.note) h.append(el("span", "note", g.note));
       wrap.appendChild(h);
       // What this quest pays. The desktop hangs it on the heading's hover; a phone has no
@@ -1836,10 +1853,39 @@ function boot() {
       }
       // FOLDED: heading, note and reward, and nothing else. A whole class fits on one
       // screen and you open the one you are working on.
-      if (g.collapsed) continue;
+      //
+      // The steps go in a container the HEADING shows and hides, rather than being skipped
+      // outright. `CompanionChecklistGroup.Collapsed` has promised "a tap opens it" since
+      // guides shipped and the page had no tap: a folded quest drew its heading, its caption
+      // and its reward line and offered no route to the steps at all. Built and hidden, not
+      // omitted, because `checklistBody` has no redraw in scope — the reward card beside it
+      // solves the same problem the same way.
+      const steps = el("div", "steps");
+      wrap.appendChild(steps);
+      if (foldable) {
+        const sync = () => {
+          steps.style.display = shut() ? "none" : "block";
+          name.textContent = (shut() ? "▸ " : "▾ ") + g.heading;
+          h.setAttribute("aria-expanded", shut() ? "false" : "true");
+          h.title = shut() ? "Show this quest's steps" : "Fold this quest away";
+        };
+        h.style.cursor = "pointer";
+        h.setAttribute("role", "button");
+        h.setAttribute("tabindex", "0");
+        const toggle = () => {
+          if (guideFoldFlipped.has(g.fold)) guideFoldFlipped.delete(g.fold);
+          else guideFoldFlipped.add(g.fold);
+          sync();
+        };
+        h.onclick = toggle;
+        h.onkeydown = (e) => {
+          if (e.key === "Enter" || e.key === " ") { e.preventDefault(); toggle(); }
+        };
+        sync();
+      }
       // The active-step card, between the heading and the rows. Every string arrives
       // worded from GuidePresentation; this decides layout only.
-      if (g.card) wrap.appendChild(guideCard(surface, g.card));
+      if (g.card) steps.appendChild(guideCard(surface, g.card));
       const ul = el("ul", "rows");
       // A SUMMARY group's rows are not items — the Sky ready band names rewards, and its
       // ids are reward keys no tick accepts. It drew checkboxes anyway, so every tap was

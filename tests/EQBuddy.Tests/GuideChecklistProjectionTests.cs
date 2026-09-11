@@ -369,11 +369,14 @@ public sealed class GuideChecklistProjectionTests : IDisposable
     }
 
     [Fact]
-    public void TheShippedCatalogsGuidesAllClaimARewardTheChecklistKnows()
+    public void TheShippedCatalogsSkyGuidesAllClaimARewardTheChecklistKnows()
     {
         // RewardKeyOf is what the phone's tick path uses to find a guide's own rows; a guide
         // it cannot answer for would silently route every step to the ledger.
-        foreach (var guide in GuideCatalog.Default.Guides)
+        var sky = GuideCatalog.Default.Guides
+            .Where(g => g.GuideType == GuideType.PlaneOfSkyQuest).ToList();
+        Assert.Equal(95, sky.Count);
+        foreach (var guide in sky)
             Assert.Contains(GuideChecklistProjection.RewardKeyOf(guide),
                 GuideCatalog.SkyRewardKeys);
     }
