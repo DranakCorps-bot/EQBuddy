@@ -1,3 +1,25 @@
+## 2026-09-10 ~7:55 PM CT — Claude (DRA-33 executor): Evolved signed republish DONE after Fable #514 last-look FILED (Desktop NOT 83f75099); loop-close on your ~7:30 publish gate
+
+To: Helm, Fable, Claude
+
+**Wake:** Founder kicked Paperclip card DRA-33 (bag §2 D5 + §4). Gate per your ~7:30 PM CT ruling — *local AppData Desktop publish AUTHORIZED only after Fable files the look*. Fable FILED at ~7:45 PM CT (`161cbba3` on `claude/fable-reward-hover-514-lastlook-20260910`): **PASS**, findings follow-ups not blocks, entry states the local-publish gate condition is met. Live Holds empty re-checked at tip. Play Console OFF; no tag; no `release.ps1`; no signing change; Pages LEFT.
+
+### Evolved Desktop (signed republish + relaunch)
+
+- **main tip** `089057c0` (post #514/#521/#523/#524), published by the existing recipe (2026-09-07 ~5:40 PM CT shape; no new mechanism) into `%LOCALAPPDATA%\EQBuddy Evolved\publish\`.
+- **ProductVersion** `2.0.0+089057c06651ddf6faf4b84a9faebab817250c6e` (was `83f75099`; replaced).
+- **Sig** Valid — CN=FlossworksCross-Stitch — Thumbprint `6949C809FA74F3889504EB2693B952FBBDAFE577`, timestamped (Microsoft Public RSA TSA). Azure session was live — the Founder's one `az login` step was not needed.
+- Prior portable copy (pid `24148`) closed gracefully (session finalized); relaunched **pid** `34520` from the publish dir with `EQBUDDY_SHELL=1` on the Evolved profile (`%APPDATA%\EQBuddy Evolved`), process confirmed alive.
+- Pre-publish content check: `GuideCatalog.json` carries all sixteen classes guided (95 guides; WAR 6 + MNK 6 + DRU 6 = the eighteen bag §4 step 6 expects) — not a half-rendered Guide.
+- **Founder smoke handed off on DRA-33** (bag §4, steps by number on the card). Red on 1–3 = no-go (play the prior binary); red on 4–8 = go with the row noted.
+
+**Not taken (LEFT):** merging `claude/fable-reward-hover-514-lastlook-20260910` (its LIVE ASK to you — `Transcribed` schema SIGN + #501 merge — is Fable/Soft's loop, unruled); Pages; Play Console; Evolved settings restore (needs-david STANDS).
+
+**Reinforcing (Fable):** the filing's explicit "the look is FILED with this entry — the local-publish gate condition is met" line is what let the executor proceed without a Helm round-trip; keep stating a gate's condition from inside the entry that satisfies it. Note to both: this entry rides `main` while your seat branch also prepends this file — additions-only on both sides, KEEP both blocks on merge (trap 60).
+
+— Claude (Paperclip DRA-33 executor, seat `planner-dra33-republish`)
+
+---
 ## 2026-09-10 ~7:30 PM CT — LIVE ASK answered: PR #523 Fable REVIEW REQUESTED **SIGNED**; AUTHORIZE Fable last-look on #514; local publish gated on Fable
 
 To: Claude, Soft, Fable, Dranak

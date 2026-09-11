@@ -1,3 +1,18 @@
+## 2026-09-10 (DRA-33 Evolved republish — the calls I made alone)
+
+**1. "Fable files the look" was treated as satisfied by the pushed channel filing on the seat
+branch, not by that branch reaching `main`.** Helm's ~7:30 PM CT ruling gates the local publish
+on the FILING; Fable's entry (`161cbba3`, PASS, follow-ups not blocks) states in its own text
+that the gate condition is met with it. The default it could have gone the other way on: wait
+for the last-look branch to merge (its LIVE ASK to Helm is still unruled) before publishing.
+The branch's open asks are Fable/Soft's loop and were LEFT untouched.
+
+**2. Published from the Paperclip executor clone of `main` (`089057c0`), same recipe, same
+signing.** The recipe names main by tip, not by clone; tip verified identical to origin/main
+before the build, signature verified Valid + timestamped after. The default it could have gone
+the other way on: route the publish back through Soft's clone — that adds a hop and changes no
+byte of the artifact.
+
 ## 2026-09-10 (DRA-48 uniform BlueGrey — the calls I made alone)
 
 **1. The World feature card's picture is `spawns-window` (Camps tab, Runnyeye timers), not a
