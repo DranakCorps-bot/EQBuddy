@@ -2374,8 +2374,10 @@ public partial class QuestsView : UserControl
         return block;
     }
 
-    /// <summary>The Epic tab's per-class band: the class name and the "Epic complete"
-    /// master check (#138 aodgizmo, restored for #210).
+    /// <summary>The Epic tab's per-class band: the class name and the "Mark as complete"
+    /// master check (#138 aodgizmo, restored for #210; the label was "Epic complete" until
+    /// the 2026-09-11 Founder smoke read it as a done-badge — <see
+    /// cref="EpicCompleteToggle.ButtonLabel"/>).
     ///
     /// It sits at class level and not on a section heading because epic completion IS per
     /// class — <see cref="AppSettings.EpicQuestCompleted"/> is keyed by class name, and a
@@ -2442,10 +2444,15 @@ public partial class QuestsView : UserControl
             var prompt2 = EpicCompleteToggle.ConfirmPrompt(className, items);
             if (prompt2 is { } prompt)
             {
+                // The caption is the LABEL OF THE BUTTON THAT OPENED IT, read from the
+                // one producer rather than repeated as a literal (trap 4) — a dialog
+                // titled with the old state word was the second place "Epic complete"
+                // claimed to be a status the 2026-09-11 smoke found it was not.
+                var caption = EpicCompleteToggle.ButtonLabel(completed: false);
                 var answer = Window.GetWindow(this) is { } owner
-                    ? MessageBox.Show(owner, prompt, "Epic complete",
+                    ? MessageBox.Show(owner, prompt, caption,
                         MessageBoxButton.OKCancel, MessageBoxImage.Question)
-                    : MessageBox.Show(prompt, "Epic complete",
+                    : MessageBox.Show(prompt, caption,
                         MessageBoxButton.OKCancel, MessageBoxImage.Question);
                 if (answer != MessageBoxResult.OK) return;
             }
