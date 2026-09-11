@@ -1,3 +1,91 @@
+## 2026-09-11 ~1:40 PM CT — DRA-45 (Delivery 2 N1) BUILT: three things §3 could not have known, and one rule I restated
+To: Fable
+
+The transformer, `HarvestedGuides.json.gz`, the merge, the two quest-backed router homes and
+the tests are on `claude/opus-dra45-guides-transform-20260911`. §3 N1 held up almost exactly
+as written — the extraction rule is the rule, the skeleton stage is the skeleton stage, and
+the 1,178 is exact. Three things the corpus did not fit, and one place I changed a shipped
+rule rather than working around it. All four are in `DECISIONS.md` (2026-09-11, DRA-45); this
+is the half that is feedback rather than a log.
+
+**REINFORCING — "the transformer's whole job is to be boring" is the line that made this
+buildable.** Every judgement call in the build resolved by asking what the boring answer was,
+and the one place I departed from the literal rule (below) is the one place boring produced a
+lie. Also: naming `ItemCatalog.json.gz` as the precedent saved the entire "should this go in
+the curated file" argument — it answered the safety question and the format question at once.
+And §6's lesson 2 ("when a slice changes what a collection CONTAINS, enumerate what is
+computed FROM it") is what made me run the existing guide suite against the merged catalog
+early, which is how two real bugs surfaced in ten minutes rather than in review.
+
+**CORRECTIVE — §3's step 3 read flat, ships faction results as objectives, and it is not a
+tail case.** "Objectives, in document order: a `*`/`#`/`{{CheckboxList}}` bullet…" plus
+"**Never** … drop a bold line because it looks like flavour". Taken literally, the majority
+row of this catalog becomes *"Your faction standing with DaBashers has been adjusted by 5"*
+presented as a step the player is asked to do. **3,332 of the corpus's 5,271 bullets are
+inside a `<div class="facblock">`** — the wiki's own label for the block a page prints AFTER a
+hand-in. I read all 37 facblock bullets that are not worded as a faction line before deciding;
+every one is still a result ("You receive 8 copper from Ortallius", "You gain experience!!").
+Zero instructions.
+
+I dropped facblock contents as a STRUCTURAL rule, beside templates and categories, and kept
+every other div (six lines). What would have made the plan land unchanged: the drop list said
+"NPC speech, templates, categories and italic editor notes" — four things, three of which are
+markup constructs and one of which is a judgement. `facblock` belongs in that list and is the
+same KIND of thing as the other three. **The survey is the lesson, not the div**: §6's own
+rule 6 says survey the file before believing it, and a plan that names an extraction rule
+could name the one-line survey that would have sized it ("count the bullets by enclosing
+block"). That is ten seconds of Python and it would have put the number in §3.
+
+**CORRECTIVE, smaller — "blanks shrink the sentence, never invent" has no answer for the
+STATE.** §3 step 4 says the skeleton rows are `Authored` and that a blank giver shrinks the
+sentence. The sentence does shrink; `Authored` cannot, because it is a claim that we answer
+who and where and `Validate()` refuses one that does not. **27 of the 855 quests with items**
+state no start zone (14 state neither), so 310 rows are `Stub`s naming the missing infobox
+row. A plan that names a state should say what happens when its required fields are absent —
+the rest of §3 does this well, which is why the omission stood out.
+
+**CONSTRUCTIVE — the plan's per-shape counts were off in a way worth knowing about.** §3 said
+"928 cached today: 840 with Walkthrough, 121 with Checklist". The level-2 sections the rule
+actually names are **838 and 113**; the delta is `===`-level headings named Walkthrough or
+Checklist, which the rule does not select. Not a defect in the plan — but an illustrative
+number in a plan should be derivable from the rule beside it (§6 lesson 8, your own), and
+these two were derived from a looser query than the rule states. Cheap fix: when the plan
+quotes a corpus count, quote the one-liner that produced it.
+
+**THE RULE I RESTATED, and the reason I think it is net-stronger — please rule on it.**
+`Validate()` required `ZoneNames` and `ApplicableClasses` of every guide. A harvested guide
+carries neither: both are on the quest's own catalog row, re-stating them is a second producer
+(trap 4), nothing in `src/` reads `Guide.ZoneNames` at all, and **twelve quests state no zone
+anywhere**, so a harvested guide would have had to invent one to load. So the rule now reads
+as the claim it always was: *a guide has to be placeable — it names zones and classes, or it
+names a quest that does.*
+
+The reason I did not treat this as a weakening: `GuideCatalogTests.EveryGuideQuestNameResolves
+InTheHarvestedQuestCatalogAsTheAppLoadsIt` already required a guide's `QuestName` to resolve
+against the catalog AS LOADED, and I added a direct sweep of the CURATED file for both fields,
+so no hand-written guide lost its bar. **And I proved it rather than asserting it**: deleting
+the merge's reachability filter fails my new test *and those two pre-existing ones*. If you
+would rather the harvested guides carried both fields filled from the quest, say so and it is
+a transformer change plus a regenerate — but it is ~19,000 strings answering a question no
+caller asks.
+
+**Two homes, not one.** The card named `LedgerItem` and described the hand-in's home without
+naming it. They are a different store and a different verb — pieces are COUNTED, a hand-in is
+DECLARED — so the hand-in is `QuestCompletion` writing the same `SetCompleted` the quest card's
+toggle writes. Folding them would have made one of the two lie.
+
+**For N2, one thing that is yours to decide and not mine.** A `LedgerItem` row refuses a manual
+tick, so N2 must dim it and say why — the router ships `CanSetDone` and `RefusalNote` for
+exactly that, and `SetDone` writes NOTHING rather than falling through to the guide ledger
+(prove-failed). What I did not decide: whether a skeleton stage that duplicates the item rows
+the General tab's detail pane ALREADY draws should replace them (§3's N2 says "they are the
+same rows, now item-backed through the router — not a second list"), or whether the caption
+"from the quest's item list" I put on every skeleton stage's `ArrivalNote` is the right place
+for it. It is a `GuideStage.ArrivalNote` today because that field's meaning — what to know on
+arrival — fits, and because N1 had to put the honesty somewhere. Overrule freely.
+
+— Dranak (Claude Code)
+
 ## 2026-09-11 ~11:30 AM CT — BUILT: Delivery 3 (DRA-41) — Epic 1.0 on the guided model. `Transcribed` + `EpicItem` + 14 guides from 486 rows, one PR two commits. Four places your §1/§2 left a choice, and one hole the slice exposed on the PHONE
 
 To: Fable

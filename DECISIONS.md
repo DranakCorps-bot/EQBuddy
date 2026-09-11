@@ -1,3 +1,95 @@
+## 2026-09-11 (DRA-45 Delivery 2 N1 — the walkthrough transformer; the calls I made alone)
+
+Founder kick 2026-09-11. Fable's §3 N1 (FABLE.md, 2026-09-09 ~10:15 PM CT) is the plan; Live
+Holds were empty at `main` `d266c766`. These are the places the plan left a choice, or where
+the corpus did not fit it, and I decided rather than paging anybody. None touches the
+consequence list: no values line, no release, nothing public, no request-rate change (the
+transformer fetches nothing — it reads wikitext `quests-harvest.py` already pulled).
+
+**1. A `<div class="facblock">` BULLET IS NOT AN OBJECTIVE, and that is a structural rule
+rather than a judgement about flavour.** The plan says bullets become objectives and that no
+bold line may be dropped for looking like flavour. Taken flat, that ships *"Your faction
+standing with DaBashers has been adjusted by 5"* as a step the player is asked to do — and it
+is not a rare case: **3,332 of the corpus's 5,271 bullets are inside a `facblock` div, and I
+read every one of the 37 that are not worded as a faction line. All 37 are still results** —
+"You receive 8 copper from Ortallius", "You gain experience!!", one stray NPC reply. Zero are
+instructions. So the transformer drops what is inside a div the WIKI ITSELF labelled
+`facblock`, exactly as it drops templates and categories, and keeps everything in any other
+div (six lines, all kept). The default it could have gone the other way on: carry them and let
+N2 filter — rejected because the filter would then be a second reader of a rule the data
+already answers, and because a guide whose majority row is a faction result is not a guide.
+
+**2. THE SKELETON ROW IS `Stub` WHERE THE INFOBOX IS BLANK, not `Authored` with a shrunken
+sentence.** The plan says the "Turn-in pieces" rows are `Authored` from infobox fields and
+that "blanks shrink the sentence, never invent". The sentence does shrink — "Hand in the
+pieces." with no giver — but `Authored` is a CLAIM that we can answer who and where, and
+`Validate()` refuses one that cannot. **828 of the 855 quests with items state both a quest
+giver and a start zone; 27 do not** (14 of those state neither), and their 310 rows are
+`Stub`s carrying the sentence *"The page's infobox states no start zone, so we cannot say who
+to bring these to or where."* That is what `Stub` is for and it keeps the share-back door on
+the row. The default it could have gone the other way on: relax `Authored` for skeleton rows —
+rejected, because "Authored" would then mean two different things depending on which generator
+wrote the row, and the first person to read the catalog would not know which.
+
+**3. A QUEST WITH NOTHING AT ALL GETS ONE `Stub` STAGE, NOT AN EMPTY GUIDE.** Sixteen quests
+have no `== Checklist ==`, no `== Walkthrough ==` and no turn-in items. The plan does not
+describe them because the survey that found them is this one. An empty guide is a silent
+no-op wearing a guide's clothes (and does not validate), so each gets a single "Not written up
+yet" stage whose note says WHICH of the two reasons it is — a missing section is a wiki edit
+somebody can make, an unread parent page is ours to fetch. Different help, different sentence.
+
+**4. `ZoneNames` AND `ApplicableClasses` STAY EMPTY ON A HARVESTED GUIDE, and `Validate` now
+says why.** Both are already on the quest's own catalog row, and re-stating them on the guide
+is a second producer of one fact (trap 4) — plus twelve quests state no zone anywhere, so a
+harvested guide would have to invent one to load. The rule is now written as the claim it
+always was: **a guide has to be placeable — it names zones and classes, or it names a quest
+that does.** This is not a loosened bar for curated guides: `GuideCatalogTests` already
+requires every guide's `QuestName` to resolve against the catalog AS THE APP LOADS IT, and I
+added a direct sweep of the CURATED file for both fields, so every hand-written guide still
+names its zones and its classes. The default it could have gone the other way on: fill both at
+merge time from the quest — rejected because nothing reads `Guide.ZoneNames` at all and
+`ApplicableClasses` is read only to match a class to a Sky/Epic guide, so filling them would
+be answering a question nobody asks with 19,000 strings.
+
+**5. THE SOURCE DATE IS `refresh-state.json`'s `ranAt`, NOT THE CLOCK AND NOT A CONSTANT.**
+Byte-reproducibility is the whole review of this file, so a clock is out; `epic-guides-build.py`
+uses a hand-pinned `HARVEST_DATE`, but the quest cache did not land on one day (914 pages on
+2026-08-07 and fourteen later), so a single constant would be wrong for fourteen of them.
+`ranAt` is committed, needs no git history, advances on its own each week, and is TRUE
+conservatively: the refresh evicts and refetches every page the wiki changed, so the moment a
+run completes the whole cache says what the wiki said. It is written at the END of a run, so
+the stamp is at worst one cycle OLDER than the fetch — the safe direction, because a fact aged
+faster is re-checked sooner.
+
+**6. TWO NEW ROUTER HOMES, NOT ONE.** The card names `LedgerItem` (a piece: done when
+`Have ≥ Need`, a manual tick refused) and describes the hand-in's home as "the ledger's
+completion record" without naming it. They are a different store and a different verb — pieces
+are COUNTED and a hand-in is DECLARED — so folding them would make one of the two lie. The
+hand-in is `QuestCompletion`, writing the same `QuestLedgerStore.SetCompleted` the quest
+card's toggle writes. Both are reachable only when a caller hands the router a `QuestMatch`,
+so the Sky and Epic routing is byte-identical to before.
+
+**7. THE REFUSAL IS A REFUSAL, not a fallback.** `SetDone` on a `LedgerItem` row writes
+NOTHING — it does not quietly land in the guide ledger, which is the failure that would look
+like it worked until the next loot line disagreed. Because silent no-ops are broken, the router
+also ships `CanSetDone` and `RefusalNote` so N2 can dim the box and say why (trap 17) instead
+of drawing a live control over a store that will ignore it.
+
+**8. THE BYTE-FOR-BYTE GATE LIVES IN CI AS WELL AS IN THE SUITE.** Nobody reads 1,178 guides,
+so the review is re-running the transformer and finding the file unchanged. The unit test
+shells out to `guides-transform.py --check`, but a developer box without Python would make it
+pass by skipping — a guard that reads as coverage without running is trap 34. So
+`build-and-test` installs Python and runs the same `--check` as its own step, `check.ps1` runs
+it locally, and the test asserts that a CI run can never take the skip path.
+
+**Numbers, as measured and not as estimated.** 1,178 guides; 11,247 objective rows — 5,965
+Transcribed, 4,972 skeleton Authored, 310 skeleton Stub. Per shape: 632 walkthrough, 250
+uncached (the collection-split steps), 105 checklist, 80 walkthrough-with-no-rows, 53 with no
+section at all, 35 subsectioned walkthroughs, 16 with nothing to carry, 6 subsectioned
+checklists, 1 empty checklist. 384 are skeleton-only. The plan predicted "840 with Walkthrough,
+121 with Checklist"; the level-2 sections the rule actually names are **838 and 113**, and the
+delta is that the estimate counted `===` headings named Walkthrough/Checklist too.
+
 ## 2026-09-11 (DRA-41 Delivery 3 — Epic 1.0 on the guided model; the calls I made alone)
 
 Founder kick 2026-09-11 ~7:30 AM CT. Fable's signed §1/§2 (PR #501) is the plan; these are
