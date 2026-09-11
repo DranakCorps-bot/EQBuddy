@@ -110,6 +110,102 @@ A door appears only on an exact catalog match.
 a phone drawing the quest CATALOG is a live defect, and parity by shared module (David,
 2026-08-18) is standing law — leaving it out would ship "more guided" on one surface and
 a lie on the other.
+## 2026-09-11 (DRA-64 — the phone still blank after #550; the calls I made alone)
+
+Founder follow-up to DRA-60: PC browser paste of the full companion URL works, phone still
+not loading, Desktop `2.0.0+4060ac5f` Authenticode Valid, Companion `:47859`. The card named
+a list of phone-specific causes to dig and told me to fix the real defect. **This session
+COULD run things** — build, tests and node are behind me, so unlike the DRA-60 block above,
+these are measured rather than argued.
+
+**What the measurement said, before the decisions.** `node scripts/dra64-choice-probe.mjs`
+lifts the shipped `ensureChoice()` out of `index.html` and runs it over a fake
+`localStorage`. The working PC paste and the blank phone are the SAME build one CSS
+breakpoint apart: `FIRST_RUN` is `innerWidth >= 900 ? [map,spawns,mez,session,quests] :
+[spawns,session]`, and this PC offers `quests,gear`. The wide list overlaps on `quests`; the
+narrow one overlaps nothing. And #550's rescue was gated on `!choice`, while the Founder's
+phone had already paired against the BROKEN build, whose first snapshot persisted
+`{quests:false,gear:false}` under `eqbuddy-screens-<token8>` — so the one device that needed
+the rescue was the only one it could not fire for, and rescanning the same QR reloads the
+same key. Trap 76.
+
+**1. THE CARD'S OWN SUSPECT LIST WAS MEASURED AND MOSTLY CLEARED, AND I SAID SO RATHER THAN
+DIGGING EACH ONE.** Cache of an old `index.html`: the server sends `Cache-Control: no-store`
+and there is no Service Worker in the page at all (`grep`), so a rescan is a fresh GET.
+Old-browser parse failure: the page contains zero instances of optional chaining, nullish
+coalescing, logical assignment, regex lookbehind, `.at(`, `Object.hasOwn` or `structuredClone`
+— it is already written to an old floor, and the whole 135,740-character inline script parses.
+QR mangling: `QrEncoder` is byte mode, so no alphanumeric-mode uppercasing, and the token is
+32 lowercase hex at ~56 URL bytes (version ≤ 4). Rate-limit leftover: the window is 60 s and
+self-clearing, and #550 already cut the page's spend to two. **The default it could have gone
+the other way on:** chase each remaining item (cellular-vs-Wi-Fi, bfcache) to a verdict —
+rejected once the probe reproduced the actual blank page deterministically. A measured
+reproduction outranks an unmeasured list, and the card's Soft LEAVE on network causes
+"without re-measuring" is satisfied by not claiming one.
+
+**2. THE GATE IS "HAS A HUMAN TOUCHED THE ⚙", NOT "IS THERE A STORED CHOICE".** `!choice`
+was a proxy for "nobody has chosen yet" (trap 64b), and the fact is available:
+`commitChoice()` is the one door a screen pick comes through, so it stamps
+`choice.playerPicked`. **The default it could have gone the other way on:** always enable the
+offered set whenever nothing is showing, with no flag at all — simpler, one line, and it
+would have fixed the Founder's phone. Rejected because it makes "turn every screen off on
+this device" impossible to express, and that is a legitimate thing to want on a tablet you
+have finished with. The committed negative for the opposite mistake is scenario E in the
+probe: a player's deliberate all-off stays blank, and `render()`'s own sentence explains it.
+
+**3. A DEVICE WHOSE STORED PICKS PREDATE DRA-64 IS TREATED AS "NEVER ASKED".** The flag is
+absent on every choice ever written before this change, so the first load after the update
+repairs any all-off device once. **The default it could have gone the other way on:** treat
+an absent flag as "the player chose" (conservative — never touch anything), which would have
+left the Founder's phone exactly as broken as it is now and made the fix unshippable for the
+case it exists for. The cost of my choice is bounded and named: a player who had BOTH
+deliberately turned every offered screen off AND is on a pre-DRA-64 build gets them turned
+back on once, is told so in one line, and turns them off again permanently. I judged one
+surprising line strictly better than a permanently blank page nobody can diagnose.
+
+**4. THE REPAIR ANNOUNCES ITSELF — BUT ONLY WHEN IT OVERRODE PICKS THE DEVICE ARRIVED WITH.**
+`rescued && hadStoredChoice`. **The default it could have gone the other way on:** stay
+silent, as #550's first-pairing branch does. Rejected: changing a setting behind someone and
+saying nothing is the silent-no-op rule pointed the other way, and a player who cannot tell a
+repaired page from a lucky one has no way to trust either. On a genuine first pairing the same
+branch IS the default, and announcing a default is noise — so it does not.
+
+**5. I DID NOT ADD THE THIRD EMPTY-STATE SENTENCE I HAD WRITTEN.** "This device picked
+screens your PC is not sharing" looked like a missing case, but
+`CompanionSnapshot.ForSubscription` puts every subscribed-but-gated name into `NotOffered`
+and the page draws those as "Not shared by the PC" — so `wanted` is empty only when
+`picked()` is empty, and the sentence would have guarded a state the server makes
+impossible. Logged because deleting it is the kind of thing that looks like an omission in
+review: a branch for an unreachable state is vacuous coverage wearing a fix's clothes.
+
+**6. THE INSTRUMENTS ARE COMMITTED, BUT NOT WIRED INTO CI.** Helm ACKed leaving node out of
+CI on #550, so the CI-visible guard is C# only (`CompanionScreenChoiceRecoveryTests`, five of
+six red before the fix). **The default it could have gone the other way on:** add
+`node --check` to `check.ps1` while I was here — left alone, because Helm ruled on exactly
+that and a shipped fix does not lift a ruling.
+
+**7. I EXTENDED #552's HARNESS RATHER THAN SHIPPING A PARALLEL DOOR — AND IT FOUND THE
+BLIND SPOT IN ITS OWN GREEN RUN.** #552 landed while I was working and had just built the
+headless readout (`-Refuse`, `#harnessState`, `--dump-dom`), using it to verify #550's blank
+page against "the Founder's actual configuration". That run was honest and green and could
+not have found this: every harness run starts with **empty localStorage**, and `-Snapshot`
+**rewrites `FIRST_RUN` to the snapshot's own offer**, which makes the overlap succeed by
+construction. So `-StoredChoice` seeds a device that has already paired and suppresses that
+rewrite, and the three readouts are pinned in the test and in `TestPlan`: BEFORE
+(`cc020280`) `panels: []`; AFTER `panels: ["Quests","Gear checklist"]` with `stored` now
+all-true; AFTER with `playerPicked:true` `panels: []`. **The default it could have gone the
+other way on:** ship only `scripts/dra64-choice-probe.mjs` and leave the harness alone,
+since the node probe already proved the logic — rejected, because the probe proves a
+function and the harness proves the PAGE, and the next person to touch this will reach for
+the harness. The probe stays as the cheap prove-fail (`node … [olderPage.html]`).
+
+**8. MY OWN INSTRUMENT REPORTED A FALSE NEGATIVE TWICE BEFORE I TRUSTED IT**, and it is
+logged because it nearly became a finding about the product. The harness's "was the player
+told" field first read `classList.contains("show")` at readout time (the notice is a 5 s
+toast, the readout is later — `false` for a sentence that had shown), then latched it on a
+`MutationObserver` registered on `DOMContentLoaded` (which under `--virtual-time-budget`
+fires after the snapshot push — `false` again). It now registers immediately and reports the
+latch beside `textContent`, which survives the hide. Two readings of one fact, deliberately.
 
 ## 2026-09-11 (DRA-60 — the mobile hang after the QR; the calls I made alone)
 

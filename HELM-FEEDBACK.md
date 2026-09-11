@@ -30,6 +30,70 @@ To: Helm
 **Scope hygiene:** not a hold, and I took none. No `src/` change, no WhatsNew, no TestPlan change (nothing a player can run moved). Live Holds empty at read. Soft LEAVE Pages / Play Console / tag / signing / prod secrets / Evolved restore / Founder mail / Bevel kick / #527 from this land.
 
 — Dranak (Claude Code, DRA-62)
+## 2026-09-11 ~6:05 PM CT — ADDENDUM to the DRA-64 LIVE ASK below: the repair is now RUN, not just measured — and #552's green run had the same blind spot
+
+To: Helm
+
+**Nothing in the ask below changes; this strengthens its evidence and adds one scope note.** PR #556, tip `f9c8b724` (rebased onto Soft `main` `08956c89`, so #552 and #554 are both in). `build-and-test` **SUCCESS**; `e2e-windows` still running at the time of writing.
+
+**#552 merged while I was working, and it had just built exactly the door this needed.** I used it rather than shipping a parallel one. But its green run — *"a PC offering quests/gear against a phone's FIRST_RUN of spawns/session, the Founder's actual configuration, paints both offered panels"* — **could not have found DRA-64**, for two reasons worth a ruling-level note because they will recur:
+
+1. every harness run starts with **empty `localStorage`**; and
+2. `-Snapshot` **rewrites `FIRST_RUN` to the snapshot's own offer**, which makes the overlap succeed *by construction*.
+
+A fixture that cannot hold the reporter's state cannot reproduce the reporter's bug, and a fixture that removes the mechanism verifies the mechanism's absence. That is trap 76's second half, and it is not a criticism of #552 — it drove four paths that had never been driven, and this card only exists because it made driving them cheap.
+
+**So `-StoredChoice` seeds a device that has ALREADY PAIRED and suppresses that rewrite.** Three runs through `#harnessState`, **BEFORE being `cc020280` — the exact page the Founder rescanned:**
+
+| run | `panels` | `noScreens` | `stored` after |
+|---|---|---|---|
+| **BEFORE** | `[]` | **true** — "No screens picked on this device. Tap ⚙…" | unchanged, all-false |
+| **AFTER** | `["Quests","Gear checklist"]` | false, notice shown | **all-true — the repair persisted** |
+| **AFTER**, `playerPicked:true` seeded | `[]` | true, nothing announced | unchanged — a real decision survives |
+
+**The BEFORE row answers ask 3 below better than I could when I wrote it.** By his second attempt the Founder was NOT looking at a hang — he was looking at "No screens picked on this device. Tap ⚙ at the top to choose what to show." and no data, permanently. So: **he does not need to be told to clear site data or re-pair.** One load of the updated page is enough, and the page now says what it did. The only residual is trap 32 — a tab left open since the last attempt runs the old JavaScript — so "close and reopen the page once" is the whole instruction. **Still your call whether that sentence goes to him; I am not writing to the Founder from here.**
+
+**One disclosure, because it nearly became a finding about the product.** The harness verdict's "was the player told" field gave a **false negative twice** before I trusted it: first it read `classList.contains("show")` at readout time (the notice is a 5 s toast, the readout is later), then it latched on a `MutationObserver` registered at `DOMContentLoaded` (which `--virtual-time-budget` beats). It now registers immediately and reports the latch **beside** `textContent`, which survives the hide — two readings of one fact. I am flagging it rather than burying it: had I stopped at reading one, I would have reported "the page changes picks silently" about a page that does not.
+
+**Scope unchanged:** `src/` change is `index.html` only; `scripts/mobile-harness.ps1` is tooling; no `src/EQBuddy` / Core / settings / wire-protocol change. Soft LEAVE Pages / Play Console / tag / `release.ps1` / signing / prod secrets. Not needs-david. Channel files verified **additions-only** against `main` — and the DRA-65 rebase collisions in `DECISIONS.md` and `HELM-FEEDBACK.md` were resolved by **keeping both entries**, mine placed by its timestamp (5:20 PM above DRA-65's 5:00 PM); nothing of Fable's was dropped.
+
+— Dranak (Claude Code)
+
+## 2026-09-11 ~5:20 PM CT — LIVE ASK: **SIGN DRA-64** — #550's rescue could not reach the Founder's phone (measured; the PC/phone split is a CSS breakpoint, not the network)
+
+To: Helm
+
+**PR:** #556 https://github.com/DranakCorps-bot/EQBuddy/pull/556 on `claude/opus-dra64-mobile-phone-20260911` tip `ab0653e1`.
+
+**Loop-close on your #550 SSC first, because it is the corrective one.** You spot-checked #550 as *"first pairing enables all offered when FIRST_RUN misses the PC gate"* and signed it, and the diagnosis was right. **The gate on it was wrong, and the Founder's phone is the one device it excluded.** `firstPairing = !choice` — and his phone had already paired against the BROKEN build, whose first snapshot persisted the all-off choice. So the fix shipped, the Desktop was republished, he rescanned, and nothing changed. Neither of us asked what the broken build had written to the device before the repair went out; that is the reusable lesson and it is now trap 76.
+
+**Measured this session (build + tests + node all available, unlike the DRA-60 session):**
+
+1. **Why the PC paste works and the phone does not — same build, one CSS breakpoint.** `FIRST_RUN = innerWidth >= 900 ? [map,spawns,mez,session,quests] : [spawns,session]`; this PC offers `[quests,gear]`. Wide overlaps on `quests` → paints. Narrow overlaps nothing → blank. **Soft LEAVE wrong-network / truncation / Tailscale — I am not claiming one, and I did not need to.**
+2. **The poison, and where it came from.** `eqbuddy-screens-<token8> = {"order":["quests","gear"],"enabled":{"quests":false,"gear":false}}`, written by `if (offerChanged) { renderScreens(); saveChoice(); }` — which fires on every first snapshot because `offered` starts `[]`. Confirmed present in `cc020280^`, i.e. the build his phone paired against.
+3. **Rescanning cannot escape it.** The key is the token prefix; the token did not change.
+4. **The instrument.** `node scripts/dra64-choice-probe.mjs` lifts the SHIPPED `ensureChoice()` out of `index.html` and runs it over a fake `localStorage`, six scenarios. Prove-failed: point it at `cc020280`'s page and the Founder's two scenarios redden.
+5. **The card's other suspects, measured and cleared:** no Service Worker in the page and `Cache-Control: no-store` (so a rescan is a fresh GET); zero instances of `?.`, `??`, `||=`, regex lookbehind, `.at(`, `Object.hasOwn`, `structuredClone` and the whole 135,740-char inline script parses (so not an old-engine parse failure); `QrEncoder` is byte mode and the token is 32 lowercase hex at ~56 URL bytes (so no alphanumeric-mode uppercasing); the rate-limit window is 60 s and self-clearing and #550 already cut the page's spend to two.
+
+**Fix:** the gate is the FACT, not the proxy (trap 64b). `commitChoice()` is the one door a human's screen pick comes through, so it stamps `choice.playerPicked`. A deliberate all-off choice survives; an accidental one is repaired once, persisted, and **announced** when it overrode picks the device arrived holding.
+
+**Guard:** `CompanionScreenChoiceRecoveryTests`, 6 tests, **5 red against `cc020280`** (the sixth is the premise anchor and holds on both by design). **Local:** `check.ps1` all gates green, 4,238 unit tests, 169 Companion.
+
+### Asks
+
+1. **SIGN #556 merge-when-green** (`build-and-test` + `e2e-windows`). Soft rebase onto Soft `main` if behind; Soft LEAVE force-merge while pending.
+2. **Republish the local AppData Desktop after merge, so the Founder can retest on his actual phone.** Your #550 SSC authorized exactly this shape of republish; I am asking again rather than reusing it, because that authorization was spent on #550. **Soft LEAVE Pages / Play Console / tag / `release.ps1` / signing / prod secrets.**
+3. **The Founder's phone needs one action from HIM that no build can do: load the page once after the update.** The repair runs on the next snapshot, so a rescan (or just reopening the tab) is enough — but if the tab has been left open since the last attempt, it is still running the old JavaScript (trap 32) and will keep showing nothing. Asking whether you want that said to him as a step, or whether the pull-to-refresh / reload path is enough to leave unsaid.
+4. **Evidence hole, restated not re-litigated:** there is still no CI JS parse of `index.html`. You ACKed leaving node out of CI on #550 and **I left it alone** — `scripts/dra64-choice-probe.mjs` is committed as an instrument, run by hand, not wired into `check.ps1`. Flagging only because this is the second card in a row whose defect lived entirely in that file.
+5. **David — ACK not needed.** Nothing here touches the consequence list: no values line, no release go, nothing public, no money, no roadmap, no eqlwiki departure, no third party, no privacy surface. Six calls logged in `DECISIONS.md` with the default each could have gone the other way on.
+
+### Feedback
+
+- **Corrective (to me, and logged as such):** "measured on a clean fixture" is not "measured on the reporter's state". `CompanionFirstPairingTests` makes exactly the right argument for a clean browser profile on trap 67, and I let that idiom carry into a bug whose whole substance was persisted state. The honest fixture is the state the reporter is actually in.
+- **Reinforcing (to you):** your #550 ruling explicitly refused to let truncation / wrong-Wi-Fi / Tailscale be called the root cause without measurement. That refusal is why this card went looking at the page's own stored state instead of re-litigating his network, and it is the reason the second dig landed in one pass.
+
+— Dranak (Claude Code)
+
 ## 2026-09-11 ~5:00 PM CT — LIVE ASK: **SIGN the DRA-65 PLAN** — Unlocks guided detail + race/class filter (plan only; Executor kicks on your SIGN)
 
 To: Helm

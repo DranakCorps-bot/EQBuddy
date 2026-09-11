@@ -637,6 +637,10 @@ function boot() {
   let choice = null; // { order:[names], enabled:{name:bool} }
   try { choice = JSON.parse(localStorage.getItem(storeKey)); } catch {}
   const saveChoice = () => { try { localStorage.setItem(storeKey, JSON.stringify(choice)); } catch {} };
+  // DRA-64: whether this device arrived holding a stored choice at all. Only used to
+  // decide whether the rescue below is a DEFAULT (first pairing — silent, nothing to
+  // explain) or an OVERRIDE of something already on this device, which has to say so.
+  const hadStoredChoice = !!choice;
   // The separate Epic/Sky screens folded into "quests": carry a device's saved picks
   // over, so a tablet that was showing its checklists keeps showing them under the
   // new name instead of silently losing the surface.
@@ -781,8 +785,15 @@ function boot() {
             : "Alert sounds are on. Tap anywhere on this page once — browsers won't play a sound until you do.";
   }
 
+  // True when the ⚙ has been used on this device — the only thing that makes an
+  // all-off choice a DECISION rather than an accident of the defaults. Absent on every
+  // choice written before DRA-64, which reads as "never touched" and is correct: the
+  // writes that existed were the offer-changed save and the fullscreen flag, neither of
+  // which is a screen pick. See ensureChoice().
+  const playerHasPicked = () => !!(choice && choice.playerPicked);
+
+  // Returns true when it had to turn the offered surfaces back on — see the rescue below.
   function ensureChoice() {
-    const firstPairing = !choice;
     if (!choice) choice = { order: [], enabled: {} };
     for (const s of offered) {
       if (!choice.order.includes(s)) choice.order.push(s);
@@ -794,12 +805,28 @@ function boot() {
     // DRA-60 (Founder, Kaybek LAN + full token): FIRST_RUN on a phone is
     // spawns/session, but this PC's CompanionHiddenSurfaces leaves offered as
     // quests/gear only. Zero overlap → wanted=[] → header over a blank
-    // #sections, which looks hung after a successful Open + snapshot. On the
-    // FIRST pairing only, enable every offered surface so something paints;
-    // a later visit that turned them all off keeps that choice.
-    if (firstPairing && offered.length && !offered.some(s => choice.enabled[s])) {
+    // #sections, which looks hung after a successful Open + snapshot. Enable every
+    // offered surface so something paints.
+    //
+    // DRA-64 — AND THE GATE USED TO BE `!choice`, WHICH IS WHY THE FOUNDER'S PHONE WAS
+    // STILL BLANK AFTER THE FIX SHIPPED. `!choice` was standing in for "nobody has
+    // chosen yet", and those are not the same claim (trap 64b). The phone had ALREADY
+    // paired against the broken build, and the first snapshot of that session persisted
+    // `{quests:false, gear:false}` under `eqbuddy-screens-<token8>` — the
+    // offer-changed saveChoice() below, which fires on every first snapshot because
+    // `offered` starts empty. So the rescue could not fire for the one device that
+    // needed it, and rescanning the SAME QR reloads the same key and the same poison.
+    // The PC's browser escaped it for a reason that has nothing to do with the network:
+    // at innerWidth >= 900 FIRST_RUN contains `quests`, which this PC offers.
+    //
+    // So the gate is the FACT — has a human ever touched the ⚙ — not the proxy. An
+    // all-off choice that a player made survives (commitChoice stamps it); an all-off
+    // choice that only the defaults produced is repaired, here, once.
+    if (!playerHasPicked() && offered.length && !offered.some(s => choice.enabled[s])) {
       for (const s of offered) choice.enabled[s] = true;
+      return true;
     }
+    return false;
   }
   // What this device picked — the subscribe message deliberately does NOT intersect
   // with `offered` (unknown until the first snapshot; the server answers gated names
@@ -844,6 +871,12 @@ function boot() {
   // page says for the few milliseconds the asking takes, rather than a cause we have not
   // established yet. Against a PC that is switched off the asking is the slow part.
   const CHECKING = "Not connected yet — checking why.";
+  // DRA-64. Said once, when the repair above changed picks this device arrived holding.
+  // Flipping a player's screens back on behind their back is the kind of silent fix that
+  // leaves them unable to tell a working page from a lucky one.
+  const RESCUED_PICKS =
+    "None of the screens your PC is sharing were switched on here, so EQBuddy Mobile " +
+    "turned them on. Tap ⚙ to change what this device shows.";
   let refusedByThePc = false;   // nothing to retry: only a new code changes this
   let connectionProblem = null; // what refreshStale() says while everConnected is false
   let diagnosing = false;
@@ -965,8 +998,14 @@ function boot() {
       alertAudio.apply(msg.alerts);
       const offerChanged = JSON.stringify(msg.offered) !== JSON.stringify(offered);
       offered = msg.offered || [];
-      ensureChoice();
-      if (offerChanged) { renderScreens(); saveChoice(); }
+      // `rescued` has to join `offerChanged` in the save: the repair must reach
+      // localStorage, or the next load repeats it and the notice below becomes a thing
+      // the player is told every single time they open the page.
+      const rescued = ensureChoice();
+      if (offerChanged || rescued) { renderScreens(); saveChoice(); }
+      // Only when we overrode picks this device ARRIVED with. On a first pairing the
+      // same branch is simply the default, and announcing a default is noise.
+      if (rescued && hadStoredChoice) notice(RESCUED_PICKS);
       // ensureChoice() is where a first-run device FIRST has picks to state — the open
       // handler could only guess at them. Narrowing to them here is what stops a newly
       // paired phone being served all eleven surfaces for the life of the connection;
@@ -3090,7 +3129,16 @@ function boot() {
     [choice.order[i], choice.order[j]] = [choice.order[j], choice.order[i]];
     commitChoice();
   }
-  function commitChoice() { saveChoice(); renderScreens(); sendSubscribe(); render(); }
+  // The ONE door a human's screen pick comes through — both the checkboxes and the
+  // ▲▼ reorder land here. So this is where "the player has chosen" is recorded (DRA-64),
+  // and recording it anywhere else would be a second producer of the same fact (trap 4).
+  // It is deliberately NOT set by the offer-changed save or by the fullscreen flag:
+  // neither of those is a screen pick, and treating them as one is what would make an
+  // accidental all-off choice permanent again.
+  function commitChoice() {
+    choice.playerPicked = true;
+    saveChoice(); renderScreens(); sendSubscribe(); render();
+  }
 
   // ---------- keep the screen awake, honestly ----------
   // Wake Lock needs a secure context; plain http://<lan-ip> is not one, so on most
