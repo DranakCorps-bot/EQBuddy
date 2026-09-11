@@ -813,6 +813,17 @@ after the named guard left with its surface.
     is a template, not research.** Survey a curated file before believing
     it — Fable's #480 last-look found this by counting, not by reading.
 
+74. **A "byte-identical" gate over a file with a CONTAINER asserts which
+    toolchain built the container.** gzip is not reproducible across zlib
+    builds, so `guides-transform.py --check` went red on CI against a
+    `HarvestedGuides.json.gz` whose CONTENTS were identical (runner 3.12 vs a
+    3.14 box). Compare the thing the claim is ABOUT — decompress first — and
+    gate the WRITE on the same comparison, or every refresh PR carries a
+    binary diff that says nothing. Applies to any zip/archive/PNG/db claim.
+    **The failure mode is the bad one:** a gate that reddens on a toolchain
+    version teaches the next person to re-run until green, and then it is a
+    guard nobody believes. [Novel](docs/ops/claude-archive/traps.md#trap-74)
+
 New trap discovered the hard way? Add the compact rule here and the novel
 under `docs/ops/claude-archive/traps.md`. That is the whole point.
 

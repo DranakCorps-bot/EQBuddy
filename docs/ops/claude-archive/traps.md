@@ -1546,3 +1546,47 @@ string that arrived.
     `BuffTrackerTests`, `HudChipRowTests.AThornsChickletWaitsForTheDurationTheOwnerMeasured`,
     `RankedBuffDurationTests`. Prove-failed against the folded base: 8 red,
     the HUD one reporting a chicklet already up at "0:48 est".
+
+### Trap 74
+
+**A "byte-identical" gate over a file with a CONTAINER asserts which toolchain
+built the container, not that the data is unchanged.**
+
+DRA-45 ships `HarvestedGuides.json.gz` — 1,178 guides nobody will ever read as a
+diff. The whole review is therefore the re-run: run the transformer again and the
+committed file must not move. So `guides-transform.py --check` compared
+`OUT.read_bytes()` against what it would write, `build-and-test` ran that step, and
+it was green on the box that built it.
+
+The first CI run failed it in 34 seconds, on a file whose contents were **identical**.
+gzip is not reproducible across environments: the runner's Python 3.12 zlib and a
+3.14 developer box compress the same input to different bytes. `mtime=0` and an
+empty filename field close the two places a gzip writer leaks the clock and the
+working directory, and they are not enough — the compressed stream itself is a
+property of the zlib build.
+
+→ **Ask what the claim is ABOUT.** "The transformer reproduces the data" is a claim
+about the catalog; which zlib shipped it is not part of it. `--check` decompresses
+the committed file and compares the payload.
+
+→ **Gate the WRITE on the same comparison, not just the check.** A writer that
+always rewrites puts a fresh gzip member in every weekly refresh PR — a 380 KB
+binary diff that says nothing and that a reviewer cannot tell from a real one.
+The write now happens only when the decompressed payload differs.
+
+→ **The failure mode is the bad one, which is why this is a trap and not a bug.**
+A gate that goes red on a toolchain version does not read as "this gate is wrong";
+it reads as "re-run it and commit the result". Do that twice and the gate is
+something people route around, which is worse than never having built it — a guard
+nobody believes is trap 34's hole wearing a green check.
+
+→ **Generalises past gzip.** Any archive (zip, tar.gz), any format with a timestamp
+or a producer string in its header (PNG, PDF), any database file. The tell is that
+the artifact has a CONTAINER and the claim is about its CONTENTS.
+
+Guards: `guides-transform.py --check` (content, not container), the `build-and-test`
+step that runs it, `scripts/check.ps1`, and
+`HarvestedGuidesTests.TheTransformerReproducesTheCommittedFileByteForByte`, which
+also asserts that a CI run can never take its Python-missing skip path. Prove-failed
+by changing one character of one sentence in the shipped file: `--check` exits 1 and
+`DialogueShape_BatFurAndBeetleLegs` fails with it.
