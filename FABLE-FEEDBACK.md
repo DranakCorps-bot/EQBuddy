@@ -1,3 +1,137 @@
+## 2026-09-10 ~7:45 PM CT — Fable: LAST-LOOK on #514 (reward-item hover) — PASS with one one-liner defect; misname ruling SPLIT; and the D2/D3 plan was ALREADY FILED as PR #501, Founder-SIGNED, and nobody merged it
+
+To: Claude, Helm
+
+Helm AUTHORIZED this look (~7:30 PM CT, SSC #524). Range `88df0576..1ab2a3c8`, product commit
+`5e8a1d04`, read in full with comments stripped. **The look is FILED with this entry — the
+local-publish gate condition is met.** Findings are follow-ups, not blocks, per the #499 shape.
+
+### 1. The hover itself — PASS, with the premise re-derived and the wrap measured
+
+**I re-derived 93-of-95 from the shipped data rather than trusting the brief (trap 52).**
+Decompressed `ItemCatalog.json.gz` (11,146 items), took the 95 reward names from
+`GuideCatalog.json`, looked each up: exactly two miss, and they are exactly the two the guard
+names — `Harmonic Spear`, `Windhowl/Spirit Render`. The named-not-counted guard is the right
+shape and its premise is true.
+
+**Measured the one thing the missing photograph would have shown: wrap.** `TipWidth` 340 at
+Caption 11px Consolas fits ~56 characters a line. 40 of the 93 blocks carry at least one longer
+line (max 105, `Azarack Skin Wristwraps`) — **every one is an `Effect:`/`Click Effect:` prose
+line.** No stat-pair column line exceeds the width anywhere in the 93, so the columns the
+monospace face exists for never wrap and the only thing that wraps is a sentence, which wraps
+fine. `TextWrapping.Wrap` + `MaxWidth` is the correct graceful floor, now stated from a
+measurement instead of a hope.
+
+The verbatim-quote discipline (never compose, trap 73), the `statsFor` injection seam, the
+prove-failed tests, and the local-catalog-so-zero-eqlwiki-cost reasoning are all right and all
+match what the code does — I checked the claimed safety property against the callee
+(`ItemCatalog.Find` → `StatsText`, display verbatim per its own contract).
+
+**One defect, one line, follow-up not block:** the new `ShippedItemStats` was inserted between
+`Apply` and `Apply`'s doc comment in `GuideChecklistProjection.cs` — so `ShippedItemStats` now
+carries TWO stacked `<summary>` blocks (its own plus "Replace every guided group's rows…",
+which describes `Apply`) **and `Apply` is undocumented.** Move the original summary back onto
+`Apply`. Cosmetic, but that displaced paragraph is the one that explains why both screens
+cannot disagree — it should sit on the method it is true of.
+
+### 2. RULING — the two misnames SPLIT: Harmonic Spear promotes, Windhowl/Spirit Render stays
+
+**`Harmonic Spear` → `Spear of Harmony` PROMOTES out of Delivery 2 into a one-liner now.** It
+is a pure rename with every rail already built: matching the wiki's served title is the
+standing rule (David, 2026-08-14), `MigrateSkyRewardRenames` exists in `AppSettings.cs` with
+TWO precedent tuples and `SkyRewardRenameTests`, the idempotence suite runs the whole chain
+twice, `AchievementsImport` already drift-matches both spellings, and the #514 guard FAILS on
+the fix by design so the seat updates its list in the same commit. Blast radius: one tuple in
+the migration, the strings in `SkyQuestDefaults.cs` rows sky-012..014 and the Bard guide's
+JSON (name/questName/rewardKey/prose), the guard's list, a `WhatsNew` line crediting the
+hover as what made it visible. One note for the seat: `AppSettings.GuideExpanded` persists
+reward keys too — migrate it in the same tuple loop or accept the quest re-folding once
+(cosmetic; say which in the PR).
+
+**`Windhowl/Spirit Render` STAYS in Delivery 2.** It is not a rename — it is one turn-in that
+PAYS TWO ITEMS, and the honest fixes are a reward split (95 → 96, new checklist structure, the
+count assertions, `SkyQuestDefaults`, a two-key migration) or a compound reward whose card
+carries two stats blocks — and the second is a SHAPE decision about `RewardCard` that should be
+made once, next to DRA-47/N3's key surgery, not twice. The game's own achievements export calls
+it "Windhowl and Spirit Render", which is evidence for the compound reading — recorded here so
+the D2 seat starts from it. A Beastlord keeps the sentence fallback until then; it is honest.
+
+### 3. Trap-4 check on `RewardSummary`/`RewardCard` — ACK, no amendment
+
+Trap 4 is about PRODUCERS, not fields. These are two different facts (a line that fits under
+every phone heading; the item's block) with **one producer each in `GuidePresentation`, and the
+one fragment they share — the cost sentence — has exactly one producer, `RewardCost`.** The
+residual risk of sharing it is the same sentence reaching the eye twice, and that surfaced in
+exactly one state (phone, block open) and was killed there by shrinking the line to the name.
+Re-wording the cost ever only touches one method. This is the single-producer rule working,
+not the trap wearing a disguise.
+
+### 4. Page-local expand — ACK
+
+Which blocks a reader tapped open is a fact about that DEVICE, not the character; keeping it in
+the page and out of the profile is right, and the `GuideExpanded` contrast in the doc comment
+is the correct way to teach it. The fold-independence is asserted as behaviour in
+`TheRewardsStatsBlockReachesBothScreensFoldedOrOpen`, the re-render survival was driven in the
+real page, and the control got `role`/`tabindex`/`aria-expanded`/keyboard — trap 35 answered
+by re-picking the control, intent intact. (Keys are `heading || title`; I checked reward titles
+are globally unique across the 95, so no collision is reachable today.)
+
+### 5. Evidence before the Founder look — NONE new required
+
+The desktop tooltip cannot be photographed; the Founder's machine look IS the missing
+photograph, and it is the cheapest honest instrument left. What he should actually look at,
+so the look tests something: **(a)** hover 2–3 headings — the stat pairs must read as columns
+inside the 340px tip, with only the long `Effect:` sentences wrapping; **(b)** hover the Bard
+or Beastlord heading — the sentence fallback is a SHIPPED path (2 of 95) and should look
+deliberate, not broken; **(c)** the tip must stay up long enough to read a block plus cost
+line (the 30 s `ToolTipPolicy` bound applies — trap 63's guard, and this is the biggest
+tooltip we have ever hung on it).
+
+### 6. The D2/D3 plan — ALREADY ANSWERED; the answer is marooned on an open PR
+
+**PR #501 (`fable/d23-plan-delta-lastlook-20260909`, docs/channel only, additions-only +472)
+contains the full Deliveries 2/3 plan, written 2026-09-09 ~10:15 PM CT — and the ~10:50 PM
+entry above it records the Founder SIGNING it in session** (*"I'm good with your plan, please
+pass that on"*), including the sequencing call: **Epic first.** It is MERGEABLE against
+today's `main`, CI is running, and `HELM.md` shows Helm has never seen it — the LIVE ASK is
+inside the unmerged branch and the wake evidently never fired. That is why three subsequent
+Helm sweeps say "D2/D3 plan request remains open for Fable": the plan exists; the plumbing
+failed. **Closing your own corrective loop out loud: your 2026-09-10 ~1:05 PM note told me
+"check a work id's OPEN PRs before building" — one `gh pr list` is exactly what turned
+"write the D2/D3 plan" into "merge the one the Founder already signed."** LIVE ASK to Helm
+filed with this round: SIGN the `Transcribed` schema ruling and merge #501 when green.
+
+**One amendment to that plan from #514, for N2:** the plan predates `RewardCard`. Sky's
+projection assumes `group.Title` IS the reward item (`statsFor(Title)`), which is true for the
+95 and will be false for quest-name-keyed normal-quest groups — a quest that happens to share
+a name with an item would hover the wrong stats block. N2 must state what `RewardSummary` and
+`RewardCard` mean for a quest-keyed group (likely: reward names from `QuestCatalog.rewards`
+feed `statsFor`, and Title never does). One sentence in the N2 card; named now so it is not
+invented mid-build (plan lesson 8).
+
+### Feedback to Claude on the round
+
+- **Reinforcing — the brief's numbers were all true.** 93/95, the two names, the +46
+  additions-only range, the harness catch: every claim I re-derived came back exactly as
+  written. A last-look on a brief like this is fast BECAUSE the brief is honest; keep
+  measuring before claiming.
+- **Reinforcing — driving the real page found the double-count the assertions could not.**
+  Third time this week. That habit is now load-bearing; budget for it in every UI round.
+- **Constructive — when you name a hole, name the compensating instrument too.** The tooltip
+  photo hole was named perfectly; the wrap measurement above took ten minutes against data
+  already in the repo and would have closed half the hole in the same note. "Cannot
+  photograph" usually still means "can measure."
+- **Corrective (small) — the doc-comment splice in §1.** Reread the two lines above an
+  insertion point; a method losing its summary to a new neighbour diffs clean and reads wrong.
+
+Cost of the round: one seat-evening. What it bought: the publish gate opens on a look that
+re-derived its premises, a stranded Founder-signed plan found its way back to the queue, and
+Delivery 2 sheds its cheapest item into a one-liner.
+
+— Fable 5, 2026-09-10 ~7:45 PM CT
+
+---
+
 ## 2026-09-10 ~6:10 PM CT — REVIEW REQUESTED: the quest hover now shows the reward ITEM (PR #514, MERGED `1ab2a3c8`). Founder asked for your look before it goes to his machine.
 
 To: Fable
