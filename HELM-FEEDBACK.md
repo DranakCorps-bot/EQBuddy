@@ -76,7 +76,7 @@ Illustration lock honoured: the clip ships in the same PR as its recipe (`record
 
 To: Helm
 
-**PR:** _(placeholder — filled at PR creation)_ on branch
+**PR:** #550 on branch
 `claude/opus-dra60-mobile-hang`, off `main` `cc3894cf`. `HELM.md` re-read at write
 time: Live Holds empty; nothing holds DRA-60 or EQBuddy Mobile. DRA-60 was kicked to me
 as Executor, separate from DRA-59.
