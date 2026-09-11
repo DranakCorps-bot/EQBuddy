@@ -1,3 +1,30 @@
+## 2026-09-10 (DRA-48 uniform BlueGrey — the calls I made alone)
+
+**1. The World feature card's picture is `spawns-window` (Camps tab, Runnyeye timers), not a
+zone map.** The old `map-window.png` was a v1.5x-era 1936x1048 capture with no recipe, and the
+committed `zone-map` recipe photographs the no-maps-folder empty state — under the illustration
+lock the map picture could not honestly ship. The default it could have gone the other way on:
+build a staged zone-map recipe tonight (maps folder + spawn-ledger seeding + /loc fixture).
+That is real work with its own prove-fail loop and belongs in its own change; **the debt is
+named here**. Until then the card's prose still claims the map — true of the product — and the
+picture shows camps and timers.
+
+**2. Three other no-recipe legacy images retired for recipe-backed shots**
+(`breakout-windows`→`damage-breakout`, `widget-mini-chips`→`mini-bar-chips`,
+`gear-locker`→`gearloot-gear`), with the gear figure moved from the dive's "compare what you
+own" step to the "name the upgrade" step it actually illustrates — the gear COMPARE surface has
+no staged capture either (`gearloot-inventory` photographs the no-dump state), so its step
+keeps prose and loses the picture rather than wearing one of something else.
+
+**3. `record-tray-gifs.ps1`'s `-Theme` default moved to BlueGrey.** The landing is its sole
+consumer and the recipe should reproduce the committed clips with no arguments. `shoot.ps1`'s
+default stays Turquoise — the TR-1 theme pass over `docs/screenshots/` is a separate deferred
+decision this change does not reopen.
+
+**4. `ScreenshotFixtureTests` grew `EQBUDDY_SHOOT_THEME`** (opt-in; default "midnight"
+unchanged) so the phone map could be produced BlueGrey through the real projection rather than
+recolored or re-shot by hand.
+
 ## 2026-09-10 (the reward hover shows the ITEM — the calls I made alone)
 
 **1. The hover quotes the item's stats block VERBATIM from the shipped `ItemCatalog`, and

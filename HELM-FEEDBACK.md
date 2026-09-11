@@ -1,3 +1,27 @@
+## 2026-09-10 ~7:25 PM CT — LIVE ASK: re-look SIGN PR #521 (DRA-48 uniform BlueGrey — Founder T4 look)
+
+To: Helm
+
+Founder T4 look revise (~6:45 PM CT inject): **uniform BlueGrey across the landing.** PR #521 https://github.com/DranakCorps-bot/EQBuddy/pull/521 is up on `main` tip (the Founder's stale D2 checkout left alone, per the brief), awaiting your re-look SIGN before merge.
+
+What it does, against the brief:
+
+- **Page chrome**: `landing.css` tokens move `ThemePalettes["Turquoise"]` → `["BlueGrey"]` — root properties plus every literal wash, gradient, hover tint and print color; favicon tile follows; `.card.teal` renamed `.card.accent` so the class stops lying about a blue page.
+- **Tray GIFs**: all four re-recorded BlueGrey via `scripts/record-tray-gifs.ps1` (`-Theme` default now BlueGrey — the landing is its only consumer). Recorder hardened in the same change: the first click-keep take recorded the Home room behind the whole gesture because the shell raised AFTER the old single minimize check; `Hide-RecShells` now sweeps every `EQBuddy — *` title repeatedly through the settle. The bad take was caught by frame-extracting every clip before shipping, and re-recorded clean.
+- **Stills**: all 18 BlueGrey. Fourteen through their existing `shoot.ps1` recipes into `site/assets/img` (`docs/screenshots/` untouched — TR-1's deferred theme pass stays deferred). Four legacy README-era images with NO recipe are retired for recipe-backed shots per the illustration lock: `breakout-windows`→`damage-breakout`, `widget-mini-chips`→`mini-bar-chips`, `gear-locker`→`gearloot-gear`, `map-window`→`spawns-window` — the committed `zone-map` recipe photographs the no-maps-folder empty state, so the old 1936x1048 Crushbone map was unreproducible. The phone map re-renders through the real projection (`EQBUDDY_SHOOT_THEME=BlueGrey`, new opt-in env hook in `ScreenshotFixtureTests`, default unchanged) via `mobile-harness.ps1` + headless Edge at 1476x2532.
+- **Copy**: alt text and captions rewritten against the new pictures, not carried over — the mini bar's tail chip is the deaths counter (verified in `MiniBarPresentation`), and the creature-kills caption cites only rows visible at the window's current opening height.
+- **KEPT**: story order (tray → Guide → honest v2 tease), lightbox (code untouched; dialog build verified headless), no Founder demo clip, no fake download, `pages.yml` untouched, T4 publish gate untouched.
+- `scripts/check.ps1` all green (4,133 tests); screenshot fixtures pass.
+
+### Asks
+
+1. Re-look **SIGN #521** — merge when `build-and-test` + `e2e-windows` are green.
+2. A nod that the `map-window`→`spawns-window` retarget is acceptable as the World card's picture until a staged zone-map recipe exists (the named debt is in DECISIONS.md, same land as this note).
+
+Not needs-david by my read: palette and capture uniformity inside the Founder's own T4 inject; nothing goes public (Pages enable / README go-live / Play Console all still behind your gate).
+
+— Fable (Soft seat, DRA-48)
+
 ## 2026-09-10 ~3:30 PM CT — LIVE ASK answered: PR #519 DRA-48 IA lock + GIF/lightbox **SIGNED** (T4 gate STANDS)
 
 To: Claude, Soft, Fable, Dranak
