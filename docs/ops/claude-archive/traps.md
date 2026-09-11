@@ -1546,3 +1546,72 @@ string that arrived.
     `BuffTrackerTests`, `HudChipRowTests.AThornsChickletWaitsForTheDurationTheOwnerMeasured`,
     `RankedBuffDurationTests`. Prove-failed against the folded base: 8 red,
     the HUD one reporting a chicklet already up at "0:48 est".
+
+### Trap 74
+
+**A "byte-identical" gate over a file with a CONTAINER asserts which toolchain
+built the container, not that the data is unchanged.**
+
+DRA-45 ships `HarvestedGuides.json.gz` — over a thousand machine-written guides
+and eleven thousand objectives that nobody will ever read as a diff. The whole
+review of a weekly refresh PR is therefore the re-run: run the transformer again
+and the committed file must not move. So `guides-transform.py --check` compared
+`OUT.read_bytes()` against what it would write, `build-and-test` ran that step,
+and it was green on the box that built it.
+
+CI failed it in 34 seconds, on a file whose contents were **identical** — run
+`34615319696`, `STALE: src\EQBuddy.Core\Data\HarvestedGuides.json.gz`, against
+`C:\hostedtoolcache\windows\Python\3.12.10`. gzip is not reproducible across
+environments: the runner's 3.12 zlib and a 3.14 developer box compress the same
+input to different bytes. `mtime=0` and an empty filename field close the two
+places a gzip writer leaks the clock and the working directory, and they are not
+enough — the deflate stream itself is a property of the zlib build.
+
+→ **Ask what the claim is ABOUT.** "The transformer reproduces the data" is a
+claim about the catalog; which zlib shipped it is not part of it. `--check` now
+decompresses the committed file and compares the payload.
+
+→ **Gate the WRITE on the same comparison, not just the check.** A writer that
+always rewrites puts a fresh deflate stream in every weekly refresh PR — a
+350 KB binary diff that says nothing and that a reviewer cannot tell from a real
+one. The write now happens only when the decompressed data differs.
+
+→ **Pinning the toolchain is not the fix.** The first response was to pin the
+runner to Python 3.12 and pin `*.gz binary`, reasoning that "a byte-for-byte
+assertion whose toolchain floats is a gate that can start failing for a reason
+nobody changed". Both are good hygiene and neither addresses it: the generating
+box still floats (this one is 3.14), and the pin only moves the tripwire onto
+whoever next bumps the runner. The version pin survives on its own merits; it is
+no longer load-bearing.
+
+→ **The failure mode is the bad one, which is why this is a trap and not a bug.**
+A gate that goes red on a toolchain version does not read as "this gate is
+wrong"; it reads as "re-run it and commit the result". Do that twice and the gate
+is something people route around, which is worse than never having built it — a
+guard nobody believes is trap 34's hole wearing a green check.
+
+→ **Generalises past gzip.** Any archive (zip, tar.gz), any format with a
+timestamp or a producer string in its header (PNG, PDF), any database file. The
+tell is that the artifact has a CONTAINER and the claim is about its CONTENTS.
+
+**The report is part of the artifact, and it went stale unnoticed.** The same
+land ships `guides-report.md`, the human-readable half of a diff nobody can read,
+guarded by `TheReportIsThereAndItsCountsMatchTheCommittedFile`. That guard checked
+the guide total and the objective total. When the Collect rows became `Stub`
+rather than `Authored` (Helm ~10:40 AM CT, ask 2), the data was regenerated and
+the report was not, and it shipped on `main` claiming `Authored: 5244 / Stub: 27`
+beside a catalog holding `1196 / 4075`. **Both totals it checked were unmoved,
+because a row changing bucket changes no total — a sum is exactly the wrong
+instrument for a redistribution.** The guard now asserts every authoring-state
+and objective-type bucket against the committed catalog.
+
+Guards: `guides-transform.py --check` (data, not container), the `build-and-test`
+step that runs it, `scripts/check.ps1`, and
+`HarvestedGuidesTests.TheReportIsThereAndItsCountsMatchTheCommittedFile`.
+Prove-failed in both directions that matter: one character changed inside the
+compressed data exits 1 (`4233441 bytes of data on disk, 4233440 generated`),
+while the identical data recompressed at a different deflate level — 356,041
+bytes against the committed 356,535 — now passes, which is the CI failure above
+reproduced on demand. The report assertion was prove-failed against `main`'s
+committed report, which fails with *Sub-string not found* for the Stub bucket's
+true count of 4075.
