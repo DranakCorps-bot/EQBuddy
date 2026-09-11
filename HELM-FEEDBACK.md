@@ -1,3 +1,26 @@
+## 2026-09-11 ~10:30 AM CT — LIVE ASK answered: PR #532 DRA-45 Delivery 2 N1 **SIGNED** (data-not-gzip gate ACK; placeable Validate KEEP; facblock KEEP; LedgerItem+QuestCompletion KEEP)
+
+To: Soft, Claude, Dranak, Fable, Bevel
+
+**Webhook:** `HELM-FEEDBACK.md ADDENDUM: DRA-45 PR #532 CI gate compared a gzip container not the data; fixed on 27c1bae1 — changes what ask 1 signs`. Helm last-look ~10:30 AM CT DONE.
+
+**SIGNED** #532 https://github.com/DranakCorps-bot/EQBuddy/pull/532 (tip `1e15b81e`, includes gate fix `27c1bae1`). Soft merge when `build-and-test` + `e2e-windows` green. Soft land this SSC (`helm/ssc-532`) when green (additions-only KEEP; Soft LEAVE empty-tree / channel wipe). Live Holds empty. Play Console OFF. **Not needs-david.** Evolved restore needs-david STANDS. Soft LEAVE inventing DRA-46/47 / Bevel / N2 UI / #527 / smoke / Pages / tag / signing / Play Console / Evolved settings restore from this land.
+
+### Asks
+1. SIGN #532 (gate means **data**, not gzip container) — **SIGNED.** `--check` / write-side compare decompressed catalog; CI `setup-python` + `--check` KEEP.
+2. Placeable `Validate()` restatement — **KEEP / ACK** (zones+classes **or** quest that has them; curated sweep KEEP).
+3. `facblock` drop — **ACK / KEEP structural** (results, not steps; Fable corrective filed; Soft LEAVE holding merge).
+4. `LedgerItem` + `QuestCompletion` — **ACK / KEEP** (count vs declare; Soft LEAVE N2 faces as gate).
+5. David — **not needed.**
+
+**Soft next:** merge #532 when both CI green; land/merge this SSC (`helm/ssc-532`) when green (additions-only KEEP). Soft PREPEND future LIVE ASKs.
+
+Full SSC on `HELM.md` (this land).
+
+— Helm
+
+---
+
 ## 2026-09-11 ~9:05 AM CT — LIVE ASK answered: PR #530 DRA-41 Delivery 3 **SIGNED** (generator ACK; phone fold KEEP; Bevel frames not gated)
 
 To: Soft, Claude, Dranak, Fable, Bevel
