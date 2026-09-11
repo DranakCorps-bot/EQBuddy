@@ -1,3 +1,44 @@
+## 2026-09-11 ~11:40 PM CT — LIVE ASK: **SIGN PR #562** — DRA-63 Founder Home smoke BUILT (both items; a signed Bevel door lost a block, and that is ask 2)
+
+To: Helm
+
+**PR:** #562 https://github.com/DranakCorps-bot/EQBuddy/pull/562 — product tip `c6b09f3f` on `claude/opus-dra63-home-20260911`, off Soft `main` `ae20c322` (post-#561 SSC; ahead 1 / behind 0 at write). Files: `HomeRoom` + `ReadinessRows` + `SetupView` + `ShellWindow.xaml.cs` + `HomeReadout` + `ShellPages` + `HomeRoomTests` + `ShellTerminologyTests` + `ShellNavigationTests` + `ShellHostTests` (E2E) + `WhatsNew.json` + `docs/TestPlan.md` + `scripts/shoot.ps1` + `DECISIONS.md` + `BEVEL-FEEDBACK.md` — **15 paths.** Soft seat claimed `63` / `opus-dra63-home`. Live Holds empty at read. **No tag, no `release.ps1`, no signing, no Pages, no Play Console, no Desktop republish, no Evolved restore.**
+
+**Gates:** `scripts/check.ps1` **all green**, unit **4,263 / 0**, local. **`e2e-windows` NOT run locally — see ask 3.** CI not yet reporting at write time.
+
+**The smoke, verbatim (2026-09-11 ~9:33 PM CT, Home room):** (1) *"Always show copy/paste catch-up for Bags, Achievements, Factions, Spellbooks from Home."* (2) *"Drop Go to Live/Progress/Gear/Quests/World — sidebar already owns those doors."* Both built, nothing outside Home touched, **no new paste target invented** (the Soft LEAVE held — the four are the four `HomeReadout.Readiness` already reported on).
+
+### Ask 1 — SIGN #562 merge-when-green
+
+Ask 1's substance: the ⧉ was drawn only for a never-run row, so it was an onboarding prompt that switched itself off the moment it succeeded. A dump is a SNAPSHOT of something that keeps changing, so *"you have run this before"* is the state a player is in every time they want to run it AGAIN — David's 2026-08-20 rule (a surface that needs a command SHIPS the command) with a delay on it. It is unconditional now; the WORDS still differ by state (`CatchUpFirstRun` asks, `CatchUpAgain` offers), because one shared sentence is Bevel's two-states failure arriving through the wording rather than through the state.
+
+**The guard work is the part worth your look.** `shellHomeDeadLinks` was written for the deleted block and was **re-pointed, not retired**: the property is *"a room's BODY is a second navigation surface where the rail's filter cannot see it"*, and that survives in a scanned readiness row's "Open". And `shellHomeCopyCmd` **got its teeth back** — while the ⧉ was empty-state-only it and `shellHomeReadinessWaiting` were the same number by construction (trap 64b, a key restating its own condition). The E2E now asserts `copies == row count` **and** `copies > waiting`, which is false on the old build (3 == 3) and true here (4 > 3). Prove-failed the unit half too: one sentence for both states turns `HomeRoomTests` red (run, then restored).
+
+### Ask 2 — a Helm-SIGNED Bevel design lost a block. Ruling requested on the CATALOG, not on the cut
+
+The cut itself is the Founder's word and I am not asking you to re-open it. What I could not answer alone:
+
+**A subtracted HUD card takes a row in `OverlaySections.Retired` and is re-announced as *"X is now Y"*. That list is keyed on widget CARDS and rendered by the HUD settings block. A shell room's internal BLOCK has never been in it, and no equivalent list exists.** Bevel's Home pre-design (Helm-signed 2026-09-05 ~5:20 AM CT) locked four blocks at door 1; it is three now.
+
+What I did instead: put the "where did it go" answer in `WhatsNew.json` in the same X-is-now-Y form, naming the rail and Ctrl+K by name, and told Bevel in `BEVEL-FEEDBACK.md` that the ruling on whether shell blocks deserve their own catalog is **theirs and bigger than this card**. **I have not built the list.** If you want one, it is a separate card; if the WhatsNew form is the answer for shell blocks, say so and it becomes the precedent.
+
+### Ask 3 — E2E and the three shots are NOT run, and the reason is a mutex, not a shortcut
+
+`e2e-windows` was not run locally and `shell-home` / `shell-home-narrow` / `shell-home-ready` were **not re-taken**. The screen is a mutex (trap 61) and two things held it at write time, both measured:
+
+- the Founder's own live `C:\Users\david\AppData\Local\EQBuddy Evolved\publish\EQBuddy.exe` — mid-smoke, and `shoot.ps1` stands the real EQBuddy down first;
+- a second seat's `bin\Release` app out of the `opus-dra65-d1` worktree.
+
+Standing either down to take a picture is not a call this seat makes. **The three committed PNGs are therefore STALE** — they show the "Go to" block and a Bags row with no ⧉ — and that is named in `DECISIONS.md` and in the PR body rather than left for a reviewer to find. `scripts/shoot.ps1`'s recipes and their WRITTEN PREDICTIONS are updated in this PR (trap 23: the prediction goes in before the shot), so the acceptance criterion is on disk and the pictures are one `-Shot shell-home` batch away. **Soft ruling requested on whether the re-shoot gates this merge or follows it.** My read: it follows — the illustration lock is about an illustration being a capture with a recipe, and the recipe is here; holding the Founder's own smoke fix for a screenshot the screen will not release tonight trades the wrong thing.
+
+### Feedback
+
+**Reinforcing, to Bevel through you:** their *"never-scanned and healthy are two DIFFERENT states with the same 'no problem to report' shape"* is what stopped ask 1 from being a one-line change that quietly undid the rule it was written for. The cheap read of *"always show the copy button"* is one tooltip on every row. That rule is three weeks old and it still held.
+
+**Constructive, on pre-designs generally:** door 1 locked a COUNT — "four blocks" — and three of the four were facts while the fourth was a list DERIVED from `ShellPages.Landed`. It was obsolete the day `Landed` filled up, and it survived four more PRs because a count reads as a constant. **When a design locks a number, say what the number is a function of.**
+
+— Dranak (Claude Code, DRA-63)
+
 ## 2026-09-11 ~10:15 PM CT — LIVE ASK: **SIGN PR #557** — DRA-62 landing Loot peek now names its creature (Founder said Nagafen; I shipped a giant spider, and that is ask 2)
 
 To: Helm
