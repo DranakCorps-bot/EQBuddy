@@ -1,3 +1,45 @@
+## 2026-09-11 (DRA-65 — Unlocks guided detail plan; the calls Fable made alone)
+
+Fable seat, plan only (`claude/fable-dra65-unlocks-20260911`). The plan itself is the top
+entry in `FABLE.md`; these are the places the Founder's three lines left a choice, decided
+by default rather than asked.
+
+**1. "FILTER BETWEEN RACE AND CLASS UNLOCKS" IS READ AS DISCOVERABILITY + PHONE PARITY,
+NOT A NEW FILTER AXIS.** The All/Races/Classes lens already exists on the desktop behind
+`UnlockSectionCombo`; the Founder asking for it anyway is evidence the combo hides it, and
+the phone's Unlocks tab — which ships in the tab strip today and falls through to the
+General catalog when tapped (`index.html` `drawList()`) — has no lens at all because it has
+no body. The plan makes the existing lens a chip strip and makes the phone tab real.
+**The default it could have gone the other way on:** invent a finer axis (filter to my
+race/class, or by done-state) — rejected; not asked, and the section lens is the thing his
+sentence names.
+
+**2. GUIDED DETAIL COMES FROM STORES THAT ALREADY EXIST, NOT FROM NEW CONTENT.** Three
+shapes: own-kill faction movers with kills-to-go arithmetic (`MobHistory` pool, log-only,
+the player's own play), the Sky checklist's own piece count + door for `Obtain` rows, a
+catalog door for `Task` rows. A harvested "ways to raise" block from the wiki's faction
+pages is PARKED with a written reopen condition — it is a new harvest shape carrying trap
+73/74 obligations and touches the weekly fetch list (consequence-7 adjacent). **The
+default it could have gone the other way on:** ship wiki content now for maximum
+"guided" — rejected; doors + measured personal evidence are honest today, prose is not.
+
+**3. NEGATIVE MOVERS ARE SHOWN AS COSTS.** "Your kills of X cost 5 each" is the same
+measured fact as a raiser and the one a faction-grinder most needs; suppressing it would
+be a top-N-hides-what-matters cut (trap 50). Capped at 3 each way, cap said aloud.
+
+**4. THE TICK NEVER MOVES.** An unlock and its criteria stay the game's answer
+(achievement flag / faction dump); every guidance line is additive prose with its own
+producer. "Pieces in hand" is worded as bag evidence, never as "obtained" (trap 4).
+
+**5. THE KERRAN TASK GETS SILENCE, NOT A STUB.** 'Aid the Kerrans of Kerra Isle' is not
+in the quest catalog (verified against `quests.json`); the row stays the dump's sentence.
+A door appears only on an exact catalog match.
+
+**6. THE PHONE FIX IS IN SCOPE THOUGH THE FOUNDER NAMED NO SURFACE.** Tapping Unlocks on
+a phone drawing the quest CATALOG is a live defect, and parity by shared module (David,
+2026-08-18) is standing law — leaving it out would ship "more guided" on one surface and
+a lie on the other.
+
 ## 2026-09-11 (DRA-60 — the mobile hang after the QR; the calls I made alone)
 
 Founder/Bosun kick, DRA-60, separate from DRA-59. The card scoped the likely cause and the
