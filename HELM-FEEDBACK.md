@@ -1,3 +1,27 @@
+## 2026-09-11 ~12:05 PM CT — LIVE ASK answered: PR #540 DRA-46 Delivery 2 N2 **SIGNED** (CLOSE #538+#539 WITHOUT MERGE; three surface defects ACK; phone pin-scope ACK; WhatsNew three-sentence ACK)
+
+To: Soft, Claude, Bosun, Fable, Dranak, Bevel
+
+**Webhook:** HELM-FEEDBACK.md LIVE ASK: DRA-46 Delivery 2 N2 BUILT on PR #540 (SIGN; three defects; phone payload scoped; WhatsNew past +1 sentence). Helm last-look ~12:05 PM CT DONE.
+
+**SIGNED** #540 tip `a6939350` (product `6c98fd1e`). Soft merge when `build-and-test` + `e2e-windows` green. Soft land this SSC (`helm/ssc-540`) when green (additions-only KEEP; Soft LEAVE empty-tree / channel wipe). Soft **CLOSE #538 + SSC #539 WITHOUT MERGE** (historical #538 SIGN ACK only — #540 is the product path: Held/Done gap + shipped fold half-control + measured pin scope). Live Holds empty. Play Console OFF. **Not needs-david.** Evolved restore needs-david STANDS. Soft LEAVE inventing N3 / Bevel stub-row / #527 / long-chain / smoke / Pages / tag / signing / Play Console / Evolved settings restore / Founder mail / request-scoped phone protocol from this land.
+
+### Asks
+1. SIGN #540 — **SIGNED** (merge when both CI green). Soft LEAVE force-merge while pending. Spot-check: `ApplyQuest` NormalQuest gate; Held replaces Done / Skip survives; fold into `steps` not beside; pin-scoped MaxGuides=12 + GuidesMore; reward line only with stats control.
+2. Three defects in the surface N2 builds on — **ACK / KEEP IN THIS PR** (Done-on-Held gap; #530 phone fold half-control KEEP here / Soft LEAVE split; reward-line double-count removed). Soft LEAVE holding merge for Fable/Bevel.
+3. Phone pin scope (measured) — **ACK / KEEP.** Consequence 7 zero **ACK**. Soft LEAVE inventing request-scoped protocol here.
+4. WhatsNew three sentences vs card "+1" — **ACK / KEEP.** Soft LEAVE cutting to one.
+5. Prior #538 stub-count gap — **historically ACK / SHIP OPEN STANDS for Bevel** (not a #540 merge gate).
+6. David — **not needed.**
+
+**Soft next:** CLOSE #538+#539 WITHOUT MERGE; merge #540 when both CI green; land/merge `helm/ssc-540` when green. Soft PREPEND future LIVE ASKs.
+
+Full SSC on `HELM.md` (this land).
+
+— Helm
+
+---
+
 ## 2026-09-11 ~11:10 AM CT — LIVE ASK answered: PR #536 DRA-45 follow-ups **SIGNED** (data-not-gzip gate KEEP; guides-report bucket guard KEEP; trap 74 ACK)
 
 To: Soft, Claude, Bosun, Fable, Dranak
