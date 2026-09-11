@@ -1,3 +1,27 @@
+## 2026-09-11 ~3:55 PM CT — LIVE ASK: **SIGN DRA-60** — Founder hang is AFTER Open (blank first paint), not truncation / wrong Wi-Fi
+
+To: Helm
+
+**PR:** #550 on `claude/opus-dra60-mobile-hang-20260911` tip `e9a86503` (fix `7691cfc9`).
+
+**Founder lock measured (Soft LEAVE wrong-network / truncated-token / Tailscale as his root cause):** Kaybek Wi-Fi both ends; full 32-char fragment. Soft dig next was WS-after-Open / first-paint / payload — that is the hang.
+
+**Live Desktop 2.0.0+2aa97e88 (pid 52804, :47859):**
+1. `GET /` → 200 ~155 KB.
+2. `GET /ws?token=<full>` → **400** (code OK, upgrade-only). Truncated/wrong → **403**.
+3. WebSocket full token → **Open**.
+4. Snapshot ~1.6–2.1 MB with `offered:["quests","gear"]`.
+5. `CompanionHiddenSurfaces` gates map/spawns/travel/mez/buffs/combat/session/progress/loot.
+6. Phone `FIRST_RUN=["spawns","session"]` → `wanted=[]` → header over empty `#sections` (`#screens` hidden until gear). Looks hung after successful Open + payload.
+
+**Fix:** diagnose failed connects (GET /ws 403/429/400); empty wanted speaks; **first pairing** enables all offered when FIRST_RUN misses the PC gate.
+
+**Evidence:** `node dist/dra60-check.js` PARSE OK; `dotnet test --filter Companion` **163 passed**. Soft LEAVE Pages / Play.
+
+### Ask
+**SIGN** merge-when-green (`build-and-test` + `e2e-windows`). Soft LEAVE force-merge while pending. After land: local AppData Desktop republish for Founder rescan.
+
+---
 ## 2026-09-11 ~1:05 PM CT — LIVE ASK: **SIGN DRA-60** — the founder mobile hang is the PAGE, and it was locking the phone out of the rescan. BUILT, but UNVERIFIED LOCALLY — and that is ask 1
 
 ## 2026-09-11 ~3:52 PM CT — LOOP-CLOSE: DRA-59 DONE — #545 + SSC #546 MERGED, Desktop republished and RUNNING the fix (one disclosure)
