@@ -178,12 +178,34 @@ and the page draws those as "Not shared by the PC" — so `wanted` is empty only
 impossible. Logged because deleting it is the kind of thing that looks like an omission in
 review: a branch for an unreachable state is vacuous coverage wearing a fix's clothes.
 
-**6. THE INSTRUMENT IS COMMITTED, BUT NOT WIRED INTO CI.** `scripts/dra64-choice-probe.mjs`
-is reproducible by anyone with node and is prove-failed against `cc020280`. Helm ACKed
-leaving node out of CI on #550, so the CI-visible guard is C# only
-(`CompanionScreenChoiceRecoveryTests`, five of six red before the fix). **The default it
-could have gone the other way on:** add `node --check` to `check.ps1` while I was here —
-left alone, because Helm ruled on exactly that and a shipped fix does not lift a ruling.
+**6. THE INSTRUMENTS ARE COMMITTED, BUT NOT WIRED INTO CI.** Helm ACKed leaving node out of
+CI on #550, so the CI-visible guard is C# only (`CompanionScreenChoiceRecoveryTests`, five of
+six red before the fix). **The default it could have gone the other way on:** add
+`node --check` to `check.ps1` while I was here — left alone, because Helm ruled on exactly
+that and a shipped fix does not lift a ruling.
+
+**7. I EXTENDED #552's HARNESS RATHER THAN SHIPPING A PARALLEL DOOR — AND IT FOUND THE
+BLIND SPOT IN ITS OWN GREEN RUN.** #552 landed while I was working and had just built the
+headless readout (`-Refuse`, `#harnessState`, `--dump-dom`), using it to verify #550's blank
+page against "the Founder's actual configuration". That run was honest and green and could
+not have found this: every harness run starts with **empty localStorage**, and `-Snapshot`
+**rewrites `FIRST_RUN` to the snapshot's own offer**, which makes the overlap succeed by
+construction. So `-StoredChoice` seeds a device that has already paired and suppresses that
+rewrite, and the three readouts are pinned in the test and in `TestPlan`: BEFORE
+(`cc020280`) `panels: []`; AFTER `panels: ["Quests","Gear checklist"]` with `stored` now
+all-true; AFTER with `playerPicked:true` `panels: []`. **The default it could have gone the
+other way on:** ship only `scripts/dra64-choice-probe.mjs` and leave the harness alone,
+since the node probe already proved the logic — rejected, because the probe proves a
+function and the harness proves the PAGE, and the next person to touch this will reach for
+the harness. The probe stays as the cheap prove-fail (`node … [olderPage.html]`).
+
+**8. MY OWN INSTRUMENT REPORTED A FALSE NEGATIVE TWICE BEFORE I TRUSTED IT**, and it is
+logged because it nearly became a finding about the product. The harness's "was the player
+told" field first read `classList.contains("show")` at readout time (the notice is a 5 s
+toast, the readout is later — `false` for a sentence that had shown), then latched it on a
+`MutationObserver` registered on `DOMContentLoaded` (which under `--virtual-time-budget`
+fires after the snapshot push — `false` again). It now registers immediately and reports the
+latch beside `textContent`, which survives the hide. Two readings of one fact, deliberately.
 
 ## 2026-09-11 (DRA-60 — the mobile hang after the QR; the calls I made alone)
 

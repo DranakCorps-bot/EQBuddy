@@ -870,8 +870,13 @@ after the named guard left with its surface.
     URL pasted into the PC's browser WORKED, because `FIRST_RUN` is chosen off
     `innerWidth >= 900` and the wide list contains `quests`. Two surfaces of one build
     disagreeing across a CSS breakpoint looks exactly like wrong-Wi-Fi. Guard:
-    `CompanionScreenChoiceRecoveryTests` (five of its six redden on the pre-fix page);
-    instrument: `node scripts/dra64-choice-probe.mjs [olderPage.html]`.
+    `CompanionScreenChoiceRecoveryTests` (five of its six redden on the pre-fix page).
+    **And the harness had the same blind spot:** every run started with empty
+    `localStorage` and `-Snapshot` rewrote `FIRST_RUN` to the snapshot's own offer, so
+    the green run that verified #550 could not have seen this. `-StoredChoice` seeds the
+    reporter's state and suppresses that rewrite — **a fixture that removes the mechanism
+    verifies its absence.** Second instrument:
+    `node scripts/dra64-choice-probe.mjs [olderPage.html]`.
     [Novel](docs/ops/claude-archive/traps.md#trap-76)
 
 New trap discovered the hard way? Add the compact rule here and the novel

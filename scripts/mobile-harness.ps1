@@ -62,7 +62,31 @@ param(
     # The fragment matters: the harness hard-codes `token`, but `tokenFromMemory` is still
     # computed from location.hash, and it is what picks which sentence the player reads.
     [ValidateSet('403', '429', '400', 'unreachable')]
-    [string] $Refuse
+    [string] $Refuse,
+    # DRA-64: drive the page as a device that has ALREADY PAIRED, by seeding the saved
+    # screen choice this JSON describes into localStorage before boot() reads it.
+    #
+    # This is the fixture -Refuse and -Snapshot cannot produce, and it is the one the bug
+    # report was actually in. A clean browser profile is the right fixture for trap 67 and
+    # the WRONG one here: the Founder's phone was blank because the BROKEN build had
+    # already written `{"order":["quests","gear"],"enabled":{"quests":false,"gear":false}}`
+    # to it, and every harness run until now started with empty storage — so the run that
+    # verified #550 could not see that #550's own gate (`!choice`) excluded exactly that
+    # device. Name the state the reporter is in, or the harness only ever re-proves the
+    # happy path.
+    #
+    #   pwsh -NoProfile -File scripts/mobile-harness.ps1 -Snapshot <snap.json> `
+    #     -StoredChoice '{"order":["quests","gear"],"enabled":{"quests":false,"gear":false}}'
+    #   msedge --headless=new --virtual-time-budget=40000 --dump-dom <harness.html>#somecode
+    #
+    # Then read #harnessState: `picked` is what this device draws, `noScreens` is whether
+    # the page had to explain itself, and `notice` is whether it said it changed anything.
+    #
+    # NOTE: this deliberately SUPPRESSES the -Snapshot FIRST_RUN rewrite below. That
+    # rewrite sets FIRST_RUN to the snapshot's own offered list, which makes the overlap
+    # succeed by construction — it is the right thing for posing a screenshot and it
+    # dissolves the very mechanism this flag exists to drive.
+    [string] $StoredChoice
 )
 
 $ErrorActionPreference = 'Stop'
@@ -158,6 +182,21 @@ window.__PUSH = m => {
 
 }
 
+if ($StoredChoice) {
+    # Written BEFORE the page's script runs, because boot() reads localStorage on its very
+    # first lines. The key is the page's own: "eqbuddy-screens-" + token.slice(0, 8), and
+    # the harness token is "harness".
+    try { $null = $StoredChoice | ConvertFrom-Json }
+    catch { throw "-StoredChoice is not valid JSON: $StoredChoice" }
+    $seed = @"
+<script>
+// Harness only (-StoredChoice): this device has paired before and saved these picks.
+try { localStorage.setItem("eqbuddy-screens-harness", JSON.stringify($StoredChoice)); } catch (e) {}
+</script>
+"@
+    $stub = $seed + $stub
+}
+
 $patched = [regex]::Replace($html, '<script>(\r?\n)"use strict";',
     { param($m) $stub + $m.Groups[1].Value + '"use strict";' }, 1)
 if ($patched -eq $html) {
@@ -180,6 +219,58 @@ setTimeout(() => {
     $patched = $patched -replace '</body>', ($verdict + "`n</body>")
 }
 
+if ($StoredChoice) {
+    # Same contract as -Refuse's verdict: the readout has to be IN THE DOM, because
+    # --dump-dom is all a headless run gives back. What it reports is the DRA-64 question
+    # in three parts — what this device ended up drawing, whether the page had to explain
+    # an empty #sections, and whether it TOLD the owner it had changed their picks. The
+    # stored choice is read back out of localStorage too, because "the repair was
+    # persisted" is a different claim from "the repair happened" and only one of them
+    # stops it repeating on every open.
+    $verdict = @'
+<div id="harnessState" style="display:none"></div>
+<script>
+// The notice is a 5 s toast and the readout below is later than that on purpose (the page
+// needs time to settle), so "is it showing now" would answer the wrong question and answer
+// it false. Latch it instead: what matters is whether the player was EVER told.
+// Registered IMMEDIATELY, not on DOMContentLoaded: this block is injected at the end of
+// <body>, so #notice already exists — and under --virtual-time-budget the snapshot push can
+// land before DOMContentLoaded fires, which is exactly how the first cut of this latch
+// reported `false` for a notice the page had demonstrably shown.
+window.__NOTICED = false;
+(function () {
+  const n = document.getElementById("notice");
+  if (!n) return;
+  if (n.classList.contains("show")) window.__NOTICED = n.textContent;
+  new MutationObserver(() => {
+    if (n.classList.contains("show")) window.__NOTICED = n.textContent;
+  }).observe(n, { attributes: true, attributeFilter: ["class"] });
+})();
+window.__CHOICESTATE = () => {
+  let stored = null;
+  try { stored = localStorage.getItem("eqbuddy-screens-harness"); } catch (e) {}
+  return {
+    panels: [...document.querySelectorAll("#sections section.surface > h2 > span:first-child")]
+      .map(s => s.textContent),
+    noScreens: !!document.getElementById("noScreens"),
+    noScreensText: (document.getElementById("noScreens") || {}).textContent || null,
+    noticeEverShown: window.__NOTICED,
+    // The latch's independent check: textContent SURVIVES the toast hiding itself, and
+    // notice() is the only thing that writes it. Two readings of one fact, on purpose —
+    // the latch can miss, and a silent miss would read as "the page said nothing".
+    noticeText: document.getElementById("notice").textContent || null,
+    stored: stored,
+  };
+};
+setTimeout(() => {
+  document.getElementById("harnessState").textContent =
+    JSON.stringify(window.__CHOICESTATE(), null, 1);
+}, 8000);
+</script>
+'@
+    $patched = $patched -replace '</body>', ($verdict + "`n</body>")
+}
+
 if ($Snapshot) {
     if (-not (Test-Path $Snapshot)) { throw "Snapshot not found: $Snapshot" }
     $json = Get-Content $Snapshot -Raw
@@ -189,10 +280,16 @@ if ($Snapshot) {
     # keyed off innerWidth, so a pane that has not settled at its final size yet picks
     # the PHONE set — and a snapshot offering only the map then renders nothing at all.
     # With a snapshot embedded, the device wants exactly what the snapshot offers.
-    $picks = ($offered | ForEach-Object { '"' + $_ + '"' }) -join ', '
-    $patched = [regex]::Replace($patched,
-        '(?s)const FIRST_RUN = .*?;',
-        "const FIRST_RUN = [$picks];   // harness: the embedded snapshot's own surfaces")
+    # …EXCEPT under -StoredChoice, where the real breakpoint-chosen defaults ARE the thing
+    # under test: rewriting FIRST_RUN to the snapshot's own offer makes the overlap succeed
+    # by construction, which is how a run can verify a fix for a non-overlap it has just
+    # removed (DRA-64).
+    if (-not $StoredChoice) {
+        $picks = ($offered | ForEach-Object { '"' + $_ + '"' }) -join ', '
+        $patched = [regex]::Replace($patched,
+            '(?s)const FIRST_RUN = .*?;',
+            "const FIRST_RUN = [$picks];   // harness: the embedded snapshot's own surfaces")
+    }
     # Pushed once the page has booted; the socket stub raises onopen on a timer, so this
     # waits for __SOCK rather than racing it.
     # 1.5s, not 300ms: the map refits itself when its box settles (a ResizeObserver, so

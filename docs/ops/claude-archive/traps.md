@@ -1764,10 +1764,44 @@ asserted against a `quests`/`gear` PC so the explanation above stops being true
 loudly rather than quietly. Prove-failed: five of the six redden against
 `cc020280`'s page; the sixth is the premise anchor and holds on both by design.
 
-Instrument: `node scripts/dra64-choice-probe.mjs [olderPage.html]` lifts the
-shipped `ensureChoice()` out of `index.html` and runs it over a fake
+**And the harness's own blind spot is the same lesson one layer up.** #552 had
+just built the headless door (`-Refuse`, `#harnessState`, `--dump-dom`) and used
+it to verify #550's other blank page — "a PC offering quests/gear against a
+phone's FIRST_RUN of spawns/session, the Founder's actual configuration, paints
+both offered panels". That run was honest and it was green, and it could not have
+found this, for two reasons worth writing down: every harness run started with
+**empty localStorage**, and `-Snapshot` **rewrote `FIRST_RUN` to the snapshot's
+own offer**, which makes the overlap succeed by construction. A fixture that
+cannot hold the reporter's state cannot reproduce the reporter's bug, and a
+fixture that removes the mechanism verifies the mechanism's absence.
+
+So `-StoredChoice` seeds a device that has already paired, and suppresses that
+rewrite. Driven through it, reading `#harnessState`, 2026-09-11:
+
+| run | `panels` | `noScreens` | `stored` after |
+|---|---|---|---|
+| **BEFORE** (`cc020280` — the page he rescanned) | `[]` | **true**, "No screens picked on this device. Tap ⚙…" | unchanged, all-false |
+| **AFTER** | `["Quests","Gear checklist"]` | false | **all-true — the repair persisted** |
+| **AFTER**, `playerPicked:true` seeded | `[]` | true | unchanged — a real decision survives |
+
+The BEFORE row also settles what the Founder was actually looking at by the
+second attempt: not a hang, but that one sentence and no data, permanently.
+
+Second, cheaper instrument: `node scripts/dra64-choice-probe.mjs [olderPage.html]`
+lifts the shipped `ensureChoice()` out of `index.html` and runs it over a fake
 `localStorage` across six scenarios — the working PC paste, a clean first
 pairing, the Founder's poisoned phone, the same hole reached from a patched
-build, a player's deliberate all-off, and a reopen. Point it at an older page and
-the Founder's two scenarios redden. Not a CI step: Helm ACKed leaving node out of
-CI on #550.
+build, a player's deliberate all-off, and a reopen. It takes an older page as an
+argument, so the prove-fail is one command. Neither is a CI step: Helm ACKed
+leaving node out of CI on #550.
+
+→ **A footnote on the instrument, because it made the mistake it measures.** The
+first cut of the harness verdict reported "was the player ever told" by reading
+`classList.contains("show")` at readout time — but the notice is a 5 s toast and
+the readout is later, so it reported `false` for a sentence the page had
+demonstrably shown. The second cut latched it on a `MutationObserver`, registered
+on `DOMContentLoaded` — which under `--virtual-time-budget` can fire AFTER the
+snapshot push, so it reported `false` again. It now registers immediately and
+reports the latch **and** `textContent` (which survives the hide) side by side:
+two readings of one fact, because a silent miss in an instrument reads as a
+finding about the product.

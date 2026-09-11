@@ -37,15 +37,40 @@ namespace EQBuddy.Tests;
 /// <para>There is no JS runner in this suite, so the page half is asserted against the
 /// shipped file with a committed NEGATIVE each, the way <see cref="CompanionFirstPairingTests"/>
 /// and <see cref="CompanionPairingFailureTests"/> do — a regex that cannot fail reads as
-/// coverage (trap 39). **The behavioural proof is
-/// <c>node scripts/dra64-choice-probe.mjs</c>**, which lifts the shipped
-/// <c>ensureChoice()</c> out of <c>index.html</c> and runs it over a fake
-/// <c>localStorage</c> across six scenarios including the Founder's. It is prove-failed
-/// rather than green-only (trap 34): point it at the pre-fix page and the Founder's two
-/// scenarios redden —
-/// <c>git show cc020280:src/EQBuddy.Companion/Web/index.html &gt; before.html</c> then
-/// <c>node scripts/dra64-choice-probe.mjs before.html</c>. It is an instrument, not a CI
-/// step; Helm ACKed leaving node out of CI on #550.</para>
+/// coverage (trap 39).</para>
+///
+/// <para><b>The behavioural proof is the harness #552 built, driven on the fixture it could
+/// not previously produce.</b> <c>-StoredChoice</c> seeds a device that has ALREADY PAIRED,
+/// and it deliberately suppresses the <c>-Snapshot</c> rewrite of <c>FIRST_RUN</c> — that
+/// rewrite sets <c>FIRST_RUN</c> to the snapshot's own offer, which makes the overlap succeed
+/// by construction and is why the run that verified #550 could not see this:</para>
+/// <code>
+/// pwsh -NoProfile -File scripts/mobile-harness.ps1 -OutDir dist/dra64 `
+///   -Snapshot &lt;snap.json offering quests+gear&gt; `
+///   -StoredChoice '{"order":["quests","gear"],"enabled":{"quests":false,"gear":false}}'
+/// msedge --headless=new --virtual-time-budget=45000 --dump-dom "file:///&lt;abs&gt;/harness.html#somecode"
+/// </code>
+/// <para>Measured 2026-09-11, reading <c>#harnessState</c>, all three through the same door.
+/// <b>Prove-failed rather than green-only</b> (trap 34) — BEFORE is the page at
+/// <c>cc020280</c>, which is the page the Founder actually rescanned:</para>
+/// <list type="bullet">
+/// <item><b>BEFORE, Founder's state</b> — <c>panels: []</c>, <c>noScreens: true</c> reading
+/// "No screens picked on this device. Tap ⚙ at the top to choose what to show.", stored
+/// choice still <c>{quests:false,gear:false}</c>. So his phone was not hanging by then: it
+/// was showing that one sentence and no data, for good.</item>
+/// <item><b>AFTER</b> — <c>panels: ["Quests","Gear checklist"]</c>, <c>noScreens: false</c>,
+/// the notice shown, and <b><c>stored</c> now <c>{quests:true,gear:true}</c></b> — the
+/// repair reached localStorage, which is what stops it repeating on every open.</item>
+/// <item><b>AFTER, the negative</b> (<c>playerPicked:true</c> seeded — a player who turned
+/// them all off deliberately) — <c>panels: []</c>, nothing overridden, nothing announced,
+/// and the #550 sentence explaining it. An over-eager repair reddens here.</item>
+/// </list>
+///
+/// <para>A second, cheaper instrument runs the same decision without a browser:
+/// <c>node scripts/dra64-choice-probe.mjs [olderPage.html]</c> lifts the shipped
+/// <c>ensureChoice()</c> out of <c>index.html</c> and runs it over a fake <c>localStorage</c>
+/// across six scenarios, and takes an older page as an argument so the prove-fail is one
+/// command. Neither is a CI step — Helm ACKed leaving node out of CI on #550.</para>
 /// </summary>
 public class CompanionScreenChoiceRecoveryTests
 {
