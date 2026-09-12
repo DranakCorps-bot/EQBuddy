@@ -318,8 +318,8 @@ asked in is the first thing you re-read.**
 dotnet build EQBuddy.slnx -c Release
 dotnet test tests/EQBuddy.Tests/EQBuddy.Tests.csproj -c Release
 pwsh -NoProfile -File scripts/check.ps1
-pwsh -NoProfile -File scripts/claim-seat.ps1 -WorkItem 428 -SeatId my-seat
-pwsh -NoProfile -File scripts/release-seat.ps1 -WorkItem 428 -SeatId my-seat
+pwsh -NoProfile -File scripts/claim-seat.ps1 -WorkItem DRA-28 -SeatId my-seat
+pwsh -NoProfile -File scripts/release-seat.ps1 -WorkItem DRA-28 -SeatId my-seat
 ```
 
 Local how-much: [docs/ops/verification-ladder.md](docs/ops/verification-ladder.md).
@@ -777,8 +777,12 @@ after the named guard left with its surface.
     `scripts/claim-seat.ps1` refuses a second default on the same work
     item; `-Mode challenger|disjoint|replacement` overrides;
     `scripts/release-seat.ps1 -ForceStale` recovers a dead holder.
-    Store is gitignored `.claude/soft-seats/`. Evidence before
-    graduation. [Novel](docs/ops/claude-archive/traps.md#trap-70)
+    Store is gitignored `.claude/soft-seats/`. **The claim key is the
+    Paperclip card, `DRA-<n>`, and only that** — one scope carries two
+    names (GitHub `#445` IS `DRA-28`), and a mutex over free text refuses
+    neither spelling. A bare issue number is REFUSED with the reason, never
+    auto-mapped; `-PaperclipIssue` may only restate `-WorkItem`. Evidence
+    before graduation. [Novel](docs/ops/claude-archive/traps.md#trap-70)
 71. **A fold that is right for IDENTITY is not automatically right for a
     QUANTITY the fold decides.** `BaseName` folds ranks — correct for "which
     buff is up", wrong for "how long", so rank V got rank I's wiki duration

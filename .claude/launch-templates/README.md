@@ -12,16 +12,21 @@ item both used to start. On this machine, claim first so we can measure
 whether the refuse holds:
 
 ```bat
-pwsh -NoProfile -File scripts\claim-seat.ps1 -WorkItem <issue-or-id> -SeatId <seat> -Worktree .claude\worktrees\<seat>
+pwsh -NoProfile -File scripts\claim-seat.ps1 -WorkItem DRA-<n> -SeatId <seat> -Worktree .claude\worktrees\<seat>
 if errorlevel 1 exit /b 1
 ```
+
+**The work item is the Paperclip card id, `DRA-<n>`, and only that.** A bare
+GitHub issue number is refused: `#445` and `DRA-28` are two names for one
+scope, and a claim under each collides with neither. Look the card up and
+pass it — the launcher will not map a number onto a card for you.
 
 `run-seat-PROMPT-only.cmd` does that, then stops at `PROMPT.txt`. It does not
 scaffold a mailbox.
 
 ```bat
-.claude\launch-templates\run-seat-PROMPT-only.cmd 428 opus-isolation
-.claude\launch-templates\run-seat-PROMPT-only.cmd 428 docs-ssc disjoint
+.claude\launch-templates\run-seat-PROMPT-only.cmd DRA-28 opus-isolation
+.claude\launch-templates\run-seat-PROMPT-only.cmd DRA-28 docs-ssc disjoint
 ```
 
 Release when the seat is done (`scripts\release-seat.ps1`). See

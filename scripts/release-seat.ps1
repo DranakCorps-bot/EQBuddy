@@ -11,9 +11,13 @@
     Does not write HELM-FEEDBACK.md. Does not touch scheduled_tasks.lock or the
     screen lock. Local store only (see scripts/soft-seat-store.ps1).
 
+    -WorkItem is NOT key-checked here, unlike claim-seat.ps1. Claims recorded
+    before DRA-50 carry bare issue numbers, and refusing to release them would
+    strand every one of them behind a rule they predate.
+
 .EXAMPLE
-    pwsh -NoProfile -File scripts/release-seat.ps1 -WorkItem 428 -SeatId opus-isolation
-    pwsh -NoProfile -File scripts/release-seat.ps1 -WorkItem 428 -ForceStale
+    pwsh -NoProfile -File scripts/release-seat.ps1 -WorkItem DRA-28 -SeatId opus-isolation
+    pwsh -NoProfile -File scripts/release-seat.ps1 -WorkItem DRA-28 -ForceStale
 #>
 [CmdletBinding()]
 param(

@@ -45,31 +45,53 @@ Every worktree of this clone shares the **main** tree's `.claude/soft-seats/`
 (resolved via `git rev-parse --git-common-dir`). Do not copy the store into a
 seat worktree.
 
+## The claim key is the Paperclip card, and only that
+
+`-WorkItem` must be `DRA-<n>` (EXO-HARDEN-A2 / DRA-50, 2026-09-10). Anything
+else is refused with the reason.
+
+A mutex only refuses a second seat that spells the key the **same way**, and
+one scope here carries two names — GitHub `#445` IS Paperclip `DRA-28`. Two
+seats, one claiming `445` and one claiming `DRA-28`, held one scope and
+collided with neither. That is trap 70 wearing a naming hat: the store was
+doing exactly what it was asked, over a key that was never canonical.
+
+- A bare issue number (`445`, `#445`) → **refused**, naming the DRA form.
+- A free-text id (`options-ia-impl`) → **refused**.
+- `dra-28` is the same key as `DRA-28`; the store canonicalises the case.
+- **No auto-map.** Guessing which tracker the caller meant produces a claim
+  key that silently misses the holder — the same bug, being helpful.
+- `-PaperclipIssue` may only restate `-WorkItem`. It is an opt-in to writing
+  the card to `in_progress`, not a second name for the work.
+
+`release-seat.ps1` stays permissive on purpose: claims recorded before this
+change still carry bare numbers and have to remain releasable.
+
 ## How Soft / Dranak calls it
 
 Before kicking a default seat:
 
 ```bat
-pwsh -NoProfile -File scripts\claim-seat.ps1 -WorkItem 428 -SeatId opus-isolation -Branch claude/opus-isolation-20260908 -Worktree .claude\worktrees\opus-isolation
+pwsh -NoProfile -File scripts\claim-seat.ps1 -WorkItem DRA-28 -SeatId opus-isolation -Branch claude/opus-isolation-20260908 -Worktree .claude\worktrees\opus-isolation
 ```
 
-A second default claim on `#428` exits `1` and names the holder. That is the
+A second default claim on `DRA-28` exits `1` and names the holder. That is the
 whole feature.
 
 Explicit second seats (must be chosen, never the default):
 
 ```bat
-pwsh -NoProfile -File scripts\claim-seat.ps1 -WorkItem 428 -SeatId docs-ssc -Mode disjoint
-pwsh -NoProfile -File scripts\claim-seat.ps1 -WorkItem 428 -SeatId challenger -Mode challenger
-pwsh -NoProfile -File scripts\claim-seat.ps1 -WorkItem 428 -SeatId takeover -Mode replacement
+pwsh -NoProfile -File scripts\claim-seat.ps1 -WorkItem DRA-28 -SeatId docs-ssc -Mode disjoint
+pwsh -NoProfile -File scripts\claim-seat.ps1 -WorkItem DRA-28 -SeatId challenger -Mode challenger
+pwsh -NoProfile -File scripts\claim-seat.ps1 -WorkItem DRA-28 -SeatId takeover -Mode replacement
 ```
 
 When the seat is done, or to recover a dead holder (age ≥ 8 h, or a recorded
 pid that is no longer running):
 
 ```bat
-pwsh -NoProfile -File scripts\release-seat.ps1 -WorkItem 428 -SeatId opus-isolation
-pwsh -NoProfile -File scripts\release-seat.ps1 -WorkItem 428 -ForceStale
+pwsh -NoProfile -File scripts\release-seat.ps1 -WorkItem DRA-28 -SeatId opus-isolation
+pwsh -NoProfile -File scripts\release-seat.ps1 -WorkItem DRA-28 -ForceStale
 ```
 
 `-ExecutorPid` is the long-lived executor (`claude.exe`), not the claim script —

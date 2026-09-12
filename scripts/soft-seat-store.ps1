@@ -6,6 +6,17 @@
 $script:SoftSeatExclusive = @('active', 'replacement')
 $script:SoftSeatModes = @('active', 'challenger', 'disjoint', 'replacement', 'abandoned')
 
+# Paperclip is the tracker for Soft work, so a CLAIM keys on the card id and
+# nothing else (EXO-HARDEN-A2 / DRA-50, 2026-09-10). One scope carries two
+# names — GitHub #445 IS Paperclip DRA-28 — and the mutex used to key on free
+# text, so two seats under two spellings of one scope both started and neither
+# was refused. That is the duplicate start trap 70 exists to stop.
+#
+# We REFUSE a bare issue number rather than map it. An auto-map is a guess
+# about which tracker the caller meant, and a wrong guess is a claim key that
+# silently misses the holder — the same failure wearing a helpful hat.
+$script:SoftSeatKeyPattern = '^DRA-\d+$'
+
 function Get-SoftSeatMainRoot {
     param([string] $Hint)
     $starts = @()
@@ -44,13 +55,55 @@ function Normalize-SoftSeatWorkItem {
     if (-not $WorkItem) { return $null }
     $t = $WorkItem.Trim()
     if ($t.StartsWith('#')) { $t = $t.Substring(1).Trim() }
+    # 'dra-28' and 'DRA-28' are ONE claim key. Case is a spelling, and a
+    # spelling that does not collide is the whole bug this file guards.
+    if ($t -match '^[Dd][Rr][Aa]-(\d+)$') { $t = "DRA-$($Matches[1])" }
     return $t
+}
+
+# -cmatch, not -match. The pattern is checked against the NORMALIZED key, so
+# the case fold above is what makes 'dra-28' legal — the stored key is always
+# the canonical 'DRA-28'. Under case-insensitive -match the fold carried no
+# weight (removing it failed nothing), which is a guard that cannot see its
+# own subject.
+function Test-SoftSeatWorkItemKey {
+    param([string] $WorkItem)
+    $item = Normalize-SoftSeatWorkItem $WorkItem
+    if (-not $item) { return $false }
+    return ($item -cmatch $script:SoftSeatKeyPattern)
+}
+
+# Returns the normalized key, or throws with the reason. Claims only —
+# Invoke-SoftSeatRelease stays permissive on purpose: claims recorded under the
+# old free-text keys still have to be releasable, or this change strands them.
+function Assert-SoftSeatWorkItemKey {
+    param([string] $WorkItem)
+    $raw = ([string] $WorkItem).Trim()
+    $item = Normalize-SoftSeatWorkItem $WorkItem
+    if (-not $item) {
+        throw '-WorkItem is required: the Paperclip card id, DRA-<n> (e.g. DRA-28).'
+    }
+    if ($item -cmatch $script:SoftSeatKeyPattern) { return $item }
+    if ($item -match '^\d+$') {
+        throw @"
+REFUSED: -WorkItem '$raw' is a GitHub issue number, and a Soft seat claims on the Paperclip card id.
+GitHub #$item and its DRA-<n> card are two names for ONE scope; two claims under two spellings never collide, so both seats start (CLAUDE.md trap 70).
+Pass the card: -WorkItem DRA-<n>. This script will NOT map an issue number onto a card for you — look the card up in Paperclip and pass it yourself.
+"@.Trim()
+    }
+    throw @"
+REFUSED: -WorkItem '$raw' is not a Paperclip card id. A Soft seat claim key is DRA-<n> (e.g. DRA-28) and nothing else.
+A free-text id is a second spelling of a scope that already has a card, so two seats can hold one scope without colliding (CLAUDE.md trap 70).
+"@.Trim()
 }
 
 function Format-SoftSeatWorkItem {
     param([string] $WorkItem)
     $n = Normalize-SoftSeatWorkItem $WorkItem
     if (-not $n) { return '' }
+    # A claim can no longer be MADE under a bare number, but rows written
+    # before DRA-50 still are — keep printing them as '#n' so -List and
+    # release-seat.ps1 name them the way they were claimed.
     if ($n -match '^\d+$') { return "#$n" }
     return $n
 }
@@ -226,8 +279,7 @@ function Invoke-SoftSeatClaim {
     if ($script:SoftSeatModes -notcontains $Mode -or $Mode -eq 'abandoned') {
         throw "Unknown -Mode '$Mode'. Use active (default), challenger, disjoint, or replacement."
     }
-    $item = Normalize-SoftSeatWorkItem $WorkItem
-    if (-not $item) { throw '-WorkItem is required (issue number or a stable id).' }
+    $item = Assert-SoftSeatWorkItemKey $WorkItem
     if (-not $SeatId) { throw '-SeatId is required (a name for this executor / worktree).' }
 
     $lock = Lock-SoftSeatStore $StoreDir
