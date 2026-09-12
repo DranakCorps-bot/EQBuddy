@@ -1,3 +1,54 @@
+## 2026-09-11 — DRA-67 (the landing's "log-only" pill was false): four calls I made alone
+
+Founder card under the DRA-48 landing family: the hero pill read **"Log-only — reads your
+/log file, nothing else"**, and that is not what the app does. `Core/OutputfileAutoImport`
+turns the game's own `Outputfile Complete:` log line into an import, and four readers sit
+behind it — `InventoryFile`, `AchievementsImport`, `FactionsFile`, and `SpellbookFile`
+(the last through `LogWatcher`/`BuffTracker`). The page already contradicted itself two
+screens down: *"The Gear Locker reads your inventory dump"*, beside a ⧉ for the
+`/outputfile inventory` command we ship. Site-only, `site/index.html`, four strings.
+
+**1. "Log-only" LEAVES the landing as a label, rather than being kept and qualified.**
+The other way — "Log-only — your /log file, plus the dumps you ask for" — keeps the phrase
+the repo uses and reads as a correction. Landed on dropping it *here*, because a label
+whose own gloss needs an "and also" is the dishonesty the card is about; "only" has to be
+true or gone. **Scoped to the site.** `CLAUDE.md`'s "log-only, by principle" is a
+statement about game memory and is untouched, and `SECURITY.md`'s "log-only, zero
+telemetry" is about **egress** — it heads the network-destination table and is still true.
+
+**2. The pill leads with the GUARANTEE, not the source list.** New text: **"No game memory
+— just your /log and your own /outputfile dumps."** The default was another
+source-first pill. Landed guarantee-first because "no game memory" is the thing "log-only"
+was actually promising a reader, and it is the half that survives the correction intact.
+The KPI directly beneath it ("0 game-memory reads — ever") now names what the pill claims
+instead of restating a different claim.
+
+**3. The principles card NAMES the four dumps; the footer does not.** §08 now reads *"the
+/log it tails live, and the /outputfile dumps you ask for — inventory, achievements,
+faction, spellbook"*. The list is the four `OutputfileKind` members with readers, not a
+description of `/outputfile`, whose own usage line offers eleven — being specific is what
+stops this sentence from drifting back into "everything the game writes". The footer stays
+one sentence because it is a footer, and the card two screens up is where a reader who
+wants the list goes.
+
+**4. No new negative was invented to replace the old one.** "Nothing else" was doing real
+work on the page and the tempting swap is "and nothing else ever leaves your PC" — which
+would be a fresh unmeasured claim of exactly the shape the card is deleting (trap 35). The
+existing, checkable negatives carry it: no game-memory reads, no packet inspection, no
+gameplay automation, no hidden-information extraction, no telemetry by default. Outbound
+requests are real (`eqlwiki.com`, `api.github.com` — `SECURITY.md`'s table), so the
+adjacent **Local-first — no account, no cloud** pill was left exactly as it was rather
+than being strengthened while I was in the file.
+
+**Found, NOT fixed, and named so it is visible:** `README.md` §log-only carries the same
+overclaim — *"it knows only what your own log says"* (line ~44). It is the identical
+defect one file over, and it is outside a card scoped to the site. Not folded in silently;
+it wants its own card, and the copy above is reusable for it.
+
+No `WhatsNew.json` entry: nothing in the app changed. No shot recipe: no surface moved.
+
+— Dranak (Claude Code, DRA-67)
+
 ## 2026-09-11 — DRA-62 (landing Loot peek had no creature selected): four calls I made alone
 
 Founder card under the DRA-48 landing family: *"Landing Loot peek needs a selected creature
