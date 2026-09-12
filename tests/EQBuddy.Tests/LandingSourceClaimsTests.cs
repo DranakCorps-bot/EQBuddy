@@ -164,4 +164,25 @@ public sealed class LandingSourceClaimsTests
             """;
         Assert.Empty(Violations(wrapped));
     }
+
+    /// <summary>
+    /// DRA-69. The landing's Support EQBuddy control is a footer text link, not a
+    /// hero CTA, and it opens the Stripe Payment Link in a new tab. The page must
+    /// not grow a checkout embed or a third-party script — "this page makes no
+    /// third-party requests" is a live claim in the same footer.
+    /// </summary>
+    [Fact]
+    public void TheFooterCarriesAQuietSupportLink()
+    {
+        var html = Page;
+        var match = Regex.Match(
+            html,
+            """<a\s+href="https://buy\.stripe\.com/aFa00k1tE2064qRb0S9R600"[^>]*>\s*Support EQBuddy\s*</a>""",
+            RegexOptions.Singleline);
+        Assert.True(match.Success, "footer is missing the Support EQBuddy Stripe Payment Link");
+        Assert.Contains("target=\"_blank\"", match.Value, StringComparison.Ordinal);
+        Assert.Contains("rel=\"noopener noreferrer\"", match.Value, StringComparison.Ordinal);
+        Assert.DoesNotContain("js.stripe.com", html, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain("paypal", html, StringComparison.OrdinalIgnoreCase);
+    }
 }
