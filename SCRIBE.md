@@ -42,19 +42,26 @@ After you take items, write a short note in `SCRIBE-FEEDBACK.md` so Scribe can l
 - **Helm 2026-09-09 ~6:15 PM CT:** SIGNED flip — Ask = item DB / name-match (not Excel export). Discoverability line done for this reporter. Soft leave / someday. No Reddit reply (u/Dranak75 already in-thread). Not needs-david. Soft LEAVE inventing implement or Claude kick from this alone. Open `#491` is Guide UX (BOT_ONLY) — different lane; Soft LEAVE folding medullah into it.
 
 ### Discoverability: how to dump the full inventory list for EQBuddy
-- **Priority:** done for this reporter (found the dump; Excel import working). Optional someday first-run tip for others — not authorized / Soft leave.
+- **Priority:** open (back on live again) — second reporter hits the wall; see 2026-09-11 note below.
 - **Place:** onboarding / Inventory import tip — how to run `/outputfile inventory` so EQBuddy (or any local tool) can see every bag/bank row. Player session. Not shared game truth.
-- **Source:** same thread as above — u/medullah nested reply on https://www.reddit.com/r/EQLegends/comments/1wbl5sk/any_exportable_database_of_items_or_easy_way_to/ (~after community named EQBuddy/Companion).
-- **Ask (verbatim):** “Ah I’ll have to look, couldn’t find a way to get a dump of all my items, just look at them one at a time.”
-- **Already shipped:** WhatsNew/README path historically taught “Type `/outputfile inventory` in game and EQBuddy reads the file” (quoted on prior SCRIBE #243 evidence). Whether that tip is visible enough on first run — **not checked on a live widget this pass**.
-- **Checked:** Reddit nested comment only. WINDOW — no.
-- **Hypothesis, unchecked:** reporter does not know the game command; not that EQBuddy lacks a parser. *(superseded for this reporter — see Reporter answer below)*
+- **Source (original 2026-09-09):** Reddit r/EQLegends u/medullah, https://www.reddit.com/r/EQLegends/comments/1wbl5sk/any_exportable_database_of_items_or_easy_way_to/ (nested reply ~after community named EQBuddy/Companion).
+- **Source (renewed 2026-09-11):** Reddit r/EQLegends u/Acrobatic-Age-3111, "Outputfile inventory", 2026-09-11 12:57 UTC. https://www.reddit.com/r/EQLegends/comments/1wdfkcp/outputfile_inventory/ Title: “Outputfile inventory”. Harvest-only (no Scribe reply drafted — community had already answered in-thread at sweep time).
+- **Ask (original, verbatim):** “Ah I’ll have to look, couldn’t find a way to get a dump of all my items, just look at them one at a time.”
+- **Ask (new, 2026-09-11, verbatim):** “I have a lot of my items in my storage inventory tab. It appears when I output my inventory that is not accounted for. Do I need to move all plane of sky items to my actual bags or is there something I am doing wrong?”
+- **Thread colour (2026-09-11, verbatim, both lines are the community’s answer — not the Ask):**
+  - u/xvilemx 13:30 UTC: “You need to be at the bank with it open and your dragon hoard and tradeskills stash open for it to see everything.”
+  - u/Zorlach 18:41 UTC: “It should be showing your storage inventory tab”
+- **Already shipped:** WhatsNew/README path historically taught “Type `/outputfile inventory` in game and EQBuddy reads the file” (quoted on prior SCRIBE #243 evidence). Whether that line of guidance is visible enough that a *second* reporter within a week doesn’t hit the storage-tab wall — **not checked on a live widget this pass**.
+- **Checked:** Reddit post + comments via arctic-shift (u/Acrobatic-Age-3111 post 1wdfkcp, 2 comments). WINDOW/WIDGET/PHONE — no. Not checked against `src` this pass.
+- **Hypothesis, unchecked:** the storage-tab / bank-open requirement is discoverability, not a data gap — the game dump format already carries those rows (per prior SCRIBE notes), the reporter just didn’t run it in the bank with the right containers open. Two reporters in one week is the signal the first-run tip is still not visible enough. *(This is now a pattern, not a single report.)*
 - **Class:** V0 (copy / first-run tip). Do not write FABLE.md.
-- **Reporter answer 2026-09-09 ~1:22 PM CT:** confirmed he has the dump path and Excel auto-import (same comment p8smp9u). Community + David named `/outputinventory` / `/outputfile inventory` in-thread.
+- **Reporter context (2026-09-09 u/medullah):** confirmed he had the dump path + Excel auto-import (comment p8smp9u). Community + David had already named the command in-thread.
+- **Reporter context (2026-09-11 u/Acrobatic-Age-3111):** community answered in-thread (xvilemx’s 13:30 UTC line is the same answer as on the 2026-09-09 thread). Do not draft a Scribe Reddit reply unless the reporter posts a follow-up or the tip is still not discoverable.
 - **Scribe 2026-09-09 ~1:10 PM CT:** Filed as its own line (not thread colour). No Reddit reply.
 - **Helm 2026-09-09 ~1:16 PM CT:** SIGNED someday / Soft leave. No Reddit reply.
-- **Scribe 2026-09-09 ~6:05 PM CT:** flipped waiting→done for this thread. No Reddit reply. Do not restore as open waiting unless a new reporter hits the same wall.
+- **Scribe 2026-09-09 ~6:05 PM CT:** flipped waiting→done for this thread. Do not restore as open waiting unless a new reporter hits the same wall.
 - **Helm 2026-09-09 ~6:15 PM CT:** SIGNED flip to done for this reporter. Soft leave optional first-run tip for others. No Reddit reply.
+- **Scribe 2026-09-11 cron intake (this run):** A *new* reporter (Acrobatic-Age-3111, Sept 11, 7:57 AM CT) reported the same storage-tab wall in a new thread, 1wdfkcp. The community answered in-thread within ~30 min (xvilemx 13:30 UTC + Zorlach 18:41 UTC). No Scribe reply drafted. Priority flipped back to **open** — two reporters in one week is a pattern; the first-run tip is clearly not visible enough yet. Soft leave / not authorized. Do not implement. Do not write FABLE.md.
 
 
 ### Inventory: flag items that can merge into one stack/slot
