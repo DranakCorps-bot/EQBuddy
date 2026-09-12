@@ -40,10 +40,50 @@
                      have content at head. All three incidents fail here, and this check
                      has no threshold to argue about.
       2. SHRINK    - ledger/state: head keeps at least 60% of base's substantive lines.
-      3. REPLACE   - ledger/state: at least 65% of base's substantive lines are still
-                     PRESENT at head (multiset). This is the "full replace when only
-                     append was expected" case - a regenerated ledger of about the right
-                     length passes check 2 and fails here.
+      3. REPLACE   - ledger/state, and it has TWO ARMS, because the two ask different
+                     questions about the same rewrite:
+
+                     3a. LINE retention - at least 65% of base's substantive lines are
+                         still PRESENT at head (multiset). Sensitive to any rewrite,
+                         which is its strength and also why it needs the REPAIR
+                         exemption below: re-encoding a file moves every line that
+                         carries a dash without losing a word of it.
+                     3b. ENTRY retention - at least 85% of base's ENTRY HEADINGS are
+                         still present at head, compared through a key with all
+                         non-ASCII STRIPPED, whitespace collapsed and case FOLDED.
+
+                     3b is the key PR #507 was built around, and the reason it is worth
+                     carrying as well as 3a rather than instead of it:
+
+                       - It cannot be moved by encoding churn. `ff6853ba`, an honest
+                         "merge main (additions-only KEEP)", re-encoded HELM.md so that
+                         E2 80 94 (a UTF-8 em dash) became C3 A2 E2 82 AC E2 80 9D (the
+                         same dash through cp1252 - trap 54's shape). Every line
+                         carrying a dash compared unequal while saying exactly what it
+                         said before. Strip non-ASCII and the entry is the same entry.
+                       - Because of that it is NOT excused by the REPAIR exemption, and
+                         that closes a real hole in arm 3a alone: a rewrite that removes
+                         mojibake at full length is waved through by REPAIR, so a commit
+                         that repaired the encoding AND quietly dropped forty entries
+                         passed every check. An encoding repair does not move an entry
+                         key, so a repair that also loses entries now has nothing left
+                         to hide behind. `channel-wipe-guard-selftest.ps1` case 13 is
+                         exactly that commit, and it is green on arm 3a.
+                       - A ledger's unit is the ENTRY - "APPEND your entry" - so losing
+                         one is the harm being named, and a percentage of entries is a
+                         number a human can argue with in review.
+
+                     Entries are found ANYWHERE, not only at the start of a line, and
+                     the key is capped at 80 characters. Both are forced by the state of
+                     the file this guard exists for: `c7a597a8` collapsed
+                     HELM-FEEDBACK.md's 8,677 lines into 2, so `origin/main` today has
+                     EIGHT line-start headings standing for 1,051 entries. A line-start
+                     reading would have given this arm no coverage at all on the one
+                     ledger that has been destroyed twice - a detector aimed at nothing
+                     (trap 74). Scanning mid-line recovers 3,523 of them. The cap keeps
+                     a recovered key from swallowing its entry's whole body, so an edit
+                     inside an entry is not read as the loss of it.
+
       4. MOJIBAKE  - no rostered file may gain double-encoded characters. HELM-FEEDBACK.md
                      carries 13,411 of these markers today, laid down by eleven separate
                      commits (trap 60(b): a whole-file rewrite through the wrong codec).
@@ -67,19 +107,46 @@
                                 The floor is 65%, which leaves the two nearest clean
                                 revisions (66.7%, 68.7% - both mojibake) failing for the
                                 right reason and every clean one passing.
+      ENTRY retention:          measured the same way, over all 1,143 ledger/state
+                                revision pairs with at least four entries at base. The
+                                separation is cleaner than any line measure in this file:
+
+                                  ledger  n=909. Three revisions below 90%, and all
+                                          three are the incidents - 24a91e64 (0.000,
+                                          PR #493), 7b804338 (0.485, the truncation),
+                                          c7a597a8 (0.594, the line collapse). The
+                                          worst CLEAN value in the whole history is
+                                          0.941 (de05c512, 17 entries).
+                                  state   n=234. One revision below 90%: the deletion,
+                                          at 0.000. Worst clean is 0.944 (3e68e2a0, a
+                                          shipped-and-closed loop on an 18-entry file).
+                                  inbox   n=314, min 0.125, fifteen clean revisions
+                                          below 90% - a drained inbox again. No entry
+                                          check on that tier either, for the same
+                                          reason there is no line check.
+
+                                The floor is 85% for both checked tiers: about six
+                                points under the worst clean revision ever recorded and
+                                thirty-six above the truncation it has to catch.
       inbox:                    9.5% size / 9.1% retention is a NORMAL drained inbox
                                 (d091939b). Hence: no percentage check on that tier.
 
     TWO EXEMPTIONS, because both describe a thing we actually want to happen:
 
-      REPAIR   Un-mangling a file rewrites most of its lines, which is check 3's exact
+      REPAIR   Un-mangling a file rewrites most of its lines, which is check 3a's exact
                signature. If head has FEWER mojibake markers than base and keeps at
-               least 95% of its length, the rewrite is a repair and check 3 stands down
+               least 95% of its length, the rewrite is a repair and check 3a stands down
                with a note. (It is how e8d2aeed would pass.)
+
+               IT DOES NOT TOUCH 3b, and that asymmetry is the point. The entry key has
+               no non-ASCII in it, so a genuine repair moves no entry at all and needs
+               no excusing; anything that DID lose entries was not only repairing.
+               Waiving 3b here would hand every future rewrite a one-line cover story.
       ARCHIVE  Moving old entries into docs/ops/claude-archive/ is the documented way a
                ledger is allowed to get shorter. If at least 90% of the lines that left
-               are found under that directory at head, checks 2 and 3 stand down with a
-               note. Content that MOVED was not content that was LOST.
+               are found under that directory at head, checks 2 and 3a stand down with a
+               note; 3b stands down on the same test applied to the entry keys that
+               left. Content that MOVED was not content that was LOST.
 
     There is no -Force and no skip switch: an escape hatch on a guard whose whole subject
     is "an automated land destroyed the file" is the automated land's next move. The two
@@ -153,13 +220,32 @@ $Roster = [ordered]@{
 # MinBaseLines keeps the percentages off files small enough that one ordinary edit is a
 # large fraction of them - below it, only checks 1 and 4 apply.
 $TierPolicy = @{
-    ledger = @{ MinKept = 0.90; MinRetained = 0.90 }
-    state  = @{ MinKept = 0.60; MinRetained = 0.65 }
+    ledger = @{ MinKept = 0.90; MinRetained = 0.90; MinEntries = 0.85 }
+    state  = @{ MinKept = 0.60; MinRetained = 0.65; MinEntries = 0.85 }
 }
 $MinBaseLines         = 40
 $RepairMinLength      = 0.95
 $ArchiveMinFound      = 0.90
 $ArchiveDir           = 'docs/ops/claude-archive'
+
+# Check 3b, the #507 key. An ENTRY is a markdown heading of two to six hashes; one hash is
+# excluded on purpose because `# comment` is the prefix of every PowerShell line quoted in
+# these files and would invent entries out of pasted scripts.
+#
+# It is matched at the start of a line OR after any whitespace inside one. That is not
+# tidiness - it is the difference between coverage and none. `c7a597a8` collapsed
+# HELM-FEEDBACK.md's 8,677 lines into 2, so at origin/main today a line-start reading finds
+# EIGHT headings in the file that has been deleted twice, and the mid-line reading finds
+# 3,523. A percentage over eight things is not a measurement.
+#
+# The key is capped, because a recovered mid-line entry has no end: it runs to the next
+# entry, which on a collapsed line is the whole body. Capped at 80 ASCII characters the key
+# is the heading and a little of what follows - distinctive enough that two entries do not
+# collide (1,009 distinct keys over HELM-FEEDBACK.md's 3,523), and short enough that
+# editing a typo inside an entry does not read as deleting it.
+$EntryPattern         = [regex] '(?:(?<=\A)|(?<=\n)|(?<=\s))#{2,6}[ \t]+\S'
+$EntryKeyCap          = 80
+$MinBaseEntries       = 20
 
 # Built from code points on purpose: this file must survive being read by a host that
 # guesses its encoding, and a literal mojibake glyph in the source is the one string that
@@ -209,6 +295,35 @@ function Get-Lines($text) {
     $normalized = $text -replace "`r`n", "`n"
     $result = @($normalized -split "`n" | ForEach-Object { $_.TrimEnd() } | Where-Object { $_.Trim().Length -gt 0 })
     return , $result
+}
+
+# The comparison key of check 3b: an entry heading with all non-ASCII STRIPPED, whitespace
+# collapsed and case FOLDED. Stripping is what makes it survive an encoding round trip -
+# `ff6853ba` turned every em dash in HELM.md into mojibake without changing a word, and a
+# guard that fails a correct merge is worth less than no guard at all.
+# Same $null-vs-empty contract as Get-Lines, and the same comma-wrapped return: an unrolled
+# empty array would make "no entries" and "file is gone" the same answer.
+function Get-EntryKeys($text) {
+    if ($null -eq $text) { return $null }
+    $t = $text -replace "`r`n", "`n"
+    $starts = @($EntryPattern.Matches($t) | ForEach-Object { $_.Index })
+    $keys = [Collections.Generic.List[string]]::new()
+    for ($i = 0; $i -lt $starts.Count; $i++) {
+        $s = $starts[$i]
+        # An entry ends at the next entry or at end of line, whichever comes first. The
+        # end-of-line half is what keeps an ordinary heading's key from running on into the
+        # paragraph under it; the next-entry half is what bounds one recovered from a
+        # collapsed line, where there is no newline to stop at.
+        $end = if ($i + 1 -lt $starts.Count) { $starts[$i + 1] } else { $t.Length }
+        $nl = $t.IndexOf("`n", $s)
+        if ($nl -ge 0 -and $nl -lt $end) { $end = $nl }
+        $seg = $t.Substring($s, $end - $s)
+        $seg = [regex]::Replace($seg, '[^\x20-\x7E]', '')
+        $seg = ([regex]::Replace($seg, '\s+', ' ')).Trim().ToLowerInvariant()
+        if ($seg.Length -gt $EntryKeyCap) { $seg = $seg.Substring(0, $EntryKeyCap) }
+        if ($seg.Length -gt 0) { [void]$keys.Add($seg) }
+    }
+    return , $keys.ToArray()
 }
 
 function Measure-Mojibake([string] $text) {
@@ -289,9 +404,11 @@ if ($LASTEXITCODE -eq 0) {
 # ---- the archive corpus, built once and only if something needs excusing ------------
 
 $script:archiveLines = $null
-function Get-ArchiveLines {
-    if ($null -ne $script:archiveLines) { return $script:archiveLines }
+$script:archiveKeys  = $null
+function Build-ArchiveCorpus {
+    if ($null -ne $script:archiveLines) { return }
     $set = [Collections.Generic.HashSet[string]]::new()
+    $keys = [Collections.Generic.HashSet[string]]::new()
     $paths = @()
     if ($HeadRef) {
         $paths = @(Invoke-GitUtf8 @('ls-tree', '-r', '--name-only', $HeadRef, $ArchiveDir))
@@ -308,10 +425,14 @@ function Get-ArchiveLines {
     foreach ($p in $paths) {
         $t = Read-At $HeadRef $p
         foreach ($l in (Get-Lines $t)) { [void]$set.Add($l) }
+        foreach ($k in (Get-EntryKeys $t)) { [void]$keys.Add($k) }
     }
     $script:archiveLines = $set
-    $set
+    $script:archiveKeys = $keys
 }
+
+function Get-ArchiveLines { Build-ArchiveCorpus; $script:archiveLines }
+function Get-ArchiveKeys { Build-ArchiveCorpus; $script:archiveKeys }
 
 # Only the lines that actually left, and only counted once each: a ledger that repeats
 # "To: Fable" four hundred times should not be able to buy its own exemption with it.
@@ -334,9 +455,23 @@ function Test-ArchiveMove($lost) {
     return (($found / $lost.Count) -ge $ArchiveMinFound)
 }
 
+# The same question as Test-ArchiveMove, asked of entries. It gets its own corpus rather
+# than reusing the line set because an archived entry's heading has been through the same
+# key - stripped and folded - and would not match the raw line it came from.
+function Test-ArchiveMoveEntries($lostKeys) {
+    if ($lostKeys.Count -eq 0) { return $true }
+    $arch = Get-ArchiveKeys
+    if ($arch.Count -eq 0) { return $false }
+    $found = 0
+    foreach ($k in $lostKeys) { if ($arch.Contains($k)) { $found++ } }
+    return (($found / $lostKeys.Count) -ge $ArchiveMinFound)
+}
+
 # ---- checks 1 to 4, per rostered file -----------------------------------------------
 
 $checked = 0
+$entriesCompared = 0
+$filesWithEntries = 0
 foreach ($path in $Roster.Keys) {
     $tier = $Roster[$path]
 
@@ -378,11 +513,37 @@ foreach ($path in $Roster.Keys) {
     $retained = ($baseLines.Count - $lost.Count) / $baseLines.Count
     $replaced = $retained -lt $policy.MinRetained
 
-    if (-not $shrank -and -not $replaced) { continue }
+    # -- 3b. ENTRY retention, the #507 key --------------------------------------------
+    # Its own floor and its own lost-list, because the two arms get different exemptions
+    # further down: an encoding repair excuses 3a and must never excuse this.
+    $baseKeys = Get-EntryKeys $baseText
+    $headKeys = Get-EntryKeys $headText
+    $lostKeys = @()
+    $entryRetained = $null
+    $entriesLost = $false
+    if ($baseKeys.Count -ge $MinBaseEntries) {
+        $lostKeys = Get-LostLines $baseKeys $headKeys
+        $entryRetained = ($baseKeys.Count - $lostKeys.Count) / $baseKeys.Count
+        $entriesLost = $entryRetained -lt $policy.MinEntries
+        $entriesCompared += $baseKeys.Count
+        $filesWithEntries++
+    }
+    else {
+        # Say it out loud. A file under the floor gets checks 1, 2, 3a and 4 and no entry
+        # arm, and a guard that silently applies four checks where the docs promise five
+        # is the shape trap 74 is about. CLAUDE-FEEDBACK.md (13 entries) is legitimately
+        # down here; HELM-FEEDBACK.md would be too if entries were read line-start only.
+        $notes += "$path has $($baseKeys.Count) entries at base, under the $MinBaseEntries needed for a percentage to mean anything - checked for wipe, shrink, line-replace and mojibake, but NOT for entry loss."
+    }
+
+    if (-not $shrank -and -not $replaced -and -not $entriesLost) { continue }
 
     # -- exemptions -------------------------------------------------------------------
+    # REPAIR stands down 3a ONLY. Stripping non-ASCII is what the entry key does, so a
+    # real repair does not move one and has nothing here to ask for; a rewrite that
+    # removed mojibake AND lost entries is not the thing this exemption is named after.
     if ($replaced -and -not $shrank -and $headMoji -lt $baseMoji -and $kept -ge $RepairMinLength) {
-        $notes += "$path rewrote $([int]((1 - $retained) * 100))% of its lines and REMOVED $($baseMoji - $headMoji) mojibake markers at full length - read as an encoding REPAIR, not a replacement."
+        $notes += "$path rewrote $([int]((1 - $retained) * 100))% of its lines and REMOVED $($baseMoji - $headMoji) mojibake markers at full length - read as an encoding REPAIR, not a replacement. (Entry retention is judged separately and is not excused by this.)"
         $replaced = $false
     }
     if (($shrank -or $replaced) -and (Test-ArchiveMove $lost)) {
@@ -390,6 +551,12 @@ foreach ($path in $Roster.Keys) {
         $shrank = $false
         $replaced = $false
     }
+    if ($entriesLost -and (Test-ArchiveMoveEntries $lostKeys)) {
+        $notes += "$path lost $($lostKeys.Count) entries, and at least $([int]($ArchiveMinFound * 100))% of them are present under $ArchiveDir at $headLabel - read as an ARCHIVE MOVE, not a loss."
+        $entriesLost = $false
+    }
+
+    if (-not $shrank -and -not $replaced -and -not $entriesLost) { continue }
 
     # -- 2. SHRINK --------------------------------------------------------------------
     if ($shrank) {
@@ -399,7 +566,7 @@ foreach ($path in $Roster.Keys) {
             "If entries are genuinely retiring, move them under $ArchiveDir in the same commit and this check stands down.")
     }
 
-    # -- 3. REPLACE -------------------------------------------------------------------
+    # -- 3a. REPLACE (lines) ----------------------------------------------------------
     if ($replaced) {
         $sample = @($lost | Where-Object { $_.Length -gt 20 } | Select-Object -First 3)
         $problems += ("$path retains only $([int]($retained * 100))% of the lines it had at base $baseShort " +
@@ -409,6 +576,22 @@ foreach ($path in $Roster.Keys) {
         foreach ($s in $sample) {
             $t = if ($s.Length -gt 96) { $s.Substring(0, 96) + '...' } else { $s }
             $problems += "    lost: $t"
+        }
+    }
+
+    # -- 3b. REPLACE (entries) --------------------------------------------------------
+    # Named separately from 3a even when both fire, because they are different evidence:
+    # 3a says the TEXT moved, 3b says an ENTRY is gone. Only the second survives an
+    # argument about encoding.
+    if ($entriesLost) {
+        $sample = @($lostKeys | Select-Object -First 3)
+        $problems += ("$path retains only $([int]($entryRetained * 100))% of the ENTRIES it had at base $baseShort " +
+            "($($baseKeys.Count) -> $($headKeys.Count); $($lostKeys.Count) gone; the floor for a $tier is $([int]($policy.MinEntries * 100))%). " +
+            'Entries are compared with non-ASCII stripped and case folded, so re-encoding, re-indenting and reordering CANNOT cause this - ' +
+            'only removing the entry can. ' +
+            "If they are genuinely retiring, move them under $ArchiveDir in the same commit and this check stands down.")
+        foreach ($s in $sample) {
+            $problems += "    lost entry: $s"
         }
     }
 }
@@ -425,7 +608,11 @@ if ($problems.Count -gt 0) {
     exit 1
 }
 
-# Say how many files were actually compared. A run that checked nothing and a run that
-# checked eleven files print the same word otherwise, and one of them is not coverage.
-Write-Host "channel-wipe-guard: ok  ($checked channel files intact; base $baseShort via $how -> $headLabel)" -ForegroundColor Green
+# Say how many files were actually compared, AND how many entries the 3b arm weighed. A run
+# that checked nothing and a run that checked eleven files print the same word otherwise,
+# and one of them is not coverage. The entry number is there for the same reason: the
+# mojibake list was green for a month while matching nothing, and it was a printed COUNT
+# that exposed it (trap 74). A sudden zero here means the pattern stopped finding entries,
+# not that the ledgers got safer.
+Write-Host "channel-wipe-guard: ok  ($checked channel files intact, $entriesCompared entries compared across $filesWithEntries of them; base $baseShort via $how -> $headLabel)" -ForegroundColor Green
 exit 0

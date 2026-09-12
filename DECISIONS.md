@@ -1,3 +1,56 @@
+## 2026-09-12 — DRA-49 revision of PR #511: the #507 entry key folded into replace/retention, and four calls made alone
+
+Pre-authorized: tooling and gates, no consequence-list door. SSC #513 steps 2–4 asked for
+the fold specifically; these are the calls inside it that could have gone another way.
+
+**1. The #507 key was FOLDED IN, not swapped for the line check.** #507 compared entry
+headings; #511 compared lines. The obvious resolution is to pick one. Both survive, as
+arms 3a and 3b of the replace check, because they fail on different things and neither
+covers the other: the line arm is the sensitive one and is the only thing still watching
+`HELM-FEEDBACK.md`, whose entries `c7a597a8` collapsed past recovery; the entry arm is the
+only one that cannot be moved by an encoding round trip, which is what made #507's author
+abandon line comparison in the first place (`ff6853ba` read as 63% destruction of a
+correct merge). **The default it could have gone the other way on:** one check, one
+number, less to explain. It landed as two because each one is green on a commit the other
+refuses, and I can point at both commits.
+
+**2. The REPAIR exemption stands 3a down and deliberately does NOT reach 3b.** This is the
+part that earns the fold. An encoding repair rewrites nearly every line, so the line arm
+has to forgive it — and that forgiveness is also a cover story: a commit that un-mangled a
+ledger **and** dropped a quarter of its entries was green under #511 as it stood. Stripping
+non-ASCII is what the entry key already does, so a genuine repair does not move one and
+has nothing to ask for. Self-test cases 15 and 16 are that commit, asserted twice — 3a
+excused it, 3b refused it. **What would reverse it:** a legitimate workflow that rewrites
+entry HEADINGS wholesale. I know of none; the archive exemption covers the one I can
+foresee.
+
+**3. Entries are matched mid-line, and the key is capped at 80 characters.** The tidy
+reading is line-start headings only. It is also, today, a detector aimed at nothing on the
+single most important file: `c7a597a8` collapsed `HELM-FEEDBACK.md`'s 8,677 lines into 2,
+so `main` carries EIGHT line-start headings standing for 1,051 entries, and a percentage
+over eight things is not a measurement (trap 74, one file over). Mid-line matching
+recovers 3,523 of them. The cap is the cost of that: a recovered entry has no end, so
+without it the key would swallow the entry's whole body and any edit inside an entry would
+read as deleting it. Two hashes minimum, not one, so a pasted `# comment` does not invent
+entries out of quoted PowerShell.
+
+**4. When the new arm refused a self-test fixture, I corrected the FIXTURE.** The "lifting
+holds from `HELM.md` passes" case lopped 22% off the end of the file, which is 13 of 60
+holds in one commit, and 3b called it. The cheap fix is to loosen the floor until the
+fixture passes. The measurement says not to: across all 234 revisions of `HELM.md` the
+worst clean entry retention ever recorded is 0.944, because holds lift one at a time. A
+floor moved to fit an invented fixture is trap 52 with the premise never re-derived. The
+fixture now lifts six holds and compacts twenty more, which is what a Helm pass does, and
+the floor stayed where the 1,143 measured revision pairs put it.
+
+**Scope, stated plainly, because it has not changed:** this still catches CATASTROPHIC
+loss and nothing else. Trap 60(a)'s stale-base clobber and 60(c)'s silently truncated
+append both still pass. `CLAUDE-FEEDBACK.md` has 12 entries and so sits under the 20 the
+percentage needs — it gets four checks, not five, and the guard now SAYS so on every run
+rather than letting the docs promise five.
+
+— Dranak (Claude Code)
+
 ## 2026-09-12 — DRA-66 (Character room rename + class line/correction): executed the SIGNED plan after building past it — the collision, and four calls that remained mine
 
 **The collision, first, because it is the entry's real content.** Paperclip assigned

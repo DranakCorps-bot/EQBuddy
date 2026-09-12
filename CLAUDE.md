@@ -732,7 +732,16 @@ after the named guard left with its surface.
     `HELM.md` is state that lifts holds (65%), the inboxes are drained by
     design and get the wipe + mojibake checks only. No `-Force`: an
     archive move and an encoding repair stand the checks down by BEING
-    one. **It catches CATASTROPHIC loss, and nothing else — (a) and (c)
+    one. **Replace has two arms, and the second is the one that survives
+    an argument about encoding:** 3a compares lines, 3b compares ENTRY
+    HEADINGS through a key with non-ASCII stripped and case folded (85%,
+    both checked tiers), so re-encoding, re-indenting and reordering
+    cannot move it and **the repair exemption deliberately does not reach
+    it** — a rewrite that un-mangles a file *and* drops forty entries used
+    to be waved through by 3a. Entries are matched mid-line too, because
+    `c7a597a8` collapsed `HELM-FEEDBACK.md` into 2 lines and a line-start
+    reading would give 3b eight headings to measure 1,051 entries with.
+    **It catches CATASTROPHIC loss, and nothing else — (a) and (c)
     still have no guard.** A stale-base clobber of 36 lines out of 10,600
     is 99.7% retention and passes; so does a silently truncated append,
     which is additions-only and retains everything. `git diff

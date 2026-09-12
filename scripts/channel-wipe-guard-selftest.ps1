@@ -9,16 +9,26 @@
     repository in TEMP - never this repo, never the real channel files - seeds it with
     fixture ledgers, and then does each destructive thing on purpose.
 
-    Fifteen cases. Six of them are "must PASS" on purpose: the useful half of a guard
+    Twenty-one cases. Eight of them are "must PASS" on purpose: the useful half of a guard
     like this is the workflows it does NOT interrupt, and every one of the passes below
     corresponds to a real commit in this repo's history that must keep landing (a drained
-    inbox, a lifted hold, an encoding repair, an archive move).
+    inbox, a lifted hold, an encoding repair, an archive move, a rebase that reorders).
 
     The marker-array bug this suite would have caught, and did: the mojibake check was
     written as `@([char]0xE2 + [char]0x20AC, [char]0xC3 + [char]0xA2)`, and PowerShell
     binds `,` TIGHTER than `+`, so the list collapsed into one string that matches
     nothing. The guard reported a clean file for the commit that quadrupled the
     corruption. It was green, and it was measuring nothing.
+
+    Case 2 is that lesson applied to the ENTRY arm before it could repeat: it asserts the
+    exact number of entries compared, because every 3b case here would still pass if
+    $EntryPattern found none at all.
+
+    Cases 15 and 16 are the pair worth reading together. They are one commit - an encoding
+    repair that also drops fifteen of sixty entries - asserted twice: that check 3a was
+    EXCUSED as a repair, and that check 3b refused it anyway. That commit was green before
+    3b existed, and it is the reason the REPAIR exemption deliberately does not reach the
+    entry arm.
 
 .EXAMPLE
     pwsh -NoProfile -File scripts/channel-wipe-guard-selftest.ps1
@@ -134,6 +144,13 @@ try {
 
     Assert-Result 'an untouched tree passes' $false 'channel files intact' $B
 
+    # Trap 74, asserted rather than hoped for. The fixture is seven checked files of sixty
+    # entries each, so the entry arm must report exactly 420. A bare "it passed" is what the
+    # collapsed mojibake list printed for a month while matching nothing; if $EntryPattern
+    # ever stops finding entries this number goes to zero and every 3b case below still
+    # passes, because a percentage of nothing is never below a floor.
+    Assert-Result 'the entry arm reports the count it actually compared' $false '420 entries compared across 7 of them' $B
+
     Reset-Tree
     New-Utf8File $ledgerPath ($baseLedger + (Get-LedgerText 3 'a new signed entry'))
     Assert-Result 'appending to a ledger passes' $false 'channel files intact' $B
@@ -145,9 +162,25 @@ try {
 
     Reset-Tree
     # HELM.md is state: lifting holds legitimately removes them, so its tier is looser.
-    $stateText = [IO.File]::ReadAllText((Join-Path $root $STATE))
-    $keepChars = [int]($stateText.Length * 0.78)
-    New-Utf8File (Join-Path $root $STATE) $stateText.Substring(0, $keepChars)
+    #
+    # This fixture used to lop 22% off the END of the file, which is 13 of 60 holds gone in
+    # one commit. Check 3b refused it, and 3b was right: across all 234 revisions of
+    # HELM.md the worst CLEAN entry retention ever recorded is 0.944 - one hold at a time,
+    # which is what "holds get lifted" means. Loosening the floor to admit the fixture
+    # would have been weakening a measured number to fit an invented one (trap 52).
+    #
+    # So the fixture now does what a Helm pass does: SIX holds lift outright, and twenty
+    # more keep their heading while their rationale is compacted away. 82% of the length
+    # and 90% of the entries - under the ledger tier's 90% length floor, which is the whole
+    # point of the state tier being separate, and over 3b's 85%.
+    $stateBase = Get-LedgerText 60 'HELM.md holds'
+    $lifted = Get-LedgerText 54 'HELM.md holds'
+    for ($i = 1; $i -le 20; $i++) {
+        $lifted = $lifted.Replace("- **Corrective:** entry $i names the evidence it rests on (HELM.md holds/$i).`r`n", '')
+        $lifted = $lifted.Replace("- **Corrective:** entry $i names the evidence it rests on (HELM.md holds/$i).`n", '')
+    }
+    if ($lifted.Length -ge $stateBase.Length) { throw 'selftest fixture: the hold-lift did not actually shorten HELM.md' }
+    New-Utf8File (Join-Path $root $STATE) $lifted
     Assert-Result 'lifting holds from HELM.md (state tier) passes' $false 'channel files intact' $B
 
     Reset-Tree
@@ -196,6 +229,45 @@ try {
     # "SSC full-replace" the card names.
     New-Utf8File $ledgerPath (Get-LedgerText 60 'regenerated from scratch')
     Assert-Result 'check 3 - full-replacing at the same length REFUSES' $true 'retains only' $B
+
+    Reset-Tree
+    # Check 3b ALONE. Twelve entries lose their `## ` and become ordinary prose; every word
+    # of every body stays where it was. Only 12 of 241 lines move, so LINE retention is 95%
+    # and check 3a is silent - this is the shape 3a cannot see, and twelve entries of sixty
+    # is the loss a reader of the ledger would actually notice.
+    $demoted = $baseLedger
+    for ($i = 1; $i -le 12; $i++) {
+        $demoted = $demoted.Replace("## 2026-09-0$([int]($i % 9) + 1) ~$i" + ':00 PM CT ' + [char]0x2014 + " $LEDGER entry $i",
+            "2026-09-0$([int]($i % 9) + 1) ~$i" + ':00 PM CT ' + [char]0x2014 + " $LEDGER entry $i")
+    }
+    New-Utf8File $ledgerPath $demoted
+    Assert-Result 'check 3b - losing entry headings at full length REFUSES' $true 'of the ENTRIES it had' $B
+
+    Reset-Tree
+    # THE HOLE THIS ARM WAS ADDED FOR. Base is a mangled ledger; head repairs the encoding
+    # (so the REPAIR exemption stands 3a down, correctly) and quietly drops fifteen of the
+    # sixty entries, padded back to full length. Before 3b existed this was GREEN.
+    #
+    # The assertion is the NUMBER: 75%. The entry key strips non-ASCII, so a mangled
+    # heading and its repaired self are the same entry and only the fifteen that are gone
+    # count as lost. If stripping were broken every heading would read as lost and this
+    # would say 0% - still red, but for a reason that would hide the real one.
+    New-Utf8File $ledgerPath ($baseLedger.Replace([string][char]0x2014, $MojiEmDash))
+    Invoke-Git @('add', '-A')
+    Invoke-Git @('commit', '--quiet', '-m', 'fixture: mangled ledger, again')
+    $mangled2 = (& git -C $root rev-parse HEAD).Trim()
+    $padding = (1..60 | ForEach-Object { "- **Constructive:** padding line $_ keeps this rewrite at full length." }) -join "`n"
+    New-Utf8File $ledgerPath ((Get-LedgerText 45 $LEDGER) + $padding + "`n")
+    Assert-Result 'check 3b - an encoding REPAIR that also drops entries REFUSES' $true 'only 75% of the ENTRIES' @('-BaseRef', $mangled2)
+    Assert-Result '  ...and 3a was in fact excused as a REPAIR, so 3b is what caught it' $true 'encoding REPAIR' @('-BaseRef', $mangled2)
+    Invoke-Git @('reset', '--hard', '--quiet', $base)
+
+    Reset-Tree
+    # The control for 3b. Same sixty entries, reordered - which is what a rebase of two
+    # channel branches produces. Nothing was lost, so nothing may be reported.
+    $blocks = [regex]::Split($baseLedger, "(?=`n## )") | Where-Object { $_.Trim().Length -gt 0 }
+    New-Utf8File $ledgerPath (($blocks[0], ($blocks[-1..-($blocks.Count - 1)] -join '')) -join '')
+    Assert-Result 'check 3b - REORDERING the same entries passes' $false 'channel files intact' $B
 
     Reset-Tree
     New-Utf8File $ledgerPath ($baseLedger.Replace([string][char]0x2014, $MojiEmDash))

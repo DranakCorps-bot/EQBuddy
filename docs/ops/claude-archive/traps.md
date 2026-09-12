@@ -1208,13 +1208,58 @@ found under `docs/ops/claude-archive/` at head — content that MOVED was not co
 was LOST) and an **encoding repair** (fewer markers than base at ≥95% length). Both are
 satisfied by doing the right thing, not by asserting that you did.
 
+→ **THE REPLACE CHECK NEEDS TWO ARMS, AND THE SECOND ONE IS THE ONLY ONE THAT SURVIVES AN
+ARGUMENT ABOUT ENCODING.** The first version compared non-blank LINES, and on real history
+it reported that `ff6853ba` — a routine *"merge main into helm/ssc-487 (additions-only
+KEEP)"* — had destroyed 63% of `HELM.md`. It had not. That commit **re-encoded** the file:
+`E2 80 94`, a correct UTF-8 em dash, became `C3 A2 E2 82 AC E2 80 9D`, the same dash
+through cp1252 — trap 54's shape, and 60(b)'s. Every one of the hundreds of lines carrying
+a dash compared unequal while saying exactly what it said before. **A guard that fails a
+correct merge is worth less than no guard**, because the first thing a red light nobody
+believes buys you is a habit of re-running until green.
+
+So the second arm compares **entry headings through a key with all non-ASCII stripped,
+whitespace collapsed and case folded**. Encoding churn, re-indentation and reordering
+cannot move it; only deleting the entry can. Three things follow, and the third is the one
+worth the trouble:
+
+- **It is measured like everything else here.** Over all 1,143 ledger/state revision
+  pairs, every revision below 90% entry retention is one of the incidents — `24a91e64`
+  (0.000), `7b804338` (0.485), `c7a597a8` (0.594) — and the worst CLEAN value in the whole
+  history is 0.941. The floor is 85%.
+- **Entries are matched mid-line, not only at line start, and that is not tidiness.**
+  `c7a597a8` collapsed `HELM-FEEDBACK.md`'s 8,677 lines into **2**. On today's `main` a
+  line-start reading finds EIGHT headings in the ledger that has been deleted twice; the
+  mid-line reading finds 3,523. Shipping the line-start version would have been a detector
+  aimed at nothing on precisely the file it exists for — trap 74 again, one file over.
+- **The REPAIR exemption deliberately does not reach it.** Un-mangling a file rewrites
+  most of its lines, so the line arm has to stand down for it; that exemption is also a
+  cover story, and before the entry arm existed a commit that repaired the encoding **and
+  quietly dropped a quarter of the entries** passed every check in this guard. A real
+  repair does not move an ASCII-stripped key, so it has nothing to ask for here. Cases 15
+  and 16 of the self-test are that commit, asserted twice: 3a *was* excused as a repair,
+  and 3b refused it anyway.
+
+The line arm stays, because it is the sensitive one and it is what catches a file whose
+entries are already collapsed beyond recovery.
+
 → **Prove-failed against real history, not just fixtures**, which is the part that would
 have been easy to skip: the guard is red on `24a91e64`, `d20c8e07`, `7b804338`,
-`e9e58c07` and `ff6853ba`, and green on `e8d2aeed` (repair), `3f405c66` (a legitimate 95.5%
-edit), `91fab9a0` (a hold lift), `d091939b` (a drained inbox) and `04b2b7aa` (the restore).
-The self-test adds the sixteen cases history cannot supply — an emptied-but-present file,
-an archive move, an unrostered channel file, and an unresolvable base, which must SKIP
-loudly rather than pass quietly.
+`e9e58c07`, `ff6853ba` and `c7a597a8`, and green on `e8d2aeed` (repair), `3f405c66` (a
+legitimate 95.5% edit), `91fab9a0` (a hold lift), `d091939b` (a drained inbox), `04b2b7aa`
+(the restore), and on `de05c512` (0.941) and `3e68e2a0` (0.944) — the two closest any clean
+commit has ever come to the entry floor. The self-test adds the twenty-one cases history
+cannot supply — an emptied-but-present file, an archive move, an unrostered channel file,
+a rebase that reorders entries, and an unresolvable base, which must SKIP loudly rather
+than pass quietly.
+
+→ **One fixture had to be corrected rather than the floor.** The self-test's "lifting holds
+from `HELM.md` passes" case lopped 22% off the end of the file — 13 of 60 holds in one
+commit — and the new arm refused it. The arm was right: across all 234 revisions of
+`HELM.md` the worst clean entry retention ever recorded is 0.944, because holds lift one at
+a time. Loosening a measured floor to admit an invented fixture is trap 52 with the
+premise never re-derived; the fixture now lifts six holds and compacts twenty more, which
+is what a Helm pass actually does.
 
 → **What is still open:** trap 60(c), the silently truncated append. A note that lost
 every backticked span still diffs additions-only and still retains 100% of the base's
