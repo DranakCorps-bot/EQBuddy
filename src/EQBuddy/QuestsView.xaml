@@ -124,13 +124,20 @@
                      combo's column because the two are never visible together — era is a
                      catalog concept and Unlocks is not a catalog. Options come from Core
                      (UnlockLayout.Sections), so this cannot offer a section the tab does
-                     not render. -->
-                <ComboBox x:Name="UnlockSectionCombo" Grid.Column="0" Width="104"
-                          FontSize="{DynamicResource FontCaption}"
-                          Height="{DynamicResource ControlHeight}"
-                          Visibility="Collapsed"
-                          SelectionChanged="OnUnlockSectionChanged"
-                          ToolTip="Show every unlock, or narrow to races or to classes"/>
+                     not render.
+
+                     A CHIP STRIP since DRA-65, not a ComboBox. The Founder asked for "a
+                     filter between race and class unlocks" that already existed behind this
+                     control, which is a discoverability verdict on a collapsed dropdown: the
+                     tabs, the class lens and the mode strip are all chips, so a fourth lens
+                     wearing a combo's clothes was the odd one out. Same producer either way
+                     (UnlockLayout.Sections) — see BuildUnlockSectionStrip.
+
+                     A WrapPanel and not a horizontal StackPanel: the chips have no fixed
+                     width, and a stack measures with infinite width and clips them with no
+                     ellipsis to say so (trap 25). -->
+                <WrapPanel x:Name="UnlockSectionStrip" Grid.Column="0"
+                           VerticalAlignment="Center" Visibility="Collapsed"/>
                 <!-- State filter (Reddit ask, 2026-08-11): every tab and search can
                      narrow to open / ready / completed. -->
                 <ComboBox x:Name="StateCombo" Grid.Column="1" Width="86"

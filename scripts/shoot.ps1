@@ -1441,6 +1441,103 @@ $Shots = [ordered]@{
                                    @{ Id = 'sky-041'; Acquired = $true }
                                )
                            } }
+    # THE UNLOCKS TAB'S GUIDED DETAIL (DRA-65, Founder ask: "each Unlock needs more guided
+    # detail; filter between race and class unlocks").
+    #
+    # Trap 22 at its purest: this tab has NEVER had a shot, because it exists only in response
+    # to two /outputfile dumps and with neither of them staged it is an empty state asking for
+    # a command. Everything the guided pass adds — the mover sentences, the kills-to-go
+    # estimate, the piece count, the four ↗ doors and the section chip strip that replaced the
+    # ComboBox — is unreviewable without all three of the dumps, the faction dump and a live
+    # session that actually moved a faction.
+    #
+    # Staged through the REAL seams, never a back door: the two dumps sit where the game writes
+    # them (game/, the Logs folder's parent) and the movers are LOG LINES the app's own tail
+    # parses into the per-creature faction ledger. Append-Log gives every appended line ONE
+    # timestamp, which is what puts each faction line inside its kill's 3-second reward window
+    # — the attribution the pool folds.
+    #
+    # PREDICTION, written before the shot (trap 23). Four rows, and each is a different arm:
+    #   * Coalition of Tradesfolk — the dump spells it "Coalition of Tradefolk" (one letter,
+    #     a real disagreement from Hateborne's own pair), so the row proves FactionNames is
+    #     doing the fold: standing "1,000 / 2,000 — 1,000 to go", and THREE guided lines —
+    #       "Your kills of an orc centurion in West Commonlands moved it +5 each — seen on 3
+    #        of your kills."
+    #       "Your kills of a Freeport merchant in West Commonlands cost you 10 each — seen on
+    #        1 of your kills."
+    #       "≈200 more kills of an orc centurion in West Commonlands at +5 each — an estimate
+    #        from your own log, not a target."   (1,000 to go ÷ 5 = 200)
+    #     West Commonlands because that is the fixture's LAST zone, and the pool is keyed on
+    #     the kill zone; both creatures are absent from the fixture, so their counts are the
+    #     appended ones and nothing else.
+    #   * Knights of Truth — maxed in the dump, so "maxed" and NO estimate.
+    #   * Freeport Militia — deliberately NOT in the faction dump, so the existing honesty line
+    #     ("not in your faction dump — tell us and we will add the name") stands, with the wiki
+    #     door beside it and no arithmetic.
+    #   * Obtain Azure Ruby Ring (Warrior) — the Sky checklist's own count: sky-194 ticked and
+    #     sky-195 not, so "1 of 2 pieces in hand — the Plane of Sky tab has the guide." and a
+    #     ↗ onto the Plane of Sky tab.
+    # So: 4 rows · 4 doors (three wiki, one Sky) · 4 guided sentences · the All | Races |
+    # Classes chip strip in the filter row with All selected, and no ComboBox anywhere.
+    #
+    # SHOT 2026-09-11: the four rows, the four doors, the chip strip and every number above
+    # came out exactly as predicted — and the prediction was WRONG in two places that only a
+    # picture was going to catch, which is the whole argument for taking one.
+    #
+    #   1. KNIGHTS OF TRUTH DRAWS TWO MOVERS OF ITS OWN. The fixture log already carries
+    #      sixteen "Your faction standing with Knights of Truth has been adjusted by 5" lines
+    #      — I predicted "nothing was farmed for it" without grepping the log I was staging
+    #      into, which is trap 23 from the other side: the staging was right and my model of
+    #      the fixture was not. Two of the sixteen land inside a kill's 3-second reward
+    #      window (Orc pawn, Skeleton, one hit each) and the rest are attributed to no kill.
+    #      The row is BETTER for it, and it is the maxed rule photographed: nothing left to
+    #      divide, so the estimate goes and what your kills DID stays. Six guided sentences
+    #      on screen, not four.
+    #   2. THE CREATURE NAMES ARE THE PARSER'S, NOT THE LOG'S. "You have slain an orc
+    #      centurion!" is pooled as "Orc centurion" — LogParser normalises the article away
+    #      and title-cases — so the sentence reads "Your kills of Orc centurion in West
+    #      Commonlands", not "of an orc centurion". Worth knowing before anyone predicts one
+    #      of these strings again; the unit tests assert the format, and this is where the
+    #      real feed's spelling shows up.
+    'quest-unlocks'   = @{ Title = 'Quest Tracker'
+                           Env = @{ EQBUDDY_QUESTS = 'unlocks' }
+                           Dump = @{
+                               'Testchar_test-Achievements.txt' = @(
+                                   'Untapped Potential: Races'
+                                   "I`tRace Unlock - Human (Freeport)"
+                                   "I`t`tGet maximum faction with Coalition of Tradesfolk."
+                                   "I`t`tGet maximum faction with Knights of Truth."
+                                   "I`t`tGet maximum faction with Freeport Militia."
+                                   "I`t`tThis achievement will autocomplete if your character was created as a Human."
+                                   "I`t`tThis achievement can be bypassed using a Race Unlock Token."
+                                   'Untapped Potential: Classes'
+                                   "I`tClass Unlock - Warrior"
+                                   "I`t`tObtain Azure Ruby Ring."
+                               )
+                               # The class code in the middle is the real shape
+                               # (Hateborne_neriak-ENC-Factions.txt); the finder matches the
+                               # SUFFIX, never a segment count.
+                               'Testchar_test-WAR-Factions.txt' = @(
+                                   "ID`tName`tStandingValue`tPointsToMax"
+                                   "229`tCoalition of Tradefolk`t1000`t1000"
+                                   "304`tKnights of Truth`t2000`t0"
+                               )
+                           }
+                           Append = @(
+                               'You have slain an orc centurion!'
+                               'Your faction standing with Coalition of Tradefolk has been adjusted by 5.'
+                               'You have slain an orc centurion!'
+                               'Your faction standing with Coalition of Tradefolk has been adjusted by 5.'
+                               'You have slain an orc centurion!'
+                               'Your faction standing with Coalition of Tradefolk has been adjusted by 5.'
+                               'You have slain a Freeport merchant!'
+                               'Your faction standing with Coalition of Tradefolk has been adjusted by -10.'
+                           )
+                           Set = @{
+                               SkyQuestChecklist = @(
+                                   @{ Id = 'sky-194'; Acquired = $true }   # Azure Ring, held
+                               )
+                           } }
     # The #243 leftover bands plus the inventory import report (Hateborne, 2026-09-03),
     # staged through the real seam: a dump beside the log and the game's own announcement.
     # PREDICTED before shooting (trap 23): Ready band "— 2" (WAR Belt of the Four Winds,

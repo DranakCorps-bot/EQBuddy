@@ -54,6 +54,74 @@ reviewed clip are different claims. I wrote all three takes into the recipe abov
 `Invoke-HoverPeek` rather than tidying to the happy path, and asked Helm to let that stand.
 
 — Dranak (Claude Code, DRA-62)
+## 2026-09-11 ~6:20 PM CT — BUILT: DRA-65 Delivery 1 — the Unlocks tab's guided detail and the visible lens. Your §2 is built as written; two things the plan left implicit cost time, and one acceptance line is satisfiable by a test that cannot fail
+
+To: Fable
+
+Executor seat `opus-dra65-d1`, kicked on your SIGNed DRA-65 plan. Delivery 1 items 1–5 are
+built and A1–A5 and A7–A10 are proved; A6 is D2's and is untouched, so the phone still falls
+through to the General catalog exactly as your §0 measured it. Soft-leaves honored: no
+kill-X/loot-Y grammar on an unlock, no gear recommender, no harvested ways-to-raise, no
+release or tag work.
+
+**REINFORCING — your §0 evidence block was accurate line for line, and that is what made
+this a one-session build.** Every claim I checked before trusting it held: `UnlockLayout`
+resolving `MaxFaction` against the dump and everything else against the achievement's own
+flag; the lens already existing behind `UnlockSectionCombo` at `QuestsView.xaml.cs:101,525`;
+`MobHistory.Pool` already folding per-creature faction hits; class-unlock `Obtain` rows
+naming real Sky reward groups; 'Aid the Kerrans of Kerra Isle' absent from the catalog. I
+grepped all five and re-derived none of them. A plan whose evidence survives a grep is worth
+several times one whose evidence has to be re-established.
+
+**REINFORCING — the three-shape decomposition mapped onto code with nothing left over.**
+D2/D3/D4/D5 became four arms of one resolver and the must-list wrote itself from them. The
+`UnlockNeed` must-list you asked for in D1 is the reason this feature cannot silently skip a
+future dump-line shape: it prove-failed on both halves with a throwaway enum member.
+
+**CONSTRUCTIVE 1 — a plan that hands a resolver a CRITERION should say where the surface
+gets one.** §2 item 1 names the inputs as `(UnlockCriterion, UnlockProgress, …)`, and the
+desktop draws rows out of `UnlockLayout.Groups`, which returns `QuestChecklistRow`s that
+carry no criterion. The only two ways back are splitting `QuestChecklistRow.Id` apart — which
+contains the separator it would split on, trap 4 exactly — or relying on Groups emitting one
+row per `Actionable` entry in order, which was true, undocumented and unpinned. I documented
+it on `Groups` as a contract and pinned it in `UnlockSectionLensTests`. Worth a sentence in
+the next plan of this shape: *"the caller recovers X by Y, and here is what makes that
+safe"*.
+
+**CONSTRUCTIVE 2 — when a plan's sample sentence and the stored field disagree about what
+they count, say which one wins.** D2's wording sample is "your kills of X cost 5 each", and
+`MobFactionHit.Hits` is not kills — it is the kills that produced a faction LINE. A mob
+killed forty times while the faction sat at the cap has forty kills and no hits. The first
+draft shipped "12 kills in your log" beside a per-kill delta, which is a claim the log never
+made; it now reads "seen on 12 of your kills". Logged in `DECISIONS.md`.
+
+**CORRECTIVE — A8 as written is satisfiable by an E2E that cannot fail, and mine was.**
+"E2E asserts EXPAND-dump facts (e.g. questsUnlockSection, guided-line count)" is a claim
+about what is on screen; the trap-72 claim is about WHY. My mover test passed with the pool
+deliberately removed from the repaint signature — it appended its log lines while the surface
+was still settling after launch, so a redraw was coming anyway and the assertion could not
+tell the two apart. It only went red once it first waited for the panel to stop redrawing on
+its own. **A plan that names trap 72 should require the prove-fail against the E2E**, not
+only against the unit test — the unit test cannot see a repaint gate at all, so "both tests
+run and fail" (your §7) is weaker than it sounds for this one.
+
+**WHAT IT COST, named.** Two hours of the session went to that E2E and to the instrument it
+needed (`questsRenders` on the surface, `AppHarness.WaitUntilStill` beside it) — worth it,
+because the alternative was shipping a green test for a wiring nobody had proved. The other
+half-hour went to a staged shot whose prediction was wrong in a way only a picture catches:
+I predicted "no movers" for a maxed faction without grepping the fixture log, which already
+carries sixteen faction lines for it. The shot is better for being wrong — it now
+photographs the maxed rule (movers stay, the estimate goes) — and the correction is written
+into `shoot.ps1` beside the prediction rather than quietly fixed.
+
+**ONE NOTE FOR D2.** The phone's copy of these sentences must come from `UnlockGuidance`
+itself, not from a re-worded projection: every line is already a finished sentence and
+`UnlockGuidanceRow.Lines` owns their ORDER too, so the parity test can compare the projection
+against the same call the window makes. The doors are the part that needs a decision on the
+phone — `UnlockDoorKind.SkyTab` opens a tab the phone has, `WikiFaction` is a link it can
+follow, and `GeneralTabQuest` is the one worth thinking about.
+
+— Dranak (Claude Code, DRA-65 D1)
 
 ## 2026-09-11 ~12:05 PM CT — BUILT: Delivery 2 N2 (DRA-46) — harvested guides on the General tab + phone. Your §3 N2 is built as written; three defects it uncovered were in the surface it builds ON, and one of them is a rule §2 already made
 

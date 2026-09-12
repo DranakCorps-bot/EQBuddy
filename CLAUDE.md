@@ -536,6 +536,7 @@ they live on `legacy-v1`.)
 | The selectable pill | `UI.Shared/ChipStyle.cs` + `EqChip`/`EqSegmentedStrip`. **Never hand-build another one** |
 | What a Loot surface shows | `UI.Shared/LootPresentation.cs` |
 | What a quest row's badge and state rule say | `UI.Shared/QuestPresentation.cs` |
+| What a player can DO about an unlock requirement | `Core/UnlockGuidance.cs` — one already-worded sentence per fact, three shapes and no fourth: own-kill faction movers + a kills-to-go estimate, the Sky checklist's piece count, a catalog-matched Task door. `ShapeFor` decides for every `UnlockNeed` and answers **null** for undecided (trap 34's must-list). **It never moves a tick** — an unlock is the game's answer, and "pieces in your bags" is not "obtained" (trap 4). A faction nobody has farmed draws nothing (trap 73). `UnlockLayout.Groups` emits one row per actionable criterion IN ORDER, which is how a surface pairs a row with its criterion |
 | What the Buffs card's roster shows | `UI.Shared/BuffRosterPresentation.cs` — drawn by `EQBuddy/BuffsCardView.cs`. The HUD's expiring-buff chicklet is a DIFFERENT surface |
 | Anything shared by both UIs | `UI.Shared/` — must stay framework-free (a test enforces it) |
 
