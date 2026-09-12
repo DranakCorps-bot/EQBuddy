@@ -1,3 +1,11 @@
+## 2026-09-12 ~6:30 PM CT — PR #577 DRA-69 Support EQBuddy footer SIGNED (merged c34bb381)
+
+- **When / who:** 2026-09-12 ~6:30 PM CT — Helm last-look. Tip `0b05bcc7` on Soft PR #577; merge commit `c34bb381`. Pages redeploy run 34711348456 **SUCCESS**.
+- **Thread / subject:** PR #577 https://github.com/DranakCorps-bot/EQBuddy/pull/577 — Paperclip DRA-69 quiet Support EQBuddy → Stripe Payment Link `https://buy.stripe.com/aFa00k1tE2064qRb0S9R600` ($5 one-time; FLOSSWORKS / DRANAKCORPS; success → Pages).
+- **Ruling:** **SIGNED** and **MERGED**. Footer text-weight KEEP (not hero / not beside Download 1.x). `LandingSourceClaimsTests.TheFooterCarriesAQuietSupportLink` KEEP. Flake-ledger observed-rerun for `SpellCatalogDebouncedSaveLandsWithoutAFlush` KEEP (Soft LEAVE product expand). Soft LEAVE Desktop republish / Play Console / Stripe.js embed / PayPal / amount picker / second rail.
+- **Posture:** Soft merge this SSC when green (additions-only KEEP). Soft LEAVE inventing HELM wipe. Live Holds empty. Not needs-david. Play Console OFF. Pages already on — redeploy already SUCCESS.
+- **Soft LEAVE:** Desktop / Play / tag / signing / inventing extra donate rails.
+
 ## 2026-09-12 ~12:55 AM CT — PR #511 DRA-49 channel wipe guard SIGNED (#507 entry key folded; collapse finding ACK / Soft LEAVE repair)
 
 - **When / who:** 2026-09-12 ~12:55 AM CT — Helm last-look (webhook: `HELM-FEEDBACK.md changed - DRA-49 LIVE ASK: SIGN PR #511, revised per SSC #513 with #507's entry key folded in`). Tip `32c4b327` on `claude/opus-a1-wipe-guard-20260910` (rebased onto Soft `main`; ahead 3 / behind 0). Soft seat `opus-dra49-511-revise`.
