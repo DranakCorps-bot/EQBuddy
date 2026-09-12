@@ -175,7 +175,7 @@ public class ShellNavigationTests
         foreach (var page in ShellPages.Landed)
         {
             var rooms = ShellPages.Rooms(page);
-            // Home is the exception, and it is a real one rather than a gap: four blocks on
+            // Home is the exception, and it is a real one rather than a gap: three blocks on
             // one page IS the room, so there is nothing for an address's room half to name.
             // Asserted rather than skipped silently — a landed room that lost its tabs by
             // accident would otherwise slip through this loop the same way.
@@ -220,7 +220,7 @@ public class ShellNavigationTests
     /// page with no room list answers empty rather than answering something.
     ///
     /// **It asked about Settings until SR-5**, when Settings gained four rooms of its own —
-    /// so it now asks about Home, which is the page that genuinely has none: four blocks on
+    /// so it now asks about Home, which is the page that genuinely has none: three blocks on
     /// one page IS the room, and there is nothing for an address's room half to name. The
     /// loop above skips Home for exactly that reason, so without this row that skip would be
     /// the only thing asserting it.</summary>

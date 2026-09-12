@@ -672,24 +672,29 @@ $Shots = [ordered]@{
     # PR 4 nothing walked this path, and the default was written in three places that were
     # never forced to agree.
     #
-    # PREDICTION, written before the shot (trap 23):
-    #   'shell-home' — a native title bar reading "EQBuddy — Home". The rail now has FIVE
-    #     rows and Home is the TOP one, above Progress, lit as selected — it did not have to
-    #     be arranged there, `RailOrder` has had Home first since PR 1 and the room joining
+    # PREDICTION, re-written for DRA-63 before the re-shoot (trap 23). **Two of the three
+    # rows below changed, and the changes are the whole of what this PR is:** the "Go to"
+    # block is gone (Founder smoke 2026-09-11 — the rail down the left edge of the same
+    # window already IS that list), and the ⧉ catch-up is now on EVERY readiness row rather
+    # than only the ones that have never been run.
+    #   'shell-home' — a native title bar reading "EQBuddy — Home". The rail has SEVEN rows
+    #     and Home is the TOP one, above Live, lit as selected — it did not have to be
+    #     arranged there, `RailOrder` has had Home first since PR 1 and the room joining
     #     `Landed` put it in place. A rail that appended Home at the BOTTOM, or a shell that
     #     still opened on Progress, is a build that looks healthy in every way except this
-    #     picture. Under it, four blocks with small-caps headings, in this order:
+    #     picture. Under it, THREE blocks with small-caps headings, in this order:
     #       Character  — "Testchar" in accent ink, "test · <zone>" under it.
-    #       Readiness — heading "Readiness — 3 not run yet"; three rows (Bags, Achievements,
-    #         Factions), each with "Not run yet" in accent ink on the right, a dim line
-    #         saying what it feeds, and a ⧉ copy button under it. Three buttons, because the
-    #         shoot profile has no dumps.
+    #       Readiness — heading "Readiness — 4 not run yet"; four rows (Bags, Achievements,
+    #         Factions, Spellbook), each with "Not run yet" in accent ink on the right, a dim
+    #         line saying what it feeds, and a ⧉ copy button under it. FOUR buttons: the
+    #         shoot profile has no dumps, so this shot cannot tell the change apart from the
+    #         old build — 'shell-home-ready' below is the one that can.
     #       Recent session — "Session in progress" and one sentence. **No numbers**: the
     #         fixture IS a live session with 82 kills in it and the Home/Live boundary says
     #         Home does not draw them.
-    #       Go to — four rows (Progress, Gear, Quests, World) with their one-line pitches.
-    #         NOT five: Home does not link to itself. NOT six: Live has not landed, and a
-    #         link that opens nothing is the rail's forbidden shape one level in.
+    #     **And NOTHING under it.** A fourth block headed "Go to", with a row per room, is
+    #     the state this shot now disproves: the picture is the only place a resurrected
+    #     block would show up, because nothing in the dump counts blocks by name.
     #     The block column is capped at `MinRoomWidth` and pinned LEFT — the first take of
     #     this shot is what asked for that, with "Not run yet" stranded about 600 units from
     #     the row it belonged to. If the answers drift back toward the right edge as the
@@ -701,11 +706,16 @@ $Shots = [ordered]@{
     #     not the shot — and never a horizontal scrollbar, which hides a layout failure
     #     behind an affordance.
     #   'shell-home-ready' — the SAME room with an inventory dump staged, which is the only
-    #     way to photograph the difference the Readiness block exists to draw. Heading reads
-    #     "Readiness — 2 not run yet"; the Bags row now carries a DATE in dim ink and an
-    #     "Open" link instead of a ⧉ button, and the other two are unchanged. If the two
-    #     pictures are indistinguishable, never-scanned and healthy have collapsed into one
-    #     state, which is exactly what the pre-design forbade.
+    #     way to photograph the difference the Readiness block exists to draw AND the only
+    #     way to photograph DRA-63's ask 1. Heading reads "Readiness — 3 not run yet"; the
+    #     Bags row now carries a DATE in dim ink where the other three say "Not run yet",
+    #     and — **this is the change** — it STILL carries its ⧉ copy button, with an "Open"
+    #     link under it. Four ⧉ buttons in this picture, not three. On the old build the
+    #     Bags row's button was gone and the "Open" stood alone; if this shot looks like
+    #     that, the catch-up is still an empty-state affordance.
+    #     The date-versus-"Not run yet" difference is the OTHER thing this pair proves: if
+    #     the two pictures are indistinguishable, never-scanned and healthy have collapsed
+    #     into one state, which is exactly what the pre-design forbade.
     #
     # There is NO shot of the room-level empty (no character at all), and that is a gap
     # named rather than hidden: this harness seeds a fixture log by construction, so
@@ -2874,8 +2884,8 @@ function Write-Settings([hashtable]$extra) {
         # **The first-run Setup screen (OE-6), and this line is load-bearing rather than
         # tidy.** This profile has a character and NO dumps — which is exactly the state
         # Setup's auto-launch predicate opens for (every readiness row never scanned; see
-        # 'shell-home', whose own prediction says "three buttons, because the shoot profile
-        # has no dumps"). Without this, every one of the twenty shell shots would be
+        # 'shell-home', whose own prediction says "FOUR buttons: the shoot profile has no
+        # dumps"). Without this, every one of the twenty shell shots would be
         # photographed with a screen over the room it is about: a real state, correctly
         # rendered, and not the state the shot is about (trap 23). The 'setup-screen' shot
         # below reaches it through EQBUDDY_SETUP, which is a forced open rather than a
