@@ -1,3 +1,86 @@
+## 2026-09-12 — DRA-67 (the landing said "log-only" beside an /outputfile button): six calls I made alone
+
+Founder smoke ~2:05 AM CT under the DRA-48 landing family, kicked by Helm. Site-only. The
+hero pill read *"**Log-only** — reads your /log file, nothing else"* while section 07.2 of
+the same page, about 400 lines down, shows a Wishlist screenshot whose alt text describes
+*"a copy button for the in-game /outputfile inventory command that ticks the rest from your
+bags"*. One page, two answers, and the wrong one is in the largest type. `GameCommands` is
+the authority and it ships **four** dumps — inventory, achievements, faction, spellbook —
+so "nothing else" was not a rounding error. These are the places the card left a choice.
+
+**1. ONE PARAGRAPH ANSWERS "WHAT DOES IT READ", AND IT IS THE PRINCIPLES CARD.** The four
+dumps are listed once, in section 08's card (renamed from *"Log-only and local-first"* to
+*"Your own files, local-first"*), with the sentence that makes them harmless: *"Each dump
+is a command you run; the game writes the file, EQBuddy reads it."* The default was to
+scatter the correction across all the false sites, which is how the original bug survived
+— the page already mentioned `/outputfile` in one figure's alt text and still claimed
+"nothing else" in the hero. Repeating a list in five places guarantees they drift, so the
+other sites (meta description, footer, scorecard header) each carry the SHORT form and
+point at no list of their own. This is CLAUDE.md's "each fact drawn in exactly one place"
+applied to marketing copy.
+
+**2. THE NO-GAME-MEMORY HALF STAYS IN THE PILL** rather than being demoted to the KPI row
+immediately below it. The pill got broader, and the temptation was to let the "0
+game-memory reads — ever" KPI carry that weight alone. But the pill is the line a reader
+deciding whether we are a memory-reader actually reads, and it is the half that is true.
+
+**3. THE GUARD IS DERIVED FROM `GameCommands`, NOT A LIST IN THE TEST.** `LandingSourceClaimsTests`
+reflects over the `Outputfile*` constants and requires the page to name every dump noun it
+finds. A hand-copied list of four was the obvious cheaper option and it is the one that
+stops covering the set the day a fifth dump is added (trap 30) — which is not hypothetical:
+`OutputfileSpellbook` was added for OE-5 LOCK A, after this page was written, and nothing
+told the page. Pairing it with the negative is trap 34: forbidding the string "log-only"
+cannot see a page that deletes the pill and explains nothing, so both halves are asserted,
+and the deleted-pill page is a committed negative.
+
+**4. I TOOK THE COMPETING BRANCH'S PILL WORDING OVER MY OWN.** `claude/opus-dra67-landing-honest-20260912`
+(PR #566) fixed the same bug independently, minutes apart — my seat claim landed 02:14:26Z,
+their PR 02:15:20Z, and `claim-seat.ps1` said OK, so the seat store did not see them. Their
+pill is *"**No game memory** — just your /log and your own /outputfile dumps"*; mine was
+*"Log + /outputfile — files the game writes, never its memory"*. Theirs leads with what the
+reader came to check and carries the scope in one word ("just"); mine leads with a mechanism
+a newcomer has to look up. Theirs is better, so it is what ships, credited. Keeping mine
+because I wrote it would have been the only bad reason available.
+
+**5. THE GUARD'S FIRST CUT HAD A REAL BUG, AND THEIR BRANCH IS WHAT FOUND IT.** Run against
+their page it reported *"dropped the values line: measures other players"* — a false red on
+a page that was correct, because they wrapped *"never measures / other players"* across a
+line and my checks compared raw bytes. HTML collapses whitespace; where a sentence is
+wrapped is a property of the editor that last touched the file, not a claim about anything.
+`Flatten` now collapses whitespace runs and `AWrappedSentenceIsStillTheSentence` pins it
+with their footer as the fixture. This is trap 74's cost in miniature: a gate that reddens
+for a reason unrelated to its subject is one people learn to re-run until green. **The
+lesson I am keeping: running a new guard against an INDEPENDENT correction of the same bug
+is worth more than any number of fixtures I write myself**, because my fixtures inherit my
+wording and cannot disagree with me. It also upgraded the prove-fail — the guard is now run
+against `origin/main`'s actual pre-fix bytes (1 of 10 red), not only synthetic `InlineData`.
+
+**6. THE README AND `EQBuddy-Evolved.md` CARRY THE SAME CLAIM AND I LEFT THEM.** `README.md:43`
+(*"it knows only what your own log says"*), `EQBuddy-Evolved.md:5` and `:68` are the same
+falsehood, and the landing's own footer links the first two. The card says **site-only**, so
+widening into the repo's front door — a surface with its own reviewers and its own release
+promises — is not mine to take on a smoke fix at 2 AM. Filed as a follow-up rather than
+fixed quietly, and named in the LIVE ASK so Helm can rule on whether it rides this PR.
+`README.md:357` is deliberately NOT on that list: *"EQBuddy reads only the log, so the
+marker moves when you ask it to"* is about live POSITION, where it is exactly true — no
+dump reports where you are standing. Sweeping it in with a regex would have replaced a true
+sentence with a vaguer one.
+
+**Noted, not fixed, and not mine:** the committed `HELM-FEEDBACK.md` carries cp437-mangled
+em-dashes (`Γ`+`Ç`+`ö` where `—` belongs — the bytes `E2 80 94` decoded as OEM and
+re-encoded). That is trap 60(c) damage already in the file from an earlier session, and
+trap 54's shape. I spliced my entry with byte-exact `cat` of two files rather than a
+whole-file rewrite, so I did not extend it; repairing the existing bytes is a channel-file
+edit across another agent's writes and is Helm's call, not a thing to do mid-smoke.
+
+**Verification.** `dotnet test --filter LandingSourceClaims` — **10 passed / 0 failed**
+against this page, **10 / 0** against #566's page (the guard is about the fact, not my
+wording), **1 of 10 RED** against `origin/main`'s pre-fix bytes. `--filter Documentation`
+— 21 / 0. V1 to the class: copy-only site change plus its unit guard; no shot, since the
+landing is not a `shoot.ps1` surface. No `src/` change, so no `WhatsNew.json` entry: the
+landing page is not shipped in the app, and the DRA-48 family's prior site commits
+(`06c66462`, `74cb9cb9`) touch no release notes either.
+
 ## 2026-09-11 — DRA-67 (the landing's "log-only" pill was false): four calls I made alone
 
 Founder card under the DRA-48 landing family: the hero pill read **"Log-only — reads your
