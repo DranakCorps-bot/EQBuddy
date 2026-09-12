@@ -99,8 +99,8 @@ public static class ShellRoomEmpty
         "No bags, loot or wishlist yet",
         "Gear reads what you pick up from your log, and what you are carrying from an "
         + "/outputfile inventory dump the game names after your character. Turn logging on "
-        + "in game with /log on and point EQBuddy at your Logs folder in Options; Home then "
-        + "hands you the dump command when it is the next thing to do.");
+        + "in game with /log on and point EQBuddy at your Logs folder in Options; the "
+        + "Character room then hands you the dump command when it is the next thing to do.");
 
     /// <summary>
     /// <paramref name="wishlistCount"/> is <c>AppSettings.GearChecklist</c>, and it is the

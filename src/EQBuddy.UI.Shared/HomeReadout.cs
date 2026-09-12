@@ -118,6 +118,63 @@ public static class HomeReadout
         + "then point EQBuddy at your Logs folder in Options. Everything else here fills "
         + "itself in from that one file.";
 
+    // ---- class (DRA-66) ---------------------------------------------------------
+
+    /// <summary>
+    /// The class line under the character's name — what EQBuddy thinks this character IS,
+    /// always saying where the reading came from, because "Warrior · Druid" is a different
+    /// sentence depending on whether the game said it, the player did, or a heuristic
+    /// guessed it (the same rule the quest window's identity note has carried since #104).
+    ///
+    /// **The list and source arrive RESOLVED** — <c>CharacterClasses.Resolve</c> through
+    /// the one <c>ClassSourceFor</c> every class-aware surface reads — so this line can
+    /// never disagree with the quest window or the phone about who the character is
+    /// (trap 33: two callers with different arguments are two current answers).
+    /// </summary>
+    public static string ClassLine(IReadOnlyList<string> classes, ClassSource source) =>
+        classes.Count == 0
+            ? EmptyClass
+            : $"{string.Join(" · ", classes)} ({CharacterClasses.SourceLabel(source)})";
+
+    /// <summary>The class line before anything knows (signed plan D2): how the answer
+    /// arrives on its own, and that the Achievements ⧉ row one block down answers it at
+    /// once — pointing at the row that already ships the command, so no new command
+    /// literal and no <c>GameCommandsTests</c> row.</summary>
+    public const string EmptyClass =
+        "Class not known yet — EQBuddy reads it from your log as you play, and the "
+        + "Achievements catch-up below answers it at once.";
+
+    /// <summary>The door into the class editor. "Set", not "correct" or "override" — the
+    /// same ruling that reworded the quest picker: being told to override your own
+    /// character is a strange thing for an app to say.</summary>
+    public const string EditClasses = "Set class…";
+
+    /// <summary>The door's label while the editor is open. It closes the strip; the picks
+    /// themselves were saved the moment they were ticked, and a button reading "Save"
+    /// over already-saved state would be claiming a job it does not do.</summary>
+    public const string EditClassesDone = "Done";
+
+    /// <summary>Over the editor's chips: what stating does, and the cap — named up front
+    /// so the fourth click refusing is an announced rule rather than a silent no-op. The
+    /// limit is the game's (up to three active classes), through
+    /// <see cref="CharacterClasses.Max"/>.</summary>
+    public const string ClassEditorNote =
+        "Tick what this character actually is — up to three, the game's own limit. "
+        + "While anything is ticked here, EQBuddy stops guessing.";
+
+    /// <summary>The way back (the plan's own words), offered only while a statement
+    /// exists: clearing it returns the line to EQBuddy's own reading (the dump if one has
+    /// landed, the log otherwise). Without this row a correction would be one-way, and a
+    /// player who set it wrong once would be stuck telling EQBuddy forever.</summary>
+    public const string ClearStated = "Let EQBuddy work it out";
+
+    /// <summary>What replaces the editor when the source is the achievements dump (plan
+    /// D4): a sentence saying WHY there is nothing to tick, not disabled chips — trap 17,
+    /// a disabled control with no visual is invisible, and even a dimmed one says nothing
+    /// about why. The repair it points at is the Achievements row one block down.</summary>
+    public const string DumpAnswersClass =
+        "Your achievements dump answers this — run it again below if it is out of date.";
+
     // ---- readiness --------------------------------------------------------------
 
     /// <summary>

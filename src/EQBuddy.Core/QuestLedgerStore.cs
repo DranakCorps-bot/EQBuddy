@@ -100,6 +100,14 @@ public sealed class QuestLedgerStore
         /// is what happens when a setting has readers and no writer, and #204/#210/#212
         /// were all one import path being missed.</summary>
         public List<string> UnlockedClasses { get; set; } = [];
+
+        /// <summary>Classes the PLAYER set on Character Setup (DRA-66) — their statement
+        /// about who the character is, which is neither <see cref="Classes"/> (the quest
+        /// filter: may hold a friend's class, #104) nor <see cref="UnlockedClasses"/> (the
+        /// game's). While non-empty it silences inference in
+        /// <see cref="CharacterClasses.Resolve"/>; empty means "EQBuddy's own reading",
+        /// which is why — unlike the dump list — clearing it IS storable.</summary>
+        public List<string> StatedClasses { get; set; } = [];
         /// <summary>Last level the log announced ("Welcome to level N!"), 0 = never
         /// seen. The log states the number only at the ding itself, so the level-unlock
         /// preview needs this to survive restarts (and log truncation).</summary>
@@ -186,6 +194,7 @@ public sealed class QuestLedgerStore
                                               && c.Hidden.Count == 0 && c.Completed.Count == 0
                                               && c.Classes.Count == 0 && c.Level == 0
                                               && c.UnlockedClasses.Count == 0
+                                              && c.StatedClasses.Count == 0
                                               && c.Guides.Count == 0))
                 {
                     try
@@ -219,6 +228,7 @@ public sealed class QuestLedgerStore
                         Completed = new Dictionary<string, int>(kv.Value.Completed, StringComparer.OrdinalIgnoreCase),
                         Classes = kv.Value.Classes,
                         UnlockedClasses = kv.Value.UnlockedClasses,
+                        StatedClasses = kv.Value.StatedClasses,
                         Level = kv.Value.Level,
                         Guides = new Dictionary<string, GuideProgress>(kv.Value.Guides, StringComparer.OrdinalIgnoreCase),
                         LastInventoryReconcile = kv.Value.LastInventoryReconcile,
@@ -532,6 +542,34 @@ public sealed class QuestLedgerStore
         {
             CharacterFor(characterKey).Classes =
                 classes.Distinct(StringComparer.OrdinalIgnoreCase).ToList();
+            Save();
+        }
+    }
+
+    /// <summary>What the player told Character Setup this character IS (copy; empty =
+    /// they have said nothing, and EQBuddy's own reading stands).</summary>
+    public List<string> StatedClassesFor(string characterKey)
+    {
+        lock (_lock)
+            return _byCharacter.TryGetValue(characterKey, out var c) ? [.. c.StatedClasses] : [];
+    }
+
+    /// <summary>Record the player's statement. **Empty is STORED here, deliberately the
+    /// opposite of <see cref="SetUnlockedClasses"/>**: an empty dump list is a parse
+    /// failure erasing the game's answer, but an empty statement is the player choosing
+    /// "go back to EQBuddy's own reading" — the one way to undo a correction, so it must
+    /// be writable. Capped at <see cref="CharacterClasses.Max"/> because that is the
+    /// game's own limit, not ours.</summary>
+    public void SetStatedClasses(string characterKey, IEnumerable<string> classes)
+    {
+        if (characterKey.Length == 0) return;
+        lock (_lock)
+        {
+            CharacterFor(characterKey).StatedClasses = classes
+                .Where(c => c.Length > 0)
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .Take(CharacterClasses.Max)
+                .ToList();
             Save();
         }
     }

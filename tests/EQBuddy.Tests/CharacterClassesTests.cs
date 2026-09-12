@@ -96,11 +96,72 @@ public class CharacterClassesTests
         Assert.Equal(["Druid"], classes);
     }
 
+    // ---- Character Setup's statement (DRA-66) --------------------------------------
+
+    /// <summary>
+    /// The whole reason the parameter exists: "correct EQBuddy's guess" is not a
+    /// correction if the guess can keep arguing with it. A player who states Warrior
+    /// against an inference of Rogue (a borrowed clicky, #120's shape) must see Warrior
+    /// and ONLY Warrior — a union here would show "Warrior · Rogue", which is the wrong
+    /// answer surviving the fix.
+    /// </summary>
+    [Fact]
+    public void AStatedClassSilencesTheGuess()
+    {
+        var (classes, source) = CharacterClasses.Resolve(
+            unlocked: null, inferred: ["Rogue"], picks: null, stated: ["Warrior"]);
+
+        Assert.Equal(["Warrior"], classes);
+        Assert.Equal(ClassSource.Stated, source);
+    }
+
+    /// <summary>The dump is the GAME's statement and outranks the player's memory of a
+    /// character screen — it stays, and the two union the way the dump and inference
+    /// always have. What the statement removes is only the GUESS.</summary>
+    [Fact]
+    public void TheDumpStillLeadsAndUnionsWithAStatement()
+    {
+        var (classes, source) = CharacterClasses.Resolve(
+            unlocked: ["Warrior"], inferred: ["Monk"], picks: null, stated: ["Druid"]);
+
+        Assert.Equal(["Warrior", "Druid"], classes);
+        Assert.Equal(ClassSource.Achievements, source);
+    }
+
+    /// <summary>An EMPTY statement is "go back to EQBuddy's own reading" — the undo the
+    /// store deliberately allows (unlike an empty dump list, which is a parse failure).
+    /// Behaviour with nothing stated is byte-identical to before DRA-66.</summary>
+    [Fact]
+    public void ClearingTheStatementPutsTheGuessBackInCharge()
+    {
+        var (classes, source) = CharacterClasses.Resolve(
+            unlocked: null, inferred: ["Rogue"], picks: null, stated: []);
+
+        Assert.Equal(["Rogue"], classes);
+        Assert.Equal(ClassSource.Inferred, source);
+    }
+
+    /// <summary>The signed plan's D3, second half: while a statement stands, the PICKS
+    /// stop feeding identity too — a union can widen but never un-guess, and a friend's
+    /// picked class landing back in "who this character is" would be #104's bug
+    /// resurrected by the very control built above it. The picker's own job (the quest
+    /// filter) is untouched; only its identity contribution pauses.</summary>
+    [Fact]
+    public void PicksStopFeedingIdentityWhileAStatementStands()
+    {
+        var (classes, source) = CharacterClasses.Resolve(
+            unlocked: null, inferred: ["Monk"], picks: ["Bard"], stated: ["Warrior"]);
+
+        Assert.Equal(["Warrior"], classes);
+        Assert.Equal(ClassSource.Stated, source);
+    }
+
     /// <summary>The words a surface prints. One table so the two desktops and the phone
     /// cannot describe the same list three ways — and so a player can tell a fact from a
     /// guess, which is the whole reason the source travels at all.</summary>
     [Theory]
     [InlineData(ClassSource.Achievements, "from your achievements")]
+    [InlineData(ClassSource.Stated, "set by you")]
     [InlineData(ClassSource.Inferred, "inferred from your log")]
     [InlineData(ClassSource.Picked, "from your picks")]
     public void EachSourceHasWordsForIt(ClassSource source, string expected) =>

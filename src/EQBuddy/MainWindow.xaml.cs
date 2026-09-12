@@ -1478,7 +1478,11 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
         CharacterClasses.Resolve(
             QuestLedger?.UnlockedClassesFor(QuestCharacterKey),
             s.InferredClasses,
-            QuestLedger?.ClassesFor(QuestCharacterKey));
+            QuestLedger?.ClassesFor(QuestCharacterKey),
+            // Character Setup's correction (DRA-66) — while it is non-empty, Resolve keeps
+            // the inference out. Passed HERE so every reader of this one resolution honours
+            // it; a surface that read the inference beside it would be trap 33's two answers.
+            QuestLedger?.StatedClassesFor(QuestCharacterKey));
 
     /// <summary>The assembled set (#120 stage 2, Frankthetankk): the "(any class)"
     /// bucket plus every active class's picks — swap one class and the others' picks

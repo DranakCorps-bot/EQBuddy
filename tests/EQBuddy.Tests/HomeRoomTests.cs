@@ -238,6 +238,58 @@ public class HomeRoomTests
         Assert.Equal("test", HomeReadout.IdentityDetail(Me, ""));
     }
 
+    // ---- 3b. the class reading and its correction (DRA-66) ----------------------
+
+    /// <summary>The class line always says where the reading came FROM — "Warrior · Druid"
+    /// is a different sentence depending on whether the game said it, the player did, or a
+    /// heuristic guessed it, and the parenthetical is the one word carrying that
+    /// difference (the quest window's identity note has worked this way since #104).</summary>
+    [Fact]
+    public void TheClassLineNamesTheListAndItsSource()
+    {
+        Assert.Equal("Warrior · Druid (inferred from your log)",
+            HomeReadout.ClassLine(["Warrior", "Druid"], ClassSource.Inferred));
+        Assert.Equal("Monk (set by you)",
+            HomeReadout.ClassLine(["Monk"], ClassSource.Stated));
+    }
+
+    /// <summary>No class yet is a SENTENCE, not a blank — a silent line here would tell a
+    /// brand-new player nothing is missing (the readiness block's own rule). Plan D2's
+    /// shape: it names how the answer arrives by itself (the log) AND points at the
+    /// Achievements ⧉ row one block down, which answers it at once and already ships the
+    /// command — so this sentence spells no command literal of its own.</summary>
+    [Fact]
+    public void AnUnknownClassIsASentenceNamingBothWaysForward()
+    {
+        var line = HomeReadout.ClassLine([], ClassSource.Unknown);
+        Assert.Equal(HomeReadout.EmptyClass, line);
+        Assert.Contains("log", line, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("Achievements", line, StringComparison.Ordinal);
+        Assert.DoesNotContain("/outputfile", line, StringComparison.OrdinalIgnoreCase);
+    }
+
+    /// <summary>The editor's own words: the cap is ANNOUNCED (so the fourth chip refusing
+    /// is a stated rule rather than a silent no-op), the door and its open-state label are
+    /// different (a "Save" over already-saved state would be a lie), the way back is the
+    /// plan's own sentence, and the dump-collapse state says WHY there is nothing to tick
+    /// and where the repair is (trap 17: disabled with no visual is invisible). "Override"
+    /// stays banned here for the same reason it was struck from the quest picker — being
+    /// told to override your own character is a strange thing for an app to say.</summary>
+    [Fact]
+    public void TheEditorAnnouncesItsCapItsWayBackAndItsDumpCollapse()
+    {
+        Assert.Contains("three", HomeReadout.ClassEditorNote, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("stops guessing", HomeReadout.ClassEditorNote, StringComparison.OrdinalIgnoreCase);
+        Assert.NotEqual(HomeReadout.EditClasses, HomeReadout.EditClassesDone);
+        Assert.Equal("Let EQBuddy work it out", HomeReadout.ClearStated);
+        Assert.Contains("achievements dump", HomeReadout.DumpAnswersClass, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("run it again", HomeReadout.DumpAnswersClass, StringComparison.OrdinalIgnoreCase);
+        foreach (var words in new[] { HomeReadout.ClassEditorNote, HomeReadout.EditClasses,
+                                      HomeReadout.ClearStated, HomeReadout.EmptyClass,
+                                      HomeReadout.DumpAnswersClass })
+            Assert.DoesNotContain("override", words, StringComparison.OrdinalIgnoreCase);
+    }
+
     /// <summary>
     /// **Never-scanned and healthy are two states with one shape, and collapsing them is
     /// the failure Bevel named**: silence tells a player who has never run the command that

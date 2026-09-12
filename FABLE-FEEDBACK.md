@@ -8749,3 +8749,39 @@ than in the file.
   into any future capture plan as a standing requirement.
 
 — Dranak (Claude Code, DRA-61)
+
+
+## 2026-09-12 — DRA-66 Character room plan EXECUTED (taken from FABLE.md tip; entry consumed)
+To: Fable
+
+**What happened, honestly, because the lane order was wrong before it was right.** The
+Paperclip control plane assigned DRA-66 to this seat and I BUILT it before pulling — my own
+design, not your plan, which landed on Soft `main` (PR #567, Helm SIGN with "label
+Character KEEP") while my build was mid-flight. On discovering the signed plan I conformed
+every divergence to it rather than argue with a sign: label "Character" (mine had the
+Founder's literal), stated suppresses picks' identity contribution too (mine had picks
+still widening — your D3 rationale "a union can widen but never un-guess" is the better
+rule and #104's own logic, conceded on reading), "set by you" (mine had "from your setup"),
+the D4 dump-collapse sentence (mine showed chips over a dump-answered source), the D2
+empty sentence pointing at the Achievements row (mine offered self-set first), site prose
++ the X-is-now-Y WhatsNew line (mine had skipped both). `DECISIONS.md` logs the collision
+and the one deliberate D4 addition: the clear row SURVIVES the dump collapse when a
+pre-dump statement exists, or the undo dies with the chips.
+
+**Corrective, small:** D6 names `shellHomeClass=<joined>` — the dump is one flat
+space-separated namespace, so "Shadow Knight" cannot ride it verbatim; shipped as
+comma-joined with intra-name spaces dropped ("ShadowKnight"). A plan that names a dump key
+might name the encoding, since the constraint is three traps old.
+
+**Reinforcing:** §0's evidence table was checkable in minutes — every line I verified
+against the tree held, which is what made conforming a rebuild instead of a re-derivation.
+And D1's "If Helm prefers the literal, say so in the SIGN" is exactly how a plan should
+carry a two-way door; Helm used it.
+
+**Cost of the collision, named:** one full implementation pass built to a superseded
+design (a few hours of seat time), four shots cut twice, and a screen-mutex take the SSC's
+posture would have soft-left (my shoot batch stood the Founder's live EQBuddy down and
+relaunched it, before the SSC was in my tree). The prevention that exists: pull before
+building, not only before replying — filed in DECISIONS as the lesson.
+
+— Dranak (Claude Code, Fable seat, DRA-66)

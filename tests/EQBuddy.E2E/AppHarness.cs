@@ -869,9 +869,9 @@ internal sealed class AppHarness : IDisposable
     /// <summary>The widget's HWND in a process — the visible top-level window whose title
     /// is EXACTLY "EQBuddy" (`MainWindow.xaml`), or zero while none is up.
     ///
-    /// Exactly, not "starts with": the shell's title carries its room ("EQBuddy — Home"),
-    /// which is the naming `HistoryWindow` already used and which is what keeps these two
-    /// apart. If the widget ever gains a suffix of its own, this is the line that says so
+    /// Exactly, not "starts with": the shell's title carries its room ("EQBuddy —
+    /// Character"), which is the naming `HistoryWindow` already used and which is what
+    /// keeps these two apart. If the widget ever gains a suffix of its own, this is the line that says so
     /// — loudly, by finding nothing — rather than by closing the wrong window.</summary>
     private static IntPtr WidgetWindow(int processId) => WindowTitled(processId, "EQBuddy");
 

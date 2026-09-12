@@ -43,7 +43,8 @@ public class Win {
 #
 # -OwnerPid separates two PROCESSES; it cannot separate two windows of one process, which
 # is the half of trap 24 the guard never covered — and E-3 made it live. The widget's
-# title is exactly "EQBuddy"; the Evolved shell's carries its room ("EQBuddy — Home"), and
+# title is exactly "EQBuddy"; the Evolved shell's carries its room ("EQBuddy — Character
+# Setup"), and
 # since scripts/shoot.ps1 opens the shell on every launch the two are in the same process
 # at the same time. `-like "*EQBuddy*"` matches both, and the winner would be whichever
 # EnumWindows reached first — a picture of the shell filed as `widget-cards.png`, which
