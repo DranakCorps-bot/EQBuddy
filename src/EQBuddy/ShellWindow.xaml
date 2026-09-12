@@ -77,7 +77,7 @@
                  capacity rather than taste. This codebase has already paid twice to learn
                  that a horizontal strip clips its overflow silently with no ellipsis and
                  no error (trap 14, then trap 25 with chips, on FOUR peers). The shell has
-                 seven rooms plus a Search affordance, and the rooms next to them want
+                 eight rooms plus a Search affordance, and the rooms next to them want
                  room to breathe. A rail grows DOWN.
 
                  It is a Grid of two rows rather than one stack so Settings can sit under

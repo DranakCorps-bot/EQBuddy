@@ -233,6 +233,12 @@ public class ShellTerminologyTests
         [
             typeof(HomeReadout), typeof(LivePresentation), typeof(ShellRoomEmpty),
             typeof(ShellPages), typeof(SetupReadout),
+            // DRA-70. Its constants are the room's chrome; its ASSEMBLED sentences — the
+            // why-lines, the gaps, the door tips — are swept by `HelperPresentationTests`,
+            // which also carries HOME-006's own ban. A reflection over const fields cannot
+            // see a word that arrives through an interpolation, so the two tiers are both
+            // needed and neither is decoration.
+            typeof(HelperPresentation),
         ];
 
         var seen = 0;
@@ -286,6 +292,13 @@ public class ShellTerminologyTests
         ("EQBuddy/ShellRoomIdentity.cs", "who the shell says it is following"),
         ("EQBuddy/IShellRoom.cs", "the room contract every room's chrome is built against"),
         ("EQBuddy/HomeRoom.cs", "identity, readiness and the recent session — the most prose in the shell"),
+        // DRA-70's Helper room, joining on the day it lands — the rule every row above
+        // follows. This row is thin BY CONSTRUCTION and that is the point: the room declares
+        // no copy of its own, because HOME-006's vocabulary ban can only be swept where the
+        // vocabulary is, and every sentence it draws comes off `HelperPresentation` (tier 1
+        // reaches those through the reflection below, and `HelperPresentationTests` sweeps
+        // the assembled ones too). What this row stops is a sentence being ADDED here later.
+        ("EQBuddy/HelperRoom.cs", "the Helper room — its blocks, its chips and its doors"),
         // OE-6's two files. `ReadinessRows` carries the ⧉ tooltip that used to sit in
         // HomeRoom — the row moved and its sweep moved with it — and `SetupView` is the
         // first-run screen, which is the only surface in the shell a player meets BEFORE

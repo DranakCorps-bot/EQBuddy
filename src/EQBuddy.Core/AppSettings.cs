@@ -618,6 +618,45 @@ public sealed class AppSettings
     /// are working on (David, 2026-09-09). An opt-OUT list would grow to 95 entries the first
     /// time somebody scrolled, and would mean a newly authored class arrived expanded.</para></summary>
     public List<string> GuideExpanded { get; set; } = [];
+
+    /// <summary>
+    /// Which goals a character has picked in the Helper room, keyed by the ledger's
+    /// character key — <see cref="HelperGoal"/> names, stored as strings.
+    ///
+    /// <para><b>Per character, and a standing intent rather than a session lens</b> (DRA-70
+    /// D2, Helm-signed). One person's alts are not one player's plan: a level-8 enchanter
+    /// being pushed and a level-50 main grinding faction want different answers from the same
+    /// install, and a selection that reset every launch would make the chip strip a control
+    /// you operate rather than a preference you hold.</para>
+    ///
+    /// <para><b>An absent key means "all goals", not "none"</b>, which is the same reading
+    /// every filter in this app already has — HOME-001 asks for goals as filters, and a
+    /// filter with nothing ticked shows everything. So a character who has never opened the
+    /// room gets the full weighing rather than an empty screen.</para>
+    ///
+    /// <para><b>Names rather than ordinals.</b> An enum's numeric value is a promise about
+    /// declaration order that nobody is keeping — inserting a tenth goal in the Founder's
+    /// list would silently re-point every stored selection — and an unknown name is skipped
+    /// on read, which is how a goal that is later removed stops mattering instead of
+    /// throwing.</para>
+    /// </summary>
+    public Dictionary<string, List<string>> HelperGoals { get; set; } = [];
+
+    /// <summary>
+    /// Which factions a character picked under the Helper's "Work on Faction" goal, keyed
+    /// the same way.
+    ///
+    /// <para>It is a REQUIRED pick and not a filter over everything: a faction dump carries
+    /// hundreds of standings, and weighing them all would be the thirty weak answers
+    /// HOME-002 asks for the opposite of. The empty state says so and offers the picker
+    /// (<c>HelperPresentation.Gap</c>, <c>NoFactionPicked</c>).</para>
+    ///
+    /// <para>Stored as the dump's own spelling. The achievements text and the faction dump
+    /// disagree about four of these names and <c>FactionNames.Resolve</c> is what reconciles
+    /// them at read time — normalising here would bake one source's spelling into the
+    /// player's profile, where nothing could correct it later.</para>
+    /// </summary>
+    public Dictionary<string, List<string>> HelperFactions { get; set; } = [];
     /// <summary>Color theme key (see EQBuddy.UI.Shared.ThemeCatalog); defaults to the
     /// original parchment-and-brass look so existing installs don't change on upgrade.</summary>
     public string Theme { get; set; } = "ParchmentBrass";

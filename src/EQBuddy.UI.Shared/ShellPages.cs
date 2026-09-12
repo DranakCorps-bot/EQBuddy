@@ -1,4 +1,4 @@
-﻿using EQBuddy.Core;
+using EQBuddy.Core;
 
 namespace EQBuddy.UI.Shared;
 
@@ -15,9 +15,12 @@ namespace EQBuddy.UI.Shared;
 /// A hand-maintained list is code that cannot be type-checked (trap 30); an enum is one
 /// the compiler walks for you.
 ///
-/// Order is the RAIL order, top to bottom, from the same pre-design: the six rooms that
+/// Order is the RAIL order, top to bottom, from the same pre-design: the rooms that
 /// answer "show me something about my character", then <see cref="ShellPage.Settings"/>
-/// below a visual gap because it answers a different question. That split does not
+/// below a visual gap because it answers a different question. (The pre-design counted
+/// SEVEN of them and DRA-70's Helper is the eighth — the count in Bevel's quote above is
+/// the number of rooms that existed when the argument was made, and the argument was about
+/// there being ONE list rather than about how long it is.) That split does not
 /// change at any window width (see <see cref="ShellLayout"/>): collapsing the rail to
 /// icons must not also reorder or drop a room, which would turn a resize into a silent
 /// capability loss — the #219/#233 shape triggered by a window edge instead of a release.
@@ -25,6 +28,12 @@ namespace EQBuddy.UI.Shared;
 public enum ShellPage
 {
     Home,
+    // DRA-70. It sits directly under Home because the two answer the pair of questions a
+    // player opens this app with: Character says WHO you are playing, Helper says WHAT to do
+    // next. It is its own room rather than a block inside Character for a reason written down
+    // in `HelperRoom` — the two standing locks on that room refuse exactly the content a
+    // recommender draws.
+    Helper,
     Live,
     Progress,
     Gear,
@@ -44,7 +53,7 @@ public static class ShellPages
     /// is drawn below a gap — see <see cref="BelowTheGap"/>.</summary>
     public static readonly IReadOnlyList<ShellPage> RailOrder =
     [
-        ShellPage.Home, ShellPage.Live, ShellPage.Progress,
+        ShellPage.Home, ShellPage.Helper, ShellPage.Live, ShellPage.Progress,
         ShellPage.Gear, ShellPage.Quests, ShellPage.World, ShellPage.Settings,
     ];
 
@@ -111,10 +120,17 @@ public static class ShellPages
     /// happens to be complete is not the same as one nobody has to maintain.
     /// <c>ShellNavigationTests</c> asserts the equality out loud rather than deleting the
     /// row that used to name what was missing.
+    ///
+    /// **DRA-70 added Helper, and it is the first room added AFTER the list stopped being a
+    /// filter** — which is exactly the day the paragraph above was written for. It is a
+    /// BUILD, like Home: no v1 window to host and no view to lift, because nothing in this
+    /// codebase has ever ranked across domains. It joins here in the PR that lands it,
+    /// sitting second in <see cref="RailOrder"/> so the rail reads "who you are playing" then
+    /// "what to do next" before any of the rooms that show you a surface.
     /// </summary>
     public static readonly IReadOnlyList<ShellPage> Landed =
     [
-        ShellPage.Home, ShellPage.Live, ShellPage.Progress,
+        ShellPage.Home, ShellPage.Helper, ShellPage.Live, ShellPage.Progress,
         ShellPage.Gear, ShellPage.Quests, ShellPage.World, ShellPage.Settings,
     ];
 
@@ -193,6 +209,7 @@ public static class ShellPages
     public static string Key(ShellPage page) => page switch
     {
         ShellPage.Home => "home",
+        ShellPage.Helper => "helper",
         ShellPage.Live => "live",
         ShellPage.Progress => "progress",
         ShellPage.Gear => "gear",
@@ -225,6 +242,7 @@ public static class ShellPages
     public static string Label(ShellPage page) => page switch
     {
         ShellPage.Home => "Character",
+        ShellPage.Helper => "Helper",
         ShellPage.Live => "Live",
         ShellPage.Progress => "Progress",
         ShellPage.Gear => "Gear",
@@ -259,6 +277,9 @@ public static class ShellPages
     public static string IconName(ShellPage page) => page switch
     {
         ShellPage.Home => "Tray",
+        // A target, because the room is about what you are aiming at. A vector out of the
+        // shared table and never a glyph (#148, #166).
+        ShellPage.Helper => "Target",
         ShellPage.Live => "Bolt",
         ShellPage.Progress => "Chart",
         ShellPage.Gear => "Bag",
@@ -275,6 +296,10 @@ public static class ShellPages
         // Unchanged by DRA-66's rename and class line (the signed plan's D1: "truer, not
         // less true" — WHO you are playing now includes what they play).
         ShellPage.Home => "Who you are playing, what is ready, and where you left off.",
+        // DRA-70. It names the QUESTION rather than the machinery, because the rail's tooltip
+        // is this room's only copy once the rail collapses to icons, and "recommendations"
+        // is a word about the tool where "what to do next" is a word about the evening.
+        ShellPage.Helper => "What to do next, weighed from your own play against your goals.",
         ShellPage.Live => "This sitting: damage, healing, pet, kills and what you cleared.",
         ShellPage.Progress => "Experience, wealth, faction and raid targets.",
         ShellPage.Gear => "Your bags, your wishlist, and what dropped for you.",

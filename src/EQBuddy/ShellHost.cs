@@ -20,7 +20,8 @@ namespace EQBuddy;
 /// "Quests…" into one row named for where it goes (see <see cref="OpenGuideDoor"/>).
 ///
 /// **That premise expired at SR-5 and nobody came back to re-check it** —
-/// <see cref="EQBuddy.UI.Shared.ShellPages.Landed"/> is the whole seven-room enum now. What
+/// <see cref="EQBuddy.UI.Shared.ShellPages.Landed"/> is the whole enum now (eight rooms
+/// since DRA-70's Helper). What
 /// turned a stale deferral into a `must-fix` is what the ✕ does: the shell has native
 /// chrome, closing it releases the rooms and clears <see cref="Window"/>, and with
 /// <c>EQBUDDY_SHELL</c> as the only entrance the player who closed it was stranded until
