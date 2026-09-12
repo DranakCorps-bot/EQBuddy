@@ -248,39 +248,45 @@ public class HomeRoomTests
     public void TheClassLineNamesTheListAndItsSource()
     {
         Assert.Equal("Warrior · Druid (inferred from your log)",
-            HomeReadout.ClassAnswer(["Warrior", "Druid"], ClassSource.Inferred));
-        Assert.Equal("Monk (from your setup)",
-            HomeReadout.ClassAnswer(["Monk"], ClassSource.Stated));
+            HomeReadout.ClassLine(["Warrior", "Druid"], ClassSource.Inferred));
+        Assert.Equal("Monk (set by you)",
+            HomeReadout.ClassLine(["Monk"], ClassSource.Stated));
     }
 
     /// <summary>No class yet is a SENTENCE, not a blank — a silent line here would tell a
-    /// brand-new player nothing is missing (the readiness block's own rule). It names both
-    /// ways an answer arrives: by itself from the log, or from the player — the second half
-    /// being the room's whole job under its DRA-66 name.</summary>
+    /// brand-new player nothing is missing (the readiness block's own rule). Plan D2's
+    /// shape: it names how the answer arrives by itself (the log) AND points at the
+    /// Achievements ⧉ row one block down, which answers it at once and already ships the
+    /// command — so this sentence spells no command literal of its own.</summary>
     [Fact]
     public void AnUnknownClassIsASentenceNamingBothWaysForward()
     {
-        var line = HomeReadout.ClassAnswer([], ClassSource.Unknown);
+        var line = HomeReadout.ClassLine([], ClassSource.Unknown);
         Assert.Equal(HomeReadout.EmptyClass, line);
-        Assert.Contains("cast", line, StringComparison.OrdinalIgnoreCase);
-        Assert.Contains("set it yourself", line, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("log", line, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("Achievements", line, StringComparison.Ordinal);
+        Assert.DoesNotContain("/outputfile", line, StringComparison.OrdinalIgnoreCase);
     }
 
     /// <summary>The editor's own words: the cap is ANNOUNCED (so the fourth chip refusing
     /// is a stated rule rather than a silent no-op), the door and its open-state label are
-    /// different (a "Save" over already-saved state would be a lie), and the way back
-    /// names whose reading returns. "Override" stays banned here for the same reason it
-    /// was struck from the quest picker — being told to override your own character is a
-    /// strange thing for an app to say.</summary>
+    /// different (a "Save" over already-saved state would be a lie), the way back is the
+    /// plan's own sentence, and the dump-collapse state says WHY there is nothing to tick
+    /// and where the repair is (trap 17: disabled with no visual is invisible). "Override"
+    /// stays banned here for the same reason it was struck from the quest picker — being
+    /// told to override your own character is a strange thing for an app to say.</summary>
     [Fact]
-    public void TheEditorAnnouncesItsCapAndItsWayBack()
+    public void TheEditorAnnouncesItsCapItsWayBackAndItsDumpCollapse()
     {
         Assert.Contains("three", HomeReadout.ClassEditorNote, StringComparison.OrdinalIgnoreCase);
         Assert.Contains("stops guessing", HomeReadout.ClassEditorNote, StringComparison.OrdinalIgnoreCase);
         Assert.NotEqual(HomeReadout.EditClasses, HomeReadout.EditClassesDone);
-        Assert.Contains("EQBuddy's own reading", HomeReadout.ClearStated, StringComparison.Ordinal);
+        Assert.Equal("Let EQBuddy work it out", HomeReadout.ClearStated);
+        Assert.Contains("achievements dump", HomeReadout.DumpAnswersClass, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("run it again", HomeReadout.DumpAnswersClass, StringComparison.OrdinalIgnoreCase);
         foreach (var words in new[] { HomeReadout.ClassEditorNote, HomeReadout.EditClasses,
-                                      HomeReadout.ClearStated, HomeReadout.EmptyClass })
+                                      HomeReadout.ClearStated, HomeReadout.EmptyClass,
+                                      HomeReadout.DumpAnswersClass })
             Assert.DoesNotContain("override", words, StringComparison.OrdinalIgnoreCase);
     }
 

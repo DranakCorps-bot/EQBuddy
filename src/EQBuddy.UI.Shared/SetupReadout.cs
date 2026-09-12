@@ -103,7 +103,7 @@ public static class SetupReadout
     /// this one.
     /// </summary>
     public const string ReopenNote =
-        "EQBuddy will not open this by itself again. Character Setup lists whatever is "
+        "EQBuddy will not open this by itself again. The Character room lists whatever is "
         + "still missing, and Settings → Behavior → Setup brings this back.";
 
     /// <summary>The re-open entry's label on Settings' Behavior tab. **Not a fifth tab** —

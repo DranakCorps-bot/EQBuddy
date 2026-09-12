@@ -11,10 +11,10 @@ public enum ClassSource
     /// <summary>The character's own achievements dump named them. The game's statement.</summary>
     Achievements,
 
-    /// <summary>The player told EQBuddy, on Character Setup (DRA-66). Their statement about
-    /// who the character IS — weaker than the game's, stronger than any guess. Safe to add
-    /// mid-enum: nothing persists or wires the NUMBER, only <see cref="CharacterClasses.SourceLabel"/>'s
-    /// string ever leaves the process.</summary>
+    /// <summary>The player told EQBuddy, on the Character room (DRA-66, signed plan D3).
+    /// Their statement about who the character IS — weaker than the game's, stronger than
+    /// any guess or lens. Safe to add mid-enum: nothing persists or wires the NUMBER, only
+    /// <see cref="CharacterClasses.SourceLabel"/>'s string ever leaves the process.</summary>
     Stated,
 
     /// <summary>Read from what the log shows being cast and used.</summary>
@@ -62,14 +62,18 @@ public static class CharacterClasses
     /// (<see cref="ClassInference.CurrentClasses"/>).</param>
     /// <param name="picks">The Quest Tracker's picked classes — a lens that may WIDEN the
     /// answer and may never narrow it.</param>
-    /// <param name="stated">What the player set on Character Setup (DRA-66) — their own
-    /// statement about who the character IS, which is a different fact from
-    /// <paramref name="picks"/> (#104: a pick may be a friend's class). **A non-empty
-    /// stated list SILENCES inference**, because "correct EQBuddy's guess" is the whole
-    /// reason the control exists — a correction the guess could keep arguing with would
-    /// not be one. It does not silence the dump: the game's statement is better evidence
-    /// than anyone's memory of a character screen, and the two union the same way the
-    /// dump and inference always have.</param>
+    /// <param name="stated">What the player set on the Character room (DRA-66, signed plan
+    /// D3) — their own statement about who the character IS, which is a different fact
+    /// from <paramref name="picks"/> (#104: a pick may be a friend's class). **A non-empty
+    /// stated list suppresses BOTH the inferred and the picks contributions to identity**:
+    /// the statement exists precisely because the guess is wrong, and a union can widen
+    /// but never un-guess. (The picks keep their own job untouched — the Quest Tracker's
+    /// filter still reads them; they just stop feeding IDENTITY while a statement
+    /// stands.) It never suppresses the dump: that is the game's own writing, and a
+    /// player who disagrees with their dump has a stale dump — the Readiness block is
+    /// already that repair. Cost, named in the plan: a stated-only player who unlocks a
+    /// second class later won't see the log widen their identity until they restate or
+    /// dump — acceptable for an explicit override with a visible clear path.</param>
     public static (IReadOnlyList<string> Classes, ClassSource Source) Resolve(
         IReadOnlyList<string>? unlocked,
         IReadOnlyList<string>? inferred,
@@ -94,20 +98,22 @@ public static class CharacterClasses
         Add(unlocked);
         var source = classes.Count > 0 ? ClassSource.Achievements : ClassSource.Unknown;
 
-        // The player's statement joins the dump's — and while one exists, the guess stays
-        // out entirely (see the parameter note: a correction inference could keep arguing
-        // with is not a correction).
+        // The player's statement joins the dump's — and while one exists, the guess AND
+        // the lens both stay out of identity (signed plan D3; see the parameter note).
         var hasStated = stated is { Count: > 0 };
         if (hasStated) Add(stated);
         if (source == ClassSource.Unknown && classes.Count > 0) source = ClassSource.Stated;
 
-        if (!hasStated) Add(inferred);
-        if (source == ClassSource.Unknown && classes.Count > 0) source = ClassSource.Inferred;
+        if (!hasStated)
+        {
+            Add(inferred);
+            if (source == ClassSource.Unknown && classes.Count > 0) source = ClassSource.Inferred;
 
-        // Picks widen. They also answer alone for a player who has never dumped and whose
-        // log shows nothing yet — a brand new session, which is the common case at launch.
-        Add(picks);
-        if (source == ClassSource.Unknown && classes.Count > 0) source = ClassSource.Picked;
+            // Picks widen. They also answer alone for a player who has never dumped and
+            // whose log shows nothing yet — a brand new session, the common case at launch.
+            Add(picks);
+            if (source == ClassSource.Unknown && classes.Count > 0) source = ClassSource.Picked;
+        }
 
         return (classes, source);
     }
@@ -130,11 +136,10 @@ public static class CharacterClasses
     public static string SourceLabel(ClassSource source) => source switch
     {
         ClassSource.Achievements => "from your achievements",
-        // The fourth reads in parallel with the other three ("from your …"): a source,
-        // no verb, no instruction. It names the Character Setup control that wrote it,
-        // because "from you" would leave the player who forgot setting it no way back
-        // to the place that can unset it.
-        ClassSource.Stated => "from your setup",
+        // The signed plan's wording (DRA-66 D3): a source, no instruction. "set" is the
+        // past participle naming who answered, not a verb telling the player to act —
+        // the same distinction the "pick" note below already draws.
+        ClassSource.Stated => "set by you",
         ClassSource.Inferred => "inferred from your log",
         ClassSource.Picked => "from your picks",
         _ => "",

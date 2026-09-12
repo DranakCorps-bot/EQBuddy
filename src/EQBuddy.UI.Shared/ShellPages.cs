@@ -213,16 +213,18 @@ public static class ShellPages
     /// <c>EQBUDDY_SHELL</c> and in every dump the E2E suite reads, and a room the shell
     /// re-spells is one every stored address stops finding.
     ///
-    /// **<see cref="ShellPage.Home"/> reads "Character Setup" since DRA-66** (Founder smoke
+    /// **<see cref="ShellPage.Home"/> reads "Character" since DRA-66** (Founder smoke
     /// 2026-09-12: *"nothing home about it; the page only helps capture game data for the
-    /// rest of EQBuddy"*). Same discipline as the Guide rename above: the enum member and
-    /// the wire key stay <c>home</c>, so every stored address, dump key (<c>shellHome*</c>)
-    /// and E2E hook keeps resolving; only the words a player reads moved. It is the one
-    /// two-word rail label, accepted knowingly — the label is the Founder's, and the rail
-    /// collapses on height, not on the width of its longest word.</summary>
+    /// rest of EQBuddy"*; label per the signed plan's D1, Helm KEEP — the Founder's literal
+    /// was "Character Setup", but "Setup" already names the first-run layer that draws OVER
+    /// this room and its Settings → Behavior door, and the rail's own rule is short nouns.
+    /// The Founder can flip it to the literal from <c>DECISIONS.md</c> at one-line cost,
+    /// here.) Same discipline as the Guide rename above: the enum member and the wire key
+    /// stay <c>home</c>, so every stored address, dump key (<c>shellHome*</c>) and E2E hook
+    /// keeps resolving; only the word a player reads moved.</summary>
     public static string Label(ShellPage page) => page switch
     {
-        ShellPage.Home => "Character Setup",
+        ShellPage.Home => "Character",
         ShellPage.Live => "Live",
         ShellPage.Progress => "Progress",
         ShellPage.Gear => "Gear",
@@ -270,12 +272,9 @@ public static class ShellPages
     /// thing carrying the room's name when the rail is collapsed to icons.</summary>
     public static string Describe(ShellPage page) => page switch
     {
-        // Four clauses since DRA-66: the class reading joined the room, and the tooltip is
-        // the room's only copy once the rail collapses to icons — the same rule World's and
-        // Settings' rows follow.
-        ShellPage.Home =>
-            "Who you are playing and their class, what EQBuddy still needs from the game, "
-            + "and where you left off.",
+        // Unchanged by DRA-66's rename and class line (the signed plan's D1: "truer, not
+        // less true" — WHO you are playing now includes what they play).
+        ShellPage.Home => "Who you are playing, what is ready, and where you left off.",
         ShellPage.Live => "This sitting: damage, healing, pet, kills and what you cleared.",
         ShellPage.Progress => "Experience, wealth, faction and raid targets.",
         ShellPage.Gear => "Your bags, your wishlist, and what dropped for you.",

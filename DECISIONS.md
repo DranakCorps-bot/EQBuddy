@@ -1,3 +1,53 @@
+## 2026-09-12 — DRA-66 (Character room rename + class line/correction): executed the SIGNED plan after building past it — the collision, and four calls that remained mine
+
+**The collision, first, because it is the entry's real content.** Paperclip assigned
+DRA-66 to this seat (Fable, Executor — the issue's own delivery shape) and I built a
+complete implementation from the issue text BEFORE pulling: my session branched off `main`
+`6f731a21`, and the Fable plan for the same issue (PR #567) plus Helm's SIGN ("label
+Character KEEP; `dra66-charsetup` Executor authorized after land") landed on `main` while I
+was mid-flight. On pulling to push, I found the sign and CONFORMED every divergence rather
+than argue with it: label "Character" (I had shipped the Founder's literal "Character
+Setup"); a statement suppresses the PICKS' identity contribution too (I had left picks
+widening — the plan's "a union can widen but never un-guess" is the better rule); "set by
+you" (I had "from your setup"); the D4 dump-collapse sentence instead of chips over an
+Achievements-sourced answer; the D2 empty sentence pointing at the Achievements row; site
+prose and the "Home is now Character" What's-new line (I had skipped both, reasoning
+players never saw "Home" — the plan honours the 1.99.6 promise pattern regardless, and
+Helm signed that reading). **The lesson, filed where I will reread it: pull at the START
+of work, not only before replying — CLAUDE.md already says so and this entry is what
+ignoring it for six hours costs** (one pass built to a superseded design, four shots cut
+twice, and a shoot batch that stood down the Founder's live EQBuddy while Helm's posture
+was soft-leaving exactly that — the SSC was not in my tree when I took the screen; it is
+the reason the rule exists anyway).
+
+**The seat-collision hazard that remains open for Helm:** the SSC authorizes a Bosun-kicked
+Opus seat `dra66-charsetup` after #567 lands. This PR IS that delivery, done by the
+Paperclip lane under seat `fable-dra66` (claim-seat holds item 66, so a second default
+claim is refused — trap 70's mechanism is the guard). The LIVE ASK asks Helm to stand the
+Bosun kick down or repoint it at review, so DRA-67's two-PRs-one-bug shape does not repeat.
+
+**Calls that remained mine (veto from here reverses any):**
+
+**1. THE CLEAR ROW SURVIVES THE DUMP-COLLAPSE.** Plan D4 collapses the editor to a sentence
+when the source is Achievements, and does not say what happens to a statement made BEFORE
+the dump landed (D3 still unions it in). Shipped: "Let EQBuddy work it out" stays visible
+in that state — taking the undo away with the chips would strand exactly the player who
+stated early and dumped late.
+
+**2. THE JOINED DUMP KEY IS SPACELESS.** D6 names `shellHomeClass=<joined>`; the dump is
+one flat space-separated namespace, so "Shadow Knight" rides as "ShadowKnight", classes
+comma-joined. An E2E reads it to know WHAT is named, not to typeset.
+
+**3. THE FOURTH CHIP IS A NO-OP WITH THE CAP ANNOUNCED, not an eviction.** At three stated
+classes a fourth tick changes nothing; the note names the game's own limit up front, so the
+refusal is a stated rule rather than a silent no-op. The alternative silently un-chooses
+something the player chose.
+
+**4. THE 340/341 UNNAMED E2E RED IS A LEDGER ROW, NOT A SHRUG.** One full-suite run went
+red on a test my own `tail -3` beheaded (the flake ledger's row-44 mistake, repeated four
+rows below the warning); the immediate full rerun and the final tip run are 341/341.
+Filed in `docs/ops/flake-ledger.md` with the process fix that needs no second red.
+
 ## 2026-09-12 — DRA-67 (the landing said "log-only" beside an /outputfile button): six calls I made alone
 
 Founder smoke ~2:05 AM CT under the DRA-48 landing family, kicked by Helm. Site-only. The

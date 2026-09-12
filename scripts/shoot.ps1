@@ -677,10 +677,10 @@ $Shots = [ordered]@{
     # block is gone (Founder smoke 2026-09-11 — the rail down the left edge of the same
     # window already IS that list), and the ⧉ catch-up is now on EVERY readiness row rather
     # than only the ones that have never been run.
-    #   'shell-home' — a native title bar reading "EQBuddy — Character Setup" (DRA-66: the
-    #     room the enum and the dump keys still call Home reads "Character Setup" to a
+    #   'shell-home' — a native title bar reading "EQBuddy — Character" (DRA-66: the
+    #     room the enum and the dump keys still call Home reads "Character" to a
     #     player — trap 53 is why these titles changed in the same diff as the label). The
-    #     rail has SEVEN rows and Character Setup is the TOP one, above Live, lit as
+    #     rail has SEVEN rows and Character is the TOP one, above Live, lit as
     #     selected — it did not have to be arranged there, `RailOrder` has had Home first
     #     since PR 1 and the room joining `Landed` put it in place. A rail that appended the
     #     room at the BOTTOM, or a shell that still opened on Progress, is a build that
@@ -796,15 +796,15 @@ $Shots = [ordered]@{
     # (The predicate itself is asserted where an assertion belongs — `SetupReadoutTests` for
     # the rule, `ShellHostTests` for the auto-launch reaching a running app.)
     #
-    # Title is 'EQBuddy — Character Setup': Setup is a LAYER over the active room and not a
+    # Title is 'EQBuddy — Character': Setup is a LAYER over the active room and not a
     # room, so the window's title is the room underneath — which is itself half of what this
     # picture proves. Trap 53 applies as it does to every row here: if a rename makes this
     # title stale the row fails rather than photographing something else — which is exactly
     # what DRA-66's rename did, and why this row changed in the same diff as the label.
     #
     # PREDICTION, written before the shot (trap 23):
-    #   'setup-screen' — a native title bar reading "EQBuddy — Character Setup" and the rail
-    #     on the left with Character Setup lit, both UNCHANGED and both visible: the screen
+    #   'setup-screen' — a native title bar reading "EQBuddy — Character" and the rail
+    #     on the left with Character lit, both UNCHANGED and both visible: the screen
     #     covers the ROOM cell only. Where the four Home blocks would be, an opaque panel with a hairline
     #     border and rounded corners, inset by one card pad, holding:
     #       "Set EQBuddy up" in accent ink at window-title size, one wrapped paragraph under
@@ -820,7 +820,7 @@ $Shots = [ordered]@{
     #     the one close on this screen is a permanent one with nothing saying so.
     #     The column is capped at MinRoomWidth and pinned LEFT, the same cap Home's blocks
     #     take — if the paragraph runs the full width of a wide window, the cap has come off.
-    'setup-screen'    = @{ Title = 'EQBuddy — Character Setup'
+    'setup-screen'    = @{ Title = 'EQBuddy — Character'
                            Env = @{ EQBUDDY_SHELL = '1'; EQBUDDY_SETUP = '1' }; Set = @{} }
     # ---- TR-1: the one-time EQBuddy 1.x profile import question ------------------------
     #
@@ -967,11 +967,11 @@ $Shots = [ordered]@{
                                @{ Character = 'Testchar'; Fraction = 0.9;  ShiftDays = 1
                                   Lines = @('You have gained a level! Welcome to level 24!') }
                            ) }
-    'shell-home'      = @{ Title = 'EQBuddy — Character Setup'; Env = @{ EQBUDDY_SHELL = '1' }; Set = @{} }
-    'shell-home-narrow' = @{ Title = 'EQBuddy — Character Setup'
+    'shell-home'      = @{ Title = 'EQBuddy — Character'; Env = @{ EQBUDDY_SHELL = '1' }; Set = @{} }
+    'shell-home-narrow' = @{ Title = 'EQBuddy — Character'
                            Env = @{ EQBUDDY_SHELL = '1'; EQBUDDY_SHELL_SIZE = '580x480' }
                            Set = @{} }
-    'shell-home-ready' = @{ Title = 'EQBuddy — Character Setup'; Env = @{ EQBUDDY_SHELL = '1' }; Set = @{}
+    'shell-home-ready' = @{ Title = 'EQBuddy — Character'; Env = @{ EQBUDDY_SHELL = '1' }; Set = @{}
                            Dump = @{ 'Testchar_test-Inventory.txt' = @(
                                "Location`tName`tID`tCount`tSlots"
                                "General1`tBone Chips`t0`t12`t0"
@@ -3578,7 +3578,7 @@ try {
         #
         # It does not change any picture. shot.ps1 uses PrintWindow, so occlusion is
         # already irrelevant, and it now prefers an EXACT title match — which is what keeps
-        # the widget's 'EQBuddy' from resolving to the shell's 'EQBuddy — Character Setup'
+        # the widget's 'EQBuddy' from resolving to the shell's 'EQBuddy — Character'
         # in the same process (trap 24's uncovered half).
         $psi.EnvironmentVariables['EQBUDDY_SHELL'] = '1'
         foreach ($k in $spec.Env.Keys) { $psi.EnvironmentVariables[$k] = $spec.Env[$k] }

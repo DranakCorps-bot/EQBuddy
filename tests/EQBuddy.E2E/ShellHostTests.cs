@@ -685,6 +685,45 @@ public class ShellHostTests
     }
 
     /// <summary>
+    /// **The class line moves to the game's own answer when the achievements dump LANDS**
+    /// (DRA-66, plan A3's E2E half) — lands meaning the game ANNOUNCES it in the log,
+    /// because a file sitting on disk reaches the readiness row's date and never the
+    /// ledger's class list: the auto-import is announcement-driven, and the first cut of
+    /// this test staged the file, watched the source stay <c>inferred</c> for 90 s, and
+    /// taught this comment. The class the dump names is deliberately NOT the fixture's
+    /// own inferred Warrior, so the source flip is visible in the CLASS too — a
+    /// Warrior-naming dump would flip the parenthetical while the line's text stood
+    /// still, which is half an assertion. Waited on as a positive event (trap 62); the
+    /// unit suite owns the precedence table, this owns "the running app reaches that
+    /// state" (trap 42's gap).
+    /// </summary>
+    [Fact]
+    public void TheClassLineReadsTheAchievementsDumpWhenOneLands()
+    {
+        using var app = new AppHarness(environment: OpenOn("home"));
+        app.WriteAchievementsDump(
+            "Untapped Potential: Classes",
+            "C\tPrimary Class Unlock - Cleric",
+            "C\t\tThis achievement will autocomplete.");
+        app.Launch();
+
+        app.WaitForDump("shellPage", "home", "the shell to land on the Character room");
+        // The game's own announcement is what turns the file into an import.
+        app.AppendLogLines("Outputfile Complete: Testchar_test-Achievements.txt");
+
+        app.WaitForDump("shellHomeClassSource", "achievements",
+            "the class line to read from the announced achievements dump");
+        // Cleric FIRST (the dump leads), the fixture's inferred Warrior still unioned in
+        // behind it — the dump is a snapshot and must not silence live evidence.
+        app.WaitForDump("shellHomeClass", "Cleric,Warrior",
+            "the dump's class to lead the line with the log's own still behind it");
+        // Nobody has stated anything, and the editor is collapsed to the dump sentence —
+        // no chip strip exists to have been built.
+        Assert.Equal(0, app.DumpValue("shellHomeStated"));
+        Assert.Equal(0, app.DumpValue("shellHomeClassChips"));
+    }
+
+    /// <summary>
     /// Readiness: the ⧉ copies, and the one row whose dump has actually landed.
     ///
     /// **Only a launched app can say a control EXISTS.** A surface that asks the player for

@@ -10,10 +10,11 @@ namespace EQBuddy;
 /// <summary>
 /// The HOME room — the sixth room of the Evolved shell, and the first one that is a NEW
 /// surface rather than a move or a lift. Bevel's Home pre-design, Helm-signed 2026-09-05
-/// ~5:20 AM CT. **A player reads "Character Setup" since DRA-66** (Founder smoke: *"nothing
-/// home about it; the page only helps capture game data for the rest of EQBuddy"*) — the
-/// class name, the enum member and every <c>shellHome*</c> key deliberately did not move,
-/// the same discipline as the Quests room reading "Guide" (<see cref="ShellPages.Label"/>).
+/// ~5:20 AM CT. **A player reads "Character" since DRA-66** (Founder smoke: *"nothing home
+/// about it; the page only helps capture game data for the rest of EQBuddy"*; label per
+/// the Helm-signed plan's D1) — the class name, the enum member and every
+/// <c>shellHome*</c> key deliberately did not move, the same discipline as the Quests
+/// room reading "Guide" (<see cref="ShellPages.Label"/>).
 ///
 /// **Three blocks: Identity · Readiness · Recent session.** They answer, in order, who
 /// EQBuddy is following, what it is missing, and where you left off — which is
@@ -294,7 +295,7 @@ internal sealed class HomeRoom : Grid, IShellRoom
     private void BuildClassLine(StackPanel block)
     {
         _classChips = 0;
-        var line = Line(HomeReadout.ClassAnswer(_classes, _classSource), Role.Body);
+        var line = Line(HomeReadout.ClassLine(_classes, _classSource), Role.Body);
         line.Margin = new Thickness(0, Tok.SpaceXs, 0, 0);
         block.Children.Add(line);
 
@@ -302,6 +303,19 @@ internal sealed class HomeRoom : Grid, IShellRoom
         // one) — nothing to write a statement onto, so no door to a strip that could not
         // save. The line above still answers; the door returns with the key.
         if (_main.QuestLedger is null || _main.QuestCharacterKey.Length == 0) return;
+
+        // The game has answered (plan D4): the editor collapses to a sentence saying WHY,
+        // never to disabled chips (trap 17). The clear row below still survives — a
+        // statement made BEFORE the dump landed still contributes (D3 unions it), and
+        // taking the undo away with the chips would strand exactly that player.
+        if (_classSource == ClassSource.Achievements)
+        {
+            var why = Line(HomeReadout.DumpAnswersClass, Role.BodySecondary);
+            why.Margin = new Thickness(0, Tok.SpaceXxs, 0, 0);
+            block.Children.Add(why);
+            AddClearRow(block);
+            return;
+        }
 
         var door = DesignSystem.Text(Role.Caption,
             _editingClasses ? HomeReadout.EditClassesDone : HomeReadout.EditClasses);
@@ -332,16 +346,21 @@ internal sealed class HomeRoom : Grid, IShellRoom
             _classChips++;
         }
         block.Children.Add(wrap);
+        AddClearRow(block);
+    }
 
-        if (_stated.Count > 0)
-        {
-            var clear = DesignSystem.Text(Role.Caption, HomeReadout.ClearStated);
-            clear.Ink("AccentBrush");
-            clear.HorizontalAlignment = HorizontalAlignment.Left;
-            clear.Margin = new Thickness(0, Tok.SpaceXs, 0, 0);
-            DesignSystem.WireClick(clear, () => WriteStated([]));
-            block.Children.Add(clear);
-        }
+    /// <summary>The undo, only while there is something to undo. Shared by the open
+    /// editor and the dump-collapsed state — see the D4 note above for why the second
+    /// one keeps it.</summary>
+    private void AddClearRow(StackPanel block)
+    {
+        if (_stated.Count == 0) return;
+        var clear = DesignSystem.Text(Role.Caption, HomeReadout.ClearStated);
+        clear.Ink("AccentBrush");
+        clear.HorizontalAlignment = HorizontalAlignment.Left;
+        clear.Margin = new Thickness(0, Tok.SpaceXs, 0, 0);
+        DesignSystem.WireClick(clear, () => WriteStated([]));
+        block.Children.Add(clear);
     }
 
     private void ToggleStated(string cls)
@@ -478,10 +497,12 @@ internal sealed class HomeRoom : Grid, IShellRoom
         $"shellHomeLinks={_links} " +
         // Must be 0, always. See BuildReadiness.
         $"shellHomeDeadLinks={_deadLinks} " +
-        // The class reading (DRA-66): how many classes the line names, where they came
+        // The class reading (DRA-66, plan D6): the classes the line names, where they came
         // from, and — when the editor is open — that all sixteen chips were BUILT (trap 29:
-        // an absent control photographs as an unremarkable panel).
-        $"shellHomeClasses={_classes.Count} " +
+        // an absent control photographs as an unremarkable panel). The dump is one flat
+        // space-separated namespace, so the joined value drops the space inside a class
+        // name ("ShadowKnight") — an E2E reads this to know WHAT is named, not to typeset.
+        $"shellHomeClass={string.Join(',', _classes.Select(c => c.Replace(" ", "")))} " +
         $"shellHomeClassSource={_classSource.ToString().ToLowerInvariant()} " +
         $"shellHomeStated={_stated.Count} " +
         $"shellHomeClassChips={_classChips}";

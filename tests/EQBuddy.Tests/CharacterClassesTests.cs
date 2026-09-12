@@ -141,16 +141,18 @@ public class CharacterClassesTests
         Assert.Equal(ClassSource.Inferred, source);
     }
 
-    /// <summary>#104 is untouched: the quest picker is a lens that may widen whatever the
-    /// identity answer is, a statement included — helping a friend does not stop working
-    /// because you told EQBuddy who you are.</summary>
+    /// <summary>The signed plan's D3, second half: while a statement stands, the PICKS
+    /// stop feeding identity too — a union can widen but never un-guess, and a friend's
+    /// picked class landing back in "who this character is" would be #104's bug
+    /// resurrected by the very control built above it. The picker's own job (the quest
+    /// filter) is untouched; only its identity contribution pauses.</summary>
     [Fact]
-    public void PicksStillWidenAStatedAnswer()
+    public void PicksStopFeedingIdentityWhileAStatementStands()
     {
         var (classes, source) = CharacterClasses.Resolve(
             unlocked: null, inferred: ["Monk"], picks: ["Bard"], stated: ["Warrior"]);
 
-        Assert.Equal(["Warrior", "Bard"], classes);
+        Assert.Equal(["Warrior"], classes);
         Assert.Equal(ClassSource.Stated, source);
     }
 
@@ -159,7 +161,7 @@ public class CharacterClassesTests
     /// guess, which is the whole reason the source travels at all.</summary>
     [Theory]
     [InlineData(ClassSource.Achievements, "from your achievements")]
-    [InlineData(ClassSource.Stated, "from your setup")]
+    [InlineData(ClassSource.Stated, "set by you")]
     [InlineData(ClassSource.Inferred, "inferred from your log")]
     [InlineData(ClassSource.Picked, "from your picks")]
     public void EachSourceHasWordsForIt(ClassSource source, string expected) =>
