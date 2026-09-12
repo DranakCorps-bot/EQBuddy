@@ -1142,6 +1142,129 @@ the note after appending. `stderr` from a `python -c` that "worked" is evidence,
 a `command not found` beside a success line means the string you thought you sent is not the
 string that arrived.
 
+### Trap 60 — the guard, 2026-09-10 (DRA-49 / EXO-HARDEN-A1)
+
+**Two more hits, and the entry above under-reported the damage by two orders of
+magnitude.** Trap 60(b) closed with *"There is no guard, and that is a named hole rather
+than an oversight … The cheap one — a mojibake scan over the channel files — would fail on
+the 446 lines already committed, which is the argument for building it and the reason it
+is a follow-up rather than this change."* That was written on 2026-09-08. Eight days
+later, measured rather than estimated:
+
+| | |
+|---|---|
+| `HELM-FEEDBACK.md`, mojibake markers on `main` today | **13,411** |
+| the same file at `e9e58c07`, one commit | **15,670 → 63,782** |
+| commits that introduced new markers into a rostered file | **31** |
+
+The 446-line figure was a line count of one marker in one place; the file has been
+re-encoded through the wrong codec repeatedly since, each pass mangling the previous
+pass's output. `Ã¢â‚¬` is a second round trip; `Ã‚Â¢Ã¢â‚¬Å¡Â¬` is a third. **Write-side
+damage compounds, because the input to each rewrite is the output of the last one.**
+
+**And the destructive half got worse while the entry sat as a follow-up:**
+
+| commit | date | what landed |
+|---|---|---|
+| `7b804338` | 2026-09-04 | `HELM-FEEDBACK.md` 2713 → 2209 lines. Message: *"restore + clean edit"* |
+| `24a91e64` | 2026-09-09 | `HELM.md` **and** `HELM-FEEDBACK.md` DELETED (PR #493) |
+| `d20c8e07` | 2026-09-10 | both DELETED again, by an empty-tree amend |
+
+Each deletion was repaired by a follow-up restore commit (`4cb742d5`, `04b2b7aa`), which
+is why `main` looks fine and why nobody counted. **Both wipes were landed by a commit
+whose message said it was SIGNING something.** The rule was in `CLAUDE.md` the whole time.
+Process language told the agent what to do; it could not tell CI what to refuse.
+
+→ **`scripts/channel-wipe-guard.ps1`**, with `scripts/channel-wipe-guard-selftest.ps1`,
+in `check.ps1` and in CI's `build-and-test`. Base ref versus head — the working tree by
+default, so a wipe fails before it is even committed; on a `pull_request` the checkout is
+the merge result, which asks the only question worth asking. Five checks: **wipe**
+(deleted or emptied), **shrink**, **replace** (line-multiset retention), **mojibake**
+(base-relative, so the existing 13,411 are not re-litigated on every PR — only NEW damage
+fails), and **roster** (every `*-FEEDBACK.md` at the root is covered, per trap 34).
+
+→ **THE THRESHOLDS WERE MEASURED, NOT PICKED.** All 1,379 revisions of all eleven rostered
+files were scored before a number was chosen, because a threshold nobody calibrated is a
+threshold that fires on Tuesday. The separation is unusually clean, and it is what makes
+the tiers real:
+
+- **ledger** (`*-FEEDBACK.md`, `DECISIONS.md`) — 90% / 90%. Exactly two clean revisions in
+  the whole history sit below 95%: `e8d2aeed` (59% retention at 99% length — a mojibake
+  *repair*) and `7b804338`, the truncation above. The nearest LEGITIMATE value is 95.5%
+  (`3f405c66`). Five points of daylight.
+- **state** (`HELM.md`) — 65% / 60%. Lifting a hold legitimately removes it; clean
+  revisions reach 85.3% retention (`91fab9a0`). Tightening this tier to the ledger's
+  numbers would fire on ordinary Helm work, and `HELM.md`'s wipes are caught by check 1,
+  which has no threshold to argue about.
+- **inbox** (`FABLE.md`, `BEVEL.md`, `SCRIBE.md`, `SCRIBE-TESTING.md`) — no percentage
+  check at all. *"When you take an item, delete it"* is the documented workflow and a
+  drained `FABLE.md` is 9.5% of its former length (`d091939b`). Checks 1 and 4 only.
+
+→ **NO `-Force`, AND NO NEED FOR ONE.** An escape hatch on a guard whose entire subject is
+*"an automated land destroyed the file"* is the automated land's next move — the same
+reasoning that keeps `release.ps1` free of `-SkipSign`. The two legitimate reasons a
+ledger shrinks are mechanisms instead: an **archive move** (≥90% of the lost lines are
+found under `docs/ops/claude-archive/` at head — content that MOVED was not content that
+was LOST) and an **encoding repair** (fewer markers than base at ≥95% length). Both are
+satisfied by doing the right thing, not by asserting that you did.
+
+→ **THE REPLACE CHECK NEEDS TWO ARMS, AND THE SECOND ONE IS THE ONLY ONE THAT SURVIVES AN
+ARGUMENT ABOUT ENCODING.** The first version compared non-blank LINES, and on real history
+it reported that `ff6853ba` — a routine *"merge main into helm/ssc-487 (additions-only
+KEEP)"* — had destroyed 63% of `HELM.md`. It had not. That commit **re-encoded** the file:
+`E2 80 94`, a correct UTF-8 em dash, became `C3 A2 E2 82 AC E2 80 9D`, the same dash
+through cp1252 — trap 54's shape, and 60(b)'s. Every one of the hundreds of lines carrying
+a dash compared unequal while saying exactly what it said before. **A guard that fails a
+correct merge is worth less than no guard**, because the first thing a red light nobody
+believes buys you is a habit of re-running until green.
+
+So the second arm compares **entry headings through a key with all non-ASCII stripped,
+whitespace collapsed and case folded**. Encoding churn, re-indentation and reordering
+cannot move it; only deleting the entry can. Three things follow, and the third is the one
+worth the trouble:
+
+- **It is measured like everything else here.** Over all 1,143 ledger/state revision
+  pairs, every revision below 90% entry retention is one of the incidents — `24a91e64`
+  (0.000), `7b804338` (0.485), `c7a597a8` (0.594) — and the worst CLEAN value in the whole
+  history is 0.941. The floor is 85%.
+- **Entries are matched mid-line, not only at line start, and that is not tidiness.**
+  `c7a597a8` collapsed `HELM-FEEDBACK.md`'s 8,677 lines into **2**. On today's `main` a
+  line-start reading finds EIGHT headings in the ledger that has been deleted twice; the
+  mid-line reading finds 3,523. Shipping the line-start version would have been a detector
+  aimed at nothing on precisely the file it exists for — trap 74 again, one file over.
+- **The REPAIR exemption deliberately does not reach it.** Un-mangling a file rewrites
+  most of its lines, so the line arm has to stand down for it; that exemption is also a
+  cover story, and before the entry arm existed a commit that repaired the encoding **and
+  quietly dropped a quarter of the entries** passed every check in this guard. A real
+  repair does not move an ASCII-stripped key, so it has nothing to ask for here. Cases 15
+  and 16 of the self-test are that commit, asserted twice: 3a *was* excused as a repair,
+  and 3b refused it anyway.
+
+The line arm stays, because it is the sensitive one and it is what catches a file whose
+entries are already collapsed beyond recovery.
+
+→ **Prove-failed against real history, not just fixtures**, which is the part that would
+have been easy to skip: the guard is red on `24a91e64`, `d20c8e07`, `7b804338`,
+`e9e58c07`, `ff6853ba` and `c7a597a8`, and green on `e8d2aeed` (repair), `3f405c66` (a
+legitimate 95.5% edit), `91fab9a0` (a hold lift), `d091939b` (a drained inbox), `04b2b7aa`
+(the restore), and on `de05c512` (0.941) and `3e68e2a0` (0.944) — the two closest any clean
+commit has ever come to the entry floor. The self-test adds the twenty-one cases history
+cannot supply — an emptied-but-present file, an archive move, an unrostered channel file,
+a rebase that reorders entries, and an unresolvable base, which must SKIP loudly rather
+than pass quietly.
+
+→ **One fixture had to be corrected rather than the floor.** The self-test's "lifting holds
+from `HELM.md` passes" case lopped 22% off the end of the file — 13 of 60 holds in one
+commit — and the new arm refused it. The arm was right: across all 234 revisions of
+`HELM.md` the worst clean entry retention ever recorded is 0.944, because holds lift one at
+a time. Loosening a measured floor to admit an invented fixture is trap 52 with the
+premise never re-derived; the fixture now lifts six holds and compacts twenty more, which
+is what a Helm pass actually does.
+
+→ **What is still open:** trap 60(c), the silently truncated append. A note that lost
+every backticked span still diffs additions-only and still retains 100% of the base's
+lines. This guard cannot see it, and nothing else does either.
+
 ### Trap 61
 
 61. **THE SCREEN IS A MUTEX NOTHING ENFORCED, AND `shoot.ps1`'S OWN STAND-DOWN IS WHAT TURNS A
@@ -1911,3 +2034,36 @@ its negation. "It works from here" almost never can. And when a surface counts
 participants, make ORIGIN part of the count — a local caller is not evidence about
 a remote one, and a count that conflates them will confirm whatever the reader
 already believes.
+### Trap 78
+
+78. **A DETECTOR'S PATTERN LIST CAN BE SILENTLY EMPTY, AND AN EMPTY LIST MATCHES NOTHING
+    AND REPORTS CLEAN.** The mojibake check above was written the obvious way:
+
+    ```powershell
+    $MojibakeMarkers = @(
+        [string][char]0x00E2 + [string][char]0x20AC,
+        [string][char]0x00C3 + [string][char]0x00A2,
+        [string][char]0xFFFD
+    )
+    ```
+
+    **PowerShell binds `,` more tightly than `+`.** That parses as
+    `a + (b, c) + d` — string, plus array, plus string — so the array is flattened into
+    the string and the whole literal collapses to ONE element containing every marker
+    joined by `$OFS` (a space). `"â€ Ã¢ "` occurs in no file. The list matched nothing.
+
+    → **It was green on the worst commit in the repo.** Run against `e9e58c07` — the merge
+    that took `HELM-FEEDBACK.md` from 15,670 markers to 63,782 — the guard reported
+    `markers=0` for both sides. It was only caught because the count was printed for a
+    file *known* to be corrupt and the answer was zero. A guard whose output is a bare
+    pass/fail would have shipped.
+
+    → **The rule, which is not really about PowerShell:** parenthesise every element of a
+    computed array literal — and **assert that a new detector's list is non-empty and that
+    it FIRES, in the same commit that adds it.** Trap 34 is a guard aimed at the wrong
+    thing. This is a guard aimed at *nothing*, and only the second one is green while
+    being wrong. The tell is that a detector added to catch known-existing damage does not
+    find the known-existing damage; if you cannot point at the thing it just caught, you
+    have not tested it. `channel-wipe-guard-selftest.ps1` now drives every check into the
+    red at least once, which is the shape that makes this un-shippable rather than
+    embarrassing.

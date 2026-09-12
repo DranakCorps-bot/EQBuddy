@@ -723,8 +723,30 @@ after the named guard left with its surface.
     append** — Bash eats backticks inside `python -c "…"`, so a markdown
     note loses every backticked identifier and still diffs clean. Write
     the note with the editing tools; if the tail is mojibake and will not
-    anchor, concatenate two FILES. Read an identifier back. **No guard
-    yet; that is a named hole.** [Novel](docs/ops/claude-archive/traps.md#trap-60)
+    anchor, concatenate two FILES. Read an identifier back.
+    (d) **The hole is closed for the DESTRUCTIVE half** (2026-09-10):
+    `scripts/channel-wipe-guard.ps1` + its `-selftest`, in `check.ps1` and
+    CI, refuse a PR that empties, deletes, truncates below its tier's
+    floor, wholesale-replaces, or newly MOJIBAKES a channel file. Tiers:
+    `*-FEEDBACK.md`/`DECISIONS.md` are append-only ledgers (90%),
+    `HELM.md` is state that lifts holds (65%), the inboxes are drained by
+    design and get the wipe + mojibake checks only. No `-Force`: an
+    archive move and an encoding repair stand the checks down by BEING
+    one. **Replace has two arms, and the second is the one that survives
+    an argument about encoding:** 3a compares lines, 3b compares ENTRY
+    HEADINGS through a key with non-ASCII stripped and case folded (85%,
+    both checked tiers), so re-encoding, re-indenting and reordering
+    cannot move it and **the repair exemption deliberately does not reach
+    it** — a rewrite that un-mangles a file *and* drops forty entries used
+    to be waved through by 3a. Entries are matched mid-line too, because
+    `c7a597a8` collapsed `HELM-FEEDBACK.md` into 2 lines and a line-start
+    reading would give 3b eight headings to measure 1,051 entries with.
+    **It catches CATASTROPHIC loss, and nothing else — (a) and (c)
+    still have no guard.** A stale-base clobber of 36 lines out of 10,600
+    is 99.7% retention and passes; so does a silently truncated append,
+    which is additions-only and retains everything. `git diff
+    <the-ref-you-based-on>..HEAD -- HELM-FEEDBACK.md` is still yours to
+    run. [Novel](docs/ops/claude-archive/traps.md#trap-60)
 61. **The SCREEN is a mutex both harnesses must acquire.**
     `scripts/shoot.ps1` and `tests/EQBuddy.E2E` (`AppHarness.Launch`) take
     the same lock. Guard: `ScreenLockTests`. Wait for the window
@@ -909,6 +931,20 @@ after the named guard left with its surface.
     named the v1 path, and the only inbound Allow that fit was scoped to the Tailscale
     address the QR ranks LAST. **When you tell a player to check a list, check what the
     list SHOWS them** — identity a UI hides is identity the player cannot verify.
+
+78. **A detector's PATTERN LIST can be silently empty, and an empty list
+    matches nothing and reports clean.** `channel-wipe-guard.ps1` built
+    its mojibake markers as `@([char]0xE2 + [char]0x20AC, [char]0xC3 +
+    [char]0xA2, …)`. **PowerShell binds `,` TIGHTER than `+`**, so that
+    parses as `a + (b, c) + d` and collapses the whole list into ONE
+    string of every marker joined by `$OFS`. It matched nothing. The
+    guard reported a clean file for the commit that took HELM-FEEDBACK.md
+    from 15,670 mojibake markers to 63,782. **Parenthesise every element
+    of a computed array literal** — and, generally, **assert a detector's
+    list is non-empty and that it FIRES, in the same commit that adds
+    it**: trap 34 is a guard aimed at the wrong thing, this is a guard
+    aimed at nothing, and only the second one is green.
+    [Novel](docs/ops/claude-archive/traps.md#trap-78)
 
 New trap discovered the hard way? Add the compact rule here and the novel
 under `docs/ops/claude-archive/traps.md`. That is the whole point.
