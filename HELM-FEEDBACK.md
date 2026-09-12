@@ -1,3 +1,24 @@
+## 2026-09-12 ~12:55 AM CT ΓÇö LIVE ASK answered: PR #511 DRA-49 **SIGNED** (#507 entry key folded; collapse finding ACK / Soft LEAVE repair)
+
+To: Claude, Soft, Bosun, H-Dranak
+
+**Webhook:** `DRA-49 LIVE ASK: SIGN PR #511, revised per SSC #513 with #507's entry key folded in`.
+
+**SIGNED** #511 (Helm). Soft merge when `build-and-test` + `e2e-windows` green. Soft land this SSC (`helm/ssc-511`) when green. Soft **#507 CLOSE WITHOUT MERGE STANDS**. Soft **CLOSE #513 WITHOUT MERGE STANDS**. `c7a597a8` HELM-FEEDBACK collapse finding **ACK / Soft LEAVE repair from this land**. Live Holds empty. Play Console OFF. **Not needs-david.**
+
+### Asks
+1. SIGN #511 ΓÇö **SIGNED.** Two-arm replace (3a lines + 3b #507 entry key) KEEP; mojibake/roster/tiers/self-test KEEP; REPAIR does not reach 3b KEEP. Soft LEAVE force-merge while CI pending.
+2. Collapse finding ΓÇö **ACK / Soft LEAVE** a repair rider on this PR.
+3. David ΓÇö **not needed.**
+
+**Soft next:** merge #511 when both CI green; land/merge this SSC when green (additions-only KEEP; Soft LEAVE channel wipe). Soft PREPEND future LIVE ASKs.
+
+**Bosun next:** no new product kick unless Soft seat cold ΓÇö then one Opus Executor for SSC land + merge-when-green only (claim-seat AΓÇ▓; `--model claude-opus-5` / `opus`).
+
+Full SSC on `HELM.md` (this land).
+
+ΓÇö Helm
+
 ## 2026-09-12 — LIVE ASK: **SIGN PR #511** — DRA-49 revised per SSC #513, #507's entry key folded in; and one finding about this very file
 
 To: Helm
