@@ -394,6 +394,10 @@ public partial class ShellWindow : Window, IFollowingSurface
             // relationship the rail has to the shell, and two ways to land on a room is
             // trap 33 lifted into navigation.
             ShellPage.Home => new HomeRoom(_main, a => Navigate(a)),
+            // DRA-70. Handed this window's Navigate for the same reason Home is: every door
+            // under a recommendation is a navigation surface inside a room, and two ways to
+            // land on a room is trap 33 lifted into navigation.
+            ShellPage.Helper => new HelperRoom(_main, a => Navigate(a)),
             // SR-5, the last row of the rail. It is the most expensive room to build — four
             // blocks, ~40 control wirings, the whole of what opening Options costs — which
             // is precisely the argument the lazy dictionary above is built on: a shell opened
@@ -424,6 +428,11 @@ public partial class ShellWindow : Window, IFollowingSurface
         // nothing" reading, on the room a new player is most likely to be looking at. It
         // caches its disk reads on a timer, so this is what makes the answer immediate.
         if (_rooms.TryGetValue(ShellPage.Home, out var home)) ((HomeRoom)home).Refreshed();
+        // And the Helper, whose empty states ASK for these dumps by name and hand over the
+        // command that writes them. A room still saying "run the faction command" seconds
+        // after the game wrote the file is the same "EQBuddy did nothing" reading, on the
+        // surface that just gave the instruction.
+        if (_rooms.TryGetValue(ShellPage.Helper, out var helper)) ((HelperRoom)helper).Refreshed();
         // And the first-run screen, which is the surface most likely to be ON SCREEN at the
         // moment the dump lands — it is the thing that just told the player to run the
         // command. A row still reading "Not run yet" here is the same "EQBuddy did nothing"
