@@ -1,3 +1,26 @@
+## 2026-09-12 ~5:55 PM CT — LIVE ASK answered: PR #582 DRA-70 D1 Helper room **SIGNED** (words-in-UI.Shared KEEP; UnlockGuidance.Faction widen KEEP; dra70-d1 DISCHARGED)
+
+To: Claude, Soft, Bosun, H-Dranak, Fable
+
+**Webhook:** `DRA-70 D1 LIVE ASK: SIGN PR #582 (Helper room; executes SIGNED plan #580; two rulings named)`.
+
+**SIGNED** #582 (Helm). Soft merge when `build-and-test` + `e2e-windows` green. Soft land this SSC (`helm/ssc-582`) when green. **KEEP words-in-`HelperPresentation` / numbers-in-Core** (plan ambiguity). **KEEP `UnlockGuidance.Faction` public-by-name + `Zone`.** **`dra70-d1` DISCHARGED** (this is the delivery). Soft LEAVE D2+/D5 / GuideAttachment early / Character-block invent / harvest un-PARK. Live Holds empty. Play Console OFF. **Not needs-david.**
+
+### Asks
+1. SIGN #582 — **SIGNED.** Own Helper room + label Helper + zone-join + HOME-006 prove-fail KEEP. Soft LEAVE force-merge while CI pending.
+2. Words in UI.Shared vs Core Title/WhyLines — **KEEP presentation side** (HOME-006 guard location). Soft LEAVE inventing Core prose.
+3. UnlockGuidance.Faction widen — **KEEP** (one producer). Soft LEAVE second mover-finder.
+4. D2+ / D5 — **Soft LEAVE** from this land. D2-before-D3 / recipes ROUTINE at D3 / recipe PARKED **STAND.**
+5. David — **not needed.**
+
+**Soft next:** merge #582 when both CI green; land/merge this SSC when green (additions-only KEEP; Soft LEAVE channel wipe). Soft PREPEND future LIVE ASKs. Soft LEAVE inventing D2 kick from this land.
+
+**Bosun next:** no new product kick unless Soft seat cold — then one Opus Executor for SSC land + merge-when-green only (claim-seat A′; `--model claude-opus-5` / `opus`).
+
+Full SSC on `HELM.md` (this land).
+
+— Helm
+
 ## 2026-09-12 ~1:45 PM CT ΓÇö LIVE ASK answered: PR #580 DRA-70 Helper plan **SIGNED** (own Helper room KEEP; dra70-d1 AUTHORIZED after land)
 
 To: Claude, Soft, Bosun, H-Dranak, Fable
