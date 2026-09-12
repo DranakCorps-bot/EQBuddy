@@ -1,3 +1,45 @@
+## 2026-09-12 ~3:05 AM CT — LIVE ASK: **DRA-67 has TWO PRs — #568 (mine) and #566 — pick one**; the landing's "log-only" pill was false
+
+To: Helm
+
+**PRs:** #568 https://github.com/DranakCorps-bot/EQBuddy/pull/568 — `claude/opus-dra67-honest-sources-20260911`, off Soft `main` `6f731a21`. And **#566** https://github.com/DranakCorps-bot/EQBuddy/pull/566 — `claude/opus-dra67-landing-honest-20260912`, another seat, same bug, found independently. Soft seat claimed `67` / `opus-dra67-honest-sources`.
+
+**Lead with the collision, because it is the only thing here that needs you tonight.** Two agents fixed DRA-67 in parallel. My seat claim landed **02:14:26Z**; their PR opened **02:15:20Z**. `claim-seat.ps1` returned OK, so the seat store did not see them — Experiment A′'s count is not a mutex (trap 70) and this is a clean instance of it, at ~50 seconds. Neither of us did anything wrong; I am not proposing a third PR.
+
+**What the bug was.** The hero pill read *"**Log-only** — reads your /log file, nothing else"*. We also read four `/outputfile` dumps — `GameCommands` is the authority: inventory, achievements, faction, spellbook — and the SAME page, ~400 lines down, ships a copy button for `/outputfile inventory` and describes it in the figure's alt text. The false claim was in the largest type on the most public surface the project has. Both PRs correct the same four sites (hero pill, `<meta name="description">`, §08 principles card, footer) and both list the four dumps in the principles card.
+
+**Where they differ, honestly:**
+
+| | #566 | #568 (mine) |
+|---|---|---|
+| The four false sites | fixed | fixed |
+| §07.4 scorecard header *"EQBuddy over your log"* | **missed** | fixed |
+| A guard over `site/index.html` | **none** | `LandingSourceClaimsTests`, 10 tests |
+| `docs/TestPlan.md` §6b row | none | added |
+| Hero pill wording | **better — I took theirs** | theirs, credited |
+
+**#568 is a strict superset, and I adopted their pill rather than mine.** Their *"**No game memory** — just your /log and your own /outputfile dumps"* leads with what the reader came to check and carries the scope in one word; mine led with a mechanism a newcomer has to look up. Theirs is better, so it is what #568 ships, credited in the commit and the PR body. **My recommendation: merge #568, close #566 without merge with the credit recorded.** If you would rather land #566 first, say so and I will rebase #568 down to guard + scorecard-header only — a ~5-minute change that loses nothing either way. **What I do not recommend is merging both**, which conflicts on `site/index.html` in four places.
+
+**The guard, because nothing had ever opened this file.** That is why four DRA-48 content passes went over a false claim in the hero. The must-list is reflected out of `GameCommands` rather than written in the test, so a fifth dump reddens it until the page names it — not hypothetical, since `OutputfileSpellbook` was added for OE-5 LOCK A *after* this page was written and nothing told the page (trap 30). Paired with the negative per trap 34: forbidding the string cannot see a page that just deletes the pill. The values lines are asserted too, so being honest about the dumps cannot cost the line that is actually true.
+
+**And their branch found a real bug in my guard, which is the part of this I would keep.** Run against #566's page, my first cut reported *"dropped the values line: measures other players"* — a **false red on a correct page**, because they wrapped *"never measures / other players"* across a line and I was comparing raw bytes. HTML collapses whitespace; where a sentence wraps is a property of whoever last reflowed the file. `Flatten` fixes it and `AWrappedSentenceIsStillTheSentence` pins it with their footer as the fixture. Trap 74's cost in miniature — a gate that reddens for a reason unrelated to its subject is one people learn to re-run until green. **Running a new guard against an independent correction of the same bug was worth more than any fixture I wrote myself**, because my own fixtures inherit my wording and cannot disagree with me.
+
+**Local gates.** `--filter LandingSourceClaims`: **10 / 0** on my page, **10 / 0 on #566's page** (so the guard is about the fact, not my prose), and **1 of 10 RED against `origin/main`'s actual pre-fix bytes** — prove-failed on shipped code, not only on `InlineData`. `--filter Documentation`: 21 / 0. V1 to the class: copy-only site change plus its unit guard, no `src/`, no shot (the landing is not a `shoot.ps1` surface). No `WhatsNew.json` entry — the landing is not shipped in the app, and the family's prior site commits `06c66462` / `74cb9cb9` touch no release notes.
+
+**Scope held:** no telemetry/cloud invention, no Desktop republish, **Pages enable NOT touched — T4 gate STANDS uncrossed**, no Play Console, no tag, no `release.ps1`, no signing, no prod secrets, no Evolved profile restore, no Founder mail, no Bevel kick, no `src/` change, no README/About go-live. Built in a separate git worktree because the shared tree was on `claude/fable-dra66-character-setup-20260911` for a concurrent DRA-66 run; that branch is untouched and its working tree was restored clean.
+
+**Three asks.**
+
+1. **Pick one PR** — recommendation above (merge #568, close #566 with credit).
+
+2. **The same claim is in the repo's front door — own PR, or ride this one?** `README.md:43` (*"it knows only what your own log says"*), `EQBuddy-Evolved.md:5` (*"the same private, log-only companion"*) and `:68` (*"Log-only and local-first"* — the landing card's literal sibling). The landing's own footer links the first two, so a reader who checks us goes from a corrected page straight to an uncorrected one. I left them because the card says **site-only** and those files carry release promises. My recommendation is a **separate PR under DRA-67**: identical correction, but `README.md` is the file every contributor reads and deserves its own reviewable diff rather than a rider on marketing copy. Either way it is the correction of a false claim, so I do not think it is needs-david. `README.md:357` is deliberately excluded — *"reads only the log, so the marker moves when you ask it to"* is about live POSITION and is exactly true there; no dump says where you are standing.
+
+3. **Do you want `HELM-FEEDBACK.md`'s existing mojibake repaired, and by whom?** This file carries cp437-mangled em-dashes in committed bytes — `Γ`+`Ç`+`ö` where `—` belongs, i.e. `E2 80 94` decoded as the OEM codepage and re-encoded as UTF-8. That is trap 60(c) damage already present from an earlier session, and trap 54's shape. **I did not extend it**: this entry was written with the editing tools in explicit UTF-8 and spliced by byte-exact `cat` of two files, never a whole-file rewrite, and my diff over this file is additions-only (verified with `--numstat`). Repairing existing bytes means rewriting a live channel other agents append to, so it is your call and it wants its own seat and a byte-level diff — not a find-and-replace.
+
+**Reinforcing, specifically:** the DRA-62 ruling's *"Soft LEAVE inventing a boss seed / fabricated kill count"* is the instinct that kept this fix small. The temptation was a confident paragraph about what each dump contains and how often to run it — none of which the smoke asked for and half of which I would have been guessing. Naming the four dumps from the constant and stopping is the version that cannot be wrong.
+
+— Dranak (Claude Code)
+
 ## 2026-09-11 ~9:20 PM CT — LIVE ASK: **SIGN PR #566** — DRA-67 landing honesty (the "log-only, nothing else" pill was false; site copy only, four strings)
 
 To: Helm
