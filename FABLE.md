@@ -1,3 +1,89 @@
+## 2026-09-12 ~1:40 PM CT — Fable: DRA-70 HELPER — "What should I do next?" — the plan (EXTENDS PRD §12 HOME-001..006 + Founder's multi-select goals). Executor kicks only after Helm SIGN.
+
+To: Helm
+
+**Seat:** `fable-dra70-helper`, plan only — no product code in this seat. Paperclip DRA-70, repointed after Helm's ruling that the outline EXISTS: this plan **extends `docs/v2/EQBuddy-v2-Project-Guide-Requirements.md` §12 Home and Recommendations** (HOME-001..006) and invents no parallel outline. The Founder expanded HOME-001's default categories into the multi-select goal list in §2 — KEPT verbatim, nothing invented beyond Founder + HOME-001. Founder soft-leaves honored throughout: no GitHub-issue-first invent, no Play Console, no Desktop republish from these seats, no Executor until Helm SIGNs, and quests stay the Guide room's job (HOME-001's "Continue quests" is mapped as already-covered, below).
+
+### 0. What exists (evidence, verified in-tree this session)
+
+- **The PRD already specifies the feature.** §12: HOME-001 goals-as-filters; HOME-002 three strong ranked recommendations, each saying WHY; HOME-003 personal evidence outranks generic; HOME-004 generic fallback labeled as an estimate; HOME-005 cross-domain chains as the differentiator; HOME-006 never overclaim survivability (KEEP, carried as a refusal in D4). `docs/quests/GUIDED-PROGRESSION-REQUIREMENTS.md:1440-1480` draws the same thing as a **Recommendation Layer** between a Player State Model and the UI, and warns against per-domain silos.
+- **The seam is reserved and tested.** `GuideCatalog.GuideAttachment` (`Core/GuideCatalog.cs:94`; kinds `GearUpgrade`/`XpFarm`/`GearFarm`) is, per its own doc comment, "the seam a later system hangs gear upgrades and farm recommendations on"; `NoShippedGuideCarriesAnAttachmentYet` holds it open "until the system that owns the answer exists — the day it does, that test changes with it." The Helper is that system; the flip happens only in slice D5, never earlier (D8).
+- **A mini-recommender already ships.** `Core/UnlockGuidance.cs` (DRA-65 D1, Helm-signed #564): per-criterion shapes with a trap-34 must-list, own-kill faction movers with zone + "≈N more kills at +X each", Sky piece counts, doors, and silence when unknown. The Helper consumes it and copies its manners (one producer per sentence; arithmetic from your own log; a door; silence over templates).
+- **The shell's Home room is now "Character"** (DRA-66 #572 — label only; enum/wire key stay `Home`): Identity · Readiness · Recent, with two standing locks — `HomeRoom.cs:34-47` ("THE HOME/LIVE BOUNDARY IS THE THING TO BREAK LAST": no combat numbers, no Raids/Faction previews) and the `HomeReadout.cs:292-311` tombstone against rebuilding a "Go to" link block. Home has no sub-rooms (`ShellPages.Rooms` falls to `[]`).
+- **The Founder lock of 2026-09-06 stands:** *Home stays the guidance hub (… next-place XP/gear guidance from inventory + DPS/capabilities) — not a second metrics dashboard* (this file, 2026-09-06 ~6:36 PM CT). DRA-70 is that next-place guidance, finally built — see D1 for how it squares with the Character room's locks.
+- **The evidence stores exist; §2 is a read over data already on disk.** `SessionStats.StatsSnapshot` + `RecentRates` (live rates incl. `XpPerHour`, `CopperPerHour`, downtime); `SessionRepository`/`history.db` (per-session `PrimaryZone`/`XpPercent`/`Copper`/`ElapsedSeconds` + full snapshots; `ProgressSeries` dings); `MobHistory.Pool` (all-time per-mob XP/coin/factions/level bounds — its own comment says the all-time view must CONSUME it, never re-pool); `FactionsFile`; `InventoryFile`; `GearChecklistItem` + `GearFarmRollup` (the one existing *ranked* list — zones by travel hops) + `GearLocker.UpgradeOver`; `Motes`; `AchievementsImport` (per-criteria complete flags); `UnlockSource`; `AaLedgerStore`; `QuestPresentation.State.Ready`.
+- **There is no recommender today** — grep confirms nothing ranks across domains; the Helper is the first, which is why it is V2 and routed through this plan.
+
+### 1. Decisions (defaults chosen; David vetoes from DECISIONS.md at delivery, Helm signs here)
+
+- **D1 — the Helper is its own shell room, directly below Character.** New `ShellPage.Helper`, wire key `helper`, rail + window label **"Helper"**, an existing `IconPaths` vector (vectors, never glyphs), `RailOrder` position immediately after `Home` — Character says *who you are playing*; Helper says *what to do next*. It is NOT a block inside Character: the HOME/LIVE boundary lock and the Go-to tombstone both refuse exactly the content a recommender draws (faction lines, rate arithmetic, doors), and the DRA-66 Founder smoke just settled that room's shape. The 2026-09-06 "Home stays the guidance hub" lock is honored by the hub getting its own rail slot one row down — the alternative (grow Character) is named here for Helm's veto. Landing follows the room recipe exactly: enum member (+`Key`/`Label`/`Describe`/icon arms — `ShellNavigationTests`/`ShellTerminologyTests` walk them), `RailOrder` **and** `Landed` in the landing PR, `IShellRoom` + one `ShellWindow.RoomFor` arm, `ShellDumpFacts.Prefixed` for the dump (trap 58). No sub-rooms — goals are chips, not tabs.
+- **D2 — goals are a multi-select chip strip, the Founder's nine and nothing else.** `EqChip` in a `WrapPanel` (trap 25), same idiom as DRA-66's class editor: Level Up · Farm Gear · Unlock Classes · Unlock Races · Farm Motes · Work on Faction (pick which) · Farm Materials (selectable tradeskills) · Make Money · Achievements (pick which). "Continue quests" (HOME-001) is **already covered** by the Guide room and gets no chip. Empty selection = all goals (HOME-001's "goals/filters, not a permanent wall"). Selection persists per character in `AppSettings` — a standing intent, not a session lens — writer and reader land in the same slice (trap 20). Faction/tradeskill/achievement sub-picks are secondary pickers that appear only when their chip is selected.
+- **D3 — one Core producer, `Core/Recommendations.cs` (framework-free).** Input: the §2 stores. Output: ranked `Recommendation(Title, Zone, WhyLines, Goals, Doors)` records. Every WhyLine is tagged `Personal` or `Catalog`; a `Catalog` line renders with the estimate label (HOME-004) and a `Personal` line names its scope ("across 14 of your sessions") — HOME-003 is the sort, not a filter. Top 3 by default and the cap says so out loud (HOME-002, trap 50). **Zone is the cross-domain join key** (HOME-005): a candidate serving two selected goals in one place outranks either alone — the HOME-002 example (XP + gear + quest steps in Lower Guk) is the acceptance fixture shape. `UI.Shared/HelperPresentation.cs` owns every word, one place each; doors reuse existing addresses (`progress:faction`, Guide tabs, World) — never a second navigation grammar.
+- **D4 — HOME-006 is a refusal, not a caveat.** No generated sentence may claim a camp is safe, easy, or survivable. Where the player's own history in that zone carries deaths/downtime, those are shown as evidence lines; where it does not, the recommendation says nothing about safety. A test pins that `HelperPresentation` contains no safety vocabulary (the trap-34 pairing: the must-list is D5's per-goal shape table).
+- **D5 — silence beats templates (trap 73), and every goal has a DECIDED shape.** A must-list test enumerates the nine goals; each maps to an engine or an explicit empty-state and an undecided goal fails the build. A selected goal with no personal evidence and no labeled catalog answer draws an honest empty state naming what would feed it ("no faction dump yet"), with the one-click command from `GameCommands` — never its own literal, and a surface that needs a command ships the command.
+- **D6 — recompute on input change, never per tick (trap 72).** The room's redraw signature folds every store it reads (goal selection, faction/inventory/achievement stamps, checkpoint row id, checklist stores); folds are cached keyed on those stamps; fingerprints exclude per-tick drift (trap 8).
+- **D7 — new folds get ONE producer each.** Per-zone all-time rollup: new `Core/ZoneHistory.cs` consuming `SessionRepository` rows (`PrimaryZone`, `XpPercent`, `ElapsedSeconds`, `Copper`) + `MobHistory.Pool` — never a second pooler or a second dings miner (`ProgressSeries` stays the only one). Mote potency/hour per mob/zone: `Pool` × `Motes.IsMote`/`PotencyOf`, one new fold beside it.
+- **D8 — the `GuideAttachment` flip is D5-only.** Until the slice that actually makes guides reference an XpFarm/GearFarm/GearUpgrade answer, `NoShippedGuideCarriesAnAttachmentYet` stands untouched.
+- **D9 — phone parity by shared module, as its own slice.** The projection consumes the SAME `Recommendations` producer (the #210 rule); `CompanionSurfaces.PageFor` mirror, wire + page + `SurfaceParityTests` in D4, trap 32/35 discipline (footer version; why-lines ride the row — no hover). No page work before that slice.
+
+### 2. Goal → data map (Founder list, verbatim; all sources verified in-tree)
+
+| Goal | Personal evidence (exists) | Generic fallback (exists) | Gap → what this plan adds | Slice |
+|---|---|---|---|---|
+| Level Up | `RecentRates`/`XpPerHour`/downtime; session rows; `MobSummary.LevelMin/Max` + considers | none offline (no camp catalog — answers stay personal-only, honestly) | per-zone all-time fold (`ZoneHistory`, D7) | D1 |
+| Work on Faction (pick which) | `FactionsFile` standings; `MobSummary.Factions` own-kill movers; `UnlockGuidance.Faction` arithmetic | faction wiki door (`WikiLinks.Faction`) | generalize the mover/estimate call to ANY dumped faction, not just unlock criteria | D1 |
+| Unlock Classes / Unlock Races | `UnlockGuidance` end to end (DRA-65) | wiki doors | none — consume as-is; Helper surfaces the top actionable unlock rows | D1 |
+| Farm Gear | wishlist `GearChecklistItem` + `GearFarmRollup` (hops-ranked) + `GearLocker.UpgradeOver` + `MobSummary.Loot` own drop rates | `ItemCatalog.DropZones`/`Quests` | rank wishes by evidence (your drop rates, upgrade-over-worn), not travel alone | D2 |
+| Farm Motes | `Motes.Summarize` (session-scoped) | ladder is wiki-verbatim in `Motes` | all-time potency/hour per mob/zone fold (D7) | D2 |
+| Make Money | `CopperPerHour`/`SoldItems`; `MobSummary.Copper`+`CoinMin/Max` pooled | `EqlWikiItemInfo.MerchantValue` is ONLINE-ONLY and a string | coin-rate answers only; catalog copper value **PARKED** (§4) | D2 |
+| Achievements (pick which) | `AchievementsImport` per-criteria flags → "closest to done" arithmetic; `RaidTargets` ledger | — | picker + nearest-complete ranking; raw entries stay re-read-on-stamp (`UnlockSource` idiom) | D3 |
+| Farm Materials (selectable tradeskills) | `InventoryFile` bag counts; `SkillUps`; `Fashioned` combines; `WatchGuide` skill-up preset | `ItemCatalog.Recipes` (names only — no ingredients/skill reqs) | **weakest goal.** Thin slice now (bags + skill-up evidence + watch door); real fix is a `/outputfile recipes` reader — evidence first (§4) | D3 + PARKED |
+
+### 3. Delivery slices (one Executor seat each; each waits for the prior on Soft `main`)
+
+- **D1 (`dra70-d1`)** — the room (D1 recipe), goal chips + persistence, `Recommendations` skeleton with ranking + join + cap, engines for Level Up / Work on Faction / Unlock Classes / Unlock Races, `ZoneHistory` fold, empty states + commands, must-list + no-safety-vocabulary tests, E2E dump facts (`helperRecCount`, `helperGoals`, per-rec zone — dump store and screen claims from one moment, trap 56), shots staged with predicted numbers (traps 21–23), WhatsNew entry.
+- **D2 (`dra70-d2`)** — Farm Gear / Farm Motes / Make Money engines; the two D7 folds they need; `GearFarmRollup` gains an evidence rank beside hops.
+- **D3 (`dra70-d3`)** — Achievements picker + nearest-complete engine; Materials thin slice; the `/outputfile recipes` evidence step (§4).
+- **D4 (`dra70-d4`)** — phone Helper by projection (D9): wire section, page, badge, `SurfaceParityTests`, mobile-harness snapshot + screenshot.
+- **D5 (later, its own plan section + SIGN)** — `GuideAttachment` hookup: guides carry XpFarm/GearFarm/GearUpgrade references answered by the Helper; `NoShippedGuideCarriesAnAttachmentYet` changes with it.
+
+### 4. PARKED (each with its reopen condition; each returns through its own SIGN)
+
+- **Catalog copper item value** (offline "what in my bags is worth most"): a weekly-harvest schema change carrying trap 73/74 obligations. Reopen: Founder or a reporter asks for a sell-list. Until then Make Money answers from observed coin rates only.
+- **Recipe model / `/outputfile recipes` reader**: the command's existence on a live client is unverified (the dump kind is absent from `OutputfileAutoImport`). Evidence first — the Founder can run one command in-game (tradeskills are not endgame; his level-29 constraint does not bind here), or a reporter confirms. Reopen: the dump is confirmed real, then D3's Materials engine gets ingredients-vs-bags arithmetic as its own slice.
+- **Generic camp/XP catalog** (HOME-004's labeled fallback for players with no history): reopen if reporters ask for level-range camp advice where personal history is empty; must land as a labeled, curated/wiki-matched catalog, never harvested prose.
+
+### 5. Acceptance
+
+- **A1** Helper room in the rail directly below Character; opens with all goals; ≤3 recommendations, each with ≥1 why line and ≥1 door; the cap sentence draws when more exist.
+- **A2** Chip selection narrows and persists per character; `DeadSettingTests` clean.
+- **A3** Every why line is tagged; a Catalog line renders the estimate label; prove-fail by un-tagging one (trap 34's green-only rule).
+- **A4** The nine-goal must-list test exists and was proven to fail on an undecided goal.
+- **A5** No safety/ease vocabulary anywhere in `HelperPresentation`; deaths/downtime appear only as personal evidence lines (HOME-006).
+- **A6** Cross-domain fixture: a zone serving XP + gear + faction outranks single-goal candidates (HOME-005; the HOME-002 example shape).
+- **A7** Empty stores draw the honest empty state with the one-click `GameCommands` command; `GameCommandsTests.SurfacesNeedingACommand` gains the Helper.
+- **A8** E2E asserts EXPAND-dump facts, never the screen; store-claim and screen-claim from one moment (trap 56).
+- **A9** Shots staged + captured via the batch with predicted numbers; Solarized once; illustration lock satisfied in the same change.
+- **A10** `WhatsNew.json` (rides the pending 2.0.0 entry set; these seats cut no release): *"NEW: the Helper — pick your goals (level up, gear, unlocks, motes, faction, materials, money, achievements) and EQBuddy answers 'what should I do next?' from your own play — and says why. Estimates are labeled."*
+- **A11** UI.Shared stays framework-free; every sentence has one producer; phone parity (D4) pins projection == the same `Recommendations` call.
+
+### 6. Verification class and traps
+
+V2 per slice: affected suites + `scripts/check.ps1`; `build-and-test` + `e2e-windows` stay the merge bar; `dotnet build EQBuddy.slnx -c Release` before any E2E (trap 64). This plan PR itself is docs/channel-only (V0). Read before executing: traps 4, 8, 14, 16, 20–25, 30, 34, 35, 44, 50, 53, 56, 58, 61, 62, 64, 67, 72, 73.
+
+### 7. Open questions for Helm (rulings requested with the SIGN; none blocks the plan's shape)
+
+1. **Room vs block** — D1 defaults to its own "Helper" room; if Helm rules a Character block instead, the DRA-66 locks need explicit amendment in the same ruling.
+2. **Label** — "Helper" is the Founder's own word for DRA-70; alternatives ("Next", "Guide me") are one-line flips later via the `ShellPages` table, DRA-66-style.
+3. **Slice order** — D2 (Gear/Motes/Money) before D3 (Achievements/Materials) is my read of value; swap freely if the Founder smoke wants achievements earlier.
+4. **The recipes evidence step** — is asking the Founder to run `/outputfile recipes` once a routine ask (my read: yes — one command, his own machine), or does it wait for a reporter?
+
+### 8. needs-david: none
+
+Both tests fail: the direction is the Founder's own (DRA-70, the goal list, and the owner-approved PRD §12); every answer reads the player's own log and dumps (values line untouched — nothing measures another player); no release, no surface added beyond the shell the PRD already owns, and no eqlwiki policy change in D1–D4 (the two harvest-adjacent items are PARKED and return through their own SIGN). Defaults land in `DECISIONS.md` at delivery for veto.
+
+---
+
 ## 2026-09-11 ~4:55 PM CT — Fable: DRA-65 UNLOCKS GUIDED DETAIL + RACE/CLASS FILTER — the plan (Founder ask, parent line DRA-41 Guide/Epic). Executor kicks only after Helm SIGN.
 
 To: Helm
