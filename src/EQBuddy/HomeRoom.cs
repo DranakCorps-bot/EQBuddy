@@ -10,12 +10,17 @@ namespace EQBuddy;
 /// <summary>
 /// The HOME room — the sixth room of the Evolved shell, and the first one that is a NEW
 /// surface rather than a move or a lift. Bevel's Home pre-design, Helm-signed 2026-09-05
-/// ~5:20 AM CT.
+/// ~5:20 AM CT. **A player reads "Character Setup" since DRA-66** (Founder smoke: *"nothing
+/// home about it; the page only helps capture game data for the rest of EQBuddy"*) — the
+/// class name, the enum member and every <c>shellHome*</c> key deliberately did not move,
+/// the same discipline as the Quests room reading "Guide" (<see cref="ShellPages.Label"/>).
 ///
 /// **Three blocks: Identity · Readiness · Recent session.** They answer, in order, who
 /// EQBuddy is following, what it is missing, and where you left off — which is
-/// <see cref="ShellPages.Describe"/>'s one-line pitch for this room, three clauses, written
-/// before the room existed and unchanged by it.
+/// <see cref="ShellPages.Describe"/>'s one-line pitch for this room. DRA-66 put the class
+/// reading and its correction inside the Identity block: WHO you are playing includes what
+/// the character is, and the one answer every class-aware surface already shares
+/// (<c>ClassSourceFor</c>) is finally shown somewhere a player can argue with it.
 ///
 /// **The fourth was "Go to", and the Founder cut it on 2026-09-11 (DRA-63 smoke).** Bevel's
 /// door 1 locked four blocks when the rail had one room on it; once every room had landed it
@@ -91,6 +96,18 @@ internal sealed class HomeRoom : Grid, IShellRoom
     private int _deadLinks;
     private bool _empty;
 
+    // ---- the class reading (DRA-66) ----
+    // Captured once per Render so the fingerprint, the line and the dump all describe the
+    // same moment (trap 56's rule about two numbers from one thing).
+    private IReadOnlyList<string> _classes = [];
+    private ClassSource _classSource = ClassSource.Unknown;
+    private List<string> _stated = [];
+    /// <summary>Whether the class chip strip is open. Survives the rebuild a tick causes —
+    /// the strip's own state lives in the store, but "the player is mid-edit" would
+    /// otherwise be thrown away by the first repaint under their pointer.</summary>
+    private bool _editingClasses;
+    private int _classChips;
+
     public HomeRoom(MainWindow main, Action<string> navigate)
     {
         _main = main;
@@ -158,16 +175,27 @@ internal sealed class HomeRoom : Grid, IShellRoom
         var identity = Who();
         ReadSources(identity, s);
 
+        // The class reading — the SAME resolution the quest window and the phone read
+        // (ClassSourceFor), so this room can never name a different character than they do.
+        // Read every tick rather than behind SourceCacheFor: it is dictionary copies, not
+        // disk, and a cast that finally qualifies a class should not wait five seconds.
+        (_classes, _classSource) = _main.ClassSourceFor(s);
+        _stated = _main.QuestLedger?.StatedClassesFor(_main.QuestCharacterKey) ?? [];
+
         // The fingerprint is what the three blocks are BUILT from, so a tick that changed
         // nothing costs one string compare instead of a torn-down visual tree. It carries no
         // countdown and no age — trap 8's rule, and the reason nothing on this surface says
         // "x ago": a value that ticks makes every tick a rebuild, which is the same defect
-        // as no gate at all.
+        // as no gate at all. The class line's inputs are in it (trap 72: a reader of a
+        // store belongs in what makes its surface redraw), and so is the editor's own
+        // open/shut — a door whose click repainted nothing would read as stuck.
         var key = string.Join('|',
             identity.Character, identity.Server, s.CurrentZone,
             _session.State, _session.EndedLocal?.Ticks ?? 0, _session.Zone,
             _session.Elapsed.Ticks, _session.XpPercent, _session.Copper, _session.LootCount,
             string.Join(',', _readiness.Select(r => $"{r.Kind}{r.State}{r.ScannedAt?.Ticks ?? 0}")),
+            string.Join(',', _classes), _classSource, string.Join(',', _stated),
+            _editingClasses,
             ShellPages.Landed.Count);
         if (key == _painted) return;
         _painted = key;
@@ -198,6 +226,7 @@ internal sealed class HomeRoom : Grid, IShellRoom
         _copyCommands = 0;
         _links = 0;
         _deadLinks = 0;
+        _classChips = 0;
 
         // **The whole-room empty, and the only state that gets one.** With no character
         // there is nothing for any of the three blocks to be about, and three separate "we do
@@ -251,6 +280,97 @@ internal sealed class HomeRoom : Grid, IShellRoom
         name.Ink("AccentBrush");
         block.Children.Add(name);
         block.Children.Add(Line(HomeReadout.IdentityDetail(identity, s.CurrentZone), Role.Body));
+        BuildClassLine(block);
+    }
+
+    /// <summary>
+    /// The class reading and its correction (DRA-66): what EQBuddy thinks this character
+    /// is, where that came from, and the door to say otherwise. The words are all
+    /// <see cref="HomeReadout"/>'s; the STORE is the ledger's per-character
+    /// <c>StatedClasses</c>, which <c>CharacterClasses.Resolve</c> honours for every
+    /// surface at once — this strip is a writer of that one store, never a second
+    /// resolution (trap 33).
+    /// </summary>
+    private void BuildClassLine(StackPanel block)
+    {
+        _classChips = 0;
+        var line = Line(HomeReadout.ClassAnswer(_classes, _classSource), Role.Body);
+        line.Margin = new Thickness(0, Tok.SpaceXs, 0, 0);
+        block.Children.Add(line);
+
+        // No character KEY yet (the log has named a character but the ledger has not keyed
+        // one) — nothing to write a statement onto, so no door to a strip that could not
+        // save. The line above still answers; the door returns with the key.
+        if (_main.QuestLedger is null || _main.QuestCharacterKey.Length == 0) return;
+
+        var door = DesignSystem.Text(Role.Caption,
+            _editingClasses ? HomeReadout.EditClassesDone : HomeReadout.EditClasses);
+        door.Ink("AccentBrush");
+        door.HorizontalAlignment = HorizontalAlignment.Left;
+        door.Margin = new Thickness(0, Tok.SpaceXxs, 0, 0);
+        DesignSystem.WireClick(door, () =>
+        {
+            _editingClasses = !_editingClasses;
+            Repaint();
+        });
+        block.Children.Add(door);
+
+        if (!_editingClasses) return;
+
+        var note = Line(HomeReadout.ClassEditorNote, Role.BodySecondary);
+        note.Margin = new Thickness(0, Tok.SpaceXs, 0, 0);
+        block.Children.Add(note);
+
+        // A WrapPanel, never a horizontal StackPanel — sixteen chips at any width is the
+        // canonical trap-25 strip.
+        var wrap = new WrapPanel { Margin = new Thickness(0, Tok.SpaceXs, 0, 0) };
+        foreach (var cls in QuestClassFilter.Classes)
+        {
+            var chip = new EqChip(cls, cls, onClick: () => ToggleStated(cls));
+            chip.SetSelected(_stated.Contains(cls, StringComparer.OrdinalIgnoreCase));
+            wrap.Children.Add(chip);
+            _classChips++;
+        }
+        block.Children.Add(wrap);
+
+        if (_stated.Count > 0)
+        {
+            var clear = DesignSystem.Text(Role.Caption, HomeReadout.ClearStated);
+            clear.Ink("AccentBrush");
+            clear.HorizontalAlignment = HorizontalAlignment.Left;
+            clear.Margin = new Thickness(0, Tok.SpaceXs, 0, 0);
+            DesignSystem.WireClick(clear, () => WriteStated([]));
+            block.Children.Add(clear);
+        }
+    }
+
+    private void ToggleStated(string cls)
+    {
+        var stated = new List<string>(_stated);
+        if (stated.RemoveAll(c => c.Equals(cls, StringComparison.OrdinalIgnoreCase)) == 0)
+        {
+            // The cap is announced in the note above the chips; a fourth tick changes
+            // nothing rather than silently evicting a class the player chose first.
+            if (stated.Count >= CharacterClasses.Max) return;
+            stated.Add(cls);
+        }
+        WriteStated(stated);
+    }
+
+    private void WriteStated(List<string> stated)
+    {
+        if (_main.QuestLedger is not { } ledger || _main.QuestCharacterKey.Length == 0) return;
+        ledger.SetStatedClasses(_main.QuestCharacterKey, stated);
+        Repaint();
+    }
+
+    /// <summary>Repaint NOW: a click must not wait for the next tick to look like it
+    /// happened. The fingerprint would catch every one of these changes anyway — this only
+    /// moves the moment.</summary>
+    private void Repaint()
+    {
+        _painted = "";
+        Render(_main.CurrentSnapshot());
     }
 
     private void BuildReadiness()
@@ -357,5 +477,12 @@ internal sealed class HomeRoom : Grid, IShellRoom
         // The readiness rows' "Open" links since DRA-63 — the only navigation this body has.
         $"shellHomeLinks={_links} " +
         // Must be 0, always. See BuildReadiness.
-        $"shellHomeDeadLinks={_deadLinks}";
+        $"shellHomeDeadLinks={_deadLinks} " +
+        // The class reading (DRA-66): how many classes the line names, where they came
+        // from, and — when the editor is open — that all sixteen chips were BUILT (trap 29:
+        // an absent control photographs as an unremarkable panel).
+        $"shellHomeClasses={_classes.Count} " +
+        $"shellHomeClassSource={_classSource.ToString().ToLowerInvariant()} " +
+        $"shellHomeStated={_stated.Count} " +
+        $"shellHomeClassChips={_classChips}";
 }

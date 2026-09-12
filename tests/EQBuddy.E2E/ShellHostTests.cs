@@ -669,6 +669,19 @@ public class ShellHostTests
         // The floor that stops the zeroes above reading as coverage (trap 39): the room DID
         // render, and it rendered the readiness rows the "Open" would have hung off.
         Assert.Equal(4, app.DumpValue("shellHomeReadiness"));
+
+        // The class reading (DRA-66) is ON the identity block of the launched app — the
+        // unit suite owns the words and the precedence, this owns "the line is there".
+        // The SOURCE is whatever the fixture log earned (a profile with no dumps and no
+        // statement can only be unknown or inferred — a "picked" or "stated" here would
+        // mean state leaked into a fresh profile), nobody has STATED anything, and the
+        // editor's sixteen chips are not built while its door is shut (trap 29 is why the
+        // count exists; 0 is this state's honest number).
+        var source = app.DumpText("shellHomeClassSource");
+        Assert.True(source is "unknown" or "inferred",
+            $"a fresh profile's class source was '{source}'; dump was: {app.Artifacts()}");
+        Assert.Equal(0, app.DumpValue("shellHomeStated"));
+        Assert.Equal(0, app.DumpValue("shellHomeClassChips"));
     }
 
     /// <summary>

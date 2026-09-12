@@ -11,6 +11,12 @@ public enum ClassSource
     /// <summary>The character's own achievements dump named them. The game's statement.</summary>
     Achievements,
 
+    /// <summary>The player told EQBuddy, on Character Setup (DRA-66). Their statement about
+    /// who the character IS — weaker than the game's, stronger than any guess. Safe to add
+    /// mid-enum: nothing persists or wires the NUMBER, only <see cref="CharacterClasses.SourceLabel"/>'s
+    /// string ever leaves the process.</summary>
+    Stated,
+
     /// <summary>Read from what the log shows being cast and used.</summary>
     Inferred,
 
@@ -56,10 +62,19 @@ public static class CharacterClasses
     /// (<see cref="ClassInference.CurrentClasses"/>).</param>
     /// <param name="picks">The Quest Tracker's picked classes — a lens that may WIDEN the
     /// answer and may never narrow it.</param>
+    /// <param name="stated">What the player set on Character Setup (DRA-66) — their own
+    /// statement about who the character IS, which is a different fact from
+    /// <paramref name="picks"/> (#104: a pick may be a friend's class). **A non-empty
+    /// stated list SILENCES inference**, because "correct EQBuddy's guess" is the whole
+    /// reason the control exists — a correction the guess could keep arguing with would
+    /// not be one. It does not silence the dump: the game's statement is better evidence
+    /// than anyone's memory of a character screen, and the two union the same way the
+    /// dump and inference always have.</param>
     public static (IReadOnlyList<string> Classes, ClassSource Source) Resolve(
         IReadOnlyList<string>? unlocked,
         IReadOnlyList<string>? inferred,
-        IReadOnlyList<string>? picks)
+        IReadOnlyList<string>? picks,
+        IReadOnlyList<string>? stated = null)
     {
         var classes = new List<string>(Max);
         var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
@@ -78,7 +93,15 @@ public static class CharacterClasses
         // snapshot must not silence live evidence.
         Add(unlocked);
         var source = classes.Count > 0 ? ClassSource.Achievements : ClassSource.Unknown;
-        Add(inferred);
+
+        // The player's statement joins the dump's — and while one exists, the guess stays
+        // out entirely (see the parameter note: a correction inference could keep arguing
+        // with is not a correction).
+        var hasStated = stated is { Count: > 0 };
+        if (hasStated) Add(stated);
+        if (source == ClassSource.Unknown && classes.Count > 0) source = ClassSource.Stated;
+
+        if (!hasStated) Add(inferred);
         if (source == ClassSource.Unknown && classes.Count > 0) source = ClassSource.Inferred;
 
         // Picks widen. They also answer alone for a player who has never dumped and whose
@@ -107,6 +130,11 @@ public static class CharacterClasses
     public static string SourceLabel(ClassSource source) => source switch
     {
         ClassSource.Achievements => "from your achievements",
+        // The fourth reads in parallel with the other three ("from your …"): a source,
+        // no verb, no instruction. It names the Character Setup control that wrote it,
+        // because "from you" would leave the player who forgot setting it no way back
+        // to the place that can unset it.
+        ClassSource.Stated => "from your setup",
         ClassSource.Inferred => "inferred from your log",
         ClassSource.Picked => "from your picks",
         _ => "",

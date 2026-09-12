@@ -366,7 +366,7 @@ public sealed class GuideProgressStoreTests : IDisposable
         string[] populated =
         [
             "Items", "Tracked", "Hidden", "Completed", "Classes",
-            "UnlockedClasses", "Level", "Guides", "LastInventoryReconcile",
+            "UnlockedClasses", "StatedClasses", "Level", "Guides", "LastInventoryReconcile",
         ];
         Assert.Equal(
             populated.OrderBy(n => n, StringComparer.Ordinal),
@@ -381,6 +381,7 @@ public sealed class GuideProgressStoreTests : IDisposable
             Completed = { ["Rogue Epic"] = 2 },
             Classes = { "Warrior" },
             UnlockedClasses = { "Warrior", "Monk" },
+            StatedClasses = { "Druid" },
             Level = 29,
             Guides =
             {

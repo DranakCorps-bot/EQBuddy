@@ -121,9 +121,12 @@ public class SetupReadoutTests
         Assert.NotEmpty(SetupReadout.Done);
         Assert.Contains("not open this by itself again", SetupReadout.ReopenNote,
             StringComparison.OrdinalIgnoreCase);
-        // Both ways back are named, because only one of them is this screen: Home keeps
-        // asking, Settings re-opens.
-        Assert.Contains("Home", SetupReadout.ReopenNote, StringComparison.Ordinal);
+        // Both ways back are named, because only one of them is this screen: the room the
+        // shell opens on keeps asking, Settings re-opens. The room's PLAYER name — the
+        // sentence must say the word on the rail, and that word is ShellPages.Label's to
+        // own (it read "Home" until DRA-66).
+        Assert.Contains(ShellPages.Label(ShellPage.Home), SetupReadout.ReopenNote,
+            StringComparison.Ordinal);
         Assert.Contains("Behavior", SetupReadout.ReopenNote, StringComparison.Ordinal);
     }
 

@@ -238,6 +238,52 @@ public class HomeRoomTests
         Assert.Equal("test", HomeReadout.IdentityDetail(Me, ""));
     }
 
+    // ---- 3b. the class reading and its correction (DRA-66) ----------------------
+
+    /// <summary>The class line always says where the reading came FROM — "Warrior · Druid"
+    /// is a different sentence depending on whether the game said it, the player did, or a
+    /// heuristic guessed it, and the parenthetical is the one word carrying that
+    /// difference (the quest window's identity note has worked this way since #104).</summary>
+    [Fact]
+    public void TheClassLineNamesTheListAndItsSource()
+    {
+        Assert.Equal("Warrior · Druid (inferred from your log)",
+            HomeReadout.ClassAnswer(["Warrior", "Druid"], ClassSource.Inferred));
+        Assert.Equal("Monk (from your setup)",
+            HomeReadout.ClassAnswer(["Monk"], ClassSource.Stated));
+    }
+
+    /// <summary>No class yet is a SENTENCE, not a blank — a silent line here would tell a
+    /// brand-new player nothing is missing (the readiness block's own rule). It names both
+    /// ways an answer arrives: by itself from the log, or from the player — the second half
+    /// being the room's whole job under its DRA-66 name.</summary>
+    [Fact]
+    public void AnUnknownClassIsASentenceNamingBothWaysForward()
+    {
+        var line = HomeReadout.ClassAnswer([], ClassSource.Unknown);
+        Assert.Equal(HomeReadout.EmptyClass, line);
+        Assert.Contains("cast", line, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("set it yourself", line, StringComparison.OrdinalIgnoreCase);
+    }
+
+    /// <summary>The editor's own words: the cap is ANNOUNCED (so the fourth chip refusing
+    /// is a stated rule rather than a silent no-op), the door and its open-state label are
+    /// different (a "Save" over already-saved state would be a lie), and the way back
+    /// names whose reading returns. "Override" stays banned here for the same reason it
+    /// was struck from the quest picker — being told to override your own character is a
+    /// strange thing for an app to say.</summary>
+    [Fact]
+    public void TheEditorAnnouncesItsCapAndItsWayBack()
+    {
+        Assert.Contains("three", HomeReadout.ClassEditorNote, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("stops guessing", HomeReadout.ClassEditorNote, StringComparison.OrdinalIgnoreCase);
+        Assert.NotEqual(HomeReadout.EditClasses, HomeReadout.EditClassesDone);
+        Assert.Contains("EQBuddy's own reading", HomeReadout.ClearStated, StringComparison.Ordinal);
+        foreach (var words in new[] { HomeReadout.ClassEditorNote, HomeReadout.EditClasses,
+                                      HomeReadout.ClearStated, HomeReadout.EmptyClass })
+            Assert.DoesNotContain("override", words, StringComparison.OrdinalIgnoreCase);
+    }
+
     /// <summary>
     /// **Never-scanned and healthy are two states with one shape, and collapsing them is
     /// the failure Bevel named**: silence tells a player who has never run the command that
