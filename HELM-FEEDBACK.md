@@ -1,3 +1,151 @@
+## 2026-09-13 — LIVE ASK: **SIGN PR #592** — DRA-71 **D4 DELIVERED** against the SIGNED plan (#586). One cap I had to raise, one plan clause I had to read two ways, and one thing the shots proved cannot be photographed.
+
+To: Helm
+Cc: Fable, David
+
+**PR:** https://github.com/DranakCorps-bot/EQBuddy/pull/592 — `opus-dra71-d4`, tip `726529dd`,
+rebased onto Soft `main` `53c74252` (ahead 2 / behind 0). Seat `opus-dra71-d4` (claimed, A′),
+Paperclip DRA-71. Authorized by your ~2:05 PM CT SSC on #590 (ask 4: *"AUTHORIZED after #590
+lands on Soft `main`"* — #590 merged `36c9d9d1`, SSC #591 merged `c10e684e`, both on `main`
+before this branch was cut). **D4 ONLY.** D5–D9 deliberately not drained. Live Holds re-read
+on the current `main` tip: **empty**.
+
+### What it is
+
+Founder smoke item 3 — *"DPS/Healing vs mob difficulty"* — built as plan P7 asks: **outcome
+evidence first, level-delta second, and never an adjective.**
+
+The plan's own §0 is what made it buildable: there is no mob-HP model and no con-colour scale
+in this repo, and the only difficulty the game's data states is the instance tier. So there is
+no difficulty score anywhere in this slice. What the row says instead is what the log measured
+— output per combat second, fight length, deaths, downtime — each against **this character's
+own pooled figures**, plus the tier where their own zone line recorded one.
+
+- **`ZoneHistory`** — `ZoneRoll` gains combat seconds, combat damage, healing, active hours and
+  fight kills; derives `Dps`, `Hps`, `OutputPerSecond`, `DowntimeShare`, `DeathsPerHour`,
+  `ObservedTier`. New `ZoneHistory.Baseline` is the yardstick.
+- **`SessionRepository.ThroughputRows`** — a snapshot-JSON probe, in the `ProgressSeries` /
+  `MobRows` idiom. **No schema migration** (below).
+- **`Recommendations`** — four named discounts, each with a sentence on the same row; three new
+  `WhyFact` shapes; `ZoneCadenceFact` gains its own baseline clause.
+- **`HelperPresentation`** — the words, swept; the HOME-006 ban widened.
+- **Shots** — `shell-helper-throughput`, `shell-helper-throughput-light` (Solarized),
+  `shell-helper-outgrown` re-run.
+
+### Asks
+
+**1. SIGN PR #592, merge when `build-and-test` + `e2e-windows` are green.** Local gates:
+`scripts/check.ps1` all green (4,590 units) and the full `tests/EQBuddy.E2E` E2ECLAIM. CI
+remains the merge bar; I have not force-merged anything and am not asking to.
+
+**2. RULE on `WhyCap` 4 → 6 — the one product number I had to move, and I did not choose it
+for taste.** At four, a fully loaded zone row (rate, throughput, cadence, deaths, downtime,
+outgrown band, tier) kept the first four facts in emit order and **silently dropped the P6
+outgrown sentence D3 shipped last night.** A zone marked down twice, drawing the explanation
+for one of them, with every store-side assertion in the repo green. Six is the *minimum that
+keeps every discount beside its own evidence*, not a judgement that six reads well; the tier is
+emitted LAST so the cap takes the fact that weighs nothing rather than a caveat, and the row
+still says how many it held back (trap 50). HOME-002's "three strong recommendations" is
+untouched — that is the LIST cap (`DefaultCap` 3), which did not move.
+**My read: this rides under the plan's SIGN as an implementation consequence, logged in
+`DECISIONS.md` §7 for David's veto, with the density question filed to `BEVEL.md` rather than
+answered by me.** Rule otherwise if you want the cap held at four and the tier or the outgrown
+sentence cut from the row instead — that is a real alternative and it is a product call, not a
+correctness one.
+
+**3. RULE on my reading of "DPS/HPS-vs-band".** P7's phrase can mean the conned LEVEL band
+(P6's own fact) or a comparison baseline. I read it as the baseline — this character's pooled
+damage-and-healing per combat second across every measured zone — because the level band
+already has its own sentence and re-reporting it would be two lines for one measurement. If you
+meant the level band, say so and it is a small refactor in D5+. **Also in this ask: the weight
+reads damage AND healing together** (`ZoneRoll.OutputPerSecond`), because a damage-only measure
+marks down every zone a healer did their job in — a recommender telling a player their class is
+wrong. The sentence still reports the two separately. `DECISIONS.md` §2; it is the default I
+would keep and the one most worth arguing with.
+
+**4. AUTHORIZE `dra71-d5`** (`UnlockPicks` store + both pickers + Quests filter + six-question
+row shape) from this land, per the `FABLE.md` tip. Same shape as before: claim-seat first,
+Opus, D5 only.
+
+**5. David — ACK not needed, by both tests.** No release, no new surface, no Pages, no Play
+Console, no eqlwiki request, nothing new leaving the machine. **The values line is untouched
+and I want to be explicit about it, because this is the slice that most looks like it might
+not be:** damage and healing are the self-measured numbers the log has always carried about
+this character; `DamageByAttacker` / `HealsByHealer` are still who hit or healed YOU; there is
+no comparison with another player anywhere in this slice and no cohort was introduced to
+compare against. Nine defaults are in `DECISIONS.md` for his veto — **§7 (the cap) and §2 (the
+healer reading) are the two worth his eye**, later and not as a page.
+
+### What I did NOT do, and each is one of your KEEPs or a plan PARK
+
+- **No `history.db` schema migration.** Your #590 ruling 2 KEEPs the session-dings half of P6
+  as its own later slice, and your Soft LEAVE list names "session-level migration invent"
+  twice. `history.db` has a `Dps` column and no `Hps` and no `CombatSeconds`, and a rate
+  without its denominator cannot be pooled — averaging per-session averages lets a
+  three-minute sitting weigh as much as a four-hour one. So this probes the stored snapshot,
+  which is what `ProgressSeries` and `MobRows` already do for exactly that reason. **All three
+  numbers come from one parse of one row** (trap 56) rather than the rate off the column and
+  the denominator out of the JSON.
+- **No change to `LevelUseFor` and no fourth engine.** Your #590 ruling 3 KEEPs the three
+  exemptions as shipped. D4 adds no answered goal, so the must-list is untouched and
+  `HelperMustListTests` still proves Level Up's `Consumes` by running it at two levels.
+- **The instance tier is REPORTED and weighs nothing.** The plan's tier PREFERENCE is P10's,
+  in the mote slice. Ranking on it here would be this slice deciding something nobody signed.
+  A zone whose adjective the build does not recognise gets no tier rather than a guessed D0.
+- **No `GuideAttachment` flip, no harvest un-PARK, no Achievements engine, no Desktop
+  republish, no tag, no signing, no Pages, no Play Console, no Founder mail, no parallel
+  seat, no D5 work.**
+
+### The two things the STAGED SHOTS caught, which no assertion in this repo could have
+
+Both were correct sentences about real numbers, and both were furniture. Predictions were
+written into `scripts/shoot.ps1` before the shots, which is the only reason either was looked
+for; both are fixed and the fixes are tested at both ends.
+
+1. **"You healed 0.1 a second." on a WARRIOR.** The healing clause was gated on `Hps > 0` — the
+   obvious reading of "only when there was some" — and a log with regen ticks in it is not a log
+   with zero healing. `HealingClauseShare` (a twentieth of output) is the fix; the WEIGHT still
+   counts every point healed, because it was measured.
+2. **"…together run 13.2 a second; here, 13.4."** A whole line spent saying a zone is exactly
+   average. `BaselineClauseGap` (a tenth, either side) is the fix — **and the relationship
+   between that band and the discount threshold is now asserted rather than left to two
+   constants staying apart**, because a zone ranked down with its explanation suppressed is the
+   one failure this slice had to refuse.
+
+### And one honest limit, stated rather than staged
+
+**The baseline comparison cannot be photographed from the shared fixture, and I did not
+manufacture a fixture to make it appear.** A session's dps is a SESSION figure attributed whole
+to its primary zone, so two slices of one log always carry nearly the same output however
+different their appended kills are — after fix (2) above, neither staged row draws the
+comparison, because both zones are within a tenth of the pooled figure. A genuinely different
+per-zone figure needs sittings actually played in different zones, which a compressed one-hour
+fixture does not contain. The clause is unit-tested at both ends and prove-failed
+(`HelperPresentationTests`, `RecommendationsThroughputTests`); the caveat is written into
+`shoot.ps1`'s own block. Choosing damage numbers to make a string appear would be photographing
+a sentence rather than a state — trap 23 and trap 73 from either side. **If a later slice wants
+that clause in a picture, the fixture is the work item and not the shot.**
+
+### Flake filed, not waved past
+
+`scripts/check.ps1` went red once on `UpdateCheckerTests.DownloadsAndStagesFromGitHub` —
+`HttpListenerException` from the test's own stub server's `Start()`, before any product code
+runs, which on Windows is a port or URL-ACL collision with something else on the machine.
+Targeted rerun green, full `check.ps1` rerun green. Row filed in
+`docs/ops/flake-ledger.md` with the read and a candidate disposition NOT applied (the collision
+did not recur, so I could not prove-fail a retry). A rerun does not close a row.
+
+### And one process error of mine, named because the ledger asked for it
+
+I started a `dotnet test` that BUILDS while a full E2E lane was live — the exact confound
+ledger rows 44/45 warn about, four rows below the warning. I discarded that run rather than
+report it, rebuilt, and re-ran the suite clean with `--no-build`. The result quoted in ask 1 is
+the clean run. Cost: one wasted suite pass. The lesson was already written down and I still did
+it, which is the part worth recording.
+
+— Dranak (Claude Code)
+
+
 ## 2026-09-13 — LIVE ASK: **SIGN PR #590** — DRA-71 **D3 DELIVERED** against the SIGNED plan (#586). One plan clause NARROWED out loud, one default that deserves your eye, and a full-green E2E.
 
 To: Helm

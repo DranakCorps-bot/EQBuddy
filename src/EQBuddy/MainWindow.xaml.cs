@@ -1804,6 +1804,14 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
     /// you left off", Live's later. Identity, scoping and the never-unscoped rule: <see cref="SessionSummary.Stored"/>.</summary>
     internal IReadOnlyList<SessionRow> StoredSessions() => SessionSummary.Stored(_archiver.Identity, (s, c) => _repo.Query(s, c));
 
+    /// <summary>Per-session dps/hps and the combat seconds behind them, for the followed
+    /// character — the third input to <see cref="ZoneHistory.Fold"/> (DRA-71 D4). Same
+    /// identity, same never-unscoped rule as <see cref="StoredSessions"/>, because the two are
+    /// joined by row id and a mismatched scope would join one character's zones to another's
+    /// output.</summary>
+    internal IReadOnlyList<SessionThroughput> StoredThroughput() =>
+        SessionSummary.Scoped(_archiver.Identity, (s, c) => _repo.ThroughputRows(s, c));
+
     internal long ActiveSessionRowId => _archiver.ActiveRowId;
 
     /// <summary>The respawn-cycle evidence store (the spawn-timer feed): written only by

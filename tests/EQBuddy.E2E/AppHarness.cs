@@ -620,6 +620,69 @@ internal sealed class AppHarness : IDisposable
             }, new JsonSerializerOptions { WriteIndented = true }));
     }
 
+    /// <summary>
+    /// **Archives a finished session into <c>history.db</c>, through the REAL repository and
+    /// the REAL snapshot type** (DRA-71 D4).
+    ///
+    /// <para>The Helper's zone answers are a fold over archived sessions, and the only other
+    /// way to get one is <c>Prime</c> — a whole app run over the fixture log, which
+    /// <c>shoot.ps1</c> does and an E2E cannot afford per row. This writes the row the same
+    /// way the archiver does (<c>SessionRepository.Checkpoint</c>, which serialises the
+    /// snapshot to the same JSON the app will read back), so the throughput probe under test
+    /// is reading a real stored snapshot rather than a fixture shaped like one.</para>
+    ///
+    /// <para><b>Call it BEFORE <see cref="Launch"/>.</b> The connection is disposed here so
+    /// the app opens the file itself; a row still marked
+    /// <c>SessionRepository.ActiveEndReason</c> would be rewritten on startup by
+    /// <c>MarkInterruptedAsRecovered</c>, which is why the end reason is a finished one.</para>
+    ///
+    /// <para>The identity is <see cref="Server"/>/<see cref="Character"/> — the two strings the
+    /// app's own archiver uses — because <c>SessionSummary.Stored</c> compares them with SQL
+    /// <c>=</c> and a near-miss is a query that silently returns nothing.</para>
+    /// </summary>
+    /// <param name="zone">Stored as the session's <c>PrimaryZone</c>, verbatim. An instance's
+    /// full name ("Najena 4 (Refined)") is what the game prints and what the tier is decoded
+    /// from, so it is spelled here exactly as a zone line would.</param>
+    /// <param name="startedAgo">How long before now the sitting began — its elapsed time.
+    /// <c>ZoneHistory.MinHours</c> is 15 minutes, so anything shorter is stored and
+    /// deliberately produces no rate.</param>
+    /// <param name="activeFraction">How much of that was ACTIVE play. 1.0 is a sitting with
+    /// no downtime; the gap is what the downtime line reports.</param>
+    public void SeedStoredSession(
+        string zone, TimeSpan startedAgo, double xpPercent, double dps, double hps,
+        double combatSeconds, int deaths = 0, double activeFraction = 1.0,
+        params (string Name, int Kills, double FightSeconds, int LevelMin, int LevelMax)[] mobs)
+    {
+        var start = DateTime.Now - startedAgo;
+        var elapsed = startedAgo.TotalSeconds;
+        using var repo = new SessionRepository(HistoryDbPath);
+        repo.Checkpoint(0, new StatsSnapshot
+        {
+            SessionStart = start,
+            LastEventTime = DateTime.Now,
+            // `Checkpoint` writes the ElapsedSeconds COLUMN from `Elapsed` and the
+            // ActiveSeconds one from this — the two the downtime line is the gap between.
+            Elapsed = startedAgo,
+            ActiveSeconds = elapsed * Math.Clamp(activeFraction, 0, 1),
+            CurrentZone = zone,
+            Zones = [new TimedDetail(start, zone)],
+            XpPercent = xpPercent,
+            SessionDps = dps,
+            Hps = hps,
+            CombatSeconds = combatSeconds,
+            YourKillCount = mobs.Sum(m => m.Kills),
+            Deaths = [.. Enumerable.Range(0, deaths)
+                .Select(i => new TimedDetail(start.AddMinutes(i), "You have been slain"))],
+            Mobs =
+            [
+                .. mobs.Select(m => new MobSummary(m.Name, m.Kills, m.Kills, m.FightSeconds, 0, 0, [])
+                {
+                    Zone = zone, LevelMin = m.LevelMin, LevelMax = m.LevelMax,
+                }),
+            ],
+        }, Server, Character, "ApplicationExit");
+    }
+
     /// <summary>Appends messages to the character log with live timestamps, the way the
     /// game would. Latin1 + CRLF, matching what LogWatcher's tail reads.
     ///

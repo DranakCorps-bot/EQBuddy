@@ -42,12 +42,36 @@ public class HelperPresentationTests
     /// <para>Whole words, so "Fashioned" does not trip "hard" and a zone called "Erudin
     /// Palace" does not trip anything at all.</para>
     /// </summary>
+    /// <remarks>
+    /// **DRA-71 D4 widened it, and the additions are the words a THROUGHPUT feature invites.**
+    ///
+    /// <para>The first list was written against a recommender that knew your experience rate
+    /// and your deaths. D4 gives it your damage, your healing, your fight length and your
+    /// downtime — and the sentence somebody writes in good faith with those in hand is not
+    /// "this camp is safe", it is *"trivial for your output"* or *"too tough at your level"*
+    /// or *"a comfortable camp for a character with your healing"*. HOME-006's actual text is
+    /// about exactly this: <i>"do not claim a camp is safe merely because the player's DPS is
+    /// high."</i> So the vocabulary the new numbers would be spent on is banned in the same
+    /// slice that adds them, and the prove-fail below is fed those sentences rather than the
+    /// old ones.</para>
+    ///
+    /// <para>"Hard", "tough" and "trivial" are the ones worth naming out loud, because they
+    /// are the words a reasonable person reaches for when they have a difficulty-shaped
+    /// number and no difficulty model. EQBuddy has no mob-HP model and no con-colour scale;
+    /// the permitted shape is a measurement with its scope, and the comparison is against
+    /// this character's own pooled figures, never against a claim about the place.</para>
+    /// </remarks>
     private static readonly string[] Forbidden =
     [
         "safe", "safer", "safest", "safely", "safety", "unsafe",
         "easy", "easier", "easiest", "easily",
         "dangerous", "danger", "deadly", "lethal", "risky",
         "survivable", "survivability", "forgiving", "harmless", "brutal", "punishing",
+        // DRA-71 D4 (plan P7): the throughput-vs-difficulty vocabulary.
+        "hard", "harder", "hardest", "tough", "tougher", "toughest",
+        "trivial", "trivially", "comfortable", "comfortably", "manageable",
+        "overwhelming", "overmatched", "outmatched", "outclassed", "punishes",
+        "efficient", "efficiently", "optimal", "suboptimal", "underperforming",
     ];
 
     private static void AssertClean(string text, string where)
@@ -241,6 +265,14 @@ public class HelperPresentationTests
     [InlineData("Your damage makes this an easy pull.")]
     [InlineData("This zone is dangerous at your level.")]
     [InlineData("Highly survivable for a character with your healing.")]
+    // DRA-71 D4: the four sentences a THROUGHPUT feature invites. Every one of them is what
+    // somebody writes when they have your dps, your fight length and no difficulty model —
+    // which is HOME-006's own worked example ("do not claim a camp is safe merely because the
+    // player's DPS is high") arriving through the new numbers rather than the old ones.
+    [InlineData("Trivial for your output — your fights here run 6 seconds.")]
+    [InlineData("These creatures are too tough for your damage right now.")]
+    [InlineData("A comfortable camp for a character putting out 60 a second.")]
+    [InlineData("Your output here is underperforming; pick somewhere more efficient.")]
     public void TheBanCatchesTheSentenceSomebodyWouldWriteInGoodFaith(string sentence) =>
         Assert.NotNull(Hit(sentence));
 
@@ -254,6 +286,202 @@ public class HelperPresentationTests
             new ZoneDeathsFact("Lower Guk", 4, 9))));
         Assert.Null(Hit(HelperPresentation.Why(
             new ZoneXpRateFact("Lower Guk", 8.2, 14, 21.5))));
+        // DRA-71 D4's four, at the values that would most tempt an adjective: an output well
+        // under the baseline, fights at twice the usual length, and most of a sitting idle.
+        // The widened ban has to pass all of them, or it is catching everything and proving
+        // nothing.
+        Assert.Null(Hit(HelperPresentation.Why(
+            new ZoneThroughputFact("Lower Guk", 12.4, 0, 12.4, 61.8, 4200, 6))));
+        Assert.Null(Hit(HelperPresentation.Why(
+            new ZoneCadenceFact("Lower Guk", 96, 480, 41))));
+        Assert.Null(Hit(HelperPresentation.Why(
+            new ZoneDowntimeFact("Lower Guk", 0.81, 9, 21.5))));
+        Assert.Null(Hit(HelperPresentation.Why(new ZoneTierFact("Najena 4 (Refined)", 4))));
+    }
+
+    // ---- the D4 sentences (plan P7) --------------------------------------------------------
+
+    /// <summary>
+    /// **The throughput line reports three measurements and draws no conclusion from
+    /// them** — Founder smoke item 3, answered without a difficulty model because there is
+    /// none.
+    ///
+    /// <para>What is in it: the damage, how long the fighting lasted, the pooled figure and
+    /// the number of zones that figure rests on. What is NOT in it is a verdict — no
+    /// judgement on whether the camp suits the character, and no prediction of what an hour
+    /// there would pay. A player reading "12.4 here against your usual 61.8" has the whole
+    /// finding; EQBuddy has no mob-HP model with which to draw a conclusion from it.</para>
+    /// </summary>
+    [Fact]
+    public void TheThroughputSentenceNamesYourOutputItsScopeAndYourOwnBaseline()
+    {
+        var line = HelperPresentation.Why(
+            new ZoneThroughputFact("Lower Guk", 12.4, 0, 12.4, 61.8, 4200, 6));
+
+        Assert.Contains("12.4", line);
+        Assert.Contains("61.8", line);
+        Assert.Contains("6 zones", line);
+        // The scope: 4,200 combat seconds said the way a person would say it.
+        Assert.Contains("1.2 hours", line);
+        Assert.DoesNotContain(HelperPresentation.CatalogLabel, line);
+        foreach (var verdict in new[] { "should", "better", "instead", "expect", "recommend" })
+            Assert.DoesNotContain(verdict, line, StringComparison.OrdinalIgnoreCase);
+    }
+
+    /// <summary>
+    /// **Healing is drawn only when healing is a real part of what this character did** —
+    /// and the trace case is the one the staged shot caught.
+    ///
+    /// <para>At <c>Hps &gt; 0</c> the fixture's WARRIOR came back saying "You healed 0.1 a
+    /// second", because a log with regen ticks in it is not a log with zero healing. The
+    /// sentence was correct, the number was real, and it was still furniture on a character
+    /// who does not heal (trap 23: the picture is what found it, and no assertion in the repo
+    /// could have). <c>HelperPresentation.HealingClauseShare</c> is the fix and this is the
+    /// row that pins it — both arms, because a threshold with only the passing side tested
+    /// would move without anything noticing.</para>
+    /// </summary>
+    [Fact]
+    public void TheHealingClauseAppearsForAHealerAndNotForATraceOfRegen()
+    {
+        var healer = HelperPresentation.Why(
+            new ZoneThroughputFact("Lower Guk", 8.1, 44.2, 52.3, 61.8, 4200, 6));
+        Assert.Contains("44.2", healer);
+        Assert.Contains("healed", healer);
+
+        // The staged shot's own numbers: 13.3 damage a second and 0.1 healing, which is
+        // under a hundredth of the output.
+        var warrior = HelperPresentation.Why(
+            new ZoneThroughputFact("West Commonlands", 13.3, 0.1, 13.4, 0, 4680, 0));
+        Assert.DoesNotContain("healed", warrior);
+
+        // And a character with no healing at all, which is the arm that was always right.
+        Assert.DoesNotContain("healed", HelperPresentation.Why(
+            new ZoneThroughputFact("Lower Guk", 61.0, 0, 61.0, 0, 4200, 0)));
+    }
+
+    /// <summary>
+    /// **The baseline comparison is drawn only when there is something to notice** — the
+    /// second thing the staged shot caught.
+    ///
+    /// <para>The first take read "your damage and healing together run 13.2 a second; here,
+    /// 13.4": a whole line spent saying a zone is exactly average. Same lesson as the cadence
+    /// clause, which already went silent when the two rounded to the same words, and the same
+    /// one the downtime line is built on — a line that never varies tells a player nothing,
+    /// and the primary figure is on screen either way.</para>
+    /// </summary>
+    [Fact]
+    public void TheBaselineClauseIsSilentWhenTheZoneIsSimplyAverage()
+    {
+        // The staged shot's own numbers.
+        Assert.DoesNotContain("Across the", HelperPresentation.Why(
+            new ZoneThroughputFact("Kithicor Forest", 13.3, 0, 13.4, 13.2, 4680, 2)));
+
+        // Well under, and well over, both say so.
+        Assert.Contains("Across the 6 zones", HelperPresentation.Why(
+            new ZoneThroughputFact("Lower Guk", 12.4, 0, 12.4, 61.8, 4200, 6)));
+        Assert.Contains("Across the 6 zones", HelperPresentation.Why(
+            new ZoneThroughputFact("Lower Guk", 90.0, 0, 90.0, 61.8, 4200, 6)));
+    }
+
+    /// <summary>
+    /// **A ZONE IS NEVER MARKED DOWN IN SILENCE, AND THIS IS THE ROW THAT KEEPS IT TRUE
+    /// ACROSS TWO FILES.**
+    ///
+    /// <para>The discount threshold lives in Core and the clause threshold lives here, and
+    /// the rule that matters spans them: any zone whose output fires
+    /// <c>Recommendations.ThroughputShortfall</c> must be far enough from its baseline to
+    /// clear <c>HelperPresentation.BaselineClauseGap</c>, or the ranking would move and the
+    /// explanation would be the sentence that got suppressed. Asserted as the RELATIONSHIP
+    /// between the two numbers rather than as two numbers, because "0.6 and 0.1" is a fact
+    /// about today and "the discount is well outside the silence band" is the rule.</para>
+    /// </summary>
+    [Fact]
+    public void AnOutputThatFiresTheDiscountAlwaysClearsTheSilenceBand()
+    {
+        Assert.True(1 - Recommendations.ThroughputShortfall > HelperPresentation.BaselineClauseGap,
+            $"a zone at {Recommendations.ThroughputShortfall:P0} of its baseline is inside the "
+            + $"{HelperPresentation.BaselineClauseGap:P0} band where the comparison goes silent — "
+            + "so a discounted zone could be ranked down with nothing on screen saying why.");
+
+        // And the worked case: exactly at the shortfall threshold, the clause is drawn.
+        var atThreshold = 61.8 * Recommendations.ThroughputShortfall;
+        Assert.Contains("Across the", HelperPresentation.Why(
+            new ZoneThroughputFact("Lower Guk", atThreshold, 0, atThreshold, 61.8, 4200, 6)));
+    }
+
+    /// <summary>
+    /// **A single measured zone gets NO comparison clause.**
+    ///
+    /// <para>A baseline folded from one zone is that zone, so the clause would read "your
+    /// average is exactly this" — a tautology printed as a finding. The engine passes 0 for
+    /// the baseline in that state and this is where the 0 becomes silence.</para>
+    /// </summary>
+    [Fact]
+    public void WithOneMeasuredZoneTheThroughputSentenceComparesItWithNothing()
+    {
+        var line = HelperPresentation.Why(
+            new ZoneThroughputFact("Lower Guk", 42.0, 0, 42.0, 0, 3600, 0));
+
+        Assert.Contains("42.0", line);
+        Assert.DoesNotContain("Across", line);
+        Assert.DoesNotContain("zones", line);
+    }
+
+    /// <summary>The cadence line gained its own baseline clause in D4, and it is silent both
+    /// when there is nothing to compare against and when the two round to the same words —
+    /// "they run 41 sec; you average 41 sec" is a line spent saying nothing.</summary>
+    [Fact]
+    public void TheCadenceSentenceComparesWithYourOwnAverageOrSaysNothing()
+    {
+        var slower = HelperPresentation.Why(new ZoneCadenceFact("Lower Guk", 96, 480, 41));
+        Assert.Contains("1.6 min", slower);
+        Assert.Contains("41 sec", slower);
+
+        Assert.DoesNotContain("Everywhere",
+            HelperPresentation.Why(new ZoneCadenceFact("Lower Guk", 96, 480)));
+        Assert.DoesNotContain("Everywhere",
+            HelperPresentation.Why(new ZoneCadenceFact("Lower Guk", 41.2, 480, 41.4)));
+    }
+
+    /// <summary>
+    /// **The downtime line says WHAT was measured and never WHY.**
+    ///
+    /// <para>The active figure counts two-minute stretches that contained an event, so
+    /// medding, travelling, a bank trip and a corpse run are one thing to it. Naming a cause
+    /// would be inventing the half the log did not record (trap 73) — and every one of those
+    /// causes is a different thing for a player to act on.</para>
+    /// </summary>
+    [Fact]
+    public void TheDowntimeSentenceNamesTheShareAndNoCauseForIt()
+    {
+        var line = HelperPresentation.Why(new ZoneDowntimeFact("Lower Guk", 0.81, 9, 21.5));
+
+        Assert.Contains("81%", line);
+        Assert.Contains("9 sessions", line);
+        Assert.Contains("21.5 hours", line);
+        foreach (var cause in new[] { "med", "travel", "bank", "corpse", "waiting", "afk" })
+            Assert.DoesNotContain(cause, line, StringComparison.OrdinalIgnoreCase);
+    }
+
+    /// <summary>
+    /// **The tier line says it was the player's OWN zone line that recorded it**, not that
+    /// the zone is anything. It is the one difficulty word the game itself states, read where
+    /// the session already stored it — nothing was looked up, so there is no estimate label,
+    /// and it is not an adjective about the place.
+    /// </summary>
+    [Fact]
+    public void TheTierSentenceAttributesTheTierToYourOwnLog()
+    {
+        var line = HelperPresentation.Why(new ZoneTierFact("Najena 4 (Refined)", 4));
+
+        Assert.Contains("D4", line);
+        Assert.Contains("your own zone line", line, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain(HelperPresentation.CatalogLabel, line);
+
+        // Every tier the game states gets a badge, D0 included — a base instance is a real
+        // observation and "D0" is what InstanceTier calls it.
+        for (var tier = 0; tier <= 4; tier++)
+            Assert.Contains($"D{tier}", HelperPresentation.Why(new ZoneTierFact("Najena", tier)));
     }
 
     // ---- 2. the sentences say what they claim --------------------------------------------

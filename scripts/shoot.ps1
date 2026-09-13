@@ -959,6 +959,109 @@ $Shots = [ordered]@{
     #     class INFERENCE, which is a different producer from the picker (trap 4's two-sources
     #     shape, and the picture is where the two are easiest to confuse).
     #
+    # ---- DRA-71 D4: the throughput lines (plan P7, Founder smoke item 3) --------------
+    #
+    # PREDICTIONS, written before the shots (trap 23). **What is pinned and what is not is
+    # the first thing to read here.** The rates, the damage-per-second figures, the combat
+    # hours and the fight lengths are the fixture's own arithmetic over a compressed hour;
+    # the block above records, in this same file, what guessing a number the staging does not
+    # pin costs the next reader. So the SHAPE is predicted, and the only literals predicted
+    # are the ones the staging actually decides: the two zone names, the level, and the
+    # absence of a difficulty badge.
+    #
+    #   'shell-helper-throughput' — the Helper with TWO real archived sessions in TWO zones
+    #     and a real ding appended. The rail of seven with Helper lit, the goals face reading
+    #     "Level Up", the source note, and the "Weighed at level 30, from your log's ding
+    #     lines." line D3 added. Then TWO recommendation rows — West Commonlands (the
+    #     fixture's own zone, from the first prime) and Kithicor Forest (this staging's, from
+    #     the second) — each carrying, in this order:
+    #       1. the measured experience rate with its session scope,
+    #       2. **NEW — "You put out N damage a second here, over H hours of fighting. Across
+    #          the 2 zones EQBuddy has measured, your damage and healing together run M a
+    #          second; here, N."** The "2 zones" IS pinned: two primes, two primary zones, and
+    #          the comparison clause exists at all only because there are two. A picture with
+    #          one row, or with that clause missing, means the second prime collapsed into the
+    #          first row (the adoption case `ShiftDays` exists to prevent) and the shot is of
+    #          something else.
+    #       3. the cadence line, **now with its own comparison** — "Everywhere EQBuddy has
+    #          measured you, they run X." — or without it if the two round to the same words,
+    #          which is a real arm and not a defect.
+    #       4. the P6 outgrown line on West Commonlands only: its conned band is the
+    #          fixture's own (Lvl 5 and Lvl 11), thirty-odd under 30. Kithicor's creatures
+    #          conned Lvl 27, so it must NOT carry that sentence — and that is the row worth
+    #          checking, because a discount sentence on a zone in band would be the P6 rule
+    #          inverted and would look perfectly reasonable.
+    #     **What must NOT be in the picture**, and each of these is a specific failure:
+    #       - No "D0".."D4" badge anywhere. Neither zone is an instance, and a tier drawn for
+    #         an open-world zone would be `InstanceTier` guessing the one thing its own line
+    #         refuses to guess.
+    #       - No sentence calling either place safe, easy, hard, tough, trivial, comfortable
+    #         or efficient — in either direction. HOME-006 is a refusal, the vocabulary sweep
+    #         is the guard, and this is the picture where a word that slipped past it would
+    #         show.
+    #       - No "and 0.0 healing a second". The fixture's character heals nothing, so the
+    #         healing clause must be ABSENT rather than a zero.
+    #       - No "Level 0" and no predicted rate for anywhere the player has not farmed.
+    #       - No downtime line unless the fixture's own active/elapsed gap is over half, which
+    #         it is not expected to be — the fixture is a dense hour. If one appears it is a
+    #         finding about the fixture, not about the feature, and the honest response is to
+    #         read the numbers rather than to change the threshold.
+    #
+    #   'shell-helper-throughput-light' — the same staging in SOLARIZED, the only light
+    #     palette, because the new lines are the densest block of dim body text the room has
+    #     and light is where dim-on-light contrast fails. Same content, same two rows; what is
+    #     being checked is that six stacked personal sentences under one headline are still
+    #     READABLE and still read as one row rather than as a paragraph. The translucency
+    #     caveat of trap 79 does not apply — there is no popup in this shot.
+    #
+    #   AND THE REGRESSION PICTURE: 'shell-helper-outgrown' changes in this slice, because it
+    #     has an archived session and therefore now carries the throughput line. Its ONE row
+    #     has one measured zone, so the comparison clause must be ABSENT — this is the picture
+    #     of the single-zone arm, and a clause reading "across the 1 zones" or comparing the
+    #     zone with itself would be the tautology `ThroughputBaseline.Known` exists to refuse.
+    #     Re-run it.
+    #     The other 'shell-helper*' shots have no `Prime` and so no archived session and no
+    #     zone rows at all; nothing in D4 reaches them, and re-running them would produce
+    #     byte-identical files.
+    #
+    #   WHAT ACTUALLY HAPPENED. SHOT 2026-09-13, 946x633, TWO takes — and the second take
+    #     exists because the first found TWO wording defects that no assertion in this repo
+    #     could have seen. Both sentences were correct, both numbers were real, and both were
+    #     furniture. This is the whole case for writing a prediction down.
+    #       (a) **"You healed 0.1 a second." on a WARRIOR.** The healing clause was gated on
+    #           `Hps > 0`, which is the obvious reading of "only when there was some" — and
+    #           the fixture's log has regen ticks in it, so "some" was 0.1 against 13.3 damage.
+    #           The prediction said this clause must be ABSENT, which is the only reason it
+    #           was looked for. Fixed with `HelperPresentation.HealingClauseShare` (a
+    #           twentieth of the output); the WEIGHT still counts every point healed, because
+    #           it was measured — only the clause is suppressed.
+    #       (b) **"…together run 13.2 a second; here, 13.4."** A whole line spent saying a zone
+    #           is exactly average, on the row where that is least interesting. Fixed with
+    #           `BaselineClauseGap` (a tenth, either side), and the threshold RELATIONSHIP
+    #           with `Recommendations.ThroughputShortfall` is now asserted rather than left to
+    #           two numbers staying apart — a zone marked down with its explanation suppressed
+    #           is the one failure this slice had to refuse.
+    #     Everything else was as predicted: two rows (Kithicor Forest 14.4%/hr first, West
+    #     Commonlands 13.2%/hr second, which is the P6 halving doing its job), the new
+    #     throughput line on both, the cadence comparison ("…they run 6 sec.") on Kithicor,
+    #     the P6 sentence on West Commonlands ONLY — its band is the fixture's own L5–11
+    #     against level 30 — and none on Kithicor, whose creatures conned Lvl 27. No D-badge,
+    #     no safety or difficulty vocabulary in either direction, no "Level 0", no downtime
+    #     line (the fixture's hour is dense, as predicted).
+    #
+    #   AND THE ONE THING THESE SHOTS CANNOT SHOW, stated rather than staged. *After fix (b)
+    #     neither row draws the baseline comparison, because both zones are within a tenth of
+    #     the pooled figure — and no staging built on the shared fixture can do better. A
+    #     session's dps is a SESSION figure attributed whole to its primary zone, so two
+    #     slices of one log always carry nearly the same output however different their
+    #     appended kills are. A genuinely different per-zone figure needs sittings actually
+    #     played in different zones, which a compressed one-hour fixture does not contain.
+    #     The comparison clause is unit-tested at both ends and prove-failed
+    #     (`HelperPresentationTests`, `RecommendationsThroughputTests`); inventing a fixture
+    #     whose damage was chosen to make the sentence appear would be staging a number to
+    #     photograph a string, which is the failure trap 23 and trap 73 name from either
+    #     side.*
+    #
     # ---- E-3 PR 5: the LIVE room, and the Raids move ---------------------------------
     #
     # Same illustration lock: a room's shot lands in the PR that lands the room, exactly the
@@ -1282,6 +1385,71 @@ $Shots = [ordered]@{
                            Prime = @( @{} )
                            Append = @('You have gained a level! Welcome to level 30!')
                            Set = @{
+                               HelperGoals = @{ 'testchar_test' = @('LevelUp') }
+                           } }
+    # DRA-71 D4: the throughput lines, which need TWO measured zones for the comparison
+    # clause to exist at all — a baseline folded from one zone IS that zone, and the sentence
+    # refuses to compare a place with itself (`ThroughputBaseline.Known`). So two prime runs
+    # under the FIXTURE'S OWN character (`SessionSummary.Stored` matches (server, character)
+    # with SQL `=`; a row under any other name is one this room can never fold), at different
+    # `Fraction`/`ShiftDays` so the adopter sees two distinct sessions rather than one row
+    # updated twice — the lesson 'shell-progress-history' records above.
+    #
+    # The SECOND run ends in a different zone and kills there, so the pool has creatures in
+    # it and the session's PrimaryZone is it: `CurrentZone` is the LAST zone entered, and
+    # kills are keyed on where they happened. Kithicor Forest is not in the fixture, which is
+    # the point — it is unambiguously this staging's zone and not a slice of the shared one.
+    # The consider line gives it its own band so its row is not silently the outgrown one too.
+    #
+    # NOT predicted, by construction: every rate, every dps, the combat hours and the fight
+    # lengths. They are the fixture's own arithmetic over a compressed hour, and the block
+    # above records what guessing them costs — predict the SHAPE and the literals the staging
+    # actually pins (the zone names, the level, the absence of a D-badge).
+    'shell-helper-throughput' = @{ Title = 'EQBuddy — Helper'
+                           Env = @{ EQBUDDY_SHELL = 'helper' }
+                           Prime = @(
+                               @{ Character = 'Testchar'; Fraction = 0.55; ShiftDays = 3 }
+                               @{ Character = 'Testchar'; Fraction = 1.0;  ShiftDays = 1
+                                  Lines = @(
+                                      'You have entered Kithicor Forest.',
+                                      'A decaying skeleton judges you amiably -- looks kind of risky, but you might win. (Lvl: 27)',
+                                      'You crush a decaying skeleton for 31 points of damage.',
+                                      'You crush a decaying skeleton for 12 points of damage.',
+                                      'You have slain a decaying skeleton!',
+                                      'A decaying skeleton judges you amiably -- looks kind of risky, but you might win. (Lvl: 27)',
+                                      'You crush a decaying skeleton for 28 points of damage.',
+                                      'You crush a decaying skeleton for 9 points of damage.',
+                                      'You have slain a decaying skeleton!',
+                                      'A decaying skeleton judges you amiably -- looks kind of risky, but you might win. (Lvl: 27)',
+                                      'You crush a decaying skeleton for 24 points of damage.',
+                                      'You have slain a decaying skeleton!') }
+                           )
+                           Append = @('You have gained a level! Welcome to level 30!')
+                           Set = @{
+                               HelperGoals = @{ 'testchar_test' = @('LevelUp') }
+                           } }
+    'shell-helper-throughput-light' = @{ Title = 'EQBuddy — Helper'
+                           Env = @{ EQBUDDY_SHELL = 'helper' }
+                           Prime = @(
+                               @{ Character = 'Testchar'; Fraction = 0.55; ShiftDays = 3 }
+                               @{ Character = 'Testchar'; Fraction = 1.0;  ShiftDays = 1
+                                  Lines = @(
+                                      'You have entered Kithicor Forest.',
+                                      'A decaying skeleton judges you amiably -- looks kind of risky, but you might win. (Lvl: 27)',
+                                      'You crush a decaying skeleton for 31 points of damage.',
+                                      'You crush a decaying skeleton for 12 points of damage.',
+                                      'You have slain a decaying skeleton!',
+                                      'A decaying skeleton judges you amiably -- looks kind of risky, but you might win. (Lvl: 27)',
+                                      'You crush a decaying skeleton for 28 points of damage.',
+                                      'You crush a decaying skeleton for 9 points of damage.',
+                                      'You have slain a decaying skeleton!',
+                                      'A decaying skeleton judges you amiably -- looks kind of risky, but you might win. (Lvl: 27)',
+                                      'You crush a decaying skeleton for 24 points of damage.',
+                                      'You have slain a decaying skeleton!') }
+                           )
+                           Append = @('You have gained a level! Welcome to level 30!')
+                           Set = @{
+                               Theme = 'Solarized'
                                HelperGoals = @{ 'testchar_test' = @('LevelUp') }
                            } }
     'shell-gear-narrow' = @{ Title = 'EQBuddy — Gear'

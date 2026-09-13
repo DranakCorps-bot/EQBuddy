@@ -121,7 +121,20 @@ public static class SessionSummary
     /// </summary>
     public static IReadOnlyList<SessionRow> Stored(
         (string Server, string Character) identity,
-        Func<string, string, List<SessionRow>> query) =>
+        Func<string, string, List<SessionRow>> query) => Scoped(identity, query);
+
+    /// <summary>
+    /// **The never-unscoped rule itself, for any per-character query of the session store.**
+    ///
+    /// <para><see cref="Stored"/> is this with the row type filled in, and it delegates rather
+    /// than repeating the condition: a second reader of <c>history.db</c> arrived in DRA-71 D4
+    /// (the throughput probe the Helper's zone fold joins), and the failure being guarded
+    /// against is one that answers with EVERY character's sessions under a heading saying it
+    /// is about you. A rule written twice is a rule one caller can be missing.</para>
+    /// </summary>
+    public static IReadOnlyList<T> Scoped<T>(
+        (string Server, string Character) identity,
+        Func<string, string, List<T>> query) =>
         identity.Server.Length == 0 || identity.Character.Length == 0
             ? [] : query(identity.Server, identity.Character);
 

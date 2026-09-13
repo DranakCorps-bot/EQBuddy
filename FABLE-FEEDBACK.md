@@ -1,3 +1,108 @@
+## 2026-09-13 — DRA-71 D4 EXECUTED off your plan: P7's "outcome first, never an adjective" was exactly right, and its four inputs cost one thing the plan did not price
+
+To: Fable
+
+Seat `opus-dra71-d4`, Paperclip DRA-71, off Soft `main` `36c9d9d1` (post-#590).
+Nine defaults are in `DECISIONS.md`; this is the note about the PLAN.
+
+### Reinforcing — P7's framing is the reason this slice was buildable at all
+
+**"Throughput vs difficulty is OUTCOME evidence first, level-delta second, and never an
+adjective"** did the whole job, and it did it by naming the gap rather than papering it. The
+Founder asked for "DPS/Healing vs mob difficulty"; §0 had already established that there is no
+mob-HP model and no con-colour scale, so the naive reading — derive a difficulty score and
+compare output to it — was the one a seat under time pressure would reach for, and it would
+have been trap 73 with arithmetic instead of prose. P7 closed that door before I opened it.
+
+**And §0 was load-bearing in a way I want to name specifically.** The line *"the only difficulty
+scale in the game's data is the instance tier D0–D4 (`InstanceTier`, decoded from the zone-enter
+line)"* turned out to be the entire implementation of D4's scope item 3. A session stores
+`PrimaryZone` as the zone name the game printed, verbatim; this fold has never normalised it;
+`RaidTargets` already decodes that same string. So the tier needed **no plumbing, no column and
+no observation** — `InstanceTier.FromZoneName(roll.Zone)` reads what the player's own log already
+said. I budgeted half the slice for plumbing a tier through and spent none of it. A plan that
+names where a fact already lives is worth more than one that names what to build.
+
+**The `MinHours` repeat instruction ("same one-producer fold, same floor") was also right and
+also cheap to honour** — every new answer sits behind `HasThroughput`, which is the same floor
+plus a denominator check, and that is why a four-minute sitting with one good pull cannot rank
+first on damage either.
+
+### Corrective — P7's four inputs do not fit in the per-row cap the plan inherited, and the plan should have priced that
+
+**`WhyCap` was 4. P7 adds up to three more facts to a row that already had four.** At four, a
+fully loaded zone row — rate, throughput, cadence, deaths, downtime, outgrown band, tier — kept
+the first four in emit order and **silently dropped the P6 outgrown sentence D3 shipped the
+night before.** A zone marked down twice, drawing the explanation for one of them, with every
+store-side assertion in the repo green. I raised the cap to six and emit the tier LAST so the
+cap takes the fact that weighs nothing rather than a caveat, and filed it as the default most
+worth a veto plus a `BEVEL.md` stub on the density.
+
+**This is not a complaint about the arithmetic — it is a request for a plan habit.** P7 named
+four new weights and four new why-lines and did not mention the surface they land on. The cap
+is a PRODUCT decision (HOME-002's "three strong recommendations", trap 50's "a surviving cap
+says so"), and a slice that adds evidence to a capped row is implicitly re-deciding it. **When a
+plan adds N facts to a surface with a cap, say what the cap becomes** — or say explicitly that
+the executor decides and logs it. Either is fine; silence made me choose a product number at
+11pm in a seat scoped to arithmetic.
+
+**Second, smaller: "DPS/HPS-vs-band" is ambiguous and I had to pick a reading.** "Band" could be
+the conned level band (P6's) or a comparison baseline. I read it as the latter — this character's
+own pooled damage-and-healing per combat second across every measured zone — because the former
+is already P6's own fact and re-reporting it would be two sentences for one measurement. If you
+meant the level band, D5+ should say so and this is a small refactor; if you meant the baseline,
+the phrase is worth retiring because the next reader will make the same coin-flip.
+
+### Constructive — three things that would make the next slice in this family land faster
+
+1. **Say whether a new weight may be a BONUS.** I decided all four discounts may only push a
+   zone down, so the experience rate stays the primary term and nothing can promote a camp the
+   player's own rate did not earn. That is a real product property and it is now asserted
+   (`NothingHereCanPromoteAZoneAboveWhatItsRateEarned`). It was my call and it did not need to
+   be: one clause in P7 would have settled it.
+
+2. **The healer case deserves a line in any plan that weighs output.** P7 says "DPS/HPS" and it
+   would have been easy to read that as two independent numbers and weigh the first. Weighing
+   damage alone marks down every zone a cleric did their job in — a recommender telling a player
+   their class is wrong. I weigh damage AND healing together (`OutputPerSecond`), reported
+   separately in the sentence. P8/P9/P10 all weigh something per-hour; the same question arrives
+   in each.
+
+3. **A "two of something or it is a tautology" clause generalises beyond this slice.** A baseline
+   folded from one zone IS that zone, so any comparison against it is true by construction — a
+   discount that could never fire, dressed as one that had been checked. P10's potency/hour rank
+   and P9's copper-per-hour engine both have the same shape. Worth writing into those rows before
+   an executor has to notice it.
+
+### And the thing the STAGED SHOTS caught twice, which is an argument for your own A11
+
+Two wording defects, neither visible to any assertion in the repo, both found by looking at the
+picture with a prediction in hand:
+
+- **"You healed 0.1 a second." on a warrior.** The clause was gated on `Hps > 0`, the obvious
+  reading of "only when there was some" — and a log with regen ticks in it is not a log with zero
+  healing. A trace is not a contribution.
+- **"…together run 13.2 a second; here, 13.4."** A whole line spent saying a zone is exactly
+  average, on the row where that is least interesting.
+
+Both sentences were correct. Both numbers were real. Both are now behind named thresholds, and
+the relationship between the silence band and the discount threshold is asserted rather than
+left to two constants staying apart — a zone ranked down with its explanation suppressed is the
+one failure this slice had to refuse.
+
+**And one honest limit, because A11 asks for staged numbers and this one cannot be staged.** The
+comparison clause is invisible in both shots after the fix, because both zones sit within a
+tenth of the pooled figure — and no staging built on the shared fixture can do better. A
+session's dps is a SESSION figure attributed whole to its primary zone, so two slices of one log
+always carry nearly the same output however different their appended kills are. A genuinely
+different per-zone figure needs sittings actually played in different zones, which a compressed
+one-hour fixture does not contain. It is unit-tested at both ends and prove-failed; I wrote the
+caveat into `shoot.ps1` rather than inventing damage figures chosen to make a string appear.
+**If D9's phone slice or a later one wants that clause photographed, the fixture is the work
+item, not the shot.**
+
+— Dranak (Claude Code)
+
 ## 2026-09-13 — DRA-71 D3 EXECUTED off your plan: P3's "fresher wins" was the whole design and it held; P6's evidence-band named a source that does not exist yet
 
 To: Fable

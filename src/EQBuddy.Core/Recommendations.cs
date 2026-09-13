@@ -91,9 +91,95 @@ public abstract record WhyFact(Evidence Evidence);
 public sealed record ZoneXpRateFact(string Zone, double XpPerHour, int Sessions, double Hours)
     : WhyFact(Evidence.Personal);
 
-/// <summary>How long your fights here actually take, and over how many kills.</summary>
-public sealed record ZoneCadenceFact(string Zone, double AvgFightSeconds, int Kills)
+/// <summary>
+/// How long your fights here actually take, and over how many kills.
+/// </summary>
+/// <param name="BaselineSeconds">How long your fights run across every zone EQBuddy has
+/// measured, or 0 when there is nothing to compare against (DRA-71 D4, plan P7).
+///
+/// <para><b>The comparison is against YOURSELF, and it has to be.</b> "Is 95 seconds a long
+/// fight?" has no answer in this repo — there is no mob-HP model and no con-colour model, so
+/// nothing here knows what a creature should take. "Is 95 seconds long FOR THIS CHARACTER?"
+/// is answerable from measurements already on disk, and it is the question the plan's
+/// outcome-first reading asks. 0 draws no comparison clause at all rather than a clause
+/// comparing a zone to itself (see <see cref="ThroughputBaseline.Known"/>).</para></param>
+public sealed record ZoneCadenceFact(
+    string Zone, double AvgFightSeconds, int Kills, double BaselineSeconds = 0)
     : WhyFact(Evidence.Personal);
+
+/// <summary>
+/// **What this character actually PUT OUT here, against what they put out everywhere else**
+/// (DRA-71 D4, plan P7; Founder smoke item 3 — *"DPS/Healing vs mob difficulty"*).
+///
+/// <para><b>There is no difficulty number in it, because the game gives none.</b> EQBuddy
+/// has no mob-HP model and no con-colour model; the only difficulty scale the game's own data
+/// states is the instance tier, which has its own fact (<see cref="ZoneTierFact"/>). So the
+/// answer to "was my output good for what I was fighting" is assembled from measurements
+/// rather than from a score: your damage and healing per second of combat here, your own
+/// pooled figure across every zone, and — in the cadence fact beside it — how long the
+/// fights ran. A player who reads all three can tell whether a camp suited their character.
+/// EQBuddy does not tell them, because it would have to invent the rule it decided
+/// with.</para>
+///
+/// <para><b>Nothing here is anybody else's number.</b> Damage and healing are the
+/// self-measured values the log has always carried; <c>DamageByAttacker</c> and
+/// <c>HealsByHealer</c> are who hit or healed YOU. There is no cohort, no comparison and no
+/// ranking against another player, and this slice adds none.</para>
+/// </summary>
+/// <param name="Dps">Your damage per combat second here.</param>
+/// <param name="Hps">Your healing per combat second here. Drawn only when it is above zero —
+/// a clause reading "and 0.0 healing a second" is furniture on every character who does not
+/// heal.</param>
+/// <param name="Output">The two together, which is the figure the WEIGHT reads — see
+/// <see cref="ZoneRoll.OutputPerSecond"/> for why a measure that can only see damage answers
+/// the question for exactly one kind of character.</param>
+/// <param name="BaselineOutput">The same figure pooled across every zone, or 0 when there is
+/// nothing to compare against.</param>
+/// <param name="CombatSeconds">The denominator. Named in the sentence, because a rate whose
+/// scope a player cannot see is a claim nobody can argue with.</param>
+/// <param name="Zones">How many zones the baseline rests on — the comparison's own scope.</param>
+public sealed record ZoneThroughputFact(
+    string Zone, double Dps, double Hps, double Output, double BaselineOutput,
+    double CombatSeconds, int Zones)
+    : WhyFact(Evidence.Personal);
+
+/// <summary>
+/// **How much of your time here had nothing happening in it** (DRA-71 D4, plan P7).
+///
+/// <para>The gap between a session's elapsed seconds and its ACTIVE seconds — two-minute
+/// buckets that contained a meaningful event. It is a measurement and the sentence says only
+/// what was measured: <b>nothing here knows WHY</b>. Medding, running back from a bind point,
+/// a bank trip and waiting on a spawn are indistinguishable to it, so no surface built on it
+/// may name a cause (trap 73 — silence beats a template with a guess in it), and it must
+/// never be worded as a claim about what a place is like (HOME-006).</para>
+/// </summary>
+/// <param name="Share">0..1 of elapsed time that was not active.</param>
+/// <param name="Sessions">Across how many of your stored sessions — the scope, on the same
+/// "sessions here" wording the rate uses, because the attribution is by primary zone.</param>
+/// <param name="Hours">The elapsed hours it rests on.</param>
+public sealed record ZoneDowntimeFact(string Zone, double Share, int Sessions, double Hours)
+    : WhyFact(Evidence.Personal);
+
+/// <summary>
+/// **The instance tier your OWN zone line recorded** (DRA-71 D4, plan P7; the observation
+/// P10's mote engine will later prefer on).
+///
+/// <para><b>The one difficulty datum the game actually states</b>, and it is
+/// <see cref="Evidence.Personal"/> rather than catalog because it is not a catalog: the
+/// tier is decoded from the "You have entered X." line this character's own log printed and
+/// this character's own session stored as its primary zone (<see cref="ZoneRoll.ObservedTier"/>).
+/// Nothing was looked up.</para>
+///
+/// <para><b>It is evidence and, in D4, weighs nothing.</b> The plan's tier PREFERENCE belongs
+/// to the mote engine in its own slice; a ranking rule added here would be this slice
+/// deciding something nobody has signed. What it does is let the row say which instance the
+/// numbers above it were measured in — without which a D0 rate and a D4 rate read as one
+/// place.</para>
+/// </summary>
+/// <param name="Tier">0..4. A zone whose adjective this build does not recognise is
+/// unmistakably an instance but has no tier, and gets no fact at all rather than a guessed
+/// D0 — the refusal <c>InstanceTier</c> itself makes.</param>
+public sealed record ZoneTierFact(string Zone, int Tier) : WhyFact(Evidence.Personal);
 
 /// <summary>
 /// What your own history says about dying here — <b>HOME-006's only permitted shape</b>.
@@ -367,9 +453,20 @@ public sealed record RecommendationSet(
 /// naming what would feed it — never a template with a guessed number in it (trap 73).</para>
 ///
 /// <para><b>HOME-006 is a refusal and not a caveat.</b> Nothing here produces a fact that
-/// could be worded as "this camp is safe". <see cref="ZoneDeathsFact"/> is the only
-/// survival-adjacent shape and it exists only where the player has actually died; the
-/// vocabulary guard lives on <c>HelperPresentation</c>, which is where the words are.</para>
+/// could be worded as "this camp is safe". The survival-adjacent shapes are
+/// <see cref="ZoneDeathsFact"/>, which exists only where the player has actually died, and
+/// <see cref="ZoneDowntimeFact"/>, which reports a share of elapsed time and names no cause
+/// for it; both are counts with their scope and neither carries an adjective. The vocabulary
+/// guard lives on <c>HelperPresentation</c>, which is where the words are.</para>
+///
+/// <para><b>"Versus difficulty" is answered without a difficulty model, because there is
+/// none</b> (DRA-71 D4, plan P7). The game states exactly one difficulty scale — the
+/// instance tier on its own zone line — and this file reports it
+/// (<see cref="ZoneTierFact"/>) rather than ranking on it. Everything else about "was this
+/// camp a match for my character" is assembled from outcomes the log already measured:
+/// output per combat second, fight length, deaths, downtime, each against this character's
+/// OWN pooled figures. No mob-HP model is invented, no con-colour scale is invented, and no
+/// number comes off anybody else's screen.</para>
 ///
 /// <para><b>Nothing here measures another player.</b> Every input is this character's own
 /// log, this character's own dumps and catalogs EQBuddy ships. There is no comparison, no
@@ -385,11 +482,26 @@ public static class Recommendations
     /// </summary>
     public const int DefaultCap = 3;
 
-    /// <summary>How many why-lines one recommendation draws before it says it is holding
-    /// some back. Four, because a headline plus five reasons stops being a recommendation
-    /// and becomes a report — and the withheld count is carried on the record rather than
-    /// dropped, for the same reason the cap above reports itself.</summary>
-    public const int WhyCap = 4;
+    /// <summary>
+    /// How many why-lines one recommendation draws before it says it is holding some back.
+    ///
+    /// <para><b>Four until DRA-71 D4, and SIX after it — a raise this slice was forced
+    /// into.</b> The original reasoning stands: a headline plus a long list stops being a
+    /// recommendation and becomes a report. But D4 gives the zone engine four new things to
+    /// measure, and at four the cap was silently trimming the P6 outgrown sentence the
+    /// PREVIOUS slice shipped — a zone marked down twice, drawing the explanation for one of
+    /// them. Trimming a caveat to make room for a number is the worst way for a cap to
+    /// behave, and it happens without any assertion in the repo noticing.</para>
+    ///
+    /// <para>Six is what a fully loaded zone row needs to keep every discount that FIRED
+    /// beside its own evidence: the rate, the throughput, the cadence, the deaths, the
+    /// downtime, and the outgrown band. The seventh — the instance tier, which weighs nothing
+    /// — is emitted last precisely so it is the one the cap takes, and the row says so out
+    /// loud (<c>HelperPresentation.WithheldWhy</c>). The density of six short personal
+    /// sentences is a product question and a <c>BEVEL.md</c> stub asks it against this
+    /// slice's shots; the number is logged in <c>DECISIONS.md</c> for veto.</para>
+    /// </summary>
+    public const int WhyCap = 6;
 
     /// <summary>How many candidates one engine offers into the join. Deliberately larger
     /// than <see cref="DefaultCap"/>: the join is what decides the winner, so an engine that
@@ -528,6 +640,89 @@ public static class Recommendations
     /// </summary>
     public const double OutgrownWeight = 0.5;
 
+    // ---- throughput: outcome evidence, as weights with sentences (DRA-71 D4, plan P7) ----
+
+    /// <summary>
+    /// **WHY THESE ARE DISCOUNTS AND NOT SCORES**, read once for all four constants below.
+    ///
+    /// <para>The plan's P7 asks the ranking to consume fight length, deaths, downtime and
+    /// throughput. Every one of them is spent the same way: a NAMED threshold, a NAMED
+    /// multiplier under 1, and a sentence saying what was measured. Three properties follow
+    /// from that shape and all three are deliberate.</para>
+    ///
+    /// <para><b>They can only ever push a zone DOWN.</b> There is no bonus arm, so nothing
+    /// here can promote a camp the player's experience rate did not already earn — the rate
+    /// stays the primary term and these re-order inside it. <see cref="Recommendation.Weight"/>
+    /// is a tie-break within a kind and never a filter, so a discounted zone keeps its place
+    /// in the list and keeps its measured numbers.</para>
+    ///
+    /// <para><b>Each one fires only above a threshold, and says so when it does.</b> A
+    /// continuous curve over four inputs would produce a number nobody could explain and no
+    /// test could pin; a threshold is a judgement somebody can disagree with, which is the
+    /// same admission <see cref="OutgrownBy"/> and <see cref="ZoneHistory.MinHours"/> make
+    /// about theirs. None of them is derived from a game rule, because this repo has no
+    /// XP curve, no mob-HP model and no con-colour model to derive one from.</para>
+    ///
+    /// <para><b>And none of them is an adjective.</b> P7's own words: throughput versus
+    /// difficulty is *"never an adjective"*. The discount moves an order; the sentence beside
+    /// it reports two measurements; nothing calls a place safe, easy or hard in either
+    /// direction (HOME-006, swept in <c>HelperPresentationTests</c>).</para>
+    ///
+    /// <para><b>The double-count question, answered out loud</b>, because it is the first
+    /// objection anybody should raise: experience per hour ALREADY prices cadence, deaths and
+    /// downtime in, in aggregate — a camp where fights drag and you die pays less per hour
+    /// and sorts lower for it. These weights are not a second helping of that. They are about
+    /// whether the rate is a rate this character can repeat: a zone that paid well while you
+    /// spent half the sitting recovering is a zone whose number rests on an evening that went
+    /// a particular way, and the honest thing is to rank it a little under the camp that paid
+    /// the same with none of that. The default worth vetoing is exactly this reading, and it
+    /// is logged in <c>DECISIONS.md</c> as such.</para>
+    /// </summary>
+    public const double DeathsPerHourCost = 1.0;
+
+    /// <summary>What a zone at or above <see cref="DeathsPerHourCost"/> is multiplied by. The
+    /// why-line is <see cref="ZoneDeathsFact"/>, which is already the only survival-adjacent
+    /// sentence the Helper has — a count with its scope and no adjective.</summary>
+    public const double DeathsCostWeight = 0.8;
+
+    /// <summary>The share of elapsed time with nothing happening in it at or above which the
+    /// weight prices downtime in. Half, which is the point where the hours a rate was divided
+    /// by stop describing the fighting they are attributed to.</summary>
+    public const double DowntimeShareCost = 0.5;
+
+    /// <summary>What a zone at or above <see cref="DowntimeShareCost"/> is multiplied by.</summary>
+    public const double DowntimeCostWeight = 0.8;
+
+    /// <summary>
+    /// How many times your own average fight length a zone's fights must run before the
+    /// weight prices the cadence in. Half again, and <b>relative to this character rather
+    /// than to a number of seconds</b>: "is 95 seconds a long fight" has no answer in this
+    /// repo, and "is 95 seconds long for the character who averages 41" does.
+    /// </summary>
+    public const double SlowFightRatio = 1.5;
+
+    /// <summary>What a zone at or above <see cref="SlowFightRatio"/> of your own mean fight
+    /// length is multiplied by. The why-line is <see cref="ZoneCadenceFact"/>, which gains
+    /// the baseline clause in the same slice so the discount and its evidence arrive
+    /// together.</summary>
+    public const double SlowFightWeight = 0.8;
+
+    /// <summary>
+    /// The share of your own pooled damage-and-healing per combat second below which a zone's
+    /// throughput counts as a shortfall. Three fifths — far enough under that a normal spread
+    /// between camps does not trip it.
+    ///
+    /// <para>It reads <see cref="ZoneRoll.OutputPerSecond"/> and not dps alone, because a
+    /// cleric's contribution is healing and a damage-only measure would discount every zone a
+    /// healer did their job in.</para>
+    /// </summary>
+    public const double ThroughputShortfall = 0.6;
+
+    /// <summary>What a zone under <see cref="ThroughputShortfall"/> of your own baseline is
+    /// multiplied by. The why-line is <see cref="ZoneThroughputFact"/>, which reports both
+    /// halves and the baseline's scope.</summary>
+    public const double ThroughputShortfallWeight = 0.8;
+
     /// <summary>
     /// Rank the answers for one set of selected goals.
     /// </summary>
@@ -654,6 +849,13 @@ public static class Recommendations
     /// changes — the ranking still runs on the player's own evidence, which is the half of
     /// the unknown-level contract that matters (a recommender that fell silent because it did
     /// not know a number would be worse than one that never asked).</para>
+    ///
+    /// <para><b>AND THE ENGINE THAT PRICES OUTCOMES</b> (DRA-71 D4, plan P7). Beside the rate
+    /// it now reports what this character actually put out here, how the fights compared with
+    /// their own average, how much of the time had nothing happening in it, and which instance
+    /// tier their own zone line recorded — and it weighs the first three (see
+    /// <see cref="ThroughputCost"/>). Every one of those is a measurement of this player and
+    /// nobody else, and none of them is drawn as an adjective.</para>
     /// </summary>
     private static void LevelUp(HelperInputs inputs, List<Recommendation> into, List<GoalGap> gaps)
     {
@@ -665,6 +867,14 @@ public static class Recommendations
         }
 
         var best = zones.Max(z => z.XpPerHour ?? 0);
+        // ONE producer for the yardstick, folded once for the whole engine rather than per
+        // candidate: it is a property of the SET, and a per-row recomputation would be the
+        // same sum computed six times with six chances to drift (trap 4's shape in a loop).
+        // It is built from inputs.Zones and not from `zones` — every zone the fold measured
+        // is part of what this character usually does, including the ones this engine will
+        // not offer.
+        var baseline = ZoneHistory.Baseline(inputs.Zones);
+
         foreach (var z in zones
                      .OrderByDescending(z => z.XpPerHour ?? 0)
                      .Take(PerEngineCandidates))
@@ -673,16 +883,48 @@ public static class Recommendations
             {
                 new ZoneXpRateFact(z.Zone, z.XpPerHour ?? 0, z.Sessions, z.Hours),
             };
+
+            // **The throughput line** (DRA-71 D4, plan P7). Drawn whenever the output was
+            // measured, discount or no discount: smoke item 3 asked to SEE this, and a
+            // number that only appears when EQBuddy is marking a zone down is a number a
+            // player would learn to read as a verdict.
+            if (z.OutputPerSecond is { } output)
+                why.Add(new ZoneThroughputFact(
+                    z.Zone, z.Dps ?? 0, z.Hps ?? 0, output,
+                    baseline.Known ? baseline.OutputPerSecond : 0,
+                    z.CombatSeconds, baseline.Known ? baseline.Zones : 0));
+
             // Unknown is not zero: a zone whose pooled creatures never recorded a fight
-            // length says nothing about cadence rather than claiming instant kills.
+            // length says nothing about cadence rather than claiming instant kills. The
+            // baseline rides along only when there is a second zone to have averaged with —
+            // otherwise the clause would compare a zone against itself.
             if (z.AvgFightSeconds > 0)
-                why.Add(new ZoneCadenceFact(z.Zone, z.AvgFightSeconds, z.Kills));
+                why.Add(new ZoneCadenceFact(z.Zone, z.AvgFightSeconds, z.Kills,
+                    baseline.FightLengthKnown ? baseline.AvgFightSeconds : 0));
+
             // HOME-006: deaths are shown where they HAPPENED and silence otherwise. There is
             // deliberately no "and you have never died here" arm — see ZoneDeathsFact.
             if (z.Deaths > 0) why.Add(new ZoneDeathsFact(z.Zone, z.Deaths, z.Sessions));
 
+            // Downtime, and only where there is enough of it to be a fact about the place
+            // rather than about one evening. Below the threshold it is not reported at all:
+            // "12% of your time here had nothing happening in it" is true of every camp and
+            // would be furniture (trap 50's sibling — a line that never varies says nothing).
+            var downtime = z.DowntimeShare;
+            var downtimeCost = downtime >= DowntimeShareCost;
+            if (downtimeCost)
+                why.Add(new ZoneDowntimeFact(z.Zone, downtime ?? 0, z.Sessions, z.Hours));
+
             var outgrown = Outgrown(z, inputs.Level);
             if (outgrown is { } fact) why.Add(fact);
+
+            // **LAST, AND THE ORDER IS THE DESIGN.** The tier the player's own zone line
+            // recorded is the one fact on this row that weighs nothing (see ZoneTierFact), so
+            // it is emitted after every fact that explains a discount — which makes it the
+            // one WhyCap takes when a row is fully loaded, rather than a caveat. Tiers only:
+            // an instance whose adjective this build does not know is not called D0.
+            if (z.ObservedTier is >= 0 and <= 4)
+                why.Add(new ZoneTierFact(z.Zone, z.ObservedTier));
 
             into.Add(new Recommendation(
                 RecommendationKind.Zone, z.Zone, z.Zone,
@@ -690,8 +932,46 @@ public static class Recommendations
                 [new HelperDoor(HelperDoorKind.World, z.Zone)],
                 0,
                 (best > 0 ? Math.Clamp((z.XpPerHour ?? 0) / best, 0, 1) : 0)
-                * (outgrown is null ? 1 : OutgrownWeight)));
+                * (outgrown is null ? 1 : OutgrownWeight)
+                * ThroughputCost(z, baseline, downtimeCost)));
         }
+    }
+
+    /// <summary>
+    /// The four P7 discounts, multiplied together — <b>outcome evidence, priced</b> (DRA-71
+    /// D4). 1.0 when none of them fires, which is every zone that was farmed without dying,
+    /// without dragging and without a recovery for every pull.
+    ///
+    /// <para><b>Each arm is gated on its own measurement being PRESENT</b>, so a profile whose
+    /// snapshots predate the throughput probe, or whose pool never recorded a fight length, is
+    /// ranked exactly as it was before this slice rather than discounted for the gap in
+    /// EQBuddy's own reading. An absent measurement is not a bad one — the same rule the
+    /// conned band keeps (trap 73).</para>
+    ///
+    /// <para>They compound, and that is intended: a zone that is slow AND fatal AND spent
+    /// half its hours recovering has three separate things measured about it, and collapsing
+    /// them into the worst single one would throw away two of the three. The floor this can
+    /// reach is <c>0.8⁴ ≈ 0.41</c>, and even multiplied by
+    /// <see cref="OutgrownWeight"/> it re-orders rather than removes:
+    /// <see cref="Recommendation.Weight"/> is a tie-break inside a kind, the zone keeps its
+    /// place in the list, and every discount that fired has a sentence in the same row.</para>
+    /// </summary>
+    /// <param name="downtimeCost">Decided by the caller and passed in, because the same
+    /// predicate decides whether the SENTENCE is drawn — a weight and a why-line that asked
+    /// the question separately could answer it differently, which is a zone marked down in
+    /// silence.</param>
+    private static double ThroughputCost(ZoneRoll z, ThroughputBaseline baseline, bool downtimeCost)
+    {
+        var weight = 1.0;
+        if (z.DeathsPerHour >= DeathsPerHourCost) weight *= DeathsCostWeight;
+        if (downtimeCost) weight *= DowntimeCostWeight;
+        if (baseline.FightLengthKnown && z.AvgFightSeconds > 0
+            && z.AvgFightSeconds >= baseline.AvgFightSeconds * SlowFightRatio)
+            weight *= SlowFightWeight;
+        if (baseline.Known && z.OutputPerSecond is { } output
+            && output < baseline.OutputPerSecond * ThroughputShortfall)
+            weight *= ThroughputShortfallWeight;
+        return weight;
     }
 
     /// <summary>

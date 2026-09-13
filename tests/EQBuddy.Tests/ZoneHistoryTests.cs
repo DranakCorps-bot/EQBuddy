@@ -263,4 +263,251 @@ public class ZoneHistoryTests
         Assert.Equal(8, guk.ConnedMin);
         Assert.Equal(8, guk.ConnedMax);
     }
+
+    // ---- throughput: the third source (DRA-71 D4, plan P7) -------------------------------
+
+    /// <summary>A row whose id and active seconds can both be set — the existing
+    /// <see cref="Session"/> helper pins the id at 1 and makes active equal elapsed, which is
+    /// exactly what the rows below need to vary.</summary>
+    private static SessionRow Row(
+        long id, string zone, double hours, double xp, double activeHours = -1,
+        int deaths = 0) =>
+        new(id, "erollisi", "Dranak", DateTime.Today, DateTime.Today.AddHours(hours),
+            hours * 3600, (activeHours < 0 ? hours : activeHours) * 3600,
+            "ended", zone, 0, xp, 0, 0, deaths, 0, "", "");
+
+    /// <summary>
+    /// **The pooled rate is combat-second weighted, not an average of averages.**
+    ///
+    /// <para>A four-hour sitting at 40 dps and a six-minute one at 400 do not average to 220.
+    /// The stored rate is multiplied back out by its own denominator and the totals are
+    /// divided once — which is the whole reason the probe carries <c>CombatSeconds</c> at all,
+    /// and the reason a <c>Dps</c> column on its own could not have answered this.</para>
+    /// </summary>
+    [Fact]
+    public void ThroughputIsPooledByCombatSecondsAndNotAveragedAcrossSessions()
+    {
+        var guk = Assert.Single(ZoneHistory.Fold(
+            [Row(1, "Lower Guk", 4, 20), Row(2, "Lower Guk", 0.5, 3)],
+            [Mob("a froglok tad", "Lower Guk", 100, 30)],
+            [new SessionThroughput(1, 40, 0, 3600), new SessionThroughput(2, 400, 0, 60)]));
+
+        Assert.Equal(3660, guk.CombatSeconds, 3);
+        Assert.Equal((40 * 3600) + (400 * 60), guk.CombatDamage, 3);
+        // 168000 / 3660 ≈ 45.9 — nowhere near the 220 an unweighted mean would have given.
+        Assert.Equal(45.9, guk.Dps!.Value, 1);
+    }
+
+    /// <summary>
+    /// **A session with no combat seconds contributes NOTHING**, rather than a zero that
+    /// would drag the pooled rate toward the floor. Unknown is not zero — the rule this fold
+    /// already keeps for fight length and the conned band.
+    /// </summary>
+    [Fact]
+    public void ASessionWithNoCombatSecondsDoesNotDragTheRateDown()
+    {
+        var guk = Assert.Single(ZoneHistory.Fold(
+            [Row(1, "Lower Guk", 4, 20), Row(2, "Lower Guk", 4, 20)],
+            [Mob("a froglok tad", "Lower Guk", 100, 30)],
+            // The second session was a bank trip: stored, real, and with nothing to divide.
+            [new SessionThroughput(1, 40, 0, 3600), new SessionThroughput(2, 0, 0, 0)]));
+
+        Assert.Equal(3600, guk.CombatSeconds, 3);
+        Assert.Equal(40, guk.Dps!.Value, 3);
+    }
+
+    /// <summary>The join is by ROW ID. The probe reads its own query in its own order, so a
+    /// positional join would attribute one zone's output to another the first time a player
+    /// had two.</summary>
+    [Fact]
+    public void ThroughputJoinsBySessionIdAndNotByPosition()
+    {
+        var rolls = ZoneHistory.Fold(
+            [Row(7, "Lower Guk", 3, 18), Row(9, "Befallen", 3, 18)],
+            [Mob("a froglok tad", "Lower Guk", 50, 30), Mob("a skeleton", "Befallen", 50, 30)],
+            // Deliberately in the other order from the session rows above.
+            [new SessionThroughput(9, 12, 0, 600), new SessionThroughput(7, 88, 0, 600)]);
+
+        Assert.Equal(88, rolls.Single(z => z.Zone == "Lower Guk").Dps!.Value, 3);
+        Assert.Equal(12, rolls.Single(z => z.Zone == "Befallen").Dps!.Value, 3);
+    }
+
+    /// <summary>
+    /// **No throughput input at all leaves every other number exactly where it was**, and
+    /// answers null rather than zero. A profile whose snapshots predate the probe, and every
+    /// caller that does not need throughput, must rank as they did before this slice.
+    /// </summary>
+    [Fact]
+    public void WithoutTheProbeThroughputIsNullRatherThanZero()
+    {
+        var guk = Assert.Single(ZoneHistory.Fold(
+            [Row(1, "Lower Guk", 3, 18)], [Mob("a froglok tad", "Lower Guk", 50, 30)]));
+
+        Assert.False(guk.HasThroughput);
+        Assert.Null(guk.Dps);
+        Assert.Null(guk.Hps);
+        Assert.Null(guk.OutputPerSecond);
+        // And the rate that existed before the slice is untouched.
+        Assert.Equal(6, guk.XpPerHour!.Value, 3);
+    }
+
+    /// <summary>The <see cref="ZoneHistory.MinHours"/> floor governs throughput too: four
+    /// minutes containing one good pull is not a measurement of anything.</summary>
+    [Fact]
+    public void ThroughputKeepsTheSameFloorTheExperienceRateKeeps()
+    {
+        var thin = Assert.Single(ZoneHistory.Fold(
+            [Row(1, "Lower Guk", 0.1, 4)], [Mob("a froglok tad", "Lower Guk", 3, 30)],
+            [new SessionThroughput(1, 90, 0, 120)]));
+
+        Assert.False(thin.HasThroughput);
+        Assert.Null(thin.Dps);
+        // The raw sums are still there — the refusal is the RATE, not the record.
+        Assert.Equal(120, thin.CombatSeconds, 3);
+    }
+
+    /// <summary>
+    /// **Healing counts toward the figure the ranking weighs.** A cleric who healed through a
+    /// camp and swung at nothing measured a dps of zero and an output that is not zero, and a
+    /// weight that could only see damage would mark down every zone they did their job in.
+    /// </summary>
+    [Fact]
+    public void AHealersOutputIsNotZeroJustBecauseTheirDamageIs()
+    {
+        var guk = Assert.Single(ZoneHistory.Fold(
+            [Row(1, "Lower Guk", 3, 18)], [Mob("a froglok tad", "Lower Guk", 50, 30)],
+            [new SessionThroughput(1, 0, 55, 1800)]));
+
+        Assert.Equal(0, guk.Dps!.Value, 3);
+        Assert.Equal(55, guk.Hps!.Value, 3);
+        Assert.Equal(55, guk.OutputPerSecond!.Value, 3);
+    }
+
+    /// <summary>Downtime is the GAP between elapsed and active, and it is a share rather than
+    /// a count of minutes — an hour idle in a two-hour sitting and an hour idle in a ten-hour
+    /// one are the same count and not the same fact.</summary>
+    [Fact]
+    public void DowntimeIsTheGapBetweenElapsedAndActiveTime()
+    {
+        var guk = Assert.Single(ZoneHistory.Fold(
+            [Row(1, "Lower Guk", 4, 20, activeHours: 1)],
+            [Mob("a froglok tad", "Lower Guk", 50, 30)]));
+
+        Assert.Equal(1, guk.ActiveHours, 3);
+        Assert.Equal(0.75, guk.DowntimeShare!.Value, 3);
+    }
+
+    /// <summary>An active figure larger than the elapsed one cannot happen from one honest
+    /// snapshot, and a stored row from a build where it did must not produce a negative
+    /// percentage on screen.</summary>
+    [Fact]
+    public void AnImpossibleActiveFigureClampsRatherThanGoingNegative()
+    {
+        var guk = Assert.Single(ZoneHistory.Fold(
+            [Row(1, "Lower Guk", 2, 20, activeHours: 9)],
+            [Mob("a froglok tad", "Lower Guk", 50, 30)]));
+
+        Assert.Equal(0, guk.DowntimeShare!.Value, 3);
+    }
+
+    /// <summary>Deaths are reported as a RATE as well as a count, and the floor applies —
+    /// one death in twenty minutes and one in twenty hours are the same count.</summary>
+    [Fact]
+    public void DeathsAreAvailableAsARateAndNotOnlyAsACount()
+    {
+        var guk = Assert.Single(ZoneHistory.Fold(
+            [Row(1, "Lower Guk", 4, 20, deaths: 6)],
+            [Mob("a froglok tad", "Lower Guk", 50, 30)]));
+
+        Assert.Equal(6, guk.Deaths);
+        Assert.Equal(1.5, guk.DeathsPerHour!.Value, 3);
+    }
+
+    /// <summary>
+    /// **The instance tier needs no plumbing: it is already in the zone's own name.**
+    ///
+    /// <para>A session stores the zone string the game printed, verbatim, and this fold has
+    /// never normalised it — so the tier is the observation the player's own log made, decoded
+    /// where it already sits. An open-world zone decodes to <c>OpenWorld</c> and draws
+    /// nothing.</para>
+    /// </summary>
+    [Fact]
+    public void TheInstanceTierComesOutOfTheZoneNameTheSessionAlreadyStored()
+    {
+        var rolls = ZoneHistory.Fold(
+            [Row(1, "Najena 4 (Refined)", 3, 18), Row(2, "Lower Guk", 3, 18)], []);
+
+        Assert.Equal(4, rolls.Single(z => z.Zone.StartsWith("Najena")).ObservedTier);
+        Assert.Equal(InstanceTier.OpenWorld, rolls.Single(z => z.Zone == "Lower Guk").ObservedTier);
+    }
+
+    // ---- the baseline --------------------------------------------------------------------
+
+    /// <summary>
+    /// **A one-zone profile has NO baseline**, and that clause is the one worth a test.
+    ///
+    /// <para>A baseline folded from one zone IS that zone, so any comparison against it would
+    /// be a tautology — "your output here is exactly your average" true by construction, and a
+    /// discount that could never fire looking like one that had been checked.</para>
+    /// </summary>
+    [Fact]
+    public void OneMeasuredZoneIsNotAYardstickForItself()
+    {
+        var one = ZoneHistory.Baseline(ZoneHistory.Fold(
+            [Row(1, "Lower Guk", 3, 18)], [Mob("a froglok tad", "Lower Guk", 50, 30)],
+            [new SessionThroughput(1, 40, 0, 1800)]));
+
+        Assert.False(one.Known);
+        // The arithmetic still ran — the refusal is the COMPARISON, not the sum.
+        Assert.Equal(40, one.OutputPerSecond, 3);
+        Assert.Equal(1, one.Zones);
+    }
+
+    /// <summary>The baseline is pooled over combat seconds, so a camp farmed for hours weighs
+    /// more than one visited for minutes — the same rule a single row's own rate keeps.</summary>
+    [Fact]
+    public void TheBaselineIsPooledAndNotAMeanOfTheRows()
+    {
+        var baseline = ZoneHistory.Baseline(ZoneHistory.Fold(
+            [Row(1, "Lower Guk", 4, 20), Row(2, "Befallen", 3, 12)],
+            [Mob("a froglok tad", "Lower Guk", 200, 20),
+             Mob("a skeleton", "Befallen", 20, 80)],
+            [new SessionThroughput(1, 100, 0, 3600), new SessionThroughput(2, 10, 0, 400)]));
+
+        Assert.True(baseline.Known);
+        Assert.Equal(2, baseline.Zones);
+        // (100×3600 + 10×400) / 4000 = 91.0, not the 55 a two-row mean would give.
+        Assert.Equal(91, baseline.OutputPerSecond, 1);
+        // Kill-weighted fight length, same discipline: (20×200 + 80×20) / 220 ≈ 25.5.
+        Assert.True(baseline.FightLengthKnown);
+        Assert.Equal(25.5, baseline.AvgFightSeconds, 1);
+    }
+
+    /// <summary>
+    /// **The two halves are known SEPARATELY.** A profile can have measured combat in two
+    /// zones and a pooled fight length in one; dragging both down to the weaker one would
+    /// throw away a comparison that was available.
+    /// </summary>
+    [Fact]
+    public void TheOutputAndFightLengthHalvesOfTheBaselineAreKnownIndependently()
+    {
+        var baseline = ZoneHistory.Baseline(ZoneHistory.Fold(
+            [Row(1, "Lower Guk", 4, 20), Row(2, "Befallen", 3, 12)],
+            // Only Lower Guk's creatures ever recorded a fight length.
+            [Mob("a froglok tad", "Lower Guk", 200, 20), Mob("a skeleton", "Befallen", 20)],
+            [new SessionThroughput(1, 100, 0, 3600), new SessionThroughput(2, 10, 0, 400)]));
+
+        Assert.True(baseline.Known);
+        Assert.False(baseline.FightLengthKnown);
+    }
+
+    /// <summary>Nothing measured anywhere is <see cref="ThroughputBaseline.None"/>, and a null
+    /// list is the same answer as an empty one.</summary>
+    [Fact]
+    public void ABaselineOverNothingIsNone()
+    {
+        Assert.Equal(ThroughputBaseline.None, ZoneHistory.Baseline([]));
+        Assert.Equal(ThroughputBaseline.None, ZoneHistory.Baseline(null));
+        Assert.False(ThroughputBaseline.None.Known);
+    }
 }

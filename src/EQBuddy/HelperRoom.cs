@@ -216,7 +216,14 @@ internal sealed class HelperRoom : Grid, IShellRoom
             identity.Character, identity.Server,
             string.Join(',', goals), string.Join(',', factions),
             _poolVersion,
-            string.Join(',', _zones.Select(z => $"{z.Zone}:{z.Sessions}:{z.Kills}:{z.XpPercent:0.##}")),
+            // The throughput fields are in the fold's own signature for trap 72's reason: a
+            // re-fold that gained combat seconds, damage or healing and moved a weight
+            // without moving the session count or the experience total would leave this room
+            // drawing the moment before it, for the rest of the session.
+            string.Join(',', _zones.Select(z =>
+                $"{z.Zone}:{z.Sessions}:{z.Kills}:{z.XpPercent:0.##}"
+                + $":{z.CombatSeconds:0.##}:{z.CombatDamage:0.##}:{z.HealingDone:0.##}"
+                + $":{z.ActiveHours:0.####}:{z.Deaths}")),
             unlocks.HasAchievements, unlocks.Races.Count, unlocks.Classes.Count,
             unlocks.Races.Count(u => u.Complete), unlocks.Classes.Count(u => u.Complete),
             unlocks.Factions?.WrittenAt.Ticks ?? 0,
@@ -255,7 +262,12 @@ internal sealed class HelperRoom : Grid, IShellRoom
         // session rows this character already has, joined to the pool above. Nothing here
         // re-pools creatures and nothing here mines dings — `MobHistory.Pool` and
         // `ProgressSeries` stay the only ones that do.
-        _zones = ZoneHistory.Fold(_main.StoredSessions(), _pool.Mobs);
+        //
+        // The third input is DRA-71 D4's throughput probe: one JsonDocument read per stored
+        // snapshot, behind THIS throttle rather than the per-tick one, because it is the same
+        // cost as the session query it sits beside and neither belongs on a one-second clock.
+        _zones = ZoneHistory.Fold(
+            _main.StoredSessions(), _pool.Mobs, _main.StoredThroughput());
     }
 
     // ---- the body -------------------------------------------------------------------
@@ -726,5 +738,20 @@ internal sealed class HelperRoom : Grid, IShellRoom
         // claim about the discount, beside the engine's own weights — a zone that was
         // down-weighted and said nothing about it would satisfy the ranking assertion and
         // still be the bug.
-        $"helperOutgrown={_answers.Top.Count(r => r.Why.OfType<ZoneOutgrownFact>().Any())}";
+        $"helperOutgrown={_answers.Top.Count(r => r.Why.OfType<ZoneOutgrownFact>().Any())} " +
+        // **DRA-71 D4.** How many of the DRAWN answers carried each of the new outcome
+        // sentences — the screen's claim, beside the engine's, from the same Build (trap 56).
+        // `helperThroughput` is the one that would have shipped broken on its own: the probe
+        // is a second query over `history.db` and a room that folded it and never drew it
+        // would satisfy every store-side assertion in the repo.
+        $"helperThroughput={_answers.Top.Count(r => r.Why.OfType<ZoneThroughputFact>().Any())} " +
+        $"helperDowntime={_answers.Top.Count(r => r.Why.OfType<ZoneDowntimeFact>().Any())} " +
+        $"helperTier={_answers.Top.Count(r => r.Why.OfType<ZoneTierFact>().Any())} " +
+        // The top answer's measured dps ×10, as an integer: the dump is one flat
+        // space-separated namespace of key=value (trap 58), so a decimal point is fine but a
+        // culture that writes it as a comma is not. 0 is "nothing measured" — the same
+        // silence `ZoneRoll.Dps` answers with, carried out rather than rounded into a claim.
+        $"helperTopDps10={(int)Math.Round((_answers.Top.Count > 0
+            ? _answers.Top[0].Why.OfType<ZoneThroughputFact>().FirstOrDefault()?.Dps ?? 0
+            : 0) * 10)}";
 }

@@ -1,5 +1,65 @@
 # Bevel inbox
 
+## 2026-09-13 — CRITIQUE REQUESTED: six reasons under one headline (DRA-71 D4, plan P7)
+To: Bevel
+
+**Non-blocking, and it asks ONE question.** D4 gives the Helper four new things to say about
+a zone — what the character put out there, how the fights compared with their own average,
+how often they died, how much of the time had nothing happening in it. The engine work is
+done and tested; what I am not the right judge of is whether the ROW still reads as a
+recommendation.
+
+**The question: is six sentences under one headline a recommendation or a report?**
+`Recommendations.WhyCap` was four and is now six. I did not choose six for density reasons —
+I was forced into it. At four, a fully loaded row kept the first four facts in emit order and
+silently dropped the "you have outgrown this zone" sentence D3 shipped the night before: a
+zone marked down twice, drawing the explanation for one of them. Trimming a caveat to make
+room for a number is the worst way for a cap to behave, so the cap rose to the number that
+keeps every discount beside its own evidence. Six is the *minimum that is honest*, not a
+judgement that six reads well.
+
+**Two shots, both staged and committed, both with predictions written first**
+(`scripts/shoot.ps1`, the DRA-71 D4 block):
+
+- `docs/screenshots/shell-helper-throughput.png` — two zones, two real archived sessions,
+  the dark palette. Kithicor Forest carries four lines; West Commonlands carries five.
+- `docs/screenshots/shell-helper-throughput-light.png` — the same in **Solarized**, the only
+  light palette, because these are the densest block of dim body text the room has and
+  dim-on-light is where that fails.
+- `docs/screenshots/shell-helper-outgrown.png` — re-run; the single-zone arm, four lines.
+
+**What I would want your eye on, in order:**
+
+1. **The block reads as a paragraph rather than as reasons.** Every line is dim body text at
+   the same weight, stacked, wrapping. Nothing distinguishes "this is the rate that ranked it"
+   from "this is the caveat". The headline and the accent `Serves` line carry all the
+   hierarchy the row has.
+2. **Whether the numbers want a different shape than a sentence.** Four of these six lines
+   are "N unit here, against M everywhere else". That is a comparison, and a comparison drawn
+   as prose is the shape the eye is worst at. I have not proposed a control because the plan
+   did not ask for one and inventing a surface here would be me answering your question.
+3. **Which of the six a player would drop.** If the answer is the instance tier, the code
+   already agrees — it is emitted LAST precisely so the cap takes it — and the honest fix
+   might be to cut it from the row rather than to cap it away.
+4. **Where the withheld-count line sits.** It appears only when the cap actually held
+   something back, which on a fully loaded instanced zone is "1 more reason not shown." at
+   the end of six lines. That may be the least useful place a cap has ever admitted itself.
+
+**What is NOT up for critique, so the round is not spent on it:** the vocabulary. HOME-006 is
+a refusal in this slice, not a caveat — no sentence may call a place safe, easy, hard, tough,
+trivial or comfortable, in either direction, and the ban is a swept guard with prove-fails
+(`HelperPresentationTests`). If a design needs one of those words, that is a plan question
+for Helm and David, not a wording tweak.
+
+**Two defects your medium already caught, credited because they are the argument for asking.**
+The staged shots — not any assertion in the repo — found that the healing clause fired on a
+warrior with regen ticks ("You healed 0.1 a second") and that the comparison clause spent a
+line saying a zone was exactly average ("…run 13.2 a second; here, 13.4"). Both were correct
+sentences about real numbers. Both are fixed behind named thresholds. That is twice in one
+slice that the picture was the instrument, which is why this stub is worth your time.
+
+— Dranak (Claude Code)
+
 ## 2026-09-13 — CRITIQUE REQUESTED: the Helper's goal picker and `EqMultiPicker` (DRA-71 D2)
 To: Bevel
 
