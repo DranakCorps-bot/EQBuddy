@@ -113,6 +113,27 @@ public sealed class QuestLedgerStore
         /// preview needs this to survive restarts (and log truncation).</summary>
         public int Level { get; set; }
 
+        /// <summary>When the log announced <see cref="Level"/> — <b>the LOG's own
+        /// timestamp</b>, not the moment EQBuddy read the line. 0001-01-01 means a level
+        /// stored before this field existed, which <see cref="CharacterLevel.Resolve"/>
+        /// treats as the oldest claim there is (see its own note on why that is the right
+        /// migration).</summary>
+        public DateTime LevelAt { get; set; }
+
+        /// <summary>The level the PLAYER set on the Character room (DRA-71 D3) — their own
+        /// statement, which is a different fact from <see cref="Level"/> (the game's). 0
+        /// means no statement stands, which is what "Let EQBuddy work it out" writes: unlike
+        /// the dump-sourced class list, clearing this IS storable, because the statement is
+        /// the thing being cleared rather than the evidence under it.</summary>
+        public int StatedLevel { get; set; }
+
+        /// <summary>When the player made that statement — <b>their wall clock, LOCAL</b>,
+        /// because <see cref="CharacterLevel.Resolve"/> compares it directly against
+        /// <see cref="LevelAt"/>, which is a log timestamp. See <see cref="LevelReading.At"/>
+        /// for why this one field is not UTC while <see cref="GuideProgress.LastUpdated"/>
+        /// is.</summary>
+        public DateTime StatedLevelAt { get; set; }
+
         /// <summary>Guide id → that guide's manual progress for this character. <b>Per
         /// character</b>, which is where progress always belonged — the per-profile Sky ticks
         /// are a known wart this deliberately does not copy (Fable plan §4).</summary>
@@ -193,6 +214,7 @@ public sealed class QuestLedgerStore
                     && stored.Values.All(c => c.Items.Count == 0 && c.Tracked.Count == 0
                                               && c.Hidden.Count == 0 && c.Completed.Count == 0
                                               && c.Classes.Count == 0 && c.Level == 0
+                                              && c.StatedLevel == 0
                                               && c.UnlockedClasses.Count == 0
                                               && c.StatedClasses.Count == 0
                                               && c.Guides.Count == 0))
@@ -230,6 +252,9 @@ public sealed class QuestLedgerStore
                         UnlockedClasses = kv.Value.UnlockedClasses,
                         StatedClasses = kv.Value.StatedClasses,
                         Level = kv.Value.Level,
+                        LevelAt = kv.Value.LevelAt,
+                        StatedLevel = kv.Value.StatedLevel,
+                        StatedLevelAt = kv.Value.StatedLevelAt,
                         Guides = new Dictionary<string, GuideProgress>(kv.Value.Guides, StringComparer.OrdinalIgnoreCase),
                         LastInventoryReconcile = kv.Value.LastInventoryReconcile,
                     }),
@@ -678,24 +703,101 @@ public sealed class QuestLedgerStore
         }
     }
 
-    /// <summary>Last announced level for this character (0 = unknown).</summary>
+    /// <summary>Last announced level for this character (0 = unknown). <b>The OBSERVED
+    /// half only</b> — a surface asking "what level is this character" wants
+    /// <see cref="ResolvedLevelFor"/>, which weighs this against the player's own statement.
+    /// This one exists for the ding gate, which has to compare the log's newest number
+    /// against the log's stored number and nothing else.</summary>
     public int LevelFor(string characterKey)
     {
         lock (_lock)
             return _byCharacter.TryGetValue(characterKey, out var c) ? c.Level : 0;
     }
 
-    /// <summary>Record the level the log just announced. Stores what the log said, not
-    /// a max — the announcement line only fires on gains, so it's already monotonic
-    /// per character. Idempotent on the same level (launch replay re-offers dings).</summary>
-    public void SetLevel(string characterKey, int level)
+    /// <summary>What the log announced, with the moment it announced it, or null when it
+    /// never has.</summary>
+    public LevelReading? ObservedLevelFor(string characterKey)
+    {
+        lock (_lock)
+            return _byCharacter.TryGetValue(characterKey, out var c)
+                ? CharacterLevel.Reading(c.Level, c.LevelAt)
+                : null;
+    }
+
+    /// <summary>What the player stated, with the moment they stated it, or null when no
+    /// statement stands.</summary>
+    public LevelReading? StatedLevelFor(string characterKey)
+    {
+        lock (_lock)
+            return _byCharacter.TryGetValue(characterKey, out var c)
+                ? CharacterLevel.Reading(c.StatedLevel, c.StatedLevelAt)
+                : null;
+    }
+
+    /// <summary>
+    /// **The one answer** — the fresher of the two claims
+    /// (<see cref="CharacterLevel.Resolve"/>).
+    ///
+    /// <para>Resolved HERE rather than by each caller, for the reason trap 33 names: two
+    /// callers with different arguments produce two current answers and whichever ran last
+    /// wins. The Character room, the Helper, the level-unlock preview and the xp tooltip all
+    /// ask this, so "the widget says 30 and the Helper says 28" is not a state the app can
+    /// reach. <b>Both readings are taken under ONE lock</b>, so the pair being weighed is
+    /// the pair that existed at one moment (trap 56).</para>
+    /// </summary>
+    public ResolvedLevel ResolvedLevelFor(string characterKey)
+    {
+        lock (_lock)
+        {
+            if (!_byCharacter.TryGetValue(characterKey, out var c)) return ResolvedLevel.Unknown;
+            return CharacterLevel.Resolve(
+                CharacterLevel.Reading(c.Level, c.LevelAt),
+                CharacterLevel.Reading(c.StatedLevel, c.StatedLevelAt));
+        }
+    }
+
+    /// <summary>
+    /// Record the level the log just announced, with <b>the LOG's own timestamp</b>. Stores
+    /// what the log said, not a max — the announcement line only fires on gains, so it's
+    /// already monotonic per character.
+    ///
+    /// <para>Idempotent on the same level AND the same stamp (launch replay re-offers every
+    /// ding in the file). It is NOT idempotent on the level alone: a ding re-read from a
+    /// fresher log line is the same number carrying a newer moment, and the moment is the
+    /// whole of what <see cref="CharacterLevel.Resolve"/> weighs.</para>
+    /// </summary>
+    public void SetLevel(string characterKey, int level, DateTime at)
     {
         if (characterKey.Length == 0 || level <= 0) return;
         lock (_lock)
         {
             var c = CharacterFor(characterKey);
-            if (c.Level == level) return;
+            if (c.Level == level && c.LevelAt == at) return;
             c.Level = level;
+            c.LevelAt = at;
+            Save();
+        }
+    }
+
+    /// <summary>
+    /// The player's own statement about their level, stamped with their wall clock.
+    /// <b>A level of 0 or less CLEARS it</b> — that is "Let EQBuddy work it out", the same
+    /// idiom the class statement uses, and it is why the undo is one click rather than a
+    /// number the player has to guess their way back to.
+    /// </summary>
+    public void SetStatedLevel(string characterKey, int level)
+    {
+        if (characterKey.Length == 0) return;
+        lock (_lock)
+        {
+            var c = CharacterFor(characterKey);
+            var wanted = Math.Max(0, level);
+            // Re-stating the SAME level is not a no-op: the player re-affirming a number
+            // after a ding is exactly how they say "no, the ding was my other class" a
+            // second time, and only the stamp can carry that.
+            if (c.StatedLevel == wanted && wanted == 0) return;
+            c.StatedLevel = wanted;
+            c.StatedLevelAt = wanted > 0 ? DateTime.Now : default;
             Save();
         }
     }

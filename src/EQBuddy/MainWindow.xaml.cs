@@ -684,10 +684,23 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
     public ZoneGraph ZoneGraph { get; private set; } = new();   // IZoneHost, World PR 1
     internal QuestLedgerStore? QuestLedger { get; private set; }
     internal string QuestCharacterKey => _stats.LedgerCharacterKey;
-    /// <summary>The ledger's durable level, or null when it has never recorded one. ONE
-    /// member: three callers ask now (unlock memo, Progress card, OE-3's xp tooltip), and
-    /// three hand-copied fallback orders is how they stop agreeing (trap 4).</summary>
-    private int? TrackedLevel => QuestLedger?.LevelFor(QuestCharacterKey) is > 0 and var lv ? lv : null;
+    /// <summary>
+    /// The character's level and where it came from — <c>CharacterLevel.Resolve</c>'s own
+    /// answer, taken here so no two surfaces can resolve it differently (trap 33). The
+    /// sibling of <see cref="ClassSourceFor"/>, and read by the same kinds of caller.
+    /// </summary>
+    internal ResolvedLevel ResolvedLevel =>
+        QuestLedger?.ResolvedLevelFor(QuestCharacterKey) ?? Core.ResolvedLevel.Unknown;
+
+    /// <summary>The character's durable level, or null when nothing knows one. ONE member:
+    /// three callers ask now (unlock memo, Progress card, OE-3's xp tooltip), and three
+    /// hand-copied fallback orders is how they stop agreeing (trap 4).
+    ///
+    /// **It is the RESOLVED level since DRA-71 D3**, not the log's raw number. A player who
+    /// told the Character room they are level 30 must not be shown "New at level 28" by the
+    /// unlock preview two rooms away — two answers to "what level is this character" is the
+    /// same defect the one member above was created to prevent, one layer up.</summary>
+    private int? TrackedLevel => ResolvedLevel is { Known: true } lv ? lv.Level : null;
 
     /// <summary>The zone the log last put us in — the Quest Tracker measures distances
     /// from here.</summary>
@@ -2425,9 +2438,16 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
         UpdateEpicQuestChecklist(s);
         // Remember the announced level per character — the "At N:" preview must survive
         // restarts and log truncation, and the log only says the number at the ding.
-        if (s.LastLevel is { } announced && QuestLedger is { } lg && QuestCharacterKey.Length > 0
+        // **The LOG's timestamp travels with it since DRA-71 D3** (trap 56: two facts about
+        // one thing, from one moment), because the ding's moment is the whole of what
+        // `CharacterLevel.Resolve` weighs against the player's own statement. The gate reads
+        // `LevelFor` — the OBSERVED half — deliberately: comparing the log's newest number
+        // against the resolved one would make a player's statement suppress the ding that is
+        // supposed to be able to beat it.
+        if (s.LastLevel is { } announced && s.LastLevelAt is { } announcedAt
+            && QuestLedger is { } lg && QuestCharacterKey.Length > 0
             && lg.LevelFor(QuestCharacterKey) != announced)
-            lg.SetLevel(QuestCharacterKey, announced);
+            lg.SetLevel(QuestCharacterKey, announced, announcedAt);
         // The ding's cue rides the header, visible while the card is closed: the header
         // is the only Progress surface that always shows, and clicking it opens the
         // card where the "New at level N" list waits (never a popup). Text built in

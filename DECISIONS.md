@@ -1,3 +1,131 @@
+## 2026-09-13 — DRA-71 delivery 3: one level, two writers, ordered by time — and the ten defaults taken to build it
+
+Pre-authorized: Helm SIGNED the plan (PR #586, merged `a28c5d89`; SSC #587 merged
+`93040ac2`), and SIGNED D2 (PR #588, merged `5d8526a2`) authorizing `dra71-d3`.
+Nothing below is on the consequence list: no release, no new surface beyond the
+two rooms the PRD already owns, no values-line question (every number is this
+character's own log and this character's own statement — nothing measures another
+player), no change to what leaves the machine and no eqlwiki request. David
+vetoes from here.
+
+**1. The fresher claim wins, and the sources are not ranked at all.** The default
+could have been a precedence table — "the log beats the player" (DRA-66's shape
+for classes) or its reverse. Both are wrong half the time here, and the Founder's
+own case is why: a Legends character holds up to three classes at once, so the
+level the log printed belongs to whatever was equipped when it printed. Time is
+the only ordering that is a FACT about the two claims rather than an opinion
+about them. **On an exact tie the STATEMENT wins** — written down rather than left
+to an operator, because a tie-break nobody named is a tie-break nobody can check.
+
+**2. The statement's stamp is LOCAL wall clock, not UTC — and that is the one
+thing in this slice most likely to have shipped silently wrong.** An observed
+reading's stamp is the LOG's timestamp, which the parser hands over as a local
+`DateTime`. `CharacterLevel.Resolve` compares the two directly, so they must be
+the same clock. The repo's sibling field is the other one on purpose:
+`GuideProgress.LastUpdated` is deliberately UTC and says so, because nothing ever
+compares it to a log line. A UTC stamp here would make every statement look up to
+a day fresher or staler than the ding it is weighed against, depending on the
+player's offset — and would look perfectly correct in the one timezone the author
+tested in. Named in `LevelReading.At`'s own comment so the next person meets it
+before they change it.
+
+**3. Only Level Up consumes the level; the other three engines are EXEMPT, each
+with a named reason. This is the default that most deserves a veto.** The
+Founder's MUST is *"recs MUST factor it"*, and three of four D3 engines answer
+"not in my arithmetic". The reasoning: the discount is about a zone's
+THROUGHPUT — what your own kills there were worth — and only Level Up makes that
+claim. For the other three the zone is a POINTER: a faction only moves where its
+own creatures are, and an unlock criterion names a specific creature, quest or
+standing. Down-weighting those for being low-level would be EQBuddy recommending
+against the goal the player just picked. The table is
+`Recommendations.LevelUseFor` and it is asserted as BEHAVIOUR, not as a comment:
+`HelperMustListTests` runs each engine at level 12 and level 60 and requires a
+declared `Consumes` to ANSWER DIFFERENTLY and a declared `Exempt` to answer
+identically — so an exemption that stops being true fails rather than going
+stale. The throughput goals that arrive later (Farm Gear D6, Farm Motes and Make
+Money D7) each own their row here when they land. **If David reads the MUST more
+broadly than this, the fix is three table rows and three engines, not a
+redesign.**
+
+**4. `OutgrownBy` is 10 levels and `OutgrownWeight` is 0.5 — both are named
+judgements rather than measurements, and they say so.** This repo has no XP
+curve, eqlwiki publishes none, and deriving one from con colours would be
+asserting a game rule nobody here can verify (David's own ceiling is level 29 —
+`david-cannot-verify-endgame`). Ten levels is the distance at which a band stops
+overlapping anything a player would still be fighting; the halving is a
+re-ordering and never a removal, because the zone keeps its real measured rate
+and the player may have a reason to go back that EQBuddy does not know. Same
+admission `ZoneHistory.MinHours` makes about its fifteen minutes.
+
+**5. The band's TOP decides, not its mean.** If anything in the zone still cons
+near you, you have outgrown PART of a zone, which is not a thing a recommendation
+should act on. The conservative direction, and it has its own test.
+
+**6. NARROWED, and said out loud: P6's evidence-band is built from `/consider`
+lines ONLY. The plan's parenthetical also named "session dings for the sessions'
+own level context", and that half is NOT in this slice.** `SessionRow` carries no
+level column, so it would be a `history.db` schema migration plus a backfill that
+could only ever be empty for existing rows. The con band is the direct measurement
+of what the sentence actually claims ("the creatures you conned here ran L5–11"),
+so nothing in the shipped behaviour rests on the missing half. Flagged rather than
+dropped: if the session-level context is wanted, it is its own slice with its own
+migration.
+
+**7. A stated level has NO upper bound.** It refuses zero, negatives and anything
+that is not a whole number, and says so out loud rather than silently reverting.
+It does not refuse 300, because EQBuddy does not know the game's level cap:
+nothing in-tree names one, the wiki answer is not in the repo, and a validation
+rule that asserted a game fact would be exactly the thing the match-the-wiki rule
+exists to prevent. The cost is bounded — the discount is a weight, not a filter,
+and "Let EQBuddy work it out" undoes a typo in one click.
+
+**8. `MainWindow.TrackedLevel` now reads the RESOLVED level, so this slice reaches
+past the Helper.** The level-unlock preview, the Progress card and the xp
+tooltip all read that one member. Leaving it on the log's raw number would mean a
+player who told the Character room they are 30 still being shown "New at level 28"
+two rooms away — two answers to "what level is this character", which is the exact
+defect that one member was created to prevent, one layer up. It is in the
+What's-new entry for the same reason.
+
+**9. The level row goes ABOVE the class row, and the zone detail line stays.**
+Order by editor size and not by importance: the level's editor is one box and the
+class's is sixteen chips, so putting class last keeps the level row from being
+pushed off the fold every time somebody opens the class strip.
+`HomeReadout.IdentityDetail` still answers ZONE — its own comment says why, and
+the Founder's ask supersedes silence about level rather than that documented
+DRA-63 call. `TheZoneDetailLineSurvivesTheLevelRowArriving` is the assertion,
+because a slice that satisfied the ask by swapping the line would have reversed a
+decision while looking finished.
+
+**10. The editor commits on Enter or "Done", and NEVER on focus loss.** The
+Character room rebuilds on a five-second throttle while a session is running, so a
+box that committed when it lost focus would write whatever half-typed prefix was
+in it at the moment the recent-session block ticked — "3" on the way to "30" — and
+that number would then be a STATEMENT outranking the player's next ding until they
+noticed. The key is announced in the editor's own note, which is a smaller price
+than a silent wrong statement. The draft survives the rebuild in a field kept
+deliberately OUT of the repaint fingerprint, and the caret goes back where the
+player left it.
+
+**What the shot disproved, recorded because a prediction caught it and nothing
+else could have.** `shell-home-level` was predicted as "a NARROW right-aligned box
+holding 28". It came back with an EMPTY box: the screenshot hook flipped the
+editor open on its own, while a player clicking the same link got their standing
+statement pre-filled. A correct photograph of a real state of something else
+(trap 23), invisible to every assertion in the repo. Both paths now go through one
+`OpenLevelEditor`, and `shellHomeLevelDraft` is the dump fact that says so from
+outside — "a box was built" and "the box holds what a player would see" are
+different claims.
+
+Verified: `dotnet build EQBuddy.slnx -c Release` green; the full unit suite green;
+the five new `ShellHostTests` rows green from a launched app; four prove-fails run
+and observed to FAIL before being reverted (a lying `LevelUse` row, the discount
+removed, `Resolve` turned into a precedence table, and the ledger round-trip
+must-list when the three new fields arrived). CI's `build-and-test` and
+`e2e-windows` remain the merge bar.
+
+— Dranak (Claude Code, DRA-71 D3)
+
 ## 2026-09-13 — DRA-71 delivery 2: one multi-select primitive, and the eight defaults taken to build it
 
 Pre-authorized: Helm SIGNED the plan (PR #586, merged `a28c5d89`; SSC #587 merged `93040ac2`)

@@ -290,6 +290,93 @@ public class HomeRoomTests
             Assert.DoesNotContain("override", words, StringComparison.OrdinalIgnoreCase);
     }
 
+    // ---- 3c. the level reading and its editor (DRA-71 D3) -----------------------
+
+    /// <summary>
+    /// **The level line always says where the number came from**, for exactly the reason the
+    /// class line one row down does: "Level 30" is a different sentence depending on whether
+    /// the game announced it or the player typed it, and a player who cannot tell which has
+    /// no way to know whether arguing with it is worth their time.
+    /// </summary>
+    [Fact]
+    public void TheLevelLineNamesTheNumberAndItsSource()
+    {
+        Assert.Equal("Level 30 — from your log's ding lines",
+            LevelReadout.Line(new ResolvedLevel(30, LevelSource.Observed, DateTime.Today)));
+        Assert.Equal("Level 28 — set by you",
+            LevelReadout.Line(new ResolvedLevel(28, LevelSource.Stated, DateTime.Today)));
+    }
+
+    /// <summary>
+    /// **The source half comes from the ONE table**, not from a string of this file's own.
+    ///
+    /// <para>Asserted by composition rather than by spelling: the line must CONTAIN what
+    /// <c>CharacterLevel.SourceLabel</c> answers, so a second wording growing here fails
+    /// instead of quietly disagreeing with the phone. That is the rule Bevel's 2026-08-23
+    /// ruling put on the class version of the same fact.</para>
+    /// </summary>
+    [Theory]
+    [InlineData(LevelSource.Observed)]
+    [InlineData(LevelSource.Stated)]
+    public void TheLevelLinesSourceIsTheOneTablesAnswer(LevelSource source) =>
+        Assert.Contains(CharacterLevel.SourceLabel(source),
+            LevelReadout.Line(new ResolvedLevel(30, source, DateTime.Today)));
+
+    /// <summary>An unknown level is a SENTENCE naming both ways forward — the log will say
+    /// it at the next ding, and the editor is right there meanwhile. A blank line would tell
+    /// a player nothing is missing, and "keep playing" alone would be asking them to grind
+    /// for a number they already know.</summary>
+    [Fact]
+    public void AnUnknownLevelIsASentenceNamingBothWaysForward()
+    {
+        var line = LevelReadout.Line(ResolvedLevel.Unknown);
+        Assert.Equal(LevelReadout.Unknown, line);
+        Assert.Contains("log", line, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("set it here", line, StringComparison.OrdinalIgnoreCase);
+        // No number at all — a "Level 0" for a character nobody has seen would be a claim.
+        Assert.DoesNotContain("0", line);
+    }
+
+    /// <summary>
+    /// The editor's own words: the commit key is ANNOUNCED (a box that only commits on a key
+    /// nobody named is a silent no-op wearing a caret), the door and its open-state label are
+    /// different, the way back is the same sentence the class editor uses, and the refusal
+    /// says what would be accepted instead of just rejecting. "Override" stays banned for the
+    /// reason it was struck from the quest picker and the class row.
+    /// </summary>
+    [Fact]
+    public void TheLevelEditorAnnouncesItsCommitKeyItsWayBackAndItsRefusal()
+    {
+        Assert.Contains("Enter", LevelReadout.EditorNote, StringComparison.Ordinal);
+        Assert.NotEqual(LevelReadout.Edit, LevelReadout.EditDone);
+        // The SAME words as the class editor's undo, deliberately: a player who has argued
+        // with EQBuddy about their classes should not learn a second idiom for their level.
+        Assert.Equal(HomeReadout.ClearStated, LevelReadout.ClearStated);
+        Assert.Contains("whole number", LevelReadout.Refused, StringComparison.OrdinalIgnoreCase);
+        foreach (var words in new[] { LevelReadout.EditorNote, LevelReadout.Edit,
+                                      LevelReadout.ClearStated, LevelReadout.Unknown,
+                                      LevelReadout.Refused, LevelReadout.EditorTip })
+            Assert.DoesNotContain("override", words, StringComparison.OrdinalIgnoreCase);
+    }
+
+    /// <summary>
+    /// **The zone detail line is NOT replaced** (plan P4: the level is an ADDED identity row).
+    ///
+    /// <para><c>HomeReadout.IdentityDetail</c> deliberately answers zone rather than level or
+    /// class, and its own comment says why: zone is the one thing that changes between
+    /// sittings and is what "where you left off" means. The Founder's ask supersedes SILENCE
+    /// about level, not that decision about zone — and a slice that satisfied the ask by
+    /// swapping the line would have quietly reversed a documented call while looking like it
+    /// delivered.</para>
+    /// </summary>
+    [Fact]
+    public void TheZoneDetailLineSurvivesTheLevelRowArriving()
+    {
+        var detail = HomeReadout.IdentityDetail(Me, "Lower Guk");
+        Assert.Contains("Lower Guk", detail);
+        Assert.DoesNotContain("Level", detail, StringComparison.OrdinalIgnoreCase);
+    }
+
     /// <summary>
     /// **Never-scanned and healthy are two states with one shape, and collapsing them is
     /// the failure Bevel named**: silence tells a player who has never run the command that

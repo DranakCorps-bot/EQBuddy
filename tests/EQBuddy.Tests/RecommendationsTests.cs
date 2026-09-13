@@ -30,6 +30,13 @@ public class RecommendationsTests
             Factions = [.. factions.Select(f => new MobFactionHit(f.Faction, f.Delta, kills))],
         };
 
+    /// <summary>The same creature with a CONNED band on it — <c>/consider</c>'s own reading,
+    /// which is the only thing in this repo that knows how hard a zone's creatures are and
+    /// therefore the only input P6's discount is allowed to rest on.</summary>
+    private static MobSummary Conned(
+        string name, string zone, int kills, int levelMin, int levelMax) =>
+        Mob(name, zone, kills) with { LevelMin = levelMin, LevelMax = levelMax };
+
     private static FactionsFile.Snapshot Dump(params (string Name, int Value, int ToMax)[] rows) =>
         new("factions.txt", DateTime.Today,
             [.. rows.Select((r, i) => new FactionsFile.Standing(i + 1, r.Name, r.Value, r.ToMax))]);
@@ -48,13 +55,20 @@ public class RecommendationsTests
         FactionsFile.Snapshot? factions = null,
         IReadOnlyList<string>? picked = null,
         IReadOnlyList<UnlockProgress>? races = null,
-        bool hasAchievements = false)
+        bool hasAchievements = false,
+        ResolvedLevel level = default)
     {
         var mobs = pool ?? [];
         return new HelperInputs(
             ZoneHistory.Fold(sessions ?? [], mobs), mobs, factions, picked ?? [],
-            races ?? [], [], hasAchievements, [], [], null);
+            races ?? [], [], hasAchievements, [], [], null, level);
     }
+
+    /// <summary>A resolved level, as the ledger would hand one over. The SOURCE is
+    /// deliberately a parameter nobody defaults: a fixture that always said "observed" could
+    /// not notice an engine that quietly cared which of the two writers won.</summary>
+    private static ResolvedLevel At(int level, LevelSource source = LevelSource.Observed) =>
+        new(level, source, new DateTime(2026, 9, 12, 20, 0, 0));
 
     // ---- 1. the join, which is the feature -------------------------------------------
 
@@ -559,5 +573,147 @@ public class RecommendationsTests
         Assert.Equal(0, set.Withheld);
         Assert.Equal(5, set.NotAnsweredYet.Count);
         Assert.Equal(4, set.Gaps.Count);
+        // And the level it was handed is the Unknown state rather than a zero somebody has
+        // to remember not to divide by (DRA-71 D3).
+        Assert.False(HelperInputs.Nothing.Level.Known);
+    }
+
+    // ---- the outgrown discount (DRA-71 D3, plan P6) ------------------------------------
+
+    /// <summary>The zone whose creatures are far under you, and the one that is not. Two
+    /// sittings of the same length; the OUTGROWN one has the BETTER measured rate, which is
+    /// the only arrangement that can prove the discount does anything.</summary>
+    private static HelperInputs TwoBands(ResolvedLevel level) => Inputs(
+        sessions: [Session("Lower Guk", 5, 60), Session("Sebilis", 5, 40)],
+        pool:
+        [
+            Conned("a froglok tad", "Lower Guk", 200, 8, 12),
+            Conned("a sebilite juggernaut", "Sebilis", 120, 45, 50),
+        ],
+        level: level);
+
+    /// <summary>
+    /// **A4: the outgrown zone loses its lead, and says why.**
+    ///
+    /// <para>Lower Guk is measured at 12%/hr and Sebilis at 8%/hr, so before this slice Lower
+    /// Guk won on weight every time. At level 50 its creatures conned L8–12 — thirty-eight
+    /// under — so it is halved, Sebilis ranks first, and the sentence explaining it is drawn
+    /// on the row rather than left as an unexplained re-order.</para>
+    /// </summary>
+    [Fact]
+    public void AZoneYouHaveOutgrownRanksBelowOneInYourBandAndSaysWhy()
+    {
+        var set = Recommendations.Rank(TwoBands(At(50)), [HelperGoal.LevelUp]);
+
+        Assert.Equal(["Sebilis", "Lower Guk"], set.Top.Select(r => r.Zone).ToArray());
+
+        var outgrown = set.Top.Single(r => r.Zone == "Lower Guk")
+            .Why.OfType<ZoneOutgrownFact>().Single();
+        Assert.Equal(8, outgrown.ConnedMin);
+        Assert.Equal(12, outgrown.ConnedMax);
+        Assert.Equal(50, outgrown.Level);
+        Assert.Equal(200, outgrown.Kills);
+        // The measured rate is UNTOUCHED — the discount is a weight, never an edit to the
+        // evidence. A recommender that quietly restated your own number would be worse than
+        // one that ranked it wrong.
+        Assert.Equal(12, set.Top.Single(r => r.Zone == "Lower Guk")
+            .Why.OfType<ZoneXpRateFact>().Single().XpPerHour, 3);
+        // And the zone in band says nothing at all about its band — there is no sentence for
+        // the opposite of outgrown, because that sentence would be a claim about how a place
+        // will treat you (HOME-006).
+        Assert.Empty(set.Top.Single(r => r.Zone == "Sebilis").Why.OfType<ZoneOutgrownFact>());
+    }
+
+    /// <summary>
+    /// **The prove-fail for the row above** (trap 34: green-only is vacuous coverage). The
+    /// SAME fixture at level 10 puts Lower Guk back on top and draws no discount sentence —
+    /// so the assertion is reading the LEVEL rather than agreeing with an order that happened
+    /// to come out that way.
+    /// </summary>
+    [Fact]
+    public void TheSameTwoZonesAtALowLevelRankTheOtherWayAndSayNothing()
+    {
+        var set = Recommendations.Rank(TwoBands(At(10)), [HelperGoal.LevelUp]);
+
+        Assert.Equal(["Lower Guk", "Sebilis"], set.Top.Select(r => r.Zone).ToArray());
+        Assert.Empty(set.Top.SelectMany(r => r.Why).OfType<ZoneOutgrownFact>());
+    }
+
+    /// <summary>
+    /// **Unknown level: the ranking still runs, and nothing is gated on a number nobody
+    /// has** (plan P5's second half).
+    ///
+    /// <para>This is the half that matters most for a new profile. A recommender that fell
+    /// silent because it had not been told a level would be worse than one that never asked —
+    /// the player's own measured rates are real evidence and do not need a level to be true.
+    /// So the answer is IDENTICAL to the un-discounted one, and carries no discount sentence
+    /// and no guessed level anywhere in it.</para>
+    /// </summary>
+    [Fact]
+    public void AnUnknownLevelRanksOnYourOwnEvidenceAndGatesNothing()
+    {
+        var unknown = Recommendations.Rank(TwoBands(ResolvedLevel.Unknown), [HelperGoal.LevelUp]);
+        var low = Recommendations.Rank(TwoBands(At(10)), [HelperGoal.LevelUp]);
+
+        Assert.Equal(
+            low.Top.Select(r => (r.Zone, r.Weight)).ToArray(),
+            unknown.Top.Select(r => (r.Zone, r.Weight)).ToArray());
+        Assert.Empty(unknown.Top.SelectMany(r => r.Why).OfType<ZoneOutgrownFact>());
+        Assert.NotEmpty(unknown.Top);
+    }
+
+    /// <summary>
+    /// **A zone nobody ever conned is not outgrown**, however high the character is.
+    ///
+    /// <para>Absence of evidence drawn as a verdict is this file's recurring failure mode —
+    /// it is the same argument <c>ZoneDeathsFact</c> makes about never having died somewhere.
+    /// A player who farmed a camp without ever pressing consider has told EQBuddy nothing
+    /// about its band, and "nothing" must not resolve to "low".</para>
+    /// </summary>
+    [Fact]
+    public void AZoneWithNoConnedBandIsNeverCalledOutgrown()
+    {
+        var set = Recommendations.Rank(Inputs(
+            sessions: [Session("Befallen", 5, 60)],
+            pool: [Mob("a skeleton", "Befallen", 200)],
+            level: At(60)), [HelperGoal.LevelUp]);
+
+        Assert.NotEmpty(set.Top);
+        Assert.Empty(set.Top.SelectMany(r => r.Why).OfType<ZoneOutgrownFact>());
+        // Full weight: an unmeasured band must not cost the zone its position either.
+        Assert.Equal(1, set.Top[0].Weight, 3);
+    }
+
+    /// <summary>The threshold is a boundary and boundaries are where rules are wrong. Exactly
+    /// <see cref="Recommendations.OutgrownBy"/> under counts; one less does not.</summary>
+    [Theory]
+    [InlineData(Recommendations.OutgrownBy, true)]
+    [InlineData(Recommendations.OutgrownBy - 1, false)]
+    public void TheThresholdIsInclusiveAtItsOwnNumber(int under, bool outgrown)
+    {
+        var set = Recommendations.Rank(Inputs(
+            sessions: [Session("Lower Guk", 5, 60)],
+            pool: [Conned("a froglok tad", "Lower Guk", 200, 8, 12)],
+            level: At(12 + under)), [HelperGoal.LevelUp]);
+
+        Assert.Equal(outgrown, set.Top.SelectMany(r => r.Why).OfType<ZoneOutgrownFact>().Any());
+    }
+
+    /// <summary>The band's TOP decides, not its middle. A zone holding one creature that
+    /// still cons near you is a zone you have outgrown PART of, which is not a thing a
+    /// recommendation should act on.</summary>
+    [Fact]
+    public void OneCreatureStillInYourBandKeepsTheWholeZoneOutOfTheDiscount()
+    {
+        var set = Recommendations.Rank(Inputs(
+            sessions: [Session("Lower Guk", 5, 60)],
+            pool:
+            [
+                Conned("a froglok tad", "Lower Guk", 200, 8, 12),
+                Conned("Ghoulbane guardian", "Lower Guk", 3, 44, 46),
+            ],
+            level: At(50)), [HelperGoal.LevelUp]);
+
+        Assert.Empty(set.Top.SelectMany(r => r.Why).OfType<ZoneOutgrownFact>());
     }
 }

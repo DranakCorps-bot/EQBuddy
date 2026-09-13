@@ -20,6 +20,17 @@ namespace EQBuddy.Core;
 /// the pool has nothing for this zone. 0 is "unknown", never "instant".</param>
 /// <param name="MobsKnown">How many pooled creatures this zone contributed.</param>
 /// <param name="LastPlayedLocal">When the newest of those sessions ended.</param>
+/// <param name="ConnedMin">The LOWEST level any creature here ever conned at, or 0 when
+/// nothing here has been conned. <b>The level band your evidence was earned at</b> (DRA-71
+/// D3, plan P6) — from <see cref="MobSummary.LevelMin"/>, which is <c>/consider</c>'s own
+/// reading and the only thing in this repo that knows how hard a zone's creatures are. 0 is
+/// unknown and never zero: a player who has never conned anything here has said nothing
+/// about the band, which is a different fact from "the creatures are level 0".</param>
+/// <param name="ConnedMax">The HIGHEST level any creature here ever conned at, same
+/// source and the same unknown rule.</param>
+/// <param name="ConnedKills">How many of <see cref="Kills"/> those conned creatures
+/// account for — the band's own denominator, so a surface can say what it rests on rather
+/// than quoting a range one <c>/consider</c> produced.</param>
 public sealed record ZoneRoll(
     string Zone,
     int Sessions,
@@ -30,8 +41,15 @@ public sealed record ZoneRoll(
     int Kills,
     double AvgFightSeconds,
     int MobsKnown,
-    DateTime? LastPlayedLocal)
+    DateTime? LastPlayedLocal,
+    int ConnedMin = 0,
+    int ConnedMax = 0,
+    int ConnedKills = 0)
 {
+    /// <summary>Has anything here ever been conned? Both bounds, because a band with one
+    /// end is not a band.</summary>
+    public bool HasConnedBand => ConnedMin > 0 && ConnedMax >= ConnedMin;
+
     /// <summary>
     /// Your observed experience per hour here, or null when there is not enough of your own
     /// play to divide.
@@ -154,6 +172,17 @@ public static class ZoneHistory
                 a.FightSeconds += mob.AvgFightSeconds * mob.Kills;
                 a.FightKills += mob.Kills;
             }
+            // The conned band, under the SAME "unknown contributes nothing" rule the line
+            // above applies to fight length. A creature nobody ever conned deserializes as
+            // LevelMin 0 (the pool's own comment says so), and folding that in as a floor
+            // would put every zone's band at 0 the first time somebody killed something
+            // without looking at it.
+            if (mob.LevelMin > 0)
+            {
+                a.ConnedMin = a.ConnedMin == 0 ? mob.LevelMin : Math.Min(a.ConnedMin, mob.LevelMin);
+                a.ConnedMax = Math.Max(a.ConnedMax, Math.Max(mob.LevelMax, mob.LevelMin));
+                a.ConnedKills += mob.Kills;
+            }
         }
 
         return [.. acc.Values
@@ -180,9 +209,13 @@ public static class ZoneHistory
         public double FightSeconds;
         public int FightKills;
         public DateTime? LastPlayed;
+        public int ConnedMin;
+        public int ConnedMax;
+        public int ConnedKills;
 
         public ZoneRoll Build() => new(
             zone, Sessions, Seconds / 3600.0, XpPercent, Copper, Deaths, Kills,
-            FightKills > 0 ? FightSeconds / FightKills : 0, Mobs, LastPlayed);
+            FightKills > 0 ? FightSeconds / FightKills : 0, Mobs, LastPlayed,
+            ConnedMin, ConnedMax, ConnedKills);
     }
 }

@@ -886,6 +886,65 @@ $Shots = [ordered]@{
     #           popup shot shows a border darker than its theme's value, suspect the capture
     #           before the theme.
     #
+    # ---- DRA-71 D3: the level, and what it changes about an answer -------------------
+    #
+    # PREDICTIONS, written before the shots (trap 23):
+    #
+    #   'shell-home-level' — the Character room with the level editor OPEN, which is a state
+    #     no shot of the shut room can reach (trap 22: a link and a link-over-a-box look the
+    #     same). The Identity block, in order: "Testchar" in accent ink, "test · West
+    #     Commonlands" under it, then the NEW row — "Level 28 — set by you" — then the accent
+    #     link reading "Done" (the editor is open, so the door carries its open-state label),
+    #     the dim note "Type the level this character actually is and press Enter…", a NARROW
+    #     right-aligned box holding 28, and the accent row "Let EQBuddy work it out". Only
+    #     THEN the class line ("Warrior (inferred from your log)") and "Set class…".
+    #     **The order is the thing to check**: level before class, because the class editor is
+    #     sixteen chips and would push this row off the fold every time it opened. And the
+    #     zone line must still be there under the name — the plan's P4 says level is an ADDED
+    #     identity row, and a shot where "Level 28" replaced "test · West Commonlands" would
+    #     be this slice quietly reversing a documented DRA-63 decision while looking finished.
+    #     Three blocks still, not four: the editor lives INSIDE Identity.
+    #   'shell-helper-outgrown' — the Helper with ONE real archived session behind it (Prime)
+    #     and a real ding appended, so every number is the fixture's own. Under "Worth doing
+    #     next" and the source note, a NEW dim line: "Weighed at level 30, from your log's ding
+    #     lines." Then the West Commonlands row carrying its measured rate, its cadence, and
+    #     the P6 sentence — "The creatures you conned here ran L5–11, across N kills — you are
+    #     level 30." The fixture's only /consider lines are Lvl 5 and Lvl 11, both in West
+    #     Commonlands, so that band is a fact about this fixture and not a number I chose.
+    #     **What must NOT be in the picture**: any sentence about the zone being easy, finished
+    #     with, or worth leaving; any predicted rate for a zone the player has not farmed; and
+    #     any "Level 0" anywhere. The goals face reads "Level Up".
+    #
+    #   WHAT ACTUALLY HAPPENED. SHOT 2026-09-13, 946x633. Both as predicted, and the
+    #     Character one took two takes because the prediction was WRONG in a way nothing else
+    #     could have caught:
+    #       (a) **'shell-home-level' came back with an EMPTY box.** The prediction said "a
+    #           narrow right-aligned box holding 28", and it held nothing — because the hook
+    #           flipped `_editingLevel` on its own while a player clicking the same link went
+    #           through a path that also seeds the draft. A correct, well-composed photograph
+    #           of a real state of SOMETHING ELSE, which is trap 23 exactly, and invisible to
+    #           every assertion in the repo: the box was there, the words were right, the
+    #           level was right. Fixed with one `OpenLevelEditor` both paths call, and
+    #           `shellHomeLevelDraft` now says from outside what is IN the box rather than
+    #           that a box exists. Re-shot: the box holds 28. **The prediction is the whole
+    #           reason this was found. A shot taken without one photographs whatever happens.**
+    #       (b) 'shell-helper-outgrown' was right first time, and the numbers are the
+    #           fixture's own: "14.2%/hr here, from 1 stored session (1.1 hours)", "your
+    #           fights here run 6 sec on average, over 82 kills", and the P6 line reading
+    #           "The creatures you conned here ran L5-11, across 26 kills - you are level 30."
+    #           L5-11 is the fixture's only two /consider lines and 26 is the kill count of
+    #           the creatures they belong to — a band nobody staged. ONE recommendation,
+    #           because one prime run archives one session and West Commonlands is its primary
+    #           zone; that is honest rather than thin. Nothing in the picture calls the zone
+    #           easy, finished with, or worth leaving, and no rate is predicted for anywhere
+    #           the player has not farmed.
+    #
+    #   AND THE REGRESSION PICTURES: every 'shell-home*' and 'shell-helper*' shot changes in
+    #     this slice — the Character room gains an identity row and the Helper gains the
+    #     "Weighed at level …" line — so all seven were re-run rather than left stale. A
+    #     committed shot that no longer matches the build is worse than no shot, because it is
+    #     the one thing a reviewer trusts without checking.
+    #
     #   AND THE REGRESSION PICTURE IS 'quest-tracker', which needs no new shot and no new
     #     prediction: the class lens moved onto the same primitive in this slice, so that
     #     window's filter row must look EXACTLY as it did — era combo, state combo, the class
@@ -1143,6 +1202,17 @@ $Shots = [ordered]@{
                                "Location`tName`tID`tCount`tSlots"
                                "General1`tBone Chips`t0`t12`t0"
                                "General2`tFlawless Diamond`t0`t1`t0") } }
+    # DRA-71 D3: the level editor OPEN. A shut editor photographs as a link, so without the
+    # hook the slice's Character-room half is a picture of a word (trap 22). EQBUDDY_HOME_EDITOR
+    # is the room's own review hook and is unset in every shipping run; `shellHomeLevelBox` in
+    # the E2E is the assertion that it is wired to the build rather than merely spelled right.
+    # The STATEMENT is seeded into the ledger so the undo row exists to be photographed — with
+    # only a ding there is nothing to take back, and the row that proves a correction is
+    # reversible would be absent from the one picture of the editor.
+    'shell-home-level' = @{ Title = 'EQBuddy — Character'
+                           Env = @{ EQBUDDY_SHELL = '1'; EQBUDDY_HOME_EDITOR = 'level' }
+                           Ledger = @{ StatedLevel = 28; StatedLevelAt = '2026-09-12T20:00:00' }
+                           Set = @{} }
     # ---- DRA-70: the Helper room. Predictions are above, with the shell-home block. -----
     'shell-helper'    = @{ Title = 'EQBuddy — Helper'
                            Env = @{ EQBUDDY_SHELL = 'helper' }; Set = @{} }
@@ -1197,6 +1267,22 @@ $Shots = [ordered]@{
                            Set = @{
                                HelperGoals = @{ 'testchar_test' = @('LevelUp', 'WorkOnFaction') }
                                HelperFactions = @{ 'testchar_test' = @('Coalition of Tradefolk') }
+                           } }
+    # DRA-71 D3: the discount, which needs a real archived session to discount. `Prime` runs
+    # the app once over the fixture and closes it GRACEFULLY so the sitting is finalized into
+    # history.db — one real session with the fixture's own numbers, which is what
+    # `ZoneHistory.Fold` reads. The LEVEL arrives through the LOG rather than through a seeded
+    # ledger, so the whole chain in the picture is the real one: parser, stamp, store, resolve,
+    # rank. The fixture's only /consider lines are (Lvl: 5) and (Lvl: 11), both in West
+    # Commonlands — so the band in the sentence is a fact about this fixture and not a number
+    # staged to make the sentence appear (trap 23: a shot whose numbers you did not predict has
+    # not been reviewed).
+    'shell-helper-outgrown' = @{ Title = 'EQBuddy — Helper'
+                           Env = @{ EQBUDDY_SHELL = 'helper' }
+                           Prime = @( @{} )
+                           Append = @('You have gained a level! Welcome to level 30!')
+                           Set = @{
+                               HelperGoals = @{ 'testchar_test' = @('LevelUp') }
                            } }
     'shell-gear-narrow' = @{ Title = 'EQBuddy — Gear'
                            Env = @{ EQBUDDY_SHELL = 'gear:gear'; EQBUDDY_SHELL_SIZE = '580x480' }

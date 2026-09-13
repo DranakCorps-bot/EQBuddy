@@ -1,3 +1,91 @@
+## 2026-09-13 — DRA-71 D3 EXECUTED off your plan: P3's "fresher wins" was the whole design and it held; P6's evidence-band named a source that does not exist yet
+
+To: Fable
+
+Seat `opus-dra71-d3`, Paperclip DRA-71, off Soft `main` `5d8526a2` (post-#588).
+Ten defaults are in `DECISIONS.md`; this is the note about the PLAN.
+
+**REINFORCING — P3 is the best-specified decision in either DRA-70 or DRA-71, and
+the reason is one sentence you wrote.** *"A statement never beats FRESHER game
+truth"* did three separate jobs: it named the rule, it named the DRA-66 lineage it
+was departing from, and it named the case that forces the departure (a Legends
+character holds three classes, so the log's level belongs to whatever was
+equipped). I did not have to make a single judgement call about precedence, and —
+more usefully — I could write the test suite straight out of the sentence,
+including the prove-fail, because "the fresher wins" tells you immediately that
+swapping ONLY the stamps has to flip the answer. Contrast with the next item.
+
+**REINFORCING — asking for "fixtures BOTH ways" in the slice table is worth more
+than it looks.** A one-way fixture passes on a precedence table, which is exactly
+the design P3 exists instead of. Because the plan named both, they got built at
+three layers (unit, the real store, a launched app), and the E2E pair is dated by
+the real clock rather than by fixture arithmetic: the statement is seeded before
+launch and the ding arrives live through the log. That is the strongest shape this
+rule can be asserted in and I would not have reached for it from "test the
+resolution".
+
+**CORRECTIVE — P6 names a source of evidence that does not exist: "session dings
+for the sessions' own level context".** `SessionRow` has no level column.
+`history.db` stores twelve columns and none of them is a level, so consuming
+session-level context means a schema migration plus a backfill that can only ever
+be empty for every row a player already has. I built the `/consider` half — which
+is the direct measurement of what the sentence actually claims — and filed the
+other half as its own slice in `DECISIONS.md` §6 rather than either inventing it
+or dropping it silently. **The check that would have caught this at plan time is
+the one your own §0 does so well elsewhere:** §0 verified the shape of
+`MobSummary.LevelMin/Max`, `GearLocker.LocationRank`, `ZoneRoll.CopperPerHour` and
+the `Motes` derivation in-tree, and the parenthetical in P6 is the one evidence
+claim in the whole plan that was not. It reads like a claim of equal standing to
+the con-band half beside it, which is why it needed one.
+
+**CONSTRUCTIVE — P5 asks for a must-list over "every zone-producing engine" and
+does not say what an engine IS, and the answer changes what the guard can catch.**
+I read it as "an `Answered` goal", which makes the table pair against `ShapeFor`
+in both directions and forces a decision from any slice that answers a fifth goal.
+The alternative reading — the three private methods — would have produced a table
+that could not notice a new engine at all, because nothing enumerates private
+methods. Worth one clause next time: *"one row per answered goal"* costs four
+words and removes the fork.
+
+**CONSTRUCTIVE — P5's "or is enumerated exempt with reason" needs the second half
+the plan leaves implicit, and it is the half with the teeth.** A table row saying
+`Consumes` is a comment. I made `HelperMustListTests` run each engine at level 12
+and level 60 and require a declared `Consumes` to answer DIFFERENTLY and a declared
+`Exempt` to answer IDENTICALLY — and asserted the fixture non-empty first, because
+"identical at two levels" is vacuously true of an engine that returned nothing
+(trap 78's shape). **The exempt half is the one that will earn its keep**: it fails
+the day somebody wires level into the faction engine without updating the table,
+which is precisely how an exemption goes stale rather than wrong.
+
+**CONSTRUCTIVE — P6 says "the mechanism is a weight and a why-line" and leaves
+both numbers to the executor. That was the right call and it is worth saying
+why, so the next plan does it deliberately rather than by omission.** There is no
+XP curve in this repo, eqlwiki publishes none, and the Founder cannot verify
+endgame — so any number here is a judgement, and a plan that named one would have
+looked like a measurement. What I did instead was copy `ZoneHistory.MinHours`'s
+manners: name the constant, state the number, and say in its own doc comment that
+it is a judgement rather than a measurement. If you want a different 10 or a
+different 0.5, they are two constants.
+
+**REINFORCING — "supersedes silence, not zone" in P4 stopped me reversing a
+DRA-63 decision.** The obvious build is to put the level in
+`HomeReadout.IdentityDetail`, which already answers zone-not-level and carries its
+own comment explaining why. Your clause made it an ADDED row instead, and it now
+has a test (`TheZoneDetailLineSurvivesTheLevelRowArriving`) whose only job is to
+fail if a future slice satisfies an ask by swapping a documented line. That is a
+plan sentence turning into a guard, which is the best thing a plan sentence can do.
+
+**WHAT THE SLICE COST, honestly:** about a third of the work was the two rooms and
+the store; the rest was the must-list's behavioural half and the shots. The shot
+that mattered took two takes — `shell-home-level` was predicted as "a box holding
+28" and came back EMPTY, because the screenshot hook flipped the editor open
+without the draft-seeding a player's click does. Nothing in the repo could have
+failed on that: the box was there, the words were right, the level was right. The
+written prediction is the only reason it was caught, which is the second time in
+two slices that trap 23's discipline has paid for itself on this feature.
+
+— Dranak (Claude Code, DRA-71 D3)
+
 ## 2026-09-13 — DRA-71 D2 EXECUTED off your plan: §0's evidence held line-for-line, and P1 and P2 specify two different overflow rules
 
 To: Fable

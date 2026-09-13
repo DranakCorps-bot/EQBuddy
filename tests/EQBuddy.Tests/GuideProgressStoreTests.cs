@@ -367,6 +367,11 @@ public sealed class GuideProgressStoreTests : IDisposable
         [
             "Items", "Tracked", "Hidden", "Completed", "Classes",
             "UnlockedClasses", "StatedClasses", "Level", "Guides", "LastInventoryReconcile",
+            // DRA-71 D3: the level's own stamp and the player's statement beside it. All
+            // three are populated below — a stamp that did not survive the reload would make
+            // `CharacterLevel.Resolve` read every restored level as the oldest claim there
+            // is, which is the migration rule applied to a profile that should not get it.
+            "LevelAt", "StatedLevel", "StatedLevelAt",
         ];
         Assert.Equal(
             populated.OrderBy(n => n, StringComparer.Ordinal),
@@ -383,6 +388,9 @@ public sealed class GuideProgressStoreTests : IDisposable
             UnlockedClasses = { "Warrior", "Monk" },
             StatedClasses = { "Druid" },
             Level = 29,
+            LevelAt = new DateTime(2026, 9, 1, 20, 15, 0),
+            StatedLevel = 31,
+            StatedLevelAt = new DateTime(2026, 9, 3, 9, 5, 0),
             Guides =
             {
                 [Guide] = new QuestLedgerStore.GuideProgress

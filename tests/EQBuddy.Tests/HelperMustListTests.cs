@@ -216,6 +216,118 @@ public class HelperMustListTests
             Assert.NotEmpty(HelperPresentation.Gap(new GoalGap(goal, reason)));
     }
 
+    // ---- 5. every ENGINE decided about the character's level (DRA-71 D3, plan P5) --------
+
+    /// <summary>
+    /// **THE FOUNDER'S MUST, PAIRED BOTH WAYS** (smoke item 2: *"recs MUST factor it"*).
+    ///
+    /// <para>An engine is an <see cref="HelperGoalShape.Answered"/> goal, so the two tables
+    /// have to agree in both directions: a goal that gained an engine without a level decision
+    /// fails here, and a level decision left behind by a goal that went back to Deferred fails
+    /// here too. Null is "nobody decided", which is the only thing a pairing can catch — *"level
+    /// does not apply to this one"* and *"nobody thought about level for this one"* look
+    /// identical on screen, and the second is how a MUST quietly becomes a maybe.</para>
+    /// </summary>
+    [Theory]
+    [MemberData(nameof(Goals))]
+    public void EveryEngineHasADecidedLevelUseAndOnlyEnginesHaveOne(HelperGoal goal) =>
+        Assert.Equal(
+            Recommendations.ShapeFor(goal) == HelperGoalShape.Answered,
+            Recommendations.LevelUseFor(goal) is not null);
+
+    /// <summary>An exemption owes a REASON, and a consuming engine must not carry one. A
+    /// reason that drifted onto the wrong row is as wrong as one that went missing — the
+    /// pairing is what makes the table readable as a decision rather than as prose.</summary>
+    [Theory]
+    [MemberData(nameof(Goals))]
+    public void AnExemptEngineOwesAReasonAndAConsumingOneDoesNot(HelperGoal goal) =>
+        Assert.Equal(
+            Recommendations.LevelUseFor(goal) == Recommendations.LevelUse.Exempt,
+            Recommendations.LevelExemptReason(goal).Length > 0);
+
+    /// <summary>
+    /// **THE ROW WITH TEETH: a declared level use is asserted as BEHAVIOUR, not as a table
+    /// entry.**
+    ///
+    /// <para>The same fixture is ranked at level 12 and at level 60. An engine that says it
+    /// CONSUMES the level must answer differently — otherwise its row is a comment, which is
+    /// exactly the shape trap 34 warns about one level up ("a guard that forbids the wrong
+    /// thing cannot see a missing thing", and a table nobody checks forbids nothing at all).
+    /// An engine that says it is EXEMPT must answer identically, so an exemption that stops
+    /// being true fails rather than going quietly stale.</para>
+    ///
+    /// <para><b>The fixture is asserted to produce candidates first</b>, because "identical at
+    /// two levels" is vacuously true of an engine that returned nothing (trap 78: a guard
+    /// aimed at nothing is green). That check is what makes the exempt half worth
+    /// running.</para>
+    /// </summary>
+    [Theory]
+    [MemberData(nameof(Goals))]
+    public void ADeclaredLevelUseIsProvedByRunningTheEngineAtTwoLevels(HelperGoal goal)
+    {
+        if (Recommendations.LevelUseFor(goal) is not { } use) return;
+
+        var low = Answers(goal, 12);
+        var high = Answers(goal, 60);
+
+        Assert.NotEmpty(low);
+        if (use == Recommendations.LevelUse.Consumes) Assert.NotEqual(low, high);
+        else Assert.Equal(low, high);
+    }
+
+    /// <summary>
+    /// One engine's answers as a comparable projection — what the player would READ, not what
+    /// the engine happens to hold. Zone, weight and the rendered why-lines, so both a
+    /// re-order and a changed sentence count as a difference; rendering through
+    /// <see cref="HelperPresentation.Why"/> means a fact that moved the ranking without ever
+    /// reaching the screen would not be mistaken for the engine consuming a level.
+    /// </summary>
+    private static string[] Answers(HelperGoal goal, int level) =>
+        [.. Recommendations.Rank(LevelFixture(level), [goal]).Top.Select(r =>
+            $"{r.Zone}|{r.Subject}|{r.Weight:0.0000}|"
+            + string.Join("¦", r.Why.Select(HelperPresentation.Why)))];
+
+    /// <summary>
+    /// One fixture that feeds all four engines at once — a farmed low-level camp, a faction
+    /// those same kills move, and a race unlock that wants it.
+    ///
+    /// <para>The creatures conned L8–12, so a level-60 character has outgrown them by any
+    /// reading and a level-12 one has not. Everything else is held still: the point of the
+    /// row above is that the ONLY thing that differs between the two runs is the level.</para>
+    /// </summary>
+    private static HelperInputs LevelFixture(int level)
+    {
+        var dump = new FactionsFile.Snapshot("factions.txt", DateTime.Today,
+            [new FactionsFile.Standing(1, "Frogloks of Guk", 1200, 800)]);
+        MobSummary[] pool =
+        [
+            new("a froglok tad", 200, 200, 30, 0, 0, [])
+            {
+                Zone = "Lower Guk",
+                LevelMin = 8,
+                LevelMax = 12,
+                Factions = [new MobFactionHit("Frogloks of Guk", 5, 200)],
+            },
+        ];
+        SessionRow[] sessions =
+        [
+            new(1, "erollisi", "Dranak", DateTime.Today, DateTime.Today.AddHours(5),
+                5 * 3600, 5 * 3600, "ended", "Lower Guk", 0, 60, 0, 0, 0, 0, "", ""),
+        ];
+        UnlockProgress[] races =
+        [
+            new("Untapped Potential: Races", "Race Unlock - Froglok", "Froglok", false, false,
+                [new UnlockCriterion(
+                    UnlockNeed.MaxFaction, "Get maximum faction with Frogloks of Guk.",
+                    "Frogloks of Guk", false)]),
+        ];
+
+        return new HelperInputs(
+            ZoneHistory.Fold(sessions, pool), pool, dump, ["Frogloks of Guk"],
+            races, races, true, [], [], null,
+            new ResolvedLevel(level, LevelSource.Observed, new DateTime(2026, 9, 12, 20, 0, 0)));
+    }
+
     // ---- fixtures ------------------------------------------------------------------------
 
     public static TheoryData<HelperGoal> Goals()

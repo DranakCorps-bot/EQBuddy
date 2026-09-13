@@ -589,10 +589,19 @@ internal sealed class AppHarness : IDisposable
     /// one, which is the same high-water hazard <see cref="SeedRaids"/> names. Call before
     /// <see cref="Launch"/>; overwrites anything <see cref="SeedQuestClasses"/> wrote.</para>
     /// </summary>
+    /// <param name="level">A level the LOG has announced, with the log timestamp it carried
+    /// (DRA-71 D3). Both halves or neither: a level with no stamp is the pre-D3 migration
+    /// state, which is a different fixture and deserves to be asked for on purpose.</param>
+    /// <param name="statedLevel">A level the PLAYER has set, with the wall clock they set it
+    /// at. <c>CharacterLevel.Resolve</c> weighs the two stamps and the fresher wins, so a
+    /// fixture that wants a particular winner has to date them both — which is exactly what
+    /// makes the two "both ways" E2E rows possible from out here.</param>
     public void SeedQuestLedger(
         IReadOnlyList<string>? classes = null,
         IReadOnlyList<string>? tracked = null,
-        IReadOnlyDictionary<string, int>? owned = null)
+        IReadOnlyDictionary<string, int>? owned = null,
+        (int Level, DateTime At)? level = null,
+        (int Level, DateTime At)? statedLevel = null)
     {
         File.WriteAllText(Path.Combine(ProfileDir, "quest-ledger.json"),
             JsonSerializer.Serialize(new Dictionary<string, object>
@@ -603,6 +612,10 @@ internal sealed class AppHarness : IDisposable
                     Tracked = tracked ?? (IReadOnlyList<string>)[],
                     Items = (owned ?? new Dictionary<string, int>())
                         .ToDictionary(kv => kv.Key, kv => new { Manual = kv.Value }),
+                    Level = level?.Level ?? 0,
+                    LevelAt = level?.At ?? default,
+                    StatedLevel = statedLevel?.Level ?? 0,
+                    StatedLevelAt = statedLevel?.At ?? default,
                 },
             }, new JsonSerializerOptions { WriteIndented = true }));
     }

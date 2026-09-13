@@ -183,4 +183,84 @@ public class ZoneHistoryTests
         Assert.Empty(ZoneHistory.Fold([], []));
         Assert.Empty(ZoneHistory.Fold(null!, null!));
     }
+
+    // ---- the conned band: what level your evidence was earned at (DRA-71 D3) ---------
+
+    private static MobSummary Conned(
+        string name, string zone, int kills, int levelMin, int levelMax) =>
+        Mob(name, zone, kills) with { LevelMin = levelMin, LevelMax = levelMax };
+
+    /// <summary>The band is the OUTER bounds across every creature conned here, and the kill
+    /// count beside it is the denominator: a range that rested on one /consider and a range
+    /// that rested on two hundred kills read identically without it.</summary>
+    [Fact]
+    public void TheBandIsTheOuterBoundsAcrossEveryConnedCreature()
+    {
+        var guk = Assert.Single(ZoneHistory.Fold(
+            [Session("Lower Guk", 3, 18)],
+            [Conned("a froglok tad", "Lower Guk", 150, 8, 10),
+             Conned("a froglok wizard", "Lower Guk", 50, 11, 13)]));
+
+        Assert.True(guk.HasConnedBand);
+        Assert.Equal(8, guk.ConnedMin);
+        Assert.Equal(13, guk.ConnedMax);
+        Assert.Equal(200, guk.ConnedKills);
+    }
+
+    /// <summary>
+    /// **A creature nobody conned contributes NOTHING — it does not drag the floor to
+    /// zero.**
+    ///
+    /// <para>This is the same "unknown is not zero" rule the pool already applies to coin and
+    /// fight length, and it is the one that would have shipped the bug: <c>LevelMin</c>
+    /// deserializes as 0 for every creature killed before <c>/consider</c> was ever pressed,
+    /// and a <c>Math.Min</c> that took those would put every zone's band floor at 0 the first
+    /// time a player killed something without looking at it — which reads downstream as a
+    /// zone whose creatures start at level zero.</para>
+    /// </summary>
+    [Fact]
+    public void AnUnconnedCreatureDoesNotPullTheBandDownToZero()
+    {
+        var guk = Assert.Single(ZoneHistory.Fold(
+            [Session("Lower Guk", 3, 18)],
+            [Conned("a froglok tad", "Lower Guk", 150, 8, 10),
+             Mob("a froglok slave", "Lower Guk", 500)]));
+
+        Assert.Equal(8, guk.ConnedMin);
+        Assert.Equal(10, guk.ConnedMax);
+        // Its kills count toward the zone, but not toward what the BAND rests on — the
+        // denominator has to describe the same creatures the range does.
+        Assert.Equal(650, guk.Kills);
+        Assert.Equal(150, guk.ConnedKills);
+    }
+
+    /// <summary>A zone where nothing was ever conned has no band at all, and says so through
+    /// <c>HasConnedBand</c> rather than through a pair of zeroes a caller has to remember to
+    /// check. The discount reads that property; a zero it had to interpret would be the
+    /// trap-64b shape (a proxy standing in for a fact).</summary>
+    [Fact]
+    public void AZoneNobodyEverConnedHasNoBand()
+    {
+        var befallen = Assert.Single(ZoneHistory.Fold(
+            [Session("Befallen", 3, 18)], [Mob("a skeleton", "Befallen", 200)]));
+
+        Assert.False(befallen.HasConnedBand);
+        Assert.Equal(0, befallen.ConnedMin);
+        Assert.Equal(0, befallen.ConnedKills);
+    }
+
+    /// <summary>A creature conned exactly once carries one level in both bounds — the pool
+    /// records <c>LevelMax</c> as 0 until a second reading widens it, and a band of "8 to 0"
+    /// would sort and compare as nonsense everywhere downstream.</summary>
+    [Fact]
+    public void ASingleConsiderGivesABandOfOneLevelRatherThanOneEndedAtZero()
+    {
+        var guk = Assert.Single(ZoneHistory.Fold(
+            [Session("Lower Guk", 3, 18)],
+            [Mob("a froglok tad", "Lower Guk", 40) with { LevelMin = 8, LevelMax = 0 }]));
+
+        Assert.True(guk.HasConnedBand);
+        Assert.Equal(8, guk.ConnedMin);
+        Assert.Equal(8, guk.ConnedMax);
+    }
 }

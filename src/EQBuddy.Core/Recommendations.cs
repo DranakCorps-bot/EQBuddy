@@ -106,6 +106,30 @@ public sealed record ZoneCadenceFact(string Zone, double AvgFightSeconds, int Ki
 public sealed record ZoneDeathsFact(string Zone, int Deaths, int Sessions)
     : WhyFact(Evidence.Personal);
 
+/// <summary>
+/// **The evidence here was earned at a level you have left behind** (DRA-71 D3, plan P6;
+/// Founder smoke item 2).
+///
+/// <para>A rate is a fact about a past sitting, and the character who farmed it is not
+/// always the character reading the recommendation. This fact is emitted only when the
+/// player has actually conned creatures here and the TOP of that band is
+/// <see cref="Recommendations.OutgrownBy"/> or more levels under their resolved level.</para>
+///
+/// <para><b>It is a report and not a prediction.</b> There is no XP curve behind it — this
+/// repo has none, the wiki gives none, and inventing one would be trap 73's shape with
+/// arithmetic instead of prose. What it says is the two numbers it measured: what conned,
+/// and what you are. The WEIGHT that goes with it is a named judgement (see
+/// <see cref="Recommendations.OutgrownWeight"/>), not a derived quantity.</para>
+///
+/// <para>HOME-006 is untouched: it makes no claim about danger in either direction, and
+/// the word for the opposite of "outgrown" is never printed at all.</para>
+/// </summary>
+/// <param name="Kills">How many kills the conned creatures account for — the band's
+/// denominator, so the sentence rests on something the player can argue with.</param>
+public sealed record ZoneOutgrownFact(
+    string Zone, int ConnedMin, int ConnedMax, int Level, int Kills)
+    : WhyFact(Evidence.Personal);
+
 /// <summary>How far along an unlock is, from the game's own achievements dump.</summary>
 public sealed record UnlockScoreFact(string Subject, int Done, int Total)
     : WhyFact(Evidence.Personal);
@@ -161,6 +185,10 @@ public enum HelperDoorKind
     Gear,
     /// <summary>Progress → Wealth, which is where motes and coin already live.</summary>
     Wealth,
+    /// <summary>The Character room — who EQBuddy is following, and since DRA-71 D3 the one
+    /// place a player can tell it what level they are. The Helper's door for the one input
+    /// it cannot read from anything.</summary>
+    Character,
 }
 
 /// <summary>One door under a recommendation.</summary>
@@ -272,6 +300,17 @@ public sealed record GoalGap(HelperGoal Goal, GoalGapReason Reason);
 /// picker has not been used — not "all of them", because 200 standings is not a
 /// recommendation.</param>
 /// <param name="HasAchievements">Whether the achievements dump has ever been read.</param>
+/// <param name="Level">
+/// The character's resolved level — <see cref="CharacterLevel.Resolve"/>'s own answer,
+/// never re-derived here (DRA-71 D3, plan P5; the Founder's MUST).
+///
+/// <para><b><see cref="ResolvedLevel.Unknown"/> is a real input and not a hole.</b> A
+/// profile that has never seen a ding and whose player has not said anything still gets
+/// every answer its own play supports; what stops is the part that needs a number. The
+/// engines' contract for that state is written once, in <see cref="Recommendations.Rank"/>:
+/// personal-evidence ranking runs unchanged, and anything gated on a level draws nothing
+/// rather than guessing one (trap 73).</para>
+/// </param>
 public sealed record HelperInputs(
     IReadOnlyList<ZoneRoll> Zones,
     IReadOnlyList<MobSummary> Pool,
@@ -282,10 +321,11 @@ public sealed record HelperInputs(
     bool HasAchievements,
     IReadOnlyList<SkyQuestChecklistItem> SkyItems,
     IReadOnlyCollection<string> SkyCompleted,
-    QuestCatalog? Catalog)
+    QuestCatalog? Catalog,
+    ResolvedLevel Level = default)
 {
     public static readonly HelperInputs Nothing =
-        new([], [], null, [], [], [], false, [], [], null);
+        new([], [], null, [], [], [], false, [], [], null, ResolvedLevel.Unknown);
 }
 
 /// <summary>The whole answer for one set of chips.</summary>
@@ -390,6 +430,103 @@ public static class Recommendations
     /// the enum rather than hand-written beside it (trap 30: a hand-maintained list stops
     /// covering the set the day the set grows).</summary>
     public static IReadOnlyList<HelperGoal> All => Enum.GetValues<HelperGoal>();
+
+    // ---- the level must-list (DRA-71 D3, plan P5) ---------------------------------------
+
+    /// <summary>Whether an engine weighs the character's resolved level. Both values are
+    /// DECISIONS — see <see cref="LevelUseFor"/>, which answers null for neither.</summary>
+    public enum LevelUse
+    {
+        /// <summary>The engine reads <see cref="HelperInputs.Level"/> and its answer can
+        /// change because of it. <c>HelperMustListTests</c> proves that by running the same
+        /// fixture at two levels and requiring the answers to DIFFER — a claim that was only
+        /// a table row is trap 34's own shape one level up.</summary>
+        Consumes,
+
+        /// <summary>Decided, and the decision is that level does not belong in this
+        /// engine's arithmetic. It owes a reason (<see cref="LevelExemptReason"/>), and the
+        /// same test requires its answer to be IDENTICAL at two levels — so an exemption
+        /// that stops being true fails rather than going quietly stale.</summary>
+        Exempt,
+    }
+
+    /// <summary>
+    /// **THE FOUNDER'S MUST, AS A TABLE THAT CANNOT GO SILENT** (smoke item 2: *"recs MUST
+    /// factor it"*).
+    ///
+    /// <para>One row per ENGINE, and an engine is an <see cref="HelperGoalShape.Answered"/>
+    /// goal — so a slice that answers a fifth goal has to decide about level in the same diff
+    /// that adds it. Null means nobody decided, which is the only thing a pairing like this
+    /// can catch: "level does not apply here" and "nobody thought about level here" look
+    /// identical on screen, and the second one is how a MUST quietly becomes a maybe.</para>
+    ///
+    /// <para>Null for a <see cref="HelperGoalShape.Deferred"/> goal is the RIGHT answer and
+    /// not a gap: there is no engine to decide about yet, and pre-deciding for one that does
+    /// not exist would be a ruling nobody could check. <c>HelperMustListTests</c> asserts the
+    /// two tables agree in both directions.</para>
+    ///
+    /// <para><b>Three of the four are exempt in D3, and that is a default logged for veto
+    /// rather than an oversight.</b> The discount P6 builds is about a zone's THROUGHPUT —
+    /// what your own kills there were worth — and only <see cref="HelperGoal.LevelUp"/> makes
+    /// that claim. For the other three the zone is a POINTER: a faction only moves where its
+    /// own creatures are, and an unlock criterion names a specific mob, quest or standing.
+    /// Down-weighting those for being low-level would be EQBuddy recommending against the
+    /// goal the player just picked. The slices that add throughput goals (Farm Gear, Farm
+    /// Motes, Make Money) each own their row here when they land.</para>
+    /// </summary>
+    public static LevelUse? LevelUseFor(HelperGoal goal) => goal switch
+    {
+        HelperGoal.LevelUp => LevelUse.Consumes,
+        HelperGoal.WorkOnFaction => LevelUse.Exempt,
+        HelperGoal.UnlockClasses => LevelUse.Exempt,
+        HelperGoal.UnlockRaces => LevelUse.Exempt,
+        _ => null,
+    };
+
+    /// <summary>Why an exempt engine is exempt. Empty for one that CONSUMES, and empty for a
+    /// goal with no engine — the test reads the pairing, so a reason that appeared beside a
+    /// consuming engine would be as wrong as one that went missing.</summary>
+    public static string LevelExemptReason(HelperGoal goal) => goal switch
+    {
+        HelperGoal.WorkOnFaction =>
+            "A faction only moves where its own creatures are. A zone you have outgrown is "
+            + "still the only place that standing changes, so discounting it would be "
+            + "recommending against the goal the player picked.",
+        HelperGoal.UnlockClasses or HelperGoal.UnlockRaces =>
+            "An unlock criterion names a specific creature, quest or standing, and the zone "
+            + "is where that thing IS rather than a rate this character could beat somewhere "
+            + "else. The game decides when an unlock is done; level is not one of its terms.",
+        _ => "",
+    };
+
+    /// <summary>
+    /// How far under your level a zone's TOP conned creature must sit before an answer says
+    /// you have outgrown it.
+    ///
+    /// <para>Ten, and <b>the number is a judgement rather than a measurement</b> — the same
+    /// admission <see cref="ZoneHistory.MinHours"/> makes about its fifteen minutes. This
+    /// repo has no XP curve, eqlwiki publishes none, and deriving one from con colours would
+    /// be asserting a game rule nobody here can verify (the Founder's own ceiling is level
+    /// 29). Ten levels is the distance at which a band stops overlapping anything a player
+    /// would still be fighting.</para>
+    ///
+    /// <para>It reads the band's TOP and not its middle on purpose: if anything in the zone
+    /// still cons near you, you have outgrown PART of a zone, which is not a thing a
+    /// recommendation should act on.</para>
+    /// </summary>
+    public const int OutgrownBy = 10;
+
+    /// <summary>
+    /// What an outgrown zone's weight is multiplied by.
+    ///
+    /// <para><b>A halving, and never a removal.</b> The zone stays in the list, keeps its
+    /// measured rate and gains a sentence saying what was measured there — because the
+    /// player may have a reason to go back that EQBuddy does not know, and a recommender
+    /// that deleted their own best-measured camp would be overruling evidence with a
+    /// judgement. <see cref="Recommendation.Weight"/> is a tie-break inside a kind, so this
+    /// re-orders and never filters.</para>
+    /// </summary>
+    public const double OutgrownWeight = 0.5;
 
     /// <summary>
     /// Rank the answers for one set of selected goals.
@@ -507,6 +644,16 @@ public static class Recommendations
     /// and a sentence saying what would fill it, rather than a level-range table EQBuddy
     /// would have had to invent (trap 73, and the "match the wiki or say nothing" rule one
     /// step further out: we have no wiki answer here either).</para>
+    ///
+    /// <para><b>THE ONE ENGINE THAT CONSUMES LEVEL IN D3</b> (plan P6;
+    /// <see cref="LevelUseFor"/>). A rate is a fact about a past sitting, and the character
+    /// reading it is not always the one who earned it. Where the player has conned creatures
+    /// here and that band's top is <see cref="OutgrownBy"/> under their resolved level, the
+    /// row keeps its measured rate, gains a sentence saying what it was measured against, and
+    /// is weighted at <see cref="OutgrownWeight"/>. With no resolved level NOTHING here
+    /// changes — the ranking still runs on the player's own evidence, which is the half of
+    /// the unknown-level contract that matters (a recommender that fell silent because it did
+    /// not know a number would be worse than one that never asked).</para>
     /// </summary>
     private static void LevelUp(HelperInputs inputs, List<Recommendation> into, List<GoalGap> gaps)
     {
@@ -534,14 +681,35 @@ public static class Recommendations
             // deliberately no "and you have never died here" arm — see ZoneDeathsFact.
             if (z.Deaths > 0) why.Add(new ZoneDeathsFact(z.Zone, z.Deaths, z.Sessions));
 
+            var outgrown = Outgrown(z, inputs.Level);
+            if (outgrown is { } fact) why.Add(fact);
+
             into.Add(new Recommendation(
                 RecommendationKind.Zone, z.Zone, z.Zone,
                 [HelperGoal.LevelUp], why,
                 [new HelperDoor(HelperDoorKind.World, z.Zone)],
                 0,
-                best > 0 ? Math.Clamp((z.XpPerHour ?? 0) / best, 0, 1) : 0));
+                (best > 0 ? Math.Clamp((z.XpPerHour ?? 0) / best, 0, 1) : 0)
+                * (outgrown is null ? 1 : OutgrownWeight)));
         }
     }
+
+    /// <summary>
+    /// Has this character left this zone's creatures behind? The fact when they have, null
+    /// otherwise.
+    ///
+    /// <para><b>Three ways to answer null and each is a different silence.</b> No resolved
+    /// level: EQBuddy has not been told and does not guess. No conned band: the player never
+    /// looked at anything here, so there is nothing measured to compare — a zone is not
+    /// outgrown because we failed to observe it. Band still within
+    /// <see cref="OutgrownBy"/>: the honest answer is nothing at all, because the sentence
+    /// for the opposite of outgrown would be a claim about how a place will treat you, which
+    /// is HOME-006's own forbidden shape.</para>
+    /// </summary>
+    private static ZoneOutgrownFact? Outgrown(ZoneRoll z, ResolvedLevel level) =>
+        level.Known && z.HasConnedBand && level.Level - z.ConnedMax >= OutgrownBy
+            ? new ZoneOutgrownFact(z.Zone, z.ConnedMin, z.ConnedMax, level.Level, z.ConnedKills)
+            : null;
 
     // ---- Work on Faction: the grind, for any faction you picked -------------------------
 

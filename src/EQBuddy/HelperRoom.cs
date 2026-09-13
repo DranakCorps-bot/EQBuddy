@@ -90,6 +90,11 @@ internal sealed class HelperRoom : Grid, IShellRoom
     private IReadOnlyList<ZoneRoll> _zones = [];
     private int _poolVersion;
     private RecommendationSet _answers = RecommendationSet.Empty;
+    /// <summary>The level the engine was handed this Build — captured so the disclosure line
+    /// and the ranking it describes come from one moment (trap 56). It is
+    /// <c>MainWindow.ResolvedLevel</c>'s answer and never a second reading of the two
+    /// stores.</summary>
+    private ResolvedLevel _level = ResolvedLevel.Unknown;
 
     /// <summary>What the blocks were last built FROM. A rebuild swaps every element in the
     /// body, which throws away scroll position and whatever the pointer was over.</summary>
@@ -129,6 +134,11 @@ internal sealed class HelperRoom : Grid, IShellRoom
     private int _deadDoors;
     private int _copyCommands;
     private bool _empty;
+    /// <summary>Whether the unknown-level line drew its Character door. Counted rather than
+    /// inferred from <see cref="_level"/>, because trap 29's whole point is that an absent
+    /// control photographs as an unremarkable panel — "the room knows the level is unknown"
+    /// and "the player has a way to fix it" are different claims.</summary>
+    private bool _levelDoor;
 
     public HelperRoom(MainWindow main, Action<string> navigate)
     {
@@ -189,6 +199,11 @@ internal sealed class HelperRoom : Grid, IShellRoom
         var goals = HelperGoalStore.Goals(_main.Settings, _main.QuestCharacterKey);
         var factions = HelperGoalStore.Factions(_main.Settings, _main.QuestCharacterKey);
         var unlocks = _main.Unlocks;
+        // The SAME resolution the Character room draws and the unlock preview keys off
+        // (MainWindow.ResolvedLevel), so the number this room ranks with is the number that
+        // room shows. Read every tick: it is two dictionary lookups, and a level the player
+        // just typed one room away must not wait five seconds to change the answers.
+        _level = _main.ResolvedLevel;
 
         // **THE FINGERPRINT, AND EVERY STORE THIS ROOM READS IS IN IT** (trap 72: the Quests
         // tab drew the moment before for a whole session because its signature carried
@@ -205,6 +220,12 @@ internal sealed class HelperRoom : Grid, IShellRoom
             unlocks.HasAchievements, unlocks.Races.Count, unlocks.Classes.Count,
             unlocks.Races.Count(u => u.Complete), unlocks.Classes.Count(u => u.Complete),
             unlocks.Factions?.WrittenAt.Ticks ?? 0,
+            // The level is an INPUT to the ranking, so it belongs in what makes the room
+            // redraw (trap 72 — the Quests tab drew the moment before for a whole session
+            // because its signature carried everything except the store the feature wrote).
+            // The SOURCE rides with the number: a clear that lands back on the same level
+            // still changes the sentence this room prints about where it came from.
+            _level.Level, _level.Source,
             ShellPages.Landed.Count);
         if (key == _painted) return;
         _painted = key;
@@ -213,7 +234,7 @@ internal sealed class HelperRoom : Grid, IShellRoom
             _zones, _pool.Mobs, unlocks.Factions, factions,
             unlocks.Races, unlocks.Classes, unlocks.HasAchievements,
             _main.Settings.SkyQuestChecklist, _main.Settings.SkyQuestCompleted,
-            _main.QuestCatalog), goals);
+            _main.QuestCatalog, _level), goals);
 
         Build(goals, factions, unlocks);
     }
@@ -255,6 +276,7 @@ internal sealed class HelperRoom : Grid, IShellRoom
         _doors = 0;
         _deadDoors = 0;
         _copyCommands = 0;
+        _levelDoor = false;
 
         _scroll.Content = _blocks;
         _blocks.Margin = new Thickness(Tok.SpaceL);
@@ -442,6 +464,7 @@ internal sealed class HelperRoom : Grid, IShellRoom
         }
 
         block.Children.Add(Line(HelperPresentation.SourceNote, Role.Metadata));
+        BuildLevelNote(block);
 
         foreach (var rec in _answers.Top) block.Children.Add(Answer(rec));
 
@@ -461,6 +484,31 @@ internal sealed class HelperRoom : Grid, IShellRoom
                 stack.Children.Add(Door(new HelperDoor(kind, "")));
             block.Children.Add(stack);
         }
+    }
+
+    /// <summary>
+    /// **THE HELPER NAMES THE LEVEL IT USED** (DRA-71 D3, plan P4).
+    ///
+    /// <para>A ranking that quietly weighed a number the player disagrees with — and never
+    /// said which — is the shape that makes somebody distrust a whole room. So the input is
+    /// disclosed on the same surface as the answers, in the same voice as the source note
+    /// above it, and it names where the number came from as well as what it was.</para>
+    ///
+    /// <para><b>An unknown level draws a sentence and a door, never a guess</b> (the plan's
+    /// own words). The sentence says what the room did ANYWAY — the answers above are ranked
+    /// from the player's own stored play and are unaffected — and the door goes to the one
+    /// room that can fix it. Inventing a level from an xp rate, a zone or a spell would be
+    /// trap 73's shape with arithmetic instead of prose, and it would then outrank the
+    /// player's own next ding.</para>
+    /// </summary>
+    private void BuildLevelNote(StackPanel block)
+    {
+        var line = Line(LevelReadout.UsedByHelper(_level), Role.Metadata);
+        line.Margin = new Thickness(0, Tok.SpaceXxs, 0, 0);
+        block.Children.Add(line);
+        if (_level.Known) return;
+        block.Children.Add(Door(new HelperDoor(HelperDoorKind.Character, "")));
+        _levelDoor = true;
     }
 
     /// <summary>One recommendation: its headline, which of your goals it serves, its
@@ -666,5 +714,17 @@ internal sealed class HelperRoom : Grid, IShellRoom
         $"helperDoors={_doors} " +
         // Must be 0, always. See Door().
         $"helperDeadDoors={_deadDoors} " +
-        $"helperCopyCmd={_copyCommands}";
+        $"helperCopyCmd={_copyCommands} " +
+        // The level the ENGINE was handed, with its source (DRA-71 D3). Both halves, because
+        // a number alone cannot tell a ding from a statement — which is exactly what the two
+        // fixtures prove — and because `helperOutgrown` below is only meaningful against a
+        // level somebody can read.
+        $"helperLevel={_level.Level} " +
+        $"helperLevelSource={_level.Source.ToString().ToLowerInvariant()} " +
+        $"helperLevelDoor={(_levelDoor ? 1 : 0)} " +
+        // How many of the drawn answers carried the P6 discount's sentence. The SCREEN's
+        // claim about the discount, beside the engine's own weights — a zone that was
+        // down-weighted and said nothing about it would satisfy the ranking assertion and
+        // still be the bug.
+        $"helperOutgrown={_answers.Top.Count(r => r.Why.OfType<ZoneOutgrownFact>().Any())}";
 }
