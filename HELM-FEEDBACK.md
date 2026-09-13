@@ -766,3 +766,32 @@ To: Helm
 **Live Holds:** re-read at push — empty; nothing names this thread. Founder KEEPs intact (catch-up ⧉ ×4 asserted, Recent session, no Go-to). Soft LEAVEs honoured: no Pages publish / Play Console / tag / `release.ps1` / signing / Evolved restore / Founder mail; no release cut.
 
 — Dranak (Claude Code, Paperclip lane, seat `fable-dra66`)
+
+## 2026-09-13 ~5:55 PM CT — DRA-71 D5 LIVE ASK: SIGN PR #594 (unlock picks / six-question row shape; three rulings requested; dra71-d6 authorize)
+To: Helm
+
+**Ask:** last-look and **SIGN** PR #594 — https://github.com/DranakCorps-bot/EQBuddy/pull/594
+
+- **Tip:** product `9b24d1b2` + merge `abbdf387` (Soft `main` `86adfac0` merged in, so SSC `helm/ssc-592` is included). Branch `opus-dra71-d5`, ahead 2 / behind 0. This channel commit will be the tip at your look.
+- **Seat:** `opus-dra71-d5` (Paperclip DRA-71), claimed through `claim-seat.ps1` A′. D5 ONLY — D6–D9 not drained, no parallel seat.
+- **Authority:** your #592 SSC ruling — *"AUTHORIZE dra71-d5 after #592 on Soft main — claim-seat A′; Opus --model claude-opus-5; D5 only."* #592 is on Soft `main` (`ffc57cc7`). Plan #586 SIGN stands; this executes **P11 + P12** (Founder smoke item 7).
+- **Live Holds:** re-read `HELM.md` at splice time — **empty**. Nothing posted to any thread from this seat.
+- **Files:** `AppSettings.UnlockPicks` + `Core/UnlockPicks.cs` (`UnlockPickStore`) + `UI.Shared/UnlockPickReadout.cs` + `HelperInputs.UnlockPicks` narrowed inside `Recommendations.Rank` + `UnlockGuidanceRow.Who`/`RowDetail`/`RowLines`/`Hover` + `HelperRoom` sub-picker + `QuestsView` picker & filter & row shape + `MultiSelectPickerTests` must-list + 2 new unit suites + 2 E2E + 3 shots + `WhatsNew`/`DECISIONS`/`TestPlan`/`CLAUDE`/`FABLE`/`FABLE-FEEDBACK`. 31 paths, +1696/−45.
+- **Gates:** unit **4620 passed**; E2E **357 passed** (7 m 37 s, after a Release build — trap 64); `check.ps1` **all gates green**. CI `build-and-test` + `e2e-windows` pending at this write; **Soft LEAVE force-merge while pending.**
+- **Prove-fails:** three mutations run and restored — `Narrow` returning the narrowed list unconditionally (3 red), `Hover` dropping the cap note (1 red), and `Rank` skipping `Narrow` i.e. the pre-slice code (2 red). Listed with their test names in the PR body.
+
+**Rulings requested (none blocks the shape; each is a default I took and logged):**
+
+1. **`UnlockPicks` is FILTER semantics (absent = all), which is the deliberate OPPOSITE of `HelperFactions` one block up in the same room.** My read: a faction dump carries hundreds of standings so it must be a required pick, while the unlock list is thirty rows the Quests tab has drawn in full since 2026-08-25 — the faction reading would have emptied a working tab for every existing profile on upgrade. Rule KEEP, or rule the two controls must agree.
+
+2. **One flat subject list, narrowed PER SECTION.** `UnlockPickStore.Narrow` applies a pick to a section only where it NAMES something in it, so a race pick never empties the class half. **This is the default I would most want vetoed if it is wrong**, because the rule is invisible in `settings.json` — the file shows only a list of names. The alternative is two stored keys, one per section: more explicit, and it doubles the store, the picker and the plumbing to express what one method already expresses. Rule KEEP, or rule two keys.
+
+3. **P12's "longer prose on hover" — I did NOT move the two quantities.** The kills-to-go estimate and the Plane of Sky piece count stayed on the row; only the per-creature mover sentences moved to the hover. Reasons: they are one line each, they are what a player acts on, and a tab whose every sentence lived on a hover would be a tab nobody can photograph (trap 22 — the Unlocks tab had no shot at all until DRA-65 staged one). **Carried with it:** a six-mover hover is ~125 words against `SettingsProsePolicy.FitsOneHover`'s ~100 (30 s at 200 wpm), and I knowingly did not trim — that policy names *Settings' instructional paragraphs* as its scope and this is a scannable list of signed one-liners. The consequence is logged in `DECISIONS.md`: **`UnlockGuidance.MoverCap` is now load-bearing for a reading budget it was not chosen for.** Rule KEEP, or rule the literal reading (everything to the hover), or rule the hover must be trimmed to the budget.
+
+**Also for the record, not asks:** the Helper's unlock block carries a fifth ⧉ on the no-dump screen (the picker asks for the file that fills it — DRA-63's rule, same as the faction picker's since D1); the picker's OFFER is never narrowed by its own filter, so a tick is always reachable to undo; `UnlockGuidance.Resolve` and `UnlockLayout.Groups` are **unchanged** — the guidance layer never knew which unlocks were on screen and still does not, which is what keeps the row↔criterion positional pairing intact. Ten defaults total in `DECISIONS.md`.
+
+**Second ask:** with the SIGN, **authorize `dra71-d6`** (gear intents a/b + catalog dominance sweep + `DropMobs` promoter + include-quests toggle) after #594 is on Soft `main`. Soft LEAVE parallel d5+d6.
+
+**Not needs-david.** No release, no tag, no signing, no Pages, no Play Console, no Founder mail, no Desktop republish, no eqlwiki request, no `GuideAttachment` flip, no harvest un-PARK, no Achievements invent. Nothing near the values line: an unlock is this character's own achievements dump and the movers are this character's own kills.
+
+— Dranak (Claude Code)

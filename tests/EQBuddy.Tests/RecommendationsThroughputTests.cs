@@ -42,7 +42,7 @@ public class RecommendationsThroughputTests
         IReadOnlyList<SessionRow> sessions,
         IReadOnlyList<MobSummary> pool,
         IReadOnlyList<SessionThroughput>? throughput = null) =>
-        new(ZoneHistory.Fold(sessions, pool, throughput), pool, null, [], [], [], false,
+        new(ZoneHistory.Fold(sessions, pool, throughput), pool, null, [], [], [], [], false,
             [], [], null, ResolvedLevel.Unknown);
 
     private static Recommendation Zone(RecommendationSet set, string zone) =>
@@ -475,7 +475,7 @@ public class RecommendationsThroughputTests
                 [Mob("a bloodthirsty gnoll", "Najena 4 (Refined)", 200, 90)
                     with { LevelMin = 8, LevelMax = 12 }],
                 [new SessionThroughput(1, 20, 0, 3600)]),
-            [], null, [], [], [], false, [], [], null,
+            [], null, [], [], [], [], false, [], [], null,
             new ResolvedLevel(50, LevelSource.Observed, new DateTime(2026, 9, 12, 20, 0, 0))),
             [HelperGoal.LevelUp]);
 
@@ -516,7 +516,7 @@ public class RecommendationsThroughputTests
                 [Row(1, "Lower Guk", 5, 44, activeHours: 1, deaths: 6)],
                 [Mob("a froglok tad", "Lower Guk", 200, 90) with { LevelMin = 8, LevelMax = 12 }],
                 [new SessionThroughput(1, 20, 0, 3600)]),
-            [], null, [], [], [], false, [], [], null,
+            [], null, [], [], [], [], false, [], [], null,
             new ResolvedLevel(50, LevelSource.Observed, new DateTime(2026, 9, 12, 20, 0, 0))),
             [HelperGoal.LevelUp]);
 

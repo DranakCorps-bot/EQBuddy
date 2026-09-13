@@ -91,6 +91,7 @@ public partial class QuestsView : UserControl
         EpicClassicOnlyCheck.IsChecked = _settings.EpicQuestClassicOnly;
         SkyIslandRepeatCheck.IsChecked = _settings.SkyStepsUnderEveryIsland;
         BuildClassChecks();
+        BuildUnlockPicker();
         EraCombo.Items.Add("Any era");
         foreach (var era in QuestEraLadder.Eras) EraCombo.Items.Add($"≤ {era}");
         var savedEra = Array.IndexOf(QuestEraLadder.Eras, _settings.QuestEraFilter);
@@ -420,6 +421,11 @@ public partial class QuestsView : UserControl
         UnlockSectionStrip.Visibility = unlocks ? Visibility.Visible : Visibility.Collapsed;
         StateCombo.Visibility = unlocks ? Visibility.Collapsed : Visibility.Visible;
         ClassBtn.Visibility = unlocks ? Visibility.Collapsed : Visibility.Visible;
+        // The unlock pick's face takes the state combo's column on this tab and only this tab.
+        // It is hidden here unconditionally and SHOWN by RefreshUnlockPicker, which is the one
+        // place that knows whether there is anything to offer — an empty dropdown is the same
+        // trap as an inert filter. EVERY CONTROL IN THIS METHOD IS ASSIGNED EXACTLY ONCE.
+        if (!unlocks) UnlockPickBtn.Visibility = Visibility.Collapsed;
         // "scan bags" copies /outputfile inventory, which is not what this tab reads.
         CopyInvBtn.Visibility = unlocks ? Visibility.Collapsed : Visibility.Visible;
         ClassStrip.Visibility = !unlocks && _classes.Count > 1
@@ -583,6 +589,75 @@ public partial class QuestsView : UserControl
         UnlockLayout.ClassesHeading => "Only the class unlocks — Plane of Sky rewards and tasks",
         _ => "Every unlock, races and classes together",
     };
+
+    // ---- which unlocks you are working on (DRA-71 D5, Founder smoke item 7) -------------
+
+    /// <summary>
+    /// The pick, on the primitive, beside the section strip.
+    ///
+    /// <para><b>The section strip and this picker answer different questions, which is why
+    /// both are on the row.</b> The strip is a VIEW — races, classes, or both — and is
+    /// session-scoped, like every other lens on this window. The pick is an INTENT: "I am
+    /// unlocking Iksar and Necromancer", stored per character and shared with the Helper room
+    /// through <see cref="UnlockPickStore"/>. Folding one into the other would make a
+    /// long-term plan something you re-enter every time you open the window, or make a glance
+    /// at the other section something you pay for by editing your plan.</para>
+    ///
+    /// <para>The rows are rebuilt on every render of this tab rather than once at
+    /// construction, because unlike the class lens's fixed sixteen they come from a dump that
+    /// arrives lazily off disk and from whatever the section strip is currently showing.</para>
+    /// </summary>
+    private EqMultiPicker? _unlockPicker;
+
+    /// <summary>What the face said at the last render — reported in the dump, because a face
+    /// that stopped tracking the store is exactly the failure a count of rows cannot see.</summary>
+    private string _unlockPickFace = "";
+
+    private void BuildUnlockPicker()
+    {
+        _unlockPicker = new EqMultiPicker(key => ToggleUnlockPick((string)key), UnlockPickBtn);
+        UnlockPickBtn.ToolTip = UnlockPickReadout.Tip;
+        UnlockPickerHost.Children.Add(_unlockPicker.Host);
+    }
+
+    /// <summary>
+    /// Re-offer the picker for what is in view, and repaint its face from the store.
+    /// </summary>
+    /// <param name="offered">The unlocks the SECTION LENS is showing, unnarrowed — the offer
+    /// has to hold every row the pick could name here, or a player who picked something and
+    /// then changed the lens would see a tick they cannot reach to undo.</param>
+    private void RefreshUnlockPicker(
+        IReadOnlyList<UnlockProgress> offered, IReadOnlyList<string> picked)
+    {
+        if (_unlockPicker is null) return;
+        UnlockPickBtn.Visibility = offered.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
+        if (offered.Count == 0) { _unlockPickFace = ""; return; }
+
+        // Closest to done first, then alphabetically — the same ordering the Helper's copy of
+        // this picker uses, so one store is offered one way and not two.
+        var rows = offered
+            .OrderBy(u => u.Complete)
+            .ThenByDescending(u => u.Score is { } s && s.Total > 0 ? s.Done / (double)s.Total : -1)
+            .ThenBy(u => u.Subject, StringComparer.OrdinalIgnoreCase)
+            .ToList();
+        _unlockPicker.SetRows([.. rows.Select(u => new PickerRow(
+            u.Subject, UnlockPickReadout.Row(u), UnlockPickStore.IsPicked(picked, u.Subject)))]);
+        // The DEFAULT width budget, not the Helper's roomier one: this face shares its row
+        // with the section strip and the mode strip, which is the geometry #184 was about.
+        _unlockPickFace = UnlockPickReadout.Face(
+            [.. rows.Where(u => UnlockPickStore.IsPicked(picked, u.Subject)).Select(u => u.Subject)],
+            rows.Count, PickerFace.MaxChars);
+        UnlockPickBtn.Content = _unlockPickFace;
+    }
+
+    private void ToggleUnlockPick(string subject)
+    {
+        var key = _main.QuestCharacterKey;
+        if (key.Length == 0) return;
+        UnlockPickStore.Toggle(_settings, key, subject);
+        _settings.Save();
+        Refresh(force: true);
+    }
 
     // ---- multiclass filter (Legends: up to three active classes; David 2026-08-07) ----
 
@@ -810,6 +885,12 @@ public partial class QuestsView : UserControl
             + (_tab == QuestTab.Unlocks
                 ? $"|un:{_unlockSection}|fac:{_main.Unlocks.Factions?.WrittenAt.Ticks ?? 0}"
                   + $"|ach:{(_main.Unlocks.HasAchievements ? 1 : 0)}|pool:{_unlockPoolVersion}"
+                  // THE PICK (DRA-71 D5), folded by CONTENT and not by count — a swap leaves a
+                  // count unmoved. It is written by the OTHER surface as often as by this one:
+                  // the Helper room shares this store, and a pick made there while this window
+                  // sits open on the Unlocks tab has to land here. Trap 72 on this surface for
+                  // the fourth time, and the first where the writer is in another room.
+                  + $"|pk:{string.Join(";", UnlockPickStore.Picked(_settings, _main.QuestCharacterKey).Order(StringComparer.OrdinalIgnoreCase))}"
                 : "");
         if (!force && sig == _signature) return;
         _signature = sig;
@@ -1183,6 +1264,24 @@ public partial class QuestsView : UserControl
         $"questsUnlockRows={PanelElements().OfType<Grid>().Count(g => g.Tag as string == UnlockRowTag)} " +
         $"questsUnlockGuided={PanelElements().OfType<TextBlock>().Count(t => t.Tag as string == UnlockGuideTag)} " +
         $"questsUnlockDoors={PanelElements().OfType<Button>().Count(b => b.Tag as string == UnlockDoorTag)} " +
+        // ---- the pick, and what P12 did to the row (DRA-71 D5) -------------------------
+        // THE STORE, THE CONTROL AND THE SCREEN, all from one Build (trap 56). `Picks` is what
+        // settings.json holds for this character — the SAME string the Helper room dumps under
+        // `helperUnlockPicks`, which is how an E2E proves one store rather than two agreeing
+        // by luck. `PickRows` is what the popup offered and `PickFace` what the button said;
+        // a pick that reached the store and no control is trap 20's shape, and a popup with
+        // rows in it photographs as an ordinary button either way (trap 29).
+        $"questsUnlockPicks={string.Join(",", UnlockPickStore.Picked(_settings, _main.QuestCharacterKey).Select(p => p.Replace(" ", "")))} " +
+        $"questsUnlockPickRows={_unlockPicker?.RowCount ?? 0} " +
+        $"questsUnlockPickFace={_unlockPickFace.Replace(" ", "")} " +
+        $"questsUnlockPickShown={(UnlockPickBtn.Visibility == Visibility.Visible ? 1 : 0)} " +
+        // How many unlocks the pick HELD BACK from the sections on screen. The screen's answer
+        // to "did the filter fire", beside `questsUnlockRows` which is what survived it.
+        $"questsUnlockHidden={_unlockHidden} " +
+        // P12's two halves: the pointer lines drawn, and the rows carrying the prose that used
+        // to be under them. See UnlockWhoWhereTag and _unlockHovers for why these are two keys.
+        $"questsUnlockWhoWhere={PanelElements().OfType<TextBlock>().Count(t => t.Tag as string == UnlockWhoWhereTag)} " +
+        $"questsUnlockHovers={_unlockHovers} " +
         // The Sky tab's ⧉ copy of /outputfile achievements. Counted off the real visual
         // tree rather than from a flag, for the same reason gearCopyCmd exists: an absent
         // control photographs as an unremarkable panel (trap 29), and a bool that nobody
@@ -2913,10 +3012,31 @@ public partial class QuestsView : UserControl
     /// </summary>
     private void RenderUnlocks()
     {
-        var races = _main.Unlocks.Races;
-        var classes = _main.Unlocks.Classes;
+        var allRaces = _main.Unlocks.Races;
+        var allClasses = _main.Unlocks.Classes;
         var factions = _main.Unlocks.Factions;
         _unlockDrewFactions = factions is not null;
+
+        // **THE PICK, APPLIED BEFORE ANYTHING IS BUILT** (DRA-71 D5, plan P11). It narrows the
+        // LISTS and not the groups, so `UnlockLayout.Groups`' contract — one group per unlock,
+        // one row per Actionable entry, IN ORDER — still pairs each drawn row with the
+        // criterion behind it, which is how the guided detail resolves at all. The guidance
+        // layer is untouched: it never knew which unlocks were on screen and still does not.
+        var picked = UnlockPickStore.Picked(_settings, _main.QuestCharacterKey);
+        // The OFFER is what the section lens shows, unnarrowed — see RefreshUnlockPicker.
+        var offered = new List<UnlockProgress>();
+        if (UnlockLayout.InSection(UnlockLayout.RacesHeading, _unlockSection))
+            offered.AddRange(allRaces);
+        if (UnlockLayout.InSection(UnlockLayout.ClassesHeading, _unlockSection))
+            offered.AddRange(allClasses);
+        RefreshUnlockPicker(offered, picked);
+
+        var races = UnlockPickStore.Narrow(allRaces, picked);
+        var classes = UnlockPickStore.Narrow(allClasses, picked);
+        _unlockHidden = UnlockPickStore.Hidden(allRaces, picked)
+                        + UnlockPickStore.Hidden(allClasses, picked);
+        _unlockWhoWhere = 0;
+        _unlockHovers = 0;
 
         // BOTH commands, always — not only in the empty states they used to hide behind
         // (Hateborne, 2026-08-25). This tab is built from two dumps and neither is a
@@ -2962,6 +3082,13 @@ public partial class QuestsView : UserControl
             title.Ink("AccentBrush");
             QuestsPanel.Children.Add(title);
 
+            // What the PICK is holding back in THIS section — a surviving filter says so out
+            // loud (trap 50), and the player did this one, so the note names the way back.
+            var hiddenHere = UnlockPickStore.Hidden(
+                heading == UnlockLayout.RacesHeading ? allRaces : allClasses, picked);
+            if (UnlockPickReadout.HiddenNote(hiddenHere) is { Length: > 0 } hiddenNote)
+                QuestsPanel.Children.Add(Note(hiddenNote, "Info"));
+
             var groups = UnlockLayout.Groups(unlocks, factions, heading);
             for (var i = 0; i < groups.Count; i++)
             {
@@ -3000,6 +3127,12 @@ public partial class QuestsView : UserControl
                     {
                         Margin = new Thickness(DesignTokens.SpaceL, 1, 0, 1),
                         Tag = UnlockRowTag,
+                        // **A GRID WITH A NULL BACKGROUND DOES NOT HIT-TEST**, so the hover
+                        // below would only appear over the ink and not over the gaps between
+                        // the icon, the text and the door. Transparent is the WPF idiom for
+                        // "claim the whole rectangle without painting it" — the same lesson
+                        // trap 16 records for vectors, one control up.
+                        Background = System.Windows.Media.Brushes.Transparent,
                     };
                     line.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
                     line.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
@@ -3044,13 +3177,46 @@ public partial class QuestsView : UserControl
                         Grid.SetColumn(open, 2);
                         line.Children.Add(open);
                     }
+                    // **THE LONGER PROSE, ON THE HOVER** (DRA-71 D5, plan P12). What your own
+                    // kills did to this faction — up to six signed one-liners — is the wall
+                    // the who · where line below replaces. Set only when it is not empty: an
+                    // empty tooltip is a rectangle that appears and says nothing.
+                    if (guidance.Hover is { Length: > 0 } hover)
+                    {
+                        line.ToolTip = hover;
+                        _unlockHovers++;
+                    }
                     QuestsPanel.Children.Add(line);
 
-                    // The guided lines, UNDER the row and indented past its icon. Each is one
-                    // already-worded sentence out of UnlockGuidance — this loop decides
-                    // layout and nothing else, which is what keeps the phone's copy (D2) from
-                    // becoming a second answer.
-                    foreach (var sentence in guidance.Lines)
+                    // **WHO · WHERE, THE GUIDE'S OWN ROW LINE** (plan P12). WHAT is the row's
+                    // title above; this is the creature and the zone the guidance already
+                    // decided on, drawn as a VALUE rather than read back out of a sentence.
+                    // Empty for the Sky and Task shapes and for a faction nobody has farmed —
+                    // an unanswered question draws nothing (trap 73), which is why this is an
+                    // `if` and not a line that sometimes says "· ".
+                    if (guidance.RowDetail is { Length: > 0 } whoWhere)
+                    {
+                        var pointer = DesignSystem.Text(Role.Caption, whoWhere);
+                        pointer.TextWrapping = TextWrapping.Wrap;
+                        pointer.Margin = new Thickness(
+                            DesignTokens.SpaceL + DesignTokens.IconInlineHit, 0, 0,
+                            DesignTokens.SpaceXxs);
+                        pointer.Ink("DimBrush");
+                        pointer.Tag = UnlockWhoWhereTag;
+                        // The hover rides the line it explains too, so a player whose pointer
+                        // landed on the sentence rather than on the row still gets it.
+                        if (guidance.Hover is { Length: > 0 } h) pointer.ToolTip = h;
+                        QuestsPanel.Children.Add(pointer);
+                        _unlockWhoWhere++;
+                    }
+
+                    // The QUANTITIES, UNDER the row and indented past its icon: the piece count
+                    // and the kills-to-go estimate. One line each, they are what a player acts
+                    // on, and they are the half of the guidance a screenshot can review — a tab
+                    // whose every sentence lived on a hover would be a tab nobody could
+                    // photograph (trap 22). Each is one already-worded sentence out of
+                    // UnlockGuidance; this loop decides layout and nothing else.
+                    foreach (var sentence in guidance.RowLines)
                     {
                         var guided = DesignSystem.Text(Role.Caption, sentence);
                         guided.TextWrapping = TextWrapping.Wrap;
@@ -3103,6 +3269,27 @@ public partial class QuestsView : UserControl
     /// <summary>The tag a row-end unlock door carries. Counted the same way and for the same
     /// reason: an absent control photographs as an unremarkable panel (trap 29).</summary>
     private const string UnlockDoorTag = "unlockDoor";
+
+    /// <summary>The tag the <c>who · where</c> line under an unlock row carries (DRA-71 D5).
+    /// Its own tag rather than sharing <see cref="UnlockGuideTag"/>, because the two are
+    /// different claims about the same feature: the POINTER reached the screen, and the
+    /// QUANTITIES did. One count could not tell a row that gained a pointer and lost its
+    /// estimate from a row that did neither.</summary>
+    private const string UnlockWhoWhereTag = "unlockWhoWhere";
+
+    /// <summary>How many unlock rows the last render hung the longer prose on, counted as it
+    /// was SET rather than walked back off the tree — a <c>ToolTip</c> is not an element and
+    /// there is nothing in the panel to find. It is the only fact that can say the movers
+    /// survived P12's move off the row: they are no longer drawn, so
+    /// <c>questsUnlockGuided</c> would read exactly the same whether the hover carries them or
+    /// nothing at all.</summary>
+    private int _unlockHovers;
+
+    /// <summary>How many <c>who · where</c> lines the last render drew, and how many unlocks
+    /// the pick held back. Both are the SCREEN's answer beside the store's — <c>pk:</c> in the
+    /// repaint signature says the pick moved, and only these say the tab acted on it.</summary>
+    private int _unlockWhoWhere;
+    private int _unlockHidden;
 
     /// <summary>
     /// Where an unlock row's ↗ leads. Core decides THAT there is a door and what it points

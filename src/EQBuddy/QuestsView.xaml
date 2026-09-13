@@ -138,6 +138,26 @@
                      ellipsis to say so (trap 25). -->
                 <WrapPanel x:Name="UnlockSectionStrip" Grid.Column="0"
                            VerticalAlignment="Center" Visibility="Collapsed"/>
+                <!-- BESIDE THE SECTION STRIP: which unlocks you are working on (DRA-71 D5,
+                     Founder smoke item 7). It shares the STATE combo's column because the two
+                     are never visible together — the state lens is not wired on this tab and
+                     an inert filter is worse than an absent one, which is the decision the
+                     line that collapses StateCombo already records.
+
+                     THE FACE IS HERE, the popup is not: the same split the class lens took in
+                     D2, for the same #184 reason — this button sits in a fixed Grid column,
+                     so it is placed in XAML and handed to EqMultiPicker, which owns the
+                     dropdown and its chrome. No Click handler; the picker wires its own face.
+                     The SELECTION itself is AppSettings.UnlockPicks, which the Helper room
+                     reads through the same UnlockPickStore — one store, two surfaces. -->
+                <Button x:Name="UnlockPickBtn" Grid.Column="1" Visibility="Collapsed"
+                        Style="{StaticResource ActionButton}"
+                        FontSize="{DynamicResource FontCaption}"
+                        Height="{DynamicResource ControlHeight}"
+                        Margin="{DynamicResource GapS}"/>
+                <!-- Where its popup is added. A Popup takes no room in the row it is declared
+                     in — it needs a logical tree to resolve its theme brushes, nothing else. -->
+                <StackPanel x:Name="UnlockPickerHost" Grid.Column="1"/>
                 <!-- State filter (Reddit ask, 2026-08-11): every tab and search can
                      narrow to open / ready / completed. -->
                 <ComboBox x:Name="StateCombo" Grid.Column="1" Width="86"

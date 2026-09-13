@@ -1318,6 +1318,13 @@ public sealed class EndToEndTests
     /// <item>3 section chips, All selected — the lens the Founder asked to see, and the only
     /// thing that can say the retired ComboBox is not what is on screen (trap 29).</item>
     /// </list>
+    ///
+    /// **DRA-71 D5 adds four numbers to the same prediction, and three of them are ZERO.**
+    /// P12 puts <c>who · where</c> on the row line and the per-creature prose on the hover —
+    /// and this staging has no kills at all, so both are absent. That is the assertion worth
+    /// having: the new shape must not invent a pointer for a faction nobody has farmed (trap
+    /// 73 again, one slice later). The picker is the fourth: it OFFERS both unlocks, nothing
+    /// is picked, and so it hides nothing and its face reads the empty state.
     /// </summary>
     [Fact]
     public void TheUnlocksTabDrawsItsLensAndItsGuidedDetail()
@@ -1349,6 +1356,18 @@ public sealed class EndToEndTests
         Assert.Equal(1, app.DumpValue("questsUnlockGuided"));
         Assert.Equal(3, app.DumpValue("questsUnlockSections"));
         Assert.Equal("All", app.DumpText("questsUnlockSection"));
+
+        // DRA-71 D5. Nothing farmed, so no pointer and no prose — the shape stays silent
+        // rather than drawing a labelled blank.
+        Assert.Equal(0, app.DumpValue("questsUnlockWhoWhere"));
+        Assert.Equal(0, app.DumpValue("questsUnlockHovers"));
+        // The picker: on screen, offering both unlocks, nothing picked, nothing hidden. The
+        // ROW COUNT is the floor under the face — a face reading "Any unlock" over an empty
+        // popup would satisfy every other assertion here (trap 29).
+        Assert.Equal(1, app.DumpValue("questsUnlockPickShown"));
+        Assert.Equal(2, app.DumpValue("questsUnlockPickRows"));
+        Assert.Equal("Anyunlock", app.DumpText("questsUnlockPickFace"));
+        Assert.Equal(0, app.DumpValue("questsUnlockHidden"));
     }
 
     /// <summary>
@@ -1360,10 +1379,20 @@ public sealed class EndToEndTests
     /// tab would keep drawing the moment before for the whole session. It timed out before the
     /// signature carried the pool's version.
     ///
-    /// **Prediction:** one row's guidance goes from nothing to two sentences — the mover and
-    /// the estimate — so the tab's guided count goes 1 → 3. At +5 a kill against the staged
+    /// **Prediction, RE-CUT FOR DRA-71 D5's row shape.** One row's guidance goes from nothing
+    /// to three drawn things, and P12 decides which is which: the <c>who · where</c> pointer
+    /// on its own line (0 → 1), the kills-to-go estimate as the visible quantity (0 → 1), and
+    /// the mover's own sentence on the row's hover (0 → 1). At +5 a kill against the staged
     /// 1,000 to go the estimate is 200 kills, which is asserted in
     /// <c>UnlockGuidanceTests</c> arithmetic rather than read off a screen here.
+    ///
+    /// <para><b>The wait moved onto the pointer, and the reason is the whole of P12.</b> It
+    /// used to wait for <c>questsUnlockGuided == 2</c> — the mover sentence and the estimate,
+    /// both drawn as caption lines. The mover now rides the hover, so that count would stop at
+    /// 1 and a wait on 2 would time out on working code. <c>questsUnlockHovers</c> is asserted
+    /// beside it because it is the ONLY fact that can tell a hover carrying the movers from a
+    /// hover carrying nothing: a <c>ToolTip</c> is not an element, so nothing in the panel can
+    /// be walked to find one.</para>
     ///
     /// <para>The wait is on the SCREEN's own count and not on a sleep: <c>AppendLogLines</c>
     /// returns when the tail has read the bytes, not when the app has acted (trap 62), and the
@@ -1397,9 +1426,11 @@ public sealed class EndToEndTests
         app.WaitUntilStill("questsRenders", TimeSpan.FromSeconds(3),
             "the Unlocks tab to stop redrawing on its own before the append");
         var before = app.DumpValues("questsUnlockRows", "questsUnlockGuided", "questsUnlockPool",
-            "questsRenders");
+            "questsRenders", "questsUnlockWhoWhere", "questsUnlockHovers");
         Assert.Equal(1, before[0]);
         Assert.Equal(0, before[1]);
+        Assert.Equal(0, before[4]);
+        Assert.Equal(0, before[5]);
 
         // A kill and the faction line that follows it, inside the reward window the
         // attribution uses — which is what makes this creature a MOVER rather than two
@@ -1408,15 +1439,19 @@ public sealed class EndToEndTests
             "You have slain a Felwithe guard!",
             "Your faction standing with Keepers of the Art has been adjusted by 5.");
 
-        Wait.Until(() => app.DumpValue("questsUnlockGuided") == 2, TimeSpan.FromSeconds(30),
-            "the open Unlocks tab to redraw with the mover and its estimate", app.Artifacts);
+        Wait.Until(() => app.DumpValue("questsUnlockWhoWhere") == 1, TimeSpan.FromSeconds(30),
+            "the open Unlocks tab to redraw with the mover's who · where pointer", app.Artifacts);
         // One read, so the three facts are one moment (trap 56). The row itself did not
         // multiply — the guidance rides UNDER the row it belongs to — and the POOL's own
         // version moved, which is the store's answer beside the screen's.
         var after = app.DumpValues("questsUnlockRows", "questsUnlockDoors", "questsUnlockPool",
-            "questsRenders");
+            "questsRenders", "questsUnlockGuided", "questsUnlockHovers");
         Assert.Equal(1, after[0]);
         Assert.Equal(1, after[1]);
+        // The estimate, drawn; and the movers, on the hover. Both from the same read as the
+        // pointer above — one moment, three claims (trap 56).
+        Assert.Equal(1, after[4]);
+        Assert.Equal(1, after[5]);
         Assert.True(after[2] > before[2],
             $"the pool should have re-folded (was {before[2]}, now {after[2]}); dump was: "
             + app.Artifacts());
@@ -1425,6 +1460,61 @@ public sealed class EndToEndTests
         Assert.True(after[3] > before[3],
             $"the panel should have rebuilt (renders were {before[3]}, now {after[3]}); dump was: "
             + app.Artifacts());
+    }
+
+    /// <summary>
+    /// **THE PICK NARROWS THE UNLOCKS TAB, AND SAYS WHAT IT HELD BACK** (DRA-71 D5, plan P11;
+    /// acceptance A8).
+    ///
+    /// <para>The engine's half is unit-tested and the store's half is unit-tested; what only a
+    /// launched app can say is that the SURFACE read the same store — filtered before
+    /// <c>UnlockLayout.Groups</c>, so the row↔criterion pairing the guided detail depends on
+    /// still holds — and that the control the player would use to undo it is on screen.</para>
+    ///
+    /// <para><b>Prediction, from the staging and written before the run.</b> The dump names two
+    /// races (High Elf, Barbarian) and one class (Warrior); the pick names High Elf only.</para>
+    /// <list type="bullet">
+    /// <item>1 race drawn, and 1 race hidden — the pick is a filter and it fired.</item>
+    /// <item><b>The Warrior class unlock survives.</b> The pick names nothing in that section,
+    /// so it narrows nothing in it — the rule one flat list of subject names rests on. Its
+    /// Obtain row is the second row on screen, so <c>questsUnlockRows</c> is 3: two faction
+    /// criteria under High Elf plus the Obtain.</item>
+    /// <item>The face reads the one pick by NAME, because one pick is always named.</item>
+    /// <item>The popup still offers all THREE, so the tick can be taken back — an offer
+    /// narrowed by its own filter is a selection a player cannot undo.</item>
+    /// </list>
+    /// </summary>
+    [Fact]
+    public void APickedUnlockIsTheOnlyOneItsSectionDrawsAndTheTabSaysWhatItHid()
+    {
+        var key = $"{AppHarness.Character}_{AppHarness.Server}".ToLowerInvariant();
+        using var app = new AppHarness(
+            configureSettings: s => s.UnlockPicks[key] = ["High Elf"],
+            environment: new Dictionary<string, string> { ["EQBUDDY_QUESTS"] = "unlocks" });
+        app.WriteAchievementsDump(
+            "Untapped Potential: Races",
+            "I	Race Unlock - High Elf",
+            "I		Get maximum faction with Clerics of Tunare.",
+            "I		Get maximum faction with Keepers of the Art.",
+            "I	Race Unlock - Barbarian",
+            "I		Get maximum faction with Rallosian Army.",
+            "Untapped Potential: Classes",
+            "I	Class Unlock - Warrior",
+            "I		Obtain Azure Ruby Ring.");
+        app.WriteFactionDump((275, "Keepers of the Art", 1000, 1000), (76, "Clerics of Tunare", 2000, 0));
+        app.Launch();
+
+        Wait.Until(() => app.DumpValue("questsUnlockDrewFactions") == 1, TimeSpan.FromSeconds(45),
+            "the Unlocks tab to render with both dumps in hand", app.Artifacts);
+
+        // ONE read, so the store's claim and the screen's are one moment (trap 56).
+        Assert.Equal("HighElf", app.DumpText("questsUnlockPicks"));
+        Assert.Equal(3, app.DumpValue("questsUnlockRows"));
+        Assert.Equal(1, app.DumpValue("questsUnlockHidden"));
+        // The way back: the offer holds every unlock in view, not only the picked one.
+        Assert.Equal(3, app.DumpValue("questsUnlockPickRows"));
+        Assert.Equal("HighElf", app.DumpText("questsUnlockPickFace"));
+        Assert.Equal(1, app.DumpValue("questsUnlockPickShown"));
     }
 
     /// <summary>

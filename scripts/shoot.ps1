@@ -1337,6 +1337,63 @@ $Shots = [ordered]@{
     # The theme rides `Set`, which is the only per-shot override Write-Settings honours — the
     # -Theme PARAMETER is batch-wide, and a shot that needed the whole batch re-run in another
     # palette to be reviewable is a shot nobody re-runs.
+    # DRA-71 D5: the UNLOCK sub-picker, OPEN. The slice's whole player-visible control, and
+    # the same trap-22 argument the goals picker's shot makes — a dropdown that is shut
+    # photographs as a button, so without the hook this is a picture of a rectangle reading
+    # "Any unlock". Popups = $true composites the popup's own HWND (trap 79).
+    #
+    # The achievements dump is staged through the REAL seam — beside the log, in the game's
+    # own filename shape — because the picker's rows ARE that dump: without it the block is
+    # its honest empty state and the ⧉ that fills it, which is a different picture of a
+    # different thing.
+    #
+    # PREDICTION, written before the shot: the GOALS face names both rather than counting —
+    # "Unlock Classes · Unlock Races" is 29 characters against the Helper's 34-char budget,
+    # and the order is the enum's, not the click order. Under it one block headed "Races and
+    # classes you are unlocking", its note, and a face reading "Human (Freeport)" — one pick
+    # is always named, never counted.
+    # The open popup holds THREE rows in closest-to-done order, each with its own count:
+    # Human (Freeport) — 0 of 2 done, Barbarian — 0 of 1 done, Warrior — 0 of 1 done (ties
+    # break alphabetically, so Barbarian precedes Human precedes Warrior). The FACTION
+    # sub-picker is absent: Work on Faction is not among the picked goals.
+    #
+    # SHOT 2026-09-13: as predicted — the goals face names both, the block and its note are
+    # there, the face reads the one pick, and the popup holds Barbarian · Human (Freeport) ·
+    # Warrior in that order with Human ticked. The ANSWERS under it were not predicted and
+    # are the better half of the picture: Warrior survives the race pick (its section is
+    # untouched) and the Human (Freeport) unlock is headed **West Commonlands** rather than
+    # by its own name, because the fixture's kills move Coalition of Tradesfolk and the
+    # cross-domain join gave that unlock a place to go. Barbarian is absent, which is the
+    # pick firing. The popup overlaps the source note behind it, which is a dropdown doing
+    # what a dropdown does.
+    #
+    # AND THE REGRESSION PICTURES: 'shell-helper', 'shell-helper-narrow' and
+    # 'shell-helper-picker' all change in this slice, because none of them picks a goal and
+    # "nothing picked" weighs every goal — so the new block is drawn in its honest no-dump
+    # state, with the ⧉ that fills it. That is the fifth copy button
+    # `TheHelperHandsOverTheCommandsItsOwnEmptyStatesAskFor` now asserts. The other
+    # 'shell-helper*' shots pick goals that are not unlock goals, so the block is absent and
+    # their pictures are unchanged.
+    'shell-helper-unlocks' = @{ Title = 'EQBuddy — Helper'
+                           Env = @{ EQBUDDY_SHELL = 'helper'; EQBUDDY_HELPER_PICKER = 'unlocks' }
+                           Popups = $true
+                           Dump = @{
+                               'Testchar_test-Achievements.txt' = @(
+                                   'Untapped Potential: Races'
+                                   "I`tRace Unlock - Human (Freeport)"
+                                   "I`t`tGet maximum faction with Coalition of Tradesfolk."
+                                   "I`t`tGet maximum faction with Knights of Truth."
+                                   "I`tRace Unlock - Barbarian"
+                                   "I`t`tGet maximum faction with Rallosian Army."
+                                   'Untapped Potential: Classes'
+                                   "I`tClass Unlock - Warrior"
+                                   "I`t`tObtain Azure Ruby Ring."
+                               )
+                           }
+                           Set = @{
+                               HelperGoals = @{ 'testchar_test' = @('UnlockRaces', 'UnlockClasses') }
+                               UnlockPicks = @{ 'testchar_test' = @('Human (Freeport)') }
+                           } }
     'shell-helper-picker-light' = @{ Title = 'EQBuddy — Helper'
                            Env = @{ EQBUDDY_SHELL = 'helper'; EQBUDDY_HELPER_PICKER = 'goals' }
                            Popups = $true
@@ -2022,6 +2079,91 @@ $Shots = [ordered]@{
                            Set = @{
                                SkyQuestChecklist = @(
                                    @{ Id = 'sky-194'; Acquired = $true }   # Azure Ring, held
+                               )
+                           } }
+    # ---- DRA-71 D5: the unlock pick, and the row shape P12 gave these rows --------------
+    #
+    # RE-SHOT 2026-09-13, and 'quest-unlocks' above is a REGRESSION PICTURE of this slice —
+    # its rows changed without its staging changing, which is exactly the shot the
+    # illustration lock exists to keep honest.
+    #
+    # PREDICTION for the re-shot 'quest-unlocks', written before the run:
+    #   * A NEW BUTTON in the filter row, beside the All | Races | Classes chips, reading
+    #     "Any unlock" — nothing is picked, and the face says what the off-state means.
+    #   * Coalition of Tradesfolk: the six guided lines become a dim POINTER line reading
+    #     "Orc centurion · West Commonlands" and ONE visible sentence, the estimate
+    #     ("≈200 more kills of Orc centurion in West Commonlands at +5 each…"). The two
+    #     mover sentences are on the row's HOVER and are not in the picture — a tooltip is
+    #     its own top-level window and PrintWindow does not composite one (trap 79's
+    #     neighbour). Stated rather than staged: 'shell-helper-unlocks' below is where the
+    #     new control is photographed, and the movers' own wording is asserted in
+    #     UnlockGuidanceTests.
+    #   * Knights of Truth: a pointer line and NO sentence under it. It is maxed, so there
+    #     is nothing left to divide and no estimate — the one row in the picture that shows
+    #     what P12 does to a row whose evidence is all prose.
+    #   * Freeport Militia: unchanged and still silent. Not in the faction dump, so no
+    #     mover, no pointer, no hover — absence of evidence stays silence (trap 73).
+    #   * Obtain Azure Ruby Ring: unchanged. "1 of 2 pieces in hand" is a QUANTITY and stays
+    #     on the row; the Sky shape has no creature and so draws no pointer.
+    #
+    # 'quest-unlocks-picked' — the SAME tab with a pick made. A second race is added to the
+    # dump for this shot only, because a filter with one row to filter cannot be seen doing
+    # anything: the pick names Human (Freeport), so Barbarian is hidden and the tab SAYS so.
+    #
+    # PREDICTION: the face reads "Human (Freeport)" (one pick is always named, never
+    # counted); the Races section draws Human (Freeport) alone with the note "1 more unlock
+    # is hidden by your pick. Untick them all to see every one." above it; and the CLASSES
+    # section is untouched — Warrior is still there, with no note over it, because the pick
+    # names nothing in that section. That last one is the whole argument for one flat list
+    # of subject names, and it is the half a screenshot can actually show.
+    # SHOT 2026-09-13: every prediction above came out as written, on both pictures — the
+    # "Any unlock" face in the filter row, the two pointer lines, Knights of Truth's pointer
+    # with no sentence under it, Freeport Militia still silent, the piece count still on the
+    # row, the hidden note over a Races section of one, and the Classes section untouched.
+    #
+    # TWO THINGS THE PREDICTION DID NOT NAME, both correct and both worth knowing:
+    #   1. The TAB BADGE on 'quest-unlocks-picked' reads "Unlocks 0 / 3" — all three, not the
+    #      one in view. That is right: the badge is progress and the pick is a view, and a
+    #      badge that moved when you filtered would be the window telling you that you had
+    #      un-unlocked something.
+    #   2. Knights of Truth's top raiser is "Orc pawn", not the Orc centurion the sibling row
+    #      names. The 2026-09-11 note above recorded that the FIXTURE already carries sixteen
+    #      Knights of Truth lines and that two of them land inside a kill's reward window;
+    #      the pointer is naming the better of those two. The row is the picture's best
+    #      argument for P12 — maxed, nothing to divide, and what your kills DID is one hover
+    #      away instead of two sentences wide.
+    'quest-unlocks-picked' = @{ Title = 'Quest Tracker'
+                           Env = @{ EQBUDDY_QUESTS = 'unlocks' }
+                           Dump = @{
+                               'Testchar_test-Achievements.txt' = @(
+                                   'Untapped Potential: Races'
+                                   "I`tRace Unlock - Human (Freeport)"
+                                   "I`t`tGet maximum faction with Coalition of Tradesfolk."
+                                   "I`t`tGet maximum faction with Knights of Truth."
+                                   "I`tRace Unlock - Barbarian"
+                                   "I`t`tGet maximum faction with Rallosian Army."
+                                   'Untapped Potential: Classes'
+                                   "I`tClass Unlock - Warrior"
+                                   "I`t`tObtain Azure Ruby Ring."
+                               )
+                               'Testchar_test-WAR-Factions.txt' = @(
+                                   "ID`tName`tStandingValue`tPointsToMax"
+                                   "229`tCoalition of Tradefolk`t1000`t1000"
+                                   "304`tKnights of Truth`t2000`t0"
+                               )
+                           }
+                           Append = @(
+                               'You have slain an orc centurion!'
+                               'Your faction standing with Coalition of Tradefolk has been adjusted by 5.'
+                               'You have slain an orc centurion!'
+                               'Your faction standing with Coalition of Tradefolk has been adjusted by 5.'
+                               'You have slain an orc centurion!'
+                               'Your faction standing with Coalition of Tradefolk has been adjusted by 5.'
+                           )
+                           Set = @{
+                               UnlockPicks = @{ 'testchar_test' = @('Human (Freeport)') }
+                               SkyQuestChecklist = @(
+                                   @{ Id = 'sky-194'; Acquired = $true }
                                )
                            } }
     # The #243 leftover bands plus the inventory import report (Hateborne, 2026-09-03),

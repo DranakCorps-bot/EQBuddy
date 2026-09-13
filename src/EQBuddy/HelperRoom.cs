@@ -51,12 +51,19 @@ namespace EQBuddy;
 /// words can only be guarded where the words are. This file decides layout and counts
 /// controls, which is the half a launched app can prove and a source scan cannot (trap 29).</para>
 ///
+/// <para><b>THE UNLOCK SUB-PICKER IS THE THIRD FACE, AND ITS STORE IS SHARED</b> (DRA-71 D5).
+/// The Quests window's Unlocks tab reads and writes the same <c>AppSettings.UnlockPicks</c>
+/// through the same <see cref="UnlockPickStore"/> — one producer of the pick, because a
+/// selection made in one room and ignored in the other is the second room reading as broken.
+/// The narrowing itself happens in the ENGINE rather than here, so the phone gets it the day
+/// it calls <c>Recommendations.Rank</c>.</para>
+///
 /// <para><b>Trap 72 is the failure this room is most likely to have shipped.</b> The Quests
 /// tab spent a session drawing the moment before because its repaint signature carried every
-/// store except the two the feature wrote. The Helper reads seven stores and writes two, so
-/// <see cref="Render"/>'s fingerprint folds every one of them — including the goal selection
-/// and the faction picks, which are the two a click changes — and a click repaints
-/// immediately rather than waiting for the next tick.</para>
+/// store except the two the feature wrote. The Helper reads eight stores and writes three, so
+/// <see cref="Render"/>'s fingerprint folds every one of them — including the goal selection,
+/// the faction picks and the unlock picks, which are the three a click changes — and a click
+/// repaints immediately rather than waiting for the next tick.</para>
 /// </summary>
 internal sealed class HelperRoom : Grid, IShellRoom
 {
@@ -106,8 +113,9 @@ internal sealed class HelperRoom : Grid, IShellRoom
     /// <para>A dropdown that is SHUT looks like a button, so a shot of the Helper says nothing
     /// about the nine rows behind the face — which is precisely trap 22: a surface with no
     /// fixture state cannot be reviewed, and a surface nobody can review reads as reviewed
-    /// anyway. <c>EQBUDDY_HELPER_PICKER=goals</c> opens the goals picker; <c>=factions</c> opens
-    /// the sub-picker. Same family as <c>EQBUDDY_SHELL</c> and the sixteen hooks in
+    /// anyway. <c>EQBUDDY_HELPER_PICKER=goals</c> opens the goals picker; <c>=factions</c> and
+    /// <c>=unlocks</c> open the two sub-pickers. Same family as <c>EQBUDDY_SHELL</c> and the
+    /// sixteen hooks in
     /// <see cref="DebugHooks"/>, and like all of them it is unset in every shipping run — see
     /// <see cref="OpenForReview"/> for why it re-arms on each rebuild rather than firing
     /// once.</para>
@@ -123,10 +131,13 @@ internal sealed class HelperRoom : Grid, IShellRoom
     // ---- what the dump reports, all captured during one Build ------------------------
     private EqMultiPicker? _goalPicker;
     private EqMultiPicker? _factionPicker;
+    private EqMultiPicker? _unlockPicker;
     private string _goalFace = "";
     private string _factionFace = "";
+    private string _unlockFace = "";
     private int _goalChips;
     private int _factionChips;
+    private int _unlockChips;
     private int _whyLines;
     private int _personalWhy;
     private int _catalogWhy;
@@ -198,6 +209,9 @@ internal sealed class HelperRoom : Grid, IShellRoom
 
         var goals = HelperGoalStore.Goals(_main.Settings, _main.QuestCharacterKey);
         var factions = HelperGoalStore.Factions(_main.Settings, _main.QuestCharacterKey);
+        // DRA-71 D5: the SAME store the Quests window's Unlocks tab reads. One producer of the
+        // pick; neither room keeps a copy of it.
+        var picks = UnlockPickStore.Picked(_main.Settings, _main.QuestCharacterKey);
         var unlocks = _main.Unlocks;
         // The SAME resolution the Character room draws and the unlock preview keys off
         // (MainWindow.ResolvedLevel), so the number this room ranks with is the number that
@@ -215,6 +229,10 @@ internal sealed class HelperRoom : Grid, IShellRoom
         var key = string.Join('|',
             identity.Character, identity.Server,
             string.Join(',', goals), string.Join(',', factions),
+            // The THIRD store a click in this room changes, folded by CONTENT for the reason
+            // the two above it are: a swap leaves a count unmoved, and the whole of D5's
+            // player-visible change is what this selection does to the answers (trap 72).
+            string.Join(',', picks),
             _poolVersion,
             // The throughput fields are in the fold's own signature for trap 72's reason: a
             // re-fold that gained combat seconds, damage or healing and moved a weight
@@ -239,11 +257,11 @@ internal sealed class HelperRoom : Grid, IShellRoom
 
         _answers = Recommendations.Rank(new HelperInputs(
             _zones, _pool.Mobs, unlocks.Factions, factions,
-            unlocks.Races, unlocks.Classes, unlocks.HasAchievements,
+            unlocks.Races, unlocks.Classes, picks, unlocks.HasAchievements,
             _main.Settings.SkyQuestChecklist, _main.Settings.SkyQuestCompleted,
             _main.QuestCatalog, _level), goals);
 
-        Build(goals, factions, unlocks);
+        Build(goals, factions, picks, unlocks);
     }
 
     /// <summary>The reads that are not free, behind one throttle and one clock so a caller
@@ -273,15 +291,19 @@ internal sealed class HelperRoom : Grid, IShellRoom
     // ---- the body -------------------------------------------------------------------
 
     private void Build(
-        IReadOnlyList<HelperGoal> goals, IReadOnlyList<string> factions, UnlockSource unlocks)
+        IReadOnlyList<HelperGoal> goals, IReadOnlyList<string> factions,
+        IReadOnlyList<string> picks, UnlockSource unlocks)
     {
         _blocks.Children.Clear();
         _goalPicker = null;
         _factionPicker = null;
+        _unlockPicker = null;
         _goalFace = "";
         _factionFace = "";
+        _unlockFace = "";
         _goalChips = 0;
         _factionChips = 0;
+        _unlockChips = 0;
         _whyLines = 0;
         _personalWhy = 0;
         _catalogWhy = 0;
@@ -301,6 +323,9 @@ internal sealed class HelperRoom : Grid, IShellRoom
         BuildGoals(goals);
         if (goals.Count == 0 || goals.Contains(HelperGoal.WorkOnFaction))
             BuildFactionPicker(factions, unlocks);
+        if (goals.Count == 0 || goals.Contains(HelperGoal.UnlockRaces)
+            || goals.Contains(HelperGoal.UnlockClasses))
+            BuildUnlockPicker(goals, picks, unlocks);
         BuildAnswers();
         OpenForReview();
     }
@@ -325,6 +350,7 @@ internal sealed class HelperRoom : Grid, IShellRoom
         {
             "goals" => _goalPicker,
             "factions" => _factionPicker,
+            "unlocks" => _unlockPicker,
             _ => null,
         };
         if (picker is null) return;
@@ -457,6 +483,86 @@ internal sealed class HelperRoom : Grid, IShellRoom
     {
         if (_main.QuestCharacterKey.Length == 0) return;
         HelperGoalStore.ToggleFaction(_main.Settings, _main.QuestCharacterKey, faction);
+        _main.Settings.Save();
+        Repaint();
+    }
+
+    /// <summary>
+    /// **THE UNLOCK SUB-PICKER** (DRA-71 D5, plan P11; Founder smoke item 7).
+    ///
+    /// <para>Same shape as the faction picker above it — a second face that exists only once
+    /// its goal is picked — and the same reason: one face per decision is the answer to
+    /// checkbox soup, and thirty check rows drawn unconditionally would be the wall the goals
+    /// dropdown was built to remove, one block lower.</para>
+    ///
+    /// <para><b>The OFFER follows the goals; the STORE does not.</b> Picking only "Unlock
+    /// Races" offers races, so the popup is about the decision the player just made. What the
+    /// face COUNTS is narrowed to that same offer, because a face that counted a class pick
+    /// while showing only races would be reporting a selection the player cannot see or undo
+    /// — the rule the faction face already follows for its cap.</para>
+    ///
+    /// <para><b>Every subject, complete ones included.</b> The engine skips finished unlocks
+    /// on its own (<c>UnlockProgress.Complete</c>), so leaving them out here would buy nothing
+    /// and would silently drop a row the Quests tab — the OTHER reader of this one store —
+    /// draws and lets you pick. The row says "unlocked" rather than a count.</para>
+    /// </summary>
+    private void BuildUnlockPicker(
+        IReadOnlyList<HelperGoal> goals, IReadOnlyList<string> picks, UnlockSource unlocks)
+    {
+        var block = Block(HelperPresentation.UnlockPickerHeading);
+
+        if (!unlocks.HasAchievements)
+        {
+            block.Children.Add(Line(UnlockPickReadout.NoDump, Role.BodySecondary));
+            block.Children.Add(CopyCommand(GameCommands.OutputfileAchievements,
+                HelperPresentation.DoorTip(new HelperDoor(HelperDoorKind.Unlocks, ""))));
+            return;
+        }
+
+        // Which sections this player's goals put in play. Nothing picked weighs everything, so
+        // it offers both — the same reading the room makes one block up.
+        var wantsRaces = goals.Count == 0 || goals.Contains(HelperGoal.UnlockRaces);
+        var wantsClasses = goals.Count == 0 || goals.Contains(HelperGoal.UnlockClasses);
+        var offered = new List<UnlockProgress>();
+        if (wantsRaces) offered.AddRange(unlocks.Races);
+        if (wantsClasses) offered.AddRange(unlocks.Classes);
+        if (offered.Count == 0)
+        {
+            block.Children.Add(Line(UnlockPickReadout.NoDump, Role.BodySecondary));
+            return;
+        }
+
+        block.Children.Add(Line(UnlockPickReadout.Note, Role.BodySecondary));
+
+        // Closest to done first, then alphabetically — the SAME ordering the engine ranks its
+        // candidates by, so the row a player is most likely to want is the row they see first
+        // and the picker does not disagree with the answers under it. A finished unlock sorts
+        // last because it is a finished job.
+        var rows = offered
+            .OrderBy(u => u.Complete)
+            .ThenByDescending(u => u.Score is { } s && s.Total > 0 ? s.Done / (double)s.Total : -1)
+            .ThenBy(u => u.Subject, StringComparer.OrdinalIgnoreCase)
+            .ToList();
+
+        var picker = new EqMultiPicker(key => ToggleUnlock((string)key),
+            tip: UnlockPickReadout.Tip);
+        picker.SetRows([.. rows.Select(u => new PickerRow(
+            u.Subject, UnlockPickReadout.Row(u), UnlockPickStore.IsPicked(picks, u.Subject)))]);
+        picker.SetFace(UnlockPickReadout.Face(
+            [.. rows.Where(u => UnlockPickStore.IsPicked(picks, u.Subject)).Select(u => u.Subject)],
+            rows.Count, HelperPresentation.FaceChars));
+        picker.Host.Margin = new Thickness(0, Tok.SpaceS, 0, 0);
+        block.Children.Add(picker.Host);
+
+        _unlockChips = picker.RowCount;
+        _unlockFace = (string)picker.Face.Content;
+        _unlockPicker = picker;
+    }
+
+    private void ToggleUnlock(string subject)
+    {
+        if (_main.QuestCharacterKey.Length == 0) return;
+        UnlockPickStore.Toggle(_main.Settings, _main.QuestCharacterKey, subject);
         _main.Settings.Save();
         Repaint();
     }
@@ -698,6 +804,14 @@ internal sealed class HelperRoom : Grid, IShellRoom
         // E2E row that has asserted the Founder's nine since the room landed.
         $"helperChips={_goalChips} " +
         $"helperFactionChips={_factionChips} " +
+        // **DRA-71 D5.** What the SHARED store holds for this character, and what the room
+        // actually OFFERED and DREW from it. Three keys because they are three claims: the
+        // store's, the popup's, and the face's. A pick that reached settings.json and no
+        // control is exactly the state trap 20 is about, and it photographs as an ordinary
+        // room (trap 29).
+        $"helperUnlockPicks={string.Join(',', UnlockPickStore.Picked(_main.Settings, _main.QuestCharacterKey).Select(p => p.Replace(" ", "")))} " +
+        $"helperUnlockChips={_unlockChips} " +
+        $"helperUnlockFace={_unlockFace.Replace(" ", "")} " +
         // What the FACE says — the whole of D2's player-visible change in one string, and the
         // only fact that can tell a capped face from a wrong one. Spaces are dropped because
         // the dump is one flat namespace (trap 58), so "2 goals" reads as "2goals".
@@ -705,7 +819,7 @@ internal sealed class HelperRoom : Grid, IShellRoom
         $"helperFactionFace={_factionFace.Replace(" ", "")} " +
         // Whether a popup is OPEN. The staged state the shot photographs, and the assertion
         // that the review hook armed the control rather than merely being spelled correctly.
-        $"helperPickerOpen={((_goalPicker?.IsOpen ?? false) || (_factionPicker?.IsOpen ?? false) ? 1 : 0)} " +
+        $"helperPickerOpen={((_goalPicker?.IsOpen ?? false) || (_factionPicker?.IsOpen ?? false) || (_unlockPicker?.IsOpen ?? false) ? 1 : 0)} " +
         $"helperPickerHook={(_reviewHookArmed ? 1 : 0)} " +
         // What the ENGINE answered.
         $"helperRecs={_answers.Top.Count} " +
@@ -716,6 +830,11 @@ internal sealed class HelperRoom : Grid, IShellRoom
         // so a zone's internal spaces are dropped — an E2E reads this to know WHICH place is
         // being recommended, not to typeset it.
         $"helperZones={string.Join(',', _answers.Top.Select(r => r.Zone.Replace(" ", "")))} " +
+        // WHAT each answer is ABOUT, in rank order. `helperZones` cannot say: an unlock the
+        // player has never farmed has no place to travel to, so its zone is empty and every
+        // such answer reads as the same blank. This is the only key that can tell "the pick
+        // narrowed the engine" from "the dump was short" (DRA-71 D5).
+        $"helperSubjects={string.Join(',', _answers.Top.Select(r => r.Subject.Replace(" ", "")))} " +
         // How many goals the top answer serves: 2 or more is the cross-domain join actually
         // having fired (HOME-005), which no other key can report.
         $"helperTopGoals={(_answers.Top.Count > 0 ? _answers.Top[0].Goals.Count : 0)} " +

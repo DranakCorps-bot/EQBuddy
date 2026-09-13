@@ -431,4 +431,117 @@ public class UnlockGuidanceTests
 
         Assert.True(g.IsEmpty);
     }
+
+    // ---- P12: the six-question SHAPE (DRA-71 D5) ---------------------------------------
+
+    /// <summary>
+    /// **WHO and WHERE come out as VALUES, and they name the creature the sentences are
+    /// about.**
+    ///
+    /// <para>The row line, the movers and the estimate are all taken from one ordering, so
+    /// all four describe one creature. Re-deriving "which mover is best" at a call site
+    /// would be a second producer of a selection this method has already made — and it would
+    /// disagree with the sentence beside it the first time two raisers tie (trap 4).</para>
+    /// </summary>
+    [Fact]
+    public void TheRowLineIsTheTopRaiserAndItsZone()
+    {
+        var highElf = Race("High Elf");
+        var keepers = Faction(highElf, "Keepers of the Art");
+
+        var g = Resolve(highElf, keepers, factions: Factions(), pool:
+        [
+            Mover("a Felwithe guard", "Northern Felwithe", "Keepers of the Art", 4, 12),
+            Mover("a lesser guard", "Northern Felwithe", "Keepers of the Art", 1, 40),
+        ]);
+
+        Assert.Equal("a Felwithe guard", g.Who);
+        Assert.Equal("Northern Felwithe", g.Zone);
+        Assert.Equal("a Felwithe guard · Northern Felwithe", g.RowDetail);
+        // The same creature the top mover sentence and the estimate are about.
+        Assert.Contains("a Felwithe guard", g.Movers[0]);
+        Assert.Contains("a Felwithe guard", g.Estimate);
+    }
+
+    /// <summary>
+    /// **NOTHING IS LOST BY THE SPLIT.** <c>RowLines</c> and <c>Hover</c> are
+    /// <c>Lines</c> divided in two, and their union is it — asserted rather than assumed,
+    /// because a split that silently dropped a sentence would look exactly like a guidance
+    /// shape that had nothing to say (trap 73's failure mode, running the wrong way).
+    /// </summary>
+    [Fact]
+    public void TheVisibleHalfAndTheHoverHalfAreTheWholeOfTheLines()
+    {
+        var highElf = Race("High Elf");
+        var keepers = Faction(highElf, "Keepers of the Art");
+
+        var g = Resolve(highElf, keepers, factions: Factions(), pool:
+        [
+            Mover("raiser one", "Felwithe", "Keepers of the Art", 9, 4),
+            Mover("raiser two", "Felwithe", "Keepers of the Art", 7, 4),
+            Mover("raiser three", "Felwithe", "Keepers of the Art", 5, 4),
+            Mover("raiser four", "Felwithe", "Keepers of the Art", 1, 40),
+            Mover("cost one", "Felwithe", "Keepers of the Art", -9, 4),
+        ]);
+
+        var split = g.RowLines.Concat(g.Hover.Split('\n')).Where(l => l.Length > 0).ToList();
+
+        Assert.Equal([.. g.Lines.Order(StringComparer.Ordinal)],
+            split.Order(StringComparer.Ordinal));
+        // And the split is the one P12 asked for: the QUANTITY stays on screen, the
+        // per-creature evidence goes to the hover.
+        Assert.Equal([g.Estimate], g.RowLines);
+        Assert.Contains("raiser one", g.Hover);
+        Assert.Contains(g.CapNote, g.Hover);
+    }
+
+    /// <summary>
+    /// **An unanswered question draws NOTHING** (trap 73). The Sky and Task shapes carry no
+    /// creature and no zone, so their row line is empty rather than a dangling separator —
+    /// and their hover is empty rather than a rectangle that appears and says nothing.
+    /// </summary>
+    [Fact]
+    public void TheShapesWithNoCreatureDrawNoRowLineAndNoHover()
+    {
+        var warrior = Classes().First(u => u.Subject == "Warrior");
+        var obtain = warrior.Actionable.First(c => c.Need == UnlockNeed.Obtain);
+
+        var sky = Resolve(warrior, obtain, sky: SkyQuestDefaults.Items, completed: []);
+
+        Assert.Equal("", sky.Who);
+        Assert.Equal("", sky.RowDetail);
+        Assert.Equal("", sky.Hover);
+        // The piece count is a QUANTITY and stays on the row, which is what keeps this tab
+        // reviewable from a screenshot (trap 22).
+        Assert.Equal([sky.Pieces], sky.RowLines);
+    }
+
+    /// <summary>And a faction nobody has farmed has no row line either — the shape is decided
+    /// by the EVIDENCE and not by the criterion's kind, which is the negative the assertion
+    /// above needs to mean anything (trap 39).</summary>
+    [Fact]
+    public void AFactionNobodyHasFarmedHasNoRowLine()
+    {
+        var highElf = Race("High Elf");
+        var g = Resolve(highElf, Faction(highElf, "Keepers of the Art"),
+            pool: [], factions: Factions());
+
+        Assert.Equal("", g.RowDetail);
+        Assert.Equal("", g.Hover);
+        Assert.Empty(g.RowLines);
+    }
+
+    /// <summary>A row whose only mover COSTS faction has nowhere to point: the row line names
+    /// the top RAISER, and there is no raiser. Saying "the creature that costs you 5 a kill ·
+    /// Northern Felwithe" would be a pointer at the one place the player should not go.</summary>
+    [Fact]
+    public void ACostOnlyRowPointsNowhereAndStillSaysWhatItCost()
+    {
+        var highElf = Race("High Elf");
+        var g = Resolve(highElf, Faction(highElf, "Keepers of the Art"), factions: Factions(),
+            pool: [Mover("a High Elf citizen", "Northern Felwithe", "Keepers of the Art", -5, 3)]);
+
+        Assert.Equal("", g.RowDetail);
+        Assert.Contains("cost you 5 each", g.Hover);
+    }
 }

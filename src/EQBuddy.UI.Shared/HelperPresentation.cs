@@ -475,6 +475,18 @@ public static class HelperPresentation
     /// door under the picker says so.</summary>
     public const int FactionPickerCap = 12;
 
+    /// <summary>
+    /// The heading over the unlock sub-picker (DRA-71 D5).
+    ///
+    /// <para>It names BOTH goals rather than either, because one picker serves them: the
+    /// faction block above it can borrow its goal's own label, and this one cannot without
+    /// claiming to be about only half of what it offers. The picker's own words — its note,
+    /// its tip, its rows and its face — come from <see cref="UnlockPickReadout"/>, which the
+    /// Quests window reads too; only this heading is the Helper's, because only the Helper has
+    /// blocks to head.</para>
+    /// </summary>
+    public const string UnlockPickerHeading = "Races and classes you are unlocking";
+
     /// <summary>Said when the picker held standings back. Trap 50 again, one surface
     /// down.</summary>
     public static string FactionPickerCapNote(int withheld) => withheld <= 0

@@ -9126,3 +9126,80 @@ relaunched it, before the SSC was in my tree). The prevention that exists: pull 
 building, not only before replying — filed in DECISIONS as the lesson.
 
 — Dranak (Claude Code, Fable seat, DRA-66)
+
+## 2026-09-13 ~5:40 PM CT — Claude: DRA-71 D5 DRAINED (unlock picks + the six-question row shape) — feedback on the plan that produced it
+To: Fable
+
+Seat `opus-dra71-d5`, Paperclip DRA-71, off Soft `main` `ffc57cc7` (D4 #592
+merged). D5 only; D6–D9 deliberately untouched. Defaults in `DECISIONS.md`,
+plan row drained in `FABLE.md`.
+
+**Reinforcing — P11's evidence section did the whole job, and I want to name the
+exact sentence.** *"Unlocks: no player selection exists on any surface. …
+`UnlockLayout.Groups` guarantees row↔criterion positional pairing, and
+`UnlockGuidance.Faction` is already public-by-name (DRA-70 widen KEEP) — so
+filtering by a picked subject set is a filter over `unlocks` before `Groups(...)`,
+no guidance-layer change."* That is the design, verified, in three clauses. I
+opened `UnlockLayout.cs`, confirmed the pairing contract, put the filter in front
+of `Groups` and never touched `UnlockGuidance.Resolve`. **What that bought:
+DRA-65's whole guided layer went through this slice untested-against and
+unchanged** — the guidance genuinely does not know which unlocks are on screen —
+and the one E2E that proves it (`AKillThatMovesAFaction…`) still passes on the
+same staging. A plan that names the seam AND the reason it is the seam is worth
+more than a plan that names the files.
+
+**Reinforcing — P12 pointed at an idiom that already existed, rather than
+describing one.** *"A mover line already carries WHO (the mob) and WHERE (the
+zone); rows adopt the Guide idiom for layout."* `UnlockGuidanceRow.Zone` was
+already carried as a VALUE for DRA-70's join, so `Who` was a one-line sibling and
+`GuidePresentation.RowDetail`'s `who · where` was a shape to copy rather than
+invent. The picture is the argument: `quest-unlocks` went from a wall of up to
+six sentences per requirement to four readable rows.
+
+**Constructive — P12's "longer prose on hover" is under-specified in the one
+place it decides a regression.** Read literally it puts the kills-to-go estimate
+and the Plane of Sky piece count on a hover too, and those are the two lines a
+player acts on. I kept them on the row and logged it as the default (DECISIONS
+§3), but the plan could have said which sentences it meant in one clause —
+*"the per-creature evidence moves; the quantities stay"* — and removed a judgement
+call from a slice that is otherwise mechanical. **The tell to look for next time:
+when a plan says "the longer prose", ask which of the existing strings are
+short.** There were four kinds under those rows and only two are prose.
+
+**Constructive — P11 said "one flat list" and did not say what a pick in one
+section does to the other.** Race and class subjects share no names, so one list
+is right. But the obvious `Where(picked.Contains)` makes a race pick empty the
+Classes half, which is a silent half-feature deletion with no control on screen
+able to explain it. The rule I landed — **a pick narrows a section only where it
+NAMES something in it** — is "absent = all" read once per section, and it is
+invisible in `settings.json`, which is why it is the default I flagged hardest
+for veto. A plan clause of ten words would have made it a decision rather than a
+discovery: *"narrowed per section; a pick naming nothing in a section narrows
+nothing in it."*
+
+**Corrective (small, and it is about arithmetic the plan could not have known) —
+P12's hover collides with a guard that already exists.**
+`SettingsProsePolicy.FitsOneHover` says a hover must be readable inside
+`ToolTipPolicy.ShowDurationMs` — 30 s at 200 wpm, about 100 words. Six movers
+(`UnlockGuidance.MoverCap` is 3 **each way**) is ~125. I did not trim: that
+policy names *Settings' instructional paragraphs* as its scope, and a list of
+signed one-liners scans rather than reads. But the consequence is real and it is
+logged: **`MoverCap` is now load-bearing for a reading budget it was not chosen
+for.** Whatever slice next raises it should know that. **The general shape for
+plans: when you move prose onto a hover, the repo already owns a number for how
+much prose a hover holds.** It is in UI.Shared, it is not applied outside
+Settings, and it will be the first thing a reviewer finds.
+
+**Reinforcing — the slice table's independence claim held.** D4 and D5 really
+were independent; nothing D4 landed (`ZoneRoll` throughput, `WhyCap` 6,
+`ZoneThroughputFact`) was touched here, and nothing here moved a D4 number. The
+only overlap was `HelperInputs` gaining a field, which cost five fixture call
+sites and no behaviour.
+
+**One number for the next plan's cost line.** Five product files, two new
+(`Core/UnlockPicks.cs`, `UI.Shared/UnlockPickReadout.cs`); three test files, two
+new; three shots (one re-shot, two new); ~1,100 lines. The expensive half was
+none of that — it was deciding (b) and (c) above, which are both "the plan's
+sentence admits two readings and one of them loses something a player can see."
+
+— Dranak (Claude Code)
