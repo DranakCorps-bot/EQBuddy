@@ -16,6 +16,20 @@ After you take items, write a short note in `SCRIBE-FEEDBACK.md` so Scribe can l
 
 ---
 
+### EQL Companion on Linux — Proton freeze as soon as the game starts
+- **Priority:** waiting (reporter is mid-freeze; needs one fact before anything else). Not authorized. Soft leave.
+- **Place (hypothesis):** Linux/Proton file-follow path — the log-file watch/parse loop when running under Proton's Windows file layer. #208 already covers native Linux (Wayland) placement but the reporter is explicitly Proton/KDE, a different runtime.
+- **Source (harvest-only):** Reddit r/EQLegends u/Emberstone73, 2026-09-13 (created_utc 1789321937 ≈ 7:52 PM CDT). https://www.reddit.com/r/EQLegends/comments/1wfejth/eql_companion_on_linux/ — 0 comments, no in-thread help yet.
+- **Ask (verbatim, reporter's own words):** "Has anyone had any luck getting it to work on Linux? I'm using Kubuntu 26.04 and running it through Proton, and simply pointed it to my EQ logs via the file explorer window. But as soon as I start the game itself, EQL Companion freezes and is unresponsive. On next boot, it'll display some info that was contained in the logs so I know it can read it, but just not sure why it's freezing. Thanks."
+- **Ask (scoped):** EQBuddy under Proton (Kubuntu 26.04) locks up the moment game play starts; on restart it has caught up on whatever was logged before the freeze — so opening/reading works, live tailing while the game writes is the freeze point. Reporter never says "eq buddy" but the behavior (point it at EQ logs via a file picker, companion app) matches EQBuddy; the product name used is the generic "EQL Companion."
+- **Already shipped / checked:** #208 shipped mobile-sounds + Wayland chip-placed (Aug 04 ~2:23 PM CT helm-signature reply on `v1.99.18`); that thread is native-Linux/Wayland, different from Proton. No native-Linux or Proton item in #261/#262/#264/#273/#394/#435 batch. No discussion thread with matching "freezes on Proton / start game" symptoms found this pass.
+- **Hypothesis (label as such):** Proton runtime file notification quirks (inotify through the Windows file layer) or a log write burst from the game saturating a single-threaded tailer. Don't assert until a Proton-specific log/behavior quote lands. Kubuntu's actual point release is 26.04 as of 2026 — plausible.
+- **Class:** V0–V1 if Proton (Linux runtime compat); V1 if it's actually a log-tail throughput issue that also hits Windows. Do not write FABLE.md.
+- **Holds re-read (HELM.md this run):** Live Holds empty. Play Console OFF. Soft LEAVE list unchanged — nothing here touched. Reddit replies remain harvest-only unless Helm/David authorize.
+- **Scribe 2026-09-13 ~8:15 PM CDT (cron intake):** New Reddit intake. Do not implement. Do not open the work. Do not reply on Reddit without Helm sign-off. Thank-you + fact-ask draft below for Helm — NOT posted.
+- **Draft for Helm (DranakCorps-bot, one reply, thanks + one fact; no promises/dates/pricing/ToS):**
+  > Thanks for the report — that "it catches up on boot but freezes while the game is running" detail is the useful one, it points at the live-tail path under Proton rather than the file reading itself. Two quick facts would help us narrow this down: what EQBuddy version are you running (the one in `About` in the app), and are you on KDE's default Wayland session or an X session? (There is a known difference in how Proton's file notifications behave between the two.) We have noted the freeze as you described it.
+
 ### EQ Companion App flicker / screen tearing on ultrawide G-SYNC (disambiguation: EQBuddy or SE official Companion?)
 - **Priority:** waiting (needs disambiguation — is this EQBuddy at all? if yes, player-facing break on one rig; if no, wrong product). Not authorized. Soft leave.
 - **Place (pending disambiguation):** If EQBuddy: overlay window rendering (G-SYNC / NVIDIA multi-monitor flicker). If official "EQ Companion App": not our product — close as non-ours.
