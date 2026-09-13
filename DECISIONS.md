@@ -1,3 +1,119 @@
+## 2026-09-13 — DRA-71 delivery 4: throughput as outcome evidence — and the nine defaults taken to build it
+
+Pre-authorized: Helm SIGNED the plan (PR #586, merged `a28c5d89`), SIGNED D2
+(PR #588) and SIGNED D3 (PR #590, merged `36c9d9d1`) authorizing `dra71-d4`.
+Nothing below is on the consequence list: no release, no new surface, no
+eqlwiki request, nothing new leaving the machine. **And nothing here goes near
+the values line** — damage and healing are the self-measured numbers the log has
+always carried about this character; `DamageByAttacker` and `HealsByHealer` are
+still who hit or healed YOU, no comparison with another player exists anywhere in
+this slice, and no cohort was introduced to compare against. David vetoes from
+here.
+
+**1. "Versus difficulty" is answered against the PLAYER, because there is no
+difficulty model to answer it against.** The Founder's smoke item is "DPS/Healing
+vs mob difficulty", and the honest reading is the one the plan's own evidence
+section forced: this repo has no mob-HP model and no con-colour scale, and the
+only difficulty the game's data states is the instance tier. So "was my output
+good here" is answered as "was my output here what my output usually is" — a
+pooled figure over every zone EQBuddy has measured for this character. The
+alternative default, named so it can be chosen instead, was to derive a
+difficulty score from con levels and mob counts; that would be trap 73's shape
+with arithmetic instead of prose, asserting a game rule nobody here can verify.
+
+**2. The weight reads damage AND healing together, not damage alone.** A cleric's
+contribution to a camp is healing, and a damage-only measure marks down every
+zone a healer did their job in — a recommender telling a player their class is
+wrong. Adding the two is **not** a claim that a point healed is worth a point
+dealt; nothing here knows that. It is the only measure available that answers
+"how much was this character doing per second of combat" for every class. The
+SENTENCE still reports the two separately, so a player can see which half is
+theirs. This is the default most likely to be argued with and the one I would
+keep.
+
+**3. Four discounts, each a named threshold and a named multiplier, and none of
+them can promote anything.** Deaths at or above one an hour, downtime at or above
+half the elapsed time, fights at or above 1.5× this character's own average, and
+output under three fifths of their own baseline; each multiplies by 0.8. There is
+no bonus arm anywhere, so the experience rate stays the primary term and these
+only ever re-order inside it. They compound (0.8⁴ ≈ 0.41 at worst) because three
+separate measurements about one zone are three facts, and collapsing them into
+the worst single one throws two away. **The objection worth recording: the
+experience rate already prices cadence, deaths and downtime in, in aggregate.**
+The reading these rest on is that they say whether the rate is one this character
+can REPEAT — a camp that paid well while you spent half the sitting recovering
+rests on an evening that went a particular way. That reading is the veto target.
+
+**4. The comparison is against this character and never against a number of
+seconds.** "Is 95 seconds a long fight" has no answer here. "Is 95 seconds long
+for the character who averages 41" does, and it needs nothing but measurements
+already on disk. Same shape for the output baseline. The cost of this default is
+that a player with one measured zone gets no comparison at all — which is correct
+(see 5) and does mean the feature arrives gradually.
+
+**5. A baseline needs TWO zones, and a one-zone profile is told nothing.** A
+baseline folded from one zone IS that zone, so "your output here is exactly your
+average" would be true of every single-zone profile by construction — a tautology
+printed as a finding, and a discount that could never fire dressed as one that
+had been checked. So `ThroughputBaseline.Known` requires two, and the sentence
+draws no comparison clause without it.
+
+**6. The instance tier is reported and weighs NOTHING in this slice.** It needed
+no plumbing at all: a session already stores the zone name the game printed,
+verbatim, and `InstanceTier` already decodes that string for the Raids card — so
+the tier is the observation the player's own log made, read where it already sits.
+No schema change, no new column. The plan's tier PREFERENCE belongs to the mote
+engine in its own slice (P10); ranking on it here would be this slice deciding
+something nobody has signed. A zone whose adjective this build does not recognise
+gets no tier rather than a guessed D0.
+
+**7. `WhyCap` is raised from four to six, and this one was FORCED.** At four, a
+fully loaded zone row — rate, throughput, cadence, deaths, downtime, outgrown
+band, tier — kept the first four and silently dropped the P6 outgrown sentence D3
+shipped last night. A zone marked down twice, drawing the explanation for one of
+them, with every store-side assertion in the repo passing. Six is what keeps every
+discount that FIRED beside its own evidence; the tier is emitted LAST precisely so
+it is the line the cap takes, and the row says how many it held back. **Six short
+personal sentences under one headline is a density question I am not the right
+judge of** — a `BEVEL.md` stub asks it against this slice's two shots, and the
+number is the thing to veto if the answer is "that is a report, not a
+recommendation".
+
+**8. No schema migration, and the throughput comes out of the stored snapshots.**
+`history.db` has a `Dps` column and no `Hps` and no `CombatSeconds`, and a rate
+without its denominator cannot be pooled — averaging per-session averages lets a
+three-minute sitting weigh as much as a four-hour one. D3 filed a `history.db`
+migration as its own slice rather than doing one quietly, and that stands: this
+probes the snapshot JSON, which is exactly what `ProgressSeries` and `MobRows`
+already do for the same reason. All three numbers come from ONE parse of ONE row,
+so the rate and its denominator describe one moment.
+
+**9. An ABSENT measurement is never scored as a poor one.** A profile whose
+snapshots predate the probe, a zone whose pool never recorded a fight length, a
+sitting with no combat seconds — each is skipped rather than folded in as a zero,
+and ranks exactly as it did before this slice. A player upgrading into this build
+must not watch their best camp drop for a gap in EQBuddy's own reading. It is the
+same rule the conned band already keeps, and it has its own E2E row.
+
+**And two defects the STAGED SHOT caught that no assertion could have** (both
+fixed; both recorded in `scripts/shoot.ps1`'s own prediction block). The healing
+clause was gated on `Hps > 0` and the fixture's WARRIOR came back saying "You
+healed 0.1 a second", because a log with regen ticks in it is not a log with zero
+healing — a trace is not a contribution. And the comparison clause read "…run
+13.2 a second; here, 13.4", spending a whole line to say a zone is average. Both
+now sit behind named thresholds, and the relationship between the silence band and
+the discount threshold is asserted rather than left to two numbers staying apart:
+a zone ranked down with its explanation suppressed is the one failure this slice
+had to refuse.
+
+**Held: the baseline comparison cannot be photographed from the shared fixture.**
+A session's dps is a SESSION figure attributed whole to its primary zone, so two
+slices of one log always carry nearly the same output however different their
+appended kills are. Both shots therefore show the single-zone and the
+average-zone arms and not the comparison; it is unit-tested at both ends and
+prove-failed. Staging a fixture whose damage was chosen to make a sentence appear
+would be photographing a string rather than a state.
+
 ## 2026-09-13 — DRA-71 delivery 3: one level, two writers, ordered by time — and the ten defaults taken to build it
 
 Pre-authorized: Helm SIGNED the plan (PR #586, merged `a28c5d89`; SSC #587 merged

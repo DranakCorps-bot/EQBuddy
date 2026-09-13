@@ -309,6 +309,75 @@ public sealed class SessionRepository : IDisposable
         }
     }
 
+    /// <summary>
+    /// **Per-session dps, hps and the combat seconds they were quoted against** — the third
+    /// input to <see cref="ZoneHistory.Fold"/> (DRA-71 D4, plan P7).
+    ///
+    /// <para><b>A probe of the stored snapshot, not a new column.</b> The <c>Dps</c> COLUMN
+    /// is here, but <c>Hps</c> and <c>CombatSeconds</c> are not, and a rate without its
+    /// denominator cannot be pooled: averaging per-session averages lets a three-minute
+    /// sitting weigh as much as a four-hour one. Adding columns is a schema migration, which
+    /// the DRA-71 D3 slice filed as its own work rather than doing quietly — so this joins
+    /// <see cref="ProgressSeries"/> and <see cref="MobRows"/>, which mine the same JSON for
+    /// the same reason (the full snapshot is big and each of them needs three fields of it).
+    /// </para>
+    ///
+    /// <para><b>All three from ONE parse of ONE row</b> (trap 56). Reading the rate off the
+    /// column and its denominator out of the JSON would be two readings of one moment, and
+    /// they would disagree the day anything writes one without the other.</para>
+    ///
+    /// <para>A session with no combat seconds is SKIPPED rather than returned as zero.
+    /// Unknown is not zero — the fold's own rule — and a row of zeroes would drag every
+    /// pooled rate toward the floor.</para>
+    /// </summary>
+    public List<SessionThroughput> ThroughputRows(string? server = null, string? character = null)
+    {
+        lock (_lock)
+        {
+            using var cmd = _db.CreateCommand();
+            cmd.CommandText = """
+                SELECT Id, SnapshotJson FROM Sessions
+                WHERE ($server IS NULL OR Server = $server)
+                  AND ($char IS NULL OR Character = $char)
+                ORDER BY StartUtc ASC LIMIT 1000
+                """;
+            cmd.Parameters.AddWithValue("$server", (object?)server ?? DBNull.Value);
+            cmd.Parameters.AddWithValue("$char", (object?)character ?? DBNull.Value);
+            using var r = cmd.ExecuteReader();
+            var rows = new List<SessionThroughput>();
+            while (r.Read())
+            {
+                try
+                {
+                    using var doc = JsonDocument.Parse(r.GetString(1));
+                    var combat = Number(doc.RootElement, "CombatSeconds");
+                    if (combat <= 0) continue;
+                    rows.Add(new SessionThroughput(
+                        r.GetInt64(0),
+                        Number(doc.RootElement, "SessionDps"),
+                        Number(doc.RootElement, "Hps"),
+                        combat));
+                }
+                catch { /* one unreadable snapshot must not empty the fold */ }
+            }
+            return rows;
+        }
+    }
+
+    /// <summary>One numeric field of a stored snapshot, or 0 when it is absent or is one of
+    /// the named floating-point literals the writer is allowed to emit (<c>JsonOpts</c> lets
+    /// a degenerate session serialise Infinity rather than killing its checkpoint — so a
+    /// reader that assumed a finite number would throw away the whole row over one field).
+    /// A snapshot archived before the field existed reads as 0, which is the "not measured"
+    /// the fold already knows how to be silent about.</summary>
+    private static double Number(JsonElement root, string name) =>
+        root.TryGetProperty(name, out var el)
+        && el.ValueKind == JsonValueKind.Number
+        && el.TryGetDouble(out var value)
+        && double.IsFinite(value)
+            ? value
+            : 0;
+
     public StatsSnapshot? LoadSnapshot(long id)
     {
         lock (_lock)

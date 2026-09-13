@@ -208,9 +208,49 @@ public static class HelperPresentation
                 : $"{f.XpPerHour:0.0}%/hr here, across {f.Sessions:N0} of your sessions "
                   + $"({Hours(f.Hours)}).",
 
+        // The cadence, and — since DRA-71 D4 — what it is against YOUR OWN average when
+        // there is more than one zone to have averaged. The comparison clause is silent at a
+        // baseline of 0 (one measured zone, so the comparison would be a zone against
+        // itself) and silent when the two round to the same number, because "they run 41 sec;
+        // you average 41 sec" is a sentence that spends a line to say nothing.
         ZoneCadenceFact f =>
             $"Your fights here run {Seconds(f.AvgFightSeconds)} on average, over "
-            + $"{f.Kills:N0} {(f.Kills == 1 ? "kill" : "kills")} you have recorded.",
+            + $"{f.Kills:N0} {(f.Kills == 1 ? "kill" : "kills")} you have recorded."
+            + (f.BaselineSeconds > 0 && Seconds(f.BaselineSeconds) != Seconds(f.AvgFightSeconds)
+                ? $" Everywhere EQBuddy has measured you, they run {Seconds(f.BaselineSeconds)}."
+                : ""),
+
+        // **The throughput line** (DRA-71 D4, plan P7; Founder smoke item 3). Three
+        // measurements and no verdict: what you put out, how long you were fighting, and what
+        // you put out everywhere else. No sentence here says the zone is a good or a bad match
+        // — a player reading "22.4 here against your usual 61.8" has the whole finding, and
+        // EQBuddy has no mob-HP model with which to draw a conclusion from it.
+        ZoneThroughputFact f =>
+            $"You put out {f.Dps:0.0} damage a second here, over "
+            // HOURS and not the fight-length shape. This is a pooled all-time figure — every
+            // session in the zone added together — so it is the same kind of number the
+            // experience rate's scope is, and "70.0 min of fighting" is a way of saying 1.2
+            // hours that nobody has ever said out loud.
+            + $"{Hours(f.CombatSeconds / 3600)} of fighting."
+            + (HealingWorthSaying(f) ? $" You healed {f.Hps:0.0} a second." : "")
+            + (BaselineWorthSaying(f)
+                ? $" Across the {f.Zones:N0} zones EQBuddy has measured, your damage and "
+                  + $"healing together run {f.BaselineOutput:0.0} a second; here, {f.Output:0.0}."
+                : ""),
+
+        // **The downtime line.** It says WHAT was measured and never why: the active figure
+        // counts two-minute stretches that contained an event, so medding, travelling, a bank
+        // trip and a corpse run are one thing to it. Naming a cause would be inventing the
+        // half the log did not record (trap 73).
+        ZoneDowntimeFact f =>
+            $"Across {Count(f.Sessions, "session", "sessions")} here ({Hours(f.Hours)}), "
+            + $"{f.Share * 100:0}% of the time had nothing happening in it.",
+
+        // **The tier line.** The game's own difficulty word, from the player's own zone
+        // line — which is why it reads "your own zone line recorded" and not "this zone is".
+        // EQBuddy did not look it up and does not rank on it.
+        ZoneTierFact f =>
+            $"Your own zone line recorded this as a {InstanceTier.Badge(f.Tier)} instance.",
 
         // HOME-006's ONLY survival-adjacent sentence, and it reports rather than advises.
         // There is no arm for zero deaths — see this class's summary.
@@ -245,6 +285,54 @@ public static class HelperPresentation
 
         _ => "",
     };
+
+    // ---- the two clauses the STAGED SHOT caught (DRA-71 D4) --------------------------------
+
+    /// <summary>
+    /// How much of a character's output has to be healing before the sentence mentions it.
+    ///
+    /// <para><b>The first staged shot of this slice is why this constant exists</b>, and it is
+    /// trap 23 doing its job. The arm was <c>Hps &gt; 0</c>, which is the obvious reading of
+    /// "only when there was some" — and the fixture's warrior came back saying *"You healed 0.1
+    /// a second"*, because a log with regen ticks and a bandage in it is not a log with zero
+    /// healing. A trace is not a contribution, and a clause reporting one reads as a defect on
+    /// a character who does not heal: exactly the furniture the <c>0.0</c> guard was written to
+    /// avoid, arriving one decimal place up. No assertion in the repo could have seen it — the
+    /// sentence was correct, the number was real, and the shape was right.</para>
+    ///
+    /// <para>A twentieth of the output. <b>The WEIGHT is untouched by this</b>: every point
+    /// healed still counts toward <see cref="ZoneRoll.OutputPerSecond"/>, because it was
+    /// measured and it is the player's own contribution. This decides only whether a clause is
+    /// worth a line, which is a question about language and therefore this file's.</para>
+    /// </summary>
+    public const double HealingClauseShare = 0.05;
+
+    /// <summary>
+    /// How far a zone's output has to sit from the player's own pooled figure before the
+    /// sentence draws the comparison.
+    ///
+    /// <para><b>Also found by the staged shot.</b> The first take read *"your damage and
+    /// healing together run 13.2 a second; here, 13.4"* — a clause spending a whole line to
+    /// say a zone is exactly average, on the row where it is least interesting. It is the
+    /// same lesson the cadence clause already carried (it goes silent when the two round to
+    /// the same words) and the same one the downtime line is built on: a line that never
+    /// varies tells a player nothing, and the primary figure is on screen either way.</para>
+    ///
+    /// <para>A tenth, either side. <b>It is deliberately far tighter than
+    /// <see cref="Recommendations.ThroughputShortfall"/></b> (three fifths), so a zone that
+    /// takes the discount is always well outside this band and its explanation can never be
+    /// the clause that got suppressed — a zone marked down in silence is the one failure this
+    /// slice had to refuse, and <c>HelperPresentationTests</c> asserts the two thresholds in
+    /// that relationship rather than trusting the two numbers to stay apart.</para>
+    /// </summary>
+    public const double BaselineClauseGap = 0.10;
+
+    private static bool HealingWorthSaying(ZoneThroughputFact f) =>
+        f.Hps > 0 && f.Output > 0 && f.Hps >= f.Output * HealingClauseShare;
+
+    private static bool BaselineWorthSaying(ZoneThroughputFact f) =>
+        f.BaselineOutput > 0
+        && Math.Abs(f.Output - f.BaselineOutput) >= f.BaselineOutput * BaselineClauseGap;
 
     /// <summary>Said only when the per-row cap actually held something back — a surviving
     /// cap says so out loud (trap 50).</summary>

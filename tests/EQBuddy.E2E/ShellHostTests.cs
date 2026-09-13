@@ -2118,6 +2118,99 @@ public class ShellHostTests
     }
 
     /// <summary>
+    /// **THE THROUGHPUT PROBE REACHES THE SCREEN** (DRA-71 D4, plan P7; Founder smoke item 3).
+    ///
+    /// <para><b>This is the row the slice most needed.</b> D4's numbers come from a SECOND
+    /// query over <c>history.db</c> — a <c>JsonDocument</c> probe of each stored snapshot for
+    /// dps, hps and the combat seconds they were quoted against — and every unit test in the
+    /// repo could pass with that query never running, its result never joined, or its facts
+    /// folded and never drawn. Trap 72 is exactly that shape on the Quests tab: a store
+    /// written, and a surface whose repaint gate never heard about it.</para>
+    ///
+    /// <para>So the session is archived through the REAL repository and the REAL snapshot
+    /// type before launch, and the assertions are the ENGINE's claim and the SCREEN's claim
+    /// from the same dump (trap 56): <c>helperThroughput</c> counts the drawn answers carrying
+    /// the fact, <c>helperTopDps10</c> carries the measured number itself — 42.0 damage a
+    /// second, seeded, so a zero or a rounding would both be visible — and
+    /// <c>helperWhy</c>/<c>helperPersonalWhy</c> count what was BUILT into the tree.</para>
+    ///
+    /// <para>The zone is an instance, so the tier fact rides along too: its name is what a
+    /// zone line prints, which is the whole of how the tier is known
+    /// (<c>ZoneRoll.ObservedTier</c>) — nothing was looked up and no column was added.</para>
+    /// </summary>
+    [Fact]
+    public void ArchivedThroughputReachesTheHelpersDrawnAnswers()
+    {
+        using var app = new AppHarness(environment: OpenOn("helper"));
+        app.SeedStoredSession(
+            "Najena 4 (Refined)", TimeSpan.FromHours(4), xpPercent: 32,
+            dps: 42.0, hps: 0, combatSeconds: 3600, deaths: 0, activeFraction: 1.0,
+            mobs: ("a bloodthirsty gnoll", 180, 28, 30, 34));
+        app.Launch();
+
+        app.WaitForDump("shellPage", "helper", "the shell to land on the Helper room");
+        // The seeded session is the only one, so it is the only answer — and the ENGINE saw it.
+        app.WaitForDump("helperRecs", "1", "the archived session to become one recommendation");
+        Assert.Equal("Najena4(Refined)", app.DumpText("helperZones"));
+
+        // The SCREEN's claim about the throughput line, and the number in it.
+        app.WaitForDump("helperThroughput", "1",
+            "the throughput sentence to be drawn on the answer");
+        Assert.Equal(420, app.DumpValue("helperTopDps10"));
+        // One measured zone, so there is nothing to compare against and the tier rides along.
+        Assert.Equal(1, app.DumpValue("helperTier"));
+        // A sitting that was active throughout says nothing about downtime — the silence is
+        // asserted, because a line that appeared on every camp would be furniture.
+        Assert.Equal(0, app.DumpValue("helperDowntime"));
+
+        // And the sentences were BUILT, not merely returned. Every one is the player's own
+        // evidence: nothing here came from a catalog, and nothing came off anyone else's screen.
+        Assert.True(app.DumpValue("helperWhy") >= 3,
+            $"the room drew fewer sentences than the engine produced; dump was: {app.Artifacts()}");
+        Assert.Equal(app.DumpValue("helperWhy"), app.DumpValue("helperPersonalWhy"));
+        Assert.Equal(0, app.DumpValue("helperCatalogWhy"));
+        Assert.Equal(0, app.DumpValue("helperDeadDoors"));
+    }
+
+    /// <summary>
+    /// **THE PROVE-FAIL FOR THE ROW ABOVE, and the honesty rule underneath it** (trap 34:
+    /// green-only is vacuous coverage).
+    ///
+    /// <para>The same archived session with NO combat seconds. The probe reads the snapshot,
+    /// finds nothing to divide, and skips the row — so the recommendation is still there,
+    /// still ranked on the experience rate the player really earned, and draws none of D4's
+    /// sentences. <b>An absent measurement is not a poor one:</b> a player upgrading into this
+    /// build must not watch their best camp drop for a gap in EQBuddy's own reading, and the
+    /// number the dump reports is 0 meaning "not measured" rather than 0 meaning "you did
+    /// nothing".</para>
+    ///
+    /// <para>Without this row, the one above passes on a build where the probe returns
+    /// everything unconditionally and the fold treats a missing denominator as a zero.</para>
+    /// </summary>
+    [Fact]
+    public void ASessionWithNothingToDivideDrawsNoThroughputAndStillRanks()
+    {
+        using var app = new AppHarness(environment: OpenOn("helper"));
+        app.SeedStoredSession(
+            "Lower Guk", TimeSpan.FromHours(4), xpPercent: 32,
+            dps: 0, hps: 0, combatSeconds: 0,
+            mobs: ("a froglok tad", 180, 28, 30, 34));
+        app.Launch();
+
+        app.WaitForDump("shellPage", "helper", "the shell to land on the Helper room");
+        app.WaitForDump("helperRecs", "1", "the archived session to become one recommendation");
+        Assert.Equal("LowerGuk", app.DumpText("helperZones"));
+
+        Assert.Equal(0, app.DumpValue("helperThroughput"));
+        Assert.Equal(0, app.DumpValue("helperTopDps10"));
+        // Open world, so no tier either — and the rate that ranked it is still on screen.
+        Assert.Equal(0, app.DumpValue("helperTier"));
+        Assert.True(app.DumpValue("helperWhy") >= 2,
+            $"the rate and cadence lines did not reach the screen; dump was: {app.Artifacts()}");
+        Assert.Equal(0, app.DumpValue("helperDeadDoors"));
+    }
+
+    /// <summary>
     /// **THE EDITOR BOX EXISTS, AND THE DUMP SAYS SO** — the runtime half of the screenshot
     /// hook (<c>EQBUDDY_HOME_EDITOR</c>) that stages the one state a shot of this room cannot
     /// otherwise reach.
