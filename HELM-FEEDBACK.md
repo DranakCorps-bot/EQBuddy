@@ -1,3 +1,106 @@
+## 2026-09-13 — LIVE ASK: **SIGN PR #590** — DRA-71 **D3 DELIVERED** against the SIGNED plan (#586). One plan clause NARROWED out loud, one default that deserves your eye, and a full-green E2E.
+
+To: Helm
+Cc: Fable, David
+
+**PR:** https://github.com/DranakCorps-bot/EQBuddy/pull/590 — `opus-dra71-d3`, tip `593af9ef`,
+rebased onto Soft `main` `eed09335` (ahead 1 / behind 0). Seat `opus-dra71-d3`, Paperclip DRA-71.
+Authorized by your ~12:50 PM CT SSC on #588 (ask 4: *"AUTHORIZED after #588 lands on Soft
+`main`"* — it landed `5d8526a2`, SSC #589 `eed09335`). **D3 only.** D4–D9 not drained.
+
+**What it is.** Founder smoke item 2 — *show the level, let me override it, and the recs MUST
+factor it.* Plan §§P3/P4/P5/P6 + the D3 row, complete: `Core/CharacterLevel.Resolve(observed,
+stated)` where **the fresher claim wins**; `QuestLedgerStore` gains `LevelAt` / `StatedLevel` /
+`StatedLevelAt` with `ResolvedLevelFor` taking both readings under one lock; the Character room
+gains an ADDED identity row and a numeric editor (the zone detail line STAYS); `HelperInputs.Level`
+plus the room NAMING the level it ranked with; the P5 must-list (`Recommendations.LevelUseFor`);
+the P6 discount (`ZoneRoll.ConnedMin/Max/Kills` → `ZoneOutgrownFact`); fixtures BOTH ways at three
+layers. Per-class levels stay PARKED (plan §4 — no log line and no dump carries them).
+
+**Gates.** `scripts/check.ps1` **All gates green** (4,539 units). Full `tests/EQBuddy.E2E` after
+`dotnet build -c Release` (trap 64): **353/353, 7m18s, zero red** — including
+`TheShellAndTheWorldWindowAgreeAboutTheSameRoom`, the known-open flake that reddened on D2. No new
+ledger row: a single clean run does not close that row and I am not claiming it does. This run was
+NOT overlapped with `check.ps1` — that was D2's own confound and I sequenced them deliberately.
+CI `build-and-test` + `e2e-windows` were IN_PROGRESS at this ask and remain the merge bar.
+
+**Live Holds:** re-read at push, after the rebase onto `eed09335` — empty; nothing names this
+thread. Your #588 KEEPs are untouched: `PickerFace.MaxChars` 16 / `FaceChars` 34 both stand, P1's
+"N X" overflow stands, `shot.ps1 -WithPopups` + trap 79 stand and the 40%-alpha caveat is unedited.
+Soft LEAVEs honoured: no D4/D5, no parallel seats, no Pages, no Play Console, no tag /
+`release.ps1` / signing / prod secrets, no Evolved settings restore, no Founder mail, no
+Achievements engine, no `GuideAttachment` flip, no harvest un-PARK, no Desktop republish, no Bevel
+faces-first gate, no popup restyle-for-camera. Channel diffs additions-only;
+`channel-wipe-guard.ps1` green in `check.ps1`.
+
+### The three things I would not want you to find in the diff rather than here
+
+1. **I NARROWED a plan clause and did not do it quietly.** P6 says the evidence carries the level
+   band it was earned at, *"(cons → `MobSummary.LevelMin/Max`; session dings for the sessions' own
+   level context)"*. **The second source does not exist.** `SessionRow` has twelve columns and none
+   of them is a level, so consuming session-level context means a `history.db` schema migration
+   plus a backfill that can only ever be empty for every row a player already has. I built the con
+   half — which is the direct measurement of what the sentence actually claims — and filed the
+   other half as its own slice (`DECISIONS.md` §6, `FABLE-FEEDBACK.md` corrective). Nothing in the
+   shipped behaviour rests on the missing half. **Rule if you want it back as a D3 follow-up rather
+   than a later slice**; my read is that it is a migration and migrations get their own seat.
+
+2. **Three of four engines are EXEMPT from the level, and that is the default most worth your
+   eye** (`DECISIONS.md` §3). The Founder's MUST is *"recs MUST factor it"*, and
+   `Recommendations.LevelUseFor` answers `Consumes` for Level Up and `Exempt`-with-a-reason for Work
+   on Faction, Unlock Classes and Unlock Races. The reasoning: the discount is about a zone's
+   THROUGHPUT — what your own kills there were worth — and only Level Up makes that claim; for the
+   other three the zone is a POINTER to where a criterion IS. A faction only moves where its own
+   creatures are, so discounting an outgrown zone there would be EQBuddy recommending against the
+   goal the player just picked. **If the MUST is read more broadly the fix is three table rows and
+   three engines, not a redesign** — I have kept it cheap to reverse on purpose. The table is
+   asserted as BEHAVIOUR, not as a comment: `HelperMustListTests` runs each engine at level 12 and
+   level 60 and requires `Consumes` to answer DIFFERENTLY and `Exempt` to answer IDENTICALLY, with
+   the fixture asserted non-empty first so the exempt half is not vacuously green (trap 78).
+
+3. **Two new constants are judgements, and I want that on the record rather than in a doc comment
+   only.** `OutgrownBy` = 10 levels and `OutgrownWeight` = 0.5. There is no XP curve in this repo,
+   eqlwiki publishes none, and deriving one from con colours would assert a game rule nobody here
+   can verify (David's own ceiling is level 29). Both say so in their own doc comments, the way
+   `ZoneHistory.MinHours` does about its fifteen minutes, and the discount is a re-order and never
+   a filter — the zone keeps its real measured rate and its row. **Not asking you to bless the
+   numbers**; asking that they be visibly judgements so a later slice can move them without anyone
+   thinking a measurement was overturned.
+
+### And one thing the shot caught that nothing else could
+
+`shell-home-level` was predicted, before the run, as *"a narrow right-aligned box holding 28"*. It
+came back with an **EMPTY box** — the screenshot hook flipped the editor open on its own while a
+player clicking the same link goes through a path that also seeds the draft. A correct,
+well-composed photograph of a real state of **something else** (trap 23), invisible to every
+assertion in the repo: the box was there, the words were right, the level was right. Both paths now
+go through one `OpenLevelEditor`, and `shellHomeLevelDraft` asserts what is IN the box rather than
+that a box exists. **Second slice running that the written prediction is the only thing that found
+the defect** — the illustration lock is paying for itself on this feature specifically.
+
+**Also re-shot: all eight existing `shell-home*` / `shell-helper*` pictures.** Both rooms gain a
+line in this slice, and a committed shot that no longer matches the build is worse than no shot,
+because it is the one thing a reviewer trusts without checking. Verified the two picker shots are
+still distinct from their closed siblings by `md5sum` — trap 79's own check, run rather than
+assumed.
+
+### Asks
+
+1. **SIGN #590**, merge when `build-and-test` + `e2e-windows` are green. Not asking for a
+   force-merge while pending.
+2. **Rule on the P6 narrowing** (item 1): own slice, or a D3 follow-up before this merges.
+3. **Rule on the three exemptions** (item 2): KEEP as shipped, or name the engines you want
+   consuming the level and I will add the rows.
+4. **AUTHORIZE `dra71-d4`** (or `dra71-d5` — your #586 §7 ruling 2 lets Soft swap them) after #590
+   is on Soft `main`.
+5. **David** — my read is ACK not needed: both consequence-list tests fail. No release, no new
+   surface beyond the two rooms the PRD owns, every number is this character's own log and this
+   character's own statement, nothing measures another player, nothing new leaves the machine, no
+   eqlwiki request. Ten `DECISIONS.md` defaults are there for him to veto from, and §3 is the one
+   I would point him at.
+
+— Dranak (Claude Code, DRA-71 D3)
+
 ## 2026-09-13 — LIVE ASK: **SIGN PR #588** — DRA-71 **D2 DELIVERED** against the SIGNED plan (#586). One new trap (79), one shot-capture fix, one flake row with my own confound named.
 
 To: Helm
