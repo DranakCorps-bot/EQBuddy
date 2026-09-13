@@ -2067,3 +2067,72 @@ already believes.
     have not tested it. `channel-wipe-guard-selftest.ps1` now drives every check into the
     red at least once, which is the shape that makes this un-shippable rather than
     embarrassing.
+
+### Trap 79
+
+**A WPF `Popup` is its own top-level HWND, so a window capture renders everything
+except the dropdown the shot is about.**
+
+DRA-71 D2 moved the Helper's nine goal chips into one `EqMultiPicker` — a face
+button plus a themed popup of check rows — and added `shell-helper-picker` to
+stage the open state, because a dropdown that is shut photographs as a button
+(trap 22). The shot came back. It was well composed, correctly themed, showed the
+room, showed the face reading "Any goal", and was **byte-identical to
+`shell-helper.png`**, the shot of the same room with nothing open.
+
+Nothing in the picture said so. It is a correct photograph of a closed control,
+which is exactly what a correct photograph of an open control looks like if you
+are only checking that the window rendered. `md5sum` on the two files is what
+caught it, and only because the file SIZES were equal in an `ls` — a coincidence
+of attention, not a process.
+
+The cause: `shot.ps1` uses `PrintWindow`, which asks a window to draw ITSELF into
+a DC. That is the right call and it is load-bearing — every EQBuddy window is
+always-on-top, so a screen grab photographs whichever copy of the app happens to
+be in front (`release.ps1` relaunching the real app once photographed a live
+profile). But a WPF `Popup` is not part of its owner's visual tree at the HWND
+level; it lives in its own `HwndSource`. `PrintWindow` on the owner cannot see
+it, and never could.
+
+**The obvious fix is a screen grab, and it was tried and reverted twice in
+twenty minutes.** Take two put the fixture's always-on-top widget across the left
+half of the room it was photographing. Take three, with the widget moved clear by
+its own persisted position, caught an unrelated application's window on the
+developer's desktop. Both are the failure `PrintWindow` was chosen to prevent,
+arriving through the door marked "just this once, and the batch holds the screen
+lock anyway." The lock (trap 61) reserves the screen against other HARNESSES. It
+reserves nothing against the machine.
+
+What shipped instead: `shot.ps1 -WithPopups` enumerates the owner process's
+visible, EMPTY-TITLED windows that intersect the captured region, `PrintWindow`s
+each into its own bitmap, and blits them at their screen offsets. Occlusion-proof,
+like everything else there. The empty-title clause is what stops it swallowing a
+sibling window and re-opening trap 24 from the other side — every EQBuddy window a
+shot can ask for has a title. It warns loudly when it finds no popup at all,
+because that is precisely the state that produced a plausible wrong picture.
+
+**And the second capture artifact is the one worth remembering.** With the
+composite working, the Solarized shot showed a hard BLACK hairline around the
+popup that appears nowhere else in that palette — the obvious reading being that
+the light theme had a contrast defect the dark ones hid. It did not. Solarized's
+`BorderBrush` is `#66586E75`: 40% alpha. The popup was being rendered onto a
+freshly allocated bitmap, which is transparent BLACK, so every translucent pixel
+composited against black. The opaque cream ground came out right, which is why it
+read as a border problem rather than a capture problem.
+
+**And it is NOT fixed — it is a stated caveat**, which is the part worth copying.
+Seeding the popup's bitmap with the pixels already rendered behind it was the
+obvious repair and it changed nothing, because `PrintWindow` overwrites the DC
+rather than blending into it. So the translucent edge cannot be recovered from a
+capture at all, and both picker shots ship with the note that the popup's 1px
+outline is darker than the app draws it while everything inside the popup is
+faithful. The illustration lock's own instruction is *"if the surface cannot be
+staged, write the italic caveat — do not invent a picture nobody can check"*, and
+the same applies one notch down: when part of a capture is not faithful, say which
+part, rather than restyling the product until the camera agrees with it.
+
+So: **a shot of a translucent surface is only as honest as what you allocated
+underneath it**, and if a captured border is darker than its theme's value says it
+should be, suspect the capture before the palette. Both halves of this are trap 23
+one layer further out than usual — a real state of the CAPTURE, photographed as if
+it were a state of the app.

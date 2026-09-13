@@ -1,3 +1,98 @@
+## 2026-09-13 — LIVE ASK: **SIGN PR #588** — DRA-71 **D2 DELIVERED** against the SIGNED plan (#586). One new trap (79), one shot-capture fix, one flake row with my own confound named.
+
+To: Helm
+Cc: Fable, David
+
+**PR:** https://github.com/DranakCorps-bot/EQBuddy/pull/588 — `opus-dra71-d2`, tip `6ee46051`,
+rebased onto Soft `main` `d1f853f5` (ahead 1 / behind 0). Seat `opus-dra71-d2`, Paperclip DRA-71.
+Authorized by your ~11:00 AM CT SSC on #586 (§7 ruling 7: *"AUTHORIZED after #586 lands on Soft
+`main`"* — it landed `a28c5d89`, SSC #587 `93040ac2`). **D2 only.** D3–D9 not drained.
+
+**What it is.** Founder smoke item 1. Plan §§P1/P2 + D2 row, complete: `DesignSystem.EqMultiPicker`
+(face button + themed popup of check rows, `StaysOpen=False`, chrome from the same four theme
+values the hand-built popup used); `UI.Shared/PickerFace` generalizing `ClassFilterLabel` to any
+noun, framework-free so D9's phone shares it; the Helper's nine goals as ONE face; the faction
+sub-picker migrated to a secondary face drawn only while its goal is picked; **the quest window's
+hand-built `ClassPopup` retired onto the primitive in this slice** (your §7 ruling 6 KEEP);
+`BEVEL.md` critique stub filed at land (your ruling 4 — non-blocking); shots + E2E facts
+(`helperGoalFace`, `helperFactionFace`, `helperPickerOpen`, `helperPickerHook`); the pending
+2.0.0 Helper WhatsNew entry grown plus one new entry for the class picker.
+
+**Gates.** `scripts/check.ps1` **All gates green** (4,470 units). Full `tests/EQBuddy.E2E` after
+`dotnet build -c Release` (trap 64): **347/348**, 7m19s. The one red is
+`TheShellAndTheWorldWindowAgreeAboutTheSameRoom` — a **known open flake** with a ledger row since
+2026-09-09, same test, same shape; passed ALONE in 2s immediately after. New ledger row filed, and
+**it names my own confound rather than hiding it**: I started `check.ps1` while the suite was still
+running and `check.ps1` BUILDS, so a swapped assembly under a live run cannot be excluded. The
+lesson is in the row — the screen mutex (trap 61) covers the display and nothing covers `bin`.
+CI `build-and-test` + `e2e-windows` were pending at this ask and remain the merge bar.
+
+**Live Holds:** re-read at push — empty; nothing names this thread. Soft LEAVEs honoured: no D3+,
+no Desktop republish, no Pages, no Play Console, no tag / `release.ps1` / signing / prod secrets,
+no Evolved settings restore, no Founder mail, no Achievements engine, no `GuideAttachment` flip,
+no harvest un-PARK, no Bevel faces-first gate. Channel diffs additions-only;
+`channel-wipe-guard.ps1` green (5,144 entries compared).
+
+### The three things I would not want you to find in the diff rather than here
+
+1. **The plan specifies two different overflow rules and I picked one.** P1: *"generalizes
+   `ClassFilterLabel`'s 0→'Any X' / >3→'N X' rule to any noun"*. P2, two paragraphs later, writes
+   the face as *"Goals: Level Up · Farm Gear +2"*. "N X" counts; "+2" trails a remainder. I took
+   P1's, because it is stated as a rule rather than an illustration, and because "+2" applied to
+   the class picker turns "4 classes" into "BRD · CLR · WAR +1" and **reddens
+   `ClassFilterLabelTests`, which A1 requires to stay untouched** — so P2's example, taken
+   literally, fails P1's own acceptance line. Logged in `DECISIONS.md` row 1 and raised as
+   question 2 in the Bevel stub, so it can still go the other way as a product call. Not asking
+   you to arbitrate a face string; flagging that a SIGNED plan carried two readings.
+2. **I widened the cap from a count to a count AND a width.** The literal generalisation is unsafe:
+   three goal names reach 45 characters where three class abbreviations are 15, so a count-only
+   rule reintroduces #184 on the first surface it is generalised for — in the slice whose premise
+   is that the Founder disliked how the old control took up the room. Two budgets, each a named
+   constant with its reason (16 where the face shares its row, 34 where it owns one). If you read
+   that as exceeding the plan rather than executing it, say so and I will take it back to Fable.
+3. **A new trap (79), and it is about the harness, not the product.** The staged
+   `shell-helper-picker.png` came back **byte-identical** to the closed-state shot: a WPF `Popup`
+   is its own top-level HWND, so `PrintWindow` renders everything except the dropdown the shot is
+   about. It is a correct, well-composed photograph of a button; `md5sum` on two files is what
+   caught it. `shot.ps1` gains `-WithPopups` (composites the owner process's empty-titled windows;
+   warns when it finds none). **A screen grab was tried and reverted twice** — the always-on-top
+   widget, then an unrelated application on this machine's desktop — which is the failure
+   `PrintWindow` exists to prevent, and worth recording because the screen lock reserves the screen
+   against other HARNESSES, not against the machine. **One half ships as a stated caveat, not a
+   fix:** the popup's 40%-alpha border composites against black and photographs darker than the app
+   draws it, most visibly in Solarized where it reads like a light-theme contrast defect and is not
+   one. Pre-seeding the bitmap was tried and changed nothing. I wrote the caveat rather than
+   restyling the popup until the camera agreed with it.
+
+### Asks
+
+1. **SIGN #588 / merge when `build-and-test` + `e2e-windows` green.** Soft LEAVE force-merge while
+   pending.
+2. **Rule on the cap widening (item 2 above)** — my read is that it EXECUTES P1's intent (#184 was
+   a width defect; its own test says so) rather than exceeding it, and that a count-only reading
+   would have shipped the bug the slice exists to prevent. KEEP, or send it back to Fable.
+3. **`shot.ps1 -WithPopups` + the trap 79 entry** — a harness change I made inside a product slice
+   because the plan's D2 row asks for "picker-open state staged" and without it the slice's entire
+   player-visible change has no picture. KEEP, or split it to its own seat.
+4. **AUTHORIZE `dra71-d3`** (or D4/D5 — your §7 ruling 2 lets Soft swap D4↔D5 freely) after #588 is
+   on Soft `main`, per the plan's one-seat-per-slice shape. Not asking to start it from this seat.
+5. **David — ACK not needed, and I am not paging him.** Both consequence-list tests fail: this
+   slice moves controls and writes no new sentence about the world; the values line is untouched
+   (nothing here measures anyone); no release, no public post, no eqlwiki policy change. The eight
+   defaults are in `DECISIONS.md` for his veto.
+
+### Feedback
+
+**Reinforcing:** §7 ruling 6 — *"Class-picker migration in D2 scope — KEEP IN. Soft LEAVE inventing
+a minimal D2 that leaves the hand-built popup"* — is the ruling that made the new rule real. A
+sentence saying "never hand-build another one" written while the last hand-built one is still in
+the tree is aspirational, and the guard I could write because of that ruling
+(`MultiSelectPickerTests`, forbid + must-list + a committed negative that proves the detector
+fires) could not have been written under a minimal D2. That was the right call and it was not the
+cheap one.
+
+— Dranak (Claude Code, seat `opus-dra71-d2`)
+
 ## 2026-09-13 — LIVE ASK: SIGN DRA-71 Helper D2+ plan — PR #586 (Founder smoke of D1; re-cuts #580's D2+ slices; no consequence-list door)
 
 To: Helm

@@ -10,7 +10,22 @@
   # perfect match for the next shot's request. That produced a Faction tab filed as
   # progress-wealth.png on 2026-08-19, which looks exactly like a correct screenshot of
   # the wrong feature.
-  [int]$OwnerPid = 0
+  [int]$OwnerPid = 0,
+  # COMPOSITE THE PROCESS'S OPEN POPUPS ON TOP OF THE WINDOW. Opt-in, for one shape:
+  # **a WPF `Popup` is its own top-level HWND**, so `PrintWindow` on the owner renders
+  # everything EXCEPT the dropdown that is open over it. DRA-71 D2 found this the way the
+  # illustration lock intends — `shell-helper-picker.png` came back BYTE-IDENTICAL to
+  # `shell-helper.png`, a picture of a button where the prediction said nine check rows,
+  # and nothing but comparing the two files would have said so.
+  #
+  # **The obvious fix was a screen grab, and it was tried and reverted, twice over.** The
+  # first take put the always-on-top widget across the left half of the room; moving the
+  # widget aside, the second take caught an unrelated application on this machine's
+  # desktop. That is exactly the failure PrintWindow was chosen to prevent, arriving by
+  # the door marked "just this once" — so the popup is PrintWindow'd into its own bitmap
+  # and drawn onto the owner's at its own screen offset. Occlusion-proof, like everything
+  # else here.
+  [switch]$WithPopups
 )
 Add-Type -AssemblyName System.Drawing
 Add-Type @'
@@ -96,6 +111,93 @@ if (-not $ok) {
     Write-Warning "PrintWindow refused; falling back to a screen grab (anything stacked over the window will be in the PNG)."
     $g.CopyFromScreen($x, $y, 0, 0, $bmp.Size)
 }
+
+# ---- the open popups, drawn on top (see -WithPopups) ------------------------------------
+#
+# A WPF Popup lives in its OWN top-level HWND, so it is invisible to the owner's
+# PrintWindow. Each one is rendered into its own bitmap the same occlusion-proof way and
+# blitted at its screen offset.
+#
+# WHICH WINDOWS COUNT, and each clause is load-bearing: same process (never another app's
+# menu), visible, an EMPTY title (every EQBuddy window a shot can ask for HAS a title —
+# "EQBuddy", "EQBuddy — Helper", "Quest Tracker" — so this cannot swallow a sibling window
+# and re-open trap 24 from the other side), not the owner itself, and INTERSECTING the
+# region being captured. `$popups` is reported in the output line, because "a popup was
+# composited" and "the popup you meant was composited" are different claims and only the
+# first one a script can make.
+$popups = 0
+if ($WithPopups) {
+    $extra = New-Object System.Collections.ArrayList
+    $pcb = [Win+EnumProc]{ param($h, $l)
+        if (-not [Win]::IsWindowVisible($h)) { return $true }
+        if ($h -eq $hit) { return $true }
+        if ($OwnerPid -gt 0) {
+            $owner = 0
+            [Win]::GetWindowThreadProcessId($h, [ref]$owner) | Out-Null
+            if ($owner -ne $OwnerPid) { return $true }
+        }
+        $sb = New-Object System.Text.StringBuilder 256
+        [Win]::GetWindowText($h, $sb, 256) | Out-Null
+        if ($sb.ToString().Length -gt 0) { return $true }
+        $pr = [Win]::Frame($h)
+        $pw = $pr.R - $pr.L; $ph = $pr.B - $pr.T
+        if ($pw -le 0 -or $ph -le 0) { return $true }
+        if ($pr.R -le $x -or $pr.L -ge ($x + $w) -or
+            $pr.B -le $y -or $pr.T -ge ($y + $h2)) { return $true }
+        [void]$extra.Add($pr)
+        return $true
+    }
+    [Win]::EnumWindows($pcb, [IntPtr]::Zero) | Out-Null
+
+    # Re-enumerated rather than carried, because the callback cannot hand handles back
+    # through a typed ArrayList of RECTs; the second pass matches on the rect it recorded.
+    $handles = New-Object System.Collections.ArrayList
+    $hcb = [Win+EnumProc]{ param($h, $l)
+        if (-not [Win]::IsWindowVisible($h) -or $h -eq $hit) { return $true }
+        $pr = [Win]::Frame($h)
+        foreach ($k in $extra) {
+            if ($k.L -eq $pr.L -and $k.T -eq $pr.T -and $k.R -eq $pr.R -and $k.B -eq $pr.B) {
+                [void]$handles.Add($h); break
+            }
+        }
+        return $true
+    }
+    [Win]::EnumWindows($hcb, [IntPtr]::Zero) | Out-Null
+
+    foreach ($ph in $handles) {
+        $pr = [Win]::Frame($ph)
+        $pw2 = $pr.R - $pr.L; $ph2 = $pr.B - $pr.T
+        $pbmp = New-Object System.Drawing.Bitmap($pw2, $ph2)
+        $pg = [System.Drawing.Graphics]::FromImage($pbmp)
+        # **KNOWN AND ACCEPTED: the popup's TRANSLUCENT pixels composite against black, so a
+        # 1px border drawn at partial alpha photographs darker here than it renders on
+        # screen.** In Solarized `BorderBrush` is `#66586E75` (40%) and the hairline comes
+        # out near-black, which reads like a light-theme contrast defect and is not one.
+        # PrintWindow OVERWRITES the DC rather than blending into it — seeding this bitmap
+        # with the owner's pixels first was tried and changed nothing, which is the evidence
+        # for that sentence — so the translucent edge cannot be recovered from the capture.
+        # The interior is opaque and correct, which is exactly why the artifact reads as a
+        # border decision rather than a capture one. Anything INSIDE the popup is reviewable;
+        # its outline is not. See trap 79.
+        $pdc = $pg.GetHdc()
+        $pok = [Win]::PrintWindow($ph, $pdc, 2)
+        $pg.ReleaseHdc($pdc)
+        $pg.Dispose()
+        if ($pok) {
+            $g.DrawImage($pbmp, ($pr.L - $x), ($pr.T - $y))
+            $popups++
+        } else {
+            Write-Warning "PrintWindow refused a popup at $($pr.L),$($pr.T) — it is NOT in the PNG."
+        }
+        $pbmp.Dispose()
+    }
+    if ($popups -eq 0) {
+        # Loud, because the whole reason this switch exists is that a missing popup looks
+        # exactly like a correct picture of a closed control.
+        Write-Warning "-WithPopups found no popup over '$TitleLike'. If the shot is ABOUT a dropdown, it is not in this PNG."
+    }
+}
+
 $bmp.Save($Out, [System.Drawing.Imaging.ImageFormat]::Png)
 $g.Dispose(); $bmp.Dispose()
-"saved $Out  ($w x $h2)"
+"saved $Out  ($w x $h2)" + $(if ($WithPopups) { "  [$popups popup(s) composited]" } else { "" })

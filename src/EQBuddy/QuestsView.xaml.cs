@@ -586,30 +586,31 @@ public partial class QuestsView : UserControl
 
     // ---- multiclass filter (Legends: up to three active classes; David 2026-08-07) ----
 
-    private readonly List<CheckBox> _classChecks = [];
+    /// <summary>
+    /// The class lens, on <see cref="EqMultiPicker"/> since DRA-71 D2.
+    ///
+    /// <para>It used to be a <c>Popup</c> of <c>CheckBox</c>es typed into this window's XAML,
+    /// with the tick bookkeeping and the re-entrancy guard written here. It was the app's ONLY
+    /// dropdown multi-select, which is why it is the primitive's first caller: a rule that says
+    /// "never hand-build another one" is only true on the day the last hand-built one is gone.
+    /// Nothing about the lens changed — same sixteen rows in the same order, same per-character
+    /// store, same capped face — and that is the acceptance bar, not a bonus.</para>
+    /// </summary>
+    private EqMultiPicker? _classPicker;
 
     private void BuildClassChecks()
     {
-        foreach (var cls in QuestClassFilter.Classes)
-        {
-            var check = new CheckBox { Margin = new Thickness(0, 1, 0, 1) };
-            check.Content = DesignSystem.Text(Role.Body, cls);
-            check.Checked += (_, _) => OnClassCheckChanged();
-            check.Unchecked += (_, _) => OnClassCheckChanged();
-            _classChecks.Add(check);
-            ClassChecks.Children.Add(check);
-        }
+        _classPicker = new EqMultiPicker(_ => OnClassCheckChanged(), ClassBtn);
+        _classPicker.SetRows([.. QuestClassFilter.Classes
+            .Select(cls => new PickerRow(cls, cls, Checked: false))]);
+        ClassPickerHost.Children.Add(_classPicker.Host);
     }
 
     private List<string> SelectedClasses() =>
-        _classChecks.Where(c => c.IsChecked == true)
-            .Select(c => ((TextBlock)c.Content).Text).ToList();
-
-    private bool _syncingClasses;
+        _classPicker is null ? [] : [.. _classPicker.Checked.Cast<string>()];
 
     private void OnClassCheckChanged()
     {
-        if (_syncingClasses) return;
         var selected = SelectedClasses();
         var key = _main.QuestCharacterKey;
         if (_main.QuestLedger is { } ledger && key.Length > 0)
@@ -620,13 +621,12 @@ public partial class QuestsView : UserControl
 
     // Capped in UI.Shared so the Avalonia window cannot disagree: an uncapped face grew
     // with the selection and pushed the mode strip off the window (#184).
-    private void UpdateClassButton(List<string> selected)
-    {
-        ClassBtn.Content = ClassFilterLabel.For(selected);
-        ClassBtn.ToolTip = selected.Count > ClassFilterLabel.MaxNamed
-            ? "Showing: " + string.Join(", ", selected)
-            : "Pick your class(es) — quests any of them can do stay visible";
-    }
+    private void UpdateClassButton(List<string> selected) =>
+        _classPicker?.SetFace(
+            ClassFilterLabel.For(selected),
+            selected.Count > ClassFilterLabel.MaxNamed
+                ? "Showing: " + string.Join(", ", selected)
+                : "Pick your class(es) — quests any of them can do stay visible");
 
     /// <summary>Load the character's saved classes into the checkboxes (character
     /// switches included — the selection follows the ledger, not the window).</summary>
@@ -634,16 +634,12 @@ public partial class QuestsView : UserControl
     {
         var current = SelectedClasses();
         if (current.SequenceEqual(saved, StringComparer.OrdinalIgnoreCase)) return;
-        _syncingClasses = true;
-        foreach (var check in _classChecks)
-            check.IsChecked = saved.Contains(((TextBlock)check.Content).Text,
-                StringComparer.OrdinalIgnoreCase);
-        _syncingClasses = false;
+        // SetChecked, not SetRows: a rebuild here would throw away a popup the player had
+        // open, and the refresh that calls this runs on every tick.
+        _classPicker?.SetChecked(key =>
+            saved.Contains((string)key, StringComparer.OrdinalIgnoreCase));
         UpdateClassButton(saved);
     }
-
-    private void OnClassBtn(object sender, RoutedEventArgs e) =>
-        ClassPopup.IsOpen = !ClassPopup.IsOpen;
 
     /// <summary>The Epic tab's classic-era lens. Persisted, because EQBuddy Mobile's
     /// Epic tab honors the same setting — one filter, both screens.</summary>

@@ -1,5 +1,59 @@
 # Bevel inbox
 
+## 2026-09-13 — CRITIQUE REQUESTED: the Helper's goal picker and `EqMultiPicker` (DRA-71 D2)
+To: Bevel
+
+**Non-blocking.** Helm's §7 ruling 4 on PR #586: *"KEEP critique stub at D2 land
+(non-blocking; follow-ups ride later slices). Soft LEAVE Bevel faces-first."* So D2 is built
+and landed, and this asks for critique of what it looks like — not for approval before it
+ships. Anything you find rides a later DRA-71 slice (D3–D9), which is the point of asking now
+rather than after five more surfaces have copied the control.
+
+**What changed.** The Founder smoked D1 and called the Helper's goal row *flat checkbox soup* —
+nine `EqChip`s in a `WrapPanel`. The nine are now rows inside one `DesignSystem.EqMultiPicker`
+(a face button + a themed `Popup` of check rows), the faction sub-picker is a second face that
+appears only once its goal is picked, and the quest window's hand-built class popup was
+retired onto the same primitive in the same slice.
+
+**The shots** (`pwsh -NoProfile -File scripts/shoot.ps1 -Shot shell-helper-picker`, and the
+`-light` sibling in Solarized):
+
+- `docs/screenshots/shell-helper.png` — the face, shut, reading "Any goal"
+- `docs/screenshots/shell-helper-picker.png` — the same face with the popup OPEN, nine rows
+- `docs/screenshots/shell-helper-picker-light.png` — open, two ticked, Solarized
+- `docs/screenshots/shell-helper-narrow.png` — the room at its 520 floor width
+- `docs/screenshots/quest-tracker.png` — the migrated class lens, which must look identical
+
+**Five things I would most like a product eye on, weighted by what I could not decide alone:**
+
+1. **The face's empty state says "Any goal".** The sentence above it says *"Pick what you are
+   working toward. Nothing picked means EQBuddy weighs all of them."* Two statements of one
+   fact, one of them inside the control. Is the sentence now redundant, or is the face too
+   quiet without it?
+2. **The overflow rule counts rather than truncating.** Past 34 characters the face reads
+   "3 goals" instead of naming two and trailing a "+1". Fable's plan illustrated the face as
+   *"Goals: Level Up · Farm Gear +2"*, which is a different rule; I implemented the one P1
+   names (`ClassFilterLabel`'s, generalised) because it is the one that is specified and
+   testable, and logged the divergence in `DECISIONS.md`. If "+2" is the better read, it is a
+   one-function change in `UI.Shared/PickerFace.cs` and the tests say exactly what it would
+   cost.
+3. **A CheckBox is WPF's own glyph** — the one part of this popup `DesignTokens` does not
+   paint. Look at it in Solarized especially. If it should be an `EqChip`-style tick or an
+   `IconPaths` vector, that is a design-system decision and belongs to you.
+4. **The sub-picker is a second face stacked under the first.** One face per decision was the
+   plan's answer to soup. D5 adds unlock-subject pickers and D6 adds a worn-item picker to the
+   same room — does a column of faces stay legible at four, or does this want a different
+   shape before those slices arrive?
+5. **The popup overlaps the answers rather than pushing them down.** Deliberate, so opening
+   the picker does not reflow the room. Check it does not cover the one recommendation the
+   fixture produces in a way that makes the room look empty.
+
+**What is NOT up for critique in this slice** (Helm-signed, or the Founder's own words): the
+nine goal labels are his verbatim, the room's rail position and "Helper" label are prior
+KEEPs, and the class lens's behaviour is a regression bar rather than a design question.
+
+— Dranak (Claude Code)
+
 ### Guide Sky + NEXT post-delivery (Helm signed 2026-09-09 ~6:14 PM CT)
 
 KEEP: walkthrough under stages + shared GuidePresentation; NEXT as one pin; row `who · where` only; StubLead + pencil Improve; Skip on turn-in/reward (P1b); sidebar Quest / title Guide naming dual. Soft: caption one-liner (heading owns pieces/ready); Ready row hides when card pins same turn-in; #491 merge-when-green for fold/reward-hover/sentence. Soft LEAVE inventing from Bevel alone; Soft LEAVE narrowing Skip; Soft LEAVE desktop HOW disclosure; Soft LEAVE leftover-band fold seat now; Soft LEAVE Options/Guide IA reopen from Quests chrome. Not needs-david.

@@ -48,7 +48,7 @@ To: Helm
 
 ### 3. Delivery slices (one Executor seat each; each waits for the prior on Soft `main`)
 
-- **D2 (`dra71-d2`)** — `EqMultiPicker` + `PickerFace` (prove-fail the face cap), goals dropdown, faction sub-pick migrated, Quests class picker migrated, `BEVEL.md` critique stub, shots + E2E facts (`helperGoalFace`, picker-open state staged), WhatsNew.
+- **D2 (`dra71-d2`)** — **DRAINED 2026-09-13, seat `opus-dra71-d2`** (feedback in `FABLE-FEEDBACK.md`; defaults in `DECISIONS.md`). `EqMultiPicker` + `PickerFace` (prove-fail the face cap), goals dropdown, faction sub-pick migrated, Quests class picker migrated, `BEVEL.md` critique stub, shots + E2E facts (`helperGoalFace`, picker-open state staged), WhatsNew.
 - **D3 (`dra71-d3`)** — `CharacterLevel` + ledger stores + Character room line/editor + `HelperInputs.Level` + P5 must-list + P6 discount + fixtures both ways (ding-after-statement, statement-after-ding).
 - **D4 (`dra71-d4`)** — `ZoneRoll.Dps/Hps` fold + weights + why-lines + HOME-006 sweep extension.
 - **D5 (`dra71-d5`)** — `UnlockPicks` store + both pickers + Quests filter + six-question row shape.

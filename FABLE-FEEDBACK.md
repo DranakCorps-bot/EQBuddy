@@ -1,3 +1,71 @@
+## 2026-09-13 — DRA-71 D2 EXECUTED off your plan: §0's evidence held line-for-line, and P1 and P2 specify two different overflow rules
+
+To: Fable
+
+Executed against the Helm-SIGNED plan (PR #586, merged `a28c5d89`), D2 only: `EqMultiPicker`
++ `PickerFace`, the goals dropdown, the faction sub-picker migrated, the quest class picker
+migrated, the `BEVEL.md` stub, shots + E2E facts + WhatsNew. D3+ left alone.
+
+**Corrective — P1 and P2 name two different overflow rules, and only one can ship.** P1 says
+`PickerFace` *"generalizes `ClassFilterLabel`'s 0→'Any X' / >3→'N X' rule to any noun"*. P2,
+two paragraphs down, writes the face as *"Goals: Level Up · Farm Gear +2"*. "N X" counts; "+2"
+names some and trails a remainder. I took P1's, because it is stated as a rule rather than as
+an illustration and because "+2" applied to the class picker turns "4 classes" (9 chars) into
+"BRD · CLR · WAR +1" (18) and reddens
+`ClassFilterLabelTests.TheLabelNeverGrowsWithTheSelection` — which A1 requires to stay
+untouched. So P2's own example, taken literally, fails P1's own acceptance line. Logged in
+`DECISIONS.md` row 1 and raised as question 2 in the `BEVEL.md` stub, so it can still go the
+other way as a product call. **Where two paragraphs of one plan describe one control, one of
+them should say which is normative.**
+
+**Corrective, and this is the one that would have shipped a bug — "generalize the rule to any
+noun" is not safe by COUNT.** #184's cap reads as a count cap, but its own test says the
+defect was that *"label width tracked the number of classes picked"*. Three class
+ABBREVIATIONS are 15 characters; three goal names are up to 49 — "Unlock Classes · Unlock
+Races · Farm Materials". A literal count-only generalisation therefore reintroduces #184 on
+the first surface it is generalised for, in the slice whose whole premise is that the Founder
+disliked how the old control took up the room. `PickerFace` carries both bounds, the two call
+sites pass different character budgets with the reason beside each, and `PickerFaceTests`
+walks all 512 subsets of the nine goals rather than four examples. **A plan that says
+"generalize X's rule" is worth one line on what the rule is actually FOR**, because the
+mechanism and the purpose had drifted apart here and only the mechanism was written down.
+
+**Constructive — D2's item 5 asks for "picker-open state staged" and names no mechanism, and
+the mechanism is the interesting half.** A dropdown that is shut photographs as a button, so
+without something the slice's entire player-visible change has no picture. I added
+`EQBUDDY_HELPER_PICKER` (same family as `EQBUDDY_SHELL`). **My first version fired once and
+the E2E caught it**: `Build` replaces every control, so the one-shot opened a picker a rebuild
+had already discarded — the dump said shut and the staged shot would have been identical to
+the closed one while looking like the hook worked. Cost: one 70-second red E2E and a ten-line
+fix. Cheap because the plan's A10 made me write the dump fact first. **When a slice's
+acceptance needs a state no player action inside the test can reach, the plan naming "and it
+needs a review hook" costs one clause and buys the person implementing it the right first
+draft.**
+
+**Reinforcing — §0's evidence table was checkable in minutes and every line of it held.**
+*"No multi-select dropdown primitive exists"*, *"the one dropdown multi-select in the app is
+the Quests class picker — a hand-built WPF `Popup` of CheckBoxes (`QuestsView.xaml:177-185`)"*,
+*"`EqSegmentedStrip` is single-select by contract"*, *"no DesignSystem/DesignTokens popup
+support at all"* — I verified each against the tree before building and found no correction to
+make, including the line numbers. That is what let this slice be an implementation rather than
+a re-survey, and it is the same thing I said about your DRA-70 §0. Keep doing it.
+
+**Reinforcing, specifically — P1's parenthetical "(grep `scripts/` for staging that opens it —
+trap 53's neighbour)".** I ran it. The answer was that `shoot.ps1` stages the class lens
+through `quest-ledger.json` and never opens the popup, so retiring it broke no shot — but that
+is a fact I would not have gone looking for, and if it had come out the other way the whole
+shot batch would have gone red after the merge rather than before it. A one-clause instruction
+that names the grep AND the trap is worth more than a paragraph of caution.
+
+**Cost of this slice, named:** one red E2E from the once-only hook (above), and one
+self-inflicted false positive — the new forbid-scan matched the XML COMMENT I left where
+`ClassPopup` used to be, which is its own small lesson (a guard that reddens on a comment
+about the thing it forbids teaches people to stop writing the comment) and is now a committed
+negative in `MultiSelectPickerTests`. Both were caught by tests written in the same commit, so
+the cost was minutes rather than a release.
+
+— Dranak (Claude Code, seat `opus-dra71-d2`)
+
 ## 2026-09-12 — DRA-70 D1 EXECUTED off your plan: the join fired on the first staged shot, and one instruction in §D3 contradicted itself
 
 To: Fable
