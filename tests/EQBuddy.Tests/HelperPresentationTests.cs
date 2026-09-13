@@ -139,6 +139,98 @@ public class HelperPresentationTests
     }
 
     /// <summary>
+    /// **The sweep reaches <see cref="LevelReadout"/> too** (DRA-71 D3).
+    ///
+    /// <para>The Helper draws two of that file's sentences — the level it ranked with, and
+    /// what it says when it has none — so the ban has to follow them there. A vocabulary guard
+    /// that stopped at the file it was written for is the first thing that goes wrong when a
+    /// producer moves out to be shared, and this one moved out on the day it landed.</para>
+    ///
+    /// <para>An outgrown zone is the most likely place the forbidden words would ever arrive
+    /// in good faith — "you have outgrown this camp, it is too easy now" is the sentence
+    /// somebody writes — so the discount's own line is swept at several bands rather than at
+    /// the one the fixture builder happens to pick.</para>
+    /// </summary>
+    [Fact]
+    public void NoLevelSentenceUsesSafetyVocabulary()
+    {
+        var seen = 0;
+        foreach (var f in typeof(LevelReadout).GetFields(BindingFlags.Public | BindingFlags.Static))
+            if (f.GetValue(null) is string s) { AssertClean(s, $"LevelReadout.{f.Name}"); seen++; }
+        Assert.True(seen >= 6,
+            $"Only {seen} LevelReadout constants were reached — the reflection has stopped "
+            + "finding them. Check the type, not the assertion.");
+
+        foreach (var source in Enum.GetValues<LevelSource>())
+        {
+            var level = new ResolvedLevel(source == LevelSource.Unknown ? 0 : 30, source,
+                new DateTime(2026, 9, 12, 20, 0, 0));
+            AssertClean(LevelReadout.Line(level), $"LevelReadout.Line({source})");
+            AssertClean(LevelReadout.UsedByHelper(level), $"LevelReadout.UsedByHelper({source})");
+        }
+
+        foreach (var (min, max, level) in new[] { (8, 12, 60), (1, 4, 11), (45, 50, 60) })
+            AssertClean(
+                HelperPresentation.Why(new ZoneOutgrownFact("Lower Guk", min, max, level, 200)),
+                $"Why(ZoneOutgrownFact {min}-{max} at {level})");
+    }
+
+    /// <summary>
+    /// **The discount's sentence reports two measurements and predicts nothing.**
+    ///
+    /// <para>Both bounds, the kill count that is the band's denominator, and the level it is
+    /// being compared against — everything a player needs to disagree with it. What is NOT in
+    /// it is a verdict: no "too low", no "move on", no estimate of what an hour there would
+    /// pay now. This repo has no XP curve, eqlwiki publishes none, and a number invented to
+    /// fill that gap would be trap 73's shape with arithmetic instead of prose.</para>
+    /// </summary>
+    [Fact]
+    public void TheOutgrownSentenceNamesTheBandTheKillsAndYourLevel()
+    {
+        var line = HelperPresentation.Why(new ZoneOutgrownFact("Lower Guk", 8, 12, 50, 200));
+
+        Assert.Contains("8", line);
+        Assert.Contains("12", line);
+        Assert.Contains("200", line);
+        Assert.Contains("50", line);
+        // Personal evidence, so no estimate label — it is a measurement of this player's own
+        // /consider lines and their own stated or observed level (HOME-004).
+        Assert.DoesNotContain(HelperPresentation.CatalogLabel, line);
+        foreach (var predicted in new[] { "should", "will", "expect", "instead" })
+            Assert.DoesNotContain(predicted, line, StringComparison.OrdinalIgnoreCase);
+    }
+
+    /// <summary>
+    /// **The Helper names the level it used, and says which of the two writers it came
+    /// from** (plan P4).
+    ///
+    /// <para>A ranking that quietly weighed a number the player disagrees with, and never
+    /// said which, is the shape that makes somebody distrust the whole room. The source rides
+    /// with it through <c>CharacterLevel.SourceLabel</c> — the one table — rather than being
+    /// re-phrased here, which is the rule that stopped the phone from growing a second verb
+    /// around the class version of it.</para>
+    /// </summary>
+    [Fact]
+    public void TheHelperDisclosesTheLevelItRankedWithAndWhereItCameFrom()
+    {
+        var stated = LevelReadout.UsedByHelper(
+            new ResolvedLevel(28, LevelSource.Stated, DateTime.Today));
+        Assert.Contains("28", stated);
+        Assert.Contains(CharacterLevel.SourceLabel(LevelSource.Stated), stated);
+
+        var observed = LevelReadout.UsedByHelper(
+            new ResolvedLevel(31, LevelSource.Observed, DateTime.Today));
+        Assert.Contains("31", observed);
+        Assert.Contains(CharacterLevel.SourceLabel(LevelSource.Observed), observed);
+
+        // Unknown says what the room DID anyway rather than apologising, and names no number
+        // at all — a guessed level disclosed as a fact would be worse than none.
+        var unknown = LevelReadout.UsedByHelper(ResolvedLevel.Unknown);
+        Assert.Equal(LevelReadout.HelperUnknown, unknown);
+        Assert.DoesNotContain("0", unknown);
+    }
+
+    /// <summary>
     /// **THE PROVE-FAIL.** The scanner is pointed at a sentence of exactly the shape the ban
     /// exists to stop — the one somebody would write in good faith, because it sounds
     /// helpful — and has to catch it. Without this row the two above are a guard that has

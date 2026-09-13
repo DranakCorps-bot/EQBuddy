@@ -218,6 +218,15 @@ public static class HelperPresentation
             $"You have died here {Count(f.Deaths, "time", "times")}, across "
             + $"{Count(f.Sessions, "session", "sessions")}.",
 
+        // **The P6 sentence** (DRA-71 D3). Two measured numbers and a dash between them,
+        // and no verdict on either side of it: it does not say the zone is finished with,
+        // does not say it is easy, and does not predict what the next hour there would pay.
+        // A player who reads "L8-12, you are 30" has everything they need to decide, and
+        // EQBuddy has no XP curve with which to decide it for them.
+        ZoneOutgrownFact f =>
+            $"The creatures you conned here ran L{f.ConnedMin}–{f.ConnedMax}, "
+            + $"across {Count(f.Kills, "kill", "kills")} — you are level {f.Level}.",
+
         UnlockScoreFact f =>
             $"{f.Subject}: {f.Done} of {f.Total} requirements done, by the game's own record.",
 
@@ -408,6 +417,9 @@ public static class HelperPresentation
         HelperDoorKind.FactionStandings => ShellPages.Address(ShellPage.Progress, ProgressSurface.KeyFor(ProgressTab.Faction)),
         HelperDoorKind.Gear => ShellPages.Address(ShellPage.Gear),
         HelperDoorKind.Wealth => ShellPages.Address(ShellPage.Progress, ProgressSurface.KeyFor(ProgressTab.Wealth)),
+        // The room a player reads as "Character" — the page key stayed `Home` when DRA-66
+        // relabelled it, the same discipline the Guide room's `quests` key keeps.
+        HelperDoorKind.Character => ShellPages.Address(ShellPage.Home),
         _ => null,
     };
 
@@ -422,6 +434,7 @@ public static class HelperPresentation
         HelperDoorKind.WikiFaction => "eqlwiki",
         HelperDoorKind.Gear => "Gear",
         HelperDoorKind.Wealth => "Wealth",
+        HelperDoorKind.Character => "Character",
         _ => "",
     };
 
@@ -448,6 +461,10 @@ public static class HelperPresentation
             + "and you open the page yourself. EQBuddy never fetches it for you.",
         HelperDoorKind.Gear => "Open the Gear room: your bags, your wishlist and what dropped.",
         HelperDoorKind.Wealth => "Open Progress → Wealth: coin, motes and what you sold.",
+        HelperDoorKind.Character =>
+            "Open the Character room, where you can tell EQBuddy what level this character "
+            + "is. It reads the level from your log when you ding, and until then it has "
+            + "nothing to weigh against.",
         _ => "",
     };
 

@@ -80,13 +80,19 @@ public class QuestTrackerTests : IDisposable
     {
         // The log states the level only at the ding; the level-unlock preview reads
         // this after a restart. Replay re-offers the same ding — idempotent.
+        // The STAMP rides with the number since DRA-71 D3, and it has to survive the reload
+        // too: without it `CharacterLevel.Resolve` would read every restored level as the
+        // oldest claim there is and let any statement beat it (the migration rule, applied
+        // to a profile that has one).
         var store = Store();
-        store.SetLevel("dranak_legends", 30);
-        store.SetLevel("dranak_legends", 30);
+        store.SetLevel("dranak_legends", 30, T0);
+        store.SetLevel("dranak_legends", 30, T0);
         store.Flush();
         var reloaded = new QuestLedgerStore(_path);
         Assert.Equal(30, reloaded.LevelFor("dranak_legends"));
+        Assert.Equal(T0, reloaded.ObservedLevelFor("dranak_legends")!.Value.At);
         Assert.Equal(0, reloaded.LevelFor("vex_legends"));   // unknown = 0, never a guess
+        Assert.Null(reloaded.ObservedLevelFor("vex_legends"));
     }
 
     [Fact]

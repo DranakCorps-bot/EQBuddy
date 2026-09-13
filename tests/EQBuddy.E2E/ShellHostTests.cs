@@ -1973,4 +1973,186 @@ public class ShellHostTests
         Assert.Equal("Anygoal", app.DumpText("helperGoalFace"));
         Assert.Equal(9, app.DumpValue("helperChips"));
     }
+
+    // ================================================================================
+    // DRA-71 D3 — one level, two writers, ordered by time
+    // ================================================================================
+
+    /// <summary>
+    /// **A REAL DING, THROUGH THE REAL PARSER, REACHES BOTH ROOMS.**
+    ///
+    /// <para>The fixture log carries no level line, so the launch starts in the state a fresh
+    /// profile is in: nothing known, and the Character room saying so rather than drawing a
+    /// blank row. Then the game's own sentence is appended and the app has to do the whole
+    /// chain — parse, stamp with the LOG's time, store, resolve, redraw two rooms.</para>
+    ///
+    /// <para><b>Both rooms are asserted, and that is the point.</b> "The ledger has 30" and
+    /// "the Helper ranked with 30" are different claims (trap 56), and the second is the one
+    /// the Founder's MUST is about. A level that reached Character and not the Helper is
+    /// exactly the shape trap 72 shipped on the Quests tab — a store written and a surface
+    /// whose repaint gate never heard about it.</para>
+    /// </summary>
+    [Fact]
+    public void ADingWritesTheLevelAndTheCharacterRoomNamesIt()
+    {
+        using var app = new AppHarness(environment: OpenOn("home"));
+        app.Launch();
+
+        app.WaitForDump("shellPage", "home", "the shell to land on the Character room");
+        // The unknown state is a real one and it is where a fresh profile starts.
+        Assert.Equal(0, app.DumpValue("shellHomeLevel"));
+        Assert.Equal("unknown", app.DumpText("shellHomeLevelSource"));
+
+        app.AppendLogLines("You have gained a level! Welcome to level 30!");
+
+        app.WaitForDump("shellHomeLevel", "30", "the ding to reach the Character room");
+        app.WaitForDump("shellHomeLevelSource", "observed",
+            "the level to be labelled as the log's own statement");
+        // Nobody typed anything, so there is no statement to undo.
+        Assert.Equal(0, app.DumpValue("shellHomeStatedLevel"));
+
+    }
+
+    /// <summary>
+    /// **FIXTURE ONE, FROM A LAUNCHED APP: a statement made AFTER the ding wins.**
+    ///
+    /// <para>The Founder's own case. A Legends character holds up to three classes at once, so
+    /// the level the log printed belongs to whatever was equipped when it printed; a player who
+    /// swaps and says "I am 28 on this one" is correcting a number that is still true about a
+    /// different thing.</para>
+    ///
+    /// <para>Both claims are seeded into the real ledger file with real stamps and read back
+    /// through the real store, so this is the resolution the app performs and not a rule a unit
+    /// test agreed with. <c>shellHomeStatedLevel</c> is the floor that proves the seeded file
+    /// was SEEN — without it every number here would be about a room that never read it.</para>
+    /// </summary>
+    [Fact]
+    public void AStatementMadeAfterTheDingIsTheLevelTheHelperRanksWith()
+    {
+        var now = DateTime.Now;
+        using var app = new AppHarness(environment: OpenOn("helper"));
+        app.SeedQuestLedger(
+            level: (31, now.AddHours(-3)),
+            statedLevel: (28, now.AddHours(-1)));
+        app.Launch();
+
+        app.WaitForDump("shellPage", "helper", "the shell to land on the Helper room");
+        app.WaitForDump("helperLevel", "28", "the fresher statement to be what the Helper ranks with");
+        Assert.Equal("stated", app.DumpText("helperLevelSource"));
+        // A known level needs no door to go and set one.
+        Assert.Equal(0, app.DumpValue("helperLevelDoor"));
+
+    }
+
+    /// <summary>
+    /// **FIXTURE TWO, THE OTHER WAY: a ding AFTER the statement wins** — and this one is the
+    /// prove-fail for the row above (trap 34: green-only is vacuous coverage).
+    ///
+    /// <para>The same two writers, the same store, the same rooms; only the ORDER in time is
+    /// different, and the answer flips. The statement is seeded with a stamp from before the
+    /// launch and the ding arrives live through the log, so its stamp is genuinely later — no
+    /// fixture arithmetic decides the winner, the clock does.</para>
+    ///
+    /// <para>A precedence table in either direction passes one of these two rows and fails the
+    /// other, which is precisely why the plan asked for both.</para>
+    /// </summary>
+    [Fact]
+    public void ADingThatArrivesAfterTheStatementTakesTheLevelBack()
+    {
+        using var app = new AppHarness(environment: OpenOn("home"));
+        app.SeedQuestLedger(statedLevel: (28, DateTime.Now.AddHours(-1)));
+        app.Launch();
+
+        app.WaitForDump("shellPage", "home", "the shell to land on the Character room");
+        app.WaitForDump("shellHomeLevel", "28", "the seeded statement to answer on its own");
+        Assert.Equal("stated", app.DumpText("shellHomeLevelSource"));
+
+        app.AppendLogLines("You have gained a level! Welcome to level 31!");
+
+        app.WaitForDump("shellHomeLevel", "31", "the fresher ding to overtake the statement");
+        app.WaitForDump("shellHomeLevelSource", "observed",
+            "the line to say the number came from the log");
+        // The statement is still STORED — it was overtaken, not deleted, so the undo row is
+        // still there and a later correction does not have to be retyped from nothing.
+        Assert.Equal(28, app.DumpValue("shellHomeStatedLevel"));
+    }
+
+    /// <summary>
+    /// **An unknown level draws a sentence and a DOOR, never a guess** (plan P4).
+    ///
+    /// <para>The answers above it are real — they are ranked from the player's own stored play
+    /// and do not need a level to be true — so the room says what it did anyway and points at
+    /// the one place that can fill the gap. <c>helperLevelDoor</c> is trap 29's assertion: a
+    /// control that is ABSENT photographs as an unremarkable panel, so only a launched app can
+    /// say the way forward is on screen rather than merely implied by the sentence.</para>
+    ///
+    /// <para><b>Then a ding arrives and the door goes away</b>, which is the half that would
+    /// have shipped broken. The Helper's repaint gate has to carry the level, and a room whose
+    /// fingerprint did not fold it would keep drawing "EQBuddy does not know your level" for
+    /// the rest of the session with the number sitting in the store one room away — trap 72,
+    /// exactly as the Quests tab had it.</para>
+    /// </summary>
+    [Fact]
+    public void AnUnknownLevelOffersTheCharacterDoorUntilADingFillsItIn()
+    {
+        using var app = new AppHarness(environment: OpenOn("helper"));
+        app.Launch();
+
+        app.WaitForDump("shellPage", "helper", "the shell to land on the Helper room");
+        Assert.Equal(0, app.DumpValue("helperLevel"));
+        Assert.Equal("unknown", app.DumpText("helperLevelSource"));
+        app.WaitForDump("helperLevelDoor", "1",
+            "the unknown-level line to offer a door into the Character room");
+        // And it lands somewhere: the door count went up and none of them are dead.
+        Assert.True(app.DumpValue("helperDoors") > 0,
+            $"no door was built at all; dump was: {app.Artifacts()}");
+        Assert.Equal(0, app.DumpValue("helperDeadDoors"));
+
+        app.AppendLogLines("You have gained a level! Welcome to level 30!");
+
+        app.WaitForDump("helperLevel", "30",
+            "the Helper's own repaint gate to notice the level the log just gave");
+        Assert.Equal("observed", app.DumpText("helperLevelSource"));
+        app.WaitForDump("helperLevelDoor", "0",
+            "the door to go away once there is nothing left for it to fix");
+    }
+
+    /// <summary>
+    /// **THE EDITOR BOX EXISTS, AND THE DUMP SAYS SO** — the runtime half of the screenshot
+    /// hook (<c>EQBUDDY_HOME_EDITOR</c>) that stages the one state a shot of this room cannot
+    /// otherwise reach.
+    ///
+    /// <para>A shut editor photographs as a link. The hook is what lets
+    /// <c>shell-home-level</c> exist at all, and a hook that was merely spelled correctly —
+    /// read from the environment, never applied to the build — would stage nothing and produce
+    /// a shot identical to the closed one (trap 22 and trap 29 arriving together, the same
+    /// pair D2 hit with the picker).</para>
+    /// </summary>
+    [Fact]
+    public void TheReviewHookReallyOpensTheLevelEditor()
+    {
+        var env = OpenOn("home");
+        env["EQBUDDY_HOME_EDITOR"] = "level";
+        using var app = new AppHarness(environment: env);
+        app.SeedQuestLedger(statedLevel: (30, DateTime.Now.AddHours(-1)));
+        app.Launch();
+
+        app.WaitForDump("shellPage", "home", "the shell to land on the Character room");
+        app.WaitForDump("shellHomeLevelBox", "1", "the review hook to open the level editor");
+        // **And the box holds the standing statement**, which is a different claim from "a box
+        // was built". The first staged shot of this state came back EMPTY while a player
+        // clicking the same link got theirs pre-filled — a picture of a real state of
+        // something else (trap 23), caught by the prediction written before the run rather
+        // than by anything that could fail. The hook and the click now share one opener, and
+        // this is the row that says so from outside.
+        Assert.Equal("30", app.DumpText("shellHomeLevelDraft"));
+
+        // Opening it changes nothing about what the room DECIDED — the line still names the
+        // same level from the same source, and nothing has been refused.
+        Assert.Equal(30, app.DumpValue("shellHomeLevel"));
+        Assert.Equal("stated", app.DumpText("shellHomeLevelSource"));
+        Assert.Equal(0, app.DumpValue("shellHomeLevelRefused"));
+        // The three blocks are still three: an editor is inside Identity, not a fourth block.
+        Assert.Equal(3, app.DumpValue("shellHomeBlocks"));
+    }
 }

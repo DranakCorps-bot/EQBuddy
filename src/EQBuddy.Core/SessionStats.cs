@@ -1944,6 +1944,7 @@ public sealed partial class SessionStats
                 AaPerHour = _aaGained / hours,
                 Levels = _levels.Select(l => new TimedDetail(l.Time, $"Level {l.Level}")).ToList(),
                 LastLevel = _levels.Count > 0 ? _levels[^1].Level : null,
+                LastLevelAt = _levels.Count > 0 ? _levels[^1].Time : null,
                 SkillUps = _skills.OrderByDescending(kv => kv.Value.Ups)
                     .Select(kv => new SkillDetail(kv.Key, kv.Value.Ups, kv.Value.Value)).ToList(),
                 SkillUpTotal = _skills.Values.Sum(v => v.Ups),
@@ -2247,6 +2248,12 @@ public sealed class StatsSnapshot
     /// <summary>The latest level-up the ingest saw ("Welcome to level N!"), null when
     /// none — the level-unlock views key off the number, not the display text.</summary>
     public int? LastLevel { get; init; }
+    /// <summary>When that ding was announced — <b>the LOG's own timestamp</b>, not the
+    /// moment the tail read it. Beside <see cref="LastLevel"/> and produced in the same
+    /// statement, so "which level" and "when" describe one moment (trap 56); the ledger
+    /// stamps its stored level with this, and <c>CharacterLevel.Resolve</c> weighs that
+    /// stamp against the player's own. Null whenever <see cref="LastLevel"/> is.</summary>
+    public DateTime? LastLevelAt { get; init; }
     public List<SkillDetail> SkillUps { get; init; } = [];
     public int SkillUpTotal { get; init; }
     public List<FactionDetail> Faction { get; init; } = [];
