@@ -821,6 +821,85 @@ $Shots = [ordered]@{
     #     not the shot — and never a horizontal scrollbar, which hides a layout failure
     #     behind an affordance.
     #
+    # ---- DRA-71 D2: the nine chips became ONE DROPDOWN --------------------------------
+    #
+    # **The three predictions above are now the state they were written in, not a claim about
+    # today.** The Founder smoked the D1 shots and called the chip strip flat checkbox soup, so
+    # the nine goals moved inside an EqMultiPicker. Every "WRAPPED strip of NINE chips" line
+    # above described what shipped in D1 and is left standing rather than rewritten — a
+    # prediction edited after the fact is a prediction nobody made. What the three shots show
+    # NOW, re-predicted before re-running them:
+    #
+    #   'shell-helper' / 'shell-helper-narrow' — where the nine pills were, ONE button reading
+    #     "Any goal", left-aligned under the same dim sentence ("Pick what you are working
+    #     toward…"), which now reads as a caption for a control rather than as an explanation
+    #     of an off-state. The Work on Faction block below it likewise becomes a face, and with
+    #     no dump it is still its dim sentence and its ⧉. Everything under "Worth doing next" is
+    #     UNCHANGED — same recommendation, same why-lines, same doors, same FOUR ⧉ — because
+    #     nothing about what the room decides moved in this slice. **The narrow shot's whole
+    #     original job is retired by this change and that is worth saying out loud**: there is no
+    #     strip left to wrap, so trap 25 cannot fire here any more. It is kept because "the room
+    #     still reads at the floor width" is a different question that still has an answer.
+    #   'shell-helper-picker' — the state the button hides, and the only picture in which D2 is
+    #     visible at all. The face reads "Any goal"; under it an open popup on PopupBrush with a
+    #     hairline border and card corners, holding NINE check rows in the Founder's order —
+    #     Level Up · Farm Gear · Unlock Classes · Unlock Races · Farm Motes · Work on Faction ·
+    #     Farm Materials · Make Money · Achievements — NONE ticked. The popup must sit BELOW the
+    #     face and overlap the answers rather than push them down; anything that reflows the room
+    #     when the picker opens means the popup was laid out inline, which is the one way this
+    #     control can be wrong and still work.
+    #   'shell-helper-picker-light' — the same popup in SOLARIZED, the only light palette, with
+    #     Level Up and Work on Faction ticked and the face reading "Level Up · Work on Faction"
+    #     (26 characters, inside the 34 the room budgets). **This is the shot most likely to
+    #     disprove something.** The popup's chrome is four theme brushes and its rows are
+    #     DesignSystem.Text at Role.Body; a control that reads fine on a dark ground and turns
+    #     into grey-on-cream here is a real defect that every assertion in this repo passes
+    #     (trap 31). Check the check-box glyphs too — they are WPF's own and are the one part of
+    #     this popup the design system does not paint.
+    #
+    #   **WHAT ACTUALLY HAPPENED, and it took three takes to get a reviewable picture.**
+    #     SHOT 2026-09-13, 946x633. The room and the popup are as predicted — face "Any goal",
+    #     nine rows in the Founder's order, none ticked, the popup OVERLAPPING the answers
+    #     rather than reflowing them; and on the light shot the face reads "Level Up · Work on
+    #     Faction" with two rows ticked. Getting there disproved two things:
+    #       (a) **The first take of 'shell-helper-picker' was BYTE-IDENTICAL to
+    #           'shell-helper'.** A WPF Popup is its own top-level HWND, so PrintWindow on the
+    #           owner renders everything except the dropdown the shot is about. Nothing in the
+    #           picture said so — it is a correct, well-composed photograph of a button — and
+    #           only `md5sum` on the two files caught it. Fixed in `shot.ps1` (-WithPopups).
+    #           **A screen grab was tried first and reverted twice**: take two had the
+    #           always-on-top widget across the left half of the room, take three had an
+    #           unrelated application on this machine's desktop in it. That is the failure
+    #           PrintWindow exists to prevent, arriving by the door marked "just this once".
+    #       (b) **The Solarized shot then showed a hard BLACK hairline round the popup** that
+    #           appears nowhere else in that palette. It is not a product defect and it is not
+    #           the theme: Solarized's `BorderBrush` is `#66586E75`, 40% alpha, and a popup's
+    #           TRANSLUCENT pixels composite against the fresh (transparent-black) bitmap it
+    #           is rendered into. A real state of the CAPTURE, photographed as if it were a
+    #           state of the app — trap 23 one layer further out than usual.
+    #           **CAVEAT, and it stays a caveat: this is NOT fixed.** Seeding the popup's
+    #           bitmap with the pixels behind it was tried and changed nothing, because
+    #           PrintWindow overwrites the DC rather than blending into it — so the
+    #           translucent edge cannot be recovered. *In both picker shots, the popup's 1px
+    #           outline is darker than the app draws it; everything INSIDE the popup is
+    #           faithful.* Do not read the hairline as a palette decision, and if a future
+    #           popup shot shows a border darker than its theme's value, suspect the capture
+    #           before the theme.
+    #
+    #   AND THE REGRESSION PICTURE IS 'quest-tracker', which needs no new shot and no new
+    #     prediction: the class lens moved onto the same primitive in this slice, so that
+    #     window's filter row must look EXACTLY as it did — era combo, state combo, the class
+    #     face, then the mode strip, all on one row that does not wrap. The whole acceptance bar
+    #     for the migration is "identical", and a shot that already exists is the cheapest way
+    #     to check it. Re-run it.
+    #     SHOT 2026-09-13: the row is intact and unchanged. **One prediction was wrong and is
+    #     corrected here rather than quietly:** it said the face would read "Bard". It reads
+    #     "Any class", because this row passes no `Ledger` and `Write-Ledger $null` DELETES
+    #     quest-ledger.json — the Bard seeding belongs to the v1-import staging, not to the
+    #     shared fixture. The "Warrior (inferred from your log)" line in the detail pane is
+    #     class INFERENCE, which is a different producer from the picker (trap 4's two-sources
+    #     shape, and the picture is where the two are easiest to confuse).
+    #
     # ---- E-3 PR 5: the LIVE room, and the Raids move ---------------------------------
     #
     # Same illustration lock: a room's shot lands in the PR that lands the room, exactly the
@@ -1070,6 +1149,28 @@ $Shots = [ordered]@{
     'shell-helper-narrow' = @{ Title = 'EQBuddy — Helper'
                            Env = @{ EQBUDDY_SHELL = 'helper'; EQBUDDY_SHELL_SIZE = '580x480' }
                            Set = @{} }
+    # DRA-71 D2: the goal picker OPEN. A dropdown that is shut photographs as a button, so
+    # without this hook the slice's whole player-visible change is a picture of a rectangle
+    # reading "Any goal" (trap 22). EQBUDDY_HELPER_PICKER is the room's own review hook and is
+    # unset in every shipping run; `helperPickerOpen` in the E2E is the assertion that it is
+    # wired to the control rather than merely spelled correctly.
+    'shell-helper-picker' = @{ Title = 'EQBuddy — Helper'
+                           Env = @{ EQBUDDY_SHELL = 'helper'; EQBUDDY_HELPER_PICKER = 'goals' }
+                           Popups = $true; Set = @{} }
+    # The same open picker with two already ticked, in SOLARIZED — the only light palette, and
+    # the one a popup drawn from theme brushes is most likely to get wrong. A dropdown that
+    # inherits a dark panel's ink onto a light ground is unreadable and passes every assertion
+    # in this repo (trap 31: a capture surface pins its own theme).
+    # The theme rides `Set`, which is the only per-shot override Write-Settings honours — the
+    # -Theme PARAMETER is batch-wide, and a shot that needed the whole batch re-run in another
+    # palette to be reviewable is a shot nobody re-runs.
+    'shell-helper-picker-light' = @{ Title = 'EQBuddy — Helper'
+                           Env = @{ EQBUDDY_SHELL = 'helper'; EQBUDDY_HELPER_PICKER = 'goals' }
+                           Popups = $true
+                           Set = @{
+                               Theme = 'Solarized'
+                               HelperGoals = @{ 'testchar_test' = @('LevelUp', 'WorkOnFaction') }
+                           } }
     # The picked state, staged through the real seams: a faction dump beside the log (the
     # finder's own filename shape, class code and all) and kills in the log that MOVE that
     # faction, so the movers come out of the real pool rather than out of a fixture. The
@@ -3644,7 +3745,20 @@ try {
         # Unconditional and before the early return, for trap 51's own reason — a shot with
         # no Prime of its own must not inherit the last shot's archive either.
         Remove-Item (Join-Path $profileDir 'history.db*') -Force -ErrorAction SilentlyContinue
-        Write-Settings $spec.Set
+        # A `Popups` shot composites every EMPTY-TITLED window of this process that overlaps
+        # the room (shot.ps1 -WithPopups). The widget's own chip-row and peek windows are
+        # empty-titled too, and the batch parks the widget at the same origin as the shell —
+        # so this moves it clear rather than teaching the compositor to tell one process's
+        # popups apart from another of its own windows' popups, which it cannot do.
+        $set = if ($spec.Set) { $spec.Set.Clone() } else { @{} }
+        if ($spec.Popups) {
+            $o = Get-EqShotOrigin
+            # Far enough right that it clears the widest shell shot (946 wide) with room to
+            # spare, and level with it so it stays on the same monitor.
+            $set['WindowLeft'] = [int]($o.Left + 1100)
+            $set['WindowTop']  = [int]$o.Top
+        }
+        Write-Settings $set
         Write-Ledger $spec.Ledger
         Write-Raids $spec.Raids
         Write-Dump $spec.Dump
@@ -3796,7 +3910,12 @@ try {
             # -OwnerPid, so a previous shot's app that is still exiting cannot be
             # photographed under this shot's name: four Progress-theme shots share the
             # title 'EQBuddy Progress', and a title is not an identity.
-            & (Join-Path $PSScriptRoot 'shot.ps1') -TitleLike $spec.Title -Out $png -OwnerPid $proc.Id | Write-Host
+            # `Popups = $true` on a row whose SUBJECT is a dropdown: a WPF Popup is its
+            # own top-level HWND and PrintWindow on the owner cannot see it, so shot.ps1
+            # renders the popups separately and composites them (see its -WithPopups). Still
+            # occlusion-proof — this is NOT a screen grab.
+            & (Join-Path $PSScriptRoot 'shot.ps1') -TitleLike $spec.Title -Out $png `
+                -OwnerPid $proc.Id -WithPopups:([bool]$spec.Popups) | Write-Host
             $taken += $png
         }
         finally {

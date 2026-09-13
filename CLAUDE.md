@@ -527,7 +527,7 @@ they live on `legacy-v1`.)
 | Quest surface (all four tabs) | `EQBuddy/QuestsView.xaml.cs`. `QuestsWindow` is a thin host; `QuestsRoom` is the shell's **Guide** room (label only — the wire key is still `quests`). **Both build their own instance** |
 | What the widget's right-click menu shows minimized | `UI.Shared/WidgetMenuPolicy.cs` — the ≤4 lock. `Tag="expanded"` in `MainWindow.xaml` hides the rest; `WidgetMenuTests` reads the XAML against the list |
 | The Evolved shell | `EQBuddy/ShellWindow.xaml.cs` + one `*Room.cs` per room; `UI.Shared/ShellPages.cs`, `ShellLayout.cs`. Player door: widget context-menu `Guide…` through `ShellHost.OpenGuideDoor` (opens the Guide room, and recovers a shell the ✕ took); `EQBUDDY_SHELL` is the review hook |
-| "What should I do next?" | `Core/Recommendations.cs` — the ONE cross-domain ranker (PRD §12 HOME-001..006, DRA-70). Nine Founder goals, `ShapeFor` is the must-list; **the join key is the ZONE**, so a place serving two selected goals outranks either alone. Top 3, and the cap says so. Every why-line is a typed `WhyFact` record tagged `Personal` or `Catalog` — **the WORDS are `UI.Shared/HelperPresentation.cs`**, which is where HOME-006's ban (nothing may call a camp safe, easy or survivable) can be swept. A faction sentence is `UnlockGuidance.Faction`'s own, passed through, never re-phrased. Drawn by `EQBuddy/HelperRoom.cs`; picks persist per character (`AppSettings.HelperGoals`/`HelperFactions` through `HelperGoalStore`) |
+| "What should I do next?" | `Core/Recommendations.cs` — the ONE cross-domain ranker (PRD §12 HOME-001..006, DRA-70). Nine Founder goals, `ShapeFor` is the must-list; **the join key is the ZONE**, so a place serving two selected goals outranks either alone. Top 3, and the cap says so. Every why-line is a typed `WhyFact` record tagged `Personal` or `Catalog` — **the WORDS are `UI.Shared/HelperPresentation.cs`**, which is where HOME-006's ban (nothing may call a camp safe, easy or survivable) can be swept. A faction sentence is `UnlockGuidance.Faction`'s own, passed through, never re-phrased. Drawn by `EQBuddy/HelperRoom.cs`; picks persist per character (`AppSettings.HelperGoals`/`HelperFactions` through `HelperGoalStore`). **The goals are ONE dropdown, not nine chips** (DRA-71 D2, Founder smoke 1) — `EqMultiPicker`, with the faction sub-picker a second face that appears only once its goal is picked |
 | Per-zone all-time evidence | `Core/ZoneHistory.cs` — ONE fold, two sources, and the split is the design: time/XP/coin/deaths from `SessionRepository` rows (attributed to `PrimaryZone`, so a rate always travels with its session count), kills and fight length from `MobHistory.Pool` (keyed on the real kill zone). Under `MinHours` it reports NO rate |
 | Auto-ticking Epic/Sky from loot, achievements import | `EQBuddy/QuestChecklistView.cs` |
 | Desktop World theme | `EQBuddy/WorldWindow.xaml.cs` |
@@ -536,6 +536,7 @@ they live on `legacy-v1`.)
 | Type roles, spacing, radii, control sizes | `UI.Shared/DesignTokens.cs` |
 | Icon geometry | `UI.Shared/IconPaths.cs` — vectors, never glyphs |
 | The selectable pill | `UI.Shared/ChipStyle.cs` + `EqChip`/`EqSegmentedStrip`. **Never hand-build another one** |
+| The multi-select dropdown | `DesignSystem.EqMultiPicker` (face + themed popup of check rows) + `UI.Shared/PickerFace.cs` for what the face SAYS. **Never hand-build another one** — the sibling of the chip rule, and the quest class lens was migrated onto it in the slice that added it so the sentence starts out true. The cap is a WIDTH as well as a count (#184); `ClassFilterLabel` is now just the class picker's noun. Guard: `MultiSelectPickerTests` — a forbid-scan over every shipped `.xaml` with a committed negative that proves it fires (trap 78), PAIRED with a curated must-list of the surfaces that HAVE a multi-select (trap 34) |
 | What a Loot surface shows | `UI.Shared/LootPresentation.cs` |
 | What a quest row's badge and state rule say | `UI.Shared/QuestPresentation.cs` |
 | What a player can DO about an unlock requirement | `Core/UnlockGuidance.cs` — one already-worded sentence per fact, three shapes and no fourth: own-kill faction movers + a kills-to-go estimate, the Sky checklist's piece count, a catalog-matched Task door. `ShapeFor` decides for every `UnlockNeed` and answers **null** for undecided (trap 34's must-list). **It never moves a tick** — an unlock is the game's answer, and "pieces in your bags" is not "obtained" (trap 4). A faction nobody has farmed draws nothing (trap 73). `UnlockLayout.Groups` emits one row per actionable criterion IN ORDER, which is how a surface pairs a row with its criterion |
@@ -947,6 +948,26 @@ after the named guard left with its surface.
     it**: trap 34 is a guard aimed at the wrong thing, this is a guard
     aimed at nothing, and only the second one is green.
     [Novel](docs/ops/claude-archive/traps.md#trap-78)
+
+79. **A WPF `Popup` is its own top-level HWND, so `PrintWindow` renders
+    everything EXCEPT the dropdown the shot is about.** The staged
+    `shell-helper-picker` came back BYTE-IDENTICAL to the closed shot — a
+    correct, well-composed photograph of a button — and only `md5sum` on the
+    two files said so. `shot.ps1 -WithPopups` composites the owner process's
+    visible EMPTY-TITLED windows that intersect the region (the title clause
+    is what stops it swallowing a sibling — trap 24 from the other side), and
+    WARNS when it finds none. **A screen grab is not the fix**: it was tried
+    and reverted twice in twenty minutes — the always-on-top widget, then an
+    unrelated app — which is the failure `PrintWindow` exists to prevent. The
+    screen lock reserves the screen against other HARNESSES, not against the
+    machine. **And a translucent surface is only as honest as what you
+    allocated under it:** the popup's 40%-alpha border composited onto a fresh
+    (transparent-black) bitmap read as a Solarized contrast defect. That half is
+    NOT fixed and ships as a stated caveat — `PrintWindow` overwrites the DC
+    rather than blending, so pre-seeding the bitmap changes nothing. **Say which
+    part of a capture is unfaithful; do not restyle the product until the camera
+    agrees.** If a captured border is darker than its palette value, suspect the
+    capture before the theme. [Novel](docs/ops/claude-archive/traps.md#trap-79)
 
 New trap discovered the hard way? Add the compact rule here and the novel
 under `docs/ops/claude-archive/traps.md`. That is the whole point.

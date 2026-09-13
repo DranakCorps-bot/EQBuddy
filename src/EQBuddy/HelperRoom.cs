@@ -29,13 +29,21 @@ namespace EQBuddy;
 /// by the hub getting its own row one line down. The alternative was named for Helm's veto in
 /// the plan and Helm KEPT the room.</para>
 ///
-/// <para><b>THE CHIPS ARE THE FOUNDER'S NINE, VERBATIM</b>, and five of them say they are not
+/// <para><b>THE GOALS ARE THE FOUNDER'S NINE, VERBATIM</b>, and five of them say they are not
 /// answered yet. That is deliberate rather than unfinished: the list is what he wrote down,
-/// a chip that vanished until its engine landed would make the feature look smaller than the
-/// plan it is executing, and each deferred chip hands over the door to the room that answers
-/// its question TODAY. A chip that produced one apologetic sentence and pointed nowhere would
+/// a goal that vanished until its engine landed would make the feature look smaller than the
+/// plan it is executing, and each deferred one hands over the door to the room that answers
+/// its question TODAY. A goal that produced one apologetic sentence and pointed nowhere would
 /// be the rail's own forbidden shape — <i>"an affordance that opens nothing is a trap"</i> —
 /// reappearing one level in, where the rail's guard cannot see it.</para>
+///
+/// <para><b>THEY ARE ONE DROPDOWN SINCE DRA-71 D2, NOT NINE CHIPS.</b> D1 drew them as a
+/// <c>WrapPanel</c> of <see cref="EqChip"/>s, and the Founder smoked it and called the result
+/// flat checkbox soup — nine pills the player has to read before they can do anything, with
+/// every sub-picker a later slice adds widening the same wall. So the nine are rows inside one
+/// <see cref="EqMultiPicker"/> and the faction sub-picker is a second face that exists only
+/// once its goal is picked. Nothing about what the room DECIDES moved: the same nine, the same
+/// per-character store, the same empty-means-all.</para>
 ///
 /// <para><b>NO WORD ON THIS SURFACE IS WRITTEN HERE.</b> Every sentence comes from
 /// <see cref="HelperPresentation"/>, which is where HOME-006's vocabulary ban can be swept:
@@ -46,7 +54,7 @@ namespace EQBuddy;
 /// <para><b>Trap 72 is the failure this room is most likely to have shipped.</b> The Quests
 /// tab spent a session drawing the moment before because its repaint signature carried every
 /// store except the two the feature wrote. The Helper reads seven stores and writes two, so
-/// <see cref="Render"/>'s fingerprint folds every one of them — including the chip selection
+/// <see cref="Render"/>'s fingerprint folds every one of them — including the goal selection
 /// and the faction picks, which are the two a click changes — and a click repaints
 /// immediately rather than waiting for the next tick.</para>
 /// </summary>
@@ -87,7 +95,31 @@ internal sealed class HelperRoom : Grid, IShellRoom
     /// body, which throws away scroll position and whatever the pointer was over.</summary>
     private string _painted = "";
 
+    /// <summary>
+    /// The screenshot hook for the one state this room's own controls cannot photograph.
+    ///
+    /// <para>A dropdown that is SHUT looks like a button, so a shot of the Helper says nothing
+    /// about the nine rows behind the face — which is precisely trap 22: a surface with no
+    /// fixture state cannot be reviewed, and a surface nobody can review reads as reviewed
+    /// anyway. <c>EQBUDDY_HELPER_PICKER=goals</c> opens the goals picker; <c>=factions</c> opens
+    /// the sub-picker. Same family as <c>EQBUDDY_SHELL</c> and the sixteen hooks in
+    /// <see cref="DebugHooks"/>, and like all of them it is unset in every shipping run — see
+    /// <see cref="OpenForReview"/> for why it re-arms on each rebuild rather than firing
+    /// once.</para>
+    /// </summary>
+    private readonly string _openPicker =
+        Environment.GetEnvironmentVariable("EQBUDDY_HELPER_PICKER") ?? "";
+    /// <summary>Whether the hook above actually FOUND the picker it names. Reported in the
+    /// dump beside <c>helperPickerOpen</c> so a staged shot that comes back shut can say which
+    /// half failed: a hook nobody read, or a popup that would not open. "The environment says
+    /// goals" and "the room found a goals picker" are different claims.</summary>
+    private bool _reviewHookArmed;
+
     // ---- what the dump reports, all captured during one Build ------------------------
+    private EqMultiPicker? _goalPicker;
+    private EqMultiPicker? _factionPicker;
+    private string _goalFace = "";
+    private string _factionFace = "";
     private int _goalChips;
     private int _factionChips;
     private int _whyLines;
@@ -112,7 +144,7 @@ internal sealed class HelperRoom : Grid, IShellRoom
         Children.Add(_scroll);
     }
 
-    /// <summary>The Helper has no rooms inside it — goals are chips, not tabs, which is
+    /// <summary>The Helper has no rooms inside it — goals are a filter, not tabs, which is
     /// HOME-001's own wording (<i>"goals/filters rather than a permanent wall of
     /// sections"</i>). A tab strip would make nine goals nine destinations, and the whole
     /// point is that they are weighed together. An address's room half is left alone rather
@@ -161,7 +193,7 @@ internal sealed class HelperRoom : Grid, IShellRoom
         // **THE FINGERPRINT, AND EVERY STORE THIS ROOM READS IS IN IT** (trap 72: the Quests
         // tab drew the moment before for a whole session because its signature carried
         // everything except the two lists the feature wrote). The two the player can change
-        // with a click — the goal chips and the faction picks — are folded by CONTENT and not
+        // with a click — the goal picks and the faction picks — are folded by CONTENT and not
         // by count, because a swap leaves a count unmoved. Nothing here ticks on the clock
         // (trap 8): no countdown, no age, no "x ago", so an idle room costs one string
         // compare per second and not a torn-down visual tree.
@@ -211,6 +243,10 @@ internal sealed class HelperRoom : Grid, IShellRoom
         IReadOnlyList<HelperGoal> goals, IReadOnlyList<string> factions, UnlockSource unlocks)
     {
         _blocks.Children.Clear();
+        _goalPicker = null;
+        _factionPicker = null;
+        _goalFace = "";
+        _factionFace = "";
         _goalChips = 0;
         _factionChips = 0;
         _whyLines = 0;
@@ -232,28 +268,74 @@ internal sealed class HelperRoom : Grid, IShellRoom
         if (goals.Count == 0 || goals.Contains(HelperGoal.WorkOnFaction))
             BuildFactionPicker(factions, unlocks);
         BuildAnswers();
+        OpenForReview();
     }
 
+    /// <summary>
+    /// See <see cref="_openPicker"/>. A popup needs its face in a rendered tree before it can
+    /// place itself, so this waits for the layout pass the Build it follows will cause.
+    ///
+    /// <para><b>It re-opens after EVERY rebuild, and the first version of it did not — which is
+    /// why this comment exists.</b> <see cref="Build"/> throws away every control and makes new
+    /// ones, so a hook that fired once opened a picker that a rebuild moments later had already
+    /// replaced: the dump said shut, the shot would have photographed shut, and the hook would
+    /// have looked spelled-correctly-and-wired-to-nothing. Nothing here reaches a player —
+    /// <c>EQBUDDY_HELPER_PICKER</c> is unset in every shipping run — so "staged open" is a state
+    /// the room holds for as long as the hook asks for it, rather than an event it fires
+    /// once.</para>
+    /// </summary>
+    private void OpenForReview()
+    {
+        if (_openPicker.Length == 0) return;
+        var picker = _openPicker switch
+        {
+            "goals" => _goalPicker,
+            "factions" => _factionPicker,
+            _ => null,
+        };
+        if (picker is null) return;
+        _reviewHookArmed = true;
+        Dispatcher.BeginInvoke(picker.Open,
+            System.Windows.Threading.DispatcherPriority.ApplicationIdle);
+    }
+
+    /// <summary>
+    /// The goals, as ONE dropdown face (DRA-71 D2, plan P2; Founder smoke item 1).
+    ///
+    /// <para>D1 drew nine <see cref="EqChip"/>s in a <c>WrapPanel</c> — the "flat checkbox
+    /// soup" the Founder named when he smoked it. Nine pills is a wall the player has to read
+    /// before they can do anything, and every sub-picker a later slice adds (worn items, unlock
+    /// subjects, professions) would have widened that wall. So the nine become rows inside one
+    /// <see cref="EqMultiPicker"/>, the face says what is picked, and the room's first line is
+    /// a decision rather than an inventory.</para>
+    ///
+    /// <para><b>The face gets a roomier budget than the class lens, and that is a measured
+    /// difference rather than an opt-out.</b> <see cref="PickerFace.MaxChars"/> is 16 because
+    /// the quest window's face SHARES its row with the era, state and mode strips — #184 was
+    /// that row running out. This face owns its own row in a column of
+    /// <see cref="ShellLayoutPolicy.MinRoomWidth"/>, so it can hold two of the longest goal
+    /// names ("Work on Faction · Farm Materials" is 32) and still counts past that.</para>
+    ///
+    /// <para>Empty means all of them, unchanged and still said out loud above the face —
+    /// "Any goal" is the same sentence in the control's own words.</para>
+    /// </summary>
     private void BuildGoals(IReadOnlyList<HelperGoal> goals)
     {
         var block = Block(HelperPresentation.GoalsHeading);
         block.Children.Add(Line(HelperPresentation.GoalStripNote, Role.BodySecondary));
 
-        // A WrapPanel, never a horizontal StackPanel: nine chips at the room's floor width is
-        // the canonical trap-25 strip, and a stack measures with infinite width in its
-        // stacking direction, so the tail would be cut with no ellipsis and no error.
-        var wrap = new WrapPanel { Margin = new Thickness(0, Tok.SpaceS, 0, 0) };
-        foreach (var goal in Recommendations.All)
-        {
-            var chip = new EqChip(
-                HelperPresentation.GoalLabel(goal), goal,
-                tip: HelperPresentation.GoalTip(goal),
-                onClick: () => ToggleGoal(goal));
-            chip.SetSelected(goals.Contains(goal));
-            wrap.Children.Add(chip);
-            _goalChips++;
-        }
-        block.Children.Add(wrap);
+        var picker = new EqMultiPicker(key => ToggleGoal((HelperGoal)key),
+            tip: HelperPresentation.GoalPickerTip);
+        picker.SetRows([.. Recommendations.All.Select(goal => new PickerRow(
+            goal, HelperPresentation.GoalLabel(goal), goals.Contains(goal),
+            HelperPresentation.GoalTip(goal)))]);
+        picker.SetFace(HelperPresentation.GoalFace(goals));
+        picker.Host.Margin = new Thickness(0, Tok.SpaceS, 0, 0);
+        block.Children.Add(picker.Host);
+
+        _goalChips = picker.RowCount;
+        _goalFace = (string)picker.Face.Content;
+        _goalPicker = picker;
     }
 
     private void ToggleGoal(HelperGoal goal)
@@ -272,6 +354,12 @@ internal sealed class HelperRoom : Grid, IShellRoom
     /// standings and weighing all of them is the thirty weak answers HOME-002 asks for the
     /// opposite of. The list is capped and the cap says so, with a door to the room that has
     /// every one of them (trap 50).</para>
+    ///
+    /// <para><b>A SECONDARY <see cref="EqMultiPicker"/> since DRA-71 D2</b>, and it is drawn on
+    /// exactly the condition it always was — only while its goal is picked (or while nothing is,
+    /// which weighs everything). That is the plan's answer to checkbox soup in full: one face
+    /// per decision, and the second face only exists once the first one has been made. The chips
+    /// it used to draw were the same list without the fold.</para>
     /// </summary>
     private void BuildFactionPicker(IReadOnlyList<string> picked, UnlockSource unlocks)
     {
@@ -305,18 +393,23 @@ internal sealed class HelperRoom : Grid, IShellRoom
                     f.Name.Equals(name, StringComparison.OrdinalIgnoreCase)) is { } extra)
                 shown.Add(extra);
 
-        var wrap = new WrapPanel { Margin = new Thickness(0, Tok.SpaceS, 0, 0) };
-        foreach (var standing in shown)
-        {
-            var name = standing.Name;
-            var chip = new EqChip(
-                HelperPresentation.FactionChip(standing), name,
-                onClick: () => ToggleFaction(name));
-            chip.SetSelected(picked.Contains(name, StringComparer.OrdinalIgnoreCase));
-            wrap.Children.Add(chip);
-            _factionChips++;
-        }
-        block.Children.Add(wrap);
+        var picker = new EqMultiPicker(key => ToggleFaction((string)key),
+            tip: HelperPresentation.FactionPickerTip);
+        picker.SetRows([.. shown.Select(standing => new PickerRow(
+            standing.Name, HelperPresentation.FactionChip(standing),
+            picked.Contains(standing.Name, StringComparer.OrdinalIgnoreCase)))]);
+        // The offer is CAPPED, so the face is told nothing about "all of them": a player who
+        // ticked every row it shows has not picked every faction they have, and "All factions"
+        // would be the picker saying something the cap note directly below contradicts.
+        picker.SetFace(HelperPresentation.FactionFace(
+            [.. shown.Where(f => picked.Contains(f.Name, StringComparer.OrdinalIgnoreCase))
+                .Select(f => f.Name)]));
+        picker.Host.Margin = new Thickness(0, Tok.SpaceS, 0, 0);
+        block.Children.Add(picker.Host);
+
+        _factionChips = picker.RowCount;
+        _factionFace = (string)picker.Face.Content;
+        _factionPicker = picker;
 
         if (HelperPresentation.FactionPickerCapNote(offered.Count - shown.Count)
             is { Length: > 0 } cap)
@@ -538,8 +631,22 @@ internal sealed class HelperRoom : Grid, IShellRoom
     public string DebugFacts() =>
         $"helperEmpty={(_empty ? 1 : 0)} " +
         $"helperGoals={string.Join(',', HelperGoalStore.Goals(_main.Settings, _main.QuestCharacterKey))} " +
+        // The goal ROWS the picker holds — still nine, still a trap-29 assertion: the rows
+        // moved inside a popup in D2 and a room that built the face and no list would
+        // photograph as a perfectly ordinary button. The key keeps its D1 name because it
+        // keeps its D1 MEANING ("how many goals this room offers"); renaming it would cost the
+        // E2E row that has asserted the Founder's nine since the room landed.
         $"helperChips={_goalChips} " +
         $"helperFactionChips={_factionChips} " +
+        // What the FACE says — the whole of D2's player-visible change in one string, and the
+        // only fact that can tell a capped face from a wrong one. Spaces are dropped because
+        // the dump is one flat namespace (trap 58), so "2 goals" reads as "2goals".
+        $"helperGoalFace={_goalFace.Replace(" ", "")} " +
+        $"helperFactionFace={_factionFace.Replace(" ", "")} " +
+        // Whether a popup is OPEN. The staged state the shot photographs, and the assertion
+        // that the review hook armed the control rather than merely being spelled correctly.
+        $"helperPickerOpen={((_goalPicker?.IsOpen ?? false) || (_factionPicker?.IsOpen ?? false) ? 1 : 0)} " +
+        $"helperPickerHook={(_reviewHookArmed ? 1 : 0)} " +
         // What the ENGINE answered.
         $"helperRecs={_answers.Top.Count} " +
         $"helperWithheld={_answers.Withheld} " +

@@ -15,20 +15,24 @@ namespace EQBuddy.UI.Shared;
 ///
 /// So the label is capped. Past <see cref="MaxNamed"/> it counts instead of listing,
 /// because a list you cannot read is worth less than a number you can.
+///
+/// <para><b>THE RULE ITSELF MOVED TO <see cref="PickerFace"/> (DRA-71 D2).</b> This file
+/// is now the class picker's NOUN and nothing else. The Helper's goals and factions are
+/// the same control with different words, and #184's lesson re-typed per surface is a
+/// lesson that holds on some of them — so the arithmetic is shared and this is where the
+/// class-shaped facts live: the noun, the abbreviations, and the fact that sixteen is all
+/// of them. Behaviour is unchanged in every case
+/// <c>ClassFilterLabelTests</c> pins, which is the point of moving it this way.</para>
 /// </summary>
 public static class ClassFilterLabel
 {
     /// <summary>How many classes are spelled out before the label counts instead.
     /// Three is Legends' own limit on active classes, so a real character always
     /// sees its own classes named.</summary>
-    public const int MaxNamed = 3;
+    public const int MaxNamed = PickerFace.MaxNamed;
 
-    public static string For(IReadOnlyList<string> selected) => selected.Count switch
-    {
-        0 => "Any class",
-        1 => selected[0],
-        _ when selected.Count >= QuestClassFilter.Classes.Length => "All classes",
-        <= MaxNamed => string.Join(" · ", selected.Select(QuestClassFilter.Abbrev)),
-        _ => $"{selected.Count} classes",
-    };
+    public static string For(IReadOnlyList<string> selected) => PickerFace.For(
+        selected, "class", "classes",
+        offered: QuestClassFilter.Classes.Length,
+        abbreviate: QuestClassFilter.Abbrev);
 }

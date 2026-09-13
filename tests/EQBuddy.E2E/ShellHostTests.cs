@@ -1774,6 +1774,15 @@ public class ShellHostTests
         Assert.Equal(ShellPages.Landed.Count, app.DumpValue("shellRail"));
         Assert.Equal(9, app.DumpValue("helperChips"));
 
+        // DRA-71 D2: the nine moved INSIDE a dropdown, and the count above is now a claim
+        // about rows nobody can see until the face is clicked. The face is the second claim,
+        // and it is the one a player reads — "Any goal" is the empty state saying, in the
+        // control's own words, that EQBuddy is weighing all nine.
+        Assert.Equal("Anygoal", app.DumpText("helperGoalFace"));
+        // Shut until something opens it. A dropdown that arrived open would cover the answers
+        // this room exists to draw.
+        Assert.Equal(0, app.DumpValue("helperPickerOpen"));
+
         // Nothing picked is the "weigh everything" state, so the five deferred goals all say
         // so and the answerable ones name what they are missing.
         Assert.Equal("", app.DumpText("helperGoals"));
@@ -1850,6 +1859,10 @@ public class ShellHostTests
 
         Assert.True(app.DumpValue("helperFactionChips") > 0,
             $"the staged faction dump was not seen; dump was: {app.Artifacts()}");
+        // The sub-picker exists and nothing in it is ticked, which is exactly the state the
+        // gap line below is about. A face reading anything else here would mean the room drew
+        // a pick the engine then said it did not have (trap 4, one control apart).
+        Assert.Equal("Anyfaction", app.DumpText("helperFactionFace"));
         Assert.Equal(1, app.DumpValue("helperGaps"));
         Assert.Equal(0, app.DumpValue("helperRecs"));
         // Only one chip is on, so the deferred goals are silent — a filter that still reported
@@ -1884,10 +1897,80 @@ public class ShellHostTests
             $"{nameof(HelperGoal.LevelUp)},{nameof(HelperGoal.FarmGear)}",
             "the stored selection to come back in the Founder's order");
 
+        // And the FACE says both of them — the store's claim and the screen's claim from one
+        // moment (trap 56). "The setting holds two goals" and "the player can see which two"
+        // are different claims, and D2's whole player-visible change is the second one.
+        Assert.Equal("LevelUp·FarmGear", app.DumpText("helperGoalFace"));
+
         // Farm Gear is deferred, so it says so and points at the room that answers it today;
         // Level Up is answered and names what it is waiting for. Exactly one of each.
         Assert.Equal(1, app.DumpValue("helperNotYet"));
         Assert.Equal(1, app.DumpValue("helperGaps"));
         Assert.Equal(0, app.DumpValue("helperDeadDoors"));
+    }
+
+    /// <summary>
+    /// **THE FACE COUNTS INSTEAD OF LISTING ONCE THE NAMES STOP FITTING** — #184's cap, on the
+    /// Helper's own noun, from a launched app (DRA-71 D2).
+    ///
+    /// <para><c>PickerFaceTests</c> walks all 512 subsets of the nine goals and proves the rule.
+    /// It cannot prove the ROOM passes its own budget to it, and that is the half that has gone
+    /// wrong before: the class face was capped in UI.Shared for a whole release while the window
+    /// rendered an uncapped label, because the cap and the call site were two decisions. Three
+    /// long goals is 49 characters of face in a room whose floor is 520 wide.</para>
+    /// </summary>
+    [Fact]
+    public void TheGoalFaceCountsRatherThanListingWhenTheNamesStopFitting()
+    {
+        var key = $"{AppHarness.Character}_{AppHarness.Server}".ToLowerInvariant();
+        using var app = new AppHarness(
+            configureSettings: s => s.HelperGoals[key] =
+            [
+                nameof(HelperGoal.UnlockClasses),
+                nameof(HelperGoal.UnlockRaces),
+                nameof(HelperGoal.FarmMaterials),
+            ],
+            environment: OpenOn("helper"));
+        app.Launch();
+
+        app.WaitForDump("shellPage", "helper", "the shell to land on the Helper room");
+        app.WaitForDump("helperGoalFace", "3goals",
+            "the face to count three long goal names rather than list them");
+
+        // The floor that keeps the line above from being a number about an empty room: the
+        // rows are still all nine, and the selection really was read back.
+        Assert.Equal(9, app.DumpValue("helperChips"));
+        Assert.Equal(
+            $"{nameof(HelperGoal.UnlockClasses)},{nameof(HelperGoal.UnlockRaces)}," +
+            $"{nameof(HelperGoal.FarmMaterials)}",
+            app.DumpText("helperGoals"));
+    }
+
+    /// <summary>
+    /// **THE POPUP OPENS, AND THE DUMP SAYS SO** — the runtime half of the screenshot hook
+    /// (<c>EQBUDDY_HELPER_PICKER</c>) that stages the one state a shot of this room cannot
+    /// otherwise reach.
+    ///
+    /// <para>A dropdown that is SHUT photographs as a button. The hook is what lets
+    /// <c>shell-helper-picker</c> exist at all, and a hook that was merely spelled correctly —
+    /// read from the environment, never wired to the control — would stage nothing and produce
+    /// a shot identical to the closed one. That failure is invisible in a picture and visible
+    /// here (trap 22 and trap 29 arriving together).</para>
+    /// </summary>
+    [Fact]
+    public void TheReviewHookReallyOpensTheGoalPicker()
+    {
+        var env = OpenOn("helper");
+        env["EQBUDDY_HELPER_PICKER"] = "goals";
+        using var app = new AppHarness(environment: env);
+        app.Launch();
+
+        app.WaitForDump("shellPage", "helper", "the shell to land on the Helper room");
+        app.WaitForDump("helperPickerOpen", "1", "the review hook to open the goals picker");
+
+        // Opening it changes nothing about what the room decided — the face still reads the
+        // empty state and the nine rows are the nine rows.
+        Assert.Equal("Anygoal", app.DumpText("helperGoalFace"));
+        Assert.Equal(9, app.DumpValue("helperChips"));
     }
 }

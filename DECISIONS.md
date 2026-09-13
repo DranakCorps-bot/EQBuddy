@@ -1,3 +1,83 @@
+## 2026-09-13 — DRA-71 delivery 2: one multi-select primitive, and the eight defaults taken to build it
+
+Pre-authorized: Helm SIGNED the plan (PR #586, merged `a28c5d89`; SSC #587 merged `93040ac2`)
+and authorized `dra71-d2` after it landed on Soft `main`. No consequence-list door was
+touched — this slice moves controls and writes no new sentence about the world; the values
+line is untouched, no release was cut, no public post was made, no eqlwiki policy moved.
+Reporting duty rather than asking duty; David vetoes from here.
+
+Each row is the default I took, the thing it could have been instead, and where it landed.
+
+**1 — The face's overflow rule COUNTS, and Fable's plan illustrated it TRAILING.** P1 says
+`PickerFace` "generalizes `ClassFilterLabel`'s 0→'Any X' / >3→'N X' rule to any noun"; P2, two
+paragraphs later, writes the face as *"Goals: Level Up · Farm Gear +2"*. Those are two
+different rules and only one of them can ship. I took P1's, because it is the one stated as a
+rule rather than as an example, it is the one the class picker has been asserted against since
+#184, and "+2" on four picks would have widened the class face from "4 classes" (9 chars) to
+"BRD · CLR · WAR +1" (18) and reddened the existing test that says that face never grows. It
+could have gone the other way with a mode flag; two overflow spellings of one control is how
+the sixteen hand-built chip strips started. If David or Bevel prefers "+2", it is one function
+in `UI.Shared/PickerFace.cs` and `PickerFaceTests` already says what it would cost. Filed as
+question 2 in the `BEVEL.md` stub.
+
+**2 — The cap is a WIDTH as well as a count, and the Helper's budget is 34 characters where
+the class picker's stays 16.** The literal generalisation — count past three, any noun — would
+have shipped #184 straight back on the Helper: "Unlock Classes · Unlock Races · Farm
+Materials" is three picks and forty-five characters. #184's own test says the defect was that
+*"label width tracked the number of classes picked"*, so width was always the point and the
+count was the mechanism. The two budgets differ because the two rows differ: the class face
+SHARES its row with the era combo, the state combo and the mode strip (that row running out
+IS #184), and the goal face owns its own row in a column of `ShellLayoutPolicy.MinRoomWidth`.
+Both numbers are named constants with the reason beside them, and `PickerFaceTests` walks all
+512 subsets of the nine goals rather than a handful of examples.
+
+**3 — The faction face is never told how many factions are offered, so it can never say "All
+factions".** The picker shows twelve standings out of a dump that carries hundreds, and prints
+the withheld count directly under the face (trap 50). A face saying "All factions" would
+un-say that one control up. The default could have been to pass the shown count and let it
+read "All" when every visible row is ticked — which is true of the ROWS and false of the
+player's factions. `PickerFace` takes `offered: 0` for an open-ended offer and the test pins
+that the capped face counts instead.
+
+**4 — `helperChips` keeps its D1 name in the `EQBUDDY_EXPAND` dump.** The nine moved inside a
+popup, so "chips" is now a word about a control that no longer exists. It could have been
+renamed to `helperGoalRows`. It was not: the key's MEANING is unchanged ("how many goals this
+room offers"), it is the trap-29 assertion that has pinned the Founder's nine since the room
+landed, and a rename would have edited the one E2E row that could catch the rows going missing
+in the same commit that hid them behind a face. `helperGoalFace`, `helperFactionFace`,
+`helperPickerOpen` and `helperPickerHook` are added beside it.
+
+**5 — `EqMultiPicker` lives in `DesignSystem.cs` beside `EqChip`, not in its own file.** The
+plan names it `DesignSystem.EqMultiPicker` and `EqChip`/`EqSegmentedStrip` are already
+same-file siblings there; a third primitive in a fourth place makes "which file do I look in
+for the shared control" a question. The file is not on the hotspot ratchet and this is what it
+is for.
+
+**6 — The screenshot hook re-opens the picker after EVERY rebuild rather than firing once.**
+The first version fired once and the E2E caught it: `Build` replaces every control, so the
+one-shot opened a picker a rebuild had already thrown away — dump said shut, and the staged
+shot would have been identical to the closed one while looking like the hook worked.
+`EQBUDDY_HELPER_PICKER` is unset in every shipping run, so "staged open" is a state the room
+holds rather than an event it fires. The alternative — latching after the first SUCCESSFUL
+open — is the same thing with more state. `helperPickerHook` reports whether the hook found
+its picker at all, so a shut staged shot can say which half failed.
+
+**7 — The class-picker migration keeps `ClassBtn` in XAML and hands it to the primitive.** The
+button sits in a fixed Grid column beside the mode strip — the exact geometry #184 was about —
+so moving it into code would have made "the filter row still lays out the same" a claim nobody
+could check by reading the diff. `EqMultiPicker` therefore takes an optional already-placed
+face. The hand-built `<Popup>` of CheckBoxes is gone, which is what makes the new rule ("the
+multi-select dropdown is `EqMultiPicker` — never hand-build another one") true on the day it
+is written rather than aspirational.
+
+**8 — The class picker gets its OWN `WhatsNew.json` entry, saying that nothing about it
+changed.** A refactor with no behaviour change is normally not player-noticeable and earns no
+entry. This one touches a surface that shipped in 1.x and was itself the subject of a
+reporter's bug (#184), and "we rebuilt the control underneath your class filter and believe it
+is identical" is worth saying to the person who reported it — with an explicit ask to tell us
+if it is not. The pending 2.0.0 Helper entry grows in the same pass to describe the picker
+rather than the chip strip nobody has seen.
+
 ## 2026-09-12 — DRA-70 delivery 1: the Helper room, and the ten defaults taken to build it
 
 Pre-authorized: Helm SIGNED the plan (PR #580, merged `0705f45f`) and authorized `dra70-d1`

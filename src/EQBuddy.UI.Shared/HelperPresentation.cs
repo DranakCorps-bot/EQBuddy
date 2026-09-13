@@ -114,6 +114,33 @@ public static class HelperPresentation
         _ => "",
     };
 
+    // ---- the goal picker's face (DRA-71 D2) ---------------------------------------------
+
+    /// <summary>
+    /// How wide the goal and faction faces may get before they count instead of listing.
+    ///
+    /// <para><see cref="PickerFace.MaxChars"/> is 16 because the quest window's class face
+    /// SHARES its row with the era combo, the state combo and the mode strip — #184 was that
+    /// row running out of width. These faces own their own row in a column of
+    /// <c>ShellLayoutPolicy.MinRoomWidth</c>, so the budget is raised to hold the two longest
+    /// goal names together ("Work on Faction · Farm Materials" is 32) and no further. Three
+    /// goals can reach 49 and are counted, which is the cap doing its job rather than failing
+    /// at it.</para>
+    /// </summary>
+    public const int FaceChars = 34;
+
+    /// <summary>Hover copy on the goals face. It says what the control IS, because a button
+    /// reading "Any goal" gives a player no reason to suspect nine rows are behind it.</summary>
+    public const string GoalPickerTip =
+        "Pick what you are working toward — any number of them.";
+
+    /// <summary>What the goals face reads. Empty is "Any goal", which is the same sentence
+    /// <see cref="GoalStripNote"/> makes above it in the control's own words: nothing picked
+    /// means EQBuddy weighs all nine.</summary>
+    public static string GoalFace(IReadOnlyList<HelperGoal> picked) => PickerFace.For(
+        [.. picked.Select(GoalLabel)], "goal", "goals",
+        offered: Recommendations.All.Count, maxChars: FaceChars);
+
     // ---- a recommendation's headline ----------------------------------------------------
 
     /// <summary>
@@ -323,7 +350,23 @@ public static class HelperPresentation
     public const string FactionPickerNoDump =
         "No faction dump yet, so there is nothing to pick from.";
 
-    /// <summary>One faction chip: the name and how far there is to go, which is what makes
+    /// <summary>Hover copy on the faction face, same job as <see cref="GoalPickerTip"/>.</summary>
+    public const string FactionPickerTip =
+        "Pick the factions you are working on — any number of them.";
+
+    /// <summary>
+    /// What the faction face reads.
+    ///
+    /// <para><b>It is never told how many are offered</b>, so it never says "All factions".
+    /// The list is capped at <see cref="FactionPickerCap"/> and a player who ticked every row
+    /// on screen has not picked every standing in their dump — a face claiming otherwise would
+    /// contradict the cap note printed directly under it (trap 50 is about saying what was
+    /// withheld; this is about not un-saying it one control up).</para>
+    /// </summary>
+    public static string FactionFace(IReadOnlyList<string> picked) =>
+        PickerFace.For(picked, "faction", "factions", maxChars: FaceChars);
+
+    /// <summary>One faction row: the name and how far there is to go, which is what makes
     /// the list pickable rather than alphabetical.</summary>
     public static string FactionChip(FactionsFile.Standing standing) =>
         standing.Maxed

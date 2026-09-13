@@ -440,3 +440,196 @@ internal sealed class EqSegmentedStrip(Panel host, bool compact = false)
         foreach (var chip in _chips) chip.SetSelected(Equals(chip.Key, key));
     }
 }
+
+/// <summary>One row inside an <see cref="EqMultiPicker"/>.</summary>
+/// <param name="Key">What the row selects — a class name, a <c>HelperGoal</c>, a faction's
+/// name in the dump's own spelling. Handed straight back to the picker's toggle callback and
+/// never interpreted here, the same contract <see cref="EqChip.Key"/> keeps.</param>
+/// <param name="Label">What the row reads. Comes from a presentation file; this control
+/// writes no words.</param>
+/// <param name="Checked">Whether it is ticked when the row is built.</param>
+/// <param name="Tip">Hover copy, where the noun has any. The phone has no hover, so a picker
+/// that PORTS later re-picks this control rather than copying it (trap 35).</param>
+internal readonly record struct PickerRow(
+    object Key, string Label, bool Checked, string? Tip = null);
+
+/// <summary>
+/// **THE multi-select dropdown** (DRA-71 D2, Fable plan P1; Founder smoke item 1) — a face
+/// button that says what is picked, and a themed popup of check rows behind it.
+///
+/// <para><b>The sibling rule to <see cref="EqChip"/>'s, and it is the same rule.</b> CLAUDE.md
+/// has said "the selectable pill is <c>EqChip</c> — never hand-build another one" since gate 2b,
+/// because sixteen hand-built strips had drifted apart before anyone counted them. Multi-select
+/// had no such primitive at all: the app's one dropdown multi-select was a <c>Popup</c> of
+/// <c>CheckBox</c>es typed into <c>QuestsView.xaml</c>, and the Helper's goals were raw chips in
+/// a <c>WrapPanel</c> — the "flat checkbox soup" the Founder named when he smoked D1. So:
+/// <b>the multi-select dropdown is <see cref="EqMultiPicker"/> — never hand-build another
+/// one.</b> The quest window's class picker is migrated onto it in the same slice that adds it,
+/// which is the only way that sentence starts out true.</para>
+///
+/// <para><b>NOTHING HERE DECIDES A WORD OR A COLOUR.</b> The face text comes from
+/// <see cref="PickerFace"/>, the row labels from a presentation file, and every brush is an
+/// existing theme key looked up by reference — so a theme switch repaints the popup and the
+/// eight palettes cannot disagree about it. The chrome is deliberately the SAME four values
+/// the hand-built class popup used (<c>PopupBrush</c>, <c>CornerCard</c>, <c>BorderBrush</c>,
+/// <c>PadCard</c>): a migration that also restyled the control would make "behaves identically"
+/// unprovable by eye.</para>
+///
+/// <para><b>Two ways in, because two hosts need different ones.</b> A host that has already
+/// placed its face in a layout (the quest window's <c>ClassBtn</c>, which sits in a fixed Grid
+/// column beside the mode strip) hands it in; a host building a block in code gets one made for
+/// it. Either way the picker owns the popup, and <see cref="Host"/> is the single element the
+/// caller adds to its tree — a popup left out of a logical tree resolves none of its theme
+/// brushes and would paint as an unstyled box in all eight palettes.</para>
+///
+/// <para><b>Ticks sync without rebuilding.</b> <see cref="SetRows"/> builds the list;
+/// <see cref="SetChecked"/> paints the ticks. They are separate because the quest window syncs
+/// the saved selection on every refresh, and a rebuild there would throw away a popup the
+/// player had open mid-click. The re-entrancy guard lives here rather than in each host, which
+/// is where it was before and where only one of the two hosts had one.</para>
+/// </summary>
+internal sealed class EqMultiPicker
+{
+    /// <summary>How tall the row list may get before it scrolls. Twelve rows is the Helper's
+    /// own faction cap and comfortably more than the nine goals; the class list is sixteen and
+    /// scrolls. The wheel belongs to the popup here and there is no trap-36 conflict — a popup
+    /// is its own top-level surface, not a view lifted into a host that already scrolls.</summary>
+    private static readonly double MaxRows = DesignTokens.RowHeight * 12;
+
+    private readonly System.Windows.Controls.Primitives.Popup _popup = new();
+    private readonly StackPanel _rows = new();
+    private readonly List<CheckBox> _checks = [];
+    private readonly Action<object> _onToggle;
+    private bool _syncing;
+
+    /// <summary>The button the player clicks. Owned by this picker when it built one, and
+    /// merely wired when the host handed one in.</summary>
+    public Button Face { get; }
+
+    /// <summary>The one element a host adds to its own tree. It carries the popup always, and
+    /// the face too when this picker made it — so a caller cannot add one and forget the
+    /// other, which is a picker that opens nothing.</summary>
+    public Panel Host { get; }
+
+    public bool IsOpen => _popup.IsOpen;
+
+    /// <summary>How many rows the popup holds. Reported in the <c>EQBUDDY_EXPAND</c> dump by
+    /// the rooms that draw one: a control that is ABSENT photographs as an unremarkable panel,
+    /// so only a launched app can say the rows are there (trap 29).</summary>
+    public int RowCount => _checks.Count;
+
+    /// <param name="onToggle">Called with the row's <see cref="PickerRow.Key"/> when the player
+    /// ticks or unticks it. Never called by <see cref="SetChecked"/>.</param>
+    /// <param name="face">An already-placed face to adopt, or null to have one built.</param>
+    /// <param name="tip">Hover copy for a built face. Ignored for an adopted one, whose host
+    /// owns its tooltip.</param>
+    public EqMultiPicker(Action<object> onToggle, Button? face = null, string? tip = null)
+    {
+        _onToggle = onToggle;
+
+        if (face is not null) Face = face;
+        else
+        {
+            Face = new Button
+            {
+                Content = "",
+                FontSize = DesignTokens.Spec(DesignTokens.TypeRole.Caption).Size,
+                Height = DesignTokens.ControlHeight,
+                HorizontalAlignment = HorizontalAlignment.Left,
+                Padding = new Thickness(DesignTokens.SpaceL, DesignTokens.SpaceXxs,
+                    DesignTokens.SpaceL, DesignTokens.SpaceXxs),
+            };
+            // The same style the quest window's face has worn since #184, so the two pickers
+            // are one control rather than two that look alike.
+            Face.SetResourceReference(FrameworkElement.StyleProperty, "ActionButton");
+            if (tip is { Length: > 0 }) Face.ToolTip = tip;
+        }
+        Face.Click += (_, _) => _popup.IsOpen = !_popup.IsOpen;
+
+        var scroll = new ScrollViewer
+        {
+            VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
+            MaxHeight = MaxRows,
+            Content = _rows,
+        };
+        var frame = new Border
+        {
+            CornerRadius = new CornerRadius(DesignTokens.RadiusCard),
+            BorderThickness = new Thickness(1),
+            Padding = new Thickness(DesignTokens.SpaceL, DesignTokens.SpaceM,
+                DesignTokens.SpaceL, DesignTokens.SpaceM),
+            Child = scroll,
+        };
+        frame.SetResourceReference(Panel.BackgroundProperty, "PopupBrush");
+        frame.SetResourceReference(Border.BorderBrushProperty, "BorderBrush");
+
+        _popup.PlacementTarget = Face;
+        _popup.Placement = System.Windows.Controls.Primitives.PlacementMode.Bottom;
+        // A click anywhere else closes it. The alternative — a popup that stays until its own
+        // face is clicked again — strands an open panel over the room the player just moved to.
+        _popup.StaysOpen = false;
+        _popup.AllowsTransparency = true;
+        _popup.Child = frame;
+
+        var host = new StackPanel { Orientation = Orientation.Horizontal };
+        if (face is null) host.Children.Add(Face);
+        host.Children.Add(_popup);
+        Host = host;
+    }
+
+    /// <summary>Builds (or rebuilds) the row list.</summary>
+    public void SetRows(IReadOnlyList<PickerRow> rows)
+    {
+        _syncing = true;
+        _rows.Children.Clear();
+        _checks.Clear();
+        foreach (var row in rows)
+        {
+            var check = new CheckBox
+            {
+                Margin = new Thickness(0, 1, 0, 1),
+                Content = DesignSystem.Text(DesignTokens.TypeRole.Body, row.Label),
+                IsChecked = row.Checked,
+                Tag = row.Key,
+            };
+            if (row.Tip is { Length: > 0 }) check.ToolTip = row.Tip;
+            check.Checked += OnRowChanged;
+            check.Unchecked += OnRowChanged;
+            _checks.Add(check);
+            _rows.Children.Add(check);
+        }
+        _syncing = false;
+    }
+
+    /// <summary>Paints the ticks from the caller's own store, without rebuilding the rows and
+    /// without calling back — the sync half of trap 20's writer/reader pair.</summary>
+    public void SetChecked(Func<object, bool> isOn)
+    {
+        _syncing = true;
+        foreach (var check in _checks) check.IsChecked = isOn(check.Tag!);
+        _syncing = false;
+    }
+
+    /// <summary>What is ticked, in ROW order rather than click order — so a caller that stores
+    /// the result gets the list its own rows are in, whichever way the player got there.</summary>
+    public IReadOnlyList<object> Checked =>
+        [.. _checks.Where(c => c.IsChecked == true).Select(c => c.Tag!)];
+
+    /// <summary>The face's words. Capped by <see cref="PickerFace"/> at the call site, which is
+    /// where the noun is.</summary>
+    public void SetFace(string text, string? tip = null)
+    {
+        Face.Content = text;
+        if (tip is not null) Face.ToolTip = tip;
+    }
+
+    /// <summary>Opens the popup. The review hook: a dropdown that is SHUT photographs as a
+    /// button, so the state this control exists for can only be staged (trap 22).</summary>
+    public void Open() => _popup.IsOpen = true;
+
+    private void OnRowChanged(object sender, RoutedEventArgs e)
+    {
+        if (_syncing) return;
+        _onToggle(((CheckBox)sender).Tag!);
+    }
+}
