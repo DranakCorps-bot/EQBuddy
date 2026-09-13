@@ -83,9 +83,26 @@ public sealed record UnlockGuidanceRow(
     /// </summary>
     public string Zone { get; init; } = "";
 
+    /// <summary>
+    /// WHO — the creature behind this row, or empty.
+    ///
+    /// <para>The same top raiser <see cref="Zone"/>, the movers and the estimate were all
+    /// taken from, carried out as a VALUE for the same reason the zone is: re-deriving "which
+    /// mover is best" at a call site would be a second producer of a selection this method has
+    /// already made (trap 4). Added by DRA-71 D5 so a surface can draw the Guide's
+    /// <c>who · where</c> row line without reading a name back out of a sentence.</para>
+    /// </summary>
+    public string Who { get; init; } = "";
+
     /// <summary>Every sentence this row adds, in the order a surface draws them: what the
     /// checklist knows, then what your own log knows, then what it implies. Ordering lives
-    /// here rather than in each renderer for the same reason the words do.</summary>
+    /// here rather than in each renderer for the same reason the words do.
+    ///
+    /// <para>It is the WHOLE set, and it stays that: the Helper reads it to build its
+    /// why-lines and the phone will. <see cref="RowLines"/> and <see cref="Hover"/> are the
+    /// same sentences SPLIT for a row-shaped surface, and their union is this — asserted,
+    /// because a split that silently dropped one would look exactly like a guidance shape
+    /// that had nothing to say.</para></summary>
     public IReadOnlyList<string> Lines =>
     [
         .. Pieces.Length > 0 ? (string[])[Pieces] : [],
@@ -93,6 +110,59 @@ public sealed record UnlockGuidanceRow(
         .. CapNote.Length > 0 ? (string[])[CapNote] : [],
         .. Estimate.Length > 0 ? (string[])[Estimate] : [],
     ];
+
+    /// <summary>
+    /// **THE ROW'S OWN LINE: WHO, then WHERE** (DRA-71 D5, plan P12).
+    ///
+    /// <para>The Guide surface's idiom, adopted here because the fact already fits it: a
+    /// mover carries a creature and the zone you killed it in, which is exactly what
+    /// <c>GuidePresentation.RowDetail</c> draws under a guide step's title. WHAT is the row's
+    /// own title (the criterion), and the longer prose is the <see cref="Hover"/> — each of
+    /// the questions drawn in exactly one place, which is the rule that idiom exists to
+    /// keep.</para>
+    ///
+    /// <para><b>The grammar is the FACT's, not a checklist's.</b> No "kill 12 orc centurions"
+    /// appears here and none is invented: this is the pointer the player's own log already
+    /// supports, and an unlock is a grind or a cross-reference rather than a checklist step
+    /// (the Founder soft-leave DRA-65 recorded, still standing).</para>
+    ///
+    /// <para>Empty for the Sky and Task shapes, and for a faction nobody has farmed — an
+    /// unanswered question draws NOTHING rather than a labelled blank (trap 73).</para>
+    /// </summary>
+    public string RowDetail => Join(Who, Zone);
+
+    /// <summary>
+    /// What a row-shaped surface keeps ON SCREEN: the two QUANTITIES.
+    ///
+    /// <para>The piece count and the kills-to-go estimate are one line each, they are what a
+    /// player acts on, and neither is prose — so they stay visible while the per-creature
+    /// evidence moves to the hover. A surface that photographed as a bare list of criteria
+    /// would also be a surface nobody could review (trap 22), which is the second reason
+    /// these two did not go with the rest.</para>
+    /// </summary>
+    public IReadOnlyList<string> RowLines =>
+    [
+        .. Pieces.Length > 0 ? (string[])[Pieces] : [],
+        .. Estimate.Length > 0 ? (string[])[Estimate] : [],
+    ];
+
+    /// <summary>
+    /// The longer prose, for the hover: what your own kills DID to this faction, and the cap
+    /// note when the list held some back.
+    ///
+    /// <para>Up to six signed one-liners — three raisers and three costs — which is the wall
+    /// the row line replaces. They are still one producer's sentences; only where they are
+    /// drawn moved.</para>
+    ///
+    /// <para>Empty when there is nothing to say, so a caller can test it rather than testing
+    /// a count. A surface must not set an empty tooltip: an empty hover is a rectangle that
+    /// appears and says nothing.</para>
+    /// </summary>
+    public string Hover => string.Join("\n",
+        (string[])[.. Movers, .. CapNote.Length > 0 ? (string[])[CapNote] : []]);
+
+    private static string Join(params string[] parts) =>
+        string.Join(" · ", parts.Select(p => p.Trim()).Where(p => p.Length > 0));
 
     /// <summary>Nothing to add — the row draws exactly what it drew before this feature
     /// existed. The common case, and it has to STAY the common case: a faction nobody has
@@ -252,8 +322,9 @@ public static class UnlockGuidance
 
         return new UnlockGuidanceRow(movers, estimate, cap, "", door)
         {
-            // The top raiser's kill zone — the same `raisers` ordering the movers and the
-            // estimate above were both taken from, so all three describe one creature.
+            // The top raiser's creature and kill zone — the same `raisers` ordering the movers
+            // and the estimate above were both taken from, so all four describe one creature.
+            Who = raisers.FirstOrDefault().Mob?.Name ?? "",
             Zone = raisers.FirstOrDefault().Mob?.Zone ?? "",
         };
     }

@@ -54,11 +54,13 @@ public class MultiSelectPickerTests
     {
         {
             @"src\EQBuddy\QuestsView.xaml.cs",
-            "the quest window's class lens — up to three active classes, per character (#184)"
+            "the quest window's class lens — up to three active classes, per character (#184) "
+            + "— and the Unlocks tab's own pick, beside the section strip (DRA-71 D5)"
         },
         {
             @"src\EQBuddy\HelperRoom.cs",
-            "the Helper's goals, and the faction sub-picker under them (DRA-71 D2)"
+            "the Helper's goals, the faction sub-picker under them (DRA-71 D2), and the "
+            + "unlock sub-picker beside it (DRA-71 D5)"
         },
     };
 

@@ -324,7 +324,7 @@ public class HelperMustListTests
 
         return new HelperInputs(
             ZoneHistory.Fold(sessions, pool), pool, dump, ["Frogloks of Guk"],
-            races, races, true, [], [], null,
+            races, races, [], true, [], [], null,
             new ResolvedLevel(level, LevelSource.Observed, new DateTime(2026, 9, 12, 20, 0, 0)));
     }
 

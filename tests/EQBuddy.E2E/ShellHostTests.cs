@@ -1804,7 +1804,7 @@ public class ShellHostTests
     /// it is the defect David reported on 2026-08-20 — worst in the empty state, which is the
     /// only state a new player sees.</para>
     ///
-    /// <para><b>FOUR on this screen, and the number is a decision rather than an
+    /// <para><b>FIVE on this screen, and the number is a decision rather than an
     /// accident.</b> Nothing is picked, so every goal is weighed: the faction picker's own
     /// empty state carries one (a player who opened this room to work on faction should not
     /// have to read to the bottom of the answers to find the command), Work on Faction's gap
@@ -1815,6 +1815,15 @@ public class ShellHostTests
     /// with a delay on it. Deduplicating would mean one of the two goals asks for a file and
     /// offers nothing, which is exactly the shape that gets noticed by the player who only
     /// picked that one.</para>
+    ///
+    /// <para><b>The FIFTH arrived with DRA-71 D5 and is the faction picker's rule, applied to
+    /// the unlock picker beside it.</b> That block is the control a player uses to say which
+    /// races and classes they are chasing, and with no achievements dump it has nothing to
+    /// offer — so it says so and hands over the command that fills it, exactly as the faction
+    /// picker has since D1. It is the same file the two gaps below ask for, and the same
+    /// argument holds: this one is attached to the CONTROL rather than to an answer, and a
+    /// picker that explains its own emptiness and points nowhere is the shape this room
+    /// refuses.</para>
     /// </summary>
     [Fact]
     public void TheHelperHandsOverTheCommandsItsOwnEmptyStatesAskFor()
@@ -1823,12 +1832,16 @@ public class ShellHostTests
         app.Launch();
 
         app.WaitForDump("shellPage", "helper", "the shell to land on the Helper room");
-        Assert.Equal(4, app.DumpValue("helperCopyCmd"));
+        Assert.Equal(5, app.DumpValue("helperCopyCmd"));
 
         // The floor that keeps the count above from being a number about some other room:
-        // four copies against four gaps is only meaningful while the gaps are the ones this
-        // assertion names.
+        // the four GAPS are unchanged by D5 — the fifth copy hangs off a picker and not off a
+        // goal, which is the distinction the paragraph above is about.
         Assert.Equal(4, app.DumpValue("helperGaps"));
+        // And the picker really is in its no-dump state rather than offering rows nobody
+        // staged: "the room drew an empty picker" and "the room drew no picker" are different
+        // claims, and only the first earns the fifth button.
+        Assert.Equal(0, app.DumpValue("helperUnlockChips"));
     }
 
     /// <summary>
@@ -1972,6 +1985,67 @@ public class ShellHostTests
         // empty state and the nine rows are the nine rows.
         Assert.Equal("Anygoal", app.DumpText("helperGoalFace"));
         Assert.Equal(9, app.DumpValue("helperChips"));
+    }
+
+    // ================================================================================
+    // DRA-71 D5 — the unlock pick, one store read by two rooms
+    // ================================================================================
+
+    /// <summary>
+    /// **THE HELPER OFFERS THE PICK AND RANKS FROM IT** (DRA-71 D5, plan P11; acceptance A8).
+    ///
+    /// <para>The other half of this claim is asserted from the Quests window
+    /// (<c>APickedUnlockIsTheOnlyOneItsSectionDrawsAndTheTabSaysWhatItHid</c>). They are two
+    /// tests rather than one because they are two surfaces in two hosts — but they read the
+    /// SAME key of the SAME profile under the same character, which is what makes
+    /// "one store" a claim rather than a hope: <c>helperUnlockPicks</c> and
+    /// <c>questsUnlockPicks</c> are both the store's own answer, dumped from the room that
+    /// used it.</para>
+    ///
+    /// <para><b>Prediction.</b> The dump names two races and one class. "Barbarian" is picked,
+    /// so the race engine answers about Barbarian alone — and the CLASS engine, whose section
+    /// the pick names nothing in, still answers about Warrior. So the two unlock answers on
+    /// screen name those two subjects and not High Elf. The picker offers all three, because
+    /// both unlock goals are picked and an offer narrowed by its own filter is a tick nobody
+    /// can take back.</para>
+    /// </summary>
+    [Fact]
+    public void TheHelperOffersTheUnlockPickAndRanksFromIt()
+    {
+        var key = $"{AppHarness.Character}_{AppHarness.Server}".ToLowerInvariant();
+        using var app = new AppHarness(
+            configureSettings: s =>
+            {
+                s.HelperGoals[key] =
+                    [nameof(HelperGoal.UnlockRaces), nameof(HelperGoal.UnlockClasses)];
+                s.UnlockPicks[key] = ["Barbarian"];
+            },
+            environment: OpenOn("helper"));
+        app.WriteAchievementsDump(
+            "Untapped Potential: Races",
+            "I\tRace Unlock - High Elf",
+            "I\t\tGet maximum faction with Clerics of Tunare.",
+            "I\tRace Unlock - Barbarian",
+            "I\t\tGet maximum faction with Rallosian Army.",
+            "Untapped Potential: Classes",
+            "I\tClass Unlock - Warrior",
+            "I\t\tObtain Azure Ruby Ring.");
+        app.Launch();
+
+        app.WaitForDump("shellPage", "helper", "the shell to land on the Helper room");
+        app.WaitForDump("helperUnlockPicks", "Barbarian",
+            "the Helper to read the pick the Quests tab writes");
+
+        // The popup offers ALL THREE — the way back from a pick, on the surface that made it.
+        Assert.Equal(3, app.DumpValue("helperUnlockChips"));
+        // One pick is always named rather than counted, whatever the budget.
+        Assert.Equal("Barbarian", app.DumpText("helperUnlockFace"));
+        // And the ANSWERS narrowed. Barbarian is the picked race; Warrior survives because the
+        // pick names nothing in the Classes section. High Elf is the one the pick removed, and
+        // naming all three in one assertion is what separates "the filter fired" from "the
+        // dump only ever had two unlocks in it".
+        Assert.Equal("Barbarian,Warrior", app.DumpText("helperSubjects"));
+        Assert.Equal(0, app.DumpValue("helperDeadDoors"));
     }
 
     // ================================================================================

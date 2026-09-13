@@ -657,6 +657,40 @@ public sealed class AppSettings
     /// player's profile, where nothing could correct it later.</para>
     /// </summary>
     public Dictionary<string, List<string>> HelperFactions { get; set; } = [];
+
+    /// <summary>
+    /// Which race and class unlocks a character is working on, keyed the same way —
+    /// <c>UnlockProgress.Subject</c> in the ACHIEVEMENTS DUMP'S OWN SPELLING (DRA-71 D5,
+    /// plan P11).
+    ///
+    /// <para><b>ONE store, read by BOTH surfaces.</b> The Helper's two unlock goals and the
+    /// Quests window's Unlocks tab are the same question asked from two rooms — "which of
+    /// these sixteen classes and fourteen races am I actually chasing" — and a player who
+    /// answered it in one room and found the other still showing all thirty would rightly
+    /// read the second as broken. <see cref="UnlockPickStore"/> is the one reader and the one
+    /// writer; neither surface keeps a copy.</para>
+    ///
+    /// <para><b>An absent key means "all of them", which is FILTER semantics and NOT the
+    /// faction picker's.</b> <see cref="HelperFactions"/> is a REQUIRED pick because a dump
+    /// carries hundreds of standings and weighing all of them is the thirty weak answers
+    /// HOME-002 asks for the opposite of. The unlock list is thirty rows the Unlocks tab has
+    /// drawn in full since 2026-08-25, so the same default here would silently empty a
+    /// working tab. Nothing picked shows everything — the reading every other filter in this
+    /// app already has.</para>
+    ///
+    /// <para><b>It is ONE list across both sections, and the narrowing is PER SECTION.</b>
+    /// Race subjects and class subjects share no names, so one list holds both without
+    /// ambiguity — but a player who picked only races must not thereby empty the class half.
+    /// So <see cref="UnlockPickStore.Narrow"/> applies the pick to a section only where the
+    /// pick actually NAMES something in it, which is "absent = all" read once per section
+    /// rather than once per profile.</para>
+    ///
+    /// <para><b>Names rather than indices</b>, for <see cref="HelperGoals"/>' reason one step
+    /// further along: the dump's order is the game's, and a race added to it would re-point
+    /// every stored pick. A stored name the dump no longer carries narrows nothing.</para>
+    /// </summary>
+    public Dictionary<string, List<string>> UnlockPicks { get; set; } = [];
+
     /// <summary>Color theme key (see EQBuddy.UI.Shared.ThemeCatalog); defaults to the
     /// original parchment-and-brass look so existing installs don't change on upgrade.</summary>
     public string Theme { get; set; } = "ParchmentBrass";

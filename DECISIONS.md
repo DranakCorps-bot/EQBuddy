@@ -1,3 +1,95 @@
+## 2026-09-13 — DRA-71 delivery 5: the unlock pick, and the row shape it arrives with
+
+Pre-authorized: Helm SIGNED the plan (PR #586, merged `a28c5d89`) and SIGNED
+D2/D3/D4 (#588, #590, #592 — `ffc57cc7`), authorizing `dra71-d5`. Nothing below
+is on the consequence list: no release, no new surface, no eqlwiki request,
+nothing new leaving the machine, nothing near the values line — an unlock is
+this character's own achievements dump and the movers are this character's own
+kills. David vetoes from here.
+
+**1. The pick is a FILTER (absent = all), not a required pick like the faction
+one beside it.** These two controls sit one block apart in the Helper and mean
+opposite things by "nothing ticked", which is a real inconsistency and a
+deliberate one. A faction dump carries hundreds of standings, so weighing all of
+them is the thirty weak answers HOME-002 asks for the opposite of. The unlock
+list is thirty rows the Quests tab has drawn in full since 2026-08-25, so the
+faction reading would have silently emptied a working tab for every existing
+profile on upgrade. The alternative — required on both, for consistency — is
+named here so it can be chosen instead; it costs a working surface to buy a
+symmetry nobody asked for.
+
+**2. ONE flat list of subject names, narrowed PER SECTION.** Races and classes
+share no names, so one list holds both. The rule that makes that safe is that a
+pick narrows a section only where it NAMES something in it: a player working on
+Iksar has picked no class, and the Classes half comes back whole. The
+alternative was two stored keys, one per section, which is more explicit and
+which I rejected because it doubles the store, the picker and the plumbing to
+express a rule one method already expresses. **This is the default most worth a
+veto**, because the per-section rule is invisible in `settings.json` — the file
+just shows a list of names.
+
+**3. P12 moves the mover sentences OFF the row and onto its hover, and keeps the
+two quantities on it.** The plan's words are "`who · where` on the row line,
+longer prose on hover". Taken literally that puts the piece count and the
+kills-to-go estimate on the hover too, and I did not: they are one line each,
+they are what a player acts on, and a tab whose every sentence lived on a hover
+would be a tab nobody can photograph (trap 22 — the Unlocks tab had no shot at
+all until DRA-65 staged one). So the row is: the criterion, the `who · where`
+pointer, and the quantities; the hover is the per-creature evidence. Nothing is
+deleted — `UnlockGuidanceRow.Lines` is unchanged and a test asserts the two
+halves union back to it — but it IS a player-visible move, and it earns two
+What's-new paragraphs saying where each half went.
+
+**4. And the hover is the one place in this slice a reading budget is knowingly
+not applied.** `SettingsProsePolicy.FitsOneHover` says a hover must be readable
+inside `ToolTipPolicy.ShowDurationMs` (30 s at 200 wpm ≈ 100 words). Six movers
+— three raisers and three costs, `UnlockGuidance.MoverCap` each way — is about
+125 words, so the worst case is over it. I did not trim, and the reason is that
+the policy names its own scope: it is about *Settings' instructional
+paragraphs*, and this is a scannable list of signed one-liners rather than
+prose. The two alternatives were both worse: trimming would put a second cap on
+top of `MoverCap` with nowhere for the withheld rows to go, and leaving the
+movers on the row is the wall P12 exists to remove. Named here because it is a
+judgement about somebody else's guard, not a fact.
+
+**5. The `who · where` pointer names the top RAISER, so a cost-only row points
+nowhere.** A faction the player has only ever lost standing with has no place
+worth travelling to, and naming the creature that costs them 5 a kill would be a
+pointer at exactly the camp to avoid. The row keeps the evidence on its hover
+and draws no line — the same silence a faction nobody has farmed gets (trap 73).
+
+**6. The picker's OFFER holds every unlock in view, including the ones the pick
+is currently hiding and the ones already unlocked.** An offer narrowed by its
+own filter is a tick nobody can take back. A finished unlock is offered too,
+labelled "unlocked": the engine skips completed ones on its own, so excluding
+them would buy nothing and would drop a row the Quests tab still draws.
+
+**7. The Helper's unlock block gets its own ⧉, which makes five copy buttons on
+one screen.** The faction picker has asked for `/outputfile faction` in its own
+empty state since D1; the unlock picker asks for `/outputfile achievements` the
+same way. The two goal gaps below it already ask for the same file, so this is
+the third mention of one command on one screen. Kept, on DRA-63's rule: a row
+that asks names its own answer, in every state. The alternative — dedupe to one
+— means the control a player is looking at explains its own emptiness and points
+nowhere.
+
+**8. The heading over the Helper's block names both goals ("Races and classes
+you are unlocking") rather than borrowing either goal's label.** One picker
+serves two goals; a heading reading "Unlock Races" over a list containing
+Warrior would be the block claiming to be about half of what it offers.
+
+**9. The narrowing happens in the ENGINE, not in the room.** `Rank` applies it,
+so the phone gets it the day it calls the same method (plan P15) — porting a
+feature *to* a surface is the signal its logic never went through the shared
+layer. The cost is one more field on `HelperInputs`; the alternative was each
+room narrowing its own lists, which is two producers of one rule.
+
+**10. What the slice deliberately did NOT do.** No phone work (D9 owns it). No
+`GuideAttachment` flip. No change to `UnlockGuidance`'s three shapes, its
+arithmetic or its doors — the guidance layer never knew which unlocks were on
+screen and still does not, which is what keeps `UnlockLayout.Groups`' row↔criterion
+pairing intact.
+
 ## 2026-09-13 — DRA-71 delivery 4: throughput as outcome evidence — and the nine defaults taken to build it
 
 Pre-authorized: Helm SIGNED the plan (PR #586, merged `a28c5d89`), SIGNED D2

@@ -385,6 +385,13 @@ public sealed record GoalGap(HelperGoal Goal, GoalGapReason Reason);
 /// <param name="PickedFactions">Which factions the player chose to work on. Empty means the
 /// picker has not been used — not "all of them", because 200 standings is not a
 /// recommendation.</param>
+/// <param name="UnlockPicks">Which race and class unlocks the player chose to work on —
+/// <see cref="UnlockPickStore.Picked"/>'s own answer, in the achievements dump's spelling.
+/// <b>Empty means ALL of them</b>, unlike <paramref name="PickedFactions"/> beside it: the
+/// unlock list is thirty rows rather than a dump's several hundred, and filter semantics are
+/// what <see cref="AppSettings.UnlockPicks"/> carries the argument for. Narrowed PER SECTION
+/// inside <see cref="Recommendations.Rank"/>, so picking a race never empties the class
+/// half.</param>
 /// <param name="HasAchievements">Whether the achievements dump has ever been read.</param>
 /// <param name="Level">
 /// The character's resolved level — <see cref="CharacterLevel.Resolve"/>'s own answer,
@@ -404,6 +411,7 @@ public sealed record HelperInputs(
     IReadOnlyList<string> PickedFactions,
     IReadOnlyList<UnlockProgress> Races,
     IReadOnlyList<UnlockProgress> Classes,
+    IReadOnlyList<string> UnlockPicks,
     bool HasAchievements,
     IReadOnlyList<SkyQuestChecklistItem> SkyItems,
     IReadOnlyCollection<string> SkyCompleted,
@@ -411,7 +419,7 @@ public sealed record HelperInputs(
     ResolvedLevel Level = default)
 {
     public static readonly HelperInputs Nothing =
-        new([], [], null, [], [], [], false, [], [], null, ResolvedLevel.Unknown);
+        new([], [], null, [], [], [], [], false, [], [], null, ResolvedLevel.Unknown);
 }
 
 /// <summary>The whole answer for one set of chips.</summary>
@@ -745,10 +753,16 @@ public static class Recommendations
 
         if (goals.Contains(HelperGoal.LevelUp)) LevelUp(inputs, candidates, gaps);
         if (goals.Contains(HelperGoal.WorkOnFaction)) Faction(inputs, candidates, gaps);
+        // **THE PICK NARROWS THE ENGINE, NOT THE ROOM** (DRA-71 D5, plan P11). It happens here
+        // rather than in the caller so the phone gets it the day it calls Rank — porting a
+        // feature TO a surface is the signal its logic never went through the shared layer —
+        // and PER SECTION, so a player working on one race still gets class answers.
         if (goals.Contains(HelperGoal.UnlockClasses))
-            Unlocks(inputs, HelperGoal.UnlockClasses, inputs.Classes, candidates, gaps);
+            Unlocks(inputs, HelperGoal.UnlockClasses,
+                UnlockPickStore.Narrow(inputs.Classes, inputs.UnlockPicks), candidates, gaps);
         if (goals.Contains(HelperGoal.UnlockRaces))
-            Unlocks(inputs, HelperGoal.UnlockRaces, inputs.Races, candidates, gaps);
+            Unlocks(inputs, HelperGoal.UnlockRaces,
+                UnlockPickStore.Narrow(inputs.Races, inputs.UnlockPicks), candidates, gaps);
 
         var joined = Join(candidates);
         var ordered = joined

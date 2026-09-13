@@ -56,12 +56,14 @@ public class RecommendationsTests
         IReadOnlyList<string>? picked = null,
         IReadOnlyList<UnlockProgress>? races = null,
         bool hasAchievements = false,
-        ResolvedLevel level = default)
+        ResolvedLevel level = default,
+        IReadOnlyList<UnlockProgress>? classes = null,
+        IReadOnlyList<string>? unlockPicks = null)
     {
         var mobs = pool ?? [];
         return new HelperInputs(
             ZoneHistory.Fold(sessions ?? [], mobs), mobs, factions, picked ?? [],
-            races ?? [], [], hasAchievements, [], [], null, level);
+            races ?? [], classes ?? [], unlockPicks ?? [], hasAchievements, [], [], null, level);
     }
 
     /// <summary>A resolved level, as the ledger would hand one over. The SOURCE is
@@ -279,6 +281,73 @@ public class RecommendationsTests
         Assert.Equal("Aid the Kerrans of Kerra Isle", line.Quest);
         Assert.Equal(Evidence.Catalog, line.Evidence);
         Assert.Contains(HelperPresentation.CatalogLabel, HelperPresentation.Why(line));
+    }
+
+    // ---- the unlock PICK narrows the engine (DRA-71 D5, plan P11) ----------------------
+
+    /// <summary>
+    /// **THE PICK NARROWS THE ENGINE, NOT THE ROOM.** It is applied inside
+    /// <c>Recommendations.Rank</c> so the phone gets it the day it calls the same method —
+    /// porting a feature TO a surface is the signal its logic never went through the shared
+    /// layer — and asserting it here rather than through a launched window is what makes that
+    /// claim testable at all.
+    /// </summary>
+    [Fact]
+    public void APickedUnlockIsTheOnlyOneTheEngineAnswersAbout()
+    {
+        var inputs = Inputs(hasAchievements: true, races:
+        [
+            Unlock("Iksar", false, Faction("Cabilis Residents")),
+            Unlock("Ogre", false, Faction("Rallos Zek")),
+        ]) with { UnlockPicks = ["Ogre"] };
+
+        var set = Recommendations.Rank(inputs, [HelperGoal.UnlockRaces]);
+
+        Assert.Equal(["Ogre"], set.Top.SelectMany(r => r.Why).OfType<UnlockScoreFact>()
+            .Select(f => f.Subject));
+    }
+
+    /// <summary>**Nothing picked weighs every one of them** — filter semantics, and the
+    /// negative the assertion above needs (trap 39). It is also the state every existing
+    /// profile is in, so getting it backwards would have emptied both unlock goals for every
+    /// player on upgrade.</summary>
+    [Fact]
+    public void NothingPickedWeighsEveryUnlock()
+    {
+        var inputs = Inputs(hasAchievements: true, races:
+        [
+            Unlock("Iksar", false, Faction("Cabilis Residents")),
+            Unlock("Ogre", false, Faction("Rallos Zek")),
+        ]);
+
+        var set = Recommendations.Rank(inputs, [HelperGoal.UnlockRaces]);
+
+        Assert.Equal(["Iksar", "Ogre"], set.Top.SelectMany(r => r.Why).OfType<UnlockScoreFact>()
+            .Select(f => f.Subject).Order(StringComparer.Ordinal));
+    }
+
+    /// <summary>
+    /// **A RACE PICK DOES NOT EMPTY THE CLASS HALF.** One flat list of subject names serves
+    /// both engines, and the narrowing is per section — so a player working on Ogre still
+    /// gets every class answer. Without this, picking a race would silently delete half the
+    /// Helper's unlock output with no control on screen able to explain it.
+    /// </summary>
+    [Fact]
+    public void APickInOneSectionLeavesTheOtherWhole()
+    {
+        var inputs = Inputs(hasAchievements: true,
+            races: [Unlock("Iksar", false, Faction("Cabilis Residents")),
+                    Unlock("Ogre", false, Faction("Rallos Zek"))],
+            classes: [Unlock("Necromancer", false, Faction("Neriak Third Gate")),
+                      Unlock("Paladin", false, Faction("Knights of Truth"))])
+            with { UnlockPicks = ["Ogre"] };
+
+        var set = Recommendations.Rank(inputs,
+            [HelperGoal.UnlockRaces, HelperGoal.UnlockClasses], cap: 10);
+
+        Assert.Equal(["Necromancer", "Ogre", "Paladin"],
+            set.Top.SelectMany(r => r.Why).OfType<UnlockScoreFact>()
+                .Select(f => f.Subject).Order(StringComparer.Ordinal));
     }
 
     /// <summary>A quest the catalog does NOT know produces no line and no door — silence is
