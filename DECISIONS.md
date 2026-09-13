@@ -1,3 +1,100 @@
+## 2026-09-12 — DRA-70 delivery 1: the Helper room, and the ten defaults taken to build it
+
+Pre-authorized: Helm SIGNED the plan (PR #580, merged `0705f45f`) and authorized `dra70-d1`
+after it landed on Soft `main`. No consequence-list door was touched — the values line is
+untouched (every input is this character's own log, dumps and catalogs EQBuddy ships;
+nothing measures another player), no release was cut, no public post was made, and no
+eqlwiki policy moved. Reporting duty rather than asking duty; David vetoes from here.
+
+Each row is the default I took, the thing it could have been instead, and where it landed.
+
+**1 — The Helper's WORDS live in `UI.Shared/HelperPresentation`, not in Core beside the
+engine.** `UnlockGuidance` — the mini-recommender this copies its manners from — phrases its
+own sentences in Core, so the obvious default was to do the same. It could have gone that
+way. It did not, because the rule this feature has to keep is a rule about VOCABULARY
+(HOME-006: nothing may claim a camp is safe, easy or survivable) and a guard over vocabulary
+can only be written where the vocabulary is. Core carries typed `WhyFact` records with
+numbers on them; `HelperPresentation` turns each into a sentence and
+`HelperPresentationTests` sweeps every one — constants AND assembled interpolations, which
+is the tier a `const` scan cannot see. **The exception is deliberate and it proves the
+rule:** a sentence `UnlockGuidance` has already measured AND phrased is passed through
+verbatim as a `WordedFact`, because two surfaces wording one arithmetic are two answers and
+the newer copy is always the one that goes stale.
+
+**2 — The second sort key is a BOOLEAN, not a line count.** HOME-003 says personal evidence
+outranks generic advice. The first build read that as "more personal lines rank higher", and
+the fixture caught what that means: a faction grind with four movers beat the fastest camp
+the character had ever farmed, on volume. A count is a proxy for confidence and a proxy is a
+claim about the world (trap 64b). `Recommendation.HasPersonalEvidence` asks HOME-003's own
+question; `MoreSentencesDoesNotOutrankABetterMeasuredCamp` is the row that pins it.
+
+**3 — "Work on Faction" REQUIRES a pick and is not a filter over every standing.** A faction
+dump carries hundreds of rows; weighing all of them is the thirty weak answers HOME-002 asks
+for the opposite of. The cost is one more state to explain, and it is explained: a dump with
+nothing picked asks for a PICK, a missing dump asks for the COMMAND, and the two are
+different sentences rather than one that covers both.
+
+**4 — `UnlockGuidance.Faction` was made PUBLIC and taught to take a faction NAME.** It was
+private and took an unlock criterion. The alternative was a second mover-finder in
+`Recommendations`, which would have been a second phrasing of one arithmetic on two surfaces
+— the failure that file's own comment names. It also gained a `Zone` init property carrying
+where the best raiser was killed, because the Helper joins on the zone and re-deriving "which
+mover is best" at the call site would be a second producer of a selection that method has
+already made. Nothing about the Unlocks tab's behaviour changed.
+
+**5 — The five goals without engines SHIP VISIBLE, each with a door.** The alternative was
+hiding a chip until its engine lands, which would make the feature look smaller than the plan
+it is executing and would mean the strip changes shape under the player three more times. A
+deferred chip says so in its own words and hands over the door to the room that answers its
+question TODAY — a chip producing one apologetic sentence and pointing nowhere would be the
+rail's own *"an affordance that opens nothing is a trap"* reappearing one level in, where the
+rail's guard cannot see it. `HelperMustListTests` asserts both halves together, because
+either one alone is the bug.
+
+**6 — The ⧉ copy REPEATS when two goals want the same dump.** With nothing picked, Unlock
+Classes and Unlock Races each carry their own `/outputfile achievements` button: four copies
+on one screen. Deduplicating would mean one of the two goals asks for a file and offers
+nothing, which is precisely the row the player who picked only that one is looking at. It is
+DRA-63's ruling applied one room over — a row that asks names its own answer, in every state.
+
+**7 — Three recommendations, four why-lines each, twelve faction chips.** Three is HOME-002's
+own number. Four is a judgement: a headline plus five reasons stops being a recommendation
+and becomes a report. Twelve is a judgement about a picker that is not a browser. **All three
+caps report what they withheld** (trap 50), and a cap that held nothing back says nothing at
+all.
+
+**8 — `ZoneHistory.MinHours` is fifteen minutes, and it is a judgement rather than a
+measurement.** It is the shortest sitting that can contain a pull, a death and a recovery,
+which is what an XP rate is supposed to average over. Below it the fold answers NO rate at
+all rather than dividing — four minutes containing one lucky pull is "120%/hr" if you let it,
+and that is noise ranked first.
+
+**9 — Level Up is personal-only, and the absence of a catalog fallback is asserted.** The
+plan PARKS a generic camp catalog behind a reporter asking for one, so a character with no
+stored play gets a sentence saying so rather than a level-range table EQBuddy would have had
+to invent (trap 73, and the match-the-wiki rule one step further out: there is no wiki answer
+here either). The consequence is that D1 ships exactly ONE catalog-sourced line — a Task
+criterion whose quoted quest name matches the shipped catalog — and
+`TheOnlyCatalogSourcedLineInThisDeliveryIsAMatchedQuestName` says so out loud, so the day D2
+adds another somebody has to come and change that row deliberately.
+
+**10 — The Helper builds its own empty state rather than joining `ShellRoomEmpty`.** That
+module's declared scope is the four rooms that came in as moves and lifts of v1 windows;
+Home and Live built their own for the same reason, and the Helper's empty is not "no
+character" but "nothing to suggest yet", which is a different question with a different
+answer.
+
+**Two wordings were found by the SHOT and not by any assertion**, which is the whole argument
+for the illustration lock: *"across 1 of your session"* (a lone plural toggle in the middle of
+an interpolation) and *"you stand at 1,000, 1,000 from the top"* (a comma that reads as a
+thousands separator). Both are fixed with a regression row. The same first shot also
+disproved two of my own written predictions — the shoot fixture's session is ALREADY ARCHIVED
+by the time a room draws, so the Helper had real recommendations where I predicted none. The
+wrong predictions are kept in `shoot.ps1` beside what the shot actually showed, because the
+next person predicting a picture of that profile needs to know.
+
+— Dranak (Claude Code, Paperclip DRA-70, seat `opus-dra70-d1`)
+
 ## 2026-09-12 — DRA-49 revision of PR #511: the #507 entry key folded into replace/retention, and four calls made alone
 
 Pre-authorized: tooling and gates, no consequence-list door. SSC #513 steps 2–4 asked for

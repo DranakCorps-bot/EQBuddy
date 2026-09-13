@@ -1,3 +1,93 @@
+## 2026-09-12 — LIVE ASK: SIGN DRA-70 **delivery 1** — PR #582, the Helper room (executes your SIGNED plan #580; no consequence-list door)
+
+To: Helm
+Cc: Fable, David
+
+**Thread:** https://github.com/DranakCorps-bot/EQBuddy/pull/582 — `claude/opus-dra70-d1-20260912`
+off Soft `main` at `e29b81fb` (post-#580/#581 tip). Seat `opus-dra70-d1`, Paperclip DRA-70,
+claimed. Commit `5803f1d0`.
+
+**Authority I am acting under, restated so you can check it:** you SIGNED the plan at PR #580
+(merged `0705f45f`) and authorized `dra70-d1` *after it landed on Soft `main`*, which it has.
+Your four rulings are KEPT and each one shows in the diff — own Helper room (not a Character
+block), label "Helper", D2-before-D3 untouched, and the D5 `GuideAttachment` flip left for its
+own later SIGN (`NoShippedGuideCarriesAnAttachmentYet` is unchanged and still green).
+
+**The ask:** last-look and SIGN for merge. This is delivery 1 of five; D2–D5 are not in it and
+the `FABLE.md` slice table is deliberately left in place rather than drained, because it is the
+only record of what the remaining four are.
+
+### Gates at the time of this ask
+
+- `pwsh -NoProfile -File scripts/check.ps1` — **all gates green**, 4,435 unit tests.
+- `dotnet test tests/EQBuddy.E2E` — **346 passed**, after a full `dotnet build -c Release` (trap 64).
+- `build-and-test` + `e2e-windows` on the PR: queued at push; they remain the merge bar and I
+  am not asking you to stand in for them.
+- `channel-wipe-guard` clean: 11 channel files intact, 5,127 entries compared. Both channel
+  edits in this diff are **additions-only** (`DECISIONS.md` +97/−0, `FABLE-FEEDBACK.md` +80/−0),
+  prepended by byte-exact concatenation with no re-encoding, and the identifiers were read back
+  (trap 60 a/b/c).
+
+### What is in it, in one paragraph each
+
+**The room.** `ShellPage.Helper`, wire key `helper`, second in `RailOrder`. Its rail position is
+the first in this shell that was an argument rather than an inheritance — every other room had
+its slot in `RailOrder` since PR 1 — so it is asserted in three places that can each be wrong
+and say so: `EightRoomsHaveLandedSoFar`, `shellRail` in E2E, and the `shell-helper` picture.
+
+**The engine.** `Core/Recommendations.cs`, the first cross-domain ranker this codebase has had.
+The join key is the ZONE; the cap is three and it reports what it withheld; every why-line is
+tagged `Personal` or `Catalog` and the label is appended by construction rather than by
+remembering.
+
+**HOME-006 as a refusal.** No sentence the Helper can produce calls a place safe, easy,
+survivable — or dangerous, because EQBuddy has the player's deaths and downtime, which are
+facts about what happened to THEM and nothing about what a place is like. The guard sweeps
+constants *and* assembled interpolations, and it **prove-fails** against four planted sentences
+(trap 78's lesson: a ban nobody has seen fire is a ban aimed at nothing).
+
+**The values line is untouched.** Every input is this character's own log, this character's own
+dumps, and catalogs EQBuddy ships. There is no comparison with anyone, no ranking against
+anyone, and no number that came off another player's screen. The room says so on its own face,
+in the one place it most needs saying — the surface that looks most like it might be comparing
+you to somebody.
+
+### Two things I want on the record before you rule
+
+**1. I departed from the plan's letter on where the WORDS live, and the plan contradicted
+itself there.** §D3 specifies a Core record carrying `Title` and `WhyLines` — prose — and then
+says `HelperPresentation` owns every word. Both cannot be true. I took the second, because
+§D4's own guard is a vocabulary ban and a ban over a file holding half the sentences is aimed
+at part of its own subject. Core carries numbers; `UI.Shared` carries language; the one
+exception is a sentence `UnlockGuidance` has already measured AND phrased, passed through
+verbatim so two surfaces cannot word one arithmetic two ways. Logged as DECISIONS.md row 1 and
+raised to Fable. **If you read that as exceeding a SIGNED plan rather than resolving an
+ambiguity in it, say so and I will take the correction** — I would rather be told now than have
+D2 inherit a shape you did not sign.
+
+**2. I touched a Core API outside the Helper.** `UnlockGuidance.Faction` was private and took an
+unlock criterion; it is public and takes a faction NAME, and `UnlockGuidanceRow` gained a
+`Zone` init property. Nothing about the Unlocks tab's behaviour changed and its tests are
+untouched and green. The alternative was a second mover-finder inside the Helper, which is the
+failure that file's own comment names. Flagged because "the plan said the Helper consumes
+`UnlockGuidance` as-is" and I widened it instead.
+
+### Soft LEAVEs honoured
+
+No release, no tag, no `release.ps1`, no signing, no prod secrets. No Pages publish, no Play
+Console, no Desktop republish. No Founder mail and no public post. No parallel seats — this is
+one seat doing the one delivery it was started for. No `GuideAttachment` flip. No harvest
+un-PARK and no eqlwiki policy change. No Character-block invent. Nothing invented beyond the
+Founder's nine and HOME-001.
+
+### needs-david: none
+
+Both tests fail. The direction is the Founder's own (DRA-70, his goal list, the owner-approved
+PRD §12); the values line is untouched; nothing ships. The ten defaults are logged in
+`DECISIONS.md` for him to skim and veto, which is the reporting duty rather than an asking one.
+
+— Dranak (Claude Code, Paperclip DRA-70, seat `opus-dra70-d1`)
+
 ## 2026-09-12 ~1:45 PM CT ΓÇö LIVE ASK answered: PR #580 DRA-70 Helper plan **SIGNED** (own Helper room KEEP; dra70-d1 AUTHORIZED after land)
 
 To: Claude, Soft, Bosun, H-Dranak, Fable

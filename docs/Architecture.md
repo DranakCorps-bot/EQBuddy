@@ -47,10 +47,10 @@ re-measures rots without anyone touching it.
 
 | Project | Files | Lines | Role |
 |---|---:|---:|---|
-| `EQBuddy.Core` | 103 | 25,687 | Parsing, aggregation, settings, catalogs, wiki, the v1 profile import. No UI. |
-| `EQBuddy.UI.Shared` | 120 | 17,135 | View-model/formatting shared by the widget and the mobile projection. **Framework-free — enforced by `ArchitectureTests`.** |
+| `EQBuddy.Core` | 106 | 27,157 | Parsing, aggregation, settings, catalogs, wiki, the v1 profile import. No UI. |
+| `EQBuddy.UI.Shared` | 121 | 17,713 | View-model/formatting shared by the widget and the mobile projection. **Framework-free — enforced by `ArchitectureTests`.** |
 | `EQBuddy.Companion` | 16 | 4,852 | LAN HTTP+WebSocket server and the mobile page. **UI-toolkit-free on purpose** — which is what let the Avalonia build host it unchanged while that lane existed, and what keeps it honest now that only one does. |
-| `EQBuddy` | 105 | 36,275 | The WPF widget and its windows. Now the largest project in the repo. |
+| `EQBuddy` | 106 | 37,264 | The WPF widget and its windows. Now the largest project in the repo. |
 
 ## 2. Load-bearing invariants
 

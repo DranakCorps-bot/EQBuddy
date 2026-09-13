@@ -1745,4 +1745,149 @@ public class ShellHostTests
         Assert.True(app.DumpValue("optionsBehaviorHotkeys") > 0,
             $"the v1 window's Behavior block was never built; dump was: {app.Artifacts()}");
     }
+
+    // ================================================================================
+    // DRA-70 — the Helper room
+    // ================================================================================
+
+    /// <summary>
+    /// **The room is on the rail, directly under Character, and it PAINTS.**
+    ///
+    /// <para><c>shellRail</c> counts what the rail built; <c>helperChips</c> counts what the
+    /// room built. Two claims, and only the second can catch a room that navigated correctly
+    /// and drew nothing — which is exactly the failure trap 72 shipped on the Quests tab for a
+    /// whole session. The nine chips are also a trap-29 assertion: an absent control
+    /// photographs as an unremarkable panel, so "all nine are there" can only be checked from
+    /// a launched app.</para>
+    ///
+    /// <para>This launch stages no dumps and the fixture log is one live session, so the
+    /// Helper is drawn in the state a new player meets: every goal weighed, nothing to
+    /// recommend, and every answerable goal naming the store it is waiting for.</para>
+    /// </summary>
+    [Fact]
+    public void TheHelperRoomLandsOnTheRailAndDrawsTheFoundersNineGoals()
+    {
+        using var app = new AppHarness(environment: OpenOn("helper"));
+        app.Launch();
+
+        app.WaitForDump("shellPage", "helper", "the shell to land on the Helper room");
+        Assert.Equal(ShellPages.Landed.Count, app.DumpValue("shellRail"));
+        Assert.Equal(9, app.DumpValue("helperChips"));
+
+        // Nothing picked is the "weigh everything" state, so the five deferred goals all say
+        // so and the answerable ones name what they are missing.
+        Assert.Equal("", app.DumpText("helperGoals"));
+        Assert.Equal(5, app.DumpValue("helperNotYet"));
+        Assert.True(app.DumpValue("helperGaps") > 0,
+            $"no goal named the store it is waiting for; dump was: {app.Artifacts()}");
+
+        // Every door that got built lands on a room that exists. Must be 0, always.
+        Assert.Equal(0, app.DumpValue("helperDeadDoors"));
+    }
+
+    /// <summary>
+    /// **The ⧉ copies, from a launched app** — the runtime half of
+    /// <c>GameCommandsTests.SurfacesNeedingACommand</c>'s two Helper rows.
+    ///
+    /// <para>The source scan proves the room NAMES <c>/outputfile faction</c> and
+    /// <c>/outputfile achievements</c> off <c>GameCommands</c>. It cannot prove the buttons are
+    /// on screen, and a surface that asks a player for a file and hands them no way to produce
+    /// it is the defect David reported on 2026-08-20 — worst in the empty state, which is the
+    /// only state a new player sees.</para>
+    ///
+    /// <para><b>FOUR on this screen, and the number is a decision rather than an
+    /// accident.</b> Nothing is picked, so every goal is weighed: the faction picker's own
+    /// empty state carries one (a player who opened this room to work on faction should not
+    /// have to read to the bottom of the answers to find the command), Work on Faction's gap
+    /// carries one, and Unlock Classes and Unlock Races carry one EACH — two rows asking for
+    /// the same achievements dump. That repetition is deliberate and it is DRA-63's ruling
+    /// applied one room over: a row that asks names its own answer, in every state, because a
+    /// surface that hands the command over once and then takes it back is the same defect
+    /// with a delay on it. Deduplicating would mean one of the two goals asks for a file and
+    /// offers nothing, which is exactly the shape that gets noticed by the player who only
+    /// picked that one.</para>
+    /// </summary>
+    [Fact]
+    public void TheHelperHandsOverTheCommandsItsOwnEmptyStatesAskFor()
+    {
+        using var app = new AppHarness(environment: OpenOn("helper"));
+        app.Launch();
+
+        app.WaitForDump("shellPage", "helper", "the shell to land on the Helper room");
+        Assert.Equal(4, app.DumpValue("helperCopyCmd"));
+
+        // The floor that keeps the count above from being a number about some other room:
+        // four copies against four gaps is only meaningful while the gaps are the ones this
+        // assertion names.
+        Assert.Equal(4, app.DumpValue("helperGaps"));
+    }
+
+    /// <summary>
+    /// **A staged faction dump turns the picker on, and "no dump" becomes "no pick".**
+    ///
+    /// <para>Two states that look identical on a count and are different answers: with no
+    /// dump the goal asks for a command, and with a dump and nothing chosen it asks for a
+    /// pick. The dump is staged through the harness in the game's own tab-separated shape so
+    /// it goes through the real finder and the real parser — a fixture-shaped substitute
+    /// renders a state that is real and is not the one this assertion is about (trap 23).</para>
+    ///
+    /// <para><c>helperFactionChips</c> is the floor that proves the file was SEEN. Without it
+    /// every number below would be about a room that never read it.</para>
+    /// </summary>
+    [Fact]
+    public void AStagedFactionDumpDrawsThePickerAndTheGoalAsksForAPickRatherThanACommand()
+    {
+        var key = $"{AppHarness.Character}_{AppHarness.Server}".ToLowerInvariant();
+        using var app = new AppHarness(
+            configureSettings: s => s.HelperGoals[key] = [nameof(HelperGoal.WorkOnFaction)],
+            environment: OpenOn("helper"));
+        app.WriteFactionDump((1, "Frogloks of Guk", 500, 1500));
+        app.Launch();
+
+        app.WaitForDump("shellPage", "helper", "the shell to land on the Helper room");
+        app.WaitForDump("helperGoals", nameof(HelperGoal.WorkOnFaction),
+            "the stored chip selection to be read back");
+
+        Assert.True(app.DumpValue("helperFactionChips") > 0,
+            $"the staged faction dump was not seen; dump was: {app.Artifacts()}");
+        Assert.Equal(1, app.DumpValue("helperGaps"));
+        Assert.Equal(0, app.DumpValue("helperRecs"));
+        // Only one chip is on, so the deferred goals are silent — a filter that still reported
+        // about what it filtered out would not be a filter.
+        Assert.Equal(0, app.DumpValue("helperNotYet"));
+        Assert.Equal(0, app.DumpValue("helperDeadDoors"));
+    }
+
+    /// <summary>
+    /// **The chip selection is per character and it PERSISTS** — the writer and the reader in
+    /// one assertion (trap 20: a setting only readers touch is a lost capability, and it has
+    /// cost this repo three player-facing bugs).
+    ///
+    /// <para>Seeded through <c>configureSettings</c> under the LEDGER's own character key,
+    /// which is what the room writes under. A launch that read it back under a different key
+    /// would report an empty selection and look exactly like a room nobody had used.</para>
+    /// </summary>
+    [Fact]
+    public void TheGoalSelectionIsReadBackUnderTheCharacterKeyTheRoomWritesUnder()
+    {
+        var key = $"{AppHarness.Character}_{AppHarness.Server}".ToLowerInvariant();
+        using var app = new AppHarness(
+            configureSettings: s => s.HelperGoals[key] =
+                [nameof(HelperGoal.LevelUp), nameof(HelperGoal.FarmGear)],
+            environment: OpenOn("helper"));
+        app.Launch();
+
+        app.WaitForDump("shellPage", "helper", "the shell to land on the Helper room");
+        // The enum's own order, not the stored order — so the "serves" line under an answer
+        // reads the way the chip strip does however the player clicked.
+        app.WaitForDump("helperGoals",
+            $"{nameof(HelperGoal.LevelUp)},{nameof(HelperGoal.FarmGear)}",
+            "the stored selection to come back in the Founder's order");
+
+        // Farm Gear is deferred, so it says so and points at the room that answers it today;
+        // Level Up is answered and names what it is waiting for. Exactly one of each.
+        Assert.Equal(1, app.DumpValue("helperNotYet"));
+        Assert.Equal(1, app.DumpValue("helperGaps"));
+        Assert.Equal(0, app.DumpValue("helperDeadDoors"));
+    }
 }

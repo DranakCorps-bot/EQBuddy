@@ -733,6 +733,94 @@ $Shots = [ordered]@{
     # (`HomeRoomTests`) and `shellHomeEmpty` is in the dump; the POSITION — centred in the
     # room's cell — is the part still unphotographed. Whoever adds that profile shape gets
     # the shot with it.
+    #
+    # ---- DRA-70: the HELPER room ------------------------------------------------------
+    #
+    # Same illustration lock: a room's shot lands in the PR that lands the room. Title is
+    # 'EQBuddy — Helper', derived from ShellPages.Label, so trap 53 applies and this should
+    # fail loudly rather than photograph something else if the room is ever renamed.
+    #
+    # **The rail is EIGHT rows now**, and every shell shot above says SEVEN in its own
+    # prediction. Those lines are the state they were written in rather than a claim about
+    # today — the count is asserted by `ShellNavigationTests.EightRoomsHaveLandedSoFar` and
+    # by `shellRail` in E2E, which are the two places it can be wrong and say so.
+    #
+    # PREDICTIONS, written before the shots (trap 23):
+    #
+    #   'shell-helper' — THE STATE A NEW PLAYER MEETS, and the one this profile can stage
+    #     honestly: a character with a live log and no dumps at all. Native title bar
+    #     "EQBuddy — Helper". The rail has EIGHT rows and Helper is SECOND, directly under
+    #     Character and above Live, lit as selected. **That position is the assertion.**
+    #     Unlike every room above it, Helper is NEW to `RailOrder` — nothing inherited its
+    #     slot from PR 1 — so a build that appended it at the bottom of the rail is a build
+    #     that looks healthy in every way except this picture.
+    #     Three blocks with small-caps headings:
+    #       Your goals — one dim sentence ("Pick what you are working toward…") over a
+    #         WRAPPED strip of NINE chips in the Founder's order: Level Up · Farm Gear ·
+    #         Unlock Classes · Unlock Races · Farm Motes · Work on Faction · Farm Materials ·
+    #         Make Money · Achievements. **None of them lit** — nothing picked means EQBuddy
+    #         weighs all of them, and a strip that arrived with everything selected would be
+    #         saying the same thing in a way the player cannot turn off.
+    #       Work on Faction — the sub-picker, drawn because nothing is picked (which weighs
+    #         every goal). With no dump it is one dim sentence and a ⧉ copy of
+    #         /outputfile faction.
+    #       Worth doing next — the values line in dim metadata ink, then FOUR gap sentences
+    #         (Level Up wants stored play; Work on Faction wants a pick; Unlock Classes and
+    #         Unlock Races each want the achievements dump) and FIVE "not ranking this one
+    #         yet" lines, each with its own accent-ink door to the room that answers it
+    #         today. FOUR ⧉ buttons in the picture — the picker's, Work on Faction's, and
+    #         one under EACH unlock goal. The repetition is deliberate (DRA-63's rule: a row
+    #         that asks names its own answer); `helperCopyCmd` is the assertion, this is the
+    #         review.
+    #     **The prediction said "what must NOT be in this picture is a recommendation", and
+    #     the shot disproved it — correctly.** The reasoning was that this profile has no
+    #     stored sessions, so a %/hr here would mean the engine divided a LIVE session it was
+    #     told not to touch. The premise was wrong: the fixture log's session ends a minute
+    #     before the app starts, so it is ARCHIVED on ingest and is a stored 1.1-hour sitting
+    #     in West Commonlands by the time the room draws. The picture is therefore honest and
+    #     the prediction was not — which is the useful direction for this to fail in, and it
+    #     is written down rather than quietly corrected because the next person predicting a
+    #     shot of this profile needs to know the fixture arrives already archived.
+    #     SHOT 2026-09-12, 946x633. What it actually shows: the nine chips as predicted, none
+    #     lit; the picker's no-dump state with its ⧉; then ONE recommendation — "West
+    #     Commonlands", "Level Up", "14.5%/hr here, from 1 stored session (1.1 hours)", "Your
+    #     fights here run 6 sec on average, over 82 kills you have recorded", and a Map door.
+    #     Under it THREE gap sentences (Work on Faction wants a pick, both unlocks want the
+    #     achievements dump) and the five deferred lines. FOUR ⧉ buttons.
+    #     **And the first take is what found two wordings**, which is the whole argument for
+    #     the illustration lock: "across 1 of your session" (a lone plural toggle in the
+    #     middle of an interpolation) and, on the picked shot, "you stand at 1,000, 1,000 from
+    #     the top" (a comma that reads as a thousands separator). Both are fixed with a
+    #     regression row; neither was visible in a passing assertion.
+    #   'shell-helper-picked' — the SAME room with two chips ON and a faction dump staged,
+    #     which is the only way to photograph the difference the picker exists to draw. Level
+    #     Up and Work on Faction lit; the other seven dim. The picker now carries real chips
+    #     reading "<faction> — N to go", with the picked one lit. Work on Faction's gap line
+    #     is GONE and a recommendation stands in its place, headlined with the zone the
+    #     appended kills happened in, with why-lines naming the standing and the player's own
+    #     movers ("Your kills of Orc centurion in <zone> moved it +5 each — seen on 3 of your
+    #     kills."), then a row of accent-ink doors (Map · eqlwiki · Standings). The five
+    #     deferred goals are silent here, because a filter that still reported about what it
+    #     filtered out would not be a filter.
+    #     **The prediction expected Level Up to stay a gap here and the join to have no
+    #     picture. Both were wrong, for the same reason as above** — the fixture's session is
+    #     already archived — and the result is the shot this room most needed:
+    #     SHOT 2026-09-12, 946x633. ONE row, headlined "West Commonlands", with
+    #     "Level Up · Work on Faction" under it. **That second line IS HOME-005** — one place
+    #     answering two goals, which is the cross-domain chain the PRD calls the key
+    #     differentiator and which no single-goal list could draw. Under it, four why-lines
+    #     from two different engines (the rate, the fight length, the standing, the mover:
+    #     "Your kills of Orc centurion in West Commonlands moved it +5 each — seen on 3 of
+    #     your kills."), a "1 more reason not shown" from the per-row cap, and THREE doors:
+    #     Map · eqlwiki · Standings. The picker shows both dumped factions with the picked one
+    #     lit. No ⧉ anywhere, because nothing is missing.
+    #   'shell-helper-narrow' — the SAME room at the floor width. The rail is icons only and
+    #     the nine chips must WRAP rather than clip: a horizontal strip that runs off the
+    #     edge with no ellipsis is trap 25's canonical failure and this is the picture that
+    #     can disprove it. Anything cut off horizontally here means the WrapPanel is wrong,
+    #     not the shot — and never a horizontal scrollbar, which hides a layout failure
+    #     behind an affordance.
+    #
     # ---- E-3 PR 5: the LIVE room, and the Raids move ---------------------------------
     #
     # Same illustration lock: a room's shot lands in the PR that lands the room, exactly the
@@ -976,6 +1064,39 @@ $Shots = [ordered]@{
                                "Location`tName`tID`tCount`tSlots"
                                "General1`tBone Chips`t0`t12`t0"
                                "General2`tFlawless Diamond`t0`t1`t0") } }
+    # ---- DRA-70: the Helper room. Predictions are above, with the shell-home block. -----
+    'shell-helper'    = @{ Title = 'EQBuddy — Helper'
+                           Env = @{ EQBUDDY_SHELL = 'helper' }; Set = @{} }
+    'shell-helper-narrow' = @{ Title = 'EQBuddy — Helper'
+                           Env = @{ EQBUDDY_SHELL = 'helper'; EQBUDDY_SHELL_SIZE = '580x480' }
+                           Set = @{} }
+    # The picked state, staged through the real seams: a faction dump beside the log (the
+    # finder's own filename shape, class code and all) and kills in the log that MOVE that
+    # faction, so the movers come out of the real pool rather than out of a fixture. The
+    # goal chips are seeded under the LEDGER's character key — `testchar_test`, lowercased,
+    # which is what the room writes under; a different key here would photograph a room
+    # nobody had used and it would look exactly like a room that lost its writer.
+    'shell-helper-picked' = @{ Title = 'EQBuddy — Helper'
+                           Env = @{ EQBUDDY_SHELL = 'helper' }
+                           Dump = @{
+                               'Testchar_test-WAR-Factions.txt' = @(
+                                   "ID`tName`tStandingValue`tPointsToMax"
+                                   "229`tCoalition of Tradefolk`t1000`t1000"
+                                   "304`tKnights of Truth`t1600`t400"
+                               )
+                           }
+                           Append = @(
+                               'You have slain an orc centurion!'
+                               'Your faction standing with Coalition of Tradefolk has been adjusted by 5.'
+                               'You have slain an orc centurion!'
+                               'Your faction standing with Coalition of Tradefolk has been adjusted by 5.'
+                               'You have slain an orc centurion!'
+                               'Your faction standing with Coalition of Tradefolk has been adjusted by 5.'
+                           )
+                           Set = @{
+                               HelperGoals = @{ 'testchar_test' = @('LevelUp', 'WorkOnFaction') }
+                               HelperFactions = @{ 'testchar_test' = @('Coalition of Tradefolk') }
+                           } }
     'shell-gear-narrow' = @{ Title = 'EQBuddy — Gear'
                            Env = @{ EQBUDDY_SHELL = 'gear:gear'; EQBUDDY_SHELL_SIZE = '580x480' }
                            Set = @{

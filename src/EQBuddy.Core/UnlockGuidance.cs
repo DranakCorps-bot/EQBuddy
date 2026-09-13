@@ -65,6 +65,24 @@ public sealed record UnlockGuidanceRow(
 {
     public static readonly UnlockGuidanceRow Nothing = new([], "", "", "", null);
 
+    /// <summary>
+    /// Where the best raiser behind this row was killed, or empty when the row has no
+    /// mover — the ZONE, as a value, never as prose.
+    ///
+    /// <para><b>It is here so that nobody computes it twice.</b> DRA-70's Helper joins its
+    /// recommendations on the zone (a place serving two of your goals at once outranks
+    /// either alone), and a faction grind's place is wherever the creature that moves it
+    /// lives. Re-deriving "which mover is best" from the pool at the call site would be a
+    /// second producer of a selection this method has already made, disagreeing with the
+    /// sentence beside it the first time two raisers tie — trap 4 with the two sources being
+    /// one arithmetic written twice.</para>
+    ///
+    /// <para>An <c>init</c> property with a default rather than a positional parameter, the
+    /// same shape <see cref="MobLoot.LastAt"/> took: the three shapes that have no zone say
+    /// nothing by constructing normally.</para>
+    /// </summary>
+    public string Zone { get; init; } = "";
+
     /// <summary>Every sentence this row adds, in the order a surface draws them: what the
     /// checklist knows, then what your own log knows, then what it implies. Ordering lives
     /// here rather than in each renderer for the same reason the words do.</summary>
@@ -157,7 +175,7 @@ public static class UnlockGuidance
         QuestCatalog? catalog) =>
         ShapeFor(criterion.Need) switch
         {
-            UnlockGuidanceShape.FactionGrind => Faction(criterion, factions, pool ?? []),
+            UnlockGuidanceShape.FactionGrind => Faction(criterion.Subject, factions, pool ?? []),
             UnlockGuidanceShape.SkyPieces => Sky(unlock, criterion, skyItems, skyCompleted),
             UnlockGuidanceShape.CatalogQuest => Task(criterion, catalog),
             _ => UnlockGuidanceRow.Nothing,
@@ -165,22 +183,38 @@ public static class UnlockGuidance
 
     // ---- MaxFaction: the player's own kills, and a door to the wiki ------------------
 
-    private static UnlockGuidanceRow Faction(
-        UnlockCriterion criterion, FactionsFile.Snapshot? factions, IReadOnlyList<MobSummary> pool)
+    /// <summary>
+    /// The faction grind, for ANY faction the dump names — not only one an unlock criterion
+    /// asked about.
+    ///
+    /// <para><b>It was private and took a criterion until DRA-70.</b> The Helper's "Work on
+    /// Faction" goal is the same question asked from a different room — which mobs of yours
+    /// move this standing, what they cost, and how far there is to go — and the one thing it
+    /// must not do is word that measurement a second time. Two surfaces that each phrase one
+    /// arithmetic are two answers, and the copy that goes stale is always the newer one; so
+    /// the parameter became a NAME and the caller below passes
+    /// <see cref="UnlockCriterion.Subject"/>. Nothing about the unlock path changed.</para>
+    ///
+    /// <para>Every sentence is still silence-by-default: a faction nobody has farmed gets
+    /// movers of length zero and an empty estimate, and only the wiki door — which costs
+    /// eqlwiki nothing until a player clicks it — is unconditional.</para>
+    /// </summary>
+    public static UnlockGuidanceRow Faction(
+        string faction, FactionsFile.Snapshot? factions, IReadOnlyList<MobSummary> pool)
     {
         // The door is unconditional, and that is the point: it is the one answer that does
         // not depend on having farmed anything, and it costs eqlwiki nothing until the
         // player clicks it. No fetch, no harvested prose — a name and a link.
-        var door = new UnlockDoor(UnlockDoorKind.WikiFaction, criterion.Subject, WikiFactionTip);
+        var door = new UnlockDoor(UnlockDoorKind.WikiFaction, faction, WikiFactionTip);
 
-        var standing = FactionNames.Resolve(factions, criterion.Subject);
+        var standing = FactionNames.Resolve(factions, faction);
         // Every (mob, zone) in the pool whose own faction ledger names this faction. The
         // names come from three different files — the log, the faction dump and the
         // achievements text — so the fold that decides "same faction" is FactionNames'
         // and not a fourth copy of it here.
         var hits = pool
             .SelectMany(m => m.Factions.Select(f => (Mob: m, Hit: f)))
-            .Where(x => FactionNames.Same(x.Hit.Faction, criterion.Subject)
+            .Where(x => FactionNames.Same(x.Hit.Faction, faction)
                         || (standing is { } s && FactionNames.Same(x.Hit.Faction, s.Name)))
             .ToList();
 
@@ -216,7 +250,12 @@ public static class UnlockGuidance
                 + $"at +{best.Hit.Delta} each — an estimate from your own log, not a target.";
         }
 
-        return new UnlockGuidanceRow(movers, estimate, cap, "", door);
+        return new UnlockGuidanceRow(movers, estimate, cap, "", door)
+        {
+            // The top raiser's kill zone — the same `raisers` ordering the movers and the
+            // estimate above were both taken from, so all three describe one creature.
+            Zone = raisers.FirstOrDefault().Mob?.Zone ?? "",
+        };
     }
 
     /// <summary>One mover, signed. A raiser and a cost are the same measurement read in two

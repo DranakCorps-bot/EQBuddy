@@ -1,4 +1,4 @@
-﻿using EQBuddy.Companion;
+using EQBuddy.Companion;
 using EQBuddy.Core;
 using EQBuddy.UI.Shared;
 
@@ -104,11 +104,21 @@ public class ShellNavigationTests
     /// **SR-5 landed Settings, LAST and below the gap, and it too placed itself.**
     /// `RailOrder` has had it in that position since PR 1 and `BelowTheGap` has answered
     /// true for it just as long, so the room joining this list put its row under the rail's
-    /// divider with nothing about the rail edited.</summary>
+    /// divider with nothing about the rail edited.
+    ///
+    /// **DRA-70 landed Helper SECOND, and it is the first room whose rail position was an
+    /// argument rather than an inheritance.** Every room above placed itself, because
+    /// `RailOrder` had held its slot since PR 1 — there was nothing to decide. Helper is new
+    /// to the enum, so its position is a choice somebody made: directly under Character,
+    /// because the two answer the pair of questions a player opens this app with ("who am I
+    /// playing" then "what should I do next") before any room that shows them a surface.
+    /// Appending it at the bottom would have been identical to a healthy build everywhere
+    /// except this line and the `shell-helper` screenshot, which is why the pre-design asked
+    /// for both.</summary>
     [Fact]
-    public void SevenRoomsHaveLandedSoFar() =>
+    public void EightRoomsHaveLandedSoFar() =>
         Assert.Equal(
-            [ShellPage.Home, ShellPage.Live, ShellPage.Progress,
+            [ShellPage.Home, ShellPage.Helper, ShellPage.Live, ShellPage.Progress,
              ShellPage.Gear, ShellPage.Quests, ShellPage.World, ShellPage.Settings],
             ShellPages.Landed);
 
@@ -179,7 +189,13 @@ public class ShellNavigationTests
             // one page IS the room, so there is nothing for an address's room half to name.
             // Asserted rather than skipped silently — a landed room that lost its tabs by
             // accident would otherwise slip through this loop the same way.
-            if (page == ShellPage.Home) { Assert.Empty(rooms); continue; }
+            // Home and Helper are the exceptions, and both are real rather than gaps: three
+            // blocks on one page IS the Home room, and the Helper's goals are CHIPS rather
+            // than tabs (HOME-001's own "goals/filters rather than a permanent wall of
+            // sections"), so neither has anything for an address's room half to name.
+            // Asserted rather than skipped silently — a landed room that lost its tabs by
+            // accident would otherwise slip through this loop the same way.
+            if (page is ShellPage.Home or ShellPage.Helper) { Assert.Empty(rooms); continue; }
             Assert.NotEmpty(rooms);
             foreach (var (label, key) in rooms)
             {
@@ -225,8 +241,15 @@ public class ShellNavigationTests
     /// loop above skips Home for exactly that reason, so without this row that skip would be
     /// the only thing asserting it.</summary>
     [Fact]
-    public void APageWithNoRoomsInsideItAnswersEmpty() =>
+    public void APagesWithNoRoomsInsideThemAnswerEmpty()
+    {
         Assert.Empty(ShellPages.Rooms(ShellPage.Home));
+        // DRA-70's Helper is the second, and it is asked separately rather than folded into
+        // the loop above so that a `Rooms` table which started answering something for it —
+        // the shape a "just add a tab" change would take — fails here with its own name on
+        // it instead of quietly satisfying a `NotEmpty`.
+        Assert.Empty(ShellPages.Rooms(ShellPage.Helper));
+    }
 
     /// <summary>The room list is the surface's, not a copy of it — asserted against the
     /// COUNT each Core definition reports, so a room added to a surface reaches the
