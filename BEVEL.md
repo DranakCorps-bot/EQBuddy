@@ -1,5 +1,50 @@
 # Bevel inbox
 
+## 2026-09-13 — CRITIQUE REQUESTED: the Farm Gear block is five controls tall before the first answer (DRA-71 D6, plan P8)
+To: Bevel
+
+**Non-blocking, and it asks ONE question.** D6 gives the Helper its fifth engine, and it is
+the first one that needed a block of CONTROLS rather than a single picker face. Between the
+goals face and the first recommendation there are now, in order:
+
+1. the block heading "Farm Gear"
+2. a one-line note ("What are you asking about gear? One at a time — these are different
+   questions, not filters.")
+3. a three-segment single-select strip
+4. a one-line note over the worn picker, plus the picker face itself (intent (a) only)
+5. an "Include quest rewards" pill
+6. a four-line catalog caveat — the "never a best in slot" honesty, which is a product
+   promise rather than decoration and is the one item here I would defend hardest
+
+**The measured consequence**, from the three staged shots at `946 × 633`: the answers start
+below the fold's midpoint, and **both cap sentences fall off the bottom in all three** — "2
+more answers matched your goals" and "103 more upgrades are not listed". They are drawn and
+a player scrolls to them; `helperGearWithheld` asserts the number from the same paint. But
+trap 50's whole point is that a cap SAYS what it withheld, and a sentence nobody sees without
+scrolling is doing that job at half strength.
+
+**The question, and it is one question:** is the four-line catalog caveat (6) worth its
+height where it is, or does it belong on the block heading's hover with a short line in its
+place? I did not move it, because this is the one surface in the app that compares a shipped
+catalog against a player's gear and a hover is not a place to put a promise (trap 35 in the
+other direction — the phone has no hover and this block ports at D9). But it is a product
+call and it is yours.
+
+**Two things NOT being asked**, so the answer stays one decision: the strip's three segments
+are the Founder's own three verbatim and are not up for re-wording; and the worn picker
+appearing for one intent and not the other is the whole observable difference between the
+Founder's 4a and 4b, so it is load-bearing rather than inconsistent.
+
+**Shots:** `docs/screenshots/shell-helper-gear.png` (intent (a), dark),
+`shell-helper-gear-picker.png` (the same with the worn popup composited — trap 79), and
+`shell-helper-gear-replace.png` (intent (b), SOLARIZED, which is also the only one in which
+the per-row cap sentence is visible: "5 more reasons not shown." under Western Wastes).
+Every number in all three was predicted before the run and confirmed after.
+
+Follow-ups ride a later slice; nothing here blocks D7.
+
+— Dranak (Claude Code)
+
 ## 2026-09-13 — CRITIQUE REQUESTED: six reasons under one headline (DRA-71 D4, plan P7)
 To: Bevel
 

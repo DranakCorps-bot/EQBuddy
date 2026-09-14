@@ -96,6 +96,17 @@ internal sealed class HelperRoom : Grid, IShellRoom
     private DateTime _readAt = DateTime.MinValue;
     private IReadOnlyList<ZoneRoll> _zones = [];
     private int _poolVersion;
+
+    /// <summary>What this character is WEARING, folded from the newest inventory dump behind
+    /// the same throttle as the session query (DRA-71 D6). It is the Farm Gear sweep's anchor
+    /// set; <see cref="GearUpgrades.WornFrom"/> is the one producer of it, so the phone reads
+    /// the same rule when it gets here.</summary>
+    private IReadOnlyList<WornItem> _worn = [];
+
+    /// <summary>The dump this room folded <see cref="_worn"/> from, in the repaint
+    /// fingerprint. A new dump changes what is worn, which changes every gear answer — trap
+    /// 72's exact shape, one store along.</summary>
+    private string _inventoryStamp = "";
     private RecommendationSet _answers = RecommendationSet.Empty;
     /// <summary>The level the engine was handed this Build — captured so the disclosure line
     /// and the ranking it describes come from one moment (trap 56). It is
@@ -132,12 +143,25 @@ internal sealed class HelperRoom : Grid, IShellRoom
     private EqMultiPicker? _goalPicker;
     private EqMultiPicker? _factionPicker;
     private EqMultiPicker? _unlockPicker;
+    private EqMultiPicker? _wornPicker;
     private string _goalFace = "";
     private string _factionFace = "";
     private string _unlockFace = "";
+    private string _wornFace = "";
     private int _goalChips;
     private int _factionChips;
     private int _unlockChips;
+    private int _wornChips;
+    /// <summary>How many segments the intent strip drew, and which one is on. Counted from
+    /// the BUILT strip rather than from the enum for trap 29's reason: an absent segment
+    /// photographs as an unremarkable row of two.</summary>
+    private int _intentChips;
+    private GearIntent _intent = GearUpgrades.DefaultIntent;
+    private bool _includeQuests;
+    /// <summary>Whether the include-quests pill was drawn at all. It exists only for the two
+    /// answered intents, and "the room decided not to offer it" and "the room forgot" look
+    /// identical in a screenshot.</summary>
+    private bool _questToggle;
     private int _whyLines;
     private int _personalWhy;
     private int _catalogWhy;
@@ -212,6 +236,12 @@ internal sealed class HelperRoom : Grid, IShellRoom
         // DRA-71 D5: the SAME store the Quests window's Unlocks tab reads. One producer of the
         // pick; neither room keeps a copy of it.
         var picks = UnlockPickStore.Picked(_main.Settings, _main.QuestCharacterKey);
+        // DRA-71 D6: the three Farm Gear selections, from the one store that owns them. Read
+        // every tick for the reason the level is — they are three dictionary lookups, and a
+        // click in this room must not wait five seconds to change the answers.
+        _intent = GearIntentStore.Intent(_main.Settings, _main.QuestCharacterKey);
+        var wornPicks = GearIntentStore.WornPicks(_main.Settings, _main.QuestCharacterKey);
+        _includeQuests = GearIntentStore.IncludeQuests(_main.Settings, _main.QuestCharacterKey);
         var unlocks = _main.Unlocks;
         // The SAME resolution the Character room draws and the unlock preview keys off
         // (MainWindow.ResolvedLevel), so the number this room ranks with is the number that
@@ -233,6 +263,12 @@ internal sealed class HelperRoom : Grid, IShellRoom
             // the two above it are: a swap leaves a count unmoved, and the whole of D5's
             // player-visible change is what this selection does to the answers (trap 72).
             string.Join(',', picks),
+            // **The three stores DRA-71 D6's clicks change, plus the dump they are ABOUT.**
+            // The picks are folded by CONTENT for the reason the two above them are — a swap
+            // leaves a count unmoved — and the inventory stamp is here because a new dump
+            // changes what is worn, which changes every gear answer without moving anything
+            // else in this key (trap 72).
+            _intent, string.Join(',', wornPicks), _includeQuests, _inventoryStamp,
             _poolVersion,
             // The throughput fields are in the fold's own signature for trap 72's reason: a
             // re-fold that gained combat seconds, damage or healing and moved a weight
@@ -259,9 +295,20 @@ internal sealed class HelperRoom : Grid, IShellRoom
             _zones, _pool.Mobs, unlocks.Factions, factions,
             unlocks.Races, unlocks.Classes, picks, unlocks.HasAchievements,
             _main.Settings.SkyQuestChecklist, _main.Settings.SkyQuestCompleted,
-            _main.QuestCatalog, _level), goals);
+            _main.QuestCatalog, _level)
+        {
+            // DRA-71 D6. The sweep lives in Core behind `Rank`, not here, so the phone gets
+            // it the day it calls the same method — porting a feature TO a surface is the
+            // signal its logic never went through the shared layer.
+            Worn = _worn,
+            Items = ItemCatalog.Default,
+            MyClasses = MyClassCodes(),
+            GearIntent = _intent,
+            WornPicks = wornPicks,
+            IncludeQuests = _includeQuests,
+        }, goals);
 
-        Build(goals, factions, picks, unlocks);
+        Build(goals, factions, picks, wornPicks, unlocks);
     }
 
     /// <summary>The reads that are not free, behind one throttle and one clock so a caller
@@ -286,24 +333,56 @@ internal sealed class HelperRoom : Grid, IShellRoom
         // cost as the session query it sits beside and neither belongs on a one-second clock.
         _zones = ZoneHistory.Fold(
             _main.StoredSessions(), _pool.Mobs, _main.StoredThroughput());
+
+        // **DRA-71 D6: what the character is WEARING.** Behind this throttle rather than the
+        // per-tick one — it is a file read plus a fold over ~200 rows, the same cost as the
+        // session query it sits beside — and `Refreshed()` clears the throttle, so a dump the
+        // player just wrote answers immediately rather than up to five seconds later. That
+        // matters more here than anywhere: the Farm Gear empty state is the thing that asked
+        // them to run the command.
+        var dump = _main.LatestInventory();
+        _inventoryStamp = dump is null ? "" : $"{dump.Path}|{dump.WrittenAt:O}|{dump.Entries.Count}";
+        _worn = dump is null ? [] : GearUpgrades.WornFrom(dump.Entries, _main.WikiItems.StatsFor);
+    }
+
+    /// <summary>
+    /// This character's classes as the item blocks spell them (PAL, RNG) — the sweep's
+    /// class-lock filter.
+    ///
+    /// <para>The same resolution the Gear room's Inventory tab makes, and deliberately the
+    /// same fallback: the ledger's picked classes first, the log's inference behind them.
+    /// Empty means unknown, and unknown filters NOTHING — hiding a real upgrade is worse than
+    /// showing one the player will recognise as not theirs.</para>
+    /// </summary>
+    private IReadOnlyList<string> MyClassCodes()
+    {
+        var picked = _main.QuestLedger?.ClassesFor(_main.QuestCharacterKey) ?? [];
+        if (picked.Count == 0 && _main.CurrentSnapshot().InferredClass is { Length: > 0 } inferred)
+            picked = [inferred];
+        return [.. picked.Select(GearLocker.Code)];
     }
 
     // ---- the body -------------------------------------------------------------------
 
     private void Build(
         IReadOnlyList<HelperGoal> goals, IReadOnlyList<string> factions,
-        IReadOnlyList<string> picks, UnlockSource unlocks)
+        IReadOnlyList<string> picks, IReadOnlyList<string> wornPicks, UnlockSource unlocks)
     {
         _blocks.Children.Clear();
         _goalPicker = null;
         _factionPicker = null;
         _unlockPicker = null;
+        _wornPicker = null;
         _goalFace = "";
         _factionFace = "";
         _unlockFace = "";
+        _wornFace = "";
         _goalChips = 0;
         _factionChips = 0;
         _unlockChips = 0;
+        _wornChips = 0;
+        _intentChips = 0;
+        _questToggle = false;
         _whyLines = 0;
         _personalWhy = 0;
         _catalogWhy = 0;
@@ -321,6 +400,10 @@ internal sealed class HelperRoom : Grid, IShellRoom
         _blocks.HorizontalAlignment = HorizontalAlignment.Left;
 
         BuildGoals(goals);
+        // DRA-71 D6, drawn on the same condition every sub-block in this room is: only while
+        // its goal is picked, or while nothing is — which weighs everything.
+        if (goals.Count == 0 || goals.Contains(HelperGoal.FarmGear))
+            BuildGearIntent(wornPicks);
         if (goals.Count == 0 || goals.Contains(HelperGoal.WorkOnFaction))
             BuildFactionPicker(factions, unlocks);
         if (goals.Count == 0 || goals.Contains(HelperGoal.UnlockRaces)
@@ -351,6 +434,7 @@ internal sealed class HelperRoom : Grid, IShellRoom
             "goals" => _goalPicker,
             "factions" => _factionPicker,
             "unlocks" => _unlockPicker,
+            "worn" => _wornPicker,
             _ => null,
         };
         if (picker is null) return;
@@ -402,6 +486,149 @@ internal sealed class HelperRoom : Grid, IShellRoom
     {
         if (_main.QuestCharacterKey.Length == 0) return;
         HelperGoalStore.Toggle(_main.Settings, _main.QuestCharacterKey, goal);
+        _main.Settings.Save();
+        Repaint();
+    }
+
+    /// <summary>
+    /// **FARM GEAR ASKS THE INTENT FIRST** (DRA-71 D6, plan P8; Founder smoke items 4a/4b).
+    ///
+    /// <para>The Founder did not ask for a gear engine — he asked for three, and named them:
+    /// upgrade what I wear, replace gear with better, farm valuable gear to sell. So the block
+    /// opens with the question rather than with an answer, and the control is an
+    /// <see cref="EqSegmentedStrip"/> because exactly one of them is being asked: unlike the
+    /// goals above it, "upgrade what I wear" and "replace with better" ticked together would
+    /// produce one merged list whose rows nobody could attribute.</para>
+    ///
+    /// <para><b>THE WORN PICKER BELONGS TO ONE INTENT AND THAT IS THE POINT.</b> The second
+    /// face appears for "upgrade what I wear" and not for "replace with better", which is the
+    /// whole observable difference between them — the first anchors on items you name, the
+    /// second on every slot you have something in. It is the same one-face-per-decision rule
+    /// the faction and unlock blocks keep, applied to a control that only half the strip
+    /// needs.</para>
+    ///
+    /// <para><b>The catalog note is drawn here rather than on a tooltip.</b> This is the one
+    /// surface in the app that compares the shipped catalog against a player's gear, and the
+    /// Gear Locker's own "never best in slot" honesty is owed in the same place the answers
+    /// are — see <see cref="HelperPresentation.GearCatalogNote"/>.</para>
+    /// </summary>
+    private void BuildGearIntent(IReadOnlyList<string> wornPicks)
+    {
+        var block = Block(HelperPresentation.GoalLabel(HelperGoal.FarmGear));
+        block.Children.Add(Line(HelperPresentation.GearIntentNote, Role.BodySecondary));
+
+        var host = new WrapPanel { Margin = new Thickness(0, Tok.SpaceS, 0, 0) };
+        block.Children.Add(host);
+        // A WrapPanel and not a horizontal StackPanel: three segments whose longest label is
+        // "Upgrade what I wear" do not fit the floor width on one line, and a StackPanel would
+        // clip the third rather than wrap it (trap 25).
+        var strip = new EqSegmentedStrip(host);
+        foreach (var intent in GearUpgrades.All)
+            strip.Add(HelperPresentation.GearIntentLabel(intent), intent,
+                tip: HelperPresentation.GearIntentTip(intent),
+                onClick: () => ChooseIntent(intent));
+        strip.Select(_intent);
+        _intentChips = strip.Count;
+
+        // The picker the OTHER intent does not have. See the summary.
+        if (_intent == GearIntent.UpgradeWorn) BuildWornPicker(block, wornPicks);
+
+        // The toggle belongs to both ANSWERED intents and to neither deferred one — an item a
+        // quest hands out is the same offer whichever way the sweep was anchored, and offering
+        // it beside an intent that ranks nothing would be a control with no effect.
+        if (GearUpgrades.ShapeFor(_intent) == GearIntentShape.Answered) BuildQuestToggle(block);
+
+        block.Children.Add(Line(HelperPresentation.GearCatalogNote, Role.Caption));
+    }
+
+    private void ChooseIntent(GearIntent intent)
+    {
+        if (_main.QuestCharacterKey.Length == 0) return;
+        GearIntentStore.Choose(_main.Settings, _main.QuestCharacterKey, intent);
+        _main.Settings.Save();
+        Repaint();
+    }
+
+    /// <summary>
+    /// The worn-item picker — the third <see cref="EqMultiPicker"/> in this room, and the
+    /// first one whose rows come out of a dump of the player's bags.
+    ///
+    /// <para>Every worn item is offered and the list is NOT capped, which is why its face is
+    /// told how many there are and can say "Any worn item": a character wears about twenty
+    /// things. That is the difference from the faction face beside it, whose offer IS capped
+    /// and which therefore never claims "all".</para>
+    /// </summary>
+    private void BuildWornPicker(StackPanel block, IReadOnlyList<string> picked)
+    {
+        if (_worn.Count == 0)
+        {
+            block.Children.Add(Line(HelperPresentation.WornPickerNoDump, Role.BodySecondary));
+            block.Children.Add(CopyCommand(GameCommands.OutputfileInventory,
+                HelperPresentation.DoorTip(new HelperDoor(HelperDoorKind.Gear, ""))));
+            return;
+        }
+
+        block.Children.Add(Line(HelperPresentation.WornPickerNote, Role.BodySecondary));
+
+        // Slot order, which is the order a player walks their own character sheet — the same
+        // list the Gear Locker groups by, so the two rooms do not disagree about where a ring
+        // sits relative to a helm. A slot the order does not know sorts last rather than
+        // vanishing.
+        var rows = _worn
+            .OrderBy(w => Array.IndexOf(GearLocker.SlotOrder, w.Slot) is var i && i >= 0
+                ? i : int.MaxValue)
+            .ThenBy(w => w.Name, StringComparer.OrdinalIgnoreCase)
+            .ToList();
+
+        var picker = new EqMultiPicker(key => ToggleWorn((string)key),
+            tip: HelperPresentation.WornPickerTip);
+        picker.SetRows([.. rows.Select(w => new PickerRow(
+            w.Name, HelperPresentation.WornRow(w),
+            picked.Contains(w.Name, StringComparer.OrdinalIgnoreCase)))]);
+        picker.SetFace(HelperPresentation.WornFace(
+            [.. rows.Where(w => picked.Contains(w.Name, StringComparer.OrdinalIgnoreCase))
+                .Select(w => w.Name).Distinct(StringComparer.OrdinalIgnoreCase)],
+            rows.DistinctBy(w => w.Name, StringComparer.OrdinalIgnoreCase).Count()));
+        picker.Host.Margin = new Thickness(0, Tok.SpaceS, 0, 0);
+        block.Children.Add(picker.Host);
+
+        _wornChips = picker.RowCount;
+        _wornFace = (string)picker.Face.Content;
+        _wornPicker = picker;
+    }
+
+    private void ToggleWorn(string item)
+    {
+        if (_main.QuestCharacterKey.Length == 0) return;
+        GearIntentStore.ToggleWorn(_main.Settings, _main.QuestCharacterKey, item);
+        _main.Settings.Save();
+        Repaint();
+    }
+
+    /// <summary>
+    /// The include-quests toggle — the Founder's own "± quests".
+    ///
+    /// <para>An <see cref="EqChip"/> and not a <c>CheckBox</c>: the selectable pill is
+    /// <c>EqChip</c> and this room never hand-builds another one. A single pill whose selected
+    /// state IS the setting is the same control the chip rule describes, used for one thing
+    /// rather than for a strip.</para>
+    /// </summary>
+    private void BuildQuestToggle(StackPanel block)
+    {
+        var host = new WrapPanel { Margin = new Thickness(0, Tok.SpaceS, 0, 0) };
+        var chip = new EqChip(
+            HelperPresentation.IncludeQuestsLabel, "quests",
+            tip: HelperPresentation.IncludeQuestsTip, onClick: ToggleQuests);
+        chip.SetSelected(_includeQuests);
+        host.Children.Add(chip);
+        block.Children.Add(host);
+        _questToggle = true;
+    }
+
+    private void ToggleQuests()
+    {
+        if (_main.QuestCharacterKey.Length == 0) return;
+        GearIntentStore.ToggleQuests(_main.Settings, _main.QuestCharacterKey);
         _main.Settings.Save();
         Repaint();
     }
@@ -590,6 +817,16 @@ internal sealed class HelperRoom : Grid, IShellRoom
         if (HelperPresentation.Cap(_answers.Withheld) is { Length: > 0 } cap)
             block.Children.Add(Line(cap, Role.Caption));
 
+        // And the gear sweep's OWN cap (DRA-71 D6), which is spent before any row exists and
+        // so cannot ride one. The Gear room has the whole wishlist, which is why the door
+        // under it goes there (trap 50: a surviving cap says what it withheld, and points at
+        // where the rest is).
+        if (HelperPresentation.GearWithheld(_answers.GearWithheld) is { Length: > 0 } gearCap)
+        {
+            block.Children.Add(Line(gearCap, Role.Caption));
+            block.Children.Add(Door(new HelperDoor(HelperDoorKind.Gear, "")));
+        }
+
         foreach (var gap in _answers.Gaps) block.Children.Add(Gap(gap));
 
         foreach (var goal in _answers.NotAnsweredYet)
@@ -696,6 +933,22 @@ internal sealed class HelperRoom : Grid, IShellRoom
                 // drawn in the block above. A door that scrolled the player back up to
                 // something already on their screen is furniture, and a second copy of the
                 // picker would be a second writer of one selection (trap 4).
+                break;
+            case GoalGapReason.NoInventoryDump:
+                // DRA-71 D6. The one gear gap with a command behind it — a surface that needs
+                // an in-game command SHIPS the command, off GameCommands and never a literal.
+                stack.Children.Add(CopyCommand(GameCommands.OutputfileInventory,
+                    HelperPresentation.DoorTip(new HelperDoor(HelperDoorKind.Gear, ""))));
+                break;
+            case GoalGapReason.GearIntentNotAnsweredYet:
+                // A deferred INTENT points at the room that answers its question today, the
+                // same pairing a deferred GOAL keeps — an affordance that produced one
+                // apologetic sentence and pointed nowhere is the rail's own forbidden shape.
+                stack.Children.Add(Door(new HelperDoor(HelperDoorKind.Wealth, "")));
+                break;
+            case GoalGapReason.NoCatalogUpgrade:
+                // Nothing to copy and nowhere new to go: the Gear room's door is already on
+                // the block above, beside the control that produced this state.
                 break;
         }
         return stack;
@@ -817,9 +1070,30 @@ internal sealed class HelperRoom : Grid, IShellRoom
         // the dump is one flat namespace (trap 58), so "2 goals" reads as "2goals".
         $"helperGoalFace={_goalFace.Replace(" ", "")} " +
         $"helperFactionFace={_factionFace.Replace(" ", "")} " +
+        // **DRA-71 D6.** The intent the STORE holds and the segments the strip actually DREW
+        // — two claims, because an intent that reached settings.json and no control is trap
+        // 20's shape and photographs as an ordinary row (trap 29). `helperWorn` is how many
+        // anchors the sweep was handed, which is the one key that can tell "no inventory dump"
+        // from "nothing in the catalog beats it": both draw one grey sentence.
+        $"helperIntent={_intent.ToString().ToLowerInvariant()} " +
+        $"helperIntentChips={_intentChips} " +
+        $"helperWorn={_worn.Count} " +
+        $"helperWornChips={_wornChips} " +
+        $"helperWornFace={_wornFace.Replace(" ", "")} " +
+        $"helperWornPicks={string.Join(',', GearIntentStore.WornPicks(_main.Settings, _main.QuestCharacterKey).Select(p => p.Replace(" ", "")))} " +
+        // The toggle's state AND whether it was drawn at all — "the room decided not to offer
+        // it" and "the room forgot" are different claims and an absent control photographs as
+        // an unremarkable panel.
+        $"helperQuestsOn={(_includeQuests ? 1 : 0)} " +
+        $"helperQuestToggle={(_questToggle ? 1 : 0)} " +
+        // What the ENGINE found: how many drawn answers carry a catalog upgrade line, how many
+        // carry an observed drop (the personal half), and what the sweep's own cap withheld.
+        $"helperGearWhy={_answers.Top.Count(r => r.Why.OfType<GearUpgradeFact>().Any())} " +
+        $"helperGearSeen={_answers.Top.Count(r => r.Why.OfType<GearDropSeenFact>().Any())} " +
+        $"helperGearWithheld={_answers.GearWithheld} " +
         // Whether a popup is OPEN. The staged state the shot photographs, and the assertion
         // that the review hook armed the control rather than merely being spelled correctly.
-        $"helperPickerOpen={((_goalPicker?.IsOpen ?? false) || (_factionPicker?.IsOpen ?? false) || (_unlockPicker?.IsOpen ?? false) ? 1 : 0)} " +
+        $"helperPickerOpen={((_goalPicker?.IsOpen ?? false) || (_factionPicker?.IsOpen ?? false) || (_unlockPicker?.IsOpen ?? false) || (_wornPicker?.IsOpen ?? false) ? 1 : 0)} " +
         $"helperPickerHook={(_reviewHookArmed ? 1 : 0)} " +
         // What the ENGINE answered.
         $"helperRecs={_answers.Top.Count} " +

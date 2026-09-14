@@ -171,14 +171,11 @@ internal sealed class InventoryView : IWidgetCard
 
         // The embedded catalog answers first with the build tool's own STRUCTURED
         // numbers — no text round-trip, and the catalog≡live-parse guarantee holds
-        // (2026-08-13 review). A genuinely fetched live page covers the rest.
-        var groups = GearLocker.Build(snap.Entries,
-            name => ItemCatalog.Default.Find(name) is { } rec
-                    && (rec.Slots.Count > 0 || rec.StatsText.Length > 0)
-                ? rec.ToStatsBlock()
-                : _main.WikiItems.CachedInfo(name) is { StatsLines.Count: > 0 } info
-                    ? ItemStatsBlock.Parse(info.StatsLines) : null,
-            MyClassCodes());
+        // (2026-08-13 review). A genuinely fetched live page covers the rest. Those three
+        // lines moved into `EqlWikiItemService.StatsFor` in DRA-71 D6, when the Helper's
+        // Farm Gear sweep became the second surface that had to resolve an item's numbers —
+        // two copies of a precedence rule is one item comparing differently in two rooms.
+        var groups = GearLocker.Build(snap.Entries, _main.WikiItems.StatsFor, MyClassCodes());
 
         _missing = groups.Where(g => g.Slot == "STATS NOT FETCHED YET")
             .SelectMany(g => g.Rows).Select(r => r.BaseName)

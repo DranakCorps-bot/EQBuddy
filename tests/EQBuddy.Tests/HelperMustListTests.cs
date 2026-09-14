@@ -100,17 +100,74 @@ public class HelperMustListTests
         Assert.Contains(parsed!.Value.Page, ShellPages.Landed);
     }
 
-    /// <summary>The four D1 engines, named. This row is meant to be EDITED — a goal moving
+    /// <summary>The engines that exist, named. This row is meant to be EDITED — a goal moving
     /// from Deferred to Answered is the whole of what a later slice delivers, and it should
-    /// be a deliberate line in a diff rather than something that happens as a side effect.</summary>
+    /// be a deliberate line in a diff rather than something that happens as a side effect.
+    /// Four in D1; Farm Gear joined them in DRA-71 D6.</summary>
     [Fact]
-    public void FourGoalsAreAnsweredInThisDelivery() =>
+    public void FiveGoalsAreAnsweredInThisDelivery() =>
         Assert.Equal(
-            [HelperGoal.LevelUp, HelperGoal.UnlockClasses, HelperGoal.UnlockRaces,
-             HelperGoal.WorkOnFaction],
+            [HelperGoal.LevelUp, HelperGoal.FarmGear, HelperGoal.UnlockClasses,
+             HelperGoal.UnlockRaces, HelperGoal.WorkOnFaction],
             Recommendations.All
                 .Where(g => Recommendations.ShapeFor(g) == HelperGoalShape.Answered)
                 .ToArray());
+
+    /// <summary>
+    /// **THE GEAR INTENTS ARE THEIR OWN MUST-LIST** (DRA-71 D6, plan P8) — trap 34 one level
+    /// below the goals'.
+    ///
+    /// <para>Farm Gear is one Answered goal asking three different questions, and two of them
+    /// are built. Null is "nobody decided", reachable only by adding a member to
+    /// <see cref="GearIntent"/>; <c>GearUpgrades.ShapeFor</c> has no default arm for the same
+    /// reason <c>Recommendations.ShapeFor</c> has none.</para>
+    /// </summary>
+    [Theory]
+    [MemberData(nameof(Intents))]
+    public void EveryGearIntentHasADecidedShapeALabelAndATip(GearIntent intent)
+    {
+        Assert.NotNull(GearUpgrades.ShapeFor(intent));
+        Assert.NotEmpty(HelperPresentation.GearIntentLabel(intent));
+        Assert.NotEmpty(HelperPresentation.GearIntentTip(intent));
+    }
+
+    /// <summary>The Founder's three, in his order, and the count said out loud — a fourth
+    /// arriving is a deliberate edit here rather than a line someone slid into the enum.</summary>
+    [Fact]
+    public void TheIntentListIsTheFoundersThree()
+    {
+        Assert.Equal(3, GearUpgrades.All.Count);
+        Assert.Equal(
+            ["Upgrade what I wear", "Replace with better", "Farm to sell"],
+            GearUpgrades.All.Select(HelperPresentation.GearIntentLabel).ToArray());
+    }
+
+    /// <summary>Two of the three answer in this delivery. The same "meant to be EDITED" row as
+    /// the goals' above it — D7's Make Money slice is what moves "Farm to sell".</summary>
+    [Fact]
+    public void TwoGearIntentsAreAnsweredInThisDelivery() =>
+        Assert.Equal(
+            [GearIntent.UpgradeWorn, GearIntent.ReplaceSlot],
+            GearUpgrades.All
+                .Where(i => GearUpgrades.ShapeFor(i) == GearIntentShape.Answered)
+                .ToArray());
+
+    /// <summary>A deferred INTENT says so and points at the room that answers its question
+    /// today — the same pairing a deferred GOAL keeps, and it lives on the gap reason because
+    /// an intent is not a goal. The door is asserted to be a room that has actually landed, so
+    /// this cannot rot into a sentence pointing at nothing.</summary>
+    [Fact]
+    public void TheDeferredGearIntentSaysSoAndPointsSomewhere()
+    {
+        var gap = new GoalGap(HelperGoal.FarmGear, GoalGapReason.GearIntentNotAnsweredYet);
+        Assert.NotEmpty(HelperPresentation.Gap(gap));
+
+        var address = HelperPresentation.AddressFor(HelperDoorKind.Wealth);
+        Assert.NotNull(address);
+        Assert.Contains(ShellPages.ParseAddress(address)!.Value.Page, ShellPages.Landed);
+    }
+
+    public static TheoryData<GearIntent> Intents() => [.. GearUpgrades.All];
 
     // ---- 2. every why-fact has a sentence ----------------------------------------------
 
@@ -288,12 +345,20 @@ public class HelperMustListTests
             + string.Join("¦", r.Why.Select(HelperPresentation.Why)))];
 
     /// <summary>
-    /// One fixture that feeds all four engines at once — a farmed low-level camp, a faction
-    /// those same kills move, and a race unlock that wants it.
+    /// One fixture that feeds all FIVE engines at once — a farmed low-level camp, a faction
+    /// those same kills move, a race unlock that wants it, and (since DRA-71 D6) a worn item
+    /// with a catalog upgrade that drops in the same zone.
     ///
     /// <para>The creatures conned L8–12, so a level-60 character has outgrown them by any
     /// reading and a level-12 one has not. Everything else is held still: the point of the
     /// row above is that the ONLY thing that differs between the two runs is the level.</para>
+    ///
+    /// <para><b>The gear half is deliberately in the SAME zone.</b> A Farm Gear answer that
+    /// named a zone with no history could not be affected by the level under any reading, so
+    /// the exemption would pass for the wrong reason — "identical at two levels" is vacuous
+    /// against an engine the level could never have reached. Anchoring it on Lower Guk, which
+    /// IS the outgrown zone, is the arrangement where a borrowed P6 discount would show
+    /// up.</para>
     /// </summary>
     private static HelperInputs LevelFixture(int level)
     {
@@ -322,10 +387,24 @@ public class HelperMustListTests
                     "Frogloks of Guk", false)]),
         ];
 
+        var worn = new WornItem("Rusty Helm", "Rusty Helm", "HEAD",
+            ItemStatsBlock.Parse(["Slot: HEAD", "AC: 4"]));
+        var catalog = new ItemCatalog([
+            new ItemCatalog.Record
+            {
+                Name = "Froglok Bone Helm", StatsText = "Slot: HEAD\nAC: 9",
+                Slots = ["HEAD"], Ac = 9, DropZones = ["Lower Guk"],
+            },
+        ]);
+
         return new HelperInputs(
             ZoneHistory.Fold(sessions, pool), pool, dump, ["Frogloks of Guk"],
             races, races, [], true, [], [], null,
-            new ResolvedLevel(level, LevelSource.Observed, new DateTime(2026, 9, 12, 20, 0, 0)));
+            new ResolvedLevel(level, LevelSource.Observed, new DateTime(2026, 9, 12, 20, 0, 0)))
+        {
+            Worn = [worn],
+            Items = catalog,
+        };
     }
 
     // ---- fixtures ------------------------------------------------------------------------

@@ -517,10 +517,14 @@ public class RecommendationsTests
     [Fact]
     public void APickedDeferredGoalComesBackAsNotAnsweredYetRatherThanAsAGap()
     {
-        var set = Recommendations.Rank(HelperInputs.Nothing, [HelperGoal.FarmGear]);
-        Assert.Equal([HelperGoal.FarmGear], set.NotAnsweredYet);
+        // Farm Motes since DRA-71 D6 — Farm Gear, which used to stand here, gained its
+        // engine in that slice and its answer is now a GAP ("no inventory dump") rather than a
+        // deferral. The distinction this test exists for is unchanged: a gap means a store is
+        // missing, a deferral means code is.
+        var set = Recommendations.Rank(HelperInputs.Nothing, [HelperGoal.FarmMotes]);
+        Assert.Equal([HelperGoal.FarmMotes], set.NotAnsweredYet);
         Assert.Empty(set.Gaps);
-        Assert.NotEmpty(HelperPresentation.NotAnsweredYet(HelperGoal.FarmGear));
+        Assert.NotEmpty(HelperPresentation.NotAnsweredYet(HelperGoal.FarmMotes));
     }
 
     // ---- 7. the doors are real ---------------------------------------------------------------
@@ -640,8 +644,13 @@ public class RecommendationsTests
         var set = Recommendations.Rank(HelperInputs.Nothing, Recommendations.All);
         Assert.Empty(set.Top);
         Assert.Equal(0, set.Withheld);
-        Assert.Equal(5, set.NotAnsweredYet.Count);
-        Assert.Equal(4, set.Gaps.Count);
+        // FOUR deferred goals since DRA-71 D6 (Farm Gear gained its engine), and FIVE gaps:
+        // the four that were already here plus Farm Gear's own, which on a fresh profile is
+        // "EQBuddy has not been told what you are wearing".
+        Assert.Equal(4, set.NotAnsweredYet.Count);
+        Assert.Equal(5, set.Gaps.Count);
+        Assert.Contains(set.Gaps,
+            g => g.Goal == HelperGoal.FarmGear && g.Reason == GoalGapReason.NoInventoryDump);
         // And the level it was handed is the Unknown state rather than a zero somebody has
         // to remember not to divide by (DRA-71 D3).
         Assert.False(HelperInputs.Nothing.Level.Known);

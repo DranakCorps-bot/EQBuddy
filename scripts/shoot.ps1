@@ -1509,6 +1509,91 @@ $Shots = [ordered]@{
                                Theme = 'Solarized'
                                HelperGoals = @{ 'testchar_test' = @('LevelUp') }
                            } }
+    # ---- DRA-71 D6: Farm Gear asks the intent first --------------------------------------
+    #
+    # The three staged states are the three claims the slice makes: the intent strip with its
+    # answers, the worn picker OPEN, and the OTHER intent producing a different top zone from
+    # the SAME profile.
+    #
+    # The anchors are staged through the real seam — an inventory dump beside the log, in the
+    # game's own tab-separated shape — and both item names are REAL rows in the shipped
+    # catalog with no class lock on them ("Cloth Cap", AC 2, HEAD; "Cloth Choker", AC 1, NECK).
+    # A made-up item would resolve to no stats, drop out of `GearUpgrades.WornFrom`, and the
+    # picture would be the honest empty state of something else (trap 23).
+    #
+    # PREDICTION, computed against the shipped catalog before the run and confirmed by the E2E
+    # rows that assert the same numbers: the fixture infers WARRIOR, so the class lock is WAR.
+    # 'shell-helper-gear' — one block headed "Farm Gear": its note, a three-segment strip with
+    #   "Upgrade what I wear" selected, a worn face reading "Cloth Cap" (one pick is always
+    #   named), the "Include quest rewards" pill UNSELECTED, and the catalog caveat under it.
+    #   The answers are THREE zones in this order — Temple of Veeshan (3 upgrades), Clan
+    #   Runnyeye (2), Kael Drakkel (1) — each naming its items with "+N AC/HP/…" and the
+    #   estimate label, the room cap saying 2 more answers matched, and the sweep's own cap
+    #   saying 103 more upgrades are not listed with a Gear door under it.
+    # 'shell-helper-gear-picker' — the same state with the WORN picker open over it. Two check
+    #   rows in slot order — "Cloth Cap — head" ticked, "Cloth Choker — neck" not — because
+    #   the popup offers every worn item and the offer is never narrowed by its own filter.
+    #   Popups = $true composites the popup's own HWND (trap 79); without it this shot is
+    #   byte-identical to the one above.
+    # 'shell-helper-gear-replace' — SOLARIZED, and the same stored pick. No picker at all (that
+    #   is the intent difference made visible), and the top zone changes to Western Wastes,
+    #   which feeds eight of the NECK upgrades — so the picture shows the two intents being
+    #   different questions rather than two labels on one answer. 225 held back.
+    #
+    # SHOT 2026-09-13: all three as predicted — the strip, the selected segment, the face, the
+    # unselected pill, the caveat, the zone order and the item sentences with their estimate
+    # labels; the picker composites its two rows in slot order with Cloth Cap ticked, and the
+    # replace shot's top zone is Western Wastes with no picker above it.
+    #
+    # THREE THINGS THE PREDICTIONS DID NOT COVER, and the third is the one worth acting on:
+    #   (a) The per-row cap is visible only in the REPLACE shot — "5 more reasons not shown."
+    #       under Western Wastes, which is 8 upgrades minus the 3 named. In the other two no
+    #       zone had more than three, so trap 50's sentence had nothing to say. That is the cap
+    #       behaving, and it took the third staging to photograph it at all.
+    #   (b) The unknown-level line is drawn above the answers in all three, with its Character
+    #       door — the shoot profile has no ding and no statement. Correct, and a reminder that
+    #       Farm Gear is EXEMPT from level: the line says the ranking is unaffected, and for
+    #       this goal that is literally true.
+    #   (c) **THE BLOCK IS TALL, AND THE TWO CAP SENTENCES FALL BELOW THE FOLD** at this
+    #       window size. The note, the strip, the picker, the pill and the four-line catalog
+    #       caveat come before the first answer, so "2 more answers matched" and "103 more
+    #       upgrades are not listed" are off-screen in every one of the three. They are drawn —
+    #       `helperGearWithheld` asserts the number from the same Build — and a player scrolls
+    #       to them. It is a density question rather than a defect, and it is filed in
+    #       `BEVEL.md` against these shots rather than restyled here.
+    'shell-helper-gear' = @{ Title = 'EQBuddy — Helper'
+                           Env = @{ EQBUDDY_SHELL = 'helper' }
+                           Dump = @{ 'Testchar_test-Inventory.txt' = @(
+                               "Location`tName`tID`tCount`tSlots"
+                               "Head`tCloth Cap`t0`t1`t0"
+                               "Neck`tCloth Choker`t0`t1`t0") }
+                           Set = @{
+                               HelperGoals = @{ 'testchar_test' = @('FarmGear') }
+                               HelperWornPicks = @{ 'testchar_test' = @('Cloth Cap') }
+                           } }
+    'shell-helper-gear-picker' = @{ Title = 'EQBuddy — Helper'
+                           Env = @{ EQBUDDY_SHELL = 'helper'; EQBUDDY_HELPER_PICKER = 'worn' }
+                           Popups = $true
+                           Dump = @{ 'Testchar_test-Inventory.txt' = @(
+                               "Location`tName`tID`tCount`tSlots"
+                               "Head`tCloth Cap`t0`t1`t0"
+                               "Neck`tCloth Choker`t0`t1`t0") }
+                           Set = @{
+                               HelperGoals = @{ 'testchar_test' = @('FarmGear') }
+                               HelperWornPicks = @{ 'testchar_test' = @('Cloth Cap') }
+                           } }
+    'shell-helper-gear-replace' = @{ Title = 'EQBuddy — Helper'
+                           Env = @{ EQBUDDY_SHELL = 'helper' }
+                           Dump = @{ 'Testchar_test-Inventory.txt' = @(
+                               "Location`tName`tID`tCount`tSlots"
+                               "Head`tCloth Cap`t0`t1`t0"
+                               "Neck`tCloth Choker`t0`t1`t0") }
+                           Set = @{
+                               Theme = 'Solarized'
+                               HelperGoals = @{ 'testchar_test' = @('FarmGear') }
+                               HelperWornPicks = @{ 'testchar_test' = @('Cloth Cap') }
+                               HelperGearIntent = @{ 'testchar_test' = 'ReplaceSlot' }
+                           } }
     'shell-gear-narrow' = @{ Title = 'EQBuddy — Gear'
                            Env = @{ EQBUDDY_SHELL = 'gear:gear'; EQBUDDY_SHELL_SIZE = '580x480' }
                            Set = @{
