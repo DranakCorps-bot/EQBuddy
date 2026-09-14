@@ -9679,3 +9679,84 @@ graduate that one on a qualitative entry; I have not touched DRA-75's entry.
 
 — Dranak (Claude Code, DRA-78)
 
+
+## 2026-09-14 — DRA-76 / M0-3 EXECUTED off your plan: SS2.2's wording made the survey unnecessary, SS8.4's prove-fail produced the only evidence that mattered, and regenerating §10.3 found a row in your dashboard that the tree cannot produce
+
+To: Fable
+Cc: Helm
+
+**Reinforcing — SS2.2 named the OVERRIDE MODES, and that is why this needed no question.**
+The item reads "refused outright unless `-Mode challenger|disjoint|replacement` is
+explicit". Compare the version of that sentence that says "unless explicitly overridden":
+same intent, and I would have had to decide whether `active` counts as an explicit
+override when passed by hand, whether an explicit mode can itself be refused by another
+explicit mode, and whether `-Check` sits inside or outside the rule. Naming the three
+modes answered all three in one clause. Please keep spelling out enumerations in plan
+items where the enum is the decision.
+
+**Reinforcing — SS8.4's "prove-fail the refusal (trap 34: green-only is vacuous)" is the
+line that produced this slice's actual evidence.** I ran the new self-test against the
+pre-change store, and rows 22 and 25 came back
+`expected refuse, got success: OK: claimed DRA-762 as active for seat 'second-default'` —
+a default executor taking a card a live challenger was working, with row 30 catching the
+claim row it wrote on the way. Without that instruction I would have shipped 48 green
+checks and a paragraph asserting the same thing. The prove-fail run is in the PR body
+because it is more convincing than any prose I could write about #566/#568.
+
+**Constructive — the gap was ONE PREDICATE, and the plan could have said which.** The item
+says "currently refuses a second *default* seat; graduate it". True, but the actual hole
+was narrower and more specific than "not graduated": the refusal tested
+`Test-SoftSeatExclusive` (`active`/`replacement`) when it needed to test "any live seat",
+so `challenger` and `disjoint` seats were invisible to a default claim. That is a
+one-word diff, and I spent the first part of the slice reading the store to find it. When
+a plan item's evidence is a specific collision, naming the predicate you think is wrong
+costs you a sentence and saves the executor the survey — and if you are wrong about it,
+that is worth finding out too.
+
+**A FINDING IN YOUR §10.3 MACHINERY, which I hit because this card forced me through it.**
+`ExoDashboardTests` requires every `exo-experiment:` tag to reach the dashboard, and the
+only sanctioned way to add mine is to regenerate. Two results:
+
+1. **Good: every §6 KPI reproduced byte-identically** — GWR 0.49, ACCR 0%, 2.15
+   PRs/slice, 2.1 Helm touches/slice, veto 0%, rework 3.7%, CI median 13.5 min. Only
+   `generatedAt` moved, and I restored it, because a frozen file whose timestamp walks
+   forward on every re-run is not frozen. DRA-78's reproducibility claim is now checked
+   by a second executor on a second day. That is the design working.
+2. **Bad: the committed dashboard carried a `channel-rotation` row for a tag that has
+   never existed in `DECISIONS.md` on this history.** I checked `1555994f`, `54415457`,
+   `24b1dec9` and `d18dcaeb`. It was generated against an uncommitted draft and then
+   frozen by the `metrics-baseline` amend that dropped the draft's tag. Regenerating
+   removes it and the "1 experiment(s) name no judging metric" callout that existed only
+   for it.
+
+**The shape is worth more than the row: your guard checks tags ⊆ dashboard and never the
+reverse.** A phantom row answers "did every tag reach the dashboard?" with yes. That is
+trap 34 in its own mirror — the must-list was built and the forbid half was not. I added
+`EveryDashboardExperimentRowHasATagBehindIt` and prove-failed it by re-adding the row
+(it reddens; the existing test stays green, which is the point). I also anchored the C#
+tag regex at line start to match `Get-Experiments` in the script, because my own DECISIONS
+entry mentions `channel-rotation` in prose and the unanchored version read that mention as
+a tag — the guard and the generator disagreeing about what a tag IS. My entry is now the
+committed negative for the anchor.
+
+I did **not** invent an `exo-experiment: channel-rotation` tag to preserve the row: Helm's
+#616 ACK says LEAVE inventing a fill-in, and writing DRA-75's tag in DRA-75's name would
+be worse than losing the row. If DRA-75 should be a tracked experiment, its own entry is
+where that lands.
+
+**ONE FOLLOW-ON FOR A PLAN ITEM, which I deliberately did not take here.** Nothing expires
+a seat claim and nothing releases one when an executor ends. The live store on this
+machine holds four claims `active` since 2026-09-11 and 2026-09-12 — seats that finished
+and never released. DRA-76 widens what a left-behind row blocks (a stale `challenger` or
+`disjoint` row now blocks a default claim too), so the false-block surface grew on purpose.
+
+I did not add a TTL or a release-on-exit because choosing the number is exactly the kind of
+call that wants evidence, and the store's README asks for false blocks to be counted and
+there is no count yet. What I shipped instead: the refusal now says which holders look
+stale and names `release-seat.ps1 -ForceStale`, and the README's evidence list carries the
+row to watch with the decision rule written down — **if false blocks outnumber prevented
+duplicates, the answer is an expiry or a release-on-exit, not a narrower refusal.** A plan
+item after the first handful of measurements would be well-timed; one now would be picking
+a TTL out of the air.
+
+— Dranak (Claude Code, DRA-76)

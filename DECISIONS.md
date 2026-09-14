@@ -1,3 +1,128 @@
+## 2026-09-14 — DRA-76 / M0-3 (claim-seat graduated to a refusing per-work-item mutex): seven calls I made alone, the one line of old behaviour that turns out to have been the whole hole, and a risk I widened on purpose and did not fix
+
+`exo-experiment: seat-mutex` — judged by *rework rate* and *PRs per delivered slice*
+(baseline 3.7% and 2.15), because a duplicate executor spends both: #566/#568 cost one
+full run and produced a second PR for one slice. Stated net of the **false-block count**
+kept in `.claude/soft-seats/README.md`'s evidence list — a mutex that refuses work that
+should have started is not cheaper than the collision, it is just quieter.
+
+Tier T0/T1 · scripts + docs only, `src/` untouched · governing plan: DRA-73 plan
+document rev 2, approved by David 2026-09-14 (SS2.2 + SS8.4; SS10.1 asks for the tag
+above).
+
+**What actually changed is one word.** The refusal used to test `Test-SoftSeatExclusive`
+— `active` or `replacement`. It now tests `Test-SoftSeatHolding` — every mode except
+`abandoned`. So a default claim is refused by a live `challenger` or `disjoint` seat as
+well, and only an abandoned claim releases the card.
+
+**The hole that word left is not theoretical, and the prove-fail run prints it.** Running
+the new self-test against the pre-change store, rows 22 and 25 read
+`expected refuse, got success: OK: claimed DRA-762 as active for seat 'second-default'`
+— a default executor taking a card a live challenger was working, and row 30 then catches
+the row it wrote while doing it. That is the #566/#568 shape, reproduced on demand.
+
+---
+
+**1. A CHALLENGER AND A DISJOINT SLICE HOLD THE CARD.** The default could have gone the
+other way, and the old code is the argument for it: those modes were deliberately
+non-exclusive, so reading them as holders is a reversal, not a completion. I reversed it.
+The store's job is to refuse a *duplicate executor*, and an executor working a card under
+`-Mode disjoint` is an executor working that card; whether its slice is disjoint is a
+claim it made about itself, not something the store checked. Exclusivity still means what
+it meant — it is what `-Mode replacement` takes over — which is why
+`Test-SoftSeatHolding` is a second predicate beside `Test-SoftSeatExclusive` rather than
+a widening of it.
+
+**2. THE EXPLICIT MODES ARE NEVER THEMSELVES REFUSED.** A challenger beside a challenger
+is admitted. The card asks for "refused outright unless `-Mode challenger|disjoint|replacement`
+is explicit", and the whole design rests on the seam between *a default that happened* and
+*a second seat somebody chose*. Capping the explicit modes would move the refusal onto
+the people who already read the rule and said what they were doing.
+
+**3. OWN ROWS ARE EXCLUDED BY SEAT ID, NOT BY "DO I HOLD AN EXCLUSIVE ONE".** The old
+`$ownExclusive` proxy answered "may I refresh my claim" with a fact about exclusivity
+(trap 64b). `-NotSeatId` names the actual fact: this seat is not a second executor. Same
+answer on every path the old code covered; correct on the paths it did not.
+
+**4. THE REFUSAL NAMES EVERY HOLDER, COUNTS THEM, AND SAYS WHICH LOOK STALE.** Widening a
+refusal without making the recovery discoverable manufactures false blocks, which is the
+row this experiment is judged net of. The old message named `$exclusive[0]` — one holder,
+no count — so a card held by three seats and a card held by one read identically. The
+self-test asserts the count (`3 live seat`), asserts each holder is named, asserts the
+released seat is *not* named, and asserts `release-seat.ps1` appears in every refusal.
+
+**5. `-ForceStale` IS THE ONLY WAY PAST A HOLDER, SO THE 8 HOURS IS NOW ONE NUMBER.**
+`SoftSeatStaleAfterHours` lives in the store; `release-seat.ps1 -StaleAfterHours` defaults
+to `0` meaning "unset" and resolves to it after the dot-source. Two copies of that number
+would let the sentence the refusal prints drift away from the behaviour the release path
+acts on (trap 4), and the refusal only just started printing it.
+
+**6. THE HOLDING LIST THROWS AT DOT-SOURCE TIME IF IT IS NOT THE MODE LIST MINUS
+`abandoned`.** A detector list that drifts fails OPEN here — a mode nobody added would
+hold a seat that refuses nobody, which is trap 78's green-guard-aimed-at-nothing in its
+worst direction. The self-test also asserts the list is non-empty and equals the four
+modes, because `@($null)` is a one-element array and reads as a healthy list.
+
+**7. THE REFUSAL TEXT CHANGED FROM "already claimed" TO "already held by N live seat(s)".**
+Grepped `scripts/`, `.claude/`, `.github/` and `tests/` first: the self-test was the only
+consumer of the old phrase. Worth saying in a log because a refusal string is exactly the
+kind of thing a launcher or a hook greps for silently.
+
+---
+
+**THE RISK I WIDENED AND DID NOT FIX, stated so the veto has something to aim at.**
+Nothing expires a claim and nothing releases one when an executor ends. The live store on
+this machine right now holds four claims that have been `active` since 2026-09-11 and
+2026-09-12 — every one of them almost certainly a seat that finished and never released.
+Before today those rows blocked only a default claim on the *same* card; the widening does
+not change that count, but it does mean a `challenger` or `disjoint` row left behind now
+blocks too, and the surface of "left behind" just grew by two statuses.
+
+I did not add an expiry or a release-on-exit. Both are a design change to the mechanism
+rather than the graduation the card authorises, and choosing a TTL is exactly the sort of
+number that wants evidence — the store's README asks for false blocks to be counted, and
+there is no count yet. What I did instead is make the refusal say when a holder looks
+stale and name the one command that clears it, and write the risk into the README's
+evidence list as the row to watch. **If false blocks outnumber prevented duplicates, the
+answer is an expiry or a release-on-exit — not a narrower refusal.** Filed to Fable as a
+follow-on rather than taken here.
+
+---
+
+**A SECOND FINDING, FROM THE ONE STEP THIS CARD FORCED ME THROUGH — and it is about
+yesterday's slice, so it is stated rather than quietly fixed.** `ExoDashboardTests`
+requires every `exo-experiment:` tag in `DECISIONS.md` to reach the dashboard's §7, and
+the only sanctioned way to put mine there is to regenerate — a hand edit of a generated
+doc is the illustration lock's failure with a recipe-shaped hole in it. So I re-ran
+`scripts/exo-metrics.ps1 -FromPr 580 -ToPr 607 -Baseline`, and two things came back.
+
+**The good one: every §6 KPI reproduced byte-identically.** GWR 0.49, ACCR 0%, 2.15
+PRs/slice, 2.1 Helm touches/slice, veto 0%, rework 3.7%, CI median 13.5 min — the only
+field that moved in `exo-baseline.json` was `generatedAt`, which I restored to the DRA-78
+run's value. The freeze is that run, not mine, and a frozen file whose timestamp walks
+forward every time somebody re-runs the generator is not frozen. DRA-78's central claim —
+that the baseline is re-derivable rather than remembered — is now checked by a second
+person on a second day.
+
+**The bad one: the committed dashboard carried a row the committed tree cannot produce.**
+§7 listed a `channel-rotation` experiment flagged "no judging metric", and there has never
+been an `exo-experiment: channel-rotation` tag in `DECISIONS.md` on this history —
+`git show <commit>:DECISIONS.md` at `1555994f`, `54415457`, `24b1dec9` and `d18dcaeb`
+finds `ssc-retirement`, `whole-sequence-auth` and later `metrics-baseline`, and nothing
+else. The row is an artefact of an UNCOMMITTED working-tree state at generation time: the
+`metrics-baseline` amend Helm asked for landed over a draft that had both tags, and the
+dashboard kept the one the amend dropped. Regenerating removes the row and the
+"1 experiment(s) name no judging metric" callout that existed only for it.
+
+I let the regeneration remove them rather than re-adding a tag I did not write (Helm's
+#616 ACK says LEAVE inventing a fill-in, and inventing the tag to preserve the row would
+be worse — it would make a DRA-75 decision up in DRA-75's name). **But the thing worth
+keeping is not the row, it is what the row proves: `ExoDashboardTests` checks tags ⊆
+dashboard and never the reverse, so a dashboard row with no tag behind it is invisible to
+the guard that exists to keep the two in step.** That is trap 34 in its own mirror — the
+must-list was built, and the forbid-scan on the other side was not. Filed to Fable;
+NOTICE'd to Helm, because Helm ACK'd that row by name.
+
 ## 2026-09-14 — DRA-78 / M0-5 (exo-metrics.ps1 + the frozen DRA-70/71/72 baseline): eight definitional calls I made alone, three numbers that came back different from the plan's estimate, and two metrics I refused to report as zero
 
 `exo-experiment: metrics-baseline` — judged by *whether a later window's claim can be

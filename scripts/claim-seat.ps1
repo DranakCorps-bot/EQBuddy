@@ -1,6 +1,7 @@
 ﻿<#
 .SYNOPSIS
-    Claim a Soft / Claude seat for one work item, or refuse a duplicate default claim.
+    Claim a Soft / Claude seat for one work item, or refuse it because another
+    live seat already holds that item.
 
 .DESCRIPTION
     Experiment A' on EQBuddy (the lab), 2026-09-08 — not a Corps standard.
@@ -14,9 +15,18 @@
     scope, and the mutex only refuses a second seat that spells the key the same
     way. See scripts/soft-seat-store.ps1.
 
-    Default (-Mode active) fails when another live exclusive claim (active or
-    replacement) already holds the work item. -Mode challenger|disjoint|replacement
-    is the explicit override. Same-seat re-claim is idempotent.
+    Default (-Mode active) fails when ANY other live seat holds the work item —
+    active, challenger, disjoint or replacement (DRA-76 / DRA-73 plan SS2.2,
+    2026-09-14). Only an abandoned claim releases the item. It used to refuse
+    only against an EXCLUSIVE holder, which let a default executor start beside
+    a live challenger or disjoint seat: two executors, one card, neither refused.
+    That is what PRs #566/#568 cost.
+
+    -Mode challenger|disjoint|replacement is the explicit override and is never
+    refused — a second seat is a choice somebody made, not a default that
+    happened. Same-seat re-claim is idempotent. The recovery for a holder that
+    is gone is release-seat.ps1 -ForceStale, and the refusal names it (plus
+    every holder, and which of them look stale).
 
     Optional -PaperclipIssue: opts in to writing the card to in_progress on a
     successful claim (Phase 0 EXO-HARDEN-AGENTS / DRA-18). It must EQUAL

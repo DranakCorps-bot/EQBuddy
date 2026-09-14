@@ -1249,3 +1249,63 @@ on; this land executed cutover 1 the same way your ACK did. Reporting, not askin
 
 — Dranak (Claude Code, DRA-78)
 
+
+## 2026-09-14 — NOTICE: DRA-76 M0-3 — claim-seat graduated to a refusing per-work-item mutex. Reporting, not asking. One line touches a row you ACK'd by name in #616.
+
+To: Helm
+
+**Not a LIVE ASK.** DRA-73 plan rev 2 authorizes this slice (SS2.2 + SS8.4), the whole
+sequence is signed, and cutover 2 says a merge starts the next slice rather than an
+authorization gap. `HELM.md` Live Holds are empty and nothing names DRA-76 or the seat
+store. Nothing here is on the consequence list. I will merge when `build-and-test` +
+`e2e-windows` are green; a HOLD stops it.
+
+**Tier T0/T1 — scripts, tests and docs. `src/` untouched.** Branch
+`claude/dra76-seat-mutex-20260914` off Soft `main` `d18dcaeb` (post-#616 MERGED). Seat
+claimed as `DRA-76` / `claude-dra76-seat-mutex` through the mechanism this card changes.
+
+**What changed, in one sentence:** `scripts/claim-seat.ps1` refused a default claim only
+against an EXCLUSIVE holder (`active`/`replacement`); it now refuses against ANY live seat,
+so a `challenger` or `disjoint` seat holds the card too and only an `abandoned` claim
+releases it. `-Mode challenger|disjoint|replacement` remains the explicit override and is
+never itself refused. `release-seat.ps1 -ForceStale` remains the recovery, and the refusal
+now names every holder, counts them, and says which look stale — widening a refusal
+without making its recovery discoverable just manufactures false blocks.
+
+**Prove-failed, per SS8.4.** Running the new self-test against the pre-change store, rows
+22 and 25 read `expected refuse, got success: OK: claimed DRA-762 as active for seat
+'second-default'` — the duplicate executor of #566/#568, reproduced on demand — and row 30
+catches the claim row it wrote. All 48 checks pass on the new store. `check.ps1` all green
+(4903 unit tests).
+
+**THE ONE LINE THAT TOUCHES YOUR #616 RULING, which is why this notice exists at all.**
+Your ACK there says *"ACK channel-rotation no judging metric — Soft LEAVE inventing
+fill-in."* Adding my `exo-experiment: seat-mutex` tag requires regenerating
+`docs/ops/exo-dashboard.md` (hand-editing a generated doc is the illustration lock's own
+failure), and the regeneration **removes the `channel-rotation` row**.
+
+It removes it because there has never been an `exo-experiment: channel-rotation` tag in
+`DECISIONS.md` on this history — I checked `1555994f`, `54415457`, `24b1dec9`, `d18dcaeb`.
+The row was generated against an uncommitted working tree that had both tags, and the
+`metrics-baseline` amend you asked for kept the other one. The committed dashboard has
+been carrying a row the committed tree cannot produce.
+
+I did **not** invent the tag to preserve the row — that is the fill-in you told Soft to
+leave, and it would put words in DRA-75's mouth. I let the regeneration drop it and added
+the guard that would have caught it: `EveryDashboardExperimentRowHasATagBehindIt`
+(prove-failed by re-adding the row). The existing test only checked tags ⊆ dashboard, so a
+phantom row was invisible to it.
+
+**Also worth your attention: DRA-78's frozen baseline reproduced byte-identically** on a
+second run by a second executor — GWR 0.49, ACCR 0%, 2.15 PRs/slice, 2.1 Helm touches/slice,
+veto 0%, rework 3.7%, CI median 13.5 min. Only `generatedAt` moved and I restored it, so
+`exo-baseline.json` is byte-unchanged and the freeze remains DRA-78's run.
+
+**Open, deliberately not taken:** nothing expires a seat claim or releases one when an
+executor ends; four claims on this machine have been `active` since 2026-09-11/12. The
+widening makes a left-behind `challenger` or `disjoint` row block a default claim that it
+did not block before. I did not add a TTL — picking one with no false-block count is a
+number out of the air — and filed it to Fable with the decision rule written into the
+store's README. Say the word if you want it held until that exists.
+
+— Dranak (Claude Code, DRA-76)

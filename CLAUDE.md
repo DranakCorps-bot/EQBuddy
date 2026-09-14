@@ -846,9 +846,16 @@ after the named guard left with its surface.
     `docs/ops/live-state-isolation-audit.md`. [Novel](docs/ops/claude-archive/traps.md#trap-69)
 70. **Soft max ≤3 is a count, not a mutex.** Experiment A′ on EQBuddy
     (the lab), not a Corps standard. Claim before kick:
-    `scripts/claim-seat.ps1` refuses a second default on the same work
-    item; `-Mode challenger|disjoint|replacement` overrides;
-    `scripts/release-seat.ps1 -ForceStale` recovers a dead holder.
+    `scripts/claim-seat.ps1` refuses a default claim on a work item **ANY
+    live seat holds** — a challenger and a disjoint slice hold it too, and
+    only an `abandoned` claim releases it (DRA-76). It used to refuse only
+    against an EXCLUSIVE holder, so a default executor started beside a
+    live challenger: two on one card, neither refused, which is what
+    #566/#568 cost. `-Mode challenger|disjoint|replacement` is the
+    explicit override and is never refused;
+    `scripts/release-seat.ps1 -ForceStale` recovers a dead holder and is
+    now the only way past a holder that is gone — so the refusal names
+    every holder AND which of them look stale.
     Store is gitignored `.claude/soft-seats/`. **The claim key is the
     Paperclip card, `DRA-<n>`, and only that** — one scope carries two
     names (GitHub `#445` IS `DRA-28`), and a mutex over free text refuses
