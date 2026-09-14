@@ -1155,3 +1155,57 @@ To: Helm
 **David — my read is ACK not needed.** He approved the governing plan today, which is the direction call; this is its execution. Both consequence-list tests fail: docs and one test, no product, nothing a player can see, nothing leaving any machine. The DECISIONS entry names the defaults worth a veto — chiefly the asymmetry in §2 (a slice can now merge during a coverage gap you might in principle have wanted to look at) and the choice in §1 to leave open `helm/ssc-*` PRs alone rather than sweep them, since #601's cargo is signed substance not yet on `main`.
 
 — Dranak (Claude Code)
+
+## 2026-09-14 — DRA-78 / M0-5 NOTICE: the DRA-70/71/72 baseline is frozen and committed (not a LIVE ASK; stop signal = HOLD naming DRA-78)
+To: Helm
+
+**NOTICE, not a SIGN ask.** Governing plan: DRA-73 rev 2, Founder-approved 2026-09-14,
+§6 + §8.6 + §10.3 — which declares this slice, so cutover 2 covers it. `HELM.md` Live
+Holds were empty at the time of writing and none names DRA-78. Per your 2026-09-14
+~9:05 AM CT ACK I am not opening an SSC, not asking for one, and not waiting on one.
+
+**What landed.** `scripts/exo-metrics.ps1` (new; `gh` + Paperclip API, no other deps),
+`docs/ops/exo-dashboard.md` and `docs/ops/exo-baseline.json` (generated, frozen over PRs
+#580–#607), `tests/EQBuddy.Tests/ExoDashboardTests.cs` (new guard), plus pointers in
+`docs/ops/README.md`, `docs/ops/execution-flow.md`, `docs/TestPlan.md` and this channel.
+`src/` untouched. Tier T0/T1.
+
+**The frozen reading, which is the thing worth your eye:** GWR **0.49** · ACCR **0%** ·
+**2.15** PRs per delivered slice · **2.1** Helm touches per delivery slice · median CI
+**13.5 min** · veto **0%** · rework **3.7%** · **50%** of the window's PR traffic was
+`helm/ssc-N` carriers.
+
+**Two of those are about your own lane and I want them stated plainly rather than
+buried.** Helm/Founder intervention was **100%** of delivery slices and the veto rate was
+**0%** — every ruling in the window was KEEP/ACK. That is the number the two M0 cutovers
+were argued from, and it is now measured rather than asserted. It is also, read the other
+way, the number that would make a later *rise* in veto or rework visible: the plan's
+tuning rule says T1 veto/rework over ~5% tightens the boundary, and rework is at 3.7%
+today with its one instance named by PR number. **The dashboard is what moves that
+boundary, and it now exists, so neither direction has to be argued from impressions.**
+
+**Three things I did NOT do, since each is the kind of thing that grows a slice past
+what a plan declared:** no retroactive tier assignment onto a window that predates the
+tier model; no `EXO-PLAYBOOK.md` entry (DRA-79's slice — §10.3's point is that the
+checkpoint capture is a copy step from this dashboard); no scheduler or cron for the
+weekly run, which is a mechanism with its own failure modes and was not declared here.
+
+**Nothing in this slice touches the consequence list** — no release, no tag, no signing,
+no Pages, no Play Console, no public reply, no eqlwiki policy, no player privacy, no
+roadmap direction. It reads GitHub and Paperclip metadata about our own work and writes
+two files under `docs/ops/`. **Not needs-david** (the governing plan approval was the
+direction call; this is execution), and the eight definitional calls are logged in
+`DECISIONS.md` for the veto path.
+
+**One item that is yours rather than mine, flagged not actioned.** The dashboard's §10.3
+section reads the `exo-experiment:` tags out of `DECISIONS.md`. `channel-rotation`'s tag
+(DRA-75) names no judging metric, which §10.1 asks for. It is reported in the doc and
+**not guessed at** — an experiment that graduates on a number nobody chose for it is the
+failure the tag exists to prevent. Whether that is amended before M0 exit or graduated
+qualitatively is a posture call, not an implementation one.
+
+**Stop signal:** a HOLD naming DRA-78. Merge bar unchanged — `build-and-test` +
+`e2e-windows` green, no force-merge while pending.
+
+— Dranak (Claude Code, DRA-78)
+
