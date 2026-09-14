@@ -95,6 +95,12 @@ internal sealed class HelperRoom : Grid, IShellRoom
 
     private DateTime _readAt = DateTime.MinValue;
     private IReadOnlyList<ZoneRoll> _zones = [];
+    // DRA-71 D7. Two more folds over the same archives — motes per zone, and what a
+    // vendor has actually paid this character per item. Neither re-pools anything:
+    // MoteHistory consumes the pool and the zone rollup, SaleHistory consumes the
+    // snapshot probe beside StoredThroughput's.
+    private IReadOnlyList<MoteRoll> _motes = [];
+    private IReadOnlyList<SaleRoll> _sales = [];
     private int _poolVersion;
 
     /// <summary>What this character is WEARING, folded from the newest inventory dump behind
@@ -174,6 +180,7 @@ internal sealed class HelperRoom : Grid, IShellRoom
     /// control photographs as an unremarkable panel — "the room knows the level is unknown"
     /// and "the player has a way to fix it" are different claims.</summary>
     private bool _levelDoor;
+    private bool _moneyNote;
 
     public HelperRoom(MainWindow main, Action<string> navigate)
     {
@@ -278,6 +285,14 @@ internal sealed class HelperRoom : Grid, IShellRoom
                 $"{z.Zone}:{z.Sessions}:{z.Kills}:{z.XpPercent:0.##}"
                 + $":{z.CombatSeconds:0.##}:{z.CombatDamage:0.##}:{z.HealingDone:0.##}"
                 + $":{z.ActiveHours:0.####}:{z.Deaths}")),
+            // **DRA-71 D7's two new stores, folded by CONTENT.** Neither can be inferred from
+            // anything else in this key: a mote looted from a creature already in the pool
+            // moves `MobLoot.Count` without moving the pool's own signature, and a vendor trip
+            // moves nothing in this room's other inputs at all. A room that re-ranked and drew
+            // the moment before it is trap 72, and these are exactly the two stores this
+            // slice's features write nothing to and read everything from.
+            string.Join(',', _motes.Select(m => $"{m.Zone}:{m.Motes}:{m.Potency}:{m.Kills}")),
+            string.Join(',', _sales.Select(x => $"{x.Item}:{x.Count}:{x.Copper}")),
             unlocks.HasAchievements, unlocks.Races.Count, unlocks.Classes.Count,
             unlocks.Races.Count(u => u.Complete), unlocks.Classes.Count(u => u.Complete),
             unlocks.Factions?.WrittenAt.Ticks ?? 0,
@@ -306,6 +321,10 @@ internal sealed class HelperRoom : Grid, IShellRoom
             GearIntent = _intent,
             WornPicks = wornPicks,
             IncludeQuests = _includeQuests,
+            // DRA-71 D7, and behind `Rank` for D6's reason: the phone gets both engines the
+            // day it calls the same method.
+            Motes = _motes,
+            Sales = _sales,
         }, goals);
 
         Build(goals, factions, picks, wornPicks, unlocks);
@@ -333,6 +352,13 @@ internal sealed class HelperRoom : Grid, IShellRoom
         // cost as the session query it sits beside and neither belongs on a one-second clock.
         _zones = ZoneHistory.Fold(
             _main.StoredSessions(), _pool.Mobs, _main.StoredThroughput());
+
+        // **DRA-71 D7's two folds**, behind the same throttle and built from what is already in
+        // hand. MoteHistory takes the pool and the rollup above it — no third query — and
+        // SaleHistory takes one more snapshot probe, the sibling of the throughput one, plus
+        // the LIVE session's own sales so a vendor trip this evening prices tonight's drops.
+        _motes = MoteHistory.Fold(_pool.Mobs, _zones);
+        _sales = SaleHistory.Fold(_main.StoredSales(), s, _main.ActiveSessionRowId);
 
         // **DRA-71 D6: what the character is WEARING.** Behind this throttle rather than the
         // per-tick one — it is a file read plus a fold over ~200 rows, the same cost as the
@@ -390,6 +416,7 @@ internal sealed class HelperRoom : Grid, IShellRoom
         _deadDoors = 0;
         _copyCommands = 0;
         _levelDoor = false;
+        _moneyNote = false;
 
         _scroll.Content = _blocks;
         _blocks.Margin = new Thickness(Tok.SpaceL);
@@ -533,12 +560,21 @@ internal sealed class HelperRoom : Grid, IShellRoom
         // The picker the OTHER intent does not have. See the summary.
         if (_intent == GearIntent.UpgradeWorn) BuildWornPicker(block, wornPicks);
 
-        // The toggle belongs to both ANSWERED intents and to neither deferred one — an item a
-        // quest hands out is the same offer whichever way the sweep was anchored, and offering
-        // it beside an intent that ranks nothing would be a control with no effect.
-        if (GearUpgrades.ShapeFor(_intent) == GearIntentShape.Answered) BuildQuestToggle(block);
+        // The toggle belongs to the two intents that SWEEP THE CATALOG, and to no other — an
+        // item a quest hands out is the same offer whichever way the sweep was anchored, but
+        // "farm to sell" never reaches the catalog's items at all (DRA-71 D7), so offering it
+        // there would be a control with no effect.
+        if (_intent != GearIntent.FarmToSell
+            && GearUpgrades.ShapeFor(_intent) == GearIntentShape.Answered) BuildQuestToggle(block);
 
-        block.Children.Add(Line(HelperPresentation.GearCatalogNote, Role.Caption));
+        // **The catalog note belongs to the SWEEP and is drawn only for the intents that use
+        // it.** It is about base stats and a "+N" the wiki does not state, which is nothing to
+        // do with "farm to sell" — that intent's own caveat is about vendor prices and is drawn
+        // under the ANSWERS, beside the lines it qualifies (see BuildAnswers). One caveat per
+        // claim, where the claim is: two under every intent is how a player learns to skip
+        // them.
+        if (_intent != GearIntent.FarmToSell)
+            block.Children.Add(Line(HelperPresentation.GearCatalogNote, Role.Caption));
     }
 
     private void ChooseIntent(GearIntent intent)
@@ -812,6 +848,15 @@ internal sealed class HelperRoom : Grid, IShellRoom
         BuildLevelNote(block);
 
         foreach (var rec in _answers.Top) block.Children.Add(Answer(rec));
+
+        // **The vendor-price caveat, beside the lines it is about** (DRA-71 D7, plan P9). It is
+        // drawn from what was actually BUILT rather than from which goal is ticked, so it can
+        // never appear over a list with no price in it and can never be missing from one that
+        // has: the two money facts are the only things in the room that quote a price, and a
+        // vendor's price moves with the seller's Charisma and faction.
+        _moneyNote = _answers.Top.Any(r =>
+            r.Why.Any(w => w is SellableDropFact or CatalogValueFact));
+        if (_moneyNote) block.Children.Add(Line(HelperPresentation.MoneyPriceNote, Role.Caption));
 
         // The cap, out loud when it held something back.
         if (HelperPresentation.Cap(_answers.Withheld) is { Length: > 0 } cap)
@@ -1098,6 +1143,12 @@ internal sealed class HelperRoom : Grid, IShellRoom
         // What the ENGINE answered.
         $"helperRecs={_answers.Top.Count} " +
         $"helperWithheld={_answers.Withheld} " +
+        // What the PER-ROW why cap held back, summed — a different cap from `helperWithheld`
+        // above it, which is the LIST's. Added in DRA-71 D7 because that is the slice where a
+        // zone first served three engines at once and the cap started trimming whole sentences
+        // off a row: a cap that trims is fine, a cap that trims in silence is trap 50, and only
+        // a launched app can say the row admitted it.
+        $"helperWhyWithheld={_answers.Top.Sum(r => r.WithheldWhy)} " +
         $"helperGaps={_answers.Gaps.Count} " +
         $"helperNotYet={_answers.NotAnsweredYet.Count} " +
         // The zones it named, in rank order. The dump is one flat space-separated namespace,
@@ -1146,5 +1197,24 @@ internal sealed class HelperRoom : Grid, IShellRoom
         // silence `ZoneRoll.Dps` answers with, carried out rather than rounded into a claim.
         $"helperTopDps10={(int)Math.Round((_answers.Top.Count > 0
             ? _answers.Top[0].Why.OfType<ZoneThroughputFact>().FirstOrDefault()?.Dps ?? 0
-            : 0) * 10)}";
+            : 0) * 10)} " +
+        // **DRA-71 D7.** The two new folds' own sizes, so "the engine ranked nothing" can be
+        // told from "the fold found nothing" — two different bugs that draw one grey sentence.
+        // `helperMoteZones` is how many zones the fold produced at all and `helperMoteRated`
+        // how many cleared BOTH floors (MinHours and MinKills), which is the one pair that can
+        // explain a character with motes in their bags and no mote answer on screen.
+        $"helperMoteZones={_motes.Count} " +
+        $"helperMoteRated={_motes.Count(m => m.HasRate)} " +
+        $"helperSales={_sales.Count} " +
+        // What the SCREEN drew from them (trap 56: the store's claim and the screen's claim are
+        // different claims, captured in one Build). `helperCatalogValue` must stay 0 until the
+        // weekly refresh puts vendor values in the shipped catalog — it is the one key that
+        // says out loud whether the promoter's field has data behind it yet.
+        $"helperMoteWhy={_answers.Top.Count(r => r.Why.OfType<ZoneMoteRateFact>().Any())} " +
+        $"helperMoteSource={_answers.Top.Count(r => r.Why.OfType<MoteSourceFact>().Any())} " +
+        $"helperTierPref={_answers.Top.Count(r => r.Why.OfType<ZoneTierPreferenceFact>().Any())} " +
+        $"helperCoinWhy={_answers.Top.Count(r => r.Why.OfType<ZoneCoinRateFact>().Any())} " +
+        $"helperSellable={_answers.Top.Count(r => r.Why.OfType<SellableDropFact>().Any())} " +
+        $"helperCatalogValue={_answers.Top.Count(r => r.Why.OfType<CatalogValueFact>().Any())} " +
+        $"helperMoneyNote={(_moneyNote ? 1 : 0)}";
 }

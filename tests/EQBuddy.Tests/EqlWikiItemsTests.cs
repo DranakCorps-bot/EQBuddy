@@ -37,6 +37,45 @@ public class EqlWikiItemsTests
         Assert.Equal("Various Mobs Level 1 - 15", Assert.Single(mobs));
     }
 
+    /// <summary>
+    /// **THE VENDOR PRICE CARRIES THE CONDITION IT WAS QUOTED AT** (DRA-71 D7, plan P9).
+    ///
+    /// <para>This fixture is real saved wikitext from the 2026-08-04 survey, and its
+    /// <c>merchant_value</c> block has always opened <i>"VALUE TO VENDOR with CHA : 80 and
+    /// faction at Ally"</i>. Until this slice the parser kept the coins and threw the heading
+    /// away — which turns one editor's Charisma and faction into a fact about the object. The
+    /// survey of the cached dump is what made that matter: 235 of the 646 pages whose value
+    /// this build can read state a condition, and the Charisma differs per page (80, 72,
+    /// 111).</para>
+    ///
+    /// <para>The number is unchanged and the condition rides beside it, verbatim — re-phrasing
+    /// it would be a second producer of a claim the page already made.</para>
+    /// </summary>
+    [Fact]
+    public void TheVendorValueKeepsTheCharismaAndFactionItWasQuotedAt()
+    {
+        var item = EqlWikiItemService.Parse(Fixture("rusty"), "Rusty Broad Sword");
+
+        Assert.Equal("5s 8c", item.MerchantValue);
+        Assert.Equal("VALUE TO VENDOR with CHA : 80 and faction at Ally", item.MerchantCondition);
+        // And the number the catalog will carry is the one CoinText reads back off that text —
+        // one grammar, asserted end to end rather than assumed.
+        Assert.Equal(58L, CoinText.Parse(item.MerchantValue));
+    }
+
+    /// <summary>A page that states its value as plain text states no condition, and gets ""
+    /// rather than an invented caveat — an unanswered question draws nothing (trap 73).</summary>
+    [Fact]
+    public void APlainValueCarriesNoConditionRatherThanAMadeUpOne()
+    {
+        var item = EqlWikiItemService.Parse(
+            "{{Itempage\n|merchant_value = 4p 7g 5s\n|itemname = Thing\n}}", "Thing");
+
+        Assert.Equal("4p 7g 5s", item.MerchantValue);
+        Assert.Equal("", item.MerchantCondition);
+        Assert.Equal(4750L, CoinText.Parse(item.MerchantValue));
+    }
+
     [Fact]
     public void DroppedOnlyItemHasDropsAndNoVendors()
     {

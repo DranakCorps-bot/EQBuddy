@@ -1784,11 +1784,11 @@ public class ShellHostTests
         Assert.Equal(0, app.DumpValue("helperPickerOpen"));
 
         // Nothing picked is the "weigh everything" state, so the deferred goals all say so and
-        // the answerable ones name what they are missing. FOUR since DRA-71 D6 — Farm Gear
-        // gained its engine and moved from a deferral to a gap, which is the row a slice that
-        // answers a goal is meant to edit.
+        // the answerable ones name what they are missing. TWO since DRA-71 D7 — Farm Motes and
+        // Make Money gained engines and moved from deferrals to gaps, after Farm Gear did the
+        // same in D6. This is the row a slice that answers a goal is meant to edit.
         Assert.Equal("", app.DumpText("helperGoals"));
-        Assert.Equal(4, app.DumpValue("helperNotYet"));
+        Assert.Equal(2, app.DumpValue("helperNotYet"));
         Assert.True(app.DumpValue("helperGaps") > 0,
             $"no goal named the store it is waiting for; dump was: {app.Artifacts()}");
 
@@ -1836,13 +1836,13 @@ public class ShellHostTests
         app.WaitForDump("shellPage", "helper", "the shell to land on the Helper room");
         Assert.Equal(7, app.DumpValue("helperCopyCmd"));
 
-        // The floor that keeps the count above from being a number about some other room. FIVE
-        // gaps since DRA-71 D6: the four that were already here plus Farm Gear's own, which on
-        // a profile with no inventory dump is "EQBuddy has not been told what you are wearing".
-        // The SIXTH and SEVENTH copies are that gap's and the worn picker's — the same file
-        // asked for twice, once by a control and once by an answer, which is the distinction
-        // the unlock picker's fifth copy already draws.
-        Assert.Equal(5, app.DumpValue("helperGaps"));
+        // The floor that keeps the count above from being a number about some other room. SEVEN
+        // gaps since DRA-71 D7: the five D6 left plus Farm Motes' and Make Money's, which on a
+        // profile with no stored session are both "EQBuddy has not stored enough of your play".
+        // **The copy count does NOT move with them, and that is the point of asserting both.**
+        // Neither new gap has a command that fixes it — no /outputfile writes a mote or a coin —
+        // so a room that grew two buttons here would be offering a file that answers nothing.
+        Assert.Equal(7, app.DumpValue("helperGaps"));
         // And the gear block really is in its no-dump state rather than offering anchors
         // nobody staged.
         Assert.Equal(0, app.DumpValue("helperWorn"));
@@ -2295,6 +2295,138 @@ public class ShellHostTests
     }
 
     /// <summary>
+    /// **THE MOTE FOLD AND THE SALE PROBE REACH THE SCREEN** (DRA-71 D7, plans P9 and P10;
+    /// Founder smoke items 4c and 5).
+    ///
+    /// <para><b>The same row D4 most needed, for the same reason.</b> Both of this slice's
+    /// answers come from things a unit test cannot see running: the mote fold joins the pooled
+    /// loot to the zone rollup, and the sale price is a SECOND <c>JsonDocument</c> probe of each
+    /// stored snapshot, beside D4's. Either could be built, folded, and never drawn — trap 72's
+    /// shape — or never queried at all, and every unit test in the repo would still pass.</para>
+    ///
+    /// <para>So one session is archived through the REAL repository and the REAL snapshot type,
+    /// carrying loot, coin AND a vendor sale, and the assertions are the fold's claim and the
+    /// SCREEN's claim from the same dump (trap 56). The zone is an instance OUTSIDE the band the
+    /// Founder named, so the tier preference is drawn too — the fact D4 deliberately reported
+    /// and refused to weigh, now weighing something.</para>
+    ///
+    /// <para><c>helperCatalogValue</c> is asserted at 0 and that is a REPORT rather than a
+    /// wish: the promoter learned <c>MerchantCopper</c> in this slice and the shipped catalog
+    /// has none in it yet, so every price on this screen is one the player was actually
+    /// paid.</para>
+    /// </summary>
+    [Fact]
+    public void ArchivedMotesAndVendorSalesReachTheHelpersDrawnAnswers()
+    {
+        using var app = new AppHarness(environment: OpenOn("helper"));
+        app.SeedStoredSession(
+            "Najena - Solo", TimeSpan.FromHours(4), xpPercent: 32,
+            dps: 42.0, hps: 0, combatSeconds: 3600, deaths: 0, activeFraction: 1.0,
+            copper: 40_000,
+            sold: [("Bone Chips", 5, 400)],
+            loot:
+            [
+                ("a shadowed man", "Mote of Major Potential", 6),
+                ("a shadowed man", "Bone Chips", 20),
+            ],
+            mobs: ("a shadowed man", 180, 28, 30, 34));
+        app.Launch();
+
+        app.WaitForDump("shellPage", "helper", "the shell to land on the Helper room");
+        app.WaitForDump("helperRecs", "1", "the archived session to become one recommendation");
+        Assert.Equal("Najena-Solo", app.DumpText("helperZones"));
+
+        // THE FOLD's claim. The floor is what matters and not an exact count: the shared
+        // fixture log has its own motes and its own sales in it, so this profile's numbers are
+        // the seeded session PLUS whatever the fixture character did — and pinning an exact
+        // total here would be a test about the fixture rather than about the fold. What is
+        // asserted is that the seeded zone cleared both floors (4 hours, 180 kills) and that the
+        // sale probe came back with something out of the stored JSON at all.
+        Assert.True(app.DumpValue("helperMoteZones") >= 1,
+            $"the mote fold produced no zone; dump was: {app.Artifacts()}");
+        Assert.True(app.DumpValue("helperMoteRated") >= 1,
+            $"no mote zone cleared the floors; dump was: {app.Artifacts()}");
+        Assert.True(app.DumpValue("helperSales") >= 1,
+            $"the sale probe read nothing out of the stored snapshots; dump was: {app.Artifacts()}");
+
+        // **THE SCREEN's claims, and this row is where the merge rule earned itself.** Three
+        // engines answer about this one zone — Level Up, Farm Motes and Make Money — which is the
+        // cross-domain join doing exactly what the room exists for (HOME-005). It also puts ten
+        // sentences on one row against a WhyCap of six, and before DRA-71 D7's interleave the
+        // cap trimmed the tail, so the row's own headline said "Make Money" over six sentences
+        // of which not one was about money. Every goal the headline claims is asserted to have a
+        // sentence under it here, because that is the failure this arrangement reproduces.
+        app.WaitForDump("helperMoteWhy", "1", "the mote rate sentence to be drawn");
+        Assert.Equal(1, app.DumpValue("helperCoinWhy"));
+        Assert.Equal(1, app.DumpValue("helperSellable"));
+        Assert.Equal(1, app.DumpValue("helperMoneyNote"));
+        Assert.True(app.DumpValue("helperTopGoals") >= 3,
+            $"the three engines did not join on the zone; dump was: {app.Artifacts()}");
+
+        // "Najena - Solo" is D0, outside the D2–D4 the Founder named, so the preference fires
+        // and says so. The zone name is the only input — nothing was looked up.
+        Assert.Equal(1, app.DumpValue("helperTierPref"));
+
+        // **AND THE THING THE CAP GAVE UP IS THE ONE THAT EXPLAINS NOTHING.** The mote engine
+        // emits its WHO line last precisely so it is what a loaded row loses, ahead of any
+        // sentence explaining a mark-down that already happened — D4's ordering rule, applied
+        // to this engine's facts. The row SAYS it held something back, which is trap 50 asserted
+        // from a launched app rather than from the engine's own return value.
+        Assert.Equal(0, app.DumpValue("helperMoteSource"));
+        Assert.True(app.DumpValue("helperWhyWithheld") >= 1,
+            $"the row trimmed a sentence and did not admit it; dump was: {app.Artifacts()}");
+
+        // Every price on screen is one the player was PAID. The catalog carries no vendor value
+        // in this build, and a row here would mean the promoter's field had data behind it.
+        Assert.Equal(0, app.DumpValue("helperCatalogValue"));
+        Assert.Equal(0, app.DumpValue("helperCatalogWhy"));
+        Assert.Equal(0, app.DumpValue("helperDeadDoors"));
+    }
+
+    /// <summary>
+    /// **THE PROVE-FAIL FOR THE ROW ABOVE** (trap 34: green-only is vacuous coverage).
+    ///
+    /// <para>The same archived session with the same hours and the same coin, and NO mote in the
+    /// loot. The money half is unchanged — it never depended on a mote — and the mote half goes
+    /// completely silent: no fold row, no sentence, and the goal draws its own
+    /// "no mote has dropped for you" rather than the no-history one.</para>
+    ///
+    /// <para>Without it, the row above passes on a build where the mote fold returns every zone
+    /// it is handed and the sentence is drawn from the zone rather than from the motes.</para>
+    /// </summary>
+    [Fact]
+    public void ASessionWithNoMotesDrawsNoMoteAnswerAndStillMakesMoney()
+    {
+        using var app = new AppHarness(environment: OpenOn("helper"));
+        app.SeedStoredSession(
+            "Najena - Solo", TimeSpan.FromHours(4), xpPercent: 32,
+            dps: 42.0, hps: 0, combatSeconds: 3600, deaths: 0, activeFraction: 1.0,
+            copper: 40_000,
+            sold: [("Bone Chips", 5, 400)],
+            loot: [("a shadowed man", "Bone Chips", 20)],
+            mobs: ("a shadowed man", 180, 28, 30, 34));
+        app.Launch();
+
+        app.WaitForDump("shellPage", "helper", "the shell to land on the Helper room");
+        app.WaitForDump("helperRecs", "1", "the archived session to become one recommendation");
+
+        // RATED and not FOLDED: the shared fixture log has motes of its own in a zone that
+        // clears neither floor, so the fold legitimately produces a row for it and quotes no
+        // rate. What this slice removed from the fixture is the only mote zone that HAD one.
+        Assert.Equal(0, app.DumpValue("helperMoteRated"));
+        Assert.Equal(0, app.DumpValue("helperMoteWhy"));
+        Assert.Equal(0, app.DumpValue("helperMoteSource"));
+        // The tier preference is the mote engine's own weight, so it goes with it.
+        Assert.Equal(0, app.DumpValue("helperTierPref"));
+
+        // …and the money answer is untouched, which is what makes the silence above a
+        // measurement of the motes rather than of the fixture.
+        Assert.Equal(1, app.DumpValue("helperCoinWhy"));
+        Assert.Equal(1, app.DumpValue("helperSellable"));
+        Assert.Equal(0, app.DumpValue("helperDeadDoors"));
+    }
+
+    /// <summary>
     /// **THE EDITOR BOX EXISTS, AND THE DUMP SAYS SO** — the runtime half of the screenshot
     /// hook (<c>EQBUDDY_HOME_EDITOR</c>) that stages the one state a shot of this room cannot
     /// otherwise reach.
@@ -2459,15 +2591,24 @@ public class ShellHostTests
     }
 
     /// <summary>
-    /// **THE DEFERRED INTENT SAYS SO AND POINTS SOMEWHERE** (DRA-71 D6).
+    /// **"FARM TO SELL" ANSWERS, AND IT ANSWERS A DIFFERENT QUESTION FROM THE OTHER TWO**
+    /// (DRA-71 D7, plan P9; the Founder's smoke item 4c).
     ///
-    /// <para>"Farm to sell" is the Founder's third ask and its engine is D7's. Picked, it
-    /// produces a gap rather than an empty answer list — a character with perfect gear and a
-    /// feature that has not been built look identical on screen otherwise — and the door under
-    /// it opens the room that answers the question today.</para>
+    /// <para>In D6 this row asserted a DEFERRAL — the intent said it was not ranked yet and
+    /// pointed at Progress → Wealth. Its engine landed in D7 and the assertion is inverted, but
+    /// the thing it protects is the same and is now sharper: <b>the sell question must never
+    /// wear the gear question's clothes.</b> This profile is WEARING two things and the catalog
+    /// is full of items that beat them — the two rows above prove that, from the same fixture —
+    /// so a single <c>helperGearWhy</c> here would mean the sell intent had been routed through
+    /// a dominance comparison it has no anchor for, which is the one claim
+    /// <c>GearUpgrades</c> exists to refuse.</para>
+    ///
+    /// <para>The controls that belong to the SWEEP go with it: no worn picker, and no
+    /// include-quests toggle, because a quest reward is not a thing you farm to sell and a
+    /// control that changed nothing would be an affordance with no effect.</para>
     /// </summary>
     [Fact]
-    public void TheFarmToSellIntentIsOfferedAndSaysItIsNotRankedYet()
+    public void TheFarmToSellIntentAnswersFromYourOwnLootRatherThanFromTheCatalog()
     {
         var key = $"{AppHarness.Character}_{AppHarness.Server}".ToLowerInvariant();
         using var app = new AppHarness(
@@ -2483,17 +2624,25 @@ public class ShellHostTests
         app.WaitForDump("shellPage", "helper", "the shell to land on the Helper room");
         app.WaitForDump("helperIntent", "farmtosell", "the stored intent to reach the strip");
 
-        // One gap, no answers, and the toggle withheld — a control that changes nothing about
-        // an unranked intent would be an affordance with no effect.
-        app.WaitForDump("helperGaps", "1", "the deferred intent to report itself");
-        Assert.Equal(0, app.DumpValue("helperRecs"));
+        // The fixture log's own kills and its own vendor sales are the whole input, so the
+        // intent produces real answers with no dump staged for it.
+        app.WaitForDump("helperSellable", "1", "the sell engine to price a drop off your sales");
+        Assert.True(app.DumpValue("helperRecs") >= 1,
+            $"the sell intent ranked nothing; dump was: {app.Artifacts()}");
+        Assert.True(app.DumpValue("helperSales") >= 1,
+            $"the sale probe read nothing; dump was: {app.Artifacts()}");
+        Assert.Equal(1, app.DumpValue("helperMoneyNote"));
+
+        // **THE ASSERTION THAT MATTERS.** Two worn anchors are staged and the catalog beats
+        // both; not one upgrade line may appear under this intent.
         Assert.Equal(0, app.DumpValue("helperGearWhy"));
+        Assert.Equal(0, app.DumpValue("helperGearWithheld"));
+        Assert.Equal(2, app.DumpValue("helperWorn"));
+
+        // The sweep's controls went with the sweep.
         Assert.Equal(0, app.DumpValue("helperQuestToggle"));
         Assert.Equal(0, app.DumpValue("helperWornChips"));
         Assert.Equal(0, app.DumpValue("helperDeadDoors"));
-        // …and the gap's door is real, which is what keeps a deferral from being a dead end.
-        Assert.True(app.DumpValue("helperDoors") >= 1,
-            $"the deferred intent pointed nowhere; dump was: {app.Artifacts()}");
     }
 
     /// <summary>

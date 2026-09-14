@@ -1594,6 +1594,111 @@ $Shots = [ordered]@{
                                HelperWornPicks = @{ 'testchar_test' = @('Cloth Cap') }
                                HelperGearIntent = @{ 'testchar_test' = 'ReplaceSlot' }
                            } }
+    # ---- DRA-71 D7: motes and money, both from the player's own play ----------------------
+    #
+    # The two staged states are this slice's two claims: what a place has paid you in MOTES,
+    # and what it has paid you in COIN and in things you sold. Both are ranked from evidence
+    # only — the shipped catalog names no real zone for a mote ("Various Zones" on all eleven
+    # records) and its vendor prices are quoted at somebody else's Charisma — so there is no
+    # catalog state to stage and no catalog sentence to photograph.
+    #
+    # EVERYTHING GOES THROUGH THE LOG, which is the point of the staging. `Prime` runs the app
+    # over the fixture and closes it gracefully so the sitting finalizes into history.db; the
+    # extra `Lines` are the real log grammar for the real parsers — a zone line, a consider, the
+    # kills, the mote loot, the coin, and one vendor sale. Nothing is seeded into a store.
+    #
+    # THE FIFTY KILLS ARE NOT DECORATION. `MoteHistory.MinKills` is 50: under it the fold
+    # quotes no rate at all, because one lucky Infinite mote in a real hour is thirty potency
+    # an hour that will never happen again. A shot staged with six kills would photograph the
+    # honest empty state and look exactly like a broken engine (trap 23). They are generated
+    # rather than typed so the count is a number somebody can read and change.
+    #
+    # THE ZONE IS "Najena - Solo", and the name is the only input: `InstanceTier.FromZoneName`
+    # reads D0 off it, which is OUTSIDE the D2-D4 band the mote engine prefers, so the tier
+    # preference fires and draws its sentence. An open-world zone would photograph the engine
+    # with one of its three criteria invisible.
+    #
+    # PREDICTION for 'shell-helper-motes' — one answer, "Najena - Solo", serving Farm Motes and
+    #   Make Money (the cross-domain join firing on one place, which is the whole room). Under
+    #   it: the mote rate with its count and its scope; the coin rate through the one coin
+    #   formatter; "Bone Chips drops here from a shadowed man … and a vendor has paid you …";
+    #   the tier sentence saying EQBuddy ranks motes toward D2-D4 so this one sits lower; and
+    #   the vendor-price note under the answers. The unknown-level line is drawn above them
+    #   with its Character door, as it is in every shot of this room — the shoot profile has
+    #   no ding. The RATES are the fixture's own arithmetic over a compressed hour and are NOT
+    #   predicted (the D4 block above records what guessing them costs).
+    # PREDICTION for 'shell-helper-motes-light' — the same in SOLARIZED, the only light palette.
+    #
+    # SHOT 2026-09-13: every sentence as predicted, in that order, with the join, the tier
+    # sentence and the vendor-price note all present.
+    #
+    # FOUR THINGS THE PREDICTION DID NOT COVER, and two of them changed the code:
+    #   (a) **TWO answers, not one.** West Commonlands comes second, also serving both goals,
+    #       because the SHARED FIXTURE LOG has motes of its own in it and that zone has enough
+    #       kills to clear `MoteHistory.MinKills`. That is the floors behaving exactly as
+    #       designed — the floor is on the ZONE's kills, not the creature's, which is why a
+    #       zone whose motes came off four Ghoul kills still qualifies — and it makes a better
+    #       picture than the single row that was predicted: a ranked list with the staged zone
+    #       on top.
+    #   (b) **The cadence discount FIRES on the staged zone, and only because of (a).** Najena
+    #       runs 44.0 kills an hour against a pooled 95.7, so the sentence is drawn and the
+    #       weight is applied. With one mote zone there would have been no baseline and no
+    #       clause at all — the same "never compare a place with itself" rule D4 photographed,
+    #       visible here by accident.
+    #   (c) **TWO WORDING DEFECTS, FOUND ONLY BY READING THE PICTURE** (trap 23). The first
+    #       take read "Shadowed man gave you 8 motes of it (40 experience) across your 50 kills
+    #       of it" — two pronouns pointing at different things and the first at nothing — and
+    #       "Bone Chips drops here from Shadowed man — 3 of your 50 kills of it", where the 50
+    #       belongs to the creature and reads as kills of the item. Every assertion passed on
+    #       both. `HelperPresentation` was changed and both shots retaken.
+    #   (d) The vendor-price note sits at the very bottom edge and its last line is cut at this
+    #       window size — the same density observation D6 filed against its own gear shots, and
+    #       it is filed in `BEVEL.md` rather than restyled here.
+    'shell-helper-motes' = @{ Title = 'EQBuddy — Helper'
+                           Env = @{ EQBUDDY_SHELL = 'helper' }
+                           Prime = @(
+                               @{ Character = 'Testchar'; Fraction = 1.0; ShiftDays = 1
+                                  Lines = @(
+                                      'You have entered Najena - Solo.'
+                                      'A shadowed man judges you amiably -- looks kind of risky, but you might win. (Lvl: 27)'
+                                  ) + (1..50 | ForEach-Object {
+                                      "You have slain a shadowed man!"
+                                      "You receive 4 silver and 2 copper from the corpse."
+                                  }) + (1..8 | ForEach-Object {
+                                      "--You have looted a Mote of Major Potential from a shadowed man's corpse.--"
+                                  }) + @(
+                                      "--You have looted 2 Bone Chips from a shadowed man's corpse.--"
+                                      "--You have looted 2 Bone Chips from a shadowed man's corpse.--"
+                                      "--You have looted 2 Bone Chips from a shadowed man's corpse.--"
+                                      'You receive 1 gold 2 silver from Lanadin for the Bone Chips(s).'
+                                  ) }
+                           )
+                           Set = @{
+                               HelperGoals = @{ 'testchar_test' = @('FarmMotes', 'MakeMoney') }
+                           } }
+    'shell-helper-motes-light' = @{ Title = 'EQBuddy — Helper'
+                           Env = @{ EQBUDDY_SHELL = 'helper' }
+                           Prime = @(
+                               @{ Character = 'Testchar'; Fraction = 1.0; ShiftDays = 1
+                                  Lines = @(
+                                      'You have entered Najena - Solo.'
+                                      'A shadowed man judges you amiably -- looks kind of risky, but you might win. (Lvl: 27)'
+                                  ) + (1..50 | ForEach-Object {
+                                      "You have slain a shadowed man!"
+                                      "You receive 4 silver and 2 copper from the corpse."
+                                  }) + (1..8 | ForEach-Object {
+                                      "--You have looted a Mote of Major Potential from a shadowed man's corpse.--"
+                                  }) + @(
+                                      "--You have looted 2 Bone Chips from a shadowed man's corpse.--"
+                                      "--You have looted 2 Bone Chips from a shadowed man's corpse.--"
+                                      "--You have looted 2 Bone Chips from a shadowed man's corpse.--"
+                                      'You receive 1 gold 2 silver from Lanadin for the Bone Chips(s).'
+                                  ) }
+                           )
+                           Set = @{
+                               Theme = 'Solarized'
+                               HelperGoals = @{ 'testchar_test' = @('FarmMotes', 'MakeMoney') }
+                           } }
     'shell-gear-narrow' = @{ Title = 'EQBuddy — Gear'
                            Env = @{ EQBUDDY_SHELL = 'gear:gear'; EQBUDDY_SHELL_SIZE = '580x480' }
                            Set = @{

@@ -289,6 +289,90 @@ public static class HelperPresentation
             $"You have seen {f.Item} drop from {f.Mob} in {f.Zone} — "
             + $"{f.Drops:N0} of your {f.Kills:N0} {(f.Kills == 1 ? "kill" : "kills")} there.",
 
+        // **THE MOTE RATE** (DRA-71 D7, plan P10; Founder smoke item 5). Potency first, because
+        // a hundred Infinitesimal motes and a hundred Infinite motes are not the same hour
+        // (#154) — and the COUNT beside it, because a player one mote short of an upgrade is
+        // counting motes. The scope is the experience rate's own wording for its own reason:
+        // the hours are attributed by the session's main zone.
+        ZoneMoteRateFact f =>
+            $"{f.PotencyPerHour:0.0} mote experience an hour here — {f.MotesPerHour:0.0} motes "
+            + $"an hour, {Count(f.Motes, "mote", "motes")} in all, across "
+            + $"{Count(f.Sessions, "session", "sessions")} ({Hours(f.Hours)})."
+            // The raid mote the ladder gives no number to. The clause exists because the
+            // potency figure CANNOT see it: a zone whose only motes were Void-Touched reads as
+            // "0.0 an hour", and stopping there would tell a player their raid night paid
+            // nothing. The wiki publishes no experience value for it and none is invented here.
+            + (f.VoidTouched > 0
+                ? $" {Count(f.VoidTouched, "of them was", "of them were")} "
+                  + $"{Motes.VoidTouched}, which raises an item a whole tier instead of "
+                  + "carrying experience — so it counts above and weighs nothing in the rate."
+                : ""),
+
+        // WHO, measured, with its denominator — the same grammar the gear rows' observed-drop
+        // line uses, because it is the same claim about the same pool.
+        //
+        // **The first staged shot of this slice is why the pronouns are gone** (trap 23). The
+        // take read "Shadowed man gave you 8 motes of it (40 experience) across your 50 kills
+        // of it" — two "it"s in one sentence pointing at different things, and the first one
+        // pointing at nothing at all. The assertion passed; the sentence was unreadable.
+        MoteSourceFact f =>
+            $"{f.Mob} gave you {Count(f.Motes, "mote", "motes")} ({f.Potency:N0} experience) "
+            + $"in {Count(f.Kills, "kill", "kills")} of it.",
+
+        // The cadence, against the player's own pooled rate. Drawn only where the discount
+        // fired, so the numbers in it are always the ones that moved the order.
+        ZoneKillRateFact f =>
+            $"You kill {f.KillsPerHour:0.0} things an hour here, over {f.Kills:N0} "
+            + $"{(f.Kills == 1 ? "kill" : "kills")}. Across the {f.Zones:N0} zones motes have "
+            + $"dropped for you, you average {f.BaselineKillsPerHour:0.0} an hour.",
+
+        // **The tier preference.** It reports the game's own word and the band it is outside,
+        // and stops: no sentence here says a D1 is easy or a D4 is hard, which is HOME-006 and
+        // also simply what EQBuddy knows. "You said" is not in it either — the band came from
+        // the plan, so the sentence attributes it to EQBuddy's own preference rather than
+        // quoting the player back at themselves.
+        ZoneTierPreferenceFact f =>
+            $"Your own zone line recorded this as a {InstanceTier.Badge(f.Tier)} instance. "
+            + $"EQBuddy ranks motes toward D{f.PreferredMin}–D{f.PreferredMax}, so this one "
+            + "sits lower than its rate alone would put it.",
+
+        // **THE COIN RATE** (DRA-71 D7, plan P9). The experience rate's twin, down to the
+        // scope clause, because it is the same division over the same rows — and the coin is
+        // formatted by the one formatter every other surface uses.
+        ZoneCoinRateFact f =>
+            f.Sessions == 1
+                ? $"{StatsSnapshot.FormatCoin((long)f.CopperPerHour)} an hour here, from 1 "
+                  + $"stored session ({Hours(f.Hours)})."
+                : $"{StatsSnapshot.FormatCoin((long)f.CopperPerHour)} an hour here, across "
+                  + $"{f.Sessions:N0} of your sessions ({Hours(f.Hours)}).",
+
+        // Both halves measured: what dropped, from what, how often — and what a vendor paid
+        // YOU for one. No sentence in this file quotes a price somebody else was given without
+        // saying so, which is the whole of what the catalog arm below is careful about.
+        // The same pronoun lesson as the mote line above it: the take read "Bone Chips drops
+        // here from Shadowed man — 3 of your 50 kills of it", where the 50 belongs to the
+        // CREATURE and reads as if it were kills of the item. The subject is now the player, as
+        // it is in every other personal line, and the denominator is attached to the creature
+        // it actually counts.
+        SellableDropFact f =>
+            $"You have looted {f.Item} here from {f.Mob} — {f.Drops:N0} in "
+            + $"{Count(f.Kills, "kill", "kills")} of it — and a vendor has paid you "
+            + $"{StatsSnapshot.FormatCoin(f.CopperEach)} each for them.",
+
+        // **The catalog price, with the condition it was quoted at.** The condition is NOT
+        // optional decoration: a vendor price in EQ moves with your Charisma and your faction,
+        // and the wiki says so on the pages that carry one. Where the page stated none, the
+        // sentence says what it does know and stops — an unanswered question draws nothing
+        // (trap 73) rather than a caveat this file made up. `Why` appends the estimate label to
+        // this line by construction, because the fact is tagged Catalog.
+        CatalogValueFact f =>
+            $"EQBuddy has read that a vendor pays {StatsSnapshot.FormatCoin(f.Copper)} for "
+            + $"{f.Item}."
+            + (f.Condition.Length > 0
+                ? $" The page quotes that as \"{f.Condition}\" — a vendor's price moves with "
+                  + "your Charisma and your faction, so yours will differ."
+                : ""),
+
         UnlockScoreFact f =>
             $"{f.Subject}: {f.Done} of {f.Total} requirements done, by the game's own record.",
 
@@ -431,8 +515,31 @@ public static class HelperPresentation
             + "a \"+N\" on something you wear raises it by an amount the wiki does not state.",
 
         GoalGapReason.GearIntentNotAnsweredYet =>
-            $"{GoalLabel(gap.Goal)}: EQBuddy is not ranking what to farm for money yet. What "
-            + "your own sessions have earned is under Progress → Wealth meanwhile.",
+            $"{GoalLabel(gap.Goal)}: EQBuddy is not ranking that gear question yet. What your "
+            + "own sessions have earned is under Progress → Wealth meanwhile.",
+
+        // ---- DRA-71 D7 ----------------------------------------------------------------
+
+        // **The subject of this sentence is the MOTES and not the zones.** "No good mote camps"
+        // would be a claim about the game; what EQBuddy knows is that nothing it has stored
+        // contains one. There is no command that fixes it and no catalog behind it — the eleven
+        // mote records in the shipped catalog name no real zone — so the sentence says what
+        // would fill it and offers nothing it cannot do.
+        GoalGapReason.NoMotesSeen =>
+            $"{GoalLabel(gap.Goal)}: no mote has dropped in a zone EQBuddy has enough of your "
+            + "play stored for. It answers this one from where motes have actually dropped for "
+            + "you — the item pages it ships say only \"Various Zones\", which is not somewhere "
+            + "you can go.",
+
+        GoalGapReason.NoCoinEarned =>
+            $"{GoalLabel(gap.Goal)}: your stored sessions have not earned coin in a zone "
+            + "EQBuddy can quote a rate for yet.",
+
+        GoalGapReason.NoSellEvidence =>
+            $"{GoalLabel(gap.Goal)}: EQBuddy prices a drop by what a vendor has actually paid "
+            + "YOU for one, and it has not seen a sale yet. Its own item pages carry vendor "
+            + "values quoted at somebody else's Charisma and faction, so they are a fallback "
+            + "rather than the answer — and this build's catalog does not carry them yet.",
 
         _ => "",
     };
@@ -451,12 +558,9 @@ public static class HelperPresentation
         // beside it (EveryDeferredGoalNamesTheRoomThatAnswersItToday) is what would have
         // caught a sentence left behind. Its one unanswered INTENT says so in its own place,
         // through GoalGapReason.GearIntentNotAnsweredYet.
-        HelperGoal.FarmMotes =>
-            "Farm Motes: EQBuddy is not ranking this one yet. Your mote totals are under "
-            + "Progress → Wealth meanwhile.",
-        HelperGoal.MakeMoney =>
-            "Make Money: EQBuddy is not ranking this one yet. What your sessions have earned "
-            + "is under Progress → Wealth meanwhile.",
+        // Farm Motes and Make Money LEFT this switch in DRA-71 D7 — their engines landed, and
+        // the pairing test beside it (EveryDeferredGoalNamesTheRoomThatAnswersItToday) is what
+        // would have caught a sentence left behind. Farm Gear left the same way in D6.
         HelperGoal.FarmMaterials =>
             "Farm Materials: EQBuddy is not ranking this one yet. What is in your bags is in "
             + "Gear meanwhile.",
@@ -471,8 +575,6 @@ public static class HelperPresentation
     /// drifting: the sentence above and this door are read together or neither is.</summary>
     public static HelperDoorKind? NotAnsweredDoor(HelperGoal goal) => goal switch
     {
-        HelperGoal.FarmMotes => HelperDoorKind.Wealth,
-        HelperGoal.MakeMoney => HelperDoorKind.Wealth,
         HelperGoal.FarmMaterials => HelperDoorKind.Gear,
         HelperGoal.Achievements => HelperDoorKind.Unlocks,
         _ => null,
@@ -567,9 +669,11 @@ public static class HelperPresentation
         GearIntent.ReplaceSlot =>
             "The same comparison across every slot you have something in — no picking, and "
             + "EQBuddy sorts the places by how many of your slots they can improve.",
+        // DRA-71 D7. It names the ANCHOR, as the two above it do, and the anchor is the whole
+        // difference: this one never looks at what you are wearing.
         GearIntent.FarmToSell =>
-            "Not ranked yet. What your own sessions have earned is under Progress → Wealth "
-            + "meanwhile.",
+            "Where your own drops are worth the most, priced at what a vendor has actually "
+            + "paid you for them. It does not look at what you are wearing.",
         _ => "",
     };
 
@@ -622,6 +726,24 @@ public static class HelperPresentation
     public const string IncludeQuestsTip =
         "Off by default: farming a camp and running a quest chain are different evenings. "
         + "Turn it on and items a quest hands out are offered too, each with its quest named.";
+
+    /// <summary>
+    /// **THE SENTENCE UNDER A MONEY ANSWER**, and it is the twin of
+    /// <see cref="GearCatalogNote"/> above (DRA-71 D7, plan P9).
+    ///
+    /// <para>The Gear note exists because the catalog's stats are base values. This one exists
+    /// because the catalog's PRICES are worse than that: the survey of the cached item pages
+    /// found 262 of the 975 that state a vendor value heading it "VALUE TO VENDOR with CHA :
+    /// 80 and faction at Indifferently", at a Charisma that differs per page. So a vendor
+    /// price is not a property of an item at all, and the player is owed that in the room
+    /// rather than in a tooltip — especially since the sentence explains why EQBuddy leads
+    /// with what THEY were paid.</para>
+    /// </summary>
+    public const string MoneyPriceNote =
+        "Money answers are priced from what a vendor has actually paid you. EQBuddy falls back "
+        + "to the price on the item pages it ships only where you have never sold one — and "
+        + "those are quoted at a particular Charisma and faction standing, so they are an "
+        + "estimate and the page's own conditions are printed with them.";
 
     /// <summary>Said when the sweep's per-anchor cap held upgrades back — the one count that
     /// cannot ride a row, because it is spent before any row exists (trap 50). The door under

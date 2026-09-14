@@ -648,9 +648,21 @@ internal sealed class AppHarness : IDisposable
     /// deliberately produces no rate.</param>
     /// <param name="activeFraction">How much of that was ACTIVE play. 1.0 is a sitting with
     /// no downtime; the gap is what the downtime line reports.</param>
+    /// <param name="copper">Coin the session earned, into the <c>Copper</c> COLUMN — what the
+    /// Make Money engine divides by the hours (DRA-71 D7). 0 is a real state and draws its own
+    /// sentence rather than a row.</param>
+    /// <param name="sold">What a vendor paid, per item, into the snapshot's <c>SoldItems</c> —
+    /// the only place that breakdown exists, which is why <c>SessionRepository.SoldRows</c>
+    /// probes the JSON rather than reading a column (DRA-71 D7).</param>
+    /// <param name="loot">What dropped, per creature: <c>(mob, item, count)</c>. It is keyed on
+    /// the MOB NAME rather than positionally so a fixture cannot silently hang a mote on the
+    /// wrong creature, and it is what both the mote fold and the sell list read.</param>
     public void SeedStoredSession(
         string zone, TimeSpan startedAgo, double xpPercent, double dps, double hps,
         double combatSeconds, int deaths = 0, double activeFraction = 1.0,
+        long copper = 0,
+        (string Item, int Count, long Copper)[]? sold = null,
+        (string Mob, string Item, int Count)[]? loot = null,
         params (string Name, int Kills, double FightSeconds, int LevelMin, int LevelMax)[] mobs)
     {
         var start = DateTime.Now - startedAgo;
@@ -670,12 +682,17 @@ internal sealed class AppHarness : IDisposable
             SessionDps = dps,
             Hps = hps,
             CombatSeconds = combatSeconds,
+            Copper = copper,
+            SoldItems = [.. (sold ?? []).Select(s => new SoldDetail(s.Item, s.Count, s.Copper))],
             YourKillCount = mobs.Sum(m => m.Kills),
             Deaths = [.. Enumerable.Range(0, deaths)
                 .Select(i => new TimedDetail(start.AddMinutes(i), "You have been slain"))],
             Mobs =
             [
-                .. mobs.Select(m => new MobSummary(m.Name, m.Kills, m.Kills, m.FightSeconds, 0, 0, [])
+                .. mobs.Select(m => new MobSummary(m.Name, m.Kills, m.Kills, m.FightSeconds, 0, 0,
+                    [.. (loot ?? [])
+                        .Where(l => l.Mob.Equals(m.Name, StringComparison.OrdinalIgnoreCase))
+                        .Select(l => new MobLoot(l.Item, l.Count, null))])
                 {
                     Zone = zone, LevelMin = m.LevelMin, LevelMax = m.LevelMax,
                 }),

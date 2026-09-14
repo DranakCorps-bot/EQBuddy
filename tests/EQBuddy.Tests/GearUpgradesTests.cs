@@ -165,10 +165,20 @@ public class GearUpgradesTests
             Catalog(Record("Rusty Helm", "HEAD", 4, zones: ["Lower Guk"])),
             [Worn("Rusty Helm", "HEAD", "AC: 4")]).Upgrades);
 
-    /// <summary>The DEFERRED intent sweeps nothing at all rather than quietly returning an
-    /// empty list that the room would draw as "nothing beats your gear".</summary>
+    /// <summary>
+    /// **"FARM TO SELL" SWEEPS NOTHING, AND NOW THAT IT HAS AN ENGINE THAT IS THE POINT**
+    /// (DRA-71 D7).
+    ///
+    /// <para>Until D7 this asserted a DEFERRAL: the intent had no engine, so an empty sweep was
+    /// the honest state. It is Answered now — by <c>Recommendations.FarmToSell</c>, whose anchor
+    /// is the player's own loot — and this file still refuses it, which is the assertion that
+    /// matters. Every candidate here has a worn item behind it; an intent that cannot supply one
+    /// would produce the game's items ranked against each other, the single claim this class
+    /// exists not to make. The shape and the sweep are asserted TOGETHER so a later edit cannot
+    /// let a third intent into the dominance comparison by flipping one of them.</para>
+    /// </summary>
     [Fact]
-    public void TheDeferredIntentSweepsNothing()
+    public void FarmToSellIsAnsweredElsewhereAndSweepsNothingHere()
     {
         var sweep = Sweep(
             Catalog(Record("Froglok Bone Helm", "HEAD", 9, zones: ["Lower Guk"])),
@@ -176,7 +186,7 @@ public class GearUpgradesTests
             intent: GearIntent.FarmToSell);
 
         Assert.Same(GearSweep.Nothing, sweep);
-        Assert.Equal(GearIntentShape.Deferred, GearUpgrades.ShapeFor(GearIntent.FarmToSell));
+        Assert.Equal(GearIntentShape.Answered, GearUpgrades.ShapeFor(GearIntent.FarmToSell));
     }
 
     // ---- the two intents anchor differently, which is the whole difference ---------------

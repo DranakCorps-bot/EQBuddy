@@ -1812,6 +1812,13 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
     internal IReadOnlyList<SessionThroughput> StoredThroughput() =>
         SessionSummary.Scoped(_archiver.Identity, (s, c) => _repo.ThroughputRows(s, c));
 
+    /// <summary>Per-session vendor sales for the followed character — what
+    /// <see cref="SaleHistory.Fold"/> pools into "what a vendor has actually paid you for one
+    /// of these" (DRA-71 D7). Same identity and the same never-unscoped rule as the two above:
+    /// another character's Charisma is another character's price.</summary>
+    internal IReadOnlyList<SessionSales> StoredSales() =>
+        SessionSummary.Scoped(_archiver.Identity, (s, c) => _repo.SoldRows(s, c));
+
     internal long ActiveSessionRowId => _archiver.ActiveRowId;
 
     /// <summary>The respawn-cycle evidence store (the spawn-timer feed): written only by

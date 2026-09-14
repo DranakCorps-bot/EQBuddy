@@ -257,6 +257,122 @@ public sealed record GearUpgradeFact(
 public sealed record GearDropSeenFact(string Item, string Mob, string Zone, int Drops, int Kills)
     : WhyFact(Evidence.Personal);
 
+/// <summary>
+/// **WHAT THIS ZONE HAS ACTUALLY PAID YOU IN MOTES** (DRA-71 D7, plan P10; Founder smoke
+/// item 5).
+///
+/// <para>Potency and not a count, because <see cref="Motes"/> has said since #154 that a
+/// hundred Infinitesimal motes and a hundred Infinite motes are not the same hour. The count
+/// rides beside it anyway: a player who is short of ONE more mote of any kind is counting
+/// motes, and the two numbers together are what they can act on.</para>
+///
+/// <para><b>There is no catalog half of this fact and there is not going to be one until the
+/// wiki gains one.</b> The shipped catalog's eleven mote records all carry a
+/// <c>DropZones</c> — and every value is "Various Zones", "Unknown" or "D3+ Zones". A drop
+/// zone nobody can travel to is not a drop zone, so the mote engine is personal-only and says
+/// so (<c>MoteCatalogSurveyTests</c>).</para>
+/// </summary>
+/// <param name="VoidTouched">How many of <paramref name="Motes"/> carried no potency at all —
+/// the raid-only mote whose worth is a whole item tier rather than a number of points. It is
+/// named in the sentence precisely because the potency figure cannot see it.</param>
+public sealed record ZoneMoteRateFact(
+    string Zone, double PotencyPerHour, double MotesPerHour, int Motes, int VoidTouched,
+    int Sessions, double Hours)
+    : WhyFact(Evidence.Personal);
+
+/// <summary>
+/// **WHO ACTUALLY GAVE THEM TO YOU** — the <c>who · where</c> half of a mote answer, measured
+/// (DRA-71 D7).
+///
+/// <para>From the pool, which is keyed on the zone the kill happened in, so this cannot be
+/// stale and cannot be a page's guess. The denominator is in the sentence, as every personal
+/// line's is: "12 motes across your 340 kills of it" is a fact somebody can argue with.</para>
+/// </summary>
+public sealed record MoteSourceFact(string Mob, string Zone, int Motes, int Potency, int Kills)
+    : WhyFact(Evidence.Personal);
+
+/// <summary>
+/// **HOW OFTEN YOU KILL THINGS HERE** — the Founder's *"frequent kills"*, measured rather
+/// than asserted (DRA-71 D7, plan P10).
+///
+/// <para>Drawn only where the cadence discount FIRED, for <see cref="ZoneDowntimeFact"/>'s
+/// reason: a line that appears on every row tells a player nothing, and the primary rate is on
+/// screen either way. The comparison is against this character's own pooled kill rate across
+/// the zones that have paid them motes — the same "compared to WHAT? to yourself" answer D4
+/// gave the throughput weight, because there is no cohort here and never will be.</para>
+/// </summary>
+public sealed record ZoneKillRateFact(
+    string Zone, double KillsPerHour, double BaselineKillsPerHour, int Kills, int Zones)
+    : WhyFact(Evidence.Personal);
+
+/// <summary>
+/// **THE INSTANCE TIER, WEIGHED** (DRA-71 D7, plan P10) — the one thing this slice does that
+/// <see cref="ZoneTierFact"/> deliberately did not.
+///
+/// <para>D4 REPORTED the tier and weighed it at nothing, saying the preference belonged to the
+/// mote engine's own slice. This is that slice, and this is that fact: a zone whose own line
+/// recorded tier 0 or 1 is marked down against the 2–4 the Founder named. <b>The assumption is
+/// logged for veto</b> — that his "difficulty 2–4" means the game's instance tiers — and the
+/// catalog corroborates it in one place: the bare "Mote of Potential" lists its drop zones as
+/// <i>"D3+ Zones"</i>, which is the wiki tying mote quality to instance tier in its own words.
+/// One string is not a model, so nothing here derives a per-tier mote value from it.</para>
+///
+/// <para><b>A zone with NO tier observed is untouched</b>, and that is the clause that keeps
+/// this honest. Open world is most of the game and most of what a low-level character can
+/// reach; marking it down would be EQBuddy telling a player their whole evening is wrong, on
+/// the strength of a comparison nobody here can make ("is an open-world camp better or worse
+/// than a D3 for motes" has no answer in this repo). So the preference applies only BETWEEN
+/// instances the player's own zone lines recorded.</para>
+/// </summary>
+public sealed record ZoneTierPreferenceFact(string Zone, int Tier, int PreferredMin, int PreferredMax)
+    : WhyFact(Evidence.Personal);
+
+/// <summary>
+/// **WHAT THIS ZONE HAS ACTUALLY PAID YOU IN COIN** (DRA-71 D7, plan P9; Founder smoke
+/// item 4c).
+///
+/// <para>The same division, the same floor and the same scope wording as
+/// <see cref="ZoneXpRateFact"/> beside it — <see cref="ZoneRoll.CopperPerHour"/> has been
+/// written and documented as "read by the Make Money engine, which is a later slice" since
+/// D1. This is that slice.</para>
+/// </summary>
+public sealed record ZoneCoinRateFact(string Zone, double CopperPerHour, int Sessions, double Hours)
+    : WhyFact(Evidence.Personal);
+
+/// <summary>
+/// **SOMETHING YOU LOOT HERE THAT YOU HAVE ACTUALLY SOLD** (DRA-71 D7, plan P9).
+///
+/// <para><b>Both halves are measurements of this player, which is the whole reason the slice
+/// ended up here.</b> The drop count and its denominator come from the pool; the price comes
+/// from what a vendor actually paid THIS character, pooled from their own stored sessions
+/// (<see cref="SaleHistory"/>). The plan asked for the catalog's price to be weighed instead —
+/// the survey of the cached pages is why it is not: eqlwiki states its vendor value at a
+/// Charisma and a faction standing that differ per page, so it is a quote somebody was given
+/// rather than a property of the object.</para>
+/// </summary>
+/// <param name="CopperEach">What one of them has fetched you, on average.</param>
+public sealed record SellableDropFact(
+    string Item, string Mob, string Zone, int Drops, int Kills, long CopperEach)
+    : WhyFact(Evidence.Personal);
+
+/// <summary>
+/// **WHAT THE WIKI SAYS A VENDOR PAYS** — the catalog fallback, for an item you have never
+/// sold (DRA-71 D7, plan P9).
+///
+/// <para><see cref="Evidence.Catalog"/>, so HOME-004's estimate label arrives by construction.
+/// <b>And it carries the page's own condition as a required field</b>, because the survey found
+/// the number is not a property of the item: 262 of the 975 cached pages that state a value
+/// head it "VALUE TO VENDOR with CHA : 80 and faction at Indifferently", at a Charisma that
+/// differs per page. A price quoted at somebody else's Charisma printed without that clause is
+/// a measurement of nothing wearing the clothes of a fact.</para>
+///
+/// <para><b>It never weighs anything.</b> The ranking reads what YOU were paid; this names an
+/// item, so that a zone you have farmed without ever visiting a merchant is not silent.</para>
+/// </summary>
+/// <param name="Condition">The page's own sentence, verbatim, or "" where it stated none.</param>
+public sealed record CatalogValueFact(string Item, long Copper, string Condition)
+    : WhyFact(Evidence.Catalog);
+
 /// <summary>How far along an unlock is, from the game's own achievements dump.</summary>
 public sealed record UnlockScoreFact(string Subject, int Done, int Total)
     : WhyFact(Evidence.Personal);
@@ -431,11 +547,40 @@ public enum GoalGapReason
     /// </summary>
     NoCatalogUpgrade,
 
-    /// <summary>The player chose a gear intent whose engine is a later slice — today, "farm to
-    /// sell", which waits on the plan's P9 copper value (DRA-71 D7). Decided rather than
-    /// silent: an intent that produced an empty list would read as a character with perfect
-    /// gear.</summary>
+    /// <summary>The player chose a gear intent whose engine is a later slice. Kept as a
+    /// DECIDED shape even though all three intents answer since DRA-71 D7 — see
+    /// <see cref="GearUpgrades.ShapeFor"/>, which still has to be able to say it, and
+    /// <c>HelperMustListTests</c>, which asserts the sentence exists for whichever intent next
+    /// arrives Deferred.</summary>
     GearIntentNotAnsweredYet,
+
+    // ---- DRA-71 D7 ------------------------------------------------------------------
+
+    /// <summary>
+    /// There is enough stored play to divide, and no mote has ever dropped in it (DRA-71 D7).
+    ///
+    /// <para>A different state from <see cref="NoPlayHistory"/> and the difference matters: one
+    /// is EQBuddy having nothing to read, the other is EQBuddy having read it and found no
+    /// motes. The second has no command that fixes it and no catalog to fall back on — the
+    /// shipped mote records name no real zone — so the sentence says what would fill it and
+    /// nothing else.</para>
+    /// </summary>
+    NoMotesSeen,
+
+    /// <summary>The stored sessions are there and none of them earned coin, so there is no
+    /// rate to rank zones by (DRA-71 D7). Not a missing dump and not a missing session — a
+    /// measured zero, said as one.</summary>
+    NoCoinEarned,
+
+    /// <summary>
+    /// Nothing this character loots has a price EQBuddy can name (DRA-71 D7).
+    ///
+    /// <para>Two ways to be in it and the sentence covers both: you have never sold anything a
+    /// vendor recorded, and the shipped catalog carries no vendor value for what you loot —
+    /// which is every item today, because the copper the promoter now parses arrives with the
+    /// next weekly refresh.</para>
+    /// </summary>
+    NoSellEvidence,
 }
 
 /// <summary>One selected goal that produced no recommendation, and why.</summary>
@@ -535,6 +680,19 @@ public sealed record HelperInputs(
 
     /// <summary>Whether quest-obtained items may be offered (the Founder's "± quests").</summary>
     public bool IncludeQuests { get; init; }
+
+    // ---- Farm Motes / Make Money (DRA-71 D7, plans P9 and P10) --------------------------
+
+    /// <summary>What each zone has paid this character in motes —
+    /// <see cref="MoteHistory.Fold"/>'s own answer. Empty is a real state: a character who has
+    /// never looted a mote, and the engine says so rather than falling back on a catalog that
+    /// names no real zone.</summary>
+    public IReadOnlyList<MoteRoll> Motes { get; init; } = [];
+
+    /// <summary>What a vendor has actually paid this character, per item —
+    /// <see cref="SaleHistory.Fold"/>'s own answer. Empty means they have never sold anything
+    /// EQBuddy saw, which is when the catalog's own estimate is allowed to speak.</summary>
+    public IReadOnlyList<SaleRoll> Sales { get; init; } = [];
 }
 
 /// <summary>The whole answer for one set of chips.</summary>
@@ -668,8 +826,11 @@ public static class Recommendations
         // to sell — is Deferred one level down (GearUpgrades.ShapeFor) and says so in the
         // room, which is why the GOAL is answered while one of its questions is not.
         HelperGoal.FarmGear => HelperGoalShape.Answered,
-        HelperGoal.FarmMotes => HelperGoalShape.Deferred,
-        HelperGoal.MakeMoney => HelperGoalShape.Deferred,
+        // DRA-71 D7. Both engines are personal-evidence-only, and honestly so: the shipped
+        // catalog names no real zone for a mote, and its vendor value is a price somebody was
+        // quoted rather than a property of an item (see the two engines below).
+        HelperGoal.FarmMotes => HelperGoalShape.Answered,
+        HelperGoal.MakeMoney => HelperGoalShape.Answered,
         HelperGoal.FarmMaterials => HelperGoalShape.Deferred,
         HelperGoal.Achievements => HelperGoalShape.Deferred,
         _ => null,
@@ -733,6 +894,12 @@ public static class Recommendations
         // says the catalog lines are "level-gated (P5)", and the survey that had to run before
         // building one found there is nothing to gate them ON — see LevelExemptReason.
         HelperGoal.FarmGear => LevelUse.Exempt,
+        // **DRA-71 D7, and the two rows are deliberately opposite.** Motes CONSUME the level
+        // because the Founder asked them to by name — *"highest-level zone"* is the first of
+        // his three mote criteria. Money is EXEMPT because nothing he asked for needs it and
+        // both readings of what it would do are wrong; see LevelExemptReason.
+        HelperGoal.FarmMotes => LevelUse.Consumes,
+        HelperGoal.MakeMoney => LevelUse.Exempt,
         _ => null,
     };
 
@@ -770,6 +937,23 @@ public static class Recommendations
             + "is rather than a rate: a camp this character has outgrown is if anything a "
             + "quicker place to farm one, so the outgrown discount would recommend against "
             + "the goal the player just picked.",
+
+        // **DRA-71 D7.** The Founder's money ask is "farm valuable gear to sell" and "make
+        // money", and neither names his level. What a level rule WOULD do here has two
+        // readings and both are wrong, which is D6's own conclusion arrived at again on
+        // different evidence. Coin is a property of the CREATURE — the pool stores CoinMin and
+        // CoinMax per creature and they do not move when the killer levels — so an outgrown
+        // camp pays the same per kill and is killed through faster, which makes it the BETTER
+        // farm rather than the worse one; and inverting the discount into a bonus is the arm
+        // D4 refused plus a game rule nobody here can verify. Neither is shipped, and the
+        // measured coin-per-hour already contains whatever the truth is.
+        HelperGoal.MakeMoney =>
+            "Coin is a property of the creature rather than of the killer — the pooled "
+            + "CoinMin and CoinMax for a creature do not move when you level — so a camp you "
+            + "have outgrown pays the same per kill and is killed through faster. Marking it "
+            + "down would recommend against the goal the player picked, and marking it up "
+            + "would be a game rule nobody here can verify. The measured coin per hour "
+            + "already contains whichever is true.",
         _ => "",
     };
 
@@ -885,6 +1069,73 @@ public static class Recommendations
     /// halves and the baseline's scope.</summary>
     public const double ThroughputShortfallWeight = 0.8;
 
+    // ---- motes: the Founder's three criteria, priced (DRA-71 D7, plan P10) --------------
+
+    /// <summary>
+    /// The share of your own pooled kill rate below which a mote zone's CADENCE is priced in —
+    /// the Founder's *"frequent kills"*.
+    ///
+    /// <para>Three fifths, the same figure and the same reasoning as
+    /// <see cref="ThroughputShortfall"/>: far enough under that an ordinary spread between
+    /// camps does not trip it. <b>It is against this character's own pooled rate and never a
+    /// number of kills per hour</b>, because "is forty kills an hour frequent?" has no answer
+    /// in this repo and "is it frequent for the character who averages a hundred?" does.</para>
+    ///
+    /// <para>The double-count objection is the same one D4 answered out loud, and so is the
+    /// answer: potency-per-hour already has cadence inside it, and this weight is about whether
+    /// a rate rests on kills the player can repeat. It is a discount and never a bonus, so a
+    /// busy camp is not promoted above the potency it actually paid.</para>
+    /// </summary>
+    public const double SlowKillShare = 0.6;
+
+    /// <summary>What a zone under <see cref="SlowKillShare"/> of your own pooled kill rate is
+    /// multiplied by. Its why-line is <see cref="ZoneKillRateFact"/>, drawn only when this
+    /// fires.</summary>
+    public const double SlowKillWeight = 0.8;
+
+    /// <summary>
+    /// The bottom of the instance-tier band the Founder named — *"tier 2–4"*.
+    ///
+    /// <para><b>The assumption is logged for veto</b> (and lives in <c>DECISIONS.md</c>): his
+    /// "difficulty 2–4" is read as the game's instance tiers D0–D4, which is the only 1–5
+    /// difficulty datum the game's own data carries (<see cref="InstanceTier"/>). The shipped
+    /// catalog corroborates the shape of it in one place — the bare "Mote of Potential" lists
+    /// its drop zones as "D3+ Zones" — and one string is not a model, so nothing here derives a
+    /// per-tier mote value from it.</para>
+    /// </summary>
+    public const int MotePreferredTierMin = 2;
+
+    /// <summary>The top of that band.</summary>
+    public const int MotePreferredTierMax = 4;
+
+    /// <summary>
+    /// What an instance OUTSIDE <see cref="MotePreferredTierMin"/>..<see cref="MotePreferredTierMax"/>
+    /// is multiplied by.
+    ///
+    /// <para><b>A preference expressed as a discount, because D4 refused bonus arms and this
+    /// slice does not reopen that.</b> A zone whose own line recorded tier 0 or 1 is marked
+    /// down; a zone in the named band is left alone rather than promoted, so the measured
+    /// potency rate stays the primary term.</para>
+    ///
+    /// <para><b>And a zone with NO tier observed is untouched</b> — the clause that keeps this
+    /// from being a verdict on the whole open world. See
+    /// <see cref="ZoneTierPreferenceFact"/>.</para>
+    /// </summary>
+    public const double OffPreferredTierWeight = 0.8;
+
+    // ---- money: your own coin, and your own prices (DRA-71 D7, plan P9) ------------------
+
+    /// <summary>
+    /// How many sellable drops one money row names before it stops.
+    ///
+    /// <para>Two, which is one fewer than <see cref="GearNamedPerRow"/> because each of these
+    /// costs a whole why-line and a money row already spends one on its coin rate. Three named
+    /// items would push a loaded row past <see cref="WhyCap"/> and start trimming the discount
+    /// sentences the zone was marked down for — the failure D4 raised the cap over, and the one
+    /// worth not repeating.</para>
+    /// </summary>
+    public const int SellablesPerRow = 2;
+
     /// <summary>
     /// Rank the answers for one set of selected goals.
     /// </summary>
@@ -908,6 +1159,10 @@ public static class Recommendations
 
         if (goals.Contains(HelperGoal.LevelUp)) LevelUp(inputs, candidates, gaps);
         if (goals.Contains(HelperGoal.FarmGear)) gearWithheld = FarmGear(inputs, candidates, gaps);
+        // DRA-71 D7. Both read the player's own play and nothing else; the catalog's half of
+        // each was refused by its own survey, which is written down where the engine is.
+        if (goals.Contains(HelperGoal.FarmMotes)) FarmMotes(inputs, candidates, gaps);
+        if (goals.Contains(HelperGoal.MakeMoney)) MakeMoney(inputs, candidates, gaps);
         if (goals.Contains(HelperGoal.WorkOnFaction)) Faction(inputs, candidates, gaps);
         // **THE PICK NARROWS THE ENGINE, NOT THE ROOM** (DRA-71 D5, plan P11). It happens here
         // rather than in the caller so the phone gets it the day it calls Rank — porting a
@@ -966,13 +1221,45 @@ public static class Recommendations
                 parts[0].Zone,
                 parts[0].Zone,
                 [.. parts.SelectMany(p => p.Goals).Distinct()],
-                [.. parts.SelectMany(p => p.Why)],
+                Interleave(parts),
                 [.. Dedupe(parts.SelectMany(p => p.Doors))],
                 parts.Sum(p => p.WithheldWhy),
                 parts.Max(p => p.Weight)));
         }
         result.AddRange(candidates.Where(c => c.Zone.Length == 0));
         return result;
+    }
+
+    /// <summary>
+    /// **ONE SENTENCE PER ENGINE BEFORE ANY ENGINE GETS A SECOND** — round-robin across the
+    /// parts a zone was merged from (DRA-71 D7).
+    ///
+    /// <para><b>A launched-app row found this and nothing else could have.</b> Concatenating
+    /// the parts put every engine's sentences in a block, and <see cref="WhyCap"/> trims the
+    /// TAIL — so the first merged row with three engines on it (Level Up + Farm Motes + Make
+    /// Money, one zone, the differentiator working exactly as designed) drew a headline reading
+    /// *"Level Up · Farm Motes · Make Money"* above six sentences of which NOT ONE was about
+    /// money. The cap was correct, the engines were correct, and the row lied about itself.</para>
+    ///
+    /// <para>Interleaving makes the cap fair by construction rather than by arithmetic: at any
+    /// cap of at least one per part, every goal the headline claims has at least one sentence
+    /// under it. It also reads better — a merged row now leads with one figure per goal instead
+    /// of burying the second engine — and it changes NOTHING for a row with one part, which is
+    /// most of them.</para>
+    ///
+    /// <para>The alternative was raising the cap again (D4 already went 4→6 under protest), and
+    /// it is the wrong lever: three engines can put ten sentences on one zone and a row with ten
+    /// sentences has stopped being a recommendation. The count withheld is still reported
+    /// (trap 50).</para>
+    /// </summary>
+    private static List<WhyFact> Interleave(List<Recommendation> parts)
+    {
+        var merged = new List<WhyFact>();
+        var deepest = parts.Max(p => p.Why.Count);
+        for (var i = 0; i < deepest; i++)
+            foreach (var part in parts)
+                if (i < part.Why.Count) merged.Add(part.Why[i]);
+        return merged;
     }
 
     private static IEnumerable<HelperDoor> Dedupe(IEnumerable<HelperDoor> doors)
@@ -1158,9 +1445,325 @@ public static class Recommendations
     /// is HOME-006's own forbidden shape.</para>
     /// </summary>
     private static ZoneOutgrownFact? Outgrown(ZoneRoll z, ResolvedLevel level) =>
-        level.Known && z.HasConnedBand && level.Level - z.ConnedMax >= OutgrownBy
-            ? new ZoneOutgrownFact(z.Zone, z.ConnedMin, z.ConnedMax, level.Level, z.ConnedKills)
+        Outgrown(z.Zone, z.ConnedMin, z.ConnedMax, z.ConnedKills, level);
+
+    /// <summary>
+    /// The same question asked of a band that did not arrive on a <see cref="ZoneRoll"/> —
+    /// <see cref="MoteRoll"/> carries its own copy of the conned figures (DRA-71 D7).
+    ///
+    /// <para>ONE producer of the judgement, taking the numbers rather than the record, so the
+    /// mote engine cannot drift into a second reading of "have you outgrown this". The
+    /// <see cref="ZoneRoll"/> overload above is a call into this one for the same reason.</para>
+    /// </summary>
+    private static ZoneOutgrownFact? Outgrown(
+        string zone, int connedMin, int connedMax, int connedKills, ResolvedLevel level) =>
+        level.Known && connedMin > 0 && connedMax >= connedMin
+        && level.Level - connedMax >= OutgrownBy
+            ? new ZoneOutgrownFact(zone, connedMin, connedMax, level.Level, connedKills)
             : null;
+
+    // ---- Farm Motes: where motes have actually dropped for you (DRA-71 D7, plan P10) -----
+
+    /// <summary>
+    /// **THE FOUNDER'S THREE MOTE CRITERIA, EACH MEASURED** (smoke item 5: *"Motes:
+    /// highest-level zone, frequent kills, tier 2–4"*).
+    ///
+    /// <para><b>Personal-only, and the survey is why.</b> The plan let this slice check whether
+    /// the shipped catalog could name where motes drop. It can't: all eleven mote records carry
+    /// a <c>DropZones</c> and every value is "Various Zones", "Unknown" or "D3+ Zones". A drop
+    /// zone nobody can travel to is not a drop zone, so there is no catalog arm and no invented
+    /// mote→zone map — a character who has never looted a mote gets
+    /// <see cref="GoalGapReason.NoMotesSeen"/> and a sentence naming what would fill it (trap
+    /// 73).</para>
+    ///
+    /// <para><b>The primary term is the measured potency rate</b> and the Founder's three
+    /// criteria are priced around it as discounts, which is D4's doctrine kept rather than
+    /// reopened: the level band through the SAME <see cref="Outgrown"/> judgement the
+    /// experience engine uses, the kill cadence against this character's own pooled rate, and
+    /// the instance tier against the band he named. There is no bonus arm, so nothing here can
+    /// promote a camp above the motes it actually paid.</para>
+    ///
+    /// <para><b>This is the engine that made <see cref="LevelUse.Consumes"/> true a second
+    /// time.</b> D3 shipped with exactly one, and its own note said the throughput goals would
+    /// each own their row when they landed.</para>
+    /// </summary>
+    private static void FarmMotes(HelperInputs inputs, List<Recommendation> into, List<GoalGap> gaps)
+    {
+        // Three ways to have nothing, and they are three different sentences. No stored play at
+        // all is the same gap the experience engine draws; stored play with no mote in it is
+        // its own fact and has no command that fixes it.
+        var rated = inputs.Motes.Where(m => m.HasRate).ToList();
+        if (rated.Count == 0)
+        {
+            gaps.Add(new GoalGap(HelperGoal.FarmMotes,
+                inputs.Zones.Any(z => z.HasPersonalEvidence)
+                    ? GoalGapReason.NoMotesSeen
+                    : GoalGapReason.NoPlayHistory));
+            return;
+        }
+
+        var best = rated.Max(m => m.PotencyPerHour ?? 0);
+        // ONE yardstick for the engine, folded once — a property of the SET, so a per-row
+        // recomputation would be the same sum computed six times (trap 4 in a loop). And TWO
+        // zones at minimum, which is D4's `Known` clause kept: a baseline built from one zone
+        // IS that zone, so every single-zone profile would compare exactly average and a
+        // discount that could never fire would be dressed as one that had been checked.
+        var killBaseline = KillRateBaseline(rated);
+
+        foreach (var m in rated
+                     .OrderByDescending(m => m.PotencyPerHour ?? 0)
+                     .Take(PerEngineCandidates))
+        {
+            var why = new List<WhyFact>
+            {
+                new ZoneMoteRateFact(
+                    m.Zone, m.PotencyPerHour ?? 0, m.MotesPerHour ?? 0, m.Motes, m.VoidTouched,
+                    m.Sessions, m.Hours),
+            };
+
+            // **EVERY DISCOUNT THAT FIRED COMES BEFORE THE FACT THAT WEIGHS NOTHING**, which is
+            // D4's own ordering rule applied to this engine's three. `WhyCap` trims the tail, so
+            // whatever is emitted last is what a loaded row gives up — and the one thing a row
+            // must never give up is the explanation for a mark-down it already applied. The WHO
+            // line is the nice-to-have here (it explains nothing about the order), so it goes
+            // last, exactly where D4 put the instance tier for the same reason.
+
+            // The cadence sentence is drawn only where its discount FIRED — ZoneDowntimeFact's
+            // rule, and for its reason: a line on every row varies with nothing and says
+            // nothing, and the potency rate is on screen either way.
+            var slowKills = SlowKills(m, killBaseline);
+            if (slowKills)
+                why.Add(new ZoneKillRateFact(
+                    m.Zone, m.KillsPerHour ?? 0, killBaseline.Rate, m.Kills, killBaseline.Zones));
+
+            var outgrown = Outgrown(m.Zone, m.ConnedMin, m.ConnedMax, m.ConnedKills, inputs.Level);
+            if (outgrown is { } fact) why.Add(fact);
+
+            // The tier, and only where the player's own line recorded one OUTSIDE the band the
+            // Founder named. An in-band instance draws nothing rather than a congratulation,
+            // and an open-world zone draws nothing because the comparison does not exist.
+            var offTier = OffPreferredTier(m.Tier);
+            if (offTier)
+                why.Add(new ZoneTierPreferenceFact(
+                    m.Zone, m.Tier, MotePreferredTierMin, MotePreferredTierMax));
+
+            // WHO, from the one source that cannot be stale. Silent where the fold found
+            // nobody, which it only can be if a mote arrived under a creature with no name.
+            if (m.Top is { } top)
+                why.Add(new MoteSourceFact(top.Mob, m.Zone, top.Motes, top.Potency, top.Kills));
+
+            into.Add(new Recommendation(
+                RecommendationKind.Zone, m.Zone, m.Zone,
+                [HelperGoal.FarmMotes], why,
+                [new HelperDoor(HelperDoorKind.World, m.Zone),
+                 new HelperDoor(HelperDoorKind.Wealth, "")],
+                0,
+                (best > 0 ? Math.Clamp((m.PotencyPerHour ?? 0) / best, 0, 1) : 0)
+                * (outgrown is null ? 1 : OutgrownWeight)
+                * (slowKills ? SlowKillWeight : 1)
+                * (offTier ? OffPreferredTierWeight : 1)));
+        }
+    }
+
+    /// <summary>This character's own pooled kill rate across the zones that have paid them
+    /// motes, and how many zones it rests on. Pooled — total kills over total hours — and never
+    /// a mean of the rows' own rates, so a zone farmed for forty hours counts for more than one
+    /// farmed for twenty minutes rather than the same (<see cref="ZoneHistory.Baseline"/>'s own
+    /// rule).</summary>
+    private static (double Rate, int Zones) KillRateBaseline(IReadOnlyList<MoteRoll> rated)
+    {
+        double hours = 0;
+        var kills = 0;
+        var zones = 0;
+        foreach (var m in rated)
+        {
+            if (m.KillsPerHour is null) continue;
+            hours += m.Hours;
+            kills += m.Kills;
+            zones++;
+        }
+        return zones >= 2 && hours > 0 ? (kills / hours, zones) : (0, zones);
+    }
+
+    private static bool SlowKills(MoteRoll m, (double Rate, int Zones) baseline) =>
+        baseline.Rate > 0 && m.KillsPerHour is { } rate && rate < baseline.Rate * SlowKillShare;
+
+    /// <summary>Did the player's own zone line record an instance OUTSIDE the band the Founder
+    /// named? False for open world and false for an adjective this build does not know — the
+    /// preference applies only between instances, because "is an open-world camp better than a
+    /// D3 for motes" is a question this repo cannot answer.</summary>
+    private static bool OffPreferredTier(int tier) =>
+        tier >= 0 && (tier < MotePreferredTierMin || tier > MotePreferredTierMax);
+
+    // ---- Make Money / Farm to sell: your coin, and your own prices (DRA-71 D7, plan P9) ---
+
+    /// <summary>
+    /// **WHAT YOUR OWN SESSIONS HAVE EARNED, PER PLACE** (Founder smoke item 4c).
+    ///
+    /// <para><see cref="ZoneRoll.CopperPerHour"/> has carried a comment since D1 saying it is
+    /// "read by the Make Money engine, which is a later slice". This is that slice, and the
+    /// division was already there — which is the point of having written it where the
+    /// experience rate lives rather than where a recommender wanted it.</para>
+    ///
+    /// <para><b>The plan asked the catalog's copper to be WEIGHED, and the survey is why it is
+    /// not.</b> Of the 975 cached item pages that state a <c>merchant_value</c>, 262 head it
+    /// "VALUE TO VENDOR with CHA : 80 and faction at Indifferently" — at a Charisma that
+    /// differs per page — and 435 more are prose, approximations or qualified figures this
+    /// build refuses to read. A vendor price in EQ moves with the seller's Charisma and their
+    /// faction, so the wiki's number is a quote somebody was given rather than a fact about the
+    /// object, and a ranking built on it would sort zones by which of their drops happen to
+    /// have a priced page. What the player was PAID has neither problem, so
+    /// <see cref="SaleHistory"/> is the evidence and the catalog's number is a label on an item
+    /// they have never sold. The departure is logged in <c>DECISIONS.md</c> for veto.</para>
+    /// </summary>
+    private static void MakeMoney(HelperInputs inputs, List<Recommendation> into, List<GoalGap> gaps)
+    {
+        var earning = inputs.Zones
+            .Where(z => z.HasPersonalEvidence && z.CopperPerHour is > 0)
+            .ToList();
+        if (earning.Count == 0)
+        {
+            gaps.Add(new GoalGap(HelperGoal.MakeMoney,
+                inputs.Zones.Any(z => z.HasPersonalEvidence)
+                    ? GoalGapReason.NoCoinEarned
+                    : GoalGapReason.NoPlayHistory));
+            return;
+        }
+
+        var best = earning.Max(z => z.CopperPerHour ?? 0);
+        foreach (var z in earning
+                     .OrderByDescending(z => z.CopperPerHour ?? 0)
+                     .Take(PerEngineCandidates))
+        {
+            var why = new List<WhyFact>
+            {
+                new ZoneCoinRateFact(z.Zone, z.CopperPerHour ?? 0, z.Sessions, z.Hours),
+            };
+            why.AddRange(Sellables(inputs, z.Zone));
+
+            into.Add(new Recommendation(
+                RecommendationKind.Zone, z.Zone, z.Zone,
+                [HelperGoal.MakeMoney], why,
+                [new HelperDoor(HelperDoorKind.World, z.Zone),
+                 new HelperDoor(HelperDoorKind.Wealth, "")],
+                0,
+                best > 0 ? Math.Clamp((z.CopperPerHour ?? 0) / best, 0, 1) : 0));
+        }
+    }
+
+    /// <summary>
+    /// **FARM TO SELL — the third gear intent, answered** (DRA-71 D7; the Founder's 4c, and the
+    /// one <see cref="GearIntent.FarmToSell"/> has pointed at since D6).
+    ///
+    /// <para><b>It is not the dominance sweep and it must not be.</b> "What is worth money" has
+    /// no worn anchor, so routing it through <see cref="GearUpgrades.Sweep"/> would be the one
+    /// thing that sweep's summary forbids — a claim about the game's items ranked against each
+    /// other. Instead the anchor is the player's own loot: what you have actually pulled out of
+    /// a place, priced at what a vendor actually paid you for it. Both halves are measurements
+    /// of this player, so the "never BiS" lock is not even approached.</para>
+    ///
+    /// <para>It shares <see cref="Sellables"/> with Make Money rather than copying it — one
+    /// producer of "what is worth selling here" — and differs in exactly the way the two
+    /// questions differ: Make Money leads with the coin your sessions earned and this one does
+    /// not mention it, because coin off a corpse is not gear you farmed to sell.</para>
+    /// </summary>
+    private static void FarmToSell(HelperInputs inputs, List<Recommendation> into, List<GoalGap> gaps)
+    {
+        var rows = new List<(ZoneRoll Zone, List<WhyFact> Why, long Value)>();
+        foreach (var z in inputs.Zones)
+        {
+            var why = Sellables(inputs, z.Zone);
+            if (why.Count == 0) continue;
+            rows.Add((z, why, why.OfType<SellableDropFact>().Sum(f => f.CopperEach * f.Drops)));
+        }
+
+        if (rows.Count == 0)
+        {
+            gaps.Add(new GoalGap(HelperGoal.FarmGear, GoalGapReason.NoSellEvidence));
+            return;
+        }
+
+        // The weight is what this place has actually put in your pocket — drops you took out of
+        // it times what one of them fetched — over the best row's. A count would say a zone full
+        // of worthless drops beats one with a single valuable one; this is arithmetic over two
+        // measurements, which is the same standard the gear rows' count-of-upgrades keeps.
+        var best = rows.Max(r => r.Value);
+        foreach (var row in rows
+                     .OrderByDescending(r => r.Value)
+                     .ThenBy(r => r.Zone.Zone, StringComparer.OrdinalIgnoreCase)
+                     .Take(PerEngineCandidates))
+            into.Add(new Recommendation(
+                RecommendationKind.Zone, row.Zone.Zone, row.Zone.Zone,
+                [HelperGoal.FarmGear], row.Why,
+                [new HelperDoor(HelperDoorKind.World, row.Zone.Zone),
+                 new HelperDoor(HelperDoorKind.Wealth, "")],
+                0,
+                best > 0 ? Math.Clamp(row.Value / (double)best, 0, 1) : 0));
+    }
+
+    /// <summary>
+    /// What one zone drops that is worth selling — <b>ONE producer, read by two engines</b>.
+    ///
+    /// <para>The player's own pooled kills say what dropped here and how often; their own
+    /// stored sales say what one fetched. Where they have never sold one, the catalog's number
+    /// speaks instead — <see cref="Evidence.Catalog"/>, so the estimate label arrives by
+    /// construction, and carrying the page's own Charisma-and-faction condition, because
+    /// without it the number is a quote pretending to be a property (HOME-004 with teeth).</para>
+    ///
+    /// <para><b>A price is answered ONCE per item</b> (trap 4): your own sale wins, and only
+    /// where there is none does the catalog answer. Two sentences naming two prices for one
+    /// item is the shape a reader has to reconcile, and the gear rows already refused it for
+    /// the creature.</para>
+    /// </summary>
+    private static List<WhyFact> Sellables(HelperInputs inputs, string zone)
+    {
+        var byItem = new Dictionary<string, (MobSummary Mob, MobLoot Loot)>(
+            StringComparer.OrdinalIgnoreCase);
+        foreach (var mob in inputs.Pool)
+        {
+            if (!mob.Zone.Equals(zone, StringComparison.OrdinalIgnoreCase)) continue;
+            foreach (var loot in mob.Loot)
+            {
+                // Motes are the other engine's answer and are not sold to a vendor; naming one
+                // here would be one item with two homes and a recommendation to sell the thing
+                // the player is being told to farm.
+                if (Motes.IsMote(loot.Item)) continue;
+                var key = QuestCatalog.BaseItemName(loot.Item);
+                if (!byItem.TryGetValue(key, out var best) || loot.Count > best.Loot.Count)
+                    byItem[key] = (mob, loot);
+            }
+        }
+
+        var priced = new List<(WhyFact Fact, long Worth, string Item)>();
+        foreach (var (item, (mob, loot)) in byItem)
+        {
+            if (SaleHistory.CopperEachFor(inputs.Sales, item) is { } each && each > 0)
+            {
+                priced.Add((
+                    new SellableDropFact(item, mob.Name, zone, loot.Count, mob.Kills, each),
+                    each * loot.Count, item));
+                continue;
+            }
+            // The catalog's own number, for an item you have never sold. It is EMPTY for every
+            // record in the catalog this slice ships — the promoter learns the field now and the
+            // values arrive with the next weekly refresh — so this arm is proved by fixture and
+            // draws nothing today (trap 73: nothing is the right amount to draw).
+            if (inputs.Items?.Find(item) is { MerchantCopper: > 0 } record)
+                priced.Add((
+                    new CatalogValueFact(item, record.MerchantCopper!.Value,
+                        record.MerchantCondition ?? ""),
+                    // Worth nothing in the ORDERING, because it is worth nothing in the ranking:
+                    // a price quoted at somebody else's Charisma must not decide which of your
+                    // own drops is named first.
+                    0, item));
+        }
+
+        return [.. priced
+            .OrderByDescending(p => p.Worth)
+            .ThenBy(p => p.Item, StringComparer.OrdinalIgnoreCase)
+            .Take(SellablesPerRow)
+            .Select(p => p.Fact)];
+    }
 
     // ---- Farm Gear: the catalog, anchored on what you are wearing (DRA-71 D6, plan P8) ---
 
@@ -1207,11 +1810,23 @@ public static class Recommendations
     /// <returns>How many upgrades the sweep's per-anchor cap held back.</returns>
     private static int FarmGear(HelperInputs inputs, List<Recommendation> into, List<GoalGap> gaps)
     {
-        // A DECIDED deferral, said out loud. An intent whose engine is a later slice returning
-        // an empty list would read as a character with perfect gear.
+        // A DECIDED deferral, said out loud. Every intent answers since DRA-71 D7, so this arm
+        // is unreachable today and STAYS: a fourth intent arriving Deferred must say so rather
+        // than return an empty list, which would read as a character with perfect gear.
         if (GearUpgrades.ShapeFor(inputs.GearIntent) != GearIntentShape.Answered)
         {
             gaps.Add(new GoalGap(HelperGoal.FarmGear, GoalGapReason.GearIntentNotAnsweredYet));
+            return 0;
+        }
+
+        // **"Farm to sell" is a different question and leaves here** (DRA-71 D7, plan P9). It
+        // has no worn anchor and does no comparing, so it must not enter the dominance sweep
+        // below — see FarmToSell for why routing it through Sweep would be the one claim that
+        // sweep's own summary forbids. It needs no inventory dump either: the anchor is what
+        // you have LOOTED, not what you are wearing.
+        if (inputs.GearIntent == GearIntent.FarmToSell)
+        {
+            FarmToSell(inputs, into, gaps);
             return 0;
         }
 

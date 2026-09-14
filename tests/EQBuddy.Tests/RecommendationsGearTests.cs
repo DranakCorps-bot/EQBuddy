@@ -350,20 +350,139 @@ public class RecommendationsGearTests
             Assert.DoesNotContain(claim, sentence, StringComparison.OrdinalIgnoreCase);
     }
 
-    /// <summary>The deferred intent says so rather than producing an empty list a room would
-    /// draw as "your gear is perfect".</summary>
+    /// <summary>
+    /// **"FARM TO SELL" LEAVES THE DOMINANCE SWEEP ENTIRELY** (DRA-71 D7).
+    ///
+    /// <para>Its anchor is the player's own loot rather than what they wear, so a fixture with
+    /// a worn item, a catalog full of upgrades and NO loot history answers nothing about gear
+    /// — which is the assertion: a single leaked <see cref="GearUpgradeFact"/> here would mean
+    /// the sell question had been routed through a comparison it has no anchor for. The gap it
+    /// draws is about sell EVIDENCE and no longer about a slice that has not happened.</para>
+    /// </summary>
     [Fact]
-    public void TheDeferredIntentComesBackAsItsOwnGap()
+    public void FarmToSellNeverProducesAnUpgradeRowAndSaysWhatItIsMissing()
     {
         var set = Rank(Gear(
             [Worn("Rusty Helm", "HEAD", 4)],
             new ItemCatalog([Record("Bone Helm", "HEAD", 9, ["Lower Guk"])]),
             intent: GearIntent.FarmToSell));
 
-        var gap = Assert.Single(set.Gaps);
-        Assert.Equal(GoalGapReason.GearIntentNotAnsweredYet, gap.Reason);
         Assert.Empty(set.Top);
+        Assert.Empty(set.Top.SelectMany(r => r.Why).OfType<GearUpgradeFact>());
+        var gap = Assert.Single(set.Gaps);
+        Assert.Equal(GoalGapReason.NoSellEvidence, gap.Reason);
         Assert.NotEmpty(HelperPresentation.Gap(gap));
+    }
+
+    /// <summary>
+    /// **THE SELL ANSWER IS TWO MEASUREMENTS OF THIS PLAYER** (DRA-71 D7, plan P9; Founder
+    /// smoke item 4c).
+    ///
+    /// <para>What the pool says dropped here, priced at what a vendor actually paid THEM — so
+    /// the row is <see cref="Evidence.Personal"/> throughout and carries no estimate label. The
+    /// catalog is deliberately loaded with an upgrade that would dominate the worn helm: if any
+    /// of it reached the answer, the sell question would be wearing the gear question's
+    /// clothes.</para>
+    /// </summary>
+    [Fact]
+    public void FarmToSellPricesYourOwnDropsAtWhatAVendorPaidYou()
+    {
+        MobSummary[] pool =
+        [
+            new("a froglok tad", 340, 340, 30, 0, 0,
+                [new MobLoot("Froglok Blood", 12, 3.5)]) { Zone = "Lower Guk" },
+        ];
+        var inputs = Gear(
+            [Worn("Rusty Helm", "HEAD", 4)],
+            new ItemCatalog([Record("Bone Helm", "HEAD", 9, ["Lower Guk"])]),
+            intent: GearIntent.FarmToSell,
+            pool: pool) with
+        {
+            Sales = [new SaleRoll("Froglok Blood", 4, 320)],
+        };
+
+        var top = Assert.Single(Recommendations.Rank(inputs, [HelperGoal.FarmGear]).Top);
+        Assert.Equal("Lower Guk", top.Zone);
+        Assert.Empty(top.Why.OfType<GearUpgradeFact>());
+
+        var fact = Assert.Single(top.Why.OfType<SellableDropFact>());
+        Assert.Equal("Froglok Blood", fact.Item);
+        Assert.Equal(12, fact.Drops);
+        Assert.Equal(340, fact.Kills);
+        Assert.Equal(80, fact.CopperEach);
+        Assert.Equal(Evidence.Personal, fact.Evidence);
+
+        var sentence = HelperPresentation.Why(fact);
+        Assert.Contains("a froglok tad", sentence);
+        Assert.Contains("8s", sentence);
+        Assert.DoesNotContain(HelperPresentation.CatalogLabel, sentence);
+    }
+
+    /// <summary>
+    /// **THE CATALOG'S PRICE SPEAKS ONLY WHERE YOURS CANNOT, AND IT BRINGS ITS CONDITION**
+    /// (DRA-71 D7, plan P9).
+    ///
+    /// <para>The survey of the cached item pages is why this arm is shaped like this: eqlwiki
+    /// states its vendor value at a Charisma and a faction standing that differ per page, so
+    /// the number is a quote somebody was given. Printing it without the page's own condition
+    /// would turn one editor's Charisma into a fact about the object — so the condition is in
+    /// the sentence, and the estimate label is there by construction because the fact is
+    /// tagged Catalog.</para>
+    ///
+    /// <para><b>It draws nothing against the catalog this build ships</b>, which is the second
+    /// assertion here: the promoter learned <c>MerchantCopper</c> in this slice and the values
+    /// arrive with the next weekly refresh, so a fixture is the only place this arm can be
+    /// proved today.</para>
+    /// </summary>
+    [Fact]
+    public void ACatalogPriceIsUsedOnlyWhereYouHaveNeverSoldOneAndCarriesItsCondition()
+    {
+        MobSummary[] pool =
+        [
+            new("a froglok tad", 340, 340, 30, 0, 0,
+                [new MobLoot("Froglok Blood", 12, 3.5)]) { Zone = "Lower Guk" },
+        ];
+        var catalog = new ItemCatalog([
+            new ItemCatalog.Record
+            {
+                Name = "Froglok Blood", MerchantCopper = 45,
+                MerchantCondition = "VALUE TO VENDOR with CHA : 80 and faction at Indifferently",
+            },
+        ]);
+        var inputs = Gear([Worn("Rusty Helm", "HEAD", 4)], catalog,
+            intent: GearIntent.FarmToSell, pool: pool);
+
+        var top = Assert.Single(Recommendations.Rank(inputs, [HelperGoal.FarmGear]).Top);
+        var fact = Assert.Single(top.Why.OfType<CatalogValueFact>());
+        Assert.Equal(45, fact.Copper);
+        Assert.Equal(Evidence.Catalog, fact.Evidence);
+
+        var sentence = HelperPresentation.Why(fact);
+        Assert.Contains("CHA : 80", sentence);
+        Assert.Contains("Charisma", sentence);
+        Assert.Contains(HelperPresentation.CatalogLabel, sentence);
+
+        // The prove-fail for the "only where yours cannot" clause: give the player a sale of
+        // the same item and the catalog's quote must vanish rather than sit beside it. Two
+        // prices for one object is the shape a reader has to reconcile (trap 4).
+        var sold = inputs with { Sales = [new SaleRoll("Froglok Blood", 4, 320)] };
+        var resold = Assert.Single(Recommendations.Rank(sold, [HelperGoal.FarmGear]).Top);
+        Assert.Empty(resold.Why.OfType<CatalogValueFact>());
+        Assert.Single(resold.Why.OfType<SellableDropFact>());
+    }
+
+    /// <summary>The shipped catalog carries no vendor value YET, and the row above is the only
+    /// reason that is not a silent hole. Asserted against the real file so the day the weekly
+    /// refresh fills it in, this fails and somebody looks at the sentences it turns on rather
+    /// than finding out from a player.</summary>
+    [Fact]
+    public void TheShippedCatalogCarriesNoVendorValueYet()
+    {
+        var priced = ItemCatalog.Default.All.Count(r => r.MerchantCopper is not null);
+        Assert.True(priced == 0,
+            $"{priced:N0} shipped item records now carry a MerchantCopper. The promoter's field "
+            + "has data behind it — check the survey counts in items-catalog-report.md, then "
+            + "update this row and re-read the sentences it turns on.");
     }
 
     /// <summary>A profile with no catalog at all is the "no dump" state and not a crash — a
