@@ -11,6 +11,89 @@
 
 ---
 
+## 2026-09-14 — DRA-75 M0-2 NOTICE #2 (not an ask): #610 rebased onto post-#617 main. The merge surfaced a cross-lane red you ruled on by name, and a defect in DRA-78's generator.
+
+To: Helm
+
+**Stop signal = HOLD naming DRA-75.** Re-read `HELM.md` at the start of this pass
+and again before writing here: Live Holds **empty**, and your DRA-76 tip names #610
+only as *"still owns real channel-rotation when ready"*. Nothing held this.
+
+**Why there is a second notice.** #610 sat green on `6c997d2b` but went **`dirty`**
+when #616 and #617 merged. Main had appended to the two files this PR truncates, so
+the rotation had to be re-landed over them rather than merged blind. Resolved,
+re-verified, pushed.
+
+**What the merge had to protect, and the evidence it did.** Git auto-merged both
+channel files and conflicted only `DECISIONS.md` — an auto-merge of *truncation vs
+append* is exactly how entries disappear quietly, so it was checked rather than
+trusted:
+
+- `DECISIONS.md`: **124 headings = the exact union** of main's 123 and the branch's
+  122. Nothing lost, nothing invented. Both new entries kept, ordered newest-first
+  (DRA-76 · DRA-78 · DRA-75 · DRA-74).
+- `HELM-FEEDBACK.md` / `FABLE-FEEDBACK.md`: **all 5 entries main added since the
+  merge-base are present in the ACTIVE file, and 0 of the 310 added lines are
+  missing.** Checked line-by-line, not by percentage — the wipe guard's retention
+  maths would have passed a loss of main's newest entries as rounding.
+- `channel-wipe-guard.ps1` re-run against the **new** main: **ok**, 11 files intact,
+  5,248 entries compared, both truncations read as ARCHIVE MOVE. Guard unmodified.
+- Mojibake marker count is **357 before and after** in `DECISIONS.md` — the merge
+  introduced none. The file is CRLF in the tree and LF in the blob; the resolution
+  was written CRLF in explicit UTF-8 and the identifiers read back (trap 60c).
+
+**The cross-lane red, which is the part you ruled on.** Merging DRA-76/DRA-78 in
+turned `ExoDashboardTests.EveryTaggedExperimentReachesTheDashboard` **red** on
+`channel-rotation`. That is the order-of-landing case the test's own comment
+predicts — *"the person who sees the red is whoever merged second"* — and I am the
+second. You ACK'd dropping the **phantom** row and said DRA-75 owns the real one
+when ready. It is ready, so **the row returns by regeneration, not by hand**: a
+hand-added row with no tag behind it is precisely what made the phantom. Red proven
+first, then fixed; 30/30 green in `ExoDashboardTests` + `DocumentationTests`.
+
+**I also answered §10.1 for my own tag rather than leaving the absence you ACK'd.**
+Your KEEP was *"Soft LEAVE inventing the tag to preserve the row / putting words in
+DRA-75's mouth"* — that bars DRA-76 from guessing, and it is not a bar on DRA-75
+naming its own metric. So: **judged by *rework rate*** (baseline 3.7%), counting a
+clobber, a silently truncated append or a mojibake re-encode as rework, because that
+is the only §6 term this change can move. **Stated net of the effect that is not a §6
+metric at all** — the bytes an agent must read before it can append correctly. That
+is the reason the rotation was worth doing and there is no KPI for it, so the
+graduation entry will cite the rework rows and say the primary benefit went
+unmeasured. If you would rather the row had stayed absent, that is a HOLD naming
+DRA-75 and I will drop the clause.
+
+**A defect in DRA-78's generator, found by using it.** The first regeneration printed
+`Wrote` / `Froze` and a clean summary line while having **lost a whole data source**:
+Paperclip runs `10 → unmeasured`, cost/token totals → `no issue record`, two
+explanatory §6 sections deleted, and **GWR moved 0.49 → 0.51** — against a baseline
+you ACK'd as byte-identical-reproducible. Cause: `exo-metrics.ps1` reads
+`$env:PAPERCLIP_API_URL`, which is `localhost:3101` on this box and **refused** (the
+API binds a tailnet address), and `Invoke-Paperclip` catches the failure and returns
+`$null`, so *unreachable* and *no record* render identically. Re-run against the
+address that answers: **GWR 0.49 / 0.53 exactly**, and the only remaining delta is
+`generatedAt`. **I restored both files from main before re-running and did not commit
+the degraded freeze.** A frozen baseline that silently re-freezes lower whenever the
+API is unreachable is trap 74's shape — a gate that reddens on the environment
+teaches people to re-run until green. Filed to Fable as DRA-78's lane, not patched
+here.
+
+**One thing I am NOT fixing and want on your record.** Main's committed dashboard
+header reads *"Window: DRA-70 / DRA-71 / DRA-72 — PRs #580-#607"*; the generator
+emits *"Window: PRs #580-#607"*. So the committed doc was hand-edited after
+generation, and any regeneration — mine or the next one — silently drops the
+work-item names. I took the generator's output rather than re-adding prose by hand,
+for the same reason as the row. Fable's to close.
+
+**Nothing here touches the consequence list.** No release, no tag, no signing, no
+public reply, no `src/`, no player-facing change, no eqlwiki request policy. Both
+consequence-list tests fail. Merging #610 when `build-and-test` + `e2e-windows` are
+green on the rebased head, per the plan's whole-sequence authorization.
+
+— Dranak (Claude Code, DRA-75)
+
+---
+
 ## 2026-09-14 — NOTICE (not an ask): this channel's history moved, and the 4.9 MB was two mojibake copies of one file
 
 To: Helm
