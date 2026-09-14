@@ -1,3 +1,87 @@
+## 2026-09-14 — DRA-74 / M0-1: the SSC-PR pattern is retired, and a signed plan now authorizes its whole slice sequence
+
+exo-experiment: ssc-retirement — judged by *PRs + Helm touches per slice*
+(baseline 2.3 PRs/slice, ≥2 touches/slice), stated net of *veto rate* and
+*rework rate*.
+exo-experiment: whole-sequence-auth — judged by *Governance Wait Ratio* and
+*Autonomous Correct Completion Rate* (baseline GWR 0.40–0.60, ACCR 0%),
+stated net of *escaped defect rate*.
+
+Pre-authorized: DRA-73 plan document revision 2, approved by David
+2026-09-14, §7 M0 and §8.1–2. Tier T1 — process docs, reversible by a HOLD.
+Live Holds were empty at the newest `HELM.md` ruling on `main` (2026-09-14
+~12:56 AM CT, PR #606), and none names this work. Nothing below is on the
+consequence list: no release, no tag, no Pages or Play Console, no eqlwiki
+request, no product code, nothing that changes what leaves a player's
+machine. `src/` is untouched. David vetoes from here.
+
+Two cutovers landed, both docs-and-comms only. The rules are compact in
+`CLAUDE.md` (Helm → *How a ruling lands, and what a SIGN buys*); the detail,
+the numbers and the rollback shape are in `docs/ops/execution-flow.md`.
+
+**1. A RULING IS A PR REVIEW AND/OR A `HELM.md` COMMIT — NEVER A `helm/ssc-N`
+PR.** In the measured DRA-70/71/72 window (PRs #580–#607), 12 of 24 PRs
+existed only to carry signature prose: half of all repository PR traffic was
+governance artifact, each piece of it with its own merge wait stacked on top
+of the product PR's. **The way this could have gone the other way is the
+audit trail**, which is the thing the SSC PR was actually buying — a durable,
+signed, timestamped, attributed record of the ruling. It survives, and
+arguably improves: a GitHub PR review is immutable, timestamped, attributed
+and indexed, and it is attached to the diff it judges rather than to a second
+branch a reader has to cross-reference. `HELM.md` keeps prose rulings where
+prose is what is wanted, additions-only (trap 60) exactly as before.
+
+The default I took rather than asked about: **open `helm/ssc-*` PRs land or
+close on their own terms** instead of being swept. Sweeping them would be a
+second, unrelated change riding a docs cutover, and #601's cargo is signed
+substance not yet on `main`. So the rule creates no NEW ones and touches no
+existing one.
+
+**2. A SIGNED PLAN AUTHORIZES EVERY SLICE IT DECLARES, IN ORDER, ON GREEN
+GATES.** Merging D(n) starts D(n+1). No LIVE ASK asking permission to begin a
+slice the plan already named; no per-slice "AUTHORIZE dra-N-dX after land".
+**Helm stops the train with a HOLD, not by withholding authorization** — an
+objection blocks, absence of attention no longer does. Three Helm coverage
+gaps in that window produced stalls of 3.5–6.4 h accounting for 15.3 of 18.2
+total wait-hours: **84% of measured wait was planned work parked overnight at
+an authorization gap.** Over the same window Helm's intervention rate was
+100% and its pre-merge change rate was ~0% — every ruling KEEP/ACK, zero
+pre-merge substantive changes to an already-signed slice.
+
+**The default most worth a veto is the asymmetry between the two signals.**
+A stop is now explicit and greppable and silence is not a stop, which is the
+whole safety property — but it does mean a slice can merge during a Helm
+coverage gap that Helm would, in principle, have wanted to look at. That is
+priced in deliberately: the guard suite catches the mechanical class
+instantly, the authorization is scoped to *what the plan declared* (a slice
+that outgrows its declared boundary stops and escalates), CI is unchanged as
+the merge bar, and nothing reaches a player without David's release go, so
+`main` stays reversible by construction — the argument he already made for
+approval-by-exception on 2026-08-22.
+
+**3. SCRIBE'S POSTURE RULE DID NOT CHANGE — ONLY THE ROUTE.** A public reply
+beyond a routine signed thread reply is still consequence-list work and is
+not covered by any plan's slice authorization. What changed is that the
+signature arrives as a `HELM.md` commit or a PR review, so "the SSC has not
+landed yet" stops being a reason to hold a reply — and, symmetrically, the
+absence of an SSC PR is not a signature either.
+
+**4. THE DOCS GOT A GUARD RATHER THAN A PROMISE.** `DocumentationTests`
+gained `TheRetiredSscPatternAndWholeSequenceAuthAreStatedInTheLiveDocs` and
+the orphan test gained the new pointer, so a future edit cannot quietly drop
+either rule or leave `docs/ops/execution-flow.md` unreachable from the one
+always-loaded file. It also asserts both `exo-experiment:` tags are present
+in this file, because §10.1 makes the tag the thing the M0-exit doctrine
+capture cites — an untagged experiment is one the playbook cannot find.
+Prove-failed by deleting each asserted phrase in turn.
+
+**What this does NOT change, stated so the absence is on the record:** CI as
+the merge bar; the guard suite; David's consequence list including the
+release go; holds living in exactly one place and only Helm lifting them;
+the `helm-back-channel.yml` webhook for exceptions; `DECISIONS.md` as the
+reporting duty, which a removed signature step makes more load-bearing, not
+less.
+
 ## 2026-09-14 — DRA-71 delivery 9: the Helper is on the phone, by shared module, read-only
 
 Pre-authorized: Helm SIGNED the plan (PR #586) and SIGNED D2–D8 (#588, #590,
