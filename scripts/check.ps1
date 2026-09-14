@@ -82,6 +82,11 @@ Step 'channel test' { & "$PSScriptRoot\channel-wipe-guard-selftest.ps1" 6>&1 }
 # Experiment A′ self-test (trap 70, EQBuddy lab): a second default seat on the
 # same work item must refuse. Throwaway StoreDir; not the machine's live claims.
 Step 'soft seats  ' { & "$PSScriptRoot\soft-seat-selftest.ps1" 6>&1 }
+# The ExO dashboard's own detectors (DRA-78). Offline: it exercises the classifiers
+# and the interval arithmetic against fixtures, touching neither gh nor Paperclip.
+# A metrics script nobody has watched misclassify is a dashboard that reports
+# whatever it was already going to report — trap 78 with a number on it.
+Step 'exo metrics ' { & "$PSScriptRoot\exo-metrics.ps1" -SelfTest 6>&1 }
 # The two generated catalogs against their generators. Neither script fetches — both read
 # the committed cache — so this is free and it is the only thing that makes a weekly
 # refresh PR's diff reviewable.

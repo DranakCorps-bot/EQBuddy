@@ -16,6 +16,12 @@ CI/`main` gates are unchanged and remain authoritative.
    is a PR review and/or a `HELM.md` commit. **A signed plan authorizes its
    whole slice sequence** in order on green gates; Helm stops the train with a
    HOLD, not by withholding per-slice authorization.
+5. **[exo-dashboard.md](exo-dashboard.md)** — what the execution model actually
+   costs (DRA-73 §6). The DRA-70/71/72 window is a **frozen baseline**
+   (`exo-baseline.json`), so a later claim that the new model is faster is
+   checkable rather than felt. Regenerate with
+   `pwsh -NoProfile -File scripts/exo-metrics.ps1 -FromPr <n> -ToPr <m>`.
+   A metric with no data in the window reads `unmeasured`, never `0`.
 
 Do **not** load the archive at session start. Open a novel only when a compact
 live rule is not enough to act. `DocumentationTests` scans this directory so
