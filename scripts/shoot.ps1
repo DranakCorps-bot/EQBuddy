@@ -2599,16 +2599,17 @@ $Shots = [ordered]@{
     # and the surface that is on screen for the whole session. Its icons were glyphs
     # until Gate 5c; a glyph that fails to render is a blank here and nowhere else.
     #
-    # PREDICTION, rewritten BEFORE the re-shoot (trap 23), for Surface A / SA-1. The seed
-    # below still names all ten keys on purpose — it is the pre-promotion profile, which
-    # is what most players are updating FROM — and AppSettings.MigratePromotedHudStats
-    # strips three of them on load. So expect, left to right:
-    #   * the ALWAYS-ON TRIO first: the character name slot ("Testchar"), a Swords + dps
-    #     reading, and a Chart + %/hr reading. The fixture session is melee, so the third
-    #     slot is the XP rate and NOT hps.
+    # PREDICTION, rewritten BEFORE the re-shoot (trap 23), for Surface A / SA-1 and
+    # AMENDED FOR DRA-81. The seed below names nine keys, and it is now a STATEMENT rather
+    # than a pre-promotion profile being migrated under the shot: `HudStatStarsRestored`
+    # stands the restore pass down, so what is seeded is what draws. 'hps' is deliberately
+    # not among them — see the note above `mini-bar`. So expect, left to right:
+    #   * the METRIC ROW first: the character name slot ("Testchar"), a Swords + dps
+    #     reading, and a Chart + %/hr reading. Three slots, because two of the three
+    #     metric ★s are set and 'hps' is not.
     #   * then SEVEN starred cells in MiniBarPresentation.Order: kills, pet, procs, loot,
-    #     motes, money, deaths. dps, hps and xp are NOT among them — they are the trio now,
-    #     and a duplicate of any of the three is the bug this prediction exists to catch.
+    #     motes, money, deaths. dps and xp are NOT among them — they draw up on the row,
+    #     and a duplicate of either is the bug this prediction exists to catch.
     #   * hairline dividers between all ten, none after the last.
     # The three metric slots are FIXED WIDTH (HudGlance), so the bar's width must not
     # change between takes of the same seed — a wobble there is trap 12 arriving.

@@ -132,8 +132,10 @@ internal sealed class BreakoutHost(MainWindow main, AppSettings settings)
     /// switch here, and Options grew a tick box for the same question that could not answer
     /// it — so a player ticking "Pet" changed nothing and went to ask on Reddit. Since SA-1
     /// the two halves are separate conditions rather than one ternary: Damage and Healing
-    /// have no star (dps/hps are always-on HUD numbers), so "no star" and "needs a pinned
-    /// rule" stopped being one case.
+    /// have no star HERE, so "no star" and "needs a pinned rule" stopped being one case.
+    /// Since DRA-81's Founder LOCK `dps` and `hps` are ★s again — what they are not is
+    /// ★s that gate a WINDOW, which is a decision `BreakoutPresentation.StarKey` now
+    /// carries on purpose rather than by the keys not existing.
     /// </summary>
     private bool AutoWants(BreakoutKind kind)
     {

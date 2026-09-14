@@ -483,8 +483,8 @@ public sealed class AppSettings
     /// <b>Kept as a property because the retirement has to READ it once.</b> Deleting it
     /// outright would drop the value out of every existing <c>settings.json</c> on the next
     /// parse, and a player who had unticked the box would get their chips back with nothing
-    /// having asked them — the SA-1 lesson (<see cref="MigratePromotedHudStats"/>: read the
-    /// switch BEFORE stripping it). <c>UI.Shared.WatchPinMigration</c> is the last reader;
+    /// having asked them — the SA-1 lesson (<see cref="MigrateHudStatStars"/> still carries
+    /// it: read the switch BEFORE overwriting it). <c>UI.Shared.WatchPinMigration</c> is the last reader;
     /// after its one-time pass this value is inert and nothing on any surface consults it,
     /// the same "left inert" treatment <c>SpawnLeft</c>/<c>SpawnTop</c> got at the World fold.
     /// </summary>
@@ -504,14 +504,22 @@ public sealed class AppSettings
     /// <summary>Has the one-time <see cref="MigrateWindowHeights"/> clear run? See there
     /// for why every stored window height written before 2026-08-25 is discarded.</summary>
     public bool WindowHeightsReset { get; set; }
-    /// <summary>Has the one-time <see cref="MigratePromotedHudStats"/> pass run?
+    /// <summary>Did SA-1's promotion ever take "xp", "dps" and "hps" out of
+    /// <see cref="MiniStats"/> on this profile?
     ///
-    /// **A flag rather than inferring it from "the keys are gone", and that distinction is
-    /// the whole bug this migration could otherwise be.** The pass reads a star's absence
-    /// as "the player had this window closed" — and after the first run every one of the
-    /// three keys IS absent, so a second run would read three deliberate ONs as OFFs and
-    /// close windows the player never touched. Trap 55 in one sentence: a migration
-    /// re-deciding on state its own previous run produced.</summary>
+    /// **It stopped being a "has the pass run" flag and became a FACT ABOUT THE PROFILE**
+    /// when DRA-81 put the keys back (<see cref="MigrateHudStatStars"/>). That pass has its
+    /// own flag; this one now answers the only question its successor cannot work out for
+    /// itself — whether an absent "dps" means *the player unstarred it* (a pre-SA-1 file,
+    /// whose star is the last record of whether the Damage window could open) or *SA-1 took
+    /// it* (every file written since, where re-reading it would close a window that has been
+    /// open ever since). Two absences, opposite meanings, and this bool is what tells them
+    /// apart.
+    ///
+    /// **A flag rather than an inference, which is the bug either migration could otherwise
+    /// be.** Reading "the keys are gone" as "the player had these off" is true exactly once;
+    /// after any pass has run, the keys' state is the pass's own output. Trap 55 in one
+    /// sentence: a migration re-deciding on state its own previous run produced.</summary>
     public bool HudStatsPromoted { get; set; }
     /// <summary>Has the one-time <see cref="MigrateHudStatStars"/> pass run? (DRA-81's
     /// Founder LOCK.)
@@ -1055,8 +1063,8 @@ public sealed class AppSettings
         // has been told "brand new profile" on every launch of every profile since the
         // argument was introduced (2026-08-21). `MigrateMotesCard` survived it because it
         // uses `hadFile` only to decide whether to FORCE a save and its state changes are
-        // unconditional; `MigratePromotedHudStats` would not have — it reads a stored star
-        // before stripping it, so an always-false `hadFile` makes it a no-op on precisely
+        // unconditional; `MigrateHudStatStars` would not have — it reads a stored star
+        // before overwriting it, so an always-false `hadFile` makes it a no-op on precisely
         // the profiles it exists for. Trap 42's shape at the settings layer: the migration
         // is present in the build and was never in effect. Guarded by
         // `HudStatPromotionLoadTests`, which drives the real `Load` against a real file and

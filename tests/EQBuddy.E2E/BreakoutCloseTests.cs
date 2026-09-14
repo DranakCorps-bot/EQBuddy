@@ -57,11 +57,12 @@ public sealed class BreakoutCloseTests
         using var app = new AppHarness(settings =>
         {
             settings.Minimized = true;
-            // "dps" is seeded and then STRIPPED by MigratePromotedHudStats on load — it is
-            // here because that migration reads the star before removing it, and a profile
-            // WITHOUT it is read as "this player had the Damage window off" and gets
-            // "Damage" written into DisabledBreakouts. Seeding it is what makes the Damage
-            // float open at all, which is the window this test closes.
+            // "dps" and "xp" ARE the top row since DRA-81's Founder LOCK — the harness
+            // marks the star restore done, so a seeded MiniStats is literally what the bar
+            // draws. "dps" also keeps the Damage float openable: `MigrateHudStatStars` reads
+            // a pre-SA-1 star before overwriting it, and a profile without one is read as
+            // "this player had the Damage window off" and gets "Damage" written into
+            // DisabledBreakouts. That float is the window this test closes.
             settings.MiniStats = ["kills", "dps", "xp"];
             // Damage may open (no star gates it since SA-1); Healing is the seeded off row
             // and the number this test holds. The other four have no star, so they stay shut
@@ -97,11 +98,12 @@ public sealed class BreakoutCloseTests
         using var app = new AppHarness(settings =>
         {
             settings.Minimized = true;
-            // "dps" is seeded and then STRIPPED by MigratePromotedHudStats on load — it is
-            // here because that migration reads the star before removing it, and a profile
-            // WITHOUT it is read as "this player had the Damage window off" and gets
-            // "Damage" written into DisabledBreakouts. Seeding it is what makes the Damage
-            // float open at all, which is the window this test closes.
+            // "dps" and "xp" ARE the top row since DRA-81's Founder LOCK — the harness
+            // marks the star restore done, so a seeded MiniStats is literally what the bar
+            // draws. "dps" also keeps the Damage float openable: `MigrateHudStatStars` reads
+            // a pre-SA-1 star before overwriting it, and a profile without one is read as
+            // "this player had the Damage window off" and gets "Damage" written into
+            // DisabledBreakouts. That float is the window this test closes.
             settings.MiniStats = ["kills", "dps", "xp"];
             settings.DisabledBreakouts = ["Healing"];
             settings.DefaultRulesVersion = int.MaxValue;
