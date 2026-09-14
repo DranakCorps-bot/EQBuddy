@@ -68,6 +68,15 @@ jobs:
       - name: Soft seat claims refuse a duplicate default
         run: pwsh -NoProfile -File scripts/soft-seat-selftest.ps1
 
+      # Paperclip merge-sync (DRA-77). The sync job itself only triggers on a
+      # merge to the default branch, which means a pull request that changes it
+      # cannot run it — the gate would first execute on the commit that already
+      # landed. THIS is the copy a PR can see: it drives the branch-beats-body
+      # precedence, every status disposition and the one-way scope lock, with no
+      # secret, no network and no GitHub event.
+      - name: Paperclip merge-sync decides, refuses and stays one-way
+        run: pwsh -NoProfile -File scripts/merge-sync-selftest.ps1
+
       # The two GENERATED catalogs are byte-reproducible from their inputs, and this is
       # where that claim is actually checked. `HarvestedGuides.json.gz` is 1,164 machine-
       # written guides; the only honest way to review the diff of a weekly refresh PR is

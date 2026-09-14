@@ -22,6 +22,12 @@ CI/`main` gates are unchanged and remain authoritative.
    checkable rather than felt. Regenerate with
    `pwsh -NoProfile -File scripts/exo-metrics.ps1 -FromPr <n> -ToPr <m>`.
    A metric with no data in the window reads `unmeasured`, never `0`.
+6. **[merge-sync.md](merge-sync.md)** — when a PR merges, the Paperclip issue
+   its **branch** names moves to `done` (DRA-77 M0-4). One way, GitHub →
+   Paperclip. **The branch beats the PR body**, because every body here carries
+   a `Governing plan: DRA-73` line. `blocked` and `cancelled` are refused, not
+   closed. **Inert until three Actions secrets exist** — it prints
+   `SKIPPED: not configured` and names them.
 
 Do **not** load the archive at session start. Open a novel only when a compact
 live rule is not enough to act. `DocumentationTests` scans this directory so

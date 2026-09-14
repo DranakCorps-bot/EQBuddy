@@ -45,7 +45,7 @@ function Step([string] $name, [scriptblock] $body) {
     if ($LASTEXITCODE -ne 0) {
         Write-Host "FAILED" -ForegroundColor Red
         # Only the lines that say why — a full MSBuild log buries the one that matters.
-        $output | Select-String -Pattern 'error |Failed!|\[FAIL\]|Assert\.|whatsnew-guard|legacy-notice-guard|evolved-channel-guard|channel-wipe-guard|soft-seat-selftest' |
+        $output | Select-String -Pattern 'error |Failed!|\[FAIL\]|Assert\.|whatsnew-guard|legacy-notice-guard|evolved-channel-guard|channel-wipe-guard|soft-seat-selftest|merge-sync' |
             Select-Object -First 15 | ForEach-Object { Write-Host "   $_" }
         Write-Host "   full log: $log" -ForegroundColor Yellow
         $script:failed += $name
@@ -82,6 +82,12 @@ Step 'channel test' { & "$PSScriptRoot\channel-wipe-guard-selftest.ps1" 6>&1 }
 # Experiment A′ self-test (trap 70, EQBuddy lab): a second default seat on the
 # same work item must refuse. Throwaway StoreDir; not the machine's live claims.
 Step 'soft seats  ' { & "$PSScriptRoot\soft-seat-selftest.ps1" 6>&1 }
+# Paperclip merge-sync (DRA-77). Offline: no secret, no network, no GitHub event —
+# it drives the linkage precedence and every status disposition, plus the
+# one-way scope lock. This job's own trigger only fires AFTER a merge to the
+# default branch, so a PR that changes it cannot otherwise test it; the
+# self-test is the only thing a pull request can actually see.
+Step 'merge sync  ' { & "$PSScriptRoot\merge-sync-selftest.ps1" 6>&1 }
 # The ExO dashboard's own detectors (DRA-78). Offline: it exercises the classifiers
 # and the interval arithmetic against fixtures, touching neither gh nor Paperclip.
 # A metrics script nobody has watched misclassify is a dashboard that reports
