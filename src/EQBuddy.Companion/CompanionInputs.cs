@@ -114,6 +114,24 @@ public sealed record CompanionInputs
     /// <summary>The live palette. Not gateable — see CompanionSnapshot.Theme.</summary>
     public CompanionThemeSection? Theme { get; init; }
 
+    /// <summary>
+    /// The Helper's per-pass bundle: the engine's own <c>HelperInputs</c> plus the goals it is
+    /// ranked against (DRA-71 D9).
+    ///
+    /// <para>Gathered desktop-side, like <see cref="Unlocks"/> and <see cref="LevelUps"/>, and
+    /// for the hardest reason of the three: the bundle is a SQLite query over every stored
+    /// session, two snapshot probes across up to a thousand archived snapshots, and an
+    /// inventory dump read. The widget owns all of them and hands over the finished object
+    /// through a <c>HelperSources</c> memo, so a paired phone does not put four database
+    /// probes on every tick.</para>
+    ///
+    /// <para>Null means the host did not gather it — the surface is gated off or nobody is
+    /// subscribed. That is NOT the same as an empty bundle, and the projection keeps the two
+    /// apart: a section built from <c>HelperInputs.Nothing</c> would be a screen claiming the
+    /// player has no history.</para>
+    /// </summary>
+    public CompanionHelperRequest? Helper { get; init; }
+
     /// <summary>The phone's alert audio (#208): the owner's switch and the running count
     /// of alerts the PC has fired. Null on the projection's older call shapes, which is
     /// why the page treats a missing section as "stay quiet" rather than as a default.</summary>

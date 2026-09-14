@@ -54,6 +54,16 @@ public sealed record CompanionSources
     /// SAME <see cref="EQBuddy.Core.TravelPlan"/> module the desktop Path tab reads.</summary>
     public ZoneGraph? ZoneGraph { get; init; }
 
+    /// <summary>
+    /// The Helper's per-tick bundle (DRA-71 D9): the SAME <c>HelperInputs</c> the desktop room
+    /// ranks with, assembled by the same <c>HelperSources</c> module.
+    ///
+    /// <para>Asked only while the surface is offered and a device is paired — the lazy rule
+    /// this whole record exists for, and it matters more here than anywhere: the bundle behind
+    /// it is four disk-and-database reads.</para>
+    /// </summary>
+    public Func<CompanionHelperRequest>? Helper { get; init; }
+
     /// <summary>"Drop camp marker" from a device (World PR 4) — the same action the
     /// desktop's World window chrome offers on every tab. Null means this host has no
     /// session to drop a marker into (there always is one on the real app; tests may
@@ -441,6 +451,10 @@ public sealed class CompanionHost : IDisposable
             Raids = On(CompanionSurfaces.Session) ? _sources.Raids : null,
             Quests = quests,
             QuestIndex = quests is null ? null : _questIndex,
+            // DRA-71 D9, behind the surface gate for the reason the quest bundle is: the reads
+            // under this callback are the most expensive in the record, and a phone that never
+            // picked the screen must not pay for them.
+            Helper = On(CompanionSurfaces.Helper) ? _sources.Helper?.Invoke() : null,
         };
 
         var snap = CompanionProjection.Build(input, now);

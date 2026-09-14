@@ -610,4 +610,83 @@ public class ScreenshotFixtureTests
         Assert.Equal(["Azure Ring ×1 · bags", "Brass Knuckles ×2 · bank"],
             bands[1].Rows.Select(r => r.Text));
     }
+
+    /// <summary>
+    /// **The Helper screen, for EQBuddy Mobile** (DRA-71 D9).
+    ///
+    /// <para>Staged through the REAL projection over a real <c>HelperInputs</c>, so what the
+    /// harness renders is what a paired phone renders — a fixture in the wrong shape draws a
+    /// state that is real, which looks exactly like a correct screenshot (trap 23). The
+    /// numbers below are PREDICTED and then asserted for the same reason.</para>
+    ///
+    /// <para>Two zones, because D4's throughput comparison has nothing to compare a single
+    /// zone against but itself; a faction dump with two standings, so the faction engine has
+    /// something to rank and the faction pick has a face; and a deliberately UNKNOWN level, so
+    /// the shot carries the disclosure line and its Character door — the one state a reviewer
+    /// most needs to see, because it is what a brand-new profile looks like.</para>
+    ///
+    ///     dotnet test --filter WriteHelperSnapshot -e EQBUDDY_SHOOT=1 -e EQBUDDY_SHOOT_HELPER=&lt;path&gt;
+    ///     pwsh scripts/mobile-harness.ps1 -Snapshot &lt;path&gt; -Screenshot
+    /// </summary>
+    [Fact]
+    public void WriteHelperSnapshot()
+    {
+        if (Environment.GetEnvironmentVariable("EQBUDDY_SHOOT") != "1") return;
+        var outPath = Environment.GetEnvironmentVariable("EQBUDDY_SHOOT_HELPER");
+        if (string.IsNullOrWhiteSpace(outPath)) return;
+
+        var now = new DateTime(2026, 9, 14, 21, 12, 0);
+        IReadOnlyList<SessionRow> sessions =
+        [
+            new(1, "erollisi", "Dranak", now.AddDays(-6), now.AddDays(-6).AddHours(6),
+                6 * 3600, 6 * 3600, "ended", "Lower Guk", 0, 240, 5_000, 0, 1, 0, "", ""),
+            new(2, "erollisi", "Dranak", now.AddDays(-3), now.AddDays(-3).AddHours(4),
+                4 * 3600, 4 * 3600, "ended", "Befallen", 0, 80, 900, 0, 0, 0, "", ""),
+        ];
+        IReadOnlyList<MobSummary> pool =
+        [
+            new("a froglok tad", 300, 300, 28, 0, 0, []) { Zone = "Lower Guk" },
+            new("a skeleton", 120, 120, 41, 0, 0, []) { Zone = "Befallen" },
+        ];
+        var factions = new FactionsFile.Snapshot("eqbuddy-factions.txt", now.AddHours(-2),
+            [new FactionsFile.Standing(1, "Guards of Qeynos", 620, 130),
+             new FactionsFile.Standing(2, "Merchants of Qeynos", 410, 340)]);
+
+        var inputs = new HelperInputs(
+            ZoneHistory.Fold(sessions, pool), pool, factions, ["Guards of Qeynos"],
+            [], [], [], false, [], [], null, ResolvedLevel.Unknown);
+
+        var snap = CompanionProjection.Build(new CompanionInputs
+        {
+            Character = "Dranak",
+            AppVersion = UpdateChecker.CurrentVersion.ToString(),
+            Offered = [CompanionSurfaces.Helper],
+            Stats = new StatsSnapshot { CurrentZone = "Lower Guk" },
+            Helper = new CompanionHelperRequest(
+                inputs, [HelperGoal.LevelUp, HelperGoal.WorkOnFaction], [],
+                Tradeskills.All.Count),
+            Theme = CompanionTheme.Project("ParchmentBrass",
+                EQBuddy.UI.Shared.ThemePalettes.For("ParchmentBrass")),
+        }, now);
+
+        File.WriteAllText(outPath!, JsonSerializer.Serialize(snap, CompanionSnapshot.JsonOpts));
+
+        // THE PREDICTION, as assertions (trap 23).
+        var helper = snap.Helper!;
+        // Two picks: the goals face, and the faction sub-pick its goal turns on. No gear,
+        // unlock or profession block, because neither of their goals is picked.
+        Assert.Equal(["Your goals", "Work on Faction"],
+            helper.Picks.Select(p => p.Heading));
+        Assert.Equal("Level Up · Work on Faction", helper.Picks[0].Face);
+        Assert.Equal("Guards of Qeynos", helper.Picks[1].Face);
+        // Lower Guk first: 40%/hr against Befallen's 20%/hr, and it is where the faction
+        // this character picked is NOT moved — so the two answers are a camp and a faction,
+        // which is the shape the cross-domain ranking is for.
+        Assert.Equal("Lower Guk", helper.Answers[0].Headline);
+        Assert.Contains("40.0%/hr here", helper.Answers[0].Why[0].Text);
+        // An unknown level draws its own sentence and the door that fixes it — never a guess.
+        Assert.Equal(LevelReadout.UsedByHelper(ResolvedLevel.Unknown), helper.LevelNote);
+        // Nothing on this screen is a control, and no door on it is a link.
+        Assert.False(CompanionSurfaces.AcceptsTicks(CompanionSurfaces.Helper));
+    }
 }

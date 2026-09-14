@@ -1,3 +1,133 @@
+## 2026-09-14 — DRA-71 delivery 9: the Helper is on the phone, by shared module, read-only
+
+Pre-authorized: Helm SIGNED the plan (PR #586) and SIGNED D2–D8 (#588, #590,
+#592, #594, #596, #598, #602), authorizing `dra71-d9`. Nothing below is on the
+consequence list: no release, no tag, no Pages or Play Console work, no eqlwiki
+request of any kind, nothing new leaving the machine beyond the LAN the phone
+was already on, and nothing near the values line — every sentence the phone
+draws is this character's own log, bags and dumps, which is what the screen says
+about itself in its first line. David vetoes from here.
+
+**1. THE PHONE IS READ-ONLY, AND THIS IS THE DEFAULT MOST WORTH A VETO.** The
+desktop Helper room's affordances are five `EqMultiPicker`s, a segmented strip
+and a toggle. Every one of them WRITES to the profile the PC is playing from,
+and one of the doors beside them (`WatchRules`) quietly adds an alert rule on
+the way through — the one door in that enum with a side effect. So the phone
+ports them as INTENT: it shows what is picked, in the picker face's own words
+(`GoalFace`, `FactionFace`, `UnlockPickReadout.Face`, `WornFace`,
+`ProfessionFace` — never a count the page made up), under one sentence saying
+where the picking happens.
+
+The plan asked for exactly this — *"picker AFFORDANCES port as intent, not as
+hover (trap 35)"* — so the decision is not whether, but how far it reaches. It
+reaches ALL of them, including the doors. **The way it could have gone the other
+way is the two WIKI doors**, which a phone genuinely could open: a browser is a
+thing this device has. They are not links, because the page has no outbound link
+anywhere today and giving the Helper the first one would be this slice inventing
+a capability rather than porting a surface. The sentence those doors already
+carry says the player opens the page themselves and that EQBuddy fetches
+nothing, so the request policy toward eqlwiki is untouched either way. If Helm
+or David want the wiki doors tappable, that is a one-line change and its own
+slice, and it should be decided as a question about outbound links on the phone
+rather than as a Helper detail.
+
+**2. The INPUT ASSEMBLY moved to `UI.Shared/HelperSources.cs`, and the desktop
+room now calls it too.** The plan's word for this slice is *"parity stays by
+shared module"*, and `Recommendations.Rank` alone does not buy that: the answers
+are only the same if the INPUTS are. `HelperRoom` had seven reads, three folds,
+an inventory stamp and six store lookups inline; a second copy of that in the
+widget's phone callback is the #210 shape exactly, and it would have drifted the
+first time one surface learned a store. So `Read` / `Gather` / `Signature` are
+one producer, the room is one of two callers, and `Gather` returns the picks it
+read ALONGSIDE the `HelperInputs` — two readers of one store at slightly
+different moments is trap 33, and the picks a surface DRAWS must come from the
+same pass as the inputs it RANKS with.
+
+The MEMO stays per host (trap 45): a five-second cache two owners can invalidate
+is state, not a producer. The same split `LevelHistoryMemo` already keeps
+between the Experience card and the phone.
+
+**The cost, said out loud: a phone subscribed to this screen pays a second copy
+of the reads** — one session query and three snapshot probes, behind the same
+five-second throttle, on top of whatever the shell room is doing. It is gated on
+the surface being offered AND a device being paired, which is the lazy rule that
+record exists for, but it is a real cost and it is the one number this slice
+adds to a steady-state tick.
+
+**3. The screen lands LAST in `CompanionSurfaces.All`, and OFF on every existing
+device.** The order comment in that file is the argument — glances first,
+reference lists after — and nothing in the app is further from a glance than a
+page you read to decide where to spend an evening. Last position also leaves
+every paired device's ⚙ picker in the order its owner already learned. It is
+absent from `FIRST_RUN`, so a phone that has already paired gets it only by
+ticking it, which is the correct behaviour for a new screen and the opposite of
+the DRA-60 repair (trap 76): a surface forcing itself on is a different defect
+from one that cannot be reached.
+
+**4. EVERY SENTENCE RIDES THE WIRE — including the two this slice wrote.**
+`HelperPresentation.PicksOnPc` and `.DoorsOnPc` are the only new strings, and
+they are in UI.Shared beside the room's other words rather than in
+`index.html`, because trap 32 means a page-side literal can sit on an open phone
+for weeks after the PC has moved on.
+`HelperSurfaceParityTests.ThePageSpellsNoneOfTheHelpersWords` scans the shipped
+page for ten of them and is PAIRED with a positive that the page draws the
+fields (trap 34) — a scan that found nothing would report a perfectly clean
+page.
+
+**5. The door TIP rides the row rather than a hover, and the why-lines already
+did.** The plan says it for the why-lines; the doors are the same device with no
+pointer. Dropping the tip would have left a row of bare nouns — "Map",
+"Standings", "eqlwiki" — with nothing saying what they open, which is trap 35
+with the right shape and no content.
+
+**6. The whole-room empty state is UNREACHABLE, and the test says so rather than
+faking it.** `NoGoalCanLeaveThisScreenWithNothingToSay` runs all nine goals over
+an empty profile and asserts each produces an answer, a named gap, or a deferred
+note — D5's must-list rule, checked against the enum rather than a list (trap
+30). The branch stays on both surfaces because "the engine returned nothing at
+all" is a state a future goal could produce and a blank panel is the one outcome
+that must never ship. **The first draft of that test asserted the empty state
+fires and was wrong**; the probe that corrected it is in this PR's body.
+
+**7. `MainWindow` hit its ratchet, and the answer was a lift rather than a
+bump.** The wiring came to 4,237 lines against a 4,222 limit.
+`PhoneHelperSource` is that wiring in its own file — the `CompanionMapSource` /
+`CompanionQuestSource` idiom, one lane along — so the hotspot gained four lines
+instead of forty and no baseline moved. CLAUDE.md's rule is "lift a surface out,
+don't split the file", and this is the smallest thing that qualifies.
+
+**8. The screenshot is 516 px wide because the camera cannot go narrower, and
+the first capture at 430 was CROPPED, not broken.** Headless Edge clamps its CSS
+viewport at 492 px however small `--window-size` is, so the 430-wide shot cut 62
+px off every line and read exactly like a wrapping defect. Trap 7 is the reason
+it was measured instead of fixed: `innerWidth` was probed,
+`document.scrollWidth` matched it, and the page had no horizontal overflow at
+all. 516×1060 is the same window `mobile-sky-leftovers.png` was taken at. **What
+the shot is therefore NOT faithful about: a real phone is 390–430 CSS px, so the
+line breaks in `mobile-helper.png` are a large phone's rather than a small
+one's.** The layout is a single column at both widths — the tablet breakpoint is
+900 — so nothing about the composition changes, but a reviewer judging line
+lengths should know which device they are looking at.
+
+**9. `CompanionSnapshot.CurrentProtocol` is UNCHANGED at 3.** A new nullable
+section property does not change the envelope, which is what that record's own
+comment says the protocol number is about. Bumping it would have taken every
+open phone in the house quiet until it was reloaded, in exchange for nothing.
+
+**10. Three new `CommandPrompts` entries rather than reusing the two that
+exist.** `GearInventory` and `RaidsAchievements` say what happens next for THEIR
+surfaces, and "the gear checklist ticks itself" is not what a player needs to
+hear when the Helper asked for the dump. A command with no next step is half an
+instruction. The phone half of `GameCommandsTests` now lists all five (trap 34's
+must-list), and the faction command reaches the phone for the first time.
+
+Verification: `check.ps1` green on the rebased base, 4,893 unit tests (+29 from this slice). Five of the new guards
+were prove-failed by sabotaging the projection and the page — reworded headline,
+dropped door tip, count-keyed fingerprint, page-side literal — and all five went
+red. E2E was not run locally; CI runs it on every push and nothing in this slice
+touches a launched surface.
+
+— Dranak (Claude Code, DRA-71 D9)
 ## 2026-09-13 — DRA-72: the collapsed HUD stops swapping its third number and grows a slot instead
 
 Authorized: Helm VIDEO CONFIRM + Soft dig+fix on the mini-bar width, Founder bug

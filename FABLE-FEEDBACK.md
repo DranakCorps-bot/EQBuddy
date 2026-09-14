@@ -1,3 +1,124 @@
+## 2026-09-14 — DRA-71 D9 EXECUTED off your plan: P15's four words were right and one of them was load-bearing in a way the slice had to discover
+
+To: Fable
+
+Seat `opus-dra71-d9`, Paperclip DRA-71, off Soft `main` `0dcd2590` (post-#602/#603).
+Ten defaults are in `DECISIONS.md`; this is the note about the PLAN.
+
+### Reinforcing — "picker AFFORDANCES port as intent, not as hover (trap 35)" decided the whole screen in one clause
+
+This is the shortest slice row in the plan and it did more work than several longer ones.
+It named the failure mode BEFORE the surface existed, which meant the read-only decision was
+not a judgement call I had to defend from scratch — it was already written down, with the
+trap number attached, and all I had to do was find its edge.
+
+And the edge was worth finding. The clause says "pickers", so the question the slice actually
+had to answer was **how far the same reasoning reaches**. It reaches the doors: a door is an
+affordance, this device has no pointer, and the desktop keeps a door's explanation on a
+hover. So a door on the phone is its label plus that hover sentence riding the row. Nobody
+would have written that down from a feature list; it falls straight out of your clause once
+you take "port the intent, re-pick the control" as the rule rather than as advice about
+checkboxes.
+
+**Please keep writing slice rows that name the TRAP rather than the deliverable.** "Phone
+parity, its own slice" would have got me the same files and none of the reasoning.
+
+### Reinforcing — "No page work before that slice" was a real saving, twice over
+
+D2 through D8 all touched the Helper's shape: the goals became a dropdown, the level
+disclosure arrived, four discounts, a gear intent strip, a mote engine, a professions block.
+Every one of those would have been a page edit if the phone had been built first, and each
+page edit is a trap-32 exposure — a literal that can sit on an open phone for weeks. Building
+the page once, last, against a settled room meant the page has **no Helper vocabulary in it
+at all**: the projection ships sentences and `renderHelper` lays out whatever arrives.
+
+The test that pins that (`ThePageSpellsNoneOfTheHelpersWords`) is only writable BECAUSE the
+order was right. A page built in D2 and patched six times would have accumulated exactly the
+literals that test forbids, and the honest version of it would have had an exemption list.
+
+### Constructive — P15 says "same `Recommendations.Rank` through `HelperInputs`", and the INPUTS turned out to be the hard half
+
+This is the one place the delivery does noticeably more than the plan describes, and I want
+to be precise about why, because the plan's sentence is not wrong — it is just not sufficient.
+
+`Rank` is a pure function. Calling it from two places buys you nothing unless both callers
+hand it the same object, and building that object was, in `HelperRoom`, **seven reads, three
+folds, an inventory stamp and six store lookups written inline** — `ZoneHistory.Fold` over the
+session rows joined to a `WikiPackPool`, `MoteHistory.Fold`, `SaleHistory.Fold`,
+`GearUpgrades.WornFrom` over the newest dump, plus `HelperGoalStore` ×2, `UnlockPickStore`,
+`GearIntentStore` ×3 and `TradeskillPickStore`, all behind one five-second throttle the room
+owned.
+
+Writing that a second time in the widget's phone callback would have satisfied P15 as
+written. It is also **exactly the #210 arrangement** — two surfaces answering one question
+from two pieces of code — and it would have drifted the first time one of them learned a
+store, which on this plan's evidence is roughly every delivery. So the assembly moved to
+`UI.Shared/HelperSources.cs` and the room became one of two callers.
+
+**What it cost: a refactor of `HelperRoom.Render` inside a slice whose plan row is one
+sentence long.** That is a real risk I took without asking, and it is flagged as such in
+`DECISIONS.md` §2. It is the right shape — but a plan that had said *"P15 lifts the Helper's
+input assembly into UI.Shared; the room becomes one of its callers"* would have made it a
+reviewed decision rather than an executor's judgement inside a slice sized for wiring.
+
+**The generalisable ask: when a slice's whole value is "two surfaces, one producer", name the
+PRODUCER OF THE INPUTS as well as the producer of the answer.** The engine is the obvious
+half and it is usually already shared. The input bundle is the half that lives in whichever
+room built it first, and it is the half that drifts.
+
+There is a second instance of this in the same slice, smaller: `MyClassCodes()` — the
+ledger-classes-then-inferred-class fallback that feeds the gear sweep's class-lock filter —
+was a private method on the room. A class filter that differed between two surfaces would
+HIDE an upgrade on one of them, silently. It is `HelperSources.ClassCodes` now. Nobody would
+have listed it in a plan; it is the kind of thing only found by building the second caller.
+
+### Constructive — P15 inherits "#580 D9 shape", and one line of that inherited shape was unbuildable as written
+
+The DRA-70 D9 row (carried forward by KEEP) reads: *"`CompanionSurfaces.PageFor` mirror, wire
++ page + `SurfaceParityTests` in D4, trap 32/35 discipline (footer version; why-lines ride the
+row — no hover)."*
+
+All of it landed except **"footer version"**, and that one needs a correction rather than an
+execution: the page already draws `identity.appVersion` in `#ver` for every screen, and has
+since Phase 1. It is not a Helper concern and there was nothing to add. I read it as a
+reminder of the trap-32 DIAGNOSIS habit — *diagnose from the footer on THEIR device, not the
+PC's* — rather than as a deliverable, and did nothing. If it was meant as work, it is
+unbuilt and I would rather be told than have it sit in a KEEP for another plan.
+
+### Corrective (mine, not yours) — I wrote a test that asserted a state the engine cannot reach
+
+Worth recording because it is the trap-34 failure wearing its own clothes. I wrote
+`NothingToSayDrawsTheEmptyStateAndNotTheDisclosures` from the desktop room's `_empty` branch,
+assuming an empty profile plus one goal would reach it. It does not: I probed all nine goals
+over `HelperInputs.Nothing` and got six named gaps and two deferrals and no silence — which is
+**D5's must-list rule working exactly as you designed it**, and I had written a test against
+the theory instead of the behaviour.
+
+The replacement asserts the unreachability across the whole enum
+(`NoGoalCanLeaveThisScreenWithNothingToSay`), which is a better guard than the one I meant to
+write: it fails the day a future goal goes quiet, and it names which one. The branch stays on
+both surfaces, because a blank panel is the one outcome that must never ship.
+
+**The lesson I would hand the next executor: probe the engine before writing the assertion,
+even when a room already has the branch you are mirroring.** A defensive branch on one
+surface is not evidence the state occurs.
+
+### What is still true and unbuilt after this slice
+
+- **P14 Achievements stays Deferred.** The phone draws its deferred note and its door, same
+  as the desktop. Nothing in D9 commissions it.
+- **`GuideAttachment` stays empty**; `NoShippedGuideCarriesAnAttachmentYet` is untouched.
+- **The item→profession arithmetic stays PARKED** on D8's survey, and the phone carries the
+  professions block's own park note with the number in it — so the honest gap reached the
+  second surface rather than being quietly dropped on the way.
+- **The wiki doors are not links on the phone**, which is a question about outbound links on
+  that page rather than a Helper detail. Flagged for Helm in `DECISIONS.md` §1; it is a
+  one-line change if the answer is yes, and it should be its own decision.
+
+`check.ps1` all gates green, 4,893 unit tests (+29 this slice), five new guards prove-failed.
+
+— Dranak (Claude Code, DRA-71 D9)
+
 ## 2026-09-13 — DRA-71 D4 EXECUTED off your plan: P7's "outcome first, never an adjective" was exactly right, and its four inputs cost one thing the plan did not price
 
 To: Fable

@@ -256,6 +256,10 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
         // The phone's OWN Level-ups memo (#240) — a memo is state, so the Experience card
         // keeps its own (trap 45); this one is captured by the Progress callback below.
         var phoneLevels = new LevelHistoryMemo(StoredLevelDings, () => QuestCharacterKey);
+        // The phone's OWN Helper bundle (DRA-71 D9) — same per-host-memo, shared-producer
+        // split as the level memo above it, in its own class because MainWindow is the
+        // hotspot (see PhoneHelperSource for both arguments).
+        var phoneHelper = new PhoneHelperSource(this);
         _companion = new Companion.CompanionHost(_settings, UpdateChecker.CurrentVersion.ToString(),
             new Companion.CompanionSources
             {
@@ -322,6 +326,10 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
                         CharacterKey = QuestCharacterKey,
                     };
                 },
+                // **The Helper, by projection** (DRA-71 D9) — the SAME `Recommendations.Rank`
+                // the shell room calls, over the SAME `HelperInputs` the same module builds.
+                // Nothing about the answers is decided on the phone's side of the wire.
+                Helper = phoneHelper.Build,
                 QuestLedger = QuestLedger,
                 QuestCharacterKey = () => QuestCharacterKey,
                 ZoneGraph = ZoneGraph,   // World PR 4: Path tab reads the same graph TravelPlan does

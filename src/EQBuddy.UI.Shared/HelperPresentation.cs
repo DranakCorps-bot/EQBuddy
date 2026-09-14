@@ -64,6 +64,27 @@ public static class HelperPresentation
         "Every answer below is read from your own log and the files the game writes for you. "
         + "EQBuddy never looks at anyone else's play.";
 
+    // ---- what a surface that cannot OPERATE this room says instead (DRA-71 D9) ----------
+    //
+    // EQBuddy Mobile ranks with the same engine and draws the same sentences, and it has
+    // none of the room's controls. That is trap 35's answer rather than a shortfall: every
+    // picker here WRITES to the profile the PC is playing from, and one of the doors has a
+    // side effect behind it, so a tap on a phone would reach across the LAN and change how
+    // the PC ranks while somebody is playing at it. The affordance ports as INTENT — the
+    // phone shows what is picked, in the picker face's own words, and says where it is
+    // changed. Both leads live here rather than in the page, because a page-side literal can
+    // sit on an open phone for weeks after the PC has moved on (trap 32).
+
+    /// <summary>Over the block of picks, on a surface that can only show them. It names the
+    /// ROOM as well as the machine: "on your PC" alone is the defect one level down, the same
+    /// one <see cref="CommandPrompts.Lead"/> exists to avoid.</summary>
+    public const string PicksOnPc =
+        "What you are working toward, picked in EQBuddy's Helper room on your PC.";
+
+    /// <summary>Over a row's doors, on a surface that cannot open them. Short, because it
+    /// repeats under every answer.</summary>
+    public const string DoorsOnPc = "On your PC, in EQBuddy:";
+
     // ---- the nine goals, the Founder's wording ------------------------------------------
 
     /// <summary>

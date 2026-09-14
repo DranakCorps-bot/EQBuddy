@@ -246,6 +246,36 @@
   .scope button.on { border-color:var(--accent); color:var(--accent); background:var(--accent-wash); }
   .sub-head { font-size:12px; color:var(--dim); padding:2px 12px 8px; }
 
+  /* ---- the Helper: "what should I do next?" (DRA-71 D9) ----
+     Nothing here decides a word. Every string this block lays out arrived on the wire from
+     HelperPresentation, which is what the desktop room draws too — a literal spelled here
+     could sit on an open phone for weeks after the PC had moved on (trap 32).
+
+     WHY-LINES AND DOOR DETAIL RIDE THE ROW. The desktop puts the door's sentence on a hover
+     and this device has no pointer, so the parity is in the INTENT and not in the control
+     (trap 35). That is also why a door is a <div> and not a <button>: nothing on this screen
+     is tappable, because every control in that room writes to the profile the PC is playing
+     from. */
+  .helper .pick { padding:10px 12px; border-top:1px solid var(--hairline); }
+  .helper .pick:first-child { border-top:none; }
+  .helper .face { font-size:16px; font-weight:600; }
+  .helper .said { color:var(--dim); font-size:12.5px; margin-top:3px; }
+  .helper .answer { padding:12px; border-top:1px solid var(--hairline); }
+  .helper .head { font-size:17px; font-weight:600; color:var(--accent); }
+  .helper .serves { color:var(--dim); font-size:12px; margin-top:2px; }
+  .helper .why { font-size:13.5px; margin-top:6px; line-height:1.35; }
+  /* A catalog line is an ESTIMATE and says so in its own text (HOME-004). The dimming is a
+     second, quieter signal of the same thing — never a replacement for the label, which is
+     why it is a shade and not a badge. */
+  .helper .why.catalog { color:var(--dim); }
+  .helper .doors { margin-top:8px; }
+  .helper .doorLead { color:var(--dim); font-size:11.5px; text-transform:uppercase; letter-spacing:.05em; }
+  .helper .door { margin-top:4px; font-size:13px; }
+  .helper .door .dn { color:var(--accent); font-weight:600; }
+  .helper .door .dd { color:var(--dim); }
+  .helper .note { padding:12px; border-top:1px solid var(--hairline); font-size:14px; }
+  .helper .caption { color:var(--dim); font-size:12px; padding:0 12px 10px; }
+
   /* ---- checklist ticks ---- */
   .rows li.tickable { cursor:pointer; }
   .rows input[type=checkbox] { width:22px; height:22px; flex:none; accent-color:var(--accent); }
@@ -530,6 +560,9 @@ const SURFACE_META = {
   progress: { label: "Progress" },
   quests:   { label: "Quests", wide: true },
   gear:     { label: "Gear checklist" },
+  // Wide for the reason `quests` is: its rows are sentences, and a column half a tablet
+  // wide turns every why-line into four ragged lines.
+  helper:   { label: "What to do next", wide: true },
 };
 // Surfaces whose rows a tap can tick. The desktop refuses anything else anyway; this
 // is what stops the page from drawing a checkbox it has no right to draw.
@@ -1823,6 +1856,107 @@ function boot() {
     if (box) card.appendChild(box);
   }
 
+  // ---------- the Helper: "what should I do next?" (DRA-71 D9) ----------
+  //
+  // THIS FUNCTION DECIDES NOTHING. Every sentence it lays out was built by
+  // HelperPresentation on the PC — the same producer the desktop room draws from — and
+  // ranked by the same Recommendations.Rank over the same HelperInputs. The page's job is
+  // the shape, and the reason that boundary is drawn hard here rather than "mostly" is
+  // #210: EQBuddy Mobile spent two days answering a question the desktop had lost, because
+  // the phone built its own list.
+  //
+  // Read-only on purpose. Every control in that room WRITES to the profile the PC is playing
+  // from, and one of the doors has a side effect behind it — so the pickers arrive as what is
+  // picked plus where it is changed, which is trap 35's "port the intent, re-pick the
+  // control" with nothing left to re-pick.
+  function renderHelper(p, h) {
+    const wrap = el("div", "card helper");
+
+    if (h.question) wrap.appendChild(el("h3", "group", h.question));
+
+    // ---- the picks, as intent ----
+    if (h.picks && h.picks.length) {
+      if (h.picksLead) wrap.appendChild(el("div", "sub-head", h.picksLead));
+      for (const pick of h.picks) {
+        const row = el("div", "pick");
+        row.appendChild(el("div", "said", pick.heading));
+        if (pick.face) row.appendChild(el("div", "face", pick.face));
+        if (pick.note) row.appendChild(el("div", "said", pick.note));
+        if (pick.detail) row.appendChild(el("div", "said", pick.detail));
+        appendCmdPrompt(row, pick.prompt);
+        wrap.appendChild(row);
+      }
+    }
+
+    // ---- the whole-room empty state ----
+    if (h.empty) {
+      const box = el("div", "empty");
+      box.appendChild(el("div", null, h.empty.heading));
+      if (h.empty.explanation) box.appendChild(el("div", "said", h.empty.explanation));
+      wrap.appendChild(box);
+      p.head.textContent = "";
+      p.body.replaceChildren(wrap);
+      return;
+    }
+
+    wrap.appendChild(el("h3", "group", h.answersHeading));
+    // The values line and the level disclosure, in the order the room says them: where the
+    // answers come from, then which level was weighed and where THAT came from. A ranking
+    // that quietly used a number the player disagrees with is the shape that makes somebody
+    // distrust a whole room.
+    if (h.sourceNote) wrap.appendChild(el("div", "sub-head", h.sourceNote));
+    if (h.levelNote) wrap.appendChild(el("div", "sub-head", h.levelNote));
+
+    for (const a of h.answers || []) wrap.appendChild(helperAnswer(a, h.doorsLead));
+
+    // The caveats, in the room's own order: the vendor-price one first (it is about lines
+    // above it), then the two caps. A surviving cap says what it withheld (trap 50).
+    for (const line of [h.moneyNote, h.cap, h.gearWithheld])
+      if (line) wrap.appendChild(el("div", "caption", line));
+
+    for (const note of (h.gaps || []).concat(h.deferred || []))
+      wrap.appendChild(helperNote(note, h.doorsLead));
+
+    p.head.textContent = (h.answers || []).length
+      ? (h.answers.length === 1 ? "1 answer" : h.answers.length + " answers") : "";
+    p.body.replaceChildren(wrap);
+  }
+
+  function helperAnswer(a, lead) {
+    const box = el("div", "answer");
+    box.appendChild(el("div", "head", a.headline));
+    if (a.serves) box.appendChild(el("div", "serves", a.serves));
+    for (const w of a.why || [])
+      box.appendChild(el("div", "why" + (w.personal ? "" : " catalog"), w.text));
+    if (a.withheldWhy) box.appendChild(el("div", "serves", a.withheldWhy));
+    helperDoors(box, a.doors, lead);
+    return box;
+  }
+
+  function helperNote(n, lead) {
+    const box = el("div", "note");
+    box.appendChild(el("div", null, n.text));
+    appendCmdPrompt(box, n.prompt);
+    helperDoors(box, n.doors, lead);
+    return box;
+  }
+
+  // The lead over a row's doors — one sentence for the whole section, off the wire, so a page
+  // whose PC has changed it cannot keep saying the old one (trap 32). A row with no doors
+  // draws no lead, which is why this returns before building anything.
+  function helperDoors(box, doors, lead) {
+    if (!doors || !doors.length) return;
+    const wrap = el("div", "doors");
+    if (lead) wrap.appendChild(el("div", "doorLead", lead));
+    for (const d of doors) {
+      const row = el("div", "door");
+      row.appendChild(el("span", "dn", d.label));
+      if (d.detail) row.append(document.createTextNode(" "), el("span", "dd", d.detail));
+      wrap.appendChild(row);
+    }
+    box.appendChild(wrap);
+  }
+
   function raidsBody(r) {
     const card = el("div", "card");
     if (!r || !r.defeated) {
@@ -3058,6 +3192,7 @@ function boot() {
     progress: renderProgress,
     quests: (p, d) => questsPanel.render(p, d),
     gear: checklist("gear"),
+    helper: renderHelper,
   };
 
   // ---------- fullscreen ----------
