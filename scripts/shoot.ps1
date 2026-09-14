@@ -733,6 +733,416 @@ $Shots = [ordered]@{
     # (`HomeRoomTests`) and `shellHomeEmpty` is in the dump; the POSITION — centred in the
     # room's cell — is the part still unphotographed. Whoever adds that profile shape gets
     # the shot with it.
+    #
+    # ---- DRA-70: the HELPER room ------------------------------------------------------
+    #
+    # Same illustration lock: a room's shot lands in the PR that lands the room. Title is
+    # 'EQBuddy — Helper', derived from ShellPages.Label, so trap 53 applies and this should
+    # fail loudly rather than photograph something else if the room is ever renamed.
+    #
+    # **The rail is EIGHT rows now**, and every shell shot above says SEVEN in its own
+    # prediction. Those lines are the state they were written in rather than a claim about
+    # today — the count is asserted by `ShellNavigationTests.EightRoomsHaveLandedSoFar` and
+    # by `shellRail` in E2E, which are the two places it can be wrong and say so.
+    #
+    # PREDICTIONS, written before the shots (trap 23):
+    #
+    #   'shell-helper' — THE STATE A NEW PLAYER MEETS, and the one this profile can stage
+    #     honestly: a character with a live log and no dumps at all. Native title bar
+    #     "EQBuddy — Helper". The rail has EIGHT rows and Helper is SECOND, directly under
+    #     Character and above Live, lit as selected. **That position is the assertion.**
+    #     Unlike every room above it, Helper is NEW to `RailOrder` — nothing inherited its
+    #     slot from PR 1 — so a build that appended it at the bottom of the rail is a build
+    #     that looks healthy in every way except this picture.
+    #     Three blocks with small-caps headings:
+    #       Your goals — one dim sentence ("Pick what you are working toward…") over a
+    #         WRAPPED strip of NINE chips in the Founder's order: Level Up · Farm Gear ·
+    #         Unlock Classes · Unlock Races · Farm Motes · Work on Faction · Farm Materials ·
+    #         Make Money · Achievements. **None of them lit** — nothing picked means EQBuddy
+    #         weighs all of them, and a strip that arrived with everything selected would be
+    #         saying the same thing in a way the player cannot turn off.
+    #       Work on Faction — the sub-picker, drawn because nothing is picked (which weighs
+    #         every goal). With no dump it is one dim sentence and a ⧉ copy of
+    #         /outputfile faction.
+    #       Worth doing next — the values line in dim metadata ink, then FOUR gap sentences
+    #         (Level Up wants stored play; Work on Faction wants a pick; Unlock Classes and
+    #         Unlock Races each want the achievements dump) and FIVE "not ranking this one
+    #         yet" lines, each with its own accent-ink door to the room that answers it
+    #         today. FOUR ⧉ buttons in the picture — the picker's, Work on Faction's, and
+    #         one under EACH unlock goal. The repetition is deliberate (DRA-63's rule: a row
+    #         that asks names its own answer); `helperCopyCmd` is the assertion, this is the
+    #         review.
+    #     **The prediction said "what must NOT be in this picture is a recommendation", and
+    #     the shot disproved it — correctly.** The reasoning was that this profile has no
+    #     stored sessions, so a %/hr here would mean the engine divided a LIVE session it was
+    #     told not to touch. The premise was wrong: the fixture log's session ends a minute
+    #     before the app starts, so it is ARCHIVED on ingest and is a stored 1.1-hour sitting
+    #     in West Commonlands by the time the room draws. The picture is therefore honest and
+    #     the prediction was not — which is the useful direction for this to fail in, and it
+    #     is written down rather than quietly corrected because the next person predicting a
+    #     shot of this profile needs to know the fixture arrives already archived.
+    #     SHOT 2026-09-12, 946x633. What it actually shows: the nine chips as predicted, none
+    #     lit; the picker's no-dump state with its ⧉; then ONE recommendation — "West
+    #     Commonlands", "Level Up", "14.5%/hr here, from 1 stored session (1.1 hours)", "Your
+    #     fights here run 6 sec on average, over 82 kills you have recorded", and a Map door.
+    #     Under it THREE gap sentences (Work on Faction wants a pick, both unlocks want the
+    #     achievements dump) and the five deferred lines. FOUR ⧉ buttons.
+    #     **And the first take is what found two wordings**, which is the whole argument for
+    #     the illustration lock: "across 1 of your session" (a lone plural toggle in the
+    #     middle of an interpolation) and, on the picked shot, "you stand at 1,000, 1,000 from
+    #     the top" (a comma that reads as a thousands separator). Both are fixed with a
+    #     regression row; neither was visible in a passing assertion.
+    #   'shell-helper-picked' — the SAME room with two chips ON and a faction dump staged,
+    #     which is the only way to photograph the difference the picker exists to draw. Level
+    #     Up and Work on Faction lit; the other seven dim. The picker now carries real chips
+    #     reading "<faction> — N to go", with the picked one lit. Work on Faction's gap line
+    #     is GONE and a recommendation stands in its place, headlined with the zone the
+    #     appended kills happened in, with why-lines naming the standing and the player's own
+    #     movers ("Your kills of Orc centurion in <zone> moved it +5 each — seen on 3 of your
+    #     kills."), then a row of accent-ink doors (Map · eqlwiki · Standings). The five
+    #     deferred goals are silent here, because a filter that still reported about what it
+    #     filtered out would not be a filter.
+    #     **The prediction expected Level Up to stay a gap here and the join to have no
+    #     picture. Both were wrong, for the same reason as above** — the fixture's session is
+    #     already archived — and the result is the shot this room most needed:
+    #     SHOT 2026-09-12, 946x633. ONE row, headlined "West Commonlands", with
+    #     "Level Up · Work on Faction" under it. **That second line IS HOME-005** — one place
+    #     answering two goals, which is the cross-domain chain the PRD calls the key
+    #     differentiator and which no single-goal list could draw. Under it, four why-lines
+    #     from two different engines (the rate, the fight length, the standing, the mover:
+    #     "Your kills of Orc centurion in West Commonlands moved it +5 each — seen on 3 of
+    #     your kills."), a "1 more reason not shown" from the per-row cap, and THREE doors:
+    #     Map · eqlwiki · Standings. The picker shows both dumped factions with the picked one
+    #     lit. No ⧉ anywhere, because nothing is missing.
+    #   'shell-helper-narrow' — the SAME room at the floor width. The rail is icons only and
+    #     the nine chips must WRAP rather than clip: a horizontal strip that runs off the
+    #     edge with no ellipsis is trap 25's canonical failure and this is the picture that
+    #     can disprove it. Anything cut off horizontally here means the WrapPanel is wrong,
+    #     not the shot — and never a horizontal scrollbar, which hides a layout failure
+    #     behind an affordance.
+    #
+    # ---- DRA-71 D2: the nine chips became ONE DROPDOWN --------------------------------
+    #
+    # **The three predictions above are now the state they were written in, not a claim about
+    # today.** The Founder smoked the D1 shots and called the chip strip flat checkbox soup, so
+    # the nine goals moved inside an EqMultiPicker. Every "WRAPPED strip of NINE chips" line
+    # above described what shipped in D1 and is left standing rather than rewritten — a
+    # prediction edited after the fact is a prediction nobody made. What the three shots show
+    # NOW, re-predicted before re-running them:
+    #
+    #   'shell-helper' / 'shell-helper-narrow' — where the nine pills were, ONE button reading
+    #     "Any goal", left-aligned under the same dim sentence ("Pick what you are working
+    #     toward…"), which now reads as a caption for a control rather than as an explanation
+    #     of an off-state. The Work on Faction block below it likewise becomes a face, and with
+    #     no dump it is still its dim sentence and its ⧉. Everything under "Worth doing next" is
+    #     UNCHANGED — same recommendation, same why-lines, same doors, same FOUR ⧉ — because
+    #     nothing about what the room decides moved in this slice. **The narrow shot's whole
+    #     original job is retired by this change and that is worth saying out loud**: there is no
+    #     strip left to wrap, so trap 25 cannot fire here any more. It is kept because "the room
+    #     still reads at the floor width" is a different question that still has an answer.
+    #   'shell-helper-picker' — the state the button hides, and the only picture in which D2 is
+    #     visible at all. The face reads "Any goal"; under it an open popup on PopupBrush with a
+    #     hairline border and card corners, holding NINE check rows in the Founder's order —
+    #     Level Up · Farm Gear · Unlock Classes · Unlock Races · Farm Motes · Work on Faction ·
+    #     Farm Materials · Make Money · Achievements — NONE ticked. The popup must sit BELOW the
+    #     face and overlap the answers rather than push them down; anything that reflows the room
+    #     when the picker opens means the popup was laid out inline, which is the one way this
+    #     control can be wrong and still work.
+    #   'shell-helper-picker-light' — the same popup in SOLARIZED, the only light palette, with
+    #     Level Up and Work on Faction ticked and the face reading "Level Up · Work on Faction"
+    #     (26 characters, inside the 34 the room budgets). **This is the shot most likely to
+    #     disprove something.** The popup's chrome is four theme brushes and its rows are
+    #     DesignSystem.Text at Role.Body; a control that reads fine on a dark ground and turns
+    #     into grey-on-cream here is a real defect that every assertion in this repo passes
+    #     (trap 31). Check the check-box glyphs too — they are WPF's own and are the one part of
+    #     this popup the design system does not paint.
+    #
+    #   **WHAT ACTUALLY HAPPENED, and it took three takes to get a reviewable picture.**
+    #     SHOT 2026-09-13, 946x633. The room and the popup are as predicted — face "Any goal",
+    #     nine rows in the Founder's order, none ticked, the popup OVERLAPPING the answers
+    #     rather than reflowing them; and on the light shot the face reads "Level Up · Work on
+    #     Faction" with two rows ticked. Getting there disproved two things:
+    #       (a) **The first take of 'shell-helper-picker' was BYTE-IDENTICAL to
+    #           'shell-helper'.** A WPF Popup is its own top-level HWND, so PrintWindow on the
+    #           owner renders everything except the dropdown the shot is about. Nothing in the
+    #           picture said so — it is a correct, well-composed photograph of a button — and
+    #           only `md5sum` on the two files caught it. Fixed in `shot.ps1` (-WithPopups).
+    #           **A screen grab was tried first and reverted twice**: take two had the
+    #           always-on-top widget across the left half of the room, take three had an
+    #           unrelated application on this machine's desktop in it. That is the failure
+    #           PrintWindow exists to prevent, arriving by the door marked "just this once".
+    #       (b) **The Solarized shot then showed a hard BLACK hairline round the popup** that
+    #           appears nowhere else in that palette. It is not a product defect and it is not
+    #           the theme: Solarized's `BorderBrush` is `#66586E75`, 40% alpha, and a popup's
+    #           TRANSLUCENT pixels composite against the fresh (transparent-black) bitmap it
+    #           is rendered into. A real state of the CAPTURE, photographed as if it were a
+    #           state of the app — trap 23 one layer further out than usual.
+    #           **CAVEAT, and it stays a caveat: this is NOT fixed.** Seeding the popup's
+    #           bitmap with the pixels behind it was tried and changed nothing, because
+    #           PrintWindow overwrites the DC rather than blending into it — so the
+    #           translucent edge cannot be recovered. *In both picker shots, the popup's 1px
+    #           outline is darker than the app draws it; everything INSIDE the popup is
+    #           faithful.* Do not read the hairline as a palette decision, and if a future
+    #           popup shot shows a border darker than its theme's value, suspect the capture
+    #           before the theme.
+    #
+    # ---- DRA-71 D3: the level, and what it changes about an answer -------------------
+    #
+    # PREDICTIONS, written before the shots (trap 23):
+    #
+    #   'shell-home-level' — the Character room with the level editor OPEN, which is a state
+    #     no shot of the shut room can reach (trap 22: a link and a link-over-a-box look the
+    #     same). The Identity block, in order: "Testchar" in accent ink, "test · West
+    #     Commonlands" under it, then the NEW row — "Level 28 — set by you" — then the accent
+    #     link reading "Done" (the editor is open, so the door carries its open-state label),
+    #     the dim note "Type the level this character actually is and press Enter…", a NARROW
+    #     right-aligned box holding 28, and the accent row "Let EQBuddy work it out". Only
+    #     THEN the class line ("Warrior (inferred from your log)") and "Set class…".
+    #     **The order is the thing to check**: level before class, because the class editor is
+    #     sixteen chips and would push this row off the fold every time it opened. And the
+    #     zone line must still be there under the name — the plan's P4 says level is an ADDED
+    #     identity row, and a shot where "Level 28" replaced "test · West Commonlands" would
+    #     be this slice quietly reversing a documented DRA-63 decision while looking finished.
+    #     Three blocks still, not four: the editor lives INSIDE Identity.
+    #   'shell-helper-outgrown' — the Helper with ONE real archived session behind it (Prime)
+    #     and a real ding appended, so every number is the fixture's own. Under "Worth doing
+    #     next" and the source note, a NEW dim line: "Weighed at level 30, from your log's ding
+    #     lines." Then the West Commonlands row carrying its measured rate, its cadence, and
+    #     the P6 sentence — "The creatures you conned here ran L5–11, across N kills — you are
+    #     level 30." The fixture's only /consider lines are Lvl 5 and Lvl 11, both in West
+    #     Commonlands, so that band is a fact about this fixture and not a number I chose.
+    #     **What must NOT be in the picture**: any sentence about the zone being easy, finished
+    #     with, or worth leaving; any predicted rate for a zone the player has not farmed; and
+    #     any "Level 0" anywhere. The goals face reads "Level Up".
+    #
+    #   WHAT ACTUALLY HAPPENED. SHOT 2026-09-13, 946x633. Both as predicted, and the
+    #     Character one took two takes because the prediction was WRONG in a way nothing else
+    #     could have caught:
+    #       (a) **'shell-home-level' came back with an EMPTY box.** The prediction said "a
+    #           narrow right-aligned box holding 28", and it held nothing — because the hook
+    #           flipped `_editingLevel` on its own while a player clicking the same link went
+    #           through a path that also seeds the draft. A correct, well-composed photograph
+    #           of a real state of SOMETHING ELSE, which is trap 23 exactly, and invisible to
+    #           every assertion in the repo: the box was there, the words were right, the
+    #           level was right. Fixed with one `OpenLevelEditor` both paths call, and
+    #           `shellHomeLevelDraft` now says from outside what is IN the box rather than
+    #           that a box exists. Re-shot: the box holds 28. **The prediction is the whole
+    #           reason this was found. A shot taken without one photographs whatever happens.**
+    #       (b) 'shell-helper-outgrown' was right first time, and the numbers are the
+    #           fixture's own: "14.2%/hr here, from 1 stored session (1.1 hours)", "your
+    #           fights here run 6 sec on average, over 82 kills", and the P6 line reading
+    #           "The creatures you conned here ran L5-11, across 26 kills - you are level 30."
+    #           L5-11 is the fixture's only two /consider lines and 26 is the kill count of
+    #           the creatures they belong to — a band nobody staged. ONE recommendation,
+    #           because one prime run archives one session and West Commonlands is its primary
+    #           zone; that is honest rather than thin. Nothing in the picture calls the zone
+    #           easy, finished with, or worth leaving, and no rate is predicted for anywhere
+    #           the player has not farmed.
+    #
+    #   AND THE REGRESSION PICTURES: every 'shell-home*' and 'shell-helper*' shot changes in
+    #     this slice — the Character room gains an identity row and the Helper gains the
+    #     "Weighed at level …" line — so all seven were re-run rather than left stale. A
+    #     committed shot that no longer matches the build is worse than no shot, because it is
+    #     the one thing a reviewer trusts without checking.
+    #
+    #   AND THE REGRESSION PICTURE IS 'quest-tracker', which needs no new shot and no new
+    #     prediction: the class lens moved onto the same primitive in this slice, so that
+    #     window's filter row must look EXACTLY as it did — era combo, state combo, the class
+    #     face, then the mode strip, all on one row that does not wrap. The whole acceptance bar
+    #     for the migration is "identical", and a shot that already exists is the cheapest way
+    #     to check it. Re-run it.
+    #     SHOT 2026-09-13: the row is intact and unchanged. **One prediction was wrong and is
+    #     corrected here rather than quietly:** it said the face would read "Bard". It reads
+    #     "Any class", because this row passes no `Ledger` and `Write-Ledger $null` DELETES
+    #     quest-ledger.json — the Bard seeding belongs to the v1-import staging, not to the
+    #     shared fixture. The "Warrior (inferred from your log)" line in the detail pane is
+    #     class INFERENCE, which is a different producer from the picker (trap 4's two-sources
+    #     shape, and the picture is where the two are easiest to confuse).
+    #
+    # ---- DRA-71 D4: the throughput lines (plan P7, Founder smoke item 3) --------------
+    #
+    # PREDICTIONS, written before the shots (trap 23). **What is pinned and what is not is
+    # the first thing to read here.** The rates, the damage-per-second figures, the combat
+    # hours and the fight lengths are the fixture's own arithmetic over a compressed hour;
+    # the block above records, in this same file, what guessing a number the staging does not
+    # pin costs the next reader. So the SHAPE is predicted, and the only literals predicted
+    # are the ones the staging actually decides: the two zone names, the level, and the
+    # absence of a difficulty badge.
+    #
+    #   'shell-helper-throughput' — the Helper with TWO real archived sessions in TWO zones
+    #     and a real ding appended. The rail of seven with Helper lit, the goals face reading
+    #     "Level Up", the source note, and the "Weighed at level 30, from your log's ding
+    #     lines." line D3 added. Then TWO recommendation rows — West Commonlands (the
+    #     fixture's own zone, from the first prime) and Kithicor Forest (this staging's, from
+    #     the second) — each carrying, in this order:
+    #       1. the measured experience rate with its session scope,
+    #       2. **NEW — "You put out N damage a second here, over H hours of fighting. Across
+    #          the 2 zones EQBuddy has measured, your damage and healing together run M a
+    #          second; here, N."** The "2 zones" IS pinned: two primes, two primary zones, and
+    #          the comparison clause exists at all only because there are two. A picture with
+    #          one row, or with that clause missing, means the second prime collapsed into the
+    #          first row (the adoption case `ShiftDays` exists to prevent) and the shot is of
+    #          something else.
+    #       3. the cadence line, **now with its own comparison** — "Everywhere EQBuddy has
+    #          measured you, they run X." — or without it if the two round to the same words,
+    #          which is a real arm and not a defect.
+    #       4. the P6 outgrown line on West Commonlands only: its conned band is the
+    #          fixture's own (Lvl 5 and Lvl 11), thirty-odd under 30. Kithicor's creatures
+    #          conned Lvl 27, so it must NOT carry that sentence — and that is the row worth
+    #          checking, because a discount sentence on a zone in band would be the P6 rule
+    #          inverted and would look perfectly reasonable.
+    #     **What must NOT be in the picture**, and each of these is a specific failure:
+    #       - No "D0".."D4" badge anywhere. Neither zone is an instance, and a tier drawn for
+    #         an open-world zone would be `InstanceTier` guessing the one thing its own line
+    #         refuses to guess.
+    #       - No sentence calling either place safe, easy, hard, tough, trivial, comfortable
+    #         or efficient — in either direction. HOME-006 is a refusal, the vocabulary sweep
+    #         is the guard, and this is the picture where a word that slipped past it would
+    #         show.
+    #       - No "and 0.0 healing a second". The fixture's character heals nothing, so the
+    #         healing clause must be ABSENT rather than a zero.
+    #       - No "Level 0" and no predicted rate for anywhere the player has not farmed.
+    #       - No downtime line unless the fixture's own active/elapsed gap is over half, which
+    #         it is not expected to be — the fixture is a dense hour. If one appears it is a
+    #         finding about the fixture, not about the feature, and the honest response is to
+    #         read the numbers rather than to change the threshold.
+    #
+    #   'shell-helper-throughput-light' — the same staging in SOLARIZED, the only light
+    #     palette, because the new lines are the densest block of dim body text the room has
+    #     and light is where dim-on-light contrast fails. Same content, same two rows; what is
+    #     being checked is that six stacked personal sentences under one headline are still
+    #     READABLE and still read as one row rather than as a paragraph. The translucency
+    #     caveat of trap 79 does not apply — there is no popup in this shot.
+    #
+    #   AND THE REGRESSION PICTURE: 'shell-helper-outgrown' changes in this slice, because it
+    #     has an archived session and therefore now carries the throughput line. Its ONE row
+    #     has one measured zone, so the comparison clause must be ABSENT — this is the picture
+    #     of the single-zone arm, and a clause reading "across the 1 zones" or comparing the
+    #     zone with itself would be the tautology `ThroughputBaseline.Known` exists to refuse.
+    #     Re-run it.
+    #     The other 'shell-helper*' shots have no `Prime` and so no archived session and no
+    #     zone rows at all; nothing in D4 reaches them, and re-running them would produce
+    #     byte-identical files.
+    #
+    #   WHAT ACTUALLY HAPPENED. SHOT 2026-09-13, 946x633, TWO takes — and the second take
+    #     exists because the first found TWO wording defects that no assertion in this repo
+    #     could have seen. Both sentences were correct, both numbers were real, and both were
+    #     furniture. This is the whole case for writing a prediction down.
+    #       (a) **"You healed 0.1 a second." on a WARRIOR.** The healing clause was gated on
+    #           `Hps > 0`, which is the obvious reading of "only when there was some" — and
+    #           the fixture's log has regen ticks in it, so "some" was 0.1 against 13.3 damage.
+    #           The prediction said this clause must be ABSENT, which is the only reason it
+    #           was looked for. Fixed with `HelperPresentation.HealingClauseShare` (a
+    #           twentieth of the output); the WEIGHT still counts every point healed, because
+    #           it was measured — only the clause is suppressed.
+    #       (b) **"…together run 13.2 a second; here, 13.4."** A whole line spent saying a zone
+    #           is exactly average, on the row where that is least interesting. Fixed with
+    #           `BaselineClauseGap` (a tenth, either side), and the threshold RELATIONSHIP
+    #           with `Recommendations.ThroughputShortfall` is now asserted rather than left to
+    #           two numbers staying apart — a zone marked down with its explanation suppressed
+    #           is the one failure this slice had to refuse.
+    #     Everything else was as predicted: two rows (Kithicor Forest 14.4%/hr first, West
+    #     Commonlands 13.2%/hr second, which is the P6 halving doing its job), the new
+    #     throughput line on both, the cadence comparison ("…they run 6 sec.") on Kithicor,
+    #     the P6 sentence on West Commonlands ONLY — its band is the fixture's own L5–11
+    #     against level 30 — and none on Kithicor, whose creatures conned Lvl 27. No D-badge,
+    #     no safety or difficulty vocabulary in either direction, no "Level 0", no downtime
+    #     line (the fixture's hour is dense, as predicted).
+    #
+    #   AND THE ONE THING THESE SHOTS CANNOT SHOW, stated rather than staged. *After fix (b)
+    #     neither row draws the baseline comparison, because both zones are within a tenth of
+    #     the pooled figure — and no staging built on the shared fixture can do better. A
+    #     session's dps is a SESSION figure attributed whole to its primary zone, so two
+    #     slices of one log always carry nearly the same output however different their
+    #     appended kills are. A genuinely different per-zone figure needs sittings actually
+    #     played in different zones, which a compressed one-hour fixture does not contain.
+    #     The comparison clause is unit-tested at both ends and prove-failed
+    #     (`HelperPresentationTests`, `RecommendationsThroughputTests`); inventing a fixture
+    #     whose damage was chosen to make the sentence appear would be staging a number to
+    #     photograph a string, which is the failure trap 23 and trap 73 name from either
+    #     side.*
+    #
+    # ---- DRA-71 D8: the professions block (plan P13; Founder smoke item 6) -----------
+    #
+    # PREDICTIONS, written before the shots (trap 23):
+    #
+    #   'shell-helper-materials' — the NARROWED state: one goal picked (Farm Materials) and two
+    #     professions picked (Baking, Blacksmithing), with ONE real skill-up appended to the log
+    #     so exactly one row carries a number and one does not. That pairing is the whole point
+    #     of the picture: "no skill-up seen yet" and "skill 122" have to read as two different
+    #     answers rather than as a number and a blank.
+    #       - The goals face reads "Farm Materials" — one pick is always named, never counted.
+    #       - One block headed "Farm Materials", its note, then the profession face reading
+    #         "Baking · Blacksmithing" (19 chars against the room's 34-char budget, so it names
+    #         rather than counts) and the picks in the CURATED list's own order — Baking before
+    #         Blacksmithing, which is the enum's order and not the click order.
+    #       - TWO rows, in that same order. The first says Baking has no skill-up in the log yet
+    #         and names the game's own "You have become better at…" line. **It must not print a
+    #         0.** The second reads "Blacksmithing — your log last raised it to 122, on <today>"
+    #         — the date is the appended line's own stamp, so it is today's, and it is a fact
+    #         about the fixture rather than a staged string.
+    #       - TWO controls on each row: "Watch skill-ups" and "eqlwiki". Both say "Watch" rather
+    #         than "Watching" — the fixture profile has no skill-up rule, and the label is read
+    #         from the player's own rules every paint.
+    #       - Then the park note, with its two numbers in it (10,957 pages read, 14 naming a
+    #         profession). The block that says what EQBuddy cannot do is part of the picture.
+    #       - Under "Worth doing next": NO recommendations — Farm Materials is still Deferred —
+    #         and the deferral sentence naming which half is missing, with the Gear door under
+    #         it. A picture where the block above is full of the player's own numbers and the
+    #         sentence below says "not ranking this one yet" is exactly the reading this slice
+    #         had to get right.
+    #       - No sentence calling a profession easy, hard or trivial, in either direction. The
+    #         HOME-006 sweep covers these sentences now and this is where a word that slipped
+    #         past it would show.
+    #
+    #   'shell-helper-materials-light' — the same staging in SOLARIZED, the only light palette.
+    #     Eight short caption rows with two accent links each is a new density for this room and
+    #     light is where dim-on-light contrast fails. No popup, so trap 79's translucency caveat
+    #     does not apply.
+    #
+    #   'shell-helper-professions' — the picker OPEN over the DEFAULT state: the goal picked and
+    #     NO profession picked, which is the filter's empty state and therefore all eight rows.
+    #     A dropdown that is shut photographs as a button (trap 22), and this is also the only
+    #     picture that answers the product question the block invites — whether eight rows, each
+    #     with a sentence and two links, reads as a list or as a wall. `EQBUDDY_HELPER_PICKER`
+    #     is the room's own review hook, unset in every shipping run; `helperPickerOpen` in the
+    #     E2E is the assertion that it is wired to the control rather than merely spelled right.
+    #       - The face reads "Any profession" — nothing picked, and the control says so in its
+    #         own words.
+    #       - The popup holds EIGHT check rows in the curated order (Alchemy, Baking,
+    #         Blacksmithing, Brewing, Fletching, Jewelcrafting, Pottery, Tailoring), none
+    #         ticked, with Blacksmithing reading "Blacksmithing — 122" and the other seven
+    #         "— not seen yet".
+    #       - Eight rows under it, sixteen controls between them.
+    #
+    #   AND THE REGRESSION PICTURES: 'shell-helper', 'shell-helper-narrow' and
+    #     'shell-helper-picker' all change, because none of them picks a goal and "nothing
+    #     picked" weighs every goal — so the new block is drawn in full, eight rows of "not seen
+    #     yet". Re-run them. The other 'shell-helper*' shots pick goals that are not Farm
+    #     Materials, so the block is absent and their pictures are unchanged.
+    #
+    #   WHAT ACTUALLY HAPPENED. SHOT 2026-09-13, 946x633, TWO takes — and the second take
+    #     exists because the first found a defect that no assertion in this repo could have
+    #     seen. Every sentence was correct, every number was real, and the block was a wall.
+    #       (a) **The unknown-standing sentence was thirty words, and there are eight rows.**
+    #           "…no skill-up in your log yet. EQBuddy reads your standing from the game's own
+    #           'You have become better at…' line, so it starts from your next one." — eight
+    #           times, one after another, in the default state that every player sees first.
+    #           Distinct-count is the tell in prose exactly as it is in data (trap 73): eight
+    #           rows carrying one distinct sentence is a template, and the fact it states
+    #           belongs to the BLOCK. Fixed with `HelperPresentation.ProfessionLearnNote`, said
+    #           once under the picker; the row is now "Baking — no skill-up in your log yet."
+    #       (b) **The park note had no margin of its own**, so it butted against the last row's
+    #           two links and read as belonging to that profession rather than to the block.
+    #           A caveat attached to the wrong subject is worse than one nobody reads.
+    #     Everything else was as predicted: the goals face names the one pick, the profession
+    #     face reads "Baking · Blacksmithing" in the curated order, the Baking row prints no
+    #     zero, Blacksmithing reads "raised it to 122, on Sep 13" (the appended line's own
+    #     stamp), both rows carry "Watch skill-ups" and "eqlwiki" and neither says "Watching",
+    #     no recommendation is drawn, and the deferral names the missing half under it. The
+    #     open picker holds the eight in curated order, none ticked, Blacksmithing reading 122.
+    #     No safety or difficulty vocabulary anywhere in the block.
+    #
     # ---- E-3 PR 5: the LIVE room, and the Raids move ---------------------------------
     #
     # Same illustration lock: a room's shot lands in the PR that lands the room, exactly the
@@ -976,6 +1386,430 @@ $Shots = [ordered]@{
                                "Location`tName`tID`tCount`tSlots"
                                "General1`tBone Chips`t0`t12`t0"
                                "General2`tFlawless Diamond`t0`t1`t0") } }
+    # DRA-71 D3: the level editor OPEN. A shut editor photographs as a link, so without the
+    # hook the slice's Character-room half is a picture of a word (trap 22). EQBUDDY_HOME_EDITOR
+    # is the room's own review hook and is unset in every shipping run; `shellHomeLevelBox` in
+    # the E2E is the assertion that it is wired to the build rather than merely spelled right.
+    # The STATEMENT is seeded into the ledger so the undo row exists to be photographed — with
+    # only a ding there is nothing to take back, and the row that proves a correction is
+    # reversible would be absent from the one picture of the editor.
+    'shell-home-level' = @{ Title = 'EQBuddy — Character'
+                           Env = @{ EQBUDDY_SHELL = '1'; EQBUDDY_HOME_EDITOR = 'level' }
+                           Ledger = @{ StatedLevel = 28; StatedLevelAt = '2026-09-12T20:00:00' }
+                           Set = @{} }
+    # ---- DRA-70: the Helper room. Predictions are above, with the shell-home block. -----
+    'shell-helper'    = @{ Title = 'EQBuddy — Helper'
+                           Env = @{ EQBUDDY_SHELL = 'helper' }; Set = @{} }
+    'shell-helper-narrow' = @{ Title = 'EQBuddy — Helper'
+                           Env = @{ EQBUDDY_SHELL = 'helper'; EQBUDDY_SHELL_SIZE = '580x480' }
+                           Set = @{} }
+    # DRA-71 D2: the goal picker OPEN. A dropdown that is shut photographs as a button, so
+    # without this hook the slice's whole player-visible change is a picture of a rectangle
+    # reading "Any goal" (trap 22). EQBUDDY_HELPER_PICKER is the room's own review hook and is
+    # unset in every shipping run; `helperPickerOpen` in the E2E is the assertion that it is
+    # wired to the control rather than merely spelled correctly.
+    'shell-helper-picker' = @{ Title = 'EQBuddy — Helper'
+                           Env = @{ EQBUDDY_SHELL = 'helper'; EQBUDDY_HELPER_PICKER = 'goals' }
+                           Popups = $true; Set = @{} }
+    # The same open picker with two already ticked, in SOLARIZED — the only light palette, and
+    # the one a popup drawn from theme brushes is most likely to get wrong. A dropdown that
+    # inherits a dark panel's ink onto a light ground is unreadable and passes every assertion
+    # in this repo (trap 31: a capture surface pins its own theme).
+    # The theme rides `Set`, which is the only per-shot override Write-Settings honours — the
+    # -Theme PARAMETER is batch-wide, and a shot that needed the whole batch re-run in another
+    # palette to be reviewable is a shot nobody re-runs.
+    # DRA-71 D5: the UNLOCK sub-picker, OPEN. The slice's whole player-visible control, and
+    # the same trap-22 argument the goals picker's shot makes — a dropdown that is shut
+    # photographs as a button, so without the hook this is a picture of a rectangle reading
+    # "Any unlock". Popups = $true composites the popup's own HWND (trap 79).
+    #
+    # The achievements dump is staged through the REAL seam — beside the log, in the game's
+    # own filename shape — because the picker's rows ARE that dump: without it the block is
+    # its honest empty state and the ⧉ that fills it, which is a different picture of a
+    # different thing.
+    #
+    # PREDICTION, written before the shot: the GOALS face names both rather than counting —
+    # "Unlock Classes · Unlock Races" is 29 characters against the Helper's 34-char budget,
+    # and the order is the enum's, not the click order. Under it one block headed "Races and
+    # classes you are unlocking", its note, and a face reading "Human (Freeport)" — one pick
+    # is always named, never counted.
+    # The open popup holds THREE rows in closest-to-done order, each with its own count:
+    # Human (Freeport) — 0 of 2 done, Barbarian — 0 of 1 done, Warrior — 0 of 1 done (ties
+    # break alphabetically, so Barbarian precedes Human precedes Warrior). The FACTION
+    # sub-picker is absent: Work on Faction is not among the picked goals.
+    #
+    # SHOT 2026-09-13: as predicted — the goals face names both, the block and its note are
+    # there, the face reads the one pick, and the popup holds Barbarian · Human (Freeport) ·
+    # Warrior in that order with Human ticked. The ANSWERS under it were not predicted and
+    # are the better half of the picture: Warrior survives the race pick (its section is
+    # untouched) and the Human (Freeport) unlock is headed **West Commonlands** rather than
+    # by its own name, because the fixture's kills move Coalition of Tradesfolk and the
+    # cross-domain join gave that unlock a place to go. Barbarian is absent, which is the
+    # pick firing. The popup overlaps the source note behind it, which is a dropdown doing
+    # what a dropdown does.
+    #
+    # AND THE REGRESSION PICTURES: 'shell-helper', 'shell-helper-narrow' and
+    # 'shell-helper-picker' all change in this slice, because none of them picks a goal and
+    # "nothing picked" weighs every goal — so the new block is drawn in its honest no-dump
+    # state, with the ⧉ that fills it. That is the fifth copy button
+    # `TheHelperHandsOverTheCommandsItsOwnEmptyStatesAskFor` now asserts. The other
+    # 'shell-helper*' shots pick goals that are not unlock goals, so the block is absent and
+    # their pictures are unchanged.
+    'shell-helper-unlocks' = @{ Title = 'EQBuddy — Helper'
+                           Env = @{ EQBUDDY_SHELL = 'helper'; EQBUDDY_HELPER_PICKER = 'unlocks' }
+                           Popups = $true
+                           Dump = @{
+                               'Testchar_test-Achievements.txt' = @(
+                                   'Untapped Potential: Races'
+                                   "I`tRace Unlock - Human (Freeport)"
+                                   "I`t`tGet maximum faction with Coalition of Tradesfolk."
+                                   "I`t`tGet maximum faction with Knights of Truth."
+                                   "I`tRace Unlock - Barbarian"
+                                   "I`t`tGet maximum faction with Rallosian Army."
+                                   'Untapped Potential: Classes'
+                                   "I`tClass Unlock - Warrior"
+                                   "I`t`tObtain Azure Ruby Ring."
+                               )
+                           }
+                           Set = @{
+                               HelperGoals = @{ 'testchar_test' = @('UnlockRaces', 'UnlockClasses') }
+                               UnlockPicks = @{ 'testchar_test' = @('Human (Freeport)') }
+                           } }
+    # ---- DRA-71 D8: the professions block. Predictions are above. ---------------------
+    # The skill-up arrives through the LOG rather than through a seeded ledger, so the whole
+    # chain in the picture is the real one: parser, session fold, ledger, standing, row. A
+    # seeded store would photograph a room nobody had used, and it would look exactly like a
+    # room whose writer was never wired (trap 20 is the bug; trap 23 is why the staging has to
+    # go through the seam).
+    'shell-helper-materials' = @{ Title = 'EQBuddy — Helper'
+                           Env = @{ EQBUDDY_SHELL = 'helper' }
+                           Append = @('You have become better at Blacksmithing! (122)')
+                           Set = @{
+                               HelperGoals = @{ 'testchar_test' = @('FarmMaterials') }
+                               HelperProfessions = @{ 'testchar_test' = @('Baking', 'Blacksmithing') }
+                           } }
+    'shell-helper-materials-light' = @{ Title = 'EQBuddy — Helper'
+                           Env = @{ EQBUDDY_SHELL = 'helper' }
+                           Append = @('You have become better at Blacksmithing! (122)')
+                           Set = @{
+                               Theme = 'Solarized'
+                               HelperGoals = @{ 'testchar_test' = @('FarmMaterials') }
+                               HelperProfessions = @{ 'testchar_test' = @('Baking', 'Blacksmithing') }
+                           } }
+    # No HelperProfessions key at all: absent means all eight, which is the state a player who
+    # has never touched the control is in and the only one that shows what the block costs.
+    'shell-helper-professions' = @{ Title = 'EQBuddy — Helper'
+                           Env = @{ EQBUDDY_SHELL = 'helper'; EQBUDDY_HELPER_PICKER = 'professions' }
+                           Popups = $true
+                           Append = @('You have become better at Blacksmithing! (122)')
+                           Set = @{
+                               HelperGoals = @{ 'testchar_test' = @('FarmMaterials') }
+                           } }
+    'shell-helper-picker-light' = @{ Title = 'EQBuddy — Helper'
+                           Env = @{ EQBUDDY_SHELL = 'helper'; EQBUDDY_HELPER_PICKER = 'goals' }
+                           Popups = $true
+                           Set = @{
+                               Theme = 'Solarized'
+                               HelperGoals = @{ 'testchar_test' = @('LevelUp', 'WorkOnFaction') }
+                           } }
+    # The picked state, staged through the real seams: a faction dump beside the log (the
+    # finder's own filename shape, class code and all) and kills in the log that MOVE that
+    # faction, so the movers come out of the real pool rather than out of a fixture. The
+    # goal chips are seeded under the LEDGER's character key — `testchar_test`, lowercased,
+    # which is what the room writes under; a different key here would photograph a room
+    # nobody had used and it would look exactly like a room that lost its writer.
+    'shell-helper-picked' = @{ Title = 'EQBuddy — Helper'
+                           Env = @{ EQBUDDY_SHELL = 'helper' }
+                           Dump = @{
+                               'Testchar_test-WAR-Factions.txt' = @(
+                                   "ID`tName`tStandingValue`tPointsToMax"
+                                   "229`tCoalition of Tradefolk`t1000`t1000"
+                                   "304`tKnights of Truth`t1600`t400"
+                               )
+                           }
+                           Append = @(
+                               'You have slain an orc centurion!'
+                               'Your faction standing with Coalition of Tradefolk has been adjusted by 5.'
+                               'You have slain an orc centurion!'
+                               'Your faction standing with Coalition of Tradefolk has been adjusted by 5.'
+                               'You have slain an orc centurion!'
+                               'Your faction standing with Coalition of Tradefolk has been adjusted by 5.'
+                           )
+                           Set = @{
+                               HelperGoals = @{ 'testchar_test' = @('LevelUp', 'WorkOnFaction') }
+                               HelperFactions = @{ 'testchar_test' = @('Coalition of Tradefolk') }
+                           } }
+    # DRA-71 D3: the discount, which needs a real archived session to discount. `Prime` runs
+    # the app once over the fixture and closes it GRACEFULLY so the sitting is finalized into
+    # history.db — one real session with the fixture's own numbers, which is what
+    # `ZoneHistory.Fold` reads. The LEVEL arrives through the LOG rather than through a seeded
+    # ledger, so the whole chain in the picture is the real one: parser, stamp, store, resolve,
+    # rank. The fixture's only /consider lines are (Lvl: 5) and (Lvl: 11), both in West
+    # Commonlands — so the band in the sentence is a fact about this fixture and not a number
+    # staged to make the sentence appear (trap 23: a shot whose numbers you did not predict has
+    # not been reviewed).
+    'shell-helper-outgrown' = @{ Title = 'EQBuddy — Helper'
+                           Env = @{ EQBUDDY_SHELL = 'helper' }
+                           Prime = @( @{} )
+                           Append = @('You have gained a level! Welcome to level 30!')
+                           Set = @{
+                               HelperGoals = @{ 'testchar_test' = @('LevelUp') }
+                           } }
+    # DRA-71 D4: the throughput lines, which need TWO measured zones for the comparison
+    # clause to exist at all — a baseline folded from one zone IS that zone, and the sentence
+    # refuses to compare a place with itself (`ThroughputBaseline.Known`). So two prime runs
+    # under the FIXTURE'S OWN character (`SessionSummary.Stored` matches (server, character)
+    # with SQL `=`; a row under any other name is one this room can never fold), at different
+    # `Fraction`/`ShiftDays` so the adopter sees two distinct sessions rather than one row
+    # updated twice — the lesson 'shell-progress-history' records above.
+    #
+    # The SECOND run ends in a different zone and kills there, so the pool has creatures in
+    # it and the session's PrimaryZone is it: `CurrentZone` is the LAST zone entered, and
+    # kills are keyed on where they happened. Kithicor Forest is not in the fixture, which is
+    # the point — it is unambiguously this staging's zone and not a slice of the shared one.
+    # The consider line gives it its own band so its row is not silently the outgrown one too.
+    #
+    # NOT predicted, by construction: every rate, every dps, the combat hours and the fight
+    # lengths. They are the fixture's own arithmetic over a compressed hour, and the block
+    # above records what guessing them costs — predict the SHAPE and the literals the staging
+    # actually pins (the zone names, the level, the absence of a D-badge).
+    'shell-helper-throughput' = @{ Title = 'EQBuddy — Helper'
+                           Env = @{ EQBUDDY_SHELL = 'helper' }
+                           Prime = @(
+                               @{ Character = 'Testchar'; Fraction = 0.55; ShiftDays = 3 }
+                               @{ Character = 'Testchar'; Fraction = 1.0;  ShiftDays = 1
+                                  Lines = @(
+                                      'You have entered Kithicor Forest.',
+                                      'A decaying skeleton judges you amiably -- looks kind of risky, but you might win. (Lvl: 27)',
+                                      'You crush a decaying skeleton for 31 points of damage.',
+                                      'You crush a decaying skeleton for 12 points of damage.',
+                                      'You have slain a decaying skeleton!',
+                                      'A decaying skeleton judges you amiably -- looks kind of risky, but you might win. (Lvl: 27)',
+                                      'You crush a decaying skeleton for 28 points of damage.',
+                                      'You crush a decaying skeleton for 9 points of damage.',
+                                      'You have slain a decaying skeleton!',
+                                      'A decaying skeleton judges you amiably -- looks kind of risky, but you might win. (Lvl: 27)',
+                                      'You crush a decaying skeleton for 24 points of damage.',
+                                      'You have slain a decaying skeleton!') }
+                           )
+                           Append = @('You have gained a level! Welcome to level 30!')
+                           Set = @{
+                               HelperGoals = @{ 'testchar_test' = @('LevelUp') }
+                           } }
+    'shell-helper-throughput-light' = @{ Title = 'EQBuddy — Helper'
+                           Env = @{ EQBUDDY_SHELL = 'helper' }
+                           Prime = @(
+                               @{ Character = 'Testchar'; Fraction = 0.55; ShiftDays = 3 }
+                               @{ Character = 'Testchar'; Fraction = 1.0;  ShiftDays = 1
+                                  Lines = @(
+                                      'You have entered Kithicor Forest.',
+                                      'A decaying skeleton judges you amiably -- looks kind of risky, but you might win. (Lvl: 27)',
+                                      'You crush a decaying skeleton for 31 points of damage.',
+                                      'You crush a decaying skeleton for 12 points of damage.',
+                                      'You have slain a decaying skeleton!',
+                                      'A decaying skeleton judges you amiably -- looks kind of risky, but you might win. (Lvl: 27)',
+                                      'You crush a decaying skeleton for 28 points of damage.',
+                                      'You crush a decaying skeleton for 9 points of damage.',
+                                      'You have slain a decaying skeleton!',
+                                      'A decaying skeleton judges you amiably -- looks kind of risky, but you might win. (Lvl: 27)',
+                                      'You crush a decaying skeleton for 24 points of damage.',
+                                      'You have slain a decaying skeleton!') }
+                           )
+                           Append = @('You have gained a level! Welcome to level 30!')
+                           Set = @{
+                               Theme = 'Solarized'
+                               HelperGoals = @{ 'testchar_test' = @('LevelUp') }
+                           } }
+    # ---- DRA-71 D6: Farm Gear asks the intent first --------------------------------------
+    #
+    # The three staged states are the three claims the slice makes: the intent strip with its
+    # answers, the worn picker OPEN, and the OTHER intent producing a different top zone from
+    # the SAME profile.
+    #
+    # The anchors are staged through the real seam — an inventory dump beside the log, in the
+    # game's own tab-separated shape — and both item names are REAL rows in the shipped
+    # catalog with no class lock on them ("Cloth Cap", AC 2, HEAD; "Cloth Choker", AC 1, NECK).
+    # A made-up item would resolve to no stats, drop out of `GearUpgrades.WornFrom`, and the
+    # picture would be the honest empty state of something else (trap 23).
+    #
+    # PREDICTION, computed against the shipped catalog before the run and confirmed by the E2E
+    # rows that assert the same numbers: the fixture infers WARRIOR, so the class lock is WAR.
+    # 'shell-helper-gear' — one block headed "Farm Gear": its note, a three-segment strip with
+    #   "Upgrade what I wear" selected, a worn face reading "Cloth Cap" (one pick is always
+    #   named), the "Include quest rewards" pill UNSELECTED, and the catalog caveat under it.
+    #   The answers are THREE zones in this order — Temple of Veeshan (3 upgrades), Clan
+    #   Runnyeye (2), Kael Drakkel (1) — each naming its items with "+N AC/HP/…" and the
+    #   estimate label, the room cap saying 2 more answers matched, and the sweep's own cap
+    #   saying 103 more upgrades are not listed with a Gear door under it.
+    # 'shell-helper-gear-picker' — the same state with the WORN picker open over it. Two check
+    #   rows in slot order — "Cloth Cap — head" ticked, "Cloth Choker — neck" not — because
+    #   the popup offers every worn item and the offer is never narrowed by its own filter.
+    #   Popups = $true composites the popup's own HWND (trap 79); without it this shot is
+    #   byte-identical to the one above.
+    # 'shell-helper-gear-replace' — SOLARIZED, and the same stored pick. No picker at all (that
+    #   is the intent difference made visible), and the top zone changes to Western Wastes,
+    #   which feeds eight of the NECK upgrades — so the picture shows the two intents being
+    #   different questions rather than two labels on one answer. 225 held back.
+    #
+    # SHOT 2026-09-13: all three as predicted — the strip, the selected segment, the face, the
+    # unselected pill, the caveat, the zone order and the item sentences with their estimate
+    # labels; the picker composites its two rows in slot order with Cloth Cap ticked, and the
+    # replace shot's top zone is Western Wastes with no picker above it.
+    #
+    # THREE THINGS THE PREDICTIONS DID NOT COVER, and the third is the one worth acting on:
+    #   (a) The per-row cap is visible only in the REPLACE shot — "5 more reasons not shown."
+    #       under Western Wastes, which is 8 upgrades minus the 3 named. In the other two no
+    #       zone had more than three, so trap 50's sentence had nothing to say. That is the cap
+    #       behaving, and it took the third staging to photograph it at all.
+    #   (b) The unknown-level line is drawn above the answers in all three, with its Character
+    #       door — the shoot profile has no ding and no statement. Correct, and a reminder that
+    #       Farm Gear is EXEMPT from level: the line says the ranking is unaffected, and for
+    #       this goal that is literally true.
+    #   (c) **THE BLOCK IS TALL, AND THE TWO CAP SENTENCES FALL BELOW THE FOLD** at this
+    #       window size. The note, the strip, the picker, the pill and the four-line catalog
+    #       caveat come before the first answer, so "2 more answers matched" and "103 more
+    #       upgrades are not listed" are off-screen in every one of the three. They are drawn —
+    #       `helperGearWithheld` asserts the number from the same Build — and a player scrolls
+    #       to them. It is a density question rather than a defect, and it is filed in
+    #       `BEVEL.md` against these shots rather than restyled here.
+    'shell-helper-gear' = @{ Title = 'EQBuddy — Helper'
+                           Env = @{ EQBUDDY_SHELL = 'helper' }
+                           Dump = @{ 'Testchar_test-Inventory.txt' = @(
+                               "Location`tName`tID`tCount`tSlots"
+                               "Head`tCloth Cap`t0`t1`t0"
+                               "Neck`tCloth Choker`t0`t1`t0") }
+                           Set = @{
+                               HelperGoals = @{ 'testchar_test' = @('FarmGear') }
+                               HelperWornPicks = @{ 'testchar_test' = @('Cloth Cap') }
+                           } }
+    'shell-helper-gear-picker' = @{ Title = 'EQBuddy — Helper'
+                           Env = @{ EQBUDDY_SHELL = 'helper'; EQBUDDY_HELPER_PICKER = 'worn' }
+                           Popups = $true
+                           Dump = @{ 'Testchar_test-Inventory.txt' = @(
+                               "Location`tName`tID`tCount`tSlots"
+                               "Head`tCloth Cap`t0`t1`t0"
+                               "Neck`tCloth Choker`t0`t1`t0") }
+                           Set = @{
+                               HelperGoals = @{ 'testchar_test' = @('FarmGear') }
+                               HelperWornPicks = @{ 'testchar_test' = @('Cloth Cap') }
+                           } }
+    'shell-helper-gear-replace' = @{ Title = 'EQBuddy — Helper'
+                           Env = @{ EQBUDDY_SHELL = 'helper' }
+                           Dump = @{ 'Testchar_test-Inventory.txt' = @(
+                               "Location`tName`tID`tCount`tSlots"
+                               "Head`tCloth Cap`t0`t1`t0"
+                               "Neck`tCloth Choker`t0`t1`t0") }
+                           Set = @{
+                               Theme = 'Solarized'
+                               HelperGoals = @{ 'testchar_test' = @('FarmGear') }
+                               HelperWornPicks = @{ 'testchar_test' = @('Cloth Cap') }
+                               HelperGearIntent = @{ 'testchar_test' = 'ReplaceSlot' }
+                           } }
+    # ---- DRA-71 D7: motes and money, both from the player's own play ----------------------
+    #
+    # The two staged states are this slice's two claims: what a place has paid you in MOTES,
+    # and what it has paid you in COIN and in things you sold. Both are ranked from evidence
+    # only — the shipped catalog names no real zone for a mote ("Various Zones" on all eleven
+    # records) and its vendor prices are quoted at somebody else's Charisma — so there is no
+    # catalog state to stage and no catalog sentence to photograph.
+    #
+    # EVERYTHING GOES THROUGH THE LOG, which is the point of the staging. `Prime` runs the app
+    # over the fixture and closes it gracefully so the sitting finalizes into history.db; the
+    # extra `Lines` are the real log grammar for the real parsers — a zone line, a consider, the
+    # kills, the mote loot, the coin, and one vendor sale. Nothing is seeded into a store.
+    #
+    # THE FIFTY KILLS ARE NOT DECORATION. `MoteHistory.MinKills` is 50: under it the fold
+    # quotes no rate at all, because one lucky Infinite mote in a real hour is thirty potency
+    # an hour that will never happen again. A shot staged with six kills would photograph the
+    # honest empty state and look exactly like a broken engine (trap 23). They are generated
+    # rather than typed so the count is a number somebody can read and change.
+    #
+    # THE ZONE IS "Najena - Solo", and the name is the only input: `InstanceTier.FromZoneName`
+    # reads D0 off it, which is OUTSIDE the D2-D4 band the mote engine prefers, so the tier
+    # preference fires and draws its sentence. An open-world zone would photograph the engine
+    # with one of its three criteria invisible.
+    #
+    # PREDICTION for 'shell-helper-motes' — one answer, "Najena - Solo", serving Farm Motes and
+    #   Make Money (the cross-domain join firing on one place, which is the whole room). Under
+    #   it: the mote rate with its count and its scope; the coin rate through the one coin
+    #   formatter; "Bone Chips drops here from a shadowed man … and a vendor has paid you …";
+    #   the tier sentence saying EQBuddy ranks motes toward D2-D4 so this one sits lower; and
+    #   the vendor-price note under the answers. The unknown-level line is drawn above them
+    #   with its Character door, as it is in every shot of this room — the shoot profile has
+    #   no ding. The RATES are the fixture's own arithmetic over a compressed hour and are NOT
+    #   predicted (the D4 block above records what guessing them costs).
+    # PREDICTION for 'shell-helper-motes-light' — the same in SOLARIZED, the only light palette.
+    #
+    # SHOT 2026-09-13: every sentence as predicted, in that order, with the join, the tier
+    # sentence and the vendor-price note all present.
+    #
+    # FOUR THINGS THE PREDICTION DID NOT COVER, and two of them changed the code:
+    #   (a) **TWO answers, not one.** West Commonlands comes second, also serving both goals,
+    #       because the SHARED FIXTURE LOG has motes of its own in it and that zone has enough
+    #       kills to clear `MoteHistory.MinKills`. That is the floors behaving exactly as
+    #       designed — the floor is on the ZONE's kills, not the creature's, which is why a
+    #       zone whose motes came off four Ghoul kills still qualifies — and it makes a better
+    #       picture than the single row that was predicted: a ranked list with the staged zone
+    #       on top.
+    #   (b) **The cadence discount FIRES on the staged zone, and only because of (a).** Najena
+    #       runs 44.0 kills an hour against a pooled 95.7, so the sentence is drawn and the
+    #       weight is applied. With one mote zone there would have been no baseline and no
+    #       clause at all — the same "never compare a place with itself" rule D4 photographed,
+    #       visible here by accident.
+    #   (c) **TWO WORDING DEFECTS, FOUND ONLY BY READING THE PICTURE** (trap 23). The first
+    #       take read "Shadowed man gave you 8 motes of it (40 experience) across your 50 kills
+    #       of it" — two pronouns pointing at different things and the first at nothing — and
+    #       "Bone Chips drops here from Shadowed man — 3 of your 50 kills of it", where the 50
+    #       belongs to the creature and reads as kills of the item. Every assertion passed on
+    #       both. `HelperPresentation` was changed and both shots retaken.
+    #   (d) The vendor-price note sits at the very bottom edge and its last line is cut at this
+    #       window size — the same density observation D6 filed against its own gear shots, and
+    #       it is filed in `BEVEL.md` rather than restyled here.
+    'shell-helper-motes' = @{ Title = 'EQBuddy — Helper'
+                           Env = @{ EQBUDDY_SHELL = 'helper' }
+                           Prime = @(
+                               @{ Character = 'Testchar'; Fraction = 1.0; ShiftDays = 1
+                                  Lines = @(
+                                      'You have entered Najena - Solo.'
+                                      'A shadowed man judges you amiably -- looks kind of risky, but you might win. (Lvl: 27)'
+                                  ) + (1..50 | ForEach-Object {
+                                      "You have slain a shadowed man!"
+                                      "You receive 4 silver and 2 copper from the corpse."
+                                  }) + (1..8 | ForEach-Object {
+                                      "--You have looted a Mote of Major Potential from a shadowed man's corpse.--"
+                                  }) + @(
+                                      "--You have looted 2 Bone Chips from a shadowed man's corpse.--"
+                                      "--You have looted 2 Bone Chips from a shadowed man's corpse.--"
+                                      "--You have looted 2 Bone Chips from a shadowed man's corpse.--"
+                                      'You receive 1 gold 2 silver from Lanadin for the Bone Chips(s).'
+                                  ) }
+                           )
+                           Set = @{
+                               HelperGoals = @{ 'testchar_test' = @('FarmMotes', 'MakeMoney') }
+                           } }
+    'shell-helper-motes-light' = @{ Title = 'EQBuddy — Helper'
+                           Env = @{ EQBUDDY_SHELL = 'helper' }
+                           Prime = @(
+                               @{ Character = 'Testchar'; Fraction = 1.0; ShiftDays = 1
+                                  Lines = @(
+                                      'You have entered Najena - Solo.'
+                                      'A shadowed man judges you amiably -- looks kind of risky, but you might win. (Lvl: 27)'
+                                  ) + (1..50 | ForEach-Object {
+                                      "You have slain a shadowed man!"
+                                      "You receive 4 silver and 2 copper from the corpse."
+                                  }) + (1..8 | ForEach-Object {
+                                      "--You have looted a Mote of Major Potential from a shadowed man's corpse.--"
+                                  }) + @(
+                                      "--You have looted 2 Bone Chips from a shadowed man's corpse.--"
+                                      "--You have looted 2 Bone Chips from a shadowed man's corpse.--"
+                                      "--You have looted 2 Bone Chips from a shadowed man's corpse.--"
+                                      'You receive 1 gold 2 silver from Lanadin for the Bone Chips(s).'
+                                  ) }
+                           )
+                           Set = @{
+                               Theme = 'Solarized'
+                               HelperGoals = @{ 'testchar_test' = @('FarmMotes', 'MakeMoney') }
+                           } }
     'shell-gear-narrow' = @{ Title = 'EQBuddy — Gear'
                            Env = @{ EQBUDDY_SHELL = 'gear:gear'; EQBUDDY_SHELL_SIZE = '580x480' }
                            Set = @{
@@ -1546,6 +2380,91 @@ $Shots = [ordered]@{
                            Set = @{
                                SkyQuestChecklist = @(
                                    @{ Id = 'sky-194'; Acquired = $true }   # Azure Ring, held
+                               )
+                           } }
+    # ---- DRA-71 D5: the unlock pick, and the row shape P12 gave these rows --------------
+    #
+    # RE-SHOT 2026-09-13, and 'quest-unlocks' above is a REGRESSION PICTURE of this slice —
+    # its rows changed without its staging changing, which is exactly the shot the
+    # illustration lock exists to keep honest.
+    #
+    # PREDICTION for the re-shot 'quest-unlocks', written before the run:
+    #   * A NEW BUTTON in the filter row, beside the All | Races | Classes chips, reading
+    #     "Any unlock" — nothing is picked, and the face says what the off-state means.
+    #   * Coalition of Tradesfolk: the six guided lines become a dim POINTER line reading
+    #     "Orc centurion · West Commonlands" and ONE visible sentence, the estimate
+    #     ("≈200 more kills of Orc centurion in West Commonlands at +5 each…"). The two
+    #     mover sentences are on the row's HOVER and are not in the picture — a tooltip is
+    #     its own top-level window and PrintWindow does not composite one (trap 79's
+    #     neighbour). Stated rather than staged: 'shell-helper-unlocks' below is where the
+    #     new control is photographed, and the movers' own wording is asserted in
+    #     UnlockGuidanceTests.
+    #   * Knights of Truth: a pointer line and NO sentence under it. It is maxed, so there
+    #     is nothing left to divide and no estimate — the one row in the picture that shows
+    #     what P12 does to a row whose evidence is all prose.
+    #   * Freeport Militia: unchanged and still silent. Not in the faction dump, so no
+    #     mover, no pointer, no hover — absence of evidence stays silence (trap 73).
+    #   * Obtain Azure Ruby Ring: unchanged. "1 of 2 pieces in hand" is a QUANTITY and stays
+    #     on the row; the Sky shape has no creature and so draws no pointer.
+    #
+    # 'quest-unlocks-picked' — the SAME tab with a pick made. A second race is added to the
+    # dump for this shot only, because a filter with one row to filter cannot be seen doing
+    # anything: the pick names Human (Freeport), so Barbarian is hidden and the tab SAYS so.
+    #
+    # PREDICTION: the face reads "Human (Freeport)" (one pick is always named, never
+    # counted); the Races section draws Human (Freeport) alone with the note "1 more unlock
+    # is hidden by your pick. Untick them all to see every one." above it; and the CLASSES
+    # section is untouched — Warrior is still there, with no note over it, because the pick
+    # names nothing in that section. That last one is the whole argument for one flat list
+    # of subject names, and it is the half a screenshot can actually show.
+    # SHOT 2026-09-13: every prediction above came out as written, on both pictures — the
+    # "Any unlock" face in the filter row, the two pointer lines, Knights of Truth's pointer
+    # with no sentence under it, Freeport Militia still silent, the piece count still on the
+    # row, the hidden note over a Races section of one, and the Classes section untouched.
+    #
+    # TWO THINGS THE PREDICTION DID NOT NAME, both correct and both worth knowing:
+    #   1. The TAB BADGE on 'quest-unlocks-picked' reads "Unlocks 0 / 3" — all three, not the
+    #      one in view. That is right: the badge is progress and the pick is a view, and a
+    #      badge that moved when you filtered would be the window telling you that you had
+    #      un-unlocked something.
+    #   2. Knights of Truth's top raiser is "Orc pawn", not the Orc centurion the sibling row
+    #      names. The 2026-09-11 note above recorded that the FIXTURE already carries sixteen
+    #      Knights of Truth lines and that two of them land inside a kill's reward window;
+    #      the pointer is naming the better of those two. The row is the picture's best
+    #      argument for P12 — maxed, nothing to divide, and what your kills DID is one hover
+    #      away instead of two sentences wide.
+    'quest-unlocks-picked' = @{ Title = 'Quest Tracker'
+                           Env = @{ EQBUDDY_QUESTS = 'unlocks' }
+                           Dump = @{
+                               'Testchar_test-Achievements.txt' = @(
+                                   'Untapped Potential: Races'
+                                   "I`tRace Unlock - Human (Freeport)"
+                                   "I`t`tGet maximum faction with Coalition of Tradesfolk."
+                                   "I`t`tGet maximum faction with Knights of Truth."
+                                   "I`tRace Unlock - Barbarian"
+                                   "I`t`tGet maximum faction with Rallosian Army."
+                                   'Untapped Potential: Classes'
+                                   "I`tClass Unlock - Warrior"
+                                   "I`t`tObtain Azure Ruby Ring."
+                               )
+                               'Testchar_test-WAR-Factions.txt' = @(
+                                   "ID`tName`tStandingValue`tPointsToMax"
+                                   "229`tCoalition of Tradefolk`t1000`t1000"
+                                   "304`tKnights of Truth`t2000`t0"
+                               )
+                           }
+                           Append = @(
+                               'You have slain an orc centurion!'
+                               'Your faction standing with Coalition of Tradefolk has been adjusted by 5.'
+                               'You have slain an orc centurion!'
+                               'Your faction standing with Coalition of Tradefolk has been adjusted by 5.'
+                               'You have slain an orc centurion!'
+                               'Your faction standing with Coalition of Tradefolk has been adjusted by 5.'
+                           )
+                           Set = @{
+                               UnlockPicks = @{ 'testchar_test' = @('Human (Freeport)') }
+                               SkyQuestChecklist = @(
+                                   @{ Id = 'sky-194'; Acquired = $true }
                                )
                            } }
     # The #243 leftover bands plus the inventory import report (Hateborne, 2026-09-03),
@@ -3523,7 +4442,20 @@ try {
         # Unconditional and before the early return, for trap 51's own reason — a shot with
         # no Prime of its own must not inherit the last shot's archive either.
         Remove-Item (Join-Path $profileDir 'history.db*') -Force -ErrorAction SilentlyContinue
-        Write-Settings $spec.Set
+        # A `Popups` shot composites every EMPTY-TITLED window of this process that overlaps
+        # the room (shot.ps1 -WithPopups). The widget's own chip-row and peek windows are
+        # empty-titled too, and the batch parks the widget at the same origin as the shell —
+        # so this moves it clear rather than teaching the compositor to tell one process's
+        # popups apart from another of its own windows' popups, which it cannot do.
+        $set = if ($spec.Set) { $spec.Set.Clone() } else { @{} }
+        if ($spec.Popups) {
+            $o = Get-EqShotOrigin
+            # Far enough right that it clears the widest shell shot (946 wide) with room to
+            # spare, and level with it so it stays on the same monitor.
+            $set['WindowLeft'] = [int]($o.Left + 1100)
+            $set['WindowTop']  = [int]$o.Top
+        }
+        Write-Settings $set
         Write-Ledger $spec.Ledger
         Write-Raids $spec.Raids
         Write-Dump $spec.Dump
@@ -3675,7 +4607,12 @@ try {
             # -OwnerPid, so a previous shot's app that is still exiting cannot be
             # photographed under this shot's name: four Progress-theme shots share the
             # title 'EQBuddy Progress', and a title is not an identity.
-            & (Join-Path $PSScriptRoot 'shot.ps1') -TitleLike $spec.Title -Out $png -OwnerPid $proc.Id | Write-Host
+            # `Popups = $true` on a row whose SUBJECT is a dropdown: a WPF Popup is its
+            # own top-level HWND and PrintWindow on the owner cannot see it, so shot.ps1
+            # renders the popups separately and composites them (see its -WithPopups). Still
+            # occlusion-proof — this is NOT a screen grab.
+            & (Join-Path $PSScriptRoot 'shot.ps1') -TitleLike $spec.Title -Out $png `
+                -OwnerPid $proc.Id -WithPopups:([bool]$spec.Popups) | Write-Host
             $taken += $png
         }
         finally {

@@ -1,0 +1,868 @@
+using EQBuddy.Core;
+using EQBuddy.UI.Shared;
+using Xunit;
+
+namespace EQBuddy.Tests;
+
+/// <summary>
+/// **THE RECOMMENDER** (DRA-70 D1; PRD §12 HOME-001..006).
+///
+/// <para>The rows that matter most are the JOIN (HOME-005 — a place serving two of your
+/// goals outranks either alone, which the PRD calls the key differentiator) and the
+/// SILENCES: a goal with no evidence must produce a named gap rather than a template with a
+/// guessed number in it (trap 73), and a zone you have never died in must produce no
+/// survival claim at all (HOME-006).</para>
+/// </summary>
+public class RecommendationsTests
+{
+    // ---- fixtures -------------------------------------------------------------------
+
+    private static SessionRow Session(string zone, double hours, double xp, int deaths = 0) =>
+        new(1, "erollisi", "Dranak", DateTime.Today, DateTime.Today.AddHours(hours),
+            hours * 3600, hours * 3600, "ended", zone, 0, xp, 0, 0, deaths, 0, "", "");
+
+    private static MobSummary Mob(
+        string name, string zone, int kills, double fightSeconds = 30,
+        params (string Faction, int Delta)[] factions) =>
+        new(name, kills, kills, fightSeconds, 0, 0, [])
+        {
+            Zone = zone,
+            Factions = [.. factions.Select(f => new MobFactionHit(f.Faction, f.Delta, kills))],
+        };
+
+    /// <summary>The same creature with a CONNED band on it — <c>/consider</c>'s own reading,
+    /// which is the only thing in this repo that knows how hard a zone's creatures are and
+    /// therefore the only input P6's discount is allowed to rest on.</summary>
+    private static MobSummary Conned(
+        string name, string zone, int kills, int levelMin, int levelMax) =>
+        Mob(name, zone, kills) with { LevelMin = levelMin, LevelMax = levelMax };
+
+    private static FactionsFile.Snapshot Dump(params (string Name, int Value, int ToMax)[] rows) =>
+        new("factions.txt", DateTime.Today,
+            [.. rows.Select((r, i) => new FactionsFile.Standing(i + 1, r.Name, r.Value, r.ToMax))]);
+
+    private static UnlockProgress Unlock(
+        string subject, bool complete, params UnlockCriterion[] criteria) =>
+        new("Untapped Potential: Races", $"Race Unlock - {subject}", subject, complete, false,
+            criteria);
+
+    private static UnlockCriterion Faction(string name, bool done = false) =>
+        new(UnlockNeed.MaxFaction, $"Get maximum faction with {name}.", name, done);
+
+    private static HelperInputs Inputs(
+        IReadOnlyList<SessionRow>? sessions = null,
+        IReadOnlyList<MobSummary>? pool = null,
+        FactionsFile.Snapshot? factions = null,
+        IReadOnlyList<string>? picked = null,
+        IReadOnlyList<UnlockProgress>? races = null,
+        bool hasAchievements = false,
+        ResolvedLevel level = default,
+        IReadOnlyList<UnlockProgress>? classes = null,
+        IReadOnlyList<string>? unlockPicks = null)
+    {
+        var mobs = pool ?? [];
+        return new HelperInputs(
+            ZoneHistory.Fold(sessions ?? [], mobs), mobs, factions, picked ?? [],
+            races ?? [], classes ?? [], unlockPicks ?? [], hasAchievements, [], [], null, level);
+    }
+
+    /// <summary>A resolved level, as the ledger would hand one over. The SOURCE is
+    /// deliberately a parameter nobody defaults: a fixture that always said "observed" could
+    /// not notice an engine that quietly cared which of the two writers won.</summary>
+    private static ResolvedLevel At(int level, LevelSource source = LevelSource.Observed) =>
+        new(level, source, new DateTime(2026, 9, 12, 20, 0, 0));
+
+    // ---- 1. the join, which is the feature -------------------------------------------
+
+    /// <summary>
+    /// **HOME-005, and the shape of the PRD's own worked example.**
+    ///
+    /// Lower Guk is where this character levels fastest AND where the creatures that raise
+    /// the faction they picked live. Kaesora is faster on paper. The answer is Lower Guk,
+    /// because the player's evening is spent in one place and serving two goals in one place
+    /// is worth more than being marginally better at one of them.
+    /// </summary>
+    [Fact]
+    public void APlaceServingTwoGoalsOutranksAFasterPlaceServingOne()
+    {
+        var set = Recommendations.Rank(Inputs(
+            sessions: [Session("Kaesora", 4, 60), Session("Lower Guk", 4, 40)],
+            pool:
+            [
+                Mob("a froglok tad", "Lower Guk", 200, factions: ("Frogloks of Guk", 5)),
+                Mob("a hierophant", "Kaesora", 80),
+            ],
+            factions: Dump(("Frogloks of Guk", 500, 1500)),
+            picked: ["Frogloks of Guk"]),
+            [HelperGoal.LevelUp, HelperGoal.WorkOnFaction]);
+
+        var top = set.Top[0];
+        Assert.Equal("Lower Guk", top.Zone);
+        Assert.Equal(2, top.Goals.Count);
+        Assert.Contains(HelperGoal.LevelUp, top.Goals);
+        Assert.Contains(HelperGoal.WorkOnFaction, top.Goals);
+        // Kaesora is still offered — the join is a SORT, never a filter that hides the
+        // faster camp from somebody who only wanted experience.
+        Assert.Contains(set.Top, r => r.Zone == "Kaesora");
+        // And the merged row carries both engines' reasons and both engines' doors.
+        Assert.Contains(top.Why, w => w is ZoneXpRateFact);
+        Assert.Contains(top.Why, w => w is FactionStandingFact);
+        Assert.Contains(top.Doors, d => d.Kind == HelperDoorKind.WikiFaction);
+    }
+
+    /// <summary>**The negative that keeps the join from being vacuous** (trap 39): the same
+    /// two goals in DIFFERENT places do not merge, and the faster camp wins on its own
+    /// terms.</summary>
+    [Fact]
+    public void TwoGoalsInDifferentPlacesStayTwoAnswers()
+    {
+        var set = Recommendations.Rank(Inputs(
+            sessions: [Session("Kaesora", 4, 60), Session("Lower Guk", 4, 40)],
+            pool:
+            [
+                Mob("a froglok tad", "Lower Guk", 200),
+                Mob("a hierophant", "Kaesora", 80),
+                Mob("a dervish cutthroat", "North Ro", 50, factions: ("Freeport Militia", 5)),
+            ],
+            factions: Dump(("Freeport Militia", 500, 1500)),
+            picked: ["Freeport Militia"]),
+            [HelperGoal.LevelUp, HelperGoal.WorkOnFaction]);
+
+        Assert.All(set.Top, r => Assert.Single(r.Goals));
+        Assert.Equal("Kaesora", set.Top[0].Zone);
+        Assert.Contains(set.Top, r => r.Zone == "North Ro");
+    }
+
+    /// <summary>
+    /// **A MERGED ROW GIVES EVERY GOAL IT CLAIMS A SENTENCE, AND THE CAP CANNOT TAKE THE LAST
+    /// ONE** (DRA-71 D7).
+    ///
+    /// <para><b>A launched app found this and no unit test had.</b> Three engines answering
+    /// about one zone — Level Up, Farm Motes and Make Money, which is the differentiator working
+    /// exactly as designed — put ten sentences on one row against a <see cref="Recommendations.WhyCap"/>
+    /// of six. The merge concatenated the parts and the cap trims the TAIL, so the row drew a
+    /// headline reading "Level Up · Farm Motes · Make Money" over six sentences of which not one
+    /// was about money. Every component was correct and the row lied about itself.</para>
+    ///
+    /// <para>The fix is round-robin rather than a bigger cap: at any cap of one per part, every
+    /// goal in the headline keeps a sentence. This asserts the property rather than the
+    /// implementation — for each goal the row serves, at least one drawn fact belongs to an
+    /// engine that could only have produced it.</para>
+    /// </summary>
+    [Fact]
+    public void EveryGoalAMergedRowClaimsKeepsASentenceUnderTheCap()
+    {
+        var pool = new[]
+        {
+            // An INSTANCE, and the name is the only input: "Najena - Solo" decodes to D0, which
+            // is outside the D2-D4 band the mote engine prefers. That is what pushes this row
+            // past the cap (eight sentences against six) so the trimming is actually exercised
+            // rather than assumed.
+            Mob("a shadowed man", "Najena - Solo", 400) with
+            {
+                Loot =
+                [
+                    new MobLoot("Mote of Major Potential", 9, null),
+                    new MobLoot("Froglok Blood", 20, null),
+                ],
+            },
+        };
+        var sessions = new[]
+        {
+            new SessionRow(1, "erollisi", "Dranak", DateTime.Today, DateTime.Today.AddHours(5),
+                5 * 3600, 5 * 3600, "ended", "Najena - Solo", 0, 60, 50_000, 0, 0, 0, "", ""),
+        };
+        var zones = ZoneHistory.Fold(sessions, pool);
+        var inputs = new HelperInputs(
+            zones, pool, null, [], [], [], [], false, [], [], null, ResolvedLevel.Unknown)
+        {
+            Motes = MoteHistory.Fold(pool, zones),
+            Sales = [new SaleRoll("Froglok Blood", 4, 320)],
+        };
+
+        var top = Assert.Single(Recommendations.Rank(
+            inputs, [HelperGoal.LevelUp, HelperGoal.FarmMotes, HelperGoal.MakeMoney]).Top);
+
+        // The join fired: one place, three goals.
+        Assert.Equal(3, top.Goals.Count);
+        Assert.True(top.Why.Count <= Recommendations.WhyCap);
+
+        // …and each of the three has something to show for itself on the row.
+        Assert.NotEmpty(top.Why.OfType<ZoneXpRateFact>());        // Level Up
+        Assert.NotEmpty(top.Why.OfType<ZoneMoteRateFact>());      // Farm Motes
+        Assert.NotEmpty(top.Why.OfType<ZoneCoinRateFact>());      // Make Money
+
+        // A cap that trimmed says so, which is trap 50 one level down from the list's own cap.
+        Assert.True(top.WithheldWhy > 0,
+            "the row dropped sentences without reporting it");
+    }
+
+    /// <summary>An unlock whose faction grind happens where you already level joins the same
+    /// way — the cross-domain chain is not a special case of two particular goals.</summary>
+    [Fact]
+    public void AnUnlocksFactionGrindJoinsTheZoneYouLevelIn()
+    {
+        var set = Recommendations.Rank(Inputs(
+            sessions: [Session("Neriak Foreign Quarter", 5, 30)],
+            pool: [Mob("a Neriak guard", "Neriak Foreign Quarter", 120,
+                factions: ("Dark Bargainers", 4))],
+            factions: Dump(("Dark Bargainers", 1200, 800)),
+            races: [Unlock("Dark Elf", false, Faction("Dark Bargainers"))],
+            hasAchievements: true),
+            [HelperGoal.LevelUp, HelperGoal.UnlockRaces]);
+
+        var top = set.Top[0];
+        Assert.Equal("Neriak Foreign Quarter", top.Zone);
+        Assert.Equal(RecommendationKind.Zone, top.Kind);
+        Assert.Equal(2, top.Goals.Count);
+        // The unlock's own name survives inside its why-line, which is what makes the merged
+        // headline honest: the row is named for the place you travel to, and the thing you
+        // are working on is still said out loud.
+        Assert.Contains(top.Why, w => w is UnlockScoreFact { Subject: "Dark Elf" });
+    }
+
+    // ---- 2. the cap says so out loud ---------------------------------------------------
+
+    /// <summary>HOME-002 wants three, and trap 50 wants the cap to admit what it held
+    /// back — the fourth-best camp is exactly the one somebody is hunting for.</summary>
+    [Fact]
+    public void TheCapIsThreeAndItReportsWhatItWithheld()
+    {
+        var set = Recommendations.Rank(Inputs(
+            sessions: [Session("A", 2, 20), Session("B", 2, 18), Session("C", 2, 16),
+                       Session("D", 2, 14), Session("E", 2, 12)],
+            pool: [Mob("m", "A", 5), Mob("m", "B", 5), Mob("m", "C", 5),
+                   Mob("m", "D", 5), Mob("m", "E", 5)]),
+            [HelperGoal.LevelUp]);
+
+        Assert.Equal(3, set.Top.Count);
+        Assert.Equal(2, set.Withheld);
+        Assert.Contains("2 more answers", HelperPresentation.Cap(set.Withheld));
+    }
+
+    /// <summary>A per-row cap on the reasons, with the same rule: personal evidence survives
+    /// the trim first, and the trimmed row keeps the order the engines emitted.</summary>
+    [Fact]
+    public void AnOverLongWhyListIsTrimmedAndSaysSo()
+    {
+        var set = Recommendations.Rank(Inputs(
+            sessions: [Session("Neriak Foreign Quarter", 5, 30, deaths: 2)],
+            pool:
+            [
+                Mob("a Neriak guard", "Neriak Foreign Quarter", 120,
+                    factions: ("Dark Bargainers", 4)),
+                Mob("a Neriak trader", "Neriak Foreign Quarter", 60,
+                    factions: ("Dark Bargainers", 3)),
+                Mob("a Neriak smith", "Neriak Foreign Quarter", 30,
+                    factions: ("Dark Bargainers", 2)),
+                Mob("a Neriak servant", "Neriak Foreign Quarter", 10,
+                    factions: ("Dark Bargainers", 1)),
+            ],
+            factions: Dump(("Dark Bargainers", 1200, 800)),
+            picked: ["Dark Bargainers"]),
+            [HelperGoal.LevelUp, HelperGoal.WorkOnFaction]);
+
+        var top = set.Top[0];
+        Assert.True(top.Why.Count <= Recommendations.WhyCap);
+        Assert.True(top.WithheldWhy > 0);
+        Assert.NotEmpty(HelperPresentation.WithheldWhy(top.WithheldWhy));
+    }
+
+    // ---- 3. HOME-006 ---------------------------------------------------------------------
+
+    /// <summary>
+    /// **A zone you have never died in produces NO survival fact at all.**
+    ///
+    /// <para>This is HOME-006 at the only place it can be enforced — the engine. "You have
+    /// not died here" is one sitting away from being false, and a recommender that offered it
+    /// would be making exactly the claim the requirement forbids. The absence of evidence is
+    /// silence, not reassurance.</para>
+    /// </summary>
+    [Fact]
+    public void AZoneWithNoDeathsSaysNothingAboutDying()
+    {
+        var clean = Recommendations.Rank(Inputs(
+            sessions: [Session("Lower Guk", 4, 40, deaths: 0)],
+            pool: [Mob("a froglok tad", "Lower Guk", 200)]), [HelperGoal.LevelUp]);
+        Assert.DoesNotContain(clean.Top[0].Why, w => w is ZoneDeathsFact);
+
+        // The positive half, so the row above is not merely asserting that the fixture has
+        // no deaths in it: the same zone with deaths DOES report them, as a count.
+        var died = Recommendations.Rank(Inputs(
+            sessions: [Session("Lower Guk", 4, 40, deaths: 3)],
+            pool: [Mob("a froglok tad", "Lower Guk", 200)]), [HelperGoal.LevelUp]);
+        var fact = Assert.Single(died.Top[0].Why.OfType<ZoneDeathsFact>());
+        Assert.Equal(3, fact.Deaths);
+    }
+
+    // ---- 4. evidence tagging (HOME-003 / HOME-004) ----------------------------------------
+
+    /// <summary>Every line the engine produces is tagged. An untagged line is not
+    /// constructible — <see cref="WhyFact"/> takes the tag in its own constructor — so what
+    /// this asserts is that no engine reaches for the wrong one.</summary>
+    [Fact]
+    public void EveryLineFromTheLevelUpAndFactionEnginesIsThePlayersOwnEvidence()
+    {
+        var set = Recommendations.Rank(Inputs(
+            sessions: [Session("Lower Guk", 4, 40, deaths: 1)],
+            pool: [Mob("a froglok tad", "Lower Guk", 200, factions: ("Frogloks of Guk", 5))],
+            factions: Dump(("Frogloks of Guk", 500, 1500)),
+            picked: ["Frogloks of Guk"]),
+            [HelperGoal.LevelUp, HelperGoal.WorkOnFaction]);
+
+        Assert.All(set.Top.SelectMany(r => r.Why),
+            w => Assert.Equal(Evidence.Personal, w.Evidence));
+    }
+
+    /// <summary>
+    /// **The one catalog-sourced line D1 ships, asserted as a fact about this delivery.**
+    ///
+    /// <para>The Level Up engine has no generic camp catalog to fall back on and the plan
+    /// PARKS one; the faction and unlock engines read the player's own dumps. So a Task
+    /// criterion matching the shipped quest catalog by name is the only claim here that comes
+    /// from a file EQBuddy ships — and it is the only one that carries the estimate label.</para>
+    ///
+    /// <para>This row is meant to be EDITED. The day D2's gear or motes engine adds a catalog
+    /// line, somebody has to come here and say so, which is the difference between a decision
+    /// and a drift.</para>
+    /// </summary>
+    [Fact]
+    public void TheOnlyCatalogSourcedLineInThisDeliveryIsAMatchedQuestName()
+    {
+        var catalog = new QuestCatalog
+        {
+            Quests = [new QuestEntry { Name = "Aid the Kerrans of Kerra Isle" }],
+        };
+        var inputs = Inputs(hasAchievements: true,
+            races: [Unlock("Kerra", false,
+                new UnlockCriterion(UnlockNeed.Task,
+                    "Complete the 'Aid the Kerrans of Kerra Isle' Task.",
+                    "Aid the Kerrans of Kerra Isle", false))])
+            with { Catalog = catalog };
+
+        var set = Recommendations.Rank(inputs, [HelperGoal.UnlockRaces]);
+        var line = Assert.Single(set.Top.SelectMany(r => r.Why).OfType<CatalogQuestFact>());
+        Assert.Equal("Aid the Kerrans of Kerra Isle", line.Quest);
+        Assert.Equal(Evidence.Catalog, line.Evidence);
+        Assert.Contains(HelperPresentation.CatalogLabel, HelperPresentation.Why(line));
+    }
+
+    // ---- the unlock PICK narrows the engine (DRA-71 D5, plan P11) ----------------------
+
+    /// <summary>
+    /// **THE PICK NARROWS THE ENGINE, NOT THE ROOM.** It is applied inside
+    /// <c>Recommendations.Rank</c> so the phone gets it the day it calls the same method —
+    /// porting a feature TO a surface is the signal its logic never went through the shared
+    /// layer — and asserting it here rather than through a launched window is what makes that
+    /// claim testable at all.
+    /// </summary>
+    [Fact]
+    public void APickedUnlockIsTheOnlyOneTheEngineAnswersAbout()
+    {
+        var inputs = Inputs(hasAchievements: true, races:
+        [
+            Unlock("Iksar", false, Faction("Cabilis Residents")),
+            Unlock("Ogre", false, Faction("Rallos Zek")),
+        ]) with { UnlockPicks = ["Ogre"] };
+
+        var set = Recommendations.Rank(inputs, [HelperGoal.UnlockRaces]);
+
+        Assert.Equal(["Ogre"], set.Top.SelectMany(r => r.Why).OfType<UnlockScoreFact>()
+            .Select(f => f.Subject));
+    }
+
+    /// <summary>**Nothing picked weighs every one of them** — filter semantics, and the
+    /// negative the assertion above needs (trap 39). It is also the state every existing
+    /// profile is in, so getting it backwards would have emptied both unlock goals for every
+    /// player on upgrade.</summary>
+    [Fact]
+    public void NothingPickedWeighsEveryUnlock()
+    {
+        var inputs = Inputs(hasAchievements: true, races:
+        [
+            Unlock("Iksar", false, Faction("Cabilis Residents")),
+            Unlock("Ogre", false, Faction("Rallos Zek")),
+        ]);
+
+        var set = Recommendations.Rank(inputs, [HelperGoal.UnlockRaces]);
+
+        Assert.Equal(["Iksar", "Ogre"], set.Top.SelectMany(r => r.Why).OfType<UnlockScoreFact>()
+            .Select(f => f.Subject).Order(StringComparer.Ordinal));
+    }
+
+    /// <summary>
+    /// **A RACE PICK DOES NOT EMPTY THE CLASS HALF.** One flat list of subject names serves
+    /// both engines, and the narrowing is per section — so a player working on Ogre still
+    /// gets every class answer. Without this, picking a race would silently delete half the
+    /// Helper's unlock output with no control on screen able to explain it.
+    /// </summary>
+    [Fact]
+    public void APickInOneSectionLeavesTheOtherWhole()
+    {
+        var inputs = Inputs(hasAchievements: true,
+            races: [Unlock("Iksar", false, Faction("Cabilis Residents")),
+                    Unlock("Ogre", false, Faction("Rallos Zek"))],
+            classes: [Unlock("Necromancer", false, Faction("Neriak Third Gate")),
+                      Unlock("Paladin", false, Faction("Knights of Truth"))])
+            with { UnlockPicks = ["Ogre"] };
+
+        var set = Recommendations.Rank(inputs,
+            [HelperGoal.UnlockRaces, HelperGoal.UnlockClasses], cap: 10);
+
+        Assert.Equal(["Necromancer", "Ogre", "Paladin"],
+            set.Top.SelectMany(r => r.Why).OfType<UnlockScoreFact>()
+                .Select(f => f.Subject).Order(StringComparer.Ordinal));
+    }
+
+    /// <summary>A quest the catalog does NOT know produces no line and no door — silence is
+    /// the honest answer and a fuzzy match would open the wrong page with complete
+    /// confidence (<c>UnlockGuidance</c>'s own rule, inherited).</summary>
+    [Fact]
+    public void AQuestTheCatalogDoesNotKnowProducesNoCatalogLine()
+    {
+        var inputs = Inputs(hasAchievements: true,
+            races: [Unlock("Kerra", false,
+                new UnlockCriterion(UnlockNeed.Task, "Complete the 'Something Else' Task.",
+                    "Something Else", false))])
+            with { Catalog = new QuestCatalog() };
+
+        var set = Recommendations.Rank(inputs, [HelperGoal.UnlockRaces]);
+        Assert.Empty(set.Top.SelectMany(r => r.Why).OfType<CatalogQuestFact>());
+        Assert.DoesNotContain(set.Top.SelectMany(r => r.Doors),
+            d => d.Kind == HelperDoorKind.QuestCatalog);
+    }
+
+    /// <summary>
+    /// **HOME-003 is the SORT, and it is a BOOLEAN sort.**
+    ///
+    /// <para>"Personal evidence outranks generic advice" does not say more sentences outrank
+    /// fewer, and ranking on the line count makes it say that — a faction grind with four
+    /// movers would beat the fastest camp this character has ever farmed, on volume. A count
+    /// is a proxy for confidence and a proxy is a claim about the world (trap 64b). So the
+    /// question asked is HOME-003's own: does this rest on your play at all.</para>
+    /// </summary>
+    [Fact]
+    public void PersonalEvidenceIsAskedAsAYesNoAndNotAsALineCount()
+    {
+        var set = Recommendations.Rank(Inputs(
+            sessions: [Session("Lower Guk", 4, 40, deaths: 2)],
+            pool: [Mob("a froglok tad", "Lower Guk", 200, fightSeconds: 25)]),
+            [HelperGoal.LevelUp]);
+
+        // Rate + cadence + deaths: three personal lines, all from the same zone's own row.
+        Assert.Equal(3, set.Top[0].PersonalWhy);
+        Assert.True(set.Top[0].HasPersonalEvidence);
+    }
+
+    /// <summary>
+    /// **The sort that the line count used to get wrong**, kept as its own row because it is
+    /// the one a reader would otherwise have to take on trust.
+    ///
+    /// <para>Kaesora is the fastest camp this character has. The faction grind in North Ro
+    /// carries more SENTENCES — a standing, three movers and an estimate — and both rows serve
+    /// exactly one goal and both rest on the player's own play. Ranking on the count put North
+    /// Ro first, which is a recommender preferring the answer it had more to say about.</para>
+    /// </summary>
+    [Fact]
+    public void MoreSentencesDoesNotOutrankABetterMeasuredCamp()
+    {
+        var set = Recommendations.Rank(Inputs(
+            sessions: [Session("Kaesora", 4, 60)],
+            pool:
+            [
+                Mob("a hierophant", "Kaesora", 80),
+                Mob("a dervish cutthroat", "North Ro", 50, factions: ("Freeport Militia", 5)),
+                Mob("a dervish priest", "North Ro", 40, factions: ("Freeport Militia", 4)),
+                Mob("a dervish thief", "North Ro", 30, factions: ("Freeport Militia", 3)),
+            ],
+            factions: Dump(("Freeport Militia", 500, 1500)),
+            picked: ["Freeport Militia"]),
+            [HelperGoal.LevelUp, HelperGoal.WorkOnFaction]);
+
+        Assert.Equal("Kaesora", set.Top[0].Zone);
+        Assert.True(set.Top.First(r => r.Zone == "North Ro").PersonalWhy > set.Top[0].PersonalWhy);
+    }
+
+    // ---- 5. the silences -------------------------------------------------------------------
+
+    /// <summary>A goal with nothing behind it names the store it is waiting for, and does not
+    /// invent a level-range table EQBuddy has never had (trap 73).</summary>
+    [Fact]
+    public void EachAnswerableGoalWithNoEvidenceProducesItsOwnNamedGap()
+    {
+        var set = Recommendations.Rank(HelperInputs.Nothing,
+            [HelperGoal.LevelUp, HelperGoal.WorkOnFaction, HelperGoal.UnlockRaces]);
+
+        Assert.Empty(set.Top);
+        Assert.Contains(set.Gaps, g => g is { Goal: HelperGoal.LevelUp, Reason: GoalGapReason.NoPlayHistory });
+        Assert.Contains(set.Gaps, g => g is { Goal: HelperGoal.WorkOnFaction, Reason: GoalGapReason.NoFactionDump });
+        Assert.Contains(set.Gaps, g => g is { Goal: HelperGoal.UnlockRaces, Reason: GoalGapReason.NoAchievementsDump });
+        Assert.All(set.Gaps, g => Assert.NotEmpty(HelperPresentation.Gap(g)));
+    }
+
+    /// <summary>A dump that exists with nothing picked is a different state from no dump at
+    /// all, and the answer is a picker rather than a command.</summary>
+    [Fact]
+    public void AFactionDumpWithNothingPickedAsksForAPickAndNotForACommand()
+    {
+        var set = Recommendations.Rank(
+            Inputs(factions: Dump(("Frogloks of Guk", 500, 1500))), [HelperGoal.WorkOnFaction]);
+
+        var gap = Assert.Single(set.Gaps);
+        Assert.Equal(GoalGapReason.NoFactionPicked, gap.Reason);
+        Assert.DoesNotContain("command", HelperPresentation.Gap(gap), StringComparison.OrdinalIgnoreCase);
+    }
+
+    /// <summary>A maxed faction is a finished job and not a recommendation — and when every
+    /// pick is finished, the goal says THAT rather than looking like a data gap.</summary>
+    [Fact]
+    public void EveryPickedFactionMaxedReadsAsFinishedRatherThanAsMissingData()
+    {
+        var set = Recommendations.Rank(Inputs(
+            factions: Dump(("Frogloks of Guk", 2000, 0)),
+            picked: ["Frogloks of Guk"]), [HelperGoal.WorkOnFaction]);
+
+        Assert.Empty(set.Top);
+        Assert.Equal(GoalGapReason.NothingLeftToDo, Assert.Single(set.Gaps).Reason);
+    }
+
+    /// <summary>An unlock that is already complete is not recommended, and a half the player
+    /// has finished entirely reads as finished.</summary>
+    [Fact]
+    public void ACompletedUnlockIsNotRecommended()
+    {
+        var set = Recommendations.Rank(Inputs(
+            hasAchievements: true,
+            races: [Unlock("Dark Elf", true, Faction("Dark Bargainers", done: true))]),
+            [HelperGoal.UnlockRaces]);
+
+        Assert.Empty(set.Top);
+        Assert.Equal(GoalGapReason.NothingLeftToDo, Assert.Single(set.Gaps).Reason);
+    }
+
+    // ---- 6. the chips ----------------------------------------------------------------------
+
+    /// <summary>**Nothing picked means all of them** — HOME-001's "goals/filters rather than a
+    /// permanent wall of sections", read the way every other filter in this app works.</summary>
+    [Fact]
+    public void NoChipsPickedWeighsEveryGoal()
+    {
+        var inputs = Inputs(
+            sessions: [Session("Lower Guk", 4, 40)],
+            pool: [Mob("a froglok tad", "Lower Guk", 200)]);
+
+        var none = Recommendations.Rank(inputs, []);
+        var all = Recommendations.Rank(inputs, Recommendations.All);
+
+        Assert.Equal(all.Top.Count, none.Top.Count);
+        Assert.Equal(all.NotAnsweredYet, none.NotAnsweredYet);
+        Assert.Equal(all.Gaps.Count, none.Gaps.Count);
+        // And null is the same answer as empty — a caller with no stored selection at all.
+        Assert.Equal(all.Top.Count, Recommendations.Rank(inputs, null).Top.Count);
+    }
+
+    /// <summary>A goal that is NOT picked contributes nothing — not a recommendation, not a
+    /// gap and not a "not yet" line. A filter that still reported about what it filtered out
+    /// would not be a filter.</summary>
+    [Fact]
+    public void AnUnpickedGoalIsSilentInEveryDirection()
+    {
+        var set = Recommendations.Rank(Inputs(
+            sessions: [Session("Lower Guk", 4, 40)],
+            pool: [Mob("a froglok tad", "Lower Guk", 200)]), [HelperGoal.LevelUp]);
+
+        Assert.Empty(set.NotAnsweredYet);
+        Assert.Empty(set.Gaps);
+        Assert.All(set.Top, r => Assert.Equal([HelperGoal.LevelUp], r.Goals));
+    }
+
+    /// <summary>A deferred goal that IS picked comes back as one, so the room can say so.
+    /// It is not a gap — a gap means a store is missing, and these are waiting on code.</summary>
+    [Fact]
+    public void APickedDeferredGoalComesBackAsNotAnsweredYetRatherThanAsAGap()
+    {
+        // Farm Materials since DRA-71 D7 — Farm Motes, which stood here after D6, gained its
+        // engine in that slice and now answers a GAP ("no mote has dropped for you") instead.
+        // The subject of this test keeps moving because the feature keeps landing; the
+        // distinction it exists for does not: a gap means a store is missing, a deferral means
+        // code is.
+        var set = Recommendations.Rank(HelperInputs.Nothing, [HelperGoal.FarmMaterials]);
+        Assert.Equal([HelperGoal.FarmMaterials], set.NotAnsweredYet);
+        Assert.Empty(set.Gaps);
+        Assert.NotEmpty(HelperPresentation.NotAnsweredYet(HelperGoal.FarmMaterials));
+    }
+
+    // ---- 7. the doors are real ---------------------------------------------------------------
+
+    /// <summary>
+    /// **Every door a real ranking produces lands on a room that has actually landed, or on
+    /// the wiki.**
+    ///
+    /// <para>The room counts this from a launched app (<c>helperDeadDoors</c>) because only a
+    /// launched app can say a control exists; this catches the same failure without one, over
+    /// doors the ENGINE emitted rather than doors a fixture named.</para>
+    /// </summary>
+    [Fact]
+    public void NoDoorFromARealRankingLeadsNowhere()
+    {
+        var set = Recommendations.Rank(Inputs(
+            sessions: [Session("Neriak Foreign Quarter", 5, 30)],
+            pool: [Mob("a Neriak guard", "Neriak Foreign Quarter", 120,
+                factions: ("Dark Bargainers", 4))],
+            factions: Dump(("Dark Bargainers", 1200, 800)),
+            picked: ["Dark Bargainers"],
+            races: [Unlock("Dark Elf", false, Faction("Dark Bargainers"))],
+            hasAchievements: true),
+            Recommendations.All);
+
+        var doors = set.Top.SelectMany(r => r.Doors).ToList();
+        Assert.NotEmpty(doors);
+        foreach (var door in doors)
+        {
+            var address = HelperPresentation.AddressFor(door.Kind);
+            if (address is null) { Assert.Equal(HelperDoorKind.WikiFaction, door.Kind); continue; }
+            var parsed = ShellPages.ParseAddress(address);
+            Assert.NotNull(parsed);
+            Assert.Contains(parsed!.Value.Page, ShellPages.Landed);
+        }
+    }
+
+    /// <summary>One door per destination on a merged row. Two engines both offering the World
+    /// room for the same zone is one link, not two — a row with the same word twice reads as
+    /// a rendering bug.</summary>
+    [Fact]
+    public void AMergedRowDoesNotDrawTheSameDoorTwice()
+    {
+        var set = Recommendations.Rank(Inputs(
+            sessions: [Session("Neriak Foreign Quarter", 5, 30)],
+            pool: [Mob("a Neriak guard", "Neriak Foreign Quarter", 120,
+                factions: ("Dark Bargainers", 4))],
+            factions: Dump(("Dark Bargainers", 1200, 800)),
+            picked: ["Dark Bargainers"]),
+            [HelperGoal.LevelUp, HelperGoal.WorkOnFaction]);
+
+        var top = set.Top[0];
+        Assert.Equal(2, top.Goals.Count);
+        Assert.Equal(top.Doors.Count, top.Doors.Distinct().Count());
+        Assert.Single(top.Doors, d => d.Kind == HelperDoorKind.World);
+    }
+
+    // ---- 8. the whole answer renders -----------------------------------------------------------
+
+    /// <summary>
+    /// **Every sentence a real ranking produces is non-empty.**
+    ///
+    /// <para>The must-list walks fact SHAPES; this walks what an actual fixture produced,
+    /// including the pass-through lines <c>UnlockGuidance</c> wrote — which no reflection over
+    /// <c>WhyFact</c> subtypes can reach, because they are one shape carrying many
+    /// sentences.</para>
+    /// </summary>
+    [Fact]
+    public void EverySentenceARealRankingProducesIsDrawable()
+    {
+        var set = Recommendations.Rank(Inputs(
+            sessions: [Session("Neriak Foreign Quarter", 5, 30, deaths: 1)],
+            pool: [Mob("a Neriak guard", "Neriak Foreign Quarter", 120,
+                factions: ("Dark Bargainers", 4))],
+            factions: Dump(("Dark Bargainers", 1200, 800)),
+            picked: ["Dark Bargainers"],
+            races: [Unlock("Dark Elf", false, Faction("Dark Bargainers"))],
+            hasAchievements: true),
+            Recommendations.All);
+
+        Assert.NotEmpty(set.Top);
+        foreach (var rec in set.Top)
+        {
+            Assert.NotEmpty(HelperPresentation.Headline(rec));
+            Assert.NotEmpty(rec.Why);
+            foreach (var fact in rec.Why) Assert.NotEmpty(HelperPresentation.Why(fact));
+            Assert.NotEmpty(rec.Doors);
+        }
+    }
+
+    /// <summary>The faction sentences are <c>UnlockGuidance</c>'s own, word for word. Two
+    /// surfaces wording one arithmetic are two answers, and this is what says the Helper did
+    /// not grow a second phrasing.</summary>
+    [Fact]
+    public void TheFactionLinesAreUnlockGuidancesOwnSentences()
+    {
+        var pool = new[] { Mob("a Neriak guard", "Neriak Foreign Quarter", 120,
+            factions: ("Dark Bargainers", 4)) };
+        var dump = Dump(("Dark Bargainers", 1200, 800));
+
+        var set = Recommendations.Rank(
+            Inputs(pool: pool, factions: dump, picked: ["Dark Bargainers"]),
+            [HelperGoal.WorkOnFaction]);
+
+        var expected = UnlockGuidance.Faction("Dark Bargainers", dump, pool).Lines;
+        Assert.NotEmpty(expected);
+        var drawn = set.Top.SelectMany(r => r.Why).OfType<WordedFact>().Select(w => w.Text).ToList();
+        Assert.Equal(expected, drawn);
+    }
+
+    /// <summary>A character with no history at all draws no recommendations and throws
+    /// nothing — the state a fresh profile is in, which is the first one a new player
+    /// sees.</summary>
+    [Fact]
+    public void AFreshProfileRanksNothingAndDoesNotThrow()
+    {
+        var set = Recommendations.Rank(HelperInputs.Nothing, Recommendations.All);
+        Assert.Empty(set.Top);
+        Assert.Equal(0, set.Withheld);
+        // TWO deferred goals since DRA-71 D7 (Farm Motes and Make Money gained engines, after
+        // Farm Gear gained one in D6), and SEVEN gaps: the five that were here plus the two new
+        // engines' own. On a fresh profile both are the no-history state rather than their own
+        // "you have never looted a mote / earned a coin" — EQBuddy has read nothing, which is a
+        // different sentence and the one a first-run player should get.
+        Assert.Equal(2, set.NotAnsweredYet.Count);
+        Assert.Equal(7, set.Gaps.Count);
+        Assert.Contains(set.Gaps,
+            g => g.Goal == HelperGoal.FarmGear && g.Reason == GoalGapReason.NoInventoryDump);
+        Assert.Contains(set.Gaps,
+            g => g.Goal == HelperGoal.FarmMotes && g.Reason == GoalGapReason.NoPlayHistory);
+        Assert.Contains(set.Gaps,
+            g => g.Goal == HelperGoal.MakeMoney && g.Reason == GoalGapReason.NoPlayHistory);
+        // And the level it was handed is the Unknown state rather than a zero somebody has
+        // to remember not to divide by (DRA-71 D3).
+        Assert.False(HelperInputs.Nothing.Level.Known);
+    }
+
+    // ---- the outgrown discount (DRA-71 D3, plan P6) ------------------------------------
+
+    /// <summary>The zone whose creatures are far under you, and the one that is not. Two
+    /// sittings of the same length; the OUTGROWN one has the BETTER measured rate, which is
+    /// the only arrangement that can prove the discount does anything.</summary>
+    private static HelperInputs TwoBands(ResolvedLevel level) => Inputs(
+        sessions: [Session("Lower Guk", 5, 60), Session("Sebilis", 5, 40)],
+        pool:
+        [
+            Conned("a froglok tad", "Lower Guk", 200, 8, 12),
+            Conned("a sebilite juggernaut", "Sebilis", 120, 45, 50),
+        ],
+        level: level);
+
+    /// <summary>
+    /// **A4: the outgrown zone loses its lead, and says why.**
+    ///
+    /// <para>Lower Guk is measured at 12%/hr and Sebilis at 8%/hr, so before this slice Lower
+    /// Guk won on weight every time. At level 50 its creatures conned L8–12 — thirty-eight
+    /// under — so it is halved, Sebilis ranks first, and the sentence explaining it is drawn
+    /// on the row rather than left as an unexplained re-order.</para>
+    /// </summary>
+    [Fact]
+    public void AZoneYouHaveOutgrownRanksBelowOneInYourBandAndSaysWhy()
+    {
+        var set = Recommendations.Rank(TwoBands(At(50)), [HelperGoal.LevelUp]);
+
+        Assert.Equal(["Sebilis", "Lower Guk"], set.Top.Select(r => r.Zone).ToArray());
+
+        var outgrown = set.Top.Single(r => r.Zone == "Lower Guk")
+            .Why.OfType<ZoneOutgrownFact>().Single();
+        Assert.Equal(8, outgrown.ConnedMin);
+        Assert.Equal(12, outgrown.ConnedMax);
+        Assert.Equal(50, outgrown.Level);
+        Assert.Equal(200, outgrown.Kills);
+        // The measured rate is UNTOUCHED — the discount is a weight, never an edit to the
+        // evidence. A recommender that quietly restated your own number would be worse than
+        // one that ranked it wrong.
+        Assert.Equal(12, set.Top.Single(r => r.Zone == "Lower Guk")
+            .Why.OfType<ZoneXpRateFact>().Single().XpPerHour, 3);
+        // And the zone in band says nothing at all about its band — there is no sentence for
+        // the opposite of outgrown, because that sentence would be a claim about how a place
+        // will treat you (HOME-006).
+        Assert.Empty(set.Top.Single(r => r.Zone == "Sebilis").Why.OfType<ZoneOutgrownFact>());
+    }
+
+    /// <summary>
+    /// **The prove-fail for the row above** (trap 34: green-only is vacuous coverage). The
+    /// SAME fixture at level 10 puts Lower Guk back on top and draws no discount sentence —
+    /// so the assertion is reading the LEVEL rather than agreeing with an order that happened
+    /// to come out that way.
+    /// </summary>
+    [Fact]
+    public void TheSameTwoZonesAtALowLevelRankTheOtherWayAndSayNothing()
+    {
+        var set = Recommendations.Rank(TwoBands(At(10)), [HelperGoal.LevelUp]);
+
+        Assert.Equal(["Lower Guk", "Sebilis"], set.Top.Select(r => r.Zone).ToArray());
+        Assert.Empty(set.Top.SelectMany(r => r.Why).OfType<ZoneOutgrownFact>());
+    }
+
+    /// <summary>
+    /// **Unknown level: the ranking still runs, and nothing is gated on a number nobody
+    /// has** (plan P5's second half).
+    ///
+    /// <para>This is the half that matters most for a new profile. A recommender that fell
+    /// silent because it had not been told a level would be worse than one that never asked —
+    /// the player's own measured rates are real evidence and do not need a level to be true.
+    /// So the answer is IDENTICAL to the un-discounted one, and carries no discount sentence
+    /// and no guessed level anywhere in it.</para>
+    /// </summary>
+    [Fact]
+    public void AnUnknownLevelRanksOnYourOwnEvidenceAndGatesNothing()
+    {
+        var unknown = Recommendations.Rank(TwoBands(ResolvedLevel.Unknown), [HelperGoal.LevelUp]);
+        var low = Recommendations.Rank(TwoBands(At(10)), [HelperGoal.LevelUp]);
+
+        Assert.Equal(
+            low.Top.Select(r => (r.Zone, r.Weight)).ToArray(),
+            unknown.Top.Select(r => (r.Zone, r.Weight)).ToArray());
+        Assert.Empty(unknown.Top.SelectMany(r => r.Why).OfType<ZoneOutgrownFact>());
+        Assert.NotEmpty(unknown.Top);
+    }
+
+    /// <summary>
+    /// **A zone nobody ever conned is not outgrown**, however high the character is.
+    ///
+    /// <para>Absence of evidence drawn as a verdict is this file's recurring failure mode —
+    /// it is the same argument <c>ZoneDeathsFact</c> makes about never having died somewhere.
+    /// A player who farmed a camp without ever pressing consider has told EQBuddy nothing
+    /// about its band, and "nothing" must not resolve to "low".</para>
+    /// </summary>
+    [Fact]
+    public void AZoneWithNoConnedBandIsNeverCalledOutgrown()
+    {
+        var set = Recommendations.Rank(Inputs(
+            sessions: [Session("Befallen", 5, 60)],
+            pool: [Mob("a skeleton", "Befallen", 200)],
+            level: At(60)), [HelperGoal.LevelUp]);
+
+        Assert.NotEmpty(set.Top);
+        Assert.Empty(set.Top.SelectMany(r => r.Why).OfType<ZoneOutgrownFact>());
+        // Full weight: an unmeasured band must not cost the zone its position either.
+        Assert.Equal(1, set.Top[0].Weight, 3);
+    }
+
+    /// <summary>The threshold is a boundary and boundaries are where rules are wrong. Exactly
+    /// <see cref="Recommendations.OutgrownBy"/> under counts; one less does not.</summary>
+    [Theory]
+    [InlineData(Recommendations.OutgrownBy, true)]
+    [InlineData(Recommendations.OutgrownBy - 1, false)]
+    public void TheThresholdIsInclusiveAtItsOwnNumber(int under, bool outgrown)
+    {
+        var set = Recommendations.Rank(Inputs(
+            sessions: [Session("Lower Guk", 5, 60)],
+            pool: [Conned("a froglok tad", "Lower Guk", 200, 8, 12)],
+            level: At(12 + under)), [HelperGoal.LevelUp]);
+
+        Assert.Equal(outgrown, set.Top.SelectMany(r => r.Why).OfType<ZoneOutgrownFact>().Any());
+    }
+
+    /// <summary>The band's TOP decides, not its middle. A zone holding one creature that
+    /// still cons near you is a zone you have outgrown PART of, which is not a thing a
+    /// recommendation should act on.</summary>
+    [Fact]
+    public void OneCreatureStillInYourBandKeepsTheWholeZoneOutOfTheDiscount()
+    {
+        var set = Recommendations.Rank(Inputs(
+            sessions: [Session("Lower Guk", 5, 60)],
+            pool:
+            [
+                Conned("a froglok tad", "Lower Guk", 200, 8, 12),
+                Conned("Ghoulbane guardian", "Lower Guk", 3, 44, 46),
+            ],
+            level: At(50)), [HelperGoal.LevelUp]);
+
+        Assert.Empty(set.Top.SelectMany(r => r.Why).OfType<ZoneOutgrownFact>());
+    }
+}

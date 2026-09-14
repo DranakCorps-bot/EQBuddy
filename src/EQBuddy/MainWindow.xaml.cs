@@ -684,10 +684,23 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
     public ZoneGraph ZoneGraph { get; private set; } = new();   // IZoneHost, World PR 1
     internal QuestLedgerStore? QuestLedger { get; private set; }
     internal string QuestCharacterKey => _stats.LedgerCharacterKey;
-    /// <summary>The ledger's durable level, or null when it has never recorded one. ONE
-    /// member: three callers ask now (unlock memo, Progress card, OE-3's xp tooltip), and
-    /// three hand-copied fallback orders is how they stop agreeing (trap 4).</summary>
-    private int? TrackedLevel => QuestLedger?.LevelFor(QuestCharacterKey) is > 0 and var lv ? lv : null;
+    /// <summary>
+    /// The character's level and where it came from — <c>CharacterLevel.Resolve</c>'s own
+    /// answer, taken here so no two surfaces can resolve it differently (trap 33). The
+    /// sibling of <see cref="ClassSourceFor"/>, and read by the same kinds of caller.
+    /// </summary>
+    internal ResolvedLevel ResolvedLevel =>
+        QuestLedger?.ResolvedLevelFor(QuestCharacterKey) ?? Core.ResolvedLevel.Unknown;
+
+    /// <summary>The character's durable level, or null when nothing knows one. ONE member:
+    /// three callers ask now (unlock memo, Progress card, OE-3's xp tooltip), and three
+    /// hand-copied fallback orders is how they stop agreeing (trap 4).
+    ///
+    /// **It is the RESOLVED level since DRA-71 D3**, not the log's raw number. A player who
+    /// told the Character room they are level 30 must not be shown "New at level 28" by the
+    /// unlock preview two rooms away — two answers to "what level is this character" is the
+    /// same defect the one member above was created to prevent, one layer up.</summary>
+    private int? TrackedLevel => ResolvedLevel is { Known: true } lv ? lv.Level : null;
 
     /// <summary>The zone the log last put us in — the Quest Tracker measures distances
     /// from here.</summary>
@@ -1791,6 +1804,21 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
     /// you left off", Live's later. Identity, scoping and the never-unscoped rule: <see cref="SessionSummary.Stored"/>.</summary>
     internal IReadOnlyList<SessionRow> StoredSessions() => SessionSummary.Stored(_archiver.Identity, (s, c) => _repo.Query(s, c));
 
+    /// <summary>Per-session dps/hps and the combat seconds behind them, for the followed
+    /// character — the third input to <see cref="ZoneHistory.Fold"/> (DRA-71 D4). Same
+    /// identity, same never-unscoped rule as <see cref="StoredSessions"/>, because the two are
+    /// joined by row id and a mismatched scope would join one character's zones to another's
+    /// output.</summary>
+    internal IReadOnlyList<SessionThroughput> StoredThroughput() =>
+        SessionSummary.Scoped(_archiver.Identity, (s, c) => _repo.ThroughputRows(s, c));
+
+    /// <summary>Per-session vendor sales for the followed character — what
+    /// <see cref="SaleHistory.Fold"/> pools into "what a vendor has actually paid you for one
+    /// of these" (DRA-71 D7). Same identity and the same never-unscoped rule as the two above:
+    /// another character's Charisma is another character's price.</summary>
+    internal IReadOnlyList<SessionSales> StoredSales() =>
+        SessionSummary.Scoped(_archiver.Identity, (s, c) => _repo.SoldRows(s, c));
+
     internal long ActiveSessionRowId => _archiver.ActiveRowId;
 
     /// <summary>The respawn-cycle evidence store (the spawn-timer feed): written only by
@@ -2425,9 +2453,26 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
         UpdateEpicQuestChecklist(s);
         // Remember the announced level per character — the "At N:" preview must survive
         // restarts and log truncation, and the log only says the number at the ding.
-        if (s.LastLevel is { } announced && QuestLedger is { } lg && QuestCharacterKey.Length > 0
+        // **The LOG's timestamp travels with it since DRA-71 D3** (trap 56: two facts about
+        // one thing, from one moment), because the ding's moment is the whole of what
+        // `CharacterLevel.Resolve` weighs against the player's own statement. The gate reads
+        // `LevelFor` — the OBSERVED half — deliberately: comparing the log's newest number
+        // against the resolved one would make a player's statement suppress the ding that is
+        // supposed to be able to beat it.
+        if (s.LastLevel is { } announced && s.LastLevelAt is { } announcedAt
+            && QuestLedger is { } lg && QuestCharacterKey.Length > 0
             && lg.LevelFor(QuestCharacterKey) != announced)
-            lg.SetLevel(QuestCharacterKey, announced);
+            lg.SetLevel(QuestCharacterKey, announced, announcedAt);
+        // **AND REMEMBER WHERE THE PROFESSIONS STAND** (DRA-71 D8, plan P13). Same argument as
+        // the level directly above: the log states a skill's number once, at the moment it
+        // moves, and until now that number died with the session — so a player who spent last
+        // week smithing opened a tool that knew nothing about it. The store takes the whole
+        // live list every tick and writes only when a value actually rose (`SetSkills` is a
+        // batch for exactly that reason), and it admits only the eight professions, which is
+        // the reader this slice ships.
+        if (s.SkillUps.Count > 0 && QuestLedger is { } skillLedger && QuestCharacterKey.Length > 0)
+            skillLedger.SetSkills(QuestCharacterKey,
+                s.SkillUps.Select(k => (k.Skill, k.Value, k.At)));
         // The ding's cue rides the header, visible while the card is closed: the header
         // is the only Progress surface that always shows, and clicking it opens the
         // card where the "New at level N" list waits (never a popup). Text built in

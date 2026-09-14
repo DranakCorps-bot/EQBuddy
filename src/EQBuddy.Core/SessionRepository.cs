@@ -309,6 +309,133 @@ public sealed class SessionRepository : IDisposable
         }
     }
 
+    /// <summary>
+    /// **Per-session dps, hps and the combat seconds they were quoted against** — the third
+    /// input to <see cref="ZoneHistory.Fold"/> (DRA-71 D4, plan P7).
+    ///
+    /// <para><b>A probe of the stored snapshot, not a new column.</b> The <c>Dps</c> COLUMN
+    /// is here, but <c>Hps</c> and <c>CombatSeconds</c> are not, and a rate without its
+    /// denominator cannot be pooled: averaging per-session averages lets a three-minute
+    /// sitting weigh as much as a four-hour one. Adding columns is a schema migration, which
+    /// the DRA-71 D3 slice filed as its own work rather than doing quietly — so this joins
+    /// <see cref="ProgressSeries"/> and <see cref="MobRows"/>, which mine the same JSON for
+    /// the same reason (the full snapshot is big and each of them needs three fields of it).
+    /// </para>
+    ///
+    /// <para><b>All three from ONE parse of ONE row</b> (trap 56). Reading the rate off the
+    /// column and its denominator out of the JSON would be two readings of one moment, and
+    /// they would disagree the day anything writes one without the other.</para>
+    ///
+    /// <para>A session with no combat seconds is SKIPPED rather than returned as zero.
+    /// Unknown is not zero — the fold's own rule — and a row of zeroes would drag every
+    /// pooled rate toward the floor.</para>
+    /// </summary>
+    public List<SessionThroughput> ThroughputRows(string? server = null, string? character = null)
+    {
+        lock (_lock)
+        {
+            using var cmd = _db.CreateCommand();
+            cmd.CommandText = """
+                SELECT Id, SnapshotJson FROM Sessions
+                WHERE ($server IS NULL OR Server = $server)
+                  AND ($char IS NULL OR Character = $char)
+                ORDER BY StartUtc ASC LIMIT 1000
+                """;
+            cmd.Parameters.AddWithValue("$server", (object?)server ?? DBNull.Value);
+            cmd.Parameters.AddWithValue("$char", (object?)character ?? DBNull.Value);
+            using var r = cmd.ExecuteReader();
+            var rows = new List<SessionThroughput>();
+            while (r.Read())
+            {
+                try
+                {
+                    using var doc = JsonDocument.Parse(r.GetString(1));
+                    var combat = Number(doc.RootElement, "CombatSeconds");
+                    if (combat <= 0) continue;
+                    rows.Add(new SessionThroughput(
+                        r.GetInt64(0),
+                        Number(doc.RootElement, "SessionDps"),
+                        Number(doc.RootElement, "Hps"),
+                        combat));
+                }
+                catch { /* one unreadable snapshot must not empty the fold */ }
+            }
+            return rows;
+        }
+    }
+
+    /// <summary>
+    /// **Per-session vendor sales** — what this character was actually paid, per item
+    /// (DRA-71 D7, plan P9).
+    ///
+    /// <para><b>The same probe idiom as <see cref="ThroughputRows"/> above, for the same
+    /// reason.</b> <c>history.db</c> carries one <c>Copper</c> figure per session and no
+    /// breakdown of it; what was sold, and for how much, exists only inside the stored
+    /// snapshot. A schema migration is its own filed slice, so this mines the JSON beside the
+    /// two folds that already do.</para>
+    ///
+    /// <para><b>Why the price this reads is better than the catalog's</b>, which is the whole
+    /// reason it exists: a vendor price in EQ moves with the seller's Charisma and faction, and
+    /// the wiki's <c>merchant_value</c> says so out loud on 262 of the pages that carry one
+    /// ("VALUE TO VENDOR with CHA : 80"). This number was quoted to THIS character at THEIR
+    /// Charisma. See <see cref="SaleHistory"/>.</para>
+    ///
+    /// <para>A session that sold nothing is SKIPPED rather than returned empty — the fold has
+    /// nothing to add from it, and a row of empties would be a longer list saying the same
+    /// thing.</para>
+    /// </summary>
+    public List<SessionSales> SoldRows(string? server = null, string? character = null)
+    {
+        lock (_lock)
+        {
+            using var cmd = _db.CreateCommand();
+            cmd.CommandText = """
+                SELECT Id, SnapshotJson FROM Sessions
+                WHERE ($server IS NULL OR Server = $server)
+                  AND ($char IS NULL OR Character = $char)
+                ORDER BY StartUtc ASC LIMIT 1000
+                """;
+            cmd.Parameters.AddWithValue("$server", (object?)server ?? DBNull.Value);
+            cmd.Parameters.AddWithValue("$char", (object?)character ?? DBNull.Value);
+            using var r = cmd.ExecuteReader();
+            var rows = new List<SessionSales>();
+            while (r.Read())
+            {
+                try
+                {
+                    using var doc = JsonDocument.Parse(r.GetString(1));
+                    if (!doc.RootElement.TryGetProperty("SoldItems", out var sold)
+                        || sold.ValueKind != JsonValueKind.Array) continue;
+                    var items = new List<SoldDetail>();
+                    foreach (var el in sold.EnumerateArray())
+                    {
+                        var name = el.TryGetProperty("Item", out var i) ? i.GetString() ?? "" : "";
+                        if (name.Length == 0) continue;
+                        items.Add(new SoldDetail(name,
+                            (int)Number(el, "Count"), (long)Number(el, "Copper")));
+                    }
+                    if (items.Count > 0) rows.Add(new SessionSales(r.GetInt64(0), items));
+                }
+                catch { /* one unreadable snapshot must not empty the fold */ }
+            }
+            return rows;
+        }
+    }
+
+    /// <summary>One numeric field of a stored snapshot, or 0 when it is absent or is one of
+    /// the named floating-point literals the writer is allowed to emit (<c>JsonOpts</c> lets
+    /// a degenerate session serialise Infinity rather than killing its checkpoint — so a
+    /// reader that assumed a finite number would throw away the whole row over one field).
+    /// A snapshot archived before the field existed reads as 0, which is the "not measured"
+    /// the fold already knows how to be silent about.</summary>
+    private static double Number(JsonElement root, string name) =>
+        root.TryGetProperty(name, out var el)
+        && el.ValueKind == JsonValueKind.Number
+        && el.TryGetDouble(out var value)
+        && double.IsFinite(value)
+            ? value
+            : 0;
+
     public StatsSnapshot? LoadSnapshot(long id)
     {
         lock (_lock)

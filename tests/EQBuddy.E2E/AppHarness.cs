@@ -589,10 +589,19 @@ internal sealed class AppHarness : IDisposable
     /// one, which is the same high-water hazard <see cref="SeedRaids"/> names. Call before
     /// <see cref="Launch"/>; overwrites anything <see cref="SeedQuestClasses"/> wrote.</para>
     /// </summary>
+    /// <param name="level">A level the LOG has announced, with the log timestamp it carried
+    /// (DRA-71 D3). Both halves or neither: a level with no stamp is the pre-D3 migration
+    /// state, which is a different fixture and deserves to be asked for on purpose.</param>
+    /// <param name="statedLevel">A level the PLAYER has set, with the wall clock they set it
+    /// at. <c>CharacterLevel.Resolve</c> weighs the two stamps and the fresher wins, so a
+    /// fixture that wants a particular winner has to date them both — which is exactly what
+    /// makes the two "both ways" E2E rows possible from out here.</param>
     public void SeedQuestLedger(
         IReadOnlyList<string>? classes = null,
         IReadOnlyList<string>? tracked = null,
-        IReadOnlyDictionary<string, int>? owned = null)
+        IReadOnlyDictionary<string, int>? owned = null,
+        (int Level, DateTime At)? level = null,
+        (int Level, DateTime At)? statedLevel = null)
     {
         File.WriteAllText(Path.Combine(ProfileDir, "quest-ledger.json"),
             JsonSerializer.Serialize(new Dictionary<string, object>
@@ -603,8 +612,92 @@ internal sealed class AppHarness : IDisposable
                     Tracked = tracked ?? (IReadOnlyList<string>)[],
                     Items = (owned ?? new Dictionary<string, int>())
                         .ToDictionary(kv => kv.Key, kv => new { Manual = kv.Value }),
+                    Level = level?.Level ?? 0,
+                    LevelAt = level?.At ?? default,
+                    StatedLevel = statedLevel?.Level ?? 0,
+                    StatedLevelAt = statedLevel?.At ?? default,
                 },
             }, new JsonSerializerOptions { WriteIndented = true }));
+    }
+
+    /// <summary>
+    /// **Archives a finished session into <c>history.db</c>, through the REAL repository and
+    /// the REAL snapshot type** (DRA-71 D4).
+    ///
+    /// <para>The Helper's zone answers are a fold over archived sessions, and the only other
+    /// way to get one is <c>Prime</c> — a whole app run over the fixture log, which
+    /// <c>shoot.ps1</c> does and an E2E cannot afford per row. This writes the row the same
+    /// way the archiver does (<c>SessionRepository.Checkpoint</c>, which serialises the
+    /// snapshot to the same JSON the app will read back), so the throughput probe under test
+    /// is reading a real stored snapshot rather than a fixture shaped like one.</para>
+    ///
+    /// <para><b>Call it BEFORE <see cref="Launch"/>.</b> The connection is disposed here so
+    /// the app opens the file itself; a row still marked
+    /// <c>SessionRepository.ActiveEndReason</c> would be rewritten on startup by
+    /// <c>MarkInterruptedAsRecovered</c>, which is why the end reason is a finished one.</para>
+    ///
+    /// <para>The identity is <see cref="Server"/>/<see cref="Character"/> — the two strings the
+    /// app's own archiver uses — because <c>SessionSummary.Stored</c> compares them with SQL
+    /// <c>=</c> and a near-miss is a query that silently returns nothing.</para>
+    /// </summary>
+    /// <param name="zone">Stored as the session's <c>PrimaryZone</c>, verbatim. An instance's
+    /// full name ("Najena 4 (Refined)") is what the game prints and what the tier is decoded
+    /// from, so it is spelled here exactly as a zone line would.</param>
+    /// <param name="startedAgo">How long before now the sitting began — its elapsed time.
+    /// <c>ZoneHistory.MinHours</c> is 15 minutes, so anything shorter is stored and
+    /// deliberately produces no rate.</param>
+    /// <param name="activeFraction">How much of that was ACTIVE play. 1.0 is a sitting with
+    /// no downtime; the gap is what the downtime line reports.</param>
+    /// <param name="copper">Coin the session earned, into the <c>Copper</c> COLUMN — what the
+    /// Make Money engine divides by the hours (DRA-71 D7). 0 is a real state and draws its own
+    /// sentence rather than a row.</param>
+    /// <param name="sold">What a vendor paid, per item, into the snapshot's <c>SoldItems</c> —
+    /// the only place that breakdown exists, which is why <c>SessionRepository.SoldRows</c>
+    /// probes the JSON rather than reading a column (DRA-71 D7).</param>
+    /// <param name="loot">What dropped, per creature: <c>(mob, item, count)</c>. It is keyed on
+    /// the MOB NAME rather than positionally so a fixture cannot silently hang a mote on the
+    /// wrong creature, and it is what both the mote fold and the sell list read.</param>
+    public void SeedStoredSession(
+        string zone, TimeSpan startedAgo, double xpPercent, double dps, double hps,
+        double combatSeconds, int deaths = 0, double activeFraction = 1.0,
+        long copper = 0,
+        (string Item, int Count, long Copper)[]? sold = null,
+        (string Mob, string Item, int Count)[]? loot = null,
+        params (string Name, int Kills, double FightSeconds, int LevelMin, int LevelMax)[] mobs)
+    {
+        var start = DateTime.Now - startedAgo;
+        var elapsed = startedAgo.TotalSeconds;
+        using var repo = new SessionRepository(HistoryDbPath);
+        repo.Checkpoint(0, new StatsSnapshot
+        {
+            SessionStart = start,
+            LastEventTime = DateTime.Now,
+            // `Checkpoint` writes the ElapsedSeconds COLUMN from `Elapsed` and the
+            // ActiveSeconds one from this — the two the downtime line is the gap between.
+            Elapsed = startedAgo,
+            ActiveSeconds = elapsed * Math.Clamp(activeFraction, 0, 1),
+            CurrentZone = zone,
+            Zones = [new TimedDetail(start, zone)],
+            XpPercent = xpPercent,
+            SessionDps = dps,
+            Hps = hps,
+            CombatSeconds = combatSeconds,
+            Copper = copper,
+            SoldItems = [.. (sold ?? []).Select(s => new SoldDetail(s.Item, s.Count, s.Copper))],
+            YourKillCount = mobs.Sum(m => m.Kills),
+            Deaths = [.. Enumerable.Range(0, deaths)
+                .Select(i => new TimedDetail(start.AddMinutes(i), "You have been slain"))],
+            Mobs =
+            [
+                .. mobs.Select(m => new MobSummary(m.Name, m.Kills, m.Kills, m.FightSeconds, 0, 0,
+                    [.. (loot ?? [])
+                        .Where(l => l.Mob.Equals(m.Name, StringComparison.OrdinalIgnoreCase))
+                        .Select(l => new MobLoot(l.Item, l.Count, null))])
+                {
+                    Zone = zone, LevelMin = m.LevelMin, LevelMax = m.LevelMax,
+                }),
+            ],
+        }, Server, Character, "ApplicationExit");
     }
 
     /// <summary>Appends messages to the character log with live timestamps, the way the

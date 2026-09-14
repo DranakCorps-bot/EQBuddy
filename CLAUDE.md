@@ -318,8 +318,8 @@ asked in is the first thing you re-read.**
 dotnet build EQBuddy.slnx -c Release
 dotnet test tests/EQBuddy.Tests/EQBuddy.Tests.csproj -c Release
 pwsh -NoProfile -File scripts/check.ps1
-pwsh -NoProfile -File scripts/claim-seat.ps1 -WorkItem 428 -SeatId my-seat
-pwsh -NoProfile -File scripts/release-seat.ps1 -WorkItem 428 -SeatId my-seat
+pwsh -NoProfile -File scripts/claim-seat.ps1 -WorkItem DRA-28 -SeatId my-seat
+pwsh -NoProfile -File scripts/release-seat.ps1 -WorkItem DRA-28 -SeatId my-seat
 ```
 
 Local how-much: [docs/ops/verification-ladder.md](docs/ops/verification-ladder.md).
@@ -513,6 +513,7 @@ they live on `legacy-v1`.)
 | Parse a log line | `Core/LogParser.cs` — one regex per line type |
 | Aggregate / DPS / encounters | `Core/SessionStats.cs` (+ `.Tracked.cs`) |
 | Which class the log looks like | `Core/ClassInference.cs` |
+| What level this character is | `Core/CharacterLevel.cs` — **two writers, ordered by TIME and the fresher wins** (a ding after your statement wins; your statement after the ding wins — DRA-71 D3). NOT a precedence table: both rankings are wrong half the time, because the log's number belongs to whatever classes were equipped when it printed. Store is `QuestLedgerStore` (`Level`/`LevelAt` ← the LOG's timestamp, `StatedLevel`/`StatedLevelAt` ← the player's LOCAL wall clock — the two are compared directly, so a UTC stamp here would be off by the player's offset and look right in one timezone). `ResolvedLevelFor` is the one answer, read by `MainWindow.ResolvedLevel` → `TrackedLevel`. `SourceLabel` is one table, the `CharacterClasses` rule. Per-class levels PARKED — no log line and no dump carries them. Words: `UI.Shared/LevelReadout.cs` |
 | Tail the file | `Core/LogWatcher.cs` — 150 ms polls, offset-based |
 | Settings + profile paths | `Core/AppSettings.cs`, `Core/AppPaths.cs` (`EQBUDDY_APPDATA`) |
 | Automated launch vs live profile | `UI.Shared/IsolatedLaunchPolicy.cs` + `scripts/isolated-profile.ps1` — pin the child last, refuse both live lines. Audit: `docs/ops/live-state-isolation-audit.md` |
@@ -527,6 +528,11 @@ they live on `legacy-v1`.)
 | Quest surface (all four tabs) | `EQBuddy/QuestsView.xaml.cs`. `QuestsWindow` is a thin host; `QuestsRoom` is the shell's **Guide** room (label only — the wire key is still `quests`). **Both build their own instance** |
 | What the widget's right-click menu shows minimized | `UI.Shared/WidgetMenuPolicy.cs` — the ≤4 lock. `Tag="expanded"` in `MainWindow.xaml` hides the rest; `WidgetMenuTests` reads the XAML against the list |
 | The Evolved shell | `EQBuddy/ShellWindow.xaml.cs` + one `*Room.cs` per room; `UI.Shared/ShellPages.cs`, `ShellLayout.cs`. Player door: widget context-menu `Guide…` through `ShellHost.OpenGuideDoor` (opens the Guide room, and recovers a shell the ✕ took); `EQBUDDY_SHELL` is the review hook |
+| "What should I do next?" | `Core/Recommendations.cs` — the ONE cross-domain ranker (PRD §12 HOME-001..006, DRA-70). Nine Founder goals, `ShapeFor` is the must-list; **the join key is the ZONE**, so a place serving two selected goals outranks either alone. Top 3, and the cap says so. Every why-line is a typed `WhyFact` record tagged `Personal` or `Catalog` — **the WORDS are `UI.Shared/HelperPresentation.cs`**, which is where HOME-006's ban (nothing may call a camp safe, easy or survivable) can be swept. A faction sentence is `UnlockGuidance.Faction`'s own, passed through, never re-phrased. Drawn by `EQBuddy/HelperRoom.cs`; picks persist per character (`AppSettings.HelperGoals`/`HelperFactions` through `HelperGoalStore`). **The goals are ONE dropdown, not nine chips** (DRA-71 D2, Founder smoke 1) — `EqMultiPicker`, with the faction sub-picker a second face that appears only once its goal is picked. **Every ENGINE has decided about the character's level** (DRA-71 D3, smoke 2): `LevelUseFor` is the must-list — `Consumes` or `Exempt` with a reason, null only for a goal that has no engine — and `HelperMustListTests` proves each row by running that engine at two levels, so a `Consumes` that is really a comment fails. Today only `LevelUp` consumes: the discount is about a zone's THROUGHPUT, and for faction/unlocks the zone is a POINTER to where a criterion IS. Unknown level ranks on personal evidence unchanged and the room says so + offers the Character door — never a guess. **Throughput is OUTCOME evidence, never an adjective** (DRA-71 D4, smoke 3): there is no mob-HP or con-colour model, so "vs difficulty" is your output/fight-length/deaths/downtime against YOUR OWN pooled figures (`ZoneHistory.Baseline`, two zones minimum or it compares a zone with itself). Four named discounts, each with a sentence on the same row and no bonus arm — the XP rate stays the primary term. The weight reads damage AND healing (`OutputPerSecond`), or it marks down every zone a healer did their job in. The instance tier is REPORTED and weighs nothing until P10's mote slice. `WhyCap` is 6 since D4 and the tier is emitted LAST, so the cap takes the fact that weighs nothing rather than a caveat. **Farm Gear is the fifth engine** (DRA-71 D6, smoke 4a/4b) and it asks the INTENT first — `Core/GearUpgrades.cs`, three `GearIntent`s with their own `ShapeFor` must-list, single-select through `GearIntentStore` (`HelperGearIntent`/`HelperWornPicks`/`HelperGearQuests`). `UpgradeWorn` anchors on the worn items the pick names (absent = all, filter semantics), `ReplaceSlot` on every worn slot and reads no pick, `FarmToSell` is Deferred to D7. Drop rows group by ZONE and quest rows by QUEST (`RecommendationKind.Quest`, only behind the include-quests toggle); the weight is how many of your open upgrades a row feeds. Level is **Exempt** with a surveyed reason: no item record carries a level, and an outgrown camp is if anything the quicker farm. **`FarmToSell` is answered since DRA-71 D7 and NOT by that sweep** — it has no worn anchor, so `GearUpgrades.Sweep` refuses it outright and `Recommendations.FarmToSell` answers from your own LOOT priced at your own sale. **Seven of the nine goals now answer** (`+ FarmMotes`, `+ MakeMoney`); `FarmMaterials` stays Deferred on purpose and still draws a block — the professions picker, the standings, a Watch skill-up preset (a door WITH a side effect, idempotent through `TrackedRule.Matches`) and the wiki door (DRA-71 D8); `LevelUseFor` gained one `Consumes` (motes, because the Founder asked for "highest-level zone") and one `Exempt` (money — coin is a property of the creature, so both readings of a level rule are wrong). **`Join` INTERLEAVES the merged parts round-robin** since D7: three engines on one zone put ten sentences against a `WhyCap` of six, and concatenating them let the cap trim a whole engine off a row whose headline still named its goal |
+| Which professions exist, and where this character stands in them | `Core/Tradeskills.cs` — CURATED, never auto-written: the EIGHT with a Mastery AA, each row naming its ability so `TradeskillsTests` can read the spelling back out of the shipped `AaCatalog` ("failing *Jewelcrafting* recipes") instead of trusting a comment. `Crafting Mastery` is refused by name; Tinkering/Spell Research/Make Poison/Fishing are OUT with the reason (no Mastery AA) as committed negatives. `Match` is WHOLE-STRING over per-profession aliases — the wiki spells Jewelcrafting three ways and "Jewelry Making" is carried from classic EQ, marked as not-the-wiki. **Standings persist since DRA-71 D8**: `QuestLedgerStore.CharacterLedger.Skills` keeps the highest value per profession with the LOG's stamp, written by `MainWindow` from `StatsSnapshot.SkillUps` and read by the Helper's block — only the eight are admitted (`TrackFilter`'s rule, a second kind of row), and highest-wins is what makes the launch replay a no-op. Picks: `TradeskillPickStore` over `AppSettings.HelperProfessions`, absent = all eight. **No item→profession arithmetic**: the `Categories` survey found 14 of 10,957 pages naming a profession against 99.7% populated, so it PARKS and the block says so with the number in it; `itemcatalog-build` re-takes the survey on every refresh (`--check` writes nothing) |
+| Where motes have actually dropped for you | `Core/MoteHistory.cs` — ONE new fold, `Pool` × `Motes.IsMote`/`PotencyOf`, with the hours and the conned band JOINED from `ZoneHistory` rather than recomputed (trap 4). **Two floors, and the second is the one `MinHours` cannot see**: `MinKills` = 50, because one Infinite mote in a legitimate twenty minutes is a rate that will never happen again. Void-Touched is COUNTED and weighs nothing — the ladder gives it no number, so the field is separate and the sentence names it rather than reading as a zero. **There is no catalog arm**: all eleven shipped mote records carry a `DropZones` and every value is "Various Zones"/"Unknown"/"D3+ Zones" (`MoteCatalogSurveyTests`, which fails the day a real zone arrives). Engine is `Recommendations.FarmMotes` — the Founder's three criteria as three named discounts, no bonus arm, and an untiered zone is never marked down for not being an instance |
+| What a vendor has actually paid you | `Core/SaleHistory.cs` ← `SessionRepository.SoldRows` (a snapshot probe beside D4's `ThroughputRows`; no schema migration). **It is the evidence the money engines rank on, and the survey is why**: eqlwiki quotes its `merchant_value` at a Charisma and a faction standing that differ per page (235 of the 646 readable ones say so in their own heading), so the catalog's number is a quote somebody was given rather than a property of an item. `ItemCatalog.Record.MerchantCopper` + `MerchantCondition` land from the promoter and **weigh nothing** — they name an item you have never sold, `Evidence.Catalog`, printed with the page's own condition. Data-less until the next weekly refresh. Coin grammar: `Core/CoinText.cs` (`Parse`, the inverse of `StatsSnapshot.FormatCoin`, round-tripped in `CoinTextTests`; anything it cannot read exactly is ABSENT, never guessed) |
+| Per-zone all-time evidence | `Core/ZoneHistory.cs` — ONE fold, two sources, and the split is the design: time/XP/coin/deaths from `SessionRepository` rows (attributed to `PrimaryZone`, so a rate always travels with its session count), kills and fight length from `MobHistory.Pool` (keyed on the real kill zone). Under `MinHours` it reports NO rate. `ConnedMin`/`ConnedMax`/`ConnedKills` are the level band the evidence was earned at, from `/consider` only — an unconned creature contributes NOTHING rather than dragging the floor to 0 (DRA-71 D3); `Recommendations.OutgrownBy`/`OutgrownWeight` are named judgements, not a derived XP curve. **Third source since DRA-71 D4: per-session dps/hps + their combat seconds**, from `SessionRepository.ThroughputRows` (a snapshot-JSON probe in the `ProgressSeries`/`MobRows` idiom — the `Dps` COLUMN has no denominator and a rate cannot be pooled without one; NO schema migration, that is still its own filed slice), joined BY ROW ID and pooled by combat seconds rather than averaged. `Dps`/`Hps`/`OutputPerSecond`/`DowntimeShare`/`DeathsPerHour` answer null under the floor — unknown is never zero, and a session with no combat seconds contributes nothing. `ObservedTier` needs no plumbing: `PrimaryZone` is the zone name the game printed, so `InstanceTier.FromZoneName` reads the observation the log already made |
 | Auto-ticking Epic/Sky from loot, achievements import | `EQBuddy/QuestChecklistView.cs` |
 | Desktop World theme | `EQBuddy/WorldWindow.xaml.cs` |
 | Mobile server + projection | `Companion/CompanionHost.cs`, `CompanionProjection*.cs` |
@@ -534,9 +540,11 @@ they live on `legacy-v1`.)
 | Type roles, spacing, radii, control sizes | `UI.Shared/DesignTokens.cs` |
 | Icon geometry | `UI.Shared/IconPaths.cs` — vectors, never glyphs |
 | The selectable pill | `UI.Shared/ChipStyle.cs` + `EqChip`/`EqSegmentedStrip`. **Never hand-build another one** |
+| The multi-select dropdown | `DesignSystem.EqMultiPicker` (face + themed popup of check rows) + `UI.Shared/PickerFace.cs` for what the face SAYS. Four callers: the quest class lens, the Unlocks tab's pick, the Helper's goals and its two sub-pickers. **Never hand-build another one** — the sibling of the chip rule, and the quest class lens was migrated onto it in the slice that added it so the sentence starts out true. The cap is a WIDTH as well as a count (#184); `ClassFilterLabel` is now just the class picker's noun. Guard: `MultiSelectPickerTests` — a forbid-scan over every shipped `.xaml` with a committed negative that proves it fires (trap 78), PAIRED with a curated must-list of the surfaces that HAVE a multi-select (trap 34) |
 | What a Loot surface shows | `UI.Shared/LootPresentation.cs` |
 | What a quest row's badge and state rule say | `UI.Shared/QuestPresentation.cs` |
-| What a player can DO about an unlock requirement | `Core/UnlockGuidance.cs` — one already-worded sentence per fact, three shapes and no fourth: own-kill faction movers + a kills-to-go estimate, the Sky checklist's piece count, a catalog-matched Task door. `ShapeFor` decides for every `UnlockNeed` and answers **null** for undecided (trap 34's must-list). **It never moves a tick** — an unlock is the game's answer, and "pieces in your bags" is not "obtained" (trap 4). A faction nobody has farmed draws nothing (trap 73). `UnlockLayout.Groups` emits one row per actionable criterion IN ORDER, which is how a surface pairs a row with its criterion |
+| Is this item better than that one | `Core/ItemDominance.cs` — the ONE metric table (AC/HP/Mana/DMG/ratio/attributes), the class-lock filter and the `+N` tier refusal. Lifted out of `UI.Shared/GearLocker.cs` in DRA-71 D6 so the Helper's catalog sweep and the Gear Locker read the SAME comparison (trap 4); the Locker's three members are now calls into it and **its "never BiS" scope lock is unchanged — it still compares your bags.** The Helper may name CATALOG items as farmable upgrades (`Core/GearUpgrades.cs`), and the amendment is narrow: every candidate has a WORN anchor, an empty slot answers nothing, every line is `Evidence.Catalog`, and the empty state's subject is the CATALOG rather than the game. `ItemDominanceTests` runs both surfaces over one table and proves each metric one at a time |
+| What a player can DO about an unlock requirement | `Core/UnlockGuidance.cs` — one already-worded sentence per fact, three shapes and no fourth: own-kill faction movers + a kills-to-go estimate, the Sky checklist's piece count, a catalog-matched Task door. `ShapeFor` decides for every `UnlockNeed` and answers **null** for undecided (trap 34's must-list). **It never moves a tick** — an unlock is the game's answer, and "pieces in your bags" is not "obtained" (trap 4). A faction nobody has farmed draws nothing (trap 73). `UnlockLayout.Groups` emits one row per actionable criterion IN ORDER, which is how a surface pairs a row with its criterion. **The row is drawn in the six-question SHAPE since DRA-71 D5**: `RowDetail` is `who · where` (the top RAISER and its zone — a cost-only row points nowhere), `RowLines` is the two QUANTITIES that stay on screen (piece count, kills-to-go), `Hover` is the per-creature prose; `Lines` is still the whole set and their union is asserted to be it. **Which unlocks a character is chasing is `Core/UnlockPicks.cs` (`UnlockPickStore` over `AppSettings.UnlockPicks`) — ONE store, read by the Helper AND the Quests Unlocks tab.** Absent = ALL (filter semantics, the opposite of `HelperFactions` beside it), one flat list of subject names, and `Narrow` applies it PER SECTION so a race pick never empties the class half. Words for both pickers: `UI.Shared/UnlockPickReadout.cs`. `Recommendations.Rank` does the narrowing, not the room, so the phone inherits it |
 | What the Buffs card's roster shows | `UI.Shared/BuffRosterPresentation.cs` — drawn by `EQBuddy/BuffsCardView.cs`. The HUD's expiring-buff chicklet is a DIFFERENT surface |
 | Anything shared by both UIs | `UI.Shared/` — must stay framework-free (a test enforces it) |
 
@@ -723,8 +731,30 @@ after the named guard left with its surface.
     append** — Bash eats backticks inside `python -c "…"`, so a markdown
     note loses every backticked identifier and still diffs clean. Write
     the note with the editing tools; if the tail is mojibake and will not
-    anchor, concatenate two FILES. Read an identifier back. **No guard
-    yet; that is a named hole.** [Novel](docs/ops/claude-archive/traps.md#trap-60)
+    anchor, concatenate two FILES. Read an identifier back.
+    (d) **The hole is closed for the DESTRUCTIVE half** (2026-09-10):
+    `scripts/channel-wipe-guard.ps1` + its `-selftest`, in `check.ps1` and
+    CI, refuse a PR that empties, deletes, truncates below its tier's
+    floor, wholesale-replaces, or newly MOJIBAKES a channel file. Tiers:
+    `*-FEEDBACK.md`/`DECISIONS.md` are append-only ledgers (90%),
+    `HELM.md` is state that lifts holds (65%), the inboxes are drained by
+    design and get the wipe + mojibake checks only. No `-Force`: an
+    archive move and an encoding repair stand the checks down by BEING
+    one. **Replace has two arms, and the second is the one that survives
+    an argument about encoding:** 3a compares lines, 3b compares ENTRY
+    HEADINGS through a key with non-ASCII stripped and case folded (85%,
+    both checked tiers), so re-encoding, re-indenting and reordering
+    cannot move it and **the repair exemption deliberately does not reach
+    it** — a rewrite that un-mangles a file *and* drops forty entries used
+    to be waved through by 3a. Entries are matched mid-line too, because
+    `c7a597a8` collapsed `HELM-FEEDBACK.md` into 2 lines and a line-start
+    reading would give 3b eight headings to measure 1,051 entries with.
+    **It catches CATASTROPHIC loss, and nothing else — (a) and (c)
+    still have no guard.** A stale-base clobber of 36 lines out of 10,600
+    is 99.7% retention and passes; so does a silently truncated append,
+    which is additions-only and retains everything. `git diff
+    <the-ref-you-based-on>..HEAD -- HELM-FEEDBACK.md` is still yours to
+    run. [Novel](docs/ops/claude-archive/traps.md#trap-60)
 61. **The SCREEN is a mutex both harnesses must acquire.**
     `scripts/shoot.ps1` and `tests/EQBuddy.E2E` (`AppHarness.Launch`) take
     the same lock. Guard: `ScreenLockTests`. Wait for the window
@@ -777,8 +807,12 @@ after the named guard left with its surface.
     `scripts/claim-seat.ps1` refuses a second default on the same work
     item; `-Mode challenger|disjoint|replacement` overrides;
     `scripts/release-seat.ps1 -ForceStale` recovers a dead holder.
-    Store is gitignored `.claude/soft-seats/`. Evidence before
-    graduation. [Novel](docs/ops/claude-archive/traps.md#trap-70)
+    Store is gitignored `.claude/soft-seats/`. **The claim key is the
+    Paperclip card, `DRA-<n>`, and only that** — one scope carries two
+    names (GitHub `#445` IS `DRA-28`), and a mutex over free text refuses
+    neither spelling. A bare issue number is REFUSED with the reason, never
+    auto-mapped; `-PaperclipIssue` may only restate `-WorkItem`. Evidence
+    before graduation. [Novel](docs/ops/claude-archive/traps.md#trap-70)
 71. **A fold that is right for IDENTITY is not automatically right for a
     QUANTITY the fold decides.** `BaseName` folds ranks — correct for "which
     buff is up", wrong for "how long", so rank V got rank I's wiki duration
@@ -905,6 +939,40 @@ after the named guard left with its surface.
     named the v1 path, and the only inbound Allow that fit was scoped to the Tailscale
     address the QR ranks LAST. **When you tell a player to check a list, check what the
     list SHOWS them** — identity a UI hides is identity the player cannot verify.
+
+78. **A detector's PATTERN LIST can be silently empty, and an empty list
+    matches nothing and reports clean.** `channel-wipe-guard.ps1` built
+    its mojibake markers as `@([char]0xE2 + [char]0x20AC, [char]0xC3 +
+    [char]0xA2, …)`. **PowerShell binds `,` TIGHTER than `+`**, so that
+    parses as `a + (b, c) + d` and collapses the whole list into ONE
+    string of every marker joined by `$OFS`. It matched nothing. The
+    guard reported a clean file for the commit that took HELM-FEEDBACK.md
+    from 15,670 mojibake markers to 63,782. **Parenthesise every element
+    of a computed array literal** — and, generally, **assert a detector's
+    list is non-empty and that it FIRES, in the same commit that adds
+    it**: trap 34 is a guard aimed at the wrong thing, this is a guard
+    aimed at nothing, and only the second one is green.
+    [Novel](docs/ops/claude-archive/traps.md#trap-78)
+
+79. **A WPF `Popup` is its own top-level HWND, so `PrintWindow` renders
+    everything EXCEPT the dropdown the shot is about.** The staged
+    `shell-helper-picker` came back BYTE-IDENTICAL to the closed shot — a
+    correct, well-composed photograph of a button — and only `md5sum` on the
+    two files said so. `shot.ps1 -WithPopups` composites the owner process's
+    visible EMPTY-TITLED windows that intersect the region (the title clause
+    is what stops it swallowing a sibling — trap 24 from the other side), and
+    WARNS when it finds none. **A screen grab is not the fix**: it was tried
+    and reverted twice in twenty minutes — the always-on-top widget, then an
+    unrelated app — which is the failure `PrintWindow` exists to prevent. The
+    screen lock reserves the screen against other HARNESSES, not against the
+    machine. **And a translucent surface is only as honest as what you
+    allocated under it:** the popup's 40%-alpha border composited onto a fresh
+    (transparent-black) bitmap read as a Solarized contrast defect. That half is
+    NOT fixed and ships as a stated caveat — `PrintWindow` overwrites the DC
+    rather than blending, so pre-seeding the bitmap changes nothing. **Say which
+    part of a capture is unfaithful; do not restyle the product until the camera
+    agrees.** If a captured border is darker than its palette value, suspect the
+    capture before the theme. [Novel](docs/ops/claude-archive/traps.md#trap-79)
 
 New trap discovered the hard way? Add the compact rule here and the novel
 under `docs/ops/claude-archive/traps.md`. That is the whole point.

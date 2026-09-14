@@ -1,3 +1,985 @@
+## 2026-09-13 — DRA-71 delivery 8: resources are profession-first, and the arithmetic is parked on its own survey
+
+Pre-authorized: Helm SIGNED the plan (PR #586, merged `a28c5d89`) and SIGNED
+D2–D7 (#588, #590, #592, #594, #596, #598), authorizing `dra71-d8`. Nothing below
+is on the consequence list: no release, no new surface, **no eqlwiki request of
+any kind** (the survey reads a cache that was already on this machine and this
+seat fetched nothing), nothing new leaving the machine, nothing near the values
+line — the professions are a catalog EQBuddy already ships and the standings are
+this character's own log. David vetoes from here.
+
+**1. THE ITEM→PROFESSION ARITHMETIC IS PARKED, AND THE SURVEY IS THE REASON.
+This is the delivery's headline default.** P13 made the arithmetic conditional on
+an evidence step — *"good coverage → promoter carries `Categories` + a curated
+Category→Profession map; poor coverage → picker + skill + doors ship and the
+arithmetic is PARKED"* — so the survey ran before anything was built, through the
+app's own item parser, over the 10,957 cached pages:
+
+- **10,919** carry at least one `[[Category:…]]` — **99.7%**, across **539**
+  distinct categories.
+- **14** of them carry a category that names a profession, across **five** of the
+  eight (Alchemy 1, Baking 2, Brewing 2, Pottery 8, Tailoring 2). Blacksmithing,
+  Fletching and Jewelcrafting have none at all.
+- The generic markers instead: **822** pages say `Tradeskill Ingredient` and
+  **1,959** say `Player Crafted`.
+
+**99.7% is the wrong number to feel good about, and that is the finding worth
+carrying forward.** The field is populated almost everywhere and it answers a
+different question: the 539 categories are class usability (`Warrior Equipment`,
+4,308 pages), slot (`Chest`, `Head`), weapon skill (`1H Slashing`), zone
+(`Plane of Sky`), acquisition (`Vendor Sold`, `Foraged`, `Quest Items`) and
+cosmetics (`Fashion: Plate`). A reader that had checked only whether the field was
+POPULATED would have shipped an arithmetic on a field that never says which
+profession. This is the third slice running where a catalog field says less than
+its name promises — `DropMobs` in D6, `merchant_value` in D7 — and the first
+where the field looked fully covered while doing it.
+
+So the picker, the standings and the two doors ship, the arithmetic parks, and
+**the block says so on screen with the number in it** rather than looking
+unfinished: *"Of the 10,957 item pages it has read, 14 say which profession an
+ingredient belongs to."* The survey now runs inside `itemcatalog-build` and prints
+in both paths, so `--check` re-takes it on every weekly refresh without writing
+anything — a reopen condition nobody measures is one nobody can satisfy.
+
+The veto shape, if this is wrong: build the map anyway from the 14 and the two
+generic categories. I think that is a worse product — a player asking where to
+farm pottery clay would get an answer built from eight pages — but it is one
+curated file away.
+
+**2. THE ANSWER IS PROBABLY IN A DIFFERENT FIELD, ALREADY SHIPPED, AND THIS SEAT
+DID NOT BUILD ON IT.** The same survey counted the `recipes` field beside the
+categories, and it is a much better source: **1,235** pages carry one, **851**
+name one of the curated eight at the top of their recipe list — *"* [[Blacksmithing]]"*
+— and all **eight** professions appear. A further **242** name a skill with no
+Mastery AA (Tinkering, Spell Research, Make Poison, Fishing). The field is already
+parsed by the app's own parser and already promoted into `ItemCatalog.Record.Recipes`,
+so an arithmetic on it would need no promoter change and no fetch.
+
+**I did not build it, deliberately.** The plan's evidence step named `Categories`,
+and a ranking engine off a field the plan never surveyed is a new arithmetic with
+its own rulings to make — how its criteria compose, whether Farm Materials becomes
+`Answered`, what `LevelUseFor` says about it — which is the shape that belongs in a
+plan rather than in an executor's judgement call. It is filed to Fable as a MET
+reopen condition with these numbers in it. **If the preference is for me to have
+built it in-seat, that is the veto**, and it is the more interesting one of the
+two on this page.
+
+**3. THE EIGHT ARE THE MASTERY-AA EIGHT, AND FOUR REAL PROFESSIONS ARE OUT.**
+P13 named the source — *"wiki-matched (from the Mastery AA list)"* — and the
+shipped `AaCatalog.json` carries all nine General "… Mastery" abilities, so the
+curated list is checked against a catalog EQBuddy already ships rather than
+against a comment: every profession names its AA, and `TradeskillsTests` reads
+that ability's own effect sentence back out (*"reduces the chance of failing
+Blacksmithing recipes"*) to check the spelling. `Crafting Mastery` is the ninth
+and is refused by name — it raises the specialization cap of professions you
+already have, and its effect text names seven of the eight in one parenthetical,
+omitting Alchemy.
+
+Tinkering, Spell Research, Make Poison and Fishing all have eqlwiki skill pages
+and all four appear in recipe lines; none has a Mastery AA, so none is here. They
+are committed negatives in the test, so the edge of the curation is a failing
+assertion rather than a comment. Widening the list is a decision, not a fix.
+
+**4. THE WIKI SPELLS ONE PROFESSION THREE WAYS AND I CARRIED ALL THREE, PLUS ONE
+THAT IS NOT THE WIKI'S.** "Jewel Craft Mastery" (the AA name) reduces failures of
+"Jewelcrafting" recipes (the effect text) and Crafting Mastery calls it
+"Jewelcraft" (the same page). Matching is whole-string against a list of aliases
+per profession, so all three resolve. **"Jewelry Making" is the fourth and it is
+NOT from eqlwiki** — it is classic EverQuest's own spelling of that skill, carried
+under the standing rule that other sources are allowed where the wiki is silent
+and marked as such in the file. The wiki names the SKILL; it is silent on what the
+game's skill-up line PRINTS, which is a different fact, and an alias the log never
+prints simply never matches while a missing one costs a player their standing with
+no way to tell why.
+
+**5. ONLY THE EIGHT PROFESSIONS ARE PERSISTED — SIXTY COMBAT SKILLS ARE NOT.**
+The plan asked for skill values to start persisting. The store admits a skill only
+when `Tradeskills.Match` claims it, which is `QuestLedgerStore.TrackFilter`'s own
+rule applied to a second kind of row ("the file stays quest-sized instead of
+hoarding every rat whisker"). The alternative — persist every skill the log
+announces — writes fifty rows per character that nothing reads, which is trap 43
+with a storage bill. The reopen is one line: widen the filter in the slice that
+builds a surface for combat skills.
+
+**6. THE HIGHEST VALUE WINS, AND THERE IS NO TIME HIGH-WATER MARK.** The loot
+ledger needs one because loot accumulates and a replayed line would double it. A
+skill-up carries the TOTAL the game printed, so the largest value seen IS the
+standing and the launch replay lands on the same number. The moment travels with
+the value rather than with the count, because a surface has to be able to say WHEN
+rather than implying "now".
+
+**7. ABSENT MEANS ALL EIGHT — filter semantics, `UnlockPicks`' rule and not
+`HelperFactions`'.** A faction pick tells an engine which of hundreds of standings
+to weigh, so "none picked" has to mean none. This pick decides which of eight rows
+a list draws, so "none picked" means the list a player who has never touched the
+control should see. The offer is never narrowed by its own filter, or a pick could
+not be undone.
+
+**8. THE ROWS ARE IN THE CURATED ORDER, NOT IN EVIDENCE ORDER.** The faction
+picker sorts closest-to-the-top first; this one does not. Eight fixed rows want a
+stable order more than a clever one, and a list that re-sorted itself when a number
+moved would shift under the player's pointer for no gain.
+
+**9. THE WATCH CONTROL WRITES A SETTING, AND IT IS THE ONLY DOOR IN THIS ROOM
+THAT DOES.** "Watch skill-ups" adds the `WatchKind.SkillUp` rule and opens
+Settings → Alerts → Watch rules so the player can give it a sound. The rule that
+makes a door-with-a-side-effect the right shape is the in-game-command one: a
+surface that names an action ships the action. It is idempotent, the existence
+check asks `TrackedRule.Matches` (the rule's own matcher, so a rule the player
+wrote and named "smithing!!" counts and is never duplicated), and a DISABLED rule
+still counts — turning it off was their decision, and a second enabled copy would
+overrule it.
+
+**10. FARM MATERIALS IS STILL `Deferred`, AND ITS SENTENCE WAS REWRITTEN.** The
+goal has no engine, so `ShapeFor` is unchanged and `LevelUseFor` stays null — which
+is the must-list's correct answer for a goal with nothing to decide about yet. The
+deferral now names which HALF is missing (*"your professions and where they stand
+are above. EQBuddy is not ranking WHERE to farm the materials yet"*), because the
+old sentence read over a block full of the player's own numbers would say the block
+had failed.
+
+**11. THE STAGED SHOT CHANGED THE COPY, AND THIS IS THE SECOND SLICE RUNNING WHERE
+IT DID.** The unknown-standing row was written as one sentence carrying its own
+explanation — *"…no skill-up in your log yet. EQBuddy reads your standing from the
+game's own 'You have become better at…' line, so it starts from your next one."*
+Correct, and there are eight rows: the default state repeated it eight times down
+the block. **Distinct-count is the tell in prose exactly as it is in data (trap
+73)**, and a fact about where EQBuddy gets its numbers belongs to the BLOCK. The
+explanation is now said once and the row is four words. The park note also had no
+margin of its own and read as belonging to the last profession rather than to the
+block. Neither was visible to any assertion in this repo.
+
+---
+
+## 2026-09-13 — DRA-71 delivery 7: motes and money, both answered from the player's own play
+
+Pre-authorized: Helm SIGNED the plan (PR #586, merged `a28c5d89`) and SIGNED
+D2–D6 (#588, #590, #592, #594, #596), authorizing `dra71-d7`. Nothing below is on
+the consequence list: no release, no new surface, **no eqlwiki request of any
+kind** (the promoter change reads a cache that was already on this machine and
+this seat fetched nothing), nothing new leaving the machine, nothing near the
+values line — every number is this character's own kills, this character's own
+stored sittings, and a catalog EQBuddy already ships. David vetoes from here.
+
+**1. THE CATALOG'S VENDOR PRICE IS NOT WEIGHED, AND THE PLAN ASKED FOR IT TO BE.
+This is the delivery's biggest departure and the default most worth a veto.**
+P9's words are *"the engine = your observed `CopperPerHour` + vendor-value-weighted
+drop evidence from your own kills and the catalog"*. The plan also asked for a
+distinct-count survey before the promoter committed to anything, and the survey
+is why the second half did not ship as written. Run through the app's own parsers
+over the 10,957 cached item pages:
+
+- **945** pages state a `merchant_value` at all — 8.6% of the catalog.
+- **646** of those parse to a number; **299** are refused as unreadable (prose
+  like "absolutely nothing", approximations like "~2pp", qualified figures like
+  "197.6p Max", and conditions written inline like "2p 1g 8s 3c with 111
+  Charisma").
+- **354 distinct** parsed values across those 646 — a healthy spread, so trap
+  73's tell passes: this is a catalog carrying real numbers, not a parser finding
+  one template.
+- **235 of the 646 state the CHARISMA AND FACTION they were quoted at**, in the
+  page's own heading — *"VALUE TO VENDOR with CHA : 80 and faction at
+  Indifferently"* — and the Charisma differs per page (80, 72, 111).
+
+That last count is the finding. **A vendor's price in EQ moves with the seller's
+Charisma and their standing with the merchant, so the wiki's number is a quote
+somebody was given rather than a property of the object.** A ranking built on it
+would sort zones by which of their drops happen to have a priced page, at a
+Charisma that is not the player's. So the ranking reads what the player was
+ACTUALLY paid — `SaleHistory`, pooled from their own stored sessions — and the
+catalog's number is demoted to naming an item they have never sold, labelled
+`Evidence.Catalog` and printed WITH the page's own condition. It weighs nothing.
+
+The veto shape, if this is wrong: restore the catalog price as a weight and
+accept that the order rests on somebody else's Charisma.
+
+**2. The copper value ships DATA-LESS, the same way `DropMobs` did in D6 — and
+the reason is now a measurement rather than a policy.** D6's note said the item
+dump is gitignored and rebuilding it means fetching ~11k pages. That is not the
+whole truth and the correction belongs here: **the dump is already on this
+machine**, at `scripts/harvests/eqlwiki/cache/items-wikitext.jsonl` in the main
+checkout, which is how the survey above was taken without a single request. But
+it holds **10,957 entries against the 11,146 the committed catalog was built
+from** — it is older than the shipped file. Regenerating from it would ship a
+catalog that has LOST ~190 items in order to gain two fields, which is a worse
+trade than waiting. So the promoter, the schema and both readers land and the
+values arrive with the next weekly refresh, which re-harvests anyway.
+`RecommendationsGearTests.TheShippedCatalogCarriesNoVendorValueYet` fails the day
+they do, so somebody reads the sentences it turns on.
+
+**3. Farm Motes CONSUMES the level and Make Money is EXEMPT** — deliberately
+opposite rows on the same must-list. Motes consume it because the Founder asked
+by name: *"highest-level zone"* is the first of his three mote criteria, and the
+discount is the SAME `Outgrown` judgement the experience engine already makes, on
+the same `/consider` evidence. Money is exempt because nothing he asked for needs
+it and both readings of what it would do are wrong — coin is a property of the
+CREATURE (the pool's `CoinMin`/`CoinMax` do not move when the killer levels), so
+an outgrown camp pays the same per kill and is killed through faster; marking it
+down recommends against the goal just picked and marking it up is a game rule
+nobody here can verify. It is D6's Farm Gear conclusion reached again on
+different evidence. `HelperMustListTests` proves both behaviourally by running
+each engine at two levels.
+
+**4. "Difficulty 2–4" is read as the game's instance tiers D0–D4** — the
+assumption the plan asked to be logged for veto. It is the only 1–5 difficulty
+datum the game's own data carries (`InstanceTier`, decoded from the zone line the
+game printed). **One piece of corroboration turned up and it is worth having:**
+the shipped catalog's bare "Mote of Potential" lists its drop zones as *"D3+
+Zones"* — the wiki tying mote quality to instance tier in its own words.
+`MoteCatalogSurveyTests` pins that string so the claim can be checked rather than
+taken on trust. One string is not a model, and nothing here derives a per-tier
+mote value from it.
+
+**5. The tier PREFERENCE is a discount on low instances and never a bonus, and
+an open-world zone is untouched.** D4 refused bonus arms and this slice does not
+reopen that, so a zone whose own line recorded D0 or D1 is marked down and a zone
+inside D2–D4 is left alone rather than promoted. The clause that matters is the
+third one: **a zone with no tier observed is not touched at all.** Open world is
+most of the game and most of what a low-level character can reach; marking it
+down would be EQBuddy ruling on a comparison nobody here can make ("is an
+open-world camp better or worse than a D3 for motes" has no answer in this repo)
+and it would read as a verdict on the player's whole evening.
+
+**6. The mote fold has a SECOND floor the experience rate does not** —
+`MoteHistory.MinKills` = 50, beside `ZoneHistory.MinHours`. A mote rate has a
+failure an hours floor cannot see: one Infinite mote in a legitimate twenty
+minutes is thirty potency an hour, measured correctly, and it will never happen
+again. Fifty kills is the point at which a rare drop has been given a chance to
+be ordinary. It is a judgement, like the fifteen minutes and the ten levels, and
+it is a FLOOR rather than a discount — under it the zone answers nothing, because
+a rate nobody should act on is not improved by a caveat beside it.
+
+**7. The Void-Touched mote is counted separately and still weighs nothing.** The
+ladder gives it no experience — its worth is a whole item tier and the wiki
+publishes no number for it — so a zone whose only motes were Void-Touched has a
+potency of zero. That is correct arithmetic and a terrible sentence on its own,
+so the count rides its own field and the row names it. The ARITHMETIC still
+refuses to make a value up.
+
+**8. "Farm to sell" does not go through the dominance sweep, and never will.**
+`GearUpgrades.Sweep` refuses the intent outright. Every candidate there has a
+worn anchor, and all three properties that keep that file off the best-in-slot
+side of the line rest on there being one; an anchorless candidate would be the
+game's items ranked against each other, which is the single claim it exists not
+to make. The sell engine's anchor is the player's own LOOT priced at their own
+sale, so the "never BiS" lock is not approached rather than merely respected.
+
+### Three things the plan did not foresee, all found by a launched app
+
+**9. A MERGED ROW WAS DROPPING A WHOLE ENGINE'S SENTENCES, AND EVERY UNIT TEST
+PASSED.** Three engines answering about one zone — Level Up, Farm Motes and Make
+Money, which is the cross-domain join working exactly as the PRD wants — put ten
+sentences on one row against a `WhyCap` of six. The merge CONCATENATED the parts
+and the cap trims the tail, so the row drew a headline reading *"Level Up · Farm
+Motes · Make Money"* over six sentences of which not one was about money. Every
+component was correct and the row lied about itself. The fix is round-robin
+interleaving in `Recommendations.Join` rather than a bigger cap: at any cap of one
+per part, every goal in the headline keeps a sentence. **Raising the cap again was
+the wrong lever** — D4 already went 4→6 under protest, and three engines can put
+ten sentences on one zone. Within an engine, the facts are now ordered so every
+discount that FIRED comes before the fact that weighs nothing, which is D4's own
+rule applied one file over: the mote engine's WHO line is what a loaded row gives
+up, and the row says it held something back. Only `helperWhyWithheld` from a
+launched app can see that, so that dump key is new.
+
+**10. The first staged shot found two wording defects that every assertion
+passed** (trap 23, again). The take read *"Shadowed man gave you 8 motes of it
+(40 experience) across your 50 kills of it"* — two pronouns pointing at different
+things and the first at nothing — and *"Bone Chips drops here from Shadowed man —
+3 of your 50 kills of it"*, where the 50 belongs to the creature and reads as
+kills of the item. Both sentences were correct, both numbers were real, and both
+were unreadable. `HelperPresentation` was changed and both shots retaken.
+
+**11. The shots came back with TWO answers where one was predicted**, and it is
+the floors behaving rather than a defect: the shared fixture log has motes of its
+own in West Commonlands, and the kills floor is on the ZONE's kills rather than
+the creature's, so that zone qualifies too. It makes a better picture than the
+single row that was staged for — and it is what caused the cadence discount to
+fire on the staged zone at all, since with one mote zone there is no baseline and
+no comparison, the same "never compare a place with itself" rule D4 photographed.
+
+---
+
+## 2026-09-13 — DRA-71 delivery 6: Farm Gear asks which gear question you are asking
+
+Pre-authorized: Helm SIGNED the plan (PR #586, merged `a28c5d89`) and SIGNED
+D2–D5 (#588, #590, #592, #594), authorizing `dra71-d6`. Nothing below is on the
+consequence list: no release, no new surface, no eqlwiki request (the promoter
+change reads cached pages and this seat fetched nothing), nothing new leaving
+the machine, nothing near the values line — every number is this character's own
+inventory dump, this character's own kills, and a catalog EQBuddy already ships.
+David vetoes from here.
+
+**1. Farm Gear is EXEMPT from the character's level, and the plan asked for it
+to be level-gated.** P8's words are "every such line `Catalog`-labeled
+(HOME-004), level-gated (P5), capped with the withheld count (trap 50)". Two of
+those three shipped as written. The third could not, and the survey is the
+reason rather than the excuse: **all 11,146 shipped item records were scanned
+for a `Level` or `Required Level` key in their stats block and not one carries
+either** — the block prints WT, SIZE, RACE, CLASS, SLOT, AC and the attributes
+and nothing else. There is nothing about a candidate for a level to gate.
+Inventing a level requirement per item is trap 73 with arithmetic instead of
+prose, and eqlwiki publishes none to match. The other level fact this repo has —
+D3's outgrown discount — was considered and REFUSED in both directions: it is a
+claim about a zone's XP throughput, and for gear the zone is where the ITEM is,
+so marking an outgrown camp DOWN recommends against the goal the player just
+picked, and marking it UP is a bonus arm D4 refused plus a game rule nobody here
+can verify. `HelperMustListTests` now proves the exemption behaviourally — the
+gear engine's answers must be IDENTICAL at level 12 and level 60 — so if this is
+the wrong call the test fails the day somebody fixes it, rather than the
+exemption going quietly stale. **This is the default most worth a veto**, because
+it is the one place this delivery does not do what the signed plan says.
+
+**2. The "never BiS" lock is amended, and the amendment is three refusals wide.**
+`GearLocker` has said since #104 that it compares your bags and never the game.
+The Helper now names CATALOG items as farmable upgrades, which the plan
+authorises "knowingly". What keeps it that side of the line: every candidate has
+a WORN anchor (nothing ranks the game's items against each other); an EMPTY SLOT
+answers nothing at all, because "the best thing for a slot you have nothing in"
+is the BiS claim itself and is the obvious next feature; and the empty state's
+subject is EQBuddy's own catalog rather than the game — "nothing beats your helm"
+is a best-in-slot claim with a minus sign in front of it. All three are asserted,
+and the third is asserted on the WORDS. The Locker's own lock is untouched.
+
+**3. The metric table moved to Core (`ItemDominance`) and the Locker delegates.**
+"The same metric table" is only true while there is one of it (trap 4), and Core
+cannot reference `UI.Shared`. `GearLocker.Dominates`/`CanClaimUpgrade`/
+`UpgradeTier` are now one-line calls; `ItemDominanceTests` runs both surfaces
+over 192 pairs and requires identical answers, and proves each metric one at a
+time because a metric silently DROPPED from the table makes dominance easier and
+nothing else would notice. The alternative — a second copy in Core — would have
+agreed on the day it was written.
+
+**4. Two intents, and the difference is the ANCHOR rather than the ranking.**
+"Upgrade what I wear" anchors on the worn items the pick names; "replace with
+better" anchors on every worn slot and does not read the pick at all. Same sweep,
+same weight, same sentences. I considered giving (b) its own ranking ("where is
+my kit weakest") and did not: that is a second rule nobody signed, and the
+anchor difference is already visible in the answers — the staged shots show the
+top zone changing from Temple of Veeshan to Western Wastes on one click.
+
+**5. The intent strip is SINGLE-select in a room whose every other control is
+multi.** The Founder's three are three different questions, not three facets of
+one; ticked together they would produce one merged list whose rows nobody could
+attribute. Absent key = `UpgradeWorn`, the Founder's own first and the one that
+asks a question rather than assuming the answer.
+
+**6. The worn pick is a FILTER (absent = all), like `UnlockPicks` and unlike
+`HelperFactions`.** A character wears about twenty things, which a room can weigh
+in full. A pick naming something you have since replaced narrows NOTHING rather
+than emptying the answer — the same rule `UnlockPickStore.Narrow` keeps, for the
+same reason: no control on screen could explain the empty. And the "+N" suffix is
+KEPT in the stored name, unlike almost every other item key in this profile,
+because the anchor is the item ON THE CHARACTER and the "+N" is what an upgrade
+has to beat.
+
+**7. Include-quests is OFF by default, per character.** Farming a camp and running
+a quest chain are different evenings. A quest-sourced upgrade is a
+`RecommendationKind.Quest` row grouped by the QUEST — a hand-in is not a place —
+rather than a zone row with an empty zone.
+
+**8. `DropMobs` ships as a PROMOTER CHANGE WITH NO DATA IN IT, and that is the
+honest half of this delivery.** The promoter now carries the per-zone creature
+names it used to discard, `ItemCatalog.Record.DropMobs` reads them, and the sweep
+and the live-lookup fallback both pass them through. **The shipped
+`ItemCatalog.json.gz` is unchanged**, because `cache/items-wikitext.jsonl` is
+gitignored and is rebuilt by fetching ~11k pages from eqlwiki — which is the new
+fetch volume the plan forbids and a request-rate decision that is David's, not a
+delivery's. The data arrives with the next weekly refresh, which re-runs the
+harvest anyway. Until then a row draws its zone and says nothing about the
+creature (trap 73), and the player's OWN kills already answer "who" for anywhere
+they have farmed. The alternative — running the harvest here — was not taken.
+
+**9. The reproducibility gate compares DECOMPRESSED contents, and is NOT in
+`check.ps1`.** Trap 74: gzip is a container whose bytes depend on which zlib built
+them. `itemcatalog-build --check` decompresses both sides, and the WRITE path
+takes the same comparison so a refresh that moved no data leaves no binary diff.
+It is absent from `check.ps1` deliberately: without the gitignored dump there is
+nothing to compare, every clone and every CI run is in that state, and a gate
+that cannot run is a gate nobody believes. It refuses with exit 2 and says so
+rather than reporting a clean comparison of nothing.
+
+**10. Two caps, and one of them cannot ride a row.** A zone names three upgrades
+and reports the rest in `WithheldWhy` as every other cap here does. The sweep's
+own per-anchor cap (`MaxPerAnchor` = 8) is spent BEFORE any row exists, so its
+count rides `RecommendationSet.GearWithheld` and the room draws it under the
+answers with a Gear door. A number hung on whichever row happened to be built
+first would have pointed at the wrong thing.
+
+**11. The stats resolver is one method now (`EqlWikiItemService.StatsFor`).** The
+catalog-first-then-cache precedence was typed out in `InventoryView` and would
+have been typed out again here; two copies of a precedence rule is one item
+comparing differently in two rooms. Same for "is this item worn", which is now
+`InventoryFile.Entry.Worn` and read by both `GearLocker.LocationRank` and the
+sweep — that rule had already been spelled twice in this repo and the two copies
+disagreed about the shared bank.
+
+## 2026-09-13 — DRA-71 delivery 5: the unlock pick, and the row shape it arrives with
+
+Pre-authorized: Helm SIGNED the plan (PR #586, merged `a28c5d89`) and SIGNED
+D2/D3/D4 (#588, #590, #592 — `ffc57cc7`), authorizing `dra71-d5`. Nothing below
+is on the consequence list: no release, no new surface, no eqlwiki request,
+nothing new leaving the machine, nothing near the values line — an unlock is
+this character's own achievements dump and the movers are this character's own
+kills. David vetoes from here.
+
+**1. The pick is a FILTER (absent = all), not a required pick like the faction
+one beside it.** These two controls sit one block apart in the Helper and mean
+opposite things by "nothing ticked", which is a real inconsistency and a
+deliberate one. A faction dump carries hundreds of standings, so weighing all of
+them is the thirty weak answers HOME-002 asks for the opposite of. The unlock
+list is thirty rows the Quests tab has drawn in full since 2026-08-25, so the
+faction reading would have silently emptied a working tab for every existing
+profile on upgrade. The alternative — required on both, for consistency — is
+named here so it can be chosen instead; it costs a working surface to buy a
+symmetry nobody asked for.
+
+**2. ONE flat list of subject names, narrowed PER SECTION.** Races and classes
+share no names, so one list holds both. The rule that makes that safe is that a
+pick narrows a section only where it NAMES something in it: a player working on
+Iksar has picked no class, and the Classes half comes back whole. The
+alternative was two stored keys, one per section, which is more explicit and
+which I rejected because it doubles the store, the picker and the plumbing to
+express a rule one method already expresses. **This is the default most worth a
+veto**, because the per-section rule is invisible in `settings.json` — the file
+just shows a list of names.
+
+**3. P12 moves the mover sentences OFF the row and onto its hover, and keeps the
+two quantities on it.** The plan's words are "`who · where` on the row line,
+longer prose on hover". Taken literally that puts the piece count and the
+kills-to-go estimate on the hover too, and I did not: they are one line each,
+they are what a player acts on, and a tab whose every sentence lived on a hover
+would be a tab nobody can photograph (trap 22 — the Unlocks tab had no shot at
+all until DRA-65 staged one). So the row is: the criterion, the `who · where`
+pointer, and the quantities; the hover is the per-creature evidence. Nothing is
+deleted — `UnlockGuidanceRow.Lines` is unchanged and a test asserts the two
+halves union back to it — but it IS a player-visible move, and it earns two
+What's-new paragraphs saying where each half went.
+
+**4. And the hover is the one place in this slice a reading budget is knowingly
+not applied.** `SettingsProsePolicy.FitsOneHover` says a hover must be readable
+inside `ToolTipPolicy.ShowDurationMs` (30 s at 200 wpm ≈ 100 words). Six movers
+— three raisers and three costs, `UnlockGuidance.MoverCap` each way — is about
+125 words, so the worst case is over it. I did not trim, and the reason is that
+the policy names its own scope: it is about *Settings' instructional
+paragraphs*, and this is a scannable list of signed one-liners rather than
+prose. The two alternatives were both worse: trimming would put a second cap on
+top of `MoverCap` with nowhere for the withheld rows to go, and leaving the
+movers on the row is the wall P12 exists to remove. Named here because it is a
+judgement about somebody else's guard, not a fact.
+
+**5. The `who · where` pointer names the top RAISER, so a cost-only row points
+nowhere.** A faction the player has only ever lost standing with has no place
+worth travelling to, and naming the creature that costs them 5 a kill would be a
+pointer at exactly the camp to avoid. The row keeps the evidence on its hover
+and draws no line — the same silence a faction nobody has farmed gets (trap 73).
+
+**6. The picker's OFFER holds every unlock in view, including the ones the pick
+is currently hiding and the ones already unlocked.** An offer narrowed by its
+own filter is a tick nobody can take back. A finished unlock is offered too,
+labelled "unlocked": the engine skips completed ones on its own, so excluding
+them would buy nothing and would drop a row the Quests tab still draws.
+
+**7. The Helper's unlock block gets its own ⧉, which makes five copy buttons on
+one screen.** The faction picker has asked for `/outputfile faction` in its own
+empty state since D1; the unlock picker asks for `/outputfile achievements` the
+same way. The two goal gaps below it already ask for the same file, so this is
+the third mention of one command on one screen. Kept, on DRA-63's rule: a row
+that asks names its own answer, in every state. The alternative — dedupe to one
+— means the control a player is looking at explains its own emptiness and points
+nowhere.
+
+**8. The heading over the Helper's block names both goals ("Races and classes
+you are unlocking") rather than borrowing either goal's label.** One picker
+serves two goals; a heading reading "Unlock Races" over a list containing
+Warrior would be the block claiming to be about half of what it offers.
+
+**9. The narrowing happens in the ENGINE, not in the room.** `Rank` applies it,
+so the phone gets it the day it calls the same method (plan P15) — porting a
+feature *to* a surface is the signal its logic never went through the shared
+layer. The cost is one more field on `HelperInputs`; the alternative was each
+room narrowing its own lists, which is two producers of one rule.
+
+**10. What the slice deliberately did NOT do.** No phone work (D9 owns it). No
+`GuideAttachment` flip. No change to `UnlockGuidance`'s three shapes, its
+arithmetic or its doors — the guidance layer never knew which unlocks were on
+screen and still does not, which is what keeps `UnlockLayout.Groups`' row↔criterion
+pairing intact.
+
+## 2026-09-13 — DRA-71 delivery 4: throughput as outcome evidence — and the nine defaults taken to build it
+
+Pre-authorized: Helm SIGNED the plan (PR #586, merged `a28c5d89`), SIGNED D2
+(PR #588) and SIGNED D3 (PR #590, merged `36c9d9d1`) authorizing `dra71-d4`.
+Nothing below is on the consequence list: no release, no new surface, no
+eqlwiki request, nothing new leaving the machine. **And nothing here goes near
+the values line** — damage and healing are the self-measured numbers the log has
+always carried about this character; `DamageByAttacker` and `HealsByHealer` are
+still who hit or healed YOU, no comparison with another player exists anywhere in
+this slice, and no cohort was introduced to compare against. David vetoes from
+here.
+
+**1. "Versus difficulty" is answered against the PLAYER, because there is no
+difficulty model to answer it against.** The Founder's smoke item is "DPS/Healing
+vs mob difficulty", and the honest reading is the one the plan's own evidence
+section forced: this repo has no mob-HP model and no con-colour scale, and the
+only difficulty the game's data states is the instance tier. So "was my output
+good here" is answered as "was my output here what my output usually is" — a
+pooled figure over every zone EQBuddy has measured for this character. The
+alternative default, named so it can be chosen instead, was to derive a
+difficulty score from con levels and mob counts; that would be trap 73's shape
+with arithmetic instead of prose, asserting a game rule nobody here can verify.
+
+**2. The weight reads damage AND healing together, not damage alone.** A cleric's
+contribution to a camp is healing, and a damage-only measure marks down every
+zone a healer did their job in — a recommender telling a player their class is
+wrong. Adding the two is **not** a claim that a point healed is worth a point
+dealt; nothing here knows that. It is the only measure available that answers
+"how much was this character doing per second of combat" for every class. The
+SENTENCE still reports the two separately, so a player can see which half is
+theirs. This is the default most likely to be argued with and the one I would
+keep.
+
+**3. Four discounts, each a named threshold and a named multiplier, and none of
+them can promote anything.** Deaths at or above one an hour, downtime at or above
+half the elapsed time, fights at or above 1.5× this character's own average, and
+output under three fifths of their own baseline; each multiplies by 0.8. There is
+no bonus arm anywhere, so the experience rate stays the primary term and these
+only ever re-order inside it. They compound (0.8⁴ ≈ 0.41 at worst) because three
+separate measurements about one zone are three facts, and collapsing them into
+the worst single one throws two away. **The objection worth recording: the
+experience rate already prices cadence, deaths and downtime in, in aggregate.**
+The reading these rest on is that they say whether the rate is one this character
+can REPEAT — a camp that paid well while you spent half the sitting recovering
+rests on an evening that went a particular way. That reading is the veto target.
+
+**4. The comparison is against this character and never against a number of
+seconds.** "Is 95 seconds a long fight" has no answer here. "Is 95 seconds long
+for the character who averages 41" does, and it needs nothing but measurements
+already on disk. Same shape for the output baseline. The cost of this default is
+that a player with one measured zone gets no comparison at all — which is correct
+(see 5) and does mean the feature arrives gradually.
+
+**5. A baseline needs TWO zones, and a one-zone profile is told nothing.** A
+baseline folded from one zone IS that zone, so "your output here is exactly your
+average" would be true of every single-zone profile by construction — a tautology
+printed as a finding, and a discount that could never fire dressed as one that
+had been checked. So `ThroughputBaseline.Known` requires two, and the sentence
+draws no comparison clause without it.
+
+**6. The instance tier is reported and weighs NOTHING in this slice.** It needed
+no plumbing at all: a session already stores the zone name the game printed,
+verbatim, and `InstanceTier` already decodes that string for the Raids card — so
+the tier is the observation the player's own log made, read where it already sits.
+No schema change, no new column. The plan's tier PREFERENCE belongs to the mote
+engine in its own slice (P10); ranking on it here would be this slice deciding
+something nobody has signed. A zone whose adjective this build does not recognise
+gets no tier rather than a guessed D0.
+
+**7. `WhyCap` is raised from four to six, and this one was FORCED.** At four, a
+fully loaded zone row — rate, throughput, cadence, deaths, downtime, outgrown
+band, tier — kept the first four and silently dropped the P6 outgrown sentence D3
+shipped last night. A zone marked down twice, drawing the explanation for one of
+them, with every store-side assertion in the repo passing. Six is what keeps every
+discount that FIRED beside its own evidence; the tier is emitted LAST precisely so
+it is the line the cap takes, and the row says how many it held back. **Six short
+personal sentences under one headline is a density question I am not the right
+judge of** — a `BEVEL.md` stub asks it against this slice's two shots, and the
+number is the thing to veto if the answer is "that is a report, not a
+recommendation".
+
+**8. No schema migration, and the throughput comes out of the stored snapshots.**
+`history.db` has a `Dps` column and no `Hps` and no `CombatSeconds`, and a rate
+without its denominator cannot be pooled — averaging per-session averages lets a
+three-minute sitting weigh as much as a four-hour one. D3 filed a `history.db`
+migration as its own slice rather than doing one quietly, and that stands: this
+probes the snapshot JSON, which is exactly what `ProgressSeries` and `MobRows`
+already do for the same reason. All three numbers come from ONE parse of ONE row,
+so the rate and its denominator describe one moment.
+
+**9. An ABSENT measurement is never scored as a poor one.** A profile whose
+snapshots predate the probe, a zone whose pool never recorded a fight length, a
+sitting with no combat seconds — each is skipped rather than folded in as a zero,
+and ranks exactly as it did before this slice. A player upgrading into this build
+must not watch their best camp drop for a gap in EQBuddy's own reading. It is the
+same rule the conned band already keeps, and it has its own E2E row.
+
+**And two defects the STAGED SHOT caught that no assertion could have** (both
+fixed; both recorded in `scripts/shoot.ps1`'s own prediction block). The healing
+clause was gated on `Hps > 0` and the fixture's WARRIOR came back saying "You
+healed 0.1 a second", because a log with regen ticks in it is not a log with zero
+healing — a trace is not a contribution. And the comparison clause read "…run
+13.2 a second; here, 13.4", spending a whole line to say a zone is average. Both
+now sit behind named thresholds, and the relationship between the silence band and
+the discount threshold is asserted rather than left to two numbers staying apart:
+a zone ranked down with its explanation suppressed is the one failure this slice
+had to refuse.
+
+**Held: the baseline comparison cannot be photographed from the shared fixture.**
+A session's dps is a SESSION figure attributed whole to its primary zone, so two
+slices of one log always carry nearly the same output however different their
+appended kills are. Both shots therefore show the single-zone and the
+average-zone arms and not the comparison; it is unit-tested at both ends and
+prove-failed. Staging a fixture whose damage was chosen to make a sentence appear
+would be photographing a string rather than a state.
+
+## 2026-09-13 — DRA-71 delivery 3: one level, two writers, ordered by time — and the ten defaults taken to build it
+
+Pre-authorized: Helm SIGNED the plan (PR #586, merged `a28c5d89`; SSC #587 merged
+`93040ac2`), and SIGNED D2 (PR #588, merged `5d8526a2`) authorizing `dra71-d3`.
+Nothing below is on the consequence list: no release, no new surface beyond the
+two rooms the PRD already owns, no values-line question (every number is this
+character's own log and this character's own statement — nothing measures another
+player), no change to what leaves the machine and no eqlwiki request. David
+vetoes from here.
+
+**1. The fresher claim wins, and the sources are not ranked at all.** The default
+could have been a precedence table — "the log beats the player" (DRA-66's shape
+for classes) or its reverse. Both are wrong half the time here, and the Founder's
+own case is why: a Legends character holds up to three classes at once, so the
+level the log printed belongs to whatever was equipped when it printed. Time is
+the only ordering that is a FACT about the two claims rather than an opinion
+about them. **On an exact tie the STATEMENT wins** — written down rather than left
+to an operator, because a tie-break nobody named is a tie-break nobody can check.
+
+**2. The statement's stamp is LOCAL wall clock, not UTC — and that is the one
+thing in this slice most likely to have shipped silently wrong.** An observed
+reading's stamp is the LOG's timestamp, which the parser hands over as a local
+`DateTime`. `CharacterLevel.Resolve` compares the two directly, so they must be
+the same clock. The repo's sibling field is the other one on purpose:
+`GuideProgress.LastUpdated` is deliberately UTC and says so, because nothing ever
+compares it to a log line. A UTC stamp here would make every statement look up to
+a day fresher or staler than the ding it is weighed against, depending on the
+player's offset — and would look perfectly correct in the one timezone the author
+tested in. Named in `LevelReading.At`'s own comment so the next person meets it
+before they change it.
+
+**3. Only Level Up consumes the level; the other three engines are EXEMPT, each
+with a named reason. This is the default that most deserves a veto.** The
+Founder's MUST is *"recs MUST factor it"*, and three of four D3 engines answer
+"not in my arithmetic". The reasoning: the discount is about a zone's
+THROUGHPUT — what your own kills there were worth — and only Level Up makes that
+claim. For the other three the zone is a POINTER: a faction only moves where its
+own creatures are, and an unlock criterion names a specific creature, quest or
+standing. Down-weighting those for being low-level would be EQBuddy recommending
+against the goal the player just picked. The table is
+`Recommendations.LevelUseFor` and it is asserted as BEHAVIOUR, not as a comment:
+`HelperMustListTests` runs each engine at level 12 and level 60 and requires a
+declared `Consumes` to ANSWER DIFFERENTLY and a declared `Exempt` to answer
+identically — so an exemption that stops being true fails rather than going
+stale. The throughput goals that arrive later (Farm Gear D6, Farm Motes and Make
+Money D7) each own their row here when they land. **If David reads the MUST more
+broadly than this, the fix is three table rows and three engines, not a
+redesign.**
+
+**4. `OutgrownBy` is 10 levels and `OutgrownWeight` is 0.5 — both are named
+judgements rather than measurements, and they say so.** This repo has no XP
+curve, eqlwiki publishes none, and deriving one from con colours would be
+asserting a game rule nobody here can verify (David's own ceiling is level 29 —
+`david-cannot-verify-endgame`). Ten levels is the distance at which a band stops
+overlapping anything a player would still be fighting; the halving is a
+re-ordering and never a removal, because the zone keeps its real measured rate
+and the player may have a reason to go back that EQBuddy does not know. Same
+admission `ZoneHistory.MinHours` makes about its fifteen minutes.
+
+**5. The band's TOP decides, not its mean.** If anything in the zone still cons
+near you, you have outgrown PART of a zone, which is not a thing a recommendation
+should act on. The conservative direction, and it has its own test.
+
+**6. NARROWED, and said out loud: P6's evidence-band is built from `/consider`
+lines ONLY. The plan's parenthetical also named "session dings for the sessions'
+own level context", and that half is NOT in this slice.** `SessionRow` carries no
+level column, so it would be a `history.db` schema migration plus a backfill that
+could only ever be empty for existing rows. The con band is the direct measurement
+of what the sentence actually claims ("the creatures you conned here ran L5–11"),
+so nothing in the shipped behaviour rests on the missing half. Flagged rather than
+dropped: if the session-level context is wanted, it is its own slice with its own
+migration.
+
+**7. A stated level has NO upper bound.** It refuses zero, negatives and anything
+that is not a whole number, and says so out loud rather than silently reverting.
+It does not refuse 300, because EQBuddy does not know the game's level cap:
+nothing in-tree names one, the wiki answer is not in the repo, and a validation
+rule that asserted a game fact would be exactly the thing the match-the-wiki rule
+exists to prevent. The cost is bounded — the discount is a weight, not a filter,
+and "Let EQBuddy work it out" undoes a typo in one click.
+
+**8. `MainWindow.TrackedLevel` now reads the RESOLVED level, so this slice reaches
+past the Helper.** The level-unlock preview, the Progress card and the xp
+tooltip all read that one member. Leaving it on the log's raw number would mean a
+player who told the Character room they are 30 still being shown "New at level 28"
+two rooms away — two answers to "what level is this character", which is the exact
+defect that one member was created to prevent, one layer up. It is in the
+What's-new entry for the same reason.
+
+**9. The level row goes ABOVE the class row, and the zone detail line stays.**
+Order by editor size and not by importance: the level's editor is one box and the
+class's is sixteen chips, so putting class last keeps the level row from being
+pushed off the fold every time somebody opens the class strip.
+`HomeReadout.IdentityDetail` still answers ZONE — its own comment says why, and
+the Founder's ask supersedes silence about level rather than that documented
+DRA-63 call. `TheZoneDetailLineSurvivesTheLevelRowArriving` is the assertion,
+because a slice that satisfied the ask by swapping the line would have reversed a
+decision while looking finished.
+
+**10. The editor commits on Enter or "Done", and NEVER on focus loss.** The
+Character room rebuilds on a five-second throttle while a session is running, so a
+box that committed when it lost focus would write whatever half-typed prefix was
+in it at the moment the recent-session block ticked — "3" on the way to "30" — and
+that number would then be a STATEMENT outranking the player's next ding until they
+noticed. The key is announced in the editor's own note, which is a smaller price
+than a silent wrong statement. The draft survives the rebuild in a field kept
+deliberately OUT of the repaint fingerprint, and the caret goes back where the
+player left it.
+
+**What the shot disproved, recorded because a prediction caught it and nothing
+else could have.** `shell-home-level` was predicted as "a NARROW right-aligned box
+holding 28". It came back with an EMPTY box: the screenshot hook flipped the
+editor open on its own, while a player clicking the same link got their standing
+statement pre-filled. A correct photograph of a real state of something else
+(trap 23), invisible to every assertion in the repo. Both paths now go through one
+`OpenLevelEditor`, and `shellHomeLevelDraft` is the dump fact that says so from
+outside — "a box was built" and "the box holds what a player would see" are
+different claims.
+
+Verified: `dotnet build EQBuddy.slnx -c Release` green; the full unit suite green;
+the five new `ShellHostTests` rows green from a launched app; four prove-fails run
+and observed to FAIL before being reverted (a lying `LevelUse` row, the discount
+removed, `Resolve` turned into a precedence table, and the ledger round-trip
+must-list when the three new fields arrived). CI's `build-and-test` and
+`e2e-windows` remain the merge bar.
+
+— Dranak (Claude Code, DRA-71 D3)
+
+## 2026-09-13 — DRA-71 delivery 2: one multi-select primitive, and the eight defaults taken to build it
+
+Pre-authorized: Helm SIGNED the plan (PR #586, merged `a28c5d89`; SSC #587 merged `93040ac2`)
+and authorized `dra71-d2` after it landed on Soft `main`. No consequence-list door was
+touched — this slice moves controls and writes no new sentence about the world; the values
+line is untouched, no release was cut, no public post was made, no eqlwiki policy moved.
+Reporting duty rather than asking duty; David vetoes from here.
+
+Each row is the default I took, the thing it could have been instead, and where it landed.
+
+**1 — The face's overflow rule COUNTS, and Fable's plan illustrated it TRAILING.** P1 says
+`PickerFace` "generalizes `ClassFilterLabel`'s 0→'Any X' / >3→'N X' rule to any noun"; P2, two
+paragraphs later, writes the face as *"Goals: Level Up · Farm Gear +2"*. Those are two
+different rules and only one of them can ship. I took P1's, because it is the one stated as a
+rule rather than as an example, it is the one the class picker has been asserted against since
+#184, and "+2" on four picks would have widened the class face from "4 classes" (9 chars) to
+"BRD · CLR · WAR +1" (18) and reddened the existing test that says that face never grows. It
+could have gone the other way with a mode flag; two overflow spellings of one control is how
+the sixteen hand-built chip strips started. If David or Bevel prefers "+2", it is one function
+in `UI.Shared/PickerFace.cs` and `PickerFaceTests` already says what it would cost. Filed as
+question 2 in the `BEVEL.md` stub.
+
+**2 — The cap is a WIDTH as well as a count, and the Helper's budget is 34 characters where
+the class picker's stays 16.** The literal generalisation — count past three, any noun — would
+have shipped #184 straight back on the Helper: "Unlock Classes · Unlock Races · Farm
+Materials" is three picks and forty-five characters. #184's own test says the defect was that
+*"label width tracked the number of classes picked"*, so width was always the point and the
+count was the mechanism. The two budgets differ because the two rows differ: the class face
+SHARES its row with the era combo, the state combo and the mode strip (that row running out
+IS #184), and the goal face owns its own row in a column of `ShellLayoutPolicy.MinRoomWidth`.
+Both numbers are named constants with the reason beside them, and `PickerFaceTests` walks all
+512 subsets of the nine goals rather than a handful of examples.
+
+**3 — The faction face is never told how many factions are offered, so it can never say "All
+factions".** The picker shows twelve standings out of a dump that carries hundreds, and prints
+the withheld count directly under the face (trap 50). A face saying "All factions" would
+un-say that one control up. The default could have been to pass the shown count and let it
+read "All" when every visible row is ticked — which is true of the ROWS and false of the
+player's factions. `PickerFace` takes `offered: 0` for an open-ended offer and the test pins
+that the capped face counts instead.
+
+**4 — `helperChips` keeps its D1 name in the `EQBUDDY_EXPAND` dump.** The nine moved inside a
+popup, so "chips" is now a word about a control that no longer exists. It could have been
+renamed to `helperGoalRows`. It was not: the key's MEANING is unchanged ("how many goals this
+room offers"), it is the trap-29 assertion that has pinned the Founder's nine since the room
+landed, and a rename would have edited the one E2E row that could catch the rows going missing
+in the same commit that hid them behind a face. `helperGoalFace`, `helperFactionFace`,
+`helperPickerOpen` and `helperPickerHook` are added beside it.
+
+**5 — `EqMultiPicker` lives in `DesignSystem.cs` beside `EqChip`, not in its own file.** The
+plan names it `DesignSystem.EqMultiPicker` and `EqChip`/`EqSegmentedStrip` are already
+same-file siblings there; a third primitive in a fourth place makes "which file do I look in
+for the shared control" a question. The file is not on the hotspot ratchet and this is what it
+is for.
+
+**6 — The screenshot hook re-opens the picker after EVERY rebuild rather than firing once.**
+The first version fired once and the E2E caught it: `Build` replaces every control, so the
+one-shot opened a picker a rebuild had already thrown away — dump said shut, and the staged
+shot would have been identical to the closed one while looking like the hook worked.
+`EQBUDDY_HELPER_PICKER` is unset in every shipping run, so "staged open" is a state the room
+holds rather than an event it fires. The alternative — latching after the first SUCCESSFUL
+open — is the same thing with more state. `helperPickerHook` reports whether the hook found
+its picker at all, so a shut staged shot can say which half failed.
+
+**7 — The class-picker migration keeps `ClassBtn` in XAML and hands it to the primitive.** The
+button sits in a fixed Grid column beside the mode strip — the exact geometry #184 was about —
+so moving it into code would have made "the filter row still lays out the same" a claim nobody
+could check by reading the diff. `EqMultiPicker` therefore takes an optional already-placed
+face. The hand-built `<Popup>` of CheckBoxes is gone, which is what makes the new rule ("the
+multi-select dropdown is `EqMultiPicker` — never hand-build another one") true on the day it
+is written rather than aspirational.
+
+**8 — The class picker gets its OWN `WhatsNew.json` entry, saying that nothing about it
+changed.** A refactor with no behaviour change is normally not player-noticeable and earns no
+entry. This one touches a surface that shipped in 1.x and was itself the subject of a
+reporter's bug (#184), and "we rebuilt the control underneath your class filter and believe it
+is identical" is worth saying to the person who reported it — with an explicit ask to tell us
+if it is not. The pending 2.0.0 Helper entry grows in the same pass to describe the picker
+rather than the chip strip nobody has seen.
+
+## 2026-09-12 — DRA-70 delivery 1: the Helper room, and the ten defaults taken to build it
+
+Pre-authorized: Helm SIGNED the plan (PR #580, merged `0705f45f`) and authorized `dra70-d1`
+after it landed on Soft `main`. No consequence-list door was touched — the values line is
+untouched (every input is this character's own log, dumps and catalogs EQBuddy ships;
+nothing measures another player), no release was cut, no public post was made, and no
+eqlwiki policy moved. Reporting duty rather than asking duty; David vetoes from here.
+
+Each row is the default I took, the thing it could have been instead, and where it landed.
+
+**1 — The Helper's WORDS live in `UI.Shared/HelperPresentation`, not in Core beside the
+engine.** `UnlockGuidance` — the mini-recommender this copies its manners from — phrases its
+own sentences in Core, so the obvious default was to do the same. It could have gone that
+way. It did not, because the rule this feature has to keep is a rule about VOCABULARY
+(HOME-006: nothing may claim a camp is safe, easy or survivable) and a guard over vocabulary
+can only be written where the vocabulary is. Core carries typed `WhyFact` records with
+numbers on them; `HelperPresentation` turns each into a sentence and
+`HelperPresentationTests` sweeps every one — constants AND assembled interpolations, which
+is the tier a `const` scan cannot see. **The exception is deliberate and it proves the
+rule:** a sentence `UnlockGuidance` has already measured AND phrased is passed through
+verbatim as a `WordedFact`, because two surfaces wording one arithmetic are two answers and
+the newer copy is always the one that goes stale.
+
+**2 — The second sort key is a BOOLEAN, not a line count.** HOME-003 says personal evidence
+outranks generic advice. The first build read that as "more personal lines rank higher", and
+the fixture caught what that means: a faction grind with four movers beat the fastest camp
+the character had ever farmed, on volume. A count is a proxy for confidence and a proxy is a
+claim about the world (trap 64b). `Recommendation.HasPersonalEvidence` asks HOME-003's own
+question; `MoreSentencesDoesNotOutrankABetterMeasuredCamp` is the row that pins it.
+
+**3 — "Work on Faction" REQUIRES a pick and is not a filter over every standing.** A faction
+dump carries hundreds of rows; weighing all of them is the thirty weak answers HOME-002 asks
+for the opposite of. The cost is one more state to explain, and it is explained: a dump with
+nothing picked asks for a PICK, a missing dump asks for the COMMAND, and the two are
+different sentences rather than one that covers both.
+
+**4 — `UnlockGuidance.Faction` was made PUBLIC and taught to take a faction NAME.** It was
+private and took an unlock criterion. The alternative was a second mover-finder in
+`Recommendations`, which would have been a second phrasing of one arithmetic on two surfaces
+— the failure that file's own comment names. It also gained a `Zone` init property carrying
+where the best raiser was killed, because the Helper joins on the zone and re-deriving "which
+mover is best" at the call site would be a second producer of a selection that method has
+already made. Nothing about the Unlocks tab's behaviour changed.
+
+**5 — The five goals without engines SHIP VISIBLE, each with a door.** The alternative was
+hiding a chip until its engine lands, which would make the feature look smaller than the plan
+it is executing and would mean the strip changes shape under the player three more times. A
+deferred chip says so in its own words and hands over the door to the room that answers its
+question TODAY — a chip producing one apologetic sentence and pointing nowhere would be the
+rail's own *"an affordance that opens nothing is a trap"* reappearing one level in, where the
+rail's guard cannot see it. `HelperMustListTests` asserts both halves together, because
+either one alone is the bug.
+
+**6 — The ⧉ copy REPEATS when two goals want the same dump.** With nothing picked, Unlock
+Classes and Unlock Races each carry their own `/outputfile achievements` button: four copies
+on one screen. Deduplicating would mean one of the two goals asks for a file and offers
+nothing, which is precisely the row the player who picked only that one is looking at. It is
+DRA-63's ruling applied one room over — a row that asks names its own answer, in every state.
+
+**7 — Three recommendations, four why-lines each, twelve faction chips.** Three is HOME-002's
+own number. Four is a judgement: a headline plus five reasons stops being a recommendation
+and becomes a report. Twelve is a judgement about a picker that is not a browser. **All three
+caps report what they withheld** (trap 50), and a cap that held nothing back says nothing at
+all.
+
+**8 — `ZoneHistory.MinHours` is fifteen minutes, and it is a judgement rather than a
+measurement.** It is the shortest sitting that can contain a pull, a death and a recovery,
+which is what an XP rate is supposed to average over. Below it the fold answers NO rate at
+all rather than dividing — four minutes containing one lucky pull is "120%/hr" if you let it,
+and that is noise ranked first.
+
+**9 — Level Up is personal-only, and the absence of a catalog fallback is asserted.** The
+plan PARKS a generic camp catalog behind a reporter asking for one, so a character with no
+stored play gets a sentence saying so rather than a level-range table EQBuddy would have had
+to invent (trap 73, and the match-the-wiki rule one step further out: there is no wiki answer
+here either). The consequence is that D1 ships exactly ONE catalog-sourced line — a Task
+criterion whose quoted quest name matches the shipped catalog — and
+`TheOnlyCatalogSourcedLineInThisDeliveryIsAMatchedQuestName` says so out loud, so the day D2
+adds another somebody has to come and change that row deliberately.
+
+**10 — The Helper builds its own empty state rather than joining `ShellRoomEmpty`.** That
+module's declared scope is the four rooms that came in as moves and lifts of v1 windows;
+Home and Live built their own for the same reason, and the Helper's empty is not "no
+character" but "nothing to suggest yet", which is a different question with a different
+answer.
+
+**Two wordings were found by the SHOT and not by any assertion**, which is the whole argument
+for the illustration lock: *"across 1 of your session"* (a lone plural toggle in the middle of
+an interpolation) and *"you stand at 1,000, 1,000 from the top"* (a comma that reads as a
+thousands separator). Both are fixed with a regression row. The same first shot also
+disproved two of my own written predictions — the shoot fixture's session is ALREADY ARCHIVED
+by the time a room draws, so the Helper had real recommendations where I predicted none. The
+wrong predictions are kept in `shoot.ps1` beside what the shot actually showed, because the
+next person predicting a picture of that profile needs to know.
+
+— Dranak (Claude Code, Paperclip DRA-70, seat `opus-dra70-d1`)
+
+## 2026-09-12 — DRA-49 revision of PR #511: the #507 entry key folded into replace/retention, and four calls made alone
+
+Pre-authorized: tooling and gates, no consequence-list door. SSC #513 steps 2–4 asked for
+the fold specifically; these are the calls inside it that could have gone another way.
+
+**1. The #507 key was FOLDED IN, not swapped for the line check.** #507 compared entry
+headings; #511 compared lines. The obvious resolution is to pick one. Both survive, as
+arms 3a and 3b of the replace check, because they fail on different things and neither
+covers the other: the line arm is the sensitive one and is the only thing still watching
+`HELM-FEEDBACK.md`, whose entries `c7a597a8` collapsed past recovery; the entry arm is the
+only one that cannot be moved by an encoding round trip, which is what made #507's author
+abandon line comparison in the first place (`ff6853ba` read as 63% destruction of a
+correct merge). **The default it could have gone the other way on:** one check, one
+number, less to explain. It landed as two because each one is green on a commit the other
+refuses, and I can point at both commits.
+
+**2. The REPAIR exemption stands 3a down and deliberately does NOT reach 3b.** This is the
+part that earns the fold. An encoding repair rewrites nearly every line, so the line arm
+has to forgive it — and that forgiveness is also a cover story: a commit that un-mangled a
+ledger **and** dropped a quarter of its entries was green under #511 as it stood. Stripping
+non-ASCII is what the entry key already does, so a genuine repair does not move one and
+has nothing to ask for. Self-test cases 15 and 16 are that commit, asserted twice — 3a
+excused it, 3b refused it. **What would reverse it:** a legitimate workflow that rewrites
+entry HEADINGS wholesale. I know of none; the archive exemption covers the one I can
+foresee.
+
+**3. Entries are matched mid-line, and the key is capped at 80 characters.** The tidy
+reading is line-start headings only. It is also, today, a detector aimed at nothing on the
+single most important file: `c7a597a8` collapsed `HELM-FEEDBACK.md`'s 8,677 lines into 2,
+so `main` carries EIGHT line-start headings standing for 1,051 entries, and a percentage
+over eight things is not a measurement (trap 74, one file over). Mid-line matching
+recovers 3,523 of them. The cap is the cost of that: a recovered entry has no end, so
+without it the key would swallow the entry's whole body and any edit inside an entry would
+read as deleting it. Two hashes minimum, not one, so a pasted `# comment` does not invent
+entries out of quoted PowerShell.
+
+**4. When the new arm refused a self-test fixture, I corrected the FIXTURE.** The "lifting
+holds from `HELM.md` passes" case lopped 22% off the end of the file, which is 13 of 60
+holds in one commit, and 3b called it. The cheap fix is to loosen the floor until the
+fixture passes. The measurement says not to: across all 234 revisions of `HELM.md` the
+worst clean entry retention ever recorded is 0.944, because holds lift one at a time. A
+floor moved to fit an invented fixture is trap 52 with the premise never re-derived. The
+fixture now lifts six holds and compacts twenty more, which is what a Helm pass does, and
+the floor stayed where the 1,143 measured revision pairs put it.
+
+**Scope, stated plainly, because it has not changed:** this still catches CATASTROPHIC
+loss and nothing else. Trap 60(a)'s stale-base clobber and 60(c)'s silently truncated
+append both still pass. `CLAUDE-FEEDBACK.md` has 12 entries and so sits under the 20 the
+percentage needs — it gets four checks, not five, and the guard now SAYS so on every run
+rather than letting the docs promise five.
+
+— Dranak (Claude Code)
+
 ## 2026-09-12 — DRA-66 (Character room rename + class line/correction): executed the SIGNED plan after building past it — the collision, and four calls that remained mine
 
 **The collision, first, because it is the entry's real content.** Paperclip assigned
@@ -840,6 +1822,70 @@ Turquoise re-shoot follow-up card is unchanged.
 page, rather than a marketing table where EQBuddy sweeps every row — the
 eqlwiki-is-the-source posture made visible to a cold visitor. The one hard cross is
 the other-players row, worded as principle, not gap.
+
+## 2026-09-10 (DRA-49 EXO-HARDEN-A1 — the channel wipe guard, calls made alone)
+
+All of these are pre-authorized: tooling and gates, no consequence-list door. Stated as
+assumptions at the top and logged here for the veto.
+
+**1. The guard is TIERED, and the inboxes get no percentage check at all.** The obvious
+build is one rule for "channel files". It is wrong: `*-FEEDBACK.md` files are append-only
+ledgers, `HELM.md` is state whose whole job includes LIFTING holds, and `FABLE.md` /
+`BEVEL.md` / `SCRIBE.md` are inboxes whose documented workflow is *"when you take an item,
+delete it."* A single threshold would have to be loose enough for the loosest of the three,
+which means loose enough to miss `7b804338` — the 2026-09-04 truncation, at 81%. **The
+default it could have gone the other way on:** one rule, one number, simpler to explain.
+It landed tiered because the measurement said the tiers are real — a drained `FABLE.md` is
+9.5% of its former length (`d091939b`) and that is CORRECT, while 81% on a ledger is an
+incident.
+
+**2. The thresholds were measured before they were chosen.** All 1,379 revisions of the
+eleven rostered files were scored for length and line-retention first. This was most of the
+work and none of the deliverable, and it is the reason I will defend the numbers: on the
+ledger tier the only clean revisions below 95% are the truncation and one encoding repair,
+with the nearest legitimate value at 95.5%. **What would reverse it:** any legitimate
+workflow that regularly rewrites a ledger — the archive exemption exists so that the one I
+can foresee does not.
+
+**3. No `-Force`, no `-Skip`, no allow-list.** Same posture as `release.ps1` having no
+`-SkipSign`: an escape hatch on a guard whose entire subject is *"an automated land
+destroyed the file"* is the automated land's next move, and both wipes were landed by
+automation whose commit message said it was signing something. The two legitimate reasons a
+ledger shrinks are MECHANISMS instead — an archive move (the lost lines are found under
+`docs/ops/claude-archive/`) and an encoding repair (fewer mojibake markers at full length).
+You satisfy them by doing the right thing, not by asserting that you did. **The default it
+could have gone the other way on:** a `-Force` switch plus a review convention, which is
+cheaper to add and is exactly what nobody would have been holding at 11pm.
+
+**4. Existing mojibake is NOT re-litigated.** `HELM-FEEDBACK.md` carries 13,411
+double-encoded markers today across 31 commits. A guard that failed on them would be
+unpassable from the first PR and would be turned off within a day, so the check is
+base-relative: only NEW damage fails. **What would reverse it:** a repair pass that cleans
+the file, after which an absolute check becomes affordable. That repair is NOT in this
+change — it is a large, reviewable diff of its own, and doing it here would have hidden the
+guard inside it.
+
+**5. It compares the WORKING TREE by default, not `HEAD`.** So a wipe fails in
+`check.ps1` before it is ever committed, which is where the cheapest possible correction
+is. CI passes the PR base sha explicitly; the merge-result checkout is what makes that the
+right question.
+
+**One thing deliberately NOT done, and it is a named hole rather than an oversight:** trap
+60(c), the silently truncated append, still has no guard. A note that lost every backticked
+identifier to Bash still diffs additions-only and still retains 100% of the base's lines.
+Nothing here can see it. Filing it as a follow-up rather than widening this card is the
+same call trap 60(b) made in September — and that entry sat while three files got wiped, so
+the follow-up is worth naming out loud rather than assuming somebody picks it up.
+
+**Correcting the record while I am here:** trap 60(b) closed by estimating the write-side
+damage at "446 lines already committed." Measured on 2026-09-10 it is 13,411 markers in
+`HELM-FEEDBACK.md` alone. The corruption compounds, because the input to each rewrite is
+the output of the last one, so an em dash reaches a second and then a third round trip.
+(The mangled forms are spelled out in the trap 60 novel and deliberately NOT here: the
+guard refused this very entry for carrying them, which is the check working. A channel
+ledger is not where corrupt bytes belong, even as an illustration.)
+
+— Dranak (Claude Code)
 
 ## 2026-09-10 (Fable, DRA-48 landing BUILD — calls made alone under the Founder override)
 

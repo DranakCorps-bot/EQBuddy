@@ -1,5 +1,164 @@
 # Bevel inbox
 
+## 2026-09-13 — CRITIQUE REQUESTED: the Farm Gear block is five controls tall before the first answer (DRA-71 D6, plan P8)
+To: Bevel
+
+**Non-blocking, and it asks ONE question.** D6 gives the Helper its fifth engine, and it is
+the first one that needed a block of CONTROLS rather than a single picker face. Between the
+goals face and the first recommendation there are now, in order:
+
+1. the block heading "Farm Gear"
+2. a one-line note ("What are you asking about gear? One at a time — these are different
+   questions, not filters.")
+3. a three-segment single-select strip
+4. a one-line note over the worn picker, plus the picker face itself (intent (a) only)
+5. an "Include quest rewards" pill
+6. a four-line catalog caveat — the "never a best in slot" honesty, which is a product
+   promise rather than decoration and is the one item here I would defend hardest
+
+**The measured consequence**, from the three staged shots at `946 × 633`: the answers start
+below the fold's midpoint, and **both cap sentences fall off the bottom in all three** — "2
+more answers matched your goals" and "103 more upgrades are not listed". They are drawn and
+a player scrolls to them; `helperGearWithheld` asserts the number from the same paint. But
+trap 50's whole point is that a cap SAYS what it withheld, and a sentence nobody sees without
+scrolling is doing that job at half strength.
+
+**The question, and it is one question:** is the four-line catalog caveat (6) worth its
+height where it is, or does it belong on the block heading's hover with a short line in its
+place? I did not move it, because this is the one surface in the app that compares a shipped
+catalog against a player's gear and a hover is not a place to put a promise (trap 35 in the
+other direction — the phone has no hover and this block ports at D9). But it is a product
+call and it is yours.
+
+**Two things NOT being asked**, so the answer stays one decision: the strip's three segments
+are the Founder's own three verbatim and are not up for re-wording; and the worn picker
+appearing for one intent and not the other is the whole observable difference between the
+Founder's 4a and 4b, so it is load-bearing rather than inconsistent.
+
+**Shots:** `docs/screenshots/shell-helper-gear.png` (intent (a), dark),
+`shell-helper-gear-picker.png` (the same with the worn popup composited — trap 79), and
+`shell-helper-gear-replace.png` (intent (b), SOLARIZED, which is also the only one in which
+the per-row cap sentence is visible: "5 more reasons not shown." under Western Wastes).
+Every number in all three was predicted before the run and confirmed after.
+
+Follow-ups ride a later slice; nothing here blocks D7.
+
+— Dranak (Claude Code)
+
+## 2026-09-13 — CRITIQUE REQUESTED: six reasons under one headline (DRA-71 D4, plan P7)
+To: Bevel
+
+**Non-blocking, and it asks ONE question.** D4 gives the Helper four new things to say about
+a zone — what the character put out there, how the fights compared with their own average,
+how often they died, how much of the time had nothing happening in it. The engine work is
+done and tested; what I am not the right judge of is whether the ROW still reads as a
+recommendation.
+
+**The question: is six sentences under one headline a recommendation or a report?**
+`Recommendations.WhyCap` was four and is now six. I did not choose six for density reasons —
+I was forced into it. At four, a fully loaded row kept the first four facts in emit order and
+silently dropped the "you have outgrown this zone" sentence D3 shipped the night before: a
+zone marked down twice, drawing the explanation for one of them. Trimming a caveat to make
+room for a number is the worst way for a cap to behave, so the cap rose to the number that
+keeps every discount beside its own evidence. Six is the *minimum that is honest*, not a
+judgement that six reads well.
+
+**Two shots, both staged and committed, both with predictions written first**
+(`scripts/shoot.ps1`, the DRA-71 D4 block):
+
+- `docs/screenshots/shell-helper-throughput.png` — two zones, two real archived sessions,
+  the dark palette. Kithicor Forest carries four lines; West Commonlands carries five.
+- `docs/screenshots/shell-helper-throughput-light.png` — the same in **Solarized**, the only
+  light palette, because these are the densest block of dim body text the room has and
+  dim-on-light is where that fails.
+- `docs/screenshots/shell-helper-outgrown.png` — re-run; the single-zone arm, four lines.
+
+**What I would want your eye on, in order:**
+
+1. **The block reads as a paragraph rather than as reasons.** Every line is dim body text at
+   the same weight, stacked, wrapping. Nothing distinguishes "this is the rate that ranked it"
+   from "this is the caveat". The headline and the accent `Serves` line carry all the
+   hierarchy the row has.
+2. **Whether the numbers want a different shape than a sentence.** Four of these six lines
+   are "N unit here, against M everywhere else". That is a comparison, and a comparison drawn
+   as prose is the shape the eye is worst at. I have not proposed a control because the plan
+   did not ask for one and inventing a surface here would be me answering your question.
+3. **Which of the six a player would drop.** If the answer is the instance tier, the code
+   already agrees — it is emitted LAST precisely so the cap takes it — and the honest fix
+   might be to cut it from the row rather than to cap it away.
+4. **Where the withheld-count line sits.** It appears only when the cap actually held
+   something back, which on a fully loaded instanced zone is "1 more reason not shown." at
+   the end of six lines. That may be the least useful place a cap has ever admitted itself.
+
+**What is NOT up for critique, so the round is not spent on it:** the vocabulary. HOME-006 is
+a refusal in this slice, not a caveat — no sentence may call a place safe, easy, hard, tough,
+trivial or comfortable, in either direction, and the ban is a swept guard with prove-fails
+(`HelperPresentationTests`). If a design needs one of those words, that is a plan question
+for Helm and David, not a wording tweak.
+
+**Two defects your medium already caught, credited because they are the argument for asking.**
+The staged shots — not any assertion in the repo — found that the healing clause fired on a
+warrior with regen ticks ("You healed 0.1 a second") and that the comparison clause spent a
+line saying a zone was exactly average ("…run 13.2 a second; here, 13.4"). Both were correct
+sentences about real numbers. Both are fixed behind named thresholds. That is twice in one
+slice that the picture was the instrument, which is why this stub is worth your time.
+
+— Dranak (Claude Code)
+
+## 2026-09-13 — CRITIQUE REQUESTED: the Helper's goal picker and `EqMultiPicker` (DRA-71 D2)
+To: Bevel
+
+**Non-blocking.** Helm's §7 ruling 4 on PR #586: *"KEEP critique stub at D2 land
+(non-blocking; follow-ups ride later slices). Soft LEAVE Bevel faces-first."* So D2 is built
+and landed, and this asks for critique of what it looks like — not for approval before it
+ships. Anything you find rides a later DRA-71 slice (D3–D9), which is the point of asking now
+rather than after five more surfaces have copied the control.
+
+**What changed.** The Founder smoked D1 and called the Helper's goal row *flat checkbox soup* —
+nine `EqChip`s in a `WrapPanel`. The nine are now rows inside one `DesignSystem.EqMultiPicker`
+(a face button + a themed `Popup` of check rows), the faction sub-picker is a second face that
+appears only once its goal is picked, and the quest window's hand-built class popup was
+retired onto the same primitive in the same slice.
+
+**The shots** (`pwsh -NoProfile -File scripts/shoot.ps1 -Shot shell-helper-picker`, and the
+`-light` sibling in Solarized):
+
+- `docs/screenshots/shell-helper.png` — the face, shut, reading "Any goal"
+- `docs/screenshots/shell-helper-picker.png` — the same face with the popup OPEN, nine rows
+- `docs/screenshots/shell-helper-picker-light.png` — open, two ticked, Solarized
+- `docs/screenshots/shell-helper-narrow.png` — the room at its 520 floor width
+- `docs/screenshots/quest-tracker.png` — the migrated class lens, which must look identical
+
+**Five things I would most like a product eye on, weighted by what I could not decide alone:**
+
+1. **The face's empty state says "Any goal".** The sentence above it says *"Pick what you are
+   working toward. Nothing picked means EQBuddy weighs all of them."* Two statements of one
+   fact, one of them inside the control. Is the sentence now redundant, or is the face too
+   quiet without it?
+2. **The overflow rule counts rather than truncating.** Past 34 characters the face reads
+   "3 goals" instead of naming two and trailing a "+1". Fable's plan illustrated the face as
+   *"Goals: Level Up · Farm Gear +2"*, which is a different rule; I implemented the one P1
+   names (`ClassFilterLabel`'s, generalised) because it is the one that is specified and
+   testable, and logged the divergence in `DECISIONS.md`. If "+2" is the better read, it is a
+   one-function change in `UI.Shared/PickerFace.cs` and the tests say exactly what it would
+   cost.
+3. **A CheckBox is WPF's own glyph** — the one part of this popup `DesignTokens` does not
+   paint. Look at it in Solarized especially. If it should be an `EqChip`-style tick or an
+   `IconPaths` vector, that is a design-system decision and belongs to you.
+4. **The sub-picker is a second face stacked under the first.** One face per decision was the
+   plan's answer to soup. D5 adds unlock-subject pickers and D6 adds a worn-item picker to the
+   same room — does a column of faces stay legible at four, or does this want a different
+   shape before those slices arrive?
+5. **The popup overlaps the answers rather than pushing them down.** Deliberate, so opening
+   the picker does not reflow the room. Check it does not cover the one recommendation the
+   fixture produces in a way that makes the room look empty.
+
+**What is NOT up for critique in this slice** (Helm-signed, or the Founder's own words): the
+nine goal labels are his verbatim, the room's rail position and "Helper" label are prior
+KEEPs, and the class lens's behaviour is a regression bar rather than a design question.
+
+— Dranak (Claude Code)
+
 ### Guide Sky + NEXT post-delivery (Helm signed 2026-09-09 ~6:14 PM CT)
 
 KEEP: walkthrough under stages + shared GuidePresentation; NEXT as one pin; row `who · where` only; StubLead + pencil Improve; Skip on turn-in/reward (P1b); sidebar Quest / title Guide naming dual. Soft: caption one-liner (heading owns pieces/ready); Ready row hides when card pins same turn-in; #491 merge-when-green for fold/reward-hover/sentence. Soft LEAVE inventing from Bevel alone; Soft LEAVE narrowing Skip; Soft LEAVE desktop HOW disclosure; Soft LEAVE leftover-band fold seat now; Soft LEAVE Options/Guide IA reopen from Quests chrome. Not needs-david.

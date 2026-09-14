@@ -65,9 +65,44 @@ public sealed record UnlockGuidanceRow(
 {
     public static readonly UnlockGuidanceRow Nothing = new([], "", "", "", null);
 
+    /// <summary>
+    /// Where the best raiser behind this row was killed, or empty when the row has no
+    /// mover — the ZONE, as a value, never as prose.
+    ///
+    /// <para><b>It is here so that nobody computes it twice.</b> DRA-70's Helper joins its
+    /// recommendations on the zone (a place serving two of your goals at once outranks
+    /// either alone), and a faction grind's place is wherever the creature that moves it
+    /// lives. Re-deriving "which mover is best" from the pool at the call site would be a
+    /// second producer of a selection this method has already made, disagreeing with the
+    /// sentence beside it the first time two raisers tie — trap 4 with the two sources being
+    /// one arithmetic written twice.</para>
+    ///
+    /// <para>An <c>init</c> property with a default rather than a positional parameter, the
+    /// same shape <see cref="MobLoot.LastAt"/> took: the three shapes that have no zone say
+    /// nothing by constructing normally.</para>
+    /// </summary>
+    public string Zone { get; init; } = "";
+
+    /// <summary>
+    /// WHO — the creature behind this row, or empty.
+    ///
+    /// <para>The same top raiser <see cref="Zone"/>, the movers and the estimate were all
+    /// taken from, carried out as a VALUE for the same reason the zone is: re-deriving "which
+    /// mover is best" at a call site would be a second producer of a selection this method has
+    /// already made (trap 4). Added by DRA-71 D5 so a surface can draw the Guide's
+    /// <c>who · where</c> row line without reading a name back out of a sentence.</para>
+    /// </summary>
+    public string Who { get; init; } = "";
+
     /// <summary>Every sentence this row adds, in the order a surface draws them: what the
     /// checklist knows, then what your own log knows, then what it implies. Ordering lives
-    /// here rather than in each renderer for the same reason the words do.</summary>
+    /// here rather than in each renderer for the same reason the words do.
+    ///
+    /// <para>It is the WHOLE set, and it stays that: the Helper reads it to build its
+    /// why-lines and the phone will. <see cref="RowLines"/> and <see cref="Hover"/> are the
+    /// same sentences SPLIT for a row-shaped surface, and their union is this — asserted,
+    /// because a split that silently dropped one would look exactly like a guidance shape
+    /// that had nothing to say.</para></summary>
     public IReadOnlyList<string> Lines =>
     [
         .. Pieces.Length > 0 ? (string[])[Pieces] : [],
@@ -75,6 +110,59 @@ public sealed record UnlockGuidanceRow(
         .. CapNote.Length > 0 ? (string[])[CapNote] : [],
         .. Estimate.Length > 0 ? (string[])[Estimate] : [],
     ];
+
+    /// <summary>
+    /// **THE ROW'S OWN LINE: WHO, then WHERE** (DRA-71 D5, plan P12).
+    ///
+    /// <para>The Guide surface's idiom, adopted here because the fact already fits it: a
+    /// mover carries a creature and the zone you killed it in, which is exactly what
+    /// <c>GuidePresentation.RowDetail</c> draws under a guide step's title. WHAT is the row's
+    /// own title (the criterion), and the longer prose is the <see cref="Hover"/> — each of
+    /// the questions drawn in exactly one place, which is the rule that idiom exists to
+    /// keep.</para>
+    ///
+    /// <para><b>The grammar is the FACT's, not a checklist's.</b> No "kill 12 orc centurions"
+    /// appears here and none is invented: this is the pointer the player's own log already
+    /// supports, and an unlock is a grind or a cross-reference rather than a checklist step
+    /// (the Founder soft-leave DRA-65 recorded, still standing).</para>
+    ///
+    /// <para>Empty for the Sky and Task shapes, and for a faction nobody has farmed — an
+    /// unanswered question draws NOTHING rather than a labelled blank (trap 73).</para>
+    /// </summary>
+    public string RowDetail => Join(Who, Zone);
+
+    /// <summary>
+    /// What a row-shaped surface keeps ON SCREEN: the two QUANTITIES.
+    ///
+    /// <para>The piece count and the kills-to-go estimate are one line each, they are what a
+    /// player acts on, and neither is prose — so they stay visible while the per-creature
+    /// evidence moves to the hover. A surface that photographed as a bare list of criteria
+    /// would also be a surface nobody could review (trap 22), which is the second reason
+    /// these two did not go with the rest.</para>
+    /// </summary>
+    public IReadOnlyList<string> RowLines =>
+    [
+        .. Pieces.Length > 0 ? (string[])[Pieces] : [],
+        .. Estimate.Length > 0 ? (string[])[Estimate] : [],
+    ];
+
+    /// <summary>
+    /// The longer prose, for the hover: what your own kills DID to this faction, and the cap
+    /// note when the list held some back.
+    ///
+    /// <para>Up to six signed one-liners — three raisers and three costs — which is the wall
+    /// the row line replaces. They are still one producer's sentences; only where they are
+    /// drawn moved.</para>
+    ///
+    /// <para>Empty when there is nothing to say, so a caller can test it rather than testing
+    /// a count. A surface must not set an empty tooltip: an empty hover is a rectangle that
+    /// appears and says nothing.</para>
+    /// </summary>
+    public string Hover => string.Join("\n",
+        (string[])[.. Movers, .. CapNote.Length > 0 ? (string[])[CapNote] : []]);
+
+    private static string Join(params string[] parts) =>
+        string.Join(" · ", parts.Select(p => p.Trim()).Where(p => p.Length > 0));
 
     /// <summary>Nothing to add — the row draws exactly what it drew before this feature
     /// existed. The common case, and it has to STAY the common case: a faction nobody has
@@ -157,7 +245,7 @@ public static class UnlockGuidance
         QuestCatalog? catalog) =>
         ShapeFor(criterion.Need) switch
         {
-            UnlockGuidanceShape.FactionGrind => Faction(criterion, factions, pool ?? []),
+            UnlockGuidanceShape.FactionGrind => Faction(criterion.Subject, factions, pool ?? []),
             UnlockGuidanceShape.SkyPieces => Sky(unlock, criterion, skyItems, skyCompleted),
             UnlockGuidanceShape.CatalogQuest => Task(criterion, catalog),
             _ => UnlockGuidanceRow.Nothing,
@@ -165,22 +253,38 @@ public static class UnlockGuidance
 
     // ---- MaxFaction: the player's own kills, and a door to the wiki ------------------
 
-    private static UnlockGuidanceRow Faction(
-        UnlockCriterion criterion, FactionsFile.Snapshot? factions, IReadOnlyList<MobSummary> pool)
+    /// <summary>
+    /// The faction grind, for ANY faction the dump names — not only one an unlock criterion
+    /// asked about.
+    ///
+    /// <para><b>It was private and took a criterion until DRA-70.</b> The Helper's "Work on
+    /// Faction" goal is the same question asked from a different room — which mobs of yours
+    /// move this standing, what they cost, and how far there is to go — and the one thing it
+    /// must not do is word that measurement a second time. Two surfaces that each phrase one
+    /// arithmetic are two answers, and the copy that goes stale is always the newer one; so
+    /// the parameter became a NAME and the caller below passes
+    /// <see cref="UnlockCriterion.Subject"/>. Nothing about the unlock path changed.</para>
+    ///
+    /// <para>Every sentence is still silence-by-default: a faction nobody has farmed gets
+    /// movers of length zero and an empty estimate, and only the wiki door — which costs
+    /// eqlwiki nothing until a player clicks it — is unconditional.</para>
+    /// </summary>
+    public static UnlockGuidanceRow Faction(
+        string faction, FactionsFile.Snapshot? factions, IReadOnlyList<MobSummary> pool)
     {
         // The door is unconditional, and that is the point: it is the one answer that does
         // not depend on having farmed anything, and it costs eqlwiki nothing until the
         // player clicks it. No fetch, no harvested prose — a name and a link.
-        var door = new UnlockDoor(UnlockDoorKind.WikiFaction, criterion.Subject, WikiFactionTip);
+        var door = new UnlockDoor(UnlockDoorKind.WikiFaction, faction, WikiFactionTip);
 
-        var standing = FactionNames.Resolve(factions, criterion.Subject);
+        var standing = FactionNames.Resolve(factions, faction);
         // Every (mob, zone) in the pool whose own faction ledger names this faction. The
         // names come from three different files — the log, the faction dump and the
         // achievements text — so the fold that decides "same faction" is FactionNames'
         // and not a fourth copy of it here.
         var hits = pool
             .SelectMany(m => m.Factions.Select(f => (Mob: m, Hit: f)))
-            .Where(x => FactionNames.Same(x.Hit.Faction, criterion.Subject)
+            .Where(x => FactionNames.Same(x.Hit.Faction, faction)
                         || (standing is { } s && FactionNames.Same(x.Hit.Faction, s.Name)))
             .ToList();
 
@@ -216,7 +320,13 @@ public static class UnlockGuidance
                 + $"at +{best.Hit.Delta} each — an estimate from your own log, not a target.";
         }
 
-        return new UnlockGuidanceRow(movers, estimate, cap, "", door);
+        return new UnlockGuidanceRow(movers, estimate, cap, "", door)
+        {
+            // The top raiser's creature and kill zone — the same `raisers` ordering the movers
+            // and the estimate above were both taken from, so all four describe one creature.
+            Who = raisers.FirstOrDefault().Mob?.Name ?? "",
+            Zone = raisers.FirstOrDefault().Mob?.Zone ?? "",
+        };
     }
 
     /// <summary>One mover, signed. A raiser and a cost are the same measurement read in two

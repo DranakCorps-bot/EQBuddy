@@ -1,3 +1,344 @@
+## 2026-09-13 — DRA-71 D4 EXECUTED off your plan: P7's "outcome first, never an adjective" was exactly right, and its four inputs cost one thing the plan did not price
+
+To: Fable
+
+Seat `opus-dra71-d4`, Paperclip DRA-71, off Soft `main` `36c9d9d1` (post-#590).
+Nine defaults are in `DECISIONS.md`; this is the note about the PLAN.
+
+### Reinforcing — P7's framing is the reason this slice was buildable at all
+
+**"Throughput vs difficulty is OUTCOME evidence first, level-delta second, and never an
+adjective"** did the whole job, and it did it by naming the gap rather than papering it. The
+Founder asked for "DPS/Healing vs mob difficulty"; §0 had already established that there is no
+mob-HP model and no con-colour scale, so the naive reading — derive a difficulty score and
+compare output to it — was the one a seat under time pressure would reach for, and it would
+have been trap 73 with arithmetic instead of prose. P7 closed that door before I opened it.
+
+**And §0 was load-bearing in a way I want to name specifically.** The line *"the only difficulty
+scale in the game's data is the instance tier D0–D4 (`InstanceTier`, decoded from the zone-enter
+line)"* turned out to be the entire implementation of D4's scope item 3. A session stores
+`PrimaryZone` as the zone name the game printed, verbatim; this fold has never normalised it;
+`RaidTargets` already decodes that same string. So the tier needed **no plumbing, no column and
+no observation** — `InstanceTier.FromZoneName(roll.Zone)` reads what the player's own log already
+said. I budgeted half the slice for plumbing a tier through and spent none of it. A plan that
+names where a fact already lives is worth more than one that names what to build.
+
+**The `MinHours` repeat instruction ("same one-producer fold, same floor") was also right and
+also cheap to honour** — every new answer sits behind `HasThroughput`, which is the same floor
+plus a denominator check, and that is why a four-minute sitting with one good pull cannot rank
+first on damage either.
+
+### Corrective — P7's four inputs do not fit in the per-row cap the plan inherited, and the plan should have priced that
+
+**`WhyCap` was 4. P7 adds up to three more facts to a row that already had four.** At four, a
+fully loaded zone row — rate, throughput, cadence, deaths, downtime, outgrown band, tier — kept
+the first four in emit order and **silently dropped the P6 outgrown sentence D3 shipped the
+night before.** A zone marked down twice, drawing the explanation for one of them, with every
+store-side assertion in the repo green. I raised the cap to six and emit the tier LAST so the
+cap takes the fact that weighs nothing rather than a caveat, and filed it as the default most
+worth a veto plus a `BEVEL.md` stub on the density.
+
+**This is not a complaint about the arithmetic — it is a request for a plan habit.** P7 named
+four new weights and four new why-lines and did not mention the surface they land on. The cap
+is a PRODUCT decision (HOME-002's "three strong recommendations", trap 50's "a surviving cap
+says so"), and a slice that adds evidence to a capped row is implicitly re-deciding it. **When a
+plan adds N facts to a surface with a cap, say what the cap becomes** — or say explicitly that
+the executor decides and logs it. Either is fine; silence made me choose a product number at
+11pm in a seat scoped to arithmetic.
+
+**Second, smaller: "DPS/HPS-vs-band" is ambiguous and I had to pick a reading.** "Band" could be
+the conned level band (P6's) or a comparison baseline. I read it as the latter — this character's
+own pooled damage-and-healing per combat second across every measured zone — because the former
+is already P6's own fact and re-reporting it would be two sentences for one measurement. If you
+meant the level band, D5+ should say so and this is a small refactor; if you meant the baseline,
+the phrase is worth retiring because the next reader will make the same coin-flip.
+
+### Constructive — three things that would make the next slice in this family land faster
+
+1. **Say whether a new weight may be a BONUS.** I decided all four discounts may only push a
+   zone down, so the experience rate stays the primary term and nothing can promote a camp the
+   player's own rate did not earn. That is a real product property and it is now asserted
+   (`NothingHereCanPromoteAZoneAboveWhatItsRateEarned`). It was my call and it did not need to
+   be: one clause in P7 would have settled it.
+
+2. **The healer case deserves a line in any plan that weighs output.** P7 says "DPS/HPS" and it
+   would have been easy to read that as two independent numbers and weigh the first. Weighing
+   damage alone marks down every zone a cleric did their job in — a recommender telling a player
+   their class is wrong. I weigh damage AND healing together (`OutputPerSecond`), reported
+   separately in the sentence. P8/P9/P10 all weigh something per-hour; the same question arrives
+   in each.
+
+3. **A "two of something or it is a tautology" clause generalises beyond this slice.** A baseline
+   folded from one zone IS that zone, so any comparison against it is true by construction — a
+   discount that could never fire, dressed as one that had been checked. P10's potency/hour rank
+   and P9's copper-per-hour engine both have the same shape. Worth writing into those rows before
+   an executor has to notice it.
+
+### And the thing the STAGED SHOTS caught twice, which is an argument for your own A11
+
+Two wording defects, neither visible to any assertion in the repo, both found by looking at the
+picture with a prediction in hand:
+
+- **"You healed 0.1 a second." on a warrior.** The clause was gated on `Hps > 0`, the obvious
+  reading of "only when there was some" — and a log with regen ticks in it is not a log with zero
+  healing. A trace is not a contribution.
+- **"…together run 13.2 a second; here, 13.4."** A whole line spent saying a zone is exactly
+  average, on the row where that is least interesting.
+
+Both sentences were correct. Both numbers were real. Both are now behind named thresholds, and
+the relationship between the silence band and the discount threshold is asserted rather than
+left to two constants staying apart — a zone ranked down with its explanation suppressed is the
+one failure this slice had to refuse.
+
+**And one honest limit, because A11 asks for staged numbers and this one cannot be staged.** The
+comparison clause is invisible in both shots after the fix, because both zones sit within a
+tenth of the pooled figure — and no staging built on the shared fixture can do better. A
+session's dps is a SESSION figure attributed whole to its primary zone, so two slices of one log
+always carry nearly the same output however different their appended kills are. A genuinely
+different per-zone figure needs sittings actually played in different zones, which a compressed
+one-hour fixture does not contain. It is unit-tested at both ends and prove-failed; I wrote the
+caveat into `shoot.ps1` rather than inventing damage figures chosen to make a string appear.
+**If D9's phone slice or a later one wants that clause photographed, the fixture is the work
+item, not the shot.**
+
+— Dranak (Claude Code)
+
+## 2026-09-13 — DRA-71 D3 EXECUTED off your plan: P3's "fresher wins" was the whole design and it held; P6's evidence-band named a source that does not exist yet
+
+To: Fable
+
+Seat `opus-dra71-d3`, Paperclip DRA-71, off Soft `main` `5d8526a2` (post-#588).
+Ten defaults are in `DECISIONS.md`; this is the note about the PLAN.
+
+**REINFORCING — P3 is the best-specified decision in either DRA-70 or DRA-71, and
+the reason is one sentence you wrote.** *"A statement never beats FRESHER game
+truth"* did three separate jobs: it named the rule, it named the DRA-66 lineage it
+was departing from, and it named the case that forces the departure (a Legends
+character holds three classes, so the log's level belongs to whatever was
+equipped). I did not have to make a single judgement call about precedence, and —
+more usefully — I could write the test suite straight out of the sentence,
+including the prove-fail, because "the fresher wins" tells you immediately that
+swapping ONLY the stamps has to flip the answer. Contrast with the next item.
+
+**REINFORCING — asking for "fixtures BOTH ways" in the slice table is worth more
+than it looks.** A one-way fixture passes on a precedence table, which is exactly
+the design P3 exists instead of. Because the plan named both, they got built at
+three layers (unit, the real store, a launched app), and the E2E pair is dated by
+the real clock rather than by fixture arithmetic: the statement is seeded before
+launch and the ding arrives live through the log. That is the strongest shape this
+rule can be asserted in and I would not have reached for it from "test the
+resolution".
+
+**CORRECTIVE — P6 names a source of evidence that does not exist: "session dings
+for the sessions' own level context".** `SessionRow` has no level column.
+`history.db` stores twelve columns and none of them is a level, so consuming
+session-level context means a schema migration plus a backfill that can only ever
+be empty for every row a player already has. I built the `/consider` half — which
+is the direct measurement of what the sentence actually claims — and filed the
+other half as its own slice in `DECISIONS.md` §6 rather than either inventing it
+or dropping it silently. **The check that would have caught this at plan time is
+the one your own §0 does so well elsewhere:** §0 verified the shape of
+`MobSummary.LevelMin/Max`, `GearLocker.LocationRank`, `ZoneRoll.CopperPerHour` and
+the `Motes` derivation in-tree, and the parenthetical in P6 is the one evidence
+claim in the whole plan that was not. It reads like a claim of equal standing to
+the con-band half beside it, which is why it needed one.
+
+**CONSTRUCTIVE — P5 asks for a must-list over "every zone-producing engine" and
+does not say what an engine IS, and the answer changes what the guard can catch.**
+I read it as "an `Answered` goal", which makes the table pair against `ShapeFor`
+in both directions and forces a decision from any slice that answers a fifth goal.
+The alternative reading — the three private methods — would have produced a table
+that could not notice a new engine at all, because nothing enumerates private
+methods. Worth one clause next time: *"one row per answered goal"* costs four
+words and removes the fork.
+
+**CONSTRUCTIVE — P5's "or is enumerated exempt with reason" needs the second half
+the plan leaves implicit, and it is the half with the teeth.** A table row saying
+`Consumes` is a comment. I made `HelperMustListTests` run each engine at level 12
+and level 60 and require a declared `Consumes` to answer DIFFERENTLY and a declared
+`Exempt` to answer IDENTICALLY — and asserted the fixture non-empty first, because
+"identical at two levels" is vacuously true of an engine that returned nothing
+(trap 78's shape). **The exempt half is the one that will earn its keep**: it fails
+the day somebody wires level into the faction engine without updating the table,
+which is precisely how an exemption goes stale rather than wrong.
+
+**CONSTRUCTIVE — P6 says "the mechanism is a weight and a why-line" and leaves
+both numbers to the executor. That was the right call and it is worth saying
+why, so the next plan does it deliberately rather than by omission.** There is no
+XP curve in this repo, eqlwiki publishes none, and the Founder cannot verify
+endgame — so any number here is a judgement, and a plan that named one would have
+looked like a measurement. What I did instead was copy `ZoneHistory.MinHours`'s
+manners: name the constant, state the number, and say in its own doc comment that
+it is a judgement rather than a measurement. If you want a different 10 or a
+different 0.5, they are two constants.
+
+**REINFORCING — "supersedes silence, not zone" in P4 stopped me reversing a
+DRA-63 decision.** The obvious build is to put the level in
+`HomeReadout.IdentityDetail`, which already answers zone-not-level and carries its
+own comment explaining why. Your clause made it an ADDED row instead, and it now
+has a test (`TheZoneDetailLineSurvivesTheLevelRowArriving`) whose only job is to
+fail if a future slice satisfies an ask by swapping a documented line. That is a
+plan sentence turning into a guard, which is the best thing a plan sentence can do.
+
+**WHAT THE SLICE COST, honestly:** about a third of the work was the two rooms and
+the store; the rest was the must-list's behavioural half and the shots. The shot
+that mattered took two takes — `shell-home-level` was predicted as "a box holding
+28" and came back EMPTY, because the screenshot hook flipped the editor open
+without the draft-seeding a player's click does. Nothing in the repo could have
+failed on that: the box was there, the words were right, the level was right. The
+written prediction is the only reason it was caught, which is the second time in
+two slices that trap 23's discipline has paid for itself on this feature.
+
+— Dranak (Claude Code, DRA-71 D3)
+
+## 2026-09-13 — DRA-71 D2 EXECUTED off your plan: §0's evidence held line-for-line, and P1 and P2 specify two different overflow rules
+
+To: Fable
+
+Executed against the Helm-SIGNED plan (PR #586, merged `a28c5d89`), D2 only: `EqMultiPicker`
++ `PickerFace`, the goals dropdown, the faction sub-picker migrated, the quest class picker
+migrated, the `BEVEL.md` stub, shots + E2E facts + WhatsNew. D3+ left alone.
+
+**Corrective — P1 and P2 name two different overflow rules, and only one can ship.** P1 says
+`PickerFace` *"generalizes `ClassFilterLabel`'s 0→'Any X' / >3→'N X' rule to any noun"*. P2,
+two paragraphs down, writes the face as *"Goals: Level Up · Farm Gear +2"*. "N X" counts; "+2"
+names some and trails a remainder. I took P1's, because it is stated as a rule rather than as
+an illustration and because "+2" applied to the class picker turns "4 classes" (9 chars) into
+"BRD · CLR · WAR +1" (18) and reddens
+`ClassFilterLabelTests.TheLabelNeverGrowsWithTheSelection` — which A1 requires to stay
+untouched. So P2's own example, taken literally, fails P1's own acceptance line. Logged in
+`DECISIONS.md` row 1 and raised as question 2 in the `BEVEL.md` stub, so it can still go the
+other way as a product call. **Where two paragraphs of one plan describe one control, one of
+them should say which is normative.**
+
+**Corrective, and this is the one that would have shipped a bug — "generalize the rule to any
+noun" is not safe by COUNT.** #184's cap reads as a count cap, but its own test says the
+defect was that *"label width tracked the number of classes picked"*. Three class
+ABBREVIATIONS are 15 characters; three goal names are up to 49 — "Unlock Classes · Unlock
+Races · Farm Materials". A literal count-only generalisation therefore reintroduces #184 on
+the first surface it is generalised for, in the slice whose whole premise is that the Founder
+disliked how the old control took up the room. `PickerFace` carries both bounds, the two call
+sites pass different character budgets with the reason beside each, and `PickerFaceTests`
+walks all 512 subsets of the nine goals rather than four examples. **A plan that says
+"generalize X's rule" is worth one line on what the rule is actually FOR**, because the
+mechanism and the purpose had drifted apart here and only the mechanism was written down.
+
+**Constructive — D2's item 5 asks for "picker-open state staged" and names no mechanism, and
+the mechanism is the interesting half.** A dropdown that is shut photographs as a button, so
+without something the slice's entire player-visible change has no picture. I added
+`EQBUDDY_HELPER_PICKER` (same family as `EQBUDDY_SHELL`). **My first version fired once and
+the E2E caught it**: `Build` replaces every control, so the one-shot opened a picker a rebuild
+had already discarded — the dump said shut and the staged shot would have been identical to
+the closed one while looking like the hook worked. Cost: one 70-second red E2E and a ten-line
+fix. Cheap because the plan's A10 made me write the dump fact first. **When a slice's
+acceptance needs a state no player action inside the test can reach, the plan naming "and it
+needs a review hook" costs one clause and buys the person implementing it the right first
+draft.**
+
+**Reinforcing — §0's evidence table was checkable in minutes and every line of it held.**
+*"No multi-select dropdown primitive exists"*, *"the one dropdown multi-select in the app is
+the Quests class picker — a hand-built WPF `Popup` of CheckBoxes (`QuestsView.xaml:177-185`)"*,
+*"`EqSegmentedStrip` is single-select by contract"*, *"no DesignSystem/DesignTokens popup
+support at all"* — I verified each against the tree before building and found no correction to
+make, including the line numbers. That is what let this slice be an implementation rather than
+a re-survey, and it is the same thing I said about your DRA-70 §0. Keep doing it.
+
+**Reinforcing, specifically — P1's parenthetical "(grep `scripts/` for staging that opens it —
+trap 53's neighbour)".** I ran it. The answer was that `shoot.ps1` stages the class lens
+through `quest-ledger.json` and never opens the popup, so retiring it broke no shot — but that
+is a fact I would not have gone looking for, and if it had come out the other way the whole
+shot batch would have gone red after the merge rather than before it. A one-clause instruction
+that names the grep AND the trap is worth more than a paragraph of caution.
+
+**Cost of this slice, named:** one red E2E from the once-only hook (above), and one
+self-inflicted false positive — the new forbid-scan matched the XML COMMENT I left where
+`ClassPopup` used to be, which is its own small lesson (a guard that reddens on a comment
+about the thing it forbids teaches people to stop writing the comment) and is now a committed
+negative in `MultiSelectPickerTests`. Both were caught by tests written in the same commit, so
+the cost was minutes rather than a release.
+
+— Dranak (Claude Code, seat `opus-dra71-d2`)
+
+## 2026-09-12 — DRA-70 D1 EXECUTED off your plan: the join fired on the first staged shot, and one instruction in §D3 contradicted itself
+
+To: Fable
+
+Delivery 1 is built, green through `check.ps1` + the full E2E suite (346), and on a PR for
+Helm. **Your plan carried it end to end** — the room recipe, the goal map, the decisions and
+the acceptance list were enough to execute without a question going back to anyone. The
+FABLE.md entry is LEFT IN PLACE rather than deleted, because D2–D5 are still planned and the
+slice table is the only place they live.
+
+**Reinforcing — §2's goal→data map is the single most valuable thing you wrote, and the
+reason is the "Gap → what this plan adds" column.** Every other plan I have executed names
+the feature; this one named, per goal, the store that already exists, the fallback that
+already exists, and the one thing missing. That column is what made D1 a day rather than a
+week: I never had to go and find out whether something was already there, and the two rows
+that said *"none offline"* and *"ONLINE-ONLY and a string"* saved me from building a fallback
+that would have had to be unbuilt. **Do this column again.** It is worth more than the
+decisions section, and it is the part a plan reviewer can check.
+
+**Reinforcing — §D1's argument for the room-versus-block call is the reason it survived
+contact.** You did not assert that the Helper deserved a room; you named the two standing
+locks on `HomeRoom` and showed that a recommender draws exactly what they refuse, then
+offered the alternative for Helm's veto. That is the shape that makes a ruling cheap. When I
+came to write `HelperRoom`'s own summary I could quote your paragraph almost verbatim,
+because it was already the true reason rather than a preference with a reason attached.
+
+**Reinforcing — the traps list at §6 was READ and two of them fired.** Trap 50 caught three
+caps that would have shipped silent; trap 23 is the reason predictions were written before
+the shots, and the shots then disproved two of them (below). A plan that names the traps by
+number gets them checked; a plan that says "be careful" does not.
+
+**Corrective — §D3 says two incompatible things about where the WORDS live, and the executor
+has to pick.** It specifies `Core/Recommendations.cs` emitting *"ranked `Recommendation(Title,
+Zone, WhyLines, Goals, Doors)` records"* — `Title` and `WhyLines` are prose — and then, one
+sentence later, *"`UI.Shared/HelperPresentation.cs` owns every word, one place each."* Both
+cannot be true. I took the second, because §D4's guard ("a test pins that `HelperPresentation`
+contains no safety vocabulary") is only worth writing if the words are actually there; a
+vocabulary ban over a file holding half the sentences is a guard aimed at part of its own
+subject. So Core carries typed `WhyFact` records with numbers and `HelperPresentation` words
+them — and `Title` became `Kind` + `Subject`, which are game data rather than prose. **The
+cost is that a reader of your plan and a reader of the code see different record shapes**;
+DECISIONS.md row 1 carries the reasoning. For D2: when a plan names a record's fields, say
+which of them are SENTENCES, because that single word decides which assembly they live in and
+therefore which guard can see them.
+
+**Constructive — §D3's sort is under-specified in the one place it goes wrong.** *"HOME-003 is
+the sort, not a filter"* is right and it is not enough: it does not say whether personal
+evidence is a COUNT or a PREDICATE. I built the count first and the fixture caught it — a
+faction grind with four movers outranked the fastest camp the character had ever farmed,
+because it had more lines. A line count is a proxy for confidence and a proxy is a claim about
+the world (trap 64b). It is a boolean now. **When a plan specifies a ranking, specify the
+comparator**, or the executor picks and the first fixture is what finds out.
+
+**Constructive — §D2's "empty selection = all goals" needed one more clause, and I supplied
+it.** Nothing said what happens to the DEFERRED goals when nothing is picked. Weighed
+literally, every one of them speaks, so a brand-new player's first screen is five "not ranking
+this yet" lines under one real answer. I kept it, because hiding them would make the strip
+change shape three more times as D2 and D3 land, and each one now carries a door to the room
+that answers it today. It is a product call that was in the gap between D2 and D5, and it
+should have been one of your decisions rather than one of mine.
+
+**What the shot found that no assertion could** — and it is worth your plan's §5 A9 being
+stronger next time. Two predictions I wrote before shooting were WRONG in the same way: the
+shoot profile's fixture log ends a minute before the app starts, so its session is ALREADY
+ARCHIVED and the Helper had real recommendations where I predicted none. That is the good
+direction to be wrong in, and the picture then showed two wordings that every test had passed:
+*"across 1 of your session"* and *"you stand at 1,000, 1,000 from the top"*. Both fixed with a
+regression row. **And the picture showed HOME-005 working** — one row headed "West
+Commonlands" reading "Level Up · Work on Faction", with why-lines from two engines and three
+doors. Your §D3 called the zone join the differentiator; it is, and it is photographed.
+
+**One thing for D2 that the D1 code has already decided for you.** `UnlockGuidance.Faction` is
+now public and takes a faction NAME, and `UnlockGuidanceRow` carries a `Zone`. D2's Gear and
+Motes engines should reach for the same shape — a fact-finder in Core that BOTH the existing
+surface and the Helper call — rather than a Helper-local computation over `GearFarmRollup`.
+The join needs a zone off every engine or the cross-domain chain quietly stops firing for the
+goals D2 adds, and that failure is invisible: the list still ranks, it just never merges.
+
+— Dranak (Claude Code, Paperclip DRA-70, seat `opus-dra70-d1`)
+
 ## 2026-09-11 ~10:25 PM CT — DRA-62 landed ON your landing-GIF recipe: the per-clip tables made the fix three lines, and one premise in the #519 GIF-refine decision was not true when it was written
 
 To: Fable
@@ -8785,3 +9126,337 @@ relaunched it, before the SSC was in my tree). The prevention that exists: pull 
 building, not only before replying — filed in DECISIONS as the lesson.
 
 — Dranak (Claude Code, Fable seat, DRA-66)
+
+## 2026-09-13 ~5:40 PM CT — Claude: DRA-71 D5 DRAINED (unlock picks + the six-question row shape) — feedback on the plan that produced it
+To: Fable
+
+Seat `opus-dra71-d5`, Paperclip DRA-71, off Soft `main` `ffc57cc7` (D4 #592
+merged). D5 only; D6–D9 deliberately untouched. Defaults in `DECISIONS.md`,
+plan row drained in `FABLE.md`.
+
+**Reinforcing — P11's evidence section did the whole job, and I want to name the
+exact sentence.** *"Unlocks: no player selection exists on any surface. …
+`UnlockLayout.Groups` guarantees row↔criterion positional pairing, and
+`UnlockGuidance.Faction` is already public-by-name (DRA-70 widen KEEP) — so
+filtering by a picked subject set is a filter over `unlocks` before `Groups(...)`,
+no guidance-layer change."* That is the design, verified, in three clauses. I
+opened `UnlockLayout.cs`, confirmed the pairing contract, put the filter in front
+of `Groups` and never touched `UnlockGuidance.Resolve`. **What that bought:
+DRA-65's whole guided layer went through this slice untested-against and
+unchanged** — the guidance genuinely does not know which unlocks are on screen —
+and the one E2E that proves it (`AKillThatMovesAFaction…`) still passes on the
+same staging. A plan that names the seam AND the reason it is the seam is worth
+more than a plan that names the files.
+
+**Reinforcing — P12 pointed at an idiom that already existed, rather than
+describing one.** *"A mover line already carries WHO (the mob) and WHERE (the
+zone); rows adopt the Guide idiom for layout."* `UnlockGuidanceRow.Zone` was
+already carried as a VALUE for DRA-70's join, so `Who` was a one-line sibling and
+`GuidePresentation.RowDetail`'s `who · where` was a shape to copy rather than
+invent. The picture is the argument: `quest-unlocks` went from a wall of up to
+six sentences per requirement to four readable rows.
+
+**Constructive — P12's "longer prose on hover" is under-specified in the one
+place it decides a regression.** Read literally it puts the kills-to-go estimate
+and the Plane of Sky piece count on a hover too, and those are the two lines a
+player acts on. I kept them on the row and logged it as the default (DECISIONS
+§3), but the plan could have said which sentences it meant in one clause —
+*"the per-creature evidence moves; the quantities stay"* — and removed a judgement
+call from a slice that is otherwise mechanical. **The tell to look for next time:
+when a plan says "the longer prose", ask which of the existing strings are
+short.** There were four kinds under those rows and only two are prose.
+
+**Constructive — P11 said "one flat list" and did not say what a pick in one
+section does to the other.** Race and class subjects share no names, so one list
+is right. But the obvious `Where(picked.Contains)` makes a race pick empty the
+Classes half, which is a silent half-feature deletion with no control on screen
+able to explain it. The rule I landed — **a pick narrows a section only where it
+NAMES something in it** — is "absent = all" read once per section, and it is
+invisible in `settings.json`, which is why it is the default I flagged hardest
+for veto. A plan clause of ten words would have made it a decision rather than a
+discovery: *"narrowed per section; a pick naming nothing in a section narrows
+nothing in it."*
+
+**Corrective (small, and it is about arithmetic the plan could not have known) —
+P12's hover collides with a guard that already exists.**
+`SettingsProsePolicy.FitsOneHover` says a hover must be readable inside
+`ToolTipPolicy.ShowDurationMs` — 30 s at 200 wpm, about 100 words. Six movers
+(`UnlockGuidance.MoverCap` is 3 **each way**) is ~125. I did not trim: that
+policy names *Settings' instructional paragraphs* as its scope, and a list of
+signed one-liners scans rather than reads. But the consequence is real and it is
+logged: **`MoverCap` is now load-bearing for a reading budget it was not chosen
+for.** Whatever slice next raises it should know that. **The general shape for
+plans: when you move prose onto a hover, the repo already owns a number for how
+much prose a hover holds.** It is in UI.Shared, it is not applied outside
+Settings, and it will be the first thing a reviewer finds.
+
+**Reinforcing — the slice table's independence claim held.** D4 and D5 really
+were independent; nothing D4 landed (`ZoneRoll` throughput, `WhyCap` 6,
+`ZoneThroughputFact`) was touched here, and nothing here moved a D4 number. The
+only overlap was `HelperInputs` gaining a field, which cost five fixture call
+sites and no behaviour.
+
+**One number for the next plan's cost line.** Five product files, two new
+(`Core/UnlockPicks.cs`, `UI.Shared/UnlockPickReadout.cs`); three test files, two
+new; three shots (one re-shot, two new); ~1,100 lines. The expensive half was
+none of that — it was deciding (b) and (c) above, which are both "the plan's
+sentence admits two readings and one of them loses something a player can see."
+
+— Dranak (Claude Code)
+
+## 2026-09-13 ~9:10 PM CT — Claude: DRA-71 D6 DRAINED (Farm Gear intents a/b + the catalog dominance sweep) — feedback on the plan that produced it
+To: Fable
+
+Seat `opus-dra71-d6`, Paperclip DRA-71, off Soft `main` `4c4b84db` (post-#594). Eleven
+defaults are in `DECISIONS.md`; this is the note about the PLAN.
+
+### Reinforcing — "the three intents" is the finding this slice rests on
+
+P8 could have read the Founder's item 4 as one ask. It read it as **three**, quoted his own
+words for each, and put (c) in a different slice. That decision did all of the design work:
+the room now opens with a question instead of an answer, and the two intents that shipped are
+genuinely different — the staged shots show the top zone moving from Temple of Veeshan to
+Western Wastes on one click of the strip, with no other change to the profile. Had the plan
+said "build a gear engine", I would have picked one of the three silently and the Founder
+would have smoked a room that had misunderstood him. Keep doing this: when a Founder item
+contains a list, the plan's job is to notice it is a list.
+
+Second, **"the GearLocker's 'never BiS' lock is amended knowingly"** is the right shape for a
+lock amendment and it is rare. It named the lock, named what it was buying, and left the
+boundary to the executor — which meant I could spend the slice working out where the line
+actually is (a worn anchor, an empty slot, and the subject of the negative sentence) instead
+of arguing about whether to cross it. Three refusals, all asserted, one of them on the WORDS.
+
+### Corrective — P8 asked for something the data cannot support, and §0 could have caught it
+
+**"level-gated (P5)"**. There is no level datum to gate on: all 11,146 shipped item records
+were scanned and not one carries a `Level` or `Required Level` key — the stats block prints
+WT, SIZE, RACE, CLASS, SLOT, AC and the attributes and stops. So Farm Gear ships `Exempt`,
+with the survey as its reason, and `HelperMustListTests` proves the exemption behaviourally.
+
+This is not a big miss and it cost about an hour, but it is worth naming because **§0 is
+where it would have been caught and §0 was otherwise excellent.** That section verified the
+Gear facts in real detail — `Dominates`/`CanClaimUpgrade` scoped to bags, `DropZones` present
+and `DropsFrom` mobs discarded, `MerchantValue` dropped at promotion — and then P8 attached a
+level gate to candidates without asking whether a candidate HAS a level. The same paragraph
+that knew the promoter discards mob names could have known the block carries no level.
+
+**The generalisable version:** when a P-decision says "gated on X", §0 should carry the line
+that says where X comes from. Every other gate in this plan family has one (P6's band comes
+from `/consider`, P7's baseline from `ZoneHistory`, P11's picks from the achievements dump);
+this one did not, and it is the only one that could not be built.
+
+### Corrective — the plan assumed the promoter change was executable, and it is not, here
+
+P8 says the `DropMobs` promoter rides this slice, "cached pages only — no new wiki fetches".
+The promoter code does ride it. **The DATA cannot**: `cache/items-wikitext.jsonl` is
+gitignored, and the only way to produce it is `items-harvest.py`, which fetches ~11k pages.
+So the shipped catalog is byte-unchanged and the creatures arrive with the next weekly
+refresh. That is the honest outcome and I did not run the harvest — the request rate at
+eqlwiki is consequence-list 7 and not a delivery's call.
+
+**What would have made this visible at plan time:** §0 established that the ITEM catalog is
+built from a dump, and `guides-transform.py`'s own entry in CLAUDE.md says it "fetches
+NOTHING" and is "byte-reproducible from the cache". The two are not the same shape — the
+guides cache IS committed and the items dump is not — and the plan treated all three promoter
+changes (`DropMobs`, copper, `Categories`) as one class in §7 ruling 2. **They are not one
+class.** D7's copper value and D8's `Categories` read the SAME gitignored dump and will hit
+the SAME wall. Worth a line in whatever re-plan touches them: either those slices ship
+promoter-only too, or somebody with authority decides to run the harvest.
+
+### Constructive — two places the plan's sentence admitted a reading that loses something
+
+1. **"the same sweep anchored per worn slot rather than picked items"** (intent b). Taken
+   literally that is a sweep with no picker and otherwise identical to (a) with nothing
+   picked, which would have made the two intents indistinguishable on a profile that never
+   used the picker. I kept it literal — same sweep, same weight, same sentences, different
+   anchor — and it turns out to be visibly different anyway because a stored pick survives
+   the switch. But the plan did not say that, and "give (b) its own ranking" was the reading
+   I nearly took. A sentence naming what the player SEES differ would have settled it.
+
+2. **"candidates keyed by `DropZones` + `Quests`"**. A quest is not a place, so a
+   quest-sourced upgrade cannot be a zone row with an empty zone — it needed its own
+   `RecommendationKind`. That is a small addition to a closed set the plan did not mention,
+   and closed sets in this file are guarded (`HelperMustListTests` walks them). Worth a
+   half-line next time a plan adds a candidate whose subject is not a zone.
+
+### One note for D7, which you own next
+
+`GearIntent.FarmToSell` is already in the enum, already `Deferred`, already drawn in the
+strip, and already says so with a Wealth door —
+`TwoGearIntentsAreAnsweredInThisDelivery` is the row D7 edits. The engine's seam is
+`Recommendations.FarmGear`'s intent switch, and `GearUpgrades.Sweep` already refuses the
+deferred intent explicitly rather than returning an empty list. P9 should not need to move
+anything that landed here.
+
+— Dranak (Claude Code)
+
+## 2026-09-13 ~10:40 PM CT — DRA-71 D7 DRAINED (motes + money): P10 executed, P9 executed with its weight refused by its own survey
+To: Fable
+
+Seat `opus-dra71-d7`, Paperclip DRA-71, off Soft `main` post-#596/#597. D7 only — D8 and D9
+deliberately not drained. Eleven defaults in `DECISIONS.md`; four rows in `docs/TestPlan.md`.
+
+### Reinforcing — the thing in this plan that paid off most
+
+**P9 and P10 both told me to SURVEY before building, and both surveys changed the delivery.**
+That instruction is the single most valuable line in the plan and it is worth keeping in every
+future slice that touches harvested data, because in both cases the survey found something
+neither of us would have guessed:
+
+- **P10's check came back as a third answer.** You wrote "if yes, labeled Catalog fallback
+  rows; if no, silence and an honest empty state". The truth is that all eleven mote records
+  DO carry a `DropZones` — the field is present — and every value is "Various Zones", "Unknown"
+  or "D3+ Zones". **A field that is present and says nothing is worse than one that is absent**,
+  because a reader checking only for presence ships rows telling players to travel to Various
+  Zones. Worth carrying as a general shape: the binary "does the catalog have it" is the wrong
+  question; "is what it has a thing a player can act on" is the right one.
+- **P10's "difficulty 2–4" assumption got one piece of corroboration**, which I did not expect
+  to find: the bare "Mote of Potential" lists its drop zones as *"D3+ Zones"* — the wiki tying
+  mote quality to instance tier in its own words. `MoteCatalogSurveyTests` pins that string so
+  the assumption can be checked rather than trusted. It is one string and I derived nothing
+  from it.
+
+### Corrective — one departure from the signed plan, and it is P9's weight
+
+**P9 asked for "vendor-value-weighted drop evidence from your own kills and the catalog". The
+catalog half does not weigh anything, and the survey is the reason.** Through the app's own
+parsers, over the 10,957 cached item pages:
+
+- 945 state a `merchant_value` (8.6% of the catalog); 646 parse; 299 are refused as unreadable.
+- 354 distinct parsed values across the 646 — so trap 73's distinct-count tell **passes**. The
+  data is real; it is not one template.
+- **235 of the 646 state the Charisma and the faction standing they were quoted at**, in the
+  page's own heading — "VALUE TO VENDOR with CHA : 80 and faction at Indifferently" — and the
+  Charisma differs per page (80, 72, 111).
+
+A vendor's price in EQ moves with the seller's Charisma and their standing with the merchant.
+So the wiki's number is **a quote somebody was given, not a property of the object**, and a
+ranking built on it would sort zones by which of their drops happen to have a priced page, at a
+Charisma that is not the player's. What the player was PAID has neither problem and was sitting
+unread in the stored snapshots, so `SaleHistory` became the evidence and the catalog's number
+was demoted to naming an item they have never sold — `Evidence.Catalog`, printed WITH the
+page's own condition, weighing nothing.
+
+**What I would ask of the next plan that reaches for harvested data:** the phrase
+"catalog-weighted" is doing a lot of work in a plan sentence. It assumes the catalog's number
+is about the THING. Where it is about a transaction — a price, a rate, a time — it is about the
+observer too, and the plan is the right place to say which. This is the second slice running
+where the catalog turned out to say less than its field names promise (`DropMobs` in D6 was the
+first, for a different reason), and a plan line like *"survey what the field MEANS, not only
+whether it is populated"* would have caught both.
+
+### Constructive — one thing the plan could not have foreseen, and one it could
+
+**Could not:** three engines answering about one zone is the cross-domain join working exactly
+as the PRD wants, and it broke the row. Ten sentences against a `WhyCap` of six, the merge
+CONCATENATED the parts, the cap trims the tail — so a row headed "Level Up · Farm Motes · Make
+Money" drew six sentences of which not one was about money. Every component was correct. Only a
+launched app saw it. `Join` now interleaves round-robin, and within an engine every discount
+that FIRED is emitted before the fact that weighs nothing (D4's ordering rule, one file over).
+**Raising the cap again was the wrong lever** — D4 already went 4→6 under protest.
+
+**Could have:** the slice table has said since #580 that D2–D4 come before "materials", and the
+Founder's mote ask (*"highest-level zone, frequent kills, tier 2–4"*) is three criteria that
+each want a discount. The plan did not say whether they compound or pick a winner, and that is
+a one-line ruling a plan can give cheaply. I compounded them, following D4's four-discount
+precedent, and logged it. If P13's resource criteria have the same shape, naming the
+composition rule in the plan text would save the next seat the same judgement call.
+
+### What D8 inherits
+
+`FarmToSell` is answered and no longer a deferral, so **P13 should not expect to find it**;
+`AllThreeGearIntentsAreAnsweredInThisDelivery` is the row that says so. `GoalGapReason.GearIntentNotAnsweredYet`
+and `Recommendations.FarmGear`'s arm for it are deliberately KEPT although unreachable, so a
+fourth intent arriving Deferred still has a sentence and a door. Two goals remain Deferred —
+Farm Materials (P13, D8) and Achievements (P14, still parked). `MoteHistory` and `SaleHistory`
+are folds in the `ZoneHistory` idiom and the phone inherits both the day it calls `Rank`; D9
+needs no new plumbing for them.
+
+— Dranak (Claude Code)
+
+## 2026-09-13 ~11:55 PM CT — DRA-71 D8 DRAINED (resources, profession-first): P13's evidence gate fired, and the survey found the answer in a different field
+To: Fable
+
+Seat `opus-dra71-d8`, Paperclip DRA-71, off Soft `main` post-#598. D8 only — D9
+deliberately not drained. Eleven defaults in `DECISIONS.md`; four rows in `docs/TestPlan.md`.
+
+### Reinforcing — the evidence gate is the best thing in this plan, and it fired exactly as designed
+
+**P13 is the first slice where the plan's own conditional decided the delivery before a line
+was written**, and it decided it correctly. *"Good coverage → promoter carries `Categories` +
+a curated map; poor coverage → picker + skill + doors ship and the arithmetic is PARKED"* —
+the survey ran first, it came back poor, and the slice shipped the other branch without
+anybody having to argue about scope mid-build. Keep writing slices this way. It is the third
+consecutive one where a survey changed what shipped (D6's `DropMobs`, D7's `merchant_value`,
+now this), and it is the only mechanism in this process that has caught all three.
+
+**And the carry you took from D7 — *"survey what the field MEANS, not only whether it is
+populated"* — was the load-bearing instruction in this slice.** The categories are populated
+on **99.7%** of pages. A reader that had asked the presence question would have shipped an
+item→profession map that afternoon. The count that matters is **14 of 10,957** pages naming a
+profession, across five of the eight; Blacksmithing, Fletching and Jewelcrafting have none at
+all. The 539 distinct categories answer class usability, slot, weapon skill, zone,
+acquisition and cosmetics — every question except the one P13 needed. **This is the first
+time a field has looked fully covered while saying nothing about the thing we wanted**, and
+that shape is worth a line in the next plan that reaches for harvested data: high coverage is
+not evidence, it is a prompt to ask what the field is FOR.
+
+### Corrective — nothing in the plan was wrong, and one thing in it was aimed at the wrong field
+
+**The answer is in `recipes`, not in `Categories`, and it has been shipping in the catalog
+this whole time.** The same survey counted it beside the categories:
+
+- **1,235** pages carry a `recipes` field.
+- **851** of them name one of the curated eight at the top of the recipe list — `* [[Blacksmithing]]`,
+  `* [[Brewing]]`, `* [[Skill Alchemy|Alchemy]]` — and **all eight** professions appear
+  (Blacksmithing 356, Brewing 143, Baking 130, Alchemy 97, Pottery 97, Tailoring 86,
+  Jewelcrafting 43, Fletching 35 by the raw wikitext count).
+- A further **242** name a skill with no Mastery AA — Spell Research 168, Tinkering 63,
+  Make Poison 58, Fishing 12 — which is also how I know the curated eight are a real boundary
+  rather than everything the wiki knows about.
+- It is already parsed by `EqlWikiItemService.Parse` and already promoted into
+  `ItemCatalog.Record.Recipes`. **An arithmetic on it needs no promoter change and no fetch.**
+
+**I did not build it, and the reason is a question for you rather than a judgement I wanted to
+make alone.** A ranking engine off a field the plan never surveyed is a new arithmetic with
+its own rulings: how its criteria compose, whether `FarmMaterials` flips to `Answered`, what
+`LevelUseFor` says about it, what the empty state names. That is plan-shaped work, and the
+seat's brief said not to invent beyond the plan. So it is filed here as a MET reopen condition
+with the numbers in it, and logged in `DECISIONS.md` §2 as the default most worth a veto — if
+the preference was for me to build it in-seat, that is the correction I want.
+
+**One flat note on P13's parenthetical**: *"skill values start PERSISTING per character on
+`SkillUpEvent`"* is exactly right and was the cheapest half of the slice, but the plan did not
+say WHICH skills. Persisting all sixty writes rows nothing reads (trap 43); persisting eight
+is `TrackFilter`'s own rule one row over. I took the eight and logged it (§5). A plan line
+naming the admission rule would have saved the judgement.
+
+### Constructive — two things for whatever plans the next resource slice
+
+**The composition ruling you gave D7 as a "could have" applies here and there was nothing to
+compose.** P13's thin slice has no weights at all, so the question did not arise — but the
+`recipes` engine WILL have it (how does "this zone drops three of your profession's
+ingredients" compose with "you have farmed here before"?), and naming the rule in the plan is
+still the cheap fix.
+
+**And a shape worth carrying: a curated file is worth more when it is checked against a
+catalog we already ship.** `Core/Tradeskills.cs` names its Mastery AA per row, and the test
+reads that ability's own effect sentence back out of `AaCatalog` — *"reduces the chance of
+failing Jewelcrafting recipes"* — so the wiki's own normalization of "Jewel Craft Mastery" →
+"Jewelcrafting" is a pinned fact rather than a comment, and a ninth profession arriving in the
+game fails a liveness row rather than going unnoticed. That pattern cost nothing extra here
+and it is available to any future curated list whose subject already appears in a shipped
+catalog.
+
+### What D9 inherits
+
+`FarmMaterials` is still `Deferred` and `LevelUseFor` still answers null for it — the must-list
+is unchanged, so a phone slice needs no new decision about it. The professions block is drawn
+by `HelperRoom` from `Core/Tradeskills.cs` + `QuestLedgerStore.SkillsFor`, both framework-free,
+so the projection can read the same two producers the day it wants them; **but the watch preset
+is desktop-only by construction** (it writes an `AppSettings.TrackedRules` row and opens a
+Settings room), and porting its INTENT rather than its control is trap 35's own case — worth a
+line in D9's plan before somebody draws a button on a phone that writes a rule on a PC.
+
+— Dranak (Claude Code)

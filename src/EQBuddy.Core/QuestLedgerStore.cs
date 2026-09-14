@@ -44,6 +44,17 @@ public sealed class QuestLedgerStore
     }
 
     /// <summary>
+    /// One profession skill's standing: the highest value the log has announced, and the
+    /// LOG's own timestamp for that announcement (never the moment EQBuddy read the line —
+    /// the same discipline <see cref="CharacterLedger.LevelAt"/> keeps).
+    /// </summary>
+    public sealed class SkillEntry
+    {
+        public int Value { get; set; }
+        public DateTime At { get; set; }
+    }
+
+    /// <summary>
     /// One character's manual progress through one <see cref="Guide"/> — the player's own
     /// statement about steps that no log line and no inventory dump can decide.
     ///
@@ -113,10 +124,52 @@ public sealed class QuestLedgerStore
         /// preview needs this to survive restarts (and log truncation).</summary>
         public int Level { get; set; }
 
+        /// <summary>When the log announced <see cref="Level"/> — <b>the LOG's own
+        /// timestamp</b>, not the moment EQBuddy read the line. 0001-01-01 means a level
+        /// stored before this field existed, which <see cref="CharacterLevel.Resolve"/>
+        /// treats as the oldest claim there is (see its own note on why that is the right
+        /// migration).</summary>
+        public DateTime LevelAt { get; set; }
+
+        /// <summary>The level the PLAYER set on the Character room (DRA-71 D3) — their own
+        /// statement, which is a different fact from <see cref="Level"/> (the game's). 0
+        /// means no statement stands, which is what "Let EQBuddy work it out" writes: unlike
+        /// the dump-sourced class list, clearing this IS storable, because the statement is
+        /// the thing being cleared rather than the evidence under it.</summary>
+        public int StatedLevel { get; set; }
+
+        /// <summary>When the player made that statement — <b>their wall clock, LOCAL</b>,
+        /// because <see cref="CharacterLevel.Resolve"/> compares it directly against
+        /// <see cref="LevelAt"/>, which is a log timestamp. See <see cref="LevelReading.At"/>
+        /// for why this one field is not UTC while <see cref="GuideProgress.LastUpdated"/>
+        /// is.</summary>
+        public DateTime StatedLevelAt { get; set; }
+
         /// <summary>Guide id → that guide's manual progress for this character. <b>Per
         /// character</b>, which is where progress always belonged — the per-profile Sky ticks
         /// are a known wart this deliberately does not copy (Fable plan §4).</summary>
         public Dictionary<string, GuideProgress> Guides { get; set; } = new(StringComparer.OrdinalIgnoreCase);
+
+        /// <summary>
+        /// **What the log says this character's PROFESSION skills stand at** — skill name in
+        /// the log's own spelling → the highest value seen and when (DRA-71 D8, plan P13).
+        ///
+        /// <para><b>It exists because a skill value died with the session.</b>
+        /// <c>StatsSnapshot.SkillUps</c> has always carried this evening's skill-ups and
+        /// nothing has ever remembered them, so a player who raised Blacksmithing to 122 last
+        /// week and opened EQBuddy today had a tool that knew nothing about it. This is the
+        /// same promise the class holds for the announced level one field up: the log states a
+        /// number once, and a store is what makes it survive the restart and the janitor.</para>
+        ///
+        /// <para><b>Only the eight professions land here</b>
+        /// (<see cref="Tradeskills.IsProfessionSkill"/>), which is
+        /// <see cref="QuestLedgerStore.TrackFilter"/>'s rule applied to a second kind of row:
+        /// a ledger admits what a surface can answer about, so the file stays
+        /// profession-sized rather than storing sixty combat skills nothing reads. Widening it
+        /// is a decision for the slice that builds the surface — writing rows now for a reader
+        /// that does not exist is the app doing something and telling nobody (trap 43).</para>
+        /// </summary>
+        public Dictionary<string, SkillEntry> Skills { get; set; } = new(StringComparer.OrdinalIgnoreCase);
 
         /// <summary>The <c>writtenAt</c> of the last inventory dump reconciled onto this
         /// character — the watermark <see cref="ReconcileInventory"/> checks so a replayed
@@ -193,9 +246,11 @@ public sealed class QuestLedgerStore
                     && stored.Values.All(c => c.Items.Count == 0 && c.Tracked.Count == 0
                                               && c.Hidden.Count == 0 && c.Completed.Count == 0
                                               && c.Classes.Count == 0 && c.Level == 0
+                                              && c.StatedLevel == 0
                                               && c.UnlockedClasses.Count == 0
                                               && c.StatedClasses.Count == 0
-                                              && c.Guides.Count == 0))
+                                              && c.Guides.Count == 0
+                                              && c.Skills.Count == 0))
                 {
                     try
                     {
@@ -230,7 +285,11 @@ public sealed class QuestLedgerStore
                         UnlockedClasses = kv.Value.UnlockedClasses,
                         StatedClasses = kv.Value.StatedClasses,
                         Level = kv.Value.Level,
+                        LevelAt = kv.Value.LevelAt,
+                        StatedLevel = kv.Value.StatedLevel,
+                        StatedLevelAt = kv.Value.StatedLevelAt,
                         Guides = new Dictionary<string, GuideProgress>(kv.Value.Guides, StringComparer.OrdinalIgnoreCase),
+                        Skills = new Dictionary<string, SkillEntry>(kv.Value.Skills, StringComparer.OrdinalIgnoreCase),
                         LastInventoryReconcile = kv.Value.LastInventoryReconcile,
                     }),
                 StringComparer.OrdinalIgnoreCase);
@@ -678,26 +737,172 @@ public sealed class QuestLedgerStore
         }
     }
 
-    /// <summary>Last announced level for this character (0 = unknown).</summary>
+    /// <summary>Last announced level for this character (0 = unknown). <b>The OBSERVED
+    /// half only</b> — a surface asking "what level is this character" wants
+    /// <see cref="ResolvedLevelFor"/>, which weighs this against the player's own statement.
+    /// This one exists for the ding gate, which has to compare the log's newest number
+    /// against the log's stored number and nothing else.</summary>
     public int LevelFor(string characterKey)
     {
         lock (_lock)
             return _byCharacter.TryGetValue(characterKey, out var c) ? c.Level : 0;
     }
 
-    /// <summary>Record the level the log just announced. Stores what the log said, not
-    /// a max — the announcement line only fires on gains, so it's already monotonic
-    /// per character. Idempotent on the same level (launch replay re-offers dings).</summary>
-    public void SetLevel(string characterKey, int level)
+    /// <summary>What the log announced, with the moment it announced it, or null when it
+    /// never has.</summary>
+    public LevelReading? ObservedLevelFor(string characterKey)
+    {
+        lock (_lock)
+            return _byCharacter.TryGetValue(characterKey, out var c)
+                ? CharacterLevel.Reading(c.Level, c.LevelAt)
+                : null;
+    }
+
+    /// <summary>What the player stated, with the moment they stated it, or null when no
+    /// statement stands.</summary>
+    public LevelReading? StatedLevelFor(string characterKey)
+    {
+        lock (_lock)
+            return _byCharacter.TryGetValue(characterKey, out var c)
+                ? CharacterLevel.Reading(c.StatedLevel, c.StatedLevelAt)
+                : null;
+    }
+
+    /// <summary>
+    /// **The one answer** — the fresher of the two claims
+    /// (<see cref="CharacterLevel.Resolve"/>).
+    ///
+    /// <para>Resolved HERE rather than by each caller, for the reason trap 33 names: two
+    /// callers with different arguments produce two current answers and whichever ran last
+    /// wins. The Character room, the Helper, the level-unlock preview and the xp tooltip all
+    /// ask this, so "the widget says 30 and the Helper says 28" is not a state the app can
+    /// reach. <b>Both readings are taken under ONE lock</b>, so the pair being weighed is
+    /// the pair that existed at one moment (trap 56).</para>
+    /// </summary>
+    public ResolvedLevel ResolvedLevelFor(string characterKey)
+    {
+        lock (_lock)
+        {
+            if (!_byCharacter.TryGetValue(characterKey, out var c)) return ResolvedLevel.Unknown;
+            return CharacterLevel.Resolve(
+                CharacterLevel.Reading(c.Level, c.LevelAt),
+                CharacterLevel.Reading(c.StatedLevel, c.StatedLevelAt));
+        }
+    }
+
+    /// <summary>
+    /// Record the level the log just announced, with <b>the LOG's own timestamp</b>. Stores
+    /// what the log said, not a max — the announcement line only fires on gains, so it's
+    /// already monotonic per character.
+    ///
+    /// <para>Idempotent on the same level AND the same stamp (launch replay re-offers every
+    /// ding in the file). It is NOT idempotent on the level alone: a ding re-read from a
+    /// fresher log line is the same number carrying a newer moment, and the moment is the
+    /// whole of what <see cref="CharacterLevel.Resolve"/> weighs.</para>
+    /// </summary>
+    public void SetLevel(string characterKey, int level, DateTime at)
     {
         if (characterKey.Length == 0 || level <= 0) return;
         lock (_lock)
         {
             var c = CharacterFor(characterKey);
-            if (c.Level == level) return;
+            if (c.Level == level && c.LevelAt == at) return;
             c.Level = level;
+            c.LevelAt = at;
             Save();
         }
+    }
+
+    /// <summary>
+    /// The player's own statement about their level, stamped with their wall clock.
+    /// <b>A level of 0 or less CLEARS it</b> — that is "Let EQBuddy work it out", the same
+    /// idiom the class statement uses, and it is why the undo is one click rather than a
+    /// number the player has to guess their way back to.
+    /// </summary>
+    public void SetStatedLevel(string characterKey, int level)
+    {
+        if (characterKey.Length == 0) return;
+        lock (_lock)
+        {
+            var c = CharacterFor(characterKey);
+            var wanted = Math.Max(0, level);
+            // Re-stating the SAME level is not a no-op: the player re-affirming a number
+            // after a ding is exactly how they say "no, the ding was my other class" a
+            // second time, and only the stamp can carry that.
+            if (c.StatedLevel == wanted && wanted == 0) return;
+            c.StatedLevel = wanted;
+            c.StatedLevelAt = wanted > 0 ? DateTime.Now : default;
+            Save();
+        }
+    }
+
+    /// <summary>
+    /// **Where this character's professions stand** — the log's spelling → value and moment,
+    /// copied out under the lock (DRA-71 D8).
+    ///
+    /// <para>A COPY rather than the live dictionary, for the reason every other reader here
+    /// takes one: the room reads this on a one-second tick while the log thread writes it, and
+    /// handing out the store's own object would be an enumeration racing an insert. Empty
+    /// means the log has never announced a profession skill-up for this character — which is
+    /// the state a player who has never crafted is in, and the state a player whose skill-ups
+    /// all happened before EQBuddy existed is ALSO in. The surface says so rather than
+    /// drawing a zero (<see cref="Tradeskills.Standings"/>).</para>
+    /// </summary>
+    public IReadOnlyList<(string Skill, int Value, DateTime At)> SkillsFor(string characterKey)
+    {
+        if (string.IsNullOrEmpty(characterKey)) return [];
+        lock (_lock)
+            return _byCharacter.TryGetValue(characterKey, out var c)
+                ? [.. c.Skills.Select(kv => (kv.Key, kv.Value.Value, kv.Value.At))]
+                : [];
+    }
+
+    /// <summary>
+    /// Offer what the log has said about this character's skills. Returns true when anything
+    /// actually moved.
+    ///
+    /// <para><b>A batch and not one call per skill, because the alternative writes the profile
+    /// file eight times a second.</b> The caller hands over the whole live session's skill
+    /// list every tick — that list only changes when the game announces a skill-up — so the
+    /// save happens once, and only when a value really rose.</para>
+    ///
+    /// <para><b>The highest value wins, which is what makes this replay-safe.</b> The
+    /// full-log replay every launch re-offers every skill-up in the file; each one carries the
+    /// TOTAL the game printed rather than an increment, so re-offering them lands on the same
+    /// number and changes nothing. That is a different rule from
+    /// <see cref="RecordLoot"/>'s time high-water mark, and deliberately so: loot accumulates
+    /// and a repeat would double it, while a skill value is a statement of where you are.</para>
+    ///
+    /// <para><b>Only the eight professions are admitted</b> —
+    /// <see cref="Tradeskills.IsProfessionSkill"/>. See <see cref="CharacterLedger.Skills"/>
+    /// for why the filter is here rather than at the surface.</para>
+    /// </summary>
+    public bool SetSkills(
+        string characterKey, IEnumerable<(string Skill, int Value, DateTime At)> seen)
+    {
+        if (string.IsNullOrEmpty(characterKey) || seen is null) return false;
+        var changed = false;
+        lock (_lock)
+        {
+            foreach (var (skill, value, at) in seen)
+            {
+                if (value <= 0 || !Tradeskills.IsProfessionSkill(skill)) continue;
+                var c = CharacterFor(characterKey);
+                if (c.Skills.TryGetValue(skill, out var entry))
+                {
+                    if (entry.Value >= value) continue;
+                    entry.Value = value;
+                    entry.At = at;
+                }
+                else
+                {
+                    c.Skills[skill] = new SkillEntry { Value = value, At = at };
+                }
+                changed = true;
+            }
+            if (changed) Save();
+        }
+        return changed;
     }
 
     private CharacterLedger CharacterFor(string characterKey)

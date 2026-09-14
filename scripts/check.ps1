@@ -45,7 +45,7 @@ function Step([string] $name, [scriptblock] $body) {
     if ($LASTEXITCODE -ne 0) {
         Write-Host "FAILED" -ForegroundColor Red
         # Only the lines that say why — a full MSBuild log buries the one that matters.
-        $output | Select-String -Pattern 'error |Failed!|\[FAIL\]|Assert\.|whatsnew-guard|legacy-notice-guard|evolved-channel-guard|soft-seat-selftest' |
+        $output | Select-String -Pattern 'error |Failed!|\[FAIL\]|Assert\.|whatsnew-guard|legacy-notice-guard|evolved-channel-guard|channel-wipe-guard|soft-seat-selftest' |
             Select-Object -First 15 | ForEach-Object { Write-Host "   $_" }
         Write-Host "   full log: $log" -ForegroundColor Yellow
         $script:failed += $name
@@ -71,6 +71,14 @@ Step 'legacy notice' { & "$PSScriptRoot\legacy-notice-guard.ps1" 6>&1 }
 # <Version> reaching 2.0.0 — and the one that reads the world as well as the tree, since
 # the family's update folder is where the promise is actually kept or broken.
 Step 'evolved     ' { & "$PSScriptRoot\evolved-channel-guard.ps1" 6>&1 }
+# A channel ledger may not be emptied, truncated or wholesale-replaced by the work in
+# flight. Three times in six days a commit that said it was signing something destroyed
+# HELM.md or HELM-FEEDBACK.md instead (trap 60). Compares the WORKING TREE against the
+# merge-base with origin/main, so a wipe fails here before it is ever committed.
+Step 'channel     ' { & "$PSScriptRoot\channel-wipe-guard.ps1" 6>&1 }
+# …and its prove-fail. Every check above is driven into the red once in a throwaway repo
+# under TEMP; a wipe guard nobody has watched refuse is trap 34 with the stakes raised.
+Step 'channel test' { & "$PSScriptRoot\channel-wipe-guard-selftest.ps1" 6>&1 }
 # Experiment A′ self-test (trap 70, EQBuddy lab): a second default seat on the
 # same work item must refuse. Throwaway StoreDir; not the machine's live claims.
 Step 'soft seats  ' { & "$PSScriptRoot\soft-seat-selftest.ps1" 6>&1 }

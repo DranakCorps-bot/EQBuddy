@@ -1745,4 +1745,1054 @@ public class ShellHostTests
         Assert.True(app.DumpValue("optionsBehaviorHotkeys") > 0,
             $"the v1 window's Behavior block was never built; dump was: {app.Artifacts()}");
     }
+
+    // ================================================================================
+    // DRA-70 — the Helper room
+    // ================================================================================
+
+    /// <summary>
+    /// **The room is on the rail, directly under Character, and it PAINTS.**
+    ///
+    /// <para><c>shellRail</c> counts what the rail built; <c>helperChips</c> counts what the
+    /// room built. Two claims, and only the second can catch a room that navigated correctly
+    /// and drew nothing — which is exactly the failure trap 72 shipped on the Quests tab for a
+    /// whole session. The nine chips are also a trap-29 assertion: an absent control
+    /// photographs as an unremarkable panel, so "all nine are there" can only be checked from
+    /// a launched app.</para>
+    ///
+    /// <para>This launch stages no dumps and the fixture log is one live session, so the
+    /// Helper is drawn in the state a new player meets: every goal weighed, nothing to
+    /// recommend, and every answerable goal naming the store it is waiting for.</para>
+    /// </summary>
+    [Fact]
+    public void TheHelperRoomLandsOnTheRailAndDrawsTheFoundersNineGoals()
+    {
+        using var app = new AppHarness(environment: OpenOn("helper"));
+        app.Launch();
+
+        app.WaitForDump("shellPage", "helper", "the shell to land on the Helper room");
+        Assert.Equal(ShellPages.Landed.Count, app.DumpValue("shellRail"));
+        Assert.Equal(9, app.DumpValue("helperChips"));
+
+        // DRA-71 D2: the nine moved INSIDE a dropdown, and the count above is now a claim
+        // about rows nobody can see until the face is clicked. The face is the second claim,
+        // and it is the one a player reads — "Any goal" is the empty state saying, in the
+        // control's own words, that EQBuddy is weighing all nine.
+        Assert.Equal("Anygoal", app.DumpText("helperGoalFace"));
+        // Shut until something opens it. A dropdown that arrived open would cover the answers
+        // this room exists to draw.
+        Assert.Equal(0, app.DumpValue("helperPickerOpen"));
+
+        // Nothing picked is the "weigh everything" state, so the deferred goals all say so and
+        // the answerable ones name what they are missing. TWO since DRA-71 D7 — Farm Motes and
+        // Make Money gained engines and moved from deferrals to gaps, after Farm Gear did the
+        // same in D6. This is the row a slice that answers a goal is meant to edit.
+        Assert.Equal("", app.DumpText("helperGoals"));
+        Assert.Equal(2, app.DumpValue("helperNotYet"));
+        Assert.True(app.DumpValue("helperGaps") > 0,
+            $"no goal named the store it is waiting for; dump was: {app.Artifacts()}");
+
+        // Every door that got built lands on a room that exists. Must be 0, always.
+        Assert.Equal(0, app.DumpValue("helperDeadDoors"));
+    }
+
+    /// <summary>
+    /// **The ⧉ copies, from a launched app** — the runtime half of
+    /// <c>GameCommandsTests.SurfacesNeedingACommand</c>'s two Helper rows.
+    ///
+    /// <para>The source scan proves the room NAMES <c>/outputfile faction</c> and
+    /// <c>/outputfile achievements</c> off <c>GameCommands</c>. It cannot prove the buttons are
+    /// on screen, and a surface that asks a player for a file and hands them no way to produce
+    /// it is the defect David reported on 2026-08-20 — worst in the empty state, which is the
+    /// only state a new player sees.</para>
+    ///
+    /// <para><b>FIVE on this screen, and the number is a decision rather than an
+    /// accident.</b> Nothing is picked, so every goal is weighed: the faction picker's own
+    /// empty state carries one (a player who opened this room to work on faction should not
+    /// have to read to the bottom of the answers to find the command), Work on Faction's gap
+    /// carries one, and Unlock Classes and Unlock Races carry one EACH — two rows asking for
+    /// the same achievements dump. That repetition is deliberate and it is DRA-63's ruling
+    /// applied one room over: a row that asks names its own answer, in every state, because a
+    /// surface that hands the command over once and then takes it back is the same defect
+    /// with a delay on it. Deduplicating would mean one of the two goals asks for a file and
+    /// offers nothing, which is exactly the shape that gets noticed by the player who only
+    /// picked that one.</para>
+    ///
+    /// <para><b>The FIFTH arrived with DRA-71 D5 and is the faction picker's rule, applied to
+    /// the unlock picker beside it.</b> That block is the control a player uses to say which
+    /// races and classes they are chasing, and with no achievements dump it has nothing to
+    /// offer — so it says so and hands over the command that fills it, exactly as the faction
+    /// picker has since D1. It is the same file the two gaps below ask for, and the same
+    /// argument holds: this one is attached to the CONTROL rather than to an answer, and a
+    /// picker that explains its own emptiness and points nowhere is the shape this room
+    /// refuses.</para>
+    /// </summary>
+    [Fact]
+    public void TheHelperHandsOverTheCommandsItsOwnEmptyStatesAskFor()
+    {
+        using var app = new AppHarness(environment: OpenOn("helper"));
+        app.Launch();
+
+        app.WaitForDump("shellPage", "helper", "the shell to land on the Helper room");
+        Assert.Equal(7, app.DumpValue("helperCopyCmd"));
+
+        // The floor that keeps the count above from being a number about some other room. SEVEN
+        // gaps since DRA-71 D7: the five D6 left plus Farm Motes' and Make Money's, which on a
+        // profile with no stored session are both "EQBuddy has not stored enough of your play".
+        // **The copy count does NOT move with them, and that is the point of asserting both.**
+        // Neither new gap has a command that fixes it — no /outputfile writes a mote or a coin —
+        // so a room that grew two buttons here would be offering a file that answers nothing.
+        Assert.Equal(7, app.DumpValue("helperGaps"));
+        // And the gear block really is in its no-dump state rather than offering anchors
+        // nobody staged.
+        Assert.Equal(0, app.DumpValue("helperWorn"));
+        // And the picker really is in its no-dump state rather than offering rows nobody
+        // staged: "the room drew an empty picker" and "the room drew no picker" are different
+        // claims, and only the first earns the fifth button.
+        Assert.Equal(0, app.DumpValue("helperUnlockChips"));
+    }
+
+    /// <summary>
+    /// **A staged faction dump turns the picker on, and "no dump" becomes "no pick".**
+    ///
+    /// <para>Two states that look identical on a count and are different answers: with no
+    /// dump the goal asks for a command, and with a dump and nothing chosen it asks for a
+    /// pick. The dump is staged through the harness in the game's own tab-separated shape so
+    /// it goes through the real finder and the real parser — a fixture-shaped substitute
+    /// renders a state that is real and is not the one this assertion is about (trap 23).</para>
+    ///
+    /// <para><c>helperFactionChips</c> is the floor that proves the file was SEEN. Without it
+    /// every number below would be about a room that never read it.</para>
+    /// </summary>
+    [Fact]
+    public void AStagedFactionDumpDrawsThePickerAndTheGoalAsksForAPickRatherThanACommand()
+    {
+        var key = $"{AppHarness.Character}_{AppHarness.Server}".ToLowerInvariant();
+        using var app = new AppHarness(
+            configureSettings: s => s.HelperGoals[key] = [nameof(HelperGoal.WorkOnFaction)],
+            environment: OpenOn("helper"));
+        app.WriteFactionDump((1, "Frogloks of Guk", 500, 1500));
+        app.Launch();
+
+        app.WaitForDump("shellPage", "helper", "the shell to land on the Helper room");
+        app.WaitForDump("helperGoals", nameof(HelperGoal.WorkOnFaction),
+            "the stored chip selection to be read back");
+
+        Assert.True(app.DumpValue("helperFactionChips") > 0,
+            $"the staged faction dump was not seen; dump was: {app.Artifacts()}");
+        // The sub-picker exists and nothing in it is ticked, which is exactly the state the
+        // gap line below is about. A face reading anything else here would mean the room drew
+        // a pick the engine then said it did not have (trap 4, one control apart).
+        Assert.Equal("Anyfaction", app.DumpText("helperFactionFace"));
+        Assert.Equal(1, app.DumpValue("helperGaps"));
+        Assert.Equal(0, app.DumpValue("helperRecs"));
+        // Only one chip is on, so the deferred goals are silent — a filter that still reported
+        // about what it filtered out would not be a filter.
+        Assert.Equal(0, app.DumpValue("helperNotYet"));
+        Assert.Equal(0, app.DumpValue("helperDeadDoors"));
+    }
+
+    /// <summary>
+    /// **The chip selection is per character and it PERSISTS** — the writer and the reader in
+    /// one assertion (trap 20: a setting only readers touch is a lost capability, and it has
+    /// cost this repo three player-facing bugs).
+    ///
+    /// <para>Seeded through <c>configureSettings</c> under the LEDGER's own character key,
+    /// which is what the room writes under. A launch that read it back under a different key
+    /// would report an empty selection and look exactly like a room nobody had used.</para>
+    /// </summary>
+    [Fact]
+    public void TheGoalSelectionIsReadBackUnderTheCharacterKeyTheRoomWritesUnder()
+    {
+        var key = $"{AppHarness.Character}_{AppHarness.Server}".ToLowerInvariant();
+        using var app = new AppHarness(
+            configureSettings: s => s.HelperGoals[key] =
+                [nameof(HelperGoal.LevelUp), nameof(HelperGoal.FarmGear)],
+            environment: OpenOn("helper"));
+        app.Launch();
+
+        app.WaitForDump("shellPage", "helper", "the shell to land on the Helper room");
+        // The enum's own order, not the stored order — so the "serves" line under an answer
+        // reads the way the chip strip does however the player clicked.
+        app.WaitForDump("helperGoals",
+            $"{nameof(HelperGoal.LevelUp)},{nameof(HelperGoal.FarmGear)}",
+            "the stored selection to come back in the Founder's order");
+
+        // And the FACE says both of them — the store's claim and the screen's claim from one
+        // moment (trap 56). "The setting holds two goals" and "the player can see which two"
+        // are different claims, and D2's whole player-visible change is the second one.
+        Assert.Equal("LevelUp·FarmGear", app.DumpText("helperGoalFace"));
+
+        // BOTH are answered since DRA-71 D6, so neither is a deferral and each names what it
+        // is waiting for: Level Up has no stored play to divide, Farm Gear has no inventory
+        // dump. The row used to read "exactly one of each" and the engine Farm Gear gained is
+        // what moved it.
+        Assert.Equal(0, app.DumpValue("helperNotYet"));
+        Assert.Equal(2, app.DumpValue("helperGaps"));
+        Assert.Equal(0, app.DumpValue("helperDeadDoors"));
+    }
+
+    /// <summary>
+    /// **THE FACE COUNTS INSTEAD OF LISTING ONCE THE NAMES STOP FITTING** — #184's cap, on the
+    /// Helper's own noun, from a launched app (DRA-71 D2).
+    ///
+    /// <para><c>PickerFaceTests</c> walks all 512 subsets of the nine goals and proves the rule.
+    /// It cannot prove the ROOM passes its own budget to it, and that is the half that has gone
+    /// wrong before: the class face was capped in UI.Shared for a whole release while the window
+    /// rendered an uncapped label, because the cap and the call site were two decisions. Three
+    /// long goals is 49 characters of face in a room whose floor is 520 wide.</para>
+    /// </summary>
+    [Fact]
+    public void TheGoalFaceCountsRatherThanListingWhenTheNamesStopFitting()
+    {
+        var key = $"{AppHarness.Character}_{AppHarness.Server}".ToLowerInvariant();
+        using var app = new AppHarness(
+            configureSettings: s => s.HelperGoals[key] =
+            [
+                nameof(HelperGoal.UnlockClasses),
+                nameof(HelperGoal.UnlockRaces),
+                nameof(HelperGoal.FarmMaterials),
+            ],
+            environment: OpenOn("helper"));
+        app.Launch();
+
+        app.WaitForDump("shellPage", "helper", "the shell to land on the Helper room");
+        app.WaitForDump("helperGoalFace", "3goals",
+            "the face to count three long goal names rather than list them");
+
+        // The floor that keeps the line above from being a number about an empty room: the
+        // rows are still all nine, and the selection really was read back.
+        Assert.Equal(9, app.DumpValue("helperChips"));
+        Assert.Equal(
+            $"{nameof(HelperGoal.UnlockClasses)},{nameof(HelperGoal.UnlockRaces)}," +
+            $"{nameof(HelperGoal.FarmMaterials)}",
+            app.DumpText("helperGoals"));
+    }
+
+    /// <summary>
+    /// **THE POPUP OPENS, AND THE DUMP SAYS SO** — the runtime half of the screenshot hook
+    /// (<c>EQBUDDY_HELPER_PICKER</c>) that stages the one state a shot of this room cannot
+    /// otherwise reach.
+    ///
+    /// <para>A dropdown that is SHUT photographs as a button. The hook is what lets
+    /// <c>shell-helper-picker</c> exist at all, and a hook that was merely spelled correctly —
+    /// read from the environment, never wired to the control — would stage nothing and produce
+    /// a shot identical to the closed one. That failure is invisible in a picture and visible
+    /// here (trap 22 and trap 29 arriving together).</para>
+    /// </summary>
+    [Fact]
+    public void TheReviewHookReallyOpensTheGoalPicker()
+    {
+        var env = OpenOn("helper");
+        env["EQBUDDY_HELPER_PICKER"] = "goals";
+        using var app = new AppHarness(environment: env);
+        app.Launch();
+
+        app.WaitForDump("shellPage", "helper", "the shell to land on the Helper room");
+        app.WaitForDump("helperPickerOpen", "1", "the review hook to open the goals picker");
+
+        // Opening it changes nothing about what the room decided — the face still reads the
+        // empty state and the nine rows are the nine rows.
+        Assert.Equal("Anygoal", app.DumpText("helperGoalFace"));
+        Assert.Equal(9, app.DumpValue("helperChips"));
+    }
+
+    // ================================================================================
+    // DRA-71 D5 — the unlock pick, one store read by two rooms
+    // ================================================================================
+
+    /// <summary>
+    /// **THE HELPER OFFERS THE PICK AND RANKS FROM IT** (DRA-71 D5, plan P11; acceptance A8).
+    ///
+    /// <para>The other half of this claim is asserted from the Quests window
+    /// (<c>APickedUnlockIsTheOnlyOneItsSectionDrawsAndTheTabSaysWhatItHid</c>). They are two
+    /// tests rather than one because they are two surfaces in two hosts — but they read the
+    /// SAME key of the SAME profile under the same character, which is what makes
+    /// "one store" a claim rather than a hope: <c>helperUnlockPicks</c> and
+    /// <c>questsUnlockPicks</c> are both the store's own answer, dumped from the room that
+    /// used it.</para>
+    ///
+    /// <para><b>Prediction.</b> The dump names two races and one class. "Barbarian" is picked,
+    /// so the race engine answers about Barbarian alone — and the CLASS engine, whose section
+    /// the pick names nothing in, still answers about Warrior. So the two unlock answers on
+    /// screen name those two subjects and not High Elf. The picker offers all three, because
+    /// both unlock goals are picked and an offer narrowed by its own filter is a tick nobody
+    /// can take back.</para>
+    /// </summary>
+    [Fact]
+    public void TheHelperOffersTheUnlockPickAndRanksFromIt()
+    {
+        var key = $"{AppHarness.Character}_{AppHarness.Server}".ToLowerInvariant();
+        using var app = new AppHarness(
+            configureSettings: s =>
+            {
+                s.HelperGoals[key] =
+                    [nameof(HelperGoal.UnlockRaces), nameof(HelperGoal.UnlockClasses)];
+                s.UnlockPicks[key] = ["Barbarian"];
+            },
+            environment: OpenOn("helper"));
+        app.WriteAchievementsDump(
+            "Untapped Potential: Races",
+            "I\tRace Unlock - High Elf",
+            "I\t\tGet maximum faction with Clerics of Tunare.",
+            "I\tRace Unlock - Barbarian",
+            "I\t\tGet maximum faction with Rallosian Army.",
+            "Untapped Potential: Classes",
+            "I\tClass Unlock - Warrior",
+            "I\t\tObtain Azure Ruby Ring.");
+        app.Launch();
+
+        app.WaitForDump("shellPage", "helper", "the shell to land on the Helper room");
+        app.WaitForDump("helperUnlockPicks", "Barbarian",
+            "the Helper to read the pick the Quests tab writes");
+
+        // The popup offers ALL THREE — the way back from a pick, on the surface that made it.
+        Assert.Equal(3, app.DumpValue("helperUnlockChips"));
+        // One pick is always named rather than counted, whatever the budget.
+        Assert.Equal("Barbarian", app.DumpText("helperUnlockFace"));
+        // And the ANSWERS narrowed. Barbarian is the picked race; Warrior survives because the
+        // pick names nothing in the Classes section. High Elf is the one the pick removed, and
+        // naming all three in one assertion is what separates "the filter fired" from "the
+        // dump only ever had two unlocks in it".
+        Assert.Equal("Barbarian,Warrior", app.DumpText("helperSubjects"));
+        Assert.Equal(0, app.DumpValue("helperDeadDoors"));
+    }
+
+    // ================================================================================
+    // DRA-71 D3 — one level, two writers, ordered by time
+    // ================================================================================
+
+    /// <summary>
+    /// **A REAL DING, THROUGH THE REAL PARSER, REACHES BOTH ROOMS.**
+    ///
+    /// <para>The fixture log carries no level line, so the launch starts in the state a fresh
+    /// profile is in: nothing known, and the Character room saying so rather than drawing a
+    /// blank row. Then the game's own sentence is appended and the app has to do the whole
+    /// chain — parse, stamp with the LOG's time, store, resolve, redraw two rooms.</para>
+    ///
+    /// <para><b>Both rooms are asserted, and that is the point.</b> "The ledger has 30" and
+    /// "the Helper ranked with 30" are different claims (trap 56), and the second is the one
+    /// the Founder's MUST is about. A level that reached Character and not the Helper is
+    /// exactly the shape trap 72 shipped on the Quests tab — a store written and a surface
+    /// whose repaint gate never heard about it.</para>
+    /// </summary>
+    [Fact]
+    public void ADingWritesTheLevelAndTheCharacterRoomNamesIt()
+    {
+        using var app = new AppHarness(environment: OpenOn("home"));
+        app.Launch();
+
+        app.WaitForDump("shellPage", "home", "the shell to land on the Character room");
+        // The unknown state is a real one and it is where a fresh profile starts.
+        Assert.Equal(0, app.DumpValue("shellHomeLevel"));
+        Assert.Equal("unknown", app.DumpText("shellHomeLevelSource"));
+
+        app.AppendLogLines("You have gained a level! Welcome to level 30!");
+
+        app.WaitForDump("shellHomeLevel", "30", "the ding to reach the Character room");
+        app.WaitForDump("shellHomeLevelSource", "observed",
+            "the level to be labelled as the log's own statement");
+        // Nobody typed anything, so there is no statement to undo.
+        Assert.Equal(0, app.DumpValue("shellHomeStatedLevel"));
+
+    }
+
+    /// <summary>
+    /// **FIXTURE ONE, FROM A LAUNCHED APP: a statement made AFTER the ding wins.**
+    ///
+    /// <para>The Founder's own case. A Legends character holds up to three classes at once, so
+    /// the level the log printed belongs to whatever was equipped when it printed; a player who
+    /// swaps and says "I am 28 on this one" is correcting a number that is still true about a
+    /// different thing.</para>
+    ///
+    /// <para>Both claims are seeded into the real ledger file with real stamps and read back
+    /// through the real store, so this is the resolution the app performs and not a rule a unit
+    /// test agreed with. <c>shellHomeStatedLevel</c> is the floor that proves the seeded file
+    /// was SEEN — without it every number here would be about a room that never read it.</para>
+    /// </summary>
+    [Fact]
+    public void AStatementMadeAfterTheDingIsTheLevelTheHelperRanksWith()
+    {
+        var now = DateTime.Now;
+        using var app = new AppHarness(environment: OpenOn("helper"));
+        app.SeedQuestLedger(
+            level: (31, now.AddHours(-3)),
+            statedLevel: (28, now.AddHours(-1)));
+        app.Launch();
+
+        app.WaitForDump("shellPage", "helper", "the shell to land on the Helper room");
+        app.WaitForDump("helperLevel", "28", "the fresher statement to be what the Helper ranks with");
+        Assert.Equal("stated", app.DumpText("helperLevelSource"));
+        // A known level needs no door to go and set one.
+        Assert.Equal(0, app.DumpValue("helperLevelDoor"));
+
+    }
+
+    /// <summary>
+    /// **FIXTURE TWO, THE OTHER WAY: a ding AFTER the statement wins** — and this one is the
+    /// prove-fail for the row above (trap 34: green-only is vacuous coverage).
+    ///
+    /// <para>The same two writers, the same store, the same rooms; only the ORDER in time is
+    /// different, and the answer flips. The statement is seeded with a stamp from before the
+    /// launch and the ding arrives live through the log, so its stamp is genuinely later — no
+    /// fixture arithmetic decides the winner, the clock does.</para>
+    ///
+    /// <para>A precedence table in either direction passes one of these two rows and fails the
+    /// other, which is precisely why the plan asked for both.</para>
+    /// </summary>
+    [Fact]
+    public void ADingThatArrivesAfterTheStatementTakesTheLevelBack()
+    {
+        using var app = new AppHarness(environment: OpenOn("home"));
+        app.SeedQuestLedger(statedLevel: (28, DateTime.Now.AddHours(-1)));
+        app.Launch();
+
+        app.WaitForDump("shellPage", "home", "the shell to land on the Character room");
+        app.WaitForDump("shellHomeLevel", "28", "the seeded statement to answer on its own");
+        Assert.Equal("stated", app.DumpText("shellHomeLevelSource"));
+
+        app.AppendLogLines("You have gained a level! Welcome to level 31!");
+
+        app.WaitForDump("shellHomeLevel", "31", "the fresher ding to overtake the statement");
+        app.WaitForDump("shellHomeLevelSource", "observed",
+            "the line to say the number came from the log");
+        // The statement is still STORED — it was overtaken, not deleted, so the undo row is
+        // still there and a later correction does not have to be retyped from nothing.
+        Assert.Equal(28, app.DumpValue("shellHomeStatedLevel"));
+    }
+
+    /// <summary>
+    /// **An unknown level draws a sentence and a DOOR, never a guess** (plan P4).
+    ///
+    /// <para>The answers above it are real — they are ranked from the player's own stored play
+    /// and do not need a level to be true — so the room says what it did anyway and points at
+    /// the one place that can fill the gap. <c>helperLevelDoor</c> is trap 29's assertion: a
+    /// control that is ABSENT photographs as an unremarkable panel, so only a launched app can
+    /// say the way forward is on screen rather than merely implied by the sentence.</para>
+    ///
+    /// <para><b>Then a ding arrives and the door goes away</b>, which is the half that would
+    /// have shipped broken. The Helper's repaint gate has to carry the level, and a room whose
+    /// fingerprint did not fold it would keep drawing "EQBuddy does not know your level" for
+    /// the rest of the session with the number sitting in the store one room away — trap 72,
+    /// exactly as the Quests tab had it.</para>
+    /// </summary>
+    [Fact]
+    public void AnUnknownLevelOffersTheCharacterDoorUntilADingFillsItIn()
+    {
+        using var app = new AppHarness(environment: OpenOn("helper"));
+        app.Launch();
+
+        app.WaitForDump("shellPage", "helper", "the shell to land on the Helper room");
+        Assert.Equal(0, app.DumpValue("helperLevel"));
+        Assert.Equal("unknown", app.DumpText("helperLevelSource"));
+        app.WaitForDump("helperLevelDoor", "1",
+            "the unknown-level line to offer a door into the Character room");
+        // And it lands somewhere: the door count went up and none of them are dead.
+        Assert.True(app.DumpValue("helperDoors") > 0,
+            $"no door was built at all; dump was: {app.Artifacts()}");
+        Assert.Equal(0, app.DumpValue("helperDeadDoors"));
+
+        app.AppendLogLines("You have gained a level! Welcome to level 30!");
+
+        app.WaitForDump("helperLevel", "30",
+            "the Helper's own repaint gate to notice the level the log just gave");
+        Assert.Equal("observed", app.DumpText("helperLevelSource"));
+        app.WaitForDump("helperLevelDoor", "0",
+            "the door to go away once there is nothing left for it to fix");
+    }
+
+    /// <summary>
+    /// **THE THROUGHPUT PROBE REACHES THE SCREEN** (DRA-71 D4, plan P7; Founder smoke item 3).
+    ///
+    /// <para><b>This is the row the slice most needed.</b> D4's numbers come from a SECOND
+    /// query over <c>history.db</c> — a <c>JsonDocument</c> probe of each stored snapshot for
+    /// dps, hps and the combat seconds they were quoted against — and every unit test in the
+    /// repo could pass with that query never running, its result never joined, or its facts
+    /// folded and never drawn. Trap 72 is exactly that shape on the Quests tab: a store
+    /// written, and a surface whose repaint gate never heard about it.</para>
+    ///
+    /// <para>So the session is archived through the REAL repository and the REAL snapshot
+    /// type before launch, and the assertions are the ENGINE's claim and the SCREEN's claim
+    /// from the same dump (trap 56): <c>helperThroughput</c> counts the drawn answers carrying
+    /// the fact, <c>helperTopDps10</c> carries the measured number itself — 42.0 damage a
+    /// second, seeded, so a zero or a rounding would both be visible — and
+    /// <c>helperWhy</c>/<c>helperPersonalWhy</c> count what was BUILT into the tree.</para>
+    ///
+    /// <para>The zone is an instance, so the tier fact rides along too: its name is what a
+    /// zone line prints, which is the whole of how the tier is known
+    /// (<c>ZoneRoll.ObservedTier</c>) — nothing was looked up and no column was added.</para>
+    /// </summary>
+    [Fact]
+    public void ArchivedThroughputReachesTheHelpersDrawnAnswers()
+    {
+        using var app = new AppHarness(environment: OpenOn("helper"));
+        app.SeedStoredSession(
+            "Najena 4 (Refined)", TimeSpan.FromHours(4), xpPercent: 32,
+            dps: 42.0, hps: 0, combatSeconds: 3600, deaths: 0, activeFraction: 1.0,
+            mobs: ("a bloodthirsty gnoll", 180, 28, 30, 34));
+        app.Launch();
+
+        app.WaitForDump("shellPage", "helper", "the shell to land on the Helper room");
+        // The seeded session is the only one, so it is the only answer — and the ENGINE saw it.
+        app.WaitForDump("helperRecs", "1", "the archived session to become one recommendation");
+        Assert.Equal("Najena4(Refined)", app.DumpText("helperZones"));
+
+        // The SCREEN's claim about the throughput line, and the number in it.
+        app.WaitForDump("helperThroughput", "1",
+            "the throughput sentence to be drawn on the answer");
+        Assert.Equal(420, app.DumpValue("helperTopDps10"));
+        // One measured zone, so there is nothing to compare against and the tier rides along.
+        Assert.Equal(1, app.DumpValue("helperTier"));
+        // A sitting that was active throughout says nothing about downtime — the silence is
+        // asserted, because a line that appeared on every camp would be furniture.
+        Assert.Equal(0, app.DumpValue("helperDowntime"));
+
+        // And the sentences were BUILT, not merely returned. Every one is the player's own
+        // evidence: nothing here came from a catalog, and nothing came off anyone else's screen.
+        Assert.True(app.DumpValue("helperWhy") >= 3,
+            $"the room drew fewer sentences than the engine produced; dump was: {app.Artifacts()}");
+        Assert.Equal(app.DumpValue("helperWhy"), app.DumpValue("helperPersonalWhy"));
+        Assert.Equal(0, app.DumpValue("helperCatalogWhy"));
+        Assert.Equal(0, app.DumpValue("helperDeadDoors"));
+    }
+
+    /// <summary>
+    /// **THE PROVE-FAIL FOR THE ROW ABOVE, and the honesty rule underneath it** (trap 34:
+    /// green-only is vacuous coverage).
+    ///
+    /// <para>The same archived session with NO combat seconds. The probe reads the snapshot,
+    /// finds nothing to divide, and skips the row — so the recommendation is still there,
+    /// still ranked on the experience rate the player really earned, and draws none of D4's
+    /// sentences. <b>An absent measurement is not a poor one:</b> a player upgrading into this
+    /// build must not watch their best camp drop for a gap in EQBuddy's own reading, and the
+    /// number the dump reports is 0 meaning "not measured" rather than 0 meaning "you did
+    /// nothing".</para>
+    ///
+    /// <para>Without this row, the one above passes on a build where the probe returns
+    /// everything unconditionally and the fold treats a missing denominator as a zero.</para>
+    /// </summary>
+    [Fact]
+    public void ASessionWithNothingToDivideDrawsNoThroughputAndStillRanks()
+    {
+        using var app = new AppHarness(environment: OpenOn("helper"));
+        app.SeedStoredSession(
+            "Lower Guk", TimeSpan.FromHours(4), xpPercent: 32,
+            dps: 0, hps: 0, combatSeconds: 0,
+            mobs: ("a froglok tad", 180, 28, 30, 34));
+        app.Launch();
+
+        app.WaitForDump("shellPage", "helper", "the shell to land on the Helper room");
+        app.WaitForDump("helperRecs", "1", "the archived session to become one recommendation");
+        Assert.Equal("LowerGuk", app.DumpText("helperZones"));
+
+        Assert.Equal(0, app.DumpValue("helperThroughput"));
+        Assert.Equal(0, app.DumpValue("helperTopDps10"));
+        // Open world, so no tier either — and the rate that ranked it is still on screen.
+        Assert.Equal(0, app.DumpValue("helperTier"));
+        Assert.True(app.DumpValue("helperWhy") >= 2,
+            $"the rate and cadence lines did not reach the screen; dump was: {app.Artifacts()}");
+        Assert.Equal(0, app.DumpValue("helperDeadDoors"));
+    }
+
+    /// <summary>
+    /// **THE MOTE FOLD AND THE SALE PROBE REACH THE SCREEN** (DRA-71 D7, plans P9 and P10;
+    /// Founder smoke items 4c and 5).
+    ///
+    /// <para><b>The same row D4 most needed, for the same reason.</b> Both of this slice's
+    /// answers come from things a unit test cannot see running: the mote fold joins the pooled
+    /// loot to the zone rollup, and the sale price is a SECOND <c>JsonDocument</c> probe of each
+    /// stored snapshot, beside D4's. Either could be built, folded, and never drawn — trap 72's
+    /// shape — or never queried at all, and every unit test in the repo would still pass.</para>
+    ///
+    /// <para>So one session is archived through the REAL repository and the REAL snapshot type,
+    /// carrying loot, coin AND a vendor sale, and the assertions are the fold's claim and the
+    /// SCREEN's claim from the same dump (trap 56). The zone is an instance OUTSIDE the band the
+    /// Founder named, so the tier preference is drawn too — the fact D4 deliberately reported
+    /// and refused to weigh, now weighing something.</para>
+    ///
+    /// <para><c>helperCatalogValue</c> is asserted at 0 and that is a REPORT rather than a
+    /// wish: the promoter learned <c>MerchantCopper</c> in this slice and the shipped catalog
+    /// has none in it yet, so every price on this screen is one the player was actually
+    /// paid.</para>
+    /// </summary>
+    [Fact]
+    public void ArchivedMotesAndVendorSalesReachTheHelpersDrawnAnswers()
+    {
+        using var app = new AppHarness(environment: OpenOn("helper"));
+        app.SeedStoredSession(
+            "Najena - Solo", TimeSpan.FromHours(4), xpPercent: 32,
+            dps: 42.0, hps: 0, combatSeconds: 3600, deaths: 0, activeFraction: 1.0,
+            copper: 40_000,
+            sold: [("Bone Chips", 5, 400)],
+            loot:
+            [
+                ("a shadowed man", "Mote of Major Potential", 6),
+                ("a shadowed man", "Bone Chips", 20),
+            ],
+            mobs: ("a shadowed man", 180, 28, 30, 34));
+        app.Launch();
+
+        app.WaitForDump("shellPage", "helper", "the shell to land on the Helper room");
+        app.WaitForDump("helperRecs", "1", "the archived session to become one recommendation");
+        Assert.Equal("Najena-Solo", app.DumpText("helperZones"));
+
+        // THE FOLD's claim. The floor is what matters and not an exact count: the shared
+        // fixture log has its own motes and its own sales in it, so this profile's numbers are
+        // the seeded session PLUS whatever the fixture character did — and pinning an exact
+        // total here would be a test about the fixture rather than about the fold. What is
+        // asserted is that the seeded zone cleared both floors (4 hours, 180 kills) and that the
+        // sale probe came back with something out of the stored JSON at all.
+        Assert.True(app.DumpValue("helperMoteZones") >= 1,
+            $"the mote fold produced no zone; dump was: {app.Artifacts()}");
+        Assert.True(app.DumpValue("helperMoteRated") >= 1,
+            $"no mote zone cleared the floors; dump was: {app.Artifacts()}");
+        Assert.True(app.DumpValue("helperSales") >= 1,
+            $"the sale probe read nothing out of the stored snapshots; dump was: {app.Artifacts()}");
+
+        // **THE SCREEN's claims, and this row is where the merge rule earned itself.** Three
+        // engines answer about this one zone — Level Up, Farm Motes and Make Money — which is the
+        // cross-domain join doing exactly what the room exists for (HOME-005). It also puts ten
+        // sentences on one row against a WhyCap of six, and before DRA-71 D7's interleave the
+        // cap trimmed the tail, so the row's own headline said "Make Money" over six sentences
+        // of which not one was about money. Every goal the headline claims is asserted to have a
+        // sentence under it here, because that is the failure this arrangement reproduces.
+        app.WaitForDump("helperMoteWhy", "1", "the mote rate sentence to be drawn");
+        Assert.Equal(1, app.DumpValue("helperCoinWhy"));
+        Assert.Equal(1, app.DumpValue("helperSellable"));
+        Assert.Equal(1, app.DumpValue("helperMoneyNote"));
+        Assert.True(app.DumpValue("helperTopGoals") >= 3,
+            $"the three engines did not join on the zone; dump was: {app.Artifacts()}");
+
+        // "Najena - Solo" is D0, outside the D2–D4 the Founder named, so the preference fires
+        // and says so. The zone name is the only input — nothing was looked up.
+        Assert.Equal(1, app.DumpValue("helperTierPref"));
+
+        // **AND THE THING THE CAP GAVE UP IS THE ONE THAT EXPLAINS NOTHING.** The mote engine
+        // emits its WHO line last precisely so it is what a loaded row loses, ahead of any
+        // sentence explaining a mark-down that already happened — D4's ordering rule, applied
+        // to this engine's facts. The row SAYS it held something back, which is trap 50 asserted
+        // from a launched app rather than from the engine's own return value.
+        Assert.Equal(0, app.DumpValue("helperMoteSource"));
+        Assert.True(app.DumpValue("helperWhyWithheld") >= 1,
+            $"the row trimmed a sentence and did not admit it; dump was: {app.Artifacts()}");
+
+        // Every price on screen is one the player was PAID. The catalog carries no vendor value
+        // in this build, and a row here would mean the promoter's field had data behind it.
+        Assert.Equal(0, app.DumpValue("helperCatalogValue"));
+        Assert.Equal(0, app.DumpValue("helperCatalogWhy"));
+        Assert.Equal(0, app.DumpValue("helperDeadDoors"));
+    }
+
+    /// <summary>
+    /// **THE PROVE-FAIL FOR THE ROW ABOVE** (trap 34: green-only is vacuous coverage).
+    ///
+    /// <para>The same archived session with the same hours and the same coin, and NO mote in the
+    /// loot. The money half is unchanged — it never depended on a mote — and the mote half goes
+    /// completely silent: no fold row, no sentence, and the goal draws its own
+    /// "no mote has dropped for you" rather than the no-history one.</para>
+    ///
+    /// <para>Without it, the row above passes on a build where the mote fold returns every zone
+    /// it is handed and the sentence is drawn from the zone rather than from the motes.</para>
+    /// </summary>
+    [Fact]
+    public void ASessionWithNoMotesDrawsNoMoteAnswerAndStillMakesMoney()
+    {
+        using var app = new AppHarness(environment: OpenOn("helper"));
+        app.SeedStoredSession(
+            "Najena - Solo", TimeSpan.FromHours(4), xpPercent: 32,
+            dps: 42.0, hps: 0, combatSeconds: 3600, deaths: 0, activeFraction: 1.0,
+            copper: 40_000,
+            sold: [("Bone Chips", 5, 400)],
+            loot: [("a shadowed man", "Bone Chips", 20)],
+            mobs: ("a shadowed man", 180, 28, 30, 34));
+        app.Launch();
+
+        app.WaitForDump("shellPage", "helper", "the shell to land on the Helper room");
+        app.WaitForDump("helperRecs", "1", "the archived session to become one recommendation");
+
+        // RATED and not FOLDED: the shared fixture log has motes of its own in a zone that
+        // clears neither floor, so the fold legitimately produces a row for it and quotes no
+        // rate. What this slice removed from the fixture is the only mote zone that HAD one.
+        Assert.Equal(0, app.DumpValue("helperMoteRated"));
+        Assert.Equal(0, app.DumpValue("helperMoteWhy"));
+        Assert.Equal(0, app.DumpValue("helperMoteSource"));
+        // The tier preference is the mote engine's own weight, so it goes with it.
+        Assert.Equal(0, app.DumpValue("helperTierPref"));
+
+        // …and the money answer is untouched, which is what makes the silence above a
+        // measurement of the motes rather than of the fixture.
+        Assert.Equal(1, app.DumpValue("helperCoinWhy"));
+        Assert.Equal(1, app.DumpValue("helperSellable"));
+        Assert.Equal(0, app.DumpValue("helperDeadDoors"));
+    }
+
+    /// <summary>
+    /// **THE EDITOR BOX EXISTS, AND THE DUMP SAYS SO** — the runtime half of the screenshot
+    /// hook (<c>EQBUDDY_HOME_EDITOR</c>) that stages the one state a shot of this room cannot
+    /// otherwise reach.
+    ///
+    /// <para>A shut editor photographs as a link. The hook is what lets
+    /// <c>shell-home-level</c> exist at all, and a hook that was merely spelled correctly —
+    /// read from the environment, never applied to the build — would stage nothing and produce
+    /// a shot identical to the closed one (trap 22 and trap 29 arriving together, the same
+    /// pair D2 hit with the picker).</para>
+    /// </summary>
+    [Fact]
+    public void TheReviewHookReallyOpensTheLevelEditor()
+    {
+        var env = OpenOn("home");
+        env["EQBUDDY_HOME_EDITOR"] = "level";
+        using var app = new AppHarness(environment: env);
+        app.SeedQuestLedger(statedLevel: (30, DateTime.Now.AddHours(-1)));
+        app.Launch();
+
+        app.WaitForDump("shellPage", "home", "the shell to land on the Character room");
+        app.WaitForDump("shellHomeLevelBox", "1", "the review hook to open the level editor");
+        // **And the box holds the standing statement**, which is a different claim from "a box
+        // was built". The first staged shot of this state came back EMPTY while a player
+        // clicking the same link got theirs pre-filled — a picture of a real state of
+        // something else (trap 23), caught by the prediction written before the run rather
+        // than by anything that could fail. The hook and the click now share one opener, and
+        // this is the row that says so from outside.
+        Assert.Equal("30", app.DumpText("shellHomeLevelDraft"));
+
+        // Opening it changes nothing about what the room DECIDED — the line still names the
+        // same level from the same source, and nothing has been refused.
+        Assert.Equal(30, app.DumpValue("shellHomeLevel"));
+        Assert.Equal("stated", app.DumpText("shellHomeLevelSource"));
+        Assert.Equal(0, app.DumpValue("shellHomeLevelRefused"));
+        // The three blocks are still three: an editor is inside Identity, not a fourth block.
+        Assert.Equal(3, app.DumpValue("shellHomeBlocks"));
+    }
+
+    // ================================================================================
+    // DRA-71 D6 — Farm Gear asks the intent first
+    // ================================================================================
+
+    /// <summary>
+    /// An inventory dump with two plain worn items in it — the sweep's anchors, written in the
+    /// game's own tab-separated shape so they go through the real parser (trap 23).
+    ///
+    /// <para>Both names are REAL rows in the shipped <c>ItemCatalog</c> with no class lock on
+    /// them, which is what makes the predictions below arithmetic rather than hope: "Cloth Cap"
+    /// is AC 2 in the HEAD slot and "Cloth Choker" is AC 1 in the NECK slot. A made-up item
+    /// would resolve to no stats, drop out of <c>WornFrom</c>, and every assertion here would
+    /// be about an empty sweep.</para>
+    /// </summary>
+    private static void WearTwoPlainThings(AppHarness app) =>
+        app.WriteInventoryDump(("Head", "Cloth Cap", 1), ("Neck", "Cloth Choker", 1));
+
+    /// <summary>
+    /// **UPGRADE WHAT I WEAR: THE PICK ANCHORS THE SWEEP** (DRA-71 D6, plan P8; acceptance A5).
+    ///
+    /// <para><b>Prediction, computed against the shipped catalog before the run.</b> The
+    /// character infers WARRIOR from the fixture log, so the class lock is WAR. "Cloth Cap" is
+    /// the only picked anchor, and 111 catalog HEAD items beat AC 2 while being usable by a
+    /// warrior and having somewhere to drop. The per-anchor cap keeps 8 and reports
+    /// <b>103</b> withheld. Those eight group into five zones — Temple of Veeshan (3), Clan
+    /// Runnyeye (2), then Kael Drakkel, Tower of Frozen Shadow and Veeshan's Peak with one
+    /// each — so the room's cap shows <b>three</b> and says it held <b>two</b> back. Nothing
+    /// in the fixture log ever looted any of them, so there is no observed-drop line.</para>
+    ///
+    /// <para><b>Both halves from one moment</b> (trap 56): <c>helperGearWithheld</c> is what
+    /// the ENGINE held back and <c>helperGearWhy</c> is how many drawn rows actually carry an
+    /// upgrade sentence. A sweep that ranked correctly and drew nothing would satisfy only the
+    /// first, which is exactly the shape trap 72 shipped on the Quests tab.</para>
+    /// </summary>
+    [Fact]
+    public void UpgradeWhatIWearAnchorsOnThePickedItemAndNamesWhereItDrops()
+    {
+        var key = $"{AppHarness.Character}_{AppHarness.Server}".ToLowerInvariant();
+        using var app = new AppHarness(
+            configureSettings: s =>
+            {
+                s.HelperGoals[key] = [nameof(HelperGoal.FarmGear)];
+                s.HelperWornPicks[key] = ["Cloth Cap"];
+            },
+            environment: OpenOn("helper"));
+        WearTwoPlainThings(app);
+        app.Launch();
+
+        app.WaitForDump("shellPage", "helper", "the shell to land on the Helper room");
+        app.WaitForDump("helperWorn", "2", "the inventory dump to become two anchors");
+
+        // The intent strip offers all three and starts on the Founder's first.
+        Assert.Equal("upgradeworn", app.DumpText("helperIntent"));
+        Assert.Equal(3, app.DumpValue("helperIntentChips"));
+        // The picker belongs to THIS intent, offers both worn things, and names the one pick.
+        Assert.Equal(2, app.DumpValue("helperWornChips"));
+        Assert.Equal("ClothCap", app.DumpText("helperWornFace"));
+        // The toggle is drawn and off — "the room decided not to offer it" and "the room
+        // forgot" are different claims (trap 29).
+        Assert.Equal(1, app.DumpValue("helperQuestToggle"));
+        Assert.Equal(0, app.DumpValue("helperQuestsOn"));
+
+        // The answers, in rank order: a zone that feeds three of your upgrades outranks one
+        // that feeds two.
+        app.WaitForDump("helperZones", "TempleofVeeshan,ClanRunnyeye,KaelDrakkel",
+            "the gear sweep to rank the zones by how many upgrades each one feeds");
+        Assert.Equal(3, app.DumpValue("helperRecs"));
+        Assert.Equal(2, app.DumpValue("helperWithheld"));
+        Assert.Equal(103, app.DumpValue("helperGearWithheld"));
+
+        // The SCREEN's claim beside the engine's, and the personal half staying silent
+        // because this fixture has never looted one of these.
+        Assert.Equal(3, app.DumpValue("helperGearWhy"));
+        Assert.Equal(0, app.DumpValue("helperGearSeen"));
+        // Every gear line is catalog-sourced, so every one of them carries the estimate label.
+        Assert.Equal(0, app.DumpValue("helperPersonalWhy"));
+        Assert.True(app.DumpValue("helperCatalogWhy") >= 3,
+            $"the catalog sentences did not reach the screen; dump was: {app.Artifacts()}");
+        Assert.Equal(0, app.DumpValue("helperDeadDoors"));
+    }
+
+    /// <summary>
+    /// **REPLACE WITH BETTER IS A DIFFERENT QUESTION, AND THE ROOM SHOWS IT** (DRA-71 D6,
+    /// plan P8; acceptance A5).
+    ///
+    /// <para><b>The same profile, the same dump and the SAME STORED PICK as the row above</b>
+    /// — only the intent differs. That is the whole point: "upgrade what I wear" reads the
+    /// picks and draws a picker; "replace with better" anchors on every worn slot and draws
+    /// none. An assertion that changed the picks too could not tell the two apart.</para>
+    ///
+    /// <para><b>Prediction.</b> Both anchors sweep, so 16 upgrades survive two per-anchor caps
+    /// and <b>225</b> are withheld. The NECK half is dominated by Western Wastes, which feeds
+    /// eight of them — so the top row changes from Temple of Veeshan to Western Wastes, which
+    /// is the intent difference visible in the answers rather than only in the controls.</para>
+    /// </summary>
+    [Fact]
+    public void ReplaceWithBetterDropsThePickerAndSweepsEverySlot()
+    {
+        var key = $"{AppHarness.Character}_{AppHarness.Server}".ToLowerInvariant();
+        using var app = new AppHarness(
+            configureSettings: s =>
+            {
+                s.HelperGoals[key] = [nameof(HelperGoal.FarmGear)];
+                s.HelperWornPicks[key] = ["Cloth Cap"];
+                s.HelperGearIntent[key] = nameof(GearIntent.ReplaceSlot);
+            },
+            environment: OpenOn("helper"));
+        WearTwoPlainThings(app);
+        app.Launch();
+
+        app.WaitForDump("shellPage", "helper", "the shell to land on the Helper room");
+        app.WaitForDump("helperIntent", "replaceslot", "the stored intent to reach the strip");
+
+        // NO picker — the stored pick is still there and this intent does not read it.
+        Assert.Equal(0, app.DumpValue("helperWornChips"));
+        Assert.Equal("ClothCap", app.DumpText("helperWornPicks"));
+        Assert.Equal(3, app.DumpValue("helperIntentChips"));
+
+        app.WaitForDump("helperZones", "WesternWastes,TempleofVeeshan,ClanRunnyeye",
+            "every worn slot to sweep rather than only the picked one");
+        Assert.Equal(225, app.DumpValue("helperGearWithheld"));
+        Assert.Equal(3, app.DumpValue("helperGearWhy"));
+        Assert.Equal(0, app.DumpValue("helperDeadDoors"));
+    }
+
+    /// <summary>
+    /// **"FARM TO SELL" ANSWERS, AND IT ANSWERS A DIFFERENT QUESTION FROM THE OTHER TWO**
+    /// (DRA-71 D7, plan P9; the Founder's smoke item 4c).
+    ///
+    /// <para>In D6 this row asserted a DEFERRAL — the intent said it was not ranked yet and
+    /// pointed at Progress → Wealth. Its engine landed in D7 and the assertion is inverted, but
+    /// the thing it protects is the same and is now sharper: <b>the sell question must never
+    /// wear the gear question's clothes.</b> This profile is WEARING two things and the catalog
+    /// is full of items that beat them — the two rows above prove that, from the same fixture —
+    /// so a single <c>helperGearWhy</c> here would mean the sell intent had been routed through
+    /// a dominance comparison it has no anchor for, which is the one claim
+    /// <c>GearUpgrades</c> exists to refuse.</para>
+    ///
+    /// <para>The controls that belong to the SWEEP go with it: no worn picker, and no
+    /// include-quests toggle, because a quest reward is not a thing you farm to sell and a
+    /// control that changed nothing would be an affordance with no effect.</para>
+    /// </summary>
+    [Fact]
+    public void TheFarmToSellIntentAnswersFromYourOwnLootRatherThanFromTheCatalog()
+    {
+        var key = $"{AppHarness.Character}_{AppHarness.Server}".ToLowerInvariant();
+        using var app = new AppHarness(
+            configureSettings: s =>
+            {
+                s.HelperGoals[key] = [nameof(HelperGoal.FarmGear)];
+                s.HelperGearIntent[key] = nameof(GearIntent.FarmToSell);
+            },
+            environment: OpenOn("helper"));
+        WearTwoPlainThings(app);
+        app.Launch();
+
+        app.WaitForDump("shellPage", "helper", "the shell to land on the Helper room");
+        app.WaitForDump("helperIntent", "farmtosell", "the stored intent to reach the strip");
+
+        // The fixture log's own kills and its own vendor sales are the whole input, so the
+        // intent produces real answers with no dump staged for it.
+        app.WaitForDump("helperSellable", "1", "the sell engine to price a drop off your sales");
+        Assert.True(app.DumpValue("helperRecs") >= 1,
+            $"the sell intent ranked nothing; dump was: {app.Artifacts()}");
+        Assert.True(app.DumpValue("helperSales") >= 1,
+            $"the sale probe read nothing; dump was: {app.Artifacts()}");
+        Assert.Equal(1, app.DumpValue("helperMoneyNote"));
+
+        // **THE ASSERTION THAT MATTERS.** Two worn anchors are staged and the catalog beats
+        // both; not one upgrade line may appear under this intent.
+        Assert.Equal(0, app.DumpValue("helperGearWhy"));
+        Assert.Equal(0, app.DumpValue("helperGearWithheld"));
+        Assert.Equal(2, app.DumpValue("helperWorn"));
+
+        // The sweep's controls went with the sweep.
+        Assert.Equal(0, app.DumpValue("helperQuestToggle"));
+        Assert.Equal(0, app.DumpValue("helperWornChips"));
+        Assert.Equal(0, app.DumpValue("helperDeadDoors"));
+    }
+
+    /// <summary>
+    /// **NO INVENTORY DUMP IS ITS OWN STATE, AND IT SHIPS THE COMMAND** (DRA-71 D6).
+    ///
+    /// <para>"EQBuddy has not been told what you are wearing" and "nothing in the catalog beats
+    /// it" both draw one grey sentence, and only the first has a command behind it. A surface
+    /// that needs an in-game command SHIPS the command (David, 2026-08-14), and only a launched
+    /// app can say the ⧉ button is actually there — an absent control photographs as an
+    /// unremarkable panel (trap 29).</para>
+    /// </summary>
+    [Fact]
+    public void WithNoInventoryDumpTheHelperAsksForOneAndHandsOverTheCommand()
+    {
+        var key = $"{AppHarness.Character}_{AppHarness.Server}".ToLowerInvariant();
+        using var app = new AppHarness(
+            configureSettings: s => s.HelperGoals[key] = [nameof(HelperGoal.FarmGear)],
+            environment: OpenOn("helper"));
+        app.Launch();
+
+        app.WaitForDump("shellPage", "helper", "the shell to land on the Helper room");
+        app.WaitForDump("helperWorn", "0", "a profile that has never written an inventory dump");
+
+        Assert.Equal(0, app.DumpValue("helperWornChips"));
+        Assert.Equal(0, app.DumpValue("helperRecs"));
+        Assert.Equal(1, app.DumpValue("helperGaps"));
+        // TWO copy buttons: the picker's own empty state and the gap under the answers. Both
+        // are the same constant off GameCommands, which is what GameCommandsTests asserts from
+        // the other side.
+        Assert.True(app.DumpValue("helperCopyCmd") >= 1,
+            $"the /outputfile inventory button never reached the screen; dump was: {app.Artifacts()}");
+        Assert.Equal(0, app.DumpValue("helperDeadDoors"));
+    }
+
+    // ================================================================================
+    // DRA-71 D8 — the professions block, and the skill value that used to die at midnight
+    // ================================================================================
+
+    /// <summary>
+    /// **THE PROFESSIONS BLOCK DRAWS ALL EIGHT, AND EVERY ROW HAS ITS TWO DOORS**
+    /// (DRA-71 D8, plan P13; Founder smoke item 6).
+    ///
+    /// <para>Nothing is picked, so the filter's empty state is "all of them" — which is the
+    /// half a source scan cannot check: <c>helperProfChips</c> is what the PICKER holds and
+    /// <c>helperProfRows</c> is what the room actually built under it, and a room that read
+    /// the store correctly and drew nothing satisfies only the first (trap 72's shape, trap
+    /// 56's discipline).</para>
+    ///
+    /// <para><c>helperWatchPresets</c> is a trap-29 assertion: the watch control is the one
+    /// affordance in this block that DOES something, and an absent control photographs as an
+    /// unremarkable row of text. <c>helperWatched</c> is 0 on a fresh profile — the state is
+    /// read from the player's own rules, so it can only be 0 before anything wrote one.</para>
+    /// </summary>
+    [Fact]
+    public void TheHelperListsAllEightProfessionsWithAWatchPresetAndAWikiDoorOnEach()
+    {
+        using var app = new AppHarness(environment: OpenOn("helper"));
+        app.Launch();
+
+        app.WaitForDump("shellPage", "helper", "the shell to land on the Helper room");
+        app.WaitForDump("helperProfRows", 8, "the professions block to draw the curated eight");
+
+        Assert.Equal(8, app.DumpValue("helperProfChips"));
+        Assert.Equal("Anyprofession", app.DumpText("helperProfFace"));
+        // A fresh profile has never had a skill-up read into it, so every row is in its
+        // unknown state — which is a sentence rather than a zero (HelperPresentationTests).
+        Assert.Equal(0, app.DumpValue("helperSkills"));
+        Assert.Equal(0, app.DumpValue("helperProfKnown"));
+        // One per row, and none of them is already watching.
+        Assert.Equal(8, app.DumpValue("helperWatchPresets"));
+        Assert.Equal(0, app.DumpValue("helperWatched"));
+        Assert.Equal(0, app.DumpValue("helperDeadDoors"));
+    }
+
+    /// <summary>
+    /// **A SKILL-UP IN THE LOG BECOMES A STANDING ON THE SCREEN** — the writer and the reader
+    /// in one assertion (trap 20), from a launched app.
+    ///
+    /// <para>This is the slice's whole point. <c>StatsSnapshot.SkillUps</c> has always known
+    /// what you raised tonight and nothing has ever remembered it, so the value died with the
+    /// session. The line goes into the real log through the real tail, the real parser and the
+    /// real ledger — a fixture-shaped substitute would render a state that is real and is not
+    /// the one this assertion is about (trap 23).</para>
+    ///
+    /// <para><b>The combat skill beside it is the negative, and it is asserted at a moment
+    /// when it is meaningful</b> (trap 62). Both lines are appended together and the wait is
+    /// for a POSITIVE event the profession line causes — the standing appearing — so
+    /// "1H Slashing was not stored" is checked after the batch has demonstrably been
+    /// processed, rather than before the tail got to it.</para>
+    ///
+    /// <para><c>helperSkills</c> is the STORE's claim and <c>helperProfKnown</c> is the
+    /// SCREEN's, captured in one Build: a skill-up that reached quest-ledger.json and no row
+    /// would satisfy the first and be the bug (trap 56).</para>
+    /// </summary>
+    [Fact]
+    public void ASkillUpInTheLogBecomesAPersistedProfessionStanding()
+    {
+        using var app = new AppHarness(environment: OpenOn("helper"));
+        app.Launch();
+
+        app.WaitForDump("shellPage", "helper", "the shell to land on the Helper room");
+        app.WaitForDump("helperSkills", 0, "a profile with no stored profession standing");
+
+        app.AppendLogLines(
+            "You have become better at Blacksmithing! (122)",
+            "You have become better at 1H Slashing! (53)");
+
+        app.WaitForDump("helperSkills", 1, "the profession skill-up to reach the ledger");
+        // Exactly one: the ledger admits professions and refuses the sixty combat skills
+        // nothing reads yet, which is what keeps the profile file profession-sized.
+        Assert.Equal(1, app.DumpValue("helperSkills"));
+        // And the SCREEN drew it. One of the eight rows now carries a number.
+        Assert.Equal(1, app.DumpValue("helperProfKnown"));
+        Assert.Equal(8, app.DumpValue("helperProfRows"));
+        Assert.Equal(0, app.DumpValue("helperDeadDoors"));
+    }
+
+    /// <summary>
+    /// **The pick narrows the list, and it is per character** (DRA-71 D8).
+    ///
+    /// <para>Seeded through <c>configureSettings</c> under the ledger's own character key, so
+    /// the assertion covers the read path a restart takes. Two rows rather than eight is the
+    /// only observable difference a filter makes, and <c>helperProfChips</c> staying at eight
+    /// is the other half: <b>the OFFER is never narrowed by its own filter</b>, or a player
+    /// could not undo a pick.</para>
+    /// </summary>
+    [Fact]
+    public void PickingTwoProfessionsNarrowsTheListAndLeavesTheOfferWhole()
+    {
+        var key = $"{AppHarness.Character}_{AppHarness.Server}".ToLowerInvariant();
+        using var app = new AppHarness(
+            configureSettings: s =>
+            {
+                s.HelperGoals[key] = [nameof(HelperGoal.FarmMaterials)];
+                s.HelperProfessions[key] =
+                    [nameof(Tradeskill.Baking), nameof(Tradeskill.Pottery)];
+            },
+            environment: OpenOn("helper"));
+        app.Launch();
+
+        app.WaitForDump("shellPage", "helper", "the shell to land on the Helper room");
+        app.WaitForDump("helperProfRows", 2, "the stored profession pick to be read back");
+
+        Assert.Equal(8, app.DumpValue("helperProfChips"));
+        Assert.Equal("Baking·Pottery", app.DumpText("helperProfFace"));
+        Assert.Equal(2, app.DumpValue("helperWatchPresets"));
+        // The goal is still Deferred — the ranking PARKED on its own evidence survey — so it
+        // says so under the answers while the block above it is full of the player's own
+        // professions. Both, from one Build.
+        Assert.Equal(1, app.DumpValue("helperNotYet"));
+        Assert.Equal(0, app.DumpValue("helperDeadDoors"));
+    }
 }

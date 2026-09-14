@@ -138,6 +138,32 @@ public class GameCommandsTests
         ("EQBuddy/MapView.cs", nameof(GameCommands.LocSocial),
             "the /loc social is the map's whole trick"),
 
+        // DRA-70's Helper room, and its two rows are the empty-state case this rule was
+        // reported about (David, 2026-08-20: EQBuddy was "telling me to import it but not
+        // telling me how or giving me the tool with which to do it"). The Helper is a
+        // surface that ASKS: two of its nine goals cannot answer anything until a dump
+        // exists, and both of those empty states name the missing file out loud. A room that
+        // said "run the faction command" and did not hand it over would be the whole of what
+        // a player could do about it.
+        //
+        // **Three rows and not four**, unlike the readiness block above: the Helper needs the
+        // dumps its OWN engines read. The spellbook feeds another room, and a room that
+        // copied every command in the app would be a launcher rather than an answer.
+        //
+        // **The THIRD arrived with DRA-71 D6, and it is the first time BAGS became one of the
+        // Helper's own inputs.** The comment above used to read "two rows and not four" and
+        // name bags as somebody else's business; the Farm Gear engine anchors its sweep on
+        // what the character is WEARING, which comes out of the inventory dump and nowhere
+        // else. This list following a surface as it grows an input is exactly the notice a
+        // curated must-list exists to give (trap 34) — the forbid-scan beside it cannot see a
+        // room that needed a command and never named one.
+        ("EQBuddy/HelperRoom.cs", nameof(GameCommands.OutputfileFaction),
+            "the Work on Faction goal is standings, which the log never sees — and the faction picker's own empty state"),
+        ("EQBuddy/HelperRoom.cs", nameof(GameCommands.OutputfileAchievements),
+            "the Unlock Classes and Unlock Races goals are the game's own record"),
+        ("EQBuddy/HelperRoom.cs", nameof(GameCommands.OutputfileInventory),
+            "the Farm Gear engine anchors on what you are WEARING — the worn picker's empty state and the gap under the answers, the same file asked for by a control and by an answer"),
+
         // ---- The seven Avalonia rows that used to sit here went with the platform in E-2
         // (2026-09-04). They were the same surfaces, per the both-UIs-in-one-change rule,
         // and the list following them across two folds is the notice this list exists to

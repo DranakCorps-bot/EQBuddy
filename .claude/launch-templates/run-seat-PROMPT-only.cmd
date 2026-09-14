@@ -3,15 +3,23 @@ rem ============================================================================
 rem  Experiment A' on EQBuddy (the lab) — PROMPT.txt only. Not a Corps standard.
 rem
 rem  Claim the work item FIRST (CLAUDE.md trap 70). A second default seat on the
-rem  same issue is refused here, before anyone starts claude.exe.
+rem  same card is refused here, before anyone starts claude.exe.
+rem
+rem  <work-item> is the PAPERCLIP CARD ID, DRA-<n>, and only that. A bare GitHub
+rem  issue number is refused by claim-seat.ps1 with the reason: #445 and DRA-28
+rem  are two names for one scope, and two claims under two spellings collide
+rem  with neither. Nothing here maps a number onto a card.
 rem
 rem  NEVER writes HELM-FEEDBACK.md / HELM.md / *-FEEDBACK.md. Kick text goes in
 rem  the seat-local PROMPT.txt. Helm #428 / trap 60: a launcher that rewrites a
 rem  mailbox is a silent history wipe.
 rem
 rem  Usage:
-rem    run-seat-PROMPT-only.cmd <work-item> <seat-id> [mode]
+rem    run-seat-PROMPT-only.cmd DRA-<n> <seat-id> [mode]
 rem    mode = active (default) | challenger | disjoint | replacement
+rem
+rem  Example:
+rem    run-seat-PROMPT-only.cmd DRA-28 opus-isolation
 rem ============================================================================
 setlocal
 
@@ -48,5 +56,6 @@ if not exist "%PROMPT%" (
 exit /b 0
 
 :usage
-echo Usage: run-seat-PROMPT-only.cmd ^<work-item^> ^<seat-id^> [active^|challenger^|disjoint^|replacement]
+echo Usage: run-seat-PROMPT-only.cmd DRA-^<n^> ^<seat-id^> [active^|challenger^|disjoint^|replacement]
+echo        The work item is the Paperclip card id (e.g. DRA-28), not a GitHub issue number.
 exit /b 2

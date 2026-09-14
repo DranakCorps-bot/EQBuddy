@@ -138,6 +138,26 @@
                      ellipsis to say so (trap 25). -->
                 <WrapPanel x:Name="UnlockSectionStrip" Grid.Column="0"
                            VerticalAlignment="Center" Visibility="Collapsed"/>
+                <!-- BESIDE THE SECTION STRIP: which unlocks you are working on (DRA-71 D5,
+                     Founder smoke item 7). It shares the STATE combo's column because the two
+                     are never visible together — the state lens is not wired on this tab and
+                     an inert filter is worse than an absent one, which is the decision the
+                     line that collapses StateCombo already records.
+
+                     THE FACE IS HERE, the popup is not: the same split the class lens took in
+                     D2, for the same #184 reason — this button sits in a fixed Grid column,
+                     so it is placed in XAML and handed to EqMultiPicker, which owns the
+                     dropdown and its chrome. No Click handler; the picker wires its own face.
+                     The SELECTION itself is AppSettings.UnlockPicks, which the Helper room
+                     reads through the same UnlockPickStore — one store, two surfaces. -->
+                <Button x:Name="UnlockPickBtn" Grid.Column="1" Visibility="Collapsed"
+                        Style="{StaticResource ActionButton}"
+                        FontSize="{DynamicResource FontCaption}"
+                        Height="{DynamicResource ControlHeight}"
+                        Margin="{DynamicResource GapS}"/>
+                <!-- Where its popup is added. A Popup takes no room in the row it is declared
+                     in — it needs a logical tree to resolve its theme brushes, nothing else. -->
+                <StackPanel x:Name="UnlockPickerHost" Grid.Column="1"/>
                 <!-- State filter (Reddit ask, 2026-08-11): every tab and search can
                      narrow to open / ready / completed. -->
                 <ComboBox x:Name="StateCombo" Grid.Column="1" Width="86"
@@ -146,12 +166,20 @@
                           Margin="{DynamicResource GapS}" SelectionChanged="OnStateChanged"
                           ToolTip="Any state · open (not yet completed) · ready (turn-ins in hand) · done (marked completed)"/>
                 <!-- Multiclass filter (Legends: up to 3 active classes): a checkbox
-                     popup, selection remembered per character. -->
+                     popup, selection remembered per character.
+
+                     THE FACE STAYS HERE, the popup does not (DRA-71 D2). This button sits
+                     in a fixed Grid column beside the mode strip — the very geometry #184
+                     was about — so it is placed in XAML and handed to EqMultiPicker, which
+                     owns the dropdown, its chrome and its re-entrancy guard. No Click
+                     handler: the picker wires its own face. The hand-built <Popup> of
+                     CheckBoxes that used to sit below is GONE; it was the app's only
+                     multi-select dropdown and is now the primitive's first caller. -->
                 <Button x:Name="ClassBtn" Grid.Column="2" Content="Any class"
                         Style="{StaticResource ActionButton}"
                         FontSize="{DynamicResource FontCaption}"
                         Height="{DynamicResource ControlHeight}"
-                        Margin="{DynamicResource GapS}" Click="OnClassBtn"
+                        Margin="{DynamicResource GapS}"
                         ToolTip="Pick your class(es) — quests any of them can do stay visible"/>
                 <!-- Followed the Epic card here when the widget's two quest cards became
                      one launcher (2026-08-16). It is an Epic-tab lens, so it shows on
@@ -174,15 +202,10 @@
                           Content="Repeat multi-island steps"
                           Foreground="{DynamicResource DimBrush}"
                           ToolTip="Some Sky pieces drop on several islands. Off: each is listed once, under &quot;Several islands&quot;. On: each appears under every island it drops on, so one island's list is complete — the same step then shows more than once."/>
-                <Popup x:Name="ClassPopup" PlacementTarget="{Binding ElementName=ClassBtn}"
-                       Placement="Bottom" StaysOpen="False" AllowsTransparency="True">
-                    <Border Background="{DynamicResource PopupBrush}"
-                            CornerRadius="{DynamicResource CornerCard}"
-                            BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1"
-                            Padding="{DynamicResource PadCard}">
-                        <StackPanel x:Name="ClassChecks"/>
-                    </Border>
-                </Popup>
+                <!-- Where EqMultiPicker's popup is added, in the column the hand-built one
+                     occupied (a Popup takes no room in the row it is declared in — it needs
+                     a logical tree to resolve its theme brushes, and nothing else). -->
+                <StackPanel x:Name="ClassPickerHost" Grid.Column="2"/>
                 <!-- mine = your items + pins · zone = doable where you're standing ·
                      held = what your bags could turn in · done = the trophy shelf ·
                      all = the whole catalog. Built in code as chips, the same primitive
