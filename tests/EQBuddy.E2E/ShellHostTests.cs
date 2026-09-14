@@ -1783,10 +1783,12 @@ public class ShellHostTests
         // this room exists to draw.
         Assert.Equal(0, app.DumpValue("helperPickerOpen"));
 
-        // Nothing picked is the "weigh everything" state, so the five deferred goals all say
-        // so and the answerable ones name what they are missing.
+        // Nothing picked is the "weigh everything" state, so the deferred goals all say so and
+        // the answerable ones name what they are missing. FOUR since DRA-71 D6 — Farm Gear
+        // gained its engine and moved from a deferral to a gap, which is the row a slice that
+        // answers a goal is meant to edit.
         Assert.Equal("", app.DumpText("helperGoals"));
-        Assert.Equal(5, app.DumpValue("helperNotYet"));
+        Assert.Equal(4, app.DumpValue("helperNotYet"));
         Assert.True(app.DumpValue("helperGaps") > 0,
             $"no goal named the store it is waiting for; dump was: {app.Artifacts()}");
 
@@ -1832,12 +1834,18 @@ public class ShellHostTests
         app.Launch();
 
         app.WaitForDump("shellPage", "helper", "the shell to land on the Helper room");
-        Assert.Equal(5, app.DumpValue("helperCopyCmd"));
+        Assert.Equal(7, app.DumpValue("helperCopyCmd"));
 
-        // The floor that keeps the count above from being a number about some other room:
-        // the four GAPS are unchanged by D5 — the fifth copy hangs off a picker and not off a
-        // goal, which is the distinction the paragraph above is about.
-        Assert.Equal(4, app.DumpValue("helperGaps"));
+        // The floor that keeps the count above from being a number about some other room. FIVE
+        // gaps since DRA-71 D6: the four that were already here plus Farm Gear's own, which on
+        // a profile with no inventory dump is "EQBuddy has not been told what you are wearing".
+        // The SIXTH and SEVENTH copies are that gap's and the worn picker's — the same file
+        // asked for twice, once by a control and once by an answer, which is the distinction
+        // the unlock picker's fifth copy already draws.
+        Assert.Equal(5, app.DumpValue("helperGaps"));
+        // And the gear block really is in its no-dump state rather than offering anchors
+        // nobody staged.
+        Assert.Equal(0, app.DumpValue("helperWorn"));
         // And the picker really is in its no-dump state rather than offering rows nobody
         // staged: "the room drew an empty picker" and "the room drew no picker" are different
         // claims, and only the first earns the fifth button.
@@ -1915,10 +1923,12 @@ public class ShellHostTests
         // are different claims, and D2's whole player-visible change is the second one.
         Assert.Equal("LevelUp·FarmGear", app.DumpText("helperGoalFace"));
 
-        // Farm Gear is deferred, so it says so and points at the room that answers it today;
-        // Level Up is answered and names what it is waiting for. Exactly one of each.
-        Assert.Equal(1, app.DumpValue("helperNotYet"));
-        Assert.Equal(1, app.DumpValue("helperGaps"));
+        // BOTH are answered since DRA-71 D6, so neither is a deferral and each names what it
+        // is waiting for: Level Up has no stored play to divide, Farm Gear has no inventory
+        // dump. The row used to read "exactly one of each" and the engine Farm Gear gained is
+        // what moved it.
+        Assert.Equal(0, app.DumpValue("helperNotYet"));
+        Assert.Equal(2, app.DumpValue("helperGaps"));
         Assert.Equal(0, app.DumpValue("helperDeadDoors"));
     }
 
@@ -2321,5 +2331,200 @@ public class ShellHostTests
         Assert.Equal(0, app.DumpValue("shellHomeLevelRefused"));
         // The three blocks are still three: an editor is inside Identity, not a fourth block.
         Assert.Equal(3, app.DumpValue("shellHomeBlocks"));
+    }
+
+    // ================================================================================
+    // DRA-71 D6 — Farm Gear asks the intent first
+    // ================================================================================
+
+    /// <summary>
+    /// An inventory dump with two plain worn items in it — the sweep's anchors, written in the
+    /// game's own tab-separated shape so they go through the real parser (trap 23).
+    ///
+    /// <para>Both names are REAL rows in the shipped <c>ItemCatalog</c> with no class lock on
+    /// them, which is what makes the predictions below arithmetic rather than hope: "Cloth Cap"
+    /// is AC 2 in the HEAD slot and "Cloth Choker" is AC 1 in the NECK slot. A made-up item
+    /// would resolve to no stats, drop out of <c>WornFrom</c>, and every assertion here would
+    /// be about an empty sweep.</para>
+    /// </summary>
+    private static void WearTwoPlainThings(AppHarness app) =>
+        app.WriteInventoryDump(("Head", "Cloth Cap", 1), ("Neck", "Cloth Choker", 1));
+
+    /// <summary>
+    /// **UPGRADE WHAT I WEAR: THE PICK ANCHORS THE SWEEP** (DRA-71 D6, plan P8; acceptance A5).
+    ///
+    /// <para><b>Prediction, computed against the shipped catalog before the run.</b> The
+    /// character infers WARRIOR from the fixture log, so the class lock is WAR. "Cloth Cap" is
+    /// the only picked anchor, and 111 catalog HEAD items beat AC 2 while being usable by a
+    /// warrior and having somewhere to drop. The per-anchor cap keeps 8 and reports
+    /// <b>103</b> withheld. Those eight group into five zones — Temple of Veeshan (3), Clan
+    /// Runnyeye (2), then Kael Drakkel, Tower of Frozen Shadow and Veeshan's Peak with one
+    /// each — so the room's cap shows <b>three</b> and says it held <b>two</b> back. Nothing
+    /// in the fixture log ever looted any of them, so there is no observed-drop line.</para>
+    ///
+    /// <para><b>Both halves from one moment</b> (trap 56): <c>helperGearWithheld</c> is what
+    /// the ENGINE held back and <c>helperGearWhy</c> is how many drawn rows actually carry an
+    /// upgrade sentence. A sweep that ranked correctly and drew nothing would satisfy only the
+    /// first, which is exactly the shape trap 72 shipped on the Quests tab.</para>
+    /// </summary>
+    [Fact]
+    public void UpgradeWhatIWearAnchorsOnThePickedItemAndNamesWhereItDrops()
+    {
+        var key = $"{AppHarness.Character}_{AppHarness.Server}".ToLowerInvariant();
+        using var app = new AppHarness(
+            configureSettings: s =>
+            {
+                s.HelperGoals[key] = [nameof(HelperGoal.FarmGear)];
+                s.HelperWornPicks[key] = ["Cloth Cap"];
+            },
+            environment: OpenOn("helper"));
+        WearTwoPlainThings(app);
+        app.Launch();
+
+        app.WaitForDump("shellPage", "helper", "the shell to land on the Helper room");
+        app.WaitForDump("helperWorn", "2", "the inventory dump to become two anchors");
+
+        // The intent strip offers all three and starts on the Founder's first.
+        Assert.Equal("upgradeworn", app.DumpText("helperIntent"));
+        Assert.Equal(3, app.DumpValue("helperIntentChips"));
+        // The picker belongs to THIS intent, offers both worn things, and names the one pick.
+        Assert.Equal(2, app.DumpValue("helperWornChips"));
+        Assert.Equal("ClothCap", app.DumpText("helperWornFace"));
+        // The toggle is drawn and off — "the room decided not to offer it" and "the room
+        // forgot" are different claims (trap 29).
+        Assert.Equal(1, app.DumpValue("helperQuestToggle"));
+        Assert.Equal(0, app.DumpValue("helperQuestsOn"));
+
+        // The answers, in rank order: a zone that feeds three of your upgrades outranks one
+        // that feeds two.
+        app.WaitForDump("helperZones", "TempleofVeeshan,ClanRunnyeye,KaelDrakkel",
+            "the gear sweep to rank the zones by how many upgrades each one feeds");
+        Assert.Equal(3, app.DumpValue("helperRecs"));
+        Assert.Equal(2, app.DumpValue("helperWithheld"));
+        Assert.Equal(103, app.DumpValue("helperGearWithheld"));
+
+        // The SCREEN's claim beside the engine's, and the personal half staying silent
+        // because this fixture has never looted one of these.
+        Assert.Equal(3, app.DumpValue("helperGearWhy"));
+        Assert.Equal(0, app.DumpValue("helperGearSeen"));
+        // Every gear line is catalog-sourced, so every one of them carries the estimate label.
+        Assert.Equal(0, app.DumpValue("helperPersonalWhy"));
+        Assert.True(app.DumpValue("helperCatalogWhy") >= 3,
+            $"the catalog sentences did not reach the screen; dump was: {app.Artifacts()}");
+        Assert.Equal(0, app.DumpValue("helperDeadDoors"));
+    }
+
+    /// <summary>
+    /// **REPLACE WITH BETTER IS A DIFFERENT QUESTION, AND THE ROOM SHOWS IT** (DRA-71 D6,
+    /// plan P8; acceptance A5).
+    ///
+    /// <para><b>The same profile, the same dump and the SAME STORED PICK as the row above</b>
+    /// — only the intent differs. That is the whole point: "upgrade what I wear" reads the
+    /// picks and draws a picker; "replace with better" anchors on every worn slot and draws
+    /// none. An assertion that changed the picks too could not tell the two apart.</para>
+    ///
+    /// <para><b>Prediction.</b> Both anchors sweep, so 16 upgrades survive two per-anchor caps
+    /// and <b>225</b> are withheld. The NECK half is dominated by Western Wastes, which feeds
+    /// eight of them — so the top row changes from Temple of Veeshan to Western Wastes, which
+    /// is the intent difference visible in the answers rather than only in the controls.</para>
+    /// </summary>
+    [Fact]
+    public void ReplaceWithBetterDropsThePickerAndSweepsEverySlot()
+    {
+        var key = $"{AppHarness.Character}_{AppHarness.Server}".ToLowerInvariant();
+        using var app = new AppHarness(
+            configureSettings: s =>
+            {
+                s.HelperGoals[key] = [nameof(HelperGoal.FarmGear)];
+                s.HelperWornPicks[key] = ["Cloth Cap"];
+                s.HelperGearIntent[key] = nameof(GearIntent.ReplaceSlot);
+            },
+            environment: OpenOn("helper"));
+        WearTwoPlainThings(app);
+        app.Launch();
+
+        app.WaitForDump("shellPage", "helper", "the shell to land on the Helper room");
+        app.WaitForDump("helperIntent", "replaceslot", "the stored intent to reach the strip");
+
+        // NO picker — the stored pick is still there and this intent does not read it.
+        Assert.Equal(0, app.DumpValue("helperWornChips"));
+        Assert.Equal("ClothCap", app.DumpText("helperWornPicks"));
+        Assert.Equal(3, app.DumpValue("helperIntentChips"));
+
+        app.WaitForDump("helperZones", "WesternWastes,TempleofVeeshan,ClanRunnyeye",
+            "every worn slot to sweep rather than only the picked one");
+        Assert.Equal(225, app.DumpValue("helperGearWithheld"));
+        Assert.Equal(3, app.DumpValue("helperGearWhy"));
+        Assert.Equal(0, app.DumpValue("helperDeadDoors"));
+    }
+
+    /// <summary>
+    /// **THE DEFERRED INTENT SAYS SO AND POINTS SOMEWHERE** (DRA-71 D6).
+    ///
+    /// <para>"Farm to sell" is the Founder's third ask and its engine is D7's. Picked, it
+    /// produces a gap rather than an empty answer list — a character with perfect gear and a
+    /// feature that has not been built look identical on screen otherwise — and the door under
+    /// it opens the room that answers the question today.</para>
+    /// </summary>
+    [Fact]
+    public void TheFarmToSellIntentIsOfferedAndSaysItIsNotRankedYet()
+    {
+        var key = $"{AppHarness.Character}_{AppHarness.Server}".ToLowerInvariant();
+        using var app = new AppHarness(
+            configureSettings: s =>
+            {
+                s.HelperGoals[key] = [nameof(HelperGoal.FarmGear)];
+                s.HelperGearIntent[key] = nameof(GearIntent.FarmToSell);
+            },
+            environment: OpenOn("helper"));
+        WearTwoPlainThings(app);
+        app.Launch();
+
+        app.WaitForDump("shellPage", "helper", "the shell to land on the Helper room");
+        app.WaitForDump("helperIntent", "farmtosell", "the stored intent to reach the strip");
+
+        // One gap, no answers, and the toggle withheld — a control that changes nothing about
+        // an unranked intent would be an affordance with no effect.
+        app.WaitForDump("helperGaps", "1", "the deferred intent to report itself");
+        Assert.Equal(0, app.DumpValue("helperRecs"));
+        Assert.Equal(0, app.DumpValue("helperGearWhy"));
+        Assert.Equal(0, app.DumpValue("helperQuestToggle"));
+        Assert.Equal(0, app.DumpValue("helperWornChips"));
+        Assert.Equal(0, app.DumpValue("helperDeadDoors"));
+        // …and the gap's door is real, which is what keeps a deferral from being a dead end.
+        Assert.True(app.DumpValue("helperDoors") >= 1,
+            $"the deferred intent pointed nowhere; dump was: {app.Artifacts()}");
+    }
+
+    /// <summary>
+    /// **NO INVENTORY DUMP IS ITS OWN STATE, AND IT SHIPS THE COMMAND** (DRA-71 D6).
+    ///
+    /// <para>"EQBuddy has not been told what you are wearing" and "nothing in the catalog beats
+    /// it" both draw one grey sentence, and only the first has a command behind it. A surface
+    /// that needs an in-game command SHIPS the command (David, 2026-08-14), and only a launched
+    /// app can say the ⧉ button is actually there — an absent control photographs as an
+    /// unremarkable panel (trap 29).</para>
+    /// </summary>
+    [Fact]
+    public void WithNoInventoryDumpTheHelperAsksForOneAndHandsOverTheCommand()
+    {
+        var key = $"{AppHarness.Character}_{AppHarness.Server}".ToLowerInvariant();
+        using var app = new AppHarness(
+            configureSettings: s => s.HelperGoals[key] = [nameof(HelperGoal.FarmGear)],
+            environment: OpenOn("helper"));
+        app.Launch();
+
+        app.WaitForDump("shellPage", "helper", "the shell to land on the Helper room");
+        app.WaitForDump("helperWorn", "0", "a profile that has never written an inventory dump");
+
+        Assert.Equal(0, app.DumpValue("helperWornChips"));
+        Assert.Equal(0, app.DumpValue("helperRecs"));
+        Assert.Equal(1, app.DumpValue("helperGaps"));
+        // TWO copy buttons: the picker's own empty state and the gap under the answers. Both
+        // are the same constant off GameCommands, which is what GameCommandsTests asserts from
+        // the other side.
+        Assert.True(app.DumpValue("helperCopyCmd") >= 1,
+            $"the /outputfile inventory button never reached the screen; dump was: {app.Artifacts()}");
+        Assert.Equal(0, app.DumpValue("helperDeadDoors"));
     }
 }

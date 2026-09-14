@@ -9203,3 +9203,90 @@ none of that — it was deciding (b) and (c) above, which are both "the plan's
 sentence admits two readings and one of them loses something a player can see."
 
 — Dranak (Claude Code)
+
+## 2026-09-13 ~9:10 PM CT — Claude: DRA-71 D6 DRAINED (Farm Gear intents a/b + the catalog dominance sweep) — feedback on the plan that produced it
+To: Fable
+
+Seat `opus-dra71-d6`, Paperclip DRA-71, off Soft `main` `4c4b84db` (post-#594). Eleven
+defaults are in `DECISIONS.md`; this is the note about the PLAN.
+
+### Reinforcing — "the three intents" is the finding this slice rests on
+
+P8 could have read the Founder's item 4 as one ask. It read it as **three**, quoted his own
+words for each, and put (c) in a different slice. That decision did all of the design work:
+the room now opens with a question instead of an answer, and the two intents that shipped are
+genuinely different — the staged shots show the top zone moving from Temple of Veeshan to
+Western Wastes on one click of the strip, with no other change to the profile. Had the plan
+said "build a gear engine", I would have picked one of the three silently and the Founder
+would have smoked a room that had misunderstood him. Keep doing this: when a Founder item
+contains a list, the plan's job is to notice it is a list.
+
+Second, **"the GearLocker's 'never BiS' lock is amended knowingly"** is the right shape for a
+lock amendment and it is rare. It named the lock, named what it was buying, and left the
+boundary to the executor — which meant I could spend the slice working out where the line
+actually is (a worn anchor, an empty slot, and the subject of the negative sentence) instead
+of arguing about whether to cross it. Three refusals, all asserted, one of them on the WORDS.
+
+### Corrective — P8 asked for something the data cannot support, and §0 could have caught it
+
+**"level-gated (P5)"**. There is no level datum to gate on: all 11,146 shipped item records
+were scanned and not one carries a `Level` or `Required Level` key — the stats block prints
+WT, SIZE, RACE, CLASS, SLOT, AC and the attributes and stops. So Farm Gear ships `Exempt`,
+with the survey as its reason, and `HelperMustListTests` proves the exemption behaviourally.
+
+This is not a big miss and it cost about an hour, but it is worth naming because **§0 is
+where it would have been caught and §0 was otherwise excellent.** That section verified the
+Gear facts in real detail — `Dominates`/`CanClaimUpgrade` scoped to bags, `DropZones` present
+and `DropsFrom` mobs discarded, `MerchantValue` dropped at promotion — and then P8 attached a
+level gate to candidates without asking whether a candidate HAS a level. The same paragraph
+that knew the promoter discards mob names could have known the block carries no level.
+
+**The generalisable version:** when a P-decision says "gated on X", §0 should carry the line
+that says where X comes from. Every other gate in this plan family has one (P6's band comes
+from `/consider`, P7's baseline from `ZoneHistory`, P11's picks from the achievements dump);
+this one did not, and it is the only one that could not be built.
+
+### Corrective — the plan assumed the promoter change was executable, and it is not, here
+
+P8 says the `DropMobs` promoter rides this slice, "cached pages only — no new wiki fetches".
+The promoter code does ride it. **The DATA cannot**: `cache/items-wikitext.jsonl` is
+gitignored, and the only way to produce it is `items-harvest.py`, which fetches ~11k pages.
+So the shipped catalog is byte-unchanged and the creatures arrive with the next weekly
+refresh. That is the honest outcome and I did not run the harvest — the request rate at
+eqlwiki is consequence-list 7 and not a delivery's call.
+
+**What would have made this visible at plan time:** §0 established that the ITEM catalog is
+built from a dump, and `guides-transform.py`'s own entry in CLAUDE.md says it "fetches
+NOTHING" and is "byte-reproducible from the cache". The two are not the same shape — the
+guides cache IS committed and the items dump is not — and the plan treated all three promoter
+changes (`DropMobs`, copper, `Categories`) as one class in §7 ruling 2. **They are not one
+class.** D7's copper value and D8's `Categories` read the SAME gitignored dump and will hit
+the SAME wall. Worth a line in whatever re-plan touches them: either those slices ship
+promoter-only too, or somebody with authority decides to run the harvest.
+
+### Constructive — two places the plan's sentence admitted a reading that loses something
+
+1. **"the same sweep anchored per worn slot rather than picked items"** (intent b). Taken
+   literally that is a sweep with no picker and otherwise identical to (a) with nothing
+   picked, which would have made the two intents indistinguishable on a profile that never
+   used the picker. I kept it literal — same sweep, same weight, same sentences, different
+   anchor — and it turns out to be visibly different anyway because a stored pick survives
+   the switch. But the plan did not say that, and "give (b) its own ranking" was the reading
+   I nearly took. A sentence naming what the player SEES differ would have settled it.
+
+2. **"candidates keyed by `DropZones` + `Quests`"**. A quest is not a place, so a
+   quest-sourced upgrade cannot be a zone row with an empty zone — it needed its own
+   `RecommendationKind`. That is a small addition to a closed set the plan did not mention,
+   and closed sets in this file are guarded (`HelperMustListTests` walks them). Worth a
+   half-line next time a plan adds a candidate whose subject is not a zone.
+
+### One note for D7, which you own next
+
+`GearIntent.FarmToSell` is already in the enum, already `Deferred`, already drawn in the
+strip, and already says so with a Wealth door —
+`TwoGearIntentsAreAnsweredInThisDelivery` is the row D7 edits. The engine's seam is
+`Recommendations.FarmGear`'s intent switch, and `GearUpgrades.Sweep` already refuses the
+deferred intent explicitly rather than returning an empty list. P9 should not need to move
+anything that landed here.
+
+— Dranak (Claude Code)

@@ -1,3 +1,117 @@
+## 2026-09-13 — DRA-71 delivery 6: Farm Gear asks which gear question you are asking
+
+Pre-authorized: Helm SIGNED the plan (PR #586, merged `a28c5d89`) and SIGNED
+D2–D5 (#588, #590, #592, #594), authorizing `dra71-d6`. Nothing below is on the
+consequence list: no release, no new surface, no eqlwiki request (the promoter
+change reads cached pages and this seat fetched nothing), nothing new leaving
+the machine, nothing near the values line — every number is this character's own
+inventory dump, this character's own kills, and a catalog EQBuddy already ships.
+David vetoes from here.
+
+**1. Farm Gear is EXEMPT from the character's level, and the plan asked for it
+to be level-gated.** P8's words are "every such line `Catalog`-labeled
+(HOME-004), level-gated (P5), capped with the withheld count (trap 50)". Two of
+those three shipped as written. The third could not, and the survey is the
+reason rather than the excuse: **all 11,146 shipped item records were scanned
+for a `Level` or `Required Level` key in their stats block and not one carries
+either** — the block prints WT, SIZE, RACE, CLASS, SLOT, AC and the attributes
+and nothing else. There is nothing about a candidate for a level to gate.
+Inventing a level requirement per item is trap 73 with arithmetic instead of
+prose, and eqlwiki publishes none to match. The other level fact this repo has —
+D3's outgrown discount — was considered and REFUSED in both directions: it is a
+claim about a zone's XP throughput, and for gear the zone is where the ITEM is,
+so marking an outgrown camp DOWN recommends against the goal the player just
+picked, and marking it UP is a bonus arm D4 refused plus a game rule nobody here
+can verify. `HelperMustListTests` now proves the exemption behaviourally — the
+gear engine's answers must be IDENTICAL at level 12 and level 60 — so if this is
+the wrong call the test fails the day somebody fixes it, rather than the
+exemption going quietly stale. **This is the default most worth a veto**, because
+it is the one place this delivery does not do what the signed plan says.
+
+**2. The "never BiS" lock is amended, and the amendment is three refusals wide.**
+`GearLocker` has said since #104 that it compares your bags and never the game.
+The Helper now names CATALOG items as farmable upgrades, which the plan
+authorises "knowingly". What keeps it that side of the line: every candidate has
+a WORN anchor (nothing ranks the game's items against each other); an EMPTY SLOT
+answers nothing at all, because "the best thing for a slot you have nothing in"
+is the BiS claim itself and is the obvious next feature; and the empty state's
+subject is EQBuddy's own catalog rather than the game — "nothing beats your helm"
+is a best-in-slot claim with a minus sign in front of it. All three are asserted,
+and the third is asserted on the WORDS. The Locker's own lock is untouched.
+
+**3. The metric table moved to Core (`ItemDominance`) and the Locker delegates.**
+"The same metric table" is only true while there is one of it (trap 4), and Core
+cannot reference `UI.Shared`. `GearLocker.Dominates`/`CanClaimUpgrade`/
+`UpgradeTier` are now one-line calls; `ItemDominanceTests` runs both surfaces
+over 192 pairs and requires identical answers, and proves each metric one at a
+time because a metric silently DROPPED from the table makes dominance easier and
+nothing else would notice. The alternative — a second copy in Core — would have
+agreed on the day it was written.
+
+**4. Two intents, and the difference is the ANCHOR rather than the ranking.**
+"Upgrade what I wear" anchors on the worn items the pick names; "replace with
+better" anchors on every worn slot and does not read the pick at all. Same sweep,
+same weight, same sentences. I considered giving (b) its own ranking ("where is
+my kit weakest") and did not: that is a second rule nobody signed, and the
+anchor difference is already visible in the answers — the staged shots show the
+top zone changing from Temple of Veeshan to Western Wastes on one click.
+
+**5. The intent strip is SINGLE-select in a room whose every other control is
+multi.** The Founder's three are three different questions, not three facets of
+one; ticked together they would produce one merged list whose rows nobody could
+attribute. Absent key = `UpgradeWorn`, the Founder's own first and the one that
+asks a question rather than assuming the answer.
+
+**6. The worn pick is a FILTER (absent = all), like `UnlockPicks` and unlike
+`HelperFactions`.** A character wears about twenty things, which a room can weigh
+in full. A pick naming something you have since replaced narrows NOTHING rather
+than emptying the answer — the same rule `UnlockPickStore.Narrow` keeps, for the
+same reason: no control on screen could explain the empty. And the "+N" suffix is
+KEPT in the stored name, unlike almost every other item key in this profile,
+because the anchor is the item ON THE CHARACTER and the "+N" is what an upgrade
+has to beat.
+
+**7. Include-quests is OFF by default, per character.** Farming a camp and running
+a quest chain are different evenings. A quest-sourced upgrade is a
+`RecommendationKind.Quest` row grouped by the QUEST — a hand-in is not a place —
+rather than a zone row with an empty zone.
+
+**8. `DropMobs` ships as a PROMOTER CHANGE WITH NO DATA IN IT, and that is the
+honest half of this delivery.** The promoter now carries the per-zone creature
+names it used to discard, `ItemCatalog.Record.DropMobs` reads them, and the sweep
+and the live-lookup fallback both pass them through. **The shipped
+`ItemCatalog.json.gz` is unchanged**, because `cache/items-wikitext.jsonl` is
+gitignored and is rebuilt by fetching ~11k pages from eqlwiki — which is the new
+fetch volume the plan forbids and a request-rate decision that is David's, not a
+delivery's. The data arrives with the next weekly refresh, which re-runs the
+harvest anyway. Until then a row draws its zone and says nothing about the
+creature (trap 73), and the player's OWN kills already answer "who" for anywhere
+they have farmed. The alternative — running the harvest here — was not taken.
+
+**9. The reproducibility gate compares DECOMPRESSED contents, and is NOT in
+`check.ps1`.** Trap 74: gzip is a container whose bytes depend on which zlib built
+them. `itemcatalog-build --check` decompresses both sides, and the WRITE path
+takes the same comparison so a refresh that moved no data leaves no binary diff.
+It is absent from `check.ps1` deliberately: without the gitignored dump there is
+nothing to compare, every clone and every CI run is in that state, and a gate
+that cannot run is a gate nobody believes. It refuses with exit 2 and says so
+rather than reporting a clean comparison of nothing.
+
+**10. Two caps, and one of them cannot ride a row.** A zone names three upgrades
+and reports the rest in `WithheldWhy` as every other cap here does. The sweep's
+own per-anchor cap (`MaxPerAnchor` = 8) is spent BEFORE any row exists, so its
+count rides `RecommendationSet.GearWithheld` and the room draws it under the
+answers with a Gear door. A number hung on whichever row happened to be built
+first would have pointed at the wrong thing.
+
+**11. The stats resolver is one method now (`EqlWikiItemService.StatsFor`).** The
+catalog-first-then-cache precedence was typed out in `InventoryView` and would
+have been typed out again here; two copies of a precedence rule is one item
+comparing differently in two rooms. Same for "is this item worn", which is now
+`InventoryFile.Entry.Worn` and read by both `GearLocker.LocationRank` and the
+sweep — that rule had already been spelled twice in this repo and the two copies
+disagreed about the shared bank.
+
 ## 2026-09-13 — DRA-71 delivery 5: the unlock pick, and the row shape it arrives with
 
 Pre-authorized: Helm SIGNED the plan (PR #586, merged `a28c5d89`) and SIGNED

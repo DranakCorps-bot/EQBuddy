@@ -153,6 +153,9 @@ public static class HelperPresentation
         RecommendationKind.Zone => r.Subject,
         RecommendationKind.Unlock => $"{r.Subject} — unlock",
         RecommendationKind.Faction => $"{r.Subject} — faction",
+        // A hand-in rather than a camp (DRA-71 D6). The suffix is what stops a quest title
+        // from reading as somewhere to travel to, which is the same job the two above it do.
+        RecommendationKind.Quest => $"{r.Subject} — quest",
         _ => r.Subject,
     };
 
@@ -266,6 +269,25 @@ public static class HelperPresentation
         ZoneOutgrownFact f =>
             $"The creatures you conned here ran L{f.ConnedMin}–{f.ConnedMax}, "
             + $"across {Count(f.Kills, "kill", "kills")} — you are level {f.Level}.",
+
+        // **THE FARM GEAR LINE** (DRA-71 D6, plan P8). It names what it beats, always, because
+        // an upgrade with no anchor is a claim about the GAME — "this is the best helm" — and
+        // that is the line the Gear Locker's "never BiS" lock draws. The catalog label is
+        // appended by Why() above, so this sentence can never read as a measurement of play.
+        //
+        // The WHO clause is silent where the wiki named nobody, which is every row until the
+        // weekly refresh rebuilds the catalog with DropMobs in it. An unanswered question
+        // draws nothing (trap 73) — and where the player's OWN kills answered it, the fact
+        // beside this one carries it instead and this clause is empty by construction.
+        GearUpgradeFact f =>
+            $"{f.Item} beats the {f.Over} in your {Slot(f.Slot)} — {Gain(f)}."
+            + (f.Who.Length > 0 ? $" {f.Who} drops it." : ""),
+
+        // The personal half: measured, with its denominator, and the creature named from your
+        // own pooled kills rather than from a page.
+        GearDropSeenFact f =>
+            $"You have seen {f.Item} drop from {f.Mob} in {f.Zone} — "
+            + $"{f.Drops:N0} of your {f.Kills:N0} {(f.Kills == 1 ? "kill" : "kills")} there.",
 
         UnlockScoreFact f =>
             $"{f.Subject}: {f.Done} of {f.Total} requirements done, by the game's own record.",
@@ -391,6 +413,27 @@ public static class HelperPresentation
             $"{GoalLabel(gap.Goal)}: EQBuddy has not stored enough of your play to divide yet. "
             + "It needs a sitting of about fifteen minutes in a zone before it will quote a "
             + "rate, because a shorter one measures one lucky pull.",
+
+        // ---- DRA-71 D6 ----------------------------------------------------------------
+        GoalGapReason.NoInventoryDump =>
+            $"{GoalLabel(gap.Goal)}: EQBuddy has not been told what you are wearing. Run the "
+            + "inventory command in game and this fills in.",
+
+        // **THE SUBJECT OF THIS SENTENCE IS THE CATALOG AND NOT THE GAME**, and that is the
+        // whole of why it is three clauses instead of four words. "Nothing beats what you are
+        // wearing" is a best-in-slot claim with a minus sign in front of it, and the Gear
+        // Locker has refused to make that claim since #104. What EQBuddy actually knows is
+        // what it has read.
+        GoalGapReason.NoCatalogUpgrade =>
+            $"{GoalLabel(gap.Goal)}: nothing EQBuddy has read about beats what you are "
+            + "wearing in these slots. That is a statement about EQBuddy's own catalog rather "
+            + "than about the game — an item it has never read about cannot be compared, and "
+            + "a \"+N\" on something you wear raises it by an amount the wiki does not state.",
+
+        GoalGapReason.GearIntentNotAnsweredYet =>
+            $"{GoalLabel(gap.Goal)}: EQBuddy is not ranking what to farm for money yet. What "
+            + "your own sessions have earned is under Progress → Wealth meanwhile.",
+
         _ => "",
     };
 
@@ -404,9 +447,10 @@ public static class HelperPresentation
     /// </summary>
     public static string NotAnsweredYet(HelperGoal goal) => goal switch
     {
-        HelperGoal.FarmGear =>
-            "Farm Gear: EQBuddy is not ranking this one yet. Your wishlist, your bags and "
-            + "what has dropped for you are in Gear meanwhile.",
+        // Farm Gear LEFT this switch in DRA-71 D6 — its engine landed, and the pairing test
+        // beside it (EveryDeferredGoalNamesTheRoomThatAnswersItToday) is what would have
+        // caught a sentence left behind. Its one unanswered INTENT says so in its own place,
+        // through GoalGapReason.GearIntentNotAnsweredYet.
         HelperGoal.FarmMotes =>
             "Farm Motes: EQBuddy is not ranking this one yet. Your mote totals are under "
             + "Progress → Wealth meanwhile.",
@@ -427,7 +471,6 @@ public static class HelperPresentation
     /// drifting: the sentence above and this door are read together or neither is.</summary>
     public static HelperDoorKind? NotAnsweredDoor(HelperGoal goal) => goal switch
     {
-        HelperGoal.FarmGear => HelperDoorKind.Gear,
         HelperGoal.FarmMotes => HelperDoorKind.Wealth,
         HelperGoal.MakeMoney => HelperDoorKind.Wealth,
         HelperGoal.FarmMaterials => HelperDoorKind.Gear,
@@ -486,6 +529,107 @@ public static class HelperPresentation
     /// blocks to head.</para>
     /// </summary>
     public const string UnlockPickerHeading = "Races and classes you are unlocking";
+
+    // ---- the gear intent strip and its picker (DRA-71 D6) ---------------------------------
+
+    /// <summary>
+    /// The intent strip's own sentence. It says the strip is a QUESTION rather than a filter,
+    /// which is the one thing about it that differs from every other control in this room —
+    /// the goals above it are multi-select and these three are not.
+    /// </summary>
+    public const string GearIntentNote =
+        "What are you asking about gear? One at a time — these are different questions, not "
+        + "filters.";
+
+    /// <summary>
+    /// The segment labels — <b>the Founder's own three, verbatim</b> (smoke items 4a/4b/4c).
+    ///
+    /// <para>Kept as he wrote them for <see cref="GoalLabel"/>'s reason: this is the list the
+    /// person who asked for the feature typed out, and making the three parallel would be a
+    /// design opinion about a decision that was already made.</para>
+    /// </summary>
+    public static string GearIntentLabel(GearIntent intent) => intent switch
+    {
+        GearIntent.UpgradeWorn => "Upgrade what I wear",
+        GearIntent.ReplaceSlot => "Replace with better",
+        GearIntent.FarmToSell => "Farm to sell",
+        _ => "",
+    };
+
+    /// <summary>What each intent DOES, on hover. It names the anchor, because the difference
+    /// between the first two is exactly which thing they are answering about, and a player
+    /// who cannot tell them apart will read the second as a duplicate of the first.</summary>
+    public static string GearIntentTip(GearIntent intent) => intent switch
+    {
+        GearIntent.UpgradeWorn =>
+            "Pick the items you want to improve, and EQBuddy names catalog items that beat "
+            + "them and where they drop.",
+        GearIntent.ReplaceSlot =>
+            "The same comparison across every slot you have something in — no picking, and "
+            + "EQBuddy sorts the places by how many of your slots they can improve.",
+        GearIntent.FarmToSell =>
+            "Not ranked yet. What your own sessions have earned is under Progress → Wealth "
+            + "meanwhile.",
+        _ => "",
+    };
+
+    /// <summary>
+    /// **THE SENTENCE THAT KEEPS THIS OFF THE "BEST IN SLOT" SIDE OF THE LINE**, printed
+    /// under the answers rather than buried in a tooltip.
+    ///
+    /// <para>The Gear Locker has said since #104 that it compares your bags and never the
+    /// game. This room compares the shipped catalog — knowingly, under a Helm-signed plan —
+    /// and the player is owed the same honesty the Locker gives them: what EQBuddy has read
+    /// about is not what exists, base numbers are not the numbers on a "+N", and nothing here
+    /// is a claim that an item is the best one.</para>
+    /// </summary>
+    public const string GearCatalogNote =
+        "Gear answers come from the item pages EQBuddy ships, compared against what you are "
+        + "wearing. They are never a \"best in slot\": EQBuddy can only compare what it has "
+        + "read about, and the numbers are the wiki's base values — a \"+N\" raises an item "
+        + "in game by an amount the page does not state.";
+
+    /// <summary>Over the worn-item picker, and only ever drawn for the intent that has
+    /// one.</summary>
+    public const string WornPickerNote =
+        "Which of the things you are wearing do you want to improve? Nothing picked means all "
+        + "of them.";
+
+    /// <summary>Hover copy on the worn face, same job as <see cref="GoalPickerTip"/>.</summary>
+    public const string WornPickerTip =
+        "Pick the worn items you are trying to upgrade — any number of them.";
+
+    /// <summary>The picker's own empty state — no inventory dump has ever been read, so there
+    /// is nothing to pick from. The command rides beside it in the room
+    /// (<c>GameCommands.OutputfileInventory</c>), never as a literal here.</summary>
+    public const string WornPickerNoDump =
+        "No inventory dump yet, so EQBuddy does not know what you are wearing.";
+
+    /// <summary>What the worn face reads. Told how many are OFFERED, unlike the faction face:
+    /// the list is every worn item and is not capped, so "Any worn item" is true.</summary>
+    public static string WornFace(IReadOnlyList<string> picked, int offered) =>
+        PickerFace.For(picked, "worn item", "worn items", offered: offered, maxChars: FaceChars);
+
+    /// <summary>One worn row: the item and the slot it is in, because a character wearing two
+    /// rings needs to be able to tell which row is which.</summary>
+    public static string WornRow(WornItem item) => $"{item.Name} — {Slot(item.Slot)}";
+
+    /// <summary>The include-quests toggle's label — the Founder's own "± quests".</summary>
+    public const string IncludeQuestsLabel = "Include quest rewards";
+
+    /// <summary>Why it is a choice rather than a default. Farming and questing are different
+    /// evenings, which is the whole reason the toggle exists.</summary>
+    public const string IncludeQuestsTip =
+        "Off by default: farming a camp and running a quest chain are different evenings. "
+        + "Turn it on and items a quest hands out are offered too, each with its quest named.";
+
+    /// <summary>Said when the sweep's per-anchor cap held upgrades back — the one count that
+    /// cannot ride a row, because it is spent before any row exists (trap 50). The door under
+    /// it is the Gear room, which has the whole list.</summary>
+    public static string GearWithheld(int withheld) => withheld <= 0
+        ? ""
+        : $"{withheld:N0} more {(withheld == 1 ? "upgrade" : "upgrades")} matched and are not "
+          + "listed — EQBuddy names a few per slot rather than every one it has read about.";
 
     /// <summary>Said when the picker held standings back. Trap 50 again, one surface
     /// down.</summary>
@@ -583,4 +727,21 @@ public static class HelperPresentation
 
     private static string Count(int n, string one, string many) =>
         $"{n:N0} {(n == 1 ? one : many)}";
+
+    /// <summary>A slot the way a person says it. The stats block prints SHOULDERS and the
+    /// sentence wants shoulders; nothing else is changed, so a slot word this build does not
+    /// know still reads as itself rather than as a blank.</summary>
+    private static string Slot(string slot) => slot.ToLowerInvariant();
+
+    /// <summary>
+    /// The improvement, as a signed number against the metric's own name.
+    ///
+    /// <para>Weapon ratio is the one that needs a decimal — it is damage per point of delay
+    /// and "+1 ratio" would round a 0.77→0.92 swap into a lie. Everything else in the block is
+    /// an integer, and printing "+12.0 AC" reads as a precision the wiki never claimed.</para>
+    /// </summary>
+    private static string Gain(GearUpgradeFact f) =>
+        f.GainMetric.Equals("ratio", StringComparison.OrdinalIgnoreCase)
+            ? $"{f.GainBy:+0.00;-0.00} ratio"
+            : $"{f.GainBy:+#;-#;0} {f.GainMetric}";
 }

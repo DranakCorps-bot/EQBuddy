@@ -137,7 +137,13 @@ public sealed partial class EqlWikiItemService
             StatsLines = rec.StatsText.Length > 0 ? [.. rec.StatsText.Split('\n')] : [],
             Quests = rec.Quests ?? [],
             Recipes = rec.Recipes ?? [],
-            DropsFrom = (rec.DropZones ?? []).Select(z => (z, new List<string>())).ToList(),
+            // The creatures ride along where the catalog has them (DRA-71 D6). A zone with no
+            // named creature keeps the empty list it always had — the shape is unchanged and
+            // an item page that never named one still says nothing.
+            DropsFrom = (rec.DropZones ?? [])
+                .Select(z => (z, rec.DropMobs is { } m && m.TryGetValue(z, out var mobs)
+                    ? new List<string>(mobs) : new List<string>()))
+                .ToList(),
             // The build tool computed QuestFlagged from the page's stats AND its
             // categories; carry the category half through so category-only quest
             // items keep their 🗺 badge (2026-08-13 review: the flag was shipped
@@ -151,6 +157,26 @@ public sealed partial class EqlWikiItemService
     // join is memoized too (2026-08-13 review): loot rows call this per row per
     // render second, and re-joining an unchanged stats block every tick was churn.
     private readonly Dictionary<string, string?> _statsTextMemo = new(StringComparer.OrdinalIgnoreCase);
+
+    /// <summary>
+    /// **THE ONE STATS RESOLVER** every gear comparison in the app takes (DRA-71 D6).
+    ///
+    /// <para>The embedded catalog answers FIRST, with the build tool's own structured numbers
+    /// — no text round-trip, and the catalog≡live-parse guarantee holds because the catalog
+    /// was built through these same parsers. A genuinely fetched live page covers the rest.
+    /// That ordering was typed out in <c>InventoryView</c> and would have been typed out again
+    /// in the Helper's Farm Gear block; the two would then have been free to disagree about
+    /// which layer wins, which is one item comparing differently in two rooms (trap 4).</para>
+    ///
+    /// <para>It never fetches. Both callers run on a render path.</para>
+    /// </summary>
+    public ItemStatsBlock? StatsFor(string baseName) =>
+        ItemCatalog.Default.Find(baseName) is { } rec
+        && (rec.Slots.Count > 0 || rec.StatsText.Length > 0)
+            ? rec.ToStatsBlock()
+            : CachedInfo(baseName) is { StatsLines.Count: > 0 } info
+                ? ItemStatsBlock.Parse(info.StatsLines)
+                : null;
 
     /// <summary>Cache-only stats peek for hover tooltips: synchronous, accepts any age,
     /// never fetches. A hover must cost nothing — the click path does the real lookup.</summary>

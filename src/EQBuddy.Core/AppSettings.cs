@@ -691,6 +691,66 @@ public sealed class AppSettings
     /// </summary>
     public Dictionary<string, List<string>> UnlockPicks { get; set; } = [];
 
+    /// <summary>
+    /// Which QUESTION this character is asking under the Helper's "Farm Gear" goal — a
+    /// <see cref="GearIntent"/> name (DRA-71 D6, plan P8; Founder smoke items 4a/4b).
+    ///
+    /// <para><b>Single-select, and the only single-select selection in this room.</b> The
+    /// goals above are filters — you can be levelling AND working faction — but the Founder's
+    /// three gear asks are three different questions, not three facets of one: "upgrade what I
+    /// wear" names items, "replace with better" names slots, and "farm to sell" does not look
+    /// at what you are wearing at all. Ticked together they would produce one merged list
+    /// whose rows nobody could attribute.</para>
+    ///
+    /// <para><b>An absent key is <c>UpgradeWorn</c></b> — the Founder's own first, and the one
+    /// that asks a question rather than assuming an answer. An unknown stored name falls back
+    /// to the same, so an intent that is later removed stops mattering instead of leaving the
+    /// strip with nothing selected.</para>
+    ///
+    /// <para><b>Names rather than ordinals</b>, for <see cref="HelperGoals"/>' reason: an
+    /// intent inserted in the middle of the enum would silently re-point every stored
+    /// choice.</para>
+    /// </summary>
+    public Dictionary<string, string> HelperGearIntent { get; set; } = [];
+
+    /// <summary>
+    /// Which WORN items this character picked under the "upgrade what I wear" intent, in the
+    /// inventory dump's own spelling — "+N" and all (DRA-71 D6, plan P8).
+    ///
+    /// <para><b>Absent means ALL of them</b> — filter semantics, the same reading
+    /// <see cref="UnlockPicks"/> has and the deliberate opposite of <see cref="HelperFactions"/>
+    /// beside it. A character wears about twenty things, which is a list a room can weigh in
+    /// full; a faction dump carries hundreds, which is why that one is a required pick.</para>
+    ///
+    /// <para><b>The tier suffix is KEPT rather than folded</b>, unlike almost every other item
+    /// key in this profile. The picker's rows are labelled with what the dump printed, and the
+    /// thing being anchored on is the item ON THE CHARACTER: a "Crushbone Belt +5" and a plain
+    /// one are the same wiki page but not the same anchor, because the "+5" is what the
+    /// upgrade has to beat. A pick naming an item you have since replaced narrows nothing
+    /// rather than emptying the answer.</para>
+    ///
+    /// <para>It is read ONLY for <c>GearIntent.UpgradeWorn</c>. "Replace with better" anchors
+    /// on every worn slot by definition, and reading a stale item list into it would be that
+    /// intent quietly becoming the other one.</para>
+    /// </summary>
+    public Dictionary<string, List<string>> HelperWornPicks { get; set; } = [];
+
+    /// <summary>
+    /// Whether the Helper's gear answers may include items a QUEST hands out (DRA-71 D6, plan
+    /// P8; the Founder's own "± quests").
+    ///
+    /// <para><b>Off by default, because "farm gear" and "run a quest chain" are different
+    /// evenings.</b> Someone who picked Farm Gear and got a list of quest rewards would have
+    /// been answered about the Guide room's job. Turning it on adds them, and every such row
+    /// says which quest and opens it on the quest list.</para>
+    ///
+    /// <para>A bool per character rather than a global one: the same install holds a level-8
+    /// alt for whom every upgrade is a quest reward and a main who is farming raid zones.
+    /// False REMOVES the key — "never touched it" and "turned it off" are one state, and two
+    /// spellings of one state is a distinction a later reader would eventually act on.</para>
+    /// </summary>
+    public Dictionary<string, bool> HelperGearQuests { get; set; } = [];
+
     /// <summary>Color theme key (see EQBuddy.UI.Shared.ThemeCatalog); defaults to the
     /// original parchment-and-brass look so existing installs don't change on upgrade.</summary>
     public string Theme { get; set; } = "ParchmentBrass";

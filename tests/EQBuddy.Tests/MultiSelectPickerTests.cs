@@ -59,8 +59,9 @@ public class MultiSelectPickerTests
         },
         {
             @"src\EQBuddy\HelperRoom.cs",
-            "the Helper's goals, the faction sub-picker under them (DRA-71 D2), and the "
-            + "unlock sub-picker beside it (DRA-71 D5)"
+            "the Helper's goals, the faction sub-picker under them (DRA-71 D2), the "
+            + "unlock sub-picker beside it (DRA-71 D5), and the worn-item picker under the "
+            + "\"upgrade what I wear\" gear intent (DRA-71 D6)"
         },
     };
 

@@ -216,6 +216,47 @@ public sealed record ZoneOutgrownFact(
     string Zone, int ConnedMin, int ConnedMax, int Level, int Kills)
     : WhyFact(Evidence.Personal);
 
+/// <summary>
+/// **A CATALOG ITEM THAT BEATS SOMETHING YOU ARE WEARING** (DRA-71 D6, plan P8; Founder smoke
+/// items 4a/4b).
+///
+/// <para><b>This is the fact the "never BiS" amendment is about, so read it with
+/// <see cref="GearUpgrades"/>' summary.</b> The Gear Locker compares what is in your bags and
+/// still does. This one compares a shipped catalog record against the item on your character
+/// — a farmable upgrade — and it is <see cref="Evidence.Catalog"/> for exactly that reason:
+/// the estimate label is appended by construction, so a line about an item EQBuddy has read
+/// about can never read as a measurement of your play.</para>
+///
+/// <para><b>It always names what it beats.</b> An upgrade with no anchor would be a claim
+/// about the game ("this is the best X"), which is the line the Locker's lock draws and this
+/// slice does not cross. The anchor is in the record because it is in the sentence.</para>
+/// </summary>
+/// <param name="GainMetric">The biggest single number that improved, in the stats block's own
+/// spelling ("AC", "HP", "STR"). From <see cref="ItemDominance.Gain"/> — the same table that
+/// decided dominance, so the sentence cannot name a metric the comparison did not weigh.</param>
+/// <param name="Who">The creature the wiki named, or "". Empty is the honest answer for every
+/// row until the weekly refresh rebuilds the catalog with
+/// <see cref="ItemCatalog.Record.DropMobs"/> in it — and an unanswered question draws nothing
+/// rather than a guess (trap 73).</param>
+public sealed record GearUpgradeFact(
+    string Item, string Over, string Slot, string GainMetric, double GainBy, string Who)
+    : WhyFact(Evidence.Catalog);
+
+/// <summary>
+/// **YOU HAVE ACTUALLY SEEN IT DROP** (DRA-71 D6).
+///
+/// <para>The catalog says an item comes from a zone; your own pooled kills say WHICH creature
+/// gave it to you and how often. That is the <c>who · where</c> the guided rows are built on,
+/// answered from the one source that cannot be stale — and it is why a zone you have farmed
+/// outranks one you have only read about, through <see cref="Recommendation.HasPersonalEvidence"/>
+/// rather than through a weight this slice invented.</para>
+///
+/// <para>The denominator is in the sentence, as every personal line's is: "2 of your 340
+/// kills" is a fact somebody can argue with and "it drops sometimes" is not.</para>
+/// </summary>
+public sealed record GearDropSeenFact(string Item, string Mob, string Zone, int Drops, int Kills)
+    : WhyFact(Evidence.Personal);
+
 /// <summary>How far along an unlock is, from the game's own achievements dump.</summary>
 public sealed record UnlockScoreFact(string Subject, int Done, int Total)
     : WhyFact(Evidence.Personal);
@@ -295,6 +336,19 @@ public enum RecommendationKind
     /// <summary>A faction, with nowhere in particular to go for it — you have never killed
     /// anything that moves it, so the wiki is the honest next step.</summary>
     Faction,
+
+    /// <summary>
+    /// A quest, because the thing you are being pointed at is a hand-in rather than a camp
+    /// (DRA-71 D6).
+    ///
+    /// <para>It exists so a gear answer whose source is a quest does not have to pretend to be
+    /// a place. Quest-sourced upgrades only appear at all behind the include-quests toggle —
+    /// "farm gear" and "run a quest chain" are different evenings, and the Founder asked for
+    /// the toggle by name — and when they do, the row is grouped by the QUEST for the same
+    /// reason a drop row is grouped by the zone: one quest handing out three of your upgrades
+    /// is one thing to go and do.</para>
+    /// </summary>
+    Quest,
 }
 
 /// <summary>
@@ -363,6 +417,25 @@ public enum GoalGapReason
     /// <summary>Not enough of the player's own play is stored to divide — see
     /// <see cref="ZoneHistory.MinHours"/>. The only honest answer is to say so.</summary>
     NoPlayHistory,
+
+    /// <summary>No inventory dump has ever been read, so EQBuddy does not know what this
+    /// character is wearing and has nothing to compare against (DRA-71 D6).</summary>
+    NoInventoryDump,
+
+    /// <summary>
+    /// The dump is read, the sweep ran, and nothing in the shipped catalog beat what is worn.
+    ///
+    /// <para><b>The subject of that sentence is the CATALOG and never the game</b> — see
+    /// <see cref="GearUpgrades"/>. "Nothing beats your helm" is a best-in-slot claim wearing a
+    /// negative, and the one the Locker's own lock has refused since #104.</para>
+    /// </summary>
+    NoCatalogUpgrade,
+
+    /// <summary>The player chose a gear intent whose engine is a later slice — today, "farm to
+    /// sell", which waits on the plan's P9 copper value (DRA-71 D7). Decided rather than
+    /// silent: an intent that produced an empty list would read as a character with perfect
+    /// gear.</summary>
+    GearIntentNotAnsweredYet,
 }
 
 /// <summary>One selected goal that produced no recommendation, and why.</summary>
@@ -420,6 +493,48 @@ public sealed record HelperInputs(
 {
     public static readonly HelperInputs Nothing =
         new([], [], null, [], [], [], [], false, [], [], null, ResolvedLevel.Unknown);
+
+    // ---- Farm Gear (DRA-71 D6, plan P8) -------------------------------------------------
+    //
+    // These five arrive as `init` properties rather than as five more positional parameters,
+    // and the reason is the twelve above them: a positional record is a good shape for a
+    // parameter object right up until the call sites are reading like a phone number. Every
+    // existing caller — the room, the E2E fixtures, forty tests — is untouched by an `init`
+    // property with a default, which is also what keeps a slice's diff about the slice.
+
+    /// <summary>
+    /// What this character is WEARING, one entry per (item, slot) —
+    /// <see cref="GearUpgrades.WornFrom"/>'s own answer over the inventory dump.
+    ///
+    /// <para>Empty is a real state and not a hole: it is the difference between "you are
+    /// wearing nothing EQBuddy can describe" and "EQBuddy has never been told", and the
+    /// engine draws <see cref="GoalGapReason.NoInventoryDump"/> with the command that fixes
+    /// it rather than an empty list.</para>
+    /// </summary>
+    public IReadOnlyList<WornItem> Worn { get; init; } = [];
+
+    /// <summary>The shipped item catalog. Null answers nothing rather than throwing — a
+    /// fixture without one is a test, not an error.</summary>
+    public ItemCatalog? Items { get; init; }
+
+    /// <summary>This character's classes, as the item blocks spell them (PAL, RNG). Empty
+    /// means unknown, and unknown filters NOTHING — hiding a real upgrade is worse than
+    /// showing one the player will recognise as not theirs.</summary>
+    public IReadOnlyList<string> MyClasses { get; init; } = [];
+
+    /// <summary>Which of the Founder's three gear questions is being asked —
+    /// <see cref="GearIntentStore.Intent"/>'s own answer. Single-select; see
+    /// <see cref="AppSettings.HelperGearIntent"/> for why this one selection in this room is
+    /// not a filter.</summary>
+    public GearIntent GearIntent { get; init; } = GearUpgrades.DefaultIntent;
+
+    /// <summary>Which worn items the player picked. <b>Empty means ALL of them</b> — filter
+    /// semantics, like <see cref="UnlockPicks"/> above. Read only for
+    /// <see cref="GearIntent.UpgradeWorn"/>.</summary>
+    public IReadOnlyList<string> WornPicks { get; init; } = [];
+
+    /// <summary>Whether quest-obtained items may be offered (the Founder's "± quests").</summary>
+    public bool IncludeQuests { get; init; }
 }
 
 /// <summary>The whole answer for one set of chips.</summary>
@@ -429,11 +544,22 @@ public sealed record HelperInputs(
 /// it</b>, because the fourth-best camp is exactly the one somebody is looking for.</param>
 /// <param name="NotAnsweredYet">Selected goals whose shape is <see cref="HelperGoalShape.Deferred"/>.</param>
 /// <param name="Gaps">Selected, answerable goals that produced nothing, each with the reason.</param>
+/// <param name="GearWithheld">
+/// Upgrades the gear sweep's own per-anchor cap held back (DRA-71 D6).
+///
+/// <para><b>It is here because it is the one cap whose count cannot ride a row.</b> Every
+/// other cap in this file trims something a row already exists for and reports it in
+/// <see cref="Recommendation.WithheldWhy"/>; <see cref="GearUpgrades.MaxPerAnchor"/> stops
+/// before there are rows at all, and a count attached to whichever row happened to be built
+/// first would be a number pointing at the wrong thing. A surviving cap says so (trap
+/// 50).</para>
+/// </param>
 public sealed record RecommendationSet(
     IReadOnlyList<Recommendation> Top,
     int Withheld,
     IReadOnlyList<HelperGoal> NotAnsweredYet,
-    IReadOnlyList<GoalGap> Gaps)
+    IReadOnlyList<GoalGap> Gaps,
+    int GearWithheld = 0)
 {
     public static readonly RecommendationSet Empty = new([], 0, [], []);
 }
@@ -538,7 +664,10 @@ public static class Recommendations
         HelperGoal.WorkOnFaction => HelperGoalShape.Answered,
         HelperGoal.UnlockClasses => HelperGoalShape.Answered,
         HelperGoal.UnlockRaces => HelperGoalShape.Answered,
-        HelperGoal.FarmGear => HelperGoalShape.Deferred,
+        // DRA-71 D6. Two of the Founder's three gear intents are answered; the third — farm
+        // to sell — is Deferred one level down (GearUpgrades.ShapeFor) and says so in the
+        // room, which is why the GOAL is answered while one of its questions is not.
+        HelperGoal.FarmGear => HelperGoalShape.Answered,
         HelperGoal.FarmMotes => HelperGoalShape.Deferred,
         HelperGoal.MakeMoney => HelperGoalShape.Deferred,
         HelperGoal.FarmMaterials => HelperGoalShape.Deferred,
@@ -600,6 +729,10 @@ public static class Recommendations
         HelperGoal.WorkOnFaction => LevelUse.Exempt,
         HelperGoal.UnlockClasses => LevelUse.Exempt,
         HelperGoal.UnlockRaces => LevelUse.Exempt,
+        // **DRA-71 D6, and this row is the delivery's most vetoable default.** The plan's P8
+        // says the catalog lines are "level-gated (P5)", and the survey that had to run before
+        // building one found there is nothing to gate them ON — see LevelExemptReason.
+        HelperGoal.FarmGear => LevelUse.Exempt,
         _ => null,
     };
 
@@ -616,6 +749,27 @@ public static class Recommendations
             "An unlock criterion names a specific creature, quest or standing, and the zone "
             + "is where that thing IS rather than a rate this character could beat somewhere "
             + "else. The game decides when an unlock is done; level is not one of its terms.",
+        // **THE SURVEY IS THE REASON, AND IT RAN BEFORE THE ENGINE WAS BUILT** (DRA-71 D6).
+        // The plan asked for level-gated catalog candidates. There is no level datum to gate
+        // them on: every one of the 11,146 shipped item records was scanned for a Level or
+        // Required-Level key in its stats block and not one carries either — the block prints
+        // WT, SIZE, RACE, CLASS, SLOT, AC and the attributes, and nothing else. Inventing a
+        // level requirement per item is trap 73 with arithmetic instead of prose, and the
+        // wiki does not publish one to match.
+        //
+        // The second half is why the OTHER level fact this repo has must not be borrowed. P6's
+        // discount marks down a zone whose creatures you have outgrown, and it is a claim about
+        // XP throughput. For gear the zone is where the ITEM is — and if anything an outgrown
+        // camp is the FASTER place to farm one, so applying the discount would rank against
+        // the goal the player picked and inverting it would be a bonus arm D4 refused plus a
+        // game rule nobody here can verify. Both readings are wrong, so neither is shipped.
+        HelperGoal.FarmGear =>
+            "An item's stats block carries no level requirement — the shipped catalog's "
+            + "11,146 records were surveyed and not one prints a Level key — so there is "
+            + "nothing about a candidate for a level to gate. And the zone is where the ITEM "
+            + "is rather than a rate: a camp this character has outgrown is if anything a "
+            + "quicker place to farm one, so the outgrown discount would recommend against "
+            + "the goal the player just picked.",
         _ => "",
     };
 
@@ -750,8 +904,10 @@ public static class Recommendations
         var deferred = goals.Where(g => ShapeFor(g) == HelperGoalShape.Deferred).ToList();
         var gaps = new List<GoalGap>();
         var candidates = new List<Recommendation>();
+        var gearWithheld = 0;
 
         if (goals.Contains(HelperGoal.LevelUp)) LevelUp(inputs, candidates, gaps);
+        if (goals.Contains(HelperGoal.FarmGear)) gearWithheld = FarmGear(inputs, candidates, gaps);
         if (goals.Contains(HelperGoal.WorkOnFaction)) Faction(inputs, candidates, gaps);
         // **THE PICK NARROWS THE ENGINE, NOT THE ROOM** (DRA-71 D5, plan P11). It happens here
         // rather than in the caller so the phone gets it the day it calls Rank — porting a
@@ -773,7 +929,8 @@ public static class Recommendations
             .ToList();
 
         var top = ordered.Take(Math.Max(0, cap)).Select(Trim).ToList();
-        return new RecommendationSet(top, Math.Max(0, ordered.Count - top.Count), deferred, gaps);
+        return new RecommendationSet(
+            top, Math.Max(0, ordered.Count - top.Count), deferred, gaps, gearWithheld);
     }
 
     // ---- the join: one place, every goal it serves (HOME-005) --------------------------
@@ -1004,6 +1161,193 @@ public static class Recommendations
         level.Known && z.HasConnedBand && level.Level - z.ConnedMax >= OutgrownBy
             ? new ZoneOutgrownFact(z.Zone, z.ConnedMin, z.ConnedMax, level.Level, z.ConnedKills)
             : null;
+
+    // ---- Farm Gear: the catalog, anchored on what you are wearing (DRA-71 D6, plan P8) ---
+
+    /// <summary>
+    /// How many upgrades one row names before it says it is holding some back.
+    ///
+    /// <para>Three, which is <see cref="DefaultCap"/> one level down and for the same
+    /// HOME-002 reason: a zone row is an answer to "where should I go tonight", and a place
+    /// that listed eleven items would be a shopping list with a heading. The count it held
+    /// back rides the row (<see cref="Recommendation.WithheldWhy"/>, trap 50), and the Gear
+    /// room's own wishlist is where the full list belongs — which is why every one of these
+    /// rows carries a Gear door.</para>
+    /// </summary>
+    public const int GearNamedPerRow = 3;
+
+    /// <summary>
+    /// **UPGRADE WHAT I WEAR / REPLACE WITH BETTER** — the Founder's smoke items 4a and 4b.
+    ///
+    /// <para><b>The engine does no comparing.</b> <see cref="GearUpgrades.Sweep"/> owns the
+    /// dominance question and <see cref="ItemDominance"/> owns the metric table; this method
+    /// decides what a player travels to. A drop groups by its ZONE, which is the join key the
+    /// whole room is built on (HOME-005) — so a zone that feeds a gear upgrade AND pays the
+    /// experience rate you picked Level Up for becomes one row, which is the differentiator
+    /// working rather than a coincidence. A quest groups by the QUEST, because a hand-in is
+    /// not a place, and only ever behind the include-quests toggle.</para>
+    ///
+    /// <para><b>The weight is a count and never a taste.</b> A row's weight is how many of
+    /// your open upgrades it accounts for, over the best row's — the same measure the Gear
+    /// room's own <c>GearFarmRollup</c> has ranked camps by since 1.84. "Which of two
+    /// upgrades is better for your character" has no answer in this repo and none is invented;
+    /// "this zone feeds four of them and that one feeds one" is arithmetic.</para>
+    ///
+    /// <para><b>Every catalog line is <see cref="Evidence.Catalog"/> and every observed drop
+    /// is <see cref="Evidence.Personal"/></b>, so HOME-004's label arrives by construction and
+    /// HOME-003's sort does the rest: a zone where you have actually SEEN the thing drop
+    /// outranks one you have only read about, through
+    /// <see cref="Recommendation.HasPersonalEvidence"/> rather than through a weight this
+    /// slice invented.</para>
+    ///
+    /// <para><b>Level is EXEMPT here, with a surveyed reason</b> — see
+    /// <see cref="LevelExemptReason"/>. It is the default in this delivery most worth a
+    /// veto.</para>
+    /// </summary>
+    /// <returns>How many upgrades the sweep's per-anchor cap held back.</returns>
+    private static int FarmGear(HelperInputs inputs, List<Recommendation> into, List<GoalGap> gaps)
+    {
+        // A DECIDED deferral, said out loud. An intent whose engine is a later slice returning
+        // an empty list would read as a character with perfect gear.
+        if (GearUpgrades.ShapeFor(inputs.GearIntent) != GearIntentShape.Answered)
+        {
+            gaps.Add(new GoalGap(HelperGoal.FarmGear, GoalGapReason.GearIntentNotAnsweredYet));
+            return 0;
+        }
+
+        // "EQBuddy has never been told what you are wearing" is a different state from
+        // "nothing beats it", and only the first one has a command that fixes it.
+        if (inputs.Worn.Count == 0)
+        {
+            gaps.Add(new GoalGap(HelperGoal.FarmGear, GoalGapReason.NoInventoryDump));
+            return 0;
+        }
+
+        var sweep = GearUpgrades.Sweep(
+            inputs.GearIntent, inputs.Worn, inputs.WornPicks,
+            inputs.Items, inputs.MyClasses, inputs.IncludeQuests);
+        if (sweep.Upgrades.Count == 0)
+        {
+            gaps.Add(new GoalGap(HelperGoal.FarmGear, GoalGapReason.NoCatalogUpgrade));
+            return sweep.Withheld;
+        }
+
+        var byZone = new Dictionary<string, List<GearUpgrade>>(StringComparer.OrdinalIgnoreCase);
+        var byQuest = new Dictionary<string, List<GearUpgrade>>(StringComparer.OrdinalIgnoreCase);
+        foreach (var upgrade in sweep.Upgrades)
+        {
+            // An item that drops in five zones is offered under every one of them, which is
+            // GearFarmRollup's own rule and its own reason: the question a row answers is "if
+            // I camp here tonight, what can this place still give me", and a per-zone list
+            // that hid a valid camp would make its own heading lie.
+            foreach (var zone in upgrade.Zones.Distinct(StringComparer.OrdinalIgnoreCase))
+                Bucket(byZone, zone, upgrade);
+            foreach (var quest in upgrade.Quests.Distinct(StringComparer.OrdinalIgnoreCase))
+                Bucket(byQuest, quest, upgrade);
+        }
+
+        // ONE yardstick for the whole engine, folded once — a property of the SET, and a
+        // per-row recomputation would be the same sum computed six times (trap 4 in a loop).
+        // Zones and quests share it deliberately: they are answers to one goal and ranking
+        // them on two scales would make the order meaningless where they interleave.
+        var best = Math.Max(
+            byZone.Count > 0 ? byZone.Max(kv => kv.Value.Count) : 0,
+            byQuest.Count > 0 ? byQuest.Max(kv => kv.Value.Count) : 0);
+
+        foreach (var (zone, upgrades) in Ranked(byZone))
+            into.Add(GearRow(inputs, RecommendationKind.Zone, zone, zone, upgrades, best,
+                [new HelperDoor(HelperDoorKind.World, zone), new HelperDoor(HelperDoorKind.Gear, "")]));
+
+        foreach (var (quest, upgrades) in Ranked(byQuest))
+            into.Add(GearRow(inputs, RecommendationKind.Quest, quest, "", upgrades, best,
+                [new HelperDoor(HelperDoorKind.QuestCatalog, quest),
+                 new HelperDoor(HelperDoorKind.Gear, "")]));
+
+        return sweep.Withheld;
+
+        static void Bucket(Dictionary<string, List<GearUpgrade>> into, string key, GearUpgrade u)
+        {
+            if (!into.TryGetValue(key, out var list)) into[key] = list = [];
+            list.Add(u);
+        }
+
+        static List<KeyValuePair<string, List<GearUpgrade>>> Ranked(
+            Dictionary<string, List<GearUpgrade>> buckets) =>
+            [.. buckets
+                .OrderByDescending(kv => kv.Value.Count)
+                .ThenBy(kv => kv.Key, StringComparer.OrdinalIgnoreCase)
+                .Take(PerEngineCandidates)];
+    }
+
+    /// <summary>
+    /// One gear row: what the place (or the quest) can give you, and what it beats.
+    ///
+    /// <para><b>The creature is answered ONCE per upgrade</b> (trap 4). Where the player's own
+    /// pool has seen the item drop, that is the answer and it is Personal — measured, with its
+    /// denominator, and it cannot be stale. Only where they have not does the catalog's own
+    /// named creature ride the Catalog line, and today that is empty for every row until the
+    /// weekly refresh rebuilds <see cref="ItemCatalog.Record.DropMobs"/>. Two sentences naming
+    /// two creatures for one item is the shape a reader has to reconcile and nobody should
+    /// have to.</para>
+    /// </summary>
+    private static Recommendation GearRow(
+        HelperInputs inputs, RecommendationKind kind, string subject, string zone,
+        List<GearUpgrade> upgrades, int best, List<HelperDoor> doors)
+    {
+        var named = upgrades
+            .OrderByDescending(u => u.ImprovedMetrics)
+            .ThenBy(u => u.Item, StringComparer.OrdinalIgnoreCase)
+            .ToList();
+        var shown = named.Take(GearNamedPerRow).ToList();
+
+        var why = new List<WhyFact>();
+        foreach (var upgrade in shown)
+        {
+            var seen = zone.Length > 0 ? SeenDrop(inputs.Pool, upgrade.Item, zone) : null;
+            why.Add(new GearUpgradeFact(
+                upgrade.Item, upgrade.Over, upgrade.Slot, upgrade.GainMetric, upgrade.GainBy,
+                seen is null ? upgrade.MobsIn(zone).FirstOrDefault() ?? "" : ""));
+            if (seen is { } fact) why.Add(fact);
+        }
+
+        return new Recommendation(
+            kind, subject, zone, [HelperGoal.FarmGear], why, doors,
+            named.Count - shown.Count,
+            best > 0 ? Math.Clamp(named.Count / (double)best, 0, 1) : 0);
+    }
+
+    /// <summary>
+    /// Has this character actually seen the item drop here, and from what?
+    ///
+    /// <para>The pool is keyed on (creature, zone), so this is a scan of the creatures the
+    /// player has killed in THIS zone for one they looted this item from. The busiest source
+    /// wins — a creature that gave it to you four times is the answer to "who drops it" in a
+    /// way one lucky pull from something else is not.</para>
+    ///
+    /// <para>Names are compared through <c>QuestCatalog.BaseItemName</c> on both sides: the
+    /// log prints what the game called it ("+N" and all) and the catalog titles the base item,
+    /// which is the same fold every other join in this repo between those two sources
+    /// makes.</para>
+    /// </summary>
+    private static GearDropSeenFact? SeenDrop(
+        IReadOnlyList<MobSummary> pool, string item, string zone)
+    {
+        var wanted = QuestCatalog.BaseItemName(item);
+        (MobSummary Mob, MobLoot Loot)? best = null;
+        foreach (var mob in pool)
+        {
+            if (!mob.Zone.Equals(zone, StringComparison.OrdinalIgnoreCase)) continue;
+            foreach (var loot in mob.Loot)
+            {
+                if (!QuestCatalog.BaseItemName(loot.Item)
+                        .Equals(wanted, StringComparison.OrdinalIgnoreCase)) continue;
+                if (best is null || loot.Count > best.Value.Loot.Count) best = (mob, loot);
+            }
+        }
+        return best is { } b
+            ? new GearDropSeenFact(item, b.Mob.Name, zone, b.Loot.Count, b.Mob.Kills)
+            : null;
+    }
 
     // ---- Work on Faction: the grind, for any faction you picked -------------------------
 

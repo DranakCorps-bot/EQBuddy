@@ -59,6 +59,19 @@ public static class InventoryFile
         public bool InBank =>
             ContainerSlot.StartsWith("Bank", StringComparison.OrdinalIgnoreCase)
             || ContainerSlot.StartsWith("SharedBank", StringComparison.OrdinalIgnoreCase);
+
+        /// <summary>
+        /// **ON THE CHARACTER**: a top-level slot that is not a bag row and not the bank.
+        ///
+        /// <para>Said once, here, for the reason the comment above it already gives — this
+        /// rule has been spelled twice in this repo before and the two copies disagreed about
+        /// the shared bank. <c>GearLocker.LocationRank</c> reads it and so does DRA-71 D6's
+        /// <see cref="WornItem"/> builder, which is what the Helper's Farm Gear sweep anchors
+        /// on: "what am I wearing" now has exactly one answer whether the question comes from
+        /// the Gear room, from the Helper, or from the phone when it gets there.</para>
+        /// </summary>
+        public bool Worn => !InBank && !InContainer
+            && !Location.StartsWith("General", StringComparison.OrdinalIgnoreCase);
     }
 
     public static List<Entry> ParseEntries(IEnumerable<string> lines)

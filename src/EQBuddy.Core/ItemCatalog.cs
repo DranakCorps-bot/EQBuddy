@@ -38,6 +38,35 @@ public sealed class ItemCatalog
         public List<string>? Recipes { get; set; }
         public List<string>? DropZones { get; set; }
 
+        /// <summary>
+        /// **WHO drops it, per zone** — the mob names the promoter used to discard (DRA-71 D6,
+        /// Fable plan P8).
+        ///
+        /// <para>The wiki's "Dropped by" section is already a zone heading with creatures
+        /// listed under it, and <c>EqlWikiItemService.ParseDropsFrom</c> has always returned
+        /// both halves; the catalog build kept the zones and threw the creatures away. A
+        /// recommendation that can only say WHERE is half a direction, and the six-question
+        /// shape the Guide rows keep — <c>who · where</c> — needs the other half.</para>
+        ///
+        /// <para><b>It is an ANNOTATION on <see cref="DropZones"/> and never a second copy of
+        /// it</b> (trap 4). Every key here is also in <see cref="DropZones"/>; a zone the page
+        /// listed with no creature under it has a zone entry and no key here, and an item with
+        /// no named creature anywhere has no dictionary at all rather than an empty one. So
+        /// the zone list has exactly one producer and this says something extra about some of
+        /// its entries. <c>ItemCatalogDropMobsTests</c> asserts that containment against the
+        /// shipped file.</para>
+        ///
+        /// <para><b>It is EMPTY in the catalog this slice ships, on purpose.</b> The item dump
+        /// (<c>cache/items-wikitext.jsonl</c>) is gitignored and is rebuilt by fetching ~11k
+        /// pages from eqlwiki; regenerating it here would be the new fetch volume the plan
+        /// forbids and the request-rate policy is the Founder's call, not a delivery's. So the
+        /// promoter learns the field now and the DATA arrives with the next weekly refresh,
+        /// which re-runs the harvest anyway. Until it does, a Helper row draws its zone and
+        /// says nothing about the creature — an unanswered question draws nothing (trap 73),
+        /// and the player's OWN kills already answer "who" for anywhere they have farmed.</para>
+        /// </summary>
+        public Dictionary<string, List<string>>? DropMobs { get; set; }
+
         /// <summary>The structured stats in the shape the Gear Locker compares.</summary>
         public ItemStatsBlock ToStatsBlock() => new()
         {
