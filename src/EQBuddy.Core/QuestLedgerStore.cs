@@ -44,6 +44,17 @@ public sealed class QuestLedgerStore
     }
 
     /// <summary>
+    /// One profession skill's standing: the highest value the log has announced, and the
+    /// LOG's own timestamp for that announcement (never the moment EQBuddy read the line —
+    /// the same discipline <see cref="CharacterLedger.LevelAt"/> keeps).
+    /// </summary>
+    public sealed class SkillEntry
+    {
+        public int Value { get; set; }
+        public DateTime At { get; set; }
+    }
+
+    /// <summary>
     /// One character's manual progress through one <see cref="Guide"/> — the player's own
     /// statement about steps that no log line and no inventory dump can decide.
     ///
@@ -139,6 +150,27 @@ public sealed class QuestLedgerStore
         /// are a known wart this deliberately does not copy (Fable plan §4).</summary>
         public Dictionary<string, GuideProgress> Guides { get; set; } = new(StringComparer.OrdinalIgnoreCase);
 
+        /// <summary>
+        /// **What the log says this character's PROFESSION skills stand at** — skill name in
+        /// the log's own spelling → the highest value seen and when (DRA-71 D8, plan P13).
+        ///
+        /// <para><b>It exists because a skill value died with the session.</b>
+        /// <c>StatsSnapshot.SkillUps</c> has always carried this evening's skill-ups and
+        /// nothing has ever remembered them, so a player who raised Blacksmithing to 122 last
+        /// week and opened EQBuddy today had a tool that knew nothing about it. This is the
+        /// same promise the class holds for the announced level one field up: the log states a
+        /// number once, and a store is what makes it survive the restart and the janitor.</para>
+        ///
+        /// <para><b>Only the eight professions land here</b>
+        /// (<see cref="Tradeskills.IsProfessionSkill"/>), which is
+        /// <see cref="QuestLedgerStore.TrackFilter"/>'s rule applied to a second kind of row:
+        /// a ledger admits what a surface can answer about, so the file stays
+        /// profession-sized rather than storing sixty combat skills nothing reads. Widening it
+        /// is a decision for the slice that builds the surface — writing rows now for a reader
+        /// that does not exist is the app doing something and telling nobody (trap 43).</para>
+        /// </summary>
+        public Dictionary<string, SkillEntry> Skills { get; set; } = new(StringComparer.OrdinalIgnoreCase);
+
         /// <summary>The <c>writtenAt</c> of the last inventory dump reconciled onto this
         /// character — the watermark <see cref="ReconcileInventory"/> checks so a replayed
         /// or repeated announcement (launch replay, a second `/outputfile inventory` with
@@ -217,7 +249,8 @@ public sealed class QuestLedgerStore
                                               && c.StatedLevel == 0
                                               && c.UnlockedClasses.Count == 0
                                               && c.StatedClasses.Count == 0
-                                              && c.Guides.Count == 0))
+                                              && c.Guides.Count == 0
+                                              && c.Skills.Count == 0))
                 {
                     try
                     {
@@ -256,6 +289,7 @@ public sealed class QuestLedgerStore
                         StatedLevel = kv.Value.StatedLevel,
                         StatedLevelAt = kv.Value.StatedLevelAt,
                         Guides = new Dictionary<string, GuideProgress>(kv.Value.Guides, StringComparer.OrdinalIgnoreCase),
+                        Skills = new Dictionary<string, SkillEntry>(kv.Value.Skills, StringComparer.OrdinalIgnoreCase),
                         LastInventoryReconcile = kv.Value.LastInventoryReconcile,
                     }),
                 StringComparer.OrdinalIgnoreCase);
@@ -800,6 +834,75 @@ public sealed class QuestLedgerStore
             c.StatedLevelAt = wanted > 0 ? DateTime.Now : default;
             Save();
         }
+    }
+
+    /// <summary>
+    /// **Where this character's professions stand** — the log's spelling → value and moment,
+    /// copied out under the lock (DRA-71 D8).
+    ///
+    /// <para>A COPY rather than the live dictionary, for the reason every other reader here
+    /// takes one: the room reads this on a one-second tick while the log thread writes it, and
+    /// handing out the store's own object would be an enumeration racing an insert. Empty
+    /// means the log has never announced a profession skill-up for this character — which is
+    /// the state a player who has never crafted is in, and the state a player whose skill-ups
+    /// all happened before EQBuddy existed is ALSO in. The surface says so rather than
+    /// drawing a zero (<see cref="Tradeskills.Standings"/>).</para>
+    /// </summary>
+    public IReadOnlyList<(string Skill, int Value, DateTime At)> SkillsFor(string characterKey)
+    {
+        if (string.IsNullOrEmpty(characterKey)) return [];
+        lock (_lock)
+            return _byCharacter.TryGetValue(characterKey, out var c)
+                ? [.. c.Skills.Select(kv => (kv.Key, kv.Value.Value, kv.Value.At))]
+                : [];
+    }
+
+    /// <summary>
+    /// Offer what the log has said about this character's skills. Returns true when anything
+    /// actually moved.
+    ///
+    /// <para><b>A batch and not one call per skill, because the alternative writes the profile
+    /// file eight times a second.</b> The caller hands over the whole live session's skill
+    /// list every tick — that list only changes when the game announces a skill-up — so the
+    /// save happens once, and only when a value really rose.</para>
+    ///
+    /// <para><b>The highest value wins, which is what makes this replay-safe.</b> The
+    /// full-log replay every launch re-offers every skill-up in the file; each one carries the
+    /// TOTAL the game printed rather than an increment, so re-offering them lands on the same
+    /// number and changes nothing. That is a different rule from
+    /// <see cref="RecordLoot"/>'s time high-water mark, and deliberately so: loot accumulates
+    /// and a repeat would double it, while a skill value is a statement of where you are.</para>
+    ///
+    /// <para><b>Only the eight professions are admitted</b> —
+    /// <see cref="Tradeskills.IsProfessionSkill"/>. See <see cref="CharacterLedger.Skills"/>
+    /// for why the filter is here rather than at the surface.</para>
+    /// </summary>
+    public bool SetSkills(
+        string characterKey, IEnumerable<(string Skill, int Value, DateTime At)> seen)
+    {
+        if (string.IsNullOrEmpty(characterKey) || seen is null) return false;
+        var changed = false;
+        lock (_lock)
+        {
+            foreach (var (skill, value, at) in seen)
+            {
+                if (value <= 0 || !Tradeskills.IsProfessionSkill(skill)) continue;
+                var c = CharacterFor(characterKey);
+                if (c.Skills.TryGetValue(skill, out var entry))
+                {
+                    if (entry.Value >= value) continue;
+                    entry.Value = value;
+                    entry.At = at;
+                }
+                else
+                {
+                    c.Skills[skill] = new SkillEntry { Value = value, At = at };
+                }
+                changed = true;
+            }
+            if (changed) Save();
+        }
+        return changed;
     }
 
     private CharacterLedger CharacterFor(string characterKey)

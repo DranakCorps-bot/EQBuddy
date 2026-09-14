@@ -561,9 +561,15 @@ public static class HelperPresentation
         // Farm Motes and Make Money LEFT this switch in DRA-71 D7 — their engines landed, and
         // the pairing test beside it (EveryDeferredGoalNamesTheRoomThatAnswersItToday) is what
         // would have caught a sentence left behind. Farm Gear left the same way in D6.
+        // DRA-71 D8 reworded this one and did NOT answer it. The professions block above now
+        // carries the standings, the watch preset and the wiki door, so the sentence has to
+        // say which half is missing — otherwise a player reading "not ranking this one yet"
+        // over a block full of their own numbers would think the block was the failure.
         HelperGoal.FarmMaterials =>
-            "Farm Materials: EQBuddy is not ranking this one yet. What is in your bags is in "
-            + "Gear meanwhile.",
+            "Farm Materials: your professions and where they stand are above. EQBuddy is not "
+            + "ranking WHERE to farm the materials yet — the wiki's item pages hardly ever say "
+            + "which profession an ingredient belongs to. What is in your bags is in Gear "
+            + "meanwhile.",
         HelperGoal.Achievements =>
             "Achievements: EQBuddy is not ranking this one yet. What the game's dump says is "
             + "on the Guide room's Unlocks tab meanwhile.",
@@ -631,6 +637,113 @@ public static class HelperPresentation
     /// blocks to head.</para>
     /// </summary>
     public const string UnlockPickerHeading = "Races and classes you are unlocking";
+
+    // ---- the profession picker and its standings (DRA-71 D8) ----------------------------
+
+    /// <summary>
+    /// Over the profession picker. It says what the list IS and what the pick does, because a
+    /// control whose empty state shows everything has to explain that before a player ticks
+    /// one row and watches seven disappear.
+    /// </summary>
+    public const string ProfessionPickerNote =
+        "Which professions are you raising? EQBuddy lists the ones you pick, and all eight "
+        + "while you have picked none.";
+
+    /// <summary>
+    /// **WHERE THE NUMBERS COME FROM, SAID ONCE** (DRA-71 D8).
+    ///
+    /// <para>It began inside <see cref="ProfessionStanding"/>'s unknown arm, and the first
+    /// staged shot of the default state is what took it out: eight professions, none of them
+    /// raised yet, and the same thirty-word explanation repeated eight times down the block.
+    /// Every copy was correct and the list was a wall — distinct-count is the tell in prose
+    /// exactly as it is in data (trap 73), and a fact about where EQBuddy gets its numbers
+    /// belongs to the BLOCK rather than to each row in it.</para>
+    /// </summary>
+    public const string ProfessionLearnNote =
+        "EQBuddy reads your standing from the game's own “You have become better at…” "
+        + "line, so a profession you raised before it was watching starts again from your next "
+        + "skill-up.";
+
+    /// <summary>Hover copy on the profession face, same job as <see cref="GoalPickerTip"/>.</summary>
+    public const string ProfessionPickerTip =
+        "Pick the professions you want on this list — any number of them.";
+
+    /// <summary>
+    /// What the profession face reads.
+    ///
+    /// <para><b>It IS told how many are offered</b>, unlike the faction face beside it, so it
+    /// can say "All professions" and be telling the truth: this list is the whole curated set
+    /// of eight and nothing is capped away. The faction face may never make that claim because
+    /// its offer is capped — the difference is a fact about the offer, not a style choice.</para>
+    /// </summary>
+    public static string ProfessionFace(IReadOnlyList<string> picked, int offered) =>
+        PickerFace.For(picked, "profession", "professions", maxChars: FaceChars, offered: offered);
+
+    /// <summary>One picker row: the profession and where it stands, so the list is pickable
+    /// on evidence rather than alphabetically.</summary>
+    public static string ProfessionRow(TradeskillStanding standing)
+    {
+        var name = Tradeskills.For(standing.Skill).Name;
+        return standing.Known ? $"{name} — {standing.Value}" : $"{name} — not seen yet";
+    }
+
+    /// <summary>
+    /// The standing line under the picker — <b>the whole of what this slice can honestly say
+    /// about a profession</b>.
+    ///
+    /// <para>It reports a number the game printed and the day it printed it, and it predicts
+    /// nothing. The unknown arm is the one that matters: it does NOT say zero, because "you
+    /// have never raised this" and "you are at 0" are different claims and the second is false
+    /// for everybody who crafted before EQBuddy was watching.</para>
+    ///
+    /// <para><b>And that arm is SHORT, which it was not when it was written.</b> It used to
+    /// carry the explanation of where the number comes from, and the first staged shot of the
+    /// default state is what took it out — eight professions repeating one thirty-word
+    /// sentence down the block. The explanation lives in <see cref="ProfessionLearnNote"/>
+    /// now, said once.</para>
+    /// </summary>
+    public static string ProfessionStanding(TradeskillStanding standing)
+    {
+        var name = Tradeskills.For(standing.Skill).Name;
+        return standing.Known
+            ? $"{name} — your log last raised it to {standing.Value}"
+              + (standing.At == default ? "." : $", on {standing.At:MMM d}.")
+            : $"{name} — no skill-up in your log yet.";
+    }
+
+    /// <summary>
+    /// The watch control's label, in its two states.
+    ///
+    /// <para>Two labels rather than one, because the control DOES something the first time and
+    /// only opens afterwards, and a player who clicked it twice should be able to tell that the
+    /// second click added nothing. The state is read from the rules the player actually has —
+    /// not from a flag this room set — so a rule deleted in Options takes the label back with
+    /// it.</para>
+    /// </summary>
+    public static string WatchPresetLabel(bool watching) =>
+        watching ? "Watching skill-ups" : "Watch skill-ups";
+
+    /// <summary>The name a rule this room creates gets, so the player can find it in a list
+    /// they may already have twenty rows in. The profession's own name, because that is what
+    /// they picked.</summary>
+    public static string WatchRuleName(Tradeskill skill) =>
+        $"{Tradeskills.For(skill).Name} skill-ups";
+
+    /// <summary>
+    /// **WHAT EQBUDDY CANNOT DO HERE, SAID ON THE SURFACE** (DRA-71 D8; the Founder's own
+    /// "plan honestly on gaps").
+    ///
+    /// <para>The obvious next question — "so where do I FARM the things this profession
+    /// needs?" — has no honest answer in this build, and the reason is a measurement rather
+    /// than a shrug: the wiki's item pages almost never say which profession an ingredient
+    /// belongs to. Saying that out loud, with the count, is what stops the block reading as
+    /// unfinished; a room that silently omitted the ranking would leave a player wondering
+    /// whether they had configured something wrong.</para>
+    /// </summary>
+    public const string ProfessionsParkNote =
+        "EQBuddy does not rank where to farm materials yet. Of the 10,957 item pages it has "
+        + "read, 14 say which profession an ingredient belongs to — not enough to point you "
+        + "at a camp without guessing.";
 
     // ---- the gear intent strip and its picker (DRA-71 D6) ---------------------------------
 
@@ -786,6 +899,14 @@ public static class HelperPresentation
         // The room a player reads as "Character" — the page key stayed `Home` when DRA-66
         // relabelled it, the same discipline the Guide room's `quests` key keeps.
         HelperDoorKind.Character => ShellPages.Address(ShellPage.Home),
+        // DRA-71 D8. `tracked` is the Watch tab's wire key and NOT a typo — it is the v1
+        // settings tag, deliberately reused so one destination keeps one spelling
+        // (SettingsSurface resolves the Alerts sub-tabs through AlertSurface's own keys).
+        HelperDoorKind.WatchRules =>
+            ShellPages.Address(ShellPage.Settings, AlertSurface.KeyFor(AlertTab.Watch)),
+        // Null for the same reason WikiFaction is: a wiki page is not a room, and a door that
+        // claimed a `page:room` address for one would be a second navigation grammar.
+        HelperDoorKind.WikiSkill => null,
         _ => null,
     };
 
@@ -801,6 +922,10 @@ public static class HelperPresentation
         HelperDoorKind.Gear => "Gear",
         HelperDoorKind.Wealth => "Wealth",
         HelperDoorKind.Character => "Character",
+        // Two labels for one control, decided by whether the rule is already there — see
+        // WatchPresetLabel, which is what the room actually draws.
+        HelperDoorKind.WatchRules => WatchPresetLabel(false),
+        HelperDoorKind.WikiSkill => "eqlwiki",
         _ => "",
     };
 
@@ -831,6 +956,17 @@ public static class HelperPresentation
             "Open the Character room, where you can tell EQBuddy what level this character "
             + "is. It reads the level from your log when you ding, and until then it has "
             + "nothing to weigh against.",
+        HelperDoorKind.WatchRules =>
+            "Add a watch rule for this skill's ups and open Settings → Alerts → Watch rules, "
+            + "where you can give it a sound. If you already have one, this just opens the "
+            + "list.",
+        HelperDoorKind.WikiSkill =>
+            door.Target.Length > 0
+                ? $"Open {door.Target} on eqlwiki — what this profession makes and what it "
+                  + "needs is the wiki's answer, and you open the page yourself. EQBuddy never "
+                  + "fetches it for you."
+                : "Open this profession's page on eqlwiki. You open it yourself; EQBuddy "
+                  + "never fetches it for you.",
         _ => "",
     };
 

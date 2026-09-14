@@ -660,4 +660,144 @@ public class HelperPresentationTests
     [Fact]
     public void TheSourceNoteSaysNobodyElseIsMeasured() =>
         Assert.Contains("never looks at anyone else's play", HelperPresentation.SourceNote);
+
+    // ---- the professions block (DRA-71 D8) -------------------------------------------
+
+    /// <summary>
+    /// **Unknown is not a zero, and the sentence names the line it is waiting for.**
+    ///
+    /// <para>"You are at 0" is false for everybody who crafted before EQBuddy was watching, and
+    /// it is the number a reader that only checked for presence would print. The permitted
+    /// shape is the one the whole Helper keeps: say what has not been seen, and name what would
+    /// feed it — here, the game's own skill-up line, which is the only thing a player can
+    /// act on.</para>
+    /// </summary>
+    [Fact]
+    public void AnUnseenProfessionSaysSoRatherThanPrintingAZero()
+    {
+        var line = HelperPresentation.ProfessionStanding(
+            new TradeskillStanding(Tradeskill.Baking, 0, default));
+
+        Assert.Contains("Baking", line);
+        Assert.DoesNotContain("0", line);
+        // And the explanation is NOT on the row — it is the block's, said once. Eight rows
+        // repeating one thirty-word sentence is what the first staged shot of this block came
+        // back as, and distinct-count is the tell in prose exactly as it is in data (trap 73).
+        Assert.DoesNotContain("become better at", line);
+        Assert.Contains("become better at", HelperPresentation.ProfessionLearnNote);
+    }
+
+    /// <summary>A known standing reports the number and the day, and predicts nothing about
+    /// what it would take to raise it — this repo has no skill curve and eqlwiki publishes
+    /// none.</summary>
+    [Fact]
+    public void AKnownStandingNamesTheNumberAndTheDay()
+    {
+        var line = HelperPresentation.ProfessionStanding(new TradeskillStanding(
+            Tradeskill.Blacksmithing, 122, new DateTime(2026, 9, 7, 21, 14, 3)));
+
+        Assert.Contains("122", line);
+        Assert.Contains("Sep 7", line);
+        Assert.DoesNotContain("trivial", line, StringComparison.OrdinalIgnoreCase);
+    }
+
+    /// <summary>A row with a value it cannot date still reads as a sentence — an archived
+    /// snapshot from before DRA-71 D8 carries no moment, and a surface that printed
+    /// "on Jan 1" for it would be inventing one.</summary>
+    [Fact]
+    public void AStandingWithNoMomentDoesNotInventADate()
+    {
+        var line = HelperPresentation.ProfessionStanding(
+            new TradeskillStanding(Tradeskill.Pottery, 40, default));
+
+        Assert.Contains("40", line);
+        Assert.DoesNotContain("Jan 1", line);
+        Assert.EndsWith(".", line);
+    }
+
+    /// <summary>The watch control's two states are different words, and both say what they
+    /// are. A control that read the same either way would make a second click look like it
+    /// did something.</summary>
+    [Fact]
+    public void TheWatchPresetHasTwoDistinctLabels()
+    {
+        Assert.NotEqual(
+            HelperPresentation.WatchPresetLabel(true), HelperPresentation.WatchPresetLabel(false));
+        Assert.Contains("skill-ups", HelperPresentation.WatchPresetLabel(true));
+        Assert.Contains("skill-ups", HelperPresentation.WatchPresetLabel(false));
+    }
+
+    /// <summary>
+    /// **The park note carries the measurement, and the measurement is what makes it honest.**
+    ///
+    /// <para>"EQBuddy does not rank this yet" is a shrug. "Of the 10,957 item pages it has
+    /// read, 14 say which profession an ingredient belongs to" is a survey result a player —
+    /// or a reporter — can argue with, and it is the number that decides when the parked
+    /// arithmetic reopens. Pinned here so a later edit cannot quietly drop it back to the
+    /// shrug.</para>
+    /// </summary>
+    [Fact]
+    public void TheParkNoteNamesTheCoverageItMeasured()
+    {
+        Assert.Contains("10,957", HelperPresentation.ProfessionsParkNote);
+        Assert.Contains("14", HelperPresentation.ProfessionsParkNote);
+    }
+
+    /// <summary>The face may say "all" here and may not on the faction picker beside it —
+    /// this offer is the whole curated eight and nothing is capped away.</summary>
+    [Fact]
+    public void TheProfessionFaceMaySayAllBecauseNothingIsCapped()
+    {
+        var all = Tradeskills.All.Select(p => p.Name).ToArray();
+
+        Assert.Equal("Any profession", HelperPresentation.ProfessionFace([], all.Length));
+        Assert.Equal("All professions", HelperPresentation.ProfessionFace(all, all.Length));
+        Assert.Equal("Pottery", HelperPresentation.ProfessionFace(["Pottery"], all.Length));
+    }
+
+    /// <summary>Every profession sentence goes through the same ban as the rest of the
+    /// room — the sweep that could not see them is the sweep that stops covering the feature
+    /// somebody adds next.</summary>
+    [Fact]
+    public void NoProfessionSentenceUsesSafetyVocabulary()
+    {
+        foreach (var skill in Enum.GetValues<Tradeskill>())
+        {
+            AssertClean(HelperPresentation.WatchRuleName(skill), $"WatchRuleName({skill})");
+            foreach (var standing in new[]
+                     {
+                         new TradeskillStanding(skill, 0, default),
+                         new TradeskillStanding(skill, 122, new DateTime(2026, 9, 7)),
+                     })
+            {
+                AssertClean(HelperPresentation.ProfessionRow(standing), $"ProfessionRow({skill})");
+                AssertClean(HelperPresentation.ProfessionStanding(standing),
+                    $"ProfessionStanding({skill})");
+            }
+        }
+
+        foreach (var watching in new[] { false, true })
+            AssertClean(HelperPresentation.WatchPresetLabel(watching), $"WatchPresetLabel({watching})");
+
+        AssertClean(HelperPresentation.ProfessionFace(["Pottery", "Baking"], 8), "ProfessionFace");
+        AssertClean(HelperPresentation.ProfessionLearnNote, "ProfessionLearnNote");
+    }
+
+    /// <summary>
+    /// **The deferral says which HALF is missing** (DRA-71 D8).
+    ///
+    /// <para>Farm Materials is still not ranked, and the block above it is now full of the
+    /// player's own numbers. A sentence that just said "not ranking this one yet" over that
+    /// block would read as the block having failed, so it names the thing that is absent —
+    /// WHERE to farm — and the reason.</para>
+    /// </summary>
+    [Fact]
+    public void TheMaterialsDeferralNamesTheHalfThatIsMissing()
+    {
+        var line = HelperPresentation.NotAnsweredYet(HelperGoal.FarmMaterials);
+
+        Assert.Contains("professions", line, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("WHERE to farm", line, StringComparison.OrdinalIgnoreCase);
+    }
 }
+

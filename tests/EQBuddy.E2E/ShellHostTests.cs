@@ -2676,4 +2676,123 @@ public class ShellHostTests
             $"the /outputfile inventory button never reached the screen; dump was: {app.Artifacts()}");
         Assert.Equal(0, app.DumpValue("helperDeadDoors"));
     }
+
+    // ================================================================================
+    // DRA-71 D8 — the professions block, and the skill value that used to die at midnight
+    // ================================================================================
+
+    /// <summary>
+    /// **THE PROFESSIONS BLOCK DRAWS ALL EIGHT, AND EVERY ROW HAS ITS TWO DOORS**
+    /// (DRA-71 D8, plan P13; Founder smoke item 6).
+    ///
+    /// <para>Nothing is picked, so the filter's empty state is "all of them" — which is the
+    /// half a source scan cannot check: <c>helperProfChips</c> is what the PICKER holds and
+    /// <c>helperProfRows</c> is what the room actually built under it, and a room that read
+    /// the store correctly and drew nothing satisfies only the first (trap 72's shape, trap
+    /// 56's discipline).</para>
+    ///
+    /// <para><c>helperWatchPresets</c> is a trap-29 assertion: the watch control is the one
+    /// affordance in this block that DOES something, and an absent control photographs as an
+    /// unremarkable row of text. <c>helperWatched</c> is 0 on a fresh profile — the state is
+    /// read from the player's own rules, so it can only be 0 before anything wrote one.</para>
+    /// </summary>
+    [Fact]
+    public void TheHelperListsAllEightProfessionsWithAWatchPresetAndAWikiDoorOnEach()
+    {
+        using var app = new AppHarness(environment: OpenOn("helper"));
+        app.Launch();
+
+        app.WaitForDump("shellPage", "helper", "the shell to land on the Helper room");
+        app.WaitForDump("helperProfRows", 8, "the professions block to draw the curated eight");
+
+        Assert.Equal(8, app.DumpValue("helperProfChips"));
+        Assert.Equal("Anyprofession", app.DumpText("helperProfFace"));
+        // A fresh profile has never had a skill-up read into it, so every row is in its
+        // unknown state — which is a sentence rather than a zero (HelperPresentationTests).
+        Assert.Equal(0, app.DumpValue("helperSkills"));
+        Assert.Equal(0, app.DumpValue("helperProfKnown"));
+        // One per row, and none of them is already watching.
+        Assert.Equal(8, app.DumpValue("helperWatchPresets"));
+        Assert.Equal(0, app.DumpValue("helperWatched"));
+        Assert.Equal(0, app.DumpValue("helperDeadDoors"));
+    }
+
+    /// <summary>
+    /// **A SKILL-UP IN THE LOG BECOMES A STANDING ON THE SCREEN** — the writer and the reader
+    /// in one assertion (trap 20), from a launched app.
+    ///
+    /// <para>This is the slice's whole point. <c>StatsSnapshot.SkillUps</c> has always known
+    /// what you raised tonight and nothing has ever remembered it, so the value died with the
+    /// session. The line goes into the real log through the real tail, the real parser and the
+    /// real ledger — a fixture-shaped substitute would render a state that is real and is not
+    /// the one this assertion is about (trap 23).</para>
+    ///
+    /// <para><b>The combat skill beside it is the negative, and it is asserted at a moment
+    /// when it is meaningful</b> (trap 62). Both lines are appended together and the wait is
+    /// for a POSITIVE event the profession line causes — the standing appearing — so
+    /// "1H Slashing was not stored" is checked after the batch has demonstrably been
+    /// processed, rather than before the tail got to it.</para>
+    ///
+    /// <para><c>helperSkills</c> is the STORE's claim and <c>helperProfKnown</c> is the
+    /// SCREEN's, captured in one Build: a skill-up that reached quest-ledger.json and no row
+    /// would satisfy the first and be the bug (trap 56).</para>
+    /// </summary>
+    [Fact]
+    public void ASkillUpInTheLogBecomesAPersistedProfessionStanding()
+    {
+        using var app = new AppHarness(environment: OpenOn("helper"));
+        app.Launch();
+
+        app.WaitForDump("shellPage", "helper", "the shell to land on the Helper room");
+        app.WaitForDump("helperSkills", 0, "a profile with no stored profession standing");
+
+        app.AppendLogLines(
+            "You have become better at Blacksmithing! (122)",
+            "You have become better at 1H Slashing! (53)");
+
+        app.WaitForDump("helperSkills", 1, "the profession skill-up to reach the ledger");
+        // Exactly one: the ledger admits professions and refuses the sixty combat skills
+        // nothing reads yet, which is what keeps the profile file profession-sized.
+        Assert.Equal(1, app.DumpValue("helperSkills"));
+        // And the SCREEN drew it. One of the eight rows now carries a number.
+        Assert.Equal(1, app.DumpValue("helperProfKnown"));
+        Assert.Equal(8, app.DumpValue("helperProfRows"));
+        Assert.Equal(0, app.DumpValue("helperDeadDoors"));
+    }
+
+    /// <summary>
+    /// **The pick narrows the list, and it is per character** (DRA-71 D8).
+    ///
+    /// <para>Seeded through <c>configureSettings</c> under the ledger's own character key, so
+    /// the assertion covers the read path a restart takes. Two rows rather than eight is the
+    /// only observable difference a filter makes, and <c>helperProfChips</c> staying at eight
+    /// is the other half: <b>the OFFER is never narrowed by its own filter</b>, or a player
+    /// could not undo a pick.</para>
+    /// </summary>
+    [Fact]
+    public void PickingTwoProfessionsNarrowsTheListAndLeavesTheOfferWhole()
+    {
+        var key = $"{AppHarness.Character}_{AppHarness.Server}".ToLowerInvariant();
+        using var app = new AppHarness(
+            configureSettings: s =>
+            {
+                s.HelperGoals[key] = [nameof(HelperGoal.FarmMaterials)];
+                s.HelperProfessions[key] =
+                    [nameof(Tradeskill.Baking), nameof(Tradeskill.Pottery)];
+            },
+            environment: OpenOn("helper"));
+        app.Launch();
+
+        app.WaitForDump("shellPage", "helper", "the shell to land on the Helper room");
+        app.WaitForDump("helperProfRows", 2, "the stored profession pick to be read back");
+
+        Assert.Equal(8, app.DumpValue("helperProfChips"));
+        Assert.Equal("Baking·Pottery", app.DumpText("helperProfFace"));
+        Assert.Equal(2, app.DumpValue("helperWatchPresets"));
+        // The goal is still Deferred — the ranking PARKED on its own evidence survey — so it
+        // says so under the answers while the block above it is full of the player's own
+        // professions. Both, from one Build.
+        Assert.Equal(1, app.DumpValue("helperNotYet"));
+        Assert.Equal(0, app.DumpValue("helperDeadDoors"));
+    }
 }

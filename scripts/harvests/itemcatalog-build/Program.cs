@@ -14,6 +14,11 @@ using EQBuddy.Core;
 // is the contents and never the .gz bytes (trap 74).
 var check = args.Contains("--check");
 
+// See ProfessionIn at the bottom of the file.
+string[] UnmasteredSkills =
+    ["Tinkering", "Research", "Spell Research", "Skill Research", "Make Poison",
+     "Poison Making", "Fishing"];
+
 var repo = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", "..", ".."));
 var dump = Path.Combine(repo, "scripts", "harvests", "eqlwiki", "cache", "items-wikitext.jsonl");
 var outPath = Path.Combine(repo, "src", "EQBuddy.Core", "Data", "ItemCatalog.json.gz");
@@ -34,6 +39,15 @@ var records = new List<ItemCatalog.Record>();
 int parsed = 0, noTemplate = 0, statless = 0;
 int valueStated = 0, valueParsed = 0, valueRefused = 0, valueConditional = 0;
 var distinctValues = new HashSet<long>();
+// **THE CATEGORY SURVEY** (DRA-71 D8, plan P13). It runs here rather than in a throwaway
+// script so the answer is re-taken on every weekly refresh — the arithmetic it gates is PARKED
+// with "better wiki coverage" as its reopen condition, and a condition nobody measures is one
+// nobody can satisfy. Nothing it counts is written into the catalog.
+int withCategory = 0, professionCategory = 0, genericTradeskillCategory = 0, playerCrafted = 0;
+int withRecipes = 0, recipesNamingAProfession = 0, recipesNamingAnUnmasteredSkill = 0;
+var distinctCategories = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+var professionsNamedByCategory = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+var professionsNamedByRecipes = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 var examples = new List<string>();
 
 foreach (var line in File.ReadLines(dump))
@@ -53,6 +67,41 @@ foreach (var line in File.ReadLines(dump))
     var stats = ItemStatsBlock.Parse(info.StatsLines);
     if (info.StatsLines.Count == 0) statless++;
     parsed++;
+
+    // The survey, per page. `info.Categories` and `info.Recipes` are both parsed by the app's
+    // own item parser; the categories are DISCARDED below and DRA-71 D8 deliberately did not
+    // change that — see the report's own note for what the survey found.
+    if (info.Categories.Count > 0) withCategory++;
+    var namedHere = false;
+    foreach (var category in info.Categories)
+    {
+        distinctCategories.Add(category);
+        if (category.Equals("Tradeskill Ingredient", StringComparison.OrdinalIgnoreCase))
+            genericTradeskillCategory++;
+        if (category.Equals("Player Crafted", StringComparison.OrdinalIgnoreCase))
+            playerCrafted++;
+        if (ProfessionIn(category) is { } named)
+        {
+            professionsNamedByCategory.Add(named);
+            namedHere = true;
+        }
+    }
+    if (namedHere) professionCategory++;
+
+    if (info.Recipes.Count > 0)
+    {
+        withRecipes++;
+        var profession = info.Recipes.Select(ProfessionIn).FirstOrDefault(n => n is not null);
+        if (profession is not null)
+        {
+            recipesNamingAProfession++;
+            professionsNamedByRecipes.Add(profession);
+        }
+        else if (info.Recipes.Any(line => UnmasteredSkills.Contains(line.Trim())))
+        {
+            recipesNamingAnUnmasteredSkill++;
+        }
+    }
 
     // The condition only means something beside a value. A caveat with nothing to qualify is
     // a sentence a surface would have to decide what to do with, and the honest answer is that
@@ -117,6 +166,24 @@ var identical = committed is not null && committed.AsSpan().SequenceEqual(payloa
 // `valueConditional` is the one nobody expected to matter: it counts the values whose own page
 // states a Charisma and a faction, which is what makes this number a quote rather than a fact
 // about the item.
+// **WHAT THE CATEGORY FIELD MEANS, NOT ONLY WHETHER IT IS THERE** (DRA-71 D8).
+// "Is it populated" is the wrong question and 99.7% is the wrong answer to feel good about:
+// what decides whether an item can be pointed at a profession is whether the field says WHICH
+// ONE. So this reports the coverage AND the count that matters, beside the recipes field —
+// which turned out to carry the answer the categories do not.
+var categorySurvey =
+    $"- item pages with at least one Category: {withCategory} of {parsed + noTemplate}; "
+    + $"distinct categories: {distinctCategories.Count}\n"
+    + $"- categories naming a PROFESSION: {professionCategory} pages, "
+    + $"{professionsNamedByCategory.Count} of the eight "
+    + $"({string.Join(", ", professionsNamedByCategory.OrderBy(n => n))})\n"
+    + $"- generic instead: 'Tradeskill Ingredient' {genericTradeskillCategory}, "
+    + $"'Player Crafted' {playerCrafted}\n"
+    + $"- pages with a recipes field: {withRecipes}; naming one of the eight: "
+    + $"{recipesNamingAProfession} ({professionsNamedByRecipes.Count} distinct); naming a skill "
+    + $"with no Mastery AA: {recipesNamingAnUnmasteredSkill}\n";
+Console.WriteLine(categorySurvey.TrimEnd());
+
 var survey =
     $"- pages stating a merchant_value: {valueStated}; parsed to copper: {valueParsed}; "
     + $"refused as unreadable: {valueRefused}; distinct parsed values: {distinctValues.Count}\n"
@@ -172,6 +239,7 @@ File.WriteAllText(reportPath,
     $"- pages with no Itempage content (skipped): {noTemplate}\n" +
     $"- catalog items without a stats block (knowledge-only): {statless}\n" +
     survey +
+    categorySurvey +
     $"- items with at least one NAMED creature (DropMobs): {withMobs}\n" +
     $"- zone entries carrying creatures: {mobZones}; creature mentions: {mobNames.Count}; " +
     $"distinct creature names: {distinctMobs}\n" +
@@ -190,6 +258,23 @@ static byte[] Decompress(string path)
     using var buffer = new MemoryStream();
     gz.CopyTo(buffer);
     return buffer.ToArray();
+}
+
+// Which of the curated eight a category or a recipe line names, or null. The category shape
+// is "Pottery Ingredient"; the recipe shape is the bare profession name on its own bullet.
+// `UnmasteredSkills` above is the survey's other half — the skills eqlwiki names in recipe
+// lines that have NO Mastery AA and are therefore not in `Core/Tradeskills.cs`. They are
+// counted so the survey reports the whole picture rather than the part the curation covers; a
+// reopen decision wants to know they exist. Survey-only: nothing here is promoted.
+static string? ProfessionIn(string text)
+{
+    var trimmed = (text ?? "").Trim();
+    if (Tradeskills.Match(trimmed) is { } direct) return direct.ToString();
+    foreach (var suffix in new[] { " Ingredient", " Ingredients", " Items" })
+        if (trimmed.EndsWith(suffix, StringComparison.OrdinalIgnoreCase)
+            && Tradeskills.Match(trimmed[..^suffix.Length]) is { } stripped)
+            return stripped.ToString();
+    return null;
 }
 
 static Dictionary<string, List<string>>? DropMobs(ItemInfo info)

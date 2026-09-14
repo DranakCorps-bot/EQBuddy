@@ -109,6 +109,13 @@ internal sealed class HelperRoom : Grid, IShellRoom
     /// the same rule when it gets here.</summary>
     private IReadOnlyList<WornItem> _worn = [];
 
+    /// <summary>**Where this character's profession skills stand** (DRA-71 D8) — the ledger's
+    /// own rows, read every tick like the level beside it because it is a dictionary copy and
+    /// a skill-up announced mid-sitting must not wait five seconds to show. The LEDGER's and
+    /// never the live session's: a value that died at midnight is the thing this slice
+    /// fixed.</summary>
+    private IReadOnlyList<(string Skill, int Value, DateTime At)> _skills = [];
+
     /// <summary>The dump this room folded <see cref="_worn"/> from, in the repaint
     /// fingerprint. A new dump changes what is worn, which changes every gear answer — trap
     /// 72's exact shape, one store along.</summary>
@@ -150,6 +157,17 @@ internal sealed class HelperRoom : Grid, IShellRoom
     private EqMultiPicker? _factionPicker;
     private EqMultiPicker? _unlockPicker;
     private EqMultiPicker? _wornPicker;
+    /// <summary>DRA-71 D8's picker, and the counts that say what it and the rows under it
+    /// actually drew. <see cref="_professionsKnown"/> is the one key that can tell "the log has
+    /// never announced a profession skill-up" from "the ledger never stored one" — two
+    /// different bugs behind one grey sentence.</summary>
+    private EqMultiPicker? _professionPicker;
+    private string _professionFace = "";
+    private int _professionChips;
+    private int _professionRows;
+    private int _professionsKnown;
+    private int _professionsWatched;
+    private int _watchPresets;
     private string _goalFace = "";
     private string _factionFace = "";
     private string _unlockFace = "";
@@ -255,6 +273,10 @@ internal sealed class HelperRoom : Grid, IShellRoom
         // room shows. Read every tick: it is two dictionary lookups, and a level the player
         // just typed one room away must not wait five seconds to change the answers.
         _level = _main.ResolvedLevel;
+        // DRA-71 D8. Two dictionary reads, on the tick for the level's reason: a pick and a
+        // skill-up both have to change the room now rather than at the next throttle.
+        var professions = TradeskillPickStore.Picked(_main.Settings, _main.QuestCharacterKey);
+        _skills = _main.QuestLedger?.SkillsFor(_main.QuestCharacterKey) ?? [];
 
         // **THE FINGERPRINT, AND EVERY STORE THIS ROOM READS IS IN IT** (trap 72: the Quests
         // tab drew the moment before for a whole session because its signature carried
@@ -302,6 +324,16 @@ internal sealed class HelperRoom : Grid, IShellRoom
             // The SOURCE rides with the number: a clear that lands back on the same level
             // still changes the sentence this room prints about where it came from.
             _level.Level, _level.Source,
+            // **DRA-71 D8's two stores, folded by CONTENT** (trap 72). The picks are a click
+            // in this room; the standings are written by the LOG thread while the room is on
+            // screen, and a skill-up that moved a number without moving anything else in this
+            // key would leave the block drawing the moment before it for the rest of the
+            // session — which is the exact bug the Quests tab shipped. The watch rules ride
+            // too, because the preset's own LABEL is read from them.
+            string.Join(',', professions),
+            string.Join(',', _skills.OrderBy(k => k.Skill, StringComparer.OrdinalIgnoreCase)
+                .Select(k => $"{k.Skill}:{k.Value}:{k.At.Ticks}")),
+            _main.Settings.TrackedRules.Count(r => r.Kind == WatchKind.SkillUp),
             ShellPages.Landed.Count);
         if (key == _painted) return;
         _painted = key;
@@ -327,7 +359,7 @@ internal sealed class HelperRoom : Grid, IShellRoom
             Sales = _sales,
         }, goals);
 
-        Build(goals, factions, picks, wornPicks, unlocks);
+        Build(goals, factions, picks, wornPicks, professions, unlocks);
     }
 
     /// <summary>The reads that are not free, behind one throttle and one clock so a caller
@@ -392,13 +424,21 @@ internal sealed class HelperRoom : Grid, IShellRoom
 
     private void Build(
         IReadOnlyList<HelperGoal> goals, IReadOnlyList<string> factions,
-        IReadOnlyList<string> picks, IReadOnlyList<string> wornPicks, UnlockSource unlocks)
+        IReadOnlyList<string> picks, IReadOnlyList<string> wornPicks,
+        IReadOnlyList<Tradeskill> professions, UnlockSource unlocks)
     {
         _blocks.Children.Clear();
         _goalPicker = null;
         _factionPicker = null;
         _unlockPicker = null;
         _wornPicker = null;
+        _professionPicker = null;
+        _professionFace = "";
+        _professionChips = 0;
+        _professionRows = 0;
+        _professionsKnown = 0;
+        _professionsWatched = 0;
+        _watchPresets = 0;
         _goalFace = "";
         _factionFace = "";
         _unlockFace = "";
@@ -436,6 +476,12 @@ internal sealed class HelperRoom : Grid, IShellRoom
         if (goals.Count == 0 || goals.Contains(HelperGoal.UnlockRaces)
             || goals.Contains(HelperGoal.UnlockClasses))
             BuildUnlockPicker(goals, picks, unlocks);
+        // DRA-71 D8, on the same condition every sub-block here is drawn on. It is the one
+        // block whose goal has no ENGINE — the ranking PARKED on its own evidence survey — and
+        // it is still drawn on the goal's own terms, because a picker that appeared only once
+        // an engine existed would make a deferred goal look like a missing feature.
+        if (goals.Count == 0 || goals.Contains(HelperGoal.FarmMaterials))
+            BuildProfessions(professions);
         BuildAnswers();
         OpenForReview();
     }
@@ -462,6 +508,7 @@ internal sealed class HelperRoom : Grid, IShellRoom
             "factions" => _factionPicker,
             "unlocks" => _unlockPicker,
             "worn" => _wornPicker,
+            "professions" => _professionPicker,
             _ => null,
         };
         if (picker is null) return;
@@ -830,6 +877,160 @@ internal sealed class HelperRoom : Grid, IShellRoom
         Repaint();
     }
 
+    /// <summary>
+    /// **THE PROFESSIONS BLOCK — profession-first, and honest about the half that is missing**
+    /// (DRA-71 D8, plan P13; Founder smoke item 6).
+    ///
+    /// <para>Three things per profession, and the plan named all three: where your skill
+    /// stands, a one-click watch on its next skill-up, and the wiki page that says what it
+    /// makes. Not one of them is a ranking, and the block says so out loud rather than letting
+    /// the absence read as a bug (<see cref="HelperPresentation.ProfessionsParkNote"/>).</para>
+    ///
+    /// <para><b>The standings are the reason this block exists at all.</b> A skill value used
+    /// to die with the session — <c>StatsSnapshot.SkillUps</c> has always known what you raised
+    /// tonight and nothing has ever remembered it — so the writer and the reader land in one
+    /// slice (trap 20) and the number here is the ledger's, not the live session's.</para>
+    ///
+    /// <para><b>The pick is a FILTER and the face may say "all"</b>, which is the difference
+    /// from the faction picker directly above: this offer is the whole curated eight and
+    /// nothing is capped away, so a player who ticked every row really has picked all of
+    /// them.</para>
+    /// </summary>
+    private void BuildProfessions(IReadOnlyList<Tradeskill> picked)
+    {
+        var block = Block(HelperPresentation.GoalLabel(HelperGoal.FarmMaterials));
+        block.Children.Add(Line(HelperPresentation.ProfessionPickerNote, Role.BodySecondary));
+        // Said ONCE, over the list, rather than on every row that has nothing yet — see
+        // HelperPresentation.ProfessionLearnNote for the shot that moved it here.
+        block.Children.Add(Line(HelperPresentation.ProfessionLearnNote, Role.Caption));
+
+        var standings = Tradeskills.Standings(_skills);
+        var bySkill = standings.ToDictionary(st => st.Skill);
+
+        var picker = new EqMultiPicker(key => ToggleProfession((Tradeskill)key),
+            tip: HelperPresentation.ProfessionPickerTip);
+        picker.SetRows([.. standings.Select(st => new PickerRow(
+            st.Skill, HelperPresentation.ProfessionRow(st), picked.Contains(st.Skill)))]);
+        picker.SetFace(HelperPresentation.ProfessionFace(
+            [.. picked.Select(p => Tradeskills.For(p).Name)], standings.Count));
+        picker.Host.Margin = new Thickness(0, Tok.SpaceS, 0, 0);
+        block.Children.Add(picker.Host);
+
+        _professionChips = picker.RowCount;
+        _professionFace = (string)picker.Face.Content;
+        _professionPicker = picker;
+
+        // The listed set — every profession while nothing is picked, which is what makes the
+        // control's empty state a list rather than a blank panel. In the CURATED order, which
+        // is the enum's: eight fixed rows want a stable order more than a clever one, and a
+        // list that re-sorted itself when a number moved would shift under the player's
+        // pointer for no gain.
+        foreach (var skill in TradeskillPickStore.Listed(_main.Settings, _main.QuestCharacterKey))
+        {
+            var standing = bySkill[skill];
+            var row = new StackPanel { Margin = new Thickness(0, Tok.SpaceM, 0, 0) };
+            row.Children.Add(Line(HelperPresentation.ProfessionStanding(standing), Role.Caption));
+            if (standing.Known) _professionsKnown++;
+
+            var doors = new WrapPanel { Margin = new Thickness(0, Tok.SpaceXs, 0, 0) };
+            doors.Children.Add(WatchPreset(skill));
+            doors.Children.Add(Door(new HelperDoor(
+                HelperDoorKind.WikiSkill, Tradeskills.For(skill).WikiPage)));
+            row.Children.Add(doors);
+            block.Children.Add(row);
+            _professionRows++;
+        }
+
+        // A margin of its own: it is the BLOCK's caveat and not the last row's, and without one
+        // it butts against that row's doors and reads as belonging to it — which is how the
+        // first staged shot came back.
+        var park = Line(HelperPresentation.ProfessionsParkNote, Role.Caption);
+        park.Margin = new Thickness(0, Tok.SpaceM, 0, 0);
+        block.Children.Add(park);
+    }
+
+    private void ToggleProfession(Tradeskill skill)
+    {
+        if (_main.QuestCharacterKey.Length == 0) return;
+        TradeskillPickStore.Toggle(_main.Settings, _main.QuestCharacterKey, skill);
+        _main.Settings.Save();
+        Repaint();
+    }
+
+    /// <summary>
+    /// **THE WATCH PRESET — the one control in this room that WRITES something the player
+    /// could have written themselves** (DRA-71 D8, plan P13).
+    ///
+    /// <para>It is a door with a side effect, and the rule that makes that the right shape is
+    /// the in-game-command one: a surface that names an action ships the action (David,
+    /// 2026-08-14). "Get told when this skill goes up" with no way to do it is the silent
+    /// no-op wearing a sentence, and landing the player in an empty rules list to type the
+    /// skill name themselves is the same defect with a walk attached.</para>
+    ///
+    /// <para><b>Idempotent, and the label says which state you are in.</b> A second click adds
+    /// nothing and just opens the list. The state is read from the player's OWN rules every
+    /// paint rather than from a flag this room set, so a rule they delete in Options takes the
+    /// label back with it — one fact, one producer (trap 4).</para>
+    /// </summary>
+    private UIElement WatchPreset(Tradeskill skill)
+    {
+        var watching = ExistingWatch(skill) is not null;
+        if (watching) _professionsWatched++;
+
+        var link = DesignSystem.Text(Role.Caption, HelperPresentation.WatchPresetLabel(watching));
+        link.Ink("AccentBrush");
+        link.Margin = new Thickness(0, 0, Tok.SpaceM, 0);
+        link.ToolTip = HelperPresentation.DoorTip(new HelperDoor(HelperDoorKind.WatchRules, ""));
+
+        var address = HelperPresentation.AddressFor(HelperDoorKind.WatchRules);
+        if (address is null) return link;
+        DesignSystem.WireClick(link, () =>
+        {
+            AddWatch(skill);
+            _navigate(address);
+        });
+        _doors++;
+        _watchPresets++;
+        if (ShellPages.ParseAddress(address) is not { } parsed
+            || !ShellPages.Landed.Contains(parsed.Page))
+            _deadDoors++;
+        return link;
+    }
+
+    /// <summary>
+    /// The player's own skill-up rule for this profession, or null.
+    ///
+    /// <para>Asked through <see cref="TrackedRule.Matches"/> — the rule's OWN matcher — rather
+    /// than by comparing strings here, so a rule they wrote themselves and named "smithing!!"
+    /// counts and is not duplicated. A second copy of a rule the player already has is the
+    /// worst thing this control could do: watch rules fire alerts, and two of them fire
+    /// twice.</para>
+    ///
+    /// <para><b>A DISABLED rule still counts.</b> It is a rule they wrote and turned off on
+    /// purpose; adding a second enabled copy beside it would overrule a decision they made,
+    /// and the door opens the list where they can see its switch.</para>
+    /// </summary>
+    private TrackedRule? ExistingWatch(Tradeskill skill) =>
+        _main.Settings.TrackedRules.FirstOrDefault(r =>
+            r.Kind == WatchKind.SkillUp && r.Matches(Tradeskills.For(skill).Name));
+
+    private void AddWatch(Tradeskill skill)
+    {
+        if (ExistingWatch(skill) is not null) return;
+        _main.Settings.TrackedRules.Add(new TrackedRule
+        {
+            Name = HelperPresentation.WatchRuleName(skill),
+            Kind = WatchKind.SkillUp,
+            // The profession's canonical name, which is the skill name the log prints. Set
+            // explicitly rather than leaning on `EffectivePattern`'s name fallback: the
+            // fallback is a convenience for hand-typed rules, and a rule this room wrote
+            // should say what it matches in the box the player will look at.
+            Pattern = Tradeskills.For(skill).Name,
+            AlertBanner = true,
+        });
+        _main.Settings.Save();
+    }
+
     private void BuildAnswers()
     {
         var block = Block(HelperPresentation.AnswersHeading);
@@ -1138,7 +1339,7 @@ internal sealed class HelperRoom : Grid, IShellRoom
         $"helperGearWithheld={_answers.GearWithheld} " +
         // Whether a popup is OPEN. The staged state the shot photographs, and the assertion
         // that the review hook armed the control rather than merely being spelled correctly.
-        $"helperPickerOpen={((_goalPicker?.IsOpen ?? false) || (_factionPicker?.IsOpen ?? false) || (_unlockPicker?.IsOpen ?? false) || (_wornPicker?.IsOpen ?? false) ? 1 : 0)} " +
+        $"helperPickerOpen={((_goalPicker?.IsOpen ?? false) || (_factionPicker?.IsOpen ?? false) || (_unlockPicker?.IsOpen ?? false) || (_wornPicker?.IsOpen ?? false) || (_professionPicker?.IsOpen ?? false) ? 1 : 0)} " +
         $"helperPickerHook={(_reviewHookArmed ? 1 : 0)} " +
         // What the ENGINE answered.
         $"helperRecs={_answers.Top.Count} " +
@@ -1216,5 +1417,23 @@ internal sealed class HelperRoom : Grid, IShellRoom
         $"helperCoinWhy={_answers.Top.Count(r => r.Why.OfType<ZoneCoinRateFact>().Any())} " +
         $"helperSellable={_answers.Top.Count(r => r.Why.OfType<SellableDropFact>().Any())} " +
         $"helperCatalogValue={_answers.Top.Count(r => r.Why.OfType<CatalogValueFact>().Any())} " +
-        $"helperMoneyNote={(_moneyNote ? 1 : 0)}";
+        $"helperMoneyNote={(_moneyNote ? 1 : 0)} " +
+        // **DRA-71 D8.** The store's claim and the screen's claim, from one Build (trap 56):
+        // `helperSkills` is how many profession standings the LEDGER holds and
+        // `helperProfKnown` how many of the DRAWN rows carried a number. A skill-up that
+        // reached quest-ledger.json and no row is trap 20's shape, and it photographs as an
+        // ordinary block (trap 29). `helperProfChips` is the picker's rows — eight, always —
+        // and `helperProfRows` what the pick actually left on screen, which is the only pair
+        // that can tell a filter from an empty fold.
+        $"helperSkills={_skills.Count} " +
+        $"helperProfChips={_professionChips} " +
+        $"helperProfRows={_professionRows} " +
+        $"helperProfKnown={_professionsKnown} " +
+        $"helperProfFace={_professionFace.Replace(" ", "")} " +
+        // The preset's two claims: how many rows OFFERED it, and how many already had a rule.
+        // The second is read from the player's own TrackedRules every paint, so a rule deleted
+        // in Options moves it back — "the room added one" and "the player has one" are the same
+        // fact with one producer, and this is what says so from outside.
+        $"helperWatchPresets={_watchPresets} " +
+        $"helperWatched={_professionsWatched}";
 }

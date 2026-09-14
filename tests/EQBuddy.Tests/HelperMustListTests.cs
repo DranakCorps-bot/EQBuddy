@@ -255,7 +255,14 @@ public class HelperMustListTests
         Assert.NotEmpty(HelperPresentation.DoorTip(new HelperDoor(kind, "Faydark Rangers")));
 
         var address = HelperPresentation.AddressFor(kind);
-        if (kind == HelperDoorKind.WikiFaction) { Assert.Null(address); return; }
+        // DRA-71 D8 added the second wiki door, and it is listed here rather than pattern
+        // matched on the name: "a kind whose name starts with Wiki" is a proxy, and the fact
+        // is that these two open a browser (trap 64b).
+        if (kind is HelperDoorKind.WikiFaction or HelperDoorKind.WikiSkill)
+        {
+            Assert.Null(address);
+            return;
+        }
 
         Assert.NotNull(address);
         var parsed = ShellPages.ParseAddress(address);
