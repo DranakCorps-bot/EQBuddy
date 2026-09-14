@@ -14,10 +14,11 @@ namespace EQBuddy;
 /// or, since SIGNED #422, <c>AppSettings.HudGlancePet</c>.
 ///
 /// **The pet chip has one slot the others do not: the always-on row's insertion gap between
-/// DPS and the third number.** Carrying it there inserts, carrying it back down ejects, and
-/// both are this same gesture family — same capture, same threshold, same SizeWE cursor,
-/// same adorner. OE-8's free-drag is untouched and not reopened, and no FIXED slot became a
-/// drop target, so #413's reasoning about a slot that swaps identity mid-session still
+/// DPS and the metrics that follow it.** Carrying it there inserts, carrying it back down
+/// ejects, and both are this same gesture family — same capture, same threshold, same SizeWE
+/// cursor, same adorner. OE-8's free-drag is untouched and not reopened, and no FIXED slot
+/// became a drop target, so #413's reasoning about a slot that swaps identity mid-session
+/// still
 /// stands.
 ///
 /// **The chip is the HANDLE, and the vocabulary is one sentence: a drag that starts on a

@@ -171,8 +171,8 @@ internal sealed class SettingsHudView
     internal const string PromotedStatsNote =
         "XP, DPS and HPS are not in this list because they are always on the HUD now — the "
         + "collapsed bar shows your name, your DPS and your XP%/hr whatever you pick here, "
-        + "and the third number becomes HPS while healing is the weight of the last "
-        + "half-minute. Their stars are gone; there is nothing left to switch off.";
+        + "and HPS appears beside them once healing is the weight of the last half-minute. "
+        + "Their stars are gone; there is nothing left to switch off.";
 
     /// <summary>
     /// Pet damage can live on the always-on row (SIGNED #422; Bevel's §3/§4 ruling,

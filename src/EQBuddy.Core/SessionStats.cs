@@ -2047,8 +2047,17 @@ public record NameCount(string Name, int Count);
 
 /// <summary>
 /// What the player has actually been DOING lately — the recent heal-versus-damage weight
-/// the collapsed HUD's third number swaps on (<see cref="EQBuddy.UI.Shared"/>'s
-/// <c>HudGlance</c>, Surface A / SA-1).
+/// that decides whether the collapsed HUD carries an HPS slot at all
+/// (<see cref="EQBuddy.UI.Shared"/>'s <c>HudGlance</c>, Surface A / SA-1 as amended by
+/// DRA-72: it used to decide which of two numbers ONE slot showed, and the flash that
+/// came of asking both of its windows at the same moment is why it now decides presence).
+///
+/// **Both windows survive that change and only one of them is still read by the glance.**
+/// The long one answers "has healing been the weight of the last half-minute" and still
+/// gates the slot; the short one answers "has damage-combat returned", which no longer
+/// takes anything away — the Damage surfaces are its readers now. Neither is removed: a
+/// window nobody reads is a measurement waiting to be re-derived by somebody who needs it
+/// (and it is what the test proving the deleted clause is gone drives).
 ///
 /// **Derived purely from event totals, anchored on the last log timestamp** — no wall
 /// clock anywhere in it. That was a choice with a real alternative: <see
@@ -2301,9 +2310,9 @@ public sealed class StatsSnapshot
     public double KillsPerActiveHour { get; init; }
     public RecentRates? Recent { get; init; }
 
-    /// <summary>The recent heal-versus-damage weight the collapsed HUD's third number
-    /// swaps on. Always present (never null) — see <see cref="RecentEffort"/> for why it
-    /// is derived from event totals rather than the wall clock.</summary>
+    /// <summary>The recent heal-versus-damage weight that decides whether the collapsed HUD
+    /// carries an HPS slot. Always present (never null) — see <see cref="RecentEffort"/> for
+    /// why it is derived from event totals rather than the wall clock.</summary>
     public RecentEffort Effort { get; init; } = RecentEffort.None;
     public List<TrackedRuleResult> Tracked { get; init; } = [];
     public List<MarkerDetail> Markers { get; init; } = [];

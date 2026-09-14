@@ -929,6 +929,32 @@ internal sealed class AppHarness : IDisposable
         return "";
     }
 
+    /// <summary>
+    /// Several WORD facts off ONE read of the dump — <see cref="DumpValues"/>'s sibling, and
+    /// it exists for the same reason: two <see cref="DumpText"/> calls are two moments, and a
+    /// comparison between two moments is a question a passing app can answer wrongly (trap 56,
+    /// which the app-side <c>PaintOneMoment</c> exists to make answerable at all).
+    ///
+    /// The case that needed it is SAMPLING: watching a word fact hold still over several
+    /// renders means pairing it with the liveness fact that says a render happened
+    /// (<c>tick</c>), and a `tick` from one read beside a `hudGlance` from the next is a
+    /// sample of neither. Any key the dump does not carry answers "".
+    /// </summary>
+    public string[] DumpTexts(params string[] keys)
+    {
+        var text = "";
+        try { text = File.ReadAllText(DebugDumpPath); }
+        catch (IOException) { }
+        var pairs = text.Split(' ');
+        return [.. keys.Select(key =>
+        {
+            foreach (var pair in pairs)
+                if (pair.StartsWith(key + "=", StringComparison.Ordinal))
+                    return pair[(key.Length + 1)..];
+            return "";
+        })];
+    }
+
     /// <summary>Closes the WIDGET (WM_CLOSE — the same path as the user's ✕) and waits
     /// for the process to exit, so shutdown-time persistence has run.
     ///

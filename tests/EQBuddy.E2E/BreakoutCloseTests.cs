@@ -109,7 +109,7 @@ public sealed class BreakoutCloseTests
         });
         app.Launch();
 
-        app.WaitForDump("hudGlance", "xp", "the collapsed bar to draw its trio");
+        app.WaitForDump("hudGlance", "dps,xp", "the collapsed bar to draw its always-on row");
         app.WaitForDump("breakoutsClosed", 0, "no float to have been dismissed");
         app.WaitForDump("breakoutsDisabled", 1, "the seeded row and nothing else");
     }

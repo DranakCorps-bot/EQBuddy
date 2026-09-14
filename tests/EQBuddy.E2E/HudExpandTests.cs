@@ -107,7 +107,7 @@ public sealed class HudExpandTests
         app.Launch();
 
         // The bar has rendered — the chips exist and had their chance to expand.
-        app.WaitForDump("hudGlance", "xp", "the collapsed bar to draw its trio");
+        app.WaitForDump("hudGlance", "dps,xp", "the collapsed bar to draw its always-on row");
         app.WaitForDump("hudExpand", "none", "no tracker to be expanded on a default launch");
         app.WaitForDump("hudExpandMode", "collapsed", "the model to be collapsed");
         app.WaitForDump("hudExpandPanel", 0, "no companion panel on screen");

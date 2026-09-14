@@ -2613,6 +2613,21 @@ $Shots = [ordered]@{
     # The three metric slots are FIXED WIDTH (HudGlance), so the bar's width must not
     # change between takes of the same seed — a wobble there is trap 12 arriving.
     #
+    # AMENDED FOR DRA-72, and it is a WIDTH amendment: the XP slot's reserved box went from
+    # 66 to 76 (the '%' and '/' out-measure a rate string's leading spaces, and a four-digit
+    # rate was trimming), so this row is ten units wider than the same row on the old build.
+    # **The PNG's total width is NOT a clean measure of that**, which is worth saying out
+    # loud before somebody subtracts two numbers: three of this bar's cells re-derive from
+    # the fixture's own elapsed time on every take (procs "N.N/min", motes "N · N.N/hr",
+    # coin), so 907x40 on 2026-09-07 and 889x40 today differ by the CELLS as well. The shot
+    # that isolates the slot is `mini-bar-chips` — its four cells are plain counts, and it
+    # moved 628 -> 638, exactly the ten.
+    # RE-SHOT 2026-09-13, 889x40: every element of the OE-7 prediction below held — Testchar,
+    # 13 dps, 14.5%/hr, then kills/pet/procs/loot/motes/money/deaths, DPS + XP%/hr + PET +
+    # LOOT bordered, no divider after the last, no duplicate of any promoted number. There is
+    # no hps slot here and that is the point of the pair: this fixture is melee. See
+    # `mini-bar-healing` for the row that carries one.
+    #
     # AMENDED FOR OE-7, and the last line above is the one that moved: **the divider is no
     # longer between all ten.** Every cell whose stat owns a floating window is an expansion
     # chip now — button chrome, no divider — because the ✕ on a float stopped writing
@@ -2635,6 +2650,45 @@ $Shots = [ordered]@{
                            Set = @{ Minimized = $true
                                     DisabledBreakouts = @('Damage','Healing','Pet','Watch','Loot','Buffs')
                                     MiniStats = @('kills','dps','hps','pet','procs','loot','motes','money','xp','deaths') } }
+    # THE SAME BAR WITH HEALING ON IT (DRA-72), which is the one state `mini-bar` cannot
+    # photograph: the fixture session is melee, so the always-on row there is name · DPS ·
+    # XP%/hr forever. Three heals through the real tail put healing above damage across the
+    # ~30 s window — `Add-LogLines` stamps every appended line with ONE timestamp, which is
+    # what puts them inside the window while the fixture's own damage is outside it — and
+    # the HPS slot arrives beside the XP rate rather than instead of it.
+    #
+    # **This is the picture the Founder's video argues with**, and the two shots are a PAIR:
+    # one row narrower, one row wider, same seed. A single shot of the wide row would prove
+    # the slot draws and say nothing about what it cost the bar's width, which is the half
+    # trap 12 is about.
+    #
+    # PREDICTION, written before the capture (trap 23). The always-on row reads name
+    # ("Testchar") · Swords + "N dps" · **Heal + "N hps"** · Chart + "N.N%/hr" — FOUR slots
+    # where `mini-bar` has three. `HudGlancePet` is unset here exactly as it is there, so the
+    # pet chip is still a starred CELL and the seven cells that follow are the same seven in
+    # the same order. So this PNG is WIDER than `mini-bar.png` by one metric slot plus its
+    # gap, and that difference IS the acceptance criterion; every other element must be
+    # identical. The hps reading will be small — the denominator is the fixture's whole
+    # session of combat seconds and the three heals are one moment — and a small number is
+    # the correct picture rather than a staging failure: the SLOT is what this shot is about.
+    'mini-bar-healing' = @{ Title = 'EQBuddy'
+                           Env = @{}
+                           Set = @{ Minimized = $true
+                                    DisabledBreakouts = @('Damage','Healing','Pet','Watch','Loot','Buffs')
+                                    MiniStats = @('kills','dps','hps','pet','procs','loot','motes','money','xp','deaths') }
+                           # Outgoing heals, the game's own wording — the same lines the E2E
+                           # row uses, so the two harnesses are staging one state rather than
+                           # two things that look alike.
+                           AppendLive = @(
+                               'You healed Grimwold for 9000 hit points by Light Healing.'
+                               'You healed Grimwold for 9000 hit points by Light Healing.'
+                               'You healed Grimwold for 9000 hit points by Light Healing.') }
+    # SHOT 2026-09-13, 991x40, and the prediction held in every element: Testchar · Swords
+    # "13 dps" · **Heal "34 hps"** · Chart "14.2%/hr", then the same seven cells in the same
+    # order (82 kills, 1.6 dps pet, 0/min procs, 39 loot, "1 · 0.9/hr" motes, 5p 1g 4s 8c,
+    # 0 deaths) and the ↗ / ✕. 991 against `mini-bar`'s 889 is one metric slot plus its gap.
+    # The hps reading is a real number rather than the near-zero the prediction allowed for —
+    # the three heals are large and the denominator is combat seconds, not wall time.
     # THE UNDER-BAR PANEL (OE-1). Its own window, so it is shot by its own title: the bar
     # ABOVE it is `mini-bar`'s picture and the two are separate windows on purpose — a panel
     # drawn inside the widget would resize a SizeToContent always-on-top window on a hover,
@@ -2979,6 +3033,15 @@ $Shots = [ordered]@{
     # the old mix was worth photographing was that two shapes might jostle, and the reason
     # this one is, is that six borders in a row might read as a toolbar. It needs re-shooting
     # and LOOKING at, not just re-running.
+    #
+    # RE-SHOT 2026-09-13 for DRA-72, 628x40 -> 638x40 — and this shot is the one that MEASURES
+    # that change rather than merely containing it: its four cells are plain counts (kills 82,
+    # pet 1.6 dps, loot 39, buffs 8), so nothing here re-derives from elapsed time. **The ten
+    # units were then proved rather than attributed**: the same seed shot against a build with
+    # `ExperienceReservedWidth` put back to 66 came out at 628 — the committed width to the
+    # pixel — so the difference is that constant and nothing else on the bar. Looked at: name, dps,
+    # 14.2%/hr, then the four chips; six borders in a row still read as chips rather than as a
+    # toolbar, so the open question above is answered again in the same direction.
     'mini-bar-chips'  = @{ Title = 'EQBuddy'
                            Env = @{}
                            Set = @{ Minimized = $true
@@ -3125,6 +3188,13 @@ $Shots = [ordered]@{
     # 13 dps, 14.5%/hr, then 82 (kills) and 39 (loot), then "Motes 1" and "Ghouls 2" — with
     # dps read ONCE. The two chips now reach the bar through the 📌 alone, and the picture
     # cannot tell, which is what the retirement promised players.
+    # RE-SHOT 2026-09-13 for DRA-72, 691x40 -> 686x40: seven cells exactly as predicted
+    # (Testchar, 13 dps, 14.5%/hr, 82, 39, "Motes 1", "Ghouls 2"). **The width moved DOWN by
+    # five while the XP slot gained ten, and the shortfall is not this change's**: the same
+    # seed shot against a build with `ExperienceReservedWidth` back at 66 comes out at 676,
+    # so the committed 691 was FIFTEEN units stale — some earlier change moved this bar and
+    # nobody re-ran the shot. Trap 18's neighbour: a committed PNG is evidence about the build
+    # that took it, and that build is not on `main` any more. This take repairs it.
     'mini-tour'       = @{ Title = 'EQBuddy'
                            Env = @{}
                            Set = @{ Minimized = $true

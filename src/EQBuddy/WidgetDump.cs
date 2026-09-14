@@ -342,15 +342,25 @@ internal static class WidgetDump
                     // pointer never reaching a chip (0,0) from the move never crossing the
                     // threshold (1,0) from the whole gesture running with no write (trap 56).
                     $"hudCellGrip={w._hudBar.GripKey} " +
-                    // …and WHICH number the glance's third slot currently is: "xp" or
-                    // "hps". A word, not a count, because the dump is space-separated
-                    // key=value and the suite has a string wait for exactly this shape.
+                    // …and WHICH metric slots the always-on row drew, left to right:
+                    // "dps,xp" for a melee character, "dps,hps,xp" while healing is on the
+                    // row, "dps,pet,hps,xp" with the pet slot inserted. Comma-joined in
+                    // `MiniBarPresentation.OrderKey`'s shape, because the dump is
+                    // space-separated key=value and a key list on this bar has one spelling
+                    // whether it is naming cells or slots.
                     //
-                    // The SWAP is the one piece of SA-1 that a screenshot cannot settle:
-                    // both states render correctly and look equally right, so only the app
-                    // can say which rule fired. HudGlance decides it and is unit-tested
-                    // with no window; this proves the decision reaches the control, which
-                    // is the half a unit test cannot see (trap 42).
+                    // **It was ONE WORD until DRA-72 — "xp" or "hps" — and that is the fact
+                    // it could not carry.** HPS and the XP rate shared a slot, so the dump
+                    // could report which of them the bar had chosen and had no way to say
+                    // that BOTH were up. The Founder's video is the two of them alternating
+                    // about once a second; the fix is that they are two slots; a fact with
+                    // room for only one of them cannot witness either.
+                    //
+                    // A screenshot cannot settle this: every membership renders correctly
+                    // and looks equally right, so only the app can say which rule fired.
+                    // HudGlance decides it and is unit-tested with no window; this proves
+                    // the decision reaches the control, which is the half a unit test cannot
+                    // see (trap 42).
                     $"hudGlance={w._hudBar.GlanceKey} " +
                     // …and whether the always-on row is drawing the OPTIONAL pet slot
                     // (SIGNED #422): 1 or 0, read off what the row DREW rather than off
@@ -373,8 +383,12 @@ internal static class WidgetDump
                     //
                     //   hudXpLevel  the level the tooltip STATES. 0 = it says none is known
                     //               yet, which is a drawn sentence and not an absence; -1 =
-                    //               the third slot is HPS right now, so there is no xp chip
-                    //               to hover at all. Three readings, not two (trap 20).
+                    //               the row drew no xp slot at all. Three readings, not two
+                    //               (trap 20) — and since DRA-72 the -1 is UNREACHABLE: the
+                    //               xp slot is unconditional now, where before HPS could take
+                    //               its place. It is kept because it is the reading that
+                    //               would report that slot going away again, and a fact with
+                    //               no way to say "absent" says it with a stale number.
                     //   hudXpEta    whether the forecast sentence is on it. False is real —
                     //               HoursToLevel is null below 0.05%/hr — so this separates
                     //               "too early to say" from "the line got dropped".

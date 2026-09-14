@@ -95,19 +95,28 @@ public sealed class HudBarTests
     }
 
     /// <summary>
-    /// The trio's third number, and the one swap it makes (Surface A / SA-1).
+    /// HEALING ADDS ITS OWN SLOT, AND A SWING DOES NOT TAKE IT AWAY (DRA-72, Surface A /
+    /// SA-1 amended).
     ///
-    /// **A screenshot cannot settle this and no unit test can reach it.** Both states
-    /// render correctly and look equally right, so a picture proves only that ONE of them
+    /// **A screenshot cannot settle this and no unit test can reach it.** Every membership
+    /// renders correctly and looks equally right, so a picture proves only that ONE of them
     /// drew; <c>HudGlanceTests</c> proves the rule, and this proves the rule reaches the
     /// control — "present in the build" and "in effect at runtime" being different claims
     /// (trap 42).
     ///
     /// It drives the app through its real seam: log lines appended to the file the widget
     /// is tailing, exactly as the game would write them.
+    ///
+    /// **THE PREDICTION, written before it ran** (trap 23). The fixture session is melee, so
+    /// the row starts <c>dps,xp</c>. Three heals and nothing else put healing above damage
+    /// across the ~30 s window, so the row becomes <c>dps,hps,xp</c> — three slots, the XP
+    /// rate still among them, which is the whole fix. Then a swing lands inside the ~5 s
+    /// resume window: before DRA-72 that took the slot straight back (<c>hudGlance=xp</c>)
+    /// and, in the Founder's video, kept doing so about once a second; now the row is
+    /// UNCHANGED at <c>dps,hps,xp</c>.
     /// </summary>
     [Fact]
-    public void HealingTakesTheThirdSlotAndOneSwingGivesItBack()
+    public void HealingAddsItsOwnSlotAndASwingDoesNotTakeItAway()
     {
         using var app = new AppHarness(settings =>
         {
@@ -120,8 +129,8 @@ public sealed class HudBarTests
         });
         app.Launch();
 
-        // The fixture session is a melee one, so the third slot starts where it should.
-        app.WaitForDump("hudGlance", "xp", "the third number to start as the XP rate");
+        // The fixture session is a melee one, so the row starts with nothing conditional.
+        app.WaitForDump("hudGlance", "dps,xp", "the row to start as DPS and the XP rate");
 
         // Healing with nothing else happening: enough to outweigh anything the fixture's
         // last half-minute could still hold, so the assertion is about the RULE and not
@@ -130,13 +139,39 @@ public sealed class HudBarTests
             "You healed Grimwold for 9000 hit points by Light Healing.",
             "You healed Grimwold for 9000 hit points by Light Healing.",
             "You healed Grimwold for 9000 hit points by Light Healing.");
-        app.WaitForDump("hudGlance", "hps", "healing to take the third slot");
+        app.WaitForDump("hudGlance", "dps,hps,xp",
+            "healing to ADD its own slot and leave the XP rate where it was");
 
-        // …and one swing takes it straight back. The thirty-second window is still almost
-        // entirely healing at this point, which is the whole point of the second, shorter
-        // window: "the moment combat-as-damage returns", not "once healing stops winning".
-        app.AppendLogLines("You crush a training dummy for 25 points of damage.");
-        app.WaitForDump("hudGlance", "xp", "one swing to bring the XP rate back");
+        // …and a swing does NOT take it back. The ding is the trap-62 half: "nothing
+        // happened" needs a moment it is true AT, and `AppendLogLines` returns when the tail
+        // has read the bytes rather than when the app has acted on them. The swing is written
+        // BEFORE the ding, so a level of 12 on the hover is proof the app has processed a line
+        // that comes after the swing — at which point the row's reading is evidence rather
+        // than a race.
+        app.AppendLogLines(
+            "You crush a training dummy for 25 points of damage.",
+            "You have gained a level! Welcome to level 12!");
+        app.WaitForDump("hudXpLevel", 12, "the app to have processed the lines after the swing");
+        Assert.Equal("dps,hps,xp", app.DumpText("hudGlance"));
+
+        // AND IT HOLDS STILL, which is the bug as the Founder saw it rather than as a rule.
+        // The row rebuilds once a second; the old code alternated on that timer, and one read
+        // of a flashing bar has a 50% chance of reading the right answer. So sample across
+        // five RENDERS — `tick` is the liveness fact that says a render happened, read from
+        // the same moment as the row so a sample is a sample of one frame (trap 56).
+        var rows = new HashSet<string>(StringComparer.Ordinal);
+        var lastTick = "";
+        var renders = 0;
+        Wait.Until(() =>
+        {
+            var seen = app.DumpTexts("tick", "hudGlance");
+            if (seen[0] == lastTick || seen[0].Length == 0) return false;
+            lastTick = seen[0];
+            rows.Add(seen[1]);
+            return ++renders >= 5;
+        }, TimeSpan.FromSeconds(30),
+            "five renders of the collapsed bar to sample (debug.txt tick has to move)");
+        Assert.Equal(["dps,hps,xp"], rows);
     }
 
     /// <summary>
@@ -171,9 +206,10 @@ public sealed class HudBarTests
         });
         app.Launch();
 
-        // The fixture is melee, so the third slot is the xp one and there IS a chip to
-        // hover — the -1 reading (swapped to HPS) would make both facts below meaningless.
-        app.WaitForDump("hudGlance", "xp", "the third slot to be the XP rate");
+        // The fixture is melee, so the row is DPS and the xp slot — and the xp slot is
+        // unconditional since DRA-72, so the row reading is here as the same-moment POSITIVE
+        // that the bar has drawn at all rather than as a question about which number it chose.
+        app.WaitForDump("hudGlance", "dps,xp", "the collapsed bar to have drawn its row");
         app.WaitForDump("hudXpEta", 1, "the fixture's xp rate to put a forecast on the hover");
         app.WaitForDump("hudXpLevel", 0, "no level known before any ding — stated, not omitted");
 

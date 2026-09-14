@@ -124,8 +124,10 @@ public partial class ProgressWindow : Window, IFollowingSurface
     /// #204/#209, #210 and #212. Here each finally gets a WORD beside it, which is more
     /// than the widget's bare star ever offered.
     ///
-    /// **"xp" left this row in Surface A / SA-1** and took nothing with it: XP%/hr is the
-    /// collapsed HUD's third number now, always on, so there is no toggle left to rehome.
+    /// **"xp" left this row in Surface A / SA-1** and took nothing with it: XP%/hr is the last
+    /// slot on the collapsed HUD's always-on row now, always there (DRA-72 made that
+    /// unconditional — it can no longer be swapped out by HPS), so there is no toggle left to
+    /// rehome.
     /// Its two siblings stay exactly as they were — the promotion was of one key, not of
     /// this row.
     /// </summary>

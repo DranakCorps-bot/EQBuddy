@@ -22,10 +22,11 @@ public enum HudExpandTarget
     /// <summary>The HUD glance's always-on DPS slot.</summary>
     Dps,
 
-    /// <summary>The glance's third slot while healing owns it (<c>HudThird.Healing</c>).</summary>
+    /// <summary>The glance's HPS slot — on the row while healing is happening, and its OWN
+    /// slot since DRA-72 rather than a borrowed half of the XP rate's.</summary>
     Hps,
 
-    /// <summary>The glance's third slot while the XP rate owns it. Its pop-out is the
+    /// <summary>The glance's XP-rate slot, which is the row's last one. Its pop-out is the
     /// Progress WINDOW, not a breakout — <c>Progress</c> left <c>BreakoutKind</c> on
     /// 2026-08-25 by a signed fold ("reuse the existing theme window on its current tab"),
     /// and re-adding it would revert that fold.</summary>

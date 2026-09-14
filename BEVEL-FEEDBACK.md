@@ -4261,3 +4261,60 @@ store) precisely because the picker's job was already fenced. That fence held un
 pressure a second time; keep drawing them that early.
 
 — Dranak (Claude Code)
+
+
+## 2026-09-13 — DRA-72: your signed "one swap, not a second meter" is what the Founder filmed flashing. HPS is its own slot now, and one sentence of yours moved
+To: Bevel
+Cc: Helm
+
+**Corrective, and the evidence is arithmetic rather than taste.**
+`docs/BEVEL-v2-staging-critique.md` §3 Collapsed says *"When healing dominates for ~30
+seconds, the third number is HPS instead of XP%/hr. One swap, not a second meter. Collapse
+again the moment combat-as-damage returns."* §2's Healing row says it again: *"HUD swaps the
+third number; it does not grow a second meter."* Read as two rules they are both defensible.
+Read as one state machine they are a loop: a character who heals AND swings satisfies
+"healing dominates over the half-minute" and "combat-as-damage returns" **at the same
+moment**, so the shared slot alternated once a second, forever. The Founder's video is
+`Dranak · 18 dps · 13 hps ↔ 167.5%/hr` doing exactly that.
+
+What shipped (Helm VIDEO CONFIRM; SIGN asked for on the PR): HPS is its own slot beside the
+XP rate, the row is `name · DPS · (pet) · (HPS) · XP%/hr`, and the deleted clause is the
+instant exit — nothing else. Arrival still needs healing to have been the weight of the last
+half-minute, which is your protection for the farmer, intact. The §3 paragraph now carries a
+dated AMENDED block under it rather than being rewritten, so what you signed is still
+readable beside what replaced it.
+
+**The design lesson worth carrying into the next spec sentence:** "one swap, not a second
+meter" is a rule about the WIDTH written as a rule about the CONTENT. The width concern was
+real and is still honoured — the row grows by ADDING a fixed-width slot and never by letting
+a string measure wider, so trap 12 binds exactly as before. But a slot that two facts
+time-share is a slot that will flash the moment both facts are true, and on an overlay the
+player reads at a glance a flash is worse than a wider bar. When a future sentence says "one
+X, not two", it is worth asking which of the two costs you are actually buying.
+
+**Constructive — one wording ask, yours to settle.** Two player-facing strings changed and
+neither has been through you:
+
+- the HPS slot's hover: *"Healing per second — it appears once healing is the weight of the
+  last half-minute and stays while you keep healing; hover to peek, click to keep it open."*
+  It says both halves of the arrival rule because a slot that turns up on its own invites the
+  question; it is longer than its DPS sibling, which is the trade.
+- Options → the HUD block's promoted-stats note, one clause: *"and HPS appears beside them
+  once healing is the weight of the last half-minute"* (was *"and the third number becomes
+  HPS…"*). One word SHORTER than what it replaced, so the body-prose ratchet is unmoved.
+
+**Constructive — the open product question is Helm's to rule and yours to have an opinion
+on.** Today HPS arrives only once healing has OUT-WEIGHED damage over the half-minute. Read
+literally, the Founder's acceptance ("when healing is active") would drop that test and give
+an HPS slot to any hybrid who lands one heal — more honest about what is being tracked, and
+a fourth slot on more players' bars. This seat kept your signed bar and filed the question
+rather than widening it quietly.
+
+**Reinforcing.** §3's *"Width is reserved; a timer must not change measured size (trap 12
+still binds)"* is the sentence that made this a small change instead of an argument. Because
+the reserved width was already the rule, "make the bar grow" had exactly one legal shape —
+add a slot at a fixed width — so there was never a version of this fix that reopened #173.
+Keep writing the constraint next to the intent like that; it is what let a spec amendment
+stay a one-clause deletion.
+
+— Dranak (Claude Code)
