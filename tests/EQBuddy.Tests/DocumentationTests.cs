@@ -42,7 +42,20 @@ public class DocumentationTests
         return null;
     }
 
-    public static TheoryData<string> DocFiles()
+    /// <summary>The rotated channel ledgers (DRA-75 / M0-2) are the one thing under
+    /// <c>docs/ops</c> that is a TRANSCRIPT rather than a map: what agents said to each
+    /// other, immutable, dated. Their paths were true when they were written, so
+    /// <c>scripts/release-review.ps1</c> and <c>/tmp/helm-entry.md</c> appear in them and
+    /// no longer exist — and the sweep's remedy ("fix the doc or restore the file") is
+    /// available for neither. A live doc is corrected; a record of what was said is not.
+    /// The archive's own <c>README.md</c> IS a map and stays swept.</summary>
+    private const string ChannelArchive = "docs/ops/claude-archive/channels/";
+
+    private static bool IsRotatedChannelLedger(string relative) =>
+        relative.StartsWith(ChannelArchive, StringComparison.Ordinal)
+        && !relative.EndsWith("/README.md", StringComparison.Ordinal);
+
+    private static List<string> SweptDocs()
     {
         // Live manuals plus the 2026-09-08 ops split (verification ladder, flake
         // ledger, CLAUDE archive). Archive novels stay true the same way CLAUDE.md
@@ -59,11 +72,57 @@ public class DocumentationTests
             files.AddRange(Directory
                 .EnumerateFiles(ops, "*.md", SearchOption.AllDirectories)
                 .Select(p => Path.GetRelativePath(Repo, p).Replace('\\', '/'))
+                .Where(p => !IsRotatedChannelLedger(p))
                 .OrderBy(p => p, StringComparer.Ordinal));
         }
+        return files;
+    }
+
+    public static TheoryData<string> DocFiles()
+    {
         var data = new TheoryData<string>();
-        foreach (var f in files) data.Add(f);
+        foreach (var f in SweptDocs()) data.Add(f);
         return data;
+    }
+
+    /// <summary>
+    /// The paired must-list for the exclusion above (trap 34), and its non-vacuity check
+    /// (trap 78). An exemption that silently stops matching anything is the same defect as
+    /// no exemption — except green. So: the transcripts must actually BE there and excluded,
+    /// the archive's README must still be swept, and every OTHER ops doc must stay swept.
+    /// </summary>
+    [Fact]
+    public void OnlyTheRotatedChannelTranscriptsAreExemptFromTheLivePathSweep()
+    {
+        var channels = Path.Combine(Repo, "docs", "ops", "claude-archive", "channels");
+        Assert.True(Directory.Exists(channels),
+            "the rotated channel archive is missing — the exemption below would be vacuous");
+
+        var onDisk = Directory
+            .EnumerateFiles(channels, "*.md", SearchOption.AllDirectories)
+            .Select(p => Path.GetRelativePath(Repo, p).Replace('\\', '/'))
+            .OrderBy(p => p, StringComparer.Ordinal)
+            .ToList();
+        var transcripts = onDisk.Where(IsRotatedChannelLedger).ToList();
+        Assert.NotEmpty(transcripts);
+
+        var swept = SweptDocs();
+
+        // The transcripts are out.
+        foreach (var t in transcripts)
+            Assert.DoesNotContain(t, swept);
+
+        // The archive's own map is in — it is the one file in there that a reader
+        // navigates by, so a dead pointer in it is the ordinary failure this file catches.
+        foreach (var readme in onDisk.Except(transcripts, StringComparer.Ordinal))
+            Assert.Contains(readme, swept);
+
+        // And nothing else under docs/ops slipped out with them.
+        var everyOpsDoc = Directory
+            .EnumerateFiles(Path.Combine(Repo, "docs", "ops"), "*.md", SearchOption.AllDirectories)
+            .Select(p => Path.GetRelativePath(Repo, p).Replace('\\', '/'));
+        foreach (var doc in everyOpsDoc.Except(transcripts, StringComparer.Ordinal))
+            Assert.Contains(doc, swept);
     }
 
     [Theory]

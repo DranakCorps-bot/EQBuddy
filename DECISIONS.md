@@ -1,4 +1,4 @@
-## 2026-09-14 — DRA-75 / M0-2 (channel archive + 30-day rotation): eight calls I made alone, one instruction that could not be carried out as written, and a guard that was right to stop me
+## 2026-09-14 — DRA-75 / M0-2 (channel archive + 30-day rotation): nine calls I made alone, one instruction that could not be carried out as written, and two guards that were right to stop me
 
 `exo-experiment: channel-rotation` · Tier T1 · governing plan: DRA-73 plan document
 rev 2, approved by David 2026-09-14 (SS4.1 + SS8.3; SS10.1 asks for this tag so the
@@ -26,7 +26,7 @@ Measured, they were **two copies of one history**: commit `c7a597a8` flattened t
 later append did it again. The file had not grown — it had been duplicated and mangled.
 The readable history was never lost; it is in git at `f4af3b5f`.
 
-**The eight calls.**
+**The nine calls.** (The ninth was forced by CI after the first eight were pushed.)
 
 1. **The `HELM-FEEDBACK.md` archive carries RECOVERED READABLE TEXT, not the bytes that
    were on disk.** The default — and the literal reading of "archive the debt" — was to
@@ -82,6 +82,30 @@ The readable history was never lost; it is in git at `f4af3b5f`.
    > against the bytes from a plain checkout, not asserted with a git SHA that nobody will
    > have. The 4.93 MB is the cost of that being verifiable, and it buys a guard that
    > passes unmodified.
+9. **The archived ledgers are EXEMPT from the doc-liveness sweep; the archive's README is
+   not.** CI caught what local verification missed:
+   `DocumentationTests.EveryFileTheDocsPointAtExists` sweeps every `.md` under `docs/ops`
+   and reddened on all three archived ledgers, because they name paths that were true when
+   an agent typed them and are not now. **Both of that test's remedies are unavailable
+   here** — the file is immutable by construction, and the paths are history, not error.
+   > **Default it could have gone the other way on:** edit the archived ledgers to remove
+   > the dead paths (which forfeits the immutability the whole rotation rests on), or park
+   > the archive outside `docs/ops` where the sweep cannot see it.
+   > **Where it landed:** a narrow exemption keyed on the `channels/` DIRECTORY, so the
+   > next rotation inherits it without a code change — paired, per trap 34, with
+   > `OnlyTheRotatedChannelTranscriptsAreExemptFromTheLivePathSweep`, which reddens if the
+   > exemption ever matches nothing (trap 78), if the README slips out of the sweep, or if
+   > any other `docs/ops` doc slips out with the transcripts. Prove-failed by disabling the
+   > predicate: 4 red, 21 green. The README stays swept because it is the one file in there
+   > a reader navigates BY.
+
+   **This is the entry's one genuine miss, and it is trap 79's shape in a new place:** I
+   verified the rotation against the guard built for channel files and against the
+   rotation script's own containment assertions, and never asked what OTHER committed
+   guard reads `docs/ops/**`. A 12,000-line file landing in a swept directory is a new
+   INPUT to every doc test, not just to the one whose subject it is. **Local greens are
+   not CI** — and here the thing local runs never covered was a suite I did not think to
+   name.
 
 **Verification.** `verify` asserts every original entry block survives byte-exact across
 archive + active: `FABLE-FEEDBACK.md` 174 original blocks → 139 + 35 = 174, all 1,180,174

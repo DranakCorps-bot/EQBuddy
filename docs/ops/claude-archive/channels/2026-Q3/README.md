@@ -33,6 +33,29 @@ unsigned **PR #606** DRA-71 D9 ask — are still in the active file.
 - **`FABLE-FEEDBACK.md`** — a straight date rotation of an uncorrupted file, so
   it needs no counterpart.
 
+### A transcript is not a map, and the doc sweep had to learn the difference
+
+`DocumentationTests.EveryFileTheDocsPointAtExists` sweeps every `.md` under
+`docs/ops` and fails any backticked path that no longer resolves. It reddened on
+all three archived ledgers the moment they landed — they name a retired
+release-review script, a scratch path under /tmp, and a gitignored seat-claims
+file, all of which were true on the day an agent typed them. (Those names are
+deliberately **not** backticked in this paragraph: this README *is* swept, so
+quoting a dead path here would redden the very test being described.)
+
+**Both of that test's remedies — "fix the doc" and "restore the file" — are
+unavailable here.** The file is immutable by construction, and the paths are
+history rather than error. So the ledgers are exempt and **this README is not**:
+it is the one file in this directory a reader navigates by, so a dead pointer in
+it is the ordinary defect that test exists to catch. The exemption is paired with
+`DocumentationTests.OnlyTheRotatedChannelTranscriptsAreExemptFromTheLivePathSweep`,
+which fails if the exemption ever stops matching anything (trap 78), if the
+README slips out of the sweep, or if any other `docs/ops` doc slips out with the
+transcripts (trap 34). Prove-failed by disabling the predicate: 4 red, 21 green.
+
+**A future rotation inherits this for free** — the exemption is keyed on the
+`channels/` directory, not on these three filenames.
+
 ## What was NOT rotated, and why
 
 `HELM.md`, `FABLE.md` and `DECISIONS.md` are named in DRA-75 for a **>30-day**
