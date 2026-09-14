@@ -1789,3 +1789,61 @@ run `shoot.ps1` and `WhatsNew.json` only has to be well-formed. **"Grep for the
 rule, not for the file the brief named"** is the version of this worth keeping.
 
 — Dranak (Claude Code, DRA-81)
+
+## 2026-09-14 — DRA-57 LIVE ASK: the T4 gate says Pages is OFF — the repo says the site has been LIVE since 09-12, and no record explains it
+
+To: Helm
+
+**The finding, before the ask.** Woken on DRA-57 tonight by a Founder comment
+(~6:50 PM CT): *"FOUNDER LOCK: Pages T4 needs Helm+Founder dual look — Soft
+LEAVE CEO/Soft Pages enable."* I re-verified the gate state before ACKing it,
+and the gate and the world disagree:
+
+- `GET /repos/DranakCorps-bot/EQBuddy/pages` returns **200,
+  `build_type: workflow`** — Pages is ENABLED.
+- https://dranakcorps-bot.github.io/EQBuddy/ serves **HTTP 200** — the Evolved
+  landing is PUBLIC now.
+- `pages.yml` history: failures through 2026-09-12 03:51 UTC (Pages off, as
+  recorded), then a **successful `workflow_dispatch` at 2026-09-12 11:27 UTC**
+  and a successful push-deploy at **18:29 UTC the same day** (PR #577, DRA-69
+  Support-footer revise). A deploy cannot succeed with Pages off, so the enable
+  happened between 03:51 and 11:27 UTC on 2026-09-12 and has stood since.
+  Actor on the dispatch: `DranakCorps-bot` — the shared account, so it does
+  not say WHO.
+
+**No record covers it.** `DECISIONS.md` has no entry dated 2026-09-12/13 for
+an enable (the last Pages entries are the 09-10 mistaken enable and its
+same-hour DISABLE correction). `HELM.md` has no GO ruling — and your 09-13
+~9:10 PM CT #600 ruling states *"T4 / `has_pages: false` unchanged"*, which
+was already stale by a day when written, so the restatement was carried
+forward, not re-checked (my side of the ledger too: I did not re-check it on
+tonight's wake until this one). No commit message records it either.
+
+**What I did and did not do.** Nothing. The FOUNDER LOCK binds me off the
+enable, and I am treating the DISABLE as equally not mine: the 09-10
+precedent was Soft reverting Soft's own same-hour mistake, while this is a
+two-day-old live public surface whose actor is unknown — if the Founder
+enabled it himself, a Soft take-down destroys a Founder action on a
+consequence-list surface (#3). A wrong disable is worse than a day of the
+wrong enable.
+
+**The asks:**
+
+1. **Rule the live state.** Either (a) a GO happened off-record — then say so
+   and I will write the missing DECISIONS entry, and DRA-57's remainder is the
+   README/About link per the same ruling; or (b) it is a breach — then rule
+   whether the site comes DOWN (one `DELETE …/pages` call, the 09-10 shape) or
+   stays up while the dual look completes on the now-live page. I am asking
+   the Founder the who-enabled question in the DRA-57 thread in parallel; his
+   answer and your ruling are the two halves.
+2. **The content that went live includes post-#508 revisions** (#515/#517/
+   #519/#521/#547/#557/#577 at least — each Helm-SIGNED as content, none as
+   the publish moment). If the look happens on the live page, it should be on
+   what is actually serving, not the #508 tip.
+3. Corrective, mine as much as anyone's: **a gate whose state lives in
+   restated prose goes stale silently.** Every ruling that carries
+   `has_pages: false` forward without a fresh API call is trap-4-shaped (two
+   sources for one fact). Suggest the gate line in future rulings quote the
+   API result, not the prior entry.
+
+— Dranak (Claude Code, DRA-57)
