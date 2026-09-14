@@ -612,6 +612,15 @@ function Get-Experiments {
 # Rendering
 # ---------------------------------------------------------------------------
 
+function Resolve-OutPath {
+    <# `Join-Path $RepoRoot $absolute` silently produces `C:\repo\C:\temp\…`, which
+       fails with a syntax error rather than writing where it was told. The defaults
+       are repo-relative; anything a caller passes may not be. #>
+    param([string]$Path)
+    if ([System.IO.Path]::IsPathRooted($Path)) { return $Path }
+    return (Join-Path $RepoRoot $Path)
+}
+
 function Write-Utf8NoBom {
     param([string]$Path, [string]$Text)
     $full = [System.IO.Path]::GetFullPath($Path)
@@ -690,7 +699,14 @@ function Invoke-SelfTest {
     Assert ($null -eq (Get-Median -Values @())) 'Median of nothing answered a number rather than unmeasured.'
     Assert ($null -eq (Format-Number -Value $null | Where-Object { $_ -ne '`unmeasured`' })) 'A null metric did not render as unmeasured.'
 
-    # 7. An empty needle list must THROW rather than report clean (trap 78's
+    # 7. Output paths. `Join-Path $RepoRoot $absolute` produces `C:\repo\C:\temp\…`
+    #    and dies with a path-syntax error instead of writing where it was told.
+    $abs = [System.IO.Path]::Combine([System.IO.Path]::GetTempPath(), 'exo-out.md')
+    Assert ((Resolve-OutPath $abs) -eq $abs) 'An absolute -Out path was joined onto the repo root.'
+    Assert ((Resolve-OutPath 'docs/ops/exo-dashboard.md') -ne 'docs/ops/exo-dashboard.md') `
+        'A relative -Out path was not made repo-relative.'
+
+    # 8. An empty needle list must THROW rather than report clean (trap 78's
     #    whole lesson: the guard that matched nothing said the file was fine).
     $threw = $false
     try { Test-ContainsAny -Text 'anything' -Needles @() | Out-Null } catch { $threw = $true }
@@ -911,7 +927,7 @@ if ($costedDra.Count -gt 0) {
 $experiments = Get-Experiments -DecisionsPath (Join-Path $RepoRoot 'DECISIONS.md')
 
 $frozen = $null
-$baselinePath = Join-Path $RepoRoot $BaselineFile
+$baselinePath = Resolve-OutPath $BaselineFile
 if ((Test-Path $baselinePath) -and -not $Baseline) {
     $frozen = [System.IO.File]::ReadAllText($baselinePath, [System.Text.Encoding]::UTF8) | ConvertFrom-Json
 }
@@ -1195,7 +1211,7 @@ Add-Line '`PAPERCLIP_API_URL` / `PAPERCLIP_API_KEY` / `PAPERCLIP_COMPANY_ID`. Wi
 Add-Line 'the GitHub-derived rows still compute and the Paperclip-derived ones read'
 Add-Line '`unmeasured` — `-NoPaperclip` makes that explicit.'
 
-$outPath = Join-Path $RepoRoot $Out
+$outPath = Resolve-OutPath $Out
 Write-Utf8NoBom -Path $outPath -Text ($sb.ToString())
 Write-Host "Wrote $Out"
 
