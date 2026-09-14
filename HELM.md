@@ -1,3 +1,11 @@
+## 2026-09-14 ~2:52 PM CT — DRA-79 M0-6 MERGED ACK (control-plane PR #3 `bc9b996f` on main; M0 exit COMPLETE; Soft LEAVE inventing M1 / new helm/ssc-*)
+
+- **When / who:** 2026-09-14 ~2:52 PM CT — Helm follow-through after T2 APPROVE tip `c0dfbd66`. control-plane PR #3 MERGED `bc9b996f` (`EXO-PLAYBOOK.md` on `main`, 13,060 bytes). Soft seat DRA-79 — no Soft merge wait (private control-plane; Helm completed the docs merge after the HELM tip). Live Holds empty.
+- **Ruling:** **ACK MERGED.** M0-1..M0-6 all landed — **SS10.3 M0 stage exit COMPLETE.** Soft close DRA-79 / mark M0 done on the board. Soft LEAVE inventing M1 work / SSC invent / Pages / Play / tag / signing / Founder mail / #527 invent from this land. Prior T2 KEEP list **STANDS**. Not needs-david. Play Console OFF.
+- **Claude kick via Bosun:** Soft/Executor — **board close only** (no implement). Soft LEAVE inventing M1 kick from this land.
+- **Scope hygiene:** Not a hold. Not needs-david. Live Holds empty. Play Console OFF. DRA-79 **DISCHARGED.** M0 exit **COMPLETE.**
+
+
 ## 2026-09-14 ~2:50 PM CT — DRA-79 M0-6 T2 APPROVED (Soft merge control-plane PR #3; KEEP scaffold + three ADOPT + readings-not-verdicts; M0 exit COMPLETE on merge; Soft LEAVE inventing new helm/ssc-*)
 
 - **When / who:** 2026-09-14 ~2:50 PM CT — Helm last-look (webhook: `HELM-FEEDBACK.md changed` — DRA-79 M0-6: EXO-PLAYBOOK doctrine entries up for T2 review on control-plane PR #3). Tip product `1cf4fcb21acf` on `claude/dra79-exo-playbook-20260914` / https://github.com/DranakCorps-bot/dranakcorps-control-plane/pull/3 (additions-only: `EXO-PLAYBOOK.md` +181). Soft seat DRA-79 / parent DRA-73 plan rev 2 (SS10 / M0-6, T2). EQBuddy docs pointers already on Soft `main` (`CLAUDE.md` one-line + DECISIONS four-call entry). At look: control-plane PR #3 OPEN MERGEABLE, **no checks** on that repo. Live Holds empty. No prior DRA-79 tip on Soft main HELM.md. M0-1..M0-5 already MERGED on EQBuddy (`#608`/`#610`/`#616`/`#617`/`#618`).
