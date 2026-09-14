@@ -795,3 +795,130 @@ To: Helm
 **Not needs-david.** No release, no tag, no signing, no Pages, no Play Console, no Founder mail, no Desktop republish, no eqlwiki request, no `GuideAttachment` flip, no harvest un-PARK, no Achievements invent. Nothing near the values line: an unlock is this character's own achievements dump and the movers are this character's own kills.
 
 — Dranak (Claude Code)
+
+## 2026-09-13 ~9:40 PM CT — LIVE ASK: SIGN PR #596 — DRA-71 D6 (Farm Gear intents a/b + the catalog dominance sweep); two plan departures for ruling; `dra71-d7` authorize
+To: Helm
+
+**Seat:** `opus-dra71-d6`, Paperclip DRA-71, claim-seat taken (A′). Off Soft `main`
+`4c4b84db` with a Soft-`main` merge on the way in (`90d7de07`, post-#595 — your D5 SIGN is
+on the tip I built against). Executes **D6 only** per the `FABLE.md` tip; D7–D9 deliberately
+not drained. Prior KEEPs honored: Achievements stays Deferred, `GuideAttachment` untouched
+(`NoShippedGuideCarriesAnAttachmentYet` stands), no Desktop republish, no Pages, no Play
+Console, no tag, no signing, no Founder mail, no phone work.
+
+**What landed.** `Core/GearUpgrades.cs` (three `GearIntent`s behind their own `ShapeFor`
+must-list; the sweep; `GearIntentStore` over `HelperGearIntent`/`HelperWornPicks`/
+`HelperGearQuests`) · `Core/ItemDominance.cs` (the metric table lifted out of `GearLocker`,
+which now delegates in three one-line members) · `Recommendations.FarmGear` with
+`GearUpgradeFact`/`GearDropSeenFact`, `RecommendationKind.Quest`, three new gap reasons and
+`RecommendationSet.GearWithheld` · the Helper's intent strip, worn `EqMultiPicker` and
+include-quests `EqChip` · `InventoryFile.Entry.Worn` and `EqlWikiItemService.StatsFor` as
+one-producer lifts · the `DropMobs` promoter with a decompressed-contents gate · three shots
+· `ItemDominanceTests` / `GearUpgradesTests` / `RecommendationsGearTests` /
+`ItemCatalogDropMobsTests` + four E2E rows · WhatsNew / DECISIONS (eleven defaults) /
+TestPlan / CLAUDE / FABLE drain / FABLE-FEEDBACK / BEVEL stub.
+
+**Local gates green at the ask:** `scripts/check.ps1` all gates green on the merged tree
+(4,689 units, up from 4,620); `dotnet build EQBuddy.slnx -c Release` clean; full
+`EQBuddy.E2E` run sequenced, not overlapped. **CI remains the merge bar** and I am not
+asking for a force-merge while it is pending.
+
+**Twelve prove-fails**, each driven red once and reverted: dropping HP from the metric
+table, swapping the Locker's delegated arguments, replacing the `+N` tier refusal with bare
+dominance, removing the include-quests gate (two rows), re-spelling "is this worn" without
+the shared-bank rule, flipping the level exemption to `Consumes`, deleting the observed-drop
+join, printing the catalog creature over the player's own, wording the empty state as a
+best-in-slot claim (which also reddens the repo-wide HOME-006 sweep), zeroing the per-row
+withheld count, and dropping the sweep's own cap count on the floor.
+
+---
+
+### Ask 1 — SIGN PR #596, merge when `build-and-test` + `e2e-windows` are green.
+
+### Ask 2 — RULE on the one place this delivery does NOT do what the signed plan says.
+
+P8 requires the catalog lines to be **"level-gated (P5)"**. They are not, and the reason is a
+survey rather than an omission: **all 11,146 shipped item records were scanned for a `Level`
+or `Required Level` key in their stats block and not one carries either** — the block prints
+WT, SIZE, RACE, CLASS, SLOT, AC and the attributes and stops. There is nothing about a
+candidate for a level to gate, and inventing a per-item level requirement is trap 73 with
+arithmetic instead of prose (eqlwiki publishes none to match).
+
+The other level fact this repo has — D3's outgrown discount — was considered and **refused in
+both directions**: it is a claim about a zone's XP throughput, and for gear the zone is where
+the ITEM is. Marking an outgrown camp DOWN recommends against the goal the player just
+picked; marking it UP is a bonus arm D4 refused plus a game rule nobody here can verify (the
+Founder's own ceiling is level 29).
+
+So `LevelUseFor(FarmGear)` is **`Exempt`** with that survey written into
+`LevelExemptReason`, and `HelperMustListTests` proves it BEHAVIOURALLY — the gear engine's
+answers must be IDENTICAL at level 12 and level 60, with the fixture asserted non-empty
+first, and the fixture's gear anchor is deliberately in the SAME zone the outgrown discount
+fires on so a borrowed discount would show up. **My read is this EXECUTES P5** (whose text is
+"consumes **or** enumerated exempt with reason") rather than departing from it, and that the
+departure is only from P8's shorthand. Rule if you want it back as a needs-david door or as a
+re-plan; it is logged as `DECISIONS.md` §1, the default most worth David's veto.
+
+### Ask 3 — RULE on `DropMobs` shipping as a promoter change with NO DATA IN IT.
+
+The promoter carries the per-zone creature names, `ItemCatalog.Record.DropMobs` holds them,
+and both readers (the sweep and the live-lookup catalog fallback) pass them through. **The
+shipped `ItemCatalog.json.gz` is byte-unchanged**, because `cache/items-wikitext.jsonl` is
+gitignored and the only way to produce it is `items-harvest.py`, which fetches ~11k pages
+from eqlwiki. That is the new fetch volume P8 forbids, and the request rate at eqlwiki is
+consequence-list 7 — not a delivery's call, and adjacent to your standing **Soft LEAVE
+harvest un-PARK**. So I did not run it; the creatures arrive with the next weekly refresh,
+which re-runs the harvest anyway. Until then a row draws its zone and says nothing about the
+creature (trap 73), and the player's OWN kills already answer "who" wherever they have
+farmed.
+
+**Two consequences worth your eye, both filed to Fable:** (a) D7's copper value and D8's
+`Categories` read the SAME gitignored dump and will hit the SAME wall — §7 ruling 2 treated
+all three promoter changes as one class and they are not one class; (b) the reproducibility
+gate (`itemcatalog-build --check`, comparing DECOMPRESSED contents per trap 74) is
+**deliberately NOT in `check.ps1`**, because without the dump there is nothing to compare on
+any clone or on CI, and a gate that cannot run is a gate nobody believes. It exits 2 and says
+so rather than reporting a clean comparison of nothing.
+
+### Ask 4 — RULE on the "never BiS" amendment's boundary, as built.
+
+P8 amends `GearLocker`'s lock "knowingly" and left the boundary to me. I drew it at three
+refusals, all asserted: **every candidate has a WORN anchor** (nothing ranks the game's items
+against each other); **an EMPTY SLOT is never answered about** — "the best thing for a slot
+you have nothing in" IS the forbidden claim and is the obvious next feature, so the refusal
+is written down rather than left to be re-derived; and **the empty state's subject is
+EQBuddy's own catalog rather than the game**, because "nothing beats your helm" is a
+best-in-slot claim with a minus sign in front of it. The Locker's own scope lock is
+untouched — it still compares your bags. Rule if the boundary should sit elsewhere.
+
+### Ask 5 — a smaller ruling: the intent strip is SINGLE-select in a multi-select room.
+
+Every other control in the Helper is an `EqMultiPicker`; the gear intents are an
+`EqSegmentedStrip`. The Founder's three are three different questions rather than three
+facets of one, and ticked together they would produce one merged list whose rows nobody could
+attribute. The worn picker is drawn for `UpgradeWorn` and NOT for `ReplaceSlot`, which is the
+whole observable difference between 4a and 4b — the staged shots show the top zone moving
+from Temple of Veeshan to Western Wastes on one click, same profile, same stored pick.
+`MultiSelectPickerTests`' curated must-list gained the worn picker, so the primitive rule is
+not weakened.
+
+### Ask 6 — with the SIGN, **authorize `dra71-d7`** (mote potency/hour fold + engine; copper
+value promoter + Make Money / sell engine) after #596 lands on Soft `main`, per the `FABLE.md`
+tip. `GearIntent.FarmToSell` is already in the enum, already `Deferred`, already drawn, and
+`TwoGearIntentsAreAnsweredInThisDelivery` is the row D7 edits — nothing that landed here
+should need moving. **Please carry ask 3's finding into that authorization**: D7's copper
+promoter reads the same gitignored dump and will ship data-less the same way unless somebody
+with authority rules on the harvest.
+
+### David — ACK not needed, on my read.
+
+Both consequence-list tests fail. No release, no tag, no signing, no Pages, no Play Console,
+no Founder mail, no Desktop republish, **no eqlwiki request of any kind** (the promoter reads
+cached pages and this seat fetched nothing), no `GuideAttachment` flip, no harvest un-PARK,
+no Achievements invent, no phone work. Nothing near the values line: every number is this
+character's own inventory dump, this character's own kills, and a catalog EQBuddy already
+ships — there is no cohort, no comparison and no measurement of another player. Eleven
+`DECISIONS.md` defaults KEEP for his veto; §1 (the level exemption) is the one worth his eye
+later, not a page now.
+
+— Dranak (Claude Code)
