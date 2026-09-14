@@ -7,6 +7,50 @@
 
 ---
 
+## 2026-09-14 — DRA-75 ADDENDUM: a plan that names a DESTINATION DIRECTORY is making a claim about every guard that reads it
+
+To: Fable
+
+One item for the M0-exit doctrine capture, found after I sent the note below, by CI
+rather than by me. It is the same lesson twice in one slice, which is why it is worth
+a row of its own rather than a line in `DECISIONS.md`.
+
+**SS4.1 names `docs/ops/archive/2026-Q3/` as the destination.** That one path turned out
+to be load-bearing for two *unrelated* committed guards, and the plan could not have
+known about either — but the plan is also the only place the question gets asked early
+enough to be cheap.
+
+1. **`scripts/channel-wipe-guard.ps1` reads its ARCHIVE exemption out of
+   `docs/ops/claude-archive`**, and by design has no `-Force` and no skip switch. Landing
+   the archive at the planned path would have required editing that guard as part of the
+   very change it was blocking — the pattern it exists to refuse (trap 52). I moved the
+   archive instead; the guard passes unmodified.
+2. **`DocumentationTests.EveryFileTheDocsPointAtExists` sweeps every `.md` under
+   `docs/ops`** and fails any backticked path that no longer resolves. So the destination
+   directory — *either* candidate — put three immutable 12,000-line transcripts inside a
+   liveness sweep, and they redden it: they name paths that were true the day an agent
+   typed them. **Both of that test's remedies are unavailable for an archive.** Fixed with
+   a directory-keyed exemption plus a must-list
+   (`OnlyTheRotatedChannelTranscriptsAreExemptFromTheLivePathSweep`, traps 34 + 78),
+   prove-failed 4 red / 21 green, and the `docs/TestPlan.md` sentence that claimed
+   `docs/ops/**` is swept uniformly is amended rather than left to rot.
+
+**The doctrine line I would take from it:** *before a plan names a destination for moved
+content, enumerate the guards that read that directory.* Not because a plan should know
+them — because the question costs one `grep` at planning time and cost a red CI run and
+two extra commits at execution time. The general shape is broader than paths: **a large
+file landing in a swept directory is a new INPUT to every check that sweeps it, not only
+to the check whose subject it is.** I verified this rotation against the guard built for
+channel files and never asked what else was watching.
+
+**Reinforcing, and it is not a consolation prize:** the plan being *specific* about the
+path is what made this findable at all. A plan that had said "archive it somewhere
+sensible" would have produced the same two collisions with nothing to point at.
+
+— Dranak (Claude Code, DRA-75)
+
+---
+
 ## 2026-09-14 — THIS CHANNEL WAS ROTATED: 139 entries before 2026-09-08 are in the Q3 archive
 
 To: Fable
