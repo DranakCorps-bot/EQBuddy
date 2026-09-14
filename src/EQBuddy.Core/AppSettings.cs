@@ -20,8 +20,8 @@ public sealed class AppSettings
     /// <summary>Which stats have a ★ and therefore a cell on the collapsed HUD bar.
     ///
     /// **"xp", "dps" and "hps" are no longer members of this list** — they were PROMOTED
-    /// to the always-on HUD numbers in Surface A / SA-1 (the collapsed trio: name, DPS,
-    /// XP%/hr with HPS taking the third slot while healing dominates), and a promotion
+    /// to the always-on HUD numbers in Surface A / SA-1 (name, DPS, XP%/hr — plus HPS in its
+    /// OWN slot beside them while healing is happening, DRA-72), and a promotion
     /// removes the toggle. <see cref="MigratePromotedHudStats"/> strips them from
     /// existing profiles; the default lost "dps" for the same reason.</summary>
     public List<string> MiniStats { get; set; } = ["kills"];
@@ -56,14 +56,15 @@ public sealed class AppSettings
     public List<string> MiniBarOrder { get; set; } = [];
 
     /// <summary>
-    /// Pet DPS sits in the collapsed HUD's always-on row, between DPS and the third number
-    /// (SIGNED #422, owner lock 2026-09-07 ~7:36 PM CT — the lock widens glance MEMBERSHIP,
+    /// Pet DPS sits in the collapsed HUD's always-on row, between DPS and the metrics that
+    /// follow it (SIGNED #422, owner lock 2026-09-07 ~7:36 PM CT — the lock widens glance MEMBERSHIP,
     /// not glance ORDER).
     ///
     /// **FALSE — the default — is today's row byte for byte**, the same floor-is-the-default
     /// construction <see cref="MiniBarOrder"/>'s empty list and
     /// <see cref="HudPanelParkLeft"/>'s NaN use: an untouched profile draws name · DPS ·
-    /// third, a reset restores it, and there is no <c>ApplyMigrations</c> entry to get wrong
+    /// (HPS) · XP%/hr, a reset restores it, and there is no <c>ApplyMigrations</c> entry to
+    /// get wrong
     /// because there is nothing to migrate.
     ///
     /// **Written at the DROP of a chip drag and nowhere else** — #191's rule, and #252's
@@ -76,8 +77,9 @@ public sealed class AppSettings
     ///
     /// **One optional slot, not a glance ORDER.** A <c>HudGlanceOrder</c> list was rejected
     /// as over-general: exactly one slot can move, a list invites reordering the fixed slots
-    /// (#413's reasoning — the third slot swaps identity mid-session, so a drop landing ON it
-    /// would change meaning under the cursor) and it buys a migration surface for nothing.
+    /// (#413's reasoning — a fixed slot that swaps identity mid-session would change meaning
+    /// under the cursor; since DRA-72 none of them does, which makes the refusal safer rather
+    /// than stale) and it buys a migration surface for nothing.
     ///
     /// **It is a THIRD verb, so it is a third setting.** <see cref="MiniStats"/> is the ★
     /// (may this stat show at all) and <see cref="MiniBarOrder"/> is the place among the

@@ -123,8 +123,9 @@ internal sealed class HudBarView
 
     /// <summary>
     /// A target's chip offset from the widget's left edge, in <c>Window.Left</c>'s own units,
-    /// or NaN when this bar has no chip for it (the third slot is HPS and Progress was asked
-    /// for; the hook fired before the bar drew; the widget is not minimized at all).
+    /// or NaN when this bar has no chip for it (HPS was asked for and the player is not
+    /// healing, so that slot is not on the row; the hook fired before the bar drew; the
+    /// widget is not minimized at all).
     ///
     /// **The transform is the framework's, so trap 1 cannot happen here**: the bar's content
     /// sits under the widget's UI-scale <c>LayoutTransform</c> and
@@ -151,35 +152,56 @@ internal sealed class HudBarView
         catch (InvalidOperationException) { return double.NaN; }
     }
 
-    /// <summary>Which number the glance's third slot currently is. Held here because the
-    /// swap has hysteresis: <see cref="HudGlance"/> is a pure decision and needs to be
-    /// told what it decided last time. Also the <c>hudGlance</c> dump fact.</summary>
-    public HudThird Third { get; private set; } = HudThird.Experience;
+    /// <summary>Which CONDITIONAL slots the always-on row is carrying. Held here because
+    /// the HPS slot's arrival has hysteresis: <see cref="HudGlance"/> is a pure decision and
+    /// needs to be told what it decided last time.</summary>
+    public HudGlanceState State { get; private set; } = HudGlanceState.Start;
 
-    /// <summary>The <c>hudGlance</c> dump value — the dump is space-separated
-    /// <c>key=value</c>, so this is one word.</summary>
-    public string GlanceKey => Third == HudThird.Healing ? "hps" : "xp";
-
-    /// <summary>Was the optional PET slot drawn in the always-on row this render — the
-    /// <c>hudGlancePet</c> dump fact (SIGNED #422 §8), 1 or 0.
+    /// <summary>The always-on row's metric slots as DRAWN, left to right — the
+    /// <c>hudGlance</c> dump fact, which reads <c>dps,xp</c> for a melee character and
+    /// <c>dps,hps,xp</c> while healing is on the row.
     ///
-    /// **Recorded on the way past, never read back off the setting** (trap 42). "The profile
-    /// says HudGlancePet" and "the row drew a pet slot" are different claims and only the
-    /// second one is the feature — a dump that asked <c>_settings</c> again would report this
-    /// working on a tree where <see cref="RenderGlance"/> had gone on drawing three slots. It
-    /// is also the same-tick POSITIVE that the "pet is not drawn twice" negative waits on
-    /// (trap 62): <c>hudCellOrder</c> losing "pet" is only evidence at a moment this says the
-    /// insert had actually happened.</summary>
-    public int GlancePetKey { get; private set; }
+    /// **It is a LIST since DRA-72, and that is the fact the old one could not carry.** The
+    /// value used to be one word, "xp" or "hps", because the two shared a slot — so the dump
+    /// could say which of them the bar had chosen and could not say that both were up. The
+    /// bug being fixed is exactly "both should be up", and a fact that cannot express the fix
+    /// cannot witness it.
+    ///
+    /// **Recorded on the way past rather than re-asked** (trap 42), which is the same rule
+    /// <see cref="CellOrderKey"/> follows one row down: "HudGlance would answer dps,hps,xp"
+    /// and "the row drew dps,hps,xp" are different claims and only the second is the
+    /// feature.</summary>
+    public string GlanceKey { get; private set; } = "-";
 
-    /// <summary>The xp chip's hover text as it was last DRAWN, or null while the third
-    /// slot is HPS and there is no xp chip to hover (OE-3).
+    /// <summary>Was the player-inserted PET slot drawn in the always-on row this render —
+    /// the <c>hudGlancePet</c> dump fact (SIGNED #422 §8), 1 or 0.
+    ///
+    /// **Read off the same recorded row <see cref="GlanceKey"/> reports, never off the
+    /// setting** (trap 42, and trap 4 for the pair): "the profile says HudGlancePet" and "the
+    /// row drew a pet slot" are different claims and only the second one is the feature — and
+    /// two INDEPENDENT records of what the row drew would be two sources for one fact, which
+    /// is how a dump ends up contradicting itself. It is also the same-tick POSITIVE that the
+    /// "pet is not drawn twice" negative waits on (trap 62): <c>hudCellOrder</c> losing "pet"
+    /// is only evidence at a moment this says the insert had actually happened.</summary>
+    public int GlancePetKey => _glanceRow.Contains(MiniBarPresentation.PetKey) ? 1 : 0;
+
+    /// <summary>The metric keys the always-on row drew this render, in order — the one
+    /// record both <see cref="GlanceKey"/> and <see cref="GlancePetKey"/> read.</summary>
+    private readonly List<string> _glanceRow = [];
+
+    /// <summary>The xp chip's hover text as it was last DRAWN (OE-3), or null when the row
+    /// drew no xp slot at all.
     ///
     /// Recorded at the point the string is handed to the control rather than recomputed
     /// for the dump: "the tooltip says level 27" and "the app would compute 27 if asked"
-    /// are different claims, and only the first one is the feature (trap 42). Null is the
-    /// honest answer for the swapped-away state — a stale last-known level would read as a
-    /// chip that is on the bar.</summary>
+    /// are different claims, and only the first one is the feature (trap 42).
+    ///
+    /// **The null is unreachable since DRA-72 and stays anyway.** It used to be the
+    /// swapped-away state — HPS owned the third slot, so there was no xp chip to hover — and
+    /// the XP rate is now the row's last slot unconditionally. What the nullable buys is that
+    /// the dump's -1 reading still EXISTS: if a later change ever takes that slot away, a
+    /// non-nullable field would report a stale last-known level as though the chip were still
+    /// there (trap 20's shape, one layer in).</summary>
     public HudXpTip? XpTip { get; private set; }
 
     /// <param name="cuesDue">The alert scheduler's "when does each rule's cue fire" map.
@@ -554,77 +576,116 @@ internal sealed class HudBarView
         return panel;
     }
 
-    /// <summary>The always-on row — character name, DPS, and XP%/hr or HPS — ahead of
-    /// every starred cell (Surface A / SA-1, spec §3), plus the ONE optional slot SIGNED
-    /// #422 gave it: pet DPS, between DPS and the third number.
+    /// <summary>What each always-on metric slot's hover says, or null for the one whose
+    /// hover is built from live data (the xp slot's ETA sentence).
     ///
-    /// The DECISION is <see cref="HudGlance"/>'s and is unit-tested with no window; what
-    /// happens here is drawing. The name slot carries no icon: it is a label, not a
-    /// metric, and inventing a person vector for it would be geometry nobody asked
-    /// for.</summary>
+    /// **A table keyed on the slot's own key**, for the same reason the cell loop below reads
+    /// <c>HudExpand.TargetForKey</c> rather than switching by hand: DRA-72 turned this row
+    /// from "three slots in a fixed shape" into a LIST, and a per-slot `if` chain would be
+    /// the thing that quietly stopped covering it the day the row grows again (trap 30's
+    /// shape). DPS and HPS keep their own richer first halves — what the number MEANS — and
+    /// everything else on the bar gets <see cref="PeekTip"/>'s title sentence.</summary>
+    private static string? GlanceTip(string key) => key switch
+    {
+        HudGlance.DpsKey => "Damage per second — hover to peek, click to keep it open",
+        // The sentence says BOTH halves of the arrival rule, because a slot that appears on
+        // its own is a slot a player will ask about: it arrives when healing has been the
+        // weight of the last half-minute, and it stays while you keep healing. Before DRA-72
+        // it read "while healing is the weight of the last half-minute", which described a
+        // slot that could also be taken away by one swing — the behaviour the Founder's
+        // video caught flashing.
+        HudGlance.HpsKey => "Healing per second — it appears once healing is the weight of "
+            + "the last half-minute and stays while you keep healing; hover to peek, click "
+            + "to keep it open",
+        MiniBarPresentation.PetKey => PetGlanceTip,
+        _ => null,
+    };
+
+    /// <summary>The always-on row — character name, DPS, then every metric slot that is
+    /// currently on it (Surface A / SA-1, spec §3 as AMENDED by DRA-72) — ahead of every
+    /// starred cell. Since SIGNED #422 one of those slots is the player's to insert: pet
+    /// DPS, between DPS and the metrics that follow it.
+    ///
+    /// The DECISION — which slots, in which order, reading what, at which reserved width —
+    /// is <see cref="HudGlance"/>'s and is unit-tested with no window; what happens here is
+    /// drawing. **This method no longer knows that HPS and the XP rate are different
+    /// questions**, which is the point of DRA-72: it draws the list it is handed, so "both at
+    /// once" is a membership answer in one testable place rather than a branch in a view the
+    /// test project cannot reach (docs/TestPlan.md §5).
+    ///
+    /// The name slot carries no icon: it is a label, not a metric, and inventing a person
+    /// vector for it would be geometry nobody asked for.</summary>
     private void RenderGlance(StatsSnapshot s, string? characterName)
     {
-        var glance = HudGlance.Next(Third, s, characterName, _settings.HudGlancePet);
-        Third = glance.Third;
+        var glance = HudGlance.Read(State, s, characterName, _settings.HudGlancePet);
+        State = glance.State;
+        _glanceRow.Clear();
         _host.Children.Add(GlanceSlot(null, glance.Name, HudGlance.NameReservedWidth,
             glance.Name.Length > 0 ? null : HudGlance.EmptyNameTooltip));
-        // THE TWO EXPANSION CHIPS (OE-1). DPS is always slot two; the last slot is HPS or the
-        // XP rate, and the tracker the panel opens FOLLOWS that swap — which is why the
-        // target is decided here, from the glance's own answer, rather than by the panel
-        // guessing what that slot currently means.
-        var dps = GlanceSlot(HudGlance.DpsIcon, glance.Dps,
-            HudGlance.MetricReservedWidth,
-            "Damage per second — hover to peek, click to keep it open",
-            expand: HudExpandTarget.Dps);
-        _host.Children.Add(dps);
-        // THE INSERTION POINT (SIGNED #422). It sits BETWEEN two fixed slots and does not
-        // move when the third one swaps, which is what makes it stable in exactly the way
-        // #413 said a fixed slot is not — so no fixed slot becomes a drop target and that
-        // reasoning is routed around rather than reopened.
-        //
-        // Membership is the glance's answer (a string or a null), never a second read of the
-        // setting from here; the ★ deliberately has no say while it is up here, and
-        // `MiniBarPresentation.DrawnKeys` is what keeps the cell from drawing the same number
-        // a second time.
-        GlancePetKey = glance.PetDps is null ? 0 : 1;
-        if (glance.PetDps is { } petDps)
+        // EVERY SLOT IS AN EXPANSION CHIP (OE-1 for DPS/HPS/Progress, SIGNED #422 for pet),
+        // and the target comes off the slot's KEY through the one table `HudExpand` already
+        // owns — the same bridge the starred cells use since OE-9, so the chip, the panel, the
+        // title, the icon and the ⧉ read one answer (trap 4). The hand-written "this slot is
+        // HPS so the target is Hps" branch that used to live here is gone with the swap.
+        FrameworkElement? dpsChip = null;
+        XpTip = null;
+        foreach (var slot in glance.Slots)
         {
-            // Registered with the reorder, and it is the ONLY slot on this row that is: the
+            // Total over the four keys this row can hold — `HudGlanceTests` asserts every one
+            // of them resolves, which is the must-list half a forbid-scan cannot see (trap
+            // 34). The fallthrough is DPS's own target rather than a hole in the row.
+            var target = HudExpand.TargetForKey(slot.Key) ?? HudExpandTarget.Dps;
+            FrameworkElement chip;
+            if (slot.Key == HudGlance.XpKey)
+            {
+                // The xp cell's double-click SURVIVES the promotion, on the slot that replaced
+                // it. While the widget is minimized it was the only door to the Progress
+                // window — the Progress card is on the expanded widget, so it is not one — and
+                // a promotion must not shut a door (trap 59). The opt-in double-click keeps
+                // priority on this chip; the single click is the primary, discoverable path
+                // Bevel's §4 asked for.
+                //
+                // OE-3: this hover carries the next-level ETA and the tracked level — both of
+                // which the app has always had and neither of which was on any screen (see
+                // HudXpTooltip). The wording is UI.Shared's and the ETA sentence is the
+                // Progress room's own, so the two surfaces cannot forecast one session
+                // differently (trap 4). Recorded on the way past for the dump: what was
+                // DRAWN, not what could be computed (trap 42).
+                XpTip = HudXpTooltip.For(s, _trackedLevel());
+                chip = GlanceSlot(slot.Icon, slot.Text, slot.ReservedWidth,
+                    tip: null, onDoubleClick: _openProgress,
+                    doubleClickHint: XpTip!.Value.Text, expand: target);
+            }
+            else
+            {
+                chip = GlanceSlot(slot.Icon, slot.Text, slot.ReservedWidth,
+                    GlanceTip(slot.Key), expand: target);
+            }
+            _host.Children.Add(chip);
+            _glanceRow.Add(slot.Key);
+            if (slot.Key == HudGlance.DpsKey) dpsChip = chip;
+            // THE INSERTED SLOT is the ONLY one on this row registered with the reorder: the
             // way back down is to carry it. `HudExpandTarget.Pet` is unchanged, so the peek,
-            // the pin and the opt-in double-click cost nothing to move (trap 59).
-            var pet = GlanceSlot(HudGlance.PetIcon, petDps, HudGlance.MetricReservedWidth,
-                PetGlanceTip, expand: HudExpandTarget.Pet);
-            _host.Children.Add(pet);
-            _reorder.Register(MiniBarPresentation.PetKey, pet);
+            // the pin and the opt-in double-click cost nothing to move (trap 59). Membership
+            // is the glance's answer and never a second read of the setting from here; the ★
+            // has no say while it is up here, and `MiniBarPresentation.DrawnKeys` is what
+            // keeps the cell from drawing the same number a second time.
+            if (slot.Key == MiniBarPresentation.PetKey)
+                _reorder.Register(MiniBarPresentation.PetKey, chip);
         }
-        // WHERE THE INSERTION MARK HANGS. There is no divider element in this gap to read an
-        // x off — both neighbours are ExpandChips and that branch draws none — so the drag
-        // is handed the DPS chip itself and measures its own box, the way `LeftOf` already
-        // does for a cell boundary (Bevel's §1 note, Helm-signed 2026-09-08).
-        _reorder.SetGlanceGap(dps);
-        // The xp cell's double-click SURVIVES the promotion, on the slot that replaced it.
-        // While the widget is minimized it was the only door to the Progress window — the
-        // Progress card is on the expanded widget, so it is not one — and a promotion must
-        // not shut a door (trap 59). It is attached only while the slot IS the xp number:
-        // a gesture that silently means something else half the time is worse than none.
-        // The opt-in double-click is untouched by OE-1 and keeps priority on this chip; the
-        // single click is the primary, discoverable path Bevel's §4 asked for.
-        // OE-3: the xp slot's hover now carries the next-level ETA and the tracked level —
-        // both of which the app has always had and neither of which was on any screen (see
-        // HudXpTooltip). The wording is UI.Shared's and the ETA sentence is the Progress
-        // room's own, so the two surfaces cannot forecast one session differently (trap 4).
-        // Recorded on the way past for the dump: what was DRAWN, not what could be
-        // computed (trap 42). Null while the slot is HPS — there is no xp chip then.
-        XpTip = glance.Third == HudThird.Healing ? null : HudXpTooltip.For(s, _trackedLevel());
-        _host.Children.Add(glance.Third == HudThird.Healing
-            ? GlanceSlot(glance.ThirdIcon, glance.ThirdText, HudGlance.MetricReservedWidth,
-                "Healing per second — while healing is the weight of the last half-minute; "
-                + "hover to peek, click to keep it open",
-                expand: HudExpandTarget.Hps)
-            : GlanceSlot(glance.ThirdIcon, glance.ThirdText, HudGlance.MetricReservedWidth,
-                tip: null, onDoubleClick: _openProgress,
-                doubleClickHint: XpTip!.Value.Text,
-                expand: HudExpandTarget.Progress));
+        GlanceKey = MiniBarPresentation.OrderKey(_glanceRow);
+        // WHERE THE INSERTION MARK HANGS (SIGNED #422). There is no divider element in the
+        // DPS↔next gap to read an x off — every slot here is an ExpandChip and that branch
+        // draws none — so the drag is handed the DPS chip itself and measures its own box, the
+        // way `LeftOf` already does for a cell boundary (Bevel's §1 note, Helm-signed
+        // 2026-09-08).
+        //
+        // **DRA-72 leaves #413's reasoning routed around rather than reopened.** The gap is
+        // still between DPS and whatever follows it, and an arriving HPS slot lands to the
+        // RIGHT of the insertion point — so no fixed slot became a drop target, and no drop
+        // target changes meaning under the cursor. `dpsChip` is non-null by construction:
+        // `HudGlance.Read` always emits the DPS slot first.
+        if (dpsChip is not null) _reorder.SetGlanceGap(dpsChip);
     }
 
     /// <summary>

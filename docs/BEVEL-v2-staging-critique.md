@@ -125,6 +125,23 @@ One swap, not a second meter. Collapse again the moment combat-as-damage returns
 No lists. No research. No "open this card." Width is reserved; a timer must not change
 measured size (trap 12 still binds).
 
+> **AMENDED 2026-09-13 — DRA-72, Founder video, Helm VIDEO CONFIRM (SIGN asked for in
+> `HELM-FEEDBACK.md`).** The two sentences above are what shipped and what the Founder
+> filmed: a character who heals *and* swings satisfies "healing dominates over ~30 s" and
+> "combat-as-damage returns" at the same moment, so the shared slot alternated between
+> `13 hps` and `167.5%/hr` about once a second, forever. **HPS is now its own slot beside
+> the XP rate rather than instead of it**, and the row is `name · DPS · (pet) · (HPS) ·
+> XP%/hr`. What was deleted is one clause — damage returning no longer takes the slot away,
+> because the number that clause handed the slot back to has a slot of its own now. What
+> was KEPT is everything else this paragraph signed: HPS still arrives only once healing
+> has been the weight of the last ~30 s, and it still goes when that window holds no
+> healing at all. **"One swap, not a second meter" is the sentence that is gone**, here and
+> in the §2 Healing row; "width is reserved" is not — the row grows by ADDING a slot at a
+> fixed reserved width, never by letting a string measure wider, which is the only way
+> "expand with the content" and trap 12 can both be true. Reasoning, the alternative that
+> was refused, and the open question about who should see an HPS slot at all: `DECISIONS.md`
+> (2026-09-13, DRA-72).
+
 ### Expanded
 
 Same HUD, more of the live moment — still not the app.

@@ -1,3 +1,120 @@
+## 2026-09-13 — DRA-72: the collapsed HUD stops swapping its third number and grows a slot instead
+
+Authorized: Helm VIDEO CONFIRM + Soft dig+fix on the mini-bar width, Founder bug
+VERIFIED. Nothing below is on the consequence list — no release, no new surface,
+no eqlwiki request, nothing new leaving the machine, nothing near the values line
+(the row shows this character's own damage, own healing and own XP rate, as it
+always has). **One thing needs Helm and is asked for rather than assumed:** the
+sentence being amended is Helm-signed (`docs/BEVEL-v2-staging-critique.md` §3,
+"One swap, not a second meter"), so the PR carries a tip-only LIVE ASK in
+`HELM-FEEDBACK.md` for SIGN. David vetoes from here.
+
+**THE BUG, named as arithmetic rather than as a vibe.** SA-1 put HPS and XP%/hr
+in ONE glance slot with a hysteresis: it ENTERS when healing out-weighs damage
+across the ~30 s window, and it LEAVES the moment any damage lands inside the
+~5 s resume window. For a character who heals and swings at once — the Founder's
+video: `Dranak · 18 dps · 13 hps ↔ 167.5%/hr` — both of those are true at the
+same time, so the slot alternated on the one-second render, forever. Neither rule
+was wrong. Nothing had ever asked them together, because the swap's tests drive
+one direction at a time. **A hysteresis is only as good as the case where both of
+its tests pass**, and that is the shape worth carrying forward.
+
+**1. The amendment is ONE DELETED CLAUSE, and the alternative that would have
+gone further is named here rather than taken.** `HudGlance.HealingShown` keeps
+the signed ARRIVE test verbatim (healing has to have out-weighed damage across
+the whole window) and keeps the signed LEAVE test verbatim (the window holds no
+healing at all — a healer who stops loses the slot ~30 s later). What is gone is
+"damage returning takes it away", because the number that clause existed to hand
+the slot back to now has a slot of its own that nothing takes. An oscillation is
+impossible by construction afterwards: the STAY test is strictly weaker than the
+ARRIVE test, so no input can add and remove on alternating ticks.
+
+**The default it could have gone the other way on:** the Founder's acceptance
+wording is *"when healing is active AND XP is tracked, show both"*, and "active"
+read literally is ANY healing in the window — which would drop the dominance test
+and give an HPS slot to every paladin who lands one heal, every shaman between
+pulls, and any warrior whose weapon lifetaps. That widens WHO sees a fourth slot
+on an always-on-top bar, which is a product question rather than a bug fix, so
+this seat kept the signed arrival bar and put the question to Helm in the LIVE
+ASK. **What a hybrid gets today:** the slot arrives the first tick their healing
+out-weighs their damage over half a minute and then STAYS while they keep
+healing, so the video's character gets both numbers permanently. A character
+whose damage always dominates still sees no HPS slot. If the Founder wants that
+one too, it is one predicate and its test row.
+
+**2. Each metric slot now carries ITS OWN reserved width, and the XP slot's is
+wider (76 against 66).** SA-1 gave every metric one width for a stated reason —
+the third slot swapped its string on a timer, so a per-string width there would
+have been the trap-12 resize the class exists to prevent. That reason is gone
+with the swap: no slot changes identity any more, so a per-metric width is a
+constant of the row. It is spent on the XP rate because "9999.9%/hr" puts '%' and
+'/' where a rate string has leading spaces, and at 66 a four-digit rate trimmed
+to an ellipsis — which is the Founder's "longer XP% string eats gap padding",
+read off the video. **It is NOT a measured number** and says so in the code:
+nothing in this project can measure text without a window, so it is headroom over
+the longest string the slot can hold, and the assertion is an ORDERING
+(`ExperienceReservedWidth > MetricReservedWidth`) so a later tidy-up cannot
+quietly equalise them again. The one-time width change this costs is the same
+permission the player's own pet drop has always had. **What the number COSTS is
+measured**, even though the number itself is a judgement: `mini-bar-chips` is the
+one collapsed-bar shot whose cells are all plain counts, and shooting the same
+seed against a build with the constant back at 66 gives 628x40 against this
+build's 638x40 — so the ten units are that constant and nothing else on the bar.
+
+**And the same experiment found a stale committed picture that is nobody's
+feature:** `mini-tour.png` is 691 wide on `main` and the current build draws it at
+676 with the old constant restored. Some earlier change moved that bar and the
+shot was never re-run, so fifteen of this PR's "width change" is a repair rather
+than an effect. It is called out because a reviewer subtracting two PNG widths
+would otherwise attribute it here — and because `mini-bar`'s own width cannot be
+compared across takes at all: three of its cells (procs, motes, coin) re-derive
+from the fixture's elapsed time on every run.
+
+**3. HPS lands THIRD — before the XP rate — and the XP rate stays the row's last
+slot.** Appending HPS after the XP rate would have kept every existing slot's x
+unchanged, which was the other reasonable choice. It went this way because the XP
+rate has been the last thing on this row since SA-1 and still is, so no POSITION
+on the row changed what it means; the rates group together (Swords, Paw, Heal)
+and the session rate stays at the tail. It also keeps SIGNED #422's insertion
+point exactly where it was — between DPS and whatever follows — so an arriving
+HPS slot lands to the RIGHT of the pet gap and #413's "a slot that changes
+identity must not be a drop target" stays routed around rather than reopened.
+With DRA-72 no slot up there changes identity at all, which is strictly safer
+than the position that reasoning was written for.
+
+**4. The `hudGlance` dump fact changed SHAPE, from one word to the row.** It read
+"xp" or "hps"; it now reads `dps,xp` / `dps,hps,xp` / `dps,pet,hps,xp` in
+`MiniBarPresentation.OrderKey`'s spelling. **A fact with room for one of the two
+numbers cannot witness a fix whose content is "both are up"** — the old key was
+true on the flashing build at every instant. `hudGlancePet` now derives from the
+same recorded row rather than from a second field (trap 4: two independent
+records of what one row drew is how a dump contradicts itself). Four E2E rows
+moved with it; `HudBarView.Third`/`HudThird` are deleted, and nothing else in the
+tree ever read them.
+
+**5. `HudXpTip`'s null is now unreachable and was NOT made non-nullable.** It
+meant "the third slot is HPS, so there is no xp chip to hover", which cannot
+happen now. The dump's `-1` reading is what would report the absence if a later
+change ever takes that slot away, and a non-nullable field would report a stale
+last-known level instead (trap 20's shape). `DamageSinceResume` stays on
+`HudGlanceInput` for the same kind of reason: it is the input that makes the
+deleted clause's own test writable.
+
+**Evidence.** `HudGlanceTests` rewritten around the row: 60 tests, including the
+video's situation driven for six consecutive ticks and asserted as six identical
+rows. **Prove-failed** — restoring the deleted clause (`shown ? input.DamageSinceResume <= 0 && …`)
+reddens exactly three of them, `TheVideosSituationShowsBothNumbersAndHoldsStillOnEveryTick`
+among them; the file was restored and the suite re-run green. 4,701 unit tests
+pass. E2E `HudBarTests.HealingAddsItsOwnSlotAndASwingDoesNotTakeItAway` drives it
+through the real seam (log lines the widget tails) and samples five consecutive
+RENDERS, because one read of a flashing bar has even odds of reading the right
+answer; the swing's "nothing happened" is asserted at a moment a ding proves the
+app had processed the line after it (trap 62). `AppHarness.DumpTexts` is new and
+exists so a word fact and the `tick` that says a render happened come off ONE
+read (trap 56).
+
+— Dranak (Claude Code, DRA-72)
+
 ## 2026-09-13 — DRA-71 delivery 8: resources are profession-first, and the arithmetic is parked on its own survey
 
 Pre-authorized: Helm SIGNED the plan (PR #586, merged `a28c5d89`) and SIGNED

@@ -40,7 +40,8 @@ public static class MiniBarPresentation
     ///
     /// **"xp", "dps" and "hps" are absent for the opposite reason since Surface A / SA-1:
     /// they are always ON.** They were promoted to the collapsed HUD's always-on row (name,
-    /// DPS, XP%/hr — HPS taking the third slot while healing dominates), which is drawn by
+    /// DPS, XP%/hr — and HPS as its OWN slot beside them while healing is happening, DRA-72;
+    /// it used to share the XP rate's slot), which is drawn by
     /// <see cref="HudGlance"/> ahead of every cell in this list. A key that is drawn
     /// unconditionally has no business in a table whose whole job is "which subset did the
     /// player switch on", and leaving one here would have drawn it twice.
@@ -78,10 +79,13 @@ public static class MiniBarPresentation
     /// like any other, so it has a PLACE, and a place is what an order is about. Its
     /// canonical slot is where it has always drawn: after "deaths".
     ///
-    /// The always-on row's own slots (name, DPS, XP%/HPS) are absent for the reason SA-1
-    /// promoted them: those three are drawn unconditionally ahead of every cell here, and the
-    /// third slot swaps identity mid-session (<see cref="HudGlance"/>), so a drag target
-    /// there would change meaning under the cursor. Pinned watch chips are absent too — they
+    /// The always-on row's own slots (name, DPS, HPS, XP%/hr) are absent for the reason SA-1
+    /// promoted them: they are drawn ahead of every cell here and the player has no ★ for
+    /// them. **Since DRA-72 no slot up there changes identity** — HPS gained a slot of its own
+    /// instead of sharing the XP rate's — so the #413 sentence that reasoning rested on has
+    /// moved: what keeps that row out of this list is that its MEMBERSHIP is decided by the
+    /// session (is healing happening) and by one drag (<see cref="PetKey"/>), never by an
+    /// order. Pinned watch chips are absent too — they
     /// are a BLOCK after the cells, one per rule, and per-rule placement would widen this
     /// list by rule id rather than by stat key. Both seams are named rather than built.
     ///
