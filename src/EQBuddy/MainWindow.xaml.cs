@@ -3312,10 +3312,12 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
     private IEnumerable<(string Key, System.Windows.Controls.Primitives.ToggleButton Star)> StarButtons()
     {
         yield return ("motes", StarMotes);
-        // "dps" and "hps" left this list in Surface A / SA-1: they are the always-on
-        // collapsed HUD numbers now, and a promotion removes the toggle. Their stars are
-        // gone from the Combat and Healing headers with them; what carried each player's
-        // stored state across is AppSettings.MigratePromotedHudStats, not this method.
+        // "dps" and "hps" left this list in Surface A / SA-1 and have NOT come back to it.
+        // They are ★s again since DRA-81's Founder LOCK, but this method is the CARD-HEADER
+        // star map and their cards' headers are not where those switches live — the Mini
+        // dashboard list is (MiniBarPresentation.OptionKeys), because the two draw on the
+        // collapsed bar's top row rather than as cells. AppSettings.MigrateHudStatStars is
+        // what carried each player's stored state across, not this method.
         yield return ("pet", StarPet);
         yield return ("procs", StarProcs);
         yield return ("buffs", StarBuffs);

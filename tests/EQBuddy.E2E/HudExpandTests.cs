@@ -34,7 +34,7 @@ public sealed class HudExpandTests
         using var app = new AppHarness(settings =>
         {
             settings.Minimized = true;
-            settings.MiniStats = ["kills"];
+            settings.MiniStats = ["kills", "dps", "xp"];
             settings.DisabledBreakouts =
                 ["Damage", "Healing", "Pet", "Watch", "Loot", "Buffs"];
             settings.DefaultRulesVersion = int.MaxValue;
@@ -64,7 +64,7 @@ public sealed class HudExpandTests
         using var app = new AppHarness(settings =>
         {
             settings.Minimized = true;
-            settings.MiniStats = ["kills"];
+            settings.MiniStats = ["kills", "dps", "xp"];
             settings.DisabledBreakouts =
                 ["Damage", "Healing", "Pet", "Watch", "Loot", "Buffs"];
             settings.DefaultRulesVersion = int.MaxValue;
@@ -98,7 +98,7 @@ public sealed class HudExpandTests
         using var app = new AppHarness(settings =>
         {
             settings.Minimized = true;
-            settings.MiniStats = ["kills"];
+            settings.MiniStats = ["kills", "dps", "xp"];
             settings.DisabledBreakouts =
                 ["Damage", "Healing", "Pet", "Watch", "Loot", "Buffs"];
             settings.DefaultRulesVersion = int.MaxValue;
@@ -185,7 +185,7 @@ public sealed class HudExpandTests
         using var app = new AppHarness(settings =>
         {
             settings.Minimized = true;
-            settings.MiniStats = ["kills"];
+            settings.MiniStats = ["kills", "dps", "xp"];
             settings.DisabledBreakouts =
                 ["Damage", "Healing", "Pet", "Watch", "Loot", "Buffs"];
             settings.DefaultRulesVersion = int.MaxValue;
@@ -232,7 +232,7 @@ public sealed class HudExpandTests
         using var app = new AppHarness(settings =>
         {
             settings.Minimized = true;
-            settings.MiniStats = ["kills"];
+            settings.MiniStats = ["kills", "dps", "xp"];
             settings.DisabledBreakouts =
                 ["Damage", "Healing", "Pet", "Watch", "Loot", "Buffs"];
             settings.DefaultRulesVersion = int.MaxValue;
@@ -284,7 +284,7 @@ public sealed class HudExpandTests
             settings.Minimized = true;
             // Three cells, so the hovered chip is nowhere near the bar's left edge — the
             // whole point of the repro. money is near the right end of MiniBarPresentation.Order (Deaths has no peek).
-            settings.MiniStats = ["kills", "loot", "money"];
+            settings.MiniStats = ["kills", "loot", "money", "dps", "xp"];
             settings.DisabledBreakouts =
                 ["Damage", "Healing", "Pet", "Watch", "Loot", "Buffs"];
             settings.DefaultRulesVersion = int.MaxValue;
@@ -329,7 +329,7 @@ public sealed class HudExpandTests
         using var app = new AppHarness(settings =>
         {
             settings.Minimized = true;
-            settings.MiniStats = ["kills", "loot", "money"];
+            settings.MiniStats = ["kills", "loot", "money", "dps", "xp"];
             settings.DisabledBreakouts =
                 ["Damage", "Healing", "Pet", "Watch", "Loot", "Buffs"];
             settings.DefaultRulesVersion = int.MaxValue;

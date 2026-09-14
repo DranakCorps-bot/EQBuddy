@@ -327,12 +327,15 @@
                         </Grid.ColumnDefinitions>
                         <local:EqCardTitle Icon="Swords" Text="Combat"/>
                         <TextBlock x:Name="CombatHeader" Grid.Column="1" Style="{StaticResource StatValue}" Text="0 dps"/>
-                        <!-- The dps ★ is gone (Surface A / SA-1): DPS is an always-on
-                             HUD number now, so there is nothing left to toggle. Its column
+                        <!-- The dps ★ left this header in Surface A / SA-1 and did NOT come
+                             back with DRA-81's Founder LOCK. There is a DPS switch again, but
+                             it belongs to the collapsed bar's top row, so it lives in the one
+                             list that names that row's stats: Options -> Mini dashboard. A
+                             second one here would be two controls for one setting. The column
                              stays for the pet/procs stars that still live in this header.
-                             AppSettings.MigratePromotedHudStats carried each player's old
-                             star into DisabledBreakouts before the key went, so the Damage
-                             breakout keeps whatever state the ★ was holding for it. -->
+                             AppSettings.MigrateHudStatStars carries each player's stored
+                             state, and the Damage breakout is gated by its own tick under
+                             Floating windows rather than by any ★. -->
                         <!-- Pet damage has no card of its own (it's the fold-out below), but its
                              watch-toggle lives up here with the other stars per David: one place
                              to say what you watch when minimized. The 🐾 tells the two stars apart. -->

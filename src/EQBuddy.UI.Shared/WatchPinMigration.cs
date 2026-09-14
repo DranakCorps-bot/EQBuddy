@@ -60,7 +60,7 @@ public static class WatchPinMigration
     /// "does this chip show" — two switches, one question — and Helm's #341 sign was to reduce
     /// them to ONE. The pin is the survivor, so the master's OFF has to become per-rule OFF or
     /// every player who unticked that box gets their chips back with nothing having asked
-    /// them. This is <c>AppSettings.MigratePromotedHudStats</c>'s order of operations exactly:
+    /// them. This is <c>AppSettings.MigrateHudStatStars</c>'s order of operations exactly:
     /// read the switch, translate it, then stop reading it.
     ///
     /// <b>It runs AFTER <see cref="PromoteToGroupPin"/>, and that is not tidiness.</b> A

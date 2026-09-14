@@ -152,20 +152,17 @@ internal sealed class HudBarView
         catch (InvalidOperationException) { return double.NaN; }
     }
 
-    /// <summary>Which CONDITIONAL slots the always-on row is carrying. Held here because
-    /// the HPS slot's arrival has hysteresis: <see cref="HudGlance"/> is a pure decision and
-    /// needs to be told what it decided last time.</summary>
-    public HudGlanceState State { get; private set; } = HudGlanceState.Start;
-
-    /// <summary>The always-on row's metric slots as DRAWN, left to right — the
-    /// <c>hudGlance</c> dump fact, which reads <c>dps,xp</c> for a melee character and
-    /// <c>dps,hps,xp</c> while healing is on the row.
+    /// <summary>The metric row's slots as DRAWN, left to right — the
+    /// <c>hudGlance</c> dump fact, which reads <c>dps,xp</c> on a default profile and
+    /// <c>dps,hps,xp</c> once HPS is ticked. <c>"-"</c> when every box is clear, which is a
+    /// row the player can legitimately ask for since DRA-81.
     ///
     /// **It is a LIST since DRA-72, and that is the fact the old one could not carry.** The
     /// value used to be one word, "xp" or "hps", because the two shared a slot — so the dump
     /// could say which of them the bar had chosen and could not say that both were up. The
-    /// bug being fixed is exactly "both should be up", and a fact that cannot express the fix
-    /// cannot witness it.
+    /// bug being fixed was exactly "both should be up", and a fact that cannot express the
+    /// fix cannot witness it. DRA-81 made membership a checkbox and left the list alone: it
+    /// is now also how the dump witnesses a ★ reaching the bar at all.
     ///
     /// **Recorded on the way past rather than re-asked** (trap 42), which is the same rule
     /// <see cref="CellOrderKey"/> follows one row down: "HudGlance would answer dps,hps,xp"
@@ -588,40 +585,40 @@ internal sealed class HudBarView
     private static string? GlanceTip(string key) => key switch
     {
         HudGlance.DpsKey => "Damage per second — hover to peek, click to keep it open",
-        // The sentence says BOTH halves of the arrival rule, because a slot that appears on
-        // its own is a slot a player will ask about: it arrives when healing has been the
-        // weight of the last half-minute, and it stays while you keep healing. Before DRA-72
-        // it read "while healing is the weight of the last half-minute", which described a
-        // slot that could also be taken away by one swing — the behaviour the Founder's
-        // video caught flashing.
-        HudGlance.HpsKey => "Healing per second — it appears once healing is the weight of "
-            + "the last half-minute and stays while you keep healing; hover to peek, click "
-            + "to keep it open",
+        // DRA-81: the sentence no longer describes an arrival rule, because there is not one
+        // any more. It said "it appears once healing is the weight of the last half-minute",
+        // which was true of DRA-72's dominance window and is now a promise about behaviour
+        // the app does not have — the slot is here because the player ticked HPS, and it
+        // stays until they untick it. Where that box lives is the other half: a number a
+        // player wants gone needs a door, and the tooltip is where they are looking.
+        HudGlance.HpsKey => "Healing per second — it shows because HPS is ticked in "
+            + "Options → Mini dashboard; hover to peek, click to keep it open",
         MiniBarPresentation.PetKey => PetGlanceTip,
         _ => null,
     };
 
-    /// <summary>The always-on row — character name, DPS, then every metric slot that is
-    /// currently on it (Surface A / SA-1, spec §3 as AMENDED by DRA-72) — ahead of every
-    /// starred cell. Since SIGNED #422 one of those slots is the player's to insert: pet
-    /// DPS, between DPS and the metrics that follow it.
+    /// <summary>The metric row — character name, then every slot the player has ticked
+    /// (Surface A / SA-1 spec §3, amended by DRA-72 and superseded on membership by DRA-81's
+    /// Founder LOCK) — ahead of every starred cell. Since SIGNED #422 one of those slots is
+    /// the player's to insert: pet DPS, between DPS and the metrics that follow it.
     ///
     /// The DECISION — which slots, in which order, reading what, at which reserved width —
     /// is <see cref="HudGlance"/>'s and is unit-tested with no window; what happens here is
-    /// drawing. **This method no longer knows that HPS and the XP rate are different
-    /// questions**, which is the point of DRA-72: it draws the list it is handed, so "both at
-    /// once" is a membership answer in one testable place rather than a branch in a view the
-    /// test project cannot reach (docs/TestPlan.md §5).
+    /// drawing. **This method knows nothing about which metric is which**, which is what
+    /// DRA-72 started and DRA-81 finished: it draws the list it is handed, so both "HPS and
+    /// XP at once" and "HPS because the box is ticked" are membership answers in one
+    /// testable place rather than branches in a view the test project cannot reach
+    /// (docs/TestPlan.md §5).
     ///
     /// The name slot carries no icon: it is a label, not a metric, and inventing a person
     /// vector for it would be geometry nobody asked for.</summary>
     private void RenderGlance(StatsSnapshot s, string? characterName)
     {
-        var glance = HudGlance.Read(State, s, characterName, _settings.HudGlancePet);
-        State = glance.State;
+        var glance = HudGlance.Read(HudGlanceStars.From(_settings), s, characterName);
         _glanceRow.Clear();
-        _host.Children.Add(GlanceSlot(null, glance.Name, HudGlance.NameReservedWidth,
-            glance.Name.Length > 0 ? null : HudGlance.EmptyNameTooltip));
+        var nameSlot = GlanceSlot(null, glance.Name, HudGlance.NameReservedWidth,
+            glance.Name.Length > 0 ? null : HudGlance.EmptyNameTooltip);
+        _host.Children.Add(nameSlot);
         // EVERY SLOT IS AN EXPANSION CHIP (OE-1 for DPS/HPS/Progress, SIGNED #422 for pet),
         // and the target comes off the slot's KEY through the one table `HudExpand` already
         // owns — the same bridge the starred cells use since OE-9, so the chip, the panel, the
@@ -683,9 +680,15 @@ internal sealed class HudBarView
         // **DRA-72 leaves #413's reasoning routed around rather than reopened.** The gap is
         // still between DPS and whatever follows it, and an arriving HPS slot lands to the
         // RIGHT of the insertion point — so no fixed slot became a drop target, and no drop
-        // target changes meaning under the cursor. `dpsChip` is non-null by construction:
-        // `HudGlance.Read` always emits the DPS slot first.
-        if (dpsChip is not null) _reorder.SetGlanceGap(dpsChip);
+        // target changes meaning under the cursor.
+        //
+        // **DRA-81 took away the "dpsChip is non-null by construction" half**: DPS is a
+        // checkbox now, and a player who unticks it would otherwise have no gap to drop a pet
+        // chip into — a way UP that disappears because of an unrelated tick is trap 59 in
+        // miniature. The NAME slot is the fallback because it is the only element on this row
+        // that is always drawn, and "after the name" is the same place "after DPS" was when
+        // DPS was the first thing after the name.
+        _reorder.SetGlanceGap(dpsChip ?? nameSlot);
     }
 
     /// <summary>

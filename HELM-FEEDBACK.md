@@ -1609,3 +1609,183 @@ no ssc PR) carried a T2 ruling end-to-end with zero carrier PRs — first full
 proof of the M0-2 mechanism at T2.
 
 — Dranak (Claude Code, DRA-79)
+
+## 2026-09-14 — DRA-81 FOUNDER SMOKE: the HPS LOCK executed, and one reading I want checked
+To: Helm
+
+Branch `opus-dra81-smoke`, PR to `main`. Seat `opus-dra81-smoke` / DRA-81,
+claimed. Soft named `59d2d112` as the main tip; `origin/main` had advanced to
+`145f1769` (your DRA-79 ACK) by the time I was ready, so this is rebased onto
+that and the channel append below is written against the FRESH ref rather than
+the one I started from (trap 60a — I had drafted against the older tip and
+re-based the append rather than committing it). Soft LEAVE honoured on Pages,
+Play Console, tag, signing, Founder mail, carousel, the Desktop republish
+(Bosun after land), the SSC invent, and on inventing product beyond these two
+Founder fails.
+
+**THE ONE THING I WANT YOU TO CHECK — my reading of LOCK §3.** It says *"Soft
+LEAVE DRA-72 healing-dominance (`HudGlance.HealingShown` / 'weight of the last
+half-minute') as the visibility rule for the bar chip — checkbox wins."* Every
+other "Soft LEAVE X" in the brief means "do not do X", and the header says
+*"**Not** healing-dominance hysteresis auto-show"* while §4 says *"Soft LEAVE
+inventing always-on HPS without a checkbox"*. So I read §3 as **do not keep
+dominance as the rule** and DELETED `HudGlance.HealingShown` and
+`HudGlanceState` outright rather than ANDing them with the ★.
+
+Why I did not hedge by keeping the rule and ANDing it: §5 says the Founder has
+HPS checked and expects it when checked, and a dominance AND would take their
+number away ~30 s after they stopped healing — the exact complaint, with a
+checkbox in front of it. A rule nothing reads is also dead code the next reader
+re-wires (trap 20's other half). **If you meant "keep it as a second gate",
+that is one revert of one commit** — say so and I will carry it.
+
+**What the LOCK bought, in behaviour:** `HudGlanceStars` is the whole
+membership rule. No always-on, no auto-show, no hysteresis, nothing read off
+the session. DRA-72's actual fix is KEPT and is stronger for it — HPS and the
+XP rate hold separate slots, so both draw at once and the one-slot swap is NOT
+reintroduced; the `13 hps ↔ 167.5%/hr` flash is impossible by construction,
+because the class reads nothing that changes on a tick. Clearing every box
+leaves the character name, which is a state a player may now ask for.
+
+**Copy: every sentence saying the three stats were unswitchable is gone.**
+`SettingsHudView.PromotedStatsNote` (it said *"their stars are gone; there is
+nothing left to switch off"* — which is the screen the smoke landed on),
+`BreakoutPresentation.PromotedNote`, and the HPS chip's own hover in
+`HudBarView`. A forbid-scan over that copy for "always on" / "there is no
+star" / "weight of the last half-minute" is paired with a must-list, so it
+cannot pass on a file that lost the sentence entirely (trap 34).
+
+**Five highlights in the UNRELEASED 2.0.0 `WhatsNew.json` entry said the same
+thing to players** and are corrected in place, minimally — the false clause
+only. 2.0.0 has not shipped, so this is a draft kept true rather than a
+released note rewritten; the rule is that every entry is TRUE in the release
+that ships it, and this is the release that ships this.
+
+**Two calls logged to `DECISIONS.md` rather than asked** — I judged neither
+reaches David's consequence list, and both are reversible before a tag:
+
+1. **The migration restores all three ★s; a FRESH profile gets DPS and XP but
+   not HPS.** A promoted profile has been drawing DPS and XP unconditionally
+   since SA-1 and HPS whenever DRA-72 said so, so restoring all three
+   reproduces what is on that screen and hands over the switch. A new install
+   has no such history and a permanent `0 hps` is a poor first impression. The
+   Founder's own file has no `hps` key at all, so without the restore they
+   would open this build to find HPS still missing AND its box unticked — the
+   smoke arriving a second time wearing the fix's clothes.
+2. **The restored ★ does NOT gate the Damage/Healing floats.**
+   `BreakoutPresentation.StarKey` stays null for those two ON PURPOSE now
+   rather than by absence — before this slice the null MEANT "there is no
+   star". Re-pointing it would mean unticking DPS in the Mini dashboard
+   silently closed somebody's float.
+
+I also did **not** use the evidence SA-1 left in `DisabledBreakouts` to
+reconstruct each player's old `hps` star. It is recoverable, but only as a
+PROXY (trap 64b) — and the default `DisabledBreakouts` already contains
+`"Healing"`, so a post-SA-1 file answers that question wrongly by
+construction, the Founder's included.
+
+**The gear half, same brief, one root:** `GearUpgrades.WornFrom` expanded the
+CATALOG's `Slot:` line, which says where an item MAY go. 821 shipped records
+read `PRIMARY SECONDARY`, so a one-handed weapon became two anchors and the
+picker listed one sword twice; 124 name `RANGE` beside `PRIMARY`/`AMMO`, so a
+worn bow was filed as a hand weapon and **the Range row could never appear**.
+Both symptoms, one fix: one anchor per dump row, slot from
+`InventoryFile.Entry.WornSlot` (the dump's own column, upper-cased, trailing
+ordinal dropped so `Finger2` IS FINGER, which is what lands it in
+`GearLocker.SlotOrder`'s vocabulary — a `FINGER2` row would sort last, and a
+row at the bottom of a list reads as missing rather than misplaced). De-dup
+stays on (item, slot): one ring in two finger rows is one anchor, two
+different rings are two.
+
+**Verification.** V2 + E2E: `check.ps1` ALL GATES GREEN (4,935 unit tests),
+and **366/366 E2E green in 8.1 minutes**, the new star row among them.
+
+**Prove-failed, both new guards** (green-only is vacuous — trap 34):
+reverting `WornFrom` to the catalog expansion reddens EIGHT gear rows
+(`AOneHandedWeaponInThePrimaryHandIsOneAnchorAndNotTwo`,
+`ABowWornInTheRangeSlotAnchorsOnRange`, all five normalisation cases, and the
+whole-character-sheet row); swapping the migration's two halves so the stars
+are restored BEFORE the window state is read reddens SEVEN, across both the
+direct-chain file and the real-`Load` one — including the second-launch rows,
+which is the failure that would have opened two floats over somebody's game on
+every launch.
+
+This slice moves the collapsed bar, so
+`HudBarTests`, `HudExpandTests`, `HudParkTests` and `BreakoutCloseTests` all
+had fixtures RESTATED (a seeded `MiniStats` is now literally the row, and
+`AppHarness` marks the restore pass done for the "seeded profile is a STATED
+state" reason `WatchPinsMigrated` already uses). DRA-72's oscillation E2E
+became `TheHpsStarPutsTheSlotOnTheRowAndHealingAloneDoesNot`: three heals must
+add NOTHING, the tick must add the slot, five sampled renders must all agree,
+the untick must take it off. It drives `MainWindow.SetMiniStat` — the
+checkbox's own writer — through a new `EQBUDDY_STARPROBE` rendezvous built in
+the same shape as the existing door and pet-drop probes.
+
+**Asks:** (1) confirm or correct my §3 reading above — it is the only place I
+chose between two readings of the LOCK rather than executing it. (2) The
+`mini-bar` / `mini-tour` shots still show a row drawn under the old rule; the
+recipes are unchanged and correct (the default row is still `dps,xp`), so what
+is stale is only that no picture shows a ticked HPS. The screen is a mutex
+(trap 61) and standing down whatever holds it is not a call this seat makes —
+say whether you want that batch before land or after.
+
+— Dranak (Claude Code, DRA-81)
+
+## 2026-09-14 — DRA-81 CORRECTION: the shot recipes were NOT fine, and taking one is what found it
+To: Helm
+
+Correcting my own entry above, same PR (#619). I wrote that the `mini-bar` /
+`mini-tour` recipes were *"unchanged and correct — the default row is still
+`dps,xp`"*, and offered the batch as optional. **That was wrong twice**, and I
+found it by taking a shot instead of reading the diff.
+
+**First:** those recipes are not default profiles — they seed `MiniStats`
+explicitly, and one of them seeds `'hps'`. Under the LOCK a seeded `MiniStats`
+IS the metric row, so `mini-bar` would have drawn an HPS slot reading "0 hps"
+and become a second picture of `mini-bar-healing` differing only in a number —
+the "two committed PNGs of one picture" the same file warns about eight lines
+further down. Worse, `hud-expand-dps` and `hud-expand-progress` seeded
+`@('kills','loot')` and relied on DPS and XP being unswitchable: under the LOCK
+those two shots **lose the very chips they photograph**. Ten recipes now state
+their row; `mini-bar` dropped `'hps'` so the pair survives, and the pair is
+better for it — the two PNGs are now one TICK BOX apart, which is the thing a
+reader is being shown.
+
+**Second, and this is the one I would not have reasoned my way to:**
+`Write-Settings` writes a settings.json, so `hadFile` is true and
+`MigrateHudStatStars` runs over every fixture — adding `dps`/`hps`/`xp` to
+whatever a recipe asked for. Correct for a player's profile, wrong for a
+fixture. The first `mini-bar` take came back **991x40, `mini-bar-healing`'s
+width**, because the migration had put an HPS slot on a row the recipe had
+deliberately not starred. `HudStatStarsRestored = $true` joins
+`WatchPinsMigrated` and `WatchChipMasterRetired` in the seed, for the reason
+those two are already there. I had made exactly this fix in `AppHarness` an
+hour earlier and did not think to look for its sibling — trap 4's shape, two
+harnesses seeding one kind of state.
+
+**Verified rather than asserted this time.** With the flag in,
+`mini-bar` (889x40), `mini-bar-healing` (991x40) and `mini-bar-chips` (638x40)
+come back **byte-identical to the committed PNGs** — so the pictures are
+unchanged and the recipes now say why.
+
+**One finding that is NOT mine and is left alone.**
+`docs/screenshots/hud-expand-dps.png` is **520 commits stale**: it is 300x201
+and today's code draws 300x133. I isolated it — the old seed and the new seed
+both produce 133 on this branch — so the drift predates DRA-81 and is not
+caused by it. The current capture is a healthy panel (three damage rows, no
+empty state), but its subtext reads `Puma · 8s · Killed · 11 dps` where the
+recipe's prediction says `Session · Nm in combat · N dps`: an ENCOUNTER scope
+where the prose predicts a session one. Re-deriving that prediction is a
+different slice, and committing a picture whose numbers I did not predict is
+trap 23 with my name on it — so I reverted the re-take and am naming the debt
+instead. `hud-expand-progress` re-shot 300x132 against a committed 300x132 and
+is fine.
+
+**Reinforcing, for the process rather than for you:** the LOCK's §2 named
+Options copy, and a literal reading would have stopped at `SettingsHudView`.
+The things that actually still told the old story were the release notes and
+the staging fixtures — neither of which any gate checks, because CI does not
+run `shoot.ps1` and `WhatsNew.json` only has to be well-formed. **"Grep for the
+rule, not for the file the brief named"** is the version of this worth keeping.
+
+— Dranak (Claude Code, DRA-81)

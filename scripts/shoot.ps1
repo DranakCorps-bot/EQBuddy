@@ -2599,16 +2599,17 @@ $Shots = [ordered]@{
     # and the surface that is on screen for the whole session. Its icons were glyphs
     # until Gate 5c; a glyph that fails to render is a blank here and nowhere else.
     #
-    # PREDICTION, rewritten BEFORE the re-shoot (trap 23), for Surface A / SA-1. The seed
-    # below still names all ten keys on purpose — it is the pre-promotion profile, which
-    # is what most players are updating FROM — and AppSettings.MigratePromotedHudStats
-    # strips three of them on load. So expect, left to right:
-    #   * the ALWAYS-ON TRIO first: the character name slot ("Testchar"), a Swords + dps
-    #     reading, and a Chart + %/hr reading. The fixture session is melee, so the third
-    #     slot is the XP rate and NOT hps.
+    # PREDICTION, rewritten BEFORE the re-shoot (trap 23), for Surface A / SA-1 and
+    # AMENDED FOR DRA-81. The seed below names nine keys, and it is now a STATEMENT rather
+    # than a pre-promotion profile being migrated under the shot: `HudStatStarsRestored`
+    # stands the restore pass down, so what is seeded is what draws. 'hps' is deliberately
+    # not among them — see the note above `mini-bar`. So expect, left to right:
+    #   * the METRIC ROW first: the character name slot ("Testchar"), a Swords + dps
+    #     reading, and a Chart + %/hr reading. Three slots, because two of the three
+    #     metric ★s are set and 'hps' is not.
     #   * then SEVEN starred cells in MiniBarPresentation.Order: kills, pet, procs, loot,
-    #     motes, money, deaths. dps, hps and xp are NOT among them — they are the trio now,
-    #     and a duplicate of any of the three is the bug this prediction exists to catch.
+    #     motes, money, deaths. dps and xp are NOT among them — they draw up on the row,
+    #     and a duplicate of either is the bug this prediction exists to catch.
     #   * hairline dividers between all ten, none after the last.
     # The three metric slots are FIXED WIDTH (HudGlance), so the bar's width must not
     # change between takes of the same seed — a wobble there is trap 12 arriving.
@@ -2625,7 +2626,10 @@ $Shots = [ordered]@{
     # RE-SHOT 2026-09-13, 889x40: every element of the OE-7 prediction below held — Testchar,
     # 13 dps, 14.5%/hr, then kills/pet/procs/loot/motes/money/deaths, DPS + XP%/hr + PET +
     # LOOT bordered, no divider after the last, no duplicate of any promoted number. There is
-    # no hps slot here and that is the point of the pair: this fixture is melee. See
+    # no hps slot here and that is the point of the pair. Until DRA-81 that was because the
+    # fixture is melee and the slot decided for itself; it is now because this seed does not
+    # star 'hps'. Same picture, and the reason it is the right picture is stronger — it is a
+    # choice a player could make rather than a state the staging had to avoid. See
     # `mini-bar-healing` for the row that carries one.
     #
     # AMENDED FOR OE-7, and the last line above is the one that moved: **the divider is no
@@ -2636,6 +2640,15 @@ $Shots = [ordered]@{
     # dividers, none after the last. Re-shot 2026-09-07 at 907x40 and every element held,
     # including the width: the trio is still fixed-width, and a chip's border adds no
     # measured jitter because it is a constant.
+    #
+    # AMENDED FOR DRA-81 (the Founder LOCK), and the amendment is one dropped key: 'hps'
+    # left this seed. Every slot on the metric row is a ★ now — nothing is "always on" and
+    # nothing arrives from the log — so a seeded 'hps' would have drawn an HPS slot reading
+    # "0 hps" here, and this shot and `mini-bar-healing` would have become two PNGs of one
+    # picture differing only in a number. **A seeded MiniStats IS the row now**, which is
+    # why 'dps' and 'xp' had to be stated in every bar shot below that had been relying on
+    # them being unswitchable. Nothing about the committed PNGs changed: the row is the same
+    # three elements it has always been.
     'mini-bar'        = @{ Title = 'EQBuddy'
                            Env = @{}
                            # Every breakout OFF: starring dps/hps/pet/loot while minimized
@@ -2649,20 +2662,28 @@ $Shots = [ordered]@{
                            # overwritten a correct committed screenshot with that.
                            Set = @{ Minimized = $true
                                     DisabledBreakouts = @('Damage','Healing','Pet','Watch','Loot','Buffs')
-                                    MiniStats = @('kills','dps','hps','pet','procs','loot','motes','money','xp','deaths') } }
-    # THE SAME BAR WITH HEALING ON IT (DRA-72), which is the one state `mini-bar` cannot
-    # photograph: the fixture session is melee, so the always-on row there is name · DPS ·
-    # XP%/hr forever. Three heals through the real tail put healing above damage across the
-    # ~30 s window — `Add-LogLines` stamps every appended line with ONE timestamp, which is
-    # what puts them inside the window while the fixture's own damage is outside it — and
-    # the HPS slot arrives beside the XP rate rather than instead of it.
+                                    MiniStats = @('kills','dps','pet','procs','loot','motes','money','xp','deaths') } }
+    # THE SAME BAR WITH HPS TICKED, which is the one state `mini-bar` cannot photograph:
+    # that seed does not star 'hps', so its row is name · DPS · XP%/hr.
     #
-    # **This is the picture the Founder's video argues with**, and the two shots are a PAIR:
-    # one row narrower, one row wider, same seed. A single shot of the wide row would prove
-    # the slot draws and say nothing about what it cost the bar's width, which is the half
-    # trap 12 is about.
+    # **WHAT MAKES THE PAIR SINCE DRA-81 IS THE ★, NOT THE LOG.** Under DRA-72 these two
+    # differed by three heals: the slot ARRIVED when healing out-weighed damage across a
+    # ~30 s window, so the only way to photograph it was to stage the session. The Founder
+    # LOCK deleted that rule — the slot is here because 'hps' is in this seed and for no
+    # other reason — so the difference between the two PNGs is now exactly the difference
+    # between the two tick boxes, which is the thing a reader is being shown.
     #
-    # PREDICTION, written before the capture (trap 23). The always-on row reads name
+    # The heals STAY, and they are no longer staging the slot's membership: they are what
+    # puts a real number in it. `Add-LogLines` stamps every appended line with ONE
+    # timestamp. Without them this shot would be `mini-bar` plus "0 hps" — a correct
+    # picture of the feature and a poor illustration of it.
+    #
+    # **The two shots are a PAIR**: one row narrower, one row wider, one key apart. A single
+    # shot of the wide row would prove the slot draws and say nothing about what it cost the
+    # bar's width, which is the half trap 12 is about — and since DRA-81 the pair also shows
+    # the only thing that can ever change that width, which is the player ticking a box.
+    #
+    # PREDICTION, written before the capture (trap 23). The metric row reads name
     # ("Testchar") · Swords + "N dps" · **Heal + "N hps"** · Chart + "N.N%/hr" — FOUR slots
     # where `mini-bar` has three. `HudGlancePet` is unset here exactly as it is there, so the
     # pet chip is still a starred CELL and the seven cells that follow are the same seven in
@@ -2720,12 +2741,12 @@ $Shots = [ordered]@{
                            # The list has to grow with BreakoutKind (trap 30).
                            Set = @{ Minimized = $true
                                     DisabledBreakouts = @('Damage','Healing','Pet','Watch','Loot','Buffs')
-                                    MiniStats = @('kills','loot') } }
+                                    MiniStats = @('kills','loot','dps','xp') } }
     'hud-expand-progress' = @{ Title = 'EQBuddy HUD Panel'
                            Env = @{ EQBUDDY_HUDEXPAND = 'progress' }
                            Set = @{ Minimized = $true
                                     DisabledBreakouts = @('Damage','Healing','Pet','Watch','Loot','Buffs')
-                                    MiniStats = @('kills','loot') } }
+                                    MiniStats = @('kills','loot','dps','xp') } }
     # THE FOUR PANELS OE-7 ADDED. `HudExpandTarget` went from three members to seven, so
     # every floating-window kind can be summoned back from a chip and the ✕ on a float can
     # stop writing `DisabledBreakouts`. Three of them draw a body nothing else in this file
@@ -2789,7 +2810,7 @@ $Shots = [ordered]@{
                            Env = @{ EQBUDDY_HUDEXPAND = 'loot' }
                            Set = @{ Minimized = $true
                                     DisabledBreakouts = @('Damage','Healing','Pet','Watch','Loot','Buffs')
-                                    MiniStats = @('kills','loot') }
+                                    MiniStats = @('kills','loot','dps','xp') }
                            # **THE TARGET IS STAGED, and the first run is why.** Left alone
                            # this came back byte-identical to `hud-expand-loot-notarget`: the
                            # fixture's trailing lines are past `TargetLinger` (45s from the
@@ -2814,13 +2835,13 @@ $Shots = [ordered]@{
                            Env = @{ EQBUDDY_HUDEXPAND = 'loot' }
                            Set = @{ Minimized = $true
                                     DisabledBreakouts = @('Damage','Healing','Pet','Watch','Loot','Buffs')
-                                    MiniStats = @('kills','loot')
+                                    MiniStats = @('kills','loot','dps','xp')
                                     ShowTargetDrops = $false } }
     'hud-expand-watch' = @{ Title = 'EQBuddy HUD Panel'
                            Env = @{ EQBUDDY_HUDEXPAND = 'watch' }
                            Set = @{ Minimized = $true
                                     DisabledBreakouts = @('Damage','Healing','Pet','Watch','Loot','Buffs')
-                                    MiniStats = @('kills','loot')
+                                    MiniStats = @('kills','loot','dps','xp')
                                     DefaultRulesVersion = 2147483647
                                     TrackedRules = @(
                                         @{ Id = 'shot-spider'; Name = 'Spider parts'
@@ -2834,7 +2855,7 @@ $Shots = [ordered]@{
                            Env = @{ EQBUDDY_HUDEXPAND = 'buffs' }
                            Set = @{ Minimized = $true
                                     DisabledBreakouts = @('Damage','Healing','Pet','Watch','Loot','Buffs')
-                                    MiniStats = @('kills','loot') }
+                                    MiniStats = @('kills','loot','dps','xp') }
                            # `buffs-card`'s staging verbatim — one producer for one set of
                            # eight buffs, so the roster and the peek cannot be photographed
                            # against different sessions and read as disagreeing.
@@ -2969,22 +2990,22 @@ $Shots = [ordered]@{
                            Env = @{ EQBUDDY_HUDEXPAND = 'kills' }
                            Set = @{ Minimized = $true
                                     DisabledBreakouts = @('Damage','Healing','Pet','Watch','Loot','Buffs')
-                                    MiniStats = @('kills','loot') } }
+                                    MiniStats = @('kills','loot','dps','xp') } }
     'hud-expand-money' = @{ Title = 'EQBuddy HUD Panel'
                            Env = @{ EQBUDDY_HUDEXPAND = 'money' }
                            Set = @{ Minimized = $true
                                     DisabledBreakouts = @('Damage','Healing','Pet','Watch','Loot','Buffs')
-                                    MiniStats = @('kills','money') } }
+                                    MiniStats = @('kills','money','dps','xp') } }
     'hud-expand-motes' = @{ Title = 'EQBuddy HUD Panel'
                            Env = @{ EQBUDDY_HUDEXPAND = 'motes' }
                            Set = @{ Minimized = $true
                                     DisabledBreakouts = @('Damage','Healing','Pet','Watch','Loot','Buffs')
-                                    MiniStats = @('kills','motes') } }
+                                    MiniStats = @('kills','motes','dps','xp') } }
     'hud-expand-procs' = @{ Title = 'EQBuddy HUD Panel'
                            Env = @{ EQBUDDY_HUDEXPAND = 'procs' }
                            Set = @{ Minimized = $true
                                     DisabledBreakouts = @('Damage','Healing','Pet','Watch','Loot','Buffs')
-                                    MiniStats = @('kills','procs') }
+                                    MiniStats = @('kills','procs','dps','xp') }
                            # **TWO lines, and the first run proved why.** The proc line only
                            # NAMES the vehicle; `SessionStats` records a proc when SPELL
                            # DAMAGE arrives whose spell was never cast ("a proc IS the
@@ -3048,7 +3069,7 @@ $Shots = [ordered]@{
                                     DisabledBreakouts = @('Damage','Healing','Pet','Watch','Loot','Buffs')
                                     DefaultRulesVersion = 2147483647
                                     TrackedRules = @()
-                                    MiniStats = @('kills','pet','loot','buffs') }
+                                    MiniStats = @('kills','pet','loot','buffs','dps','xp') }
                            AppendLive = @(
                                'Sanctari begins casting Insight.'
                                'Your mind fills with wisdom.'
@@ -3199,7 +3220,7 @@ $Shots = [ordered]@{
                            Env = @{}
                            Set = @{ Minimized = $true
                                     DisabledBreakouts = @('Damage','Healing','Pet','Watch','Loot','Buffs')
-                                    MiniStats = @('kills','dps','loot')
+                                    MiniStats = @('kills','dps','loot','xp')
                                     TrackedRules = @(
                                         @{ Id = 'shot-mote'; Name = 'Motes'
                                            Pattern = 'mote'; Kind = 0; Pinned = $true }
@@ -3996,6 +4017,17 @@ function Write-Settings([hashtable]$extra) {
         # cleared before the bar rendered, and the picture would be of a real state that is
         # not the state the shot is about (trap 23).
         WatchChipMasterRetired = $true
+        # **DRA-81's star restore, marked done — and this line was found by TAKING A SHOT
+        # rather than by reading the diff.** `Write-Settings` writes a settings.json, so
+        # `hadFile` is true and `MigrateHudStatStars` runs: it would ADD 'dps', 'hps' and
+        # 'xp' to whatever `MiniStats` a recipe asked for, which is correct for a player's
+        # own profile and wrong for a fixture. The first `mini-bar` take after the LOCK came
+        # back 991x40 — `mini-bar-healing`'s width — because the migration had put an HPS
+        # slot on a row the recipe had deliberately not starred. Same class of mistake as
+        # the two pass flags above, and the same fix: a seeded profile is a STATED state.
+        # With this set, a recipe's `MiniStats` IS the metric row (trap 23, and trap 42 for
+        # how it was caught — the seed said one thing and the pixels said another).
+        HudStatStarsRestored = $true
         # No chip windows floating over the capture, and no log rewriting under it.
         TrackSpawns  = $false
         TruncateLogs = $false

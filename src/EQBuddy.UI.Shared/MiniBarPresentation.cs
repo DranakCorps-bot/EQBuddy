@@ -38,13 +38,13 @@ public static class MiniBarPresentation
     /// "buffs" is deliberately absent — it is a valid <see cref="AppSettings.MiniStats"/>
     /// entry that gates the Buffs breakout window and never draws a cell here.
     ///
-    /// **"xp", "dps" and "hps" are absent for the opposite reason since Surface A / SA-1:
-    /// they are always ON.** They were promoted to the collapsed HUD's always-on row (name,
-    /// DPS, XP%/hr — and HPS as its OWN slot beside them while healing is happening, DRA-72;
-    /// it used to share the XP rate's slot), which is drawn by
-    /// <see cref="HudGlance"/> ahead of every cell in this list. A key that is drawn
-    /// unconditionally has no business in a table whose whole job is "which subset did the
-    /// player switch on", and leaving one here would have drawn it twice.
+    /// **"xp", "dps" and "hps" are absent because they are drawn ELSEWHERE, not because
+    /// they are unswitchable.** They are <see cref="GlanceKeys"/>: ★s again since DRA-81's
+    /// Founder LOCK, listed for the player by <see cref="OptionKeys"/>, and rendered by
+    /// <see cref="HudGlance"/> as metric SLOTS ahead of every cell in this list. Keeping
+    /// them out of this table is what stops the bar drawing one of them twice — the same
+    /// exclusion <see cref="DrawnKeys"/> applies to <see cref="PetKey"/> while it is
+    /// inserted, and the reason is identical: a key is a cell OR a slot, never both at once.
     ///
     /// **<see cref="PetKey"/> is here and stays here, because pet damage is drawn
     /// unconditionally only SOMETIMES** (SIGNED #422). It is the one insertable member of
@@ -54,6 +54,40 @@ public static class MiniBarPresentation
     /// is a cell again.</summary>
     public static readonly IReadOnlyList<string> Order =
         ["kills", "pet", "procs", "loot", "motes", "money", "deaths"];
+
+    /// <summary>
+    /// The stats the collapsed HUD draws as METRIC SLOTS on its top row rather than as
+    /// cells, in <see cref="HudGlance.Read"/>'s own order — DPS, HPS, then the XP rate.
+    ///
+    /// **They are ★s like everything else since the FOUNDER LOCK of 2026-09-14** (DRA-81).
+    /// Surface A / SA-1 promoted them to "always on" and deleted their switches; the
+    /// Founder's smoke is what an unswitchable row costs when the one number they wanted was
+    /// the one the app had decided to withhold. So the keys are back in
+    /// <see cref="AppSettings.MiniStats"/>, this is the list that names them, and
+    /// <see cref="HudGlanceStars.From"/> is the one place a ★ becomes a slot.
+    ///
+    /// **<see cref="PetKey"/> is deliberately NOT here.** It appears on that row too, but it
+    /// is in <see cref="Order"/> because it is a cell that can be MOVED up — one key, one ★,
+    /// two possible homes, chosen by a drag (SIGNED #422). These three have exactly one home
+    /// and no drag, so listing them here keeps "which row is this stat on" a question with a
+    /// single answer per key.
+    /// </summary>
+    public static readonly IReadOnlyList<string> GlanceKeys = [HudGlance.DpsKey, HudGlance.HpsKey, HudGlance.XpKey];
+
+    /// <summary>
+    /// Every ★ the Mini dashboard offers, in the order that screen lists them: the top row's
+    /// slots first (<see cref="GlanceKeys"/>), then the cells (<see cref="Order"/>) — which
+    /// is the order they appear on the bar itself, read left to right and top row first.
+    ///
+    /// **It exists because the two lists have different jobs and the SCREEN needs both.**
+    /// <see cref="Order"/> is a formatting table ("which stats can this class turn into a
+    /// cell"); a screen that listed ★s out of it could only ever offer the stats that happen
+    /// to be cells, which is exactly the hole SA-1 left — three switches that existed in the
+    /// profile with nothing anywhere to set them. Options walks THIS list, and
+    /// <see cref="DrawnKeys"/> still walks the other, so a key can gain a ★ without gaining
+    /// a cell.
+    /// </summary>
+    public static readonly IReadOnlyList<string> OptionKeys = [.. GlanceKeys, .. Order];
 
     /// <summary>The key the buff set's chip draws under. A <see cref="AppSettings.MiniStats"/>
     /// member since long before it drew anything, and deliberately absent from
@@ -79,13 +113,14 @@ public static class MiniBarPresentation
     /// like any other, so it has a PLACE, and a place is what an order is about. Its
     /// canonical slot is where it has always drawn: after "deaths".
     ///
-    /// The always-on row's own slots (name, DPS, HPS, XP%/hr) are absent for the reason SA-1
-    /// promoted them: they are drawn ahead of every cell here and the player has no ★ for
-    /// them. **Since DRA-72 no slot up there changes identity** — HPS gained a slot of its own
-    /// instead of sharing the XP rate's — so the #413 sentence that reasoning rested on has
-    /// moved: what keeps that row out of this list is that its MEMBERSHIP is decided by the
-    /// session (is healing happening) and by one drag (<see cref="PetKey"/>), never by an
-    /// order. Pinned watch chips are absent too — they
+    /// The top row's own slots (name, DPS, HPS, XP%/hr) are absent, and **since DRA-81 the
+    /// reason is ORDER rather than the absence of a ★**. They have their ★s back
+    /// (<see cref="GlanceKeys"/>) and the player sets them in the same list as everything
+    /// else — what they do not have is a PLACE to argue about: that row's order is fixed in
+    /// <see cref="HudGlance.Read"/> and no drag reaches it, so a stat key in this list would
+    /// be an order nothing reads. <see cref="PetKey"/> is the one key on both rows, and it is
+    /// here because its cell CAN be carried (SIGNED #422). Pinned watch chips are absent
+    /// too — they
     /// are a BLOCK after the cells, one per rule, and per-rule placement would widen this
     /// list by rule id rather than by stat key. Both seams are named rather than built.
     ///
@@ -183,6 +218,13 @@ public static class MiniBarPresentation
     public static readonly IReadOnlyDictionary<string, string> Names =
         new Dictionary<string, string>(StringComparer.Ordinal)
         {
+            // The three top-row slots (DRA-81). They are in this table and NOT in `Icons`,
+            // which is the pair that decides where a key draws: `Cell` refuses anything
+            // `Icons` cannot face, so naming them here gives Options a row to list without
+            // giving the cell loop a chip to draw. Their icons are HudGlance's own constants.
+            [HudGlance.DpsKey] = "DPS",
+            [HudGlance.HpsKey] = "HPS (healing)",
+            [HudGlance.XpKey] = "XP per hour",
             ["kills"] = "Kills",
             ["pet"] = "Pet damage",
             ["procs"] = "Weapon procs",
@@ -220,10 +262,11 @@ public static class MiniBarPresentation
     public static string Text(StatsSnapshot s, string key) => key switch
     {
         "kills" => $"{s.YourKillCount}",
-        // No "dps"/"hps"/"xp" rows: those three are the always-on HUD trio since SA-1 and
-        // HudGlance formats them. Leaving a second formatter here would be two sources for
-        // one number (trap 4), and the day one of them gained a decimal only the other
-        // would move.
+        // No "dps"/"hps"/"xp" rows: those three draw as HudGlance SLOTS and HudGlance
+        // formats them. They have ★s again since DRA-81, but a ★ decides whether a stat
+        // shows and never which class writes its string — a second formatter here would be
+        // two sources for one number (trap 4), and the day one of them gained a decimal only
+        // the other would move.
         // The VALUE is StatsSnapshot's since SIGNED #422 and the SHAPE is this table's: the
         // always-on row can draw pet damage too now, and two copies of one expression is
         // the very thing the comment above forbids for dps/hps. Compact here, padded into

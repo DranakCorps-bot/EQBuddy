@@ -6421,3 +6421,87 @@ two Home rows in `ShellHostTests` are the ones that moved. `check.ps1` all
 gates green, 4,263 unit tests.
 
 — Dranak (Claude Code, DRA-63)
+
+## 2026-09-14 — DRA-81 (Founder smoke: the HPS LOCK + the worn anchor): four calls I made alone
+
+**Assumption at the top:** Helm's FOUNDER LOCK is the whole scope of the HUD
+half, and its §3 reads as *"do not leave healing-dominance as the visibility
+rule — checkbox wins"*, matching the header's own *"**Not** healing-dominance
+hysteresis auto-show"* and §4's *"Soft LEAVE inventing always-on HPS without a
+checkbox"*. So `HudGlance.HealingShown` and `HudGlanceState` were DELETED
+rather than kept and ANDed with the ★. Keeping a rule nothing reads is the
+dead-code half of trap 20, and an unread field is the next reader's invitation
+to make it decide something again. If Helm meant "keep the window as a second
+gate", that is one revert of one commit and I would rather be told than guess
+quietly.
+
+**1. The migration restores all three ★s; the fresh-install default restores
+only two.** This is the call that could most easily have gone the other way,
+and the two populations really are different. A profile that went through SA-1
+has been DRAWING DPS and the XP rate unconditionally ever since, and HPS
+whenever DRA-72's dominance window said so — so ticking all three reproduces
+what is on that player's screen today, takes nothing away, and hands them the
+switch they did not have. A fresh profile has no such history, and a permanent
+`0 hps` is a poor thing to give somebody who has never cast a heal. The
+alternative I rejected was ONE state for both: it is tidier, and it either
+gives every new player a dead number or leaves the Founder — whose file has no
+`hps` key at all — opening the app to find HPS still missing and its box
+unticked, which is the smoke arriving a second time wearing the fix's clothes.
+`TheMigratedRowGainsHpsAndTheFreshOneDoesNot` asserts the difference so a later
+"surely these should match" tidy-up has to argue with the reason.
+
+**I did NOT use the evidence SA-1 left behind, and that is deliberate.** The
+promotion wrote `DisabledBreakouts` from each star, so "was hps starred before
+SA-1" is recoverable — but only as a PROXY (trap 64b): a player who has since
+closed their Healing window through Options would read as "never wanted HPS",
+and the default `DisabledBreakouts` already contains `"Healing"`, so a
+post-SA-1 file answers the question wrongly by construction. A proxy that is
+wrong for the Founder's own profile is not evidence.
+
+**2. The restored ★ does NOT gate the breakout window, and
+`BreakoutPresentation.StarKey` stays null for Damage and Healing.** Before this
+slice that null MEANT "there is no star"; now there is one, so the null had to
+become a decision or it would rot into an oversight. Re-pointing it would mean
+unticking DPS in the Mini dashboard silently closed somebody's Damage float —
+the "tick box that lies" with the lie on the other side. A window and a HUD
+slot are different objects; the LOCK is about the bar and says nothing about
+the floats. `PromotedNote` now says both switches exist and that neither moves
+the other, because two settings that sound like one is how a player unticks the
+wrong thing and reports the window as broken.
+
+**3. Options walks a new list (`MiniBarPresentation.OptionKeys`) rather than
+`Order`.** `Order` is a FORMATTING table — which stats this class can turn into
+a cell — and the screen was walking it to decide what to OFFER. That is the
+whole mechanism of the hole: three keys lived in `MiniStats`, the bar read
+them, and no screen could reach them. The three stay OUT of `Order`, `Icons`
+and `CanonicalOrder`, which is what keeps the bar from drawing a second DPS
+chip beside the top row's, and `TheTopRowsStatsAreOfferedButNeverDrawnAsCells`
+pins both halves so a tidy-up of the `Names`/`Icons` asymmetry cannot do it.
+
+**4. `WornFrom` reads `InventoryFile.Entry.WornSlot`, and the normaliser lives
+on `Entry` rather than in `GearUpgrades`.** The Founder reported a missing
+Range row and duplicated primary/secondary rows as two items; they are one bug,
+and naming it once is the fix. The slot rule belongs beside `Worn`, `InBank`
+and `ContainerSlot` — the other facts a Location knows about itself — so the
+Gear Locker and any later phone surface can read the same answer (trap 4). The
+trailing ordinal is dropped (`Finger2` IS the FINGER slot), which is what lands
+the anchor in `GearLocker.SlotOrder`'s vocabulary; without that the picker
+would sort a `FINGER2` row last, and a row at the bottom of a list reads as a
+missing row rather than a misplaced one.
+
+**Named, because it is a behaviour change in unreleased copy rather than a
+silent one:** five highlights in the 2.0.0 `WhatsNew.json` entry said the three
+stats were always on, that their stars were gone, or that HPS arrives "once
+healing has been the weight of your last half-minute". All five are now false
+and all five were corrected in place — minimally, the false clause only. 2.0.0
+has not shipped, so this is a draft being kept true rather than a released note
+being rewritten; the rule is that every entry is TRUE in the release that
+ships it, and this is the release that ships this.
+
+**Not done, and not mine:** the `mini-bar` / `mini-tour` screenshots still show
+a row drawn under the old rule. The recipes are unchanged and correct — the
+default row is still `dps,xp` — so what is stale is only that no picture shows
+a ticked HPS. The screen is a mutex (trap 61) and standing down whatever holds
+it is not a call this seat makes.
+
+— Dranak (Claude Code, DRA-81)

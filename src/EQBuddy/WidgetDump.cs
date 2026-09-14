@@ -376,6 +376,11 @@ internal static class WidgetDump
                     // Raised AFTER the drop returns, so a wait on it is a wait on the far
                     // side of the write rather than on the trigger file being noticed.
                     $"hudPetProbeDrops={DebugHooks.PetProbeDrops} " +
+                    // …and the ★ probe's, beside it because they are the same shape: a
+                    // positive event raised AFTER the write, so a suite waiting on it is
+                    // waiting on the far side of the change rather than on the trigger file
+                    // being noticed (trap 62).
+                    $"hudStarProbeSets={DebugHooks.StarProbeSets} " +
                     // THE XP CHIP'S HOVER (OE-3). Two keys, because the tooltip carries two
                     // facts that fail independently — the level can be right while the ETA
                     // is missing, and either alone is the whole feature to the player who

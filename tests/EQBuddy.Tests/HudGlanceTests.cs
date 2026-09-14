@@ -4,67 +4,115 @@ using EQBuddy.UI.Shared;
 namespace EQBuddy.Tests;
 
 /// <summary>
-/// The collapsed HUD's always-on row (Surface A / SA-1, AMENDED by DRA-72).
+/// The collapsed HUD's metric row (Surface A / SA-1, amended by DRA-72, **superseded on
+/// membership by DRA-81's Founder LOCK**).
 ///
 /// Three things are being pinned, and only one of them is the obvious one. WHICH SLOTS are
 /// on the row is the interesting logic. The FIXED SHAPE of every string is the trap-12
 /// guard, and it is the half that a later "just add a decimal" would break silently — a
 /// readout whose width changes resizes an always-on-top window over a fullscreen game,
 /// which is what cost #173 its keyboard. And the ROW ITSELF — order, keys, reserved widths
-/// — is what the view now draws without knowing what any slot means, so a rule that used
-/// to live in a branch of `HudBarView` (which no test project can reach, docs/TestPlan.md
-/// §5) is asserted here instead.
+/// — is what the view draws without knowing what any slot means, so a rule that used to
+/// live in a branch of `HudBarView` (which no test project can reach, docs/TestPlan.md §5)
+/// is asserted here instead.
 ///
-/// **DRA-72 is the swap becoming an addition**, and the file is organised so the situation
-/// that produced the Founder's video has a test of its own: the old rule's ENTER test and
-/// EXIT test were both true of one character, so the third slot alternated between HPS and
-/// the XP rate about once a second. Each direction had a passing test; nothing drove them
-/// together.
+/// **What DRA-81 changed is the first of those, and it made it smaller.** Membership used
+/// to be a rule: SA-1 declared DPS and the XP rate always-on and deleted their switches,
+/// DRA-72 then gave HPS a dominance window, a 30-second weigh-in and a hysteresis. Now it
+/// is <see cref="HudGlanceStars"/> — what the player ticked — and this file's membership
+/// half is a truth table rather than a simulation. The tests that drove the old rule's
+/// window (one heal mid-fight, a tie, the slot ageing out) went with it; there is no
+/// timer-driven input left for them to be about.
+///
+/// **The DRA-72 property they protected is still asserted, because it is still true and is
+/// the half the Founder actually needed**: HPS and the XP rate hold separate slots, so both
+/// can be up at once and neither can take the other's place. It is proved here as a
+/// membership fact rather than as a settling loop.
 /// </summary>
 public class HudGlanceTests
 {
     private static HudGlanceInput Situation(
         double currentDps = 0, double sessionDps = 0, double hps = 0, double xpPerHour = 0,
-        long recentDamage = 0, long recentHealing = 0, long damageSinceResume = 0,
-        string? name = "Dranak", double petDps = 0, bool petInserted = false) =>
-        new(name, currentDps, sessionDps, hps, xpPerHour,
-            recentDamage, recentHealing, damageSinceResume, petDps, petInserted);
+        string? name = "Dranak", double petDps = 0) =>
+        new(name, currentDps, sessionDps, hps, xpPerHour, petDps);
 
-    private static string Row(HudGlanceState state, in HudGlanceInput input) =>
-        HudGlance.Read(state, in input).RowKey;
+    /// <summary>The row a profile draws out of the box — DPS and the XP rate ticked, HPS
+    /// not (<see cref="AppSettings.MiniStats"/>'s default).</summary>
+    private static readonly HudGlanceStars Default = new(Dps: true, Hps: false, Xp: true, Pet: false);
 
-    private static readonly HudGlanceState Healing = new(true);
+    /// <summary>A healer's row: the same, plus the HPS box.</summary>
+    private static readonly HudGlanceStars Healing = Default with { Hps = true };
+
+    private static string Row(HudGlanceStars stars, in HudGlanceInput input) =>
+        HudGlance.Read(stars, in input).RowKey;
 
     // --------------------------------------------------- the row a player sees ----
 
-    /// <summary>The row every melee character sees, forever: DPS then the XP rate, with
-    /// nothing conditional on it. Same two numbers SA-1 shipped, in the same order.</summary>
+    /// <summary>The row a default profile draws: DPS then the XP rate. Byte for byte what
+    /// SA-1 shipped and what DRA-72 left behind — the difference is that it is now a
+    /// consequence of two ticked boxes rather than of a promotion nobody can undo.</summary>
     [Fact]
-    public void AMeleeCharactersRowIsDpsThenTheXpRate()
+    public void ADefaultProfilesRowIsDpsThenTheXpRate()
     {
-        var glance = HudGlance.Read(HudGlanceState.Start, Situation(xpPerHour: 12.5));
+        var glance = HudGlance.Read(Default, Situation(xpPerHour: 12.5));
 
         Assert.Equal("dps,xp", glance.RowKey);
         Assert.Equal("Dranak", glance.Name);
         Assert.Equal("  12.5%/hr", glance.TextOf(HudGlance.XpKey));
         Assert.Null(glance.TextOf(HudGlance.HpsKey));
-        Assert.False(glance.State.Healing);
     }
 
     /// <summary>
-    /// **THE WHOLE OF DRA-72, in one assertion**: when healing is on the row, the XP rate is
-    /// still on it too. Both numbers, at once, each in its own slot.
+    /// **THE FOUNDER'S SMOKE, in one assertion**: HPS is ticked, so HPS is on the row.
     ///
-    /// Before this, HPS and the XP rate shared one slot and the readout could only ever
-    /// answer with one of them — which is why the assertion is on the ROW and not on a
-    /// "which is it" mode. A test that asked "is the third slot HPS" cannot fail on the bug
-    /// this fixes, because the answer was always yes-or-no and both answers drew correctly.
+    /// No healing has happened in this situation and none needs to — that is the whole
+    /// point. Under DRA-72 this row drew nothing for HPS until healing had out-weighed
+    /// damage across the last half-minute, so a healer who ticked the box (or believed they
+    /// had) got a bar that disagreed with them, and there was no box to check because SA-1
+    /// had deleted it. A ★ that shows the number is smaller than any window rule and cannot
+    /// be wrong about what the player wants.
+    /// </summary>
+    [Fact]
+    public void TickingHpsPutsItOnTheRowWithNoHealingRequired()
+    {
+        var glance = HudGlance.Read(Healing, Situation(hps: 0, xpPerHour: 12.5));
+
+        Assert.Equal("dps,hps,xp", glance.RowKey);
+        // Reading zero is a READING — a healer between pulls — and it is why the slot must
+        // not be gated on evidence. A row that appeared only once the number was interesting
+        // is a row that is missing exactly when somebody goes looking for it.
+        Assert.Equal("     0 hps", glance.TextOf(HudGlance.HpsKey));
+    }
+
+    /// <summary>The other direction, and it is the one SA-1 made impossible: unticking HPS
+    /// takes the slot away even while healing is pouring in. "I do not want this number" is
+    /// an answer the app has to accept.</summary>
+    [Fact]
+    public void UntickingHpsTakesItOffEvenWhileHealing()
+    {
+        var glance = HudGlance.Read(Default, Situation(hps: 900, xpPerHour: 12.5));
+
+        Assert.Equal("dps,xp", glance.RowKey);
+        Assert.False(glance.Has(HudGlance.HpsKey));
+        Assert.Null(glance.TextOf(HudGlance.HpsKey));
+    }
+
+    /// <summary>
+    /// **THE DRA-72 PROPERTY, KEPT**: HPS and the XP rate are separate slots, so both are up
+    /// at once.
+    ///
+    /// The bug it was written against was a shared slot whose identity alternated on the
+    /// one-second timer between "13 hps" and "167.5%/hr". DRA-72 fixed it with a hysteresis;
+    /// DRA-81 keeps the fix and drops the hysteresis, because the slots being separate is
+    /// what made "both at once" possible and the window was only ever deciding WHEN. The
+    /// assertion is on the ROW rather than on a "which is it" mode for the original reason:
+    /// a test that asked "is the third slot HPS" cannot fail on the flashing bar, since both
+    /// answers drew correctly.
     /// </summary>
     [Fact]
     public void WhenHealingIsOnTheRowTheXpRateIsStillThere()
     {
-        var glance = HudGlance.Read(HudGlanceState.Start,
-            Situation(hps: 141, xpPerHour: 167.5, recentDamage: 200, recentHealing: 2400));
+        var glance = HudGlance.Read(Healing, Situation(hps: 141, xpPerHour: 167.5));
 
         Assert.Equal("dps,hps,xp", glance.RowKey);
         Assert.Equal("   141 hps", glance.TextOf(HudGlance.HpsKey));
@@ -76,145 +124,118 @@ public class HudGlanceTests
     }
 
     /// <summary>
-    /// **THE FOUNDER'S VIDEO, driven as a situation and then held.**
+    /// **THE FOUNDER'S VIDEO, and why it can no longer happen.**
     ///
     /// The character was healing enough to out-weigh damage across the ~30 s window AND
-    /// swinging inside the ~5 s resume window — so the old rule's "healing has dominated,
-    /// take the slot" and its "damage is back, give it up" were both true, and the one slot
-    /// they shared alternated between "13 hps" and "167.5%/hr" on the one-second timer,
-    /// forever. Nothing was broken in either rule; they had never been asked at the same
-    /// moment.
+    /// swinging inside the ~5 s resume window, so the old rule's "healing has dominated,
+    /// take the slot" and its "damage is back, give it up" were both true and the shared
+    /// slot alternated forever. DRA-72 answered it by deleting one clause; DRA-81 answers it
+    /// by construction — the row is a function of the profile alone, so a hundred reads of
+    /// one unchanged situation are a hundred identical rows and there is no input left that
+    /// could make it flicker.
     ///
-    /// Fed back into itself, because that is how a host uses this: the row has to be the
-    /// same row on every tick, not the same row on alternate ones. An assertion that only
-    /// looked at the first answer would pass on the code that flashes.
+    /// Read repeatedly rather than once, because the bug was a bar that was right half the
+    /// time: an assertion that looked at the first answer passed on the code that flashed.
     /// </summary>
     [Fact]
     public void TheVideosSituationShowsBothNumbersAndHoldsStillOnEveryTick()
     {
-        var input = Situation(currentDps: 18, hps: 13, xpPerHour: 167.5,
-            recentDamage: 200, recentHealing: 2400, damageSinceResume: 60);
+        var input = Situation(currentDps: 18, hps: 13, xpPerHour: 167.5);
 
-        var state = HudGlanceState.Start;
-        var rows = new List<string>();
-        for (var tick = 0; tick < 6; tick++)
-        {
-            var glance = HudGlance.Read(state, input);
-            state = glance.State;
-            rows.Add(glance.RowKey);
-        }
+        var rows = Enumerable.Range(0, 6)
+            .Select(_ => HudGlance.Read(Healing, input).RowKey)
+            .ToList();
 
         Assert.Equal(["dps,hps,xp", "dps,hps,xp", "dps,hps,xp", "dps,hps,xp",
             "dps,hps,xp", "dps,hps,xp"], rows);
     }
 
-    /// <summary>The deleted clause, named and asserted: damage returning does not take the
-    /// HPS slot away. It used to, instantly and by design — "collapse again the moment
-    /// combat-as-damage returns" — because the XP rate had nowhere else to be drawn. It has
-    /// somewhere else now.</summary>
-    [Fact]
-    public void OneSwingNoLongerTakesTheHealingSlotAway()
-    {
-        var swung = Situation(hps: 141, xpPerHour: 12.5,
-            recentDamage: 40, recentHealing: 9000, damageSinceResume: 40);
+    // ------------------------------------------------ membership is the ★, only ----
 
-        Assert.Equal("dps,hps,xp", Row(Healing, swung));
-        Assert.True(HudGlance.HealingShown(shown: true, swung));
-    }
-
-    // ---------------------------------------------- when the slot arrives ----
-
-    /// <summary>Arriving is deliberately slow, and that half of the hysteresis is
-    /// UNCHANGED: healing has to have out-weighed damage across the whole ~30 s window. A
-    /// damage dealer who lands one heal mid-pull gains no slot — and since a slot arriving
-    /// widens an always-on-top window, that protection is now about the player's HUD as
-    /// well as about their XP rate.</summary>
-    [Fact]
-    public void OneHealDuringAFightDoesNotPutHealingOnTheRow()
-    {
-        var glance = HudGlance.Read(HudGlanceState.Start,
-            Situation(recentDamage: 9000, recentHealing: 300));
-
-        Assert.Equal("dps,xp", glance.RowKey);
-        Assert.False(glance.State.Healing);
-    }
-
-    [Fact]
-    public void HealingThatOutweighsDamageOverTheWindowArrives()
-    {
-        var glance = HudGlance.Read(HudGlanceState.Start,
-            Situation(hps: 141, recentDamage: 200, recentHealing: 2400));
-
-        Assert.True(glance.State.Healing);
-        Assert.Equal("dps,hps,xp", glance.RowKey);
-    }
-
-    [Fact]
-    public void HealingWithNoDamageAtAllStillCounts()
-    {
-        // A healer between pulls: nothing to hit, everything to mend.
-        Assert.Equal("dps,hps,xp",
-            Row(HudGlanceState.Start, Situation(recentDamage: 0, recentHealing: 1200)));
-    }
-
-    /// <summary>Equal weight is not dominance. A tie leaves the row alone, because a slot
-    /// arriving needs a reason.</summary>
-    [Fact]
-    public void EqualHealingAndDamageLeavesTheRowAlone() =>
-        Assert.Equal("dps,xp",
-            Row(HudGlanceState.Start, Situation(recentDamage: 1000, recentHealing: 1000)));
-
-    /// <summary>Once it is there, healing that is REAL but no longer dominant keeps it —
-    /// which is the "stays while you keep healing" half, and the reason a healer who starts
-    /// swinging does not watch their own number disappear. It is also the arithmetic that
-    /// makes an oscillation impossible: the stay test is weaker than the arrive test, so no
-    /// input can satisfy one and fail the other in alternate directions.</summary>
-    [Fact]
-    public void OnceItIsThereHealingThatIsNoLongerDominantKeepsIt() =>
-        Assert.Equal("dps,hps,xp",
-            Row(Healing, Situation(recentDamage: 9000, recentHealing: 300)));
-
-    // -------------------------------------------------- when it leaves ----
-
-    /// <summary>A healer who simply stops: thirty seconds later the window holds no
-    /// healing, and there is no longer anything for the slot to be about. UNCHANGED from
-    /// SA-1 — and it is the one way the slot can leave, which is what makes the row's width
-    /// a function of what the player is doing rather than of the timer.</summary>
-    [Fact]
-    public void TheSlotLeavesWhenTheHealingWindowEmpties()
-    {
-        var glance = HudGlance.Read(Healing, Situation());
-
-        Assert.Equal("dps,xp", glance.RowKey);
-        Assert.False(glance.State.Healing);
-    }
-
-    /// <summary>…and it leaves on an empty healing window even while damage is still
-    /// pouring in, which is the same rule read from the other side.</summary>
-    [Fact]
-    public void ItLeavesOnAnEmptyHealingWindowWhateverDamageIsDoing() =>
-        Assert.Equal("dps,xp",
-            Row(Healing, Situation(recentDamage: 9000, damageSinceResume: 9000)));
-
-    /// <summary>Feeding the answer back in is how a host uses this, so a settled state has
-    /// to stay settled — in both memberships, because a row that flickers costs the same
-    /// either way round.</summary>
+    /// <summary>
+    /// **The truth table, so no ★ can be quietly ignored.** Each of the three has to be able
+    /// to be the ONLY thing on the row and the only thing missing from it — a membership
+    /// rule that reads two of three boxes passes every test that only ever ticks all of
+    /// them.
+    /// </summary>
     [Theory]
-    [InlineData(100, 3000, "dps,hps,xp")]
-    [InlineData(9000, 0, "dps,xp")]
-    public void FedBackToItselfTheRowSettles(long recentDamage, long recentHealing, string row)
-    {
-        var input = Situation(hps: 141, xpPerHour: 12.5,
-            recentDamage: recentDamage, recentHealing: recentHealing,
-            damageSinceResume: recentDamage);
+    [InlineData(true, true, true, "dps,hps,xp")]
+    [InlineData(true, false, true, "dps,xp")]
+    [InlineData(false, true, true, "hps,xp")]
+    [InlineData(true, true, false, "dps,hps")]
+    [InlineData(true, false, false, "dps")]
+    [InlineData(false, true, false, "hps")]
+    [InlineData(false, false, true, "xp")]
+    public void EveryStarDecidesItsOwnSlotAndNobodyElses(bool dps, bool hps, bool xp, string row) =>
+        Assert.Equal(row, Row(new HudGlanceStars(dps, hps, xp, Pet: false),
+            Situation(currentDps: 412, hps: 141, xpPerHour: 12.5)));
 
-        var state = HudGlanceState.Start;
-        for (var i = 0; i < 5; i++)
-        {
-            var glance = HudGlance.Read(state, input);
-            state = glance.State;
-            Assert.Equal(row, glance.RowKey);
-        }
+    /// <summary>Every box clear leaves the NAME and nothing else, and the row token says so
+    /// as "-" rather than as an empty string — the dump is space-separated key=value, so an
+    /// empty value cannot be waited on (<see cref="MiniBarPresentation.OrderKey"/>).
+    ///
+    /// It is a state a player can ask for on purpose: someone who wants the bar to be a name
+    /// and their own chips is allowed to have that, and it is the first time since SA-1 they
+    /// could.</summary>
+    [Fact]
+    public void EveryStarClearedLeavesTheNameAloneOnTheRow()
+    {
+        var glance = HudGlance.Read(default, Situation(currentDps: 412, hps: 141, xpPerHour: 12.5));
+
+        Assert.Empty(glance.Slots);
+        Assert.Equal("-", glance.RowKey);
+        Assert.Equal("Dranak", glance.Name);
+    }
+
+    /// <summary>The ORDER is the class's and never the order the boxes were ticked in —
+    /// `MiniBarPresentation.Order`'s rule one row up, and for its reason: a row that
+    /// reshuffles as you toggle is a row you have to re-read every time. Asserted by reading
+    /// the same membership out of two differently-ordered profiles.</summary>
+    [Fact]
+    public void TheRowsOrderIsFixedAndNotTheOrderTheStarsWereSetIn()
+    {
+        var input = Situation(currentDps: 412, hps: 141, xpPerHour: 12.5, petDps: 88);
+        var all = new HudGlanceStars(Dps: true, Hps: true, Xp: true, Pet: true);
+
+        Assert.Equal("dps,pet,hps,xp", Row(all, input));
+
+        var backwards = new AppSettings { MiniStats = ["xp", "hps", "dps"], HudGlancePet = true };
+        Assert.Equal("dps,pet,hps,xp", Row(HudGlanceStars.From(backwards), input));
+    }
+
+    // ------------------------------------------------ the ★s come off the profile ----
+
+    /// <summary>
+    /// <see cref="HudGlanceStars.From"/> is the ONE place a ★ becomes a slot (trap 4), so
+    /// the widget, a test and any later host cannot disagree about what the profile says.
+    ///
+    /// The negative is the half worth having: a profile with the keys ABSENT answers false
+    /// for each, which is the state every player's file was in between SA-1 and the restore
+    /// pass — and reading it as anything but "off" is how an unswitchable row comes back.
+    /// </summary>
+    [Fact]
+    public void TheStarsAreReadOffTheProfileAndAnAbsentKeyIsOff()
+    {
+        var settings = new AppSettings { MiniStats = ["kills", "dps", "hps", "xp"], HudGlancePet = true };
+
+        Assert.Equal(new HudGlanceStars(true, true, true, true), HudGlanceStars.From(settings));
+        Assert.Equal(default, HudGlanceStars.From(new AppSettings { MiniStats = ["kills"] }));
+        // "pet" is its own verb and its own setting — a ★ for pet is about the CELL, and
+        // whether the slot is on this row is the drag's answer (SIGNED #422).
+        Assert.False(HudGlanceStars.From(new AppSettings { MiniStats = ["pet"] }).Pet);
+    }
+
+    /// <summary>A fresh profile draws the row every profile has drawn since SA-1 — DPS and
+    /// the XP rate — so nothing about a new install changed when the switches came back.
+    /// **And HPS is deliberately NOT in it**: a permanent "0 hps" is not what to hand
+    /// somebody who has never cast a heal, and the box is right there.</summary>
+    [Fact]
+    public void AFreshProfilesDefaultRowIsDpsAndTheXpRate()
+    {
+        var stars = HudGlanceStars.From(new AppSettings());
+
+        Assert.Equal(new HudGlanceStars(Dps: true, Hps: false, Xp: true, Pet: false), stars);
+        Assert.Equal("dps,xp", Row(stars, Situation(xpPerHour: 12.5)));
     }
 
     // ------------------------------------------------------- the fixed shape ----
@@ -272,10 +293,9 @@ public class HudGlanceTests
     [Fact]
     public void EverySlotsStringIsTheSameLengthAsEveryOthers()
     {
-        var input = Situation(currentDps: 412, hps: 141, xpPerHour: 12.5,
-            recentHealing: 2400, petDps: 88, petInserted: true);
+        var input = Situation(currentDps: 412, hps: 141, xpPerHour: 12.5, petDps: 88);
 
-        var slots = HudGlance.Read(Healing, input).Slots;
+        var slots = HudGlance.Read(Healing with { Pet = true }, input).Slots;
 
         // The count first: `Assert.All` over a row that had quietly lost a slot would pass
         // while asserting nothing about it, which is the shape of a vacuous guard.
@@ -302,14 +322,14 @@ public class HudGlanceTests
     /// **A per-metric width only became legal with DRA-72.** SA-1 gave every metric ONE
     /// width because the third slot changed its string's identity on a timer, so a per-string
     /// width there would have been the resize the rule forbids. No slot changes identity now,
-    /// so these are constants of the row.
+    /// so these are constants of the row — and since DRA-81 the only thing that can add one
+    /// is a click the player just made.
     /// </summary>
     [Fact]
     public void EachSlotCarriesItsOwnMetricsReservedWidth()
     {
-        var glance = HudGlance.Read(Healing,
-            Situation(hps: 141, xpPerHour: 12.5, recentHealing: 2400, petDps: 88,
-                petInserted: true));
+        var glance = HudGlance.Read(Healing with { Pet = true },
+            Situation(hps: 141, xpPerHour: 12.5, petDps: 88));
 
         Assert.Equal(HudGlance.MetricReservedWidth,
             glance.Slots.Single(s => s.Key == HudGlance.DpsKey).ReservedWidth);
@@ -368,9 +388,8 @@ public class HudGlanceTests
     [Fact]
     public void EverySlotKeyResolvesToItsOwnExpansionTarget()
     {
-        var glance = HudGlance.Read(Healing,
-            Situation(hps: 141, xpPerHour: 12.5, recentHealing: 2400, petDps: 88,
-                petInserted: true));
+        var glance = HudGlance.Read(Healing with { Pet = true },
+            Situation(hps: 141, xpPerHour: 12.5, petDps: 88));
         var targets = glance.Slots
             .Select(slot => (slot.Key, Target: HudExpand.TargetForKey(slot.Key)))
             .ToList();
@@ -392,8 +411,8 @@ public class HudGlanceTests
     [Fact]
     public void TheRowTokenIsOneSpaceFreeWordInTheBarsOwnSpelling()
     {
-        var row = HudGlance.Read(Healing,
-            Situation(hps: 141, recentHealing: 2400, petDps: 88, petInserted: true)).RowKey;
+        var row = HudGlance.Read(Healing with { Pet = true },
+            Situation(hps: 141, petDps: 88)).RowKey;
 
         Assert.Equal("dps,pet,hps,xp", row);
         Assert.DoesNotContain(' ', row);
@@ -405,19 +424,11 @@ public class HudGlanceTests
     /// mapping from session fields to glance inputs lives once — a second host wiring its
     /// own would be two producers of one decision (trap 33).</summary>
     [Fact]
-    public void TheSnapshotOverloadReadsTheSessionsOwnEffortSignal()
+    public void TheSnapshotOverloadFormatsTheSessionsOwnNumbers()
     {
-        var snapshot = new StatsSnapshot
-        {
-            CurrentDps = 300,
-            Hps = 141,
-            XpPerHour = 12.5,
-            Effort = new RecentEffort(TimeSpan.FromSeconds(30), 100, 4000,
-                TimeSpan.FromSeconds(5), 0),
-        };
+        var snapshot = new StatsSnapshot { CurrentDps = 300, Hps = 141, XpPerHour = 12.5 };
 
-        var glance = HudGlance.Read(HudGlanceState.Start, snapshot, "Dranak",
-            petInserted: false);
+        var glance = HudGlance.Read(Healing, snapshot, "Dranak");
 
         Assert.Equal("dps,hps,xp", glance.RowKey);
         Assert.Equal("Dranak", glance.Name);
@@ -426,29 +437,33 @@ public class HudGlanceTests
         Assert.Equal("  12.5%/hr", glance.TextOf(HudGlance.XpKey));
     }
 
+    /// <summary>…and the SAME snapshot under a default profile draws no HPS slot, so "the
+    /// session healed" and "the row shows healing" cannot be read off one another. This is
+    /// the pair that would have caught the Founder's smoke from the code's side: the number
+    /// existed on the snapshot the whole time.</summary>
     [Fact]
-    public void ASnapshotWithNoEffortYetShowsTheXpRateAlone()
+    public void TheSameSnapshotWithoutTheStarDrawsNoHealingSlot()
     {
-        var snapshot = new StatsSnapshot { XpPerHour = 12.5 };
+        var snapshot = new StatsSnapshot { CurrentDps = 300, Hps = 141, XpPerHour = 12.5 };
 
-        var glance = HudGlance.Read(HudGlanceState.Start, snapshot, "", petInserted: false);
+        var glance = HudGlance.Read(Default, snapshot, "");
 
         Assert.Equal("dps,xp", glance.RowKey);
         Assert.Equal("", glance.Name);
-        Assert.Equal("  12.5%/hr", glance.TextOf(HudGlance.XpKey));
+        Assert.False(glance.Has(HudGlance.HpsKey));
+        Assert.Equal(141, snapshot.Hps);   // the number was there; the ★ was not
     }
 
     // ------------------------------------- the one inserted slot (SIGNED #422) ----
 
-    /// <summary>The default row is what SA-1 shipped: the pet slot is ABSENT rather than
+    /// <summary>Without the drag there is no pet slot at all — ABSENT rather than
     /// present-and-empty. Membership is the whole answer the view reads, so "not inserted"
-    /// and "inserted but reading nothing" must not collapse into one value — the second is a
+    /// and "inserted but reading nothing" must not collapse into one value: the second is a
     /// real state (a session with no pet damage yet) and it still draws a slot.</summary>
     [Fact]
     public void WithoutTheSettingThereIsNoPetSlotAtAll()
     {
-        var glance = HudGlance.Read(HudGlanceState.Start,
-            Situation(xpPerHour: 12.5, petDps: 88, petInserted: false));
+        var glance = HudGlance.Read(Default, Situation(xpPerHour: 12.5, petDps: 88));
 
         Assert.Equal("dps,xp", glance.RowKey);
         Assert.False(glance.Has(MiniBarPresentation.PetKey));
@@ -458,8 +473,8 @@ public class HudGlanceTests
     [Fact]
     public void InsertedTheRowReadsDpsThenPetThenTheXpRate()
     {
-        var glance = HudGlance.Read(HudGlanceState.Start,
-            Situation(currentDps: 412, xpPerHour: 12.5, petDps: 88, petInserted: true));
+        var glance = HudGlance.Read(Default with { Pet = true },
+            Situation(currentDps: 412, xpPerHour: 12.5, petDps: 88));
 
         Assert.Equal("dps,pet,xp", glance.RowKey);
         Assert.Equal("   412 dps", glance.TextOf(HudGlance.DpsKey));
@@ -473,7 +488,7 @@ public class HudGlanceTests
     [Fact]
     public void AnInsertedPetWithNoDamageYetStillDrawsItsSlot() =>
         Assert.Equal("     0 dps",
-            HudGlance.Read(HudGlanceState.Start, Situation(petInserted: true))
+            HudGlance.Read(Default with { Pet = true }, Situation())
                 .TextOf(MiniBarPresentation.PetKey));
 
     /// <summary>Trap 12, for the inserted slot: every value it can hold formats to the same
@@ -503,18 +518,19 @@ public class HudGlanceTests
     /// than reopened.**
     ///
     /// SIGNED #422 put the pet slot between DPS and the metrics that follow it, and the
-    /// reasoning it had to route around was #413's: a fixed slot that changes identity
-    /// mid-session must not be a drop target. DRA-72 removes the identity change altogether,
-    /// and this asserts the consequence that matters — an HPS slot ARRIVING lands to the
-    /// RIGHT of the pet slot, so the gap the drag measures is the same gap either way.
+    /// reasoning it routed around was #413's: a fixed slot that changes identity mid-session
+    /// must not be a drop target. Nothing on this row changes identity at all now, and this
+    /// asserts the consequence that matters — ticking HPS lands the new slot to the RIGHT of
+    /// the pet slot, so the gap the drag measures is the same gap either way.
     /// </summary>
     [Fact]
-    public void AnArrivingHealingSlotLandsAfterTheInsertedPetSlot()
+    public void TickingHealingLandsItAfterTheInsertedPetSlot()
     {
-        var input = Situation(hps: 141, xpPerHour: 12.5, recentDamage: 200,
-            recentHealing: 2400, petDps: 88, petInserted: true);
+        var input = Situation(hps: 141, xpPerHour: 12.5, petDps: 88);
 
-        var glance = HudGlance.Read(HudGlanceState.Start, input);
+        Assert.Equal("dps,pet,xp", Row(Default with { Pet = true }, input));
+
+        var glance = HudGlance.Read(Healing with { Pet = true }, input);
 
         Assert.Equal("dps,pet,hps,xp", glance.RowKey);
         // The two ends are fixed, which is what makes the middle safe to grow: DPS is
@@ -540,8 +556,8 @@ public class HudGlanceTests
     [Fact]
     public void EverySlotWearsItsOwnRealVector()
     {
-        var icons = HudGlance.Read(Healing,
-                Situation(hps: 141, recentHealing: 2400, petDps: 88, petInserted: true))
+        var icons = HudGlance.Read(Healing with { Pet = true },
+                Situation(hps: 141, petDps: 88))
             .Slots.Select(slot => slot.Icon).ToList();
 
         Assert.Equal(4, icons.Distinct().Count());
@@ -560,15 +576,13 @@ public class HudGlanceTests
             PetAbilities = [new SourceDamage("Pet (Gnoll Pup)", 40, 10_560)],
         };
 
-        var glance = HudGlance.Read(HudGlanceState.Start, snapshot, "Dranak",
-            petInserted: true);
+        var glance = HudGlance.Read(Default with { Pet = true }, snapshot, "Dranak");
 
         Assert.Equal(88, snapshot.PetDps);
         Assert.Equal("    88 dps", glance.TextOf(MiniBarPresentation.PetKey));
         // …and the SAME snapshot with the setting off draws no slot, so the two facts cannot
         // be read off one another.
-        Assert.False(HudGlance
-            .Read(HudGlanceState.Start, snapshot, "Dranak", petInserted: false)
+        Assert.False(HudGlance.Read(Default, snapshot, "Dranak")
             .Has(MiniBarPresentation.PetKey));
     }
 }

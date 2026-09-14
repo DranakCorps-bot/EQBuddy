@@ -17,14 +17,22 @@ public sealed class AppSettings
     /// it.</summary>
     public bool LegacyFinalNoticeAcknowledged { get; set; }
     public bool Minimized { get; set; }
-    /// <summary>Which stats have a ★ and therefore a cell on the collapsed HUD bar.
+    /// <summary>Which stats have a ★, and therefore a place on the collapsed HUD bar —
+    /// a metric SLOT on its top row for "dps"/"hps"/"xp", a CELL for everything else.
     ///
-    /// **"xp", "dps" and "hps" are no longer members of this list** — they were PROMOTED
-    /// to the always-on HUD numbers in Surface A / SA-1 (name, DPS, XP%/hr — plus HPS in its
-    /// OWN slot beside them while healing is happening, DRA-72), and a promotion
-    /// removes the toggle. <see cref="MigratePromotedHudStats"/> strips them from
-    /// existing profiles; the default lost "dps" for the same reason.</summary>
-    public List<string> MiniStats { get; set; } = ["kills"];
+    /// **"xp", "dps" and "hps" are members again since the FOUNDER LOCK of 2026-09-14**
+    /// (DRA-81). Surface A / SA-1 promoted them to always-on and deleted their switches;
+    /// DRA-72 then decided HPS from the log instead. Between them the row was the one thing
+    /// on the widget a player could not change, and the Founder's smoke found it from the
+    /// worst side — HPS wanted, absent, and no box anywhere to tick.
+    /// <see cref="MigrateHudStatStars"/> puts the three keys back on an existing profile;
+    /// the default carries them for a new one.
+    ///
+    /// **The default is "dps", "xp", "kills" and deliberately not "hps"**: those three ARE
+    /// the row every profile has drawn since SA-1, so a fresh install is unchanged, and a
+    /// permanent "0 hps" is not something to hand someone who has never cast a heal. A
+    /// migrated profile is the one case that also gets "hps" — see there for why.</summary>
+    public List<string> MiniStats { get; set; } = ["dps", "xp", "kills"];
 
     /// <summary>
     /// The order the minimized bar's chips sit in, left to right — the player's own, set by
@@ -475,8 +483,8 @@ public sealed class AppSettings
     /// <b>Kept as a property because the retirement has to READ it once.</b> Deleting it
     /// outright would drop the value out of every existing <c>settings.json</c> on the next
     /// parse, and a player who had unticked the box would get their chips back with nothing
-    /// having asked them — the SA-1 lesson (<see cref="MigratePromotedHudStats"/>: read the
-    /// switch BEFORE stripping it). <c>UI.Shared.WatchPinMigration</c> is the last reader;
+    /// having asked them — the SA-1 lesson (<see cref="MigrateHudStatStars"/> still carries
+    /// it: read the switch BEFORE overwriting it). <c>UI.Shared.WatchPinMigration</c> is the last reader;
     /// after its one-time pass this value is inert and nothing on any surface consults it,
     /// the same "left inert" treatment <c>SpawnLeft</c>/<c>SpawnTop</c> got at the World fold.
     /// </summary>
@@ -496,15 +504,34 @@ public sealed class AppSettings
     /// <summary>Has the one-time <see cref="MigrateWindowHeights"/> clear run? See there
     /// for why every stored window height written before 2026-08-25 is discarded.</summary>
     public bool WindowHeightsReset { get; set; }
-    /// <summary>Has the one-time <see cref="MigratePromotedHudStats"/> pass run?
+    /// <summary>Did SA-1's promotion ever take "xp", "dps" and "hps" out of
+    /// <see cref="MiniStats"/> on this profile?
     ///
-    /// **A flag rather than inferring it from "the keys are gone", and that distinction is
-    /// the whole bug this migration could otherwise be.** The pass reads a star's absence
-    /// as "the player had this window closed" — and after the first run every one of the
-    /// three keys IS absent, so a second run would read three deliberate ONs as OFFs and
-    /// close windows the player never touched. Trap 55 in one sentence: a migration
-    /// re-deciding on state its own previous run produced.</summary>
+    /// **It stopped being a "has the pass run" flag and became a FACT ABOUT THE PROFILE**
+    /// when DRA-81 put the keys back (<see cref="MigrateHudStatStars"/>). That pass has its
+    /// own flag; this one now answers the only question its successor cannot work out for
+    /// itself — whether an absent "dps" means *the player unstarred it* (a pre-SA-1 file,
+    /// whose star is the last record of whether the Damage window could open) or *SA-1 took
+    /// it* (every file written since, where re-reading it would close a window that has been
+    /// open ever since). Two absences, opposite meanings, and this bool is what tells them
+    /// apart.
+    ///
+    /// **A flag rather than an inference, which is the bug either migration could otherwise
+    /// be.** Reading "the keys are gone" as "the player had these off" is true exactly once;
+    /// after any pass has run, the keys' state is the pass's own output. Trap 55 in one
+    /// sentence: a migration re-deciding on state its own previous run produced.</summary>
     public bool HudStatsPromoted { get; set; }
+    /// <summary>Has the one-time <see cref="MigrateHudStatStars"/> pass run? (DRA-81's
+    /// Founder LOCK.)
+    ///
+    /// **Its own flag rather than a reuse of <see cref="HudStatsPromoted"/>**, even though
+    /// the two passes are halves of one story. That one records "the keys were taken away";
+    /// this records "the keys were given back", and a profile can need the second without
+    /// ever having had the first. Folding them into one bool would also make this pass
+    /// unable to run on the very profiles it exists for — every one of them already has
+    /// <see cref="HudStatsPromoted"/> set, which is trap 76's shape: a repair gated on a
+    /// flag the broken build already wrote is a repair that cannot reach the damage.</summary>
+    public bool HudStatStarsRestored { get; set; }
     /// <summary>Whether the watch-rule examples panel in Options is expanded. Remembered so
     /// someone still learning the feature doesn't have to reopen it every time, and someone
     /// who doesn't need it never sees it again.</summary>
@@ -1036,8 +1063,8 @@ public sealed class AppSettings
         // has been told "brand new profile" on every launch of every profile since the
         // argument was introduced (2026-08-21). `MigrateMotesCard` survived it because it
         // uses `hadFile` only to decide whether to FORCE a save and its state changes are
-        // unconditional; `MigratePromotedHudStats` would not have — it reads a stored star
-        // before stripping it, so an always-false `hadFile` makes it a no-op on precisely
+        // unconditional; `MigrateHudStatStars` would not have — it reads a stored star
+        // before overwriting it, so an always-false `hadFile` makes it a no-op on precisely
         // the profiles it exists for. Trap 42's shape at the settings layer: the migration
         // is present in the build and was never in effect. Guarded by
         // `HudStatPromotionLoadTests`, which drives the real `Load` against a real file and
@@ -1111,52 +1138,63 @@ public sealed class AppSettings
         changed |= MigrateBuffSetsToClassBuckets();
         changed |= MigrateArchiveDefault();
         changed |= MigrateWindowHeights();
-        // xp / dps / hps leave MiniStats for the always-on HUD numbers (SA-1). Last in
-        // the chain because it reads MiniStats and DisabledBreakouts as they finally
-        // stand, and nothing above it touches either.
-        changed |= MigratePromotedHudStats(hadFile);
+        // xp / dps / hps come BACK to MiniStats as the collapsed bar's own ★s (DRA-81's
+        // Founder LOCK, reversing SA-1's promotion). Last in the chain because it reads
+        // MiniStats and DisabledBreakouts as they finally stand, and nothing above it
+        // touches either.
+        changed |= MigrateHudStatStars(hadFile);
         return changed;
     }
 
     /// <summary>
-    /// SA-1: "xp", "dps" and "hps" leave <see cref="MiniStats"/> because they became the
-    /// always-on collapsed HUD numbers, and a promotion removes the toggle.
+    /// DRA-81's FOUNDER LOCK: "xp", "dps" and "hps" come BACK into <see cref="MiniStats"/>,
+    /// because the collapsed bar's contents are the Mini dashboard's checkboxes and nothing
+    /// else. It replaces SA-1's promotion pass, which took the same three keys OUT.
     ///
-    /// **The landmine this exists to defuse is trap 20's shape.** The ★ for dps and hps
-    /// was never only a HUD cell — <c>MainWindow.UpdateBreakouts</c> opened the Damage and
-    /// Healing breakout windows only when the kind was NOT in
-    /// <see cref="DisabledBreakouts"/> **and** its key was in <see cref="MiniStats"/>. So
-    /// stripping the keys naively would silently close a player's open breakout: the
-    /// switch survives the promotion, the state it carried does not. "xp" has no
-    /// <c>BreakoutKind</c> at all (the Progress float was retired in 2026-08-24's fold),
-    /// so it simply leaves.
+    /// <b>All three are restored, and the asymmetry with the fresh-install default is the
+    /// decision worth stating.</b> Since SA-1 every one of these profiles has been drawing
+    /// DPS and the XP rate unconditionally, and HPS whenever DRA-72's dominance window said
+    /// so — so ticking all three reproduces what is on the player's screen today and takes
+    /// nothing away. Someone who never heals gains one "0 hps" slot, which they can now
+    /// untick; before this pass they could not, and that is the entire point. A NEW profile
+    /// starts without "hps" (<see cref="MiniStats"/>) because it has no such history to
+    /// preserve and a permanent zero is a poor first impression.
     ///
-    /// **Read the star BEFORE stripping it**, which is the whole order of operations here:
-    /// a key ABSENT at migration time means that window was off, so the kind is written
-    /// into <see cref="DisabledBreakouts"/> to say so out loud; a key PRESENT means it was
-    /// on, and an absent entry in that list already says exactly that. Afterwards the gate
-    /// reads <see cref="DisabledBreakouts"/> alone for those two kinds
-    /// (<c>BreakoutPresentation.StarKey</c> answers null for them), so an open breakout
-    /// stays open and a closed one stays closed.
+    /// <b>SA-1's other half is still owed to a profile that never went through it</b>, and
+    /// it runs first. The ★ for dps and hps was never only a HUD cell:
+    /// <c>MainWindow.UpdateBreakouts</c> gated the Damage and Healing windows on the kind
+    /// being absent from <see cref="DisabledBreakouts"/> <b>and</b> its key being in
+    /// <see cref="MiniStats"/>. <c>BreakoutPresentation.StarKey</c> answers null for those
+    /// two kinds now — deliberately, and it stays that way: the window and the HUD slot are
+    /// different objects, and a ★ that closed someone's window would be the "tick box that
+    /// lies" pointed the other way. So a pre-SA-1 profile's star has to be written into
+    /// <see cref="DisabledBreakouts"/> BEFORE this pass adds the key, or an absent star is
+    /// about to become a present one and the window it was speaking for is lost (trap 20).
     ///
-    /// **Guarded on <paramref name="hadFile"/> as well as on the flag.** A brand-new
-    /// profile has no star to read — the new defaults (<see cref="MiniStats"/> without
-    /// "dps", <see cref="DisabledBreakouts"/> with "Healing") already ARE the promoted
-    /// state — and running the pass against them would read the new default as a player's
-    /// old choice and disable the Damage window a fresh install has always had.
+    /// <b>Guarded on <paramref name="hadFile"/> as well as on the flag.</b> A brand-new
+    /// profile has no history to restore and its defaults already ARE the restored state;
+    /// running the pass against them would add "hps" to an install that never asked for it.
     /// <c>MigrateMotesCard</c> takes <paramref name="hadFile"/> for the same reason.
     /// </summary>
-    public bool MigratePromotedHudStats(bool hadFile)
+    public bool MigrateHudStatStars(bool hadFile)
     {
-        if (HudStatsPromoted) return false;
-        HudStatsPromoted = true;
-        if (!hadFile) return true;   // born promoted; the defaults carry it
+        if (HudStatStarsRestored) return false;
+        HudStatStarsRestored = true;
+        if (!hadFile) return true;   // born restored; the defaults carry it
 
-        foreach (var (key, kind) in new[] { ("dps", "Damage"), ("hps", "Healing") })
-            if (!MiniStats.Contains(key) && !DisabledBreakouts.Contains(kind))
-                DisabledBreakouts.Add(kind);
+        // A profile from before SA-1 still has its own stars, and they are the only record
+        // of whether those two windows were open. Move that fact across first — after the
+        // loop below, every one of the three keys is present and the evidence is gone.
+        if (!HudStatsPromoted)
+        {
+            HudStatsPromoted = true;
+            foreach (var (key, kind) in new[] { ("dps", "Damage"), ("hps", "Healing") })
+                if (!MiniStats.Contains(key) && !DisabledBreakouts.Contains(kind))
+                    DisabledBreakouts.Add(kind);
+        }
 
-        MiniStats.RemoveAll(k => k is "xp" or "dps" or "hps");
+        foreach (var key in new[] { "dps", "hps", "xp" })
+            if (!MiniStats.Contains(key)) MiniStats.Add(key);
         return true;
     }
 
