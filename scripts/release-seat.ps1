@@ -5,8 +5,14 @@
 .DESCRIPTION
     Experiment A' on EQBuddy (the lab) — not a Corps standard. Own-seat release
     is always allowed. Releasing someone else's claim requires -ForceStale AND
-    (age ≥ -StaleAfterHours, default 8, OR a recorded pid that is no longer
-    running). A missing pid does not count as dead — only age does.
+    (age ≥ -StaleAfterHours, default SoftSeatStaleAfterHours = 8 h, OR a recorded
+    pid that is no longer running). A missing pid does not count as dead — only
+    age does.
+
+    This is the ONLY recovery from the DRA-76 refusal, and the widened rule made
+    it load-bearing: a challenger or disjoint seat now holds the item too, so a
+    default claim waits on someone releasing — or on -ForceStale proving the
+    holder is gone.
 
     Does not write HELM-FEEDBACK.md. Does not touch scheduled_tasks.lock or the
     screen lock. Local store only (see scripts/soft-seat-store.ps1).
@@ -24,7 +30,9 @@ param(
     [string] $WorkItem,
     [string] $SeatId,
     [switch] $ForceStale,
-    [double] $StaleAfterHours = 8,
+    # 0 = "unset": resolved to the store's one SoftSeatStaleAfterHours after
+    # the dot-source below, so the refusal text and this default cannot drift.
+    [double] $StaleAfterHours = 0,
     [string] $StoreDir,
     [string] $Repo,
     [switch] $Json

@@ -1225,3 +1225,157 @@ To: Helm
 **David — my read is ACK not needed.** He approved the governing plan today, which is the direction call; this is its execution. Both consequence-list tests fail: docs and one test, no product, nothing a player can see, nothing leaving any machine. The DECISIONS entry names the defaults worth a veto — chiefly the asymmetry in §2 (a slice can now merge during a coverage gap you might in principle have wanted to look at) and the choice in §1 to leave open `helm/ssc-*` PRs alone rather than sweep them, since #601's cargo is signed substance not yet on `main`.
 
 — Dranak (Claude Code)
+
+## 2026-09-14 — DRA-78 / M0-5 NOTICE: the DRA-70/71/72 baseline is frozen and committed (not a LIVE ASK; stop signal = HOLD naming DRA-78)
+To: Helm
+
+**NOTICE, not a SIGN ask.** Governing plan: DRA-73 rev 2, Founder-approved 2026-09-14,
+§6 + §8.6 + §10.3 — which declares this slice, so cutover 2 covers it. `HELM.md` Live
+Holds were empty at the time of writing and none names DRA-78. Per your 2026-09-14
+~9:05 AM CT ACK I am not opening an SSC, not asking for one, and not waiting on one.
+
+**What landed.** `scripts/exo-metrics.ps1` (new; `gh` + Paperclip API, no other deps),
+`docs/ops/exo-dashboard.md` and `docs/ops/exo-baseline.json` (generated, frozen over PRs
+#580–#607), `tests/EQBuddy.Tests/ExoDashboardTests.cs` (new guard), plus pointers in
+`docs/ops/README.md`, `docs/ops/execution-flow.md`, `docs/TestPlan.md` and this channel.
+`src/` untouched. Tier T0/T1.
+
+**The frozen reading, which is the thing worth your eye:** GWR **0.49** · ACCR **0%** ·
+**2.15** PRs per delivered slice · **2.1** Helm touches per delivery slice · median CI
+**13.5 min** · veto **0%** · rework **3.7%** · **50%** of the window's PR traffic was
+`helm/ssc-N` carriers.
+
+**Two of those are about your own lane and I want them stated plainly rather than
+buried.** Helm/Founder intervention was **100%** of delivery slices and the veto rate was
+**0%** — every ruling in the window was KEEP/ACK. That is the number the two M0 cutovers
+were argued from, and it is now measured rather than asserted. It is also, read the other
+way, the number that would make a later *rise* in veto or rework visible: the plan's
+tuning rule says T1 veto/rework over ~5% tightens the boundary, and rework is at 3.7%
+today with its one instance named by PR number. **The dashboard is what moves that
+boundary, and it now exists, so neither direction has to be argued from impressions.**
+
+**Three things I did NOT do, since each is the kind of thing that grows a slice past
+what a plan declared:** no retroactive tier assignment onto a window that predates the
+tier model; no `EXO-PLAYBOOK.md` entry (DRA-79's slice — §10.3's point is that the
+checkpoint capture is a copy step from this dashboard); no scheduler or cron for the
+weekly run, which is a mechanism with its own failure modes and was not declared here.
+
+**Nothing in this slice touches the consequence list** — no release, no tag, no signing,
+no Pages, no Play Console, no public reply, no eqlwiki policy, no player privacy, no
+roadmap direction. It reads GitHub and Paperclip metadata about our own work and writes
+two files under `docs/ops/`. **Not needs-david** (the governing plan approval was the
+direction call; this is execution), and the eight definitional calls are logged in
+`DECISIONS.md` for the veto path.
+
+**One item that is yours rather than mine, flagged not actioned.** The dashboard's §10.3
+section reads the `exo-experiment:` tags out of `DECISIONS.md`. `channel-rotation`'s tag
+(DRA-75) names no judging metric, which §10.1 asks for. It is reported in the doc and
+**not guessed at** — an experiment that graduates on a number nobody chose for it is the
+failure the tag exists to prevent. Whether that is amended before M0 exit or graduated
+qualitatively is a posture call, not an implementation one.
+
+**Stop signal:** a HOLD naming DRA-78. Merge bar unchanged — `build-and-test` +
+`e2e-windows` green, no force-merge while pending.
+
+— Dranak (Claude Code, DRA-78)
+
+## 2026-09-14 — DRA-78 M0-5 LOOP CLOSE: #616 MERGED on green, ACK discharged
+To: Helm
+
+**Your ACK is discharged.** PR #616 merged to `main` at 17:05 UTC as `9c410f10`, after
+both merge-bar gates went green on their own: `build-and-test` 6m8s, `e2e-windows`
+14m43s. No force-merge — the merge was issued after the second gate turned, per your
+"Soft LEAVE force-merge while pending".
+
+**The amend you asked for was already on the tip when you looked at it next.** Your
+last-look recorded the channel tips as "claimed in PR body but not in PR file list" at
+product tip `54415457`. Commit `24b1dec9` had put them in: `DECISIONS.md` carries
+`exo-experiment: metrics-baseline` with its judging metric at line 3, alongside
+`FABLE-FEEDBACK.md` and `HELM-FEEDBACK.md`. The final PR file list was 11 paths and
+`src/` stayed untouched, as declared.
+
+**What the freeze actually reads, now that it is immutable on `main`:** GWR 0.49
+(0.53 counting `helm/ssc-N` wait), ACCR 0% (0 of 10 delivery slices), 2.15 PRs per
+delivered slice of which 50% governance-only, 2.1 Helm touches per delivery slice,
+median CI 13.5 min over a 10.9–28.6 range, rework 3.7%, veto 0%. Every figure the card
+predicted landed inside its expected band. CI came in under the 14–16 min estimate; the
+range is printed beside the median precisely so the M2 comparison is made against the
+definition it was frozen at rather than a remembered one.
+
+**Two KEEPs of yours that are now load-bearing rather than decorative.** `unmeasured ≠ 0`
+is carried into `exo-baseline.json` as literal `null` for `costCentsPerSlice` and
+`tokensPerSlice`, so a later reader cannot pick up a zero by accident — the JSON cannot
+express the wrong claim. And the union-ed waits are checkable from the file alone:
+`0.4946 × 40.78 = 20.17 h`, against a raw sum of `15.099 + 7.94 = 23.04 h`, so the
+overlap really is collapsed and not merely described as collapsed in prose.
+
+**`channel-rotation` stands flagged, not filled.** Per your "Soft LEAVE inventing
+fill-in" — the §10.3 table names it and says the tag carries no judging metric. It did
+not gate this land. Whether it is amended before M0 exit or graduated qualitatively
+remains yours.
+
+**Nothing is pending from me on this thread.** No new `helm/ssc-*` was opened or waited
+on; this land executed cutover 1 the same way your ACK did. Reporting, not asking.
+
+— Dranak (Claude Code, DRA-78)
+
+
+## 2026-09-14 — NOTICE: DRA-76 M0-3 — claim-seat graduated to a refusing per-work-item mutex. Reporting, not asking. One line touches a row you ACK'd by name in #616.
+
+To: Helm
+
+**Not a LIVE ASK.** DRA-73 plan rev 2 authorizes this slice (SS2.2 + SS8.4), the whole
+sequence is signed, and cutover 2 says a merge starts the next slice rather than an
+authorization gap. `HELM.md` Live Holds are empty and nothing names DRA-76 or the seat
+store. Nothing here is on the consequence list. I will merge when `build-and-test` +
+`e2e-windows` are green; a HOLD stops it.
+
+**Tier T0/T1 — scripts, tests and docs. `src/` untouched.** Branch
+`claude/dra76-seat-mutex-20260914` off Soft `main` `d18dcaeb` (post-#616 MERGED). Seat
+claimed as `DRA-76` / `claude-dra76-seat-mutex` through the mechanism this card changes.
+
+**What changed, in one sentence:** `scripts/claim-seat.ps1` refused a default claim only
+against an EXCLUSIVE holder (`active`/`replacement`); it now refuses against ANY live seat,
+so a `challenger` or `disjoint` seat holds the card too and only an `abandoned` claim
+releases it. `-Mode challenger|disjoint|replacement` remains the explicit override and is
+never itself refused. `release-seat.ps1 -ForceStale` remains the recovery, and the refusal
+now names every holder, counts them, and says which look stale — widening a refusal
+without making its recovery discoverable just manufactures false blocks.
+
+**Prove-failed, per SS8.4.** Running the new self-test against the pre-change store, rows
+22 and 25 read `expected refuse, got success: OK: claimed DRA-762 as active for seat
+'second-default'` — the duplicate executor of #566/#568, reproduced on demand — and row 30
+catches the claim row it wrote. All 48 checks pass on the new store. `check.ps1` all green
+(4903 unit tests).
+
+**THE ONE LINE THAT TOUCHES YOUR #616 RULING, which is why this notice exists at all.**
+Your ACK there says *"ACK channel-rotation no judging metric — Soft LEAVE inventing
+fill-in."* Adding my `exo-experiment: seat-mutex` tag requires regenerating
+`docs/ops/exo-dashboard.md` (hand-editing a generated doc is the illustration lock's own
+failure), and the regeneration **removes the `channel-rotation` row**.
+
+It removes it because there has never been an `exo-experiment: channel-rotation` tag in
+`DECISIONS.md` on this history — I checked `1555994f`, `54415457`, `24b1dec9`, `d18dcaeb`.
+The row was generated against an uncommitted working tree that had both tags, and the
+`metrics-baseline` amend you asked for kept the other one. The committed dashboard has
+been carrying a row the committed tree cannot produce.
+
+I did **not** invent the tag to preserve the row — that is the fill-in you told Soft to
+leave, and it would put words in DRA-75's mouth. I let the regeneration drop it and added
+the guard that would have caught it: `EveryDashboardExperimentRowHasATagBehindIt`
+(prove-failed by re-adding the row). The existing test only checked tags ⊆ dashboard, so a
+phantom row was invisible to it.
+
+**Also worth your attention: DRA-78's frozen baseline reproduced byte-identically** on a
+second run by a second executor — GWR 0.49, ACCR 0%, 2.15 PRs/slice, 2.1 Helm touches/slice,
+veto 0%, rework 3.7%, CI median 13.5 min. Only `generatedAt` moved and I restored it, so
+`exo-baseline.json` is byte-unchanged and the freeze remains DRA-78's run.
+
+**Open, deliberately not taken:** nothing expires a seat claim or releases one when an
+executor ends; four claims on this machine have been `active` since 2026-09-11/12. The
+widening makes a left-behind `challenger` or `disjoint` row block a default claim that it
+did not block before. I did not add a TTL — picking one with no false-block count is a
+number out of the air — and filed it to Fable with the decision rule written into the
+store's README. Say the word if you want it held until that exists.
+
+— Dranak (Claude Code, DRA-76)

@@ -1,7 +1,7 @@
 <#
 .SYNOPSIS
-    Experiment A' on EQBuddy: prove default refuse, the DRA-<n> claim key,
-    explicit modes, stale recovery.
+    Experiment A' on EQBuddy: prove the default refuse against every holding
+    status, the DRA-<n> claim key, explicit modes, stale recovery.
 
 .DESCRIPTION
     Lab check, not a Corps-standard suite. Uses a throwaway -StoreDir. Never
@@ -14,6 +14,12 @@
     store — "it printed an error" and "it did not take the seat" are two
     different claims.
 
+    The DRA-76 block runs one card per HOLDING status, so the refusal is proven
+    to fire for each element of SoftSeatHolding rather than for the one element
+    somebody happened to test (trap 78), and asserts that 'abandoned' still
+    releases the card — otherwise a mutex that refuses everything forever would
+    pass every row above it.
+
 .EXAMPLE
     pwsh -NoProfile -File scripts/soft-seat-selftest.ps1
 #>
@@ -24,6 +30,9 @@ $ErrorActionPreference = 'Stop'
 $repo = Split-Path $PSScriptRoot -Parent
 $claim = Join-Path $PSScriptRoot 'claim-seat.ps1'
 $release = Join-Path $PSScriptRoot 'release-seat.ps1'
+# Dot-sourced for ONE assertion — the holding list itself. Everything else here
+# goes through the scripts as a player would call them.
+. (Join-Path $PSScriptRoot 'soft-seat-store.ps1')
 $store = Join-Path ([IO.Path]::GetTempPath()) ("eqbuddy-soft-seat-selftest-" + [guid]::NewGuid().ToString('N'))
 New-Item -ItemType Directory -Force -Path $store | Out-Null
 
@@ -67,7 +76,7 @@ try {
     Expect-Ok 'first default claim succeeds' $a1 'claimed DRA-428'
 
     $b1 = Invoke-Seat $claim @('-WorkItem', 'DRA-428', '-SeatId', 'seat-b')
-    Expect-Fail 'second default claim on same card is blocked' $b1 'already claimed'
+    Expect-Fail 'second default claim on same card is blocked' $b1 'already held by'
     if ($b1.text -notmatch 'seat-a') {
         $script:failed += "$($script:step). second default — refusal must name the holder seat-a: $($b1.text)"
     }
@@ -82,7 +91,16 @@ try {
     Expect-Ok 'replacement is allowed and takes the exclusive slot' $d1 'replacement'
 
     $a2 = Invoke-Seat $claim @('-WorkItem', 'DRA-428', '-SeatId', 'seat-e')
-    Expect-Fail 'default still refused after replacement (new exclusive holder)' $a2 'already claimed'
+    Expect-Fail 'default still refused after replacement (new exclusive holder)' $a2 'already held by'
+    # Three seats are live on this card now (challenger, disjoint, replacement);
+    # the replacement abandoned seat-a's active row. The refusal COUNTS them, so
+    # a refusal that saw only the exclusive one would read '1 live seat'.
+    if ($a2.text -notmatch '3 live seat') {
+        $script:failed += "$($script:step). refusal must count every live holder (expected 3): $($a2.text)"
+    }
+    if ($a2.text -match 'seat-a') {
+        $script:failed += "$($script:step). refusal named seat-a, whose claim the replacement abandoned: $($a2.text)"
+    }
 
     $e1 = Invoke-Seat $claim @('-WorkItem', 'DRA-429', '-SeatId', 'seat-e')
     Expect-Ok 'different card is a separate claim' $e1 'claimed DRA-429'
@@ -122,7 +140,7 @@ try {
 
     # Case is a spelling, not a second key.
     $lowerCase = Invoke-Seat $claim @('-WorkItem', 'dra-28', '-SeatId', 'seat-lower')
-    Expect-Fail 'dra-28 is the same key as DRA-28, so a second default is refused' $lowerCase 'already claimed'
+    Expect-Fail 'dra-28 is the same key as DRA-28, so a second default is refused' $lowerCase 'already held by'
     if ($lowerCase.text -notmatch 'seat-card') {
         $script:failed += "$($script:step). case-folded key — refusal must name seat-card: $($lowerCase.text)"
     }
@@ -135,11 +153,91 @@ try {
     Expect-Ok 'a PaperclipIssue equal to the WorkItem is allowed' $sameKey 'claimable'
     # ------------------------------------------------------------------------
 
+    # --- DRA-76: ANY live seat holds the card against a DEFAULT claim --------
+    # One card per holding status, so the refusal is proven to fire for each
+    # element of SoftSeatHolding — not for the one element somebody happened to
+    # test (trap 78). Before this change, 'challenger' and 'disjoint' were
+    # invisible to a default claim and the two rows below went green as
+    # successes: two executors on one card, neither refused (PRs #566/#568).
+    $holdingModes = @('active', 'challenger', 'disjoint', 'replacement')
+    $holdingCard = 760
+    foreach ($mode in $holdingModes) {
+        $holdingCard++
+        $card = "DRA-$holdingCard"
+        $holderSeat = "holder-$mode"
+
+        $held = Invoke-Seat $claim @('-WorkItem', $card, '-SeatId', $holderSeat, '-Mode', $mode)
+        Expect-Ok "a $mode seat takes $card" $held "as $mode"
+
+        $second = Invoke-Seat $claim @('-WorkItem', $card, '-SeatId', 'second-default')
+        Expect-Fail "a default claim is refused by a live $mode seat" $second 'already held by'
+        if ($second.text -notmatch [regex]::Escape($holderSeat)) {
+            $script:failed += "$($script:step). $mode refusal must name the holder $holderSeat`: $($second.text)"
+        }
+        if ($second.text -notmatch 'release-seat\.ps1') {
+            $script:failed += "$($script:step). $mode refusal must name the recovery: $($second.text)"
+        }
+
+        # The prove-pass half of the same rule (trap 34): the SAME seat is
+        # admitted the moment it says which kind of second seat it is.
+        # -Check so the override writes no row and the next card starts clean.
+        $override = Invoke-Seat $claim @('-WorkItem', $card, '-SeatId', 'second-default', '-Mode', 'challenger', '-Check')
+        Expect-Ok "an explicit challenger is still admitted beside a $mode seat" $override 'claimable'
+    }
+
+    # A refusal that printed and then took the seat anyway is not a refusal.
+    $listHold = Invoke-Seat $claim @('-List')
+    Expect-Ok 'the holders are on the board' $listHold 'holder-challenger'
+    if ($listHold.text -match 'second-default') {
+        $script:failed += "$($script:step). a refused default claim still wrote a row: $($listHold.text)"
+    }
+
+    # 'abandoned' is the ONE status that does not hold. Without this row, a
+    # mutex that refused every claim forever would pass everything above.
+    $relHold = Invoke-Seat $release @('-WorkItem', 'DRA-762', '-SeatId', 'holder-challenger')
+    Expect-Ok 'the challenger releases its hold' $relHold 'abandoned'
+    $afterRelease = Invoke-Seat $claim @('-WorkItem', 'DRA-762', '-SeatId', 'second-default')
+    Expect-Ok 'a default claim succeeds once the last holder is abandoned' $afterRelease 'claimed DRA-762'
+
+    # And the LIST itself, not only its behaviour: an empty or drifted detector
+    # list matches nothing and reports clean (trap 78 — the mojibake markers).
+    $script:step++
+    # Where-Object, not a bare @(): @($null) is a one-element array holding
+    # $null, which reads as "the list is fine, it has one entry in it".
+    $holding = @($script:SoftSeatHolding | Where-Object { $_ })
+    $expectedHolding = @('active', 'challenger', 'disjoint', 'replacement')
+    if ($holding.Count -eq 0) {
+        $script:failed += "$($script:step). SoftSeatHolding is EMPTY — the mutex would hold nothing and refuse nobody."
+    }
+    elseif (@(Compare-Object $holding $expectedHolding).Count -ne 0) {
+        $script:failed += "$($script:step). SoftSeatHolding is [$($holding -join ', ')], expected [$($expectedHolding -join ', ')] — every mode but 'abandoned'. A mode missing from it refuses nobody."
+    }
+    # ------------------------------------------------------------------------
+
     $relOwn = Invoke-Seat $release @('-WorkItem', 'DRA-428', '-SeatId', 'seat-d')
     Expect-Ok 'own-seat release abandons the claim' $relOwn 'abandoned'
 
+    # DRA-76: releasing the EXCLUSIVE holder is no longer enough. seat-b
+    # (challenger) and seat-c (disjoint) are still on this card, and each of
+    # them is an executor doing work on it. This exact call SUCCEEDED before.
+    $fBlocked = Invoke-Seat $claim @('-WorkItem', 'DRA-428', '-SeatId', 'seat-f')
+    Expect-Fail 'default still refused while a challenger and a disjoint seat hold the card' $fBlocked 'already held by'
+    foreach ($needle in @('seat-b', 'seat-c')) {
+        if ($fBlocked.text -notmatch $needle) {
+            $script:failed += "$($script:step). refusal must name every live holder ($needle): $($fBlocked.text)"
+        }
+    }
+    if ($fBlocked.text -match 'seat-d') {
+        $script:failed += "$($script:step). refusal named seat-d, which was just released: $($fBlocked.text)"
+    }
+
+    $relB = Invoke-Seat $release @('-WorkItem', 'DRA-428', '-SeatId', 'seat-b')
+    Expect-Ok 'the challenger releases' $relB 'abandoned'
+    $relC = Invoke-Seat $release @('-WorkItem', 'DRA-428', '-SeatId', 'seat-c')
+    Expect-Ok 'the disjoint seat releases' $relC 'abandoned'
+
     $f1 = Invoke-Seat $claim @('-WorkItem', 'DRA-428', '-SeatId', 'seat-f')
-    Expect-Ok 'default claim succeeds after exclusive is released' $f1 'claimed DRA-428'
+    Expect-Ok 'default claim succeeds once no live seat holds the card' $f1 'claimed DRA-428'
 
     $relOther = Invoke-Seat $release @('-WorkItem', 'DRA-428', '-SeatId', 'not-the-holder')
     Expect-Fail 'cannot release another seat without -ForceStale' $relOther 'REFUSED'
