@@ -1,7 +1,8 @@
+{{Classic Era}}
 {{Spellpagesmart|
 
 | spellname = Starfire
-| spellicon = O
+| spellicon = 51
 | description = Ignites your target's skin, doing 634 damage.
 
 | Table = {{{Table|0}}}
@@ -30,12 +31,7 @@
 
 | where_to_obtain = 
 
-{{SpellWhereTable|
-{{SpellWhereRowB | [[Lavastorm Mountains]] | [[Tisiana]] | Druid Ring | (982,1369) }}
-{{SpellWhereRow  | [[The Wakening Land]] | [[Phillip Aghllsews]] | Plane of Growth Tower | (519,-1028) }}
-}}
-
-| TableLocations = Lavastorm<br/>Wakening
-| TableEra = Classic
-
+<ul>
+<li>[[Druid#Spell Vendors|Druid Spell Vendors]]</li>
+</ul>
 }}

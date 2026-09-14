@@ -1,5 +1,5 @@
 {{Classic Era}}
-[[File:npc_brona_frugrin.png|250px|Brona Frugrin|thumb]]
+[[File:npc_brona_frugrin.png|thumb|Brona Frugrin]]
 {| class="questTopTable"
 ! ''' Start Zone: '''
 | [[Steamfont Mountains]]
@@ -25,7 +25,7 @@
 
 == Reward ==
 
-<ul><li>[[Staff of the Observers]]
+<ul><li>{{:Staff of the Observers}}
 </li></ul>
 
 == Walkthrough ==

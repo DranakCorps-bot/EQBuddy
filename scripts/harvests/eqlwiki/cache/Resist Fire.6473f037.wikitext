@@ -1,5 +1,5 @@
 {{Classic Era}}
-{{Spellpage|
+{{Spellpagesmart|
 
 | spellname = Resist Fire
 | spellicon = 52
@@ -36,24 +36,10 @@
 
 | where_to_obtain = 
 
-{{SpellWhereTable|
-{{SpellWhereRowB | [[Ak'Anon]] | [[Clockwork Merchant (CG-4)]] | Cleric Guild | (1223,-547) }}
-{{SpellWhereRow  | [[Ak'Anon]] | [[Clockwork Merchant (NG-13)]] | Necromancer Guild | (2112,-438) }}
-{{SpellWhereRowB | [[Cabilis|East Cabilis]] | [[Vessel Mortyr]] | Temple of Terror (First Floor) | (1046,-160) }}
-{{SpellWhereRow  | [[Erudin]] | [[Alysa Eltern]] | Cleric Guild - Quellious (Outside) | (-707,-57) }}
-{{SpellWhereRowB | [[Felwithe]] | [[Terri Woodshape]] | Cleric Guild | (2,-456) }}
-{{SpellWhereRow  | [[Greater Faydark]] | [[Cerila Windrider]] | Kelethin Ranger Guild | (-428,476) }}
-{{SpellWhereRowB | [[Grobb]] | [[Cralk - Troll]] | Shaman Guild | (289,-424) }}
-{{SpellWhereRow  | [[Halas]] | [[Telvina]] | Shaman Guild | (315,450) }}
-{{SpellWhereRowB | [[Neriak|Neriak - 3rd Gate]] | [[Friz Punox]] | Cleric Guid | (412,-788) }}
-{{SpellWhereRow  | [[Freeport|North Freeport]] | [[Perep Chen]] | Cleric Guild (basement) | (106,311) }}
-{{SpellWhereRow  | [[Kaladim|North Kaladim]] | [[Dorlita Splitshield]] | Cleric Guild | (733,138) }}
-{{SpellWhereRowB | [[Qeynos|North Qeynos]] | [[Enpero Mesog]] | Cleric Guild (Outside) | (-216,-230) }}
-{{SpellWhereRow  | [[Northern Karana]] | [[Tak Whistler]] | Druid Ring | (-2732,-1466) }}
-{{SpellWhereRowB | [[Oggok]] | [[Cralk - Ogre]] | Shaman Guild | (633,1005) }}
-{{SpellWhereRow  | [[Qeynos Aqueducts|Qeynos Catacombs]] | [[Naes Ereek]] | Cleric Guild | (340,-427) }}
-{{SpellWhereRowB | [[Rivervale]] | [[Alice Sweetoven]] | Cleric Guild | (-232,-419) }}
-}}
-| TableLocations = Vendors
-| TableEra = Classic
+<ul>
+<li>[[Cleric#Spell Vendors|Cleric Spell Vendors]]</li>
+<li>[[Druid#Spell Vendors|Druid Spell Vendors]]</li>
+<li>[[Ranger#Spell Vendors|Ranger Spell Vendors]]</li>
+<li>[[Shaman#Spell Vendors|Shaman Spell Vendors]]</li>
+</ul>
 }}

@@ -1,5 +1,5 @@
 {{Classic Era}}
-{{Spellpage|
+{{Spellpagesmart|
 
 | spellname = Resist Magic
 | spellicon = 69
@@ -43,29 +43,9 @@
 
 | where_to_obtain = 
 
-{{SpellWhereTable|
-{{SpellWhereRowB | <s>[[Ak'Anon]]</s> | <s>[[Clockwork Merchant (CG-6)]]</s> | <s>Cleric Guild</s> | <s>(1197,-560)</s> }}
-{{SpellWhereRow  | [[Ak'Anon]] | [[Clockwork Merchant (NG-14)]] | Necromancer Guild | (2111,-429) }}
-{{SpellWhereRowB | [[Cabilis|East Cabilis]] | [[Vessel Migron]] | Temple of Terror (First Floor) | (1031,-160) }}
-{{SpellWhereRow  | [[Cabilis|East Cabilis]] | [[Gaxl the scribe]] | Temple of Terror (West Tower - Bottom +1) | (1025,-109) }}
-{{SpellWhereRowB | [[Erudin]] | [[Junice Weslent]] | Cleric Guild - Quellious (Outside) | (-697,-55) }}
-{{SpellWhereRow  | [[Felwithe]] | [[Terren Starwatcher]] | Cleric Guild | (13,-426) }}
-{{SpellWhereRowB | [[Grobb]] | [[Korff - Troll]] | Shaman Guild | (304,-438) }}
-{{SpellWhereRow  | [[Halas]] | [[Bolace]] | Shaman Guild | (326,478) }}
-{{SpellWhereRowB | [[Lavastorm Mountains]] | [[Tisiana]] | Druid Ring | (982,1369) }}
-{{SpellWhereRow  | [[Neriak|Neriak - 3rd Gate]] | [[Lyniv S'Kor]] | Cleric Guild | (410,-858) }}
-{{SpellWhereRowB | [[North Kaladim]] | [[Poriss Splitrock]] | Cleric Guild  | (740,130) }}
-{{SpellWhereRow  | [[Freeport|North Freeport]] | [[Nosspri Andrika]] | Cleric Guild (basement) | (102,391) }}
-{{SpellWhereRowB | [[Qeynos|North Qeynos]] | [[Ladia Qursii]] | Cleric Guild (Outside) | (-225,-238) }}
-{{SpellWhereRow  | [[Oggok]] | [[Korff - Ogre]] | Shaman Guild | (667,1066) }}
-{{SpellWhereRowB | [[Qeynos Aqueducts|Qeynos Catacombs]] | [[Senst Ereek]] | Cleric Guild | (340,-413) }}
-{{SpellWhereRow  | [[Rivervale]] | [[Misty Valefriend]] | Cleric Guild | (-226,-374) }}
-{{SpellWhereRowB | [[The Wakening Land]] | [[Phillip Aghllsews]] | � | (519,-1028) }}
-}}
-
-* This spell is crafted with the [[Skill Research|Research Skill]].
-
-| TableLocations = Lavastorm<br/>Wakening
-| TableEra = Classic
-
+<ul><li>[[Cleric#Spell Vendors|Cleric Spell Vendors]]</li>
+<li>[[Druid#Spell Vendors|Druid Spell Vendors]]</li>
+<li>[[Enchanter#Spell Vendors|Enchanter Spell Vendors]]</li>
+<li>[[Shaman#Spell Vendors|Shaman Spell Vendors]]</li>
+</ul>
 }}

@@ -1,4 +1,5 @@
-<noinclude>{{Classic Era}}</noinclude>{{Spellpagesmart|
+{{Classic Era}}
+{{Spellpagesmart|
 
 | spellname = Budding Heal
 | spellicon = 632
@@ -34,14 +35,10 @@
 | msg_cast_on_other = Target is seeded with healing energy.
 | msg_wears_off =  
 
+
 | where_to_obtain = 
 
-{{SpellWhereTable|
-{{SpellWhereRowB | [[New Sebilis Expedition]] | [[Wanderer Rakshaazi]] | Spell Vendor Area | (120, -163) }}
-{{SpellWhereRow | [[West Commonlands]] | [[Slea Pinewhisper]] | Druid Ring | (450, 1383, -52) }}
-}}
-
-| TableLocations = W.Commonlands
-| TableEra = Classic
-
+<ul>
+<li>[[Druid#Spell Vendors|Druid Spell Vendors]]</li>
+</ul>
 }}

@@ -19,9 +19,9 @@
 
 | slots = 
 
-{{SpellSlotRowSmart | 1 | Increase ATK by 20 | simple = {{#ifeq:{{{Table|0}}}|0|0|1}} }}
+{{SpellSlotRowSmart | 1 | Increase Hitpoints by 6 per tick. Max: 19 per tick | simple = {{#ifeq:{{{Table|0}}}|0|0|1}} }}
 {{SpellSlotRowSmart | 2 | Increase Damage Shield by 5 | simple = {{#ifeq:{{{Table|0}}}|0|0|1}} }}
-{{SpellSlotRowSmart | 3 | Increase Hitpoints by 6 per tick. Max: 19 per tick | simple = {{#ifeq:{{{Table|0}}}|0|0|1}} }}
+{{SpellSlotRowSmart | 3 | Increase ATK by 20 | simple = {{#ifeq:{{{Table|0}}}|0|0|1}} }}
 {{SpellSlotRowSmart | 4 | Increase Endurance by 6 per tick. Max: 19 per tick | simple = {{#ifeq:{{{Table|0}}}|0|0|1}} }}
 
 

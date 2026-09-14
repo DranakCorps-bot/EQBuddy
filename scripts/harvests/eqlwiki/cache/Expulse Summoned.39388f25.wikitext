@@ -1,5 +1,5 @@
 {{Classic Era}}
-{{Spellpage|
+{{Spellpagesmart|
 
 | spellname = Expulse Summoned
 | spellicon = 153
@@ -41,4 +41,5 @@
 <li>[[Druid#Spell Vendors|Druid Spell Vendors]]</li>
 <li>[[Magician#Spell Vendors|Magician Spell Vendors]]</li>
 </ul>
+
 }}

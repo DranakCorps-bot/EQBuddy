@@ -88,12 +88,12 @@ Hand in the four [[Woven Grass Amulet]]s to [[Perrir Zexus]] back in [[Neriak Th
 : Perrir Zexus says, 'You have done well young Initiate. I grant you this medallion invested with the divine hatred of Innoruuk. Wear it proudly as a representation of your importance to these sacred spires. Now if you will excuse me I must proceed with the burning of these pathetic halfling symbols of faith.'
 
 <div class='facblock'>
-* Your faction standing with [[King Naythox Thex]] got better.
-* Your faction standing with [[Priests of Innoruuk]] got better.
-* Your faction standing with [[Clerics of Tunare]] got worse.
-* Your faction standing with [[Priests of Life]] got worse.
-* Your faction standing with [[Priests of Marr]] got worse.
-* Your faction standing with [[Primordial Malice]] got worse.
+* Your faction standing with [[King Naythox Thex]] got better (7).
+* Your faction standing with [[Priests of Innoruuk]] got better (50).
+* Your faction standing with [[Clerics of Tunare]] got worse (-12).
+* Your faction standing with [[Priests of Life]] got worse (-7)
+* Your faction standing with [[Priests of Marr]] got worse (-17).
+* Your faction standing with [[Primordial Malice]] got worse (-200).
 </div>
 {{exp}}
 
@@ -125,8 +125,8 @@ You say, 'I am willing'
 ''[[Draxiz N`Ryt]] says, 'I have foreseen your arrival, _____. I see from the mind of this lesser creature you have slain that he was receiving orders from beyond the boundaries of Nektulos. I see an armored Leatherfoot moving cautiously through the commonlands attempting to avoid the eyes of travelers and guard posts. Find this Leatherfoot I see in my visions and return any pertinent information he may be carrying to me so that I may decipher it. I have skinned the face of this druid and enchanted it so that you may learn what you must through your skills of subterfuge. Go now, _____, and do not disappoint me!' ''
 
 <div class='facblock'>
-* Your faction standing with [[The Dead]] got worse.
-* Your faction standing with [[The Spurned]] got better.
+* Your faction standing with [[The Dead]] got worse (-1).
+* Your faction standing with [[The Spurned]] got better (10).
 </div>
 
 '''You receive a [[Skinned Halfling Face Mask]] from [[Draxiz N`Ryt]].'''

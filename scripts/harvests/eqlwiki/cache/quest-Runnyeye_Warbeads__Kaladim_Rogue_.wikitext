@@ -1,5 +1,5 @@
 {{Classic Era}}
-[[File:npc_diggins_scaled.png|frame|Diggins]]
+[[File:npc_diggins_scaled.png|thumb|Diggins]]
 {| class="questTopTable"
 ! ''' Start Zone: '''
 | [[Kaladim|North Kaladim]]
@@ -11,7 +11,7 @@
 | 9
 |-
 ! ''' Classes: '''
-| [[Bard]], [[Enchanter]], [[Magician]], [[Necromancer]], [[Ranger]], [[Rogue]], [[Shadow Knight]], [[Shaman]], [[Warrior]], [[Wizard]]
+| [[Rogue]]
 |-
 ! ''' Related Zones: '''
 | [[Butcherblock Mountains]]
@@ -72,13 +72,4 @@ You receive 2 silver pieces.
 
 [[Category:Quests]]
 [[Category:North Kaladim]]
-[[Category:Bard Quests]]
-[[Category:Enchanter Quests]]
-[[Category:Magician Quests]]
-[[Category:Necromancer Quests]]
-[[Category:Ranger Quests]]
 [[Category:Rogue Quests]]
-[[Category:Shadow Knight Quests]]
-[[Category:Shaman Quests]]
-[[Category:Warrior Quests]]
-[[Category:Wizard Quests]]

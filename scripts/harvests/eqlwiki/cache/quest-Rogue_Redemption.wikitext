@@ -152,7 +152,7 @@ You have slain a hemo enologist!
 
 Create:
 
-[[Blackburrow Swig]] - This is a no-fail brewing combine made in the Blackburrow Cask (a looted item from Blackburrow). I highly recommend that you first check the Bazaar on your server to see if some of these components are available. 
+[[Blackburrow Swig]] - This is a no-fail brewing combine made in the Blackburrow Cask (a looted item from Blackburrow). I highly recommend that you first check the Bazaar on your server to see if some of these components are available. You can find the recipe in [[Blackburrow]] on the [[Mammoth Skin]], which drops from [[a gnoll brewer]] or the [[Master Brewer]], but it is not written in Common Tongue. The recipe is as follows:
 
 * [[Gnoll Pup Scalp]] x 2
 * [[Blackburrow Gnoll Skin]] x 4

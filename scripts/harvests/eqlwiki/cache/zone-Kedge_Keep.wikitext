@@ -42,33 +42,33 @@ Kedge Keep is the ancient fortress of the Kedge, an aquatic race of beings whose
 |style="padding:10px;"|
 [[File:Kedgekeep.jpg|right|border]]
 '''2D View
-* A. "The Hole" a shaft that goes down from First Floor to Second Floor and keeps going down into the "Piranha Pit" where Stiletto Fang Piranha spawns
-* B. Shaft down from Second Floor
-* C. Shaft up from Second Floor to #4
-* D. "Bubble's Tube" a shaft down from Second Floor to opening to north and eventually to #3
-* E. Shaft up to #14
-* 1. "First Floor" with [[Fierce Impaler]] who drops [[Gloomwater Harpoon]] (Common) and [[Darksea Harpoon]] (Rare)
-* 2. "Second Floor"
-* 3. "Bubble's Den" with [[Cauldronbubble]] who drops [[Sharkbone Warhammer]] (Common) and [[Hammerhead Helm]] (Rare)
-* 4. Room with [[Golden Haired Mermaid]] who drops [[Lock of Hair]]
-* 5. "Fallen Gate Room" with shaft to east which leads downwards
-* 6. "Safe Den"
-* 7. "The Balcony" which is a common pull spot for Estrella
-* 8. "Estrella's Temple" with [[Estrella of Gloomwater]] who drops [[Rod of Drones]] (Common) and [[Lamentation Blade]] (Common) and [[Prayer Shawl]] (Rare) and [[Shellara Ebbhunter]] who drops [[Gloomwater Arrow]] (Common) and [[Pearlescent Mask]] (Rare)
-* 9. "Temple of Prexus" with [[Undertow]] who drops [[Blazing Wand]] (Common) and [[Squallsurge Shawl]] (Rare)
-* 10. Spawn spot of [[Coralyn Kelpmaiden]] who drops [[Sharkbone Warhammer]] (Common) and [[Sharkskin Drum]] (Rare)
-* 11. "Seahorse Caves" with [[Seahorse Matriarch]] who drops [[Rod of Health]] (Common) and [[Shield of Prexus]] (Rare)
-* 12. "The Crossroads" with [[a frenzied bull shark]] who drops [[Abalone Gorget]] (Rare)
-* 13. "Boil's Lair" with [[Cauldronboil]] who drops [[Sharkjaw Cutlass]] (Common) and [[Kedgemail Gauntlets]] (Rare)
-* 14. "Frenzied Room" with [[Frenzied Cauldron Shark]] who drops [[Shark Tooth]] (Common) and [[Abalone Gorget]] (Rare)
-* 15. "Patriarch's Room" with [[Seahorse Patriarch]] who drops [[Wand of Ice]] (Common) and [[Seahorse Scale Cloak]] (Rare)
-* 16. "Ferocious Room" with [[a ferocious hammerhead]] who drops [[Wand of Shadow]] (Common) and [[Driftwood Treasure Chest]] (Rare)
-* 17. Room with '''[[Phinigel Autropos]]''' (Raid Instance Only)
-
+<ul><li> A. "The Hole" a shaft that goes down from First Floor to Second Floor and keeps going down into the "Piranha Pit" where Stiletto Fang Piranha spawns
+</li><li> B. Shaft down from Second Floor
+</li><li> C. Shaft up from Second Floor to #4
+</li><li> D. "Bubble's Tube" a shaft down from Second Floor to opening to north and eventually to #3
+</li><li> E. Shaft up to #14
+</li><li> 1. "First Floor" with [[Fierce Impaler]] who drops {{:Gloomwater Harpoon}} (Common) and {{:Darksea Harpoon}} (Rare)
+</li><li> 2. "Second Floor"
+</li><li> 3. "Bubble's Den" with [[Cauldronbubble]] who drops {{:Sharkbone Warhammer}} (Common) and {{:Hammerhead Helm}} (Rare)
+</li><li> 4. Room with [[Golden Haired Mermaid]] who drops {{:Lock of Hair}}
+</li><li> 5. "Fallen Gate Room" with shaft to east which leads downwards
+</li><li> 6. "Safe Den"
+</li><li> 7. "The Balcony" which is a common pull spot for Estrella
+</li><li> 8. "Estrella's Temple" with [[Estrella of Gloomwater]] who drops {{:Rod of Drones}} (Common) and {{:Lamentation Blade}} (Common) and {{:Prayer Shawl}} (Rare) and [[Shellara Ebbhunter]] who drops {{:Gloomwater Arrow}} (Common) and {{:Pearlescent Mask}} (Rare)
+</li><li> 9. "Temple of Prexus" with [[Undertow]] who drops {{:Blazing Wand}} (Common) and {{:Squallsurge Shawl}} (Rare)
+</li><li> 10. Spawn spot of [[Coralyn Kelpmaiden]] who drops {{:Sharkbone Warhammer}} (Common) and {{:Sharkskin Drum}} (Rare)
+</li><li> 11. "Seahorse Caves" with [[Seahorse Matriarch]] who drops {{:Rod of Health}} (Common) and {{:Shield of Prexus}} (Rare)
+</li><li> 12. "The Crossroads" with [[a frenzied bull shark]] who drops {{:Abalone Gorget}} (Rare)
+</li><li> 13. "Boil's Lair" with [[Cauldronboil]] who drops {{:Sharkjaw Cutlass}} (Common) and {{:Kedgemail Gauntlets}} (Rare)
+</li><li> 14. "Frenzied Room" with [[Frenzied Cauldron Shark]] who drops {{:Shark Tooth}} (Common) and {{:Abalone Gorget}} (Rare)
+</li><li> 15. "Patriarch's Room" with [[Seahorse Patriarch]] who drops {{:Wand of Ice}} (Common) and {{:Seahorse Scale Cloak}} (Rare)
+</li><li> 16. "Ferocious Room" with [[a ferocious hammerhead]] who drops {{:Wand of Shadow}} (Common) and {{:Driftwood Treasure Chest}} (Rare)
+</li><li> 17. Room with '''[[Phinigel Autropos]]''' (Raid Instance Only)
+</li></ul>
 Not marked on map: 
-* In the room south of the "Patriarch's Room" there is a spawn point for the 'frenzied shark' which drops the [[Abalone Gorget]] just like [[a frenzied bull shark]]. It's placeholder can be a sailfin or a cauldron hammerhead. (Note - this is not the room with [[a ferocious hammerhead]] spawn).
-
-Note: in the above map the lettered areas are shafts of water that extend in and out of the page.
+<ul><li> In the room south of the "Patriarch's Room" there is a spawn point for the 'frenzied shark' which drops the [[Abalone Gorget]] just like [[a frenzied bull shark]]. It's placeholder can be a sailfin or a cauldron hammerhead. (Note - this is not the room with [[a ferocious hammerhead]] spawn).
+</li></ul>
+<strong>Note:</strong> in the above map the lettered areas are shafts of water that extend in and out of the page.
 
 |}
 

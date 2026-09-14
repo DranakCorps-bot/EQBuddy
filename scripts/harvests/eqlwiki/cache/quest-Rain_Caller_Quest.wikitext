@@ -28,16 +28,15 @@
 
 == Checklist ==
 {{CheckboxList}}
-* '''The Toupee'''
-** Obtain [[Trueshot Longbow]] through prerequisite quests
+* Obtain [[Trueshot Longbow]] through prerequisite quests
+* Obtain [[A Wooden Heart]] 
+** Loot from either [[a treant]] (Karanas),
+** OR [[Jyle Windshot]] (West Freeport Version) by handing him [[Small Lantern]]s ''(about ~10% chance to get the heart per lantern)''.
+* Obtain [[Tattered Toupee]]
 ** Obtain [[Crate for Tonics]] from [[Sanfyrd Featherhead]] in [[Ak'Anon]]
 ** Obtain 10x [[Fuzzlecutter Formula 5000]] and combine in Crate (to yield [[Crate of Tonic]])
-** Obtain [[A Wooden Heart]] 
-*** Loot from either [[a treant]] (Karanas),
-*** OR [[Jyle Windshot]] (West Freeport Version) by handing him [[Small Lantern]]s ''(about ~10% chance to get the heart per lantern)''.
 ** Turn in Tonic Crate to Sanfyrd (to receive [[Tattered Toupee]])
-
-* '''The Pouch'''
+* Obtain [[Pouch of Gold Dust]]
 ** Obtain 2x [[Clump of Gorilla Hair]] from [[A Hulking Gorilla]] in [[Cazic Thule]]
 ** Obtain a [[Lock of Hair]] from [[Golden_Haired_Mermaid|A Golden Haired Mermaid]] in [[Kedge Keep]]
 ** Turn in Toupee, Gorilla Hairs and a Mermaid Lock to [[Ping Fuzzlecutter]] (to receive [[Mane Attraction]])

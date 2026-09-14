@@ -82,7 +82,7 @@ __NOTOC__
 * Kill mobs on the 7th island on the [[Plane of Sky]]. Loot the [[Crown of Elemental Mastery]].
 * Kill mobs in [[the Hole]]. Loot the [[Elemental Binder]].
 * Kill [[Quillmane]] in [[South Karana]]. Loot the [[Pegasus Feather Cloak]].
-* Give these items to [[Kihun Solstin]] in the [[Plane of Air]] and receive the [[Element of Wind]].
+* Give these items to [[Kihun Solstin]] in the [[Plane of Sky]] and receive the [[Element of Wind]].
 
 ==== Spell Summon Orb ====
 * Go to the [[Master of Elements]] and give him the four Elements. Receive Spell: [[Summon Orb]].

@@ -224,7 +224,7 @@ These items are not the result of any quests. They drop from Monk Guildmasters i
 
 == Faction ==
 
-These turn ins require high amiably faction to turn in.  Since all of the items are tradeable, the turn ins can be done on a new monk.  If you want to do the turn ins on an Iksar monk, it will require approximately 1600 gnoll kills.
+These turn ins require high amiably faction to turn in.  You can kill Deathfist Orcs in the Commonlands to get to Dubious and then do [[Note for Konem]] repeatedly to get your faction to amiable.
 </onlyinclude>
 
 ==See also==

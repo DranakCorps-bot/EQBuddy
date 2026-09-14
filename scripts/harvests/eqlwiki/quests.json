@@ -1312,10 +1312,6 @@
     "qty": 1
    },
    {
-    "name": "Ripped Qeynos Bards Guild Flyer",
-    "qty": 1
-   },
-   {
     "name": "Solusek Mining Company Invoice",
     "qty": 1
    },
@@ -1801,9 +1797,9 @@
    }
   ],
   "rewards": [
+   "Amulet of the Fae",
    "Denon's Horn of Disaster",
    "Ervaj's Flute of Flight",
-   "Fae Amulet",
    "Mantle of the Songweaver",
    "Mask of Song",
    "Spear of Harmony"
@@ -2314,7 +2310,7 @@
   "startZone": "Ak'Anon",
   "questGiver": "Larkon Theardor",
   "minLevel": 10,
-  "classes": "Cleric, Druid, Enchanter, Magician, Necromancer, Paladin, Shaman, Wizard",
+  "classes": "Enchanter, Magician, Necromancer, Wizard",
   "items": [
    {
     "name": "Basilisk Tongue",
@@ -2331,13 +2327,9 @@
   ],
   "categories": [
    "Ak'Anon",
-   "Cleric Quests",
-   "Druid Quests",
    "Enchanter Quests",
    "Magician Quests",
    "Necromancer Quests",
-   "Paladin Quests",
-   "Shaman Quests",
    "Wizard Quests"
   ],
   "relatedZones": [
@@ -2963,11 +2955,15 @@
   "classes": "Cleric",
   "items": [
    {
+    "name": "Airtight Metal Box",
+    "qty": 1
+   },
+   {
     "name": "Container of Infectious Reagents",
     "qty": 1
    },
    {
-    "name": "Empty Infectious Vial",
+    "name": "Diseased Bone Marrow",
     "qty": 1
    }
   ],
@@ -3668,9 +3664,11 @@
   "items": [],
   "rewards": [
    "Aviak Feather",
+   "Broad Sword",
    "Conch Shell",
    "Fishing Spear",
-   "Kiola Nut"
+   "Kiola Nut",
+   "Targ Shield"
   ],
   "categories": [
    "Ocean of Tears"
@@ -3716,7 +3714,7 @@
    "Karnor's Castle",
    "Trakanon's Teeth"
   ],
-  "era": "",
+  "era": "Kunark",
   "repeatable": false
  },
  {
@@ -4427,7 +4425,7 @@
    "Karnor's Castle",
    "Trakanon's Teeth"
   ],
-  "era": "",
+  "era": "Kunark",
   "repeatable": false
  },
  {
@@ -4927,12 +4925,7 @@
   "questGiver": "",
   "minLevel": 0,
   "classes": "",
-  "items": [
-   {
-    "name": "Innoruuk Symbol Quests",
-    "qty": 1
-   }
-  ],
+  "items": [],
   "rewards": [
    "Class_Race_Quest_List/Bard",
    "Class_Race_Quest_List/Cleric",
@@ -5613,7 +5606,7 @@
    "The Overthere"
   ],
   "relatedZones": [],
-  "era": "",
+  "era": "Kunark",
   "repeatable": false
  },
  {
@@ -5635,7 +5628,7 @@
    "Firiona Vie"
   ],
   "relatedZones": [],
-  "era": "",
+  "era": "Kunark",
   "repeatable": false
  },
  {
@@ -6024,6 +6017,10 @@
    },
    {
     "name": "Glowing Coin of Tash",
+    "qty": 1
+   },
+   {
+    "name": "Old Silver Coin",
     "qty": 1
    },
    {
@@ -8195,7 +8192,17 @@
    "Southern Karana",
    "Warrior Quests"
   ],
-  "relatedZones": [],
+  "relatedZones": [
+   "Beholder's Maze",
+   "Lower Guk",
+   "Mistmoore",
+   "Najena",
+   "Northern Karana",
+   "Permafrost",
+   "Runnyeye Citadel",
+   "Solusek's Eye",
+   "Southern Karana"
+  ],
   "era": "",
   "repeatable": false
  },
@@ -9292,261 +9299,16 @@
   ],
   "relatedZones": [
    "Cazic Thule",
-   "Steamfont Mountains"
+   "East Freeport",
+   "Greater Faydark",
+   "Lesser Faydark",
+   "Northern Desert of Ro",
+   "Northern Karana",
+   "Solusek's Eye",
+   "Steamfont Mountains",
+   "West Freeport"
   ],
-  "era": "Classic",
-  "repeatable": false
- },
- {
-  "name": "Darkforge Boots",
-  "url": "https://eqlwiki.com/Darkforge_Armor_Quests",
-  "parent": "Darkforge Armor Quests",
-  "startZone": "Temple of Solusek Ro",
-  "questGiver": "an undead knight",
-  "minLevel": 33,
-  "classes": "Shadow Knight",
-  "items": [
-   {
-    "name": "Decayed Left Boot",
-    "qty": 1
-   },
-   {
-    "name": "Decayed Right Boot",
-    "qty": 1
-   },
-   {
-    "name": "Fairy Dust",
-    "qty": 1
-   }
-  ],
-  "rewards": [
-   "Darkforge Boots"
-  ],
-  "categories": [
-   "Shadow Knight Quests",
-   "Temple of Solusek Ro"
-  ],
-  "relatedZones": [
-   "Cazic Thule",
-   "Steamfont Mountains"
-  ],
-  "era": "Classic",
-  "repeatable": false
- },
- {
-  "name": "Darkforge Bracer",
-  "url": "https://eqlwiki.com/Darkforge_Armor_Quests",
-  "parent": "Darkforge Armor Quests",
-  "startZone": "Temple of Solusek Ro",
-  "questGiver": "an undead knight",
-  "minLevel": 33,
-  "classes": "Shadow Knight",
-  "items": [
-   {
-    "name": "Broken Minotaur Lord's Horn",
-    "qty": 1
-   },
-   {
-    "name": "Decayed Left Bracer",
-    "qty": 1
-   },
-   {
-    "name": "Decayed Right Bracer",
-    "qty": 1
-   }
-  ],
-  "rewards": [
-   "Darkforge Bracer"
-  ],
-  "categories": [
-   "Shadow Knight Quests",
-   "Temple of Solusek Ro"
-  ],
-  "relatedZones": [
-   "Cazic Thule",
-   "Steamfont Mountains"
-  ],
-  "era": "Classic",
-  "repeatable": false
- },
- {
-  "name": "Darkforge Breastplate",
-  "url": "https://eqlwiki.com/Darkforge_Armor_Quests",
-  "parent": "Darkforge Armor Quests",
-  "startZone": "Temple of Solusek Ro",
-  "questGiver": "an undead knight",
-  "minLevel": 33,
-  "classes": "Shadow Knight",
-  "items": [
-   {
-    "name": "Decayed Breastplate",
-    "qty": 1
-   },
-   {
-    "name": "Decayed Chainmail",
-    "qty": 1
-   },
-   {
-    "name": "Enchanted Platinum Bar",
-    "qty": 1
-   }
-  ],
-  "rewards": [
-   "Darkforge Breastplate"
-  ],
-  "categories": [
-   "Shadow Knight Quests",
-   "Temple of Solusek Ro"
-  ],
-  "relatedZones": [
-   "Cazic Thule",
-   "Steamfont Mountains"
-  ],
-  "era": "Classic",
-  "repeatable": false
- },
- {
-  "name": "Darkforge Gauntlets",
-  "url": "https://eqlwiki.com/Darkforge_Armor_Quests",
-  "parent": "Darkforge Armor Quests",
-  "startZone": "Temple of Solusek Ro",
-  "questGiver": "an undead knight",
-  "minLevel": 33,
-  "classes": "Shadow Knight",
-  "items": [
-   {
-    "name": "Decayed Left Gauntlet",
-    "qty": 1
-   },
-   {
-    "name": "Decayed Right Gauntlet",
-    "qty": 1
-   },
-   {
-    "name": "Enchanted Platinum Bar",
-    "qty": 1
-   }
-  ],
-  "rewards": [
-   "Darkforge Gauntlets"
-  ],
-  "categories": [
-   "Shadow Knight Quests",
-   "Temple of Solusek Ro"
-  ],
-  "relatedZones": [
-   "Cazic Thule",
-   "Steamfont Mountains"
-  ],
-  "era": "Classic",
-  "repeatable": false
- },
- {
-  "name": "Darkforge Greaves",
-  "url": "https://eqlwiki.com/Darkforge_Armor_Quests",
-  "parent": "Darkforge Armor Quests",
-  "startZone": "Temple of Solusek Ro",
-  "questGiver": "an undead knight",
-  "minLevel": 33,
-  "classes": "Shadow Knight",
-  "items": [
-   {
-    "name": "Decayed Left Legplate",
-    "qty": 1
-   },
-   {
-    "name": "Decayed Right Legplate",
-    "qty": 1
-   },
-   {
-    "name": "Melatite",
-    "qty": 1
-   }
-  ],
-  "rewards": [
-   "Darkforge Greaves"
-  ],
-  "categories": [
-   "Shadow Knight Quests",
-   "Temple of Solusek Ro"
-  ],
-  "relatedZones": [
-   "Cazic Thule",
-   "Steamfont Mountains"
-  ],
-  "era": "Classic",
-  "repeatable": false
- },
- {
-  "name": "Darkforge Helm",
-  "url": "https://eqlwiki.com/Darkforge_Armor_Quests",
-  "parent": "Darkforge Armor Quests",
-  "startZone": "Temple of Solusek Ro",
-  "questGiver": "an undead knight",
-  "minLevel": 33,
-  "classes": "Shadow Knight",
-  "items": [
-   {
-    "name": "Damaged Militia Helm",
-    "qty": 1
-   },
-   {
-    "name": "Decayed Helm",
-    "qty": 1
-   },
-   {
-    "name": "Decayed Visor",
-    "qty": 1
-   }
-  ],
-  "rewards": [
-   "Darkforge Helm"
-  ],
-  "categories": [
-   "Shadow Knight Quests",
-   "Temple of Solusek Ro"
-  ],
-  "relatedZones": [
-   "Cazic Thule",
-   "Steamfont Mountains"
-  ],
-  "era": "Classic",
-  "repeatable": false
- },
- {
-  "name": "Darkforge Vambraces",
-  "url": "https://eqlwiki.com/Darkforge_Armor_Quests",
-  "parent": "Darkforge Armor Quests",
-  "startZone": "Temple of Solusek Ro",
-  "questGiver": "an undead knight",
-  "minLevel": 33,
-  "classes": "Shadow Knight",
-  "items": [
-   {
-    "name": "Decayed Left Vambrace",
-    "qty": 1
-   },
-   {
-    "name": "Decayed Right Vambrace",
-    "qty": 1
-   },
-   {
-    "name": "Qeynos Kite Shield",
-    "qty": 1
-   }
-  ],
-  "rewards": [
-   "Darkforge Vambraces"
-  ],
-  "categories": [
-   "Shadow Knight Quests",
-   "Temple of Solusek Ro"
-  ],
-  "relatedZones": [
-   "Cazic Thule",
-   "Steamfont Mountains"
-  ],
-  "era": "Classic",
+  "era": "",
   "repeatable": false
  },
  {
@@ -12669,6 +12431,24 @@
   ],
   "relatedZones": [],
   "era": "Classic",
+  "repeatable": false
+ },
+ {
+  "name": "Escort the Cargo Clockwork",
+  "url": "https://eqlwiki.com/Escort_the_Cargo_Clockwork",
+  "startZone": "",
+  "questGiver": "Jarah Reskan",
+  "minLevel": 0,
+  "classes": "ALL",
+  "items": [],
+  "rewards": [],
+  "categories": [
+   "Ak'Anon"
+  ],
+  "relatedZones": [
+   "Steamfont Mountains"
+  ],
+  "era": "",
   "repeatable": false
  },
  {
@@ -16680,11 +16460,7 @@
   "classes": "Warrior, Rogue, Monk, Paladin, Shadow Knight, Cleric, Ranger, Bard",
   "items": [
    {
-    "name": "Hero Bracers",
-    "qty": 1
-   },
-   {
-    "name": "Minotaur Hero Shackles",
+    "name": "Rusty Two Handed Battle Axe",
     "qty": 1
    }
   ],
@@ -18776,7 +18552,12 @@
   "questGiver": "Leraena Shelyrak",
   "minLevel": 5,
   "classes": "?",
-  "items": [],
+  "items": [
+   {
+    "name": "Odd Kobold Paw",
+    "qty": 1
+   }
+  ],
   "rewards": [
    "Cure Disease",
    "Holy Armor"
@@ -20016,6 +19797,10 @@
     "qty": 1
    },
    {
+    "name": "Token of Mastery",
+    "qty": 1
+   },
+   {
     "name": "Torch of the Elements",
     "qty": 1
    },
@@ -20683,7 +20468,7 @@
    "The Overthere"
   ],
   "relatedZones": [],
-  "era": "",
+  "era": "Kunark",
   "repeatable": false
  },
  {
@@ -20705,7 +20490,7 @@
    "Magician Quests"
   ],
   "relatedZones": [],
-  "era": "",
+  "era": "Kunark",
   "repeatable": false
  },
  {
@@ -23100,10 +22885,6 @@
     "qty": 1
    },
    {
-    "name": "Slime Blood of Cazic Thule",
-    "qty": 1
-   },
-   {
     "name": "Spiroc Feathers",
     "qty": 1
    },
@@ -24330,7 +24111,7 @@
   "relatedZones": [
    "Qeynos"
   ],
-  "era": "",
+  "era": "Classic",
   "repeatable": false
  },
  {
@@ -26498,7 +26279,7 @@
   "relatedZones": [
    "Plane of Sky"
   ],
-  "era": "Sky",
+  "era": "",
   "repeatable": false
  },
  {
@@ -27336,6 +27117,10 @@
     "qty": 1
    },
    {
+    "name": "Encrypted Document",
+    "qty": 1
+   },
+   {
     "name": "Hieroglyph Translations",
     "qty": 1
    },
@@ -27463,6 +27248,10 @@
   "items": [
    {
     "name": "Disciple Symbol of Quellious",
+    "qty": 1
+   },
+   {
+    "name": "Encrypted Document",
     "qty": 1
    },
    {
@@ -28220,6 +28009,10 @@
    },
    {
     "name": "Shimmering Pearl",
+    "qty": 1
+   },
+   {
+    "name": "Spiroc Earth Totem",
     "qty": 1
    },
    {
@@ -29012,6 +28805,32 @@
   ],
   "relatedZones": [
    "Qeynos Hills"
+  ],
+  "era": "Classic",
+  "repeatable": false
+ },
+ {
+  "name": "Rathe Mountains Spiders",
+  "url": "https://eqlwiki.com/Rathe_Mountains_Spiders",
+  "startZone": "",
+  "questGiver": "Exterminator Galub",
+  "minLevel": 1,
+  "classes": "ALL",
+  "items": [
+   {
+    "name": "Spiderling Eye",
+    "qty": 1
+   }
+  ],
+  "rewards": [
+   "Faction"
+  ],
+  "categories": [
+   "All Classes Quests",
+   "The Rathe Mountains"
+  ],
+  "relatedZones": [
+   "The Rathe Mountains"
   ],
   "era": "Classic",
   "repeatable": false
@@ -30202,6 +30021,10 @@
     "qty": 1
    },
    {
+    "name": "Mammoth Skin",
+    "qty": 1
+   },
+   {
     "name": "Never Stop Chopping",
     "qty": 1
    },
@@ -30733,7 +30556,7 @@
   "startZone": "Kaladim",
   "questGiver": "Diggins",
   "minLevel": 9,
-  "classes": "Bard, Enchanter, Magician, Necromancer, Ranger, Rogue, Shadow Knight, Shaman, Warrior, Wizard",
+  "classes": "Rogue",
   "items": [
    {
     "name": "RunnyEye Warbeads",
@@ -30747,17 +30570,8 @@
    "Rusty Spear"
   ],
   "categories": [
-   "Bard Quests",
-   "Enchanter Quests",
-   "Magician Quests",
-   "Necromancer Quests",
    "North Kaladim",
-   "Ranger Quests",
-   "Rogue Quests",
-   "Shadow Knight Quests",
-   "Shaman Quests",
-   "Warrior Quests",
-   "Wizard Quests"
+   "Rogue Quests"
   ],
   "relatedZones": [
    "Butcherblock Mountains"
@@ -33640,7 +33454,7 @@
    "Shaman Quests"
   ],
   "relatedZones": [],
-  "era": "",
+  "era": "Kunark",
   "repeatable": false
  },
  {
@@ -33662,7 +33476,7 @@
    "The Overthere"
   ],
   "relatedZones": [],
-  "era": "",
+  "era": "Kunark",
   "repeatable": false
  },
  {
@@ -33684,7 +33498,7 @@
    "Shaman Quests"
   ],
   "relatedZones": [],
-  "era": "",
+  "era": "Kunark",
   "repeatable": false
  },
  {
@@ -33901,6 +33715,7 @@
    }
   ],
   "rewards": [
+   "Bronze_Dagger",
    "Cast-Iron Rapier"
   ],
   "categories": [
@@ -34242,7 +34057,7 @@
   "startZone": "Kaladim",
   "questGiver": "Nultal Malfoot",
   "minLevel": 2,
-  "classes": "Cleric, Druid, Enchanter, Magician, Necromancer, Paladin, Ranger, Shadow Knight, Shaman, Wizard",
+  "classes": "Cleric",
   "items": [
    {
     "name": "Skunk Scent Gland",
@@ -34262,16 +34077,7 @@
   ],
   "categories": [
    "Cleric Quests",
-   "Druid Quests",
-   "Enchanter Quests",
-   "Magician Quests",
-   "Necromancer Quests",
-   "North Kaladim",
-   "Paladin Quests",
-   "Ranger Quests",
-   "Shadow Knight Quests",
-   "Shaman Quests",
-   "Wizard Quests"
+   "North Kaladim"
   ],
   "relatedZones": [
    "Butcherblock Mountains"
@@ -34504,7 +34310,7 @@
   "url": "https://eqlwiki.com/Soldier%27s_Brooch_Quest",
   "startZone": "Rathe Mountains",
   "questGiver": "Gaz Commander Faltip",
-  "minLevel": 30,
+  "minLevel": 0,
   "classes": "All",
   "items": [],
   "rewards": [
@@ -34583,7 +34389,12 @@
   "questGiver": "The Kerran Sha`rr",
   "minLevel": 1,
   "classes": "All",
-  "items": [],
+  "items": [
+   {
+    "name": "Desecrated Kejaar Totem",
+    "qty": 1
+   }
+  ],
   "rewards": [
    "Hamed's Ring of Tears"
   ],
@@ -34594,7 +34405,7 @@
   "relatedZones": [
    "Kerra Island"
   ],
-  "era": "",
+  "era": "Classic",
   "repeatable": false
  },
  {
@@ -35809,6 +35620,10 @@
     "qty": 1
    },
    {
+    "name": "Dusty Ribcage",
+    "qty": 1
+   },
+   {
     "name": "Dwarven Ale",
     "qty": 1
    },
@@ -35826,6 +35641,14 @@
    },
    {
     "name": "Fire Opal",
+    "qty": 1
+   },
+   {
+    "name": "Full Gem Bag",
+    "qty": 1
+   },
+   {
+    "name": "Gem Encrusted Casket",
     "qty": 1
    },
    {
@@ -36178,7 +36001,15 @@
   "classes": "Paladin",
   "items": [
    {
-    "name": "A Sealed List",
+    "name": "Dwarf Decapitated Head",
+    "qty": 1
+   },
+   {
+    "name": "Gnome Decapitated Head",
+    "qty": 1
+   },
+   {
+    "name": "Human Decapitated Head",
     "qty": 1
    }
   ],
@@ -38135,6 +37966,10 @@
     "qty": 1
    },
    {
+    "name": "Mundane Shield",
+    "qty": 1
+   },
+   {
     "name": "Powder of Reanimation",
     "qty": 1
    }
@@ -38832,7 +38667,7 @@
   "relatedZones": [
    "Felwithe"
   ],
-  "era": "",
+  "era": "Velious",
   "repeatable": false
  },
  {
@@ -38865,8 +38700,7 @@
    }
   ],
   "rewards": [
-   "Reaper of the Dead",
-   "Thex Mallet"
+   "Reaper of the Dead"
   ],
   "categories": [
    "Necromancer Quests",
@@ -38886,10 +38720,17 @@
   "questGiver": "The Kerran Sha`rr",
   "minLevel": 1,
   "classes": "All",
-  "items": [],
+  "items": [
+   {
+    "name": "Desecrated Kejaar Totem",
+    "qty": 1
+   },
+   {
+    "name": "Heretic Insurrection Orders",
+    "qty": 1
+   }
+  ],
   "rewards": [
-   "Desecrated Kejaar Totem",
-   "Heretic Insurrection Orders",
    "Talisman of Kejaar Kerrath"
   ],
   "categories": [
@@ -40326,7 +40167,7 @@
   "startZone": "Greater Faydark",
   "questGiver": "Tylfon",
   "minLevel": 1,
-  "classes": "Bard, Enchanter, Magician, Necromancer, Ranger, Rogue, Shadow Knight, Warrior, Wizard",
+  "classes": "Rogue",
   "items": [
    {
     "name": "Rusty Dagger",
@@ -40338,15 +40179,8 @@
   ],
   "categories": [
    "Bard Quests",
-   "Enchanter Quests",
    "Greater Faydark",
-   "Magician Quests",
-   "Necromancer Quests",
-   "Ranger Quests",
-   "Rogue Quests",
-   "Shadow Knight Quests",
-   "Warrior Quests",
-   "Wizard Quests"
+   "Rogue Quests"
   ],
   "relatedZones": [
    "Greater Faydark"
@@ -43273,7 +43107,7 @@
    "Wizard Quests"
   ],
   "relatedZones": [],
-  "era": "",
+  "era": "Kunark",
   "repeatable": false
  },
  {
@@ -43295,7 +43129,7 @@
    "Wizard Quests"
   ],
   "relatedZones": [],
-  "era": "",
+  "era": "Kunark",
   "repeatable": false
  },
  {

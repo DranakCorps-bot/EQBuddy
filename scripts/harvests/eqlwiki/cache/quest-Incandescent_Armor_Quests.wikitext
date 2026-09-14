@@ -84,7 +84,7 @@ You receive the {{:Incandescent Gloves}}.
 Sultin needs four items:{{CheckboxList}}
 * [[Glowing Mask]], found on [[a froglok scryer]] or [[a skeleton monk]] in [[Upper Guk]]
 * [[Rune of Fortune]] (top), from [[Enynti]] in the Chasm below [[Mistmoore]]
-* [[Rune of Fortune]] (bottom) by giving 5 pp to [[Mizr N`Mar]] in the [[Neriak|Neriak City Library]]
+* [[Rune of Fortune]] (bottom) by giving 5 pp to [[Mizr N`Mar]] in [[Neriak|Neriak Third Gate]]
 * [[Rune of Fortune]] (middle) by giving 5 pp to [[Madame Serena]] in [[Qeynos|South Qeynos]]
 {{End}}
 
@@ -125,8 +125,8 @@ You receive the {{:Incandescent Mask}}.
 Sultin needs:{{CheckboxList}}
 * [[Pouch of Silver Dust]] from the [[a dusty werebat]] in [[The Estate of Unrest]]
 * [[Glowing Silver Wand]] from [[Raine Beteria]]
-** [[Blessed Silver Wand]] from [[Ezmirella]] (and 5 pp)
-*** [[Silver Wand]] from [[a silvered guard]] in [[Cazic Thule (Zone)|The Temple of Cazic-Thule]] (and 5 pp)
+** [[Blessed Silver Wand]] from [[Ezmirella]]
+*** [[Silver Wand]] from [[a silvered guard]] in [[Cazic Thule (Zone)|The Temple of Cazic-Thule]]
 {{End}}
 
 '''You say, 'I am interested in the wand''''
@@ -137,11 +137,11 @@ In [[The Estate of Unrest]], get the keys and go to the basement. Slay a [[A Dus
 
 In [[Cazic Thule (Zone)|The Temple of Cazic-Thule]], find [[a silvered guard]] at the northwest pyramids, and kill it to get a [[Silver Wand]]. 
 
-Find [[Ezmirella]] in the gypsy camp in the [[Northern Plains of Karana]]. Hand her the [[Silver Wand]] and 50 gold coins (or 5 platinum). She will return a [[Blessed Silver Wand]] and instruct you to seek out [[Raine Beteria]]. 
+Find [[Ezmirella]] in the gypsy camp in the [[Northern Plains of Karana]]. Hand her the [[Silver Wand]]. You do not need to tip her. She will return a [[Blessed Silver Wand]] and instruct you to seek out [[Raine Beteria]]. 
 
 : Ezmirella says, 'I have blessed your silver wand.  To complete the enchantment, you must take the wand to Raine Beteria in the Erudin library.  Tip her 50 golden coins, and she will help you.'
 
-Hand Raine the [[Blessed Silver Wand]] and 50 gold coins (or 5 platinum) to receive the [[Glowing Silver Wand]].
+Hand Raine the [[Blessed Silver Wand]] to receive the [[Glowing Silver Wand]]. You do not need to tip her.
 
 : Raine Beteria says, 'Your silver wand has been fully enchanted.  Take it and the pouch of silver dust back to the temple of Ro.'
 

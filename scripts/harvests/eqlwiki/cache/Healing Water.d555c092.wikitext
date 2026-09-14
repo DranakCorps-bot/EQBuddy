@@ -1,7 +1,8 @@
+{{Classic Era}}
 {{Spellpagesmart|
 
-| spellname = Greater Healing
-| spellicon = J
+| spellname = Healing Water
+| spellicon = 99
 | description = Conjures healing water from the ground, healing 425 damage to your target.
 
 | Table = {{{Table|0}}}
@@ -36,9 +37,7 @@
 
 | where_to_obtain = 
 
-{{SpellWhereTable|
-{{SpellWhereRowB | [[New Sebilis Expedition]] | [[Wanderer Rakshaazi]] | Spell Vendor Area | (120, -163) }}
-{{SpellWhereRow | [[West Commonlands]] | [[Slea Pinewhisper]] | Druid Ring | (450, 1383, -52) }}
-}}
-
+<ul>
+<li>[[Druid#Spell Vendors|Druid Spell Vendors]]</li>
+</ul>
 }}

@@ -3263,84 +3263,39 @@ All AAs are available at [[Alternate Advancement]], the class AAs listed here ar
 ! Benefits
 ! Era
 |-
-| [[Boon of the Garou]] 
-| 44
-| 5-35 Lifetap Proc (L1-L60), +30 ATK, +100 DEX
+| [[Minor Illusion]] 
+| 1
+| Almost root.
 | {{Classic Short}}
 |-
-| [[Illusion: Werewolf]]
-| 44
-| +45-91 ATK (L44-L60), 40% Haste, +30 STR
-| {{Classic Short}}
-|-
-| [[Illusion: Spirit Wolf]] 
-| 39
-| +15 ATK, +10 CR
-| {{Classic Short}}
-|-
-| [[Illusion: Dry Bone]] 
-| 39
-| +25 FR
-| {{Classic Short}}
-|-
-| [[Illusion: Fire Elemental]] 
-| 34
-| +9-17 Damage Shield (L34-L65) 
-| {{Classic Short}}
-|-
-| [[Illusion: Air Elemental]] 
-| 29
-| Levitate
-| {{Classic Short}}
-|-
-| [[Illusion: Water Elemental]] 
-| 29
-| Water Breathing
-| {{Classic Short}}
-|-
-| [[Illusion: Earth Elemental]] 
-| 24
-| +10 STR
-| {{Classic Short}}
-|-
-| [[Illusion: Skeleton]] 
-| 24
+| [[Illusion: Human]] 
+| 2
 |
 | {{Classic Short}}
 |-
-| [[Illusion: Iksar]] 
-| 20
+| [[Illusion: Half-Elf]] 
+| 3
 | [[Infravision]]
 | {{Classic Short}}
 |-
-| [[Illusion: Ogre]] 
-| 20
-| [[Infravision]], Racial [[Slam]]
+| [[Illusion: Wood Elf]] 
+| 5
+| [[Infravision]]
 | {{Classic Short}}
 |-
-| [[Illusion: Troll]] 
-| 20
-| +1 HP regen, [[Infravision]], Racial [[Slam]]
-| {{Classic Short}}
-|-
-| [[Illusion: Barbarian]] 
-| 16
-| Racial [[Slam]]
-| {{Classic Short}}
-|-
-| [[Illusion: Dwarf]] 
-| 16
-| [[https://wiki.project1999.com/Character_Races#Barrel_Roll Barrel Roll]], [[Infravision]]
-| {{Classic Short}}
-|-
-| [[Illusion: Tree]] 
-| 16
-| Root
+| [[Illusion: Gnome]] 
+| 8
+| [[Infravision]]
 | {{Classic Short}}
 |-
 | [[Illusion: Dark Elf]] 
-| 12
+| 10
 | [[Ultravision]]
+| {{Classic Short}}
+|-
+| [[Illusion: High Elf]] 
+| 11
+| [[Infravision]]
 | {{Classic Short}}
 |-
 | [[Illusion: Erudite]] 
@@ -3353,36 +3308,88 @@ All AAs are available at [[Alternate Advancement]], the class AAs listed here ar
 | [[Infravision]]
 | {{Classic Short}}
 |-
-| [[Illusion: High Elf]] 
-| 12
+| [[Illusion: Dwarf]] 
+| 13
+| [[Character Races#Barrel Roll|Barrel Roll]], [[Infravision]]
+| {{Classic Short}}
+|-
+| [[Illusion: Barbarian]] 
+| 15
+| 
+| {{Classic Short}}
+|-
+| [[Illusion: Tree]] 
+| 15
+| Root
+| {{Classic Short}}
+|-
+| [[Illusion: Ogre]] 
+| 17
 | [[Infravision]]
 | {{Classic Short}}
 |-
-| [[Illusion: Gnome]] 
-| 8
-| [[Infravision]]
+| [[Illusion: Troll]] 
+| 18
+| +1 HP regen, [[Infravision]]
 | {{Classic Short}}
 |-
-| [[Illusion: Wood Elf]] 
-| 8
-| [[Infravision]]
+| [[Illusion: Iksar]] 
+| 20
+| +1 HP regen, [[Infravision]]
 | {{Classic Short}}
 |-
-| [[Illusion: Half-Elf]] 
-| 4
-| [[Infravision]]
+| [[Illusion: Earth Elemental]] 
+| 21
+| +10 STR
 | {{Classic Short}}
 |-
-| [[Illusion: Human]] 
-| 4
+| [[Illusion: Skeleton]] 
+| 24
 |
 | {{Classic Short}}
 |-
-| [[Minor Illusion]] 
-| 1
-| Almost root.
+| [[Illusion: Water Elemental]] 
+| 28
+| Water Breathing
+| {{Classic Short}}
+|-
+| [[Illusion: Air Elemental]] 
+| 29
+| Levitate
+| {{Classic Short}}
+|-
+| [[Illusion: Fire Elemental]] 
+| 33
+| +9-10 Damage Shield (L34-L50) 
+| {{Classic Short}}
+|-
+| [[Illusion: Dry Bone]] 
+| 37
+| +25 FR
+| {{Classic Short}}
+|-
+| [[Illusion: Spirit Wolf]] 
+| 38
+| +15 ATK, +10 CR
+| {{Classic Short}}
+|-
+| [[Illusion: Werewolf]]
+| 44
+| 
+| {{Classic Short}}
+|-
+| [[Boon of the Garou]] 
+| 44
+| 5-30 Lifetap Proc (L1-L50), +30 ATK, +100 DEX
+| {{Classic Short}}
+|-
+| [[Illusion: Imp]]
+| 45
+| Levitate
 | {{Classic Short}}
 |}
+
+Illusions for the larger races, (Ogres, Trolls, and Barbarians) do ''not'' grant a [[Skill Slam|Slam]] ability. However, when one of those races uses an illusion, they keep their innate Slam ability.
 
 == Mesmerization Spells ==
 This table describes which mesmerization spells can be overwritten by which others.
