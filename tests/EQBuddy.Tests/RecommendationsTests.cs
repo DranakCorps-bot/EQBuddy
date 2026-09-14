@@ -133,6 +133,70 @@ public class RecommendationsTests
         Assert.Contains(set.Top, r => r.Zone == "North Ro");
     }
 
+    /// <summary>
+    /// **A MERGED ROW GIVES EVERY GOAL IT CLAIMS A SENTENCE, AND THE CAP CANNOT TAKE THE LAST
+    /// ONE** (DRA-71 D7).
+    ///
+    /// <para><b>A launched app found this and no unit test had.</b> Three engines answering
+    /// about one zone — Level Up, Farm Motes and Make Money, which is the differentiator working
+    /// exactly as designed — put ten sentences on one row against a <see cref="Recommendations.WhyCap"/>
+    /// of six. The merge concatenated the parts and the cap trims the TAIL, so the row drew a
+    /// headline reading "Level Up · Farm Motes · Make Money" over six sentences of which not one
+    /// was about money. Every component was correct and the row lied about itself.</para>
+    ///
+    /// <para>The fix is round-robin rather than a bigger cap: at any cap of one per part, every
+    /// goal in the headline keeps a sentence. This asserts the property rather than the
+    /// implementation — for each goal the row serves, at least one drawn fact belongs to an
+    /// engine that could only have produced it.</para>
+    /// </summary>
+    [Fact]
+    public void EveryGoalAMergedRowClaimsKeepsASentenceUnderTheCap()
+    {
+        var pool = new[]
+        {
+            // An INSTANCE, and the name is the only input: "Najena - Solo" decodes to D0, which
+            // is outside the D2-D4 band the mote engine prefers. That is what pushes this row
+            // past the cap (eight sentences against six) so the trimming is actually exercised
+            // rather than assumed.
+            Mob("a shadowed man", "Najena - Solo", 400) with
+            {
+                Loot =
+                [
+                    new MobLoot("Mote of Major Potential", 9, null),
+                    new MobLoot("Froglok Blood", 20, null),
+                ],
+            },
+        };
+        var sessions = new[]
+        {
+            new SessionRow(1, "erollisi", "Dranak", DateTime.Today, DateTime.Today.AddHours(5),
+                5 * 3600, 5 * 3600, "ended", "Najena - Solo", 0, 60, 50_000, 0, 0, 0, "", ""),
+        };
+        var zones = ZoneHistory.Fold(sessions, pool);
+        var inputs = new HelperInputs(
+            zones, pool, null, [], [], [], [], false, [], [], null, ResolvedLevel.Unknown)
+        {
+            Motes = MoteHistory.Fold(pool, zones),
+            Sales = [new SaleRoll("Froglok Blood", 4, 320)],
+        };
+
+        var top = Assert.Single(Recommendations.Rank(
+            inputs, [HelperGoal.LevelUp, HelperGoal.FarmMotes, HelperGoal.MakeMoney]).Top);
+
+        // The join fired: one place, three goals.
+        Assert.Equal(3, top.Goals.Count);
+        Assert.True(top.Why.Count <= Recommendations.WhyCap);
+
+        // …and each of the three has something to show for itself on the row.
+        Assert.NotEmpty(top.Why.OfType<ZoneXpRateFact>());        // Level Up
+        Assert.NotEmpty(top.Why.OfType<ZoneMoteRateFact>());      // Farm Motes
+        Assert.NotEmpty(top.Why.OfType<ZoneCoinRateFact>());      // Make Money
+
+        // A cap that trimmed says so, which is trap 50 one level down from the list's own cap.
+        Assert.True(top.WithheldWhy > 0,
+            "the row dropped sentences without reporting it");
+    }
+
     /// <summary>An unlock whose faction grind happens where you already level joins the same
     /// way — the cross-domain chain is not a special case of two particular goals.</summary>
     [Fact]
@@ -517,14 +581,15 @@ public class RecommendationsTests
     [Fact]
     public void APickedDeferredGoalComesBackAsNotAnsweredYetRatherThanAsAGap()
     {
-        // Farm Motes since DRA-71 D6 — Farm Gear, which used to stand here, gained its
-        // engine in that slice and its answer is now a GAP ("no inventory dump") rather than a
-        // deferral. The distinction this test exists for is unchanged: a gap means a store is
-        // missing, a deferral means code is.
-        var set = Recommendations.Rank(HelperInputs.Nothing, [HelperGoal.FarmMotes]);
-        Assert.Equal([HelperGoal.FarmMotes], set.NotAnsweredYet);
+        // Farm Materials since DRA-71 D7 — Farm Motes, which stood here after D6, gained its
+        // engine in that slice and now answers a GAP ("no mote has dropped for you") instead.
+        // The subject of this test keeps moving because the feature keeps landing; the
+        // distinction it exists for does not: a gap means a store is missing, a deferral means
+        // code is.
+        var set = Recommendations.Rank(HelperInputs.Nothing, [HelperGoal.FarmMaterials]);
+        Assert.Equal([HelperGoal.FarmMaterials], set.NotAnsweredYet);
         Assert.Empty(set.Gaps);
-        Assert.NotEmpty(HelperPresentation.NotAnsweredYet(HelperGoal.FarmMotes));
+        Assert.NotEmpty(HelperPresentation.NotAnsweredYet(HelperGoal.FarmMaterials));
     }
 
     // ---- 7. the doors are real ---------------------------------------------------------------
@@ -644,13 +709,19 @@ public class RecommendationsTests
         var set = Recommendations.Rank(HelperInputs.Nothing, Recommendations.All);
         Assert.Empty(set.Top);
         Assert.Equal(0, set.Withheld);
-        // FOUR deferred goals since DRA-71 D6 (Farm Gear gained its engine), and FIVE gaps:
-        // the four that were already here plus Farm Gear's own, which on a fresh profile is
-        // "EQBuddy has not been told what you are wearing".
-        Assert.Equal(4, set.NotAnsweredYet.Count);
-        Assert.Equal(5, set.Gaps.Count);
+        // TWO deferred goals since DRA-71 D7 (Farm Motes and Make Money gained engines, after
+        // Farm Gear gained one in D6), and SEVEN gaps: the five that were here plus the two new
+        // engines' own. On a fresh profile both are the no-history state rather than their own
+        // "you have never looted a mote / earned a coin" — EQBuddy has read nothing, which is a
+        // different sentence and the one a first-run player should get.
+        Assert.Equal(2, set.NotAnsweredYet.Count);
+        Assert.Equal(7, set.Gaps.Count);
         Assert.Contains(set.Gaps,
             g => g.Goal == HelperGoal.FarmGear && g.Reason == GoalGapReason.NoInventoryDump);
+        Assert.Contains(set.Gaps,
+            g => g.Goal == HelperGoal.FarmMotes && g.Reason == GoalGapReason.NoPlayHistory);
+        Assert.Contains(set.Gaps,
+            g => g.Goal == HelperGoal.MakeMoney && g.Reason == GoalGapReason.NoPlayHistory);
         // And the level it was handed is the Unknown state rather than a zero somebody has
         // to remember not to divide by (DRA-71 D3).
         Assert.False(HelperInputs.Nothing.Level.Known);

@@ -1,3 +1,152 @@
+## 2026-09-13 — DRA-71 delivery 7: motes and money, both answered from the player's own play
+
+Pre-authorized: Helm SIGNED the plan (PR #586, merged `a28c5d89`) and SIGNED
+D2–D6 (#588, #590, #592, #594, #596), authorizing `dra71-d7`. Nothing below is on
+the consequence list: no release, no new surface, **no eqlwiki request of any
+kind** (the promoter change reads a cache that was already on this machine and
+this seat fetched nothing), nothing new leaving the machine, nothing near the
+values line — every number is this character's own kills, this character's own
+stored sittings, and a catalog EQBuddy already ships. David vetoes from here.
+
+**1. THE CATALOG'S VENDOR PRICE IS NOT WEIGHED, AND THE PLAN ASKED FOR IT TO BE.
+This is the delivery's biggest departure and the default most worth a veto.**
+P9's words are *"the engine = your observed `CopperPerHour` + vendor-value-weighted
+drop evidence from your own kills and the catalog"*. The plan also asked for a
+distinct-count survey before the promoter committed to anything, and the survey
+is why the second half did not ship as written. Run through the app's own parsers
+over the 10,957 cached item pages:
+
+- **945** pages state a `merchant_value` at all — 8.6% of the catalog.
+- **646** of those parse to a number; **299** are refused as unreadable (prose
+  like "absolutely nothing", approximations like "~2pp", qualified figures like
+  "197.6p Max", and conditions written inline like "2p 1g 8s 3c with 111
+  Charisma").
+- **354 distinct** parsed values across those 646 — a healthy spread, so trap
+  73's tell passes: this is a catalog carrying real numbers, not a parser finding
+  one template.
+- **235 of the 646 state the CHARISMA AND FACTION they were quoted at**, in the
+  page's own heading — *"VALUE TO VENDOR with CHA : 80 and faction at
+  Indifferently"* — and the Charisma differs per page (80, 72, 111).
+
+That last count is the finding. **A vendor's price in EQ moves with the seller's
+Charisma and their standing with the merchant, so the wiki's number is a quote
+somebody was given rather than a property of the object.** A ranking built on it
+would sort zones by which of their drops happen to have a priced page, at a
+Charisma that is not the player's. So the ranking reads what the player was
+ACTUALLY paid — `SaleHistory`, pooled from their own stored sessions — and the
+catalog's number is demoted to naming an item they have never sold, labelled
+`Evidence.Catalog` and printed WITH the page's own condition. It weighs nothing.
+
+The veto shape, if this is wrong: restore the catalog price as a weight and
+accept that the order rests on somebody else's Charisma.
+
+**2. The copper value ships DATA-LESS, the same way `DropMobs` did in D6 — and
+the reason is now a measurement rather than a policy.** D6's note said the item
+dump is gitignored and rebuilding it means fetching ~11k pages. That is not the
+whole truth and the correction belongs here: **the dump is already on this
+machine**, at `scripts/harvests/eqlwiki/cache/items-wikitext.jsonl` in the main
+checkout, which is how the survey above was taken without a single request. But
+it holds **10,957 entries against the 11,146 the committed catalog was built
+from** — it is older than the shipped file. Regenerating from it would ship a
+catalog that has LOST ~190 items in order to gain two fields, which is a worse
+trade than waiting. So the promoter, the schema and both readers land and the
+values arrive with the next weekly refresh, which re-harvests anyway.
+`RecommendationsGearTests.TheShippedCatalogCarriesNoVendorValueYet` fails the day
+they do, so somebody reads the sentences it turns on.
+
+**3. Farm Motes CONSUMES the level and Make Money is EXEMPT** — deliberately
+opposite rows on the same must-list. Motes consume it because the Founder asked
+by name: *"highest-level zone"* is the first of his three mote criteria, and the
+discount is the SAME `Outgrown` judgement the experience engine already makes, on
+the same `/consider` evidence. Money is exempt because nothing he asked for needs
+it and both readings of what it would do are wrong — coin is a property of the
+CREATURE (the pool's `CoinMin`/`CoinMax` do not move when the killer levels), so
+an outgrown camp pays the same per kill and is killed through faster; marking it
+down recommends against the goal just picked and marking it up is a game rule
+nobody here can verify. It is D6's Farm Gear conclusion reached again on
+different evidence. `HelperMustListTests` proves both behaviourally by running
+each engine at two levels.
+
+**4. "Difficulty 2–4" is read as the game's instance tiers D0–D4** — the
+assumption the plan asked to be logged for veto. It is the only 1–5 difficulty
+datum the game's own data carries (`InstanceTier`, decoded from the zone line the
+game printed). **One piece of corroboration turned up and it is worth having:**
+the shipped catalog's bare "Mote of Potential" lists its drop zones as *"D3+
+Zones"* — the wiki tying mote quality to instance tier in its own words.
+`MoteCatalogSurveyTests` pins that string so the claim can be checked rather than
+taken on trust. One string is not a model, and nothing here derives a per-tier
+mote value from it.
+
+**5. The tier PREFERENCE is a discount on low instances and never a bonus, and
+an open-world zone is untouched.** D4 refused bonus arms and this slice does not
+reopen that, so a zone whose own line recorded D0 or D1 is marked down and a zone
+inside D2–D4 is left alone rather than promoted. The clause that matters is the
+third one: **a zone with no tier observed is not touched at all.** Open world is
+most of the game and most of what a low-level character can reach; marking it
+down would be EQBuddy ruling on a comparison nobody here can make ("is an
+open-world camp better or worse than a D3 for motes" has no answer in this repo)
+and it would read as a verdict on the player's whole evening.
+
+**6. The mote fold has a SECOND floor the experience rate does not** —
+`MoteHistory.MinKills` = 50, beside `ZoneHistory.MinHours`. A mote rate has a
+failure an hours floor cannot see: one Infinite mote in a legitimate twenty
+minutes is thirty potency an hour, measured correctly, and it will never happen
+again. Fifty kills is the point at which a rare drop has been given a chance to
+be ordinary. It is a judgement, like the fifteen minutes and the ten levels, and
+it is a FLOOR rather than a discount — under it the zone answers nothing, because
+a rate nobody should act on is not improved by a caveat beside it.
+
+**7. The Void-Touched mote is counted separately and still weighs nothing.** The
+ladder gives it no experience — its worth is a whole item tier and the wiki
+publishes no number for it — so a zone whose only motes were Void-Touched has a
+potency of zero. That is correct arithmetic and a terrible sentence on its own,
+so the count rides its own field and the row names it. The ARITHMETIC still
+refuses to make a value up.
+
+**8. "Farm to sell" does not go through the dominance sweep, and never will.**
+`GearUpgrades.Sweep` refuses the intent outright. Every candidate there has a
+worn anchor, and all three properties that keep that file off the best-in-slot
+side of the line rest on there being one; an anchorless candidate would be the
+game's items ranked against each other, which is the single claim it exists not
+to make. The sell engine's anchor is the player's own LOOT priced at their own
+sale, so the "never BiS" lock is not approached rather than merely respected.
+
+### Three things the plan did not foresee, all found by a launched app
+
+**9. A MERGED ROW WAS DROPPING A WHOLE ENGINE'S SENTENCES, AND EVERY UNIT TEST
+PASSED.** Three engines answering about one zone — Level Up, Farm Motes and Make
+Money, which is the cross-domain join working exactly as the PRD wants — put ten
+sentences on one row against a `WhyCap` of six. The merge CONCATENATED the parts
+and the cap trims the tail, so the row drew a headline reading *"Level Up · Farm
+Motes · Make Money"* over six sentences of which not one was about money. Every
+component was correct and the row lied about itself. The fix is round-robin
+interleaving in `Recommendations.Join` rather than a bigger cap: at any cap of one
+per part, every goal in the headline keeps a sentence. **Raising the cap again was
+the wrong lever** — D4 already went 4→6 under protest, and three engines can put
+ten sentences on one zone. Within an engine, the facts are now ordered so every
+discount that FIRED comes before the fact that weighs nothing, which is D4's own
+rule applied one file over: the mote engine's WHO line is what a loaded row gives
+up, and the row says it held something back. Only `helperWhyWithheld` from a
+launched app can see that, so that dump key is new.
+
+**10. The first staged shot found two wording defects that every assertion
+passed** (trap 23, again). The take read *"Shadowed man gave you 8 motes of it
+(40 experience) across your 50 kills of it"* — two pronouns pointing at different
+things and the first at nothing — and *"Bone Chips drops here from Shadowed man —
+3 of your 50 kills of it"*, where the 50 belongs to the creature and reads as
+kills of the item. Both sentences were correct, both numbers were real, and both
+were unreadable. `HelperPresentation` was changed and both shots retaken.
+
+**11. The shots came back with TWO answers where one was predicted**, and it is
+the floors behaving rather than a defect: the shared fixture log has motes of its
+own in West Commonlands, and the kills floor is on the ZONE's kills rather than
+the creature's, so that zone qualifies too. It makes a better picture than the
+single row that was staged for — and it is what caused the cadence discount to
+fire on the staged zone at all, since with one mote zone there is no baseline and
+no comparison, the same "never compare a place with itself" rule D4 photographed.
+
+---
+
 ## 2026-09-13 — DRA-71 delivery 6: Farm Gear asks which gear question you are asking
 
 Pre-authorized: Helm SIGNED the plan (PR #586, merged `a28c5d89`) and SIGNED

@@ -103,12 +103,13 @@ public class HelperMustListTests
     /// <summary>The engines that exist, named. This row is meant to be EDITED — a goal moving
     /// from Deferred to Answered is the whole of what a later slice delivers, and it should
     /// be a deliberate line in a diff rather than something that happens as a side effect.
-    /// Four in D1; Farm Gear joined them in DRA-71 D6.</summary>
+    /// Four in D1; Farm Gear joined them in DRA-71 D6; Farm Motes and Make Money in D7.</summary>
     [Fact]
-    public void FiveGoalsAreAnsweredInThisDelivery() =>
+    public void SevenGoalsAreAnsweredInThisDelivery() =>
         Assert.Equal(
             [HelperGoal.LevelUp, HelperGoal.FarmGear, HelperGoal.UnlockClasses,
-             HelperGoal.UnlockRaces, HelperGoal.WorkOnFaction],
+             HelperGoal.UnlockRaces, HelperGoal.FarmMotes, HelperGoal.WorkOnFaction,
+             HelperGoal.MakeMoney],
             Recommendations.All
                 .Where(g => Recommendations.ShapeFor(g) == HelperGoalShape.Answered)
                 .ToArray());
@@ -142,22 +143,28 @@ public class HelperMustListTests
             GearUpgrades.All.Select(HelperPresentation.GearIntentLabel).ToArray());
     }
 
-    /// <summary>Two of the three answer in this delivery. The same "meant to be EDITED" row as
-    /// the goals' above it — D7's Make Money slice is what moves "Farm to sell".</summary>
+    /// <summary>All three answer since DRA-71 D7. The same "meant to be EDITED" row as the
+    /// goals' above it — and a fourth intent arriving must decide rather than inherit.</summary>
     [Fact]
-    public void TwoGearIntentsAreAnsweredInThisDelivery() =>
+    public void AllThreeGearIntentsAreAnsweredInThisDelivery() =>
         Assert.Equal(
-            [GearIntent.UpgradeWorn, GearIntent.ReplaceSlot],
+            [GearIntent.UpgradeWorn, GearIntent.ReplaceSlot, GearIntent.FarmToSell],
             GearUpgrades.All
                 .Where(i => GearUpgrades.ShapeFor(i) == GearIntentShape.Answered)
                 .ToArray());
 
-    /// <summary>A deferred INTENT says so and points at the room that answers its question
-    /// today — the same pairing a deferred GOAL keeps, and it lives on the gap reason because
-    /// an intent is not a goal. The door is asserted to be a room that has actually landed, so
-    /// this cannot rot into a sentence pointing at nothing.</summary>
+    /// <summary>
+    /// **THE DEFERRED-INTENT SENTENCE SURVIVES THE SLICE THAT EMPTIED ITS CASELOAD** (DRA-71
+    /// D7).
+    ///
+    /// <para>No intent is Deferred any more, so <c>Recommendations.FarmGear</c>'s arm for it is
+    /// unreachable today. That is exactly when an empty state rots: the next intent to arrive
+    /// Deferred would return an empty list a room draws as "your gear is perfect". So the
+    /// sentence and its door are still asserted, and the door is still checked against the
+    /// rooms that have actually landed.</para>
+    /// </summary>
     [Fact]
-    public void TheDeferredGearIntentSaysSoAndPointsSomewhere()
+    public void TheDeferredGearIntentSentenceStillExistsAndStillPointsSomewhere()
     {
         var gap = new GoalGap(HelperGoal.FarmGear, GoalGapReason.GearIntentNotAnsweredYet);
         Assert.NotEmpty(HelperPresentation.Gap(gap));
@@ -366,7 +373,13 @@ public class HelperMustListTests
             [new FactionsFile.Standing(1, "Frogloks of Guk", 1200, 800)]);
         MobSummary[] pool =
         [
-            new("a froglok tad", 200, 200, 30, 0, 0, [])
+            // The loot is DRA-71 D7's half: a mote, so Farm Motes has something to rank, and a
+            // sellable drop, so Make Money and Farm to Sell do. Both ride the SAME creature in
+            // the SAME zone as everything else — see the summary for why every engine has to
+            // be anchored on Lower Guk or an exemption passes for the wrong reason.
+            new("a froglok tad", 200, 200, 30, 0, 0,
+                [new MobLoot("Mote of Major Potential", 6, 3.0),
+                 new MobLoot("Froglok Blood", 12, 6.0)])
             {
                 Zone = "Lower Guk",
                 LevelMin = 8,
@@ -376,8 +389,11 @@ public class HelperMustListTests
         ];
         SessionRow[] sessions =
         [
+            // Copper is non-zero so the Make Money engine has a rate to rank — a zone that
+            // earned nothing draws its gap instead, and "identical at two levels" would then be
+            // vacuously true of an engine that returned nothing (trap 78).
             new(1, "erollisi", "Dranak", DateTime.Today, DateTime.Today.AddHours(5),
-                5 * 3600, 5 * 3600, "ended", "Lower Guk", 0, 60, 0, 0, 0, 0, "", ""),
+                5 * 3600, 5 * 3600, "ended", "Lower Guk", 0, 60, 50_000, 0, 0, 0, "", ""),
         ];
         UnlockProgress[] races =
         [
@@ -397,13 +413,19 @@ public class HelperMustListTests
             },
         ]);
 
+        var zones = ZoneHistory.Fold(sessions, pool);
         return new HelperInputs(
-            ZoneHistory.Fold(sessions, pool), pool, dump, ["Frogloks of Guk"],
+            zones, pool, dump, ["Frogloks of Guk"],
             races, races, [], true, [], [], null,
             new ResolvedLevel(level, LevelSource.Observed, new DateTime(2026, 9, 12, 20, 0, 0)))
         {
             Worn = [worn],
             Items = catalog,
+            // DRA-71 D7. The mote fold over the same pool and the same rollup — never a second
+            // one — and a sale so the money engines price a drop from measurement rather than
+            // falling through to the catalog arm this fixture does not exercise.
+            Motes = MoteHistory.Fold(pool, zones),
+            Sales = [new SaleRoll("Froglok Blood", 4, 320)],
         };
     }
 
@@ -460,6 +482,10 @@ public class HelperMustListTests
         if (type == typeof(string)) return "Lower Guk";
         if (type == typeof(int)) return 3;
         if (type == typeof(double)) return 7.5;
+        // Coin is a long everywhere in this repo (StatsSnapshot.FormatCoin takes one), so the
+        // two DRA-71 D7 money facts take one. 320 copper is "3s 2c" — a value the formatter
+        // prints with two denominations, so a sentence that dropped one would be visible.
+        if (type == typeof(long)) return 320L;
         if (type == typeof(Evidence)) return Evidence.Personal;
         throw new InvalidOperationException(
             $"A WhyFact takes a {type.Name}, which this fixture cannot make up. Add an arm — "

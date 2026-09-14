@@ -67,6 +67,39 @@ public sealed class ItemCatalog
         /// </summary>
         public Dictionary<string, List<string>>? DropMobs { get; set; }
 
+        /// <summary>
+        /// **WHAT A VENDOR PAID, IN COPPER** — the value the promoter used to discard
+        /// (DRA-71 D7, Fable plan P9; Founder smoke item 4c un-PARKed it).
+        ///
+        /// <para>Parsed through <see cref="CoinText.Parse"/> from the page's
+        /// <c>merchant_value</c>. <b>An unparseable value is ABSENT and never guessed</b> —
+        /// null here is "the page said nothing this build can read", which is a different fact
+        /// from a zero (a page that says the item is worthless).</para>
+        ///
+        /// <para><b>IT IS NOT A PROPERTY OF THE ITEM, AND THAT IS THE SURVEY'S FINDING.</b>
+        /// A vendor price in EQ moves with the seller's Charisma and their faction, and the
+        /// wiki says so in its own heading on 262 of the 975 cached pages that carry a value —
+        /// at a Charisma that differs per page. So <see cref="MerchantCondition"/> travels with
+        /// this number, every surface that prints one prints the other, and <b>nothing in the
+        /// Helper WEIGHS it</b>: what a player was actually paid is pooled from their own
+        /// sessions (<see cref="SaleHistory"/>) and that is what the ranking reads. This names
+        /// an item you have never sold, labelled as the estimate it is (HOME-004).</para>
+        ///
+        /// <para><b>It is EMPTY in the catalog this slice ships</b>, for the reason
+        /// <see cref="DropMobs"/> is: the item dump is gitignored and the copy on this machine
+        /// is 190 items shorter than the one the committed catalog was built from, so
+        /// regenerating here would ship a catalog that is missing items to gain a field. The
+        /// promoter, the schema and both readers land; the values arrive with the next weekly
+        /// refresh, which re-runs the harvest anyway.</para>
+        /// </summary>
+        public long? MerchantCopper { get; set; }
+
+        /// <summary>The condition the page stated its price at, verbatim — "VALUE TO VENDOR
+        /// with CHA : 80 and faction at Indifferently" — or null where it stated none. It
+        /// exists only beside a <see cref="MerchantCopper"/>; a condition with no value would
+        /// be a caveat about nothing.</summary>
+        public string? MerchantCondition { get; set; }
+
         /// <summary>The structured stats in the shape the Gear Locker compares.</summary>
         public ItemStatsBlock ToStatsBlock() => new()
         {

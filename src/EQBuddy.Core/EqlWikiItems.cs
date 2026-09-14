@@ -12,6 +12,23 @@ public sealed class ItemInfo
     public List<string> StatsLines { get; set; } = [];
     /// <summary>Vendor value as compact coin text ("5g 8s 2c"), or "" when unlisted.</summary>
     public string MerchantValue { get; set; } = "";
+
+    /// <summary>
+    /// **WHAT THE PAGE SAID THE PRICE WAS QUOTED AT** — "with CHA : 80 and faction at
+    /// Indifferently", or "" where it stated no condition (DRA-71 D7, plan P9).
+    ///
+    /// <para><b>It exists because the survey found the number is not a property of the
+    /// item.</b> A vendor price in EQ moves with the seller's Charisma and their faction with
+    /// the merchant, and 262 of the 975 cached pages carrying a <c>merchant_value</c> say so
+    /// in their own heading — at a Charisma that differs per page (80, 72, 111). Until this
+    /// slice, <see cref="MerchantValue"/> kept the number and threw the heading away, which
+    /// turns one player's quote into a fact about the object.</para>
+    ///
+    /// <para>So the condition travels with the value, and any surface that prints the one
+    /// prints the other. An unconditional page produces "", and an unanswered question draws
+    /// nothing (trap 73) — it does not get an invented caveat either.</para>
+    /// </summary>
+    public string MerchantCondition { get; set; } = "";
     public List<(string Zone, List<string> Mobs)> DropsFrom { get; set; } = [];
     public List<(string Zone, string Merchant, string Loc)> SoldBy { get; set; } = [];
     public List<string> Quests { get; set; } = [];
@@ -248,6 +265,14 @@ public sealed partial class EqlWikiItemService
     [GeneratedRegex(@"(\d+)\s+(Platinum|Gold|Silver|Copper)s?", RegexOptions.IgnoreCase)]
     private static partial Regex CoinWordRx();
 
+    /// <summary>A bolded run — where the vendor-value block states what its price was quoted
+    /// at (DRA-71 D7).</summary>
+    [GeneratedRegex(@"<b>(.*?)</b>", RegexOptions.Singleline | RegexOptions.IgnoreCase)]
+    private static partial Regex BoldRunRx();
+
+    [GeneratedRegex(@"\s+")]
+    private static partial Regex WhitespaceRx();
+
     [GeneratedRegex(@"\{\{ItemWhereRow(.*?)\}\}", RegexOptions.Singleline)]
     private static partial Regex WhereRowRx();
 
@@ -280,7 +305,7 @@ public sealed partial class EqlWikiItemService
                 .ToList();
 
         if (fields.TryGetValue("merchant_value", out var value))
-            info.MerchantValue = ParseMerchantValue(value);
+            (info.MerchantValue, info.MerchantCondition) = ParseMerchantValue(value);
 
         if (fields.TryGetValue("dropsfrom", out var drops))
             info.DropsFrom = ParseDropsFrom(drops);
@@ -306,20 +331,47 @@ public sealed partial class EqlWikiItemService
     private static Dictionary<string, string> SplitTemplateFields(string wikitext) =>
         EqlWikiText.TemplateFields(wikitext, "Itempage");
 
-    /// <summary>Two shapes in the wild: plain "5p 9g 2s 8c", or an HTML list of per-coin
-    /// lines ("0 Platinums / 5 Silvers / 8 Coppers" with markup). Both normalize to
-    /// compact coin text; zero denominations drop out.</summary>
-    private static string ParseMerchantValue(string raw)
+    /// <summary>
+    /// Two shapes in the wild: plain "5p 9g 2s 8c", or an HTML list of per-coin lines
+    /// ("0 Platinums / 5 Silvers / 8 Coppers" with markup). Both normalize to compact coin
+    /// text; zero denominations drop out.
+    ///
+    /// <para><b>The HTML shape carries a HEADING, and since DRA-71 D7 the heading comes back
+    /// too</b> — "VALUE TO VENDOR with CHA : 80 and faction at Indifferently". It is the
+    /// condition the price was quoted at, it differs per page, and dropping it (which this
+    /// method did until now) turns one editor's quote into a fact about the item. See
+    /// <see cref="ItemInfo.MerchantCondition"/>.</para>
+    /// </summary>
+    private static (string Value, string Condition) ParseMerchantValue(string raw)
     {
-        if (!raw.Contains('<')) return raw.Trim();
-        var text = HtmlTagRx().Replace(raw, " ");
+        if (!raw.Contains('<')) return (raw.Trim(), "");
         var parts = new List<string>();
-        foreach (Match m in CoinWordRx().Matches(text))
+        foreach (Match m in CoinWordRx().Matches(HtmlTagRx().Replace(raw, " ")))
         {
             var n = int.Parse(m.Groups[1].Value);
             if (n > 0) parts.Add(n + m.Groups[2].Value[..1].ToString().ToLowerInvariant());
         }
-        return string.Join(" ", parts);
+        return (string.Join(" ", parts), MerchantCondition(raw));
+    }
+
+    /// <summary>
+    /// The page's own sentence about what the price rests on, or "".
+    ///
+    /// <para>The first bolded run before the coin list, tags stripped and whitespace
+    /// collapsed. It is taken VERBATIM rather than re-phrased: the numbers in it (a Charisma,
+    /// a faction standing) are the page's own and a tidier sentence would be a second
+    /// producer of one claim. Only a run that actually names Charisma qualifies — a bolded
+    /// heading that says something else is not a condition, and an unanswered question draws
+    /// nothing rather than a caveat somebody invented (trap 73).</para>
+    /// </summary>
+    private static string MerchantCondition(string raw)
+    {
+        foreach (Match m in BoldRunRx().Matches(raw))
+        {
+            var text = WhitespaceRx().Replace(HtmlTagRx().Replace(m.Groups[1].Value, " "), " ").Trim();
+            if (text.Contains("CHA", StringComparison.OrdinalIgnoreCase)) return text;
+        }
+        return "";
     }
 
     private static List<(string Zone, List<string> Mobs)> ParseDropsFrom(string raw)

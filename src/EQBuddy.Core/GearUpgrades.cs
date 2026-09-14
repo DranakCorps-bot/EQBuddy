@@ -28,8 +28,16 @@ public enum GearIntent
     /// slot, and no picker is drawn.</summary>
     ReplaceSlot,
 
-    /// <summary>Farm things worth money. Not answered in D6 — the copper value the catalog
-    /// carries is un-PARKed by the plan's P9, in D7, alongside the Make Money engine.</summary>
+    /// <summary>
+    /// Farm things worth money. Answered in DRA-71 D7 — <b>and not by this file</b>.
+    ///
+    /// <para><see cref="GearUpgrades.Sweep"/> refuses it, deliberately and permanently: "what
+    /// is worth money" has no worn anchor, and every one of the three properties that keeps
+    /// this class off the best-in-slot side of the line rests on there being one. The engine
+    /// is <c>Recommendations.FarmToSell</c>, whose anchor is the player's own LOOT priced at
+    /// what a vendor actually paid them — two measurements of this player, so the lock is not
+    /// approached rather than merely respected.</para>
+    /// </summary>
     FarmToSell,
 }
 
@@ -148,7 +156,9 @@ public static class GearUpgrades
     {
         GearIntent.UpgradeWorn => GearIntentShape.Answered,
         GearIntent.ReplaceSlot => GearIntentShape.Answered,
-        GearIntent.FarmToSell => GearIntentShape.Deferred,
+        // DRA-71 D7. Answered by `Recommendations.FarmToSell`, NOT by Sweep below — the
+        // shape says an engine exists, not that this file is it.
+        GearIntent.FarmToSell => GearIntentShape.Answered,
         _ => null,
     };
 
@@ -175,9 +185,10 @@ public static class GearUpgrades
     /// **THE SWEEP.**
     /// </summary>
     /// <param name="intent">Which question is being asked. <see cref="GearIntent.FarmToSell"/>
-    /// answers <see cref="GearSweep.Nothing"/> — it is <see cref="GearIntentShape.Deferred"/>
-    /// and the room says so; producing a silent empty list would make a decided deferral look
-    /// like a character with perfect gear.</param>
+    /// answers <see cref="GearSweep.Nothing"/> and <b>always will</b>: it has no worn anchor,
+    /// and an anchorless candidate here would be the game's items ranked against each other,
+    /// which is the one claim this class exists not to make. Its engine is elsewhere
+    /// (<c>Recommendations.FarmToSell</c>); <c>GearUpgradesTests</c> holds the refusal.</param>
     /// <param name="worn">What the character is wearing, one entry per (item, slot).</param>
     /// <param name="picks">Which worn items the player picked. <b>Empty means ALL of them</b> —
     /// filter semantics, the same reading <see cref="AppSettings.UnlockPicks"/> has and the
@@ -202,6 +213,10 @@ public static class GearUpgrades
         IReadOnlyList<string> myClasses,
         bool includeQuests)
     {
+        // The ANCHOR rule, enforced at the door. "Farm to sell" has an engine (DRA-71 D7) and it
+        // is not this one: every candidate here has a worn item behind it, and an intent that
+        // cannot supply one is refused rather than served an anchorless list.
+        if (intent == GearIntent.FarmToSell) return GearSweep.Nothing;
         if (ShapeFor(intent) != GearIntentShape.Answered) return GearSweep.Nothing;
         if (catalog is null || worn is not { Count: > 0 }) return GearSweep.Nothing;
 

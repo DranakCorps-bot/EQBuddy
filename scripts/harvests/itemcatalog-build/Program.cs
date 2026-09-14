@@ -32,6 +32,8 @@ if (!File.Exists(dump))
 
 var records = new List<ItemCatalog.Record>();
 int parsed = 0, noTemplate = 0, statless = 0;
+int valueStated = 0, valueParsed = 0, valueRefused = 0, valueConditional = 0;
+var distinctValues = new HashSet<long>();
 var examples = new List<string>();
 
 foreach (var line in File.ReadLines(dump))
@@ -51,6 +53,15 @@ foreach (var line in File.ReadLines(dump))
     var stats = ItemStatsBlock.Parse(info.StatsLines);
     if (info.StatsLines.Count == 0) statless++;
     parsed++;
+
+    // The condition only means something beside a value. A caveat with nothing to qualify is
+    // a sentence a surface would have to decide what to do with, and the honest answer is that
+    // there is nothing to say (trap 73).
+    var copper = CoinText.Parse(info.MerchantValue);
+    if (info.MerchantValue.Trim().Length > 0) valueStated++;
+    if (copper is not null) valueParsed++; else if (info.MerchantValue.Trim().Length > 0) valueRefused++;
+    if (copper is not null && info.MerchantCondition.Length > 0) valueConditional++;
+    if (copper is { } c) distinctValues.Add(c);
 
     records.Add(new ItemCatalog.Record
     {
@@ -73,6 +84,16 @@ foreach (var line in File.ReadLines(dump))
         // (trap 4). Zones are folded case-insensitively for the same reason DropZones
         // De-duplicates — a page that heads one zone twice is one zone with both lists.
         DropMobs = DropMobs(info),
+        // WHAT A VENDOR PAID — the half this build discarded until DRA-71 D7. Parsed through
+        // the app's own CoinText.Parse, which refuses anything that is not plain
+        // coin text: an unparseable merchant_value is ABSENT rather than guessed (trap 73).
+        // The CONDITION rides with it because the wiki's price is quoted at a Charisma and a
+        // faction standing that differ per page — a number stripped of that heading is one
+        // editor's quote wearing the clothes of a fact about the object.
+        MerchantCopper = copper,
+        MerchantCondition = copper is not null && info.MerchantCondition.Length > 0
+            ? info.MerchantCondition
+            : null,
     });
 }
 
@@ -88,6 +109,19 @@ var payload = JsonSerializer.SerializeToUtf8Bytes(
 // diff in the PR at all.
 var committed = File.Exists(outPath) ? Decompress(outPath) : null;
 var identical = committed is not null && committed.AsSpan().SequenceEqual(payload);
+
+// **THE COPPER SURVEY, PRINTED IN BOTH PATHS** (DRA-71 D7, plan P9, trap 73's tell).
+// It runs before the --check return so a survey can be taken WITHOUT writing anything, which
+// is how this slice took its own. A distinct count is the only thing that separates "the
+// catalog learned what vendors pay" from "the parser found one template" — and
+// `valueConditional` is the one nobody expected to matter: it counts the values whose own page
+// states a Charisma and a faction, which is what makes this number a quote rather than a fact
+// about the item.
+var survey =
+    $"- pages stating a merchant_value: {valueStated}; parsed to copper: {valueParsed}; "
+    + $"refused as unreadable: {valueRefused}; distinct parsed values: {distinctValues.Count}\n"
+    + $"- of the parsed, quoted at a stated Charisma/faction: {valueConditional}\n";
+Console.WriteLine(survey.TrimEnd());
 
 if (check)
 {
@@ -137,6 +171,7 @@ File.WriteAllText(reportPath,
     $"- dump entries parsed into the catalog: {parsed}\n" +
     $"- pages with no Itempage content (skipped): {noTemplate}\n" +
     $"- catalog items without a stats block (knowledge-only): {statless}\n" +
+    survey +
     $"- items with at least one NAMED creature (DropMobs): {withMobs}\n" +
     $"- zone entries carrying creatures: {mobZones}; creature mentions: {mobNames.Count}; " +
     $"distinct creature names: {distinctMobs}\n" +
