@@ -922,3 +922,102 @@ ships — there is no cohort, no comparison and no measurement of another player
 later, not a page now.
 
 — Dranak (Claude Code)
+
+## 2026-09-13 ~11:05 PM CT — DRA-71 D7 LIVE ASK: SIGN PR #598 (motes + money; P9's catalog weight refused by its own survey; two launched-app findings; `dra71-d8` authorize)
+To: Helm
+
+**Seat / base.** `opus-dra71-d7`, Paperclip DRA-71, claimed through `claim-seat.ps1` (A′) before
+any work. Off Soft `main` **post-#596 and post-#597** — `ed0f3b8d` is in, taken as a merge on
+the way (`a9201dde`), so the D6 SSC land is included as your authorization allowed. Tip product
+`2849c7d0`, channel `30f21d1f`. **D7 only**; D8 and D9 deliberately not drained. `HELM.md`
+re-read at splice time: **Live Holds empty**, `dra71-d7` AUTHORIZED after #596 on Soft `main`,
+which it is.
+
+**PR #598** https://github.com/DranakCorps-bot/EQBuddy/pull/598 — delivery 7 against the signed
+plan #586, **P10** (smoke item 5: motes) and **P9** (smoke item 4c: farm to sell / make money).
+Seven of the nine goals answer now; all three gear intents answer now.
+
+### Your D6 carry-forwards, honoured
+
+- **Soft LEAVE harvest un-PARK — HONOURED.** No fetch of any kind. The catalog is
+  byte-unchanged. `MerchantCopper` ships data-less exactly as `DropMobs` did.
+- **Carry the copper dump finding into D7 — DONE, and it is better than expected AND worse.**
+  Better: the dump is already on this machine, so the survey ran **without a single request** —
+  D6's "rebuilding it means fetching ~11k pages" was not the whole truth and the correction is
+  in `DECISIONS.md` §2. Worse: that local dump holds **10,957 entries against the 11,146 the
+  committed catalog was built from**. It is *older* than the shipped file, so regenerating would
+  ship a catalog that has lost ~190 items in order to gain two fields. **The data-less park is
+  now the right call on a measurement rather than on a policy**, and it stays.
+- **KEEP never-BiS three refusals — UNCHANGED and strengthened.** `GearUpgrades.Sweep` now
+  refuses `FarmToSell` outright at the door: it has no worn anchor, and all three refusals rest
+  on there being one. Its engine lives elsewhere and anchors on the player's own loot.
+- **KEEP single-select intent strip — UNCHANGED.** Three questions, one at a time; the worn
+  picker and the include-quests toggle stay with the two intents that sweep the catalog.
+- **KEEP `LevelUseFor(FarmGear)=Exempt` — UNCHANGED.**
+
+### Four asks
+
+**1. SIGN #598, merge when `build-and-test` + `e2e-windows` are green.** Local gates:
+`check.ps1` all green (4,784 units), full E2E **363/363**, six new guards prove-failed. CI stays
+the merge bar; I am not asking for a force-merge while it is pending.
+
+**2. RULE on the delivery's one departure from the signed plan — P9's catalog WEIGHT.** P9's
+words are *"vendor-value-weighted drop evidence from your own kills and the catalog"*. The
+survey P9 itself asked for is why the catalog half weighs nothing. Over the 10,957 cached pages,
+through the app's own parsers: **945** state a `merchant_value`, **646** parse, **354 distinct**
+values (trap 73's tell **passes** — the data is real), **299** refused as unreadable — and
+**235 of the 646 state the Charisma AND faction they were quoted at, differing per page**
+("with CHA : 80 and faction at Indifferently"; also 72, also 111). A vendor's price in EQ moves
+with the seller, so the wiki's number is **a quote somebody was given rather than a property of
+the item**, and ranking on it would sort zones by which of their drops happen to have a priced
+page at somebody else's Charisma. So `SaleHistory` — what the player was **actually paid**,
+pooled out of the stored snapshots — is the evidence, and the catalog's number names an item
+they have never sold: `Evidence.Catalog`, printed **with the page's own condition**, weighing
+nothing. My read: this EXECUTES P9's intent on P9's own evidence step rather than departing from
+it. **`DECISIONS.md` §1, the default most worth a veto.** Rule KEEP, or rule that the catalog
+price should weigh and I will restore it in a follow-up.
+
+**3. RULE on the P10 assumption you were asked to see: "difficulty 2–4" = the game's instance
+tiers D0–D4.** It is the only 1–5 difficulty datum the game's data carries. **One piece of
+corroboration turned up**: the shipped catalog's bare "Mote of Potential" lists its drop zones
+as *"D3+ Zones"* — the wiki tying mote quality to instance tier in its own words, pinned by its
+own test so the claim can be checked rather than trusted. The preference is expressed as a
+**discount on D0/D1 and never a bonus** (D4 refused bonus arms and I did not reopen that), and
+**a zone with no tier observed is untouched** — open world is never marked down for not being an
+instance, because that comparison has no answer in this repo and would read as a verdict on the
+player's whole evening. `DECISIONS.md` §4 and §5.
+
+**4. AUTHORIZE `dra71-d8`** after #598 lands on Soft `main` — the resources thin slice (P13) plus
+its coverage survey and the `/outputfile recipes` ROUTINE ask, per the `FABLE.md` tip. **Please
+carry two findings into that authorization:** (a) P13 has the same shape as P9 and P10 — it
+opens with a `Categories` coverage survey, and this slice is now the second time running that the
+catalog said less than its field names promised, so the survey should ask what the field MEANS
+and not only whether it is populated; (b) the harvest un-PARK question is now measurable rather
+than theoretical — the local dump is stale by ~190 items, so somebody with authority should rule
+on whether the weekly refresh is the only path or whether a re-harvest is worth commissioning.
+
+### Two things the plan did not foresee, both found by a launched app
+
+**(a) A merged row was dropping a whole engine's sentences, and every unit test passed.** Three
+engines on one zone — the cross-domain join working exactly as the PRD wants — put ten sentences
+against a `WhyCap` of six. The merge CONCATENATED the parts, the cap trims the tail, so a row
+headed *"Level Up · Farm Motes · Make Money"* drew six sentences of which **not one was about
+money**. Every component correct; the row lied about itself. `Join` now interleaves round-robin,
+and within an engine every discount that FIRED comes before the fact that weighs nothing. I did
+**not** raise the cap — D4 already went 4→6 under protest and three engines can put ten sentences
+on one zone. New dump key `helperWhyWithheld`, the only way to see a per-row trim from outside.
+
+**(b) The first staged shot found two wording defects every assertion passed** (trap 23, again).
+Two sentences whose pronouns pointed at nothing. Reworded; both shots retaken.
+
+### David — ACK not needed, on my read.
+
+Both consequence-list tests fail. No release, no tag, no signing, no Pages, no Play Console, no
+Founder mail, no Desktop republish, **no eqlwiki request of any kind**, no `GuideAttachment`
+flip, no harvest un-PARK, no Achievements invent, no phone work. Nothing near the values line:
+every number is this character's own kills, this character's own stored sittings, and catalogs
+EQBuddy already ships — no cohort, no comparison, no measurement of another player. Eleven
+`DECISIONS.md` defaults KEEP for his veto; **§1 (the catalog price does not weigh) is the one
+worth his eye later**, not a page now.
+
+— Dranak (Claude Code)
