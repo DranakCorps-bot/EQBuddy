@@ -31,6 +31,13 @@ ratchet; truth outranks brevity.
 | [claude-2026-09-08.md](claude-2026-09-08.md) | Byte-exact pre-split `CLAUDE.md` (171,685 bytes). Reversible. |
 | [traps.md](traps.md) | Traps 1–69 with `### Trap N` anchors for live links. |
 | [operating-history.md](operating-history.md) | Scribe two-machines, stale-hold examples, question-tool closing-paragraph novel, illustration-lock debt. |
+| [channels/2026-Q3/](channels/2026-Q3/README.md) | **Rotated channel ledgers** (DRA-75, 2026-09-14) — `HELM-FEEDBACK.md` and `FABLE-FEEDBACK.md` history. Immutable transcripts, not novels. Start at that README. |
+
+**The channel archive is a different KIND of thing from the three rows above
+it.** Those are novels: prose someone wrote to be read later, and they stay true
+the same way `CLAUDE.md` does. A channel ledger is a **transcript** — what agents
+said to each other, dated, and correct as of the day it was said. It is never
+edited, which is why it gets the one exception in the next section.
 
 ## How to archive the next novel
 
@@ -40,6 +47,15 @@ ratchet; truth outranks brevity.
    if the reader has the novel in context.
 4. If you bury a file or a test suite, do not backtick a path that no longer
    exists — `DocumentationTests` scans this directory too.
+
+   **The one exception is the rotated channel transcripts under `channels/`**,
+   and it exists because neither of that test's remedies reaches them: "fix the
+   doc" forfeits the immutability the rotation rests on, and "restore the file"
+   would resurrect a retired script to satisfy a transcript. The exemption is
+   keyed on the directory and paired with
+   `DocumentationTests.OnlyTheRotatedChannelTranscriptsAreExemptFromTheLivePathSweep`,
+   which reddens if it ever stops matching anything. **It does not extend to a
+   novel** — a novel is edited when it goes stale, so rule 4 binds one in full.
 
 ## What this is not
 

@@ -357,6 +357,153 @@ tag exists to prevent.
 
 — Dranak (Claude Code, DRA-78)
 
+## 2026-09-14 — DRA-75 / M0-2 (channel archive + 30-day rotation): nine calls I made alone, one instruction that could not be carried out as written, and two guards that were right to stop me
+
+`exo-experiment: channel-rotation` — judged by *rework rate* (baseline 3.7%), counting
+a channel-file clobber, a silently truncated append or a mojibake re-encode as rework,
+because that is the class trap 60 records three times in six days and the only §6 term
+this change can move. **Stated net of the effect that is NOT a §6 metric at all:** the
+bytes an agent must read before it can append correctly. That is the reason the rotation
+was worth doing and there is no KPI for it, so a later graduation entry cites the rework
+rows and says the primary benefit went unmeasured rather than mapping it onto a number
+it did not move.
+
+Tier T1 · governing plan: DRA-73 plan document rev 2, approved by David 2026-09-14
+(SS4.1 + SS8.3; SS10.1 asks for this tag so the M0-exit doctrine capture can cite it).
+
+**Pre-flight.** Re-read `HELM.md` before starting and again after re-basing: the Holds
+block is empty, so no live hold named this work. The plan authorizes the change; a hold
+would still have bound it.
+
+**The instruction that could not be carried out as written, first, because it is the
+entry's real content.** SS4.1 directs rotating ">30-day-old content of `HELM.md` /
+`FABLE.md` / `DECISIONS.md`". **There is none.** The oldest dated entry anywhere in the
+channel set is 2026-08-21 — 24 days old on 2026-09-14. That clause moves zero bytes.
+
+> **Default it could have gone the other way on:** invent a shorter cutoff so the named
+> files visibly shrink, or leave them untouched and say so.
+> **Where it landed:** untouched. A 30-day rule that fires at 20 days because the 30-day
+> answer was boring is not a rule. Evidence is committed:
+> `python scripts/channel-rotate.py report HELM.md FABLE.md DECISIONS.md --cutoff 2026-08-15`.
+
+**And the issue's diagnosis was wrong in a way that improved the outcome.** The two
+~2.4 MB lines in `HELM-FEEDBACK.md` were logged as "mojibake debt, already acknowledged".
+Measured, they were **two copies of one history**: commit `c7a597a8` flattened the entire
+12,254-line file onto a single line and re-encoded it through cp437 (trap 60c), and a
+later append did it again. The file had not grown — it had been duplicated and mangled.
+The readable history was never lost; it is in git at `f4af3b5f`.
+
+**The nine calls.** (The ninth was forced by CI after the first eight were pushed.)
+
+1. **The `HELM-FEEDBACK.md` archive carries RECOVERED READABLE TEXT, not the bytes that
+   were on disk.** The default — and the literal reading of "archive the debt" — was to
+   archive the corrupt bytes as found. Landed on recovering from `f4af3b5f` and dropping
+   4.93 MB of duplicate mojibake, because an archive nobody can read is a tombstone, not
+   history. Gated on a proof rather than a hunch: `scripts/probe-uncovered.py` shows that,
+   peeled, the second flattened line IS the `f4af3b5f` blob whole, and the first is
+   `[the PR #564 entry] + [f4af3b5f minus its first entry]`. The corrupt bytes are
+   archived verbatim beside the recovery (call 8), so the claim is checkable from a
+   checkout rather than from git `1e0f7232`.
+2. **The 4,519-byte PR #564 entry is recovered and kept.** It was the ONLY content unique
+   to the flattened bytes. Its words are byte-recoverable; **its line breaks are not, and
+   I did not invent them** — it sits in the archive as one long line, with the header
+   saying so. Reconstructing plausible paragraphing would have been fabrication wearing
+   the shape of a fix (trap 73).
+3. **Pending asks were NOT archived.** Every readable `HELM-FEEDBACK.md` entry stays
+   active, including the unsigned **PR #606** DRA-71 D9 LIVE ASK. The default reading of
+   "each active file restarts with a pointer line" is a full restart; that would have
+   buried a live request under an immutable file. A rotation that hides a pending ask is
+   a worse bug than a large file.
+4. **`FABLE-FEEDBACK.md` cutoff is 2026-09-08 (7 days).** No cutoff was specified for it
+   and the 30-day one moves nothing. Picked a stated 7-day working-set rule: 1.1 MB →
+   174 KB, 35 entries kept, 139 archived.
+5. **`BEVEL-FEEDBACK.md` (515 KB) was left alone and the call handed to Bevel.** Outside
+   DRA-75's scope and not in the size class that made the other two urgent. Noted in
+   `BEVEL-FEEDBACK.md` with the numbers a 2026-09-08 cutoff would produce (92 entries /
+   464 KB), for Bevel to accept or decline.
+6. **Rotation is a script, not a hand-edit** (`scripts/channel-rotate.py`, with `report` /
+   `rotate` / `verify`). 4.9 MB is not hand-editable, and the next rotation should not
+   re-derive any of this. The script refuses to write until its containment assertions
+   pass, and finds the flattened lines **by size, never by index**.
+7. **The archive lives under `docs/ops/claude-archive/channels/2026-Q3/`, NOT the
+   `docs/ops/archive/2026-Q3/` the issue named.** `scripts/channel-wipe-guard.ps1` — the
+   guard built after a channel ledger was destroyed three times in six days — reads its
+   ARCHIVE exemption out of `docs/ops/claude-archive`, and says in its own header that
+   there is no `-Force` and no skip switch because "an escape hatch on a guard whose whole
+   subject is *an automated land destroyed the file* is the automated land's next move."
+   > **Default it could have gone the other way on:** keep the plan's path and add a second
+   > directory to the guard's exemption.
+   > **Where it landed:** moved the archive. Editing a guard as part of the very change it
+   > blocks is the pattern it exists to refuse (trap 52), and the path was the cheap thing
+   > to move. The guard now passes on its own merits, unmodified.
+8. **The exact removed bytes are archived beside the recovery**
+   (`HELM-FEEDBACK.original-flattened.md`, 4.93 MB, unreadable on purpose). Against the
+   readable recovery alone the guard's ARCHIVE exemption reached **89.5%** against a 90%
+   floor — and measured, the 368 misses were not losses at all: an entry key recovered
+   from a FLATTENED line absorbs body text up to the guard's 80-character cap, while the
+   same entry in the newline-delimited recovery stops at end of line. Same entries, keyed
+   differently.
+   > **Default it could have gone the other way on:** argue the 89.5% is a keying artifact
+   > and relax the floor, or put the bytes where the guard can see them.
+   > **Where it landed:** archived the bytes. "Nothing was lost" should be checkable
+   > against the bytes from a plain checkout, not asserted with a git SHA that nobody will
+   > have. The 4.93 MB is the cost of that being verifiable, and it buys a guard that
+   > passes unmodified.
+9. **The archived ledgers are EXEMPT from the doc-liveness sweep; the archive's README is
+   not.** CI caught what local verification missed:
+   `DocumentationTests.EveryFileTheDocsPointAtExists` sweeps every `.md` under `docs/ops`
+   and reddened on all three archived ledgers, because they name paths that were true when
+   an agent typed them and are not now. **Both of that test's remedies are unavailable
+   here** — the file is immutable by construction, and the paths are history, not error.
+   > **Default it could have gone the other way on:** edit the archived ledgers to remove
+   > the dead paths (which forfeits the immutability the whole rotation rests on), or park
+   > the archive outside `docs/ops` where the sweep cannot see it.
+   > **Where it landed:** a narrow exemption keyed on the `channels/` DIRECTORY, so the
+   > next rotation inherits it without a code change — paired, per trap 34, with
+   > `OnlyTheRotatedChannelTranscriptsAreExemptFromTheLivePathSweep`, which reddens if the
+   > exemption ever matches nothing (trap 78), if the README slips out of the sweep, or if
+   > any other `docs/ops` doc slips out with the transcripts. Prove-failed by disabling the
+   > predicate: 4 red, 21 green. The README stays swept because it is the one file in there
+   > a reader navigates BY.
+
+   **This is the entry's one genuine miss, and it is trap 79's shape in a new place:** I
+   verified the rotation against the guard built for channel files and against the
+   rotation script's own containment assertions, and never asked what OTHER committed
+   guard reads `docs/ops/**`. A 12,000-line file landing in a swept directory is a new
+   INPUT to every doc test, not just to the one whose subject it is. **Local greens are
+   not CI** — and here the thing local runs never covered was a suite I did not think to
+   name.
+
+**Verification.** `verify` asserts every original entry block survives byte-exact across
+archive + active: `FABLE-FEEDBACK.md` 174 original blocks → 139 + 35 = 174, all 1,180,174
+bytes accounted for, zero lost; `HELM-FEEDBACK.md` archive contains the `f4af3b5f` blob
+verbatim, all 24 readable pre-rotation entries survive in the active file, and the
+recovered #564 entry is clean UTF-8 with a real em-dash rather than mojibake. Backticked
+identifiers were read back out of all four appended notes by hand (trap 60c).
+
+**Two process findings, filed here rather than as new trap rows because the rule they
+need is already trap 60c.**
+
+- **`core.autocrlf=true` makes `git show ref:path` an unsafe verification reference.** The
+  blob is LF, the working tree CRLF. My first verify pass went red on a rotation that was
+  byte-perfect. `verify` takes `--pristine` and compares against a byte copy taken before
+  the move.
+- **The flattened lines are at different INDICES on every ref.** 0-based 70/72 against one
+  ref and 788/790 against `origin/main` an hour later, because channel entries prepend. I
+  caught this only by diffing against `origin/main` before committing — the first rotation
+  was computed on a stale base and would have reverted other agents' appends (trap 60a).
+  Both scripts now find the lines by size.
+
+**One thing I did NOT do.** The corruption is **ongoing**, not historical — `╬ô├ç├╢` and
+`ΓÇö` both appear in entries written 2026-09-12/13. This rotation cleaned up accumulated
+damage without touching whatever keeps producing it. That is a live defect and a
+separate item; flagged to Helm and Fable, not silently absorbed here.
+
+**Reversible.** `git revert` restores both files; the archive is additive and no original
+bytes were destroyed.
+
+— Dranak (Claude Code, DRA-75)
+
 ---
 
 ## 2026-09-14 — DRA-74 / M0-1: the SSC-PR pattern is retired, and a signed plan now authorizes its whole slice sequence
