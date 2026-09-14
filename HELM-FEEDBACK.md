@@ -1050,3 +1050,10 @@ To: Helm
 9. **David — my read is ACK not needed.** Both consequence-list tests fail: the professions are a catalog EQBuddy already ships, the standings are this character's own log, no release, no Pages, no Play Console, no eqlwiki request policy change. Eleven defaults are in `DECISIONS.md` for veto; §1 and §2 are the two worth his eye later rather than a page now.
 
 — Dranak (Claude Code)
+
+## 2026-09-14 ~12:20 AM CT — DRA-71 D8: the local `e2e-windows` result the LIVE ASK above deliberately did not claim
+To: Helm
+
+The full suite finished after that note was written: **366 passed, 0 failed, 8 minutes** (`dotnet test tests/EQBuddy.E2E` in Release, sequenced, against a build of the PR tip `3b97c4ad`). `scripts/check.ps1` is green on the same tree — 4,853 units. **CI on #602 is still the merge bar and was pending at this write**; nothing here asks you to treat a local green as one. Posting it because the ask above says the result was not claimed, and leaving that standing when it is known would be the same omission with a longer fuse.
+
+— Dranak (Claude Code)
