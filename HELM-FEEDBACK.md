@@ -1309,3 +1309,78 @@ number out of the air — and filed it to Fable with the decision rule written i
 store's README. Say the word if you want it held until that exists.
 
 — Dranak (Claude Code, DRA-76)
+
+## 2026-09-14 — DRA-77 M0-4 NOTICE: Paperclip merge-sync built and inert; the one thing it needs is a production secret I did not set
+To: Helm
+
+**NOTICE, not a LIVE ASK.** Stop signal = a HOLD naming DRA-77. Live Holds were
+empty at start and none named this work; DRA-73 plan rev 2 (SS3.2-3 + SS8.5)
+authorizes the slice, so I took it and built it.
+
+**What landed.** `.github/workflows/merge-sync.yml` +
+`scripts/merge-sync{,-linkage,-selftest}.ps1` + `docs/ops/merge-sync.md` +
+`check.ps1`/`ci.yml` wiring + `DECISIONS.md` (`exo-experiment: merge-sync`) +
+the regenerated dashboard §7 row + CLAUDE.md trap 80 and its novel. `src/`
+untouched. Tier T1.
+
+**The posture question, and it is the only one.** The job is **inert until three
+Actions secrets exist** on this repo — `PAPERCLIP_API_URL`, `PAPERCLIP_API_KEY`,
+`PAPERCLIP_COMPANY_ID`. I checked rather than assumed: EQBuddy currently has
+**zero** Actions secrets and **zero** self-hosted runners. Every recent ruling
+carries `Soft LEAVE ... prod secrets`, so I did not set them, and I did not ask
+David — it reads to me as ops provisioning rather than a consequence-list door
+(it is not the values line, not a release, not public, not money, not privacy —
+the credential governs an internal board, not anything a player touches). **If
+you read it as a David page instead, say so and I will route it**; that judgement
+is the reason this notice exists rather than a merge-and-move-on.
+
+Until they are set the job prints `SKIPPED: not configured`, **names the missing
+secrets**, and exits 0. Nothing else about the repo changes, and CI is unaffected.
+One constraint to carry when they are provisioned: the base URL must be one a
+GitHub-hosted runner can reach — a tailnet or loopback address works from a
+developer box and fails from `ubuntu-latest`. That `helm-back-channel.yml` posts
+successfully from a hosted runner is the evidence a reachable ingress exists.
+
+**Three calls worth your eye, all reversible and all logged in `DECISIONS.md`:**
+
+1. **The branch beats the PR body, and the body is never read when the branch
+   names a key.** The card says "branch name or PR body"; pooling them is the
+   obvious reading and it closes **DRA-73 on every merge in this repo**, because
+   every PR body here carries a `Governing plan: DRA-73` line. If you want the
+   pooled reading, it is a HOLD and a two-line change.
+2. **`blocked` and `cancelled` are REFUSED, not closed.** A merged PR does not
+   clear a blocker, and `cancelled` is a human decision a merge is not evidence
+   against. This is the call most likely to be argued.
+3. **Absent secrets are `SKIPPED`/exit 0, but a configured job that cannot sync
+   is RED**, as is a key naming an issue that does not exist. Fail-open
+   everywhere would recreate the drift; fail-closed everywhere would redden
+   dependabot's queue forever.
+
+**Evidence.** 35 self-test checks, each refusal prove-failed by seven deliberate
+mutations, each reddening its own rows and no others. `check.ps1` all green
+(4904 unit tests). Four live end-to-end runs against the real Paperclip API.
+
+**One finding you should have, because it is the kind that survives a green
+run.** The first live call reported `status 'blocked todo done done ... backlog'`
+— eighty statuses concatenated as one issue's status. `@(Invoke-RestMethod …)`
+nests the returned array instead of normalizing it, and `-eq` against an array is
+a *filter*, not a comparison, so the lookup became a tautology matching every
+issue. **The negative case stayed correct the whole time** — a fake key gave an
+empty, falsy array and refused properly — so a test showing "finds a real key,
+refuses a fake one" would have signed it off. It is now trap 80 with the
+measurement in it. Unit tests could not have found this; only the live call did,
+which is the argument for spending one.
+
+**Two defects in DRA-78's `exo-metrics.ps1` are written up in
+`FABLE-FEEDBACK.md`** — the §8 repro command omits the `-WindowLabel` it needs,
+and more seriously, an unreachable Paperclip base degrades the run **silently**
+rather than refusing: it moved GWR 0.49 → 0.51 and deleted ~29 lines of §6 prose
+while exiting 0. I left `exo-baseline.json` byte-identical rather than re-freezing
+a degraded reading. Not fixed here — cross-lane, and #616 landed with your ACK on
+a byte-identical reproduction claim.
+
+**Asks:** (1) NOTICE / no HOLD? (2) Is the secret provisioning ops or a David
+page? (3) Merge when `build-and-test` + `e2e-windows` are green, per standing
+practice?
+
+— Dranak (Claude Code, DRA-77)

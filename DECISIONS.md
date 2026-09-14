@@ -1,3 +1,117 @@
+## 2026-09-14 — DRA-77 / M0-4 (Paperclip merge-sync): eight calls I made alone, one secret I deliberately did not set, and a lookup bug that only the live run could have found
+
+`exo-experiment: merge-sync` — judged by *merge-to-close latency*: the wall time
+from a PR merging to its linked issue reaching a terminal state. The observed
+failure is days (EXO-HARDEN-A2, EQ-V2-HOME-CATCHUP sat `in_review` long after the
+work was on `main`), and the target is minutes, because the run starts on the
+merge event. Stated net of the **wrong-close count** — issues this job moved to
+`done` that a human then reopened. A sync that closes the wrong card is not
+faster than the drift, it is just more confident, and the same "state net of the
+harm" shape the seat-mutex tag uses for false blocks.
+
+Tier T1 · one workflow + three scripts + docs, `src/` untouched · governing plan:
+DRA-73 plan document rev 2, approved by David 2026-09-14 (SS3.2-3 + SS8.5;
+SS10.1 asks for the tag above). Live Holds empty at start; none named DRA-77.
+
+**The shape.** `pull_request: [closed]` filtered on `merged == true`, the issue
+key read from the branch, `PATCH /api/issues/{id}` to `done`, and a comment on
+the issue naming the PR. One way, GitHub → Paperclip.
+
+---
+
+**1. THE BRANCH BEATS THE PR BODY, and the body is never read when the branch
+names a key.** The card says "issue key in branch name or PR body", and the
+obvious reading is one pool of text. That reading closes the wrong issue on
+*every merge in this repo*: every PR body here carries a `Governing plan: DRA-73`
+line, so the parent plan issue would be transitioned each time. The default could
+have gone the other way — pooling is simpler and the card's wording allows it —
+and the self-test row that pins this is the one I would keep if I could keep only
+one.
+
+**2. AN AMBIGUOUS BODY IS REFUSED, NOT RESOLVED BY FIRST-MATCH.** Picking the
+first of two keys is a coin flip whose losing side writes `done` onto somebody
+else's issue, and one-way sync gives that no undo path. With rule 1 in place this
+only reaches PRs whose branch named nothing, so the cost is small and the
+instruction is concrete: put the key in the branch.
+
+**3. `blocked` AND `cancelled` ARE REFUSED.** A merged PR does not clear a
+blocker, and stamping `done` over one hides it; `cancelled` is a human decision
+that a merge is not evidence against. This is the call most likely to be argued —
+if a `blocked` issue's PR merges, something is genuinely out of date — and I
+chose the reading where the job never overwrites a state a person chose on
+purpose.
+
+**4. `backlog`, `todo` AND `in_progress` CLOSE TOO, not just `in_review`.** The
+card names the `in_review` drift, so restricting to it was the narrower and
+defensible option. A merged PR is evidence the work happened whatever column the
+board was left in, and a job that only fixes one column leaves the same complaint
+alive in the others.
+
+**5. THE THREE DISPOSITION LISTS ARE ASSERTED TO PARTITION THE STATUS ENUM.**
+Total and disjoint, checked in the self-test. A status Paperclip adds later
+reddens a test instead of falling into the unknown-status arm silently. This is
+the trap 78 lesson applied before it cost anything: the list is asserted
+non-empty AND proven to fire, per element, in the commit that adds it.
+
+**6. ABSENT SECRETS ARE `SKIPPED` / EXIT 0; A CONFIGURED JOB THAT CANNOT SYNC IS
+RED.** Fail-open everywhere would recreate the drift this fixes, and fail-closed
+everywhere would paint dependabot's queue red forever. The split is by cause: not
+being configured yet is not a fault, and a run that names the missing secrets
+tells the operator exactly what to do. A key that resolves to **no issue** is also
+red — silence there is how a mislabelled branch quietly stops syncing forever.
+
+**7. `-Merged` IS A STRING AND THE SELF-TEST PINS IT.** GitHub hands the value
+over as the text `true`/`false`, and in PowerShell a non-empty string is truthy,
+so `if (-not $Merged)` closes an issue every time a PR is *abandoned*. Run as a
+mutation, it sails past the gate to `Linked: this PR -> DRA-77`. Worst single bug
+this job could have; one keyword away at all times.
+
+**8. THE AUDIT COMMENT IS BEST-EFFORT; THE TRANSITION IS THE DELIVERABLE.** If
+the comment fails after a successful PATCH the job warns and exits 0. Failing
+there would report a sync that *did* happen as one that did not, and the re-run
+would find the issue already `done` and no-op — so the comment would never be
+written anyway.
+
+---
+
+**THE SECRET I DID NOT SET.** The job is inert until `PAPERCLIP_API_URL`,
+`PAPERCLIP_API_KEY` and `PAPERCLIP_COMPANY_ID` exist as Actions secrets; this
+repo currently has **zero** Actions secrets and **zero** self-hosted runners
+(checked, not assumed). Provisioning a production credential is the standing
+`Soft LEAVE ... prod secrets` line in every recent Helm ruling, so it is named as
+the Founder/ops step rather than done here. The base URL must also be one a
+hosted runner can reach — a tailnet or loopback address works from a developer
+box and fails from `ubuntu-latest`. That `helm-back-channel.yml` posts
+successfully from a hosted runner is the evidence such an ingress exists.
+
+**THE BUG THE LIVE RUN FOUND, which is now trap 80.** The first real call against
+Paperclip reported `status 'blocked todo done done todo ... backlog'` — eighty
+statuses concatenated as one issue's status. `@(Invoke-RestMethod ...)` nests the
+returned array rather than normalizing it, and `-eq` against an array is a filter
+returning matching elements rather than a boolean, so `Where-Object` became a
+tautology that passed all eighty issues. **The negative case was correct
+throughout** — a fake key gave an empty, falsy array and refused properly — so a
+test showing "finds a real key, refuses a fake one" would have signed it off.
+Fixed by enumerating through the pipeline, which unrolls. My first repair added a
+"refuse a nested list" guard beside it; the row written to prove that guard fired
+came back green-as-found, because after the flatten nothing reachable is still
+nested. I deleted the guard rather than keep an unreachable one, and replaced it
+with the assertion that would have named the bug in one line: the field the job
+is about to act on must be a scalar.
+
+**What it is verified on.** 35 self-test checks, every refusal driven red at
+least once by seven deliberate mutations (pooled linkage, dropped word boundary,
+emptied disposition list, `blocked` made closable, fatal missing-secrets,
+`[bool] $Merged`, `if (-not $Merged)`, reverted flatten) — each reddening the
+rows it should and no others. Four live end-to-end runs against the real API
+covering base normalization, an already-`done` no-op, a `blocked` refusal and an
+unresolvable key. **The live WRITE path — PATCH plus comment — is exercised by
+this issue's own closure and nothing earlier**; that is stated rather than
+implied, because until it ran, the write was the one path with no evidence behind
+it.
+
+---
+
 ## 2026-09-14 — DRA-76 / M0-3 (claim-seat graduated to a refusing per-work-item mutex): seven calls I made alone, the one line of old behaviour that turns out to have been the whole hole, and a risk I widened on purpose and did not fix
 
 `exo-experiment: seat-mutex` — judged by *rework rate* and *PRs per delivered slice*

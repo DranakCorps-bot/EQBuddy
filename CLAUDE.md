@@ -1023,6 +1023,25 @@ after the named guard left with its surface.
     agrees.** If a captured border is darker than its palette value, suspect the
     capture before the theme. [Novel](docs/ops/claude-archive/traps.md#trap-79)
 
+80. **`@(command)` NESTS an array instead of normalizing it, and `-eq` against
+    an array is a FILTER — together they make a lookup that matches
+    everything.** `Invoke-RestMethod` emits a JSON array as ONE object, so
+    `@(...)` gives a 1-element array holding the 80-item one (`@(fn).Count` is
+    1 where `(fn).Count` is 80 — measured). `$_.identifier` then
+    member-enumerates and `eighty-identifiers -eq 'DRA-78'` returns the
+    MATCHING ONES, not a boolean; non-empty is truthy, so `Where-Object` passed
+    all eighty and merge-sync reported eighty concatenated statuses as one
+    issue's status. **The negative case stayed correct the whole time** — a
+    fake key gave an empty (falsy) array and refused properly, so "finds a real
+    key, refuses a fake one" would have signed it off (trap 11, one layer
+    down). Enumerate through the PIPELINE, which unrolls:
+    `@($x | ForEach-Object { $_ })`. The paired "refuse a nested list" check
+    was written, found unreachable after the flatten, and DELETED — a guard
+    aimed at nothing (trap 78's other half). What replaced it is the reachable
+    one: assert the field you are about to ACT on is a SCALAR
+    (`Select-MergeSyncIssue`; reverting the flatten reddens it with the live
+    symptom). [Novel](docs/ops/claude-archive/traps.md#trap-80)
+
 New trap discovered the hard way? Add the compact rule here and the novel
 under `docs/ops/claude-archive/traps.md`. That is the whole point.
 

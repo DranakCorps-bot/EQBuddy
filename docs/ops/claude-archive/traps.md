@@ -2136,3 +2136,79 @@ underneath it**, and if a captured border is darker than its theme's value says 
 should be, suspect the capture before the palette. Both halves of this are trap 23
 one layer further out than usual — a real state of the CAPTURE, photographed as if
 it were a state of the app.
+
+### Trap 80
+
+**`@(command)` does not normalize an array — it nests one. And `-eq` against an
+array is a FILTER, not a comparison, so the two together make a lookup that
+matches everything.**
+
+DRA-77's merge-sync had to turn a human issue key into an issue id. Paperclip has
+no lookup-by-identifier route, so the script listed the company's 80 issues and
+filtered:
+
+```powershell
+$issues = @(Invoke-Paperclip -Method GET -Path "/api/companies/$CompanyId/issues?view=compact")
+$issue  = $issues | Where-Object { $_.identifier -eq $key } | Select-Object -First 1
+```
+
+Both lines are idiomatic PowerShell and the pair is wrong.
+
+The first live run against a branch named `claude/dra78-exo-metrics-20260914`
+printed:
+
+```
+REFUSED: DRA-78 - status 'blocked todo done done todo done done in_review
+in_review done done done in_review ... backlog backlog' is not one this job
+knows about - refusing rather than guessing.
+```
+
+Eighty statuses, concatenated, reported as one issue's status.
+
+**The first half.** `Invoke-RestMethod` emits a whole JSON array as a SINGLE
+object rather than enumerating it, so `@(...)` wraps it a second time: a
+1-element array whose one element is the 80-item array. Measured rather than
+argued, which is the only reason it was found in one pass:
+
+```
+direct          type=Object[] count=80
+via function    type=Object[] count=80
+@(via function) type=Object[] count=1     <-- element 0 type = Object[]
+```
+
+**The second half, and it is the one that hides the first.** `$_.identifier` on
+that nested element member-enumerates to eighty identifiers, and
+`eighty-identifiers -eq 'DRA-78'` does not answer true or false — it returns the
+matching elements. A non-empty array, which `Where-Object` reads as `$true`. So
+the filter became a tautology and passed the whole collection through.
+
+**Why it survived a plausible-looking test.** The negative case still behaved
+perfectly: `DRA-9999` produced an empty array, which is falsy, so the lookup
+refused it with the right message and exit 1. A run that showed "finds a real
+key, refuses a fake one" would have signed this off. **A correct-looking negative
+is not evidence the positive is correct** — trap 11's shape, one layer down: only
+one side of the evidence could be produced, so the verdict looked like a vote.
+
+**The fix is one line, and it is not a shape guard.** Enumeration through the
+PIPELINE unrolls; `@()` around the value does not:
+
+```powershell
+$flat = @($Issues | ForEach-Object { $_ })
+```
+
+That normalizes the API's shape and the nested shape alike. The first attempt at
+a fix added a "refuse a list whose elements are collections" check beside it —
+and the self-test row written to prove that refusal fired came back green-as-
+found instead, because after the flatten no reachable input is still nested. The
+guard was aimed at nothing (trap 78's other half) and was deleted. What replaced
+it is the assertion that would have NAMED the bug in one line: the matched
+issue's `id`/`status`/`identifier` must each hold exactly one value.
+`Select-MergeSyncIssue` carries both, and reverting the flatten reddens that row
+with the live symptom verbatim — `the matched issue's 'id' holds 3 values, not
+one`.
+
+**Generally:** when a lookup over a collection returns more than you asked for,
+suspect the collection's SHAPE before the predicate; and never let `-eq` be the
+only thing standing between a key and a destructive write, because on an array
+it is not a question with a yes-or-no answer. The cheap standing assertion is to
+check that the field you are about to ACT on is a scalar.
