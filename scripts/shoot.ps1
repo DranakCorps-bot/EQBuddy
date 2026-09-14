@@ -1062,6 +1062,87 @@ $Shots = [ordered]@{
     #     photograph a string, which is the failure trap 23 and trap 73 name from either
     #     side.*
     #
+    # ---- DRA-71 D8: the professions block (plan P13; Founder smoke item 6) -----------
+    #
+    # PREDICTIONS, written before the shots (trap 23):
+    #
+    #   'shell-helper-materials' — the NARROWED state: one goal picked (Farm Materials) and two
+    #     professions picked (Baking, Blacksmithing), with ONE real skill-up appended to the log
+    #     so exactly one row carries a number and one does not. That pairing is the whole point
+    #     of the picture: "no skill-up seen yet" and "skill 122" have to read as two different
+    #     answers rather than as a number and a blank.
+    #       - The goals face reads "Farm Materials" — one pick is always named, never counted.
+    #       - One block headed "Farm Materials", its note, then the profession face reading
+    #         "Baking · Blacksmithing" (19 chars against the room's 34-char budget, so it names
+    #         rather than counts) and the picks in the CURATED list's own order — Baking before
+    #         Blacksmithing, which is the enum's order and not the click order.
+    #       - TWO rows, in that same order. The first says Baking has no skill-up in the log yet
+    #         and names the game's own "You have become better at…" line. **It must not print a
+    #         0.** The second reads "Blacksmithing — your log last raised it to 122, on <today>"
+    #         — the date is the appended line's own stamp, so it is today's, and it is a fact
+    #         about the fixture rather than a staged string.
+    #       - TWO controls on each row: "Watch skill-ups" and "eqlwiki". Both say "Watch" rather
+    #         than "Watching" — the fixture profile has no skill-up rule, and the label is read
+    #         from the player's own rules every paint.
+    #       - Then the park note, with its two numbers in it (10,957 pages read, 14 naming a
+    #         profession). The block that says what EQBuddy cannot do is part of the picture.
+    #       - Under "Worth doing next": NO recommendations — Farm Materials is still Deferred —
+    #         and the deferral sentence naming which half is missing, with the Gear door under
+    #         it. A picture where the block above is full of the player's own numbers and the
+    #         sentence below says "not ranking this one yet" is exactly the reading this slice
+    #         had to get right.
+    #       - No sentence calling a profession easy, hard or trivial, in either direction. The
+    #         HOME-006 sweep covers these sentences now and this is where a word that slipped
+    #         past it would show.
+    #
+    #   'shell-helper-materials-light' — the same staging in SOLARIZED, the only light palette.
+    #     Eight short caption rows with two accent links each is a new density for this room and
+    #     light is where dim-on-light contrast fails. No popup, so trap 79's translucency caveat
+    #     does not apply.
+    #
+    #   'shell-helper-professions' — the picker OPEN over the DEFAULT state: the goal picked and
+    #     NO profession picked, which is the filter's empty state and therefore all eight rows.
+    #     A dropdown that is shut photographs as a button (trap 22), and this is also the only
+    #     picture that answers the product question the block invites — whether eight rows, each
+    #     with a sentence and two links, reads as a list or as a wall. `EQBUDDY_HELPER_PICKER`
+    #     is the room's own review hook, unset in every shipping run; `helperPickerOpen` in the
+    #     E2E is the assertion that it is wired to the control rather than merely spelled right.
+    #       - The face reads "Any profession" — nothing picked, and the control says so in its
+    #         own words.
+    #       - The popup holds EIGHT check rows in the curated order (Alchemy, Baking,
+    #         Blacksmithing, Brewing, Fletching, Jewelcrafting, Pottery, Tailoring), none
+    #         ticked, with Blacksmithing reading "Blacksmithing — 122" and the other seven
+    #         "— not seen yet".
+    #       - Eight rows under it, sixteen controls between them.
+    #
+    #   AND THE REGRESSION PICTURES: 'shell-helper', 'shell-helper-narrow' and
+    #     'shell-helper-picker' all change, because none of them picks a goal and "nothing
+    #     picked" weighs every goal — so the new block is drawn in full, eight rows of "not seen
+    #     yet". Re-run them. The other 'shell-helper*' shots pick goals that are not Farm
+    #     Materials, so the block is absent and their pictures are unchanged.
+    #
+    #   WHAT ACTUALLY HAPPENED. SHOT 2026-09-13, 946x633, TWO takes — and the second take
+    #     exists because the first found a defect that no assertion in this repo could have
+    #     seen. Every sentence was correct, every number was real, and the block was a wall.
+    #       (a) **The unknown-standing sentence was thirty words, and there are eight rows.**
+    #           "…no skill-up in your log yet. EQBuddy reads your standing from the game's own
+    #           'You have become better at…' line, so it starts from your next one." — eight
+    #           times, one after another, in the default state that every player sees first.
+    #           Distinct-count is the tell in prose exactly as it is in data (trap 73): eight
+    #           rows carrying one distinct sentence is a template, and the fact it states
+    #           belongs to the BLOCK. Fixed with `HelperPresentation.ProfessionLearnNote`, said
+    #           once under the picker; the row is now "Baking — no skill-up in your log yet."
+    #       (b) **The park note had no margin of its own**, so it butted against the last row's
+    #           two links and read as belonging to that profession rather than to the block.
+    #           A caveat attached to the wrong subject is worse than one nobody reads.
+    #     Everything else was as predicted: the goals face names the one pick, the profession
+    #     face reads "Baking · Blacksmithing" in the curated order, the Baking row prints no
+    #     zero, Blacksmithing reads "raised it to 122, on Sep 13" (the appended line's own
+    #     stamp), both rows carry "Watch skill-ups" and "eqlwiki" and neither says "Watching",
+    #     no recommendation is drawn, and the deferral names the missing half under it. The
+    #     open picker holds the eight in curated order, none ticked, Blacksmithing reading 122.
+    #     No safety or difficulty vocabulary anywhere in the block.
+    #
     # ---- E-3 PR 5: the LIVE room, and the Raids move ---------------------------------
     #
     # Same illustration lock: a room's shot lands in the PR that lands the room, exactly the
@@ -1393,6 +1474,36 @@ $Shots = [ordered]@{
                            Set = @{
                                HelperGoals = @{ 'testchar_test' = @('UnlockRaces', 'UnlockClasses') }
                                UnlockPicks = @{ 'testchar_test' = @('Human (Freeport)') }
+                           } }
+    # ---- DRA-71 D8: the professions block. Predictions are above. ---------------------
+    # The skill-up arrives through the LOG rather than through a seeded ledger, so the whole
+    # chain in the picture is the real one: parser, session fold, ledger, standing, row. A
+    # seeded store would photograph a room nobody had used, and it would look exactly like a
+    # room whose writer was never wired (trap 20 is the bug; trap 23 is why the staging has to
+    # go through the seam).
+    'shell-helper-materials' = @{ Title = 'EQBuddy — Helper'
+                           Env = @{ EQBUDDY_SHELL = 'helper' }
+                           Append = @('You have become better at Blacksmithing! (122)')
+                           Set = @{
+                               HelperGoals = @{ 'testchar_test' = @('FarmMaterials') }
+                               HelperProfessions = @{ 'testchar_test' = @('Baking', 'Blacksmithing') }
+                           } }
+    'shell-helper-materials-light' = @{ Title = 'EQBuddy — Helper'
+                           Env = @{ EQBUDDY_SHELL = 'helper' }
+                           Append = @('You have become better at Blacksmithing! (122)')
+                           Set = @{
+                               Theme = 'Solarized'
+                               HelperGoals = @{ 'testchar_test' = @('FarmMaterials') }
+                               HelperProfessions = @{ 'testchar_test' = @('Baking', 'Blacksmithing') }
+                           } }
+    # No HelperProfessions key at all: absent means all eight, which is the state a player who
+    # has never touched the control is in and the only one that shows what the block costs.
+    'shell-helper-professions' = @{ Title = 'EQBuddy — Helper'
+                           Env = @{ EQBUDDY_SHELL = 'helper'; EQBUDDY_HELPER_PICKER = 'professions' }
+                           Popups = $true
+                           Append = @('You have become better at Blacksmithing! (122)')
+                           Set = @{
+                               HelperGoals = @{ 'testchar_test' = @('FarmMaterials') }
                            } }
     'shell-helper-picker-light' = @{ Title = 'EQBuddy — Helper'
                            Env = @{ EQBUDDY_SHELL = 'helper'; EQBUDDY_HELPER_PICKER = 'goals' }

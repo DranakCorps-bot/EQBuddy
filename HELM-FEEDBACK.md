@@ -1021,3 +1021,39 @@ EQBuddy already ships — no cohort, no comparison, no measurement of another pl
 worth his eye later**, not a page now.
 
 — Dranak (Claude Code)
+
+## 2026-09-13 ~11:59 PM CT — LIVE ASK: **SIGN PR #602** — DRA-71 D8 resources thin slice (P13's evidence gate FIRED and PARKED the arithmetic; the answer turned out to be in a different field; `/outputfile recipes` ROUTINE ask fires here)
+To: Helm
+
+**PR:** https://github.com/DranakCorps-bot/EQBuddy/pull/602 — branch `opus-dra71-d8`, product tip `3b97c4ad`, off Soft `main` `c3071f24` (post-#598; **#599's SSC is still OPEN**, so it is not in this base). Soft seat `opus-dra71-d8`, Paperclip DRA-71. 29 paths. Executes **D8 only** — D9 deliberately not drained.
+
+**What it is.** Fable's Helm-signed plan #586 **P13**, the Founder's smoke item 6 (*"resources: profession-first; honest on gaps"*). `Core/Tradeskills.cs` (curated eight, never auto-written, checked against the shipped `AaCatalog`), per-character **skill standings that finally survive the session** (writer + reader in one slice, trap 20), and the Helper's Farm Materials block: profession picker → standing → Watch skill-up preset → wiki door. **`FarmMaterials` stays `Deferred`** and `LevelUseFor` still answers null for it — the must-list is untouched.
+
+**The gate fired.** P13 made the item→profession arithmetic conditional on a `Categories` coverage survey. It ran first, through the app's own parser, over the 10,957 cached pages: **10,919 carry a category — 99.7%, 539 distinct — and 14 name a profession**, across five of the eight (Blacksmithing, Fletching and Jewelcrafting: zero). The field is populated nearly everywhere and answers a different question. So the arithmetic **PARKS on the plan's own branch**, the block says so on screen with the number in it, and the survey now lives in `itemcatalog-build` printing in both paths so `--check` re-takes it every refresh **writing nothing**.
+
+**And the survey found the answer somewhere else.** `recipes` — already parsed, already shipped in `ItemCatalog.Record.Recipes` — carries the profession on **851** pages, all eight distinct, plus **242** naming a skill with no Mastery AA. **An arithmetic on it needs no promoter change and no fetch.** I did not build it: a ranking engine off a field the plan never surveyed is new arithmetic with its own rulings, and the seat's brief says not to invent beyond the plan. Filed to Fable as a MET reopen with the numbers; **`DECISIONS.md` §2 is the default most worth a veto**, and ask 3 below is that question put to you directly.
+
+**Gates.** `scripts/check.ps1` **all green** (4,853 units, whats-new, channel, wipe-guard, generated, build). Three new E2E rows pass, including the log-line-to-screen one; **the full `e2e-windows` suite was still running locally when this was written and its result is not claimed** — CI is the merge bar either way. **Six prove-fails**, including disabling the `MainWindow` writer, which times the E2E row out rather than letting it pass quietly. Shots: three new (one Solarized, one popup-composited — trap 79) and three re-shot; **the first take found a defect no assertion could see** and it is recorded beside the prediction.
+
+**Scope.** No release. No new surface. **No eqlwiki request of any kind** — the survey reads a cache already on this machine; **harvest stays PARKED** and the local dump is 189 pages behind the shipped catalog, which the next weekly refresh closes. Nothing leaves the machine; nothing near the values line.
+
+### Asks
+
+1. **SIGN #602, merge when `build-and-test` + `e2e-windows` are green.** No force-merge while CI is pending.
+2. **KEEP the PARK of the item→profession arithmetic.** It is P13's own "poor coverage" branch, the survey is in the PR body and in `DECISIONS.md` §1, and the reopen condition is now measured on every refresh. Rule if you want the map built from the 14 anyway.
+3. **Rule on §2 — the `recipes` finding.** My default: it goes back through Fable as a plan item rather than being built in this seat, because it needs composition and must-list rulings a plan owns. If your read is that an executor should have taken it in-seat on evidence this strong, that is the correction and I would rather have it now than at D9.
+4. **KEEP the curated EIGHT** (the Mastery-AA list P13 named). Tinkering, Spell Research, Make Poison and Fishing have wiki pages and appear in recipe lines, and none has a Mastery AA, so all four are OUT as committed negatives. Rule if you want the list widened to what the wiki knows rather than to what the AA page grants.
+5. **KEEP the ledger admitting only the eight professions.** The alternative — persist every skill the log announces — writes ~fifty rows per character that nothing reads (trap 43). Widening is one line in the slice that builds a surface for combat skills.
+6. **KEEP the watch preset as a door WITH a side effect.** It writes one `TrackedRule` and opens Settings → Alerts → Watch rules; idempotent through the rule's own matcher, and a DISABLED rule still counts because turning it off was the player's decision. The rule that makes this shape right is the in-game-command one (a surface that names an action ships the action). It is the only control in this room that writes a setting.
+7. **The `/outputfile recipes` ROUTINE ask fires at this slice** (your ruling STANDS — routine, one command on the Founder's machine, Soft LEAVE inventing a needs-david page). **I am not the courier and a file write is not a call**, so this is the ask: please route it. What is wanted is one line from him — run `/outputfile recipes` once in game and say whether the command exists and what the file looks like. `OutputfileAutoImport` has no reader for that dump kind today and the recipe/ingredient model stays PARKED until the evidence exists; **nothing in this PR depends on it.**
+8. **AUTHORIZE `dra71-d9`** (the phone Helper by projection, plan P15) after #602 lands on Soft `main`. One carry for its plan: the professions block's two producers are framework-free and port cleanly, but **the watch preset is desktop-only by construction** — it writes a PC setting and opens a PC room — so its INTENT ports, not its control (trap 35).
+9. **David — my read is ACK not needed.** Both consequence-list tests fail: the professions are a catalog EQBuddy already ships, the standings are this character's own log, no release, no Pages, no Play Console, no eqlwiki request policy change. Eleven defaults are in `DECISIONS.md` for veto; §1 and §2 are the two worth his eye later rather than a page now.
+
+— Dranak (Claude Code)
+
+## 2026-09-14 ~12:20 AM CT — DRA-71 D8: the local `e2e-windows` result the LIVE ASK above deliberately did not claim
+To: Helm
+
+The full suite finished after that note was written: **366 passed, 0 failed, 8 minutes** (`dotnet test tests/EQBuddy.E2E` in Release, sequenced, against a build of the PR tip `3b97c4ad`). `scripts/check.ps1` is green on the same tree — 4,853 units. **CI on #602 is still the merge bar and was pending at this write**; nothing here asks you to treat a local green as one. Posting it because the ask above says the result was not claimed, and leaving that standing when it is known would be the same omission with a longer fuse.
+
+— Dranak (Claude Code)

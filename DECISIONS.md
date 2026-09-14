@@ -1,3 +1,156 @@
+## 2026-09-13 — DRA-71 delivery 8: resources are profession-first, and the arithmetic is parked on its own survey
+
+Pre-authorized: Helm SIGNED the plan (PR #586, merged `a28c5d89`) and SIGNED
+D2–D7 (#588, #590, #592, #594, #596, #598), authorizing `dra71-d8`. Nothing below
+is on the consequence list: no release, no new surface, **no eqlwiki request of
+any kind** (the survey reads a cache that was already on this machine and this
+seat fetched nothing), nothing new leaving the machine, nothing near the values
+line — the professions are a catalog EQBuddy already ships and the standings are
+this character's own log. David vetoes from here.
+
+**1. THE ITEM→PROFESSION ARITHMETIC IS PARKED, AND THE SURVEY IS THE REASON.
+This is the delivery's headline default.** P13 made the arithmetic conditional on
+an evidence step — *"good coverage → promoter carries `Categories` + a curated
+Category→Profession map; poor coverage → picker + skill + doors ship and the
+arithmetic is PARKED"* — so the survey ran before anything was built, through the
+app's own item parser, over the 10,957 cached pages:
+
+- **10,919** carry at least one `[[Category:…]]` — **99.7%**, across **539**
+  distinct categories.
+- **14** of them carry a category that names a profession, across **five** of the
+  eight (Alchemy 1, Baking 2, Brewing 2, Pottery 8, Tailoring 2). Blacksmithing,
+  Fletching and Jewelcrafting have none at all.
+- The generic markers instead: **822** pages say `Tradeskill Ingredient` and
+  **1,959** say `Player Crafted`.
+
+**99.7% is the wrong number to feel good about, and that is the finding worth
+carrying forward.** The field is populated almost everywhere and it answers a
+different question: the 539 categories are class usability (`Warrior Equipment`,
+4,308 pages), slot (`Chest`, `Head`), weapon skill (`1H Slashing`), zone
+(`Plane of Sky`), acquisition (`Vendor Sold`, `Foraged`, `Quest Items`) and
+cosmetics (`Fashion: Plate`). A reader that had checked only whether the field was
+POPULATED would have shipped an arithmetic on a field that never says which
+profession. This is the third slice running where a catalog field says less than
+its name promises — `DropMobs` in D6, `merchant_value` in D7 — and the first
+where the field looked fully covered while doing it.
+
+So the picker, the standings and the two doors ship, the arithmetic parks, and
+**the block says so on screen with the number in it** rather than looking
+unfinished: *"Of the 10,957 item pages it has read, 14 say which profession an
+ingredient belongs to."* The survey now runs inside `itemcatalog-build` and prints
+in both paths, so `--check` re-takes it on every weekly refresh without writing
+anything — a reopen condition nobody measures is one nobody can satisfy.
+
+The veto shape, if this is wrong: build the map anyway from the 14 and the two
+generic categories. I think that is a worse product — a player asking where to
+farm pottery clay would get an answer built from eight pages — but it is one
+curated file away.
+
+**2. THE ANSWER IS PROBABLY IN A DIFFERENT FIELD, ALREADY SHIPPED, AND THIS SEAT
+DID NOT BUILD ON IT.** The same survey counted the `recipes` field beside the
+categories, and it is a much better source: **1,235** pages carry one, **851**
+name one of the curated eight at the top of their recipe list — *"* [[Blacksmithing]]"*
+— and all **eight** professions appear. A further **242** name a skill with no
+Mastery AA (Tinkering, Spell Research, Make Poison, Fishing). The field is already
+parsed by the app's own parser and already promoted into `ItemCatalog.Record.Recipes`,
+so an arithmetic on it would need no promoter change and no fetch.
+
+**I did not build it, deliberately.** The plan's evidence step named `Categories`,
+and a ranking engine off a field the plan never surveyed is a new arithmetic with
+its own rulings to make — how its criteria compose, whether Farm Materials becomes
+`Answered`, what `LevelUseFor` says about it — which is the shape that belongs in a
+plan rather than in an executor's judgement call. It is filed to Fable as a MET
+reopen condition with these numbers in it. **If the preference is for me to have
+built it in-seat, that is the veto**, and it is the more interesting one of the
+two on this page.
+
+**3. THE EIGHT ARE THE MASTERY-AA EIGHT, AND FOUR REAL PROFESSIONS ARE OUT.**
+P13 named the source — *"wiki-matched (from the Mastery AA list)"* — and the
+shipped `AaCatalog.json` carries all nine General "… Mastery" abilities, so the
+curated list is checked against a catalog EQBuddy already ships rather than
+against a comment: every profession names its AA, and `TradeskillsTests` reads
+that ability's own effect sentence back out (*"reduces the chance of failing
+Blacksmithing recipes"*) to check the spelling. `Crafting Mastery` is the ninth
+and is refused by name — it raises the specialization cap of professions you
+already have, and its effect text names seven of the eight in one parenthetical,
+omitting Alchemy.
+
+Tinkering, Spell Research, Make Poison and Fishing all have eqlwiki skill pages
+and all four appear in recipe lines; none has a Mastery AA, so none is here. They
+are committed negatives in the test, so the edge of the curation is a failing
+assertion rather than a comment. Widening the list is a decision, not a fix.
+
+**4. THE WIKI SPELLS ONE PROFESSION THREE WAYS AND I CARRIED ALL THREE, PLUS ONE
+THAT IS NOT THE WIKI'S.** "Jewel Craft Mastery" (the AA name) reduces failures of
+"Jewelcrafting" recipes (the effect text) and Crafting Mastery calls it
+"Jewelcraft" (the same page). Matching is whole-string against a list of aliases
+per profession, so all three resolve. **"Jewelry Making" is the fourth and it is
+NOT from eqlwiki** — it is classic EverQuest's own spelling of that skill, carried
+under the standing rule that other sources are allowed where the wiki is silent
+and marked as such in the file. The wiki names the SKILL; it is silent on what the
+game's skill-up line PRINTS, which is a different fact, and an alias the log never
+prints simply never matches while a missing one costs a player their standing with
+no way to tell why.
+
+**5. ONLY THE EIGHT PROFESSIONS ARE PERSISTED — SIXTY COMBAT SKILLS ARE NOT.**
+The plan asked for skill values to start persisting. The store admits a skill only
+when `Tradeskills.Match` claims it, which is `QuestLedgerStore.TrackFilter`'s own
+rule applied to a second kind of row ("the file stays quest-sized instead of
+hoarding every rat whisker"). The alternative — persist every skill the log
+announces — writes fifty rows per character that nothing reads, which is trap 43
+with a storage bill. The reopen is one line: widen the filter in the slice that
+builds a surface for combat skills.
+
+**6. THE HIGHEST VALUE WINS, AND THERE IS NO TIME HIGH-WATER MARK.** The loot
+ledger needs one because loot accumulates and a replayed line would double it. A
+skill-up carries the TOTAL the game printed, so the largest value seen IS the
+standing and the launch replay lands on the same number. The moment travels with
+the value rather than with the count, because a surface has to be able to say WHEN
+rather than implying "now".
+
+**7. ABSENT MEANS ALL EIGHT — filter semantics, `UnlockPicks`' rule and not
+`HelperFactions`'.** A faction pick tells an engine which of hundreds of standings
+to weigh, so "none picked" has to mean none. This pick decides which of eight rows
+a list draws, so "none picked" means the list a player who has never touched the
+control should see. The offer is never narrowed by its own filter, or a pick could
+not be undone.
+
+**8. THE ROWS ARE IN THE CURATED ORDER, NOT IN EVIDENCE ORDER.** The faction
+picker sorts closest-to-the-top first; this one does not. Eight fixed rows want a
+stable order more than a clever one, and a list that re-sorted itself when a number
+moved would shift under the player's pointer for no gain.
+
+**9. THE WATCH CONTROL WRITES A SETTING, AND IT IS THE ONLY DOOR IN THIS ROOM
+THAT DOES.** "Watch skill-ups" adds the `WatchKind.SkillUp` rule and opens
+Settings → Alerts → Watch rules so the player can give it a sound. The rule that
+makes a door-with-a-side-effect the right shape is the in-game-command one: a
+surface that names an action ships the action. It is idempotent, the existence
+check asks `TrackedRule.Matches` (the rule's own matcher, so a rule the player
+wrote and named "smithing!!" counts and is never duplicated), and a DISABLED rule
+still counts — turning it off was their decision, and a second enabled copy would
+overrule it.
+
+**10. FARM MATERIALS IS STILL `Deferred`, AND ITS SENTENCE WAS REWRITTEN.** The
+goal has no engine, so `ShapeFor` is unchanged and `LevelUseFor` stays null — which
+is the must-list's correct answer for a goal with nothing to decide about yet. The
+deferral now names which HALF is missing (*"your professions and where they stand
+are above. EQBuddy is not ranking WHERE to farm the materials yet"*), because the
+old sentence read over a block full of the player's own numbers would say the block
+had failed.
+
+**11. THE STAGED SHOT CHANGED THE COPY, AND THIS IS THE SECOND SLICE RUNNING WHERE
+IT DID.** The unknown-standing row was written as one sentence carrying its own
+explanation — *"…no skill-up in your log yet. EQBuddy reads your standing from the
+game's own 'You have become better at…' line, so it starts from your next one."*
+Correct, and there are eight rows: the default state repeated it eight times down
+the block. **Distinct-count is the tell in prose exactly as it is in data (trap
+73)**, and a fact about where EQBuddy gets its numbers belongs to the BLOCK. The
+explanation is now said once and the row is four words. The park note also had no
+margin of its own and read as belonging to the last profession rather than to the
+block. Neither was visible to any assertion in this repo.
+
+---
+
 ## 2026-09-13 — DRA-71 delivery 7: motes and money, both answered from the player's own play
 
 Pre-authorized: Helm SIGNED the plan (PR #586, merged `a28c5d89`) and SIGNED

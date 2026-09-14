@@ -432,6 +432,25 @@ public enum HelperDoorKind
     /// place a player can tell it what level they are. The Helper's door for the one input
     /// it cannot read from anything.</summary>
     Character,
+
+    /// <summary>
+    /// Settings → Alerts → Watch rules, where every watch a player has written lives
+    /// (DRA-71 D8).
+    ///
+    /// <para><b>It is the one door in this enum with a SIDE EFFECT behind it</b> — the Helper
+    /// adds the profession's skill-up rule on the way through when the player has none, which
+    /// is why the room's control has two labels. The rule that makes that acceptable is the
+    /// one this repo already keeps for in-game commands: a surface that names an action ships
+    /// the action. "Turn on a skill-up alert" with no way to do it is the silent no-op wearing
+    /// a sentence, and a door that lands the player in an empty rules list to type it
+    /// themselves is the same defect with a walk attached.</para>
+    /// </summary>
+    WatchRules,
+
+    /// <summary>The profession's own skill page on eqlwiki. Player-clicked, exactly like
+    /// <see cref="WikiFaction"/>: EQBuddy fetches nothing, so the request policy toward the
+    /// wiki is untouched.</summary>
+    WikiSkill,
 }
 
 /// <summary>One door under a recommendation.</summary>

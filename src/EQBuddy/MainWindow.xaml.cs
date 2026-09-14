@@ -2463,6 +2463,16 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
             && QuestLedger is { } lg && QuestCharacterKey.Length > 0
             && lg.LevelFor(QuestCharacterKey) != announced)
             lg.SetLevel(QuestCharacterKey, announced, announcedAt);
+        // **AND REMEMBER WHERE THE PROFESSIONS STAND** (DRA-71 D8, plan P13). Same argument as
+        // the level directly above: the log states a skill's number once, at the moment it
+        // moves, and until now that number died with the session — so a player who spent last
+        // week smithing opened a tool that knew nothing about it. The store takes the whole
+        // live list every tick and writes only when a value actually rose (`SetSkills` is a
+        // batch for exactly that reason), and it admits only the eight professions, which is
+        // the reader this slice ships.
+        if (s.SkillUps.Count > 0 && QuestLedger is { } skillLedger && QuestCharacterKey.Length > 0)
+            skillLedger.SetSkills(QuestCharacterKey,
+                s.SkillUps.Select(k => (k.Skill, k.Value, k.At)));
         // The ding's cue rides the header, visible while the card is closed: the header
         // is the only Progress surface that always shows, and clicking it opens the
         // card where the "New at level N" list waits (never a popup). Text built in

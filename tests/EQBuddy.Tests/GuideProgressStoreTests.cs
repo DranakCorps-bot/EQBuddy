@@ -372,6 +372,11 @@ public sealed class GuideProgressStoreTests : IDisposable
             // `CharacterLevel.Resolve` read every restored level as the oldest claim there
             // is, which is the migration rule applied to a profile that should not get it.
             "LevelAt", "StatedLevel", "StatedLevelAt",
+            // DRA-71 D8: where the eight professions stand, from the log's own skill-up
+            // lines. A standing that did not survive the reload would be the feature's whole
+            // point failing silently — the value already survived the session before this
+            // store existed.
+            "Skills",
         ];
         Assert.Equal(
             populated.OrderBy(n => n, StringComparer.Ordinal),
@@ -401,6 +406,14 @@ public sealed class GuideProgressStoreTests : IDisposable
                 },
             },
             LastInventoryReconcile = new DateTime(2026, 8, 20, 18, 47, 36),
+            Skills =
+            {
+                ["Blacksmithing"] = new QuestLedgerStore.SkillEntry
+                {
+                    Value = 122,
+                    At = new DateTime(2026, 9, 7, 21, 14, 3),
+                },
+            },
         };
         var written = JsonSerializer.Serialize(
             new Dictionary<string, QuestLedgerStore.CharacterLedger> { [Dranak] = sample });

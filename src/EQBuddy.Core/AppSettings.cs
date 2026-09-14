@@ -692,6 +692,23 @@ public sealed class AppSettings
     public Dictionary<string, List<string>> UnlockPicks { get; set; } = [];
 
     /// <summary>
+    /// Which professions a character wants listed under the Helper's "Farm Materials" goal —
+    /// <see cref="Tradeskill"/> names, keyed the same way (DRA-71 D8, plan P13).
+    ///
+    /// <para><b>Absent means all eight</b>, which is <see cref="UnlockPicks"/>' filter rule
+    /// and not <see cref="HelperFactions"/>' required-pick one. The difference is what the
+    /// pick is FOR: a faction pick tells an engine which of hundreds of standings to weigh,
+    /// and this one decides which of eight rows a list draws. A player who has never touched
+    /// the control should see the list, not an empty block asking them to choose from a set
+    /// small enough to show whole.</para>
+    ///
+    /// <para>Read and written only through <see cref="TradeskillPickStore"/>; an unknown
+    /// stored name is skipped, so a profession later removed from the curated list stops
+    /// mattering instead of throwing.</para>
+    /// </summary>
+    public Dictionary<string, List<string>> HelperProfessions { get; set; } = [];
+
+    /// <summary>
     /// Which QUESTION this character is asking under the Helper's "Farm Gear" goal — a
     /// <see cref="GearIntent"/> name (DRA-71 D6, plan P8; Founder smoke items 4a/4b).
     ///

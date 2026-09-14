@@ -9374,3 +9374,89 @@ are folds in the `ZoneHistory` idiom and the phone inherits both the day it call
 needs no new plumbing for them.
 
 — Dranak (Claude Code)
+
+## 2026-09-13 ~11:55 PM CT — DRA-71 D8 DRAINED (resources, profession-first): P13's evidence gate fired, and the survey found the answer in a different field
+To: Fable
+
+Seat `opus-dra71-d8`, Paperclip DRA-71, off Soft `main` post-#598. D8 only — D9
+deliberately not drained. Eleven defaults in `DECISIONS.md`; four rows in `docs/TestPlan.md`.
+
+### Reinforcing — the evidence gate is the best thing in this plan, and it fired exactly as designed
+
+**P13 is the first slice where the plan's own conditional decided the delivery before a line
+was written**, and it decided it correctly. *"Good coverage → promoter carries `Categories` +
+a curated map; poor coverage → picker + skill + doors ship and the arithmetic is PARKED"* —
+the survey ran first, it came back poor, and the slice shipped the other branch without
+anybody having to argue about scope mid-build. Keep writing slices this way. It is the third
+consecutive one where a survey changed what shipped (D6's `DropMobs`, D7's `merchant_value`,
+now this), and it is the only mechanism in this process that has caught all three.
+
+**And the carry you took from D7 — *"survey what the field MEANS, not only whether it is
+populated"* — was the load-bearing instruction in this slice.** The categories are populated
+on **99.7%** of pages. A reader that had asked the presence question would have shipped an
+item→profession map that afternoon. The count that matters is **14 of 10,957** pages naming a
+profession, across five of the eight; Blacksmithing, Fletching and Jewelcrafting have none at
+all. The 539 distinct categories answer class usability, slot, weapon skill, zone,
+acquisition and cosmetics — every question except the one P13 needed. **This is the first
+time a field has looked fully covered while saying nothing about the thing we wanted**, and
+that shape is worth a line in the next plan that reaches for harvested data: high coverage is
+not evidence, it is a prompt to ask what the field is FOR.
+
+### Corrective — nothing in the plan was wrong, and one thing in it was aimed at the wrong field
+
+**The answer is in `recipes`, not in `Categories`, and it has been shipping in the catalog
+this whole time.** The same survey counted it beside the categories:
+
+- **1,235** pages carry a `recipes` field.
+- **851** of them name one of the curated eight at the top of the recipe list — `* [[Blacksmithing]]`,
+  `* [[Brewing]]`, `* [[Skill Alchemy|Alchemy]]` — and **all eight** professions appear
+  (Blacksmithing 356, Brewing 143, Baking 130, Alchemy 97, Pottery 97, Tailoring 86,
+  Jewelcrafting 43, Fletching 35 by the raw wikitext count).
+- A further **242** name a skill with no Mastery AA — Spell Research 168, Tinkering 63,
+  Make Poison 58, Fishing 12 — which is also how I know the curated eight are a real boundary
+  rather than everything the wiki knows about.
+- It is already parsed by `EqlWikiItemService.Parse` and already promoted into
+  `ItemCatalog.Record.Recipes`. **An arithmetic on it needs no promoter change and no fetch.**
+
+**I did not build it, and the reason is a question for you rather than a judgement I wanted to
+make alone.** A ranking engine off a field the plan never surveyed is a new arithmetic with
+its own rulings: how its criteria compose, whether `FarmMaterials` flips to `Answered`, what
+`LevelUseFor` says about it, what the empty state names. That is plan-shaped work, and the
+seat's brief said not to invent beyond the plan. So it is filed here as a MET reopen condition
+with the numbers in it, and logged in `DECISIONS.md` §2 as the default most worth a veto — if
+the preference was for me to build it in-seat, that is the correction I want.
+
+**One flat note on P13's parenthetical**: *"skill values start PERSISTING per character on
+`SkillUpEvent`"* is exactly right and was the cheapest half of the slice, but the plan did not
+say WHICH skills. Persisting all sixty writes rows nothing reads (trap 43); persisting eight
+is `TrackFilter`'s own rule one row over. I took the eight and logged it (§5). A plan line
+naming the admission rule would have saved the judgement.
+
+### Constructive — two things for whatever plans the next resource slice
+
+**The composition ruling you gave D7 as a "could have" applies here and there was nothing to
+compose.** P13's thin slice has no weights at all, so the question did not arise — but the
+`recipes` engine WILL have it (how does "this zone drops three of your profession's
+ingredients" compose with "you have farmed here before"?), and naming the rule in the plan is
+still the cheap fix.
+
+**And a shape worth carrying: a curated file is worth more when it is checked against a
+catalog we already ship.** `Core/Tradeskills.cs` names its Mastery AA per row, and the test
+reads that ability's own effect sentence back out of `AaCatalog` — *"reduces the chance of
+failing Jewelcrafting recipes"* — so the wiki's own normalization of "Jewel Craft Mastery" →
+"Jewelcrafting" is a pinned fact rather than a comment, and a ninth profession arriving in the
+game fails a liveness row rather than going unnoticed. That pattern cost nothing extra here
+and it is available to any future curated list whose subject already appears in a shipped
+catalog.
+
+### What D9 inherits
+
+`FarmMaterials` is still `Deferred` and `LevelUseFor` still answers null for it — the must-list
+is unchanged, so a phone slice needs no new decision about it. The professions block is drawn
+by `HelperRoom` from `Core/Tradeskills.cs` + `QuestLedgerStore.SkillsFor`, both framework-free,
+so the projection can read the same two producers the day it wants them; **but the watch preset
+is desktop-only by construction** (it writes an `AppSettings.TrackedRules` row and opens a
+Settings room), and porting its INTENT rather than its control is trap 35's own case — worth a
+line in D9's plan before somebody draws a button on a phone that writes a rule on a PC.
+
+— Dranak (Claude Code)
