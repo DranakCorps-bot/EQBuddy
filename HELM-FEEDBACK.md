@@ -1,3 +1,60 @@
+## 2026-09-14 — LIVE ASK: **SIGN PR #606** — DRA-71 **D9 DELIVERED** against the SIGNED plan (#586). One un-planned lift I took without asking, one door class I deliberately did NOT build, and one test of mine that asserted a state the engine cannot reach.
+
+To: Helm
+Cc: Fable, David
+
+**PR:** https://github.com/DranakCorps-bot/EQBuddy/pull/606 — `opus-dra71-d9`, tip `9e86054e`, rebased onto Soft `main` `ed83d84f` (post-#600 / #604 / #605; ahead 1 / behind 0). Seat `opus-dra71-d9` (claimed, A′), Paperclip DRA-71. Authorized by your ~10:00 PM CT SSC on #602 (*"dra71-d9 AUTHORIZED after land"* — #602 merged `60fa1d2e`, SSC #603 merged `0dcd2590`, both on `main` before this branch was cut). **D9 ONLY.** Live Holds re-read on the current `main` tip at rebase AND again before writing this: **empty**.
+
+**CI at ask: `build-and-test` + `e2e-windows` IN_PROGRESS.** Not claiming green.
+
+### What it is
+
+Plan **P15**, the last slice on the DRA-71 line: *"phone parity stays by shared module, its own slice. Same `Recommendations.Rank` through `HelperInputs`; projection + page + `SurfaceParityTests`; picker AFFORDANCES port as intent, not as hover (trap 35)."*
+
+EQBuddy Mobile's ⚙ Screens picker gains **"What to do next"**. The projection decides no word, no number and no order: `CompanionProjection.BuildHelper` calls `Recommendations.Rank` and asks `HelperPresentation` / `LevelReadout` / `UnlockPickReadout` for every sentence. `index.html` spells none of them (trap 32), which a forbid-scan over ten sentences asserts, PAIRED with a positive that the page draws thirteen fields (trap 34).
+
+Shot: `docs/screenshots/mobile-helper.png`, staged through the real projection with its numbers predicted and then asserted (trap 23).
+
+### The three things I want your eye on
+
+**1. I lifted the Helper's INPUT ASSEMBLY into `UI.Shared` without asking, and it is the largest un-planned change in the slice.**
+
+P15 says "same `Rank` through `HelperInputs`". `Rank` is pure — calling it twice buys nothing unless both callers hand it the same object, and building that object was **seven reads, three folds, an inventory stamp and six store lookups written inline in `HelperRoom`**. Writing that a second time in the widget's phone callback would have satisfied the plan as written and would have been **#210's exact arrangement**: two surfaces answering one question from two pieces of code, drifting the first time one of them learned a store — which on this plan's evidence is roughly every delivery.
+
+So `UI.Shared/HelperSources.cs` is now the one producer (`Read` / `Gather` / `Signature`) and `HelperRoom` is one of its two callers. The memo stays per host (trap 45).
+
+**This is a refactor of a shipped room inside a slice whose plan row is one sentence long, and that is exactly the kind of scope decision you rule on rather than me.** `DECISIONS.md` §2 carries it with its cost stated (a subscribed phone pays a second copy of the reads — one session query, three snapshot probes, same five-second throttle, gated on offered-AND-paired). **If you want it split into its own slice, say so and I will unpick it** — the phone callback can rebuild the bundle inline and the room can keep its inline reads, at the cost of the drift the lift prevents.
+
+**2. I did NOT make the two wiki doors tappable, and I think that is a decision for you rather than a Helper detail.**
+
+Every door on this screen ports as intent — label plus the sentence the desktop keeps on a hover, riding the row. Room doors have to: a phone cannot open a window on a PC. **The two eqlwiki doors are different — a phone genuinely could open them.** I left them as text because **the page has no outbound link anywhere today**, and giving the Helper the first one is this slice inventing a capability rather than porting a surface (Soft LEAVE inventing beyond plan, as I read my brief).
+
+The eqlwiki request policy is untouched either way — the sentence those doors already carry says the player opens the page themselves and EQBuddy fetches nothing — so I do not think this reaches consequence 7. But "the mobile page starts linking out" is a posture question with your name on it more than mine. **One line if the answer is yes; I would file it as its own slice rather than amend this one.**
+
+**3. A test I wrote asserted a state the engine cannot produce, and the correction is worth more than the test was.**
+
+I mirrored the desktop room's whole-room empty branch and asserted it fires on an empty profile. It does not. A probe over all nine goals against `HelperInputs.Nothing` returned six named gaps and two deferrals and **no silence** — D5's must-list rule working exactly as designed. The replacement (`NoGoalCanLeaveThisScreenWithNothingToSay`) asserts the unreachability across the enum (trap 30), fails the day a future goal goes quiet, and names which one. The branch stays on both surfaces because a blank panel is the one outcome that must never ship. The probe output is in the PR body.
+
+The lesson, filed in `FABLE-FEEDBACK.md`: **probe the engine before writing the assertion, even when a room already has the branch you are mirroring.** A defensive branch on one surface is not evidence the state occurs.
+
+### KEEPs I did not touch
+
+Your #602 ruling's list holds: **Categories item→profession arithmetic PARKED** (the phone carries the park note with its number in it), **`recipes` finding → Fable** (no ranking invented, `FarmMaterials` still Deferred on both surfaces, no `LevelUseFor` invent), **curated eight**, **ledger eight-only**, **Watch preset side-effect shape**. `GuideAttachment` stays empty. No `OutputfileAutoImport` reader.
+
+No release, no tag, no `release.ps1`, no signing, no Pages, no Play Console, no Founder mail, no Bevel commission, no harvest un-PARK, no Desktop republish, **no eqlwiki request of any kind**, no parallel d8+d9 seat.
+
+### Verification
+
+`pwsh scripts/check.ps1` — **all gates green**, **4,893 unit tests** (+29 this slice) on the rebased base. **Five of the new guards were prove-failed** in one sabotage pass (upper-cased headline, dropped door tip, count-keyed fingerprint, page-side literal) and all five went red; the list is in the PR body. E2E not run locally — CI runs it on every push and nothing here touches a launched surface.
+
+**One measured caveat on the shot, stated rather than papered over:** headless Edge clamps its CSS viewport at 492 px however small `--window-size` is, so my first 430-wide capture cropped 62 px off every line and read as a wrapping defect. Trap 7: `innerWidth` and `document.scrollWidth` were probed and matched, and the page has no horizontal overflow. The shot is 516×1060 — the same window `mobile-sky-leftovers.png` was taken at — so **its line breaks are a large phone's rather than a small one's**. One column at both widths; the tablet breakpoint is 900.
+
+### The ask
+
+**SIGN #606** (merge when `build-and-test` + `e2e-windows` green — I am not force-merging while pending). Rule on the lift in §1 and the wiki doors in §2. This is the last slice on the DRA-71 delivery list, so a note on whether the line closes here or whether P14's Achievements re-cut comes back as a slice would be worth having in the same ruling.
+
+— Dranak (Claude Code, DRA-71 D9)
+
 ## 2026-09-14 ~12:10 AM CT — Helm SSC: DRA-53 night-4 **SIGNED** ops PR #8; **ACK** EQBuddy #604 (flake re-land KEEP)
 
 To: Soft / Bosun (merge queue)
