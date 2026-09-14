@@ -4633,7 +4633,7 @@
    },
    "Auspice": {
     "description": "",
-    "era": "",
+    "era": "Classic",
     "level": 45
    },
    "Banish Undead": {
@@ -4703,7 +4703,7 @@
    },
    "Cancelling of Life": {
     "description": "",
-    "era": "",
+    "era": "Classic",
     "level": 8
    },
    "Cascading Darkness": {
@@ -4718,7 +4718,7 @@
    },
    "Cessation of Life": {
     "description": "",
-    "era": "",
+    "era": "Classic",
     "level": 37
    },
    "Chilling Embrace": {
@@ -4773,7 +4773,7 @@
    },
    "Dark Soul": {
     "description": "",
-    "era": "",
+    "era": "Classic",
     "level": 39
    },
    "Dead Man Floating": {
@@ -4848,7 +4848,7 @@
    },
    "Eternities Torment": {
     "description": "",
-    "era": "",
+    "era": "Classic",
     "level": 27
    },
    "Expel Undead": {
@@ -4873,7 +4873,7 @@
    },
    "Focus Death": {
     "description": "",
-    "era": "",
+    "era": "Classic",
     "level": 11
    },
    "Form of Bleached Bone": {
@@ -4948,7 +4948,7 @@
    },
    "Improved Invisibility to Undead": {
     "description": "",
-    "era": "",
+    "era": "Classic",
     "level": 50
    },
    "Incinerate Bones": {
@@ -4963,7 +4963,7 @@
    },
    "Insidious Retrogression": {
     "description": "",
-    "era": "",
+    "era": "Classic",
     "level": 46
    },
    "Intensify Death": {
@@ -5018,7 +5018,7 @@
    },
    "Lifebite": {
     "description": "",
-    "era": "",
+    "era": "Classic",
     "level": 8
    },
    "Lifedraw": {
@@ -5058,7 +5058,7 @@
    },
    "Negation of Life": {
     "description": "",
-    "era": "",
+    "era": "Classic",
     "level": 18
    },
    "Nullify Magic": {
@@ -5163,12 +5163,12 @@
    },
    "Shackle of Bone": {
     "description": "",
-    "era": "",
+    "era": "Classic",
     "level": 17
    },
    "Shackle of Spirit": {
     "description": "",
-    "era": "",
+    "era": "Classic",
     "level": 38
    },
    "Shadow Compact": {
@@ -5268,7 +5268,7 @@
    },
    "Torbas' Poison Blast": {
     "description": "",
-    "era": "",
+    "era": "Classic",
     "level": 49
    },
    "True North": {
@@ -5303,7 +5303,7 @@
    },
    "Ward of Calliav": {
     "description": "",
-    "era": "",
+    "era": "Classic",
     "level": 49
    },
    "Wave of Enfeeblement": {

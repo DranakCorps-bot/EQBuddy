@@ -35,3 +35,5 @@
 <li>[[Shaman#Spell Vendors|Shaman Spell Vendors]]</li>
 </ul>
 }}
+
+At level 10, Puma proc's for 200 damage

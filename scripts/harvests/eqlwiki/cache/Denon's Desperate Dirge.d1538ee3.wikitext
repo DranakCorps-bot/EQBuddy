@@ -14,7 +14,7 @@
 
 {{SpellSlotRowSmart | 1 | Decrease Hitpoints by 315 | simple = {{#ifeq:{{{Table|0}}}|0|0|1}} }}
 {{SpellSlotRowSmart | 2 | Requires 800 Mana | simple = {{#ifeq:{{{Table|0}}}|0|0|1}} | HideFromMainPage = 1 }}
-{{SpellSlotRowSmart | Enhanced by instrument? | '''Yes''' | simple = {{#ifeq:{{{Table|0}}}|0|0|1}} }}
+{{SpellSlotRowSmart | Enhanced by instrument? | '''No''' | simple = {{#ifeq:{{{Table|0}}}|0|0|1}} }}
 
 | skill = [[Skill Singing | Singing]]
 

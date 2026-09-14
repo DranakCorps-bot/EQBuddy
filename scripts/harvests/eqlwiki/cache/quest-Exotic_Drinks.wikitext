@@ -50,7 +50,7 @@ You need amiable or higher faction with [[Clurg_(NPC)|Clurg]]. The most common w
 ** If you don't mind large Qeynos faction hits, you can kill [[A Koalindl]] in [[Qeynos|North Qeynos]].
 
 * '''Get [[Barkeep Compendium]]''' 
-** Go to [[Freeport]]. Turn into a Human and/or cast faction spell on [[Gregor Nasin]] (at East Freeport docks). Give [[Gregor Nasin]] the [[Kiola Nut]], [[Honey Jum]], [[Koalindl Fish]], and [[Erud's Tonic]] all at the same time and receive the [[Barkeep Compendium]]
+** Go to [[East Freeport]]. Turn into a Human and/or cast faction spell on [[Gregor Nasin]] (at East Freeport docks). Give [[Gregor Nasin]] the [[Kiola Nut]], [[Honey Jum]], [[Koalindl Fish]], and [[Erud's Tonic]] all at the same time and receive the [[Barkeep Compendium]]
 
 * '''Get [[Stein of Moggok]]'''
 ** Go to [[Oggok]]. Turn into a Dark Elf or Ogre and/or cast faction spell on [[Clurg]] (located around area 17 of the [[Oggok]] map). Give him the [[Barkeep Compendium]] to receive the [[Stein of Moggok]]

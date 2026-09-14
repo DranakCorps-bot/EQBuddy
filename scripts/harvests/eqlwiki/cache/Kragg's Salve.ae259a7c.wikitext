@@ -36,3 +36,5 @@
 <li>[[Shaman#Spell Vendors|Shaman Spell Vendors]]</li>
 </ul>
 }}
+
+At level X (10) heals me for 1011, scaled up with tier/level

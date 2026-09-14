@@ -1,5 +1,5 @@
 {{Classic Era}}
-{{Spellpage|
+{{Spellpagesmart|
 
 | spellname = Endure Cold
 | spellicon = 57

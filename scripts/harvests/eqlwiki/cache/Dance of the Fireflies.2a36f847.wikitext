@@ -1,4 +1,4 @@
-<noinclude>{{Classic Era}}</noinclude>
+{{Classic Era}}
 {{Spellpagesmart|
 
 | spellname = Dance of the Fireflies

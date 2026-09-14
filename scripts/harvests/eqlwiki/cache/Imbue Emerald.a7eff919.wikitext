@@ -1,8 +1,8 @@
-<noinclude>{{Classic Era}}</noinclude>
+{{Classic Era}}
 {{Spellpagesmart|
 
 | spellname = Imbue Emerald
-| spellicon = U
+| spellicon = 100
 | description = Focuses the power of Tunare into an emerald. Consumes an emerald when cast.
 
 | Table = {{{Table|0}}}
@@ -38,10 +38,8 @@
 
 | where_to_obtain = 
 
-{{SpellWhereTable|
-{{SpellWhereRowB | [[Felwithe]] | [[Allia Moondancer]] | Cleric Guild | (2,-444) }}
-}}
-| TableLocations = Felwithe
-| TableEra = {{{TableEra|Classic}}}
-
+<ul>
+<li>[[Cleric#Spell Vendors|Cleric Spell Vendors]]</li>
+<li>[[Druid#Spell Vendors|Druid Spell Vendors]]</li>
+</ul>
 }}

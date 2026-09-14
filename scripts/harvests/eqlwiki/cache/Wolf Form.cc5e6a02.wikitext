@@ -1,4 +1,5 @@
-<noinclude>{{Classic Era}}</noinclude>{{Spellpagesmart|
+{{Classic Era}}
+{{Spellpagesmart|
 
 | spellname = Wolf Form
 | spellicon = 81

@@ -168,11 +168,13 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
 |(???, -???)
 |-
 |'''[[South Qeynos]]'''
-|???
+|[[Feese Bontex]]
 |Paladin Guild
-|(???, -???)
+|(-256, -511)
 |}
 <div id="spells_level_1">
+
+
 ==Level 1==
 <table class="eoTable2 " style="width:100%;">
     <tr>

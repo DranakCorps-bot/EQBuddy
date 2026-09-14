@@ -1,3 +1,4 @@
+{{Classic Era}}
 {{Spellpagesmart|
 
 | spellname = Thorncoat
@@ -34,13 +35,7 @@
 
 | where_to_obtain = 
 
-{{SpellWhereTable|
-{{SpellWhereRowB | [[Firiona Vie]] | [[Raciel Sanherb]] | Outpost | (-3396,3310) }}
-{{SpellWhereRow  | [[Lavastorm Mountains]] | [[Tisiana]] | Druid Ring | (982,1369) }}
-{{SpellWhereRowB | [[The Wakening Land]] | [[Phillip Aghllsews]] | � | (519,-1028) }}
-}}
-
-| TableLocations = Lavastorm<br/>Wakening
-| TableEra = Classic
-
+<ul>
+<li>[[Druid#Spell Vendors|Druid Spell Vendors]]</li>
+</ul>
 }}

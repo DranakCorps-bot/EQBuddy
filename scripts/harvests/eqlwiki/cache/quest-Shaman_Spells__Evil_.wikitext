@@ -1,3 +1,4 @@
+{{Kunark Era}}
 [[File:npc_bukuku_wolffeetz.png|frame|Bukuku Wolffeetz]]
 {| class="questTopTable"
 ! ''' Start Zone: '''

@@ -11,7 +11,7 @@
 | 2
 |-
 ! ''' Classes: '''
-| [[Cleric]], [[Druid]], [[Enchanter]], [[Magician]], [[Necromancer]], [[Paladin]], [[Ranger]], [[Shadow Knight]], [[Shaman]], [[Wizard]]
+| [[Cleric]]
 |-
 ! ''' Related Zones: '''
 | [[Butcherblock Mountains]]
@@ -68,12 +68,3 @@ You receive 5 silver pieces.
 [[Category:Quests]]
 [[Category:North Kaladim]]
 [[Category:Cleric Quests]]
-[[Category:Druid Quests]]
-[[Category:Enchanter Quests]]
-[[Category:Magician Quests]]
-[[Category:Necromancer Quests]]
-[[Category:Paladin Quests]]
-[[Category:Ranger Quests]]
-[[Category:Shadow Knight Quests]]
-[[Category:Shaman Quests]]
-[[Category:Wizard Quests]]

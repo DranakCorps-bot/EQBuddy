@@ -1,4 +1,4 @@
-[[File:npc_guard_weleth.png|frame|Guard Weleth]]
+[[File:npc_guard_weleth.png|thumb|Guard Weleth]]
 {| class="questTopTable"
 ! ''' Start Zone: '''
 | [[Qeynos|North Qeynos]]

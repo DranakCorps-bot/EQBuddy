@@ -1,4 +1,4 @@
-[[File:npc_theron_rolius.png|frame|Theron Rolius]]
+[[File:npc_theron_rolius.png|thumb|Theron Rolius]]
 {| class="questTopTable"
 ! ''' Start Zone: '''
 | [[Freeport|North Freeport]]

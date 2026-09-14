@@ -10,8 +10,8 @@
 ! ''' Types of Monsters: '''
 |Greater Kobolds, Greater Kobold Shamans, Solusek Kobolds, Solusek Kobold Shamans, Sonic Bats, Lava Beetles, Lava Duct Crawlers, Lava Guardians, [[Imp Protector]], Fire Giants, Fire Giant Magi, [[Fire Giant Warrior]], Fire Giant Wizards
 |-
-! ''' Notable NPCs: '''
-|[[death beetle]], [[Efreeti Lord Djarn]], [[guano harvester]], [[kobold champion]], [[kobold noble]], [[kobold priest]], [[Midghh the Dark]], [[noxious spider]], [[Solusek kobold king]], [[stone spider]], [[Targin the Rock]],  [[Zordak Ragefire]]
+! ''' Rare NPCs: '''
+|[[death beetle]], [[Efreeti Lord Djarn]], [[guano harvester]], [[kobold champion]], [[kobold noble]], [[kobold priest]], [[noxious spider]], [[Solusek kobold king]], [[stone spider]], [[Targin the Rock]]
 |-
 ! ''' Unique Items: '''
 |{{:Black Chitin Leggings}}, {{:Brown Chitin Protector}}, {{:Carnal Pauldrons}}, {{:Cloak of Shadows}}, {{:Code of Zan Fi}}, {{:Crystalline Orb}}, {{:Death Scarab Gland}}, {{:Djarn's Amethyst Ring}}, {{:Fleshripper}}, {{:Golden Chitin Bracer}}, {{:Golden Efreeti Boots}}, {{:Green Silken Drape}}, {{:Large Soiled Bag}}, {{:Mithril Breastplate}}, {{:Painbringer}}, {{:Petrified Erudite Heart Amulet}}, {{:Runed Mithril Bracer}}, {{:Staff of Writhing}}
@@ -23,7 +23,7 @@
 |'''soldungb'''
 |-
 ! ''' [[Zone Spawn Timer]]: '''
-|11:00
+|8:50
 |-
 ! '''Succor/Evacuate:'''
 | -424, -263 (Zone line to Lavastorm)
@@ -111,7 +111,7 @@ There are multiple zones from Solusek's Eye (Sol A) into Nagafen's Lair. These a
 |48-55 (Needs verified)
 |-
 ! ''' Types of Monsters: '''
-[[Fire Giant Warrior]], [[Fire Giant Wizard]]
+|[[Fire Giant Warrior]], [[Fire Giant Wizard]]
 |-
 ! ''' Raid Boss NPCs: '''
 |[[King Tranix]], '''[[Lord Nagafen]]''', [[Magi Rokyl]], [[Warlord Skarlon]]

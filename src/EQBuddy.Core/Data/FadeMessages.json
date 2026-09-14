@@ -4264,6 +4264,16 @@
     "note": "msg_wears_off on the spell's eqlwiki page (fades-harvest.py)."
   },
   {
+    "message": "Your small murderbee departs.",
+    "spells": [
+      "Summon Familiar: Murderbee"
+    ],
+    "label": "Summon Familiar: Murderbee",
+    "category": "Buff",
+    "confidence": "wiki",
+    "note": "msg_wears_off on the spell's eqlwiki page (fades-harvest.py)."
+  },
+  {
     "message": "Your speed returns.",
     "spells": [
       "Forlorn Deeds",

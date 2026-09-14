@@ -1,5 +1,5 @@
 {{Temple Era}}
-[[File:npc_gardern.png|frame|Gardern]]
+[[File:npc_gardern.png|thumb|Gardern]]
 {| class="questTopTable"
 ! ''' Start Zone: '''
 | [[Temple of Solusek Ro]]
@@ -61,10 +61,6 @@ The most difficult part of this quest is getting the Rod of Bone in Lake Rathete
 Note: At lvl 29 you can use Bonds of Force (aoe snare) on one of the pets, and then run to zone. At zone root the stone skeleton and zone dance, then root the pet again and quickly burst down stone skeleton. Use leatherskin.
 
 Note: The above method did not work for me. However, I found a method that does, and I was able to solo them at 31 with a Stein of Moggok as my only int gear. Bind yourself at the tower off to the side. Port to WC and grab a sow from a druid, and stock up on bloodstones for Leatherskin, and bat wings for levitate. You will need these buffs up at all times. You can tip a cleric for buffs if you want another safety net. As always, clarity will speed up the process here. Root the stone skeleton you want to kill and then high tail it for Rathe Mountains. After you zone in, gate. Run in and fight the skeleton. Fight him in melee range so he casts less. If you get two resists, you won't have enough mana to kill him. After you kill him, it takes about 10-20 seconds for his elemental earth pet to get to you. You must root him and camp or gate out to west commons. It takes about a minute for the other skeleton and pet to get back because they walk. Rinse and repeat until you get your staff!
-
-'''Multiquestable'''
-
-The quest may be [[multiquest]]able? The helper should be able to hand in all the no-drop items, then the recipient must hand in the staff.
 
 [[Category:Quests]]
 [[Category:Temple of Solusek Ro]]

@@ -20,11 +20,11 @@ You must be at least level 5 to zone into Lower Guk.
 ! ''' Types of Monsters: '''
 | Frogloks of all types, including: Shin, Tsu, Vis, Tal, Wan, Urd, Zol, Yun, Dar, Kor, Bok, Jin, and Guk in different varieties, including Knights, Shamans, and Wizards, as well as live and Ghoul forms; Basilisks, Bloodthirsty Ghouls, Deadly Black Widows, Granite Gargoyles, Greater Ice Bones, Greater Minotaurs, Vampire Bats
 |-
-! ''' Notable NPCs: '''
-| [[a basalt gargoyle]], [[Raster of Guk]], [[a frenzied ghoul]], [[a froglok crusader]], [[a froglok herbalist]], [[the froglok king]], [[a froglok noble]], [[a froglok yun priest]], [[a froglok tactician]], [[the ghoul arch magi]], [[a ghoul assassin]], [[a ghoul cavalier]], [[a ghoul executioner]], [[the ghoul lord]], [[a ghoul ritualist]], [[a ghoul sage]], [[a ghoul savant]], [[a ghoul scribe]], [[a ghoul sentinel]], [[a ghoul supplier]], [[a huge water elemental]], [[a minotaur elder]], [[a minotaur patriarch]], [[a reanimated hand (Lower Guk)]], [[Slaythe the Slayer]]
+! ''' Rare NPCs: '''
+| [[a frenzied ghoul]], [[a froglok crusader]], [[a froglok herbalist]], [[the froglok king]], [[a froglok noble]], [[a froglok yun priest]], [[a froglok tactician]], [[the ghoul arch magi]], [[a ghoul assassin]], [[a ghoul cavalier]], [[a ghoul executioner]], [[the ghoul lord]], [[a ghoul ritualist]], [[a ghoul sage]], [[a ghoul savant]], [[a ghoul scribe]], [[a ghoul sentinel]], [[a ghoul supplier]], [[a huge water elemental]], [[a minotaur elder]], [[a minotaur patriarch]], [[a reanimated hand (Lower Guk)]], [[Raster of Guk]], [[Slaythe the Slayer]]
 |-
 ! ''' Unique Items: '''
-| [[Woven Armor]], {{:Adamantite Band}}, {{:Adamantite Epaulets}}, {{:Amethyst Bracelet}}, {{:Azure Sleeves}}, {{:Bag of Sewn Evil-Eye}}, {{:Basalt Carapace}}, {{:Black Tome with Silver Runes}}, {{:Braided Cinch Cord}}, {{:Brigandine Tunic}}, {{:Broken Bow Part B}}, {{:Carved Ivory Mask}}, {{:Chrysoberyl Talisman}}, {{:Crown of the Froglok Kings}}, {{:Dark Mail Gauntlets}}, {{:Dark Reaver}}, {{:Ebony Bladed Sword}}, {{:Embroidered Black Cape}}, {{:Embroidered Black Sleeves}}, {{:Enameled Black Chestplate}}, {{:Enameled Black Mace}}, {{:An Executioners Axe}}, {{:Executioners Hood}}, {{:Flowing Black Silk Sash}}, {{:Gilded Cloth}}, {{:Gorgon Feather Quill}}, {{:The Idol}}, {{:Light Burlap Sack}}, {{:Mask of Deception}}, {{:Mithril Frog Totem}}, {{:Mithril-Runed Tunic}}, {{:Mithril Two-Handed Sword}}, {{:Moonstone Ring}}, {{:Platinum Tiara}}, {{:Runed Cowl}}, {{:Runed Falchion}}, {{:Scepter of Tears}}, {{:Serpentine Bracer}}, {{:Serrated Bone Dirk}}, {{:Shimmering White Shroud}}, {{:Shin Gauntlets}}, {{:Shin Greaves}}, {{:Shining Metallic Robes}}, {{:Short Sword of the Ykesha}}, {{:Silver-Plated Leggings}}, {{:Silversilk Leggings}}, {{:Skull-shaped Barbute}}, {{:Thick Banded Belt}}, {{:White Gold Necklace}}
+| [[Woven Armor]], {{:Adamantite Band}}, {{:Adamantite Epaulets}}, {{:Amethyst Bracelet}}, {{:Azure Sleeves}}, {{:Bag of Sewn Evil-Eye}}, {{:Basalt Carapace}}, {{:Black Tome with Silver Runes}}, {{:Braided Cinch Cord}}, {{:Brigandine Tunic}}, {{:Broken Bow Part B}}, {{:Carved Ivory Mask}}, {{:Chrysoberyl Talisman}}, {{:Crown of the Froglok Kings}}, {{:Dark Mail Gauntlets}}, {{:Dark Reaver}}, {{:Ebony Bladed Sword}}, {{:Embroidered Black Cape}}, {{:Embroidered Black Sleeves}}, {{:Enameled Black Chestplate}}, {{:Enameled Black Mace}}, {{:Executioner's Axe}}, {{:Executioners Hood}}, {{:Flowing Black Silk Sash}}, {{:Gilded Cloth}}, {{:Gorgon Feather Quill}}, {{:The Idol}}, {{:Light Burlap Sack}}, {{:Mask of Deception}}, {{:Mithril Frog Totem}}, {{:Mithril-Runed Tunic}}, {{:Mithril Two-Handed Sword}}, {{:Moonstone Ring}}, {{:Platinum Tiara}}, {{:Runed Cowl}}, {{:Runed Falchion}}, {{:Scepter of Tears}}, {{:Serpentine Bracer}}, {{:Serrated Bone Dirk}}, {{:Shimmering White Shroud}}, {{:Shin Gauntlets}}, {{:Shin Greaves}}, {{:Shining Metallic Robes}}, {{:Short Sword of the Ykesha}}, {{:Silver-Plated Leggings}}, {{:Silversilk Leggings}}, {{:Skull-shaped Barbute}}, {{:Thick Banded Belt}}, {{:White Gold Necklace}}
 |-
 ! ''' Adjacent Zones: '''
 | [[Upper Guk]]
@@ -33,7 +33,7 @@ You must be at least level 5 to zone into Lower Guk.
 | gukbottom
 |-
 ! ''' [[Zone Spawn Timer]]: '''
-| 11:00
+| 9:27
 |-
 ! '''Succor/Evacuate:'''
 | 1197, -217 (Zone line to Upper Guk (between Bedroom and Waterfall)
@@ -61,17 +61,17 @@ You must be at least level 5 to zone into Lower Guk.
 </li><li> 8. Ledge with [[an evil eye (Lower Guk)|an evil eye]] who drops {{:Bag of Sewn Evil-Eye}} (and {{:Manastone}} before its removal)
 </li><li> 9. "Noble Room" with [[a froglok noble]] who drops {{:White Gold Necklace}} (Rare) and {{:Gilded Cloth}} (Common)
 </li><li> 10. "Live Keep" with three floors
-<ul> middle floor with [[A Froglok Yun Priest]] who drops {{:Silver-Plated Leggings}} (Common) and {{:Amethyst Bracelet}} (Rare)
-</ul><ul> bottom floor with [[a froglok crusader]] who drops {{:Runed Falchion}} (Common) and {{:Mithril-Runed Tunic}} (Rare)
-</ul><li> 11. "Huge Elemental Room" with [[a huge water elemental]]
+<ul><li> middle floor with [[A Froglok Yun Priest]] who drops {{:Silver-Plated Leggings}} (Common) and {{:Amethyst Bracelet}} (Rare)
+</ul><ul></li><li> bottom floor with [[a froglok crusader]] who drops {{:Runed Falchion}} (Common) and {{:Mithril-Runed Tunic}} (Rare)
+</li></ul><li> 11. "Huge Elemental Room" with [[a huge water elemental]]
 </li><li> 12. "King Prep Room"
 </li><li> 13. "Herbalist Room" with [[a froglok herbalist]] who drops {{:Mithril Frog Totem}} (Common) and {{:Shimmering White Shroud}} (Rare)
 </li><li> 14. "King Room"
-<ul> [[the froglok king]] 
+<ul><li> [[the froglok king]] 
 who drops {{:Crown of the Froglok Kings}} (Common) and {{:Mithril Two-Handed Sword}} (Rare)
-</ul><ul>  [[a froglok tactician]] 
+</ul><ul></li><li>   [[a froglok tactician]] 
 who drops {{:Black Tome with Silver Runes}} (Common) and {{:Platinum Tiara}} (Rare).
-</li><li> NOTE: The zone here is a one-way exit to Innothule Swamp, right outside the entrance to Upper Guk.
+</li><li> <strong>NOTE:</strong> The zone here is a one-way exit to Innothule Swamp, right outside the entrance to Upper Guk.
 
 |}
 
@@ -102,7 +102,7 @@ who drops {{:Black Tome with Silver Runes}} (Common) and {{:Platinum Tiara}} (Ra
 </li><li> 15. "Savant Room" with [[a ghoul savant]] who drops {{:Enameled Black Mace}} (Common) and {{:Enameled Black Chestplate}} (Rare)
 </li><li> 16. "Cavalier Room" with [[a ghoul cavalier]] who drops {{:Adamantite Epaulets}} (Common) and {{:Dark Reaver}} (Rare)
 </li><li> 17. "Sage Room" with [[a ghoul sage]] who drops {{:Braided Cinch Cord}} (Common) and {{:Runed Cowl}} (Rare) and [[a ghoul scribe]] who drops {{:Parchment of Flayed Skin}} (Common) and {{:Gorgon Feather Quill}} (Rare)
-</li><li> 18. "Executioner Room" with [[a ghoul executioner]] who drops {{:Executioners Hood}} (Common) and {{:An Executioners Axe}} (Rare)
+</li><li> 18. "Executioner Room" with [[a ghoul executioner]] who drops {{:Executioners Hood}} (Common) and {{:Executioner's Axe}} (Rare)
 
 |}
 

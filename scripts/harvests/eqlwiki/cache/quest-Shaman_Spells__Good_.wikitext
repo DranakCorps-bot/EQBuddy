@@ -1,3 +1,4 @@
+{{Kunark Era}}
 [[File:npc_alex_mcdarnin.png|frame|Alex McDarnin]]
 {| class="questTopTable"
 ! ''' Start Zone: '''

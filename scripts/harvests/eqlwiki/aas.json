@@ -24,7 +24,7 @@
       "cost_per_rank_raw": "3/6/9",
       "level_requirement": 1,
       "requirements_raw": "Requirements: Level 1.",
-      "effect_text": "This passive ability reduces the chance of failing Alchemy recipes by 10/25/?%. Requirements: Level 1."
+      "effect_text": "This passive ability reduces the chance of failing Alchemy recipes by 10/25/50%. Requirements: Level 1."
     },
     {
       "name": "Baking Mastery",
@@ -35,7 +35,7 @@
       "cost_per_rank_raw": "2/4/6",
       "level_requirement": 1,
       "requirements_raw": "Requirements: Level 1.",
-      "effect_text": "This passive ability reduces the chance of failing Baking recipes by 10/25/?%. Requirements: Level 1."
+      "effect_text": "This passive ability reduces the chance of failing Baking recipes by 10/25/50%. Requirements: Level 1."
     },
     {
       "name": "Blacksmithing Mastery",
@@ -46,7 +46,7 @@
       "cost_per_rank_raw": "2/4/6",
       "level_requirement": 1,
       "requirements_raw": "Requirements: Level 1.",
-      "effect_text": "This passive ability reduces the chance of failing Blacksmithing recipes by 10/25/?%. Requirements: Level 1."
+      "effect_text": "This passive ability reduces the chance of failing Blacksmithing recipes by 10/25/50%. Requirements: Level 1."
     },
     {
       "name": "Brewing Mastery",
@@ -57,7 +57,7 @@
       "cost_per_rank_raw": "2/4/6",
       "level_requirement": 1,
       "requirements_raw": "Requirements: Level 1.",
-      "effect_text": "This passive ability reduces the chance of failing Brewing recipes by 10/?/?%. Requirements: Level 1."
+      "effect_text": "This passive ability reduces the chance of failing Brewing recipes by 10/25/50%. Requirements: Level 1."
     },
     {
       "name": "Circular Breathing",
@@ -79,7 +79,7 @@
       "cost_per_rank_raw": "2/4/6",
       "level_requirement": 1,
       "requirements_raw": "Requirements: Level 1.",
-      "effect_text": "This passive ability increases your melee avoidance by 2%/5%/10%. Melee avoidance is the component of armor class that allows you to avoid incoming attacks and is derived from agility, item avoidance, and your defense skill. Requirements: Level 1."
+      "effect_text": "This passive ability increases your melee avoidance by 2/5/10%. Melee avoidance is the component of armor class that allows you to avoid incoming attacks and is derived from agility, item avoidance, and your defense skill. Requirements: Level 1."
     },
     {
       "name": "Combat Fury",
@@ -131,7 +131,7 @@
       "class": null,
       "max_rank": 6,
       "ranks_raw": "6",
-      "cost_per_rank_raw": "1/1/1/3/?/?",
+      "cost_per_rank_raw": "1/1/1/3/6/9",
       "level_requirement": 1,
       "requirements_raw": "Requirements: Level 1.",
       "effect_text": "This passive ability increases the maximum health you can bind wound to 80/90/100/100/100/100% and increases the amount of healing provided by a single bandage by 0/0/0/10/25/50%. Requirements: Level 1."
@@ -145,7 +145,7 @@
       "cost_per_rank_raw": "2/4/6",
       "level_requirement": 1,
       "requirements_raw": "Requirements: Level 1.",
-      "effect_text": "This passive ability reduces the chance of failing Fletching recipes by 10/25/?%. Requirements: Level 1."
+      "effect_text": "This passive ability reduces the chance of failing Fletching recipes by 10/25/50%. Requirements: Level 1."
     },
     {
       "name": "Foraging",
@@ -299,7 +299,7 @@
       "cost_per_rank_raw": "2/4/6",
       "level_requirement": 1,
       "requirements_raw": "Requirements: Level 1.",
-      "effect_text": "This passive ability reduces the chance of failing Pottery recipes by 10/25/?%. Requirements: Level 1."
+      "effect_text": "This passive ability reduces the chance of failing Pottery recipes by 10/25/50%. Requirements: Level 1."
     },
     {
       "name": "Quick Buff",
@@ -332,7 +332,7 @@
       "cost_per_rank_raw": "2/2/2/2/2",
       "level_requirement": 1,
       "requirements_raw": "Requirements: Level 1.",
-      "effect_text": "This passive ability reduces how far incoming melee attacks push you backward by 10%. Requirements: Level 1."
+      "effect_text": "This passive ability reduces how far incoming melee attacks push you backward by 10/20/30/40/50%. Requirements: Level 1."
     },
     {
       "name": "Tailoring Mastery",
@@ -343,7 +343,7 @@
       "cost_per_rank_raw": "2/4/6",
       "level_requirement": 1,
       "requirements_raw": "Requirements: Level 1.",
-      "effect_text": "This passive ability reduces the chance of failing Tailoring recipes by 10/25/?%. Requirements: Level 1."
+      "effect_text": "This passive ability reduces the chance of failing Tailoring recipes by 10/25/50%. Requirements: Level 1."
     },
     {
       "name": "Acrobatics",
@@ -376,7 +376,7 @@
       "cost_per_rank_raw": "3/6/9",
       "level_requirement": 46,
       "requirements_raw": "Requirements: Level 46.",
-      "effect_text": "This passive ability increases your flurry chance (up to two extra attacks after a primary slot triple attack) by 7/11/?%. Requirements: Level 46."
+      "effect_text": "This passive ability increases your flurry chance (up to two extra attacks after a primary slot triple attack) by 7/11/15%. Requirements: Level 46."
     },
     {
       "name": "Companion's Discipline",
@@ -560,7 +560,7 @@
       "class": null,
       "max_rank": 4,
       "ranks_raw": "4",
-      "cost_per_rank_raw": "5",
+      "cost_per_rank_raw": "5/5/5/5",
       "level_requirement": 20,
       "requirements_raw": "Requirements: Level 20.",
       "effect_text": "This passive ability allows you to you gain a second specialization. Specialized schools of magic benefit from a from a reduction in mana cost and fizzle chance. After acquiring this ability, the next specialization to go over its current cap becomes your second specialization. Requirements: Level 20."
@@ -701,12 +701,12 @@
       "name": "Spell Casting Subtlety",
       "category": "Archetype",
       "class": null,
-      "max_rank": 6,
-      "ranks_raw": "6",
-      "cost_per_rank_raw": "2/0/4/0/6/0",
+      "max_rank": 3,
+      "ranks_raw": "3",
+      "cost_per_rank_raw": "2/4/6",
       "level_requirement": 1,
       "requirements_raw": "Requirements: Level 1.",
-      "effect_text": "Ability Activation ID: 25 - Refresh Time: 0:00:01 - Ability Timer(s): 0. This ability is DISABLED. Purchase the 0 cost rank to enable its effects. When enabled, this passive ability reduces the amount of hate generated by your attacks and spells by 5/10/20%. Requirements: Level 1."
+      "effect_text": "Ability Activation ID: 25 - Refresh Time: 0:00:01 - Ability Timer(s): 0. This toggleable ability reduces the amount of hate generated by your attacks and spells by 5/10/20%. Requirements: Level 1."
     },
     {
       "name": "Thief's Intuition",
@@ -714,10 +714,10 @@
       "class": null,
       "max_rank": 4,
       "ranks_raw": "4",
-      "cost_per_rank_raw": "3/?/?/?",
+      "cost_per_rank_raw": "3/6/9/15",
       "level_requirement": 1,
       "requirements_raw": "Requirements: Level 1.",
-      "effect_text": "This passive ability reduces the reuse time of your Sense Traps and Disarm Traps skills by 1/?/?/? seconds. Requirements: Level 1."
+      "effect_text": "This passive ability reduces the reuse time of your Sense Traps and Disarm Traps skills by 1/3/5/5 seconds.<br><br>Final rank: grants a chance to innately sense traps when near them. This passive chance is only half as effective as your active Sense Trap skill. Requirements: Level 1."
     },
     {
       "name": "Instrument Mastery",
@@ -745,12 +745,12 @@
       "name": "Reaching Notes",
       "category": "Class",
       "class": "Bard",
-      "max_rank": 6,
-      "ranks_raw": "6",
-      "cost_per_rank_raw": "2/4/6/?/?/?",
+      "max_rank": 3,
+      "ranks_raw": "3",
+      "cost_per_rank_raw": "2/4/6",
       "level_requirement": 1,
       "requirements_raw": "Requirements: Level 1.",
-      "effect_text": "Ability Activation ID: 227 - Refresh Time: 0:00:01 - Ability Timer(s): 0. This ability is ENABLED. Expend the current rank to disable its effects. When enabled, this passive ability extends the radius of your beneficial area songs by 10%. Requirements: Level 1."
+      "effect_text": "Ability Activation ID: 227 - Refresh Time: 0:00:01 - Ability Timer(s): 0. This toggleable ability extends the radius of your beneficial area songs by 10/15/25%. Requirements: Level 1."
     },
     {
       "name": "Scribble Notes",
@@ -778,12 +778,12 @@
       "name": "Symphonic Aura",
       "category": "Class",
       "class": "Bard",
-      "max_rank": 10,
-      "ranks_raw": "10",
-      "cost_per_rank_raw": "0/0/3/0/3/0/3/0/3/0",
+      "max_rank": 5,
+      "ranks_raw": "5",
+      "cost_per_rank_raw": "0/3/3/3/3",
       "level_requirement": 1,
-      "requirements_raw": "Requirements: Level 1. Rank 1 is auto-granted. Each additional auto-pulsing song takes two ranks: the odd rank costs 3 points and grants the song, and the following even rank re-enables the ability at no cost. All 5 songs cost 12 points total. (The tooltip's ENABLED/DISABLED line reflects the state of your current rank, not a property of the ability.)",
-      "effect_text": "Ability Activation ID: 152 - Refresh Time: 0:00:01 - Ability Timer(s): 0. Expendable Charges: 1. Expend the current rank to disable this ability's effects. When enabled, this passive ability allows one/two/three/four/five Bard songs to auto pulse. In order for a song to be eligible, it must have no mana cost, have no cooldown, and be a non-targeted area of effect song. Any song that meets these criteria cannot be played manually while the ability is turned on. This ability chooses the first eligible song, starting from your final spell gem, and working backwards. Total 5 songs at max rank. Requirements: Level 1. Rank 1 is auto-granted. Each additional auto-pulsing song takes two ranks: the odd rank costs 3 points and grants the song, and the following even rank re-enables the ability at no cost. All 5 songs cost 12 points total. (The tooltip's ENABLED/DISABLED line reflects the state of your current rank, not a property of the ability.)"
+      "requirements_raw": "Requirements: Level 1. Rank 1 is auto-granted.",
+      "effect_text": "Ability Activation ID: 152 - Refresh Time: 0:00:01 - Ability Timer(s): 0. This toggleable ability allows one/two/three/four/five Bard songs to auto pulse. In order for a song to be eligible, it must have no mana cost, have no cooldown, and be a non-targeted area of effect song. Any song that meets these criteria cannot be played manually while the ability is turned on. This ability chooses the first eligible song, starting from your final spell gem, and working backwards. Requirements: Level 1. Rank 1 is auto-granted."
     },
     {
       "name": "Unbound Versatility",
@@ -959,7 +959,7 @@
       "cost_per_rank_raw": "0",
       "level_requirement": 12,
       "requirements_raw": "Requirements: Level 12/30/50.",
-      "effect_text": "This passive ability grants your healing spells a 2/?/?% chance to score an exceptional heal. An exceptional heal doubles the healing value of the spell. Requirements: Level 12/30/50."
+      "effect_text": "This passive ability grants your healing spells a 2/4/?% chance to score an exceptional heal. An exceptional heal doubles the healing value of the spell. Requirements: Level 12/30/50."
     },
     {
       "name": "Enhanced Root",
@@ -978,7 +978,7 @@
       "class": "Druid",
       "max_rank": 3,
       "ranks_raw": "3",
-      "cost_per_rank_raw": "3/?/?",
+      "cost_per_rank_raw": "3/6/9",
       "level_requirement": 1,
       "requirements_raw": "Requirements: Level 1.",
       "effect_text": "This passive ability reduces the cast time of your evacuation and succor spells and abilities by 10%. Requirements: Level 1."
@@ -1033,10 +1033,10 @@
       "class": "Magician",
       "max_rank": 5,
       "ranks_raw": "5",
-      "cost_per_rank_raw": "3/?/?/?/?",
+      "cost_per_rank_raw": "3/5/6/6/6",
       "level_requirement": 1,
       "requirements_raw": "Requirements: Level 1.",
-      "effect_text": "This passive ability prevents components used in the summoning of pets from being expended. Requirements: Level 1."
+      "effect_text": "Rank 1: This passive ability prevents components used in the summoning of pets from being expended.<br>Rank 2: Reduces cast time of your summon item, summon pet and summon target spells by 10% and of your summon swarm pet spells and abilities by 2%.<br>Rank 3: Reduces cast time of your summon item, summon pet and summon target spells by 25% and of your summon swarm pet spells and abilities by 5%.<br>Rank 4: Reduces cast time of your summon item, summon pet and summon target spells by 50% and of your summon swarm pet spells and abilities by 10%.<br>Rank 5: Allows reclaim energy to return 95% of the base mana cost of your current pet<br><br>Requirements: Level 1."
     },
     {
       "name": "Elemental Form",
@@ -1057,8 +1057,8 @@
       "ranks_raw": "3",
       "cost_per_rank_raw": "3/?/?",
       "level_requirement": 45,
-      "requirements_raw": "Requirements: Level 45.",
-      "effect_text": "Ability Activation ID: 559 - Refresh Time: 0:05:00 - Ability Timer(s): 5. Turn Summoned I, when activated, deals 400 damage to your elemental target and has a 5% chance to trigger Infusion of Elemental Light I which critically deals 32000 damage. Requirements: Level 45."
+      "requirements_raw": "Requirements: Level 45. Rank 2 requires level 59 so not reachable for now.",
+      "effect_text": "Ability Activation ID: 559 - Refresh Time: 0:05:00 - Ability Timer(s): 5. Turn Summoned I, when activated, deals 400 damage to your elemental target and has a 5% chance to trigger Infusion of Elemental Light I which critically deals 32000 damage. Requirements: Level 45. Rank 2 requires level 59 so not reachable for now."
     },
     {
       "name": "Unbound Companion",
@@ -1248,15 +1248,15 @@
       "effect_text": "Gives a passive 2/4/6% increase to your direct healing spells. Requirements: Level 12/30/50."
     },
     {
-      "name": "Valiant Steed",
+      "name": "<s>Valiant Steed</s>",
       "category": "Class",
       "class": "Paladin",
       "max_rank": 1,
       "ranks_raw": "1",
       "cost_per_rank_raw": "9",
       "level_requirement": 50,
-      "requirements_raw": "Requirements: Level 50, Holy Steed at Level 1.",
-      "effect_text": "Ability Activation ID: 570 - Refresh Time: 0:00:01 - Ability Timer(s): 0. This ability, when activated, summons the bridle of a very fast Valiant Unicorn. Requirements: Level 50, Holy Steed at Level 1."
+      "requirements_raw": "Requirements: Level 50, Holy Steed at Level 1.</s> This AA has been removed.",
+      "effect_text": "<s>Ability Activation ID: 570 - Refresh Time: 0:00:01 - Ability Timer(s): 0. This ability, when activated, summons the bridle of a very fast Valiant Unicorn. Requirements: Level 50, Holy Steed at Level 1.</s> This AA has been removed."
     },
     {
       "name": "Hunter's Attack Power",
@@ -1369,15 +1369,15 @@
       "effect_text": "Gives a passive 10/15/20% bonus to the duration of all poisons. Additionally lowers the resist value of all poisons by 25/50/75. Requirements: Level 12/30/50."
     },
     {
-      "name": "Abyssal Steed",
+      "name": "<s>Abyssal Steed</s>",
       "category": "Class",
       "class": "Shadow Knight",
       "max_rank": 1,
       "ranks_raw": "1",
       "cost_per_rank_raw": "9",
       "level_requirement": 50,
-      "requirements_raw": "Requirements: Level 50, Unholy Steed at Level 1.",
-      "effect_text": "Ability Activation ID: 571 - Refresh Time: 0:00:01 - Ability Timer(s): 0. This ability, when activated, summons the bridle of a very fast Abyssal Nightmare. Requirements: Level 50, Unholy Steed at Level 1."
+      "requirements_raw": "Requirements: Level 50, Unholy Steed at Level 1.</s> This AA has been removed.",
+      "effect_text": "<s>Ability Activation ID: 571 - Refresh Time: 0:00:01 - Ability Timer(s): 0. This ability, when activated, summons the bridle of a very fast Abyssal Nightmare. Requirements: Level 50, Unholy Steed at Level 1.</s> This AA has been removed."
     },
     {
       "name": "Harm Touch",
@@ -1550,10 +1550,10 @@
       "class": "Wizard",
       "max_rank": 3,
       "ranks_raw": "3",
-      "cost_per_rank_raw": "3/?/?",
+      "cost_per_rank_raw": "3/6/9",
       "level_requirement": 1,
       "requirements_raw": "Requirements: Level 1.",
-      "effect_text": "This passive ability reduces the cast time of your evacuation and succor spells and abilities by 10/?/?%. Requirements: Level 1."
+      "effect_text": "This passive ability reduces the cast time of your evacuation and succor spells and abilities by 10/25/50%. Requirements: Level 1."
     },
     {
       "name": "Strong Root",

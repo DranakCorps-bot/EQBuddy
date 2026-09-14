@@ -668,7 +668,7 @@ For a comparison of the efficiency of spells by level see: [[Necromancer Spell L
 |effects=1: Decrease Hitpoints by 11 per tick<br>2: Decrease Healing Modifier by 20
 |duration=1 Min
 |school=Conjuration
-|location=
+|location=Vendor
 |era={{Classic Short}}
 }}
 {{KhazamSpellRow
@@ -701,7 +701,7 @@ For a comparison of the efficiency of spells by level see: [[Necromancer Spell L
 |effects=1: Decrease Hitpoints by 42
 |duration=Instant
 |school=Alteration
-|location=
+|location=Vendor
 |era={{Classic Short}}
 }}
 </table>
@@ -851,7 +851,7 @@ For a comparison of the efficiency of spells by level see: [[Necromancer Spell L
 |effects=1: Increase Strength by 14 (L11) to 20 (L32)<br>2: Increase Attack Speed by 11% (L11) to 15% (L30)<br>3: Increase AC by 3 (L11) to 5 (L32)
 |duration=60 Min
 |school=Alteration
-|location=
+|location=Vendor
 |era={{Classic Short}}
 }}
 </table>
@@ -1060,7 +1060,7 @@ For a comparison of the efficiency of spells by level see: [[Necromancer Spell L
 |location=Autogranted Vendor
 |era={{Classic Short}}
 }}
-{{KhazamSpellRow
+<!-- {{KhazamSpellRow
 |name=Form of Chilled Bone
 |kind=Illusion: Other
 |targ=Pet
@@ -1070,7 +1070,7 @@ For a comparison of the efficiency of spells by level see: [[Necromancer Spell L
 |school=Divination
 |location=
 |era={{Classic Short}}
-}}
+}} -->
 {{KhazamSpellRow
 |name=Hungry Earth
 |kind=Root
@@ -1090,7 +1090,7 @@ For a comparison of the efficiency of spells by level see: [[Necromancer Spell L
 |effects=1: Summons a Skeleton Pet
 |duration=Instant
 |school=Conjuration
-|location=Vendor
+|location=Autogranted Vendor
 |era={{Classic Short}}
 }}
 {{KhazamSpellRow
@@ -1119,6 +1119,7 @@ For a comparison of the efficiency of spells by level see: [[Necromancer Spell L
 </div>
 
 <div id="spells_level_17">
+
 ==Level 17==
 <table class="eoTable2 " style="width:100%;">
     <tr>
@@ -1140,7 +1141,7 @@ For a comparison of the efficiency of spells by level see: [[Necromancer Spell L
 |effects=1: Decrease Attack Speed by 24% (L17) to 32% (L50)
 |duration=3 Min 30 Sec
 |school=Alteration
-|location=
+|location=Vendor
 |era={{Classic Short}}
 }}
 {{KhazamSpellRow
@@ -1201,7 +1202,7 @@ For a comparison of the efficiency of spells by level see: [[Necromancer Spell L
 |effects=1: Decrease Hitpoints by 20 per tick<br>2: Decrease Healing Modifier by 30
 |duration=1 Min 30 Sec
 |school=Conjuration
-|location=
+|location=Vendor
 |era={{Classic Short}}
 }}
 </table>
@@ -1618,7 +1619,7 @@ For a comparison of the efficiency of spells by level see: [[Necromancer Spell L
 |effects=1: Decrease Hitpoints by 30 per tick
 |duration=2 Min 6 Sec
 |school=Alteration
-|location=
+|location=Vendor
 |era={{Classic Short}}
 }}
 {{KhazamSpellRow
@@ -1708,7 +1709,6 @@ For a comparison of the efficiency of spells by level see: [[Necromancer Spell L
 |duration=54 Sec
 |school=Alteration
 |location=Vendor
-Vendor (Kunark)
 |era={{Classic Short}}
 }}
 </table>
@@ -1981,7 +1981,7 @@ Vendor (Kunark)
 |effects=1: Increase Poison Counter by 3<br>2: Decrease Hitpoints by 100 (L36) to 114 (L50) per tick
 |duration=36 Sec
 |school=Alteration
-|location=NPC Drop.
+|location=Vendor
 |era={{Classic Short}}
 }}
 {{KhazamSpellRow
@@ -2031,7 +2031,7 @@ Vendor (Kunark)
 |effects=1: Decrease Hitpoints by 72 per tick<br>2: Decrease Healing Modifier by 35
 |duration=1 Min 36 Sec
 |school=Conjuration
-|location=
+|location=Vendor
 |era={{Classic Short}}
 }}
 {{KhazamSpellRow
@@ -2092,7 +2092,7 @@ Vendor (Kunark)
 |effects=1: Decrease Attack Speed by 48% (L38) to 60% (L50)
 |duration=3 Min 30 Sec
 |school=Alteration
-|location=
+|location=Vendor
 |era={{Classic Short}}
 }}
 </table>
@@ -2120,7 +2120,7 @@ Vendor (Kunark)
 |effects=1: Increase Curse Counter by 8<br>2: Decrease Hitpoints by 134 (L39) to 140 (L45) per tick
 |duration=30 Sec
 |school=Conjuration
-|location=
+|location=Vendor
 |era={{Classic Short}}
 }}
 {{KhazamSpellRow
@@ -2287,7 +2287,7 @@ Vendor (Kunark)
 |effects=1: Increase Hitpoints by 215
 |duration=Instant
 |school=Alteration
-|location=NPC Drop
+|location=Vendor
 |era={{Classic Short}}
 }}
 {{KhazamSpellRow
@@ -2351,7 +2351,7 @@ Vendor (Kunark)
 |location=Vendor
 |era={{Classic Short}}
 }}
-{{KhazamSpellRow
+<!-- {{KhazamSpellRow
 |name=Form of Bleached Bone
 |kind=Illusion: Other
 |targ=Pet
@@ -2361,7 +2361,7 @@ Vendor (Kunark)
 |school=Divination
 |location=
 |era={{Classic Short}}
-}}
+}} -->
 {{KhazamSpellRow
 |name=Pact of Shadow
 |kind=Life Flow
@@ -2398,7 +2398,7 @@ Vendor (Kunark)
 |effects=1: Decrease Hitpoints by 30 per tick<br>2: Reference model: returns 100% of spell damage as HP, capped at 105 per damage event
 |duration=54 Sec
 |school=Alteration
-|location=
+|location=Vendor
 |era={{Classic Short}}
 }}
 {{KhazamSpellRow
@@ -2409,7 +2409,7 @@ Vendor (Kunark)
 |effects=1: Enduring Breath (Water Breathing)<br>2: See Invisible<br>3: Levitate<br>4: Increase Poison Resist by 65 (L45) to 70 (L50)
 |duration=72 Min
 |school=Abjuration
-|location=NPC Drop.
+|location=Vendor
 |era={{Classic Short}}
 }}
 </table>
@@ -2448,7 +2448,7 @@ Vendor (Kunark)
 |effects=1: Decrease Hitpoints by 546 (L46) to 550 (L50)<br>2: Decrease Movement Speed by 56% (L46) to 60% (L50)<br>3: Decrease Strength by 25<br>4: Decrease ATK by 25
 |duration=1 Min 36 Sec
 |school=Conjuration
-|location=
+|location=Vendor
 |era={{Classic Short}}
 }}
 {{KhazamSpellRow
@@ -2598,7 +2598,7 @@ Vendor (Kunark)
 |effects=1: Decrease Hitpoints by 466
 |duration=Instant
 |school=Conjuration
-|location=
+|location=Vendor
 |era={{Classic Short}}
 }}
 {{KhazamSpellRow
@@ -2609,7 +2609,7 @@ Vendor (Kunark)
 |effects=1: Increase Absorb Damage by 1
 |duration=36 Min
 |school=Abjuration
-|location=
+|location=Vendor
 |era={{Classic Short}}
 }}
 </table>
@@ -2648,7 +2648,7 @@ Vendor (Kunark)
 |effects=1: Improved Invis vs Undead
 |duration=10 Min
 |school=Divination
-|location=
+|location=Vendor
 |era={{Classic Short}}
 }}
 </table>

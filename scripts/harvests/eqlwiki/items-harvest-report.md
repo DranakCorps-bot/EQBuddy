@@ -1,8 +1,8 @@
 # items harvest report
 
-- Category:Items members: 11147
-- fetched this run: 11147
-- in dump after compaction: 11147
+- Category:Items members: 11197
+- fetched this run: 11197
+- in dump after compaction: 11197
 - pages with no readable revision: 0
 
 
