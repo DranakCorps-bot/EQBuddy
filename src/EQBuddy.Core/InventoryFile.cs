@@ -72,6 +72,36 @@ public static class InventoryFile
         /// </summary>
         public bool Worn => !InBank && !InContainer
             && !Location.StartsWith("General", StringComparison.OrdinalIgnoreCase);
+
+        /// <summary>
+        /// **WHICH slot this row is worn in, as the dump itself says it** — "Ear2" → EAR,
+        /// "Range" → RANGE, "Primary" → PRIMARY. Upper-cased so it compares against
+        /// <c>GearLocker.SlotOrder</c> and the catalog's own slot spellings, with the
+        /// trailing ordinal dropped because "Finger" and "Finger2" are one slot NAME worn
+        /// twice, not two kinds of slot.
+        ///
+        /// <para><b>It is the answer to "what is this item ON", and the catalog's
+        /// <c>Slot:</c> line is not</b> (DRA-81). That line says where an item MAY go: a
+        /// one-handed sword reads "PRIMARY SECONDARY" and 124 catalog records name RANGE
+        /// beside PRIMARY or AMMO. Reading it as the worn slot put the same weapon in both
+        /// hands at once and lost the Range row entirely for anything the wiki also lists as
+        /// a hand weapon — the Founder saw both halves of that at once, because they are one
+        /// bug. The dump prints the truth once per row; this is that column, and nothing
+        /// else.</para>
+        ///
+        /// <para>Only meaningful on a <see cref="Worn"/> row — a bag or bank location has a
+        /// slot name too and it means a container, so every caller gates on
+        /// <see cref="Worn"/> first.</para>
+        /// </summary>
+        public string WornSlot
+        {
+            get
+            {
+                var slot = Location.AsSpan().Trim();
+                while (slot.Length > 0 && char.IsAsciiDigit(slot[^1])) slot = slot[..^1];
+                return slot.Trim().ToString().ToUpperInvariant();
+            }
+        }
     }
 
     public static List<Entry> ParseEntries(IEnumerable<string> lines)

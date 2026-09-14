@@ -300,6 +300,68 @@ public class MiniBarPresentationTests
         Assert.Equal(0, new StatsSnapshot().PetDps);
     }
 
+    // ------------------------------------- the ★s Options lists (DRA-81) ----
+
+    /// <summary>
+    /// **Every ★ the Mini dashboard offers, and the top row's three are among them.**
+    ///
+    /// <para>This is the assertion SA-1's hole would have failed. `Order` is a table of
+    /// stats that can be drawn as CELLS, and Options walked it — so "dps", "hps" and "xp"
+    /// were valid `MiniStats` keys that no screen anywhere could set, which is exactly the
+    /// wall the Founder's smoke hit when it went looking for the HPS box.</para>
+    /// </summary>
+    [Fact]
+    public void TheOptionsListOffersTheTopRowsStatsAndTheCells()
+    {
+        Assert.Equal(["dps", "hps", "xp"], MiniBarPresentation.GlanceKeys);
+        Assert.Equal(
+            ["dps", "hps", "xp", "kills", "pet", "procs", "loot", "motes", "money", "deaths"],
+            MiniBarPresentation.OptionKeys);
+    }
+
+    /// <summary>Every key Options lists has a NAME to list it under — a checkbox labelled
+    /// with a raw settings key is what the `GetValueOrDefault(key, key)` fallback draws, and
+    /// it looks like a bug rather than like a stat.</summary>
+    [Fact]
+    public void EveryOfferedStarHasAWordForIt() =>
+        Assert.All(MiniBarPresentation.OptionKeys,
+            key => Assert.True(MiniBarPresentation.Names.ContainsKey(key),
+                $"the Mini dashboard would label the '{key}' box with its settings key"));
+
+    /// <summary>
+    /// **The top row's three are listed and are NOT cells**, which is the pairing that keeps
+    /// the bar from drawing one of them twice.
+    ///
+    /// <para>`Cell` refuses any key `Icons` cannot face, and `DrawnKeys` walks `Order` — so
+    /// the negative is what makes the positive safe. A "fix" that added them to `Icons` to
+    /// tidy up the `Names`/`Icons` asymmetry would put a second DPS chip on the bar.</para>
+    /// </summary>
+    [Fact]
+    public void TheTopRowsStatsAreOfferedButNeverDrawnAsCells()
+    {
+        foreach (var key in MiniBarPresentation.GlanceKeys)
+        {
+            Assert.Contains(key, MiniBarPresentation.OptionKeys);
+            Assert.DoesNotContain(key, MiniBarPresentation.Order);
+            Assert.DoesNotContain(key, MiniBarPresentation.CanonicalOrder);
+            Assert.False(MiniBarPresentation.Icons.ContainsKey(key));
+            Assert.Null(MiniBarPresentation.Cell(Snapshot(), key));
+        }
+
+        // …and starring all three puts no extra chip on the bar. The list assertions above
+        // are about tables; this is about the bar (trap 42).
+        Assert.Equal(["kills"],
+            MiniBarPresentation.DrawnKeys(Starred("kills", "dps", "hps", "xp")));
+    }
+
+    /// <summary>No key is offered twice — `OptionKeys` is two lists spliced, and a stat with
+    /// two checkboxes is two switches for one setting that will disagree the moment one of
+    /// them is rebuilt.</summary>
+    [Fact]
+    public void NoStatIsOfferedTwice() =>
+        Assert.Equal(MiniBarPresentation.OptionKeys.Count,
+            MiniBarPresentation.OptionKeys.Distinct().Count());
+
     [Fact]
     public void KillsAndDeathsShareTheirIconAndThatIsDeliberate()
     {

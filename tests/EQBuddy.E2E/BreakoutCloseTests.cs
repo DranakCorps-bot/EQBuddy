@@ -62,7 +62,7 @@ public sealed class BreakoutCloseTests
             // WITHOUT it is read as "this player had the Damage window off" and gets
             // "Damage" written into DisabledBreakouts. Seeding it is what makes the Damage
             // float open at all, which is the window this test closes.
-            settings.MiniStats = ["kills", "dps"];
+            settings.MiniStats = ["kills", "dps", "xp"];
             // Damage may open (no star gates it since SA-1); Healing is the seeded off row
             // and the number this test holds. The other four have no star, so they stay shut
             // without needing a row of their own.
@@ -102,7 +102,7 @@ public sealed class BreakoutCloseTests
             // WITHOUT it is read as "this player had the Damage window off" and gets
             // "Damage" written into DisabledBreakouts. Seeding it is what makes the Damage
             // float open at all, which is the window this test closes.
-            settings.MiniStats = ["kills", "dps"];
+            settings.MiniStats = ["kills", "dps", "xp"];
             settings.DisabledBreakouts = ["Healing"];
             settings.DefaultRulesVersion = int.MaxValue;
             settings.TrackedRules.Clear();

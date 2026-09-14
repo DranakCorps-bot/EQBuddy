@@ -1,4 +1,5 @@
 using EQBuddy.Core;
+using EQBuddy.UI.Shared;
 using Xunit;
 
 namespace EQBuddy.Tests;
@@ -347,8 +348,9 @@ public class GearUpgradesTests
             [new("Head", "Scroll", 1)], _ => ItemStatsBlock.Parse(["MAGIC ITEM"])));
     }
 
-    /// <summary>A ring in two FINGER rows is ONE anchor: the dump prints two locations and the
-    /// upgrade for both is the same upgrade.</summary>
+    /// <summary>A ring in two FINGER rows is ONE anchor: the dump prints "Finger" and
+    /// "Finger2", both of which are the FINGER slot, and the upgrade for the two of them is
+    /// the same upgrade. The trailing ordinal is an index, not a kind of slot.</summary>
     [Fact]
     public void OneItemInTwoIdenticalSlotsIsOneAnchor()
     {
@@ -357,19 +359,162 @@ public class GearUpgradesTests
             _ => ItemStatsBlock.Parse(["Slot: FINGER", "AC: 1"]));
 
         Assert.Single(worn);
+        Assert.Equal("FINGER", worn[0].Slot);
     }
 
-    /// <summary>An item that goes in TWO DIFFERENT slots is two anchors — the anchor is the
-    /// slot as much as the item, and a one-handed weapon that can go in either hand is being
-    /// compared against two different things.</summary>
+    /// <summary>…but TWO DIFFERENT rings in those two rows are two anchors. Both are FINGER
+    /// and each is its own item to beat — the de-duplication is on (item, slot) and not on
+    /// the slot alone, or a character with two rings could only ever be offered one
+    /// upgrade.</summary>
     [Fact]
-    public void OneItemInTwoDifferentSlotsIsTwoAnchors()
+    public void TwoDifferentRingsInTheTwoFingerRowsAreTwoAnchors()
+    {
+        var worn = GearUpgrades.WornFrom(
+            [new("Finger", "Plain Band", 1), new("Finger2", "Gold Band", 1)],
+            _ => ItemStatsBlock.Parse(["Slot: FINGER", "AC: 1"]));
+
+        Assert.Equal(["Plain Band", "Gold Band"], worn.Select(w => w.Name));
+        Assert.All(worn, w => Assert.Equal("FINGER", w.Slot));
+    }
+
+    /// <summary>
+    /// **THE FOUNDER'S SMOKE, first half: a one-handed weapon in the primary hand is ONE
+    /// anchor, not a PRIMARY and a SECONDARY** (DRA-81).
+    ///
+    /// <para>This used to expand the CATALOG's <c>Slot:</c> line, which for 821 of the
+    /// shipped records reads "PRIMARY SECONDARY" — a statement about where the item MAY go.
+    /// So one sword produced two anchors, the worn picker listed the same item twice with
+    /// different detail lines, and the sweep compared it against the whole secondary index
+    /// as though the character were dual-wielding it. The dump prints where it actually is,
+    /// once, per row.</para>
+    /// </summary>
+    [Fact]
+    public void AOneHandedWeaponInThePrimaryHandIsOneAnchorAndNotTwo()
     {
         var worn = GearUpgrades.WornFrom(
             [new("Primary", "Short Sword", 1)],
             _ => ItemStatsBlock.Parse(["Slot: PRIMARY SECONDARY", "DMG: 8", "Atk Delay: 24"]));
 
+        Assert.Equal(["PRIMARY"], worn.Select(w => w.Slot));
+        Assert.Single(worn);
+    }
+
+    /// <summary>…and the same weapon worn in BOTH hands is two anchors, one per hand —
+    /// which is the case the old expansion was accidentally right about, and the reason the
+    /// assertion above is not just "always one".</summary>
+    [Fact]
+    public void TheSameWeaponInBothHandsIsOneAnchorPerHand()
+    {
+        var worn = GearUpgrades.WornFrom(
+            [new("Primary", "Short Sword", 1), new("Secondary", "Short Sword", 1)],
+            _ => ItemStatsBlock.Parse(["Slot: PRIMARY SECONDARY", "DMG: 8", "Atk Delay: 24"]));
+
         Assert.Equal(["PRIMARY", "SECONDARY"], worn.Select(w => w.Slot));
+    }
+
+    /// <summary>
+    /// **THE FOUNDER'S SMOKE, second half: the RANGE row is there** (DRA-81) — and it is the
+    /// same bug as the one above, seen from the other side.
+    ///
+    /// <para>124 shipped catalog records name RANGE beside PRIMARY, SECONDARY or AMMO,
+    /// because a wiki page lists every slot an item is legal in. Expanding that line anchored
+    /// a worn bow as a hand weapon and never produced a RANGE anchor at all, so the Range row
+    /// the Founder went looking for could not appear however many bows they equipped. Reading
+    /// the dump's location gives exactly one anchor and it is the right one.</para>
+    /// </summary>
+    [Fact]
+    public void ABowWornInTheRangeSlotAnchorsOnRange()
+    {
+        var worn = GearUpgrades.WornFrom(
+            [new("Range", "Willow Bow", 1)],
+            _ => ItemStatsBlock.Parse(
+                ["Slot: RANGE PRIMARY SECONDARY", "DMG: 6", "Atk Delay: 30"]));
+
+        Assert.Equal(["RANGE"], worn.Select(w => w.Slot));
+        Assert.DoesNotContain("PRIMARY", worn.Select(w => w.Slot));
+    }
+
+    /// <summary>The slot is the dump's word, upper-cased, so it lands in
+    /// <c>GearLocker.SlotOrder</c>'s vocabulary — which is what the Helper's picker sorts its
+    /// rows by, and a slot that sorted last because it was spelled "Range" would read as a
+    /// missing row rather than a misplaced one.</summary>
+    [Theory]
+    [InlineData("Range", "RANGE")]
+    [InlineData("Ear2", "EAR")]
+    [InlineData("Wrist2", "WRIST")]
+    [InlineData("Charm", "CHARM")]
+    [InlineData("Shoulders", "SHOULDERS")]
+    public void TheAnchorsSlotIsTheDumpsLocationInTheLockersVocabulary(string location, string slot)
+    {
+        var worn = GearUpgrades.WornFrom(
+            [new(location, "Some Thing", 1)],
+            _ => ItemStatsBlock.Parse(["Slot: CHEST", "AC: 4"]));
+
+        Assert.Equal([slot], worn.Select(w => w.Slot));
+        Assert.Contains(slot, GearLocker.SlotOrder);
+    }
+
+    /// <summary>
+    /// **THE WORN PICKER, as the Founder sees it**: a realistic character sheet gives ONE row
+    /// per worn item, the Range row is in it, and no item appears twice.
+    ///
+    /// <para>The Helper's picker keys its rows on the item NAME
+    /// (<c>HelperRoom.BuildWornPicker</c>), so two anchors for one item are two rows wearing
+    /// the same label — which is the duplicate the Founder counted. It sorts by
+    /// <c>GearLocker.SlotOrder</c>, so a slot that never became an anchor is a row that is
+    /// simply not on the list. Both symptoms are assertions about this one list, which is why
+    /// they are asserted together: the per-shape tests above each prove a rule, and this
+    /// proves the rules add up to the screen.</para>
+    ///
+    /// <para>Every catalog block here is one a real page would carry — the bow legal in three
+    /// slots, the sword legal in two, the ring legal in one — so the fixture is the situation
+    /// rather than a reduction of it (trap 23).</para>
+    /// </summary>
+    [Fact]
+    public void ARealCharacterSheetGivesOneRowPerWornItemIncludingRange()
+    {
+        InventoryFile.Entry[] sheet =
+        [
+            new("Primary", "Short Sword", 1),
+            new("Secondary", "Wooden Shield", 1),
+            new("Range", "Willow Bow", 1),
+            new("Finger", "Plain Band", 1),
+            new("Finger2", "Gold Band", 1),
+            new("Chest", "Bronze Breastplate", 1),
+            new("General1", "Spare Sword", 1),        // a bag row is not worn
+        ];
+
+        var worn = GearUpgrades.WornFrom(sheet, name => name switch
+        {
+            "Short Sword" => ItemStatsBlock.Parse(["Slot: PRIMARY SECONDARY", "DMG: 8", "Atk Delay: 24"]),
+            "Wooden Shield" => ItemStatsBlock.Parse(["Slot: SECONDARY", "AC: 9"]),
+            "Willow Bow" => ItemStatsBlock.Parse(["Slot: RANGE PRIMARY SECONDARY", "DMG: 6", "Atk Delay: 30"]),
+            "Plain Band" or "Gold Band" => ItemStatsBlock.Parse(["Slot: FINGER", "AC: 1"]),
+            "Bronze Breastplate" => ItemStatsBlock.Parse(["Slot: CHEST", "AC: 20"]),
+            _ => ItemStatsBlock.Parse(["Slot: PRIMARY", "DMG: 2", "Atk Delay: 30"]),
+        });
+
+        // One row per worn row of the dump, and the bag row is not one of them.
+        Assert.Equal(6, worn.Count);
+        // The picker's own key: no label appears twice. Before DRA-81 "Short Sword" and
+        // "Willow Bow" each produced two or three rows.
+        Assert.Equal(worn.Count, worn.Select(w => w.Name).Distinct(StringComparer.OrdinalIgnoreCase).Count());
+        // …and each is anchored where it is actually worn.
+        Assert.Equal("PRIMARY", worn.Single(w => w.Name == "Short Sword").Slot);
+        Assert.Equal("SECONDARY", worn.Single(w => w.Name == "Wooden Shield").Slot);
+        Assert.Equal("RANGE", worn.Single(w => w.Name == "Willow Bow").Slot);
+
+        // THE ROW THE FOUNDER WENT LOOKING FOR, in the order the picker draws it.
+        var rows = worn
+            .OrderBy(w => Array.IndexOf(GearLocker.SlotOrder, w.Slot) is var i && i >= 0 ? i : int.MaxValue)
+            .ThenBy(w => w.Name, StringComparer.OrdinalIgnoreCase)
+            .Select(w => w.Slot)
+            .ToList();
+        Assert.Contains("RANGE", rows);
+        Assert.Equal(["PRIMARY", "SECONDARY", "RANGE", "CHEST", "FINGER", "FINGER"], rows);
+        // Nothing sorted last for want of a known slot — an unknown spelling is how a row
+        // goes missing at the bottom of a list rather than loudly.
+        Assert.All(worn, w => Assert.Contains(w.Slot, GearLocker.SlotOrder));
     }
 
     // ---- the store -----------------------------------------------------------------------
