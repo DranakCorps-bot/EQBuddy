@@ -181,15 +181,10 @@ that doctrine capture at an M-checkpoint is a copy step and not an archaeology
 project. **An untagged experiment does not appear here** — which is the point: the
 tag is what the playbook cites.
 
-> **1 experiment(s) below name no judging metric.** §10.1 asks the tag to name
-> the §6 metric that will judge it, because that is what a graduation entry cites.
-> This is reported rather than filled in: guessing which metric an author meant is
-> how an experiment graduates on a number nobody chose for it.
-
 | Experiment | Judging metric | Frozen baseline | Current reading |
 |---|---|---|---|
+| `seat-mutex` | judged by *rework rate* and *PRs per delivered slice* (baseline 3.7% and 2.15), because a duplicate executor spends both: #566/#568 cost one full run and produced a second PR for one slice. Stated net of the **false-block count** kept in `.claude/soft-seats/README.md`'s evidence list — a mutex that refuses work that should have started is not cheaper than the collision, it is just quieter. | **GWR 0.49 · ACCR 0% · 2.15 PRs/slice · 2.1 Helm touches/slice · veto 0% · rework 3.7%** _(frozen by this run)_ | _this run IS the baseline_ |
 | `metrics-baseline` | judged by *whether a later window's claim can be checked against it without re-deriving the window*: concretely, whether the §10.3 "current vs baseline" column fills from `docs/ops/exo-baseline.json` alone at the M2 checkpoint, without any §6 KPI being recomputed by hand. Stated net of the count of metrics still reading `unmeasured`. | **GWR 0.49 · ACCR 0% · 2.15 PRs/slice · 2.1 Helm touches/slice · veto 0% · rework 3.7%** _(frozen by this run)_ | _this run IS the baseline_ |
-| `channel-rotation` | **no judging metric named on the tag** — plan §10.1 asks for one | **GWR 0.49 · ACCR 0% · 2.15 PRs/slice · 2.1 Helm touches/slice · veto 0% · rework 3.7%** _(frozen by this run)_ | _this run IS the baseline_ |
 | `ssc-retirement` | judged by *PRs + Helm touches per slice* (baseline 2.3 PRs/slice, ≥2 touches/slice), stated net of *veto rate* and *rework rate*. | **GWR 0.49 · ACCR 0% · 2.15 PRs/slice · 2.1 Helm touches/slice · veto 0% · rework 3.7%** _(frozen by this run)_ | _this run IS the baseline_ |
 | `whole-sequence-auth` | judged by *Governance Wait Ratio* and *Autonomous Correct Completion Rate* (baseline GWR 0.40–0.60, ACCR 0%), stated net of *escaped defect rate*. | **GWR 0.49 · ACCR 0% · 2.15 PRs/slice · 2.1 Helm touches/slice · veto 0% · rework 3.7%** _(frozen by this run)_ | _this run IS the baseline_ |
 

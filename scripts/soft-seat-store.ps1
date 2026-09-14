@@ -6,6 +6,24 @@
 $script:SoftSeatExclusive = @('active', 'replacement')
 $script:SoftSeatModes = @('active', 'challenger', 'disjoint', 'replacement', 'abandoned')
 
+# DRA-76 (DRA-73 plan SS2.2 / SS8.4): a default claim is refused by ANY live
+# seat on the work item, not only an exclusive one. A challenger and a disjoint
+# slice are seats doing work on that card; admitting a default one beside them
+# is the duplicate executor this store exists to stop (PRs #566/#568 cost one
+# full run plus two rulings). The four explicit modes stay the only override.
+$script:SoftSeatHolding = @('active', 'challenger', 'disjoint', 'replacement')
+
+# The holding list is the detector, and a detector that drifts out of sync with
+# the mode list fails OPEN — a new mode nobody added here would hold a seat that
+# refuses nobody (CLAUDE.md trap 78: a guard aimed at nothing is green). Derive
+# the expectation from SoftSeatModes and throw at dot-source time if they part.
+$script:SoftSeatHoldingExpected = @($script:SoftSeatModes | Where-Object { $_ -ne 'abandoned' })
+if (@(Compare-Object $script:SoftSeatHolding $script:SoftSeatHoldingExpected).Count -ne 0) {
+    throw ("soft-seat-store: SoftSeatHolding [$($script:SoftSeatHolding -join ', ')] is not " +
+        "SoftSeatModes minus 'abandoned' [$($script:SoftSeatHoldingExpected -join ', ')]. " +
+        'A mode that holds no seat refuses nobody — add it to both lists or to neither.')
+}
+
 # Paperclip is the tracker for Soft work, so a CLAIM keys on the card id and
 # nothing else (EXO-HARDEN-A2 / DRA-50, 2026-09-10). One scope carries two
 # names — GitHub #445 IS Paperclip DRA-28 — and the mutex used to key on free
@@ -16,6 +34,11 @@ $script:SoftSeatModes = @('active', 'challenger', 'disjoint', 'replacement', 'ab
 # about which tracker the caller meant, and a wrong guess is a claim key that
 # silently misses the holder — the same failure wearing a helpful hat.
 $script:SoftSeatKeyPattern = '^DRA-\d+$'
+
+# ONE number for "old enough to be presumed dead". The claim refusal reads it to
+# say so in the refusal text, and the release path reads it to act on it; two
+# copies would let the sentence and the behaviour drift apart (trap 4).
+$script:SoftSeatStaleAfterHours = 8
 
 function Get-SoftSeatMainRoot {
     param([string] $Hint)
@@ -126,6 +149,14 @@ function Test-SoftSeatExclusive {
     return $script:SoftSeatExclusive -contains ([string] $Status).ToLowerInvariant()
 }
 
+# "Does this row hold the work item against a DEFAULT claim?" Every mode but
+# 'abandoned' does. Kept separate from Test-SoftSeatExclusive on purpose:
+# exclusivity is what -Mode replacement takes over, holding is what refuses.
+function Test-SoftSeatHolding {
+    param([string] $Status)
+    return $script:SoftSeatHolding -contains ([string] $Status).ToLowerInvariant()
+}
+
 function Test-SoftSeatPidAlive {
     param($PidValue)
     if ($null -eq $PidValue -or $PidValue -eq '') { return $false }
@@ -215,15 +246,26 @@ function Lock-SoftSeatStore {
 }
 
 function Get-SoftSeatMatches {
-    param($Store, [string] $WorkItem, [string] $SeatId, [switch] $ExclusiveOnly, [switch] $LiveOnly)
+    param(
+        $Store,
+        [string] $WorkItem,
+        [string] $SeatId,
+        [string] $NotSeatId,
+        [switch] $ExclusiveOnly,
+        [switch] $HoldingOnly,
+        [switch] $LiveOnly
+    )
     $wantItem = Normalize-SoftSeatWorkItem $WorkItem
     $wantSeat = if ($SeatId) { $SeatId.Trim() } else { $null }
+    $skipSeat = if ($NotSeatId) { $NotSeatId.Trim() } else { $null }
     $out = @()
     foreach ($c in @($Store.claims)) {
         if ($LiveOnly -and ([string] $c.status).ToLowerInvariant() -eq 'abandoned') { continue }
         if ($ExclusiveOnly -and -not (Test-SoftSeatExclusive $c.status)) { continue }
+        if ($HoldingOnly -and -not (Test-SoftSeatHolding $c.status)) { continue }
         if ($wantItem -and ((Normalize-SoftSeatWorkItem $c.work_item) -ne $wantItem)) { continue }
         if ($wantSeat -and ([string] $c.seat_id -ine $wantSeat)) { continue }
+        if ($skipSeat -and ([string] $c.seat_id -ieq $skipSeat)) { continue }
         $out += $c
     }
     return $out
@@ -286,23 +328,38 @@ function Invoke-SoftSeatClaim {
     try {
         $store = Read-SoftSeatStoreFile $StoreDir
         $mine = @(Get-SoftSeatMatches $store -WorkItem $item -SeatId $SeatId -LiveOnly)
-        $exclusive = @(Get-SoftSeatMatches $store -WorkItem $item -ExclusiveOnly -LiveOnly)
+
+        # Every live seat OTHER than this one holds the work item against a
+        # default claim — challengers and disjoint slices included (DRA-76).
+        # Excluding our own rows by seat id is what keeps a re-claim idempotent;
+        # it is not an exception, this seat is simply not a second executor.
+        $holders = @(Get-SoftSeatMatches $store -WorkItem $item -NotSeatId $SeatId -HoldingOnly)
 
         $ownExclusive = $false
         foreach ($c in $mine) {
             if (Test-SoftSeatExclusive $c.status) { $ownExclusive = $true; break }
         }
 
-        if ($Mode -eq 'active' -and $exclusive.Count -gt 0 -and -not $ownExclusive) {
-            $holder = Format-SoftSeatHolder $exclusive[0]
+        if ($Mode -eq 'active' -and $holders.Count -gt 0) {
             $label = Format-SoftSeatWorkItem $item
+            $lines = @($holders | ForEach-Object { "  - $(Format-SoftSeatHolder $_)" })
+            # Widening the refusal without making recovery discoverable just
+            # manufactures false blocks (the risk row in the store's README):
+            # a holder that is gone must say so on the same screen as the refusal.
+            $stale = @($holders | Where-Object { Test-SoftSeatStale $_ $script:SoftSeatStaleAfterHours })
+            $staleLine = ''
+            if ($stale.Count -gt 0) {
+                $names = ($stale | ForEach-Object { "'$($_.seat_id)'" }) -join ', '
+                $staleLine = "`nLooks stale (age >= $($script:SoftSeatStaleAfterHours)h or a recorded pid that is no longer running): $names."
+            }
             $msg = @"
-REFUSED: $label is already claimed ($holder).
-A second default Soft seat on the same work item is the collision this store exists to stop (CLAUDE.md trap 70).
+REFUSED: $label is already held by $($holders.Count) live seat(s):
+$($lines -join "`n")
+A default Soft seat on a work item another seat already holds is the duplicate executor this store exists to stop (CLAUDE.md trap 70). A challenger and a disjoint slice HOLD the item too — only an abandoned claim releases it.$staleLine
 If this seat is an explicit challenger, disjoint slice, or replacement, pass -Mode challenger|disjoint|replacement.
 If the holder is gone: pwsh -NoProfile -File scripts/release-seat.ps1 -WorkItem $label -ForceStale
 "@.Trim()
-            return [pscustomobject]@{ ok = $false; message = $msg; claim = $exclusive[0]; store = $store }
+            return [pscustomobject]@{ ok = $false; message = $msg; claim = $holders[0]; holders = $holders; store = $store }
         }
 
         if ($Check) {
@@ -361,8 +418,9 @@ function Invoke-SoftSeatRelease {
         [string] $WorkItem,
         [string] $SeatId,
         [switch] $ForceStale,
-        [double] $StaleAfterHours = 8
+        [double] $StaleAfterHours = 0
     )
+    if ($StaleAfterHours -le 0) { $StaleAfterHours = $script:SoftSeatStaleAfterHours }
     $item = Normalize-SoftSeatWorkItem $WorkItem
     if (-not $item -and -not $SeatId) {
         throw 'Pass -WorkItem and/or -SeatId (or -ForceStale with -WorkItem to recover a dead holder).'
