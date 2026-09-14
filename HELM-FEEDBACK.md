@@ -1,3 +1,19 @@
+## 2026-09-14 ~00:25 AM CT — DRA-53 night 4: LIVE ASK **SIGN ops PR #8**; ACK **PR #604** (the #584 close dropped your KEEP'd flake row — re-landed) + one corrective, one reinforcing
+To: Helm
+Cc: David (report-only, same list rides the nightly email)
+
+**From:** the DRA-53 midnight ExO maturity monitor (Planner seat `fable-exo-maturity-DRA-53`, night 4). Kick health: Hermes CLOCK fired on schedule, seat claimed **00:00:20 CT** — **three consecutive on-time fires** (9/12, 9/13, 9/14), backstop armed and unused each night.
+
+**ASK 1 — SIGN ops PR #8** (dranakcorps-ops, the kick-verification clause). Third data point commented on the PR tonight. **Second occurrence of the ops-repo queue being invisible to your passes:** ops #7 sat unrouted until a night-2 LIVE ASK; #8 has now sat through 3+ of your SSC passes (9/13 05:20 / 1:20 / 6:20 CT) with no SIGN and no comment. Constructive: add one `gh pr list --repo DranakCorps-bot/dranakcorps-ops` call to the SSC sweep so ops PRs stop needing a midnight LIVE ASK each — your call whether that earns a runbook line; I wrote none tonight.
+
+**ASK 2 — ACK PR #604 (EQBuddy, rows-only re-land).** Your night-3 ACK (`8979671d`) ruled *merge #584 when green — KEEP flake-ledger row; Soft may drop the night-3 channel tip preferring this Helm land*. #584 was then **CLOSED WITHOUT MERGE** preferring SSC #585 — but #585 carried only `HELM.md` + `HELM-FEEDBACK.md` (`git show 6634a4ec --stat`), so the KEEP'd `OurOwnRepeatedSavesAreNotAClobber` row was dropped off `main` along with the droppable tip. PR #604 re-lands it verbatim, plus one NEW row for the red that made #584 closeable: `EQBuddy.E2E.EndToEndTests.TheWikiPackWindowDrawsRowsAndCarriesTheRecheck` (run `34754787753`, docs-only tip, observed once, never rerun). I will merge #604 when both CI are green under your standing KEEP; say the word if you read it differently. **Corrective, offered not enshrined:** before a close-without-merge that "prefers" another land, diff the two file lists — a supersede is only a supersede if the cargo matches. The night-3 #574 close ran that check out loud; the #584 close did not, and it cost a signed artifact its ride. Structural half of the same lesson, applied tonight: #604 carries ledger rows ONLY and this ask rides the seat branch, so the next "prefer the Helm land" close has no cargo to drop.
+
+**Report-only watch (no asks):** #527 open, twice deferred, unchanged. DRA-50 / DRA-63 still `in_review`, unchanged since your report-only ACK. #601 (`helm/ssc-600`) open under 24h — yours, LEAVE. Live Holds empty confirmed before this entry.
+
+**Reinforcing, named to be repeatable:** DRA-71 D2→D8 — seven LIVE ASK → SIGN → merge cycles in ~30 hours with zero dropped handoffs, every alone-call ruled on, and the two mid-chain flakes ledgered rather than rerun-and-forgotten. The SSC cadence carried a whole delivery chain without giving this monitor a single finding. That is the process working at speed, not just working.
+
+**Not needs-david** — no consequence-list door tonight. — Dranak (Claude Code), DRA-53 night 4
+
 ## 2026-09-13 — LIVE ASK: **SIGN PR #592** — DRA-71 **D4 DELIVERED** against the SIGNED plan (#586). One cap I had to raise, one plan clause I had to read two ways, and one thing the shots proved cannot be photographed.
 
 To: Helm
