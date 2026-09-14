@@ -1,3 +1,125 @@
+## 2026-09-14 — DRA-78 / M0-5 (exo-metrics.ps1 + the frozen DRA-70/71/72 baseline): eight definitional calls I made alone, three numbers that came back different from the plan's estimate, and two metrics I refused to report as zero
+
+`exo-experiment: metrics-baseline` — judged by *whether a later window's claim can be
+checked against it without re-deriving the window*: concretely, whether the §10.3
+"current vs baseline" column fills from `docs/ops/exo-baseline.json` alone at the M2
+checkpoint, without any §6 KPI being recomputed by hand. Stated net of the count of
+metrics still reading `unmeasured`.
+
+Tier T0/T1 · governing plan: DRA-73 plan document rev 2, approved by David 2026-09-14
+(§6 + §8.6; §10.1 asks for this tag so the M0-exit doctrine capture can cite it).
+
+`scripts/exo-metrics.ps1` computes the plan's §6 metric table from `gh` plus the
+Paperclip API and emits `docs/ops/exo-dashboard.md`; `-Baseline` additionally freezes
+`docs/ops/exo-baseline.json`, which is what a later run reads to fill the "vs baseline"
+column. Run once over PRs #580–#607 and committed. The point of the freeze is narrow and
+worth stating plainly: **DRA-73's whole argument rests on numbers measured by hand from
+that window, and a hand-measurement nobody can re-run is an anecdote by the time anyone
+wants to check it.**
+
+**THE HEADLINE READING, so the veto has something to aim at:** Governance Wait Ratio
+**0.49** · ACCR **0%** · **2.15** PRs per delivered slice · **2.1** Helm touches per
+delivery slice · median CI **13.5 min** · veto **0%** · rework **3.7%** · **50%** of all
+PR traffic was `helm/ssc-N` carriers.
+
+---
+
+**1. A SLICE IS A HEAD BRANCH, AND ITS `helm/ssc-N` PR BELONGS TO IT.** The plan counts
+"PRs per slice" without defining a slice, and the repo offers three candidates: a
+Paperclip work item, a plan's declared delivery, or a branch. I took the branch — a slice
+is one non-`helm/ssc-*` head branch, normalised past its `claude/` / `opus-` / date
+decoration, and the SSC PR that rules on it attaches to it rather than counting as a
+slice of its own. **The default it could have gone the other way on:** counting each SSC
+as its own slice, which would have halved the PRs-per-slice figure and hidden the exact
+cost cutover 1 exists to remove. Logged because it is the definition every later
+comparison inherits.
+
+**2. PRs PER SLICE IS ALL PR TRAFFIC OVER DELIVERED SLICES — INCLUDING A SLICE THAT
+DELIVERED NOTHING.** `exo-night3` (#584 + #585) burned two PRs and closed without
+merging. A ratio that drops it reports 2.0 and flatters the old model with its own waste;
+including it reports **2.15**. The plan estimated 2.3. **I am not reverse-engineering the
+definition that reproduces 2.3** — the measured number under a stated definition is the
+thing worth freezing, and the gap is small enough to be exactly the kind of drift a
+frozen baseline exists to stop happening silently a second time.
+
+**3. WAIT HOURS ARE UNION-ED, NOT SUMMED, AND THIS IS THE ONE THAT WOULD HAVE SHIPPED A
+WRONG NUMBER.** The first working version summed every merged PR's open→merge minus CI.
+A slice's product PR and its SSC twin sat open across *the same hours* waiting on the
+same person, so the sum double-counted: 42.9 wait-hours against a 40.8-hour denominator,
+a ratio of **1.05**. A governance wait ratio above 1 means the window contained more
+waiting than it contained time. Elapsed time is what a wait costs, so the numerator is
+now the union of the wait intervals. Five self-test cases pin the arithmetic — contained,
+overlapping, disjoint, empty, zero-length.
+
+**4. TWO GWR READINGS, BECAUSE ONE WOULD HIDE WHICH DEFINITION IT IS.** The headline
+(**0.49**) uses the plan's §6 terms: product-PR wait plus authorization gaps. A second
+line adds the hours an SSC PR spent open beyond that (**0.53**). The first is the one
+comparable to the plan's < 0.15 target and to its 0.40–0.60 estimate; the second is the
+fuller cost, since an SSC PR's entire existence is governance overhead. **The default it
+could have gone the other way on:** publishing only the fuller number, which reads worse
+for the old model and is therefore the tempting one. It would also have been
+incomparable to the target it is supposed to be measured against.
+
+**5. A STANDING WORK ITEM'S LEAD TIME IS CLAMPED TO THE WINDOW.** DRA-53 is an ops lane
+accepted 2026-09-10 and still open; its two slices here are minutes long. Counting its
+whole open life as lead time put **77.4 h** in the denominator and dragged GWR from 0.49
+down to **0.36** — a governance metric improved by an ops ticket nobody had closed. Lead
+time for a window is now the lead time of the work done *in* it, and the clamped rows say
+so in the table.
+
+**6. AN UNMEASURED METRIC IS NEVER A ZERO, AND TWO OF THEM ARE.** *Escaped defect rate
+per tier* has no data because the tier model did not exist during this window — no merge
+in it carries a tier. *Cost per delivered slice* has none because DRA-70/71/72 ran on Soft
+CLI seats with no Paperclip run records; the one work item in the window that *does* carry
+run records delivered no slices, so dividing its cost by another item's slices would print
+a number about neither of them. **I checked that the instrument itself works before
+calling the gap the window's**: issues worked through Paperclip return non-zero run counts
+and token totals. Both render as `unmeasured` with the reason, and `ExoDashboardTests`
+reddens if that word leaves the document. `costCents` is 0 everywhere, which is a
+subscription billing shape rather than a measurement — tokens are the quantity that moves,
+so they are carried beside the cents.
+
+**7. A RED CI RUN IS ONE THAT FAILED *OR* NEEDED A SECOND ATTEMPT.** A rerun-to-green
+overwrites the run's conclusion, so counting conclusions alone misses exactly the reds the
+flake ledger exists for — including `34724000246`, which is *in* the ledger and reports
+`success` today. Twelve red events in the window, **two filed**, six unfiled on window PR
+branches. The unfiled count is not an accusation; it is the number that says the ledger is
+behind, which is the only way "passed on rerun is an observation" becomes checkable.
+
+**8. A GOVERNANCE PR THAT DESCRIBES REWORK IS NOT REWORK.** #605's body ACKs #604's
+re-land, and the first version counted both — doubling the rework rate to 7.4%. Signature
+prose about someone else's correction is a ruling, not a correction. Rework is **3.7%**
+(1 of 27), and the one PR is named in the dashboard so the rate is checkable rather than
+assertable.
+
+---
+
+**WHERE THE MEASURED NUMBERS DISAGREE WITH THE PLAN'S ESTIMATES**, and the disagreement is
+the deliverable rather than an embarrassment: PRs/slice **2.15** vs 2.3 (definitional,
+§2); median CI **13.5 min** vs "14–16" (the range is 10.9–28.6, so the estimate was
+reading the middle of the spread rather than the median); GWR **0.49** lands inside the
+estimated 0.40–0.60 band; ACCR **0%** and "≥2 Helm touches per slice" (**2.1**) came back
+exactly as estimated. **And one claim the instrument confirmed independently:** the plan
+says half of all PR traffic in the window was signature carriers, from a count of 12 of
+24; the script measures 14 of 28 over a slightly wider read of the same window — the same
+50%, reached from a different count. `docs/ops/execution-flow.md` now carries the measured
+figures beside the estimates it shipped with, and says the frozen definition is the one M2
+must use.
+
+**WHAT I DID NOT DO.** No tier was assigned retroactively to a window that predates the
+tier model. No `EXO-PLAYBOOK.md` entry — that is DRA-79's slice, and §10.3's whole point is
+that capture-back at a checkpoint should be a copy step from this dashboard. No weekly
+schedule or cron for the script; the plan says "weekly and on demand" and wiring a
+scheduler is a separate mechanism with its own failure modes. No Paperclip-side change to
+start recording runs for CLI seats. The dashboard flags `channel-rotation`'s tag for
+naming no judging metric (§10.1 asks for one) and **does not guess which metric was
+meant** — an experiment that graduates on a number nobody chose for it is the failure the
+tag exists to prevent.
+
+— Dranak (Claude Code, DRA-78)
+
+---
+
 ## 2026-09-14 — DRA-74 / M0-1: the SSC-PR pattern is retired, and a signed plan now authorizes its whole slice sequence
 
 exo-experiment: ssc-retirement — judged by *PRs + Helm touches per slice*
