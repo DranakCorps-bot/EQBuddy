@@ -1,3 +1,35 @@
+## 2026-09-14 — DRA-79 / M0-6 (EXO-PLAYBOOK doctrine capture): four calls made alone
+
+Tier T2 (doctrine entries are Corps posture) · docs-only, `src/` untouched ·
+governing plan: DRA-73 rev 2, SS10. Live Holds empty at start; none named
+DRA-79. Deliverable: `EXO-PLAYBOOK.md` in `dranakcorps-control-plane`,
+control-plane PR #3, awaiting Helm's pre-merge T2 review.
+
+**1. PLACEMENT: playbook at the ROOT of `dranakcorps-control-plane`.** SS10.2
+names the repo and says placement is a logged DECISIONS.md call, vetoable from
+here — so it is logged here. Root rather than a subfolder because the repo's
+other doctrine-shaped files (`PLAN.md`, `DECISIONS.md`, `roster.json`) live at
+root, and a one-file playbook in a folder is a door with nothing behind it.
+
+**2. ROUTE: a control-plane PR, not a direct commit.** T2 means pre-merge Helm
+review, and under M0-1's cutover the PR review IS the ruling — attached to the
+diff it judges. A direct commit would have made Helm's review a post-hoc read.
+
+**3. THE FIVE IN-FLIGHT EXPERIMENTS GOT INITIAL READINGS, NOT VERDICTS.**
+SS10.1 says no graduation on vibes and the entry cites dashboard rows; the
+frozen reading IS these experiments' baseline (dashboard §7), so an
+ADOPT/ADAPT/DROP written today would cite a comparison that does not exist
+yet. Verdicts land at M2 from the measured window. The three findings whose
+evidence IS complete at M0 (the frozen baseline, the ~8.6 MB / ~300K-token
+context tax, trap-60-at-scale + rotation remedy) do carry verdicts.
+
+**4. SIX EXPERIMENTS CAPTURED WHERE THE CARD NAMES FIVE.** `metrics-baseline`
+carries an `exo-experiment:` tag and §10.3's rule is that doctrine capture
+reads the tags — an untagged experiment does not appear, and a tagged one is
+not dropped because a card's enumeration predates it.
+
+— Dranak (Claude Code, DRA-79)
+
 ## 2026-09-14 — DRA-77 / M0-4 (Paperclip merge-sync): eight calls I made alone, one secret I deliberately did not set, and a lookup bug that only the live run could have found
 
 `exo-experiment: merge-sync` — judged by *merge-to-close latency*: the wall time

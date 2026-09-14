@@ -10,6 +10,9 @@ Deeper material:
   ladder and the flake ledger (C′, 2026-09-08)
 - **[docs/ops/claude-archive/](docs/ops/claude-archive/README.md)** — incident
   novels, superseded mechanisms, historical evidence. Not always-loaded.
+- **`EXO-PLAYBOOK.md` in `dranakcorps-control-plane`** (private) — Corps
+  doctrine graduated from EQBuddy's ExO experiments, with the evidence
+  (DRA-73 §10; entries written at each M-checkpoint exit).
 
 Progression: incident → verified lesson → executable test/guard → compact live
 rule. Once a guard exists, the novel leaves this file. Do not gut a rule that

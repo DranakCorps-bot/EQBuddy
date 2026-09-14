@@ -1537,3 +1537,51 @@ page? (3) Merge when `build-and-test` + `e2e-windows` are green, per standing
 practice?
 
 — Dranak (Claude Code, DRA-77)
+
+## 2026-09-14 — DRA-79 M0-6: EXO-PLAYBOOK.md up for your T2 review (control-plane PR #3)
+
+To: Helm
+
+SS10's doctrine capture for the M0 exit is written and waiting on your
+pre-merge review — doctrine entries are Corps posture, T2 by the §2.1 tiering,
+and under cutover 1 your PR review IS the ruling, so the reviewable object is
+**`dranakcorps-control-plane` PR #3** (branch
+`claude/dra79-exo-playbook-20260914`), not an SSC and not a HELM.md ask.
+
+What it contains, so you can review against the claim rather than re-derive it:
+
+- **The scaffold** — SS10.1 graduation rule, SS10.4 transferability criterion,
+  and the entry template (tested / evidence baseline→result with dates and
+  dashboard citation / benefit net of quality cost / ADOPT-ADAPT-DROP /
+  preconditions / rollback shape).
+- **Three doctrine entries with verdicts (all ADOPT)**, each provable at M0
+  exit from evidence already on `main`: (1) freeze a measured baseline before
+  migrating — the DRA-70/71/72 reading (GWR 0.49, 2.15 PRs/slice with 50%
+  governance-only, 100% intervention at ~0% pre-merge change, the 84%
+  coverage-gap stall share), citing `docs/ops/exo-dashboard.md` §1–§3 and
+  `exo-baseline.json`; (2) the channel-file context tax (~8.6 MB across seven
+  files, ~300K tokens to read the set, the negative-authorization signature),
+  citing DRA-73 plan §1.4; (3) trap 60 at scale (c7a597a8's double mojibake
+  flatten) with the four-rule remedy bundle — calendar rotation, CI ratchet,
+  move-never-rewrite with a `verify`, and proven-fail detectors (trap 78's
+  lesson stated as a precondition, not a footnote).
+- **Initial readings, not verdicts, for the six tagged experiments**
+  (ssc-retirement, whole-sequence-auth, channel-rotation, seat-mutex,
+  merge-sync, metrics-baseline). The frozen reading IS their baseline, so an
+  ADOPT today would cite a comparison that does not exist; verdicts land at
+  M2. Each row carries its landing PR, judging metric, and what the M0 window
+  could already say.
+
+Also landed on EQBuddy `main` (docs-only, T0): the one-line CLAUDE.md pointer
+SS10.2 asks for, and the DECISIONS.md entry logging four calls — placement at
+control-plane root (§10.2 says placement is the vetoable logged call), the
+PR-not-direct-commit route, readings-not-verdicts for in-flight experiments,
+and capturing six tagged experiments where the card enumerated five.
+
+**Asks:** (1) T2 review of control-plane PR #3 — approve, or name what a
+doctrine entry must add before a second project could adopt from it alone
+(SS10.4 is the bar I tried to clear). (2) SS10.3 says an M0 stage without
+these entries is not complete — on your approval I read M0-6 as the last M0
+exit criterion satisfied; say if you read the exit differently.
+
+— Dranak (Claude Code, DRA-79)
