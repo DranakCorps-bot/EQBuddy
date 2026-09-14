@@ -9290,3 +9290,87 @@ deferred intent explicitly rather than returning an empty list. P9 should not ne
 anything that landed here.
 
 — Dranak (Claude Code)
+
+## 2026-09-13 ~10:40 PM CT — DRA-71 D7 DRAINED (motes + money): P10 executed, P9 executed with its weight refused by its own survey
+To: Fable
+
+Seat `opus-dra71-d7`, Paperclip DRA-71, off Soft `main` post-#596/#597. D7 only — D8 and D9
+deliberately not drained. Eleven defaults in `DECISIONS.md`; four rows in `docs/TestPlan.md`.
+
+### Reinforcing — the thing in this plan that paid off most
+
+**P9 and P10 both told me to SURVEY before building, and both surveys changed the delivery.**
+That instruction is the single most valuable line in the plan and it is worth keeping in every
+future slice that touches harvested data, because in both cases the survey found something
+neither of us would have guessed:
+
+- **P10's check came back as a third answer.** You wrote "if yes, labeled Catalog fallback
+  rows; if no, silence and an honest empty state". The truth is that all eleven mote records
+  DO carry a `DropZones` — the field is present — and every value is "Various Zones", "Unknown"
+  or "D3+ Zones". **A field that is present and says nothing is worse than one that is absent**,
+  because a reader checking only for presence ships rows telling players to travel to Various
+  Zones. Worth carrying as a general shape: the binary "does the catalog have it" is the wrong
+  question; "is what it has a thing a player can act on" is the right one.
+- **P10's "difficulty 2–4" assumption got one piece of corroboration**, which I did not expect
+  to find: the bare "Mote of Potential" lists its drop zones as *"D3+ Zones"* — the wiki tying
+  mote quality to instance tier in its own words. `MoteCatalogSurveyTests` pins that string so
+  the assumption can be checked rather than trusted. It is one string and I derived nothing
+  from it.
+
+### Corrective — one departure from the signed plan, and it is P9's weight
+
+**P9 asked for "vendor-value-weighted drop evidence from your own kills and the catalog". The
+catalog half does not weigh anything, and the survey is the reason.** Through the app's own
+parsers, over the 10,957 cached item pages:
+
+- 945 state a `merchant_value` (8.6% of the catalog); 646 parse; 299 are refused as unreadable.
+- 354 distinct parsed values across the 646 — so trap 73's distinct-count tell **passes**. The
+  data is real; it is not one template.
+- **235 of the 646 state the Charisma and the faction standing they were quoted at**, in the
+  page's own heading — "VALUE TO VENDOR with CHA : 80 and faction at Indifferently" — and the
+  Charisma differs per page (80, 72, 111).
+
+A vendor's price in EQ moves with the seller's Charisma and their standing with the merchant.
+So the wiki's number is **a quote somebody was given, not a property of the object**, and a
+ranking built on it would sort zones by which of their drops happen to have a priced page, at a
+Charisma that is not the player's. What the player was PAID has neither problem and was sitting
+unread in the stored snapshots, so `SaleHistory` became the evidence and the catalog's number
+was demoted to naming an item they have never sold — `Evidence.Catalog`, printed WITH the
+page's own condition, weighing nothing.
+
+**What I would ask of the next plan that reaches for harvested data:** the phrase
+"catalog-weighted" is doing a lot of work in a plan sentence. It assumes the catalog's number
+is about the THING. Where it is about a transaction — a price, a rate, a time — it is about the
+observer too, and the plan is the right place to say which. This is the second slice running
+where the catalog turned out to say less than its field names promise (`DropMobs` in D6 was the
+first, for a different reason), and a plan line like *"survey what the field MEANS, not only
+whether it is populated"* would have caught both.
+
+### Constructive — one thing the plan could not have foreseen, and one it could
+
+**Could not:** three engines answering about one zone is the cross-domain join working exactly
+as the PRD wants, and it broke the row. Ten sentences against a `WhyCap` of six, the merge
+CONCATENATED the parts, the cap trims the tail — so a row headed "Level Up · Farm Motes · Make
+Money" drew six sentences of which not one was about money. Every component was correct. Only a
+launched app saw it. `Join` now interleaves round-robin, and within an engine every discount
+that FIRED is emitted before the fact that weighs nothing (D4's ordering rule, one file over).
+**Raising the cap again was the wrong lever** — D4 already went 4→6 under protest.
+
+**Could have:** the slice table has said since #580 that D2–D4 come before "materials", and the
+Founder's mote ask (*"highest-level zone, frequent kills, tier 2–4"*) is three criteria that
+each want a discount. The plan did not say whether they compound or pick a winner, and that is
+a one-line ruling a plan can give cheaply. I compounded them, following D4's four-discount
+precedent, and logged it. If P13's resource criteria have the same shape, naming the
+composition rule in the plan text would save the next seat the same judgement call.
+
+### What D8 inherits
+
+`FarmToSell` is answered and no longer a deferral, so **P13 should not expect to find it**;
+`AllThreeGearIntentsAreAnsweredInThisDelivery` is the row that says so. `GoalGapReason.GearIntentNotAnsweredYet`
+and `Recommendations.FarmGear`'s arm for it are deliberately KEPT although unreachable, so a
+fourth intent arriving Deferred still has a sentence and a door. Two goals remain Deferred —
+Farm Materials (P13, D8) and Achievements (P14, still parked). `MoteHistory` and `SaleHistory`
+are folds in the `ZoneHistory` idiom and the phone inherits both the day it calls `Rank`; D9
+needs no new plumbing for them.
+
+— Dranak (Claude Code)
