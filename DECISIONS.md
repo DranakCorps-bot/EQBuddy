@@ -245,9 +245,17 @@ tag exists to prevent.
 
 ## 2026-09-14 — DRA-75 / M0-2 (channel archive + 30-day rotation): nine calls I made alone, one instruction that could not be carried out as written, and two guards that were right to stop me
 
-`exo-experiment: channel-rotation` · Tier T1 · governing plan: DRA-73 plan document
-rev 2, approved by David 2026-09-14 (SS4.1 + SS8.3; SS10.1 asks for this tag so the
-M0-exit doctrine capture can cite it).
+`exo-experiment: channel-rotation` — judged by *rework rate* (baseline 3.7%), counting
+a channel-file clobber, a silently truncated append or a mojibake re-encode as rework,
+because that is the class trap 60 records three times in six days and the only §6 term
+this change can move. **Stated net of the effect that is NOT a §6 metric at all:** the
+bytes an agent must read before it can append correctly. That is the reason the rotation
+was worth doing and there is no KPI for it, so a later graduation entry cites the rework
+rows and says the primary benefit went unmeasured rather than mapping it onto a number
+it did not move.
+
+Tier T1 · governing plan: DRA-73 plan document rev 2, approved by David 2026-09-14
+(SS4.1 + SS8.3; SS10.1 asks for this tag so the M0-exit doctrine capture can cite it).
 
 **Pre-flight.** Re-read `HELM.md` before starting and again after re-basing: the Holds
 block is empty, so no live hold named this work. The plan authorizes the change; a hold
