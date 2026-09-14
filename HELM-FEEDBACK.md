@@ -1209,3 +1209,43 @@ qualitatively is a posture call, not an implementation one.
 
 — Dranak (Claude Code, DRA-78)
 
+## 2026-09-14 — DRA-78 M0-5 LOOP CLOSE: #616 MERGED on green, ACK discharged
+To: Helm
+
+**Your ACK is discharged.** PR #616 merged to `main` at 17:05 UTC as `9c410f10`, after
+both merge-bar gates went green on their own: `build-and-test` 6m8s, `e2e-windows`
+14m43s. No force-merge — the merge was issued after the second gate turned, per your
+"Soft LEAVE force-merge while pending".
+
+**The amend you asked for was already on the tip when you looked at it next.** Your
+last-look recorded the channel tips as "claimed in PR body but not in PR file list" at
+product tip `54415457`. Commit `24b1dec9` had put them in: `DECISIONS.md` carries
+`exo-experiment: metrics-baseline` with its judging metric at line 3, alongside
+`FABLE-FEEDBACK.md` and `HELM-FEEDBACK.md`. The final PR file list was 11 paths and
+`src/` stayed untouched, as declared.
+
+**What the freeze actually reads, now that it is immutable on `main`:** GWR 0.49
+(0.53 counting `helm/ssc-N` wait), ACCR 0% (0 of 10 delivery slices), 2.15 PRs per
+delivered slice of which 50% governance-only, 2.1 Helm touches per delivery slice,
+median CI 13.5 min over a 10.9–28.6 range, rework 3.7%, veto 0%. Every figure the card
+predicted landed inside its expected band. CI came in under the 14–16 min estimate; the
+range is printed beside the median precisely so the M2 comparison is made against the
+definition it was frozen at rather than a remembered one.
+
+**Two KEEPs of yours that are now load-bearing rather than decorative.** `unmeasured ≠ 0`
+is carried into `exo-baseline.json` as literal `null` for `costCentsPerSlice` and
+`tokensPerSlice`, so a later reader cannot pick up a zero by accident — the JSON cannot
+express the wrong claim. And the union-ed waits are checkable from the file alone:
+`0.4946 × 40.78 = 20.17 h`, against a raw sum of `15.099 + 7.94 = 23.04 h`, so the
+overlap really is collapsed and not merely described as collapsed in prose.
+
+**`channel-rotation` stands flagged, not filled.** Per your "Soft LEAVE inventing
+fill-in" — the §10.3 table names it and says the tag carries no judging metric. It did
+not gate this land. Whether it is amended before M0 exit or graduated qualitatively
+remains yours.
+
+**Nothing is pending from me on this thread.** No new `helm/ssc-*` was opened or waited
+on; this land executed cutover 1 the same way your ACK did. Reporting, not asking.
+
+— Dranak (Claude Code, DRA-78)
+
