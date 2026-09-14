@@ -1730,3 +1730,62 @@ is stale is only that no picture shows a ticked HPS. The screen is a mutex
 say whether you want that batch before land or after.
 
 — Dranak (Claude Code, DRA-81)
+
+## 2026-09-14 — DRA-81 CORRECTION: the shot recipes were NOT fine, and taking one is what found it
+To: Helm
+
+Correcting my own entry above, same PR (#619). I wrote that the `mini-bar` /
+`mini-tour` recipes were *"unchanged and correct — the default row is still
+`dps,xp`"*, and offered the batch as optional. **That was wrong twice**, and I
+found it by taking a shot instead of reading the diff.
+
+**First:** those recipes are not default profiles — they seed `MiniStats`
+explicitly, and one of them seeds `'hps'`. Under the LOCK a seeded `MiniStats`
+IS the metric row, so `mini-bar` would have drawn an HPS slot reading "0 hps"
+and become a second picture of `mini-bar-healing` differing only in a number —
+the "two committed PNGs of one picture" the same file warns about eight lines
+further down. Worse, `hud-expand-dps` and `hud-expand-progress` seeded
+`@('kills','loot')` and relied on DPS and XP being unswitchable: under the LOCK
+those two shots **lose the very chips they photograph**. Ten recipes now state
+their row; `mini-bar` dropped `'hps'` so the pair survives, and the pair is
+better for it — the two PNGs are now one TICK BOX apart, which is the thing a
+reader is being shown.
+
+**Second, and this is the one I would not have reasoned my way to:**
+`Write-Settings` writes a settings.json, so `hadFile` is true and
+`MigrateHudStatStars` runs over every fixture — adding `dps`/`hps`/`xp` to
+whatever a recipe asked for. Correct for a player's profile, wrong for a
+fixture. The first `mini-bar` take came back **991x40, `mini-bar-healing`'s
+width**, because the migration had put an HPS slot on a row the recipe had
+deliberately not starred. `HudStatStarsRestored = $true` joins
+`WatchPinsMigrated` and `WatchChipMasterRetired` in the seed, for the reason
+those two are already there. I had made exactly this fix in `AppHarness` an
+hour earlier and did not think to look for its sibling — trap 4's shape, two
+harnesses seeding one kind of state.
+
+**Verified rather than asserted this time.** With the flag in,
+`mini-bar` (889x40), `mini-bar-healing` (991x40) and `mini-bar-chips` (638x40)
+come back **byte-identical to the committed PNGs** — so the pictures are
+unchanged and the recipes now say why.
+
+**One finding that is NOT mine and is left alone.**
+`docs/screenshots/hud-expand-dps.png` is **520 commits stale**: it is 300x201
+and today's code draws 300x133. I isolated it — the old seed and the new seed
+both produce 133 on this branch — so the drift predates DRA-81 and is not
+caused by it. The current capture is a healthy panel (three damage rows, no
+empty state), but its subtext reads `Puma · 8s · Killed · 11 dps` where the
+recipe's prediction says `Session · Nm in combat · N dps`: an ENCOUNTER scope
+where the prose predicts a session one. Re-deriving that prediction is a
+different slice, and committing a picture whose numbers I did not predict is
+trap 23 with my name on it — so I reverted the re-take and am naming the debt
+instead. `hud-expand-progress` re-shot 300x132 against a committed 300x132 and
+is fine.
+
+**Reinforcing, for the process rather than for you:** the LOCK's §2 named
+Options copy, and a literal reading would have stopped at `SettingsHudView`.
+The things that actually still told the old story were the release notes and
+the staging fixtures — neither of which any gate checks, because CI does not
+run `shoot.ps1` and `WhatsNew.json` only has to be well-formed. **"Grep for the
+rule, not for the file the brief named"** is the version of this worth keeping.
+
+— Dranak (Claude Code, DRA-81)
