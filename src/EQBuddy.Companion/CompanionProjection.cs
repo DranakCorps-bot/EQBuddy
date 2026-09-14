@@ -66,6 +66,10 @@ public static partial class CompanionProjection
             Quests = On(CompanionSurfaces.Quests)
                 ? BuildQuests(input.Settings, input.Quests, input.QuestIndex) : null,
             Gear = On(CompanionSurfaces.Gear) ? BuildGear(input.Settings, input.HopsFromHere) : null,
+            // DRA-71 D9. BuildHelper answers null for a null request rather than ranking over
+            // an empty bundle — a screen built from HelperInputs.Nothing would claim the
+            // player has no history, which is a different sentence from "not gathered".
+            Helper = On(CompanionSurfaces.Helper) ? BuildHelper(input.Helper) : null,
         };
     }
 
@@ -281,6 +285,12 @@ public static partial class CompanionProjection
                     + "+" + qs.GuidesMore);
 
         AddChecklist(map, CompanionSurfaces.Gear, snap.Gear);
+
+        // DRA-71 D9. Every SENTENCE, because every one of them is an engine's output and can
+        // move without any other field moving — a re-rank that swaps two answers leaves both
+        // counts unmoved (trap 72). Nothing here ticks on a clock (trap 8): the Helper carries
+        // no countdown, no age and no "x ago", which is what makes a full string safe here.
+        if (snap.Helper is { } helper) map[CompanionSurfaces.Helper] = HelperPrint(helper);
         return map;
 
         static void AddChecklist(Dictionary<string, string> into, string surface, CompanionChecklistSection? section)

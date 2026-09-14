@@ -1,4 +1,4 @@
-using System.Text.RegularExpressions;
+﻿using System.Text.RegularExpressions;
 using EQBuddy.UI.Shared;
 using Xunit;
 
@@ -216,11 +216,21 @@ public class GameCommandsTests
     [Fact]
     public void ThePhoneShowsTheCommandAndNeverSpellsItItself()
     {
-        Assert.All(new[] { CommandPrompts.GearInventory, CommandPrompts.RaidsAchievements }, p =>
+        // FIVE since DRA-71 D9, and the three new ones are the Helper's — the same three the
+        // desktop half of this list carries against HelperRoom.cs, because the Helper needs the
+        // dumps its OWN engines read. A curated must-list is what catches a surface that grew
+        // an input and never named the command (trap 34); the forbid-scan under it cannot.
+        Assert.All(new[]
+        {
+            CommandPrompts.GearInventory, CommandPrompts.RaidsAchievements,
+            CommandPrompts.HelperFaction, CommandPrompts.HelperAchievements,
+            CommandPrompts.HelperInventory,
+        }, p =>
         {
             Assert.Contains(p.Command, new[]
             {
                 GameCommands.OutputfileInventory, GameCommands.OutputfileAchievements,
+                GameCommands.OutputfileFaction,
             });
             Assert.NotEmpty(p.Note);
             // The lead has to say WHERE: the player is holding the one device in the room

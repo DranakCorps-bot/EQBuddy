@@ -42,4 +42,33 @@ public static class CommandPrompts
     public static readonly CommandPrompt RaidsAchievements = new(
         Lead, GameCommands.OutputfileAchievements,
         "EQBuddy on your PC reads it by itself and marks clears from before EQBuddy.");
+
+    // ---- the Helper, on the phone (DRA-71 D9) -------------------------------------------
+    //
+    // THREE, and they are the same three the desktop room's own list carries
+    // (GameCommandsTests.SurfacesNeedingACommand has three rows against HelperRoom.cs): the
+    // Helper needs the dumps its OWN engines read, and a surface that copied every command
+    // in the app would be a launcher rather than an answer. The NOTES differ from the
+    // surfaces above because what happens next differs — a dump that fills the gear
+    // checklist is not a dump that lets a room start ranking — and a command with no next
+    // step is half an instruction.
+
+    /// <summary>Work on Faction cannot rank a standing the log never sees.</summary>
+    public static readonly CommandPrompt HelperFaction = new(
+        Lead, GameCommands.OutputfileFaction,
+        "EQBuddy on your PC picks the file up by itself, and the Helper starts ranking "
+        + "factions and which of your own kills move them.");
+
+    /// <summary>Unlock Classes and Unlock Races are the game's own record.</summary>
+    public static readonly CommandPrompt HelperAchievements = new(
+        Lead, GameCommands.OutputfileAchievements,
+        "EQBuddy on your PC reads it by itself, and the Helper starts ranking the unlocks "
+        + "you are closest to.");
+
+    /// <summary>Farm Gear anchors its sweep on what you are WEARING, which comes out of the
+    /// inventory dump and nowhere else.</summary>
+    public static readonly CommandPrompt HelperInventory = new(
+        Lead, GameCommands.OutputfileInventory,
+        "EQBuddy on your PC picks the file up by itself, and the Helper starts looking for "
+        + "upgrades over what you are wearing.");
 }

@@ -1,4 +1,4 @@
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
 using EQBuddy.Core;
 using EQBuddy.UI.Shared;
@@ -75,51 +75,27 @@ internal sealed class HelperRoom : Grid, IShellRoom
     public UIElement Body => this;
 
     /// <summary>
-    /// How long the disk-and-database reads behind this room are trusted for.
+    /// **Every store this room ranks over, and the phone's projection ranks over the same
+    /// bundle** — <see cref="HelperSources"/>, which owns the seven reads, the three folds
+    /// and the five-second throttle in front of them.
     ///
-    /// <para>Same five seconds and the same argument as <c>HomeRoom</c>: the visible room
-    /// paints on the widget's one-second tick (only chrome was ever throttled — trap 46), and
-    /// this room's inputs are a SQLite query over every stored session plus two dump files.
-    /// Neither can change faster than a player can finish a sitting or type a command, and
-    /// both are re-read immediately when something the player just did lands
-    /// (<see cref="Refreshed"/>) — so the cache never stands between them and their own
-    /// action.</para>
+    /// <para>The reads used to live in this file. DRA-71 D9 put a second host on the same
+    /// engine, and the plan's word for that slice is *parity by shared module* — so the
+    /// assembly moved to UI.Shared and this room became one of its two callers rather than
+    /// the place the phone would have had to be kept level with by hand (#210).</para>
+    ///
+    /// <para>The INSTANCE stays this room's own, which is trap 45's rule about a memo: a
+    /// cache with a clock in it that two owners could invalidate is state, not a
+    /// producer.</para>
     /// </summary>
-    private static readonly TimeSpan SourceCacheFor = TimeSpan.FromSeconds(5);
-
-    /// <summary>The pooled creature list, cached and re-folded only when the live session's
-    /// creatures actually move. The SAME <see cref="WikiPackPool"/> the Unlocks tab holds —
-    /// <see cref="MobHistory.Pool"/> stays the one pooler, and this is a cache in front of it
-    /// rather than a second fold (its own comment asks for exactly that).</summary>
-    private readonly WikiPackPool _pool;
-
-    private DateTime _readAt = DateTime.MinValue;
-    private IReadOnlyList<ZoneRoll> _zones = [];
-    // DRA-71 D7. Two more folds over the same archives — motes per zone, and what a
-    // vendor has actually paid this character per item. Neither re-pools anything:
-    // MoteHistory consumes the pool and the zone rollup, SaleHistory consumes the
-    // snapshot probe beside StoredThroughput's.
-    private IReadOnlyList<MoteRoll> _motes = [];
-    private IReadOnlyList<SaleRoll> _sales = [];
-    private int _poolVersion;
-
-    /// <summary>What this character is WEARING, folded from the newest inventory dump behind
-    /// the same throttle as the session query (DRA-71 D6). It is the Farm Gear sweep's anchor
-    /// set; <see cref="GearUpgrades.WornFrom"/> is the one producer of it, so the phone reads
-    /// the same rule when it gets here.</summary>
-    private IReadOnlyList<WornItem> _worn = [];
+    private readonly HelperSources _sources;
 
     /// <summary>**Where this character's profession skills stand** (DRA-71 D8) — the ledger's
     /// own rows, read every tick like the level beside it because it is a dictionary copy and
     /// a skill-up announced mid-sitting must not wait five seconds to show. The LEDGER's and
-    /// never the live session's: a value that died at midnight is the thing this slice
+    /// never the live session's: a value that died at midnight is the thing that slice
     /// fixed.</summary>
     private IReadOnlyList<(string Skill, int Value, DateTime At)> _skills = [];
-
-    /// <summary>The dump this room folded <see cref="_worn"/> from, in the repaint
-    /// fingerprint. A new dump changes what is worn, which changes every gear answer — trap
-    /// 72's exact shape, one store along.</summary>
-    private string _inventoryStamp = "";
     private RecommendationSet _answers = RecommendationSet.Empty;
     /// <summary>The level the engine was handed this Build — captured so the disclosure line
     /// and the ranking it describes come from one moment (trap 56). It is
@@ -204,7 +180,14 @@ internal sealed class HelperRoom : Grid, IShellRoom
     {
         _main = main;
         _navigate = navigate;
-        _pool = new WikiPackPool(_main.StoredMobRows);
+        _sources = new HelperSources(new HelperSources.Reads(
+            StoredMobRows: () => _main.StoredMobRows(),
+            StoredSessions: () => _main.StoredSessions(),
+            StoredThroughput: () => _main.StoredThroughput(),
+            StoredSales: () => _main.StoredSales(),
+            LatestInventory: () => _main.LatestInventory(),
+            StatsFor: _main.WikiItems.StatsFor,
+            ActiveSessionRowId: () => _main.ActiveSessionRowId));
 
         _scroll = new ScrollViewer
         {
@@ -223,7 +206,8 @@ internal sealed class HelperRoom : Grid, IShellRoom
 
     /// <summary>Nothing to give back: no timer, no token, no file handle, no watcher. The
     /// pool is a plain in-memory fold and the reads are on-demand behind
-    /// <see cref="SourceCacheFor"/>, which is a cost decision rather than a resource one.
+    /// <see cref="HelperSources.CacheFor"/>, which is a cost decision rather than a
+    /// resource one.
     /// Empty with a reason, per the interface's own contract.</summary>
     public void Release() { }
 
@@ -235,7 +219,7 @@ internal sealed class HelperRoom : Grid, IShellRoom
 
     /// <summary>
     /// A dump the player just produced landed. Re-read now rather than up to
-    /// <see cref="SourceCacheFor"/> later.
+    /// <see cref="HelperSources.CacheFor"/> later.
     ///
     /// <para>This room asks for two commands in its empty states, so the gap between running
     /// one and seeing it answered is the whole of what those states promise. A Helper still
@@ -245,7 +229,7 @@ internal sealed class HelperRoom : Grid, IShellRoom
     /// </summary>
     public void Refreshed()
     {
-        _readAt = DateTime.MinValue;
+        _sources.Invalidate();
         Repaint();
     }
 
@@ -256,35 +240,39 @@ internal sealed class HelperRoom : Grid, IShellRoom
         var identity = Who();
         ReadSources(identity, s);
 
-        var goals = HelperGoalStore.Goals(_main.Settings, _main.QuestCharacterKey);
-        var factions = HelperGoalStore.Factions(_main.Settings, _main.QuestCharacterKey);
-        // DRA-71 D5: the SAME store the Quests window's Unlocks tab reads. One producer of the
-        // pick; neither room keeps a copy of it.
-        var picks = UnlockPickStore.Picked(_main.Settings, _main.QuestCharacterKey);
-        // DRA-71 D6: the three Farm Gear selections, from the one store that owns them. Read
-        // every tick for the reason the level is — they are three dictionary lookups, and a
-        // click in this room must not wait five seconds to change the answers.
-        _intent = GearIntentStore.Intent(_main.Settings, _main.QuestCharacterKey);
-        var wornPicks = GearIntentStore.WornPicks(_main.Settings, _main.QuestCharacterKey);
-        _includeQuests = GearIntentStore.IncludeQuests(_main.Settings, _main.QuestCharacterKey);
         var unlocks = _main.Unlocks;
         // The SAME resolution the Character room draws and the unlock preview keys off
         // (MainWindow.ResolvedLevel), so the number this room ranks with is the number that
-        // room shows. Read every tick: it is two dictionary lookups, and a level the player
-        // just typed one room away must not wait five seconds to change the answers.
+        // room shows.
         _level = _main.ResolvedLevel;
-        // DRA-71 D8. Two dictionary reads, on the tick for the level's reason: a pick and a
-        // skill-up both have to change the room now rather than at the next throttle.
-        var professions = TradeskillPickStore.Picked(_main.Settings, _main.QuestCharacterKey);
-        _skills = _main.QuestLedger?.SkillsFor(_main.QuestCharacterKey) ?? [];
+
+        // **ONE PASS OVER EVERY STORE THIS ROOM READS, and the phone's projection ranks over
+        // the object it produces** (DRA-71 D9). Every selection below is read here rather than
+        // by each consumer for trap 33's reason: two callers reading one store at slightly
+        // different moments produce two current answers and whichever ran last wins. The picks
+        // this room DRAWS and the inputs it RANKS with came out of the same `Gather`.
+        var bundle = _sources.Gather(
+            _main.Settings, _main.QuestCharacterKey, unlocks, _level, _main.QuestCatalog,
+            ItemCatalog.Default,
+            _main.QuestLedger?.ClassesFor(_main.QuestCharacterKey) ?? [],
+            _main.CurrentSnapshot().InferredClass ?? "",
+            _main.QuestLedger?.SkillsFor(_main.QuestCharacterKey) ?? []);
+
+        var goals = bundle.Goals;
+        var factions = bundle.Factions;
+        var picks = bundle.UnlockPicks;
+        var wornPicks = bundle.WornPicks;
+        var professions = bundle.Professions;
+        _intent = bundle.Inputs.GearIntent;
+        _includeQuests = bundle.Inputs.IncludeQuests;
+        _skills = bundle.Skills;
 
         // **THE FINGERPRINT, AND EVERY STORE THIS ROOM READS IS IN IT** (trap 72: the Quests
         // tab drew the moment before for a whole session because its signature carried
-        // everything except the two lists the feature wrote). The two the player can change
-        // with a click — the goal picks and the faction picks — are folded by CONTENT and not
-        // by count, because a swap leaves a count unmoved. Nothing here ticks on the clock
-        // (trap 8): no countdown, no age, no "x ago", so an idle room costs one string
-        // compare per second and not a torn-down visual tree.
+        // everything except the two lists the feature wrote). Everything the player can change
+        // with a click is folded by CONTENT and not by count, because a swap leaves a count
+        // unmoved. Nothing here ticks on the clock (trap 8): no countdown, no age, no "x ago",
+        // so an idle room costs one string compare per second and not a torn-down visual tree.
         var key = string.Join('|',
             identity.Character, identity.Server,
             string.Join(',', goals), string.Join(',', factions),
@@ -292,37 +280,21 @@ internal sealed class HelperRoom : Grid, IShellRoom
             // the two above it are: a swap leaves a count unmoved, and the whole of D5's
             // player-visible change is what this selection does to the answers (trap 72).
             string.Join(',', picks),
-            // **The three stores DRA-71 D6's clicks change, plus the dump they are ABOUT.**
-            // The picks are folded by CONTENT for the reason the two above them are — a swap
-            // leaves a count unmoved — and the inventory stamp is here because a new dump
-            // changes what is worn, which changes every gear answer without moving anything
-            // else in this key (trap 72).
-            _intent, string.Join(',', wornPicks), _includeQuests, _inventoryStamp,
-            _poolVersion,
-            // The throughput fields are in the fold's own signature for trap 72's reason: a
-            // re-fold that gained combat seconds, damage or healing and moved a weight
-            // without moving the session count or the experience total would leave this room
-            // drawing the moment before it, for the rest of the session.
-            string.Join(',', _zones.Select(z =>
-                $"{z.Zone}:{z.Sessions}:{z.Kills}:{z.XpPercent:0.##}"
-                + $":{z.CombatSeconds:0.##}:{z.CombatDamage:0.##}:{z.HealingDone:0.##}"
-                + $":{z.ActiveHours:0.####}:{z.Deaths}")),
-            // **DRA-71 D7's two new stores, folded by CONTENT.** Neither can be inferred from
-            // anything else in this key: a mote looted from a creature already in the pool
-            // moves `MobLoot.Count` without moving the pool's own signature, and a vendor trip
-            // moves nothing in this room's other inputs at all. A room that re-ranked and drew
-            // the moment before it is trap 72, and these are exactly the two stores this
-            // slice's features write nothing to and read everything from.
-            string.Join(',', _motes.Select(m => $"{m.Zone}:{m.Motes}:{m.Potency}:{m.Kills}")),
-            string.Join(',', _sales.Select(x => $"{x.Item}:{x.Count}:{x.Copper}")),
+            // DRA-71 D6's three clicks. The dump they are ABOUT rides the bundle's own
+            // signature below.
+            _intent, string.Join(',', wornPicks), _includeQuests,
+            // **Every store the shared bundle holds, folded by CONTENT by the bundle itself**
+            // (trap 72). It is one call rather than six lines here because the phone's
+            // projection is fed by the identical object: two hosts keying on two different
+            // subsets of one bundle is how one of them ends up drawing the moment before, and
+            // the field most likely to be missed is whichever one the next slice adds.
+            _sources.Signature(),
             unlocks.HasAchievements, unlocks.Races.Count, unlocks.Classes.Count,
             unlocks.Races.Count(u => u.Complete), unlocks.Classes.Count(u => u.Complete),
             unlocks.Factions?.WrittenAt.Ticks ?? 0,
             // The level is an INPUT to the ranking, so it belongs in what makes the room
-            // redraw (trap 72 — the Quests tab drew the moment before for a whole session
-            // because its signature carried everything except the store the feature wrote).
-            // The SOURCE rides with the number: a clear that lands back on the same level
-            // still changes the sentence this room prints about where it came from.
+            // redraw. The SOURCE rides with the number: a clear that lands back on the same
+            // level still changes the sentence this room prints about where it came from.
             _level.Level, _level.Source,
             // **DRA-71 D8's two stores, folded by CONTENT** (trap 72). The picks are a click
             // in this room; the standings are written by the LOG thread while the room is on
@@ -338,87 +310,19 @@ internal sealed class HelperRoom : Grid, IShellRoom
         if (key == _painted) return;
         _painted = key;
 
-        _answers = Recommendations.Rank(new HelperInputs(
-            _zones, _pool.Mobs, unlocks.Factions, factions,
-            unlocks.Races, unlocks.Classes, picks, unlocks.HasAchievements,
-            _main.Settings.SkyQuestChecklist, _main.Settings.SkyQuestCompleted,
-            _main.QuestCatalog, _level)
-        {
-            // DRA-71 D6. The sweep lives in Core behind `Rank`, not here, so the phone gets
-            // it the day it calls the same method — porting a feature TO a surface is the
-            // signal its logic never went through the shared layer.
-            Worn = _worn,
-            Items = ItemCatalog.Default,
-            MyClasses = MyClassCodes(),
-            GearIntent = _intent,
-            WornPicks = wornPicks,
-            IncludeQuests = _includeQuests,
-            // DRA-71 D7, and behind `Rank` for D6's reason: the phone gets both engines the
-            // day it calls the same method.
-            Motes = _motes,
-            Sales = _sales,
-        }, goals);
+        // The sweep and both D7 engines live in Core behind `Rank`, not here, so the phone
+        // gets them by calling the same method with the same bundle — porting a feature TO a
+        // surface is the signal its logic never went through the shared layer.
+        _answers = Recommendations.Rank(bundle.Inputs, goals);
 
         Build(goals, factions, picks, wornPicks, professions, unlocks);
     }
 
     /// <summary>The reads that are not free, behind one throttle and one clock so a caller
-    /// cannot accidentally take one and skip the other.</summary>
-    private void ReadSources((string Server, string Character) identity, StatsSnapshot s)
-    {
-        // The pool's own signature decides whether it re-folds, so asking it every tick is
-        // one string-join — cheap, and it is what makes a kill during a live session move the
-        // Helper's cadence line. The stored-session query behind it runs once per window.
-        if (_pool.Refresh(s, identity.Character, identity.Server, _main.ActiveSessionRowId))
-            _poolVersion++;
-
-        if (DateTime.Now - _readAt < SourceCacheFor) return;
-        _readAt = DateTime.Now;
-        // ONE producer for the zone rollup (the plan's D7): `ZoneHistory.Fold` over the
-        // session rows this character already has, joined to the pool above. Nothing here
-        // re-pools creatures and nothing here mines dings — `MobHistory.Pool` and
-        // `ProgressSeries` stay the only ones that do.
-        //
-        // The third input is DRA-71 D4's throughput probe: one JsonDocument read per stored
-        // snapshot, behind THIS throttle rather than the per-tick one, because it is the same
-        // cost as the session query it sits beside and neither belongs on a one-second clock.
-        _zones = ZoneHistory.Fold(
-            _main.StoredSessions(), _pool.Mobs, _main.StoredThroughput());
-
-        // **DRA-71 D7's two folds**, behind the same throttle and built from what is already in
-        // hand. MoteHistory takes the pool and the rollup above it — no third query — and
-        // SaleHistory takes one more snapshot probe, the sibling of the throughput one, plus
-        // the LIVE session's own sales so a vendor trip this evening prices tonight's drops.
-        _motes = MoteHistory.Fold(_pool.Mobs, _zones);
-        _sales = SaleHistory.Fold(_main.StoredSales(), s, _main.ActiveSessionRowId);
-
-        // **DRA-71 D6: what the character is WEARING.** Behind this throttle rather than the
-        // per-tick one — it is a file read plus a fold over ~200 rows, the same cost as the
-        // session query it sits beside — and `Refreshed()` clears the throttle, so a dump the
-        // player just wrote answers immediately rather than up to five seconds later. That
-        // matters more here than anywhere: the Farm Gear empty state is the thing that asked
-        // them to run the command.
-        var dump = _main.LatestInventory();
-        _inventoryStamp = dump is null ? "" : $"{dump.Path}|{dump.WrittenAt:O}|{dump.Entries.Count}";
-        _worn = dump is null ? [] : GearUpgrades.WornFrom(dump.Entries, _main.WikiItems.StatsFor);
-    }
-
-    /// <summary>
-    /// This character's classes as the item blocks spell them (PAL, RNG) — the sweep's
-    /// class-lock filter.
-    ///
-    /// <para>The same resolution the Gear room's Inventory tab makes, and deliberately the
-    /// same fallback: the ledger's picked classes first, the log's inference behind them.
-    /// Empty means unknown, and unknown filters NOTHING — hiding a real upgrade is worse than
-    /// showing one the player will recognise as not theirs.</para>
-    /// </summary>
-    private IReadOnlyList<string> MyClassCodes()
-    {
-        var picked = _main.QuestLedger?.ClassesFor(_main.QuestCharacterKey) ?? [];
-        if (picked.Count == 0 && _main.CurrentSnapshot().InferredClass is { Length: > 0 } inferred)
-            picked = [inferred];
-        return [.. picked.Select(GearLocker.Code)];
-    }
+    /// cannot accidentally take one and skip the other — <see cref="HelperSources"/>'s own
+    /// job since DRA-71 D9, and the phone's projection calls the same thing.</summary>
+    private void ReadSources((string Server, string Character) identity, StatsSnapshot s) =>
+        _sources.Read(s, identity.Character, identity.Server);
 
     // ---- the body -------------------------------------------------------------------
 
@@ -643,7 +547,7 @@ internal sealed class HelperRoom : Grid, IShellRoom
     /// </summary>
     private void BuildWornPicker(StackPanel block, IReadOnlyList<string> picked)
     {
-        if (_worn.Count == 0)
+        if (_sources.Worn.Count == 0)
         {
             block.Children.Add(Line(HelperPresentation.WornPickerNoDump, Role.BodySecondary));
             block.Children.Add(CopyCommand(GameCommands.OutputfileInventory,
@@ -657,7 +561,7 @@ internal sealed class HelperRoom : Grid, IShellRoom
         // list the Gear Locker groups by, so the two rooms do not disagree about where a ring
         // sits relative to a helm. A slot the order does not know sorts last rather than
         // vanishing.
-        var rows = _worn
+        var rows = _sources.Worn
             .OrderBy(w => Array.IndexOf(GearLocker.SlotOrder, w.Slot) is var i && i >= 0
                 ? i : int.MaxValue)
             .ThenBy(w => w.Name, StringComparer.OrdinalIgnoreCase)
@@ -1323,7 +1227,7 @@ internal sealed class HelperRoom : Grid, IShellRoom
         // from "nothing in the catalog beats it": both draw one grey sentence.
         $"helperIntent={_intent.ToString().ToLowerInvariant()} " +
         $"helperIntentChips={_intentChips} " +
-        $"helperWorn={_worn.Count} " +
+        $"helperWorn={_sources.Worn.Count} " +
         $"helperWornChips={_wornChips} " +
         $"helperWornFace={_wornFace.Replace(" ", "")} " +
         $"helperWornPicks={string.Join(',', GearIntentStore.WornPicks(_main.Settings, _main.QuestCharacterKey).Select(p => p.Replace(" ", "")))} " +
@@ -1404,9 +1308,9 @@ internal sealed class HelperRoom : Grid, IShellRoom
         // `helperMoteZones` is how many zones the fold produced at all and `helperMoteRated`
         // how many cleared BOTH floors (MinHours and MinKills), which is the one pair that can
         // explain a character with motes in their bags and no mote answer on screen.
-        $"helperMoteZones={_motes.Count} " +
-        $"helperMoteRated={_motes.Count(m => m.HasRate)} " +
-        $"helperSales={_sales.Count} " +
+        $"helperMoteZones={_sources.Motes.Count} " +
+        $"helperMoteRated={_sources.Motes.Count(m => m.HasRate)} " +
+        $"helperSales={_sources.Sales.Count} " +
         // What the SCREEN drew from them (trap 56: the store's claim and the screen's claim are
         // different claims, captured in one Build). `helperCatalogValue` must stay 0 until the
         // weekly refresh puts vendor values in the shipped catalog — it is the one key that

@@ -1,4 +1,4 @@
-using System.Text.Json;
+﻿using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace EQBuddy.Companion;
@@ -75,6 +75,10 @@ public sealed record CompanionSnapshot
     public CompanionQuestsSection? Quests { get; init; }
     public CompanionChecklistSection? Gear { get; init; }
 
+    /// <summary>"What should I do next?", ranked by the same engine the desktop room calls
+    /// (DRA-71 D9). Read-only — see <see cref="CompanionHelperSection"/>.</summary>
+    public CompanionHelperSection? Helper { get; init; }
+
     /// <summary>This snapshot reduced to what one client subscribed to:
     /// null subscriptions = everything offered. Unknown or gated names land in
     /// <see cref="NotOffered"/>. A cheap record copy — safe per client per push.</summary>
@@ -98,6 +102,7 @@ public sealed record CompanionSnapshot
             Progress = wanted.Contains(CompanionSurfaces.Progress) ? Progress : null,
             Quests = wanted.Contains(CompanionSurfaces.Quests) ? Quests : null,
             Gear = wanted.Contains(CompanionSurfaces.Gear) ? Gear : null,
+            Helper = wanted.Contains(CompanionSurfaces.Helper) ? Helper : null,
             NotOffered = missing.Count > 0 ? missing : null,
         };
     }
