@@ -170,6 +170,52 @@ public class DocumentationTests
         Assert.Contains("docs/ops/verification-ladder.md", claude);
         Assert.Contains("docs/ops/flake-ledger.md", claude);
         Assert.Contains("docs/ops/claude-archive/", claude);
+        // DRA-74 / DRA-73 M0 (2026-09-14): the execution-flow detail is only
+        // reachable from the always-loaded file, so an unlinked copy is invisible.
+        Assert.Contains("docs/ops/execution-flow.md", claude);
+    }
+
+    /// <summary>Markdown wraps, so a sentence that is one claim to a reader is several
+    /// lines to <c>Contains</c>. Collapse runs of whitespace before asserting on prose.</summary>
+    private static string Flatten(string text) => Regex.Replace(text, @"\s+", " ");
+
+    /// <summary>
+    /// DRA-74 (DRA-73 plan §7 M0 / §8.1–2, approved by David 2026-09-14): two process
+    /// cutovers that exist ONLY as prose, and therefore have no other way to be kept true.
+    ///
+    /// **The failure this prevents is silent reversion.** Both rules DELETE a step
+    /// (the `helm/ssc-N` PR; the per-slice kick authorization). A deleted step leaves no
+    /// artifact behind, so nothing in the repo notices when an agent starts doing it again
+    /// — the retired pattern simply reappears in a posture list and looks like diligence.
+    /// A rule with a real reason to be reversed should be reversed OUT LOUD, by a HOLD and
+    /// an edit that reddens this, not by drift.
+    ///
+    /// The `exo-experiment:` half is the other direction: §10.1 makes that tag the thing
+    /// the M0-exit doctrine capture cites, so an untagged experiment is one the Corps
+    /// playbook cannot find. Prove-failed by deleting each asserted phrase in turn.
+    /// </summary>
+    [Fact]
+    public void TheRetiredSscPatternAndWholeSequenceAuthAreStatedInTheLiveDocs()
+    {
+        var claude = Flatten(Read("CLAUDE.md"));
+        Assert.Contains("never a `helm/ssc-N` PR", claude);
+        Assert.Contains("no new ones.", claude);
+        Assert.Contains(
+            "A signed plan authorizes every slice it declares, in order, on green gates.",
+            claude);
+        Assert.Contains(
+            "Helm stops the train with a HOLD, not by withholding authorization",
+            claude);
+
+        // The detail doc carries the evidence and the rollback shape; the experiment names
+        // are what the dashboard and the playbook entry key on.
+        var flow = Flatten(Read(Path.Combine("docs", "ops", "execution-flow.md")));
+        Assert.Contains("ssc-retirement", flow);
+        Assert.Contains("whole-sequence-auth", flow);
+
+        var decisions = Flatten(Read("DECISIONS.md"));
+        Assert.Contains("exo-experiment: ssc-retirement", decisions);
+        Assert.Contains("exo-experiment: whole-sequence-auth", decisions);
     }
 
     [Fact]

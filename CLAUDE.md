@@ -96,6 +96,13 @@ named thread.
 - **Holds live in exactly one place: `HELM.md`.** If you ever find a second
   list, one of them is stale by construction. Re-read `HELM.md` before every
   thread reply — holds arrive by commit between pulls.
+- **A public reply still waits for Helm's posture signature — only the
+  ROUTE changed** (2026-09-14). The signature arrives as a `HELM.md` commit
+  or a PR review; there is no `helm/ssc-N` PR to watch for any more, so
+  "the SSC has not landed yet" is not a reason to hold a reply, and its
+  absence is not a signature either. Nothing else about Scribe changes: a
+  public reply beyond a routine signed thread reply is consequence-list
+  work and is not covered by any plan's slice authorization.
 - **Before you describe what a reporter has or has not been told, OPEN THE
   THREAD.** One `gh` call. Hold text describes an intention, never the
   state of a thread.
@@ -119,6 +126,12 @@ the item and write the feedback note.
 `ready` the moment Fable writes it. The ONLY plans that wait carry a
 `needs-david:` line naming a decision from the [consequence
 list](#what-needs-david-and-what-does-not).
+
+**A plan is signed ONCE, for its whole declared slice sequence** — see
+[How a ruling lands](#how-a-ruling-lands-and-what-a-sign-buys). Fable does
+not re-authorize per slice and you do not ask it to; you take D(n+1) when
+D(n) merges green. A slice that turns out to exceed what the plan declared
+stops and escalates — that is the seam the sequence-wide SIGN rests on.
 
 There is no Fable Grok Bot. **You do not start Fable** (David, 2026-08-24).
 File the ask, push, then wake Helm. A file write is not a call.
@@ -255,6 +268,35 @@ then the workflow above. A push alone is not a wake.
 
 **Ask a hold for its lifting CONDITION.** A hold with no condition is one
 nobody can ever satisfy.
+
+### How a ruling lands, and what a SIGN buys
+
+Two cutovers from the DRA-73 plan's M0, 2026-09-14. Both are process, both
+are **reversible by a HOLD**, and neither touches the consequence list.
+Detail and the numbers behind them:
+[docs/ops/execution-flow.md](docs/ops/execution-flow.md).
+
+- **A ruling is a GitHub PR review and/or a `HELM.md` commit — never a
+  `helm/ssc-N` PR.** Do not open one, do not ask for one, do not wait on
+  one, and do not add "land the SSC" to a posture list. A PR review plus a
+  merge commit is the same audit trail: immutable, timestamped, indexed,
+  and attached to the thing it rules on. `helm/ssc-*` branches already on
+  the remote land or close on their own terms; **no new ones.** In the
+  DRA-70/71/72 window, 12 of 24 PRs existed only to carry signature prose.
+- **A signed plan authorizes every slice it declares, in order, on green
+  gates.** When D(n) merges you start D(n+1) — you do not write a LIVE ASK
+  asking to be allowed to, and Helm does not issue "AUTHORIZE dra-N-dX
+  after land" per slice. **Helm stops the train with a HOLD, not by
+  withholding authorization**: an objection blocks, absence of attention no
+  longer does. 84% of the measured wait in that window was planned work
+  parked overnight at an authorization gap, and no pre-merge SIGN in it
+  changed a slice.
+
+You still wake Helm for what the plan did **not** declare: a departure
+from it, a slice that outgrew its declared boundary, a guard failure, a
+cross-lane conflict, a public reply's posture, or anything on the
+consequence list. That is the exception path working, not a formality —
+and a live hold naming the work still binds, plan or no plan.
 
 Durable truth lives in the repo, not in a conversation. Keep this file,
 `HANDOFF.md`, the trap list and `docs/TestPlan.md` true as you go.
