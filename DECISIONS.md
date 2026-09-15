@@ -6820,3 +6820,95 @@ sentences should be named in it), no engine change belonging to D1/D2/D4, and no
 standing Soft-open un-PARK, which the #623 SIGN named for D3 only.
 
 — Dranak (Claude Code, DRA-84 D3)
+
+## 2026-09-14 — DRA-84 D1 (zone level bands): five calls I made alone, and the number the slice was built to produce
+
+Seat `opus-dra84-d1` / Paperclip DRA-84, claimed `-Mode disjoint` (D3 holds the card in
+parallel by Helm's named AUTHORIZE — a default claim is refused there, correctly, trap 70).
+Plan P1 as SIGNED on #623: `zonelevels-transform.py` + `ZoneLevelBands.json` +
+`Core/ZoneLevels.cs` + surveys + `--check` in `check.ps1` and CI. No engine change, no
+fetch, no harvest. Everything below is pre-authorized with a reporting duty; veto from here.
+
+**The measurement this slice exists for, first, because it changes what D2 should be.**
+Strict parsing gives **46 bands out of 118 zone pages**. Joined against the shipped
+`ItemCatalog.json.gz` (11,146 records, 5,613 carrying a `DropZones`):
+
+| Where a `DropZones` spelling lands | Spellings | Mentions |
+|---|---:|---:|
+| On a zone we have a band for | 48 / 302 (15%) | 3,564 / 10,612 (33%) |
+| On a zone page whose row we REFUSED | 74 (24%) | **5,743 (54%)** |
+| On no zone page we have read | 180 (59%) | 1,305 (12%) |
+
+The middle row is the finding, and it is not a spelling problem. Plane of Sky is `50+`,
+Plane of Hate and Plane of Fear `48+`, Temple of Veeshan `60+`, Kael Drakkel `30-60+`,
+Lower Guk `30-50+`, Karnor's Castle `40-55+`. **Every one of the heaviest drop zones in the
+catalog HAS a page, and the plan's strict rule refuses its row.** So a P2 gate that reads a
+band's TOP would, on today's data, do nothing at all for 54% of the item×zone mentions it
+looks at — including most of the high-level ones. The Founder's named exhibit survives
+(Crushbone `5-20`), and the other one was never a level question (Rathe Mountains `13-45`).
+That is a plan question, not mine to answer, and it is the ask on this PR.
+
+**Call 1 — strict stays strict, and the refused shapes ship as evidence instead.** The
+plan said `N-M` or `N`, everything else ABSENT, never guessed. I kept it even after
+measuring what it costs, because the alternative is inventing a maximum for "and above",
+which is the shape trap 73 exists to refuse, and because departing from a SIGNED plan's
+stated rule is an escalation rather than a call. **The default it could have gone the other
+way on:** reading `50+` as `50-60` (the era cap) or as an open top with its own field. Both
+are defensible and neither is mine. `zonelevels-report.md` lists all 57 refused verbatims
+with the zones carrying them, so whoever decides is deciding with the evidence.
+
+**Call 2 — lookup is exact title then the repo's existing zone-identity fold, and NOT
+longest containment.** `ZoneGraph.Resolve` uses containment for travel, and reusing it here
+was the obvious default. Measured, it bought 35 more spellings and almost every one was
+wrong: "Commonlands" got West Commonlands's `6-30`; all four Qeynos sub-zones got the city's
+`1-9`, including "Qeynos Aqueducts", whose OWN page we refused; "This drop is super ultra
+rare from any spider in kaesora." got Kaesora's `30-40`. A wrong band is a number a surface
+states as fact, where ABSENT just makes the gate do nothing — the asymmetry decides it.
+I lifted `ZoneMapFiles.IdentityKey` out of the map-file resolver rather than write a second
+normalisation rule (trap 4); it is the same private `Normalize`+`Squeeze` that was already
+there, made public and named for what it does. **Cost:** "Burning Woods" no longer reaches
+"Burning Wood" (102 mentions), because bridging it means pulling a curated alias table into
+a band lookup. It is pinned as a KNOWN miss in a test that says to delete itself when some
+slice has a reason to widen, rather than left to rot into a claim the fold is complete.
+
+**Call 3 — ABSENT ships as data.** `ZoneLevelBands.json` carries a `NoBand` section: all 72
+zones we read and got no band from, with the verbatim we refused (or `""` where the page has
+no row). `ZoneLevels.Lookup` therefore answers one of four things — Unknown / NoRow /
+Refused / Banded — because "we have never read a page for this zone" and "the wiki does not
+say" and "the wiki says `50+` and we will not read it" are three different sentences, and a
+surface that cannot tell them apart will say the wrong one. It also makes the fold refuse to
+borrow: a zone we know about but have no band for answers Refused, never a neighbour's band.
+**The default:** ship only the 46 and let absence be a hole.
+
+**Call 4 — `--check` covers the DATA file and deliberately NOT the report's join numbers.**
+The join is measured against `ItemCatalog.json.gz`, which D3's refresh rebuilds in a seat
+running right now. Gating on it would redden D3's PR on a file it did not touch, and D3's
+code-independence is something the plan declared. So the report states in its own text that
+the join half is a snapshot, prints the record count it was taken against, and says to
+re-run the transform (no `--check`) after a refresh. `ZoneLevelsTests` asserts every
+cache-derived bucket in the report and none of the join ones. **The default:** assert
+everything and let the refresh seat deal with it. **The cost of my choice, stated plainly:**
+nothing makes a stale join number go red. D4's coverage survey should re-take it.
+
+**Call 5 — plain JSON, no gzip.** `HarvestedGuides.json.gz` needs `--check` to decompress
+before comparing because a container asserts which zlib built it (trap 74). 5.8 KB of bands
+needs no container, so the gate compares the file itself and there is no toolchain for it to
+redden on. **The default:** match the neighbouring generated catalog's shape.
+
+**Verified to the class (V1 — new Core data and reader, nothing user-visible):**
+`scripts/check.ps1` all green, **4,982 units**, `ZoneLevelsTests` 47/47. Prove-failed both
+new guards rather than shipping them green-only: editing one `Max` in the committed file
+makes `--check` exit 1 with the reason; swapping `Lookup` back to longest containment
+reddens **fourteen of the fifteen committed negatives** plus the alias and ambiguity rows
+(the fifteenth, Qeynos Aqueducts, moved to the refused list where it belongs — its own page
+answers). No E2E run locally: no surface changed, and CI runs it regardless.
+
+**No `WhatsNew.json` entry, on purpose.** Nothing a player can notice ships here — no engine
+reads a band. The entry belongs to the release that ships the gate.
+
+**Not done, deliberately:** D2's gate, the `Exempt`→`Consumes` flip, any `Recommendations`
+change, any fetch or harvest, any curated-catalog edit, Pages / Play / tag / `release.ps1` /
+signing / prod secrets / Founder mail / Desktop / #527 / a new `helm/ssc-*`.
+
+— Dranak (Claude Code, DRA-84 D1)
+

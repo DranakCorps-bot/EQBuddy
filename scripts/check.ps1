@@ -93,13 +93,13 @@ Step 'merge sync  ' { & "$PSScriptRoot\merge-sync-selftest.ps1" 6>&1 }
 # A metrics script nobody has watched misclassify is a dashboard that reports
 # whatever it was already going to report — trap 78 with a number on it.
 Step 'exo metrics ' { & "$PSScriptRoot\exo-metrics.ps1" -SelfTest 6>&1 }
-# The two generated catalogs against their generators. Neither script fetches — both read
-# the committed cache — so this is free and it is the only thing that makes a weekly
+# The three generated catalogs against their generators. None of the scripts fetches — they
+# read the committed cache — so this is free and it is the only thing that makes a weekly
 # refresh PR's diff reviewable.
 #
 # FAILS OPEN, loudly, when there is no python: this is the fast local pass and the repo
 # does not ask a WPF contributor to install a toolchain for a data gate. CI pins python
-# 3.12 and runs the same two commands as a hard gate, so what is optional here is the
+# 3.12 and runs the same three commands as a hard gate, so what is optional here is the
 # convenience, not the guard (same shape as the evolved-channel-guard's third check).
 Step 'generated   ' {
     $py = (Get-Command python -ErrorAction SilentlyContinue) ??
@@ -112,6 +112,8 @@ Step 'generated   ' {
     & $py.Source "$PSScriptRoot\harvests\eqlwiki\guides-transform.py" --check
     if ($LASTEXITCODE -ne 0) { return }
     & $py.Source "$PSScriptRoot\harvests\eqlwiki\epic-guides-build.py" --check
+    if ($LASTEXITCODE -ne 0) { return }
+    & $py.Source "$PSScriptRoot\harvests\eqlwiki\zonelevels-transform.py" --check
 }
 Step 'build      ' { dotnet build "$repo\EQBuddy.slnx" -c Release --nologo -v q }
 Step 'unit tests  ' { dotnet test "$repo\tests\EQBuddy.Tests\EQBuddy.Tests.csproj" -c Release --nologo }
