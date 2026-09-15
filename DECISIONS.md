@@ -1,3 +1,67 @@
+## 2026-09-14 ~9:00 PM CT — DRA-84 D3 follow-up: the refresh landed and four shipped sentences went stale with it. Plus the duplicate-seat fact.
+
+**Seat:** `opus-dra84-d3` (claimed 01:27Z). Paperclip DRA-84. This entry is about the
+commit range AFTER #626 merged. Nothing here is on the consequence list.
+
+**The duplicate first, because it is the only thing here with a cost.** Two Executor seats
+ran D3 concurrently. This one claimed DRA-84 at **01:27Z**; `opus-dra84-d3`/PR **#626**
+opened at **01:32Z** and ran the full weekly refresh. Both fetched ~11k eqlwiki pages
+inside the same half hour — **two Soft-driven fetches inside Helm's one named un-PARK**.
+Neither exceeded the standing rate and both used the committed polite client, so
+consequence-list item 7 was not breached, but the duplication was real and only luck made
+it harmless. `claim-seat.ps1` held no DRA-84 row when either seat started (trap 70 again).
+
+**The one good thing to come out of it: the two rebuilds are byte-identical decompressed** —
+SHA-256 `5487aa79…`, 4,217,353 bytes, 11,196 records, 5,591 with creatures, 773 priced. Two
+independent harvests, hours apart, same bytes. That is the strongest evidence anyone has
+that `itemcatalog-build` is reproducible, and it was free.
+
+**Decision: #626 is D3; this seat's own refresh commit is abandoned, not pushed.** It was
+filed first, it is broader (quests, spells, guides, items), and it matches "the standing
+weekly refresh" more literally than the item-only half. Could have gone the other way: push
+a competing PR and make a human choose. That wastes the review, not the fetch.
+
+**What was left over, and is what this PR actually is.** #626 shipped the data and did not
+move the sentences that quote it. On `main` right now, four are wrong:
+
+1. **The professions park note is player-facing and false.** It says *"Of the 10,957 item
+   pages it has read, 14 say which profession an ingredient belongs to."* The refresh made
+   that 11,197 — and shipped `items-catalog-report.md` saying so, in the same commit.
+   EQBuddy is currently telling players a survey result its own committed report
+   contradicts.
+2. **Its guard could not see it.** `TheParkNoteNamesTheCoverageItMeasured` asserted the
+   sentence CONTAINED the literal `"10,957"` — the sentence quoting itself. It can catch
+   somebody deleting the number and never the number going wrong. **Default chosen: read
+   both numbers out of `items-catalog-report.md`** (the promoter rewrites it every refresh),
+   with a committed negative carrying the exact stale text that shipped. Prove-failed.
+   Could have gone the other way: bump the literal, which is the smaller diff and leaves the
+   next refresh to ship the same defect.
+3. **DRA-71 D6's level survey is no longer literally true.** Shipped, on screen: *"11,146
+   records were surveyed and not one prints a Level key."* Re-taken: **five** print one and
+   exactly **one** is a wearable (`Shroud of the Sky`, `Required Level: 46`); the other four
+   are `Level Needed` on spell scrolls and a food item, which is the SPELL's level. D6's
+   conclusion **stands** — one in 11,196 gates nothing, and D2's band gate reads the ZONE —
+   so this is a sentence correction, not a plan change.
+4. **`CLAUDE.md` still said the vendor field was "data-less until the next weekly
+   refresh."** It has 773 prices in it now.
+
+**Decision: a `WhatsNew.json` entry ships here rather than waiting for D5.** Rows naming a
+creature is player-noticeable the moment #626 landed, and the house rule puts the entry in
+the release that ships the change — 2.0.0, unreleased, the list DRA-83 already appended to
+mid-plan. The stale "10,957" inside the unreleased DRA-71 D8 entry is corrected while it is
+still ahead of a player. No release rides this; that stays David's.
+
+**Measured for D4, which is the slice that needs it.** The plan tells D4 to open with a
+`DropMobs` coverage survey and **STOP and wake Helm under half**. On the merged data it is
+**99.4%** (5,591 of 5,626 drop-bearing records), and both zones the Founder named are at
+**100%** — Rathe Mountains 163/163, Crushbone 102/102. D4 starts with the number instead of
+discovering it.
+
+**Untouched:** no engine, no ranking, no curated file. Rathe and Crushbone still rank
+tonight exactly as they did — that is D2's bands and D4's who-or-withheld, in that order.
+
+---
+
 ## 2026-09-14 — DRA-84 plan: the defaults chosen while turning the Founder's Farm Gear FAIL into slices
 
 Plan-only seat `fable-dra84-farmgear` (Paperclip DRA-84), branch `fable-dra84-farmgear`,

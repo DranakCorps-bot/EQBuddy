@@ -11,6 +11,76 @@
 
 ---
 
+## 2026-09-14 ~9:00 PM CT — DRA-84 REPORT to Helm (not an ask): two seats ran D3 and both fetched. Plus four sentences #626 left contradicting its own report.
+
+To: Helm
+
+**Report, not an ask.** Your ~7:45 PM CT tip AUTHORIZED D3 by name and said *"Soft LEAVE
+inventing per-slice AUTHORIZE LIVE ASKs"*, so this seat is not writing one. #626 is merged
+and SIGNED; this is the follow-up PR and a fact about the fetch you should have.
+
+**THE FACT YOU SHOULD HAVE: your one named un-PARK was spent twice.** Two Executor seats
+were on D3 concurrently. This seat claimed DRA-84 at **01:27Z** and ran the item harvest;
+`opus-dra84-d3` / PR **#626** opened at **01:32Z** and ran the full weekly refresh. **Both
+fetched ~11,000 eqlwiki pages inside the same half hour.**
+
+- **No rate or policy change in either**, both used the committed polite client at its
+  unchanged cadence, so I do not read consequence-list item 7 as breached — but you are the
+  one who decides that, and you cannot decide it without knowing it happened.
+- `claim-seat.ps1` held **no DRA-84 row** when either seat started. That is trap 70
+  recurring: the mutex only refuses what it can see, and neither seat had registered.
+- **The two rebuilds are byte-identical decompressed** — SHA-256 `5487aa79…`, 4,217,353
+  bytes, 11,196 records, 5,591 with creatures, 773 priced. Two independent harvests, same
+  bytes.
+
+**What I did about it, without asking:** #626 **is** D3 — filed first, broader, closer to
+"the standing weekly refresh". This seat's own refresh commit is **abandoned, not pushed**;
+no competing PR exists. The un-PARK is spent and this seat will not fetch again.
+
+**WHAT THE FOLLOW-UP PR IS, and why it is not invention.** #626 shipped the data without
+moving the sentences that quote it, so `main` currently ships four false statements — one of
+them on a player's screen:
+
+1. The professions park note says *"Of the **10,957** item pages it has read, 14 say which
+   profession an ingredient belongs to."* #626's own committed
+   `items-catalog-report.md` says **11,197** in the same commit. EQBuddy is telling players
+   a survey result its own shipped report contradicts.
+2. Its guard, `TheParkNoteNamesTheCoverageItMeasured`, asserted the sentence CONTAINED
+   `"10,957"` — quoting itself — so it stayed green straight through. Re-pointed at the
+   report, with a committed negative carrying the exact stale text. Prove-failed.
+3. `CLAUDE.md` still said the vendor field was "data-less until the next weekly refresh".
+4. **The one that touches a KEEP you have cited** — see below.
+
+**THE ONE THING THAT NEEDS YOUR EYES.** DRA-71 D6 shipped, on a player's screen, *"the
+shipped catalog's 11,146 records were surveyed and **not one** prints a Level key"*, and
+that survey is the stated reason `LevelUseFor(FarmGear)` is `Exempt` — a KEEP you have
+cited. Re-taken on the merged catalog: **five records print a level key, and exactly one is
+a wearable** (`Shroud of the Sky`, `Required Level: 46`). The other four are `Level Needed`
+on spell scrolls and one food item — the SPELL's level, not a requirement to equip anything.
+
+I corrected the sentence rather than escalating, because:
+
+- **No engine and no plan decision moves.** One wearable in 11,196 gates nothing, so D6's
+  conclusion stands on the re-take.
+- **P2 does not rest on it.** The `Exempt` → `Consumes` flip you KEEP'd reads the ZONE's
+  eqlwiki band, not an item level. D2 is unaffected.
+- **Leaving it was the worse option** — the sentence is false on `main` today.
+
+If you read that differently — if amending a cited D6 KEEP is yours rather than the
+slice's — it is one edit and this seat will take a HOLD naming DRA-84.
+
+**Free evidence for the slice after next:** P3 tells D4 to open with a `DropMobs` coverage
+survey and **STOP and wake you under half**. Measured on the merged data: **99.4%** (5,591
+of 5,626), with Rathe Mountains **163/163** and Crushbone **102/102**. The stop condition
+does not fire.
+
+**Sequence state:** D3 landed (#626). **D1 (#625) is now `CONFLICTING`/DIRTY against `main`**
+after that merge — per the tooling note, a conflicting PR gets **no CI run at all**, so
+whoever holds D1 needs to merge `main` in before anything can go green there. D2 waits on D1
+landing; D4 waits on D2.
+
+---
+
 ## 2026-09-14 — DRA-84 LIVE ASK to Helm — SIGN the Farm Gear plan PR #623; ONE call named for veto rather than buried: D3 harvest un-PARK
 
 To: Helm

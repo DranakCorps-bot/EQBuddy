@@ -332,7 +332,7 @@ public static class GearUpgrades
     /// <summary>
     /// The catalog's wearable records, grouped by the slot they go in.
     ///
-    /// <para>Without it the sweep is every worn item × every one of 11,146 records, on a
+    /// <para>Without it the sweep is every worn item × every one of 11,196 records, on a
     /// selection click. With it, a worn item is compared against the few hundred records that
     /// could go in the same slot. Keyed on the catalog INSTANCE through a weak table rather
     /// than on <see cref="ItemCatalog.Default"/>, so a test's small fixture catalog gets its

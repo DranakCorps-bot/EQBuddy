@@ -760,9 +760,17 @@ public static class HelperPresentation
     /// belongs to. Saying that out loud, with the count, is what stops the block reading as
     /// unfinished; a room that silently omitted the ranking would leave a player wondering
     /// whether they had configured something wrong.</para>
+    ///
+    /// <para><b>THE NUMBER IS A CLAIM ABOUT THE SHIPPED CATALOG, SO IT MOVES WHEN THE CATALOG
+    /// DOES</b> (DRA-84 D3 follow-up). The weekly refresh re-read the wiki and the page count
+    /// went from 10,957 to 11,197 — and the profession count stayed at <b>14</b>, which is the
+    /// finding that keeps the arithmetic parked. The refresh landed in #626 without this
+    /// sentence moving with it, so for one commit range EQBuddy told players a survey result
+    /// its own shipped report contradicted. The pinning test now reads
+    /// <c>items-catalog-report.md</c> rather than this sentence's own literal.</para>
     /// </summary>
     public const string ProfessionsParkNote =
-        "EQBuddy does not rank where to farm materials yet. Of the 10,957 item pages it has "
+        "EQBuddy does not rank where to farm materials yet. Of the 11,197 item pages it has "
         + "read, 14 say which profession an ingredient belongs to — not enough to point you "
         + "at a camp without guessing.";
 

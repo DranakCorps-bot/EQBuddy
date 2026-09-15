@@ -86,11 +86,19 @@ public sealed record TradeskillProfession(
 ///
 /// <para><b>There is no item→profession arithmetic behind this, and that is the delivery's
 /// main finding</b> (see <c>DECISIONS.md</c>, DRA-71 D8). The coverage survey the plan asked
-/// for ran first: 10,919 of the 10,957 cached item pages carry at least one
-/// <c>[[Category:…]]</c> — 99.7%, across 539 distinct categories — and exactly <b>14</b> of
+/// for ran first: 11,157 of the 11,197 cached item pages carry at least one
+/// <c>[[Category:…]]</c> — 99.6%, across 553 distinct categories — and exactly <b>14</b> of
 /// them carry a category naming a profession, across five of the eight. The field is populated and it answers a different
 /// question (who can wear this, what slot, which zone, how it is obtained), so the arithmetic
 /// PARKS with its reopen condition rather than shipping on a field that looks covered.</para>
+///
+/// <para><b>RE-TAKEN BY THE DRA-84 D3 REFRESH, AND THE REOPEN CONDITION DID NOT FIRE.</b> The
+/// weekly refresh re-read the wiki — 240 more pages than the survey above was taken on — and
+/// the profession count is still exactly <b>14</b>. That is the number this park was
+/// conditional on, so it stays parked on re-measured evidence rather than on a year-old
+/// reading. The recipes field moved with the corpus (899 pages naming one of the eight, all
+/// eight distinct, up from 851) and is still the field carrying the answer the categories
+/// do not.</para>
 /// </summary>
 public static class Tradeskills
 {

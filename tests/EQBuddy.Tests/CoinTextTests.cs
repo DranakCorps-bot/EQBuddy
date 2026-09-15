@@ -7,8 +7,11 @@ namespace EQBuddy.Tests;
 /// **READING A COIN AMOUNT SOMEBODY ELSE WROTE** (DRA-71 D7, plan P9).
 ///
 /// <para>The shapes below are not invented: every one of them was taken from the survey of
-/// eqlwiki's <c>merchant_value</c> field across the 10,957 cached item pages, which is the
+/// eqlwiki's <c>merchant_value</c> field across the cached item pages, which is the
 /// evidence step the plan asked for before the promoter carried anything (trap 73's tell).
+/// The DRA-84 D3 refresh re-took that survey over 11,197 pages and every shape below still
+/// appears: 1,079 pages state a value, 773 parse to copper, 306 are still refused as
+/// unreadable — the refusal rate barely moved, which is the point of keeping them here.
 /// The refusals matter more than the acceptances — an unparseable value must be ABSENT rather
 /// than guessed, and each of these is a real page this build declines to read rather than a
 /// hypothetical.</para>
