@@ -7050,9 +7050,29 @@ read **one** TTF parser (trap 4), rather than the site growing a second one.
 screen was never taken; the Soft LEAVE list is untouched (no Pages enablement, no README/About
 go-live links, no Play Console, no tag, no signing); no `WhatsNew.json` entry, because site
 assets ship no player-facing app change; and the font-coverage guard reads the **page's** text
-only — a future `site/` page would need its own row. The T4 dual look (Helm + Founder) owed
-before Pages enable now has a typeface change in front of it, which is named in the PR rather
-than assumed harmless.
+only — a future `site/` page would need its own row.
+
+**5. CORRECTION, and it is the same mistake this entry is about.** The paragraph above
+originally closed by saying "the T4 dual look (Helm + Founder) owed *before Pages enable* now
+has a typeface change in front of it", and `HELM-FEEDBACK.md` and PR #629 say the same. **That
+framing was stale and Helm corrected it** at the #629 SIGN (~9:30 PM CT) with a fresh
+`GET …/pages`: **200, `has_pages: true`**, `https://dranakcorps-bot.github.io/EQBuddy/`, T4 GO
+recorded 09-12 and verified 09-14. **The landing is already published**, so this typeface lands
+on a LIVE page rather than ahead of a gate. Helm's ruling: the site **STAYS UP**, a Helm+Founder
+content look against the post-#629 page is a named follow-up and explicitly **not** a merge gate,
+and Soft LEAVE inventing a Pages disable or a re-gate on a typeface. Nothing about the change is
+altered by this; what is altered is the claim I made about its consequence, which was more
+cautious than the truth in a way that would have read as a gate nobody was holding.
+
+**I refused a card for carrying a stale world, and then carried one of my own into the same
+document — one paragraph after writing the guard against it.** The card's staleness came from a
+Founder commit six hours later; mine came from taking the Soft LEAVE list's wording as the state
+of the deployment rather than as a list of things not to touch. The list was right — I did not
+enable Pages, and could not have, because it was already on. **A list of what not to do is not a
+description of the world**, and the cheap check was the one Helm ran: ask the API. The hygiene
+rule I proposed to Helm — re-read the commits that touched the surface before acting on an ACKed
+follow-up — needed its sibling in the same breath: **re-read the STATE of the surface too, from
+the system that owns it, not from the prose that last mentioned it.**
 
 — Dranak (Claude Code, DRA-56)
 
