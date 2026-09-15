@@ -43,32 +43,40 @@ public class HarvestedGuidesTests
     // ---- The file --------------------------------------------------------------------
 
     /// <summary>
-    /// One guide per catalog quest — <b>except the fourteen that have nothing to say at all</b>,
+    /// One guide per catalog quest — <b>except the fifteen that have nothing to say at all</b>,
     /// which are named rather than counted.
     ///
-    /// <para>Fable's §3 predicted 1,178, one per catalog row. Fourteen of those rows are index
+    /// <para>Fable's §3 predicted one per catalog row. Fifteen of those rows are index
     /// or collection PAGES: no walkthrough, no checklist, no turn-in items, and no quest giver
     /// and start zone to open with. A guide with no objectives is refused by lock 4a, and
-    /// inventing a step so the count reads 1,178 would be the fabrication this whole file is
-    /// built to avoid. Naming them means the day one of them gains content on the wiki, this
-    /// fails and says which — a bare 1,164 would not.</para>
+    /// inventing a step so the count reads one-per-row would be the fabrication this whole file
+    /// is built to avoid. Naming them means the day one of them gains content on the wiki, this
+    /// fails and says which — a bare 1,158 would not.</para>
+    ///
+    /// <para><b>Moved by the 2026-09-15 refresh (DRA-84 D3), and the names are why it was
+    /// reviewable.</b> The catalog went 1,178 → 1,173: the wiki folded the seven per-piece
+    /// Darkforge armor pages into Category:Items under one "Darkforge Armor Quests" page, and
+    /// added two quests. `Class Race Quest List` JOINED this list — its row's one turn-in item
+    /// was "Innoruuk Symbol Quests", itself a quest page that was never in Category:Items, so
+    /// dropping it left the index page with nothing to say. A bare count would have reported
+    /// all of that as one number moving.</para>
     /// </summary>
     [Fact]
-    public void EveryCatalogQuestGetsAGuideExceptTheFourteenWithNothingToSay()
+    public void EveryCatalogQuestGetsAGuideExceptTheFifteenWithNothingToSay()
     {
         string[] nothingToSay =
         [
             "Bone Chips Quests", "Burning Soul of the Pestilent", "Burning Soul of the Pious",
-            "Burning Soul of the Virtuous", "Cougarskin Sleeves Quest", "Dozekar Tear Quests",
-            "Faction Quests", "Guild Summons", "Monk Quests", "Orc Belt Quests",
-            "Popular Quests by Level", "Scroll of G'han", "Velious Class Armor",
-            "Velious Class Armor Comparisons",
+            "Burning Soul of the Virtuous", "Class Race Quest List", "Cougarskin Sleeves Quest",
+            "Dozekar Tear Quests", "Faction Quests", "Guild Summons", "Monk Quests",
+            "Orc Belt Quests", "Popular Quests by Level", "Scroll of G'han",
+            "Velious Class Armor", "Velious Class Armor Comparisons",
         ];
 
         // The RAW catalog: the transformer reads the file, so its universe is every row in
         // it, not the smaller set QuestCatalog.LoadEmbedded hands the app.
         var raw = ReadRawQuestNames();
-        Assert.Equal(1178, raw.Count);
+        Assert.Equal(1173, raw.Count);
 
         var guided = new HashSet<string>(
             Harvested.Guides.Select(g => g.QuestName), StringComparer.OrdinalIgnoreCase);
@@ -76,7 +84,7 @@ public class HarvestedGuidesTests
             .OrderBy(n => n, StringComparer.Ordinal).ToList();
 
         Assert.Equal(nothingToSay.OrderBy(n => n, StringComparer.Ordinal), without);
-        Assert.Equal(1164, Harvested.Guides.Count);
+        Assert.Equal(1158, Harvested.Guides.Count);
     }
 
     [Fact]
@@ -383,16 +391,21 @@ public class HarvestedGuidesTests
             .OrderBy(n => n, StringComparer.Ordinal)
             .ToList();
 
-        // Two pure index pages CatalogHygiene removes (the other three have no harvested
-        // guide to turn away — they are in the fourteen with nothing to say), the sixteen
+        // ONE pure index page CatalogHygiene removes (the other four have no harvested
+        // guide to turn away — they are in the fifteen with nothing to say), the sixteen
         // "{Class} Plane of Sky Tests" aggregates SkyTestSplit replaces with one quest per
-        // reward, and the fourteen epics the curated catalog owns. 2 + 16 + 14 = 32.
+        // reward, and the fourteen epics the curated catalog owns. 1 + 16 + 14 = 31.
+        //
+        // It was two index pages until the 2026-09-15 refresh (DRA-84 D3): `Class Race Quest
+        // List` stopped being TURNED AWAY and became a row with no guide to turn away at all,
+        // because the quest-item enumeration dropped "Innoruuk Symbol Quests" — a quest page,
+        // never an item — which was the only thing its row had to say.
         Assert.Equal(
             new[]
             {
                 "All Positive Faction Quests", "Bard Epic Quest", "Bard Plane of Sky Tests",
                 "Beastlord Plane of Sky Tests", "Berserker Plane of Sky Tests",
-                "Class Race Quest List", "Cleric Epic Quest",
+                "Cleric Epic Quest",
                 "Cleric Plane of Sky Tests", "Druid Epic Quest", "Druid Plane of Sky Tests",
                 "Enchanter Epic Quest", "Enchanter Plane of Sky Tests", "Magician Epic Quest",
                 "Magician Plane of Sky Tests", "Monk Epic Quest", "Monk Plane of Sky Tests",

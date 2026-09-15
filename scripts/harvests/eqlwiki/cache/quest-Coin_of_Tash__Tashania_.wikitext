@@ -29,23 +29,23 @@ __NOTOC__
 == Checklist ==
 
 {{CheckboxList}}
-* Get [[Coin Pouch]] from [[Romar Sunto]] in The Temple of Solusek Ro
-* Collect the coins from cities across the world:
-** Azia - '''[[Ak'anon]]''' - Near great wheel (not in water) (+1990, -260, -125).  It's on the West side of the water wheel, then North a bit right at the Star light thing.
-** Beza - '''[[Erudin|Erudin Palace]]''' - In the Caster's Guild zone (Erudin Palace), go one level up from the zone-in teleporter. It's in the fountain with rocks in it, on the rocks. (+703, +740, +44).
-** Caza - '''[[Felwithe|Northern Felwithe]]''' - in the fishing pond (-110, -790, -50).
+* Get [[Coin Pouch]] from [[Romar Sunto]] in [[The Temple of Solusek Ro]]
+* Collect the [[Old Silver Coin|Old Silver Coins]] from cities across the world:
+** Azia - '''[[Ak'anon]]''' - Near great wheel (not in water) (1990, -260, -125). It's on the West side of the water wheel, then North a bit, right at the Star light thing.
+** Beza - '''[[Erudin|Erudin Palace]]''' - In the Caster's Guild zone (Erudin Palace), go one level up from the zone-in teleporter. It's in the fountain with rocks in it, on the rocks. (703, 740, 44).
+** Caza - '''[[Felwithe|Northern Felwithe]]''' - In the fishing pond (-110, -790, -50).
 ** Dena - '''[[West Freeport]]''' - In the pool under the Academy of Arcane Science (Caster Guild) (129, -750, -80).
-** Ena - '''[[Grobb]]''' - in pool near bar #6 on map. When you enter the zone and go across the first bridge the small pool on the right. (+197, -261).
-** Fana - '''[[Halas]]''' - in lake in front of city. If you're facing the city, it's to the left near the far dock, underwater on a raised ledge (-138, +179).
-** Geza - '''[[South Kaladim]]''' - Pool by warrior's guild (+75, +360, -5).
-** Heda - '''[[Neriak Commons]]''' - Pass the [[Constructed Potential]] to the big bridge. Jump off to the left, it's in the water next to the glass windows. (0, -795, -70).
-** Izah - '''[[Oggok]]''' - in lake near warrior guild at the north end (+103, +108).
-** Jaka - '''[[North Qeynos]]''' - under Temple of Life "UFO" in the Koalindl Fish Pool (-90, -445, -10).
-* Combine the 10 coins and combine them in the coin pouch to get a [[Coin of Tash]].
-* Give [[Coin of Tash]] to [[Tarn Visilin]] in the High Keep library at +75, -220 and receive the [[Glowing Coin of Tash]].
-* Give [[Glowing Coin of Tash]] to [[Mizr N`Mar]] in the Neriak 3rd Gate library at +913, -1314 to receive the [[Gleaming Coin of Tash]]. 
-* Give [[Gleaming Coin of Tash]] to [[Raine Beteria]] in Erudin library at -1050, -212 to receive the [[Radiant Coin of Tash]]. 
-* Give [[Radiant Coin of Tash]] to [[Romar Sunto]] in The Temple of Solusek Ro at +393, +90 to receive [[Spell: Tashania]].
+** Ena - '''[[Grobb]]''' - In the pool near a bar. When you enter the zone and go across the first bridge, you'll see the small pool on the right. (197, -261, -2.31).
+** Fana - '''[[Halas]]''' - In the lake in front of city. If you're facing the city, it's to the left near the far dock, underwater on a raised ledge (-138, 179).
+** Geza - '''[[South Kaladim]]''' - Pool by warrior's guild (75, 360, -5).
+** Heda - '''[[Neriak Commons]]''' - Pass the [[Constructed Potential]] by the big bridge. Jump off to the left; it's in the water next to the glass windows. (0, -795, -70).
+** Izah - '''[[Oggok]]''' - In the lake near warrior guild at the north end (109, 101, -137).
+** Jaka - '''[[North Qeynos]]''' - Under the Temple of Life "UFO" in the Koalindl Fish Pool (-90, -445, -10).
+* Combine the 10 coins in the coin pouch to get a [[Coin of Tash]].
+* Give [[Coin of Tash]] to [[Tarn Visilin]] in the library at [[High Keep]], at (75, -220), to receive the [[Glowing Coin of Tash]].
+* Give [[Glowing Coin of Tash]] to [[Mizr N`Mar]] in the Neriak 3rd Gate library at (913, -1314) to receive the [[Gleaming Coin of Tash]]. 
+* Give [[Gleaming Coin of Tash]] to [[Raine Beteria]] in the Erudin library at (-1050, -212) to receive the [[Radiant Coin of Tash]]. 
+* Give [[Radiant Coin of Tash]] to [[Romar Sunto]] in The Temple of Solusek Ro at (393, 90) to receive the [[Spell: Tashania]].
 {{End}}
 
 '''Warning DO NOT do turn-ins while invisible, though you can use Sneak'''

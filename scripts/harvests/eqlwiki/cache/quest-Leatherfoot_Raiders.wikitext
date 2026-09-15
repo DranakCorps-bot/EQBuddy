@@ -1,5 +1,5 @@
 {{Classic Era}}
-[[File:npc_marshal_anrey.png|frame|Marshal Anrey]]
+[[File:npc_marshal_anrey.png|thumb|Marshal Anrey]]
 {| class="questTopTable"
 ! ''' Start Zone: '''
 | [[Rivervale]]

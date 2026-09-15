@@ -1,8 +1,8 @@
-<noinclude>{{Classic Era}}</noinclude>
+{{Classic Era}}
 {{Spellpagesmart|
 
 | spellname = Mass Imbue Plains Pebble
-| spellicon = U
+| spellicon = 100
 | description = Focuses the power of Karana into five plains pebbles. Consumes five plains pebbles when cast.
 
 | Table = {{{Table|0}}}
@@ -38,9 +38,8 @@
 
 | where_to_obtain = 
 
-{{SpellWhereTable|
-{{SpellWhereRowB | [[New Sebilis Expedition]] | [[Wanderer Rakshaazi]] | Spell Vendor Area | (120, -163) }}
-{{SpellWhereRow | [[West Commonlands]] | [[Slea Pinewhisper]] | Druid Ring | (450, 1383, -52) }}
-}}
-
+<ul>
+<li>[[Cleric#Spell Vendors|Cleric Spell Vendors]]</li>
+<li>[[Druid#Spell Vendors|Druid Spell Vendors]]</li>
+</ul>
 }}

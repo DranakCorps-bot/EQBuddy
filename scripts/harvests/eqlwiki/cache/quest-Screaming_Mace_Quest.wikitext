@@ -28,7 +28,7 @@
 </li></ul>
 
 == Pre-Quest Mini-Quest/Dialogue ==
-'''Note''': You do not need to do this part to get prayer cloth. Just hail the elf and say "The king is dead" and he will ask for proof. Give him the BoB and receive the prayer cloth of tunare.
+'''Note''': You do not need to do this part to get prayer cloth. Just hail the elf and say "The king is dead" and he will ask for proof. Give him the [[Bracers of Battle]] and receive the [[Prayer Cloth of Tunare]].
 
 '''Hail a dwarven slave (male) found in various locations around Crushbone.'''
 
@@ -51,7 +51,7 @@ This is the [[Taskmaster Earring]] quest. The [[Brass Earring]] (incorrectly cal
 : a dwarven smith says, 'Outstanding! If you can kill the taskmaster, you might prove useful in recovering the #items the orcs took from me when they caught me out in the Faydarks. Interested in helping me out?'
 
 {{YouGainExperience}}
-You receive a {{:Unfinished Blade Mold}}. (Note: this does not give any faction.)
+You receive a {{:Unfinished Blade Mold}}. (Note: This does not give any faction, and the mold is not needed for the quest or any other purpose. Just sell it.)
 
 
 You say 'I am interested' to get the next dialogue, asking you to retrieve the shiny brass shield.
@@ -61,7 +61,7 @@ You say 'I am interested' to get the next dialogue, asking you to retrieve the s
 : a dwarven smith says 'MY SHIELD!! Excellent, laddie! Next item on the list is my ringmail. Once I have my ringmail, I am out of here for good. I will finally be able to leave!' 
 
 {{YouGainExperience}}
-You receive an {{:Unfinished Sledge Mold}}. (Note: this does not give any faction.)
+You receive an {{:Unfinished Sledge Mold}}. (Note: This does not give any faction, and the mold is not needed for the quest or any other purpose. Just sell it.)
 
 == Quest Start ==
 

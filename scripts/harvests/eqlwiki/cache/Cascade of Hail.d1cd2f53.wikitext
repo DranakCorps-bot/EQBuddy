@@ -1,11 +1,9 @@
+{{Classic Era}}
 {{Spellpagesmart|
 
 | spellname = Cascade of Hail
-| spellicon = S
-| description = Calls down a hailstorm from the sky, causing three waves of 27 damage, up to a maximum of 4 targets hit. (0.435DPM per hit)
-
-
-*Note: Rain nukes are limited to 4 hits total. Either you can hit the same mobs 3 times, you can hit 2 mobs twice each, or you can hit 4 mobs once each.
+| spellicon = 56
+| description = Calls down a hailstorm from the sky, causing three waves of 27 damage, up to a maximum of 4 targets hit.
 | Table = {{{Table|0}}}
 | TableLevel = {{{TableLevel|}}}
 
@@ -32,13 +30,8 @@
 
 | where_to_obtain = 
 
-{{SpellWhereTable|
-{{SpellWhereRowB | [[Greater Faydark]] | [[Zelli Starsfire]] | Kelethin Druid Guild | (-622,243) }}
-{{SpellWhereRow  | [[Rivervale]] | [[Staria Longhair]] | Druid Guild | (-62,-403) }}
-{{SpellWhereRowB | [[Surefall Glade]] | [[Sallah]] | Druid Guild | (-153,-286) }}
-}}
-
-| TableLocations = Kelethin<br/>Rivervale<br/>Surefall Glade
-| TableEra = Classic
+<ul>
+<li>[[Druid#Spell Vendors|Druid Spell Vendors]]</li>
+</ul>
 
 }}

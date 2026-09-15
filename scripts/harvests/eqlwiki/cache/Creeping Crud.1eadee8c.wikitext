@@ -1,7 +1,8 @@
+{{Classic Era}}
 {{Spellpagesmart|
 
 | spellname = Creeping Crud
-| spellicon = T
+| spellicon = 160
 | description = Covers your target in oozing filth, causing 85 damage every 6 seconds for 48s.
 | Table = {{{Table|0}}}
 | TableLevel = {{{TableLevel|}}}
@@ -32,9 +33,7 @@
 
 | where_to_obtain = 
 
-{{SpellWhereTable|
-{{SpellWhereRowB | [[Northern Karana]] | [[Tak Whistler]] | Druid Ring | (-2732,-1466) }}
-}}
-| TableLocations = North Karana
-| TableEra = {{{TableEra|Classic}}}
+<ul>
+<li>[[Druid#Spell Vendors|Druid Spell Vendors]]</li>
+</ul>
 }}

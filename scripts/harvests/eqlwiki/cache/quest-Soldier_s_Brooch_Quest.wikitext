@@ -6,9 +6,6 @@
 ! ''' Quest Giver: '''
 | [[Gaz Commander Faltip]]
 |-
-! ''' Minimum Level: '''
-| 30+
-|-
 ! ''' Classes: '''
 | All
 |-
@@ -20,13 +17,13 @@
 |}
 
 == General Information ==
-The Soldier's Brooch is a set of Range slot items with a level 30 minimum requirement, but the quest is easy to do at that level.  The set of items granted all start with the name "Soldier's Brooch Of", and there are versions for most classes.
+The Soldier's Brooch is a set of Range slot items.  The set of items granted all start with the name "Soldier's Brooch Of", and there are versions for most classes.
 
 == Rewards ==
 
 You can pick whichever brooch suits your build.
 
-All eight brooches are LORE EQUIPPED, NO TRADE, Range slot, Req Level 30, Race: ALL. Their stats are compared below so you can pick the best one for your class — click an item name for its full page.
+All eight brooches are LORE EQUIPPED, NO TRADE, Range slot, Race: ALL. Their stats are compared below so you can pick the best one for your class — click an item name for its full page.
 
 {| class="wikitable sortable"
 ! Class !! Reward !! AC !! HP !! Mana !! STR !! STA !! AGI !! DEX !! WIS !! INT !! CHA !! SV Magic !! SV Fire !! SV Cold !! SV Disease !! SV Poison !! WT

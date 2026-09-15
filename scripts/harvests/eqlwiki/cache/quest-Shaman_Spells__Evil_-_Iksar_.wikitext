@@ -1,3 +1,4 @@
+{{Kunark Era}}
 [[File:npc_himart_kichith.png|frame|Himart Kichith]]
 {| class="questTopTable"
 ! ''' Start Zone: '''

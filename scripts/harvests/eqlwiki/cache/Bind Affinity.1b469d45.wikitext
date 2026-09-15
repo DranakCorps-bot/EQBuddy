@@ -1,6 +1,6 @@
 <noinclude>{{disambig3|[[Bind Locations]]}}</noinclude>
 {{Classic Era}}
-{{Spellpage|
+{{Spellpagesmart|
 
 | spellname = Bind Affinity
 | spellicon = 30

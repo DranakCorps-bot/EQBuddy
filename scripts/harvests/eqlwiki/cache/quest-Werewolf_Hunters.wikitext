@@ -45,7 +45,7 @@ You say, 'What enchanted blade?'
 
 : Fixxin Followig says 'Interested in an enchanted blade? You wouldn't be planning on hunting the moon beasts without a strong. well-oiled party to back you up, now, would you? Well, in any case, I'll gladly lend you a copy of my book, Fixxin Followigs Silvery Blades, if you will fetch me a bar of silver. My supply is running low and our weapons are in need of repair after the deaths of so many lycanthropes.'
 
-'''Give him a [[Silver Bar]].''' (Stacks of bars works)
+'''Give him a [[Silver Bar]].''' (Stacks of bars works. Protip: Options > Gameplay > Confirmations to access Fast Item Destroy; every turn in will put a book in your inventory.)
 
 : Fixxin Followig thanks ______ heartily. 'Here is the book as promised. I wish you luck with your enchanted weapons. May they slay many lycanthropes before they go dull.'
 

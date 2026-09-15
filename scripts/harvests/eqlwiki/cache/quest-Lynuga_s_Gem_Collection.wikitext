@@ -1,6 +1,5 @@
 {{Classic Era}}
-{{Nerfed Quest}}
-[[File:npc_lynuga.png|frame|Lynuga]]
+[[File:npc_lynuga.png|thumb|Lynuga]]
 {| class="questTopTable"
 ! ''' Start Zone: '''
 | [[Innothule Swamp]]
@@ -50,7 +49,7 @@ You say, 'Collecting what?'
 * Your faction standing with [[DaBashers]] got worse. 
 </div>
 
-'''You receive one of the three rewards at random - the Hoop is the (ultra)rarest of the rewards.  All three rewards are lore, to receive substantial return on investment do not turn in multiple rubies at once or duplicate rewards will be lost.''' ''Note: The Hoop was made even more rare on the 9/10/11 patch due to balance issues.''.
+'''You receive one of the three rewards at random - the Hoop is the rarest of the rewards.''' 
 
 [[Category:Quests]]
 [[Category:Innothule Swamp]]

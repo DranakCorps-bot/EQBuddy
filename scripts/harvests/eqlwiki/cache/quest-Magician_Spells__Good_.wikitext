@@ -1,3 +1,4 @@
+{{Kunark Era}}
 [[File:npc_hiptal_frizzleboth.png|frame|Hiptal Frizzleboth]]
 {| class="questTopTable"
 ! ''' Start Zone: '''

@@ -31,11 +31,6 @@
 
 | where_to_obtain = 
 
-* [[Quest renew bones]]
-
-{{Necromancer Recipe| Renew Bones | 93+}}
-{{Recipe Component| Words of Purification | 869}}
-{{Recipe Component| Words of the Incorporeal | 869}}
-{{Recipe Component| Words of Acquisition (Azia) | 869}}
+* Vendors
 
 }}

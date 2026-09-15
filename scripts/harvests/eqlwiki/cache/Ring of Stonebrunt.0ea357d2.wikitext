@@ -1,7 +1,8 @@
+{{Classic Era}}
 {{Spellpagesmart|
 
 | spellname = Ring of Stonebrunt
-| spellicon = V
+| spellicon = 103
 | description = Opens a mystical portal that transports you to [[Stonebrunt Mountains|The Stonebrunt Mountains]].
 
 | Table = {{{Table|0}}}
@@ -30,15 +31,9 @@
 | msg_cast_on_you =  
 | msg_cast_on_other = Player fades away.
 | msg_wears_off =  
-
 | where_to_obtain = 
 
-{{SpellWhereTable|
-{{SpellWhereRowB | [[New Sebilis Expedition]] | [[Wanderer Rakshaazi]] | Spell Vendor Area | (120, -163) }}
-{{SpellWhereRow | [[West Commonlands]] | [[Slea Pinewhisper]] | Druid Ring | (450, 1383, -52) }}
-}}
-
-| TableLocations = W.Commonlands
-| TableEra = Classic
-
+<ul>
+<li>[[Druid#Spell Vendors|Druid Spell Vendors]]</li>
+</ul>
 }}

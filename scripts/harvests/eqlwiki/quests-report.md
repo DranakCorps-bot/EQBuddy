@@ -1,12 +1,12 @@
 # Quest harvest report
 
-- Quest Items category members: 4020
-- Pages enumerated: 928
-- Parsed: 1178 (empty pages: 0)
-- With turn-in items: 855
-- Unique turn-in item names: 2419
+- Quest Items category members: 4034
+- Pages enumerated: 930
+- Parsed: 1173 (empty pages: 0)
+- With turn-in items: 851
+- Unique turn-in item names: 2429
 - Missing quest giver: 27
-- Collection pages split: 57 (250 step quests)
+- Collection pages split: 56 (243 step quests)
 - Backoff events: 0
 
 ## Collection page splits
@@ -86,14 +86,6 @@
   - note: 'Ring of Dain Frostreaver IV' delegated to standalone page ['10th Coldain Ring Quest']
 - **Crusader's Tests** -> not split
   - note: not split: 1 usable steps
-- **Darkforge Armor Quests** -> 7 steps
-  - Darkforge Boots (3 items)
-  - Darkforge Bracer (3 items)
-  - Darkforge Breastplate (3 items)
-  - Darkforge Gauntlets (3 items)
-  - Darkforge Greaves (3 items)
-  - Darkforge Helm (3 items)
-  - Darkforge Vambraces (3 items)
 - **Dreadscale Armor** -> 7 steps
   - Dreadscale Boots (4 items)
   - Dreadscale Bracer (3 items)
@@ -217,7 +209,7 @@
 - **Quellious Symbol Quests** -> 3 steps
   - Disciple Symbol of Quellious (4 items)
   - Initiate Symbol of Quellious (2 items)
-  - Regent Symbol of Quellious (4 items)
+  - Regent Symbol of Quellious (5 items)
 - **Rallos Zek Symbol Quests** -> not split
   - note: not split: 1 usable steps
 - **Ranger Kael Armor Quests** -> 4 steps
@@ -385,6 +377,7 @@
 - Captain Nealith's Brother
 - Catfish Tail
 - Cazic Thule Symbol Quests
+- Class Race Quest List
 - Clear Water Quest
 - Cleric Spells (Evil)
 - Cleric Spells (Good)
@@ -411,6 +404,7 @@
 - Errand for Tonmerk
 - Erud's Tonic Quest
 - Erudin Cures
+- Escort the Cargo Clockwork
 - Faction Quests
 - Faerie Dragon Wings
 - Fang Tooth (quest)
@@ -525,7 +519,6 @@
 - Kevlin Diggs' Debt
 - Key to Sleeper's Tomb
 - Kilij's Plans
-- Kobold Shaman Paws
 - Kwinn's Quest
 - Kwint's Kwest
 - Legion Lager Quest
@@ -608,7 +601,6 @@
 - Soil of Underfoot
 - Soldier's Brooch Quest
 - Solusek's Flower
-- Something is Wrrrong
 - Steel Warrior Initiation
 - Strife to the Coldain
 - Supplies for the New Sebilisian Expedition
@@ -650,7 +642,6 @@
 - The Vengeful Musicians
 - The Waylaid Courier
 - The Worldly Path
-- This Means Warrr
 - Tinmizer's Fabulous Compactor (Quest)
 - Tiny Savages
 - Tome of Ages

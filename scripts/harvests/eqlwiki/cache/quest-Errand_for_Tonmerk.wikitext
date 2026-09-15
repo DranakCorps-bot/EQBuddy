@@ -1,4 +1,4 @@
-{{Classic Era}}[[File:npc_tonmerk_plorsin.png|frame|Tonmerk Plorsin]]
+{{Classic Era}}[[File:npc_tonmerk_plorsin.png|thumb|Tonmerk Plorsin]]
 {| class="questTopTable"
 ! ''' Start Zone: '''
 | [[Qeynos|North Qeynos]]

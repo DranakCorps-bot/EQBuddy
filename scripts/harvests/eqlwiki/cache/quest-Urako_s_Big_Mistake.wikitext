@@ -138,7 +138,7 @@ You say, 'Hail, Basher Avisk'
 :  Basher Avisk stops humming to himself and turns to look at you.
 :  Basher Avisk says, 'Hey dere.'
 
-You say, 'What tune?'
+You say, 'Where is the minstrel?'
 
 : Basher Avisk says, 'Yous like da toon me hum? Me hum gud! Me hears it sumtimes when me walks by da Dark Ones place. Dey gots strong majik back dere, me gets funny feeling in me tummy.'
 
@@ -166,8 +166,9 @@ Go back to Urako and hand him all four skulls you have collected.
 :  Urako says, 'Ohh, tank you!! Kaglari not hafta do bad tings to Urako!! Me berry berry happy!! Oh, here is da doll, me tanks you a lot!!'
 
 <div class="facblock">
-* Your faction standing with [[Dark Ones]] got better.
-* Your faction standing with [[Shadowknights of Night Keep]] got better.
+* Your faction standing with [[Dark Ones]] got better by 10.
+* Your faction standing with [[Shadowknights of Night Keep]] got better by 5.
+* You faction standing with [[Frogloks of Guk]] got worse by -1.
 </div>
 
 {{YouGainExperience}}

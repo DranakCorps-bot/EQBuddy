@@ -1,6 +1,6 @@
 __NOTOC__
 {{Classic Era}}
-[[File:npc_evah_xokez.png|frame|Evah Xokez]]
+[[File:npc_evah_xokez.png|thumb|Evah Xokez]]
 {| class="questTopTable"
 ! ''' Start Zone: '''
 | [[Ak'Anon]]
@@ -24,7 +24,7 @@ __NOTOC__
 | [[Ennixy Frennor]], [[a brittle skeleton]], [[a female rat]], [[Diseased female rat]]
 |-
 ! ''' Required Faction: '''
-| Indifferent or better
+| Indifferent
 |}
 
 == Rewards ==
@@ -34,38 +34,45 @@ __NOTOC__
 
 == Part 1: Spread the Plague ==
 
+You can prove your worth to the god [[Bertoxxulous]] and earn a symbol of your devotion. Find [[Evah Xokez]] in the tunnels in northern [[Ak'Anon]] (#1 on the map).
+
 You say, 'Hail Evah Xokez'
-  
-: Evah Xokez says, 'Be wary, Vaslin , there are unseen powers within these mines that can destroy the strongest warriors or the wisest seers. Do you find the rust that corrodes the mechanisms around you and the decaying forms that wander [these tunnels pleasing]?'
-  
+
+: Evah Xokez says, 'Be wary, _______, there are unseen powers within these mines that can destroy the strongest warriors or the wisest seers. Do you find the rust that corrodes the mechanisms around you and the decaying forms that wander [these tunnels pleasing]?'
+
 You say, 'I find these tunnels pleasing'
-  
+
 : Evah Xokez says, 'Then perhaps you share the vision of we who have made these mines our home. We are the Dark Reflection and our perceptions have been refined to allow us to see the poisons and disease coursing through every creature's veins and the decay afflicting all forms of matter in Norrath. I can teach you to harness the powers of our divine benefactor if you are [willing to learn] through service to the Dark Reflection.'
-  
+
 You say, 'I am willing to learn'
 
 : Evah Xokez says, 'Then your first lesson shall be the fulfillment of spreading infection and disease. Some of the best carriers of infectious diseases are rodents. Take this vial containing a slow and painful infection and give it to one of the pregnant giant rodents that can be found outside in the Steamfont Mountains. This way you can spread the disease to not only those creatures which cross the mother's path but also to those who cross the paths of her future offspring. Bring me the empty vial when the task has been completed.'
 
-[Receive a [[Vial of Infectious Disease]] ]
+'''You receive a [[Vial of Infectious Disease]].'''
 
-'''Find [[a female rat]] in Steamfont Mountains and trade it the vial.'''
+(You can give the rat up to 4 vials at once, but she despawns after you give them to her.)
 
-  a female rat injests the virulent substance and becomes ill. 
+Head out to [[Steamfont Mountains]] and find [[a female rat]] in the nothern half of the zone. [[Tracking]] can certainly help. Give it the vial. (Again, you can give her up to 4 at once, but no more than 4 at a time.)
 
-''The female rat will respawn as [[Diseased female rat]] and proceed to have babies.''
+: a female rat injests the virulent substance and becomes ill. 
 
-'''Return the [[Empty Infectious Vial]] to Evah Xokez.'''
+'''You receive the [[Empty Infectious Vial]].'''
+
+The female rat will respawn as [[Diseased female rat]] and proceed to have babies.
+
+Return back to [[Ak'Anon]] and give the vial to [[Evah Xokez]].
 
 : Evah Xokez says 'I hope you enjoyed the thrill of your first lesson and the awakening of your vision. Now you must prove your utility to our society. Take this airtight container and gather the [components] for another dose of the plague rat disease.'
 
 <div class="facblock">
-*  Your faction standing with [[Dark Reflection]] got better.
-*  Your faction standing with [[Eldritch Collective]] got worse.
-*  Your faction standing with [[Gem Choppers]] got worse.
-*  Your faction standing with [[Deep Muses]] got worse.
+*  Your faction standing with [[Dark Reflection]] has been adjusted by 50.
+*  Your faction standing with [[Eldritch Collective]] has been adjusted by -5.
+*  Your faction standing with [[Gem Choppers]] has been adjusted by -5.
+*  Your faction standing with [[Deep Muses]] has been adjusted by -5.
 </div>
+{{YouGainExperience}}
 
-{{exp}}
+'''You receive an [[Airtight Metal Box]].'''
 
 == Part 2: Poison Components ==
 
@@ -73,13 +80,11 @@ You say, 'What components'
 
 : Evah Xokez says, 'The recipe we use to make the plague rat disease is fairly simple. We could easily extract the fluids from the infected rat livers but that would be counterproductive to our cause since it would require the deaths of our rodent carriers. Instead, I need you to collect two parts diseased bone marrow, one sprig of wormwood and one part gnomish spirits to be used as a medium. When you have combined all the components in the container I have provided, return it to me so that we may continue to spread the disease!'
 
-''You need to combine the following items in the box to make [[Container of Infectious Reagents]].''
+In [[Ak'Anon]], find [[a clockwork barkeep]] and purchase the [[Gnomish Spirits]]. 
 
-<ul><li> [[Gnomish Spirits]] - Vendors</li>
-<li>2 [[Diseased Bone Marrow]] - Steamfont Mountains - [[a brittle skeleton]]</li>
-<li>[[Sprig of Wormwood]] - Steamfont Mountains - [[Ennixy Frennor]]</li></ul>
+Head out to northern [[Steamfont Mountains]] again and kill several [[a brittle skeleton|brittle skeletons]] to get 2 [[Diseased Bone Marrow]]. It's a rare drop, so you may want to switch difficulties back and forth to force the spawns.
 
-''After getting the first two, go see [[Ennixy Frennor]] in Steamfont Mountains.''
+Once you have the [[Gnomish Spirits]] and the 2 [[Diseased Bone Marrow]], go north of Steamfont's windmills to find [[Ennixy Frennor]]: 
 
 You say, 'Hail Ennixy Frennor'
 
@@ -89,23 +94,21 @@ You say, 'What sprig of wormwood?'
 
 : Ennixy Frennor says, 'Interested in wormwood, are you? Harvesting and curing wormwood just happens to be one of my specialties. I guarantee that my wormwood has been cured to perfection to fully harness its natural properties. Here, have a sample and, if you like it, I have got plenty more for a reasonable price.'
 
-[Receive a free [[Sprig of Wormwood]]]
+'''You receive a [[Sprig of Wormwood]],'''
 
-'''Return and give [[Container of Infectious Reagents]] to Evah Xokez.'''
+Combine the sprig, the spirits, and the rib bones in the [[Airtight Metal Box]] to make the [[Container of Infectious Reagents]]. Head back to [[Evah Xokez]] and give her the container..
 
-Evah Xokez says, 'It appears that you truly seek to expand your vision into the Dark Reflection, Soandso. I grant you the Initiate Symbol of Bertoxxulous!'
+: Evah Xokez says, 'It appears that you truly seek to expand your vision into the Dark Reflection, Soandso. I grant you the Initiate Symbol of Bertoxxulous!'
 
 <div class="facblock">
-*  Your faction standing with [[Dark Reflection]] got better.
-*  Your faction standing with [[Eldritch Collective]] got worse.
-*  Your faction standing with [[Gem Choppers]] got worse.
-*  Your faction standing with [[Deep Muses]] got worse.
+*  Your faction standing with [[Dark Reflection]] has been adjusted by 25.
+*  Your faction standing with [[Eldritch Collective]] has been adjusted by -2.
+*  Your faction standing with [[Gem Choppers]] has been adjusted by -2.
+*  Your faction standing with [[Deep Muses]] has been adjusted by -2.
 </div>
+{{YouGainExperience}}
 
-{{exp}}
-
-[Receive the [[Initiate Symbol of Bertoxxulous]] ]
-
+'''You receive the [[Initiate Symbol of Bertoxxulous]].'''
 
 [[Category: Quests]]
 [[Category:Ak'Anon]]

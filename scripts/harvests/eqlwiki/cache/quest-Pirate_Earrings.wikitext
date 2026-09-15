@@ -1,4 +1,4 @@
-[[File:npc_styria_fearnon.png|frame|Styria Fearnon]]
+[[File:npc_styria_fearnon.png|thumb|Styria Fearnon]]
 {| class="questTopTable"
 ! ''' Start Zone: '''
 | [[Ocean of Tears]]
@@ -29,7 +29,7 @@
 
 == Walkthrough ==
 
-''Styria Fearnon may be found on Erollisi Isle (/loc?).''
+''Styria Fearnon may be found on Erollisi Isle in her own hut, northeast of the dock (578, -9357).''
 
 You say, 'Hail, Styria Fearnon'
 
@@ -48,11 +48,11 @@ You say, 'I wish to hunt the pirates.'
 : Styria Fearnon says 'Good work. That is one less pirate to worry about. We do not have much, but take this as payment.'
 
 <div class="facblock">
-* Your faction standing with [[Faydarks Champions]] got better.
-* Your faction standing with [[King Tearis Thex]] got better.
-* Your faction standing with [[Clerics of Tunare]] got better.
-* Your faction standing with [[Soldiers of Tunare]] got better.
-* Your faction standing with [[Crushbone Orcs]] got worse.
+* Your faction standing with [[Faydarks Champions]] could not possibly get any better.
+* Your faction standing with [[King Tearis Thex]] could not possibly get any better.
+* Your faction standing with [[Clerics of Tunare]] could not possibly get any better.
+* Your faction standing with [[Soldiers of Tunare]] could not possibly get any better.
+* Your faction standing with [[Crushbone Orcs]] has been adjusted by -1.
 </div>
 {{YouGainExperience}}
 
