@@ -1,4 +1,5 @@
 using System.Text.RegularExpressions;
+using EQBuddy.Core;
 
 namespace EQBuddy.Tests;
 
@@ -32,6 +33,83 @@ public class WeeklyRefreshWiringTests
         Assert.True(File.Exists(path), $"{relative} has moved — this guard scans it, so a wrong "
             + "path here is a guard that silently passes (trap 34).");
         return File.ReadAllText(path);
+    }
+
+    /// <summary>
+    /// <b>The committed guides carry the date the committed state claims</b> — the invariant
+    /// CI's <c>guides-transform.py --check</c> actually enforces, asserted here directly so it
+    /// is a named rule and not an emergent property of two scripts' running order.
+    ///
+    /// <para><b>The bug this is built on (DRA-84 D3, 2026-09-14).</b> Every guide's
+    /// <c>retrievedAt</c> is <c>refresh-state.json</c>'s <c>ranAt</c> date, and
+    /// <c>refresh.py</c> stamped that state AFTER the promotion that reads it. So the
+    /// transform baked the PREVIOUS run's date, the stamp then advanced past it, and
+    /// <c>--check</c> regenerated a date the committed file could not have. The gate went red
+    /// with the data byte-for-byte identical and the payload length unchanged — a gate
+    /// reddening for a reason that is not about the data, which teaches everyone to re-run
+    /// until green (trap 74's own warning, from the other side). The fix is the
+    /// <c>--stamp</c> wiring below; this row is what notices if it ever comes undone, by ANY
+    /// mechanism, without needing Python to run.</para>
+    /// </summary>
+    [Fact]
+    public void TheCommittedGuidesCarryTheDateTheCommittedRefreshStateClaims()
+    {
+        var state = Read("scripts/harvests/eqlwiki/refresh-state.json");
+        var ranAt = Regex.Match(state, @"""ranAt""\s*:\s*""([^""]+)""").Groups[1].Value;
+        Assert.False(ranAt.Length == 0, "refresh-state.json has no ranAt — the stamp every "
+            + "harvested guide's retrievedAt is derived from.");
+        var expected = ranAt[..10];
+
+        // Guide sources AND objective sources — a partial regeneration would leave two dates
+        // in the file, and reading only one level would photograph the half that agreed.
+        var guides = GuideCatalog.LoadHarvested().Guides;
+        var stamps = guides.SelectMany(g => g.Sources)
+            .Concat(guides.SelectMany(g => g.AllObjectives).SelectMany(o => o.Sources))
+            .Select(s => s.RetrievedAt)
+            .Where(s => !string.IsNullOrEmpty(s))
+            .Distinct(StringComparer.Ordinal)
+            .ToList();
+
+        // One distinct value, and it is the state's. Two would mean a partial regeneration.
+        Assert.Equal([expected], stamps);
+    }
+
+    /// <summary>
+    /// <b>refresh.py hands guides-transform the stamp it is ABOUT to write</b>, and the state
+    /// write stays last. Both halves matter: passing the stamp is what stops the gate
+    /// reddening on a date nobody changed, and keeping the write last is what stops a promotion
+    /// that throws from leaving the window advanced past pages nobody processed.
+    ///
+    /// <para>And the QUIET path must not advance <c>ranAt</c> at all. No promotion runs there,
+    /// so nothing regenerates the guides — advancing the date would date the committed file to
+    /// a run that never rebuilt it and redden the gate on a week where, by construction,
+    /// nothing happened.</para>
+    /// </summary>
+    [Fact]
+    public void TheRefreshStampsTheGuidesWithTheDateItIsAboutToWriteAndLeavesAQuietWeekAlone()
+    {
+        var refresh = Read("scripts/harvests/refresh.py");
+
+        // The stamp is passed, and to guides-transform specifically.
+        Assert.Matches(@"--stamp""\s*,\s*now\s*\]\s*if\s*script\.name\s*==\s*""guides-transform\.py""",
+            refresh);
+
+        // guides-transform accepts it rather than silently ignoring an unknown flag.
+        var transform = Read("scripts/harvests/eqlwiki/guides-transform.py");
+        Assert.Contains("\"--stamp\"", transform);
+        Assert.Contains("harvested_at(args.stamp)", transform);
+
+        // The quiet path keeps the previous ranAt; the full path writes `now`.
+        Assert.Contains("\"ranAt\": keep", refresh);
+        Assert.Contains("\"ranAt\": now", refresh);
+
+        // The state write stays AFTER the promotions — read off positions, not off the text,
+        // because the name appears in the comment that explains the ordering too.
+        var promotionsRun = refresh.IndexOf("for script in PROMOTIONS:", StringComparison.Ordinal);
+        var finalStamp = refresh.LastIndexOf("\"ranAt\": now", StringComparison.Ordinal);
+        Assert.True(promotionsRun >= 0 && finalStamp > promotionsRun,
+            "refresh.py must stamp refresh-state.json AFTER the promotions run, so a promotion "
+            + "that throws cannot leave the window advanced past pages nobody processed.");
     }
 
     /// <summary>Every harvester the refresh drives must exist. A renamed script would make
