@@ -562,7 +562,8 @@ they live on `legacy-v1`.)
 | Tail the file | `Core/LogWatcher.cs` — 150 ms polls, offset-based |
 | Settings + profile paths | `Core/AppSettings.cs`, `Core/AppPaths.cs` (`EQBUDDY_APPDATA`) |
 | Automated launch vs live profile | `UI.Shared/IsolatedLaunchPolicy.cs` + `scripts/isolated-profile.ps1` — pin the child last, refuse both live lines. Audit: `docs/ops/live-state-isolation-audit.md` |
-| Zone map geometry, aliases | `Core/ZoneMap.cs` |
+| Zone map geometry, aliases | `Core/ZoneMap.cs` — `ZoneMapFiles.IdentityKey` is the ONE answer to "are these two spellings the same zone" (lowercase, drop a parenthetical, drop a leading "the", squeeze spaces/'/-) |
+| What level a zone's creatures are | `Core/ZoneLevels.cs` + `Core/Data/ZoneLevelBands.json` ← `scripts/harvests/eqlwiki/zonelevels-transform.py` (DRA-84 D1). The wiki's `Level of Monsters` row, from the COMMITTED zone cache — **fetches nothing**, plain JSON so trap 74's container problem cannot arise, `--check` in `check.ps1` + CI. **Parsing is strict: `N-M` or `N`, everything else ABSENT** — 46 of 118 pages, and the refused shapes (`50+`, `1-15, 35`) are listed verbatim in `zonelevels-report.md` with the zones carrying them. ABSENT SHIPS TOO (`NoBand`), so `Lookup`'s four outcomes tell "never read a page" from "the page is silent" from "the page says something we will not read". Lookup is exact title then `IdentityKey` and **nothing looser** — containment would hand "Commonlands" West Commonlands's band and match a zone name inside free prose, and a wrong band is a number a surface states as fact (`ZoneLevelsTests`' committed negatives are real `DropZones` values that containment DID match). No engine reads a band yet |
 | Spawn points / timers | `Core/SpawnPointLedger.cs`, `Core/SpawnTimers.cs` |
 | Wiki lookups + contribution packs | `Core/EqlWikiMobs.cs`, `Core/WikiContribution.cs` |
 | The widget itself | `EQBuddy/MainWindow.xaml.cs` (~4.5k lines — the hotspot) |

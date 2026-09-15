@@ -2990,3 +2990,89 @@ list. DropMobs coverage is 5,591 items across 4,450 distinct creature names. Cur
 untouched, flag-only, with 255 `GuideCatalog` flags waiting for a human.
 
 — Dranak (Claude Code, DRA-84 D3)
+
+## 2026-09-14 ~8:40 PM CT — DRA-84 D1 executed (plan P1, bands): the strict rule held, and it costs more than the plan could have known
+To: Fable
+
+PR #625, seat `opus-dra84-d1`, off Soft `main` `c0346265`. `check.ps1` all green, 5,001
+units. D1 delivered exactly as declared: transform + `ZoneLevelBands.json` + `ZoneLevels.cs`
++ surveys + `--check` in `check.ps1` and CI. No engine change, no fetch, no harvest.
+
+**Reinforcing — §0's new datum was correct, and it was correct in the specific way that
+mattered.** "All 118 zone wikitexts are COMMITTED, verified this session: Crushbone `5-20`,
+Rathe Mountains `13-45`." Both verbatims are byte-exact in the shipped file. A plan that
+cites two spot-checks I can re-run in one command is a plan I can start from without a
+verification pass of my own, and this one cost me about four minutes to confirm before I
+wrote a line. Keep doing that — it is the difference between a plan and a hypothesis.
+
+**Reinforcing — §3 cut D3 out of the sequence and said so in the slice table.** That is why
+this PR could decline to gate its `--check` on `ItemCatalog.json.gz`: I knew D3 was running
+in parallel and that its code-independence was declared, so coupling the two would have been
+me breaking something the plan had already thought about. A slice table that names what runs
+beside what is load-bearing, not bookkeeping.
+
+**Corrective — the strict rule refuses 54% of the catalog's drop weight, and the plan's
+own evidence could have shown that before it was signed.** §1 P1 says "Parsing is strict:
+`N-M` or a single `N` … prose, absent rows and anything else are ABSENT". Measured:
+
+| Where a `DropZones` spelling lands | Spellings | Mentions |
+|---|---:|---:|
+| On a zone we have a band for | 48 / 302 | 3,564 / 10,612 (33%) |
+| On a zone page whose row we REFUSED | 74 | **5,743 (54%)** |
+| On no zone page we have read | 180 | 1,305 (12%) |
+
+Plane of Sky `50+`, Plane of Hate and Plane of Fear `48+`, Temple of Veeshan `60+`, Kael
+Drakkel `30-60+`, Lower Guk `30-50+`, Karnor's Castle `40-55+`. The **trailing `+` is the
+single most common shape on the pages that matter**, and P2's gate reads a band's TOP. So
+P2 as written would, on today's data, refuse nothing in most of the high-level game — not
+because the plan was wrong about the mechanism, but because nobody counted the shapes in
+the cache before choosing which ones to read.
+
+The two cited exhibits are exactly the two that do not show this: Crushbone is `5-20` and
+Rathe Mountains is `13-45`, both clean closed bands. **Two spot-checks that both parse is
+not evidence about the parse rate** — it is the same shape as trap 11, a table of evidence
+where only one outcome had a way to be named. The distinct-count instinct §1 already applies
+to the VALUES would have caught it one level up, applied to the SHAPES: `grep` the
+`Level of Monsters` rows in the committed cache, count the verbatims, and the 57-to-46 split
+is there in one command, before the slice exists.
+
+**Constructive — for a promoter slice, put the shape census in §0 next to the spot-checks.**
+Not the parse rate as a guess; the actual `collections.Counter` over the raw field. It costs
+the same four minutes the two spot-checks cost, and here it would have changed P2's design
+rather than D1's — which is the cheapest possible place for it to change.
+
+**The open question, and it is yours, not mine.** I kept strict. Reading `50+` as `50-60`
+invents a maximum for "and above" (trap 73), and departing from a SIGNED plan's stated rule
+is an escalation rather than a call I get to make. What I did instead is make the decision
+cheap for whoever makes it: all 57 refused verbatims ship in `zonelevels-report.md` grouped
+by shape, with the zones carrying each, and the join table above is in the report too. Three
+readings are visible in that data and each is a different product:
+
+1. **Learn the open top** as its own fact (`Min` with a null `Max`), and let P2's gate use
+   the BOTTOM only for those zones — `GearBandReachAbove` already gates on the bottom, so
+   the refusal rule is half-usable without inventing anything.
+2. **Cap at the era's 60** — cheap, defensible, and a guess. `45-60+` becoming `45-60`
+   changes nothing; `50+` becoming `50-60` is us deciding what the wiki declined to say.
+3. **Keep strict and accept the reach**, letting P2 refuse only where the wiki drew a closed
+   band. Honest, and it means the Founder's Crushbone class is fixed while most of the
+   endgame is untouched.
+
+I would take (1): it is the only one that adds a fact rather than a number, and the report
+shows 46 of the 57 refused verbatims carry a parseable bottom. But it is a plan decision and
+it changes P2, so I have not written a line of it.
+
+**One more finding for D4 rather than for you to act on now.** 180 of 302 distinct
+`DropZones` spellings land on no zone page at all — 12% of mentions. They are not spelling
+variants; they are `{{VeliousGray| Skyshrine }}`, `Greater Faydark<br>`,
+`Kaesora, Droga, Nurga`, and free prose like "This drop is super ultra rare from any spider
+in kaesora." sitting in a field that is supposed to hold a zone name. That is a catalog-data
+finding, it is measured in this PR's report, and it is exactly the sort of thing P3's
+who-or-withheld coverage survey will trip over. Recorded where it was measured.
+
+**Verified to the class:** V1 — new Core data plus a reader, nothing user-visible. Both new
+guards prove-failed (one edited `Max` fails `--check`; containment reddens 14 of 15 committed
+negatives). No `WhatsNew.json` entry, no shot, no local E2E. Decisions in `DECISIONS.md`;
+LIVE ASK to Helm in `HELM-FEEDBACK.md`.
+
+— Dranak (Claude Code, DRA-84 D1)
+

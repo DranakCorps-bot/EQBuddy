@@ -2262,3 +2262,110 @@ appearing in Farm-to-sell sentences is player-noticeable and should be named the
 move on the standing Soft-open un-PARK**, which your #623 SIGN named for D3 only.
 
 — Dranak (Claude Code, DRA-84 D3)
+
+## 2026-09-14 ~8:45 PM CT — DRA-84 LIVE ASK to Helm: SIGN PR #625 (D1 bands), and rule the open-top verbatim — the strict rule the plan signed refuses 54% of the catalog's drop weight
+To: Helm
+
+**What landed.** PR #625 https://github.com/DranakCorps-bot/EQBuddy/pull/625 — seat
+`opus-dra84-d1` / Paperclip DRA-84, off Soft `main` `c0346265` (rebased onto it; ahead 1 /
+behind 0). Kicked under your ~7:45 PM CT tip's posture item (2): D1 after #623 on Soft
+`main`. Claim-seat took it `-Mode disjoint`, because `opus-dra84-d3` holds DRA-84 under your
+named harvest AUTHORIZE — a default claim was refused with both holders named, which is trap
+70's store working exactly as built.
+
+D1 as the plan declares it, and nothing else: `zonelevels-transform.py` +
+`src/EQBuddy.Core/Data/ZoneLevelBands.json` + `Core/ZoneLevels.cs` + the surveys + `--check`
+in `check.ps1` and `ci.yml`. **No engine change, no fetch, no harvest** — the transform's
+whole input is the COMMITTED `cache/zone-*.wikitext`, so consequence-list item 7 is untouched
+rather than merely unchanged. 14 files, +1,473 / −8.
+
+**Gates.** `scripts/check.ps1` all green, **5,001 units**, `ZoneLevelsTests` 47/47, after
+rebase. CI `build-and-test` + `e2e-windows` are the merge bar and are running on #625 now.
+
+**The finding, which is why this is a LIVE ASK and not a merge-when-green note.** The plan's
+P1 says parsing is strict — `N-M` or a single `N`, everything else ABSENT, never guessed. I
+kept it. Measured against the shipped `ItemCatalog.json.gz` (11,146 records, 5,613 carrying a
+`DropZones`):
+
+| Where a `DropZones` spelling lands | Spellings | Mentions |
+|---|---:|---:|
+| On a zone we have a band for | 48 / 302 (15%) | 3,564 / 10,612 (33%) |
+| On a zone page whose row we **REFUSED** | 74 (24%) | **5,743 (54%)** |
+| On no zone page we have read | 180 (59%) | 1,305 (12%) |
+
+The middle row is not a spelling problem. Plane of Sky `50+`, Plane of Hate and Plane of Fear
+`48+`, Temple of Veeshan `60+`, Kael Drakkel `30-60+`, Lower Guk `30-50+`, Karnor's Castle
+`40-55+`. **Every one of the heaviest drop zones in the catalog HAS a page, and the strict
+rule refuses its row.** The dominant refused shape is the trailing `+`, and P2's gate reads a
+band's TOP — so D2 as planned would, on today's data, refuse nothing across most of the
+high-level game. The Founder's named exhibit survives (Crushbone `5-20`); the other one was
+never a level question (Rathe Mountains `13-45`), exactly as the plan says.
+
+**I did not depart from the plan to fix this**, and that is deliberate: reading `50+` as
+`50-60` invents a maximum for "and above" (trap 73), and a signed plan's stated parse rule is
+not mine to widen. What I did instead is make the call cheap — all 57 refused verbatims ship
+in `zonelevels-report.md`, grouped by shape, with the zones carrying each, and 46 of them
+carry a parseable BOTTOM.
+
+**The asks.**
+
+1. **SIGN #625 merge-when-green.** D1 is within the declared slice; I am not asking for
+   permission to have done it, per cutover 2. What I am asking you to put a signature on is
+   that the boundary was NOT exceeded given the finding above — I read this as "the plan's
+   rule held and produced a number", not "the slice outgrew what it declared". If you read
+   it the other way, that is a HOLD naming DRA-84 and I stop.
+2. **Rule the open-top verbatim, by name, before D2 starts.** D2 is authorized by the
+   sequence SIGN and starts when D1 merges, so without a ruling here I would start writing a
+   gate against data that cannot answer for 54% of the catalog. Three readings, each a
+   different product: **(a)** learn the open top as its own fact (`Min`, null `Max`) and let
+   the gate use the bottom only for those zones — adds a fact, invents no number, and
+   `GearBandReachAbove` already gates on the bottom; **(b)** cap at the era's 60 — cheap,
+   and it is us deciding what the wiki declined to say; **(c)** keep strict and accept the
+   reach, so the Crushbone class is fixed and most of the endgame is untouched. **I would
+   take (a).** Naming it here rather than burying it in D2's diff.
+3. **David — ACK not needed.** Both consequence-list tests fail: no release, nothing public,
+   no privacy surface, no policy toward eqlwiki (zero requests), and the direction is the
+   Founder's own FAIL. Veto surface is the `DECISIONS.md` tip. Flagging it so the judgement
+   is visible rather than assumed.
+
+**Two calls inside the slice you may want to veto rather than discover.**
+**ABSENT ships as data** (`NoBand`, 72 zones with the verbatim refused), so `Lookup` answers
+Unknown / NoRow / Refused / Banded — three different sentences a surface would otherwise
+collapse. **Lookup is exact title then `ZoneMapFiles.IdentityKey`, never longest
+containment**: measured, containment bought 35 more spellings and almost all were wrong —
+`Commonlands` took West Commonlands's `6-30`, the four Qeynos sub-zones took the city's `1-9`
+(including `Qeynos Aqueducts`, whose own page we refused), and free prose in a `DropZones`
+field matched a zone name inside it. A wrong band is a number a surface states as fact;
+ABSENT makes the gate do nothing. `IdentityKey` is the map resolver's existing
+`Normalize`+`Squeeze` lifted out and named, not a second rule (trap 4).
+
+**Both new guards prove-failed**, not shipped green: one edited `Max` in the committed file
+makes `--check` exit 1 with the reason; swapping `Lookup` back to containment reddens 14 of
+the 15 committed negatives plus the alias and ambiguity rows. Every one of those negatives is
+a real `DropZones` value from the shipped catalog that containment DID match — measured, not
+imagined (trap 34 / trap 78).
+
+**One staleness I chose and am naming rather than hiding.** The report's JOIN numbers are
+measured against `ItemCatalog.json.gz`, which `dra84-d3` rebuilds in the parallel seat.
+`--check` deliberately does NOT cover them: gating them would redden D3's PR on a file it did
+not touch, and D3's code-independence is something the plan declared. So nothing turns red
+when those numbers go stale. The report says so in its own text, prints the record count it
+was taken against, and names the command to re-take it. D4's coverage survey is the right
+place; flagging it so it is a decision rather than a gap.
+
+**Channel hygiene.** This note and the `FABLE-FEEDBACK.md` loop-close are APPENDED,
+additions-only, in explicit UTF-8, over a re-fetched `origin/main` (`c0346265`) — checked
+against the base ref, not the tip (trap 60a). `DECISIONS.md` **+90 / −0**. The rebase hit an
+append-vs-append conflict in `DECISIONS.md` against DRA-83's tip; **both entries survive**,
+verified by heading count before the continue. No mailbox wipe, no reorder, no whole-file
+rewrite.
+
+**Not done, deliberately:** D2 (waits on D1 landing), D4 (waits on D2 AND D3 on Soft `main`),
+any harvest or eqlwiki request from this seat (D3 is a separate seat and its AUTHORIZE is
+not mine to spend), any `Recommendations` change, any curated-catalog edit, Pages / Play
+Console / tag / `release.ps1` / signing / prod secrets / Founder mail / Desktop republish /
+#527 / a new `helm/ssc-*` — your tip IS the ruling. No `WhatsNew.json` entry: nothing a
+player can notice ships here, and the entry belongs to the release that ships the gate.
+
+— Dranak (Claude Code, DRA-84 D1)
+

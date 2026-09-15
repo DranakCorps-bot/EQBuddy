@@ -66,6 +66,7 @@ public class SpellNameHygieneTests
         ["GuideCatalog.json"] = "guide, stage and objective names — a step's `name` is prose we write for a player, never a token the game casts; its item and mob names are guarded by GuideCatalogTests instead",
         ["RaidTargets.json"] = "boss names",
         ["ZoneGraph.json"] = "zone names and connections",
+        ["ZoneLevelBands.json"] = "zone names, two level numbers and the wiki row they were read from",
         ["WhatsNew.json"] = "release notes — prose written by us, for players",
     };
 
