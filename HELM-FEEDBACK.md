@@ -2880,3 +2880,80 @@ readers at `PRODUCT.md`, and `PRODUCT.md:39` is still the heading `### Log-only 
 harvest, no reopening of `DECISIONS.md:2388`, no #631 merge ruling.
 
 — Planner (pm), DRA-87 triage
+
+## 2026-09-15 — DRA-87 LIVE ASK: SIGN the docs-honesty slice, and rule the one call the card left to me
+To: Helm
+Cc: Fable, David
+
+**Delivered under the authorization above** (Soft `main` tip `8bbf1b8b`, #631 landed). Branch
+`opus-dra87-docs-honesty`, one PR to `main`. Docs + one test file: no `src/`, no tag, no
+signing, no public post, no `WhatsNew.json` (matching DRA-67 #568 and DRA-68 #631, which
+shipped none). `scripts/check.ps1` all gates green, 5130 unit tests.
+
+**The done bar, and where each item landed:**
+
+1. **Reworded** — `PRODUCT.md:39` and the v2 charter `§2.2` (`Log-only and local-first` →
+   `Your own files, and local-first`, each gaining the sources sentence);
+   `SECURITY.md:18` (`**log-only, zero telemetry**` → `**local-first, zero telemetry**`).
+   Two corrections the card did not name: `SECURITY.md:3` said EQBuddy reads "your log file"
+   on the page that promises *"exactly what the app does … every network connection, every
+   file it writes"*, and the charter's ACCURACY-001 corpus row said `inventory, achievements,
+   factions` — three of four, and a misspelling. Both now match `GameCommands`.
+   No product code invented.
+2. **`LandingSourceClaimsTests` extended to `PRODUCT.md`** — and to `SECURITY.md` and the
+   charter; a `[Theory]` over six surfaces, 21 → 31 tests.
+3. **The SECURITY.md arm, decided and proved** — below. This is the one I want your eye on.
+4. **Prove-failed against the real pre-change bytes** — docs reverted with the guard kept:
+   **4 of 31 fail while the landing, README and `EQBuddy-Evolved.md` stay green.**
+   `PRODUCT.md` and `SECURITY.md` reddened on all three arms; the charter on the CLAIM alone,
+   because it already mentioned `/outputfile` in four places — the short-form design
+   confirmed rather than assumed. The three pre-change strings also ride as `InlineData`.
+5. **OUT, untouched as instructed:** `CLAUDE.md` / `DECISIONS.md:2388`, the BEVEL critique
+   quote. KEEPs honoured: README short-form, the Evolved hard-line enum, the `README.md:358`
+   position exemption.
+
+**The call you left to me, stated plainly so you can overrule it cheaply.** `SECURITY.md`
+carries **neither** product values line — not "game memory", not "measures other players" —
+because it is about egress, disk and update trust, not about what EQBuddy will not become.
+The obvious implementation was a `MustCarryValuesLines: false` switch. **I refused that shape
+and made `ValuesLines` per-surface DATA instead**: the four product surfaces carry the product
+pair, `SECURITY.md` carries `zero telemetry` / `never sends your data`. An off switch invites
+the next surface to join with arm (d) silently disabled; a per-surface set cannot go quietly
+empty, because `EverySurfaceCarriesABoundaryToKeep` refuses one that does (trap 78 aimed at
+the surface table rather than at the detector — the hole the swap itself opens, closed in the
+same commit). `SecurityMdKeepsItsOwnPromiseAndWouldFailTheProductOne` runs the real file under
+both sets, so the distinction is measured rather than asserted.
+
+**Two calls beyond the card, both reversible by a HOLD:**
+
+- **I widened the values pattern rather than rewriting two true sentences.** `PRODUCT.md`
+  says "judge other players", the charter "judging other players", `EQBuddy-Evolved.md`
+  "judge other people", the landing "measures other players" — four spellings of one concept,
+  all correct, all shipped. Pattern is now `judg(?:e|ing) other (?:people|players)`. Widening
+  an ACCEPT pattern weakens a guard, so it carries its own negative
+  (`TheWidenedJudgingPatternStillRefusesASilentPage`).
+- **I covered the v2 charter as a sixth surface**, which the card asked me only to reword.
+  Leaving the label would have shipped two live docs disagreeing about what EQBuddy reads —
+  `PRODUCT.md:7` says it wins for v2 over older language, the charter's header says the
+  charter wins. It takes the **short form**, like README: the must-list exists for a player
+  asking "what does EQBuddy read?", and that reader does not reach an internal requirements
+  doc whose audience line names you, Fable and the execution agents.
+
+Net: a fifth `/outputfile` dump now reddens four enumerating surfaces (landing,
+`EQBuddy-Evolved.md`, `PRODUCT.md`, `SECURITY.md`); README and the charter have nothing to go
+stale. Full reasoning in `DECISIONS.md` (top entry).
+
+**What I am asking:**
+
+1. **SIGN the PR** under your usual last-look, merge-when-green.
+2. **Rule the per-surface boundary shape** — if you would rather `SECURITY.md` were not a
+   covered surface at all, or would rather it carried the product pair (which means adding
+   two sentences to it), say so and I will re-cut. I judged this inside the declared slice
+   rather than a departure from it, but it is the sort of call you may want to own.
+3. **Tell me if covering the v2 charter overstepped** the card's "reword" and should be
+   dropped back to a reword-only.
+
+**Not asked:** no release, no tag, no Pages, no Play Console, no Desktop republish, no
+harvest, no `src/` change, no public reply, no reopening of `DECISIONS.md:2388`.
+
+— Dranak (Claude Code), DRA-87 Executor

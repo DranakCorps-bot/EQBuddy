@@ -66,17 +66,49 @@ public sealed class LandingSourceClaimsTests
 
     /// <summary>
     /// The product boundary, as CONCEPTS with their accepted phrasings — not as literal
-    /// bytes. The three surfaces say these in different words and always have: README
-    /// writes "game memory" where the landing writes "game-memory", and
-    /// EQBuddy-Evolved.md's hard line says "a way to judge other people" where the other
-    /// two say "measures other players". A guard that demanded one spelling would be
-    /// demanding a rewrite of a correct sentence, which is how a gate teaches people to
-    /// edit around it.
+    /// bytes. The surfaces say these in different words and always have: README writes
+    /// "game memory" where the landing writes "game-memory"; EQBuddy-Evolved.md's hard
+    /// line says "a way to judge other people", PRODUCT.md says "judge other players" and
+    /// the v2 charter says "judging other players", where the landing says "measures other
+    /// players". A guard that demanded one spelling would be demanding a rewrite of a
+    /// correct sentence, which is how a gate teaches people to edit around it.
+    ///
+    /// DRA-87 widened the second pattern for exactly that reason: PRODUCT.md's and the
+    /// charter's sentences were already correct and already shipped, and the alternative
+    /// to widening was editing two true sentences to buy a green run.
     /// </summary>
-    private static readonly (string Label, string Pattern)[] ValuesLines =
+    private static readonly (string Label, string Pattern)[] ProductBoundary =
     [
         ("game-memory", @"game[- ]memory"),
-        ("measures other players", @"measures other players|judge other people"),
+        ("measures other players", @"measures other players|judg(?:e|ing) other (?:people|players)"),
+    ];
+
+    /// <summary>
+    /// SECURITY.md's boundary is NOT the product's two, and DRA-87's decision was to say so
+    /// rather than to switch the arm off for that file.
+    ///
+    /// The card left "whether/how to claim-test SECURITY.md" to the executor. Arms (a), (b)
+    /// and (c) fit it better than any other surface — a page whose own genre is
+    /// completeness ("The complete list of hosts", "That's the whole list", "Everything
+    /// lives under %AppData%") is the last place that may take the short form, and a fifth
+    /// dump SHOULD redden it. Arm (d) was the problem: SECURITY.md carries NEITHER product
+    /// values line, because it is not about the product's values — it is about what leaves
+    /// the machine, what is written to disk, and how an update is verified. Demanding
+    /// "never measures other players" on it would have forced unrelated prose onto a
+    /// correct page, which is the same failure as demanding one spelling.
+    ///
+    /// So the arm is not exempted; it is KEYED TO THE PROMISE THE PAGE ACTUALLY MAKES.
+    /// That matters because an off switch would have let a future surface join with the
+    /// check silently disabled, whereas a per-surface SET cannot go quietly empty —
+    /// <see cref="EverySurfaceCarriesABoundaryToKeep"/> refuses one that does. The point of
+    /// arm (d) was never the two specific sentences; it was that correcting a false claim
+    /// must not cost the true boundary line standing next to it, and on this page that line
+    /// is "zero telemetry".
+    /// </summary>
+    private static readonly (string Label, string Pattern)[] SecurityBoundary =
+    [
+        ("zero telemetry", @"zero telemetry|no telemetry"),
+        ("never sends your data on its own", @"never sends your data|sends nothing about you"),
     ];
 
     /// <summary>
@@ -96,11 +128,16 @@ public sealed class LandingSourceClaimsTests
     /// TRUE. These excuse a CLAIM only — they are stripped before the claim scan and
     /// nowhere else, so an exemption can never satisfy the must-list or stand in for a
     /// values line. <see cref="EveryExemptSentenceIsStillInItsFile"/> keeps them honest.</param>
+    /// <param name="valuesLines">The boundary line(s) this surface must keep while being
+    /// corrected. Defaults to <see cref="ProductBoundary"/>; SECURITY.md brings its own
+    /// (<see cref="SecurityBoundary"/>). Never null and never empty — that is the whole
+    /// difference between a per-surface SET and an off switch.</param>
     internal static IReadOnlyList<string> Violations(
         string text,
         bool markdown = false,
         bool mustEnumerateDumps = true,
-        IReadOnlyList<string>? exempt = null)
+        IReadOnlyList<string>? exempt = null,
+        (string Label, string Pattern)[]? valuesLines = null)
     {
         var bad = new List<string>();
         var flat = Flatten(text);
@@ -136,9 +173,10 @@ public sealed class LandingSourceClaimsTests
                         + string.Join(", ", DumpNames) + ")");
         }
 
-        // (d) Being honest about the dumps must not cost the line that is the actual
-        // product boundary. The pill got broader; these do not move.
-        foreach (var (label, pattern) in ValuesLines)
+        // (d) Being honest about the dumps must not cost the true boundary line standing
+        // next to the false one. The pill got broader; these do not move. Which line that
+        // is depends on the promise the surface makes — see SecurityBoundary.
+        foreach (var (label, pattern) in valuesLines ?? ProductBoundary)
             if (!Regex.IsMatch(flat, pattern, RegexOptions.IgnoreCase))
                 bad.Add($"dropped the values line: \"{label}\"");
 
@@ -203,13 +241,47 @@ public sealed class LandingSourceClaimsTests
     private const string ReadmePositionSentence =
         "EQBuddy reads only the log, so the marker moves when you ask it to, not by magic.";
 
-    internal sealed record Surface(string Path, bool Markdown, bool MustEnumerateDumps, string[] Exempt);
+    internal sealed record Surface(
+        string Path,
+        bool Markdown,
+        bool MustEnumerateDumps,
+        string[] Exempt,
+        (string Label, string Pattern)[] ValuesLines);
 
+    /// <summary>
+    /// Six surfaces, and the two columns that differ are decisions rather than
+    /// convenience.
+    ///
+    /// ENUMERATE answers "does this surface promise to answer in full?" The landing's §08
+    /// card, EQBuddy-Evolved.md's hard line, PRODUCT.md's principle and SECURITY.md's
+    /// opening paragraph all do; README (DRA-68's card) and the v2 charter take the short
+    /// form and must DISCLOSE the dumps without listing them. The consequence is stated
+    /// rather than hidden: a fifth dump reddens the four enumerating surfaces, and the
+    /// other two have nothing to go stale.
+    ///
+    /// The charter takes the short form because the must-list exists for a PLAYER asking
+    /// "what does EQBuddy read?" — that reader reaches the landing, README, PRODUCT.md and
+    /// SECURITY.md, not an internal requirements doc whose audience line names Helm, Fable
+    /// and the execution agents. What the charter owes is that its hard lines are not
+    /// FALSE, which is arms (a) and (b).
+    ///
+    /// VALUES is the boundary each surface must keep while being corrected, and SECURITY.md
+    /// is the one that is not the product pair — see <see cref="SecurityBoundary"/>.
+    /// </summary>
     internal static readonly Surface[] Surfaces =
     [
-        new(Path.Combine("site", "index.html"), Markdown: false, MustEnumerateDumps: true, Exempt: []),
-        new("EQBuddy-Evolved.md", Markdown: true, MustEnumerateDumps: true, Exempt: []),
-        new("README.md", Markdown: true, MustEnumerateDumps: false, Exempt: [ReadmePositionSentence]),
+        new(Path.Combine("site", "index.html"), Markdown: false, MustEnumerateDumps: true,
+            Exempt: [], ValuesLines: ProductBoundary),
+        new("EQBuddy-Evolved.md", Markdown: true, MustEnumerateDumps: true,
+            Exempt: [], ValuesLines: ProductBoundary),
+        new("README.md", Markdown: true, MustEnumerateDumps: false,
+            Exempt: [ReadmePositionSentence], ValuesLines: ProductBoundary),
+        new("PRODUCT.md", Markdown: true, MustEnumerateDumps: true,
+            Exempt: [], ValuesLines: ProductBoundary),
+        new("SECURITY.md", Markdown: true, MustEnumerateDumps: true,
+            Exempt: [], ValuesLines: SecurityBoundary),
+        new(Path.Combine("docs", "v2", "EQBuddy-v2-Project-Guide-Requirements.md"),
+            Markdown: true, MustEnumerateDumps: false, Exempt: [], ValuesLines: ProductBoundary),
     ];
 
     public static IEnumerable<object[]> SurfacePaths() => Surfaces.Select(s => new object[] { s.Path });
@@ -222,7 +294,7 @@ public sealed class LandingSourceClaimsTests
     {
         var s = Find(path);
         var text = File.ReadAllText(Path.Combine(Repo, s.Path));
-        Assert.Empty(Violations(text, s.Markdown, s.MustEnumerateDumps, s.Exempt));
+        Assert.Empty(Violations(text, s.Markdown, s.MustEnumerateDumps, s.Exempt, s.ValuesLines));
     }
 
     /// <summary>
@@ -273,13 +345,87 @@ public sealed class LandingSourceClaimsTests
     }
 
     /// <summary>A detector whose pattern list is empty matches nothing and reports clean
-    /// (trap 78). Both lists are load-bearing; neither may go quietly empty.</summary>
+    /// (trap 78). Every list here is load-bearing; none may go quietly empty.</summary>
     [Fact]
     public void TheDetectorListsAreNotEmpty()
     {
         Assert.NotEmpty(ForbiddenClaims);
-        Assert.NotEmpty(ValuesLines);
+        Assert.NotEmpty(ProductBoundary);
+        Assert.NotEmpty(SecurityBoundary);
         Assert.NotEmpty(Surfaces);
+    }
+
+    /// <summary>
+    /// The price of making arm (d) per-surface. A bool would have had two states and both
+    /// are visible in the table; a SET has a third — empty — which turns the arm off while
+    /// still looking like a configured surface, and `Violations` would then report that
+    /// file clean forever (trap 78 aimed at the surface table instead of the detector).
+    ///
+    /// This is the assertion that makes "SECURITY.md brings its own boundary" a different
+    /// thing from "SECURITY.md is excused". A surface may change WHICH line it keeps; it
+    /// may not join with none.
+    /// </summary>
+    [Fact]
+    public void EverySurfaceCarriesABoundaryToKeep()
+    {
+        foreach (var s in Surfaces)
+            Assert.True(s.ValuesLines.Length > 0,
+                $"{s.Path} joined the table with no boundary line — arm (d) is off for it.");
+
+        // And the empty set really would be the hole above: with nothing to keep, a page
+        // that says only true things about its sources passes while naming no boundary.
+        const string noBoundary = "EQBuddy reads your /log and the /outputfile dumps — "
+                                + "inventory, achievements, faction, spellbook.";
+        Assert.NotEmpty(Violations(noBoundary, markdown: true));
+        Assert.Empty(Violations(noBoundary, markdown: true, valuesLines: []));
+    }
+
+    /// <summary>
+    /// The decision under <see cref="SecurityBoundary"/>, proved rather than asserted.
+    ///
+    /// If the two sets were a distinction without a difference, handing SECURITY.md the
+    /// product pair would change nothing and the per-surface column would be ceremony. It
+    /// is not: the real committed file carries NEITHER product values line, because it
+    /// never made that promise. So the choice was to force two unrelated sentences onto a
+    /// correct security page, or to key the arm to the promise the page does make.
+    /// </summary>
+    [Fact]
+    public void SecurityMdKeepsItsOwnPromiseAndWouldFailTheProductOne()
+    {
+        var text = File.ReadAllText(Path.Combine(Repo, "SECURITY.md"));
+
+        // Its own boundary: kept, and the page passes on it.
+        Assert.Empty(Violations(text, markdown: true, valuesLines: SecurityBoundary));
+
+        // The product pair: absent from the file, and absent because the page is about
+        // egress and disk rather than about what EQBuddy will not become.
+        var underProductRules = Violations(text, markdown: true, valuesLines: ProductBoundary);
+        Assert.Contains(underProductRules, v => v.Contains("game-memory", StringComparison.Ordinal));
+        Assert.Contains(underProductRules,
+            v => v.Contains("measures other players", StringComparison.Ordinal));
+    }
+
+    /// <summary>
+    /// And the arm still bites on the page it was keyed to. Correcting the "log-only" label
+    /// in SECURITY.md's egress rule while dropping "zero telemetry" from the same sentence
+    /// is the DRA-67 failure with a new noun — a true boundary line spent to buy a green
+    /// run on a false one — and it is refused.
+    /// </summary>
+    [Fact]
+    public void FixingTheLabelMayNotCostSecurityMdsOwnBoundary()
+    {
+        const string spent = "EQBuddy reads your /log and the /outputfile dumps — inventory, "
+                           + "achievements, faction, spellbook. EQBuddy's rule is local-first: "
+                           + "here is the list of hosts it contacts.";
+        var bad = Violations(spent, markdown: true, valuesLines: SecurityBoundary);
+        Assert.Contains(bad, v => v.Contains("zero telemetry", StringComparison.Ordinal));
+        Assert.Contains(bad, v => v.Contains("never sends your data", StringComparison.Ordinal));
+
+        // Keeping it is all that was ever being asked.
+        const string kept = "EQBuddy reads your /log and the /outputfile dumps — inventory, "
+                          + "achievements, faction, spellbook. EQBuddy's rule is local-first, "
+                          + "zero telemetry: it never sends your data anywhere on its own.";
+        Assert.Empty(Violations(kept, markdown: true, valuesLines: SecurityBoundary));
     }
 
     /// <summary>The exact bytes DRA-67 removed, and the other ways this has been said —
@@ -292,6 +438,16 @@ public sealed class LandingSourceClaimsTests
     [InlineData("""<meta name="description" content="the personal, log-only companion">""")]
     [InlineData("**Log-only, by principle.** EQBuddy knows only what your own log says.")]
     [InlineData("the same private, log-only companion, finished into one coherent product")]
+    // DRA-87's three, verbatim from the pre-change files. All three are LABELS over prose
+    // that was already true — PRODUCT.md's and the charter's bullets ("no game-memory
+    // reads", "no packet inspection"…) say nothing false, and SECURITY.md's sentence is a
+    // correct statement about egress wearing the wrong noun. That is why four content
+    // passes and two prior honesty cards walked past them: nothing under the heading was
+    // wrong, and the heading is the part a reader quotes back at you.
+    [InlineData("### Log-only and local-first")]
+    [InlineData("## 2.2 Log-only and local-first")]
+    [InlineData("EQBuddy's rule is **log-only, zero telemetry**: it never sends your data "
+              + "anywhere on its own.")]
     public void ThePreDra67WordingIsCaught(string text) =>
         Assert.Contains(Violations(text), v => v.StartsWith("claims", StringComparison.Ordinal));
 
@@ -398,6 +554,35 @@ public sealed class LandingSourceClaimsTests
             "No game-memory reads. It is not a leaderboard, or a way to judge other people. "
             + "It reads your /outputfile dumps.";
         Assert.Empty(Violations(evolvedSpelling, markdown: true, mustEnumerateDumps: false));
+
+        // DRA-87's two, and the reason the pattern was widened rather than the sentences
+        // rewritten: both were already shipped, already correct, and say the same thing in
+        // the tense their own document is written in.
+        const string productSpelling =
+            "It does not become a party/raid ranking tool, leaderboard, coaching score, or a "
+            + "way to judge other players. No game-memory reads. It reads your /outputfile dumps.";
+        Assert.Empty(Violations(productSpelling, markdown: true, mustEnumerateDumps: false));
+
+        const string charterSpelling =
+            "It must not become a party/raid ranking tool, leaderboard, coaching score, or "
+            + "mechanism for judging other players. No game-memory reads. "
+            + "It reads your /outputfile dumps.";
+        Assert.Empty(Violations(charterSpelling, markdown: true, mustEnumerateDumps: false));
+    }
+
+    /// <summary>
+    /// Widening an ACCEPT pattern makes a guard weaker, so the widening gets its own
+    /// negative. "judge"/"judging" and "people"/"players" are admitted; a page that names
+    /// neither the judging nor the measuring is still caught, and the alternation did not
+    /// quietly become a match on "other players" alone.
+    /// </summary>
+    [Fact]
+    public void TheWidenedJudgingPatternStillRefusesASilentPage()
+    {
+        const string silent = "No game-memory reads. EQBuddy shows you what other players "
+                            + "are doing. It reads your /log and /outputfile dumps.";
+        Assert.Contains(Violations(silent, markdown: true, mustEnumerateDumps: false),
+                        v => v.Contains("measures other players", StringComparison.Ordinal));
     }
 
     /// <summary>

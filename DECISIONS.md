@@ -1,3 +1,117 @@
+## 2026-09-15 — DRA-87: the last three "log-only" labels, and why SECURITY.md got its own boundary line rather than an exemption
+
+**Seat:** `opus-dra87-docs-honesty`. Paperclip DRA-87, authorized by Helm as a one-slice
+follow-on after #631 (DRA-68) landed. Nothing here is on the consequence list: correcting a
+false claim is not a values-line change, and this is docs + one test file — no `src/`, no
+tag, no signing, no public post. No `WhatsNew.json` entry, matching DRA-67 (#568) and DRA-68
+(#631), which shipped none: a docs wording fix is not player-noticeable in the app.
+
+### 1. Why two honesty cards walked past these three
+
+DRA-67 corrected `site/index.html`; DRA-68 corrected `README.md` and `EQBuddy-Evolved.md`.
+All three remaining sites are **LABELS over prose that was already true**, which is a
+different failure from the hero pill and is why a reader of either earlier card's diff would
+not have noticed them:
+
+- `PRODUCT.md:39` `### Log-only and local-first` and the v2 charter's `## 2.2 Log-only and
+  local-first` both head bullet lists — "no game-memory reads", "no packet inspection", "no
+  telemetry by default" — where **every bullet is true**. Nothing under the heading is wrong.
+- `SECURITY.md:18` *"EQBuddy's rule is **log-only, zero telemetry**: it never sends your data
+  anywhere on its own"* is a **correct statement about EGRESS wearing the wrong noun**. The
+  sentence heads the network-destination table and the claim it actually makes ("never sends
+  your data") is true and stays.
+
+The heading is the part a reader quotes back at you, so the label is the bug. And the chain
+is the DRA-67→68 one, one link further: `EQBuddy-Evolved.md:7` — a surface DRA-68 corrected —
+points at `PRODUCT.md` **by name** for "the product identity — principles, surfaces, and the
+north star in full". A reader who checked us walked from a corrected surface onto this one.
+
+`SECURITY.md:3` earned a second correction the card did not name: it said EQBuddy "reads your
+log file" on the page whose next clause promises *"exactly what the app does with it — every
+network connection, every file it writes"*. An incomplete statement of what we read is worst
+on the page whose whole genre is completeness, so the opening paragraph now names the `/log`
+and all four dumps. The charter's ACCURACY-001 corpus row said `inventory, achievements,
+factions` — three of four, and a misspelling of `faction`; it now matches `GameCommands`.
+
+### 2. The decision the card handed me: whether/how to claim-test SECURITY.md
+
+**Decision: cover it, with all four arms, and give arm (d) the boundary line THAT PAGE
+actually makes.**
+
+Arms (a) claim / (b) disclose / (c) enumerate fit `SECURITY.md` better than any other
+surface. Its own genre is exhaustiveness — *"The complete list of hosts"*, *"That's the whole
+list"*, *"Everything lives under `%AppData%`"* — so it is the last surface that may take
+README's short form, and a fifth `/outputfile` dump **should** redden it.
+
+Arm (d) was the problem, and the measurement is what decided it: the committed
+`SECURITY.md` carries **neither** product values line. Not "game memory", not "measures other
+players". Not an oversight — the page is about what leaves the machine, what is written to
+disk, and how an update is verified. Requiring the product pair would have forced two
+unrelated sentences onto a correct page, which is the same failure as demanding one spelling
+(trap 74's shape, and DRA-68's own stated reason for matching concepts rather than bytes).
+
+**The default it could have gone the other way on: adding a `MustCarryValuesLines: false`
+switch.** I refused that shape. A bool has two states and both are visible in the table, but
+an off switch invites the next surface to join with the check silently disabled — and
+`Violations` would then report that file clean forever. Instead `ValuesLines` became
+**per-surface DATA**: the four product surfaces carry the product pair, `SECURITY.md` carries
+`zero telemetry` / `never sends your data`. No surface's arm (d) is ever off.
+
+That swap opens one hole a bool did not — an **empty** set turns the arm off while still
+looking configured (trap 78 aimed at the surface table rather than at the detector). So it is
+closed in the same commit: `EverySurfaceCarriesABoundaryToKeep` refuses a surface with no
+boundary line, and demonstrates the hole is real by showing the same text passing with `[]`
+and failing without it.
+
+The point of arm (d) was never those two specific sentences. It was that **correcting a false
+claim must not cost the true boundary line standing next to it** — and on this page that line
+is "zero telemetry", which the obvious fix (deleting "log-only," from the pair) would have
+left within one word of being spent.
+
+### 3. Two calls beyond what the card named
+
+**(a) I widened the values pattern instead of rewriting two true sentences.** `PRODUCT.md`
+says "a way to judge other players" and the charter "mechanism for judging other players",
+where the landing says "measures other players" and `EQBuddy-Evolved.md` says "judge other
+people" — four spellings of one concept, all correct, all already shipped. The pattern is now
+`judg(?:e|ing) other (?:people|players)`. Editing a correct sentence to buy a green run is
+exactly how a gate teaches people to edit around it. Widening an ACCEPT pattern **weakens** a
+guard, so it gets its own negative (`TheWidenedJudgingPatternStillRefusesASilentPage`): a page
+that names neither the judging nor the measuring is still caught, and the alternation did not
+quietly decay into a match on "other players" alone.
+
+**(b) I covered the v2 charter as a sixth surface, which the card asked me only to reword.**
+Leaving the false label in the charter would have recreated the exact defect this card exists
+to close — and worse, a contradiction: `PRODUCT.md:7` says it wins for v2 over older language
+while the charter's own header says the charter wins. Two live docs disagreeing about what
+EQBuddy reads is not a state to ship.
+
+It takes the **short form** (`MustEnumerateDumps: false`), like README. The must-list exists
+for a PLAYER asking "what does EQBuddy read?", and that reader reaches the landing, README,
+`PRODUCT.md` and `SECURITY.md` — not an internal requirements doc whose own audience line
+names Helm, Fable and the execution agents. What the charter owes is that its hard lines are
+not false. The prove-fail confirmed the shape rather than assuming it: **the charter failed on
+the CLAIM alone**, because it already mentioned `/outputfile` in four places.
+
+So a fifth dump now reddens four enumerating surfaces (landing, `EQBuddy-Evolved.md`,
+`PRODUCT.md`, `SECURITY.md`) and README plus the charter have nothing to go stale.
+
+### 4. Prove-failed against the real pre-change bytes, not only fixtures
+
+Docs reverted with the guard kept: **4 of 31 fail, and the landing, README and
+`EQBuddy-Evolved.md` stay green** — the discrimination is the point, not the count.
+`PRODUCT.md` and `SECURITY.md` reddened on all three arms (claim, undisclosed, no single
+paragraph); the charter on the claim alone. The three pre-change strings also ride as
+committed `InlineData`. `SecurityMdKeepsItsOwnPromiseAndWouldFailTheProductOne` proves the two
+boundary sets are not a distinction without a difference by running the real file under both.
+
+`scripts/check.ps1`: all gates green, 5130 unit tests.
+
+**Left alone deliberately, per the card:** `README.md:358` (the position-sentence exemption,
+still exactly true), `CLAUDE.md` (`DECISIONS.md:2388`'s reopen), and the BEVEL critique quote.
+
+---
+
 ## 2026-09-14 ~10:40 PM CT — DRA-68: the front door's "log-only", and the tension inside the card that sent me
 
 **Seat:** `dra68-executor`. Paperclip DRA-68, the DRA-67 follow-on Helm already ruled is its
