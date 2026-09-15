@@ -556,6 +556,19 @@ public static class HelperPresentation
             $"{GoalLabel(gap.Goal)}: your stored sessions have not earned coin in a zone "
             + "EQBuddy can quote a rate for yet.",
 
+        // ---- DRA-84 D2 ----------------------------------------------------------------
+
+        // **THE SUBJECT IS THE BANDS AND NOT THE PLAYER.** "Nowhere is right for your level"
+        // reads as a verdict on the character; what EQBuddy did was read eqlwiki's own numbers
+        // for the places its catalog names and find all of them outside a range it will
+        // recommend at. The count and each band arrive under this line (GearBandRefused), so
+        // this sentence says WHAT happened and leaves the numbers to the one that has them.
+        GoalGapReason.EveryZoneOutsideYourBand =>
+            $"{GoalLabel(gap.Goal)}: EQBuddy found upgrades in its catalog and every place they "
+            + "drop has a creature level band on eqlwiki that sits outside yours. The bands and "
+            + "your level are below — nothing here is a claim about the game, only about which "
+            + "zones EQBuddy will put in this list.",
+
         GoalGapReason.NoSellEvidence =>
             $"{GoalLabel(gap.Goal)}: EQBuddy prices a drop by what a vendor has actually paid "
             + "YOU for one, and it has not seen a sale yet. Its own item pages carry vendor "
@@ -894,6 +907,68 @@ public static class HelperPresentation
         ? ""
         : $"{withheld:N0} more {(withheld == 1 ? "upgrade" : "upgrades")} matched and are not "
           + "listed — EQBuddy names a few per slot rather than every one it has read about.";
+
+    /// <summary>How many refused zones are NAMED before the sentence counts the rest. Three,
+    /// which is <c>GearNamedPerRow</c> and <c>DefaultCap</c>'s reason one surface out: a
+    /// caption that listed eleven zones with eleven bands would be a table pretending to be a
+    /// sentence.</summary>
+    public const int GearBandNamed = 3;
+
+    /// <summary>
+    /// **A BAND IN WORDS, AND THERE IS ONE PRODUCER OF THEM** (DRA-84 D2).
+    ///
+    /// <para>Three shapes, because the data has three: a closed band, a single level, and an
+    /// OPEN TOP where <see cref="ZoneLevels.Band.Max"/> is null because the page said "and
+    /// above" (41 of the 87 shipped bands). The open one must not render as a range with a
+    /// missing end — "5–" is a typo and "5–99" is the invented maximum the ruling refused.</para>
+    /// </summary>
+    public static string BandPhrase(int min, int? max) => max switch
+    {
+        null => $"{min} and above",
+        { } m when m == min => $"{min}",
+        { } m => $"{min}–{m}",
+    };
+
+    /// <summary>
+    /// **WHAT THE BAND GATE HELD BACK, WITH THE NUMBERS IT HELD IT BACK ON** (DRA-84 D2, plan
+    /// P2; trap 50).
+    ///
+    /// <para><b>A refusal that says nothing is worse than a cap that says nothing</b>, which is
+    /// why this exists as well as the gate. A zone missing from the list is indistinguishable
+    /// from a zone the catalog has nothing in, and the player has no way to discover that
+    /// EQBuddy decided for them — so the count, the rule and each band are said out loud, and
+    /// the Gear room's door under it has the whole wishlist.</para>
+    ///
+    /// <para><b>Two numbers and a source, and no adjective</b> (HOME-006). It quotes eqlwiki's
+    /// own row and this character's own level and then stops: "outside yours" is a statement
+    /// about two ranges, where "too tough for you" would be a claim about the place and about
+    /// the player that nothing here measured. The rule is named in full so the reader can
+    /// disagree with the judgement rather than just with the outcome.</para>
+    /// </summary>
+    public static string GearBandRefused(IReadOnlyList<GearBandRefusal> refused)
+    {
+        if (refused.Count == 0) return "";
+
+        var named = refused
+            .Take(GearBandNamed)
+            .Select(r => $"{r.Zone} ({BandPhrase(r.Min, r.Max)})")
+            .ToList();
+        var rest = refused.Count - named.Count;
+        var list = string.Join(", ", named) + (rest > 0 ? $", and {rest} more" : "");
+
+        // Only the arms that actually fired, so the sentence never quotes a threshold that
+        // decided nothing in this list.
+        var arms = new List<string>();
+        if (refused.Any(r => r.Arm == GearBandArm.TopUnder))
+            arms.Add($"tops out {Recommendations.OutgrownBy} or more levels under you");
+        if (refused.Any(r => r.Arm == GearBandArm.BottomOver))
+            arms.Add($"starts {Recommendations.GearBandReachAbove} or more levels over you");
+
+        return $"{refused.Count:N0} {(refused.Count == 1 ? "zone" : "zones")} EQBuddy has "
+            + $"upgrades for {(refused.Count == 1 ? "is" : "are")} not listed at your level "
+            + $"{refused[0].Level}: {list}. Those are eqlwiki's own creature levels — EQBuddy "
+            + $"leaves a zone out of this list when its band {string.Join(" or ", arms)}.";
+    }
 
     /// <summary>Said when the picker held standings back. Trap 50 again, one surface
     /// down.</summary>

@@ -143,6 +143,41 @@ public class HelperSurfaceParityTests
         Assert.Equal(HelperPresentation.GearWithheld(desktop.GearWithheld), phone.GearWithheld);
     }
 
+    /// <summary>
+    /// **AND SO DOES A REFUSAL** (DRA-84 D2, trap 50). A zone the PC removed from the list and
+    /// the phone did not mention is the two surfaces disagreeing about what the list contains —
+    /// and the phone reader has no PC in front of them to notice.
+    ///
+    /// <para><b>Its fixture produces a real refusal, which is the whole point of it being its
+    /// own test.</b> The parity fixture above wears nothing, so Farm Gear has no anchor there
+    /// and both sides would agree on an empty string: a guard aimed at nothing is green (trap
+    /// 78). The assertion below is that the refusal is NON-empty first.</para>
+    /// </summary>
+    [Fact]
+    public void ARefusedZoneSaysSoOnThePhoneToo()
+    {
+        var inputs = Inputs(new ResolvedLevel(30, LevelSource.Observed, DateTime.Now)) with
+        {
+            Worn = [new WornItem("Rusty Helm", "Rusty Helm", "HEAD",
+                ItemStatsBlock.Parse(["Slot: HEAD", "AC: 4"]))],
+            Items = new ItemCatalog([
+                new ItemCatalog.Record
+                {
+                    Name = "Bone Helm", StatsText = "Slot: HEAD\nAC: 9",
+                    Slots = ["HEAD"], Ac = 9, DropZones = ["Crushbone"],
+                },
+            ]),
+            Bands = ZoneLevels.Default,
+        };
+        var request = Request(inputs, HelperGoal.FarmGear);
+        var desktop = Recommendations.Rank(request.Inputs, request.Goals);
+
+        var said = HelperPresentation.GearBandRefused(desktop.GearBandRefusals);
+        Assert.NotEmpty(desktop.GearBandRefusals);
+        Assert.NotEqual("", said);
+        Assert.Equal(said, Phone(request).GearBandRefused);
+    }
+
     /// <summary>The Helper names the level it used, on both screens, off the one readout.
     /// A ranking that quietly weighed a number the player disagrees with — and never said
     /// which — is the shape that makes somebody distrust a whole room.</summary>

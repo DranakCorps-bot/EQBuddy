@@ -28,6 +28,9 @@ public class RecommendationsGearTests
     private static WornItem Worn(string name, string slot, int ac) =>
         new(name, name, slot, ItemStatsBlock.Parse([$"Slot: {slot}", $"AC: {ac}"]));
 
+    /// <summary>The default is <see cref="ResolvedLevel.Unknown"/> with no bands, which stands
+    /// DRA-84 D2's gate down — so every test written before it keeps testing what it was written
+    /// to test, and a test about the gate has to ask for both halves by name.</summary>
     private static HelperInputs Gear(
         IReadOnlyList<WornItem> worn,
         ItemCatalog? catalog,
@@ -35,13 +38,28 @@ public class RecommendationsGearTests
         IReadOnlyList<string>? picks = null,
         bool includeQuests = false,
         IReadOnlyList<MobSummary>? pool = null,
-        IReadOnlyList<SessionRow>? sessions = null) =>
+        IReadOnlyList<SessionRow>? sessions = null,
+        int? level = null,
+        ZoneLevels? bands = null) =>
         new(ZoneHistory.Fold(sessions ?? [], pool ?? []), pool ?? [], null, [], [], [], [],
-            false, [], [], null, ResolvedLevel.Unknown)
+            false, [], [], null,
+            level is { } l
+                ? new ResolvedLevel(l, LevelSource.Observed, new DateTime(2026, 9, 14, 20, 0, 0))
+                : ResolvedLevel.Unknown)
         {
             Worn = worn, Items = catalog, GearIntent = intent,
-            WornPicks = picks ?? [], IncludeQuests = includeQuests,
+            WornPicks = picks ?? [], IncludeQuests = includeQuests, Bands = bands,
         };
+
+    /// <summary>A fixture band table. Named zones only, so a test says which band it is about
+    /// and nothing else can leak in.</summary>
+    private static ZoneLevels Bands(params (string Zone, int Min, int? Max)[] rows) =>
+        new(rows.ToDictionary(
+                r => r.Zone,
+                r => new ZoneLevels.Band(
+                    r.Min, r.Max,
+                    r.Max is { } m ? (m == r.Min ? $"{r.Min}" : $"{r.Min}-{m}") : $"{r.Min}+")),
+            new Dictionary<string, string>());
 
     private static RecommendationSet Rank(HelperInputs inputs) =>
         Recommendations.Rank(inputs, [HelperGoal.FarmGear]);
@@ -567,4 +585,412 @@ public class RecommendationsGearTests
             foreach (var word in banned)
                 Assert.DoesNotContain(word, sentence, StringComparison.OrdinalIgnoreCase);
     }
+
+    // ---- DRA-84 D2: the band gate (plan P2, Founder acceptance 3) -------------------------
+    //
+    // The Founder failed this room for offering camps his level could not farm. The gate
+    // REFUSES a zone row whose eqlwiki band sits outside his level, on two named distances, and
+    // says what it held back. Everything below is either a boundary on one of those two numbers
+    // or one of the ways the gate must stand down.
+
+    private static ItemCatalog OneHelmIn(params string[] zones) =>
+        new([Record("Bone Helm", "HEAD", 9, zones)]);
+
+    private static RecommendationSet RankIn(
+        int? level, ZoneLevels? bands, params string[] zones) =>
+        Rank(Gear([Worn("Rusty Helm", "HEAD", 4)], OneHelmIn(zones),
+            level: level, bands: bands));
+
+    /// <summary>
+    /// **THE FOUNDER'S EXHIBIT, AND THE FINDING THAT CAME OUT OF MEASURING IT.**
+    ///
+    /// <para>Crushbone really is `5-20` on eqlwiki and the Founder's own ceiling is level 29,
+    /// which is the complaint in one row. <b>At 29 this gate does NOT refuse it</b>:
+    /// 29 − 20 = 9, and <see cref="Recommendations.OutgrownBy"/> is 10. It refuses from 30.</para>
+    ///
+    /// <para>That is the plan's number doing exactly what the plan said — *"`OutgrownBy` (= 10,
+    /// reused, not re-derived)"* — and it is one level short of the plan's own worked example,
+    /// which asserts Crushbone is refused for a 29. Re-deriving the constant to close a
+    /// one-level gap would be inventing a number to fit an anecdote, which is the opposite of
+    /// what "reused, not re-derived" asks for. So the arithmetic ships, the boundary is pinned
+    /// here in both directions, and the product call — whether the Founder's 29 should see
+    /// Crushbone — is Helm's with this measurement in front of it.</para>
+    ///
+    /// <para>The band comes from <see cref="ZoneLevels.Default"/> rather than a fixture, so this
+    /// fails if the shipped data stops saying it.</para>
+    /// </summary>
+    [Fact]
+    public void TheFoundersCrushboneExhibitIsRefusedFromThirtyAndNotAtTwentyNine()
+    {
+        var band = ZoneLevels.Default.BandFor("Crushbone")!;
+        Assert.Equal((5, 20), (band.Min, band.Max));
+
+        // 29 - 20 = 9, under the threshold. The row the Founder saw is still there.
+        var at29 = RankIn(29, ZoneLevels.Default, "Crushbone");
+        Assert.Equal("Crushbone", Assert.Single(at29.Top).Zone);
+        Assert.Empty(at29.GearBandRefusals);
+
+        // 30 - 20 = 10, exactly OutgrownBy, and the rule is "or more".
+        var at30 = RankIn(30, ZoneLevels.Default, "Crushbone");
+        Assert.Empty(at30.Top);
+        var refusal = Assert.Single(at30.GearBandRefusals);
+        Assert.Equal("Crushbone", refusal.Zone);
+        Assert.Equal(5, refusal.Min);
+        Assert.Equal(20, refusal.Max);
+        Assert.Equal("5-20", refusal.Verbatim);
+        Assert.Equal(30, refusal.Level);
+        Assert.Equal(GearBandArm.TopUnder, refusal.Arm);
+    }
+
+    /// <summary>
+    /// **AND THE EXHIBIT THE GATE CANNOT ANSWER, asserted so nobody mistakes this slice for
+    /// the whole of acceptance 3.** Rathe Mountains is `13-45`: it spans most characters, so no
+    /// level rule refuses it for a 29 and the Founder's complaint about that row is about WHO
+    /// drops the item, which is D4's. A slice that quietly widened the gate until the Rathe row
+    /// disappeared would be answering the wrong half.
+    /// </summary>
+    [Fact]
+    public void TheRatheRowSurvivesTheGateBecauseALevelRuleCannotRefuseIt()
+    {
+        var set = RankIn(29, ZoneLevels.Default, "Rathe Mountains");
+
+        Assert.Equal("Rathe Mountains", Assert.Single(set.Top).Zone);
+        Assert.Empty(set.GearBandRefusals);
+    }
+
+    /// <summary>
+    /// **THE OPEN TOP, BOTH WAYS, against the shipped file** (Helm option (a)). Plane of Sky is
+    /// `50+`: at 12 the BOTTOM arm refuses it, and at 60 nothing does — because there is no
+    /// maximum to be ten levels under, and reading the row's absent top as one would be
+    /// inventing the number the ruling refused to invent.
+    /// </summary>
+    [Theory]
+    [InlineData(12, true)]
+    [InlineData(45, true)]     // 50 - 45 = 5, exactly GearBandReachAbove
+    [InlineData(46, false)]    // 50 - 46 = 4, in reach
+    [InlineData(60, false)]    // 10 over the bottom, and there is no top to be under
+    [InlineData(99, false)]
+    public void AnOpenToppedBandIsOnlyEverRefusedByItsBottom(int level, bool refused)
+    {
+        var set = RankIn(level, ZoneLevels.Default, "Plane of Sky");
+
+        Assert.Null(ZoneLevels.Default.BandFor("Plane of Sky")!.Max);
+        if (refused)
+        {
+            Assert.Empty(set.Top);
+            Assert.Equal(GearBandArm.BottomOver, Assert.Single(set.GearBandRefusals).Arm);
+        }
+        else
+        {
+            Assert.Equal("Plane of Sky", Assert.Single(set.Top).Zone);
+            Assert.Empty(set.GearBandRefusals);
+        }
+    }
+
+    /// <summary><see cref="Recommendations.OutgrownBy"/> is an inclusive threshold, pinned at
+    /// the boundary in both directions. Off by one here silently changes which zones a player
+    /// sees, and no other test would notice.</summary>
+    /// <summary><see cref="Recommendations.OutgrownBy"/> is an INCLUSIVE threshold, pinned at
+    /// the boundary in both directions over a fixture band of 5–20. Off by one here silently
+    /// changes which zones a player sees and no other test would notice.</summary>
+    [Theory]
+    [InlineData(29, false)]    // 29 - 20 = 9
+    [InlineData(30, true)]     // exactly 10
+    [InlineData(31, true)]
+    [InlineData(20, false)]    // standing in the band's own top
+    [InlineData(5, false)]
+    public void TheTopArmFiresAtExactlyOutgrownByLevelsUnder(int level, bool refused)
+    {
+        var set = RankIn(level, Bands(("Crushbone", 5, 20)), "Crushbone");
+        Assert.Equal(refused, set.GearBandRefusals.Count == 1);
+        Assert.Equal(refused, set.Top.Count == 0);
+        if (refused)
+            Assert.Equal(GearBandArm.TopUnder, set.GearBandRefusals[0].Arm);
+    }
+
+    /// <summary><see cref="Recommendations.GearBandReachAbove"/>, the same way, over a fixture
+    /// band of 30–40. Five, not ten — the two arms carry different numbers on purpose and a
+    /// single constant used for both would have to be wrong in one direction.</summary>
+    [Theory]
+    [InlineData(24, true)]     // 30 - 24 = 6
+    [InlineData(25, true)]     // exactly 5
+    [InlineData(26, false)]    // 4, in reach
+    [InlineData(30, false)]
+    public void TheBottomArmFiresAtExactlyGearBandReachAboveLevelsOver(int level, bool refused)
+    {
+        var set = RankIn(level, Bands(("Kaesora", 30, 40)), "Kaesora");
+        Assert.Equal(refused, set.GearBandRefusals.Count == 1);
+        if (refused)
+            Assert.Equal(GearBandArm.BottomOver, set.GearBandRefusals[0].Arm);
+    }
+
+    /// <summary>The two constants are what the tests above say they are — read here rather than
+    /// hard-coded in eleven assertions, so a veto of either number changes one place and the
+    /// rows above re-derive.</summary>
+    [Fact]
+    public void TheTwoNamedDistancesAreTenAndFive()
+    {
+        Assert.Equal(10, Recommendations.OutgrownBy);
+        Assert.Equal(5, Recommendations.GearBandReachAbove);
+    }
+
+    /// <summary>
+    /// **IT REFUSES RATHER THAN DEMOTES, AND IT DOES IT OVER THE PLAYER'S OWN EVIDENCE.**
+    ///
+    /// <para>The deliberate divergence from <see cref="Recommendations.OutgrownWeight"/>, which
+    /// halves a zone and keeps it. Crushbone stays refused for a 29 who farmed it at 12 and
+    /// looted this very helm there — the drop is real, and the answer to "where should I go
+    /// tonight" is still not Crushbone. This is the delivery's most vetoable default, so it has
+    /// a test that would have to be deleted to change it quietly.</para>
+    /// </summary>
+    [Fact]
+    public void ARefusedZoneIsRemovedEvenWhereYouHaveSeenTheItemDropThere()
+    {
+        MobSummary[] pool =
+        [
+            new("a young orc", 300, 300, 40, 0, 0, [new MobLoot("Bone Helm", 4, 1.0)])
+                { Zone = "Crushbone", LevelMin = 8, LevelMax = 12 },
+        ];
+        // 30 rather than the Founder's 29, for the reason pinned in
+        // TheFoundersCrushboneExhibitIsRefusedFromThirtyAndNotAtTwentyNine.
+        var inputs = Gear([Worn("Rusty Helm", "HEAD", 4)], OneHelmIn("Crushbone"),
+            pool: pool, level: 30, bands: ZoneLevels.Default);
+
+        // The evidence really is there — without the gate this is a Personal row.
+        var ungated = Rank(inputs with { Bands = null });
+        Assert.True(Assert.Single(ungated.Top).HasPersonalEvidence);
+
+        var set = Rank(inputs);
+        Assert.Empty(set.Top);
+        Assert.Single(set.GearBandRefusals);
+    }
+
+    /// <summary>
+    /// **A GATE THAT EMPTIED THE LIST SAYS SO IN ITS OWN VOICE**, and the voice is neither of
+    /// the two that already existed. <c>NoCatalogUpgrade</c> would be false — the catalog DOES
+    /// have a better helm — and the whole-room empty state says EQBuddy has nothing stored,
+    /// which is the opposite of what happened.
+    /// </summary>
+    [Fact]
+    public void RefusingEveryZoneIsItsOwnGapAndNotNoCatalogUpgrade()
+    {
+        var set = RankIn(30, ZoneLevels.Default, "Crushbone", "Greater Faydark");
+
+        Assert.Empty(set.Top);
+        Assert.Equal(2, set.GearBandRefusals.Count);
+        Assert.Equal(GoalGapReason.EveryZoneOutsideYourBand, Assert.Single(set.Gaps).Reason);
+
+        // It must cite the bands and must NOT reach for NoCatalogUpgrade's claim, which is that
+        // the catalog holds nothing better — the opposite of what happened here.
+        var sentence = HelperPresentation.Gap(Assert.Single(set.Gaps));
+        Assert.Contains("eqlwiki", sentence, StringComparison.Ordinal);
+        Assert.Contains("found upgrades", sentence, StringComparison.Ordinal);
+        Assert.DoesNotContain("beats what you are wearing", sentence, StringComparison.Ordinal);
+        Assert.NotEqual(
+            HelperPresentation.Gap(new GoalGap(HelperGoal.FarmGear, GoalGapReason.NoCatalogUpgrade)),
+            sentence);
+    }
+
+    /// <summary>A partial refusal keeps its survivors and still says what went — the case the
+    /// gap above must NOT fire in, because there are rows to read.</summary>
+    [Fact]
+    public void APartialRefusalKeepsTheZonesThatSurvivedAndStillReportsTheRest()
+    {
+        var set = RankIn(30, ZoneLevels.Default, "Crushbone", "Rathe Mountains");
+
+        Assert.Equal("Rathe Mountains", Assert.Single(set.Top).Zone);
+        Assert.Equal("Crushbone", Assert.Single(set.GearBandRefusals).Zone);
+        Assert.Empty(set.Gaps);
+    }
+
+    /// <summary>
+    /// A refused zone does not set the yardstick the surviving rows are measured against.
+    ///
+    /// <para><see cref="Recommendation.Weight"/> is a share of the best zone's upgrade count, so
+    /// a camp this character cannot farm must not decide how full every other row's bar looks.
+    /// The gate runs before <c>best</c> is taken; this is that ordering, asserted as a
+    /// number.</para>
+    /// </summary>
+    [Fact]
+    public void ARefusedZoneDoesNotSetTheWeightYardstick()
+    {
+        // Crushbone drops two upgrades, Rathe Mountains one. Refused, Crushbone must not make
+        // the Rathe row a half-weight answer.
+        var catalog = new ItemCatalog([
+            Record("Bone Helm", "HEAD", 9, ["Crushbone", "Rathe Mountains"]),
+            Record("Orcish Bracer", "ARMS", 8, ["Crushbone"]),
+        ]);
+        var set = Rank(Gear(
+            [Worn("Rusty Helm", "HEAD", 4), Worn("Cloth Sleeves", "ARMS", 2)], catalog,
+            level: 30, bands: ZoneLevels.Default));
+
+        var top = Assert.Single(set.Top);
+        Assert.Equal("Rathe Mountains", top.Zone);
+        Assert.Equal(1.0, top.Weight);
+    }
+
+    /// <summary>
+    /// **THE THREE WAYS IT STANDS DOWN, each a different silence** (trap 73: an unanswered
+    /// question gates nothing). Unknown level is the one the room already has a door for; the
+    /// other two are EQBuddy not having read a page.
+    /// </summary>
+    [Fact]
+    public void AnUnknownLevelStandsTheGateDownEntirely()
+    {
+        var set = RankIn(null, ZoneLevels.Default, "Crushbone");
+
+        Assert.Equal("Crushbone", Assert.Single(set.Top).Zone);
+        Assert.Empty(set.GearBandRefusals);
+    }
+
+    [Fact]
+    public void NoBandTableStandsTheGateDown()
+    {
+        var set = RankIn(29, null, "Crushbone");
+
+        Assert.Equal("Crushbone", Assert.Single(set.Top).Zone);
+        Assert.Empty(set.GearBandRefusals);
+    }
+
+    /// <summary>All three ABSENT outcomes gate nothing, and they are named individually because
+    /// "the page says something we will not read" is the one somebody might think should
+    /// refuse. It must not: a row we declined to parse is not evidence about a level.</summary>
+    [Theory]
+    [InlineData("Butcherblock Mountains", ZoneLevels.Source.Refused)]
+    [InlineData("Freeport", ZoneLevels.Source.NoRow)]
+    [InlineData("Plane of Knowledge", ZoneLevels.Source.Unknown)]
+    public void AZoneWithNoBandIsNeverRefused(string zone, ZoneLevels.Source expected)
+    {
+        Assert.Equal(expected, ZoneLevels.Default.Lookup(zone).Source);
+
+        var set = RankIn(29, ZoneLevels.Default, zone);
+        Assert.Equal(zone, Assert.Single(set.Top).Zone);
+        Assert.Empty(set.GearBandRefusals);
+    }
+
+    /// <summary>**A QUEST ROW IS NOT A CAMP AND IS NOT BAND-GATED** (plan P2). The quest names
+    /// no zone to look a band up for, and a hand-in is not something a band describes. Asserted
+    /// with a refused zone in the same set, so this is the gate running and declining rather
+    /// than the gate being off.</summary>
+    [Fact]
+    public void AQuestRowIsNotBandGated()
+    {
+        var catalog = new ItemCatalog([
+            Record("Bone Helm", "HEAD", 9, ["Crushbone"]),
+            Record("Blessed Helm", "HEAD", 12, quests: ["A Blessing"]),
+        ]);
+        var set = Rank(Gear([Worn("Rusty Helm", "HEAD", 4)], catalog,
+            includeQuests: true, level: 30, bands: ZoneLevels.Default));
+
+        var quest = Assert.Single(set.Top);
+        Assert.Equal(RecommendationKind.Quest, quest.Kind);
+        Assert.Equal("A Blessing", quest.Subject);
+        Assert.Equal("Crushbone", Assert.Single(set.GearBandRefusals).Zone);
+    }
+
+    /// <summary>**FARM TO SELL STAYS LEVEL-EXEMPT** (plan P2, D7's coin reasoning). It ranks
+    /// what the player already looted and names no camp, so there is no band to read — asserted
+    /// as identical answers at two levels with the gate's own band table present.</summary>
+    [Fact]
+    public void FarmToSellIsUnmovedByTheBandGate()
+    {
+        MobSummary[] pool =
+        [
+            new("a young orc", 300, 300, 40, 0, 0, [new MobLoot("Orcish Axe", 5, 1.0)])
+                { Zone = "Crushbone" },
+        ];
+        HelperInputs At(int level) => Gear(
+            [Worn("Rusty Helm", "HEAD", 4)], new ItemCatalog([Record("Bone Helm", "HEAD", 9)]),
+            GearIntent.FarmToSell, pool: pool, level: level, bands: ZoneLevels.Default) with
+        {
+            Sales = [new SaleRoll("Orcish Axe", 3, 900)],
+        };
+
+        static string[] Read(RecommendationSet s) =>
+            [.. s.Top.Select(r => r.Subject + "|" + string.Join("¦",
+                r.Why.Select(HelperPresentation.Why)))];
+
+        var low = Read(Rank(At(12)));
+        Assert.NotEmpty(low);
+        Assert.Equal(low, Read(Rank(At(60))));
+        Assert.Empty(Rank(At(12)).GearBandRefusals);
+    }
+
+    // ---- what the refusal SAYS (trap 50, HOME-006) ---------------------------------------
+
+    /// <summary>
+    /// The sentence carries the count, each band, the level and the rule — two numbers and a
+    /// source, and nothing that reads as a judgement about the place or the player.
+    /// </summary>
+    [Fact]
+    public void TheRefusalSaysHowManyAndOnWhatRule()
+    {
+        var set = RankIn(30, ZoneLevels.Default, "Crushbone", "Plane of Sky");
+        var said = HelperPresentation.GearBandRefused(set.GearBandRefusals);
+
+        Assert.Contains("2 zones", said, StringComparison.Ordinal);
+        Assert.Contains("at your level 30", said, StringComparison.Ordinal);
+        Assert.Contains("Crushbone (5–20)", said, StringComparison.Ordinal);
+        // The open top reads as "and above" and never as a range with a missing end.
+        Assert.Contains("Plane of Sky (50 and above)", said, StringComparison.Ordinal);
+        Assert.DoesNotContain("50–", said, StringComparison.Ordinal);
+        // Both arms fired here, so both thresholds are named.
+        Assert.Contains("tops out 10 or more levels under you", said, StringComparison.Ordinal);
+        Assert.Contains("starts 5 or more levels over you", said, StringComparison.Ordinal);
+        Assert.Contains("eqlwiki", said, StringComparison.Ordinal);
+    }
+
+    /// <summary>Only the arms that FIRED are quoted. A sentence naming a threshold that decided
+    /// nothing in this list is a rule the reader cannot check against what they are
+    /// seeing.</summary>
+    [Fact]
+    public void OnlyTheRuleThatFiredIsNamed()
+    {
+        var said = HelperPresentation.GearBandRefused(
+            Rank(Gear([Worn("Rusty Helm", "HEAD", 4)], OneHelmIn("Crushbone"),
+                level: 40, bands: ZoneLevels.Default)).GearBandRefusals);
+
+        Assert.Contains("tops out 10 or more levels under you", said, StringComparison.Ordinal);
+        Assert.DoesNotContain("starts 5 or more", said, StringComparison.Ordinal);
+    }
+
+    /// <summary>The named zones are capped and the cap says so — trap 50 applied to the
+    /// sentence that exists because of trap 50.</summary>
+    [Fact]
+    public void TheRefusalNamesAFewZonesAndCountsTheRest()
+    {
+        var zones = new[] { "Crushbone", "Greater Faydark", "Najena", "Erud's Crossing" };
+        var said = HelperPresentation.GearBandRefused(
+            RankIn(60, ZoneLevels.Default, zones).GearBandRefusals);
+
+        Assert.Contains("4 zones", said, StringComparison.Ordinal);
+        Assert.Contains($", and {4 - HelperPresentation.GearBandNamed} more",
+            said, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void NoRefusalMeansNoSentence() =>
+        Assert.Equal("", HelperPresentation.GearBandRefused([]));
+
+    /// <summary>One refused zone reads as one zone. The singular is where a count-driven
+    /// sentence usually breaks.</summary>
+    [Fact]
+    public void OneRefusedZoneReadsAsOne()
+    {
+        var said = HelperPresentation.GearBandRefused(
+            RankIn(30, ZoneLevels.Default, "Crushbone").GearBandRefusals);
+
+        Assert.StartsWith("1 zone EQBuddy has upgrades for is not listed at your level 30", said,
+            StringComparison.Ordinal);
+        Assert.DoesNotContain("1 zones", said, StringComparison.Ordinal);
+    }
+
+    /// <summary>Every shape of band renders as words, including the single level — one producer,
+    /// three shapes, and the open one must never read as "5–".</summary>
+    [Theory]
+    [InlineData(5, 20, "5–20")]
+    [InlineData(12, 12, "12")]
+    [InlineData(50, null, "50 and above")]
+    public void ABandRendersAsWordsInThreeShapes(int min, int? max, string expected) =>
+        Assert.Equal(expected, HelperPresentation.BandPhrase(min, max));
 }
