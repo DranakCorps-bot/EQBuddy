@@ -1278,6 +1278,16 @@ internal sealed class HelperRoom : Grid, IShellRoom
         $"helperBandRefused={_answers.GearBandRefusals.Count} " +
         $"helperBandLine={(HelperPresentation.GearBandRefused(_answers.GearBandRefusals).Length > 0 ? 1 : 0)} " +
         $"helperBandGate={(_bandGate ? 1 : 0)} " +
+        // **DRA-84 D5: the gate's INPUTS beside its verdict** (plan P6). `helperBandRefused`
+        // above is a COUNT, and a count is equally true of a gate that refused the right two
+        // zones for the wrong reason — the band it read, the arm that fired, or the level it
+        // compared against could each be wrong without moving it. This key carries what the
+        // gate actually COMPARED: the zone, eqlwiki's own row verbatim, and which of the two
+        // arms decided. Read beside `helperLevel`, an E2E can assert the RELATIONSHIP — this
+        // band against that level, therefore refused on this arm — instead of leaving the
+        // arithmetic in a doc comment nobody runs. Spaces go and `:` separates, because the
+        // dump is one flat space-separated namespace (trap 58).
+        $"helperBandRefusals={string.Join(',', _answers.GearBandRefusals.Select(r => $"{r.Zone.Replace(" ", "")}:{r.Verbatim.Replace(" ", "")}:{r.Arm}"))} " +
         // **DRA-84 D4: the who rule, in the same two-numbers-one-moment shape.** `helperWho` is
         // how many DRAWN item lines can name a creature from the page, `helperWhoWithheld` is
         // how many offers the rule removed, and `helperWhoLine` is whether the room said so. A

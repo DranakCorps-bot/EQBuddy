@@ -2617,6 +2617,17 @@ public class ShellHostTests
         Assert.Equal(2, app.DumpValue("helperBandRefused"));
         Assert.Equal(1, app.DumpValue("helperBandLine"));
 
+        // **DRA-84 D5: the relationship, not the count** (plan P6). Two is equally the answer
+        // of a gate that refused these two zones off the wrong band, the wrong arm or a level
+        // it never read — the count moves for none of those. This asserts the comparison the
+        // gate actually made: eqlwiki's own `60+` for both zones, against the 28 asserted
+        // above, refused on the BOTTOM arm because 60 is 32 over 28 and `GearBandReachAbove`
+        // is 5. The TOP arm cannot appear here — an open-topped band has no maximum to be
+        // under — and a run that reported `TopUnder` would be the D2 ruling broken while both
+        // counts stayed green.
+        Assert.Equal("TempleofVeeshan:60+:BottomOver,Veeshan'sPeak:60+:BottomOver",
+            app.DumpText("helperBandRefusals"));
+
         // The sweep's own cap is untouched by the gate — two caps, two numbers, no wiring.
         Assert.Equal(103, app.DumpValue("helperGearWithheld"));
         Assert.Equal(3, app.DumpValue("helperRecs"));
