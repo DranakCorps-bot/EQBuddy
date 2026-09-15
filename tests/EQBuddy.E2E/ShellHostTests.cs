@@ -2539,6 +2539,13 @@ public class ShellHostTests
         // because this fixture has never looted one of these.
         Assert.Equal(3, app.DumpValue("helperGearWhy"));
         Assert.Equal(0, app.DumpValue("helperGearSeen"));
+        // **DRA-84 D4: what each of those rows can now SAY.** Six item lines across the three
+        // drawn zones (3 + 2 + 1), and every one of them names a creature — the half of
+        // acceptance item 2 that read as empty on the Founder's build. None of the eight
+        // upgrades is anonymous, so nothing is withheld here; the row two below stages a fixture
+        // where the rule fires.
+        Assert.Equal(6, app.DumpValue("helperWho"));
+        Assert.Equal(0, app.DumpValue("helperWhoWithheld"));
         // Every gear line is catalog-sourced, so every one of them carries the estimate label.
         Assert.Equal(0, app.DumpValue("helperPersonalWhy"));
         Assert.True(app.DumpValue("helperCatalogWhy") >= 3,
@@ -2658,6 +2665,78 @@ public class ShellHostTests
             "every worn slot to sweep rather than only the picked one");
         Assert.Equal(225, app.DumpValue("helperGearWithheld"));
         Assert.Equal(3, app.DumpValue("helperGearWhy"));
+        Assert.Equal(0, app.DumpValue("helperDeadDoors"));
+
+        // **DRA-84 D4: every drawn item line can say what drops it.** Eight lines across three
+        // zones (Western Wastes and Temple of Veeshan name three apiece, Clan Runnyeye two),
+        // and none of the sixteen upgrades is anonymous, so the who rule withholds nothing here
+        // and the room draws no sentence about it. That zero is the PREDICTION and not a
+        // shrug — the row below stages a fixture where it fires.
+        Assert.Equal(8, app.DumpValue("helperWho"));
+        Assert.Equal(0, app.DumpValue("helperWhoWithheld"));
+        Assert.Equal(0, app.DumpValue("helperWhoLine"));
+    }
+
+    /// <summary>
+    /// **THE WHO RULE FIRING, IN THE LAUNCHED APP, AGAINST THE REAL CATALOG** (DRA-84 D4, plan
+    /// P3; Founder acceptance items 2 and 3).
+    ///
+    /// <para><b>Prediction, computed against the shipped catalog before the run</b> (trap 23).
+    /// A warrior in AC-2 <c>Cloth Gloves</c> with the sweep on every slot has one anchor; 97
+    /// catalog HANDS items beat it, the per-anchor cap keeps 8 and reports <b>89</b> withheld.
+    /// Those eight land in eleven zone buckets — and <b>five of the eleven come from one
+    /// record</b>, <c>Slime Blood of Cazic-Thule</c>, whose <c>DropZones</c> the promoter parsed
+    /// out of a bulleted wiki line as <c>Plane of Fear&lt;br&gt;</c>, <c>:* Fright</c>,
+    /// <c>:* Dread</c>, <c>:* Terror</c> and
+    /// <c>:* Cazic Thule (God) (needs confirmation)</c>.</para>
+    ///
+    /// <para><b>Those five are the Founder's "junk camps" arriving by a second mechanism the
+    /// plan did not foresee</b>, and the who rule removes all five — not because anyone taught
+    /// it to recognise a broken zone name, but because a string that is not a place has no
+    /// creature under it on the page either. <c>helperWhoWithheld</c> is <b>5</b>. The six real
+    /// zones survive, the top three are drawn, and all six of their item lines name a creature.
+    /// The promoter defect itself is filed for Fable — this slice does not parse wikitext.</para>
+    ///
+    /// <para><b>Both halves from one moment</b> (trap 56): the ENGINE's count
+    /// (<c>helperWhoWithheld</c>) beside whether the ROOM said so (<c>helperWhoLine</c>). A rule
+    /// that silently removed five camps would satisfy the first alone, which is the shape trap
+    /// 50 exists to refuse.</para>
+    /// </summary>
+    [Fact]
+    public void AnUpgradeNothingCanNameADropperForIsWithheldAndTheRoomSaysSo()
+    {
+        var key = $"{AppHarness.Character}_{AppHarness.Server}".ToLowerInvariant();
+        using var app = new AppHarness(
+            configureSettings: s =>
+            {
+                s.HelperGoals[key] = [nameof(HelperGoal.FarmGear)];
+                s.HelperGearIntent[key] = nameof(GearIntent.ReplaceSlot);
+            },
+            environment: OpenOn("helper"));
+        app.WriteInventoryDump(("Hands", "Cloth Gloves", 1));
+        app.Launch();
+
+        app.WaitForDump("shellPage", "helper", "the shell to land on the Helper room");
+        app.WaitForDump("helperWorn", "1", "the inventory dump to become one anchor");
+
+        app.WaitForDump("helperZones", "TempleofVeeshan,KaelDrakkel,DragonNecropolis",
+            "the who rule to drop the five phantom zones and rank the real ones");
+
+        // The ENGINE's count, and the ROOM's sentence about it.
+        Assert.Equal(5, app.DumpValue("helperWhoWithheld"));
+        Assert.Equal(1, app.DumpValue("helperWhoLine"));
+
+        // The sweep's own cap is a DIFFERENT number with a different cause, and folding the two
+        // together is precisely what this slice refused to do.
+        Assert.Equal(89, app.DumpValue("helperGearWithheld"));
+
+        // Every drawn item line answers WHO — three rows, six lines, six creatures.
+        Assert.Equal(3, app.DumpValue("helperRecs"));
+        Assert.Equal(3, app.DumpValue("helperGearWhy"));
+        Assert.Equal(6, app.DumpValue("helperWho"));
+        // Nothing in the fixture log looted any of these, so the personal half stays silent and
+        // every one of those six creatures came from the catalog.
+        Assert.Equal(0, app.DumpValue("helperGearSeen"));
         Assert.Equal(0, app.DumpValue("helperDeadDoors"));
     }
 

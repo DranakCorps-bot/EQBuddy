@@ -7252,3 +7252,77 @@ merge bar and the local screen is a mutex a concurrent seat was holding (trap 61
 
 — Dranak (Claude Code, DRA-86)
 
+
+---
+
+## 2026-09-15 — DRA-84 D4: the who rule, its sentence's home, and one finding the plan did not foresee
+
+Seat `opus-dra84-d4`, plan P3 (+ P4's verification half), under #623's whole-sequence SIGN.
+Defaults below are mine to make; the veto surface is this file.
+
+**1. THE COVERAGE SURVEY CAME BACK 98.2%, SO THE SLICE PROCEEDED.** The plan made D4 open with a
+measurement and named the number that would stop it: under half, the withhold default is wrong
+and the slice escalates to Helm rather than shipping a hollowed room. Measured on the post-D3
+catalog: **5,897 of 6,004 wearable (item, zone) pairs name a creature — 98.2%**; 10,497 of 10,637
+over the whole catalog; 5,591 of 5,626 records. 4,712 distinct names over 25,695 mentions, which
+is the trap-73 tell passing comfortably. The survey is COMMITTED as `ItemCatalogWhoCoverageTests`
+with the floor left armed, because the data is regenerated weekly by a transform nobody reads
+line by line and a refresh that reverted the creature half would empty the Farm Gear room
+honestly and silently.
+
+**2. THE WITHHELD COUNT GETS ITS OWN SENTENCE, and the plan's prose said otherwise.** P3 said the
+withheld offers are *"counted in the existing withheld sentence"*. They are not — `GearWhoWithheld`
+is its own field and its own line beside `GearWithheld`. **`GearWithheld` is a CAP** (EQBuddy
+naming a few of many it could have named, remedy: open the Gear room); **this is a RULE** (nothing
+can say what drops it, remedy: play there, or edit the page). Summing them gives one number that
+can explain neither, which is the failure trap 50 is about rather than a tidier surface. The
+room now carries three such lines — cap, band, who — and a player can act on all three only if
+they can tell which fired. **Named for Helm as a departure from the plan's wording**; if Helm
+reads the phrase as load-bearing rather than as a suggested home, the fold is one line.
+
+**3. THE WHO RULE RUNS AFTER THE BAND GATE, and the order decides which sentence a player gets.**
+Both rules can remove the same row. D2's refusal quotes eqlwiki's own band and the character's
+level; this one can only say a page was silent. Running the who rule first would have swallowed
+refusals D2 shipped — a level-30 character's anonymous Crushbone offer would vanish as "no
+creature named" instead of "eqlwiki lists its creatures at 5–20". **A slice must not quietly
+narrow what the slice before it refused out loud.** Pinned by
+`TheBandGateReportsARefusalTheWhoRuleWouldOtherwiseHaveSwallowed`, which is one of the six
+prove-failed mutants.
+
+**4. `GearMobsPerItem` = 3, and the order is the wiki page's own.** Three because a zone row names
+three items, so an uncapped clause puts eighteen creature names on one row; and because one name
+reads as *the* thing to kill where three read as the sort of thing this zone drops it from, which
+is what a camp is. **Nothing ranks creatures** — nothing here has measured them — so the page's
+order stands and what is held back is attributed to the page ("and 4 more on its page") rather
+than to EQBuddy. Load-bearing on real data: 3,830 pairs name more than one and 1,384 more than
+three.
+
+**5. THE FINDING THE PLAN DID NOT FORESEE — the who rule removes a class of camp that is not a
+place at all.** 75 of the 107 anonymous wearable (item, zone) pairs have a "zone" string that is
+not a zone: `}}`, `Category:2H Slashing`, `N O T _ C L A S S I C`, `ITEM REMOVED FROM GAME`,
+`EQL Note - Dropped from an ogre shaman (9/9/26)`, and free prose. The staged shot is the
+exhibit: a warrior in `Cloth Gloves` was being offered **five** camps off ONE record — `Plane of
+Fear<br>`, `:* Fright`, `:* Dread`, `:* Terror`, `:* Cazic Thule (God) (needs confirmation)` —
+all parsed out of one bulleted wiki line onto `Slime Blood of Cazic-Thule`. The rule removes all
+five, not because anything here learned to recognise a broken zone name, but because **a string
+that is not a place has no creature under it on the page either.** That is the Founder's "junk
+camps" arriving by a second mechanism.
+
+**The promoter defect itself is NOT fixed here and that is deliberate.** Correcting how
+`items-promote.py` reads a bulleted drop list is a transform change whose output is the catalog,
+and rebuilding the catalog is a harvest question — D3's AUTHORIZE is discharged. Filed as a stub
+in `FABLE.md` with the numbers. **What ships is the engine refusing to act on it**, which is the
+right layer for this slice and leaves the data honest either way.
+
+**6. Existing fixtures gained a creature, and that is a change worth seeing.** `RecommendationsGearTests.Record`
+and two sibling fixtures now populate `DropMobs` by default, with `anonymous: true` as the opt-out
+for the tests about the rule. They were written when the field was empty on all 11,146 records; a
+null default now would make every fixture in those files the 1.8% case and the who rule would
+silently be the thing every other test was measuring.
+
+**Not done, deliberately:** no fetch, no harvest, no curated write, no transform change, no rate
+or policy change; no Pages, Play Console, tag, `release.ps1` or signing; the never-BiS three
+refusals, the single-select intent strip, the include-quests toggle and the count-based zone
+ranking all KEEP. The item side of the band gate stays ungated (D6's survey, unchanged).
+
+— Dranak (Claude Code, DRA-84 D4)

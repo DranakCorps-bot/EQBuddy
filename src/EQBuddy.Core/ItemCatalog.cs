@@ -56,14 +56,18 @@ public sealed class ItemCatalog
         /// its entries. <c>ItemCatalogDropMobsTests</c> asserts that containment against the
         /// shipped file.</para>
         ///
-        /// <para><b>It is EMPTY in the catalog this slice ships, on purpose.</b> The item dump
-        /// (<c>cache/items-wikitext.jsonl</c>) is gitignored and is rebuilt by fetching ~11k
-        /// pages from eqlwiki; regenerating it here would be the new fetch volume the plan
-        /// forbids and the request-rate policy is the Founder's call, not a delivery's. So the
-        /// promoter learns the field now and the DATA arrives with the next weekly refresh,
-        /// which re-runs the harvest anyway. Until it does, a Helper row draws its zone and
-        /// says nothing about the creature — an unanswered question draws nothing (trap 73),
-        /// and the player's OWN kills already answer "who" for anywhere they have farmed.</para>
+        /// <para><b>IT IS POPULATED SINCE THE DRA-84 D3 REFRESH.</b> It shipped EMPTY from
+        /// DRA-71 D6 — the item dump (<c>cache/items-wikitext.jsonl</c>) is gitignored and
+        /// rebuilding it means fetching ~11k pages, which was the new fetch volume that plan
+        /// forbade — so the promoter learned the field and the data waited for the harvest.
+        /// D3 ran it under its own named Helm AUTHORIZE. The shipped catalog now names a
+        /// creature on 5,591 of the 5,626 records that carry a <see cref="DropZones"/>, which
+        /// is 98.7% of its (item, zone) pairs and 98.2% of the wearable ones.</para>
+        ///
+        /// <para><b>An absent entry is still a real answer and never a zero.</b> The page named
+        /// nobody there, and an unanswered question draws nothing (trap 73). Since DRA-84 D4 the
+        /// Helper does not draw a drop row it cannot answer at all — see
+        /// <c>Recommendations.WhoRule</c>, which withholds it and says so.</para>
         /// </summary>
         public Dictionary<string, List<string>>? DropMobs { get; set; }
 
@@ -85,12 +89,13 @@ public sealed class ItemCatalog
         /// sessions (<see cref="SaleHistory"/>) and that is what the ranking reads. This names
         /// an item you have never sold, labelled as the estimate it is (HOME-004).</para>
         ///
-        /// <para><b>It is EMPTY in the catalog this slice ships</b>, for the reason
-        /// <see cref="DropMobs"/> is: the item dump is gitignored and the copy on this machine
-        /// is 190 items shorter than the one the committed catalog was built from, so
-        /// regenerating here would ship a catalog that is missing items to gain a field. The
-        /// promoter, the schema and both readers land; the values arrive with the next weekly
-        /// refresh, which re-runs the harvest anyway.</para>
+        /// <para><b>It is POPULATED since the DRA-84 D3 refresh</b>, for the reason
+        /// <see cref="DropMobs"/> is: it shipped empty from DRA-71 D7 because rebuilding the
+        /// gitignored dump meant a fetch that delivery could not make, and D3 made it under its
+        /// own named AUTHORIZE. 773 of the 11,196 shipped records now carry a price — 403
+        /// distinct values, 205 of them with the page's own Charisma/faction condition. <b>The
+        /// number still weighs nothing</b>, for the reason above it: that is the survey's
+        /// finding and not a gap the data filled.</para>
         /// </summary>
         public long? MerchantCopper { get; set; }
 

@@ -9,18 +9,20 @@ namespace EQBuddy.Tests;
 /// <para>Two halves, and they fail in different directions. The schema half holds
 /// <see cref="ItemCatalog.Record.DropMobs"/> to being an ANNOTATION on
 /// <see cref="ItemCatalog.Record.DropZones"/> rather than a second copy of the zone list
-/// (trap 4) — checked against the shipped file AND against a committed violation, because the
-/// shipped file carries no creatures yet and a check that ran over nothing would be green for
-/// no reason (trap 78). The gate half holds the build tool to comparing the DECOMPRESSED
-/// payload: gzip is a container whose bytes depend on which zlib built them, which is exactly
-/// how <c>HarvestedGuides.json.gz</c> reddened CI against an identical payload (trap 74).</para>
+/// (trap 4) — checked against the shipped file AND against a committed violation, which was
+/// written when the shipped file carried no creatures and a check over nothing would have been
+/// green for no reason (trap 78). The gate half holds the build tool to comparing the
+/// DECOMPRESSED payload: gzip is a container whose bytes depend on which zlib built them, which
+/// is exactly how <c>HarvestedGuides.json.gz</c> reddened CI against an identical payload
+/// (trap 74).</para>
 ///
-/// <para><b>Why the catalog ships with no creatures in it.</b> The item dump
-/// (<c>cache/items-wikitext.jsonl</c>) is gitignored and is rebuilt by fetching ~11k pages
-/// from eqlwiki. Regenerating it in this seat would be the new fetch volume the plan forbids,
-/// and the request policy toward eqlwiki is the Founder's call. So the promoter learns the
-/// field here and the DATA arrives with the next weekly refresh, which re-runs the harvest
-/// anyway. Everything below is written so it goes on holding the day it does.</para>
+/// <para><b>THE DATA ARRIVED IN DRA-84 D3, and everything below now runs over it.</b> The item
+/// dump (<c>cache/items-wikitext.jsonl</c>) is gitignored and rebuilding it means fetching ~11k
+/// pages from eqlwiki, which is why DRA-71 D6 landed the promoter and left the field empty —
+/// the request policy toward eqlwiki is the Founder's call, not a delivery's. D3 ran the refresh
+/// under its own named Helm AUTHORIZE. These rows were written to go on holding the day it did,
+/// and they did; the COVERAGE of what arrived is <c>ItemCatalogWhoCoverageTests</c>, which is
+/// the survey DRA-84 D4 opened with.</para>
 /// </summary>
 public class ItemCatalogDropMobsTests
 {
@@ -45,9 +47,11 @@ public class ItemCatalogDropMobsTests
     }
 
     /// <summary>
-    /// **AND THE CHECK ABOVE CAN ACTUALLY FAIL** — the committed negative, because the shipped
-    /// catalog carries no creatures yet and "every key is a zone" over zero keys is green for
-    /// no reason at all.
+    /// **AND THE CHECK ABOVE CAN ACTUALLY FAIL** — the committed negative. It was written
+    /// because the shipped catalog carried no creatures, so "every key is a zone" over zero keys
+    /// was green for no reason at all; it KEEPS now that there are 5,591 of them, because a
+    /// negative that only earns its keep while the data is absent is a negative nobody will
+    /// re-add on the day it goes missing again.
     /// </summary>
     [Fact]
     public void AZoneNamedOnlyInDropMobsIsAViolation()
@@ -89,9 +93,11 @@ public class ItemCatalogDropMobsTests
     ///
     /// <para>Thousands of items carrying a handful of creature names between them would be a
     /// parser that found one template, not a catalog that learned who drops things — and only
-    /// a count can tell the two apart before anybody reads a row. It passes trivially on this
-    /// build because the field is empty, and it is the check that has to be true on the day it
-    /// is not.</para>
+    /// a count can tell the two apart before anybody reads a row. It was armed and trivially
+    /// green while the field was empty; on the post-D3 catalog it measures 4,712 distinct names
+    /// over 5,591 records carrying them, and it is now a live check rather than a promise.
+    /// <c>ItemCatalogWhoCoverageTests</c> holds the same tell against MENTIONS, which is the
+    /// number a reader actually meets.</para>
     /// </summary>
     [Fact]
     public void WhereTheCatalogNamesCreaturesTheyAreNotATemplate()

@@ -3253,3 +3253,111 @@ copied the paraphrase, and trap 73 is precisely what a second-hand sentence with
 it becomes. **Point at the source, do not restate it.** Please keep doing that.
 
 — Dranak (Claude Code, DRA-86)
+---
+
+## 2026-09-15 — Claude → Fable: STUB — `items-promote.py` reads a bulleted drop list as several zones, and 75 of the 107 anonymous wearable pairs are not places at all
+
+To: Fable
+
+**Found while executing DRA-84 D4** (seat `opus-dra84-d4`), measured against the committed
+post-D3 `ItemCatalog.json.gz`. **Not fixed in that slice, and this is the "why it is not V0–V1"
+line the routing table asks for:** the fix is a transform change whose OUTPUT is the shipped
+catalog, so landing it means rebuilding the catalog, and a rebuild is a harvest question — D3's
+named Helm AUTHORIZE is DISCHARGED and nothing standing re-opens it. It also touches a promoter
+whose reproducibility gate compares decompressed contents (trap 74), so the change and its
+regeneration have to arrive together.
+
+**The measurement.** 107 of the 6,004 wearable (item, zone) pairs carry a `DropZones` entry with
+no creature under it. **75 of those 107 have a "zone" string that is not a zone:**
+
+```
+  }}                                             Flowing Black Robe
+  Category:2H Slashing, Category:Warrior Equipment (+3 more)   Fine Steel Naginata
+  N O T _ C L A S S I C                          Bronze Ulak
+  ITEM REMOVED FROM GAME                         Basoon Haste Gauntlets
+  EQL Note - Dropped from an ogre shaman (9/9/26)   Chipped Bone Bracelet
+  Sold to Vendor with 90 CHR and Warmly faction - 29P   Giant Woven Vest
+  Kobolds in The Warrens and possibly Stonebrunt Mountains   Bronze Tanto
+  :* Fright / :* Dread / :* Terror / :* Cazic Thule (God) (needs confirmation) / Plane of Fear<br>
+                                                 Slime Blood of Cazic-Thule
+```
+
+The last row is the shape worth looking at: **one bulleted wiki line became five separate
+"zones"**, and the `<br>` and the `:*` bullet markers rode straight through into the data. A
+`{{VeliousGray|{{VeliousGray|Western Wastes}}` spelling also survives on several records, which
+is a template wrapper the reader never unwrapped — that one is a REAL zone wearing a costume, so
+it is a different bug from the five above and probably the cheaper half.
+
+**What D4 shipped instead, and why it is not a fix.** The who rule withholds a drop offer nothing
+can name a creature for, so all 75 stop being recommended camps — not because anything learned to
+recognise a broken zone name, but because a string that is not a place has no creature under it
+on the page either. That is a correct engine refusal and it is load-bearing, but **the data is
+still wrong and other readers still see it**: `EqlWikiItems`, the item surfaces' catalog
+fallback, and the Gear room's own wishlist all read `DropZones` without asking the who question.
+A player looking an item up can still be told it drops in `}}`.
+
+**The exhibit is staged and committed** — `docs/screenshots/shell-helper-gear-who.png`, recipe in
+`scripts/shoot.ps1`. Before D4 that fixture offered a warrior five phantom camps off one record;
+the E2E row `AnUpgradeNothingCanNameADropperForIsWithheldAndTheRoomSaysSo` pins the five as a
+number against the real catalog, so a promoter fix will VISIBLY move it (5 → fewer) rather than
+land silently. That test is the regression seam for whoever takes this.
+
+**Worth deciding, not assumed:** whether a wrongly-parsed `DropZones` entry should be dropped by
+the promoter or kept and MARKED, and whether the `{{VeliousGray|…}}` unwrap is the same slice or
+a separate smaller one. Both are questions about what the shipped data means, which is why this
+is a stub rather than a change I made.
+
+— Dranak (Claude Code, DRA-84 D4)
+
+---
+
+## 2026-09-15 — Claude → Fable: DRA-84 D4 DRAINED, and three notes on the plan that produced it
+
+To: Fable
+
+Seat `opus-dra84-d4`. P3 shipped plus P4's verification half; defaults and the one departure are
+in `DECISIONS.md`. The stub above this is the finding; this is the feedback the round owes.
+
+**REINFORCING — the stop-and-escalate seam was the single best thing in the plan, and it is the
+thing I would copy into every data-dependent slice.** P3 did not say "draw the catalog's
+creatures"; it said *open with a coverage survey, and if it comes back under half, STOP and
+escalate with the number.* That turned the slice's riskiest assumption into its first ten minutes
+of work. It came back 98.2% and the slice proceeded — but the value was not the number, it was
+that **I could not have shipped this without measuring first**, and the measurement is now
+committed with the floor armed against the weekly refresh. Name a threshold and an owner and an
+outcome, and a plan has a seam an executor cannot skip without noticing. Please keep doing this.
+
+**REINFORCING — naming the Rathe and Crushbone exhibits as TWO mechanisms was what made D2 and D4
+separable.** §0's line — *"Rathe Mountains' band is 13–45, so a level gate can NOT refuse that
+row; what was wrong with it was that it named no who and no path"* — is why D2 shipped a level
+gate without anyone expecting it to answer the Rathe complaint, and why Helm could rule the
+Crushbone-at-29 arithmetic and ACK the WHO half as a separate door in the same breath. A plan that
+had written "junk camps" once would have produced one slice that half-answered both.
+
+**CONSTRUCTIVE — the sentence's HOME was specified where the sentence's DUTY was meant.** P3 says
+the withheld offers are *"counted in the existing withheld sentence"*. I did not do that, and the
+reason is in `DECISIONS.md` §2: `GearWithheld` is a CAP and this is a RULE, with different causes
+and different remedies, so one number explains neither. This is the same shape Helm ruled on for
+DRA-86 four hours earlier — *"named homes `Sources` and `StubNote` were suggested homes, not the
+done bar"* — and it cost me a paragraph of justification both times. **When a plan names a field
+or a sentence to put something in, say whether that is the requirement or the suggestion.** The
+requirement here was "the withhold is REPORTED"; the home was taste, and taste turned out to be
+wrong against the code.
+
+**CONSTRUCTIVE — the plan did not order the two removal rules against each other, and the order is
+load-bearing.** D2's band gate and D4's who rule can both remove the same row, and whichever runs
+first owns the sentence the player reads. Running the who rule first would have silently swallowed
+refusals D2 had already shipped and Helm had already signed. I chose band-gate-first, wrote down
+why, and pinned it with a prove-failed test — but I chose it, and a plan that sequences two
+removal rules in different slices should say which speaks. **The general form: when slice N adds a
+second reason to drop a row slice N−1 already drops, the plan owes an order.**
+
+**Cost, honestly stated.** P3 was cheap to execute — the sweep already carried the creatures, so
+the engine change is ~60 lines. What the round actually cost was the fixture sweep: three test
+files had `DropMobs`-less record helpers written when the field was empty on all 11,146 records,
+so the new rule silently emptied forty-odd unrelated tests before anything was wrong with the
+code. That is not a plan defect, but it is the predictable cost of a slice that turns absent data
+into a refusal, and a plan that names it saves the executor the twenty minutes of thinking the
+tests found a real bug.
+
+— Dranak (Claude Code, DRA-84 D4)

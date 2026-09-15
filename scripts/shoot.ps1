@@ -1750,6 +1750,53 @@ $Shots = [ordered]@{
                                HelperGoals = @{ 'testchar_test' = @('FarmGear') }
                                HelperWornPicks = @{ 'testchar_test' = @('Cloth Cap') }
                            } }
+    # ---- DRA-84 D4: every drop row saying WHO, and the ones that could not -----------------
+    #
+    #   'shell-helper-gear-who' — the Founder's acceptance item 2 in a picture, and item 3's
+    #     second mechanism beside it. A DIFFERENT anchor from the four shots above, chosen
+    #     because it is the one in the shipped catalog that makes both halves visible at once:
+    #     a warrior in AC-2 `Cloth Gloves` on the REPLACE intent.
+    #
+    #   PREDICTED (trap 23) — computed against the shipped `ItemCatalog.json.gz` before the take,
+    #   and the same prediction the E2E row
+    #   `AnUpgradeNothingCanNameADropperForIsWithheldAndTheRoomSaysSo` makes:
+    #     * THREE answers — Temple of Veeshan (3 upgrades), Kael Drakkel (2), Dragon Necropolis
+    #       (1) — and "3 more answers matched" under them.
+    #     * SIX item lines, and every one of them names a creature, which is the half that read
+    #       as empty on the build the Founder failed: Vulak`Aerr, Lendiniara the Keeper and Lord
+    #       Vyemm under Temple of Veeshan; King Tormax and Yetarr under Kael Drakkel.
+    #     * THE PLURAL CLAUSE is the Dragon Necropolis line and it is the reason this anchor was
+    #       picked: *"Flayed Paebala Gloves beats the Cloth Gloves in your hands — +15 DEX. a
+    #       Chetari master, a Chetari dominator and Dominator Yisaki drop it."* Three names, one
+    #       verb, one sentence. The four shots above happen to name one creature apiece.
+    #     * "5 more drop offers are not listed: their item pages name nothing that drops them
+    #       in those zones…", with a Gear door under it. **All five are one record** — `Slime Blood of
+    #       Cazic-Thule`, whose DropZones the promoter parsed out of a bulleted wiki line as
+    #       `Plane of Fear<br>`, `:* Fright`, `:* Dread`, `:* Terror` and `:* Cazic Thule (God)
+    #       (needs confirmation)`. So this picture is also the evidence for the promoter defect
+    #       filed in `FABLE.md`: before D4 those five strings were five recommended CAMPS.
+    #     * "89 more upgrades matched and are not listed" — the sweep's own cap, a DIFFERENT
+    #       number with a different cause, which is why the two sentences are separate.
+    #     * The unknown-level line above the answers with its Character door: no ding and no
+    #       statement in this profile, so the band gate stands down and nothing here is about it.
+    #
+    #   THE HEIGHT IS PART OF THE STAGING, for the reason 'shell-helper-gear-band' records: the
+    #   two withheld captions come AFTER three answers, so at the default 946x633 this would be a
+    #   well-composed photograph of the feature off-screen. The density question stays with
+    #   Bevel and is not restyled from here.
+    #
+    #   AND THE REGRESSION PICTURES: all four 'shell-helper-gear*' shots above change in this
+    #     slice — every one of their item lines gains a creature clause it did not have. That is
+    #     the slice working, and they are re-taken in the same change.
+    'shell-helper-gear-who' = @{ Title = 'EQBuddy — Helper'
+                           Env = @{ EQBUDDY_SHELL = 'helper'; EQBUDDY_SHELL_SIZE = '946x880' }
+                           Dump = @{ 'Testchar_test-Inventory.txt' = @(
+                               "Location`tName`tID`tCount`tSlots"
+                               "Hands`tCloth Gloves`t0`t1`t0") }
+                           Set = @{
+                               HelperGoals = @{ 'testchar_test' = @('FarmGear') }
+                               HelperGearIntent = @{ 'testchar_test' = 'ReplaceSlot' }
+                           } }
     # ---- DRA-71 D7: motes and money, both from the player's own play ----------------------
     #
     # The two staged states are this slice's two claims: what a place has paid you in MOTES,

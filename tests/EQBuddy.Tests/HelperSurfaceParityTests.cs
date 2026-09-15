@@ -178,6 +178,71 @@ public class HelperSurfaceParityTests
         Assert.Equal(said, Phone(request).GearBandRefused);
     }
 
+    /// <summary>
+    /// **AND SO DOES A WITHHELD DROP OFFER** (DRA-84 D4, plan P3). Same shape one rule on: the
+    /// PC dropped an offer because nothing could say what drops it, and a phone that listed one
+    /// fewer row without a word would be the two surfaces disagreeing about the list again.
+    ///
+    /// <para>Its fixture makes a real withhold — a catalog record whose page names nobody, in a
+    /// zone the band gate keeps — and asserts the count is non-zero BEFORE comparing the
+    /// sentences, because "" == "" is what a guard aimed at nothing looks like (trap 78).</para>
+    /// </summary>
+    [Fact]
+    public void AWithheldDropOfferSaysSoOnThePhoneToo()
+    {
+        var inputs = Inputs(new ResolvedLevel(30, LevelSource.Observed, DateTime.Now)) with
+        {
+            Worn = [new WornItem("Rusty Helm", "Rusty Helm", "HEAD",
+                ItemStatsBlock.Parse(["Slot: HEAD", "AC: 4"]))],
+            Items = new ItemCatalog([
+                new ItemCatalog.Record
+                {
+                    Name = "Bone Helm", StatsText = "Slot: HEAD\nAC: 9",
+                    Slots = ["HEAD"], Ac = 9, DropZones = ["Lower Guk"],
+                },
+            ]),
+        };
+        var request = Request(inputs, HelperGoal.FarmGear);
+        var desktop = Recommendations.Rank(request.Inputs, request.Goals);
+
+        var said = HelperPresentation.GearWhoWithheld(desktop.GearWhoWithheld);
+        Assert.True(desktop.GearWhoWithheld > 0);
+        Assert.NotEqual("", said);
+        Assert.Equal(said, Phone(request).GearWhoWithheld);
+    }
+
+    /// <summary>
+    /// **AND THE CREATURES THEMSELVES RIDE THE WIRE** (trap 32). The who clause is part of the
+    /// why-line's own sentence rather than a field of its own, so this asserts the phone's TEXT
+    /// carries the names — a projection that dropped them would still match on every field name.
+    /// </summary>
+    [Fact]
+    public void ThePhonesRowNamesTheSameCreaturesAsThePcs()
+    {
+        var record = new ItemCatalog.Record
+        {
+            Name = "Bone Helm", StatsText = "Slot: HEAD\nAC: 9",
+            Slots = ["HEAD"], Ac = 9, DropZones = ["Lower Guk"],
+            DropMobs = new() { ["Lower Guk"] = ["a froglok knight", "a froglok shaman"] },
+        };
+        var inputs = Inputs(new ResolvedLevel(30, LevelSource.Observed, DateTime.Now)) with
+        {
+            Worn = [new WornItem("Rusty Helm", "Rusty Helm", "HEAD",
+                ItemStatsBlock.Parse(["Slot: HEAD", "AC: 4"]))],
+            Items = new ItemCatalog([record]),
+        };
+        var request = Request(inputs, HelperGoal.FarmGear);
+        var desktop = Recommendations.Rank(request.Inputs, request.Goals);
+
+        var fact = Assert.Single(desktop.Top[0].Why.OfType<GearUpgradeFact>());
+        Assert.Equal(["a froglok knight", "a froglok shaman"], fact.Who);
+
+        var lines = Phone(request).Answers.SelectMany(a => a.Why).Select(w => w.Text).ToList();
+        Assert.Contains(lines,
+            text => text.Contains("a froglok knight and a froglok shaman drop it",
+                StringComparison.Ordinal));
+    }
+
     /// <summary>The Helper names the level it used, on both screens, off the one readout.
     /// A ranking that quietly weighed a number the player disagrees with — and never said
     /// which — is the shape that makes somebody distrust a whole room.</summary>

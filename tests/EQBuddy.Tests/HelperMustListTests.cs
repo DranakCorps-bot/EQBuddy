@@ -426,6 +426,9 @@ public class HelperMustListTests
             {
                 Name = "Froglok Bone Helm", StatsText = "Slot: HEAD\nAC: 9",
                 Slots = ["HEAD"], Ac = 9, DropZones = ["Lower Guk"],
+                // DRA-84 D4: a drop offer with no creature to name is withheld, so a fixture
+                // that named nobody would stop this must-list proving what it is about.
+                DropMobs = new() { ["Lower Guk"] = ["a froglok knight"] },
             },
         ]);
 
@@ -508,6 +511,11 @@ public class HelperMustListTests
         // prints with two denominations, so a sentence that dropped one would be visible.
         if (type == typeof(long)) return 320L;
         if (type == typeof(Evidence)) return Evidence.Personal;
+        // DRA-84 D4: a fact may carry a LIST of names now (the plural WHO). Two entries rather
+        // than one, so a sentence that joined them wrongly — or printed only the first, which
+        // is precisely what this slice replaced — comes out visibly wrong in the sweep.
+        if (type == typeof(IReadOnlyList<string>))
+            return new List<string> { "a froglok knight", "a froglok shaman" };
         throw new InvalidOperationException(
             $"A WhyFact takes a {type.Name}, which this fixture cannot make up. Add an arm — "
             + "the sweep is only as complete as the values it can construct.");
