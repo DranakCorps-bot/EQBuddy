@@ -730,17 +730,69 @@ public class HelperPresentationTests
     /// <summary>
     /// **The park note carries the measurement, and the measurement is what makes it honest.**
     ///
-    /// <para>"EQBuddy does not rank this yet" is a shrug. "Of the 10,957 item pages it has
+    /// <para>"EQBuddy does not rank this yet" is a shrug. "Of the 11,197 item pages it has
     /// read, 14 say which profession an ingredient belongs to" is a survey result a player —
     /// or a reporter — can argue with, and it is the number that decides when the parked
     /// arithmetic reopens. Pinned here so a later edit cannot quietly drop it back to the
     /// shrug.</para>
+    ///
+    /// <para><b>AND PINNED TO THE SURVEY RATHER THAN TO ITSELF.</b> This test used to assert
+    /// the sentence contained the literal <c>"10,957"</c> — which is the sentence quoting
+    /// itself. It stayed GREEN through the DRA-84 D3 weekly refresh (#626), which moved the
+    /// real count to 11,197 and left a player-facing survey result its own committed report
+    /// contradicts. A guard that can only catch somebody DELETING a number, never the number
+    /// going wrong, is trap 34's shape sitting on trap 4's: the report and this literal were
+    /// two producers of one fact. Both numbers now come out of <c>items-catalog-report.md</c>,
+    /// which <c>itemcatalog-build</c> rewrites on every refresh, so the NEXT refresh that
+    /// moves either one reddens here instead of reaching a player.</para>
     /// </summary>
     [Fact]
     public void TheParkNoteNamesTheCoverageItMeasured()
     {
-        Assert.Contains("10,957", HelperPresentation.ProfessionsParkNote);
-        Assert.Contains("14", HelperPresentation.ProfessionsParkNote);
+        var (pages, naming) = CategorySurvey();
+
+        Assert.Contains(pages.ToString("N0"), HelperPresentation.ProfessionsParkNote);
+        Assert.Contains(naming.ToString("N0"), HelperPresentation.ProfessionsParkNote);
+    }
+
+    /// <summary>
+    /// **And the pin above can actually fail** — the committed negative, because "the sentence
+    /// contains a number" was green for no reason before (trap 78). The stale text below is
+    /// what really shipped on `main` between #626 and this change.
+    /// </summary>
+    [Fact]
+    public void AParkNoteQuotingTheSurveyItWasWrittenAgainstIsWhatThisCatches()
+    {
+        const string stale =
+            "EQBuddy does not rank where to farm materials yet. Of the 10,957 item pages it "
+            + "has read, 14 say which profession an ingredient belongs to.";
+
+        var (pages, _) = CategorySurvey();
+
+        Assert.DoesNotContain(pages.ToString("N0"), stale);
+    }
+
+    /// <summary>The two numbers the promoter's own survey printed, read from the committed
+    /// report. A parse that yields nothing is itself a failure — a guard whose input silently
+    /// went missing measures nothing at all (trap 78).</summary>
+    private static (int Pages, int Naming) CategorySurvey()
+    {
+        var repoRoot = Path.GetFullPath(Path.Combine(
+            AppContext.BaseDirectory, "..", "..", "..", "..", ".."));
+        var report = File.ReadAllText(Path.Combine(
+            repoRoot, "scripts", "harvests", "eqlwiki", "items-catalog-report.md"));
+
+        var pages = Regex.Match(report,
+            @"item pages with at least one Category:\s*[\d,]+\s+of\s+([\d,]+)");
+        var naming = Regex.Match(report,
+            @"categories naming a PROFESSION:\s*([\d,]+)\s+pages");
+
+        Assert.True(pages.Success && naming.Success,
+            "items-catalog-report.md did not yield the two survey numbers — itemcatalog-build's "
+            + "report format moved and this guard stopped measuring anything.");
+
+        return (int.Parse(pages.Groups[1].Value.Replace(",", "")),
+                int.Parse(naming.Groups[1].Value.Replace(",", "")));
     }
 
     /// <summary>The face may say "all" here and may not on the faction picker beside it —

@@ -936,12 +936,21 @@ public static partial class Recommendations
             + "is where that thing IS rather than a rate this character could beat somewhere "
             + "else. The game decides when an unlock is done; level is not one of its terms.",
         // **THE SURVEY IS THE REASON, AND IT RAN BEFORE THE ENGINE WAS BUILT** (DRA-71 D6).
-        // The plan asked for level-gated catalog candidates. There is no level datum to gate
-        // them on: every one of the 11,146 shipped item records was scanned for a Level or
-        // Required-Level key in its stats block and not one carries either — the block prints
-        // WT, SIZE, RACE, CLASS, SLOT, AC and the attributes, and nothing else. Inventing a
-        // level requirement per item is trap 73 with arithmetic instead of prose, and the
-        // wiki does not publish one to match.
+        // The plan asked for level-gated catalog candidates. There is effectively no level
+        // datum to gate them on: every one of the 11,196 shipped item records was scanned for
+        // a Level or Required-Level key in its stats block, and the block prints WT, SIZE,
+        // RACE, CLASS, SLOT, AC and the attributes. Inventing a level requirement per item is
+        // trap 73 with arithmetic instead of prose, and the wiki does not publish one to
+        // match.
+        //
+        // **RE-TAKEN ON THE REFRESHED CATALOG** (DRA-84 D3 follow-up), because a survey is a
+        // claim about data and the data moved. D6 said "not one carries either"; that is no
+        // longer literally true. Across 11,196 records, FIVE print a level key and only ONE is
+        // a wearable — `Shroud of the Sky`, `Required Level: 46`. The other four are
+        // `Level Needed` on spell scrolls and a food item, which is the SPELL's level and not
+        // a requirement to equip anything. One wearable in 11,196 is not a datum an engine can
+        // gate on, so D6's conclusion stands on the re-take and D2's band gate (which reads the
+        // ZONE) is unaffected. What changed is that the claim is "one" rather than "none".
         //
         // The second half is why the OTHER level fact this repo has must not be borrowed. P6's
         // discount marks down a zone whose creatures you have outgrown, and it is a claim about
@@ -950,8 +959,8 @@ public static partial class Recommendations
         // the goal the player picked and inverting it would be a bonus arm D4 refused plus a
         // game rule nobody here can verify. Both readings are wrong, so neither is shipped.
         HelperGoal.FarmGear =>
-            "An item's stats block carries no level requirement — the shipped catalog's "
-            + "11,146 records were surveyed and not one prints a Level key — so there is "
+            "An item's stats block almost never carries a level requirement — the shipped "
+            + "catalog's 11,196 records were surveyed and exactly one prints a Level key — so there is "
             + "nothing about a candidate for a level to gate. And the zone is where the ITEM "
             + "is rather than a rate: a camp this character has outgrown is if anything a "
             + "quicker place to farm one, so the outgrown discount would recommend against "

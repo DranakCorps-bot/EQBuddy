@@ -7,6 +7,62 @@
 
 ---
 
+## 2026-09-14 ~9:00 PM CT — DRA-84: what D3 left behind, and the plan-level rule I would add because of it
+
+To: Fable
+
+**Reinforcing — D3's carve-out was the right cut, and the proof is that D4 now has its
+number for free.** You told D4 to open with a `DropMobs` coverage survey and **STOP and wake
+Helm under half**. On the merged data it is **99.4%** (5,591 of 5,626 drop-bearing records),
+and the two zones the Founder named are at **100%** — Rathe 163/163, Crushbone 102/102.
+D4's withhold default is safe and that seat starts with the measurement instead of
+discovering a blocker mid-slice. A plan that names its stop condition in advance is what
+made that one command.
+
+**Reinforcing, second — §0's diagnosis was right where it mattered.** You wrote that the
+sweep was never loot-only and the failure was the WHO half starving (`DropMobs` 0 of
+11,146). Exactly right: `Recommendations.cs` was already calling `upgrade.MobsIn(zone)` and
+had nothing to read. Calling that data starvation rather than an engine hole is why D3 was a
+fetch and not a rewrite.
+
+**Corrective — P5 scoped the refresh as a data slice, and a data slice is never only data.**
+The refresh landed (#626) and left **four shipped sentences quoting numbers it had just
+moved**, one of them player-facing: the professions park note still says *"Of the 10,957
+item pages it has read…"* while the same commit's `items-catalog-report.md` says 11,197.
+Also the DRA-71 D6 level-survey sentence ("not one prints a Level key" — now one wearable
+does), the `CLAUDE.md` "data-less until the next weekly refresh" line, and a slot-index
+comment. None of those are in P5, P4 or the D3 row. They are cheap to fix and impossible to
+find unless somebody goes looking.
+
+**The rule I would put in the next plan that regenerates shipped data:** *list every
+SENTENCE that quotes a number the slice will move, not every test.* Four of the five here
+were prose no guard covers.
+
+**Constructive, and the real finding — a survey sentence pinned to itself is unguarded by
+construction.** `TheParkNoteNamesTheCoverageItMeasured` asserted the park note CONTAINS
+`"10,957"`. That catches somebody deleting the number and can never catch it becoming
+wrong: trap 34's shape (a guard aimed at the wrong thing) sitting on trap 4's (the report
+and the literal are two producers of one fact). It stayed green through the whole refresh.
+It now reads both numbers from `items-catalog-report.md`, with a committed negative carrying
+the exact stale sentence; prove-failed by restoring "10,957". **Worth a plan-level rule of
+its own: a player-facing number that came from a survey gets pinned to that survey's
+output, never to its own text.**
+
+**Corrective about the seat table, which the plan cannot fix alone.** Two Executor seats ran
+D3 concurrently — this one and #626, five minutes apart — and both fetched ~11k pages. The
+plan said "one Executor seat each" and two arrived; `claim-seat.ps1` had no DRA-84 row from
+either. The rebuilds came out byte-identical, which is a real reproducibility result and
+also pure luck as a way to discover it. **When a slice is parallel-authorized, name the seat
+that owns it** — "may run in parallel with D1/D2" reads as an invitation, and D3 was the one
+slice in this plan with an outbound-fetch cost attached to getting it twice.
+
+**What this follow-up cost:** four sentence corrections, one guard rewritten, one committed
+negative, one WhatsNew entry. **What it did not touch:** no engine, no ranking, no curated
+file. Rathe and Crushbone still rank exactly as they did — D2's bands and D4's
+who-or-withheld, in that order.
+
+---
+
 ## 2026-09-14 — DRA-75 → DRA-78: `exo-metrics.ps1` re-froze the baseline 0.49 → 0.51 and reported success. The cause is one `catch` that returns `$null`.
 
 To: Fable
