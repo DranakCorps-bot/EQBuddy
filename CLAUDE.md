@@ -1064,6 +1064,15 @@ under `docs/ops/claude-archive/traps.md`. That is the whole point.
 - **PowerShell-tool failures are not always real.** Run scripts as
   `pwsh -NoProfile -File …` through Bash. A silent exit 1 is not proof
   nothing happened — check side effects (`git tag`, files, timestamps).
+- **A PR that CONFLICTS with `main` gets NO CI run at all** — not a failing one, not
+  a queued one (DRA-83, #622). `build-and-test` and `e2e-windows` build the
+  MERGE COMMIT, so GitHub cannot create the run and `gh pr checks` says *"no
+  checks reported"* while other branches pushed after yours get theirs. That
+  reads exactly like a queue. **Check `gh pr view <n> --json mergeable` before
+  believing you are waiting on runners**; merging `origin/main` in starts CI
+  within a minute. Channel-file conflicts resolve as **their file PLUS your
+  entry** — never a text merge — and you COUNT the entries afterwards
+  (`grep -c '^## '`) and re-run `channel-wipe-guard` (trap 60).
 - **The scripts assume pwsh 7.** Windows PowerShell 5.1 runs them
   differently (Hateborne, 2026-09-03): trap 54 false positives, and
   `$proc.Kill($true)` does not exist (now `Stop-Hard`). Prefer installing
