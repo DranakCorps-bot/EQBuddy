@@ -56,10 +56,20 @@ internal sealed class PhoneHelperSource
     /// </summary>
     public GuideAttachmentLines Attachments()
     {
-        _pass.Read();
-        _attachments.Refresh();
+        // ON ITS OWN CLOCK, for the reason `GuideHelperSource.Refresh` keeps one: the quest
+        // request is built every tick a phone is paired on that screen, and the fold behind this
+        // is archived play rather than anything the player just did. `HelperSources.CacheFor` is
+        // the interval the reads under it already keep.
+        if (DateTime.Now - _asked >= HelperSources.CacheFor)
+        {
+            _asked = DateTime.Now;
+            _pass.Read();
+            _attachments.Refresh();
+        }
         return _attachments.Lines;
     }
+
+    private DateTime _asked = DateTime.MinValue;
 
     /// <summary>One pass. Called only while the screen is offered AND a device is paired —
     /// <c>CompanionHost.Tick</c>'s lazy rule, which matters here more than for any other

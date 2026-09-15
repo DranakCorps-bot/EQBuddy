@@ -47,12 +47,27 @@ internal sealed class GuideHelperSource
     /// <summary>
     /// Take the reads, and rebuild the answers only if the evidence actually moved.
     /// </summary>
+    /// <remarks>
+    /// <b>On its own clock, because the CALLER's is one second.</b> The Guide surface repaints
+    /// every tick (the shell room calls <c>Refresh</c> rather than <c>MaybeRefresh</c> on
+    /// purpose — trap 56), and this sits inside its repaint KEY, so without a clock of its own
+    /// every tick would pay a pool-signature join and a fold over every zone, mote and sale this
+    /// character has. <see cref="HelperSources.CacheFor"/> is the interval because it is the one
+    /// the reads behind it already keep: asking more often than the data can change is the
+    /// steady-state allocation the perf audit's rule is about, and the answer a guide row draws
+    /// is a fold of archived play rather than something the player just did.
+    /// </remarks>
     /// <returns>The evidence signature, for the caller's repaint key. A caller that drops it
     /// draws the moment before for the rest of the session (trap 72) — which is exactly what the
     /// Quests tab did with its own checklist stores until it was measured.</returns>
     public string Refresh()
     {
+        if (DateTime.Now - _asked < HelperSources.CacheFor) return _signature;
+        _asked = DateTime.Now;
         _pass.Read();
-        return _memo.Refresh();
+        return _signature = _memo.Refresh();
     }
+
+    private DateTime _asked = DateTime.MinValue;
+    private string _signature = "";
 }
