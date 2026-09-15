@@ -7413,3 +7413,85 @@ refusals, the single-select intent strip, the include-quests toggle and the coun
 ranking all KEEP. The item side of the band gate stays ungated (D6's survey, unchanged).
 
 — Dranak (Claude Code, DRA-84 D4)
+
+---
+
+## 2026-09-15 — DRA-84 D5: the re-smoke found the phone had been drawing four of five sentences
+
+**Seat:** `opus-dra84-d5` (default; `opus-dra84-d4` released as DISCHARGED on #633's merge,
+per Helm's ~11:55 PM CT ruling). Paperclip DRA-84, plan P6, under the #623 whole-sequence
+SIGN — D4 landed on `main` as `1c00e298` with both gates green, which is what authorizes this
+one. Nothing here is on the consequence list: no release, no tag, no signing, no Pages, no
+Play Console, no public post, no privacy surface, no third-party request, no fetch.
+
+### 1. The finding, because a re-smoke that finds nothing has not been run
+
+**`gearWhoWithheld` reached the wire and was never drawn.** D4's withheld sentence is
+produced by `CompanionProjection.Helper` (line 68), is in the Helper section's fingerprint
+(line 244), and passes `HelperSurfaceParityTests.AWithheldDropOfferSaysSoOnThePhoneToo` —
+which compares the PROJECTION to `HelperPresentation` and never to the page. `index.html`
+drew `[moneyNote, cap, gearWithheld, gearBandRefused]` and stopped. So on a phone, five drop
+offers left the list with nothing said about them, while the PC beside it said exactly why.
+
+That is trap 50's failure with the right shape everywhere else, and it is the one thing the
+phone half is explicitly not allowed to do: the two surfaces disagreeing about what a list
+contains, where the phone reader has no PC in front of them to notice.
+
+**The guard that should have caught it was aimed at a screen that no longer exists** (trap
+34). `ThePageSpellsNoneOfTheHelpersWords` pairs its forbid-scan with a must-list of the
+fields the page has to draw — written when the Helper had ONE gear caption. D2 added
+`gearBandRefused` and D4 added `gearWhoWithheld`; neither added a row. The page happened to
+draw the first and not the second, and a must-list that stops growing cannot tell those
+apart. It now names all five, and was prove-failed against the pre-fix page.
+
+**Default taken:** fixed here rather than filed. It is one line of the page plus two rows of
+a must-list, it is inside acceptance items 2 and 3 on the surface the plan's P3 named
+("the same words ride the wire"), and D4's `WhatsNew` entry already promises the sentence to
+everyone. A stub would have left the release shipping a promise that is false on one screen.
+
+### 2. The phone shot is staged against the REAL catalog, and its numbers come from the E2E
+
+`WriteHelperGearSnapshot` stages the same anchor, intent and unknown level as
+`AnUpgradeNothingCanNameADropperForIsWithheldAndTheRoomSaysSo`, so every number it asserts is
+one the launched app already committed: three zones, six creature clauses, five withheld, 89
+capped. A hand-built two-record catalog would have photographed the feature being absent.
+
+**The prediction was wrong first time and the fixture moved, not the number** (trap 23). The
+first draft left `MyClasses` empty — the honest reading of "EQBuddy has not been told", which
+filters nothing — and the three zones came back as Plane of Growth / Temple of Veeshan /
+Chardok. A real screen of a different character. The E2E's profile is a WARRIOR and the
+class-lock filter is an INPUT to the sweep, which is exactly the kind of thing predicting
+catches and eyeballing does not.
+
+**Its caveat, stated rather than papered over:** the shot carries no band-gate sentence,
+because the level is unknown and the gate stands down (trap 73). Staging a level would have
+re-ranked the zones and left this picture with numbers nothing else had computed. The gate's
+own picture is `shell-helper-gear-band`, and that the phone says the same words when it fires
+is `ARefusedZoneSaysSoOnThePhoneToo`'s claim. Headless Edge's 492 px viewport clamp applies
+here as it did to `mobile-helper.png`: 516×1500, a large phone's line breaks rather than a
+small one's.
+
+### 3. `helperBandRefused` is a count, and a count cannot fail the right way
+
+The D2 E2E asserted two refusals and a drawn sentence. Both stay true if the gate read the
+wrong band, fired the wrong arm, or compared against a level it never read — the arithmetic
+lived only in a doc comment. `helperBandRefusals` now carries what the gate COMPARED
+(`TempleofVeeshan:60+:BottomOver,Veeshan'sPeak:60+:BottomOver`) beside the `helperLevel` 28
+already asserted, so the relationship is an assertion. A `TopUnder` in that string would be
+D2's signed open-top ruling broken with both counts still green.
+
+### 4. What the checklist says that a test cannot
+
+`docs/ops/dra84-founder-resmoke.md` maps acceptance 1–4 to what to look at, what would count
+as a FAIL rather than a preference, and — the section worth the most — **what is knowingly
+not fixed**: the promoter still writes `DropZones` strings that are not places, and the Gear
+room, item lookups and the wishlist still read them directly, so looking an item up can still
+show you `}}` as a zone. The Helper refuses to offer them as camps; that is an engine refusal
+and not a data fix, and the checklist says so in those words.
+
+**Not done, deliberately:** no fetch, no harvest, no transform change, no curated write, no
+rate or policy change; no Pages, Play Console, tag, `release.ps1` or signing; no promoter
+rebuild (Fable stub STANDS, Helm ACKed the stop); no second D4 seat; no re-ranking, no new
+weight and no new threshold — this slice changes what is SAID, not what is chosen.
+
+— Dranak (Claude Code, DRA-84 D5)

@@ -3361,3 +3361,49 @@ into a refusal, and a plan that names it saves the executor the twenty minutes o
 tests found a real bug.
 
 — Dranak (Claude Code, DRA-84 D4)
+
+---
+
+## 2026-09-15 — DRA-84 D5 (P6, the re-smoke pack): the slice that was mostly already delivered, and the one thing only it could find
+
+To: Fable
+
+**Reinforcing, and it is the whole point of P6 existing.** *"Staged shots with predicted
+numbers… the phone helper"* is the line that earned this slice. D2 and D4 had each shipped
+their own desktop shot and their own E2E facts in-slice, so on arriving at P6 two of its three
+pictures already existed and the honest reading was "this slice is WhatsNew and a checklist".
+The third one — **the phone** — found a real defect in D4's own acceptance item: `gearWhoWithheld`
+reached the wire, reached the section fingerprint, passed every parity assertion, and
+`index.html` never drew it. Five drop offers left the phone's list in silence while the PC said
+why. **A slice whose job is to LOOK at the thing is not redundant with the slices that built
+it**, and I would have argued the opposite before running it.
+
+**Constructive, for the next plan with a phone half in it.** P3 said *"the same words ride the
+wire (trap 32); `HelperSurfaceParityTests` rows updated in-slice"* and that is exactly what D4
+did — and it was not enough, because that suite compares the PROJECTION to `HelperPresentation`
+and never to what the page draws. The gap is structural rather than an oversight: **the only
+guard that can see a field the page fails to draw is the page-side must-list, and a must-list
+only stays true if every slice that adds a field adds a row.** D2 added `gearBandRefused`, D4
+added `gearWhoWithheld`, neither touched the list, and the page happened to draw one of the
+two. Worth a standing line in any plan that adds a sentence to a phone surface: *"and add it to
+the page-side must-list"* — one clause that would have closed this before it shipped.
+
+**Constructive, on P6's own wording.** *"E2E facts dump the gate's INPUTS (band, level, refused
+count)"* was right and D2 delivered two of the three: `helperBandRefused` is a COUNT, and a
+count stays true of a gate that read the wrong band or fired the wrong arm. The band itself
+lived only in a doc comment. That the plan asked for INPUTS rather than for a verdict is the
+reason this got fixed; the slice that implements a gate is not naturally the slice that asks
+what a green assertion would still allow.
+
+**Corrective, small.** P6 lists the re-smoke pack as depending on D4 alone, which made it look
+like a wrap-up. Two of its three deliverables were already in the tree and one of them was
+load-bearing — **a P6 that names which pictures its earlier slices are expected to have already
+taken** would have told me in one line where to spend the slice, instead of my reading four
+files to find out.
+
+**Cost.** Small, and almost all of it in the shot: the first phone fixture came back with three
+different zones because it left `MyClasses` empty, which is the honest reading of "EQBuddy has
+not been told" and is not what the E2E's warrior has. Predicting the numbers is what caught it;
+it would have photographed perfectly (trap 23).
+
+— Dranak (Claude Code, DRA-84 D5)
