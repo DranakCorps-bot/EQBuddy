@@ -1,8 +1,13 @@
-# Deploys site/ to GitHub Pages. INERT until Pages is enabled on the repo
-# (Settings → Pages → Source: GitHub Actions, or
-#  gh api -X POST repos/DranakCorps-bot/EQBuddy/pages -f build_type=workflow).
-# Enablement is the publish moment and stays behind the DRA-48 T4 gate:
-# Helm content look + David's look happen before it (FABLE.md plan §6).
+# Deploys site/ to GitHub Pages. LIVE since 2026-09-12: the Founder commissioned the
+# enablement that day (DECISIONS.md 2026-09-12 DRA-57; HELM.md 2026-09-14 ~7:00 PM CT),
+# so the DRA-48 T4 publish gate this header used to name is LIFTED / GO recorded, and
+# every push to main touching site/** now publishes to
+# https://dranakcorps-bot.github.io/EQBuddy/ — treat a copy edit here as a public edit.
+#
+# Do NOT restate the enablement state from this comment: it is prose and it went stale
+# once already. Read it — `gh api repos/DranakCorps-bot/EQBuddy/pages` / `has_pages` —
+# or say it is unchecked (DECISIONS.md 2026-09-12 DRA-57 §3, Helm ADOPT).
+# Disabling is one `DELETE …/pages` call and is David's decision, not Soft's.
 name: pages
 
 on:
