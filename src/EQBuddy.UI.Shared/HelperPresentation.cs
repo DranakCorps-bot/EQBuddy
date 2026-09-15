@@ -991,6 +991,84 @@ public static class HelperPresentation
         _ => "",
     };
 
+    // ---- a guide step's reference, answered (DRA-83) --------------------------------------
+
+    /// <summary>
+    /// How many of the Helper's sentences a GUIDE STEP draws before it says it is holding some
+    /// back.
+    ///
+    /// <para><b>Two, where the room draws <see cref="Recommendations.WhyCap"/> six</b>, and the
+    /// difference is what the two surfaces are for. The room's whole job is one evening's
+    /// argument and it can spend six lines on it; a guide step is one line of a checklist a
+    /// player is scrolling, and a walkthrough where every row grew a paragraph would have
+    /// buried the walkthrough. The cap SAYS what it withheld and names where the rest is
+    /// (trap 50) — the room, which is one click away and is where the answer lives.</para>
+    /// </summary>
+    public const int AttachedWhyCap = 2;
+
+    /// <summary>
+    /// **What the Helper says about the subject this step points at** — the whole line, worded
+    /// once for all three surfaces (DRA-83).
+    ///
+    /// <para><b>Every sentence in it is the Helper's own, passed through.</b> The why-lines go
+    /// through <see cref="Why"/> — the same call the Helper room and the phone's Helper screen
+    /// make — so the catalog label arrives by construction and a guide row cannot word a
+    /// measurement differently from the room that measured it. The only words this method adds
+    /// are the lead clause naming WHICH reference is being answered, and the cap sentence.</para>
+    ///
+    /// <para>Empty is a real answer and the common one: a step whose reference the Helper
+    /// could not answer draws nothing at all. See <c>Recommendations.Attached</c> — silence
+    /// rather than an empty-state sentence repeated down a checklist.</para>
+    /// </summary>
+    public static string Attached(GuideAttachmentAnswer answer)
+    {
+        var lines = answer.Why
+            .Select(Why)
+            .Where(s => s.Length > 0)
+            .ToList();
+        if (lines.Count == 0) return "";
+
+        var shown = lines.Take(AttachedWhyCap).ToList();
+        var parts = new List<string> { AttachedLead(answer) };
+        parts.AddRange(shown);
+        // The row's own withheld count is the Helper's (the engine already trimmed to WhyCap
+        // and reported it) PLUS what this cap held: one number for "there is more", because two
+        // counts on a checklist row would be arithmetic the player has to do.
+        var withheld = lines.Count - shown.Count + answer.Answer.WithheldWhy;
+        if (withheld > 0) parts.Add(AttachedWithheld(withheld));
+        return string.Join(" ", parts);
+    }
+
+    /// <summary>
+    /// The clause that says which reference is being answered, per kind.
+    ///
+    /// <para><b>It names the SUBJECT and the GOAL, and nothing about the step.</b> A sentence
+    /// like "this is a good place to do this" would be the Helper deciding something about the
+    /// guide, which is the wrong way round: the guide says what the step relates to and the
+    /// Helper answers from this character's own play.</para>
+    ///
+    /// <para>The default arm is unreachable from <c>Recommendations.Attached</c>, which refuses
+    /// a kind <c>GoalFor</c> does not map — and it answers with the GOAL's own label rather
+    /// than with nothing, so a fourth kind arriving before this switch knows it still says
+    /// which engine spoke instead of drawing a headless block of numbers.</para>
+    /// </summary>
+    public static string AttachedLead(GuideAttachmentAnswer answer) => answer.Attachment.Kind switch
+    {
+        GuideAttachment.XpFarm => $"Your Helper on levelling in {answer.Attachment.Key}:",
+        GuideAttachment.GearFarm => $"Your Helper on farming gear in {answer.Attachment.Key}:",
+        GuideAttachment.GearUpgrade => $"Your Helper on {answer.Attachment.Key}:",
+        _ => $"Your Helper on {GoalLabel(answer.Goal)} — {answer.Attachment.Key}:",
+    };
+
+    /// <summary>What the step is not drawing, and where it is. Same shape as
+    /// <see cref="WithheldWhy"/>, and it names the room rather than offering a link: on the
+    /// phone this line rides a row that cannot open one (trap 35).</summary>
+    public static string AttachedWithheld(int withheld) => withheld <= 0
+        ? ""
+        : withheld == 1
+            ? "One more reason is in the Helper room."
+            : $"{withheld:N0} more reasons are in the Helper room.";
+
     // ---- number shapes -------------------------------------------------------------------
 
     /// <summary>A fight length a player would recognise. Seconds under a minute, because

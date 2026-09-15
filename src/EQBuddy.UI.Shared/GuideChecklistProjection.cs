@@ -136,7 +136,8 @@ public static class GuideChecklistProjection
         AppSettings settings,
         QuestLedgerStore ledger,
         string characterKey,
-        Func<string, string?>? statsFor = null)
+        Func<string, string?>? statsFor = null,
+        GuideAttachmentLines? helper = null)
     {
         statsFor ??= ShippedItemStats;
         var projected = new List<QuestChecklistGroup>(groups.Count);
@@ -146,7 +147,7 @@ public static class GuideChecklistProjection
             projected.Add(guide is null
                 ? group
                 : Project(group, guide, settings, ledger, characterKey,
-                    GuideStores.For(ItemsFor(settings, group.CompletionKey)), statsFor));
+                    GuideStores.For(ItemsFor(settings, group.CompletionKey)), statsFor, helper));
         }
         return projected;
     }
@@ -219,7 +220,8 @@ public static class GuideChecklistProjection
         AppSettings settings,
         QuestLedgerStore ledger,
         string characterKey,
-        Func<string, string?>? statsFor = null)
+        Func<string, string?>? statsFor = null,
+        GuideAttachmentLines? helper = null)
     {
         if (QuestGuideFor(catalog, quest.Name) is not { } guide) return null;
         statsFor ??= ShippedItemStats;
@@ -240,7 +242,7 @@ public static class GuideChecklistProjection
                 TurnInNpc: quest.QuestGiver.Length > 0 ? quest.QuestGiver : null,
                 WikiPage: quest.Name),
             guide, settings, ledger, characterKey,
-            new GuideStores([], [], quest), statsFor);
+            new GuideStores([], [], quest), statsFor, helper);
     }
 
     /// <summary>The <see cref="GuideType.EpicQuest"/> guide for a class, or null — the ONE
@@ -289,7 +291,8 @@ public static class GuideChecklistProjection
         AppSettings settings,
         QuestLedgerStore ledger,
         string characterKey,
-        Func<string, string?>? statsFor = null)
+        Func<string, string?>? statsFor = null,
+        GuideAttachmentLines? helper = null)
     {
         statsFor ??= ShippedItemStats;
         var projected = new List<QuestChecklistGroup>(groups.Count);
@@ -342,7 +345,7 @@ public static class GuideChecklistProjection
                     CompletionKey = null,
                 },
                 guide, settings, ledger, characterKey,
-                GuideStores.For([], classRows), statsFor));
+                GuideStores.For([], classRows), statsFor, helper));
         }
 
         return projected;
@@ -385,15 +388,26 @@ public static class GuideChecklistProjection
         QuestChecklistGroup group, Guide guide,
         AppSettings settings, QuestLedgerStore ledger, string characterKey,
         GuideStores stores,
-        Func<string, string?> statsFor)
+        Func<string, string?> statsFor,
+        GuideAttachmentLines? helper)
     {
+        helper ??= GuideAttachmentLines.None;
         var items = stores.SkyItems;
         var epicRows = stores.EpicRows;
         var byId = guide.AllObjectives.ToDictionary(o => o.Id, StringComparer.OrdinalIgnoreCase);
         var stageOf = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        // The STAGE an objective belongs to, for its references (DRA-83) — the stage's own
+        // `Attachments` are about the stage, and the row that gets them is its FIRST DRAWN one.
+        // Every row in the stage would be the same sentence printed five times, and a row picked
+        // by position at least matches where a reader meets the stage: under its heading.
+        var stageFor = new Dictionary<string, GuideStage>(StringComparer.OrdinalIgnoreCase);
         foreach (var stage in guide.Stages)
             foreach (var objective in stage.Objectives)
+            {
                 stageOf[objective.Id] = stage.Name;
+                stageFor[objective.Id] = stage;
+            }
+        var stagesAnswered = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
         var rows = new List<QuestChecklistRow>();
         var stubs = 0;
@@ -450,7 +464,11 @@ public static class GuideChecklistProjection
                 home is GuideProgressHome.SkyTurnIn or GuideProgressHome.QuestCompletion,
                 string.Equals(facts, title, StringComparison.Ordinal) ? "" : facts,
                 skipped,
-                ledgerItem?.Name ?? ""));
+                ledgerItem?.Name ?? "",
+                // The step's own references first, then its stage's — on the stage's first drawn
+                // row only. `For` answers "" for a step nobody attached anything to and for one
+                // the Helper cannot answer, which is nearly every row in the catalog.
+                HelperLine(helper, objective, stageFor, stagesAnswered)));
         }
 
         var counts = GuideProgressRouter.Counts(
@@ -488,6 +506,30 @@ public static class GuideChecklistProjection
             GuideCaption = GuidePresentation.GuidedCaption(counts.Skipped, stubs),
             GuideCard = Card(group, guide, settings, ledger, characterKey, stores),
         };
+    }
+
+    /// <summary>
+    /// The Helper's line for one row: this step's references, and its stage's the first time
+    /// that stage draws a row (DRA-83).
+    ///
+    /// <para><b>The stage's line is claimed by the first DRAWN row, not the first objective.</b>
+    /// On the Epic tab the classic-era lens removes rows, so a stage's opening objective may not
+    /// be on the tab at all — claiming it there would put a stage's reference on nothing. The
+    /// set is mutated as rows are built, which is why this takes it rather than computing it:
+    /// one pass, in reading order, and the claim happens where the row is made.</para></summary>
+    private static string HelperLine(
+        GuideAttachmentLines helper, GuideObjective objective,
+        Dictionary<string, GuideStage> stageFor, HashSet<string> stagesAnswered)
+    {
+        var own = helper.For(objective.Attachments);
+        if (!stageFor.TryGetValue(objective.Id, out var stage)
+            || stage.Attachments.Count == 0
+            || !stagesAnswered.Add(stage.Id))
+            return own;
+
+        var stageLine = helper.For(stage.Attachments);
+        if (stageLine.Length == 0) return own;
+        return own.Length == 0 ? stageLine : own + "\n" + stageLine;
     }
 
     /// <summary>

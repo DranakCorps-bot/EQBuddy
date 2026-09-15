@@ -268,25 +268,112 @@ public sealed class EpicGuideTests : IDisposable
 
     // ---- 2. The attachment seam ------------------------------------------------------
 
-    /// <summary>
-    /// The hook is real enough to be wrong in a test, and <b>empty in the shipped file</b>.
-    ///
-    /// <para>Founder, 2026-09-11: guides must be able to integrate later with gear-upgrade,
-    /// recommended XP farms and gear farms — <i>and</i> "do not fake-ship a gear recommender".
-    /// Those two together are exactly this: a typed reference a later system can hang an answer
-    /// on, and nothing in the catalog pretending to be that answer. The day the recommender
-    /// exists, this test changes with it.</para></summary>
-    [Fact]
-    public void NoShippedGuideCarriesAnAttachmentYet()
-    {
-        var placed = Shipped.Guides
-            .SelectMany(g => g.Stages.SelectMany(s =>
-                s.Attachments.Select(a => $"{g.Id}/{s.Id}: {a.Kind}")
-                    .Concat(s.Objectives.SelectMany(o =>
-                        o.Attachments.Select(a => $"{g.Id}/{o.Id}: {a.Kind}")))))
-            .ToList();
+    /// <summary>Every reference the shipped catalog places, as
+    /// <c>guideId/objectiveId: Kind=Key</c>. One producer for the three tests below, so a rule
+    /// change cannot move rows between them without moving all three.</summary>
+    private static List<(string Where, string Kind, string Key)> ShippedAttachments() =>
+    [
+        .. Shipped.Guides.SelectMany(g => g.Stages.SelectMany(s =>
+            s.Attachments.Select(a => ($"{g.Id}/{s.Id}", a.Kind, a.Key))
+                .Concat(s.Objectives.SelectMany(o =>
+                    o.Attachments.Select(a => ($"{g.Id}/{o.Id}", a.Kind, a.Key)))))),
+    ];
 
-        Assert.Empty(placed);
+    /// <summary>
+    /// **The references the curated catalog actually places** — the test
+    /// <c>NoShippedGuideCarriesAnAttachmentYet</c> turned into when the system that owns the
+    /// answer arrived (DRA-83, the DRA-70 plan's D5; that test's own comment promised this and
+    /// the DRA-70 plan's D8 held it to the slice).
+    ///
+    /// <para>Founder, 2026-09-11: guides must be able to integrate with gear-upgrade,
+    /// recommended XP farms and gear farms — <i>and</i> "do not fake-ship a gear recommender".
+    /// Both halves still hold: the catalog places a REFERENCE and the Helper answers it or says
+    /// nothing, so there is still no sentence here that a recommender would have written.</para>
+    ///
+    /// <para><b>A COUNT, because the alternative cannot see a loss</b> (trap 34). "Every
+    /// attachment resolves" passes beautifully on an empty file, so the count is what notices a
+    /// refresh, a re-author or a bad merge quietly dropping them — and the two rules that placed
+    /// them are the two numbers.</para></summary>
+    [Fact]
+    public void TheShippedAttachmentsAreTheTwoSkyRulesDra83Placed()
+    {
+        var placed = ShippedAttachments();
+
+        // Rule 1: the reward item, on the turn-in step of every Sky guide whose reward
+        // ItemCatalog knows — 93 of 95, and the two it does not are the test below.
+        Assert.Equal(93, placed.Count(a => a.Kind == GuideAttachment.GearUpgrade));
+        // Rule 2: the zone, on the one open-farm step of each of the 95 Sky guides. The 127
+        // Loot steps name a creature and carry nothing: one pull is not a camp.
+        Assert.Equal(95, placed.Count(a => a.Kind == GuideAttachment.XpFarm));
+        Assert.All(placed.Where(a => a.Kind == GuideAttachment.XpFarm),
+            a => Assert.Equal("Plane of Sky", a.Key));
+
+        // **NO GearFarm, and that is a DECISION rather than an oversight.** A gear-farm
+        // reference means "this step farms gear in this place", and no curated step does: the
+        // Sky drop steps farm quest pieces, which is a different evening. The engine answers the
+        // kind (GuideAttachmentTests proves it on a fixture); the catalog has nothing true to
+        // point at yet, and pointing anyway is what trap 73 costs.
+        Assert.DoesNotContain(placed, a => a.Kind == GuideAttachment.GearFarm);
+        // And the epics carry none: their steps are Transcribed prose, so which item a step
+        // hands over is not a field anybody has authored — reading it out of the sentence is the
+        // inference Transcribed exists to refuse.
+        Assert.DoesNotContain(placed, a => a.Where.StartsWith("epic-", StringComparison.Ordinal));
+    }
+
+    /// <summary>
+    /// **Every key names something its own catalog knows** — the resolve half, paired with the
+    /// count above.
+    ///
+    /// <para>A reference whose key nothing can resolve is silence with a schema in front of it:
+    /// the Helper would answer nothing and no test would ever say why. So a <c>GearUpgrade</c>
+    /// key has to be an item <c>ItemCatalog</c> holds and a zone key has to be a zone the shipped
+    /// <c>ZoneGraph</c> knows — which is also the zone the World door would travel to.</para></summary>
+    [Fact]
+    public void EveryShippedAttachmentNamesSomethingItsOwnCatalogKnows()
+    {
+        var graph = ZoneGraph.LoadEmbedded();
+        foreach (var (where, kind, key) in ShippedAttachments())
+        {
+            Assert.NotEqual("", key);
+            if (kind == GuideAttachment.GearUpgrade)
+                Assert.True(ItemCatalog.Default.Find(key) is not null,
+                    $"{where}: ItemCatalog has no item called '{key}'");
+            else
+                Assert.True(graph.Resolve(key) is not null,
+                    $"{where}: ZoneGraph has no zone called '{key}'");
+        }
+    }
+
+    /// <summary>
+    /// **The two Sky rewards that got NO reference, by name** — a committed negative, because
+    /// the reason they were skipped is a bug of OURS and a silent skip would bury it.
+    ///
+    /// <para>Both names are spellings the item catalog has never heard of: <c>Harmonic Spear</c>
+    /// is the wiki's <i>Spear of Harmony</i> (PR #527 carries the rename) and
+    /// <c>Windhowl/Spirit Render</c> is one checklist row standing for two items. Neither is a
+    /// gap in eqlwiki, and when either is fixed the count above moves — which is the point of
+    /// asserting both ends.</para></summary>
+    [Fact]
+    public void TheTwoUnresolvableSkyRewardsAreNamedAndCarryNoReference()
+    {
+        string[] ours = ["Harmonic Spear", "Windhowl/Spirit Render"];
+
+        foreach (var name in ours)
+            Assert.Null(ItemCatalog.Default.Find(name));
+
+        var turnIns = Shipped.Guides
+            .Where(g => g.GuideType == GuideType.PlaneOfSkyQuest)
+            .SelectMany(g => g.AllObjectives)
+            .Where(o => o.RewardKey.Length > 0)
+            .ToList();
+        Assert.Equal(95, turnIns.Count);
+
+        foreach (var objective in turnIns)
+        {
+            var named = ours.Any(o => objective.RewardKey.EndsWith("|" + o, StringComparison.Ordinal));
+            if (named) Assert.Empty(objective.Attachments);
+            else Assert.Single(objective.Attachments, a => a.Kind == GuideAttachment.GearUpgrade);
+        }
     }
 
     [Fact]

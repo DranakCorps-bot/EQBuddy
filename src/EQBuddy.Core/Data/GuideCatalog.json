@@ -73,7 +73,13 @@
               "how": "",
               "who": "any Plane of Sky mob",
               "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
-              "authoring": "Authored"
+              "authoring": "Authored",
+              "attachments": [
+                {
+                  "kind": "XpFarm",
+                  "key": "Plane of Sky"
+                }
+              ]
             }
           ]
         },
@@ -116,6 +122,12 @@
                   "url": "https://eqlwiki.com/Plane_of_Sky",
                   "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
+                }
+              ],
+              "attachments": [
+                {
+                  "kind": "GearUpgrade",
+                  "key": "Amulet of the Fae"
                 }
               ]
             }
@@ -234,7 +246,13 @@
               "how": "",
               "who": "any Plane of Sky mob",
               "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
-              "authoring": "Authored"
+              "authoring": "Authored",
+              "attachments": [
+                {
+                  "kind": "XpFarm",
+                  "key": "Plane of Sky"
+                }
+              ]
             }
           ]
         },
@@ -279,6 +297,12 @@
                   "url": "https://eqlwiki.com/Plane_of_Sky",
                   "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
+                }
+              ],
+              "attachments": [
+                {
+                  "kind": "GearUpgrade",
+                  "key": "Denon's Horn of Disaster"
                 }
               ]
             }
@@ -365,7 +389,13 @@
               "how": "",
               "who": "any Plane of Sky mob",
               "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
-              "authoring": "Authored"
+              "authoring": "Authored",
+              "attachments": [
+                {
+                  "kind": "XpFarm",
+                  "key": "Plane of Sky"
+                }
+              ]
             }
           ]
         },
@@ -408,6 +438,12 @@
                   "url": "https://eqlwiki.com/Plane_of_Sky",
                   "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
+                }
+              ],
+              "attachments": [
+                {
+                  "kind": "GearUpgrade",
+                  "key": "Ervaj's Flute of Flight"
                 }
               ]
             }
@@ -526,7 +562,13 @@
               "how": "",
               "who": "any Plane of Sky mob",
               "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
-              "authoring": "Authored"
+              "authoring": "Authored",
+              "attachments": [
+                {
+                  "kind": "XpFarm",
+                  "key": "Plane of Sky"
+                }
+              ]
             }
           ]
         },
@@ -657,7 +699,13 @@
               "how": "",
               "who": "any Plane of Sky mob",
               "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
-              "authoring": "Authored"
+              "authoring": "Authored",
+              "attachments": [
+                {
+                  "kind": "XpFarm",
+                  "key": "Plane of Sky"
+                }
+              ]
             }
           ]
         },
@@ -700,6 +748,12 @@
                   "url": "https://eqlwiki.com/Plane_of_Sky",
                   "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
+                }
+              ],
+              "attachments": [
+                {
+                  "kind": "GearUpgrade",
+                  "key": "Mantle of the Songweaver"
                 }
               ]
             }
@@ -786,7 +840,13 @@
               "how": "",
               "who": "any Plane of Sky mob",
               "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
-              "authoring": "Authored"
+              "authoring": "Authored",
+              "attachments": [
+                {
+                  "kind": "XpFarm",
+                  "key": "Plane of Sky"
+                }
+              ]
             }
           ]
         },
@@ -829,6 +889,12 @@
                   "url": "https://eqlwiki.com/Plane_of_Sky",
                   "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
+                }
+              ],
+              "attachments": [
+                {
+                  "kind": "GearUpgrade",
+                  "key": "Mask of Song"
                 }
               ]
             }
@@ -916,7 +982,13 @@
               "how": "",
               "who": "any Plane of Sky mob",
               "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
-              "authoring": "Authored"
+              "authoring": "Authored",
+              "attachments": [
+                {
+                  "kind": "XpFarm",
+                  "key": "Plane of Sky"
+                }
+              ]
             }
           ]
         },
@@ -959,6 +1031,12 @@
                   "url": "https://eqlwiki.com/Plane_of_Sky",
                   "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
+                }
+              ],
+              "attachments": [
+                {
+                  "kind": "GearUpgrade",
+                  "key": "Azarack Skin Wristwraps"
                 }
               ]
             }
@@ -1045,7 +1123,13 @@
               "how": "",
               "who": "any Plane of Sky mob",
               "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
-              "authoring": "Authored"
+              "authoring": "Authored",
+              "attachments": [
+                {
+                  "kind": "XpFarm",
+                  "key": "Plane of Sky"
+                }
+              ]
             }
           ]
         },
@@ -1088,6 +1172,12 @@
                   "url": "https://eqlwiki.com/Plane_of_Sky",
                   "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
+                }
+              ],
+              "attachments": [
+                {
+                  "kind": "GearUpgrade",
+                  "key": "Diaphonous Waistband"
                 }
               ]
             }
@@ -1174,7 +1264,13 @@
               "how": "",
               "who": "any Plane of Sky mob",
               "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
-              "authoring": "Authored"
+              "authoring": "Authored",
+              "attachments": [
+                {
+                  "kind": "XpFarm",
+                  "key": "Plane of Sky"
+                }
+              ]
             }
           ]
         },
@@ -1217,6 +1313,12 @@
                   "url": "https://eqlwiki.com/Plane_of_Sky",
                   "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
+                }
+              ],
+              "attachments": [
+                {
+                  "kind": "GearUpgrade",
+                  "key": "Griffin-Hide Armguards"
                 }
               ]
             }
@@ -1303,7 +1405,13 @@
               "how": "",
               "who": "any Plane of Sky mob",
               "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
-              "authoring": "Authored"
+              "authoring": "Authored",
+              "attachments": [
+                {
+                  "kind": "XpFarm",
+                  "key": "Plane of Sky"
+                }
+              ]
             }
           ]
         },
@@ -1346,6 +1454,12 @@
                   "url": "https://eqlwiki.com/Plane_of_Sky",
                   "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
+                }
+              ],
+              "attachments": [
+                {
+                  "kind": "GearUpgrade",
+                  "key": "Spiroc Beak Earcuff"
                 }
               ]
             }
@@ -1496,7 +1610,13 @@
               "how": "",
               "who": "any Plane of Sky mob",
               "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
-              "authoring": "Authored"
+              "authoring": "Authored",
+              "attachments": [
+                {
+                  "kind": "XpFarm",
+                  "key": "Plane of Sky"
+                }
+              ]
             }
           ]
         },
@@ -1630,7 +1750,13 @@
               "how": "",
               "who": "any Plane of Sky mob",
               "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
-              "authoring": "Authored"
+              "authoring": "Authored",
+              "attachments": [
+                {
+                  "kind": "XpFarm",
+                  "key": "Plane of Sky"
+                }
+              ]
             }
           ]
         },
@@ -1673,6 +1799,12 @@
                   "url": "https://eqlwiki.com/Plane_of_Sky",
                   "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
+                }
+              ],
+              "attachments": [
+                {
+                  "kind": "GearUpgrade",
+                  "key": "Blood-Drawn Runes"
                 }
               ]
             }
@@ -1791,7 +1923,13 @@
               "how": "",
               "who": "any Plane of Sky mob",
               "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
-              "authoring": "Authored"
+              "authoring": "Authored",
+              "attachments": [
+                {
+                  "kind": "XpFarm",
+                  "key": "Plane of Sky"
+                }
+              ]
             }
           ]
         },
@@ -1836,6 +1974,12 @@
                   "url": "https://eqlwiki.com/Plane_of_Sky",
                   "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
+                }
+              ],
+              "attachments": [
+                {
+                  "kind": "GearUpgrade",
+                  "key": "Cudgel of the Fool"
                 }
               ]
             }
@@ -1922,7 +2066,13 @@
               "how": "",
               "who": "any Plane of Sky mob",
               "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
-              "authoring": "Authored"
+              "authoring": "Authored",
+              "attachments": [
+                {
+                  "kind": "XpFarm",
+                  "key": "Plane of Sky"
+                }
+              ]
             }
           ]
         },
@@ -1965,6 +2115,12 @@
                   "url": "https://eqlwiki.com/Plane_of_Sky",
                   "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
+                }
+              ],
+              "attachments": [
+                {
+                  "kind": "GearUpgrade",
+                  "key": "Molten Coil"
                 }
               ]
             }
@@ -2051,7 +2207,13 @@
               "how": "",
               "who": "any Plane of Sky mob",
               "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
-              "authoring": "Authored"
+              "authoring": "Authored",
+              "attachments": [
+                {
+                  "kind": "XpFarm",
+                  "key": "Plane of Sky"
+                }
+              ]
             }
           ]
         },
@@ -2094,6 +2256,12 @@
                   "url": "https://eqlwiki.com/Plane_of_Sky",
                   "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
+                }
+              ],
+              "attachments": [
+                {
+                  "kind": "GearUpgrade",
+                  "key": "Sash of Ferocity"
                 }
               ]
             }
@@ -2180,7 +2348,13 @@
               "how": "",
               "who": "any Plane of Sky mob",
               "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
-              "authoring": "Authored"
+              "authoring": "Authored",
+              "attachments": [
+                {
+                  "kind": "XpFarm",
+                  "key": "Plane of Sky"
+                }
+              ]
             }
           ]
         },
@@ -2223,6 +2397,12 @@
                   "url": "https://eqlwiki.com/Plane_of_Sky",
                   "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
+                }
+              ],
+              "attachments": [
+                {
+                  "kind": "GearUpgrade",
+                  "key": "Shroud of the Sky"
                 }
               ]
             }
@@ -2341,7 +2521,13 @@
               "how": "",
               "who": "any Plane of Sky mob",
               "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
-              "authoring": "Authored"
+              "authoring": "Authored",
+              "attachments": [
+                {
+                  "kind": "XpFarm",
+                  "key": "Plane of Sky"
+                }
+              ]
             }
           ]
         },
@@ -2386,6 +2572,12 @@
                   "url": "https://eqlwiki.com/Plane_of_Sky",
                   "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
+                }
+              ],
+              "attachments": [
+                {
+                  "kind": "GearUpgrade",
+                  "key": "Skycleaver"
                 }
               ]
             }
@@ -2472,7 +2664,13 @@
               "how": "",
               "who": "any Plane of Sky mob",
               "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
-              "authoring": "Authored"
+              "authoring": "Authored",
+              "attachments": [
+                {
+                  "kind": "XpFarm",
+                  "key": "Plane of Sky"
+                }
+              ]
             }
           ]
         },
@@ -2515,6 +2713,12 @@
                   "url": "https://eqlwiki.com/Plane_of_Sky",
                   "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
+                }
+              ],
+              "attachments": [
+                {
+                  "kind": "GearUpgrade",
+                  "key": "Aegis of the Wind"
                 }
               ]
             }
@@ -2633,7 +2837,13 @@
               "how": "",
               "who": "any Plane of Sky mob",
               "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
-              "authoring": "Authored"
+              "authoring": "Authored",
+              "attachments": [
+                {
+                  "kind": "XpFarm",
+                  "key": "Plane of Sky"
+                }
+              ]
             }
           ]
         },
@@ -2678,6 +2888,12 @@
                   "url": "https://eqlwiki.com/Plane_of_Sky",
                   "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
+                }
+              ],
+              "attachments": [
+                {
+                  "kind": "GearUpgrade",
+                  "key": "Baton of the Sky"
                 }
               ]
             }
@@ -2764,7 +2980,13 @@
               "how": "",
               "who": "any Plane of Sky mob",
               "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
-              "authoring": "Authored"
+              "authoring": "Authored",
+              "attachments": [
+                {
+                  "kind": "XpFarm",
+                  "key": "Plane of Sky"
+                }
+              ]
             }
           ]
         },
@@ -2807,6 +3029,12 @@
                   "url": "https://eqlwiki.com/Plane_of_Sky",
                   "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
+                }
+              ],
+              "attachments": [
+                {
+                  "kind": "GearUpgrade",
+                  "key": "Necklace of Resolution"
                 }
               ]
             }
@@ -2893,7 +3121,13 @@
               "how": "",
               "who": "any Plane of Sky mob",
               "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
-              "authoring": "Authored"
+              "authoring": "Authored",
+              "attachments": [
+                {
+                  "kind": "XpFarm",
+                  "key": "Plane of Sky"
+                }
+              ]
             }
           ]
         },
@@ -2936,6 +3170,12 @@
                   "url": "https://eqlwiki.com/Plane_of_Sky",
                   "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
+                }
+              ],
+              "attachments": [
+                {
+                  "kind": "GearUpgrade",
+                  "key": "Pauldrons of Piety"
                 }
               ]
             }
@@ -3054,7 +3294,13 @@
               "how": "",
               "who": "any Plane of Sky mob",
               "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
-              "authoring": "Authored"
+              "authoring": "Authored",
+              "attachments": [
+                {
+                  "kind": "XpFarm",
+                  "key": "Plane of Sky"
+                }
+              ]
             }
           ]
         },
@@ -3099,6 +3345,12 @@
                   "url": "https://eqlwiki.com/Plane_of_Sky",
                   "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
+                }
+              ],
+              "attachments": [
+                {
+                  "kind": "GearUpgrade",
+                  "key": "Theurgist's Star"
                 }
               ]
             }
@@ -3185,7 +3437,13 @@
               "how": "",
               "who": "any Plane of Sky mob",
               "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
-              "authoring": "Authored"
+              "authoring": "Authored",
+              "attachments": [
+                {
+                  "kind": "XpFarm",
+                  "key": "Plane of Sky"
+                }
+              ]
             }
           ]
         },
@@ -3228,6 +3486,12 @@
                   "url": "https://eqlwiki.com/Plane_of_Sky",
                   "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
+                }
+              ],
+              "attachments": [
+                {
+                  "kind": "GearUpgrade",
+                  "key": "Truewind Earring"
                 }
               ]
             }
@@ -3314,7 +3578,13 @@
               "how": "",
               "who": "any Plane of Sky mob",
               "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
-              "authoring": "Authored"
+              "authoring": "Authored",
+              "attachments": [
+                {
+                  "kind": "XpFarm",
+                  "key": "Plane of Sky"
+                }
+              ]
             }
           ]
         },
@@ -3357,6 +3627,12 @@
                   "url": "https://eqlwiki.com/Plane_of_Sky",
                   "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
+                }
+              ],
+              "attachments": [
+                {
+                  "kind": "GearUpgrade",
+                  "key": "Drake-Hide Mask"
                 }
               ]
             }
@@ -3475,7 +3751,13 @@
               "how": "",
               "who": "any Plane of Sky mob",
               "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
-              "authoring": "Authored"
+              "authoring": "Authored",
+              "attachments": [
+                {
+                  "kind": "XpFarm",
+                  "key": "Plane of Sky"
+                }
+              ]
             }
           ]
         },
@@ -3520,6 +3802,12 @@
                   "url": "https://eqlwiki.com/Plane_of_Sky",
                   "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
+                }
+              ],
+              "attachments": [
+                {
+                  "kind": "GearUpgrade",
+                  "key": "Espri"
                 }
               ]
             }
@@ -3606,7 +3894,13 @@
               "how": "",
               "who": "any Plane of Sky mob",
               "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
-              "authoring": "Authored"
+              "authoring": "Authored",
+              "attachments": [
+                {
+                  "kind": "XpFarm",
+                  "key": "Plane of Sky"
+                }
+              ]
             }
           ]
         },
@@ -3649,6 +3943,12 @@
                   "url": "https://eqlwiki.com/Plane_of_Sky",
                   "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
+                }
+              ],
+              "attachments": [
+                {
+                  "kind": "GearUpgrade",
+                  "key": "Honeycomb Belt"
                 }
               ]
             }
@@ -3735,7 +4035,13 @@
               "how": "",
               "who": "any Plane of Sky mob",
               "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
-              "authoring": "Authored"
+              "authoring": "Authored",
+              "attachments": [
+                {
+                  "kind": "XpFarm",
+                  "key": "Plane of Sky"
+                }
+              ]
             }
           ]
         },
@@ -3778,6 +4084,12 @@
                   "url": "https://eqlwiki.com/Plane_of_Sky",
                   "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
+                }
+              ],
+              "attachments": [
+                {
+                  "kind": "GearUpgrade",
+                  "key": "Nature Walker's Mantle"
                 }
               ]
             }
@@ -3897,7 +4209,13 @@
               "how": "",
               "who": "any Plane of Sky mob",
               "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
-              "authoring": "Authored"
+              "authoring": "Authored",
+              "attachments": [
+                {
+                  "kind": "XpFarm",
+                  "key": "Plane of Sky"
+                }
+              ]
             }
           ]
         },
@@ -3942,6 +4260,12 @@
                   "url": "https://eqlwiki.com/Plane_of_Sky",
                   "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
+                }
+              ],
+              "attachments": [
+                {
+                  "kind": "GearUpgrade",
+                  "key": "Shillelagh"
                 }
               ]
             }
@@ -4060,7 +4384,13 @@
               "how": "",
               "who": "any Plane of Sky mob",
               "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
-              "authoring": "Authored"
+              "authoring": "Authored",
+              "attachments": [
+                {
+                  "kind": "XpFarm",
+                  "key": "Plane of Sky"
+                }
+              ]
             }
           ]
         },
@@ -4105,6 +4435,12 @@
                   "url": "https://eqlwiki.com/Plane_of_Sky",
                   "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
+                }
+              ],
+              "attachments": [
+                {
+                  "kind": "GearUpgrade",
+                  "key": "Spiroc Banisher Focus"
                 }
               ]
             }
@@ -4196,7 +4532,13 @@
               "how": "",
               "who": "any Plane of Sky mob",
               "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
-              "authoring": "Authored"
+              "authoring": "Authored",
+              "attachments": [
+                {
+                  "kind": "XpFarm",
+                  "key": "Plane of Sky"
+                }
+              ]
             }
           ]
         },
@@ -4234,6 +4576,12 @@
                   "url": "https://eqlwiki.com/Enchanter_Plane_of_Sky_Tests",
                   "title": "Enchanter Plane of Sky Tests",
                   "retrievedAt": "2026-09-09"
+                }
+              ],
+              "attachments": [
+                {
+                  "kind": "GearUpgrade",
+                  "key": "Earring of Displacement"
                 }
               ]
             }
@@ -4325,7 +4673,13 @@
               "how": "",
               "who": "any Plane of Sky mob",
               "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
-              "authoring": "Authored"
+              "authoring": "Authored",
+              "attachments": [
+                {
+                  "kind": "XpFarm",
+                  "key": "Plane of Sky"
+                }
+              ]
             }
           ]
         },
@@ -4363,6 +4717,12 @@
                   "url": "https://eqlwiki.com/Enchanter_Plane_of_Sky_Tests",
                   "title": "Enchanter Plane of Sky Tests",
                   "retrievedAt": "2026-09-09"
+                }
+              ],
+              "attachments": [
+                {
+                  "kind": "GearUpgrade",
+                  "key": "Ivory Mask"
                 }
               ]
             }
@@ -4454,7 +4814,13 @@
               "how": "",
               "who": "any Plane of Sky mob",
               "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
-              "authoring": "Authored"
+              "authoring": "Authored",
+              "attachments": [
+                {
+                  "kind": "XpFarm",
+                  "key": "Plane of Sky"
+                }
+              ]
             }
           ]
         },
@@ -4492,6 +4858,12 @@
                   "url": "https://eqlwiki.com/Enchanter_Plane_of_Sky_Tests",
                   "title": "Enchanter Plane of Sky Tests",
                   "retrievedAt": "2026-09-09"
+                }
+              ],
+              "attachments": [
+                {
+                  "kind": "GearUpgrade",
+                  "key": "Necklace of Whispering Winds"
                 }
               ]
             }
@@ -4615,7 +4987,13 @@
               "how": "",
               "who": "any Plane of Sky mob",
               "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
-              "authoring": "Authored"
+              "authoring": "Authored",
+              "attachments": [
+                {
+                  "kind": "XpFarm",
+                  "key": "Plane of Sky"
+                }
+              ]
             }
           ]
         },
@@ -4655,6 +5033,12 @@
                   "url": "https://eqlwiki.com/Enchanter_Plane_of_Sky_Tests",
                   "title": "Enchanter Plane of Sky Tests",
                   "retrievedAt": "2026-09-09"
+                }
+              ],
+              "attachments": [
+                {
+                  "kind": "GearUpgrade",
+                  "key": "Rod of the Protecting Winds"
                 }
               ]
             }
@@ -4746,7 +5130,13 @@
               "how": "",
               "who": "any Plane of Sky mob",
               "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
-              "authoring": "Authored"
+              "authoring": "Authored",
+              "attachments": [
+                {
+                  "kind": "XpFarm",
+                  "key": "Plane of Sky"
+                }
+              ]
             }
           ]
         },
@@ -4784,6 +5174,12 @@
                   "url": "https://eqlwiki.com/Enchanter_Plane_of_Sky_Tests",
                   "title": "Enchanter Plane of Sky Tests",
                   "retrievedAt": "2026-09-09"
+                }
+              ],
+              "attachments": [
+                {
+                  "kind": "GearUpgrade",
+                  "key": "Sphinx Hair Cord"
                 }
               ]
             }
@@ -4875,7 +5271,13 @@
               "how": "",
               "who": "any Plane of Sky mob",
               "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
-              "authoring": "Authored"
+              "authoring": "Authored",
+              "attachments": [
+                {
+                  "kind": "XpFarm",
+                  "key": "Plane of Sky"
+                }
+              ]
             }
           ]
         },
@@ -4913,6 +5315,12 @@
                   "url": "https://eqlwiki.com/Enchanter_Plane_of_Sky_Tests",
                   "title": "Enchanter Plane of Sky Tests",
                   "retrievedAt": "2026-09-09"
+                }
+              ],
+              "attachments": [
+                {
+                  "kind": "GearUpgrade",
+                  "key": "Wind Walker's Mantle"
                 }
               ]
             }
@@ -4999,7 +5407,13 @@
               "how": "",
               "who": "any Plane of Sky mob",
               "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
-              "authoring": "Authored"
+              "authoring": "Authored",
+              "attachments": [
+                {
+                  "kind": "XpFarm",
+                  "key": "Plane of Sky"
+                }
+              ]
             }
           ]
         },
@@ -5042,6 +5456,12 @@
                   "url": "https://eqlwiki.com/Plane_of_Sky",
                   "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
+                }
+              ],
+              "attachments": [
+                {
+                  "kind": "GearUpgrade",
+                  "key": "Bracelet of Clarification"
                 }
               ]
             }
@@ -5128,7 +5548,13 @@
               "how": "",
               "who": "any Plane of Sky mob",
               "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
-              "authoring": "Authored"
+              "authoring": "Authored",
+              "attachments": [
+                {
+                  "kind": "XpFarm",
+                  "key": "Plane of Sky"
+                }
+              ]
             }
           ]
         },
@@ -5171,6 +5597,12 @@
                   "url": "https://eqlwiki.com/Plane_of_Sky",
                   "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
+                }
+              ],
+              "attachments": [
+                {
+                  "kind": "GearUpgrade",
+                  "key": "Drake-Hide Amice"
                 }
               ]
             }
@@ -5257,7 +5689,13 @@
               "how": "",
               "who": "any Plane of Sky mob",
               "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
-              "authoring": "Authored"
+              "authoring": "Authored",
+              "attachments": [
+                {
+                  "kind": "XpFarm",
+                  "key": "Plane of Sky"
+                }
+              ]
             }
           ]
         },
@@ -5300,6 +5738,12 @@
                   "url": "https://eqlwiki.com/Plane_of_Sky",
                   "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
+                }
+              ],
+              "attachments": [
+                {
+                  "kind": "GearUpgrade",
+                  "key": "Duennan Shielding Ring"
                 }
               ]
             }
@@ -5386,7 +5830,13 @@
               "how": "",
               "who": "any Plane of Sky mob",
               "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
-              "authoring": "Authored"
+              "authoring": "Authored",
+              "attachments": [
+                {
+                  "kind": "XpFarm",
+                  "key": "Plane of Sky"
+                }
+              ]
             }
           ]
         },
@@ -5429,6 +5879,12 @@
                   "url": "https://eqlwiki.com/Plane_of_Sky",
                   "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
+                }
+              ],
+              "attachments": [
+                {
+                  "kind": "GearUpgrade",
+                  "key": "Gold White Pendant"
                 }
               ]
             }
@@ -5515,7 +5971,13 @@
               "how": "",
               "who": "any Plane of Sky mob",
               "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
-              "authoring": "Authored"
+              "authoring": "Authored",
+              "attachments": [
+                {
+                  "kind": "XpFarm",
+                  "key": "Plane of Sky"
+                }
+              ]
             }
           ]
         },
@@ -5558,6 +6020,12 @@
                   "url": "https://eqlwiki.com/Plane_of_Sky",
                   "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
+                }
+              ],
+              "attachments": [
+                {
+                  "kind": "GearUpgrade",
+                  "key": "Mask of Empowerment"
                 }
               ]
             }
@@ -5708,7 +6176,13 @@
               "how": "",
               "who": "any Plane of Sky mob",
               "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
-              "authoring": "Authored"
+              "authoring": "Authored",
+              "attachments": [
+                {
+                  "kind": "XpFarm",
+                  "key": "Plane of Sky"
+                }
+              ]
             }
           ]
         },
@@ -5755,6 +6229,12 @@
                   "url": "https://eqlwiki.com/Plane_of_Sky",
                   "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
+                }
+              ],
+              "attachments": [
+                {
+                  "kind": "GearUpgrade",
+                  "key": "Staff of Elemental Mastery: Air"
                 }
               ]
             }
@@ -5873,7 +6353,13 @@
               "how": "",
               "who": "any Plane of Sky mob",
               "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
-              "authoring": "Authored"
+              "authoring": "Authored",
+              "attachments": [
+                {
+                  "kind": "XpFarm",
+                  "key": "Plane of Sky"
+                }
+              ]
             }
           ]
         },
@@ -5918,6 +6404,12 @@
                   "url": "https://eqlwiki.com/Plane_of_Sky",
                   "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
+                }
+              ],
+              "attachments": [
+                {
+                  "kind": "GearUpgrade",
+                  "key": "Staff of The Magister"
                 }
               ]
             }
@@ -6009,7 +6501,13 @@
               "how": "",
               "who": "any Plane of Sky mob",
               "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
-              "authoring": "Authored"
+              "authoring": "Authored",
+              "attachments": [
+                {
+                  "kind": "XpFarm",
+                  "key": "Plane of Sky"
+                }
+              ]
             }
           ]
         },
@@ -6047,6 +6545,12 @@
                   "url": "https://eqlwiki.com/Monk_Plane_of_Sky_Tests",
                   "title": "Monk Plane of Sky Tests",
                   "retrievedAt": "2026-09-09"
+                }
+              ],
+              "attachments": [
+                {
+                  "kind": "GearUpgrade",
+                  "key": "Back Straps of Mastery"
                 }
               ]
             }
@@ -6138,7 +6642,13 @@
               "how": "",
               "who": "any Plane of Sky mob",
               "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
-              "authoring": "Authored"
+              "authoring": "Authored",
+              "attachments": [
+                {
+                  "kind": "XpFarm",
+                  "key": "Plane of Sky"
+                }
+              ]
             }
           ]
         },
@@ -6176,6 +6686,12 @@
                   "url": "https://eqlwiki.com/Monk_Plane_of_Sky_Tests",
                   "title": "Monk Plane of Sky Tests",
                   "retrievedAt": "2026-09-09"
+                }
+              ],
+              "attachments": [
+                {
+                  "kind": "GearUpgrade",
+                  "key": "Golden Sash of Tranquility"
                 }
               ]
             }
@@ -6267,7 +6783,13 @@
               "how": "",
               "who": "any Plane of Sky mob",
               "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
-              "authoring": "Authored"
+              "authoring": "Authored",
+              "attachments": [
+                {
+                  "kind": "XpFarm",
+                  "key": "Plane of Sky"
+                }
+              ]
             }
           ]
         },
@@ -6305,6 +6827,12 @@
                   "url": "https://eqlwiki.com/Monk_Plane_of_Sky_Tests",
                   "title": "Monk Plane of Sky Tests",
                   "retrievedAt": "2026-09-09"
+                }
+              ],
+              "attachments": [
+                {
+                  "kind": "GearUpgrade",
+                  "key": "Sandals of Alacrity"
                 }
               ]
             }
@@ -6396,7 +6924,13 @@
               "how": "",
               "who": "any Plane of Sky mob",
               "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
-              "authoring": "Authored"
+              "authoring": "Authored",
+              "attachments": [
+                {
+                  "kind": "XpFarm",
+                  "key": "Plane of Sky"
+                }
+              ]
             }
           ]
         },
@@ -6434,6 +6968,12 @@
                   "url": "https://eqlwiki.com/Monk_Plane_of_Sky_Tests",
                   "title": "Monk Plane of Sky Tests",
                   "retrievedAt": "2026-09-09"
+                }
+              ],
+              "attachments": [
+                {
+                  "kind": "GearUpgrade",
+                  "key": "Ton Po's Eye Patch"
                 }
               ]
             }
@@ -6525,7 +7065,13 @@
               "how": "",
               "who": "any Plane of Sky mob",
               "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
-              "authoring": "Authored"
+              "authoring": "Authored",
+              "attachments": [
+                {
+                  "kind": "XpFarm",
+                  "key": "Plane of Sky"
+                }
+              ]
             }
           ]
         },
@@ -6563,6 +7109,12 @@
                   "url": "https://eqlwiki.com/Monk_Plane_of_Sky_Tests",
                   "title": "Monk Plane of Sky Tests",
                   "retrievedAt": "2026-09-09"
+                }
+              ],
+              "attachments": [
+                {
+                  "kind": "GearUpgrade",
+                  "key": "Ton Po's Shoulder Wraps"
                 }
               ]
             }
@@ -6686,7 +7238,13 @@
               "how": "",
               "who": "any Plane of Sky mob",
               "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
-              "authoring": "Authored"
+              "authoring": "Authored",
+              "attachments": [
+                {
+                  "kind": "XpFarm",
+                  "key": "Plane of Sky"
+                }
+              ]
             }
           ]
         },
@@ -6726,6 +7284,12 @@
                   "url": "https://eqlwiki.com/Monk_Plane_of_Sky_Tests",
                   "title": "Monk Plane of Sky Tests",
                   "retrievedAt": "2026-09-09"
+                }
+              ],
+              "attachments": [
+                {
+                  "kind": "GearUpgrade",
+                  "key": "Wu's Fist of Mastery"
                 }
               ]
             }
@@ -6817,7 +7381,13 @@
               "how": "",
               "who": "any Plane of Sky mob",
               "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
-              "authoring": "Authored"
+              "authoring": "Authored",
+              "attachments": [
+                {
+                  "kind": "XpFarm",
+                  "key": "Plane of Sky"
+                }
+              ]
             }
           ]
         },
@@ -6860,6 +7430,12 @@
                   "url": "https://eqlwiki.com/Plane_of_Sky",
                   "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
+                }
+              ],
+              "attachments": [
+                {
+                  "kind": "GearUpgrade",
+                  "key": "Band of Wailing Winds"
                 }
               ]
             }
@@ -6951,7 +7527,13 @@
               "how": "",
               "who": "any Plane of Sky mob",
               "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
-              "authoring": "Authored"
+              "authoring": "Authored",
+              "attachments": [
+                {
+                  "kind": "XpFarm",
+                  "key": "Plane of Sky"
+                }
+              ]
             }
           ]
         },
@@ -6994,6 +7576,12 @@
                   "url": "https://eqlwiki.com/Plane_of_Sky",
                   "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
+                }
+              ],
+              "attachments": [
+                {
+                  "kind": "GearUpgrade",
+                  "key": "Bloodsoaked Raiment"
                 }
               ]
             }
@@ -7085,7 +7673,13 @@
               "how": "",
               "who": "any Plane of Sky mob",
               "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
-              "authoring": "Authored"
+              "authoring": "Authored",
+              "attachments": [
+                {
+                  "kind": "XpFarm",
+                  "key": "Plane of Sky"
+                }
+              ]
             }
           ]
         },
@@ -7128,6 +7722,12 @@
                   "url": "https://eqlwiki.com/Plane_of_Sky",
                   "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
+                }
+              ],
+              "attachments": [
+                {
+                  "kind": "GearUpgrade",
+                  "key": "Bloody Griffon-Hide Wrist Guard"
                 }
               ]
             }
@@ -7219,7 +7819,13 @@
               "how": "",
               "who": "any Plane of Sky mob",
               "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
-              "authoring": "Authored"
+              "authoring": "Authored",
+              "attachments": [
+                {
+                  "kind": "XpFarm",
+                  "key": "Plane of Sky"
+                }
+              ]
             }
           ]
         },
@@ -7262,6 +7868,12 @@
                   "url": "https://eqlwiki.com/Plane_of_Sky",
                   "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
+                }
+              ],
+              "attachments": [
+                {
+                  "kind": "GearUpgrade",
+                  "key": "Cloak of Spiroc Feathers"
                 }
               ]
             }
@@ -7385,7 +7997,13 @@
               "how": "",
               "who": "any Plane of Sky mob",
               "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
-              "authoring": "Authored"
+              "authoring": "Authored",
+              "attachments": [
+                {
+                  "kind": "XpFarm",
+                  "key": "Plane of Sky"
+                }
+              ]
             }
           ]
         },
@@ -7430,6 +8048,12 @@
                   "url": "https://eqlwiki.com/Plane_of_Sky",
                   "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
+                }
+              ],
+              "attachments": [
+                {
+                  "kind": "GearUpgrade",
+                  "key": "Gorgon Head Staff"
                 }
               ]
             }
@@ -7521,7 +8145,13 @@
               "how": "",
               "who": "any Plane of Sky mob",
               "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
-              "authoring": "Authored"
+              "authoring": "Authored",
+              "attachments": [
+                {
+                  "kind": "XpFarm",
+                  "key": "Plane of Sky"
+                }
+              ]
             }
           ]
         },
@@ -7564,6 +8194,12 @@
                   "url": "https://eqlwiki.com/Plane_of_Sky",
                   "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
+                }
+              ],
+              "attachments": [
+                {
+                  "kind": "GearUpgrade",
+                  "key": "Sphinx Heart Amulet"
                 }
               ]
             }
@@ -7655,7 +8291,13 @@
               "how": "",
               "who": "any Plane of Sky mob",
               "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
-              "authoring": "Authored"
+              "authoring": "Authored",
+              "attachments": [
+                {
+                  "kind": "XpFarm",
+                  "key": "Plane of Sky"
+                }
+              ]
             }
           ]
         },
@@ -7693,6 +8335,12 @@
                   "url": "https://eqlwiki.com/Paladin_Plane_of_Sky_Tests",
                   "title": "Paladin Plane of Sky Tests",
                   "retrievedAt": "2026-09-09"
+                }
+              ],
+              "attachments": [
+                {
+                  "kind": "GearUpgrade",
+                  "key": "Aldryn, Blade of the Ocean"
                 }
               ]
             }
@@ -7784,7 +8432,13 @@
               "how": "",
               "who": "any Plane of Sky mob",
               "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
-              "authoring": "Authored"
+              "authoring": "Authored",
+              "attachments": [
+                {
+                  "kind": "XpFarm",
+                  "key": "Plane of Sky"
+                }
+              ]
             }
           ]
         },
@@ -7822,6 +8476,12 @@
                   "url": "https://eqlwiki.com/Paladin_Plane_of_Sky_Tests",
                   "title": "Paladin Plane of Sky Tests",
                   "retrievedAt": "2026-09-09"
+                }
+              ],
+              "attachments": [
+                {
+                  "kind": "GearUpgrade",
+                  "key": "Girdle of Faith"
                 }
               ]
             }
@@ -7945,7 +8605,13 @@
               "how": "",
               "who": "any Plane of Sky mob",
               "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
-              "authoring": "Authored"
+              "authoring": "Authored",
+              "attachments": [
+                {
+                  "kind": "XpFarm",
+                  "key": "Plane of Sky"
+                }
+              ]
             }
           ]
         },
@@ -7985,6 +8651,12 @@
                   "url": "https://eqlwiki.com/Paladin_Plane_of_Sky_Tests",
                   "title": "Paladin Plane of Sky Tests",
                   "retrievedAt": "2026-09-09"
+                }
+              ],
+              "attachments": [
+                {
+                  "kind": "GearUpgrade",
+                  "key": "Thelvorn, Blade of Light"
                 }
               ]
             }
@@ -8108,7 +8780,13 @@
               "how": "",
               "who": "any Plane of Sky mob",
               "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
-              "authoring": "Authored"
+              "authoring": "Authored",
+              "attachments": [
+                {
+                  "kind": "XpFarm",
+                  "key": "Plane of Sky"
+                }
+              ]
             }
           ]
         },
@@ -8148,6 +8826,12 @@
                   "url": "https://eqlwiki.com/Paladin_Plane_of_Sky_Tests",
                   "title": "Paladin Plane of Sky Tests",
                   "retrievedAt": "2026-09-09"
+                }
+              ],
+              "attachments": [
+                {
+                  "kind": "GearUpgrade",
+                  "key": "Truvinan"
                 }
               ]
             }
@@ -8266,7 +8950,13 @@
               "how": "",
               "who": "any Plane of Sky mob",
               "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
-              "authoring": "Authored"
+              "authoring": "Authored",
+              "attachments": [
+                {
+                  "kind": "XpFarm",
+                  "key": "Plane of Sky"
+                }
+              ]
             }
           ]
         },
@@ -8306,6 +8996,12 @@
                   "url": "https://eqlwiki.com/Ranger_Plane_of_Sky_Tests",
                   "title": "Ranger Plane of Sky Tests",
                   "retrievedAt": "2026-09-09"
+                }
+              ],
+              "attachments": [
+                {
+                  "kind": "GearUpgrade",
+                  "key": "Arydryidriyorn"
                 }
               ]
             }
@@ -8392,7 +9088,13 @@
               "how": "",
               "who": "any Plane of Sky mob",
               "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
-              "authoring": "Authored"
+              "authoring": "Authored",
+              "attachments": [
+                {
+                  "kind": "XpFarm",
+                  "key": "Plane of Sky"
+                }
+              ]
             }
           ]
         },
@@ -8430,6 +9132,12 @@
                   "url": "https://eqlwiki.com/Ranger_Plane_of_Sky_Tests",
                   "title": "Ranger Plane of Sky Tests",
                   "retrievedAt": "2026-09-09"
+                }
+              ],
+              "attachments": [
+                {
+                  "kind": "GearUpgrade",
+                  "key": "Dark Cloak of the Sky"
                 }
               ]
             }
@@ -8516,7 +9224,13 @@
               "how": "",
               "who": "any Plane of Sky mob",
               "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
-              "authoring": "Authored"
+              "authoring": "Authored",
+              "attachments": [
+                {
+                  "kind": "XpFarm",
+                  "key": "Plane of Sky"
+                }
+              ]
             }
           ]
         },
@@ -8554,6 +9268,12 @@
                   "url": "https://eqlwiki.com/Ranger_Plane_of_Sky_Tests",
                   "title": "Ranger Plane of Sky Tests",
                   "retrievedAt": "2026-09-09"
+                }
+              ],
+              "attachments": [
+                {
+                  "kind": "GearUpgrade",
+                  "key": "Earthshaker's Mantle"
                 }
               ]
             }
@@ -8640,7 +9360,13 @@
               "how": "",
               "who": "any Plane of Sky mob",
               "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
-              "authoring": "Authored"
+              "authoring": "Authored",
+              "attachments": [
+                {
+                  "kind": "XpFarm",
+                  "key": "Plane of Sky"
+                }
+              ]
             }
           ]
         },
@@ -8678,6 +9404,12 @@
                   "url": "https://eqlwiki.com/Ranger_Plane_of_Sky_Tests",
                   "title": "Ranger Plane of Sky Tests",
                   "retrievedAt": "2026-09-09"
+                }
+              ],
+              "attachments": [
+                {
+                  "kind": "GearUpgrade",
+                  "key": "Griffon Talon Necklace"
                 }
               ]
             }
@@ -8764,7 +9496,13 @@
               "how": "",
               "who": "any Plane of Sky mob",
               "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
-              "authoring": "Authored"
+              "authoring": "Authored",
+              "attachments": [
+                {
+                  "kind": "XpFarm",
+                  "key": "Plane of Sky"
+                }
+              ]
             }
           ]
         },
@@ -8802,6 +9540,12 @@
                   "url": "https://eqlwiki.com/Ranger_Plane_of_Sky_Tests",
                   "title": "Ranger Plane of Sky Tests",
                   "retrievedAt": "2026-09-09"
+                }
+              ],
+              "attachments": [
+                {
+                  "kind": "GearUpgrade",
+                  "key": "Thunderforged Earring"
                 }
               ]
             }
@@ -8920,7 +9664,13 @@
               "how": "",
               "who": "any Plane of Sky mob",
               "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
-              "authoring": "Authored"
+              "authoring": "Authored",
+              "attachments": [
+                {
+                  "kind": "XpFarm",
+                  "key": "Plane of Sky"
+                }
+              ]
             }
           ]
         },
@@ -8960,6 +9710,12 @@
                   "url": "https://eqlwiki.com/Ranger_Plane_of_Sky_Tests",
                   "title": "Ranger Plane of Sky Tests",
                   "retrievedAt": "2026-09-09"
+                }
+              ],
+              "attachments": [
+                {
+                  "kind": "GearUpgrade",
+                  "key": "Windstriker"
                 }
               ]
             }
@@ -9046,7 +9802,13 @@
               "how": "",
               "who": "any Plane of Sky mob",
               "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
-              "authoring": "Authored"
+              "authoring": "Authored",
+              "attachments": [
+                {
+                  "kind": "XpFarm",
+                  "key": "Plane of Sky"
+                }
+              ]
             }
           ]
         },
@@ -9084,6 +9846,12 @@
                   "url": "https://eqlwiki.com/Rogue_Plane_of_Sky_Tests",
                   "title": "Rogue Plane of Sky Tests",
                   "retrievedAt": "2026-09-09"
+                }
+              ],
+              "attachments": [
+                {
+                  "kind": "GearUpgrade",
+                  "key": "Crystal Mask"
                 }
               ]
             }
@@ -9170,7 +9938,13 @@
               "how": "",
               "who": "any Plane of Sky mob",
               "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
-              "authoring": "Authored"
+              "authoring": "Authored",
+              "attachments": [
+                {
+                  "kind": "XpFarm",
+                  "key": "Plane of Sky"
+                }
+              ]
             }
           ]
         },
@@ -9208,6 +9982,12 @@
                   "url": "https://eqlwiki.com/Rogue_Plane_of_Sky_Tests",
                   "title": "Rogue Plane of Sky Tests",
                   "retrievedAt": "2026-09-09"
+                }
+              ],
+              "attachments": [
+                {
+                  "kind": "GearUpgrade",
+                  "key": "Griffon Wing Spaulders"
                 }
               ]
             }
@@ -9294,7 +10074,13 @@
               "how": "",
               "who": "any Plane of Sky mob",
               "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
-              "authoring": "Authored"
+              "authoring": "Authored",
+              "attachments": [
+                {
+                  "kind": "XpFarm",
+                  "key": "Plane of Sky"
+                }
+              ]
             }
           ]
         },
@@ -9332,6 +10118,12 @@
                   "url": "https://eqlwiki.com/Rogue_Plane_of_Sky_Tests",
                   "title": "Rogue Plane of Sky Tests",
                   "retrievedAt": "2026-09-09"
+                }
+              ],
+              "attachments": [
+                {
+                  "kind": "GearUpgrade",
+                  "key": "Renard's Belt of Quickness"
                 }
               ]
             }
@@ -9418,7 +10210,13 @@
               "how": "",
               "who": "any Plane of Sky mob",
               "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
-              "authoring": "Authored"
+              "authoring": "Authored",
+              "attachments": [
+                {
+                  "kind": "XpFarm",
+                  "key": "Plane of Sky"
+                }
+              ]
             }
           ]
         },
@@ -9456,6 +10254,12 @@
                   "url": "https://eqlwiki.com/Rogue_Plane_of_Sky_Tests",
                   "title": "Rogue Plane of Sky Tests",
                   "retrievedAt": "2026-09-09"
+                }
+              ],
+              "attachments": [
+                {
+                  "kind": "GearUpgrade",
+                  "key": "Shimmering Bracer of Protection"
                 }
               ]
             }
@@ -9574,7 +10378,13 @@
               "how": "",
               "who": "any Plane of Sky mob",
               "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
-              "authoring": "Authored"
+              "authoring": "Authored",
+              "attachments": [
+                {
+                  "kind": "XpFarm",
+                  "key": "Plane of Sky"
+                }
+              ]
             }
           ]
         },
@@ -9614,6 +10424,12 @@
                   "url": "https://eqlwiki.com/Rogue_Plane_of_Sky_Tests",
                   "title": "Rogue Plane of Sky Tests",
                   "retrievedAt": "2026-09-09"
+                }
+              ],
+              "attachments": [
+                {
+                  "kind": "GearUpgrade",
+                  "key": "Thornstinger"
                 }
               ]
             }
@@ -9700,7 +10516,13 @@
               "how": "",
               "who": "any Plane of Sky mob",
               "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
-              "authoring": "Authored"
+              "authoring": "Authored",
+              "attachments": [
+                {
+                  "kind": "XpFarm",
+                  "key": "Plane of Sky"
+                }
+              ]
             }
           ]
         },
@@ -9738,6 +10560,12 @@
                   "url": "https://eqlwiki.com/Rogue_Plane_of_Sky_Tests",
                   "title": "Rogue Plane of Sky Tests",
                   "retrievedAt": "2026-09-09"
+                }
+              ],
+              "attachments": [
+                {
+                  "kind": "GearUpgrade",
+                  "key": "Wispy Choker of Vigor"
                 }
               ]
             }
@@ -9824,7 +10652,13 @@
               "how": "",
               "who": "any Plane of Sky mob",
               "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
-              "authoring": "Authored"
+              "authoring": "Authored",
+              "attachments": [
+                {
+                  "kind": "XpFarm",
+                  "key": "Plane of Sky"
+                }
+              ]
             }
           ]
         },
@@ -9862,6 +10696,12 @@
                   "url": "https://eqlwiki.com/Shadow_Knight_Plane_of_Sky_Tests",
                   "title": "Shadow Knight Plane of Sky Tests",
                   "retrievedAt": "2026-09-09"
+                }
+              ],
+              "attachments": [
+                {
+                  "kind": "GearUpgrade",
+                  "key": "Amulet of the Sphinx Eye"
                 }
               ]
             }
@@ -9948,7 +10788,13 @@
               "how": "",
               "who": "any Plane of Sky mob",
               "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
-              "authoring": "Authored"
+              "authoring": "Authored",
+              "attachments": [
+                {
+                  "kind": "XpFarm",
+                  "key": "Plane of Sky"
+                }
+              ]
             }
           ]
         },
@@ -9986,6 +10832,12 @@
                   "url": "https://eqlwiki.com/Shadow_Knight_Plane_of_Sky_Tests",
                   "title": "Shadow Knight Plane of Sky Tests",
                   "retrievedAt": "2026-09-09"
+                }
+              ],
+              "attachments": [
+                {
+                  "kind": "GearUpgrade",
+                  "key": "Blood Sky Face Plate"
                 }
               ]
             }
@@ -10072,7 +10924,13 @@
               "how": "",
               "who": "any Plane of Sky mob",
               "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
-              "authoring": "Authored"
+              "authoring": "Authored",
+              "attachments": [
+                {
+                  "kind": "XpFarm",
+                  "key": "Plane of Sky"
+                }
+              ]
             }
           ]
         },
@@ -10110,6 +10968,12 @@
                   "url": "https://eqlwiki.com/Shadow_Knight_Plane_of_Sky_Tests",
                   "title": "Shadow Knight Plane of Sky Tests",
                   "retrievedAt": "2026-09-09"
+                }
+              ],
+              "attachments": [
+                {
+                  "kind": "GearUpgrade",
+                  "key": "Crimson Ring of the Djinni"
                 }
               ]
             }
@@ -10228,7 +11092,13 @@
               "how": "",
               "who": "any Plane of Sky mob",
               "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
-              "authoring": "Authored"
+              "authoring": "Authored",
+              "attachments": [
+                {
+                  "kind": "XpFarm",
+                  "key": "Plane of Sky"
+                }
+              ]
             }
           ]
         },
@@ -10268,6 +11138,12 @@
                   "url": "https://eqlwiki.com/Shadow_Knight_Plane_of_Sky_Tests",
                   "title": "Shadow Knight Plane of Sky Tests",
                   "retrievedAt": "2026-09-09"
+                }
+              ],
+              "attachments": [
+                {
+                  "kind": "GearUpgrade",
+                  "key": "Khyldorn the Blood Drinker"
                 }
               ]
             }
@@ -10354,7 +11230,13 @@
               "how": "",
               "who": "any Plane of Sky mob",
               "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
-              "authoring": "Authored"
+              "authoring": "Authored",
+              "attachments": [
+                {
+                  "kind": "XpFarm",
+                  "key": "Plane of Sky"
+                }
+              ]
             }
           ]
         },
@@ -10392,6 +11274,12 @@
                   "url": "https://eqlwiki.com/Shadow_Knight_Plane_of_Sky_Tests",
                   "title": "Shadow Knight Plane of Sky Tests",
                   "retrievedAt": "2026-09-09"
+                }
+              ],
+              "attachments": [
+                {
+                  "kind": "GearUpgrade",
+                  "key": "Obtenebrate Mithril Guard"
                 }
               ]
             }
@@ -10510,7 +11398,13 @@
               "how": "",
               "who": "any Plane of Sky mob",
               "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
-              "authoring": "Authored"
+              "authoring": "Authored",
+              "attachments": [
+                {
+                  "kind": "XpFarm",
+                  "key": "Plane of Sky"
+                }
+              ]
             }
           ]
         },
@@ -10550,6 +11444,12 @@
                   "url": "https://eqlwiki.com/Shadow_Knight_Plane_of_Sky_Tests",
                   "title": "Shadow Knight Plane of Sky Tests",
                   "retrievedAt": "2026-09-09"
+                }
+              ],
+              "attachments": [
+                {
+                  "kind": "GearUpgrade",
+                  "key": "Pearlescent Pauldrons"
                 }
               ]
             }
@@ -10636,7 +11536,13 @@
               "how": "",
               "who": "any Plane of Sky mob",
               "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
-              "authoring": "Authored"
+              "authoring": "Authored",
+              "attachments": [
+                {
+                  "kind": "XpFarm",
+                  "key": "Plane of Sky"
+                }
+              ]
             }
           ]
         },
@@ -10674,6 +11580,12 @@
                   "url": "https://eqlwiki.com/Shadow_Knight_Plane_of_Sky_Tests",
                   "title": "Shadow Knight Plane of Sky Tests",
                   "retrievedAt": "2026-09-09"
+                }
+              ],
+              "attachments": [
+                {
+                  "kind": "GearUpgrade",
+                  "key": "Pegasus-Hide Belt"
                 }
               ]
             }
@@ -10760,7 +11672,13 @@
               "how": "",
               "who": "any Plane of Sky mob",
               "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
-              "authoring": "Authored"
+              "authoring": "Authored",
+              "attachments": [
+                {
+                  "kind": "XpFarm",
+                  "key": "Plane of Sky"
+                }
+              ]
             }
           ]
         },
@@ -10798,6 +11716,12 @@
                   "url": "https://eqlwiki.com/Shaman_Plane_of_Sky_Tests",
                   "title": "Shaman Plane of Sky Tests",
                   "retrievedAt": "2026-09-09"
+                }
+              ],
+              "attachments": [
+                {
+                  "kind": "GearUpgrade",
+                  "key": "Amulet of the Fang"
                 }
               ]
             }
@@ -10884,7 +11808,13 @@
               "how": "",
               "who": "any Plane of Sky mob",
               "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
-              "authoring": "Authored"
+              "authoring": "Authored",
+              "attachments": [
+                {
+                  "kind": "XpFarm",
+                  "key": "Plane of Sky"
+                }
+              ]
             }
           ]
         },
@@ -10922,6 +11852,12 @@
                   "url": "https://eqlwiki.com/Shaman_Plane_of_Sky_Tests",
                   "title": "Shaman Plane of Sky Tests",
                   "retrievedAt": "2026-09-09"
+                }
+              ],
+              "attachments": [
+                {
+                  "kind": "GearUpgrade",
+                  "key": "Bracelet of the Spirits"
                 }
               ]
             }
@@ -11008,7 +11944,13 @@
               "how": "",
               "who": "any Plane of Sky mob",
               "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
-              "authoring": "Authored"
+              "authoring": "Authored",
+              "attachments": [
+                {
+                  "kind": "XpFarm",
+                  "key": "Plane of Sky"
+                }
+              ]
             }
           ]
         },
@@ -11046,6 +11988,12 @@
                   "url": "https://eqlwiki.com/Shaman_Plane_of_Sky_Tests",
                   "title": "Shaman Plane of Sky Tests",
                   "retrievedAt": "2026-09-09"
+                }
+              ],
+              "attachments": [
+                {
+                  "kind": "GearUpgrade",
+                  "key": "Fairy-Hide Mantle"
                 }
               ]
             }
@@ -11164,7 +12112,13 @@
               "how": "",
               "who": "any Plane of Sky mob",
               "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
-              "authoring": "Authored"
+              "authoring": "Authored",
+              "attachments": [
+                {
+                  "kind": "XpFarm",
+                  "key": "Plane of Sky"
+                }
+              ]
             }
           ]
         },
@@ -11204,6 +12158,12 @@
                   "url": "https://eqlwiki.com/Shaman_Plane_of_Sky_Tests",
                   "title": "Shaman Plane of Sky Tests",
                   "retrievedAt": "2026-09-09"
+                }
+              ],
+              "attachments": [
+                {
+                  "kind": "GearUpgrade",
+                  "key": "Garduk"
                 }
               ]
             }
@@ -11323,7 +12283,13 @@
               "how": "",
               "who": "any Plane of Sky mob",
               "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
-              "authoring": "Authored"
+              "authoring": "Authored",
+              "attachments": [
+                {
+                  "kind": "XpFarm",
+                  "key": "Plane of Sky"
+                }
+              ]
             }
           ]
         },
@@ -11363,6 +12329,12 @@
                   "url": "https://eqlwiki.com/Shaman_Plane_of_Sky_Tests",
                   "title": "Shaman Plane of Sky Tests",
                   "retrievedAt": "2026-09-09"
+                }
+              ],
+              "attachments": [
+                {
+                  "kind": "GearUpgrade",
+                  "key": "Vermilion Sky Ring"
                 }
               ]
             }
@@ -11481,7 +12453,13 @@
               "how": "",
               "who": "any Plane of Sky mob",
               "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
-              "authoring": "Authored"
+              "authoring": "Authored",
+              "attachments": [
+                {
+                  "kind": "XpFarm",
+                  "key": "Plane of Sky"
+                }
+              ]
             }
           ]
         },
@@ -11521,6 +12499,12 @@
                   "url": "https://eqlwiki.com/Shaman_Plane_of_Sky_Tests",
                   "title": "Shaman Plane of Sky Tests",
                   "retrievedAt": "2026-09-09"
+                }
+              ],
+              "attachments": [
+                {
+                  "kind": "GearUpgrade",
+                  "key": "Warhammer of the Wind"
                 }
               ]
             }
@@ -11607,7 +12591,13 @@
               "how": "",
               "who": "any Plane of Sky mob",
               "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
-              "authoring": "Authored"
+              "authoring": "Authored",
+              "attachments": [
+                {
+                  "kind": "XpFarm",
+                  "key": "Plane of Sky"
+                }
+              ]
             }
           ]
         },
@@ -11650,6 +12640,12 @@
                   "url": "https://eqlwiki.com/Plane_of_Sky",
                   "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
+                }
+              ],
+              "attachments": [
+                {
+                  "kind": "GearUpgrade",
+                  "key": "Azure Ruby Ring"
                 }
               ]
             }
@@ -11768,7 +12764,13 @@
               "how": "",
               "who": "any Plane of Sky mob",
               "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
-              "authoring": "Authored"
+              "authoring": "Authored",
+              "attachments": [
+                {
+                  "kind": "XpFarm",
+                  "key": "Plane of Sky"
+                }
+              ]
             }
           ]
         },
@@ -11813,6 +12815,12 @@
                   "url": "https://eqlwiki.com/Plane_of_Sky",
                   "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
+                }
+              ],
+              "attachments": [
+                {
+                  "kind": "GearUpgrade",
+                  "key": "Belt of the Four Winds"
                 }
               ]
             }
@@ -11931,7 +12939,13 @@
               "how": "",
               "who": "any Plane of Sky mob",
               "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
-              "authoring": "Authored"
+              "authoring": "Authored",
+              "attachments": [
+                {
+                  "kind": "XpFarm",
+                  "key": "Plane of Sky"
+                }
+              ]
             }
           ]
         },
@@ -11976,6 +12990,12 @@
                   "url": "https://eqlwiki.com/Plane_of_Sky",
                   "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
+                }
+              ],
+              "attachments": [
+                {
+                  "kind": "GearUpgrade",
+                  "key": "Dagas"
                 }
               ]
             }
@@ -12094,7 +13114,13 @@
               "how": "",
               "who": "any Plane of Sky mob",
               "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
-              "authoring": "Authored"
+              "authoring": "Authored",
+              "attachments": [
+                {
+                  "kind": "XpFarm",
+                  "key": "Plane of Sky"
+                }
+              ]
             }
           ]
         },
@@ -12139,6 +13165,12 @@
                   "url": "https://eqlwiki.com/Plane_of_Sky",
                   "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
+                }
+              ],
+              "attachments": [
+                {
+                  "kind": "GearUpgrade",
+                  "key": "Fangol"
                 }
               ]
             }
@@ -12225,7 +13257,13 @@
               "how": "",
               "who": "any Plane of Sky mob",
               "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
-              "authoring": "Authored"
+              "authoring": "Authored",
+              "attachments": [
+                {
+                  "kind": "XpFarm",
+                  "key": "Plane of Sky"
+                }
+              ]
             }
           ]
         },
@@ -12268,6 +13306,12 @@
                   "url": "https://eqlwiki.com/Plane_of_Sky",
                   "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
+                }
+              ],
+              "attachments": [
+                {
+                  "kind": "GearUpgrade",
+                  "key": "Pauldrons of the Blue Sky"
                 }
               ]
             }
@@ -12354,7 +13398,13 @@
               "how": "",
               "who": "any Plane of Sky mob",
               "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
-              "authoring": "Authored"
+              "authoring": "Authored",
+              "attachments": [
+                {
+                  "kind": "XpFarm",
+                  "key": "Plane of Sky"
+                }
+              ]
             }
           ]
         },
@@ -12397,6 +13447,12 @@
                   "url": "https://eqlwiki.com/Plane_of_Sky",
                   "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
+                }
+              ],
+              "attachments": [
+                {
+                  "kind": "GearUpgrade",
+                  "key": "Runed Wind Amulet"
                 }
               ]
             }
@@ -12483,7 +13539,13 @@
               "how": "",
               "who": "any Plane of Sky mob",
               "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
-              "authoring": "Authored"
+              "authoring": "Authored",
+              "attachments": [
+                {
+                  "kind": "XpFarm",
+                  "key": "Plane of Sky"
+                }
+              ]
             }
           ]
         },
@@ -12526,6 +13588,12 @@
                   "url": "https://eqlwiki.com/Plane_of_Sky",
                   "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
+                }
+              ],
+              "attachments": [
+                {
+                  "kind": "GearUpgrade",
+                  "key": "Al`Kabor's Cap of Binding"
                 }
               ]
             }
@@ -12612,7 +13680,13 @@
               "how": "",
               "who": "any Plane of Sky mob",
               "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
-              "authoring": "Authored"
+              "authoring": "Authored",
+              "attachments": [
+                {
+                  "kind": "XpFarm",
+                  "key": "Plane of Sky"
+                }
+              ]
             }
           ]
         },
@@ -12655,6 +13729,12 @@
                   "url": "https://eqlwiki.com/Plane_of_Sky",
                   "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
+                }
+              ],
+              "attachments": [
+                {
+                  "kind": "GearUpgrade",
+                  "key": "Amulet of the Void"
                 }
               ]
             }
@@ -12741,7 +13821,13 @@
               "how": "",
               "who": "any Plane of Sky mob",
               "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
-              "authoring": "Authored"
+              "authoring": "Authored",
+              "attachments": [
+                {
+                  "kind": "XpFarm",
+                  "key": "Plane of Sky"
+                }
+              ]
             }
           ]
         },
@@ -12784,6 +13870,12 @@
                   "url": "https://eqlwiki.com/Plane_of_Sky",
                   "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
+                }
+              ],
+              "attachments": [
+                {
+                  "kind": "GearUpgrade",
+                  "key": "Augmentor's Mask"
                 }
               ]
             }
@@ -12902,7 +13994,13 @@
               "how": "",
               "who": "any Plane of Sky mob",
               "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
-              "authoring": "Authored"
+              "authoring": "Authored",
+              "attachments": [
+                {
+                  "kind": "XpFarm",
+                  "key": "Plane of Sky"
+                }
+              ]
             }
           ]
         },
@@ -12947,6 +14045,12 @@
                   "url": "https://eqlwiki.com/Plane_of_Sky",
                   "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
+                }
+              ],
+              "attachments": [
+                {
+                  "kind": "GearUpgrade",
+                  "key": "Nargon's Staff"
                 }
               ]
             }
@@ -13033,7 +14137,13 @@
               "how": "",
               "who": "any Plane of Sky mob",
               "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
-              "authoring": "Authored"
+              "authoring": "Authored",
+              "attachments": [
+                {
+                  "kind": "XpFarm",
+                  "key": "Plane of Sky"
+                }
+              ]
             }
           ]
         },
@@ -13076,6 +14186,12 @@
                   "url": "https://eqlwiki.com/Plane_of_Sky",
                   "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
+                }
+              ],
+              "attachments": [
+                {
+                  "kind": "GearUpgrade",
+                  "key": "Raiment of Thunder"
                 }
               ]
             }
@@ -13195,7 +14311,13 @@
               "how": "",
               "who": "any Plane of Sky mob",
               "where": "Plane of Sky - any isle; the zone page says most players farm the trash mobs on one of the early isles.",
-              "authoring": "Authored"
+              "authoring": "Authored",
+              "attachments": [
+                {
+                  "kind": "XpFarm",
+                  "key": "Plane of Sky"
+                }
+              ]
             }
           ]
         },
@@ -13240,6 +14362,12 @@
                   "url": "https://eqlwiki.com/Plane_of_Sky",
                   "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
+                }
+              ],
+              "attachments": [
+                {
+                  "kind": "GearUpgrade",
+                  "key": "Solidate Mithril Ring"
                 }
               ]
             }

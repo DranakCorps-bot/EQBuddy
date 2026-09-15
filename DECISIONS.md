@@ -6505,3 +6505,84 @@ a ticked HPS. The screen is a mutex (trap 61) and standing down whatever holds
 it is not a call this seat makes.
 
 — Dranak (Claude Code, DRA-81)
+
+---
+
+## 2026-09-14 — DRA-83 (the `GuideAttachment` hookup, DRA-70 plan D5): six calls made alone
+
+Founder LOCK, Paperclip DRA-83: *"product implement GuideAttachment →
+Executor. Soft LEAVE CEO code."* That routes the implementation straight to this
+seat, so no `FABLE.md` D5 plan stub was filed and no pre-implementation SIGN was
+waited on; Helm's SSC SIGN stays where the card's own acceptance puts it, before
+merge. Seat `opus-dra83-guideattachment` off Soft `main` `3174aa5f`. Live Holds
+empty at start, none naming DRA-83. Nothing here is on the consequence list: it
+reads this character's own log, dumps and catalogs EQBuddy ships, measures no
+other player, and sends nothing anywhere.
+
+**1. ONE PRODUCER, LITERALLY — `Recommendations.Attached` runs the SAME engine
+methods `Rank` does.** The acceptance said "the same Recommendations producer",
+and the cheap reading would have been a new module that asks similar questions
+of the same stores. It calls `LevelUp` and `FarmGear` — the two private methods
+the Helper room's own ranking calls — and hands back their `Recommendation`
+records untouched, so a guide row cannot word, weight or trim an answer
+differently from the room. The default it could have gone the other way on: a
+`GuideAttachment`-shaped engine of its own, which would have been a second
+sweep behind a reference field (trap 4 with a schema in front of it).
+
+**2. THE GUIDE NEVER SAYS MORE THAN THE ROOM WOULD.** Both engines shortlist
+(`PerEngineCandidates` = 6) and a gear row names three items, so a subject those
+caps did not reach gets NO answer on a guide row either. That is a decision:
+lifting the caps for this surface would make the walkthrough the loudest voice
+about a question the Helper room is the place to argue with. Silence is trap 73's
+own rule.
+
+**3. THE ENGINES' GAPS ARE DROPPED, AND THE ROOM KEEPS THEM.** "EQBuddy has
+never read an inventory dump" is a sentence about the whole evening; ninety-five
+guide rows repeating it is the room's empty state wallpapered down a checklist.
+So an unanswerable reference draws nothing at all. The other way — a per-row
+empty state — was rejected because the row already has a `StubNote` slot for
+"our data is thin here", and two kinds of apology on one row is not help.
+
+**4. THE CURATED CATALOG GOT TWO RULES AND 188 REFERENCES, NOT A SWEEP.**
+`GearUpgrade` on each Sky guide's turn-in step keyed on the reward ITEM (93 of
+95 — see 5), and `XpFarm` keyed on the zone on the ONE open-farm step of each of
+the 95, the step whose own `who` names no creature. The 127 Loot steps carry
+nothing: one named pull is not a camp. The epics carry nothing either — their
+steps are `Transcribed` prose, so which item a step hands over is not a field
+anybody authored, and reading it out of the sentence is the inference
+`Transcribed` exists to refuse. **`GearFarm` ships EMPTY on purpose:** it means
+"this step farms gear in this place" and no curated step does, so the engine
+answers the kind and the catalog points at nothing until a human authors one.
+`scripts/dra83-attachments.py` is committed as the record of the two rules — a
+hand-authored file gaining 188 rows is a claim somebody has to be able to
+re-derive.
+
+**5. THE TWO SKY REWARDS `ItemCatalog` CANNOT RESOLVE ARE NAMED IN A TEST
+RATHER THAN SKIPPED QUIETLY.** `Harmonic Spear` (the wiki's *Spear of Harmony*;
+PR #527 carries the rename) and `Windhowl/Spirit Render` (one checklist row
+standing for two items). Both are OUR naming bugs, not gaps in eqlwiki, so they
+carry no reference and `TheTwoUnresolvableSkyRewardsAreNamedAndCarryNoReference`
+asserts both ends — when either is fixed, the 93 moves and the test says so.
+
+**6. THE FLIP: `NoShippedGuideCarriesAnAttachmentYet` became a COUNT plus a
+RESOLVE.** Its own comment promised it would change the day the answering system
+existed, and D8 held it to this slice. "Every attachment resolves" passes
+beautifully on an empty file, so the count (93 / 95 / 0) is what notices a
+refresh or a bad merge dropping them, and the resolve is what notices a typo:
+a `GearUpgrade` key must be an item `ItemCatalog` holds, a zone key a zone the
+shipped `ZoneGraph` knows.
+
+**Verified to V2.** `scripts/check.ps1` all gates green; 4,954 unit tests pass;
+`GuideRowsTests` 15/15 in the launched app. **Prove-failed:** suppressing the
+projection's line reddens the new E2E with the live symptom
+(`shellQuestsHelperLines` stuck at 0 for 90 s), reverted and re-greened —
+green-only is vacuous coverage (trap 34).
+
+**Not done, and said out loud:** no staged screenshot of the new caption. The
+positive state needs two archived sessions in a named zone, which `shoot.ps1`
+stages through `Prime` (a whole app run per row) rather than through
+`SeedStoredSession`; the E2E asserts the same two numbers from one moment
+instead (trap 56). The screen is a mutex (trap 61) and a shot recipe for this is
+its own change.
+
+— Dranak (Claude Code, DRA-83)

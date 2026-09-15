@@ -70,7 +70,26 @@ public sealed record QuestChecklistRow(
     /// and the router writes nothing; a box that moved would be a fourth door disagreeing with
     /// three that already exist. A surface draws the count and its own +1, never a checkbox —
     /// a checkbox that silently ignores clicks is the broken kind of no-op.</para></summary>
-    string LedgerItemName = "");
+    string LedgerItemName = "",
+    /// <summary>What the HELPER says about the subject this step points at — already worded,
+    /// empty on the overwhelming majority of rows (DRA-83, the DRA-70 plan's D5).
+    ///
+    /// <para>Filled only where the curated catalog placed a <c>GuideAttachment</c> AND this
+    /// character's own play gave <c>Recommendations.Attached</c> something to answer with, so
+    /// an empty string is the normal state and not a gap: see that method for why silence beats
+    /// an empty-state sentence repeated down a checklist.</para>
+    ///
+    /// <para><b>It is a fact about the PLAYER'S HISTORY, never about our data or their
+    /// progress.</b> A row carrying it ticks exactly like one that does not, which is why it
+    /// rides here and is never mapped onto <c>QuestPresentation.State</c> — the same reason
+    /// <see cref="StubNote"/> does not.</para>
+    ///
+    /// <para>One field with two renderings, like <see cref="GuideFacts"/>: the desktop draws it
+    /// under the row and the phone draws it in the row's block. It is NOT hover-only — the
+    /// phone has no hover and an affordance it cannot honour is a lie with the right shape
+    /// (trap 35) — and the sentence naming the Helper room is deliberately not a link, because
+    /// one of the three surfaces cannot open one.</para></summary>
+    string HelperAnswer = "");
 
 /// <summary>
 /// The active-step card: what the player should do NEXT in one guided reward, lifted out of

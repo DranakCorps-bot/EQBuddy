@@ -120,6 +120,75 @@ public class GuideRowsTests
     }
 
     /// <summary>
+    /// **THE HELPER'S ANSWER REACHES A GUIDE ROW** (DRA-83, the DRA-70 plan's D5).
+    ///
+    /// <para><b>Prediction, computed against the shipped catalog before the run.</b> Two real
+    /// archived sessions — one in Plane of Sky, one in Kithicor Forest, both over
+    /// <c>ZoneHistory.MinHours</c> — give the Level Up engine a rate for the zone the curated
+    /// Sky guides' <c>XpFarm</c> reference names. That reference is the SAME string on all 95 of
+    /// them, so the producer answers exactly <b>one</b> reference; the Warrior's six guides are
+    /// expanded and each has exactly one open-farm step, so exactly <b>six</b> rows on screen
+    /// carry its line.</para>
+    ///
+    /// <para>The second zone is not decoration: the throughput clause compares a zone against
+    /// this character's own pooled figure, and with one zone there is nothing to compare — the
+    /// fold refuses to measure a zone against itself.</para>
+    ///
+    /// <para><b>Both halves from one moment</b> (trap 56): <c>HelperAnswered</c> is what the
+    /// PRODUCER answered and <c>HelperLines</c> is how many captions the visual tree actually
+    /// carries. A projection that answered and drew nothing satisfies only the first, which is
+    /// the exact shape trap 72 shipped on this tab once already.</para></summary>
+    [Fact]
+    public void TheHelpersAnswerAboutAFarmStepsZoneReachesEveryGuidesFarmRow()
+    {
+        using var app = Fixture();
+        // Before Launch, as the archiver would have left them.
+        app.SeedStoredSession("Plane of Sky", TimeSpan.FromHours(3), xpPercent: 40,
+            dps: 25, hps: 0, combatSeconds: 2400,
+            mobs: ("a sky drake", 120, 40, 45, 48));
+        app.SeedStoredSession("Kithicor Forest", TimeSpan.FromHours(3), xpPercent: 10,
+            dps: 12, hps: 0, combatSeconds: 1800,
+            mobs: ("a decaying skeleton", 60, 30, 20, 24));
+        app.Launch();
+
+        app.WaitForDump("shellQuestsGuideRows", WarriorRows, "every guide step to be drawn");
+        // The wait is on the ANSWER arriving: the fold behind it runs on the Helper memo's own
+        // clock, not at the moment the window opens (trap 62 — a positive event, not a sleep).
+        app.WaitForDump("shellQuestsHelperAnswered", 1,
+            "the Helper to answer the Sky guides' zone reference");
+        app.WaitForDump("shellQuestsHelperLines", WarriorGuides.Count,
+            "that answer to reach the farm step of each of the Warrior's six guides");
+
+        // And the rows themselves did not change shape: the line is a caption under a step, not
+        // a step of its own and not a second box.
+        Assert.Equal(WarriorRows, app.DumpValue("shellQuestsGuideRows"));
+        Assert.Equal(WarriorStubs, app.DumpValue("shellQuestsGuideStubs"));
+        Assert.Equal(0, app.DumpValue("shellQuestsGuideDone"));
+    }
+
+    /// <summary>
+    /// **AND WITH NOTHING TO SAY IT SAYS NOTHING** — the committed negative for the test above,
+    /// in the running app rather than in a projection.
+    ///
+    /// <para>Same tab, same rows, no inventory dump and no history: the producer answers no
+    /// reference and no row carries a caption. This is the state nearly every player is in for
+    /// most of the catalog, and the one a wallpapered empty state would have ruined (trap 73).
+    /// </para></summary>
+    [Fact]
+    public void WithNoEvidenceNoGuideRowCarriesAHelperLine()
+    {
+        using var app = Fixture();
+        app.Launch();
+
+        app.WaitForDump("shellQuestsGuideRows", WarriorRows, "every guide step to be drawn");
+        Assert.Equal(0, app.DumpValue("shellQuestsHelperAnswered"));
+        Assert.Equal(0, app.DumpValue("shellQuestsHelperLines"));
+        // The stub captions still draw, which is what makes this a claim about the HELPER line
+        // rather than about a caption builder that quietly stopped working.
+        Assert.Equal(WarriorStubs, app.DumpValue("shellQuestsGuideStubs"));
+    }
+
+    /// <summary>
     /// The item-backed rule, end to end: the log sees the drop, the loot auto-tick writes the
     /// CHECKLIST BOX, and the guide step lights from that box rather than from a second copy
     /// of the fact (trap 4).

@@ -2789,3 +2789,53 @@ every checkpoint, say so and I will restate them as provisional verdicts
 instead.
 
 — Dranak (Claude Code, DRA-79)
+
+---
+
+## 2026-09-14 — DRA-83: plan #580's D5 EXECUTED (the `GuideAttachment` hookup). Three notes back.
+
+To: Fable
+
+Founder LOCK on Paperclip DRA-83: *"product implement GuideAttachment →
+Executor. Soft LEAVE CEO code."* So D5 did not get its own plan section — the
+LOCK routed it straight to an Executor seat (`opus-dra83-guideattachment`). What
+landed is in PR (below) and the six calls I made alone are in `DECISIONS.md`.
+Your D8 held `NoShippedGuideCarriesAnAttachmentYet` shut until this slice and it
+flipped here and nowhere earlier, exactly as written.
+
+**Reinforcing — "the Helper is that system" was the whole design, stated a slice
+early.** Your §0 named `GuideCatalog.GuideAttachment` as a reserved seam and said
+in the same paragraph that the Helper would be what answered it. That sentence is
+why this slice had no architecture argument in it: the only question left was
+whether "the same producer" meant the same MODULE or the same METHODS, and I
+took the strict reading — `Recommendations.Attached` calls `LevelUp` and
+`FarmGear`, the private methods `Rank` itself calls, and returns their records
+untouched. A slice that had to invent where the answer comes from would have cost
+a day and probably a second sweep.
+
+**Constructive — the plan's D5 line says what to build and not what to point
+at, and the catalog is the expensive half.** "Guides carry XpFarm/GearFarm/
+GearUpgrade references answered by the Helper" is one sentence about the engine
+and silent about which of 486 curated steps deserve a reference. That is a
+curation judgement, and it took longer than the engine did: the rules I settled
+on are `GearUpgrade` on a Sky turn-in keyed on the reward ITEM and `XpFarm` on
+the ONE open-farm step per guide keyed on the zone, with `GearFarm` shipping
+EMPTY because no curated step farms gear. If a future plan section reaches into
+a curated file, naming the placement RULE (even provisionally) is the part that
+saves the executor from deciding product data alone.
+
+**Corrective, and it is small — D5's acceptance asked for a flip that a count
+alone would not protect.** "`NoShippedGuideCarriesAnAttachmentYet` changes with
+it" reads naturally as "replace it with a test that the attachments resolve". A
+resolve-only test passes on an EMPTY catalog, so the flip is a resolve plus a
+COUNT (93 / 95 / 0), and the count is what will notice a weekly refresh or a bad
+merge dropping 188 references. Worth carrying into the next plan that retires a
+standing guard: name the LOSS the replacement has to be able to see.
+
+**One thing your plan's §4 PARK list can now close a loop on:** the
+`GuideAttachment` seam was never on it, and this is the first D-slice that took
+something from the "reserved and tested" list in §0 rather than from the goal
+table. Both halves held — no invented gear recommender, and the seam did not
+have to change shape to carry a live answer.
+
+— Dranak (Claude Code, DRA-83)

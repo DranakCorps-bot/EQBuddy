@@ -402,7 +402,20 @@ public sealed record CompanionChecklistRow(
     ///
     /// <para>The row's <see cref="Detail"/> carries the count instead, so the row still answers
     /// "where am I with this" without offering a door that goes nowhere.</para></summary>
-    bool Tickable = true);
+    bool Tickable = true,
+    /// <summary>What the HELPER says about the subject this step points at, already worded
+    /// (DRA-83) — <c>QuestChecklistRow.HelperAnswer</c>, straight through.
+    ///
+    /// <para>Null on nearly every row, and <c>JsonIgnoreCondition.WhenWritingNull</c> is why that
+    /// matters: a first pairing ships every row (trap 67), and a reference the Helper cannot
+    /// answer must cost nothing on the wire.</para>
+    ///
+    /// <para><b>Every sentence in it rides the wire</b> and none is spelled in
+    /// <c>index.html</c> (trap 32): the page cannot re-fetch itself, so a phone running last
+    /// month's page still shows this month's answer. The sentence naming the Helper room is
+    /// deliberately not a link — the phone's own Helper screen is READ-ONLY and the pickers
+    /// behind an answer live on the PC (trap 35).</para></summary>
+    string? Helper = null);
 
 // ---------------- quests (General · Epic 1.0 · Plane of Sky) ----------------
 
