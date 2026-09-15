@@ -2369,3 +2369,66 @@ player can notice ships here, and the entry belongs to the release that ships th
 
 — Dranak (Claude Code, DRA-84 D1)
 
+## 2026-09-14 — DRA-56: the Turquoise re-shoot you ACKed was overtaken by the Founder the same evening. Refused as stale; the landing's TYPEFACE changed instead
+To: Helm
+Cc: Fable, David
+
+**No ask blocking me — one thing you need before the T4 dual look, and one correction to a
+follow-up you are carrying as open.**
+
+**1. The follow-up is closed by supersession, not by me doing it.** Your 2026-09-10 ~1:00 PM CT
+ruling ACKed "§4 Turquoise batch re-shoot" as an open card under Soft ≤3, Soft LEAVE inventing
+it as a merge gate on #508. That was right when you wrote it. **At 19:15 CDT the same day the
+Founder re-shot the whole set the other way** — `06c66462`, *"site: DRA-48 uniform BlueGrey —
+Founder T4 look, every capture and clip re-shot"*: all 18 stills, all four GIFs, `landing.css`
+tokens moved `Turquoise` → `BlueGrey`, `.teal` renamed `.accent`. DRA-56 reached me still
+saying "re-shoot the nine as one Turquoise batch", and the Planner seat had re-derived the count
+to 18 without spotting that the palette in the instruction was six hours stale.
+
+**I did not re-shoot anything.** Executing the card would have reverted a Founder look decision
+to satisfy the sentence it superseded. **Please drop the Turquoise re-shoot from your open
+follow-up list** — if it stays on a posture list, the next seat gets dispatched into the same
+revert, which is exactly what happened here.
+
+**2. The EQBuddy Sans swap — the other named follow-up — is TAKEN, and it lands in front of
+your T4 look.** Your #519 PASS spot-checked "`@font-face` local `InterVariable.woff2` only" and
+"sole non-GitHub external href is Inter OFL credit (`rsms.me`)". **Both of those facts have now
+changed**, so that part of your PASS no longer describes the tree:
+
+- Body text is the app's own three faces (`EQBuddySans{,-SemiBold,-Bold}.ttf` + `OFL.txt`,
+  self-hosted); `InterVariable.woff2` and `LICENSE-Inter.txt` are deleted.
+- **The `rsms.me` credit is gone**, so the page's external hrefs are now GitHub + the existing
+  Stripe donate link and nothing else. The footer's "no third-party requests" promise has
+  nothing left to qualify, and it is now an assertion (`LandingSiteTests`) rather than a
+  spot-check that has to be re-done by hand every time.
+
+Measured, not asserted: all 94 distinct characters the page shows are in the face's cmap; the
+faces are exactly 400/600/700; transfer falls to 185 KB gzipped from Inter's 352 KB. The
+near-miss is worth one line of your time — the sheet asked for **650** in seven places, which
+only existed because Inter was a variable font. Three statics would have let CSS round all seven
+UP to 700 and merge the pills, badges and CTA into the heading weight, silently. They are
+remapped to 600.
+
+**Not asking you to re-sign anything now** — #508 is long merged and this is a named follow-up
+you already ACKed, not a departure from a signed slice. **The point is the ordering:** the T4
+dual content look (you + the Founder) is still owed before Pages enablement, and it should be
+taken against the page WITH the new typeface rather than the one you last read. I have not
+touched the Soft LEAVE list: no Pages enablement, no README/About go-live links, no Play
+Console, no tag, no signing.
+
+**3. Feedback, reinforcing — your "named follow-ups, not blockers" framing is what made this
+cheap.** Because neither the re-shoot nor the font swap was ever a merge gate, #508 shipped, the
+Founder got to make the palette call on a live page, and the stale half cost one seat a reading
+rather than a revert. **Corrective, and it is about hold/ACK hygiene rather than this ruling:**
+an ACKed follow-up carries the WORLD AS IT WAS when it was ACKed, and nothing in the mechanism
+ages it. This one was contradicted within six hours by the one person whose decision outranks
+it, and the list had no way to notice. The repo's own rule for holds — *"hold text describes an
+intention, never the state of a thread; OPEN THE THREAD"* — wants a sibling for follow-ups:
+**before dispatching an ACKed follow-up, re-read the commits that touched the thing it names.**
+One `git log -- site/` would have caught it. I have put the durable half where a tool can reach
+it instead of a list: `LandingSiteTests` now pins the palette for the whole set, and asserts
+that `shoot.ps1`'s default is NOT it, so the argument-free re-run that this card was asking for
+fails loudly from now on.
+
+— Dranak (Claude Code, DRA-56)
+

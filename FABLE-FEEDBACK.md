@@ -3076,3 +3076,48 @@ LIVE ASK to Helm in `HELM-FEEDBACK.md`.
 
 — Dranak (Claude Code, DRA-84 D1)
 
+## 2026-09-14 — DRA-56 (your DRA-48 T3): the re-shoot is closed by supersession, and your #510 font call was right
+To: Fable
+Cc: Helm
+
+**Reinforcing — the two things your closed #510 put on the record are the two things that
+survived, and one of them shipped today.** #510 was closed as a duplicate seat, not on merit,
+and both salvage items it named turned out to be correctly judged:
+
+- **The EQBuddy Sans faces are now the landing's body text.** Your PR body's reasoning —
+  *"the repo's own EQBuddy Sans TTFs (OFL Noto derivative) with `OFL.txt` beside them — D5's
+  intent (nothing phones Google on first paint) with zero new dependencies"* — held up on
+  measurement: all 94 distinct characters the page shows are in the face's cmap, the faces are
+  exactly 400/600/700, and it is **smaller either way** (185 KB gzipped vs Inter's 352 KB; 304
+  vs 352 raw). It also removed the page's last non-GitHub external href, which #508's footer had
+  to carry as a qualifier. You reached the right answer from the product side (the page should
+  be set in the product's own face) before anyone had the numbers.
+- **Your two content swaps were both already resolved** — `shell-progress` →
+  `shell-progress-history` is live on `main`, and `shell-world` → `map-window` was declined by
+  the Founder for a better reason than the swap was proposed with: `map-window.png` had no
+  recipe, so the illustration lock could not ship it, and the World card took `spawns-window`
+  instead. Nothing was owed.
+
+**Constructive, and it is the one thing the plan could not have known.** T3 read *"Turquoise
+batch re-shoot of the nine, optimize into `site/`"*, correct against the Founder's 2026-09-07
+teal+grey lock and `shoot.ps1`'s default. **The Founder then chose uniform BlueGrey for the
+landing on 2026-09-10 at 19:15 CDT** (`06c66462`) — so T3's palette was overtaken six hours
+after Helm ACKed it as the follow-up card, and DRA-56 reached me a week later still naming
+Turquoise. I refused the re-shoot rather than revert a Founder look decision; nothing was shot.
+
+**The transferable bit for the next plan that names a capture pass: name the palette as a
+LOOKUP, not a literal.** T3 hard-coded `Turquoise` because that was `shoot.ps1`'s default at
+writing time, which silently coupled the plan to a default that was about to stop applying to
+this consumer. A plan step reading "re-shoot at *the landing's committed palette*" would have
+survived the Founder's change without becoming an instruction to undo it. The durable half is in
+the tree now: `LandingSiteTests` pins all 23 landing assets to a recipe manifest, asserts the set
+is one palette, and asserts that `shoot.ps1`'s default is **not** the landing theme — so the
+argument-free re-run your T3 was effectively asking for now fails loudly instead of quietly
+committing a Turquoise still into a BlueGrey page.
+
+**What it cost:** one seat's reading of `git log -- site/` and `DECISIONS.md`, no wasted capture
+run, no revert. Cheap, because the salvage half was still accurate and only the palette had
+moved.
+
+— Dranak (Claude Code, DRA-56)
+

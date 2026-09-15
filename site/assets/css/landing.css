@@ -2,10 +2,31 @@
    onto the Founder example chrome (FABLE.md plan §3, DRA-48; uniform BlueGrey
    per the Founder T4 look, 2026-09-10). */
 
+/* The app's own bundled face (DRA-56, salvaged from the closed #510). Three STATIC
+   faces where Inter was one variable file, so every weight this sheet asks for has a
+   real face behind it — 400/600/700, measured off the TTFs. There is no 650 face and
+   CSS would round one UP to 700, collapsing the pills into the headings, so the seven
+   650s below are mapped to 600 deliberately. */
 @font-face {
-  font-family: "Inter";
-  src: url("../fonts/InterVariable.woff2") format("woff2");
-  font-weight: 100 900;
+  font-family: "EQBuddy Sans";
+  src: url("../fonts/EQBuddySans.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "EQBuddy Sans";
+  src: url("../fonts/EQBuddySans-SemiBold.ttf") format("truetype");
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "EQBuddy Sans";
+  src: url("../fonts/EQBuddySans-Bold.ttf") format("truetype");
+  font-weight: 700;
   font-style: normal;
   font-display: swap;
 }
@@ -36,7 +57,7 @@ body {
   margin: 0;
   background: var(--deep);
   color: var(--text);
-  font-family: "Inter", "Segoe UI", system-ui, sans-serif;
+  font-family: "EQBuddy Sans", "Segoe UI", system-ui, sans-serif;
   font-size: 16px;
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
@@ -95,7 +116,7 @@ body {
   display: flex;
   align-items: center;
   gap: 8px;
-  font-weight: 650;
+  font-weight: 600;
   color: var(--text);
   text-decoration: none;
   padding-right: 10px;
@@ -228,7 +249,7 @@ section h2 { font-size: clamp(26px, 4vw, 36px); line-height: 1.15; margin: 0 0 1
   color: var(--text);
   font-size: 13.5px;
 }
-.pill b { color: var(--accent); font-weight: 650; }
+.pill b { color: var(--accent); font-weight: 600; }
 
 /* Honest KPI band */
 .kpis {
@@ -335,7 +356,7 @@ figcaption.cap, .cap { font-size: 12.5px; color: var(--muted); margin-top: 8px; 
   padding: 2px 10px;
   border-radius: 999px;
   font-size: 11.5px;
-  font-weight: 650;
+  font-weight: 600;
   letter-spacing: 0.05em;
   vertical-align: 1px;
 }
@@ -433,7 +454,7 @@ figcaption.cap, .cap { font-size: 12.5px; color: var(--muted); margin-top: 8px; 
   margin-top: 16px;
   padding: 10px 20px;
   border-radius: 999px;
-  font-weight: 650;
+  font-weight: 600;
   font-size: 14.5px;
   text-decoration: none;
 }
@@ -652,9 +673,9 @@ a { color: var(--accent); }
 }
 .tbl-wrap tr:last-child td { border-bottom: none; }
 .tbl-wrap td strong { color: var(--text); }
-.tick { color: var(--good); font-weight: 650; }
-.cross { color: var(--alert); font-weight: 650; }
-.part { color: var(--warn); font-weight: 650; }
+.tick { color: var(--good); font-weight: 600; }
+.cross { color: var(--alert); font-weight: 600; }
+.part { color: var(--warn); font-weight: 600; }
 
 @media (max-width: 1030px) {
   .dive-shell { grid-template-columns: 1fr; gap: 20px; }
