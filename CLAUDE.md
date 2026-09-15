@@ -1045,6 +1045,31 @@ after the named guard left with its surface.
     (`Select-MergeSyncIssue`; reverting the flatten reddens it with the live
     symptom). [Novel](docs/ops/claude-archive/traps.md#trap-80)
 
+81. **A dashboard may report an absence; it may never FREEZE one.** `exo-metrics.ps1`
+    returned `$null` from `Invoke-Paperclip` for three different worlds — no
+    credentials, the GET threw, and no matching record — and the callers gated on
+    `$null -ne`. With `PAPERCLIP_API_URL` set to `localhost` against an API that
+    binds a tailnet address, every read was refused, the Paperclip-derived rows
+    computed as absent, and `-Baseline` **froze GWR 0.51 and printed its success
+    line** — against the file's own header promising `unmeasured` with the reason,
+    "never `0`". Measured: pre-fix + unreachable freezes `0.5051`; reachable is
+    `0.4946`. The failure is now a VALUE (`Ok`/`NotConfigured`/`Unreachable`, with
+    `NoRecord` the caller's to declare), and **the guard lives inside the writer**
+    (`Write-BaselineFreeze`), so there is no path to the file that skips it — a
+    `-Baseline` run with any unreachable input writes NOTHING and exits 3.
+    `-NoPaperclip` is the one explicit door. **The asymmetry is the rule:** reading
+    a stale number is recoverable, but a baseline is what every later claim is
+    checked against, so freezing an unmeasured one poisons every comparison that
+    cites it — and it does so silently, forever. Trap 11's shape (evidence only one
+    side can produce) wearing trap 64b's clothes (a `$null` proxy for a fact nobody
+    named). **And the printed recipe must regenerate the file it is printed in:**
+    section 8 dropped `-WindowLabel`, so a labelled dashboard regenerated without
+    its work-item names and the first diff to notice would have gone red for a
+    reason that says nothing about metrics (trap 74). Guard: `-SelfTest` arms 9–12
+    — a REAL socket to a dead port, the refusal predicate's four corners, and
+    `Write-BaselineFreeze` asserted to leave no file behind. Prove-failed against
+    four mutants. [Novel](docs/ops/claude-archive/traps.md#trap-81)
+
 New trap discovered the hard way? Add the compact rule here and the novel
 under `docs/ops/claude-archive/traps.md`. That is the whole point.
 
