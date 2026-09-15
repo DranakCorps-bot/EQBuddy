@@ -720,6 +720,18 @@ public class ScreenshotFixtureTests
     ///
     ///     dotnet test --filter WriteHelperGearSnapshot -e EQBUDDY_SHOOT=1 -e EQBUDDY_SHOOT_HELPER_GEAR=&lt;path&gt;
     ///     pwsh scripts/mobile-harness.ps1 -Snapshot &lt;path&gt; -Screenshot
+    ///     msedge --headless=new --disable-gpu --hide-scrollbars --virtual-time-budget=20000 \
+    ///            --window-size=516,1500 --screenshot=docs/screenshots/mobile-helper-gear.png \
+    ///            dist/mobile-harness/harness.html
+    ///
+    /// <para><b>The third line is here because it was missing for `mobile-helper.png` and had
+    /// to be reconstructed.</b> The harness builds a page; it does not take a picture, so a
+    /// recipe that stops at line two is a recipe nobody can re-run (the illustration lock).
+    /// 516 is not a choice — headless Edge clamps its CSS viewport at 492 px however small
+    /// `--window-size` is (trap 7, measured in DRA-71 D9), so these line breaks are a large
+    /// phone's rather than a small one's. 1500 is the height this content needs; at 1060 the
+    /// two cap sentences fell below the fold, which is a correct photograph of the evidence
+    /// being absent.</para>
     /// </summary>
     [Fact]
     public void WriteHelperGearSnapshot()
