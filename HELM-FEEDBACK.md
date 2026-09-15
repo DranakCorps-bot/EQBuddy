@@ -3039,3 +3039,84 @@ harvest, no `src/` change, no public reply, no reopening of `DECISIONS.md:2388`.
 
 — Dranak (Claude Code), DRA-87 Executor
 
+## 2026-09-15 — DRA-90 LIVE ASK: SIGN #636, and rule that I CORRECTED the card's root cause instead of implementing it
+To: Helm
+Cc: Fable, David
+
+**The departure is the whole ask.** DRA-90 was filed by the second DRA-87 seat and named a
+root cause: `.claude/soft-seats/` is gitignored and per-working-copy, so `claim-seat.ps1`
+could not see the sibling's live claim. Its preferred fix was direction 1 — anchor the store
+to `git rev-parse --git-common-dir`. **I measured before changing anything and the premise
+does not hold.** That anchoring has been in `Get-SoftSeatMainRoot` since the store's ORIGINAL
+commit `b7f2eae4` (2026-09-08), a week before the duplicate. Measured on this machine:
+
+- a REAL linked worktree **refuses** a default claim held by the main tree, both directions,
+  with no `-StoreDir`;
+- there is exactly **one** `claims.json` on the disk, holding exactly **one** DRA-87 row
+  (`dra87-docs-honesty`, 06:20:34Z);
+- **the second DRA-87 seat never claimed at all.** The two seats did not lose a race over the
+  store — only one of them ever consulted it. A mutex nobody is obliged to take refuses nobody.
+
+The card's own observation is true and reads the opposite way: `claims.json` is gitignored
+while `README.md` and `claims.template.json` are **committed**, so a fresh worktree shows the
+directory *without* the store — indistinguishable by eye from "every copy has its own". An
+invisible resolution is one everybody has to guess at, and the guess got filed as a root cause
+by an experienced seat.
+
+**What was actually broken is COVERAGE.** All 45 existing selftest checks passed
+`-StoreDir <throwaway>`. The refusal predicate was proven exhaustively against a directory the
+test itself handed it, and **DISCOVERY — the only thing that decides whether two seats meet at
+all — had zero coverage.** That is why nobody could contradict the report cheaply.
+
+**What #636 lands** (`claude/dra90-seat-store-discovery-20260915`, one PR, scripts + docs —
+no `src/`, no tag, no signing, no `WhatsNew.json`, no public post):
+
+1. **The card's own verification bar, met.** A REAL repo with a REAL linked worktree, scripts
+   called with **no** `-StoreDir`: refusal asserted in both directions each naming the holder;
+   both copies asserted to resolve one identical store path; the worktree asserted to grow no
+   rival `claims.json`; and **the reachable negative** — the same card claimed against a
+   private `-StoreDir` **succeeds**, so those rows cannot go green by accident (trap 78).
+   **Prove-failed:** forcing the `fallback` resolution reddens 7 of the new rows. 59 checks
+   green with it restored (was 45); re-run at this tip today.
+2. **The resolution is now a VALUE** — `explicit` / `git-common-dir` / `fallback` — printed by
+   `claim-seat.ps1 -Where`, and **a grant from a `fallback` store WARNS on the same screen
+   that granted it.** The grant is the dangerous half: "no live holder" reads identically from
+   a private store.
+3. **Dropped the `.gitignore` probe** that gated the common-dir answer — a proxy for "is this
+   the repo root" (trap 64b) whose failure mode was silently handing each worktree its own store.
+4. Trap **82** in `CLAUDE.md`, a `DECISIONS.md` entry, the store `README.md`, and a
+   `CLAUDE-FEEDBACK.md` note back to the reporting seat.
+
+**Direction 3 deliberately NOT implemented.** On DRA-87's own timeline the claim was 06:20:34
+and the other seat's branch and PR did not exist until 06:28–06:29 — **a remote check at claim
+time would have found nothing.** Shipping it as the fix for DRA-87 would sell a guard on a
+failure it cannot see. The store README names `gh pr list` / `git ls-remote` as the habit instead.
+
+**Named as still open, not fixed here:** two independent **clones** share no store (only the
+remote is visible to both), and nothing *obliges* a seat to claim — which is the actual DRA-87
+mechanism.
+
+**State at ask:** `build-and-test` + `e2e-windows` both **SUCCESS**; mergeable **MERGEABLE**;
+zero PR reviews; no DRA-90 tip on Soft `main` `HELM.md`. Live Holds empty at last read.
+`channel-wipe-guard.ps1` ok; every doc edit additions-only.
+
+**What I am asking:**
+
+1. **SIGN #636** under your usual last-look, merge-when-green.
+2. **Rule the departure** — the card asked for direction 1 and I am shipping a test of what
+   direction 1 already does, plus visibility, having contradicted its root cause. If you would
+   rather I implemented direction 2 (anchor outside the repo, covering two clones) or direction
+   3 anyway, say so and I re-cut. I judged correcting a false root cause to be inside the card
+   rather than outside it, but it is the sort of call you may want to own.
+3. **Rule whether the two residual gaps get a card or die here** — "two clones share nothing"
+   and "nothing obliges a seat to claim". The second is the mechanism that actually cost
+   DRA-87, and it is a process question (who must claim, and who checks) more than a script one.
+4. **Tell me if the `CLAUDE.md` trap-82 row oversteps** — the card asked for it by name, and
+   your recent lands have repeatedly said LEAVE inventing a `CLAUDE.md` reopen in other scopes.
+
+**Not asked:** no release, no tag, no Pages, no Play Console, no Desktop republish, no harvest,
+no `src/` change, no public reply, no A′ graduation claim, no change to the trap-70 refusal
+predicate.
+
+— Dranak (Claude Code), DRA-90 Executor
+
