@@ -2773,3 +2773,84 @@ because I am asking for one.**
 **Not asked:** no release, no tag, no Pages, no Play Console, no Desktop republish, no harvest.
 
 — Dranak (Claude Code, DRA-84 D4)
+
+---
+
+## 2026-09-15 — DRA-84 D5 REPORT (not a LIVE ASK): the re-smoke found D4's phone half drawing four sentences of five, and I FIXED it rather than filing it. One HOLD surface named.
+
+To: Helm
+
+**State.** #633 merged to Soft `main` as `1c00e298` — both gates green, per your ~11:55 PM CT
+SIGN (merge-when-green). `opus-dra84-d4` RELEASED as DISCHARGED, exactly as that ruling said.
+`opus-dra84-d5` claimed; D5 is the last row of the plan's table and is authorized by the #623
+whole-sequence SIGN, so this is a report rather than a request to start. Live Holds empty at
+the ref I based on. Nothing here touches Pages, Play Console, tag, `release.ps1`, signing,
+prod secrets, Founder mail, Desktop republish, the harvest, the promoter, or any eqlwiki
+request — **zero fetches of any kind**.
+
+### 1. The finding, and the one thing in this slice you may read as a departure
+
+**D4's withheld sentence never reached the phone's screen.** It reached the wire
+(`CompanionProjection.Helper` line 68), reached the section fingerprint (line 244), and passes
+`AWithheldDropOfferSaysSoOnThePhoneToo` — which compares the PROJECTION to
+`HelperPresentation` and never to the page. `index.html` drew
+`[moneyNote, cap, gearWithheld, gearBandRefused]` and stopped. So five drop offers left the
+phone's list in total silence while the PC beside it said exactly why.
+
+That is trap 50's failure on the surface where the reader has no PC to notice, and it is
+D4's own acceptance item 2 — the one you signed — being false on one of the two screens.
+
+**I fixed it here: one line of the page, plus the page-side must-list extended from one gear
+caption to all five, prove-failed against the pre-fix page.** The must-list is why it shipped
+at all (trap 34): it was written when the Helper had ONE gear caption, D2 added
+`gearBandRefused`, D4 added `gearWhoWithheld`, neither added a row, and the page happened to
+draw the first and not the second.
+
+**The departure surface, named rather than assumed away.** P6's declared content is *"re-smoke
+pack + WhatsNew + Founder checklist"*, and a product fix to `index.html` is not literally in
+that list. My reading is that it is P3's *"the same words ride the wire (trap 32)"* delivered
+late rather than new scope — same sentence, same acceptance item, no new engine, no new
+weight, no re-ranking, and D4's shipped `WhatsNew` entry already promises that sentence to
+everyone. **If you read it as outgrowing D5's declared boundary, the remedy is cheap and I
+will take it either way:** the page fix and its guard revert as one commit and the defect
+becomes a named follow-up slice. Say so and it is done; a HOLD naming DRA-84 D5 binds me the
+same.
+
+### 2. What else is in it
+
+- **The phone picture** (`mobile-helper-gear.png`), staged through the real projection against
+  the REAL shipped catalog. **Its numbers are predicted from the committed E2E row's**, not
+  from a run: three zones, six creature clauses, five withheld, 89 capped. First draft was
+  WRONG — it left `MyClasses` empty and produced a real screen of a different character — and
+  the fixture moved rather than the number (trap 23). It deliberately carries no band sentence:
+  unknown level, gate stood down, and staging one would have re-ranked the zones into numbers
+  nothing else had computed. Same 492 px viewport caveat as `mobile-helper.png`: 516×1500.
+- **`helperBandRefusals`** — D2's E2E asserted a COUNT, which stays true of a gate that read
+  the wrong band or fired the wrong arm. The new fact carries what the gate COMPARED
+  (`TempleofVeeshan:60+:BottomOver,Veeshan'sPeak:60+:BottomOver`) beside the level already
+  asserted, so a `TopUnder` there would be your signed open-top ruling broken with both counts
+  still green.
+- **`docs/ops/dra84-founder-resmoke.md`** — acceptance 1–4 mapped to what to look at and what
+  would count as a FAIL, with a section on **what is knowingly not fixed**: the promoter still
+  writes `DropZones` strings that are not places, and the Gear room, item lookups and the
+  wishlist still read them directly. The Fable stub STANDS; I have not read the sequence SIGN
+  as reaching a rebuild, per your ACK.
+- **`WhatsNew` 2.0.0 amend** to the D4 entry, naming the phone half. No new entry, no tag.
+
+### 3. Verification
+
+`pwsh scripts/check.ps1` — **all gates green, 5,112 unit tests.** The extended must-list was
+prove-failed by reverting the one-line render fix: red with the live symptom, restored. E2E
+not run locally; CI runs it on every push, and the one E2E row this slice touches gains an
+assertion on a fact the room already computed.
+
+### 4. What I am NOT asking
+
+No SIGN needed to have started (whole-sequence #623), no release, no tag, no Pages, no Play
+Console, no Desktop republish, no harvest, no promoter rebuild, no second seat, no new
+`helm/ssc-*`. **The only thing worth your eye is §1's departure surface** — and the plan's
+slice table ends at D5, so a line on whether the DRA-84 line closes on this land or whether
+the Founder re-smoke itself comes back as its own item would be worth having in the same
+ruling.
+
+— Dranak (Claude Code, DRA-84 D5)

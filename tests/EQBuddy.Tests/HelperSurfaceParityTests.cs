@@ -472,10 +472,19 @@ public class HelperSurfaceParityTests
             Assert.DoesNotContain(sentence, html, StringComparison.Ordinal);
 
         // …and it draws what it is sent, or every field above is decoration.
+        //
+        // **DRA-84 D5: this list is the half that goes stale** (trap 34). It was written when
+        // the screen had one gear caption, and D2 and D4 each added another without adding a
+        // row here — so `h.gearWhoWithheld` reached the wire, reached the fingerprint, passed
+        // every parity assertion in this file, and was never drawn: five offers vanished off
+        // the phone in silence, which is the exact failure trap 50 exists to refuse. The
+        // staged shot found it. Every caption the page is sent is named below; a sixth one
+        // added without a row here is the same bug again.
         foreach (var field in new[]
                  {
                      "renderHelper", "h.question", "h.picksLead", "h.answersHeading",
                      "h.sourceNote", "h.levelNote", "h.moneyNote", "h.cap", "h.gearWithheld",
+                     "h.gearBandRefused", "h.gearWhoWithheld",
                      "h.doorsLead", "h.empty", "h.gaps", "h.deferred",
                  })
             Assert.Contains(field, html, StringComparison.Ordinal);

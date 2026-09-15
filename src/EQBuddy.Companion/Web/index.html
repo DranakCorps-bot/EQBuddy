@@ -1915,10 +1915,18 @@ function boot() {
     for (const a of h.answers || []) wrap.appendChild(helperAnswer(a, h.doorsLead));
 
     // The caveats, in the room's own order: the vendor-price one first (it is about lines
-    // above it), then the caps and the band gate's refusals. A surviving cap says what it
-    // withheld, and so does a refusal (trap 50). Every one of these sentences is built by
-    // HelperPresentation and arrives on the wire — this page never words one (trap 32).
-    for (const line of [h.moneyNote, h.cap, h.gearWithheld, h.gearBandRefused])
+    // above it), then the caps, the band gate's refusals and the who rule's. A surviving cap
+    // says what it withheld, and so does a refusal (trap 50). Every one of these sentences is
+    // built by HelperPresentation and arrives on the wire — this page never words one (trap
+    // 32).
+    //
+    // DRA-84 D5: `gearWhoWithheld` was MISSING from this list, so five drop offers left the
+    // phone's list with nothing said about them while the PC said so — found by the re-smoke's
+    // own staged picture, not by a test, because the parity suite compares the projection to
+    // HelperPresentation and never to what this page draws. Its page-side must-list is the
+    // guard, and it now names every one of these five (trap 34).
+    for (const line of [h.moneyNote, h.cap, h.gearWithheld, h.gearBandRefused,
+                        h.gearWhoWithheld])
       if (line) wrap.appendChild(el("div", "caption", line));
 
     for (const note of (h.gaps || []).concat(h.deferred || []))

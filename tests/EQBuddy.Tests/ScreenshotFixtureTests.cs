@@ -689,4 +689,112 @@ public class ScreenshotFixtureTests
         // Nothing on this screen is a control, and no door on it is a link.
         Assert.False(CompanionSurfaces.AcceptsTicks(CompanionSurfaces.Helper));
     }
+
+    /// <summary>
+    /// **The Helper answering FARM GEAR, for EQBuddy Mobile** (DRA-84 D5, plan P6).
+    ///
+    /// <para>The row above pictures the Helper a new profile meets; this one pictures the
+    /// screen the Founder FAILED. It is staged against the <b>REAL shipped catalog</b> rather
+    /// than a two-record fixture, because acceptance 1 is precisely that the answers come from
+    /// full item knowledge and not from what this session happened to loot — a hand-built
+    /// catalog would photograph as a correct screenshot of the thing under test being absent
+    /// (trap 23).</para>
+    ///
+    /// <para><b>The prediction is not mine to invent: it is a number already committed.</b>
+    /// This fixture stages the same anchor, the same intent and the same unknown level as the
+    /// E2E row <c>AnUpgradeNothingCanNameADropperForIsWithheldAndTheRoomSaysSo</c>, which
+    /// asserts the desktop's three zones, its six named creatures and its two withheld counts
+    /// against the launched app. So the phone's numbers are PREDICTED from the PC's committed
+    /// ones, and a disagreement here is a parity defect rather than a fixture to re-fit —
+    /// which is the one thing a second surface's screenshot is uniquely able to find (trap
+    /// 4).</para>
+    ///
+    /// <para><b>What this picture deliberately does NOT carry: the band gate's sentence.</b>
+    /// The level is unknown, so the gate stands down (trap 73) and the screen shows its
+    /// level disclosure and the Character door instead. The gate's own picture is the
+    /// desktop's <c>shell-helper-gear-band</c>, and that the phone says the same words when
+    /// it does fire is <c>HelperSurfaceParityTests.ARefusedZoneSaysSoOnThePhoneToo</c>'s
+    /// claim, asserted against a fixture that produces a real refusal. Staging a level here
+    /// would have re-ranked the zones and left this shot with numbers nothing else had
+    /// computed.</para>
+    ///
+    ///     dotnet test --filter WriteHelperGearSnapshot -e EQBUDDY_SHOOT=1 -e EQBUDDY_SHOOT_HELPER_GEAR=&lt;path&gt;
+    ///     pwsh scripts/mobile-harness.ps1 -Snapshot &lt;path&gt; -Screenshot
+    /// </summary>
+    [Fact]
+    public void WriteHelperGearSnapshot()
+    {
+        if (Environment.GetEnvironmentVariable("EQBUDDY_SHOOT") != "1") return;
+        var outPath = Environment.GetEnvironmentVariable("EQBUDDY_SHOOT_HELPER_GEAR");
+        if (string.IsNullOrWhiteSpace(outPath)) return;
+
+        var now = new DateTime(2026, 9, 15, 0, 20, 0);
+        var items = ItemCatalog.Default;
+        // The anchor the E2E wears, resolved the way the app resolves it — the catalog's own
+        // stats for the base name, which is what `GearUpgrades.WornFrom` is handed in
+        // production. AC-2 cloth, so the sweep has plenty to beat.
+        var gloves = items.Find("Cloth Gloves")
+            ?? throw new InvalidOperationException("the shipped catalog has no Cloth Gloves");
+        var inputs = HelperInputs.Nothing with
+        {
+            Worn = [new WornItem("Cloth Gloves", "Cloth Gloves", "HANDS", gloves.ToStatsBlock())],
+            Items = items,
+            // **The E2E's character is a WARRIOR, and the class-lock filter is an INPUT to the
+            // sweep.** The first draft of this fixture left it empty — which filters nothing,
+            // and is the honest reading of "EQBuddy has not been told" — and the three zones
+            // came back as Plane of Growth / Temple of Veeshan / Chardok. That is a real screen
+            // of a different character, which is what trap 23 is about: the prediction caught
+            // it, and the fixture moved rather than the number.
+            MyClasses = ["WAR"],
+            GearIntent = GearIntent.ReplaceSlot,
+            // Named for the reason `HelperSources.Gather` names it: a gate that is live on one
+            // surface and stood down on the other is trap 4 wearing a fixture (it stands down
+            // here anyway, because the level is unknown).
+            Bands = ZoneLevels.Default,
+        };
+
+        var snap = CompanionProjection.Build(new CompanionInputs
+        {
+            Character = "Dranak",
+            AppVersion = UpdateChecker.CurrentVersion.ToString(),
+            Offered = [CompanionSurfaces.Helper],
+            Stats = new StatsSnapshot { CurrentZone = "Lower Guk" },
+            Helper = new CompanionHelperRequest(
+                inputs, [HelperGoal.FarmGear], [], Tradeskills.All.Count),
+            Theme = CompanionTheme.Project("ParchmentBrass",
+                EQBuddy.UI.Shared.ThemePalettes.For("ParchmentBrass")),
+        }, now);
+
+        File.WriteAllText(outPath!, JsonSerializer.Serialize(snap, CompanionSnapshot.JsonOpts));
+
+        // THE PREDICTION, as assertions (trap 23) — every number below is the E2E row's.
+        var helper = snap.Helper!;
+        Assert.Equal(["Temple of Veeshan", "Kael Drakkel", "Dragon Necropolis"],
+            helper.Answers.Select(a => a.Headline));
+
+        // Acceptance 2, on the phone: every drawn item line names its creatures. Six lines
+        // across the three zones, and the sentence carries the names rather than a field
+        // beside them (trap 32).
+        // BOTH verbs: the clause agrees with the count ("a bandit drops it" / "a bandit, a
+        // hill giant and a ghoul drop it"), and a predicate that knew only the plural counted
+        // one of these six.
+        var gear = helper.Answers.SelectMany(a => a.Why)
+            .Where(w => w.Text.Contains(" drops it", StringComparison.Ordinal)
+                        || w.Text.Contains(" drop it", StringComparison.Ordinal)).ToList();
+        Assert.Equal(6, gear.Count);
+        // Nothing was looted in this fixture, so every one of those creatures is the
+        // CATALOG's and carries the estimate label that says so.
+        foreach (var line in gear) Assert.False(line.Personal);
+
+        // Both caps say so, in the words the PC uses (trap 50). Five offers the who rule
+        // removed — the `Slime Blood of Cazic-Thule` phantom zones — and 89 the sweep's own
+        // per-anchor cap held back before the rule ever ran.
+        Assert.Equal(HelperPresentation.GearWhoWithheld(5), helper.GearWhoWithheld);
+        Assert.Equal(HelperPresentation.GearWithheld(89), helper.GearWithheld);
+        // The band gate stood down, and the screen says which number it does not have.
+        Assert.Equal("", helper.GearBandRefused);
+        Assert.Equal(LevelReadout.UsedByHelper(ResolvedLevel.Unknown), helper.LevelNote);
+        // Still read-only, one surface down (trap 35).
+        Assert.False(CompanionSurfaces.AcceptsTicks(CompanionSurfaces.Helper));
+    }
 }
