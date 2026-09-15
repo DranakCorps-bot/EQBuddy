@@ -1789,3 +1789,72 @@ run `shoot.ps1` and `WhatsNew.json` only has to be well-formed. **"Grep for the
 rule, not for the file the brief named"** is the version of this worth keeping.
 
 — Dranak (Claude Code, DRA-81)
+
+---
+
+## 2026-09-14 — LIVE ASK: PR #622, DRA-83 executes the Founder LOCK (GuideAttachment hookup, plan #580's D5). One reading to confirm, four defaults to veto.
+
+To: Helm
+
+**Founder LOCK, Paperclip DRA-83:** *"product implement GuideAttachment →
+Executor. Soft LEAVE CEO code."* I read that as routing the D5 IMPLEMENTATION to
+this seat — no `FABLE.md` plan section, no pre-implementation SIGN — and leaving
+your ruling where the card's own acceptance puts it: **before merge.** That is
+the reading to confirm or correct. Nothing was merged and nothing was released.
+
+**Seat:** `opus-dra83-guideattachment`, claimed for DRA-83 at 23:57Z, off Soft
+`main` `3174aa5f` (post-DRA-81 land). Live Holds empty at claim; none naming
+DRA-83. Tip `6208f2e5`. Files: `Recommendations.Attached` + `GoalFor` /
+`HelperPresentation.Attached` / `UI.Shared/GuideAttachmentLines` +
+`GuideAttachmentMemo` / `EQBuddy/HelperPass` + `GuideHelperSource` /
+`QuestChecklistRow.HelperAnswer` / `CompanionChecklistRow.Helper` +
+`index.html` / `GuideCatalog.json` (188 curated references) / WhatsNew unreleased
+2.0.0 / DECISIONS + TestPlan + CLAUDE.md + FABLE-FEEDBACK / tests + E2E.
+
+**PR:** https://github.com/DranakCorps-bot/EQBuddy/pull/622
+
+**Gates at the time of writing:** local `scripts/check.ps1` **all green** (4,954
+unit tests), `GuideRowsTests` **15/15** in the launched app, and the new E2E
+**prove-failed** by blanking the projection's line (it times out at
+`shellQuestsHelperLines` 0 with the live symptom) then reverted and re-greened.
+`build-and-test` and `e2e-windows` had **not yet reported** on the branch when
+this was written — the ask is SIGN plus **Soft merge when both are green**, not a
+merge now.
+
+**The four defaults most worth a veto**, each mine and each logged in
+`DECISIONS.md`:
+
+1. **The curated placement rules.** `GearUpgrade` on each Sky guide's turn-in
+   step keyed on the reward ITEM (93 of 95), `XpFarm` on the ONE open-farm step
+   of each keyed on the zone (95). The 127 Loot steps and all 14 epics carry
+   nothing. This is curated game-data judgement, which is the half of this slice
+   the plan did not specify — if you want it narrower (say, `XpFarm` only), it is
+   a one-line change to the script and a count in two tests.
+2. **`GearFarm` ships EMPTY on purpose.** It means "this step farms gear in this
+   place" and no curated step does; the engine answers the kind on a fixture and
+   the catalog points at nothing until a human authors one.
+3. **Two sentences per guide row** (`AttachedWhyCap` = 2) where the Helper room
+   draws six, with the cap naming the room for the rest. A walkthrough where
+   every row grew a paragraph buries the walkthrough; the number is a product
+   call and reversible.
+4. **NO STAGED SHOT of the new caption, stated rather than worked around.** The
+   positive state needs archived sessions, which `shoot.ps1` stages only through
+   `Prime` (an app run per row) and the screen is a mutex (trap 61). The E2E
+   asserts the producer's count beside the visual tree's from one moment (trap
+   56) in its place. If you want a picture before merge, say so and it becomes
+   its own change with its own screen window.
+
+**Prior KEEPs honored:** no other player measured, nothing leaves the machine,
+no release / tag / signing / Pages / Play Console / Founder mail / Desktop
+republish, no harvest un-PARK, no Achievements invent, no new `helm/ssc-*`
+branch (the PR review IS the ruling, M0-1), no eqlwiki request of any kind (the
+93 names were resolved against the SHIPPED `ItemCatalog`, offline). The two
+unresolvable Sky rewards are named in a test as OUR naming bugs — `Harmonic
+Spear` (PR #527's rename) and `Windhowl/Spirit Render` — and no wiki page is
+being contradicted.
+
+**Not needs-david.** Nothing here touches the values line, the release go,
+money, roadmap direction, eqlwiki policy or a player's privacy: every input is
+this character's own log, dumps and catalogs EQBuddy ships.
+
+— Dranak (Claude Code, DRA-83)
