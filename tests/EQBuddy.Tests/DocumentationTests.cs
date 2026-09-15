@@ -42,7 +42,20 @@ public class DocumentationTests
         return null;
     }
 
-    public static TheoryData<string> DocFiles()
+    /// <summary>The rotated channel ledgers (DRA-75 / M0-2) are the one thing under
+    /// <c>docs/ops</c> that is a TRANSCRIPT rather than a map: what agents said to each
+    /// other, immutable, dated. Their paths were true when they were written, so
+    /// <c>scripts/release-review.ps1</c> and <c>/tmp/helm-entry.md</c> appear in them and
+    /// no longer exist — and the sweep's remedy ("fix the doc or restore the file") is
+    /// available for neither. A live doc is corrected; a record of what was said is not.
+    /// The archive's own <c>README.md</c> IS a map and stays swept.</summary>
+    private const string ChannelArchive = "docs/ops/claude-archive/channels/";
+
+    private static bool IsRotatedChannelLedger(string relative) =>
+        relative.StartsWith(ChannelArchive, StringComparison.Ordinal)
+        && !relative.EndsWith("/README.md", StringComparison.Ordinal);
+
+    private static List<string> SweptDocs()
     {
         // Live manuals plus the 2026-09-08 ops split (verification ladder, flake
         // ledger, CLAUDE archive). Archive novels stay true the same way CLAUDE.md
@@ -59,11 +72,57 @@ public class DocumentationTests
             files.AddRange(Directory
                 .EnumerateFiles(ops, "*.md", SearchOption.AllDirectories)
                 .Select(p => Path.GetRelativePath(Repo, p).Replace('\\', '/'))
+                .Where(p => !IsRotatedChannelLedger(p))
                 .OrderBy(p => p, StringComparer.Ordinal));
         }
+        return files;
+    }
+
+    public static TheoryData<string> DocFiles()
+    {
         var data = new TheoryData<string>();
-        foreach (var f in files) data.Add(f);
+        foreach (var f in SweptDocs()) data.Add(f);
         return data;
+    }
+
+    /// <summary>
+    /// The paired must-list for the exclusion above (trap 34), and its non-vacuity check
+    /// (trap 78). An exemption that silently stops matching anything is the same defect as
+    /// no exemption — except green. So: the transcripts must actually BE there and excluded,
+    /// the archive's README must still be swept, and every OTHER ops doc must stay swept.
+    /// </summary>
+    [Fact]
+    public void OnlyTheRotatedChannelTranscriptsAreExemptFromTheLivePathSweep()
+    {
+        var channels = Path.Combine(Repo, "docs", "ops", "claude-archive", "channels");
+        Assert.True(Directory.Exists(channels),
+            "the rotated channel archive is missing — the exemption below would be vacuous");
+
+        var onDisk = Directory
+            .EnumerateFiles(channels, "*.md", SearchOption.AllDirectories)
+            .Select(p => Path.GetRelativePath(Repo, p).Replace('\\', '/'))
+            .OrderBy(p => p, StringComparer.Ordinal)
+            .ToList();
+        var transcripts = onDisk.Where(IsRotatedChannelLedger).ToList();
+        Assert.NotEmpty(transcripts);
+
+        var swept = SweptDocs();
+
+        // The transcripts are out.
+        foreach (var t in transcripts)
+            Assert.DoesNotContain(t, swept);
+
+        // The archive's own map is in — it is the one file in there that a reader
+        // navigates by, so a dead pointer in it is the ordinary failure this file catches.
+        foreach (var readme in onDisk.Except(transcripts, StringComparer.Ordinal))
+            Assert.Contains(readme, swept);
+
+        // And nothing else under docs/ops slipped out with them.
+        var everyOpsDoc = Directory
+            .EnumerateFiles(Path.Combine(Repo, "docs", "ops"), "*.md", SearchOption.AllDirectories)
+            .Select(p => Path.GetRelativePath(Repo, p).Replace('\\', '/'));
+        foreach (var doc in everyOpsDoc.Except(transcripts, StringComparer.Ordinal))
+            Assert.Contains(doc, swept);
     }
 
     [Theory]
@@ -170,6 +229,52 @@ public class DocumentationTests
         Assert.Contains("docs/ops/verification-ladder.md", claude);
         Assert.Contains("docs/ops/flake-ledger.md", claude);
         Assert.Contains("docs/ops/claude-archive/", claude);
+        // DRA-74 / DRA-73 M0 (2026-09-14): the execution-flow detail is only
+        // reachable from the always-loaded file, so an unlinked copy is invisible.
+        Assert.Contains("docs/ops/execution-flow.md", claude);
+    }
+
+    /// <summary>Markdown wraps, so a sentence that is one claim to a reader is several
+    /// lines to <c>Contains</c>. Collapse runs of whitespace before asserting on prose.</summary>
+    private static string Flatten(string text) => Regex.Replace(text, @"\s+", " ");
+
+    /// <summary>
+    /// DRA-74 (DRA-73 plan §7 M0 / §8.1–2, approved by David 2026-09-14): two process
+    /// cutovers that exist ONLY as prose, and therefore have no other way to be kept true.
+    ///
+    /// **The failure this prevents is silent reversion.** Both rules DELETE a step
+    /// (the `helm/ssc-N` PR; the per-slice kick authorization). A deleted step leaves no
+    /// artifact behind, so nothing in the repo notices when an agent starts doing it again
+    /// — the retired pattern simply reappears in a posture list and looks like diligence.
+    /// A rule with a real reason to be reversed should be reversed OUT LOUD, by a HOLD and
+    /// an edit that reddens this, not by drift.
+    ///
+    /// The `exo-experiment:` half is the other direction: §10.1 makes that tag the thing
+    /// the M0-exit doctrine capture cites, so an untagged experiment is one the Corps
+    /// playbook cannot find. Prove-failed by deleting each asserted phrase in turn.
+    /// </summary>
+    [Fact]
+    public void TheRetiredSscPatternAndWholeSequenceAuthAreStatedInTheLiveDocs()
+    {
+        var claude = Flatten(Read("CLAUDE.md"));
+        Assert.Contains("never a `helm/ssc-N` PR", claude);
+        Assert.Contains("no new ones.", claude);
+        Assert.Contains(
+            "A signed plan authorizes every slice it declares, in order, on green gates.",
+            claude);
+        Assert.Contains(
+            "Helm stops the train with a HOLD, not by withholding authorization",
+            claude);
+
+        // The detail doc carries the evidence and the rollback shape; the experiment names
+        // are what the dashboard and the playbook entry key on.
+        var flow = Flatten(Read(Path.Combine("docs", "ops", "execution-flow.md")));
+        Assert.Contains("ssc-retirement", flow);
+        Assert.Contains("whole-sequence-auth", flow);
+
+        var decisions = Flatten(Read("DECISIONS.md"));
+        Assert.Contains("exo-experiment: ssc-retirement", decisions);
+        Assert.Contains("exo-experiment: whole-sequence-auth", decisions);
     }
 
     [Fact]

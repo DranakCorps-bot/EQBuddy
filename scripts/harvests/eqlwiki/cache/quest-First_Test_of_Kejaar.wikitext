@@ -53,7 +53,7 @@ Asad, the Shazda of the Kerran Sejah has given you a direct order. You are to tr
 
 === Quest Stage 1: ===
 * Step - Claim the head of the Erudin Emissary in Toxxulia Forest
-* Task - Claim the head of an Erudin Emissay in Toxxulia <br> 
+* Task - Claim the head of an Erudin Emissary in Toxxulia <br> 
 
 '''[[an Erudin Emissary]] can be found wandering Toxxulia Forest. Kill them.'''
 

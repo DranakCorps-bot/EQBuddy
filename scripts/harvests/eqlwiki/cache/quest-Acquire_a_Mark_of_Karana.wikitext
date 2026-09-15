@@ -1,5 +1,5 @@
 {{Classic Era}}
-[[File:Npc_qaelin_hailstorm.png|frame|Qaelin Hailstorm]]
+[[File:Npc_qaelin_hailstorm.png|thumb|Qaelin Hailstorm]]
 {| class="questTopTable"
 ! ''' Start Zone: '''
 | [[Surefall Glade]]

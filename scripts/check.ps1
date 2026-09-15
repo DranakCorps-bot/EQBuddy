@@ -45,7 +45,7 @@ function Step([string] $name, [scriptblock] $body) {
     if ($LASTEXITCODE -ne 0) {
         Write-Host "FAILED" -ForegroundColor Red
         # Only the lines that say why — a full MSBuild log buries the one that matters.
-        $output | Select-String -Pattern 'error |Failed!|\[FAIL\]|Assert\.|whatsnew-guard|legacy-notice-guard|evolved-channel-guard|channel-wipe-guard|soft-seat-selftest' |
+        $output | Select-String -Pattern 'error |Failed!|\[FAIL\]|Assert\.|whatsnew-guard|legacy-notice-guard|evolved-channel-guard|channel-wipe-guard|soft-seat-selftest|merge-sync' |
             Select-Object -First 15 | ForEach-Object { Write-Host "   $_" }
         Write-Host "   full log: $log" -ForegroundColor Yellow
         $script:failed += $name
@@ -82,13 +82,24 @@ Step 'channel test' { & "$PSScriptRoot\channel-wipe-guard-selftest.ps1" 6>&1 }
 # Experiment A′ self-test (trap 70, EQBuddy lab): a second default seat on the
 # same work item must refuse. Throwaway StoreDir; not the machine's live claims.
 Step 'soft seats  ' { & "$PSScriptRoot\soft-seat-selftest.ps1" 6>&1 }
-# The two generated catalogs against their generators. Neither script fetches — both read
-# the committed cache — so this is free and it is the only thing that makes a weekly
+# Paperclip merge-sync (DRA-77). Offline: no secret, no network, no GitHub event —
+# it drives the linkage precedence and every status disposition, plus the
+# one-way scope lock. This job's own trigger only fires AFTER a merge to the
+# default branch, so a PR that changes it cannot otherwise test it; the
+# self-test is the only thing a pull request can actually see.
+Step 'merge sync  ' { & "$PSScriptRoot\merge-sync-selftest.ps1" 6>&1 }
+# The ExO dashboard's own detectors (DRA-78). Offline: it exercises the classifiers
+# and the interval arithmetic against fixtures, touching neither gh nor Paperclip.
+# A metrics script nobody has watched misclassify is a dashboard that reports
+# whatever it was already going to report — trap 78 with a number on it.
+Step 'exo metrics ' { & "$PSScriptRoot\exo-metrics.ps1" -SelfTest 6>&1 }
+# The three generated catalogs against their generators. None of the scripts fetches — they
+# read the committed cache — so this is free and it is the only thing that makes a weekly
 # refresh PR's diff reviewable.
 #
 # FAILS OPEN, loudly, when there is no python: this is the fast local pass and the repo
 # does not ask a WPF contributor to install a toolchain for a data gate. CI pins python
-# 3.12 and runs the same two commands as a hard gate, so what is optional here is the
+# 3.12 and runs the same three commands as a hard gate, so what is optional here is the
 # convenience, not the guard (same shape as the evolved-channel-guard's third check).
 Step 'generated   ' {
     $py = (Get-Command python -ErrorAction SilentlyContinue) ??
@@ -101,6 +112,8 @@ Step 'generated   ' {
     & $py.Source "$PSScriptRoot\harvests\eqlwiki\guides-transform.py" --check
     if ($LASTEXITCODE -ne 0) { return }
     & $py.Source "$PSScriptRoot\harvests\eqlwiki\epic-guides-build.py" --check
+    if ($LASTEXITCODE -ne 0) { return }
+    & $py.Source "$PSScriptRoot\harvests\eqlwiki\zonelevels-transform.py" --check
 }
 Step 'build      ' { dotnet build "$repo\EQBuddy.slnx" -c Release --nologo -v q }
 Step 'unit tests  ' { dotnet test "$repo\tests\EQBuddy.Tests\EQBuddy.Tests.csproj" -c Release --nologo }

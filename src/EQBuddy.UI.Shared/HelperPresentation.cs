@@ -64,6 +64,27 @@ public static class HelperPresentation
         "Every answer below is read from your own log and the files the game writes for you. "
         + "EQBuddy never looks at anyone else's play.";
 
+    // ---- what a surface that cannot OPERATE this room says instead (DRA-71 D9) ----------
+    //
+    // EQBuddy Mobile ranks with the same engine and draws the same sentences, and it has
+    // none of the room's controls. That is trap 35's answer rather than a shortfall: every
+    // picker here WRITES to the profile the PC is playing from, and one of the doors has a
+    // side effect behind it, so a tap on a phone would reach across the LAN and change how
+    // the PC ranks while somebody is playing at it. The affordance ports as INTENT — the
+    // phone shows what is picked, in the picker face's own words, and says where it is
+    // changed. Both leads live here rather than in the page, because a page-side literal can
+    // sit on an open phone for weeks after the PC has moved on (trap 32).
+
+    /// <summary>Over the block of picks, on a surface that can only show them. It names the
+    /// ROOM as well as the machine: "on your PC" alone is the defect one level down, the same
+    /// one <see cref="CommandPrompts.Lead"/> exists to avoid.</summary>
+    public const string PicksOnPc =
+        "What you are working toward, picked in EQBuddy's Helper room on your PC.";
+
+    /// <summary>Over a row's doors, on a surface that cannot open them. Short, because it
+    /// repeats under every answer.</summary>
+    public const string DoorsOnPc = "On your PC, in EQBuddy:";
+
     // ---- the nine goals, the Founder's wording ------------------------------------------
 
     /// <summary>
@@ -535,6 +556,19 @@ public static class HelperPresentation
             $"{GoalLabel(gap.Goal)}: your stored sessions have not earned coin in a zone "
             + "EQBuddy can quote a rate for yet.",
 
+        // ---- DRA-84 D2 ----------------------------------------------------------------
+
+        // **THE SUBJECT IS THE BANDS AND NOT THE PLAYER.** "Nowhere is right for your level"
+        // reads as a verdict on the character; what EQBuddy did was read eqlwiki's own numbers
+        // for the places its catalog names and find all of them outside a range it will
+        // recommend at. The count and each band arrive under this line (GearBandRefused), so
+        // this sentence says WHAT happened and leaves the numbers to the one that has them.
+        GoalGapReason.EveryZoneOutsideYourBand =>
+            $"{GoalLabel(gap.Goal)}: EQBuddy found upgrades in its catalog and every place they "
+            + "drop has a creature level band on eqlwiki that sits outside yours. The bands and "
+            + "your level are below — nothing here is a claim about the game, only about which "
+            + "zones EQBuddy will put in this list.",
+
         GoalGapReason.NoSellEvidence =>
             $"{GoalLabel(gap.Goal)}: EQBuddy prices a drop by what a vendor has actually paid "
             + "YOU for one, and it has not seen a sale yet. Its own item pages carry vendor "
@@ -739,9 +773,17 @@ public static class HelperPresentation
     /// belongs to. Saying that out loud, with the count, is what stops the block reading as
     /// unfinished; a room that silently omitted the ranking would leave a player wondering
     /// whether they had configured something wrong.</para>
+    ///
+    /// <para><b>THE NUMBER IS A CLAIM ABOUT THE SHIPPED CATALOG, SO IT MOVES WHEN THE CATALOG
+    /// DOES</b> (DRA-84 D3 follow-up). The weekly refresh re-read the wiki and the page count
+    /// went from 10,957 to 11,197 — and the profession count stayed at <b>14</b>, which is the
+    /// finding that keeps the arithmetic parked. The refresh landed in #626 without this
+    /// sentence moving with it, so for one commit range EQBuddy told players a survey result
+    /// its own shipped report contradicted. The pinning test now reads
+    /// <c>items-catalog-report.md</c> rather than this sentence's own literal.</para>
     /// </summary>
     public const string ProfessionsParkNote =
-        "EQBuddy does not rank where to farm materials yet. Of the 10,957 item pages it has "
+        "EQBuddy does not rank where to farm materials yet. Of the 11,197 item pages it has "
         + "read, 14 say which profession an ingredient belongs to — not enough to point you "
         + "at a camp without guessing.";
 
@@ -866,6 +908,68 @@ public static class HelperPresentation
         : $"{withheld:N0} more {(withheld == 1 ? "upgrade" : "upgrades")} matched and are not "
           + "listed — EQBuddy names a few per slot rather than every one it has read about.";
 
+    /// <summary>How many refused zones are NAMED before the sentence counts the rest. Three,
+    /// which is <c>GearNamedPerRow</c> and <c>DefaultCap</c>'s reason one surface out: a
+    /// caption that listed eleven zones with eleven bands would be a table pretending to be a
+    /// sentence.</summary>
+    public const int GearBandNamed = 3;
+
+    /// <summary>
+    /// **A BAND IN WORDS, AND THERE IS ONE PRODUCER OF THEM** (DRA-84 D2).
+    ///
+    /// <para>Three shapes, because the data has three: a closed band, a single level, and an
+    /// OPEN TOP where <see cref="ZoneLevels.Band.Max"/> is null because the page said "and
+    /// above" (41 of the 87 shipped bands). The open one must not render as a range with a
+    /// missing end — "5–" is a typo and "5–99" is the invented maximum the ruling refused.</para>
+    /// </summary>
+    public static string BandPhrase(int min, int? max) => max switch
+    {
+        null => $"{min} and above",
+        { } m when m == min => $"{min}",
+        { } m => $"{min}–{m}",
+    };
+
+    /// <summary>
+    /// **WHAT THE BAND GATE HELD BACK, WITH THE NUMBERS IT HELD IT BACK ON** (DRA-84 D2, plan
+    /// P2; trap 50).
+    ///
+    /// <para><b>A refusal that says nothing is worse than a cap that says nothing</b>, which is
+    /// why this exists as well as the gate. A zone missing from the list is indistinguishable
+    /// from a zone the catalog has nothing in, and the player has no way to discover that
+    /// EQBuddy decided for them — so the count, the rule and each band are said out loud, and
+    /// the Gear room's door under it has the whole wishlist.</para>
+    ///
+    /// <para><b>Two numbers and a source, and no adjective</b> (HOME-006). It quotes eqlwiki's
+    /// own row and this character's own level and then stops: "outside yours" is a statement
+    /// about two ranges, where "too tough for you" would be a claim about the place and about
+    /// the player that nothing here measured. The rule is named in full so the reader can
+    /// disagree with the judgement rather than just with the outcome.</para>
+    /// </summary>
+    public static string GearBandRefused(IReadOnlyList<GearBandRefusal> refused)
+    {
+        if (refused.Count == 0) return "";
+
+        var named = refused
+            .Take(GearBandNamed)
+            .Select(r => $"{r.Zone} ({BandPhrase(r.Min, r.Max)})")
+            .ToList();
+        var rest = refused.Count - named.Count;
+        var list = string.Join(", ", named) + (rest > 0 ? $", and {rest} more" : "");
+
+        // Only the arms that actually fired, so the sentence never quotes a threshold that
+        // decided nothing in this list.
+        var arms = new List<string>();
+        if (refused.Any(r => r.Arm == GearBandArm.TopUnder))
+            arms.Add($"tops out {Recommendations.OutgrownBy} or more levels under you");
+        if (refused.Any(r => r.Arm == GearBandArm.BottomOver))
+            arms.Add($"starts {Recommendations.GearBandReachAbove} or more levels over you");
+
+        return $"{refused.Count:N0} {(refused.Count == 1 ? "zone" : "zones")} EQBuddy has "
+            + $"upgrades for {(refused.Count == 1 ? "is" : "are")} not listed at your level "
+            + $"{refused[0].Level}: {list}. Those are eqlwiki's own creature levels — EQBuddy "
+            + $"leaves a zone out of this list when its band {string.Join(" or ", arms)}.";
+    }
+
     /// <summary>Said when the picker held standings back. Trap 50 again, one surface
     /// down.</summary>
     public static string FactionPickerCapNote(int withheld) => withheld <= 0
@@ -969,6 +1073,84 @@ public static class HelperPresentation
                   + "never fetches it for you.",
         _ => "",
     };
+
+    // ---- a guide step's reference, answered (DRA-83) --------------------------------------
+
+    /// <summary>
+    /// How many of the Helper's sentences a GUIDE STEP draws before it says it is holding some
+    /// back.
+    ///
+    /// <para><b>Two, where the room draws <see cref="Recommendations.WhyCap"/> six</b>, and the
+    /// difference is what the two surfaces are for. The room's whole job is one evening's
+    /// argument and it can spend six lines on it; a guide step is one line of a checklist a
+    /// player is scrolling, and a walkthrough where every row grew a paragraph would have
+    /// buried the walkthrough. The cap SAYS what it withheld and names where the rest is
+    /// (trap 50) — the room, which is one click away and is where the answer lives.</para>
+    /// </summary>
+    public const int AttachedWhyCap = 2;
+
+    /// <summary>
+    /// **What the Helper says about the subject this step points at** — the whole line, worded
+    /// once for all three surfaces (DRA-83).
+    ///
+    /// <para><b>Every sentence in it is the Helper's own, passed through.</b> The why-lines go
+    /// through <see cref="Why"/> — the same call the Helper room and the phone's Helper screen
+    /// make — so the catalog label arrives by construction and a guide row cannot word a
+    /// measurement differently from the room that measured it. The only words this method adds
+    /// are the lead clause naming WHICH reference is being answered, and the cap sentence.</para>
+    ///
+    /// <para>Empty is a real answer and the common one: a step whose reference the Helper
+    /// could not answer draws nothing at all. See <c>Recommendations.Attached</c> — silence
+    /// rather than an empty-state sentence repeated down a checklist.</para>
+    /// </summary>
+    public static string Attached(GuideAttachmentAnswer answer)
+    {
+        var lines = answer.Why
+            .Select(Why)
+            .Where(s => s.Length > 0)
+            .ToList();
+        if (lines.Count == 0) return "";
+
+        var shown = lines.Take(AttachedWhyCap).ToList();
+        var parts = new List<string> { AttachedLead(answer) };
+        parts.AddRange(shown);
+        // The row's own withheld count is the Helper's (the engine already trimmed to WhyCap
+        // and reported it) PLUS what this cap held: one number for "there is more", because two
+        // counts on a checklist row would be arithmetic the player has to do.
+        var withheld = lines.Count - shown.Count + answer.Answer.WithheldWhy;
+        if (withheld > 0) parts.Add(AttachedWithheld(withheld));
+        return string.Join(" ", parts);
+    }
+
+    /// <summary>
+    /// The clause that says which reference is being answered, per kind.
+    ///
+    /// <para><b>It names the SUBJECT and the GOAL, and nothing about the step.</b> A sentence
+    /// like "this is a good place to do this" would be the Helper deciding something about the
+    /// guide, which is the wrong way round: the guide says what the step relates to and the
+    /// Helper answers from this character's own play.</para>
+    ///
+    /// <para>The default arm is unreachable from <c>Recommendations.Attached</c>, which refuses
+    /// a kind <c>GoalFor</c> does not map — and it answers with the GOAL's own label rather
+    /// than with nothing, so a fourth kind arriving before this switch knows it still says
+    /// which engine spoke instead of drawing a headless block of numbers.</para>
+    /// </summary>
+    public static string AttachedLead(GuideAttachmentAnswer answer) => answer.Attachment.Kind switch
+    {
+        GuideAttachment.XpFarm => $"Your Helper on levelling in {answer.Attachment.Key}:",
+        GuideAttachment.GearFarm => $"Your Helper on farming gear in {answer.Attachment.Key}:",
+        GuideAttachment.GearUpgrade => $"Your Helper on {answer.Attachment.Key}:",
+        _ => $"Your Helper on {GoalLabel(answer.Goal)} — {answer.Attachment.Key}:",
+    };
+
+    /// <summary>What the step is not drawing, and where it is. Same shape as
+    /// <see cref="WithheldWhy"/>, and it names the room rather than offering a link: on the
+    /// phone this line rides a row that cannot open one (trap 35).</summary>
+    public static string AttachedWithheld(int withheld) => withheld <= 0
+        ? ""
+        : withheld == 1
+            ? "One more reason is in the Helper room."
+            : $"{withheld:N0} more reasons are in the Helper room.";
 
     // ---- number shapes -------------------------------------------------------------------
 

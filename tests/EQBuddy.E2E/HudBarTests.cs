@@ -39,7 +39,7 @@ public sealed class HudBarTests
         using var app = new AppHarness(settings =>
         {
             settings.Minimized = true;
-            settings.MiniStats = ["kills", "dps", "loot"];
+            settings.MiniStats = ["kills", "dps", "loot", "xp"];
             settings.DisabledBreakouts =
                 ["Damage", "Healing", "Pet", "Watch", "Loot", "Buffs"];
             // The built-in "CC broke" rule ships PINNED, so a profile that lets
@@ -57,10 +57,11 @@ public sealed class HudBarTests
         });
         app.Launch();
 
-        // THE PREDICTION, written before it ran (trap 23). "dps" is no longer a
-        // MiniStats key — MigratePromotedHudStats strips it on load — so the seed's three
-        // stars land as TWO cells, plus one pinned rule, plus the always-on trio: 3 + 2 + 1.
-        app.WaitForDump("hudCells", 6, "the trio, a cell per surviving star, and the pin");
+        // THE PREDICTION, written before it ran (trap 23). Since DRA-81 every one of these
+        // stars is real, and "dps"/"xp" draw as top-row SLOTS rather than as cells — so the
+        // seed's four stars land as the name plus two slots up top and two cells below,
+        // plus one pinned rule: 3 + 2 + 1.
+        app.WaitForDump("hudCells", 6, "the name, the two ticked slots, two cells and the pin");
     }
 
     /// <summary>Un-pinning is the other direction, and it is the one a refactor drops
@@ -77,7 +78,7 @@ public sealed class HudBarTests
         using var app = new AppHarness(settings =>
         {
             settings.Minimized = true;
-            settings.MiniStats = ["kills"];
+            settings.MiniStats = ["kills", "dps", "xp"];
             settings.DisabledBreakouts =
                 ["Damage", "Healing", "Pet", "Watch", "Loot", "Buffs"];
             settings.DefaultRulesVersion = int.MaxValue;   // see the note above
@@ -95,48 +96,92 @@ public sealed class HudBarTests
     }
 
     /// <summary>
-    /// The trio's third number, and the one swap it makes (Surface A / SA-1).
+    /// **THE HPS STAR REACHES THE BAR** (DRA-81's Founder LOCK), and the XP rate stays
+    /// beside it (the DRA-72 property this keeps).
     ///
-    /// **A screenshot cannot settle this and no unit test can reach it.** Both states
-    /// render correctly and look equally right, so a picture proves only that ONE of them
+    /// **A screenshot cannot settle this and no unit test can reach it.** Every membership
+    /// renders correctly and looks equally right, so a picture proves only that ONE of them
     /// drew; <c>HudGlanceTests</c> proves the rule, and this proves the rule reaches the
     /// control — "present in the build" and "in effect at runtime" being different claims
-    /// (trap 42).
+    /// (trap 42). It is the assertion the Founder's smoke needed and did not have: the
+    /// profile said one thing and the bar drew another, for a whole session.
     ///
-    /// It drives the app through its real seam: log lines appended to the file the widget
-    /// is tailing, exactly as the game would write them.
+    /// **It drives the star through the app's own writer**, <c>MainWindow.SetMiniStat</c> —
+    /// the handler the Mini dashboard checkbox calls — rather than by seeding a second
+    /// profile. A test that relaunched with a different fixture would prove the row can be
+    /// built that way and would say nothing about the click, which is the half that was
+    /// broken.
+    ///
+    /// **THE PREDICTION, written before it ran** (trap 23). The seed ticks DPS and XP and
+    /// not HPS, so the row starts <c>dps,xp</c> — and it STAYS <c>dps,xp</c> through three
+    /// heals, which is the deleted dominance rule asserted as an absence. Ticking HPS then
+    /// makes it <c>dps,hps,xp</c>: three slots with the XP rate still among them, no swap
+    /// and no flash. Unticking it puts the row back, which is the thing SA-1 made
+    /// impossible.
+    ///
+    /// **The healing lines are written BEFORE the tick on purpose.** Under DRA-72 they were
+    /// what summoned the slot; here they must summon nothing, and the ticked row afterwards
+    /// is what proves the assertion was not simply early (trap 62 — "nothing happened" needs
+    /// a moment it is true at, and the moment is "after a render the box had changed by").
     /// </summary>
     [Fact]
-    public void HealingTakesTheThirdSlotAndOneSwingGivesItBack()
+    public void TheHpsStarPutsTheSlotOnTheRowAndHealingAloneDoesNot()
     {
         using var app = new AppHarness(settings =>
         {
             settings.Minimized = true;
-            settings.MiniStats = ["kills"];
+            settings.MiniStats = ["kills", "dps", "xp"];   // deliberately no "hps"
             settings.DisabledBreakouts =
                 ["Damage", "Healing", "Pet", "Watch", "Loot", "Buffs"];
             settings.DefaultRulesVersion = int.MaxValue;
             settings.TrackedRules.Clear();
-        });
+        },
+        new Dictionary<string, string> { ["EQBUDDY_STARPROBE"] = "1" });
         app.Launch();
 
-        // The fixture session is a melee one, so the third slot starts where it should.
-        app.WaitForDump("hudGlance", "xp", "the third number to start as the XP rate");
+        app.WaitForDump("hudGlance", "dps,xp", "the row to start as DPS and the XP rate");
 
-        // Healing with nothing else happening: enough to outweigh anything the fixture's
-        // last half-minute could still hold, so the assertion is about the RULE and not
-        // about how the fixture happens to end.
+        // Healing with nothing else happening — far more than DRA-72's window ever needed to
+        // hand the slot over. It must now do nothing at all: the log has no vote.
         app.AppendLogLines(
             "You healed Grimwold for 9000 hit points by Light Healing.",
             "You healed Grimwold for 9000 hit points by Light Healing.",
             "You healed Grimwold for 9000 hit points by Light Healing.");
-        app.WaitForDump("hudGlance", "hps", "healing to take the third slot");
+        // The trap-62 moment: a ding is written after the heals, so a level of 12 on the
+        // hover proves the app has processed a line that comes AFTER them. Reading the row
+        // before that is reading a race.
+        app.AppendLogLines("You have gained a level! Welcome to level 12!");
+        app.WaitForDump("hudXpLevel", 12, "the app to have processed the lines after the heals");
+        Assert.Equal("dps,xp", app.DumpText("hudGlance"));
 
-        // …and one swing takes it straight back. The thirty-second window is still almost
-        // entirely healing at this point, which is the whole point of the second, shorter
-        // window: "the moment combat-as-damage returns", not "once healing stops winning".
-        app.AppendLogLines("You crush a training dummy for 25 points of damage.");
-        app.WaitForDump("hudGlance", "xp", "one swing to bring the XP rate back");
+        // …and the ★ is the whole switch. This is the Mini dashboard checkbox's own handler.
+        app.SetMiniStat("hps", true);
+        app.WaitForDump("hudGlance", "dps,hps,xp",
+            "the HPS star to ADD its own slot and leave the XP rate where it was");
+
+        // AND IT HOLDS STILL. The row rebuilds once a second; the bug the Founder filmed
+        // alternated on that timer, and one read of a flashing bar has a 50% chance of
+        // reading the right answer. So sample across five RENDERS — `tick` is the liveness
+        // fact that says a render happened, read from the same moment as the row so a sample
+        // is a sample of one frame (trap 56).
+        var rows = new HashSet<string>(StringComparer.Ordinal);
+        var lastTick = "";
+        var renders = 0;
+        Wait.Until(() =>
+        {
+            var seen = app.DumpTexts("tick", "hudGlance");
+            if (seen[0] == lastTick || seen[0].Length == 0) return false;
+            lastTick = seen[0];
+            rows.Add(seen[1]);
+            return ++renders >= 5;
+        }, TimeSpan.FromSeconds(30),
+            "five renders of the collapsed bar to sample (debug.txt tick has to move)");
+        Assert.Equal(["dps,hps,xp"], rows);
+
+        // The way back, which is the capability SA-1 removed and this restores: unticking
+        // takes the slot off while the session's healing is unchanged.
+        app.SetMiniStat("hps", false);
+        app.WaitForDump("hudGlance", "dps,xp", "unticking HPS to take its slot off the row");
     }
 
     /// <summary>
@@ -163,7 +208,7 @@ public sealed class HudBarTests
         using var app = new AppHarness(settings =>
         {
             settings.Minimized = true;   // the bar only draws while MiniRoot is visible
-            settings.MiniStats = ["kills"];
+            settings.MiniStats = ["kills", "dps", "xp"];
             settings.DisabledBreakouts =
                 ["Damage", "Healing", "Pet", "Watch", "Loot", "Buffs"];
             settings.DefaultRulesVersion = int.MaxValue;
@@ -171,9 +216,10 @@ public sealed class HudBarTests
         });
         app.Launch();
 
-        // The fixture is melee, so the third slot is the xp one and there IS a chip to
-        // hover — the -1 reading (swapped to HPS) would make both facts below meaningless.
-        app.WaitForDump("hudGlance", "xp", "the third slot to be the XP rate");
+        // The fixture is melee, so the row is DPS and the xp slot — and the xp slot is
+        // unconditional since DRA-72, so the row reading is here as the same-moment POSITIVE
+        // that the bar has drawn at all rather than as a question about which number it chose.
+        app.WaitForDump("hudGlance", "dps,xp", "the collapsed bar to have drawn its row");
         app.WaitForDump("hudXpEta", 1, "the fixture's xp rate to put a forecast on the hover");
         app.WaitForDump("hudXpLevel", 0, "no level known before any ding — stated, not omitted");
 
@@ -204,7 +250,7 @@ public sealed class HudBarTests
         using var app = new AppHarness(settings =>
         {
             settings.Minimized = true;
-            settings.MiniStats = ["kills", "buffs"];
+            settings.MiniStats = ["kills", "buffs", "dps", "xp"];
             settings.DisabledBreakouts =
                 ["Damage", "Healing", "Pet", "Watch", "Loot", "Buffs"];
             settings.DefaultRulesVersion = int.MaxValue;
@@ -224,7 +270,7 @@ public sealed class HudBarTests
         using var app = new AppHarness(settings =>
         {
             settings.Minimized = true;
-            settings.MiniStats = ["kills"];
+            settings.MiniStats = ["kills", "dps", "xp"];
             settings.DisabledBreakouts =
                 ["Damage", "Healing", "Pet", "Watch", "Loot", "Buffs"];
             settings.DefaultRulesVersion = int.MaxValue;
@@ -259,7 +305,7 @@ public sealed class HudBarTests
         using var app = new AppHarness(settings =>
         {
             settings.Minimized = true;
-            settings.MiniStats = ["kills", "loot", "money", "buffs"];
+            settings.MiniStats = ["kills", "loot", "money", "buffs", "dps", "xp"];
             settings.MiniBarOrder =
                 ["money", "buffs", "kills", "loot", "pet", "procs", "motes", "deaths"];
             settings.DisabledBreakouts =
@@ -298,7 +344,7 @@ public sealed class HudBarTests
         using var app = new AppHarness(settings =>
         {
             settings.Minimized = true;
-            settings.MiniStats = ["money", "kills", "loot"];   // NOT canonical order
+            settings.MiniStats = ["money", "kills", "loot", "dps", "xp"];   // NOT canonical order
             settings.MiniBarOrder.Clear();
             settings.DisabledBreakouts =
                 ["Damage", "Healing", "Pet", "Watch", "Loot", "Buffs"];
@@ -320,7 +366,7 @@ public sealed class HudBarTests
         new(settings =>
         {
             settings.Minimized = true;
-            settings.MiniStats = ["kills", "pet"];
+            settings.MiniStats = ["kills", "pet", "dps", "xp"];
             settings.HudGlancePet = inserted;
             settings.DisabledBreakouts =
                 ["Damage", "Healing", "Pet", "Watch", "Loot", "Buffs"];

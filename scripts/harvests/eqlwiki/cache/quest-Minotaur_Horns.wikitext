@@ -46,11 +46,11 @@ You say, 'I will gather minotaur horns'
 : Larkon Theardor says, 'Fine work. You have earned the respect of the Library. Here is a small token of our appreciation. We shall have this ground down as soon as we find someone to go to Kaladim.'
 
 <div class="facblock">
-* Your faction standing with [[Eldritch Collective]] got better.
-* Your faction standing with [[Dark Reflection]] got worse.
-* Your faction standing with [[The Dead]] got worse.
-* Your faction standing with [[Gem Choppers]] got better.
-* Your faction standing with [[King Ak'Anon]] got better.
+* Your faction standing with [[Eldritch Collective]] got better (20).
+* Your faction standing with [[Dark Reflection]] got worse (-3).
+* Your faction standing with [[The Dead]] got worse (-1).
+* Your faction standing with [[Gem Choppers]] got better (5).
+* Your faction standing with [[King Ak'Anon]] got better (5).
 </div>
 
 {{YouGainExperience}}

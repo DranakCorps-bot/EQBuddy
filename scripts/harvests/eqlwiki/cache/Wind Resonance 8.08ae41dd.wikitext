@@ -1,0 +1,44 @@
+{{Classic Era}}
+
+{{Spellpage|
+
+| spellname = Wind Resonance 8
+| spellicon = 51
+
+| description = Focus effect; Increases the power of wind instrument based bard songs by up to 80%.
+
+| classes =
+
+NPC Only Spell
+
+| items_with_effect =
+
+* [[Broken Minotaur Lord's Horn]]
+
+| slots =
+
+{{SpellSlotRow | 1 | Increases the power of wind instrument based bard songs by up to 80% }}
+
+| skill = 
+
+| mana = 
+| range = 
+| casting_time = 
+| fizzle_time = 
+| recast_time = 
+| duration = 
+| target_type = 
+| spell_type = Beneficial
+| resist = 
+
+| other =
+
+| msg_cast_on_you =
+| msg_cast_on_other =
+| msg_wears_off =
+
+| where_to_obtain =
+
+}}
+
+[[Category:Focus Effects]]

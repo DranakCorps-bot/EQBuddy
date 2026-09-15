@@ -368,11 +368,20 @@ public class HelperMustListTests
     /// row above is that the ONLY thing that differs between the two runs is the level.</para>
     ///
     /// <para><b>The gear half is deliberately in the SAME zone.</b> A Farm Gear answer that
-    /// named a zone with no history could not be affected by the level under any reading, so
-    /// the exemption would pass for the wrong reason — "identical at two levels" is vacuous
+    /// named a zone with no history could not be affected by the level under any reading, so a
+    /// claim about level would pass for the wrong reason — "identical at two levels" is vacuous
     /// against an engine the level could never have reached. Anchoring it on Lower Guk, which
     /// IS the outgrown zone, is the arrangement where a borrowed P6 discount would show
     /// up.</para>
+    ///
+    /// <para><b>DRA-84 D2 gives it a <see cref="ZoneLevels"/>, and the band is the FIXTURE's
+    /// own rather than the shipped page's.</b> It is 8–12 because that is what this fixture's
+    /// creatures conned at, so the gate's TOP arm is the thing that moves between the two runs:
+    /// at 12 the band is in reach and the row stands, at 60 it is 48 levels under and the row is
+    /// refused. The real eqlwiki row for Lower Guk is `30-50+`, which is an OPEN top and would
+    /// exercise the other arm — it is asserted against the shipped catalog in
+    /// <c>RecommendationsGearTests</c>, which is where a claim about the wiki belongs. Nothing
+    /// here is a statement about a wiki page.</para>
     /// </summary>
     private static HelperInputs LevelFixture(int level)
     {
@@ -433,6 +442,11 @@ public class HelperMustListTests
             // falling through to the catalog arm this fixture does not exercise.
             Motes = MoteHistory.Fold(pool, zones),
             Sales = [new SaleRoll("Froglok Blood", 4, 320)],
+            // DRA-84 D2. See the summary: the fixture's own band, matching the fixture's own
+            // conned creatures, so the gate's TOP arm is what differs between 12 and 60.
+            Bands = new ZoneLevels(
+                new Dictionary<string, ZoneLevels.Band> { ["Lower Guk"] = new(8, 12, "8-12") },
+                new Dictionary<string, string>()),
         };
     }
 

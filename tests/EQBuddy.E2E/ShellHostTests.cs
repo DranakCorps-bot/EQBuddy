@@ -2547,6 +2547,77 @@ public class ShellHostTests
     }
 
     /// <summary>
+    /// **THE BAND GATE, IN THE LAUNCHED APP, AGAINST A REAL LEDGER** (DRA-84 D2, plan P2;
+    /// Founder acceptance 3).
+    ///
+    /// <para><b>The same staging and the same stored pick as the row above — only a level is
+    /// added.</b> That is the whole assertion: the row above leaves the level UNKNOWN, so the
+    /// gate stands down and its five zones are the ungated answer. Seed a level through the real
+    /// ledger file and two of those five have to leave, which is the Founder's complaint
+    /// answered on the surface he failed rather than in a unit test.</para>
+    ///
+    /// <para><b>Prediction, computed against the shipped bands before the run</b> (trap 23).
+    /// The eight surviving upgrades group into Temple of Veeshan (3), Clan Runnyeye (2), Kael
+    /// Drakkel, Tower of Frozen Shadow and Veeshan's Peak. At level 28:</para>
+    /// <list type="bullet">
+    /// <item>Temple of Veeshan `60+` and Veeshan's Peak `60+` — bottom 60, which is 32 over 28,
+    /// so both go on the BOTTOM arm. <b>Two refused.</b></item>
+    /// <item>Kael Drakkel `30-60+` — bottom 30 is 2 over, inside
+    /// <c>GearBandReachAbove</c>, and an open top has no maximum to be under. Kept.</item>
+    /// <item>Tower of Frozen Shadow `26-51` — 28 sits inside it. Kept.</item>
+    /// <item>Clan Runnyeye — the fold does not bridge it to the wiki's "Runnyeye" page, so it
+    /// has NO band and an unanswered question gates nothing (trap 73). Kept.</item>
+    /// </list>
+    /// <para>So the three drawn zones become Clan Runnyeye (2 upgrades), Kael Drakkel and Tower
+    /// of Frozen Shadow — and the top row CHANGES, which is the gate visible in the answers and
+    /// not only in a caption. <c>helperGearWithheld</c> stays <b>103</b>: the sweep's per-anchor
+    /// cap is spent before the gate runs, and a gate that moved it would mean the two counts had
+    /// been wired together.</para>
+    ///
+    /// <para><b>Three claims from one moment</b> (trap 56): the ENGINE refused two
+    /// (<c>helperBandRefused</c>), the ROOM drew the sentence saying so
+    /// (<c>helperBandLine</c>), and the gate was live at all (<c>helperBandGate</c>). A refusal
+    /// the player is never told about is a row that vanished, and only a launched app can say
+    /// the caption was drawn.</para>
+    /// </summary>
+    [Fact]
+    public void TheBandGateRefusesTheZonesOutsideYourLevelAndSaysSo()
+    {
+        var key = $"{AppHarness.Character}_{AppHarness.Server}".ToLowerInvariant();
+        using var app = new AppHarness(
+            configureSettings: s =>
+            {
+                s.HelperGoals[key] = [nameof(HelperGoal.FarmGear)];
+                s.HelperWornPicks[key] = ["Cloth Cap"];
+            },
+            environment: OpenOn("helper"));
+        WearTwoPlainThings(app);
+        app.SeedQuestLedger(statedLevel: (28, DateTime.Now.AddHours(-1)));
+        app.Launch();
+
+        app.WaitForDump("shellPage", "helper", "the shell to land on the Helper room");
+        app.WaitForDump("helperWorn", "2", "the inventory dump to become two anchors");
+        app.WaitForDump("helperLevel", "28", "the seeded statement to be what the Helper ranks with");
+
+        // The gate is LIVE — a zero refusal count below would otherwise be indistinguishable
+        // from a gate that never ran (trap 78).
+        Assert.Equal(1, app.DumpValue("helperBandGate"));
+
+        app.WaitForDump("helperZones", "ClanRunnyeye,KaelDrakkel,TowerofFrozenShadow",
+            "the band gate to remove the two level-60 planes and re-rank what is left");
+
+        // What the ENGINE refused, and that the ROOM said so.
+        Assert.Equal(2, app.DumpValue("helperBandRefused"));
+        Assert.Equal(1, app.DumpValue("helperBandLine"));
+
+        // The sweep's own cap is untouched by the gate — two caps, two numbers, no wiring.
+        Assert.Equal(103, app.DumpValue("helperGearWithheld"));
+        Assert.Equal(3, app.DumpValue("helperRecs"));
+        Assert.Equal(3, app.DumpValue("helperGearWhy"));
+        Assert.Equal(0, app.DumpValue("helperDeadDoors"));
+    }
+
+    /// <summary>
     /// **REPLACE WITH BETTER IS A DIFFERENT QUESTION, AND THE ROOM SHOWS IT** (DRA-71 D6,
     /// plan P8; acceptance A5).
     ///

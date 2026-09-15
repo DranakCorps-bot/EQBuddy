@@ -1,7 +1,8 @@
-<noinclude>{{Classic Era}}</noinclude>{{Spellpagesmart|
+{{Classic Era}}
+{{Spellpagesmart|
 
 | spellname = Ring of Feerrott
-| spellicon = V
+| spellicon = 103
 | description = Opens a mystical portal that transports you to the [[Feerrott]] Jungle.
 | Table = {{{Table|0}}}
 | TableLevel = {{{TableLevel|}}}
@@ -29,9 +30,7 @@
 
 | where_to_obtain = 
 
-{{SpellWhereTable|
-{{SpellWhereRowB | [[West Commonlands]] | [[Slea Pinewhisper]] | Druid Ring | (455,1386) }}
-}}
-| TableLocations = West Commonlands
-| TableEra = {{{TableEra|Classic}}}
+<ul>
+<li>[[Druid#Spell Vendors|Druid Spell Vendors]]</li>
+</ul>
 }}

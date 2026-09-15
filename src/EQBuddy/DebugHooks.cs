@@ -40,6 +40,12 @@ internal static class DebugHooks
     /// positive event to wait on; 0 forever unless <c>EQBUDDY_PETDROP=1</c> armed it.</summary>
     internal static int PetProbeDrops;
 
+    /// <summary>How many times the ★ probe has driven <c>MainWindow.SetMiniStat</c> — the
+    /// Mini dashboard checkbox's own writer (DRA-81's Founder LOCK). Reported in the
+    /// <c>EQBUDDY_EXPAND</c> dump so the suite has a positive event to wait on; 0 forever
+    /// unless <c>EQBUDDY_STARPROBE=1</c> armed it.</summary>
+    internal static int StarProbeSets;
+
     /// <summary>Called once from the widget's constructor, at the point the block used to
     /// sit — after the tray icon and the item-catalog warm, before the What's-new notes.
     /// </summary>
@@ -343,6 +349,51 @@ internal static class DebugHooks
                     // AFTER the drop, so a wait on this is a wait on the far side of the
                     // write (trap 62) rather than on the trigger file being noticed.
                     PetProbeDrops++;
+                };
+                poll.Start();
+            };
+
+        // THE ★ PROBE (DRA-81's Founder LOCK), the third of this shape and for the third
+        // version of the same reason: the claim is "ticking HPS in Options puts the slot on
+        // the bar", and the tick is a click on a control inside a window this suite cannot
+        // reach — it may not assert the screen, let alone drive one.
+        //
+        // So the rendezvous is a file in the profile, and it drives `MainWindow.SetMiniStat`
+        // — the SAME method the Mini dashboard checkbox's own handler calls
+        // (`SettingsHudView.BuildMiniStats`), never a private path built for the test. What
+        // it skips is the checkbox's `Checked`/`Unchecked` plumbing, which is WPF and has no
+        // decision in it; what it covers is every inch between the setting and the bar, which
+        // is where the Founder's smoke actually lived.
+        //
+        // The trigger's content is "<key> <on|off>" — "hps on" stars HPS. An unknown word is
+        // ignored rather than guessed, so a staging mistake times out naming the probe.
+        if (Environment.GetEnvironmentVariable("EQBUDDY_STARPROBE") == "1")
+            w.Loaded += (_, _) =>
+            {
+                var trigger = AppPaths.File("star.trigger");
+                var poll = new System.Windows.Threading.DispatcherTimer(
+                    System.Windows.Threading.DispatcherPriority.Background)
+                { Interval = TimeSpan.FromMilliseconds(200) };
+                poll.Tick += (_, _) =>
+                {
+                    if (!System.IO.File.Exists(trigger)) return;
+                    string text;
+                    // READ before DELETE, for the two probes above's reason: a set that throws
+                    // must not spin the timer on one trigger forever, and the suite's next
+                    // write must be a new event.
+                    try
+                    {
+                        text = System.IO.File.ReadAllText(trigger);
+                        System.IO.File.Delete(trigger);
+                    }
+                    catch (System.IO.IOException) { return; }
+                    var parts = text.Trim().Split(' ',
+                        StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+                    if (parts.Length != 2 || parts[1] is not ("on" or "off")) return;
+                    w.SetMiniStat(parts[0], parts[1] == "on");
+                    // AFTER the write, so a wait on this is a wait on the far side of it
+                    // (trap 62) rather than on the trigger file being noticed.
+                    StarProbeSets++;
                 };
                 poll.Start();
             };

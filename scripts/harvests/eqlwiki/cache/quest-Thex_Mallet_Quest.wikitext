@@ -24,17 +24,22 @@
 == Rewards ==
 
 <ul>
-<li> {{:Reaper of the Dead}} <br></li>
-<li> or {{:Thex Mallet}} <br></li>
+<li> {{:Reaper of the Dead}} </li>
 </ul>
+
+== Faction ==
+'''Note: This quest requires amiable faction (+100) with [[The Dead]], the dark elf necromancer and shadow knight guild.'''
+
+* Kizdean can be charmed to acquire the note, however the final turn in NPC ('''[[Loveal S`Nez]])''' cannot be charmed. Raising [[The Dead]] faction is possible by killing high elf or gnome casters from [[Eldritch Collective]] or [[Keepers of the Art]] such as [[Linara Parlone]] (highly recommended: +47 faction/kill, faction hits reversible by [[Bat Wings]] quest) or [[Retlon Brenclog]]. 
+* Faction can be bypassed as both the [[Thex Mallet]] and [[Reaper of the Dead]] are tradable.
+
+* For Bards (and possibly Enchanters) with Dubious or higher faction, you can still turn in the Thex Mallet through the combination of Alliance spells like [[Cinda's Charismatic Carillon|Cinda's Charismatric Carillon]] and Dark Elf Illusion; this is enough to get Amiable.
+** While the GMs and Merchants cannot have alliance spells cast on them, there is a Shadow Knight named [[DeGarran Kixl]] roaming the outside ramparts of the SK & Necro Guild
+
+* The [[Messages For Neriak]] quest can be a simple way to quickly raise [[The Dead]] as well.
 
 == Walkthrough ==
 
-'''Note: This requires amiable faction (+100) with [[The Dead]], the dark elf necromancer and shadow knight guild.'''
-
-An enchanter can charm Kizdean for the note, however the final turn in NPC cannot be charmed. Raising [[The Dead]] faction is possible by killing high elf or gnome casters from [[Eldritch Collective]] or [[Keepers of the Art]] such as [[Linara Parlone]] (highly recommended: +47 faction/kill, faction hits reversible by [[Bat Wings]] quest) or [[Retlon Brenclog]]. Dark elf form (auto-granted to enchanters at level 10) or [[Guise of the Deceiver]] will also help. Faction can potentially be bypassed as both the [[Thex Mallet]] and [[Reaper of the Dead]] are tradable.
-
-The [[Messages For Neriak]] quest can be a simple way to quickly raise [[The Dead]] as well. 
 
 You say, 'Hail [[Loveal S`Nez]]'
 

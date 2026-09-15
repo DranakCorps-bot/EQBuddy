@@ -254,7 +254,16 @@ public class SettingsProsePolicyTests
         Assert.Contains("\"Last Xm\"", Prose("RecentRateBlurb"), StringComparison.Ordinal);
         // The semicolon INSIDE the literal, which is what a naive match-to-the-first-`;`
         // would truncate at. The words after it are the point of the sentence.
-        Assert.EndsWith("there is nothing left to switch off.", Prose("PromotedStatsNote"),
+        //
+        // **It reads `GlancePetNote` since DRA-81, and the move is the probe keeping its
+        // job.** `PromotedStatsNote` used to be the semicolon case; the Founder LOCK rewrote
+        // that sentence (it said the three stats had no switch, which is no longer true) and
+        // the replacement has no semicolon in it. Rather than bend product copy to a
+        // scanner's fixture, the assertion moved to a sentence that still has the shape.
+        Assert.EndsWith("if you drag it off.", Prose("GlancePetNote"), StringComparison.Ordinal);
+        Assert.Contains("show at all; once it's on the top row", Prose("GlancePetNote"),
+            StringComparison.Ordinal);
+        Assert.EndsWith("untick it to put it away.", Prose("PromotedStatsNote"),
             StringComparison.Ordinal);
     }
 }

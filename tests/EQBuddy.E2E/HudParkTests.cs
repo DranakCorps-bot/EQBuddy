@@ -130,7 +130,7 @@ public sealed class HudParkTests
         using var app = new AppHarness(settings =>
         {
             settings.Minimized = true;
-            settings.MiniStats = ["kills"];
+            settings.MiniStats = ["kills", "dps", "xp"];
             settings.DisabledBreakouts = ["Damage", "Healing", "Pet", "Watch", "Loot", "Buffs"];
             settings.DefaultRulesVersion = int.MaxValue;
             settings.TrackedRules.Clear();
@@ -159,7 +159,7 @@ public sealed class HudParkTests
         using var app = new AppHarness(settings =>
         {
             settings.Minimized = true;
-            settings.MiniStats = ["kills"];
+            settings.MiniStats = ["kills", "dps", "xp"];
             settings.DisabledBreakouts = ["Damage", "Healing", "Pet", "Watch", "Loot", "Buffs"];
             settings.DefaultRulesVersion = int.MaxValue;
             settings.TrackedRules.Clear();
@@ -190,7 +190,7 @@ public sealed class HudParkTests
         using var app = new AppHarness(settings =>
         {
             settings.Minimized = true;
-            settings.MiniStats = ["kills"];
+            settings.MiniStats = ["kills", "dps", "xp"];
             settings.DisabledBreakouts = ["Damage", "Healing", "Pet", "Watch", "Loot", "Buffs"];
             settings.DefaultRulesVersion = int.MaxValue;
             settings.TrackedRules.Clear();

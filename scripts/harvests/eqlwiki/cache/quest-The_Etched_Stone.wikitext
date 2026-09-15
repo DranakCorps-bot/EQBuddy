@@ -99,7 +99,7 @@ Take the [[Pulsating Hyacinth Telesm]] to Kazzel. On handing it in, a level 53 g
 
 Kill it, loot a [[Monstrous Zombie Heart]], and give it to Kazzel to receive your spell [[Spell: Life Leech]]: 
 
-: Kazzel D`Leryt says, 'Oh! Umm... Well, I was just playing with you. Certainly you know I was joking! We had a deal and I will abide by the terms of our agreement. HHere is my payment for your services. Bye...'
+: Kazzel D`Leryt says, 'Oh! Umm... Well, I was just playing with you. Certainly you know I was joking! We had a deal and I will abide by the terms of our agreement. Here is my payment for your services. Bye...'
 
 '''You receive [[Spell: Life Leech]].'''
 

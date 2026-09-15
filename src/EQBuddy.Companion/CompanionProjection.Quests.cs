@@ -105,7 +105,8 @@ public static partial class CompanionProjection
         {
             if (!byName.TryGetValue(name, out var quest)) continue;
             var group = GuideChecklistProjection.ApplyQuest(
-                quest, GuideCatalog.Default, settings, req.Ledger, req.CharacterKey);
+                quest, GuideCatalog.Default, settings, req.Ledger, req.CharacterKey,
+                helper: req.Helper);
             if (group is null) continue;
             if (guides.Count >= MaxGuides) { more++; continue; }
 

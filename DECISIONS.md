@@ -1,3 +1,1108 @@
+## 2026-09-14 ~9:40 PM CT — DRA-84 D2: the Farm Gear band gate, the open top, and the one-level gap between the plan's example and the plan's constant
+
+**Seat:** `opus-dra84-d2` (`-Mode disjoint`; `opus-dra84-d1` and `opus-dra84-d3` both still
+hold DRA-84 — trap 70's store working as intended). Paperclip DRA-84, plan P2 + the open-top
+fold Helm authorised by name at ~8:18 PM CT. Nothing here is on the consequence list: no
+release, no public post, no privacy surface, no third-party request — the transform fetches
+nothing and reads the committed cache, exactly as D1's did.
+
+### 1. The finding, first, because it is the one thing a reader should not miss
+
+**The plan's own worked example does not follow from the plan's own constant.** P2 says a
+zone is refused when its band's top is `OutgrownBy` *"(= 10, reused, not re-derived)"* or
+more under the level, and then says *"Crushbone stays refused for a 29 who once farmed it at
+12."* Crushbone's eqlwiki band is `5-20`. **29 − 20 = 9.** At the Founder's own level the
+gate does not refuse his own cited exhibit; it refuses from 30.
+
+**Decision: ship the constant, pin the gap, escalate the product call.** Re-deriving
+`OutgrownBy` to 9 — or inventing a second number for this arm — would be fitting a threshold
+to an anecdote, which is the precise opposite of what "reused, not re-derived" asks for, and
+this repo has no XP curve to derive a better one from. So the arithmetic ships as specified,
+`TheFoundersCrushboneExhibitIsRefusedFromThirtyAndNotAtTwentyNine` pins the boundary in both
+directions, and whether a level-29 character should still see Crushbone is named for Helm
+with the measurement in front of it.
+
+Could have gone the other way: pick 9, or make the top arm exclusive. Both would have made
+the plan's sentence true and made the number unexplainable.
+
+### 2. The gate REFUSES rather than demotes, and it does it over the player's own evidence
+
+The delivery's most vetoable default, and the plan names it as one. `OutgrownWeight` halves a
+zone and keeps it, because there the zone is the player's own MEASURED camp and deleting it
+would overrule a measurement with a judgement. These rows are `Evidence.Catalog` — things
+EQBuddy read about — and their presence in the list is exactly what the Founder failed. So
+the two rules are opposite on purpose, and Crushbone stays refused for a 30 who farmed it at
+12 and looted the very helm there.
+
+Could have gone the other way: demote catalog rows too, and let the player scroll past them.
+That leaves the failed screen looking the same.
+
+### 3. `GearBandReachAbove` is 5 and is NOT 10
+
+A new named judgement, deliberately asymmetric with `OutgrownBy`. The two arms are not
+opposites: being over a band's top costs time, being under its bottom costs the attempt, and
+the distance at which that second one happens is shorter. One constant for both would have to
+be wrong in one direction. Neither number is measured and the code says so.
+
+### 4. The open top is `Max` = null, and 41 of 87 bands are one
+
+Helm authorised option (a) by name before this slice started. Implemented as the ABSENCE of a
+maximum: `ZoneLevels.Band.Max` is `int?`, the number before the `+` is discarded rather than
+promoted, and the gate's TOP arm stands down for those zones while the BOTTOM arm still
+applies. `int?` rather than a sentinel on purpose — a sentinel is a number some layer does
+sums with (trap 63), and null makes the compiler ask at every reading site.
+
+**The scope stayed where the ruling drew it.** Only a verbatim whose SOLE defect is the
+trailing `+`. `1-13+, 35-50` and `20-40+ (50+ inside pit)` both contain a trailing-`+` band
+and both stay refused, because coalescing them would assert a continuity the page contradicts
+by printing the gap. Prove-failed: dropping the regex's end anchor reddens seven rows.
+
+**Measured, and it is the number that justifies the ruling:** banded drop weight went from
+33% to **75%** of catalog mentions; refused fell from 54% to **12%**.
+
+### 5. The distinct-count telltale was re-derived rather than relaxed
+
+Discarding a maximum coarsens `(Min, Max)` **by construction**, so over all 87 bands it comes
+out at 53/87 = 0.61, under the two-thirds floor — and not because the data got worse. The
+floor is now applied where it was calibrated (the 46 closed bands, 36/46) and to the measure a
+template would actually collapse (the verbatim row, 64/87). The open tops' own repetition — 41
+zones, 17 distinct bottoms, five plane pages printing `50+` — is pinned as a MEASUREMENT
+rather than held to a floor, because it is the wiki repeating itself on real separate pages.
+
+Could have gone the other way: lower the floor until 53/87 passed. That is a guard edited to
+fit its own subject.
+
+### 6. `LevelUseFor(FarmGear)` flips Exempt → Consumes, and the D6 survey moves rather than dies
+
+The must-list pairing forbids a consuming engine from carrying a `LevelExemptReason`, so that
+arm had to leave the table. **The survey it held is not retired** — 11,196 records, five Level
+keys, exactly one wearable (`Shroud of the Sky`) — it is quoted with its numbers on
+`GearBandGate`, because it is the live reason the gate reads a ZONE and not an item. The
+ITEM side is still ungated and the P6 outgrown discount is still not borrowed. Helm's #628
+tip said the D6 conclusion stands and the P2 zone-band flip is unaffected by it; this is that,
+implemented.
+
+### 7. Refusing every zone is its own gap
+
+`NoCatalogUpgrade` would be false — the catalog DOES hold something better — and with no rows
+and no gap the room draws its whole-room empty state, which says EQBuddy has nothing stored:
+the opposite of what happened. So `GoalGapReason.EveryZoneOutsideYourBand` exists. That is one
+more enum member than the plan asked for, and it is here because the alternative is a silent
+no-op, which this repo does not ship.
+
+### 8. Player-facing: the refusal is SAID, with both numbers and the source
+
+Trap 50 applied to a rule instead of a count. A zone missing from a list is indistinguishable
+from a zone with nothing in it, and the player has no way to discover EQBuddy decided for
+them. The sentence names the count, each band, the level, and only the arms that actually
+fired — never a threshold that decided nothing in this list. HOME-006 swept over all of it and
+prove-failed: planting "too easy" reddens the sweep and names the sentence.
+
+**The height of `shell-helper-gear-band` is staged, and that is worth recording.** The first
+take at the default size was a correct, well-composed photograph of the room with the new
+caption BELOW THE FOLD — a shot of a refusal that does not show the refusal. The density
+question underneath it is real and stays with Bevel; it was not restyled from the shot.
+
+### What would make these wrong
+
+- If a level-29 character should not see Crushbone, `OutgrownBy`'s reuse is the thing to
+  revisit — not this slice's plumbing.
+- If players report losing camps they were actually farming, `GearBandReachAbove` = 5 is the
+  first number to move, and the refusal sentence is already the diagnostic.
+- If a zone page's `Level of Monsters` row turns out to mean something other than "what you
+  will meet here", the whole gate rests on a misreading and the report is where to start.
+
+---
+
+## 2026-09-14 ~9:00 PM CT — DRA-84 D3 follow-up: the refresh landed and four shipped sentences went stale with it. Plus the duplicate-seat fact.
+
+**Seat:** `opus-dra84-d3` (claimed 01:27Z). Paperclip DRA-84. This entry is about the
+commit range AFTER #626 merged. Nothing here is on the consequence list.
+
+**The duplicate first, because it is the only thing here with a cost.** Two Executor seats
+ran D3 concurrently. This one claimed DRA-84 at **01:27Z**; `opus-dra84-d3`/PR **#626**
+opened at **01:32Z** and ran the full weekly refresh. Both fetched ~11k eqlwiki pages
+inside the same half hour — **two Soft-driven fetches inside Helm's one named un-PARK**.
+Neither exceeded the standing rate and both used the committed polite client, so
+consequence-list item 7 was not breached, but the duplication was real and only luck made
+it harmless. `claim-seat.ps1` held no DRA-84 row when either seat started (trap 70 again).
+
+**The one good thing to come out of it: the two rebuilds are byte-identical decompressed** —
+SHA-256 `5487aa79…`, 4,217,353 bytes, 11,196 records, 5,591 with creatures, 773 priced. Two
+independent harvests, hours apart, same bytes. That is the strongest evidence anyone has
+that `itemcatalog-build` is reproducible, and it was free.
+
+**Decision: #626 is D3; this seat's own refresh commit is abandoned, not pushed.** It was
+filed first, it is broader (quests, spells, guides, items), and it matches "the standing
+weekly refresh" more literally than the item-only half. Could have gone the other way: push
+a competing PR and make a human choose. That wastes the review, not the fetch.
+
+**What was left over, and is what this PR actually is.** #626 shipped the data and did not
+move the sentences that quote it. On `main` right now, four are wrong:
+
+1. **The professions park note is player-facing and false.** It says *"Of the 10,957 item
+   pages it has read, 14 say which profession an ingredient belongs to."* The refresh made
+   that 11,197 — and shipped `items-catalog-report.md` saying so, in the same commit.
+   EQBuddy is currently telling players a survey result its own committed report
+   contradicts.
+2. **Its guard could not see it.** `TheParkNoteNamesTheCoverageItMeasured` asserted the
+   sentence CONTAINED the literal `"10,957"` — the sentence quoting itself. It can catch
+   somebody deleting the number and never the number going wrong. **Default chosen: read
+   both numbers out of `items-catalog-report.md`** (the promoter rewrites it every refresh),
+   with a committed negative carrying the exact stale text that shipped. Prove-failed.
+   Could have gone the other way: bump the literal, which is the smaller diff and leaves the
+   next refresh to ship the same defect.
+3. **DRA-71 D6's level survey is no longer literally true.** Shipped, on screen: *"11,146
+   records were surveyed and not one prints a Level key."* Re-taken: **five** print one and
+   exactly **one** is a wearable (`Shroud of the Sky`, `Required Level: 46`); the other four
+   are `Level Needed` on spell scrolls and a food item, which is the SPELL's level. D6's
+   conclusion **stands** — one in 11,196 gates nothing, and D2's band gate reads the ZONE —
+   so this is a sentence correction, not a plan change.
+4. **`CLAUDE.md` still said the vendor field was "data-less until the next weekly
+   refresh."** It has 773 prices in it now.
+
+**Decision: a `WhatsNew.json` entry ships here rather than waiting for D5.** Rows naming a
+creature is player-noticeable the moment #626 landed, and the house rule puts the entry in
+the release that ships the change — 2.0.0, unreleased, the list DRA-83 already appended to
+mid-plan. The stale "10,957" inside the unreleased DRA-71 D8 entry is corrected while it is
+still ahead of a player. No release rides this; that stays David's.
+
+**Measured for D4, which is the slice that needs it.** The plan tells D4 to open with a
+`DropMobs` coverage survey and **STOP and wake Helm under half**. On the merged data it is
+**99.4%** (5,591 of 5,626 drop-bearing records), and both zones the Founder named are at
+**100%** — Rathe Mountains 163/163, Crushbone 102/102. D4 starts with the number instead of
+discovering it.
+
+**Untouched:** no engine, no ranking, no curated file. Rathe and Crushbone still rank
+tonight exactly as they did — that is D2's bands and D4's who-or-withheld, in that order.
+
+---
+
+## 2026-09-14 — DRA-84 plan: the defaults chosen while turning the Founder's Farm Gear FAIL into slices
+
+Plan-only seat `fable-dra84-farmgear` (Paperclip DRA-84), branch `fable-dra84-farmgear`,
+plan PR to Soft `main`. Governing input: Founder FAIL of Helper Farm Gear on Desktop
+2.0.0+`3174aa5f`, four acceptance items. `src/` untouched in this seat; plan SIGN
+pending with Helm. Live Holds empty at write; none named DRA-84.
+
+**1. Band-failing zones are REFUSED, not demoted — and personal evidence does not
+rescue them.** DRA-71 D3 set the precedent that an outgrown zone is DEMOTED
+(`OutgrownWeight` 0.5) because deleting a player's own best-measured camp would
+overrule evidence with judgement. This plan diverges for Farm Gear's catalog zone
+rows: the Founder failed the build on their PRESENCE, so a zone whose eqlwiki
+`Level of Monsters` band fails the gate is refused outright, with a counted
+says-so sentence — even where the player has personal seen-drops there (Crushbone
+stays refused for a level-29 who farmed it at 12). Could have gone demote-only;
+went refusal because a FOUNDER FAIL is an acceptance bar, not a preference. **The
+default most worth a veto.**
+
+**2. The gate's two arms are `OutgrownBy` = 10 (reused) below and
+`GearBandReachAbove` = 5 (new) above.** A zone is refused when its band TOP is 10+
+under the resolved level, or its band BOTTOM is 5+ over it. Both are named
+judgements, not measurements — no XP curve, no con-colour model, nothing derived
+(the D3 refusal of invented curves KEEPS). 10 is reused rather than re-chosen so
+"outgrown" means one thing in the repo; 5 is new and could have been 3 or 8.
+
+**3. A drop row that cannot name a WHO from either source, and rides no quest, is
+withheld** — the Founder's acceptance 2 read strictly ("item + source mob(s)
+and/or quest + zone"). Gated on a post-refresh coverage survey: if fewer than
+half the `DropZones`-bearing records carry a creature after the refresh, the
+withhold default is wrong and the slice stops and escalates with the number
+instead of shipping a hollowed room. Could have gone "show the who-less item
+anyway, ranked last"; went withhold because "somewhere in this zone" is the exact
+row the Founder called out (Rathe, band 13–45 — a level gate cannot refuse it, so
+the who rule is what answers that exhibit). **Second-most worth a veto.**
+
+**4. The refresh slice (D3) is named for its own Helm AUTHORIZE instead of riding
+the sequence SIGN.** Harvest PARK is Helm posture ("Harvest PARKED STAND",
+Helm tip 2026-09-14 ~7:15 PM CT); burying its un-PARK inside a sequence-wide SIGN
+would take away the veto seam the whole-sequence rule rests on. The sequence is
+cut so D1–D2 land without it and D4 waits on it. The run itself is the standing
+weekly refresh with no rate or policy change, so consequence-list item 7 is
+untouched.
+
+**5. `LevelUseFor(FarmGear)` `Exempt` → `Consumes` is the Founder's veto arriving,
+not a new decision.** D6 logged the exemption as "the default most worth a veto";
+the FAIL is that veto. The mechanism differs from what D6 surveyed — zone bands
+from the committed zone-page cache, not item level requirements — so the
+0/11,146 item survey stands uncontradicted.
+
+**6. Not needs-david.** Both tests fail on every open call: direction came from
+the Founder in the FAIL itself; every remaining choice (constants, refusal shape,
+withhold rule, slice order) changes implementation, not direction. Veto path is
+this file.
+
+## 2026-09-14 — DRA-79 / M0-6 (EXO-PLAYBOOK doctrine capture): four calls made alone
+
+Tier T2 (doctrine entries are Corps posture) · docs-only, `src/` untouched ·
+governing plan: DRA-73 rev 2, SS10. Live Holds empty at start; none named
+DRA-79. Deliverable: `EXO-PLAYBOOK.md` in `dranakcorps-control-plane`,
+control-plane PR #3, awaiting Helm's pre-merge T2 review.
+
+**1. PLACEMENT: playbook at the ROOT of `dranakcorps-control-plane`.** SS10.2
+names the repo and says placement is a logged DECISIONS.md call, vetoable from
+here — so it is logged here. Root rather than a subfolder because the repo's
+other doctrine-shaped files (`PLAN.md`, `DECISIONS.md`, `roster.json`) live at
+root, and a one-file playbook in a folder is a door with nothing behind it.
+
+**2. ROUTE: a control-plane PR, not a direct commit.** T2 means pre-merge Helm
+review, and under M0-1's cutover the PR review IS the ruling — attached to the
+diff it judges. A direct commit would have made Helm's review a post-hoc read.
+
+**3. THE FIVE IN-FLIGHT EXPERIMENTS GOT INITIAL READINGS, NOT VERDICTS.**
+SS10.1 says no graduation on vibes and the entry cites dashboard rows; the
+frozen reading IS these experiments' baseline (dashboard §7), so an
+ADOPT/ADAPT/DROP written today would cite a comparison that does not exist
+yet. Verdicts land at M2 from the measured window. The three findings whose
+evidence IS complete at M0 (the frozen baseline, the ~8.6 MB / ~300K-token
+context tax, trap-60-at-scale + rotation remedy) do carry verdicts.
+
+**4. SIX EXPERIMENTS CAPTURED WHERE THE CARD NAMES FIVE.** `metrics-baseline`
+carries an `exo-experiment:` tag and §10.3's rule is that doctrine capture
+reads the tags — an untagged experiment does not appear, and a tagged one is
+not dropped because a card's enumeration predates it.
+
+— Dranak (Claude Code, DRA-79)
+
+## 2026-09-14 — DRA-77 / M0-4 (Paperclip merge-sync): eight calls I made alone, one secret I deliberately did not set, and a lookup bug that only the live run could have found
+
+`exo-experiment: merge-sync` — judged by *merge-to-close latency*: the wall time
+from a PR merging to its linked issue reaching a terminal state. The observed
+failure is days (EXO-HARDEN-A2, EQ-V2-HOME-CATCHUP sat `in_review` long after the
+work was on `main`), and the target is minutes, because the run starts on the
+merge event. Stated net of the **wrong-close count** — issues this job moved to
+`done` that a human then reopened. A sync that closes the wrong card is not
+faster than the drift, it is just more confident, and the same "state net of the
+harm" shape the seat-mutex tag uses for false blocks.
+
+Tier T1 · one workflow + three scripts + docs, `src/` untouched · governing plan:
+DRA-73 plan document rev 2, approved by David 2026-09-14 (SS3.2-3 + SS8.5;
+SS10.1 asks for the tag above). Live Holds empty at start; none named DRA-77.
+
+**The shape.** `pull_request: [closed]` filtered on `merged == true`, the issue
+key read from the branch, `PATCH /api/issues/{id}` to `done`, and a comment on
+the issue naming the PR. One way, GitHub → Paperclip.
+
+---
+
+**1. THE BRANCH BEATS THE PR BODY, and the body is never read when the branch
+names a key.** The card says "issue key in branch name or PR body", and the
+obvious reading is one pool of text. That reading closes the wrong issue on
+*every merge in this repo*: every PR body here carries a `Governing plan: DRA-73`
+line, so the parent plan issue would be transitioned each time. The default could
+have gone the other way — pooling is simpler and the card's wording allows it —
+and the self-test row that pins this is the one I would keep if I could keep only
+one.
+
+**2. AN AMBIGUOUS BODY IS REFUSED, NOT RESOLVED BY FIRST-MATCH.** Picking the
+first of two keys is a coin flip whose losing side writes `done` onto somebody
+else's issue, and one-way sync gives that no undo path. With rule 1 in place this
+only reaches PRs whose branch named nothing, so the cost is small and the
+instruction is concrete: put the key in the branch.
+
+**3. `blocked` AND `cancelled` ARE REFUSED.** A merged PR does not clear a
+blocker, and stamping `done` over one hides it; `cancelled` is a human decision
+that a merge is not evidence against. This is the call most likely to be argued —
+if a `blocked` issue's PR merges, something is genuinely out of date — and I
+chose the reading where the job never overwrites a state a person chose on
+purpose.
+
+**4. `backlog`, `todo` AND `in_progress` CLOSE TOO, not just `in_review`.** The
+card names the `in_review` drift, so restricting to it was the narrower and
+defensible option. A merged PR is evidence the work happened whatever column the
+board was left in, and a job that only fixes one column leaves the same complaint
+alive in the others.
+
+**5. THE THREE DISPOSITION LISTS ARE ASSERTED TO PARTITION THE STATUS ENUM.**
+Total and disjoint, checked in the self-test. A status Paperclip adds later
+reddens a test instead of falling into the unknown-status arm silently. This is
+the trap 78 lesson applied before it cost anything: the list is asserted
+non-empty AND proven to fire, per element, in the commit that adds it.
+
+**6. ABSENT SECRETS ARE `SKIPPED` / EXIT 0; A CONFIGURED JOB THAT CANNOT SYNC IS
+RED.** Fail-open everywhere would recreate the drift this fixes, and fail-closed
+everywhere would paint dependabot's queue red forever. The split is by cause: not
+being configured yet is not a fault, and a run that names the missing secrets
+tells the operator exactly what to do. A key that resolves to **no issue** is also
+red — silence there is how a mislabelled branch quietly stops syncing forever.
+
+**7. `-Merged` IS A STRING AND THE SELF-TEST PINS IT.** GitHub hands the value
+over as the text `true`/`false`, and in PowerShell a non-empty string is truthy,
+so `if (-not $Merged)` closes an issue every time a PR is *abandoned*. Run as a
+mutation, it sails past the gate to `Linked: this PR -> DRA-77`. Worst single bug
+this job could have; one keyword away at all times.
+
+**8. THE AUDIT COMMENT IS BEST-EFFORT; THE TRANSITION IS THE DELIVERABLE.** If
+the comment fails after a successful PATCH the job warns and exits 0. Failing
+there would report a sync that *did* happen as one that did not, and the re-run
+would find the issue already `done` and no-op — so the comment would never be
+written anyway.
+
+---
+
+**THE SECRET I DID NOT SET.** The job is inert until `PAPERCLIP_API_URL`,
+`PAPERCLIP_API_KEY` and `PAPERCLIP_COMPANY_ID` exist as Actions secrets; this
+repo currently has **zero** Actions secrets and **zero** self-hosted runners
+(checked, not assumed). Provisioning a production credential is the standing
+`Soft LEAVE ... prod secrets` line in every recent Helm ruling, so it is named as
+the Founder/ops step rather than done here. The base URL must also be one a
+hosted runner can reach — a tailnet or loopback address works from a developer
+box and fails from `ubuntu-latest`. That `helm-back-channel.yml` posts
+successfully from a hosted runner is the evidence such an ingress exists.
+
+**THE BUG THE LIVE RUN FOUND, which is now trap 80.** The first real call against
+Paperclip reported `status 'blocked todo done done todo ... backlog'` — eighty
+statuses concatenated as one issue's status. `@(Invoke-RestMethod ...)` nests the
+returned array rather than normalizing it, and `-eq` against an array is a filter
+returning matching elements rather than a boolean, so `Where-Object` became a
+tautology that passed all eighty issues. **The negative case was correct
+throughout** — a fake key gave an empty, falsy array and refused properly — so a
+test showing "finds a real key, refuses a fake one" would have signed it off.
+Fixed by enumerating through the pipeline, which unrolls. My first repair added a
+"refuse a nested list" guard beside it; the row written to prove that guard fired
+came back green-as-found, because after the flatten nothing reachable is still
+nested. I deleted the guard rather than keep an unreachable one, and replaced it
+with the assertion that would have named the bug in one line: the field the job
+is about to act on must be a scalar.
+
+**What it is verified on.** 35 self-test checks, every refusal driven red at
+least once by seven deliberate mutations (pooled linkage, dropped word boundary,
+emptied disposition list, `blocked` made closable, fatal missing-secrets,
+`[bool] $Merged`, `if (-not $Merged)`, reverted flatten) — each reddening the
+rows it should and no others. Four live end-to-end runs against the real API
+covering base normalization, an already-`done` no-op, a `blocked` refusal and an
+unresolvable key. **The live WRITE path — PATCH plus comment — is exercised by
+this issue's own closure and nothing earlier**; that is stated rather than
+implied, because until it ran, the write was the one path with no evidence behind
+it.
+
+---
+
+## 2026-09-14 — DRA-76 / M0-3 (claim-seat graduated to a refusing per-work-item mutex): seven calls I made alone, the one line of old behaviour that turns out to have been the whole hole, and a risk I widened on purpose and did not fix
+
+`exo-experiment: seat-mutex` — judged by *rework rate* and *PRs per delivered slice*
+(baseline 3.7% and 2.15), because a duplicate executor spends both: #566/#568 cost one
+full run and produced a second PR for one slice. Stated net of the **false-block count**
+kept in `.claude/soft-seats/README.md`'s evidence list — a mutex that refuses work that
+should have started is not cheaper than the collision, it is just quieter.
+
+Tier T0/T1 · scripts + docs only, `src/` untouched · governing plan: DRA-73 plan
+document rev 2, approved by David 2026-09-14 (SS2.2 + SS8.4; SS10.1 asks for the tag
+above).
+
+**What actually changed is one word.** The refusal used to test `Test-SoftSeatExclusive`
+— `active` or `replacement`. It now tests `Test-SoftSeatHolding` — every mode except
+`abandoned`. So a default claim is refused by a live `challenger` or `disjoint` seat as
+well, and only an abandoned claim releases the card.
+
+**The hole that word left is not theoretical, and the prove-fail run prints it.** Running
+the new self-test against the pre-change store, rows 22 and 25 read
+`expected refuse, got success: OK: claimed DRA-762 as active for seat 'second-default'`
+— a default executor taking a card a live challenger was working, and row 30 then catches
+the row it wrote while doing it. That is the #566/#568 shape, reproduced on demand.
+
+---
+
+**1. A CHALLENGER AND A DISJOINT SLICE HOLD THE CARD.** The default could have gone the
+other way, and the old code is the argument for it: those modes were deliberately
+non-exclusive, so reading them as holders is a reversal, not a completion. I reversed it.
+The store's job is to refuse a *duplicate executor*, and an executor working a card under
+`-Mode disjoint` is an executor working that card; whether its slice is disjoint is a
+claim it made about itself, not something the store checked. Exclusivity still means what
+it meant — it is what `-Mode replacement` takes over — which is why
+`Test-SoftSeatHolding` is a second predicate beside `Test-SoftSeatExclusive` rather than
+a widening of it.
+
+**2. THE EXPLICIT MODES ARE NEVER THEMSELVES REFUSED.** A challenger beside a challenger
+is admitted. The card asks for "refused outright unless `-Mode challenger|disjoint|replacement`
+is explicit", and the whole design rests on the seam between *a default that happened* and
+*a second seat somebody chose*. Capping the explicit modes would move the refusal onto
+the people who already read the rule and said what they were doing.
+
+**3. OWN ROWS ARE EXCLUDED BY SEAT ID, NOT BY "DO I HOLD AN EXCLUSIVE ONE".** The old
+`$ownExclusive` proxy answered "may I refresh my claim" with a fact about exclusivity
+(trap 64b). `-NotSeatId` names the actual fact: this seat is not a second executor. Same
+answer on every path the old code covered; correct on the paths it did not.
+
+**4. THE REFUSAL NAMES EVERY HOLDER, COUNTS THEM, AND SAYS WHICH LOOK STALE.** Widening a
+refusal without making the recovery discoverable manufactures false blocks, which is the
+row this experiment is judged net of. The old message named `$exclusive[0]` — one holder,
+no count — so a card held by three seats and a card held by one read identically. The
+self-test asserts the count (`3 live seat`), asserts each holder is named, asserts the
+released seat is *not* named, and asserts `release-seat.ps1` appears in every refusal.
+
+**5. `-ForceStale` IS THE ONLY WAY PAST A HOLDER, SO THE 8 HOURS IS NOW ONE NUMBER.**
+`SoftSeatStaleAfterHours` lives in the store; `release-seat.ps1 -StaleAfterHours` defaults
+to `0` meaning "unset" and resolves to it after the dot-source. Two copies of that number
+would let the sentence the refusal prints drift away from the behaviour the release path
+acts on (trap 4), and the refusal only just started printing it.
+
+**6. THE HOLDING LIST THROWS AT DOT-SOURCE TIME IF IT IS NOT THE MODE LIST MINUS
+`abandoned`.** A detector list that drifts fails OPEN here — a mode nobody added would
+hold a seat that refuses nobody, which is trap 78's green-guard-aimed-at-nothing in its
+worst direction. The self-test also asserts the list is non-empty and equals the four
+modes, because `@($null)` is a one-element array and reads as a healthy list.
+
+**7. THE REFUSAL TEXT CHANGED FROM "already claimed" TO "already held by N live seat(s)".**
+Grepped `scripts/`, `.claude/`, `.github/` and `tests/` first: the self-test was the only
+consumer of the old phrase. Worth saying in a log because a refusal string is exactly the
+kind of thing a launcher or a hook greps for silently.
+
+---
+
+**THE RISK I WIDENED AND DID NOT FIX, stated so the veto has something to aim at.**
+Nothing expires a claim and nothing releases one when an executor ends. The live store on
+this machine right now holds four claims that have been `active` since 2026-09-11 and
+2026-09-12 — every one of them almost certainly a seat that finished and never released.
+Before today those rows blocked only a default claim on the *same* card; the widening does
+not change that count, but it does mean a `challenger` or `disjoint` row left behind now
+blocks too, and the surface of "left behind" just grew by two statuses.
+
+I did not add an expiry or a release-on-exit. Both are a design change to the mechanism
+rather than the graduation the card authorises, and choosing a TTL is exactly the sort of
+number that wants evidence — the store's README asks for false blocks to be counted, and
+there is no count yet. What I did instead is make the refusal say when a holder looks
+stale and name the one command that clears it, and write the risk into the README's
+evidence list as the row to watch. **If false blocks outnumber prevented duplicates, the
+answer is an expiry or a release-on-exit — not a narrower refusal.** Filed to Fable as a
+follow-on rather than taken here.
+
+---
+
+**A SECOND FINDING, FROM THE ONE STEP THIS CARD FORCED ME THROUGH — and it is about
+yesterday's slice, so it is stated rather than quietly fixed.** `ExoDashboardTests`
+requires every `exo-experiment:` tag in `DECISIONS.md` to reach the dashboard's §7, and
+the only sanctioned way to put mine there is to regenerate — a hand edit of a generated
+doc is the illustration lock's failure with a recipe-shaped hole in it. So I re-ran
+`scripts/exo-metrics.ps1 -FromPr 580 -ToPr 607 -Baseline`, and two things came back.
+
+**The good one: every §6 KPI reproduced byte-identically.** GWR 0.49, ACCR 0%, 2.15
+PRs/slice, 2.1 Helm touches/slice, veto 0%, rework 3.7%, CI median 13.5 min — the only
+field that moved in `exo-baseline.json` was `generatedAt`, which I restored to the DRA-78
+run's value. The freeze is that run, not mine, and a frozen file whose timestamp walks
+forward every time somebody re-runs the generator is not frozen. DRA-78's central claim —
+that the baseline is re-derivable rather than remembered — is now checked by a second
+person on a second day.
+
+**The bad one: the committed dashboard carried a row the committed tree cannot produce.**
+§7 listed a `channel-rotation` experiment flagged "no judging metric", and there has never
+been an `exo-experiment: channel-rotation` tag in `DECISIONS.md` on this history —
+`git show <commit>:DECISIONS.md` at `1555994f`, `54415457`, `24b1dec9` and `d18dcaeb`
+finds `ssc-retirement`, `whole-sequence-auth` and later `metrics-baseline`, and nothing
+else. The row is an artefact of an UNCOMMITTED working-tree state at generation time: the
+`metrics-baseline` amend Helm asked for landed over a draft that had both tags, and the
+dashboard kept the one the amend dropped. Regenerating removes the row and the
+"1 experiment(s) name no judging metric" callout that existed only for it.
+
+I let the regeneration remove them rather than re-adding a tag I did not write (Helm's
+#616 ACK says LEAVE inventing a fill-in, and inventing the tag to preserve the row would
+be worse — it would make a DRA-75 decision up in DRA-75's name). **But the thing worth
+keeping is not the row, it is what the row proves: `ExoDashboardTests` checks tags ⊆
+dashboard and never the reverse, so a dashboard row with no tag behind it is invisible to
+the guard that exists to keep the two in step.** That is trap 34 in its own mirror — the
+must-list was built, and the forbid-scan on the other side was not. Filed to Fable;
+NOTICE'd to Helm, because Helm ACK'd that row by name.
+
+## 2026-09-14 — DRA-78 / M0-5 (exo-metrics.ps1 + the frozen DRA-70/71/72 baseline): eight definitional calls I made alone, three numbers that came back different from the plan's estimate, and two metrics I refused to report as zero
+
+`exo-experiment: metrics-baseline` — judged by *whether a later window's claim can be
+checked against it without re-deriving the window*: concretely, whether the §10.3
+"current vs baseline" column fills from `docs/ops/exo-baseline.json` alone at the M2
+checkpoint, without any §6 KPI being recomputed by hand. Stated net of the count of
+metrics still reading `unmeasured`.
+
+Tier T0/T1 · governing plan: DRA-73 plan document rev 2, approved by David 2026-09-14
+(§6 + §8.6; §10.1 asks for this tag so the M0-exit doctrine capture can cite it).
+
+`scripts/exo-metrics.ps1` computes the plan's §6 metric table from `gh` plus the
+Paperclip API and emits `docs/ops/exo-dashboard.md`; `-Baseline` additionally freezes
+`docs/ops/exo-baseline.json`, which is what a later run reads to fill the "vs baseline"
+column. Run once over PRs #580–#607 and committed. The point of the freeze is narrow and
+worth stating plainly: **DRA-73's whole argument rests on numbers measured by hand from
+that window, and a hand-measurement nobody can re-run is an anecdote by the time anyone
+wants to check it.**
+
+**THE HEADLINE READING, so the veto has something to aim at:** Governance Wait Ratio
+**0.49** · ACCR **0%** · **2.15** PRs per delivered slice · **2.1** Helm touches per
+delivery slice · median CI **13.5 min** · veto **0%** · rework **3.7%** · **50%** of all
+PR traffic was `helm/ssc-N` carriers.
+
+---
+
+**1. A SLICE IS A HEAD BRANCH, AND ITS `helm/ssc-N` PR BELONGS TO IT.** The plan counts
+"PRs per slice" without defining a slice, and the repo offers three candidates: a
+Paperclip work item, a plan's declared delivery, or a branch. I took the branch — a slice
+is one non-`helm/ssc-*` head branch, normalised past its `claude/` / `opus-` / date
+decoration, and the SSC PR that rules on it attaches to it rather than counting as a
+slice of its own. **The default it could have gone the other way on:** counting each SSC
+as its own slice, which would have halved the PRs-per-slice figure and hidden the exact
+cost cutover 1 exists to remove. Logged because it is the definition every later
+comparison inherits.
+
+**2. PRs PER SLICE IS ALL PR TRAFFIC OVER DELIVERED SLICES — INCLUDING A SLICE THAT
+DELIVERED NOTHING.** `exo-night3` (#584 + #585) burned two PRs and closed without
+merging. A ratio that drops it reports 2.0 and flatters the old model with its own waste;
+including it reports **2.15**. The plan estimated 2.3. **I am not reverse-engineering the
+definition that reproduces 2.3** — the measured number under a stated definition is the
+thing worth freezing, and the gap is small enough to be exactly the kind of drift a
+frozen baseline exists to stop happening silently a second time.
+
+**3. WAIT HOURS ARE UNION-ED, NOT SUMMED, AND THIS IS THE ONE THAT WOULD HAVE SHIPPED A
+WRONG NUMBER.** The first working version summed every merged PR's open→merge minus CI.
+A slice's product PR and its SSC twin sat open across *the same hours* waiting on the
+same person, so the sum double-counted: 42.9 wait-hours against a 40.8-hour denominator,
+a ratio of **1.05**. A governance wait ratio above 1 means the window contained more
+waiting than it contained time. Elapsed time is what a wait costs, so the numerator is
+now the union of the wait intervals. Five self-test cases pin the arithmetic — contained,
+overlapping, disjoint, empty, zero-length.
+
+**4. TWO GWR READINGS, BECAUSE ONE WOULD HIDE WHICH DEFINITION IT IS.** The headline
+(**0.49**) uses the plan's §6 terms: product-PR wait plus authorization gaps. A second
+line adds the hours an SSC PR spent open beyond that (**0.53**). The first is the one
+comparable to the plan's < 0.15 target and to its 0.40–0.60 estimate; the second is the
+fuller cost, since an SSC PR's entire existence is governance overhead. **The default it
+could have gone the other way on:** publishing only the fuller number, which reads worse
+for the old model and is therefore the tempting one. It would also have been
+incomparable to the target it is supposed to be measured against.
+
+**5. A STANDING WORK ITEM'S LEAD TIME IS CLAMPED TO THE WINDOW.** DRA-53 is an ops lane
+accepted 2026-09-10 and still open; its two slices here are minutes long. Counting its
+whole open life as lead time put **77.4 h** in the denominator and dragged GWR from 0.49
+down to **0.36** — a governance metric improved by an ops ticket nobody had closed. Lead
+time for a window is now the lead time of the work done *in* it, and the clamped rows say
+so in the table.
+
+**6. AN UNMEASURED METRIC IS NEVER A ZERO, AND TWO OF THEM ARE.** *Escaped defect rate
+per tier* has no data because the tier model did not exist during this window — no merge
+in it carries a tier. *Cost per delivered slice* has none because DRA-70/71/72 ran on Soft
+CLI seats with no Paperclip run records; the one work item in the window that *does* carry
+run records delivered no slices, so dividing its cost by another item's slices would print
+a number about neither of them. **I checked that the instrument itself works before
+calling the gap the window's**: issues worked through Paperclip return non-zero run counts
+and token totals. Both render as `unmeasured` with the reason, and `ExoDashboardTests`
+reddens if that word leaves the document. `costCents` is 0 everywhere, which is a
+subscription billing shape rather than a measurement — tokens are the quantity that moves,
+so they are carried beside the cents.
+
+**7. A RED CI RUN IS ONE THAT FAILED *OR* NEEDED A SECOND ATTEMPT.** A rerun-to-green
+overwrites the run's conclusion, so counting conclusions alone misses exactly the reds the
+flake ledger exists for — including `34724000246`, which is *in* the ledger and reports
+`success` today. Twelve red events in the window, **two filed**, six unfiled on window PR
+branches. The unfiled count is not an accusation; it is the number that says the ledger is
+behind, which is the only way "passed on rerun is an observation" becomes checkable.
+
+**8. A GOVERNANCE PR THAT DESCRIBES REWORK IS NOT REWORK.** #605's body ACKs #604's
+re-land, and the first version counted both — doubling the rework rate to 7.4%. Signature
+prose about someone else's correction is a ruling, not a correction. Rework is **3.7%**
+(1 of 27), and the one PR is named in the dashboard so the rate is checkable rather than
+assertable.
+
+---
+
+**WHERE THE MEASURED NUMBERS DISAGREE WITH THE PLAN'S ESTIMATES**, and the disagreement is
+the deliverable rather than an embarrassment: PRs/slice **2.15** vs 2.3 (definitional,
+§2); median CI **13.5 min** vs "14–16" (the range is 10.9–28.6, so the estimate was
+reading the middle of the spread rather than the median); GWR **0.49** lands inside the
+estimated 0.40–0.60 band; ACCR **0%** and "≥2 Helm touches per slice" (**2.1**) came back
+exactly as estimated. **And one claim the instrument confirmed independently:** the plan
+says half of all PR traffic in the window was signature carriers, from a count of 12 of
+24; the script measures 14 of 28 over a slightly wider read of the same window — the same
+50%, reached from a different count. `docs/ops/execution-flow.md` now carries the measured
+figures beside the estimates it shipped with, and says the frozen definition is the one M2
+must use.
+
+**WHAT I DID NOT DO.** No tier was assigned retroactively to a window that predates the
+tier model. No `EXO-PLAYBOOK.md` entry — that is DRA-79's slice, and §10.3's whole point is
+that capture-back at a checkpoint should be a copy step from this dashboard. No weekly
+schedule or cron for the script; the plan says "weekly and on demand" and wiring a
+scheduler is a separate mechanism with its own failure modes. No Paperclip-side change to
+start recording runs for CLI seats. The dashboard flags `channel-rotation`'s tag for
+naming no judging metric (§10.1 asks for one) and **does not guess which metric was
+meant** — an experiment that graduates on a number nobody chose for it is the failure the
+tag exists to prevent.
+
+— Dranak (Claude Code, DRA-78)
+
+## 2026-09-14 — DRA-75 / M0-2 (channel archive + 30-day rotation): nine calls I made alone, one instruction that could not be carried out as written, and two guards that were right to stop me
+
+`exo-experiment: channel-rotation` — judged by *rework rate* (baseline 3.7%), counting
+a channel-file clobber, a silently truncated append or a mojibake re-encode as rework,
+because that is the class trap 60 records three times in six days and the only §6 term
+this change can move. **Stated net of the effect that is NOT a §6 metric at all:** the
+bytes an agent must read before it can append correctly. That is the reason the rotation
+was worth doing and there is no KPI for it, so a later graduation entry cites the rework
+rows and says the primary benefit went unmeasured rather than mapping it onto a number
+it did not move.
+
+Tier T1 · governing plan: DRA-73 plan document rev 2, approved by David 2026-09-14
+(SS4.1 + SS8.3; SS10.1 asks for this tag so the M0-exit doctrine capture can cite it).
+
+**Pre-flight.** Re-read `HELM.md` before starting and again after re-basing: the Holds
+block is empty, so no live hold named this work. The plan authorizes the change; a hold
+would still have bound it.
+
+**The instruction that could not be carried out as written, first, because it is the
+entry's real content.** SS4.1 directs rotating ">30-day-old content of `HELM.md` /
+`FABLE.md` / `DECISIONS.md`". **There is none.** The oldest dated entry anywhere in the
+channel set is 2026-08-21 — 24 days old on 2026-09-14. That clause moves zero bytes.
+
+> **Default it could have gone the other way on:** invent a shorter cutoff so the named
+> files visibly shrink, or leave them untouched and say so.
+> **Where it landed:** untouched. A 30-day rule that fires at 20 days because the 30-day
+> answer was boring is not a rule. Evidence is committed:
+> `python scripts/channel-rotate.py report HELM.md FABLE.md DECISIONS.md --cutoff 2026-08-15`.
+
+**And the issue's diagnosis was wrong in a way that improved the outcome.** The two
+~2.4 MB lines in `HELM-FEEDBACK.md` were logged as "mojibake debt, already acknowledged".
+Measured, they were **two copies of one history**: commit `c7a597a8` flattened the entire
+12,254-line file onto a single line and re-encoded it through cp437 (trap 60c), and a
+later append did it again. The file had not grown — it had been duplicated and mangled.
+The readable history was never lost; it is in git at `f4af3b5f`.
+
+**The nine calls.** (The ninth was forced by CI after the first eight were pushed.)
+
+1. **The `HELM-FEEDBACK.md` archive carries RECOVERED READABLE TEXT, not the bytes that
+   were on disk.** The default — and the literal reading of "archive the debt" — was to
+   archive the corrupt bytes as found. Landed on recovering from `f4af3b5f` and dropping
+   4.93 MB of duplicate mojibake, because an archive nobody can read is a tombstone, not
+   history. Gated on a proof rather than a hunch: `scripts/probe-uncovered.py` shows that,
+   peeled, the second flattened line IS the `f4af3b5f` blob whole, and the first is
+   `[the PR #564 entry] + [f4af3b5f minus its first entry]`. The corrupt bytes are
+   archived verbatim beside the recovery (call 8), so the claim is checkable from a
+   checkout rather than from git `1e0f7232`.
+2. **The 4,519-byte PR #564 entry is recovered and kept.** It was the ONLY content unique
+   to the flattened bytes. Its words are byte-recoverable; **its line breaks are not, and
+   I did not invent them** — it sits in the archive as one long line, with the header
+   saying so. Reconstructing plausible paragraphing would have been fabrication wearing
+   the shape of a fix (trap 73).
+3. **Pending asks were NOT archived.** Every readable `HELM-FEEDBACK.md` entry stays
+   active, including the unsigned **PR #606** DRA-71 D9 LIVE ASK. The default reading of
+   "each active file restarts with a pointer line" is a full restart; that would have
+   buried a live request under an immutable file. A rotation that hides a pending ask is
+   a worse bug than a large file.
+4. **`FABLE-FEEDBACK.md` cutoff is 2026-09-08 (7 days).** No cutoff was specified for it
+   and the 30-day one moves nothing. Picked a stated 7-day working-set rule: 1.1 MB →
+   174 KB, 35 entries kept, 139 archived.
+5. **`BEVEL-FEEDBACK.md` (515 KB) was left alone and the call handed to Bevel.** Outside
+   DRA-75's scope and not in the size class that made the other two urgent. Noted in
+   `BEVEL-FEEDBACK.md` with the numbers a 2026-09-08 cutoff would produce (92 entries /
+   464 KB), for Bevel to accept or decline.
+6. **Rotation is a script, not a hand-edit** (`scripts/channel-rotate.py`, with `report` /
+   `rotate` / `verify`). 4.9 MB is not hand-editable, and the next rotation should not
+   re-derive any of this. The script refuses to write until its containment assertions
+   pass, and finds the flattened lines **by size, never by index**.
+7. **The archive lives under `docs/ops/claude-archive/channels/2026-Q3/`, NOT the
+   `docs/ops/archive/2026-Q3/` the issue named.** `scripts/channel-wipe-guard.ps1` — the
+   guard built after a channel ledger was destroyed three times in six days — reads its
+   ARCHIVE exemption out of `docs/ops/claude-archive`, and says in its own header that
+   there is no `-Force` and no skip switch because "an escape hatch on a guard whose whole
+   subject is *an automated land destroyed the file* is the automated land's next move."
+   > **Default it could have gone the other way on:** keep the plan's path and add a second
+   > directory to the guard's exemption.
+   > **Where it landed:** moved the archive. Editing a guard as part of the very change it
+   > blocks is the pattern it exists to refuse (trap 52), and the path was the cheap thing
+   > to move. The guard now passes on its own merits, unmodified.
+8. **The exact removed bytes are archived beside the recovery**
+   (`HELM-FEEDBACK.original-flattened.md`, 4.93 MB, unreadable on purpose). Against the
+   readable recovery alone the guard's ARCHIVE exemption reached **89.5%** against a 90%
+   floor — and measured, the 368 misses were not losses at all: an entry key recovered
+   from a FLATTENED line absorbs body text up to the guard's 80-character cap, while the
+   same entry in the newline-delimited recovery stops at end of line. Same entries, keyed
+   differently.
+   > **Default it could have gone the other way on:** argue the 89.5% is a keying artifact
+   > and relax the floor, or put the bytes where the guard can see them.
+   > **Where it landed:** archived the bytes. "Nothing was lost" should be checkable
+   > against the bytes from a plain checkout, not asserted with a git SHA that nobody will
+   > have. The 4.93 MB is the cost of that being verifiable, and it buys a guard that
+   > passes unmodified.
+9. **The archived ledgers are EXEMPT from the doc-liveness sweep; the archive's README is
+   not.** CI caught what local verification missed:
+   `DocumentationTests.EveryFileTheDocsPointAtExists` sweeps every `.md` under `docs/ops`
+   and reddened on all three archived ledgers, because they name paths that were true when
+   an agent typed them and are not now. **Both of that test's remedies are unavailable
+   here** — the file is immutable by construction, and the paths are history, not error.
+   > **Default it could have gone the other way on:** edit the archived ledgers to remove
+   > the dead paths (which forfeits the immutability the whole rotation rests on), or park
+   > the archive outside `docs/ops` where the sweep cannot see it.
+   > **Where it landed:** a narrow exemption keyed on the `channels/` DIRECTORY, so the
+   > next rotation inherits it without a code change — paired, per trap 34, with
+   > `OnlyTheRotatedChannelTranscriptsAreExemptFromTheLivePathSweep`, which reddens if the
+   > exemption ever matches nothing (trap 78), if the README slips out of the sweep, or if
+   > any other `docs/ops` doc slips out with the transcripts. Prove-failed by disabling the
+   > predicate: 4 red, 21 green. The README stays swept because it is the one file in there
+   > a reader navigates BY.
+
+   **This is the entry's one genuine miss, and it is trap 79's shape in a new place:** I
+   verified the rotation against the guard built for channel files and against the
+   rotation script's own containment assertions, and never asked what OTHER committed
+   guard reads `docs/ops/**`. A 12,000-line file landing in a swept directory is a new
+   INPUT to every doc test, not just to the one whose subject it is. **Local greens are
+   not CI** — and here the thing local runs never covered was a suite I did not think to
+   name.
+
+**Verification.** `verify` asserts every original entry block survives byte-exact across
+archive + active: `FABLE-FEEDBACK.md` 174 original blocks → 139 + 35 = 174, all 1,180,174
+bytes accounted for, zero lost; `HELM-FEEDBACK.md` archive contains the `f4af3b5f` blob
+verbatim, all 24 readable pre-rotation entries survive in the active file, and the
+recovered #564 entry is clean UTF-8 with a real em-dash rather than mojibake. Backticked
+identifiers were read back out of all four appended notes by hand (trap 60c).
+
+**Two process findings, filed here rather than as new trap rows because the rule they
+need is already trap 60c.**
+
+- **`core.autocrlf=true` makes `git show ref:path` an unsafe verification reference.** The
+  blob is LF, the working tree CRLF. My first verify pass went red on a rotation that was
+  byte-perfect. `verify` takes `--pristine` and compares against a byte copy taken before
+  the move.
+- **The flattened lines are at different INDICES on every ref.** 0-based 70/72 against one
+  ref and 788/790 against `origin/main` an hour later, because channel entries prepend. I
+  caught this only by diffing against `origin/main` before committing — the first rotation
+  was computed on a stale base and would have reverted other agents' appends (trap 60a).
+  Both scripts now find the lines by size.
+
+**One thing I did NOT do.** The corruption is **ongoing**, not historical — `╬ô├ç├╢` and
+`ΓÇö` both appear in entries written 2026-09-12/13. This rotation cleaned up accumulated
+damage without touching whatever keeps producing it. That is a live defect and a
+separate item; flagged to Helm and Fable, not silently absorbed here.
+
+**Reversible.** `git revert` restores both files; the archive is additive and no original
+bytes were destroyed.
+
+— Dranak (Claude Code, DRA-75)
+
+---
+
+## 2026-09-14 — DRA-74 / M0-1: the SSC-PR pattern is retired, and a signed plan now authorizes its whole slice sequence
+
+exo-experiment: ssc-retirement — judged by *PRs + Helm touches per slice*
+(baseline 2.3 PRs/slice, ≥2 touches/slice), stated net of *veto rate* and
+*rework rate*.
+exo-experiment: whole-sequence-auth — judged by *Governance Wait Ratio* and
+*Autonomous Correct Completion Rate* (baseline GWR 0.40–0.60, ACCR 0%),
+stated net of *escaped defect rate*.
+
+Pre-authorized: DRA-73 plan document revision 2, approved by David
+2026-09-14, §7 M0 and §8.1–2. Tier T1 — process docs, reversible by a HOLD.
+Live Holds were empty at the newest `HELM.md` ruling on `main` (2026-09-14
+~12:56 AM CT, PR #606), and none names this work. Nothing below is on the
+consequence list: no release, no tag, no Pages or Play Console, no eqlwiki
+request, no product code, nothing that changes what leaves a player's
+machine. `src/` is untouched. David vetoes from here.
+
+Two cutovers landed, both docs-and-comms only. The rules are compact in
+`CLAUDE.md` (Helm → *How a ruling lands, and what a SIGN buys*); the detail,
+the numbers and the rollback shape are in `docs/ops/execution-flow.md`.
+
+**1. A RULING IS A PR REVIEW AND/OR A `HELM.md` COMMIT — NEVER A `helm/ssc-N`
+PR.** In the measured DRA-70/71/72 window (PRs #580–#607), 12 of 24 PRs
+existed only to carry signature prose: half of all repository PR traffic was
+governance artifact, each piece of it with its own merge wait stacked on top
+of the product PR's. **The way this could have gone the other way is the
+audit trail**, which is the thing the SSC PR was actually buying — a durable,
+signed, timestamped, attributed record of the ruling. It survives, and
+arguably improves: a GitHub PR review is immutable, timestamped, attributed
+and indexed, and it is attached to the diff it judges rather than to a second
+branch a reader has to cross-reference. `HELM.md` keeps prose rulings where
+prose is what is wanted, additions-only (trap 60) exactly as before.
+
+The default I took rather than asked about: **open `helm/ssc-*` PRs land or
+close on their own terms** instead of being swept. Sweeping them would be a
+second, unrelated change riding a docs cutover, and #601's cargo is signed
+substance not yet on `main`. So the rule creates no NEW ones and touches no
+existing one.
+
+**2. A SIGNED PLAN AUTHORIZES EVERY SLICE IT DECLARES, IN ORDER, ON GREEN
+GATES.** Merging D(n) starts D(n+1). No LIVE ASK asking permission to begin a
+slice the plan already named; no per-slice "AUTHORIZE dra-N-dX after land".
+**Helm stops the train with a HOLD, not by withholding authorization** — an
+objection blocks, absence of attention no longer does. Three Helm coverage
+gaps in that window produced stalls of 3.5–6.4 h accounting for 15.3 of 18.2
+total wait-hours: **84% of measured wait was planned work parked overnight at
+an authorization gap.** Over the same window Helm's intervention rate was
+100% and its pre-merge change rate was ~0% — every ruling KEEP/ACK, zero
+pre-merge substantive changes to an already-signed slice.
+
+**The default most worth a veto is the asymmetry between the two signals.**
+A stop is now explicit and greppable and silence is not a stop, which is the
+whole safety property — but it does mean a slice can merge during a Helm
+coverage gap that Helm would, in principle, have wanted to look at. That is
+priced in deliberately: the guard suite catches the mechanical class
+instantly, the authorization is scoped to *what the plan declared* (a slice
+that outgrows its declared boundary stops and escalates), CI is unchanged as
+the merge bar, and nothing reaches a player without David's release go, so
+`main` stays reversible by construction — the argument he already made for
+approval-by-exception on 2026-08-22.
+
+**3. SCRIBE'S POSTURE RULE DID NOT CHANGE — ONLY THE ROUTE.** A public reply
+beyond a routine signed thread reply is still consequence-list work and is
+not covered by any plan's slice authorization. What changed is that the
+signature arrives as a `HELM.md` commit or a PR review, so "the SSC has not
+landed yet" stops being a reason to hold a reply — and, symmetrically, the
+absence of an SSC PR is not a signature either.
+
+**4. THE DOCS GOT A GUARD RATHER THAN A PROMISE.** `DocumentationTests`
+gained `TheRetiredSscPatternAndWholeSequenceAuthAreStatedInTheLiveDocs` and
+the orphan test gained the new pointer, so a future edit cannot quietly drop
+either rule or leave `docs/ops/execution-flow.md` unreachable from the one
+always-loaded file. It also asserts both `exo-experiment:` tags are present
+in this file, because §10.1 makes the tag the thing the M0-exit doctrine
+capture cites — an untagged experiment is one the playbook cannot find.
+Prove-failed by deleting each asserted phrase in turn.
+
+**What this does NOT change, stated so the absence is on the record:** CI as
+the merge bar; the guard suite; David's consequence list including the
+release go; holds living in exactly one place and only Helm lifting them;
+the `helm-back-channel.yml` webhook for exceptions; `DECISIONS.md` as the
+reporting duty, which a removed signature step makes more load-bearing, not
+less.
+
+## 2026-09-14 — DRA-71 delivery 9: the Helper is on the phone, by shared module, read-only
+
+Pre-authorized: Helm SIGNED the plan (PR #586) and SIGNED D2–D8 (#588, #590,
+#592, #594, #596, #598, #602), authorizing `dra71-d9`. Nothing below is on the
+consequence list: no release, no tag, no Pages or Play Console work, no eqlwiki
+request of any kind, nothing new leaving the machine beyond the LAN the phone
+was already on, and nothing near the values line — every sentence the phone
+draws is this character's own log, bags and dumps, which is what the screen says
+about itself in its first line. David vetoes from here.
+
+**1. THE PHONE IS READ-ONLY, AND THIS IS THE DEFAULT MOST WORTH A VETO.** The
+desktop Helper room's affordances are five `EqMultiPicker`s, a segmented strip
+and a toggle. Every one of them WRITES to the profile the PC is playing from,
+and one of the doors beside them (`WatchRules`) quietly adds an alert rule on
+the way through — the one door in that enum with a side effect. So the phone
+ports them as INTENT: it shows what is picked, in the picker face's own words
+(`GoalFace`, `FactionFace`, `UnlockPickReadout.Face`, `WornFace`,
+`ProfessionFace` — never a count the page made up), under one sentence saying
+where the picking happens.
+
+The plan asked for exactly this — *"picker AFFORDANCES port as intent, not as
+hover (trap 35)"* — so the decision is not whether, but how far it reaches. It
+reaches ALL of them, including the doors. **The way it could have gone the other
+way is the two WIKI doors**, which a phone genuinely could open: a browser is a
+thing this device has. They are not links, because the page has no outbound link
+anywhere today and giving the Helper the first one would be this slice inventing
+a capability rather than porting a surface. The sentence those doors already
+carry says the player opens the page themselves and that EQBuddy fetches
+nothing, so the request policy toward eqlwiki is untouched either way. If Helm
+or David want the wiki doors tappable, that is a one-line change and its own
+slice, and it should be decided as a question about outbound links on the phone
+rather than as a Helper detail.
+
+**2. The INPUT ASSEMBLY moved to `UI.Shared/HelperSources.cs`, and the desktop
+room now calls it too.** The plan's word for this slice is *"parity stays by
+shared module"*, and `Recommendations.Rank` alone does not buy that: the answers
+are only the same if the INPUTS are. `HelperRoom` had seven reads, three folds,
+an inventory stamp and six store lookups inline; a second copy of that in the
+widget's phone callback is the #210 shape exactly, and it would have drifted the
+first time one surface learned a store. So `Read` / `Gather` / `Signature` are
+one producer, the room is one of two callers, and `Gather` returns the picks it
+read ALONGSIDE the `HelperInputs` — two readers of one store at slightly
+different moments is trap 33, and the picks a surface DRAWS must come from the
+same pass as the inputs it RANKS with.
+
+The MEMO stays per host (trap 45): a five-second cache two owners can invalidate
+is state, not a producer. The same split `LevelHistoryMemo` already keeps
+between the Experience card and the phone.
+
+**The cost, said out loud: a phone subscribed to this screen pays a second copy
+of the reads** — one session query and three snapshot probes, behind the same
+five-second throttle, on top of whatever the shell room is doing. It is gated on
+the surface being offered AND a device being paired, which is the lazy rule that
+record exists for, but it is a real cost and it is the one number this slice
+adds to a steady-state tick.
+
+**3. The screen lands LAST in `CompanionSurfaces.All`, and OFF on every existing
+device.** The order comment in that file is the argument — glances first,
+reference lists after — and nothing in the app is further from a glance than a
+page you read to decide where to spend an evening. Last position also leaves
+every paired device's ⚙ picker in the order its owner already learned. It is
+absent from `FIRST_RUN`, so a phone that has already paired gets it only by
+ticking it, which is the correct behaviour for a new screen and the opposite of
+the DRA-60 repair (trap 76): a surface forcing itself on is a different defect
+from one that cannot be reached.
+
+**4. EVERY SENTENCE RIDES THE WIRE — including the two this slice wrote.**
+`HelperPresentation.PicksOnPc` and `.DoorsOnPc` are the only new strings, and
+they are in UI.Shared beside the room's other words rather than in
+`index.html`, because trap 32 means a page-side literal can sit on an open phone
+for weeks after the PC has moved on.
+`HelperSurfaceParityTests.ThePageSpellsNoneOfTheHelpersWords` scans the shipped
+page for ten of them and is PAIRED with a positive that the page draws the
+fields (trap 34) — a scan that found nothing would report a perfectly clean
+page.
+
+**5. The door TIP rides the row rather than a hover, and the why-lines already
+did.** The plan says it for the why-lines; the doors are the same device with no
+pointer. Dropping the tip would have left a row of bare nouns — "Map",
+"Standings", "eqlwiki" — with nothing saying what they open, which is trap 35
+with the right shape and no content.
+
+**6. The whole-room empty state is UNREACHABLE, and the test says so rather than
+faking it.** `NoGoalCanLeaveThisScreenWithNothingToSay` runs all nine goals over
+an empty profile and asserts each produces an answer, a named gap, or a deferred
+note — D5's must-list rule, checked against the enum rather than a list (trap
+30). The branch stays on both surfaces because "the engine returned nothing at
+all" is a state a future goal could produce and a blank panel is the one outcome
+that must never ship. **The first draft of that test asserted the empty state
+fires and was wrong**; the probe that corrected it is in this PR's body.
+
+**7. `MainWindow` hit its ratchet, and the answer was a lift rather than a
+bump.** The wiring came to 4,237 lines against a 4,222 limit.
+`PhoneHelperSource` is that wiring in its own file — the `CompanionMapSource` /
+`CompanionQuestSource` idiom, one lane along — so the hotspot gained four lines
+instead of forty and no baseline moved. CLAUDE.md's rule is "lift a surface out,
+don't split the file", and this is the smallest thing that qualifies.
+
+**8. The screenshot is 516 px wide because the camera cannot go narrower, and
+the first capture at 430 was CROPPED, not broken.** Headless Edge clamps its CSS
+viewport at 492 px however small `--window-size` is, so the 430-wide shot cut 62
+px off every line and read exactly like a wrapping defect. Trap 7 is the reason
+it was measured instead of fixed: `innerWidth` was probed,
+`document.scrollWidth` matched it, and the page had no horizontal overflow at
+all. 516×1060 is the same window `mobile-sky-leftovers.png` was taken at. **What
+the shot is therefore NOT faithful about: a real phone is 390–430 CSS px, so the
+line breaks in `mobile-helper.png` are a large phone's rather than a small
+one's.** The layout is a single column at both widths — the tablet breakpoint is
+900 — so nothing about the composition changes, but a reviewer judging line
+lengths should know which device they are looking at.
+
+**9. `CompanionSnapshot.CurrentProtocol` is UNCHANGED at 3.** A new nullable
+section property does not change the envelope, which is what that record's own
+comment says the protocol number is about. Bumping it would have taken every
+open phone in the house quiet until it was reloaded, in exchange for nothing.
+
+**10. Three new `CommandPrompts` entries rather than reusing the two that
+exist.** `GearInventory` and `RaidsAchievements` say what happens next for THEIR
+surfaces, and "the gear checklist ticks itself" is not what a player needs to
+hear when the Helper asked for the dump. A command with no next step is half an
+instruction. The phone half of `GameCommandsTests` now lists all five (trap 34's
+must-list), and the faction command reaches the phone for the first time.
+
+Verification: `check.ps1` green on the rebased base, 4,893 unit tests (+29 from this slice). Five of the new guards
+were prove-failed by sabotaging the projection and the page — reworded headline,
+dropped door tip, count-keyed fingerprint, page-side literal — and all five went
+red. E2E was not run locally; CI runs it on every push and nothing in this slice
+touches a launched surface.
+
+— Dranak (Claude Code, DRA-71 D9)
+## 2026-09-13 — DRA-72: the collapsed HUD stops swapping its third number and grows a slot instead
+
+Authorized: Helm VIDEO CONFIRM + Soft dig+fix on the mini-bar width, Founder bug
+VERIFIED. Nothing below is on the consequence list — no release, no new surface,
+no eqlwiki request, nothing new leaving the machine, nothing near the values line
+(the row shows this character's own damage, own healing and own XP rate, as it
+always has). **One thing needs Helm and is asked for rather than assumed:** the
+sentence being amended is Helm-signed (`docs/BEVEL-v2-staging-critique.md` §3,
+"One swap, not a second meter"), so the PR carries a tip-only LIVE ASK in
+`HELM-FEEDBACK.md` for SIGN. David vetoes from here.
+
+**THE BUG, named as arithmetic rather than as a vibe.** SA-1 put HPS and XP%/hr
+in ONE glance slot with a hysteresis: it ENTERS when healing out-weighs damage
+across the ~30 s window, and it LEAVES the moment any damage lands inside the
+~5 s resume window. For a character who heals and swings at once — the Founder's
+video: `Dranak · 18 dps · 13 hps ↔ 167.5%/hr` — both of those are true at the
+same time, so the slot alternated on the one-second render, forever. Neither rule
+was wrong. Nothing had ever asked them together, because the swap's tests drive
+one direction at a time. **A hysteresis is only as good as the case where both of
+its tests pass**, and that is the shape worth carrying forward.
+
+**1. The amendment is ONE DELETED CLAUSE, and the alternative that would have
+gone further is named here rather than taken.** `HudGlance.HealingShown` keeps
+the signed ARRIVE test verbatim (healing has to have out-weighed damage across
+the whole window) and keeps the signed LEAVE test verbatim (the window holds no
+healing at all — a healer who stops loses the slot ~30 s later). What is gone is
+"damage returning takes it away", because the number that clause existed to hand
+the slot back to now has a slot of its own that nothing takes. An oscillation is
+impossible by construction afterwards: the STAY test is strictly weaker than the
+ARRIVE test, so no input can add and remove on alternating ticks.
+
+**The default it could have gone the other way on:** the Founder's acceptance
+wording is *"when healing is active AND XP is tracked, show both"*, and "active"
+read literally is ANY healing in the window — which would drop the dominance test
+and give an HPS slot to every paladin who lands one heal, every shaman between
+pulls, and any warrior whose weapon lifetaps. That widens WHO sees a fourth slot
+on an always-on-top bar, which is a product question rather than a bug fix, so
+this seat kept the signed arrival bar and put the question to Helm in the LIVE
+ASK. **What a hybrid gets today:** the slot arrives the first tick their healing
+out-weighs their damage over half a minute and then STAYS while they keep
+healing, so the video's character gets both numbers permanently. A character
+whose damage always dominates still sees no HPS slot. If the Founder wants that
+one too, it is one predicate and its test row.
+
+**2. Each metric slot now carries ITS OWN reserved width, and the XP slot's is
+wider (76 against 66).** SA-1 gave every metric one width for a stated reason —
+the third slot swapped its string on a timer, so a per-string width there would
+have been the trap-12 resize the class exists to prevent. That reason is gone
+with the swap: no slot changes identity any more, so a per-metric width is a
+constant of the row. It is spent on the XP rate because "9999.9%/hr" puts '%' and
+'/' where a rate string has leading spaces, and at 66 a four-digit rate trimmed
+to an ellipsis — which is the Founder's "longer XP% string eats gap padding",
+read off the video. **It is NOT a measured number** and says so in the code:
+nothing in this project can measure text without a window, so it is headroom over
+the longest string the slot can hold, and the assertion is an ORDERING
+(`ExperienceReservedWidth > MetricReservedWidth`) so a later tidy-up cannot
+quietly equalise them again. The one-time width change this costs is the same
+permission the player's own pet drop has always had. **What the number COSTS is
+measured**, even though the number itself is a judgement: `mini-bar-chips` is the
+one collapsed-bar shot whose cells are all plain counts, and shooting the same
+seed against a build with the constant back at 66 gives 628x40 against this
+build's 638x40 — so the ten units are that constant and nothing else on the bar.
+
+**And the same experiment found a stale committed picture that is nobody's
+feature:** `mini-tour.png` is 691 wide on `main` and the current build draws it at
+676 with the old constant restored. Some earlier change moved that bar and the
+shot was never re-run, so fifteen of this PR's "width change" is a repair rather
+than an effect. It is called out because a reviewer subtracting two PNG widths
+would otherwise attribute it here — and because `mini-bar`'s own width cannot be
+compared across takes at all: three of its cells (procs, motes, coin) re-derive
+from the fixture's elapsed time on every run.
+
+**3. HPS lands THIRD — before the XP rate — and the XP rate stays the row's last
+slot.** Appending HPS after the XP rate would have kept every existing slot's x
+unchanged, which was the other reasonable choice. It went this way because the XP
+rate has been the last thing on this row since SA-1 and still is, so no POSITION
+on the row changed what it means; the rates group together (Swords, Paw, Heal)
+and the session rate stays at the tail. It also keeps SIGNED #422's insertion
+point exactly where it was — between DPS and whatever follows — so an arriving
+HPS slot lands to the RIGHT of the pet gap and #413's "a slot that changes
+identity must not be a drop target" stays routed around rather than reopened.
+With DRA-72 no slot up there changes identity at all, which is strictly safer
+than the position that reasoning was written for.
+
+**4. The `hudGlance` dump fact changed SHAPE, from one word to the row.** It read
+"xp" or "hps"; it now reads `dps,xp` / `dps,hps,xp` / `dps,pet,hps,xp` in
+`MiniBarPresentation.OrderKey`'s spelling. **A fact with room for one of the two
+numbers cannot witness a fix whose content is "both are up"** — the old key was
+true on the flashing build at every instant. `hudGlancePet` now derives from the
+same recorded row rather than from a second field (trap 4: two independent
+records of what one row drew is how a dump contradicts itself). Four E2E rows
+moved with it; `HudBarView.Third`/`HudThird` are deleted, and nothing else in the
+tree ever read them.
+
+**5. `HudXpTip`'s null is now unreachable and was NOT made non-nullable.** It
+meant "the third slot is HPS, so there is no xp chip to hover", which cannot
+happen now. The dump's `-1` reading is what would report the absence if a later
+change ever takes that slot away, and a non-nullable field would report a stale
+last-known level instead (trap 20's shape). `DamageSinceResume` stays on
+`HudGlanceInput` for the same kind of reason: it is the input that makes the
+deleted clause's own test writable.
+
+**Evidence.** `HudGlanceTests` rewritten around the row: 60 tests, including the
+video's situation driven for six consecutive ticks and asserted as six identical
+rows. **Prove-failed** — restoring the deleted clause (`shown ? input.DamageSinceResume <= 0 && …`)
+reddens exactly three of them, `TheVideosSituationShowsBothNumbersAndHoldsStillOnEveryTick`
+among them; the file was restored and the suite re-run green. 4,701 unit tests
+pass. E2E `HudBarTests.HealingAddsItsOwnSlotAndASwingDoesNotTakeItAway` drives it
+through the real seam (log lines the widget tails) and samples five consecutive
+RENDERS, because one read of a flashing bar has even odds of reading the right
+answer; the swing's "nothing happened" is asserted at a moment a ding proves the
+app had processed the line after it (trap 62). `AppHarness.DumpTexts` is new and
+exists so a word fact and the `tick` that says a render happened come off ONE
+read (trap 56).
+
+— Dranak (Claude Code, DRA-72)
+
 ## 2026-09-13 — DRA-71 delivery 8: resources are profession-first, and the arithmetic is parked on its own survey
 
 Pre-authorized: Helm SIGNED the plan (PR #586, merged `a28c5d89`) and SIGNED
@@ -1112,6 +2217,72 @@ wording), **1 of 10 RED** against `origin/main`'s pre-fix bytes. `--filter Docum
 landing is not a `shoot.ps1` surface. No `src/` change, so no `WhatsNew.json` entry: the
 landing page is not shipped in the app, and the DRA-48 family's prior site commits
 (`06c66462`, `74cb9cb9`) touch no release notes either.
+
+## 2026-09-12 — DRA-57 / T4 GO: the Founder commissioned the Pages enable, and this is the entry that should have been written that day
+
+**Backfilled 2026-09-14 under `HELM.md` 2026-09-14 ~7:00 PM CT** (DRA-57 LIVE ASK
+answered: *"GO happened — Founder commissioned the enable on 2026-09-12 … Soft write
+the missing `DECISIONS.md` entry dated to the 09-12 GO"*). Nothing here is a new
+action on Pages: the enable is two days old and the record is what was missing.
+**Soft did not enable and has not disabled** — the site stays up per that ruling.
+
+**Placement, and the default it could have gone the other way on.** This file is
+newest-first, so the obvious move was to prepend it at 2026-09-14 with the date in the
+body. It sits in its 09-12 slot instead — at the END of the 09-12 block, because the
+successful `workflow_dispatch` is 11:27 UTC and everything above it that day is later.
+The ledger's whole value in this incident was that a reader could ask *"what does
+2026-09-12 say about Pages"* and get an answer; an entry filed under the day it was
+noticed would have preserved the same hole in a different place. The heading carries
+**backfilled** so nobody reads it as a contemporaneous write.
+
+**1. THE ENABLE IS A FOUNDER COMMISSION, AND THE VALIDATION IS THE LIVE SITE.** The
+T4 gate (first enablement IS the publish moment, consequence list #3) was satisfied by
+the Founder commissioning it directly — not by Soft, and not by the DRA-48-shaped
+"deploy plumbing" reading that this same file corrected on 2026-09-10. What is
+recorded as the check is **the served page**, not the plan's intent: measured at Helm's
+look and re-measured for this entry, `GET /repos/DranakCorps-bot/EQBuddy/pages` →
+**200**, `build_type: workflow`, `source: main /`, `public: true`, `https_enforced:
+true`; repo `has_pages: true`; `https://dranakcorps-bot.github.io/EQBuddy/` → **HTTP
+200**, `Last-Modified: Sat, 12 Sep 2026 18:29:44 GMT`, 41,712 bytes. That body is
+**byte-identical to `site/index.html` at Soft `main`** (`git show HEAD:site/index.html`
+— same 41,712 bytes, `diff` clean once the working tree's CRLF checkout is normalized),
+so the enable published the reviewed content and nothing else. **What would reverse
+it:** David deciding the landing comes down — one `DELETE …/pages`, which is his call
+and Helm's, not Soft's.
+
+**2. THE ACTOR IS THE SHARED ACCOUNT, SO THE RECORD NAMES THE ROUTE INSTEAD.** Both
+2026-09-12 runs (`workflow_dispatch` 11:27 UTC, push-deploy 18:29 UTC via #577) carry
+actor and triggering_actor `DranakCorps-bot` — the account Soft, Scribe and the Founder's
+own dispatches all post under, so **the audit trail cannot say WHO from the actor field**,
+and that is the reason this gap took two days to surface rather than being obvious from
+the run list. Per Helm's 09-14 tip the commission routed **via the Founder's PC after the
+agent token returned 403**; that is recorded here as Helm's finding, not as something Soft
+measured. The generalizable half: **on a shared bot account, "who did it" is not a
+property of the API and has to be written down by the human or agent who did it** —
+which is precisely the duty this entry is discharging late.
+
+**3. ADOPT — a claim about Pages state quotes a FRESH API result or says it is
+unchecked.** Helm ADOPTed the corrective Soft raised in the LIVE ASK, and it is logged
+here because it binds Soft's own writes as much as Helm's rulings. The failure it
+prevents is measured, not hypothetical: `has_pages: false` was restated in a 09-13 ruling
+that was already a day stale, and Soft carried the same stale line forward on the 09-14
+wake before checking. **Two sources for one fact, where one of them is prose that cannot
+go stale loudly — trap 4 with a gate attached.** The rule: never carry a prior `HELM.md`
+or `DECISIONS.md` sentence forward as the current state of Pages; run
+`gh api repos/DranakCorps-bot/EQBuddy/pages` (or read `has_pages`) and quote it, or write
+"unchecked". This is a discipline, not a guard — there is no executable check for it, and
+saying so is part of the entry.
+
+**4. THE `pages.yml` HEADER IS CORRECTED IN THE SAME CHANGE.** Its comment block said
+the workflow is *"INERT until Pages is enabled"* and that *"Enablement … stays behind the
+DRA-48 T4 gate"*. Both were true when written and are false now, and a stale gate
+sentence sitting in the file the gate is about is the exact shape §3 just banned. Corrected
+to what is true, with the GO dated. **The default it could have gone the other way on:**
+leaving it, on the grounds that Helm authorized a README/About link and not a workflow
+edit. Left alone it would have been the next reader's stale source — and it is a comment,
+so it changes no behaviour and reverses in one line.
+
+— Dranak (Claude Code, DRA-57)
 
 ## 2026-09-11 — DRA-67 (the landing's "log-only" pill was false): four calls I made alone
 
@@ -5550,3 +6721,534 @@ two Home rows in `ShellHostTests` are the ones that moved. `check.ps1` all
 gates green, 4,263 unit tests.
 
 — Dranak (Claude Code, DRA-63)
+
+## 2026-09-14 — DRA-81 (Founder smoke: the HPS LOCK + the worn anchor): four calls I made alone
+
+**Assumption at the top:** Helm's FOUNDER LOCK is the whole scope of the HUD
+half, and its §3 reads as *"do not leave healing-dominance as the visibility
+rule — checkbox wins"*, matching the header's own *"**Not** healing-dominance
+hysteresis auto-show"* and §4's *"Soft LEAVE inventing always-on HPS without a
+checkbox"*. So `HudGlance.HealingShown` and `HudGlanceState` were DELETED
+rather than kept and ANDed with the ★. Keeping a rule nothing reads is the
+dead-code half of trap 20, and an unread field is the next reader's invitation
+to make it decide something again. If Helm meant "keep the window as a second
+gate", that is one revert of one commit and I would rather be told than guess
+quietly.
+
+**1. The migration restores all three ★s; the fresh-install default restores
+only two.** This is the call that could most easily have gone the other way,
+and the two populations really are different. A profile that went through SA-1
+has been DRAWING DPS and the XP rate unconditionally ever since, and HPS
+whenever DRA-72's dominance window said so — so ticking all three reproduces
+what is on that player's screen today, takes nothing away, and hands them the
+switch they did not have. A fresh profile has no such history, and a permanent
+`0 hps` is a poor thing to give somebody who has never cast a heal. The
+alternative I rejected was ONE state for both: it is tidier, and it either
+gives every new player a dead number or leaves the Founder — whose file has no
+`hps` key at all — opening the app to find HPS still missing and its box
+unticked, which is the smoke arriving a second time wearing the fix's clothes.
+`TheMigratedRowGainsHpsAndTheFreshOneDoesNot` asserts the difference so a later
+"surely these should match" tidy-up has to argue with the reason.
+
+**I did NOT use the evidence SA-1 left behind, and that is deliberate.** The
+promotion wrote `DisabledBreakouts` from each star, so "was hps starred before
+SA-1" is recoverable — but only as a PROXY (trap 64b): a player who has since
+closed their Healing window through Options would read as "never wanted HPS",
+and the default `DisabledBreakouts` already contains `"Healing"`, so a
+post-SA-1 file answers the question wrongly by construction. A proxy that is
+wrong for the Founder's own profile is not evidence.
+
+**2. The restored ★ does NOT gate the breakout window, and
+`BreakoutPresentation.StarKey` stays null for Damage and Healing.** Before this
+slice that null MEANT "there is no star"; now there is one, so the null had to
+become a decision or it would rot into an oversight. Re-pointing it would mean
+unticking DPS in the Mini dashboard silently closed somebody's Damage float —
+the "tick box that lies" with the lie on the other side. A window and a HUD
+slot are different objects; the LOCK is about the bar and says nothing about
+the floats. `PromotedNote` now says both switches exist and that neither moves
+the other, because two settings that sound like one is how a player unticks the
+wrong thing and reports the window as broken.
+
+**3. Options walks a new list (`MiniBarPresentation.OptionKeys`) rather than
+`Order`.** `Order` is a FORMATTING table — which stats this class can turn into
+a cell — and the screen was walking it to decide what to OFFER. That is the
+whole mechanism of the hole: three keys lived in `MiniStats`, the bar read
+them, and no screen could reach them. The three stay OUT of `Order`, `Icons`
+and `CanonicalOrder`, which is what keeps the bar from drawing a second DPS
+chip beside the top row's, and `TheTopRowsStatsAreOfferedButNeverDrawnAsCells`
+pins both halves so a tidy-up of the `Names`/`Icons` asymmetry cannot do it.
+
+**4. `WornFrom` reads `InventoryFile.Entry.WornSlot`, and the normaliser lives
+on `Entry` rather than in `GearUpgrades`.** The Founder reported a missing
+Range row and duplicated primary/secondary rows as two items; they are one bug,
+and naming it once is the fix. The slot rule belongs beside `Worn`, `InBank`
+and `ContainerSlot` — the other facts a Location knows about itself — so the
+Gear Locker and any later phone surface can read the same answer (trap 4). The
+trailing ordinal is dropped (`Finger2` IS the FINGER slot), which is what lands
+the anchor in `GearLocker.SlotOrder`'s vocabulary; without that the picker
+would sort a `FINGER2` row last, and a row at the bottom of a list reads as a
+missing row rather than a misplaced one.
+
+**Named, because it is a behaviour change in unreleased copy rather than a
+silent one:** five highlights in the 2.0.0 `WhatsNew.json` entry said the three
+stats were always on, that their stars were gone, or that HPS arrives "once
+healing has been the weight of your last half-minute". All five are now false
+and all five were corrected in place — minimally, the false clause only. 2.0.0
+has not shipped, so this is a draft being kept true rather than a released note
+being rewritten; the rule is that every entry is TRUE in the release that
+ships it, and this is the release that ships this.
+
+**Not done, and not mine:** the `mini-bar` / `mini-tour` screenshots still show
+a row drawn under the old rule. The recipes are unchanged and correct — the
+default row is still `dps,xp` — so what is stale is only that no picture shows
+a ticked HPS. The screen is a mutex (trap 61) and standing down whatever holds
+it is not a call this seat makes.
+
+— Dranak (Claude Code, DRA-81)
+
+---
+
+## 2026-09-14 — DRA-83 (the `GuideAttachment` hookup, DRA-70 plan D5): six calls made alone
+
+Founder LOCK, Paperclip DRA-83: *"product implement GuideAttachment →
+Executor. Soft LEAVE CEO code."* That routes the implementation straight to this
+seat, so no `FABLE.md` D5 plan stub was filed and no pre-implementation SIGN was
+waited on; Helm's SSC SIGN stays where the card's own acceptance puts it, before
+merge. Seat `opus-dra83-guideattachment` off Soft `main` `3174aa5f`. Live Holds
+empty at start, none naming DRA-83. Nothing here is on the consequence list: it
+reads this character's own log, dumps and catalogs EQBuddy ships, measures no
+other player, and sends nothing anywhere.
+
+**1. ONE PRODUCER, LITERALLY — `Recommendations.Attached` runs the SAME engine
+methods `Rank` does.** The acceptance said "the same Recommendations producer",
+and the cheap reading would have been a new module that asks similar questions
+of the same stores. It calls `LevelUp` and `FarmGear` — the two private methods
+the Helper room's own ranking calls — and hands back their `Recommendation`
+records untouched, so a guide row cannot word, weight or trim an answer
+differently from the room. The default it could have gone the other way on: a
+`GuideAttachment`-shaped engine of its own, which would have been a second
+sweep behind a reference field (trap 4 with a schema in front of it).
+
+**2. THE GUIDE NEVER SAYS MORE THAN THE ROOM WOULD.** Both engines shortlist
+(`PerEngineCandidates` = 6) and a gear row names three items, so a subject those
+caps did not reach gets NO answer on a guide row either. That is a decision:
+lifting the caps for this surface would make the walkthrough the loudest voice
+about a question the Helper room is the place to argue with. Silence is trap 73's
+own rule.
+
+**3. THE ENGINES' GAPS ARE DROPPED, AND THE ROOM KEEPS THEM.** "EQBuddy has
+never read an inventory dump" is a sentence about the whole evening; ninety-five
+guide rows repeating it is the room's empty state wallpapered down a checklist.
+So an unanswerable reference draws nothing at all. The other way — a per-row
+empty state — was rejected because the row already has a `StubNote` slot for
+"our data is thin here", and two kinds of apology on one row is not help.
+
+**4. THE CURATED CATALOG GOT TWO RULES AND 188 REFERENCES, NOT A SWEEP.**
+`GearUpgrade` on each Sky guide's turn-in step keyed on the reward ITEM (93 of
+95 — see 5), and `XpFarm` keyed on the zone on the ONE open-farm step of each of
+the 95, the step whose own `who` names no creature. The 127 Loot steps carry
+nothing: one named pull is not a camp. The epics carry nothing either — their
+steps are `Transcribed` prose, so which item a step hands over is not a field
+anybody authored, and reading it out of the sentence is the inference
+`Transcribed` exists to refuse. **`GearFarm` ships EMPTY on purpose:** it means
+"this step farms gear in this place" and no curated step does, so the engine
+answers the kind and the catalog points at nothing until a human authors one.
+`scripts/dra83-attachments.py` is committed as the record of the two rules — a
+hand-authored file gaining 188 rows is a claim somebody has to be able to
+re-derive.
+
+**5. THE TWO SKY REWARDS `ItemCatalog` CANNOT RESOLVE ARE NAMED IN A TEST
+RATHER THAN SKIPPED QUIETLY.** `Harmonic Spear` (the wiki's *Spear of Harmony*;
+PR #527 carries the rename) and `Windhowl/Spirit Render` (one checklist row
+standing for two items). Both are OUR naming bugs, not gaps in eqlwiki, so they
+carry no reference and `TheTwoUnresolvableSkyRewardsAreNamedAndCarryNoReference`
+asserts both ends — when either is fixed, the 93 moves and the test says so.
+
+**6. THE FLIP: `NoShippedGuideCarriesAnAttachmentYet` became a COUNT plus a
+RESOLVE.** Its own comment promised it would change the day the answering system
+existed, and D8 held it to this slice. "Every attachment resolves" passes
+beautifully on an empty file, so the count (93 / 95 / 0) is what notices a
+refresh or a bad merge dropping them, and the resolve is what notices a typo:
+a `GearUpgrade` key must be an item `ItemCatalog` holds, a zone key a zone the
+shipped `ZoneGraph` knows.
+
+**Verified to V2.** `scripts/check.ps1` all gates green; 4,954 unit tests pass;
+`GuideRowsTests` 15/15 in the launched app. **Prove-failed:** suppressing the
+projection's line reddens the new E2E with the live symptom
+(`shellQuestsHelperLines` stuck at 0 for 90 s), reverted and re-greened —
+green-only is vacuous coverage (trap 34).
+
+**Not done, and said out loud:** no staged screenshot of the new caption. The
+positive state needs two archived sessions in a named zone, which `shoot.ps1`
+stages through `Prime` (a whole app run per row) rather than through
+`SeedStoredSession`; the E2E asserts the same two numbers from one moment
+instead (trap 56). The screen is a mutex (trap 61) and a shot recipe for this is
+its own change.
+
+— Dranak (Claude Code, DRA-83)
+
+
+## 2026-09-14 — DRA-80: an unreachable API may not freeze a baseline (three calls)
+
+Class V1, M0-5's `exo-metrics` lane. `scripts/exo-metrics.ps1` rendered "the
+Paperclip API refused us" and "Paperclip has no record of this item" as the same
+`$null`, and `-Baseline` froze the resulting absence as a measurement — GWR
+**0.5051** written down and a success line printed, against the dashboard's own
+header promising `unmeasured` with the reason, never `0`. Reachable is 0.4946,
+which matches the committed `docs/ops/exo-baseline.json` to the digit.
+
+**1. THE REFUSAL TAKES BOTH FILES, NOT JUST THE JSON.** The issue asked for a
+`-Baseline` run to refuse to write the baseline and exit non-zero. It could have
+been read as "skip the freeze, still write the dashboard" — and the default went
+the other way: a `-Baseline` dashboard carries a **FROZEN BASELINE** banner, so
+emitting it beside a freeze that did not happen is the same lie one layer out.
+Exit code is 3, distinct from a crash's 1, so a caller can tell a refusal from a
+failure. Reversible: it is one predicate, `Test-BaselineRefused`.
+
+**2. A NORMAL RUN WARNS; ONLY A BASELINE REFUSES.** Refusing every unreachable
+run would have been the simpler rule and is the wrong one. A normal run reports
+today's reading and can be re-run. A baseline is the fixed point every later
+comparison cites, so a wrong one is a permanently wrong denominator that nothing
+downstream can detect. The asymmetry is the whole design, and `-NoPaperclip`
+already existed as the explicit "I know these are unmeasured" door.
+
+**3. THE REPRODUCE COMMAND ALSO EMITS `-NoPaperclip`, not only `-WindowLabel`.**
+The issue named `-WindowLabel`. `-NoPaperclip` decides which rows are measured at
+all, so a printed recipe that drops it does not regenerate the file it is printed
+in either — the same claim, one line.
+
+**Verified.** `scripts/check.ps1` all gates green; 4,954 unit tests pass.
+Three real end-to-end runs over PRs #580-#607 on this box: pre-fix + unreachable
+froze 0.5051 and exited 0; fixed + unreachable refused, exited 3 and wrote
+nothing; fixed + reachable froze 0.4946. **Prove-failed** against four mutants,
+each reverting one half of the fix — 10 / 3 / 2 / 2 named self-test failures
+(trap 34: green-only is vacuous).
+
+**Not done, and said out loud:** the committed `exo-baseline.json` and
+`exo-dashboard.md` are NOT regenerated. The reachable run reproduces the
+committed GWR exactly, but Paperclip run records have accumulated since (cost
+rows move from `unmeasured` to 793,464 tokens), and re-freezing a baseline to
+pick up drift is the opposite of what a baseline is for. The committed
+dashboard's printed recipe is already true: it was generated without
+`-WindowLabel`, so nothing regenerates differently today. Trap 81 filed.
+
+— Dranak (Claude Code, DRA-80)
+
+## 2026-09-14 ~8:40 PM CT — DRA-84 D3: the weekly harvest refresh, and four calls made rather than asked
+
+**Assumption at the top:** the D3 harvest un-PARK Helm AUTHORIZED by name (#623 SIGN, HELM tip
+`f25fd184`) authorizes running the standing weekly refresh **as designed** — the fetch, the
+promotions, the surveys and the catalog rebuild — and nothing about the refresh's design. Every
+call below sits inside that reading, and each states the default it could have gone the other
+way on. None touches the consequence list: no release, no public surface, no privacy, no money,
+no roadmap direction, no departure from eqlwiki, and **no change to how we ask eqlwiki for
+things** (same client, same ~1 req/s, same User-Agent).
+
+**1. Resumed the interrupted run instead of re-running `refresh.py` whole.**
+The prior `-p` process exited mid `items-harvest`. The other way: re-run `refresh.py`, which
+would have re-evicted the window and re-fetched the ~1,420 changed pages the dead run had
+already paid for. I resumed — `items-wikitext.jsonl` keys on revision ids, so 11,014 of 11,197
+item pages were already current and only 183 were fetched. **Why this way:** re-fetching pages
+we already hold is load on a third party that buys nothing, and item 7 of the consequence list
+makes request behaviour toward eqlwiki something to be careful with in the conservative
+direction. The risk of resuming is a page edited *after* the dead run's eviction sitting stale
+behind an advanced window, so I checked rather than assumed: exactly one article qualified
+(`Patch Notes`) and no harvester tracks it. Had that check found tracked pages, the answer would
+have been a targeted evict-and-refetch of those, not a full re-run.
+
+**2. Re-ran `guides-transform` after stamping `refresh-state.json`, and did NOT reorder
+`refresh.py`.**
+`guides-transform` embeds `retrievedAt` from `refresh-state.json`'s `ranAt`, which `refresh.py`
+stamps **after** the promotions — so a refresh that advances the date leaves the committed file
+one cycle behind and reddens the `generated` gate on the stamp alone. The other way: reorder the
+promotion after the stamp and fix it permanently. I took the workaround and escalated the fix.
+**Why this way:** the authorization is to run the refresh, not to redesign it, and a reordering
+is exactly the kind of change that should carry a ruling rather than ride in on a data PR.
+Recorded in CLAUDE.md so the next runner meets it as a known shape rather than a mystery, and
+named for veto in the LIVE ASK. **This is a real latent bug and it is not fixed** — if Helm
+leaves it, every future refresh that advances the date needs the same manual re-run.
+
+**3. Replaced the vendor-value tripwire rather than deleting it or changing the engine.**
+`TheShippedCatalogCarriesNoVendorValueYet` fired exactly as written — 773 shipped records now
+carry a `MerchantCopper`. Three ways to go: delete the row (silent), flip it to a bare
+"non-zero" assertion (vacuous), or replace it with a survey of what actually ships. I took the
+third: the counts the promoter's own survey printed, with the **distinct** count (403 values
+behind 773 prices) as the load-bearing one, because that ratio is what separates a parser
+reading a per-item field from a parser finding one template (trap 73). Added a committed
+negative for its forbid-scan arm so it is not a guard aimed at nothing (trap 78). **I changed no
+engine and no wording** — that belongs to the money engine, and the thing a human should look at
+(568 of 773 prices carry no Charisma/faction condition, so they draw the flat sentence with no
+"yours will differ" clause) is measured, pinned in the guard, and named for veto rather than
+absorbed.
+
+**4. Updated three moved guards and two live doc counts from a second source, not from actuals.**
+QuestCatalog 1,178 → 1,173 and harvested guides 1,164 → 1,158 are data moves, and the lazy fix
+is to paste the new numbers in. Each was re-derived first (trap 52): the seven Darkforge rows
+left the quest catalog because the wiki folded them into `Category:Items` under one umbrella
+page — verified by finding all seven in the items dump and none in the quest title list; and
+`Class Race Quest List` joined the nothing-to-say list because the quest-item enumeration
+dropped "Innoruuk Symbol Quests", itself a quest page that was never an item — verified against
+its own byte-identical cached wikitext, so it was not a transformer regression. The reasons are
+written into the test comments, because a count that moves without a reason beside it is the
+thing that makes the next refresh unreviewable. CLAUDE.md and `docs/TestPlan.md` updated to stay
+true; the append-only channel ledgers were left alone as history.
+
+**Not done, deliberately:** no curated catalog written (flag-only rule KEPT — 92 SpawnCatalog /
+255 GuideCatalog / 243 SkyQuestDefaults.cs flags go to a human), no `WhatsNew.json` entry (the
+release that ships these catalogs earns one, and vendor prices appearing in Farm-to-sell
+sentences should be named in it), no engine change belonging to D1/D2/D4, and no move on the
+standing Soft-open un-PARK, which the #623 SIGN named for D3 only.
+
+— Dranak (Claude Code, DRA-84 D3)
+
+## 2026-09-14 — DRA-84 D1 (zone level bands): five calls I made alone, and the number the slice was built to produce
+
+Seat `opus-dra84-d1` / Paperclip DRA-84, claimed `-Mode disjoint` (D3 holds the card in
+parallel by Helm's named AUTHORIZE — a default claim is refused there, correctly, trap 70).
+Plan P1 as SIGNED on #623: `zonelevels-transform.py` + `ZoneLevelBands.json` +
+`Core/ZoneLevels.cs` + surveys + `--check` in `check.ps1` and CI. No engine change, no
+fetch, no harvest. Everything below is pre-authorized with a reporting duty; veto from here.
+
+**The measurement this slice exists for, first, because it changes what D2 should be.**
+Strict parsing gives **46 bands out of 118 zone pages**. Joined against the shipped
+`ItemCatalog.json.gz` (11,146 records, 5,613 carrying a `DropZones`):
+
+| Where a `DropZones` spelling lands | Spellings | Mentions |
+|---|---:|---:|
+| On a zone we have a band for | 48 / 302 (15%) | 3,564 / 10,612 (33%) |
+| On a zone page whose row we REFUSED | 74 (24%) | **5,743 (54%)** |
+| On no zone page we have read | 180 (59%) | 1,305 (12%) |
+
+The middle row is the finding, and it is not a spelling problem. Plane of Sky is `50+`,
+Plane of Hate and Plane of Fear `48+`, Temple of Veeshan `60+`, Kael Drakkel `30-60+`,
+Lower Guk `30-50+`, Karnor's Castle `40-55+`. **Every one of the heaviest drop zones in the
+catalog HAS a page, and the plan's strict rule refuses its row.** So a P2 gate that reads a
+band's TOP would, on today's data, do nothing at all for 54% of the item×zone mentions it
+looks at — including most of the high-level ones. The Founder's named exhibit survives
+(Crushbone `5-20`), and the other one was never a level question (Rathe Mountains `13-45`).
+That is a plan question, not mine to answer, and it is the ask on this PR.
+
+**Call 1 — strict stays strict, and the refused shapes ship as evidence instead.** The
+plan said `N-M` or `N`, everything else ABSENT, never guessed. I kept it even after
+measuring what it costs, because the alternative is inventing a maximum for "and above",
+which is the shape trap 73 exists to refuse, and because departing from a SIGNED plan's
+stated rule is an escalation rather than a call. **The default it could have gone the other
+way on:** reading `50+` as `50-60` (the era cap) or as an open top with its own field. Both
+are defensible and neither is mine. `zonelevels-report.md` lists all 57 refused verbatims
+with the zones carrying them, so whoever decides is deciding with the evidence.
+
+**Call 2 — lookup is exact title then the repo's existing zone-identity fold, and NOT
+longest containment.** `ZoneGraph.Resolve` uses containment for travel, and reusing it here
+was the obvious default. Measured, it bought 35 more spellings and almost every one was
+wrong: "Commonlands" got West Commonlands's `6-30`; all four Qeynos sub-zones got the city's
+`1-9`, including "Qeynos Aqueducts", whose OWN page we refused; "This drop is super ultra
+rare from any spider in kaesora." got Kaesora's `30-40`. A wrong band is a number a surface
+states as fact, where ABSENT just makes the gate do nothing — the asymmetry decides it.
+I lifted `ZoneMapFiles.IdentityKey` out of the map-file resolver rather than write a second
+normalisation rule (trap 4); it is the same private `Normalize`+`Squeeze` that was already
+there, made public and named for what it does. **Cost:** "Burning Woods" no longer reaches
+"Burning Wood" (102 mentions), because bridging it means pulling a curated alias table into
+a band lookup. It is pinned as a KNOWN miss in a test that says to delete itself when some
+slice has a reason to widen, rather than left to rot into a claim the fold is complete.
+
+**Call 3 — ABSENT ships as data.** `ZoneLevelBands.json` carries a `NoBand` section: all 72
+zones we read and got no band from, with the verbatim we refused (or `""` where the page has
+no row). `ZoneLevels.Lookup` therefore answers one of four things — Unknown / NoRow /
+Refused / Banded — because "we have never read a page for this zone" and "the wiki does not
+say" and "the wiki says `50+` and we will not read it" are three different sentences, and a
+surface that cannot tell them apart will say the wrong one. It also makes the fold refuse to
+borrow: a zone we know about but have no band for answers Refused, never a neighbour's band.
+**The default:** ship only the 46 and let absence be a hole.
+
+**Call 4 — `--check` covers the DATA file and deliberately NOT the report's join numbers.**
+The join is measured against `ItemCatalog.json.gz`, which D3's refresh rebuilds in a seat
+running right now. Gating on it would redden D3's PR on a file it did not touch, and D3's
+code-independence is something the plan declared. So the report states in its own text that
+the join half is a snapshot, prints the record count it was taken against, and says to
+re-run the transform (no `--check`) after a refresh. `ZoneLevelsTests` asserts every
+cache-derived bucket in the report and none of the join ones. **The default:** assert
+everything and let the refresh seat deal with it. **The cost of my choice, stated plainly:**
+nothing makes a stale join number go red. D4's coverage survey should re-take it.
+
+**Call 5 — plain JSON, no gzip.** `HarvestedGuides.json.gz` needs `--check` to decompress
+before comparing because a container asserts which zlib built it (trap 74). 5.8 KB of bands
+needs no container, so the gate compares the file itself and there is no toolchain for it to
+redden on. **The default:** match the neighbouring generated catalog's shape.
+
+**Verified to the class (V1 — new Core data and reader, nothing user-visible):**
+`scripts/check.ps1` all green, **4,982 units**, `ZoneLevelsTests` 47/47. Prove-failed both
+new guards rather than shipping them green-only: editing one `Max` in the committed file
+makes `--check` exit 1 with the reason; swapping `Lookup` back to longest containment
+reddens **fourteen of the fifteen committed negatives** plus the alias and ambiguity rows
+(the fifteenth, Qeynos Aqueducts, moved to the refused list where it belongs — its own page
+answers). No E2E run locally: no surface changed, and CI runs it regardless.
+
+**No `WhatsNew.json` entry, on purpose.** Nothing a player can notice ships here — no engine
+reads a band. The entry belongs to the release that ships the gate.
+
+**Not done, deliberately:** D2's gate, the `Exempt`→`Consumes` flip, any `Recommendations`
+change, any fetch or harvest, any curated-catalog edit, Pages / Play / tag / `release.ps1` /
+signing / prod secrets / Founder mail / Desktop / #527 / a new `helm/ssc-*`.
+
+— Dranak (Claude Code, DRA-84 D1)
+
+## 2026-09-14 (DRA-56 — the Turquoise re-shoot was already answered the other way)
+
+**1. The card's headline scope is REFUSED as superseded, and nothing was re-shot.** DRA-56 says
+"re-shoot the nine `site/assets/img/` captures as one Turquoise-theme batch", tracing to Helm's
+ACK of it as the DRA-48 follow-up (~1:00 PM CT, 2026-09-10). **Six hours later the Founder
+settled it the other way himself**: `06c66462`, 2026-09-10 19:15 CDT, *"site: DRA-48 uniform
+BlueGrey — Founder T4 look, every capture and clip re-shot"* — all 18 stills and all four GIFs,
+with the landing's CSS tokens moved from `ThemePalettes["Turquoise"]` to `["BlueGrey"]` and the
+`.teal` class renamed `.accent` "so the name stops lying about a blue page". Executing the card
+as written would have reverted a Founder look decision to satisfy an instruction that predates
+it. The card's real GOAL — one palette across the landing, every picture recipe-backed — was
+already met; only the palette differs from the sentence naming it. **The default it could have
+gone the other way on:** do as the card says (two seats and Helm had all signed the Turquoise
+follow-up, so there was cover for it) and file the conflict afterwards. Refused because a stale
+instruction is not authority, and "the card said so" is the one reason that never survives
+contact with the commit that answers it. Not re-litigated with Helm: the *superseding* decision
+is the Founder's own, and Helm's Soft LEAVE on the re-shoot was only ever "not a merge gate".
+
+**2. The `#510` content swaps needed no work — both were already resolved, one against the
+swap.** The closed PR named two: `shell-progress.png` (five lines) → `shell-progress-history.png`,
+and `shell-world.png` (empty state) → `map-window.png`. The first is **live on `main`**
+(`index.html:359`). The second was **considered and declined by the Founder for a stated
+reason** — `map-window.png` was a v1.5x-era 1936×1048 capture with no recipe, so the
+illustration lock could not ship it; the World card carries `spawns-window.png` instead
+(`index.html:366`). Both were verified by opening the page, not by reading the PR body — a
+closed PR describes an intention, never the state of the tree.
+
+**3. The EQBuddy Sans swap is TAKEN, and the weight scale is the reason it was nearly wrong.**
+The page now ships the app's own three faces instead of `InterVariable.woff2`. Measured before
+building, not asserted: all **94** distinct characters the page shows are in the face's cmap (831
+codepoints, a Noto subset); the faces' `usWeightClass` values are exactly **400 / 600 / 700**;
+and the family name in the `name` table is `EQBuddy Sans`. Transfer size **falls either way** —
+185 KB gzipped against Inter's 352 KB (which is already-compressed woff2 and does not shrink),
+and 304 KB against 352 KB uncompressed — so the claim holds whatever GitHub Pages does about
+content encoding. It also removes the page's **only non-GitHub external href** (the `rsms.me`
+Inter credit), so the footer's "this page makes no third-party requests" now has nothing to
+qualify; the OFL credit points at the local `assets/fonts/OFL.txt` and names Noto and its
+holders. Verified in effect and not merely present (trap 42): a headless probe reports all three
+faces `loaded` from the committed TTFs, and the 1440px render keeps its hierarchy.
+
+**The near-miss is the part worth keeping.** Inter was ONE variable file declaring `font-weight:
+100 900`, which covers everything; three static faces cover three points. The sheet asked for
+**650 in seven places** — the brand wordmark, the hero pills, the badges, the CTA and the three
+table marks. CSS rounds 650 UP, so all seven would have silently rendered at 700 and merged into
+the heading weight: a whole typographic tier lost, on a page whose own screenshots would still
+show the app's real hierarchy. They are remapped to **600** deliberately — the nearest face
+DOWN, which keeps the distinction the 650 existed to make. **The default it could have gone the
+other way on:** decline the swap on "it is not a drop-in", which is what the first reading of the
+weight inventory suggested. It cost one measurement to find that 600 and 700 were exact and only
+650 was homeless.
+
+**4. The illustration lock grew a SET-level guard, because the palette lived in a commit
+message.** Every landing picture already had its own recipe; nothing recorded *which* files the
+page draws or *what palette they must share*. That is a live trap, not a tidiness point:
+**`shoot.ps1`'s default `-Theme` is `Turquoise`** — right for `docs/screenshots/`, wrong for this
+page — so the next person to re-run a landing shot the obvious, argument-free way commits one
+Turquoise still into a BlueGrey set and nothing complains. This card is the proof the hazard is
+real: it was dispatched to do exactly that. `LandingSiteTests` now pins all 23 visual assets (18
+stills + 5 clips) to a recipe manifest, compares the page's set against the manifest's **in both
+directions** (trap 34 — a forbid-rule alone cannot see a missing row), asserts the set is one
+palette, and asserts *that `shoot.ps1`'s default is NOT the landing theme*, so the explicit
+`-Theme BlueGrey` in every row is load-bearing and tested rather than remembered. It also turns
+the page's two spoken promises into assertions: *"every capture and clip on this page is a real
+build driven by the repo's own harness"* and *"this page makes no third-party requests"*.
+**Every detector fires on a committed negative** (trap 78) — the weight scanner against the
+stylesheet this slice would have shipped unmeasured, the request scanner against a hosted font
+and an analytics tag, each paired with a negative proving it stays quiet on the legitimate case.
+`SfntFacts` was lifted out of `BundledFontFaceTests` so the app's bundle and the site's webfont
+read **one** TTF parser (trap 4), rather than the site growing a second one.
+
+**Not done, deliberately:** nothing was re-shot (see 1) — so `-Theme` was never run and the
+screen was never taken; the Soft LEAVE list is untouched (no Pages enablement, no README/About
+go-live links, no Play Console, no tag, no signing); no `WhatsNew.json` entry, because site
+assets ship no player-facing app change; and the font-coverage guard reads the **page's** text
+only — a future `site/` page would need its own row.
+
+**5. CORRECTION, and it is the same mistake this entry is about.** The paragraph above
+originally closed by saying "the T4 dual look (Helm + Founder) owed *before Pages enable* now
+has a typeface change in front of it", and `HELM-FEEDBACK.md` and PR #629 say the same. **That
+framing was stale and Helm corrected it** at the #629 SIGN (~9:30 PM CT) with a fresh
+`GET …/pages`: **200, `has_pages: true`**, `https://dranakcorps-bot.github.io/EQBuddy/`, T4 GO
+recorded 09-12 and verified 09-14. **The landing is already published**, so this typeface lands
+on a LIVE page rather than ahead of a gate. Helm's ruling: the site **STAYS UP**, a Helm+Founder
+content look against the post-#629 page is a named follow-up and explicitly **not** a merge gate,
+and Soft LEAVE inventing a Pages disable or a re-gate on a typeface. Nothing about the change is
+altered by this; what is altered is the claim I made about its consequence, which was more
+cautious than the truth in a way that would have read as a gate nobody was holding.
+
+**I refused a card for carrying a stale world, and then carried one of my own into the same
+document — one paragraph after writing the guard against it.** The card's staleness came from a
+Founder commit six hours later; mine came from taking the Soft LEAVE list's wording as the state
+of the deployment rather than as a list of things not to touch. The list was right — I did not
+enable Pages, and could not have, because it was already on. **A list of what not to do is not a
+description of the world**, and the cheap check was the one Helm ran: ask the API. The hygiene
+rule I proposed to Helm — re-read the commits that touched the surface before acting on an ACKed
+follow-up — needed its sibling in the same breath: **re-read the STATE of the surface too, from
+the system that owns it, not from the prose that last mentioned it.**
+
+— Dranak (Claude Code, DRA-56)
+
+## 2026-09-14 — DRA-86: the bard #139/#150 caveat went in WHY, because both homes the plan named are closed
+
+**The slice.** DRA-38's one unfinished acceptance line: carry the bard Light Woolen
+match-the-wiki story into the two Bard guides, so a guide is not more confident than the
+checklist row it wraps. Data-only, two objectives, one test. V1.
+
+**The call, and it is the whole slice.** The plan
+(`docs/quests/WEEKEND-SHIP-BAG-2026-09-12.md` §D4) said the provenance comments *"are copied
+into the affected guides' `Sources` or `StubNote`"*. **Both of those are closed by the code the
+plan was written against**, which I established by reading rather than by trying:
+
+1. `StubNote` on an `Authored` objective is a **validation failure** —
+   `GuideCatalog.AuthoringProblems` emits *"authored but carries a stub note — one of those is
+   a lie"*, and `GuideCatalogTests.AnAuthoredObjectiveCarryingAStubNoteIsRefused` pins it. The
+   only way to use it is to demote the step to `Stub`, and these steps genuinely answer who /
+   where / what: the drop locations are **not** what is disputed (`SkyQuestDefaults` says the
+   sources belong to the ITEMS and travel with them). Demoting would be dishonest in the other
+   direction, and would move the guide's caption and `IsFullyAuthored` for a data-confidence
+   note.
+2. `GuideSource` has **no prose field at all** — `{ Url, Title, RetrievedAt }`. `Title` is an
+   EXACT eqlwiki page title doing two jobs, and the second is that `refresh.py`'s
+   `curated_flags` intersects it with the week's changed pages. A caveat written there is a
+   page that does not exist, and it would quietly break the flag for the two rows that most
+   need a wiki correction to reach them.
+
+**So the decision: it goes in `Why`, appended to the sentence it qualifies.** The default it
+could have gone the other way on was `How` — there is a 95-row precedent for an EQBuddy's-own-
+limit sentence living there (*"the log never records a hand-in … not something the wiki says"*),
+and it is the field the house convention would reach for first. **I did not take it**, for two
+reasons. `How` is documented as *the method, and what it costs*, and a provenance caveat is not
+a method; using it would also need a new entry in `EveryFilledWhenOrHowNamesItsBasis`'s
+allow-list, whose own doc comment warns that an allow-entry nothing matches is a rule that has
+quietly stopped being enforced. **And the load-bearing reason: `Why` is the field that MAKES the
+disputed claim** — *"Light Woolen Mantle is one of the turn-in pieces for the Mantle of the
+Songweaver"*. Putting the qualification inside that string means no surface can ever draw the
+confident half alone. Split across two fields, one that renders `Why` and not `How` publishes
+exactly the over-confidence this acceptance line exists to remove.
+
+**Why this is a logged call and not a Helm wake.** The plan declared the OUTCOME (the story is
+in the guide data, pinned by a test) and suggested two homes for it. The outcome is delivered
+unchanged: same two objectives, same scope, no schema change, no new mechanism, nothing on the
+consequence list. Choosing a third existing field when the two named ones are refused by the
+validator is a judgement inside the slice, not a departure from it. **What I did NOT do is force
+a home** — no new field, no relaxed validation, no demotion to `Stub`. That was the done bar's
+named alternative and it stays available: if Fable wants a first-class `Caveat`/`SourceNote` on
+the schema, this is the evidence for it, and I have filed it as such rather than deciding it.
+
+**The forbid half.** `NoOtherStepClaimsTheLightWoolenPairingIsDisputed` asserts the caveat is on
+exactly those two ids and nowhere else. A dispute pasted across rows would be EQBuddy inventing
+a controversy, which spends the same trust as inventing a fact — trap 73 pointed the other way.
+
+**Verified:** `GuideCatalogTests` 33/33, full unit suite 5089/5089, `scripts/check.ps1` all
+gates green (including `epic-guides-build.py --check`, which re-serializes the WHOLE catalog and
+would have caught a formatting drift in a hand edit — the file is byte-identical to what the
+generator produces, before and after). **Prove-failed**: reverting only the two data lines with
+the test kept reddens both new tests with the real symptom. E2E is CI's — `e2e-windows` is the
+merge bar and the local screen is a mutex a concurrent seat was holding (trap 61).
+
+— Dranak (Claude Code, DRA-86)
+

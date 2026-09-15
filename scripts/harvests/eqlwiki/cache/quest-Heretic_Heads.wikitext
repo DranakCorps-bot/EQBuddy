@@ -39,7 +39,7 @@ You say, 'What about the Heretics?'
 
 : Shazda Kaekwon says 'The heretics have not only corrupted their own spirits but they defile the spirits of the dead with their evil sorceries. Fill this satchel with the heads of invading heretics and I shall reward you for your allegiance to Kejek. 
 
-'''Receive Burlap Satchel. Inside it, combine four [[Heretics Head]]s (Male/Female heads work). Then hand in the Satchel of Heretic Heads.'''
+'''Receive Burlap Satchel. Inside it, combine four [[Heretics Head]]s (Male/Female heads work). Then hand in the [[Satchel of Heretic Heads]].'''
 
 : Shazda Kaekwon says 'Less heretics to defile the lands and spirits. You have the gratitude of Kejek for your assistance in repelling the heretic threat.' 
 
@@ -49,10 +49,10 @@ You say, 'What about the Heretics?'
 </div> 
 {{YouGainExperience}}
 
-You receive 1pp, 5cp from Shazda Kaekwon.
-You receive either the [[Kejekan Tribal Headband]] (common) or a [[Swiftclaw Sash]] (rare).
+You receive either the [[Kejekan Tribal Headband]] (common) or a [[Swiftclaw Sash]] (rare) and some minor coin.
 
-''Drop Statistics''
+== Notes ==
+''Drop Statistics:''
 
 5 Turn ins: 4 [[Kejekan Tribal Headband]], 1 [[Swiftclaw Sash]]
 

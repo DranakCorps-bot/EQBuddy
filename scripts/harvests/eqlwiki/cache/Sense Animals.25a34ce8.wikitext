@@ -1,5 +1,5 @@
 {{Classic Era}}
-{{Spellpage|
+{{Spellpagesmart|
 
 | spellname = Sense Animals
 | spellicon = 76

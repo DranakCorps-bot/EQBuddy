@@ -7,6 +7,7 @@
 >
 > | | |
 > |---|---|
+> | **The site** | **[dranakcorps-bot.github.io/EQBuddy](https://dranakcorps-bot.github.io/EQBuddy/)** — the Evolved landing page: the tray, the Guide, the chain, the roadmap. It links back here for the 1.x downloads; **there is no Evolved download on it either.** |
 > | **Identity & vision** | [PRODUCT.md](PRODUCT.md) · [EQBuddy-Evolved.md](EQBuddy-Evolved.md) |
 > | **1.x stays up** | [LEGACY-V1.md](LEGACY-V1.md) · [issue #275](https://github.com/DranakCorps-bot/EQBuddy/issues/275) |
 > | **Supported** | Windows Evolved desktop + EQBuddy Mobile hosted by Windows |

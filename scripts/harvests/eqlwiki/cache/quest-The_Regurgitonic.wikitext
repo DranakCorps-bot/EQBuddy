@@ -71,6 +71,7 @@ You receive [[Regurgitonic]].
 You say, 'regurgitonic'.
  
 :Kimble Nogflop says 'I formulate the Regurgitonic myself. My animals kept eating the occasional spectator here and there. Femurs and ribs kept getting stuck inside, not to mention a few platinum pieces. Sometimes my batch would come out wrong and the animals would go berserk!! '''I hope I got the formula right this time'''.'
+:* Note that sometimes Kimble definitely does not get the formula right and gives you a dud that will not work. When a good tonic is inspected (as though you were adding motes) it will not have a 'Lore' tab. The bad tonics will have an item lore tab with the text 'Bad Regurgitonic'.
 
 If you choose to give the [[Regurgitonic]] to [[Mammoth]]:
 

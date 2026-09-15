@@ -1,5 +1,5 @@
 {{Temple Era}}
-[[File:npc_vurgo.png|frame|Vurgo]]
+[[File:npc_vurgo.png|thumb|Vurgo]]
 {| class="questTopTable"
 ! ''' Start Zone: '''
 | [[Temple of Solusek Ro]]

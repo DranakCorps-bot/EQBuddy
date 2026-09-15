@@ -1,8 +1,8 @@
-<noinclude>{{Classic Era}}</noinclude>
+{{Classic Era}}
 {{Spellpagesmart|
 
 | spellname = Imbue Plains Pebble
-| spellicon = U
+| spellicon = 100
 | description = Focuses the power of Karana into a plains pebble. Consumes a plains pebble when cast.
 
 | Table = {{{Table|0}}}
@@ -38,10 +38,8 @@
 
 | where_to_obtain = 
 
-{{SpellWhereTable|
-{{SpellWhereRowB | [[Northern Karana|Northern Plains of Karana]] | [[Tak Whistler]] | Druid Ring | (-2732,-1466) }}
-}}
-| TableLocations = N.Karana
-| TableEra = {{{TableEra|Classic}}}
-
+<ul>
+<li>[[Cleric#Spell Vendors|Cleric Spell Vendors]]</li>
+<li>[[Druid#Spell Vendors|Druid Spell Vendors]]</li>
+</ul>
 }}

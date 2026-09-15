@@ -165,14 +165,22 @@ internal sealed class SettingsHudView
         + "switch as the ★ on that panel's own heading — two views of one setting, not two "
         + "settings.";
 
-    /// <summary>Where three switches WENT (SA-1). Naming the destination without naming the
-    /// origin is the #233 complaint; this screen is where someone looks for a switch that is
-    /// gone, so it says both.</summary>
+    /// <summary>Where the top row's three switches ARE (DRA-81's Founder LOCK).
+    ///
+    /// **It used to say the opposite**, and what it said was the defect: *"XP, DPS and HPS
+    /// are not in this list because they are always on the HUD now … their stars are gone;
+    /// there is nothing left to switch off."* That was true of SA-1 and it told a player
+    /// looking for the HPS box that no such box existed — which is exactly the screen the
+    /// Founder's smoke landed on. The switches are back in the list above; this sentence now
+    /// explains the only thing about them that is still special, which is WHERE they draw.
+    ///
+    /// Naming the destination without naming the origin is the #233 complaint, so it says
+    /// both: the three sit on the top row rather than among the chips, and that is the whole
+    /// difference.</summary>
     internal const string PromotedStatsNote =
-        "XP, DPS and HPS are not in this list because they are always on the HUD now — the "
-        + "collapsed bar shows your name, your DPS and your XP%/hr whatever you pick here, "
-        + "and the third number becomes HPS while healing is the weight of the last "
-        + "half-minute. Their stars are gone; there is nothing left to switch off.";
+        "DPS, HPS and XP per hour draw on the bar's top row, beside your character name, "
+        + "rather than as chips with the rest — so they read at a glance while you play. "
+        + "They are ordinary stars otherwise: tick one to show it, untick it to put it away.";
 
     /// <summary>
     /// Pet damage can live on the always-on row (SIGNED #422; Bevel's §3/§4 ruling,
@@ -192,8 +200,8 @@ internal sealed class SettingsHudView
     /// moment changes nothing on screen, there being no cell chip to lose. Without a sentence
     /// saying the ★'s job NARROWS rather than stops, a player who unticks it expecting the
     /// number gone sees nothing happen and reasonably reads that as broken.
-    /// <see cref="PromotedStatsNote"/> could not cover it: those three lost their stars
-    /// outright, and pet's still means something.
+    /// <see cref="PromotedStatsNote"/> does not cover it: those three have ONE home each and
+    /// their ★ simply shows or hides them, where pet's also depends on which row it is on.
     /// </summary>
     internal const string GlancePetNote =
         "Pet damage can also sit on the always-on row up top, next to DPS — drag its chip "
@@ -531,7 +539,11 @@ internal sealed class SettingsHudView
     public void BuildMiniStats()
     {
         _miniStats.Children.Clear();
-        foreach (var key in MiniBarPresentation.Order)
+        // OptionKeys and NOT Order since DRA-81: the top row's three stats are ★s again, and
+        // `Order` is a formatting table for CELLS that will never hold them. Walking `Order`
+        // here is precisely how SA-1 left three switches in the profile with no screen able
+        // to offer them.
+        foreach (var key in MiniBarPresentation.OptionKeys)
         {
             var check = new CheckBox
             {

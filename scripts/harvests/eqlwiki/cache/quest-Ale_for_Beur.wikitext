@@ -1,5 +1,5 @@
 {{Classic Era}}
-[[File:npc_beur_tenlah.png|frame|Beur Tenlah]]
+[[File:npc_beur_tenlah.png|thumb|Beur Tenlah]]
 {| class="questTopTable"
 ! ''' Start Zone: '''
 | [[Freeport|East Freeport]]

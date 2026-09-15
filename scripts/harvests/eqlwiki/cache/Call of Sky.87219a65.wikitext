@@ -10,7 +10,7 @@
 | classes = * [[Ranger]] - Level 36
 | slots = 
 
-{{SpellSlotRowSmart | 1 | Add Melee Proc: {{SpellHoverLink|Call of Sky Strike}} | simple = {{#ifeq:{{{Table|0}}}|0|0|1}} }}
+{{SpellSlotRowSmart | 6 | Add Melee Proc: {{SpellHoverLink|Call of Sky Strike}} | simple = {{#ifeq:{{{Table|0}}}|0|0|1}} }}
 
 | skill = [[Skill Alteration | Alteration]]
 

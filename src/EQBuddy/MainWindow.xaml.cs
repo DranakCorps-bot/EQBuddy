@@ -256,6 +256,10 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
         // The phone's OWN Level-ups memo (#240) — a memo is state, so the Experience card
         // keeps its own (trap 45); this one is captured by the Progress callback below.
         var phoneLevels = new LevelHistoryMemo(StoredLevelDings, () => QuestCharacterKey);
+        // The phone's OWN Helper bundle (DRA-71 D9) — same per-host-memo, shared-producer
+        // split as the level memo above it, in its own class because MainWindow is the
+        // hotspot (see PhoneHelperSource for both arguments).
+        var phoneHelper = new PhoneHelperSource(this);
         _companion = new Companion.CompanionHost(_settings, UpdateChecker.CurrentVersion.ToString(),
             new Companion.CompanionSources
             {
@@ -320,8 +324,16 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
                         // desktop does; these two are the guide ledger's half of that.
                         Ledger = QuestLedger,
                         CharacterKey = QuestCharacterKey,
+                        // DRA-83: what the Helper says about the subjects those steps point at,
+                        // from the phone's OWN Helper pass — one host, one set of stores, both of
+                        // its screens (see PhoneHelperSource.Attachments).
+                        Helper = phoneHelper.Attachments(),
                     };
                 },
+                // **The Helper, by projection** (DRA-71 D9) — the SAME `Recommendations.Rank`
+                // the shell room calls, over the SAME `HelperInputs` the same module builds.
+                // Nothing about the answers is decided on the phone's side of the wire.
+                Helper = phoneHelper.Build,
                 QuestLedger = QuestLedger,
                 QuestCharacterKey = () => QuestCharacterKey,
                 ZoneGraph = ZoneGraph,   // World PR 4: Path tab reads the same graph TravelPlan does
@@ -3304,10 +3316,12 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
     private IEnumerable<(string Key, System.Windows.Controls.Primitives.ToggleButton Star)> StarButtons()
     {
         yield return ("motes", StarMotes);
-        // "dps" and "hps" left this list in Surface A / SA-1: they are the always-on
-        // collapsed HUD numbers now, and a promotion removes the toggle. Their stars are
-        // gone from the Combat and Healing headers with them; what carried each player's
-        // stored state across is AppSettings.MigratePromotedHudStats, not this method.
+        // "dps" and "hps" left this list in Surface A / SA-1 and have NOT come back to it.
+        // They are ★s again since DRA-81's Founder LOCK, but this method is the CARD-HEADER
+        // star map and their cards' headers are not where those switches live — the Mini
+        // dashboard list is (MiniBarPresentation.OptionKeys), because the two draw on the
+        // collapsed bar's top row rather than as cells. AppSettings.MigrateHudStatStars is
+        // what carried each player's stored state across, not this method.
         yield return ("pet", StarPet);
         yield return ("procs", StarProcs);
         yield return ("buffs", StarBuffs);

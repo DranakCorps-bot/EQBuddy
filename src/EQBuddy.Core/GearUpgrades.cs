@@ -332,7 +332,7 @@ public static class GearUpgrades
     /// <summary>
     /// The catalog's wearable records, grouped by the slot they go in.
     ///
-    /// <para>Without it the sweep is every worn item × every one of 11,146 records, on a
+    /// <para>Without it the sweep is every worn item × every one of 11,196 records, on a
     /// selection click. With it, a worn item is compared against the few hundred records that
     /// could go in the same slot. Keyed on the catalog INSTANCE through a weak table rather
     /// than on <see cref="ItemCatalog.Default"/>, so a test's small fixture catalog gets its
@@ -373,27 +373,38 @@ public static class GearUpgrades
     /// stats: it cannot win or lose a comparison, and an anchor that silently matches nothing
     /// would read as "no upgrades exist" instead of "EQBuddy has never read about this
     /// item".</para>
+    ///
+    /// <para><b>ONE ANCHOR PER WORN ROW, and the slot is the DUMP'S</b>
+    /// (<see cref="InventoryFile.Entry.WornSlot"/>, DRA-81 Founder smoke). This used to
+    /// expand the CATALOG's <c>Slot:</c> line, which is a statement about where an item may
+    /// go rather than about where this character is wearing it — so a one-handed weapon in
+    /// the primary hand became a PRIMARY anchor and a SECONDARY one, and the picker listed
+    /// the same sword twice; and a bow whose wiki page also names PRIMARY was anchored as a
+    /// hand weapon, so the RANGE row the Founder was looking for never appeared at all. Two
+    /// symptoms, one root: the dump already prints the answer, once, per row.</para>
+    ///
+    /// <para>The (name, slot) de-duplication survives that change and still earns its keep —
+    /// a ring in both FINGER rows is ONE anchor, because both rows normalise to FINGER and
+    /// the upgrade for the two of them is the same upgrade.</para>
     /// </summary>
     /// <param name="statsFor">Base name → stats, the room's own resolver (catalog first, wiki
-    /// cache behind it) — the same delegate <c>GearLocker.Build</c> takes.</param>
+    /// cache behind it) — the same delegate <c>GearLocker.Build</c> takes. The stats still
+    /// have to say WEARABLE: a spell scroll sitting in a worn row is not gear, and it is the
+    /// stats block rather than the location that knows that.</param>
     public static List<WornItem> WornFrom(
         IEnumerable<InventoryFile.Entry> entries, Func<string, ItemStatsBlock?> statsFor)
     {
         var worn = new List<WornItem>();
         foreach (var entry in entries.Where(e => e.Worn))
         {
+            var slot = entry.WornSlot;
+            if (slot.Length == 0) continue;   // a location that is only an ordinal
             var baseName = QuestCatalog.BaseItemName(entry.Name);
             if (statsFor(baseName) is not { Wearable: true } stats) continue;
-            foreach (var slot in stats.Slots)
-            {
-                var key = slot.ToUpperInvariant();
-                // One anchor per (item, slot). A ring in both FINGER rows is one anchor, not
-                // two identical ones — the dump prints two locations and the upgrade for both
-                // is the same upgrade.
-                if (worn.Any(w => w.Name.Equals(entry.Name, StringComparison.OrdinalIgnoreCase)
-                                  && w.Slot == key)) continue;
-                worn.Add(new WornItem(entry.Name, baseName, key, stats));
-            }
+            if (worn.Any(w => w.Slot == slot
+                              && w.Name.Equals(entry.Name, StringComparison.OrdinalIgnoreCase)))
+                continue;
+            worn.Add(new WornItem(entry.Name, baseName, slot, stats));
         }
         return worn;
     }

@@ -1,4 +1,5 @@
-<noinclude>{{Classic Era}}</noinclude>{{Spellpagesmart|
+{{Classic Era}}
+{{Spellpagesmart|
 
 | spellname = Dustdevil
 | spellicon = 85
@@ -32,9 +33,10 @@
 | msg_cast_on_other = 's body is crushed by flying debris.
 | msg_wears_off = 
 
-| where_to_obtain =
+| where_to_obtain = 
 
-| TableLocations =
-| TableEra = Classic
+<ul>
+<li>[[Druid#Spell Vendors|Druid Spell Vendors]]</li>
+</ul>
 }}
 [[Category:Spells]]

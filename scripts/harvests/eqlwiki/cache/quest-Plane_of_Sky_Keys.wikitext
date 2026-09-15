@@ -1,4 +1,4 @@
-{{Sky Era}}
+{{Delete}} Not relevant in EQL
 [[File:npc_sirran_the_lunatic.png|frame|Sirran the Lunatic]]
 {| class="questTopTable"
 ! ''' Start Zone: '''

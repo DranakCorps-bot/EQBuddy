@@ -1,0 +1,100 @@
+{{Era}}
+[[File:Cargo_clockwork_ambush.png|thumb|''This is highway robbery!'']]
+{| class="raidMobTopTable"
+! ''' Starts In: '''
+| [[Ak'Anon]]
+|-
+! ''' Quest Giver: '''
+| [[Jarah Reskan]]
+|-
+! ''' Minimum Level: '''
+| ?
+|-
+! ''' Classes: '''
+| ALL
+|-
+! ''' Related Zones: '''
+| [[Steamfont Mountains]]
+|-
+! ''' Related NPCs: '''
+| [[Cargo Clockwork]], [[Hector the highway bandit]], [[Renaldo the highway bandit]], [[Jerald the highway bandit]]
+|-
+! ''' Required Faction: '''
+| ?
+|}
+
+= Reward =
+
+* Coin
+
+= Walkthrough =
+You say, 'Hail, Jarah Reskan'
+
+Jarah Reskan says, 'Greetings, child. Welcome to Gemchopper Hall. I trust that you are a [warrior], or perhaps you are lost..?'
+
+You say, 'warrior'
+
+Jarah Reskan says, 'That is good news! We gnomes are not known for our love of battle so it is always good to bring new blood into our ranks. We shall prove our worth as warriors to all other races. For now, there is much to do in Ak'Anon.  We need someone to take care of the [rogue] and [bandit] problems in the Steamfont Mountains.'
+
+You say, 'bandit'
+
+Jarah Reskan says, 'The cargo clockwork is located near the entrance to Ak'Anon in the Steamfont Mountains. It runs a delivery to the windmills every five days at eight in the morning. There have been attacks by a group of highwaymen. They are quite a formidable group. I have offered a reward for their heads. Be very careful if you plan on escorting the cargo clockwork. This trio of bandits is very strong.'
+
+''The Cargo Clockwork appears to depart for the windmills at 7am, though it may not leave on the same day in every difficulty.'' < Needs further verification
+
+''Upon departure''  --  
+Cargo Clockwork says, 'This unit requires oiling.'
+
+''Enroute''  --  
+Cargo Clockwork Chuga... Chug... Chug... (sic)
+
+Cargo Clockwork says, 'This unit requires maintenance.'
+
+''The bandits will ambush the [[Cargo Clockwork]] as it returns from the windmills, just east of Watchman Grep's post. (-700, 100)''
+
+Cargo Clockwork says, 'The chugging of the Cargo Clockwork comes to a halt.  Cargo Clockwork say, This is highway robbery!' (sic)
+
+You have slain Hector the highway bandit!
+
+--You have looted a [[Hector's Severed Head]] from Hector the highway bandit's corpse.--
+
+You have slain Renaldo the highway bandit!
+
+--You have looted a [[Renaldo's Severed Head]] from Renaldo the highway bandit's corpse.--
+
+You have slain Jerald the highway bandit!
+
+--You have looted a [[Jerald's Severed Head]] from Jerald the highway bandit's corpse.--
+
+''(No faction or dialogue upon their demise)''
+
+''Hand all three heads in to [[Jarah Reskan]]:''
+
+You offered 1 Hector's Severed Head to Jarah Reskan.
+
+You offered 1 Renaldo's Severed Head to Jarah Reskan.
+
+You offered 1 Jerald's Severed Head to Jarah Reskan.
+
+Jarah Reskan says, 'I heard our shipment made it back safely.  These heads will send a message to any other thief that plans on robbing our cargo shipments.  Thank you <player name>, take this coin as your reward. I'm sorry to say we're currently out of masks.'
+
+You receive 7 copper .
+
+You receive 5 silver .
+
+You receive 2 gold .
+
+{{YouGainExperience}}
+
+= Notes =
+
+This quest was broken at or around initial live release and remained so for many years. When fixed in October of 2005 it became possible to complete and rewarded small faction hits and a [[Highway Protector's Mask]], a rather nice ALL/ALL face slot item. The quest was later modified for TLP servers to remove the mask and faction hits prior to the release of Luclin.
+
+In EQL it appears the Cargo Clockwork makes it's trip differently than the quest text or other servers might suggest. Should there be no brave adventurers to help with the bandits the Cargo Clockwork will wait about two ticks then begin walking back to Ak'Anon, trailing the murderous rogues behind all the way. The Cargo Clockwork will heal to 100% almost immediately after each blow lands, and in difficulty zero it easily survives it's walk back to it's starting point. The guards along the way will not assist. Just before it reaches it's home the Cargo Clockwork will despawn and respawn at it's start point, and the trio will rush over to continue their attack. At this point the Cargo Clockwork will fight back and also be capable of taking damage, though still will receive no direct assistance from other npcs. In difficulty zero the highwaymen are easily defeated.
+
+It's possible that in higher difficulties the rogues manage to kill their target and return to their spawn points along the road. Some or all of the rogues may be spotted waiting on the road for their prey long after the event has completed. Should all three remain when a new Cargo Clockwork begins their journey the three will remain indifferent as it passes them heading to the windmills and though, upon returning, the Cargo Clockwork will raise the alarm there is no combat, and after a short pause the journey is resumed and the Cargo Clockwork will return unmolested to it's start.
+
+Also notable are the three bandits' drops aside from their heads. Each always has a [[Fine Steel Dagger]] and Hector, Jerald, and Renaldo each also wield a [[Fine Steel Katana]], [[Fine Steel Rapier]], and [[Fine Steel Spear]] respectively. This is an early source for fine steel as these lads are only level 13.
+
+[[Category:Quests]]
+[[Category:Ak'Anon]]

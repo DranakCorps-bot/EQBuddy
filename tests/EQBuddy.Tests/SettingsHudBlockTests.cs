@@ -61,10 +61,14 @@ public class SettingsHudBlockTests
 
         // ---- the minimised-HUD tick boxes
         ("MiniStatsPanel", "HUD block", "_miniStats"),
-        ("MiniStatsPanel", "HUD block", "MiniBarPresentation.Order"),
+        // **OptionKeys and not Order since DRA-81's Founder LOCK.** `Order` is a formatting
+        // table for CELLS, and walking it here is precisely how SA-1 left three ★s in the
+        // profile that no screen could offer — the hole the Founder's smoke fell into. This
+        // row is what stops a later tidy-up "simplifying" it back to the shorter list.
+        ("MiniStatsPanel", "HUD block", "MiniBarPresentation.OptionKeys"),
         ("MiniStatsPanel", "HUD block", "MiniBarPresentation.Names"),
         ("MiniStatsPanel", "HUD block", "_main.SetMiniStat("),
-        // The heading, its blurb and the note about the three switches SA-1 removed.
+        // The heading, its blurb and the note about where the top row's three stats draw.
         ("MiniStatsPanel", "HUD block", "HudStatsHeading"),
         ("MiniStatsPanel", "HUD block", "HudStatsBlurb"),
         ("MiniStatsPanel", "HUD block", "PromotedStatsNote"),

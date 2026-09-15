@@ -10,6 +10,9 @@ Deeper material:
   ladder and the flake ledger (C′, 2026-09-08)
 - **[docs/ops/claude-archive/](docs/ops/claude-archive/README.md)** — incident
   novels, superseded mechanisms, historical evidence. Not always-loaded.
+- **`EXO-PLAYBOOK.md` in `dranakcorps-control-plane`** (private) — Corps
+  doctrine graduated from EQBuddy's ExO experiments, with the evidence
+  (DRA-73 §10; entries written at each M-checkpoint exit).
 
 Progression: incident → verified lesson → executable test/guard → compact live
 rule. Once a guard exists, the novel leaves this file. Do not gut a rule that
@@ -96,6 +99,13 @@ named thread.
 - **Holds live in exactly one place: `HELM.md`.** If you ever find a second
   list, one of them is stale by construction. Re-read `HELM.md` before every
   thread reply — holds arrive by commit between pulls.
+- **A public reply still waits for Helm's posture signature — only the
+  ROUTE changed** (2026-09-14). The signature arrives as a `HELM.md` commit
+  or a PR review; there is no `helm/ssc-N` PR to watch for any more, so
+  "the SSC has not landed yet" is not a reason to hold a reply, and its
+  absence is not a signature either. Nothing else about Scribe changes: a
+  public reply beyond a routine signed thread reply is consequence-list
+  work and is not covered by any plan's slice authorization.
 - **Before you describe what a reporter has or has not been told, OPEN THE
   THREAD.** One `gh` call. Hold text describes an intention, never the
   state of a thread.
@@ -119,6 +129,12 @@ the item and write the feedback note.
 `ready` the moment Fable writes it. The ONLY plans that wait carry a
 `needs-david:` line naming a decision from the [consequence
 list](#what-needs-david-and-what-does-not).
+
+**A plan is signed ONCE, for its whole declared slice sequence** — see
+[How a ruling lands](#how-a-ruling-lands-and-what-a-sign-buys). Fable does
+not re-authorize per slice and you do not ask it to; you take D(n+1) when
+D(n) merges green. A slice that turns out to exceed what the plan declared
+stops and escalates — that is the seam the sequence-wide SIGN rests on.
 
 There is no Fable Grok Bot. **You do not start Fable** (David, 2026-08-24).
 File the ask, push, then wake Helm. A file write is not a call.
@@ -255,6 +271,35 @@ then the workflow above. A push alone is not a wake.
 
 **Ask a hold for its lifting CONDITION.** A hold with no condition is one
 nobody can ever satisfy.
+
+### How a ruling lands, and what a SIGN buys
+
+Two cutovers from the DRA-73 plan's M0, 2026-09-14. Both are process, both
+are **reversible by a HOLD**, and neither touches the consequence list.
+Detail and the numbers behind them:
+[docs/ops/execution-flow.md](docs/ops/execution-flow.md).
+
+- **A ruling is a GitHub PR review and/or a `HELM.md` commit — never a
+  `helm/ssc-N` PR.** Do not open one, do not ask for one, do not wait on
+  one, and do not add "land the SSC" to a posture list. A PR review plus a
+  merge commit is the same audit trail: immutable, timestamped, indexed,
+  and attached to the thing it rules on. `helm/ssc-*` branches already on
+  the remote land or close on their own terms; **no new ones.** In the
+  DRA-70/71/72 window, 12 of 24 PRs existed only to carry signature prose.
+- **A signed plan authorizes every slice it declares, in order, on green
+  gates.** When D(n) merges you start D(n+1) — you do not write a LIVE ASK
+  asking to be allowed to, and Helm does not issue "AUTHORIZE dra-N-dX
+  after land" per slice. **Helm stops the train with a HOLD, not by
+  withholding authorization**: an objection blocks, absence of attention no
+  longer does. 84% of the measured wait in that window was planned work
+  parked overnight at an authorization gap, and no pre-merge SIGN in it
+  changed a slice.
+
+You still wake Helm for what the plan did **not** declare: a departure
+from it, a slice that outgrew its declared boundary, a guard failure, a
+cross-lane conflict, a public reply's posture, or anything on the
+consequence list. That is the exception path working, not a formality —
+and a live hold naming the work still binds, plan or no plan.
 
 Durable truth lives in the repo, not in a conversation. Keep this file,
 `HANDOFF.md`, the trap list and `docs/TestPlan.md` true as you go.
@@ -517,25 +562,26 @@ they live on `legacy-v1`.)
 | Tail the file | `Core/LogWatcher.cs` — 150 ms polls, offset-based |
 | Settings + profile paths | `Core/AppSettings.cs`, `Core/AppPaths.cs` (`EQBUDDY_APPDATA`) |
 | Automated launch vs live profile | `UI.Shared/IsolatedLaunchPolicy.cs` + `scripts/isolated-profile.ps1` — pin the child last, refuse both live lines. Audit: `docs/ops/live-state-isolation-audit.md` |
-| Zone map geometry, aliases | `Core/ZoneMap.cs` |
+| Zone map geometry, aliases | `Core/ZoneMap.cs` — `ZoneMapFiles.IdentityKey` is the ONE answer to "are these two spellings the same zone" (lowercase, drop a parenthetical, drop a leading "the", squeeze spaces/'/-) |
+| What level a zone's creatures are | `Core/ZoneLevels.cs` + `Core/Data/ZoneLevelBands.json` ← `scripts/harvests/eqlwiki/zonelevels-transform.py` (DRA-84 D1). The wiki's `Level of Monsters` row, from the COMMITTED zone cache — **fetches nothing**, plain JSON so trap 74's container problem cannot arise, `--check` in `check.ps1` + CI. **FOUR admitted shapes and no fifth: `N-M`, `N`, `N-M+`, `N+`** — 87 of 118 pages (46 closed + 41 open-topped), everything else ABSENT. **An open top is `Max` = null, never an invented maximum** (D2, Helm option (a) of three; D1 shipped strict and measured the cost at 54% of drop weight, now 12%): the number before the `+` is NOT promoted, `Band.Max` is `int?` so every reading site is asked, and a gate's TOP arm stands down where there is none. Scope is narrow — a verbatim whose SOLE defect is the `+`; multi-range (`1-15, 35`, `1-13+, 35-50`), prose (`20-40+ (50+ inside pit)`) and `Quest Only`/`n/a`/`?` stay refused, and coalesce-as-open-top is refused by name. ABSENT SHIPS TOO (`NoBand`), so `Lookup`'s four outcomes tell "never read a page" from "the page is silent" from "the page says something we will not read". Lookup is exact title then `IdentityKey` and **nothing looser** — containment would hand "Commonlands" West Commonlands's band and match a zone name inside free prose, and a wrong band is a number a surface states as fact (`ZoneLevelsTests`' committed negatives are real `DropZones` values that containment DID match). The distinct-count telltale is measured on the CLOSED bands and on the verbatims, because discarding a maximum coarsens the parsed pair by construction (53/87 vs 36/46 and 64/87). One reader: the Farm Gear band gate (row below) |
 | Spawn points / timers | `Core/SpawnPointLedger.cs`, `Core/SpawnTimers.cs` |
 | Wiki lookups + contribution packs | `Core/EqlWikiMobs.cs`, `Core/WikiContribution.cs` |
 | The widget itself | `EQBuddy/MainWindow.xaml.cs` (~4.5k lines — the hotspot) |
-| A guide's stages, objectives, and how complete OUR data is | `Core/GuideCatalog.cs` + `Core/Data/GuideCatalog.json` — CURATED, never auto-written; the harvested half is the row below and `LoadEmbedded` merges the two. `Validate()` is lock 4a executable: an `Authored` objective answers **who + where + what** and cites a source, a `Stub` says what is missing, a **`Transcribed`** one carries the page's ONE sentence verbatim in `What` and is REFUSED if it fills who/where/when/how or carries a title (promotion to `Authored` is a human PR, never a transformer), a `RewardKey` is one the Sky checklist already owns. **The six questions are the SCHEMA, not a fill-in bar** — `When`/`Why`/`How` are optional and stay EMPTY where no source answers them (`GuideCatalog.FabricatedProse` refuses the sentences we invented once; trap 73). `GuideAttachment` is the empty seam a later gear-upgrade / XP-farm / gear-farm system attaches to — a REFERENCE, never a recommendation, and `NoShippedGuideCarriesAnAttachmentYet` keeps it empty until that system exists |
+| A guide's stages, objectives, and how complete OUR data is | `Core/GuideCatalog.cs` + `Core/Data/GuideCatalog.json` — CURATED, never auto-written; the harvested half is the row below and `LoadEmbedded` merges the two. `Validate()` is lock 4a executable: an `Authored` objective answers **who + where + what** and cites a source, a `Stub` says what is missing, a **`Transcribed`** one carries the page's ONE sentence verbatim in `What` and is REFUSED if it fills who/where/when/how or carries a title (promotion to `Authored` is a human PR, never a transformer), a `RewardKey` is one the Sky checklist already owns. **The six questions are the SCHEMA, not a fill-in bar** — `When`/`Why`/`How` are optional and stay EMPTY where no source answers them (`GuideCatalog.FabricatedProse` refuses the sentences we invented once; trap 73). `GuideAttachment` is the seam the HELPER now answers (DRA-83) — a REFERENCE (`{ Kind, Key }`), never a recommendation. Two curated rules and no third: `GearUpgrade` on a Sky turn-in keyed on the reward ITEM (93 of 95 — the two misses are our own naming bugs, named in a test), `XpFarm` on the ONE open-farm step of each keyed on the zone; `GearFarm` ships EMPTY on purpose because no curated step farms gear. `scripts/dra83-attachments.py` is the record of the two rules. The answer is `Recommendations.Attached` (row below), the guards are `TheShippedAttachmentsAreTheTwoSkyRulesDra83Placed` + `EveryShippedAttachmentNamesSomethingItsOwnCatalogKnows` — the flip `NoShippedGuideCarriesAnAttachmentYet` promised |
 | Turning a guide into the rows every surface draws | `UI.Shared/GuideChecklistProjection.cs` — **three matching rules, one per tab**: `Apply` for Sky (the REWARD KEY), `ApplyEpic` for Epic (the CLASS — an epic class has one quest, so its section groups collapse into one), and `ApplyQuest` for the General tab (the QUEST NAME, gated on `GuideType.NormalQuest` so a Sky guide never answers there). Sky and Epic REPLACE a group's rows; an unguided one comes back the same object (lock 5). **`ApplyQuest` does not replace anything** — it returns a group to draw ALONGSIDE the catalog pane, or null. `UI.Shared/GuidePresentation.cs` owns every word, and **each of the six is drawn in exactly one place**: WHAT is the row title, `who · where` the row's line, when+why+how the hover (the phone has no hover, so they ride the row — trap 35). An unanswered question draws nothing |
-| The AUTO-WRITTEN guides beside the curated ones | `Core/Data/HarvestedGuides.json.gz` ← `scripts/harvests/eqlwiki/guides-transform.py`, run after `quests-promote.py` in the weekly refresh. 1,164 guides, one per catalog quest with anything to say, **byte-reproducible from the cache** (CI runs `--check`; so does `check.ps1`). It fetches NOTHING. Four objective shapes and no fifth: a `Transcribed` line of the page's prose, a `Collect` stub per catalog item, the hand-in, the opening `TalkToNpc`. **`GuideCatalog.Merge` admits one only where no curated guide claims the `QuestName` and the app actually loads the quest** — curated always wins. `guides-report.md` is the weekly diff's readable half |
+| The AUTO-WRITTEN guides beside the curated ones | `Core/Data/HarvestedGuides.json.gz` ← `scripts/harvests/eqlwiki/guides-transform.py`, run after `quests-promote.py` in the weekly refresh. 1,158 guides, one per catalog quest with anything to say, **byte-reproducible from the cache** (CI runs `--check`; so does `check.ps1`) — and the reproducibility is against `refresh-state.json`'s `ranAt`, which `refresh.py` stamps AFTER the promotions, so a refresh that advances the date must re-run the transform or the gate reddens on the stamp alone (DRA-84 D3). It fetches NOTHING. Four objective shapes and no fifth: a `Transcribed` line of the page's prose, a `Collect` stub per catalog item, the hand-in, the opening `TalkToNpc`. **`GuideCatalog.Merge` admits one only where no curated guide claims the `QuestName` and the app actually loads the quest** — curated always wins. `guides-report.md` is the weekly diff's readable half |
 | Where a guide step's tick lives | `UI.Shared/GuideProgressRouter.cs` — SIX homes, one writer each: `SkyTurnIn` (a `RewardKey`), **`SkyItem`** (an acquire-shaped step naming exactly one of ITS reward's checklist rows → that row's own box, so the loot auto-tick lights it), **`EpicItem`** (an objective whose ID names an `EpicQuestChecklistItem` → that row's box; `EpicCompleteToggle` stays the per-class done store), **`LedgerItem`** (a harvested `Collect` naming one of ITS quest's turn-in items → the character's owned count, done at `Have ≥ Need`, and **a manual tick is refused** — the bags are the answer; the row carries `QuestChecklistRow.LedgerItemName` so a surface draws it AS the item row it already had rather than a checkbox beside one — DRA-46), **`QuestCompletion`** (the hand-in → `SetCompleted`, the catch-up line the General tab writes, consuming nothing), else the guide ledger. Group-scoped: one class's Wind Rune — or epic row — is never another's. `GuideStores` carries what the decision reads; `Drawn()` is the one producer of "which objectives this tab shows" (the Epic classic-era lens) |
 | Quest surface (all four tabs) | `EQBuddy/QuestsView.xaml.cs`. `QuestsWindow` is a thin host; `QuestsRoom` is the shell's **Guide** room (label only — the wire key is still `quests`). **Both build their own instance** |
 | What the widget's right-click menu shows minimized | `UI.Shared/WidgetMenuPolicy.cs` — the ≤4 lock. `Tag="expanded"` in `MainWindow.xaml` hides the rest; `WidgetMenuTests` reads the XAML against the list |
 | The Evolved shell | `EQBuddy/ShellWindow.xaml.cs` + one `*Room.cs` per room; `UI.Shared/ShellPages.cs`, `ShellLayout.cs`. Player door: widget context-menu `Guide…` through `ShellHost.OpenGuideDoor` (opens the Guide room, and recovers a shell the ✕ took); `EQBUDDY_SHELL` is the review hook |
-| "What should I do next?" | `Core/Recommendations.cs` — the ONE cross-domain ranker (PRD §12 HOME-001..006, DRA-70). Nine Founder goals, `ShapeFor` is the must-list; **the join key is the ZONE**, so a place serving two selected goals outranks either alone. Top 3, and the cap says so. Every why-line is a typed `WhyFact` record tagged `Personal` or `Catalog` — **the WORDS are `UI.Shared/HelperPresentation.cs`**, which is where HOME-006's ban (nothing may call a camp safe, easy or survivable) can be swept. A faction sentence is `UnlockGuidance.Faction`'s own, passed through, never re-phrased. Drawn by `EQBuddy/HelperRoom.cs`; picks persist per character (`AppSettings.HelperGoals`/`HelperFactions` through `HelperGoalStore`). **The goals are ONE dropdown, not nine chips** (DRA-71 D2, Founder smoke 1) — `EqMultiPicker`, with the faction sub-picker a second face that appears only once its goal is picked. **Every ENGINE has decided about the character's level** (DRA-71 D3, smoke 2): `LevelUseFor` is the must-list — `Consumes` or `Exempt` with a reason, null only for a goal that has no engine — and `HelperMustListTests` proves each row by running that engine at two levels, so a `Consumes` that is really a comment fails. Today only `LevelUp` consumes: the discount is about a zone's THROUGHPUT, and for faction/unlocks the zone is a POINTER to where a criterion IS. Unknown level ranks on personal evidence unchanged and the room says so + offers the Character door — never a guess. **Throughput is OUTCOME evidence, never an adjective** (DRA-71 D4, smoke 3): there is no mob-HP or con-colour model, so "vs difficulty" is your output/fight-length/deaths/downtime against YOUR OWN pooled figures (`ZoneHistory.Baseline`, two zones minimum or it compares a zone with itself). Four named discounts, each with a sentence on the same row and no bonus arm — the XP rate stays the primary term. The weight reads damage AND healing (`OutputPerSecond`), or it marks down every zone a healer did their job in. The instance tier is REPORTED and weighs nothing until P10's mote slice. `WhyCap` is 6 since D4 and the tier is emitted LAST, so the cap takes the fact that weighs nothing rather than a caveat. **Farm Gear is the fifth engine** (DRA-71 D6, smoke 4a/4b) and it asks the INTENT first — `Core/GearUpgrades.cs`, three `GearIntent`s with their own `ShapeFor` must-list, single-select through `GearIntentStore` (`HelperGearIntent`/`HelperWornPicks`/`HelperGearQuests`). `UpgradeWorn` anchors on the worn items the pick names (absent = all, filter semantics), `ReplaceSlot` on every worn slot and reads no pick, `FarmToSell` is Deferred to D7. Drop rows group by ZONE and quest rows by QUEST (`RecommendationKind.Quest`, only behind the include-quests toggle); the weight is how many of your open upgrades a row feeds. Level is **Exempt** with a surveyed reason: no item record carries a level, and an outgrown camp is if anything the quicker farm. **`FarmToSell` is answered since DRA-71 D7 and NOT by that sweep** — it has no worn anchor, so `GearUpgrades.Sweep` refuses it outright and `Recommendations.FarmToSell` answers from your own LOOT priced at your own sale. **Seven of the nine goals now answer** (`+ FarmMotes`, `+ MakeMoney`); `FarmMaterials` stays Deferred on purpose and still draws a block — the professions picker, the standings, a Watch skill-up preset (a door WITH a side effect, idempotent through `TrackedRule.Matches`) and the wiki door (DRA-71 D8); `LevelUseFor` gained one `Consumes` (motes, because the Founder asked for "highest-level zone") and one `Exempt` (money — coin is a property of the creature, so both readings of a level rule are wrong). **`Join` INTERLEAVES the merged parts round-robin** since D7: three engines on one zone put ten sentences against a `WhyCap` of six, and concatenating them let the cap trim a whole engine off a row whose headline still named its goal |
-| Which professions exist, and where this character stands in them | `Core/Tradeskills.cs` — CURATED, never auto-written: the EIGHT with a Mastery AA, each row naming its ability so `TradeskillsTests` can read the spelling back out of the shipped `AaCatalog` ("failing *Jewelcrafting* recipes") instead of trusting a comment. `Crafting Mastery` is refused by name; Tinkering/Spell Research/Make Poison/Fishing are OUT with the reason (no Mastery AA) as committed negatives. `Match` is WHOLE-STRING over per-profession aliases — the wiki spells Jewelcrafting three ways and "Jewelry Making" is carried from classic EQ, marked as not-the-wiki. **Standings persist since DRA-71 D8**: `QuestLedgerStore.CharacterLedger.Skills` keeps the highest value per profession with the LOG's stamp, written by `MainWindow` from `StatsSnapshot.SkillUps` and read by the Helper's block — only the eight are admitted (`TrackFilter`'s rule, a second kind of row), and highest-wins is what makes the launch replay a no-op. Picks: `TradeskillPickStore` over `AppSettings.HelperProfessions`, absent = all eight. **No item→profession arithmetic**: the `Categories` survey found 14 of 10,957 pages naming a profession against 99.7% populated, so it PARKS and the block says so with the number in it; `itemcatalog-build` re-takes the survey on every refresh (`--check` writes nothing) |
+| "What should I do next?" | `Core/Recommendations.cs` — the ONE cross-domain ranker (PRD §12 HOME-001..006, DRA-70). Nine Founder goals, `ShapeFor` is the must-list; **the join key is the ZONE**, so a place serving two selected goals outranks either alone. Top 3, and the cap says so. Every why-line is a typed `WhyFact` record tagged `Personal` or `Catalog` — **the WORDS are `UI.Shared/HelperPresentation.cs`**, which is where HOME-006's ban (nothing may call a camp safe, easy or survivable) can be swept. A faction sentence is `UnlockGuidance.Faction`'s own, passed through, never re-phrased. Drawn by `EQBuddy/HelperRoom.cs`; picks persist per character (`AppSettings.HelperGoals`/`HelperFactions` through `HelperGoalStore`). **The goals are ONE dropdown, not nine chips** (DRA-71 D2, Founder smoke 1) — `EqMultiPicker`, with the faction sub-picker a second face that appears only once its goal is picked. **Every ENGINE has decided about the character's level** (DRA-71 D3, smoke 2): `LevelUseFor` is the must-list — `Consumes` or `Exempt` with a reason, null only for a goal that has no engine — and `HelperMustListTests` proves each row by running that engine at two levels, so a `Consumes` that is really a comment fails. Today only `LevelUp` consumes: the discount is about a zone's THROUGHPUT, and for faction/unlocks the zone is a POINTER to where a criterion IS. Unknown level ranks on personal evidence unchanged and the room says so + offers the Character door — never a guess. **Throughput is OUTCOME evidence, never an adjective** (DRA-71 D4, smoke 3): there is no mob-HP or con-colour model, so "vs difficulty" is your output/fight-length/deaths/downtime against YOUR OWN pooled figures (`ZoneHistory.Baseline`, two zones minimum or it compares a zone with itself). Four named discounts, each with a sentence on the same row and no bonus arm — the XP rate stays the primary term. The weight reads damage AND healing (`OutputPerSecond`), or it marks down every zone a healer did their job in. The instance tier is REPORTED and weighs nothing until P10's mote slice. `WhyCap` is 6 since D4 and the tier is emitted LAST, so the cap takes the fact that weighs nothing rather than a caveat. **Farm Gear is the fifth engine** (DRA-71 D6, smoke 4a/4b) and it asks the INTENT first — `Core/GearUpgrades.cs`, three `GearIntent`s with their own `ShapeFor` must-list, single-select through `GearIntentStore` (`HelperGearIntent`/`HelperWornPicks`/`HelperGearQuests`). `UpgradeWorn` anchors on the worn items the pick names (absent = all, filter semantics), `ReplaceSlot` on every worn slot and reads no pick, `FarmToSell` is Deferred to D7. Drop rows group by ZONE and quest rows by QUEST (`RecommendationKind.Quest`, only behind the include-quests toggle); the weight is how many of your open upgrades a row feeds. **Level CONSUMES since DRA-84 D2** (it was Exempt from D6): `Recommendations.GearBandGate` REFUSES an `UpgradeWorn`/`ReplaceSlot` ZONE row whose eqlwiki band (row above) sits outside the character — top `OutgrownBy` (10, reused) or more under, or bottom `GearBandReachAbove` (5, NEW) or more over. **It refuses rather than demotes, deliberately unlike `OutgrownWeight`** — that halves the player's own measured camp, these are Catalog rows and their presence is what the Founder failed — and it fires even over a personal seen-drop. Open top ⇒ TOP arm stands down, BOTTOM arm still applies. Quest rows are not camps and are NOT gated; `FarmToSell` stays level-Exempt (no camp to band). Unknown level / no bands / no band for the zone ⇒ stands down whole (trap 73). Refusals are REPORTED (`RecommendationSet.GearBandRefusals` → `HelperPresentation.GearBandRefused`, trap 50: count + each band + the level + which rule, no adjective), and refusing every zone is its own `GoalGapReason.EveryZoneOutsideYourBand` because `NoCatalogUpgrade` would be a lie. **MEASURED: Crushbone `5-20` refuses from 30, NOT at the Founder's 29** (29−20 = 9) — the plan's worked example is one level off its own constant; the constant was reused as instructed and the gap is pinned in `TheFoundersCrushboneExhibitIsRefusedFromThirtyAndNotAtTwentyNine`. The ITEM side is still ungated (D6's survey: 11,196 records, exactly one wearable Level key) — the gate reads the ZONE. **`FarmToSell` is answered since DRA-71 D7 and NOT by that sweep** — it has no worn anchor, so `GearUpgrades.Sweep` refuses it outright and `Recommendations.FarmToSell` answers from your own LOOT priced at your own sale. **Seven of the nine goals now answer** (`+ FarmMotes`, `+ MakeMoney`); `FarmMaterials` stays Deferred on purpose and still draws a block — the professions picker, the standings, a Watch skill-up preset (a door WITH a side effect, idempotent through `TrackedRule.Matches`) and the wiki door (DRA-71 D8); `LevelUseFor` gained one `Consumes` (motes, because the Founder asked for "highest-level zone") and one `Exempt` (money — coin is a property of the creature, so both readings of a level rule are wrong). **`Join` INTERLEAVES the merged parts round-robin** since D7: three engines on one zone put ten sentences against a `WhyCap` of six, and concatenating them let the cap trim a whole engine off a row whose headline still named its goal. **The PHONE ranks with the same `Rank` over the same `HelperInputs` since DRA-71 D9** — the inputs are assembled ONCE in `UI.Shared/HelperSources.cs` (`Read`/`Gather`/`Signature`; the room and `EQBuddy/PhoneHelperSource.cs` are its two callers, each holding its own memo per trap 45), the projection is `Companion/CompanionProjection.Helper.cs` and decides no word, and the screen is **READ-ONLY**: every control in that room writes to the profile the PC is playing from, so the pickers port as INTENT — the face's own words plus where it is changed — and a door is its label + the desktop's TIP riding the row, never a link (trap 35). Guard: `HelperSurfaceParityTests`. **A GUIDE STEP asks the same producer since DRA-83**: `Recommendations.Attached` (its own file) resolves a `GuideAttachment` by calling the SAME `LevelUp`/`FarmGear` methods `Rank` calls — `GoalFor` is the kind→goal must-list, a zone kind matches `Recommendation.Zone` and `GearUpgrade` matches the LINE naming the item, the engines' own caps mean **the guide never says more than the room would**, and their GAPS are dropped (the room keeps those sentences, once). Words: `HelperPresentation.Attached` (`AttachedWhyCap` 2, and it says what it held back). Lookup + memo: `UI.Shared/GuideAttachmentLines` / `GuideAttachmentMemo`, one instance per HOST (`EQBuddy/GuideHelperSource` for the desktop, `PhoneHelperSource` for the phone, both over `EQBuddy/HelperPass`) rebuilt only when `HelperSources.Signature` moves. It rides `QuestChecklistRow.HelperAnswer` → both surfaces |
+| Which professions exist, and where this character stands in them | `Core/Tradeskills.cs` — CURATED, never auto-written: the EIGHT with a Mastery AA, each row naming its ability so `TradeskillsTests` can read the spelling back out of the shipped `AaCatalog` ("failing *Jewelcrafting* recipes") instead of trusting a comment. `Crafting Mastery` is refused by name; Tinkering/Spell Research/Make Poison/Fishing are OUT with the reason (no Mastery AA) as committed negatives. `Match` is WHOLE-STRING over per-profession aliases — the wiki spells Jewelcrafting three ways and "Jewelry Making" is carried from classic EQ, marked as not-the-wiki. **Standings persist since DRA-71 D8**: `QuestLedgerStore.CharacterLedger.Skills` keeps the highest value per profession with the LOG's stamp, written by `MainWindow` from `StatsSnapshot.SkillUps` and read by the Helper's block — only the eight are admitted (`TrackFilter`'s rule, a second kind of row), and highest-wins is what makes the launch replay a no-op. Picks: `TradeskillPickStore` over `AppSettings.HelperProfessions`, absent = all eight. **No item→profession arithmetic**: the `Categories` survey found 14 of 11,197 pages naming a profession against 99.6% populated (re-taken by the DRA-84 D3 refresh — 240 more pages, still exactly 14, so the park stands on re-measured evidence), so it PARKS and the block says so with the number in it; `itemcatalog-build` re-takes the survey on every refresh (`--check` writes nothing) |
 | Where motes have actually dropped for you | `Core/MoteHistory.cs` — ONE new fold, `Pool` × `Motes.IsMote`/`PotencyOf`, with the hours and the conned band JOINED from `ZoneHistory` rather than recomputed (trap 4). **Two floors, and the second is the one `MinHours` cannot see**: `MinKills` = 50, because one Infinite mote in a legitimate twenty minutes is a rate that will never happen again. Void-Touched is COUNTED and weighs nothing — the ladder gives it no number, so the field is separate and the sentence names it rather than reading as a zero. **There is no catalog arm**: all eleven shipped mote records carry a `DropZones` and every value is "Various Zones"/"Unknown"/"D3+ Zones" (`MoteCatalogSurveyTests`, which fails the day a real zone arrives). Engine is `Recommendations.FarmMotes` — the Founder's three criteria as three named discounts, no bonus arm, and an untiered zone is never marked down for not being an instance |
-| What a vendor has actually paid you | `Core/SaleHistory.cs` ← `SessionRepository.SoldRows` (a snapshot probe beside D4's `ThroughputRows`; no schema migration). **It is the evidence the money engines rank on, and the survey is why**: eqlwiki quotes its `merchant_value` at a Charisma and a faction standing that differ per page (235 of the 646 readable ones say so in their own heading), so the catalog's number is a quote somebody was given rather than a property of an item. `ItemCatalog.Record.MerchantCopper` + `MerchantCondition` land from the promoter and **weigh nothing** — they name an item you have never sold, `Evidence.Catalog`, printed with the page's own condition. Data-less until the next weekly refresh. Coin grammar: `Core/CoinText.cs` (`Parse`, the inverse of `StatsSnapshot.FormatCoin`, round-tripped in `CoinTextTests`; anything it cannot read exactly is ABSENT, never guessed) |
+| What a vendor has actually paid you | `Core/SaleHistory.cs` ← `SessionRepository.SoldRows` (a snapshot probe beside D4's `ThroughputRows`; no schema migration). **It is the evidence the money engines rank on, and the survey is why**: eqlwiki quotes its `merchant_value` at a Charisma and a faction standing that differ per page (235 of the 646 readable ones say so in their own heading), so the catalog's number is a quote somebody was given rather than a property of an item. `ItemCatalog.Record.MerchantCopper` + `MerchantCondition` land from the promoter and **weigh nothing** — they name an item you have never sold, `Evidence.Catalog`, printed with the page's own condition. **The DRA-84 D3 refresh filled both in**: 773 of 11,196 records carry a price (403 distinct, 205 with the page's own Charisma/faction condition, 568 with none) and the catalog's number still weighs nothing. Coin grammar: `Core/CoinText.cs` (`Parse`, the inverse of `StatsSnapshot.FormatCoin`, round-tripped in `CoinTextTests`; anything it cannot read exactly is ABSENT, never guessed) |
 | Per-zone all-time evidence | `Core/ZoneHistory.cs` — ONE fold, two sources, and the split is the design: time/XP/coin/deaths from `SessionRepository` rows (attributed to `PrimaryZone`, so a rate always travels with its session count), kills and fight length from `MobHistory.Pool` (keyed on the real kill zone). Under `MinHours` it reports NO rate. `ConnedMin`/`ConnedMax`/`ConnedKills` are the level band the evidence was earned at, from `/consider` only — an unconned creature contributes NOTHING rather than dragging the floor to 0 (DRA-71 D3); `Recommendations.OutgrownBy`/`OutgrownWeight` are named judgements, not a derived XP curve. **Third source since DRA-71 D4: per-session dps/hps + their combat seconds**, from `SessionRepository.ThroughputRows` (a snapshot-JSON probe in the `ProgressSeries`/`MobRows` idiom — the `Dps` COLUMN has no denominator and a rate cannot be pooled without one; NO schema migration, that is still its own filed slice), joined BY ROW ID and pooled by combat seconds rather than averaged. `Dps`/`Hps`/`OutputPerSecond`/`DowntimeShare`/`DeathsPerHour` answer null under the floor — unknown is never zero, and a session with no combat seconds contributes nothing. `ObservedTier` needs no plumbing: `PrimaryZone` is the zone name the game printed, so `InstanceTier.FromZoneName` reads the observation the log already made |
 | Auto-ticking Epic/Sky from loot, achievements import | `EQBuddy/QuestChecklistView.cs` |
 | Desktop World theme | `EQBuddy/WorldWindow.xaml.cs` |
-| Mobile server + projection | `Companion/CompanionHost.cs`, `CompanionProjection*.cs` |
+| Mobile server + projection | `Companion/CompanionHost.cs`, `CompanionProjection*.cs`. A new screen is a `CompanionSurfaces` name + a nullable section + a `ForSubscription` arm + a `SectionFingerprints` arm + a `RENDER` entry — the envelope never changes shape, so `CurrentProtocol` does NOT move for one. **Every SENTENCE rides the wire, never `index.html`** (trap 32) |
 | The mobile page | `Companion/Web/index.html` |
 | Type roles, spacing, radii, control sizes | `UI.Shared/DesignTokens.cs` |
 | Icon geometry | `UI.Shared/IconPaths.cs` — vectors, never glyphs |
@@ -804,9 +850,16 @@ after the named guard left with its surface.
     `docs/ops/live-state-isolation-audit.md`. [Novel](docs/ops/claude-archive/traps.md#trap-69)
 70. **Soft max ≤3 is a count, not a mutex.** Experiment A′ on EQBuddy
     (the lab), not a Corps standard. Claim before kick:
-    `scripts/claim-seat.ps1` refuses a second default on the same work
-    item; `-Mode challenger|disjoint|replacement` overrides;
-    `scripts/release-seat.ps1 -ForceStale` recovers a dead holder.
+    `scripts/claim-seat.ps1` refuses a default claim on a work item **ANY
+    live seat holds** — a challenger and a disjoint slice hold it too, and
+    only an `abandoned` claim releases it (DRA-76). It used to refuse only
+    against an EXCLUSIVE holder, so a default executor started beside a
+    live challenger: two on one card, neither refused, which is what
+    #566/#568 cost. `-Mode challenger|disjoint|replacement` is the
+    explicit override and is never refused;
+    `scripts/release-seat.ps1 -ForceStale` recovers a dead holder and is
+    now the only way past a holder that is gone — so the refusal names
+    every holder AND which of them look stale.
     Store is gitignored `.claude/soft-seats/`. **The claim key is the
     Paperclip card, `DRA-<n>`, and only that** — one scope carries two
     names (GitHub `#445` IS `DRA-28`), and a mutex over free text refuses
@@ -974,6 +1027,50 @@ after the named guard left with its surface.
     agrees.** If a captured border is darker than its palette value, suspect the
     capture before the theme. [Novel](docs/ops/claude-archive/traps.md#trap-79)
 
+80. **`@(command)` NESTS an array instead of normalizing it, and `-eq` against
+    an array is a FILTER — together they make a lookup that matches
+    everything.** `Invoke-RestMethod` emits a JSON array as ONE object, so
+    `@(...)` gives a 1-element array holding the 80-item one (`@(fn).Count` is
+    1 where `(fn).Count` is 80 — measured). `$_.identifier` then
+    member-enumerates and `eighty-identifiers -eq 'DRA-78'` returns the
+    MATCHING ONES, not a boolean; non-empty is truthy, so `Where-Object` passed
+    all eighty and merge-sync reported eighty concatenated statuses as one
+    issue's status. **The negative case stayed correct the whole time** — a
+    fake key gave an empty (falsy) array and refused properly, so "finds a real
+    key, refuses a fake one" would have signed it off (trap 11, one layer
+    down). Enumerate through the PIPELINE, which unrolls:
+    `@($x | ForEach-Object { $_ })`. The paired "refuse a nested list" check
+    was written, found unreachable after the flatten, and DELETED — a guard
+    aimed at nothing (trap 78's other half). What replaced it is the reachable
+    one: assert the field you are about to ACT on is a SCALAR
+    (`Select-MergeSyncIssue`; reverting the flatten reddens it with the live
+    symptom). [Novel](docs/ops/claude-archive/traps.md#trap-80)
+
+81. **A dashboard may report an absence; it may never FREEZE one.** `exo-metrics.ps1`
+    returned `$null` from `Invoke-Paperclip` for three different worlds — no
+    credentials, the GET threw, and no matching record — and the callers gated on
+    `$null -ne`. With `PAPERCLIP_API_URL` set to `localhost` against an API that
+    binds a tailnet address, every read was refused, the Paperclip-derived rows
+    computed as absent, and `-Baseline` **froze GWR 0.51 and printed its success
+    line** — against the file's own header promising `unmeasured` with the reason,
+    "never `0`". Measured: pre-fix + unreachable freezes `0.5051`; reachable is
+    `0.4946`. The failure is now a VALUE (`Ok`/`NotConfigured`/`Unreachable`, with
+    `NoRecord` the caller's to declare), and **the guard lives inside the writer**
+    (`Write-BaselineFreeze`), so there is no path to the file that skips it — a
+    `-Baseline` run with any unreachable input writes NOTHING and exits 3.
+    `-NoPaperclip` is the one explicit door. **The asymmetry is the rule:** reading
+    a stale number is recoverable, but a baseline is what every later claim is
+    checked against, so freezing an unmeasured one poisons every comparison that
+    cites it — and it does so silently, forever. Trap 11's shape (evidence only one
+    side can produce) wearing trap 64b's clothes (a `$null` proxy for a fact nobody
+    named). **And the printed recipe must regenerate the file it is printed in:**
+    section 8 dropped `-WindowLabel`, so a labelled dashboard regenerated without
+    its work-item names and the first diff to notice would have gone red for a
+    reason that says nothing about metrics (trap 74). Guard: `-SelfTest` arms 9–12
+    — a REAL socket to a dead port, the refusal predicate's four corners, and
+    `Write-BaselineFreeze` asserted to leave no file behind. Prove-failed against
+    four mutants. [Novel](docs/ops/claude-archive/traps.md#trap-81)
+
 New trap discovered the hard way? Add the compact rule here and the novel
 under `docs/ops/claude-archive/traps.md`. That is the whole point.
 
@@ -993,6 +1090,15 @@ under `docs/ops/claude-archive/traps.md`. That is the whole point.
 - **PowerShell-tool failures are not always real.** Run scripts as
   `pwsh -NoProfile -File …` through Bash. A silent exit 1 is not proof
   nothing happened — check side effects (`git tag`, files, timestamps).
+- **A PR that CONFLICTS with `main` gets NO CI run at all** — not a failing one, not
+  a queued one (DRA-83, #622). `build-and-test` and `e2e-windows` build the
+  MERGE COMMIT, so GitHub cannot create the run and `gh pr checks` says *"no
+  checks reported"* while other branches pushed after yours get theirs. That
+  reads exactly like a queue. **Check `gh pr view <n> --json mergeable` before
+  believing you are waiting on runners**; merging `origin/main` in starts CI
+  within a minute. Channel-file conflicts resolve as **their file PLUS your
+  entry** — never a text merge — and you COUNT the entries afterwards
+  (`grep -c '^## '`) and re-run `channel-wipe-guard` (trap 60).
 - **The scripts assume pwsh 7.** Windows PowerShell 5.1 runs them
   differently (Hateborne, 2026-09-03): trap 54 false positives, and
   `$proc.Kill($true)` does not exist (now `Stop-Hard`). Prefer installing
@@ -1016,6 +1122,21 @@ change. If the surface cannot be staged, write the italic caveat — do not
 invent a picture nobody can check. Check `docs/screenshots/` and grep the
 docs for the name first (trap 21).
 [Debt and why](docs/ops/claude-archive/operating-history.md#illustration-lock-debt-2026-09-04).
+
+**A per-picture recipe does not record the SET's shared palette, and
+`shoot.ps1`'s default is not every consumer's.** The landing is uniform
+**`BlueGrey`** (Founder T4 look, 2026-09-10); the default `-Theme` is
+`Turquoise`. So the obvious argument-free re-run of a landing shot commits
+the WRONG picture and nothing complains — DRA-56 was itself dispatched to do
+that, from a card written six hours before the Founder settled it. Guard:
+`LandingSiteTests` pins all 23 landing assets (18 stills + 5 clips) to a
+recipe manifest, compares page-against-manifest **both ways**, and asserts
+the default is NOT the landing theme so every row's explicit `-Theme` stays
+load-bearing. `record-tray-gifs.ps1` is the other way round — the landing is
+its only consumer, so its default IS `BlueGrey` and bare runs reproduce the
+clips. It also holds the page's two spoken promises (every picture
+harness-made; no third-party requests) and that the page's own prose is
+covered by the webfont's cmap.
 
 **The screen is exclusive.** A batch takes a lock and refuses when another
 holds it, or when any EQBuddy is running out of `bin\Release` /

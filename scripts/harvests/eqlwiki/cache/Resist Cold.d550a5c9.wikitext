@@ -1,5 +1,5 @@
 {{Classic Era}}
-{{Spellpage|
+{{Spellpagesmart|
 
 | spellname = Resist Cold
 | spellicon = 57

@@ -1,4 +1,5 @@
 ﻿using EQBuddy.Core;
+using EQBuddy.UI.Shared;
 
 namespace EQBuddy.Companion;
 
@@ -65,6 +66,17 @@ public sealed record CompanionQuestRequest
     /// dump, folds the log's gains into it, and hands over the same object its own window
     /// draws from, so the phone cannot answer from an older file than the PC.</summary>
     public InventoryFile.Snapshot? Inventory { get; init; }
+
+    /// <summary>
+    /// What the HELPER says about the subjects this catalog's guide steps point at (DRA-83) —
+    /// <c>GuideAttachmentLines</c>, built widget-side from the phone's OWN Helper pass.
+    ///
+    /// <para>It rides the request for the reason <see cref="Inventory"/> does: the widget owns the
+    /// stores, and a phone that folded its own would be a second producer of an answer the PC has
+    /// already given. Null (and <c>GuideAttachmentLines.None</c>) is a real state — a host with no
+    /// Helper wiring, or a character whose play says nothing about what the catalog points at —
+    /// and the rows simply carry no Helper line.</para></summary>
+    public GuideAttachmentLines? Helper { get; init; }
 }
 
 /// <summary>

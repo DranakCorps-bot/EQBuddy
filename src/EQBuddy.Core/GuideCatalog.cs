@@ -84,11 +84,18 @@ public sealed class GuideSource
 ///
 /// <para><b>It carries a REFERENCE and never a recommendation.</b> <see cref="Key"/> is the
 /// identity of a thing that lives in whatever catalog owns it — an item name, a zone, a camp —
-/// and this schema states only "that step relates to this". EQBuddy does not yet have a gear
-/// recommender, an XP-farm ranker or a gear-farm ranker, and a field holding a sentence one of
-/// them would have written is the invention trap 73 exists to stop. <b>The shipped catalog
-/// carries none of these, and <c>NoShippedGuideCarriesAnAttachmentYet</c> holds that open</b>
-/// until the system that owns the answer exists — the day it does, that test changes with it.</para>
+/// and this schema states only "that step relates to this". A field holding a sentence a
+/// recommender would have written is the invention trap 73 exists to stop, and there is still
+/// no such field here.</para>
+///
+/// <para><b>The system that owns the answer arrived in DRA-83: the Helper.</b>
+/// <c>Recommendations.Attached</c> resolves a reference through the SAME engines the Helper
+/// room ranks with, and the day it landed <c>NoShippedGuideCarriesAnAttachmentYet</c> changed
+/// with it — as its own comment promised — into
+/// <c>EveryShippedAttachmentNamesSomethingItsOwnCatalogKnows</c> beside a must-list of what the
+/// curated catalog actually places. The attachment still answers NOTHING by itself: it names a
+/// subject, the Helper decides whether this character's own play says anything about it, and a
+/// step whose reference the Helper cannot answer draws no line at all.</para>
 ///
 /// <para>A STRING kind rather than an enum, for the same reason
 /// <see cref="GuideObjective.ObjectiveType"/> is one: the list grows as those systems land, and
@@ -101,9 +108,26 @@ public sealed class GuideAttachment
     /// <summary>What the owning catalog calls the thing — never prose about it.</summary>
     public string Key { get; set; } = "";
 
+    /// <summary>An item, in the spelling <see cref="ItemCatalog"/> holds it under — answered by
+    /// the Helper's Farm Gear engine (<c>Recommendations.Attached</c>, DRA-83).</summary>
+    public const string GearUpgrade = "GearUpgrade";
+
+    /// <summary>A zone, in the spelling the game's own log prints — answered by the Helper's
+    /// Level Up engine.</summary>
+    public const string XpFarm = "XpFarm";
+
+    /// <summary>A zone, as above, asked of the Helper's Farm Gear engine instead: "what can
+    /// this place still give me to wear".</summary>
+    public const string GearFarm = "GearFarm";
+
     /// <summary>The three the Founder named, and nothing speculative beside them. A member
-    /// with no content behind it is schema cosplay; these three have a named owner coming.</summary>
-    public static readonly string[] KnownKinds = ["GearUpgrade", "XpFarm", "GearFarm"];
+    /// with no content behind it is schema cosplay; these three have a named owner coming.
+    ///
+    /// <para>Spelled ONCE, as the three constants above: the curated file, the validator and
+    /// <c>Recommendations.GoalFor</c>'s must-list all compare against this list, and a kind
+    /// whose literal was typed out a fourth time is a typo waiting for a release (the same
+    /// reason <c>GameCommands</c> refuses a surface its own literal).</para></summary>
+    public static readonly string[] KnownKinds = [GearUpgrade, XpFarm, GearFarm];
 }
 
 /// <summary>

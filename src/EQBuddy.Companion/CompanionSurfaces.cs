@@ -1,4 +1,4 @@
-using EQBuddy.UI.Shared;
+﻿using EQBuddy.UI.Shared;
 
 namespace EQBuddy.Companion;
 
@@ -41,9 +41,26 @@ public static class CompanionSurfaces
     /// uncontested ground, so the phone does NOT fold to match the desktop.</summary>
     public const string Travel = "travel";
 
-    /// <summary>All surfaces this build knows, in default display order.</summary>
+    /// <summary>
+    /// **"What should I do next?" on the phone** (DRA-71 D9) — the shell's Helper room,
+    /// ranked by the same <c>Recommendations.Rank</c> the desktop calls.
+    ///
+    /// <para><b>Read-only, and that is a product decision rather than a shortfall</b> — see
+    /// <see cref="CompanionHelperSection"/>. It is deliberately NOT in
+    /// <see cref="AcceptsTicks"/>: every control in that room writes to the profile the PC is
+    /// playing from.</para>
+    /// </summary>
+    public const string Helper = "helper";
+
+    /// <summary>All surfaces this build knows, in default display order.
+    ///
+    /// <para><see cref="Helper"/> lands LAST, and the order comment above is the argument:
+    /// the things you glance at while camping come first and the reference lists after, and
+    /// nothing in the app is further from a glance than a page you read to decide where to
+    /// spend an evening. It is also the position that leaves every existing device's ⚙ picker
+    /// in the order its owner already learned.</para></summary>
     public static readonly IReadOnlyList<string> All =
-        [Map, Spawns, Travel, Mez, Buffs, Combat, Session, Loot, Progress, Quests, Gear];
+        [Map, Spawns, Travel, Mez, Buffs, Combat, Session, Loot, Progress, Quests, Gear, Helper];
 
     /// <summary>Human label for the desktop gate checkboxes (both UIs share it;
     /// the phone page carries its own copy in its SURFACE_META table).</summary>
@@ -60,6 +77,7 @@ public static class CompanionSurfaces
         Progress => "Progress",
         Quests => "Quest tracker",
         Gear => "Gear checklist",
+        Helper => "What to do next",
         _ => surface,
     };
 
@@ -80,6 +98,9 @@ public static class CompanionSurfaces
         Quests => "Your quest tracker — the searchable catalog with your progress and pins, " +
                   "plus the Epic and Plane of Sky checklists, tappable from EQBuddy Mobile.",
         Gear => "Your gear checklist, by slot and by farm zone.",
+        Helper => "What EQBuddy thinks is worth doing next, weighed from your own stored "
+                  + "play against the goals you picked on the PC — and the evidence for "
+                  + "each answer.",
         _ => "",
     };
 
@@ -126,6 +147,10 @@ public static class CompanionSurfaces
         // no longer offered screens but are still live tick ROUTES, and a route resolves
         // to the room its rows are drawn in.
         Quests or Epics or Sky => ShellPage.Quests,
+        // DRA-71 D9. The one surface in this registry whose phone screen and shell room were
+        // conceived together, so there is nothing to transcribe: the Helper room IS what this
+        // screen shows.
+        Helper => ShellPage.Helper,
         _ => ShellPage.Home,
     };
 

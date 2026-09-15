@@ -11,6 +11,14 @@ evidence from this machine.
 One-seat mutex for Soft / Claude executors on this clone. **Not** a
 scheduler, **not** a control plane, **not** a mailbox.
 
+**Since DRA-76 (2026-09-14) it is a refusing per-work-item mutex.** A default
+claim is refused by **any** live seat on that card — `active`, `challenger`,
+`disjoint` or `replacement`. Only an `abandoned` claim releases the item. Until
+then it refused only against an *exclusive* holder (`active`/`replacement`),
+which meant a default executor could start beside a live challenger or disjoint
+seat and neither was told: two executors, one card. That is what PRs #566/#568
+cost — one full run and two rulings.
+
 `scheduled_tasks.lock` and `%TEMP%\eqbuddy-screen.lock` are different mutexes
 (the latter is the SCREEN — CLAUDE.md trap 61). They do not claim a work item.
 
@@ -19,12 +27,17 @@ scheduler, **not** a control plane, **not** a mailbox.
 Keep a note (anywhere local; not this file, not a mailbox) when a kick hits
 the store:
 
-- **Duplicate starts prevented** — second default claim on the same work item
-  refused, and named the holder.
+- **Duplicate starts prevented** — default claim on a held work item refused,
+  and named the holders. Say which MODE held it: a refusal against a
+  `challenger` or `disjoint` seat is one the pre-DRA-76 mutex would have let
+  through, and those are the rows that measure the graduation.
 - **Stale claims** — a holder that was gone, and whether age or a dead pid
   was what `-ForceStale` used.
-- **False blocks** — a seat that should have started (disjoint / challenger /
-  replacement, or a dead holder we could not recover) and was refused.
+- **False blocks** — a seat that should have started and was refused. **DRA-76
+  widened this surface on purpose**, so it is the row to watch: nothing expires
+  a claim, so a card whose seat simply ended without releasing stays held until
+  someone runs `-ForceStale`. If false blocks outnumber prevented duplicates,
+  the answer is an expiry or a release-on-exit, not a narrower refusal.
 - **Recovery** — own-seat `release-seat.ps1` vs `-ForceStale` steal; did the
   next default claim then succeed.
 
@@ -75,8 +88,9 @@ Before kicking a default seat:
 pwsh -NoProfile -File scripts\claim-seat.ps1 -WorkItem DRA-28 -SeatId opus-isolation -Branch claude/opus-isolation-20260908 -Worktree .claude\worktrees\opus-isolation
 ```
 
-A second default claim on `DRA-28` exits `1` and names the holder. That is the
-whole feature.
+A default claim on a `DRA-28` that any live seat holds exits `1`, names **every**
+holder with its mode, and says which of them look stale. That is the whole
+feature.
 
 Explicit second seats (must be chosen, never the default):
 

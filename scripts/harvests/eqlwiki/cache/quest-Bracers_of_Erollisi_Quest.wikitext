@@ -25,6 +25,8 @@
 </li><li>      {{:Conch Shell}}
 </li><li>      {{:Fishing Spear}}
 </li><li>      {{:Kiola Nut}}
+</li><li>      {{:Targ Shield}}
+</li><li>      {{:Broad Sword}}
 </li></ul>
 
 == Walkthrough ==

@@ -11,6 +11,23 @@ CI/`main` gates are unchanged and remain authoritative.
    locally before you push. Sized by V0–V3 consequence, not by habit.
 3. **[flake-ledger.md](flake-ledger.md)** — known intermittent failures.
    “Passed on rerun” is an **observation**, not a resolution.
+4. **[execution-flow.md](execution-flow.md)** — how a slice gets from a signed
+   plan onto `main` (DRA-73 M0, 2026-09-14). **No `helm/ssc-N` PRs:** a ruling
+   is a PR review and/or a `HELM.md` commit. **A signed plan authorizes its
+   whole slice sequence** in order on green gates; Helm stops the train with a
+   HOLD, not by withholding per-slice authorization.
+5. **[exo-dashboard.md](exo-dashboard.md)** — what the execution model actually
+   costs (DRA-73 §6). The DRA-70/71/72 window is a **frozen baseline**
+   (`exo-baseline.json`), so a later claim that the new model is faster is
+   checkable rather than felt. Regenerate with
+   `pwsh -NoProfile -File scripts/exo-metrics.ps1 -FromPr <n> -ToPr <m>`.
+   A metric with no data in the window reads `unmeasured`, never `0`.
+6. **[merge-sync.md](merge-sync.md)** — when a PR merges, the Paperclip issue
+   its **branch** names moves to `done` (DRA-77 M0-4). One way, GitHub →
+   Paperclip. **The branch beats the PR body**, because every body here carries
+   a `Governing plan: DRA-73` line. `blocked` and `cancelled` are refused, not
+   closed. **Inert until three Actions secrets exist** — it prints
+   `SKIPPED: not configured` and names them.
 
 Do **not** load the archive at session start. Open a novel only when a compact
 live rule is not enough to act. `DocumentationTests` scans this directory so

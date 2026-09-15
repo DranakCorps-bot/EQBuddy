@@ -77,6 +77,10 @@ public partial class QuestsView : UserControl
     /// class you play — because you had it lensed out — is a false claim, and it is the
     /// one claim band B exists to make carefully (#193's rule, one surface over).</summary>
     private IReadOnlyList<string> _myClasses = [];
+    /// <summary>The Helper's answers about the subjects this catalog's steps point at
+    /// (DRA-83) — this view's OWN memo, like <see cref="_unlockPool"/> beside it, because
+    /// QuestsWindow and QuestsRoom each build their own view (trap 45).</summary>
+    private readonly GuideHelperSource _helper;
 
     public QuestsView(MainWindow main)
     {
@@ -87,6 +91,7 @@ public partial class QuestsView : UserControl
         _classes = new EqSegmentedStrip(ClassStrip);
         _modes = new EqSegmentedStrip(ModeStrip);
         _unlockPool = new WikiPackPool(main.StoredMobRows);
+        _helper = new GuideHelperSource(main);
         BuildStaticChrome();
         EpicClassicOnlyCheck.IsChecked = _settings.EpicQuestClassicOnly;
         SkyIslandRepeatCheck.IsChecked = _settings.SkyStepsUnderEveryIsland;
@@ -882,6 +887,17 @@ public partial class QuestsView : UserControl
             // from a faction dump, a pooled kill history and a section lens, and not one of
             // those moved anything above. `ck:` already carries the Sky ticks and turn-ins the
             // piece count reads, so those are deliberately not repeated here.
+            // THE HELPER'S OWN EVIDENCE (DRA-83). A guide row carries what the Helper says
+            // about the subject its step points at, and NOTHING else in this signature moves
+            // when that answer does: an archived session, a fresh inventory dump or tonight's
+            // kills change an XP rate or a dominance result without touching a tick, a fold or
+            // a pick. Trap 72 for the fifth time on this surface, and the call is also what
+            // REBUILDS the answers — the memo's own signature decides whether the engines run
+            // (see GuideHelperSource), so asking is a string join and not a fold.
+            //
+            // Not on the Unlocks tab: it draws no guide rows, and this is the one term here
+            // whose refresh reads the database.
+            + (_tab == QuestTab.Unlocks ? "" : $"|hlp:{_helper.Refresh()}")
             + (_tab == QuestTab.Unlocks
                 ? $"|un:{_unlockSection}|fac:{_main.Unlocks.Factions?.WrittenAt.Ticks ?? 0}"
                   + $"|ach:{(_main.Unlocks.HasAchievements ? 1 : 0)}|pool:{_unlockPoolVersion}"
@@ -1330,6 +1346,13 @@ public partial class QuestsView : UserControl
         $"questsGuideStubs={GuideStubsOnScreen()} " +
         $"questsGuideDone={GuideRowsOnScreen().Count(c => c.IsChecked == true)} " +
         $"questsGuideImprove={GuideImproveDoorsOnScreen()} " +
+        // THE HELPER'S LINES, from BOTH ENDS OF ONE MOMENT (DRA-83, trap 56). The first is what
+        // the producer answered — every reference in the catalog the Helper had something to say
+        // about; the second is how many rows on this tab are drawing one. "The engine says so"
+        // and "the screen says so" are different claims, and the gap between these two numbers
+        // is the one a repaint bug lives in.
+        $"questsHelperAnswered={_helper.Lines.Answered} " +
+        $"questsHelperLines={GuideHelperLinesOnScreen()} " +
         // The card, counted off the real tree. questsGuideNext is the LENGTH of the next
         // step's row id and never the text: the E2E compares dumps, and an id with a space
         // in it would split the flat namespace (trap 58). Length moves when the step moves,
@@ -1655,6 +1678,10 @@ public partial class QuestsView : UserControl
     private const string GuideRowTag = "guideRow";
     /// <summary>The tag a stub row's "Wiki incomplete —" caption carries.</summary>
     private const string GuideStubTag = "guideStub";
+    /// <summary>The tag the Helper's line under a guide row carries (DRA-83). Counted into the
+    /// dump beside the store's own number, because "the Helper answered" and "the row says so"
+    /// are different claims (trap 56).</summary>
+    private const string GuideHelperTag = "guideHelper";
     /// <summary>The tag the row-end "Improve this step" door carries.</summary>
     private const string GuideImproveTag = "guideImprove";
 
@@ -1700,10 +1727,57 @@ public partial class QuestsView : UserControl
 
     // Nested one level down: the stub caption lives inside the row's own StackPanel, which
     // is what a wrapped second line requires (trap 14).
-    private int GuideStubsOnScreen() => GuideRowsOnScreen()
+    private int GuideStubsOnScreen() => GuideCaptionsOnScreen(GuideStubTag);
+
+    /// <summary>How many guide rows on screen carry the Helper's line (DRA-83).</summary>
+    private int GuideHelperLinesOnScreen() => GuideCaptionsOnScreen(GuideHelperTag);
+
+    private int GuideCaptionsOnScreen(string tag) => GuideRowsOnScreen()
         .Select(c => c.Content).OfType<StackPanel>()
         .SelectMany(p => p.Children.OfType<TextBlock>())
-        .Count(t => t.Tag as string == GuideStubTag);
+        .Count(t => t.Tag as string == tag);
+
+    /// <summary>
+    /// A guide row's captions: the stub note, and the Helper's answer about what this step
+    /// points at (DRA-83).
+    ///
+    /// <para>ONE builder for both surfaces that draw guide rows — the checklist tabs and the
+    /// General tab's detail pane — because they had already been two copies of the stub block,
+    /// and a second caption spelled twice is the drift the shared projection above them exists
+    /// to prevent. A VERTICAL <see cref="StackPanel"/>: <c>TextWrapping</c> does nothing in a
+    /// horizontal one (trap 14).</para>
+    ///
+    /// <para>A row with neither caption is handed back AS the text block, so nothing gains a
+    /// panel it does not need — and the dump's caption counts stay a count of real captions
+    /// rather than of wrappers.</para></summary>
+    private static FrameworkElement GuideSubLines(TextBlock text, QuestChecklistRow row)
+    {
+        if (row.StubNote.Length == 0 && row.HelperAnswer.Length == 0) return text;
+
+        var stack = new StackPanel();
+        stack.Children.Add(text);
+        // A stub step says so, in the player's words, under its own title. It stays fully
+        // tickable — manual state beats weak inference, and "we could not find directions" is
+        // a fact about US, not about how far the player has got.
+        if (row.StubNote.Length > 0)
+            stack.Children.Add(Caption(
+                GuidePresentation.StubLead + " " + row.StubNote, GuideStubTag));
+        // And what the player's own play says about the subject this step points at. Already
+        // worded by HelperPresentation, drawn and not composed.
+        if (row.HelperAnswer.Length > 0)
+            stack.Children.Add(Caption(row.HelperAnswer, GuideHelperTag));
+        return stack;
+
+        static TextBlock Caption(string words, string tag)
+        {
+            var caption = DesignSystem.Text(Role.Caption, words);
+            caption.TextWrapping = TextWrapping.Wrap;
+            caption.Margin = new Thickness(0, DesignTokens.SpaceXxs, 0, 0);
+            caption.Ink("DimBrush");
+            caption.Tag = tag;
+            return caption;
+        }
+    }
 
     /// <summary>
     /// A guide row, with the one-click share-back door at its end. Every other row is
@@ -1983,7 +2057,7 @@ public partial class QuestsView : UserControl
         // those same rows, item-backed through the router (see GuideBlock).
         _generalGuide = _main.QuestLedger is { } guideLedger
             ? GuideChecklistProjection.ApplyQuest(m.Quest, GuideCatalog.Default,
-                _settings, guideLedger, _main.QuestCharacterKey)
+                _settings, guideLedger, _main.QuestCharacterKey, helper: _helper.Lines)
             : null;
 
         if (_generalGuide is { } guided) DetailPane.Children.Add(GuideBlock(guided, m));
@@ -2209,20 +2283,8 @@ public partial class QuestsView : UserControl
         text.Ink(row.Acquired || row.IsSkipped ? "DimBrush" : "TextBrush");
         if (row.IsSkipped) text.TextDecorations = TextDecorations.Strikethrough;
 
-        FrameworkElement content = text;
-        if (row.StubNote.Length > 0)
-        {
-            var stub = DesignSystem.Text(Role.Caption,
-                GuidePresentation.StubLead + " " + row.StubNote);
-            stub.TextWrapping = TextWrapping.Wrap;
-            stub.Margin = new Thickness(0, DesignTokens.SpaceXxs, 0, 0);
-            stub.Ink("DimBrush");
-            stub.Tag = GuideStubTag;
-            var stack = new StackPanel();
-            stack.Children.Add(text);
-            stack.Children.Add(stub);
-            content = stack;
-        }
+        // The stub note and the Helper's line, each as its own dim caption under the row.
+        FrameworkElement content = GuideSubLines(text, row);
 
         var check = new CheckBox
         {
@@ -3431,9 +3493,9 @@ public partial class QuestsView : UserControl
             // sections the tab grouped by become its stage headings (Fable §2, Delivery 3).
             groups = tab == QuestTab.Epic
                 ? GuideChecklistProjection.ApplyEpic(groups, epicRows, GuideCatalog.Default,
-                    _settings, guideLedger, _main.QuestCharacterKey)
+                    _settings, guideLedger, _main.QuestCharacterKey, helper: _helper.Lines)
                 : GuideChecklistProjection.Apply(groups, GuideCatalog.Default,
-                    _settings, guideLedger, _main.QuestCharacterKey);
+                    _settings, guideLedger, _main.QuestCharacterKey, helper: _helper.Lines);
 
             // Guide rows tick through the router, which decides per objective whether the
             // fact belongs to the Sky turn-in store, to one of THIS reward's item boxes, to
@@ -3709,20 +3771,7 @@ public partial class QuestsView : UserControl
                 // fully tickable — manual state beats weak inference, and "we could not find
                 // directions" is a fact about US, not about how far the player has got.
                 // A VERTICAL StackPanel: TextWrapping does nothing in a horizontal one (trap 14).
-                FrameworkElement content = text;
-                if (row.StubNote.Length > 0)
-                {
-                    var stub = DesignSystem.Text(Role.Caption,
-                        GuidePresentation.StubLead + " " + row.StubNote);
-                    stub.TextWrapping = TextWrapping.Wrap;
-                    stub.Margin = new Thickness(0, DesignTokens.SpaceXxs, 0, 0);
-                    stub.Ink("DimBrush");
-                    stub.Tag = GuideStubTag;
-                    var stack = new StackPanel();
-                    stack.Children.Add(text);
-                    stack.Children.Add(stub);
-                    content = stack;
-                }
+                FrameworkElement content = GuideSubLines(text, row);
 
                 var check = new CheckBox
                 {

@@ -18,8 +18,8 @@
 | slots = 
 
 {{SpellSlotRow | 1 | Increase Disease Counter by 4 }}
-{{SpellSlotRow | 2 | Decrease Hitpoints by 24 per tick }}
-{{SpellSlotRow | 3 | Decrease HP when cast by 40 }}
+{{SpellSlotRow | 2 | Decrease Hitpoints by 98 per tick }}
+{{SpellSlotRow | 3 | Decrease HP when cast by 58 }}
 
 | skill = [[Skill Conjuration | Conjuration]]
 

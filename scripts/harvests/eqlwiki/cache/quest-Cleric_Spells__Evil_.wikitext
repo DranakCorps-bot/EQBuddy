@@ -1,3 +1,4 @@
+{{Kunark Era}}
 [[File:npc_brinaa_darkpact.png|frame|Brinaa Darkpact]]
 {| class="questTopTable"
 ! ''' Start Zone: '''

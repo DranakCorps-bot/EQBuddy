@@ -2,74 +2,73 @@
 
 Auto-written by `guides-transform.py`. Nothing here is curated; `GuideCatalog.json` is, and wins on `questName`.
 
-- Catalog quests: 1178
-- Guides written: 1164
-- Objectives: 11075
-- Distinct eqlwiki pages cited: 914
-- Wikitext verified current as of: 2026-08-31 (last completed refresh)
+- Catalog quests: 1173
+- Guides written: 1158
+- Objectives: 11069
+- Distinct eqlwiki pages cited: 915
+- Wikitext verified current as of: 2026-09-15 (last completed refresh)
 
 ## Per shape
 
 | Shape | Guides |
 |---|---|
-| checklist | 109 |
-| checklist-yielded-nothing | 7 |
-| no-guide | 14 |
-| no-section | 50 |
-| split-step | 250 |
-| walkthrough | 664 |
-| walkthrough-yielded-nothing | 84 |
+| checklist | 108 |
+| checklist-yielded-nothing | 6 |
+| no-guide | 15 |
+| no-section | 49 |
+| split-step | 243 |
+| walkthrough | 667 |
+| walkthrough-yielded-nothing | 85 |
 
 `split-step` is one of the 250 per-step quests split out of a collection page; its
 page is the parent's, so it never gets the parent's walkthrough (see the script's
 header). `*-yielded-nothing` means the section is there and holds no bullet, bold
 line or `You say`.
 
-### Where the presence rule costs a page rows (2)
+### Where the presence rule costs a page rows (1)
 
 A `Checklist` section that yielded nothing, on a page whose `Walkthrough` would
 have. The rule picks by presence, not by yield — see `prose_stages`.
 
-- Darkforge Armor Quests
 - The Restraining Order
 
 ## Authoring states
 
-- `Authored`: 1196
-- `Stub`: 4075
-- `Transcribed`: 5804
+- `Authored`: 1185
+- `Stub`: 4068
+- `Transcribed`: 5816
 
 ## Objective types
 
-- `Collect`: 4048
-- `Custom`: 5804
-- `TalkToNpc`: 368
-- `TurnIn`: 855
+- `Collect`: 4041
+- `Custom`: 5816
+- `TalkToNpc`: 361
+- `TurnIn`: 851
 
 ## Transcribed rows per guide
 
-- 0 rows: 391 guides
-- 1 rows: 34 guides
-- 2 rows: 118 guides
-- 3 rows: 117 guides
-- 4 rows: 101 guides
+- 0 rows: 383 guides
+- 1 rows: 35 guides
+- 2 rows: 117 guides
+- 3 rows: 116 guides
+- 4 rows: 103 guides
 - 5 rows: 68 guides
-- 6 rows: 59 guides
-- 7 rows: 46 guides
-- 8 rows: 22 guides
-- 9 rows: 23 guides
+- 6 rows: 58 guides
+- 7 rows: 48 guides
+- 8 rows: 20 guides
+- 9 rows: 24 guides
 - 10 rows: 17 guides
-- 11 rows: 22 guides
+- 11 rows: 23 guides
 - 12 rows: 15 guides
-- 13 rows: 15 guides
-- 14 rows: 12 guides
+- 13 rows: 17 guides
+- 14 rows: 11 guides
 - 15 rows: 8 guides
 - 16 rows: 8 guides
-- 17 rows: 4 guides
+- 17 rows: 3 guides
 - 18 rows: 3 guides
 - 19 rows: 5 guides
-- 20 rows: 4 guides
-- 21 rows: 45 guides
+- 20 rows: 3 guides
+- 21 rows: 46 guides
 - 22 rows: 2 guides
 - 23 rows: 2 guides
 - 24 rows: 4 guides
@@ -91,7 +90,7 @@ have. The rule picks by presence, not by yield — see `prose_stages`.
 - 66 rows: 1 guides
 - 83 rows: 1 guides
 
-## Skeleton-only guides (391)
+## Skeleton-only guides (383)
 
 No walkthrough and no checklist reached these — the 250 collection split-steps,
 whose page is their parent's, plus the pages that carry neither section.
@@ -152,7 +151,6 @@ whose page is their parent's, plus the pages that carry neither section.
 - Champion's Bracer
 - Champion's Gauntlets
 - Chestplate of the Constant
-- Class Race Quest List
 - Cleric Plane of Sky Tests
 - Cloth Coldain Prayer Shawl (#2)
 - Clurg's New Creation
@@ -162,19 +160,12 @@ whose page is their parent's, plus the pages that carry neither section.
 - Coldain Ring Quests
 - Copper Coldain Insignia Ring (#1)
 - Cougarskin Mask Quest
+- Crafted Armor Quests
 - Crest of the Fauns Quest
 - Cromil's Remains
 - Dark Runed Boots
 - Dark Runed Bracer
 - Dark Runed Gauntlets
-- Darkforge Armor Quests
-- Darkforge Boots
-- Darkforge Bracer
-- Darkforge Breastplate
-- Darkforge Gauntlets
-- Darkforge Greaves
-- Darkforge Helm
-- Darkforge Vambraces
 - Dazzling Gloves
 - Dazzling Robe
 - Dazzling Sleeves
@@ -494,6 +485,7 @@ whose page is their parent's, plus the pages that carry neither section.
 - Burning Soul of the Pestilent
 - Burning Soul of the Pious
 - Burning Soul of the Virtuous
+- Class Race Quest List
 - Cougarskin Sleeves Quest
 - Dozekar Tear Quests
 - Faction Quests

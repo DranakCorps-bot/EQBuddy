@@ -1,5 +1,5 @@
 {{Classic Era}}
-[[File:npc_larkon_theardor.png|frame|Larkon Theardor]]
+[[File:npc_larkon_theardor.png|thumb|Larkon Theardor]]
 {| class="questTopTable"
 ! ''' Start Zone: '''
 | [[Ak'Anon]]
@@ -11,7 +11,7 @@
 | 10
 |-
 ! ''' Classes: '''
-| [[Cleric]], [[Druid]], [[Enchanter]], [[Magician]], [[Necromancer]], [[Paladin]], [[Shaman]], [[Wizard]]
+| [[Enchanter]], [[Magician]], [[Necromancer]], [[Wizard]]
 |-
 ! ''' Related Zones: '''
 | [[Butcherblock Mountains]], [[Rathe Mountains]]
@@ -72,11 +72,7 @@ You receive 1 platinum, 5 gold, 1 silver, 6 copper pieces.
 
 [[Category:Quests]]
 [[Category:Ak'Anon]]
-[[Category:Cleric Quests]]
-[[Category:Druid Quests]]
 [[Category:Enchanter Quests]]
 [[Category:Magician Quests]]
 [[Category:Necromancer Quests]]
-[[Category:Paladin Quests]]
-[[Category:Shaman Quests]]
 [[Category:Wizard Quests]]

@@ -1,0 +1,111 @@
+name: Paperclip merge-sync
+
+# DRA-77 / M0-4, governing plan DRA-73 rev 2 (SS3.2-3 + SS8.5).
+# exo-experiment: merge-sync
+#
+# When a PR merges, move the Paperclip issue its branch names to `done`. Issues
+# were sitting `in_review` for days after the work had landed, because closing
+# the card is a separate act from merging the PR and nothing tied them together.
+#
+# ONE WAY: GitHub -> Paperclip. Nothing here writes to the PR, adds a label, or
+# reports a status back. `merge-sync-selftest.ps1` scans the script for GitHub
+# writes and reddens if one appears; the only `gh` call in this repo's sync path
+# is the READ in the manual-replay job below, and it lives in the workflow
+# rather than in the script so that scan stays a true statement about the script.
+#
+# The decision logic is in scripts/merge-sync-linkage.ps1 and is proven by
+# scripts/merge-sync-selftest.ps1, which ci.yml runs on every push and PR. That
+# matters more than usual here: this workflow's own trigger only fires on a
+# merge to the default branch, so a change to it cannot be tested by the PR that
+# makes the change (the classic "the gate that only runs after you have already
+# merged it" shape). The self-test is what a PR can actually see.
+
+on:
+  pull_request:
+    types: [closed]
+
+  # Manual replay for a merge this job missed — it was added after the fact, the
+  # secrets were not there yet, or the run failed. Idempotent: an issue already
+  # `done` is a no-op, so re-running costs nothing.
+  workflow_dispatch:
+    inputs:
+      pr:
+        description: PR number to re-sync (must already be merged)
+        required: true
+
+permissions:
+  contents: read
+  # Needed only by the manual-replay job, to READ the PR. Nothing here writes.
+  pull-requests: read
+
+# One at a time per PR. Two runs racing on the same issue would both PATCH it to
+# the same value, which is harmless, but the audit comments would duplicate.
+concurrency:
+  group: merge-sync-${{ github.event.pull_request.number || github.event.inputs.pr }}
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    # `merged` is the only thing that separates "landed" from "abandoned", and
+    # closing an issue because somebody gave up on its PR is the worst single
+    # bug this job could have. Checked here AND inside the script — the script's
+    # copy is what the self-test can drive, and this copy is what keeps a
+    # closed-without-merge PR from spending a runner at all.
+    if: github.event_name == 'workflow_dispatch' || github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      # The merged-PR path. Everything comes off the event payload; nothing is
+      # fetched, so there is no token spend and no way for this to disagree with
+      # the merge that triggered it.
+      - name: Sync the linked Paperclip issue
+        if: github.event_name == 'pull_request'
+        env:
+          PAPERCLIP_API_URL: ${{ secrets.PAPERCLIP_API_URL }}
+          PAPERCLIP_API_KEY: ${{ secrets.PAPERCLIP_API_KEY }}
+          PAPERCLIP_COMPANY_ID: ${{ secrets.PAPERCLIP_COMPANY_ID }}
+          # Through the environment, not the command line: a PR body is
+          # attacker-influenced text, and interpolating it into a shell command
+          # is a script-injection hole. `${{ }}` expands BEFORE the shell sees
+          # the line, so a body containing a quote would otherwise end the
+          # argument and start a command.
+          PR_BRANCH: ${{ github.event.pull_request.head.ref }}
+          PR_BODY: ${{ github.event.pull_request.body }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          PR_URL: ${{ github.event.pull_request.html_url }}
+          PR_TITLE: ${{ github.event.pull_request.title }}
+        run: |
+          pwsh -NoProfile -File scripts/merge-sync.ps1 `
+            -Branch "$env:PR_BRANCH" `
+            -PrBody "$env:PR_BODY" `
+            -PrNumber "$env:PR_NUMBER" `
+            -PrUrl "$env:PR_URL" `
+            -PrTitle "$env:PR_TITLE" `
+            -Merged 'true'
+        shell: pwsh
+
+      # The manual-replay path. `gh pr view` is a READ; the one-way lock holds.
+      - name: Re-sync a named PR
+        if: github.event_name == 'workflow_dispatch'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PAPERCLIP_API_URL: ${{ secrets.PAPERCLIP_API_URL }}
+          PAPERCLIP_API_KEY: ${{ secrets.PAPERCLIP_API_KEY }}
+          PAPERCLIP_COMPANY_ID: ${{ secrets.PAPERCLIP_COMPANY_ID }}
+          PR: ${{ github.event.inputs.pr }}
+        run: |
+          $pr = gh pr view $env:PR --repo $env:GITHUB_REPOSITORY `
+            --json number,title,body,url,headRefName,mergedAt | ConvertFrom-Json
+          # `mergedAt` rather than a `merged` boolean: the JSON field is null for
+          # an unmerged PR, and a null is unambiguous in a way that a string
+          # "false" is not.
+          $merged = if ($pr.mergedAt) { 'true' } else { 'false' }
+          pwsh -NoProfile -File scripts/merge-sync.ps1 `
+            -Branch $pr.headRefName `
+            -PrBody $pr.body `
+            -PrNumber $pr.number `
+            -PrUrl $pr.url `
+            -PrTitle $pr.title `
+            -Merged $merged
+        shell: pwsh

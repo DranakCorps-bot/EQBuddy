@@ -130,6 +130,14 @@ internal sealed class AppHarness : IDisposable
             // false on a fresh AppSettings), which is trap 23 — the picture is of a real
             // state and not of the state the test is about.
             WatchChipMasterRetired = true,
+            // DRA-81's star restore, marked done for the same reason as the two above: a
+            // seeded profile is a STATED state. The harness writes a settings.json, so
+            // `hadFile` is true and the pass would otherwise run over every fixture and add
+            // "dps", "hps" and "xp" to whatever `MiniStats` the test asked for — a test that
+            // seeded ["kills"] would get a row it never wrote and could not express its
+            // absence (trap 23: the picture would be of a real state, and not of the state
+            // the test is about). With this set, a fixture's `MiniStats` IS the row.
+            HudStatStarsRestored = true,
         };
         configureSettings?.Invoke(settings);
 
@@ -803,6 +811,31 @@ internal sealed class AppHarness : IDisposable
             "and is the bar drawing that chip?)");
     }
 
+    /// <summary>
+    /// Ticks or unticks one Mini dashboard ★ through the <c>EQBUDDY_STARPROBE</c>
+    /// rendezvous, which the scenario must have asked for (DRA-81's Founder LOCK).
+    ///
+    /// **The checkbox is in a window this suite cannot reach**, and may not assert the
+    /// screen even if it could — so the probe drives <c>MainWindow.SetMiniStat</c>, the same
+    /// method the checkbox's own <c>Checked</c>/<c>Unchecked</c> handler calls. What it skips
+    /// is WPF plumbing with no decision in it; what it covers is every inch between the
+    /// setting and the bar, which is exactly where the Founder's smoke lived: the profile
+    /// said one thing and the row drew another.
+    ///
+    /// **It returns on <c>hudStarProbeSets</c>, which the probe raises AFTER the write** —
+    /// not on the trigger file disappearing, which only says the probe saw it. A row read
+    /// before the far side of the write is a race (trap 62). The same split, and the same
+    /// rendezvous shape, as <see cref="ClickGuideDoor"/> and <see cref="DropHudChip"/>.
+    /// </summary>
+    public void SetMiniStat(string key, bool on)
+    {
+        var before = DumpValue("hudStarProbeSets");
+        File.WriteAllText(Path.Combine(ProfileDir, "star.trigger"), $"{key} {(on ? "on" : "off")}");
+        Until(() => DumpValue("hudStarProbeSets") > before, AssertTimeout,
+            $"the ★ probe to turn \"{key}\" {(on ? "on" : "off")} (debug.txt " +
+            $"hudStarProbeSets past {before}; is EQBUDDY_STARPROBE=1 set on this scenario?)");
+    }
+
     /// <summary>Current value of a debug.txt "key=value" field, or -1 while the dump is
     /// missing, mid-write, or lacks the key — callers poll via <see cref="WaitForDump"/>.</summary>
     public int DumpValue(string key)
@@ -927,6 +960,32 @@ internal sealed class AppHarness : IDisposable
         }
         catch (IOException) { }
         return "";
+    }
+
+    /// <summary>
+    /// Several WORD facts off ONE read of the dump — <see cref="DumpValues"/>'s sibling, and
+    /// it exists for the same reason: two <see cref="DumpText"/> calls are two moments, and a
+    /// comparison between two moments is a question a passing app can answer wrongly (trap 56,
+    /// which the app-side <c>PaintOneMoment</c> exists to make answerable at all).
+    ///
+    /// The case that needed it is SAMPLING: watching a word fact hold still over several
+    /// renders means pairing it with the liveness fact that says a render happened
+    /// (<c>tick</c>), and a `tick` from one read beside a `hudGlance` from the next is a
+    /// sample of neither. Any key the dump does not carry answers "".
+    /// </summary>
+    public string[] DumpTexts(params string[] keys)
+    {
+        var text = "";
+        try { text = File.ReadAllText(DebugDumpPath); }
+        catch (IOException) { }
+        var pairs = text.Split(' ');
+        return [.. keys.Select(key =>
+        {
+            foreach (var pair in pairs)
+                if (pair.StartsWith(key + "=", StringComparison.Ordinal))
+                    return pair[(key.Length + 1)..];
+            return "";
+        })];
     }
 
     /// <summary>Closes the WIDGET (WM_CLOSE — the same path as the user's ✕) and waits

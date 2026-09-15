@@ -1,5 +1,5 @@
 {{Classic Era}}
-[[File:npc_gallin_woodwind.png|frame|Gallin Woodwind]]
+[[File:npc_gallin_woodwind.png|thumb|Gallin Woodwind]]
 {| class="questTopTable"
 ! ''' Start Zone: '''
 | [[Greater Faydark|Kelethin]]
@@ -22,7 +22,7 @@
 
 == Reward ==
 
-<ul><li>  {{:Cast-Iron Rapier}}
+<ul><li>  {{:Cast-Iron Rapier}} or {{:Bronze_Dagger}}
 </li></ul>
 
 == Walkthrough ==
@@ -51,6 +51,8 @@ You say, 'I will hunt for meat'
 </div>
 
 {{YouGainExperience}} 10% xp every turn-in for a level 3 Halfling Druid (5% at level 4)
+
+{{YouGainExperience}} 0.055% xp for a level 29 and a bronze dagger, no cast iron rapier - 9/2/2026 
 
 You receive 7 gold, 23 copper pieces.
 

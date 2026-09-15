@@ -72,11 +72,19 @@ public static class BreakoutPresentation
     /// <see cref="NeedsPinnedRule"/>, which is what tells that null apart from the others.
     ///
     /// **Damage, Healing and Progress are null since Surface A / SA-1**, and for a
-    /// different reason again: <c>dps</c>, <c>hps</c> and <c>xp</c> are the always-on HUD
-    /// numbers now, so no star exists to gate them and the Options tick is the whole
-    /// switch. <c>AppSettings.MigratePromotedHudStats</c> is what carries each player's
-    /// old star into <c>DisabledBreakouts</c> before the keys go, so an open window stays
-    /// open and a closed one stays closed.
+    /// different reason again: the Options tick is the whole switch for those three, and
+    /// <c>AppSettings.MigrateHudStatStars</c> is what carries a pre-SA-1 player's star into
+    /// <c>DisabledBreakouts</c> before the keys land, so an open window stays open and a
+    /// closed one stays closed.
+    ///
+    /// **They stay null through DRA-81, and that is a decision rather than an oversight.**
+    /// <c>dps</c>, <c>hps</c> and <c>xp</c> are <c>MiniStats</c> keys again — the Founder
+    /// LOCK put their ★s back — so the old inference "no key, so no star to read" no longer
+    /// holds and something has to say what the new star does NOT do. It decides whether the
+    /// HUD draws that metric, and nothing else. Re-pointing this table at it would mean
+    /// unticking DPS in the Mini dashboard silently closed somebody's Damage window: a
+    /// window and a HUD slot are different objects, and one switch quietly doing both is the
+    /// "tick box that lies" with the lie on the other side.
     /// </summary>
     public static string? StarKey(string kind) => kind switch
     {
@@ -150,11 +158,17 @@ public static class BreakoutPresentation
         "Opens by itself while EQBuddy is minimised. Ticking this also stars the stat, so it "
         + "shows on the HUD too.";
 
-    /// <summary>For Damage and Healing, whose stats are on the HUD whatever this says.
-    /// Naming the removed toggle rather than only the replacement is the #233 rule.</summary>
+    /// <summary>For Damage and Healing, the two kinds whose tick does NOT also set a star.
+    ///
+    /// **It used to say "DPS and HPS are always-on HUD numbers now, so there is no star to
+    /// set"**, which stopped being true with DRA-81's Founder LOCK — there is a star, it is
+    /// in Mini dashboard, and this row deliberately does not touch it. Saying where the
+    /// other switch is matters more than it did: two switches that sound like one is how
+    /// somebody unticks the wrong thing and reports the window as broken.</summary>
     public const string PromotedNote =
-        "Opens by itself while EQBuddy is minimised. DPS and HPS are always-on HUD numbers "
-        + "now, so there is no star to set and this tick is the whole switch.";
+        "Opens by itself while EQBuddy is minimised, and this tick is the whole switch for "
+        + "the window. Whether DPS and HPS show on the HUD is their own star up in Mini "
+        + "dashboard; neither setting changes the other.";
 
     /// <summary>The kind for a <c>BreakoutKind</c> member, whichever UI's enum it came
     /// from. The two enums disagree about membership but not about spelling.</summary>
