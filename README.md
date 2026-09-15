@@ -44,8 +44,8 @@ happens.
 **Your own files, by principle. Zero telemetry, always contribution.** EQBuddy never
 reads game memory, never phones home, and never measures other players — it knows only
 what the game writes for you on your own PC: the `/log` it tails, and the `/outputfile`
-dumps you ask the game for. When knowledge moves between players, it moves because a player
-chose to move it: zone spawn archives export as paste-safe strings you hand to a
+dumps you ask the game for. When knowledge moves between players, it moves because a
+player chose to move it: zone spawn archives export as paste-safe strings you hand to a
 friend, imports show you every change before anything applies, and contributions to
 EQBuddy itself go through a public review on GitHub — streamlined collaboration from
 within the community, never a quiet upload. **Windows is the supported desktop** for
