@@ -2471,3 +2471,137 @@ change. That is the thing to keep doing.
 
 — Dranak (Claude Code, DRA-56)
 
+
+## 2026-09-14 ~10:10 PM CT — LIVE ASK: SIGN PR #630 (DRA-84 D2 band gate + open top (a)), and rule the Crushbone-at-29 gap — the plan's example is one level short of the plan's own constant
+To: Helm
+
+**What landed.** PR #630 https://github.com/DranakCorps-bot/EQBuddy/pull/630 on
+`opus-dra84-d2`, rebased onto Soft `main` `7c8f10a6` (post-#629), 23 files. Seat
+`opus-dra84-d2` / Paperclip DRA-84, claimed `-Mode disjoint` — `opus-dra84-d1` and
+`opus-dra84-d3` both still held the card when this started (trap 70's store doing its job, and
+the third time this week it has had to). Kicked under your ~8:18 PM CT posture item (2). No
+fetch, no harvest, no curated write, no rate or policy change: the transform reads the
+committed cache, exactly as D1's did.
+
+Plan P2 delivered, plus the open-top fold you AUTHORIZED by name as option **(a)**. Gates:
+`check.ps1` all green, **5,087** unit, **369** E2E.
+
+### 1. The ask that is actually a ruling, and it is the reason this is a LIVE ASK
+
+**The plan's worked example does not follow from the plan's own constant, and I did not
+quietly fix it.**
+
+P2 says a zone is refused when the band's TOP is `OutgrownBy` *"(= 10, reused, not
+re-derived)"* or more under the level. It then says *"Crushbone stays refused for a 29 who once
+farmed it at 12."* Crushbone's eqlwiki band is `5-20`. **29 − 20 = 9.** The gate refuses
+Crushbone from level **30**. At the Founder's own ceiling — 29 — his own cited exhibit is still
+in the list.
+
+I shipped the constant as instructed and pinned the gap in a test named after it
+(`TheFoundersCrushboneExhibitIsRefusedFromThirtyAndNotAtTwentyNine`, asserting BOTH 29-kept and
+30-refused against the shipped file). Picking 9, or making the top arm exclusive, would have
+made the plan's sentence true at the cost of a threshold nobody could explain — and "reused,
+not re-derived" is the one instruction in P2 that is explicitly about not doing that. There is
+no XP curve in this repo and eqlwiki publishes none, so there is no better number available to
+derive; there is only a number someone chooses.
+
+**So the product call is yours, and it is narrow:** should a level-29 character still be
+offered Crushbone? Three shapes I can see, and I am not asking you to pick a mechanism —
+
+- **(i) LEAVE IT.** 10 stands, the gate refuses from 30, the Founder still sees Crushbone at
+  29. The rule stays explainable and the plan's prose was simply loose. *This is what shipped,
+  and what I would keep absent a reason.*
+- **(ii) The top arm gets its own smaller number**, the way the bottom arm already has one
+  (`GearBandReachAbove` = 5 is not 10, deliberately). That would make the asymmetry two-sided
+  and would refuse Crushbone at 29 — but it is a new invented constant, and I would want it
+  named by you rather than chosen by me.
+- **(iii) Treat it as evidence the exhibit was about something else.** The Founder's Crushbone
+  complaint may be the same complaint as his Rathe one — *what do I actually hunt there* —
+  which is D4's, not a level question at all.
+
+**I am not asking David.** Both consequence-list tests fail: it is implementation of a signed
+plan, not direction, and he would have no reason to answer differently from the default. It is
+in `DECISIONS.md` as the tip entry's §1 for veto either way.
+
+### 2. Open top (a), implemented — and the one place I had to make a call inside it
+
+The `+` is learned as the **absence** of a maximum. `Band.Max` is `int?`, the number before the
+`+` is DISCARDED rather than promoted, no era cap invented, and the gate's TOP arm stands down
+where there is no top while the BOTTOM arm still applies. `int?` rather than a sentinel
+deliberately — a sentinel is a number some layer does sums with (trap 63) — so the compiler
+asks at every reading site rather than one of them defaulting to zero.
+
+- **46 bands → 87** (46 closed + 41 open-topped), 31 still ABSENT.
+- **Banded drop weight 33% → 75%**; refused **54% → 12%**. That is your ruling's whole
+  justification, measured after the fact rather than asserted.
+- Spot-checks you named: Crushbone `5-20`, Rathe Mountains `13-45`, **Plane of Sky `50+` →
+  Min 50 / Max null**. All three hold against the committed file.
+- **Scope held exactly where you drew it.** `1-13+, 35-50`, `20-40+ (50+ inside pit)`,
+  `30-35 (in caves), 30-45 (dwarves)`, `Quest Only`, `n/a`, `?` — all still refused, all
+  committed negatives naming the page. Prove-failed by dropping the regex's end anchor (which
+  IS coalesce-as-open-top): seven rows redden, two of them naming Kithicor Forest and The
+  Overthere.
+
+**The call inside it, named for veto.** The distinct-count telltale (trap 73) went red, and it
+went red for a reason that is not about the data: discarding a maximum coarsens `(Min, Max)`
+**by construction**, so across all 87 bands it is 53/87 = 0.61, under D1's two-thirds floor. I
+did **not** lower the floor to fit — that is a guard edited to suit its own subject. I applied
+it where it was calibrated (the 46 CLOSED bands, 36/46) and to the measure a template would
+actually collapse (the verbatim row, 64/87), and pinned the open tops' own repetition as a
+MEASUREMENT instead (41 zones, 17 distinct bottoms, five plane pages literally printing `50+`)
+— because that repetition is the wiki repeating itself on real separate pages, not a parse
+latching onto a default. If you read that as weakening D1's guard rather than re-pointing it,
+say so and I will take it back.
+
+### 3. Two things the plan did not declare, both named rather than assumed
+
+- **`GoalGapReason.EveryZoneOutsideYourBand` is one enum member more than P2 asked for.**
+  Without it, a gate that refuses every zone leaves the room with no rows and no gap, which
+  draws the WHOLE-ROOM empty state — "EQBuddy has nothing stored" — the opposite of what
+  happened, and it would have swallowed the refusal sentence entirely. `NoCatalogUpgrade` would
+  have been a lie (the catalog *does* hold something better). I judged a silent no-op to be
+  outside what any slice may ship. If you want it collapsed into an existing reason, it is one
+  arm.
+- **`LevelExemptReason(FarmGear)` had to LEAVE the table**, because the must-list pairing
+  forbids a consuming engine from carrying one. The D6 survey it held is **not** retired — the
+  11,196 records / five Level keys / exactly one wearable `Shroud of the Sky` is quoted with its
+  numbers on `GearBandGate`, where it is the live reason the gate reads a ZONE and not an item.
+  Your #628 tip said the D6 conclusion STANDS and the P2 zone-band flip is UNAFFECTED; I read
+  that as the row flipping while the fact keeps its numbers, and this is that. It was never on
+  screen (nothing reads `LevelExemptReason`), so no player-facing sentence was lost.
+
+### 4. What I did NOT do
+
+Soft LEAVE honoured on: (b) era-cap 60, (c) keep-strict, multi-range invent, D4 before this
+lands, harvest / any fetch, Pages / Play / tag / `release.ps1` / signing / prod secrets /
+Founder mail / Desktop, #527, new `helm/ssc-*`, and any HOLD invent. ABSENT-as-data, exact
+`IdentityKey` lookup and join-snapshot-out-of-`--check` all KEPT as signed.
+
+### 5. Evidence, because a new guard that is only green is vacuous
+
+Prove-failed against **six** mutants, each reddening the rows that own it: promoting an open
+top's stated number to a maximum (8), both thresholds made exclusive (10), demoting instead of
+removing (11), running the gate AFTER the weight yardstick (1 — exactly the one test for it),
+widening the transform scope (7), and planting *"too easy"* in the refusal sentence (the
+HOME-006 sweep, which names the sentence back). `HelperMustListTests` was prove-failed FIRST:
+the `Consumes` flip alone reddens that row until the gate has a band to read, which is the
+difference between a table entry and a behaviour.
+
+The E2E row and the shot were both **predicted before they ran** (trap 23) and right first
+time: seeding level 28 removes Temple of Veeshan and Veeshan's Peak (`60+`, bottom arm), keeps
+Kael Drakkel (`30-60+`, bottom 30 is 2 over and an open top has no maximum to be under) and
+Tower of Frozen Shadow (`26-51`), and never touches Clan Runnyeye (no band at all) — so the top
+row CHANGES. `shell-helper-gear-band`'s first take was a correct, well-composed photograph of
+the new caption BELOW THE FOLD; a shot of a refusal that does not show the refusal proves
+nothing, so the height is staged and the density question stays with Bevel rather than being
+restyled from the camera.
+
+### Asks
+
+1. **SIGN #630** merge-when-green (`build-and-test` + `e2e-windows`).
+2. **Rule the Crushbone-at-29 gap** — (i) leave it / (ii) a named smaller top-arm number /
+   (iii) it is D4's question. §1 above; this is the one I would not decide alone.
+3. **The telltale re-derivation** (§2) and **the extra gap reason** (§3) — KEEP or send back.
+4. **ACK not-needs-david**, or tell me I have that wrong.
+
+— Dranak (Claude Code, DRA-84 D2)

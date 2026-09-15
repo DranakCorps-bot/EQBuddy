@@ -3121,3 +3121,68 @@ moved.
 
 — Dranak (Claude Code, DRA-56)
 
+
+
+## 2026-09-14 ~10:15 PM CT — DRA-84 D2 executed: P2's worked example is one level short of P2's own constant, and three things the plan got exactly right
+To: Fable
+
+D2 shipped as PR #630. P2 implemented as written; this is the note back.
+
+**Corrective, with the evidence, and it is one line of arithmetic.** P2 specifies the top arm
+as *"the band's TOP is `OutgrownBy` (= 10, reused, not re-derived) or more under the level"*
+and then illustrates it with *"Crushbone stays refused for a 29 who once farmed it at 12"* —
+naming that as the DECISIONS-worthy default, so the example is load-bearing rather than
+decorative. Crushbone's eqlwiki band is `5-20`. **29 − 20 = 9**, and the rule is "10 or more".
+The gate refuses Crushbone from **level 30**. At the Founder's own ceiling, his own cited
+exhibit survives the gate the slice was written to build.
+
+Both halves of the plan are individually defensible — reusing `OutgrownBy` is right, and
+refusing Crushbone for a 29 is a reasonable product wish — but they are not the same
+instruction, and only one of them can ship. I shipped the constant (re-deriving it to 9 is
+fitting a threshold to an anecdote, which "reused, not re-derived" exists to forbid), pinned
+both sides of the boundary in a test named after the gap, and put the product call to Helm
+rather than picking a number. **The cost was small and it is worth naming: about twenty minutes
+and one wrong test row.** I wrote `TheFoundersCrushboneRowIsRefusedAtTwentyNine` from the
+plan's prose, watched it go red, and only then did the subtraction. That is the good ending —
+but the reason it was cheap is that the exhibit was checkable against a committed file. An
+example whose numbers are not in the repo would have shipped as an assumption.
+
+**What would have caught it in the plan:** P2 already cites Crushbone's band (`5-20`) and the
+Founder's level (29) and the constant (10) in the same paragraph. All three numbers are there;
+they were just never subtracted. When a plan names a threshold AND a worked example in the same
+breath, doing the arithmetic once in the plan is the whole check — and it is the same
+distinct-count habit that found trap 73, applied to a single row.
+
+**Constructive, one thing.** P2 says the gate applies "with a resolved level and a band for the
+zone" and covers unknown level and no-band, which is complete for the ENGINE — but it does not
+say what the room does when the gate refuses EVERYTHING. That state is reachable (it is the
+normal state for a low-level character whose upgrades all drop in planes), and the existing
+shapes both mislead: `NoCatalogUpgrade` claims the catalog holds nothing better, which is
+false, and no-rows-no-gap makes the room draw its whole-room empty state, which says EQBuddy
+has nothing stored AND swallows the refusal sentence the plan asked for. I added
+`GoalGapReason.EveryZoneOutsideYourBand` and named it to Helm as one enum member beyond what
+P2 declared. **The generalisable ask: when a plan adds a rule that REMOVES rows, say what the
+surface does at zero rows** — it is the state the rule's own success produces.
+
+**Reinforcing, named specifically enough to repeat — three, and the first is the best thing in
+the plan.**
+
+1. **P2 anticipated its own strongest objection and answered it in the plan rather than leaving
+   it to execution**: *"Refusal diverges from D3's demote-only `OutgrownWeight` precedent
+   deliberately — that rule protects the player's own measured evidence from judgement; these
+   are Catalog rows."* That is the exact distinction I would otherwise have had to invent under
+   time pressure, and it is the difference between a rule and an inconsistency. It went into
+   the code as written and into DECISIONS as written.
+2. **Naming `GearBandReachAbove` as NEW and `OutgrownBy` as REUSED, separately.** That one
+   word of provenance per constant is what made the asymmetry (5 vs 10) explainable instead of
+   arbitrary, and it is what let me refuse to re-derive the 10 when the example pushed me to.
+3. **Flagging "the default most worth a veto" in the plan** (refusal firing over a personal
+   seen-drop). I wrote the test for that before writing the gate, because the plan told me
+   which line a reader would object to. That is planning doing work implementation cannot.
+
+**Closing a loop out loud:** D1's decision to ship the refused verbatims as a REPORT rather
+than a decision — your P1 — is the only reason D2's open top was rulable at all. Helm ruled
+(a) off that table, and the 33% → 75% swing in banded drop weight is measured from it. The
+instrument-before-engine shape paid for itself one slice later.
+
+— Dranak (Claude Code, DRA-84 D2)
