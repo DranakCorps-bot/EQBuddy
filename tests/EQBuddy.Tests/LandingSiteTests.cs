@@ -158,6 +158,36 @@ public class LandingSiteTests
         Assert.All(shots, row => Assert.Contains($"-Theme {LandingTheme}", row.Recipe));
     }
 
+    /// <summary>**A recipe is only a recipe if it RUNS.** Every `-Shot` the manifest names is a
+    /// shot `shoot.ps1` actually defines, and the palette every row passes is one
+    /// `ThemePalettes` actually ships. Without this the manifest is a set of strings that look
+    /// like commands — and the failure it prevents is the worst kind, because you only discover
+    /// it at the moment you need to re-shoot.</summary>
+    [Fact]
+    public void EveryRecipeNamesAShotAndAPaletteThatReallyExist()
+    {
+        var declared = Regex.Matches(
+                ReadRepoFile(Path.Combine("scripts", "shoot.ps1")),
+                @"^\s*'(?<shot>[a-z0-9-]+)'\s*=\s*@\{", RegexOptions.Multiline)
+            .Select(m => m.Groups["shot"].Value)
+            .ToHashSet(StringComparer.Ordinal);
+
+        Assert.NotEmpty(declared);
+
+        var unknown = Manifest
+            .Select(r => Regex.Match(r.Recipe, @"-Shot (?<shot>[a-z0-9-]+)"))
+            .Where(m => m.Success && !declared.Contains(m.Groups["shot"].Value))
+            .Select(m => m.Groups["shot"].Value)
+            .ToArray();
+
+        Assert.True(unknown.Length == 0,
+            "the manifest names shots shoot.ps1 does not define: " + string.Join(", ", unknown));
+
+        Assert.Contains(
+            $"[\"{LandingTheme}\"]",
+            ReadRepoFile(Path.Combine("src", "EQBuddy.UI.Shared", "ThemePalettes.cs")));
+    }
+
     /// <summary>The clip recorder is the other way round: the landing is its only consumer, so
     /// its default IS the landing theme and the committed clips reproduce with no arguments.
     /// If that default moves, the recipes above stop being reproducible.</summary>
