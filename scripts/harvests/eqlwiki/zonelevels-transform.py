@@ -191,7 +191,13 @@ def render(bands: dict[str, dict], no_band: dict[str, str]) -> str:
 def identity_key(zone: str) -> str:
     """The repo's zone-identity token, mirrored from `ZoneMapFiles.IdentityKey` — lowercase,
     drop a parenthetical, drop a trailing difficulty number, drop a leading "the", squeeze
-    out spaces/apostrophes/hyphens. `ZoneLevelsTests` pins the two against each other."""
+    out spaces/apostrophes/hyphens.
+
+    Mirrored rather than shared, because one side is Python and one is C#. The pin is
+    ONE-DIRECTIONAL and worth being honest about: `ZoneLevelsTests` asserts the C# side's
+    match/refuse outcome over the exact spellings this report's tables name, so a change to
+    `ZoneMapFiles.IdentityKey` reddens. A change HERE moves the report's numbers and nothing
+    goes red — so if you edit this, re-read those test rows."""
     z = zone.strip().lower()
     paren = z.find("(")
     if paren > 0:
