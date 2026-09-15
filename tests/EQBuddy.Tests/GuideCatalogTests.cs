@@ -232,6 +232,77 @@ public class GuideCatalogTests
                         $"{o.Id}: \"{claim}\" — a filled WHEN/HOW has to say what it rests on");
     }
 
+    /// <summary>
+    /// <b>The two Bard Light Woolen steps carry the #139/#150 dispute, in the guide's own
+    /// data</b> (DRA-38 acceptance, finished in DRA-86). The pairing of Light Woolen
+    /// Mask/Mantle to Mask of Song / Mantle of the Songweaver is the one place this catalog
+    /// states something two players have contradicted each other about:
+    /// <c>SkyQuestDefaults</c> records that #139 reported it crossed (we swapped it in
+    /// v1.79.0) and #150 reported that swap wrong (we put it back), with no decisive turn-in
+    /// either way — so David's standing rule decides it and we match the wiki.
+    ///
+    /// <para><b>Why WHY and not StubNote or a source.</b> The plan named those two homes
+    /// (<c>WEEKEND-SHIP-BAG-2026-09-12.md</c> §D4) and both are closed: an Authored objective
+    /// carrying a <c>StubNote</c> is a validation failure with a test of its own
+    /// (<see cref="AnAuthoredObjectiveCarryingAStubNoteIsRefused"/>), and <c>GuideSource</c>
+    /// has no prose field — its <c>Title</c> is the exact page title the weekly refresh
+    /// intersects with changed pages, so a caveat written there would be a page that does not
+    /// exist. These steps DO answer who / where / what (the drop locations are not what is
+    /// disputed), so demoting them to Stub would be dishonest in the other direction.</para>
+    ///
+    /// <para><b>And it is one string on purpose.</b> WHY is the field that makes the disputed
+    /// claim — "X is one of the turn-in pieces for Y" — so the qualification lives inside the
+    /// sentence it qualifies. Split across two fields, a surface that draws one and not the
+    /// other publishes the confident half alone, which is the exact failure the acceptance
+    /// line names: a guide must not be more confident than the checklist row it wraps.</para>
+    /// </summary>
+    [Fact]
+    public void TheTwoBardLightWoolenStepsCarryTheDisputedPairingCaveat()
+    {
+        // The must-list (trap 34): naming the objectives is what makes a MISSING caveat fail.
+        // Counting rows that happen to carry one could never see a row that stopped.
+        var mustCarry = new[] { "light-woolen-mask", "light-woolen-mantle" };
+
+        foreach (var id in mustCarry)
+        {
+            var objective = Shipped.Guides.SelectMany(g => g.AllObjectives)
+                .SingleOrDefault(o => string.Equals(o.Id, id, StringComparison.OrdinalIgnoreCase));
+
+            Assert.True(objective is not null, $"{id}: no such objective in the shipped catalog");
+
+            // Both report numbers, because either one alone tells half the story — #139 without
+            // #150 reads as a settled correction rather than a contradiction.
+            Assert.Contains("#139", objective!.Why, StringComparison.Ordinal);
+            Assert.Contains("#150", objective.Why, StringComparison.Ordinal);
+
+            // The rule that actually decides it, and the marker that says whose sentence this
+            // is. Without the marker the caveat reads as the wiki's own hedge (trap 73's shape
+            // from the other side) — the cited page states the pairing flatly.
+            Assert.Contains("match the wiki", objective.Why, StringComparison.OrdinalIgnoreCase);
+            Assert.Contains("not something the wiki says", objective.Why, StringComparison.Ordinal);
+
+            // The claim and its qualification are ONE field, so neither can travel alone.
+            Assert.Contains("turn-in pieces", objective.Why, StringComparison.Ordinal);
+        }
+    }
+
+    /// <summary>The paired forbid (trap 34 the other way): the dispute belongs to those two
+    /// steps and nowhere else. A caveat pasted onto the wind runes — or onto another class's
+    /// rows — would be EQBuddy inventing a controversy, which costs the same trust as
+    /// inventing a fact.</summary>
+    [Fact]
+    public void NoOtherStepClaimsTheLightWoolenPairingIsDisputed()
+    {
+        var carriers = Shipped.Guides.SelectMany(g => g.AllObjectives)
+            .Where(o => o.Why.Contains("#139", StringComparison.Ordinal)
+                     || o.Why.Contains("#150", StringComparison.Ordinal))
+            .Select(o => o.Id)
+            .OrderBy(id => id, StringComparer.Ordinal)
+            .ToList();
+
+        Assert.Equal(new[] { "light-woolen-mantle", "light-woolen-mask" }, carriers);
+    }
+
     /// <summary>A stub says what is missing, in the player's terms. "Incomplete" with no
     /// sentence behind it tells nobody anything and gives the share-back door nothing to
     /// carry (Founder lock 4).</summary>

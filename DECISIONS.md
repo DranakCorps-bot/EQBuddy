@@ -7192,3 +7192,63 @@ the system that owns it, not from the prose that last mentioned it.**
 
 — Dranak (Claude Code, DRA-56)
 
+## 2026-09-14 — DRA-86: the bard #139/#150 caveat went in WHY, because both homes the plan named are closed
+
+**The slice.** DRA-38's one unfinished acceptance line: carry the bard Light Woolen
+match-the-wiki story into the two Bard guides, so a guide is not more confident than the
+checklist row it wraps. Data-only, two objectives, one test. V1.
+
+**The call, and it is the whole slice.** The plan
+(`docs/quests/WEEKEND-SHIP-BAG-2026-09-12.md` §D4) said the provenance comments *"are copied
+into the affected guides' `Sources` or `StubNote`"*. **Both of those are closed by the code the
+plan was written against**, which I established by reading rather than by trying:
+
+1. `StubNote` on an `Authored` objective is a **validation failure** —
+   `GuideCatalog.AuthoringProblems` emits *"authored but carries a stub note — one of those is
+   a lie"*, and `GuideCatalogTests.AnAuthoredObjectiveCarryingAStubNoteIsRefused` pins it. The
+   only way to use it is to demote the step to `Stub`, and these steps genuinely answer who /
+   where / what: the drop locations are **not** what is disputed (`SkyQuestDefaults` says the
+   sources belong to the ITEMS and travel with them). Demoting would be dishonest in the other
+   direction, and would move the guide's caption and `IsFullyAuthored` for a data-confidence
+   note.
+2. `GuideSource` has **no prose field at all** — `{ Url, Title, RetrievedAt }`. `Title` is an
+   EXACT eqlwiki page title doing two jobs, and the second is that `refresh.py`'s
+   `curated_flags` intersects it with the week's changed pages. A caveat written there is a
+   page that does not exist, and it would quietly break the flag for the two rows that most
+   need a wiki correction to reach them.
+
+**So the decision: it goes in `Why`, appended to the sentence it qualifies.** The default it
+could have gone the other way on was `How` — there is a 95-row precedent for an EQBuddy's-own-
+limit sentence living there (*"the log never records a hand-in … not something the wiki says"*),
+and it is the field the house convention would reach for first. **I did not take it**, for two
+reasons. `How` is documented as *the method, and what it costs*, and a provenance caveat is not
+a method; using it would also need a new entry in `EveryFilledWhenOrHowNamesItsBasis`'s
+allow-list, whose own doc comment warns that an allow-entry nothing matches is a rule that has
+quietly stopped being enforced. **And the load-bearing reason: `Why` is the field that MAKES the
+disputed claim** — *"Light Woolen Mantle is one of the turn-in pieces for the Mantle of the
+Songweaver"*. Putting the qualification inside that string means no surface can ever draw the
+confident half alone. Split across two fields, one that renders `Why` and not `How` publishes
+exactly the over-confidence this acceptance line exists to remove.
+
+**Why this is a logged call and not a Helm wake.** The plan declared the OUTCOME (the story is
+in the guide data, pinned by a test) and suggested two homes for it. The outcome is delivered
+unchanged: same two objectives, same scope, no schema change, no new mechanism, nothing on the
+consequence list. Choosing a third existing field when the two named ones are refused by the
+validator is a judgement inside the slice, not a departure from it. **What I did NOT do is force
+a home** — no new field, no relaxed validation, no demotion to `Stub`. That was the done bar's
+named alternative and it stays available: if Fable wants a first-class `Caveat`/`SourceNote` on
+the schema, this is the evidence for it, and I have filed it as such rather than deciding it.
+
+**The forbid half.** `NoOtherStepClaimsTheLightWoolenPairingIsDisputed` asserts the caveat is on
+exactly those two ids and nowhere else. A dispute pasted across rows would be EQBuddy inventing
+a controversy, which spends the same trust as inventing a fact — trap 73 pointed the other way.
+
+**Verified:** `GuideCatalogTests` 33/33, full unit suite 5089/5089, `scripts/check.ps1` all
+gates green (including `epic-guides-build.py --check`, which re-serializes the WHOLE catalog and
+would have caught a formatting drift in a hand edit — the file is byte-identical to what the
+generator produces, before and after). **Prove-failed**: reverting only the two data lines with
+the test kept reddens both new tests with the real symptom. E2E is CI's — `e2e-windows` is the
+merge bar and the local screen is a mutex a concurrent seat was holding (trap 61).
+
+— Dranak (Claude Code, DRA-86)
+
