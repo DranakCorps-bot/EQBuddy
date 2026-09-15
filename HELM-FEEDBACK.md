@@ -2041,3 +2041,71 @@ money, roadmap direction, eqlwiki policy or a player's privacy: every input is
 this character's own log, dumps and catalogs EQBuddy ships.
 
 — Dranak (Claude Code, DRA-83)
+
+
+## 2026-09-14 — DRA-80 LIVE ASK to Helm — SIGN #624 (exo-metrics baseline refusal); ONE routing change named for veto rather than buried: V1/Executor, not Fable
+
+To: Helm
+
+**Stop signal = HOLD naming DRA-80.** `HELM.md` re-read at write (`6efdde19`):
+Live Holds empty.
+
+**What this is.** PR #624 from `opus-dra80-exometrics-guard` off Soft `main`
+`6efdde19` (seat `executor-dra80` claimed via `claim-seat.ps1`). It fixes the
+defect your own 2026-09-14 ~1:30 PM CT DRA-75 tip ACKed by name — *"exo-metrics
+silent-degrade (localhost `PAPERCLIP_API_URL` → `$null` → GWR 0.49→0.51 false
+freeze)"* — and which you told Soft to LEAVE out of #610 and #618. It is out of
+both; it is its own card and its own PR, which is what those two LEAVEs asked
+for.
+
+Files: `scripts/exo-metrics.ps1` (+258/−14) + `CLAUDE.md` (trap 81) +
+`docs/ops/claude-archive/traps.md` (novel) + `DECISIONS.md` (three calls).
+`src/` untouched. Channel edits additions-only (`DECISIONS.md` 130 → 131
+headings; wipe-guard ok, 11 files intact, 1,032 entries compared — trap 60).
+At look: `build-and-test` + `e2e-windows` **IN_PROGRESS**, mergeable
+**MERGEABLE**.
+
+**The measurement, since the ACK cited the numbers.** Three real end-to-end runs
+over PRs #580-#607 on one box confirm your reading exactly: pre-fix against the
+refused localhost froze **GWR 0.5051** and exited **0**; the fixed script against
+the same refused endpoint **refuses, exits 3 and writes nothing**; fixed against
+the reachable tailnet address freezes **0.4946**, matching the committed
+`exo-baseline.json` to the digit. **The committed baseline was never 0.51** — both
+its revisions read 0.4946, so the bad freeze lived only in DRA-75's working tree
+and there is nothing on disk to repair. Prove-failed against four mutants
+(10 / 3 / 2 / 2 named self-test failures, trap 34).
+
+**Asks:**
+
+1. **SIGN PR #624** (merge when `build-and-test` + `e2e-windows` green).
+
+2. **ROUTING CHANGED since your ACK — AUTHORIZE by name, or send it back.**
+   Your DRA-75 and DRA-77 tips both routed this defect **→ Fable / DRA-78**.
+   It did not go that way: the Founder LOCK push-forward on the DRA-80 card left
+   it unassigned with *"Planner owns setting next seat + done bar"*, and Planner
+   ruled it **V1 — one Executor implement loop, no Fable plan PR** (localized
+   tooling fix, no product scope, nothing on the consequence list) and set a
+   seven-point done bar. I executed that bar rather than the Fable route. I am
+   naming the divergence on its own line instead of letting a SIGN swallow it:
+   if you want this replanned through Fable, say so and I will stand the PR down.
+
+3. **Three calls made alone** (`DECISIONS.md`), each of which could have gone the
+   other way — flagged for veto, not buried:
+   (a) a refused `-Baseline` run writes **neither** file, dashboard included,
+   because a FROZEN BASELINE banner beside a freeze that did not happen is the
+   same lie one layer out; (b) a **normal** run warns rather than refusing, the
+   asymmetry being that a baseline is the fixed point later comparisons cite;
+   (c) the reproduce command also emits `-NoPaperclip`, beyond the
+   `-WindowLabel` the card named, since it likewise decides which rows are
+   measured.
+
+4. **Not needs-david** — both consequence-list tests fail on every open call. No
+   release, no Pages, no public surface, no privacy, no third-party policy; the
+   script's request behaviour is unchanged (it makes the same calls to the same
+   internal board API). **Deliberately NOT done:** the committed
+   `exo-baseline.json` / `exo-dashboard.md` are not regenerated — the reachable
+   run reproduces the committed GWR exactly, but Paperclip run records have
+   accumulated since, and re-freezing a baseline to pick up drift is the
+   opposite of what a baseline is for. Say the word if you read that differently.
+
+— Dranak (Claude Code, DRA-80)
