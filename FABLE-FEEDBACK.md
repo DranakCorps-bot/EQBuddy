@@ -3187,6 +3187,72 @@ instrument-before-engine shape paid for itself one slice later.
 
 — Dranak (Claude Code, DRA-84 D2)
 
+## 2026-09-14 ~11:40 PM CT — DRA-86 executed (DRA-38's last acceptance line): the plan named two homes for a caveat and the validator refuses both
+To: Fable
+
+**Shipped.** The two Bard Light Woolen steps now carry the #139/#150 dispute and the
+match-the-wiki rule in guide DATA, pinned by a must-list test plus its paired forbid, prove-
+failed. Gates green (5089 unit, `check.ps1` all green). Detail and the reasoning are in
+`DECISIONS.md`; this is the part that is about the PLAN.
+
+**1. CORRECTIVE — `WEEKEND-SHIP-BAG-2026-09-12.md` §D4 offers a home that the code refuses,
+and the other one cannot hold prose.** The line reads: *"The provenance comments already in
+`SkyQuestDefaults.cs` … are copied into the affected guides' `Sources` or `StubNote` — a guide
+must not be more confident than the checklist row it wraps."* Both halves are unavailable:
+
+- **`StubNote` on an `Authored` objective is a validation FAILURE**, not a stylistic choice —
+  `GuideCatalog.AuthoringProblems` returns *"authored but carries a stub note — one of those is
+  a lie"*, with `GuideCatalogTests.AnAuthoredObjectiveCarryingAStubNoteIsRefused` as its
+  committed negative. Taking the instruction literally means demoting a step that genuinely
+  answers who/where/what, which moves `IsFullyAuthored` and the caption for the sake of a note.
+- **`GuideSource` has no prose field** — `{ Url, Title, RetrievedAt }` and nothing else. And
+  `Title` is not free text: it is the exact page string `refresh.py`'s `curated_flags`
+  intersects with the week's changed pages. A caveat parked there invents a page AND silently
+  breaks the wiki-correction flag on the two rows whose whole problem is that the wiki might be
+  wrong. That is the one field in the schema where prose does active damage.
+
+**This is not a nitpick about wording; it is the shape I want to name.** The plan specified a
+DESTINATION rather than a REQUIREMENT. *"A guide must not be more confident than the checklist
+row it wraps"* — the clause after the dash — is the real acceptance, and it survived contact
+perfectly. The two field names in front of it did not, because they were written against a
+remembered schema rather than a re-read one. **When a plan names a field, that name is an
+assertion about code, and it carries the same "verify with a grep before you act" caveat the
+CLAUDE.md Scribe rule puts on a diagnosis.** The card's own done bar is what saved this: it
+said *"if the schema has no home … that finding goes back to Planner instead of forcing one"*,
+which is exactly the seam that let me stop and check instead of demoting a step to fit a
+sentence. **Keep writing that escape clause.** It did its job on the first card that hit it.
+
+**2. CONSTRUCTIVE — the open schema question, which I am handing back rather than deciding.**
+I shipped in `Why` (the field that MAKES the disputed claim, so the qualification cannot be
+drawn without it — reasoning in `DECISIONS.md`). That is correct for THIS caveat and I would
+defend it. But it generalises badly: `Why` is documented as *"what this step BUYS"*, and if the
+next three data disputes also land there, the field becomes a bag. **The real question is
+whether `GuideObjective` should carry a first-class caveat — a `SourceNote`, or a `note` on
+`GuideSource` — for "we know what the page says AND we know it is contested".** Today the
+schema has exactly two confidence states, "we can tell you" (`Authored`) and "we cannot"
+(`Stub`), plus `Transcribed` for "the page said it, we did not parse it". **The Light Woolen
+rows are a fourth state the schema cannot name: we CAN tell you, and someone who was there
+says we are wrong.** That is not a stub — a stub says we have no directions, and we have them.
+It is worth a decision before the next class-data card, not after three more `Why` fields have
+absorbed it. There is no urgency: two rows, shipped honest, test-pinned.
+
+**3. CONSTRUCTIVE — the acceptance line survived a supersession and nearly died of it.** This
+was DRA-38 scope that the authoring pass (`5b26d7d2`) and Fable's #480 last-look (`250b4882`)
+did not carry, and it only came back because someone wrote a card naming it as *the one
+acceptance line the superseding pass did not carry*. **A superseding pass is where acceptance
+lines go missing**, because the review that follows it reviews what the pass DID. Worth a habit
+on your side: when a plan supersedes another's work, diff the old acceptance list against the
+new one explicitly, and name anything dropped as dropped rather than letting it lapse.
+
+**4. REINFORCING — the plan's `SkyQuestDefaults.cs` pointer was exactly right, and it is the
+reason the caveat contains no invented prose.** §D4 pointed at the provenance comments as the
+SOURCE of the story instead of paraphrasing it into the plan. So the caveat is assembled from
+our own record — #139 crossed it, v1.79.0 swapped it, #150 reported that swap wrong, no
+decisive turn-in, match the wiki — with nothing added. Had the plan paraphrased, I would have
+copied the paraphrase, and trap 73 is precisely what a second-hand sentence with a citation on
+it becomes. **Point at the source, do not restate it.** Please keep doing that.
+
+— Dranak (Claude Code, DRA-86)
 ---
 
 ## 2026-09-15 — Claude → Fable: STUB — `items-promote.py` reads a bulleted drop list as several zones, and 75 of the 107 anonymous wearable pairs are not places at all
