@@ -20,6 +20,20 @@ namespace EQBuddy.Tests;
 /// and <c>EQBuddy-Evolved.md</c> carried the literal sibling of the §08 card. A guard that
 /// reads one of three surfaces is a guard against one third of the claim.
 ///
+/// DRA-87 took the last three, and they are a DIFFERENT SHAPE — labels over prose that was
+/// already true, which is why two honesty cards walked past them. <c>PRODUCT.md</c>'s
+/// "### Log-only and local-first" and the v2 charter's "## 2.2 Log-only and local-first"
+/// each head a bullet list where every bullet is correct ("no game-memory reads", "no
+/// packet inspection"); <c>SECURITY.md</c>'s "EQBuddy's rule is log-only, zero telemetry"
+/// is a true statement about EGRESS wearing the wrong noun. Nothing under the heading was
+/// wrong, and the heading is the part a reader quotes back at you. The chain is the same
+/// one, a link further: <c>EQBuddy-Evolved.md</c>'s own intro points at <c>PRODUCT.md</c>
+/// BY NAME for "the product identity in full".
+///
+/// Six surfaces now, and two columns of <see cref="Surfaces"/> differ by decision rather
+/// than convenience — which surface must ENUMERATE the dumps, and which boundary line each
+/// must keep while being corrected (<see cref="SecurityBoundary"/>).
+///
 /// The negative below cannot see a MISSING thing (trap 34), so it is paired with a
 /// must-list that is DERIVED from <see cref="GameCommands"/> rather than written here:
 /// a fifth /outputfile dump reddens this test until the enumerating surfaces name it,
