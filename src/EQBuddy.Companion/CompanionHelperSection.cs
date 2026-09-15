@@ -52,6 +52,10 @@ namespace EQBuddy.Companion;
 /// <param name="GearBandRefused">Which zones the Farm Gear band gate refused, with their bands
 /// and this character's level (DRA-84 D2). Its own field for the same reason as
 /// <paramref name="GearWithheld"/>, one rule out: the row is what did not get built.</param>
+/// <param name="GearWhoWithheld">What the who rule held back — drop offers whose item page names
+/// no creature in that zone and which this character has never looted there (DRA-84 D4). Its own
+/// field beside <paramref name="GearWithheld"/> rather than summed into it: a cap and a rule are
+/// different causes, and one number could explain neither.</param>
 /// <param name="Gaps">Answerable goals that produced nothing, each with its reason and —
 /// where the answer is a file the game writes — the command as selectable text.</param>
 /// <param name="Deferred">Selected goals whose engine does not exist yet, each naming the
@@ -71,6 +75,7 @@ public sealed record CompanionHelperSection(
     string Cap,
     string GearWithheld,
     string GearBandRefused,
+    string GearWhoWithheld,
     IReadOnlyList<CompanionHelperNote> Gaps,
     IReadOnlyList<CompanionHelperNote> Deferred,
     CompanionHelperEmpty? Empty = null);

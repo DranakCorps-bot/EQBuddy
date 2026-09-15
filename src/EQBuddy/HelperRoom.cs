@@ -995,6 +995,16 @@ internal sealed class HelperRoom : Grid, IShellRoom
             block.Children.Add(Door(new HelperDoor(HelperDoorKind.Gear, "")));
         }
 
+        // **AND THE WHO RULE'S** (DRA-84 D4, plan P3). The third count spent before a row
+        // exists, and the third to get its own sentence rather than be summed into the others:
+        // a cap, a band and a missing creature are three causes with three remedies, and the
+        // player can act on all three only if they can tell which one happened.
+        if (HelperPresentation.GearWhoWithheld(_answers.GearWhoWithheld) is { Length: > 0 } whoCap)
+        {
+            block.Children.Add(Line(whoCap, Role.Caption));
+            block.Children.Add(Door(new HelperDoor(HelperDoorKind.Gear, "")));
+        }
+
         foreach (var gap in _answers.Gaps) block.Children.Add(Gap(gap));
 
         foreach (var goal in _answers.NotAnsweredYet)
@@ -1268,6 +1278,14 @@ internal sealed class HelperRoom : Grid, IShellRoom
         $"helperBandRefused={_answers.GearBandRefusals.Count} " +
         $"helperBandLine={(HelperPresentation.GearBandRefused(_answers.GearBandRefusals).Length > 0 ? 1 : 0)} " +
         $"helperBandGate={(_bandGate ? 1 : 0)} " +
+        // **DRA-84 D4: the who rule, in the same two-numbers-one-moment shape.** `helperWho` is
+        // how many DRAWN item lines can name a creature from the page, `helperWhoWithheld` is
+        // how many offers the rule removed, and `helperWhoLine` is whether the room said so. A
+        // room drawing three items with three silent who clauses and a room drawing three with
+        // named creatures are the same screen to every other key here.
+        $"helperWho={_answers.Top.Sum(r => r.Why.OfType<GearUpgradeFact>().Count(f => f.Who.Count > 0))} " +
+        $"helperWhoWithheld={_answers.GearWhoWithheld} " +
+        $"helperWhoLine={(HelperPresentation.GearWhoWithheld(_answers.GearWhoWithheld).Length > 0 ? 1 : 0)} " +
         // Whether a popup is OPEN. The staged state the shot photographs, and the assertion
         // that the review hook armed the control rather than merely being spelled correctly.
         $"helperPickerOpen={((_goalPicker?.IsOpen ?? false) || (_factionPicker?.IsOpen ?? false) || (_unlockPicker?.IsOpen ?? false) || (_wornPicker?.IsOpen ?? false) || (_professionPicker?.IsOpen ?? false) ? 1 : 0)} " +

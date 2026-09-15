@@ -296,13 +296,14 @@ public static class HelperPresentation
         // that is the line the Gear Locker's "never BiS" lock draws. The catalog label is
         // appended by Why() above, so this sentence can never read as a measurement of play.
         //
-        // The WHO clause is silent where the wiki named nobody, which is every row until the
-        // weekly refresh rebuilds the catalog with DropMobs in it. An unanswered question
-        // draws nothing (trap 73) — and where the player's OWN kills answered it, the fact
-        // beside this one carries it instead and this clause is empty by construction.
+        // **THE WHO CLAUSE IS PLURAL SINCE DRA-84 D4** (plan P3). It is empty in exactly two
+        // states and neither is a guess: the player's OWN kills answered, so the fact beside
+        // this one carries it instead (trap 4), or this is a QUEST row, where the quest is the
+        // path and no creature drops the thing at all. A zone row that could name nobody is no
+        // longer drawn — see GearWhoWithheld, which counts them out loud.
         GearUpgradeFact f =>
             $"{f.Item} beats the {f.Over} in your {Slot(f.Slot)} — {Gain(f)}."
-            + (f.Who.Length > 0 ? $" {f.Who} drops it." : ""),
+            + Who(f),
 
         // The personal half: measured, with its denominator, and the creature named from your
         // own pooled kills rather than from a page.
@@ -573,7 +574,20 @@ public static class HelperPresentation
             $"{GoalLabel(gap.Goal)}: EQBuddy prices a drop by what a vendor has actually paid "
             + "YOU for one, and it has not seen a sale yet. Its own item pages carry vendor "
             + "values quoted at somebody else's Charisma and faction, so they are a fallback "
-            + "rather than the answer — and this build's catalog does not carry them yet.",
+            + "rather than the answer — and nothing you loot carries one.",
+
+        // ---- DRA-84 D4 ----------------------------------------------------------------
+
+        // **THE SUBJECT IS THE PAGES AND NOT THE PLACES.** "Those zones have no camps" is a
+        // claim about the game; what happened is that every item EQBuddy would have offered is
+        // one whose own page names nobody in the zone it drops in, and that this character has
+        // never looted one there either. Both halves are in the sentence because both are
+        // things a player can change.
+        GoalGapReason.NoUpgradeNamesACreature =>
+            $"{GoalLabel(gap.Goal)}: EQBuddy found upgrades in its catalog and cannot tell you "
+            + "what to kill for any of them — no item page names a creature in the zone it "
+            + "drops in, and you have not looted one there. It would rather say that than send "
+            + "you to a zone with only a name in hand.",
 
         _ => "",
     };
@@ -908,6 +922,27 @@ public static class HelperPresentation
         : $"{withheld:N0} more {(withheld == 1 ? "upgrade" : "upgrades")} matched and are not "
           + "listed — EQBuddy names a few per slot rather than every one it has read about.";
 
+    /// <summary>
+    /// **WHAT THE WHO RULE HELD BACK** (DRA-84 D4, plan P3; trap 50).
+    ///
+    /// <para><b>Its own sentence, deliberately not folded into
+    /// <see cref="GearWithheld"/>.</b> That one is a CAP — EQBuddy naming a few of the many it
+    /// could have named — and this one is a RULE with a different cause and a different remedy.
+    /// Summing them would produce one number that can explain neither, which is the failure
+    /// trap 50 is about rather than a tidier surface.</para>
+    ///
+    /// <para><b>The subject is EQBuddy's own knowledge, never the game.</b> "Nothing drops it
+    /// there" would be a claim about the world; what actually happened is that the item's page
+    /// named no creature for that zone and this character has never looted one there. The
+    /// sentence says both halves, because both are things a player can change — one by playing,
+    /// one by editing the page.</para>
+    /// </summary>
+    public static string GearWhoWithheld(int withheld) => withheld <= 0
+        ? ""
+        : $"{withheld:N0} more drop {(withheld == 1 ? "offer is" : "offers are")} not listed: "
+          + "the item's page names nothing that drops it in that zone, and you have not looted "
+          + "one there. EQBuddy leaves out a camp it cannot tell you what to kill at.";
+
     /// <summary>How many refused zones are NAMED before the sentence counts the rest. Three,
     /// which is <c>GearNamedPerRow</c> and <c>DefaultCap</c>'s reason one surface out: a
     /// caption that listed eleven zones with eleven bands would be a table pretending to be a
@@ -1184,4 +1219,34 @@ public static class HelperPresentation
         f.GainMetric.Equals("ratio", StringComparison.OrdinalIgnoreCase)
             ? $"{f.GainBy:+0.00;-0.00} ratio"
             : $"{f.GainBy:+#;-#;0} {f.GainMetric}";
+
+    /// <summary>
+    /// **WHAT DROPS IT, IN THE WIKI'S OWN WORDS AND ITS OWN ORDER** (DRA-84 D4, plan P3;
+    /// Founder acceptance item 2).
+    ///
+    /// <para>The list joins with the ordinary English comma-and rather than a bulleted run,
+    /// because this rides INSIDE a sentence about an item and on the phone it rides the row
+    /// with no hover to escape to (trap 35). The verb agrees with the count — "a bandit drops
+    /// it" and "a bandit, a hill giant and a ghoul drop it" — which matters more than it looks
+    /// like it should: the creature names are lower-case nouns from the page, so the verb is
+    /// the only thing in the clause telling a reader whether they are looking at one name or a
+    /// list.</para>
+    ///
+    /// <para><b>What the cap held back is named as the PAGE's, not as EQBuddy's</b>
+    /// (trap 50). "and 4 more on its page" says where the rest are and implies the door;
+    /// "and 4 more" alone would read as EQBuddy having measured something it has not.</para>
+    /// </summary>
+    private static string Who(GearUpgradeFact f)
+    {
+        if (f.Who.Count == 0) return "";
+
+        var names = f.Who.Count == 1
+            ? f.Who[0]
+            : string.Join(", ", f.Who.Take(f.Who.Count - 1)) + " and " + f.Who[^1];
+        var verb = f.Who.Count == 1 && f.WhoWithheld == 0 ? "drops" : "drop";
+        var more = f.WhoWithheld > 0
+            ? $", and {f.WhoWithheld:N0} more on its page"
+            : "";
+        return $" {names}{more} {verb} it.";
+    }
 }

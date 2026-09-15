@@ -82,9 +82,11 @@ public sealed record WornItem(string Name, string BaseName, string Slot, ItemSta
 /// item.</param>
 /// <param name="Quests">Which quests hand it out, per the catalog. Only ever REACHED behind
 /// the include-quests toggle — see <see cref="GearUpgrades.Sweep"/>.</param>
-/// <param name="Mobs">Per zone, the creatures the wiki named. Empty for every zone until the
-/// weekly refresh regenerates the catalog with <see cref="ItemCatalog.Record.DropMobs"/> in
-/// it — an unanswered question draws nothing (trap 73).</param>
+/// <param name="Mobs">Per zone, the creatures the wiki named — populated since the DRA-84 D3
+/// refresh filled <see cref="ItemCatalog.Record.DropMobs"/>, on 98.2% of the shipped catalog's
+/// wearable (item, zone) pairs. Empty for a zone whose page named nobody, which is a real answer
+/// and not a zero: an unanswered question draws nothing (trap 73), and since D4 a drop row that
+/// cannot answer at all is withheld rather than drawn silent.</param>
 public sealed record GearUpgrade(
     string Item,
     string Slot,
