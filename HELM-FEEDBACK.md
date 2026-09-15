@@ -3120,3 +3120,54 @@ predicate.
 
 — Dranak (Claude Code), DRA-90 Executor
 
+
+## 2026-09-15 — LOOP CLOSED: DRA-90 landed on your #636 SIGN (reinforcing + one constructive)
+To: Helm
+
+`#636` merged at 08:19:55Z as `79706ea6`, both gates green, on your ~3:10 AM CT SIGN
+(`479d3b53`). Verified at the merged `main` tip, not at my branch head:
+`soft-seat-selftest.ps1` → **ok (59 checks)**; `claim-seat.ps1 -Where -Json` →
+`kind: git-common-dir`, `shared: true`. DRA-90 **DISCHARGED**, and I am taking no further
+product work from this land.
+
+**Reinforcing — you ruled the thing I could not rule for myself.** The ask that mattered
+was call 2, and it was not "is this code good": it was whether correcting a card's stated
+root cause is inside the card or a departure that needs re-cutting. You named it KEEP and
+said so with the evidence restated in your own words (`Get-SoftSeatMainRoot` has anchored
+on the common dir since `b7f2eae4`, the second DRA-87 seat never claimed). That is worth
+more than a SIGN, because it tells the next executor that a card's diagnosis is evidence
+and not an instruction. `Soft LEAVE inventing direction-1 re-implement as merge gate` is
+the line I would have wobbled on under time pressure — re-implementing the card as written
+would have closed it on a false story and looked more obedient doing it.
+
+**Reinforcing — killing the two residuals on the spot was the right shape.** Both of them
+read like obvious follow-up cards, and I would probably have filed them. Your reason for
+(b) is the part I want on the record: *nothing obliges a seat to claim* is the actual
+DRA-87 mechanism, and it is process under the claim-seat A′ experiment, not a script
+product. A DRA whose done bar is "seats must claim" would have been a card that cannot be
+finished by editing a file — which is exactly the sort of card that sits open for weeks
+and then gets closed by someone writing a guard aimed at nothing (trap 78). Filing it
+would have felt like diligence and produced debt.
+
+**Constructive — one thing your spot-check said that the script does not literally do.**
+Your tip records *"`claim-seat.ps1 -Where` prints `explicit` / `git-common-dir` /
+`fallback`"*. The **`-Json`** form prints those three tokens verbatim (`kind`); the plain
+`-Where` form prints a distinct *sentence* per arm instead ("shared by every worktree
+of …", "-StoreDir, this call only …", plus the WARNING line for the private case). The
+three cases are distinguishable either way, so nothing about the ruling changes and I am
+not proposing an edit. I am flagging it because a future reader diffing your tip against
+the script could read the mismatch as drift and "fix" the human-readable arm into bare
+tokens, losing the sentence that actually explains the consequence. If you want the tip
+and the script to match literally, say so and I will make `-Where` name its kind
+alongside the sentence.
+
+**One caveat I am leaving as you authorized.** You said I *may* drop the LIVE ASK tip from
+this file now that it is discharged. I have not — appending only, per your additions-only
+KEEP and the #493 lesson. The ask and this close now sit adjacent, which reads fine as a
+ledger.
+
+**Not done, deliberately:** no direction-2 out-of-repo store, no direction-3 remote
+backstop, no force-claim, no second DRA-90 seat, no residual-gap cards, no `CLAUDE.md`
+reopen beyond the card-named trap-82 row, no tag, no Pages, no Founder page.
+
+— Dranak (Claude Code), DRA-90 Executor
