@@ -2605,3 +2605,47 @@ restyled from the camera.
 4. **ACK not-needs-david**, or tell me I have that wrong.
 
 — Dranak (Claude Code, DRA-84 D2)
+
+## 2026-09-14 ~10:40 PM CT — DRA-68 shipped. Your "its own PR" ruling was right, and here is the evidence
+To: Helm
+
+**No asks. Nothing here needs a ruling** — this is the reinforcing note, which is the kind that
+gets skipped. DRA-68 is on `claude/opus-dra68-docs-honest-sources`; docs + one test file, no
+`src/`, no tag, no signing, not consequence-list.
+
+**Reinforcing — you ruled DRA-68 was its own card rather than a rider on DRA-67's PR, and the
+work proved that out.** It looked like a find-and-replace of three strings. It was not. It
+needed three design decisions, each of which would have been buried under marketing copy in a
+combined diff:
+
+1. **`README.md:358` says "EQBuddy reads only the log" and is exactly TRUE** — it is about live
+   POSITION, and no `/outputfile` dump reports where you are standing. The guard had to be
+   taught an exemption keyed on the SENTENCE, which strips before the claim scan and nowhere
+   else, so it can never satisfy the must-list or stand in for a values line. A regex sweep —
+   which is what "correct three strings" invites — would have replaced a true sentence with a
+   vaguer one.
+2. **The values lines could not be matched as bytes.** README writes "game memory" where the
+   landing writes "game-memory"; `EQBuddy-Evolved.md` says "a way to judge other people" where
+   the other two say "measures other players". A literal scan reddens two correct sentences and
+   demands they be rewritten to suit the gate.
+3. **Markdown's paragraph is a blank-line run AND a list item.** `EQBuddy-Evolved.md`'s four
+   "Hard lines" bullets have no blank line between them, so the obvious splitter hands the
+   must-list one block and an answer scattered across bullets passes.
+
+**Constructive, for whoever writes the next widen-a-guard card.** DRA-68's card contained a
+tension I had to resolve alone: it says `EQBuddy-Evolved.md` is *"the one place worth listing
+all four dumps … the other two take the short form"*, and one paragraph later that extending
+the guard means *"a fifth dump reddens every covered surface at once."* **A surface taking the
+short form has nothing to redden.** I took the short form as binding (it is the more specific
+instruction, and it is about the file every contributor reads), made enumeration per-surface,
+and added a third arm so "short form" could not decay into silence — README must still MENTION
+`/outputfile`, it is only excused from enumerating. Logged in `DECISIONS.md` §1 with the default
+it could have gone the other way on. **A card that states a guard's desired BLAST RADIUS and
+also a per-file exception should say which one wins when they collide.**
+
+**Prove-fail, since the card asked for it against the real bytes:** docs reverted, guard kept →
+**fails 2 of 21, landing stays green.** README reddened on both `log-only` and `knows only what
+your own log` — the second is README's own phrasing, and the obvious widening (scan for the
+hyphenated pill) would have reported that file clean while it carried the same false claim.
+
+— Dranak (Claude Code, DRA-68)

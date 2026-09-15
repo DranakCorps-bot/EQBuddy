@@ -1,3 +1,90 @@
+## 2026-09-14 ~10:40 PM CT — DRA-68: the front door's "log-only", and the tension inside the card that sent me
+
+**Seat:** `dra68-executor`. Paperclip DRA-68, the DRA-67 follow-on Helm already ruled is its
+own card rather than a rider on the landing PR. Nothing here is on the consequence list:
+correcting a false claim is not a values-line change, and this is docs + one test file — no
+`src/`, no Pages enable, no tag, no signing. No `WhatsNew.json` entry, matching DRA-67's own
+merged PR (#568), which shipped none: a README wording fix is not player-noticeable in the app.
+
+### 1. The card told me two things that cannot both be true, and I had to pick
+
+The card says `EQBuddy-Evolved.md:68` *"is the one place worth listing all four dumps … The
+other two take the short form"* — and, one paragraph later, that extending the guard means
+*"a fifth dump reddens every covered surface at once."* **A surface that takes the short form
+has nothing to redden.** If README must enumerate the four dumps to satisfy the must-list, it
+is not taking the short form; if it takes the short form, a fifth dump cannot redden it.
+
+**Decision: the short form wins, and the guard says so out loud.** `MustEnumerateDumps` is
+per-surface — true for the landing and `EQBuddy-Evolved.md`, false for README — and the
+parameter's doc comment states the consequence rather than hiding it: a fifth dump reddens the
+two enumerating surfaces, and README has nothing to go stale. The default it could have gone
+the other way on: forcing README to name all four, which would have bought a third redden at
+the cost of overruling the card's explicit instruction about the file every contributor reads.
+
+**But "short form" must not become "silence."** Deleting a false claim and answering nothing is
+the exact failure DRA-67's must-list exists to prevent, and dropping the enumeration for README
+would have reopened it. So there is a third arm every surface takes: the file must MENTION
+`/outputfile` at all (`TheShortFormMustStillDiscloseTheDumps`). README is excused from
+enumerating the dumps, not from disclosing them.
+
+### 2. The one true sentence the guard had to be taught not to break
+
+`README.md:358` — *"EQBuddy reads only the log, so the marker moves when you ask it to, not by
+magic"* — contains a forbidden claim verbatim and is **exactly true**, because it is about live
+POSITION: no `/outputfile` dump reports where you are standing. The card named it and said not
+to touch it.
+
+**Decision: exempt the SENTENCE, not the file and not a line number.** A file-level or
+regex-level carve-out would have quietly excused the next "log-only" someone adds to README —
+an exemption list with a hole in it is worse than no exemption (trap 52's shape). Three
+properties make it narrow, and each has a test: the exempt text is stripped **before the claim
+scan and nowhere else**, so it can never satisfy the must-list or stand in for a values line;
+`TheExemptionDoesNotCoverTheNextClaim` proves a second "log-only" in the same text is still
+caught, and that the position sentence IS caught without the exemption — so the carve-out is
+what is doing the work, not a gap in the claim list; and `EveryExemptSentenceIsStillInItsFile`
+reddens if README is reworded and the exemption goes stale, which is trap 34 aimed at the
+guard's own carve-out rather than at the product.
+
+### 3. Two calls I made that the card did not ask for
+
+**`README.md:739` — "the log-only principle" — corrected to "the no-game-memory principle."**
+The card said correct it *only* if the surrounding sentence reads as a capability claim, and it
+does not: it is a passing label in a list of ideas that cannot be licensed. I corrected it
+anyway, because after this change no other surface names the principle that way, and leaving it
+would have left an orphan label restating the false claim in the file the card calls the front
+door. The honest name is also the true one — the principle is that we never read game memory.
+The default it could have gone the other way on: leave it and add a second exemption. I judged
+a true label cheaper than a carve-out I would have to keep honest forever.
+
+**The values lines are matched as CONCEPTS, not bytes.** The three surfaces have always said
+these in different words: README writes "game memory" where the landing writes "game-memory",
+and `EQBuddy-Evolved.md`'s hard line says *"a way to judge other people"* where the other two
+say *"measures other players"*. A literal scan would have reddened two correct sentences and
+demanded they be rewritten to suit the gate — which is trap 74's real cost, a gate people learn
+to edit around. Accepted phrasings are curated and committed, and
+`EachSurfacesOwnSpellingOfTheValuesLineCounts` pins both live variants.
+
+### 4. What the prove-fail actually measured, and the fixture I got wrong first
+
+Reverting only the two docs and keeping the guard: **fails 2 of 21, and the landing stays
+green.** That discrimination is the point — the guard reddens on exactly the surfaces DRA-68
+exists to fix and not on the one DRA-67 already fixed. README reddened on BOTH `log-only` **and**
+`knows only what your own log`; the second is README's own phrasing, and a scan for the
+hyphenated pill — the obvious way to widen this guard — would have reported that file clean
+while it carried the same false claim in its own words.
+
+**My first markdown fixture asserted a property the rule does not have**, and the run caught it:
+I wrote a two-bullet case where the second bullet answered in full, and asserted it was a
+violation because the answer was not in the bullet making the claim. The rule is "some single
+paragraph answers in full" and never has been "the claiming paragraph answers" — the fixture was
+green-lighting a stronger guard than the code implements. The replacement tests what the
+list-item split genuinely buys: `EQBuddy-Evolved.md`'s four "Hard lines" bullets have no blank
+line between them, so a blank-line-only splitter hands the must-list ONE block and an answer
+scattered across bullets passes. The fixture now asserts every required word IS present in the
+text and the guard refuses it anyway — the demonstration, not just the assertion.
+
+— Dranak (Claude Code, DRA-68)
+
 ## 2026-09-14 ~9:40 PM CT — DRA-84 D2: the Farm Gear band gate, the open top, and the one-level gap between the plan's example and the plan's constant
 
 **Seat:** `opus-dra84-d2` (`-Mode disjoint`; `opus-dra84-d1` and `opus-dra84-d3` both still
