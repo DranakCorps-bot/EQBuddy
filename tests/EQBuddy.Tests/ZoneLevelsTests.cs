@@ -4,13 +4,20 @@ using Xunit;
 namespace EQBuddy.Tests;
 
 /// <summary>
-/// Zone level bands (DRA-84 D1, plan P1) — eqlwiki's <c>Level of Monsters</c> row, promoted
-/// from the COMMITTED wikitext cache by <c>scripts/harvests/eqlwiki/zonelevels-transform.py</c>.
+/// Zone level bands (DRA-84 D1, plan P1; open top learned in D2) — eqlwiki's
+/// <c>Level of Monsters</c> row, promoted from the COMMITTED wikitext cache by
+/// <c>scripts/harvests/eqlwiki/zonelevels-transform.py</c>.
 ///
-/// <para>This slice ships an INSTRUMENT and a measurement; no engine reads a band yet. So
-/// what these tests hold is the two things a later gate will rest on and cannot check for
+/// <para>What these tests hold is the two things the D2 gate rests on and cannot check for
 /// itself: <b>that a band is the wiki's number and never ours</b>, and <b>that a lookup
-/// never hands one zone another zone's band</b>.</para>
+/// never hands one zone another zone's band</b>. <c>RecommendationsGearTests</c> owns what the
+/// gate does with them.</para>
+///
+/// <para><b>D2 widened the admitted shapes to four, and the widening is guarded from both
+/// sides.</b> The open top (`50+`, `30-50+`) is now a band with a null <c>Max</c> on Helm's
+/// named ruling; what stayed refused — multi-range, range-plus-prose, `Quest Only` — is held
+/// by committed negatives that are all real pages, because a scope that quietly widened to
+/// coalesce `1-13+, 35-50` would be inventing the continuity the page denies.</para>
 ///
 /// <para>The lookup half is written as a must-list PAIRED with committed negatives (trap 34,
 /// trap 78). The negatives are not hypothetical: every one of them is a real
@@ -37,79 +44,127 @@ public class ZoneLevelsTests
         Assert.True(Shipped.BandCount > 0,
             "ZoneLevelBands.json did not load — an embedded resource that silently answers " +
             "nothing is a guard aimed at nothing (trap 78).");
-        Assert.Equal(46, Shipped.BandCount);
-        Assert.Equal(72, Shipped.AbsentCount);
+        // 46 closed + 41 open tops. D1 shipped 46/72; the split is asserted below, so a
+        // rule change that moved rows between the two buckets without moving either total
+        // cannot pass here (trap 74's report half, one file over).
+        Assert.Equal(87, Shipped.BandCount);
+        Assert.Equal(31, Shipped.AbsentCount);
         Assert.Equal(118, Shipped.BandCount + Shipped.AbsentCount);
+        Assert.Equal(16, Shipped.RefusedCount);
+        Assert.Equal(15, Shipped.NoRowCount);
     }
 
-    /// <summary>The plan's two cited exhibits, quoted from the pages this session read.
-    /// Crushbone is the Founder's Farm Gear complaint in one row; Rathe Mountains is the one
-    /// a level rule can never refuse, and it is here so nobody later mistakes the band for
-    /// the answer to that half.</summary>
+    private static IEnumerable<ZoneLevels.Band> AllBands =>
+        Shipped.BandedZones.Select(z => Shipped.BandFor(z)!);
+
+    /// <summary>The two buckets, counted. The open tops are the class D1 refused and D2
+    /// learned, and 41 of 87 is too large a share to leave uncounted: a caller that forgot
+    /// <c>Max</c> can be null would be wrong about nearly half the shipped data.</summary>
+    [Fact]
+    public void TheOpenTopsAreCountedSeparatelyFromTheClosedBands()
+    {
+        var open = AllBands.Count(b => b.OpenTop);
+        Assert.Equal(41, open);
+        Assert.Equal(46, Shipped.BandCount - open);
+        Assert.All(AllBands.Where(b => b.OpenTop), b => Assert.Null(b.Max));
+        Assert.All(AllBands.Where(b => !b.OpenTop), b => Assert.NotNull(b.Max));
+    }
+
+    /// <summary>The plan's cited exhibits, quoted from the pages this session read. Crushbone
+    /// is the Founder's Farm Gear complaint in one row; Rathe Mountains is the one a level rule
+    /// can never refuse, and it is here so nobody later mistakes the band for the answer to
+    /// that half. The last four are open tops — Plane of Sky is the verbatim Helm's ruling
+    /// named, and Lower Guk the heaviest drop zone it reaches.</summary>
     [Theory]
     [InlineData("Crushbone", 5, 20, "5-20")]
     [InlineData("Rathe Mountains", 13, 45, "13-45")]
     [InlineData("Greater Faydark", 1, 12, "1-12")]
     [InlineData("Najena", 8, 35, "8-35")]
-    public void TheCitedBandsAreWhatTheWikiPageSays(string zone, int min, int max, string verbatim)
+    [InlineData("Plane of Sky", 50, null, "50+")]
+    [InlineData("Lower Guk", 30, null, "30-50+")]
+    [InlineData("Temple of Veeshan", 60, null, "60+")]
+    [InlineData("Karnor's Castle", 40, null, "40-55+")]
+    public void TheCitedBandsAreWhatTheWikiPageSays(string zone, int min, int? max, string verbatim)
     {
         var band = Shipped.BandFor(zone);
         Assert.NotNull(band);
         Assert.Equal(min, band!.Min);
         Assert.Equal(max, band.Max);
         Assert.Equal(verbatim, band.Verbatim);
+        Assert.Equal(max is null, band.OpenTop);
     }
 
-    /// <summary>Every shipped band is arithmetically a band, AND its numbers re-derive from
-    /// the verbatim it cites. A band whose numbers do not come out of its own quoted row is
-    /// a number we made up with a citation stapled to it (trap 73).</summary>
+    /// <summary>
+    /// Every shipped band is arithmetically a band, AND its numbers re-derive from the verbatim
+    /// it cites. A band whose numbers do not come out of its own quoted row is a number we made
+    /// up with a citation stapled to it (trap 73).
+    ///
+    /// <para><b>The open-top arm asserts the top is DROPPED</b>, which is the half of Helm's
+    /// option (a) a reading could quietly get wrong: `30-50+` must not ship 50 as a maximum,
+    /// because the `+` is the page saying creatures above 50 are there.</para>
+    /// </summary>
     [Fact]
     public void EveryBandReDerivesFromTheRowItQuotes()
     {
-        foreach (var zone in Shipped.BandedZones)
+        foreach (var band in AllBands)
         {
-            var band = Shipped.BandFor(zone)!;
             Assert.InRange(band.Min, 1, 99);
-            Assert.InRange(band.Max, band.Min, 99);
+            if (band.Max is { } max) Assert.InRange(max, band.Min, 99);
 
-            var parts = band.Verbatim.Split('-');
-            var expected = parts.Length switch
+            var open = band.Verbatim.EndsWith('+');
+            Assert.Equal(open, band.OpenTop);
+
+            var parts = band.Verbatim.TrimEnd('+').Split('-');
+            Assert.Equal(int.Parse(parts[0]), band.Min);
+            if (open)
             {
-                1 => (int.Parse(parts[0]), int.Parse(parts[0])),
-                2 => (int.Parse(parts[0]), int.Parse(parts[1])),
-                _ => (-1, -1),
-            };
-            Assert.Equal(expected, (band.Min, band.Max));
+                // The stated top, where there was one, is evidence the row was well formed and
+                // is deliberately NOT the Max.
+                Assert.InRange(parts.Length, 1, 2);
+                if (parts.Length == 2) Assert.InRange(int.Parse(parts[1]), band.Min, 99);
+            }
+            else
+            {
+                Assert.Equal(parts.Length == 2 ? int.Parse(parts[1]) : band.Min, band.Max);
+            }
         }
     }
 
-    /// <summary>The refusal rule, asserted on its observable consequence: no shipped band was
-    /// read out of an open top or a multi-range. These are the shapes the transform refuses,
-    /// and refusing them is the whole reason the coverage is 46 of 118 rather than 103.</summary>
+    /// <summary>
+    /// The admitted set is exactly FOUR shapes, asserted as a whole-string match on every
+    /// shipped verbatim.
+    ///
+    /// <para>Written as a pattern rather than as "contains no comma" (which is what D1 had)
+    /// because D2 admits a `+` and a character-by-character denial can no longer express the
+    /// rule: `20-40+ (50+ inside pit)` contains a `+` too, and the difference is that the `+`
+    /// is not the ONLY defect. A whole-string match is the rule itself, so a scope that widened
+    /// to prose or to a multi-range fails here rather than needing a new clause.</para>
+    /// </summary>
     [Fact]
-    public void NoShippedBandCameFromAShapeTheTransformRefuses()
+    public void EveryShippedVerbatimIsOneOfTheFourAdmittedShapes()
     {
-        foreach (var zone in Shipped.BandedZones)
-        {
-            var verbatim = Shipped.BandFor(zone)!.Verbatim;
-            Assert.DoesNotContain("+", verbatim, StringComparison.Ordinal);
-            Assert.DoesNotContain(",", verbatim, StringComparison.Ordinal);
-            Assert.DoesNotContain(" ", verbatim, StringComparison.Ordinal);
-        }
+        foreach (var band in AllBands)
+            Assert.Matches(@"^\d{1,2}(-\d{1,2})?\+?$", band.Verbatim);
     }
 
-    /// <summary>…and the committed negatives that prove the refusal FIRES on real pages,
-    /// each carrying the verbatim it refused so a later slice can see what it is deciding
-    /// about. Without these the test above passes on a transform that reads nothing at
-    /// all.</summary>
+    /// <summary>…and the committed negatives that prove the refusal still FIRES on real pages,
+    /// each carrying the verbatim it refused. Without these the test above passes on a
+    /// transform that reads nothing at all (trap 78).
+    ///
+    /// <para><b>Every row here is a page whose `+` was NOT the only thing wrong with it</b>, or
+    /// a page declining to answer. The first three are the scope boundary Helm drew by name:
+    /// `1-13+, 35-50` has a trailing-`+` range INSIDE it, and coalescing it to "1 and above"
+    /// would assert a continuity the page contradicts by printing the gap.</para></summary>
     [Theory]
-    [InlineData("Plane of Sky", "50+")]
-    [InlineData("Plane of Fear", "48+")]
-    [InlineData("Temple of Veeshan", "60+")]
+    [InlineData("Kithicor Forest", "1-13+, 35-50")]
+    [InlineData("The Overthere", "20-40+ (50+ inside pit)")]
+    [InlineData("Thurgadin", "30-35 (in caves), 30-45 (dwarves)")]
     [InlineData("Butcherblock Mountains", "1-15, 35")]
     [InlineData("Lesser Faydark", "10-30, 40-50")]
+    [InlineData("Temple of Droga", "29-34 Droga Main, 33-38 Inner Sanctum")]
     [InlineData("The Arena", "n/a")]
     [InlineData("Surefall Glade", "?")]
+    [InlineData("The Temple of Solusek Ro", "Quest Only")]
     // The one that matters most: Qeynos Aqueducts has its OWN page, refused, and it sits one
     // containment hop from Qeynos's 1-9. Refused — not the city's band, and not Unknown
     // either, because we DID read its page.
@@ -128,7 +183,8 @@ public class ZoneLevelsTests
     /// one out loud (trap 34's must-list).</summary>
     [Theory]
     [InlineData("Crushbone", ZoneLevels.Source.Banded)]
-    [InlineData("Plane of Sky", ZoneLevels.Source.Refused)]
+    [InlineData("Plane of Sky", ZoneLevels.Source.Banded)]   // was Refused until D2
+    [InlineData("Butcherblock Mountains", ZoneLevels.Source.Refused)]
     [InlineData("Freeport", ZoneLevels.Source.NoRow)]
     [InlineData("Neriak", ZoneLevels.Source.NoRow)]
     [InlineData("Plane of Knowledge", ZoneLevels.Source.Unknown)]
@@ -228,31 +284,65 @@ public class ZoneLevelsTests
     [Fact]
     public void TwoTitlesThatFoldTogetherAndAgreeStillAnswer()
     {
-        // The real shipped case: both Chardok pages give "50+", so both are Refused with the
-        // same verbatim and the folded key is not ambiguous at all.
+        // The real shipped case: both Chardok pages give "50+", so both carry the SAME band and
+        // the folded key is not ambiguous at all. Until D2 both were Refused with the same
+        // verbatim and this asserted the agreement on that; the agreement is now over a band,
+        // which is the stronger half — Agrees() compares the Band record too.
         var answer = Shipped.Lookup("Chardok");
-        Assert.Equal(ZoneLevels.Source.Refused, answer.Source);
+        Assert.Equal(ZoneLevels.Source.Banded, answer.Source);
         Assert.Equal("50+", answer.Verbatim);
+        Assert.Equal(50, answer.Band!.Min);
+        Assert.Null(answer.Band.Max);
     }
 
     // ---- Is the data a per-zone fact, or a template? ----------------------------------------
 
-    /// <summary>The distinct-count telltale (trap 73). 48 authored guide steps carrying ten
-    /// distinct sentences between them was a template nobody noticed by reading. A per-zone
-    /// band should be nearly as varied as the zones carrying it; a floor of two-thirds is
-    /// loose enough for the genuine repeats (three zones really are 30-40) and tight enough
-    /// that a parse which latched onto some shared infobox default would fail.</summary>
+    /// <summary>
+    /// The distinct-count telltale (trap 73). 48 authored guide steps carrying ten distinct
+    /// sentences between them was a template nobody noticed by reading. A per-zone band should
+    /// be nearly as varied as the zones carrying it; the two-thirds floor is loose enough for
+    /// the genuine repeats (three zones really are 30-40) and tight enough that a parse which
+    /// latched onto a shared infobox default would fail.
+    ///
+    /// <para><b>D2 re-derived which population the floor is applied to, and that is a change
+    /// worth reading rather than a threshold being relaxed to fit.</b> An open top DISCARDS its
+    /// maximum by design, so (Min, Max) over all 87 bands measures a deliberately coarser fact
+    /// than D1's 46 did — it comes out at 53/87 = 0.61, under the floor, and NOT because the
+    /// data got worse. So the floor is applied where it was calibrated (the closed bands, on the
+    /// parsed pair) and to the measure a template would actually collapse (the verbatim row,
+    /// over everything). Both clear it: 36/46 and 64/87.</para>
+    /// </summary>
     [Fact]
     public void TheBandsAreAPerZoneFactRatherThanATemplate()
     {
-        var distinct = Shipped.BandedZones
-            .Select(z => Shipped.BandFor(z)!)
-            .Select(b => (b.Min, b.Max))
-            .Distinct()
-            .Count();
-        Assert.True(distinct * 3 >= Shipped.BandCount * 2,
-            $"only {distinct} distinct bands across {Shipped.BandCount} zones — that reads " +
-            "like a template, not the wiki's own per-zone numbers.");
+        var closed = AllBands.Where(b => !b.OpenTop).ToList();
+        var closedDistinct = closed.Select(b => (b.Min, b.Max)).Distinct().Count();
+        Assert.True(closedDistinct * 3 >= closed.Count * 2,
+            $"only {closedDistinct} distinct bands across {closed.Count} closed-band zones — " +
+            "that reads like a template, not the wiki's own per-zone numbers.");
+
+        var verbatims = AllBands.Select(b => b.Verbatim).Distinct().Count();
+        Assert.True(verbatims * 3 >= Shipped.BandCount * 2,
+            $"only {verbatims} distinct `Level of Monsters` rows across {Shipped.BandCount} " +
+            "banded zones — a shared infobox default would look exactly like this.");
+    }
+
+    /// <summary>
+    /// The open tops repeat MORE than the closed bands do, and that is measured and written
+    /// down rather than smoothed over: 41 zones carry only 17 distinct bottoms.
+    ///
+    /// <para>It is the wiki's own repetition — five plane pages print `50+` and three print
+    /// `48+` — so it is not the template signal the floor above hunts, and holding it to that
+    /// floor would fail a true reading of real pages. It is pinned as an OBSERVATION instead, so
+    /// the day the shape of this class changes somebody has to look at it.</para>
+    /// </summary>
+    [Fact]
+    public void TheOpenTopsRepeatMoreThanTheClosedBandsAndTheNumberIsPinned()
+    {
+        var open = AllBands.Where(b => b.OpenTop).ToList();
+        Assert.Equal(41, open.Count);
+        Assert.Equal(17, open.Select(b => b.Min).Distinct().Count());
+        Assert.Equal(5, open.Count(b => b.Verbatim == "50+"));
     }
 
     // ---- The report ------------------------------------------------------------------------
@@ -275,15 +365,27 @@ public class ZoneLevelsTests
 
         // Every bucket, from the catalog's own numbers — the three ABSENT kinds are exactly
         // where a rule change moves rows without moving a total (trap 74's report half).
+        var open = AllBands.Count(b => b.OpenTop);
         Assert.Contains($"- Bands shipped in `ZoneLevelBands.json`: **{Shipped.BandCount}**",
             report, StringComparison.Ordinal);
-        Assert.Contains($"- ABSENT — row present but not `N-M` or `N`: **{Shipped.RefusedCount}**",
+        Assert.Contains($"  - of those, CLOSED (`N-M` / `N`): **{Shipped.BandCount - open}**",
             report, StringComparison.Ordinal);
+        Assert.Contains(
+            $"  - of those, OPEN TOP (`N+` / `N-M+`, `Max` is null): **{open}**",
+            report, StringComparison.Ordinal);
+        Assert.Contains(
+            "- ABSENT — row present and in none of the four admitted shapes: "
+            + $"**{Shipped.RefusedCount}**", report, StringComparison.Ordinal);
         Assert.Contains($"- ABSENT — page has no `Level of Monsters` row: **{Shipped.NoRowCount}**",
             report, StringComparison.Ordinal);
 
         Assert.Contains("## Distinct-count telltale (trap 73)", report, StringComparison.Ordinal);
         Assert.Contains("## Refused verbatims", report, StringComparison.Ordinal);
+        // Every open top listed one zone at a time, which is what makes the class auditable
+        // rather than a count somebody has to take on trust.
+        Assert.Contains("## Open tops learned", report, StringComparison.Ordinal);
+        foreach (var zone in Shipped.BandedZones.Where(z => Shipped.BandFor(z)!.OpenTop))
+            Assert.Contains($"| {zone} | ", report, StringComparison.Ordinal);
         Assert.Contains("## The join", report, StringComparison.Ordinal);
         Assert.Contains("This half is a snapshot.", report, StringComparison.Ordinal);
     }

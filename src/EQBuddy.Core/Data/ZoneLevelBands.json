@@ -1,6 +1,16 @@
 {
  "Source": "eqlwiki zone pages, 'Level of Monsters' infobox row (scripts/harvests/eqlwiki/zonelevels-transform.py; fetches nothing)",
  "Bands": {
+  "Befallen": {
+   "Min": 7,
+   "Max": null,
+   "Verbatim": "7-25+"
+  },
+  "Blackburrow": {
+   "Min": 4,
+   "Max": null,
+   "Verbatim": "4-15+"
+  },
   "Burning Wood": {
    "Min": 40,
    "Max": 55,
@@ -11,10 +21,25 @@
    "Max": 45,
    "Verbatim": "19-45"
   },
+  "Chardok (Post-Revamp)": {
+   "Min": 50,
+   "Max": null,
+   "Verbatim": "50+"
+  },
+  "Chardok (Pre-Revamp)": {
+   "Min": 50,
+   "Max": null,
+   "Verbatim": "50+"
+  },
   "City of Mist": {
    "Min": 35,
    "Max": 55,
    "Verbatim": "35-55"
+  },
+  "Cobalt Scar": {
+   "Min": 35,
+   "Max": null,
+   "Verbatim": "35-60+"
   },
   "Crushbone": {
    "Min": 5,
@@ -31,6 +56,26 @@
    "Max": 25,
    "Verbatim": "10-25"
   },
+  "Dalnir": {
+   "Min": 25,
+   "Max": null,
+   "Verbatim": "25-35+"
+  },
+  "Dragon Necropolis": {
+   "Min": 45,
+   "Max": null,
+   "Verbatim": "45-60+"
+  },
+  "Dreadlands": {
+   "Min": 35,
+   "Max": null,
+   "Verbatim": "35-50+"
+  },
+  "Eastern Plains of Karana": {
+   "Min": 10,
+   "Max": null,
+   "Verbatim": "10-30+"
+  },
   "Eastern Wastes": {
    "Min": 30,
    "Max": 45,
@@ -45,6 +90,16 @@
    "Min": 5,
    "Max": 15,
    "Verbatim": "5-15"
+  },
+  "Everfrost Peaks": {
+   "Min": 1,
+   "Max": null,
+   "Verbatim": "1-20+"
+  },
+  "Field of Bone": {
+   "Min": 1,
+   "Max": null,
+   "Verbatim": "1-50+"
   },
   "Firiona Vie": {
    "Min": 25,
@@ -81,6 +136,11 @@
    "Max": 22,
    "Verbatim": "9-22"
   },
+  "Howling Stones": {
+   "Min": 50,
+   "Max": null,
+   "Verbatim": "50+"
+  },
   "Iceclad Ocean": {
    "Min": 30,
    "Max": 40,
@@ -96,10 +156,20 @@
    "Max": 60,
    "Verbatim": "35-60"
   },
+  "Kael Drakkel": {
+   "Min": 30,
+   "Max": null,
+   "Verbatim": "30-60+"
+  },
   "Kaesora": {
    "Min": 30,
    "Max": 40,
    "Verbatim": "30-40"
+  },
+  "Karnor's Castle": {
+   "Min": 40,
+   "Max": null,
+   "Verbatim": "40-55+"
   },
   "Kedge Keep": {
    "Min": 32,
@@ -121,6 +191,16 @@
    "Max": 35,
    "Verbatim": "15-35"
   },
+  "Lake of Ill Omen": {
+   "Min": 1,
+   "Max": null,
+   "Verbatim": "1-30+"
+  },
+  "Lower Guk": {
+   "Min": 30,
+   "Max": null,
+   "Verbatim": "30-50+"
+  },
   "Mines of Nurga": {
    "Min": 30,
    "Max": 40,
@@ -141,10 +221,60 @@
    "Max": 35,
    "Verbatim": "8-35"
   },
+  "Northern Plains of Karana": {
+   "Min": 10,
+   "Max": null,
+   "Verbatim": "10-30+"
+  },
+  "Oasis of Marr": {
+   "Min": 7,
+   "Max": null,
+   "Verbatim": "7-30+"
+  },
+  "Ocean of Tears": {
+   "Min": 9,
+   "Max": null,
+   "Verbatim": "9-30+"
+  },
   "Old Sebilis": {
    "Min": 48,
    "Max": 60,
    "Verbatim": "48-60"
+  },
+  "Permafrost": {
+   "Min": 15,
+   "Max": null,
+   "Verbatim": "15-50+"
+  },
+  "Plane of Fear": {
+   "Min": 48,
+   "Max": null,
+   "Verbatim": "48+"
+  },
+  "Plane of Growth": {
+   "Min": 55,
+   "Max": null,
+   "Verbatim": "55+"
+  },
+  "Plane of Hate": {
+   "Min": 48,
+   "Max": null,
+   "Verbatim": "48+"
+  },
+  "Plane of Hate cleanupproject": {
+   "Min": 48,
+   "Max": null,
+   "Verbatim": "48+"
+  },
+  "Plane of Mischief": {
+   "Min": 50,
+   "Max": null,
+   "Verbatim": "50+"
+  },
+  "Plane of Sky": {
+   "Min": 50,
+   "Max": null,
+   "Verbatim": "50+"
   },
   "Qeynos": {
    "Min": 1,
@@ -161,15 +291,40 @@
    "Max": 45,
    "Verbatim": "13-45"
   },
+  "Runnyeye": {
+   "Min": 7,
+   "Max": null,
+   "Verbatim": "7-30+"
+  },
+  "Siren's Grotto": {
+   "Min": 50,
+   "Max": null,
+   "Verbatim": "50-60+"
+  },
+  "Skyfire Mountains": {
+   "Min": 40,
+   "Max": null,
+   "Verbatim": "40-60+"
+  },
   "Skyshrine": {
    "Min": 35,
    "Max": 60,
    "Verbatim": "35-60"
   },
+  "Sleeper's Tomb": {
+   "Min": 55,
+   "Max": null,
+   "Verbatim": "55+"
+  },
   "Solusek's Eye": {
    "Min": 20,
    "Max": 40,
    "Verbatim": "20-40"
+  },
+  "Southern Desert of Ro": {
+   "Min": 5,
+   "Max": null,
+   "Verbatim": "5-20+"
   },
   "Southern Karana": {
    "Min": 15,
@@ -186,6 +341,16 @@
    "Max": 46,
    "Verbatim": "14-46"
   },
+  "Swamp of No Hope": {
+   "Min": 1,
+   "Max": null,
+   "Verbatim": "1-25+"
+  },
+  "Temple of Veeshan": {
+   "Min": 60,
+   "Max": null,
+   "Verbatim": "60+"
+  },
   "The Estate of Unrest": {
    "Min": 10,
    "Max": 35,
@@ -195,6 +360,16 @@
    "Min": 39,
    "Max": 56,
    "Verbatim": "39-56"
+  },
+  "The Northern Desert of Ro": {
+   "Min": 5,
+   "Max": null,
+   "Verbatim": "5-30+"
+  },
+  "The Wakening Land": {
+   "Min": 33,
+   "Max": null,
+   "Verbatim": "33-60+"
   },
   "The Warrens": {
    "Min": 4,
@@ -226,84 +401,73 @@
    "Max": 1,
    "Verbatim": "1"
   },
+  "Upper Guk": {
+   "Min": 4,
+   "Max": null,
+   "Verbatim": "4-25+"
+  },
+  "Veeshan's Peak": {
+   "Min": 60,
+   "Max": null,
+   "Verbatim": "60+"
+  },
+  "Velketor's Labyrinth": {
+   "Min": 45,
+   "Max": null,
+   "Verbatim": "45-60+"
+  },
+  "Warsliks Woods": {
+   "Min": 1,
+   "Max": null,
+   "Verbatim": "1-30+"
+  },
   "West Commonlands": {
    "Min": 6,
    "Max": 30,
    "Verbatim": "6-30"
+  },
+  "Western Karana": {
+   "Min": 4,
+   "Max": null,
+   "Verbatim": "4-20+"
+  },
+  "Western Wastes": {
+   "Min": 45,
+   "Max": null,
+   "Verbatim": "45-60+"
   }
  },
  "NoBand": {
   "Ak'Anon": "",
-  "Befallen": "7-25+",
-  "Blackburrow": "4-15+",
   "Butcherblock Mountains": "1-15, 35",
   "Cabilis": "",
-  "Chardok (Post-Revamp)": "50+",
-  "Chardok (Pre-Revamp)": "50+",
-  "Cobalt Scar": "35-60+",
-  "Dalnir": "25-35+",
-  "Dragon Necropolis": "45-60+",
-  "Dreadlands": "35-50+",
   "East Commonlands": "1-20, 35",
-  "Eastern Plains of Karana": "10-30+",
   "Erudin": "",
-  "Everfrost Peaks": "1-20+",
   "Felwithe": "",
-  "Field of Bone": "1-50+",
   "Freeport": "",
   "Grobb": "",
   "Halas": "",
-  "Howling Stones": "50+",
   "Innothule Swamp": "1-10, 25-30",
-  "Kael Drakkel": "30-60+",
   "Kaladim": "",
-  "Karnor's Castle": "40-55+",
   "Kelethin": "",
   "Kithicor Forest": "1-13+, 35-50",
-  "Lake of Ill Omen": "1-30+",
   "Lavastorm Mountains": "10-19, 25-30",
   "Lesser Faydark": "10-30, 40-50",
-  "Lower Guk": "30-50+",
   "Misty Thicket": "",
   "Nektulos Forest": "1-20, 25-30",
   "Neriak": "",
   "New Sebilis Expedition": "",
-  "Northern Plains of Karana": "10-30+",
-  "Oasis of Marr": "7-30+",
-  "Ocean of Tears": "9-30+",
   "Oggok": "",
   "Paineel": "",
-  "Permafrost": "15-50+",
-  "Plane of Fear": "48+",
-  "Plane of Growth": "55+",
-  "Plane of Hate": "48+",
-  "Plane of Hate cleanupproject": "48+",
-  "Plane of Mischief": "50+",
-  "Plane of Sky": "50+",
   "Qeynos Aqueducts": "1-15, 33-38",
   "Rivervale": "",
-  "Runnyeye": "7-30+",
-  "Siren's Grotto": "50-60+",
-  "Skyfire Mountains": "40-60+",
-  "Sleeper's Tomb": "55+",
-  "Southern Desert of Ro": "5-20+",
   "Steamfont Mountains": "1-18, 30-35",
   "Surefall Glade": "?",
-  "Swamp of No Hope": "1-25+",
   "Temple of Droga": "29-34 Droga Main, 33-38 Inner Sanctum",
-  "Temple of Veeshan": "60+",
   "The Arena": "n/a",
   "The Feerrott": "1-30, 34-40",
-  "The Northern Desert of Ro": "5-30+",
   "The Overthere": "20-40+ (50+ inside pit)",
   "The Temple of Solusek Ro": "Quest Only",
-  "The Wakening Land": "33-60+",
-  "Thurgadin": "30-35 (in caves), 30-45 (dwarves)",
-  "Upper Guk": "4-25+",
-  "Veeshan's Peak": "60+",
-  "Velketor's Labyrinth": "45-60+",
-  "Warsliks Woods": "1-30+",
-  "Western Karana": "4-20+",
-  "Western Wastes": "45-60+"
+  "Thurgadin": "30-35 (in caves), 30-45 (dwarves)"
  }
 }

@@ -49,6 +49,9 @@ namespace EQBuddy.Companion;
 /// <param name="Cap">What the answer cap held back, when it held anything (trap 50).</param>
 /// <param name="GearWithheld">What the gear sweep's own per-anchor cap held back. A separate
 /// field because it is spent before any row exists and so cannot ride one.</param>
+/// <param name="GearBandRefused">Which zones the Farm Gear band gate refused, with their bands
+/// and this character's level (DRA-84 D2). Its own field for the same reason as
+/// <paramref name="GearWithheld"/>, one rule out: the row is what did not get built.</param>
 /// <param name="Gaps">Answerable goals that produced nothing, each with its reason and —
 /// where the answer is a file the game writes — the command as selectable text.</param>
 /// <param name="Deferred">Selected goals whose engine does not exist yet, each naming the
@@ -67,6 +70,7 @@ public sealed record CompanionHelperSection(
     string MoneyNote,
     string Cap,
     string GearWithheld,
+    string GearBandRefused,
     IReadOnlyList<CompanionHelperNote> Gaps,
     IReadOnlyList<CompanionHelperNote> Deferred,
     CompanionHelperEmpty? Empty = null);

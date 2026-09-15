@@ -1915,8 +1915,10 @@ function boot() {
     for (const a of h.answers || []) wrap.appendChild(helperAnswer(a, h.doorsLead));
 
     // The caveats, in the room's own order: the vendor-price one first (it is about lines
-    // above it), then the two caps. A surviving cap says what it withheld (trap 50).
-    for (const line of [h.moneyNote, h.cap, h.gearWithheld])
+    // above it), then the caps and the band gate's refusals. A surviving cap says what it
+    // withheld, and so does a refusal (trap 50). Every one of these sentences is built by
+    // HelperPresentation and arrives on the wire — this page never words one (trap 32).
+    for (const line of [h.moneyNote, h.cap, h.gearWithheld, h.gearBandRefused])
       if (line) wrap.appendChild(el("div", "caption", line));
 
     for (const note of (h.gaps || []).concat(h.deferred || []))

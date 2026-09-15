@@ -97,6 +97,10 @@ internal sealed class HelperRoom : Grid, IShellRoom
     /// fixed.</summary>
     private IReadOnlyList<(string Skill, int Value, DateTime At)> _skills = [];
     private RecommendationSet _answers = RecommendationSet.Empty;
+
+    /// <summary>Whether DRA-84 D2's band gate could run at all — a resolved level AND a band
+    /// table. Dumped so a zero refusal count can be told from a gate that stood down.</summary>
+    private bool _bandGate;
     /// <summary>The level the engine was handed this Build — captured so the disclosure line
     /// and the ranking it describes come from one moment (trap 56). It is
     /// <c>MainWindow.ResolvedLevel</c>'s answer and never a second reading of the two
@@ -264,6 +268,9 @@ internal sealed class HelperRoom : Grid, IShellRoom
         var wornPicks = bundle.WornPicks;
         var professions = bundle.Professions;
         _intent = bundle.Inputs.GearIntent;
+        // DRA-84 D2: captured from the SAME bundle the ranking used, so the dump cannot report
+        // a gate state from a different moment than the answers it sits beside (trap 56).
+        _bandGate = bundle.Inputs.Level.Known && bundle.Inputs.Bands is not null;
         _includeQuests = bundle.Inputs.IncludeQuests;
         _skills = bundle.Skills;
 
@@ -977,6 +984,17 @@ internal sealed class HelperRoom : Grid, IShellRoom
             block.Children.Add(Door(new HelperDoor(HelperDoorKind.Gear, "")));
         }
 
+        // **AND THE BAND GATE'S REFUSALS** (DRA-84 D2, plan P2). The same shape one rule out:
+        // a count spent before any row exists, said out loud with the numbers it was spent on,
+        // pointing at the room that has the whole wishlist. It is drawn from what the ENGINE
+        // refused rather than from which goal is ticked, so it cannot appear over a list the
+        // gate never ran on.
+        if (HelperPresentation.GearBandRefused(_answers.GearBandRefusals) is { Length: > 0 } bandCap)
+        {
+            block.Children.Add(Line(bandCap, Role.Caption));
+            block.Children.Add(Door(new HelperDoor(HelperDoorKind.Gear, "")));
+        }
+
         foreach (var gap in _answers.Gaps) block.Children.Add(Gap(gap));
 
         foreach (var goal in _answers.NotAnsweredYet)
@@ -1241,6 +1259,15 @@ internal sealed class HelperRoom : Grid, IShellRoom
         $"helperGearWhy={_answers.Top.Count(r => r.Why.OfType<GearUpgradeFact>().Any())} " +
         $"helperGearSeen={_answers.Top.Count(r => r.Why.OfType<GearDropSeenFact>().Any())} " +
         $"helperGearWithheld={_answers.GearWithheld} " +
+        // **DRA-84 D2: what the band gate REFUSED, and whether the sentence for it was drawn**
+        // — two numbers from one moment (trap 56), because "the engine refused two zones" and
+        // "the room told the player so" are different claims and a refusal nobody was told
+        // about is a row that vanished. `helperBandLine` is the line, `helperBandGate` is
+        // whether the gate could run at all (a level AND a band table), so a green run with a
+        // zero count can be told from a run where the gate stood down.
+        $"helperBandRefused={_answers.GearBandRefusals.Count} " +
+        $"helperBandLine={(HelperPresentation.GearBandRefused(_answers.GearBandRefusals).Length > 0 ? 1 : 0)} " +
+        $"helperBandGate={(_bandGate ? 1 : 0)} " +
         // Whether a popup is OPEN. The staged state the shot photographs, and the assertion
         // that the review hook armed the control rather than merely being spelled correctly.
         $"helperPickerOpen={((_goalPicker?.IsOpen ?? false) || (_factionPicker?.IsOpen ?? false) || (_unlockPicker?.IsOpen ?? false) || (_wornPicker?.IsOpen ?? false) || (_professionPicker?.IsOpen ?? false) ? 1 : 0)} " +

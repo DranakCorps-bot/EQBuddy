@@ -1,3 +1,119 @@
+## 2026-09-14 ~9:40 PM CT — DRA-84 D2: the Farm Gear band gate, the open top, and the one-level gap between the plan's example and the plan's constant
+
+**Seat:** `opus-dra84-d2` (`-Mode disjoint`; `opus-dra84-d1` and `opus-dra84-d3` both still
+hold DRA-84 — trap 70's store working as intended). Paperclip DRA-84, plan P2 + the open-top
+fold Helm authorised by name at ~8:18 PM CT. Nothing here is on the consequence list: no
+release, no public post, no privacy surface, no third-party request — the transform fetches
+nothing and reads the committed cache, exactly as D1's did.
+
+### 1. The finding, first, because it is the one thing a reader should not miss
+
+**The plan's own worked example does not follow from the plan's own constant.** P2 says a
+zone is refused when its band's top is `OutgrownBy` *"(= 10, reused, not re-derived)"* or
+more under the level, and then says *"Crushbone stays refused for a 29 who once farmed it at
+12."* Crushbone's eqlwiki band is `5-20`. **29 − 20 = 9.** At the Founder's own level the
+gate does not refuse his own cited exhibit; it refuses from 30.
+
+**Decision: ship the constant, pin the gap, escalate the product call.** Re-deriving
+`OutgrownBy` to 9 — or inventing a second number for this arm — would be fitting a threshold
+to an anecdote, which is the precise opposite of what "reused, not re-derived" asks for, and
+this repo has no XP curve to derive a better one from. So the arithmetic ships as specified,
+`TheFoundersCrushboneExhibitIsRefusedFromThirtyAndNotAtTwentyNine` pins the boundary in both
+directions, and whether a level-29 character should still see Crushbone is named for Helm
+with the measurement in front of it.
+
+Could have gone the other way: pick 9, or make the top arm exclusive. Both would have made
+the plan's sentence true and made the number unexplainable.
+
+### 2. The gate REFUSES rather than demotes, and it does it over the player's own evidence
+
+The delivery's most vetoable default, and the plan names it as one. `OutgrownWeight` halves a
+zone and keeps it, because there the zone is the player's own MEASURED camp and deleting it
+would overrule a measurement with a judgement. These rows are `Evidence.Catalog` — things
+EQBuddy read about — and their presence in the list is exactly what the Founder failed. So
+the two rules are opposite on purpose, and Crushbone stays refused for a 30 who farmed it at
+12 and looted the very helm there.
+
+Could have gone the other way: demote catalog rows too, and let the player scroll past them.
+That leaves the failed screen looking the same.
+
+### 3. `GearBandReachAbove` is 5 and is NOT 10
+
+A new named judgement, deliberately asymmetric with `OutgrownBy`. The two arms are not
+opposites: being over a band's top costs time, being under its bottom costs the attempt, and
+the distance at which that second one happens is shorter. One constant for both would have to
+be wrong in one direction. Neither number is measured and the code says so.
+
+### 4. The open top is `Max` = null, and 41 of 87 bands are one
+
+Helm authorised option (a) by name before this slice started. Implemented as the ABSENCE of a
+maximum: `ZoneLevels.Band.Max` is `int?`, the number before the `+` is discarded rather than
+promoted, and the gate's TOP arm stands down for those zones while the BOTTOM arm still
+applies. `int?` rather than a sentinel on purpose — a sentinel is a number some layer does
+sums with (trap 63), and null makes the compiler ask at every reading site.
+
+**The scope stayed where the ruling drew it.** Only a verbatim whose SOLE defect is the
+trailing `+`. `1-13+, 35-50` and `20-40+ (50+ inside pit)` both contain a trailing-`+` band
+and both stay refused, because coalescing them would assert a continuity the page contradicts
+by printing the gap. Prove-failed: dropping the regex's end anchor reddens seven rows.
+
+**Measured, and it is the number that justifies the ruling:** banded drop weight went from
+33% to **75%** of catalog mentions; refused fell from 54% to **12%**.
+
+### 5. The distinct-count telltale was re-derived rather than relaxed
+
+Discarding a maximum coarsens `(Min, Max)` **by construction**, so over all 87 bands it comes
+out at 53/87 = 0.61, under the two-thirds floor — and not because the data got worse. The
+floor is now applied where it was calibrated (the 46 closed bands, 36/46) and to the measure a
+template would actually collapse (the verbatim row, 64/87). The open tops' own repetition — 41
+zones, 17 distinct bottoms, five plane pages printing `50+` — is pinned as a MEASUREMENT
+rather than held to a floor, because it is the wiki repeating itself on real separate pages.
+
+Could have gone the other way: lower the floor until 53/87 passed. That is a guard edited to
+fit its own subject.
+
+### 6. `LevelUseFor(FarmGear)` flips Exempt → Consumes, and the D6 survey moves rather than dies
+
+The must-list pairing forbids a consuming engine from carrying a `LevelExemptReason`, so that
+arm had to leave the table. **The survey it held is not retired** — 11,196 records, five Level
+keys, exactly one wearable (`Shroud of the Sky`) — it is quoted with its numbers on
+`GearBandGate`, because it is the live reason the gate reads a ZONE and not an item. The
+ITEM side is still ungated and the P6 outgrown discount is still not borrowed. Helm's #628
+tip said the D6 conclusion stands and the P2 zone-band flip is unaffected by it; this is that,
+implemented.
+
+### 7. Refusing every zone is its own gap
+
+`NoCatalogUpgrade` would be false — the catalog DOES hold something better — and with no rows
+and no gap the room draws its whole-room empty state, which says EQBuddy has nothing stored:
+the opposite of what happened. So `GoalGapReason.EveryZoneOutsideYourBand` exists. That is one
+more enum member than the plan asked for, and it is here because the alternative is a silent
+no-op, which this repo does not ship.
+
+### 8. Player-facing: the refusal is SAID, with both numbers and the source
+
+Trap 50 applied to a rule instead of a count. A zone missing from a list is indistinguishable
+from a zone with nothing in it, and the player has no way to discover EQBuddy decided for
+them. The sentence names the count, each band, the level, and only the arms that actually
+fired — never a threshold that decided nothing in this list. HOME-006 swept over all of it and
+prove-failed: planting "too easy" reddens the sweep and names the sentence.
+
+**The height of `shell-helper-gear-band` is staged, and that is worth recording.** The first
+take at the default size was a correct, well-composed photograph of the room with the new
+caption BELOW THE FOLD — a shot of a refusal that does not show the refusal. The density
+question underneath it is real and stays with Bevel; it was not restyled from the shot.
+
+### What would make these wrong
+
+- If a level-29 character should not see Crushbone, `OutgrownBy`'s reuse is the thing to
+  revisit — not this slice's plumbing.
+- If players report losing camps they were actually farming, `GearBandReachAbove` = 5 is the
+  first number to move, and the refusal sentence is already the diagnostic.
+- If a zone page's `Level of Monsters` row turns out to mean something other than "what you
+  will meet here", the whole gate rests on a misreading and the report is where to start.
+
+---
+
 ## 2026-09-14 ~9:00 PM CT — DRA-84 D3 follow-up: the refresh landed and four shipped sentences went stale with it. Plus the duplicate-seat fact.
 
 **Seat:** `opus-dra84-d3` (claimed 01:27Z). Paperclip DRA-84. This entry is about the

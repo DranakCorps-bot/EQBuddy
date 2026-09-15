@@ -13,22 +13,42 @@ namespace EQBuddy.Core;
 /// its creatures at 5–20") rather than turn them into an adjective. Nothing here knows about
 /// a player, an XP curve, or whether a zone is worth farming.</para>
 ///
-/// <para><b>Absent is an answer, and it is the common one.</b> 46 of 118 zone pages give a
-/// band this strictly; the rest either carry no row or carry a shape the transform refuses
-/// to read (`50+`, `1-15, 35`). Those ship too, in <c>NoBand</c>, because "the page does not
-/// answer" and "we have never read a page for this zone" are different sentences —
-/// see <see cref="Lookup"/>'s four outcomes. Read
+/// <para><b>Absent is still an answer.</b> 87 of 118 zone pages give a band — 46 closed and
+/// 41 open-topped (see <see cref="Band.Max"/>) — and the remaining 31 either carry no row or
+/// carry a shape the transform refuses to read (`1-15, 35`, `20-40+ (50+ inside pit)`,
+/// `Quest Only`). Those ship too, in <c>NoBand</c>, because "the page does not answer" and
+/// "we have never read a page for this zone" are different sentences — see
+/// <see cref="Lookup"/>'s four outcomes. Read
 /// <c>scripts/harvests/eqlwiki/zonelevels-report.md</c> before relying on the coverage.</para>
 ///
-/// <para>DRA-84 D1 ships the instrument only: no engine reads a band yet. The gate that
-/// will (plan P2) is its own slice, and the report's join numbers are what it should be
-/// written against.</para>
+/// <para>D1 shipped the instrument; <b>DRA-84 D2 is the first reader</b> —
+/// <c>Recommendations.FarmGear</c>'s band gate, which refuses a zone row whose band sits
+/// outside the character's level. Nothing here knows about that: this class answers what the
+/// wiki said, and the judgement lives with the engine.</para>
 /// </summary>
 public sealed class ZoneLevels
 {
-    /// <summary>A closed level band and the wiki row it was read from, so the words a
-    /// surface writes can quote the source instead of paraphrasing it.</summary>
-    public sealed record Band(int Min, int Max, string Verbatim);
+    /// <summary>
+    /// A level band and the wiki row it was read from, so the words a surface writes can quote
+    /// the source instead of paraphrasing it.
+    ///
+    /// <para><b><see cref="Max"/> is nullable, and null is the page saying "and above"</b>
+    /// (DRA-84 D2, Helm option (a) of three). 41 of the 87 shipped bands are open-topped:
+    /// `50+`, `30-50+`. The `+` is learned as the ABSENCE of a maximum rather than turned into
+    /// one — the number before it is not promoted, and no era cap is invented — so a caller
+    /// that reads a top has to decide what to do when there isn't one. <see cref="Min"/> is
+    /// always present.</para>
+    ///
+    /// <para>A caller that treats null as zero would read every plane as a zone whose
+    /// creatures top out below level 1, which is why this is `int?` rather than a sentinel: the
+    /// compiler asks the question at every reading site.</para>
+    /// </summary>
+    public sealed record Band(int Min, int? Max, string Verbatim)
+    {
+        /// <summary>Whether the page declined to state a maximum. The name is so a condition
+        /// reads as the fact it is testing rather than as a null check.</summary>
+        public bool OpenTop => Max is null;
+    }
 
     /// <summary>Why a lookup answered the way it did. Four outcomes and no fifth: a caller
     /// that wants to SAY something about a zone needs to tell "we have no idea" apart from

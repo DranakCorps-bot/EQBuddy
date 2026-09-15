@@ -154,7 +154,32 @@ public class HelperPresentationTests
             AssertClean(HelperPresentation.Cap(n), $"Cap({n})");
             AssertClean(HelperPresentation.WithheldWhy(n), $"WithheldWhy({n})");
             AssertClean(HelperPresentation.FactionPickerCapNote(n), $"FactionPickerCapNote({n})");
+            AssertClean(HelperPresentation.GearWithheld(n), $"GearWithheld({n})");
         }
+
+        // **DRA-84 D2's refusal sentence, at the values that would most tempt an adjective.**
+        // "eqlwiki lists its creatures at 5-20 and you are 30" is a place somebody would
+        // reasonably write "too easy now" or "too tough" — the band gate is a difficulty-shaped
+        // rule with no difficulty model behind it, which is exactly the D4 lesson one slice on.
+        // Both arms, a single-level band, an OPEN top, and past the name cap.
+        foreach (var refusals in new IReadOnlyList<GearBandRefusal>[]
+                 {
+                     [],
+                     [new("Crushbone", 5, 20, "5-20", 30, GearBandArm.TopUnder)],
+                     [new("Plane of Sky", 50, null, "50+", 12, GearBandArm.BottomOver)],
+                     [new("Befallen", 12, 12, "12", 40, GearBandArm.TopUnder)],
+                     [
+                         new("Crushbone", 5, 20, "5-20", 30, GearBandArm.TopUnder),
+                         new("Plane of Sky", 50, null, "50+", 30, GearBandArm.BottomOver),
+                         new("Najena", 8, 35, "8-35", 60, GearBandArm.TopUnder),
+                         new("Befallen", 7, 25, "7-25", 60, GearBandArm.TopUnder),
+                     ],
+                 })
+            AssertClean(HelperPresentation.GearBandRefused(refusals),
+                $"GearBandRefused({refusals.Count})");
+
+        foreach (var (min, max) in new (int, int?)[] { (5, 20), (12, 12), (50, null) })
+            AssertClean(HelperPresentation.BandPhrase(min, max), $"BandPhrase({min},{max})");
 
         foreach (var maxed in new[] { false, true })
             AssertClean(

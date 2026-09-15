@@ -15,24 +15,41 @@ request rate at eqlwiki) is not merely unchanged but untouched, exactly as
 `zone-titles.json`, and its output is `src/EQBuddy.Core/Data/ZoneLevelBands.json`, read by
 `Core/ZoneLevels.cs`.
 
-This slice ships the INSTRUMENT and the numbers. It changes no engine: nothing in
-`Recommendations` reads a band yet. The gate that will (plan P2 / D2) is a separate slice,
-and it should not be written until the numbers below have been read.
+D1 shipped the INSTRUMENT and the numbers and changed no engine. **D2 is the first reader**:
+`Recommendations.FarmGear`'s band gate refuses a zone row whose band sits outside the
+character's level. Nothing in this file knows about that — it publishes what the page said,
+and the judgement lives with the engine.
 
 PARSING IS STRICT, AND THE REPORT IS WHERE THE REST GOES
 --------------------------------------------------------
-Exactly two shapes are admitted from that row, after whitespace is stripped:
+Exactly four shapes are admitted from that row, after whitespace is stripped:
 
   * `N-M`  — a closed band, `1 <= N <= M <= 99`
   * `N`    — a single level, stored as `N-N`
+  * `N-M+` — an OPEN TOP: `Min` is `N`, and `Max` is **null**
+  * `N+`   — an open top with no stated bottom either: `Min` is `N`, `Max` is null
 
-**Everything else is ABSENT, never guessed** — and every rejected verbatim is listed in
-`zonelevels-report.md` with the zones that carry it, because the shapes we refuse are the
-evidence for whether a later slice should learn one of them. The big refused class is the
-open top (`50+`, `45-60+`): a trailing `+` is a genuinely different fact from a closed band,
-the plan's P2 gate reads a band's TOP, and inventing a number for "and above" is the shape
-trap 73 exists to refuse. A second class is the multi-range page (`1-15, 35`), where the one
-band a caller would get back is a fiction stitched from two. Neither is decided here.
+**The open top is D1's refused class, learned in D2 on a named Helm ruling** (~8:18 PM CT
+2026-09-14, option (a) of three). It was refused in D1 because a trailing `+` is not a
+maximum and inventing one is trap 73; what the ruling authorises is the opposite of
+inventing one — the `+` is learned as **the absence of a maximum**, carried as JSON `null`,
+and the gate that reads a top stands down for exactly those zones rather than reading a
+number nobody published. D1 measured what the refusal cost: 54% of the catalog's drop
+weight, including Plane of Sky, Hate, Fear, Temple of Veeshan, Kael Drakkel, Lower Guk and
+Karnor's Castle. The alternatives Helm did not take are on the record too — capping at the
+era's level 60 (`(b)`, an invented number) and keeping strict (`(c)`, a gate that cannot
+answer half the catalog).
+
+**Its SCOPE is narrow, and the narrowness is the ruling.** Only a verbatim whose SOLE defect
+is the trailing `+` is admitted. Everything else stays ABSENT, never guessed, and is still
+listed in `zonelevels-report.md` with the zones that carry it:
+
+  * multi-range (`1-15, 35`, `1-13+, 35-50`) — the one band a caller would get back is a
+    fiction stitched from two, and coalescing them into an open top is exactly the
+    coalesce-as-open-top the ruling refuses by name;
+  * prose (`20-40+ (50+ inside pit)`, `30-35 (in caves), 30-45 (dwarves)`) — the `+` is
+    there, but it is not the only thing wrong with the row;
+  * `Quest Only`, `n/a`, `?` — the page answering that it will not say.
 
 Range-checking 1..99 is not a guess either — it refuses a row whose numbers cannot be levels
 rather than shipping them. No row in the current cache is refused for that reason; the check
@@ -54,10 +71,12 @@ to answer "Qeynos Aqueducts" with Qeynos's `1-9`, which is a guess wearing a cit
 
 AND IT MEASURES THE JOIN BEFORE ANYONE TRUSTS THE GATE
 -------------------------------------------------------
-Item pages and zone pages are not obliged to spell a zone the same way. The gate P2 plans
-looks a band up by the zone name an `ItemCatalog` record's `DropZones` carries, so the
-number that actually decides whether that gate can do anything is *how many distinct
-`DropZones` spellings resolve to a band*, and how many item records sit behind them.
+Item pages and zone pages are not obliged to spell a zone the same way. The D2 gate looks a
+band up by the zone name an `ItemCatalog` record's `DropZones` carries, so the number that
+actually decides whether that gate can do anything is *how many distinct `DropZones`
+spellings resolve to a band*, and how many item records sit behind them. D1's reading of
+that table is why the open top was ruled on at all: it was 33% of drop weight banded against
+54% refused, and it is 75% against 12% now.
 
 The lookup rule is **exact title, then the repo's existing zone-identity fold**
 (`ZoneMapFiles.IdentityKey` — lowercase, drop a parenthetical, drop a leading "the", squeeze
@@ -117,6 +136,12 @@ LEVEL_ROW_RX = re.compile(
 BAND_RX = re.compile(r"^(\d{1,2})\s*-\s*(\d{1,2})$")
 SINGLE_RX = re.compile(r"^(\d{1,2})$")
 
+# The open top (DRA-84 D2, Helm option (a)). Anchored at both ends like the two above, which
+# is what keeps the scope narrow: `1-13+, 35-50` and `20-40+ (50+ inside pit)` both contain a
+# trailing-`+` band and neither matches, because in both the `+` is not the only defect.
+OPEN_BAND_RX = re.compile(r"^(\d{1,2})\s*-\s*(\d{1,2})\s*\+$")
+OPEN_SINGLE_RX = re.compile(r"^(\d{1,2})\s*\+$")
+
 MIN_LEVEL = 1
 MAX_LEVEL = 99
 
@@ -136,12 +161,28 @@ def level_row(wikitext: str) -> str | None:
     return m.group(1).strip()
 
 
-def parse_band(verbatim: str) -> tuple[int, int] | None:
-    """`N-M` or `N`, in 1..99, or None. Nothing else, and nothing inferred."""
+def parse_band(verbatim: str) -> tuple[int, int | None] | None:
+    """`N-M`, `N`, `N-M+` or `N+`, in 1..99, or None. Nothing else, and nothing inferred.
+
+    The second element is the MAXIMUM, and `None` means the page did not state one. On the
+    two open-top shapes the number before the `+` is deliberately DISCARDED as a maximum: the
+    `+` says creatures above it exist, so keeping 60 out of `45-60+` would be publishing a
+    ceiling the page just denied. It survives in the verbatim, which is what a surface quotes.
+    """
     if (m := BAND_RX.match(verbatim)) is not None:
         lo, hi = int(m.group(1)), int(m.group(2))
     elif (m := SINGLE_RX.match(verbatim)) is not None:
         lo = hi = int(m.group(1))
+    elif (m := OPEN_BAND_RX.match(verbatim)) is not None:
+        # Both numbers are still range-checked — a malformed row is refused rather than
+        # half-read — and then the top is dropped rather than shipped.
+        lo, hi = int(m.group(1)), int(m.group(2))
+        if lo > hi or lo < MIN_LEVEL or hi > MAX_LEVEL:
+            return None
+        return lo, None
+    elif (m := OPEN_SINGLE_RX.match(verbatim)) is not None:
+        lo = int(m.group(1))
+        return (lo, None) if MIN_LEVEL <= lo <= MAX_LEVEL else None
     else:
         return None
     if lo > hi or lo < MIN_LEVEL or hi > MAX_LEVEL:
@@ -283,6 +324,10 @@ def pct(part: int, whole: int) -> int:
 
 def write_report(titles, bands, no_band, no_page, survey) -> None:
     parsed_pairs = {(b["Min"], b["Max"]) for b in bands.values()}
+    verbatims = {b["Verbatim"] for b in bands.values()}
+    open_top = {z: b for z, b in bands.items() if b["Max"] is None}
+    closed_pairs = {(b["Min"], b["Max"]) for b in bands.values() if b["Max"] is not None}
+    open_mins = {b["Min"] for b in open_top.values()}
     refused = {z: v for z, v in no_band.items() if v}
     no_row = sorted(z for z, v in no_band.items() if not v)
     grouped: dict[str, list[str]] = collections.defaultdict(list)
@@ -292,33 +337,69 @@ def write_report(titles, bands, no_band, no_page, survey) -> None:
     lines = [
         "# Zone level bands report", "",
         "Written by `zonelevels-transform.py` from the COMMITTED zone wikitext cache.",
-        "It fetches nothing. **Read the numbers here before trusting a band anywhere** —",
-        "this slice ships the instrument and the measurement, and no engine reads a band yet.",
+        "It fetches nothing. **Read the numbers here before trusting a band anywhere.**",
         "", "## Coverage", "",
         f"- Zone pages enumerated (`zone-titles.json`): **{len(titles)}**",
         f"- Bands shipped in `ZoneLevelBands.json`: **{len(bands)}** "
         f"({pct(len(bands), len(titles))}% of pages)",
-        f"- ABSENT — row present but not `N-M` or `N`: **{len(refused)}**",
+        f"  - of those, CLOSED (`N-M` / `N`): **{len(bands) - len(open_top)}**",
+        f"  - of those, OPEN TOP (`N+` / `N-M+`, `Max` is null): **{len(open_top)}**",
+        f"- ABSENT — row present and in none of the four admitted shapes: **{len(refused)}**",
         f"- ABSENT — page has no `Level of Monsters` row: **{len(no_row)}**",
         f"- ABSENT — title enumerated but no cached page: **{len(no_page)}**", "",
         "The two ABSENT kinds ship in `NoBand` so a reader can tell them apart from a zone",
         "nobody has looked at.", "",
+        "**An open top is a band with a bottom and no top, and a caller has to handle it as",
+        "one.** `Max` is JSON `null` and `ZoneLevels.Band.Max` is `int?`; the DRA-84 D2 gate's",
+        "TOP arm stands down for these zones and only its BOTTOM arm (`Min`) can refuse one.",
+        "That is the whole of what Helm's option (a) authorised — no maximum is invented, and",
+        "the number before the `+` is not promoted into one.", "",
         "## Distinct-count telltale (trap 73)", "",
-        f"- Distinct `Min-Max` pairs across {len(bands)} shipped bands: **{len(parsed_pairs)}**",
-        "",
         "A per-zone fact should be nearly as varied as the zones carrying it. A handful of",
         "distinct values across dozens of zones would mean a template got parsed, not the",
         "wiki's own per-zone numbers, and nothing downstream should believe it.", "",
+        f"- Distinct `Min-Max` pairs across all {len(bands)} shipped bands: "
+        f"**{len(parsed_pairs)}**",
+        f"- Distinct verbatim rows across all {len(bands)}: **{len(verbatims)}**",
+        f"- Distinct `Min-Max` pairs across the {len(bands) - len(open_top)} CLOSED bands: "
+        f"**{len(closed_pairs)}**",
+        f"- Distinct `Min` across the {len(open_top)} OPEN TOPS: **{len(open_mins)}**", "",
+        "**Read the last two rows, not the first.** D2's open top DISCARDS the maximum by",
+        "design, so the all-bands pair count is measuring a deliberately coarser fact than D1's",
+        "was and its ratio fell for that reason rather than because the data got worse. The",
+        "closed-band ratio is the one the two-thirds floor was calibrated on, and the verbatim",
+        "count is the measure a template would actually collapse — a shared infobox default",
+        "would show up as one row string on dozens of pages.", "",
+        "The open tops repeat more than the closed bands do, and that repetition is the wiki's",
+        "own: five plane pages print `50+`, three print `48+`. That is a real shared value on",
+        "real separate pages, not a parse latching onto a default, which is why it is reported",
+        "here as a measurement and is not held to the floor.", "",
         "## Refused verbatims — the row was there and we would not read it", "",
         "Listed so a later slice can decide whether to learn one of these shapes with the",
-        "evidence in front of it. Nothing here is guessed into a band. The dominant class is",
-        "the **open top** (`50+`, `45-60+`): a trailing `+` is not a band's maximum, and the",
-        "gate P2 plans reads a band's maximum.", "",
+        "evidence in front of it. Nothing here is guessed into a band.", "",
+        "**The open top has LEFT this table** (DRA-84 D2): `50+` and `45-60+` are now bands",
+        "with a null `Max`. What is left is the class where a trailing `+` is not the only",
+        "thing wrong with the row — a multi-range (`1-15, 35`), a range plus prose",
+        "(`20-40+ (50+ inside pit)`), or the page declining to answer (`Quest Only`, `n/a`,",
+        "`?`). Coalescing a multi-range into one open top is refused by name: the bottom of",
+        "the first range and no top would assert a continuity the page contradicts.", "",
         "| Verbatim | Zones | Which |",
         "|---|---:|---|",
     ]
     for verbatim, zones in sorted(grouped.items(), key=lambda kv: (-len(kv[1]), kv[0])):
         lines.append(f"| `{verbatim}` | {len(zones)} | {', '.join(sorted(zones))} |")
+
+    lines += [
+        "", "## Open tops learned — every zone whose `Max` is null", "",
+        "Here in full rather than summarised, because this is the class D1 refused and D2",
+        "admitted on a ruling, and the row a reader should be able to audit one zone at a",
+        "time. `Min` is the page's own bottom; the number after the dash in a `N-M+` verbatim",
+        "is NOT the `Max` and is not shipped as one.", "",
+        "| Zone | `Min` | `Max` | Verbatim |",
+        "|---|---:|---|---|",
+        *[f"| {z} | {b['Min']} | *null* | `{b['Verbatim']}` |"
+          for z, b in sorted(open_top.items())],
+    ]
 
     lines += ["", "## Pages with no `Level of Monsters` row at all", "",
               *[f"- {z}" for z in no_row]]
@@ -351,9 +432,14 @@ def write_report(titles, bands, no_band, no_page, survey) -> None:
             f"| {pct(len(survey['unknown']), survey['spellings'])}% "
             f"| {survey['unknown_mentions']} "
             f"| {pct(survey['unknown_mentions'], survey['mentions'])}% |", "",
-            "**The middle row is the finding.** The gate's reach is not limited by spelling —",
-            "it is limited by the open-top verbatims above. Every one of the heaviest drop",
-            "zones in the catalog HAS a zone page, and we refused its row.", "",
+            "**Read the first two rows against D1's own numbers.** When D1 shipped, the",
+            "middle row carried 54% of the catalog's drop weight and the finding was that the",
+            "gate's reach was limited by the open-top verbatims rather than by spelling. D2",
+            "learned that class, so weight has moved from the middle row to the top one. What",
+            "is left in the middle is the multi-range and prose class, which stays refused.",
+            "**An open-top hit is not a hit on both arms** — those zones can only ever be",
+            "refused by the gate's BOTTOM arm, so the top row overstates what a TOP-arm",
+            "reading can reach. The open-top table above is the denominator for that.", "",
             "**This half is a snapshot.** DRA-84 D3 rebuilds the item catalog; re-run this",
             "transform (no `--check`) afterwards to re-take it. `--check` deliberately does",
             "not cover the report, so a refresh PR is not reddened by a file it did not touch.",
