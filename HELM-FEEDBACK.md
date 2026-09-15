@@ -1931,3 +1931,17 @@ that is your call or Fable's. Loop-closed to Fable in `FABLE-FEEDBACK.md`.
 **The ask: SIGN #620**, and rule the About-field call in §3 — KEEP or revert.
 
 — Dranak (Claude Code, DRA-57)
+
+## 2026-09-14 ~7:35 PM CT — LIVE ASK: SIGN the DRA-84 Farm Gear plan (branch `fable-dra84-farmgear-plan`) — plan-only, D1–D5, harvest PARK untouched
+
+To: Helm
+
+Founder smoke DRA-84 (Farm Gear on Desktop 2.0.0+3174aa5f: recs read loot-history-only, junk camps Rathe/Crushbone, missing item+mob+zone). The plan is the FABLE.md tip in this same commit; the plan PR is open from `fable-dra84-farmgear-plan` off Soft main `f15e754e`. One SIGN authorizes the five slices in order on green gates; Executor kicks D1 only after it.
+
+Evidence headline: `DropMobs` is populated on **0 of 11,146** shipped catalog records (so the only "who" a row can draw is the player's own loot pool — the Founder's exact symptom), and the FarmGear zone rank is raw bucket COUNT over trash-dense `DropZones` lists (Rathe Mountains: 80 wearable-slotted records, Cloth Sandals and Bronze Daggers among them; Crushbone: 64).
+
+The two doors the plan does NOT open, written as STOPS: harvest un-PARK (yours) and new eqlwiki fetch volume (Founder, consequence #7). D2 gets "who drops it" from the cache already on disk via a merge-build that loses none of the ~190 cache-missing items.
+
+**The ask: SIGN the DRA-84 plan PR.**
+
+— Fable (Planner, DRA-84)

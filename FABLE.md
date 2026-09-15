@@ -1,3 +1,42 @@
+## 2026-09-14 ~7:35 PM CT — Fable: DRA-84 FARM GEAR × CATALOG — the plan from the Founder's smoke (recs read loot-history-only; junk camps Rathe/Crushbone; missing item+mob+zone). Executor kicks only after Helm SIGN.
+
+To: Helm
+
+**Seat:** `fable-dra84-farmgear-plan`, plan only — no product code in this seat. Paperclip DRA-84 (child of DRA-70; Founder smoke of Desktop 2.0.0+3174aa5f). Soft LEAVEs honored: no implement before SIGN, no Pages / Play Console / tag / signing from these seats, and **the harvest PARK STANDS** — every slice below is designed to need no new fetch, and the one that could want one says so and STOPS instead.
+
+### 0. What exists (evidence, verified in-tree this session, Soft main `f15e754e`)
+
+- **The sweep is already catalog-wide, so acceptance 1 is a VISIBILITY defect, not an engine one.** `GearUpgrades.Sweep` walks the shipped `ItemCatalog` (11,146 records) per worn anchor; `Recommendations.FarmGear` buckets by `DropZones`/`Quests`. Nothing anchors on session loot.
+- **"Who drops it" is empty catalog-wide: `DropMobs` is populated on 0 of 11,146 shipped records** (surveyed `ItemCatalog.json.gz` this session). Schema, promoter and both readers landed in DRA-71 D6; the DATA was deferred to "the next weekly refresh" — and the harvest is PARKED, so the deferral has no arrival date. `GearRow`'s only "who" is therefore the player's own `SeenDrop` pool, which is exactly the Founder's "loot-history-only" reading. The engine is fine; the sentence is starved.
+- **Junk camps are the RANK, plus trash-dense zone lists.** `FarmGear`'s `Ranked` orders zone buckets by raw COUNT of dominating records (`Recommendations.cs:1911`). Rathe Mountains carries 163 catalog records with a `DropZones` entry, 80 of them wearable-slotted — Cloth Sandals, Bronze Daggers, Bandit Sash; Crushbone 102/64, mostly Bronze weapon trash. A zone dense in marginal wins over your weakest anchors outranks the camp holding the one upgrade you would actually go for. (Hypothesis, labelled: WHICH anchors let Bronze trash dominate on the Founder's profile is what D1's instrument answers before D3 picks a rule.)
+- **Level is `LevelUse.Exempt` for FarmGear** with the surveyed reason (no item record carries a level). The reason survives for ITEMS, but it was read as "no zone judgement at all" — and `OutgrownBy` (personal conned-band evidence) already exists one engine over and is not consulted here.
+- **The tier rule is NOT the hole:** `CanClaimUpgrade` refuses a base-stats candidate against a worn "+N" (candidate tier ≥ worn tier), re-read this session.
+
+### The slices — D1..D5, in order, each its own PR off Soft main, gates green between
+
+**D1 — The instrument (V1, no behavior change).** A probe that, for a worn set + catalog, dumps per zone: every dominating record, the anchor it beats, gain, `ImprovedMetrics`, tier — enough to say WHY Rathe/Crushbone ranked, on a Founder-shaped fixture (weak off-slots + strong mains is the suspected shape). Script (`scripts/dra84-farmgear-probe.*`) or a Core surveyor + test — executor's call; committed evidence memo in the PR. Plus a distinct-count survey (trap 73's tell) over `DropZones` committed as a test in the `MoteCatalogSurveyTests` idiom, so catalog drift re-answers it. D3's rule is chosen FROM this output — measure before the third theory.
+
+**D2 — "Who" arrives, without a fetch.** `itemcatalog-build` becomes a MERGE-build: regenerate every record whose page is in the local `cache/items-wikitext.jsonl`; PRESERVE the committed record for the ~190 pages the cache is missing. The D6 objection to regenerating ("ship a catalog missing items to gain a field") dissolves when absence keeps the committed row. Fetches NOTHING; harvest PARK untouched. Gate the write on the DECOMPRESSED comparison (trap 74). Guards: `ItemCatalogDropMobsTests` containment stands; ADD the prove-fail that `DropMobs` is non-empty after the rebuild and that the record count never shrinks (trap 78 — a detector that can be silently empty has reported clean here before). If D1 finds the cache unusable for this, the slice STOPS and wakes Helm — un-PARKing the refresh is a HELM ruling and new fetch volume is consequence-list #7 (Founder); this plan authorizes neither.
+
+**D3 — The rank stops rewarding junk count.** Zone buckets rank on QUALITY before density — the shape is (best candidate's `ImprovedMetrics`, then a minimum-gain floor, then count as tiebreak), but the constants and the exact floor come from D1's memo, with before/after output on the Founder-shaped fixture committed in the PR. Acceptance: Rathe/Crushbone fall below the real camps on that fixture, and a zone whose only wins are marginal trash stops appearing at all. `Withheld` keeps saying what the floor held back (trap 50).
+
+**D4 — Level viability, the honest half.** The `LevelUseFor` row for FarmGear moves Exempt → Consumes, narrowly: the ITEM side stays level-blind (the surveyed reason stands), but a zone row picks up the `OutgrownBy` discount where the character's OWN conned-band evidence says the camp is grey — the LevelUp engine's named-discount idiom, sentence on the row, no bonus arm. A catalog-only zone with no personal evidence gets NO level judgement — unknown is never zero. Catalog zone-level bands (eqlwiki zone pages) are OPTION-ONLY: not already in a local cache means new fetch volume, which is the Founder's door (consequence #7), so the plan PARKS that with this sentence as the reason. `HelperMustListTests` proves the Consumes by running the engine at two levels — the existing bar for that word.
+
+**D5 — Every row answers what · who · where.** With D2's data: `GearRow` already prefers personal `SeenDrop` (Personal) and falls back to `MobsIn` (Catalog, estimate-labelled by construction) — one producer per fact stands (trap 4). This slice makes the answer visible and GUARDED: `HelperPresentation` draws item + creature-or-quest + zone in the six-question shape; the mob sentence must survive `WhyCap` trimming (the D7 interleave lesson — check `GearNamedPerRow` × cap arithmetic); a guard asserts a FarmGear row whose upgrade HAS a known who never draws without it, paired with the committed negative (a record with no `DropMobs` draws zone-only, inventing nothing — trap 73). The phone inherits through the same projection; `HelperSurfaceParityTests` extends.
+
+### Acceptance (the card's four, mapped)
+
+1. Full item/zone catalog as the VISIBLE source → D2 (with D1 proving the sweep already was).
+2. Item + source mob(s)/quest + zone on every rec → D2 + D5.
+3. No junk-camp recs for the intent/level → D3 + D4.
+4. Pages / Play / tag / signing untouched; harvest PARK stands → structural in every slice.
+
+**Class: V2** — data pipeline + engine + presentation + phone parity. One SIGN authorizes D1–D5 in order on green gates (DRA-73 M0 cutover); a slice that outgrows its declared box stops and wakes Helm. `needs-david:` none — no consequence-list door opens; the two that COULD (harvest un-PARK, new fetch volume) are written as STOPS, not slices.
+
+**Done bar for DRA-84:** Founder re-smokes Farm Gear on a Desktop build ≥ D5's land — every rec names item + who + where, Rathe/Crushbone junk gone on his profile, all new guards green in `build-and-test` + `e2e-windows`.
+
+— Fable (Planner, DRA-84)
+
 ## 2026-09-13 ~10:55 AM CT — Fable: DRA-71 HELPER D2+ — the plan from the Founder's smoke of D1 (RE-CUTS #580's D2+ slice table; still EXTENDS PRD §12 HOME-001..006). Executor kicks only after Helm SIGN.
 
 To: Helm
