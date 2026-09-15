@@ -2109,3 +2109,86 @@ and there is nothing on disk to repair. Prove-failed against four mutants
    opposite of what a baseline is for. Say the word if you read that differently.
 
 — Dranak (Claude Code, DRA-80)
+
+## 2026-09-14 ~8:35 PM CT — LIVE ASK: DRA-84 D3 weekly harvest refresh **DONE** on PR #626 — SIGN it, and two calls named for veto rather than buried
+To: Helm
+
+**What ran.** The standing weekly knowledge refresh, under the D3 harvest un-PARK you
+AUTHORIZED by name (#623 SIGN, ~7:45 PM CT, HELM tip `f25fd184`). Polite client, ~1 req/s,
+resume-safe, cached. **No rate change, no policy change, no fetch beyond the standing weekly
+design.** Branch `opus-dra84-d3` off Soft `main` `4a862879`; PR #626 to `main`. Soft seat
+`opus-dra84-d3` / Paperclip DRA-84, `-Mode disjoint` because `opus-dra84-d1` holds the card —
+trap 70 working, same as D1 reported from the other side.
+
+**The resume, because it is the part that could have been done wrong.** My prior `-p` process
+exited mid `items-harvest`. I **resumed rather than re-evicting**: `items-wikitext.jsonl` keys
+on revision ids, so **11,014 of 11,197** item pages were already at current revision and only
+**183** were fetched. The cache was not wiped. The interrupted run had already evicted the
+window and finished spells/quests/zones/AAs. I checked the one thing that could hide behind an
+advanced window: exactly **one** article was edited after that eviction — `Patch Notes` — and
+no harvester tracks it (not in any title list, no cache entry, not in `Category:Items`). So
+nothing is stale behind the new `since`.
+
+Window `2026-08-31T18:53:57Z` → `2026-09-15T01:19:43Z`: **1,420** changed pages, **1** changed
+template (`Template:Itempage` — the one the item parser reads; the rebuild still parsed 11,196
+of 11,197, 1 skipped, 1 statless, so the shape holds).
+
+**Promoted:** `FadeMessages`, `QuestCatalog`, `ItemCatalog.json.gz`, `SpellLevels`,
+`HarvestedGuides.json.gz`. Unchanged and carrying no binary diff: `SlowSpells`,
+`BuffDurations`, `DebuffLandings`, `CharmSpells`, `ZoneGraph`. Both `.gz` gates compare the
+**DECOMPRESSED** contents and pass (trap 74).
+
+**Curated stays curated.** Flag-only rule KEPT — nothing curated is written by this PR.
+Flagged for a human: `SpawnCatalog` (92), `GuideCatalog` (255), `SkyQuestDefaults.cs` (243),
+`AaCatalog` (7), `CcSpells` (9).
+
+**Surveys carried, with the distinct count that separates data from a template (trap 73):**
+DropMobs — 5,591 items name a creature across **4,450 distinct** names. MerchantCopper — 1,079
+pages state a value, **773 parsed**, 306 refused, **403 distinct values**, **205** quoting a
+Charisma/faction. Categories — 11,157 of 11,197 populated, but only 14 pages name a
+profession, which is why the item→profession arithmetic stays PARKED.
+
+**Three guards moved, each re-derived from a second source rather than pasted (trap 52):**
+QuestCatalog 1,178 → 1,173 (the wiki folded the seven per-piece Darkforge armor pages into
+`Category:Items` under one "Darkforge Armor Quests" page — verified all seven now appear in
+the items dump); harvested guides 1,164 → 1,158 with the nothing-to-say list fourteen →
+**fifteen** (`Class Race Quest List` joined it because the quest-item enumeration dropped
+"Innoruuk Symbol Quests", itself a quest page and never an item, which was the only thing its
+row had to say — its own wikitext is byte-identical); and the vendor-value tripwire FIRED
+exactly as written, replaced by a survey guard with a **committed negative** so its forbid-scan
+is not aimed at nothing (trap 78).
+
+`check.ps1` **all green**, 4,935 unit tests. E2E is CI's.
+
+### The asks
+
+1. **SIGN PR #626.** Data + reports + three guard updates + two doc counts. No engine, no
+   release, no Pages, no public surface, no privacy, no third-party policy change.
+
+2. **NAMED FOR VETO — 568 of the 773 shipped vendor prices carry no condition.** Only 205
+   pages state the Charisma/faction their quote was taken at. The other **568** draw the flat
+   "a vendor pays X for Y" sentence with **no "yours will differ" clause**, carried only by the
+   Catalog estimate label. The conditioned shape was already proved by the existing arm; what
+   this refresh changes is that the unconditioned one now has 568 real rows behind it. The
+   engine and the wording belong to the money engine, so **I changed nothing** — I measured it
+   and pinned the number in the guard. Your call whether an unconditioned catalog quote may
+   draw at all. I have no recommendation to press; the survey is the evidence.
+
+3. **NAMED FOR VETO — a latent ordering hazard in `refresh.py`, worked around but NOT fixed.**
+   `guides-transform` embeds `retrievedAt` from `refresh-state.json`'s `ranAt`, which
+   `refresh.py` stamps **after** the promotions. So any refresh that advances the date leaves
+   the committed file one cycle behind and reddens the `generated` gate **on the stamp alone**
+   — a gate that goes red for a reason that is not about the data, which is the failure mode
+   trap 74 exists to prevent. I re-ran the transform after stamping and the gate is green, but
+   **reordering `refresh.py` is a change to the refresh itself** and I left it for a ruling
+   rather than taking it under a D3 authorization that says "run it as designed". Noted in
+   CLAUDE.md so the next runner is not surprised. If you want it fixed, it is a small slice and
+   I will take it; if you want it left, the workaround is documented.
+
+**Deliberately NOT done:** no curated file touched, no rate or politeness change, no fetch
+beyond the standing weekly design, no engine change belonging to D1/D2/D4, no
+`WhatsNew.json` entry (the release that ships these catalogs earns one — vendor prices
+appearing in Farm-to-sell sentences is player-noticeable and should be named there), and **no
+move on the standing Soft-open un-PARK**, which your #623 SIGN named for D3 only.
+
+— Dranak (Claude Code, DRA-84 D3)
