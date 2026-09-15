@@ -324,6 +324,10 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
                         // desktop does; these two are the guide ledger's half of that.
                         Ledger = QuestLedger,
                         CharacterKey = QuestCharacterKey,
+                        // DRA-83: what the Helper says about the subjects those steps point at,
+                        // from the phone's OWN Helper pass — one host, one set of stores, both of
+                        // its screens (see PhoneHelperSource.Attachments).
+                        Helper = phoneHelper.Attachments(),
                     };
                 },
                 // **The Helper, by projection** (DRA-71 D9) — the SAME `Recommendations.Rank`

@@ -281,7 +281,9 @@ public static partial class CompanionProjection
                 // trap 72's exact shape one surface over. Not a bare count — a swap of one
                 // skip for another leaves a count where it was.
                 Join(qs.Guides, g => $"{g.Quest}:{(g.Group.Collapsed ? 'F' : 'O')}="
-                    + Join(g.Group.Rows, r => $"{r.Id}:{(r.Done ? '1' : '0')}{(r.Skipped ? 's' : '-')}"))
+                    + Join(g.Group.Rows, r =>
+                        // The Helper's line too (DRA-83) — see ChecklistPrint for why in full.
+                        $"{r.Id}:{(r.Done ? '1' : '0')}{(r.Skipped ? 's' : '-')}:{r.Helper}"))
                     + "+" + qs.GuidesMore);
 
         AddChecklist(map, CompanionSurfaces.Gear, snap.Gear);
@@ -304,10 +306,16 @@ public static partial class CompanionProjection
         // bands' held-back note names the items another quest vetoed (#243), and those are
         // deliberately not rows. Nothing here drifts on a clock — every note is a state word
         // ("ready", "in progress") or a list of item and quest names (trap 8).
+        // AND THE HELPER'S LINE, in full (DRA-83). It is an engine's output, so it moves when an
+        // archived session, a fresh inventory dump or tonight's kills move it — and NOTHING else
+        // in this print does: a tick, a fold and a note are all somewhere else. Trap 72 on the
+        // wire, which is worse than on a window: a phone would keep drawing last week's rate with
+        // no repaint to blame. Safe as a full string for the same reason the Helper section's own
+        // sentences are (trap 8): there is no countdown, no age and no "x ago" in any of them.
         static string ChecklistPrint(CompanionChecklistSection section) =>
             Fold($"{section.Done}/{section.Total}",
                 Join(section.Groups, g => g.Heading + "~" + g.Note
-                    + "=" + Join(g.Rows, r => $"{r.Id}:{(r.Done ? '1' : '0')}")));
+                    + "=" + Join(g.Rows, r => $"{r.Id}:{(r.Done ? '1' : '0')}:{r.Helper}")));
     }
 
     /// <summary>The pseudo-section for envelope-level change (who/where/the gate/the

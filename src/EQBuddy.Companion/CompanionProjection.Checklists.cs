@@ -42,7 +42,7 @@ public static partial class CompanionProjection
         var all = QuestChecklistLayout.Epic(scoped);
         if (settings is not null && req.Ledger is not null)
             all = GuideChecklistProjection.ApplyEpic(all, scoped, GuideCatalog.Default,
-                settings, req.Ledger, req.CharacterKey);
+                settings, req.Ledger, req.CharacterKey, helper: req.Helper);
 
         var groups = all
             .Select(g => new CompanionChecklistGroup(
@@ -100,7 +100,7 @@ public static partial class CompanionProjection
         // both screens already share (David, 2026-08-18 — parity by shared module).
         if (settings is not null && req.Ledger is not null)
             all = GuideChecklistProjection.Apply(all, GuideCatalog.Default,
-                settings, req.Ledger, req.CharacterKey);
+                settings, req.Ledger, req.CharacterKey, helper: req.Helper);
 
         var groups = new List<CompanionChecklistGroup>();
 
@@ -200,7 +200,11 @@ public static partial class CompanionProjection
             r.IsSkipped,
             // A turn-in piece's answer is the bags, and the router refuses a tick of it — so
             // the page draws the count and no checkbox rather than a box that ignores taps.
-            Tickable: r.LedgerItemName.Length == 0)),
+            Tickable: r.LedgerItemName.Length == 0,
+            // The Helper's answer about what this step points at (DRA-83). Already worded by the
+            // projection above, which is what makes the two screens say the same thing about one
+            // reference — the phone decides nothing about it, not even how many sentences.
+            Helper: r.HelperAnswer.Length > 0 ? r.HelperAnswer : null)),
     ];
 
     /// <summary>What a guided group's fold is keyed on, or null when the group is not guided

@@ -26,34 +26,58 @@ namespace EQBuddy;
 /// that can live outside it does (the <c>CompanionMapSource</c> / <c>CompanionQuestSource</c>
 /// idiom, one lane along).</para>
 /// </summary>
-internal sealed class PhoneHelperSource(MainWindow main)
+internal sealed class PhoneHelperSource
 {
-    private readonly HelperSources _sources = new(new HelperSources.Reads(
-        StoredMobRows: main.StoredMobRows,
-        StoredSessions: main.StoredSessions,
-        StoredThroughput: main.StoredThroughput,
-        StoredSales: main.StoredSales,
-        LatestInventory: () => main.LatestInventory(),
-        StatsFor: main.WikiItems.StatsFor,
-        ActiveSessionRowId: () => main.ActiveSessionRowId));
+    /// <summary>This host's own pass — the seven reads and the eight <c>Gather</c> arguments,
+    /// which DRA-83 moved into <see cref="HelperPass"/> because the guide surface needs the
+    /// identical ones. Still ONE INSTANCE PER HOST (trap 45); only the wiring is shared.</summary>
+    private readonly HelperPass _pass;
+
+    /// <summary>The guide-reference answers for THIS host (DRA-83). They live here rather than in
+    /// a second phone-side source because the phone is ONE host: its Helper screen and its quest
+    /// screens have to read one pass, or the two would answer from stores taken moments apart
+    /// (trap 33) and each would keep its own five-second clock.</summary>
+    private readonly GuideAttachmentMemo _attachments;
+
+    public PhoneHelperSource(MainWindow main)
+    {
+        _pass = new HelperPass(main);
+        _attachments = _pass.Attachments();
+    }
+
+    /// <summary>
+    /// The Helper's answers about the subjects the guide steps point at, for the phone's quest
+    /// screens (DRA-83).
+    ///
+    /// <para>Asked from the QUEST request rather than from <see cref="Build"/>, because the two
+    /// screens are offered independently: a phone paired on quests with the Helper screen off
+    /// still draws guided Sky rows, and on the desktop those rows carry this line. It takes the
+    /// same throttled read and the same memo, so a quiet tick costs a string join.</para>
+    /// </summary>
+    public GuideAttachmentLines Attachments()
+    {
+        // ON ITS OWN CLOCK, for the reason `GuideHelperSource.Refresh` keeps one: the quest
+        // request is built every tick a phone is paired on that screen, and the fold behind this
+        // is archived play rather than anything the player just did. `HelperSources.CacheFor` is
+        // the interval the reads under it already keep.
+        if (DateTime.Now - _asked >= HelperSources.CacheFor)
+        {
+            _asked = DateTime.Now;
+            _pass.Read();
+            _attachments.Refresh();
+        }
+        return _attachments.Lines;
+    }
+
+    private DateTime _asked = DateTime.MinValue;
 
     /// <summary>One pass. Called only while the screen is offered AND a device is paired —
     /// <c>CompanionHost.Tick</c>'s lazy rule, which matters here more than for any other
     /// source: the reads behind it are a session query and three probes.</summary>
     public Companion.CompanionHelperRequest Build()
     {
-        var snap = main.CurrentSnapshot();
-        // The widget's pair is (Character, Server) and every UI.Shared reader takes
-        // (Server, Character) — named access rather than a positional destructure, which is
-        // the mistake ShellRoomIdentity exists to have made once and never again.
-        _sources.Read(snap, main.Identity.Character, main.Identity.Server);
-
-        var bundle = _sources.Gather(
-            main.Settings, main.QuestCharacterKey, main.Unlocks, main.ResolvedLevel,
-            main.QuestCatalog, ItemCatalog.Default,
-            main.QuestLedger?.ClassesFor(main.QuestCharacterKey) ?? [],
-            snap.InferredClass ?? "",
-            main.QuestLedger?.SkillsFor(main.QuestCharacterKey) ?? []);
+        _pass.Read();
+        var bundle = _pass.Gather();
 
         return new Companion.CompanionHelperRequest(
             bundle.Inputs, bundle.Goals, bundle.Professions,

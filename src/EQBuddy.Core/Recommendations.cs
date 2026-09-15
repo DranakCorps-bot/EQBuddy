@@ -783,7 +783,7 @@ public sealed record RecommendationSet(
 /// log, this character's own dumps and catalogs EQBuddy ships. There is no comparison, no
 /// ranking against anyone, and no number that came off somebody else's screen.</para>
 /// </summary>
-public static class Recommendations
+public static partial class Recommendations
 {
     /// <summary>
     /// How many recommendations are shown by default. <b>Three, and the PRD asked for the

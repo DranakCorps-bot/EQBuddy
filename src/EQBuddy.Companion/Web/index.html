@@ -207,6 +207,11 @@
      the block is one labelled line per question. */
   .rows .facts { display:block; font-size:11px; color:var(--dim); margin-top:2px;
                  white-space:pre-line; }
+  /* The Helper's answer about what this step points at (DRA-83). Pre-wrapped like .facts,
+     because several references on one step arrive one per line - and dim like them, because
+     it is context under the step rather than the step. */
+  .rows .helper { display:block; font-size:11px; color:var(--dim); margin-top:2px;
+                  white-space:pre-line; }
   .rows li.skipped .rn { text-decoration:line-through; opacity:.6; }
   /* The active-step card. Above the group's rows and under its heading, because the one
      thing that says "do this next" belongs where the eye lands. */
@@ -2084,6 +2089,10 @@ function boot() {
         if (r.detail) rn.appendChild(el("span", "sub", r.detail));
         if (r.stub) rn.appendChild(el("span", "stub", r.stub));
         if (r.facts) rn.appendChild(el("span", "facts", r.facts));
+        // What the Helper says about the subject this step points at (DRA-83). Every word of it
+        // came over the wire already written — this page decides nothing about it, which is the
+        // only reason a phone running last month's copy shows this month's answer (trap 32).
+        if (r.helper) rn.appendChild(el("span", "helper", r.helper));
         if (r.improve) {
           // A plain link: the phone's browser opens the prefilled draft natively, so the
           // desktop's pencil ports as itself rather than as a "do this on your PC" note.
@@ -2262,6 +2271,10 @@ function boot() {
         if (r.detail) rn.appendChild(el("span", "sub", r.detail));
         if (r.stub) rn.appendChild(el("span", "stub", r.stub));
         if (r.facts) rn.appendChild(el("span", "facts", r.facts));
+        // What the Helper says about the subject this step points at (DRA-83). Every word of it
+        // came over the wire already written — this page decides nothing about it, which is the
+        // only reason a phone running last month's copy shows this month's answer (trap 32).
+        if (r.helper) rn.appendChild(el("span", "helper", r.helper));
         if (r.improve) {
           // A plain link: the phone's browser opens the prefilled draft natively, so the
           // desktop's pencil ports as itself rather than as a "do this on your PC" note.
