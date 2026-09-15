@@ -65,7 +65,7 @@ You say, 'What present?'
 
 '''After turn in:'''
 
-: Karam Dragonforge says 'My fiance will be so excited! An exquisite ring for the wedding and a gorgeous necklace as my wedding gift to her. Well, as promised, here is your white dragonscale cloak.'
+: Karam Dragonforge says 'My fiance will be so excited! An exquisite ring for the wedding and a gorgeous necklace as my wedding gift to her. Well, as promised, here is your [[White Dragonscale Cloak]].'
 
 [[Category:Quests]]
 [[Category:Rathe Mountains]]

@@ -10,7 +10,7 @@
 | classes = * [[Shaman]] - Level 42
 | slots = 
 
-{{SpellSlotRow | 1 | Increase Current Hit Points by 160 per Tick }}
+{{SpellSlotRow | 1 | Increase Current Hit Points by 200 per Tick }}
 {{SpellSlotRow | 3 | Decrease Movement Speed by 100% }}
 
 | items_with_effect = 

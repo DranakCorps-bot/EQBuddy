@@ -1,8 +1,9 @@
+{{Classic Era}}
 {{Spellpagesmart|
 
 | spellname = Fire
-| spellicon = O
-| description = Ignites your target's skin, doing 392 damage, and lowering their ice resistance for 18 secs (3 ticks). 1.51 DPM.
+| spellicon = 51
+| description = Ignites your target's skin, doing 392 damage, and lowering their ice resistance for 18 secs (3 ticks).
 
 | Table = {{{Table|0}}}
 | TableLevel = {{{TableLevel|}}}
@@ -31,13 +32,7 @@
 
 | where_to_obtain = 
 
-{{SpellWhereTable|
-{{SpellWhereRowB | [[Lavastorm Mountains]] | [[Tisiana]] | Druid Ring | (982,1369) }}
-{{SpellWhereRow  | [[The Wakening Land]] | [[Phillip Aghllsews]] | PoG Tower | (519,-1028) }}
-}}
-
-
-| TableLocations = Lavastorm<br/>Wakening
-| TableEra = Classic
-
+<ul>
+<li>[[Druid#Spell Vendors|Druid Spell Vendors]]</li>
+</ul>
 }}

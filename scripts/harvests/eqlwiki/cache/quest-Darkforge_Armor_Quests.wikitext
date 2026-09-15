@@ -1,6 +1,8 @@
-{{Classic Era}}
+__NOTOC__
 
-[[File:npc_an_undead_knight.png|thumb|right|an undead knight]]
+<div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 3em; flex-wrap: wrap;">
+
+<div style="flex: 1 1 750px; min-width: 0;">
 
 {| class="questTopTable"
 ! ''' Start Zone: '''
@@ -16,24 +18,31 @@
 | [[Shadow Knight]]
 |-
 ! ''' Related Zones: '''
-| [[Steamfont Mountains]], [[Cazic Thule]]
+| [[Cazic Thule]], [[Steamfont Mountains]], [[Greater Faydark]], [[Lesser Faydark]], [[Solusek's Eye]], [[East Freeport]], [[West Freeport]], [[Northern Desert of Ro]], [[Northern Karana]]
 |-
 ! ''' Related NPCs: '''
-| [[Minotaur Lord]], [[A Lizard Crusader]]
+| [[A Lizard Crusader]], [[A Lizard Ritualist]], [[Minotaur Lord]], faeries, lettered CWG Model clockworks, Freeport militia guards, [[Guard Shilster]]
 |}
 
+</div>
 
-Darkforge Armor is a set of [[Shadow Knight]] specific armor obtained through quests offered in the [[The Temple of Solusek Ro]] by the Undead Knights.  It could not originally be used by Iksar, but this racial restriction has been removed.
+<div style="flex: 0 0 210px; margin-right: 5%;">
 
-Each piece of Darkforge armor requires two pieces of [[Decayed Armor]]. These drop form [[A Lizard Crusader]] and [[A Lizard Ritualist]] in the Temple of Cazic-Thule.  You will also need one other item from around the world.
+[[File:Darkforge_Armor.png|200px|thumb|none|Darkforge Armor on a Male Dark Elf]]
 
-In EQL, the most reliable way to farm the decayed armor is to focus on [[A Lizard Ritualist]], who has a static spawn on top of a small temple at the SouthEast corner of the zone.  You can use Invis to run past all of the other lizards, kill him and any adds, switch to another difficulty, and do it again.  It's also helpful to bind just outside the zone and to Gate over and kill him in base difficulty and another difficulty quickly then return to other tasks.
+</div>
 
-Take note when turning in the items that there are two undead knights in the same room, each offers only certain pieces of the Darkforge Armor in return for the hand-ins, hail them to find out which pieces they can forge.
+</div>
 
-The undead knight to the LEFT (say: I seek the darkforge armor) makes: Helm, Breastplate, Vambraces and Bracers.
+== General Information ==
 
-The undead knight to the RIGHT (say: I seek the darkforge armor) makes: Gauntlets, Greaves and Boots.
+Darkforge Armor is a mid-level [[Shadow Knight]]-specific armor set obtained through quests offered by the undead knights in the [[Temple of Solusek Ro]]. It could not originally be used by Iksar, but this racial restriction has been removed.
+
+Each piece requires two corresponding pieces of [[Decayed Armor]] and one additional turn-in item. Decayed Armor drops from [[A Lizard Crusader]] and [[A Lizard Ritualist]] in the [[Cazic Thule (Zone)|Temple of Cazic-Thule]].
+
+In EQL, [[A Lizard Ritualist]] is always up on top of the small temple in the southeastern corner of Cazic Thule and always drops one piece of Decayed Armor. [[A Lizard Crusader|Lizard Crusaders]] spawn at multiple locations throughout the zone but have PHs and can also drop Decayed Armor.
+
+The ritualist can be reached using invisibility to pass the other lizards. Kill the ritualist and any nearby adds, switch difficulties, and repeat.
 
 == Rewards ==
 
@@ -49,86 +58,72 @@ The undead knight to the RIGHT (say: I seek the darkforge armor) makes: Gauntlet
 
 == Walkthrough ==
 
-=== Checklist ===
+There are two undead knights in the same room. Each knight accepts turn-ins for specific pieces of Darkforge Armor.
+
+* Left undead knight: Bracer, Breastplate, Helm, Vambraces
+* Right undead knight: Boots, Gauntlets, Greaves
+
+== Left Undead Knight ==
+
+[[File:npc_an_undead_knight.png|thumb|right|an undead knight]]
 
 {{CheckboxList}}
-=== [[Darkforge Bracer]] ===
-*[[Decayed Left Bracer]]
-*[[Decayed Right Bracer]]
-*[[Broken Minotaur Lord's Horn]]
-=== [[Darkforge Breastplate]] ===
-*[[Decayed Chainmail]]
-*[[Decayed Breastplate]]
-*[[Enchanted Platinum Bar]] x2
-=== [[Darkforge Boots]] ===
-*[[Decayed Left Boot]]
-*[[Decayed Right Boot]]
-*[[Fairy Dust]] x2
-=== [[Darkforge Gauntlets]] ===
-*[[Decayed Left Gauntlet]]
-*[[Decayed Right Gauntlet]]
-*[[Enchanted Platinum Bar]] x1
-=== [[Darkforge Greaves]] ===
-*[[Decayed Left Legplate]]
-*[[Decayed Right Legplate]]
-*[[Melatite]] x2
-=== [[Darkforge Helm]] ===
-*[[Decayed Helm]]
-*[[Decayed Visor]]
-*[[Damaged Militia Helm]] x2
-=== [[Darkforge Vambraces]] ===
-*[[Decayed Left Vambrace]]
-*[[Decayed Right Vambrace]]
-*[[Qeynos Kite Shield]]
 
-== Rewards and Walkthrough ==
+'''{{:Darkforge Bracer}}'''
 
+* [[Decayed Left Bracer]]
+* [[Decayed Right Bracer]]
+* [[Broken Minotaur Lord's Horn]] ([[Steamfont Mountains]] – [[Minotaur Lord]] in the minotaur mines around 1555, -2410)
 
-{| class="eoTable2"
-! Darkforge Piece
-! Stats
-! Decayed Pieces
-! Other Items
-|-
-| {{:Darkforge Bracer}}
-| 9ac, 3dex, 2.0wgt
-| Left and Right Decayed bracer
-| 1 [[Broken Minotaur Lord's Horn]] (Minotaur Lord in [[Steamfont Mountains]] caves). Makes one bracer.
-|-
-| {{:Darkforge Breastplate}}
-| 20ac, 10sta, 3sv magic, 5.0wgt
-| Decayed Mail and Breastplate
-| 2 [[Enchanted Platinum Bar]]s (not stacked).
-|-
-| {{:Darkforge Boots}}
-| 11ac, 3sta, 1.5wgt
-| Left and Right Decayed boot
-| 2 [[Fairy Dust]] (not stacked) from [[Lesser Faydark]].
-|-
-| {{:Darkforge Gauntlets}}
-| 12ac, 2dex, 5sv magic, 2.5wgt
-| Left and Right Decayed Gauntlets
-| 1 [[Enchanted Platinum Bar]].
-|-
-| {{:Darkforge Greaves}}
-| 13ac, 9sta, 3sv magic, 3.7wgt
-| Left and Right Decayed leg
-| 2 [[Melatite]] (not stacked) MB, MA and MC Model Clockworks in [[Solusek's Eye|Solusek A]].
-|-
-| {{:Darkforge Helm}}
-| 13ac, 5int, 5sv all, 3.0wgt
-| Decayed Helm and Visor
-| 2 [[Damaged Militia Helm]]s (Freeport guards).
-|-
-| {{:Darkforge Vambraces}}
-| 11ac, 4str, 3.2wgt
-| Left and Right Decayed arm
-| [[Qeynos Kite Shield ]] (Qeynos guards).
-|}
+<br>
 
-== Fashion ==
+'''{{:Darkforge Breastplate}}'''
 
-[[File:Geykaken.jpg|center|Complete Darkforge Set worn by the Dark Knight Geykaken Ofnyahm]]
+* [[Decayed Chainmail]]
+* [[Decayed Breastplate]]
+* [[Enchanted Platinum Bar]] x2 ([[Platinum Bar]]s enchanted by an Enchanter)
+
+<br>
+
+'''{{:Darkforge Helm}}'''
+
+* [[Decayed Helm]]
+* [[Decayed Visor]]
+* [[Damaged Militia Helm]] x2 (dropped by militia guards in [[East Freeport]], [[West Freeport]], and the [[Northern Desert of Ro]])
+
+<br>
+
+'''{{:Darkforge Vambraces}}'''
+
+* [[Decayed Left Vambrace]]
+* [[Decayed Right Vambrace]]
+* [[Qeynos Kite Shield]] ([[Northern Karana]] – [[Guard Shilster]] at 1380, -2764, in the northeastern corner of the zone)
+
+:'''Note:''' Guard Shilster is the recommended source because he always drops the shield and has the smallest faction penalties of the listed guards. Killing him lowers Bloodsabers, Circle of Unseen Hands, Corrupt Qeynos Guards, and Kane Bayle by only 1 point each while raising Guards of Qeynos by 5.
+
+== Right Undead Knight ==
+
+'''{{:Darkforge Boots}}'''
+
+* [[Decayed Left Boot]]
+* [[Decayed Right Boot]]
+* [[Fairy Dust]] x2 (dropped by faeries in [[Lesser Faydark]] and [[Greater Faydark]])
+
+<br>
+
+'''{{:Darkforge Gauntlets}}'''
+
+* [[Decayed Left Gauntlet]]
+* [[Decayed Right Gauntlet]]
+* [[Enchanted Platinum Bar]] ([[Platinum Bar]] enchanted by an Enchanter)
+
+<br>
+
+'''{{:Darkforge Greaves}}'''
+
+* [[Decayed Left Legplate]]
+* [[Decayed Right Legplate]]
+* [[Melatite]] x2 (dropped by lettered CWG Model clockworks in the upper gnome fort of [[Solusek's Eye|Solusek A]]. The entrance is in the northeastern portion of the zone around -1100, -200)
 
 [[Category:Quests]]
 [[Category:Temple of Solusek Ro]]

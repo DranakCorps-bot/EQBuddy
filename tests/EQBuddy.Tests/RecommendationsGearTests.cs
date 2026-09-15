@@ -471,18 +471,56 @@ public class RecommendationsGearTests
         Assert.Single(resold.Why.OfType<SellableDropFact>());
     }
 
-    /// <summary>The shipped catalog carries no vendor value YET, and the row above is the only
-    /// reason that is not a silent hole. Asserted against the real file so the day the weekly
-    /// refresh fills it in, this fails and somebody looks at the sentences it turns on rather
-    /// than finding out from a player.</summary>
+    /// <summary>
+    /// <b>The vendor-value tripwire FIRED on the 2026-09-15 refresh (DRA-84 D3)</b>, which is
+    /// what it was for: the row used to assert the shipped catalog carried no
+    /// <c>MerchantCopper</c> at all, "so the day the weekly refresh fills it in, this fails and
+    /// somebody looks at the sentences it turns on rather than finding out from a player".
+    /// It is now a survey of what actually ships, pinned so the next move is visible too.
+    ///
+    /// <para><b>The distinct count is the load-bearing one</b> (trap 73): 773 prices drawn from
+    /// 403 distinct values is a parser reading a per-item field, not one template quoted 773
+    /// times. A future refresh that collapses that ratio is a parser regression wearing a
+    /// coverage gain's clothes.</para>
+    ///
+    /// <para><b>The open question this refresh raises, referred to Helm rather than decided
+    /// here:</b> only 205 of the 773 priced pages state the Charisma/faction their quote was
+    /// taken at, so <b>568 of them draw the flat sentence with no "yours will differ" clause</b>
+    /// — carried only by the Catalog estimate label, because there is no condition on the page
+    /// to quote. The arm above proves the conditioned shape; this names the size of the
+    /// unconditioned one so it is not a silent hole.</para>
+    /// </summary>
     [Fact]
-    public void TheShippedCatalogCarriesNoVendorValueYet()
+    public void TheShippedCatalogsVendorValuesAreASurveyedQuoteAndNotATemplate()
     {
-        var priced = ItemCatalog.Default.All.Count(r => r.MerchantCopper is not null);
-        Assert.True(priced == 0,
-            $"{priced:N0} shipped item records now carry a MerchantCopper. The promoter's field "
-            + "has data behind it — check the survey counts in items-catalog-report.md, then "
-            + "update this row and re-read the sentences it turns on.");
+        var priced = ItemCatalog.Default.All.Where(r => r.MerchantCopper is not null).ToList();
+        var conditioned = priced.Count(r => !string.IsNullOrEmpty(r.MerchantCondition));
+
+        // The counts the promoter's own survey printed into items-catalog-report.md.
+        Assert.Equal(773, priced.Count);
+        Assert.Equal(205, conditioned);
+        Assert.Equal(568, priced.Count - conditioned);
+        Assert.Equal(403, priced.Select(r => r.MerchantCopper!.Value).Distinct().Count());
+
+        // A condition without a price is an orphan caveat: a sentence qualifying a number
+        // that is not there. The promoter only sets one beside a parsed value — asserted,
+        // not assumed, because that pairing is what makes the quote readable as a quote.
+        static bool IsOrphanCaveat(ItemCatalog.Record r) =>
+            r.MerchantCopper is null && !string.IsNullOrEmpty(r.MerchantCondition);
+
+        Assert.DoesNotContain(ItemCatalog.Default.All, IsOrphanCaveat);
+
+        // The committed negative, because a forbid-scan that has never fired is a guard aimed
+        // at nothing (trap 78): the same predicate, over a catalog that HAS one.
+        Assert.Contains(
+            new ItemCatalog([
+                new ItemCatalog.Record
+                {
+                    Name = "A Condition With No Price",
+                    MerchantCondition = "VALUE TO VENDOR with CHA : 80",
+                },
+            ]).All,
+            IsOrphanCaveat);
     }
 
     /// <summary>A profile with no catalog at all is the "no dump" state and not a crash — a

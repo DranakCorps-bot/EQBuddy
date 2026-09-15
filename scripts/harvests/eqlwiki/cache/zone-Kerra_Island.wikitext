@@ -30,7 +30,7 @@
 | 4 minutes
 |-
 ! '''Succor/Evacuate:'''
-| 474, -860 (Zone line to Toxxulia)
+| 474, -860, 23 (Zone line to Toxxulia)
 |-
 ! [[Recommended Levels and ZEM List | ZEM]] ''' Value:'''
 |<s>90 (120%)</s> '''100 (133%)'''

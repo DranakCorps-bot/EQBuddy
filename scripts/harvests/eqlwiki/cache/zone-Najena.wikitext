@@ -49,7 +49,7 @@ Najena is the ancient home of a twisted dark elf magician named Najena, who carv
 <ul><li>  1. Entry Room with elementals
 </li><li>  1.5. To the left of #1 in the dead end room. [[Unbound Flame]] who drops {{:Flaming Fist}}, {{:Drop of Crystallized Flame}}
 </li><li> 2. Najena's Room with [[Najena (NPC)|Najena]] who drops {{:Flowing Black Robe}} (Common), {{:Clawed Knuckle-Ring}} (Rare), and {{:Black Tome with Silver Runes}} (Rare)
-</li><li> 3. Torture Rooms
+</li><li> 3. Torture Rooms with [[The Blood Artist]] who drops {{:The Muse's Flayed Legs}} (Common) and {{:The Artist's Brush}} (Rare)
 </li><li> 4. Crystal Room
 </li><li> 5. [[Drelzna]]'s Room with [[Drelzna]] who drops {{:Journeyman's Boots}}, {{:Stiletto of the Bloodclaw}}, {{:Earring of Disease Reflection}} (Common) and {{:Ashenwood Short Spear}} (Rare) and {{:Golden Crescent Key}} to #2
 </li><li> 6. Pit Traps (marked with X) to room 10 below

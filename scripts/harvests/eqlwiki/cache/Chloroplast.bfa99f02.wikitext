@@ -21,6 +21,7 @@
 | slots = 
 
 {{SpellSlotRowSmart | 1 | Increase Hitpoints by 10 (L39) to 16 (L50) per tick | simple = {{#ifeq:{{{Table|0}}}|0|0|1}} }}
+{{SpellSlotRowSmart | 2 | Increase Endurance by 7 (L39) to 10 (L50) per tick | simple = {{#ifeq:{{{Table|0}}}|0|0|1}} }}
 
 | skill = [[Skill Alteration | Alteration]]
 

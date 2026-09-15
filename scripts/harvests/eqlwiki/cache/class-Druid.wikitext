@@ -1811,7 +1811,7 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
 |kind=Imbue Gem
 |targ=Self
 |mana=200
-|effects=1: {{:Summoned: Imbued Emerald}}
+|effects=1: Create {{:Imbued Emerald}}
 |duration=Instant
 |school=Alteration
 |location=Vendor
@@ -1822,7 +1822,7 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
 |kind=Imbue Gem
 |targ=Self
 |mana=200
-|effects=1: {{:Summoned: Imbued Plains Pebble}}
+|effects=1: Create {{:Imbued Plains Pebble}}
 |duration=Instant
 |school=Alteration
 |location=Vendor
@@ -1833,7 +1833,7 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
 |kind=Imbue Gem
 |targ=Self
 |mana=600
-|effects=1: {{:Summoned: Imbued Emerald}} (×5)
+|effects=1: Create {{:Imbued Emerald}} (×5)
 |duration=Instant
 |school=Alteration
 |location=Vendor
@@ -1844,7 +1844,7 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
 |kind=Imbue Gem
 |targ=Self
 |mana=600
-|effects=1: {{:Summoned: Imbued Plains Pebble}} (×5)
+|effects=1: Create {{:Imbued Plains Pebble}} (×5)
 |duration=Instant
 |school=Alteration
 |location=Vendor
@@ -1854,6 +1854,7 @@ Starting Cities can have multiple vendors for class spells - they all sell the s
 </div>
 
 <div id="spells_level_30">
+
 ==Level 30==
 <table class="eoTable2 " style="width:100%;">
     <tr>

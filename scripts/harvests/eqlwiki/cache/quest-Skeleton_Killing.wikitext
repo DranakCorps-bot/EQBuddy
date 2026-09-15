@@ -1,5 +1,4 @@
 {{Classic Era}}
-
 :''For the overview of the many bone chips quests, see [[Bone Chips Quests]].''
 [[File:npc_lumi_stergnon.png|thumb|Lumi Stergnon]]
 {| class="questTopTable"

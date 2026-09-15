@@ -63,11 +63,11 @@ You say, 'What about [[Frostbite]]?'
 ====Regurg====
 '''Or you can do [[The Regurgitonic]] quest in [[Ak'Anon]] and feed Frostbite the [[Regurgitonic]], which will cause him to cough up the fish corpse with no loss of faction. 
 
-* As of November 20th 2019 Frostbite does NOT cough up the fish every time. Out of 8 turn in's the fish was provided 5 of those times. Gnome Agnostic Enchanter doing turn in. (Note 6/17/21 - This is because sometimes Kimble gives you a 'Bad Regurgitonic'. Identify will tell you the item lore and let you know if you got a bad one.)'''
+* Note that sometimes Kimble gives you a dud that will not work. When a good tonic is inspected (as though you were adding motes) it will not have a 'Lore' tab. The bad tonics will have an item lore tab with the text 'Bad Regurgitonic'.
 
 Frostbite spits something into your hand.
 <div class='facblock'>
-* Your faction standing with [[Wolves of the North]] has been adjusted by 5.
+* Your faction standing with [[Wolves of the North|Wolves of the Nor]][[Wolves of the North|th]] has been adjusted by 5.
 * Your faction standing with [[Shamen of Justice]] has been adjusted by 5.
 * Your faction standing with [[Merchants of Halas]] has been adjusted by 5.
 * Your faction standing with [[Rogues of the White Rose]] has been adjusted by 5.

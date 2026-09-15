@@ -13,7 +13,7 @@
 
 | slots = 
 
-{{SpellSlotRow | 1 | Increase STR by 40 (effect decreases over time) }}
+{{SpellSlotRow | 1 | Increase STR by 40 (effect decreases over time).  Upgrading the spell increases the strength gained (+100 STR at level III) }}
 
 | skill = [[Skill Alteration | Alteration]]
 

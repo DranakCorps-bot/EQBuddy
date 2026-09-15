@@ -151,7 +151,7 @@ Obtain the 10 rods and combine them in the <span style="color:#d52200"><strong>T
 ! Jaka
 | [[Unrest]]
 | {{loc|Unrest|+520, -285}}
-| width="500" style="text-align: left" | Underwater on the hidden cavern floor to the right of the manor. Near [[Serra]] and [[a gnomish spelunker]], but in a cubby between them and the house.
+| width="500" style="text-align: left" | Underwater on the hidden cavern floor to the right of the manor. Near [[Serra]] and [[a gnomish spelunker]], but in a cubby between them and the gazebo.
 | No
 |}
 

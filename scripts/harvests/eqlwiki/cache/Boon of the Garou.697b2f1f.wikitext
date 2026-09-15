@@ -4,6 +4,7 @@
 | spellname = Boon of the Garou
 | spellicon = U
 | description = Transforms your target into a feral werewolf, increasing their attack rating, dexterity, and allowing a chance to perform a life draining attack. Adds {{SpellHoverLink|Lifetap Strike}} (melee proc).
+| other = Note: Your target must be level 35 or higher.
 
 | classes = 
 

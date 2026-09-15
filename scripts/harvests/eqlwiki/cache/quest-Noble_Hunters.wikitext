@@ -1,5 +1,5 @@
 {{Classic Era}}
-[[File:npc_guntrik.png|frame|Guntrik]]
+[[File:npc_guntrik.png|thumb|Guntrik]]
 {| class="questTopTable"
 ! ''' Start Zone: '''
 | [[Oggok]]

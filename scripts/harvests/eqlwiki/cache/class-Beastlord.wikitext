@@ -45,7 +45,8 @@ When selecting a race, a big consideration is the factions it is associate with 
 | style="text-align: left"| '''[[Beastlord]] Adds''' ||  || 10 || 5 ||  || 10 ||  || 5
 |}
 
-== Your Race & Warder ==
+== Warder Companion ==
+Beastlords can summon Warrior/Beastlord pets via the [[Spirit of Sharik]] series of spells learned every 6-9 levels. The warder's appearance is based only on the Beastlord's race, unaffected by Enchanter illusions and such. Warder appearance has no effect on gameplay other than visual and sound effects.
 {| class="wikitable"
 ! Race
 ! Warder
@@ -66,7 +67,7 @@ When selecting a race, a big consideration is the factions it is associate with 
 | [[:File:Froglok_Warder_Leech.png|Leech]]
 |-
 | [[Gnome]] 
-| [[:File:Gnome_Warder_Rat.png|Rat]] (Currently - 5.15.26) / Clockwork Spider (Launch)
+| Clockwork Spider
 |-
 | [[Half Elf]] 
 | [[:File:HalfElf_Warder_Puma.png|Puma]]
@@ -100,9 +101,6 @@ Special thanks to Gigglemage, Moth, and Secrets for this information.
 
 == Impact from stats ==
 Prioritize Strength, Stamina, and Wisdom based on whether you want to emphasize melee performance, survivability, or spellcasting utility.
-
-= Warder Companion =
-The Beastlord’s warder is a permanent pet that fights alongside its master and is a core part of the class’s power in both solo and group play.
 
 = Skills =
 

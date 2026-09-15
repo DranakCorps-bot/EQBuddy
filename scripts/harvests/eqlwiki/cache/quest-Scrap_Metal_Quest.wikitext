@@ -1,4 +1,4 @@
-[[File:npc_sanfyrd_featherhead.png|frame|Sanfyrd Featherhead]]
+[[File:npc_sanfyrd_featherhead.png|thumb|Sanfyrd Featherhead]]
 {| class="questTopTable"
 ! ''' Start Zone: '''
 | [[Ak'Anon]]
@@ -36,11 +36,11 @@ You say, 'Hail, Sanfyrd Featherhead'
 '''Give [[scrap metal]] to Sanfyrd four at a time''' for some experience, money, a random item and the following faction changes:
 
 <div class="facblock">
-* Your faction with [[King AkAnon]] got better.
-* Your faction with [[Merchants of AkAnon]] got better.
-* Your faction with [[Gem Choppers]] got better.
-* Your faction with [[Dark Reflection]] got worse.
-* Your faction with [[Clan Grikbar]] got worse.
+* Your faction with [[King AkAnon]] got better (5).
+* Your faction with [[Merchants of AkAnon]] got better (5).
+* Your faction with [[Gem Choppers]] got better (5).
+* Your faction with [[Dark Reflection]] got worse (-1).
+* Your faction with [[Clan Grikbar]] got worse (-1).
 </div>
 
 You will get one of several random items out of this.  Often it is [[Rusty Weapons]].  One unusual item is the [[Gnome Glow Rod]], which acts as a light source.

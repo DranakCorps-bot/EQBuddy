@@ -1,3 +1,4 @@
+{{Kunark Era}}
 [[File:npc_barnal_flamehand.png|frame|Barnal Flamehand]]
 {| class="questTopTable"
 ! ''' Start Zone: '''

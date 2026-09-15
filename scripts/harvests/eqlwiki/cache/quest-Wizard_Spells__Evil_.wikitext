@@ -1,3 +1,4 @@
+{{Kunark Era}}
 [[File:npc_utandar_rizndown.png|frame|Utandar Rizndown]]
 {| class="questTopTable"
 ! ''' Start Zone: '''

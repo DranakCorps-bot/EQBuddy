@@ -11,8 +11,8 @@ Crushbone is the home of the Crushbone clan of orcs. It is located directly to t
 ! ''' Types of Monsters: '''
 |[[Orc Pawn (Crushbone)|Orc Pawns]], [[Orc Centurion (Crushbone)|Orc Centurions]], [[Orc Legionnaire (Crushbone)|Orc Legionnaires]], [[Orc Slaver]]s, [[Orc Oracle (Crushbone)|Orc Oracles]], [[Orc Emissary|Orc Emissaries]], [[Royal Guard|Orc Royal Guards]]
 |-
-! ''' Notable NPCs: '''
-|[[Ambassador DVinn]], [[Bloodgurgler]], [[Bonefire]], [[Chokehold]], [[Emperor Crush]], [[Lord Darish]], [[Marrowbane]], [[Orc Taskmaster]], [[Orc Trainer]], [[Orc Warden]], [[Orc Warlord]], [[Retlon Brenclog]], [[Rondo Dunfire]], [[The Prophet]]
+! ''' Rare NPCs: '''
+|[[Ambassador DVinn]], [[Bloodgurgler]], [[Bonefire]], [[Chokehold]], [[Emperor Crush]], [[Lord Darish]], [[Marrowbane]], [[Orc oracle|orc oracle]], [[Orc Trainer]], [[Orc Warden]], [[Orc Warlord]], [[Retlon Brenclog]], [[Rondo Dunfire]], [[The Prophet]]
 |-
 ! ''' Unique Items: '''
 |{{:Armband of Serrated Teeth}}, {{:Bandolier of Teeth}}, {{:Bracers of Battle}}, {{:Carved Walking Stick}}, {{:Corroded Hand Guards}}, {{:Crown of Crush}}, {{:Crushbone Cadet's Grimoire}}, {{:Crushbone Fetish}}, {{:Dwarven Ringmail Tunic}}, {{:Deteriorated Ancient Faydark Longbow}}, {{:Disgusting Padded Shirt}}, {{:Dragoon Dirk}}, {{:Grimy Black Silk Robe}}, {{:Headsplitter}}, {{:Ornament of the Oracle}}, {{:Prayer Cloth of Tunare}}, {{:Rib-bone Stiletto}}, {{:Rotting Faydark Mask}}, {{:Screaming Mace}}, {{:Shiny Brass Shield}}, {{:Slave Trammels}}, {{:Slaver's Lash}}, {{:Spiky Splintmail}}, {{:Torn Elvish Tapestry}}, {{:Wood Elf Scout Bauble}}, {{:Wood Elf Scout Shoes}}
@@ -47,12 +47,21 @@ Crushbone is the home of the Crushbone clan of orcs. It is located directly to t
 '''Crushbone'''
 
 <ul><li> 1. Tents, inhabited by legionnaires
-</li><li> 2. Castle Crush, where high levels spawn including emissaries, with [[Ambassador DVinn]], and [[Emperor Crush]] in the tower, and with [[Lord Darish]] and [[Bonefire]] in the Throneroom
+</li><li> 2. Castle Crush, where high levels spawn including emissaries, with [[Ambassador DVinn]], [[Emperor Crush]], and occasionally [[The Prophet]] in the tower. In the Throne Room  there is [[Lord Darish]], [[Bonefire]], and occasionally an [[Orc Warlord]].
+<ul></li><li>  In the courtyard of the castle, is an [[Orc Warlord]] who drops {{:Bracers of Battle}} and {{:Deteriorated Ancient Faydark Longbow}}
+</li><li>  On the east side of the castle outside next to the mote is [[Marrowbane]] who drops {{:Wood Elf Scout Bauble}} and {{:Grimy Black Silk Robe}}
+</li><li>  On the north side of the castle outside next to the mote is [[Chokehold]] who drops {{:Armband of Serrated Teeth}} and {{:Carved Walking Stick}}
+</ul>
 * Outside the castle entrance and across the bridge is the camp frequently called Wall
 </li><li> 3. Slave Cabin, with inhabitants needed for [[Screaming Mace Quest]]
 </li><li> 4. Slaver Caves, with the [[Orc Warden]] who drops {{:Bracers of Battle}} (Rare) and [[Rondo Dunfire]]
-</li><li> 5. Slaver Pit with the [[Orc Taskmaster]] and [[Bloodgurgler]]
-</li><li> 6. Trainer Hill with [[Orc Trainer]] who drops {{:Shiny Brass Shield}} (Common) and {{:Crushbone Cadet's Grimoire}} (Rare) ("Where camping was born...")
+</li><li> 5. Slaver Pit
+<ul></li><li> [[Bloodgurgler]] who drops {{:Rib-bone Stiletto}} and {{:Spiky Splintmail}}
+</li><li> Occasionally [[The Prophet]] who drops {{:Disgusting Padded Shirt}} and {{:Rotting Faydark Mask}}
+</li><li>[[Retlon Brenclog]]
+</ul>
+</li><li> 6. Trainer Hill with [[Orc Trainer]] who drops {{:Shiny Brass Shield}} (Common) and {{:Crushbone Cadet's Grimoire}} (Rare) 
+<ul></ul> ("Where camping was born...")
 </li></ul>
 
 Note that the map is in error -- there is a land connection along the back wall from area 1 to behind the castle at area 5.

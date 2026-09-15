@@ -5,6 +5,8 @@
 | spellicon = 55
 | description = Decreases your target's resistance to cold, fire, magic, and poison.
 
+Note: This spell is unresistable. This was an undocumented change prior to the August 25, 2026 patch, which corrected the tooltip.
+
 | Table = {{{Table|0}}}
 | TableLevel = {{{TableLevel|}}}
 | classes = 
@@ -29,7 +31,7 @@
 | duration = 11 Min
 | target_type = Single
 | spell_type = Detrimental
-| resist = Magic (0)
+| resist = Unresistable
 
 | msg_cast_on_you = You feel very vulnerable.
 | msg_cast_on_other = Someone  looks very uncomfortable.

@@ -1,4 +1,4 @@
-{{Sky Era}}{{Spellpage|
+{{Spellpage|
 
 | spellname   = Ab of Strength Recourse
 | spellicon   = I

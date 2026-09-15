@@ -1,4 +1,4 @@
-[[File:npc_weligon_steelherder.png|frame|Weligon Steelherder]]
+[[File:npc_weligon_steelherder.png|thumb|Weligon Steelherder]]
 {| class="questTopTable"
 ! ''' Start Zone: '''
 | [[Erudin]]

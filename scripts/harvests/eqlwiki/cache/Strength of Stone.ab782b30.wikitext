@@ -1,7 +1,8 @@
+{{Classic Era}}
 {{Spellpagesmart|
 
 | spellname = Strength of Stone
-| spellicon = R
+| spellicon = 6
 | description = Fills your target with the power of the stone, increasing their strength for 36 min.
 
 | Table = {{{Table|0}}}
@@ -33,10 +34,7 @@
 
 | where_to_obtain = 
 
-{{SpellWhereTable|
-{{SpellWhereRowB | [[Steamfont Mountains]] | [[Crisyn]] | Druid Ring | (-1750,1657) }}
-}}
-
-| TableLocations = Steamfont Mntns
-| TableEra = {{{TableEra|Classic}}}
+<ul>
+<li>[[Druid#Spell Vendors|Druid Spell Vendors]]</li>
+</ul>
 }}

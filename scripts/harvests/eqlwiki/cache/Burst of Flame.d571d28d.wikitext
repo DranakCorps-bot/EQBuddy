@@ -1,5 +1,5 @@
 {{Classic Era}}
-{{Spellpage|
+{{Spellpagesmart|
 
 | spellname = Burst of Flame
 | spellicon = 51

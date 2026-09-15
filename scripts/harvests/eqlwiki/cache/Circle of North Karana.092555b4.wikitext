@@ -1,3 +1,4 @@
+{{Classic Era}}
 {{Spellpagesmart|
 
 | spellname = Circle of Karana
@@ -34,10 +35,7 @@
 
 | where_to_obtain = 
 
-{{SpellWhereTable|
-{{SpellWhereRowB | [[Toxxulia Forest]] | [[Martyn Firechaser]] | Druid Ring | (1040,-359) }}
-}}
-| TableLocations = Toxxulia
-| TableEra = {{{TableEra|Classic}}}
-
+<ul>
+<li>[[Druid#Spell Vendors|Druid Spell Vendors]]</li>
+</ul>
 }}
