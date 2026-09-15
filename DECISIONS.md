@@ -1984,6 +1984,72 @@ landing is not a `shoot.ps1` surface. No `src/` change, so no `WhatsNew.json` en
 landing page is not shipped in the app, and the DRA-48 family's prior site commits
 (`06c66462`, `74cb9cb9`) touch no release notes either.
 
+## 2026-09-12 — DRA-57 / T4 GO: the Founder commissioned the Pages enable, and this is the entry that should have been written that day
+
+**Backfilled 2026-09-14 under `HELM.md` 2026-09-14 ~7:00 PM CT** (DRA-57 LIVE ASK
+answered: *"GO happened — Founder commissioned the enable on 2026-09-12 … Soft write
+the missing `DECISIONS.md` entry dated to the 09-12 GO"*). Nothing here is a new
+action on Pages: the enable is two days old and the record is what was missing.
+**Soft did not enable and has not disabled** — the site stays up per that ruling.
+
+**Placement, and the default it could have gone the other way on.** This file is
+newest-first, so the obvious move was to prepend it at 2026-09-14 with the date in the
+body. It sits in its 09-12 slot instead — at the END of the 09-12 block, because the
+successful `workflow_dispatch` is 11:27 UTC and everything above it that day is later.
+The ledger's whole value in this incident was that a reader could ask *"what does
+2026-09-12 say about Pages"* and get an answer; an entry filed under the day it was
+noticed would have preserved the same hole in a different place. The heading carries
+**backfilled** so nobody reads it as a contemporaneous write.
+
+**1. THE ENABLE IS A FOUNDER COMMISSION, AND THE VALIDATION IS THE LIVE SITE.** The
+T4 gate (first enablement IS the publish moment, consequence list #3) was satisfied by
+the Founder commissioning it directly — not by Soft, and not by the DRA-48-shaped
+"deploy plumbing" reading that this same file corrected on 2026-09-10. What is
+recorded as the check is **the served page**, not the plan's intent: measured at Helm's
+look and re-measured for this entry, `GET /repos/DranakCorps-bot/EQBuddy/pages` →
+**200**, `build_type: workflow`, `source: main /`, `public: true`, `https_enforced:
+true`; repo `has_pages: true`; `https://dranakcorps-bot.github.io/EQBuddy/` → **HTTP
+200**, `Last-Modified: Sat, 12 Sep 2026 18:29:44 GMT`, 41,712 bytes. That body is
+**byte-identical to `site/index.html` at Soft `main`** (`git show HEAD:site/index.html`
+— same 41,712 bytes, `diff` clean once the working tree's CRLF checkout is normalized),
+so the enable published the reviewed content and nothing else. **What would reverse
+it:** David deciding the landing comes down — one `DELETE …/pages`, which is his call
+and Helm's, not Soft's.
+
+**2. THE ACTOR IS THE SHARED ACCOUNT, SO THE RECORD NAMES THE ROUTE INSTEAD.** Both
+2026-09-12 runs (`workflow_dispatch` 11:27 UTC, push-deploy 18:29 UTC via #577) carry
+actor and triggering_actor `DranakCorps-bot` — the account Soft, Scribe and the Founder's
+own dispatches all post under, so **the audit trail cannot say WHO from the actor field**,
+and that is the reason this gap took two days to surface rather than being obvious from
+the run list. Per Helm's 09-14 tip the commission routed **via the Founder's PC after the
+agent token returned 403**; that is recorded here as Helm's finding, not as something Soft
+measured. The generalizable half: **on a shared bot account, "who did it" is not a
+property of the API and has to be written down by the human or agent who did it** —
+which is precisely the duty this entry is discharging late.
+
+**3. ADOPT — a claim about Pages state quotes a FRESH API result or says it is
+unchecked.** Helm ADOPTed the corrective Soft raised in the LIVE ASK, and it is logged
+here because it binds Soft's own writes as much as Helm's rulings. The failure it
+prevents is measured, not hypothetical: `has_pages: false` was restated in a 09-13 ruling
+that was already a day stale, and Soft carried the same stale line forward on the 09-14
+wake before checking. **Two sources for one fact, where one of them is prose that cannot
+go stale loudly — trap 4 with a gate attached.** The rule: never carry a prior `HELM.md`
+or `DECISIONS.md` sentence forward as the current state of Pages; run
+`gh api repos/DranakCorps-bot/EQBuddy/pages` (or read `has_pages`) and quote it, or write
+"unchecked". This is a discipline, not a guard — there is no executable check for it, and
+saying so is part of the entry.
+
+**4. THE `pages.yml` HEADER IS CORRECTED IN THE SAME CHANGE.** Its comment block said
+the workflow is *"INERT until Pages is enabled"* and that *"Enablement … stays behind the
+DRA-48 T4 gate"*. Both were true when written and are false now, and a stale gate
+sentence sitting in the file the gate is about is the exact shape §3 just banned. Corrected
+to what is true, with the GO dated. **The default it could have gone the other way on:**
+leaving it, on the grounds that Helm authorized a README/About link and not a workflow
+edit. Left alone it would have been the next reader's stale source — and it is a comment,
+so it changes no behaviour and reverses in one line.
+
+— Dranak (Claude Code, DRA-57)
+
 ## 2026-09-11 — DRA-67 (the landing's "log-only" pill was false): four calls I made alone
 
 Founder card under the DRA-48 landing family: the hero pill read **"Log-only — reads your
