@@ -1,7 +1,9 @@
 # Security
 
-EQBuddy runs next to your game and reads your log file. That's a position of
-trust, so this page says exactly what the app does with it — every network
+EQBuddy runs next to your game and reads the files the game writes for you on
+your own PC: the `/log` it tails live, and the `/outputfile` dumps you ask the
+game for — inventory, achievements, faction, spellbook. That's a position of
+trust, so this page says exactly what the app does with them — every network
 connection, every file it writes, and how updates are verified. If anything
 here stops matching the code, that's a bug; report it like one.
 
@@ -15,7 +17,7 @@ ships as the next release.
 
 ## Every network destination, and why
 
-EQBuddy's rule is **log-only, zero telemetry**: it never sends your data
+EQBuddy's rule is **local-first, zero telemetry**: it never sends your data
 anywhere on its own. The complete list of hosts the app itself contacts:
 
 | Host | When | What |
