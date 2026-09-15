@@ -291,6 +291,128 @@ try {
     [IO.File]::WriteAllText($jsonPath, ($planted2 | ConvertTo-Json -Depth 6), [Text.UTF8Encoding]::new($false))
     $relLegacy = Invoke-Seat $release @('-WorkItem', '445', '-SeatId', 'seat-legacy')
     Expect-Ok 'a pre-DRA-50 numeric claim can still be released' $relLegacy 'abandoned'
+
+    # --- DRA-90: the mutex is only as good as the store BOTH seats read ------
+    # Every check above hands the scripts a -StoreDir, so none of them exercise
+    # store DISCOVERY — the one thing that decides whether two seats collide at
+    # all. That hole is why DRA-90 could be reported as "the store is
+    # per-working-copy" (it is not: git rev-parse --git-common-dir sends every
+    # linked worktree to the main tree's copy) and why nobody could check.
+    # A refusal proven only against a store dir somebody passed in is a mutex
+    # proven against itself.
+    #
+    # This block builds a REAL repo with a REAL linked worktree and calls the
+    # scripts with NO -StoreDir, the way a seat actually runs.
+    $lab = Join-Path ([IO.Path]::GetTempPath()) ("eqbuddy-soft-seat-worktree-" + [guid]::NewGuid().ToString('N'))
+    try {
+        $labMain = Join-Path $lab 'main'
+        $labWt = Join-Path $lab 'wt'
+        New-Item -ItemType Directory -Force -Path (Join-Path $labMain 'scripts') | Out-Null
+        foreach ($f in @('claim-seat.ps1', 'release-seat.ps1', 'soft-seat-store.ps1')) {
+            Copy-Item (Join-Path $PSScriptRoot $f) (Join-Path $labMain "scripts/$f") -Force
+        }
+        # .gitignore mirrors the real repo: the live store is never committed,
+        # which is precisely why it is ABSENT in a fresh worktree and why its
+        # absence must not be read as "not shared".
+        [IO.File]::WriteAllText((Join-Path $labMain '.gitignore'), ".claude/soft-seats/claims.json`n", [Text.UTF8Encoding]::new($false))
+        & git -C $labMain init -q . 2>&1 | Out-Null
+        & git -C $labMain add -A 2>&1 | Out-Null
+        & git -C $labMain -c user.email='seat@lab' -c user.name='seat lab' commit -qm 'seat lab' 2>&1 | Out-Null
+        & git -C $labMain worktree add -q $labWt -b seat-lab-wt 2>&1 | Out-Null
+
+        $script:step++
+        if (-not (Test-Path (Join-Path $labWt 'scripts/claim-seat.ps1'))) {
+            $script:failed += "$($script:step). worktree lab — git worktree add did not produce a working copy at $labWt"
+            throw 'selftest aborted: worktree lab not built'
+        }
+
+        $labClaim = Join-Path $labMain 'scripts/claim-seat.ps1'
+        $wtClaim = Join-Path $labWt 'scripts/claim-seat.ps1'
+        # No -StoreDir anywhere in this block. That is the whole point.
+        function Invoke-LabSeat {
+            param([string] $Script, [string[]] $SeatArgs)
+            $out = & pwsh -NoProfile -File $Script @SeatArgs 2>&1 | Out-String
+            return @{ code = $LASTEXITCODE; text = $out.Trim() }
+        }
+
+        $mainClaim = Invoke-LabSeat $labClaim @('-WorkItem', 'DRA-901', '-SeatId', 'seat-in-main')
+        Expect-Ok 'a seat claims in the main working tree' $mainClaim 'claimed DRA-901'
+
+        # THE ROW THIS CARD EXISTS FOR. A second executor, in a different
+        # working copy of the same clone, must be refused by the first.
+        $wtBlocked = Invoke-LabSeat $wtClaim @('-WorkItem', 'DRA-901', '-SeatId', 'seat-in-worktree')
+        Expect-Fail 'a default claim from a LINKED WORKTREE is refused by the main tree''s holder' $wtBlocked 'already held by'
+        if ($wtBlocked.text -notmatch 'seat-in-main') {
+            $script:failed += "$($script:step). cross-worktree refusal must name the holder seat-in-main: $($wtBlocked.text)"
+        }
+
+        # ...and the reverse direction, so this is a shared store rather than
+        # a worktree that happens to read the main tree one-way.
+        $wtOwn = Invoke-LabSeat $wtClaim @('-WorkItem', 'DRA-902', '-SeatId', 'seat-in-worktree')
+        Expect-Ok 'a seat claims from the worktree' $wtOwn 'claimed DRA-902'
+        $mainBlocked = Invoke-LabSeat $labClaim @('-WorkItem', 'DRA-902', '-SeatId', 'seat-in-main')
+        Expect-Fail 'a default claim in the MAIN tree is refused by the worktree''s holder' $mainBlocked 'already held by'
+        if ($mainBlocked.text -notmatch 'seat-in-worktree') {
+            $script:failed += "$($script:step). reverse refusal must name the holder seat-in-worktree: $($mainBlocked.text)"
+        }
+
+        # Both copies must NAME the same file. -Where is the diagnostic that
+        # turns "I looked in my worktree and claims.json was not there" into a
+        # question with an answer.
+        $whereMain = Invoke-LabSeat $labClaim @('-Where')
+        Expect-Ok 'the main tree names its store' $whereMain 'shared by every worktree'
+        $whereWt = Invoke-LabSeat $wtClaim @('-Where')
+        Expect-Ok 'the worktree names its store' $whereWt 'shared by every worktree'
+        $script:step++
+        $pathOf = {
+            param($text)
+            $m = [regex]::Match($text, '(?m)^store:\s*(.+?)\s*\(')
+            if ($m.Success) { return $m.Groups[1].Value.Trim() }
+            return $null
+        }
+        $pMain = & $pathOf $whereMain.text
+        $pWt = & $pathOf $whereWt.text
+        if (-not $pMain -or -not $pWt) {
+            $script:failed += "$($script:step). -Where must print a 'store: <path>' line in both copies (main='$($whereMain.text)', wt='$($whereWt.text)')"
+        }
+        elseif ($pMain -ne $pWt) {
+            $script:failed += "$($script:step). the two copies resolve DIFFERENT stores — main '$pMain' vs worktree '$pWt'. Two seats reading two files refuse nobody (DRA-90)."
+        }
+
+        # The store lives in the MAIN tree, and the worktree writes no rival
+        # copy. The reporter's observation, turned into an assertion: the file
+        # is absent there, and that absence is correct rather than the bug.
+        $script:step++
+        if (-not (Test-Path (Join-Path $labMain '.claude/soft-seats/claims.json'))) {
+            $script:failed += "$($script:step). the shared store is not in the main tree at .claude/soft-seats/claims.json"
+        }
+        if (Test-Path (Join-Path $labWt '.claude/soft-seats/claims.json')) {
+            $script:failed += "$($script:step). the worktree grew its OWN claims.json — the store is per-working-copy and the mutex is blind (DRA-90)."
+        }
+
+        # THE REACHABLE NEGATIVE (trap 78: a guard aimed at nothing is green).
+        # Every row above asserts a refusal, and a refusal can pass for reasons
+        # that have nothing to do with sharing. So prove the same claim
+        # SUCCEEDS the moment the two seats are pointed at different stores —
+        # i.e. that the unshared store really is the bug, and that these rows
+        # would go green-and-wrong if discovery ever regressed to per-copy.
+        $wtPrivate = Invoke-LabSeat $wtClaim @(
+            '-WorkItem', 'DRA-901', '-SeatId', 'seat-in-worktree',
+            '-StoreDir', (Join-Path $labWt '.claude/soft-seats'))
+        Expect-Ok 'a PRIVATE store admits the duplicate the shared one refused (this is the bug, reproduced)' $wtPrivate 'claimed DRA-901'
+
+        # ...and that private store must SAY it is private, so a seat reading
+        # -Where cannot mistake a hand-passed dir for the machine's shared one.
+        $wherePrivate = Invoke-LabSeat $wtClaim @('-Where', '-StoreDir', (Join-Path $labWt '.claude/soft-seats'))
+        Expect-Ok 'an explicit -StoreDir reports itself as NOT the shared store' $wherePrivate 'NOT the machine'
+    }
+    finally {
+        # Detach the worktree admin record before deleting, or git leaves a
+        # stale entry pointing into a temp dir that no longer exists.
+        & git -C (Join-Path $lab 'main') worktree remove --force (Join-Path $lab 'wt') 2>&1 | Out-Null
+        Remove-Item -LiteralPath $lab -Recurse -Force -ErrorAction SilentlyContinue
+    }
+    # ------------------------------------------------------------------------
 }
 finally {
     Remove-Item -LiteralPath $store -Recurse -Force -ErrorAction SilentlyContinue

@@ -1071,6 +1071,36 @@ after the named guard left with its surface.
     `Write-BaselineFreeze` asserted to leave no file behind. Prove-failed against
     four mutants. [Novel](docs/ops/claude-archive/traps.md#trap-81)
 
+82. **A mutex is only as good as the store BOTH seats read — and a suite that
+    hands the store in never tests that.** Every one of the 45 soft-seat
+    selftest checks passed `-StoreDir <throwaway>`, so the refusal predicate was
+    proven exhaustively against a directory the test itself chose, and
+    DISCOVERY — the only thing that decides whether two seats meet at all — had
+    zero coverage. **The store was fine.** `git rev-parse --git-common-dir` has
+    sent every linked worktree to the main tree's `claims.json` since the
+    original commit (b7f2eae4, 2026-09-08), a week before the duplicate that
+    prompted the report; measured both directions, and there is exactly ONE
+    `claims.json` on the machine. DRA-87's two executors did not lose a race
+    over the store — **only one of them ever claimed**, and a mutex nobody is
+    obliged to take refuses nobody. **What made it look like a store bug is the
+    shape to remember:** `claims.json` is gitignored while `README.md` and
+    `claims.template.json` are committed, so a fresh worktree shows the
+    directory WITHOUT the store, which is indistinguishable by eye from "every
+    copy has its own". An invisible resolution is one everybody has to guess at,
+    and the guess was filed as a root cause. So the resolution is now a VALUE
+    (`explicit` / `git-common-dir` / `fallback`) that `claim-seat.ps1 -Where`
+    prints, a grant from a `fallback` store WARNS on the same screen that
+    granted it, and the `.gitignore` probe that used to gate the common-dir
+    answer is gone — it was a proxy for "is this the repo root" (trap 64b) whose
+    failure mode was to silently hand each worktree its own store. Guard:
+    `soft-seat-selftest.ps1`'s DRA-90 block builds a REAL repo and a REAL linked
+    worktree, calls the scripts with NO `-StoreDir`, and asserts the refusal in
+    both directions plus one identical resolved path; its reachable negative
+    claims the same card against a private `-StoreDir` and asserts it SUCCEEDS,
+    so the rows above cannot go green by accident. Prove-failed: forcing the
+    `fallback` reddens 7 of them. **Two independent CLONES still share nothing**
+    — the remote is the only store both can see.
+
 New trap discovered the hard way? Add the compact rule here and the novel
 under `docs/ops/claude-archive/traps.md`. That is the whole point.
 
