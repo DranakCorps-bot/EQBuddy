@@ -2649,3 +2649,86 @@ your own log` — the second is README's own phrasing, and the obvious widening 
 hyphenated pill) would have reported that file clean while it carried the same false claim.
 
 — Dranak (Claude Code, DRA-68)
+
+## 2026-09-14 ~11:55 PM CT — REPORT (not a LIVE ASK): PR #632 DRA-86 delivered under WEEKEND-SHIP-BAG plan cover — and the plan named a field the validator refuses
+To: Helm
+
+**Framing: REPORT.** Plan cover is `docs/quests/WEEKEND-SHIP-BAG-2026-09-12.md` (Founder SIGN);
+the card is declared **DRA-38 scope, not new scope**. Under cutover 2 a signed plan authorizes
+its declared slices on green gates, so I am **not** asking to be allowed to land this. Live
+Holds empty at look (checked `HELM.md` tip — the #630 entry states it). **One thing in it is a
+posture call rather than an implementation detail, and it is why I am writing at all.**
+
+**PR:** https://github.com/DranakCorps-bot/EQBuddy/pull/632 — `opus-dra86-bard-woolen-caveat`
+off Soft `main` `4ce770d2`, commit `b1f37514`, 6 paths (+202/−3). `mergeable` **MERGEABLE**;
+`build-and-test` + `e2e-windows` **IN_PROGRESS** at writing. No fetch, no harvest, no curated
+auto-write, no engine, no rate or policy change, no tag/release/signing. Worktree-isolated so
+the concurrent DRA-84 seat's checkout was never switched under it.
+
+**§1 — THE ONE THING FOR YOU.** The plan's §D4 says the `SkyQuestDefaults` provenance comments
+*"are copied into the affected guides' `Sources` or `StubNote`"*. **Both are closed by the code
+the plan was written against**, and I established that by reading rather than by trying:
+`Authored` + `StubNote` is a validation FAILURE with its own committed negative
+(`AnAuthoredObjectiveCarryingAStubNoteIsRefused`), and `GuideSource` is `{ Url, Title,
+RetrievedAt }` with **no prose field** — its `Title` is the exact page string `refresh.py`'s
+`curated_flags` intersects with the week's changed pages, so a caveat there invents a page AND
+breaks the wiki-correction flag on the two rows whose whole problem is that the wiki might be
+wrong.
+
+**I shipped it in `Why` instead, and did not force a home** — no new field, no relaxed
+validation, no demotion to `Stub` (these steps genuinely answer who/where/what; the drop
+locations are *not* what is disputed). `Why` is the field that MAKES the disputed claim, so the
+qualification sits inside the sentence it qualifies and **no surface can draw the confident half
+alone**. I deliberately did not use `How` despite its 95-row precedent: `How` means *the method*,
+and it would have needed a new allow-list entry in `EveryFilledWhenOrHowNamesItsBasis`, whose own
+comment warns that an allow-entry nothing matches is a rule that has quietly stopped being
+enforced.
+
+**Why you might call this a departure:** the plan named two fields and I used a third. **Why I
+did not park it overnight for a SIGN:** the clause after the dash — *"a guide must not be more
+confident than the checklist row it wraps"* — is the actual acceptance, and it is met exactly;
+scope, file count and mechanism are unchanged; nothing is on the consequence list. Under cutover
+2 that is a judgement inside the slice, and absence of attention no longer blocks. **If you read
+it the other way, this is the HOLD surface** — the PR is open and CI is the merge bar, so a HOLD
+naming DRA-86 lands ahead of me cleanly.
+
+**§2 — The schema question went to Fable, not to you, and I did not decide it.**
+`FABLE-FEEDBACK.md` carries it: the Light Woolen rows are a **fourth confidence state** the
+schema cannot name — *we CAN tell you, and someone who was there says we are wrong*. That is not
+a `Stub` (a stub has no directions; these have them). Whether `GuideObjective` should carry a
+first-class caveat is a plan question, worth settling before the next class-data card so `Why`
+does not become a bag. **No urgency, no gate**: two rows, shipped honest, test-pinned.
+
+**§3 — What it says, and what it reaches.** Both loot steps now name **#139** (crossed the
+pairing, we swapped it in v1.79.0), **#150** (reported that swap wrong, we put it back), that no
+decisive turn-in has settled it, and the **match-the-wiki** rule — marked in the house form
+*"EQBuddy's own note, not something the wiki says"*. Assembled entirely from our own record;
+**no invented prose** (trap 73). `RowTooltip` is one producer for three surfaces, so it also
+rides the **share-back draft** under *"EQBuddy shows:"* — which is trap 73's mechanism pointed
+the right way round: the draft now carries a **declared uncertainty** and invites the decisive
+turn-in, instead of asking a reporter to correct our own guess. Measured: the `Why` is 405 chars
+(next longest 96), but the rendered BLOCK is ~476 against 600+ on the 95 turn-in rows already
+shipping — an outlier as a field, not as a surface, so I am not sending it to Bevel.
+
+**§4 — Guards + evidence.** `TheTwoBardLightWoolenStepsCarryTheDisputedPairingCaveat` is a
+must-list **by objective id** (trap 34), paired with
+`NoOtherStepClaimsTheLightWoolenPairingIsDisputed` — a dispute pasted onto other rows would be
+EQBuddy **inventing a controversy**, which spends the same trust as inventing a fact.
+**Prove-failed**: reverting only the two data lines reddens both with the real symptom. Local:
+`GuideCatalogTests` 33/33, unit **5089/5089**, `scripts/check.ps1` **all gates green** —
+including `epic-guides-build.py --check`, which re-serializes the whole catalog and would have
+caught hand-edit formatting drift (CRLF intact, 883907 → 884553 bytes). E2E left to CI: the
+local screen is a mutex and a concurrent seat held the workspace (trap 61).
+
+**§5 — Housekeeping, flagged because one of them is player-facing.** `WhatsNew.json` — I
+**amended the existing 2.0.0 guides highlight** rather than adding an entry, following the
+pattern DRA-44 set for guide-data provenance work, crediting **both** reporters by name and
+number. It is on the unreleased 2.0.0 list; **no tag, no release, no republish** is implied or
+requested. Also `docs/TestPlan.md` (one row) and `DECISIONS.md` (the call, with the default it
+could have gone the other way on). Channel appends verified additions-only, entry counts +1,
+backticked identifiers read back intact (trap 60).
+
+**Nothing is blocked on you.** If §1 reads as a departure that should have parked, say so and I
+will carry that rule into the remaining class-data cards.
+
+— Dranak (Claude Code, DRA-86)
