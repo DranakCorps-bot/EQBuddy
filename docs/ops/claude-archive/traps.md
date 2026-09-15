@@ -2212,3 +2212,100 @@ suspect the collection's SHAPE before the predicate; and never let `-eq` be the
 only thing standing between a key and a destructive write, because on an array
 it is not a question with a yes-or-no answer. The cheap standing assertion is to
 check that the field you are about to ACT on is a scalar.
+
+### Trap 81
+
+**An unreachable API rendered as an absence, and `-Baseline` froze the absence
+as a measurement.**
+
+`scripts/exo-metrics.ps1` generates the ExO execution dashboard. Its own header
+makes a promise, in bold, in the generated file:
+
+> A metric whose data does not exist in the window reads `unmeasured`, with the
+> reason — never `0`. An unmeasured metric and a measured zero are different
+> claims, and reading one as the other is how a dashboard starts lying.
+
+`Invoke-Paperclip` broke exactly that promise. It returned `$null` for three
+different worlds — no credentials configured, the HTTP GET threw, and (through
+the callers) the API answered and had no matching record — and the callers gated
+on `if ($null -ne $issues)`. Three claims, one representation, no way back.
+
+**What made it fire is a detail worth keeping.** On this box
+`PAPERCLIP_API_URL` is `http://localhost:3101`, but the Paperclip API binds a
+tailnet address (`100.118.30.124:3101`) and loopback is refused. So every read
+failed, instantly and silently, for a reason that has nothing to do with the
+metrics. The acceptance timestamps never arrived, lead time was computed from
+first-commit only, and `-Baseline` wrote the result down as the number every
+later claim about the new operating model would be checked against. Then it
+printed its success line and exited 0.
+
+**Measured, three runs, same window (#580–#607), same machine:**
+
+| Run | GWR frozen | Exit | Wrote? |
+|---|---|---|---|
+| pre-fix, `localhost` (refused) | **0.5051** | 0 | **yes — "Froze …"** |
+| fixed, `localhost` (refused) | — | **3** | **no** |
+| fixed, `100.118.30.124` (reachable) | 0.4946 | 0 | yes |
+
+The 0.4946 matches the committed `docs/ops/exo-baseline.json` to the digit, which
+is how we know 0.5051 is the artefact and not the correction.
+
+**The fix has two halves, and the second is the one that matters.**
+
+The first is naming the fact (trap 64b): `Invoke-Paperclip` returns a result
+carrying `Status` — `Ok`, `NotConfigured` or `Unreachable` — with `NoRecord` left
+to the callers, because only they know what they were looking for in an `Ok`
+payload. Failures register themselves inside the function rather than at each
+call site; a caller that forgets to register would restore the silence.
+
+The second is that **the guard lives inside the writer.** `Write-BaselineFreeze`
+runs `Test-BaselineRefused` itself and throws, so there is no path to the file
+that does not pass it (trap 47: never let two code paths decide one question).
+Asserting the predicate alone would have passed happily on a writer that never
+calls it — which is why the self-test asserts the *file does not exist* after the
+refusal, not merely that something threw.
+
+**Why a baseline gets a refusal and a normal run gets a warning.** They are not
+the same risk. A normal run reports today's reading; read it, notice the
+`unmeasured` rows, run it again. A baseline is the fixed point every later
+comparison cites, so a wrong one is not a stale number — it is a permanently
+wrong denominator under every future claim, and nothing downstream can detect it.
+`-NoPaperclip` already existed as the explicit "I know these are unmeasured"
+door, so the refusal has somewhere to send you, and a run through that door never
+calls the API and therefore has no failures to weigh.
+
+**The reproduce command is the same lesson one layer out.** Section 8 prints the
+command that regenerates the file, and it emitted only `-FromPr` / `-ToPr` /
+`-Baseline`. `-WindowLabel` feeds the header, so a dashboard headed
+`DRA-70/71/72` regenerates as `PRs #580-#607` for anyone who follows the printed
+instructions. Nothing was broken yet — but the first gate to compare a
+regenerated file against the committed one would have gone red for a reason that
+says nothing about any metric, and the lesson people learn from that gate is that
+the gate is noise (trap 74). `Get-ReproduceCommand` now emits `-WindowLabel` and
+`-NoPaperclip` whenever they were set, with shell-quoting for a label containing
+an apostrophe.
+
+**Prove-failed** (trap 34 — green-only is vacuous), four mutants, each reverting
+one half of the fix:
+
+| Mutant | Self-test |
+|---|---|
+| `Invoke-Paperclip` returns `$null` on throw (the original) | 10 FAILED |
+| `Test-BaselineRefused` always returns `$false` | 3 FAILED |
+| `Write-BaselineFreeze` ignores its guard | 2 FAILED |
+| `Get-ReproduceCommand` drops `-WindowLabel` | 2 FAILED |
+
+The first mutant initially died on a property lookup instead of naming anything,
+because `$null.Status` throws under `Set-StrictMode -Version Latest`. That is
+worth its own line: **returning `$null` IS the pre-fix behaviour, so the arm that
+exists to catch it must report it as a named failure rather than a stack trace.**
+The null checks beside each assertion are the point, not defensive noise.
+
+**A methodology note that cost twenty minutes.** The first attempt ran the
+pre-fix copy from `$PAPERCLIP_RUN_SCRATCH_DIR`, and `$RepoRoot` is
+`Split-Path -Parent $PSScriptRoot` — so the script read `HELM.md` out of a temp
+directory, found no repository, and died in `Get-Slices` on an unrelated
+`PrNumbers` lookup. It looks like a bug in the code under test and is not.
+**A script that derives its repo root from its own location must be run from its
+own location**; copy a variant into `scripts/` rather than running it from
+elsewhere.

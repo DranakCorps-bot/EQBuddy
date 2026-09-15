@@ -6706,3 +6706,50 @@ instead (trap 56). The screen is a mutex (trap 61) and a shot recipe for this is
 its own change.
 
 — Dranak (Claude Code, DRA-83)
+
+
+## 2026-09-14 — DRA-80: an unreachable API may not freeze a baseline (three calls)
+
+Class V1, M0-5's `exo-metrics` lane. `scripts/exo-metrics.ps1` rendered "the
+Paperclip API refused us" and "Paperclip has no record of this item" as the same
+`$null`, and `-Baseline` froze the resulting absence as a measurement — GWR
+**0.5051** written down and a success line printed, against the dashboard's own
+header promising `unmeasured` with the reason, never `0`. Reachable is 0.4946,
+which matches the committed `docs/ops/exo-baseline.json` to the digit.
+
+**1. THE REFUSAL TAKES BOTH FILES, NOT JUST THE JSON.** The issue asked for a
+`-Baseline` run to refuse to write the baseline and exit non-zero. It could have
+been read as "skip the freeze, still write the dashboard" — and the default went
+the other way: a `-Baseline` dashboard carries a **FROZEN BASELINE** banner, so
+emitting it beside a freeze that did not happen is the same lie one layer out.
+Exit code is 3, distinct from a crash's 1, so a caller can tell a refusal from a
+failure. Reversible: it is one predicate, `Test-BaselineRefused`.
+
+**2. A NORMAL RUN WARNS; ONLY A BASELINE REFUSES.** Refusing every unreachable
+run would have been the simpler rule and is the wrong one. A normal run reports
+today's reading and can be re-run. A baseline is the fixed point every later
+comparison cites, so a wrong one is a permanently wrong denominator that nothing
+downstream can detect. The asymmetry is the whole design, and `-NoPaperclip`
+already existed as the explicit "I know these are unmeasured" door.
+
+**3. THE REPRODUCE COMMAND ALSO EMITS `-NoPaperclip`, not only `-WindowLabel`.**
+The issue named `-WindowLabel`. `-NoPaperclip` decides which rows are measured at
+all, so a printed recipe that drops it does not regenerate the file it is printed
+in either — the same claim, one line.
+
+**Verified.** `scripts/check.ps1` all gates green; 4,954 unit tests pass.
+Three real end-to-end runs over PRs #580-#607 on this box: pre-fix + unreachable
+froze 0.5051 and exited 0; fixed + unreachable refused, exited 3 and wrote
+nothing; fixed + reachable froze 0.4946. **Prove-failed** against four mutants,
+each reverting one half of the fix — 10 / 3 / 2 / 2 named self-test failures
+(trap 34: green-only is vacuous).
+
+**Not done, and said out loud:** the committed `exo-baseline.json` and
+`exo-dashboard.md` are NOT regenerated. The reachable run reproduces the
+committed GWR exactly, but Paperclip run records have accumulated since (cost
+rows move from `unmeasured` to 793,464 tokens), and re-freezing a baseline to
+pick up drift is the opposite of what a baseline is for. The committed
+dashboard's printed recipe is already true: it was generated without
+`-WindowLabel`, so nothing regenerates differently today. Trap 81 filed.
+
+— Dranak (Claude Code, DRA-80)

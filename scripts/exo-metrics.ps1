@@ -233,16 +233,118 @@ function Get-PaperclipBase {
     return $b
 }
 
-function Invoke-Paperclip {
-    param([string]$Base, [string]$Key, [string]$Path)
-    if ([string]::IsNullOrWhiteSpace($Base) -or [string]::IsNullOrWhiteSpace($Key)) { return $null }
-    try {
-        return Invoke-RestMethod -Method Get -Uri ("$Base$Path") -TimeoutSec 40 `
-            -Headers @{ Authorization = "Bearer $Key" }
-    } catch {
-        Write-Verbose "Paperclip GET $Path failed: $($_.Exception.Message)"
-        return $null
+# The three worlds this call can land in are DIFFERENT CLAIMS, and $null told
+# them apart from nothing (DRA-80). "The API refused the connection" and "the
+# API answered, and has no record of DRA-71" produce the same absent cost row,
+# and a -Baseline run froze that absence as a measurement. That is trap 11
+# (evidence only one side can produce) wearing trap 64b's clothes (a $null proxy
+# standing in for a fact nobody named), and it cost a wrong frozen GWR: this
+# box's PAPERCLIP_API_URL says localhost, the API binds a tailnet address, every
+# GET was refused, and the run printed its success line.
+#
+# So the failure is a VALUE. `Status` is one of:
+#   Ok            — the API answered. `Data` is what it said (possibly null).
+#   NotConfigured — no base or no key. The operator never asked for this.
+#   Unreachable   — the call was made and threw. We know NOTHING about the data.
+# `NoRecord` is the callers' to declare: only they know what they were looking
+# for in an Ok payload.
+$script:PaperclipFailures = @()
+
+function New-PaperclipResult {
+    param(
+        [ValidateSet('Ok', 'NoRecord', 'NotConfigured', 'Unreachable')][string]$Status,
+        $Data,
+        [string]$Reason
+    )
+    return [pscustomobject]@{
+        Status      = $Status
+        Data        = $Data
+        Reason      = $Reason
+        Ok          = ($Status -eq 'Ok')
+        Unreachable = ($Status -eq 'Unreachable')
     }
+}
+
+function Invoke-Paperclip {
+    param([string]$Base, [string]$Key, [string]$Path, [int]$TimeoutSec = 40)
+    if ([string]::IsNullOrWhiteSpace($Base) -or [string]::IsNullOrWhiteSpace($Key)) {
+        return (New-PaperclipResult -Status 'NotConfigured' -Data $null `
+                -Reason 'PAPERCLIP_API_URL / PAPERCLIP_API_KEY not set')
+    }
+    try {
+        $data = Invoke-RestMethod -Method Get -Uri ("$Base$Path") -TimeoutSec $TimeoutSec `
+            -Headers @{ Authorization = "Bearer $Key" }
+        return (New-PaperclipResult -Status 'Ok' -Data $data -Reason '')
+    } catch {
+        # Registered here rather than at the call sites, because a caller that
+        # forgets to register turns the refusal below back into the silence this
+        # whole change exists to delete.
+        $reason = ('GET {0}{1} failed: {2}' -f $Base, $Path, $_.Exception.Message)
+        $script:PaperclipFailures += , $reason
+        Write-Verbose "Paperclip $reason"
+        return (New-PaperclipResult -Status 'Unreachable' -Data $null -Reason $reason)
+    }
+}
+
+function Get-PaperclipFailureSummary {
+    <# The one sentence a row or banner cites. Exception messages carry the URL
+       and a stack-ish tail; a table cell gets the first line only. #>
+    param([string[]]$Failures = $script:PaperclipFailures)
+    if (@($Failures).Count -eq 0) { return '' }
+    $first = ([string]$Failures[0] -split "`r?`n")[0].Trim()
+    if ($first.Length -gt 160) { $first = $first.Substring(0, 157) + '…' }
+    if (@($Failures).Count -gt 1) { $first += (' (+{0} more)' -f (@($Failures).Count - 1)) }
+    return $first
+}
+
+function Format-PaperclipUnmeasured {
+    <# Never a bare `unmeasured`, and never a `0`: the cell says which of the
+       three worlds it is reporting. The dashboard header promises exactly this. #>
+    param([string]$Fallback = 'no Paperclip record')
+    if (@($script:PaperclipFailures).Count -gt 0) { return '`unmeasured` — API unreachable' }
+    return ('`unmeasured` — {0}' -f $Fallback)
+}
+
+function Test-BaselineRefused {
+    <# A -Baseline run exists to write a number down FIRST so later claims are
+       checkable against it. Freezing an absence we never measured poisons every
+       later comparison, so an Unreachable input REFUSES the freeze outright.
+       -NoPaperclip is the explicit door: it says "I know these are unmeasured",
+       and a run through it never calls the API, so it has no failures to weigh. #>
+    param([bool]$Baseline, [bool]$NoPaperclip, [string[]]$Failures)
+    if (-not $Baseline) { return $false }
+    if ($NoPaperclip) { return $false }
+    return (@($Failures).Count -gt 0)
+}
+
+function Write-BaselineFreeze {
+    <# The guard lives INSIDE the writer, so there is no path to the file that
+       does not pass it (trap 47: never let two code paths decide one question). #>
+    param([string]$Path, $Current, [bool]$NoPaperclip, [string[]]$Failures)
+    if (Test-BaselineRefused -Baseline $true -NoPaperclip $NoPaperclip -Failures $Failures) {
+        throw ("Refusing to freeze a baseline: {0} Paperclip read(s) were UNREACHABLE, so the " +
+            "Paperclip-derived rows are unknown rather than zero. First failure: {1}. " +
+            "Fix the endpoint, or re-run with -NoPaperclip to freeze them as explicitly unmeasured." `
+                -f @($Failures).Count, (Get-PaperclipFailureSummary -Failures $Failures))
+    }
+    Write-Utf8NoBom -Path $Path -Text (($Current | ConvertTo-Json -Depth 4))
+}
+
+function Get-ReproduceCommand {
+    <# The printed recipe must regenerate THIS file. -WindowLabel feeds the
+       header, so a command that drops it regenerates a file that differs from
+       the committed one for a reason that says nothing about the metrics — and
+       the lesson people learn from that gate is that the gate is noise
+       (trap 74). Same argument for -NoPaperclip, which decides which rows are
+       measured at all. #>
+    param([int]$FromPr, [int]$ToPr, [string]$WindowLabel, [bool]$Baseline, [bool]$NoPaperclip)
+    $cmd = ('pwsh -NoProfile -File scripts/exo-metrics.ps1 -FromPr {0} -ToPr {1}' -f $FromPr, $ToPr)
+    if (-not [string]::IsNullOrWhiteSpace($WindowLabel)) {
+        $cmd += (" -WindowLabel '{0}'" -f $WindowLabel.Replace("'", "''"))
+    }
+    if ($Baseline) { $cmd += ' -Baseline' }
+    if ($NoPaperclip) { $cmd += ' -NoPaperclip' }
+    return $cmd
 }
 
 # ---------------------------------------------------------------------------
@@ -712,6 +814,82 @@ function Invoke-SelfTest {
     try { Test-ContainsAny -Text 'anything' -Needles @() | Out-Null } catch { $threw = $true }
     Assert $threw 'An empty needle list reported clean instead of throwing.'
 
+    # 9. Paperclip results are a VALUE, and the three worlds are told apart.
+    #    The Unreachable arm is a REAL socket to a closed port, not a mock: the
+    #    defect was that a refused connection rendered as a measurement, and a
+    #    stubbed exception would not have proved the live path produces one.
+    $savedFailures = $script:PaperclipFailures
+    $script:PaperclipFailures = @()
+
+    # The null checks are the point, not defensive noise: returning $null IS the
+    # pre-fix behaviour, so this arm has to report it as a named failure rather
+    # than die on a property lookup.
+    $noKey = Invoke-Paperclip -Base 'http://127.0.0.1:9' -Key '' -Path '/api/x'
+    Assert ($null -ne $noKey) 'A missing key answered $null — absence again, not a value.'
+    Assert ($null -ne $noKey -and $noKey.Status -eq 'NotConfigured') 'A missing key did not read as NotConfigured.'
+    Assert (@($script:PaperclipFailures).Count -eq 0) 'NotConfigured registered a failure — it is not one.'
+
+    $dead = Invoke-Paperclip -Base 'http://127.0.0.1:9' -Key 'k' -Path '/api/x' -TimeoutSec 5
+    Assert ($null -ne $dead) 'An unreachable GET answered $null — the defect DRA-80 exists for.'
+    Assert ($null -ne $dead -and $dead.Status -eq 'Unreachable') 'A dead base did not read as Unreachable.'
+    Assert ($null -ne $dead -and $dead.Unreachable) 'An Unreachable result did not say so.'
+    Assert ($null -eq $dead -or $null -eq $dead.Data) 'An Unreachable result carried data.'
+    Assert (@($script:PaperclipFailures).Count -eq 1) 'An unreachable GET was not registered as a failure.'
+    Assert ((Get-PaperclipFailureSummary).Length -gt 0) 'An unreachable run produced no reason to print.'
+    Assert ((Format-PaperclipUnmeasured) -notmatch '^\s*`?0`?\s*$') 'An unmeasured cell rendered as a zero.'
+    Assert ((Format-PaperclipUnmeasured) -match 'unreachable') 'An unreachable cell did not name the reason.'
+    Assert ((Format-PaperclipUnmeasured -Fallback 'no Paperclip record') -match 'unreachable') `
+        'An unreachable run rendered a row as "no record" — the two are different claims.'
+
+    $deadFailures = $script:PaperclipFailures
+    $script:PaperclipFailures = @()
+    Assert ((Format-PaperclipUnmeasured -Fallback 'no Paperclip record') -match 'no Paperclip record') `
+        'A reachable run with no record did not say "no record".'
+
+    # 10. The refusal predicate — a -Baseline run with an unreachable input does
+    #     not freeze. All four corners, because a guard that only ever says yes
+    #     is indistinguishable from a guard that is broken open (trap 34).
+    Assert (Test-BaselineRefused -Baseline $true -NoPaperclip $false -Failures $deadFailures) `
+        'A -Baseline run with an UNREACHABLE Paperclip read was allowed to freeze.'
+    Assert (-not (Test-BaselineRefused -Baseline $true -NoPaperclip $false -Failures @())) `
+        'A clean -Baseline run was refused.'
+    Assert (-not (Test-BaselineRefused -Baseline $true -NoPaperclip $true -Failures $deadFailures)) `
+        '-NoPaperclip, the explicit "these are unmeasured" door, was refused.'
+    Assert (-not (Test-BaselineRefused -Baseline $false -NoPaperclip $false -Failures $deadFailures)) `
+        'A non-baseline run was refused — it freezes nothing, so it has nothing to poison.'
+
+    # 11. And the WRITER honours it: the file must not appear on disk. Asserting
+    #     the predicate alone would pass on a writer that never calls it.
+    $probe = [System.IO.Path]::Combine([System.IO.Path]::GetTempPath(),
+        ('exo-baseline-selftest-{0}.json' -f [guid]::NewGuid().ToString('N')))
+    $refused = $false
+    try { Write-BaselineFreeze -Path $probe -Current @{ gwr = 0.51 } -NoPaperclip $false -Failures $deadFailures }
+    catch { $refused = $true }
+    Assert $refused 'Write-BaselineFreeze did not throw on an unreachable input.'
+    Assert (-not (Test-Path $probe)) 'Write-BaselineFreeze REFUSED and wrote the file anyway.'
+
+    try {
+        Write-BaselineFreeze -Path $probe -Current @{ gwr = 0.49 } -NoPaperclip $false -Failures @()
+        Assert (Test-Path $probe) 'Write-BaselineFreeze refused a clean run — the guard is stuck shut.'
+    } catch { Assert $false "Write-BaselineFreeze threw on a clean run: $($_.Exception.Message)" }
+    finally { if (Test-Path $probe) { Remove-Item $probe -Force } }
+
+    $script:PaperclipFailures = $savedFailures
+
+    # 12. The printed recipe reproduces the file it is printed in (trap 74): a
+    #     dashboard headed "DRA-70/71/72" whose command omits -WindowLabel
+    #     regenerates without the work-item names, and the diff that catches it
+    #     says nothing about metrics.
+    $withLabel = Get-ReproduceCommand -FromPr 580 -ToPr 607 -WindowLabel 'DRA-70/71/72' -Baseline $true -NoPaperclip $false
+    Assert ($withLabel -match "-WindowLabel 'DRA-70/71/72'") 'The reproduce command dropped -WindowLabel.'
+    Assert ($withLabel -match '-Baseline') 'The reproduce command dropped -Baseline.'
+    Assert ($withLabel -notmatch '-NoPaperclip') 'The reproduce command invented -NoPaperclip.'
+    $bare = Get-ReproduceCommand -FromPr 580 -ToPr 607 -WindowLabel '' -Baseline $false -NoPaperclip $true
+    Assert ($bare -notmatch '-WindowLabel') 'The reproduce command emitted an empty -WindowLabel.'
+    Assert ($bare -match '-NoPaperclip') 'The reproduce command dropped -NoPaperclip.'
+    Assert ((Get-ReproduceCommand -FromPr 1 -ToPr 2 -WindowLabel "it's a window" -Baseline $false -NoPaperclip $false) `
+            -match "-WindowLabel 'it''s a window'") 'A label containing a quote was not escaped for the shell.'
+
     if ($script:selfTestFailures.Count -gt 0) {
         Write-Host "exo-metrics self-test: $($script:selfTestFailures.Count) FAILED" -ForegroundColor Red
         foreach ($f in $script:selfTestFailures) { Write-Host "  - $f" -ForegroundColor Red }
@@ -768,7 +946,11 @@ $apiBase = Get-PaperclipBase -Raw $ApiBase
 $issues = $null
 if (-not $NoPaperclip -and $apiBase -and $CompanyId) {
     Write-Host "Reading Paperclip issues …"
-    $issues = Invoke-Paperclip -Base $apiBase -Key $ApiKey -Path "/api/companies/$CompanyId/issues?limit=200"
+    $issuesResult = Invoke-Paperclip -Base $apiBase -Key $ApiKey -Path "/api/companies/$CompanyId/issues?limit=200"
+    if ($issuesResult.Ok) { $issues = $issuesResult.Data }
+    else {
+        Write-Host ("  Paperclip {0}: {1}" -f $issuesResult.Status, $issuesResult.Reason) -ForegroundColor Yellow
+    }
 }
 
 $draRows = @()
@@ -800,13 +982,24 @@ foreach ($group in ($allMergedSlices | Group-Object Dra | Sort-Object Name)) {
     if ($null -ne $accepted -and $accepted -lt $start -and $accepted -ge $windowStart) { $start = $accepted }
     $clamped = ($null -ne $accepted -and $accepted -lt $windowStart)
 
+    # Which of the three worlds this row's cost cell is reporting. Without it,
+    # "the API refused us" and "Paperclip has never heard of DRA-71" render the
+    # same, and the reader cannot tell a measurement from a silence.
+    $rowStatus = 'NoRecord'
+    if ($NoPaperclip) { $rowStatus = 'NotConfigured' }
+    elseif (-not $apiBase -or -not $CompanyId) { $rowStatus = 'NotConfigured' }
+    elseif ($null -eq $issues -and @($script:PaperclipFailures).Count -gt 0) { $rowStatus = 'Unreachable' }
+
     $cost = $null
     if ($null -ne $issue -and -not $NoPaperclip) {
-        $cost = Invoke-Paperclip -Base $apiBase -Key $ApiKey -Path "/api/issues/$($issue.id)/cost-summary"
+        $costResult = Invoke-Paperclip -Base $apiBase -Key $ApiKey -Path "/api/issues/$($issue.id)/cost-summary"
+        if ($costResult.Ok) { $cost = $costResult.Data; $rowStatus = 'Ok' }
+        else { $rowStatus = $costResult.Status }
     }
 
     $draRows += , [pscustomobject]@{
         Dra           = $dra
+        PaperclipStatus = $rowStatus
         Slices        = @($group.Group | Where-Object { $_.Kind -eq 'delivery' }).Count
         Accepted      = $accepted
         Clamped       = $clamped
@@ -986,6 +1179,13 @@ if ($Baseline) {
     Add-Line '> of §7 fills itself.'
     Add-Line ''
 }
+if (@($script:PaperclipFailures).Count -gt 0) {
+    Add-Line ('> **{0} Paperclip read(s) in this run were UNREACHABLE.** Every Paperclip-derived' -f @($script:PaperclipFailures).Count)
+    Add-Line '> row below (queue latency, cost, and the acceptance half of lead time) is'
+    Add-Line '> **unknown** rather than zero, and this run is NOT eligible to freeze a baseline.'
+    Add-Line ('> First failure: `{0}`' -f (Get-PaperclipFailureSummary))
+    Add-Line ''
+}
 Add-Line 'Every row is computed from data that already existed: PR timestamps, workflow'
 Add-Line 'runs, `HELM.md` commits, `docs/ops/flake-ledger.md`, and Paperclip issue records.'
 Add-Line '**A metric whose data does not exist in the window reads `unmeasured`, with the**'
@@ -1049,7 +1249,7 @@ Add-Line ('| Rework rate | PRs reverting/re-landing a ≤14-day-old merge ÷ mer
 Add-Line ('| Escaped defect rate | player-reported defects per tier | `unmeasured` — see §6 |')
 Add-Line ('| CI failure/flake split | red runs: filed as flake vs unfiled | {0} red event(s), {1} filed — see §4 |' -f @($ciRed).Count, @($ciRed | Where-Object { $_.Filed }).Count)
 Add-Line ('| PRs + Helm touches per slice | count | {0} PRs/slice, {1} Helm touches/delivery slice |' -f (Format-Number $prsPerSlice 2), (Format-Number $touchesPerSlice 2))
-Add-Line ('| Cost per delivered slice | Paperclip run cost ÷ slices delivered | {0} — see §5 and §6 |' -f $(if ($null -eq $costPerSlice) { '`unmeasured`' } else { ('{0} cents · {1:N0} tokens' -f (Format-Number $costPerSlice 2), $tokensPerSlice) }))
+Add-Line ('| Cost per delivered slice | Paperclip run cost ÷ slices delivered | {0} — see §5 and §6 |' -f $(if ($null -eq $costPerSlice) { (Format-PaperclipUnmeasured -Fallback 'no run records in the window') } else { ('{0} cents · {1:N0} tokens' -f (Format-Number $costPerSlice 2), $tokensPerSlice) }))
 Add-Line ''
 if (@($rework).Count -gt 0) {
     Add-Line '**The rework in this window, named so the rate is checkable:**'
@@ -1122,16 +1322,30 @@ Add-Line ''
 Add-Line '| Work item | Delivery slices | Queue latency (created→first action) | Lead time (h) | Paperclip runs | Cost |'
 Add-Line '|---|---|---|---|---|---|'
 foreach ($d in ($draRows | Sort-Object Dra)) {
-    $costCell = if ($null -eq $d.RunCount) { '`no issue record`' }
+    # Three absences, three sentences. `no issue record` is a measurement (we
+    # asked, and Paperclip does not know this item); `API unreachable` is the
+    # absence of one.
+    $absent = switch ($d.PaperclipStatus) {
+        'Unreachable' { '`unmeasured` — API unreachable' }
+        'NotConfigured' { '`unmeasured` — no Paperclip credentials' }
+        default { '`no issue record`' }
+    }
+    $costCell = if ($null -eq $d.RunCount) { $absent }
     elseif ($d.RunCount -eq 0) { '`no run records`' }
     else { ('{0} cents · {1:N0} in / {2:N0} out tokens' -f $d.CostCents, $d.InputTokens, $d.OutputTokens) }
     $leadCell = (Format-Number $d.LeadTimeHours 2)
     if ($d.Clamped) { $leadCell += ' _(clamped)_' }
     Add-Line ('| {0} | {1} | {2} | {3} | {4} | {5} |' -f `
-            $d.Dra, $d.Slices, $(if ($null -eq $d.QueueHours) { '`unmeasured`' } else { (Format-Number $d.QueueHours 2) + ' h' }), `
-        $leadCell, $(if ($null -eq $d.RunCount) { '`unmeasured`' } else { $d.RunCount }), $costCell)
+            $d.Dra, $d.Slices, $(if ($null -eq $d.QueueHours) { $absent } else { (Format-Number $d.QueueHours 2) + ' h' }), `
+        $leadCell, $(if ($null -eq $d.RunCount) { $absent } else { $d.RunCount }), $costCell)
 }
 Add-Line ''
+if (@($draRows | Where-Object { $_.PaperclipStatus -eq 'Unreachable' }).Count -gt 0) {
+    Add-Line ('_`API unreachable`_ — the Paperclip GET threw, so these rows are **unknown**, not')
+    Add-Line 'zero. Nothing was measured and nothing may be inferred from the blank. Reason:'
+    Add-Line ('`{0}`' -f (Get-PaperclipFailureSummary))
+    Add-Line ''
+}
 if (@($draRows | Where-Object { $_.Clamped }).Count -gt 0) {
     Add-Line '_(clamped)_ — the work item was accepted before this window opened, so its lead'
     Add-Line 'time is measured from its first commit **in** the window. Letting a standing lane'
@@ -1202,22 +1416,52 @@ Add-Line ''
 Add-Line '## 8. Reproducing this'
 Add-Line ''
 Add-Line '```bash'
-Add-Line ('pwsh -NoProfile -File scripts/exo-metrics.ps1 -FromPr {0} -ToPr {1}{2}' -f $FromPr, $ToPr, $(if ($Baseline) { ' -Baseline' } else { '' }))
+Add-Line (Get-ReproduceCommand -FromPr $FromPr -ToPr $ToPr -WindowLabel $WindowLabel `
+        -Baseline $Baseline.IsPresent -NoPaperclip $NoPaperclip.IsPresent)
 Add-Line 'pwsh -NoProfile -File scripts/exo-metrics.ps1 -SelfTest   # the detectors fire'
 Add-Line '```'
 Add-Line ''
 Add-Line 'Needs `gh` authenticated against the repo and, for the cost and queue columns,'
 Add-Line '`PAPERCLIP_API_URL` / `PAPERCLIP_API_KEY` / `PAPERCLIP_COMPANY_ID`. Without them'
 Add-Line 'the GitHub-derived rows still compute and the Paperclip-derived ones read'
-Add-Line '`unmeasured` — `-NoPaperclip` makes that explicit.'
+Add-Line '`unmeasured` **with which kind of absence it is** — `-NoPaperclip` makes that'
+Add-Line 'explicit, and is the only door through which a `-Baseline` run may freeze them.'
+Add-Line 'A run whose Paperclip reads were *unreachable* refuses to freeze and exits 3:'
+Add-Line 'the point of a baseline is that later claims are checkable against it, and an'
+Add-Line 'absence nobody measured is not a number to check anything against.'
+
+# --- Refuse before writing anything -----------------------------------------
+# Both files, not just the JSON: a -Baseline dashboard carries a "FROZEN
+# BASELINE" banner, and writing that beside a freeze that did not happen is the
+# same lie one layer out.
+if (Test-BaselineRefused -Baseline $Baseline.IsPresent -NoPaperclip $NoPaperclip.IsPresent -Failures $script:PaperclipFailures) {
+    [Console]::OutputEncoding = $priorOutputEncoding
+    Write-Host ''
+    Write-Host ('REFUSED: {0} Paperclip read(s) were UNREACHABLE, so the Paperclip-derived inputs' -f @($script:PaperclipFailures).Count) -ForegroundColor Red
+    Write-Host 'to this baseline are UNKNOWN, not zero. Nothing was written.' -ForegroundColor Red
+    Write-Host ''
+    foreach ($f in $script:PaperclipFailures) { Write-Host "  - $f" -ForegroundColor Red }
+    Write-Host ''
+    Write-Host 'Fix the endpoint (check that PAPERCLIP_API_URL is the address the API actually' -ForegroundColor Yellow
+    Write-Host 'binds — a localhost URL against a tailnet-bound server is refused, which is the' -ForegroundColor Yellow
+    Write-Host 'bug this refusal exists for), or re-run with -NoPaperclip to freeze those rows' -ForegroundColor Yellow
+    Write-Host 'as explicitly unmeasured.' -ForegroundColor Yellow
+    exit 3
+}
 
 $outPath = Resolve-OutPath $Out
 Write-Utf8NoBom -Path $outPath -Text ($sb.ToString())
 Write-Host "Wrote $Out"
 
 if ($Baseline) {
-    Write-Utf8NoBom -Path $baselinePath -Text (($current | ConvertTo-Json -Depth 4))
+    Write-BaselineFreeze -Path $baselinePath -Current $current `
+        -NoPaperclip $NoPaperclip.IsPresent -Failures $script:PaperclipFailures
     Write-Host "Froze $BaselineFile"
+}
+if (@($script:PaperclipFailures).Count -gt 0) {
+    Write-Host ''
+    Write-Host ('WARNING: {0} Paperclip read(s) were unreachable — the Paperclip-derived rows read' -f @($script:PaperclipFailures).Count) -ForegroundColor Yellow
+    Write-Host 'unmeasured, not zero. This run may not be used to freeze a baseline.' -ForegroundColor Yellow
 }
 
 Write-Host ''
