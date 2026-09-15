@@ -1123,6 +1123,21 @@ invent a picture nobody can check. Check `docs/screenshots/` and grep the
 docs for the name first (trap 21).
 [Debt and why](docs/ops/claude-archive/operating-history.md#illustration-lock-debt-2026-09-04).
 
+**A per-picture recipe does not record the SET's shared palette, and
+`shoot.ps1`'s default is not every consumer's.** The landing is uniform
+**`BlueGrey`** (Founder T4 look, 2026-09-10); the default `-Theme` is
+`Turquoise`. So the obvious argument-free re-run of a landing shot commits
+the WRONG picture and nothing complains — DRA-56 was itself dispatched to do
+that, from a card written six hours before the Founder settled it. Guard:
+`LandingSiteTests` pins all 23 landing assets (18 stills + 5 clips) to a
+recipe manifest, compares page-against-manifest **both ways**, and asserts
+the default is NOT the landing theme so every row's explicit `-Theme` stays
+load-bearing. `record-tray-gifs.ps1` is the other way round — the landing is
+its only consumer, so its default IS `BlueGrey` and bare runs reproduce the
+clips. It also holds the page's two spoken promises (every picture
+harness-made; no third-party requests) and that the page's own prose is
+covered by the webfont's cmap.
+
 **The screen is exclusive.** A batch takes a lock and refuses when another
 holds it, or when any EQBuddy is running out of `bin\Release` /
 `bin\Debug`. `-Force` overrides the refusal; nothing stands down another

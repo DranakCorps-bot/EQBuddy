@@ -6976,3 +6976,103 @@ signing / prod secrets / Founder mail / Desktop / #527 / a new `helm/ssc-*`.
 
 — Dranak (Claude Code, DRA-84 D1)
 
+## 2026-09-14 (DRA-56 — the Turquoise re-shoot was already answered the other way)
+
+**1. The card's headline scope is REFUSED as superseded, and nothing was re-shot.** DRA-56 says
+"re-shoot the nine `site/assets/img/` captures as one Turquoise-theme batch", tracing to Helm's
+ACK of it as the DRA-48 follow-up (~1:00 PM CT, 2026-09-10). **Six hours later the Founder
+settled it the other way himself**: `06c66462`, 2026-09-10 19:15 CDT, *"site: DRA-48 uniform
+BlueGrey — Founder T4 look, every capture and clip re-shot"* — all 18 stills and all four GIFs,
+with the landing's CSS tokens moved from `ThemePalettes["Turquoise"]` to `["BlueGrey"]` and the
+`.teal` class renamed `.accent` "so the name stops lying about a blue page". Executing the card
+as written would have reverted a Founder look decision to satisfy an instruction that predates
+it. The card's real GOAL — one palette across the landing, every picture recipe-backed — was
+already met; only the palette differs from the sentence naming it. **The default it could have
+gone the other way on:** do as the card says (two seats and Helm had all signed the Turquoise
+follow-up, so there was cover for it) and file the conflict afterwards. Refused because a stale
+instruction is not authority, and "the card said so" is the one reason that never survives
+contact with the commit that answers it. Not re-litigated with Helm: the *superseding* decision
+is the Founder's own, and Helm's Soft LEAVE on the re-shoot was only ever "not a merge gate".
+
+**2. The `#510` content swaps needed no work — both were already resolved, one against the
+swap.** The closed PR named two: `shell-progress.png` (five lines) → `shell-progress-history.png`,
+and `shell-world.png` (empty state) → `map-window.png`. The first is **live on `main`**
+(`index.html:359`). The second was **considered and declined by the Founder for a stated
+reason** — `map-window.png` was a v1.5x-era 1936×1048 capture with no recipe, so the
+illustration lock could not ship it; the World card carries `spawns-window.png` instead
+(`index.html:366`). Both were verified by opening the page, not by reading the PR body — a
+closed PR describes an intention, never the state of the tree.
+
+**3. The EQBuddy Sans swap is TAKEN, and the weight scale is the reason it was nearly wrong.**
+The page now ships the app's own three faces instead of `InterVariable.woff2`. Measured before
+building, not asserted: all **94** distinct characters the page shows are in the face's cmap (831
+codepoints, a Noto subset); the faces' `usWeightClass` values are exactly **400 / 600 / 700**;
+and the family name in the `name` table is `EQBuddy Sans`. Transfer size **falls either way** —
+185 KB gzipped against Inter's 352 KB (which is already-compressed woff2 and does not shrink),
+and 304 KB against 352 KB uncompressed — so the claim holds whatever GitHub Pages does about
+content encoding. It also removes the page's **only non-GitHub external href** (the `rsms.me`
+Inter credit), so the footer's "this page makes no third-party requests" now has nothing to
+qualify; the OFL credit points at the local `assets/fonts/OFL.txt` and names Noto and its
+holders. Verified in effect and not merely present (trap 42): a headless probe reports all three
+faces `loaded` from the committed TTFs, and the 1440px render keeps its hierarchy.
+
+**The near-miss is the part worth keeping.** Inter was ONE variable file declaring `font-weight:
+100 900`, which covers everything; three static faces cover three points. The sheet asked for
+**650 in seven places** — the brand wordmark, the hero pills, the badges, the CTA and the three
+table marks. CSS rounds 650 UP, so all seven would have silently rendered at 700 and merged into
+the heading weight: a whole typographic tier lost, on a page whose own screenshots would still
+show the app's real hierarchy. They are remapped to **600** deliberately — the nearest face
+DOWN, which keeps the distinction the 650 existed to make. **The default it could have gone the
+other way on:** decline the swap on "it is not a drop-in", which is what the first reading of the
+weight inventory suggested. It cost one measurement to find that 600 and 700 were exact and only
+650 was homeless.
+
+**4. The illustration lock grew a SET-level guard, because the palette lived in a commit
+message.** Every landing picture already had its own recipe; nothing recorded *which* files the
+page draws or *what palette they must share*. That is a live trap, not a tidiness point:
+**`shoot.ps1`'s default `-Theme` is `Turquoise`** — right for `docs/screenshots/`, wrong for this
+page — so the next person to re-run a landing shot the obvious, argument-free way commits one
+Turquoise still into a BlueGrey set and nothing complains. This card is the proof the hazard is
+real: it was dispatched to do exactly that. `LandingSiteTests` now pins all 23 visual assets (18
+stills + 5 clips) to a recipe manifest, compares the page's set against the manifest's **in both
+directions** (trap 34 — a forbid-rule alone cannot see a missing row), asserts the set is one
+palette, and asserts *that `shoot.ps1`'s default is NOT the landing theme*, so the explicit
+`-Theme BlueGrey` in every row is load-bearing and tested rather than remembered. It also turns
+the page's two spoken promises into assertions: *"every capture and clip on this page is a real
+build driven by the repo's own harness"* and *"this page makes no third-party requests"*.
+**Every detector fires on a committed negative** (trap 78) — the weight scanner against the
+stylesheet this slice would have shipped unmeasured, the request scanner against a hosted font
+and an analytics tag, each paired with a negative proving it stays quiet on the legitimate case.
+`SfntFacts` was lifted out of `BundledFontFaceTests` so the app's bundle and the site's webfont
+read **one** TTF parser (trap 4), rather than the site growing a second one.
+
+**Not done, deliberately:** nothing was re-shot (see 1) — so `-Theme` was never run and the
+screen was never taken; the Soft LEAVE list is untouched (no Pages enablement, no README/About
+go-live links, no Play Console, no tag, no signing); no `WhatsNew.json` entry, because site
+assets ship no player-facing app change; and the font-coverage guard reads the **page's** text
+only — a future `site/` page would need its own row.
+
+**5. CORRECTION, and it is the same mistake this entry is about.** The paragraph above
+originally closed by saying "the T4 dual look (Helm + Founder) owed *before Pages enable* now
+has a typeface change in front of it", and `HELM-FEEDBACK.md` and PR #629 say the same. **That
+framing was stale and Helm corrected it** at the #629 SIGN (~9:30 PM CT) with a fresh
+`GET …/pages`: **200, `has_pages: true`**, `https://dranakcorps-bot.github.io/EQBuddy/`, T4 GO
+recorded 09-12 and verified 09-14. **The landing is already published**, so this typeface lands
+on a LIVE page rather than ahead of a gate. Helm's ruling: the site **STAYS UP**, a Helm+Founder
+content look against the post-#629 page is a named follow-up and explicitly **not** a merge gate,
+and Soft LEAVE inventing a Pages disable or a re-gate on a typeface. Nothing about the change is
+altered by this; what is altered is the claim I made about its consequence, which was more
+cautious than the truth in a way that would have read as a gate nobody was holding.
+
+**I refused a card for carrying a stale world, and then carried one of my own into the same
+document — one paragraph after writing the guard against it.** The card's staleness came from a
+Founder commit six hours later; mine came from taking the Soft LEAVE list's wording as the state
+of the deployment rather than as a list of things not to touch. The list was right — I did not
+enable Pages, and could not have, because it was already on. **A list of what not to do is not a
+description of the world**, and the cheap check was the one Helm ran: ask the API. The hygiene
+rule I proposed to Helm — re-read the commits that touched the surface before acting on an ACKed
+follow-up — needed its sibling in the same breath: **re-read the STATE of the surface too, from
+the system that owns it, not from the prose that last mentioned it.**
+
+— Dranak (Claude Code, DRA-56)
+
