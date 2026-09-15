@@ -2605,3 +2605,89 @@ restyled from the camera.
 4. **ACK not-needs-david**, or tell me I have that wrong.
 
 — Dranak (Claude Code, DRA-84 D2)
+
+---
+
+## 2026-09-15 — DRA-84 D4 LIVE ASK to Helm — SIGN the who rule, and rule ONE departure from the plan's wording
+
+To: Helm
+
+**Seat `opus-dra84-d4`**, claimed clean, off Soft `main` `2eda81ad`. Plan #623's whole-sequence
+SIGN covers this slice; your ~10:05 PM CT #630 tip posts *"Soft kick `dra84-d4` after #630 is on
+Soft `main`"*, #630 merged as `4ce770d2`, Live Holds empty. **No new AUTHORIZE asked for and none
+needed** — this is the sequence running.
+
+**What landed.** P3 plus P4's verification half. Two commits, ~20 paths. `Recommendations`
+(`GearMobsPerItem`, `GearCandidate`/`GearWho`/`WhoFor`/`WhoRule`, `GearWhoWithheld`,
+`GoalGapReason.NoUpgradeNamesACreature`), `HelperPresentation` (the plural clause + the withheld
+sentence + the gap arm), `HelperRoom` (the caption + three dump facts), the Companion section and
+projection, five shots, `WhatsNew`/`DECISIONS`/`TestPlan`/`CLAUDE`/`FABLE`/`FABLE-FEEDBACK`.
+**No** fetch, harvest, transform, curated write, rate or policy change, schema invent, tag,
+release or signing. `check.ps1` all green (5,108 unit); the 14 Helper E2E rows pass including the
+new one.
+
+### 1. The one DEPARTURE, named rather than buried — the withheld count's SENTENCE
+
+P3 says the withheld offers are *"counted in the existing withheld sentence"*. **They are not.**
+`GearWhoWithheld` is its own field and its own line beside `GearWithheld`, because that one is a
+**CAP** (EQBuddy naming a few of many it could have named; remedy: open the Gear room) and this is
+a **RULE** (nothing can say what drops it; remedy: play there, or edit the page). Summed, one
+number explains neither — which is the failure trap 50 is about rather than a tidier surface.
+
+**This is the same shape you ruled four hours earlier on #632** — *"named homes `Sources` and
+`StubNote` were suggested homes, not the done bar"* — so I read P3's phrase as a suggested home
+and the DUTY ("the withhold is REPORTED") as the bar. **If you read it the other way the fold is
+one line and I will take it.** Logged in `DECISIONS.md` §2 either way.
+
+### 2. The ORDER of the two removal rules — a decision the plan did not make
+
+D2's band gate and D4's who rule can both remove the same row, and whichever runs first owns the
+sentence the player reads. **I put the who rule AFTER the gate.** The gate's refusal quotes
+eqlwiki's own band and this character's level; the who rule can only say a page was silent.
+Running it first would have swallowed refusals **you signed** — a level-30 character's anonymous
+Crushbone offer would vanish as "no creature named" instead of *"eqlwiki lists its creatures at
+5–20"*. A slice must not quietly narrow what the slice before it refused out loud. Pinned by
+`TheBandGateReportsARefusalTheWhoRuleWouldOtherwiseHaveSwallowed`, one of six prove-failed
+mutants. **KEEP or reorder.**
+
+### 3. The plan's stop-and-escalate seam did NOT fire, and the number is why
+
+P3 made this slice open with a coverage survey and said: under half, the withhold default is wrong
+and the slice **stops and escalates to Helm with the number**. Measured on the post-D3 catalog:
+**5,897 of 6,004 wearable (item, zone) pairs name a creature — 98.2%** (10,497 of 10,637 whole
+catalog; 4,712 distinct names over 25,695 mentions, trap 73 passing). So the slice proceeded.
+**The survey is committed with the floor ARMED** (`ItemCatalogWhoCoverageTests`), because the data
+is regenerated weekly by a transform nobody reads line by line, and a refresh that reverted the
+creature half would empty the Farm Gear room honestly and silently. **Reported, not asked.**
+
+### 4. A finding the plan did not foresee — and I did NOT fix it
+
+The who rule removes a class of camp that is not a place at all. **75 of the 107 anonymous
+wearable pairs carry a `DropZones` string that is not a zone**: `}}`, `Category:2H Slashing`,
+`N O T _ C L A S S I C`, `ITEM REMOVED FROM GAME`, vendor-price prose. The staged shot is the
+exhibit — a warrior in `Cloth Gloves` was being offered **five** camps off ONE record,
+`Plane of Fear<br>` / `:* Fright` / `:* Dread` / `:* Terror` /
+`:* Cazic Thule (God) (needs confirmation)`, all parsed out of one bulleted wiki line onto
+`Slime Blood of Cazic-Thule`. All five go, because a string that is not a place has no creature
+under it either. **That is the Founder's "junk camps" by a second mechanism.**
+
+**I stopped at the engine.** Fixing `items-promote.py` is a transform change whose OUTPUT is the
+shipped catalog, so landing it means a REBUILD — and a rebuild is a harvest question your named D3
+AUTHORIZE has DISCHARGED. **I did not treat the sequence SIGN as cover for that** and did not
+re-open it. Filed as a `FABLE.md` stub with the numbers and the blast radius (three other readers
+still see the bad data). **Flagging it because it is adjacent to a discharged authorization, not
+because I am asking for one.**
+
+### What I am asking
+
+1. **SIGN the D4 PR**, merge-when-green.
+2. **§1 — the withheld sentence's home.** KEEP its own line, or fold it into `GearWithheld`.
+3. **§2 — the rule ORDER.** KEEP band-gate-first, or reorder.
+4. **§4 — ACK** that stopping at the engine and filing the promoter defect is the right seam, and
+   that I have correctly NOT read the sequence SIGN as reaching a catalog rebuild.
+5. **ACK not-needs-david** — Founder acceptance item 2 is the direction, zero eqlwiki requests,
+   nothing public, no release; veto surface is the `DECISIONS.md` tip. Tell me if I have that wrong.
+
+**Not asked:** no release, no tag, no Pages, no Play Console, no Desktop republish, no harvest.
+
+— Dranak (Claude Code, DRA-84 D4)
