@@ -6753,3 +6753,70 @@ dashboard's printed recipe is already true: it was generated without
 `-WindowLabel`, so nothing regenerates differently today. Trap 81 filed.
 
 — Dranak (Claude Code, DRA-80)
+
+## 2026-09-14 ~8:40 PM CT — DRA-84 D3: the weekly harvest refresh, and four calls made rather than asked
+
+**Assumption at the top:** the D3 harvest un-PARK Helm AUTHORIZED by name (#623 SIGN, HELM tip
+`f25fd184`) authorizes running the standing weekly refresh **as designed** — the fetch, the
+promotions, the surveys and the catalog rebuild — and nothing about the refresh's design. Every
+call below sits inside that reading, and each states the default it could have gone the other
+way on. None touches the consequence list: no release, no public surface, no privacy, no money,
+no roadmap direction, no departure from eqlwiki, and **no change to how we ask eqlwiki for
+things** (same client, same ~1 req/s, same User-Agent).
+
+**1. Resumed the interrupted run instead of re-running `refresh.py` whole.**
+The prior `-p` process exited mid `items-harvest`. The other way: re-run `refresh.py`, which
+would have re-evicted the window and re-fetched the ~1,420 changed pages the dead run had
+already paid for. I resumed — `items-wikitext.jsonl` keys on revision ids, so 11,014 of 11,197
+item pages were already current and only 183 were fetched. **Why this way:** re-fetching pages
+we already hold is load on a third party that buys nothing, and item 7 of the consequence list
+makes request behaviour toward eqlwiki something to be careful with in the conservative
+direction. The risk of resuming is a page edited *after* the dead run's eviction sitting stale
+behind an advanced window, so I checked rather than assumed: exactly one article qualified
+(`Patch Notes`) and no harvester tracks it. Had that check found tracked pages, the answer would
+have been a targeted evict-and-refetch of those, not a full re-run.
+
+**2. Re-ran `guides-transform` after stamping `refresh-state.json`, and did NOT reorder
+`refresh.py`.**
+`guides-transform` embeds `retrievedAt` from `refresh-state.json`'s `ranAt`, which `refresh.py`
+stamps **after** the promotions — so a refresh that advances the date leaves the committed file
+one cycle behind and reddens the `generated` gate on the stamp alone. The other way: reorder the
+promotion after the stamp and fix it permanently. I took the workaround and escalated the fix.
+**Why this way:** the authorization is to run the refresh, not to redesign it, and a reordering
+is exactly the kind of change that should carry a ruling rather than ride in on a data PR.
+Recorded in CLAUDE.md so the next runner meets it as a known shape rather than a mystery, and
+named for veto in the LIVE ASK. **This is a real latent bug and it is not fixed** — if Helm
+leaves it, every future refresh that advances the date needs the same manual re-run.
+
+**3. Replaced the vendor-value tripwire rather than deleting it or changing the engine.**
+`TheShippedCatalogCarriesNoVendorValueYet` fired exactly as written — 773 shipped records now
+carry a `MerchantCopper`. Three ways to go: delete the row (silent), flip it to a bare
+"non-zero" assertion (vacuous), or replace it with a survey of what actually ships. I took the
+third: the counts the promoter's own survey printed, with the **distinct** count (403 values
+behind 773 prices) as the load-bearing one, because that ratio is what separates a parser
+reading a per-item field from a parser finding one template (trap 73). Added a committed
+negative for its forbid-scan arm so it is not a guard aimed at nothing (trap 78). **I changed no
+engine and no wording** — that belongs to the money engine, and the thing a human should look at
+(568 of 773 prices carry no Charisma/faction condition, so they draw the flat sentence with no
+"yours will differ" clause) is measured, pinned in the guard, and named for veto rather than
+absorbed.
+
+**4. Updated three moved guards and two live doc counts from a second source, not from actuals.**
+QuestCatalog 1,178 → 1,173 and harvested guides 1,164 → 1,158 are data moves, and the lazy fix
+is to paste the new numbers in. Each was re-derived first (trap 52): the seven Darkforge rows
+left the quest catalog because the wiki folded them into `Category:Items` under one umbrella
+page — verified by finding all seven in the items dump and none in the quest title list; and
+`Class Race Quest List` joined the nothing-to-say list because the quest-item enumeration
+dropped "Innoruuk Symbol Quests", itself a quest page that was never an item — verified against
+its own byte-identical cached wikitext, so it was not a transformer regression. The reasons are
+written into the test comments, because a count that moves without a reason beside it is the
+thing that makes the next refresh unreviewable. CLAUDE.md and `docs/TestPlan.md` updated to stay
+true; the append-only channel ledgers were left alone as history.
+
+**Not done, deliberately:** no curated catalog written (flag-only rule KEPT — 92 SpawnCatalog /
+255 GuideCatalog / 243 SkyQuestDefaults.cs flags go to a human), no `WhatsNew.json` entry (the
+release that ships these catalogs earns one, and vendor prices appearing in Farm-to-sell
+sentences should be named in it), no engine change belonging to D1/D2/D4, and no move on the
+standing Soft-open un-PARK, which the #623 SIGN named for D3 only.
+
+— Dranak (Claude Code, DRA-84 D3)
