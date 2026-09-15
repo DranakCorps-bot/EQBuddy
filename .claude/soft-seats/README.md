@@ -58,6 +58,33 @@ Every worktree of this clone shares the **main** tree's `.claude/soft-seats/`
 (resolved via `git rev-parse --git-common-dir`). Do not copy the store into a
 seat worktree.
 
+**`claims.json` is ABSENT in a fresh worktree, and that is correct** (DRA-90,
+2026-09-15). `README.md` and `claims.template.json` are committed, so they
+appear in every working copy; the live store is gitignored and lives in the
+main tree only. Listing a worktree's `.claude/soft-seats/` therefore shows a
+directory with no store in it — which reads exactly like "the store is
+per-working-copy and the mutex is blind", and was reported as that. It is not:
+a linked worktree resolves to the main tree's file, and a default claim in one
+is refused by a holder in the other (proved both directions, with a real
+worktree, in `scripts/soft-seat-selftest.ps1`).
+
+Do not infer the store from a directory listing. **Ask:**
+
+```powershell
+pwsh -NoProfile -File scripts\claim-seat.ps1 -Where
+```
+
+It prints the resolved path and how it was resolved. `shared by every worktree
+of <root>` is the healthy answer. If it warns that the store is **private**,
+git resolved no common dir and this copy genuinely cannot see another seat —
+that, and only that, is the DRA-90 failure. A claim granted in that state says
+so on the same screen.
+
+Two independent **clones** still do not share a store. Nothing here closes
+that; the remote is the only thing both can see (`gh pr list` / `git ls-remote`
+for a branch naming the card) and checking it before you push is a habit, not
+a guard.
+
 ## The claim key is the Paperclip card, and only that
 
 `-WorkItem` must be `DRA-<n>` (EXO-HARDEN-A2 / DRA-50, 2026-09-10). Anything

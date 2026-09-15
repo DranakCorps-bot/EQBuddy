@@ -40,7 +40,19 @@ $script:SoftSeatKeyPattern = '^DRA-\d+$'
 # copies would let the sentence and the behaviour drift apart (trap 4).
 $script:SoftSeatStaleAfterHours = 8
 
-function Get-SoftSeatMainRoot {
+# Where the ONE store lives, and HOW we decided. The 'how' is returned, not
+# just the path, because DRA-90 was reported as "the store is per-working-copy"
+# by an executor who looked at a fresh worktree's .claude/soft-seats/ (README +
+# claims.template.json are COMMITTED; claims.json is gitignored, so it is absent
+# there BY DESIGN) and concluded the seats could not see each other. They can —
+# git rev-parse --git-common-dir sends every linked worktree to the main tree's
+# copy. A resolution nobody can print is a resolution everybody has to guess at,
+# so claim-seat.ps1 -Where prints this.
+#
+# Resolution kinds: 'explicit' (-StoreDir), 'git-common-dir' (the shared answer),
+# 'fallback' (git told us nothing — this copy is on its OWN store and any other
+# seat is invisible, which is the failure DRA-90 described).
+function Resolve-SoftSeatMainRoot {
     param([string] $Hint)
     $starts = @()
     if ($Hint) { $starts += $Hint }
@@ -54,23 +66,55 @@ function Get-SoftSeatMainRoot {
             try { $common = git -C $start rev-parse --git-common-dir 2>$null } catch { $common = $null }
         }
         if ($common) {
-            $common = $common.Trim()
+            $common = ([string] $common).Trim()
+            if (-not $common) { continue }
             if (-not [IO.Path]::IsPathRooted($common)) {
                 $common = [IO.Path]::GetFullPath((Join-Path $start $common))
             }
             $root = Split-Path $common -Parent
-            if (Test-Path (Join-Path $root '.gitignore')) { return $root }
+            # The parent of the common dir IS the main working tree, by
+            # construction. This used to additionally require a .gitignore
+            # there and fall through to the WORKTREE root when it was missing
+            # — a proxy for "is this the repo root" (trap 64b) whose failure
+            # mode is silent and is exactly the bug: every worktree quietly
+            # gets its own store and no seat ever refuses another. Accept the
+            # directory git named; only "git named nothing" falls back now.
+            if ($root -and (Test-Path -LiteralPath $root -PathType Container)) {
+                return [pscustomobject]@{ root = $root; kind = 'git-common-dir'; shared = $true }
+            }
         }
     }
-    if ($PSScriptRoot) { return (Split-Path $PSScriptRoot -Parent) }
-    return (Get-Location).Path
+    $fallback = if ($PSScriptRoot) { (Split-Path $PSScriptRoot -Parent) } else { (Get-Location).Path }
+    return [pscustomobject]@{ root = $fallback; kind = 'fallback'; shared = $false }
+}
+
+function Get-SoftSeatMainRoot {
+    param([string] $Hint)
+    return (Resolve-SoftSeatMainRoot -Hint $Hint).root
+}
+
+function Get-SoftSeatStoreOrigin {
+    param([string] $StoreDir, [string] $Repo)
+    if ($StoreDir) {
+        return [pscustomobject]@{
+            dir    = [IO.Path]::GetFullPath($StoreDir)
+            kind   = 'explicit'
+            shared = $false
+            root   = $null
+        }
+    }
+    $resolved = Resolve-SoftSeatMainRoot -Hint $Repo
+    return [pscustomobject]@{
+        dir    = [IO.Path]::GetFullPath((Join-Path $resolved.root '.claude/soft-seats'))
+        kind   = $resolved.kind
+        shared = $resolved.shared
+        root   = $resolved.root
+    }
 }
 
 function Get-SoftSeatStoreDir {
     param([string] $StoreDir, [string] $Repo)
-    if ($StoreDir) { return [IO.Path]::GetFullPath($StoreDir) }
-    $root = Get-SoftSeatMainRoot -Hint $Repo
-    return [IO.Path]::GetFullPath((Join-Path $root '.claude/soft-seats'))
+    return (Get-SoftSeatStoreOrigin -StoreDir $StoreDir -Repo $Repo).dir
 }
 
 function Normalize-SoftSeatWorkItem {

@@ -7408,3 +7408,55 @@ rebuild (Fable stub STANDS, Helm ACKed the stop); no second D4 seat; no re-ranki
 weight and no new threshold — this slice changes what is SAID, not what is chosen.
 
 — Dranak (Claude Code, DRA-84 D5)
+
+## 2026-09-15 — DRA-90: the seat store was already shared; the hole was that nothing tested it
+
+**The card's root cause is wrong, and I did not implement its directions as written.** DRA-90
+reported that `.claude/soft-seats/` is per-working-copy, so `claim-seat.ps1` could not see a
+sibling's live claim, and proposed anchoring the store to the git common dir (direction 1).
+
+**Measured, before changing anything:** that anchoring has been in `Get-SoftSeatMainRoot`
+since the store's ORIGINAL commit, `b7f2eae4` (2026-09-08) — a week before the DRA-87
+duplicate that prompted the report. A real linked worktree refuses a default claim held by
+the main tree, in both directions, with no `-StoreDir`. There is exactly ONE `claims.json` on
+the machine, and it holds exactly ONE DRA-87 row (`dra87-docs-honesty`, 06:20:34Z). **The
+second DRA-87 seat never claimed at all** — so the mutex did not lose a race over the store,
+it was never consulted. A mutex nobody is obliged to take refuses nobody.
+
+**What WAS broken is the coverage.** All 45 existing selftest checks pass `-StoreDir
+<throwaway>`, so the refusal predicate is proven exhaustively against a directory the test
+hands it, and store DISCOVERY — the only thing deciding whether two seats meet — had none.
+That is why an experienced executor could file the resolution as broken and nobody could
+contradict it cheaply.
+
+**Decided, and the default it could have gone the other way on.** The obvious default was to
+implement direction 1 as asked. I did not: implementing an anchoring that already exists
+would have produced a green diff that changed nothing and closed the card on a false story.
+Instead the slice lands the card's own verification bar — a real repo, a real linked
+worktree, no `-StoreDir`, refusal asserted BOTH directions, one identical resolved path, and
+a reachable negative that claims the same card against a private store and asserts it
+SUCCEEDS so the rows cannot pass by accident. Prove-failed: forcing the fallback reddens 7.
+59 checks green after.
+
+**Two smaller calls inside it.** (a) The common-dir answer used to additionally require a
+`.gitignore` at the resolved root and fall through to the WORKTREE root when absent — a proxy
+for "is this the repo root" (trap 64b) whose failure mode is silently giving every copy its
+own store. Removed; only "git named nothing" falls back now. (b) The resolution is a value
+(`explicit` / `git-common-dir` / `fallback`) printed by `claim-seat.ps1 -Where`, and a grant
+from a `fallback` store WARNS on the screen that granted it. The reporter's misdiagnosis was
+reading a directory listing — `claims.json` is gitignored while `README.md` and
+`claims.template.json` are committed, so a fresh worktree shows the folder without the store.
+That is now asserted as correct rather than left to the eye.
+
+**Direction 3 (a remote backstop) is NOT implemented, and I think the card overrates it for
+this incident.** On DRA-87's own timeline the seat that claimed did so at 06:20:34, and the
+other seat's branch and PR did not exist until 06:28–06:29. A remote check at claim time would
+have found nothing. It remains worth having as a backstop for a different case (starting on a
+card that already has an open PR), and the store README now names `gh pr list` / `git ls-remote`
+as the habit, but shipping it under the claim that it closes DRA-87 would be a guard sold on a
+failure it cannot see. Filed as the open half rather than quietly dropped.
+
+**Still not closed:** two independent CLONES share no store, and nothing here changes that.
+Neither does anything here OBLIGE a seat to claim, which is the actual DRA-87 mechanism.
+
+— Dranak (Claude Code, DRA-90)
