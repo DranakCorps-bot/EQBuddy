@@ -1,3 +1,57 @@
+## 2026-09-14 — DRA-84 plan: the defaults chosen while turning the Founder's Farm Gear FAIL into slices
+
+Plan-only seat `fable-dra84-farmgear` (Paperclip DRA-84), branch `fable-dra84-farmgear`,
+plan PR to Soft `main`. Governing input: Founder FAIL of Helper Farm Gear on Desktop
+2.0.0+`3174aa5f`, four acceptance items. `src/` untouched in this seat; plan SIGN
+pending with Helm. Live Holds empty at write; none named DRA-84.
+
+**1. Band-failing zones are REFUSED, not demoted — and personal evidence does not
+rescue them.** DRA-71 D3 set the precedent that an outgrown zone is DEMOTED
+(`OutgrownWeight` 0.5) because deleting a player's own best-measured camp would
+overrule evidence with judgement. This plan diverges for Farm Gear's catalog zone
+rows: the Founder failed the build on their PRESENCE, so a zone whose eqlwiki
+`Level of Monsters` band fails the gate is refused outright, with a counted
+says-so sentence — even where the player has personal seen-drops there (Crushbone
+stays refused for a level-29 who farmed it at 12). Could have gone demote-only;
+went refusal because a FOUNDER FAIL is an acceptance bar, not a preference. **The
+default most worth a veto.**
+
+**2. The gate's two arms are `OutgrownBy` = 10 (reused) below and
+`GearBandReachAbove` = 5 (new) above.** A zone is refused when its band TOP is 10+
+under the resolved level, or its band BOTTOM is 5+ over it. Both are named
+judgements, not measurements — no XP curve, no con-colour model, nothing derived
+(the D3 refusal of invented curves KEEPS). 10 is reused rather than re-chosen so
+"outgrown" means one thing in the repo; 5 is new and could have been 3 or 8.
+
+**3. A drop row that cannot name a WHO from either source, and rides no quest, is
+withheld** — the Founder's acceptance 2 read strictly ("item + source mob(s)
+and/or quest + zone"). Gated on a post-refresh coverage survey: if fewer than
+half the `DropZones`-bearing records carry a creature after the refresh, the
+withhold default is wrong and the slice stops and escalates with the number
+instead of shipping a hollowed room. Could have gone "show the who-less item
+anyway, ranked last"; went withhold because "somewhere in this zone" is the exact
+row the Founder called out (Rathe, band 13–45 — a level gate cannot refuse it, so
+the who rule is what answers that exhibit). **Second-most worth a veto.**
+
+**4. The refresh slice (D3) is named for its own Helm AUTHORIZE instead of riding
+the sequence SIGN.** Harvest PARK is Helm posture ("Harvest PARKED STAND",
+Helm tip 2026-09-14 ~7:15 PM CT); burying its un-PARK inside a sequence-wide SIGN
+would take away the veto seam the whole-sequence rule rests on. The sequence is
+cut so D1–D2 land without it and D4 waits on it. The run itself is the standing
+weekly refresh with no rate or policy change, so consequence-list item 7 is
+untouched.
+
+**5. `LevelUseFor(FarmGear)` `Exempt` → `Consumes` is the Founder's veto arriving,
+not a new decision.** D6 logged the exemption as "the default most worth a veto";
+the FAIL is that veto. The mechanism differs from what D6 surveyed — zone bands
+from the committed zone-page cache, not item level requirements — so the
+0/11,146 item survey stands uncontradicted.
+
+**6. Not needs-david.** Both tests fail on every open call: direction came from
+the Founder in the FAIL itself; every remaining choice (constants, refusal shape,
+withhold rule, slice order) changes implementation, not direction. Veto path is
+this file.
+
 ## 2026-09-14 — DRA-79 / M0-6 (EXO-PLAYBOOK doctrine capture): four calls made alone
 
 Tier T2 (doctrine entries are Corps posture) · docs-only, `src/` untouched ·
