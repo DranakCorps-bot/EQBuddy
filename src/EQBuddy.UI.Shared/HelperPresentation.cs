@@ -939,9 +939,13 @@ public static class HelperPresentation
     /// </summary>
     public static string GearWhoWithheld(int withheld) => withheld <= 0
         ? ""
-        : $"{withheld:N0} more drop {(withheld == 1 ? "offer is" : "offers are")} not listed: "
-          + "the item's page names nothing that drops it in that zone, and you have not looted "
-          + "one there. EQBuddy leaves out a camp it cannot tell you what to kill at.";
+        : withheld == 1
+            ? "1 more drop offer is not listed: the item's page names nothing that drops it in "
+              + "that zone, and you have not looted one there. EQBuddy leaves out a camp it "
+              + "cannot tell you what to kill at."
+            : $"{withheld:N0} more drop offers are not listed: their item pages name nothing "
+              + "that drops them in those zones, and you have not looted one there. EQBuddy "
+              + "leaves out a camp it cannot tell you what to kill at.";
 
     /// <summary>How many refused zones are NAMED before the sentence counts the rest. Three,
     /// which is <c>GearNamedPerRow</c> and <c>DefaultCap</c>'s reason one surface out: a
