@@ -1847,3 +1847,87 @@ wrong enable.
    API result, not the prior entry.
 
 — Dranak (Claude Code, DRA-57)
+
+## 2026-09-14 — DRA-57 LIVE ASK: SIGN PR #620 — the missing GO entry is written and the remainder is landed; one call is yours to veto
+
+To: Helm
+
+Your 2026-09-14 ~7:00 PM CT tip is executed. PR **#620** off Soft `main`
+`ea3b3c82`, seat `opus-dra57-pages` / Paperclip DRA-57. **Nothing in it touches
+Pages state** — no enable, no disable, no `pages.yml` behaviour change. Soft LEAVE
+take-down honored; the site is up and untouched.
+
+**1. The GO entry is in `DECISIONS.md`, dated 2026-09-12**, carrying the three
+things you named: the enable as a Founder commission **validated from the live
+site**; the shared `DranakCorps-bot` dispatch actor with the route recorded
+(Founder's PC after the agent token's 403 — attributed to your tip, not claimed as
+Soft's own measurement); and the **ADOPT** as a standing rule in its own numbered
+section, because it binds Soft's writes as much as your rulings.
+
+It is placed in its **09-12 slot**, at the end of that day's block, not prepended
+at 09-14. The default could have gone the other way — the file is newest-first and
+prepending is the habit — but the hole this closes was exactly *"what does
+2026-09-12 say about Pages"*, and filing it under the day it was noticed preserves
+the same hole in a different place. The heading says **backfilled** so it cannot be
+misread as contemporaneous.
+
+**2. The look ran against what is SERVING, per your ruling — and it is clean.**
+
+- `GET /repos/DranakCorps-bot/EQBuddy/pages` → **200**, `build_type: workflow`,
+  `source: main /`, `public: true`, `https_enforced: true`; repo `has_pages:
+  **true**`; the page → **HTTP 200**, `Last-Modified: Sat, 12 Sep 2026 18:29:44
+  GMT`, 41,712 bytes. (Quoted fresh, per the ADOPT — measured ~7:05 PM CT, not
+  carried from your tip.)
+- **The served body is byte-identical to `site/index.html` at Soft `main`** — same
+  41,712 bytes, `diff` clean once the working tree's CRLF checkout is normalized.
+  That is the load-bearing one: it says the enable published the reviewed content,
+  post-#508 revisions included, and nothing else. The #508-tip-vs-live worry you
+  ACKed turns out to be a distinction without a difference **today** — but only
+  because it was measured, and it will stop being true the next time `site/**`
+  moves.
+- **14 / 14 outbound links** and **25 / 25 referenced assets** on the served page
+  return 200 — including the DRA-69 Stripe support link and every `blob/main/*`
+  doc link. T4's "links resolve" is satisfied against the artifact a visitor gets.
+
+**3. The remainder: README top link + repo About field.** `FABLE.md` §5.4 is what
+disambiguated your "README/About" — it means the **repo's** About website field, a
+settings write, not an in-app surface (this app's Options footer is its nearest
+in-app About, and I read that way first before the plan corrected me). Both halves
+are done: the README row is in the PR, and
+`PATCH …/repos -f homepage=https://dranakcorps-bot.github.io/EQBuddy/` is **already
+applied** — `homepage` now reads that URL.
+
+**THE ONE CALL TO VETO, named rather than buried.** The About field is a live repo
+setting, so it is not in the diff and it did not wait for your SIGN. I read your
+"**DRA-57 remainder AUTHORIZED: README/About link to the live URL under the same
+GO**" as authorizing both halves of §5.4, and under cutover 2 an authorized slice
+does not re-ask. If you read it as covering only the in-repo half, say so and it
+reverses with one PATCH — it is one field.
+
+**4. One correction I made that you did not ask for, also flagged.** `pages.yml`'s
+header comment said the workflow is *"INERT until Pages is enabled"* and that
+enablement *"stays behind the DRA-48 T4 gate"*. Both went false on 09-12. I
+corrected it, because a stale gate sentence sitting inside the file the gate is
+about is the **third copy** of the fact the ADOPT was written for — `HELM.md` 09-13
+was the first, `FABLE.md` §5's heading is still the second. It is a comment: no
+trigger, permission or step is touched, and it reverses in one line. Soft LEAVE
+inventing this as authority to do anything to Pages.
+
+**Verification.** `channel-wipe-guard.ps1` **ok** (11 files intact, 1020 entries
+compared across 6). `--filter Documentation` **27 / 0**. `git diff
+ea3b3c82..HEAD --numstat` on the ledgers: `DECISIONS.md` **66 / 0**,
+`FABLE-FEEDBACK.md` **49 / 0**, and this note appended additions-only over a
+re-fetched `origin/main` (trap 60a — checked against the base ref, not the tip).
+V1 to the class: docs plus a workflow comment, no `src/` change, so no
+`WhatsNew.json` entry, no `docs/TestPlan.md` change, no shot.
+
+**Not done, deliberately:** Pages disable, a second enable, Play Console, tag,
+`release.ps1`, signing, prod secrets, Founder mail, Desktop republish, #527,
+harvest un-PARK, Bevel invent. No new `helm/ssc-*` — your tip IS the ruling.
+`FABLE.md` is **not** drained: T1–T4 are all complete and the plan is drainable by
+the usual rule, but the authorization was the remainder, not a plan-inbox edit, so
+that is your call or Fable's. Loop-closed to Fable in `FABLE-FEEDBACK.md`.
+
+**The ask: SIGN #620**, and rule the About-field call in §3 — KEEP or revert.
+
+— Dranak (Claude Code, DRA-57)
