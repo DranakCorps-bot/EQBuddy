@@ -9,9 +9,16 @@
 
   Every metric is computed from data that already exists (PR timestamps, merge
   commits, workflow runs, HELM.md commits, the flake ledger, Paperclip issue
-  records). A metric whose data does NOT exist in the window is reported as
-  `unmeasured` **with the reason**, never as a zero — an unmeasured metric and a
-  measured zero are different claims (trap 64b).
+  records, the player-report feed). A metric whose data does NOT exist in the
+  window is reported as `unmeasured` **with the reason**, never as a zero — an
+  unmeasured metric and a measured zero are different claims (trap 64b).
+
+  And the REASON is computed too (DRA-127). A reason printed beside an
+  `unmeasured` row is a claim about the window it is printed for; a constant
+  sentence is true of at most the window it was written for, and stays printed
+  for all the others. Every such sentence here is derived from what this run
+  actually read, and the run REFUSES to write a document whose text names a
+  precondition the measured window satisfies.
 
   -Baseline additionally freezes the run into docs/ops/exo-baseline.json, which
   later runs read to fill the "vs baseline" column of the §10.3 "Experiments in
@@ -34,6 +41,7 @@ param(
     [string]$WindowLabel,
     [switch]$Baseline,
     [switch]$NoPaperclip,
+    [switch]$NoDefectFeed,
     [switch]$SelfTest,
     [string]$ApiBase = $env:PAPERCLIP_API_URL,
     [string]$ApiKey = $env:PAPERCLIP_API_KEY,
@@ -91,6 +99,96 @@ $script:OpsBranchMarkers = @(
     ('ops-'),
     ('dra53'),
     ('channel-rotation')
+)
+
+# ---------------------------------------------------------------------------
+# The player-report feed — escaped defect rate (DRA-127).
+#
+# The feed is GitHub Discussions on the product repo. That is where player
+# reports actually land — 166 of them at the time of writing — and it is the
+# only channel this instrument can read without inventing one.
+#
+# It is also, as read, ILLEGIBLE to a defect count, and the three discussions
+# the card named show why: #234 ("Named Monsters in Guk do not appear in
+# session") reads as a defect and sits in Q&A, while #237 and #239 are feature
+# requests and sit in Ideas. The repo's ten labels are never applied to
+# discussions, and the category is the author's guess, not a triage verdict.
+#
+# A discussion becomes an ESCAPED DEFECT READING only when BOTH halves hold:
+#
+#   1. it is MARKED as a defect report, and
+#   2. the marker NAMES the merge the defect escaped through.
+#
+# Neither half is decoration. Without (1) the feed is a mixed channel — feature
+# requests, quest data, "how do I", and genuine regressions, in one list with no
+# labels — and counting it would report ideas as defects. Without (2) a report
+# cannot be attributed to a window or a tier at all: an escaped defect is
+# reported LATER than the merge that caused it, usually in some other window, so
+# "discussions opened during the window" is not the population. The population
+# is "reports naming a merge IN the window", and only the marker can say that.
+#
+# This is why the row is `unmeasured` while the marker is unused, and why that
+# is a STRUCTURAL absence rather than a checkpoint that has not arrived: no
+# M-milestone marks a discussion. The moment reports carry the marker, the code
+# path below computes — including a legitimate measured ZERO, because once the
+# feed is legible "no defect escaped this window's merges" is a finding.
+$script:DefectMarkerPattern = '(?im)^\s*exo-defect:\s*escaped\s+#(\d+)\s*$'
+
+# One page is normally the whole feed. The cap exists so that a feed which has
+# outgrown it reports TRUNCATED rather than a count that silently omits its own
+# tail — an undercount of escaped defects is the one direction that flatters the
+# experiment this metric is the stated cost of.
+$script:DefectFeedPageSize = 100
+$script:DefectFeedPageCap = 20
+
+# ---------------------------------------------------------------------------
+# Reason honesty (DRA-127).
+#
+# The defect this exists for: the escaped-defect row printed a hardcoded
+# sentence — "the tier model (plan §2.1) did not exist during this window, so no
+# merge in it carries a tier. The metric becomes computable for windows after
+# M0." That was true of the baseline window #580–#607 and FALSE of every window
+# after DRA-74 landed the tier model (PR #608, merge stamp below). It printed
+# again unchanged over #619–#643, a window whose PRs do carry tiers, and it
+# promised a fix — "computable after M0" — that nothing was going to deliver,
+# because the missing thing was never the tier model. A wrong VALUE gets caught
+# by the next reader who checks it; a wrong reason for an absent value tells
+# that reader not to bother.
+#
+# A constant sentence may state a STRUCTURAL fact ("no marking convention
+# exists"). It may not name a precondition a window can satisfy, because
+# nothing re-checks a constant. Each check below is a phrase plus the window
+# condition that makes printing it dishonest; the scan runs over the rendered
+# document before it is written, so it catches a hardcoded reason anywhere in
+# the output, not only the rows this script currently knows about.
+$script:TierModelLandedUtc = [datetime]::Parse(
+    '2026-09-14T14:25:13Z', [System.Globalization.CultureInfo]::InvariantCulture,
+    [System.Globalization.DateTimeStyles]::AdjustToUniversal -bor
+    [System.Globalization.DateTimeStyles]::AssumeUniversal)
+
+$script:WindowClaimChecks = @(
+    (@{
+            Name    = 'tier-model-absent'
+            # `[\s\S]` and `\s+`, not `.` and ' ': Add-Line wraps the rendered
+            # document, so the retired sentence reaches this scan split across
+            # two lines with the indent in the middle. A pattern that only
+            # matches the one-line form would pass on the committed defect.
+            Pattern = '(?i)tier model[\s\S]{0,140}?did\s+not\s+exist'
+            # Dishonest as soon as the window reaches the merge that landed the
+            # tier model: from there on, merges in it DO carry tiers.
+            Satisfied = { param($Start, $End) $End -ge $script:TierModelLandedUtc }
+            Why     = 'the window extends past DRA-74 / PR #608, so merges in it do carry tiers'
+        }),
+    (@{
+            Name    = 'computable-after-checkpoint'
+            Pattern = '(?i)becomes\s+computable\s+for\s+windows\s+after\s+M\d'
+            # The promise itself is the defect, and it is dishonest for every
+            # window at or past the checkpoint it names: the checkpoint passed
+            # and the metric did not become computable, because a checkpoint
+            # wires no feed. Before M0 it is a forecast; after, it is a lie.
+            Satisfied = { param($Start, $End) $End -ge $script:TierModelLandedUtc }
+            Why     = 'the named checkpoint has passed and the metric did not become computable — a checkpoint wires no feed'
+        })
 )
 
 # ---------------------------------------------------------------------------
@@ -222,6 +320,119 @@ function Get-WindowWorkflowRuns {
 }
 
 # ---------------------------------------------------------------------------
+# Data acquisition — the player-report feed
+# ---------------------------------------------------------------------------
+
+$script:DefectFeedFailures = @()
+
+function Get-DefectFeedPage {
+    <# One page of Discussions, newest first. Separated from the loop below so
+       the loop is testable against a fake page source: the live query needs a
+       network and -SelfTest must not. #>
+    param([string]$Repository, [string]$Cursor)
+
+    $parts = $Repository -split '/'
+    if ($parts.Count -ne 2) { throw "Repository '$Repository' is not owner/name." }
+
+    # `after: null` is the first page; gh -F sends an empty string as an empty
+    # string, which GraphQL rejects as a cursor, so the argument is omitted
+    # rather than blanked.
+    $query = @'
+query($owner:String!,$name:String!,$size:Int!,$after:String){
+  repository(owner:$owner,name:$name){
+    discussions(first:$size, after:$after, orderBy:{field:CREATED_AT,direction:DESC}){
+      pageInfo{ hasNextPage endCursor }
+      nodes{ number title url createdAt body category{ name } }
+    }
+  }
+}
+'@
+    $ghArgs = @('api', 'graphql', '-f', "query=$query",
+        '-F', "owner=$($parts[0])", '-F', "name=$($parts[1])",
+        '-F', "size=$script:DefectFeedPageSize")
+    if (-not [string]::IsNullOrWhiteSpace($Cursor)) { $ghArgs += @('-F', "after=$Cursor") }
+
+    $raw = & gh @ghArgs 2>&1
+    if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace($raw)) {
+        throw ("gh api graphql (discussions) failed: {0}" -f (($raw | Out-String).Trim()))
+    }
+    $json = $raw | ConvertFrom-Json
+    if ($null -ne $json.PSObject.Properties['errors'] -and $null -ne $json.errors) {
+        throw ("gh api graphql (discussions) returned errors: {0}" -f (($json.errors | ForEach-Object { $_.message }) -join '; '))
+    }
+    return $json.data.repository.discussions
+}
+
+function Get-DefectReports {
+    <# Walks the whole feed and returns the MARKED reports as a status value, in
+       the same three-worlds shape the Paperclip reads use: the failure is a
+       value, not a $null that every caller re-guesses at (DRA-80).
+
+       The whole feed, not a date slice: an escaped defect is reported after the
+       merge that caused it, so a report about this window can be younger than
+       any bound the window has. The marker names the merge; the marker is the
+       bound. #>
+    param(
+        [string]$Repository,
+        [bool]$Enabled = $true,
+        [scriptblock]$PageSource = $null
+    )
+
+    if (-not $Enabled) {
+        return [pscustomobject]@{
+            Status = 'NotConfigured'; Reports = @(); Scanned = 0
+            Reason = '-NoDefectFeed: the player-report feed was not read'
+        }
+    }
+
+    $fetch = $PageSource
+    if ($null -eq $fetch) { $fetch = { param($Cursor) Get-DefectFeedPage -Repository $Repository -Cursor $Cursor }.GetNewClosure() }
+
+    $reports = @()
+    $scanned = 0
+    $cursor = $null
+    for ($page = 0; $page -lt $script:DefectFeedPageCap; $page++) {
+        try { $d = & $fetch $cursor }
+        catch {
+            $reason = ('player-report feed read failed: {0}' -f $_.Exception.Message)
+            $script:DefectFeedFailures += , $reason
+            return [pscustomobject]@{ Status = 'Unreachable'; Reports = @(); Scanned = $scanned; Reason = $reason }
+        }
+        if ($null -eq $d) {
+            $reason = 'player-report feed returned no payload'
+            $script:DefectFeedFailures += , $reason
+            return [pscustomobject]@{ Status = 'Unreachable'; Reports = @(); Scanned = $scanned; Reason = $reason }
+        }
+
+        foreach ($n in @($d.nodes)) {
+            $scanned++
+            $m = [regex]::Match([string]$n.body, $script:DefectMarkerPattern)
+            if (-not $m.Success) { continue }
+            $reports += , [pscustomobject]@{
+                Number   = [int]$n.number
+                Title    = [string]$n.title
+                Url      = [string]$n.url
+                Created  = (ConvertTo-Utc $n.createdAt)
+                MergedPr = [int]$m.Groups[1].Value
+            }
+        }
+
+        if (-not $d.pageInfo.hasNextPage) {
+            return [pscustomobject]@{ Status = 'Ok'; Reports = $reports; Scanned = $scanned; Reason = '' }
+        }
+        $cursor = [string]$d.pageInfo.endCursor
+    }
+
+    # Cap reached with pages left. Reporting the partial count would undercount
+    # escaped defects, which is the direction that flatters the experiment this
+    # metric is the stated cost of, so it reports the truncation instead.
+    $reason = ('player-report feed exceeded {0} pages of {1}; the tail was not read' -f
+        $script:DefectFeedPageCap, $script:DefectFeedPageSize)
+    $script:DefectFeedFailures += , $reason
+    return [pscustomobject]@{ Status = 'Truncated'; Reports = $reports; Scanned = $scanned; Reason = $reason }
+}
+
+# ---------------------------------------------------------------------------
 # Data acquisition — Paperclip
 # ---------------------------------------------------------------------------
 
@@ -335,15 +546,16 @@ function Get-ReproduceCommand {
        header, so a command that drops it regenerates a file that differs from
        the committed one for a reason that says nothing about the metrics — and
        the lesson people learn from that gate is that the gate is noise
-       (trap 74). Same argument for -NoPaperclip, which decides which rows are
-       measured at all. #>
-    param([int]$FromPr, [int]$ToPr, [string]$WindowLabel, [bool]$Baseline, [bool]$NoPaperclip)
+       (trap 74). Same argument for -NoPaperclip and -NoDefectFeed, which decide
+       which rows are measured at all. #>
+    param([int]$FromPr, [int]$ToPr, [string]$WindowLabel, [bool]$Baseline, [bool]$NoPaperclip, [bool]$NoDefectFeed)
     $cmd = ('pwsh -NoProfile -File scripts/exo-metrics.ps1 -FromPr {0} -ToPr {1}' -f $FromPr, $ToPr)
     if (-not [string]::IsNullOrWhiteSpace($WindowLabel)) {
         $cmd += (" -WindowLabel '{0}'" -f $WindowLabel.Replace("'", "''"))
     }
     if ($Baseline) { $cmd += ' -Baseline' }
     if ($NoPaperclip) { $cmd += ' -NoPaperclip' }
+    if ($NoDefectFeed) { $cmd += ' -NoDefectFeed' }
     return $cmd
 }
 
@@ -662,6 +874,223 @@ function Get-MedianCiMinutes {
     return (Get-Median -Values $vals)
 }
 
+function Get-TierMap {
+    <# Work item → tier, read from the `Tier T…` line each DECISIONS.md entry
+       carries. Read rather than kept by hand for the same reason §10.3 reads the
+       `exo-experiment:` tags: a hand-kept list is a second copy of a fact, and
+       the two copies disagree silently.
+
+       Sparse on purpose — most entries carry no tier line, and an item with no
+       tier reads `untiered` rather than being assigned a plausible one. A tier
+       this instrument invented would be a tier no ruling ever set. #>
+    param([string]$DecisionsPath)
+
+    if (-not (Test-Path $DecisionsPath)) { return @{} }
+    $lines = @([System.IO.File]::ReadAllLines($DecisionsPath, [System.Text.Encoding]::UTF8))
+
+    $map = @{}
+    $current = @()
+    foreach ($line in $lines) {
+        if ($line -match '^##\s') {
+            $current = @([regex]::Matches($line, '(?i)dra[-\s]?(\d{2,3})') | ForEach-Object { 'DRA-{0}' -f $_.Groups[1].Value })
+            continue
+        }
+        if ($current.Count -eq 0) { continue }
+        $m = [regex]::Match($line, '(?i)\bTier\s+(T\d(?:/T\d)?)\b')
+        if (-not $m.Success) { continue }
+        foreach ($dra in $current) {
+            # First tier line in an entry wins: later mentions in the same entry
+            # are prose about other work ("a T2 ruling would be needed").
+            if (-not $map.ContainsKey($dra)) { $map[$dra] = $m.Groups[1].Value }
+        }
+    }
+    return $map
+}
+
+function Get-EscapedDefectReading {
+    <# The §6 escaped-defect row, as a value that carries its own reason.
+
+       Five worlds, and they are DIFFERENT CLAIMS — which is the whole of
+       DRA-127. `Ok` with a rate of 0 is a measurement ("the feed is legible and
+       no marked report names a merge in this window"); `NoConvention` is the
+       absence of one ("nothing in the feed says which discussions are defect
+       reports, so a count of them would be a count of ideas"). Collapsing those
+       two into a bare `unmeasured` with a stock sentence is what let one
+       sentence, true of the window it was written for, print unchanged over the
+       next one. #>
+    param($Feed, $Facts, $Delivery, $TierMap)
+
+    $windowPrs = @($Facts | ForEach-Object { $_.Number })
+    $inWindow = @($Feed.Reports | Where-Object { $windowPrs -contains $_.MergedPr })
+    $elsewhere = @($Feed.Reports | Where-Object { $windowPrs -notcontains $_.MergedPr })
+
+    $status = $Feed.Status
+    if ($status -eq 'Ok' -and @($Feed.Reports).Count -eq 0) { $status = 'NoConvention' }
+
+    $rate = $null
+    $perTier = @()
+    if ($status -eq 'Ok' -and @($Delivery).Count -gt 0) {
+        $rate = @($inWindow).Count / @($Delivery).Count
+        $buckets = @{}
+        foreach ($r in $inWindow) {
+            $owner = @($Facts | Where-Object { $_.Number -eq $r.MergedPr })
+            $dra = if ($owner.Count -gt 0) { $owner[0].Dra } else { 'unattributed' }
+            $tier = if ($TierMap.ContainsKey($dra)) { $TierMap[$dra] } else { 'untiered' }
+            if (-not $buckets.ContainsKey($tier)) { $buckets[$tier] = @() }
+            $buckets[$tier] += , $r
+        }
+        foreach ($k in ($buckets.Keys | Sort-Object)) {
+            $perTier += , [pscustomobject]@{ Tier = $k; Count = @($buckets[$k]).Count }
+        }
+    }
+
+    return [pscustomobject]@{
+        Status          = $status
+        FeedStatus      = $Feed.Status
+        Rate            = $rate
+        Scanned         = [int]$Feed.Scanned
+        MarkedTotal     = @($Feed.Reports).Count
+        InWindow        = $inWindow
+        Elsewhere       = @($elsewhere).Count
+        DeliverySlices  = @($Delivery).Count
+        PerTier         = $perTier
+        FeedReason      = [string]$Feed.Reason
+    }
+}
+
+function Format-EscapedDefectCell {
+    <# The §2 cell. One function, so the cell and the §6 sentence below cannot
+       drift apart: two code paths deciding one question is trap 47, and the
+       table saying "see §6" while §6 says something else is how it shows up. #>
+    param($Reading)
+    switch ($Reading.Status) {
+        'Ok' {
+            $cell = ('{0} per delivered slice ({1} report(s) / {2} slice(s))' -f
+                (Format-Number $Reading.Rate 3), @($Reading.InWindow).Count, $Reading.DeliverySlices)
+            if (@($Reading.PerTier).Count -gt 0) {
+                $cell += (' — ' + ((@($Reading.PerTier) | ForEach-Object { '{0} {1}' -f $_.Tier, $_.Count }) -join ', '))
+            }
+            return $cell
+        }
+        'NoConvention' { return '`unmeasured` — feed unmarked, see §6' }
+        'NotConfigured' { return '`unmeasured` — feed not read (`-NoDefectFeed`)' }
+        'Truncated' { return '`unmeasured` — feed read truncated, see §6' }
+        default { return '`unmeasured` — feed unreachable, see §6' }
+    }
+}
+
+function Get-EscapedDefectReason {
+    <# The §6 sentence. Every branch states what THIS run read, and none of them
+       promises that a checkpoint will fix it, because no checkpoint marks a
+       discussion. The row that used to live here promised exactly that. #>
+    param($Reading, [string]$Repository)
+
+    switch ($Reading.Status) {
+        'Ok' {
+            # Each template is built, THEN formatted. `'a' + 'b {0}' -f $x` binds
+            # -f to the last segment alone and ships the other segments' braces
+            # as literal text — which is what the first run of this function did.
+            $head = '- **Escaped defect rate per tier — no longer unmeasured.** The reading is in §2. ' +
+                'The player-report feed (GitHub Discussions on `{0}`) carries {1} marked report(s) ' +
+                'across {2} discussion(s); {3} name a merge in this window, over {4} delivered ' +
+                'delivery slice(s).'
+            $lines = @($head -f $Repository, $Reading.MarkedTotal, $Reading.Scanned,
+                @($Reading.InWindow).Count, $Reading.DeliverySlices)
+            if (@($Reading.InWindow).Count -gt 0) {
+                foreach ($r in @($Reading.InWindow)) {
+                    $lines += ('  - [#{0}]({1}) — {2} _(escaped through #{3})_' -f $r.Number, $r.Url, $r.Title, $r.MergedPr)
+                }
+            } else {
+                $zeroNote = '  A rate of 0 here is a **measurement**, not a blank: the feed is legible, ' +
+                    'it was read in full, and no marked report names a merge in this window. ' +
+                    '{0} marked report(s) name merges outside it.'
+                $lines += ($zeroNote -f $Reading.Elsewhere)
+            }
+            return $lines
+        }
+        'NoConvention' {
+            $head = '- **Escaped defect rate per tier.** `unmeasured`, and the reason is structural ' +
+                'rather than a checkpoint that has not arrived. The raw feed exists and was read: ' +
+                '**{0} discussion(s)** on `{1}`, which is where player reports actually land. ' +
+                '**None of them carries the `exo-defect: escaped #<pr>` marker** this row computes ' +
+                'from, and nothing else in a discussion says which merge a defect escaped through.'
+            return @(
+                ($head -f $Reading.Scanned, $Repository),
+                '',
+                ('  Both halves of the marker are load-bearing. Unmarked, the feed is a mixed ' +
+                    'channel — feature requests, quest data, "how do I", and real regressions in ' +
+                    'one unlabelled list — so a count of it would report ideas as defects. ' +
+                    'Unattributed, a report cannot be placed in a window or a tier at all: an ' +
+                    'escaped defect is reported LATER than the merge that caused it, usually in ' +
+                    'some other window, so "discussions opened during the window" is the wrong ' +
+                    'population.'),
+                '',
+                ('  **No M-checkpoint changes this.** A checkpoint marks no discussion. The row ' +
+                    'becomes computable when player reports start carrying the marker — the code ' +
+                    'path is live and reads the feed on every run — and from that point a rate of ' +
+                    '0 is a finding rather than a blank.'),
+                '',
+                ('  Until then `whole-sequence-auth`, which `DECISIONS.md` defines as judged by GWR ' +
+                    'and ACCR *stated net of escaped defect rate*, has no measurable quality cost ' +
+                    'to be stated net of. That bounds what any graduation ruling on it can honestly ' +
+                    'claim, and it is stated here so the bound is not rediscovered.')
+            )
+        }
+        'NotConfigured' {
+            return @(
+                ('- **Escaped defect rate per tier.** `unmeasured` — this run was given ' +
+                    '`-NoDefectFeed`, so the player-report feed was **not read at all**. Nothing ' +
+                    'may be inferred from the blank; re-run without the switch to read it.')
+            )
+        }
+        'Truncated' {
+            $head = '- **Escaped defect rate per tier.** `unmeasured` — the feed read hit its page ' +
+                'cap with pages left ({0} discussion(s) scanned), so the marked reports found so ' +
+                'far are a **lower bound** and are not reported as a rate. An undercount of escaped ' +
+                'defects is the one direction that flatters the experiment this metric is the ' +
+                'stated cost of. Reason: `{1}`'
+            return @($head -f $Reading.Scanned, $Reading.FeedReason)
+        }
+        default {
+            $head = '- **Escaped defect rate per tier.** `unmeasured` — the player-report feed read ' +
+                '**failed**, so this row is *unknown* rather than zero, and it is unknown for a ' +
+                'different reason than the one below it. Reason: `{0}`'
+            return @($head -f $Reading.FeedReason)
+        }
+    }
+}
+
+function Get-WindowClaimViolations {
+    <# DRA-127's guard. Scans text that is about to be published for a sentence
+       naming a precondition the measured window SATISFIES — the shape of the
+       retired escaped-defect reason, which said the tier model "did not exist
+       during this window" and kept saying it after the tier model landed.
+
+       Deliberately a scan of the rendered document rather than of the rows this
+       script knows about today: the next hardcoded reason will be written by
+       someone who has not read this function, and a must-list of known rows
+       cannot see a sentence nobody registered (trap 34). #>
+    param([string]$Text, $WindowStart, $WindowEnd)
+
+    if (@($script:WindowClaimChecks).Count -eq 0) {
+        throw 'Get-WindowClaimViolations called with an EMPTY check list — a scan with no patterns reports clean (trap 78).'
+    }
+    if ([string]::IsNullOrEmpty($Text)) { return @() }
+
+    $out = @()
+    foreach ($check in $script:WindowClaimChecks) {
+        $m = [regex]::Match($Text, $check.Pattern)
+        if (-not $m.Success) { continue }
+        if (-not (& $check.Satisfied $WindowStart $WindowEnd)) { continue }
+        $out += , [pscustomobject]@{
+            Name     = [string]$check.Name
+            Why      = [string]$check.Why
+            Sentence = $m.Value.Trim()
+        }
+    }
+    return $out
+}
+
 # ---------------------------------------------------------------------------
 # §10.3 — experiments in flight
 # ---------------------------------------------------------------------------
@@ -889,6 +1318,204 @@ function Invoke-SelfTest {
     Assert ($bare -match '-NoPaperclip') 'The reproduce command dropped -NoPaperclip.'
     Assert ((Get-ReproduceCommand -FromPr 1 -ToPr 2 -WindowLabel "it's a window" -Baseline $false -NoPaperclip $false) `
             -match "-WindowLabel 'it''s a window'") 'A label containing a quote was not escaped for the shell.'
+    Assert ((Get-ReproduceCommand -FromPr 1 -ToPr 2 -WindowLabel '' -Baseline $false -NoPaperclip $false -NoDefectFeed $true) `
+            -match '-NoDefectFeed') 'The reproduce command dropped -NoDefectFeed, which decides whether the defect row is read at all.'
+    Assert ((Get-ReproduceCommand -FromPr 1 -ToPr 2 -WindowLabel '' -Baseline $false -NoPaperclip $false -NoDefectFeed $false) `
+            -notmatch '-NoDefectFeed') 'The reproduce command invented -NoDefectFeed.'
+
+    # 13. Tiers are READ, never invented. A tier this script guessed would be a
+    #     tier no ruling ever set, and the per-tier breakdown would be fiction.
+    $decoy = [System.IO.Path]::Combine([System.IO.Path]::GetTempPath(),
+        ('exo-decisions-selftest-{0}.md' -f [guid]::NewGuid().ToString('N')))
+    try {
+        Write-Utf8NoBom -Path $decoy -Text (@(
+                '## 2026-09-14 — DRA-77 / M0-4 (merge-sync): eight calls',
+                '',
+                'Tier T1 · one workflow + three scripts · governing plan: DRA-73.',
+                'A T2 ruling would be needed to undo this.',
+                '',
+                '## 2026-09-15 — DRA-87: the last three "log-only" labels',
+                '',
+                'No tier line in this entry at all.',
+                ''
+            ) -join "`n")
+        $tiers = Get-TierMap -DecisionsPath $decoy
+        Assert ($tiers['DRA-77'] -eq 'T1') 'Get-TierMap did not read the tier off a DECISIONS entry.'
+        Assert (-not $tiers.ContainsKey('DRA-87')) 'Get-TierMap invented a tier for an entry that carries none.'
+        Assert ((Get-TierMap -DecisionsPath ($decoy + '.missing')).Count -eq 0) 'A missing DECISIONS.md produced tiers anyway.'
+    } finally { if (Test-Path $decoy) { Remove-Item $decoy -Force } }
+
+    # 14. The defect marker fires on a marked report and stays QUIET on a real
+    #     unmarked one. The negative is a live discussion title from the feed —
+    #     an unlabelled channel full of genuine bug reports is exactly why the
+    #     marker, and not the word "bug", is what this row counts.
+    $marked = "Kills stopped counting after 1.9.2.`n`nexo-defect: escaped #630`n"
+    Assert ([regex]::IsMatch($marked, $script:DefectMarkerPattern)) 'The defect marker missed a marked report.'
+    Assert ([regex]::Match($marked, $script:DefectMarkerPattern).Groups[1].Value -eq '630') 'The defect marker did not capture the merge it names.'
+    Assert (-not [regex]::IsMatch(
+            "Bug: Wizard kill in Lower Guk hall triggers an arch magi respawn chip`n`nSeen twice tonight.",
+            $script:DefectMarkerPattern)) 'The defect marker fired on an unmarked bug report — the feed is full of those.'
+    Assert (-not [regex]::IsMatch("exo-defect: escaped (no pr)", $script:DefectMarkerPattern)) `
+        'A marker naming no merge was accepted — an unattributable report cannot be placed in a window or a tier.'
+
+    # 15. The feed walk, against a FAKE page source: the loop is what has to be
+    #     right, and -SelfTest must not need a network for it.
+    $script:DefectFeedFailures = @()
+    function New-FeedNode([int]$Number, [string]$Body) {
+        return [pscustomobject]@{
+            number = $Number; title = "d$Number"; url = "https://x/$Number"
+            createdAt = '2026-09-15T00:00:00Z'; body = $Body; category = [pscustomobject]@{ name = 'Q&A' }
+        }
+    }
+    function New-FeedPage($Nodes, [bool]$More, [string]$Cursor = 'c1') {
+        return [pscustomobject]@{
+            nodes = @($Nodes)
+            pageInfo = [pscustomobject]@{ hasNextPage = $More; endCursor = $Cursor }
+        }
+    }
+    $twoPages = {
+        param($Cursor)
+        if ([string]::IsNullOrEmpty($Cursor)) {
+            return (New-FeedPage @((New-FeedNode 1 'no marker here'), (New-FeedNode 2 "exo-defect: escaped #630")) $true 'PAGE2')
+        }
+        if ($Cursor -ne 'PAGE2') { throw "the walk did not carry the cursor forward (got '$Cursor')." }
+        return (New-FeedPage @((New-FeedNode 3 "exo-defect: escaped #999")) $false)
+    }
+    $walked = Get-DefectReports -Repository 'o/n' -PageSource $twoPages
+    Assert ($walked.Status -eq 'Ok') 'A complete two-page feed walk did not report Ok.'
+    Assert ($walked.Scanned -eq 3) "The feed walk scanned $($walked.Scanned) node(s) rather than 3 — page 2 was dropped."
+    Assert (@($walked.Reports).Count -eq 2) 'The feed walk did not find both marked reports.'
+    Assert (@($walked.Reports | Where-Object { $_.MergedPr -eq 630 }).Count -eq 1) 'A marked report lost the merge it names.'
+
+    $blowsUp = { param($Cursor) throw 'no network' }
+    $dead2 = Get-DefectReports -Repository 'o/n' -PageSource $blowsUp
+    Assert ($dead2.Status -eq 'Unreachable') 'A failed feed read did not report Unreachable.'
+    Assert (@($dead2.Reports).Count -eq 0) 'A failed feed read carried reports.'
+    Assert (@($script:DefectFeedFailures).Count -eq 1) 'A failed feed read was not registered as a failure.'
+
+    $never = { param($Cursor) return (New-FeedPage @((New-FeedNode 9 'x')) $true 'again') }
+    $capped = Get-DefectReports -Repository 'o/n' -PageSource $never
+    Assert ($capped.Status -eq 'Truncated') 'A feed longer than the page cap did not report Truncated.'
+    Assert ($capped.Scanned -eq $script:DefectFeedPageCap) 'The page cap did not bound the walk.'
+
+    $off = Get-DefectReports -Repository 'o/n' -Enabled $false
+    Assert ($off.Status -eq 'NotConfigured') '-NoDefectFeed did not read as NotConfigured.'
+    $script:DefectFeedFailures = @()
+
+    # 16. The reading, and the distinction DRA-127 is about: a LEGIBLE feed with
+    #     no in-window report is a measured 0; an ILLEGIBLE feed is not a 0 at
+    #     all. Collapsing those two is what let one sentence stand in for both.
+    $fakeFacts = @(
+        ([pscustomobject]@{ Number = 630; Dra = 'DRA-77' }),
+        ([pscustomobject]@{ Number = 631; Dra = 'DRA-87' })
+    )
+    $fakeDelivery = @(1, 2, 3, 4)   # four delivered slices
+    $tierMap = @{ 'DRA-77' = 'T1' }
+
+    $emptyFeed = [pscustomobject]@{ Status = 'Ok'; Reports = @(); Scanned = 166; Reason = '' }
+    $noConv = Get-EscapedDefectReading -Feed $emptyFeed -Facts $fakeFacts -Delivery $fakeDelivery -TierMap $tierMap
+    Assert ($noConv.Status -eq 'NoConvention') 'A readable feed with NO marked report read as a measured rate.'
+    Assert ($null -eq $noConv.Rate) 'An unmarked feed produced a RATE — that is the zero this row must never print.'
+    Assert ((Format-EscapedDefectCell -Reading $noConv) -notmatch '^\s*`?0') 'An unmeasurable escaped-defect cell rendered as a zero.'
+    Assert ((Format-EscapedDefectCell -Reading $noConv) -match 'unmeasured') 'An unmeasurable escaped-defect cell did not say unmeasured.'
+
+    $elsewhereFeed = [pscustomobject]@{
+        Status = 'Ok'; Scanned = 166; Reason = ''
+        Reports = @([pscustomobject]@{ Number = 501; Title = 't'; Url = 'u'; Created = $a; MergedPr = 4242 })
+    }
+    $zero = Get-EscapedDefectReading -Feed $elsewhereFeed -Facts $fakeFacts -Delivery $fakeDelivery -TierMap $tierMap
+    Assert ($zero.Status -eq 'Ok') 'A legible feed whose reports name other windows was not treated as measured.'
+    Assert ($zero.Rate -eq 0) 'A legible feed with no in-window report did not measure 0 — a finding was reported as a blank.'
+    Assert ($zero.Elsewhere -eq 1) 'A report naming a merge outside the window was not counted as such.'
+    Assert ((((Get-EscapedDefectReason -Reading $zero -Repository 'o/n') -join ' ') -match 'measurement')) `
+        'A measured zero did not say it was a measurement rather than a blank.'
+
+    $hitFeed = [pscustomobject]@{
+        Status = 'Ok'; Scanned = 166; Reason = ''
+        Reports = @(
+            ([pscustomobject]@{ Number = 501; Title = 't1'; Url = 'u1'; Created = $a; MergedPr = 630 }),
+            ([pscustomobject]@{ Number = 502; Title = 't2'; Url = 'u2'; Created = $a; MergedPr = 631 })
+        )
+    }
+    $hit = Get-EscapedDefectReading -Feed $hitFeed -Facts $fakeFacts -Delivery $fakeDelivery -TierMap $tierMap
+    Assert ($hit.Rate -eq 0.5) "Two in-window reports over four slices read $($hit.Rate) rather than 0.5."
+    Assert ((@($hit.PerTier) | Where-Object { $_.Tier -eq 'T1' }).Count -eq 1) 'The per-tier split lost the tiered report.'
+    Assert ((@($hit.PerTier) | Where-Object { $_.Tier -eq 'untiered' }).Count -eq 1) `
+        'A report against an untiered work item was given a tier, or dropped.'
+    Assert ((Format-EscapedDefectCell -Reading $hit) -notmatch 'unmeasured') 'A measured escaped-defect cell still said unmeasured.'
+
+    foreach ($st in @('NoConvention', 'NotConfigured', 'Truncated', 'Unreachable')) {
+        $r = [pscustomobject]@{
+            Status = $st; FeedStatus = $st; Rate = $null; Scanned = 166; MarkedTotal = 0
+            InWindow = @(); Elsewhere = 0; DeliverySlices = 4; PerTier = @(); FeedReason = 'because'
+        }
+        Assert ((Format-EscapedDefectCell -Reading $r) -match 'unmeasured') "Status $st did not render as unmeasured."
+        Assert (@(Get-EscapedDefectReason -Reading $r -Repository 'o/n').Count -gt 0) "Status $st produced no reason to print."
+    }
+
+    # Every emitted string is fully substituted. `'a' + 'b {0}' -f $x` binds -f to
+    # the last segment only and publishes the rest of the braces verbatim: the
+    # first live run of this row printed "**{0} discussion(s)** on `{1}`" into the
+    # document, and every assertion above still passed, because they all checked
+    # for phrases rather than for the numbers the phrases were supposed to carry.
+    foreach ($case in @($noConv, $zero, $hit)) {
+        $rendered = ((Get-EscapedDefectReason -Reading $case -Repository 'o/n') -join "`n") + "`n" +
+            (Format-EscapedDefectCell -Reading $case)
+        Assert ($rendered -notmatch '\{\d+\}') `
+            "The escaped-defect text for status $($case.Status) shipped an unsubstituted format placeholder."
+    }
+    Assert ((Format-EscapedDefectCell -Reading $hit) -match '0\.5') 'The measured cell did not carry the rate it measured.'
+    Assert ((((Get-EscapedDefectReason -Reading $noConv -Repository 'o/n') -join ' ') -match '166 discussion')) `
+        'The unmeasurable reason did not carry the number of discussions actually read — the count is what makes it a reading rather than an assertion.'
+
+    # 17. DRA-127's own guard. The positive fixture is the RETIRED sentence, word
+    #     for word, because a guard that has never fired on the defect it was
+    #     built for is a guard aimed at nothing (trap 78).
+    $retired = 'The tier model (plan §2.1) did not exist during this window, so no merge in it ' +
+        'carries a tier. The metric becomes computable for windows after M0; it is `unmeasured` ' +
+        'here rather than `0`, because nobody looked.'
+    $postM0Start = $script:TierModelLandedUtc.AddHours(6)
+    $postM0End = $script:TierModelLandedUtc.AddDays(2)
+    $preM0Start = $script:TierModelLandedUtc.AddDays(-20)
+    $preM0End = $script:TierModelLandedUtc.AddHours(-1)
+
+    $fired = Get-WindowClaimViolations -Text $retired -WindowStart $postM0Start -WindowEnd $postM0End
+    Assert (@($fired).Count -eq 2) `
+        "The retired escaped-defect reason produced $(@($fired).Count) violation(s) over a post-M0 window rather than 2 — the guard does not see the defect it exists for."
+    Assert (@($fired | Where-Object { $_.Name -eq 'tier-model-absent' }).Count -eq 1) 'The "tier model did not exist" claim was not caught for a post-M0 window.'
+    Assert (@($fired | Where-Object { $_.Name -eq 'computable-after-checkpoint' }).Count -eq 1) 'The "becomes computable after M0" promise was not caught after M0.'
+    Assert (@($fired | Where-Object { [string]::IsNullOrWhiteSpace($_.Why) }).Count -eq 0) 'A violation was reported without saying why it is false here.'
+
+    # The shape the scan actually meets: Add-Line wrapped that sentence across
+    # three lines in every dashboard that shipped it, so the wrapped form is the
+    # committed defect and the one-line form is only a convenience.
+    $retiredWrapped = @(
+        '- **Escaped defect rate per tier.** The tier model (plan §2.1) did not exist during',
+        '  this window, so no merge in it carries a tier. The metric becomes computable for',
+        '  windows after M0; it is `unmeasured` here rather than `0`, because nobody looked.'
+    ) -join "`n"
+    Assert (@(Get-WindowClaimViolations -Text $retiredWrapped -WindowStart $postM0Start -WindowEnd $postM0End).Count -eq 2) `
+        'The guard missed the WRAPPED retired reason — which is the only form that ever shipped.'
+
+    Assert (@(Get-WindowClaimViolations -Text $retired -WindowStart $preM0Start -WindowEnd $preM0End).Count -eq 0) `
+        'The guard fired on the BASELINE window, where that sentence was true — a guard that flags a true statement is a guard people disable.'
+    Assert (@(Get-WindowClaimViolations -Text 'Nothing here names a precondition.' -WindowStart $postM0Start -WindowEnd $postM0End).Count -eq 0) `
+        'The guard fired on innocent prose.'
+    Assert (@(Get-WindowClaimViolations -Text '' -WindowStart $postM0Start -WindowEnd $postM0End).Count -eq 0) 'The guard fired on empty text.'
+    Assert (@($script:WindowClaimChecks).Count -gt 1) 'The window-claim check list collapsed — a scan with no patterns reports clean (trap 78).'
+
+    # And the sentences this script ACTUALLY emits survive their own guard, for
+    # every status, over a window past the checkpoint the retired text named.
+    foreach ($st in @('Ok', 'NoConvention', 'NotConfigured', 'Truncated', 'Unreachable')) {
+        $r = [pscustomobject]@{
+            Status = $st; FeedStatus = $st; Rate = $(if ($st -eq 'Ok') { 0 } else { $null })
+            Scanned = 166; MarkedTotal = $(if ($st -eq 'Ok') { 1 } else { 0 })
+            InWindow = @(); Elsewhere = 1; DeliverySlices = 4; PerTier = @(); FeedReason = 'because'
+        }
+        $text = (Get-EscapedDefectReason -Reading $r -Repository 'o/n') -join "`n"
+        Assert (@(Get-WindowClaimViolations -Text $text -WindowStart $postM0Start -WindowEnd $postM0End).Count -eq 0) `
+            "The reason this script prints for status $st names a precondition the window satisfies — the DRA-127 defect, re-introduced."
+    }
 
     if ($script:selfTestFailures.Count -gt 0) {
         Write-Host "exo-metrics self-test: $($script:selfTestFailures.Count) FAILED" -ForegroundColor Red
@@ -940,6 +1567,23 @@ $flakeText = if (Test-Path $flakePath) { [System.IO.File]::ReadAllText($flakePat
 $slices = Get-Slices -Facts $facts -HelmCommits $helmCommits
 $delivery = @($slices | Where-Object { $_.Kind -eq 'delivery' -and $_.Merged })
 $allMergedSlices = @($slices | Where-Object { $_.Merged })
+
+# --- The player-report feed: escaped defect rate ----------------------------
+# Read unconditionally (bar -NoDefectFeed) because the point of the row is that
+# the instrument LOOKS. The retired version asserted an absence it had never
+# checked, which is how its reason outlived the fact it was about.
+$decisionsPath = Join-Path $RepoRoot 'DECISIONS.md'
+if ($NoDefectFeed) {
+    Write-Host 'Skipping the player-report feed (-NoDefectFeed) …'
+} else {
+    Write-Host 'Reading the player-report feed (Discussions) …'
+}
+$defectFeed = Get-DefectReports -Repository $Repo -Enabled (-not $NoDefectFeed.IsPresent)
+if ($defectFeed.Status -notin @('Ok', 'NotConfigured')) {
+    Write-Host ("  player-report feed {0}: {1}" -f $defectFeed.Status, $defectFeed.Reason) -ForegroundColor Yellow
+}
+$defects = Get-EscapedDefectReading -Feed $defectFeed -Facts $facts -Delivery $delivery `
+    -TierMap (Get-TierMap -DecisionsPath $decisionsPath)
 
 # --- Paperclip: lead time per DRA, queue latency, cost ---------------------
 $apiBase = Get-PaperclipBase -Raw $ApiBase
@@ -1117,7 +1761,7 @@ if ($costedDra.Count -gt 0) {
 }
 
 # --- Experiments in flight (§10.3) ----------------------------------------
-$experiments = Get-Experiments -DecisionsPath (Join-Path $RepoRoot 'DECISIONS.md')
+$experiments = Get-Experiments -DecisionsPath $decisionsPath
 
 $frozen = $null
 $baselinePath = Resolve-OutPath $BaselineFile
@@ -1155,6 +1799,14 @@ $current = [ordered]@{
     ciRedFiledAsFlake = @($ciRed | Where-Object { $_.Filed }).Count
     costCentsPerSlice = $costPerSlice
     tokensPerSlice    = $tokensPerSlice
+    # The rate AND the name of the world it came from. A later window comparing
+    # against this file has to be able to tell a measured 0 from an unreadable
+    # feed, and a lone `null` cannot: that is the same absent-proxy-for-a-fact
+    # shape (trap 64b) the Paperclip rows were fixed for in DRA-80.
+    escapedDefectRate = $defects.Rate
+    escapedDefectStatus = $defects.Status
+    escapedDefectsMarked = $defects.MarkedTotal
+    escapedDefectFeedScanned = $defects.Scanned
 }
 
 # ---------------------------------------------------------------------------
@@ -1246,7 +1898,7 @@ Add-Line ('| Handoff delay | plan merged → first executor commit | median {0} 
 Add-Line ('| Helm/Founder intervention % | delivery slices with ≥1 pre-merge touch ÷ slices | {0} ({1} of {2}) |' -f (Format-Percent $interventionRate), $intervened.Count, $delivery.Count)
 Add-Line ('| Veto rate | Helm/Bevel post-merge vetoes ÷ delivery merges | {0} ({1} veto ruling(s)) |' -f (Format-Percent $vetoRate 1), @($vetoes).Count)
 Add-Line ('| Rework rate | PRs reverting/re-landing a ≤14-day-old merge ÷ merged PRs | {0} ({1} of {2}) |' -f (Format-Percent $reworkRate 1), @($rework).Count, $mergedPrCount)
-Add-Line ('| Escaped defect rate | player-reported defects per tier | `unmeasured` — see §6 |')
+Add-Line ('| Escaped defect rate | marked player reports naming a window merge ÷ delivery slices, per tier | {0} |' -f (Format-EscapedDefectCell -Reading $defects))
 Add-Line ('| CI failure/flake split | red runs: filed as flake vs unfiled | {0} red event(s), {1} filed — see §4 |' -f @($ciRed).Count, @($ciRed | Where-Object { $_.Filed }).Count)
 Add-Line ('| PRs + Helm touches per slice | count | {0} PRs/slice, {1} Helm touches/delivery slice |' -f (Format-Number $prsPerSlice 2), (Format-Number $touchesPerSlice 2))
 Add-Line ('| Cost per delivered slice | Paperclip run cost ÷ slices delivered | {0} — see §5 and §6 |' -f $(if ($null -eq $costPerSlice) { (Format-PaperclipUnmeasured -Fallback 'no run records in the window') } else { ('{0} cents · {1:N0} tokens' -f (Format-Number $costPerSlice 2), $tokensPerSlice) }))
@@ -1356,9 +2008,7 @@ if (@($draRows | Where-Object { $_.Clamped }).Count -gt 0) {
 
 Add-Line '## 6. What this window could NOT measure, and why'
 Add-Line ''
-Add-Line '- **Escaped defect rate per tier.** The tier model (plan §2.1) did not exist during'
-Add-Line '  this window, so no merge in it carries a tier. The metric becomes computable for'
-Add-Line '  windows after M0; it is `unmeasured` here rather than `0`, because nobody looked.'
+foreach ($line in (Get-EscapedDefectReason -Reading $defects -Repository $Repo)) { Add-Line $line }
 $noCost = @($draRows | Where-Object { $null -ne $_.RunCount -and $_.RunCount -eq 0 })
 if ($noCost.Count -gt 0) {
     Add-Line ('- **Cost per delivered slice.** {0} of the window''s work items have Paperclip issue' -f $noCost.Count)
@@ -1417,7 +2067,7 @@ Add-Line '## 8. Reproducing this'
 Add-Line ''
 Add-Line '```bash'
 Add-Line (Get-ReproduceCommand -FromPr $FromPr -ToPr $ToPr -WindowLabel $WindowLabel `
-        -Baseline $Baseline.IsPresent -NoPaperclip $NoPaperclip.IsPresent)
+        -Baseline $Baseline.IsPresent -NoPaperclip $NoPaperclip.IsPresent -NoDefectFeed $NoDefectFeed.IsPresent)
 Add-Line 'pwsh -NoProfile -File scripts/exo-metrics.ps1 -SelfTest   # the detectors fire'
 Add-Line '```'
 Add-Line ''
@@ -1429,6 +2079,13 @@ Add-Line 'explicit, and is the only door through which a `-Baseline` run may fre
 Add-Line 'A run whose Paperclip reads were *unreachable* refuses to freeze and exits 3:'
 Add-Line 'the point of a baseline is that later claims are checkable against it, and an'
 Add-Line 'absence nobody measured is not a number to check anything against.'
+Add-Line ''
+Add-Line 'The escaped-defect row reads the player-report feed (Discussions) on every run;'
+Add-Line '`-NoDefectFeed` skips it and says so in the row. A run that would print a reason'
+Add-Line 'naming a precondition **this** window satisfies refuses to write and exits 4 —'
+Add-Line 'the escaped-defect reason was a hardcoded sentence true of one window and printed'
+Add-Line 'for three (DRA-127), and a wrong reason for a missing value tells the next reader'
+Add-Line 'not to bother looking.'
 
 # --- Refuse before writing anything -----------------------------------------
 # Both files, not just the JSON: a -Baseline dashboard carries a "FROZEN
@@ -1449,6 +2106,28 @@ if (Test-BaselineRefused -Baseline $Baseline.IsPresent -NoPaperclip $NoPaperclip
     exit 3
 }
 
+# Same door, one layer further in: the document must not carry a reason that is
+# false of the window it is about. Scanned here rather than at each row, because
+# the next hardcoded sentence will be added by someone who has not read the row
+# code, and it still must not ship (DRA-127).
+$claimViolations = Get-WindowClaimViolations -Text ($sb.ToString()) -WindowStart $windowStart -WindowEnd $windowEnd
+if (@($claimViolations).Count -gt 0) {
+    [Console]::OutputEncoding = $priorOutputEncoding
+    Write-Host ''
+    Write-Host ('REFUSED: {0} sentence(s) in this document name a precondition THIS window' -f @($claimViolations).Count) -ForegroundColor Red
+    Write-Host 'satisfies, so they are false of the reading they are printed beside. Nothing was written.' -ForegroundColor Red
+    Write-Host ''
+    foreach ($v in $claimViolations) {
+        Write-Host ("  - [{0}] `"{1}`"" -f $v.Name, $v.Sentence) -ForegroundColor Red
+        Write-Host ("      why it is false here: {0}" -f $v.Why) -ForegroundColor Yellow
+    }
+    Write-Host ''
+    Write-Host 'A reason beside an `unmeasured` row is a claim about the window it is printed' -ForegroundColor Yellow
+    Write-Host 'for. Compute it from what the run read, or state a structural fact that no' -ForegroundColor Yellow
+    Write-Host 'window can falsify — do not hardcode a precondition nobody re-checks.' -ForegroundColor Yellow
+    exit 4
+}
+
 $outPath = Resolve-OutPath $Out
 Write-Utf8NoBom -Path $outPath -Text ($sb.ToString())
 Write-Host "Wrote $Out"
@@ -1463,10 +2142,18 @@ if (@($script:PaperclipFailures).Count -gt 0) {
     Write-Host ('WARNING: {0} Paperclip read(s) were unreachable — the Paperclip-derived rows read' -f @($script:PaperclipFailures).Count) -ForegroundColor Yellow
     Write-Host 'unmeasured, not zero. This run may not be used to freeze a baseline.' -ForegroundColor Yellow
 }
+if (@($script:DefectFeedFailures).Count -gt 0) {
+    Write-Host ''
+    Write-Host 'WARNING: the player-report feed read did not complete, so escaped defect rate is' -ForegroundColor Yellow
+    Write-Host 'UNKNOWN rather than zero for this run.' -ForegroundColor Yellow
+    foreach ($f in $script:DefectFeedFailures) { Write-Host "  - $f" -ForegroundColor Yellow }
+}
 
 Write-Host ''
 Write-Host ('GWR {0} (incl. SSC wait {1}) · ACCR {2} · {3} PRs/slice · {4} Helm touches/slice · CI median {5} min' -f `
     (Format-Number $gwr 2), (Format-Number $gwrWithSsc 2), (Format-Percent $accr), `
     (Format-Number $prsPerSlice 2), (Format-Number $touchesPerSlice 2), (Format-Number $medianCi 1))
+Write-Host ('escaped defect rate: {0} ({1}; {2} marked report(s) in {3} discussion(s) read)' -f `
+    (Format-Number $defects.Rate 3), $defects.Status, $defects.MarkedTotal, $defects.Scanned)
 
 [Console]::OutputEncoding = $priorOutputEncoding
