@@ -39,6 +39,13 @@ namespace EQBuddy.Tests;
 /// a fifth /outputfile dump reddens this test until the enumerating surfaces name it,
 /// which is the only version of this guard that survives the next command being added.
 ///
+/// DRA-89 then closed the gap that widening left. DRA-87 put a list into the v2 charter's
+/// ACCURACY-001 table that enumerates the dumps and cites <c>GameCommands</c> BY NAME — into
+/// the one surface the table tells to take the short form. So the only list in that change
+/// naming the producer as its authority was the only list nothing checked against it. See
+/// <see cref="OutputFilesRowViolations"/>, and the note there on why the row is checked
+/// where it is written rather than by flipping the surface's flag.
+///
 /// The checks are factored through <see cref="Violations"/> so the pre-DRA-67 wording can
 /// ride along as a committed negative — green-only is vacuous coverage, and the wording
 /// this exists to forbid is the honest fixture to prove-fail against.
@@ -270,14 +277,21 @@ public sealed class LandingSourceClaimsTests
     /// card, EQBuddy-Evolved.md's hard line, PRODUCT.md's principle and SECURITY.md's
     /// opening paragraph all do; README (DRA-68's card) and the v2 charter take the short
     /// form and must DISCLOSE the dumps without listing them. The consequence is stated
-    /// rather than hidden: a fifth dump reddens the four enumerating surfaces, and the
-    /// other two have nothing to go stale.
+    /// rather than hidden: a fifth dump reddens the four enumerating surfaces, and README
+    /// has nothing to go stale.
     ///
     /// The charter takes the short form because the must-list exists for a PLAYER asking
     /// "what does EQBuddy read?" — that reader reaches the landing, README, PRODUCT.md and
     /// SECURITY.md, not an internal requirements doc whose audience line names Helm, Fable
     /// and the execution agents. What the charter owes is that its hard lines are not
     /// FALSE, which is arms (a) and (b).
+    ///
+    /// "Nothing to go stale" was said of the charter too until DRA-89, and it was never
+    /// true of it: excusing this file from ENUMERATING never stopped it enumerating, and
+    /// DRA-87's ACCURACY-001 row does. The flag stays <c>false</c> — it asks "does SOME
+    /// paragraph answer in full?", which §2.2 could discharge while the stale row sat
+    /// untouched — and the row is checked where it is written instead
+    /// (<see cref="TheCharterOutputFilesRowIsVerifiedAgainstGameCommands"/>).
     ///
     /// VALUES is the boundary each surface must keep while being corrected, and SECURITY.md
     /// is the one that is not the product pair — see <see cref="SecurityBoundary"/>.
@@ -367,6 +381,152 @@ public sealed class LandingSourceClaimsTests
         Assert.NotEmpty(ProductBoundary);
         Assert.NotEmpty(SecurityBoundary);
         Assert.NotEmpty(Surfaces);
+        Assert.NotEmpty(CountWords);
+    }
+
+    // ---- The charter's Output-files row (DRA-89) -------------------------------------
+
+    /// <summary>
+    /// DRA-89. The v2 charter's ACCURACY-001 corpus table has a row that enumerates the
+    /// dumps AND cites <c>GameCommands</c> as its authority — and it is the one list in
+    /// DRA-87's change that nothing checked against that producer. A fifth /outputfile
+    /// command reddens the four enumerating surfaces and leaves this row saying "the four"
+    /// (trap 30), with the citation making the stale claim read as verified.
+    ///
+    /// The row is checked HERE rather than by flipping the charter's
+    /// <c>MustEnumerateDumps</c>, and the difference is not stylistic. That flag asserts
+    /// "SOME single paragraph in this file names /log plus every dump" — §2.2 is the
+    /// paragraph that would answer it, so a fifth dump would be discharged by editing §2.2
+    /// and THIS ROW WOULD STILL SAY "the four". The flag makes the FILE redden; only a
+    /// check anchored on the row makes the ROW true. It would also overturn DRA-87's
+    /// reasoned short-form decision for an internal requirements doc (see
+    /// <see cref="Surfaces"/>) to buy a weaker assertion.
+    /// </summary>
+    private const string CharterOutputFilesRowPrefix = "| Output files |";
+
+    /// <summary>
+    /// Spelled counts, indexed by the number they mean. The row states its count in words,
+    /// so "does the prose agree with the enum" needs the prose's own alphabet. A count the
+    /// table cannot read is a failure with the word in it, never a silent pass.
+    /// </summary>
+    private static readonly string[] CountWords =
+    [
+        "zero", "one", "two", "three", "four", "five", "six",
+        "seven", "eight", "nine", "ten", "eleven", "twelve",
+    ];
+
+    /// <summary>
+    /// What the row owes <see cref="GameCommands"/>, as one line per violation.
+    ///
+    /// Arm (b) matches each dump as a WHOLE WORD on purpose: <c>Contains("faction")</c> is
+    /// satisfied by "factions", which is the exact wrong spelling #635 corrected in this
+    /// row. A substring check would have let that regression back in silently.
+    /// </summary>
+    internal static IReadOnlyList<string> OutputFilesRowViolations(string row)
+    {
+        var bad = new List<string>();
+        var flat = Flatten(row);
+
+        // (a) The citation is what makes a stale list read as verified. If the row stops
+        // claiming GameCommands as its authority it is an ordinary list, but while it does
+        // claim it, the claim is this test's business.
+        if (!flat.Contains("GameCommands", StringComparison.Ordinal))
+            bad.Add("no longer cites GameCommands as its authority");
+
+        // (b) Every dump the app actually ships, as a whole word.
+        foreach (var n in DumpNames)
+            if (!Regex.IsMatch(flat, $@"\b{Regex.Escape(n)}\b", RegexOptions.IgnoreCase))
+                bad.Add($"does not name the \"{n}\" dump — GameCommands ships it");
+
+        // (c) The COUNT is a second hand-copied enumeration of the same enum, and it is the
+        // half that cannot be fixed by adding a noun. "the four" is a claim about
+        // GameCommands.Length written in words.
+        var stated = Regex.Match(flat, @"\bthe\s+([A-Za-z0-9]+)\s+`?/outputfile`?\s+dumps\b",
+                                 RegexOptions.IgnoreCase);
+        if (!stated.Success)
+        {
+            bad.Add("states no count of the /outputfile dumps — expected \"the "
+                    + Spell(DumpNames.Length) + " `/outputfile` dumps\"");
+        }
+        else
+        {
+            var word = stated.Groups[1].Value;
+            var n = int.TryParse(word, out var digits) ? digits : Array.IndexOf(CountWords, word.ToLowerInvariant());
+            if (n != DumpNames.Length)
+                bad.Add($"says \"the {word}\" /outputfile dumps, but GameCommands ships "
+                        + $"{DumpNames.Length} ({string.Join(", ", DumpNames)}) — expected \"the "
+                        + Spell(DumpNames.Length) + "\"");
+        }
+
+        return bad;
+    }
+
+    private static string Spell(int n) =>
+        n >= 0 && n < CountWords.Length ? CountWords[n] : n.ToString();
+
+    /// <summary>
+    /// The committed row, against the committed enum. This is the assertion the finding
+    /// asked for: a fifth /outputfile command in <see cref="GameCommands"/> reddens it on
+    /// BOTH arms — the new dump is unnamed, and "the four" is no longer four.
+    /// </summary>
+    [Fact]
+    public void TheCharterOutputFilesRowIsVerifiedAgainstGameCommands()
+    {
+        Assert.Empty(OutputFilesRowViolations(CharterOutputFilesRow()));
+    }
+
+    /// <summary>
+    /// A locator that matches nothing reports clean, and one that matches everything
+    /// reports on the wrong text (traps 78 and 80). The row is asserted to be exactly one
+    /// line, so a renamed column heading is a loud failure rather than a quiet exemption.
+    /// </summary>
+    private static string CharterOutputFilesRow()
+    {
+        var path = Path.Combine("docs", "v2", "EQBuddy-v2-Project-Guide-Requirements.md");
+        Assert.Contains(Surfaces, s => s.Path == path);
+
+        var rows = File.ReadAllLines(Path.Combine(Repo, path))
+            .Where(l => l.TrimStart().StartsWith(CharterOutputFilesRowPrefix, StringComparison.Ordinal))
+            .ToArray();
+        return Assert.Single(rows);
+    }
+
+    /// <summary>
+    /// Prove-fail without touching the shipped enum. Each fixture is a way this row has
+    /// been wrong or could go wrong, and the first is VERBATIM the pre-#635 spelling — the
+    /// substring reading of "faction" passes on it, which is why arm (b) matches words.
+    /// </summary>
+    [Theory]
+    [InlineData("| Output files | inventory, achievements, factions, spellbook — the four `/outputfile` dumps `GameCommands` ships |",
+                "does not name the \"faction\" dump")]
+    [InlineData("| Output files | inventory, achievements, faction — the three `/outputfile` dumps `GameCommands` ships |",
+                "does not name the \"spellbook\" dump")]
+    [InlineData("| Output files | inventory, achievements, faction, spellbook — the three `/outputfile` dumps `GameCommands` ships |",
+                "says \"the three\" /outputfile dumps")]
+    [InlineData("| Output files | inventory, achievements, faction, spellbook — the `/outputfile` dumps `GameCommands` ships |",
+                "states no count")]
+    [InlineData("| Output files | inventory, achievements, faction, spellbook — the four `/outputfile` dumps |",
+                "no longer cites GameCommands")]
+    public void EachArmOfTheRowCheckFires(string row, string expected) =>
+        Assert.Contains(OutputFilesRowViolations(row),
+                        v => v.Contains(expected, StringComparison.Ordinal));
+
+    /// <summary>
+    /// And the rule is satisfiable at a DIFFERENT enum size, so the count arm is reading
+    /// the producer rather than agreeing with today's number by coincidence. This is the
+    /// shape the row must take the day a fifth dump lands.
+    /// </summary>
+    [Fact]
+    public void TheCountArmIsSatisfiableAtTheNextEnumSize()
+    {
+        Assert.Equal("four", Spell(4));
+        Assert.Equal("five", Spell(5));
+
+        var next = "| Output files | " + string.Join(", ", DumpNames) + ", motes — the "
+                 + Spell(DumpNames.Length + 1) + " `/outputfile` dumps `GameCommands` ships |";
+        var bad = OutputFilesRowViolations(next);
+        Assert.Contains(bad, v => v.Contains("/outputfile dumps, but GameCommands ships", StringComparison.Ordinal));
+        Assert.DoesNotContain(bad, v => v.StartsWith("does not name", StringComparison.Ordinal));
     }
 
     /// <summary>
