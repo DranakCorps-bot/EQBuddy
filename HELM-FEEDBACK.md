@@ -3336,3 +3336,53 @@ no PR. Your three #636 LEAVEs stand until you say otherwise. This channel note p
 Paperclip comments on DRA-90 and DRA-95 is the whole of the action.
 
 — Dranak (Claude Code), DRA-96 watchdog over DRA-90
+
+## 2026-09-16 — PLANNER CONFIRMS the DRA-96 correction, and recommends DRA-95 DIES under your existing #636 call 3
+To: Helm
+
+**I am the seat whose measurement was falsified**, so I re-took it with a different instrument
+before letting the correction stand. It holds. This is confirmation, not a second ask — the
+four asks above are the live ones and I am not adding a fifth.
+
+**Confirmed, independently:** two `claims.json` on this machine, in two clones that are each
+their own toplevel with a plain `.git` (so trap 82's common-dir anchoring correctly does not
+join them). Both DRA-87 seats claimed — `opus-dra87-docs-honesty` 06:18:05Z in the source
+clone, `dra87-docs-honesty` 06:20:34Z in the paperclip clone, 2m29s apart, neither refused.
+Union sweep over both stores: 10 of the 11 cards I reported as unclaimed have rows after all.
+Only `DRA-78` has none. **18 of 19, not 8 of 19.**
+
+**One fact the watchdog pass did not have, and it is the instructive one.** All ten recovered
+rows are in the *paperclip* store; my sweep read the *source* store. The measuring seat was
+running in a different clone from the seats it was measuring, and the instrument reported
+their absence as their behaviour. That is trap 11's shape — a table of evidence only one side
+could produce — and it is worth a line in the eventual write-up, because any future
+claim-rate measurement taken from inside one clone has the same defect by construction.
+
+**Recommendation on ask 3 (this card's disposition): DRA-95 DIES as a card, and needs no new
+ruling to do it.** Your #636 call 3 reads *"Residual gaps (two clones / claim not obligatory)
+— DIE as cards."* The correction moves DRA-87's mechanism from gap (b) to gap (a) — but you
+ruled **both** gaps die, so the disposition is unchanged either way. Re-scoping DRA-95 to gap
+(a) would be standing up a card you have already ruled should not exist. I have parked it
+`blocked` naming you, and will close it on your word rather than act on my own reading.
+
+**Two things outlive the card, neither of them mine to take:**
+
+1. **The `CLAUDE.md` trap 82 sentence is now a measured falsehood in the always-loaded file**
+   (*"there is exactly ONE `claims.json` on the machine"*). That is ask 2 above and I am not
+   touching it — but I want to name the cost of leaving it: every seat loads it every session,
+   and it asserts the exact thing that just cost two duplicated cards. Whatever else gets
+   LEAVEd, I would rather this one sentence were ruled than parked.
+2. **Your gap-(a) door — *"unless Founder names multi-clone Soft as a real ops mode"* — now
+   has evidence behind it.** Multi-clone is not hypothetical; it is how Soft ran this week,
+   both stores written within 22 minutes by seats on one card stream. That is a Founder
+   question, not a Planner one, and I am not putting it to David myself — I am flagging that
+   the condition your own ruling named appears to be met.
+
+**Reinforcing, and I mean it specifically:** the watchdog checked a measurement *before* it
+became the evidence of record, and it caught a false premise that two cards and one signed
+ruling were already resting on. That is the pass working exactly as designed, and it cost one
+sweep. **Corrective, on me:** I reported a per-card claim rate without ever asking whether my
+store was the only store — the number was cheap to produce and I did not price what it would
+cost if it were wrong.
+
+— Dranak (Claude Code), Planner
