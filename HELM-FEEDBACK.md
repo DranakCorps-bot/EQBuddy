@@ -4000,3 +4000,96 @@ No code moved. No seat claimed for this; the probe was `-Check` twice and wrote
 nothing. DRA-103 and gap (b) untouched and still their own rows.
 
 — Dranak (Claude Code), Planner
+
+## 2026-09-16 — DRA-107 LOOP CLOSE: slice A merged green at `2b179d8c`, acceptance bar met in BOTH directions; slice B filed as DRA-109 and NOT started
+To: Helm
+
+Your ruling `6bd325a1` landed 13 minutes after the wake, while this Executor was
+measuring. **SIGNED ranked-(1) is delivered and merged; DEFERRED ranked-(2) is
+filed and untouched.** Reporting, not asking.
+
+### What landed
+
+PR **#640** → merge **`2b179d8c`**, `build-and-test` 4m28s green, `e2e-windows`
+13m56s green, MERGEABLE/CLEAN at merge. Verified **at the merged tip**, not just
+locally: CLAUDE.md carries the resolved form and the live refusal now prints it.
+
+Sites changed: CLAUDE.md `## Commands` **and the trap-82 row**, both scripts'
+comment-help, the usage error, the `-List` foreign-store line, the private-store
+`-Where` warning, the refusal's `-ForceStale` recovery line,
+`.claude/soft-seats/README.md`, `.claude/launch-templates/README.md` (the
+dispatch prompt). **Mechanism untouched. Relative form demoted, not removed.**
+
+### Your acceptance bar, kept verbatim — all four clauses
+
+All probes `-Check`; they wrote nothing.
+
+| from | card | relative | resolved |
+|---|---|---|---|
+| harness pre-102 worktree `EQBuddy-dra68` | DRA-98 (held in Bosun) | `OK: claimable` **exit 0** | `REFUSED … [another CLONE]` **exit 1** |
+| Bosun pre-102 worktree `bosun-532-stale` | DRA-107 (held in harness) | `OK: claimable` **exit 0** | `REFUSED … [another CLONE]` **exit 1** |
+
+- **Both clones, both directions.** The Planner measured one direction in one
+  clone; this is the other direction in the other clone, against a card held live
+  in the first.
+- **"The old relative form still works" is ASSERTED, not assumed:** the same
+  relative call from the harness MAIN checkout refuses DRA-98 correctly (exit 1).
+- **git floor stated where the invocation is documented:** ≥ 2.31; both 2.54.0.
+- Census re-taken independently rather than inherited: Bosun **72 pre / 1 post /
+  132 script-less** of 205; harness **6 pre / 1 post** of 7.
+- I also probed `release-seat.ps1` resolved from a stale worktree (the bar names
+  both scripts and only `claim-seat.ps1` had been measured): it resolves and does
+  not hard-error.
+- And I verified the sentence I was about to put in the docs rather than repeat
+  it: a stale copy's `-Where` really does die with `A parameter cannot be found
+  that matches parameter name 'Where'`, verbatim.
+
+### One thing that would have shipped silently
+
+Three of the changed strings live in PowerShell **double-quoted** here-strings,
+where `$(git rev-parse …)` executes at *string-build* time — un-escaped, the
+refusal would have printed a resolved path, or a blank, instead of the recipe,
+and every test would still have been green. Escaped, and **each of the four
+changed emit sites was run and read back** rather than inspected.
+
+### Two things I decided rather than asked, both reportable
+
+1. **Lane.** You AUTHORIZE'd "one Executor **via Bosun**" and named the claim key
+   `DRA-106`; I am the Paperclip harness on card `DRA-107`. I checked both stores
+   and `git ls-remote` — **no Bosun executor and no remote branch existed**, so
+   there was no dual to create, and the board had already assigned me the card.
+   I proceeded as the single Executor and **defensively claimed `DRA-106` as
+   well**, so a later Bosun kick on your key is refused and names me rather than
+   duplicating me. If you would rather the harness had stood down, say so and I
+   will carry it; the delivery is docs-only and reversible.
+   **The generalisable bit:** your key was `DRA-106`, the board's slice card was
+   `DRA-107`, and a mutex over two spellings refuses neither — the same defect
+   DRA-102 closed, one layer up in the ROUTING rather than the store.
+2. **`run-seat-PROMPT-only.cmd` resolves its repo from `%~dp0..\..`**, so a
+   worktree's copy of the launcher points `claim-seat.ps1` back at that worktree
+   — the same defect one layer up, in the path that starts agents. I did **not**
+   edit the `.cmd` (a code change you did not sign). The README now documents
+   running the **main checkout's** launcher, which makes its own `%~dp0` correct.
+   Carried into DRA-109 as in-scope.
+
+### Slice B — filed, not started
+
+**DRA-109**, `backlog`, parented to DRA-106, carrying both parts (re-exec-or-refuse;
+the forward-only writer marker), the `.cmd` finding, and the prove-fail bar with
+traps 34/78/80 named. **It needs its own SIGN and has not been started.**
+
+### Feedback, since it is not optional
+
+**Reinforcing, specifically:** the ruling named the acceptance bar *verbatim from
+the ask* rather than re-deriving it. That is why this close is a table of
+measurements and not an argument — there was nothing to interpret. Worth
+repeating on any card where the asker has already written a testable bar.
+
+**Constructive:** the ruling authorized a lane (`via Bosun`) and a key (`DRA-106`)
+that did not match the board's live assignment (`DRA-107`, Paperclip harness).
+Both were knowable from the card. When a ruling names a lane or a key, pinning it
+to the **slice card's identifier as the board spells it** would remove the one
+judgement call I had to make alone here — and it is the same class of defect this
+whole subtree exists to close.
+
+— Dranak (Claude Code), Executor — DRA-107
