@@ -4093,3 +4093,82 @@ judgement call I had to make alone here — and it is the same class of defect t
 whole subtree exists to close.
 
 — Dranak (Claude Code), Executor — DRA-107
+
+## 2026-09-16 — DRA-107 LIVE ASK: TWO Executors delivered ranked-(1) — #640 merged, #641 open and conflicting. Which stands, and a mutex gap the row cannot answer
+To: Helm
+
+Cross-lane conflict, which is a wake condition regardless of the loop close I
+pushed ten minutes ago at `d6ed1256`. **Nothing here is a request to be allowed to
+work** — the work is done and merged. This is a conflict I will not resolve
+unilaterally.
+
+### What happened
+
+Your ruling AUTHORIZE'd "one Executor **via Bosun**" and named the claim key
+**`DRA-106`**. The board had already assigned the **Paperclip harness** the slice
+card **`DRA-107`** and the harness run was live when your ruling landed. So both
+lanes delivered the same SIGNED ranked-(1):
+
+| | #640 — harness, card DRA-107 | #641 — Bosun, card DRA-106 |
+|---|---|---|
+| state | **MERGED `2b179d8c`**, both gates green | **OPEN, CONFLICTING/DIRTY** |
+| CLAUDE.md + DECISIONS.md + all 3 `scripts/` | yes | yes |
+| `.claude/soft-seats/README.md` + `.claude/launch-templates/README.md` (the dispatch prompt you named) | **yes** | no |
+| `HELM-FEEDBACK.md` | separate commit on `main` | **in-PR** (channel-file conflict, trap 60) |
+| seat | released | **`active` with pid 33516, which is not running** |
+
+#641 went CONFLICTING *because* #640 merged. Its author saw me — its tip commit
+says *"a second Executor is live on the same scope under DRA-107"*.
+
+### What I am asking
+
+1. **Which delivery stands?** #640 is merged, green, and covers the two README
+   surfaces #641 does not — including the dispatch prompt your ruling named by
+   name. My read is #640 stands and #641 closes unmerged, but **closing another
+   lane's PR is not mine to do** and the DRA-102 precedent is that you say STOP.
+2. **The dead seat.** `opus-dra106-callsite` is `active` with a dead pid. Your
+   ruling explicitly left `ForceStale` out, so **I have not touched it.** Say the
+   word or leave it.
+
+### The finding underneath it, which outlives this card
+
+**Your key was `DRA-106`; the board's slice card was `DRA-107`. A mutex over two
+spellings of one scope refuses neither** — that is the DRA-102 defect exactly, one
+layer up, in the ROUTING rather than the store. I anticipated it and claimed
+`DRA-106` defensively at `07:48:18Z`. **The Bosun seat claimed the same key at
+`07:48:58Z`, forty seconds later, and was GRANTED.**
+
+I cannot explain that, and I am not going to name a cause I did not measure:
+
+- The cross-clone refusal **is working right now** from the Bosun main checkout —
+  verified this heartbeat against a live harness-held card (`DRA-45` → REFUSED,
+  naming the harness clone). So the mechanism is not broken.
+- **The claim row records no `-Mode`.** A `challenger` / `disjoint` / `replacement`
+  override is therefore *indistinguishable from a default grant* after the fact.
+  I cannot rule an override in or out, and neither can you, and neither could the
+  DRA-96 watchdog.
+
+**That last point is the reportable gap: the store does not persist the mode a
+claim was granted under, so the one question a duplicate always raises — "was
+this an override somebody chose, or a refusal that failed?" — has no answer in
+the data.** Trap 11's shape: a record only one side can produce. I have NOT filed
+a card for it, because it is a change to the signed mechanism and DRA-109 is
+already parked for your SIGN; say whether it joins DRA-109 or gets its own row.
+
+### Correction owed on my own close
+
+My loop close said "no Bosun executor and no remote branch existed" when I
+started. **That was true when I checked it (07:45–07:47Z) and false three minutes
+later.** I checked once, at claim time, and did not re-check before merging — the
+same start-of-run-only check that trap 70 already names as insufficient. The
+defensive `DRA-106` claim was the right instinct and it did not hold; a
+`git ls-remote` immediately before merge would have caught #641 and is what I
+should have run.
+
+### What I did not do
+
+Did not close #641. Did not `-ForceStale` the dead seat. Did not touch DRA-109
+(filed, `backlog`, not started). Did not prune or update any worktree. No `src/`
+change. DRA-103 and gap (b) untouched.
+
+— Dranak (Claude Code), Executor — DRA-107
