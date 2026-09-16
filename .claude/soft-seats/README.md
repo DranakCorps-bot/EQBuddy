@@ -8,8 +8,9 @@ tree is the lab that implements and measures them.
 the control-plane `proposals/` tree. Nothing here graduates until we have
 evidence from this machine.
 
-One-seat mutex for Soft / Claude executors on this clone. **Not** a
-scheduler, **not** a control plane, **not** a mailbox.
+One-seat mutex for Soft / Claude executors on this **machine** — every worktree
+of this clone by store, every other registered clone by path registry since
+DRA-102 (below). **Not** a scheduler, **not** a control plane, **not** a mailbox.
 
 **Since DRA-76 (2026-09-14) it is a refusing per-work-item mutex.** A default
 claim is refused by **any** live seat on that card — `active`, `challenger`,
@@ -80,10 +81,67 @@ git resolved no common dir and this copy genuinely cannot see another seat —
 that, and only that, is the DRA-90 failure. A claim granted in that state says
 so on the same screen.
 
-Two independent **clones** still do not share a store. Nothing here closes
-that; the remote is the only thing both can see (`gh pr list` / `git ls-remote`
-for a branch naming the card) and checking it before you push is a habit, not
-a guard.
+## Two independent CLONES: union-READ, local-WRITE (DRA-102)
+
+A linked worktree shares the main tree's store. **Two independent clones share
+nothing**, and on this machine the two clones ARE the two dispatch lanes — one
+holds the `opus-*` / `fable-*` seats, the other the harness's `*-executor` ones.
+DRA-87's two executors **both claimed**, 2m29s apart, and neither was refused
+*or warned*, because neither store could see the other.
+
+**Since DRA-102 (DRA-95 shape A′, Helm-signed 2026-09-16) the refusal crosses
+clones.** The shape is a machine-level registry of store **paths**:
+
+```
+%LOCALAPPDATA%\DranakCorps\soft-seats\stores.json
+```
+
+- Each clone registers **its own resolved store path**, once, the first time it
+  runs `claim-seat.ps1` or `release-seat.ps1` (`-Where` and `-List` count as
+  first use — the diagnostic you are told to run is what puts you on the board).
+- A claim reads **every registered store** and writes **only its own**. The
+  refusal names the holder **and the clone it is in**, and the recovery command
+  it prints runs `release-seat.ps1` **in that clone**, because this script has
+  no business writing another clone's file.
+- **Paths only.** No seat id, no card, no claim ever enters the registry. That
+  is why this is A′ and not A (moving the claims themselves out of the tree),
+  and it is what Helm's ruling rests on — `soft-seat-selftest.ps1` asserts the
+  registry file contains none of those strings.
+- An explicit `-StoreDir` **never registers and never union-reads**. It is a
+  per-call store; putting a throwaway temp dir in front of every future refusal
+  is the opposite of the point.
+
+**It degrades, deliberately, to the pre-DRA-102 behaviour** when the registry is
+absent, unreadable, or switched off with `EQBUDDY_SOFT_SEAT_REGISTRY=off`
+(exactly that string). No new failure mode — **and a grant decided that way
+SAYS so on the same screen**, because "consulted every clone and found nothing"
+and "never looked" are the same sentence otherwise (trap 68). A registered store
+that could not be read is named for the same reason (trap 81).
+
+```powershell
+pwsh -NoProfile -File scripts\claim-seat.ps1 -Where
+```
+
+now prints the registry, **every store consulted**, which one this call writes,
+and any registered store whose directory has since vanished.
+
+### A claim-rate measurement is only valid swept over EVERY registered store
+
+`claim-seat.ps1 -List` is **this clone's board**, not the machine's. The
+graduation numbers above — duplicates prevented, false blocks, stale claims —
+are per-machine quantities, so **a count taken in one clone is not that number
+and must not be reported as it**. Sweep every store `-Where` names (the run that
+found the DRA-87 duplicate reported the other lane's seats as never claiming,
+which is the same error one layer down). `-List` prints how many other stores it
+did not show.
+
+What is still **not** closed: a seat that never runs `claim-seat.ps1` at all is
+refused by nobody, in any clone — the registry is a mutex for seats that take
+it, not an obligation to take one. Two seats duplicated an authorized one-line
+`CLAUDE.md` correction six minutes apart on 2026-09-16 with **neither having
+claimed**, and no store design would have refused that. `gh pr list` /
+`git ls-remote` for a branch naming the card before you push stays the habit
+that crosses everything, including machines.
 
 ## The claim key is the Paperclip card, and only that
 
