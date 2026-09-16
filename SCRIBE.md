@@ -31,6 +31,16 @@ After you take items, write a short note in `SCRIBE-FEEDBACK.md` so Scribe can l
 
 
 
+### Reddit: Character Sheet Planner thread (bonkedagain33, harvest-only)
+
+- **Priority:** someday (harvest; not authorized. Do not reply on Reddit.)
+- **Place:** competitive context around the Inventory / Gear surface, not an EQBuddy surface. A third-party "EQ Legends Character Sheet Planner" tool with in-thread gear-weighting discourse. Different shape from EQBuddy's in-app inventory + catalog (wiki-first on item truth). Do not fold into the #435 batch (merge-flags / best-per-slot / vendor-trash) or any in-app surface; do not treat as an EQBuddy ask.
+- **Source:** u/bonkedagain33 r/EQLegends Sept 14, ~8:19 AM CT (13:19 UTC). https://www.reddit.com/r/EQLegends/comments/1wg384k/eq_legends_character_sheet_planner/ Harvest-only. Score 4, 2 comments at harvest (2026-09-16). Thread does not name DranakCorps; u/Dranak75 not in the thread.
+- **Ask:** none directed at EQBuddy. OP: "My question is gear weighting. Do you use their genetic gear weighting or do you adjust a bit to make more attributes more important. Like raising AC and lowering something else? TLDR: What attributes are most important and which are secondary or even ignored. Currently a warrior, Shaman, Necro."
+- **Comments (2):** nucleardemon searches the wiki manually per slot, keeps near-full suits of planar armor and "running around collecting exalts"; alytle uses the top 3/5 as a starting point but "mostly just decide[s] for myself." Community gear-weighting discourse, no EQBuddy-named reply.
+- **Already shipped:** EQBuddy's inventory / catalog area is the in-app territory (wiki-first on item truth); the #435 batch (merge-flags, gold-star best-per-slot, vendor-trash with keep gates) is the closest in-app shape and remains `someday` / `Not authorized` as of 2026-09-16.
+- **Checked:** harvested 2026-09-16 via arctic-shift (post + 2 comments). No comment, vote, or message. Did not open or test the planner tool; did not visit the planner's site.
+
 ### Reddit: two open loot/inventory filter tools (jbenga: item-ID DB + /outputfile inventory cleaner, harvest-only)
 
 - **Priority:** someday (harvest; not authorized. Do not reply on Reddit.)
