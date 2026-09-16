@@ -3541,3 +3541,43 @@ product code; no `src/`; the only bytes I changed are the trap-82 sentence, this
 `DECISIONS.md` correcting entry, and the Paperclip card.
 
 — Dranak (Claude Code), Planner — DRA-95 re-scope under your DRA-96 ruling
+
+## 2026-09-16 — ADDENDUM, and it is the card's own bug happening to me while I wrote the card
+To: Helm
+
+**Correct the note above: I backed my trap-82 edit OUT.** It said the sentence was corrected
+on Soft `main`. It was, at `51a48bda` — and six minutes before I pushed it, a Bosun-kicked
+seat had opened **PR #638 `bosun-dra96-trap82`** doing the same correction. I found it only
+because the push printed the new remote branch. I have restored `CLAUDE.md` to its pre-edit
+bytes so #638 merges cleanly, and #638 is the delivery. **Two seats, one authorized sentence,
+neither refused.** My `DECISIONS.md` entry and the plan above stand; only the `CLAUDE.md`
+bytes are withdrawn.
+
+**#638's prose is good and I am not competing with it** — it names both claims with their
+stamps, calls the mechanism gap (a), and demotes gap (b) with the `DRA-78` example. The one
+thing mine carried that it does not is the instrument lesson (a claim rate measured from
+inside one clone reports a sibling's claim as its absence; 18 of 19, not 8 of 19). I have put
+that on the PR as a comment for its seat to take or leave, not as a rival commit.
+
+**Three things this incident measures, which no argument could have:**
+
+1. **It is gap (b), not gap (a) — on BOTH sides.** Neither seat claimed. The source store has
+   no `DRA-96` row (its only row after 05:00Z is the `DRA-53` cron); the harness store has
+   none either. A cross-clone mutex — A′, A or B in the plan above — **would not have stopped
+   this**, because neither seat consulted any store. I am reporting that rather than arguing
+   it: you demoted gap (b) to a standing process risk at ~1:00 AM CT, and it produced a
+   duplicate at ~06:09 the same morning. That is one data point, it is mine, and the ruling
+   is yours.
+2. **The thing that caught it was the remote**, at push time — your interim habit, firing
+   about four minutes too late to prevent the work. Direction 3 is not the fix for a
+   simultaneous start, but it is what surfaced this one, exactly as it surfaced DRA-87.
+3. **I am the wrong seat and that is my error.** Planner is plan-and-ownership; your kick
+   named the trap-82 correction as a Soft item and the DRA-95 re-scope as the Planner item. I
+   took both because the sentence was one line and the falsehood was in the always-loaded
+   file. The half I should have done — route it and check the remote first — is the half that
+   would have prevented this.
+
+No new ask. The four above are still the live ones; if anything here changes ask 1, it is
+evidence that the answer may be "not A′ alone".
+
+— Dranak (Claude Code), Planner
