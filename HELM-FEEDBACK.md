@@ -3705,3 +3705,77 @@ lists a non-answer as an option spends the executor's first move on proving the 
 wrong. Naming §2.2 would have made it a one-line card.
 
 — Dranak (Claude Code), Executor
+
+## 2026-09-16 — LIVE ASK: DRA-102 shipped, and a SECOND live executor is on it
+To: Helm
+
+**The slice is done and pushed: PR #639, `dra102-seat-store-registry`. I am not
+merging it, because there is a cross-lane conflict on the card itself.**
+
+**The conflict.** `C:\Users\david\source\EQBuddy` (the Bosun/local lane) holds
+`DRA-102` **active**, seat `opus-dra102-a-prime`, since `2026-09-16T06:30:57Z`,
+pid 39872 (`claude`, verified still running), worktree
+`.claude/worktrees/opus-dra102-a-prime`. My seat claimed at `06:31:16Z` —
+**nineteen seconds later**. Neither of us had pushed a branch when I ran the
+card's KEPT `git ls-remote` / `gh pr list` habit at the start; that is why it
+caught nothing. Mine is now pushed, so the habit works from here in one
+direction at least.
+
+**The finding that matters more than the collision: the two seats spell the key
+differently, so NO store design would have refused either of us.** This card's
+"Before you start" says *"Claim the seat as well: `-WorkItem DRA-95`"* — the
+PARENT — and I did exactly that. The other lane claimed `DRA-102`, the SLICE.
+One scope, two card ids, two claims, zero collisions. That is trap 70 one level
+up from where DRA-50 closed it: DRA-50 made the key canonical *within* a
+tracker, and this is two legitimate canonical card ids for one piece of work.
+**A dispatch instruction that names a different card from the one being worked
+defeats the mutex by construction, and neither the union read nor anything after
+it can help.** Worth a rule: the claim key is the card the SLICE is filed as.
+
+**Decision I need from you: which branch lands.** Both are cheap to discard; I
+have no view on whose is better and have not looked at theirs (nothing pushed).
+I will not merge, re-dispatch, release the other seat, or touch that worktree
+until you rule. `release-seat.ps1 -ForceStale` would refuse anyway — their pid
+is alive and the claim is minutes old, which is the refusal behaving correctly.
+
+**What #639 contains**, against the bar you KEPT verbatim: the registry at
+`%LOCALAPPDATA%\DranakCorps\soft-seats\stores.json`, paths only (the selftest
+asserts no seat id / card / claim string is in the file, because that property
+is what your A′-not-A ruling rests on); union read on refuse, write to this
+clone only; the refusal names the holder AND its clone AND the recovery command
+*in that clone*; `-Where` prints every store consulted; absent / unreadable /
+`EQBUDDY_SOFT_SEAT_REGISTRY=off` degrades to today **and a grant decided that
+way says so on the same screen**. Bar rows 1–3 are two real `git clone`s (with
+an assertion that their git-common-dirs differ, so the block cannot decay into
+re-testing worktrees), no `-StoreDir` anywhere, refusal proved both directions,
+and the registry-absent negative where clone 2 succeeds. 45 → 80 checks.
+`check.ps1` all green.
+
+**Prove-fail, row 4 — three mutants, and the third earned its keep.** Reverting
+the union read reddens 7 rows. Dropping the trap-80 scalar check on a registry
+entry's `dir` reddens one and prints the tell (`two paths  (clone nonsense)` —
+an array joined by `$OFS` and used as a path). Dropping the own-store exclusion
+**survived every row I had written**, which was a real hole: I added a same-seat
+re-claim row, and that mutant now makes a clone refuse ITSELF as "another
+CLONE". I would not have found it by writing more refusal rows.
+
+**Live evidence, on this card.** With both real lanes registered, from my clone:
+`REFUSED: DRA-102 is already held by 1 live seat(s): seat 'opus-dra102-a-prime'
+… [in another CLONE: C:\Users\david\source\EQBuddy]`. The mechanism catching a
+real duplicate on the card that built it — nineteen seconds too late, and only
+because I registered the other lane's path by hand (`-Repo`), since that clone
+is still running pre-DRA-102 scripts and has not registered itself. **Until
+#639 or its rival is on `main` and both lanes have run the new scripts once,
+the registry protects nobody.** That is the honest state, not a caveat.
+
+**Reinforcing:** the bar you KEPT verbatim is the reason this slice has evidence
+instead of a green run. "Two real clones, no `-StoreDir`, and a reachable
+negative" named the exact defect trap 82 left behind — 45 checks that all passed
+a store dir in, so discovery had never been covered once. I would have written
+more refusal rows and shipped a mutex proven against itself.
+
+**Constructive:** the card's claim instruction is the one line that cost
+something here. If a slice card names a parent for the seat, the two lanes
+cannot collide by construction, and every guard downstream is decoration.
+
+— Dranak (Claude Code), Executor
