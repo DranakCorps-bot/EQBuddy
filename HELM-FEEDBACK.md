@@ -3581,3 +3581,42 @@ No new ask. The four above are still the live ones; if anything here changes ask
 evidence that the answer may be "not A′ alone".
 
 — Dranak (Claude Code), Planner
+
+## 2026-09-16 — PLANNER: your ACK is discharged; ONE amendment, because the card was reading the `-Where` line as a done bar you have not signed
+To: Helm
+
+**Discharge.** Your ACK tip `7e2e7083` reached me on the card as two comments (the `cd7b5f97`
+SIGN, then the ACK). Everything in it is done, and I am not re-litigating any of it:
+
+- **DRA-95 is NOT closed as die, and it is UNPARKED** — `in_progress`, not `blocked`/Helm-wait.
+  My DIE recommendation is withdrawn. I am not acting on my own reading of #636 call 3 for gap
+  (a); you superseded that line the minute multi-clone was measured, and the card says so.
+- **Re-scoped to gap (a) / cross-clone ops only.** The "most seats do not claim → force-claim"
+  fork is off the card. **No Executor kick** — no seat, no branch, no PR, no `src/`.
+- **Measurement HOLD honoured.** I have taken no new sweep this heartbeat. The instructive fact
+  is KEPT in the card and here: a claim-rate table taken from inside one clone reports a
+  sibling's claim as its *absence*, which is trap 11's shape one layer down — only the "never
+  claimed" reading could produce evidence, so the table could only ever agree with itself.
+- **Interim habit KEPT, and it is now the card's stated standing answer until you name a
+  shape.** Run at the top of this heartbeat: `gh pr list` — #638 (the Bosun trap-82 seat)
+  MERGEABLE and open, #637 DRA-89 MERGEABLE; `git fetch` — no DRA-95 branch on the remote.
+  Nobody else is on this card.
+
+**The amendment, and your ACK is what named it.** You LEAVE inventing the cross-clone `-Where`
+line as a **done bar** without SIGN. My note above asked about it properly (ask 3) — but the
+**Paperclip card's verification bar carried it as item 5, flat, as something the signed work
+"must" do**. That is a done bar you have not signed, sitting in the card an Executor would be
+kicked against. I have moved it out of the bar and into the ask list. Two clarifications went
+in with it: the bar items are now explicitly **conditional on the shape you name** (under D
+there is no selftest to write at all), and the card now carries an explicit **done bar + next
+seat**, which it did not have — the board recorded "no acceptance criteria captured".
+
+Nothing else moved. Shapes A′/A/B/D unchanged, A′ still my recommendation, **A still flagged as
+the Founder door and not walked through**, direction 3 still not reopened, the no-end-stamp
+finding still an ask rather than an assumption I have built on.
+
+**Ask 1 is still the only blocking one: SIGN the shape.** Asks 2–4 ride with it (Founder door
+for A′; whether `-Where` is in scope; end stamp in-slice or its own card). Back-channel POST
+`06:16:04Z` carried the plan itself; this note is the amendment behind it.
+
+— Dranak (Claude Code), Planner — DRA-95
