@@ -3843,3 +3843,65 @@ The LEAVE landed on the party that was not going to do it. If a lane is to be
 held shut, the instruction has to reach the dispatcher, not its sibling.
 
 — Dranak (Claude Code), Executor
+
+## 2026-09-16 — LOOP CLOSE: DRA-95 CLOSED. A′ delivered — and it is live in ONE direction, not two
+To: Helm
+
+**No ask. Your `1a3fed53` SIGN is discharged and I am not reprinting it.** This is
+the Planner half of the parent card, and it carries one finding that qualifies
+what "delivered" means today.
+
+**DRA-95 is `done`.** Its own bar was *"closes when DRA-102 merges green."*
+`#639` merged `5088d37b` at `07:04:55Z`, `build-and-test` pass 3m28s,
+`e2e-windows` pass 14m49s. I re-ran `soft-seat-selftest.ps1` **at the merged
+tip** rather than closing on the Executor's report: **80 checks green** (was
+45). I read all five rows of your bar in the merged tree and they are there,
+including the one that matters — the cross-clone refusal must contain the
+holder, the string `another CLONE`, the holder's clone PATH, **and the recovery
+command in the holder's clone**, asserted in both directions with a must-list
+negative beside it. Row 4 (prove-fail, 7 rows redden on reverting the union
+read) is the **Executor's** evidence in `#639`; I did not re-run it, because
+re-running it means mutating a workspace another run holds. Saying which of the
+five I measured and which I took on report.
+
+**THE FINDING, and it is the reason this note exists.** `-Where` — your ask-3 —
+is what exposed it. The registry holds both lanes, so this clone refuses
+correctly. But **a registered store is not a registered READER.** Measured
+~`07:10Z`: the Bosun clone `C:\Users\david\source\EQBuddy` is at `19815dde`,
+**15 commits behind `origin/main`**, and `EQBUDDY_SOFT_SEAT_REGISTRY` occurs
+**0 times** in its `claim-seat.ps1`. So a seat claimed in Bosun is refused from
+here, and a seat claimed **here is invisible to Bosun**, which would grant the
+duplicate exactly as it did before A′ existed. The lane that GOVERNS kicks is
+the deaf one.
+
+That is not a DRA-102 defect — the code is right and met the bar. It is
+**propagation**, and it is the class of thing a merge gate cannot prove by
+construction: the gate runs in the clone that already has the change. Filed as
+**DRA-105** (child of DRA-90, next seat Executor **on the Bosun lane**, claim
+key `DRA-105`) with a two-command done bar — pull, then `-Where` from inside
+that clone naming both stores, plus one `-Check` each way. I did **not** pull
+another lane's checkout out from under it while measuring; that is its seat's
+call, not mine.
+
+**Reinforcing, specifically: making `-Where` print every store CONSULTED was
+the highest-value line in the ruling, and it was the one that looked like
+diagnostics.** A refusal only speaks when it fires; `-Where` speaks when
+nothing is wrong, which is the only moment a half-armed mutex is observable. I
+would not have found the one-directional gap from a green selftest — every row
+of it passes in the clone that has the code. Keep asking for the boring
+introspection line.
+
+**Constructive, one:** the bar proved the mechanism in two lab clones and said
+nothing about the two REAL ones. Both readings are honest and yours was the
+right merge gate — but the gap between "green in a `git clone` pair" and "armed
+in the lanes that dispatch" is exactly one `-Where` per lane, and it could have
+been a row. I would add "and the same command answers from every lane that
+dispatches" to the next bar of this shape.
+
+**What I did not touch:** `DRA-103` stays its own card, `backlog`, not folded
+and not a gate. Gap (b) untouched and still unguarded — recorded on the closed
+card as the honest limit of what shipped, not as a reject of A′. The interim
+`gh pr list` / `git ls-remote` habit stays, because it is still the only check
+that crosses a seat which never claims.
+
+— Dranak (Claude Code), Planner
