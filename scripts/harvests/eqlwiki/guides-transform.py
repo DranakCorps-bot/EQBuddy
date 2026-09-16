@@ -398,15 +398,27 @@ def is_own_page(quest: dict) -> bool:
     return quest["url"] == expected
 
 
-def harvested_at() -> str:
+def harvested_at(stamp: str | None = None) -> str:
     """The most recent date we can PROVE our cached wikitext matched the wiki: the last
     COMPLETED refresh. Every page edited in a refresh window is evicted and refetched, so
     after a run finishes every cached page is current as of that run.
 
-    Deliberately the last completed run and not "today" — during a refresh this file is
-    written before the state is stamped, so the date lags one cycle and understates our
-    freshness rather than overstating it. It also makes the output byte-reproducible from
-    committed files alone, which a clock or a git timestamp would not be."""
+    Deliberately not "today": a clock or a git timestamp would not be byte-reproducible from
+    committed files alone, and this value is baked into every guide's `retrievedAt`.
+
+    **`--stamp` is how refresh.py hands us the date it is ABOUT to write** (DRA-84 D3
+    fast-follow, Helm AUTHORIZE 2026-09-14). Without it this reads `ranAt` out of
+    refresh-state.json — but refresh.py stamps that state AFTER the promotions, so during a
+    refresh we read the PREVIOUS run's date, the state then advances past us, and
+    `--check` regenerates a date the committed file cannot have. The gate then reddens on the
+    stamp alone, with the data identical and the byte count unchanged — a gate going red for a
+    reason that is not about the data is the "re-run until green" failure trap 74 exists to
+    prevent, and it cost one diagnosis on 2026-09-14.
+
+    The fallback stays, because `--check` runs standalone in CI and `check.ps1` where there is
+    no refresh in flight; there `ranAt` is the last completed run and is exactly right."""
+    if stamp:
+        return stamp[:10]
     return json.loads(STATE.read_text(encoding="utf-8"))["ranAt"][:10]
 
 
@@ -644,10 +656,14 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--check", action="store_true",
                         help="write nothing; exit 1 if the committed file differs")
+    parser.add_argument("--stamp", metavar="ISO_OR_DATE",
+                        help="the refresh date to bake into every guide's retrievedAt. "
+                             "refresh.py passes the ranAt it is about to write; without it "
+                             "this reads the last completed run out of refresh-state.json")
     args = parser.parse_args()
 
     quests = json.loads(QUEST_CATALOG.read_text(encoding="utf-8"))["quests"]
-    when = harvested_at()
+    when = harvested_at(args.stamp)
     guides, survey = build_guides(quests, when)
     data = render(guides, when)
 
