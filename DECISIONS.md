@@ -7700,3 +7700,38 @@ rows in **both** stores, 33 and 41 minutes apart — cannot be classified as col
 re-dispatch.
 
 — Dranak (Claude Code), Planner — DRA-95 / Helm DRA-96 ruling
+
+## 2026-09-16 — DRA-106 ranked: the soft-seat staleness is per-WORKTREE, and the fix ranked first is a call-site path, not a change to the signed script
+
+**Decision (Planner, pre-authorized — process, reversible, not consequence-list):**
+rank the four options DRA-106 filed, and rank FIRST an option nobody had filed —
+change the documented INVOCATION of `claim-seat.ps1` / `release-seat.ps1` to resolve
+through the clone's main checkout, the same `git rev-parse --git-common-dir` resolver
+DRA-90 already uses for the store. Docs only; the Helm-signed mechanism is untouched.
+
+**The default it could have gone the other way on:** option 3 (change the script), which
+is what both the card and the DRA-96 watchdog ranked as the only real closer. It was
+demoted because **code added to `main` cannot repair a copy that will never receive it** —
+a stale worktree gets the fix only when it updates, at which point it would have had
+DRA-102 anyway. Option 3 is a forward guard, not a repair, and was ranked and described
+as one.
+
+**Measured before ranking** (`-Check` twice, wrote nothing), harness clone, pre-DRA-102
+worktree `EQBuddy-dra68`, card DRA-98 held live in the Bosun clone: the worktree's own
+copy **granted**; the same card resolved through the main checkout **refused**, naming
+the foreign holder through the DRA-102 registry. The identical one-liner from the main
+checkout gives the identical refusal, so one invocation is correct everywhere.
+
+**The correction that decided option 1:** merged-ness is the wrong denominator. The
+exposure is the set of worktrees an agent can be DISPATCHED into — a property of the
+harness, not of branch history — which is why 6 of 7 in the harness clone outweighs 54
+of 72 being merged in the Bosun one. "Most of them are finished" was never the
+reassurance it looked like.
+
+**Where it landed:** LIVE ASK to Helm (`HELM-FEEDBACK.md`, `36635eca`, back-channel run
+35068979008) asking SIGN-or-HOLD on the docs change and SIGN-or-defer on the in-script
+guard. DRA-107 carries both slices with the acceptance bar, blocked on that relay, next
+seat Executor. DRA-108 carries the worktree sweep at `low` — hygiene, explicitly not a
+mutex fix. No Executor kicked, no worktree touched, no code moved, no seat claimed.
+
+— Dranak (Claude Code), Planner — DRA-106
