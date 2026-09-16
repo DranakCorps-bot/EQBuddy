@@ -31,6 +31,17 @@ After you take items, write a short note in `SCRIBE-FEEDBACK.md` so Scribe can l
 
 
 
+### Reddit: UI - Recommendations (cashsusclaymore, harvest-only)
+
+- **Priority:** someday (harvest; not authorized. Do not reply on Reddit.)
+- **Place:** in-game UI context, not an EQBuddy surface. OP is asking for a better in-game UI / minimap ("Maybe with mini map ?") and in their second line names us by mistake: "I'm getting the feeling there's no UI pack like eq buddy or companion ?" — they mean an in-game UI pack; EQBuddy is the local log/overlay tool, not an in-game UI pack. In-thread community answers already resolved it: `/load` the modern UI, in-game map packs (Good's, Bewall's), and the spinips UI pack. Do not fold into any EQBuddy item; do not treat as an EQBuddy ask.
+- **Source:** u/cashsusclaymore r/EQLegends Sept 14, 6:01 AM CT (11:01 UTC). https://www.reddit.com/r/EQLegends/comments/1wgx61u/ui_recommendations/ Harvest-only. 8 comments at harvest (2026-09-16 13:31 UTC); OP resolved in-thread ("Yeah. Something like that. Tyvm.", 2026-09-16 13:31 UTC). Thread names "eq buddy" in passing; u/Dranak75 not in the thread.
+- **Ask:** none directed at EQBuddy. OP verbatim: "My ui looks like junk, I'm not inspired to fix it myself. Am I able to find a better smoother ui ? Maybe with mini map ?" and "I'm getting the feeling there's no UI pack like eq buddy or companion ? Maybe I'm asking wrong like my layout sucks."
+- **Comments (harvest colour):** u/LazyTruth147 9-15 8:16 AM CT: "The default UI is beyond bad. If you haven't done it, do /load and pick the modern UI."; u/OneOf8 9-15 10:34 AM CT: in-game map packs (Good's / Bewall's, Drive links); u/danceofjimbeam 9-16 7:59 AM CT: "I'm using https://github.com/itsspin/spinips and am liking it" (third-party UI pack, community, not a DranakCorps artifact — do not link on our side); u/Grammeton 9-16 10:46 PM CT: chat-window / font / transparency tips. All community in-game-UI advice; no EQBuddy-named help.
+- **Already shipped / checked:** none applies — in-game UI is game territory, not EQBuddy's. EQBuddy's map (2D, /loc dot) and the "map should show facing" ask are the closest in-app neighbourhood; do not fold.
+- **Checked:** harvested 2026-09-16 via arctic-shift (post body + all 8 comments). No comment, vote, or message. No thank-you draft — OP resolved in-thread before any reply was warranted; nothing to thank.
+
+
 ### Reddit: Character Sheet Planner thread (bonkedagain33, harvest-only)
 
 - **Priority:** someday (harvest; not authorized. Do not reply on Reddit.)
