@@ -18,6 +18,22 @@
     the pre-DRA-102 behaviour, and a grant decided that way says so.
     -Where prints every store consulted, not just the resolved one.
 
+    CALL THIS THROUGH --git-common-dir (DRA-106, Helm-signed 2026-09-16):
+
+      pwsh -NoProfile -File "$(git rev-parse --path-format=absolute --git-common-dir)/../scripts/claim-seat.ps1" ...
+
+    Resolve the SCRIPT the way DRA-90 already resolves the STORE. A linked
+    worktree shares its clone's store but carries its OWN checkout of this
+    file, so a relative call runs whatever copy that worktree happens to hold
+    — and a pre-DRA-102 copy consults no registry and GRANTS the cross-clone
+    duplicate. Measured same worktree / same card / same second: relative
+    grants, the form above refuses and names the foreign clone.
+    --git-common-dir answers the clone's .git from a linked worktree AND from
+    the main checkout, so one invocation is right everywhere. The relative
+    form is DEMOTED, not removed: it is correct only when the copy you are
+    standing in is current, which is the one thing you cannot see from inside
+    it. No code here enforces this — a stale copy never receives a fix.
+
     -WorkItem IS the Paperclip card id, DRA-<n>, and nothing else (EXO-HARDEN-A2
     / DRA-50, 2026-09-10). A bare GitHub issue number is refused with the reason,
     never silently mapped onto a card: #445 and DRA-28 are two names for one
@@ -47,8 +63,8 @@
     Formal proposal lands in the control-plane repo; this file only verifies.
 
 .EXAMPLE
-    pwsh -NoProfile -File scripts/claim-seat.ps1 -WorkItem DRA-28 -SeatId opus-isolation
-    pwsh -NoProfile -File scripts/claim-seat.ps1 -WorkItem DRA-7 -SeatId x -PaperclipIssue DRA-7
+    pwsh -NoProfile -File "$(git rev-parse --path-format=absolute --git-common-dir)/../scripts/claim-seat.ps1" -WorkItem DRA-28 -SeatId opus-isolation
+    pwsh -NoProfile -File "$(git rev-parse --path-format=absolute --git-common-dir)/../scripts/claim-seat.ps1" -WorkItem DRA-7 -SeatId x -PaperclipIssue DRA-7
 #>
 [CmdletBinding()]
 param(
@@ -159,13 +175,14 @@ if ($List) {
     # measurement swept from one clone is not the machine's rate (the store
     # README says so), so say how many other stores exist and where to see them.
     if (@($foreignStores).Count -gt 0) {
-        Write-Host "($(@($foreignStores).Count) other registered store(s) on this machine are NOT listed above — claim-seat.ps1 -Where names them.)"
+        Write-Host "($(@($foreignStores).Count) other registered store(s) on this machine are NOT listed above — $($script:SoftSeatCallForm -f 'claim-seat.ps1') -Where names them.)"
     }
     exit $listCode
 }
 
 if (-not $WorkItem -or -not $SeatId) {
-    Write-Error 'Usage: claim-seat.ps1 -WorkItem DRA-<n> -SeatId <name> [-Mode active|challenger|disjoint|replacement] [-Branch <ref>] [-Worktree <path>] [-ExecutorPid <n>] [-PaperclipIssue DRA-<n>, same card] | -List | -Where'
+    Write-Error "Usage: $($script:SoftSeatCallForm -f 'claim-seat.ps1') -WorkItem DRA-<n> -SeatId <name> [-Mode active|challenger|disjoint|replacement] [-Branch <ref>] [-Worktree <path>] [-ExecutorPid <n>] [-PaperclipIssue DRA-<n>, same card] | -List | -Where
+(DRA-106: call it through --git-common-dir. A relative path runs THIS worktree's copy, which may predate DRA-102 and grant a duplicate another clone already holds. The relative form still works — it is demoted, not removed.)"
     exit 1
 }
 
@@ -207,7 +224,7 @@ else { Write-Host $result.message }
 # only this line tells them apart (DRA-90 / trap 82). Refusals need it less —
 # a refusal already found somebody — but an unshared store makes a grant a lie.
 if ($result.ok -and $origin.kind -eq 'fallback' -and -not $Json) {
-    Write-Host 'WARNING: this claim was granted from a PRIVATE store (git did not resolve a common dir). A seat in another checkout is invisible to it. Run: claim-seat.ps1 -Where'
+    Write-Host "WARNING: this claim was granted from a PRIVATE store (git did not resolve a common dir). A seat in another checkout is invisible to it. Run: $($script:SoftSeatCallForm -f 'claim-seat.ps1') -Where"
 }
 
 # The same sentence, one level up (DRA-102). A grant decided WITHOUT the union

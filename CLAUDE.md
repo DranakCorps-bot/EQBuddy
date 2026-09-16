@@ -363,9 +363,26 @@ asked in is the first thing you re-read.**
 dotnet build EQBuddy.slnx -c Release
 dotnet test tests/EQBuddy.Tests/EQBuddy.Tests.csproj -c Release
 pwsh -NoProfile -File scripts/check.ps1
-pwsh -NoProfile -File scripts/claim-seat.ps1 -WorkItem DRA-28 -SeatId my-seat
-pwsh -NoProfile -File scripts/release-seat.ps1 -WorkItem DRA-28 -SeatId my-seat
+pwsh -NoProfile -File "$(git rev-parse --path-format=absolute --git-common-dir)/../scripts/claim-seat.ps1" -WorkItem DRA-28 -SeatId my-seat
+pwsh -NoProfile -File "$(git rev-parse --path-format=absolute --git-common-dir)/../scripts/release-seat.ps1" -WorkItem DRA-28 -SeatId my-seat
 ```
+
+**The seat scripts are called through `--git-common-dir`** (DRA-106,
+Helm-signed 2026-09-16) — **resolve the SCRIPT the way DRA-90 already
+resolves the STORE.** A linked worktree shares its clone's store (correct)
+but carries its OWN checkout of `scripts/claim-seat.ps1`, so a relative call
+runs whatever copy that worktree happens to hold — and a pre-DRA-102 copy
+consults no registry and GRANTS the cross-clone duplicate DRA-102 closed.
+Measured same worktree / same card / same second: relative **grants**, the
+resolved form **refuses** and names the foreign clone. `--git-common-dir`
+answers the clone's `.git` from a linked worktree AND from the main
+checkout, so **one invocation is right everywhere** and nothing branches on
+where you are standing. **The relative form is DEMOTED, not removed** — it
+is correct only when the copy you are standing in is current, which is the
+one thing you cannot see from inside it. 72 of 205 worktrees in one clone
+and 6 of 7 in the other were stale on the day this was measured, and a
+stale copy never receives a code fix — so this is a call-site rule, not a
+guard (`claim-seat.ps1` itself is unchanged by it).
 
 Local how-much: [docs/ops/verification-ladder.md](docs/ops/verification-ladder.md).
 Flakes: [docs/ops/flake-ledger.md](docs/ops/flake-ledger.md).
@@ -1112,7 +1129,14 @@ after the named guard left with its surface.
     registry-absent negative beside them. **A seat that never claims is still
     refused by nobody in any clone**, so the remote (`gh pr list` /
     `git ls-remote` for a branch naming the card) stays the only check that
-    crosses everything.
+    crosses everything. **And the store being shared does not make the SCRIPT
+    shared** (DRA-106, 2026-09-16): a linked worktree carries its own checkout,
+    so a relative `scripts/claim-seat.ps1` in a pre-DRA-102 one consults no
+    registry and grants the duplicate — measured both directions, same
+    worktree / same card / same second. Call it through `--git-common-dir`
+    (`## Commands`); the relative form is demoted, not removed. Code on `main`
+    cannot repair this — a stale copy only gets the fix when it updates, at
+    which point it would have had DRA-102 anyway.
 
 New trap discovered the hard way? Add the compact rule here and the novel
 under `docs/ops/claude-archive/traps.md`. That is the whole point.

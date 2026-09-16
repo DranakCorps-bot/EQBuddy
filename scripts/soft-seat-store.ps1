@@ -40,6 +40,18 @@ $script:SoftSeatKeyPattern = '^DRA-\d+$'
 # copies would let the sentence and the behaviour drift apart (trap 4).
 $script:SoftSeatStaleAfterHours = 8
 
+# ONE spelling of the DOCUMENTED call form (DRA-106, Helm-signed 2026-09-16).
+# A linked worktree shares this clone's store (DRA-90) but carries its OWN
+# checkout of claim-seat.ps1, so a RELATIVE call runs whatever copy that
+# worktree happens to hold — and a pre-DRA-102 copy consults no registry and
+# GRANTS the cross-clone duplicate DRA-102 closed. --git-common-dir answers the
+# clone's .git from a linked worktree AND from the main checkout, so one
+# invocation is right everywhere and nothing branches on where you are standing.
+# Held here because the help text and two refusal lines quote it and three
+# copies drift (trap 4). TEXT ONLY: no decision reads it, and the relative form
+# is DEMOTED, not removed, so nothing in flight breaks.
+$script:SoftSeatCallForm = 'pwsh -NoProfile -File "$(git rev-parse --path-format=absolute --git-common-dir)/../scripts/{0}"'
+
 # Where the ONE store lives, and HOW we decided. The 'how' is returned, not
 # just the path, because DRA-90 was reported as "the store is per-working-copy"
 # by an executor who looked at a fresh worktree's .claude/soft-seats/ (README +
@@ -680,7 +692,7 @@ REFUSED: $label is already held by $($holders.Count) live seat(s):
 $($lines -join "`n")
 A default Soft seat on a work item another seat already holds is the duplicate executor this store exists to stop (CLAUDE.md trap 70). A challenger and a disjoint slice HOLD the item too — only an abandoned claim releases it.$staleLine$foreignLine
 If this seat is an explicit challenger, disjoint slice, or replacement, pass -Mode challenger|disjoint|replacement.
-If the holder is gone: pwsh -NoProfile -File scripts/release-seat.ps1 -WorkItem $label -ForceStale
+If the holder is gone: $($script:SoftSeatCallForm -f 'release-seat.ps1') -WorkItem $label -ForceStale
 "@.Trim()
             return [pscustomobject]@{
                 ok                 = $false

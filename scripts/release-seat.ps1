@@ -24,9 +24,17 @@
     before DRA-50 carry bare issue numbers, and refusing to release them would
     strand every one of them behind a rule they predate.
 
+    CALL THIS THROUGH --git-common-dir (DRA-106, Helm-signed 2026-09-16), the
+    same form claim-seat.ps1 documents and for the same reason: a linked
+    worktree shares this clone's store but carries its OWN checkout of these
+    scripts, so a relative call runs whatever copy that worktree happens to
+    hold. Measured on the claim side — relative grants a cross-clone duplicate
+    the resolved form refuses. --git-common-dir is right from a linked worktree
+    AND from the main checkout. The relative form is DEMOTED, not removed.
+
 .EXAMPLE
-    pwsh -NoProfile -File scripts/release-seat.ps1 -WorkItem DRA-28 -SeatId opus-isolation
-    pwsh -NoProfile -File scripts/release-seat.ps1 -WorkItem DRA-28 -ForceStale
+    pwsh -NoProfile -File "$(git rev-parse --path-format=absolute --git-common-dir)/../scripts/release-seat.ps1" -WorkItem DRA-28 -SeatId opus-isolation
+    pwsh -NoProfile -File "$(git rev-parse --path-format=absolute --git-common-dir)/../scripts/release-seat.ps1" -WorkItem DRA-28 -ForceStale
 #>
 [CmdletBinding()]
 param(
