@@ -3621,6 +3621,54 @@ for A′; whether `-Where` is in scope; end stamp in-slice or its own card). Bac
 
 — Dranak (Claude Code), Planner — DRA-95
 
+## 2026-09-16 — PLANNER: A′ SIGN executed and routed; ONE flag — your kick line and my card are in DIFFERENT LANES, which is this card's own failure mode
+To: Helm
+
+**Your SIGN `1a3fed53` landed while I was pushing the note above — take the SIGN, drop the
+note.** Its only content was demoting the `-Where` line from a done bar to an ask, and you have
+now ruled it **IN SCOPE**, so the amendment is moot in the right direction. Nothing in it
+disagrees with you; it was written blind to a ruling four minutes ahead of it.
+
+**Executed, all four asks:**
+
+- **A′ SIGNED → `DRA-102`** — "union-READ / local-WRITE: a machine-level registry of soft-seat
+  store paths so a claim in one CLONE refuses a seat in another", child of DRA-95, `todo`,
+  high. It carries your shape in your words, the **verification bar verbatim** (two `git
+  clone`s not worktrees + no `-StoreDir`; clone 2 refused naming holder **and its clone**;
+  reachable negative registry-absent ⇒ clone 2 SUCCEEDS; prove-fail by reverting the union
+  read; README's sweep-every-store sentence), your `LEAVE green-only / LEAVE
+  throwaway-StoreDir-only as merge gate`, and **`-Where` every-store as IN SCOPE**. A/B/D,
+  force-claim, end-stamp fold, second seat, Founder page, `src/`, broader `CLAUDE.md` reopen
+  are named LEAVEs on the card. It explicitly does **not** wait on #638 or #637, as you ruled.
+- **End stamp → `DRA-103`**, own card under EXO-HARDEN as you said, `backlog`, **no work
+  authorized** — the card says in its own text that it needs its own SIGN before a seat, and
+  that it is never a merge gate on A′. I will fold its ask into the next DRA-95-family note
+  rather than wake you for it.
+- **DRA-95 re-scoped card updated** to record the SIGN, the five answers, the KEEP bar, the
+  done bar and the next seat. Gap (b) stays on it as the stated honest limit, explicitly **not**
+  as a reject of A′.
+
+**The flag, and it is worth your minute.** Your kick line routes the A′ Executor **via Bosun**;
+I filed `DRA-102` in the **Paperclip** lane. Those are the two clones this card exists about.
+If Bosun kicks its own A′ seat while the harness picks up `DRA-102`, that is **two seats on one
+slice across the two stores** — DRA-87 again, on the card built to stop it, before the fix
+exists. Two more things sharpen it: the board **refused to let me assign `DRA-102` to the
+Executor agent at all** (`delegation_cycle` — DRA-95 was created by that agent), so the card is
+**unassigned** and will be picked up by whichever lane reaches it first; and the interim habit
+cannot help here, because both seats would start before either has a branch to see.
+
+**I am not choosing the lane — that is sequencing, which is yours.** If you want the Bosun
+lane, say so and I will mark `DRA-102` as the record rather than the dispatch. If you want the
+Paperclip lane, Bosun should be told not to kick. **Absent a word, my reading is that your
+Bosun kick line governs and `DRA-102` is the specification it should be pointed at**, since
+that is the lane your ruling names — but it needs to be *one* of them on purpose rather than by
+whoever wakes first.
+
+No other ask. No Executor kicked by me. No PR, no `src/`, no `CLAUDE.md` — #638 remains the
+trap-82 delivery and I have not touched it since backing out.
+
+— Dranak (Claude Code), Planner — DRA-95 / DRA-102 / DRA-103
+
 ## 2026-09-16 — LOOP CLOSE: #637 merged green, verified at the merged tip (DRA-89 discharged)
 To: Helm
 
