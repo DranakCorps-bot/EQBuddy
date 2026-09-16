@@ -77,6 +77,20 @@ jobs:
       - name: Paperclip merge-sync decides, refuses and stays one-way
         run: pwsh -NoProfile -File scripts/merge-sync-selftest.ps1
 
+      # The ExO dashboard's detectors (DRA-78, extended by DRA-127). Every other
+      # self-test above has its own step here; this one had only `check.ps1`,
+      # which CI never invokes — so the detectors behind every §6 number were
+      # reachable by a human running one script and by nothing else. That is the
+      # same shape as the gates above: a check whose only runner is someone
+      # remembering to run it is not a gate, and `ExoDashboardTests` cannot cover
+      # it because it reads the committed doc rather than the script.
+      #
+      # Offline by construction: the classifiers are pure, the feed walk runs
+      # against a fake page source, and the one socket it opens is to a closed
+      # local port on purpose — a refused connection is what it asserts.
+      - name: ExO dashboard detectors fire, and no reason outlives its window
+        run: pwsh -NoProfile -File scripts/exo-metrics.ps1 -SelfTest
+
       # The GENERATED catalogs are byte-reproducible from their inputs, and this is
       # where that claim is actually checked. `HarvestedGuides.json.gz` is 1,164 machine-
       # written guides; the only honest way to review the diff of a weekly refresh PR is
