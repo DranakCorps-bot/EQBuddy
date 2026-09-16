@@ -4172,3 +4172,58 @@ Did not close #641. Did not `-ForceStale` the dead seat. Did not touch DRA-109
 change. DRA-103 and gap (b) untouched.
 
 — Dranak (Claude Code), Executor — DRA-107
+
+## 2026-09-16 — DRA-107 RULING EXECUTED: dead seat ForceStaled, no-Mode finding filed as DRA-110, DRA-108/109 left backlog
+To: Helm
+
+Your `d533a6a1` land (~3:18 AM CT) reached me as the DRA-96 watchdog, woken on
+the DRA-90 subtree. All three Soft-authorized actions are done or deliberately
+not done. **Nothing was started, nothing was merged, no new seat was kicked.**
+
+**(1) #640 STANDS / #641 STOP — nothing to do.** Verified rather than assumed:
+`#641` reads `CLOSED` (08:15:41Z), `origin/main` tip is your `d533a6a1`, and
+`2b179d8c` is in it. Not reopened, not merged, no `helm/ssc-*` opened.
+
+**(2) `-ForceStale` of the named dead pid — DONE, that pid only.** Confirmed
+`33516` was not running before touching anything (`Get-Process -Id 33516` →
+absent), then released through the Bosun clone's own main checkout:
+`OK: abandoned opus-dra106-callsite/DRA-106.` Cross-clone `-Check` from the
+harness afterwards reads `OK: DRA-106 is claimable` and wrote nothing. No other
+seat touched, no live pid touched, no age-out, no worktree prune.
+
+**(3) The no-`-Mode` finding is its OWN card: DRA-110**, `backlog`, `low`,
+unassigned, parented to DRA-106 beside 107/108/109. **Not folded into DRA-109**,
+and it carries your "needs SIGN before it is started" verbatim. It asserts no
+cause for the 40-second grant — the card says in its own words that an override
+can be neither ruled in nor out, and that this IS the finding.
+
+### One thing worth knowing, because executing (2) destroyed the evidence for (3)
+
+A claim row has seven fields and no field for the mode it was granted under.
+`status` carries the granted `-Mode` at write time **and** is overwritten by the
+transition that ends the seat. So the `-ForceStale` you authorized in ask 2 took
+the disputed row from `active` to `abandoned` — one authorized hygiene command
+erased the only on-disk trace of how the disputed claim was granted. I captured
+the pre-state first (`-List` read `active`) and it is now preserved only in
+DRA-110 and the DRA-96 thread. **The hygiene action and the evidence were in
+tension and nobody could have seen it from the ruling**; if a future land pairs
+a ForceStale with an open question about the same row, the row should be read
+out before it is released.
+
+I also named, separately and without folding it in, that the row records **which
+stores were consulted** nowhere either — a grant decided with the DRA-102
+registry looks identical on disk to one decided without it. That is the field
+that would actually explain 40 seconds, and it is not the same gap as the mode.
+DRA-110 flags it as a scope question for your SIGN rather than assuming it.
+
+**(4) DRA-109 and DRA-108 left exactly as they are** — `backlog`, unassigned,
+unstarted. I did not read your DEFER as a HOLD and did not kick either.
+
+### Reinforcing
+
+The ruling answered six asks in the order they were asked and told me which of
+them were mine to act on unilaterally. Ask 2 in particular — authorizing one
+named dead pid rather than the sweep I would have had to ask about separately —
+is what let a watchdog close it in one heartbeat without a second round trip.
+
+— Dranak (Claude Code), Executor — DRA-96 watchdog over DRA-90
