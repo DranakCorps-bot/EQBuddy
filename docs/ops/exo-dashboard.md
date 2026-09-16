@@ -201,3 +201,426 @@ Needs `gh` authenticated against the repo and, for the cost and queue columns,
 `PAPERCLIP_API_URL` / `PAPERCLIP_API_KEY` / `PAPERCLIP_COMPANY_ID`. Without them
 the GitHub-derived rows still compute and the Paperclip-derived ones read
 `unmeasured` — `-NoPaperclip` makes that explicit.
+
+---
+
+# Reading 2 — the post-M0-cutover window (PRs #619–#643)
+
+> **This is a reading. It is not a verdict.** Playbook §10.1: no experiment
+> graduates on vibes, and a graduation ruling is Helm T2 doctrine in any case.
+> Nothing below decides whether `ssc-retirement` or `whole-sequence-auth`
+> graduates — that is a separate act on a separate card. Produced by DRA-118,
+> which was scoped to the reading and explicitly forbidden the verdict.
+
+The section above this line is the **frozen pre-migration baseline** and was not
+touched: its bytes are identical to what they were before this section was
+appended. That is the whole point of having frozen it — the comparison below is
+only worth anything because the first number was written down first.
+
+## R2.0 Bounds of this window
+
+| | Value |
+|---|---|
+| **Start** | `2026-09-14 21:49 UTC` — first commit of slice `dra81-smoke` (PR #619) |
+| **End** | `2026-09-16 20:36 UTC` — merge of PR #643, the newest merge on the repo at run time |
+| **PR range** | **#619–#643 inclusive** — 23 merged, 2 closed-unmerged (#621, #641) |
+| **Slices** | 23 total, 21 delivery, 2 plan |
+| **Baseline this is compared against** | PRs #580–#607, closed `2026-09-14 11:35:30 UTC` (`docs/ops/exo-baseline.json`) |
+
+### Why the window starts at #619 and not #608
+
+DRA-118 asked for "the first merge after the baseline's close at
+2026-09-14T11:35 UTC". Read literally that bound is **#608**, which merged at
+`14:25 UTC` that day. But **#608–#618 are the M0 cutover PRs themselves**:
+
+| PR | What it is |
+|---|---|
+| #608 | DRA-74 **M0-1** — retires the SSC-PR pattern; **this is the PR that registered both `ssc-retirement` and `whole-sequence-auth`** |
+| #609 | DRA-74 flake-ledger follow-on |
+| #610 | DRA-75 **M0-2** — channel rotation |
+| #616 | DRA-78 **M0-5** — froze the baseline this section compares against |
+| #617 | DRA-76 **M0-3** — seat mutex |
+| #618 | DRA-77 **M0-4** — merge-sync |
+
+Counting the migration's own PRs as post-cutover delivery would score the
+cutover against the model it installed, and would fold the baseline-freezing PR
+into the window being compared to that baseline. So the primary window opens at
+the first slice merged after the M0 set was fully on `main` — **#619**, which is
+also the range DRA-118's own title names.
+
+The literal bound was not discarded. It was **run**, and appears as the
+sensitivity check in `R2.0.2` below, so that the choice of bound is visible
+rather than assumed.
+
+## R2.0.1 The two readings this window was run for
+
+Both "vs baseline" figures below come from `docs/ops/exo-baseline.json`. **No §6
+KPI was re-derived by hand** — that property is itself the judging metric for
+`metrics-baseline`, and it is recorded in `R2.0.3`.
+
+### `ssc-retirement` — judged by *PRs + Helm touches per slice*, net of *veto rate* and *rework rate*
+
+| Term | Baseline (#580–#607) | This window (#619–#643) | Δ |
+|---|---|---|---|
+| PRs per delivered slice | 2.15 | **1.09** | −1.06 |
+| Helm touches per delivery slice | 2.1 | **1.62** | −0.48 |
+| — governance-only PR share | 50% | **0%** | −50 pp |
+| *net of* veto rate | 0% (0 rulings) | **0%** (0 rulings) | 0 pp |
+| *net of* rework rate | 3.7% (1 of 27) | **0%** (0 of 23) | −3.7 pp |
+
+**Net of its named quality cost, this reading is not paid for in the window it
+was taken in**: neither term the tag names as the cost — veto rate, rework rate
+— worsened; both are flat or lower.
+
+Two things the number carries that a reader should not have to infer:
+
+- The `helm/ssc-N` twin PR is *gone by construction*, not by improvement. The
+  governance-only share falling 50% → 0% is the mechanical consequence of
+  retiring the pattern, and it accounts for most of the PRs-per-slice drop. The
+  Helm-touches term is the one that moved for reasons a reader must judge.
+- **0 of 23 is a small denominator.** It is consistent with "no rework", and
+  equally consistent with a true rework rate anywhere below roughly 4%. It does
+  not distinguish them, and one window cannot.
+
+> The tag in `DECISIONS.md` cites "baseline 2.3 PRs/slice, ≥2 touches/slice".
+> The frozen baseline says **2.15** and **2.1**. The tag was written before the
+> freeze landed; the frozen file is authoritative here, per DRA-118 step 3.
+
+### `whole-sequence-auth` — judged by *Governance Wait Ratio* and *ACCR*, net of *escaped defect rate*
+
+| Term | Baseline (#580–#607) | This window (#619–#643) | Δ |
+|---|---|---|---|
+| Governance Wait Ratio | 0.49 | **0.60** | **+0.11** |
+| Autonomous Correct Completion Rate | 0% (0 of 10) | **5%** (1 of 21) | +5 pp |
+| *net of* escaped defect rate | `unmeasured` | **`unmeasured`** — see `R2.0.3` | — |
+
+**This experiment cannot be stated net of its quality cost, and that is a
+finding, not a formatting problem.** Its tag says "stated net of *escaped defect
+rate*", and that metric reads `unmeasured` in this window exactly as it did at
+baseline. Per doctrine entry 1 it reads `unmeasured` **with its reason** rather
+than `0` — and the reason the instrument prints for it is now wrong. See
+`R2.0.3`.
+
+**The headline ratio rose. Its decomposition says where from** — stated because
+a single number would hide it, not in order to argue anything from it:
+
+| GWR term | Baseline | This window |
+|---|---|---|
+| Product-PR wait | 15.1 h | **28.8 h** |
+| Authorization gaps | 7.9 h across 7 gaps | **2.2 h across 4 gaps** |
+| `helm/ssc-N` wait beyond the above | 1.4 h | **0 h** |
+| Lead time (denominator) | 40.8 h over 4 items | 48.2 h over 16 items |
+
+- The **authorization-gap term fell by 72%** (7.9 h → 2.2 h). That is the term
+  whole-sequence-auth exists to move.
+- The **product-PR wait roughly doubled**, and it is concentrated in one slice:
+  `dra84-d3-refreshstamp` (#627) held **27.69 h** of the window's 28.8 h — about
+  **96%** of all product wait in the window sat in a single PR.
+- The `helm/ssc-N` term went to a **measured zero**, which is a measured zero and
+  not an `unmeasured`: the pattern was retired, so the branches do not exist.
+
+Whether a ratio that rose while its own target term fell 72%, on a denominator
+that changed from 4 work items to 16, means anything about the experiment is
+precisely the judgement this card does not make.
+
+## R2.0.2 Sensitivity: the literal "first merge after the baseline" bound
+
+The same script, same end bound, opened at **#608** instead — i.e. including the
+M0 cutover PRs — so the choice in `R2.0` is checkable rather than asserted:
+
+| Term | Baseline | Primary **#619–#643** | Sensitivity **#608–#643** |
+|---|---|---|---|
+| Governance Wait Ratio | 0.49 | 0.60 | 0.57 |
+| ACCR | 0% (0/10) | 5% (1/21) | 8% (2/25) |
+| PRs per delivered slice | 2.15 | 1.09 | 1.24 |
+| Helm touches per delivery slice | 2.1 | 1.62 | 1.60 |
+| Governance-only PR share | 50% | 0% | 0% |
+| Veto rate | 0% | 0% | 0% |
+| Rework rate | 3.7% (1/27) | 0% (0/23) | 0% (0/29) |
+| Product-PR wait | 15.1 h | 28.8 h | 31.8 h |
+| Authorization gaps | 7.9 h / 7 gaps | 2.2 h / 4 gaps | 2.5 h / 5 gaps |
+| Escaped defect rate | `unmeasured` | `unmeasured` | `unmeasured` |
+
+**The bound choice does not change the shape of the reading.** Every term moves
+the same direction by a similar amount under both bounds. Nothing in `R2.0.1`
+rests on having opened the window at #619 rather than #608.
+
+Reproduce the sensitivity column with:
+
+```bash
+pwsh -NoProfile -File scripts/exo-metrics.ps1 -FromPr 608 -ToPr 643 -WindowLabel 'sensitivity: literal post-baseline bound — PRs #608-#643'
+```
+
+## R2.0.3 Instrument notes from this run
+
+**`scripts/exo-metrics.ps1 -SelfTest` passed in full before the window run**, so
+the detectors that produced every number above are known to fire.
+
+**1. `metrics-baseline`'s judging metric held.** Its tag asks whether a later
+window's "vs baseline" column fills from `docs/ops/exo-baseline.json` alone,
+with no §6 KPI recomputed by hand. It did: the script read the frozen JSON and
+filled the column mechanically. Stated net of what that tag names as its cost —
+*the count of metrics still reading `unmeasured`* — the count went from **2 at
+baseline to 1 here**:
+
+| Metric | Baseline | This window |
+|---|---|---|
+| Escaped defect rate per tier | `unmeasured` | `unmeasured` — still |
+| Cost per delivered slice | `unmeasured` (no run records) | **measured**: 0 cents · 608,442 tokens/slice |
+
+`costCents` remains 0 across the board. That is a **billing shape, not a
+measurement** — the account bills by subscription rather than per token — which
+is why tokens are carried beside the cents rather than instead of them.
+
+**2. The escaped-defect row's stated reason is now false, and the row is
+hardcoded.** `Escaped defect rate` is emitted as a literal `unmeasured` at
+`scripts/exo-metrics.ps1:1249`; no code path computes it. The reason printed
+beside it at `:1359` reads *"the tier model (plan §2.1) did not exist during
+this window"* — true of the baseline window, **false of this one**: DRA-74
+landed the tier model, and PRs in this window carry tiers. The honest reason is
+that **there is no player-reported-defect feed wired into the instrument at
+all**, for any window.
+
+This matters beyond tidiness. `whole-sequence-auth` is defined as *stated net of
+escaped defect rate*, so for as long as that row is a hardcoded constant, this
+experiment has no measurable quality cost to be stated net of — and a graduation
+that cited the GWR and ACCR alone would be citing half its own definition. That
+is recorded here and carried to a follow-up card; DRA-118 was explicitly
+forbidden from changing metric definitions, so nothing in the instrument was
+edited by this run.
+
+**3. `merge-sync` remains inert, as DRA-118 anticipated.** `gh secret list
+--repo DranakCorps-bot/EQBuddy` returns **zero secrets**, so none of the three
+the job needs — `PAPERCLIP_API_URL`, `PAPERCLIP_API_KEY`, `PAPERCLIP_COMPANY_ID`
+— exist. Its merge-to-close latency is therefore not measured here, because the
+job has never run. Out of scope per the card: recorded, moved past.
+
+**4. The window's start is a first *commit*, not a first merge.** `R2.0`'s
+`21:49 UTC` is when slice `dra81-smoke` began, which is how the script bounds a
+window. The merge that closes #619 is `22:37 UTC`.
+
+## R2.0.4 What is left open
+
+Named so that the next card does not have to rediscover it:
+
+- **No verdict is written here**, by design. Whether these readings graduate
+  `ssc-retirement` or `whole-sequence-auth` is a Helm T2 ruling on a separate
+  card.
+- **Escaped defect rate** is unmeasurable by construction (note 2 above), which
+  bounds what any `whole-sequence-auth` ruling can honestly claim.
+- **`merge-sync` is unread** because it has never executed (note 3 above).
+- **One slice holds 96% of the window's product-PR wait.** Whether #627 is a
+  representative slice or an outlier that should be reported separately is a
+  question about the *instrument's* definition, and changing that definition was
+  out of scope for this card.
+
+---
+
+Everything below this line is **verbatim `scripts/exo-metrics.ps1` output** for
+the primary window, minus its `# ExO execution dashboard` title line. The only
+edit is the heading numbers, prefixed `R2.` so they do not collide with the
+frozen baseline's §1–§8 above. **No cell was changed.**
+Prose inside it that says "see §5" or "see §6" means the correspondingly
+numbered `R2.` subsection below; "plan §6" and "plan §10.3" mean the DRA-73 plan,
+as they do in the baseline section.
+
+Generated by `scripts/exo-metrics.ps1` — DRA-73 plan §6 (metric table) and
+§10.3 (experiments in flight). Window: **post-M0-cutover window — PRs #619-#643**, 2026-09-14 21:49 → 2026-09-16 20:36 UTC.
+
+Every row is computed from data that already existed: PR timestamps, workflow
+runs, `HELM.md` commits, `docs/ops/flake-ledger.md`, and Paperclip issue records.
+**A metric whose data does not exist in the window reads `unmeasured`, with the**
+**reason** — never `0`. An unmeasured metric and a measured zero are different
+claims, and reading one as the other is how a dashboard starts lying.
+
+---
+
+## R2.1 Headline KPIs
+
+| KPI | Reading | Plan §6 target after M2 |
+|---|---|---|
+| **Governance Wait Ratio** | **0.6** | < 0.15 |
+| — same, counting `helm/ssc-N` PR wait too | 0.6 | — |
+| **Autonomous Correct Completion Rate** | **5%** | > 70% |
+| PRs per delivered slice | 1.09 | ~1.05 |
+| — of which governance-only PRs | 0% | 0% |
+| Helm touches per delivery slice | 1.62 | < 0.3 |
+| Median CI runtime | 15.4 min (range 12.8–384.3) | unchanged (the merge bar) |
+| T0/T1 merge latency (median executor PR open→merge) | 0.41 h | ≈ CI time |
+
+### How the Governance Wait Ratio is built
+
+- **Product-PR wait** — the hours a product or plan PR stayed open after CI had
+  finished with it: **28.8 h**.
+- **Authorization gaps** — previous slice merged → next slice's first commit, for
+  consecutive delivery slices of one work item: **2.2 h** across 4 gap(s).
+- **`helm/ssc-N` wait, beyond the above** — **0 h**. Reported separately because
+  it is the second reading's whole difference, and because it is the term cutover 1
+  (DRA-74) deletes outright rather than shortens.
+- **Lead time** — Σ per-work-item (accepted, or first commit, → last merge): **48.2 h**.
+
+**These hours are UNION-ed, not summed.** A slice's product PR and its `helm/ssc-N`
+twin sat open across the same hours waiting on the same person; adding their waits
+would report more wait than the window contains, and the ratio could exceed 1.
+Elapsed time is what a wait costs, so elapsed time is what is counted.
+
+The headline figure uses the plan §6 terms (product wait + authorization gaps), so
+it is the one comparable to the < 0.15 target. The second line adds the hours an
+SSC PR spent open on its own — governance overhead by construction. Both are
+printed because the M2 comparison has to be made against the same definition it was
+frozen at, and a single number would hide which one that is.
+
+The authorization-gap term is an **upper** bound on what a process change can
+recover: it also contains the executor's own startup (claim-seat, context read),
+which no cutover removes.
+
+## R2.2 The §6 metric table
+
+| Metric | Computation | Reading |
+|---|---|---|
+| Lead time | issue accepted (or first commit) → last PR merged, per work item | 48.2 h total over 16 item(s) |
+| Governance Wait Ratio | Σ(open→merge − CI) + Σ(auth gaps) ÷ lead time | 0.6 |
+| Autonomous Correct Completion Rate | slices with zero Helm/Founder pre-merge touches and no rework within 14 d | 5% (1 of 21) |
+| Queue latency by role | issue created → first action | see §5 |
+| Handoff delay | plan merged → first executor commit | median 0.29 h |
+| Helm/Founder intervention % | delivery slices with ≥1 pre-merge touch ÷ slices | 95% (20 of 21) |
+| Veto rate | Helm/Bevel post-merge vetoes ÷ delivery merges | 0% (0 veto ruling(s)) |
+| Rework rate | PRs reverting/re-landing a ≤14-day-old merge ÷ merged PRs | 0% (0 of 23) |
+| Escaped defect rate | player-reported defects per tier | `unmeasured` — see §6 |
+| CI failure/flake split | red runs: filed as flake vs unfiled | 8 red event(s), 2 filed — see §4 |
+| PRs + Helm touches per slice | count | 1.09 PRs/slice, 1.62 Helm touches/delivery slice |
+| Cost per delivered slice | Paperclip run cost ÷ slices delivered | 0 cents · 608,442 tokens — see §5 and §6 |
+
+## R2.3 Slices in the window
+
+| Slice | Work item | Kind | PRs | Helm touches | First commit → final merge | Wait (h) |
+|---|---|---|---|---|---|---|
+| `dra81-smoke` | DRA-81 | delivery | #619 | 2 | 09-14 21:49 → 09-14 22:37 | 0.19 |
+| `dra57-pages` | DRA-57 | delivery | #620 | 2 | 09-15 00:11 → 09-15 00:25 | 0.01 |
+| `dra83-guideattachment` | DRA-83 | delivery | #622 | 1 | 09-15 00:34 → 09-15 00:58 | 0.14 |
+| `dra84-farmgear` | DRA-84 | plan | #623 | 1 | 09-15 00:38 → 09-15 00:53 | 0.01 |
+| `dra80-exometrics-guard` | DRA-80 | delivery | #624 | 1 | 09-15 01:06 → 09-15 01:31 | 0.15 |
+| `dra84-d1` | DRA-84 | delivery | #625 | 1 | 09-15 01:11 → 09-15 02:13 | 0.77 |
+| `dra84-d3` | DRA-84 | delivery | #626 | 3 | 09-15 01:31 → 09-15 01:45 | 0 |
+| `dra84-d3-refreshstamp` | DRA-84 | delivery | #627 | 1 | 09-15 01:51 → 09-16 05:47 | 27.69 |
+| `dra84-d3-sentences` | DRA-84 | delivery | #628 | 1 | 09-15 01:52 → 09-15 02:08 | 0 |
+| `dra56-turquoise-landing` | DRA-56 | delivery | #629 | 2 | 09-15 02:26 → 09-15 02:51 | 0.15 |
+| `dra84-d2` | DRA-84 | delivery | #630 | 1 | 09-15 02:56 → 09-15 03:35 | 0.03 |
+| `dra68-docs-honest-sources` | DRA-68 | delivery | #631 | 2 | 09-15 03:48 → 09-15 06:17 | 2.04 |
+| `dra86-bard-woolen-caveat` | DRA-86 | delivery | #632 | 1 | 09-15 04:10 → 09-15 05:00 | 0.07 |
+| `dra84-d4` | DRA-84 | delivery | #633 | 1 | 09-15 04:40 → 09-15 05:30 | 0.37 |
+| `dra84-d5` | DRA-84 | delivery | #634 | 1 | 09-15 05:45 → 09-15 06:27 | 0.44 |
+| `dra87-docs-honesty` | DRA-87 | delivery | #635 | 3 | 09-15 06:28 → 09-15 06:47 | 0.05 |
+| `dra90-seat-store-discovery` | DRA-90 | delivery | #636 | 2 | 09-15 07:48 → 09-15 08:19 | 0.29 |
+| `dra89-outputfile-row-guard` | DRA-89 | delivery | #637 | 3 | 09-16 06:08 → 09-16 06:24 | 0 |
+| `bosun-dra96-trap82` | DRA-96 | delivery | #638 | 4 | 09-16 06:09 → 09-16 06:23 | 0 |
+| `dra102-seat-store-registry` | DRA-102 | delivery | #639 | 1 | 09-16 06:47 → 09-16 07:04 | 0 |
+| `dra107-seat-callsite-resolution` | DRA-107 | delivery | #640 | 1 | 09-16 07:54 → 09-16 08:09 | 0 |
+| `dra98-learning-loop` | DRA-98 | plan | #642 | 0 | 09-16 13:17 → 09-16 19:41 | 0 |
+| `exo/dra55-mojibake-repair` | DRA-55 | delivery | #643 | 0 | 09-16 20:04 → 09-16 20:36 | 0 |
+
+**Slices that consumed PRs and delivered nothing** — counted in the PR-traffic
+ratio above, because a ratio that drops them flatters the model with its own waste:
+
+| Slice | Work item | PRs | What happened |
+|---|---|---|---|
+| `dra84-farmgear-plan` | DRA-84 | #621 | delivery PR `CLOSED` |
+| `dra106-callsite` | DRA-106 | #641 | delivery PR `CLOSED` |
+
+**Authorization gaps between consecutive slices:**
+
+| Work item | After | Before | Hours |
+|---|---|---|---|
+| DRA-84 | `dra84-d2` | `dra84-d4` | 1.08 |
+| DRA-84 | `dra84-d3-sentences` | `dra84-d2` | 0.81 |
+| DRA-84 | `dra84-d4` | `dra84-d5` | 0.25 |
+| DRA-84 | `dra84-d3` | `dra84-d3-refreshstamp` | 0.1 |
+
+## R2.4 CI: failure vs flake
+
+A run is **red** if it concluded `failure` **or** if it needed a second attempt —
+a rerun-to-green overwrites the run's conclusion, so counting conclusions alone
+undercounts exactly the reds the flake ledger exists for. A red is **filed** when
+its run id appears in `docs/ops/flake-ledger.md`.
+
+| Run | Branch | Attempt | Conclusion | Scope | Filed as a flake |
+|---|---|---|---|---|---|
+| `34902911899` | `opus-dra81-smoke` | 1 | failure | window PR branch | no |
+| `34928105133` | `opus-dra86-bard-woolen-caveat` | 2 | success | window PR branch | **yes** |
+| `34932892258` | `claude/opus-dra68-docs-honest-sources` | 1 | failure | window PR branch | **yes** |
+| `34933036155` | `main` | 1 | failure | main (post-merge) | no |
+| `35062047409` | `main` | 1 | failure | main (post-merge) | no |
+| `35072277941` | `main` | 1 | failure | main (post-merge) | no |
+| `35084582549` | `main` | 1 | failure | main (post-merge) | no |
+| `35092552180` | `main` | 1 | failure | main (post-merge) | no |
+
+1 red event(s) on PR branches are **unfiled**. "Passed on rerun" is an
+observation, not a resolution — an unfiled red is a row `docs/ops/flake-ledger.md`
+should have and does not, and this split is the number that says so.
+
+## R2.5 Work items, queue latency and cost
+
+| Work item | Delivery slices | Queue latency (created→first action) | Lead time (h) | Paperclip runs | Cost |
+|---|---|---|---|---|---|
+| DRA-102 | 1 | 0.73 h | 0.3 | 3 | 0 cents · 317,333 in / 122,749 out tokens |
+| DRA-107 | 1 | 0.17 h | 0.43 | 3 | 0 cents · 224,137 in / 101,186 out tokens |
+| DRA-55 | 1 | 145.98 h | 0.7 | 8 | 0 cents · 268,862 in / 135,852 out tokens |
+| DRA-56 | 1 | 103.02 h | 1.75 | 3 | 0 cents · 314,914 in / 130,619 out tokens |
+| DRA-57 | 1 | 101.8 h | 0.34 | 6 | 0 cents · 98,176 in / 23,600 out tokens |
+| DRA-68 | 1 | 76.39 h | 2.49 | 13 | 0 cents · 1,189,325 in / 290,291 out tokens |
+| DRA-80 | 1 | 6.31 h | 0.68 | 5 | 0 cents · 338,936 in / 98,081 out tokens |
+| DRA-81 | 1 | 0.03 h | 0.8 _(clamped)_ | 5 | 0 cents · 255,854 in / 35,063 out tokens |
+| DRA-83 | 1 | 0 h | 2.35 | 5 | 0 cents · 533,465 in / 205,516 out tokens |
+| DRA-84 | 7 | 29.47 h | 29.16 | 18 | 0 cents · 1,897,457 in / 541,941 out tokens |
+| DRA-86 | 1 | 2.96 h | 1.05 | 7 | 0 cents · 511,510 in / 126,387 out tokens |
+| DRA-87 | 1 | 0.4 h | 0.49 | 8 | 0 cents · 627,256 in / 170,826 out tokens |
+| DRA-89 | 1 | 23.45 h | 0.36 | 4 | 0 cents · 144,686 in / 41,084 out tokens |
+| DRA-90 | 1 | 1.04 h | 0.69 | 23 | 0 cents · 2,399,042 in / 756,089 out tokens |
+| DRA-96 | 1 | 24.6 h | 0.24 | 6 | 0 cents · 690,357 in / 186,695 out tokens |
+| DRA-98 | 0 | 18.93 h | 6.41 | 5 | 0 cents · 74,814 in / 34,628 out tokens |
+
+_(clamped)_ — the work item was accepted before this window opened, so its lead
+time is measured from its first commit **in** the window. Letting a standing lane
+contribute its whole open life to the denominator would divide the Governance Wait
+Ratio down by an amount that has nothing to do with governance.
+
+## R2.6 What this window could NOT measure, and why
+
+- **Escaped defect rate per tier.** The tier model (plan §2.1) did not exist during
+  this window, so no merge in it carries a tier. The metric becomes computable for
+  windows after M0; it is `unmeasured` here rather than `0`, because nobody looked.
+- **Queue latency by role** is reported as issue-created → first action, which is the
+  latency the Paperclip record can actually support. A per-wake latency needs
+  heartbeat-run records, which these work items do not have.
+
+## R2.7 Experiments in flight (plan §10.3)
+
+Read from the `exo-experiment:` tags §10.1 requires on every process change, so
+that doctrine capture at an M-checkpoint is a copy step and not an archaeology
+project. **An untagged experiment does not appear here** — which is the point: the
+tag is what the playbook cites.
+
+| Experiment | Judging metric | Frozen baseline | Current reading |
+|---|---|---|---|
+| `merge-sync` | judged by *merge-to-close latency*: the wall time from a PR merging to its linked issue reaching a terminal state. The observed failure is days (EXO-HARDEN-A2, EQ-V2-HOME-CATCHUP sat `in_review` long after the work was on `main`), and the target is minutes, because the run starts on the merge event. Stated net of the **wrong-close count** — issues this job moved to `done` that a human then reopened. A sync that closes the wrong card is not faster than the drift, it is just more confident, and the same "state net of the harm" shape the seat-mutex tag uses for false blocks. | GWR 0.49 · ACCR 0% · 2.15 PRs/slice · 2.1 Helm touches/slice · veto 0% · rework 3.7% | GWR 0.6 · ACCR 5% · 1.09 PRs/slice · 1.62 Helm touches/slice · veto 0% · rework 0% |
+| `seat-mutex` | judged by *rework rate* and *PRs per delivered slice* (baseline 3.7% and 2.15), because a duplicate executor spends both: #566/#568 cost one full run and produced a second PR for one slice. Stated net of the **false-block count** kept in `.claude/soft-seats/README.md`'s evidence list — a mutex that refuses work that should have started is not cheaper than the collision, it is just quieter. | GWR 0.49 · ACCR 0% · 2.15 PRs/slice · 2.1 Helm touches/slice · veto 0% · rework 3.7% | GWR 0.6 · ACCR 5% · 1.09 PRs/slice · 1.62 Helm touches/slice · veto 0% · rework 0% |
+| `metrics-baseline` | judged by *whether a later window's claim can be checked against it without re-deriving the window*: concretely, whether the §10.3 "current vs baseline" column fills from `docs/ops/exo-baseline.json` alone at the M2 checkpoint, without any §6 KPI being recomputed by hand. Stated net of the count of metrics still reading `unmeasured`. | GWR 0.49 · ACCR 0% · 2.15 PRs/slice · 2.1 Helm touches/slice · veto 0% · rework 3.7% | GWR 0.6 · ACCR 5% · 1.09 PRs/slice · 1.62 Helm touches/slice · veto 0% · rework 0% |
+| `channel-rotation` | judged by *rework rate* (baseline 3.7%), counting a channel-file clobber, a silently truncated append or a mojibake re-encode as rework, because that is the class trap 60 records three times in six days and the only §6 term this change can move. **Stated net of the effect that is NOT a §6 metric at all:** the bytes an agent must read before it can append correctly. That is the reason the rotation was worth doing and there is no KPI for it, so a later graduation entry cites the rework rows and says the primary benefit went unmeasured rather than mapping it onto a number it did not move. | GWR 0.49 · ACCR 0% · 2.15 PRs/slice · 2.1 Helm touches/slice · veto 0% · rework 3.7% | GWR 0.6 · ACCR 5% · 1.09 PRs/slice · 1.62 Helm touches/slice · veto 0% · rework 0% |
+| `ssc-retirement` | judged by *PRs + Helm touches per slice* (baseline 2.3 PRs/slice, ≥2 touches/slice), stated net of *veto rate* and *rework rate*. | GWR 0.49 · ACCR 0% · 2.15 PRs/slice · 2.1 Helm touches/slice · veto 0% · rework 3.7% | GWR 0.6 · ACCR 5% · 1.09 PRs/slice · 1.62 Helm touches/slice · veto 0% · rework 0% |
+| `whole-sequence-auth` | judged by *Governance Wait Ratio* and *Autonomous Correct Completion Rate* (baseline GWR 0.40–0.60, ACCR 0%), stated net of *escaped defect rate*. | GWR 0.49 · ACCR 0% · 2.15 PRs/slice · 2.1 Helm touches/slice · veto 0% · rework 3.7% | GWR 0.6 · ACCR 5% · 1.09 PRs/slice · 1.62 Helm touches/slice · veto 0% · rework 0% |
+
+## R2.8 Reproducing this
+
+```bash
+pwsh -NoProfile -File scripts/exo-metrics.ps1 -FromPr 619 -ToPr 643 -WindowLabel 'post-M0-cutover window — PRs #619-#643'
+pwsh -NoProfile -File scripts/exo-metrics.ps1 -SelfTest   # the detectors fire
+```
+
+Needs `gh` authenticated against the repo and, for the cost and queue columns,
+`PAPERCLIP_API_URL` / `PAPERCLIP_API_KEY` / `PAPERCLIP_COMPANY_ID`. Without them
+the GitHub-derived rows still compute and the Paperclip-derived ones read
+`unmeasured` **with which kind of absence it is** — `-NoPaperclip` makes that
+explicit, and is the only door through which a `-Baseline` run may freeze them.
+A run whose Paperclip reads were *unreachable* refuses to freeze and exits 3:
+the point of a baseline is that later claims are checkable against it, and an
+absence nobody measured is not a number to check anything against.
