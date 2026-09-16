@@ -7735,3 +7735,64 @@ seat Executor. DRA-108 carries the worktree sweep at `low` — hygiene, explicit
 mutex fix. No Executor kicked, no worktree touched, no code moved, no seat claimed.
 
 — Dranak (Claude Code), Planner — DRA-106
+
+## 2026-09-16 — DRA-107 slice A: the soft-seat scripts are invoked RESOLVED, through the clone's main checkout
+
+**Assumption at the top:** this is the docs-only ranked-(1) of DRA-106, **Helm-signed**
+at `6bd325a1` (2026-09-16 ~2:35 AM CT) — "SIGN ranked-1 call-site path (docs-only);
+DEFER ranked-2 in-script guard". Slice B is **not** started here and is **not** a merge
+gate for this, on Helm's explicit words.
+
+**What was decided:** the documented invocation of `claim-seat.ps1` **and**
+`release-seat.ps1` is now
+
+```
+pwsh -NoProfile -File "$(git rev-parse --path-format=absolute --git-common-dir)/../scripts/<script>.ps1"
+```
+
+in CLAUDE.md `## Commands`, CLAUDE.md's trap-82 row, both scripts' comment-help, the
+usage error, the `-List` foreign-store line, the private-store `-Where` warning, the
+refusal's `-ForceStale` recovery line, `.claude/soft-seats/README.md` and
+`.claude/launch-templates/README.md` (the dispatch prompt).
+
+**The default it could have gone the other way on:** removing the relative form, or
+"fixing" it inside the script. Neither happened. The relative form is **demoted, not
+removed** — Helm named that explicitly, and anything in flight keeps working. The
+in-script guard stays deferred because code on `main` cannot repair a copy that will
+never receive it.
+
+**Measured, this heartbeat, bidirectionally** (`-Check` throughout — wrote nothing;
+the acceptance bar Helm kept verbatim):
+
+| from | card | relative form | resolved form |
+|---|---|---|---|
+| harness clone, pre-102 worktree `EQBuddy-dra68` | DRA-98 (held in Bosun) | `OK: claimable` **exit 0** | `REFUSED … [in another CLONE: C:\Users\david\source\EQBuddy]` **exit 1** |
+| Bosun clone, pre-102 worktree `bosun-532-stale` | DRA-107 (held in harness) | `OK: claimable` **exit 0** | `REFUSED … [in another CLONE: …\7218e9ce-…\EQBuddy]` **exit 1** |
+
+The Planner had measured one direction in one clone; this is the other direction, in the
+other clone, against a card held in the first. **And the old form still works**: the same
+relative call from the harness clone's MAIN checkout refuses DRA-98 correctly (exit 1),
+which is the "nothing in flight breaks" half of the bar, asserted rather than assumed.
+
+**Census re-taken independently** (not inherited from the card): Bosun **72 pre-DRA-102 /
+1 post / 132 with no script at all**, of 205 worktrees; harness **6 pre / 1 post**, of 7 —
+and the sixth is `workspaces/c96997d1-…/dra-28`, this Executor's own dispatch target.
+
+**A rendering risk that would have shipped silently:** three of those strings are
+PowerShell **double-quoted** here-strings, where `$(git rev-parse …)` executes at
+string-build time. Un-escaped, the refusal would have printed a path instead of the
+recipe — or a blank. Escaped with a backtick, and each of the four changed emit sites was
+run and read back rather than assumed: refusal, usage error, `-List` tail, `-Where`.
+
+**Scope note, stated because it is a judgement:** `run-seat-PROMPT-only.cmd` resolves its
+repo from `%~dp0..\..`, so a worktree's copy of the launcher points `claim-seat.ps1` back
+at that worktree. That is the same defect one layer up. It was **not** fixed by editing
+the `.cmd` (that would be a code change Helm did not sign); the README now documents
+running the **main checkout's** launcher, which makes its own `%~dp0` resolve correctly.
+The `.cmd`'s internal resolution is named in the slice-B follow-on.
+
+**Gates:** `soft-seat-selftest.ps1` **80 checks green**; `channel-wipe-guard.ps1` ok (11
+files, 1149 entries); all three scripts parse-checked. Needs **git ≥ 2.31** for
+`--path-format=absolute`, stated where the invocation is documented; both clones 2.54.0.
+
+— Dranak (Claude Code), Executor — DRA-107

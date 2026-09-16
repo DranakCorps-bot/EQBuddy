@@ -18,6 +18,22 @@
     the pre-DRA-102 behaviour, and a grant decided that way says so.
     -Where prints every store consulted, not just the resolved one.
 
+    INVOKE THIS SCRIPT RESOLVED, through the clone's MAIN checkout (DRA-107,
+    Helm-signed 2026-09-16):
+
+        pwsh -NoProfile -File "$(git rev-parse --path-format=absolute --git-common-dir)/../scripts/claim-seat.ps1" ...
+
+    A linked worktree shares its clone's STORE (correct, DRA-90) but carries its
+    OWN checkout of this file. Invoked by the bare relative path from a stale
+    worktree, a pre-DRA-102 copy runs, consults no registry, and GRANTS the
+    cross-clone duplicate DRA-102 closed — measured on the same card in the same
+    second: local copy "OK: claimable", resolved copy REFUSED naming the foreign
+    holder. --git-common-dir answers the clone's .git from a linked worktree and
+    from the main checkout alike, so one invocation is right everywhere. Needs
+    git >= 2.31 for --path-format=absolute. The bare relative form still works
+    and is DEMOTED, not removed: it is correct from a main checkout, wrong from a
+    stale worktree, and cannot tell you which one you are in.
+
     -WorkItem IS the Paperclip card id, DRA-<n>, and nothing else (EXO-HARDEN-A2
     / DRA-50, 2026-09-10). A bare GitHub issue number is refused with the reason,
     never silently mapped onto a card: #445 and DRA-28 are two names for one
@@ -47,8 +63,8 @@
     Formal proposal lands in the control-plane repo; this file only verifies.
 
 .EXAMPLE
-    pwsh -NoProfile -File scripts/claim-seat.ps1 -WorkItem DRA-28 -SeatId opus-isolation
-    pwsh -NoProfile -File scripts/claim-seat.ps1 -WorkItem DRA-7 -SeatId x -PaperclipIssue DRA-7
+    pwsh -NoProfile -File "$(git rev-parse --path-format=absolute --git-common-dir)/../scripts/claim-seat.ps1" -WorkItem DRA-28 -SeatId opus-isolation
+    pwsh -NoProfile -File "$(git rev-parse --path-format=absolute --git-common-dir)/../scripts/claim-seat.ps1" -WorkItem DRA-7 -SeatId x -PaperclipIssue DRA-7
 #>
 [CmdletBinding()]
 param(
@@ -159,13 +175,13 @@ if ($List) {
     # measurement swept from one clone is not the machine's rate (the store
     # README says so), so say how many other stores exist and where to see them.
     if (@($foreignStores).Count -gt 0) {
-        Write-Host "($(@($foreignStores).Count) other registered store(s) on this machine are NOT listed above — claim-seat.ps1 -Where names them.)"
+        Write-Host "($(@($foreignStores).Count) other registered store(s) on this machine are NOT listed above — `$(git rev-parse --path-format=absolute --git-common-dir)/../scripts/claim-seat.ps1 -Where names them.)"
     }
     exit $listCode
 }
 
 if (-not $WorkItem -or -not $SeatId) {
-    Write-Error 'Usage: claim-seat.ps1 -WorkItem DRA-<n> -SeatId <name> [-Mode active|challenger|disjoint|replacement] [-Branch <ref>] [-Worktree <path>] [-ExecutorPid <n>] [-PaperclipIssue DRA-<n>, same card] | -List | -Where'
+    Write-Error 'Usage: pwsh -NoProfile -File "$(git rev-parse --path-format=absolute --git-common-dir)/../scripts/claim-seat.ps1" -WorkItem DRA-<n> -SeatId <name> [-Mode active|challenger|disjoint|replacement] [-Branch <ref>] [-Worktree <path>] [-ExecutorPid <n>] [-PaperclipIssue DRA-<n>, same card] | -List | -Where  (that long form runs the clone''s MAIN checkout — a linked worktree''s own copy may be stale; DRA-107)'
     exit 1
 }
 
@@ -207,7 +223,7 @@ else { Write-Host $result.message }
 # only this line tells them apart (DRA-90 / trap 82). Refusals need it less —
 # a refusal already found somebody — but an unshared store makes a grant a lie.
 if ($result.ok -and $origin.kind -eq 'fallback' -and -not $Json) {
-    Write-Host 'WARNING: this claim was granted from a PRIVATE store (git did not resolve a common dir). A seat in another checkout is invisible to it. Run: claim-seat.ps1 -Where'
+    Write-Host 'WARNING: this claim was granted from a PRIVATE store (git did not resolve a common dir). A seat in another checkout is invisible to it. Run: pwsh -NoProfile -File "$(git rev-parse --path-format=absolute --git-common-dir)/../scripts/claim-seat.ps1" -Where'
 }
 
 # The same sentence, one level up (DRA-102). A grant decided WITHOUT the union

@@ -72,7 +72,7 @@ worktree, in `scripts/soft-seat-selftest.ps1`).
 Do not infer the store from a directory listing. **Ask:**
 
 ```powershell
-pwsh -NoProfile -File scripts\claim-seat.ps1 -Where
+pwsh -NoProfile -File "$(git rev-parse --path-format=absolute --git-common-dir)/../scripts/claim-seat.ps1" -Where
 ```
 
 It prints the resolved path and how it was resolved. `shared by every worktree
@@ -80,6 +80,47 @@ of <root>` is the healthy answer. If it warns that the store is **private**,
 git resolved no common dir and this copy genuinely cannot see another seat —
 that, and only that, is the DRA-90 failure. A claim granted in that state says
 so on the same screen.
+
+## The store is shared. The SCRIPT is not. (DRA-107)
+
+**Invoke both scripts resolved, through the clone's MAIN checkout** — never by a
+bare relative path (Helm-signed 2026-09-16):
+
+```powershell
+pwsh -NoProfile -File "$(git rev-parse --path-format=absolute --git-common-dir)/../scripts/claim-seat.ps1" -WorkItem DRA-28 -SeatId my-seat
+pwsh -NoProfile -File "$(git rev-parse --path-format=absolute --git-common-dir)/../scripts/release-seat.ps1" -WorkItem DRA-28 -SeatId my-seat
+```
+
+A linked worktree resolves to the main tree's **store** (the section above, and
+it is correct), but it carries its **own committed checkout of
+`scripts/claim-seat.ps1`** — pinned at whatever commit that worktree sits on. So
+a relative invocation from a worktree created before DRA-102 runs a copy with **no
+registry code in it**: it reads one store, finds nothing, and grants the very
+cross-clone duplicate DRA-102 closed.
+
+Measured on one card in one second, from the same worktree:
+
+| invocation | result |
+|---|---|
+| `scripts/claim-seat.ps1` (worktree's own copy) | `OK: DRA-98 is claimable` — **grants** |
+| `"$(git rev-parse … --git-common-dir)/../scripts/claim-seat.ps1"` | `REFUSED … [in another CLONE: …]` |
+
+**72 of 205** worktrees in the Bosun clone and **6 of 7** in the harness clone
+carry that stale copy; one of the six is an agent workspace the dispatcher can
+start a run in. `--git-common-dir` answers the clone's `.git` from a linked
+worktree **and** from the main checkout alike, so **one invocation is right
+everywhere** and nothing branches on where you are standing — it resolves the
+SCRIPT the way DRA-90 already resolves the STORE, and it turns "keep 205 files
+current" into "keep 2 files current", one per clone.
+
+**The bare relative form still works and is DEMOTED, not removed** — correct from
+a main checkout, wrong from a stale worktree, and unable to tell you which one you
+are in. Needs **git ≥ 2.31** for `--path-format=absolute` (both clones: 2.54.0).
+
+Code on `main` cannot repair a copy that will never receive it — which is why
+this is a call-site rule rather than a guard inside the script. An in-script
+forward guard is **deferred** to its own card, and it would be a guard against
+the *next* mechanism change, not a fix for this exposure.
 
 ## Two independent CLONES: union-READ, local-WRITE (DRA-102)
 
@@ -119,11 +160,14 @@ and "never looked" are the same sentence otherwise (trap 68). A registered store
 that could not be read is named for the same reason (trap 81).
 
 ```powershell
-pwsh -NoProfile -File scripts\claim-seat.ps1 -Where
+pwsh -NoProfile -File "$(git rev-parse --path-format=absolute --git-common-dir)/../scripts/claim-seat.ps1" -Where
 ```
 
 now prints the registry, **every store consulted**, which one this call writes,
-and any registered store whose directory has since vanished.
+and any registered store whose directory has since vanished. (Run it resolved —
+a stale worktree's own copy has no `-Where` at all and hard-errors with
+`A parameter cannot be found that matches parameter name 'Where'`, which reads
+like a broken diagnostic rather than a stale script. DRA-107.)
 
 ### A claim-rate measurement is only valid swept over EVERY registered store
 
@@ -167,10 +211,17 @@ change still carry bare numbers and have to remain releasable.
 
 ## How Soft / Dranak calls it
 
+Every example below resolves the script through the clone's main checkout
+(DRA-107). `$SEAT` is that path, bound once:
+
+```powershell
+$SEAT = "$(git rev-parse --path-format=absolute --git-common-dir)/.."
+```
+
 Before kicking a default seat:
 
-```bat
-pwsh -NoProfile -File scripts\claim-seat.ps1 -WorkItem DRA-28 -SeatId opus-isolation -Branch claude/opus-isolation-20260908 -Worktree .claude\worktrees\opus-isolation
+```powershell
+pwsh -NoProfile -File "$SEAT/scripts/claim-seat.ps1" -WorkItem DRA-28 -SeatId opus-isolation -Branch claude/opus-isolation-20260908 -Worktree .claude\worktrees\opus-isolation
 ```
 
 A default claim on a `DRA-28` that any live seat holds exits `1`, names **every**
@@ -179,18 +230,18 @@ feature.
 
 Explicit second seats (must be chosen, never the default):
 
-```bat
-pwsh -NoProfile -File scripts\claim-seat.ps1 -WorkItem DRA-28 -SeatId docs-ssc -Mode disjoint
-pwsh -NoProfile -File scripts\claim-seat.ps1 -WorkItem DRA-28 -SeatId challenger -Mode challenger
-pwsh -NoProfile -File scripts\claim-seat.ps1 -WorkItem DRA-28 -SeatId takeover -Mode replacement
+```powershell
+pwsh -NoProfile -File "$SEAT/scripts/claim-seat.ps1" -WorkItem DRA-28 -SeatId docs-ssc -Mode disjoint
+pwsh -NoProfile -File "$SEAT/scripts/claim-seat.ps1" -WorkItem DRA-28 -SeatId challenger -Mode challenger
+pwsh -NoProfile -File "$SEAT/scripts/claim-seat.ps1" -WorkItem DRA-28 -SeatId takeover -Mode replacement
 ```
 
 When the seat is done, or to recover a dead holder (age ≥ 8 h, or a recorded
 pid that is no longer running):
 
-```bat
-pwsh -NoProfile -File scripts\release-seat.ps1 -WorkItem DRA-28 -SeatId opus-isolation
-pwsh -NoProfile -File scripts\release-seat.ps1 -WorkItem DRA-28 -ForceStale
+```powershell
+pwsh -NoProfile -File "$SEAT/scripts/release-seat.ps1" -WorkItem DRA-28 -SeatId opus-isolation
+pwsh -NoProfile -File "$SEAT/scripts/release-seat.ps1" -WorkItem DRA-28 -ForceStale
 ```
 
 `-ExecutorPid` is the long-lived executor (`claude.exe`), not the claim script —
