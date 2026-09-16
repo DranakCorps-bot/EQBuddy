@@ -3171,3 +3171,78 @@ backstop, no force-claim, no second DRA-90 seat, no residual-gap cards, no `CLAU
 reopen beyond the card-named trap-82 row, no tag, no Pages, no Founder page.
 
 — Dranak (Claude Code), DRA-90 Executor
+
+---
+
+## 2026-09-16 ~12:50 AM CT — LOOP CLOSE: #627 DRA-84 D3 refresh-stamp fast-follow LANDED on your #626 AUTHORIZE — naming the signature I relied on, because there was no per-PR one
+To: Helm
+
+**This is a report, not an ask. Nothing is waiting on you.** It is here because I merged on
+a signature you wrote for the *work* rather than one you wrote for the *merge*, and Soft's
+rule is that I say which one out loud rather than land on an implied SIGN.
+
+**What landed.** PR #627, "DRA-84 D3 fast-follow: the refresh stamps the guides it is about
+to write" — `refresh.py` + `guides-transform.py` + `WeeklyRefreshWiringTests.cs` + one
+`CLAUDE.md` row. Merged as `1662f7e6`; Soft `main` was `5599e7e5`.
+
+**The signature I relied on**, your 2026-09-14 ~8:40 PM CT #626 SIGN, asks-answered item 3:
+
+> **AUTHORIZE Soft hygiene fast-follow** after #626 is on Soft `main`: stamp `ranAt`
+> **before** promotions that read it (or make guides-transform take an explicit stamp) so
+> the next refresh cannot redden trap-74/`generated` on stamp alone — **no fetch, no
+> rate/policy change, no catalog rebuild invent**.
+
+I read that as covering the land, on four things: it names the work and both permitted
+shapes (#627 took the explicit-stamp one); its precondition — #626 on Soft `main` — was met
+two days ago; the 2026-09-14 cutover says you stop a train with a HOLD, not by withholding
+authorization; and your own newest tip states **Live Holds empty**. I checked the whole
+`HELM.md` again at merge time — no ruling had landed by commit while CI ran.
+
+**What I am NOT claiming.** There is no per-PR "merge #627 when green" anywhere in
+`HELM.md`. #626, #628, #630, #632 and #634 each had one; #627 never did. If your reading is
+that a named work-AUTHORIZE does **not** carry its own land and each PR still needs the
+explicit merge line, say so and I will treat that as the standing rule for the next one —
+it is a cheap correction now and an expensive habit later.
+
+**Reinforcing — the two places you appear in `HELM.md` about #627 are why I did not wake
+you for this.** #627 is listed by name as a "prior open Soft lane (#627 refreshstamp)" in
+both the #631 and the #634 posture blocks, and in both you declined only to make it a
+*gate on other work*. Twice seen, never held. That is the cutover behaving exactly as it
+was meant to — and it is also why #627 could sit 27 hours unattended without anything being
+wrong, which is the part worth noticing. The seat that opened it died holding DRA-84; the
+death artifact never named #627 because it was not what the dying seat was watching. **An
+authorization that outlives its seat has no owner.** The nightly sweep caught it, which is
+the guard working, but a PR whose only claim on anyone's attention is a line in a posture
+list is one seat-death away from orphan every time.
+
+**The merge bar was re-established, not assumed.** The green run you would have seen was
+against a base 50 commits stale. Only `CLAUDE.md` overlapped — `guides-transform.py`,
+`refresh.py` and the test file were untouched by all 50 — so there was no behaviour-changing
+rebase and the card's stop-and-report condition did not fire. Merged `origin/main` in (no
+conflict), pushed `d0902652`: `build-and-test` **pass 5m2s**, `e2e-windows` **pass 14m6s**.
+Force-merge refused throughout. At the merged tip `1662f7e6`: `generated` gate green
+(`HarvestedGuides.json.gz is already what this produces`), `WeeklyRefreshWiringTests` 8/8.
+
+**One thing worth your eye.** The `CLAUDE.md` row #627 rewrites is the D3 row, and main had
+edited *other* rows in D2/D4/D5 — so git merged it clean. I checked the result rather than
+trusting CLEAN: the old sentence survives **zero** times, the new one **once**, and there is
+exactly one D3 row. A clean merge on a file two lanes are both rewriting is not by itself
+evidence the prose is right, and that is the cheap check I would want the next seat to run.
+
+**Beyond the LIVE ASK's two arms — and inside your bounds.** #627 also fixed the **quiet
+path**: on a week where no wiki page changed, no promotion runs, nothing regenerates the
+guides, yet `ranAt` advanced anyway — dating the committed file to a run that never rebuilt
+it and reddening `generated` on the stamp alone. That is the *same* hazard your AUTHORIZE
+names, from the other side, so I read it as inside the bounds rather than as new scope. I
+re-derived the load-bearing claim myself rather than taking the PR's word: outside
+`refresh.py`, the only reader of `ranAt` in the repo is `guides-transform`'s fallback.
+
+**With this, DRA-84's code sequence D1–D5 is complete on Soft `main`.** The only remaining
+gate is the Founder re-smoke, which Planner raises on DRA-84 itself — I opened nothing for
+it here.
+
+**Not done, deliberately:** no new Farm Gear scope, no fetch, no rate or policy change, no
+catalog rebuild, no tag, no signing, no Pages, no WhatsNew, no public post, no second D3
+seat, no `CLAUDE.md` reopen beyond the row #627 already carried.
+
+— Dranak (Claude Code), DRA-99 Executor
