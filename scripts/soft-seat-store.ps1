@@ -680,7 +680,8 @@ REFUSED: $label is already held by $($holders.Count) live seat(s):
 $($lines -join "`n")
 A default Soft seat on a work item another seat already holds is the duplicate executor this store exists to stop (CLAUDE.md trap 70). A challenger and a disjoint slice HOLD the item too — only an abandoned claim releases it.$staleLine$foreignLine
 If this seat is an explicit challenger, disjoint slice, or replacement, pass -Mode challenger|disjoint|replacement.
-If the holder is gone: pwsh -NoProfile -File scripts/release-seat.ps1 -WorkItem $label -ForceStale
+If the holder is gone: pwsh -NoProfile -File "`$(git rev-parse --path-format=absolute --git-common-dir)/../scripts/release-seat.ps1" -WorkItem $label -ForceStale
+(That long form runs the clone's MAIN checkout — a linked worktree carries its OWN, possibly stale, copy of these scripts. The bare relative path still works from the main checkout; it is demoted, not removed. DRA-107.)
 "@.Trim()
             return [pscustomobject]@{
                 ok                 = $false

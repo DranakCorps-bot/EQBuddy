@@ -363,9 +363,37 @@ asked in is the first thing you re-read.**
 dotnet build EQBuddy.slnx -c Release
 dotnet test tests/EQBuddy.Tests/EQBuddy.Tests.csproj -c Release
 pwsh -NoProfile -File scripts/check.ps1
-pwsh -NoProfile -File scripts/claim-seat.ps1 -WorkItem DRA-28 -SeatId my-seat
-pwsh -NoProfile -File scripts/release-seat.ps1 -WorkItem DRA-28 -SeatId my-seat
 ```
+
+**Soft seats — invoke them RESOLVED, through the clone's main checkout:**
+
+```bash
+pwsh -NoProfile -File "$(git rev-parse --path-format=absolute --git-common-dir)/../scripts/claim-seat.ps1" -WorkItem DRA-28 -SeatId my-seat
+pwsh -NoProfile -File "$(git rev-parse --path-format=absolute --git-common-dir)/../scripts/release-seat.ps1" -WorkItem DRA-28 -SeatId my-seat
+```
+
+**Why the long form is the documented one** (DRA-107, Helm-signed 2026-09-16):
+a linked worktree shares its clone's STORE (correct, DRA-90) but carries its
+**own checkout of the script**. `scripts/claim-seat.ps1` is a *relative* path, so
+from a stale worktree it runs a pre-DRA-102 copy that consults no registry and
+**grants the cross-clone duplicate DRA-102 closed** — measured, same worktree and
+same card and same second: the local copy said `OK: claimable`, the resolved copy
+refused and named the holder in the other clone. 72 of 205 worktrees in the Bosun
+clone and 6 of 7 in the harness clone are that stale copy, one of them an agent
+workspace the dispatcher can start a run in.
+
+`--git-common-dir` answers the clone's `.git` from a linked worktree **and** from
+the main checkout, so **one invocation is right everywhere** and nothing branches
+on where you are standing. It resolves the SCRIPT the way DRA-90 already resolves
+the STORE, and it reduces the standing invariant from "keep 205 files current" to
+"keep 2 files current", one per clone.
+
+**The bare relative form still works and is not removed — it is DEMOTED.** It is
+correct from a clone's main checkout and wrong from a stale worktree, and it
+cannot tell you which one you are in. Needs **git ≥ 2.31** for
+`--path-format=absolute` (both clones measured at 2.54.0). Code on `main` cannot
+repair a copy that will never receive it, which is why this is a call-site rule
+rather than a guard inside the script.
 
 Local how-much: [docs/ops/verification-ladder.md](docs/ops/verification-ladder.md).
 Flakes: [docs/ops/flake-ledger.md](docs/ops/flake-ledger.md).
@@ -1112,7 +1140,19 @@ after the named guard left with its surface.
     registry-absent negative beside them. **A seat that never claims is still
     refused by nobody in any clone**, so the remote (`gh pr list` /
     `git ls-remote` for a branch naming the card) stays the only check that
-    crosses everything.
+    crosses everything. **And the store being shared says nothing about the
+    SCRIPT** (DRA-107, Helm-signed 2026-09-16): a linked worktree carries its own
+    committed checkout of `claim-seat.ps1`, pinned at that worktree's commit, so
+    the RELATIVE invocation runs a pre-DRA-102 copy that consults no registry and
+    grants the cross-clone duplicate DRA-102 just closed — measured on one card in
+    one second, local copy `OK: claimable`, resolved copy `REFUSED … [in another
+    CLONE]`. 72 of 205 Bosun worktrees and 6 of 7 harness ones are that copy, one
+    an agent workspace the dispatcher starts runs in. **Invoke both scripts
+    through `"$(git rev-parse --path-format=absolute --git-common-dir)/../scripts/…"`**
+    (git ≥ 2.31) — right from a worktree and from the main checkout alike, so
+    nothing branches on where you stand. The bare form is DEMOTED, not removed.
+    Code on `main` cannot repair a copy that will never receive it, so this is a
+    call-site rule, not a guard in the script.
 
 New trap discovered the hard way? Add the compact rule here and the novel
 under `docs/ops/claude-archive/traps.md`. That is the whole point.

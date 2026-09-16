@@ -24,9 +24,17 @@
     before DRA-50 carry bare issue numbers, and refusing to release them would
     strand every one of them behind a rule they predate.
 
+    INVOKE THIS SCRIPT RESOLVED, through the clone's MAIN checkout (DRA-107,
+    Helm-signed 2026-09-16) — the same rule as claim-seat.ps1, for the same
+    reason: a linked worktree carries its OWN, possibly stale, copy of this file,
+    and the bare relative path runs that copy. --git-common-dir answers the
+    clone's .git from a linked worktree and from the main checkout alike, so one
+    invocation is right everywhere. Needs git >= 2.31 for --path-format=absolute.
+    The bare relative form still works and is DEMOTED, not removed.
+
 .EXAMPLE
-    pwsh -NoProfile -File scripts/release-seat.ps1 -WorkItem DRA-28 -SeatId opus-isolation
-    pwsh -NoProfile -File scripts/release-seat.ps1 -WorkItem DRA-28 -ForceStale
+    pwsh -NoProfile -File "$(git rev-parse --path-format=absolute --git-common-dir)/../scripts/release-seat.ps1" -WorkItem DRA-28 -SeatId opus-isolation
+    pwsh -NoProfile -File "$(git rev-parse --path-format=absolute --git-common-dir)/../scripts/release-seat.ps1" -WorkItem DRA-28 -ForceStale
 #>
 [CmdletBinding()]
 param(
