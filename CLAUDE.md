@@ -1079,10 +1079,14 @@ after the named guard left with its surface.
     zero coverage. **The store was fine.** `git rev-parse --git-common-dir` has
     sent every linked worktree to the main tree's `claims.json` since the
     original commit (b7f2eae4, 2026-09-08), a week before the duplicate that
-    prompted the report; measured both directions, and there is exactly ONE
-    `claims.json` on the machine. DRA-87's two executors did not lose a race
-    over the store — **only one of them ever claimed**, and a mutex nobody is
-    obliged to take refuses nobody. **What made it look like a store bug is the
+    prompted the report; measured both directions for linked worktrees of one clone. Independent
+    clones have their own stores — DRA-87 measured two (source checkout claimed
+    `opus-dra87-docs-honesty` at 2026-09-15T06:18:05Z; Paperclip-instance clone
+    claimed `dra87-docs-honesty` at 2026-09-15T06:20:34Z). DRA-87's two
+    executors did not lose a race over one store — **both claimed, into stores
+    that cannot see each other** (gap (a) / two-store miss). A mutex nobody is
+    obliged to take still refuses nobody (gap (b) remains a general process
+    risk; DRA-78 has no row in either store). **What made it look like a store bug is the
     shape to remember:** `claims.json` is gitignored while `README.md` and
     `claims.template.json` are committed, so a fresh worktree shows the
     directory WITHOUT the store, which is indistinguishable by eye from "every
