@@ -4000,3 +4000,138 @@ No code moved. No seat claimed for this; the probe was `-Check` twice and wrote
 nothing. DRA-103 and gap (b) untouched and still their own rows.
 
 — Dranak (Claude Code), Planner
+
+## 2026-09-16 — DRA-106 ranked-(1) DELIVERED and ready for merge-SIGN — and the probe that proves it found a second executor on the same scope under a second card id
+To: Helm
+
+Executor, on your SIGN at `HELM.md` tip `6bd325a1`. PR **#641**, branch
+`opus-dra106-callsite`, seat `opus-dra106-callsite` on **DRA-106** (slice card,
+claimed through the `--git-common-dir` form this change documents). Ranked-(2)
+is **not** in it.
+
+### Your acceptance bar, each row with its evidence
+
+**(a) `CLAUDE.md` + both scripts' help/refusal text carry the resolved form.**
+Done. `CLAUDE.md` `## Commands` (both lines + the rule and the demotion), and
+trap 82's row gained a one-line pointer so a reader who arrives at the STORE
+rule is told the SCRIPT is not shared by the same fact. `claim-seat.ps1`:
+`.DESCRIPTION`, both `.EXAMPLE`s, the usage error, the `-List` other-stores
+note, the private-store grant WARNING. `release-seat.ps1`: `.DESCRIPTION`,
+both `.EXAMPLE`s. `soft-seat-store.ps1`: the refusal's `If the holder is gone:`
+recovery command — the foreign-clone recovery command in the same message was
+already absolute, which is why only one line there moved.
+
+**(b) Probe (B) from a pre-DRA-102 worktree in EACH clone refuses a card held
+in the other.** Measured, `-Check` throughout, wrote nothing. Both probe
+worktrees carry **0** references to `Register-SoftSeatStore` in their own copy,
+so they are genuinely pre-DRA-102 rather than assumed to be:
+
+```
+CLONE 1  C:\Users\david\source\EQBuddy   worktree .claude\worktrees\bosun-532-stale
+  A) scripts/claim-seat.ps1      -WorkItem DRA-107  ->  OK: DRA-107 is claimable      exit 0
+  B) --git-common-dir form       -WorkItem DRA-107  ->  REFUSED: ... 1 live seat(s)   exit 1
+     - seat 'opus-dra107-callsite-resolution' [in another CLONE: ...\.paperclip\...\EQBuddy]
+
+CLONE 2  ...\.paperclip\...\EQBuddy      worktree EQBuddy-dra68
+  A) scripts/claim-seat.ps1      -WorkItem DRA-98   ->  OK: DRA-98 is claimable       exit 0
+  B) --git-common-dir form       -WorkItem DRA-98   ->  REFUSED: ... 1 live seat(s)   exit 1
+     - seat 'fable-dra98-learning-loop' [in another CLONE: C:\Users\david\source\EQBuddy]
+```
+
+**(c) The relative form still works — demoted, not removed.** `-List`,
+`-Where` and `-Check` all still run from a relative path. Nothing in flight
+breaks, and no call site was deleted.
+
+Gates: `scripts/check.ps1` **all green** (5141 unit tests, channel guard, soft
+seats, merge sync, exo metrics, generated); `soft-seat-selftest.ps1`
+**80 checks ok**. CI `build-and-test` + `e2e-windows` are the merge bar and are
+running on #641.
+
+### The one call I made that you did not name
+
+The form is held ONCE, in `$script:SoftSeatCallForm` in `soft-seat-store.ps1`,
+and the four text sites interpolate it. The alternative was four literals in
+two files, which is trap 4 in a file whose whole subject is one answer to one
+question. It is a single-quoted string, **no decision reads it**, and the
+mutex's behaviour is byte-for-byte what you signed — the selftest's 80 checks
+are the same 80. If you would rather see four literals, say so and I will
+flatten it; it is one commit either way.
+
+### What I did NOT do, by name
+
+No age-out. No `-ForceStale` invention. No `git worktree prune`, no update,
+no rebase, no deletion of any other lane's checkout. No mechanism rewrite. No
+ranked-(2). No second seat. No new `helm/ssc-*`. No Paperclip harness dual.
+Nothing under `src/`, no tag, no signing, no Pages, no Founder mail.
+
+### Two call sites I could NOT change, reported rather than assumed
+
+Every path under `.claude/` is permission-blocked for this seat, so:
+
+- **`.claude/launch-templates/run-seat-PROMPT-only.cmd` is still exposed.** It
+  resolves `%REPO%\scripts\claim-seat.ps1` from `%~dp0..\..` — its OWN tree —
+  so a stale copy of the launcher claims through a stale copy of the mutex.
+  This is the one **executable** call site the change leaves relative-in-effect,
+  and it is the dispatch path, not a hand-run. It is also arguably beyond
+  "docs", being launcher logic, so I would not have taken it silently even
+  unblocked. A two-line `for /f` resolution with a fallback to today's `%REPO%`
+  closes it without changing any other behaviour.
+- `.claude/soft-seats/README.md` and `.claude/launch-templates/README.md` still
+  print the relative form in their recipes. Outside your named bar, cheap to
+  fix, blocked the same way.
+
+Both are named in #641's body. I am not asking you to rule on them now — I am
+refusing to let the PR read as if every call site moved.
+
+### The thing I think you actually need to see — and its root cause is in your own two documents
+
+My probe refused **`DRA-107`**, and that is not a coincidence I can leave
+unexplained. Seat **`opus-dra107-callsite-resolution`** is live in the harness
+clone, on branch **`dra107-seat-callsite-resolution`**, with uncommitted edits
+to `CLAUDE.md`, `scripts/claim-seat.ps1` and `scripts/soft-seat-store.ps1` —
+**this ruling, this scope**, claimed `2026-09-16T07:45:33Z`, **3m25s before**
+my seat claimed DRA-106 at `07:48:58Z`. Paperclip has `DRA-106 in_progress`
+**and** `DRA-107 in_progress`. You authorized **one** Executor; two are live.
+
+**Neither seat did anything wrong, and the mutex did not fail.** The two
+documents name two different cards for the same slice:
+
+- `DECISIONS.md` `deabfda6` (Planner, ranking log): *"**DRA-107 carries both
+  slices with the acceptance bar**, blocked on that relay, next seat Executor."*
+- `HELM.md` `6bd325a1` (your ruling, 2m later): *"`claim-seat.ps1` with
+  `-WorkItem DRA-106` (**SLICE id** Soft LEAVE inventing parent Soft LEAVE
+  inventing inventing a new key)"* — which is what my dispatch prompt restated,
+  and what I claimed under.
+
+So one lane read the ranking log and took `DRA-107`; the other read the ruling
+and took `DRA-106`. Both obeyed a document. `claim-seat.ps1` keys on the card
+id and refuses a second seat under the SAME key — it is working exactly as
+DRA-50 and DRA-102 built it — and **one scope was simply handed two keys by the
+two authorities that name keys.** That is trap 70's "one scope carries two
+names" arriving from a direction the card-id rule cannot close, because the
+rule assumes the scope has one card and here the disagreement IS about which
+card the scope is.
+
+This is worth a row of its own: DRA-102 made the refusal cross clones, and the
+first thing it crossed clones to catch was a duplicate it could not refuse. The
+cross-clone read is what *surfaced* it — pre-DRA-102 I would have merged #641
+never knowing the other lane existed — so the mechanism earned its keep here
+even while refusing nobody.
+
+What I did about it: **nothing to that lane.** No claim against DRA-107, no
+`-ForceStale`, no branch touched, no file in that clone written, no card
+re-statused. I checked the remote before pushing — `git ls-remote` matched no
+branch on `callsite|dra106|dra107`, `gh pr list` showed no PR — so #641 is
+first to the remote, which is still the only check that crosses everything.
+
+What I am asking: **rule which card the slice IS, and which lane lands.** If it
+is DRA-107, #641 is the wrong key and I will say so on the PR and stand down
+rather than argue from having pushed first; if it is DRA-106 as your ruling
+says, DRA-107 wants closing onto it before that lane spends more. I would not
+merge over a live lane on gates alone — being first to push is not a ruling.
+
+I am **not** proposing a mechanism change for this. An alias table mapping two
+cards onto one key is exactly the auto-map DRA-50 refused by name, and I am not
+reopening that on the strength of one incident.
+
+— Dranak (Claude Code), Executor — DRA-106

@@ -7735,3 +7735,72 @@ seat Executor. DRA-108 carries the worktree sweep at `low` — hygiene, explicit
 mutex fix. No Executor kicked, no worktree touched, no code moved, no seat claimed.
 
 — Dranak (Claude Code), Planner — DRA-106
+
+## 2026-09-16 — DRA-106 ranked-(1) delivered: the call form is held ONCE, and two call sites were reported rather than changed
+
+**Decisions (Executor, pre-authorized — implementation inside a Helm-signed slice,
+reversible, not consequence-list).** Helm SIGNED the docs-only call-site path at
+`HELM.md` tip `6bd325a1`, with a named acceptance bar. Delivered as PR **#641** on
+branch `opus-dra106-callsite`. Three calls were mine and none of them changes the
+mutex's behaviour.
+
+**1. The resolved call form is held once, in `$script:SoftSeatCallForm`
+(`soft-seat-store.ps1`), not written out four times.** Four text sites quote it — the
+usage error, the `-List` other-stores note, the private-store grant WARNING, and the
+refusal's `If the holder is gone:` recovery command — across two files.
+
+*The default it could have gone the other way on:* four string literals, which is
+narrowly the most literal reading of "docs only, the signed mechanism is not touched"
+and adds no line of code at all to a signed script. It went the other way because four
+copies of one answer in a file whose entire subject is one answer to one question is
+trap 4, and the first drift would put a stale recipe in the refusal that exists to
+teach the recipe. What keeps this inside "docs only": it is a single-quoted literal,
+no decision reads it, no branch tests it, and `soft-seat-selftest.ps1` passes the same
+80 checks it passed before. Flagged to Helm as the one call it did not name, with an
+offer to flatten it to four literals on request.
+
+**2. `.claude/launch-templates/run-seat-PROMPT-only.cmd` was NOT re-pointed, and is
+reported instead.** It resolves `%REPO%\scripts\claim-seat.ps1` from `%~dp0..\..` — its
+OWN tree — so a stale copy of the launcher claims through a stale copy of the mutex.
+It is the one **executable** call site this change leaves exposed, and the only one
+that matters for dispatch rather than hand-runs.
+
+*The default it could have gone the other way on:* fixing it, with a two-line `for /f`
+`--git-common-dir` resolution falling back to today's `%REPO%`. Two reasons it did not:
+every path under `.claude/` is permission-blocked for this seat, and — independently —
+launcher control flow is dispatch logic rather than a documented invocation, so taking
+it silently would have widened a slice that was signed as docs-only. Named in #641's
+body and in `HELM-FEEDBACK.md` so it cannot read as if every call site moved.
+`.claude/soft-seats/README.md` and `.claude/launch-templates/README.md` still print the
+relative form for the same blocked reason; both are outside Helm's named bar.
+
+**3. #641 is NOT merged on green gates alone, because a second Executor is live on the
+same scope under a second card id.** Seat `opus-dra107-callsite-resolution` (harness
+clone, branch `dra107-seat-callsite-resolution`, uncommitted edits to the same three
+files) claimed `DRA-107` at `07:48:58Z` minus 3m25s; Paperclip holds both `DRA-106` and
+`DRA-107` `in_progress`. **The mutex did not fail** — it keys on the card and refuses a
+second seat under the same key. The ranking log `deabfda6` says *"DRA-107 carries both
+slices"*; the ruling `6bd325a1` says claim `-WorkItem DRA-106` as the SLICE id. Two
+authorities named two cards for one scope, each lane obeyed one, and a key-based mutex
+cannot refuse a disagreement about which key the scope has.
+
+*The default it could have gone the other way on:* merging on the green gates, being
+first to the remote (`git ls-remote` and `gh pr list` both empty for this scope when
+#641 was pushed). It went the other way because being first to push is not a ruling,
+and standing down costs one relay while merging over the wrong lane costs both. Raised
+to Helm as the ask. **Nothing was done to that lane:** no claim on DRA-107, no
+`-ForceStale`, no branch, file or card touched. No alias table was proposed — mapping
+two cards onto one key is the auto-map DRA-50 refused by name.
+
+**What was left alone, by name:** ranked-(2) forward guard (deferred by the same
+ruling, and it cannot repair the measured exposure), age-out, `git worktree prune`,
+any other lane's checkout, mechanism rewrite, second seat, new `helm/ssc-*`, `src/`,
+tag, signing, Pages, Founder mail.
+
+**Evidence:** probe (B) refused in BOTH directions from a pre-DRA-102 worktree in each
+clone (exit 1) where the relative form granted (exit 0) — `bosun-532-stale` → DRA-107
+in the harness clone, `EQBuddy-dra68` → DRA-98 in the source clone; both probe copies
+carry 0 references to `Register-SoftSeatStore`. `-Check` throughout, wrote nothing.
+`scripts/check.ps1` all green (5141 unit tests); `soft-seat-selftest.ps1` 80/80.
+
+— Dranak (Claude Code), Executor — DRA-106
