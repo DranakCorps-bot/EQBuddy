@@ -3905,3 +3905,98 @@ card as the honest limit of what shipped, not as a reject of A′. The interim
 that crosses a seat which never claims.
 
 — Dranak (Claude Code), Planner
+
+## 2026-09-16 — DRA-106 LIVE ASK: the soft-seat staleness is per-WORKTREE, and the fix I rank FIRST is a call-site path, not a code change
+To: Helm
+
+Planner, ranking the card DRA-106 asked to have ranked. Executor filed it at the
+DRA-105 close and the DRA-96 watchdog re-measured every number in it; both are on
+the card. I re-ran the decisive probe myself before ranking, from the harness
+clone, and it changed which option wins.
+
+**The gap, in one sentence:** a linked worktree shares its clone's store (correct,
+DRA-90) but carries its OWN checkout of `scripts/claim-seat.ps1`, and CLAUDE.md's
+invocation is a relative path — so an agent in a pre-DRA-102 worktree runs a copy
+that consults no registry and grants the cross-clone duplicate DRA-102 closed.
+72 of 205 worktrees in the Bosun clone; 6 of 7 in the harness clone, one of them an
+agent workspace the dispatcher can start a run in.
+
+### The measurement that decides it (mine, this heartbeat, `-Check`, wrote nothing)
+
+Same worktree, same card, same second, two copies of the script:
+
+```
+A) pwsh -NoProfile -File scripts/claim-seat.ps1 -WorkItem DRA-98 -SeatId planner-dra106-probe -Check
+   OK: DRA-98 is claimable as active by seat 'planner-dra106-probe'.     exit=0
+
+B) pwsh -NoProfile -File "$(git rev-parse --path-format=absolute --git-common-dir)/../scripts/claim-seat.ps1" \
+        -WorkItem DRA-98 -SeatId planner-dra106-probe -Check
+   REFUSED: DRA-98 is already held by 1 live seat(s):
+     - seat 'fable-dra98-learning-loop' ... [in another CLONE: C:\Users\david\source\EQBuddy]
+   1 of those seat(s) live in ANOTHER CLONE on this machine (found through the
+   store registry, DRA-102).                                             exit=1
+```
+
+(A) is what doctrine runs today. (B) is one line, no code change, and it is correct
+in the pre-DRA-102 worktree `EQBuddy-dra68`. I ran the same (B) from the clone's
+MAIN checkout and it is byte-for-byte the same refusal — `--git-common-dir` answers
+the clone's `.git` from a linked worktree AND from the main one, so **one
+invocation is right everywhere** and nothing branches on where you are standing.
+Store resolution is unaffected: (B) still resolved its own store as the harness
+clone's, which is what named the Bosun holder as foreign.
+
+### The ranking
+
+**1. NEW — resolve the SCRIPT the way DRA-90 already resolves the STORE.** Change
+the documented invocation (CLAUDE.md `## Commands`, the refusal/`-Where` help text,
+the dispatch prompt) from `scripts/claim-seat.ps1` to the `--git-common-dir` form
+above, for `claim-seat.ps1` and `release-seat.ps1`. **Docs only; the signed
+mechanism is not touched.** It closes 72/72 and 6/6 TODAY, on copies that will
+never receive a code fix, and it reduces the standing invariant from "keep 205
+files current" to "keep 2 files current" — one per clone, and DRA-105 already
+established both are.
+
+**2. Option 3 as written (in-script), demoted with its reason.** Code added to
+`main`'s `claim-seat.ps1` reaches a stale worktree only when that worktree updates
+— at which point it would have had DRA-102 anyway. **Option 3 cannot repair the
+measured exposure**; it is a forward guard against the NEXT mechanism change. Worth
+doing, in two parts, after (1): (i) when the running copy is a linked-worktree copy,
+re-exec the main checkout's copy (or refuse, naming the (B) command) — this makes
+(1) self-enforcing instead of doctrine-only; (ii) stamp a writer marker on rows
+`claim-seat.ps1` writes, so a row lacking it, written after the ship date, is a
+stale writer caught in the act. (ii) is the honest answer to the watchdog's fourth
+option: a stale copy has no code to say it is stale, but its CLAIM ROW can be
+identified by what it lacks. Forward-only, and the entry should say so.
+
+**3. Option 2 (sweep).** Real hygiene, wrong target — it buys the 132 script-less
+and most of the 54 merged worktrees, and misses the 18 unmerged and the agent
+workspace, which are the exposure. Its own card, low, and NOT a unilateral deletion
+of other lanes' checkouts: `git worktree prune` is safe, removal is the lane
+owner's.
+
+**4. Option 1 (age out). Rejected**, and the reason is a correction to the card's
+own severity framing: **merged-ness is the wrong denominator.** The exposure is the
+set of worktrees an agent can be DISPATCHED into, which is a property of the
+harness, not of branch history — that is why 6 of 7 in the harness clone matters
+more than 54 of 72 being merged in the Bosun one.
+
+### What I am asking for
+
+**SIGN (1)** — or HOLD it. I read (1) as doc-only and inside the pre-authorized
+band with a reporting duty, but it is the documented invocation of a Helm-signed
+mutex, so I am asking rather than assuming, and I have kicked no Executor.
+**SIGN or defer (2)** — that one is a change to signed code and I would not start it
+without you either way.
+
+Acceptance bar I would put on (1): CLAUDE.md and both scripts' help/refusal text
+carry the resolved form; `pwsh` run of (B) from at least one pre-DRA-102 worktree in
+EACH clone refuses a card held in the other; the old relative form still works (it
+is not removed, only demoted) so nothing in flight breaks.
+
+### What I did not do
+
+No worktree updated, pruned or rebased — 71 of the 72 are other lanes' checkouts.
+No code moved. No seat claimed for this; the probe was `-Check` twice and wrote
+nothing. DRA-103 and gap (b) untouched and still their own rows.
+
+— Dranak (Claude Code), Planner
