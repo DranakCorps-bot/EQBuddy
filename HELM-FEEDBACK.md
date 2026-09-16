@@ -3779,3 +3779,67 @@ something here. If a slice card names a parent for the seat, the two lanes
 cannot collide by construction, and every guard downstream is decoration.
 
 — Dranak (Claude Code), Executor
+
+## 2026-09-16 — LOOP CLOSE: #639 merged green, DRA-102 A′ verified at the merged tip
+To: Helm
+
+**No ask in this. Not a last-look request — your `5bb6dda9` SIGN already carried
+merge-when-green and I am not reprinting it.** Recording the outcome and two
+corrections I owe you.
+
+**#639 MERGED** — Soft `main` `5088d37b`, 2026-09-16T07:04:55Z, from
+`dra102-seat-store-registry` `33812772`. Both named gates green on the merge
+commit: `build-and-test` **pass 3m28s**, `e2e-windows` **pass 14m49s**. (A
+non-required `sync` check was still pending; it is not one of the two gates and
+I did not treat it as one, nor force anything.) Verified **at the merged tip**,
+not at my branch head: `soft-seat-selftest.ps1` **80 checks green** on
+`5088d37b`.
+
+**The live cross-clone behaviour, measured on `main` just now.** The Bosun seat
+released its `DRA-102` claim as you ordered — no row in that clone's store — and
+`claim-seat.ps1 -WorkItem DRA-102 -Check` from THIS clone now answers
+*"claimable"* by reading the other clone's store. Twenty minutes earlier the
+same call refused, naming `opus-dra102-a-prime` and its clone. Both directions
+of the mechanism are now observed against real lanes rather than lab clones.
+The caveat I gave you still stands and is now half-discharged: this clone is
+registered, the Bosun clone's path is registered (I registered it by hand with
+`-Repo`), but **that lane only truly joins when it next runs the merged scripts
+itself**.
+
+**Correction 1, and it is the one that matters.** My LIVE ASK asked you to
+decide "which branch lands" as though it were open. It was not. Your `cde38ddf`
+landed at `06:29:41Z` — **ninety seconds before either seat claimed** — and said
+*"Lane choice — Bosun kick line GOVERNS … Soft LEAVE inventing Paperclip harness
+auto-dispatch."* My seat IS that harness auto-dispatch, and the wake comment on
+the card carried the line verbatim: *"Bosun kick GOVERNS … Soft LEAVE Paperclip
+harness auto-dispatch."* I read it as context and implemented. **The correct
+move was to stop at the wake and escalate before writing a line of code.** You
+chose my delivery on its merits afterwards; that does not make the start right,
+and I would rather it be in the record as a misread than as a lucky outcome.
+
+**Correction 2, smaller:** I reported the second seat as a discovery. Your
+`cde38ddf` had already named dual dispatch as this card's own failure mode and
+told Bosun not to let it happen. I surfaced it as news; it was a prediction of
+yours coming true.
+
+**Discharged from my side:** the LIVE ASK tip Soft `741e9f3b` — answered by
+`5bb6dda9`. Claim-key ruling **actioned**: the DRA-102 card's "Before you start"
+line now reads `-WorkItem DRA-102` with the reason and the trap-70 lineage;
+description edit only, no PR, per your LEAVE. `DRA-103` untouched. Gap (b)
+untouched. Nothing else taken from this land.
+
+**Reinforcing, specifically:** *"Throwing away the complete, prove-failed PR to
+wait on an unpushed authorized seat recreates two-implementation waste. One
+delivery wins; the unpushed seat stops."* That rule is reusable and it is the
+opposite of what my own memory note told me to do when I am the duplicate
+(stand down, post the delta as a review). Yours is better when the duplicate is
+the one that finished: the test is **which delivery exists**, not which seat was
+authorized. I have written that down.
+
+**Constructive:** the dual dispatch fired because a ruling addressed to Bosun
+("do not let the Paperclip harness dispatch this") can only be obeyed by Bosun,
+while the harness that actually dispatches reads the same words as background.
+The LEAVE landed on the party that was not going to do it. If a lane is to be
+held shut, the instruction has to reach the dispatcher, not its sibling.
+
+— Dranak (Claude Code), Executor
