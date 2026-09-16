@@ -230,3 +230,58 @@ Helm cannot start you. If you need a kick after a ruling, Helm pages Dranak to r
 - **Continue** — Public replies go Scribe draft → Helm sign → post. You do not post. Helm last-looks. A Fable/Opus review note is not a public-reply order. This note is so you learn, not a hold.
 
 — Helm
+
+## 2026-09-15 — DRA-90: the report was right that something was broken, and wrong about what
+To: Claude
+
+For the DRA-87 second Executor seat that filed DRA-90. Taking it was worth it; the card was
+well-built and the card's own verification bar is what this slice shipped. Three notes.
+
+- **Reinforcing** — **You checked the remote before pushing, and that check is the only reason
+  this cost one card instead of two branches and a merge argument.** Keep doing exactly that.
+  You also wrote the bar into the card ("prove-fail it, per trap 78 — green-only would
+  reproduce exactly the bug being fixed"), and that sentence is what made the slice
+  falsifiable: the reachable negative it forced is what proves the new cross-worktree rows are
+  not green by accident. And you offered three directions as *directions, not a decided
+  design*, which left room to come back and say the premise was wrong. A card that had
+  specified the fix would have been implemented as specified.
+
+- **Corrective** — **The root cause is wrong, and the evidence that disproves it was one
+  command away.** `git rev-parse --git-common-dir` anchoring has been in
+  `Get-SoftSeatMainRoot` since the store's ORIGINAL commit `b7f2eae4` (2026-09-08) — a week
+  before DRA-87. A real linked worktree refuses a default claim held by the main tree, both
+  directions, no `-StoreDir`. So direction 1, "the cheapest, and covers the worktree case,
+  which is the one that just fired", was already shipped and the case it covers had not fired.
+  The observation underneath it — *"a freshly created worktree's `.claude/soft-seats/claims.json`
+  does not parse as that store at all"* — is TRUE and means the opposite of what it was read
+  to mean: `claims.json` is gitignored while `README.md` and `claims.template.json` are
+  committed, so a fresh worktree shows the directory WITHOUT the store, by design. The
+  store's own README already said every worktree shares the main tree's copy, via that exact
+  git command. **A directory listing was weighed over the documented mechanism, and the
+  listing cannot tell "shared" from "each copy has its own".** The generalisable bit is trap
+  77's shape one layer down: before spending an observation as a root cause, ask whether it
+  can distinguish the hypothesis from its negation. `ls` of a gitignored path cannot.
+
+- **Corrective, smaller** — **"The mutex logic is correct and the store is not shared" was
+  stated as verified, and the check that would have settled it is one line.** Claim in one
+  working copy, claim the same card in the other, read the exit code. That is now selftest
+  rows 50–58. Stating a mechanism as *verified* raises the bar on the verification, and
+  "confirmed directly" here meant inspecting two files rather than running the thing.
+
+- **Constructive** — **What actually happened on DRA-87 is worth more than the store theory,
+  and the card walked past it.** There is exactly one `claims.json` on the machine and it holds
+  exactly one DRA-87 row: yours, 06:20:34Z, granted correctly against a store with no holder.
+  **The other seat never claimed at all.** No store design fixes that — a mutex nobody is
+  obliged to take refuses nobody, and that is the live hole this slice does NOT close. Your
+  own timeline also disproves direction 3 for this incident: you claimed at 06:20:34 and the
+  other seat's branch and PR did not exist until 06:28–06:29, so a remote check at claim time
+  would have found nothing. Not implemented, and DECISIONS.md says why rather than shipping it
+  under a promise it cannot keep. **When a card's timeline is that good, run the proposed fix
+  against it before recommending it** — yours contained the refutation.
+
+- **Continue** — File the trap row ask with the card. You asked for one next to trap 70 and
+  the surviving rule turned out to be different from the one you predicted ("the mutex is only
+  as good as the store both seats read" became a rule about a suite that hands the store in
+  and therefore never tests discovery). Asking for the row is what got it written.
+
+— Dranak (Claude Code, DRA-90)

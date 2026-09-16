@@ -234,12 +234,22 @@ public sealed record ZoneOutgrownFact(
 /// <param name="GainMetric">The biggest single number that improved, in the stats block's own
 /// spelling ("AC", "HP", "STR"). From <see cref="ItemDominance.Gain"/> — the same table that
 /// decided dominance, so the sentence cannot name a metric the comparison did not weigh.</param>
-/// <param name="Who">The creature the wiki named, or "". Empty is the honest answer for every
-/// row until the weekly refresh rebuilds the catalog with
-/// <see cref="ItemCatalog.Record.DropMobs"/> in it — and an unanswered question draws nothing
-/// rather than a guess (trap 73).</param>
+/// <param name="Who">The creatures the wiki named for THIS zone, in the page's own order, capped
+/// at <see cref="Recommendations.GearMobsPerItem"/>.
+///
+/// <para><b>Plural since DRA-84 D4</b> (plan P3). It used to be one string, taken with
+/// <c>FirstOrDefault</c> — so a page naming six creatures answered with one of them and nothing
+/// said the other five existed. 3,830 of the 10,637 (item, zone) pairs in the shipped catalog
+/// name more than one.</para>
+///
+/// <para>Empty only where the player's own kills answered instead — the fact beside this one
+/// carries it, one producer per fact (trap 4). A pair that can answer from NEITHER source is not
+/// a row at all any more: see <see cref="RecommendationSet.GearWhoWithheld"/>.</para></param>
+/// <param name="WhoWithheld">How many more creatures the page named that the cap held back. Said
+/// out loud rather than dropped (trap 50).</param>
 public sealed record GearUpgradeFact(
-    string Item, string Over, string Slot, string GainMetric, double GainBy, string Who)
+    string Item, string Over, string Slot, string GainMetric, double GainBy,
+    IReadOnlyList<string> Who, int WhoWithheld = 0)
     : WhyFact(Evidence.Catalog);
 
 /// <summary>
@@ -600,10 +610,74 @@ public enum GoalGapReason
     /// next weekly refresh.</para>
     /// </summary>
     NoSellEvidence,
+
+    // ---- DRA-84 D2 -------------------------------------------------------------------
+
+    /// <summary>
+    /// The sweep found upgrades and the band gate refused every zone they drop in (DRA-84 D2).
+    ///
+    /// <para><b>A distinct state from <see cref="NoCatalogUpgrade"/>, and calling it that would
+    /// be a lie.</b> The catalog DOES carry something better than what this character wears —
+    /// it drops in places whose creatures eqlwiki puts outside their level. The count and the
+    /// bands ride <see cref="RecommendationSet.GearBandRefusals"/>; this reason is what stops a
+    /// gate that emptied the list from reading as a room with nothing in it.</para>
+    /// </summary>
+    EveryZoneOutsideYourBand,
+
+    // ---- DRA-84 D4 -------------------------------------------------------------------
+
+    /// <summary>
+    /// The sweep found upgrades, the band gate kept their zones, and not one of them could name
+    /// a creature from either source (DRA-84 D4, plan P3).
+    ///
+    /// <para><b>A third distinct state, and the third one that <see cref="NoCatalogUpgrade"/>
+    /// would misdescribe.</b> The catalog carries something better than what this character
+    /// wears and eqlwiki's band says the place is in reach — what is missing is the WHO, which
+    /// is the half the Founder failed the Rathe row for. 98.2% of the shipped catalog's
+    /// wearable (item, zone) pairs name a creature, so this arm is rare by construction and
+    /// KEEPS for the same reason <see cref="GearIntentNotAnsweredYet"/> does: a rule that
+    /// emptied the list must be able to say it did.</para>
+    /// </summary>
+    NoUpgradeNamesACreature,
 }
 
 /// <summary>One selected goal that produced no recommendation, and why.</summary>
 public sealed record GoalGap(HelperGoal Goal, GoalGapReason Reason);
+
+/// <summary>Which arm of the Farm Gear band gate refused a zone. Two arms and no third —
+/// see <see cref="Recommendations.OutgrownBy"/> and
+/// <see cref="Recommendations.GearBandReachAbove"/> for why they carry different numbers.</summary>
+public enum GearBandArm
+{
+    /// <summary>The band's TOP is <see cref="Recommendations.OutgrownBy"/> or more under the
+    /// character's level. Never fires for an open-topped band — there is no top to read
+    /// (<see cref="ZoneLevels.Band.Max"/>).</summary>
+    TopUnder,
+
+    /// <summary>The band's BOTTOM is <see cref="Recommendations.GearBandReachAbove"/> or more
+    /// over the character's level.</summary>
+    BottomOver,
+}
+
+/// <summary>
+/// One zone the Farm Gear band gate refused, carrying everything its sentence quotes
+/// (DRA-84 D2, plan P2).
+///
+/// <para><b>The wiki's own row travels with the refusal, not a paraphrase of it.</b> The
+/// player is owed the two numbers and the source that produced them — *"eqlwiki lists its
+/// creatures at 5–20 — you are 29"* — because a zone silently missing from a list is
+/// indistinguishable from a zone that has nothing in it. <see cref="Verbatim"/> is the row as
+/// the page printed it, so an open top reads as the "and above" it actually was.</para>
+/// </summary>
+/// <param name="Zone">The zone as the item catalog spelled it — what the row would have said.</param>
+/// <param name="Min">The band's bottom.</param>
+/// <param name="Max">The band's top, or null where the page stated none.</param>
+/// <param name="Verbatim">The <c>Level of Monsters</c> row, word for word.</param>
+/// <param name="Level">The resolved level the gate compared against, so the sentence can
+/// name the number it used rather than leaving the reader to infer it.</param>
+/// <param name="Arm">Which of the two rules fired.</param>
+public sealed record GearBandRefusal(
+    string Zone, int Min, int? Max, string Verbatim, int Level, GearBandArm Arm);
 
 /// <summary>
 /// Everything the Helper needs, read once by its host and handed over in one object.
@@ -700,6 +774,18 @@ public sealed record HelperInputs(
     /// <summary>Whether quest-obtained items may be offered (the Founder's "± quests").</summary>
     public bool IncludeQuests { get; init; }
 
+    /// <summary>
+    /// What eqlwiki says the creatures in each zone are levelled at — <see cref="ZoneLevels"/>,
+    /// read by the Farm Gear band gate (DRA-84 D2, plan P2).
+    ///
+    /// <para><b>Null is a real state and it stands the gate down</b>, in the same voice
+    /// <see cref="Items"/> uses beside it: a fixture without bands is a test rather than an
+    /// error, and an unanswered question gates nothing (trap 73). Production supplies it in
+    /// exactly one place — <c>HelperSources.Gather</c>, which is the ONE assembly point both
+    /// the room and the phone go through, so neither surface can be the one that forgot.</para>
+    /// </summary>
+    public ZoneLevels? Bands { get; init; }
+
     // ---- Farm Motes / Make Money (DRA-71 D7, plans P9 and P10) --------------------------
 
     /// <summary>What each zone has paid this character in motes —
@@ -731,13 +817,42 @@ public sealed record HelperInputs(
 /// first would be a number pointing at the wrong thing. A surviving cap says so (trap
 /// 50).</para>
 /// </param>
+/// <param name="GearBandRefusals">
+/// The zones the Farm Gear band gate refused (DRA-84 D2, plan P2).
+///
+/// <para><b>A refusal is a cap with a rule instead of a number, and trap 50 applies to it the
+/// same way.</b> This one cannot ride a row either — the row is precisely what did not get
+/// built — and a zone that vanished without a sentence is worse than a capped list, because
+/// the player cannot tell it from a zone the catalog has nothing in. The list rather than a
+/// count, because the sentence quotes each band.</para>
+/// </param>
+/// <param name="GearWhoWithheld">
+/// Drop offers held back because nothing could say what drops them (DRA-84 D4, plan P3).
+///
+/// <para><b>Its own count, beside <paramref name="GearWithheld"/> rather than folded into
+/// it.</b> That one is the per-anchor cap — a number of things EQBuddy chose not to list from a
+/// list it could have listed. This one is a RULE with a different cause: the offer exists, its
+/// zone is in reach, and neither the page nor the player's own kills can say who carries it.
+/// Two causes summed into one sentence is a sentence that cannot explain itself, which is the
+/// opposite of what trap 50 asks a surviving cap to do.</para>
+///
+/// <para>Counted per (item, zone) OFFER and not per item: the same item is offered under every
+/// zone it drops in, and a page that names creatures in one of two zones is answered in one
+/// place and withheld in the other.</para>
+/// </param>
 public sealed record RecommendationSet(
     IReadOnlyList<Recommendation> Top,
     int Withheld,
     IReadOnlyList<HelperGoal> NotAnsweredYet,
     IReadOnlyList<GoalGap> Gaps,
-    int GearWithheld = 0)
+    int GearWithheld = 0,
+    IReadOnlyList<GearBandRefusal>? GearBandRefusals = null,
+    int GearWhoWithheld = 0)
 {
+    /// <summary>Never null, so no caller has to decide what an absent list means.</summary>
+    public IReadOnlyList<GearBandRefusal> GearBandRefusals { get; init; }
+        = GearBandRefusals ?? [];
+
     public static readonly RecommendationSet Empty = new([], 0, [], []);
 }
 
@@ -909,10 +1024,14 @@ public static partial class Recommendations
         HelperGoal.WorkOnFaction => LevelUse.Exempt,
         HelperGoal.UnlockClasses => LevelUse.Exempt,
         HelperGoal.UnlockRaces => LevelUse.Exempt,
-        // **DRA-71 D6, and this row is the delivery's most vetoable default.** The plan's P8
-        // says the catalog lines are "level-gated (P5)", and the survey that had to run before
-        // building one found there is nothing to gate them ON — see LevelExemptReason.
-        HelperGoal.FarmGear => LevelUse.Exempt,
+        // **DRA-84 D2: the Founder's veto lands, and this row flips.** It was Exempt from
+        // DRA-71 D6 until 2026-09-14, on a survey of the ITEM side that still stands (see the
+        // comment on GearBandGate for the numbers and why they are not what changed). What
+        // changed is that there is now a ZONE-side level datum to read: D1 shipped eqlwiki's
+        // own `Level of Monsters` band for 87 zones, so the engine can refuse a camp whose
+        // creatures sit outside this character's level instead of ranking it. The Founder
+        // failed the room for offering Crushbone to a 29.
+        HelperGoal.FarmGear => LevelUse.Consumes,
         // **DRA-71 D7, and the two rows are deliberately opposite.** Motes CONSUME the level
         // because the Founder asked them to by name — *"highest-level zone"* is the first of
         // his three mote criteria. Money is EXEMPT because nothing he asked for needs it and
@@ -935,27 +1054,11 @@ public static partial class Recommendations
             "An unlock criterion names a specific creature, quest or standing, and the zone "
             + "is where that thing IS rather than a rate this character could beat somewhere "
             + "else. The game decides when an unlock is done; level is not one of its terms.",
-        // **THE SURVEY IS THE REASON, AND IT RAN BEFORE THE ENGINE WAS BUILT** (DRA-71 D6).
-        // The plan asked for level-gated catalog candidates. There is no level datum to gate
-        // them on: every one of the 11,146 shipped item records was scanned for a Level or
-        // Required-Level key in its stats block and not one carries either — the block prints
-        // WT, SIZE, RACE, CLASS, SLOT, AC and the attributes, and nothing else. Inventing a
-        // level requirement per item is trap 73 with arithmetic instead of prose, and the
-        // wiki does not publish one to match.
-        //
-        // The second half is why the OTHER level fact this repo has must not be borrowed. P6's
-        // discount marks down a zone whose creatures you have outgrown, and it is a claim about
-        // XP throughput. For gear the zone is where the ITEM is — and if anything an outgrown
-        // camp is the FASTER place to farm one, so applying the discount would rank against
-        // the goal the player picked and inverting it would be a bonus arm D4 refused plus a
-        // game rule nobody here can verify. Both readings are wrong, so neither is shipped.
-        HelperGoal.FarmGear =>
-            "An item's stats block carries no level requirement — the shipped catalog's "
-            + "11,146 records were surveyed and not one prints a Level key — so there is "
-            + "nothing about a candidate for a level to gate. And the zone is where the ITEM "
-            + "is rather than a rate: a camp this character has outgrown is if anything a "
-            + "quicker place to farm one, so the outgrown discount would recommend against "
-            + "the goal the player just picked.",
+        // **FarmGear's arm LEFT this table in DRA-84 D2** and deliberately left no stub behind:
+        // the pairing above requires a consuming engine to carry no reason, so a row here would
+        // now be the drift that pairing exists to catch. The D6 item-side survey it used to
+        // hold is NOT retired — it is the live reason the gate reads a ZONE and not an item,
+        // and it is quoted with its numbers on GearBandGate.
 
         // **DRA-71 D7.** The Founder's money ask is "farm valuable gear to sell" and "make
         // money", and neither names his level. What a level rule WOULD do here has two
@@ -1004,6 +1107,28 @@ public static partial class Recommendations
     /// re-orders and never filters.</para>
     /// </summary>
     public const double OutgrownWeight = 0.5;
+
+    /// <summary>
+    /// How far OVER the character's level a zone band's BOTTOM must sit before a Farm Gear row
+    /// for that zone is refused (DRA-84 D2, plan P2).
+    ///
+    /// <para><b>Five, and like <see cref="OutgrownBy"/> beside it this is a judgement somebody
+    /// can veto rather than a measurement.</b> This repo has no XP curve, no mob-HP model and
+    /// no con-colour scale, and eqlwiki publishes none; the Founder's own ceiling is level 29.
+    /// What the number encodes is one claim: a camp whose weakest creature is five or more
+    /// levels above you is not a camp you can farm an item out of tonight.</para>
+    ///
+    /// <para><b>It is deliberately smaller than <see cref="OutgrownBy"/>'s ten, and the
+    /// asymmetry is the point.</b> The two arms are not opposites. Being over a band's top
+    /// costs time; being under its bottom costs the attempt, and the distance at which that
+    /// happens is shorter. A single number used for both would have to be wrong in one
+    /// direction.</para>
+    ///
+    /// <para>It reads the band's BOTTOM and not its middle for the mirror of
+    /// <see cref="OutgrownBy"/>'s reason: if anything in the zone is within reach, the player
+    /// has a camp there, and refusing the whole zone would hide it.</para>
+    /// </summary>
+    public const int GearBandReachAbove = 5;
 
     // ---- throughput: outcome evidence, as weights with sentences (DRA-71 D4, plan P7) ----
 
@@ -1175,9 +1300,13 @@ public static partial class Recommendations
         var gaps = new List<GoalGap>();
         var candidates = new List<Recommendation>();
         var gearWithheld = 0;
+        var gearWhoWithheld = 0;
+        List<GearBandRefusal> gearBandRefusals = [];
 
         if (goals.Contains(HelperGoal.LevelUp)) LevelUp(inputs, candidates, gaps);
-        if (goals.Contains(HelperGoal.FarmGear)) gearWithheld = FarmGear(inputs, candidates, gaps);
+        if (goals.Contains(HelperGoal.FarmGear))
+            (gearWithheld, gearBandRefusals, gearWhoWithheld) =
+                FarmGear(inputs, candidates, gaps);
         // DRA-71 D7. Both read the player's own play and nothing else; the catalog's half of
         // each was refused by its own survey, which is written down where the engine is.
         if (goals.Contains(HelperGoal.FarmMotes)) FarmMotes(inputs, candidates, gaps);
@@ -1204,7 +1333,8 @@ public static partial class Recommendations
 
         var top = ordered.Take(Math.Max(0, cap)).Select(Trim).ToList();
         return new RecommendationSet(
-            top, Math.Max(0, ordered.Count - top.Count), deferred, gaps, gearWithheld);
+            top, Math.Max(0, ordered.Count - top.Count), deferred, gaps, gearWithheld,
+            gearBandRefusals, gearWhoWithheld);
     }
 
     // ---- the join: one place, every goal it serves (HOME-005) --------------------------
@@ -1763,10 +1893,11 @@ public static partial class Recommendations
                     each * loot.Count, item));
                 continue;
             }
-            // The catalog's own number, for an item you have never sold. It is EMPTY for every
-            // record in the catalog this slice ships — the promoter learns the field now and the
-            // values arrive with the next weekly refresh — so this arm is proved by fixture and
-            // draws nothing today (trap 73: nothing is the right amount to draw).
+            // The catalog's own number, for an item you have never sold. It was EMPTY on every
+            // record when DRA-71 D7 wrote this arm; the DRA-84 D3 refresh filled it on 773 of
+            // the 11,196, so this now draws on real rows. It still WEIGHS nothing — see
+            // MerchantCopper's own summary: a price quoted at somebody else's Charisma is not a
+            // property of the item, which is a survey finding rather than a gap that closed.
             if (inputs.Items?.Find(item) is { MerchantCopper: > 0 } record)
                 priced.Add((
                     new CatalogValueFact(item, record.MerchantCopper!.Value,
@@ -1799,6 +1930,25 @@ public static partial class Recommendations
     public const int GearNamedPerRow = 3;
 
     /// <summary>
+    /// How many creatures ONE item line names before it says it is holding some back (DRA-84
+    /// D4, plan P3).
+    ///
+    /// <para>Three, and for a reason one level down from <see cref="GearNamedPerRow"/>'s: a zone
+    /// row names three items, so an uncapped who clause would put a row of eighteen creature
+    /// names on screen. Three is also enough to be a PLAN — one name reads as the thing to kill,
+    /// three reads as the sort of thing this zone drops it from, which is what a camp actually
+    /// is.</para>
+    ///
+    /// <para><b>The cap is load-bearing on the shipped data rather than theoretical.</b> 3,830
+    /// of the 10,637 (item, zone) pairs name more than one creature and 1,384 name more than
+    /// three; before this slice the row named exactly one of them and said nothing about the
+    /// rest. What it holds back rides the same line (<see cref="GearUpgradeFact.WhoWithheld"/>,
+    /// trap 50), and the order is the wiki page's own — nothing here ranks creatures, because
+    /// nothing here has measured them.</para>
+    /// </summary>
+    public const int GearMobsPerItem = 3;
+
+    /// <summary>
     /// **UPGRADE WHAT I WEAR / REPLACE WITH BETTER** — the Founder's smoke items 4a and 4b.
     ///
     /// <para><b>The engine does no comparing.</b> <see cref="GearUpgrades.Sweep"/> owns the
@@ -1826,8 +1976,10 @@ public static partial class Recommendations
     /// <see cref="LevelExemptReason"/>. It is the default in this delivery most worth a
     /// veto.</para>
     /// </summary>
-    /// <returns>How many upgrades the sweep's per-anchor cap held back.</returns>
-    private static int FarmGear(HelperInputs inputs, List<Recommendation> into, List<GoalGap> gaps)
+    /// <returns>What the sweep's per-anchor cap held back, and which zones the band gate
+    /// refused.</returns>
+    private static (int Withheld, List<GearBandRefusal> Refused, int WhoWithheld) FarmGear(
+        HelperInputs inputs, List<Recommendation> into, List<GoalGap> gaps)
     {
         // A DECIDED deferral, said out loud. Every intent answers since DRA-71 D7, so this arm
         // is unreachable today and STAYS: a fourth intent arriving Deferred must say so rather
@@ -1835,7 +1987,7 @@ public static partial class Recommendations
         if (GearUpgrades.ShapeFor(inputs.GearIntent) != GearIntentShape.Answered)
         {
             gaps.Add(new GoalGap(HelperGoal.FarmGear, GoalGapReason.GearIntentNotAnsweredYet));
-            return 0;
+            return (0, [], 0);
         }
 
         // **"Farm to sell" is a different question and leaves here** (DRA-71 D7, plan P9). It
@@ -1843,10 +1995,16 @@ public static partial class Recommendations
         // below — see FarmToSell for why routing it through Sweep would be the one claim that
         // sweep's own summary forbids. It needs no inventory dump either: the anchor is what
         // you have LOOTED, not what you are wearing.
+        //
+        // **IT IS ALSO WHY FarmToSell STAYS LEVEL-EXEMPT** while the goal as a whole now
+        // Consumes (DRA-84 D2). The band gate below refuses a CAMP, and this intent names no
+        // camp: it ranks what the player has already looted, priced at what a vendor has
+        // already paid them. There is no zone to look a band up for, and D7's coin reasoning
+        // is untouched by anything D2 measured.
         if (inputs.GearIntent == GearIntent.FarmToSell)
         {
             FarmToSell(inputs, into, gaps);
-            return 0;
+            return (0, [], 0);
         }
 
         // "EQBuddy has never been told what you are wearing" is a different state from
@@ -1854,7 +2012,7 @@ public static partial class Recommendations
         if (inputs.Worn.Count == 0)
         {
             gaps.Add(new GoalGap(HelperGoal.FarmGear, GoalGapReason.NoInventoryDump));
-            return 0;
+            return (0, [], 0);
         }
 
         var sweep = GearUpgrades.Sweep(
@@ -1863,22 +2021,44 @@ public static partial class Recommendations
         if (sweep.Upgrades.Count == 0)
         {
             gaps.Add(new GoalGap(HelperGoal.FarmGear, GoalGapReason.NoCatalogUpgrade));
-            return sweep.Withheld;
+            return (sweep.Withheld, [], 0);
         }
 
-        var byZone = new Dictionary<string, List<GearUpgrade>>(StringComparer.OrdinalIgnoreCase);
-        var byQuest = new Dictionary<string, List<GearUpgrade>>(StringComparer.OrdinalIgnoreCase);
+        var byZone = new Dictionary<string, List<GearCandidate>>(StringComparer.OrdinalIgnoreCase);
+        var byQuest = new Dictionary<string, List<GearCandidate>>(StringComparer.OrdinalIgnoreCase);
         foreach (var upgrade in sweep.Upgrades)
         {
             // An item that drops in five zones is offered under every one of them, which is
             // GearFarmRollup's own rule and its own reason: the question a row answers is "if
             // I camp here tonight, what can this place still give me", and a per-zone list
             // that hid a valid camp would make its own heading lie.
+            //
+            // The creature question is answered HERE, once, for the (offer, place) pair — and
+            // it is only ACTED on further down, after the band gate has had its say.
             foreach (var zone in upgrade.Zones.Distinct(StringComparer.OrdinalIgnoreCase))
-                Bucket(byZone, zone, upgrade);
+                Bucket(byZone, zone, new GearCandidate(upgrade, WhoFor(inputs, upgrade, zone)));
+            // **A quest row is not a drop row and the who rule does not reach it.** "Who drops
+            // it" has no answer for a hand-in and needs none — the quest IS the path, which is
+            // the other half of acceptance item 2's "source mob(s) AND/OR quest".
             foreach (var quest in upgrade.Quests.Distinct(StringComparer.OrdinalIgnoreCase))
-                Bucket(byQuest, quest, upgrade);
+                Bucket(byQuest, quest, new GearCandidate(upgrade, GearWho.None));
         }
+
+        // **THE BAND GATE, AND IT RUNS BEFORE THE YARDSTICK IS TAKEN** (DRA-84 D2, plan P2).
+        // A refused zone is not a candidate, so it must not set the scale the surviving rows
+        // are measured against — leaving it in `best` would let a camp this character cannot
+        // farm decide how full every other row's bar looks.
+        var refused = GearBandGate(inputs, byZone);
+
+        // **AND THE WHO RULE RUNS AFTER IT** (DRA-84 D4, plan P3; acceptance item 2, the Rathe
+        // exhibit). Both rules can remove the same row and the ORDER decides which sentence the
+        // player gets, so it is chosen rather than incidental: the band refusal quotes eqlwiki's
+        // own numbers and this character's level, and the who rule can only say that a page was
+        // silent. Running the who rule first would have swallowed refusals D2 shipped —
+        // Crushbone at level 30 would vanish as "no creature named" instead of as "eqlwiki lists
+        // its creatures at 5–20". A slice must not quietly narrow what the slice before it
+        // refused out loud.
+        var whoWithheld = WhoRule(byZone);
 
         // ONE yardstick for the whole engine, folded once — a property of the SET, and a
         // per-row recomputation would be the same sum computed six times (trap 4 in a loop).
@@ -1888,25 +2068,41 @@ public static partial class Recommendations
             byZone.Count > 0 ? byZone.Max(kv => kv.Value.Count) : 0,
             byQuest.Count > 0 ? byQuest.Max(kv => kv.Value.Count) : 0);
 
-        foreach (var (zone, upgrades) in Ranked(byZone))
-            into.Add(GearRow(inputs, RecommendationKind.Zone, zone, zone, upgrades, best,
+        // **A GATE THAT EMPTIED THE LIST HAS TO SAY SO IN ITS OWN VOICE.** The refusal
+        // sentence alone is not enough: with no rows and no gap the room draws its
+        // whole-room empty state, which says EQBuddy has nothing stored — the opposite of
+        // what happened, which is that it read the catalog, found upgrades and refused every
+        // place they drop. NoCatalogUpgrade would be a lie for the same reason.
+        if (byZone.Count == 0 && byQuest.Count == 0)
+        {
+            // Two rules can empty this list and they are different states, so they get
+            // different sentences. The band gate is named first because it is the louder of
+            // the two and carries its own numbers; the who rule answers for the rest.
+            if (refused.Count > 0)
+                gaps.Add(new GoalGap(HelperGoal.FarmGear, GoalGapReason.EveryZoneOutsideYourBand));
+            else if (whoWithheld > 0)
+                gaps.Add(new GoalGap(HelperGoal.FarmGear, GoalGapReason.NoUpgradeNamesACreature));
+        }
+
+        foreach (var (zone, candidates) in Ranked(byZone))
+            into.Add(GearRow(RecommendationKind.Zone, zone, zone, candidates, best,
                 [new HelperDoor(HelperDoorKind.World, zone), new HelperDoor(HelperDoorKind.Gear, "")]));
 
-        foreach (var (quest, upgrades) in Ranked(byQuest))
-            into.Add(GearRow(inputs, RecommendationKind.Quest, quest, "", upgrades, best,
+        foreach (var (quest, candidates) in Ranked(byQuest))
+            into.Add(GearRow(RecommendationKind.Quest, quest, "", candidates, best,
                 [new HelperDoor(HelperDoorKind.QuestCatalog, quest),
                  new HelperDoor(HelperDoorKind.Gear, "")]));
 
-        return sweep.Withheld;
+        return (sweep.Withheld, refused, whoWithheld);
 
-        static void Bucket(Dictionary<string, List<GearUpgrade>> into, string key, GearUpgrade u)
+        static void Bucket(Dictionary<string, List<GearCandidate>> into, string key, GearCandidate c)
         {
             if (!into.TryGetValue(key, out var list)) into[key] = list = [];
-            list.Add(u);
+            list.Add(c);
         }
 
-        static List<KeyValuePair<string, List<GearUpgrade>>> Ranked(
-            Dictionary<string, List<GearUpgrade>> buckets) =>
+        static List<KeyValuePair<string, List<GearCandidate>>> Ranked(
+            Dictionary<string, List<GearCandidate>> buckets) =>
             [.. buckets
                 .OrderByDescending(kv => kv.Value.Count)
                 .ThenBy(kv => kv.Key, StringComparer.OrdinalIgnoreCase)
@@ -1914,34 +2110,202 @@ public static partial class Recommendations
     }
 
     /// <summary>
-    /// One gear row: what the place (or the quest) can give you, and what it beats.
+    /// One catalog upgrade, offered under one place, with the creature question already
+    /// answered for it (DRA-84 D4, plan P3).
     ///
-    /// <para><b>The creature is answered ONCE per upgrade</b> (trap 4). Where the player's own
-    /// pool has seen the item drop, that is the answer and it is Personal — measured, with its
-    /// denominator, and it cannot be stale. Only where they have not does the catalog's own
-    /// named creature ride the Catalog line, and today that is empty for every row until the
-    /// weekly refresh rebuilds <see cref="ItemCatalog.Record.DropMobs"/>. Two sentences naming
-    /// two creatures for one item is the shape a reader has to reconcile and nobody should
-    /// have to.</para>
+    /// <para>The pairing exists so the who is decided ONCE, at the door, and read at the row
+    /// (trap 4). Before this slice the row resolved it — which was harmless while it only
+    /// decided a sentence, and is not now that it also decides whether the offer exists at
+    /// all: a bucket whose count disagreed with the rows drawn from it would make this
+    /// engine's weight a number about a different list.</para>
+    /// </summary>
+    private readonly record struct GearCandidate(GearUpgrade Upgrade, GearWho Who);
+
+    /// <summary>
+    /// **A DROP OFFER THAT CANNOT SAY WHAT DROPS IT IS NOT AN OFFER** (DRA-84 D4, plan P3;
+    /// Founder acceptance item 2, and the Rathe Mountains exhibit by name).
+    ///
+    /// <para>The Founder's Rathe row named an item and a place and stopped. Its band is 13–45,
+    /// which spans most characters, so D2's level gate cannot refuse it and was never going to
+    /// — what was wrong with that row is that there was nothing in it to DO. This rule is the
+    /// other mechanism the plan named for the other class of failure.</para>
+    ///
+    /// <para><b>It prunes rather than filtering at the door, so the count stays honest.</b> The
+    /// bucket count is this engine's weight AND its yardstick, so an offer that will never be
+    /// drawn must not inflate the zone it cannot be drawn under; a zone left with nothing goes
+    /// with them, because a heading over no items is the emptiest version of the same row.</para>
+    ///
+    /// <para><b>It is rare by construction on the shipped data</b> — 98.2% of the catalog's
+    /// wearable (item, zone) pairs name a creature since the D3 refresh — which is what makes
+    /// the rule affordable. Before that refresh it would have withheld everything, which is
+    /// exactly why the plan ordered this slice after it and made the coverage survey this
+    /// slice's opening move (<c>ItemCatalogWhoCoverageTests</c>).</para>
+    /// </summary>
+    /// <returns>How many (item, zone) offers were withheld.</returns>
+    private static int WhoRule(Dictionary<string, List<GearCandidate>> byZone)
+    {
+        var withheld = 0;
+        foreach (var zone in byZone.Keys.ToList())
+        {
+            var kept = byZone[zone].FindAll(c => c.Who.Answered);
+            withheld += byZone[zone].Count - kept.Count;
+            if (kept.Count == 0) byZone.Remove(zone);
+            else byZone[zone] = kept;
+        }
+        return withheld;
+    }
+
+    /// <summary>
+    /// **WHO DROPS IT — ONE ANSWER, FROM ONE SOURCE** (DRA-84 D4, plan P3; trap 4).
+    ///
+    /// <para>The player's own pool WINS wherever it has seen the item drop here: it is
+    /// measured, it carries its denominator, and it cannot be stale. Only where it has not does
+    /// the wiki's own list speak, Catalog-labelled, capped at
+    /// <see cref="GearMobsPerItem"/>. The two are never both drawn for one item — two
+    /// sentences naming two creatures for one thing is a contradiction the reader has to
+    /// resolve, and the catalog clause is empty BY CONSTRUCTION here rather than by a rule at
+    /// the far end that someone could later forget.</para>
+    /// </summary>
+    /// <param name="Seen">The player's own kills, or null.</param>
+    /// <param name="Named">The wiki's creatures for this zone, capped. Empty where
+    /// <paramref name="Seen"/> answered, and empty where the page named nobody.</param>
+    /// <param name="Withheld">How many more the page named.</param>
+    private readonly record struct GearWho(
+        GearDropSeenFact? Seen, IReadOnlyList<string> Named, int Withheld)
+    {
+        /// <summary>The answer for a place that is not a place — a quest row, which is asked
+        /// nothing and withheld for nothing.</summary>
+        public static readonly GearWho None = new(null, [], 0);
+
+        /// <summary>Whether anything at all can say what drops this here. The withhold rule is
+        /// this property and nothing else.</summary>
+        public bool Answered => Seen is not null || Named.Count > 0;
+    }
+
+    private static GearWho WhoFor(HelperInputs inputs, GearUpgrade upgrade, string zone)
+    {
+        if (zone.Length == 0) return GearWho.None;
+        if (SeenDrop(inputs.Pool, upgrade.Item, zone) is { } seen)
+            return new GearWho(seen, [], 0);
+
+        var named = upgrade.MobsIn(zone);
+        return named.Count == 0
+            ? GearWho.None
+            : new GearWho(null, [.. named.Take(GearMobsPerItem)],
+                Math.Max(0, named.Count - GearMobsPerItem));
+    }
+
+    /// <summary>
+    /// **THE FOUNDER'S VETO, AS A RULE THAT REMOVES ROWS** (DRA-84 D2, plan P2; acceptance
+    /// item 3 — *"no zones with no viable upgrade path for my intent/level"*, Crushbone and
+    /// the Rathe named as the exhibits).
+    ///
+    /// <para><b>It REFUSES rather than demotes, and that is a deliberate departure from the
+    /// precedent beside it.</b> <see cref="OutgrownWeight"/> halves a zone and keeps it,
+    /// because there the zone is the player's OWN measured evidence and a recommender that
+    /// deleted their best camp would be overruling a measurement with a judgement. These rows
+    /// are <see cref="Evidence.Catalog"/> — EQBuddy read about them — and their mere presence
+    /// is what the Founder failed. So the two rules are opposite on purpose: protect what the
+    /// player measured, remove what we only read about.</para>
+    ///
+    /// <para><b>It fires even where the player HAS farmed the zone.</b> Crushbone stays
+    /// refused for a 29 who camped it at 12, because the question a Farm Gear row answers is
+    /// where to go tonight and a personal drop from seventeen levels ago does not change the
+    /// band. This is the delivery's most vetoable default and is logged as one.</para>
+    ///
+    /// <para><b>Both numbers are judgements</b> — <see cref="OutgrownBy"/> reused rather than
+    /// re-derived, and <see cref="GearBandReachAbove"/> new. No XP curve is invented, and the
+    /// band is eqlwiki's own row rather than anything this repo computed.</para>
+    ///
+    /// <para><b>The TOP arm stands down for an open-topped band</b>
+    /// (<see cref="ZoneLevels.Band.Max"/> null — 41 of the 87 shipped bands). There is no top
+    /// to be ten levels under, and reading the number before the `+` as one would be inventing
+    /// the maximum Helm's option (a) refused to invent. Those zones can still be refused by the
+    /// BOTTOM arm, which is what keeps a level-12 character out of Plane of Sky's `50+`.</para>
+    ///
+    /// <para><b>THE ITEM SIDE IS STILL NOT GATED, and the D6 survey is why</b> — kept here
+    /// because it is the live reason this gate reads a ZONE. Every one of the 11,196 shipped
+    /// item records was scanned for a Level or Required-Level key: FIVE print one and exactly
+    /// ONE is a wearable (<c>Shroud of the Sky</c>, <c>Required Level: 46</c>); the other four
+    /// are <c>Level Needed</c> on spell scrolls and a food, which is the SPELL's level and not
+    /// a requirement to equip anything. Re-taken on the DRA-84 D3 refresh, so the claim is
+    /// "one" rather than D6's "none" and the conclusion is unchanged: one wearable in 11,196 is
+    /// not a datum an engine can gate on. Inventing a level requirement per item would be trap
+    /// 73 with arithmetic instead of prose.</para>
+    ///
+    /// <para><b>And the P6 outgrown DISCOUNT is still not borrowed here</b>, which is the
+    /// other half of that survey and is not what D2 changed. That discount is a claim about XP
+    /// throughput; for gear the zone is where the ITEM is, and an outgrown camp is if anything
+    /// the quicker farm. What D2 adds is not a discount — it is a refusal on eqlwiki's
+    /// published band, and it is bounded by two named distances rather than applied as a
+    /// slope.</para>
+    ///
+    /// <para>Three ways to stand down entirely, each a different silence: no resolved level
+    /// (EQBuddy has not been told, and the room already offers the Character door), no
+    /// <see cref="HelperInputs.Bands"/>, and no band for this zone — 31 zone pages answer
+    /// nothing and an unanswered question gates nothing (trap 73).</para>
+    /// </summary>
+    /// <param name="byZone">Mutated in place: a refused zone is REMOVED.</param>
+    /// <returns>One entry per refused zone, in the order a reader would meet them
+    /// (alphabetical), each carrying the band and the level its sentence quotes.</returns>
+    private static List<GearBandRefusal> GearBandGate(
+        HelperInputs inputs, Dictionary<string, List<GearCandidate>> byZone)
+    {
+        var refused = new List<GearBandRefusal>();
+        if (!inputs.Level.Known || inputs.Bands is not { } bands) return refused;
+
+        var level = inputs.Level.Level;
+        foreach (var zone in byZone.Keys
+                     .OrderBy(z => z, StringComparer.OrdinalIgnoreCase).ToList())
+        {
+            if (bands.BandFor(zone) is not { } band) continue;
+            if (ArmFor(band, level) is not { } arm) continue;
+            byZone.Remove(zone);
+            refused.Add(new GearBandRefusal(
+                zone, band.Min, band.Max, band.Verbatim, level, arm));
+        }
+        return refused;
+    }
+
+    /// <summary>
+    /// Which arm refuses this band at this level, or null for a band that is in reach.
+    ///
+    /// <para>Split out so the judgement is one expression a test can drive at a boundary: the
+    /// numbers are inclusive thresholds (*"<see cref="OutgrownBy"/> or more under"*), and
+    /// off-by-one on either of them would silently change which zones a player sees.</para>
+    /// </summary>
+    internal static GearBandArm? ArmFor(ZoneLevels.Band band, int level)
+    {
+        if (band.Max is { } max && level - max >= OutgrownBy) return GearBandArm.TopUnder;
+        if (band.Min - level >= GearBandReachAbove) return GearBandArm.BottomOver;
+        return null;
+    }
+
+    /// <summary>
+    /// One gear row: what the place (or the quest) can give you, what it beats, and — since
+    /// DRA-84 D4 — what drops it.
+    ///
+    /// <para><b>The creature was answered at the door</b> (<see cref="WhoFor"/>, trap 4). This
+    /// method draws the answer and decides nothing about it: every candidate that reached here
+    /// under a ZONE can name somebody, because one that could not was never bucketed.</para>
     /// </summary>
     private static Recommendation GearRow(
-        HelperInputs inputs, RecommendationKind kind, string subject, string zone,
-        List<GearUpgrade> upgrades, int best, List<HelperDoor> doors)
+        RecommendationKind kind, string subject, string zone,
+        List<GearCandidate> candidates, int best, List<HelperDoor> doors)
     {
-        var named = upgrades
-            .OrderByDescending(u => u.ImprovedMetrics)
-            .ThenBy(u => u.Item, StringComparer.OrdinalIgnoreCase)
+        var named = candidates
+            .OrderByDescending(c => c.Upgrade.ImprovedMetrics)
+            .ThenBy(c => c.Upgrade.Item, StringComparer.OrdinalIgnoreCase)
             .ToList();
         var shown = named.Take(GearNamedPerRow).ToList();
 
         var why = new List<WhyFact>();
-        foreach (var upgrade in shown)
+        foreach (var (upgrade, who) in shown)
         {
-            var seen = zone.Length > 0 ? SeenDrop(inputs.Pool, upgrade.Item, zone) : null;
             why.Add(new GearUpgradeFact(
                 upgrade.Item, upgrade.Over, upgrade.Slot, upgrade.GainMetric, upgrade.GainBy,
-                seen is null ? upgrade.MobsIn(zone).FirstOrDefault() ?? "" : ""));
-            if (seen is { } fact) why.Add(fact);
+                who.Named, who.Withheld));
+            if (who.Seen is { } fact) why.Add(fact);
         }
 
         return new Recommendation(

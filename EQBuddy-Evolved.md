@@ -2,7 +2,7 @@
 
 **Your Personalized Guide to Norrath**
 
-EQBuddy 1.x grew a lot of capability, fast. **EQBuddy Evolved** is the next major version: the same private, log-only companion, finished into one coherent product — clean, simple, personal, and easy to navigate.
+EQBuddy 1.x grew a lot of capability, fast. **EQBuddy Evolved** is the next major version: the same private, local-first companion, finished into one coherent product — clean, simple, personal, and easy to navigate.
 
 This is the player-facing vision. The product identity — principles, surfaces, and the north star in full — lives in [PRODUCT.md](PRODUCT.md). **Current public downloads remain 1.x.** Evolved is the direction, not a download yet.
 
@@ -65,7 +65,7 @@ Primary workflows aim for **one click to the domain, one more to the answer.** A
 ## Hard lines (these do not move)
 
 - **Personal, not competitive.** EQBuddy measures the player using it. It is not a party or raid ranking tool, a leaderboard, or a way to judge other people.
-- **Log-only and local-first.** No game-memory reads, no packet inspection, no gameplay automation, no hidden-information extraction, no required account, no required cloud, no telemetry by default.
+- **Your own files, and local-first.** EQBuddy reads what the game writes for you on your own PC: the `/log` it tails live, and the `/outputfile` dumps you ask for — inventory, achievements, faction, spellbook. No game-memory reads, no packet inspection, no gameplay automation, no hidden-information extraction, no required account, no required cloud, no telemetry by default.
 - **Evidence before confidence.** A precise-looking wrong number is worse than a clearly identified estimate.
 - **No modal interruptions for ordinary information.** Looting a quest item should be a dismissible toast or chip, not a dialog that steals the fight.
 

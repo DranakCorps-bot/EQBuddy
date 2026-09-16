@@ -368,11 +368,20 @@ public class HelperMustListTests
     /// row above is that the ONLY thing that differs between the two runs is the level.</para>
     ///
     /// <para><b>The gear half is deliberately in the SAME zone.</b> A Farm Gear answer that
-    /// named a zone with no history could not be affected by the level under any reading, so
-    /// the exemption would pass for the wrong reason — "identical at two levels" is vacuous
+    /// named a zone with no history could not be affected by the level under any reading, so a
+    /// claim about level would pass for the wrong reason — "identical at two levels" is vacuous
     /// against an engine the level could never have reached. Anchoring it on Lower Guk, which
     /// IS the outgrown zone, is the arrangement where a borrowed P6 discount would show
     /// up.</para>
+    ///
+    /// <para><b>DRA-84 D2 gives it a <see cref="ZoneLevels"/>, and the band is the FIXTURE's
+    /// own rather than the shipped page's.</b> It is 8–12 because that is what this fixture's
+    /// creatures conned at, so the gate's TOP arm is the thing that moves between the two runs:
+    /// at 12 the band is in reach and the row stands, at 60 it is 48 levels under and the row is
+    /// refused. The real eqlwiki row for Lower Guk is `30-50+`, which is an OPEN top and would
+    /// exercise the other arm — it is asserted against the shipped catalog in
+    /// <c>RecommendationsGearTests</c>, which is where a claim about the wiki belongs. Nothing
+    /// here is a statement about a wiki page.</para>
     /// </summary>
     private static HelperInputs LevelFixture(int level)
     {
@@ -417,6 +426,9 @@ public class HelperMustListTests
             {
                 Name = "Froglok Bone Helm", StatsText = "Slot: HEAD\nAC: 9",
                 Slots = ["HEAD"], Ac = 9, DropZones = ["Lower Guk"],
+                // DRA-84 D4: a drop offer with no creature to name is withheld, so a fixture
+                // that named nobody would stop this must-list proving what it is about.
+                DropMobs = new() { ["Lower Guk"] = ["a froglok knight"] },
             },
         ]);
 
@@ -433,6 +445,11 @@ public class HelperMustListTests
             // falling through to the catalog arm this fixture does not exercise.
             Motes = MoteHistory.Fold(pool, zones),
             Sales = [new SaleRoll("Froglok Blood", 4, 320)],
+            // DRA-84 D2. See the summary: the fixture's own band, matching the fixture's own
+            // conned creatures, so the gate's TOP arm is what differs between 12 and 60.
+            Bands = new ZoneLevels(
+                new Dictionary<string, ZoneLevels.Band> { ["Lower Guk"] = new(8, 12, "8-12") },
+                new Dictionary<string, string>()),
         };
     }
 
@@ -494,6 +511,11 @@ public class HelperMustListTests
         // prints with two denominations, so a sentence that dropped one would be visible.
         if (type == typeof(long)) return 320L;
         if (type == typeof(Evidence)) return Evidence.Personal;
+        // DRA-84 D4: a fact may carry a LIST of names now (the plural WHO). Two entries rather
+        // than one, so a sentence that joined them wrongly — or printed only the first, which
+        // is precisely what this slice replaced — comes out visibly wrong in the sweep.
+        if (type == typeof(IReadOnlyList<string>))
+            return new List<string> { "a froglok knight", "a froglok shaman" };
         throw new InvalidOperationException(
             $"A WhyFact takes a {type.Name}, which this fixture cannot make up. Add an arm — "
             + "the sweep is only as complete as the values it can construct.");

@@ -296,13 +296,14 @@ public static class HelperPresentation
         // that is the line the Gear Locker's "never BiS" lock draws. The catalog label is
         // appended by Why() above, so this sentence can never read as a measurement of play.
         //
-        // The WHO clause is silent where the wiki named nobody, which is every row until the
-        // weekly refresh rebuilds the catalog with DropMobs in it. An unanswered question
-        // draws nothing (trap 73) — and where the player's OWN kills answered it, the fact
-        // beside this one carries it instead and this clause is empty by construction.
+        // **THE WHO CLAUSE IS PLURAL SINCE DRA-84 D4** (plan P3). It is empty in exactly two
+        // states and neither is a guess: the player's OWN kills answered, so the fact beside
+        // this one carries it instead (trap 4), or this is a QUEST row, where the quest is the
+        // path and no creature drops the thing at all. A zone row that could name nobody is no
+        // longer drawn — see GearWhoWithheld, which counts them out loud.
         GearUpgradeFact f =>
             $"{f.Item} beats the {f.Over} in your {Slot(f.Slot)} — {Gain(f)}."
-            + (f.Who.Length > 0 ? $" {f.Who} drops it." : ""),
+            + Who(f),
 
         // The personal half: measured, with its denominator, and the creature named from your
         // own pooled kills rather than from a page.
@@ -556,11 +557,37 @@ public static class HelperPresentation
             $"{GoalLabel(gap.Goal)}: your stored sessions have not earned coin in a zone "
             + "EQBuddy can quote a rate for yet.",
 
+        // ---- DRA-84 D2 ----------------------------------------------------------------
+
+        // **THE SUBJECT IS THE BANDS AND NOT THE PLAYER.** "Nowhere is right for your level"
+        // reads as a verdict on the character; what EQBuddy did was read eqlwiki's own numbers
+        // for the places its catalog names and find all of them outside a range it will
+        // recommend at. The count and each band arrive under this line (GearBandRefused), so
+        // this sentence says WHAT happened and leaves the numbers to the one that has them.
+        GoalGapReason.EveryZoneOutsideYourBand =>
+            $"{GoalLabel(gap.Goal)}: EQBuddy found upgrades in its catalog and every place they "
+            + "drop has a creature level band on eqlwiki that sits outside yours. The bands and "
+            + "your level are below — nothing here is a claim about the game, only about which "
+            + "zones EQBuddy will put in this list.",
+
         GoalGapReason.NoSellEvidence =>
             $"{GoalLabel(gap.Goal)}: EQBuddy prices a drop by what a vendor has actually paid "
             + "YOU for one, and it has not seen a sale yet. Its own item pages carry vendor "
             + "values quoted at somebody else's Charisma and faction, so they are a fallback "
-            + "rather than the answer — and this build's catalog does not carry them yet.",
+            + "rather than the answer — and nothing you loot carries one.",
+
+        // ---- DRA-84 D4 ----------------------------------------------------------------
+
+        // **THE SUBJECT IS THE PAGES AND NOT THE PLACES.** "Those zones have no camps" is a
+        // claim about the game; what happened is that every item EQBuddy would have offered is
+        // one whose own page names nobody in the zone it drops in, and that this character has
+        // never looted one there either. Both halves are in the sentence because both are
+        // things a player can change.
+        GoalGapReason.NoUpgradeNamesACreature =>
+            $"{GoalLabel(gap.Goal)}: EQBuddy found upgrades in its catalog and cannot tell you "
+            + "what to kill for any of them — no item page names a creature in the zone it "
+            + "drops in, and you have not looted one there. It would rather say that than send "
+            + "you to a zone with only a name in hand.",
 
         _ => "",
     };
@@ -760,9 +787,17 @@ public static class HelperPresentation
     /// belongs to. Saying that out loud, with the count, is what stops the block reading as
     /// unfinished; a room that silently omitted the ranking would leave a player wondering
     /// whether they had configured something wrong.</para>
+    ///
+    /// <para><b>THE NUMBER IS A CLAIM ABOUT THE SHIPPED CATALOG, SO IT MOVES WHEN THE CATALOG
+    /// DOES</b> (DRA-84 D3 follow-up). The weekly refresh re-read the wiki and the page count
+    /// went from 10,957 to 11,197 — and the profession count stayed at <b>14</b>, which is the
+    /// finding that keeps the arithmetic parked. The refresh landed in #626 without this
+    /// sentence moving with it, so for one commit range EQBuddy told players a survey result
+    /// its own shipped report contradicted. The pinning test now reads
+    /// <c>items-catalog-report.md</c> rather than this sentence's own literal.</para>
     /// </summary>
     public const string ProfessionsParkNote =
-        "EQBuddy does not rank where to farm materials yet. Of the 10,957 item pages it has "
+        "EQBuddy does not rank where to farm materials yet. Of the 11,197 item pages it has "
         + "read, 14 say which profession an ingredient belongs to — not enough to point you "
         + "at a camp without guessing.";
 
@@ -886,6 +921,93 @@ public static class HelperPresentation
         ? ""
         : $"{withheld:N0} more {(withheld == 1 ? "upgrade" : "upgrades")} matched and are not "
           + "listed — EQBuddy names a few per slot rather than every one it has read about.";
+
+    /// <summary>
+    /// **WHAT THE WHO RULE HELD BACK** (DRA-84 D4, plan P3; trap 50).
+    ///
+    /// <para><b>Its own sentence, deliberately not folded into
+    /// <see cref="GearWithheld"/>.</b> That one is a CAP — EQBuddy naming a few of the many it
+    /// could have named — and this one is a RULE with a different cause and a different remedy.
+    /// Summing them would produce one number that can explain neither, which is the failure
+    /// trap 50 is about rather than a tidier surface.</para>
+    ///
+    /// <para><b>The subject is EQBuddy's own knowledge, never the game.</b> "Nothing drops it
+    /// there" would be a claim about the world; what actually happened is that the item's page
+    /// named no creature for that zone and this character has never looted one there. The
+    /// sentence says both halves, because both are things a player can change — one by playing,
+    /// one by editing the page.</para>
+    /// </summary>
+    public static string GearWhoWithheld(int withheld) => withheld <= 0
+        ? ""
+        : withheld == 1
+            ? "1 more drop offer is not listed: the item's page names nothing that drops it in "
+              + "that zone, and you have not looted one there. EQBuddy leaves out a camp it "
+              + "cannot tell you what to kill at."
+            : $"{withheld:N0} more drop offers are not listed: their item pages name nothing "
+              + "that drops them in those zones, and you have not looted one there. EQBuddy "
+              + "leaves out a camp it cannot tell you what to kill at.";
+
+    /// <summary>How many refused zones are NAMED before the sentence counts the rest. Three,
+    /// which is <c>GearNamedPerRow</c> and <c>DefaultCap</c>'s reason one surface out: a
+    /// caption that listed eleven zones with eleven bands would be a table pretending to be a
+    /// sentence.</summary>
+    public const int GearBandNamed = 3;
+
+    /// <summary>
+    /// **A BAND IN WORDS, AND THERE IS ONE PRODUCER OF THEM** (DRA-84 D2).
+    ///
+    /// <para>Three shapes, because the data has three: a closed band, a single level, and an
+    /// OPEN TOP where <see cref="ZoneLevels.Band.Max"/> is null because the page said "and
+    /// above" (41 of the 87 shipped bands). The open one must not render as a range with a
+    /// missing end — "5–" is a typo and "5–99" is the invented maximum the ruling refused.</para>
+    /// </summary>
+    public static string BandPhrase(int min, int? max) => max switch
+    {
+        null => $"{min} and above",
+        { } m when m == min => $"{min}",
+        { } m => $"{min}–{m}",
+    };
+
+    /// <summary>
+    /// **WHAT THE BAND GATE HELD BACK, WITH THE NUMBERS IT HELD IT BACK ON** (DRA-84 D2, plan
+    /// P2; trap 50).
+    ///
+    /// <para><b>A refusal that says nothing is worse than a cap that says nothing</b>, which is
+    /// why this exists as well as the gate. A zone missing from the list is indistinguishable
+    /// from a zone the catalog has nothing in, and the player has no way to discover that
+    /// EQBuddy decided for them — so the count, the rule and each band are said out loud, and
+    /// the Gear room's door under it has the whole wishlist.</para>
+    ///
+    /// <para><b>Two numbers and a source, and no adjective</b> (HOME-006). It quotes eqlwiki's
+    /// own row and this character's own level and then stops: "outside yours" is a statement
+    /// about two ranges, where "too tough for you" would be a claim about the place and about
+    /// the player that nothing here measured. The rule is named in full so the reader can
+    /// disagree with the judgement rather than just with the outcome.</para>
+    /// </summary>
+    public static string GearBandRefused(IReadOnlyList<GearBandRefusal> refused)
+    {
+        if (refused.Count == 0) return "";
+
+        var named = refused
+            .Take(GearBandNamed)
+            .Select(r => $"{r.Zone} ({BandPhrase(r.Min, r.Max)})")
+            .ToList();
+        var rest = refused.Count - named.Count;
+        var list = string.Join(", ", named) + (rest > 0 ? $", and {rest} more" : "");
+
+        // Only the arms that actually fired, so the sentence never quotes a threshold that
+        // decided nothing in this list.
+        var arms = new List<string>();
+        if (refused.Any(r => r.Arm == GearBandArm.TopUnder))
+            arms.Add($"tops out {Recommendations.OutgrownBy} or more levels under you");
+        if (refused.Any(r => r.Arm == GearBandArm.BottomOver))
+            arms.Add($"starts {Recommendations.GearBandReachAbove} or more levels over you");
+
+        return $"{refused.Count:N0} {(refused.Count == 1 ? "zone" : "zones")} EQBuddy has "
+            + $"upgrades for {(refused.Count == 1 ? "is" : "are")} not listed at your level "
+            + $"{refused[0].Level}: {list}. Those are eqlwiki's own creature levels — EQBuddy "
+            + $"leaves a zone out of this list when its band {string.Join(" or ", arms)}.";
+    }
 
     /// <summary>Said when the picker held standings back. Trap 50 again, one surface
     /// down.</summary>
@@ -1101,4 +1223,34 @@ public static class HelperPresentation
         f.GainMetric.Equals("ratio", StringComparison.OrdinalIgnoreCase)
             ? $"{f.GainBy:+0.00;-0.00} ratio"
             : $"{f.GainBy:+#;-#;0} {f.GainMetric}";
+
+    /// <summary>
+    /// **WHAT DROPS IT, IN THE WIKI'S OWN WORDS AND ITS OWN ORDER** (DRA-84 D4, plan P3;
+    /// Founder acceptance item 2).
+    ///
+    /// <para>The list joins with the ordinary English comma-and rather than a bulleted run,
+    /// because this rides INSIDE a sentence about an item and on the phone it rides the row
+    /// with no hover to escape to (trap 35). The verb agrees with the count — "a bandit drops
+    /// it" and "a bandit, a hill giant and a ghoul drop it" — which matters more than it looks
+    /// like it should: the creature names are lower-case nouns from the page, so the verb is
+    /// the only thing in the clause telling a reader whether they are looking at one name or a
+    /// list.</para>
+    ///
+    /// <para><b>What the cap held back is named as the PAGE's, not as EQBuddy's</b>
+    /// (trap 50). "and 4 more on its page" says where the rest are and implies the door;
+    /// "and 4 more" alone would read as EQBuddy having measured something it has not.</para>
+    /// </summary>
+    private static string Who(GearUpgradeFact f)
+    {
+        if (f.Who.Count == 0) return "";
+
+        var names = f.Who.Count == 1
+            ? f.Who[0]
+            : string.Join(", ", f.Who.Take(f.Who.Count - 1)) + " and " + f.Who[^1];
+        var verb = f.Who.Count == 1 && f.WhoWithheld == 0 ? "drops" : "drop";
+        var more = f.WhoWithheld > 0
+            ? $", and {f.WhoWithheld:N0} more on its page"
+            : "";
+        return $" {names}{more} {verb} it.";
+    }
 }

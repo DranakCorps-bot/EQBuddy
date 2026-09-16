@@ -59,6 +59,13 @@ public static partial class CompanionProjection
             MoneyNote: money ? HelperPresentation.MoneyPriceNote : "",
             Cap: HelperPresentation.Cap(answers.Withheld),
             GearWithheld: HelperPresentation.GearWithheld(answers.GearWithheld),
+            // DRA-84 D2. Same words, same producer, same wire — a refusal the PC made and the
+            // phone did not mention would be the two surfaces disagreeing about what the list
+            // contains, and every sentence rides the wire rather than index.html (trap 32).
+            GearBandRefused: HelperPresentation.GearBandRefused(answers.GearBandRefusals),
+            // DRA-84 D4, same rule one slice on: a drop offer the PC withheld for having no
+            // creature to name is withheld on the phone too, and says so in the same words.
+            GearWhoWithheld: HelperPresentation.GearWhoWithheld(answers.GearWhoWithheld),
             Gaps: [.. answers.Gaps.Select(Gap)],
             Deferred: [.. answers.NotAnsweredYet.Select(Deferred)],
             Empty: empty
@@ -231,7 +238,10 @@ public static partial class CompanionProjection
         Join(h.Answers, a => a.Headline + "/" + a.Serves
             + "/" + Join(a.Why, w => w.Text) + "/" + a.WithheldWhy
             + "/" + Join(a.Doors, d => d.Label)),
-        h.MoneyNote, h.Cap, h.GearWithheld,
+        // DRA-84 D2: the refusal sentence carries the level and the bands, so it moves when a
+        // ding changes which zones the gate refuses even though no other field here does
+        // (trap 72 — the repaint gate must see the store the feature writes).
+        h.MoneyNote, h.Cap, h.GearWithheld, h.GearBandRefused, h.GearWhoWithheld,
         Join(h.Gaps, g => g.Text + "|" + g.Prompt?.Command),
         Join(h.Deferred, d => d.Text),
         h.Empty?.Heading);

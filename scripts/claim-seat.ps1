@@ -55,13 +55,37 @@ param(
     [string] $PaperclipIssue,
     [switch] $List,
     [switch] $Check,
+    [switch] $Where,
     [switch] $Json
 )
 
 $ErrorActionPreference = 'Stop'
 . (Join-Path $PSScriptRoot 'soft-seat-store.ps1')
 
-$dir = Get-SoftSeatStoreDir -StoreDir $StoreDir -Repo $Repo
+$origin = Get-SoftSeatStoreOrigin -StoreDir $StoreDir -Repo $Repo
+$dir = $origin.dir
+
+# "Which file is this seat reading?" — the question DRA-90 was reported without
+# an answer to. A mutex is only as good as the store BOTH seats read, and the
+# store is gitignored, so it is invisible in a fresh worktree by design; the
+# only way to tell "shared" from "my own private copy" is to print it.
+function Write-SoftSeatOrigin {
+    param($Origin)
+    switch ($Origin.kind) {
+        'explicit' { Write-Host "store: $($Origin.dir) (-StoreDir, this call only — NOT the machine's shared store)" }
+        'git-common-dir' { Write-Host "store: $($Origin.dir) (shared by every worktree of $($Origin.root))" }
+        default {
+            Write-Host "store: $($Origin.dir)"
+            Write-Host 'WARNING: git did not resolve a common dir, so this is a PRIVATE store for this copy. A seat in another checkout cannot see it and will not be refused.'
+        }
+    }
+}
+
+if ($Where) {
+    if ($Json) { $origin | ConvertTo-Json -Depth 6; exit 0 }
+    Write-SoftSeatOrigin $origin
+    exit 0
+}
 
 if ($List) {
     if ($Json) {
@@ -69,11 +93,12 @@ if ($List) {
         $store | ConvertTo-Json -Depth 6
         exit 0
     }
+    Write-SoftSeatOrigin $origin
     exit (Write-SoftSeatList $dir)
 }
 
 if (-not $WorkItem -or -not $SeatId) {
-    Write-Error 'Usage: claim-seat.ps1 -WorkItem DRA-<n> -SeatId <name> [-Mode active|challenger|disjoint|replacement] [-Branch <ref>] [-Worktree <path>] [-ExecutorPid <n>] [-PaperclipIssue DRA-<n>, same card]'
+    Write-Error 'Usage: claim-seat.ps1 -WorkItem DRA-<n> -SeatId <name> [-Mode active|challenger|disjoint|replacement] [-Branch <ref>] [-Worktree <path>] [-ExecutorPid <n>] [-PaperclipIssue DRA-<n>, same card] | -List | -Where'
     exit 1
 }
 
@@ -108,6 +133,14 @@ catch {
 
 if ($Json) { $result | ConvertTo-Json -Depth 6 }
 else { Write-Host $result.message }
+
+# A GRANT is the dangerous half. "No live holder" from a store no other seat
+# writes to is the same sentence as "no live holder" from the shared one, and
+# only this line tells them apart (DRA-90 / trap 82). Refusals need it less —
+# a refusal already found somebody — but an unshared store makes a grant a lie.
+if ($result.ok -and $origin.kind -eq 'fallback' -and -not $Json) {
+    Write-Host 'WARNING: this claim was granted from a PRIVATE store (git did not resolve a common dir). A seat in another checkout is invisible to it. Run: claim-seat.ps1 -Where'
+}
 
 if ($result.ok -and $PaperclipIssue -and -not $Check) {
     $cardScript = Join-Path $PSScriptRoot 'paperclip-card.ps1'

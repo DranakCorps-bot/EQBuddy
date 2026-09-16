@@ -1,3 +1,384 @@
+## 2026-09-15 — DRA-87: the last three "log-only" labels, and why SECURITY.md got its own boundary line rather than an exemption
+
+**Seat:** `opus-dra87-docs-honesty`. Paperclip DRA-87, authorized by Helm as a one-slice
+follow-on after #631 (DRA-68) landed. Nothing here is on the consequence list: correcting a
+false claim is not a values-line change, and this is docs + one test file — no `src/`, no
+tag, no signing, no public post. No `WhatsNew.json` entry, matching DRA-67 (#568) and DRA-68
+(#631), which shipped none: a docs wording fix is not player-noticeable in the app.
+
+### 1. Why two honesty cards walked past these three
+
+DRA-67 corrected `site/index.html`; DRA-68 corrected `README.md` and `EQBuddy-Evolved.md`.
+All three remaining sites are **LABELS over prose that was already true**, which is a
+different failure from the hero pill and is why a reader of either earlier card's diff would
+not have noticed them:
+
+- `PRODUCT.md:39` `### Log-only and local-first` and the v2 charter's `## 2.2 Log-only and
+  local-first` both head bullet lists — "no game-memory reads", "no packet inspection", "no
+  telemetry by default" — where **every bullet is true**. Nothing under the heading is wrong.
+- `SECURITY.md:18` *"EQBuddy's rule is **log-only, zero telemetry**: it never sends your data
+  anywhere on its own"* is a **correct statement about EGRESS wearing the wrong noun**. The
+  sentence heads the network-destination table and the claim it actually makes ("never sends
+  your data") is true and stays.
+
+The heading is the part a reader quotes back at you, so the label is the bug. And the chain
+is the DRA-67→68 one, one link further: `EQBuddy-Evolved.md:7` — a surface DRA-68 corrected —
+points at `PRODUCT.md` **by name** for "the product identity — principles, surfaces, and the
+north star in full". A reader who checked us walked from a corrected surface onto this one.
+
+`SECURITY.md:3` earned a second correction the card did not name: it said EQBuddy "reads your
+log file" on the page whose next clause promises *"exactly what the app does with it — every
+network connection, every file it writes"*. An incomplete statement of what we read is worst
+on the page whose whole genre is completeness, so the opening paragraph now names the `/log`
+and all four dumps. The charter's ACCURACY-001 corpus row said `inventory, achievements,
+factions` — three of four, and a misspelling of `faction`; it now matches `GameCommands`.
+
+### 2. The decision the card handed me: whether/how to claim-test SECURITY.md
+
+**Decision: cover it, with all four arms, and give arm (d) the boundary line THAT PAGE
+actually makes.**
+
+Arms (a) claim / (b) disclose / (c) enumerate fit `SECURITY.md` better than any other
+surface. Its own genre is exhaustiveness — *"The complete list of hosts"*, *"That's the whole
+list"*, *"Everything lives under `%AppData%`"* — so it is the last surface that may take
+README's short form, and a fifth `/outputfile` dump **should** redden it.
+
+Arm (d) was the problem, and the measurement is what decided it: the committed
+`SECURITY.md` carries **neither** product values line. Not "game memory", not "measures other
+players". Not an oversight — the page is about what leaves the machine, what is written to
+disk, and how an update is verified. Requiring the product pair would have forced two
+unrelated sentences onto a correct page, which is the same failure as demanding one spelling
+(trap 74's shape, and DRA-68's own stated reason for matching concepts rather than bytes).
+
+**The default it could have gone the other way on: adding a `MustCarryValuesLines: false`
+switch.** I refused that shape. A bool has two states and both are visible in the table, but
+an off switch invites the next surface to join with the check silently disabled — and
+`Violations` would then report that file clean forever. Instead `ValuesLines` became
+**per-surface DATA**: the four product surfaces carry the product pair, `SECURITY.md` carries
+`zero telemetry` / `never sends your data`. No surface's arm (d) is ever off.
+
+That swap opens one hole a bool did not — an **empty** set turns the arm off while still
+looking configured (trap 78 aimed at the surface table rather than at the detector). So it is
+closed in the same commit: `EverySurfaceCarriesABoundaryToKeep` refuses a surface with no
+boundary line, and demonstrates the hole is real by showing the same text passing with `[]`
+and failing without it.
+
+The point of arm (d) was never those two specific sentences. It was that **correcting a false
+claim must not cost the true boundary line standing next to it** — and on this page that line
+is "zero telemetry", which the obvious fix (deleting "log-only," from the pair) would have
+left within one word of being spent.
+
+### 3. Two calls beyond what the card named
+
+**(a) I widened the values pattern instead of rewriting two true sentences.** `PRODUCT.md`
+says "a way to judge other players" and the charter "mechanism for judging other players",
+where the landing says "measures other players" and `EQBuddy-Evolved.md` says "judge other
+people" — four spellings of one concept, all correct, all already shipped. The pattern is now
+`judg(?:e|ing) other (?:people|players)`. Editing a correct sentence to buy a green run is
+exactly how a gate teaches people to edit around it. Widening an ACCEPT pattern **weakens** a
+guard, so it gets its own negative (`TheWidenedJudgingPatternStillRefusesASilentPage`): a page
+that names neither the judging nor the measuring is still caught, and the alternation did not
+quietly decay into a match on "other players" alone.
+
+**(b) I covered the v2 charter as a sixth surface, which the card asked me only to reword.**
+Leaving the false label in the charter would have recreated the exact defect this card exists
+to close — and worse, a contradiction: `PRODUCT.md:7` says it wins for v2 over older language
+while the charter's own header says the charter wins. Two live docs disagreeing about what
+EQBuddy reads is not a state to ship.
+
+It takes the **short form** (`MustEnumerateDumps: false`), like README. The must-list exists
+for a PLAYER asking "what does EQBuddy read?", and that reader reaches the landing, README,
+`PRODUCT.md` and `SECURITY.md` — not an internal requirements doc whose own audience line
+names Helm, Fable and the execution agents. What the charter owes is that its hard lines are
+not false. The prove-fail confirmed the shape rather than assuming it: **the charter failed on
+the CLAIM alone**, because it already mentioned `/outputfile` in four places.
+
+So a fifth dump now reddens four enumerating surfaces (landing, `EQBuddy-Evolved.md`,
+`PRODUCT.md`, `SECURITY.md`) and README plus the charter have nothing to go stale.
+
+### 4. Prove-failed against the real pre-change bytes, not only fixtures
+
+Docs reverted with the guard kept: **4 of 31 fail, and the landing, README and
+`EQBuddy-Evolved.md` stay green** — the discrimination is the point, not the count.
+`PRODUCT.md` and `SECURITY.md` reddened on all three arms (claim, undisclosed, no single
+paragraph); the charter on the claim alone. The three pre-change strings also ride as
+committed `InlineData`. `SecurityMdKeepsItsOwnPromiseAndWouldFailTheProductOne` proves the two
+boundary sets are not a distinction without a difference by running the real file under both.
+
+`scripts/check.ps1`: all gates green, 5130 unit tests.
+
+**Left alone deliberately, per the card:** `README.md:358` (the position-sentence exemption,
+still exactly true), `CLAUDE.md` (`DECISIONS.md:2388`'s reopen), and the BEVEL critique quote.
+
+---
+
+## 2026-09-14 ~10:40 PM CT — DRA-68: the front door's "log-only", and the tension inside the card that sent me
+
+**Seat:** `dra68-executor`. Paperclip DRA-68, the DRA-67 follow-on Helm already ruled is its
+own card rather than a rider on the landing PR. Nothing here is on the consequence list:
+correcting a false claim is not a values-line change, and this is docs + one test file — no
+`src/`, no Pages enable, no tag, no signing. No `WhatsNew.json` entry, matching DRA-67's own
+merged PR (#568), which shipped none: a README wording fix is not player-noticeable in the app.
+
+### 1. The card told me two things that cannot both be true, and I had to pick
+
+The card says `EQBuddy-Evolved.md:68` *"is the one place worth listing all four dumps … The
+other two take the short form"* — and, one paragraph later, that extending the guard means
+*"a fifth dump reddens every covered surface at once."* **A surface that takes the short form
+has nothing to redden.** If README must enumerate the four dumps to satisfy the must-list, it
+is not taking the short form; if it takes the short form, a fifth dump cannot redden it.
+
+**Decision: the short form wins, and the guard says so out loud.** `MustEnumerateDumps` is
+per-surface — true for the landing and `EQBuddy-Evolved.md`, false for README — and the
+parameter's doc comment states the consequence rather than hiding it: a fifth dump reddens the
+two enumerating surfaces, and README has nothing to go stale. The default it could have gone
+the other way on: forcing README to name all four, which would have bought a third redden at
+the cost of overruling the card's explicit instruction about the file every contributor reads.
+
+**But "short form" must not become "silence."** Deleting a false claim and answering nothing is
+the exact failure DRA-67's must-list exists to prevent, and dropping the enumeration for README
+would have reopened it. So there is a third arm every surface takes: the file must MENTION
+`/outputfile` at all (`TheShortFormMustStillDiscloseTheDumps`). README is excused from
+enumerating the dumps, not from disclosing them.
+
+### 2. The one true sentence the guard had to be taught not to break
+
+`README.md:358` — *"EQBuddy reads only the log, so the marker moves when you ask it to, not by
+magic"* — contains a forbidden claim verbatim and is **exactly true**, because it is about live
+POSITION: no `/outputfile` dump reports where you are standing. The card named it and said not
+to touch it.
+
+**Decision: exempt the SENTENCE, not the file and not a line number.** A file-level or
+regex-level carve-out would have quietly excused the next "log-only" someone adds to README —
+an exemption list with a hole in it is worse than no exemption (trap 52's shape). Three
+properties make it narrow, and each has a test: the exempt text is stripped **before the claim
+scan and nowhere else**, so it can never satisfy the must-list or stand in for a values line;
+`TheExemptionDoesNotCoverTheNextClaim` proves a second "log-only" in the same text is still
+caught, and that the position sentence IS caught without the exemption — so the carve-out is
+what is doing the work, not a gap in the claim list; and `EveryExemptSentenceIsStillInItsFile`
+reddens if README is reworded and the exemption goes stale, which is trap 34 aimed at the
+guard's own carve-out rather than at the product.
+
+### 3. Two calls I made that the card did not ask for
+
+**`README.md:739` — "the log-only principle" — corrected to "the no-game-memory principle."**
+The card said correct it *only* if the surrounding sentence reads as a capability claim, and it
+does not: it is a passing label in a list of ideas that cannot be licensed. I corrected it
+anyway, because after this change no other surface names the principle that way, and leaving it
+would have left an orphan label restating the false claim in the file the card calls the front
+door. The honest name is also the true one — the principle is that we never read game memory.
+The default it could have gone the other way on: leave it and add a second exemption. I judged
+a true label cheaper than a carve-out I would have to keep honest forever.
+
+**The values lines are matched as CONCEPTS, not bytes.** The three surfaces have always said
+these in different words: README writes "game memory" where the landing writes "game-memory",
+and `EQBuddy-Evolved.md`'s hard line says *"a way to judge other people"* where the other two
+say *"measures other players"*. A literal scan would have reddened two correct sentences and
+demanded they be rewritten to suit the gate — which is trap 74's real cost, a gate people learn
+to edit around. Accepted phrasings are curated and committed, and
+`EachSurfacesOwnSpellingOfTheValuesLineCounts` pins both live variants.
+
+### 4. What the prove-fail actually measured, and the fixture I got wrong first
+
+Reverting only the two docs and keeping the guard: **fails 2 of 21, and the landing stays
+green.** That discrimination is the point — the guard reddens on exactly the surfaces DRA-68
+exists to fix and not on the one DRA-67 already fixed. README reddened on BOTH `log-only` **and**
+`knows only what your own log`; the second is README's own phrasing, and a scan for the
+hyphenated pill — the obvious way to widen this guard — would have reported that file clean
+while it carried the same false claim in its own words.
+
+**My first markdown fixture asserted a property the rule does not have**, and the run caught it:
+I wrote a two-bullet case where the second bullet answered in full, and asserted it was a
+violation because the answer was not in the bullet making the claim. The rule is "some single
+paragraph answers in full" and never has been "the claiming paragraph answers" — the fixture was
+green-lighting a stronger guard than the code implements. The replacement tests what the
+list-item split genuinely buys: `EQBuddy-Evolved.md`'s four "Hard lines" bullets have no blank
+line between them, so a blank-line-only splitter hands the must-list ONE block and an answer
+scattered across bullets passes. The fixture now asserts every required word IS present in the
+text and the guard refuses it anyway — the demonstration, not just the assertion.
+
+— Dranak (Claude Code, DRA-68)
+
+## 2026-09-14 ~9:40 PM CT — DRA-84 D2: the Farm Gear band gate, the open top, and the one-level gap between the plan's example and the plan's constant
+
+**Seat:** `opus-dra84-d2` (`-Mode disjoint`; `opus-dra84-d1` and `opus-dra84-d3` both still
+hold DRA-84 — trap 70's store working as intended). Paperclip DRA-84, plan P2 + the open-top
+fold Helm authorised by name at ~8:18 PM CT. Nothing here is on the consequence list: no
+release, no public post, no privacy surface, no third-party request — the transform fetches
+nothing and reads the committed cache, exactly as D1's did.
+
+### 1. The finding, first, because it is the one thing a reader should not miss
+
+**The plan's own worked example does not follow from the plan's own constant.** P2 says a
+zone is refused when its band's top is `OutgrownBy` *"(= 10, reused, not re-derived)"* or
+more under the level, and then says *"Crushbone stays refused for a 29 who once farmed it at
+12."* Crushbone's eqlwiki band is `5-20`. **29 − 20 = 9.** At the Founder's own level the
+gate does not refuse his own cited exhibit; it refuses from 30.
+
+**Decision: ship the constant, pin the gap, escalate the product call.** Re-deriving
+`OutgrownBy` to 9 — or inventing a second number for this arm — would be fitting a threshold
+to an anecdote, which is the precise opposite of what "reused, not re-derived" asks for, and
+this repo has no XP curve to derive a better one from. So the arithmetic ships as specified,
+`TheFoundersCrushboneExhibitIsRefusedFromThirtyAndNotAtTwentyNine` pins the boundary in both
+directions, and whether a level-29 character should still see Crushbone is named for Helm
+with the measurement in front of it.
+
+Could have gone the other way: pick 9, or make the top arm exclusive. Both would have made
+the plan's sentence true and made the number unexplainable.
+
+### 2. The gate REFUSES rather than demotes, and it does it over the player's own evidence
+
+The delivery's most vetoable default, and the plan names it as one. `OutgrownWeight` halves a
+zone and keeps it, because there the zone is the player's own MEASURED camp and deleting it
+would overrule a measurement with a judgement. These rows are `Evidence.Catalog` — things
+EQBuddy read about — and their presence in the list is exactly what the Founder failed. So
+the two rules are opposite on purpose, and Crushbone stays refused for a 30 who farmed it at
+12 and looted the very helm there.
+
+Could have gone the other way: demote catalog rows too, and let the player scroll past them.
+That leaves the failed screen looking the same.
+
+### 3. `GearBandReachAbove` is 5 and is NOT 10
+
+A new named judgement, deliberately asymmetric with `OutgrownBy`. The two arms are not
+opposites: being over a band's top costs time, being under its bottom costs the attempt, and
+the distance at which that second one happens is shorter. One constant for both would have to
+be wrong in one direction. Neither number is measured and the code says so.
+
+### 4. The open top is `Max` = null, and 41 of 87 bands are one
+
+Helm authorised option (a) by name before this slice started. Implemented as the ABSENCE of a
+maximum: `ZoneLevels.Band.Max` is `int?`, the number before the `+` is discarded rather than
+promoted, and the gate's TOP arm stands down for those zones while the BOTTOM arm still
+applies. `int?` rather than a sentinel on purpose — a sentinel is a number some layer does
+sums with (trap 63), and null makes the compiler ask at every reading site.
+
+**The scope stayed where the ruling drew it.** Only a verbatim whose SOLE defect is the
+trailing `+`. `1-13+, 35-50` and `20-40+ (50+ inside pit)` both contain a trailing-`+` band
+and both stay refused, because coalescing them would assert a continuity the page contradicts
+by printing the gap. Prove-failed: dropping the regex's end anchor reddens seven rows.
+
+**Measured, and it is the number that justifies the ruling:** banded drop weight went from
+33% to **75%** of catalog mentions; refused fell from 54% to **12%**.
+
+### 5. The distinct-count telltale was re-derived rather than relaxed
+
+Discarding a maximum coarsens `(Min, Max)` **by construction**, so over all 87 bands it comes
+out at 53/87 = 0.61, under the two-thirds floor — and not because the data got worse. The
+floor is now applied where it was calibrated (the 46 closed bands, 36/46) and to the measure a
+template would actually collapse (the verbatim row, 64/87). The open tops' own repetition — 41
+zones, 17 distinct bottoms, five plane pages printing `50+` — is pinned as a MEASUREMENT
+rather than held to a floor, because it is the wiki repeating itself on real separate pages.
+
+Could have gone the other way: lower the floor until 53/87 passed. That is a guard edited to
+fit its own subject.
+
+### 6. `LevelUseFor(FarmGear)` flips Exempt → Consumes, and the D6 survey moves rather than dies
+
+The must-list pairing forbids a consuming engine from carrying a `LevelExemptReason`, so that
+arm had to leave the table. **The survey it held is not retired** — 11,196 records, five Level
+keys, exactly one wearable (`Shroud of the Sky`) — it is quoted with its numbers on
+`GearBandGate`, because it is the live reason the gate reads a ZONE and not an item. The
+ITEM side is still ungated and the P6 outgrown discount is still not borrowed. Helm's #628
+tip said the D6 conclusion stands and the P2 zone-band flip is unaffected by it; this is that,
+implemented.
+
+### 7. Refusing every zone is its own gap
+
+`NoCatalogUpgrade` would be false — the catalog DOES hold something better — and with no rows
+and no gap the room draws its whole-room empty state, which says EQBuddy has nothing stored:
+the opposite of what happened. So `GoalGapReason.EveryZoneOutsideYourBand` exists. That is one
+more enum member than the plan asked for, and it is here because the alternative is a silent
+no-op, which this repo does not ship.
+
+### 8. Player-facing: the refusal is SAID, with both numbers and the source
+
+Trap 50 applied to a rule instead of a count. A zone missing from a list is indistinguishable
+from a zone with nothing in it, and the player has no way to discover EQBuddy decided for
+them. The sentence names the count, each band, the level, and only the arms that actually
+fired — never a threshold that decided nothing in this list. HOME-006 swept over all of it and
+prove-failed: planting "too easy" reddens the sweep and names the sentence.
+
+**The height of `shell-helper-gear-band` is staged, and that is worth recording.** The first
+take at the default size was a correct, well-composed photograph of the room with the new
+caption BELOW THE FOLD — a shot of a refusal that does not show the refusal. The density
+question underneath it is real and stays with Bevel; it was not restyled from the shot.
+
+### What would make these wrong
+
+- If a level-29 character should not see Crushbone, `OutgrownBy`'s reuse is the thing to
+  revisit — not this slice's plumbing.
+- If players report losing camps they were actually farming, `GearBandReachAbove` = 5 is the
+  first number to move, and the refusal sentence is already the diagnostic.
+- If a zone page's `Level of Monsters` row turns out to mean something other than "what you
+  will meet here", the whole gate rests on a misreading and the report is where to start.
+
+---
+
+## 2026-09-14 ~9:00 PM CT — DRA-84 D3 follow-up: the refresh landed and four shipped sentences went stale with it. Plus the duplicate-seat fact.
+
+**Seat:** `opus-dra84-d3` (claimed 01:27Z). Paperclip DRA-84. This entry is about the
+commit range AFTER #626 merged. Nothing here is on the consequence list.
+
+**The duplicate first, because it is the only thing here with a cost.** Two Executor seats
+ran D3 concurrently. This one claimed DRA-84 at **01:27Z**; `opus-dra84-d3`/PR **#626**
+opened at **01:32Z** and ran the full weekly refresh. Both fetched ~11k eqlwiki pages
+inside the same half hour — **two Soft-driven fetches inside Helm's one named un-PARK**.
+Neither exceeded the standing rate and both used the committed polite client, so
+consequence-list item 7 was not breached, but the duplication was real and only luck made
+it harmless. `claim-seat.ps1` held no DRA-84 row when either seat started (trap 70 again).
+
+**The one good thing to come out of it: the two rebuilds are byte-identical decompressed** —
+SHA-256 `5487aa79…`, 4,217,353 bytes, 11,196 records, 5,591 with creatures, 773 priced. Two
+independent harvests, hours apart, same bytes. That is the strongest evidence anyone has
+that `itemcatalog-build` is reproducible, and it was free.
+
+**Decision: #626 is D3; this seat's own refresh commit is abandoned, not pushed.** It was
+filed first, it is broader (quests, spells, guides, items), and it matches "the standing
+weekly refresh" more literally than the item-only half. Could have gone the other way: push
+a competing PR and make a human choose. That wastes the review, not the fetch.
+
+**What was left over, and is what this PR actually is.** #626 shipped the data and did not
+move the sentences that quote it. On `main` right now, four are wrong:
+
+1. **The professions park note is player-facing and false.** It says *"Of the 10,957 item
+   pages it has read, 14 say which profession an ingredient belongs to."* The refresh made
+   that 11,197 — and shipped `items-catalog-report.md` saying so, in the same commit.
+   EQBuddy is currently telling players a survey result its own committed report
+   contradicts.
+2. **Its guard could not see it.** `TheParkNoteNamesTheCoverageItMeasured` asserted the
+   sentence CONTAINED the literal `"10,957"` — the sentence quoting itself. It can catch
+   somebody deleting the number and never the number going wrong. **Default chosen: read
+   both numbers out of `items-catalog-report.md`** (the promoter rewrites it every refresh),
+   with a committed negative carrying the exact stale text that shipped. Prove-failed.
+   Could have gone the other way: bump the literal, which is the smaller diff and leaves the
+   next refresh to ship the same defect.
+3. **DRA-71 D6's level survey is no longer literally true.** Shipped, on screen: *"11,146
+   records were surveyed and not one prints a Level key."* Re-taken: **five** print one and
+   exactly **one** is a wearable (`Shroud of the Sky`, `Required Level: 46`); the other four
+   are `Level Needed` on spell scrolls and a food item, which is the SPELL's level. D6's
+   conclusion **stands** — one in 11,196 gates nothing, and D2's band gate reads the ZONE —
+   so this is a sentence correction, not a plan change.
+4. **`CLAUDE.md` still said the vendor field was "data-less until the next weekly
+   refresh."** It has 773 prices in it now.
+
+**Decision: a `WhatsNew.json` entry ships here rather than waiting for D5.** Rows naming a
+creature is player-noticeable the moment #626 landed, and the house rule puts the entry in
+the release that ships the change — 2.0.0, unreleased, the list DRA-83 already appended to
+mid-plan. The stale "10,957" inside the unreleased DRA-71 D8 entry is corrected while it is
+still ahead of a player. No release rides this; that stays David's.
+
+**Measured for D4, which is the slice that needs it.** The plan tells D4 to open with a
+`DropMobs` coverage survey and **STOP and wake Helm under half**. On the merged data it is
+**99.4%** (5,591 of 5,626 drop-bearing records), and both zones the Founder named are at
+**100%** — Rathe Mountains 163/163, Crushbone 102/102. D4 starts with the number instead of
+discovering it.
+
+**Untouched:** no engine, no ranking, no curated file. Rathe and Crushbone still rank
+tonight exactly as they did — that is D2's bands and D4's who-or-withheld, in that order.
+
+---
+
 ## 2026-09-14 — DRA-84 plan: the defaults chosen while turning the Founder's Farm Gear FAIL into slices
 
 Plan-only seat `fable-dra84-farmgear` (Paperclip DRA-84), branch `fable-dra84-farmgear`,
@@ -6820,3 +7201,463 @@ sentences should be named in it), no engine change belonging to D1/D2/D4, and no
 standing Soft-open un-PARK, which the #623 SIGN named for D3 only.
 
 — Dranak (Claude Code, DRA-84 D3)
+
+## 2026-09-14 — DRA-84 D1 (zone level bands): five calls I made alone, and the number the slice was built to produce
+
+Seat `opus-dra84-d1` / Paperclip DRA-84, claimed `-Mode disjoint` (D3 holds the card in
+parallel by Helm's named AUTHORIZE — a default claim is refused there, correctly, trap 70).
+Plan P1 as SIGNED on #623: `zonelevels-transform.py` + `ZoneLevelBands.json` +
+`Core/ZoneLevels.cs` + surveys + `--check` in `check.ps1` and CI. No engine change, no
+fetch, no harvest. Everything below is pre-authorized with a reporting duty; veto from here.
+
+**The measurement this slice exists for, first, because it changes what D2 should be.**
+Strict parsing gives **46 bands out of 118 zone pages**. Joined against the shipped
+`ItemCatalog.json.gz` (11,146 records, 5,613 carrying a `DropZones`):
+
+| Where a `DropZones` spelling lands | Spellings | Mentions |
+|---|---:|---:|
+| On a zone we have a band for | 48 / 302 (15%) | 3,564 / 10,612 (33%) |
+| On a zone page whose row we REFUSED | 74 (24%) | **5,743 (54%)** |
+| On no zone page we have read | 180 (59%) | 1,305 (12%) |
+
+The middle row is the finding, and it is not a spelling problem. Plane of Sky is `50+`,
+Plane of Hate and Plane of Fear `48+`, Temple of Veeshan `60+`, Kael Drakkel `30-60+`,
+Lower Guk `30-50+`, Karnor's Castle `40-55+`. **Every one of the heaviest drop zones in the
+catalog HAS a page, and the plan's strict rule refuses its row.** So a P2 gate that reads a
+band's TOP would, on today's data, do nothing at all for 54% of the item×zone mentions it
+looks at — including most of the high-level ones. The Founder's named exhibit survives
+(Crushbone `5-20`), and the other one was never a level question (Rathe Mountains `13-45`).
+That is a plan question, not mine to answer, and it is the ask on this PR.
+
+**Call 1 — strict stays strict, and the refused shapes ship as evidence instead.** The
+plan said `N-M` or `N`, everything else ABSENT, never guessed. I kept it even after
+measuring what it costs, because the alternative is inventing a maximum for "and above",
+which is the shape trap 73 exists to refuse, and because departing from a SIGNED plan's
+stated rule is an escalation rather than a call. **The default it could have gone the other
+way on:** reading `50+` as `50-60` (the era cap) or as an open top with its own field. Both
+are defensible and neither is mine. `zonelevels-report.md` lists all 57 refused verbatims
+with the zones carrying them, so whoever decides is deciding with the evidence.
+
+**Call 2 — lookup is exact title then the repo's existing zone-identity fold, and NOT
+longest containment.** `ZoneGraph.Resolve` uses containment for travel, and reusing it here
+was the obvious default. Measured, it bought 35 more spellings and almost every one was
+wrong: "Commonlands" got West Commonlands's `6-30`; all four Qeynos sub-zones got the city's
+`1-9`, including "Qeynos Aqueducts", whose OWN page we refused; "This drop is super ultra
+rare from any spider in kaesora." got Kaesora's `30-40`. A wrong band is a number a surface
+states as fact, where ABSENT just makes the gate do nothing — the asymmetry decides it.
+I lifted `ZoneMapFiles.IdentityKey` out of the map-file resolver rather than write a second
+normalisation rule (trap 4); it is the same private `Normalize`+`Squeeze` that was already
+there, made public and named for what it does. **Cost:** "Burning Woods" no longer reaches
+"Burning Wood" (102 mentions), because bridging it means pulling a curated alias table into
+a band lookup. It is pinned as a KNOWN miss in a test that says to delete itself when some
+slice has a reason to widen, rather than left to rot into a claim the fold is complete.
+
+**Call 3 — ABSENT ships as data.** `ZoneLevelBands.json` carries a `NoBand` section: all 72
+zones we read and got no band from, with the verbatim we refused (or `""` where the page has
+no row). `ZoneLevels.Lookup` therefore answers one of four things — Unknown / NoRow /
+Refused / Banded — because "we have never read a page for this zone" and "the wiki does not
+say" and "the wiki says `50+` and we will not read it" are three different sentences, and a
+surface that cannot tell them apart will say the wrong one. It also makes the fold refuse to
+borrow: a zone we know about but have no band for answers Refused, never a neighbour's band.
+**The default:** ship only the 46 and let absence be a hole.
+
+**Call 4 — `--check` covers the DATA file and deliberately NOT the report's join numbers.**
+The join is measured against `ItemCatalog.json.gz`, which D3's refresh rebuilds in a seat
+running right now. Gating on it would redden D3's PR on a file it did not touch, and D3's
+code-independence is something the plan declared. So the report states in its own text that
+the join half is a snapshot, prints the record count it was taken against, and says to
+re-run the transform (no `--check`) after a refresh. `ZoneLevelsTests` asserts every
+cache-derived bucket in the report and none of the join ones. **The default:** assert
+everything and let the refresh seat deal with it. **The cost of my choice, stated plainly:**
+nothing makes a stale join number go red. D4's coverage survey should re-take it.
+
+**Call 5 — plain JSON, no gzip.** `HarvestedGuides.json.gz` needs `--check` to decompress
+before comparing because a container asserts which zlib built it (trap 74). 5.8 KB of bands
+needs no container, so the gate compares the file itself and there is no toolchain for it to
+redden on. **The default:** match the neighbouring generated catalog's shape.
+
+**Verified to the class (V1 — new Core data and reader, nothing user-visible):**
+`scripts/check.ps1` all green, **4,982 units**, `ZoneLevelsTests` 47/47. Prove-failed both
+new guards rather than shipping them green-only: editing one `Max` in the committed file
+makes `--check` exit 1 with the reason; swapping `Lookup` back to longest containment
+reddens **fourteen of the fifteen committed negatives** plus the alias and ambiguity rows
+(the fifteenth, Qeynos Aqueducts, moved to the refused list where it belongs — its own page
+answers). No E2E run locally: no surface changed, and CI runs it regardless.
+
+**No `WhatsNew.json` entry, on purpose.** Nothing a player can notice ships here — no engine
+reads a band. The entry belongs to the release that ships the gate.
+
+**Not done, deliberately:** D2's gate, the `Exempt`→`Consumes` flip, any `Recommendations`
+change, any fetch or harvest, any curated-catalog edit, Pages / Play / tag / `release.ps1` /
+signing / prod secrets / Founder mail / Desktop / #527 / a new `helm/ssc-*`.
+
+— Dranak (Claude Code, DRA-84 D1)
+
+## 2026-09-14 (DRA-56 — the Turquoise re-shoot was already answered the other way)
+
+**1. The card's headline scope is REFUSED as superseded, and nothing was re-shot.** DRA-56 says
+"re-shoot the nine `site/assets/img/` captures as one Turquoise-theme batch", tracing to Helm's
+ACK of it as the DRA-48 follow-up (~1:00 PM CT, 2026-09-10). **Six hours later the Founder
+settled it the other way himself**: `06c66462`, 2026-09-10 19:15 CDT, *"site: DRA-48 uniform
+BlueGrey — Founder T4 look, every capture and clip re-shot"* — all 18 stills and all four GIFs,
+with the landing's CSS tokens moved from `ThemePalettes["Turquoise"]` to `["BlueGrey"]` and the
+`.teal` class renamed `.accent` "so the name stops lying about a blue page". Executing the card
+as written would have reverted a Founder look decision to satisfy an instruction that predates
+it. The card's real GOAL — one palette across the landing, every picture recipe-backed — was
+already met; only the palette differs from the sentence naming it. **The default it could have
+gone the other way on:** do as the card says (two seats and Helm had all signed the Turquoise
+follow-up, so there was cover for it) and file the conflict afterwards. Refused because a stale
+instruction is not authority, and "the card said so" is the one reason that never survives
+contact with the commit that answers it. Not re-litigated with Helm: the *superseding* decision
+is the Founder's own, and Helm's Soft LEAVE on the re-shoot was only ever "not a merge gate".
+
+**2. The `#510` content swaps needed no work — both were already resolved, one against the
+swap.** The closed PR named two: `shell-progress.png` (five lines) → `shell-progress-history.png`,
+and `shell-world.png` (empty state) → `map-window.png`. The first is **live on `main`**
+(`index.html:359`). The second was **considered and declined by the Founder for a stated
+reason** — `map-window.png` was a v1.5x-era 1936×1048 capture with no recipe, so the
+illustration lock could not ship it; the World card carries `spawns-window.png` instead
+(`index.html:366`). Both were verified by opening the page, not by reading the PR body — a
+closed PR describes an intention, never the state of the tree.
+
+**3. The EQBuddy Sans swap is TAKEN, and the weight scale is the reason it was nearly wrong.**
+The page now ships the app's own three faces instead of `InterVariable.woff2`. Measured before
+building, not asserted: all **94** distinct characters the page shows are in the face's cmap (831
+codepoints, a Noto subset); the faces' `usWeightClass` values are exactly **400 / 600 / 700**;
+and the family name in the `name` table is `EQBuddy Sans`. Transfer size **falls either way** —
+185 KB gzipped against Inter's 352 KB (which is already-compressed woff2 and does not shrink),
+and 304 KB against 352 KB uncompressed — so the claim holds whatever GitHub Pages does about
+content encoding. It also removes the page's **only non-GitHub external href** (the `rsms.me`
+Inter credit), so the footer's "this page makes no third-party requests" now has nothing to
+qualify; the OFL credit points at the local `assets/fonts/OFL.txt` and names Noto and its
+holders. Verified in effect and not merely present (trap 42): a headless probe reports all three
+faces `loaded` from the committed TTFs, and the 1440px render keeps its hierarchy.
+
+**The near-miss is the part worth keeping.** Inter was ONE variable file declaring `font-weight:
+100 900`, which covers everything; three static faces cover three points. The sheet asked for
+**650 in seven places** — the brand wordmark, the hero pills, the badges, the CTA and the three
+table marks. CSS rounds 650 UP, so all seven would have silently rendered at 700 and merged into
+the heading weight: a whole typographic tier lost, on a page whose own screenshots would still
+show the app's real hierarchy. They are remapped to **600** deliberately — the nearest face
+DOWN, which keeps the distinction the 650 existed to make. **The default it could have gone the
+other way on:** decline the swap on "it is not a drop-in", which is what the first reading of the
+weight inventory suggested. It cost one measurement to find that 600 and 700 were exact and only
+650 was homeless.
+
+**4. The illustration lock grew a SET-level guard, because the palette lived in a commit
+message.** Every landing picture already had its own recipe; nothing recorded *which* files the
+page draws or *what palette they must share*. That is a live trap, not a tidiness point:
+**`shoot.ps1`'s default `-Theme` is `Turquoise`** — right for `docs/screenshots/`, wrong for this
+page — so the next person to re-run a landing shot the obvious, argument-free way commits one
+Turquoise still into a BlueGrey set and nothing complains. This card is the proof the hazard is
+real: it was dispatched to do exactly that. `LandingSiteTests` now pins all 23 visual assets (18
+stills + 5 clips) to a recipe manifest, compares the page's set against the manifest's **in both
+directions** (trap 34 — a forbid-rule alone cannot see a missing row), asserts the set is one
+palette, and asserts *that `shoot.ps1`'s default is NOT the landing theme*, so the explicit
+`-Theme BlueGrey` in every row is load-bearing and tested rather than remembered. It also turns
+the page's two spoken promises into assertions: *"every capture and clip on this page is a real
+build driven by the repo's own harness"* and *"this page makes no third-party requests"*.
+**Every detector fires on a committed negative** (trap 78) — the weight scanner against the
+stylesheet this slice would have shipped unmeasured, the request scanner against a hosted font
+and an analytics tag, each paired with a negative proving it stays quiet on the legitimate case.
+`SfntFacts` was lifted out of `BundledFontFaceTests` so the app's bundle and the site's webfont
+read **one** TTF parser (trap 4), rather than the site growing a second one.
+
+**Not done, deliberately:** nothing was re-shot (see 1) — so `-Theme` was never run and the
+screen was never taken; the Soft LEAVE list is untouched (no Pages enablement, no README/About
+go-live links, no Play Console, no tag, no signing); no `WhatsNew.json` entry, because site
+assets ship no player-facing app change; and the font-coverage guard reads the **page's** text
+only — a future `site/` page would need its own row.
+
+**5. CORRECTION, and it is the same mistake this entry is about.** The paragraph above
+originally closed by saying "the T4 dual look (Helm + Founder) owed *before Pages enable* now
+has a typeface change in front of it", and `HELM-FEEDBACK.md` and PR #629 say the same. **That
+framing was stale and Helm corrected it** at the #629 SIGN (~9:30 PM CT) with a fresh
+`GET …/pages`: **200, `has_pages: true`**, `https://dranakcorps-bot.github.io/EQBuddy/`, T4 GO
+recorded 09-12 and verified 09-14. **The landing is already published**, so this typeface lands
+on a LIVE page rather than ahead of a gate. Helm's ruling: the site **STAYS UP**, a Helm+Founder
+content look against the post-#629 page is a named follow-up and explicitly **not** a merge gate,
+and Soft LEAVE inventing a Pages disable or a re-gate on a typeface. Nothing about the change is
+altered by this; what is altered is the claim I made about its consequence, which was more
+cautious than the truth in a way that would have read as a gate nobody was holding.
+
+**I refused a card for carrying a stale world, and then carried one of my own into the same
+document — one paragraph after writing the guard against it.** The card's staleness came from a
+Founder commit six hours later; mine came from taking the Soft LEAVE list's wording as the state
+of the deployment rather than as a list of things not to touch. The list was right — I did not
+enable Pages, and could not have, because it was already on. **A list of what not to do is not a
+description of the world**, and the cheap check was the one Helm ran: ask the API. The hygiene
+rule I proposed to Helm — re-read the commits that touched the surface before acting on an ACKed
+follow-up — needed its sibling in the same breath: **re-read the STATE of the surface too, from
+the system that owns it, not from the prose that last mentioned it.**
+
+— Dranak (Claude Code, DRA-56)
+
+## 2026-09-14 — DRA-86: the bard #139/#150 caveat went in WHY, because both homes the plan named are closed
+
+**The slice.** DRA-38's one unfinished acceptance line: carry the bard Light Woolen
+match-the-wiki story into the two Bard guides, so a guide is not more confident than the
+checklist row it wraps. Data-only, two objectives, one test. V1.
+
+**The call, and it is the whole slice.** The plan
+(`docs/quests/WEEKEND-SHIP-BAG-2026-09-12.md` §D4) said the provenance comments *"are copied
+into the affected guides' `Sources` or `StubNote`"*. **Both of those are closed by the code the
+plan was written against**, which I established by reading rather than by trying:
+
+1. `StubNote` on an `Authored` objective is a **validation failure** —
+   `GuideCatalog.AuthoringProblems` emits *"authored but carries a stub note — one of those is
+   a lie"*, and `GuideCatalogTests.AnAuthoredObjectiveCarryingAStubNoteIsRefused` pins it. The
+   only way to use it is to demote the step to `Stub`, and these steps genuinely answer who /
+   where / what: the drop locations are **not** what is disputed (`SkyQuestDefaults` says the
+   sources belong to the ITEMS and travel with them). Demoting would be dishonest in the other
+   direction, and would move the guide's caption and `IsFullyAuthored` for a data-confidence
+   note.
+2. `GuideSource` has **no prose field at all** — `{ Url, Title, RetrievedAt }`. `Title` is an
+   EXACT eqlwiki page title doing two jobs, and the second is that `refresh.py`'s
+   `curated_flags` intersects it with the week's changed pages. A caveat written there is a
+   page that does not exist, and it would quietly break the flag for the two rows that most
+   need a wiki correction to reach them.
+
+**So the decision: it goes in `Why`, appended to the sentence it qualifies.** The default it
+could have gone the other way on was `How` — there is a 95-row precedent for an EQBuddy's-own-
+limit sentence living there (*"the log never records a hand-in … not something the wiki says"*),
+and it is the field the house convention would reach for first. **I did not take it**, for two
+reasons. `How` is documented as *the method, and what it costs*, and a provenance caveat is not
+a method; using it would also need a new entry in `EveryFilledWhenOrHowNamesItsBasis`'s
+allow-list, whose own doc comment warns that an allow-entry nothing matches is a rule that has
+quietly stopped being enforced. **And the load-bearing reason: `Why` is the field that MAKES the
+disputed claim** — *"Light Woolen Mantle is one of the turn-in pieces for the Mantle of the
+Songweaver"*. Putting the qualification inside that string means no surface can ever draw the
+confident half alone. Split across two fields, one that renders `Why` and not `How` publishes
+exactly the over-confidence this acceptance line exists to remove.
+
+**Why this is a logged call and not a Helm wake.** The plan declared the OUTCOME (the story is
+in the guide data, pinned by a test) and suggested two homes for it. The outcome is delivered
+unchanged: same two objectives, same scope, no schema change, no new mechanism, nothing on the
+consequence list. Choosing a third existing field when the two named ones are refused by the
+validator is a judgement inside the slice, not a departure from it. **What I did NOT do is force
+a home** — no new field, no relaxed validation, no demotion to `Stub`. That was the done bar's
+named alternative and it stays available: if Fable wants a first-class `Caveat`/`SourceNote` on
+the schema, this is the evidence for it, and I have filed it as such rather than deciding it.
+
+**The forbid half.** `NoOtherStepClaimsTheLightWoolenPairingIsDisputed` asserts the caveat is on
+exactly those two ids and nowhere else. A dispute pasted across rows would be EQBuddy inventing
+a controversy, which spends the same trust as inventing a fact — trap 73 pointed the other way.
+
+**Verified:** `GuideCatalogTests` 33/33, full unit suite 5089/5089, `scripts/check.ps1` all
+gates green (including `epic-guides-build.py --check`, which re-serializes the WHOLE catalog and
+would have caught a formatting drift in a hand edit — the file is byte-identical to what the
+generator produces, before and after). **Prove-failed**: reverting only the two data lines with
+the test kept reddens both new tests with the real symptom. E2E is CI's — `e2e-windows` is the
+merge bar and the local screen is a mutex a concurrent seat was holding (trap 61).
+
+— Dranak (Claude Code, DRA-86)
+
+
+---
+
+## 2026-09-15 — DRA-84 D4: the who rule, its sentence's home, and one finding the plan did not foresee
+
+Seat `opus-dra84-d4`, plan P3 (+ P4's verification half), under #623's whole-sequence SIGN.
+Defaults below are mine to make; the veto surface is this file.
+
+**1. THE COVERAGE SURVEY CAME BACK 98.2%, SO THE SLICE PROCEEDED.** The plan made D4 open with a
+measurement and named the number that would stop it: under half, the withhold default is wrong
+and the slice escalates to Helm rather than shipping a hollowed room. Measured on the post-D3
+catalog: **5,897 of 6,004 wearable (item, zone) pairs name a creature — 98.2%**; 10,497 of 10,637
+over the whole catalog; 5,591 of 5,626 records. 4,712 distinct names over 25,695 mentions, which
+is the trap-73 tell passing comfortably. The survey is COMMITTED as `ItemCatalogWhoCoverageTests`
+with the floor left armed, because the data is regenerated weekly by a transform nobody reads
+line by line and a refresh that reverted the creature half would empty the Farm Gear room
+honestly and silently.
+
+**2. THE WITHHELD COUNT GETS ITS OWN SENTENCE, and the plan's prose said otherwise.** P3 said the
+withheld offers are *"counted in the existing withheld sentence"*. They are not — `GearWhoWithheld`
+is its own field and its own line beside `GearWithheld`. **`GearWithheld` is a CAP** (EQBuddy
+naming a few of many it could have named, remedy: open the Gear room); **this is a RULE** (nothing
+can say what drops it, remedy: play there, or edit the page). Summing them gives one number that
+can explain neither, which is the failure trap 50 is about rather than a tidier surface. The
+room now carries three such lines — cap, band, who — and a player can act on all three only if
+they can tell which fired. **Named for Helm as a departure from the plan's wording**; if Helm
+reads the phrase as load-bearing rather than as a suggested home, the fold is one line.
+
+**3. THE WHO RULE RUNS AFTER THE BAND GATE, and the order decides which sentence a player gets.**
+Both rules can remove the same row. D2's refusal quotes eqlwiki's own band and the character's
+level; this one can only say a page was silent. Running the who rule first would have swallowed
+refusals D2 shipped — a level-30 character's anonymous Crushbone offer would vanish as "no
+creature named" instead of "eqlwiki lists its creatures at 5–20". **A slice must not quietly
+narrow what the slice before it refused out loud.** Pinned by
+`TheBandGateReportsARefusalTheWhoRuleWouldOtherwiseHaveSwallowed`, which is one of the six
+prove-failed mutants.
+
+**4. `GearMobsPerItem` = 3, and the order is the wiki page's own.** Three because a zone row names
+three items, so an uncapped clause puts eighteen creature names on one row; and because one name
+reads as *the* thing to kill where three read as the sort of thing this zone drops it from, which
+is what a camp is. **Nothing ranks creatures** — nothing here has measured them — so the page's
+order stands and what is held back is attributed to the page ("and 4 more on its page") rather
+than to EQBuddy. Load-bearing on real data: 3,830 pairs name more than one and 1,384 more than
+three.
+
+**5. THE FINDING THE PLAN DID NOT FORESEE — the who rule removes a class of camp that is not a
+place at all.** 75 of the 107 anonymous wearable (item, zone) pairs have a "zone" string that is
+not a zone: `}}`, `Category:2H Slashing`, `N O T _ C L A S S I C`, `ITEM REMOVED FROM GAME`,
+`EQL Note - Dropped from an ogre shaman (9/9/26)`, and free prose. The staged shot is the
+exhibit: a warrior in `Cloth Gloves` was being offered **five** camps off ONE record — `Plane of
+Fear<br>`, `:* Fright`, `:* Dread`, `:* Terror`, `:* Cazic Thule (God) (needs confirmation)` —
+all parsed out of one bulleted wiki line onto `Slime Blood of Cazic-Thule`. The rule removes all
+five, not because anything here learned to recognise a broken zone name, but because **a string
+that is not a place has no creature under it on the page either.** That is the Founder's "junk
+camps" arriving by a second mechanism.
+
+**The promoter defect itself is NOT fixed here and that is deliberate.** Correcting how
+`items-promote.py` reads a bulleted drop list is a transform change whose output is the catalog,
+and rebuilding the catalog is a harvest question — D3's AUTHORIZE is discharged. Filed as a stub
+in `FABLE.md` with the numbers. **What ships is the engine refusing to act on it**, which is the
+right layer for this slice and leaves the data honest either way.
+
+**6. Existing fixtures gained a creature, and that is a change worth seeing.** `RecommendationsGearTests.Record`
+and two sibling fixtures now populate `DropMobs` by default, with `anonymous: true` as the opt-out
+for the tests about the rule. They were written when the field was empty on all 11,146 records; a
+null default now would make every fixture in those files the 1.8% case and the who rule would
+silently be the thing every other test was measuring.
+
+**Not done, deliberately:** no fetch, no harvest, no curated write, no transform change, no rate
+or policy change; no Pages, Play Console, tag, `release.ps1` or signing; the never-BiS three
+refusals, the single-select intent strip, the include-quests toggle and the count-based zone
+ranking all KEEP. The item side of the band gate stays ungated (D6's survey, unchanged).
+
+— Dranak (Claude Code, DRA-84 D4)
+
+---
+
+## 2026-09-15 — DRA-84 D5: the re-smoke found the phone had been drawing four of five sentences
+
+**Seat:** `opus-dra84-d5` (default; `opus-dra84-d4` released as DISCHARGED on #633's merge,
+per Helm's ~11:55 PM CT ruling). Paperclip DRA-84, plan P6, under the #623 whole-sequence
+SIGN — D4 landed on `main` as `1c00e298` with both gates green, which is what authorizes this
+one. Nothing here is on the consequence list: no release, no tag, no signing, no Pages, no
+Play Console, no public post, no privacy surface, no third-party request, no fetch.
+
+### 1. The finding, because a re-smoke that finds nothing has not been run
+
+**`gearWhoWithheld` reached the wire and was never drawn.** D4's withheld sentence is
+produced by `CompanionProjection.Helper` (line 68), is in the Helper section's fingerprint
+(line 244), and passes `HelperSurfaceParityTests.AWithheldDropOfferSaysSoOnThePhoneToo` —
+which compares the PROJECTION to `HelperPresentation` and never to the page. `index.html`
+drew `[moneyNote, cap, gearWithheld, gearBandRefused]` and stopped. So on a phone, five drop
+offers left the list with nothing said about them, while the PC beside it said exactly why.
+
+That is trap 50's failure with the right shape everywhere else, and it is the one thing the
+phone half is explicitly not allowed to do: the two surfaces disagreeing about what a list
+contains, where the phone reader has no PC in front of them to notice.
+
+**The guard that should have caught it was aimed at a screen that no longer exists** (trap
+34). `ThePageSpellsNoneOfTheHelpersWords` pairs its forbid-scan with a must-list of the
+fields the page has to draw — written when the Helper had ONE gear caption. D2 added
+`gearBandRefused` and D4 added `gearWhoWithheld`; neither added a row. The page happened to
+draw the first and not the second, and a must-list that stops growing cannot tell those
+apart. It now names all five, and was prove-failed against the pre-fix page.
+
+**Default taken:** fixed here rather than filed. It is one line of the page plus two rows of
+a must-list, it is inside acceptance items 2 and 3 on the surface the plan's P3 named
+("the same words ride the wire"), and D4's `WhatsNew` entry already promises the sentence to
+everyone. A stub would have left the release shipping a promise that is false on one screen.
+
+### 2. The phone shot is staged against the REAL catalog, and its numbers come from the E2E
+
+`WriteHelperGearSnapshot` stages the same anchor, intent and unknown level as
+`AnUpgradeNothingCanNameADropperForIsWithheldAndTheRoomSaysSo`, so every number it asserts is
+one the launched app already committed: three zones, six creature clauses, five withheld, 89
+capped. A hand-built two-record catalog would have photographed the feature being absent.
+
+**The prediction was wrong first time and the fixture moved, not the number** (trap 23). The
+first draft left `MyClasses` empty — the honest reading of "EQBuddy has not been told", which
+filters nothing — and the three zones came back as Plane of Growth / Temple of Veeshan /
+Chardok. A real screen of a different character. The E2E's profile is a WARRIOR and the
+class-lock filter is an INPUT to the sweep, which is exactly the kind of thing predicting
+catches and eyeballing does not.
+
+**Its caveat, stated rather than papered over:** the shot carries no band-gate sentence,
+because the level is unknown and the gate stands down (trap 73). Staging a level would have
+re-ranked the zones and left this picture with numbers nothing else had computed. The gate's
+own picture is `shell-helper-gear-band`, and that the phone says the same words when it fires
+is `ARefusedZoneSaysSoOnThePhoneToo`'s claim. Headless Edge's 492 px viewport clamp applies
+here as it did to `mobile-helper.png`: 516×1500, a large phone's line breaks rather than a
+small one's.
+
+### 3. `helperBandRefused` is a count, and a count cannot fail the right way
+
+The D2 E2E asserted two refusals and a drawn sentence. Both stay true if the gate read the
+wrong band, fired the wrong arm, or compared against a level it never read — the arithmetic
+lived only in a doc comment. `helperBandRefusals` now carries what the gate COMPARED
+(`TempleofVeeshan:60+:BottomOver,Veeshan'sPeak:60+:BottomOver`) beside the `helperLevel` 28
+already asserted, so the relationship is an assertion. A `TopUnder` in that string would be
+D2's signed open-top ruling broken with both counts still green.
+
+### 4. What the checklist says that a test cannot
+
+`docs/ops/dra84-founder-resmoke.md` maps acceptance 1–4 to what to look at, what would count
+as a FAIL rather than a preference, and — the section worth the most — **what is knowingly
+not fixed**: the promoter still writes `DropZones` strings that are not places, and the Gear
+room, item lookups and the wishlist still read them directly, so looking an item up can still
+show you `}}` as a zone. The Helper refuses to offer them as camps; that is an engine refusal
+and not a data fix, and the checklist says so in those words.
+
+**Not done, deliberately:** no fetch, no harvest, no transform change, no curated write, no
+rate or policy change; no Pages, Play Console, tag, `release.ps1` or signing; no promoter
+rebuild (Fable stub STANDS, Helm ACKed the stop); no second D4 seat; no re-ranking, no new
+weight and no new threshold — this slice changes what is SAID, not what is chosen.
+
+— Dranak (Claude Code, DRA-84 D5)
+
+## 2026-09-15 — DRA-90: the seat store was already shared; the hole was that nothing tested it
+
+**The card's root cause is wrong, and I did not implement its directions as written.** DRA-90
+reported that `.claude/soft-seats/` is per-working-copy, so `claim-seat.ps1` could not see a
+sibling's live claim, and proposed anchoring the store to the git common dir (direction 1).
+
+**Measured, before changing anything:** that anchoring has been in `Get-SoftSeatMainRoot`
+since the store's ORIGINAL commit, `b7f2eae4` (2026-09-08) — a week before the DRA-87
+duplicate that prompted the report. A real linked worktree refuses a default claim held by
+the main tree, in both directions, with no `-StoreDir`. There is exactly ONE `claims.json` on
+the machine, and it holds exactly ONE DRA-87 row (`dra87-docs-honesty`, 06:20:34Z). **The
+second DRA-87 seat never claimed at all** — so the mutex did not lose a race over the store,
+it was never consulted. A mutex nobody is obliged to take refuses nobody.
+
+**What WAS broken is the coverage.** All 45 existing selftest checks pass `-StoreDir
+<throwaway>`, so the refusal predicate is proven exhaustively against a directory the test
+hands it, and store DISCOVERY — the only thing deciding whether two seats meet — had none.
+That is why an experienced executor could file the resolution as broken and nobody could
+contradict it cheaply.
+
+**Decided, and the default it could have gone the other way on.** The obvious default was to
+implement direction 1 as asked. I did not: implementing an anchoring that already exists
+would have produced a green diff that changed nothing and closed the card on a false story.
+Instead the slice lands the card's own verification bar — a real repo, a real linked
+worktree, no `-StoreDir`, refusal asserted BOTH directions, one identical resolved path, and
+a reachable negative that claims the same card against a private store and asserts it
+SUCCEEDS so the rows cannot pass by accident. Prove-failed: forcing the fallback reddens 7.
+59 checks green after.
+
+**Two smaller calls inside it.** (a) The common-dir answer used to additionally require a
+`.gitignore` at the resolved root and fall through to the WORKTREE root when absent — a proxy
+for "is this the repo root" (trap 64b) whose failure mode is silently giving every copy its
+own store. Removed; only "git named nothing" falls back now. (b) The resolution is a value
+(`explicit` / `git-common-dir` / `fallback`) printed by `claim-seat.ps1 -Where`, and a grant
+from a `fallback` store WARNS on the screen that granted it. The reporter's misdiagnosis was
+reading a directory listing — `claims.json` is gitignored while `README.md` and
+`claims.template.json` are committed, so a fresh worktree shows the folder without the store.
+That is now asserted as correct rather than left to the eye.
+
+**Direction 3 (a remote backstop) is NOT implemented, and I think the card overrates it for
+this incident.** On DRA-87's own timeline the seat that claimed did so at 06:20:34, and the
+other seat's branch and PR did not exist until 06:28–06:29. A remote check at claim time would
+have found nothing. It remains worth having as a backstop for a different case (starting on a
+card that already has an open PR), and the store README now names `gh pr list` / `git ls-remote`
+as the habit, but shipping it under the claim that it closes DRA-87 would be a guard sold on a
+failure it cannot see. Filed as the open half rather than quietly dropped.
+
+**Still not closed:** two independent CLONES share no store, and nothing here changes that.
+Neither does anything here OBLIGE a seat to claim, which is the actual DRA-87 mechanism.
+
+— Dranak (Claude Code, DRA-90)

@@ -206,6 +206,12 @@ public sealed class HelperSources
                 IncludeQuests = includeQuests,
                 Motes = Motes,
                 Sales = Sales,
+                // **DRA-84 D2, and it is supplied HERE rather than by a host.** This is the one
+                // assembly point the room and the phone both go through, so the band gate
+                // cannot be live on one surface and stood down on the other — which is the
+                // shape porting a feature to the phone keeps finding (trap 4). It is the lazy
+                // shipped catalog, so naming it costs nothing until something reads a band.
+                Bands = ZoneLevels.Default,
             },
             goals, factions, unlockPicks, wornPicks, professions, skills);
     }

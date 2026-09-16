@@ -77,12 +77,15 @@ jobs:
       - name: Paperclip merge-sync decides, refuses and stays one-way
         run: pwsh -NoProfile -File scripts/merge-sync-selftest.ps1
 
-      # The two GENERATED catalogs are byte-reproducible from their inputs, and this is
+      # The GENERATED catalogs are byte-reproducible from their inputs, and this is
       # where that claim is actually checked. `HarvestedGuides.json.gz` is 1,164 machine-
       # written guides; the only honest way to review the diff of a weekly refresh PR is
       # to know the generator and the committed file agree, because reading 11,000
-      # objectives is not a review. Neither script fetches — both read the cache and the
-      # committed catalogs — so this costs no eqlwiki request (consequence 7).
+      # objectives is not a review. None of the scripts fetches — they read the cache and
+      # the committed catalogs — so this costs no eqlwiki request (consequence 7).
+      #
+      # `ZoneLevelBands.json` is plain JSON with no container, so unlike the guides gate it
+      # compares the file itself — there is no zlib build for it to redden on (trap 74).
       #
       # Pinned python rather than the runner's default, for the reason the actions above
       # are pinned: a byte-for-byte assertion whose toolchain floats is a gate that can
@@ -95,6 +98,7 @@ jobs:
         run: |
           python scripts/harvests/eqlwiki/guides-transform.py --check
           python scripts/harvests/eqlwiki/epic-guides-build.py --check
+          python scripts/harvests/eqlwiki/zonelevels-transform.py --check
 
       - uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
         with:

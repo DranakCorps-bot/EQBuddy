@@ -226,6 +226,15 @@ public static class ZoneMapFiles
         }
     }
 
+    /// <summary>The token that decides whether two zone SPELLINGS are the same zone:
+    /// lowercased, a parenthetical dropped ("Cazic Thule (Zone)"), a trailing difficulty
+    /// number dropped, a leading "the" dropped, and spaces/apostrophes/hyphens squeezed
+    /// out. It is the identity half of what map lookup already did, lifted out so
+    /// <see cref="ZoneLevels"/> asks the same question rather than growing a second rule
+    /// for it (trap 4). Nothing here touches the filesystem — this names a zone, it does
+    /// not find a file.</summary>
+    public static string IdentityKey(string zone) => Squeeze(Normalize(zone));
+
     private static string Squeeze(string key) =>
         key.Replace(" ", "").Replace("'", "").Replace("-", "");
 

@@ -36,7 +36,11 @@ It is **not** a feature-count race. Feature breadth is no longer the primary con
 
 EQBuddy measures and guides **the player using it**. It does not become a party/raid ranking tool, leaderboard, coaching score, or a way to judge other players.
 
-### Log-only and local-first
+### Your own files, and local-first
+
+EQBuddy reads what the game writes for you on your own PC: the `/log` it tails live, and
+the `/outputfile` dumps you ask the game for — inventory, achievements, faction,
+spellbook. Those are the sources; the hard lines below are what it will not do to get more.
 
 - no game-memory reads  
 - no packet inspection  

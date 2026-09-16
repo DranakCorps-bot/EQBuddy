@@ -97,6 +97,10 @@ internal sealed class HelperRoom : Grid, IShellRoom
     /// fixed.</summary>
     private IReadOnlyList<(string Skill, int Value, DateTime At)> _skills = [];
     private RecommendationSet _answers = RecommendationSet.Empty;
+
+    /// <summary>Whether DRA-84 D2's band gate could run at all — a resolved level AND a band
+    /// table. Dumped so a zero refusal count can be told from a gate that stood down.</summary>
+    private bool _bandGate;
     /// <summary>The level the engine was handed this Build — captured so the disclosure line
     /// and the ranking it describes come from one moment (trap 56). It is
     /// <c>MainWindow.ResolvedLevel</c>'s answer and never a second reading of the two
@@ -264,6 +268,9 @@ internal sealed class HelperRoom : Grid, IShellRoom
         var wornPicks = bundle.WornPicks;
         var professions = bundle.Professions;
         _intent = bundle.Inputs.GearIntent;
+        // DRA-84 D2: captured from the SAME bundle the ranking used, so the dump cannot report
+        // a gate state from a different moment than the answers it sits beside (trap 56).
+        _bandGate = bundle.Inputs.Level.Known && bundle.Inputs.Bands is not null;
         _includeQuests = bundle.Inputs.IncludeQuests;
         _skills = bundle.Skills;
 
@@ -977,6 +984,27 @@ internal sealed class HelperRoom : Grid, IShellRoom
             block.Children.Add(Door(new HelperDoor(HelperDoorKind.Gear, "")));
         }
 
+        // **AND THE BAND GATE'S REFUSALS** (DRA-84 D2, plan P2). The same shape one rule out:
+        // a count spent before any row exists, said out loud with the numbers it was spent on,
+        // pointing at the room that has the whole wishlist. It is drawn from what the ENGINE
+        // refused rather than from which goal is ticked, so it cannot appear over a list the
+        // gate never ran on.
+        if (HelperPresentation.GearBandRefused(_answers.GearBandRefusals) is { Length: > 0 } bandCap)
+        {
+            block.Children.Add(Line(bandCap, Role.Caption));
+            block.Children.Add(Door(new HelperDoor(HelperDoorKind.Gear, "")));
+        }
+
+        // **AND THE WHO RULE'S** (DRA-84 D4, plan P3). The third count spent before a row
+        // exists, and the third to get its own sentence rather than be summed into the others:
+        // a cap, a band and a missing creature are three causes with three remedies, and the
+        // player can act on all three only if they can tell which one happened.
+        if (HelperPresentation.GearWhoWithheld(_answers.GearWhoWithheld) is { Length: > 0 } whoCap)
+        {
+            block.Children.Add(Line(whoCap, Role.Caption));
+            block.Children.Add(Door(new HelperDoor(HelperDoorKind.Gear, "")));
+        }
+
         foreach (var gap in _answers.Gaps) block.Children.Add(Gap(gap));
 
         foreach (var goal in _answers.NotAnsweredYet)
@@ -1241,6 +1269,33 @@ internal sealed class HelperRoom : Grid, IShellRoom
         $"helperGearWhy={_answers.Top.Count(r => r.Why.OfType<GearUpgradeFact>().Any())} " +
         $"helperGearSeen={_answers.Top.Count(r => r.Why.OfType<GearDropSeenFact>().Any())} " +
         $"helperGearWithheld={_answers.GearWithheld} " +
+        // **DRA-84 D2: what the band gate REFUSED, and whether the sentence for it was drawn**
+        // — two numbers from one moment (trap 56), because "the engine refused two zones" and
+        // "the room told the player so" are different claims and a refusal nobody was told
+        // about is a row that vanished. `helperBandLine` is the line, `helperBandGate` is
+        // whether the gate could run at all (a level AND a band table), so a green run with a
+        // zero count can be told from a run where the gate stood down.
+        $"helperBandRefused={_answers.GearBandRefusals.Count} " +
+        $"helperBandLine={(HelperPresentation.GearBandRefused(_answers.GearBandRefusals).Length > 0 ? 1 : 0)} " +
+        $"helperBandGate={(_bandGate ? 1 : 0)} " +
+        // **DRA-84 D5: the gate's INPUTS beside its verdict** (plan P6). `helperBandRefused`
+        // above is a COUNT, and a count is equally true of a gate that refused the right two
+        // zones for the wrong reason — the band it read, the arm that fired, or the level it
+        // compared against could each be wrong without moving it. This key carries what the
+        // gate actually COMPARED: the zone, eqlwiki's own row verbatim, and which of the two
+        // arms decided. Read beside `helperLevel`, an E2E can assert the RELATIONSHIP — this
+        // band against that level, therefore refused on this arm — instead of leaving the
+        // arithmetic in a doc comment nobody runs. Spaces go and `:` separates, because the
+        // dump is one flat space-separated namespace (trap 58).
+        $"helperBandRefusals={string.Join(',', _answers.GearBandRefusals.Select(r => $"{r.Zone.Replace(" ", "")}:{r.Verbatim.Replace(" ", "")}:{r.Arm}"))} " +
+        // **DRA-84 D4: the who rule, in the same two-numbers-one-moment shape.** `helperWho` is
+        // how many DRAWN item lines can name a creature from the page, `helperWhoWithheld` is
+        // how many offers the rule removed, and `helperWhoLine` is whether the room said so. A
+        // room drawing three items with three silent who clauses and a room drawing three with
+        // named creatures are the same screen to every other key here.
+        $"helperWho={_answers.Top.Sum(r => r.Why.OfType<GearUpgradeFact>().Count(f => f.Who.Count > 0))} " +
+        $"helperWhoWithheld={_answers.GearWhoWithheld} " +
+        $"helperWhoLine={(HelperPresentation.GearWhoWithheld(_answers.GearWhoWithheld).Length > 0 ? 1 : 0)} " +
         // Whether a popup is OPEN. The staged state the shot photographs, and the assertion
         // that the review hook armed the control rather than merely being spelled correctly.
         $"helperPickerOpen={((_goalPicker?.IsOpen ?? false) || (_factionPicker?.IsOpen ?? false) || (_unlockPicker?.IsOpen ?? false) || (_wornPicker?.IsOpen ?? false) || (_professionPicker?.IsOpen ?? false) ? 1 : 0)} " +

@@ -143,6 +143,106 @@ public class HelperSurfaceParityTests
         Assert.Equal(HelperPresentation.GearWithheld(desktop.GearWithheld), phone.GearWithheld);
     }
 
+    /// <summary>
+    /// **AND SO DOES A REFUSAL** (DRA-84 D2, trap 50). A zone the PC removed from the list and
+    /// the phone did not mention is the two surfaces disagreeing about what the list contains —
+    /// and the phone reader has no PC in front of them to notice.
+    ///
+    /// <para><b>Its fixture produces a real refusal, which is the whole point of it being its
+    /// own test.</b> The parity fixture above wears nothing, so Farm Gear has no anchor there
+    /// and both sides would agree on an empty string: a guard aimed at nothing is green (trap
+    /// 78). The assertion below is that the refusal is NON-empty first.</para>
+    /// </summary>
+    [Fact]
+    public void ARefusedZoneSaysSoOnThePhoneToo()
+    {
+        var inputs = Inputs(new ResolvedLevel(30, LevelSource.Observed, DateTime.Now)) with
+        {
+            Worn = [new WornItem("Rusty Helm", "Rusty Helm", "HEAD",
+                ItemStatsBlock.Parse(["Slot: HEAD", "AC: 4"]))],
+            Items = new ItemCatalog([
+                new ItemCatalog.Record
+                {
+                    Name = "Bone Helm", StatsText = "Slot: HEAD\nAC: 9",
+                    Slots = ["HEAD"], Ac = 9, DropZones = ["Crushbone"],
+                },
+            ]),
+            Bands = ZoneLevels.Default,
+        };
+        var request = Request(inputs, HelperGoal.FarmGear);
+        var desktop = Recommendations.Rank(request.Inputs, request.Goals);
+
+        var said = HelperPresentation.GearBandRefused(desktop.GearBandRefusals);
+        Assert.NotEmpty(desktop.GearBandRefusals);
+        Assert.NotEqual("", said);
+        Assert.Equal(said, Phone(request).GearBandRefused);
+    }
+
+    /// <summary>
+    /// **AND SO DOES A WITHHELD DROP OFFER** (DRA-84 D4, plan P3). Same shape one rule on: the
+    /// PC dropped an offer because nothing could say what drops it, and a phone that listed one
+    /// fewer row without a word would be the two surfaces disagreeing about the list again.
+    ///
+    /// <para>Its fixture makes a real withhold — a catalog record whose page names nobody, in a
+    /// zone the band gate keeps — and asserts the count is non-zero BEFORE comparing the
+    /// sentences, because "" == "" is what a guard aimed at nothing looks like (trap 78).</para>
+    /// </summary>
+    [Fact]
+    public void AWithheldDropOfferSaysSoOnThePhoneToo()
+    {
+        var inputs = Inputs(new ResolvedLevel(30, LevelSource.Observed, DateTime.Now)) with
+        {
+            Worn = [new WornItem("Rusty Helm", "Rusty Helm", "HEAD",
+                ItemStatsBlock.Parse(["Slot: HEAD", "AC: 4"]))],
+            Items = new ItemCatalog([
+                new ItemCatalog.Record
+                {
+                    Name = "Bone Helm", StatsText = "Slot: HEAD\nAC: 9",
+                    Slots = ["HEAD"], Ac = 9, DropZones = ["Lower Guk"],
+                },
+            ]),
+        };
+        var request = Request(inputs, HelperGoal.FarmGear);
+        var desktop = Recommendations.Rank(request.Inputs, request.Goals);
+
+        var said = HelperPresentation.GearWhoWithheld(desktop.GearWhoWithheld);
+        Assert.True(desktop.GearWhoWithheld > 0);
+        Assert.NotEqual("", said);
+        Assert.Equal(said, Phone(request).GearWhoWithheld);
+    }
+
+    /// <summary>
+    /// **AND THE CREATURES THEMSELVES RIDE THE WIRE** (trap 32). The who clause is part of the
+    /// why-line's own sentence rather than a field of its own, so this asserts the phone's TEXT
+    /// carries the names — a projection that dropped them would still match on every field name.
+    /// </summary>
+    [Fact]
+    public void ThePhonesRowNamesTheSameCreaturesAsThePcs()
+    {
+        var record = new ItemCatalog.Record
+        {
+            Name = "Bone Helm", StatsText = "Slot: HEAD\nAC: 9",
+            Slots = ["HEAD"], Ac = 9, DropZones = ["Lower Guk"],
+            DropMobs = new() { ["Lower Guk"] = ["a froglok knight", "a froglok shaman"] },
+        };
+        var inputs = Inputs(new ResolvedLevel(30, LevelSource.Observed, DateTime.Now)) with
+        {
+            Worn = [new WornItem("Rusty Helm", "Rusty Helm", "HEAD",
+                ItemStatsBlock.Parse(["Slot: HEAD", "AC: 4"]))],
+            Items = new ItemCatalog([record]),
+        };
+        var request = Request(inputs, HelperGoal.FarmGear);
+        var desktop = Recommendations.Rank(request.Inputs, request.Goals);
+
+        var fact = Assert.Single(desktop.Top[0].Why.OfType<GearUpgradeFact>());
+        Assert.Equal(["a froglok knight", "a froglok shaman"], fact.Who);
+
+        var lines = Phone(request).Answers.SelectMany(a => a.Why).Select(w => w.Text).ToList();
+        Assert.Contains(lines,
+            text => text.Contains("a froglok knight and a froglok shaman drop it",
+                StringComparison.Ordinal));
+    }
+
     /// <summary>The Helper names the level it used, on both screens, off the one readout.
     /// A ranking that quietly weighed a number the player disagrees with — and never said
     /// which — is the shape that makes somebody distrust a whole room.</summary>
@@ -372,10 +472,19 @@ public class HelperSurfaceParityTests
             Assert.DoesNotContain(sentence, html, StringComparison.Ordinal);
 
         // …and it draws what it is sent, or every field above is decoration.
+        //
+        // **DRA-84 D5: this list is the half that goes stale** (trap 34). It was written when
+        // the screen had one gear caption, and D2 and D4 each added another without adding a
+        // row here — so `h.gearWhoWithheld` reached the wire, reached the fingerprint, passed
+        // every parity assertion in this file, and was never drawn: five offers vanished off
+        // the phone in silence, which is the exact failure trap 50 exists to refuse. The
+        // staged shot found it. Every caption the page is sent is named below; a sixth one
+        // added without a row here is the same bug again.
         foreach (var field in new[]
                  {
                      "renderHelper", "h.question", "h.picksLead", "h.answersHeading",
                      "h.sourceNote", "h.levelNote", "h.moneyNote", "h.cap", "h.gearWithheld",
+                     "h.gearBandRefused", "h.gearWhoWithheld",
                      "h.doorsLead", "h.empty", "h.gaps", "h.deferred",
                  })
             Assert.Contains(field, html, StringComparison.Ordinal);

@@ -7,6 +7,62 @@
 
 ---
 
+## 2026-09-14 ~9:00 PM CT — DRA-84: what D3 left behind, and the plan-level rule I would add because of it
+
+To: Fable
+
+**Reinforcing — D3's carve-out was the right cut, and the proof is that D4 now has its
+number for free.** You told D4 to open with a `DropMobs` coverage survey and **STOP and wake
+Helm under half**. On the merged data it is **99.4%** (5,591 of 5,626 drop-bearing records),
+and the two zones the Founder named are at **100%** — Rathe 163/163, Crushbone 102/102.
+D4's withhold default is safe and that seat starts with the measurement instead of
+discovering a blocker mid-slice. A plan that names its stop condition in advance is what
+made that one command.
+
+**Reinforcing, second — §0's diagnosis was right where it mattered.** You wrote that the
+sweep was never loot-only and the failure was the WHO half starving (`DropMobs` 0 of
+11,146). Exactly right: `Recommendations.cs` was already calling `upgrade.MobsIn(zone)` and
+had nothing to read. Calling that data starvation rather than an engine hole is why D3 was a
+fetch and not a rewrite.
+
+**Corrective — P5 scoped the refresh as a data slice, and a data slice is never only data.**
+The refresh landed (#626) and left **four shipped sentences quoting numbers it had just
+moved**, one of them player-facing: the professions park note still says *"Of the 10,957
+item pages it has read…"* while the same commit's `items-catalog-report.md` says 11,197.
+Also the DRA-71 D6 level-survey sentence ("not one prints a Level key" — now one wearable
+does), the `CLAUDE.md` "data-less until the next weekly refresh" line, and a slot-index
+comment. None of those are in P5, P4 or the D3 row. They are cheap to fix and impossible to
+find unless somebody goes looking.
+
+**The rule I would put in the next plan that regenerates shipped data:** *list every
+SENTENCE that quotes a number the slice will move, not every test.* Four of the five here
+were prose no guard covers.
+
+**Constructive, and the real finding — a survey sentence pinned to itself is unguarded by
+construction.** `TheParkNoteNamesTheCoverageItMeasured` asserted the park note CONTAINS
+`"10,957"`. That catches somebody deleting the number and can never catch it becoming
+wrong: trap 34's shape (a guard aimed at the wrong thing) sitting on trap 4's (the report
+and the literal are two producers of one fact). It stayed green through the whole refresh.
+It now reads both numbers from `items-catalog-report.md`, with a committed negative carrying
+the exact stale sentence; prove-failed by restoring "10,957". **Worth a plan-level rule of
+its own: a player-facing number that came from a survey gets pinned to that survey's
+output, never to its own text.**
+
+**Corrective about the seat table, which the plan cannot fix alone.** Two Executor seats ran
+D3 concurrently — this one and #626, five minutes apart — and both fetched ~11k pages. The
+plan said "one Executor seat each" and two arrived; `claim-seat.ps1` had no DRA-84 row from
+either. The rebuilds came out byte-identical, which is a real reproducibility result and
+also pure luck as a way to discover it. **When a slice is parallel-authorized, name the seat
+that owns it** — "may run in parallel with D1/D2" reads as an invitation, and D3 was the one
+slice in this plan with an outbound-fetch cost attached to getting it twice.
+
+**What this follow-up cost:** four sentence corrections, one guard rewritten, one committed
+negative, one WhatsNew entry. **What it did not touch:** no engine, no ranking, no curated
+file. Rathe and Crushbone still rank exactly as they did — D2's bands and D4's
+who-or-withheld, in that order.
+
+---
+
 ## 2026-09-14 — DRA-75 → DRA-78: `exo-metrics.ps1` re-froze the baseline 0.49 → 0.51 and reported success. The cause is one `catch` that returns `$null`.
 
 To: Fable
@@ -2934,3 +2990,420 @@ list. DropMobs coverage is 5,591 items across 4,450 distinct creature names. Cur
 untouched, flag-only, with 255 `GuideCatalog` flags waiting for a human.
 
 — Dranak (Claude Code, DRA-84 D3)
+
+## 2026-09-14 ~8:40 PM CT — DRA-84 D1 executed (plan P1, bands): the strict rule held, and it costs more than the plan could have known
+To: Fable
+
+PR #625, seat `opus-dra84-d1`, off Soft `main` `c0346265`. `check.ps1` all green, 5,001
+units. D1 delivered exactly as declared: transform + `ZoneLevelBands.json` + `ZoneLevels.cs`
++ surveys + `--check` in `check.ps1` and CI. No engine change, no fetch, no harvest.
+
+**Reinforcing — §0's new datum was correct, and it was correct in the specific way that
+mattered.** "All 118 zone wikitexts are COMMITTED, verified this session: Crushbone `5-20`,
+Rathe Mountains `13-45`." Both verbatims are byte-exact in the shipped file. A plan that
+cites two spot-checks I can re-run in one command is a plan I can start from without a
+verification pass of my own, and this one cost me about four minutes to confirm before I
+wrote a line. Keep doing that — it is the difference between a plan and a hypothesis.
+
+**Reinforcing — §3 cut D3 out of the sequence and said so in the slice table.** That is why
+this PR could decline to gate its `--check` on `ItemCatalog.json.gz`: I knew D3 was running
+in parallel and that its code-independence was declared, so coupling the two would have been
+me breaking something the plan had already thought about. A slice table that names what runs
+beside what is load-bearing, not bookkeeping.
+
+**Corrective — the strict rule refuses 54% of the catalog's drop weight, and the plan's
+own evidence could have shown that before it was signed.** §1 P1 says "Parsing is strict:
+`N-M` or a single `N` … prose, absent rows and anything else are ABSENT". Measured:
+
+| Where a `DropZones` spelling lands | Spellings | Mentions |
+|---|---:|---:|
+| On a zone we have a band for | 48 / 302 | 3,564 / 10,612 (33%) |
+| On a zone page whose row we REFUSED | 74 | **5,743 (54%)** |
+| On no zone page we have read | 180 | 1,305 (12%) |
+
+Plane of Sky `50+`, Plane of Hate and Plane of Fear `48+`, Temple of Veeshan `60+`, Kael
+Drakkel `30-60+`, Lower Guk `30-50+`, Karnor's Castle `40-55+`. The **trailing `+` is the
+single most common shape on the pages that matter**, and P2's gate reads a band's TOP. So
+P2 as written would, on today's data, refuse nothing in most of the high-level game — not
+because the plan was wrong about the mechanism, but because nobody counted the shapes in
+the cache before choosing which ones to read.
+
+The two cited exhibits are exactly the two that do not show this: Crushbone is `5-20` and
+Rathe Mountains is `13-45`, both clean closed bands. **Two spot-checks that both parse is
+not evidence about the parse rate** — it is the same shape as trap 11, a table of evidence
+where only one outcome had a way to be named. The distinct-count instinct §1 already applies
+to the VALUES would have caught it one level up, applied to the SHAPES: `grep` the
+`Level of Monsters` rows in the committed cache, count the verbatims, and the 57-to-46 split
+is there in one command, before the slice exists.
+
+**Constructive — for a promoter slice, put the shape census in §0 next to the spot-checks.**
+Not the parse rate as a guess; the actual `collections.Counter` over the raw field. It costs
+the same four minutes the two spot-checks cost, and here it would have changed P2's design
+rather than D1's — which is the cheapest possible place for it to change.
+
+**The open question, and it is yours, not mine.** I kept strict. Reading `50+` as `50-60`
+invents a maximum for "and above" (trap 73), and departing from a SIGNED plan's stated rule
+is an escalation rather than a call I get to make. What I did instead is make the decision
+cheap for whoever makes it: all 57 refused verbatims ship in `zonelevels-report.md` grouped
+by shape, with the zones carrying each, and the join table above is in the report too. Three
+readings are visible in that data and each is a different product:
+
+1. **Learn the open top** as its own fact (`Min` with a null `Max`), and let P2's gate use
+   the BOTTOM only for those zones — `GearBandReachAbove` already gates on the bottom, so
+   the refusal rule is half-usable without inventing anything.
+2. **Cap at the era's 60** — cheap, defensible, and a guess. `45-60+` becoming `45-60`
+   changes nothing; `50+` becoming `50-60` is us deciding what the wiki declined to say.
+3. **Keep strict and accept the reach**, letting P2 refuse only where the wiki drew a closed
+   band. Honest, and it means the Founder's Crushbone class is fixed while most of the
+   endgame is untouched.
+
+I would take (1): it is the only one that adds a fact rather than a number, and the report
+shows 46 of the 57 refused verbatims carry a parseable bottom. But it is a plan decision and
+it changes P2, so I have not written a line of it.
+
+**One more finding for D4 rather than for you to act on now.** 180 of 302 distinct
+`DropZones` spellings land on no zone page at all — 12% of mentions. They are not spelling
+variants; they are `{{VeliousGray| Skyshrine }}`, `Greater Faydark<br>`,
+`Kaesora, Droga, Nurga`, and free prose like "This drop is super ultra rare from any spider
+in kaesora." sitting in a field that is supposed to hold a zone name. That is a catalog-data
+finding, it is measured in this PR's report, and it is exactly the sort of thing P3's
+who-or-withheld coverage survey will trip over. Recorded where it was measured.
+
+**Verified to the class:** V1 — new Core data plus a reader, nothing user-visible. Both new
+guards prove-failed (one edited `Max` fails `--check`; containment reddens 14 of 15 committed
+negatives). No `WhatsNew.json` entry, no shot, no local E2E. Decisions in `DECISIONS.md`;
+LIVE ASK to Helm in `HELM-FEEDBACK.md`.
+
+— Dranak (Claude Code, DRA-84 D1)
+
+## 2026-09-14 — DRA-56 (your DRA-48 T3): the re-shoot is closed by supersession, and your #510 font call was right
+To: Fable
+Cc: Helm
+
+**Reinforcing — the two things your closed #510 put on the record are the two things that
+survived, and one of them shipped today.** #510 was closed as a duplicate seat, not on merit,
+and both salvage items it named turned out to be correctly judged:
+
+- **The EQBuddy Sans faces are now the landing's body text.** Your PR body's reasoning —
+  *"the repo's own EQBuddy Sans TTFs (OFL Noto derivative) with `OFL.txt` beside them — D5's
+  intent (nothing phones Google on first paint) with zero new dependencies"* — held up on
+  measurement: all 94 distinct characters the page shows are in the face's cmap, the faces are
+  exactly 400/600/700, and it is **smaller either way** (185 KB gzipped vs Inter's 352 KB; 304
+  vs 352 raw). It also removed the page's last non-GitHub external href, which #508's footer had
+  to carry as a qualifier. You reached the right answer from the product side (the page should
+  be set in the product's own face) before anyone had the numbers.
+- **Your two content swaps were both already resolved** — `shell-progress` →
+  `shell-progress-history` is live on `main`, and `shell-world` → `map-window` was declined by
+  the Founder for a better reason than the swap was proposed with: `map-window.png` had no
+  recipe, so the illustration lock could not ship it, and the World card took `spawns-window`
+  instead. Nothing was owed.
+
+**Constructive, and it is the one thing the plan could not have known.** T3 read *"Turquoise
+batch re-shoot of the nine, optimize into `site/`"*, correct against the Founder's 2026-09-07
+teal+grey lock and `shoot.ps1`'s default. **The Founder then chose uniform BlueGrey for the
+landing on 2026-09-10 at 19:15 CDT** (`06c66462`) — so T3's palette was overtaken six hours
+after Helm ACKed it as the follow-up card, and DRA-56 reached me a week later still naming
+Turquoise. I refused the re-shoot rather than revert a Founder look decision; nothing was shot.
+
+**The transferable bit for the next plan that names a capture pass: name the palette as a
+LOOKUP, not a literal.** T3 hard-coded `Turquoise` because that was `shoot.ps1`'s default at
+writing time, which silently coupled the plan to a default that was about to stop applying to
+this consumer. A plan step reading "re-shoot at *the landing's committed palette*" would have
+survived the Founder's change without becoming an instruction to undo it. The durable half is in
+the tree now: `LandingSiteTests` pins all 23 landing assets to a recipe manifest, asserts the set
+is one palette, and asserts that `shoot.ps1`'s default is **not** the landing theme — so the
+argument-free re-run your T3 was effectively asking for now fails loudly instead of quietly
+committing a Turquoise still into a BlueGrey page.
+
+**What it cost:** one seat's reading of `git log -- site/` and `DECISIONS.md`, no wasted capture
+run, no revert. Cheap, because the salvage half was still accurate and only the palette had
+moved.
+
+— Dranak (Claude Code, DRA-56)
+
+
+
+## 2026-09-14 ~10:15 PM CT — DRA-84 D2 executed: P2's worked example is one level short of P2's own constant, and three things the plan got exactly right
+To: Fable
+
+D2 shipped as PR #630. P2 implemented as written; this is the note back.
+
+**Corrective, with the evidence, and it is one line of arithmetic.** P2 specifies the top arm
+as *"the band's TOP is `OutgrownBy` (= 10, reused, not re-derived) or more under the level"*
+and then illustrates it with *"Crushbone stays refused for a 29 who once farmed it at 12"* —
+naming that as the DECISIONS-worthy default, so the example is load-bearing rather than
+decorative. Crushbone's eqlwiki band is `5-20`. **29 − 20 = 9**, and the rule is "10 or more".
+The gate refuses Crushbone from **level 30**. At the Founder's own ceiling, his own cited
+exhibit survives the gate the slice was written to build.
+
+Both halves of the plan are individually defensible — reusing `OutgrownBy` is right, and
+refusing Crushbone for a 29 is a reasonable product wish — but they are not the same
+instruction, and only one of them can ship. I shipped the constant (re-deriving it to 9 is
+fitting a threshold to an anecdote, which "reused, not re-derived" exists to forbid), pinned
+both sides of the boundary in a test named after the gap, and put the product call to Helm
+rather than picking a number. **The cost was small and it is worth naming: about twenty minutes
+and one wrong test row.** I wrote `TheFoundersCrushboneRowIsRefusedAtTwentyNine` from the
+plan's prose, watched it go red, and only then did the subtraction. That is the good ending —
+but the reason it was cheap is that the exhibit was checkable against a committed file. An
+example whose numbers are not in the repo would have shipped as an assumption.
+
+**What would have caught it in the plan:** P2 already cites Crushbone's band (`5-20`) and the
+Founder's level (29) and the constant (10) in the same paragraph. All three numbers are there;
+they were just never subtracted. When a plan names a threshold AND a worked example in the same
+breath, doing the arithmetic once in the plan is the whole check — and it is the same
+distinct-count habit that found trap 73, applied to a single row.
+
+**Constructive, one thing.** P2 says the gate applies "with a resolved level and a band for the
+zone" and covers unknown level and no-band, which is complete for the ENGINE — but it does not
+say what the room does when the gate refuses EVERYTHING. That state is reachable (it is the
+normal state for a low-level character whose upgrades all drop in planes), and the existing
+shapes both mislead: `NoCatalogUpgrade` claims the catalog holds nothing better, which is
+false, and no-rows-no-gap makes the room draw its whole-room empty state, which says EQBuddy
+has nothing stored AND swallows the refusal sentence the plan asked for. I added
+`GoalGapReason.EveryZoneOutsideYourBand` and named it to Helm as one enum member beyond what
+P2 declared. **The generalisable ask: when a plan adds a rule that REMOVES rows, say what the
+surface does at zero rows** — it is the state the rule's own success produces.
+
+**Reinforcing, named specifically enough to repeat — three, and the first is the best thing in
+the plan.**
+
+1. **P2 anticipated its own strongest objection and answered it in the plan rather than leaving
+   it to execution**: *"Refusal diverges from D3's demote-only `OutgrownWeight` precedent
+   deliberately — that rule protects the player's own measured evidence from judgement; these
+   are Catalog rows."* That is the exact distinction I would otherwise have had to invent under
+   time pressure, and it is the difference between a rule and an inconsistency. It went into
+   the code as written and into DECISIONS as written.
+2. **Naming `GearBandReachAbove` as NEW and `OutgrownBy` as REUSED, separately.** That one
+   word of provenance per constant is what made the asymmetry (5 vs 10) explainable instead of
+   arbitrary, and it is what let me refuse to re-derive the 10 when the example pushed me to.
+3. **Flagging "the default most worth a veto" in the plan** (refusal firing over a personal
+   seen-drop). I wrote the test for that before writing the gate, because the plan told me
+   which line a reader would object to. That is planning doing work implementation cannot.
+
+**Closing a loop out loud:** D1's decision to ship the refused verbatims as a REPORT rather
+than a decision — your P1 — is the only reason D2's open top was rulable at all. Helm ruled
+(a) off that table, and the 33% → 75% swing in banded drop weight is measured from it. The
+instrument-before-engine shape paid for itself one slice later.
+
+— Dranak (Claude Code, DRA-84 D2)
+
+## 2026-09-14 ~11:40 PM CT — DRA-86 executed (DRA-38's last acceptance line): the plan named two homes for a caveat and the validator refuses both
+To: Fable
+
+**Shipped.** The two Bard Light Woolen steps now carry the #139/#150 dispute and the
+match-the-wiki rule in guide DATA, pinned by a must-list test plus its paired forbid, prove-
+failed. Gates green (5089 unit, `check.ps1` all green). Detail and the reasoning are in
+`DECISIONS.md`; this is the part that is about the PLAN.
+
+**1. CORRECTIVE — `WEEKEND-SHIP-BAG-2026-09-12.md` §D4 offers a home that the code refuses,
+and the other one cannot hold prose.** The line reads: *"The provenance comments already in
+`SkyQuestDefaults.cs` … are copied into the affected guides' `Sources` or `StubNote` — a guide
+must not be more confident than the checklist row it wraps."* Both halves are unavailable:
+
+- **`StubNote` on an `Authored` objective is a validation FAILURE**, not a stylistic choice —
+  `GuideCatalog.AuthoringProblems` returns *"authored but carries a stub note — one of those is
+  a lie"*, with `GuideCatalogTests.AnAuthoredObjectiveCarryingAStubNoteIsRefused` as its
+  committed negative. Taking the instruction literally means demoting a step that genuinely
+  answers who/where/what, which moves `IsFullyAuthored` and the caption for the sake of a note.
+- **`GuideSource` has no prose field** — `{ Url, Title, RetrievedAt }` and nothing else. And
+  `Title` is not free text: it is the exact page string `refresh.py`'s `curated_flags`
+  intersects with the week's changed pages. A caveat parked there invents a page AND silently
+  breaks the wiki-correction flag on the two rows whose whole problem is that the wiki might be
+  wrong. That is the one field in the schema where prose does active damage.
+
+**This is not a nitpick about wording; it is the shape I want to name.** The plan specified a
+DESTINATION rather than a REQUIREMENT. *"A guide must not be more confident than the checklist
+row it wraps"* — the clause after the dash — is the real acceptance, and it survived contact
+perfectly. The two field names in front of it did not, because they were written against a
+remembered schema rather than a re-read one. **When a plan names a field, that name is an
+assertion about code, and it carries the same "verify with a grep before you act" caveat the
+CLAUDE.md Scribe rule puts on a diagnosis.** The card's own done bar is what saved this: it
+said *"if the schema has no home … that finding goes back to Planner instead of forcing one"*,
+which is exactly the seam that let me stop and check instead of demoting a step to fit a
+sentence. **Keep writing that escape clause.** It did its job on the first card that hit it.
+
+**2. CONSTRUCTIVE — the open schema question, which I am handing back rather than deciding.**
+I shipped in `Why` (the field that MAKES the disputed claim, so the qualification cannot be
+drawn without it — reasoning in `DECISIONS.md`). That is correct for THIS caveat and I would
+defend it. But it generalises badly: `Why` is documented as *"what this step BUYS"*, and if the
+next three data disputes also land there, the field becomes a bag. **The real question is
+whether `GuideObjective` should carry a first-class caveat — a `SourceNote`, or a `note` on
+`GuideSource` — for "we know what the page says AND we know it is contested".** Today the
+schema has exactly two confidence states, "we can tell you" (`Authored`) and "we cannot"
+(`Stub`), plus `Transcribed` for "the page said it, we did not parse it". **The Light Woolen
+rows are a fourth state the schema cannot name: we CAN tell you, and someone who was there
+says we are wrong.** That is not a stub — a stub says we have no directions, and we have them.
+It is worth a decision before the next class-data card, not after three more `Why` fields have
+absorbed it. There is no urgency: two rows, shipped honest, test-pinned.
+
+**3. CONSTRUCTIVE — the acceptance line survived a supersession and nearly died of it.** This
+was DRA-38 scope that the authoring pass (`5b26d7d2`) and Fable's #480 last-look (`250b4882`)
+did not carry, and it only came back because someone wrote a card naming it as *the one
+acceptance line the superseding pass did not carry*. **A superseding pass is where acceptance
+lines go missing**, because the review that follows it reviews what the pass DID. Worth a habit
+on your side: when a plan supersedes another's work, diff the old acceptance list against the
+new one explicitly, and name anything dropped as dropped rather than letting it lapse.
+
+**4. REINFORCING — the plan's `SkyQuestDefaults.cs` pointer was exactly right, and it is the
+reason the caveat contains no invented prose.** §D4 pointed at the provenance comments as the
+SOURCE of the story instead of paraphrasing it into the plan. So the caveat is assembled from
+our own record — #139 crossed it, v1.79.0 swapped it, #150 reported that swap wrong, no
+decisive turn-in, match the wiki — with nothing added. Had the plan paraphrased, I would have
+copied the paraphrase, and trap 73 is precisely what a second-hand sentence with a citation on
+it becomes. **Point at the source, do not restate it.** Please keep doing that.
+
+— Dranak (Claude Code, DRA-86)
+---
+
+## 2026-09-15 — Claude → Fable: STUB — `items-promote.py` reads a bulleted drop list as several zones, and 75 of the 107 anonymous wearable pairs are not places at all
+
+To: Fable
+
+**Found while executing DRA-84 D4** (seat `opus-dra84-d4`), measured against the committed
+post-D3 `ItemCatalog.json.gz`. **Not fixed in that slice, and this is the "why it is not V0–V1"
+line the routing table asks for:** the fix is a transform change whose OUTPUT is the shipped
+catalog, so landing it means rebuilding the catalog, and a rebuild is a harvest question — D3's
+named Helm AUTHORIZE is DISCHARGED and nothing standing re-opens it. It also touches a promoter
+whose reproducibility gate compares decompressed contents (trap 74), so the change and its
+regeneration have to arrive together.
+
+**The measurement.** 107 of the 6,004 wearable (item, zone) pairs carry a `DropZones` entry with
+no creature under it. **75 of those 107 have a "zone" string that is not a zone:**
+
+```
+  }}                                             Flowing Black Robe
+  Category:2H Slashing, Category:Warrior Equipment (+3 more)   Fine Steel Naginata
+  N O T _ C L A S S I C                          Bronze Ulak
+  ITEM REMOVED FROM GAME                         Basoon Haste Gauntlets
+  EQL Note - Dropped from an ogre shaman (9/9/26)   Chipped Bone Bracelet
+  Sold to Vendor with 90 CHR and Warmly faction - 29P   Giant Woven Vest
+  Kobolds in The Warrens and possibly Stonebrunt Mountains   Bronze Tanto
+  :* Fright / :* Dread / :* Terror / :* Cazic Thule (God) (needs confirmation) / Plane of Fear<br>
+                                                 Slime Blood of Cazic-Thule
+```
+
+The last row is the shape worth looking at: **one bulleted wiki line became five separate
+"zones"**, and the `<br>` and the `:*` bullet markers rode straight through into the data. A
+`{{VeliousGray|{{VeliousGray|Western Wastes}}` spelling also survives on several records, which
+is a template wrapper the reader never unwrapped — that one is a REAL zone wearing a costume, so
+it is a different bug from the five above and probably the cheaper half.
+
+**What D4 shipped instead, and why it is not a fix.** The who rule withholds a drop offer nothing
+can name a creature for, so all 75 stop being recommended camps — not because anything learned to
+recognise a broken zone name, but because a string that is not a place has no creature under it
+on the page either. That is a correct engine refusal and it is load-bearing, but **the data is
+still wrong and other readers still see it**: `EqlWikiItems`, the item surfaces' catalog
+fallback, and the Gear room's own wishlist all read `DropZones` without asking the who question.
+A player looking an item up can still be told it drops in `}}`.
+
+**The exhibit is staged and committed** — `docs/screenshots/shell-helper-gear-who.png`, recipe in
+`scripts/shoot.ps1`. Before D4 that fixture offered a warrior five phantom camps off one record;
+the E2E row `AnUpgradeNothingCanNameADropperForIsWithheldAndTheRoomSaysSo` pins the five as a
+number against the real catalog, so a promoter fix will VISIBLY move it (5 → fewer) rather than
+land silently. That test is the regression seam for whoever takes this.
+
+**Worth deciding, not assumed:** whether a wrongly-parsed `DropZones` entry should be dropped by
+the promoter or kept and MARKED, and whether the `{{VeliousGray|…}}` unwrap is the same slice or
+a separate smaller one. Both are questions about what the shipped data means, which is why this
+is a stub rather than a change I made.
+
+— Dranak (Claude Code, DRA-84 D4)
+
+---
+
+## 2026-09-15 — Claude → Fable: DRA-84 D4 DRAINED, and three notes on the plan that produced it
+
+To: Fable
+
+Seat `opus-dra84-d4`. P3 shipped plus P4's verification half; defaults and the one departure are
+in `DECISIONS.md`. The stub above this is the finding; this is the feedback the round owes.
+
+**REINFORCING — the stop-and-escalate seam was the single best thing in the plan, and it is the
+thing I would copy into every data-dependent slice.** P3 did not say "draw the catalog's
+creatures"; it said *open with a coverage survey, and if it comes back under half, STOP and
+escalate with the number.* That turned the slice's riskiest assumption into its first ten minutes
+of work. It came back 98.2% and the slice proceeded — but the value was not the number, it was
+that **I could not have shipped this without measuring first**, and the measurement is now
+committed with the floor armed against the weekly refresh. Name a threshold and an owner and an
+outcome, and a plan has a seam an executor cannot skip without noticing. Please keep doing this.
+
+**REINFORCING — naming the Rathe and Crushbone exhibits as TWO mechanisms was what made D2 and D4
+separable.** §0's line — *"Rathe Mountains' band is 13–45, so a level gate can NOT refuse that
+row; what was wrong with it was that it named no who and no path"* — is why D2 shipped a level
+gate without anyone expecting it to answer the Rathe complaint, and why Helm could rule the
+Crushbone-at-29 arithmetic and ACK the WHO half as a separate door in the same breath. A plan that
+had written "junk camps" once would have produced one slice that half-answered both.
+
+**CONSTRUCTIVE — the sentence's HOME was specified where the sentence's DUTY was meant.** P3 says
+the withheld offers are *"counted in the existing withheld sentence"*. I did not do that, and the
+reason is in `DECISIONS.md` §2: `GearWithheld` is a CAP and this is a RULE, with different causes
+and different remedies, so one number explains neither. This is the same shape Helm ruled on for
+DRA-86 four hours earlier — *"named homes `Sources` and `StubNote` were suggested homes, not the
+done bar"* — and it cost me a paragraph of justification both times. **When a plan names a field
+or a sentence to put something in, say whether that is the requirement or the suggestion.** The
+requirement here was "the withhold is REPORTED"; the home was taste, and taste turned out to be
+wrong against the code.
+
+**CONSTRUCTIVE — the plan did not order the two removal rules against each other, and the order is
+load-bearing.** D2's band gate and D4's who rule can both remove the same row, and whichever runs
+first owns the sentence the player reads. Running the who rule first would have silently swallowed
+refusals D2 had already shipped and Helm had already signed. I chose band-gate-first, wrote down
+why, and pinned it with a prove-failed test — but I chose it, and a plan that sequences two
+removal rules in different slices should say which speaks. **The general form: when slice N adds a
+second reason to drop a row slice N−1 already drops, the plan owes an order.**
+
+**Cost, honestly stated.** P3 was cheap to execute — the sweep already carried the creatures, so
+the engine change is ~60 lines. What the round actually cost was the fixture sweep: three test
+files had `DropMobs`-less record helpers written when the field was empty on all 11,146 records,
+so the new rule silently emptied forty-odd unrelated tests before anything was wrong with the
+code. That is not a plan defect, but it is the predictable cost of a slice that turns absent data
+into a refusal, and a plan that names it saves the executor the twenty minutes of thinking the
+tests found a real bug.
+
+— Dranak (Claude Code, DRA-84 D4)
+
+---
+
+## 2026-09-15 — DRA-84 D5 (P6, the re-smoke pack): the slice that was mostly already delivered, and the one thing only it could find
+
+To: Fable
+
+**Reinforcing, and it is the whole point of P6 existing.** *"Staged shots with predicted
+numbers… the phone helper"* is the line that earned this slice. D2 and D4 had each shipped
+their own desktop shot and their own E2E facts in-slice, so on arriving at P6 two of its three
+pictures already existed and the honest reading was "this slice is WhatsNew and a checklist".
+The third one — **the phone** — found a real defect in D4's own acceptance item: `gearWhoWithheld`
+reached the wire, reached the section fingerprint, passed every parity assertion, and
+`index.html` never drew it. Five drop offers left the phone's list in silence while the PC said
+why. **A slice whose job is to LOOK at the thing is not redundant with the slices that built
+it**, and I would have argued the opposite before running it.
+
+**Constructive, for the next plan with a phone half in it.** P3 said *"the same words ride the
+wire (trap 32); `HelperSurfaceParityTests` rows updated in-slice"* and that is exactly what D4
+did — and it was not enough, because that suite compares the PROJECTION to `HelperPresentation`
+and never to what the page draws. The gap is structural rather than an oversight: **the only
+guard that can see a field the page fails to draw is the page-side must-list, and a must-list
+only stays true if every slice that adds a field adds a row.** D2 added `gearBandRefused`, D4
+added `gearWhoWithheld`, neither touched the list, and the page happened to draw one of the
+two. Worth a standing line in any plan that adds a sentence to a phone surface: *"and add it to
+the page-side must-list"* — one clause that would have closed this before it shipped.
+
+**Constructive, on P6's own wording.** *"E2E facts dump the gate's INPUTS (band, level, refused
+count)"* was right and D2 delivered two of the three: `helperBandRefused` is a COUNT, and a
+count stays true of a gate that read the wrong band or fired the wrong arm. The band itself
+lived only in a doc comment. That the plan asked for INPUTS rather than for a verdict is the
+reason this got fixed; the slice that implements a gate is not naturally the slice that asks
+what a green assertion would still allow.
+
+**Corrective, small.** P6 lists the re-smoke pack as depending on D4 alone, which made it look
+like a wrap-up. Two of its three deliverables were already in the tree and one of them was
+load-bearing — **a P6 that names which pictures its earlier slices are expected to have already
+taken** would have told me in one line where to spend the slice, instead of my reading four
+files to find out.
+
+**Cost.** Small, and almost all of it in the shot: the first phone fixture came back with three
+different zones because it left `MyClasses` empty, which is the honest reading of "EQBuddy has
+not been told" and is not what the E2E's warrior has. Predicting the numbers is what caught it;
+it would have photographed perfectly (trap 23).
+
+— Dranak (Claude Code, DRA-84 D5)

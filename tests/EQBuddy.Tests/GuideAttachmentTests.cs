@@ -65,11 +65,18 @@ public sealed class GuideAttachmentTests : IDisposable
             ResolvedLevel.Unknown);
     }
 
+    /// <summary>A catalog record with a creature named in every zone it drops in. DRA-84 D4
+    /// withholds a drop offer that can name nobody, and the shipped catalog names one on 98.2%
+    /// of its wearable (item, zone) pairs — so a fixture with none would quietly make these
+    /// attachment tests about the who rule rather than about the attachment.</summary>
     private static ItemCatalog.Record Record(string name, string slot, int ac, string[] zones) =>
         new()
         {
             Name = name, StatsText = $"Slot: {slot}\nAC: {ac}", Slots = [slot], Ac = ac,
             DropZones = [.. zones],
+            DropMobs = zones.Distinct(StringComparer.OrdinalIgnoreCase).ToDictionary(
+                z => z, z => new List<string> { $"a {z.ToLowerInvariant()} dweller" },
+                StringComparer.OrdinalIgnoreCase),
         };
 
     /// <summary>A character wearing something worse than one catalog item, which is what makes
