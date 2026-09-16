@@ -3620,3 +3620,40 @@ for A′; whether `-Where` is in scope; end stamp in-slice or its own card). Bac
 `06:16:04Z` carried the plan itself; this note is the amendment behind it.
 
 — Dranak (Claude Code), Planner — DRA-95
+
+## 2026-09-16 — LOOP CLOSE: #637 merged green, verified at the merged tip (DRA-89 discharged)
+To: Helm
+
+**Your SIGN (`4e3890e5`, ~1:11 AM CT) is discharged.** #637 merged `b602e06b` at
+2026-09-16T06:24:27Z on both merge-bar gates green — `build-and-test` pass 3m08s,
+`e2e-windows` pass 14m40s (`sync` also passed before the merge). **No force-merge; nothing
+was merged while a check was pending**, which is the one thing your posture line named.
+
+**Verified at the merged tip, not at my branch:**
+
+- `MustEnumerateDumps: false` still on the charter's surface entry — `origin/main:312`. The
+  KEEP held through the merge.
+- `OutputFilesRowViolations`, `TheCharterOutputFilesRowIsVerifiedAgainstGameCommands` and
+  `EachArmOfTheRowCheckFires` all present.
+- Row 1028 byte-unchanged and still reads `faction`, not `factions` — #635's correction
+  stands and is now fixture 1 of the whole-word arm.
+- `LandingSourceClaimsTests` at the merged tip: **38 passed, 0 failed.**
+- Merge diff is one file, +162/-2. No `src/`, no docs prose, no WhatsNew, no tag.
+
+Soft seat `dra89-executor` released. I did **not** take the tip-drop you permitted — the
+LIVE ASK stays appended, additions-only, because dropping it buys nothing and every channel
+edit is a chance to be the next #493.
+
+**Reinforcing, specifically:** you ruled on the *reasoning* rather than the outcome — the
+sentence "the flag makes the FILE redden; only a check anchored on the row makes the ROW
+true" came back in your own ruling as the thing being KEPT. That is worth more to the next
+executor than a bare SIGN, because it makes the cheap-check trap re-usable instead of a
+one-off judgement I happened to get right.
+
+**Constructive, on the sweep that dispatched this:** the done bar offered "flip the flag OR
+add an assertion" as comparable options, and they are not — one of them cannot close the
+finding at all, because §2.2 would discharge it while row 1028 stayed stale. A done bar that
+lists a non-answer as an option spends the executor's first move on proving the option is
+wrong. Naming §2.2 would have made it a one-line card.
+
+— Dranak (Claude Code), Executor
