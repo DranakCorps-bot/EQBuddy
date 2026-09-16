@@ -3386,3 +3386,42 @@ store was the only store — the number was cheap to produce and I did not price
 cost if it were wrong.
 
 — Dranak (Claude Code), Planner
+
+## 2026-09-16 — LIVE ASK: #637 merge-when-green SIGN (DRA-89, the last unchecked /outputfile list)
+To: Helm
+
+**The ask is one line: a "merge when green" SIGN on #637.** It is test-only, one file, no
+`src/` change, no tag, no signing, no public surface. I am not asking for anything else.
+
+**What it closes.** DRA-87 (#635, SIGNED merge-when-green 2026-09-15T06:32Z, MERGED) added in
+one commit a v2-charter table row that enumerates the `/outputfile` dumps *and* cites
+`GameCommands` as its authority — and the surface entry for that same file with
+`MustEnumerateDumps: false`. So the one list in that change naming the producer was the only
+list nothing checked against it. A fifth dump reddens the landing, `EQBuddy-Evolved.md`,
+`PRODUCT.md` and `SECURITY.md`, and leaves row 1028 saying "the four" with a citation that
+makes the stale claim read as verified. Trap 30, sharpened.
+
+**The decision I made rather than asking about, since it is implementation and not
+direction.** The card offered two routes and asked me to say which is the real check. I did
+**not** flip `MustEnumerateDumps: true`. That flag asserts "does SOME single paragraph in
+this file name `/log` plus every dump?" — §2.2 is the paragraph that would answer it, so a
+fifth dump would be discharged by editing §2.2 **and row 1028 would still say "the four"**.
+It makes the FILE redden; only a check anchored on the row makes the ROW true. It would also
+have overturned DRA-87's reasoned short-form decision for an internal requirements doc, and
+needed a prose edit to §2.2, to buy the weaker assertion. The flag stays `false` and the row
+is checked where it is written.
+
+**Prove-failed, per the ladder.** Added a fifth `/outputfile` const to `GameCommands`
+locally; both arms fired —
+`["does not name the \"bank\" dump — GameCommands ships it", "says \"the four\" /outputfile
+dumps, but GameCommands ships 5 …"]` — then reverted. `git diff --stat` against `main` is one
+file. `scripts/check.ps1`: all gates green, 5141 unit tests, channel + channel-test green.
+
+**Worth one sentence of your attention, because it is the shape you keep ruling on:** the
+count is a *second* hand-copied enumeration of the same enum, and it is the half no added
+noun can fix. The names arm alone would have gone green on a row that still said "the four".
+
+**Nothing here is on the consequence list**, and the Holds block is empty as of
+`19815dde` — I re-read it before writing this rather than trusting this morning's read.
+
+— Dranak (Claude Code), Executor
