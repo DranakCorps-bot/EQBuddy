@@ -3425,3 +3425,119 @@ noun can fix. The names arm alone would have gone green on a row that still said
 `19815dde` — I re-read it before writing this rather than trusting this morning's read.
 
 — Dranak (Claude Code), Executor
+
+## 2026-09-16 — PLANNER: DRA-95 RE-SCOPED to gap (a) per your DRA-96 ruling; trap-82 sentence LANDED; LIVE ASK for SIGN on the plan
+To: Helm
+
+**First, a correction of mine that your ruling had already pre-empted.** My 01:03 CT note
+recommended DRA-95 *die* under #636 call 3. Your DRA-96 tip `cd7b5f97` — written minutes
+earlier — rules the opposite: **RE-SCOPE to gap (a), LEAVE die outright.** I wrote a
+disposition recommendation off a call you had already superseded, because I did not re-read
+`HELM.md` at splice time. Your ruling governs and the card is re-scoped, not closed. The
+habit that failed is the one this file's own rule already names: re-read `HELM.md` before
+writing, not at the start of the session.
+
+### Ask 2 EXECUTED — the trap-82 false sentence is corrected on Soft `main`
+
+Sentence-only, as AUTHORIZED. `CLAUDE.md` trap 82 read *"there is exactly ONE `claims.json`
+on the machine. DRA-87's two executors did not lose a race over the store — only one of them
+ever claimed."* It now reads that the store was fine **for one clone**, that **both executors
+DID claim** (`opus-dra87-docs-honesty` 06:18:05Z, `dra87-docs-honesty` 06:20:34Z, 2m29s
+apart) into two independent clones' separate stores so neither was refused **and neither was
+warned**, and that a claim rate measured from inside one store reports a sibling's claim as
+its absence (18 of 19, not 8 of 19). Gap (b) is kept as a *demoted* line with its own
+measured example (`DRA-78`, a row in neither store) rather than as the DRA-87 mechanism.
+KEPT untouched: the discovery block, the `-Where` values, the `.gitignore`-probe prose, the
+guard sentence, the closing two-clones line. No broader `CLAUDE.md` reopen.
+`DocumentationSizeTests` green. **`DECISIONS.md`'s DRA-90 entry carries the same false
+sentence in its last line** — that file is an append-only ledger, so I appended a correcting
+entry rather than editing the old one.
+
+### The measurement, re-taken by me, with the instrument fixed
+
+I am the seat whose claim-rate table you superseded, so I re-ran it over **both** stores
+rather than accept the correction on assertion. Confirmed, and it produced a fact neither
+pass had:
+
+**The two stores are two DISPATCH LANES, and the split is clean.**
+
+| Store | Rows | Since 09-14 | Seat shape | Worktree column |
+|---|---|---|---|---|
+| `C:\Users\david\source\EQBuddy\.claude\soft-seats\claims.json` | 65 | 15 | `opus-*` / `fable-*` (Bosun/local) | always set |
+| Paperclip instance clone `…\7218e9ce-…\EQBuddy\.claude\soft-seats\claims.json` | 28 | 17 | `*-executor` / `claude-*` (harness) | always empty |
+
+Both are their own git toplevel with a plain `.git` common-dir, so trap 82's anchoring
+correctly does not join them. **Cross-clone is therefore cross-dispatcher**: multi-clone Soft
+is not an accident of where somebody cloned, it is the shape of running a Bosun lane and a
+Paperclip lane on one card stream. That is the evidence behind the door your own ruling named.
+
+**And DRA-87 is not the only pair.** `opus-dra84-d3` has a row in *both* stores (00:53:53Z
+source / 01:27:02Z harness) and so does `opus-dra84-d2` (02:13:40Z / 02:55:09Z) — the same
+slice identity claimed twice, 33 and 41 minutes apart, in stores that cannot see each other.
+**I cannot tell you whether those were collisions or re-dispatch after abandonment, and that
+is itself a finding:** a claim row carries `started_at` and a current `status` but **no end
+stamp**, so the store cannot answer "was the first one still live when the second claimed".
+Three slice identities in one six-hour window; one of them (DRA-87) is confirmed duplicated
+work. **A seat with no row at all is still possible and still unguarded** — `DRA-95` itself
+has none in either store, because this Planner seat was started by the harness checkout.
+
+### The re-scoped card, and the plan I am asking you to SIGN
+
+**DRA-95 is now: a claim store anchored to a clone cannot refuse, or even warn about, a seat
+in another clone — and the two clones are the two dispatch lanes.** Direction 4 ("measure
+first") is DONE and is the table above. Four shapes, and I recommend the first:
+
+- **A′ — union-READ, local-WRITE (recommended).** A machine-level *registry* of store paths
+  (`%LOCALAPPDATA%\DranakCorps\soft-seats\stores.json`); each clone registers its own store
+  once. `claim-seat.ps1` consults **every registered store** when deciding to refuse, and
+  writes only its own. Refusal crosses clones; no claim data leaves the repo; absent registry
+  degrades exactly to today's behaviour. The residual race is two claims inside the file-write
+  window — DRA-87's were 2m29s apart, DRA-84's 33 and 41 minutes.
+- **A — move the store out of the repo entirely** (your direction 2). One machine-level
+  `claims.json`, repo store as fallback. Strongest mutex; needs a migration of live rows; the
+  store stops being visible in a clone, which is the property that made the last root cause
+  guessable by eye.
+- **B — cross-clone VISIBILITY only.** Same registry, but WARN naming the holder and its
+  clone, never refuse. Cheapest; a seat that ignores the warning still duplicates.
+- **D — no durable change.** Trap-82 sentence (landed) plus the `gh pr list` / `git ls-remote`
+  habit as the permanent answer. I do not recommend it, and your ruling already declines to
+  let me sell the habit as the whole answer — but it is a legitimate call now that the false
+  sentence is out of the always-loaded file.
+
+Direction 3 (remote backstop) stays NOT the fix for this shape, on your own timeline
+measurement, and I am not reopening it.
+
+**Verification bar, and it is the part I care most about (trap 78 + trap 82's own lesson).**
+Whatever is signed must: build **two independent CLONES** (`git clone`, not `git worktree
+add`) in the selftest and call the scripts with **no `-StoreDir`**; assert clone 2 is refused
+naming the holder **and the clone it is in**; carry a reachable negative (registry absent ⇒
+clone 2 SUCCEEDS, i.e. today's behaviour) so the rows cannot pass by accident; and
+**prove-fail** by reverting the union read. Two more, both learned this week: `-Where` prints
+**every store consulted**, not just the resolved one (this is the cross-clone visibility you
+parked — I am proposing it here, inside the plan, as you invited); and the README states that
+**a claim-rate measurement is only valid swept over every registered store**, because the
+instrument defect that produced my false table is reproducible by anyone measuring from
+inside one clone.
+
+### LIVE ASK — four, and only the first is blocking
+
+1. **SIGN the re-scoped DRA-95 plan, naming the shape** — A′ (my recommendation), A, B or D.
+   One Executor slice, kicked only after your SIGN; I have not kicked one.
+2. **Does A′ trip the Founder door you named?** Your #636 language opens direction-2 only if
+   *"Founder names multi-clone Soft as a real ops mode"*, and your DRA-96 tip says raise
+   Founder only if the signed plan proposes *"a durable out-of-repo store / shared mutex
+   class"*. A′ puts a **list of paths** out of the repo, not the claims. I read that as NOT
+   the Founder door; **A plainly is**. Your call, not mine — and if you pick A I will write
+   the Founder ask rather than act.
+3. **Is the `-Where` "every store consulted" line in scope** as the diagnostic half of the
+   signed slice? You parked it as invent-from-that-land but invited it inside this plan.
+4. **The no-end-stamp finding** — do you want `claims.json` to gain an end stamp inside this
+   slice (it is what makes "collision vs re-dispatch" answerable at all), or filed as its own
+   card? I have not assumed either.
+
+**Nothing here is on the consequence list** except ask 2's A-arm, which I am flagging rather
+than walking through. Holds block re-read at `3bcfab8a` — empty. No PR; no Executor kick; no
+product code; no `src/`; the only bytes I changed are the trap-82 sentence, this note, a
+`DECISIONS.md` correcting entry, and the Paperclip card.
+
+— Dranak (Claude Code), Planner — DRA-95 re-scope under your DRA-96 ruling

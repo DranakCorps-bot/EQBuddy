@@ -7661,3 +7661,42 @@ failure it cannot see. Filed as the open half rather than quietly dropped.
 Neither does anything here OBLIGE a seat to claim, which is the actual DRA-87 mechanism.
 
 — Dranak (Claude Code, DRA-90)
+
+## 2026-09-16 — DRA-87's mechanism CORRECTED to the two-store miss; trap-82's sentence rewritten
+
+**This entry corrects the last line of the DRA-90 entry above.** That line says the DRA-87
+mechanism is "nothing obliges a seat to claim". It is measured false. This file is an
+append-only ledger, so the old entry stands as written and this one supersedes it.
+
+**What was actually measured** (twice, by two seats, the second time over both stores): there
+are **two** `claims.json` on this machine, in two independent clones — the Bosun/local
+checkout (`C:\Users\david\source\EQBuddy`, 65 rows, `opus-*`/`fable-*` seats, worktree always
+set) and the Paperclip instance clone (28 rows, `*-executor`/`claude-*` seats, worktree always
+empty). Each is its own git toplevel with a plain `.git`, so the common-dir anchoring trap 82
+describes correctly does not join them. **Both DRA-87 seats claimed** —
+`opus-dra87-docs-honesty` 06:18:05Z and `dra87-docs-honesty` 06:20:34Z, 2m29s apart — into
+stores that cannot see each other. Neither was refused; neither was warned.
+
+**The decision, and the default it could have gone the other way on.** Helm AUTHORIZED
+correcting the trap-82 sentence and nothing else (ruling `cd7b5f97`, 2026-09-16 ~1:00 AM CT).
+The tempting default was to rewrite trap 82's discovery block to match the new story, or to
+drop the trap. Neither happened: #636's discovery delivery is still the right work for linked
+worktrees of one clone, and the trap's lesson (a suite that hands the store in never tests
+discovery) is unchanged. Only the DRA-87 claim sentence moved, gap (b) was demoted to a
+standing process risk with its own example (`DRA-78` — a row in neither store), and the
+correction cites the two-store measurement inline.
+
+**The instrument lesson is the one worth keeping.** The false sentence came from a sweep run
+inside ONE clone, which reports a sibling's claim as its absence — trap 11's shape, a table of
+evidence only one side could produce. The corrected claim rate is 18 of 19, not 8 of 19. Any
+future claim-rate measurement must sweep every store on the machine, or it is measuring its
+own clone's dispatch lane.
+
+**Open, and now owned by the re-scoped DRA-95:** a store anchored to a clone cannot refuse or
+warn about a seat in another clone, and the two clones are the two dispatch lanes. Plan filed
+for Helm SIGN; no implementation taken. Also open and unmeasurable today: a claim row carries
+`started_at` and a current `status` but no end stamp, so `opus-dra84-d2`/`-d3` — which have
+rows in **both** stores, 33 and 41 minutes apart — cannot be classified as collision or
+re-dispatch.
+
+— Dranak (Claude Code), Planner — DRA-95 / Helm DRA-96 ruling

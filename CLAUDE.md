@@ -1076,13 +1076,23 @@ after the named guard left with its surface.
     selftest checks passed `-StoreDir <throwaway>`, so the refusal predicate was
     proven exhaustively against a directory the test itself chose, and
     DISCOVERY — the only thing that decides whether two seats meet at all — had
-    zero coverage. **The store was fine.** `git rev-parse --git-common-dir` has
-    sent every linked worktree to the main tree's `claims.json` since the
-    original commit (b7f2eae4, 2026-09-08), a week before the duplicate that
-    prompted the report; measured both directions, and there is exactly ONE
-    `claims.json` on the machine. DRA-87's two executors did not lose a race
-    over the store — **only one of them ever claimed**, and a mutex nobody is
-    obliged to take refuses nobody. **What made it look like a store bug is the
+    zero coverage. **The store was fine FOR ONE CLONE.** `git rev-parse
+    --git-common-dir` has sent every linked worktree to the main tree's
+    `claims.json` since the original commit (b7f2eae4, 2026-09-08), a week
+    before the duplicate that prompted the report; measured both directions,
+    and a linked worktree grows no rival store. **DRA-87's mechanism is the
+    CLONE half** (corrected 2026-09-16, Helm-authorized): both executors DID
+    claim — `opus-dra87-docs-honesty` at 06:18:05Z and `dra87-docs-honesty` at
+    06:20:34Z, 2m29s apart — into the separate `claims.json` of two independent
+    clones, neither of which can see the other, so **neither was refused and
+    neither was warned**. This file read *"only one of them ever claimed"* for
+    a day, because the sweep behind it ran inside ONE clone: **a claim rate
+    measured from inside one store reports a sibling's claim as its absence**
+    (trap 11's shape — 10 of the 11 "never claimed" cards had rows in the other
+    store; the corrected rate is 18 of 19, not 8 of 19). A mutex nobody is
+    obliged to take does still refuse nobody — `DRA-78` has a row in neither
+    store — but that is a standing process risk, not what happened here.
+    **What made it look like a store bug is the
     shape to remember:** `claims.json` is gitignored while `README.md` and
     `claims.template.json` are committed, so a fresh worktree shows the
     directory WITHOUT the store, which is indistinguishable by eye from "every
