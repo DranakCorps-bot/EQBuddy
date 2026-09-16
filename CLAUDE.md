@@ -1102,8 +1102,17 @@ after the named guard left with its surface.
     both directions plus one identical resolved path; its reachable negative
     claims the same card against a private `-StoreDir` and asserts it SUCCEEDS,
     so the rows above cannot go green by accident. Prove-failed: forcing the
-    `fallback` reddens 7 of them. **Two independent CLONES still share nothing**
-    — the remote is the only store both can see.
+    `fallback` reddens 7 of them. Two independent CLONES shared nothing until
+    **DRA-102 made the refusal cross them: union-READ / local-WRITE over a
+    machine-level registry of store PATHS** (`%LOCALAPPDATA%\DranakCorps\soft-seats\stores.json`,
+    no claim data; `EQBUDDY_SOFT_SEAT_REGISTRY=off` or an absent registry
+    degrades to the old behaviour and a grant decided that way says so) — the
+    refusal names the holder AND its clone, `-Where` prints every store
+    consulted, and the bar is two real `git clone`s in the selftest with the
+    registry-absent negative beside them. **A seat that never claims is still
+    refused by nobody in any clone**, so the remote (`gh pr list` /
+    `git ls-remote` for a branch naming the card) stays the only check that
+    crosses everything.
 
 New trap discovered the hard way? Add the compact rule here and the novel
 under `docs/ops/claude-archive/traps.md`. That is the whole point.
