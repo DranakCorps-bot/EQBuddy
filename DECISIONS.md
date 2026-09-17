@@ -1,3 +1,64 @@
+## 2026-09-17 — DRA-164, correcting item 8 the same day: the republish WAS authorized, it IS done, and it lied once before it was true
+
+**This entry corrects item 8 of the entry below it**, which landed an hour earlier saying the
+Desktop republish was owed rather than performed. It is appended rather than edited, because a
+ledger that revises itself in place is one nobody can audit.
+
+**1. ITEM 8 QUOTED HALF OF HELM'S SIGNATURE.** It rested on the Ruling clause — *"LEAVE
+inventing Desktop republish **from this land** … LEAVE inventing release / `release.ps1` / tag /
+signing / prod secrets"* — and did not quote **Posture (3) of the same SIGN**: *"After D1+D2
+green on `main`, **Executor republishes Desktop + pings Helm with 2.0.0+sha per card**"*. Both
+clauses are Helm's, and read together they do not conflict: **"this land" is the plan PR's own
+merge**, which published nothing, while Posture (3) names this seat, this step and this
+precondition. D1, D2 and D3 are all on `main`, so the precondition is met and the republish is
+the instruction, not an invention. **The default the other way** was the one item 8 took — treat
+the prohibition as governing because it is more specific. That reading was wrong on the scope of
+three words and would have left the Founder's ~2:00 PM CT smoke with no build to smoke.
+
+**2. AND IT IS NOT A RELEASE, WHICH IS WHY BOTH CLAUSES CAN BE TRUE.** `scripts/install-local.ps1
+-Evolved` is the local field-test loop, and its own header is the evidence: *"Touches neither
+OneDrive nor GitHub"*, it does **not** install, and it runs **portable** out of `dist\publish`
+against its own profile. No tag, no `release.ps1`, no GitHub release, no OneDrive, no update
+channel, no Pages, no Play Console, no installer. **Consequence-list item 2 is untouched** —
+nothing reached a player, and the release go remains David's alone. Item 8's instinct that the
+release gate is not Helm's to waive was right; it simply was not a release.
+
+**3. WHAT IS LIVE:** `2.0.0+03d4832892c0f7441d649f18f221808044930415` — `main` at D3's merge —
+signed `CN=FlossworksCross-Stitch`, valid and timestamped through the same `Invoke-EqSign` a
+release uses. No bypass was added and none exists. Running portable against
+`%AppData%\EQBuddy Evolved`; the v1 install, its shortcut and its profile are as they were.
+
+**4. THE REPUBLISH REPORTED SUCCESS WHILE THE SCREEN KEPT THE OLD BUILD, AND THAT IS THE FINDING
+WORTH MORE THAN THE FEATURE.** `install-local.ps1` closes a running copy by **PATH**
+(`$_.Path.StartsWith($repo\dist\publish)`); EQBuddy's single-instance lock is keyed on the
+**PROFILE** (`instance.lock` inside `EQBUDDY_APPDATA`, `UI.Shared/SingleInstance`). Those are
+different keys, and a copy running from a different path on the same profile satisfies neither
+the close filter nor the launch. Measured: a 06:16 build —
+`2.0.0+11e4a80838aa9429fca754c26d924e220fb40067`, **predating D1–D3, with no island view** — was
+running from `%LOCALAPPDATA%\EQBuddy Evolved\publish\` holding the lock, so the freshly signed
+process asked it to surface and exited. The script printed *"EQBuddy Evolved 2.0.0 is running,
+PORTABLE, from … dist\publish"* and **exited 0**. The publish was real, the signature was real,
+the exit code was real, and every one of them was about the wrong thing. **CLAUDE.md already
+says a silent failure is not proof nothing happened; this is its mirror — a LOUD SUCCESS is not
+proof the right thing happened.** Closed the stale copy with `CloseMainWindow` so it finalized
+its session into `history.db` (the script's own discipline, not `Stop-Process`), relaunched, and
+verified the running process's own `ProductVersion` reads the D3 sha. **Reading the version off
+the process rather than trusting the exit code is the only reason this is a report and not a
+false "LIVE" ping to Helm.**
+
+**5. WHAT I DID NOT DO, DELIBERATELY.** (a) **I did not fix `install-local.ps1`.** The shape is a
+one-liner — close on the PROFILE the launch is about, not on a path — but the SIGN declares
+D1–D3 and a script in the Founder's daily loop is not in it; a slice that outgrows its declared
+boundary stops. Filed as its own card. **The default the other way** was to fix it while it was
+in my hand, which is exactly how a signed sequence quietly becomes four slices. (b) **I did not
+touch `%LOCALAPPDATA%\EQBuddy Evolved\publish\`.** It still holds the 06:16 build, and **nothing
+in this repo writes that path** — no script, no installer target, no workflow. If that is the
+copy the Founder's shortcut opens, the smoke must be pointed at `dist\publish` or that folder
+refreshed by whatever owns it; inventing a deployment path to find out is precisely what the
+SIGN forbids. Named to Helm as the one open question.
+
+— Dranak (Claude Code), Executor — DRA-164 republish
+
 ## 2026-09-17 — DRA-164 D1–D3: the Plane of Sky Island view, and the republish this land does NOT do
 
 **Seat:** `dra164-d1` → `d2` → `d3`, one signed sequence (Helm SIGNED PR #663 @ `148cdd6e`,
