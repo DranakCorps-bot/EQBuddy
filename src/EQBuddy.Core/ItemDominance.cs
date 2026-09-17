@@ -69,9 +69,15 @@ public static class ItemDominance
     /// unequip their best item, which is worse than saying nothing. A candidate at the same
     /// tier or higher has no such excuse against it.</para>
     ///
-    /// <para><b>It is the rule the Helper's catalog sweep keeps too</b>, and there it matters
-    /// more than it does in the Locker: the Locker is comparing two things the player can see
-    /// side by side, while the Helper is asking them to go and spend an evening.</para>
+    /// <para><b>THE HELPER'S CATALOG SWEEP NO LONGER ASKS THIS, AND THE REASON IS THE
+    /// PREMISE</b> (DRA-149 D1, plan P1). This rule assumes both names can carry a tier, which
+    /// is true in the Locker — both come off one dump — and false on the catalog side, where
+    /// <b>0 of 11,196 names end in "+N"</b>. There <see cref="UpgradeTier"/> returns 0 for every
+    /// candidate, so the test read <c>0 &gt;= 6</c> for any plussed worn item and the sweep
+    /// returned nothing for 19 of the Founder's 19 gear anchors. A refusal that cannot be
+    /// satisfied is not conservative, it is silent. <c>GearUpgrades.Sweep</c> asks
+    /// <see cref="Dominates"/> instead and narrows what its rows may CLAIM to match; this
+    /// method is unchanged and stays the Locker's, whose scope lock is untouched.</para>
     /// </summary>
     public static bool CanClaimUpgrade(
         string candidateName, ItemStatsBlock? candidate,

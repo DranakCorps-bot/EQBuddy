@@ -107,7 +107,9 @@ public class RecommendationsGearTests
 
         var sentence = HelperPresentation.Why(fact);
         Assert.Contains("Froglok Bone Helm", sentence);
-        Assert.Contains("beats the Rusty Helm", sentence);
+        // DRA-149 D1: the row claims a better BASE item rather than "beats", because that is
+        // what base-vs-base actually established. The "+N" caveat is the block's, once.
+        Assert.Contains("is a better base item than the Rusty Helm", sentence);
         Assert.Contains("head", sentence);
         Assert.Contains("+5 AC", sentence);
         Assert.EndsWith(HelperPresentation.CatalogLabel, sentence);

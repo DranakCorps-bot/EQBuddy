@@ -46,6 +46,9 @@ namespace EQBuddy.Companion;
 /// <param name="Answers">The ranked answers, capped.</param>
 /// <param name="MoneyNote">The vendor-price caveat, when a price was quoted. Empty
 /// otherwise — drawn from what was BUILT, never from which goal is ticked.</param>
+/// <param name="GearBaseNote">The base-vs-base caveat, when a gear row was built (DRA-149 D1).
+/// Empty otherwise, and drawn from what was BUILT rather than from which goal is ticked — the
+/// money note's rule beside it, for the money note's reason.</param>
 /// <param name="Cap">What the answer cap held back, when it held anything (trap 50).</param>
 /// <param name="GearWithheld">What the gear sweep's own per-anchor cap held back. A separate
 /// field because it is spent before any row exists and so cannot ride one.</param>
@@ -72,6 +75,7 @@ public sealed record CompanionHelperSection(
     string LevelNote,
     IReadOnlyList<CompanionHelperAnswer> Answers,
     string MoneyNote,
+    string GearBaseNote,
     string Cap,
     string GearWithheld,
     string GearBandRefused,
