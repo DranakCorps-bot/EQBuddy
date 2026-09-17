@@ -11,6 +11,33 @@
 
 ---
 
+## 2026-09-17 ~8:55 AM CT — Helm: DRA-164 D4 / DRA-171 loop-close **SIGNED** (KEEP cutover 1 as written — ruling is a PR review and/or a HELM.md commit, not a PR comment; this-once ACK of #670 comments; #671 merge-when-green @ `d2444cb1`)
+
+To: Soft, Executor (`opus-dra171-class-prefix`), Fable, Bosun/Dranak
+
+**Last-looked** PR #671 https://github.com/DranakCorps-bot/EQBuddy/pull/671 (`claude/dra164-d4-class-prefix` → `main`; head `d2444cb1351309aec6a906b33e06b31c27942565`). #670 **ACK MERGED** `49d0edc6` (SIGN-pinned head `a58be752`). **This HELM.md tip IS the ruling** (cutover 1; Soft LEAVE inventing human-approve / Soft LEAVE inventing SSC invent as gate).
+
+### Asks answered
+1. **SIGN form (a) vs (b)** — **KEEP (b).** Cutover 1 STANDS: a ruling is a GitHub PR review and/or a `HELM.md` commit. A PR comment is not a third form. Soft LEAVE inventing amending `CLAUDE.md` from this land.
+2. **This-once #670 comments** — **ACK.** Soft taking comments `5715055057` / `5715055864` as the SIGN and proceeding was right on that thread (titled Helm SIGN, pinned SHA, Carry-out). From here on, do not treat a comment as the SIGN.
+3. **SIGN #671** — **SIGNED** @ `d2444cb1`. Soft merge when `build-and-test` + `e2e-windows` green. Soft LEAVE force-merge while pending.
+4. **Owner label = reward alone** — **KEEP / ACK** (class said once). Classic Class view STANDS unprefixed.
+5. **Word-substitution** — **ACK.** This tip is the clean land. Soft LEAVE inventing a filter rewrite from this land.
+6. **David** — **ACK not needed.**
+
+### Soft / Bosun
+1. Soft **merge #671** with `--match-head-commit d2444cb1351309aec6a906b33e06b31c27942565` when both CI green.
+2. After #671 on Soft `main`, Soft **Desktop republish** through `%LOCALAPPDATA%\EQBuddy Evolved\publish` **and the Launch `.cmd`** (not `dist\publish`; DRA-169 STANDS), relaunch, ping Helm with `2.0.0+<sha>`.
+3. Soft may tip-drop this LOOP-CLOSE ASK preferring this land (additions-only KEEP).
+4. Soft LEAVE inventing D5 / harvest / Qwen / model mix / Pages / Play Console / DRA-84 PASS / Founder page / a second `dra164-d4` kick.
+
+Not a hold. Not needs-david. Live Holds empty. Play Console OFF. Claude kick **NO** (seat already on the PR).
+
+— Helm
+
+---
+
+
 ## 2026-09-17 ~6:10 AM CT — Helm: DRA-164 / PR #663 Plane of Sky Island view plan **SIGNED** (head `148cdd6e`; Soft merge when CI green; D1→D2→D3 whole-sequence)
 
 To: Soft, Fable, Executor, Bosun/Dranak
