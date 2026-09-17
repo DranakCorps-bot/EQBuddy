@@ -1,3 +1,85 @@
+## 2026-09-17 — DRA-161 / EXO-HARDEN-A1e: the rotated archive copies are OUT of scope for mojibake repair, permanently
+
+**Seat:** Executor, carrying out the Planner ruling on DRA-160 (2026-09-17 09:50Z). This entry and one
+paragraph added to the archive's own `README.md` are the whole change — **zero bytes under
+`docs/ops/claude-archive/` were modified**, no transform was run against any archived path, and the PR's
+`git diff --stat` shows only those two files.
+
+**Verdict: OUT. All three files under `docs/ops/claude-archive/channels/2026-Q3/`, not now and not on the
+next sweep.** The counts that raised DRA-160 are real — 56,979 cp437 depth-1 plus 14 depth-2 in
+`HELM-FEEDBACK.original-flattened.md` (4,926,243 bytes, blob `fef3a1f9`), 5,429 cp1252 in the archived
+`HELM-FEEDBACK.md` (1,915,606 bytes, blob `7eada6af`), 1,527 cp1252 in the archived `FABLE-FEEDBACK.md`
+(1,000,117 bytes, blob `022fdea4`) — each measured off `/git/blobs/{sha}` with the decoded byte length
+asserted against the tree's `size`, which is the only read that does not hit the contents-API false-clean
+trap. They are real and they are not a defect to repair. **A future mojibake sweep reads this entry
+instead of re-raising the card.**
+
+### The Helm LOCK is not spent by this, and it stays live
+
+The governing sentence is the DRA-55 Helm SIGN (2026-09-16 19:53Z), quoted here verbatim rather than
+paraphrased, and re-read off the source comment during carry-out rather than trusted from the relay:
+
+> Helm SIGN DRA-55 plan (ops PR #10). Executor owns slice 1 producer fix then slice 2 ledger repair.
+> **Soft LEAVE inventing archive repair without separate Helm ruling.** BEVEL.md marker line stays.
+
+That LOCK forbids *repairing* the archive without a Helm ruling. It does not require a Helm ruling to
+*decline* to repair: leaving the archive untouched is the LOCK's own default state, so this verdict
+affirms the LOCK rather than lifting it. No LIVE ASK was opened and Helm's door stays unspent.
+
+**The LOCK remains live.** Anyone who wants these files repaired later still needs a real, separate Helm
+ruling. This entry neither grants one nor pre-empts one — it records why nobody should bother asking.
+
+### Three files, three different reasons — not one bucket
+
+**1. `HELM-FEEDBACK.original-flattened.md` — it is corrupt on purpose, and two artifacts already said so.**
+It holds 56,979 of the ~57k cp437 occurrences on the card, and it exists so DRA-75's "nothing was lost"
+claim can be checked **against the bytes** instead of taken on trust, and so `channel-wipe-guard`'s
+ARCHIVE exemption can see the entries that moved. It is also the cp437 detector's only clean-checkout
+fixture — real corrupt bytes with no git archaeology needed, as DRA-55's intake comment named it. The
+archive README has said *"Do not try to read it; do not edit it"* since the day it landed. Those 56,979
+markers are the exhibit, not the damage.
+
+**2. `HELM-FEEDBACK.md` — it is a git blob carried byte-verbatim, and every marker sits inside the
+verbatim region.** Byte arithmetic, re-derived during carry-out rather than copied from the ruling:
+`f4af3b5f` resolves as commit `f4af3b5f5ac6dc1b06290a478278bd9d19681d90`; `HELM-FEEDBACK.md` at that
+commit is blob `8e18b203fcbe42a20d255f477f386b5d283afcf2`, **1,909,798 bytes**. That blob is byte-contained
+in the 1,915,606-byte archive copy **at offset 5,808, with zero bytes after it** — the archive file is
+exactly `[5,808 bytes of header + recovered PR #564 entry]` + `[the f4af3b5f blob, whole]`. All 5,429
+cp1252 occurrences are inside the verbatim tail; none are in the prepended part. So a repair pass edits
+the verbatim region, and that breaks two live assertions: the README's own claim (L84-85) that the
+recovered history is carried verbatim, and `channel-rotate.py verify`, which per README L140-143 asserts
+that the archive contains the `f4af3b5f` blob verbatim. It also buys nothing — git still holds blob
+`8e18b203` with all 5,429 markers intact. Repairing the copy does not repair the history; it only makes
+the copy stop matching the history it exists to document.
+
+**3. `FABLE-FEEDBACK.md` — rotation moved these bytes, it did not create them.** The pre-rotation live
+`FABLE-FEEDBACK.md` at `c3a40c1e` (parent of rotation commit `8f9e3205`) is blob
+`51b18b02101c5210b94892a652549872f7f9a0b2`, 1,170,568 bytes, carrying **1,527** cp1252 occurrences — the
+identical count now in the 1,000,117-byte archive copy. Those bytes were already permanent in git before
+the archive existed.
+
+### The principle, stated once so the next sweep quotes it instead of re-deriving it
+
+**A rotated archive copy is not an independent site of corruption.** Rotation is a one-way move of bytes
+that are already immutable in git history. Repairing a rotated copy removes zero corruption from the
+record — it only makes the archive diverge from the revisions it was cut from, and it spends the fixtures
+and byte-identity assertions that were deliberately built on that sameness. Count archive markers as
+*copies of* live-surface markers when scoping a sweep, never as their own findings.
+
+Repair pays on the **live** surface, and that work is done and guarded: DRA-119 slice A (PR #657, merged
+2026-09-17 07:25Z) made `channel-wipe-guard.ps1` check 4 fail CI on cp437 at both depths, and slice B
+(PR #659, merged 2026-09-17 09:40Z) repaired 77 lines while preserving 4 quoted ones. Rotation is
+one-way, so nothing in the archive can reach a live file. Nothing is at risk from this verdict.
+
+### The default this could have gone the other way on
+
+Repair all three, on the grounds that ~64k mojibake occurrences in the tree is obviously bad and the fix
+is a script that already exists (`scripts/demojibake.py`). That reading counts markers instead of reading
+what each file is for, and it would have destroyed a SIGNed checkability exhibit, a detector fixture, and
+two byte-identity assertions in order to change nothing about how much corruption git holds. The tell is
+that the archive numbers do not move the live numbers in either direction — which is what makes them the
+wrong surface to measure.
+
 ## 2026-09-17 — DRA-149 D4: the vendor half ships, and a guard deleted three keywords a human wrote
 
 **Seat:** `opus-dra149-d4` (disjoint). D3 merged at `ec22acc6` (PR #653, both gates green), so
