@@ -1017,6 +1017,26 @@ internal sealed class HelperRoom : Grid, IShellRoom
             block.Children.Add(Door(new HelperDoor(HelperDoorKind.Gear, "")));
         }
 
+        // **AND THE ROWS THERE WAS NEVER AN ANCHOR FOR** (DRA-149 D2, plan P2). The fourth
+        // sentence in this stack and the only one that is not a decision EQBuddy made: the
+        // three above chose to hold something back, this one admits it never had the row. It is
+        // drawn LAST of the four and directly above the gaps because that is where the
+        // `NothingWornIsReadable` gap lands — the caption names the items and the gap says what
+        // it cost, in that order.
+        //
+        // Its doors are the wiki, one per NAMED item rather than one for the block: the check a
+        // player can actually make is per item (is this how eqlwiki spells it?), and a single
+        // door would have to pick one of them to be about.
+        if (HelperPresentation.UnreadWorn(_answers.UnreadWorn) is { Length: > 0 } unreadCap)
+        {
+            block.Children.Add(Line(unreadCap, Role.Caption));
+            var doors = new WrapPanel { Margin = new Thickness(0, Tok.SpaceXs, 0, 0) };
+            foreach (var item in _answers.UnreadWorn.Take(HelperPresentation.UnreadWornNamed))
+                doors.Children.Add(Door(new HelperDoor(HelperDoorKind.WikiItem, item)));
+            doors.Children.Add(Door(new HelperDoor(HelperDoorKind.Gear, "")));
+            block.Children.Add(doors);
+        }
+
         foreach (var gap in _answers.Gaps) block.Children.Add(Gap(gap));
 
         foreach (var goal in _answers.NotAnsweredYet)
@@ -1176,10 +1196,30 @@ internal sealed class HelperRoom : Grid, IShellRoom
         link.Margin = new Thickness(0, 0, Tok.SpaceM, 0);
         link.ToolTip = HelperPresentation.DoorTip(door);
 
-        if (door.Kind == HelperDoorKind.WikiFaction)
+        // **THE THREE WIKI ARMS, AND THE SECOND ONE WAS A SILENT NO-OP** (found in DRA-149 D2).
+        // `AddressFor` answers null for every wiki kind — correctly, a page is not a room — and
+        // the fall-through below returns the label UNWIRED, so `WikiSkill` has drawn an
+        // "eqlwiki" control with a tooltip and no click since DRA-71 D8 shipped it under all
+        // eight professions. `helperDeadDoors` could not see it either: that counter is only
+        // reached past the `address is null` return. The must-list proves the WORDS exist
+        // (`EveryDoorEitherLandsOnARoomOrOpensTheWiki`) and nothing proved the CONTROL opens —
+        // trap 34 one layer down. Adding a third wiki door beside a dead one was not an option,
+        // so both are wired here and the switch is exhaustive by kind rather than by fall-
+        // through, which is what makes a fourth wiki kind a compile-time question.
+        var url = door.Kind switch
         {
-            var faction = door.Target;
-            DesignSystem.WireClick(link, () => MainWindow.OpenWikiUrl(WikiLinks.Faction(faction)));
+            HelperDoorKind.WikiFaction => WikiLinks.Faction(door.Target),
+            // `Page`, not `Search`: a profession's page title is not an item, and the item
+            // rule would fold a "+N" and consult the item alias table on the way past.
+            HelperDoorKind.WikiSkill => WikiLinks.Page(door.Target),
+            // The name the GAME printed, searched rather than resolved — see WikiItem's own
+            // summary: this door only exists for names that matched no page.
+            HelperDoorKind.WikiItem => WikiLinks.Search(door.Target),
+            _ => null,
+        };
+        if (url is { Length: > 0 })
+        {
+            DesignSystem.WireClick(link, () => MainWindow.OpenWikiUrl(url));
             _doors++;
             return link;
         }
@@ -1308,6 +1348,17 @@ internal sealed class HelperRoom : Grid, IShellRoom
         $"helperWho={_answers.Top.Sum(r => r.Why.OfType<GearUpgradeFact>().Count(f => f.Who.Count > 0))} " +
         $"helperWhoWithheld={_answers.GearWhoWithheld} " +
         $"helperWhoLine={(HelperPresentation.GearWhoWithheld(_answers.GearWhoWithheld).Length > 0 ? 1 : 0)} " +
+        // **DRA-149 D2: the worn rows that never became an anchor** — the same two-numbers-one-
+        // moment shape, and the one it matters most for. `helperWorn` above is the anchor count
+        // and it was the ONLY thing this dump said about the dump: twenty anchors from a
+        // twenty-one-row sheet and twenty from a twenty-row sheet are the same number, which is
+        // precisely how the Founder's bow left without a trace. `helperUnreadWorn` is the count,
+        // `helperUnreadNames` is what they were (spaces out, `,` between — trap 58's flat
+        // namespace), and `helperUnreadLine` is whether the room actually SAID it, because the
+        // engine reporting it and the screen drawing it are different claims (trap 56).
+        $"helperUnreadWorn={_answers.UnreadWorn.Count} " +
+        $"helperUnreadNames={string.Join(',', _answers.UnreadWorn.Select(n => n.Replace(" ", "")))} " +
+        $"helperUnreadLine={(HelperPresentation.UnreadWorn(_answers.UnreadWorn).Length > 0 ? 1 : 0)} " +
         // Whether a popup is OPEN. The staged state the shot photographs, and the assertion
         // that the review hook armed the control rather than merely being spelled correctly.
         $"helperPickerOpen={((_goalPicker?.IsOpen ?? false) || (_factionPicker?.IsOpen ?? false) || (_unlockPicker?.IsOpen ?? false) || (_wornPicker?.IsOpen ?? false) || (_professionPicker?.IsOpen ?? false) ? 1 : 0)} " +

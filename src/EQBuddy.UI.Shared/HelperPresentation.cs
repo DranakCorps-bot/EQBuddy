@@ -550,6 +550,19 @@ public static class HelperPresentation
             $"{GoalLabel(gap.Goal)}: EQBuddy is not ranking that gear question yet. What your "
             + "own sessions have earned is under Progress → Wealth meanwhile.",
 
+        // ---- DRA-149 D2 ----------------------------------------------------------------
+        //
+        // **IT MUST NOT ASK FOR THE DUMP AGAIN**, which is the whole reason this is not
+        // NoInventoryDump. The dump is there and EQBuddy read every row of it; what it could
+        // not do is recognise a single item in it. "Run the inventory command" would send the
+        // player round a loop that ends where it started, and the names that explain it are on
+        // the caption directly above this line (`UnreadWorn`).
+        GoalGapReason.NothingWornIsReadable =>
+            $"{GoalLabel(gap.Goal)}: your inventory dump is here, and EQBuddy could not match "
+            + "a single worn item in it to an item page it ships — so there is nothing to "
+            + "compare against. Another dump will not change that; the names above are what to "
+            + "check on eqlwiki.",
+
         // ---- DRA-71 D7 ----------------------------------------------------------------
 
         // **The subject of this sentence is the MOTES and not the zones.** "No good mote camps"
@@ -979,6 +992,54 @@ public static class HelperPresentation
               + "that drops them in those zones, and you have not looted one there. EQBuddy "
               + "leaves out a camp it cannot tell you what to kill at.";
 
+    /// <summary>
+    /// How many unread worn items are NAMED before the sentence counts the rest.
+    ///
+    /// <para>Three, which is <see cref="GearBandNamed"/>'s number and its argument: the names
+    /// are long — <i>"Deterioriated Ancient Faydark Longbow +2"</i> is one of them — and a
+    /// caption listing eleven of them would be a table pretending to be a sentence. The count
+    /// is the WHOLE count either way (trap 50): a cap that hid how much it was hiding is the
+    /// silence this whole sentence exists to end.</para>
+    /// </summary>
+    public const int UnreadWornNamed = 3;
+
+    /// <summary>
+    /// **WHAT EQBUDDY IS WEARING AND CANNOT READ ABOUT** (DRA-149 D2, plan P2; trap 50).
+    ///
+    /// <para><b>The Founder failed Farm Gear on this sentence not existing.</b> His dump has
+    /// twenty-one worn rows; EQBuddy could describe twenty, and the twenty-first — a bow the
+    /// game spells <c>Deterioriated</c> and eqlwiki spells <c>Deteriorated</c> — was dropped
+    /// without a word. From his side of the screen that is indistinguishable from a Range slot
+    /// with nothing better available, which is why he reported the bow as MISSING rather than
+    /// as unbeaten.</para>
+    ///
+    /// <para><b>The subject is EQBuddy's own catalog, never the game and never the player.</b>
+    /// "That item does not exist" would be a claim about the world; what happened is that a
+    /// name did not match anything in the pages EQBuddy ships. The sentence says which names,
+    /// says that the two sources do not always spell an item the same way, and stops — the
+    /// wiki door under it is where a player can check, and <see cref="ItemNameAliases"/> is
+    /// where a checked answer lands.</para>
+    ///
+    /// <para><b>The dump's own spelling, "+N" and all</b>, because that is the string on the
+    /// player's screen. Naming the folded base name would report a real miss under a name
+    /// nobody has seen.</para>
+    /// </summary>
+    public static string UnreadWorn(IReadOnlyList<string> unread)
+    {
+        if (unread is not { Count: > 0 }) return "";
+
+        var named = unread.Take(UnreadWornNamed).ToList();
+        var rest = unread.Count - named.Count;
+        var list = string.Join(", ", named) + (rest > 0 ? $", and {rest} more" : "");
+
+        return $"EQBuddy has never read about {unread.Count:N0} "
+            + $"{(unread.Count == 1 ? "thing" : "things")} you are wearing: {list}. "
+            + $"{(unread.Count == 1 ? "It is" : "They are")} not in the item pages EQBuddy "
+            + $"ships under {(unread.Count == 1 ? "that name" : "those names")}, so nothing "
+            + $"below is anchored on {(unread.Count == 1 ? "it" : "them")} — the game and "
+            + "eqlwiki do not always spell an item the same way.";
+    }
+
     /// <summary>How many refused zones are NAMED before the sentence counts the rest. Three,
     /// which is <c>GearNamedPerRow</c> and <c>DefaultCap</c>'s reason one surface out: a
     /// caption that listed eleven zones with eleven bands would be a table pretending to be a
@@ -1082,6 +1143,7 @@ public static class HelperPresentation
         // Null for the same reason WikiFaction is: a wiki page is not a room, and a door that
         // claimed a `page:room` address for one would be a second navigation grammar.
         HelperDoorKind.WikiSkill => null,
+        HelperDoorKind.WikiItem => null,
         _ => null,
     };
 
@@ -1101,6 +1163,7 @@ public static class HelperPresentation
         // WatchPresetLabel, which is what the room actually draws.
         HelperDoorKind.WatchRules => WatchPresetLabel(false),
         HelperDoorKind.WikiSkill => "eqlwiki",
+        HelperDoorKind.WikiItem => "eqlwiki",
         _ => "",
     };
 
@@ -1142,6 +1205,15 @@ public static class HelperPresentation
                   + "fetches it for you."
                 : "Open this profession's page on eqlwiki. You open it yourself; EQBuddy "
                   + "never fetches it for you.",
+        // DRA-149 D2. A SEARCH, and the tip says so: this door is under a name that matched no
+        // page, so "open its page" would promise the thing that just failed.
+        HelperDoorKind.WikiItem =>
+            door.Target.Length > 0
+                ? $"Search eqlwiki for {door.Target} — if the wiki spells it differently, that "
+                  + "is why EQBuddy could not read it. You open the search yourself; EQBuddy "
+                  + "never fetches it for you."
+                : "Search eqlwiki for this item. You open the search yourself; EQBuddy never "
+                  + "fetches it for you.",
         _ => "",
     };
 

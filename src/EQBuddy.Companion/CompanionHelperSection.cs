@@ -59,6 +59,15 @@ namespace EQBuddy.Companion;
 /// no creature in that zone and which this character has never looted there (DRA-84 D4). Its own
 /// field beside <paramref name="GearWithheld"/> rather than summed into it: a cap and a rule are
 /// different causes, and one number could explain neither.</param>
+/// <param name="UnreadWorn">The worn rows EQBuddy could not read about, named (DRA-149 D2). The
+/// fourth field of this shape and the only one that is not a decision — the three above chose to
+/// hold something back, this one is EQBuddy admitting it never had the row. It rides the wire for
+/// the reason all of them do: a phone that quietly listed one fewer anchor than the PC is the two
+/// surfaces disagreeing about what the player is wearing.</param>
+/// <param name="UnreadWornDoors">Where to check those names, as intent — one wiki search per
+/// NAMED item. Its own field rather than doors on a note, because this sentence is a caption in
+/// the caption stack rather than a <see cref="CompanionHelperNote"/>, and the desktop draws its
+/// doors the same way.</param>
 /// <param name="Gaps">Answerable goals that produced nothing, each with its reason and —
 /// where the answer is a file the game writes — the command as selectable text.</param>
 /// <param name="Deferred">Selected goals whose engine does not exist yet, each naming the
@@ -80,6 +89,8 @@ public sealed record CompanionHelperSection(
     string GearWithheld,
     string GearBandRefused,
     string GearWhoWithheld,
+    string UnreadWorn,
+    IReadOnlyList<CompanionHelperDoor> UnreadWornDoors,
     IReadOnlyList<CompanionHelperNote> Gaps,
     IReadOnlyList<CompanionHelperNote> Deferred,
     CompanionHelperEmpty? Empty = null);

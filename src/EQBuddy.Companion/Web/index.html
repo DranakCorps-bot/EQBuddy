@@ -1933,6 +1933,17 @@ function boot() {
                         h.gearWhoWithheld])
       if (line) wrap.appendChild(el("div", "caption", line));
 
+    // DRA-149 D2: the worn rows EQBuddy could not read about, last of the captions and
+    // directly above the gaps — the desktop's own order, because that is where its
+    // `NothingWornIsReadable` gap lands. It is the one caption with doors of its own (a wiki
+    // search per named item), so it is drawn here rather than in the loop above.
+    if (h.unreadWorn) {
+      const box = el("div", "note");
+      box.appendChild(el("div", "caption", h.unreadWorn));
+      helperDoors(box, h.unreadWornDoors, h.doorsLead);
+      wrap.appendChild(box);
+    }
+
     for (const note of (h.gaps || []).concat(h.deferred || []))
       wrap.appendChild(helperNote(note, h.doorsLead));
 

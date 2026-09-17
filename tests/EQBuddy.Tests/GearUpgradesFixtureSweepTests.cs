@@ -31,7 +31,8 @@ public class GearUpgradesFixtureSweepTests
 
     /// <summary>The worn rows, resolved the way the Helper room resolves them.</summary>
     private static List<WornItem> Worn() =>
-        GearUpgrades.WornFrom(Fixture(), n => ItemCatalog.Default.Find(n)?.ToStatsBlock());
+        [.. GearUpgrades.WornFrom(
+            Fixture(), n => ItemCatalog.Default.Find(n)?.ToStatsBlock()).Worn];
 
     /// <summary>Gear, as opposed to ammunition — the AMMO anchor is excluded because it is the
     /// one row that ALREADY worked, and counting it would let the floor be met by the thing
@@ -50,17 +51,27 @@ public class GearUpgradesFixtureSweepTests
     /// <para>He picked "upgrade what I wear" against this dump and the room told him the catalog
     /// had nothing for him, for all 19 things he was wearing. The sentence was true and the
     /// feature was broken.</para>
+    ///
+    /// <para><b>The count moved 19 → 20 when D2 landed, and the two slices are why</b>: D1 gave
+    /// the 19 readable gear anchors candidates, and D2's curated alias made the Founder's bow
+    /// READABLE, so it is a twentieth anchor rather than a row that vanished silently. Both
+    /// halves of his FAIL show up in this one number — it is not churn, and a later reader
+    /// finding it at 19 again should look for a lost alias before touching the floor.</para>
     /// </summary>
     [Fact]
     public void TheFoundersOwnDumpFindsUpgradesForAlmostEverythingHeWears()
     {
         var anchors = GearAnchors();
-        Assert.Equal(19, anchors.Count);
+        Assert.Equal(20, anchors.Count);
+        // The twentieth is DRA-149 D2's: the RANGE row, which resolved to nothing before the
+        // alias table and was dropped without a word.
+        Assert.Single(anchors, a => a.Slot == "RANGE");
 
         var answered = anchors.Where(a => CandidatesFor(a) > 0).ToList();
 
-        // Measured at 19 of 19 the day this landed; the floor is 15 so the weekly eqlwiki
-        // refresh cannot redden the suite on churn that says nothing about the sweep.
+        // Measured at 19 of 19 the day D1 landed and 20 of 20 once D2 added the bow; the floor
+        // is 15 so the weekly eqlwiki refresh cannot redden the suite on churn that says
+        // nothing about the sweep.
         Assert.True(answered.Count >= 15,
             $"only {answered.Count} of {anchors.Count} gear anchors found a candidate; "
             + "silent ones: " + string.Join(", ",
@@ -87,8 +98,9 @@ public class GearUpgradesFixtureSweepTests
         foreach (var anchor in GearAnchors())
         {
             // Only the plussed anchors can show the difference — a plain worn item is treated
-            // identically by both rules, which is why the dump is the right fixture: 19 of its
-            // 19 gear rows carry a "+N".
+            // identically by both rules, which is why the dump is the right fixture: 20 of its
+            // 20 gear rows carry a "+N" (19 before DRA-149 D2's alias made the bow readable,
+            // and the bow is "+2").
             if (ItemDominance.UpgradeTier(anchor.Name) == 0) continue;
 
             foreach (var record in ItemCatalog.Default.All)
@@ -192,7 +204,7 @@ public class GearUpgradesSlotTests
         var worn = GearUpgrades.WornFrom(
             InventoryFile.ParseEntries(File.ReadAllLines(Path.Combine(AppContext.BaseDirectory,
                 "..", "..", "..", "..", "fixtures", "inventory", "dranak.txt"))),
-            n => ItemCatalog.Default.Find(n)?.ToStatsBlock());
+            n => ItemCatalog.Default.Find(n)?.ToStatsBlock()).Worn;
 
         var shield = Assert.Single(worn, w => w.Name.StartsWith("Shiny Brass Shield"));
         // The anchor is still the DUMP's: the fallback moved the candidate pool, not identity.

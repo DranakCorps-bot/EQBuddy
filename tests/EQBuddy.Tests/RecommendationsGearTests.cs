@@ -59,7 +59,8 @@ public class RecommendationsGearTests
         IReadOnlyList<MobSummary>? pool = null,
         IReadOnlyList<SessionRow>? sessions = null,
         int? level = null,
-        ZoneLevels? bands = null) =>
+        ZoneLevels? bands = null,
+        IReadOnlyList<string>? unread = null) =>
         new(ZoneHistory.Fold(sessions ?? [], pool ?? []), pool ?? [], null, [], [], [], [],
             false, [], [], null,
             level is { } l
@@ -68,6 +69,7 @@ public class RecommendationsGearTests
         {
             Worn = worn, Items = catalog, GearIntent = intent,
             WornPicks = picks ?? [], IncludeQuests = includeQuests, Bands = bands,
+            UnreadWorn = unread ?? [],
         };
 
     /// <summary>A fixture band table. Named zones only, so a test says which band it is about
@@ -600,7 +602,90 @@ public class RecommendationsGearTests
         var gap = Assert.Single(set.Gaps);
         Assert.Equal(GoalGapReason.NoInventoryDump, gap.Reason);
         Assert.Empty(set.Top);
+        Assert.Empty(set.UnreadWorn);
         Assert.Contains("what you are wearing", HelperPresentation.Gap(gap));
+    }
+
+    // ---- DRA-149 D2: and a FOURTH way, between the first two ------------------------------
+
+    /// <summary>
+    /// **A DUMP EQBUDDY CANNOT READ IS NOT A MISSING DUMP** (DRA-149 D2, plan P2).
+    ///
+    /// <para>Both states have no anchors, and before this slice both drew the same sentence —
+    /// which for a player whose dump is sitting right there is a loop with no exit: run the
+    /// command, get the same unreadable rows, be told to run the command. The names are what
+    /// makes it actionable, so they ride out with the gap.</para>
+    /// </summary>
+    [Fact]
+    public void ADumpWhoseEveryRowIsUnreadableIsItsOwnGapAndNamesTheRows()
+    {
+        var set = Rank(Gear([], new ItemCatalog([]),
+            unread: ["Deterioriated Ancient Faydark Longbow +2", "Mystery Pauldrons"]));
+
+        var gap = Assert.Single(set.Gaps);
+        Assert.Equal(GoalGapReason.NothingWornIsReadable, gap.Reason);
+        Assert.Equal(
+            ["Deterioriated Ancient Faydark Longbow +2", "Mystery Pauldrons"], set.UnreadWorn);
+        Assert.DoesNotContain("Run the inventory command", HelperPresentation.Gap(gap));
+    }
+
+    /// <summary>The unread rows are reported even when the sweep DID find upgrades — the usual
+    /// case, and the Founder's: twenty anchors answering normally beside one row that never
+    /// became an anchor at all. A sentence that only appeared when everything failed would
+    /// never have fired for him.</summary>
+    [Fact]
+    public void UnreadRowsAreReportedBesideARoomFullOfAnswers()
+    {
+        var set = Rank(Gear(
+            [Worn("Bronze Breastplate", "CHEST", 10)],
+            new ItemCatalog([Record("Mithril Breastplate", "CHEST", 30, ["Lower Guk"])]),
+            unread: ["Deterioriated Ancient Faydark Longbow +2"]));
+
+        Assert.NotEmpty(set.Top);
+        Assert.Empty(set.Gaps);
+        Assert.Equal(["Deterioriated Ancient Faydark Longbow +2"], set.UnreadWorn);
+    }
+
+    /// <summary>…and when the sweep found nothing, which is the state the Founder actually read
+    /// as "the bow is missing": the catalog sentence and the unread sentence are about different
+    /// things and both are true at once.</summary>
+    [Fact]
+    public void UnreadRowsSurviveTheNoCatalogUpgradeGap()
+    {
+        var set = Rank(Gear(
+            [Worn("Bronze Breastplate", "CHEST", 99)],
+            new ItemCatalog([Record("Rusty Breastplate", "CHEST", 1, ["Lower Guk"])]),
+            unread: ["Deterioriated Ancient Faydark Longbow +2"]));
+
+        Assert.Equal(GoalGapReason.NoCatalogUpgrade, Assert.Single(set.Gaps).Reason);
+        Assert.Equal(["Deterioriated Ancient Faydark Longbow +2"], set.UnreadWorn);
+    }
+
+    /// <summary>**Farm to sell has no worn anchor, so it has nothing to say about a worn row.**
+    /// It never looked at one — an unread-worn sentence under a question about what to sell
+    /// would be an answer to a question nobody asked, and it is refused here for the same
+    /// reason the sweep itself is.</summary>
+    [Fact]
+    public void FarmToSellReportsNoUnreadWornRows()
+    {
+        var set = Rank(Gear([], new ItemCatalog([]), intent: GearIntent.FarmToSell,
+            unread: ["Deterioriated Ancient Faydark Longbow +2"]));
+
+        Assert.Empty(set.UnreadWorn);
+    }
+
+    /// <summary>And a player who never picked Farm Gear is told nothing about their gear. The
+    /// engine is what reports this, so the narrowing is the engine's — which is what makes the
+    /// phone inherit it (DRA-71 D9).</summary>
+    [Fact]
+    public void AGoalSetWithoutFarmGearReportsNoUnreadWornRows()
+    {
+        var set = Recommendations.Rank(
+            Gear([], new ItemCatalog([]),
+                unread: ["Deterioriated Ancient Faydark Longbow +2"]),
+            [HelperGoal.LevelUp]);
+
+        Assert.Empty(set.UnreadWorn);
     }
 
     /// <summary>

@@ -362,7 +362,7 @@ public class GearUpgradesTests
         ];
 
         var worn = GearUpgrades.WornFrom(entries,
-            _ => ItemStatsBlock.Parse(["Slot: HEAD", "AC: 4"]));
+            _ => ItemStatsBlock.Parse(["Slot: HEAD", "AC: 4"])).Worn;
 
         Assert.Equal(["Rusty Helm"], worn.Select(w => w.Name));
         Assert.Equal("HEAD", worn[0].Slot);
@@ -375,9 +375,64 @@ public class GearUpgradesTests
     [Fact]
     public void AnItemWithNoStatsOrNoSlotIsNotAnAnchor()
     {
-        Assert.Empty(GearUpgrades.WornFrom([new("Head", "Mystery Helm", 1)], _ => null));
+        Assert.Empty(GearUpgrades.WornFrom([new("Head", "Mystery Helm", 1)], _ => null).Worn);
         Assert.Empty(GearUpgrades.WornFrom(
-            [new("Head", "Scroll", 1)], _ => ItemStatsBlock.Parse(["MAGIC ITEM"])));
+            [new("Head", "Scroll", 1)], _ => ItemStatsBlock.Parse(["MAGIC ITEM"])).Worn);
+    }
+
+    /// <summary>
+    /// **…AND IT IS NAMED, which is the half DRA-149 D2 added** (plan P2).
+    ///
+    /// <para>The test above asserts the refusal and stops there — which is exactly the shape
+    /// the Founder failed. A dropped row left no count, no sentence and no trace: twenty
+    /// anchors from a twenty-one-row dump is the same screen as twenty anchors from a
+    /// twenty-row dump. The drop is still a drop; what changes is that it comes back BESIDE
+    /// the anchors.</para>
+    ///
+    /// <para>As the DUMP spells it, "+N" and all: that is the string on the player's screen,
+    /// and reporting a real miss under a folded base name nobody has seen is the right fact in
+    /// a form the reader cannot use (trap 35's shape).</para>
+    /// </summary>
+    [Fact]
+    public void AnItemTheCatalogCannotDescribeIsReportedUnreadUnderTheDumpsOwnName()
+    {
+        var sheet = GearUpgrades.WornFrom(
+            [new("Head", "Mystery Helm +3", 1), new("Chest", "Bronze Breastplate", 1)],
+            name => name == "Bronze Breastplate"
+                ? ItemStatsBlock.Parse(["Slot: CHEST", "AC: 20"])
+                : null);
+
+        Assert.Equal(["Bronze Breastplate"], sheet.Worn.Select(w => w.Name));
+        Assert.Equal(["Mystery Helm +3"], sheet.Unread);
+    }
+
+    /// <summary>A pair of unknown rings is ONE thing to say. The anchors de-duplicate on
+    /// (item, slot) because two rings are two upgrades; the SENTENCE de-duplicates on the name
+    /// alone, because "EQBuddy has never read about Plain Band, Plain Band" is a list that
+    /// has stopped being a sentence.</summary>
+    [Fact]
+    public void TwoUnreadableRowsOfOneItemAreNamedOnce()
+    {
+        var sheet = GearUpgrades.WornFrom(
+            [new("Finger", "Mystery Band", 1), new("Finger2", "Mystery Band", 1)],
+            _ => null);
+
+        Assert.Empty(sheet.Worn);
+        Assert.Equal(["Mystery Band"], sheet.Unread);
+    }
+
+    /// <summary>A row that resolves is never reported unread, and a dump with nothing wrong in
+    /// it says nothing — the committed negative for the sentence above, so a caption that had
+    /// learned to fire always would fail here rather than on somebody's screen.</summary>
+    [Fact]
+    public void AReadableSheetReportsNothingUnread()
+    {
+        var sheet = GearUpgrades.WornFrom(
+            [new("Chest", "Bronze Breastplate", 1)],
+            _ => ItemStatsBlock.Parse(["Slot: CHEST", "AC: 20"]));
+
+        Assert.Single(sheet.Worn);
+        Assert.Empty(sheet.Unread);
     }
 
     /// <summary>A ring in two FINGER rows is ONE anchor: the dump prints "Finger" and
@@ -388,7 +443,7 @@ public class GearUpgradesTests
     {
         var worn = GearUpgrades.WornFrom(
             [new("Finger", "Plain Band", 1), new("Finger2", "Plain Band", 1)],
-            _ => ItemStatsBlock.Parse(["Slot: FINGER", "AC: 1"]));
+            _ => ItemStatsBlock.Parse(["Slot: FINGER", "AC: 1"])).Worn;
 
         Assert.Single(worn);
         Assert.Equal("FINGER", worn[0].Slot);
@@ -403,7 +458,7 @@ public class GearUpgradesTests
     {
         var worn = GearUpgrades.WornFrom(
             [new("Finger", "Plain Band", 1), new("Finger2", "Gold Band", 1)],
-            _ => ItemStatsBlock.Parse(["Slot: FINGER", "AC: 1"]));
+            _ => ItemStatsBlock.Parse(["Slot: FINGER", "AC: 1"])).Worn;
 
         Assert.Equal(["Plain Band", "Gold Band"], worn.Select(w => w.Name));
         Assert.All(worn, w => Assert.Equal("FINGER", w.Slot));
@@ -425,7 +480,7 @@ public class GearUpgradesTests
     {
         var worn = GearUpgrades.WornFrom(
             [new("Primary", "Short Sword", 1)],
-            _ => ItemStatsBlock.Parse(["Slot: PRIMARY SECONDARY", "DMG: 8", "Atk Delay: 24"]));
+            _ => ItemStatsBlock.Parse(["Slot: PRIMARY SECONDARY", "DMG: 8", "Atk Delay: 24"])).Worn;
 
         Assert.Equal(["PRIMARY"], worn.Select(w => w.Slot));
         Assert.Single(worn);
@@ -439,7 +494,7 @@ public class GearUpgradesTests
     {
         var worn = GearUpgrades.WornFrom(
             [new("Primary", "Short Sword", 1), new("Secondary", "Short Sword", 1)],
-            _ => ItemStatsBlock.Parse(["Slot: PRIMARY SECONDARY", "DMG: 8", "Atk Delay: 24"]));
+            _ => ItemStatsBlock.Parse(["Slot: PRIMARY SECONDARY", "DMG: 8", "Atk Delay: 24"])).Worn;
 
         Assert.Equal(["PRIMARY", "SECONDARY"], worn.Select(w => w.Slot));
     }
@@ -460,7 +515,7 @@ public class GearUpgradesTests
         var worn = GearUpgrades.WornFrom(
             [new("Range", "Willow Bow", 1)],
             _ => ItemStatsBlock.Parse(
-                ["Slot: RANGE PRIMARY SECONDARY", "DMG: 6", "Atk Delay: 30"]));
+                ["Slot: RANGE PRIMARY SECONDARY", "DMG: 6", "Atk Delay: 30"])).Worn;
 
         Assert.Equal(["RANGE"], worn.Select(w => w.Slot));
         Assert.DoesNotContain("PRIMARY", worn.Select(w => w.Slot));
@@ -480,7 +535,7 @@ public class GearUpgradesTests
     {
         var worn = GearUpgrades.WornFrom(
             [new(location, "Some Thing", 1)],
-            _ => ItemStatsBlock.Parse(["Slot: CHEST", "AC: 4"]));
+            _ => ItemStatsBlock.Parse(["Slot: CHEST", "AC: 4"])).Worn;
 
         Assert.Equal([slot], worn.Select(w => w.Slot));
         Assert.Contains(slot, GearLocker.SlotOrder);
@@ -524,7 +579,7 @@ public class GearUpgradesTests
             "Plain Band" or "Gold Band" => ItemStatsBlock.Parse(["Slot: FINGER", "AC: 1"]),
             "Bronze Breastplate" => ItemStatsBlock.Parse(["Slot: CHEST", "AC: 20"]),
             _ => ItemStatsBlock.Parse(["Slot: PRIMARY", "DMG: 2", "Atk Delay: 30"]),
-        });
+        }).Worn;
 
         // One row per worn row of the dump, and the bag row is not one of them.
         Assert.Equal(6, worn.Count);
