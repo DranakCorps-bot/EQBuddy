@@ -33,6 +33,31 @@ unsigned **PR #606** DRA-71 D9 ask — are still in the active file.
 - **`FABLE-FEEDBACK.md`** — a straight date rotation of an uncorrupted file, so
   it needs no counterpart.
 
+### None of the three gets repaired — including the mojibake (ruled 2026-09-17)
+
+All three files carry mojibake: ~57k cp437 occurrences in the flattened one, 5,429 cp1252 in
+`HELM-FEEDBACK.md`, 1,527 in `FABLE-FEEDBACK.md`. They are **OUT of scope for repair, permanently** —
+ruled on DRA-160 and recorded with its byte evidence in `DECISIONS.md` (DRA-161). The "do not edit it"
+above was written for the flattened file alone, and that gap is exactly what let the card be raised.
+One reason each, and they are three different reasons:
+
+- **`HELM-FEEDBACK.original-flattened.md`** — corrupt on purpose: it is the checkability exhibit
+  described above and the only clean-checkout fixture the cp437 detector has.
+- **`HELM-FEEDBACK.md`** — from offset 5,808 to end it is the `f4af3b5f` blob carried verbatim, and all
+  5,429 of its markers are inside that region, so repairing them breaks both the verbatim claim below
+  and what `channel-rotate.py verify` asserts — while git keeps the same markers in that blob anyway.
+- **`FABLE-FEEDBACK.md`** — its marker count is identical to the pre-rotation blob's. Rotation moved
+  those bytes; it did not create them.
+
+**The rule behind all three:** a rotated archive copy is not an independent site of corruption. Rotation
+is a one-way move of bytes already immutable in git, so repairing the copy removes nothing from the
+record — it only makes the archive diverge from the revisions it was cut from. Repair pays on the live
+files at the repo root, and that work is done (DRA-55, DRA-119). It never pays here.
+
+The DRA-55 Helm LOCK — *"Soft LEAVE inventing archive repair without separate Helm ruling."* — **stays
+live.** The ruling above declines to seek repair; it does not lift the LOCK. Wanting these files
+repaired later still needs a real, separate Helm ruling.
+
 ### A transcript is not a map, and the doc sweep had to learn the difference
 
 `DocumentationTests.EveryFileTheDocsPointAtExists` sweeps every `.md` under
