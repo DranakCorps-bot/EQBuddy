@@ -172,7 +172,7 @@ public class HelperSurfaceParityTests
         var request = Request(inputs, HelperGoal.FarmGear);
         var desktop = Recommendations.Rank(request.Inputs, request.Goals);
 
-        var said = HelperPresentation.GearBandRefused(desktop.GearBandRefusals);
+        var said = HelperPresentation.BandRefused(desktop.GearBandRefusals, HelperPresentation.BandRefusedUpgrades);
         Assert.NotEmpty(desktop.GearBandRefusals);
         Assert.NotEqual("", said);
         Assert.Equal(said, Phone(request).GearBandRefused);
@@ -205,7 +205,7 @@ public class HelperSurfaceParityTests
         var request = Request(inputs, HelperGoal.FarmGear);
         var desktop = Recommendations.Rank(request.Inputs, request.Goals);
 
-        var said = HelperPresentation.GearWhoWithheld(desktop.GearWhoWithheld);
+        var said = HelperPresentation.DropOffersWithheld(desktop.GearWhoWithheld);
         Assert.True(desktop.GearWhoWithheld > 0);
         Assert.NotEqual("", said);
         Assert.Equal(said, Phone(request).GearWhoWithheld);
@@ -469,6 +469,9 @@ public class HelperSurfaceParityTests
                      HelperPresentation.MoneyPriceNote,
                      HelperPresentation.GearBaseClaimNote,
                      HelperPresentation.CatalogLabel,
+                     // DRA-149 D3: the materials block's own note. It is the one new SENTENCE
+                     // this slice sends, and the page must not have learned to say it (trap 32).
+                     HelperPresentation.ProfessionsFarmNote,
                  })
             Assert.DoesNotContain(sentence, html, StringComparison.Ordinal);
 
@@ -489,6 +492,11 @@ public class HelperSurfaceParityTests
                      // DRA-149 D2's caption and its doors, added in the SAME slice as the field
                      // — which is the whole of what D5's lesson was.
                      "h.unreadWorn", "h.unreadWornDoors",
+                     // DRA-149 D3's three, added in the SAME slice as the fields — D5's lesson,
+                     // and the reason this half of the list exists at all. Two of them are
+                     // counts the desktop room draws as its own captions; the third is the
+                     // block note above.
+                     "h.materialNote", "h.materialBandRefused", "h.materialWhoWithheld",
                      "h.doorsLead", "h.empty", "h.gaps", "h.deferred",
                  })
             Assert.Contains(field, html, StringComparison.Ordinal);

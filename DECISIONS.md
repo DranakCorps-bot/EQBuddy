@@ -7982,3 +7982,57 @@ files, 1149 entries); all three scripts parse-checked. Needs **git ≥ 2.31** fo
 `--path-format=absolute`, stated where the invocation is documented; both clones 2.54.0.
 
 — Dranak (Claude Code), Executor — DRA-107
+
+## 2026-09-16 — DRA-149 D3: Farm Materials un-parks on the RECIPES column; a non-place is refused by name
+
+**Assumption stated at the top, and it is the default most worth a veto:** an item page's
+`recipes` field names the recipes the item is **used in**, so a record carrying a
+profession heading IS an ingredient for that profession. The plan declared an escalation
+seam here — *"if materials cannot be told from products defensibly it STOPS AND ESCALATES
+with the number"* — and it did not fire, because the corpus answers rather than the
+reasoning: of the 905 records naming one of the eight, 165 are themselves a recipe output
+somewhere and **150 of those drop nowhere**, so they leave through a zone gate the rows
+have to pass anyway. The 15 that are both an output and a real drop are the pelts, the
+ores and a loaf of bread — genuinely farmable, so naming them is true either way.
+`scripts/dra149-materials-survey.py` is the committed measurement.
+
+**The DRA-71 D8 park was not wrong; it measured the wrong COLUMN.** "14 of 11,197 pages
+name a profession" is a survey of `[[Category:…]]`, re-taken on the DRA-84 D3 refresh and
+still 14. `Recipes` carries the association on **1,276** pages, all eight professions
+appearing as headings. The player-facing sentence moved with the finding
+(`ProfessionsFarmNote`), and its pin moved with it: the test reads
+`items-catalog-report.md`'s recipes row rather than the sentence's own literal, which is
+the DRA-84 D3 lesson kept.
+
+**The default that could have gone the other way: a non-place is refused BY NAME rather
+than left to the who rule.** On the gear side the promoter's junk fell out for free — a
+`}}` names no creature, so the who rule removed it. **That luck does not hold here:** all
+12 of the eight professions' `Various Zones` pairs DO name creatures, so without an
+explicit rule the room would have offered "Various Zones" as somewhere to go. That is the
+Rathe class of failure with a different cause. `TradeskillMaterials.IsPlace` states the
+vocabulary `MoteCatalogSurveyTests` already pinned one engine over, with committed
+positives and negatives.
+
+**Level CONSUMES, and it is the same gate rather than the same numbers typed twice.**
+`BandGate` and `WhoRule` are now generic and shared with Farm Gear, in that order, with
+the same constants — a camp is a camp, and the order is the decision (a band refusal
+quotes eqlwiki's numbers and a level; the who rule can only say a page was silent).
+Their COUNTS are kept apart (`MaterialBandRefusals` / `MaterialWhoWithheld`): one merged
+number would be the one number that can explain neither list.
+
+**Fletching draws its own sentence with its own zero** — 33 materials, no drop zones
+between them, because they are bought, foraged and crafted. `NoMaterialDrops` says that
+about EQBuddy's pages and never about the game.
+
+**Gates:** `check.ps1` all green (5,259 unit, +56); Helper/profession E2E 12/12. **Four
+prove-fails recorded** — emptying the non-place list reddens 5 rows, running the who rule
+before the band gate reddens the order row, downgrading `Consumes` to `Exempt` reddens 2
+must-list rows, and dropping the page's two material captions reddens the page-side
+must-list. **One of my own guards was found circular by prove-failing it** (it asserted
+`IsPlace` over zones `IsPlace` had filtered — green for every implementation including one
+that refuses nothing, trap 78) and now states the offending values independently.
+
+Nothing fetched, no catalog rebuild, no `WhatsNew.json` entry (P6 puts them in D5), and
+nothing here marks DRA-84 PASS.
+
+— Dranak (Claude Code), Executor — DRA-149 D3

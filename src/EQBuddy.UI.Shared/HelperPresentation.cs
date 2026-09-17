@@ -313,7 +313,29 @@ public static class HelperPresentation
         GearUpgradeFact f =>
             $"{f.Item} is a better base item than the {f.Over} in your {Slot(f.Slot)} — "
             + $"{Gain(f)}."
-            + Who(f),
+            + Who(f.Who, f.WhoWithheld),
+
+        // **THE FARM MATERIALS LINE** (DRA-149 D3, plan P4; the Founder's FAIL item 3a).
+        //
+        // It names the PROFESSION first, because the player picked professions and a row that
+        // said only "Amber drops here" would leave them to remember which of eight needs amber.
+        // The recipe is the EVIDENCE for the association and it is the page's own line, quoted
+        // rather than re-phrased: "the page lists this under Jewelcrafting, for <recipe>" is
+        // checkable, "amber is a jewelcrafting material" is a claim. What the page listed
+        // BEYOND the first recipe is counted rather than listed — the row is about where to go,
+        // not a recipe book, and the cap says so (trap 50).
+        //
+        // The who clause is the gear row's own, from the same helper: the player's own kills
+        // answered instead (the fact beside this one), or the page named somebody. A zone row
+        // that could name nobody is not drawn at all.
+        TradeskillMaterialFact f =>
+            $"{f.Item} — {Tradeskills.For(f.Skill).Name}"
+            + (f.Recipe.Length > 0 ? $", for {f.Recipe}" : "")
+            + (f.OtherRecipes > 0
+                ? $" and {f.OtherRecipes:N0} more {(f.OtherRecipes == 1 ? "recipe" : "recipes")} on its page"
+                : "")
+            + "."
+            + Who(f.Who, f.WhoWithheld),
 
         // The personal half: measured, with its denominator, and the creature named from your
         // own pooled kills rather than from a page.
@@ -612,6 +634,32 @@ public static class HelperPresentation
             + "drops in, and you have not looted one there. It would rather say that than send "
             + "you to a zone with only a name in hand.",
 
+        // ---- DRA-149 D3 ----------------------------------------------------------------
+
+        // **THE SUBJECT IS THE PAGES AND NOT THE PROFESSION.** "Nothing to farm for Fletching"
+        // is a claim about the game and it is false — a fletcher farms plenty. What happened is
+        // that every ingredient EQBuddy read for the picked professions is one whose own page
+        // names no place it drops: Fletching's 33 materials carry ZERO drop zones between them,
+        // because they are bought, foraged and crafted. The sentence says which of the two it
+        // is, and names the other half of the answer rather than stopping at a refusal.
+        GoalGapReason.NoMaterialDrops =>
+            $"{GoalLabel(gap.Goal)}: EQBuddy read the recipes for the professions you picked "
+            + "and none of their ingredients has a page saying where it drops. That is a "
+            + "statement about its own item pages rather than about the game — plenty of "
+            + "materials are bought, foraged or made, and eqlwiki is where to check which.",
+
+        GoalGapReason.EveryMaterialZoneOutsideYourBand =>
+            $"{GoalLabel(gap.Goal)}: EQBuddy found the ingredients your professions need and "
+            + "every place they drop has a creature level band on eqlwiki that sits outside "
+            + "yours. The bands and your level are below — nothing here is a claim about the "
+            + "game, only about which zones EQBuddy will put in this list.",
+
+        GoalGapReason.NoMaterialNamesACreature =>
+            $"{GoalLabel(gap.Goal)}: EQBuddy found the ingredients your professions need and "
+            + "cannot tell you what to kill for any of them — no item page names a creature in "
+            + "the zone it drops in, and you have not looted one there. It would rather say "
+            + "that than send you to a zone with only a name in hand.",
+
         _ => "",
     };
 
@@ -636,11 +684,13 @@ public static class HelperPresentation
         // carries the standings, the watch preset and the wiki door, so the sentence has to
         // say which half is missing — otherwise a player reading "not ranking this one yet"
         // over a block full of their own numbers would think the block was the failure.
-        HelperGoal.FarmMaterials =>
-            "Farm Materials: your professions and where they stand are above. EQBuddy is not "
-            + "ranking WHERE to farm the materials yet — the wiki's item pages hardly ever say "
-            + "which profession an ingredient belongs to. What is in your bags is in Gear "
-            + "meanwhile.",
+        // DRA-149 D3 took Farm Materials OUT of this switch — its engine landed. The pairing
+        // test beside it (EveryDeferredGoalNamesTheRoomThatAnswersItToday) is what would have
+        // caught a sentence left behind, which is exactly what happened to this one's
+        // predecessor: it told players EQBuddy was "not ranking WHERE to farm the materials
+        // yet" because "the wiki's item pages hardly ever say which profession an ingredient
+        // belongs to" — a true sentence about the CATEGORIES column, printed over a question
+        // the RECIPES column answers for 1,276 pages.
         HelperGoal.Achievements =>
             "Achievements: EQBuddy is not ranking this one yet. What the game's dump says is "
             + "on the Guide room's Unlocks tab meanwhile.",
@@ -652,7 +702,9 @@ public static class HelperPresentation
     /// drifting: the sentence above and this door are read together or neither is.</summary>
     public static HelperDoorKind? NotAnsweredDoor(HelperGoal goal) => goal switch
     {
-        HelperGoal.FarmMaterials => HelperDoorKind.Gear,
+        // Farm Materials left with its sentence in DRA-149 D3 — the pairing is read together
+        // or neither is, so a door left behind here would point at a room for a question this
+        // one now answers.
         HelperGoal.Achievements => HelperDoorKind.Unlocks,
         _ => null,
     };
@@ -801,28 +853,35 @@ public static class HelperPresentation
         $"{Tradeskills.For(skill).Name} skill-ups";
 
     /// <summary>
-    /// **WHAT EQBUDDY CANNOT DO HERE, SAID ON THE SURFACE** (DRA-71 D8; the Founder's own
-    /// "plan honestly on gaps").
+    /// **WHERE THE FARMING ANSWER COMES FROM, AND WHAT IT STILL CANNOT SEE** (DRA-149 D3,
+    /// plan P4; the Founder's own "plan honestly on gaps", kept).
     ///
-    /// <para>The obvious next question — "so where do I FARM the things this profession
-    /// needs?" — has no honest answer in this build, and the reason is a measurement rather
-    /// than a shrug: the wiki's item pages almost never say which profession an ingredient
-    /// belongs to. Saying that out loud, with the count, is what stops the block reading as
-    /// unfinished; a room that silently omitted the ranking would leave a player wondering
-    /// whether they had configured something wrong.</para>
+    /// <para><b>This sentence used to be a PARK and the park was about the wrong column.</b>
+    /// From DRA-71 D8 until this slice it read: *"EQBuddy does not rank where to farm materials
+    /// yet. Of the 11,197 item pages it has read, 14 say which profession an ingredient belongs
+    /// to."* Every word of that was true and it was measured on <c>[[Category:…]]</c> tags —
+    /// which answer a different question. The <c>Recipes</c> field is the one that carries the
+    /// association, and the shipped report has said so in the same file the whole time: 1,276
+    /// pages carry a recipe list and all eight professions appear in them as headings.</para>
     ///
-    /// <para><b>THE NUMBER IS A CLAIM ABOUT THE SHIPPED CATALOG, SO IT MOVES WHEN THE CATALOG
-    /// DOES</b> (DRA-84 D3 follow-up). The weekly refresh re-read the wiki and the page count
-    /// went from 10,957 to 11,197 — and the profession count stayed at <b>14</b>, which is the
-    /// finding that keeps the arithmetic parked. The refresh landed in #626 without this
-    /// sentence moving with it, so for one commit range EQBuddy told players a survey result
-    /// its own shipped report contradicted. The pinning test now reads
-    /// <c>items-catalog-report.md</c> rather than this sentence's own literal.</para>
+    /// <para><b>The honest gap moved rather than closed, and this sentence still carries
+    /// it.</b> An ingredient that is bought, foraged or crafted has no page saying where it
+    /// drops, so it is not in the rows below — which is the whole of Fletching (33 materials,
+    /// zero drop zones) and is why that profession draws
+    /// <see cref="GoalGapReason.NoMaterialDrops"/> rather than an empty list.</para>
+    ///
+    /// <para><b>THE NUMBERS ARE A CLAIM ABOUT THE SHIPPED CATALOG, SO THEY MOVE WHEN IT DOES</b>
+    /// — the DRA-84 D3 lesson, kept exactly. The pinning test reads
+    /// <c>items-catalog-report.md</c>, which <c>itemcatalog-build</c> rewrites on every refresh,
+    /// rather than this sentence's own literal: a guard that can only catch somebody DELETING a
+    /// number, never the number going wrong, is what let the previous version of this sentence
+    /// ship a survey result its own report contradicted.</para>
     /// </summary>
-    public const string ProfessionsParkNote =
-        "EQBuddy does not rank where to farm materials yet. Of the 11,197 item pages it has "
-        + "read, 14 say which profession an ingredient belongs to — not enough to point you "
-        + "at a camp without guessing.";
+    public const string ProfessionsFarmNote =
+        "Where to farm these is below, read off the recipes on EQBuddy's own item pages — "
+        + "1,276 of the 11,197 it has read carry a recipe list, and all eight professions "
+        + "appear in them. An ingredient that is bought, foraged or crafted has no page saying "
+        + "where it drops, so it is not in that list.";
 
     // ---- the gear intent strip and its picker (DRA-71 D6) ---------------------------------
 
@@ -981,8 +1040,14 @@ public static class HelperPresentation
     /// named no creature for that zone and this character has never looted one there. The
     /// sentence says both halves, because both are things a player can change — one by playing,
     /// one by editing the page.</para>
+    ///
+    /// <para><b>It is NOT gear-specific and since DRA-149 D3 it is not named as though it
+    /// were.</b> Farm Materials runs the identical rule over the identical catalog, and the
+    /// sentence it needs is this one word for word — the subject is a drop offer and the remedy
+    /// is the same page. A second copy reading "material" instead of "item" would be one
+    /// sentence's worth of prose that could go stale on its own (trap 4).</para>
     /// </summary>
-    public static string GearWhoWithheld(int withheld) => withheld <= 0
+    public static string DropOffersWithheld(int withheld) => withheld <= 0
         ? ""
         : withheld == 1
             ? "1 more drop offer is not listed: the item's page names nothing that drops it in "
@@ -1046,6 +1111,13 @@ public static class HelperPresentation
     /// sentence.</summary>
     public const int GearBandNamed = 3;
 
+    /// <summary>The noun <see cref="BandRefused"/> takes for each engine, said once so the two
+    /// call sites cannot drift into describing each other's list.</summary>
+    public const string BandRefusedUpgrades = "upgrades";
+
+    /// <inheritdoc cref="BandRefusedUpgrades"/>
+    public const string BandRefusedMaterials = "materials";
+
     /// <summary>
     /// **A BAND IN WORDS, AND THERE IS ONE PRODUCER OF THEM** (DRA-84 D2).
     ///
@@ -1077,7 +1149,12 @@ public static class HelperPresentation
     /// the player that nothing here measured. The rule is named in full so the reader can
     /// disagree with the judgement rather than just with the outcome.</para>
     /// </summary>
-    public static string GearBandRefused(IReadOnlyList<GearBandRefusal> refused)
+    /// <param name="what">What EQBuddy found in those zones, as a plural noun — "upgrades" for
+    /// Farm Gear, "materials" for Farm Materials. <b>It is a required argument rather than a
+    /// default since DRA-149 D3</b>: the arithmetic, the arms and the thresholds are one
+    /// producer's, and the ONE word that differs between the two lists is the one a caller must
+    /// state, so neither caption can silently describe the other engine's refusals.</param>
+    public static string BandRefused(IReadOnlyList<GearBandRefusal> refused, string what)
     {
         if (refused.Count == 0) return "";
 
@@ -1097,7 +1174,7 @@ public static class HelperPresentation
             arms.Add($"starts {Recommendations.GearBandReachAbove} or more levels over you");
 
         return $"{refused.Count:N0} {(refused.Count == 1 ? "zone" : "zones")} EQBuddy has "
-            + $"upgrades for {(refused.Count == 1 ? "is" : "are")} not listed at your level "
+            + $"{what} for {(refused.Count == 1 ? "is" : "are")} not listed at your level "
             + $"{refused[0].Level}: {list}. Those are eqlwiki's own creature levels — EQBuddy "
             + $"leaves a zone out of this list when its band {string.Join(" or ", arms)}.";
     }
@@ -1344,16 +1421,19 @@ public static class HelperPresentation
     /// (trap 50). "and 4 more on its page" says where the rest are and implies the door;
     /// "and 4 more" alone would read as EQBuddy having measured something it has not.</para>
     /// </summary>
-    private static string Who(GearUpgradeFact f)
+    /// <remarks>It takes the two fields rather than a <c>GearUpgradeFact</c> since DRA-149 D3:
+    /// the materials row asks the same question of the same catalog and prints the same clause,
+    /// and a second copy of this grammar is the sentence that goes stale (trap 4).</remarks>
+    private static string Who(IReadOnlyList<string> who, int withheld)
     {
-        if (f.Who.Count == 0) return "";
+        if (who.Count == 0) return "";
 
-        var names = f.Who.Count == 1
-            ? f.Who[0]
-            : string.Join(", ", f.Who.Take(f.Who.Count - 1)) + " and " + f.Who[^1];
-        var verb = f.Who.Count == 1 && f.WhoWithheld == 0 ? "drops" : "drop";
-        var more = f.WhoWithheld > 0
-            ? $", and {f.WhoWithheld:N0} more on its page"
+        var names = who.Count == 1
+            ? who[0]
+            : string.Join(", ", who.Take(who.Count - 1)) + " and " + who[^1];
+        var verb = who.Count == 1 && withheld == 0 ? "drops" : "drop";
+        var more = withheld > 0
+            ? $", and {withheld:N0} more on its page"
             : "";
         return $" {names}{more} {verb} it.";
     }

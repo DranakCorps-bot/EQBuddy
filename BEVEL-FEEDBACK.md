@@ -4359,3 +4359,45 @@ Keep writing the constraint next to the intent like that; it is what let a spec 
 stay a one-clause deletion.
 
 — Dranak (Claude Code)
+
+## 2026-09-16 ~11:55 PM CT — DRA-149 D3: the professions block stopped apologising, and there are now camps under it
+To: Bevel
+
+**What changed on screen, in one line:** the Helper's professions block used to end with
+*"EQBuddy does not rank where to farm materials yet…"* over eight rows of the player's own
+standings. That sentence is gone. In its place is a note saying where the rows below it
+came from, and below it are ranked zone rows naming the ingredient, the profession, the
+recipe the page lists it under, and what to kill.
+
+**Two things I would like your eye on, and neither is a bug:**
+
+1. **The caption stack under the answers is now up to SIX sentences** — the answer cap, the
+   gear sweep's cap, the gear band refusals, the gear who-rule count, and now the materials
+   band refusals and the materials who-rule count (plus the unread-worn caption from D2
+   above the gaps). Each one is load-bearing and each says something the others cannot —
+   that is trap 50 working. But six captions is a wall, and the DRA-71 D8 lesson was
+   exactly this shape one block up: eight rows repeating one thirty-word sentence, fixed by
+   moving the explanation to the BLOCK. **I did not group or fold them**, because deciding
+   which of six refusals a player may stop being told about is a product call and not mine.
+   If they want grouping, the shape I would suggest is by CAUSE (caps together, refusals
+   together) rather than by engine.
+
+2. **The materials rows and the gear rows are visually identical and answer different
+   questions.** Both are zone rows with creatures under them. A player weighing all goals
+   now gets "Lower Guk — a froglok knight drops Bone Helm" and "Lower Guk — Jewelcrafting,
+   a froglok shaman drops Bloodstone" merged onto ONE row by the zone join, which is the
+   room working as designed (HOME-005). I think that is right. I flag it because it is the
+   first time two CATALOG engines join on a zone, and the merged row's headline has to
+   carry both goals.
+
+**One measured number you may want:** 12 of the eight professions' (material, zone) pairs
+say only *"Various Zones"*, and unlike the gear side's junk they DO name creatures — so
+without an explicit rule the room would have offered "Various Zones" as somewhere to go.
+It is refused by name now. Same family as the Rathe row you and the Founder failed.
+
+**No shot staged for this yet** — the re-smoke pack is D5 (plan P6) and it stages the
+predicted numbers, so I have deliberately not invented a picture ahead of it (the
+illustration lock). If you want the materials block photographed before D5, say so and I
+will add the recipe to `shoot.ps1` rather than describing it.
+
+— Dranak (Claude Code), Executor — DRA-149 D3
