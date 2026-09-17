@@ -1265,6 +1265,63 @@ is what a Helm pass actually does.
 every backticked span still diffs additions-only and still retains 100% of the base's
 lines. This guard cannot see it, and nothing else does either.
 
+### Trap 60 — the API surface, 2026-09-17 (DRA-170 / DRA-144 F1-c)
+
+**60(c) is not confined to repo channel files.** The paragraph above stands exactly as
+written — *"trap 60(c), the silently truncated append. A note that lost every backticked span
+still diffs additions-only and still retains 100% of the base's lines. This guard cannot see
+it, and nothing else does either."* — and this entry **widens it rather than closing it**.
+60(c) is still open. What is new is where it lands: the same mechanism destroys a **Paperclip
+API body**, and on that surface the closing clause is literal rather than rhetorical.
+
+→ **THE SURFACE IS ANY PAPERCLIP API BODY** — an issue comment, an issue description, a
+document body, an interaction payload. Anything whose text you compose in a shell and then
+POST or PATCH as JSON.
+
+→ **The mechanism is 60(c)'s, unchanged.** The body was built with `python -c "…"` from Bash,
+and Bash command-substitutes every backtick pair inside a double-quoted argument before Python
+ever runs. Python received a shorter string and posted it, and reported success, because from
+Python's side the string it received was simply shorter.
+
+→ **What arrived: HTTP 201, and a comment with zero backticks in it.** DRA-144 comment
+`7af2ecf6` (2026-09-17T12:50:20Z) — **1,816 characters, 0 backticks**. The clean repost,
+`12c66373` (12:51:09Z) — **3,555 characters, 36 backticks**. Both are on DRA-144 and **diffing
+them is the whole proof.** `FABLE-FEEDBACK.md`, `channel-size-guard`,
+`channel-size-baseline.psd1` and `DECISIONS.md` are simply gone, leaving sentences that read as
+finished English with the identifier removed — *"So neither editing  nor rotating into  was
+mine to do"* — and an inline `wc -c` had itself command-substituted, to the literal `0`, so the
+posted body asserts that *"0 reads the file as 268,733 B"*. **A sentence that lost a noun still
+parses, and a number that lost its command still looks like a number.** (The same body renders
+every apostrophe as `'''`, the shell's own quote escape leaking through; the 201 did not
+mention that either. And the repost is longer than a pure restoration would be — it also
+carries the finding — so the character delta is not a loss figure. The backtick count is.)
+
+→ **WHY THIS SURFACE IS WORSE THAN THE ONE 60(c) DESCRIBES, and it is not a difference of
+degree.** On a channel file there is a `git diff`, a PR review and `channel-wipe-guard.ps1`.
+60(c)'s point is that all three are blind to a truncated append — but they exist, they show you
+the text, and one of them is a human reading it. On an API body there is **no diff, no guard
+and no reviewer: only a 201.** Nothing compares what you sent against what you meant, and
+nobody re-reads a comment they just posted. The write is final at the instant it succeeds,
+which is the same instant you stop looking.
+
+→ **THE REMEDY TRANSFERS UNCHANGED, AND IT IS MEASURED HERE RATHER THAN ASSERTED.** Write the
+body to a file with the editing tools, then `curl --data-binary @file` — the text never becomes
+a shell word, so there is nothing for the shell to eat. This is 60(c)'s *"let Python
+concatenate two FILES"* with the destination changed. Two bodies were posted that way on
+DRA-165 the same afternoon: `5bc4e6d8` (**4,631 chars, 44 backticks**) and `da1322a3`
+(**2,570 chars, 16 backticks**). Both re-fetched **byte-identical to their source files, with
+backtick counts equal**. One day, one board, four comments: the two built through a shell
+string lost every backtick, and the two built file-to-file lost nothing.
+
+→ **THE CHECK IS THE READ-BACK, and it is the API-side twin of the one this trap already
+names.** 60(b)'s check is a `git diff`; 60(c)'s is *"read back a distinctive identifier from
+the note after appending"*, and the guard entry's is *"read an identifier back from both the
+trimmed live file and the archive"*. Here it is: **re-GET the posted object and count the
+backticks against the source file.** That re-fetch is the only reason the first failure was
+noticed at all — the 201 was believed and the object was not. `stderr` keeps its standing too:
+a `command not found` beside a success line means the string you thought you sent is not the
+string that arrived, on an API body exactly as on a file.
+
 ### Trap 61
 
 61. **THE SCREEN IS A MUTEX NOTHING ENFORCED, AND `shoot.ps1`'S OWN STAND-DOWN IS WHAT TURNS A
