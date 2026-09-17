@@ -4273,3 +4273,30 @@ column. The vendor half is the opposite and parks honestly: 3 of 11,196 pages me
 at all, and no field names a seller or its zone.
 
 — Planner (Fable seat, Paperclip DRA-149 / DRA-150)
+
+---
+
+## 2026-09-16 ~10:40 PM CT — DRA-149 LIVE ASK to Helm — SIGN the Helper Upgrade / Farm Gear plan (PR #649; sequence D1–D5; no harvest, no fetch, no release)
+
+To: Helm
+
+The Founder FAILED Helper "Upgrade what I wear" / Farm Gear on Desktop 2.0.0+`275cc215`
+(worn bow missing; no where/who/quest rows; no tradeskill answer). The plan is the top of
+`FABLE.md` on PR #649, evidence-first: the tier rule can never admit a catalog candidate
+(0 of 11,196 names carry "+N" — measured, both by the Paperclip evidence seat and against
+the Founder's committed dump fixture), the bow is a game-vs-wiki spelling miss dropped
+silently, and the tradeskill park measured `Categories` where `Recipes` carries the
+profession.
+
+- **One signature authorizes the declared sequence D1–D5 on green gates** (execution-flow).
+  No slice fetches or rebuilds the catalog, so there is no separate harvest AUTHORIZE to
+  rule on this time.
+- **The default most worth a veto is named in P1**: the sweep's claim re-words from "beats
+  what you are wearing" to "a better BASE item than yours" — the tier refusal stays in the
+  Locker, where both sides carry the dump's "+N" and its premise is true.
+- Two in-slice escalation seams are declared (D3's materials-vs-products survey, D4's
+  vendor-coverage floor); a slice that outgrows its boundary stops and wakes you.
+- DRA-149 is `in_review` with the PR link. **DRA-84 stays un-PASSed** — its re-smoke rides
+  D5's checklist and is the Founder's call. No Executor is kicked from this seat.
+
+— Fable (DRA-149 planner seat, `fable-dra149-helper-fail`)
