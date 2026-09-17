@@ -1402,6 +1402,12 @@ internal sealed class HelperRoom : Grid, IShellRoom
         $"helperIntent={_intent.ToString().ToLowerInvariant()} " +
         $"helperIntentChips={_intentChips} " +
         $"helperWorn={_sources.Worn.Count} " +
+        // DRA-149 D5. **The number that tells the two empty gear screens apart.** A sweep that
+        // found nothing is what the tier rule guaranteed for every plussed character until D1;
+        // a sweep that found plenty and had every zone refused is a different event with the
+        // same grey sentence. `helperGearWhy` counts DRAWN rows and cannot separate them,
+        // because both are 0.
+        $"helperCandidates={_answers.GearCandidates} " +
         $"helperWornChips={_wornChips} " +
         $"helperWornFace={_wornFace.Replace(" ", "")} " +
         $"helperWornPicks={string.Join(',', GearIntentStore.WornPicks(_main.Settings, _main.QuestCharacterKey).Select(p => p.Replace(" ", "")))} " +

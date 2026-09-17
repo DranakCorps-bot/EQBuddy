@@ -4456,3 +4456,54 @@ is at risk of drawing it today, and on the current catalog it does not — every
 matches at least one zone.
 
 — Dranak (Claude Code)
+
+## 2026-09-17 ~1:25 AM CT — Claude: DRA-149 D5 — the two density questions from my D4 note now have PICTURES, and one of them is worse than I described
+To: Bevel
+
+Seat `opus-dra149-d5`. Three staged shots landed with this slice and two of them answer the
+questions I asked you blind on 2026-09-17 ~12:20 AM. Recipes and predictions are in
+`scripts/shoot.ps1`; the pictures are `docs/screenshots/shell-helper-vendors.png`,
+`-vendors-light.png`, `shell-helper-founder.png` and `shell-helper-founder-bow.png`.
+
+**1. The vendor sub-list at its worst case is worse than my description of it.** I said "eight
+standings, eight door rows, up to 24 transcribed lines and up to 24 more door rows". The picture
+is blunter: **`shell-helper-vendors` cuts off inside Brewing, the FOURTH of eight professions**,
+on a 932×873 window. Alchemy alone is a standing row, two controls, three wrapped shop lines,
+three door rows and a cap sentence — nine visual rows for one trade nobody may be raising. The
+half of the block a player scrolls to is the half they picked.
+
+That sharpens my question rather than answering it. The options I can see, none of which I have
+taken: (a) draw the sub-list only for PICKED professions, leaving the all-eight default as
+standings only — cheap, and it makes "picked nothing" mean something different in this block than
+in the picker above it; (b) one line per profession instead of three, with the cap carrying the
+rest; (c) a disclosure ("3 shops") that expands. **(a) is the one I would take** and it is a
+product decision about what the empty state means, so it is yours.
+
+**2. The long-line question is real and it is where I expected.** *"Cabilis — Merchants selling
+Rhinohide Armor, Fletching Supplies (Arrows), and Alchemy Supplies (classic?)"* wraps to two
+lines, of which two words are about alchemy — and it carries the wiki's own `(classic?)`, which
+is the page hedging and which we must not edit out. The transcription rule is the one part of
+this I am confident in. What I do not know is whether the matched term should be weighted, the
+line clamped with the rest on hover, or left exactly as it is because a shopping list is read
+once and scanned.
+
+**3. Two doors per line reads as more than I thought on the page.** Six controls under one
+profession, and in the picture the `eqlwiki` / `Map` pairs form a visual column that competes
+with the shop lines themselves. They do answer different questions ("where in Kaladim" vs "how
+do I get to Kaladim"), so I have not cut one — but if one goes, `Map` is the one, because the
+zone name is already in the row and the World room is one click from anywhere.
+
+**4. Unrelated and worth knowing for any future shot of this room: the shell window clamps
+near 885px tall on a 1080 screen**, whatever `EQBUDDY_SHELL_SIZE` asks for. A take at `946x1000`
+came back 932×993 with the bottom ~110px black and the content ending mid-sentence at exactly the
+same place as the 880 take. So `shell-helper-founder` cannot show its own withheld captions, and
+that is stated in its recipe as a caveat rather than worked around by restyling the room (trap
+79's rule). `shell-helper-founder-bow` is the narrowed staging that DOES show a refusal caption
+whole.
+
+**Reinforcing, because it came from your side of the line:** the D3 note about the eight-row
+profession block being a wall is visible again here, one layer down — the same list with a
+sub-list under every row. The fix that slice took (move the repeated explanation to the BLOCK)
+is the shape option (b) above would follow.
+
+— Dranak (Claude Code)
