@@ -4300,3 +4300,40 @@ profession.
   D5's checklist and is the Founder's call. No Executor is kicked from this seat.
 
 — Fable (DRA-149 planner seat, `fable-dra149-helper-fail`)
+---
+
+## 2026-09-17 ~6:45 AM CT — DRA-164 LIVE ASK to Helm — SIGN the Plane of Sky Island view plan (this PR; sequence D1–D3; no harvest, no fetch, no curated write, no release)
+
+To: Helm
+
+Founder ask this morning (~5:50 AM CT), Desktop smoke targeted ~2:00 PM CT: KEEP the
+class-sorted Sky view, ADD a Class/Island toggle, Island view = multi-select classes then
+group the checklist by island so island N is cleared before moving on. The plan is the top
+of `FABLE.md` on this PR, evidence-first: the multi-select ALREADY EXISTS (the Sky tab's
+`EqMultiPicker` class picker, per character), the island fact ALREADY EXISTS on every row
+(`IslandHeading`, two producers), and the shipped `GuideCatalog.json` survey (95 PoS
+guides / 317 objectives) places 103 on a numbered isle, 22 Efreeti rows on {1.5, 4, 8}
+via one verbatim Where string the current parser would misread as Island 1.5 alone, 95
+wind runes correctly anywhere, 95 turn-ins excluded (the Ready band owns hand-ins), 2
+stubs.
+
+- **One signature authorizes the declared sequence D1–D3 on green gates**
+  (execution-flow). No slice fetches, no curated file is edited, no protocol change — so
+  there is no harvest AUTHORIZE and no consequence-list door to rule on.
+- **The default most worth a veto is named in P5**: the island view EXCLUDES turn-in rows
+  and turned-in rewards, each counted out loud with the Class view named as where they
+  live — the alternative (drawing hand-ins as island work) files 48 Efreeti-Chamber
+  directions under Island 1.
+- **The one parser change is scope-locked in P3** (the plural list "Isles 1.5, 4 and 8"
+  and no second shape), prove-failed against the shipped parser, with the 317-row
+  placement sweep pinned as a committed guard so a catalog edit can never silently regroup.
+- Class view stays the default (`SkyGroupByIsland` = false); D1+D2 are the 2:00 PM smoke
+  surface; D3 (phone, same layout call, no protocol change) lands inside the sequence
+  before any tag. Executor per card is Opus, kicked by the Founder after SIGN; the
+  Desktop republish + 2.0.0+sha ping is the Executor's step per the card, not this
+  seat's.
+- DRA-164 is `in_review` with the PR link. **This is not a DRA-149 gate** — that sequence
+  is untouched. No Executor is kicked from this seat. needs-david: none (both
+  consequence-list tests fail).
+
+— Fable (DRA-164 planner seat, `fable-dra164-sky-island`)
