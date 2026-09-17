@@ -2180,6 +2180,13 @@ function boot() {
     // the page cannot call into Core. Keep the two in step: same match fields, same
     // most-wanted-first order.
     if (filter) return checklistSearchBody(surface, data, opts, filter);
+    // WHAT THIS LIST IS NOT SHOWING, above the groups (DRA-164 D3). Sent by the PC, worded
+    // entirely in Core - the island view's two exclusions and the fact that it crosses every
+    // class, so the class chips below are not a live-looking no-op. It could not ride a group:
+    // the loop under this drops a group with no rows, and a sentence about the whole list has
+    // nowhere to sit among them. Null on every other checklist and every other mode, so this
+    // draws nothing at all in the common case.
+    if (data.note) wrap.appendChild(el("div", "note", data.note));
     let any = false;
     for (const g of data.groups) {
       if (opts.classes && opts.classes.length && g.class

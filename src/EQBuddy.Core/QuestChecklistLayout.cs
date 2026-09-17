@@ -740,6 +740,24 @@ public static class QuestChecklistLayout
     }
 
     /// <summary>
+    /// **Said on the PHONE only, and the difference is not a wording choice.**
+    ///
+    /// <para>On the PC the class picker and the class lens narrow the checklist BEFORE it is
+    /// regrouped, so an island there already holds exactly the classes the player asked for.
+    /// The phone's class chips narrow client-side and they narrow GROUPS — and an island group
+    /// holds several classes at once, so a chip has nothing it can honestly do to one. The
+    /// island groups therefore carry no class, exactly as the ★ Ready band already does, and
+    /// the chips stand down rather than silently half-working.</para>
+    ///
+    /// <para>This is <see cref="SearchScopeNote"/>'s situation and it gets the same treatment:
+    /// a control that stays on screen and stops narrowing must SAY so, or it is a live-looking
+    /// no-op — "silent no-ops are broken", with the switch on the other side.</para>
+    /// </summary>
+    public const string SkyIslandCrossClassNote =
+        "Island view crosses every class on this checklist — the class chips don't narrow it. "
+        + "Pick which classes you are on the PC.";
+
+    /// <summary>
     /// Regroup an already-projected Sky checklist by ISLAND.
     ///
     /// <para><b>Pass the groups you would have DRAWN.</b> Unlike <see cref="SearchByItem"/>,
