@@ -467,6 +467,7 @@ public class HelperSurfaceParityTests
                      HelperPresentation.DoorsOnPc,
                      HelperPresentation.Nothing.Heading,
                      HelperPresentation.MoneyPriceNote,
+                     HelperPresentation.GearBaseClaimNote,
                      HelperPresentation.CatalogLabel,
                  })
             Assert.DoesNotContain(sentence, html, StringComparison.Ordinal);
@@ -483,8 +484,8 @@ public class HelperSurfaceParityTests
         foreach (var field in new[]
                  {
                      "renderHelper", "h.question", "h.picksLead", "h.answersHeading",
-                     "h.sourceNote", "h.levelNote", "h.moneyNote", "h.cap", "h.gearWithheld",
-                     "h.gearBandRefused", "h.gearWhoWithheld",
+                     "h.sourceNote", "h.levelNote", "h.moneyNote", "h.gearBaseNote", "h.cap",
+                     "h.gearWithheld", "h.gearBandRefused", "h.gearWhoWithheld",
                      // DRA-149 D2's caption and its doors, added in the SAME slice as the field
                      // — which is the whole of what D5's lesson was.
                      "h.unreadWorn", "h.unreadWornDoors",

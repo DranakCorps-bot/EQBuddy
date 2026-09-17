@@ -179,6 +179,7 @@ internal sealed class HelperRoom : Grid, IShellRoom
     /// and "the player has a way to fix it" are different claims.</summary>
     private bool _levelDoor;
     private bool _moneyNote;
+    private bool _gearBaseNote;
 
     public HelperRoom(MainWindow main, Action<string> navigate)
     {
@@ -368,6 +369,7 @@ internal sealed class HelperRoom : Grid, IShellRoom
         _copyCommands = 0;
         _levelDoor = false;
         _moneyNote = false;
+        _gearBaseNote = false;
 
         _scroll.Content = _blocks;
         _blocks.Margin = new Thickness(Tok.SpaceL);
@@ -970,6 +972,16 @@ internal sealed class HelperRoom : Grid, IShellRoom
             r.Why.Any(w => w is SellableDropFact or CatalogValueFact));
         if (_moneyNote) block.Children.Add(Line(HelperPresentation.MoneyPriceNote, Role.Caption));
 
+        // **The base-vs-base caveat, once for the whole block** (DRA-149 D1, plan P1). Same
+        // idiom as the money note directly above and for the same reason: it is driven by what
+        // was actually BUILT — a gear row exists in this list — rather than by which goal is
+        // ticked, so it cannot appear over a list with no gear row in it and cannot be missing
+        // from one that has. Once here rather than on each of up to eight rows: the caveat is
+        // identical every time, and a row's own words are what the player came for (trap 73).
+        _gearBaseNote = _answers.Top.Any(r => r.Why.Any(w => w is GearUpgradeFact));
+        if (_gearBaseNote)
+            block.Children.Add(Line(HelperPresentation.GearBaseClaimNote, Role.Caption));
+
         // The cap, out loud when it held something back.
         if (HelperPresentation.Cap(_answers.Withheld) is { Length: > 0 } cap)
             block.Children.Add(Line(cap, Role.Caption));
@@ -1428,6 +1440,7 @@ internal sealed class HelperRoom : Grid, IShellRoom
         $"helperSellable={_answers.Top.Count(r => r.Why.OfType<SellableDropFact>().Any())} " +
         $"helperCatalogValue={_answers.Top.Count(r => r.Why.OfType<CatalogValueFact>().Any())} " +
         $"helperMoneyNote={(_moneyNote ? 1 : 0)} " +
+        $"helperGearBaseNote={(_gearBaseNote ? 1 : 0)} " +
         // **DRA-71 D8.** The store's claim and the screen's claim, from one Build (trap 56):
         // `helperSkills` is how many profession standings the LEDGER holds and
         // `helperProfKnown` how many of the DRAWN rows carried a number. A skill-up that

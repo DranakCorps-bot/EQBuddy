@@ -44,6 +44,10 @@ public static partial class CompanionProjection
         // appear over a list with no price in it nor be missing from one that has.
         var money = answers.Top.Any(r => r.Why.Any(w => w is SellableDropFact or CatalogValueFact));
 
+        // DRA-149 D1, the same rule one caveat along: the sweep compares base numbers, so the
+        // phone says so wherever a gear row was built — once for the block, never per row.
+        var gearBase = answers.Top.Any(r => r.Why.Any(w => w is GearUpgradeFact));
+
         return new CompanionHelperSection(
             Question: HelperPresentation.RoomQuestion,
             PicksLead: HelperPresentation.PicksOnPc,
@@ -57,6 +61,7 @@ public static partial class CompanionProjection
             LevelNote: empty ? "" : LevelReadout.UsedByHelper(request.Inputs.Level),
             Answers: [.. answers.Top.Select(Answer)],
             MoneyNote: money ? HelperPresentation.MoneyPriceNote : "",
+            GearBaseNote: gearBase ? HelperPresentation.GearBaseClaimNote : "",
             Cap: HelperPresentation.Cap(answers.Withheld),
             GearWithheld: HelperPresentation.GearWithheld(answers.GearWithheld),
             // DRA-84 D2. Same words, same producer, same wire — a refusal the PC made and the
@@ -250,7 +255,8 @@ public static partial class CompanionProjection
         // (trap 72 — the repaint gate must see the store the feature writes).
         // DRA-149 D2: the unread sentence NAMES its items, so it moves when a new dump changes
         // which of them EQBuddy cannot read even though no count beside it does (trap 72).
-        h.MoneyNote, h.Cap, h.GearWithheld, h.GearBandRefused, h.GearWhoWithheld, h.UnreadWorn,
+        h.MoneyNote, h.GearBaseNote, h.Cap, h.GearWithheld, h.GearBandRefused,
+        h.GearWhoWithheld, h.UnreadWorn,
         Join(h.Gaps, g => g.Text + "|" + g.Prompt?.Command),
         Join(h.Deferred, d => d.Text),
         h.Empty?.Heading);
