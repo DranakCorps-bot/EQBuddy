@@ -55,9 +55,10 @@ public class SkyIslandViewTests
         var island6 = QuestChecklistLayout.SkyByIsland(Groups()).Groups
             .Single(g => g.Heading == "Island 6");
 
-        Assert.Equal(["Monk · Celestial Fists", "Warrior · Belt of the Four Winds"],
-            island6.Rows.Select(r => r.Label));
-        Assert.Equal(["Jade Bracelet", "Wind Tablet"], island6.Rows.Select(r => r.Row.Title));
+        Assert.Equal(["Celestial Fists", "Belt of the Four Winds"],
+            island6.Rows.Select(r => r.Reward));
+        Assert.Equal(["[Monk] Jade Bracelet", "[Warrior] Wind Tablet"],
+            island6.Rows.Select(r => r.Title));
     }
 
     /// <summary>Islands ascend NUMERICALLY (1.5 before 5, which is the whole reason islands are
@@ -100,9 +101,84 @@ public class SkyIslandViewTests
         var row = QuestChecklistLayout.SkyByIsland(Groups()).Groups
             .Single(g => g.Heading == "Island 5").Rows.Single();
 
-        Assert.Equal("Druid · Nature Walkers Scimitar", row.Label);
+        Assert.Equal("[Druid] Spiroc Feather", row.Title);
         Assert.Equal("Nature Walkers Scimitar", row.Reward);
         Assert.Equal("Druid", row.Row.ClassName);
+    }
+
+    // ----- P8: the row PREFIXES its class (Founder CLARIFY, 2026-09-17 ~8:11 AM CT) --------
+
+    /// <summary>**The clarify, answered, on every row there is.** Not one sampled row: the
+    /// Founder's sentence is about the island view, so the assertion is over all of it, in the
+    /// exact shape asked for — `[Cleric] gather …`, brackets and one space.</summary>
+    [Fact]
+    public void EveryIslandRowPrefixesItsClassInTheShapeTheFounderAskedFor()
+    {
+        var rows = QuestChecklistLayout.SkyByIsland(Groups(repeat: true), repeatMultiIsland: true)
+            .Groups.SelectMany(g => g.Rows).ToList();
+
+        Assert.NotEmpty(rows);
+        foreach (var row in rows)
+        {
+            Assert.StartsWith("[" + row.Row.ClassName + "] ", row.Title, StringComparison.Ordinal);
+            // …and the step text itself is the class view's, untouched. A prefix that also
+            // rewrote the step would be the "second unlabeled row" the LEAVE names, wearing
+            // the right shape.
+            Assert.EndsWith(row.Row.Title, row.Title, StringComparison.Ordinal);
+        }
+    }
+
+    /// <summary>
+    /// **The class is said ONCE.** The prefix carries it, so the owner half the surfaces draw
+    /// beside the title is the REWARD alone — "[Cleric] Wind Rune Fana" + "Belt of the Four
+    /// Winds", never "[Cleric] Wind Rune Fana" + "Cleric · Belt of the Four Winds".
+    ///
+    /// <para>This is the guard the D3 Bevel note earned: saying one fact three times on a row
+    /// is how a rearrangement view stops being readable, and the prefix is only an improvement
+    /// if it REPLACES the owner's copy of the class rather than joining it.</para>
+    /// </summary>
+    [Fact]
+    public void TheRewardTravellingBesideTheTitleDoesNotRepeatTheClass()
+    {
+        foreach (var row in QuestChecklistLayout.SkyByIsland(Groups()).Groups.SelectMany(g => g.Rows))
+        {
+            Assert.DoesNotContain(row.Row.ClassName, row.Reward, StringComparison.OrdinalIgnoreCase);
+            Assert.Equal(1, Occurrences(row.Title + " " + row.Reward, row.Row.ClassName));
+        }
+
+        static int Occurrences(string haystack, string needle)
+        {
+            var n = 0;
+            for (var i = haystack.IndexOf(needle, StringComparison.OrdinalIgnoreCase); i >= 0;
+                 i = haystack.IndexOf(needle, i + 1, StringComparison.OrdinalIgnoreCase)) n++;
+            return n;
+        }
+    }
+
+    /// <summary>**CLASS VIEW STANDS** — the LEAVE, as a test rather than as a promise. The
+    /// prefix lives on <c>SkyIslandRow</c> and nowhere else, so the rows the class view draws
+    /// carry the catalog's own titles with no bracket in front of them. Trap 34's must-list
+    /// half: the test above forbids a missing prefix, and this one forbids an extra one.</summary>
+    [Fact]
+    public void TheClassViewsRowsAreUnprefixedAndUnchanged()
+    {
+        foreach (var row in Groups().SelectMany(g => g.Rows))
+            Assert.False(row.Title.StartsWith('['),
+                $"Class view row '{row.Title}' carries the island view's class prefix. "
+                + "Classic STANDS (Founder, 2026-09-17).");
+    }
+
+    /// <summary>An UNCLASSED row is not given an empty bracket. There is no such Sky row today,
+    /// which is exactly why the record must not assume it — "[] Wind Rune Fana" is a label
+    /// naming nothing, and it would ship the first time a row arrived without a class.</summary>
+    [Fact]
+    public void ARowWithNoClassIsLeftUnprefixedRatherThanGivenAnEmptyBracket()
+    {
+        var row = new QuestChecklistLayout.SkyIslandRow(
+            new QuestChecklistRow("x", "", "Wind Rune Fana", "detail", false, false),
+            "Belt of the Four Winds");
+
+        Assert.Equal("Wind Rune Fana", row.Title);
     }
 
     // ----- P5: what it excludes, it counts out loud (trap 50) -----------------------------

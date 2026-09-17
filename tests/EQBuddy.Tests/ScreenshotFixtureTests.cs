@@ -696,9 +696,28 @@ public class ScreenshotFixtureTests
         Assert.Contains(QuestChecklistLayout.SkyIslandCrossClassNote, snap.Quests.Sky.Note);
         Assert.Contains("1 turned-in reward is not listed here", snap.Quests.Sky.Note);
 
-        // And every row still says whose work it is, because no heading does any more.
-        Assert.All(islands.SelectMany(g => g.Rows),
-            r => Assert.Contains(" · ", r.Detail ?? ""));
+        // And every row still says whose work it is, because no heading does any more — since
+        // D4 by PREFIXING the class (Founder CLARIFY 2026-09-17, plan P8), with the reward
+        // leading the detail beside it and the class said ONCE.
+        //
+        // **The class is read back out of the row rather than compared to a list.** This
+        // fixture is the phone's, and the phone is not narrowed to the played classes — all
+        // sixteen are on this wire — so a three-name list would fail on a Wizard row that is
+        // perfectly correct. The bracket is asserted to hold a REAL class name instead.
+        Assert.All(islands.SelectMany(g => g.Rows), r =>
+        {
+            var close = r.Text.IndexOf("] ", StringComparison.Ordinal);
+            Assert.True(r.Text.StartsWith('[') && close > 1,
+                $"island row '{r.Text}' carries no class prefix");
+            var named = r.Text[1..close];
+            Assert.Contains(named, QuestClassFilter.Classes);
+            // …and the REWARD beside it does not repeat that class. Scoped to the reward
+            // segment on purpose: the rest of the detail is the drop location, and one of the
+            // shipped NPCs is called "Wizard Schrock" — a whole-string check here would be
+            // reading the game's own naming as our redundancy.
+            Assert.DoesNotContain(named, (r.Detail ?? "").Split(" · ")[0],
+                StringComparison.OrdinalIgnoreCase);
+        });
     }
 
     /// <summary>

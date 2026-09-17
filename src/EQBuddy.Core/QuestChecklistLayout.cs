@@ -694,11 +694,31 @@ public static class QuestChecklistLayout
     /// read-only report.</param>
     public sealed record SkyIslandRow(QuestChecklistRow Row, string Reward)
     {
-        /// <summary>"Warrior · Belt of the Four Winds" — what was the heading above this row
-        /// in class view, and has to travel WITH it here. Worded once, in the same shape as
-        /// <see cref="QuestChecklistGroup.Heading"/>, so three surfaces cannot spell it three
-        /// ways.</summary>
-        public string Label => Row.ClassName + " · " + Reward;
+        /// <summary>
+        /// "[Cleric] Wind Rune Fana" — the row's own title with its CLASS in front of it
+        /// (Founder CLARIFY, 2026-09-17 ~8:11 AM CT; signed plan P8).
+        ///
+        /// <para><b>The class leads because the island heading no longer answers it.</b> In
+        /// class view the class is the group and the reward is the heading above the row, so
+        /// the row itself need say neither. An island group crosses every class the player
+        /// picked, so the first thing a reader needs on a row they are scanning past is whose
+        /// work it is — and a prefix is read before the eye has finished the line, where a
+        /// trailing owner run is read after.</para>
+        ///
+        /// <para><b>Said ONCE per row.</b> This is why <see cref="Reward"/> travels beside it
+        /// bare rather than as "Cleric · Belt of the Four Winds": the class is already in the
+        /// title, and repeating it is the redundancy the six questions exist to remove — the
+        /// same lesson the D3 Bevel note filed about the island being said three times. The
+        /// prefix and the owner run are ONE decision made here, so three surfaces cannot
+        /// disagree about which of them carries the class (#184).</para>
+        ///
+        /// <para>An unclassed row (there are none on Sky today, but the record does not get to
+        /// assume that) comes back UNPREFIXED rather than with an empty bracket — a "[] " in
+        /// front of a step is a label that names nothing.</para>
+        /// </summary>
+        public string Title => Row.ClassName.Length > 0
+            ? "[" + Row.ClassName + "] " + Row.Title
+            : Row.Title;
     }
 
     /// <summary>Everything to collect on one island, across every class the player picked.</summary>

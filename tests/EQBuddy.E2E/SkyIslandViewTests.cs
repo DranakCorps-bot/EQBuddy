@@ -133,6 +133,62 @@ public class SkyIslandViewTests
     }
 
     /// <summary>
+    /// **The row on the SCREEN prefixes its class** (Founder CLARIFY 2026-09-17 ~8:11 AM CT,
+    /// signed plan P8) — `[Warrior] …`, taken from the strings the control that reached the
+    /// panel was actually built from.
+    ///
+    /// <para>The unit suite proves Core PRODUCES a prefixed title; only a launched app can say
+    /// the renderer PASSED it to the row it drew. Those are different claims and the second is
+    /// the one the Founder can see (trap 56). A render that kept calling the row builder with
+    /// `row.Row.Title` would pass every Core assertion there is.</para>
+    ///
+    /// <para><b>And the class is said ONCE.</b> The owner half beside the title is asserted to
+    /// be the REWARD with no second copy of the class in it — the prefix is only an improvement
+    /// if it REPLACED the owner's copy rather than joining it, which is the half a "does it
+    /// start with a bracket" check cannot see.</para>
+    /// </summary>
+    [Fact]
+    public void AnIslandRowOnTheScreenPrefixesItsClassAndSaysItOnlyOnce()
+    {
+        using var app = Fixture(island: true);
+        app.Launch();
+
+        app.WaitForDump("shellQuestsSkyIsland", 1, "the Sky tab to be in island view");
+        app.WaitForDumpAtLeast("shellQuestsIslandRows", 1, "at least one island row on screen");
+
+        // ONE read, so the two halves below are the same row from the same moment (trap 56).
+        var title = app.DumpText("shellQuestsIslandRowTitle");
+        var owner = app.DumpText("shellQuestsIslandRowOwner");
+
+        // "-" is the dump's "no island row reached the panel" — assert against it by name, or
+        // the StartsWith below would be checking a sentinel (trap 78).
+        Assert.NotEqual("-", title);
+        Assert.NotEqual("-", owner);
+
+        // The fixture character reads as a Warrior, so the tab narrows to Warrior on its own —
+        // the class is derived from the fixture rather than typed (trap 23).
+        Assert.StartsWith("[Warrior]_", title, StringComparison.Ordinal);
+        Assert.DoesNotContain("Warrior", owner, StringComparison.OrdinalIgnoreCase);
+    }
+
+    /// <summary>**Class view STANDS unprefixed**, and this is the prove-fail for the row above:
+    /// without it, a build that had put `[Warrior]` on every checklist row everywhere would
+    /// satisfy the prefix assertion while breaking the LEAVE the Founder wrote beside it. The
+    /// dump answers "-" because no island row reached the panel at all.</summary>
+    [Fact]
+    public void TheClassViewDrawsNoPrefixedRowAtAll()
+    {
+        using var app = Fixture(island: false);
+        app.Launch();
+
+        app.WaitForDump("shellQuestsTab", "sky", "the shell to reach the Plane of Sky tab");
+        app.WaitForDump("shellQuestsGuideRows", WarriorRows, "every guide step to be drawn");
+
+        Assert.Equal("-", app.DumpText("shellQuestsIslandRowTitle"));
+        Assert.Equal("-", app.DumpText("shellQuestsIslandRowOwner"));
+    }
+
+    /// <summary>
     /// **A box on an island row is the same box.** The loot auto-tick writes the Sky item
     /// store; the island view is a rearrangement of rows that route through
     /// <c>GuideProgressRouter</c>, so the guide's step must read as done and the tab must
