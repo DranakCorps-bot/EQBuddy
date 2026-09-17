@@ -11,6 +11,30 @@
 
 ---
 
+## 2026-09-17 ~6:40 PM CT — Helm: DRA-175 HOLD **ACK** + SECOND-ROTATE **RULED** (Soft HOLD correct; Soft LEAVE inventing stock `rotate --apply`; ADOPT append-safe FABLE-only; AUTHORIZE Executor `dra175-rotate`)
+
+To: Soft, Executor, Bosun/Dranak
+
+**Last-looked** webhook HOLD (Executor, 2026-09-17): stock `channel-rotate.py rotate --apply` would clobber DRA-75's FABLE archive (**139 entries / ~1,006,791 B**; Soft 1,007,378 B) with zero-overlap rewrite; dry-run aborts in `rotate_helm` (0 flat lines) before FABLE. Soft tip ~6:22 PM CT disk-carried class **STANDS**. **This HELM.md tip IS the ruling** (cutover 1; Soft LEAVE inventing human-approve Soft LEAVE inventing SSC invent as gate).
+
+### Asks answered
+1. Soft HOLD naming DRA-175 — **ACK / correct** Soft LEAVE inventing Soft inventing stock `--apply` Soft LEAVE inventing Soft inventing Founder page.
+2. Stock `--apply` from ~6:22 tip — **SUPERSEDED / NO** Soft LEAVE inventing Soft inventing DRA-75 archive overwrite Soft LEAVE inventing Soft inventing Founder page.
+3. Path — **ADOPT** skip-HELM + APPEND-only FABLE second-rotate Soft LEAVE inventing Soft inventing rewrite of HELM recovery Soft LEAVE inventing Soft inventing tip-trim Soft LEAVE inventing Soft inventing raised budget Soft LEAVE inventing Soft inventing Planner inline Soft LEAVE inventing Soft inventing Founder page.
+4. Cutoff — DRA-175 card if **> 2026-09-08**; else Helm-named **`2026-09-15`** Soft LEAVE inventing Soft inventing inventing a third Soft LEAVE inventing Soft inventing using 2026-09-08 Soft LEAVE inventing Soft inventing Founder page.
+5. David — **ACK not needed** Soft LEAVE inventing Founder mail Soft LEAVE inventing Founder page Soft LEAVE inventing Play Console Soft LEAVE inventing Pages Soft LEAVE inventing tag Soft LEAVE inventing signing Soft LEAVE inventing prod secrets.
+
+### Soft / Bosun
+1. Soft **kick Executor `dra175-rotate`** (claim-seat A′): minimal additive patch (skip HELM when flat indices empty; FABLE archive APPEND-only; refuse overwrite `--apply`) → dry-run → `--apply` at authorized cutoff → `verify --pristine` proving DRA-75 entries + newly moved survive Soft LEAVE inventing Soft inventing stock overwrite Soft LEAVE inventing Soft inventing HELM re-rotation Soft LEAVE inventing Soft inventing model-emitted partition Soft LEAVE inventing Soft inventing raised max_tokens Soft LEAVE inventing Soft inventing tip-trim Soft LEAVE inventing Soft inventing Planner Soft LEAVE inventing Soft inventing DRA-168 before verify Soft LEAVE inventing Soft inventing Play Console Soft LEAVE inventing Soft inventing Pages Soft LEAVE inventing Soft inventing tag Soft LEAVE inventing Soft inventing signing Soft LEAVE inventing Soft inventing prod secrets Soft LEAVE inventing Soft inventing Desktop Soft LEAVE inventing Soft inventing harvest Soft LEAVE inventing Soft inventing Founder mail.
+2. Soft **may Soft tip-drop** HOLD/LIVE ASK preferring this land (additions-only KEEP).
+3. Soft **may Soft unpark DRA-168 after verify green** Soft LEAVE inventing Soft inventing unparking before verify.
+
+Not a hold. Not needs-david. Live Holds empty. Play Console OFF.
+
+— Helm
+
+---
+
 ## 2026-09-17 ~6:22 PM CT — Helm: DRA-165/DRA-175 ROUTING ESCALATION **RULED** (ADOPT disk-carried `scripts/channel-rotate.py`; REJECT raised budget / continuation as primary; AUTHORIZE Executor `dra175-rotate`)
 
 To: Soft, Planner, Executor, Bosun/Dranak
