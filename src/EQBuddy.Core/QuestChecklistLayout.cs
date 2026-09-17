@@ -89,7 +89,25 @@ public sealed record QuestChecklistRow(
     /// phone has no hover and an affordance it cannot honour is a lie with the right shape
     /// (trap 35) — and the sentence naming the Helper room is deliberately not a link, because
     /// one of the three surfaces cannot open one.</para></summary>
-    string HelperAnswer = "");
+    string HelperAnswer = "",
+    /// <summary>The islands this row names, as <see cref="SkyIslands.SetKey"/> — "" when it
+    /// names none, which is the honest answer for 97 of the 317 shipped Plane of Sky
+    /// objectives and for every Epic row (DRA-164).
+    ///
+    /// <para><b>Why the heading is not enough, when the heading is right there.</b>
+    /// <see cref="IslandHeading"/> is a string written for a person to read, and its two
+    /// producers do not spell it the same way: the classic layout writes "Island 6", the guide
+    /// projection writes the stage's own name, "Isle 6: Bazzt Zzzt". Recovering the island by
+    /// parsing that back is one fact stored in one place and read out of another (trap 4) —
+    /// and it would be parsing the very prose this field exists so nobody has to. So the SAME
+    /// code that stamps the heading stamps this, in both producers, and
+    /// <see cref="QuestChecklistLayout.SkyByIsland"/> reads only this.</para>
+    ///
+    /// <para>A string rather than a list so the record stays value-equal: two rows with the
+    /// same islands compare equal, which every repaint gate and every equality assertion in
+    /// this app already relies on. <see cref="SkyIslands.FromSetKey"/> is the inverse and is
+    /// round-trip tested.</para></summary>
+    string IslandKey = "");
 
 /// <summary>
 /// The active-step card: what the player should do NEXT in one guided reward, lifted out of
@@ -381,7 +399,11 @@ public static class QuestChecklistLayout
                                     : SkyIslands.WithoutIslePrefix(p.Item.Source)),
                                 p.Item.Acquired,
                                 p.Item.AcquiredUnassigned,
-                                p.Heading)),
+                                p.Heading,
+                                // Stamped by the same code that stamped the heading, from the
+                                // islands it already holds — never re-parsed from either the
+                                // heading or the prose (trap 4).
+                                IslandKey: p.Key)),
                     ],
                     RewardKey(g.Key.ClassName, g.Key.Reward),
                     completed.Contains(RewardKey(g.Key.ClassName, g.Key.Reward)),
@@ -653,6 +675,162 @@ public static class QuestChecklistLayout
         bool Hit(string s) => s.Contains(q, StringComparison.OrdinalIgnoreCase);
     }
 
+    // ----- The island view (DRA-164) ---------------------------------------------------
+    //
+    // The Founder's ask, 2026-09-17: KEEP the class-sorted Sky view, and ADD one that groups
+    // the checklist by island — "everything to collect on island N before moving to next".
+    //
+    // **It is a REARRANGEMENT, never a second producer** (signed plan P1). It takes groups
+    // that have already been through `Sky`, the guide projection, the class picker and both
+    // lenses, and regroups the ROWS they already contain: same row ids, same tick setters,
+    // same ledger-backed refusals. Nothing here decides what is on the checklist, only where
+    // it is drawn. `SearchByItem` above is the same shape — this is that precedent a second
+    // time, and it lands in this file for the same #184 reason: three surfaces draw it.
+
+    /// <summary>One row of the island view, with the reward it belongs to — because the
+    /// reward heading is no longer above it.</summary>
+    /// <param name="Row">The ORIGINAL row object, so a surface wires the same tick it would
+    /// wire in class view. An island group is a different arrangement of the rows, not a
+    /// read-only report.</param>
+    public sealed record SkyIslandRow(QuestChecklistRow Row, string Reward)
+    {
+        /// <summary>"Warrior · Belt of the Four Winds" — what was the heading above this row
+        /// in class view, and has to travel WITH it here. Worded once, in the same shape as
+        /// <see cref="QuestChecklistGroup.Heading"/>, so three surfaces cannot spell it three
+        /// ways.</summary>
+        public string Label => Row.ClassName + " · " + Reward;
+    }
+
+    /// <summary>Everything to collect on one island, across every class the player picked.</summary>
+    public sealed record SkyIslandGroup(string Heading, IReadOnlyList<SkyIslandRow> Rows)
+    {
+        /// <summary>Counts DISTINCT steps, not rendered rows — the
+        /// <see cref="QuestChecklistGroup.Done"/> lesson, which cost a "3/12" on a six-piece
+        /// reward the first time it was learned. It can still bite here: with
+        /// <c>repeatMultiIsland</c> on, one step is drawn under three islands.</summary>
+        public int Done => Distinct.Count(r => r.Row.Acquired);
+
+        public int Total => Distinct.Count();
+
+        private IEnumerable<SkyIslandRow> Distinct =>
+            Rows.DistinctBy(r => r.Row.Id, StringComparer.Ordinal);
+    }
+
+    /// <summary>The island view, and what it left out.</summary>
+    /// <param name="Groups">Islands in ascending order, then the multi-island sets, then the
+    /// rows that name no island under their own existing headings. EMPTY islands are never
+    /// emitted: the list of islands is the data's, not an invented 1–8 scaffold.</param>
+    public sealed record SkyIslandLayout(
+        IReadOnlyList<SkyIslandGroup> Groups,
+        int HiddenRewards,
+        int HiddenTurnIns)
+    {
+        /// <summary>What the turned-in rewards exclusion hid, out loud (trap 50) — or "" when
+        /// it hid nothing, because a cap that did not fire has nothing to confess.</summary>
+        public string HiddenNote => HiddenRewards == 0 ? ""
+            : $"{HiddenRewards} turned-in reward{(HiddenRewards == 1 ? " is" : "s are")} not "
+              + "listed here — every piece is already in hand, so they would fill each island "
+              + "with finished rows. The Class view still has them.";
+
+        /// <summary>Why no hand-in appears on any island. Says where the answer DID go, which
+        /// is the difference between a note and a shrug.</summary>
+        public string TurnInNote => HiddenTurnIns == 0 ? ""
+            : "Hand-ins are not island work — the Ready band above still says what you can "
+              + "turn in, and to whom.";
+    }
+
+    /// <summary>
+    /// Regroup an already-projected Sky checklist by ISLAND.
+    ///
+    /// <para><b>Pass the groups you would have DRAWN.</b> Unlike <see cref="SearchByItem"/>,
+    /// which deliberately crosses every filter, this view is the same checklist the player is
+    /// already looking at — the class picker, the class lens and the state lens have all had
+    /// their say, and an island list that ignored them would answer a question nobody asked.</para>
+    ///
+    /// <para><b>Two exclusions, and each one is counted</b> (plan P5). TURN-IN rows go, because
+    /// "what can I hand in right now" is the Ready band's question and it stays on screen in
+    /// both modes — one owner per question. Rows of TURNED-IN rewards go, because
+    /// <c>MarkRewardTurnedIn</c> force-acquires every one of them, so they would render each
+    /// island as mostly-done noise. Both report themselves through
+    /// <see cref="SkyIslandLayout"/>.</para>
+    ///
+    /// <para>Within an island: class, then reward, then step — so one class's work on an island
+    /// stays together, which is what "everything to collect on island N" means for the player
+    /// who ticked three classes.</para>
+    /// </summary>
+    /// <param name="repeatMultiIsland">The player's existing
+    /// <c>AppSettings.SkyStepsUnderEveryIsland</c> choice, honoured here exactly as
+    /// <see cref="Sky"/> honours it: on, a step naming three islands appears under all three;
+    /// off, it gets its own group whose heading NAMES them. This is the setting's second
+    /// reader and the one that makes it matter again — with every Sky reward now guided, the
+    /// projection replaces the classic rows that used to be the only thing it moved.</param>
+    public static SkyIslandLayout SkyByIsland(
+        IEnumerable<QuestChecklistGroup> groups, bool repeatMultiIsland = false)
+    {
+        var placements = new List<(double Sort, string Key, string Heading, SkyIslandRow Row)>();
+        var hiddenRewards = 0;
+        var hiddenTurnIns = 0;
+
+        foreach (var group in groups)
+        {
+            if (group.Completed) { hiddenRewards++; continue; }
+            foreach (var row in group.Rows)
+            {
+                if (row.IsTurnIn) { hiddenTurnIns++; continue; }
+                var entry = new SkyIslandRow(row, group.Title);
+                var islands = SkyIslands.FromSetKey(row.IslandKey);
+
+                if (islands.Count == 0)
+                {
+                    // No island named. The row keeps the heading it ALREADY has, verbatim —
+                    // "The wind rune", "Not placed", "Anywhere on the plane". Those are the
+                    // stage names the catalog wrote and they are already the honest label;
+                    // inventing a location word for a step nobody located is trap 73's lesson
+                    // with the grouping switched on.
+                    var heading = row.IslandHeading.Length > 0
+                        ? row.IslandHeading
+                        : SkyIslands.AnywhereHeading;
+                    placements.Add((AnywhereSort, heading, heading, entry));
+                }
+                else if (islands.Count == 1)
+                {
+                    placements.Add((islands[0], SkyIslands.SetKey(islands),
+                        SkyIslands.Heading(islands[0]), entry));
+                }
+                else if (repeatMultiIsland)
+                {
+                    foreach (var island in islands)
+                        placements.Add((island, SkyIslands.SetKey([island]),
+                            SkyIslands.Heading(island), entry));
+                }
+                else
+                {
+                    placements.Add((SeveralSort, SkyIslands.SetKey(islands),
+                        SkyIslands.SeveralHeading(islands), entry));
+                }
+            }
+        }
+
+        // The three tiers cannot collide on Sort — a real island is <= 8, a set is 90, an
+        // unlocated row is 99 — so grouping on (Sort, Key) keeps "Islands 1.5 · 4 · 8" apart
+        // from "Islands 4 · 8" without either of them touching the numbered groups.
+        return new SkyIslandLayout(
+        [
+            .. placements
+                .GroupBy(p => (p.Sort, p.Key))
+                .OrderBy(g => g.Key.Sort)
+                .ThenBy(g => g.Key.Key, StringComparer.Ordinal)
+                .Select(g => new SkyIslandGroup(
+                    g.First().Heading,
+                    [
+                        .. g.Select(p => p.Row)
+                            .OrderBy(r => r.Row.ClassName, StringComparer.OrdinalIgnoreCase)
+                            .ThenBy(r => r.Reward, StringComparer.OrdinalIgnoreCase)
+                            .ThenBy(r => r.Row.Title, StringComparer.OrdinalIgnoreCase),
+                    ])),
+        ], hiddenRewards, hiddenTurnIns);
+    }
+
     /// <summary>"Cilin Spellsinger · Isle 6: Bazzt Zzzt" — whichever halves exist. The
     /// drop location is the half #184 asked for back, and the half that was never drawn.</summary>
     /// <summary>
@@ -666,7 +844,7 @@ public static class QuestChecklistLayout
     /// because Sky has an island 1.5. Sorted as TEXT that lands where it belongs by luck, and
     /// the luck runs out on any two-digit number.
     /// </summary>
-    private static IEnumerable<(SkyQuestChecklistItem Item, double Sort, string Heading, string Tie)>
+    private static IEnumerable<(SkyQuestChecklistItem Item, double Sort, string Heading, string Tie, string Key)>
         IslandPlacements(SkyQuestChecklistItem item, bool repeatMultiIsland)
     {
         var islands = SkyIslands.Parse(item.Source);
@@ -674,12 +852,13 @@ public static class QuestChecklistLayout
         {
             // No island named — and that is the truth for 95 of 223 steps, not a gap.
             // Sorted last, keeping the flat presentation these have always had.
-            yield return (item, AnywhereSort, SkyIslands.AnywhereHeading, "");
+            yield return (item, AnywhereSort, SkyIslands.AnywhereHeading, "", "");
             yield break;
         }
         if (islands.Count == 1)
         {
-            yield return (item, islands[0], SkyIslands.Heading(islands[0]), "");
+            yield return (item, islands[0], SkyIslands.Heading(islands[0]), "",
+                SkyIslands.SetKey(islands));
             yield break;
         }
         if (!repeatMultiIsland)
@@ -691,19 +870,17 @@ public static class QuestChecklistLayout
             // islands (David, 2026-08-23), two different sets are two different headings and
             // must not interleave — before that they shared one "Several islands" bucket
             // only because the heading could not tell them apart.
-            yield return (item, SeveralSort, SkyIslands.SeveralHeading(islands), SetKey(islands));
+            var key = SkyIslands.SetKey(islands);
+            yield return (item, SeveralSort, SkyIslands.SeveralHeading(islands), key, key);
             yield break;
         }
+        // Repeating: each rendered row sits under ONE island and says so, so its key names
+        // that island alone. The row ID is unchanged, which is what keeps the score honest
+        // (see QuestChecklistGroup.Done) and what stops SkyByIsland expanding it a second time.
         foreach (var island in islands)
-            yield return (item, island, SkyIslands.Heading(island), "");
+            yield return (item, island, SkyIslands.Heading(island), "",
+                SkyIslands.SetKey([island]));
     }
-
-    /// <summary>A stable, sortable key for a set of islands: zero-padded so "10" could never
-    /// sort between "1" and "2", and ordered so the set starting on the lowest island leads.
-    /// Text, because it only ever has to be consistent — it is never shown.</summary>
-    private static string SetKey(IReadOnlyList<double> islands) =>
-        string.Join("|", islands.Select(i => i.ToString("00.0",
-            System.Globalization.CultureInfo.InvariantCulture)));
 
     /// <summary>Sorts after every real island (Sky's highest is 8) and before "anywhere".</summary>
     private const double SeveralSort = 90;
