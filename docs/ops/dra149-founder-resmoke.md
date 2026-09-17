@@ -17,7 +17,12 @@ red rather than this page going quietly wrong.
 
 ## Before you start
 
-1. A build with all five slices in it. `Help → About` should show a commit at or after D5.
+1. A build with all five slices in it. `Help → About` should show a commit at or after D5
+   (`11e4a808`). **The Desktop published on your machine is `2.0.0+798cd23d`** — a later
+   republish (DRA-164), which carries all five: every D1–D5 commit is an ancestor of it, and
+   each slice's own strings were read back out of that `EQBuddy.exe` rather than trusted from
+   the version stamp (trap 18). If About shows `798cd23d`, you are on the right build and
+   nothing needs republishing.
 2. `/outputfile inventory` in game, once. Nothing below needs a played session — every answer
    comes from the catalog, which is the point.
 3. Tell EQBuddy your level if it does not know: **Character room**. The gear answers change a
