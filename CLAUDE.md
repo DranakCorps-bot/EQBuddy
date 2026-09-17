@@ -10,9 +10,11 @@ Deeper material:
   ladder and the flake ledger (C′, 2026-09-08)
 - **[docs/ops/claude-archive/](docs/ops/claude-archive/README.md)** — incident
   novels, superseded mechanisms, historical evidence. Not always-loaded.
-- **`EXO-PLAYBOOK.md` in `dranakcorps-control-plane`** (private) — Corps
-  doctrine graduated from EQBuddy's ExO experiments, with the evidence
-  (DRA-73 §10; entries written at each M-checkpoint exit).
+- **`EXO-PLAYBOOK.md` in `dranakcorps-ops`** (private) — Corps doctrine
+  graduated from EQBuddy's ExO experiments, with the evidence (DRA-73 §10;
+  entries written at each M-checkpoint exit). **Moved out of
+  `dranakcorps-control-plane` 2026-09-16 (DRA-115)** — what is left there is
+  a pointer, not the playbook.
 
 Progression: incident → verified lesson → executable test/guard → compact live
 rule. Once a guard exists, the novel leaves this file. Do not gut a rule that
@@ -496,8 +498,9 @@ Use the **question tool**, not a paragraph in a long message.
   fails `TestProfileIsolationTests` by design.
   **The child-process half is `UI.Shared/IsolatedLaunchPolicy`** (E2E,
   `shoot.ps1`, drag-verify) — a host that is isolated can still launch
-  `EQBuddy.exe` against a live profile (trap 69). EQBuddy lab
-  experiment, not a Corps-wide standard. Audit:
+  `EQBuddy.exe` against a live profile (trap 69). **Corps doctrine since
+  2026-09-16** — ops `EXO-PLAYBOOK.md` entry 6 (ADOPT as a principle; the
+  principle transfers, not this repo's C#). Audit:
   `docs/ops/live-state-isolation-audit.md`.
 - **Curated catalogs are never auto-written** (spawn timers, AAs, CC
   lists). The weekly wiki refresh only *flags* them. A wrong respawn timer
@@ -873,8 +876,8 @@ after the named guard left with its surface.
 69. **A host redirect does not cover a child `ProcessStartInfo`.** Pin
     `EQBUDDY_APPDATA` AFTER the caller dictionary; refuse both live
     lines. Guard: `UI.Shared/IsolatedLaunchPolicy` /
-    `IsolatedLaunchPolicyTests`. EQBuddy lab experiment, not a
-    Corps-wide standard. Audit:
+    `IsolatedLaunchPolicyTests`. **Corps doctrine** (ops
+    `EXO-PLAYBOOK.md` entry 6). Audit:
     `docs/ops/live-state-isolation-audit.md`. [Novel](docs/ops/claude-archive/traps.md#trap-69)
 70. **Soft max ≤3 is a count, not a mutex.** Experiment A′ on EQBuddy
     (the lab), not a Corps standard. Claim before kick:

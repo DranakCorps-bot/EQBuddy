@@ -1,8 +1,14 @@
 # Live-state isolation audit (E′)
 
-**EQBuddy lab experiment, 2026-09-08.** Evidence first; graduate later.
-This is verification and local guards **in EQBuddy**, not a Dranak Corps
-standard. Formal proposal belongs in a separate control-plane PR.
+**EQBuddy lab experiment, 2026-09-08 — graduated 2026-09-16.** Evidence
+first; graduate later — and it did. The practice this audit evidences is now
+Corps doctrine: **`EXO-PLAYBOOK.md` entry 6** in `dranakcorps-ops` (*"An
+inherited environment variable is not a decision — pin the child's state
+last, and refuse the live path"* — **ADOPT as a principle**, DRA-116 / ops
+PR #19). That entry is the authority for the principle and its adoption
+preconditions; **this file is the EQBuddy evidence it was written from**, and
+everything below is the audit as run on 2026-09-08. What transfers is the
+principle, not this repo's C# (DRA-136).
 
 **Scope:** remaining ways automated / agent-driven execution in *this* repo can
 touch owner or player AppData, logs, or settings.
