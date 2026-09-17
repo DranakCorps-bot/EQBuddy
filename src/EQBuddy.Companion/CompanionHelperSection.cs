@@ -79,6 +79,16 @@ namespace EQBuddy.Companion;
 /// <param name="MaterialNote">Where the materials rows came FROM, and what still has no page
 /// (DRA-149 D3). Empty where no materials row was built, which is the money note's rule beside
 /// it, for the money note's reason.</param>
+/// <param name="MerchantNote">Where the vendor lines came from, said once over the whole block
+/// (DRA-149 D4). Empty when no profession is listed.</param>
+/// <param name="MerchantDoorNote">The zone-page door, as INTENT (trap 35). One sentence over
+/// the block rather than a link per line: the phone cannot open a browser on the PC, and the
+/// desktop's per-row door tip is the same sentence with a zone name in it — thirty copies of it
+/// down a phone screen is the wall trap 73 names in prose.</param>
+/// <param name="Merchants">One entry per LISTED profession, in the curated enum's order. It is
+/// the listed set and not the picked one, because "picked nothing" means "show me all eight" —
+/// the rule lives in <c>TradeskillPickStore.ListedFrom</c> so the phone cannot arrive at a
+/// different eight from the PC.</param>
 /// <param name="Gaps">Answerable goals that produced nothing, each with its reason and —
 /// where the answer is a file the game writes — the command as selectable text.</param>
 /// <param name="Deferred">Selected goals whose engine does not exist yet, each naming the
@@ -105,9 +115,32 @@ public sealed record CompanionHelperSection(
     string MaterialBandRefused,
     string MaterialWhoWithheld,
     string MaterialNote,
+    string MerchantNote,
+    string MerchantDoorNote,
+    IReadOnlyList<CompanionHelperMerchants> Merchants,
     IReadOnlyList<CompanionHelperNote> Gaps,
     IReadOnlyList<CompanionHelperNote> Deferred,
     CompanionHelperEmpty? Empty = null);
+
+/// <summary>
+/// One profession's vendor lines, transcribed from eqlwiki's zone maps (DRA-149 D4).
+///
+/// <para>Every string here is a sentence <c>HelperPresentation</c> already built, and
+/// <see cref="Lines"/> carries the wiki's own words with the zone in front. The projection
+/// decides nothing: which lines, how many, and what the cap says are all the desktop room's
+/// answers, asked of the same <c>ZoneMerchants</c> catalog.</para>
+/// </summary>
+/// <param name="Profession">The trade, in the curated list's own spelling.</param>
+/// <param name="Lines">Up to <c>HelperPresentation.MerchantLineCap</c> rows, one per zone.</param>
+/// <param name="More">What the cap held back (trap 50). Empty when it held nothing.</param>
+/// <param name="Empty">The honest empty state when no zone page names this trade. Empty string
+/// when <see cref="Lines"/> has something — the two are never both set, and the page draws
+/// whichever is there rather than deciding which case it is in.</param>
+public sealed record CompanionHelperMerchants(
+    string Profession,
+    IReadOnlyList<string> Lines,
+    string More,
+    string Empty);
 
 /// <summary>
 /// One of the desktop room's pickers, ported as INTENT (trap 35).

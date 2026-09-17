@@ -472,6 +472,11 @@ public class HelperSurfaceParityTests
                      // DRA-149 D3: the materials block's own note. It is the one new SENTENCE
                      // this slice sends, and the page must not have learned to say it (trap 32).
                      HelperPresentation.ProfessionsFarmNote,
+                     // DRA-149 D4: the vendor block's source caption and the honest empty state
+                     // for a trade no zone page names. Both ride the wire; neither is in the
+                     // page.
+                     HelperPresentation.MerchantsNote,
+                     HelperPresentation.NoMerchantsFor(Tradeskill.Fletching),
                  })
             Assert.DoesNotContain(sentence, html, StringComparison.Ordinal);
 
@@ -497,6 +502,12 @@ public class HelperSurfaceParityTests
                      // counts the desktop room draws as its own captions; the third is the
                      // block note above.
                      "h.materialNote", "h.materialBandRefused", "h.materialWhoWithheld",
+                     // DRA-149 D4's three, added in the SAME slice as the fields. `m.lines` and
+                     // `m.empty` are named as well as the block: a page that drew the heading
+                     // and neither of those would pass on the block's row alone, which is
+                     // exactly the shape D5 got caught by.
+                     "h.merchants", "h.merchantNote", "h.merchantDoorNote",
+                     "m.profession", "m.lines", "m.more", "m.empty",
                      "h.doorsLead", "h.empty", "h.gaps", "h.deferred",
                  })
             Assert.Contains(field, html, StringComparison.Ordinal);
@@ -570,6 +581,74 @@ public class HelperSurfaceParityTests
         Assert.NotEqual(
             Print(clean with { UnreadWorn = ["Lute +1"] }),
             Print(clean with { UnreadWorn = ["Mystery Pauldrons"] }));
+    }
+
+    // ---- DRA-149 D4: the vendor half reaches the phone --------------------------------
+
+    /// <summary>
+    /// **The phone lists the SAME shops, in the same words, for the same eight professions.**
+    ///
+    /// <para>The projection chooses nothing: every line is
+    /// <c>HelperPresentation.MerchantsShown</c>'s, which is the desktop room's own call, and the
+    /// professions are <c>TradeskillPickStore.ListedFrom</c>'s — so "picked nothing" resolves to
+    /// the same eight rows on both surfaces rather than to a second reading of what empty
+    /// means.</para>
+    /// </summary>
+    [Fact]
+    public void TheVendorLinesRideTheWireForEveryListedProfession()
+    {
+        var phone = Phone(Request(Inputs(), HelperGoal.FarmMaterials));
+
+        Assert.Equal(Tradeskills.All.Count, phone.Merchants.Count);
+        Assert.Equal(HelperPresentation.MerchantsNote, phone.MerchantNote);
+        // The door is INTENT, said once (trap 35): no link, and the sentence that says what is
+        // behind it.
+        Assert.Contains("never fetches it for you", phone.MerchantDoorNote);
+
+        foreach (var skill in Enum.GetValues<Tradeskill>())
+        {
+            var block = phone.Merchants.Single(m => m.Profession == Tradeskills.For(skill).Name);
+            var shown = HelperPresentation.MerchantsShown(ZoneMerchants.Default, skill);
+
+            Assert.Equal([.. shown.Select(HelperPresentation.MerchantRow)], block.Lines);
+            // The two states are never both set: a block either has lines or says why it has
+            // none, and the page draws whichever is there rather than deciding which case it is.
+            Assert.True(block.Lines.Count == 0 ^ block.Empty.Length == 0);
+        }
+    }
+
+    /// <summary>The committed negative: a player who picked only Level Up gets no vendor block,
+    /// and — the part that is easy to miss — no caption over it either. A source note printed
+    /// above nothing is the disclosure-line rule broken one block along.</summary>
+    [Fact]
+    public void APhoneThatDidNotPickMaterialsIsSentNoVendorBlockAndNoCaptionForIt()
+    {
+        var phone = Phone(Request(Inputs(), HelperGoal.LevelUp));
+
+        Assert.Empty(phone.Merchants);
+        Assert.Empty(phone.MerchantNote);
+        Assert.Empty(phone.MerchantDoorNote);
+    }
+
+    /// <summary>A profession SWAP moves the push key. It is trap 72's own shape: one pick out
+    /// and one in leaves every count on this screen unmoved, so a fingerprint that folded counts
+    /// would leave the phone drawing the trade the player just deselected.</summary>
+    [Fact]
+    public void ASwappedProfessionPickWakesThePairedDevice()
+    {
+        string Print(params Tradeskill[] professions) => CompanionProjection.SectionFingerprints(
+            CompanionProjection.Build(
+                new CompanionInputs
+                {
+                    Character = "Dranak", AppVersion = "2.0.0",
+                    Offered = CompanionSurfaces.All,
+                    Helper = new CompanionHelperRequest(
+                        Inputs(), [HelperGoal.FarmMaterials], professions, Tradeskills.All.Count),
+                },
+                DateTime.Now))[CompanionSurfaces.Helper];
+
+        Assert.NotEqual(Print(Tradeskill.Jewelcrafting), Print(Tradeskill.Pottery));
+        Assert.NotEqual(Print(Tradeskill.Jewelcrafting), Print());
     }
 
     // ---- trap 72 / trap 8: the push gate ---------------------------------------------

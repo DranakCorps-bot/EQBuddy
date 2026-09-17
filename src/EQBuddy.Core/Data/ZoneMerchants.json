@@ -1,0 +1,534 @@
+{
+ "Source": "eqlwiki zone pages, map-key list lines naming a merchant (scripts/harvests/eqlwiki/merchants-transform.py; fetches nothing)",
+ "Zones": {
+  "Ak'Anon": [
+   "Trainers for Necromancers and Evil Clerics, also Merchants selling Dark Gold Robes and Spells",
+   "Merchant selling Tinkering Supplies",
+   "Abbey of Deep Musing - Cleric Trainers and Merchants selling Blunt Weapons, through secret door lies stairs down to Rogue Guild with Merchants selling Rogue Weapons",
+   "The Smithy - Merchants selling Weapons of all types",
+   "Merchant selling Blunt Weapons with Forge",
+   "Merchants selling Bags and Boxes, Food and other Goods, also Bard",
+   "Merchant selling Shoes",
+   "Library Mechanamagica - Enchanter, Magician, and Wizard Trainers, with Merchants selling Spells, Gold Robes, and equipment for all spellcasters",
+   "Merchant selling Small Cloth and Leather Armor, also Tailoring Patterns",
+   "Merchants selling Food, Fishing Supplies, Crystals, and Potions",
+   "Warrior Guild - Warrior Trainers and Merchant selling Various Weapons",
+   "Merchant selling Fishing Supplies, outside Merchant selling Small Cloth Armor and Small Sewing Kit, Loom outside",
+   "Priest of Discord and Merchant selling Food and other Goods",
+   "Bank of Ak'Anon, and Merchants selling Jewelry supplies (Gems)",
+   "Merchants selling Jewelry Supplies (Metals)",
+   "Merchants selling Small Cloth Armor, Food and other Goods, Weapons of Various Types, and Small Shields of all types",
+   "Merchant selling Fletching Supplies for making Arrows",
+   "Bar - Merchants selling Alcohol, Brew Barrel inside"
+  ],
+  "Butcherblock Mountains": [
+   "Docks: Northern Pier leads to Freeport, Southern Pier leads to Firiona Vie in Kunark, Merchants that sell Food and other goods, also many houses representing all the races on Faydwer",
+   "Huts with Merchants who sell Food, Cookie Molds, Smithing Molds, Brewing Supplies and Books, and other Goods",
+   "Tower with Guards and High Elf Merchant selling Food and other goods",
+   "Merchants who sell Clay, Firing Sheets, Chain Armor, tailoring patterns, Large Sewing Kit and other goods",
+   "Druid Ring with Merchant selling Druid Spells"
+  ],
+  "Cabilis": [
+   "Tink n' Babble - Merchant selling Alcohol, Brew Barrel inside",
+   "Merchants selling Alcohol and Brewing Supplies, Brew Barrel nearby",
+   "Merchant selling Gems of all types, Metals and Jewelry Kit",
+   "Merchant selling Basic Smithing Molds",
+   "Merchant selling Cooking Supplies, Pastries and Cook Books, Oven inside",
+   "Court of Pain - Monk Guild, Merchants selling Monk Supplies, Iksar History Books and Bandages and Backpacks.",
+   "The Haggle Baron - Merchant selling Bristle Silk Armor",
+   "Merchant selling Food Items",
+   "Merchant selling Pottery Supplies, Kiln and Pottery Wheel outside",
+   "Merchants selling Blacksmithing Armor Molds and Sheet Metal, Pottery Molds, Sectional Molds, Forge nearby",
+   "Merchant selling Ore, Sharpening Stones, Smithy Hammers, and Clay",
+   "Merchant selling Sewing Patterns and Guides",
+   "Merchant selling Medium Cloth Armor, Large and Small Sewing Kits, Sewing Patterns",
+   "Merchant selling Food Items",
+   "Merchants selling Fishing Supplies and all Fletching Supplies for Bows",
+   "Merchant selling Bags and Boxes",
+   "Merchant selling Rhino Hide Armor, Loom outside",
+   "Merchant selling Wilderness Survival Gear",
+   "Merchant selling Blunt Weapons, Weapon Molds, Forge nearby",
+   "Merchants selling Combine Weapons, Weapon Blade Molds, and Weapon Part Molds",
+   "Merchants selling Weapons and Shields (all sizes), Ore, Skyfire Metal, and Shield Molds, Cabilis Forge",
+   "Merchant selling Lupine Scale Armor",
+   "Merchant selling Cooking and Lore Books",
+   "Tower of Death - Necromancer Guild Hall, Merchant selling Necromancer Equipment, Books, and some Gems",
+   "Merchant selling Ivory Weapons",
+   "Merchants selling Rhinohide Armor, Fletching Supplies (Arrows), and Alchemy Supplies (classic?)",
+   "Merchant selling Food Items, water flasks and other Goods",
+   "Merchant selling Medium Cloth Armor, Erudite Sewing Kit and Metal Thread",
+   "Merchants selling Alchemy Supplies (all, classic?), Potions, Crystals, and Dufrenite",
+   "Merchants selling Necromancer spells - Underneath these merchants is a tunnel leading to a section of catacombs to the east of the city, as well as a maze area."
+  ],
+  "Cobalt Scar": [
+   "Othmir Camp with Merchants selling Othmir Baking and Brewing Supplies, Brew Barrel and Oven inside huts",
+   "Othmirs generally like anyone and provide merchants/quests. They used to act as guards when fighting the cobalt drakes, but they no longer do so."
+  ],
+  "Crystal Caverns": [
+   "Lower Room with Merchant who sells Alcohol",
+   "Room with Merchant who sells Alcohol",
+   "Upper Room with Merchant who sells Food, Water, Bandages, and other Goods, Lower Room with Captain Dunstan Coldheart",
+   "Lower Room with Merchant who sells Food, Water, Bandages, and other Goods"
+  ],
+  "Eastern Plains of Karana": [
+   "Barbarian Fishing Village, with merchant selling food and other items."
+  ],
+  "Erud's Crossing": [
+   "Merchant selling Fishing Supplies and Weapons"
+  ],
+  "Erudin": [
+   "Temple of Divine Light - Followers of Quellious the Tranquil -- Cleric and Paladin Guilds, Merchants selling Blunt and Sharp Weapons, Merchant outside selling Cloth Armor and Leather Armor and Patterns",
+   "City Armory - Merchants selling Medium Chain and Plate Armor with Erudin Royal Forge outside",
+   "Erudin Surplus - Merchants selling Food and other Goods, Bags and Boxes, upstairs Brew Barrel, outside Merchant selling Small Cloth Armor, Oven, Pottery Wheel and Kiln, and Loom",
+   "Erudin City Library - Merchants selling Bard Songs, Cleric Spells, Enchanter Illusion Spells, Wizard Portal Spells, Mage Summon Item Spells, Wizard Vision and various Elemental Effect Spells, Cloudy Stone of Veeshan",
+   "Deepwater Knights, Followers of Prexus - Cleric and Paladin Guild, Merchants selling Blunt and Sharp Weapons, Forge out back",
+   "Vasty Deep Inn - Merchant selling Bags and Boxes, Enchanter Trainer",
+   "BlueHawk's Food - Merchant selling Food and other Goods, Alcohol, Cooking Books, Brew Barrel inside, Oven outside",
+   "Merchant selling Bags and Boxes, Large Sewing Kit and Patterns",
+   "Erudin Port Authority - Merchants selling Bags and Boxes",
+   "Merchant selling Cooking Supplies and Food",
+   "Erudin City Office - Merchants selling Bags, Prison downstairs",
+   "Sothure's Fine Gems - Merchants selling Gems and Metals and all Jewelry Supplies",
+   "Vials of Vitality - Merchants selling Jewelry Supplies (all except metal), Potions, Magic Stones",
+   "Tower of the Crimson Hands - Wizard Guild, Merchants selling Spells, Crimson Robes, Wizard Books, Gems (assorted)",
+   "Tower of the Gate Callers - Magician Guild, Merchants selling Spells, Blue Robes, Gems (many), Magician Equipment",
+   "Tower of the Craft Keepers - Enchanter Guild, Merchants selling Spells, Gold Robes, Gems (assorted), and various Spell Components",
+   "Merchant selling Common Spells"
+  ],
+  "Everfrost Peaks": [
+   "Merchants selling Smithing and Tailoring supplies."
+  ],
+  "Felwithe": [
+   "Paladin Guild - Merchant selling Weapons, Priest of Discord, Secret Tunnels to Ramparts",
+   "Tovanik's Venom - Merchant selling Alcohol, Brew Barrel",
+   "Shop of All Holds - Merchants selling Food, Cloth Armor, Gems, Mithril Ore and Chainmail Patterns.",
+   "Beyond Faydark - Merchant selling Food and other goods.",
+   "Cleric Guild - Merchants selling Blunt Weapons. Backpack",
+   "Faydark's Bane - Merchants selling Swords, Fletching and Sewing Kits, Fletching Supplies, Leather Armor and Patterns, Pottery Wheel and Kiln outside",
+   "Emerald Armor - Merchants selling Chain/Plate Armor, Weapons, Shields, Smithing Molds, Koada'Dal Forge inside",
+   "Bait and Tackle - Merchant selling Fishing Supplies",
+   "Felwithe Fish House - Merchant sells Food and Drinks, outside Merchant sells Jewelry Supplies (Rare Gems), Oven outside.",
+   "Wizard Guild - Merchants selling Wizard spells",
+   "Magician Guild - Merchants selling Magician spells",
+   "Enchanter Guild - Merchants selling Enchanter spells and reagents.",
+   "Merchants selling Cloth Armor and Sewing Kits, Jewelry Supplies (Common Gems), Common Spells, Potions and Crystals, Loom inside"
+  ],
+  "Field of Bone": [
+   "Cabilis Outpost ruins - Merchants selling Patch Hide Armor, Newbie Weapons, Survival Gear, and Food Items"
+  ],
+  "Firiona Vie": [
+   "Merchant selling Food, Water, Cookbooks, and Mixing Bowl",
+   "Merchants selling Bags and Boxes",
+   "Merchants selling Weapons, Medium Plate and Chain Armor, Oven and Forge outside",
+   "Merchants selling Bard Songs, Alcohol, Brewing Supplies and Brew Barrel",
+   "Merchant selling Monk Weapons",
+   "Merchant selling Unfinished Bard Instruments and torches for pets",
+   "Ranger Trainer, Merchants selling All Bow and Arrow Fletching Supplies, High Level Ranger Spells",
+   "Merchant selling Medium Leather Armor",
+   "Enchanter, Wizard, and Magician Trainers, Merchants selling Enchanter, Wizard, and Magician Spells",
+   "Merchants selling Most Jewelry Supplies",
+   "Rogue Trainer, Merchant selling Poison Supplies",
+   "Merchants selling Large and Small Sewing Kits and Patterns",
+   "Merchants selling Magic Stones, Potions, High Level Druid Spells",
+   "Paladin Trainer, Merchant selling Cleric and Paladin Spells",
+   "Merchants selling Fishing Supplies, Bows and Arrows, Alchemy Supplies, Bags, and High Level Shaman Spells"
+  ],
+  "Freeport": [
+   "Office of Landholders with Merchants selling Food and other Goods, and Cooking Books",
+   "Groflah's Forger with Merchants selling Ore, Weapons, Clay, Sharpening Stones, Smithing Equipment, Forge outside door",
+   "Marsheart's Chords - Bard Guild Hall, Merchants selling Throwing Weapons, Backpacks, Lockpicks and Musical Instruments",
+   "Coalition of Trade Folks with Merchants selling Food and other Goods",
+   "\"The Blue Building\" with Merchant selling Jewelry Metals, Gems, and Books",
+   "Jade Tiger Den with Merchants selling Food and other Goods",
+   "Tassel's Tavern with Merchants selling Alcohol, Brew Barrel inside",
+   "Emporium with Merchants selling Medium Cloth items, Forge outside door",
+   "Bank of Freeport, Merchant selling Gems",
+   "Tavern with Merchant selling Food Items, Meat Pies, has Brew Barrel and Oven inside and Pottery Wheel and Kiln outside",
+   "Empty building, Oven outside. Merchants selling Fletching and Bowmaking Supplies were removed (not classic)",
+   "Merchants selling Food and other Goods",
+   "Clothier Shop with Merchants selling Pottery Sketches and Cloth armor",
+   "Merchant selling Brewing Supplies",
+   "Merchant selling Cloth Armor",
+   "Warrior Guild with Merchants selling Various Weapons, Forge and Freeport Forge out back",
+   "Smithy - Merchants selling Pottery Supplies, Pottery Wheel inside and Kiln outside",
+   "\"Theater of the Tranquil\", Ashen Order - Monk Guild Hall, Merchants selling Throwing Weapons and Musical Instruments. Asnod Marnoc also sells bags/containers.",
+   "Armor by Ikthar with Merchants selling Chain and Plate Armor, Armor Molds, Clay, Chain Sectionals, Shield Molds, Plate Molds, Forge outside",
+   "Trader's Holiday with Merchants selling Blacksmithing Molds and Books, Alcohol, Brew Barrel and Oven inside",
+   "Tavern with Merchant selling Racial Alcohol",
+   "Velithe & Bardo's Imported Goods with Merchants selling Racial Alcohol, Blacksmithing Books, File molds and other molds, Loom upstairs",
+   "Leather and Hide with Merchants selling Small and Medium Leather Armor and Patterns",
+   "Grub n Grog Tavern Merchants selling Alcohol and Food, has Brew Barrel and Oven inside",
+   "Freeport Inn with Merchants selling Food and other Goods, Soulbinder outside",
+   "Port Authority with Merchants selling Fishing Supplies",
+   "Seafarer's Roost with Merchants selling Odd and Unusual Beers, Throwing Weapons and Lockpicks, Brew Barrel inside, Entrance to Stairs B in East Freeport Tunnels (under the deck in the basement of the Tavern) Rogues heading to tunnels beware of a level 30 Warrior who attacks all rogues on sight who resides in this building. Just East of the Roost out in the harbor is a glowing orb which can be clicked on to teleport to Plane of Sky",
+   "Gord's Smithy with Merchants selling Various Weapons and Bags, Forge outside",
+   "Chops and Hops with Merchant selling Alcohol, has Oven inside",
+   "Hallard's Resales with Merchants selling Various Weapons, also KOS dog named Scraps",
+   "Shadow Knight Trainer, Merchants selling Weapons and Spells",
+   "Cleric and Necromancer Trainers, Merchants selling Spells",
+   "Necromancer Trainer, Merchants selling Necromancer Equipment and Spells",
+   "Shadow Knight Trainer, Merchant selling Weapons"
+  ],
+  "Grobb": [
+   "Sells Weapons, Large Leather, Chain, and Plate Armor. One Forge inside, another outside, north of Bimuk. Outside sells Food Items, Boots, Fletching Equipment and Bows and Arrows. Kiln and Pottery Wheel near pottery merchant Vynugga.",
+   "Jewelry Merchant and oven"
+  ],
+  "Halas": [
+   "Pit of Doom - the Warrior guild w/ merchants selling adventuring supplies and weapons.",
+   "Rose McDowell, the bags and boxes merchant.",
+   "Temple of the Tribunal - Shaman guild w/ alchemy ingredient merchants and the Halas Soulbinder.",
+   "Dok's Cigars - General supplies and pottery supply merchants.",
+   "The Golden Torc - Tailoring supply merchant, armor merchant selling steel and iron torques, and a pottery wheel inside with a kiln out back.",
+   "Bank, General goods merchant on ground floor w/ weapons merchant and Rogue trainers up top, and Constructed Potential outside.",
+   "Mac's Kilts - Tailoring supplies merchants (including Cindl) selling cloth and leather armor w/ small sewing kits and patterns.",
+   "McDaniels Smokes and Spirits - Merchants selling alcohol, baking supplies, smithing supplies, and a Warrior trainer. There's also a smithing supplies merchant and an oven out front.",
+   "McDonald's Fire Cider - Merchants selling alcohol, brewing, and general supplies w/ a brewing barrel inside.",
+   "McPherson's Bloody Blades - Merchants selling chain and plate armor, fletching supplies, and weapon molds w/ a forget outside.",
+   "McQuaid's Dark Stout - Brewing Barrel w/ bartenders selling alcohol inside and a smithing supplies merchant out back.",
+   "Yee Magik - Merchants selling alchemy supplies, blunt weapons, medicine bags, dufrenite, turquoise, and various potions and crystals.",
+   "The Bonny Mermaid - Fishing supplies merchant.",
+   "Baking and Pottery supplies merchants."
+  ],
+  "High Keep": [
+   "Merchant who sells anything",
+   "Merchant who sells anything",
+   "Merchant selling Gemstones",
+   "Kitchen with Merchant (Baker Jena) selling Baking Supplies, Oven and Brew Barrel",
+   "Gambling Room, Merchant selling Brewing Supplies"
+  ],
+  "Iceclad Ocean": [
+   "Gnome Pirate Outpost with Merchants who sell Food and Water (very expensive), Tinkering Supplies, Mana Batteries, and Velious Spells"
+  ],
+  "Jaggedpine Forest": [
+   "Buildings with Druid Trainer, Bank, Merchants selling Food and Goods, Cooking Supplies, Pottery Sketches, Molds",
+   "Bank, also Merchants selling Food and Other Goods, Molds, Pottery Sketches"
+  ],
+  "Kael Drakkel": [
+   "Arena, Avatar of War appears here when Statue of Rallos Zek dies, Merchant selling tickets and Food",
+   "Noble Building - Merchants selling Food and Drink and Alcohol, also Wenglawks Kkeak and Noble Helssen",
+   "Merchants selling Othmir Hide Armor, Drakkel Weapons, Frozen Flower, and Dwarf Bone Toothpick",
+   "Bank, Merchant selling Spell Components, Bard Quest NPC"
+  ],
+  "Kaladim": [
+   "Merchant selling Gems",
+   "Merchant selling Brellium, Ore, Smithy Hammers, Sharpening Stones",
+   "Cleric Guild - Merchants selling Blunt Weapons, Food and Goods Merchant outside",
+   "Ratsbone Treasure and Assay Office - Bank, Merchants who sell Throwing Weapons (Kafia Ratsbone), Mining Supplies & Boxes (Kadek Norkhitter), and Rogue Guild Members outside",
+   "Everhot Forge - Merchants selling Blunt and Sharp Weapons, Small Chain and Plate Armor, Small Plate and Shield Molds, Weapon Molds (Bndainy Everhot), Jewelry Metal and Rare Gems, Forge Outside",
+   "Greybloom Farms - Merchants selling Grapes, Brew Barrel inside, Oven outside",
+   "Tanned Assets - Merchant selling Small Leather Armor",
+   "Irontoe's Eats - home of Tumpy Irontoe, Merchants selling Alcohol and Meat Pies",
+   "Staff and Spear - Merchants selling Swords (Didek Stormhammer) and Fletching Supplies (Alanury Stormhammer)",
+   "Redfist's Metal - Merchants selling Small Shields and Weapons of all types, Forge and Stormguard Forge outside",
+   "Pub Kal - Merchants selling Alcohol (Hanamaf Darkfoam & Dura Darkfoam), Brew Barrel, Bard outside",
+   "Warrior's Guild with Merchants selling Various Weapons",
+   "Merchant selling Potions and Crystals",
+   "Merchant selling Bags, Pottery Wheel and Kiln outside",
+   "Gurtha's Ware with Merchants selling Small Boots, Small Cloth Armor, Pottery Supplies, Oven outside"
+  ],
+  "Kelethin": [
+   "Lift to ground - \"Orc Lift,\" Merchants selling Food and other Goods and Pottery Sketches, Inn",
+   "Merchants selling Elven Food Items, Food, and other Goods",
+   "Tavern selling Alcohol, Merchant selling Plate Armor",
+   "Merchants selling Racial Alcohol, Common Gems",
+   "Tavern selling Alcohol, Merchant selling Plate Armor",
+   "-Upper (connects to platforms 5, 6, and 7) Sparkling Glass with Merchant selling Metals and Rare Gems, Merchants selling Elven Food, Oven",
+   "-Lower (connects to platforms 3 and 11) Pottery and Fletching Supply Merchants, Warrior Guild",
+   "\"Priest of Discord Lift aka PoD Lift,\" Merchants selling Medium Armor Molds, Sheet Metal, Food and other Goods",
+   "Bank, Merchant selling Potions and Crystals",
+   "Newbie Lift, Merchants selling Food, Milk and other Goods, Large Sewing Kit, tailoring patterns and instructions",
+   "Inn with Innkeep Wuleran selling Food and other Goods, Forge, Merchant selling Potions and Crystals, Chain Mail Patterns, Weapons Outside on the Platform \"Merchant Winerasea\" Sells Bows for about 3pp each",
+   "Merchant selling Leather Armor and Sewing Patterns, Merchant in hut selling Bags and Boxes",
+   "Shop selling Smithing Books and Container, Weapon, and File Molds, Merchant (Linadian) selling Cloth Armor, Pottery Wheel and Kiln",
+   "Merchants selling Chain Mail Armor and Boots, also Fier'Dal Forge",
+   "Trueshot Bows selling Fletching (arrow) Supplies, Merchants selling Fletching (bows) Supplies, Tavern selling Alcohol and Ranger Spells"
+  ],
+  "Lake Rathetear": [
+   "Ogre Camp, Ogre Merchant who sells Food and Goods"
+  ],
+  "Lake of Ill Omen": [
+   "Cabilis Outpost Ruins - Merchants selling Patch Hide Armor, Newbie Weapons, Survival Gear, and Food Items",
+   "\"The Windmill\" - Tower with Professor Akabao and Merchant who sells Poison Supplies"
+  ],
+  "Lavastorm Mountains": [
+   "Druid Ring with Druid Merchant selling Druid Spells"
+  ],
+  "Lesser Faydark": [
+   "Brownie Compound - Merchants who sell high level Enchanter spells (1775, 3100)"
+  ],
+  "Misty Thicket": [
+   "Merchant with Baking Supplies",
+   "Merchant with Small Leather Armor and Patterns",
+   "Merchant with Sewing Supplies, including How To's, Large Kit, and Needle and Thimble Molds",
+   "Merchant with Pottery Supplies",
+   "Merchant with Small Armor Molds"
+  ],
+  "Neriak": [
+   "The Smugglers Inn - Merchants selling Alcohol, Brewing Supplies, Food Items and other goods",
+   "Silk Underground - Merchants Small and Large Cloth Armor and Sewing Kits, loom.",
+   "Dranas Bread and Butcher - Merchants selling Food Items and Baking Supplies, Oven outside",
+   "Slug's Tavern - Merchants selling Alcohol, Food and Other Goods, Brew Barrel outside",
+   "Market View with Gambel's Greens with Merchant selling Potions and Crystals",
+   "Merchants who sell Shoes and Bags, as well as Kiln and Pottery Wheel",
+   "Merchant outside who sells Various Weapons",
+   "Pig Stickers - Merchants selling Various Weapons, Forge outside",
+   "Merchant selling Food and Alcohol",
+   "Merchants selling Weapons, Shaman Spells, Shadow Knight Spells, Shaman Trainers",
+   "PvP Area, Merchants who sell Food and other Goods, Various Weapons, and Alcohol",
+   "Bites n Pieces - Merchants selling Food Items, Fishing supplies and other Goods, Oven outside",
+   "Shinie Tings - Merchant selling Jewelry Metals and Rare Gems",
+   "Smithy - Merchants selling Small Chain Armor and Various Weapons, also Medicine Bag",
+   "Adamant Armor - Merchant who sells Small Plate Armor, Forge outside",
+   "Forge House with jewelry merchants upstairs.",
+   "Wizard, Magician, and Enchanter Guild Hall - Merchants selling all items for those classes",
+   "Toadstools - Merchants selling Alcohol and Small Armor Molds, Fishing Supplies outside. Secret entrance to Underground and zone point.",
+   "The Bleek Fletcher - Merchant selling Fletching supplies (arrows)",
+   "The House of D'abth - Merchant selling Food Items and other Goods",
+   "The Dashing Form - Merchant selling Small Cloth Armor, Sewing Kits and Patterns",
+   "Warrior Guild Hall with merchants who sell Weapons and Alcohol",
+   "Temple of Innoruuk - Cleric Guild Hall, Merchants selling Blunt Weapons, Merchant selling Fuligan Soulstone of Innoruuk (reagent for Alter Plane: Hate), Verina Tomb",
+   "Necromancer and Shadow Knight Guild Hall - Merchants selling appropriate equipment for these classes",
+   "Library - Merchants selling Various Spells, including Wizard Portal spells, Enchanter Vision and Enchant metal spells, and Magician Summon spells",
+   "Furrier Royale - Merchant selling Small Leather Armor, Patterns and Kit",
+   "Rogue Guild Hall with Merchants selling Rogue Weapons",
+   "The Maidens Fancy - Merchants selling Alcohol, Brew Barrel inside, also has Dark Elf Ambassador and Ironforge Prisoner",
+   "The Bauble - Merchant selling Gems for Jewelcraft",
+   "Cuisine Excelsior - Merchants selling Alcohol, Oven outside",
+   "The Rack - Merchant selling Wine",
+   "Merchant outside selling Small Plate and Shield Molds. Forge around the corner.",
+   "J'Narus Private Mansion with Merchant selling Adamantite and Chain Patterns"
+  ],
+  "New Sebilis Expedition": [
+   "Merchant Room, including a Forge and a Loom, Tailoring Supplies (Klok Qyzel & Klok Walrot) and Smithing Supplies (Klok Lagnoz & Klok Rento), a Banker (Quartermaster Zevrex) and Adventuring Supplies & Parcels Vendor (Klok Koglin)"
+  ],
+  "Northern Plains of Karana": [
+   "Druid Ring with Treants, Druid Trainer and merchant selling Druid Spells -2750,-1450"
+  ],
+  "Oggok": [
+   "Shaman Guild, Merchant selling Spell Components and Various Weapons",
+   "Merchant who sells Blunt Weapons, Ore, and Large Chainmail Patterns, Oggok Forge",
+   "Merchant selling Food and other Goods, Pottery Wheel and Kiln",
+   "Merchant selling Large Boots and Sewing Patterns, Loom",
+   "Merchant selling Large Shields",
+   "Merchant selling Various Weapons",
+   "Merchant who sells Boxes",
+   "Merchant selling Arrows and Fletching Supplies",
+   "Merchant who sells Food and other Goods",
+   "Merchants selling Food, Oven",
+   "Shadow Knight Guild, Merchant selling Various Weapons",
+   "Merchants selling Large Leather and Cloth Armor, Merchant outside selling Various Weapons",
+   "Merchants selling Large Chain and Plate Armor, Merchant outside sells Large Plate and Shield Molds, and Smithy Hammers, Forge Inside",
+   "Merchants selling Alchemy Items and Blunt Weapons",
+   "Merchants selling Food and Alcohol and Brewing Supplies, Brew Barrel",
+   "Warrior Guild, Merchant selling Various Weapons"
+  ],
+  "Paineel": [
+   "Fortunes' Fancy - Merchant selling Jewelry Metals and Rare Gems",
+   "Merchants selling Chain Mail Armor and Blunt Weapons",
+   "Merchants selling Shields and Blunt Weapons",
+   "False Idols - Merchant with Pottery Supplies, Clay, and Ore, Kiln inside",
+   "Shackled Spirits - Dancing Skeletons, Merchant selling Alcohol, Brew Barrel inside, Inn upstairs",
+   "Superior Supplies (Poison Petal on top floor) - Merchants selling Food and other Goods and Alchemy Supplies, Hole Key",
+   "Sinfully Handsome - Merchants selling Cloth and Leather Armor, Loom",
+   "Good Iva's Tasty Treats - Merchants selling Food and Cooking Supplies",
+   "The Fell Blade - Shadow Knight Guild, Merchants selling Leather Armor and Two-Handed Slashing Weapons",
+   "Merchant selling Plate Armor, Forge and Erud Forge inside"
+  ],
+  "Qeynos": [
+   "Order of the Silent Fist - Monk Guild, Merchant who sells Monk Weapons, Bags, and Bandages",
+   "Crow’s Pub & Casino - Merchant selling Alcohol, Brew Barrel, secret tunnel to Rogues' Guild",
+   "Galliway's Trading Post - Merchants selling Food and other Goods, Priest of Discord outside",
+   "Ironforge's - Merchants selling Sharp Weapons, Medicine Bags, and Weapon Molds, Forge out back",
+   "Jewelbox - Merchants selling Jewelry supplies (Metals and Gems)",
+   "Merchants selling Medium Cloth Armor and Medium Chainmail Molds",
+   "The Cobbler - Merchant selling Boots of all types",
+   "Merchants selling Blunt Weapons and Cleric/Paladin spells",
+   "Tin Soldier - Forge outside, Merchants selling Medium Chain Armor and Full Plate Molds",
+   "The Wind Spirit's Song - Bard Guild Hall, Merchants selling Bard songs and various Weapons",
+   "Fharn's Leather & Thread - Merchant selling Medium Leather Armor and Small Sewing Kit and Patterns",
+   "Bag n Barrel - Merchants selling Bags, Pottery Wheel and Kiln out back",
+   "Nesiff's Wooden Weapons - Merchants selling Blunt Weapons, Bows, outside Merchant selling Fletching Supplies (Arrows), Royal Qeynos Forge nearby",
+   "Lion's Mane Inn - Merchants selling Alcohol, Brew Barrel, Message Board",
+   "The Herb Jar - Merchants selling Spells, Potions, Books, Crystals, and Magician Equipment",
+   "Wizard, Enchanter, and Magician Guild Hall with Merchants selling Spells and Wizard Equipment, outside Wizard, Enchanter, and Magician Trainers",
+   "Tent Merchants selling Small Leather and Ringmail Armor and Medium Cloth Armor, Loom nearby",
+   "Fireprides - Merchants selling Medium Plate, Chain and Leather Armor and Shields, Shield Molds, Forge outside",
+   "Tent Merchant selling Large Leather and Ringmail Armor and Large Shields",
+   "Mermaid's Lure - Merchant selling Fishing Supplies",
+   "Tent Merchants selling Cloth Armor, Small Sewing Kits, Bags, Axes, and Sharp Weapons (including Claymore)",
+   "Warrior Training Hall inside the Grounds of Fate (PvP Area), Merchant selling Various Weapons, underground tunnel leads to a variety of evil trainers and merchants in the Qeynos Aqueducts (follow the bones)",
+   "Merchant selling Instrument Parts, Spells, Compass, and Fish",
+   "Voleen's Fine Baked Goods - Merchants selling Food, Brewing Supplies, some Baking Supplies, Oven inside",
+   "Fish's Ale - Merchants selling Alcohol, Brew Barrel inside, Message Board",
+   "Temple of Thunder - Paladin and Cleric Trainers, Merchants selling Spells, Various Weapons, and Shields of all sizes"
+  ],
+  "Qeynos Aqueducts": [
+   "8a. Enchanter, Magician, and Shadow Knight Trainers, Banker, Merchants selling Spells and Weapons",
+   "8b. Warrior, Wizard, and Necromancer Trainers, Merchants selling Necromancer Spells and Equipment"
+  ],
+  "Rathe Mountains": [
+   "Inn, Hut with Merchant Darfumpel Zirubbel who sells Gems nearby."
+  ],
+  "Rivervale": [
+   "Merchants selling Bags and Fishing Supplies",
+   "Town Hall and Leatherfoot Hall - Bank, Warrior Guild, Merchants selling Various Weapons",
+   "Merchants selling Food and other Goods, Fishing Supplies",
+   "Fool's Gold - Rogue Guild, Merchants selling Alcohol, Brew Barrel",
+   "Merchant selling Cloth Armor, Brew Barrel, and Loom",
+   "Merchants selling Potions and Crystals",
+   "Merchant selling Leather Armor and Patterns outside, Small Chain Armor and Small Chain Armor Patterns",
+   "Druid Guild with Merchants selling Ore, Veggies, Druid Weapons, and Druid and Ranger Spells, Forge and Oven outside",
+   "Merchant selling Potions and Crystals",
+   "Cleric and Paladin Guilds with Merchants selling Blunt Weapons and Cleric and Paladin Spells"
+  ],
+  "Runnyeye": [
+   "Bar with Goblin Merchants selling Baking Supplies and Alcohol, and Goblin Bartender and Battlewizard Unak may spawn here"
+  ],
+  "Solusek's Eye": [
+   "Gnomish merchant, Marfen Binkdirple, who sells {{:Bag of the Tinkerers}}",
+   "Room with Goblin Merchant"
+  ],
+  "Southern Desert of Ro": [
+   "Evil Merchants selling Pottery Supplies (all), Combine Weapons"
+  ],
+  "Southern Karana": [
+   "Centaur Stables with Merchant selling Bowyer Supplies",
+   "Aviak Town (AKA \"KFC\") with Merchant Krak Windchaser (Top of Bird House)"
+  ],
+  "Steamfont Mountains": [
+   "The Windmills of Steamfont, several Observers as well as Merchants who sell Ore, Medium-Quality Ore, Dye Materials, Sharpening Stones, Clay, and Tinkering Equipment",
+   "Merchant selling Sewing Supplies, including Large Sewing Kit, How To's, and Needle and Thimble Molds",
+   "Merchant selling Small Armor Molds",
+   "Merchant selling Cookie Molds",
+   "Merchant selling Food and other goods",
+   "Merchants selling Cooking Supplies and Gems for Jewelry"
+  ],
+  "Stonebrunt Mountains": [
+   "Town of Kejek, with Merchants selling Weapon Molds, Ore, Clay, Smithing Hammers, Pottery Equipment, and Baking Supplies, and Oven, Kiln, Pottery Wheel, and Forge (1350, 1025)"
+  ],
+  "Surefall Glade": [
+   "Archery Range with Ranger Trainer and Merchant who sells Arrow-making Supplies",
+   "Shop with Ranger Trainer and Merchants who sell Bow-making Supplies, Bows, Throwing Weapons, Spells, Sharp Weapons, Food and Other Goods",
+   "Merchant selling Basic Smithing Molds",
+   "Jaggedpine Treefolk with Druid Trainer and Merchants who sell Arrow-making Supplies, Druid Weapons, Spells, Food and Other Goods"
+  ],
+  "Swamp of No Hope": [
+   "Cabilis Outpost Ruins - Merchants selling Patch Hide Armor, Newbie Weapons, Survival Gear, and Food Items"
+  ],
+  "The Feerrott": [
+   "Merchants with Bowyers Guide and Materials and Blacksmithing Books and Molds",
+   "Merchant with Cooking Supplies",
+   "Merchant with Large Sewing Kit and Tailoring Supplies"
+  ],
+  "The Overthere": [
+   "Merchants selling Arrow Fletching Supplies, Food and other Goods, Bags and Boxes, Jewelry Supplies (all), Cooking Supplies (all), Tinkering Supplies (all), Pottery Supplies, Weapons, Tailoring Supplies (all)",
+   "Merchants selling Cleric, Enchanter, Magician, Necromancer, Shadow Knight, Shaman, and Wizard Spells, Pottery Wheel, Kiln, Oven, Brew Barrel inside, Building to Northeast has Dark Elf Wizard Trainer",
+   "Indifferent to all Iksar Merchant Southeast of #5 at Watering Hole"
+  ],
+  "The Wakening Land": [
+   "Tower with portal to the Plane of Growth and Merchant who sells Velious Druid Portal spells."
+  ],
+  "Thurgadin": [
+   "Thurgadin Mining Company with Rogue Trainer, Merchants who sell Poison Supplies, Blacksmithing Supplies, Thieves Goods",
+   "The Velium Keg with Brew Barrel, Merchants who sell Alcohol, Brewing Supplies, Tailoring Supplies",
+   "Merchants selling Coldain Velium Weapons",
+   "Agar's Adventuring Supplies with Merchants selling Bags and Boxes",
+   "Doogle's Drinks with Merchants selling Alcohol",
+   "Argash's House of Carpentry with Merchants selling Bowyer and Fletching Supplies",
+   "Mordin's Meats with Merchant who sells Food and Water and other Goods, Oven",
+   "Underbelly Arms with Forge, Merchants selling Small Chain Armor, Small Velium Plate Armor, and Shields",
+   "Gem Merchants who sell Jewelry Supplies (all)",
+   "The Broken Glacier with Merchants who sell Brewing Supplies, Alcohol",
+   "The Scars Edge with Merchants who sell Coldain Velium Weapons and Armor Molds",
+   "Thurgadin Exchange with Bank, Pottery Wheel and Kiln, Merchants who sell Pottery Supplies, Tailoring Patterns, Tailoring Supplies, Baking Supplies, Cookie Cutter Molds, Alchemy Supplies",
+   "The Holy Harbinger with Merchants selling Alcohol",
+   "Merchant who sells Potions",
+   "Garish's Boots with Merchant who sells Boots",
+   "Temple of Brell with Cleric Trainer and Merchant who sells Velious Spells",
+   "Temple Library with Merchants who sell Cleric Spells",
+   "Paladin Training Hall with Trainer and Merchants selling Spells, Weapons, and other Goods",
+   "Frostbeard's Furs & Leather with Merchants who sell Cloth and Leather Armor, some Sewing Supplies",
+   "The Icy Mug with Merchants who sell Alcohol and Brewing Supplies"
+  ],
+  "Timorous Deep": [
+   "Elven Outpost with Merchants",
+   "Inn with quest NPCs and Merchant with Omat Vastsea (for Cleric epic) and Dolgin Codslayer (for Druid epic to trigger Faydedar) (Outer opening -11500, -3800, Inner opening -11300, -1300)"
+  ],
+  "Warsliks Woods": [
+   "Cabilis Outpost Ruins - Merchants selling Patch Hide Armor, Newbie Weapons, Food Items, and Survival Gear"
+  ],
+  "Western Karana": [
+   "Farms with Poison Merchant"
+  ]
+ },
+ "NoLines": [
+  "Befallen",
+  "Blackburrow",
+  "Burning Wood",
+  "Cazic Thule (Zone)",
+  "Chardok (Post-Revamp)",
+  "Chardok (Pre-Revamp)",
+  "City of Mist",
+  "Crushbone",
+  "Dagnor's Cauldron",
+  "Dalnir",
+  "Dragon Necropolis",
+  "Dreadlands",
+  "East Commonlands",
+  "Eastern Wastes",
+  "Emerald Jungle",
+  "Frontier Mountains",
+  "Gorge of King Xorbb",
+  "Great Divide",
+  "Greater Faydark",
+  "Highpass Hold",
+  "Howling Stones",
+  "Icewell Keep",
+  "Innothule Swamp",
+  "Kaesora",
+  "Karnor's Castle",
+  "Kedge Keep",
+  "Kerra Island",
+  "Kithicor Forest",
+  "Kurn's Tower",
+  "Lower Guk",
+  "Mines of Nurga",
+  "Mistmoore Castle",
+  "Nagafen's Lair",
+  "Najena",
+  "Nektulos Forest",
+  "Oasis of Marr",
+  "Ocean of Tears",
+  "Old Sebilis",
+  "Permafrost",
+  "Plane of Fear",
+  "Plane of Growth",
+  "Plane of Hate",
+  "Plane of Hate cleanupproject",
+  "Plane of Mischief",
+  "Plane of Sky",
+  "Qeynos Hills",
+  "Siren's Grotto",
+  "Skyfire Mountains",
+  "Skyshrine",
+  "Sleeper's Tomb",
+  "Splitpaw Lair",
+  "Temple of Droga",
+  "Temple of Veeshan",
+  "The Arena",
+  "The Estate of Unrest",
+  "The Hole",
+  "The Northern Desert of Ro",
+  "The Temple of Solusek Ro",
+  "The Warrens",
+  "Tower of Frozen Shadow",
+  "Toxxulia Forest",
+  "Trakanon's Teeth",
+  "Tutorial Zone",
+  "Upper Guk",
+  "Veeshan's Peak",
+  "Velketor's Labyrinth",
+  "West Commonlands",
+  "Western Wastes"
+ ]
+}

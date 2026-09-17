@@ -1950,6 +1950,23 @@ function boot() {
       wrap.appendChild(box);
     }
 
+    // DRA-149 D4: the vendor half — shops eqlwiki's zone maps name, per profession. Every
+    // string is one HelperPresentation built and the wire carried; this page decides only
+    // where they go. `merchantDoorNote` is the zone-page door as INTENT, said once over the
+    // whole block rather than thirty times down it (trap 35).
+    if ((h.merchants || []).length) {
+      if (h.merchantNote) wrap.appendChild(el("div", "caption", h.merchantNote));
+      for (const m of h.merchants) {
+        const box = el("div", "note");
+        box.appendChild(el("div", "head", m.profession));
+        for (const line of m.lines || []) box.appendChild(el("div", "caption", line));
+        if (m.more) box.appendChild(el("div", "serves", m.more));
+        if (m.empty) box.appendChild(el("div", "caption", m.empty));
+        wrap.appendChild(box);
+      }
+      if (h.merchantDoorNote) wrap.appendChild(el("div", "caption", h.merchantDoorNote));
+    }
+
     for (const note of (h.gaps || []).concat(h.deferred || []))
       wrap.appendChild(helperNote(note, h.doorsLead));
 

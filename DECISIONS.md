@@ -1,3 +1,107 @@
+## 2026-09-17 — DRA-149 D4: the vendor half ships, and a guard deleted three keywords a human wrote
+
+**Seat:** `opus-dra149-d4` (disjoint). D3 merged at `ec22acc6` (PR #653, both gates green), so
+the sequence-wide SIGN carries this slice. Everything below is inside plan P5 except items 5
+and 8, which say so; nothing here touches the consequence list, **nothing fetches** (the 118
+zone wikitexts are the COMMITTED cache), no catalog was rebuilt, no release, and nothing here
+marks DRA-84 PASS.
+
+**1. The opening survey said SHIP, not park, and the number is on the record.** P5's park
+condition was *"if Jewelcrafting matches fewer than 3 zones the face parks with that number and
+the wiki door"*. Measured against the committed cache: 50 of 118 zone pages name a merchant in
+their map key, 359 lines, 353 of them distinct; all eight professions match at least one zone,
+and Jewelcrafting matches **17**. The face shipped.
+`EveryProfessionMatchesAZoneAndJewelcraftingClearsTheParkFloor` keeps that condition alive in
+the suite, so the day a wiki edit takes it under three the park is back on the table.
+
+**2. The ADMIT rule is a LIST ITEM in THREE spellings, not one, and reading the refusals is what
+found the other two.** The first pass admitted only `*` and refused 86 lines. Most of them were
+map keys written differently — Misty Thicket and Everfrost Peaks number theirs with `#`, and
+Halas, Oggok, Runnyeye and Timorous Deep write theirs as raw HTML `<li>` (three of those four
+with the previous item's `</li>` on the front of the line, so an anchored `^<li>` rule missed
+Oggok's entire fifteen-entry key). Widening to all three took the catalog from 41 zones to 50.
+**The default it could have gone the other way on:** ship the `*`-only rule with a clean report
+and 86 refusals. Nothing would have failed and five zones would simply have had no shops
+forever. A COUNT of refusals would not have found it — the report listing them by zone did,
+which is the argument for the report being part of the transform rather than a nicety.
+
+**3. Prose stays refused even where it names a real merchant.** Kaladim's page says *"Note that
+there is a merchant who sells Ore located at approximately 750, 200 on this map."* — true,
+useful, and not admitted. **The default:** take it, on the grounds that it is obviously good
+data. Refused because *"a sentence mentioning a merchant"* is a rule with no edge, and the same
+relaxation admits Freeport's city history and Crushbone's hunting advice, both of which mention
+merchants and neither of which points at one. All 42 refusals are listed by zone in
+`merchants-report.md`, so what the strictness costs is visible rather than assumed.
+
+**4. The vendor's NAME is not a field.** It is the obvious next step — `[[Bndainy Everhot]]`
+looks exactly like an NPC — and the same Kaladim list also holds `[[Cleric]] Guild`,
+`[[Rogue]] Guild Members` and `[[Kadek Norkhitter]]`. A rule that lifted link targets into a
+"vendor" column would print "Cleric" as a merchant's name, and a rule that tried to tell them
+apart would be guessing about the wiki's own linking. The name survives IN the transcribed
+sentence, which is where the page put it and where a player can check it. **The default:** a
+`Vendors` array per line, which every surface would then have had to caveat.
+
+**5. NOT spelled out in the plan: `MerchantsShown` shows ONE line per ZONE.** P5 named a cap
+and did not say per what. Per LINE, Freeport — the busiest map key in the cache — fills a
+profession's whole list on its own, and "where should I go" answers with one place three times.
+The cap is a travel budget, so it counts destinations. It lives in `HelperPresentation` rather
+than in either surface because both draw the same three (trap 4), and
+`TheShownListIsCappedAndNeverRepeatsAZone` prove-fails by removing the `continue`.
+
+**6. THE GUARD DELETED THREE CURATED KEYWORDS, AND THIS IS THE ITEM MOST WORTH A VETO.** The
+first draft of `ZoneMerchants.Keywords` carried `spices` (Baking), `metal bit` (Blacksmithing)
+and `pelt` (Tailoring). All three are real trade supplies. Not one of them appears on any
+shipped merchant line, so all three matched nothing, contributed nothing, and made the table
+look longer and better-researched than it was — the failure with no symptom, because a dead
+keyword produces a perfectly well-formed empty result (trap 78). They were removed because
+`EveryCuratedKeywordMatchesSomethingInTheShippedCatalog` named them.
+**The default the other way:** keep them as future-proofing against a wiki edit that adds the
+word. I did not, because a curated table is only worth its curation if every row was checked
+against the data, and a row nobody can point at a line for is a guess with a comment on it. The
+consequence is stated plainly: **a keyword added here without a shipped line behind it fails the
+build**, so a future wiki edit that introduces "Spices" needs the row put back deliberately.
+
+**7. Stations and finished products are refused by name, which is a judgement.** No `oven`,
+`kiln`, `forge`, `loom` or `barrel` — they sit on about a third of the lines, they are not
+something a merchant sells, and matching on one files most of Norrath's shops under most
+professions. `alcohol` is out for the same reason from the other side: it is Brewing's PRODUCT,
+it is on forty lines, and a brewer buys "Brewing Supplies". Where a station rides a line matched
+for another reason it is still on screen, because the line is shown whole.
+`NoProfessionMatchesOnACraftingStationOrAFinishedProduct` pins all six.
+
+**8. NOT named in D4's row: the phone got the block in this slice.** P5's row reads "transform +
+reader + face + committed negatives". The parity rule in `CLAUDE.md` is a standing repo rule
+rather than a plan extension — when a surface exists on both, the decision lives in `UI.Shared`
+and all three call it — and DRA-84 D5's lesson is that a sentence reaching the wire without a
+page-side must-list row passes every parity test there is. Both words already lived in
+`HelperPresentation`, so the wire, the page and the must-list rows landed together.
+**The default:** ship desktop-only and let D5's checklist caveat it. The cost of the choice is
+three fields and one record on the Helper section; the cost of the other was a re-smoke that
+finds the phone missing a block the PC has.
+
+**9. A FOURTH wiki door, and it is wired.** `HelperDoorKind.WikiZone` resolves through
+`WikiLinks.Page`, not `Search`: a zone title is not an item and must not go through the
+item-alias rule. D2 found `WikiSkill` had shipped UNWIRED for a whole slice because `Door()`
+fell through to `AddressFor`, which answers null for every wiki kind; the switch D2 left behind
+is exhaustive by kind, so adding this one was a compile-time question rather than a silent
+no-op.
+
+**10. THE FABLE FEEDBACK FOR THIS SLICE IS NOT IN `FABLE-FEEDBACK.md`, AND THAT IS THE GUARD'S
+CALL RATHER THAN MINE.** `channel-size-guard` refuses the append: the file has spent its
+grandfather band (baseline 240,896 B, ceiling 264,985 B, currently 264,970 B — fifteen bytes of
+headroom), and the refusal says in its own words that *"RAISING the row is not the fix"* and
+*"rotation belongs to the standing EXO-CHANNEL-ROTATE card, not to the Executor seat that
+tripped this."* So there is no version of this entry that fits and no edit here that is mine to
+make. The note is written and lives **verbatim in the PR body**, and DRA-144 (*Channel hygiene
+B: rotation pass 2*) carries a comment naming this file and this block. `BEVEL-FEEDBACK.md` is
+well inside its band and its note landed normally. Recording it here because "feedback is not
+optional" and a silently skipped round is indistinguishable from not bothering.
+
+Gates: `check.ps1` all green (5,289 unit, +30), the two Helper E2E rows green. Four prove-fails
+recorded: a plain substring rule reddens two word-boundary rows, dropping the per-zone rule
+reddens the cap row, dropping the page's `m.lines` reddens the page-side must-list, and dropping
+the transform's HTML arm reddens `--check` on both generated files.
+
 ## 2026-09-17 — DRA-149 D2: the alias table's seam, a fourth gap reason, and a dead wiki door found on the way
 
 **Seat:** `opus-dra149-d2` (disjoint; D1 ran in parallel on `dra149/d1-sweep-base-vs-base`).

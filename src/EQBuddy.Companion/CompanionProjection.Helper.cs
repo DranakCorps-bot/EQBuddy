@@ -48,6 +48,11 @@ public static partial class CompanionProjection
         // phone says so wherever a gear row was built — once for the block, never per row.
         var gearBase = answers.Top.Any(r => r.Why.Any(w => w is GearUpgradeFact));
 
+        // DRA-149 D4. Built before the record so the two captions over it can be withheld with
+        // it — a phone that printed "shops eqlwiki's zone maps name" over nothing would be the
+        // disclosure-line rule broken one block along.
+        var merchants = Merchants(request);
+
         return new CompanionHelperSection(
             Question: HelperPresentation.RoomQuestion,
             PicksLead: HelperPresentation.PicksOnPc,
@@ -82,6 +87,14 @@ public static partial class CompanionProjection
             MaterialWhoWithheld: HelperPresentation.DropOffersWithheld(answers.MaterialWhoWithheld),
             MaterialNote: answers.Top.Any(r => r.Why.Any(w => w is TradeskillMaterialFact))
                 ? HelperPresentation.ProfessionsFarmNote : "",
+            // DRA-149 D4, the vendor half. Both captions ride the wire rather than index.html
+            // (trap 32), and the door is INTENT: the phone cannot open a browser on the PC, so
+            // it gets the sentence saying what is behind it, once (trap 35).
+            MerchantNote: merchants.Count == 0 ? "" : HelperPresentation.MerchantsNote,
+            MerchantDoorNote: merchants.Count == 0
+                ? ""
+                : HelperPresentation.DoorTip(new HelperDoor(HelperDoorKind.WikiZone, "")),
+            Merchants: merchants,
             // DRA-149 D2, and it arrives WITH its doors in the same slice — DRA-84 D5's lesson
             // was that a caption which reaches the wire and is never drawn passes every test in
             // the parity suite, so the page-side must-list gains its row here too (trap 34).
@@ -179,6 +192,38 @@ public static partial class CompanionProjection
         return picks;
     }
 
+    /// <summary>
+    /// **THE VENDOR HALF, PORTED** (DRA-149 D4, plan P5).
+    ///
+    /// <para>One entry per LISTED profession — <c>TradeskillPickStore.ListedFrom</c>, so "picked
+    /// nothing" means the same eight here as it does on the PC — and the lines inside each are
+    /// <c>HelperPresentation.MerchantsShown</c>'s, which is the desktop room's own call. The
+    /// projection chooses no line, no order and no cap.</para>
+    ///
+    /// <para>Gated on the same condition the desktop room draws the professions block on: the
+    /// goal is picked, or nothing is. An empty list is what a player who picked only Level Up
+    /// gets, and it withholds the two captions with it.</para>
+    /// </summary>
+    private static List<CompanionHelperMerchants> Merchants(CompanionHelperRequest r)
+    {
+        if (r.Goals.Count != 0 && !r.Goals.Contains(HelperGoal.FarmMaterials)) return [];
+
+        var rows = new List<CompanionHelperMerchants>();
+        foreach (var skill in TradeskillPickStore.ListedFrom(r.Professions))
+        {
+            var shown = HelperPresentation.MerchantsShown(ZoneMerchants.Default, skill);
+            rows.Add(new CompanionHelperMerchants(
+                Tradeskills.For(skill).Name,
+                [.. shown.Select(HelperPresentation.MerchantRow)],
+                shown.Count == 0
+                    ? ""
+                    : HelperPresentation.MerchantsCapped(
+                        shown.Count, ZoneMerchants.Default.ZonesFor(skill)),
+                shown.Count == 0 ? HelperPresentation.NoMerchantsFor(skill) : ""));
+        }
+        return rows;
+    }
+
     /// <summary>How many unlock subjects the picker is offering — the desktop room's own
     /// arithmetic, which is per SECTION: a player who picked only races is offered only
     /// races, and a face that counted both halves would say "of 31" over a list of 12.</summary>
@@ -272,6 +317,13 @@ public static partial class CompanionProjection
         h.MoneyNote, h.GearBaseNote, h.Cap, h.GearWithheld, h.GearBandRefused,
         h.GearWhoWithheld, h.UnreadWorn,
         h.MaterialBandRefused, h.MaterialWhoWithheld, h.MaterialNote,
+        // DRA-149 D4: the vendor blocks fold their LINES, not a count. The profession PICK is
+        // what moves them, and a pick swapped one-for-one leaves every count here unmoved
+        // (trap 72's own shape) — Jewelcrafting out and Pottery in is eight rows before and
+        // eight rows after. The lines are transcribed wiki prose: no clock, no age, nothing
+        // that drifts on a tick (trap 8).
+        Join(h.Merchants, m => m.Profession + "=" + Join(m.Lines, l => l) + "|" + m.More
+            + "|" + m.Empty),
         Join(h.Gaps, g => g.Text + "|" + g.Prompt?.Command),
         Join(h.Deferred, d => d.Text),
         h.Empty?.Heading);

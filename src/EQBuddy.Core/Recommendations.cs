@@ -502,6 +502,20 @@ public enum HelperDoorKind
     /// something the wiki is missing. Both are answers EQBuddy cannot produce on its own.</para>
     /// </summary>
     WikiItem,
+
+    /// <summary>
+    /// A ZONE's own page on eqlwiki (DRA-149 D4).
+    ///
+    /// <para>The door under a merchant line, and the fourth player-clicked one: EQBuddy fetches
+    /// nothing here either. It is the page the line was TRANSCRIBED from, which is the whole
+    /// reason it belongs beside the sentence — the map key it came out of sits under a map
+    /// image EQBuddy does not ship, so "where in the zone" is an answer only the page can
+    /// give.</para>
+    ///
+    /// <para>It resolves through <c>WikiLinks.Page</c> rather than <c>WikiLinks.Search</c>: a
+    /// zone title is not an item and must not go through the item-alias rule.</para>
+    /// </summary>
+    WikiZone,
 }
 
 /// <summary>One door under a recommendation.</summary>

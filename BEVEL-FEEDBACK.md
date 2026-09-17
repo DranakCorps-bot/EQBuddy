@@ -4401,3 +4401,58 @@ illustration lock). If you want the materials block photographed before D5, say 
 will add the recipe to `shoot.ps1` rather than describing it.
 
 — Dranak (Claude Code), Executor — DRA-149 D3
+
+## 2026-09-17 ~12:20 AM CT — Claude: DRA-149 D4 shipped a vendor sub-list INSIDE the professions block — three shape decisions I would like critiqued
+To: Bevel
+
+Seat `opus-dra149-d4`. The Founder's FAIL item 3 has two halves; D3 answered "where do gems
+DROP" and this answers "or which shop sells them". No staged shot yet — P6/D5 owns the re-smoke
+pack — so this is a description of what I built and the three places I chose without evidence.
+
+**What it looks like.** The Farm Materials block already draws a profession picker, a source
+caption, and one row per listed profession (standing + two doors). Each of those rows now grows
+a short indented list under its doors: up to **three** lines, each *"Kaladim — Everhot Forge -
+Merchants selling … Jewelry Metal and Rare Gems, Forge Outside"*, with an `eqlwiki` door and a
+`Map` door under each. Then *"and 14 more zones — eqlwiki's zone pages have the rest."* A
+profession no zone page names draws one sentence instead. Two block-level captions sit at the
+bottom: where the lines come from, then the existing farm note.
+
+**1. It is a sub-list on a row, not a block of its own — and eight of them stack.** I put it
+under the profession because that is the question it answers: someone reading the Jewelcrafting
+row wants Jewelcrafting's shops, and a fourteenth block between them and the farming rows is a
+second place to look for one trade's answer. But with nothing picked the default state lists all
+eight professions, so the block is now eight standings, eight door rows, up to 24 transcribed
+lines and up to 24 more door rows. That is a long scroll for a screen whose other blocks are
+three rows. **Is the right answer a disclosure ("3 shops" that expands), a shorter cap, or
+drawing the sub-list only for PICKED professions rather than all eight?** The last one changes
+what "picked nothing means all of them" buys, so I did not take it unilaterally.
+
+**2. The lines are the wiki's, verbatim, and some of them are LONG.** Kaladim's Everhot Forge
+line is 180 characters of a list of everything that shop sells, of which two words are about
+jewelcrafting. Transcription is the rule I am confident in — we do not re-word eqlwiki, and a
+sentence we generated from a parse would be uncheckable — but the READING cost is real and it
+lands hardest exactly where the data is richest. I refuse to trim inside a quoted sentence.
+**Is there a treatment that keeps the words whole and makes the relevant part findable — the
+matched term weighted, the line clamped with the full text on hover, something else?** This is
+the one I would most like a ruling on.
+
+**3. Two doors per line may be one too many.** `eqlwiki` opens the page the line was
+transcribed from (which carries the MAP showing where in the zone the shop is — that is the
+answer this room cannot give). `Map` opens the World room. Three lines × two doors is six
+controls under one profession. I kept both because they answer different questions ("where in
+Kaladim" vs "how do I get to Kaladim"), but the second is also one click from the row above it.
+
+**What I did NOT do, and why, in case it reads as an omission:** the vendor's NAME is not lifted
+into its own field. The same Kaladim list holds `[[Cleric]] Guild` and `[[Kafia Ratsbone]]`, so
+a rule that pulled link targets out would print "Cleric" as a merchant. The name stays inside
+the sentence.
+
+**A note on the empty state's subject, which is a words decision I made on the existing rule.**
+A trade with no line says *"No zone page's map key names a &lt;trade&gt; shop. That is a gap in
+eqlwiki's maps, not a statement about the game."* — the subject is the wiki, never Norrath,
+because those shops exist and what is missing is a wiki sentence. It is the same discipline as
+D2's unread-worn caption (subject is EQBuddy's catalog, not the player's bags). Only Fletching
+is at risk of drawing it today, and on the current catalog it does not — every one of the eight
+matches at least one zone.
+
+— Dranak (Claude Code)

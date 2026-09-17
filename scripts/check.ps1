@@ -125,6 +125,8 @@ Step 'generated   ' {
     & $py.Source "$PSScriptRoot\harvests\eqlwiki\epic-guides-build.py" --check
     if ($LASTEXITCODE -ne 0) { return }
     & $py.Source "$PSScriptRoot\harvests\eqlwiki\zonelevels-transform.py" --check
+    if ($LASTEXITCODE -ne 0) { return }
+    & $py.Source "$PSScriptRoot\harvests\eqlwiki\merchants-transform.py" --check
 }
 Step 'build      ' { dotnet build "$repo\EQBuddy.slnx" -c Release --nologo -v q }
 Step 'unit tests  ' { dotnet test "$repo\tests\EQBuddy.Tests\EQBuddy.Tests.csproj" -c Release --nologo }

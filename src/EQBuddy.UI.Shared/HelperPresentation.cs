@@ -883,6 +883,94 @@ public static class HelperPresentation
         + "appear in them. An ingredient that is bought, foraged or crafted has no page saying "
         + "where it drops, so it is not in that list.";
 
+    // ---- the vendor half: merchants eqlwiki's zone pages name (DRA-149 D4) -----------------
+
+    /// <summary>
+    /// **HOW MANY MERCHANT LINES ONE PROFESSION SHOWS BEFORE THE REST BECOME A COUNT.**
+    ///
+    /// <para>Three, and the surviving cap SAYS so (trap 50) — the same shape
+    /// <see cref="UnreadWorn"/> and the who rule already keep. Three is not arbitrary: with
+    /// eight professions listed by default, a cap of three puts at most twenty-four transcribed
+    /// sentences under the block, and these sentences are long because they are the wiki's own.
+    /// Jewelcrafting alone matches thirty.</para>
+    /// </summary>
+    public const int MerchantLineCap = 3;
+
+    /// <summary>
+    /// **WHERE THE VENDOR LINES COME FROM, SAID ONCE OVER THE BLOCK** (DRA-149 D4, plan P5 —
+    /// the Founder's FAIL item 3, second half: *"named vendors + where they are when shopping
+    /// vendors"*).
+    ///
+    /// <para>It is a caption about the SOURCE, not about any row, for the reason
+    /// <see cref="ProfessionLearnNote"/> is: a fact about where EQBuddy gets its sentences
+    /// belongs to the block, and repeating it under eight professions is the wall trap 73 names
+    /// in prose.</para>
+    ///
+    /// <para><b>It says "the wiki's own words" because that is the claim the data supports.</b>
+    /// These lines are transcribed from the map key under each zone page's map image; EQBuddy
+    /// matched them on the profession's own vocabulary and did not re-word them, so what a
+    /// player reads is checkable against the page the door opens.</para>
+    /// </summary>
+    public const string MerchantsNote =
+        "Shops eqlwiki's zone maps name, in the wiki's own words — EQBuddy matched them on each "
+        + "profession's materials and tools and changed nothing else. Where a page named the "
+        + "vendor, the name is in the line.";
+
+    /// <summary>One merchant row: the zone, then the page's sentence. The zone leads because it
+    /// is the answer to "where", which is what the line itself often does not say.</summary>
+    public static string MerchantRow(MerchantLine merchant) =>
+        $"{merchant.Zone} — {merchant.Line}";
+
+    /// <summary>
+    /// **WHICH LINES A SURFACE SHOWS — one producer, because both of them show the same ones**
+    /// (trap 4).
+    ///
+    /// <para><b>One line per ZONE before a second from the same one.</b> The cap is a travel
+    /// budget, and three shops in Freeport is one destination rather than three: without this
+    /// rule Freeport fills every profession's list on its own, because it is the page with the
+    /// most map-key entries in the cache. Within a zone the FIRST line wins, which is the page's
+    /// own order — not a ranking, and nothing here invents one.</para>
+    /// </summary>
+    public static IReadOnlyList<MerchantLine> MerchantsShown(ZoneMerchants catalog, Tradeskill skill)
+    {
+        var shown = new List<MerchantLine>();
+        var zones = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        foreach (var merchant in catalog.For(skill))
+        {
+            if (shown.Count >= MerchantLineCap) break;
+            if (!zones.Add(merchant.Zone)) continue;
+            shown.Add(merchant);
+        }
+        return shown;
+    }
+
+    /// <summary>
+    /// The cap's own sentence — <b>what was held back and where the rest of it is</b> (trap 50).
+    ///
+    /// <para>It counts ZONES rather than lines, because a player deciding where to travel cares
+    /// how many places are on offer and not how many shops are in them. The number of lines is
+    /// what the cap acts on; the number of zones is what the sentence is about.</para>
+    /// </summary>
+    public static string MerchantsCapped(int shown, int zones)
+    {
+        var more = zones - shown;
+        return more <= 0
+            ? ""
+            : $"and {more} more {(more == 1 ? "zone" : "zones")} — eqlwiki's zone pages have the "
+              + "rest.";
+    }
+
+    /// <summary>
+    /// The honest empty state for a profession no zone page names.
+    ///
+    /// <para>The subject is <b>eqlwiki's zone pages</b>, never the game: a trade with no shop in
+    /// this list has shops, and what is missing is a line on a wiki page. Saying "nowhere sells
+    /// this" would be a claim about Norrath that this data cannot make.</para>
+    /// </summary>
+    public static string NoMerchantsFor(Tradeskill skill) =>
+        $"No zone page's map key names a {Tradeskills.For(skill).Name} shop. That is a gap in "
+        + "eqlwiki's maps, not a statement about the game.";
+
     // ---- the gear intent strip and its picker (DRA-71 D6) ---------------------------------
 
     /// <summary>
@@ -1221,6 +1309,7 @@ public static class HelperPresentation
         // claimed a `page:room` address for one would be a second navigation grammar.
         HelperDoorKind.WikiSkill => null,
         HelperDoorKind.WikiItem => null,
+        HelperDoorKind.WikiZone => null,
         _ => null,
     };
 
@@ -1241,6 +1330,7 @@ public static class HelperPresentation
         HelperDoorKind.WatchRules => WatchPresetLabel(false),
         HelperDoorKind.WikiSkill => "eqlwiki",
         HelperDoorKind.WikiItem => "eqlwiki",
+        HelperDoorKind.WikiZone => "eqlwiki",
         _ => "",
     };
 
@@ -1290,6 +1380,16 @@ public static class HelperPresentation
                   + "is why EQBuddy could not read it. You open the search yourself; EQBuddy "
                   + "never fetches it for you."
                 : "Search eqlwiki for this item. You open the search yourself; EQBuddy never "
+                  + "fetches it for you.",
+        // DRA-149 D4. The tip names the MAP, because that is what the page has and this room
+        // does not: the line beside this door came out of a map key, and the numbered marker it
+        // belongs to is on the page's own image.
+        HelperDoorKind.WikiZone =>
+            door.Target.Length > 0
+                ? $"Open {door.Target} on eqlwiki — this line is from that page's map key, and "
+                  + "the map showing where the shop is is on it. You open the page yourself; "
+                  + "EQBuddy never fetches it for you."
+                : "Open this zone's page on eqlwiki. You open it yourself; EQBuddy never "
                   + "fetches it for you.",
         _ => "",
     };

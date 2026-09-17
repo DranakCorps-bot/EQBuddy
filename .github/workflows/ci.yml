@@ -142,6 +142,7 @@ jobs:
           python scripts/harvests/eqlwiki/guides-transform.py --check
           python scripts/harvests/eqlwiki/epic-guides-build.py --check
           python scripts/harvests/eqlwiki/zonelevels-transform.py --check
+          python scripts/harvests/eqlwiki/merchants-transform.py --check
 
       - uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
         with:

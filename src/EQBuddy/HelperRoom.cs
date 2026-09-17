@@ -148,6 +148,11 @@ internal sealed class HelperRoom : Grid, IShellRoom
     private int _professionsKnown;
     private int _professionsWatched;
     private int _watchPresets;
+    /// <summary>DRA-149 D4: how many transcribed merchant lines the professions block actually
+    /// drew. It is counted at DRAW rather than read back off <see cref="ZoneMerchants"/>,
+    /// because "the catalog has thirty for Jewelcrafting" and "the screen shows three" are
+    /// different claims and the E2E assertion is about the second (trap 56).</summary>
+    private int _merchantRows;
     private string _goalFace = "";
     private string _factionFace = "";
     private string _unlockFace = "";
@@ -351,6 +356,7 @@ internal sealed class HelperRoom : Grid, IShellRoom
         _professionsKnown = 0;
         _professionsWatched = 0;
         _watchPresets = 0;
+        _merchantRows = 0;
         _goalFace = "";
         _factionFace = "";
         _unlockFace = "";
@@ -852,6 +858,7 @@ internal sealed class HelperRoom : Grid, IShellRoom
             doors.Children.Add(Door(new HelperDoor(
                 HelperDoorKind.WikiSkill, Tradeskills.For(skill).WikiPage)));
             row.Children.Add(doors);
+            BuildMerchants(row, skill);
             block.Children.Add(row);
             _professionRows++;
         }
@@ -862,6 +869,65 @@ internal sealed class HelperRoom : Grid, IShellRoom
         var note = Line(HelperPresentation.ProfessionsFarmNote, Role.Caption);
         note.Margin = new Thickness(0, Tok.SpaceM, 0, 0);
         block.Children.Add(note);
+
+        // The source caption for the merchant lines, under the whole block for
+        // ProfessionLearnNote's reason. It is LAST because it explains rows the reader has
+        // already passed, and because putting it first would head the block with a sentence
+        // about a sub-list rather than about professions.
+        var merchants = Line(HelperPresentation.MerchantsNote, Role.Caption);
+        merchants.Margin = new Thickness(0, Tok.SpaceS, 0, 0);
+        block.Children.Add(merchants);
+    }
+
+    /// <summary>
+    /// **THE VENDOR HALF — where the wiki says you can BUY this profession's supplies**
+    /// (DRA-149 D4, plan P5; the Founder's FAIL item 3, second half).
+    ///
+    /// <para>D3's rows above this block answer "what drops and where". This answers the other
+    /// plan for the same evening: the shop. It is drawn on the PROFESSION's row rather than as a
+    /// block of its own because that is the question it answers — a player reading the
+    /// Jewelcrafting row wants Jewelcrafting's shops, and a fourteenth block between them and
+    /// the farming rows would be a second place to look for one trade's answer.</para>
+    ///
+    /// <para><b>Every line is the page's own sentence</b>, from <see cref="ZoneMerchants"/>, and
+    /// the door beside it opens the page it came from — because the map key it was lifted out of
+    /// sits under a map image this room does not ship, so "where in the zone" is an answer only
+    /// the page can give.</para>
+    ///
+    /// <para><b>Capped at <see cref="HelperPresentation.MerchantLineCap"/>, and the cap says
+    /// so</b> (trap 50). A profession nothing names draws
+    /// <see cref="HelperPresentation.NoMerchantsFor"/> rather than nothing, so an absent list is
+    /// distinguishable from a list that has not loaded.</para>
+    /// </summary>
+    private void BuildMerchants(Panel row, Tradeskill skill)
+    {
+        var shown = HelperPresentation.MerchantsShown(ZoneMerchants.Default, skill);
+        if (shown.Count == 0)
+        {
+            var empty = Line(HelperPresentation.NoMerchantsFor(skill), Role.Caption);
+            empty.Margin = new Thickness(Tok.SpaceM, Tok.SpaceXs, 0, 0);
+            row.Children.Add(empty);
+            return;
+        }
+
+        foreach (var merchant in shown)
+        {
+            var text = Line(HelperPresentation.MerchantRow(merchant), Role.Caption);
+            text.Margin = new Thickness(Tok.SpaceM, Tok.SpaceXs, 0, 0);
+            row.Children.Add(text);
+
+            var doors = new WrapPanel { Margin = new Thickness(Tok.SpaceM, 0, 0, 0) };
+            doors.Children.Add(Door(new HelperDoor(HelperDoorKind.WikiZone, merchant.Zone)));
+            doors.Children.Add(Door(new HelperDoor(HelperDoorKind.World, merchant.Zone)));
+            row.Children.Add(doors);
+            _merchantRows++;
+        }
+
+        var capped = HelperPresentation.MerchantsCapped(shown.Count, ZoneMerchants.Default.ZonesFor(skill));
+        if (capped.Length == 0) return;
+        var more = Line(capped, Role.Caption);
+        more.Margin = new Thickness(Tok.SpaceM, Tok.SpaceXs, 0, 0);
+        row.Children.Add(more);
     }
 
     private void ToggleProfession(Tradeskill skill)
@@ -1239,6 +1305,10 @@ internal sealed class HelperRoom : Grid, IShellRoom
             // The name the GAME printed, searched rather than resolved — see WikiItem's own
             // summary: this door only exists for names that matched no page.
             HelperDoorKind.WikiItem => WikiLinks.Search(door.Target),
+            // DRA-149 D4, and it is the FOURTH arm the comment above predicted. `Page`, for
+            // WikiSkill's reason exactly: a zone title is not an item, and putting one through
+            // the item rule would fold a "+N" off it and consult the alias table on the way.
+            HelperDoorKind.WikiZone => WikiLinks.Page(door.Target),
             _ => null,
         };
         if (url is { Length: > 0 })
@@ -1500,5 +1570,13 @@ internal sealed class HelperRoom : Grid, IShellRoom
         // in Options moves it back — "the room added one" and "the player has one" are the same
         // fact with one producer, and this is what says so from outside.
         $"helperWatchPresets={_watchPresets} " +
-        $"helperWatched={_professionsWatched}";
+        $"helperWatched={_professionsWatched} " +
+        // DRA-149 D4. The vendor half's two numbers, from ONE moment: what the SCREEN drew and
+        // what the shipped catalog HAS for the same professions. The relationship is the
+        // assertion — drawn is capped at three per profession, so it can never exceed the
+        // catalog's, and a zero beside a non-zero catalog is the cap or the pick misbehaving
+        // rather than an empty file (trap 56).
+        $"helperMerchantRows={_merchantRows} " +
+        $"helperMerchantZones={ZoneMerchants.Default.ZoneCount} " +
+        $"helperMerchantLines={ZoneMerchants.Default.LineCount}";
 }
