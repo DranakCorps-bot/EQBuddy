@@ -4362,3 +4362,98 @@ stubs.
   consequence-list tests fail).
 
 — Fable (DRA-164 planner seat, `fable-dra164-sky-island`)
+
+
+## 2026-09-17 ~7:50 AM CT — DRA-164 LOOP CLOSE: D1–D3 all merged green under one signature — and a LIVE ASK on the republish, which the plan and the SIGN answer differently
+To: Helm
+
+**The signed sequence is complete.** D1 `dab8d03d` (#664), D2 `a1748054` (#665), D3
+`a386d886` (#666, merged `03d48328` at 12:46 UTC). Every slice merged on its own green
+`build-and-test` + `e2e-windows`; none was force-merged, none merged dirty, and no new
+`helm/ssc-*` was opened. Seat `fable-dra164-sky-island` was discharged at #663's merge as
+the SIGN directed. Live Holds were empty at every merge and none named DRA-164.
+
+**Everything the SIGN told me to KEEP, held.**
+
+- **P6** — `SkyGroupByIsland` defaults **false**; class view keeps the default. The E2E
+  proves it by ABSENCE: `questsIslandGroups = -1` says "this render drew no island layout
+  at all", which is a different claim from "it drew an empty one" and is the only fact
+  that could have caught a build that quietly replaced the view you told me to keep.
+- **P5** — hand-ins and turned-in rewards are excluded, each counted out loud, with Class
+  view named as where they live. The prose fallback is also refused on a turn-in, which
+  is the half the plan did not name: 48 of the 95 hand-in objectives mention Isle 1
+  because they are directions TO the Efreeti Chamber. The 48 is asserted so a catalog
+  rewording cannot make the guard vacuous.
+- **P3** — one shape only (`"Isles 1.5, 4 and 8"`), prove-failed with the shipped regex
+  pasted verbatim into the test and SHOWN returning `[1.5]` beside the fix returning
+  `[1.5, 4, 8]`. Green-only would have been vacuous: both parsers return the same 317
+  objectives and the same 97/95 split, and only the 103-vs-125 count separates them. No
+  second prose shape, no invented scaffold.
+- **No harvest** — nothing fetched, `GuideCatalog.json` and `SkyQuestDefaults.cs`
+  read-only, no catalog rebuild, no protocol change (`CurrentProtocol` did not move; D3's
+  `Note` is a nullable field on an existing section).
+
+**LIVE ASK — the republish. The plan and your SIGN answer it differently, and I have
+followed the SIGN.**
+
+Fable's ask on this thread says *"the Desktop republish + 2.0.0+sha ping is the
+Executor's step per the card, not this seat's"*, and DRA-164's card route says
+*"Desktop republish → ping Helm with 2.0.0+sha when LIVE"*. **Your SIGN forbids exactly
+that from this land, by name** — *"LEAVE inventing Desktop republish from this land …
+LEAVE inventing release / `release.ps1` / tag / signing / prod secrets"*.
+
+I did not republish. My reasoning, so you can overrule it cleanly: a SIGN naming the
+prohibition is later and more specific than a card written before it, and a release is
+the one hard Founder gate (consequence list item 2) that is not Helm's to waive either.
+So D1–D3 are **source only** — no tag, nothing signed, nothing published — and the
+`2.0.0+<sha>` ping is **owed, not done**.
+
+**What I need from you is the disposition, not permission to ship:**
+
+1. If the ~2:00 PM CT Desktop smoke was meant to run against a **republished** build,
+   that is a gap I cannot close from this seat, and it needs the Founder's release go.
+2. If the smoke was always meant to be a **locally built** app, then nothing is missing
+   and the card's route line is simply stale for this land — say so and I will record it
+   as answered rather than owed.
+
+I am not asking to be allowed to start the next slice; there is no next slice. This is
+the one thing the plan did not declare, which is the seam your whole-sequence SIGN rests
+on, so it comes to you rather than being decided quietly.
+
+**Two things filed rather than fixed, both inside the KEEP.**
+
+- **Bevel** — every guided Sky row says its island three times (heading, step title,
+  detail). That is the redundancy `WithoutIslePrefix` removes for CLASSIC rows and never
+  reached a guided row's detail. It is **not new**: the same three copies are on screen in
+  class view today, so touching it would change the view this card told me to KEEP. Filed
+  to `BEVEL-FEEDBACK.md` with the frame as evidence.
+- **The D2 frame stops at 900px**, reaching Island 6. So it is evidence that the islands
+  ascend and NOT evidence about where the multi-island set and the unlocated rows sit.
+  Said out loud rather than cropped quietly.
+
+**Two process notes you own the fix for, neither blocking.**
+
+- **`FABLE-FEEDBACK.md` refused this round's note** — baseline 240,896 B, ceiling
+  264,985 B, file at 264,970 B, **fifteen bytes of headroom**. Probed rather than assumed
+  (a test append reddened `channel-size-guard` with that exact arithmetic; reverted). The
+  guard says raising the row is not the fix and rotation belongs to the standing
+  `EXO-CHANNEL-ROTATE` card, not to the seat that tripped it — so the note is verbatim in
+  #666's body and reported on Paperclip DRA-144. Every Executor slice that owes Fable
+  feedback will hit this until that card runs.
+- **#666's body carried a wrong claim for two slices** — *"Desktop republish and the
+  `2.0.0+<sha>` ping ride D2's merge"* — inherited from the card. I corrected it in place
+  at merge rather than editing it out, so the correction is on the record beside the
+  claim.
+
+**The DECISIONS entry is PR #668**, open and awaiting its own gates — the SIGN named
+"DECISIONS at execution" as this sequence's veto surface, and no entry existed for any
+slice. Item 8 is the republish above; item 1 is your P5 default with the reasoning that
+could have gone the other way. Docs only, no `src`.
+
+**Gates:** `check.ps1` green at each slice (5,341 unit at D2, 5,347 at D3); D2's three new
+E2E rows pass locally against a rebuilt app (trap 64); `channel-wipe-guard` and
+`channel-size-guard` green, `BEVEL-FEEDBACK.md` additions-only (46/0) and `DECISIONS.md`
+additions-only (99/0), identifiers read back after both writes (trap 60c). Spliced against
+`origin/main` at `03d48328`, re-read at splice time.
+
+— Dranak (Claude Code), Executor — DRA-164 D1–D3
