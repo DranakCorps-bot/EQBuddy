@@ -211,17 +211,20 @@ public static partial class CompanionProjection
     ///
     /// <para>In class view the reward is the heading above the row; in island view nothing
     /// above it says whose work it is, so the row has to — and it says it with Core's own
-    /// <c>SkyIslandRow.Label</c>, which is the string the desktop draws too. The desktop puts
-    /// it in its own coloured run and the phone joins it to the detail; the WORDS are one
-    /// producer either way (#184).</para></summary>
+    /// strings, which are the ones the desktop draws too. The CLASS leads the title
+    /// ("[Cleric] Wind Rune Fana", <c>SkyIslandRow.Title</c> — Founder CLARIFY 2026-09-17)
+    /// and the REWARD joins the detail. The desktop puts the reward in its own coloured run
+    /// and the phone joins it to the detail; the WORDS, and which of the two carries the
+    /// class, are one producer either way (#184).</para></summary>
     private static CompanionChecklistRow IslandRow(QuestChecklistLayout.SkyIslandRow row)
     {
         var one = GuideRows(new QuestChecklistGroup("", "", [row.Row])).Single();
         return one with
         {
+            Text = row.Title,
             Detail = one.Detail is { Length: > 0 } detail
-                ? row.Label + " · " + detail
-                : row.Label,
+                ? row.Reward + " · " + detail
+                : row.Reward,
         };
     }
 

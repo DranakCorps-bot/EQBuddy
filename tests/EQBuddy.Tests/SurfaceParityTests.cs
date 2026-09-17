@@ -793,10 +793,64 @@ public class SurfaceParityTests
         Assert.NotNull(sky.Note);
         Assert.Contains(QuestChecklistLayout.SkyIslandCrossClassNote, sky.Note);
         // A row of one class's work still knows whose it is — the heading above it no longer
-        // does, so the row carries Core's own label.
-        Assert.Contains(
-            Checklist(sky).SelectMany(g => g.Rows),
-            r => r.Detail is { } d && d.StartsWith("Bard · ", StringComparison.Ordinal));
+        // does, so the row carries Core's own strings: the class PREFIXES the title and the
+        // reward leads the detail (Founder CLARIFY 2026-09-17, plan P8).
+        var rows = Checklist(sky).SelectMany(g => g.Rows).ToList();
+        Assert.Contains(rows, r => r.Text.StartsWith("[Bard] ", StringComparison.Ordinal));
+        Assert.Contains(rows,
+            r => r.Detail is { } d && d.StartsWith("Mask of Song", StringComparison.Ordinal));
+    }
+
+    /// <summary>
+    /// **The phone's island row says the class exactly where Core says it does** — the
+    /// prefixed title is <c>SkyIslandRow.Title</c> verbatim, not the phone's own bracket
+    /// grammar. Asserted row-for-row against a direct <c>SkyByIsland</c> call, so a phone that
+    /// spelled "(Bard)" or dropped the prefix on the surface with no hover fails here.
+    ///
+    /// <para>The sibling of the note test below: Core decides the WORDS, the page decides
+    /// nothing, and the class is said ONCE — so the detail beside the title carries the reward
+    /// with no second copy of the class in it.</para>
+    /// </summary>
+    [Fact]
+    public void ThePhonesIslandRowsCarryCoresClassPrefixVerbatim()
+    {
+        var s = IslandSettings();
+        var desktop = QuestChecklistLayout.SkyByIsland(Desktop(s));
+        var phone = Checklist(Sky(s)).ToList();
+
+        Assert.Equal(
+            desktop.Groups.Select(g => string.Join("|", g.Rows.Select(r => r.Title))),
+            phone.Select(g => string.Join("|", g.Rows.Select(r => r.Text))));
+
+        // Every one of them actually carries a bracket — without this the equality above is
+        // satisfied by two surfaces agreeing to draw no prefix at all (trap 78).
+        var all = desktop.Groups.SelectMany(g => g.Rows).ToList();
+        Assert.NotEmpty(all);
+        Assert.All(all, r =>
+        {
+            Assert.StartsWith("[" + r.Row.ClassName + "] ", r.Title, StringComparison.Ordinal);
+            Assert.DoesNotContain(r.Row.ClassName, r.Reward, StringComparison.OrdinalIgnoreCase);
+        });
+
+        // AND THE PHONE'S OWN DETAIL DOES NOT PUT IT BACK. The equality above compares TEXT, so
+        // it is blind to a projection that re-joined "Bard · " onto the detail beside the
+        // prefix — which is exactly the pre-P8 line, and the one change most likely to survive
+        // a careless merge. Read off the wire rows a player would be sent.
+        //
+        // Scoped to the REWARD segment the prefix change is about, not the whole detail: the
+        // rest is the drop location, where the game's own names ("Wizard Schrock") would read
+        // as our redundancy and fail a correct row.
+        var classes = desktop.Groups.SelectMany(g => g.Rows)
+            .Select(r => r.Row.ClassName).Where(c => c.Length > 0)
+            .Distinct(StringComparer.OrdinalIgnoreCase).ToList();
+        Assert.NotEmpty(classes);
+        foreach (var row in phone.SelectMany(g => g.Rows))
+        {
+            var named = classes.Single(c =>
+                row.Text.StartsWith("[" + c + "] ", StringComparison.Ordinal));
+            Assert.DoesNotContain(named, (row.Detail ?? "").Split(" · ")[0],
+                StringComparison.OrdinalIgnoreCase);
+        }
     }
 
     /// <summary>Every exclusion sentence Core produced rides the wire beside the cross-class

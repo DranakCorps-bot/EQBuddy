@@ -684,9 +684,24 @@ $Shots = [ordered]@{
     # and NO "Island 1.5" group: the catalog locates no gathering work on either, and an
     # invented 1-8 scaffold is exactly what this view does not do.
     #
-    # Every row says its own class and reward ("Warrior - Belt of the Four Winds"), because
-    # the reward heading is no longer above it - that is the half of the design a count
-    # cannot check and a picture can.
+    # Every row says its own class and reward, because the reward heading is no longer above
+    # it - that is the half of the design a count cannot check and a picture can.
+    #
+    # RE-PREDICTED FOR D4 (Founder CLARIFY 2026-09-17 ~8:11 AM CT, plan P8), because the
+    # change is to the ROWS this frame exists to show and re-running the old recipe would
+    # commit a picture nobody had predicted (trap 23). The class moved from the trailing
+    # accent run to the FRONT of the title:
+    #
+    #   was:  Kill Gorgalosk on Isle 3 and loot...   Warrior - Belt of the Four Winds   <drop>
+    #   now:  [Warrior] Kill Gorgalosk on Isle 3 and loot...   Belt of the Four Winds   <drop>
+    #
+    # So every row opens with a bracketed class, in accent-free body ink (the prefix is part
+    # of the title run, not a second coloured run), and the accent run beside it is the
+    # REWARD ALONE - no "Warrior - " in front of it any more. The class appears ONCE per row.
+    # Three classes are staged, so a single island's block should show [Druid], [Monk] and
+    # [Warrior] rows interleaved in that order (the sort is class, then reward, then title,
+    # and it is unchanged). The headings, the counts, the exclusion line and the ORDER of the
+    # islands are all untouched by D4 - if any of those moved, the re-shoot found a bug.
     #
     # TALLER THAN THE DEFAULT, for the reason the guide-card shot is: nine headings and 43
     # rows, and a frame that shows only the first island is not evidence about a view whose

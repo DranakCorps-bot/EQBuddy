@@ -981,6 +981,8 @@ public partial class QuestsView : UserControl
         // screen that is no longer there (trap 38's shape — the memo must record what the last
         // message CARRIED).
         _lastIslandLayout = null;
+        _lastIslandRowTitle = "";
+        _lastIslandRowOwner = "";
         _rows.Clear();
         _renderedCount = 0;
         _suppressed = 0;
@@ -1338,6 +1340,15 @@ public partial class QuestsView : UserControl
         // exists — the counts are what the sentences are about.
         $"questsIslandHiddenTurnIns={_lastIslandLayout?.HiddenTurnIns ?? -1} " +
         $"questsIslandHiddenRewards={_lastIslandLayout?.HiddenRewards ?? -1} " +
+        // THE CLASS PREFIX, as the row that reached the panel actually carries it (Founder
+        // CLARIFY 2026-09-17, plan P8). Taken from what RenderIslandView PASSED to the control
+        // it added, not from the layout a moment later — "Core produced a prefixed title" and
+        // "the screen drew one" are different claims (trap 56), and the second is the one the
+        // Founder can see. The owner rides beside it so a test can assert the class is said
+        // ONCE: the pair is the whole row, and a class in both halves is the redundancy P8
+        // moved the label to avoid.
+        $"questsIslandRowTitle={Dumped(_lastIslandRowTitle)} " +
+        $"questsIslandRowOwner={Dumped(_lastIslandRowOwner)} " +
         // ---- the UNLOCKS tab (DRA-65) -------------------------------------------------
         // The section lens, counted off the STRIP rather than from UnlockLayout.Sections:
         // the claim is that the chips reached the screen, and a count taken from the list
@@ -3871,6 +3882,8 @@ public partial class QuestsView : UserControl
     {
         var layout = QuestChecklistLayout.SkyByIsland(matching, _settings.SkyStepsUnderEveryIsland);
         _lastIslandLayout = layout;
+        _lastIslandRowTitle = "";
+        _lastIslandRowOwner = "";
 
         // WHAT IS NOT ON THIS SCREEN, above the rows rather than under them (trap 44 and
         // trap 50). Both sentences are Core's and are EMPTY when nothing was hidden, so this
@@ -3912,9 +3925,21 @@ public partial class QuestsView : UserControl
             {
                 // The island view never locks a row: locking is the Epic tab's master-complete
                 // and there is no Epic island.
+                // The class rides the TITLE and the reward rides the owner run — both of them
+                // Core's strings, and which one carries the class is Core's decision too
+                // (SkyIslandRow.Title). This method picks neither.
                 if (ChecklistRowControl(row.Row, setters, locked: false, lockedClassName: "",
-                        owner: row.Label) is { } control)
+                        owner: row.Reward, title: row.Title) is { } control)
+                {
                     QuestsPanel.Children.Add(control);
+                    // Recorded on ADD, not on build: a row whose setter is missing returns null
+                    // and never reaches the screen, and the dump has to answer for the screen.
+                    if (_lastIslandRowTitle.Length == 0)
+                    {
+                        _lastIslandRowTitle = row.Title;
+                        _lastIslandRowOwner = row.Reward;
+                    }
+                }
             }
         }
     }
@@ -3922,6 +3947,19 @@ public partial class QuestsView : UserControl
     /// <summary>What the LAST island render drew, for the <c>EQBUDDY_EXPAND</c> dump — the
     /// screen's answer, not the store's, which is the distinction trap 56 is about.</summary>
     private QuestChecklistLayout.SkyIslandLayout? _lastIslandLayout;
+
+    /// <summary>The first island row that actually reached the panel, as the two strings the
+    /// control was built from (plan P8). Reset on every island render and cleared by a class
+    /// render, so "-" is the honest answer for "no island row is on screen" rather than the
+    /// previous render's leftovers (trap 38).</summary>
+    private string _lastIslandRowTitle = "";
+
+    private string _lastIslandRowOwner = "";
+
+    /// <summary>One dump value: "-" when absent, and spaces underscored because the dump is
+    /// space-separated <c>key=value</c> and a space would silently corrupt the NEXT pair.</summary>
+    private static string Dumped(string value) =>
+        value.Length == 0 ? "-" : value.Replace(' ', '_');
 
     /// <summary>
     /// ONE checklist row, wired to its own tick — the control both Sky arrangements draw.
@@ -3935,17 +3973,21 @@ public partial class QuestsView : UserControl
     /// <para>Returns <c>null</c> when nothing can set this row, which is the old <c>continue</c>
     /// kept honest: a checkbox with no setter is a control that silently ignores clicks.</para>
     /// </summary>
-    /// <param name="owner">"Warrior · Belt of the Four Winds", on the island view only. In
-    /// class view that is the heading above the row and repeating it would be the redundancy
-    /// the six questions exist to remove; in island view nothing above the row says whose work
-    /// it is, so the row has to.</param>
+    /// <param name="owner">"Belt of the Four Winds", on the island view only — the REWARD,
+    /// whose heading is no longer above the row. In class view that heading is on screen and
+    /// repeating it would be the redundancy the six questions exist to remove.</param>
+    /// <param name="title">The row title to draw when it is not <c>row.Title</c> — the island
+    /// view's class-prefixed "[Cleric] Wind Rune Fana" (<c>SkyIslandRow.Title</c>, Founder
+    /// CLARIFY 2026-09-17). Empty means "the row's own title", so class view is untouched by
+    /// the parameter's existence rather than by a second branch through it.</param>
     private UIElement? ChecklistRowControl(
         QuestChecklistRow row, Dictionary<string, Action<bool>> setters,
-        bool locked, string lockedClassName, string owner = "")
+        bool locked, string lockedClassName, string owner = "", string title = "")
     {
         var text = DesignSystem.Text(Role.Body, "");
         text.TextWrapping = TextWrapping.Wrap;
-        text.Inlines.Add(new System.Windows.Documents.Run(row.Title));
+        text.Inlines.Add(new System.Windows.Documents.Run(
+            title.Length > 0 ? title : row.Title));
         if (owner.Length > 0)
         {
             // Whose work this is, between the step and where it drops: the row reads
