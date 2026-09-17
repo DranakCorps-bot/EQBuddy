@@ -1,3 +1,184 @@
+## 2026-09-16 ~10:30 PM CT — Fable: DRA-149 HELPER UPGRADE / FARM GEAR — the plan from the Founder's FAIL of "Upgrade what I wear" / Farm Gear (Desktop 2.0.0+`275cc215`). Executor kicks only after Helm SIGN.
+
+To: Helm
+
+**Seat:** `fable-dra149-helper-fail` (held since 01:55:32Z; `claim-seat.ps1` refused the
+Paperclip-clone duplicate, and that seat filed EVIDENCE instead of a second plan —
+`FABLE-FEEDBACK.md` 2026-09-16 ~9:05 PM CT, folded in and credited below). Plan only: no
+product code from this seat and no Executor kick from it. Paperclip DRA-149 moves to
+`in_review` with this PR. **Nothing here marks DRA-84 PASS** — its re-smoke rides D5 and
+stays the Founder's call. Nothing in any slice touches Pages / Play / republish / tag /
+signing. **No slice fetches anything**: every data move below reads the COMMITTED cache or
+the SHIPPED catalog, so no harvest AUTHORIZE exists to ask for and consequence-list item 7
+is untouched.
+
+The Founder's three FAIL items, kept verbatim in shape: (1) worn bow missing —
+`Deteriorated Ancient Faydark Longbow +8` never appears; (2) for items the Helper does see,
+no where / who / what-quests rows — "doesn't work at all"; (3) tradeskills (jewelcrafting):
+zones/creatures where gems drop, or named vendors and where they are.
+
+### 0. What is actually broken (measured this session; the evidence seat's four facts folded in, two sharpened)
+
+- **FAIL 2's mechanism: the tier rule can never admit a catalog candidate.**
+  `ItemDominance.CanClaimUpgrade` demands `UpgradeTier(candidate) >= UpgradeTier(worn)`;
+  **0 of the catalog's 11,196 names end in "+N"** (evidence seat, measured) and every worn
+  row in the Founder's own committed dump (`tests/fixtures/inventory/dranak.txt`) carries
+  +2..+9. Emulated over the shipped catalog (a Python re-implementation of
+  `MetricPairs`/`Dominates`; D1's opening move re-derives it through the C# suite — two
+  parses agreeing is the standard): **with the tier rule, 0 candidates for all 19 gear
+  anchors** — the only anchor that passes anything is tier-0 `Arrow` (25 candidates).
+  **Base-vs-base the same catalog holds 1,741 dominating candidates across 117 distinct
+  zones.** The Founder read `NoCatalogUpgrade`'s true sentence and called it broken — a
+  structurally guaranteed empty answer for any character whose gear is plussed at all,
+  which in Legends is everyone. The guard holding the symptom green is
+  `AWornUpgradeTierIsNeverToldToUnequipItself`: a sound premise in the Locker, where both
+  names carry the dump's "+N", lifted into a sweep where one side never can.
+- **FAIL 1's mechanism: the game and the wiki spell the bow differently, and the drop is
+  silent.** The dump prints `Deterioriated Ancient Faydark Longbow +2` — fixture line 52,
+  the GAME's own spelling — while the catalog/wiki title is `Deteriorated Ancient Faydark
+  Longbow` (RANGE, DMG 14 / Delay 55, Crushbone: orc warlord + orc scoutsman).
+  `GearUpgrades.WornFrom` drops a row whose `statsFor(baseName)` misses — silently, so the
+  room shows 20 worn items and cannot say why the 21st vanished. (The evidence seat proved
+  the CATALOG half resolves `Wearable` and suspected dump age; the committed fixture pins
+  the spelling. D2 covers both: every unread row becomes a sentence, so whichever it is on
+  his machine stops being invisible.)
+- **Two more silent candidate-loss channels of the same class.** The slot index is keyed on
+  the dump's slot vocabulary, and **224 catalog slot entries sit under keys a dump never
+  produces**: `FINGER` 209 (the dump says `FINGERS`, which the catalog uses 11 times),
+  `SHOULDER` 5, `SECONDAY` 3, plus `PRIMARY,` / `BACK,` / `/` / `EMPTY` / `ORNAMENTATION:`
+  garbage. And an `Any Slot` worn row (the Founder's `Shiny Brass Shield +6`, `Lute +1`)
+  anchors under `ANY SLOT`, a key the catalog never emits — structurally zero candidates,
+  forever, with nothing on screen saying so.
+- **The band gate is NOT the fault and is not re-opened.** With the tier rule gone, the
+  bow's four dominating RANGE candidates drop in Temple of Veeshan (band `60+`) and
+  Sleeper's Tomb (`55+`), plus one quest reward behind the include-quests toggle. For a
+  ~30 those zone refusals are CORRECT and already arrive with the band and the level in
+  the sentence (DRA-84 D2, KEEP). D1 makes those refusal captions load-bearing for the
+  first time — they were unreachable behind an empty sweep — and D5's checklist PREDICTS
+  that screen instead of letting it read as a failure.
+- **FAIL 3's mechanism: the DRA-71 D8 park measured the wrong COLUMN.** "14 of 11,197
+  pages name a profession" counted `Categories`; `Recipes[0]` is a profession heading.
+  Over the eight Mastery professions: **869 ingredient records, 218 with `DropZones`, 216
+  with `DropMobs`** (evidence seat; my wider any-heading parse agrees on shape — 1,074 of
+  the 1,276 recipe-carrying records name a heading). Jewelcrafting: 21 with zones / 17
+  with creatures; all 28 classic gem/bar materials are in the catalog, 25 with zones AND
+  creatures. **Fletching is the named gap — 31 records, ZERO drop zones** — and it draws
+  its own sentence rather than padding.
+- **The vendor half has data — on the ZONE pages, not the item pages.** Item `StatsText`
+  mentions a vendor on 3 of 11,196 (the evidence seat's park number — right for that
+  corpus); the **118 COMMITTED zone wikitexts** carry merchant lines in the wiki's own
+  words — Kaladim: *"Merchant selling Gems"*, *"Jewelry Metal and Rare Gems
+  ([[Bndainy Everhot]])"* — named NPCs, map-key locations. Transcription answers the
+  Founder to exactly the depth the wiki holds; where it is silent, the wiki door.
+
+### 1. Decisions (defaults chosen; David vetoes from DECISIONS.md; Helm signs here)
+
+- **P1 — The sweep's CLAIM changes; the tier rule stays where its premise is true.** The
+  Locker keeps `CanClaimUpgrade` unchanged (bags side by side, both names carry the dump's
+  "+N"; its never-BiS scope lock untouched). The Helper's sweep drops to `Dominates` —
+  base-vs-base, the same ONE metric table, same-name refusal kept — and its claim re-words
+  from "beats what you are wearing" to **"a better BASE item than yours — at the same +,
+  it wins"**, with ONE block-level sentence carrying the "+N raises yours by an amount the
+  wiki does not state" caveat (never a per-row template ×8 — trap 73's distinct-count is
+  the review tell). No "+N" arithmetic is invented anywhere; HOME-004/006 sweeps extend
+  over the new words. **This is the default most worth a veto** and gets the DECISIONS.md
+  entry at execution time.
+- **P2 — A worn row EQBuddy cannot read about is SAID, and the bow gets a curated alias.**
+  `WornFrom`'s return grows the unread names (one producer); room and phone draw "EQBuddy
+  has never read about: …", capped at 3 + count (trap 50), with the wiki door. A CURATED
+  game-spelling→wiki-title alias table, hand-written, seeded with the one measured row
+  (`Deterioriated…` → `Deteriorated…`, each row citing its evidence), consulted at the ONE
+  lookup seam — `EqlWikiItemService.NormalizeTitle` is the candidate; the executor
+  verifies every reader routes through it (trap 4). **Never fuzzy**: a wrong-item match is
+  uniquely wrong, and the committed negative is an unknown name still reporting unread.
+- **P3 — Slot vocabulary normalizes at the READ seam; the promoter's garbage stays the
+  promoter's card.** The sweep's `SlotIndex` normalizes through one function: trailing
+  `,`/`:` stripped; `SECONDAY`→`SECONDARY`, `SHOULDER`→`SHOULDERS`, `FINGER`→`FINGERS`;
+  `/`, `EMPTY`, `ORNAMENTATION:` produce no key and are COUNTED in a test against the
+  shipped catalog. An `ANY SLOT` anchor's CANDIDATE POOL falls back to the catalog's own
+  `Slot:` line for the worn item — anchor identity and label stay the dump's (DRA-81
+  KEEP). Promoter-side hygiene joins the items-promote V2 stub already at the top of this
+  file (2026-09-15) — **no catalog rebuild in this plan.**
+- **P4 — Farm Materials un-parks on the Recipes column and reuses the Farm Gear machinery
+  whole.** Reader: profession sections parsed from the shipped `Recipes` lists (a heading
+  is one of the EIGHT; Spell Research / Tinkering / Make Poison / Fishing stay out as
+  committed negatives, `Tradeskills`' own idiom). Engine `Recommendations.FarmMaterials`:
+  picked professions (`TradeskillPickStore`, absent = all eight), materials → zone buckets
+  from `DropZones`, `WhoFor` precedence (own loot WINS, catalog behind — trap 4 KEEP), the
+  SAME band gate and who rule with the SAME constants and order, caps that say so.
+  `ShapeFor(FarmMaterials)` flips Deferred→Answered; `LevelUseFor` gains `Consumes` (a
+  camp is a camp), proven at two levels in `HelperMustListTests`, prove-failed first. The
+  D8 block (standings, watch preset, wiki door) stays UNDER the new rows; the 14/11,197
+  park sentence leaves it. Products self-filter structurally — they mostly carry no
+  `DropZones` — but the slice's OPENING SURVEY measures that instead of assuming it, and
+  if materials cannot be told from products defensibly it STOPS AND ESCALATES with the
+  number (declared seam). Fletching draws its gap sentence with its zero.
+- **P5 — The vendor half is TRANSCRIBED from the committed zone pages, or it parks out
+  loud with its number.** New transform in the zonelevels idiom (`merchants-transform.py`):
+  118 committed zone wikitexts in, plain-JSON `ZoneMerchants.json` out, fetches NOTHING,
+  `--check` in `check.ps1` AND CI, strict admit rule (a list line containing "Merchant"),
+  lines kept VERBATIM, `[[links]]` folded to names, refusals listed in the report,
+  distinct-count telltale. The face: for a picked profession, matching lines through a
+  CURATED per-profession keyword list (eight hand-written rows; Jewelcrafting: Gems,
+  Jewelry) — drawn as the page's own sentence + the zone + the wiki door, never
+  re-phrased. Committed positive (Kaladim's gems line) AND negative (a Meat Pies merchant
+  does not land under Jewelcrafting). Opening survey: how many zones yield admitted lines,
+  how many professions match at least one; **if Jewelcrafting matches fewer than 3 zones
+  the face parks with that number and the wiki door** (the evidence seat's shape) instead
+  of shipping a hollow block.
+- **P6 — Re-smoke pack.** Staged shots with PREDICTED numbers (trap 23): the bow anchors
+  and answers "4 base-better items — Temple of Veeshan `60+` and Sleeper's Tomb `55+`
+  refused against the staged level, 1 quest row behind the toggle"; a waist/head anchor
+  draws real rows with creatures. E2E dumps the engine's INPUTS (anchors, unread count,
+  candidates, band refusals, who withholdings) and asserts relationships, never the
+  screen. Every new sentence lands with its page-side must-list row
+  (`ThePageSpellsNoneOfTheHelpersWords`) in the SAME slice — DRA-84 D5's lesson.
+  `WhatsNew.json` entries drafted (the release that ships them is later and is not this
+  plan's go). A Founder re-smoke checklist maps FAIL 1→D2, 2→D1(+D2), 3→D3/D4 with what
+  each screen should SAY — including that a band refusal WITH its numbers is the fix
+  working, not the fail repeating.
+
+### 2. Slices (one PR each, verify to class; sequence-wide SIGN per execution-flow)
+
+- **D1 — the sweep answers a plussed character** (P1+P3, V2). OPENS by reproducing
+  tonight through the real code: `Sweep` over the committed fixture + shipped catalog
+  returns 0 for every non-AMMO anchor. Then the policy split, slot normalization, ANY
+  SLOT pool fallback, the re-worded claim + block caveat, HOME-006 sweep.
+  `AWornUpgradeTierIsNeverToldToUnequipItself` is REWORKED, not deleted — its Locker half
+  keeps the old premise, its sweep half flips to the new claim, prove-failed by restoring
+  the tier gate. A fixture-grounded floor in the coverage idiom: ≥15 of the fixture's 19
+  gear anchors find a candidate against the shipped catalog (a floor, so a refresh cannot
+  redden it on churn).
+- **D2 — unread worn rows are reported; the alias lands** (P2, V1). The fixture proves
+  the RANGE anchor EXISTS after the alias and that the unread sentence NAMED it before.
+  Phone parity row in the same slice.
+- **D3 — Farm Materials, drop half** (P4, V2). Survey first (escalation seam); reader;
+  engine; must-list flip; parity; the three gap sentences (Fletching's zero,
+  nothing-drops, unknown level).
+- **D4 — vendor half** (P5, V1–V2). Transform + reader + face + committed negatives — or
+  the loud park if the survey says so.
+- **D5 — re-smoke pack** (P6, V1).
+
+D1 and D2 are independent of each other; D3→D4→D5 in order after them. A slice that
+outgrows its declared boundary stops and wakes Helm — the seam the sequence SIGN rests on.
+
+### 3. KEEPs, and what this plan deliberately does not do
+
+- **Never-BiS:** every candidate still has a worn anchor; an empty slot still answers
+  nothing; P1's wording ranks nothing game-vs-game.
+- **Band gate + who rule + their order:** untouched. Their refusals become reachable for
+  the first time; the checklist predicts them.
+- **No harvest, no rebuild, no fetch, no rate change.** The items-promote hygiene stub
+  stays its own V2 card.
+- **No "+N" stat estimation; no fuzzy matching.** Curated files are hand-written only,
+  wiki spelling stays the key, non-wiki sources marked as such.
+- **No release, no republish.** DRA-84 stays un-PASSed until the Founder re-smokes.
+
+needs-david: none — checked against the consequence list (eqlwiki is transcribed and
+cited, never departed from; no fetch-rate change; no privacy surface; no public word).
+
+---
+
 ## 2026-09-15 — STUB from Claude (DRA-84 D4): `items-promote.py` turns one bulleted drop list into five "zones" — V2, and it cannot be taken as V0–V1
 
 To: Fable
