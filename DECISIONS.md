@@ -8418,3 +8418,56 @@ Nothing fetched, no catalog rebuild, no `WhatsNew.json` entry (P6 puts them in D
 nothing here marks DRA-84 PASS.
 
 — Dranak (Claude Code), Executor — DRA-149 D3
+
+---
+
+## 2026-09-17 — DRA-164 D4 (DRA-171): the island view's rows prefix their class
+
+Executes P8 of the DRA-164 plan (PR #670, merged `49d0edc6`) under the Helm SIGN pinned
+to head `a58be752`. PR #671.
+
+**Two defaults it could have gone the other way on, and neither is a consequence-list
+door:**
+
+**1. A PR COMMENT was taken as the Helm SIGN.** The ruling arrived as two comments on
+#670 (`5715055057` / `5715055864`), not as a PR review and not as a `HELM.md` commit —
+and `CLAUDE.md`'s DRA-73 M0 cutover 1 names exactly those two forms. I took it as the
+signature and started the slice.
+
+*Why.* The substance is unmistakable: titled `Helm SIGN`, the head SHA pinned, a numbered
+Carry-out addressed to Executor. It is immutable, timestamped and attached to the thing it
+rules on — which is the whole of what cutover 1 says a review buys over an `ssc-N` PR.
+The cutover's purpose was to stop Executor waiting on a ceremony; refusing a signature
+this explicit on its container would have reproduced exactly the stall cutover 2 exists to
+end, and "the SSC has not landed" is already named as not a reason to hold.
+
+*The other way.* Treat the comment as no signature, write a LIVE ASK asking for a review,
+and park the slice. That is defensible on the letter of the doc and it is what an
+automated check would do — `gh pr view 670 --json reviews` returns `[]`.
+
+*Where it landed.* Proceeded, and asked Helm to close the gap in whichever direction it
+prefers — amend cutover 1 to admit a comment, or issue rulings as reviews from here on.
+The standing risk is only that the doc and the practice disagree; David vetoes from here.
+
+**2. The class was REMOVED from the owner label rather than said twice.** P8 asked for the
+prefix and said the row carries it "plus the reward"; it did not say what becomes of the
+class in the existing owner label (`Warrior · Belt of the Four Winds`). I moved the class
+INTO the title and left the reward alone beside it, so each row names its class once.
+
+*Why.* Saying one fact twice on a row is the redundancy the six questions exist to remove,
+and the D3 Bevel note had already filed the island being said three times on every guided
+Sky row. The prefix is only an improvement if it REPLACES the owner's copy.
+
+*The other way.* Keep the owner label exactly as it was and add the prefix in front —
+strictly additive, and unarguably inside the LEAVE list.
+
+*Where it landed.* One copy. Guarded on both surfaces and in the running app
+(`questsIslandRowOwner` is asserted not to name the class), and stated in the plan feedback
+so Fable can rule differently next time at the cost of one line.
+
+**No `WhatsNew.json` entry of its own:** the sentence went into the island-view highlight
+that has not shipped yet, rather than a second highlight about a feature no player has
+seen without the prefix. Nothing here touches privacy, the release go, a public surface,
+or the values line.
+
+— Dranak (Claude Code), Executor — DRA-164 D4 / DRA-171

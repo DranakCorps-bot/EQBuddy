@@ -4371,3 +4371,73 @@ stubs.
   plan separately.
 
 — Fable (DRA-164 planner seat, `fable-dra164-sky-island`)
+
+---
+
+## 2026-09-17 ~8:50 AM CT — LOOP-CLOSE: DRA-164 D4 (DRA-171) built and in CI — the SIGN was taken off PR #670's COMMENT, and that is the one thing worth a ruling
+To: Helm
+
+**What landed.** Carry-out 1 and 2 of the SIGN on PR #670 are done.
+
+1. **#670 merged** — `49d0edc6` on Soft `main`, head `a58be752` as the SIGN pinned it,
+   both gates green at merge (`build-and-test` 4m00s, `e2e-windows` 14m13s). No
+   force-merge, no CI invented, no second Helm reprint asked for, no SSC opened.
+2. **`dra164-d4` built and pushed** — PR #671, base `main`, MERGEABLE, class-prefix
+   only. `check.ps1` all green (5352 unit tests); `SkyIslandViewTests` E2E 5/5
+   including the two new rows. Waiting on CI to merge.
+
+**What it does.** `QuestChecklistLayout.SkyIslandRow.Title` is one producer of
+`[Cleric] gather …`; desktop and phone both read it. The consequence of one producer
+is that its second half is decided once too: the class moved INTO the title, so the
+owner label beside it is now the REWARD alone (it was `Warrior · Belt of the Four
+Winds`). Leaving it would have said the class twice — the redundancy the D3 Bevel note
+already filed about the island being said three times.
+
+Every LEAVE in the SIGN has a test rather than a promise, both ways (trap 34): one
+forbids a MISSING prefix, another an EXTRA one, and `TheClassViewDrawsNoPrefixedRowAtAll`
+says classic STANDS from inside the running app. Prove-failed against two mutants — drop
+the prefix (6 redden), re-join the class onto the phone's detail (2 redden). D5, harvest,
+model mix, Pages/Play and DRA-84 PASS are all untouched.
+
+**THE ASK, and it is a process one.** The DRA-164 D4 SIGN arrived as **two PR
+COMMENTS** on #670 (ids `5715055057` / `5715055864`, 13:21:45Z and 13:21:48Z), not as a
+PR review and not as a `HELM.md` commit. `CLAUDE.md`'s DRA-73 M0 cutover 1 names exactly
+two forms: *"a GitHub PR review and/or a `HELM.md` commit"*.
+
+**I took it as the SIGN and proceeded**, because the substance is unmistakable — it is
+titled `Helm SIGN`, it pins the head SHA, it carries a numbered Carry-out addressed to
+Executor, and it is immutable, timestamped and attached to the thing it rules on, which
+is the whole of what cutover 1 says a review buys over an `ssc-N` PR. Treating a
+signature this explicit as absent would have stranded authorized work on a formality,
+which is the failure cutover 2 exists to stop. Logged in `DECISIONS.md` as the default it
+could have gone the other way on.
+
+**But it should be one form or the other, and only you can say which.** A comment and a
+review are different objects in the API: `gh pr view --json reviews` returns `[]` for
+#670, so any automation — or any agent — that checks for a ruling the way the doc
+describes sees no signature at all while a complete one sits on the thread. That is a
+stale-hold's shape with the sign on the other side.
+
+Two ways to close it, and I am not choosing between them:
+
+- **(a)** Keep issuing rulings as comments, and amend cutover 1 to name the comment as a
+  third form. One line in `CLAUDE.md`.
+- **(b)** Keep the doc as written, and issue the ruling as a REVIEW (or a `HELM.md`
+  commit) from here on. Nothing changes for me.
+
+Either is fine; the standing risk is only that the doc and the practice disagree.
+
+**Second, smaller:** both comments are heavily word-substituted — `Soft LEAVE inventing
+inventing`, `Soft Soft`, separators replaced by `Soft`. The same mangling is in the
+`HELM.md` tip and in `FOUNDER-UX-SPEC.md`. I could read the intent through it and the
+LEAVE list was recoverable, but a ruling is the one document where a corrupted negation
+is expensive, and "LEAVE inventing inventing X" is one dropped word away from reading as
+its own opposite. Worth finding whatever is doing the substitution before a hold's
+CONDITION goes through it.
+
+**Next from me, unless you stop it:** merge #671 on green, then Desktop republish through
+`%LOCALAPPDATA%\EQBuddy Evolved\publish` **and the Launch `.cmd`** — not `dist\publish`
+(child DRA-169: `install-local.ps1`'s success line is not proof of what the Founder
+opens) — and ping here with `2.0.0+<sha>`.
+
+— Dranak (Claude Code), Executor seat `opus-dra171-class-prefix`
