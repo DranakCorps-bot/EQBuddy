@@ -24,6 +24,14 @@ namespace EQBuddy.Core;
 /// ungrouped presentation it has always had.</item>
 /// </list>
 ///
+/// **Since DRA-164 it reads a SECOND body of prose, and that is where the sixth shape came
+/// from.** The island view asks the same question of the GUIDE catalog — a stage's name
+/// (`Isle 6: Bazzt Zzzt`), falling back to an objective's `Where`. Those `Where` strings are
+/// written by a different hand and one of them puts a list under a single isle word:
+/// *"Plane of Sky - Isles 1.5, 4 and 8 respectively."* — 22 steps, see <see cref="Parse"/>.
+/// The five shapes above are untouched by it, and no classic `Source` string in
+/// <c>SkyQuestDefaults</c> uses the list shape at all (a committed negative says so).
+///
 /// **Nothing here writes back into the catalog.** Curated data is never auto-written, and a
 /// parse that guessed wrong would be a wrong island printed with the same confidence as a
 /// right one. When the prose does not clearly name an island this returns nothing, which the
@@ -45,9 +53,33 @@ public static partial class SkyIslands
 
     // "Isle 4", "Isle 1.5", "Isle eight", "Island 6" — the word, then a number or a name.
     // Anchored on the word so a stray number in prose ("2 spawns") cannot become an island.
-    [GeneratedRegex(@"\bisles?\b\s*\.?\s*(?<n>\d+(?:\.\d+)?|[a-z]+)",
+    //
+    // **`rest` is the sixth shape, and it is the only one DRA-164 added** (P3, scope-locked).
+    // The guide catalog writes the Efreeti drop's location as *"Plane of Sky - Isles 1.5, 4
+    // and 8 respectively."* — one isle word governing a LIST — and the five shapes above
+    // captured only the number touching the word, so all 22 of those steps parsed to `[1.5]`
+    // and would have been filed on the half-island alone. That is the failure this file's own
+    // summary calls out: a wrong island printed with the same confidence as a right one, and
+    // the only one of the failures here that a reader cannot notice, because it looks like an
+    // answer. `SkyIslandsTests.TheShippedParserReadTheEfreetiDropAsOneIsland` holds the
+    // before-picture so this is a fix that was shown to fix something (trap 34).
+    //
+    // **The tail is DIGITS ONLY, deliberately.** "Isle four - griffons and pegasus" is a real
+    // catalog string and an `and` arm that accepted words would read "pegasus" as an island;
+    // the same goes for "Isle 7: sphinxes, drakes and undine spirits". A spelled-out number may
+    // still LEAD, because that shape is already in the catalog — a spelled-out number in a
+    // list is not, and inventing an admitted shape no page uses is how the next reader learns
+    // the wrong rule.
+    [GeneratedRegex(
+        @"\bisles?\b\s*\.?\s*(?<n>\d+(?:\.\d+)?|[a-z]+)"
+        + @"(?<rest>(?:\s*(?:,|\band\b|&)\s*\d+(?:\.\d+)?)*)",
         RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)]
     private static partial Regex IsleRx();
+
+    // The numbers inside a matched tail. Only ever run over `rest`, which the regex above has
+    // already proved is a comma/and list of numbers and nothing else.
+    [GeneratedRegex(@"\d+(?:\.\d+)?", RegexOptions.CultureInvariant)]
+    private static partial Regex TailNumberRx();
 
     /// <summary>Every island a step's <c>Source</c> names, in ascending order, without
     /// duplicates. Empty when it names none — which is a real answer, not a failure.</summary>
@@ -64,6 +96,48 @@ public static partial class SkyIslands
             else if (Words.TryGetValue(token, out var word))
                 n = word;
             else continue;   // "Isle of …" and anything else that is not a number
+            if (!found.Contains(n)) found.Add(n);
+
+            // The rest of the list this isle word governs. Empty for all five older shapes,
+            // which is why they come back byte for byte.
+            foreach (Match tail in TailNumberRx().Matches(m.Groups["rest"].Value))
+                if (double.TryParse(tail.Value, NumberStyles.Float, CultureInfo.InvariantCulture,
+                        out var more) && !found.Contains(more))
+                    found.Add(more);
+        }
+        found.Sort();
+        return found;
+    }
+
+    /// <summary>
+    /// A set of islands in one sortable, round-trippable string — the value
+    /// <c>QuestChecklistRow.IslandKey</c> carries.
+    ///
+    /// <para>Zero-padded so "10" could never sort between "1" and "2", and ordered so the set
+    /// starting on the lowest island leads. The empty set is the empty string, which is the
+    /// default on every row that names no island and on every Epic row.</para>
+    ///
+    /// <para><b>It lives here, with its inverse, because DRA-164 gave it a second reader.</b>
+    /// It was <c>QuestChecklistLayout</c>'s private tie-breaker — never shown, only ever
+    /// compared — and the island view needs the SET back to decide which island headings a row
+    /// belongs under. Parsing the HEADING back would be the trap 4 shape twice over: a fact
+    /// stored in one place and recovered from another, and that other a string written for a
+    /// human to read.</para>
+    /// </summary>
+    public static string SetKey(IReadOnlyList<double> islands) =>
+        string.Join("|", islands.Select(i => i.ToString("00.0", CultureInfo.InvariantCulture)));
+
+    /// <summary>The islands a <see cref="SetKey"/> was built from. Round-trips, and answers
+    /// empty for "" and for anything it cannot read exactly — a key it cannot read is a row
+    /// with no island rather than a guess at one.</summary>
+    public static IReadOnlyList<double> FromSetKey(string? key)
+    {
+        if (string.IsNullOrWhiteSpace(key)) return [];
+        var found = new List<double>();
+        foreach (var part in key.Split('|', StringSplitOptions.RemoveEmptyEntries))
+        {
+            if (!double.TryParse(part, NumberStyles.Float, CultureInfo.InvariantCulture, out var n))
+                return [];
             if (!found.Contains(n)) found.Add(n);
         }
         found.Sort();
