@@ -2917,6 +2917,47 @@ public class ShellHostTests
     }
 
     /// <summary>
+    /// **THE VENDOR LINES ARE ON THE SCREEN, AND THE CAP IS WHY THERE ARE NOT MORE**
+    /// (DRA-149 D4, plan P5; the Founder's FAIL item 3, second half).
+    ///
+    /// <para>Three numbers from ONE moment (trap 56), and the assertion is the RELATIONSHIP
+    /// rather than any of them: <c>helperMerchantLines</c> is what the shipped catalog holds,
+    /// <c>helperMerchantRows</c> is what the room drew, and the second is bounded by the cap
+    /// times the eight rows above it. A room that read the catalog perfectly and drew nothing
+    /// satisfies the first two and fails the third — which is the professions block's own
+    /// <c>helperProfChips</c>/<c>helperProfRows</c> discipline, one sub-list in.</para>
+    ///
+    /// <para>The drop half's rows need a played session to rank; these need none, because they
+    /// are the catalog's and a player who has never logged in can still be told where a shop
+    /// is. That is the whole reason the vendor half is a different surface from D3's.</para>
+    /// </summary>
+    [Fact]
+    public void TheProfessionsBlockDrawsTheWikisVendorLinesUnderEachTrade()
+    {
+        using var app = new AppHarness(environment: OpenOn("helper"));
+        app.Launch();
+
+        app.WaitForDump("shellPage", "helper", "the shell to land on the Helper room");
+        app.WaitForDump("helperProfRows", 8, "the professions block to draw the curated eight");
+
+        var catalogLines = app.DumpValue("helperMerchantLines");
+        var catalogZones = app.DumpValue("helperMerchantZones");
+        var drawn = app.DumpValue("helperMerchantRows");
+
+        // The shipped file is not the empty one LoadEmbedded answers with when the resource is
+        // missing — a launched app is the only place that can say so about the packaged build.
+        Assert.True(catalogZones >= 40, $"the packaged catalog has only {catalogZones} zones");
+        Assert.True(catalogLines >= 300, $"the packaged catalog has only {catalogLines} lines");
+
+        // Drawn, capped, and fewer than the catalog holds — the cap doing its job rather than an
+        // empty fold, which is the pair a single number could not tell apart.
+        Assert.True(drawn > 0, "the professions block drew no vendor line");
+        Assert.True(drawn <= 8 * 3, $"{drawn} rows is more than eight professions capped at three");
+        Assert.True(drawn < catalogLines);
+        Assert.Equal(0, app.DumpValue("helperDeadDoors"));
+    }
+
+    /// <summary>
     /// **A SKILL-UP IN THE LOG BECOMES A STANDING ON THE SCREEN** — the writer and the reader
     /// in one assertion (trap 20), from a launched app.
     ///
