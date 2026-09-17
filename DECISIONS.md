@@ -50,12 +50,38 @@ false "LIVE" ping to Helm.**
 one-liner — close on the PROFILE the launch is about, not on a path — but the SIGN declares
 D1–D3 and a script in the Founder's daily loop is not in it; a slice that outgrows its declared
 boundary stops. Filed as its own card. **The default the other way** was to fix it while it was
-in my hand, which is exactly how a signed sequence quietly becomes four slices. (b) **I did not
-touch `%LOCALAPPDATA%\EQBuddy Evolved\publish\`.** It still holds the 06:16 build, and **nothing
-in this repo writes that path** — no script, no installer target, no workflow. If that is the
-copy the Founder's shortcut opens, the smoke must be pointed at `dist\publish` or that folder
-refreshed by whatever owns it; inventing a deployment path to find out is precisely what the
-SIGN forbids. Named to Helm as the one open question.
+in my hand, which is exactly how a signed sequence quietly becomes four slices. (b) I did not invent a
+deployment script. See item 6 — the `%LOCALAPPDATA%` half turned out to be answerable from the
+machine rather than a question for Helm.
+
+**6. `dist\publish` IS NOT WHAT THE FOUNDER OPENS, AND FINDING THAT OUT WAS THE DIFFERENCE
+BETWEEN A TRUE PING AND A USEFUL ONE.** I had written the `%LOCALAPPDATA%` folder up as an open
+question for Helm on the grounds that nothing in this repo writes it. Nothing does — but the
+machine answers it. The **Desktop shortcut** `EQBuddy Evolved.lnk` targets
+`%LOCALAPPDATA%\EQBuddy Evolved\Launch EQBuddy Evolved.cmd`, which runs the exe in
+`%LOCALAPPDATA%\EQBuddy Evolved\publish\`, **not** `dist\publish`. Beside it sits
+**`last-republish.json`** with `landed` / `dest` / `ProductVersion` / `tip`, previously reading
+`2.0.0+275cc215…` landed 2026-09-16 20:43 — **the exact build string in DRA-149's Founder
+FAIL**. So "Desktop republish" is a copy from `dist\publish` into that folder plus the stamp,
+and `install-local.ps1 -Evolved` is only its first half. **The default the other way** was to
+stop where the script stops and ping Helm: the ping would have been TRUE about `dist\publish`,
+and the ~2:00 PM CT smoke would have opened the 06:16 build through the shortcut — a correct
+"LIVE" beside a Sky tab with no Island view. **Where it landed:** completed the copy, stamped
+`last-republish.json` at `2.0.0+03d4832892c0f7441d649f18f221808044930415`, and launched through
+`Launch EQBuddy Evolved.cmd` itself rather than the exe, so the thing verified is the thing the
+Founder clicks. Verified by reading the RUNNING process's path, `ProductVersion` and
+Authenticode (`Valid`, `CN=FlossworksCross-Stitch`, timestamped), plus a UTF-16-LE scan for
+`Island view` / `Class view` in the shipped binary (trap 18). Still no tag, no `release.ps1`, no
+GitHub release, no OneDrive, no update channel, no Pages, no Play Console.
+
+**7. THE TWO LOOPS ARE DIFFERENT LOOPS AND NOTHING IN THE REPO CONNECTS THEM.** The local loop
+this repo documents is `install-local.ps1` → `dist\publish`; the loop the Founder's Desktop
+actually runs is `%LOCALAPPDATA%` → shortcut → `last-republish.json`. The second has **no
+script, no guard and no home in version control** — the only evidence it exists is an untracked
+JSON file on one machine, which is why the first half of this entry could be written in good
+faith. Every future "Desktop republish" instruction inherits that gap. Raised to Helm as a
+posture call; I did not invent the missing script, because where that mechanism should live is
+not an Executor's decision.
 
 — Dranak (Claude Code), Executor — DRA-164 republish
 

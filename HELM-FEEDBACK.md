@@ -4453,12 +4453,49 @@ reason this is a report and not a false "LIVE" ping.**
    PROFILE the launch is about, not on a path — but the SIGN declares D1–D3, and a script
    in the Founder's daily loop is not in it. Filed as its own card rather than smuggled
    into a loop-close.
-2. **I did not touch `%LOCALAPPDATA%\EQBuddy Evolved\publish\`.** It still holds the
-   06:16 build, and **nothing in this repo writes that path** — no script, no installer
-   target, no workflow. If that is the copy the Founder's shortcut opens, the smoke needs
-   to be pointed at `dist\publish` or that folder refreshed by whatever owns it. I am not
-   inventing a deployment path to find out; this is the one question in this note where
-   your answer changes what happens next.
+**AND THE FIRST VERSION OF THIS NOTE WAS ABOUT TO HAND YOU A QUESTION I COULD ANSWER
+MYSELF. `dist\publish` IS NOT WHAT THE FOUNDER OPENS.**
+
+I had written `%LOCALAPPDATA%\EQBuddy Evolved\publish\` up as an open question for you,
+on the grounds that nothing in this repo writes it. Nothing in this repo does — but the
+machine answers it, and I should have looked before asking:
+
+- The **Desktop shortcut** `EQBuddy Evolved.lnk` targets
+  `%LOCALAPPDATA%\EQBuddy Evolved\Launch EQBuddy Evolved.cmd`, which runs the exe in
+  `%LOCALAPPDATA%\EQBuddy Evolved\publish\` — **not** `dist\publish`.
+- Beside it sits **`last-republish.json`**, carrying `landed`, `dest`, `ProductVersion`
+  and `tip`. Its previous contents were `2.0.0+275cc215…` landed 2026-09-16 20:43 —
+  **the exact build string in DRA-149's Founder FAIL.** That file is the record of the
+  republish loop, and its `ProductVersion` is where the card's "2.0.0+sha" comes from.
+
+So **"Desktop republish" is a copy from `dist\publish` into that folder plus the stamp**,
+and `install-local.ps1 -Evolved` is only its first half. Had I stopped where the script
+stopped and pinged you, the ping would have been true about `dist\publish` and the
+~2:00 PM CT smoke would have opened the 06:16 build through the shortcut — a correct
+"LIVE" and a Founder looking at a Sky tab with no Island view.
+
+**Completed, and verified through the door the Founder actually uses:** closed the
+portable copy gracefully, copied the signed payload over, stamped `last-republish.json`
+with `2.0.0+03d4832892c0f7441d649f18f221808044930415` / tip `03d48328…`, launched via
+**`Launch EQBuddy Evolved.cmd` itself** rather than the exe, and read the running
+process's own path, `ProductVersion` and Authenticode back: `Valid`,
+`CN=FlossworksCross-Stitch`, timestamped. The binary carries the strings `Island view`
+and `Class view` (UTF-16-LE scan, trap 18), so this is the built feature and not a stale
+assembly with a fresh timestamp.
+
+Still no tag, no `release.ps1`, no GitHub release, no OneDrive, no update channel, no
+Pages, no Play Console. A local copy into the Founder's own folder is none of those, and
+it is the loop that was already run on 2026-09-16 at 20:43.
+
+**The part that IS yours, and it is bigger than the lock bug:** the local loop the repo
+documents (`install-local.ps1` → `dist\publish`) and the loop the Founder's Desktop
+actually runs (`%LOCALAPPDATA%` → shortcut → `last-republish.json`) **are different
+loops, and nothing in the repo connects them.** The second one has no script, no guard
+and no home in version control — the only evidence it exists is an untracked JSON file on
+one machine. Every future "Desktop republish" instruction inherits that gap, and a
+republish that stops at the script's success line will keep being wrong in the quiet
+direction. I have not invented a script for it; where that mechanism should live is a
+posture call rather than an Executor one.
 
 **Two things filed rather than fixed, both inside the KEEP.**
 
