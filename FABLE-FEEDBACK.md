@@ -3407,3 +3407,60 @@ not been told" and is not what the E2E's warrior has. Predicting the numbers is 
 it would have photographed perfectly (trap 23).
 
 — Dranak (Claude Code, DRA-84 D5)
+
+---
+
+## 2026-09-16 ~9:05 PM CT — Planner: DRA-149 EVIDENCE for the seat that holds the card (Founder FAIL of Helper Farm Gear, Desktop 2.0.0+`275cc215`)
+
+To: Fable
+
+**I did not write this plan, deliberately.** Paperclip checked DRA-149 out to me at
+`01:55:11Z`; the Bosun lane kicked `fable-dra149-helper-fail` for the same card at `01:55:32Z`,
+21 seconds later. `claim-seat.ps1` (invoked RESOLVED, DRA-107) refused my default claim and
+named the holder in the other clone — and the holder is **live**, not stale: pid 4560,
+`run-seat-silent.ps1 -WorkItem DRA-149`, still running. The holder owns the plan and the ONE
+LIVE ASK; a second plan and a second wake is what trap 70 / #566+#568 cost. The full evidence
+pack and the acceptance bar are on the Paperclip card; the four facts a plan must not
+re-derive:
+
+1. **The build is not stale and the catalog is not the fault.** `275cc215` is an ancestor of
+   `origin/main` and carries the D3 refresh (11,196 records, 5,591 with `DropMobs`).
+   `Deteriorated Ancient Faydark Longbow` is IN it — `Slots [RANGE]`, DMG 14/Delay 55,
+   `DropZones ["Crushbone"]`, `DropMobs { Crushbone: [orc warlord, orc scoutsman - Rare Drop] }`
+   — and `StatsFor` resolves it `Wearable`, so `WornFrom` cannot be dropping it for want of
+   stats. What remains is the DUMP (age or a worn location we do not read), and the room says
+   nothing about either: `WornFrom` drops a row silently.
+
+2. **The tier rule can never admit a catalog candidate — MEASURED: 0 of 11,196 catalog names
+   end in "+N".** `CanClaimUpgrade` demands `UpgradeTier(candidate) >= UpgradeTier(worn)`, and
+   the catalog keys the BASE item by construction, so every worn "+N" refuses **every**
+   candidate, permanently. His bow is **+8**. `AWornUpgradeTierIsNeverToldToUnequipItself`
+   asserts that symptom GREEN with a prove-it-fires negative beside it — a sound guard whose
+   premise was lifted from the Locker (bags vs bags, where both sides carry the dump's "+N")
+   into a sweep where one side never can. It is margin-blind too: a worn **+1** refuses a
+   candidate 200 AC better.
+
+3. **D2's band gate eats the bow's only camp.** Crushbone is `5-20` and is the item's ONLY
+   zone, so it is refused for any character level **≥ 30**. Even with (2) fixed the bow answers
+   nothing for a level-30+ character. The gate's premise is a LEVELLING premise; "where does
+   the item I NAMED drop" is not a suggestion about where to level.
+
+4. **The tradeskill park rests on the wrong COLUMN.** DRA-71 D8's "14 of 11,197 pages name a
+   profession" was measured on `Categories`. `Recipes[0]` is the profession heading, and over
+   the eight Mastery professions it is **869 ingredient records, 218 with `DropZones`, 216 with
+   `DropMobs`** — Jewelcrafting **21 / 17**, joining to Steamfont Mountains (13 distinct
+   ingredients), Lesser Faydark (12), Unrest (11), and `Amber` alone naming 22 Mistmoore
+   creatures. So the Founder's gem ask is answerable from SHIPPED data, no harvest and no
+   un-PARK. **Fletching is 31 records with ZERO drop zones** — keep that gap out loud. The
+   vendor half is the opposite: **3 of 11,196** `StatsText` mention a vendor at all and no field
+   names a seller or its zone, so vendors PARK on that number with the eqlwiki door as the
+   shape.
+
+**Reinforcing, and it is the thing that made this diagnosis cheap:** D4's habit of writing the
+SURVEY NUMBER into the doc comment is why (4) was findable at all — I could see what had been
+counted, so I could see which column had not been. **Constructive:** a park earns its number's
+FIELD NAME beside it. "14 of 11,197 pages name a profession" survived two slices because
+nothing in the sentence said `Categories`, and the field that does answer was sitting in the
+same record.
+
+— Planner (Fable seat, Paperclip DRA-149)
