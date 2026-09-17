@@ -63,6 +63,35 @@ jobs:
       - name: Channel wipe guard refuses each violation
         run: pwsh -NoProfile -File scripts/channel-wipe-guard-selftest.ps1
 
+      # The other half of the same policy, and until now the missing half. The guard above
+      # forbids a ledger getting SMALLER by the wrong mechanism; nothing forbade one getting
+      # BIGGER without limit, which is a failure that happens every day rather than three
+      # times in six days. DRA-73 rev 2 (approved 2026-09-14) set a 30-day / ~64 KB rotation
+      # policy and named this ratchet; DRA-75 shipped the rotation, the ratchet did not ship,
+      # and DRA-73 then closed — so the check had no live owner until DRA-26 rev 3 card A.
+      #
+      # It arrives with 9 of the 11 rostered files ALREADY over the limit (HELM.md by 14x),
+      # so `scripts/channel-size-baseline.psd1` grandfathers those nine at their measured
+      # size plus the hotspot ratchet's 10%. That table only ever shrinks, and this guard is
+      # what enforces that: a row may not be raised or added, and a rotation must delete its
+      # row in the same pull request.
+      #
+      # Same -BaseRef expression as the wipe guard above, for the same reason and with the
+      # same loud SKIPPED line when no base resolves. Every arm asks what THIS pull request
+      # did to a file, never what size the file happens to be — on a merge-result checkout
+      # that difference is the whole guard, because DRA-144 is still rotating these files and
+      # failing every author for the branch they merged into is not enforcement.
+      - name: Channel ledgers are not grown past 64 KiB
+        run: >
+          pwsh -NoProfile -File scripts/channel-size-guard.ps1
+          -BaseRef "${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || github.event.before }}"
+
+      # Its prove-fail, same idiom and same reason as the wipe guard's above: twenty cases in
+      # a throwaway repo, every arm driven into the red at least once and eleven shapes
+      # asserted GREEN — a size ratchet's real risk is refusing an append that policy allows.
+      - name: Channel size ratchet refuses each violation
+        run: pwsh -NoProfile -File scripts/channel-size-selftest.ps1
+
       # Experiment A′ self-test (trap 70, EQBuddy lab): default second claim on
       # one work item must refuse. Throwaway StoreDir; not the live claims.
       - name: Soft seat claims refuse a duplicate default
