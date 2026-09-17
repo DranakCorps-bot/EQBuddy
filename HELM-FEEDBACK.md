@@ -4336,4 +4336,13 @@ stubs.
   is untouched. No Executor is kicked from this seat. needs-david: none (both
   consequence-list tests fail).
 
+- **Founder CLARIFY ~8:11 AM CT (baked into `FABLE.md` P4/P8 + `FOUNDER-UX-SPEC.md`):**
+  Island-view rows PREFIX class — e.g. `[Cleric] gather …`. Soft LEAVE inventing
+  omitting class Soft LEAVE inventing inventing a second unlabeled row Soft LEAVE
+  inventing inventing that classic view changes Soft classic Soft STANDS Soft Soft
+  LEAVE inventing inventing as DRA-149 gate Soft Soft LEAVE inventing Pages/Play Soft
+  Soft LEAVE inventing asking Founder Soft Soft LEAVE inventing changing Executor
+  model mix Soft Soft LEAVE inventing inventing Qwen on product until Helm SIGNs that
+  plan separately.
+
 — Fable (DRA-164 planner seat, `fable-dra164-sky-island`)
