@@ -663,6 +663,64 @@ $Shots = [ordered]@{
                                    @{ Id = 'sky-060'; Acquired = $true }   # Efreeti Statuette
                                )
                            } }
+    # ---- DRA-164: the ISLAND view ----------------------------------------------------
+    #
+    # THE FOUNDER'S OWN EXAMPLE, staged: warrior/monk/druid, grouped by island. The ask
+    # (2026-09-17) was "multi-select which classes I am, then group checklist by island -
+    # everything to collect on island N before moving to next", and the three classes are
+    # named in it, so the picture is of the thing that was asked for rather than of a
+    # convenient single class.
+    #
+    # PREDICTION, written before the run (trap 23). Nine groups, in this order, with these
+    # counts - derived from the shipped GuideCatalog by scripts/dra164-island-survey.py and
+    # narrowed to the three classes:
+    #
+    #     Island 3    0/3      Island 6    0/3      Islands 1.5 / 4 / 8   0/4
+    #     Island 4    0/3      Island 7    0/4      Not placed            0/1
+    #     Island 5    0/4      Island 8    0/3      The wind rune         0/18
+    #
+    # 43 gathering rows drawn out of 61 objectives; the other 18 are hand-ins and are
+    # EXCLUDED, so the frame must carry the line saying so above the rows. NO "Island 1"
+    # and NO "Island 1.5" group: the catalog locates no gathering work on either, and an
+    # invented 1-8 scaffold is exactly what this view does not do.
+    #
+    # Every row says its own class and reward ("Warrior - Belt of the Four Winds"), because
+    # the reward heading is no longer above it - that is the half of the design a count
+    # cannot check and a picture can.
+    #
+    # TALLER THAN THE DEFAULT, for the reason the guide-card shot is: nine headings and 43
+    # rows, and a frame that shows only the first island is not evidence about a view whose
+    # whole claim is the ORDER the islands come in.
+    #
+    # MEASURED, and the prediction held: Island 3 0/3, Island 4 0/3, Island 5 0/4, Island 6
+    # 0/3, ascending, with the hand-in line above them and no hidden-rewards line (nothing
+    # is turned in). Every row says its class and reward.
+    #
+    # TWO THINGS THE PICTURE SAID THAT THE COUNTS COULD NOT, both recorded rather than
+    # fixed here:
+    #
+    # 1. THE FRAME REACHES ISLAND 6 AND STOPS. The four groups below it - Island 7, Island
+    #    8, "Islands 1.5 / 4 / 8", "Not placed" and "The wind rune" - are under the fold at
+    #    900px, which is already about as tall as the shot host gets. So this frame is
+    #    evidence that the islands ASCEND and that a player reads one island's work
+    #    together; it is NOT evidence about where the multi-island set and the unlocated
+    #    rows sit. Said out loud rather than cropped quietly, per the illustration lock.
+    #
+    # 2. THE ISLAND IS SAID THREE TIMES ON EVERY GUIDED ROW: the heading ("Island 3"), the
+    #    step title ("Kill Gorgalosk on Isle 3 and loot..."), and the detail ("Gorgalosk -
+    #    Plane of Sky - Isle 3."). That is the exact redundancy SkyIslands.WithoutIslePrefix
+    #    removes for CLASSIC rows, and it does not reach a guided row's detail - which comes
+    #    from GuidePresentation. It is NOT new in the island view and not this slice's to
+    #    fix: the same three copies are on screen in class view under the stage heading
+    #    "Isle 3: Gorgalosk", so touching it would change the view DRA-164 was told to KEEP.
+    #    Filed for Bevel with this frame as the evidence.
+    'shell-quests-sky-island' = @{ Title = 'EQBuddy — Guide'
+                           Env = @{ EQBUDDY_SHELL = 'quests:sky'
+                                    EQBUDDY_SHELL_SIZE = '1000x900' }
+                           Ledger = @{ Classes = @('Warrior', 'Monk', 'Druid') }
+                           Set = @{
+                               SkyGroupByIsland = $true
+                           } }
     # ---- E-3 PR 4: the HOME room, and the default landing ----------------------------
     #
     # **`EQBUDDY_SHELL = '1'` is deliberate and is half of what these shots prove.** Every

@@ -90,6 +90,7 @@ public partial class QuestsView : UserControl
         _tabs = new EqSegmentedStrip(TabStrip);
         _classes = new EqSegmentedStrip(ClassStrip);
         _modes = new EqSegmentedStrip(ModeStrip);
+        _skyView = new EqSegmentedStrip(SkyViewStrip, compact: true);
         _unlockPool = new WikiPackPool(main.StoredMobRows);
         _helper = new GuideHelperSource(main);
         BuildStaticChrome();
@@ -107,6 +108,7 @@ public partial class QuestsView : UserControl
         StateCombo.SelectedIndex = 0;
         BuildUnlockSectionStrip();
         BuildModeStrip();
+        BuildSkyViewStrip();
         // Ctrl+Z, because the undo button promises it and a promise in a tooltip is a
         // feature. Not while typing in the search box — there it means undo the text.
         //
@@ -301,6 +303,8 @@ public partial class QuestsView : UserControl
     private EqSegmentedStrip _tabs = null!;
     private EqSegmentedStrip _classes = null!;
     private EqSegmentedStrip _modes = null!;
+    /// <summary>Class view · Island view, on the Sky tab (DRA-164).</summary>
+    private EqSegmentedStrip _skyView = null!;
     private EqSegmentedStrip _unlockSections = null!;
 
     /// <summary>Build the strip from Core's <see cref="QuestSurface"/> so the desktop and
@@ -356,6 +360,47 @@ public partial class QuestsView : UserControl
         }
         ApplyModeVisual();
     }
+
+    /// <summary>
+    /// Class view · Island view (DRA-164, the Founder's ask of 2026-09-17).
+    ///
+    /// <para><b>KEEP was the first word of the ask</b>, so "Class" leads and is what a player
+    /// who upgrades sees. Both chips are always offered — an island view that appeared only
+    /// once some condition was met would be a surface nobody could find.</para>
+    ///
+    /// <para>The fifth instance of the one primitive (<c>EqChip</c> / <c>EqSegmentedStrip</c>),
+    /// never hand-built: the tabs, the class lens, the mode strip and the Unlocks section lens
+    /// are the other four, and a two-chip control wearing its own clothes is the odd one out
+    /// this rule exists to prevent.</para>
+    /// </summary>
+    private void BuildSkyViewStrip()
+    {
+        foreach (var (key, label, tip) in new[]
+        {
+            ("class", "Class view",
+                "Grouped by your class and the reward you're working toward — the view "
+                + "EQBuddy has always had, and still the default."),
+            ("island", "Island view",
+                "Grouped by ISLAND, across every class you've picked: everything to collect "
+                + "on one island before you move to the next. Hand-ins aren't listed here — "
+                + "the Ready band above still says what you can turn in."),
+        })
+        {
+            var island = key == "island";
+            _skyView.Add(label, key, tip: tip, onClick: () =>
+            {
+                if (_settings.SkyGroupByIsland == island) return;
+                _settings.SkyGroupByIsland = island;
+                _settings.Save();
+                ApplySkyViewVisual();
+                Refresh(force: true);
+            });
+        }
+        ApplySkyViewVisual();
+    }
+
+    private void ApplySkyViewVisual() =>
+        _skyView.Select(_settings.SkyGroupByIsland ? "island" : "class");
 
     /// <summary>Any · one of your classes. The class picker still decides WHICH classes
     /// you have; this decides which of them you're looking at right now, which is a
@@ -416,7 +461,10 @@ public partial class QuestsView : UserControl
         // The Epic tab's own lens, which followed the Epic card here when the widget
         // consolidated its quest cards (2026-08-16).
         EpicClassicOnlyCheck.Visibility = _tab == QuestTab.Epic ? Visibility.Visible : Visibility.Collapsed;
-        SkyIslandRepeatCheck.Visibility = _tab == QuestTab.Sky ? Visibility.Visible : Visibility.Collapsed;
+        // The HOST, which carries both Sky lenses — the view toggle and the repeat check.
+        // One assignment for the pair, because the decision is "are we on the Sky tab" and
+        // that is a fact about the pair, not about either control (trap 15).
+        SkyViewHost.Visibility = _tab == QuestTab.Sky ? Visibility.Visible : Visibility.Collapsed;
         // Unlocks is divided by SECTION, not by class, so the class picker is replaced by
         // a section lens; the state lens is not wired here and an inert filter is worse
         // than an absent one. EVERY CONTROL BELOW IS ASSIGNED EXACTLY ONCE — an earlier
@@ -873,6 +921,19 @@ public partial class QuestsView : UserControl
             // So the store said "you have the Stone Amulet" and this tab went on drawing
             // the moment before — measured in E2E, not theorised.
             $"|ck:{ChecklistTickSignature()}" +
+            // THE SKY TAB'S TWO LENSES — the Class/Island toggle (DRA-164) and the repeat
+            // choice beside it. Trap 72 BY NAME, in the commit the island reader lands in:
+            // nothing else in this signature moves when either is flipped, and each one
+            // changes every row on the tab.
+            //
+            // Their own chips force a refresh, so this is not about the control the player
+            // pressed — it is about the OTHER instance. QuestsWindow and QuestsRoom each
+            // build their own QuestsView (trap 45) over ONE AppSettings, so switching to
+            // Island view in the shell left the window drawing the class view until something
+            // unrelated moved. Exactly the fold's story, one store later; the repeat flag has
+            // had the same hole since it shipped and gets closed here because DRA-164 gave it
+            // its second reader.
+            $"|sky:{(_settings.SkyGroupByIsland ? 1 : 0)}{(_settings.SkyStepsUnderEveryIsland ? 1 : 0)}" +
             // THE FOLD. Every guided group on all three tabs reads AppSettings.GuideExpanded
             // to decide whether it starts open, and nothing else in this signature moves when
             // it does. The fold control's own click forces a refresh, so this is not about
@@ -915,6 +976,11 @@ public partial class QuestsView : UserControl
         _renders++;
         QuestsPanel.Children.Clear();
         _lastGuideCards.Clear();
+        // What the last render DREW, cleared with the panel it drew into: a dump that kept
+        // reporting an island layout after a switch back to class view would be describing a
+        // screen that is no longer there (trap 38's shape — the memo must record what the last
+        // message CARRIED).
+        _lastIslandLayout = null;
         _rows.Clear();
         _renderedCount = 0;
         _suppressed = 0;
@@ -1247,6 +1313,31 @@ public partial class QuestsView : UserControl
         $"questsReadySummary={(SummaryRow.Visibility == Visibility.Visible ? 1 : 0)} " +
         $"questsTabs={_tabs.Count} " +
         $"questsModes={_modes.Count} " +
+        // ---- the SKY tab's island view (DRA-164) --------------------------------------
+        // The MODE as the setting holds it, and the STRIP that offers it — counted off the
+        // real strip rather than from the list that built it, because the claim is that the
+        // chips reached the screen and an absent control photographs as an unremarkable
+        // panel (trap 29). `questsSkyViewShown` is the host's own visibility, which is what
+        // says the pair is on the Sky tab and nowhere else.
+        $"questsSkyIsland={(_settings.SkyGroupByIsland ? 1 : 0)} " +
+        $"questsSkyRepeat={(_settings.SkyStepsUnderEveryIsland ? 1 : 0)} " +
+        $"questsSkyViewChips={_skyView.Count} " +
+        $"questsSkyViewShown={(SkyViewHost.Visibility == Visibility.Visible ? 1 : 0)} " +
+        // WHAT THE LAST RENDER DREW, from ONE moment (trap 56): the setting says the player
+        // asked for the island view, and these say the screen actually built one. -1 is
+        // "this render drew no island layout at all", which is a different claim from "it
+        // drew an empty one" and is the state a stale memo would hide (trap 38).
+        $"questsIslandGroups={_lastIslandLayout?.Groups.Count ?? -1} " +
+        // The first heading, which is the ORDERING claim — "the lowest island leads" is the
+        // whole of "before moving to the next" and nothing else in this dump can say it.
+        // SPACES BECOME UNDERSCORES because the dump is space-separated `key=value` and a
+        // value containing a space would silently corrupt the pair after it, not this one.
+        $"questsIslandFirst={(_lastIslandLayout?.Groups.FirstOrDefault()?.Heading ?? "-").Replace(' ', '_')} " +
+        $"questsIslandRows={_lastIslandLayout?.Groups.Sum(g => g.Rows.Count) ?? -1} " +
+        // The two exclusions, so a test can assert they FIRED rather than that a sentence
+        // exists — the counts are what the sentences are about.
+        $"questsIslandHiddenTurnIns={_lastIslandLayout?.HiddenTurnIns ?? -1} " +
+        $"questsIslandHiddenRewards={_lastIslandLayout?.HiddenRewards ?? -1} " +
         // ---- the UNLOCKS tab (DRA-65) -------------------------------------------------
         // The section lens, counted off the STRIP rather than from UnlockLayout.Sections:
         // the claim is that the chips reached the screen, and a count taken from the list
@@ -3571,6 +3662,18 @@ public partial class QuestsView : UserControl
             return;
         }
 
+        // ISLAND VIEW (DRA-164). Downstream of the class picker, the class lens and the state
+        // lens — it is the same checklist the player is already looking at, rearranged. The
+        // search box above returns before this and still crosses every class, unchanged; the
+        // Ready band, the leftover bands and the class counts are already on screen and stay
+        // there in BOTH modes, because they answer cross-class questions the arrangement does
+        // not change.
+        if (tab == QuestTab.Sky && _settings.SkyGroupByIsland)
+        {
+            RenderIslandView(matching, setters);
+            return;
+        }
+
         var lastClass = "";
         foreach (var group in matching)
         {
@@ -3744,74 +3847,177 @@ public partial class QuestsView : UserControl
                     island.Ink("DimBrush");
                     QuestsPanel.Children.Add(island);
                 }
-                var text = DesignSystem.Text(Role.Body, "");
-                text.TextWrapping = TextWrapping.Wrap;
-                text.Inlines.Add(new System.Windows.Documents.Run(row.Title));
-                if (row.Detail.Length > 0)
-                {
-                    // The drop location, dimmed — present on every row, because "where
-                    // does this come from" is the question the row exists to answer.
-                    var detail = new System.Windows.Documents.Run("   " + row.Detail);
-                    detail.SetResourceReference(System.Windows.Documents.Run.ForegroundProperty, "DimBrush");
-                    text.Inlines.Add(detail);
-                }
-                if (row.Unassigned)
-                {
-                    // The auto-tick guessed which class earned a shared item. Say so.
-                    var mark = new System.Windows.Documents.Run(" *") { FontWeight = FontWeights.Bold };
-                    mark.SetResourceReference(System.Windows.Documents.Run.ForegroundProperty, "WarnBrush");
-                    text.Inlines.Add(mark);
-                }
-                text.Ink(row.Acquired || row.IsSkipped ? "DimBrush" : "TextBrush");
-                // "Not doing this one." Struck through and dimmed, so a skipped step reads as
-                // deliberately set aside rather than as merely unfinished.
-                if (row.IsSkipped) text.TextDecorations = TextDecorations.Strikethrough;
-
-                // A stub step says so, in the player's words, under its own title. It stays
-                // fully tickable — manual state beats weak inference, and "we could not find
-                // directions" is a fact about US, not about how far the player has got.
-                // A VERTICAL StackPanel: TextWrapping does nothing in a horizontal one (trap 14).
-                FrameworkElement content = GuideSubLines(text, row);
-
-                var check = new CheckBox
-                {
-                    Tag = row.GuideRowKey.Length > 0 ? GuideRowTag : null,
-                    Content = content,
-                    IsChecked = row.Acquired,
-                    Margin = new Thickness(DesignTokens.SpaceM, 1, 0, 1),
-                    // The six questions live on the hover for a guide row: the row itself
-                    // says what to do and where, and repeating why and how inline is the
-                    // redundancy the six are meant to remove (David, 2026-09-09).
-                    ToolTip = row.Unassigned
-                        ? "EQBuddy ticked this itself — several classes want this item and the "
-                          + "log couldn't say which one earned it. Move the tick if it's on the "
-                          + "wrong class; either way, toggling it settles the question."
-                        : row.GuideFacts.Length > 0 ? row.GuideFacts : null,
-                };
-                if (locked)
-                {
-                    check.IsEnabled = false;
-                    // And LOOK disabled. The app's CheckBox style carries no disabled
-                    // visual, so IsEnabled alone leaves a control that reads as live and
-                    // silently ignores clicks — the "silent no-ops are broken" rule with
-                    // the switch on the other side. Found by looking at the screenshot.
-                    check.Opacity = 0.5;
-                    check.ToolTip = $"{group.ClassName}'s epic is marked complete. "
-                        + "Reopen it above to change individual steps.";
-                }
-                if (!setters.TryGetValue(row.Id, out var set)) continue;
-                check.Checked += (_, _) => Tick(true);
-                check.Unchecked += (_, _) => Tick(false);
-                QuestsPanel.Children.Add(WithImproveDoor(check, row));
-
-                void Tick(bool done)
-                {
-                    set(done);
-                    _settings.Save();
-                    PushUndo(row, done, set);
-                    Refresh(force: true);
-                }
+                if (ChecklistRowControl(row, setters, locked, group.ClassName) is { } control)
+                    QuestsPanel.Children.Add(control);
             }
+        }
+    }
+
+    /// <summary>
+    /// The Sky checklist grouped by ISLAND — the Founder's ask of 2026-09-17: *"everything to
+    /// collect on island N before moving to next"*, across every class the player picked.
+    ///
+    /// <para><b>It decides nothing.</b> The grouping, the ordering, the exclusions and both
+    /// sentences come from <c>QuestChecklistLayout.SkyByIsland</c>, which EQBuddy Mobile calls
+    /// from the same point — this method draws what Core hands it and owns no rule of its own,
+    /// which is the only reason three surfaces can agree about a checklist (#184).</para>
+    ///
+    /// <para>No guide chrome: no per-reward cards, no fold state, no wiki-link headings. Folds
+    /// are keyed on the REWARD and a reward is not what a group is here; the search-results
+    /// view is the precedent for a rearrangement drawing rows and nothing else.</para>
+    /// </summary>
+    private void RenderIslandView(
+        IReadOnlyList<QuestChecklistGroup> matching, Dictionary<string, Action<bool>> setters)
+    {
+        var layout = QuestChecklistLayout.SkyByIsland(matching, _settings.SkyStepsUnderEveryIsland);
+        _lastIslandLayout = layout;
+
+        // WHAT IS NOT ON THIS SCREEN, above the rows rather than under them (trap 44 and
+        // trap 50). Both sentences are Core's and are EMPTY when nothing was hidden, so this
+        // draws nothing in the common case rather than a standing disclaimer nobody reads.
+        foreach (var note in new[] { layout.TurnInNote, layout.HiddenNote })
+        {
+            if (note.Length == 0) continue;
+            var line = DesignSystem.Text(Role.Caption, note);
+            line.TextWrapping = TextWrapping.Wrap;
+            line.Margin = new Thickness(DesignTokens.SpaceS, DesignTokens.SpaceXs,
+                DesignTokens.SpaceS, 0);
+            line.Ink("DimBrush");
+            QuestsPanel.Children.Add(line);
+        }
+
+        if (layout.Groups.Count == 0)
+        {
+            // NAME what emptied it. Every Sky row this player can see is either a hand-in or
+            // belongs to a reward they have already turned in — which is a real and rather
+            // good state, not a broken tracker.
+            QuestsPanel.Children.Add(EmptyState(
+                "Nothing left to collect on any island for the classes you have picked. "
+                + "Hand-ins and turned-in rewards are not listed here — switch to Class view "
+                + "above to see them."));
+            return;
+        }
+
+        foreach (var island in layout.Groups)
+        {
+            var heading = DesignSystem.Text(Role.TitleSection,
+                $"{island.Heading}   {island.Done}/{island.Total}");
+            heading.TextWrapping = TextWrapping.Wrap;
+            heading.Margin = new Thickness(DesignTokens.SpaceXxs, DesignTokens.SpaceL,
+                0, DesignTokens.SpaceXs);
+            heading.Ink("AccentBrush");
+            QuestsPanel.Children.Add(heading);
+
+            foreach (var row in island.Rows)
+            {
+                // The island view never locks a row: locking is the Epic tab's master-complete
+                // and there is no Epic island.
+                if (ChecklistRowControl(row.Row, setters, locked: false, lockedClassName: "",
+                        owner: row.Label) is { } control)
+                    QuestsPanel.Children.Add(control);
+            }
+        }
+    }
+
+    /// <summary>What the LAST island render drew, for the <c>EQBUDDY_EXPAND</c> dump — the
+    /// screen's answer, not the store's, which is the distinction trap 56 is about.</summary>
+    private QuestChecklistLayout.SkyIslandLayout? _lastIslandLayout;
+
+    /// <summary>
+    /// ONE checklist row, wired to its own tick — the control both Sky arrangements draw.
+    ///
+    /// <para><b>Lifted out when the island view landed (DRA-164), and that is the point.</b>
+    /// The island view is a rearrangement of the rows the class view already produces, so a
+    /// second copy of this block would be a second producer of what a row LOOKS like and what
+    /// pressing its box DOES — trap 4 with a renderer's clothes on, and the two would part
+    /// company the first time one of them learned something.</para>
+    ///
+    /// <para>Returns <c>null</c> when nothing can set this row, which is the old <c>continue</c>
+    /// kept honest: a checkbox with no setter is a control that silently ignores clicks.</para>
+    /// </summary>
+    /// <param name="owner">"Warrior · Belt of the Four Winds", on the island view only. In
+    /// class view that is the heading above the row and repeating it would be the redundancy
+    /// the six questions exist to remove; in island view nothing above the row says whose work
+    /// it is, so the row has to.</param>
+    private UIElement? ChecklistRowControl(
+        QuestChecklistRow row, Dictionary<string, Action<bool>> setters,
+        bool locked, string lockedClassName, string owner = "")
+    {
+        var text = DesignSystem.Text(Role.Body, "");
+        text.TextWrapping = TextWrapping.Wrap;
+        text.Inlines.Add(new System.Windows.Documents.Run(row.Title));
+        if (owner.Length > 0)
+        {
+            // Whose work this is, between the step and where it drops: the row reads
+            // "what · who wants it · where it comes from", which is the order a player
+            // scanning one island's list needs them in.
+            var whose = new System.Windows.Documents.Run("   " + owner);
+            whose.SetResourceReference(System.Windows.Documents.Run.ForegroundProperty, "AccentBrush");
+            text.Inlines.Add(whose);
+        }
+        if (row.Detail.Length > 0)
+        {
+            // The drop location, dimmed — present on every row, because "where
+            // does this come from" is the question the row exists to answer.
+            var detail = new System.Windows.Documents.Run("   " + row.Detail);
+            detail.SetResourceReference(System.Windows.Documents.Run.ForegroundProperty, "DimBrush");
+            text.Inlines.Add(detail);
+        }
+        if (row.Unassigned)
+        {
+            // The auto-tick guessed which class earned a shared item. Say so.
+            var mark = new System.Windows.Documents.Run(" *") { FontWeight = FontWeights.Bold };
+            mark.SetResourceReference(System.Windows.Documents.Run.ForegroundProperty, "WarnBrush");
+            text.Inlines.Add(mark);
+        }
+        text.Ink(row.Acquired || row.IsSkipped ? "DimBrush" : "TextBrush");
+        // "Not doing this one." Struck through and dimmed, so a skipped step reads as
+        // deliberately set aside rather than as merely unfinished.
+        if (row.IsSkipped) text.TextDecorations = TextDecorations.Strikethrough;
+
+        // A stub step says so, in the player's words, under its own title. It stays
+        // fully tickable — manual state beats weak inference, and "we could not find
+        // directions" is a fact about US, not about how far the player has got.
+        // A VERTICAL StackPanel: TextWrapping does nothing in a horizontal one (trap 14).
+        FrameworkElement content = GuideSubLines(text, row);
+
+        var check = new CheckBox
+        {
+            Tag = row.GuideRowKey.Length > 0 ? GuideRowTag : null,
+            Content = content,
+            IsChecked = row.Acquired,
+            Margin = new Thickness(DesignTokens.SpaceM, 1, 0, 1),
+            // The six questions live on the hover for a guide row: the row itself
+            // says what to do and where, and repeating why and how inline is the
+            // redundancy the six are meant to remove (David, 2026-09-09).
+            ToolTip = row.Unassigned
+                ? "EQBuddy ticked this itself — several classes want this item and the "
+                  + "log couldn't say which one earned it. Move the tick if it's on the "
+                  + "wrong class; either way, toggling it settles the question."
+                : row.GuideFacts.Length > 0 ? row.GuideFacts : null,
+        };
+        if (locked)
+        {
+            check.IsEnabled = false;
+            // And LOOK disabled. The app's CheckBox style carries no disabled
+            // visual, so IsEnabled alone leaves a control that reads as live and
+            // silently ignores clicks — the "silent no-ops are broken" rule with
+            // the switch on the other side. Found by looking at the screenshot.
+            check.Opacity = 0.5;
+            check.ToolTip = $"{lockedClassName}'s epic is marked complete. "
+                + "Reopen it above to change individual steps.";
+        }
+        if (!setters.TryGetValue(row.Id, out var set)) return null;
+        check.Checked += (_, _) => Tick(true);
+        check.Unchecked += (_, _) => Tick(false);
+        return WithImproveDoor(check, row);
+
+        void Tick(bool done)
+        {
+            set(done);
+            _settings.Save();
+            PushUndo(row, done, set);
+            Refresh(force: true);
         }
     }
 
