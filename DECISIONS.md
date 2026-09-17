@@ -1,3 +1,102 @@
+## 2026-09-17 — DRA-164 D1–D3: the Plane of Sky Island view, and the republish this land does NOT do
+
+**Seat:** `dra164-d1` → `d2` → `d3`, one signed sequence (Helm SIGNED PR #663 @ `148cdd6e`,
+whole-sequence on green gates). Founder ask ~5:50 AM CT: KEEP the class-sorted Sky view, ADD a
+Class/Island toggle, island view multi-selects classes and groups by island —
+"everything to collect on island N before moving to next", warrior/monk/druid. D1 `dab8d03d`
+(#664), D2 `a1748054` (#665), D3 `a386d886` (#666). Nothing here fetched, no curated catalog
+was written, **no tag, no signing, no release** — see item 8, which is the one place this
+entry departs from the card's own text.
+
+**1. The veto-worthy default Helm named: the island view EXCLUDES hand-ins and turned-in
+rewards, and counts both out loud.** Hand-ins go because the ★ Ready band already owns "what
+can I turn in right now" and stays on screen in both modes; turned-in rewards go because
+`MarkRewardTurnedIn` force-acquires every row under them, so keeping them renders each island
+as mostly-done noise. **The default the other way** was to draw everything and let the player
+sort it out, which is defensible right up until the first island is twelve rows of work already
+done. Both sentences are EMPTY when nothing was hidden — a note that always fires is furniture,
+not a disclosure — and Class view is named in them as where the excluded rows still live.
+
+**2. Class view KEEPS the default (`SkyGroupByIsland` = false), and the E2E proves it by
+ABSENCE.** `questsIslandGroups` reports `-1`, meaning "this render drew no island layout at
+all" — a different claim from "it drew an empty one", and the only fact that can say the new
+renderer did not run. Without it every assertion in the suite would still pass on a build that
+had quietly replaced the view this card was told to keep.
+
+**3. THE PARSER WAS ALREADY WRONG ABOUT 22 OBJECTIVES, AND THE FAILURE LOOKED EXACTLY LIKE AN
+ANSWER.** The guide catalog writes the Efreeti drop as *"Plane of Sky - Isles 1.5, 4 and 8
+respectively."* — one isle word governing a list — and the five shapes the shipped `Parse` knew
+captured only the number touching the word. All 22 parsed to `[1.5]` and would have been filed
+on the half-island alone. **The before-picture is committed**: the shipped regex is pasted
+verbatim into `SkyIslandsTests` and SHOWN returning `[1.5]` beside the fix returning
+`[1.5, 4, 8]`, because green-only would have been vacuous here — both parsers return the same
+317 objectives and the same 97/95 split, and only the 103-vs-125 count tells them apart (trap
+34). The new shape's tail is DIGITS ONLY: *"Isle four - griffons and pegasus"* is also a real
+catalog string. **Scope-locked to that one shape**, per the SIGN; no second prose shape, no
+invented island scaffold.
+
+**4. The island fact rides the ROW, rather than being parsed back out of the heading.** One
+fact stored in one place and read out of another is trap 4, and the other place here is a
+string the two producers spell differently — `"Island 6"` from the classic layout,
+`"Isle 6: Bazzt Zzzt"` from the guide projection. `QuestChecklistRow.IslandKey` is stamped by
+the same code that stamps the heading, in both producers; `SkyIslands.SetKey` gained its
+inverse, round-trip tested with the zero-padding asserted AS TEXT so a later tidy-up cannot
+silently re-order the groups.
+
+**5. The prose fallback is REFUSED on a turn-in, and the count is what keeps that guard
+honest.** 48 of the 95 hand-in objectives mention Isle 1 — they are directions TO the Efreeti
+Chamber, not gathering work on Island 1. A naive `Where` fallback would have filed all 48 under
+Island 1 with full confidence. The 48 is asserted, so a catalog rewording cannot quietly make
+the guard vacuous.
+
+**6. The phone's note needed its own FIELD because it could not ride a group.** The page drops
+a group with no rows (`if (!rows.length) continue;`), so a sentence about the list as a whole
+has nowhere to sit among the groups, and hanging it on the first island would read as a fact
+about that island. `CompanionChecklistSection.Note` is nullable and additive — the envelope
+does not change shape, so `CurrentProtocol` does not move. **Both halves of the page claim are
+asserted**: every word is Core's and the page spells none of them (trap 32), AND the page is
+asserted to READ `data.note`, because a sentence the page is sent but never draws passes every
+projection test there is. DRA-84's D2 and D4 each shipped a caption without that second half
+and the phone drew four of five.
+
+**7. Two things the pictures said that the counts could not, both RECORDED rather than fixed.**
+(a) The desktop frame reaches Island 6 and stops at 900px, so it is evidence that the islands
+ascend and NOT evidence about where the multi-island set and the unlocated rows sit — said out
+loud rather than cropped quietly. (b) Every guided row says its island three times: the
+heading, the step title, and the detail. That is the exact redundancy `WithoutIslePrefix`
+removes for CLASSIC rows and never reached a guided row's detail. **It is not new here** — the
+same three copies are on screen in class view today — so touching it would change the view this
+card was told to KEEP. Filed to `BEVEL-FEEDBACK.md` with the frame as evidence.
+
+**8. THE CARD'S OWN ROUTE SAYS "Desktop republish → ping Helm with 2.0.0+sha when LIVE", AND
+THIS LAND DOES NOT DO THAT.** Helm's SIGN forbids it by name from this land — *"LEAVE inventing
+Desktop republish … LEAVE inventing release / `release.ps1` / tag / signing / prod secrets"* —
+and a release is the one hard Founder gate that stays (CLAUDE.md, consequence list item 2). So
+D1–D3 are source only. **The default the other way** was to read the card as authorizing the
+republish because it is written into the route; I did not, because a SIGN that names the
+prohibition is later and more specific than the card that was written before it, and because
+the release gate is not Helm's to waive either. **Where it landed:** the three slices merge, and
+the republish is named as owed to Helm/the Founder rather than performed. If the ~2:00 PM CT
+Desktop smoke was meant to run against a republished build rather than a local one, that is the
+gap, and it is theirs to close.
+
+**9. Fable's feedback for this sequence is in PR #666's body, not in its channel.**
+`FABLE-FEEDBACK.md` has spent its grandfather band — recorded baseline 240,896 B, ratchet
+ceiling 264,985 B, file at 264,970 B, **fifteen bytes of headroom** — and `channel-size-guard`
+refuses the append. Verified by probing it rather than assumed: a test append reddened the
+guard with that exact arithmetic, and was reverted. The guard's own refusal says raising the
+row is not the fix and that rotation belongs to the standing `EXO-CHANNEL-ROTATE` card, not to
+the Executor seat that tripped it — so the note goes in the PR body verbatim and is reported on
+DRA-144. Not skipped: a skipped round is indistinguishable from not bothering.
+
+**Gates:** `check.ps1` green at each slice (5,341 unit at D2, 5,347 at D3); D2's three new E2E
+rows pass locally against a rebuilt app (trap 64); both channel guards green with the
+`BEVEL-FEEDBACK.md` append verified additions-only (46/0) and its identifiers read back after
+the write (trap 60c). `WhatsNew.json` entry landed in D2. No `GuideCatalog.json` or
+`SkyQuestDefaults.cs` write, no eqlwiki fetch, and nothing here marks DRA-149 or DRA-84 PASS.
+
+— Dranak (Claude Code), Executor — DRA-164 D1–D3
+
 ## 2026-09-17 — DRA-149 D5: the re-smoke pack, and the prediction that caught itself
 
 **Seat:** `opus-dra149-d5` (disjoint). D4 merged at `3df21141`; this is the last slice of the
