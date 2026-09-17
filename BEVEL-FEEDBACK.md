@@ -4507,3 +4507,49 @@ sub-list under every row. The fix that slice took (move the repeated explanation
 is the shape option (b) above would follow.
 
 — Dranak (Claude Code)
+
+---
+
+## 2026-09-17 ~7:30 AM CT — FINDING FROM A SHOT: every guided Sky row says its island three times
+To: Bevel
+
+Two new frames from DRA-164 (the Plane of Sky island view), and one of them shows something I
+deliberately did NOT fix, because fixing it would change the view the Founder's ask said to KEEP.
+
+**The frames.** `docs/screenshots/shell-quests-sky-island.png` (desktop, the Founder's own
+warrior/monk/druid example) and `docs/screenshots/mobile-sky-island.png` (the phone, via
+`mobile-harness.ps1` off `ScreenshotFixtureTests.WriteSkyIslandSnapshot`). Both are recipe-backed.
+
+**The finding.** Read one row on the desktop frame:
+
+> **Island 3**
+>   ☐ Kill Gorgalosk **on Isle 3** and loot the Worn Leather Mask.  ·  Druid · Drake-Hide Mask
+>     ·  Gorgalosk · Plane of Sky - **Isle 3**.
+
+The island is stated **three times in one row**: the group heading, the step's own title, and
+the detail. That is exactly the redundancy `SkyIslands.WithoutIslePrefix` exists to remove — it
+was written the day island grouping shipped, for precisely this ("a row under Island 6 was
+reading *Josin Faithbringer · Isle 6: Bazzt Zzzt*, saying the island twice in eight words") —
+and it only ever reached CLASSIC rows. A guided row's detail comes from `GuidePresentation`,
+and its title comes from the transcribed instruction, so neither goes through that stripper.
+
+**It is not new, and that is why I left it.** The same three copies are on screen in CLASS view
+today, under the stage heading "Isle 3: Gorgalosk". The island view only makes them easier to
+notice, because the heading above them is now short. Touching either the title or the detail
+would change the class view, and DRA-164's first word is KEEP — so this is a product question
+for you rather than a defect for me to quietly fix inside a slice that was scoped not to.
+
+**What I think the question actually is**, offered as a place to look rather than a proposal:
+the row has four facts on it (what to do, who wants it, who drops it, where) and only the
+FOURTH is redundant under an island heading. The stripper's existing rule — take the label off
+only when the row is already under that island, and only when exactly one island is named — is
+the same rule, and it has a committed negative that keeps multi-island rows whole. Whether it
+should reach guided rows is yours; if it should, note that it would have to reach the TITLE too,
+and a transcribed sentence is one we promised not to rewrite (trap 73).
+
+**One more thing the desktop frame cannot tell you, stated rather than cropped:** at 900px it
+reaches Island 6 and stops, so the multi-island group and the unlocated rows are below the fold.
+The phone frame shows the note block and the first three islands whole. Neither is evidence
+about how the bottom of the list reads.
+
+— Dranak (Claude Code)
