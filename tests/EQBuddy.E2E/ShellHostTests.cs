@@ -2917,6 +2917,71 @@ public class ShellHostTests
     }
 
     /// <summary>
+    /// **THE FOUNDER'S OWN DUMP, THROUGH THE REAL APP, WITH THE NUMBERS THE CHECKLIST PREDICTS**
+    /// (DRA-149 D5, plan P6).
+    ///
+    /// <para>The unit half of this lives in <c>FounderResmokeTests</c> and runs the engine
+    /// directly. This is the other claim: that those numbers survive the app — the tail, the
+    /// inventory watcher, the settings store, the room's own paint. "The engine computed it" and
+    /// "the screen shows it" are different claims (trap 56), and the screen is the one he
+    /// failed.</para>
+    ///
+    /// <para><b>It asserts RELATIONSHIPS, never the screen</b> (plan P6): the anchors, the unread
+    /// count, the candidate count, the band refusals and the who withholdings, dumped from ONE
+    /// moment, with the pair that tells the two empty gear screens apart at the centre of it.
+    /// <c>helperCandidates</c> is large and <c>helperGearWhy</c> is small — the gate removing
+    /// places, not the sweep failing to find any.</para>
+    ///
+    /// <para>Level 29 is the Founder's own, from the failing build, so the prediction is about
+    /// the screen he will actually open.</para>
+    /// </summary>
+    [Fact]
+    public void TheFoundersOwnDumpReachesTheHelperWithCandidatesAndRefusals()
+    {
+        var key = $"{AppHarness.Character}_{AppHarness.Server}".ToLowerInvariant();
+        using var app = new AppHarness(
+            configureSettings: s => s.HelperGoals[key] = [nameof(HelperGoal.FarmGear)],
+            environment: OpenOn("helper"));
+        app.WriteInventoryDumpFrom("dranak.txt");
+        app.SeedQuestLedger(statedLevel: (29, DateTime.Now.AddHours(-1)));
+        app.Launch();
+
+        app.WaitForDump("shellPage", "helper", "the shell to land on the Helper room");
+        // TWENTY-ONE, not twenty: the room counts every worn row, and the AMMO anchor is one of
+        // them. `GearUpgradesFixtureSweepTests` says 20 because it excludes AMMO deliberately —
+        // that is the one anchor that ALREADY worked before D1, and a floor met by it would be
+        // met by the thing that was never broken. Two numbers, two questions, both right.
+        app.WaitForDump("helperWorn", "21", "the Founder's readable worn rows");
+        app.WaitForDump("helperLevel", "29", "the seeded statement to be what the Helper ranks with");
+
+        // The gate is LIVE. A zero refusal count below is otherwise indistinguishable from a
+        // gate that never ran, which is exactly how this test first went green while `Bands`
+        // was null (trap 78).
+        Assert.Equal(1, app.DumpValue("helperBandGate"));
+
+        // **FAIL 1.** Every row he is wearing is readable now — the bow included, via D2's
+        // curated alias — so the unread caption is correctly ABSENT. Predicting the blank is
+        // what stops it reading as a missing feature.
+        Assert.Equal(0, app.DumpValue("helperUnreadWorn"));
+        Assert.Equal(0, app.DumpValue("helperUnreadLine"));
+
+        // **FAIL 2, and this is the pair.** The sweep found plenty; the gate removed places.
+        // Before D1 the first number was 0 for all 19 gear anchors and the screen looked the
+        // same as a refusal.
+        var candidates = app.DumpValue("helperCandidates");
+        var refused = app.DumpValue("helperBandRefused");
+        Assert.True(candidates >= 50, $"only {candidates} candidates for the Founder's dump");
+        Assert.True(refused >= 10, $"only {refused} zones refused at level 29");
+        Assert.True(candidates > refused);
+
+        // …and the ROOM said so, with rows left over. A gate that emptied the list would be a
+        // different screen and a different sentence.
+        Assert.Equal(1, app.DumpValue("helperBandLine"));
+        Assert.True(app.DumpValue("helperGearWhy") > 0, "the gate refused everything");
+        Assert.Equal(0, app.DumpValue("helperDeadDoors"));
+    }
+
+    /// <summary>
     /// **THE VENDOR LINES ARE ON THE SCREEN, AND THE CAP IS WHY THERE ARE NOT MORE**
     /// (DRA-149 D4, plan P5; the Founder's FAIL item 3, second half).
     ///

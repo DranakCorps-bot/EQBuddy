@@ -1008,7 +1008,8 @@ public sealed record RecommendationSet(
     int GearWhoWithheld = 0,
     IReadOnlyList<string>? UnreadWorn = null,
     IReadOnlyList<GearBandRefusal>? MaterialBandRefusals = null,
-    int MaterialWhoWithheld = 0)
+    int MaterialWhoWithheld = 0,
+    int GearCandidates = 0)
 {
     /// <summary>Never null, so no caller has to decide what an absent list means.</summary>
     public IReadOnlyList<GearBandRefusal> GearBandRefusals { get; init; }
@@ -1029,6 +1030,26 @@ public sealed record RecommendationSet(
     /// </summary>
     public IReadOnlyList<GearBandRefusal> MaterialBandRefusals { get; init; }
         = MaterialBandRefusals ?? [];
+
+    /// <summary>
+    /// **HOW MANY CATALOG UPGRADES THE FARM GEAR SWEEP FOUND, BEFORE ANY GATE REMOVED ONE**
+    /// (DRA-149 D5, plan P6).
+    ///
+    /// <para><b>It is the number the Founder's FAIL 2 was about, and it is the only one in this
+    /// record that can tell the two empty screens apart.</b> A sweep that found NOTHING is what
+    /// the tier rule guaranteed for every plussed character until D1 — `UpgradeTier(candidate)
+    /// >= UpgradeTier(worn)` against a catalog where 0 of 11,196 names carry a "+N". A sweep
+    /// that found 1,741 candidates and had every place they drop refused by the band gate is a
+    /// different event with the same screen. Both draw one grey sentence; only this number says
+    /// which happened.</para>
+    ///
+    /// <para>It counts the sweep's output, so it is AFTER the sweep's own per-anchor cap
+    /// (<see cref="GearWithheld"/> is what that held back) and BEFORE the band gate and the who
+    /// rule. Zero on every path that never reached the sweep — no dump, no readable row, goal
+    /// not picked — which is why it is reported beside <see cref="UnreadWorn"/> rather than
+    /// inferred from it.</para>
+    /// </summary>
+    public int GearCandidates { get; init; } = GearCandidates;
 
     public static readonly RecommendationSet Empty = new([], 0, [], []);
 }
@@ -1494,10 +1515,11 @@ public static partial class Recommendations
         IReadOnlyList<string> unreadWorn = [];
         List<GearBandRefusal> materialBandRefusals = [];
         var materialWhoWithheld = 0;
+        var gearCandidates = 0;
 
         if (goals.Contains(HelperGoal.LevelUp)) LevelUp(inputs, candidates, gaps);
         if (goals.Contains(HelperGoal.FarmGear))
-            (gearWithheld, gearBandRefusals, gearWhoWithheld, unreadWorn) =
+            (gearWithheld, gearBandRefusals, gearWhoWithheld, unreadWorn, gearCandidates) =
                 FarmGear(inputs, candidates, gaps);
         // DRA-71 D7. Both read the player's own play and nothing else; the catalog's half of
         // each was refused by its own survey, which is written down where the engine is.
@@ -1532,7 +1554,7 @@ public static partial class Recommendations
         return new RecommendationSet(
             top, Math.Max(0, ordered.Count - top.Count), deferred, gaps, gearWithheld,
             gearBandRefusals, gearWhoWithheld, unreadWorn,
-            materialBandRefusals, materialWhoWithheld);
+            materialBandRefusals, materialWhoWithheld, gearCandidates);
     }
 
     // ---- the join: one place, every goal it serves (HOME-005) --------------------------
@@ -2175,14 +2197,22 @@ public static partial class Recommendations
     /// veto.</para>
     /// </summary>
     /// <returns>What the sweep's per-anchor cap held back, which zones the band gate refused,
-    /// what the who rule withheld, and the worn rows EQBuddy could never read (DRA-149 D2 —
+    /// what the who rule withheld, the worn rows EQBuddy could never read (DRA-149 D2 —
     /// the last one is not a decision this method made, which is exactly why it has to be
-    /// carried out rather than inferred from a short list of anchors).</returns>
+    /// carried out rather than inferred from a short list of anchors), and <b>how many catalog
+    /// candidates the sweep actually found</b> (DRA-149 D5).
+    ///
+    /// <para>That last number is the one the Founder's FAIL 2 was about, and it is the only one
+    /// here that can tell the two empty screens apart: a sweep that found NOTHING (which is what
+    /// the tier rule guaranteed for every plussed character before D1) and a sweep that found
+    /// plenty and had every place refused. Both draw one grey sentence, and the re-smoke needs
+    /// to predict which.</para></returns>
     private static (
         int Withheld,
         List<GearBandRefusal> Refused,
         int WhoWithheld,
-        IReadOnlyList<string> UnreadWorn) FarmGear(
+        IReadOnlyList<string> UnreadWorn,
+        int Candidates) FarmGear(
         HelperInputs inputs, List<Recommendation> into, List<GoalGap> gaps)
     {
         // A DECIDED deferral, said out loud. Every intent answers since DRA-71 D7, so this arm
@@ -2191,7 +2221,7 @@ public static partial class Recommendations
         if (GearUpgrades.ShapeFor(inputs.GearIntent) != GearIntentShape.Answered)
         {
             gaps.Add(new GoalGap(HelperGoal.FarmGear, GoalGapReason.GearIntentNotAnsweredYet));
-            return (0, [], 0, []);
+            return (0, [], 0, [], 0);
         }
 
         // **"Farm to sell" is a different question and leaves here** (DRA-71 D7, plan P9). It
@@ -2213,7 +2243,7 @@ public static partial class Recommendations
         if (inputs.GearIntent == GearIntent.FarmToSell)
         {
             FarmToSell(inputs, into, gaps);
-            return (0, [], 0, []);
+            return (0, [], 0, [], 0);
         }
 
         // "EQBuddy has never been told what you are wearing" is a different state from
@@ -2229,7 +2259,7 @@ public static partial class Recommendations
             gaps.Add(new GoalGap(HelperGoal.FarmGear, inputs.UnreadWorn.Count > 0
                 ? GoalGapReason.NothingWornIsReadable
                 : GoalGapReason.NoInventoryDump));
-            return (0, [], 0, inputs.UnreadWorn);
+            return (0, [], 0, inputs.UnreadWorn, 0);
         }
 
         var sweep = GearUpgrades.Sweep(
@@ -2238,7 +2268,7 @@ public static partial class Recommendations
         if (sweep.Upgrades.Count == 0)
         {
             gaps.Add(new GoalGap(HelperGoal.FarmGear, GoalGapReason.NoCatalogUpgrade));
-            return (sweep.Withheld, [], 0, inputs.UnreadWorn);
+            return (sweep.Withheld, [], 0, inputs.UnreadWorn, 0);
         }
 
         var byZone = new Dictionary<string, List<GearCandidate>>(StringComparer.OrdinalIgnoreCase);
@@ -2311,7 +2341,7 @@ public static partial class Recommendations
                 [new HelperDoor(HelperDoorKind.QuestCatalog, quest),
                  new HelperDoor(HelperDoorKind.Gear, "")]));
 
-        return (sweep.Withheld, refused, whoWithheld, inputs.UnreadWorn);
+        return (sweep.Withheld, refused, whoWithheld, inputs.UnreadWorn, sweep.Upgrades.Count);
     }
 
     /// <summary>Add one candidate under one key. Generic since DRA-149 D3 — the materials
