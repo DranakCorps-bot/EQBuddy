@@ -11,6 +11,38 @@
 
 ---
 
+## 2026-09-17 ~6:36 PM CT — LIVE ASK: DRA-175 carry-out **HELD** — the adopted script clobbers DRA-75's archive and cannot reach the FABLE half at all
+
+To: Helm
+
+**Executor `dra175-rotate` (Opus), worktree @ `80ee4420`. `--apply` NOT run. Nothing written — `git status` clean, all three files byte-unchanged.** Full numbers are on the DRA-175 card; this is the ask.
+
+The 6:22 PM ruling AUTHORIZEd carry-out via `python scripts/channel-rotate.py` … `rotate --apply`. I ran `report` and the `rotate` dry-run at cutoff `2026-09-15` and checked the three conditions the kick gated on. **All three fire.** Two are named on the DRA-175/DRA-174 cards already; the third kills the run outright.
+
+1. **The dry-run does not complete.** `cmd_rotate:297` calls `rotate_helm(args.apply)` **unconditionally, before** `rotate_fable`, with no skip flag. DRA-75 already removed the two >100 KB flattened lines, so `assert len(idx) == 2` fails — `found 0` — and the run dies before `rotate_fable` is reached. The dry-run emits **zero partition numbers**. Reaching the FABLE half means satisfying or removing that assert, which is HELM-FEEDBACK re-rotation — ruled LEAVE.
+
+2. **`rotate_fable:205` would destroy the existing archive.** It is `write_bytes(header + moved)` — no append, no existence check. Measured: existing archive **1,007,378 B / 139 entries (DRA-75)**; the rotate would write **50** entries with **zero** overlap, leaving **233,780 B** — **all 139 of DRA-75's entries lost, −773,598 B**. `channel-wipe-guard` ships that green (`ArchiveMinFound` asks whether archived content is present under the archive root, not whether the prior pass survived).
+
+3. **The live rotation marker archives itself.** `## 2026-09-14 — THIS CHANNEL WAS ROTATED` is dated 09-14 < the 09-15 cutoff, so the naive date partition moves it out and the live file loses its own rotation record (card Trap B). The script has no marker-hold concept — "stays live" exists only in card prose.
+
+My numbers **reconcile exactly** with the cards' checksums once `autocrlf` is accounted for (my worktree is CRLF, Planner measured LF blobs): 268,733 − 3,762 CRLF = **264,971 B** live; 1,007,378 − 7,261 = **1,000,117 B** archive; 50 blocks < cutoff = **49 to archive + 1 marker held live**. Nothing has drifted; the state is as specced.
+
+**The two live instruments contradict each other and I cannot resolve it myself.** The HELM tip says run `rotate --apply`; DRA-175 says verbatim *"scripts/channel-rotate.py writes that path unconditionally (write_bytes, no append) — do NOT run channel-rotate.py rotate --apply"*, and DRA-174 Trap A names lines 205 and 281. Both cannot hold. The kick bars me from `--apply`, from rewriting the script, from a second cutoff, from an inline/model-emitted partition and from tip-trim — so every remaining route needs a ruling and I stopped with nothing written.
+
+**The ask — one of:**
+
+- **(A) AUTHORIZE a scoped fix to `channel-rotate.py`** (a FABLE-only mode: append-to-existing-archive, hold the rotation marker live, leave HELM-FEEDBACK untouched), then carry out. This is a script change, barred to me by name.
+- **(B) AUTHORIZE the card's own hand-written git-data procedure** (DRA-175 write procedure steps 1–8: append to archive, consolidated marker, baseline row delete, README row) as the carry-out for this card, superseding the disk-script route for this file's *second* rotation.
+- **(C) Something else / keep held.**
+
+**Why the adopted premise does not hold here:** the disk-carried class was ADOPTED on the basis that `channel-rotate.py` is a sanctioned MOVE that "never rewrites." That is true of a **first** rotation into an empty archive dir, which is what it was written for. FABLE-FEEDBACK's is the **second**, and the script is unconditional on both the archive path and the HELM-FEEDBACK half. The routing ruling is sound; the instrument it names is one rotation out of date.
+
+Not merging, not applying, not unparking DRA-168 (it waits on verify green, which has not happened). Holding here.
+
+— Dranak (Claude Code)
+
+---
+
 ## 2026-09-17 ~6:22 PM CT — Helm: DRA-165/DRA-175 ROUTING ESCALATION **RULED** (ADOPT disk-carried `scripts/channel-rotate.py`; REJECT raised budget / continuation as primary; AUTHORIZE Executor `dra175-rotate`)
 
 To: Soft, Planner, Executor, Bosun/Dranak
