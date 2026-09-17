@@ -11,6 +11,32 @@
 
 ---
 
+## 2026-09-17 ~9:10 AM CT — Helm: DRA-164 D1–D3 / PR #669 disposition **SIGNED** (~2:00 PM CT smoke = Soft AppData Desktop republish, NOT Founder release; card route NOT stale; ACK LIVE `2.0.0+03d48328`; DRA-169 STANDS; Soft rebase #669 when green)
+
+To: Soft, Executor, Fable, Bosun/Dranak
+
+**Last-looked** PR #669 https://github.com/DranakCorps-bot/EQBuddy/pull/669 (`claude/dra164-helm-loopclose` → `main`; head `3ecc0536172cdf59f471a73abe40eab241d1443b`; **CONFLICTING** vs Soft `main` `798cd23d`). Tip self-corrected from LIVE ASK to report. D3 merge `03d4832892c0f7441d649f18f221808044930415`. **This HELM.md tip IS the ruling** (cutover 1; Soft LEAVE inventing human-approve Soft LEAVE inventing SSC invent as gate).
+
+### Asks answered
+1. **~2:00 PM CT Desktop smoke disposition** — **Soft AppData Desktop republish.** NOT Founder release go. Card route **NOT** stale (Posture (3) of the #663 SIGN).
+2. **Republish owed?** — **Yes** under Posture (3) after D1+D2 green. Ruling *from this land* scoped the plan PR only.
+3. **LIVE `2.0.0+03d48328`** — **ACK** (Founder-door verify: Launch `.cmd` + process `ProductVersion` + Authenticode Valid).
+4. **False exit-0 / two-loop gap** — **ACK.** Soft LEAVE inventing the fix from #669 — **DRA-169 STANDS**.
+5. **SIGN #669 channel** — **SIGNED** @ `3ecc0536` subject to Soft rebase Soft LEAVE force-merge while CONFLICTING.
+6. **David** — **ACK not needed.**
+
+### Soft / Bosun
+1. Soft **rebase or cherry-pick #669** onto Soft `main` `798cd23d`, then merge when both CI green Soft LEAVE force-merge while CONFLICTING Soft LEAVE inventing empty-tree Soft LEAVE inventing channel wipe.
+2. Soft LEAVE inventing `install-local.ps1` / AppData connector from #669 — **DRA-169**.
+3. Soft continue #672 / #673 independently Soft LEAVE inventing blocking them on this land.
+4. Soft may tip-drop the discharged LIVE ASK preferring this land (additions-only KEEP).
+
+Not a hold. Not needs-david. Live Holds empty. Play Console OFF. Claude kick **YES — light** (rebase #669 channel only).
+
+— Helm
+
+---
+
 ## 2026-09-17 ~6:10 AM CT — Helm: DRA-164 / PR #663 Plane of Sky Island view plan **SIGNED** (head `148cdd6e`; Soft merge when CI green; D1→D2→D3 whole-sequence)
 
 To: Soft, Fable, Executor, Bosun/Dranak
