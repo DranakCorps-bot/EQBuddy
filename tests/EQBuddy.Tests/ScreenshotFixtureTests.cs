@@ -612,6 +612,96 @@ public class ScreenshotFixtureTests
     }
 
     /// <summary>
+    /// **The Plane of Sky ISLAND view, for EQBuddy Mobile** (DRA-164 D3).
+    ///
+    /// <para>The phone reads the PC's own <c>SkyGroupByIsland</c> and calls the same
+    /// <c>QuestChecklistLayout.SkyByIsland</c> from the same point — so this fixture is
+    /// staged by flipping ONE setting on a shipped checklist, which is exactly what a player
+    /// does. Anything else would be a fixture in the wrong shape rendering a state that is
+    /// real (trap 23).</para>
+    ///
+    /// <para>PREDICTION, derived from the shipped <c>SkyQuestDefaults</c> before the run. Nine
+    /// groups, ascending, with these counts:</para>
+    ///
+    /// <code>
+    ///   Island 2               0/2      Island 7                0/20
+    ///   Island 3               0/16     Island 8                0/16
+    ///   Island 4               0/15     Islands 1.5 · 4 · 8     0/22
+    ///   Island 5               0/17     Anywhere on the plane   0/94
+    ///   Island 6               0/18
+    /// </code>
+    ///
+    /// <para>220 rows, not 222: the Bard's Ervaj's Flute of Flight is turned in, so its two
+    /// rows are hidden — one from Island 5 (18→17) and one from "Anywhere" (95→94) — and the
+    /// section's note must SAY that one reward is not listed. That is the point of staging a
+    /// completed reward rather than a clean profile: an exclusion nobody can see fire is an
+    /// exclusion nobody can review.</para>
+    ///
+    /// <para><b>No ledger, so these are the CLASSIC rows</b> — a fresh profile's state, and the
+    /// one where the island fact comes from each step's own <c>Source</c> prose rather than a
+    /// guide's stage name. The guided half is covered by <c>SkyIslandPlacementSweepTests</c>
+    /// over the real catalog; this frame is about what the PHONE draws.</para>
+    ///
+    ///     dotnet test --filter WriteSkyIslandSnapshot -e EQBUDDY_SHOOT=1 -e EQBUDDY_SHOOT_SKY_ISLAND=&lt;path&gt;
+    ///     pwsh scripts/mobile-harness.ps1 -Snapshot &lt;path&gt; -Screenshot
+    /// </summary>
+    [Fact]
+    public void WriteSkyIslandSnapshot()
+    {
+        if (Environment.GetEnvironmentVariable("EQBUDDY_SHOOT") != "1") return;
+        var outPath = Environment.GetEnvironmentVariable("EQBUDDY_SHOOT_SKY_ISLAND");
+        if (string.IsNullOrWhiteSpace(outPath)) return;
+
+        var now = new DateTime(2026, 9, 17, 9, 30, 0);
+        var settings = new AppSettings();
+        settings.ApplyDefaultSkyQuestChecklist();   // the shipped catalog, not a hand list
+        settings.SkyGroupByIsland = true;           // the ONE thing a player flips
+        settings.SkyQuestCompleted.Add(
+            QuestChecklistLayout.RewardKey("Bard", "Ervaj's Flute of Flight"));
+
+        var catalog = QuestCatalog.LoadEmbedded();
+        var snap = CompanionProjection.Build(new CompanionInputs
+        {
+            Character = "Dranak",
+            AppVersion = UpdateChecker.CurrentVersion.ToString(),
+            Offered = [CompanionSurfaces.Quests],
+            Stats = new StatsSnapshot { CurrentZone = "Plane of Sky" },
+            Settings = settings,
+            Quests = new CompanionQuestRequest
+            {
+                Catalog = catalog,
+                CharacterClassNames = ["Warrior", "Monk", "Druid"],
+                ClassSource = ClassSource.Achievements,
+            },
+            QuestIndex = CompanionQuestIndex.Build(catalog),
+            Theme = CompanionTheme.Project("ParchmentBrass",
+                EQBuddy.UI.Shared.ThemePalettes.For("ParchmentBrass")),
+        }, now);
+
+        File.WriteAllText(outPath!, JsonSerializer.Serialize(snap, CompanionSnapshot.JsonOpts));
+
+        // The prediction above, as assertions. A shot whose numbers were not predicted in
+        // advance has not been reviewed (trap 23).
+        var islands = snap.Quests!.Sky.Groups.Where(g => g.Tickable).ToList();
+        Assert.Equal(
+            [("Island 2", "0 of 2"), ("Island 3", "0 of 16"), ("Island 4", "0 of 15"),
+             ("Island 5", "0 of 17"), ("Island 6", "0 of 18"), ("Island 7", "0 of 20"),
+             ("Island 8", "0 of 16"), ("Islands 1.5 · 4 · 8", "0 of 22"),
+             ("Anywhere on the plane", "0 of 94")],
+            islands.Select(g => (g.Heading, g.Note)));
+        Assert.Equal(220, islands.Sum(g => g.Rows.Count));
+
+        // The note is on the WIRE — the exclusion and the reason the class chips stand down.
+        Assert.NotNull(snap.Quests.Sky.Note);
+        Assert.Contains(QuestChecklistLayout.SkyIslandCrossClassNote, snap.Quests.Sky.Note);
+        Assert.Contains("1 turned-in reward is not listed here", snap.Quests.Sky.Note);
+
+        // And every row still says whose work it is, because no heading does any more.
+        Assert.All(islands.SelectMany(g => g.Rows),
+            r => Assert.Contains(" · ", r.Detail ?? ""));
+    }
+
+    /// <summary>
     /// **The Helper screen, for EQBuddy Mobile** (DRA-71 D9).
     ///
     /// <para>Staged through the REAL projection over a real <c>HelperInputs</c>, so what the
