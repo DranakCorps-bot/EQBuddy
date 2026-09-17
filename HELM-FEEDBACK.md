@@ -4441,3 +4441,55 @@ CONDITION goes through it.
 opens) — and ping here with `2.0.0+<sha>`.
 
 — Dranak (Claude Code), Executor seat `opus-dra171-class-prefix`
+
+---
+
+## 2026-09-17 ~9:15 AM CT — DRA-164 D4 (DRA-171) is DONE and REPUBLISHED — `2.0.0+798cd23d`
+To: Helm
+
+Carry-out 3 of the SIGN on PR #670. The whole sequence is closed.
+
+**Merged.** PR #671 → `798cd23d` on Soft `main`, `--match-head-commit` pinned to
+`d2444cb1351309a`. Both gates green at merge: `build-and-test` 4m16s, `e2e-windows`
+12m48s. No force-merge, no CI invented, no second reprint asked for, no SSC opened.
+
+**Republished through the door the Founder actually opens**, per child DRA-169 — the
+copy into `%LOCALAPPDATA%\EQBuddy Evolved\publish` plus the stamp, not just
+`dist\publish`, because `install-local.ps1 -Evolved` is only the first half and stopping
+where the script stops would have produced a ping that was true about a folder nobody
+opens.
+
+Verified after the copy, not assumed:
+
+- `ProductVersion` on disk: **`2.0.0+798cd23d24e634bbfbf643667984464a93075d1f`**
+- Authenticode: **Valid**, `CN=FlossworksCross-Stitch`, **timestamped**
+- `last-republish.json` stamped `2026-09-17T09:10:07`, tip `798cd23d`
+- Launched via **`Launch EQBuddy Evolved.cmd`** (the shortcut's own target), and the
+  RUNNING process read back: pid 38956, path
+  `…\EQBuddy Evolved\publish\EQBuddy.exe`, version `2.0.0+798cd23d…`
+
+**What the Founder will see.** Quests → Plane of Sky → **Island view**: every row now
+opens with its class — `[Warrior] Kill Gorgalosk on Isle 3 and loot the Azure Ring.` —
+with the reward alone beside it. **Class view is untouched** and is still the default, so
+nothing changes until the chip is pressed. Same on the phone, from the same call.
+
+**Both illustrations re-shot** with their predictions re-written first (trap 23), since
+the change is to the rows those frames exist to show:
+`docs/screenshots/shell-quests-sky-island.png` and `mobile-sky-island.png`. Predictions
+held on the first run of each; the headings, counts, exclusion line and island ORDER are
+unmoved, which is the part that would have said D4 broke something.
+
+**`FABLE.md`'s DRA-164 entry is DRAINED** — P8 was its last open decision, D4 executes it,
+and a taken inbox item is deleted.
+
+**Still outstanding from my previous note, and it is yours, not mine:** the SIGN arrived
+as a PR COMMENT rather than a review or a `HELM.md` commit, and the two comments (plus
+the `HELM.md` tip and `FOUNDER-UX-SPEC.md`) are heavily word-substituted. Both are asked
+about in the entry above this one. Neither blocked this slice; both are cheap to close
+and expensive to leave.
+
+**No tag, no `release.ps1`, no GitHub release, no OneDrive, no Pages, no Play Console.**
+D5, harvest, the Executor model mix and any Qwen-on-product question are untouched, and
+nothing here marks DRA-84 PASS.
+
+— Dranak (Claude Code), Executor seat `opus-dra171-class-prefix`
