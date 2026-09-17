@@ -108,6 +108,12 @@ whole story in miniature:
 the creature rule do not touch it — the quest IS the path. That is the *"what quests drop
 improvements"* half of your item 2.
 
+> **Your class decides how many of those four you actually get, and it should.** Bow of the
+> Silver Fang is Ranger-only; the Rune Shafted Harpoon is Shaman-only; the two Sleeper's Tomb
+> bows are WAR / PAL / RNG / SHD / ROG. So four is what the CATALOG holds for that slot, and a
+> real character sees the subset their class can equip. If you see one refused zone rather than
+> two, that is the class lock and not a gate misfiring.
+
 ### Who to kill
 
 Every drop row names its creatures — up to three from the item's page, in the page's own order,

@@ -1797,6 +1797,124 @@ $Shots = [ordered]@{
                                HelperGoals = @{ 'testchar_test' = @('FarmGear') }
                                HelperGearIntent = @{ 'testchar_test' = 'ReplaceSlot' }
                            } }
+    # ---- DRA-149 D5: the FOUNDER'S OWN DUMP, and the two halves of FAIL 3 ------------------
+    #
+    #   'shell-helper-founder' — the picture of the whole card. HIS dump, copied verbatim from
+    #     `tests/fixtures/inventory/dranak.txt` (the `DumpFrom` key exists for this), at HIS
+    #     level 29, on the intent he failed. Every other Helper shot in this file stages a
+    #     two-item fixture whose point is the shape; this one stages the thing that broke.
+    #
+    #   PREDICTED (trap 23) — measured against the shipped catalog before the take, and the
+    #   same numbers `FounderResmokeTests` and the E2E row
+    #   `TheFoundersOwnDumpReachesTheHelperWithCandidatesAndRefusals` pin:
+    #     * The worn face reads "Any worn item" — nothing picked, so the sweep runs over all
+    #       TWENTY-ONE of his readable rows. (The tests say 20 anchors because they exclude
+    #       AMMO; the room counts what it drew.)
+    #     * NO "EQBuddy has never read about:" caption. That caption is D2's and it ships — it
+    #       is what would have told him his bow had vanished. On HIS dump it is correctly
+    #       absent, because after the alias nothing is unreadable, and **predicting the blank is
+    #       the point**: a correct absence is indistinguishable from a missing feature.
+    #     * THREE answers — Kael Drakkel, Great Divide, Clan Runnyeye — places a 29 can stand
+    #       in, each with item lines naming their creatures.
+    #     * THE SENTENCE THIS SHOT EXISTS FOR, under them: *"18 zones EQBuddy has upgrades for
+    #       are not listed at your level 29: Chardok (50 and up), … and 13 more. Those are
+    #       eqlwiki's own creature levels — EQBuddy leaves a zone out of this list when its band
+    #       starts 5 or more levels over you."* Temple of Veeshan, Sleeper's Tomb, Plane of
+    #       Fear, Plane of Hate and Veeshan's Peak are all in that list. **It reads like a
+    #       failure and is the fix working**, which is exactly why it is photographed and why
+    #       `docs/ops/dra149-founder-resmoke.md` leads with it.
+    #     * "8 more drop offers are not listed: their item pages name nothing that drops them in
+    #       those zones" — the who rule, a DIFFERENT number with a different cause, which is why
+    #       it is a second sentence.
+    #     * "1,190 more upgrades matched and are not listed" — the sweep's own cap, a third
+    #       cause and a third sentence. Three withheld numbers in one picture is the density
+    #       question this shot puts to Bevel; it is not restyled from here.
+    #     * The base-claim line: *"a better BASE item than yours — at the same +, it wins"*,
+    #       said ONCE for the block. Not once per row — eight item lines carrying one caveat
+    #       apiece is trap 73 in prose, and D1 chose the block.
+    #     * NO unknown-level line and no Character door: the level is stated, so the disclosure
+    #       says where the 29 came from instead.
+    #
+    #   WHAT ACTUALLY HAPPENED, AND THE CAVEAT THIS SHOT SHIPS WITH. Taken 2026-09-17. Every
+    #   prediction above is met — "Any worn item", the base claim said once, "Weighed at level
+    #   29, set by you", Kael Drakkel / Great Divide / Clan Runnyeye in that order, creature
+    #   clauses on every item line including a plural one ("a furious tizmak warrior, a tizmak
+    #   champion and a tizmak warrior drop it"), and no unread-worn caption. **The three withheld
+    #   captions are BELOW THE FOLD and this picture does not show them.** The shell window
+    #   clamps near 885px tall on a 1080 screen whatever `EQBUDDY_SHELL_SIZE` asks for — a first
+    #   take at `946x1000` came back 932x993 with the bottom ~110px black and the content ending
+    #   mid-sentence at the same place. So the sentence this shot was chosen to photograph is
+    #   the one it cannot reach, which is stated here rather than worked around by restyling the
+    #   product (trap 79's rule: say which part of a capture is unfaithful). `shell-helper-
+    #   founder-bow` below is the picture that DOES show a refusal caption whole, and the
+    #   numbers themselves are asserted by `FounderResmokeTests` and the E2E row, which is where
+    #   a caption below a fold cannot hide.
+    #
+    #   'shell-helper-founder-bow' — the same dump and the same level, NARROWED to the bow, with
+    #     include-quests ON. Short enough that the captions fit, and it is a state worth its own
+    #     picture: every place the one anchor's upgrades drop is refused, so the room draws the
+    #     refusal AND `EveryZoneOutsideYourBand` — which exists precisely because
+    #     `NoCatalogUpgrade` would be a lie there.
+    #
+    #   MEASURED, AND IT CORRECTS THE PLAN'S WORKED EXAMPLE. P6 predicted four base-better items
+    #   for the bow, and there are — but **only for a character who is both a Ranger and a
+    #   Shaman**, which is nobody. The class lock decides: `Bow of the Silver Fang` (Temple of
+    #   Veeshan) is `RNG` only and `Rune Shafted Harpoon` (The Mighty Snowfang Hero) is `SHM`
+    #   only, while the two Velium Reinforced bows in Sleeper's Tomb are `WAR|PAL|RNG|SHD|ROG`.
+    #   So the fixture character sees **one** refused zone, not two, and no quest row at all.
+    #   The four-item figure in `FounderResmokeTests` is measured with NO class lock and is a
+    #   fact about the CATALOG; what any real character sees is a subset of it, and the picture
+    #   is what made the difference visible.
+    #
+    #   'shell-helper-vendors' — FAIL 3's second half, which has no picture anywhere else.
+    #     Farm Materials picked and NO profession picked, which is the filter's empty state and
+    #     therefore all eight — so this is also the density question for the vendor sub-list,
+    #     asked at its worst case rather than its best.
+    #       - Under each profession's standing row and its two controls: up to THREE shop lines,
+    #         one per zone, in eqlwiki's own words with the zone in front. Jewelcrafting reads
+    #         Ak'Anon, Cabilis, Erudin — the catalog's own order, never ranked.
+    #       - "and 14 more zones — eqlwiki's zone pages have the rest." under Jewelcrafting. The
+    #         cap says what it held back (trap 50) and counts ZONES, because that is what a
+    #         player deciding where to travel is choosing between.
+    #       - TWO doors under each line — `eqlwiki` and `Map` — which is six controls under one
+    #         profession, and the second thing this shot asks Bevel about.
+    #       - NO profession draws the "No zone page's map key names a … shop" sentence on the
+    #         current catalog: all eight match at least one zone. If one appears in this
+    #         picture, a keyword row has been lost.
+    #       - The block caption under the whole list: *"Shops eqlwiki's zone maps name, in the
+    #         wiki's own words — EQBuddy matched them on each profession's materials and tools
+    #         and changed nothing else."*
+    #
+    #   'shell-helper-vendors-light' — the same staging in SOLARIZED, the only light palette.
+    #     Twenty-four transcribed caption lines with two accent links each is a new density for
+    #     this room and light is where dim-on-light contrast fails.
+    'shell-helper-founder' = @{ Title = 'EQBuddy — Helper'
+                           Env = @{ EQBUDDY_SHELL = 'helper'; EQBUDDY_SHELL_SIZE = '946x880' }
+                           DumpFrom = @{ 'Testchar_test-Inventory.txt' = 'inventory/dranak.txt' }
+                           Ledger = @{ StatedLevel = 29; StatedLevelAt = '2026-09-16T20:00:00' }
+                           Set = @{
+                               HelperGoals = @{ 'testchar_test' = @('FarmGear') }
+                           } }
+    'shell-helper-founder-bow' = @{ Title = 'EQBuddy — Helper'
+                           Env = @{ EQBUDDY_SHELL = 'helper'; EQBUDDY_SHELL_SIZE = '946x880' }
+                           DumpFrom = @{ 'Testchar_test-Inventory.txt' = 'inventory/dranak.txt' }
+                           Ledger = @{ StatedLevel = 29; StatedLevelAt = '2026-09-16T20:00:00' }
+                           Set = @{
+                               HelperGoals = @{ 'testchar_test' = @('FarmGear') }
+                               HelperWornPicks = @{ 'testchar_test' = @('Deterioriated Ancient Faydark Longbow +2') }
+                               HelperGearQuests = @{ 'testchar_test' = $true }
+                           } }
+    'shell-helper-vendors' = @{ Title = 'EQBuddy — Helper'
+                           Env = @{ EQBUDDY_SHELL = 'helper'; EQBUDDY_SHELL_SIZE = '946x1000' }
+                           Set = @{
+                               HelperGoals = @{ 'testchar_test' = @('FarmMaterials') }
+                           } }
+    'shell-helper-vendors-light' = @{ Title = 'EQBuddy — Helper'
+                           Env = @{ EQBUDDY_SHELL = 'helper'; EQBUDDY_SHELL_SIZE = '946x1000' }
+                           Set = @{
+                               Theme = 'Solarized'
+                               HelperGoals = @{ 'testchar_test' = @('FarmMaterials') }
+                           } }
     # ---- DRA-71 D7: motes and money, both from the player's own play ----------------------
     #
     # The two staged states are this slice's two claims: what a place has paid you in MOTES,
@@ -4210,6 +4328,32 @@ function Write-Dump([hashtable]$dump) {
     }
 }
 
+# A COMMITTED dump, copied verbatim (DRA-149 D5).
+#
+# `Write-Dump` above builds a dump from lines in the recipe, which is right when the point of
+# the picture is the SHAPE — two items, one slot each. It is the wrong tool for the Founder's
+# re-smoke: his FAIL is about HIS dump, and every detail of it is something a slice of DRA-149
+# fixed. Twenty-one worn rows rather than two, "+2".."+9" on every one (the tier rule's whole
+# problem), an `Any Slot` shield, and a bow the game spells `Deterioriated`. Re-typing a
+# stand-in into this file would photograph a real state that is not the one under test (trap
+# 23), and it would drift from the fixture the tests predict against.
+#
+# Runs AFTER `Write-Dump`, which clears `Testchar_*.txt` before writing.
+#
+# The source is resolved against the REPO, not against `$root` — `$root` is the throwaway
+# fixture tree this script builds per run, and the first take of `shell-helper-founder` looked
+# for the committed dump inside it and refused. That refusal is the design: it THROWS with the
+# path it tried rather than copying nothing, so a missing fixture is a failed shot and not a
+# correct photograph of an empty inventory (trap 23 again, one layer down).
+function Write-DumpFrom([hashtable]$from) {
+    if ($null -eq $from) { return }
+    foreach ($file in $from.Keys) {
+        $src = Join-Path $PSScriptRoot "../tests/fixtures/$($from[$file])"
+        if (-not (Test-Path $src)) { throw "shot fixture not found: $src" }
+        Copy-Item -Path $src -Destination (Join-Path $root "game/$file") -Force
+    }
+}
+
 # The wiki page cache, which is where the contribution pack's state actually comes from
 # (EqlWikiMobService's 7-day disk cache, under <profile>/wiki-cache/mobs). A seeded entry
 # is served without a fetch, so the shot is offline and deterministic; an unseeded
@@ -4653,6 +4797,8 @@ try {
         Write-Ledger $spec.Ledger
         Write-Raids $spec.Raids
         Write-Dump $spec.Dump
+        # AFTER Write-Dump, which clears the folder before it writes (DRA-149 D5).
+        Write-DumpFrom $spec.DumpFrom
         Write-WikiCache $spec.Wiki
         Write-Cycles $spec.Cycles
         Write-Timers $spec.Timers

@@ -95,6 +95,16 @@ public class FounderResmokeTests
     /// <para><b>This is the single clearest refutation of FAIL 2.</b> Before D1 this anchor
     /// produced zero, and the reason was not the catalog: the tier rule compared a worn "+2"
     /// against catalog names that never carry one.</para>
+    ///
+    /// <para><b>IT IS A FACT ABOUT THE CATALOG, NOT ABOUT ANY CHARACTER, AND THE STAGED SHOT IS
+    /// WHAT MADE THAT VISIBLE.</b> This runs with NO class lock, so four is the number a
+    /// character who was somehow both a Ranger and a Shaman would see. The class lock decides
+    /// the rest: <c>Bow of the Silver Fang</c> (Temple of Veeshan) is <c>RNG</c> only and
+    /// <c>Rune Shafted Harpoon</c> is <c>SHM</c> only, while the two Sleeper's Tomb bows are
+    /// <c>WAR|PAL|RNG|SHD|ROG</c>. <c>shell-helper-founder-bow</c> photographs the fixture
+    /// character getting ONE refused zone and no quest row, which is correct and is a strict
+    /// subset of this. A reader taking the four below as "what the Founder will see" would be
+    /// reading a catalog fact as a personal one.</para>
     /// </summary>
     [Fact]
     public void TheBowHasFourBaseBetterItemsAndTheFourthIsOnlyThereWithQuestsOn()

@@ -1,3 +1,99 @@
+## 2026-09-17 — DRA-149 D5: the re-smoke pack, and the prediction that caught itself
+
+**Seat:** `opus-dra149-d5` (disjoint). D4 merged at `3df21141`; this is the last slice of the
+signed sequence. Everything below is inside plan P6 except items 3 and 6, which say so. Nothing
+here touches the consequence list, nothing fetches, no catalog was rebuilt, **no release and no
+tag**, and nothing here marks DRA-84 PASS — that is still the Founder's call.
+
+**1. `GearCandidates` is a new field on a public Core record, and the reason is that P6's E2E
+list named an input nothing carried.** The plan asked the re-smoke to dump "anchors, unread
+count, candidates, band refusals, who withholdings". Four of those five were already in the
+`EQBUDDY_EXPAND` dump; **candidates** was not, and it is the one that matters most. Without it
+the two empty gear screens are indistinguishable: a sweep that found NOTHING (the pre-D1 state —
+the tier rule compared a worn `+2` against catalog names where 0 of 11,196 carry one) and a
+sweep that found 147 and had every place refused. Both draw one grey sentence, and
+`helperGearWhy` counts DRAWN rows, so it is 0 in both. **The default the other way:** infer it
+from `helperGearWithheld`, which is the sweep's per-anchor CAP rather than its output — a proxy
+for a fact nobody had named (trap 64b), and wrong whenever the cap is 0.
+
+**2. THE FIRST RUN OF THE PREDICTION TESTS REPORTED ZERO BAND REFUSALS AT EVERY LEVEL, AND IT
+WAS THE TESTS THAT WERE WRONG.** Those numbers were minutes from being written into a checklist
+the Founder would have read. The fixture did not set `HelperInputs.Bands`, and the gate stands
+down entirely without them (trap 73, correctly) — it reports nothing and everything passes. That
+is trap 78 from the test side: a guard aimed at a rule that never ran. What makes the E2E row
+trustworthy is that it asserts `helperBandGate=1` BEFORE it reads any refusal count, which is a
+liveness check DRA-84 D2 already wrote for exactly this reason and which I had not copied into
+the unit half. **Recorded because it is the single most likely way this pack could have shipped
+confidently wrong.**
+
+**3. NOT in P6: `AppHarness.WriteInventoryDumpFrom`, and the number it settles.** The plan says
+to stage the Founder's screens; it does not say how. `WriteInventoryDump` builds a dump from
+tuples, which is right when the point is the SHAPE. His FAIL is about HIS dump — 21 worn rows,
+`+2`..`+9` on every one, an `Any Slot` shield, a bow the game spells `Deterioriated` — and every
+one of those is a thing a slice of this card fixed, so a hand-typed stand-in photographs a real
+state that is not the one under test (trap 23). It copies the committed fixture verbatim.
+**It also settles a pair that reads as a contradiction:** the room dumps 21 anchors and
+`GearUpgradesFixtureSweepTests` says 20, because that suite excludes AMMO deliberately — a floor
+met by the one anchor that already worked would be met by the thing that was never broken. Two
+numbers, two questions, both right, and now both written down.
+
+**4. The unit half and the E2E half disagree on the counts ON PURPOSE, and the disagreement is
+load-bearing.** 155 candidates / 16 refusals from the engine; 147 / 18 through the launched app.
+The app knows the character's CLASS from the log and the fixture does not, so the class lock
+removes different candidates and a different set of zones reaches the gate. Both are right about
+their own inputs. The tests are therefore FLOORS on both sides rather than equalities — a gate
+that reddens because a wiki refresh moved one row is a gate the next person re-runs until green
+(trap 74's lesson), and this one would additionally redden on a fixture difference that is not a
+defect.
+
+**5. The `WhatsNew.json` entries are drafted in `docs/ops/` and NOT in `WhatsNew.json`.** P6 says
+to draft them and that the release shipping them is later. The tempting place is the existing
+`2.0.0` entry, and it is the wrong one: **2.0.0 is the build the Founder failed**
+(`2.0.0+275cc215`), so filing these there would tell every player that the fix was in the build
+that lacked it. They land when `<Version>` moves, which is a release decision and David's.
+**The default:** append to 2.0.0 now so nothing can be forgotten. The forgetting risk is real and
+is handled by `release.ps1` refusing a tag without an entry.
+
+**6. NOT named in P6: the checklist leads with the two screens that look like failures.** The
+plan asked for a checklist saying what each screen should SAY, and for the band refusal to be
+predicted "instead of letting it read as a failure". Writing it surfaced a SECOND screen of that
+shape, in the opposite direction: the vendor block needs **no play history at all**, so it is the
+one block in the room where *"it is empty because I have not played enough"* is not available as
+an explanation — an empty one is a real defect. Every other block in this room gets better the
+more you play, so the reading is inverted exactly where a reader would not expect it. Both are
+⚠️ boxes in `docs/ops/dra149-founder-resmoke.md`.
+
+**7. The plan's worked example was right, and it is now pinned rather than quoted.** P6 predicted
+*"4 base-better items — Temple of Veeshan `60+` and Sleeper's Tomb `55+` refused against the
+staged level, 1 quest row behind the toggle"*. Measured: two Velium Reinforced bows in Sleeper's
+Tomb, the Bow of the Silver Fang in Temple of Veeshan, and `Rune Shafted Harpoon` from *The
+Mighty Snowfang Hero* — which appears ONLY with include-quests on, because a quest is not a camp
+and neither the band gate nor the who rule touches it. That is a plan prediction surviving
+contact with the shipped catalog, and it is worth saying so as loudly as the one that did not
+(DRA-84 D2's Crushbone example was a level off its own constant).
+
+**8. THE STAGED SHOT CORRECTED THE PLAN'S WORKED EXAMPLE, AND NO ASSERTION COULD HAVE.** P6
+predicted four base-better items for the bow. There are four — **for a character who is both a
+Ranger and a Shaman**, which is nobody. `Bow of the Silver Fang` (Temple of Veeshan) is `RNG`
+only; `Rune Shafted Harpoon` (The Mighty Snowfang Hero) is `SHM` only; the two Sleeper's Tomb
+bows are `WAR|PAL|RNG|SHD|ROG`. The fixture character sees ONE refused zone and no quest row, and
+`shell-helper-founder-bow` photographs exactly that. `FounderResmokeTests` runs with no class
+lock, so its four is a fact about the CATALOG and was one sentence away from being read as a fact
+about the Founder — it now says so, and so does the checklist. **The class lock is working
+correctly**; what was wrong was a claim's scope, which is the kind of defect a green test cannot
+see.
+
+**9. `shell-helper-founder` ships with a stated caveat rather than a restyle.** The shell window
+clamps near 885px tall on a 1080 screen whatever `EQBUDDY_SHELL_SIZE` asks for — a take at
+`946x1000` came back 932x993 with the bottom ~110px black and the content ending mid-sentence at
+the same place as the 880 take. So the three withheld captions are below the fold in the very
+picture chosen to photograph one of them. **The default the other way:** shorten the room's
+content by narrowing the staged pick until they fit, which would have made the picture agree with
+the recipe by changing what it is a picture OF. Instead the caveat is in the recipe (trap 79's
+rule: say which part of a capture is unfaithful, do not restyle the product until the camera
+agrees), `shell-helper-founder-bow` is the narrowed staging that shows a refusal caption whole,
+and the numbers are asserted where a fold cannot hide them.
+
 ## 2026-09-17 — DRA-161 / EXO-HARDEN-A1e: the rotated archive copies are OUT of scope for mojibake repair, permanently
 
 **Seat:** Executor, carrying out the Planner ruling on DRA-160 (2026-09-17 09:50Z). This entry and one
