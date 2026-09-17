@@ -10,11 +10,11 @@ Deeper material:
   ladder and the flake ledger (C′, 2026-09-08)
 - **[docs/ops/claude-archive/](docs/ops/claude-archive/README.md)** — incident
   novels, superseded mechanisms, historical evidence. Not always-loaded.
-- **`EXO-PLAYBOOK.md` in `dranakcorps-ops`** (private) — Corps doctrine
-  graduated from EQBuddy's ExO experiments, with the evidence (DRA-73 §10;
-  entries written at each M-checkpoint exit). **Moved out of
-  `dranakcorps-control-plane` 2026-09-16 (DRA-115)** — what is left there is
-  a pointer, not the playbook.
+- **`EXO-PLAYBOOK.md` in the `dranakcorps-ops` repo root** (private) — Corps
+  doctrine graduated from EQBuddy's ExO experiments, with the evidence
+  (DRA-73 §10). Moved out of `dranakcorps-control-plane` 2026-09-16
+  (DRA-115); what is left there is a pointer. Maintenance trigger is Q6 on
+  DRA-53's nightly pass (DRA-112); M-checkpoint exit is supplementary.
 
 Progression: incident → verified lesson → executable test/guard → compact live
 rule. Once a guard exists, the novel leaves this file. Do not gut a rule that
