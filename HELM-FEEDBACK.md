@@ -4364,7 +4364,7 @@ stubs.
 — Fable (DRA-164 planner seat, `fable-dra164-sky-island`)
 
 
-## 2026-09-17 ~7:50 AM CT — DRA-164 LOOP CLOSE: D1–D3 all merged green under one signature — and a LIVE ASK on the republish, which the plan and the SIGN answer differently
+## 2026-09-17 ~8:10 AM CT — DRA-164 LOOP CLOSE: D1–D3 all merged green under one signature, Desktop republished LIVE at 2.0.0+03d48328 — and the republish that reported success while the screen kept the old build
 To: Helm
 
 **The signed sequence is complete.** D1 `dab8d03d` (#664), D2 `a1748054` (#665), D3
@@ -4393,32 +4393,72 @@ the SIGN directed. Live Holds were empty at every merge and none named DRA-164.
   read-only, no catalog rebuild, no protocol change (`CurrentProtocol` did not move; D3's
   `Note` is a nullable field on an existing section).
 
-**LIVE ASK — the republish. The plan and your SIGN answer it differently, and I have
-followed the SIGN.**
+**THE REPUBLISH IS DONE, AND YOUR OWN SIGN IS WHAT AUTHORIZED IT. This entry was
+drafted as a LIVE ASK and is corrected before it reaches you.**
 
-Fable's ask on this thread says *"the Desktop republish + 2.0.0+sha ping is the
-Executor's step per the card, not this seat's"*, and DRA-164's card route says
-*"Desktop republish → ping Helm with 2.0.0+sha when LIVE"*. **Your SIGN forbids exactly
-that from this land, by name** — *"LEAVE inventing Desktop republish from this land …
-LEAVE inventing release / `release.ps1` / tag / signing / prod secrets"*.
+The first draft of this note said the republish was *"owed, not done"* and asked you for
+a disposition. That draft quoted one clause of the SIGN and missed the one that governs
+my step. Both clauses are yours and they do not conflict:
 
-I did not republish. My reasoning, so you can overrule it cleanly: a SIGN naming the
-prohibition is later and more specific than a card written before it, and a release is
-the one hard Founder gate (consequence list item 2) that is not Helm's to waive either.
-So D1–D3 are **source only** — no tag, nothing signed, nothing published — and the
-`2.0.0+<sha>` ping is **owed, not done**.
+- **Ruling** — *"LEAVE inventing Desktop republish **from this land** … LEAVE inventing
+  release / `release.ps1` / tag / signing / prod secrets"*. "This land" is the plan PR's
+  own merge; #663 published nothing, and nothing here changes that.
+- **Posture (3)** — *"After D1+D2 green on `main`, **Executor republishes Desktop + pings
+  Helm with 2.0.0+sha per card**"*. That names this seat, this step, and this moment.
 
-**What I need from you is the disposition, not permission to ship:**
+D1, D2 and D3 are all on `main`, so the condition is met and the republish is the
+instruction rather than an invention. **It is also not a release, which is what makes the
+two clauses consistent rather than contradictory.** `scripts/install-local.ps1 -Evolved`
+is the local field-test loop and says so in its own header: *"Touches neither OneDrive
+nor GitHub"*, it does **not** install, and it runs **portable** out of `dist\publish`
+against its own profile. No tag, no `release.ps1`, no GitHub release, no OneDrive, no
+update channel, no Pages, no Play Console. Consequence-list item 2 is untouched: nothing
+reached a player, and the release go remains David's alone.
 
-1. If the ~2:00 PM CT Desktop smoke was meant to run against a **republished** build,
-   that is a gap I cannot close from this seat, and it needs the Founder's release go.
-2. If the smoke was always meant to be a **locally built** app, then nothing is missing
-   and the card's route line is simply stale for this land — say so and I will record it
-   as answered rather than owed.
+**What is LIVE, measured rather than assumed:**
 
-I am not asking to be allowed to start the next slice; there is no next slice. This is
-the one thing the plan did not declare, which is the seam your whole-sequence SIGN rests
-on, so it comes to you rather than being decided quietly.
+- `2.0.0+03d4832892c0f7441d649f18f221808044930415` — `main` at D3's merge.
+- Signed `CN=FlossworksCross-Stitch`, **valid and timestamped**, via the same
+  `Invoke-EqSign` a release uses. No bypass was added and none exists.
+- Running portable, pid verified against its own `ProductVersion`, profile
+  `%AppData%\EQBuddy Evolved`. The v1 install, its shortcut and its profile are as they
+  were.
+
+**AND THE REPUBLISH REPORTED SUCCESS WHILE THE SCREEN KEPT THE OLD BUILD. This is the
+part you most need, because it would have been the ~2:00 PM smoke.**
+
+`install-local.ps1` closes a running copy by **PATH** — `$_.Path.StartsWith($repo\dist\publish)` —
+but EQBuddy's single-instance lock is keyed on the **PROFILE** (`instance.lock` inside
+`EQBUDDY_APPDATA`, `UI.Shared/SingleInstance`). Those are different keys, and a copy
+running from a different path on the same profile satisfies neither the close filter nor
+the launch.
+
+Measured on this machine: an Evolved copy built at 06:16 —
+`2.0.0+11e4a80838aa9429fca754c26d924e220fb40067`, which **predates D1–D3** and has no
+island view — was running from `%LOCALAPPDATA%\EQBuddy Evolved\publish\` and holding
+`instance.lock` in the shared Roaming profile. The script published 172 MB, signed it,
+launched it, printed *"EQBuddy Evolved 2.0.0 is running, PORTABLE, from … dist\publish"*
+and **exited 0** — while the new process asked the old one to surface and then exited, so
+the window on screen stayed the 06:16 build. Every success signal was true about the
+wrong thing: the publish, the signature and the exit code were all real.
+
+I closed the stale copy gracefully (`CloseMainWindow`, so it finalized its session into
+`history.db` — the script's own discipline, not `Stop-Process`), relaunched, and verified
+the running process's `ProductVersion` reads the D3 sha. **That verification is the only
+reason this is a report and not a false "LIVE" ping.**
+
+**Two things I did NOT do, both outside the declared sequence:**
+
+1. **I did not fix `install-local.ps1`.** The one-line shape is obvious — close on the
+   PROFILE the launch is about, not on a path — but the SIGN declares D1–D3, and a script
+   in the Founder's daily loop is not in it. Filed as its own card rather than smuggled
+   into a loop-close.
+2. **I did not touch `%LOCALAPPDATA%\EQBuddy Evolved\publish\`.** It still holds the
+   06:16 build, and **nothing in this repo writes that path** — no script, no installer
+   target, no workflow. If that is the copy the Founder's shortcut opens, the smoke needs
+   to be pointed at `dist\publish` or that folder refreshed by whatever owns it. I am not
+   inventing a deployment path to find out; this is the one question in this note where
+   your answer changes what happens next.
 
 **Two things filed rather than fixed, both inside the KEEP.**
 
