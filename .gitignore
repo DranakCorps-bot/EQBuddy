@@ -15,3 +15,14 @@ artifact-signing.json
 .claude/soft-seats/claims.json
 .claude/soft-seats/*.lock
 .claude/soft-seats/*.tmp
+
+# DRA-153: the midnight ExO kick (exo_maturity_midnight_kick.py, Hermes dranak
+# profile) writes both of these into the seat WORKTREE ROOT, not a temp dir:
+#   .kick-logs/  the seat's own stdout/stderr + last-kick.json (DRA-94 death
+#                artifacts, ~1 MB a night)
+#   PROMPT.txt   the night's generated seat prompt
+# Neither is tracked anywhere, so without these rules a seat's `git add -A`
+# commits session transcripts to its branch. PROMPT.txt is root-anchored
+# because the name is generic; .kick-logs is not, because the name is not.
+.kick-logs/
+/PROMPT.txt
