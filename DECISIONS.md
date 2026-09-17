@@ -1,3 +1,40 @@
+## 2026-09-16 — DRA-148 (#527 rebase): the rename reached a rail that was built after the PR was written
+
+**Seat:** `opus-dra148-pr527`. #527 sat CONFLICTING through 409 commits of `main` drift. The
+two textual conflicts were channel-shaped and resolved by the standing rule (their file PLUS
+my entry): `DECISIONS.md` took my 2026-09-10 entry back into reverse-chronological place, and
+`WhatsNew.json` kept `main`'s edit of the shared sidebar highlight — `main` had since dropped
+the "jump to a room" clause from it — and appended only the Bard-spear line. Nothing in the
+PR's own intent changed.
+
+**1. The one real call: re-running `scripts/dra83-attachments.py` rather than stopping.**
+DRA-83 landed on `main` AFTER #527 was written and added
+`EpicGuideTests.TheTwoUnresolvableSkyRewardsAreNamedAndCarryNoReference`, which git could not
+see as a conflict because it is a different file. It went red on the rebase, exactly as its
+own doc comment predicted it would: *"`Harmonic Spear` is the wiki's Spear of Harmony (PR #527
+carries the rename) ... when either is fixed the count above moves — which is the point of
+asserting both ends."* The Bard's turn-in now resolves to a real `ItemCatalog` item, so DRA-83
+rule 1 ("`GearUpgrade` on the turn-in step, keyed on the reward ITEM, placed only where
+`ItemCatalog` knows the name") applies to it and it was carrying no reference.
+
+I re-ran the committed script rather than hand-editing the catalog or filing a stub. It skips
+any objective that already has attachments, so it placed **exactly one** — `GearUpgrade` /
+`Spear of Harmony` on `pos-bard-harmonic-spear`'s turn-in — and refused exactly one,
+`Windhowl/Spirit Render`, which is what the PR's intent says stays in Delivery 2. The guard's
+count moved 93 → 94 and its named list went from two to one, edited in the same commit that
+reddened it — the same shape the PR already applies to `GuideCatalogTests`.
+
+**The default it could have gone the other way on:** treat a newly-red guard as "product
+judgment beyond the stated intent", stop, and leave the PR open with a note. I did not,
+because nothing here is a judgement: the rule is committed and re-derivable, the script is its
+own record, the script CHOSE the placement, and the guard's author wrote #527 into the doc
+comment as the thing that would move the number. Deciding anything about
+`Windhowl/Spirit Render` WOULD have been that call, and it is untouched.
+
+**2. No scope beyond the rename's reach.** `QuestCatalog.json`, `AchievementsImport`, the
+guide's internal id `pos-bard-harmonic-spear`, and the Delivery 2 `RewardCard` shape question
+are all still untouched, for the reasons in the 2026-09-10 entry below.
+
 ## 2026-09-15 — DRA-87: the last three "log-only" labels, and why SECURITY.md got its own boundary line rather than an exemption
 
 **Seat:** `opus-dra87-docs-honesty`. Paperclip DRA-87, authorized by Helm as a one-slice

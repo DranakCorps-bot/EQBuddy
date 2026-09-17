@@ -614,6 +614,12 @@
                   "title": "Plane of Sky",
                   "retrievedAt": "2026-09-09"
                 }
+              ],
+              "attachments": [
+                {
+                  "kind": "GearUpgrade",
+                  "key": "Spear of Harmony"
+                }
               ]
             }
           ]
