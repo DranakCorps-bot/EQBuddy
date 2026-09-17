@@ -3,7 +3,10 @@
     Every gate that must pass before a commit, in one command.
 
 .DESCRIPTION
-    Three guards, build, unit tests. Prints one summary line per stage and returns a
+    The guards and their prove-fails, build, unit tests. (This line said "three guards" and
+    had been wrong for some time before the channel size ratchet was added below it — the
+    stage list is the answer to "how many", not a number in this paragraph.) Prints one
+    summary line per stage and returns a
     non-zero exit code if any of them fail, so it is equally usable by a human and by
     an agent that only reads the tail of the output.
 
@@ -45,7 +48,7 @@ function Step([string] $name, [scriptblock] $body) {
     if ($LASTEXITCODE -ne 0) {
         Write-Host "FAILED" -ForegroundColor Red
         # Only the lines that say why — a full MSBuild log buries the one that matters.
-        $output | Select-String -Pattern 'error |Failed!|\[FAIL\]|Assert\.|whatsnew-guard|legacy-notice-guard|evolved-channel-guard|channel-wipe-guard|soft-seat-selftest|merge-sync' |
+        $output | Select-String -Pattern 'error |Failed!|\[FAIL\]|Assert\.|whatsnew-guard|legacy-notice-guard|evolved-channel-guard|channel-wipe-guard|channel-size-guard|channel-size-selftest|soft-seat-selftest|merge-sync' |
             Select-Object -First 15 | ForEach-Object { Write-Host "   $_" }
         Write-Host "   full log: $log" -ForegroundColor Yellow
         $script:failed += $name
@@ -79,6 +82,14 @@ Step 'channel     ' { & "$PSScriptRoot\channel-wipe-guard.ps1" 6>&1 }
 # …and its prove-fail. Every check above is driven into the red once in a throwaway repo
 # under TEMP; a wipe guard nobody has watched refuse is trap 34 with the stakes raised.
 Step 'channel test' { & "$PSScriptRoot\channel-wipe-guard-selftest.ps1" 6>&1 }
+# The size half of the same policy (DRA-73's 30-day / ~64 KB rotation trigger, enforced at
+# last by DRA-26 rev 3 card A). The guard above refuses a ledger shrinking by the wrong
+# mechanism; this one refuses one GROWING past 64 KiB, and the remedy it names is rotation
+# into docs/ops/claude-archive/ — never deletion, which the guard above would refuse anyway.
+# Working tree against the merge-base, so an over-limit append fails before it is committed.
+Step 'channel size' { & "$PSScriptRoot\channel-size-guard.ps1" 6>&1 }
+# …and its prove-fail, for the reason the one above has one.
+Step 'size test   ' { & "$PSScriptRoot\channel-size-selftest.ps1" 6>&1 }
 # Experiment A′ self-test (trap 70, EQBuddy lab): a second default seat on the
 # same work item must refuse. Throwaway StoreDir; not the machine's live claims.
 Step 'soft seats  ' { & "$PSScriptRoot\soft-seat-selftest.ps1" 6>&1 }
