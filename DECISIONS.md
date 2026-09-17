@@ -1,3 +1,40 @@
+## 2026-09-16 — DRA-148 (#527 rebase): the rename reached a rail that was built after the PR was written
+
+**Seat:** `opus-dra148-pr527`. #527 sat CONFLICTING through 409 commits of `main` drift. The
+two textual conflicts were channel-shaped and resolved by the standing rule (their file PLUS
+my entry): `DECISIONS.md` took my 2026-09-10 entry back into reverse-chronological place, and
+`WhatsNew.json` kept `main`'s edit of the shared sidebar highlight — `main` had since dropped
+the "jump to a room" clause from it — and appended only the Bard-spear line. Nothing in the
+PR's own intent changed.
+
+**1. The one real call: re-running `scripts/dra83-attachments.py` rather than stopping.**
+DRA-83 landed on `main` AFTER #527 was written and added
+`EpicGuideTests.TheTwoUnresolvableSkyRewardsAreNamedAndCarryNoReference`, which git could not
+see as a conflict because it is a different file. It went red on the rebase, exactly as its
+own doc comment predicted it would: *"`Harmonic Spear` is the wiki's Spear of Harmony (PR #527
+carries the rename) ... when either is fixed the count above moves — which is the point of
+asserting both ends."* The Bard's turn-in now resolves to a real `ItemCatalog` item, so DRA-83
+rule 1 ("`GearUpgrade` on the turn-in step, keyed on the reward ITEM, placed only where
+`ItemCatalog` knows the name") applies to it and it was carrying no reference.
+
+I re-ran the committed script rather than hand-editing the catalog or filing a stub. It skips
+any objective that already has attachments, so it placed **exactly one** — `GearUpgrade` /
+`Spear of Harmony` on `pos-bard-harmonic-spear`'s turn-in — and refused exactly one,
+`Windhowl/Spirit Render`, which is what the PR's intent says stays in Delivery 2. The guard's
+count moved 93 → 94 and its named list went from two to one, edited in the same commit that
+reddened it — the same shape the PR already applies to `GuideCatalogTests`.
+
+**The default it could have gone the other way on:** treat a newly-red guard as "product
+judgment beyond the stated intent", stop, and leave the PR open with a note. I did not,
+because nothing here is a judgement: the rule is committed and re-derivable, the script is its
+own record, the script CHOSE the placement, and the guard's author wrote #527 into the doc
+comment as the thing that would move the number. Deciding anything about
+`Windhowl/Spirit Render` WOULD have been that call, and it is untouched.
+
+**2. No scope beyond the rename's reach.** `QuestCatalog.json`, `AchievementsImport`, the
+guide's internal id `pos-bard-harmonic-spear`, and the Delivery 2 `RewardCard` shape question
+are all still untouched, for the reasons in the 2026-09-10 entry below.
+
 ## 2026-09-15 — DRA-87: the last three "log-only" labels, and why SECURITY.md got its own boundary line rather than an exemption
 
 **Seat:** `opus-dra87-docs-honesty`. Paperclip DRA-87, authorized by Helm as a one-slice
@@ -3085,6 +3122,35 @@ touching the actual unknown, which is rendering.
 PR #501 still open carrying the full plan; filed the LIVE ASK for Helm's SIGN + merge instead
 of writing a second plan in this seat. One `gh pr list` before writing — the corrective from
 the DRA-48 #508/#510 collision, applied.
+
+## 2026-09-10 (Fable's two #514 follow-ups — the calls I made alone)
+
+**1. The Bard's guide ID stays `pos-bard-harmonic-spear` after the rename.** Everything a
+player can SEE now says "Spear of Harmony", but the guide's internal id does not, and that is
+deliberate: `GuideProgressRouter` uses `Guide.Id` as the per-character ledger key for steps
+that belong to no checklist item, so renaming it would silently drop this Bard's recorded skips
+and travel steps to buy a tidier string nobody reads. Fable's blast-radius list did not include
+it either. The default it could have gone the other way on: rename for consistency and accept
+the progress loss. If it ever DOES get renamed, it needs its own ledger migration.
+
+**2. `GuideExpanded` migrates with the rename rather than accepting one re-fold.** Fable named
+this as a choice and asked me to say which I took. Migrating is four lines in a loop that
+already exists and it means a player with that quest open does not find it silently folded on
+next launch. The two loops are separate because an expanded quest is not a completed one — the
+first loop's `continue` would have skipped it. `AnExpandedQuestStaysExpandedThroughARename`
+prove-failed.
+
+**3. `QuestCatalog.json` keeps "Harmonic Spear" and was not touched.** It is HARVESTED wiki
+data, auto-written by the weekly refresh, and that string is a rewards entry on a quest page —
+hand-editing it would be overwritten next refresh and would make us disagree with our own
+harvest. The rename is ours to make in the CURATED rows (`SkyQuestDefaults`, the guide
+catalog); the wiki's quest page saying something different from its item page is the wiki's to
+fix, not ours to paper over.
+
+**4. `AchievementsImport`'s drift-match pair keeps BOTH spellings.** It exists to tolerate the
+game's export and our catalog disagreeing, and the game's export is not renamed by us. Removing
+the old spelling would break the import for anyone whose dump predates this.
+
 ## 2026-09-10 (DRA-33 Evolved republish — the calls I made alone)
 
 **1. "Fable files the look" was treated as satisfied by the pushed channel filing on the seat

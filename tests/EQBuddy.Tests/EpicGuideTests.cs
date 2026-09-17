@@ -300,8 +300,10 @@ public sealed class EpicGuideTests : IDisposable
         var placed = ShippedAttachments();
 
         // Rule 1: the reward item, on the turn-in step of every Sky guide whose reward
-        // ItemCatalog knows — 93 of 95, and the two it does not are the test below.
-        Assert.Equal(93, placed.Count(a => a.Kind == GuideAttachment.GearUpgrade));
+        // ItemCatalog knows — 94 of 95, and the one it does not is the test below. It was 93
+        // until the Bard's reward took the wiki's own title, "Spear of Harmony" (#527): the
+        // lookup started resolving, so rule 1 placed a reference it had been refusing.
+        Assert.Equal(94, placed.Count(a => a.Kind == GuideAttachment.GearUpgrade));
         // Rule 2: the zone, on the one open-farm step of each of the 95 Sky guides. The 127
         // Loot steps name a creature and carry nothing: one pull is not a camp.
         Assert.Equal(95, placed.Count(a => a.Kind == GuideAttachment.XpFarm));
@@ -345,18 +347,23 @@ public sealed class EpicGuideTests : IDisposable
     }
 
     /// <summary>
-    /// **The two Sky rewards that got NO reference, by name** — a committed negative, because
-    /// the reason they were skipped is a bug of OURS and a silent skip would bury it.
+    /// **The ONE Sky reward that got NO reference, by name** — a committed negative, because
+    /// the reason it was skipped is a bug of OURS and a silent skip would bury it.
     ///
-    /// <para>Both names are spellings the item catalog has never heard of: <c>Harmonic Spear</c>
-    /// is the wiki's <i>Spear of Harmony</i> (PR #527 carries the rename) and
-    /// <c>Windhowl/Spirit Render</c> is one checklist row standing for two items. Neither is a
-    /// gap in eqlwiki, and when either is fixed the count above moves — which is the point of
-    /// asserting both ends.</para></summary>
+    /// <para><c>Windhowl/Spirit Render</c> is one checklist row standing for two items, so no
+    /// item page can ever match it. That is not a gap in eqlwiki and it is NOT a rename: the
+    /// honest fixes are a reward split or a compound <c>RewardCard</c>, a SHAPE decision that
+    /// stays in Delivery 2 beside DRA-47.</para>
+    ///
+    /// <para><c>Harmonic Spear</c> WAS the other one. #527 gave it the wiki's own item title,
+    /// <i>Spear of Harmony</i>, the lookup resolved, and rule 1 placed the reference it had
+    /// been refusing — so the count above moved 93 → 94 and this list lost a name. This test
+    /// going red on that rename, and being edited in the commit that caused it, is the
+    /// committed negative working rather than a count quietly absorbing a fix.</para></summary>
     [Fact]
-    public void TheTwoUnresolvableSkyRewardsAreNamedAndCarryNoReference()
+    public void TheOneUnresolvableSkyRewardIsNamedAndCarriesNoReference()
     {
-        string[] ours = ["Harmonic Spear", "Windhowl/Spirit Render"];
+        string[] ours = ["Windhowl/Spirit Render"];
 
         foreach (var name in ours)
             Assert.Null(ItemCatalog.Default.Find(name));
