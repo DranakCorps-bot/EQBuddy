@@ -16,6 +16,14 @@ Class view (existing) vs Island view. Island view: multi-select which classes I 
 group checklist by island — everything to collect on island N before moving to next;
 warrior/monk/druid example.
 
+**Founder CLARIFY ~8:11 AM CT (baked):** Island-view checklist rows PREFIX which class —
+e.g. `[Cleric] gather …`. Soft LEAVE inventing omitting the class label. Soft LEAVE
+inventing inventing a second unlabeled row. Soft LEAVE inventing inventing that classic
+view changes — classic STANDS unchanged. Soft LEAVE inventing inventing as a DRA-149
+gate. Soft LEAVE inventing Pages/Play. Soft LEAVE inventing asking Founder. Soft LEAVE
+inventing changing Executor model mix / inventing Qwen on product until Helm SIGNs any
+Qwen/Opus plan separately — this card stays Opus-after-SIGN as written.
+
 ### 0. What already exists (measured this session; the survey numbers are the guards' floors)
 
 - **The multi-select the ask names EXISTS.** The Sky tab's class picker is `EqMultiPicker`
@@ -91,8 +99,10 @@ warrior/monk/druid example.
   close the list GROUPED BY THEIR EXISTING HEADING VERBATIM (`The wind rune`,
   `Not placed`, `Anywhere on the plane`) — the stage names are already the honest label
   and no location words are invented (trap 73's lesson). Within an island: class, then
-  reward, then title, and every row SAYS its class and reward — the reward heading is not
-  above it any more. Counts are distinct-by-id (the `SkyIslandGroupingTests` score
+  reward, then title, and every row PREFIXES its class in the title — e.g. `[Cleric]
+  gather …` (Founder CLARIFY ~8:11 AM CT) — plus the reward; Soft LEAVE inventing omitting
+  the class Soft LEAVE inventing inventing a second unlabeled row Soft LEAVE inventing
+  inventing that classic view changes. The reward heading is not above it any more. Counts are distinct-by-id (the `SkyIslandGroupingTests` score
   lesson). Empty islands are not emitted — the island list is the data's, never an
   invented 1–8 scaffold.
 - **P5 — What the island view EXCLUDES, it counts out loud** (trap 50). Turn-in rows are
@@ -113,6 +123,14 @@ warrior/monk/druid example.
   fold state (folds are reward-keyed and stay in class view), no wiki-link island
   headings at v1 — the search-results precedent for a rearrangement view. Bevel critiques
   the built card after delivery; that is input, not a gate.
+- **P8 — Island-view row titles PREFIX the class** (Founder CLARIFY ~8:11 AM CT). Shape:
+  `[Cleric] gather …` (class in brackets, then the same step text classic already shows).
+  Soft LEAVE inventing omitting the class Soft LEAVE inventing inventing a second unlabeled
+  row Soft LEAVE inventing inventing that classic view changes — classic STANDS. Same
+  checkboxes / same progress store as classic. Soft LEAVE inventing inventing as a DRA-149
+  gate Soft LEAVE inventing Pages/Play Soft LEAVE inventing asking Founder. Soft LEAVE
+  inventing changing Executor model mix Soft LEAVE inventing inventing Qwen on this product
+  card until Helm SIGNs a separate Qwen/Opus plan — Opus-after-SIGN stands here.
 
 ### 2. Slices
 
