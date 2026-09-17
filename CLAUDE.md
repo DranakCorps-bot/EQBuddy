@@ -63,6 +63,30 @@ unit + targeted E2E if user-visible; V2 affected suites + `scripts/check.ps1`;
 V3 full discipline. Full CI/`main` gates stay authoritative — do not weaken
 them.
 
+### Channel files: who trims, and how they stay small
+
+- **Executor never trims.** Executors append only; spotted rot goes into a card
+  comment, never fixed inline. Trimming is janitorial, not engineering, and must
+  never ride inside a feature branch.
+- **Rotation owner is a non-Executor Soft seat** — Clerk/Researcher-class,
+  claiming the standing `EXO-CHANNEL-ROTATE` card (**DRA-154**).
+- **Cadence:** one weekly pass batching every file due (<=1 Soft seat), plus a
+  64 KB size trigger for early rotation.
+- **Signing.** Helm last-looks rotations touching `HELM.md` /
+  `HELM-FEEDBACK.md`. David signs the first rotation of each file class and any
+  `HANDOFF.md` retirement; after one clean cycle those are Helm-signed only.
+- **Open asks, holds and standing rules never rotate**, at any age. A pass that
+  eats a live hold has failed.
+- **Discharge on close.** Whoever closes a loop writes the LOOP CLOSED line *at
+  close time* — that is what makes the entry rotatable next pass. Un-discharged
+  loops are the only thing that makes files immortal.
+- **Card-ID-or-it-didn't-happen.** Channel entries about tracked work cite the
+  card; they do not restate acceptance criteria, repro steps, or history the
+  card already holds.
+- **One channel per fact.** On a card → the channel gets a pointer; a ruling →
+  the channel holds it and the card points back. Never both in full.
+- **No repo TODO files.** Every TODO is a card; code TODOs carry `TODO(DRA-nn):`.
+
 ---
 
 ## Scribe
