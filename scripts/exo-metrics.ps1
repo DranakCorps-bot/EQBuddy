@@ -132,7 +132,23 @@ $script:OpsBranchMarkers = @(
 # M-milestone marks a discussion. The moment reports carry the marker, the code
 # path below computes — including a legitimate measured ZERO, because once the
 # feed is legible "no defect escaped this window's merges" is a finding.
-$script:DefectMarkerPattern = '(?im)^\s*exo-defect:\s*escaped\s+#(\d+)\s*$'
+#
+# DRA-133 / DRA-135 amend the marker and the read in four ways, and each one
+# exists to stop the SAME failure: silence printed as a measured zero.
+#
+#   - The marker is posted as a COMMENT by triage (ruling 1), not written into
+#     the player's body, so the read below matches the body OR any comment.
+#     Until this landed, a triage sweep would have run, marked, and produced
+#     nothing the instrument could see — worse than no sweep, because it would
+#     manufacture the belief that the feed is marked.
+#   - `unattributed` is an accepted form (ruling 3): "marked, but nobody can
+#     name the culprit merge" is a real state, and refusing to represent it
+#     means it is recorded as NOT MARKED, which is an undercount.
+#   - A window whose merges predate the convention could not have been marked
+#     (ruling 4), and a window younger than the report lag floor has a
+#     population that has not arrived yet (ruling 6). Both are `unmeasured`
+#     with a named reason, never `0`.
+$script:DefectMarkerPattern = '(?im)^\s*exo-defect:\s*escaped\s+(?:#(\d+)|(unattributed))\s*$'
 
 # One page is normally the whole feed. The cap exists so that a feed which has
 # outgrown it reports TRUNCATED rather than a count that silently omits its own
@@ -140,6 +156,45 @@ $script:DefectMarkerPattern = '(?im)^\s*exo-defect:\s*escaped\s+#(\d+)\s*$'
 # experiment this metric is the stated cost of.
 $script:DefectFeedPageSize = 100
 $script:DefectFeedPageCap = 20
+
+# The marker now lives in comments, so the comment fetch inherits the same
+# discipline: a discussion with an unread comment tail AND no marker in what was
+# read is not "unmarked", it is UNREAD, and the whole reading reports Truncated
+# rather than a count missing that discussion (ruling 5).
+$script:DefectCommentPageSize = 100
+
+# ---------------------------------------------------------------------------
+# The two guards that stop adoption turning an honest blank into a zero
+# (DRA-133 rulings 4 and 6).
+#
+# `Get-EscapedDefectReading` used to leave `NoConvention` the moment ANY marked
+# report existed ANYWHERE in the feed, then divide in-window reports by delivery
+# slices. So the first marker ever posted — on any discussion, naming any merge,
+# however old — would have flipped every other window from an honest
+# `unmeasured` to a measured `0.000`, sourced from silence and printed as
+# stated-net-of quality credit for `whole-sequence-auth`. These two constants
+# are what make that impossible.
+
+# The date the marking sweep begins. A window whose last merge predates it is
+# PERMANENTLY unmeasurable and says so: no backfill (ruling 4), because
+# retro-bisecting a three-week-old report is guesswork presented as measurement.
+#
+# $null is the PLACEHOLDER state and it is deliberately the strictest one: until
+# Scribe's first sweep sets a date, NO window is after the convention, so no
+# window computes. The alternative — leaving it unset and permissive — is
+# exactly the trap above, reachable by one marker comment posted before the
+# convention has a start date to be measured against.
+$script:DefectConventionStart = $null
+
+# Report-lag floor, in days. An escaped defect is reported LATER than the merge
+# that caused it, so a window read the day it closes has a population that has
+# not arrived. `0/N` in that state is a statement about the calendar.
+#
+# L = 14 is judgement, not data — there is no marked data yet to set it from.
+# Which is why every marked report's observed lag is recorded and reported
+# below: L is re-set from that distribution at five marked reports or M2,
+# whichever comes first (ruling 6).
+$script:DefectReportLagFloorDays = 14
 
 # ---------------------------------------------------------------------------
 # Reason honesty (DRA-127).
@@ -337,19 +392,32 @@ function Get-DefectFeedPage {
     # `after: null` is the first page; gh -F sends an empty string as an empty
     # string, which GraphQL rejects as a cursor, so the argument is omitted
     # rather than blanked.
+    # `comments` is the DRA-133 ruling-5 widening: the marker is a triage
+    # COMMENT, so a query that reads bodies only reads a feed that is marked and
+    # reports it unmarked. `totalCount` and the comments' own `hasNextPage` are
+    # both fetched because the caller has to be able to tell "this discussion
+    # has no marker" from "this discussion has more comments than I read".
     $query = @'
-query($owner:String!,$name:String!,$size:Int!,$after:String){
+query($owner:String!,$name:String!,$size:Int!,$csize:Int!,$after:String){
   repository(owner:$owner,name:$name){
     discussions(first:$size, after:$after, orderBy:{field:CREATED_AT,direction:DESC}){
       pageInfo{ hasNextPage endCursor }
-      nodes{ number title url createdAt body category{ name } }
+      nodes{
+        number title url createdAt body category{ name }
+        comments(first:$csize){
+          totalCount
+          pageInfo{ hasNextPage }
+          nodes{ body createdAt url author{ login } }
+        }
+      }
     }
   }
 }
 '@
     $ghArgs = @('api', 'graphql', '-f', "query=$query",
         '-F', "owner=$($parts[0])", '-F', "name=$($parts[1])",
-        '-F', "size=$script:DefectFeedPageSize")
+        '-F', "size=$script:DefectFeedPageSize",
+        '-F', "csize=$script:DefectCommentPageSize")
     if (-not [string]::IsNullOrWhiteSpace($Cursor)) { $ghArgs += @('-F', "after=$Cursor") }
 
     $raw = & gh @ghArgs 2>&1
@@ -361,6 +429,96 @@ query($owner:String!,$name:String!,$size:Int!,$after:String){
         throw ("gh api graphql (discussions) returned errors: {0}" -f (($json.errors | ForEach-Object { $_.message }) -join '; '))
     }
     return $json.data.repository.discussions
+}
+
+function Get-NodeProperty {
+    <# StrictMode makes a missing property a terminating error, and the fake
+       nodes -SelfTest builds deliberately omit `comments` (a discussion with no
+       comment thread is the common case and must not be a crash). #>
+    param($Node, [string]$Name)
+    if ($null -eq $Node) { return $null }
+    if ($null -eq $Node.PSObject.Properties[$Name]) { return $null }
+    return $Node.$Name
+}
+
+function Get-DefectMarkerFromNode {
+    <# The marker read, over ONE discussion: body first, then comments in the
+       order GitHub returns them.
+
+       Returns a marker record, or a truncation flag, or neither — and the
+       difference between the last two is the whole of ruling 5. A discussion
+       whose comment tail was not read and which carries no marker in what WAS
+       read is not unmarked; it is unread, and reporting it as unmarked is the
+       silent undercount `Truncated` exists to refuse.
+
+       A discussion whose marker was already found needs no tail: one discussion
+       is one report, so the only thing the tail could add is a second marker on
+       the same report. Counting it once is the reading. #>
+    param($Node)
+
+    $number = [int](Get-NodeProperty $Node 'number')
+    $created = ConvertTo-Utc (Get-NodeProperty $Node 'createdAt')
+
+    $bodyMatch = [regex]::Match([string](Get-NodeProperty $Node 'body'), $script:DefectMarkerPattern)
+    if ($bodyMatch.Success) {
+        return [pscustomobject]@{
+            Marked = $true; Truncated = $false
+            Report = (New-DefectReport -Node $Node -Match $bodyMatch -Source 'body' `
+                    -MarkedAt $created -MarkedBy ([string](Get-NodeProperty $Node 'authorLogin')))
+        }
+    }
+
+    $comments = Get-NodeProperty $Node 'comments'
+    $commentNodes = @()
+    $tailUnread = $false
+    if ($null -ne $comments) {
+        $commentNodes = @(Get-NodeProperty $comments 'nodes')
+        $pi = Get-NodeProperty $comments 'pageInfo'
+        if ($null -ne $pi -and [bool](Get-NodeProperty $pi 'hasNextPage')) { $tailUnread = $true }
+    }
+
+    foreach ($c in $commentNodes) {
+        if ($null -eq $c) { continue }
+        $m = [regex]::Match([string](Get-NodeProperty $c 'body'), $script:DefectMarkerPattern)
+        if (-not $m.Success) { continue }
+        $author = Get-NodeProperty $c 'author'
+        $login = if ($null -ne $author) { [string](Get-NodeProperty $author 'login') } else { '' }
+        return [pscustomobject]@{
+            Marked = $true; Truncated = $false
+            Report = (New-DefectReport -Node $Node -Match $m -Source 'comment' `
+                    -MarkedAt (ConvertTo-Utc (Get-NodeProperty $c 'createdAt')) -MarkedBy $login)
+        }
+    }
+
+    if ($tailUnread) {
+        return [pscustomobject]@{ Marked = $false; Truncated = $true; Report = $null; Number = $number }
+    }
+    return [pscustomobject]@{ Marked = $false; Truncated = $false; Report = $null; Number = $number }
+}
+
+function New-DefectReport {
+    <# One marked report. `MergedPr` is $null for the `unattributed` form, and
+       that $null is load-bearing: an unattributed report is COUNTED (it is a
+       real escaped defect somebody triaged) but belongs to no window, so it
+       enters neither the numerator nor the denominator of any rate (ruling 3).
+
+       `Created` is the PLAYER's report time and `MarkedAt` is the TRIAGE time.
+       They are different facts and ruling 6's observed lag is built from the
+       first: how long after a merge the report arrives is what sets L. The
+       second says how long triage took, which is our latency, not the feed's. #>
+    param($Node, $Match, [string]$Source, $MarkedAt, [string]$MarkedBy)
+
+    $attributed = $Match.Groups[1].Success
+    return [pscustomobject]@{
+        Number   = [int](Get-NodeProperty $Node 'number')
+        Title    = [string](Get-NodeProperty $Node 'title')
+        Url      = [string](Get-NodeProperty $Node 'url')
+        Created  = (ConvertTo-Utc (Get-NodeProperty $Node 'createdAt'))
+        MergedPr = $(if ($attributed) { [int]$Match.Groups[1].Value } else { $null })
+        MarkerSource = $Source
+        MarkedAt = $MarkedAt
+        MarkedBy = $MarkedBy
+    }
 }
 
 function Get-DefectReports {
@@ -380,7 +538,7 @@ function Get-DefectReports {
 
     if (-not $Enabled) {
         return [pscustomobject]@{
-            Status = 'NotConfigured'; Reports = @(); Scanned = 0
+            Status = 'NotConfigured'; Reports = @(); Scanned = 0; Newest = $null
             Reason = '-NoDefectFeed: the player-report feed was not read'
         }
     }
@@ -391,34 +549,41 @@ function Get-DefectReports {
     $reports = @()
     $scanned = 0
     $cursor = $null
+    # Newest discussion createdAt across the whole walk — ruling 6's feed
+    # liveness. A window can only be read against a feed that was alive after it
+    # closed; a dead feed reading as zero escaped defects is the same lie as an
+    # unread one.
+    $newest = $null
+    # Discussions whose comment tail went unread AND which carried no marker in
+    # what was read. Named, not counted, so the truncation reason can say which
+    # discussions to go look at.
+    $commentTruncated = @()
     for ($page = 0; $page -lt $script:DefectFeedPageCap; $page++) {
         try { $d = & $fetch $cursor }
         catch {
             $reason = ('player-report feed read failed: {0}' -f $_.Exception.Message)
             $script:DefectFeedFailures += , $reason
-            return [pscustomobject]@{ Status = 'Unreachable'; Reports = @(); Scanned = $scanned; Reason = $reason }
+            return [pscustomobject]@{ Status = 'Unreachable'; Reports = @(); Scanned = $scanned; Newest = $newest; Reason = $reason }
         }
         if ($null -eq $d) {
             $reason = 'player-report feed returned no payload'
             $script:DefectFeedFailures += , $reason
-            return [pscustomobject]@{ Status = 'Unreachable'; Reports = @(); Scanned = $scanned; Reason = $reason }
+            return [pscustomobject]@{ Status = 'Unreachable'; Reports = @(); Scanned = $scanned; Newest = $newest; Reason = $reason }
         }
 
         foreach ($n in @($d.nodes)) {
             $scanned++
-            $m = [regex]::Match([string]$n.body, $script:DefectMarkerPattern)
-            if (-not $m.Success) { continue }
-            $reports += , [pscustomobject]@{
-                Number   = [int]$n.number
-                Title    = [string]$n.title
-                Url      = [string]$n.url
-                Created  = (ConvertTo-Utc $n.createdAt)
-                MergedPr = [int]$m.Groups[1].Value
-            }
+            $created = ConvertTo-Utc (Get-NodeProperty $n 'createdAt')
+            if ($null -ne $created -and ($null -eq $newest -or $created -gt $newest)) { $newest = $created }
+
+            $hit = Get-DefectMarkerFromNode -Node $n
+            if ($hit.Marked) { $reports += , $hit.Report; continue }
+            if ($hit.Truncated) { $commentTruncated += , $hit.Number }
         }
 
         if (-not $d.pageInfo.hasNextPage) {
-            return [pscustomobject]@{ Status = 'Ok'; Reports = $reports; Scanned = $scanned; Reason = '' }
+            if (@($commentTruncated).Count -gt 0) { return (New-CommentTruncatedResult $reports $scanned $newest $commentTruncated) }
+            return [pscustomobject]@{ Status = 'Ok'; Reports = $reports; Scanned = $scanned; Newest = $newest; Reason = '' }
         }
         $cursor = [string]$d.pageInfo.endCursor
     }
@@ -428,8 +593,24 @@ function Get-DefectReports {
     # metric is the stated cost of, so it reports the truncation instead.
     $reason = ('player-report feed exceeded {0} pages of {1}; the tail was not read' -f
         $script:DefectFeedPageCap, $script:DefectFeedPageSize)
+    if (@($commentTruncated).Count -gt 0) {
+        $reason += ('; and {0} discussion(s) had unread comment tails (#{1})' -f
+            @($commentTruncated).Count, (@($commentTruncated) -join ', #'))
+    }
     $script:DefectFeedFailures += , $reason
-    return [pscustomobject]@{ Status = 'Truncated'; Reports = $reports; Scanned = $scanned; Reason = $reason }
+    return [pscustomobject]@{ Status = 'Truncated'; Reports = $reports; Scanned = $scanned; Newest = $newest; Reason = $reason }
+}
+
+function New-CommentTruncatedResult {
+    <# The feed pages were all read, but some discussion's COMMENTS were not,
+       and the marker now lives in comments — so this is the same claim the page
+       cap makes and gets the same status. The counted reports are a lower bound
+       and are not reported as a rate. #>
+    param($Reports, [int]$Scanned, $Newest, $Numbers)
+    $reason = ('{0} discussion(s) carry more than {1} comment(s) and no marker in the page read (#{2}); the marker now lives in comments, so those tails are unread rather than unmarked' -f
+        @($Numbers).Count, $script:DefectCommentPageSize, (@($Numbers) -join ', #'))
+    $script:DefectFeedFailures += , $reason
+    return [pscustomobject]@{ Status = 'Truncated'; Reports = $Reports; Scanned = $Scanned; Newest = $Newest; Reason = $reason }
 }
 
 # ---------------------------------------------------------------------------
@@ -910,22 +1091,126 @@ function Get-TierMap {
 function Get-EscapedDefectReading {
     <# The §6 escaped-defect row, as a value that carries its own reason.
 
-       Five worlds, and they are DIFFERENT CLAIMS — which is the whole of
+       EIGHT worlds now, and they are DIFFERENT CLAIMS — which is the whole of
        DRA-127. `Ok` with a rate of 0 is a measurement ("the feed is legible and
        no marked report names a merge in this window"); `NoConvention` is the
        absence of one ("nothing in the feed says which discussions are defect
        reports, so a count of them would be a count of ideas"). Collapsing those
        two into a bare `unmeasured` with a stock sentence is what let one
        sentence, true of the window it was written for, print unchanged over the
-       next one. #>
-    param($Feed, $Facts, $Delivery, $TierMap)
+       next one.
+
+       DRA-133 adds three more, and they are the reason this function is not
+       just a division. Before them, the reading left `NoConvention` the moment
+       ANY marked report existed ANYWHERE in the feed. One marker on one old
+       discussion naming one old merge would have turned every other window's
+       row into a measured `0.000` — an assertion about merges nobody had
+       looked at, printed as quality credit.
+
+         PreConvention — the window's merges predate the marking sweep, so
+                         nothing in it COULD have been marked (ruling 4).
+         LagFloor      — the window is younger than L days, so its reports have
+                         not arrived yet; `0/N` here is about the calendar
+                         rather than the code (ruling 6).
+         FeedSilent    — no discussion at all has been created since the window
+                         closed. A dead feed reading as zero escaped defects is
+                         the same lie as an unread one (ruling 6).
+
+       Precedence is deliberate and is ordered by how PERMANENT the reason is,
+       not by how the checks happen to be written:
+
+         feed read failure  (nothing about the window is knowable)
+         → PreConvention    (permanent; no sweep will ever fix this window)
+         → NoConvention     (feed-wide; true until the first marker exists)
+         → LagFloor         (window-specific; fixes itself on a known date)
+         → FeedSilent       (window-specific; fixes itself if anyone posts)
+         → Ok
+
+       NoConvention precedes LagFloor on purpose: when NOTHING in the feed is
+       marked, "this window is too young to read" is the less informative of two
+       true sentences, and it implies the instrument would otherwise have read
+       it. #>
+    param($Feed, $Facts, $Delivery, $TierMap, $Now = $null)
+
+    if ($null -eq $Now) { $Now = [datetime]::UtcNow }
 
     $windowPrs = @($Facts | ForEach-Object { $_.Number })
-    $inWindow = @($Feed.Reports | Where-Object { $windowPrs -contains $_.MergedPr })
-    $elsewhere = @($Feed.Reports | Where-Object { $windowPrs -notcontains $_.MergedPr })
 
+    # Ruling 3's partition, and it happens BEFORE anything is counted. An
+    # unattributed report names no merge, so it is in no window — but it is a
+    # real marked defect and vanishing it would undercount, which is the one
+    # direction that flatters the experiment this metric is the cost of.
+    $attributed = @($Feed.Reports | Where-Object { $null -ne (Get-NodeProperty $_ 'MergedPr') })
+    $unattributed = @($Feed.Reports | Where-Object { $null -eq (Get-NodeProperty $_ 'MergedPr') })
+    $inWindow = @($attributed | Where-Object { $windowPrs -contains $_.MergedPr })
+    $elsewhere = @($attributed | Where-Object { $windowPrs -notcontains $_.MergedPr })
+
+    # The window's last merge — the date both guards are measured from.
+    $mergeStamps = @($Facts | ForEach-Object { $_.Merged } | Where-Object { $null -ne $_ })
+    $lastMerge = $null
+    if ($mergeStamps.Count -gt 0) { $lastMerge = ($mergeStamps | Sort-Object)[-1] }
+
+    # Observed report lag, per in-window marked report (ruling 6). L = 14 was set
+    # by judgement because there was no marked data to set it from; this is the
+    # data. Only in-window reports have a merge date to subtract — a report
+    # naming a merge outside the window names a PR this run never fetched, so
+    # its lag is unknown and is reported as unknown rather than guessed.
+    $lags = @()
+    foreach ($r in $inWindow) {
+        $owner = @($Facts | Where-Object { $_.Number -eq $r.MergedPr -and $null -ne $_.Merged })
+        if ($owner.Count -eq 0) { continue }
+        $lags += , [pscustomobject]@{
+            Number   = $r.Number
+            MergedPr = $r.MergedPr
+            Days     = [math]::Round(($r.Created - $owner[0].Merged).TotalDays, 2)
+        }
+    }
+
+    $daysSince = $null
+    if ($null -ne $lastMerge) { $daysSince = [math]::Round(($Now - $lastMerge).TotalDays, 2) }
+
+    # A feed value built before DRA-135 (or by a caller that only needs the
+    # statuses) has no `Newest`. Absent is not "the feed is dead": an absent
+    # liveness fact must not be read as the strongest liveness claim, which is
+    # why FeedSilent below requires a zero reading as well.
+    $feedNewest = Get-NodeProperty $Feed 'Newest'
+
+    # --- status, in precedence order -------------------------------------
     $status = $Feed.Status
-    if ($status -eq 'Ok' -and @($Feed.Reports).Count -eq 0) { $status = 'NoConvention' }
+    $conventionCase = ''
+    if ($status -eq 'Ok') {
+        if ($null -eq $lastMerge) {
+            # No merged PR in the window at all, so there is no date to measure
+            # either guard from. The window is not SHOWN to be inside the
+            # convention, and "not shown" resolves to unmeasured, never to 0.
+            $status = 'PreConvention'; $conventionCase = 'no-merge'
+        } elseif ($null -eq $script:DefectConventionStart) {
+            # The placeholder state. Strict on purpose: with no adopted date,
+            # no window is after the convention, so a marker posted before
+            # Scribe's sweep cannot promote any window to a measured zero.
+            $status = 'PreConvention'; $conventionCase = 'unset'
+        } elseif ($lastMerge -lt $script:DefectConventionStart) {
+            $status = 'PreConvention'; $conventionCase = 'predates'
+        } elseif (@($Feed.Reports).Count -eq 0) {
+            $status = 'NoConvention'
+        } elseif (@($attributed).Count -eq 0) {
+            # Marked, but not one marked report names a merge. The rate would be
+            # 0/N with a "lower bound" label on it — and "at least 0 per
+            # delivered slice" is true of every window that has ever existed, so
+            # it is not a reading, it is a shape. The done bar is explicit that a
+            # zero needs a marked, ATTRIBUTED report behind it; this is the arm
+            # where marking is demonstrably happening and attribution is not.
+            $status = 'Unattributable'
+        } elseif ($daysSince -lt $script:DefectReportLagFloorDays) {
+            $status = 'LagFloor'
+        } elseif (@($inWindow).Count -eq 0 -and ($null -eq $feedNewest -or $feedNewest -le $lastMerge)) {
+            # Nothing has been posted since this window closed. An in-window
+            # report is still theoretically reachable (the marker is a comment,
+            # and a comment can land on an old discussion), so this check runs
+            # only when the reading would otherwise have been a zero.
+            $status = 'FeedSilent'
+        }
+    }
 
     $rate = $null
     $perTier = @()
@@ -944,6 +1229,21 @@ function Get-EscapedDefectReading {
         }
     }
 
+    # Ruling 3's lower-bound rule: when as many reports failed attribution as
+    # succeeded, the rate is a floor and must be printed as one, so attribution
+    # difficulty shows up as visible uncertainty rather than as a smaller number.
+    #
+    # The ruling's literal test is `unattributed >= inWindow`, which fires at
+    # 0 >= 0. Taken literally it would stamp "lower bound" on every honest
+    # measured zero, including one read from a feed where attribution never
+    # failed — collapsing the measured-zero-is-a-finding distinction DRA-127
+    # exists to protect. So the degenerate arm is excluded: with no unattributed
+    # report there is no attribution difficulty for the label to be about. This
+    # is the one place this implementation reads the ruling narrowly, and it is
+    # called out in the PR for Planner to overrule if that reading is wrong.
+    $lowerBound = ($status -eq 'Ok' -and @($unattributed).Count -gt 0 -and
+        @($unattributed).Count -ge @($inWindow).Count)
+
     return [pscustomobject]@{
         Status          = $status
         FeedStatus      = $Feed.Status
@@ -952,9 +1252,19 @@ function Get-EscapedDefectReading {
         MarkedTotal     = @($Feed.Reports).Count
         InWindow        = $inWindow
         Elsewhere       = @($elsewhere).Count
+        Unattributed    = @($unattributed)
+        LowerBound      = $lowerBound
         DeliverySlices  = @($Delivery).Count
         PerTier         = $perTier
         FeedReason      = [string]$Feed.Reason
+        ConventionCase  = $conventionCase
+        ConventionStart = $script:DefectConventionStart
+        LastMerge       = $lastMerge
+        DaysSinceLastMerge = $daysSince
+        LagFloorDays    = $script:DefectReportLagFloorDays
+        FeedNewest      = $Feed.Newest
+        ObservedLags    = $lags
+        CommentMarked   = @($Feed.Reports | Where-Object { $_.MarkerSource -eq 'comment' }).Count
     }
 }
 
@@ -965,18 +1275,106 @@ function Format-EscapedDefectCell {
     param($Reading)
     switch ($Reading.Status) {
         'Ok' {
-            $cell = ('{0} per delivered slice ({1} report(s) / {2} slice(s))' -f
+            # "at least", not a bare rate, when attribution failed at least as
+            # often as it succeeded (ruling 3). The number is the same; the
+            # claim it supports is not, and the cell is where a reader forms it.
+            $lead = if ($Reading.LowerBound) { 'at least {0}' } else { '{0}' }
+            $cell = (($lead + ' per delivered slice ({1} report(s) / {2} slice(s))') -f
                 (Format-Number $Reading.Rate 3), @($Reading.InWindow).Count, $Reading.DeliverySlices)
             if (@($Reading.PerTier).Count -gt 0) {
                 $cell += (' — ' + ((@($Reading.PerTier) | ForEach-Object { '{0} {1}' -f $_.Tier, $_.Count }) -join ', '))
+            }
+            if ($Reading.LowerBound) {
+                $cell += (' — **lower bound**: {0} marked report(s) name no merge, see §6' -f @($Reading.Unattributed).Count)
             }
             return $cell
         }
         'NoConvention' { return '`unmeasured` — feed unmarked, see §6' }
         'NotConfigured' { return '`unmeasured` — feed not read (`-NoDefectFeed`)' }
         'Truncated' { return '`unmeasured` — feed read truncated, see §6' }
+        'PreConvention' {
+            # Three sub-forms of one claim — "this window is not established to
+            # be inside the marking convention" — and they are distinguished
+            # because a reader who cannot tell "adopted, and this window is
+            # older" from "never adopted" cannot tell which one somebody has to
+            # go fix.
+            switch ($Reading.ConventionCase) {
+                'unset' { return '`unmeasured` — the marking convention has no adopted date yet, see §6' }
+                'no-merge' { return '`unmeasured` — no merged PR in the window to date the convention against, see §6' }
+                default {
+                    return ('`unmeasured` — window predates the marking convention (adopted {0})' -f
+                        (Format-DefectDate $Reading.ConventionStart))
+                }
+            }
+        }
+        'LagFloor' { return '`unmeasured` — window younger than the report lag floor, see §6' }
+        'Unattributable' {
+            return ('`unmeasured` — {0} marked report(s), none naming a merge, see §6' -f @($Reading.Unattributed).Count)
+        }
+        'FeedSilent' { return '`unmeasured` — no player report filed since the window closed, see §6' }
         default { return '`unmeasured` — feed unreachable, see §6' }
     }
+}
+
+function Format-DefectDate {
+    param($Value)
+    if ($null -eq $Value) { return 'not set' }
+    return ([datetime]$Value).ToString('yyyy-MM-dd')
+}
+
+function Get-DefectEvidenceLines {
+    <# The facts every branch that actually READ the feed owes the reader,
+       whatever its status: what was marked but unattributable (ruling 3), the
+       observed report lag that L is supposed to be re-set from (ruling 6), and
+       whether the feed has produced anything at all since the window closed.
+
+       These are appended rather than folded into each status sentence because
+       they are true independently of which guard fired, and a fact that is
+       re-stated per branch is a fact that drifts per branch. #>
+    param($Reading)
+
+    $lines = @()
+
+    if (@($Reading.Unattributed).Count -gt 0) {
+        $head = '  - **{0} marked report(s) name no merge and are in no window.** They are counted ' +
+            'here and excluded from every rate, numerator and denominator alike: a report nobody ' +
+            'could bisect is a real escaped defect with an unknown address, and folding it into a ' +
+            'window would attribute it to merges that may not have caused it.'
+        $lines += ($head -f @($Reading.Unattributed).Count)
+        foreach ($u in @($Reading.Unattributed)) {
+            $lines += ('    - [#{0}]({1}) — {2} _(unattributed)_' -f $u.Number, $u.Url, $u.Title)
+        }
+    }
+
+    if (@($Reading.ObservedLags).Count -gt 0) {
+        $days = @($Reading.ObservedLags | ForEach-Object { [double]$_.Days })
+        $head = '  - **Observed report lag: {0} sample(s), median {1} d, max {2} d.** The floor is ' +
+            'currently {3} d, set by judgement because there was no marked data to set it from. ' +
+            'These are that data; the floor is re-set from them once five marked reports exist.'
+        $lines += ($head -f @($days).Count, (Format-Number (Get-Median -Values $days) 2),
+            (Format-Number ($days | Sort-Object)[-1] 2), $Reading.LagFloorDays)
+        foreach ($l in @($Reading.ObservedLags)) {
+            $lines += ('    - [#{0}] reported {1} d after #{2} merged' -f $l.Number, (Format-Number $l.Days 2), $l.MergedPr)
+        }
+    }
+
+    if ($Reading.CommentMarked -gt 0) {
+        $lines += ('  - {0} of the marked report(s) carry the marker in a **comment** rather than the body — the form triage posts it in.' -f
+            $Reading.CommentMarked)
+    }
+
+    return $lines
+}
+
+function Get-DefectLivenessLine {
+    <# Ruling 6's feed-liveness statement, as one sentence with the dates in it.
+       A reader who is told a window is unmeasurable is owed the two timestamps
+       that decide it, because those are what make the claim checkable. #>
+    param($Reading)
+    if ($null -eq $Reading.LastMerge) { return @() }
+    $newest = if ($null -eq $Reading.FeedNewest) { 'never' } else { (Format-DefectDate $Reading.FeedNewest) }
+    return @('  - Window last merged **{0}** ({1} d ago); newest discussion in the feed: **{2}**.' -f
+        (Format-DefectDate $Reading.LastMerge), (Format-Number $Reading.DaysSinceLastMerge 1), $newest)
 }
 
 function Get-EscapedDefectReason {
@@ -1001,20 +1399,131 @@ function Get-EscapedDefectReason {
                     $lines += ('  - [#{0}]({1}) — {2} _(escaped through #{3})_' -f $r.Number, $r.Url, $r.Title, $r.MergedPr)
                 }
             } else {
+                # The conditions under which this sentence is allowed to be
+                # printed are now four, not one, and they are named here because
+                # a measured zero is the single most misreadable cell on the
+                # page: it is the one an approving reader wants to see.
                 $zeroNote = '  A rate of 0 here is a **measurement**, not a blank: the feed is legible, ' +
-                    'it was read in full, and no marked report names a merge in this window. ' +
-                    '{0} marked report(s) name merges outside it.'
-                $lines += ($zeroNote -f $Reading.Elsewhere)
+                    'it was read in full, the window''s merges are inside the marking convention, ' +
+                    'the window is older than the {0}-day report lag floor, and the feed has ' +
+                    'produced discussions since it closed. No marked report names a merge in this ' +
+                    'window; {1} marked report(s) name merges outside it.'
+                $lines += ($zeroNote -f $Reading.LagFloorDays, $Reading.Elsewhere)
             }
+            if ($Reading.LowerBound) {
+                $lb = '  This rate is a **lower bound**, not a rate: {0} marked report(s) could not be ' +
+                    'attributed to any merge, which is at least as many as the {1} that could. ' +
+                    'Attribution difficulty belongs in the uncertainty, not in a smaller number.'
+                $lines += ($lb -f @($Reading.Unattributed).Count, @($Reading.InWindow).Count)
+            }
+            $lines += (Get-DefectEvidenceLines -Reading $Reading)
+            $lines += (Get-DefectLivenessLine -Reading $Reading)
+            return $lines
+        }
+        'PreConvention' {
+            $lines = @()
+            switch ($Reading.ConventionCase) {
+                'unset' {
+                    $head = '- **Escaped defect rate per tier.** `unmeasured` — the marking convention ' +
+                        'has **no adopted date**. Triage marks player reports from the day the sweep ' +
+                        'starts; until that date is recorded here, no window can be shown to lie ' +
+                        'inside the convention, and a window that cannot be shown to lie inside it ' +
+                        'is not measured against it.'
+                    $lines += $head
+                    $lines += ''
+                    $why = '  This is deliberately the strict end of the placeholder. The alternative — ' +
+                        'compute anyway, and let the date arrive later — is the failure this guard ' +
+                        'exists for: one marker comment posted on one old discussion would promote ' +
+                        'every window in the archive to a measured `0.000`, an assertion about ' +
+                        'merges nobody triaged, printed as quality credit.'
+                    $lines += $why
+                }
+                'no-merge' {
+                    $head = '- **Escaped defect rate per tier.** `unmeasured` — **no PR in this window ' +
+                        'merged**, so the window has no date to measure the marking convention or ' +
+                        'the report lag floor from. Both guards are anchored on the last merge; ' +
+                        'with no merge there is nothing to anchor, and an unanchored window reads ' +
+                        'unmeasured rather than zero.'
+                    $lines += $head
+                }
+                default {
+                    $head = '- **Escaped defect rate per tier.** `unmeasured`, **permanently**, and the ' +
+                        'reason is structural. This window''s last merge is {0}; the marking ' +
+                        'convention was adopted {1}. Every merge in it shipped before anyone was ' +
+                        'triaging player reports against merges, so nothing in it **could** have ' +
+                        'been marked.'
+                    $lines += ($head -f (Format-DefectDate $Reading.LastMerge), (Format-DefectDate $Reading.ConventionStart))
+                    $lines += ''
+                    $why = '  There is no backfill and there will not be one: nobody can bisect a ' +
+                        'weeks-old report to a merge now, and the result would be a history of our ' +
+                        'own guesses presented as measurement. `unmeasured` with this reason is the ' +
+                        'honest end state for this window, not a gap waiting to be filled.'
+                    $lines += $why
+                }
+            }
+            $lines += (Get-DefectEvidenceLines -Reading $Reading)
+            $lines += (Get-DefectLivenessLine -Reading $Reading)
+            return $lines
+        }
+        'LagFloor' {
+            $head = '- **Escaped defect rate per tier.** `unmeasured` — this window is **younger than ' +
+                'the {0}-day report lag floor**. Its last merge was {1} ({2} d ago), so the ' +
+                'population of reports about it has not arrived yet. A count of escaped defects ' +
+                'taken now would be a statement about the calendar rather than about the code, and ' +
+                '`0` is the specific wrong answer it would give.'
+            $lines = @($head -f $Reading.LagFloorDays, (Format-DefectDate $Reading.LastMerge),
+                (Format-Number $Reading.DaysSinceLastMerge 1))
+            $lines += ''
+            $lines += ('  Re-run this window on or after **{0}** and the row computes.' -f
+                (Format-DefectDate ($Reading.LastMerge).AddDays($Reading.LagFloorDays)))
+            $lines += (Get-DefectEvidenceLines -Reading $Reading)
+            $lines += (Get-DefectLivenessLine -Reading $Reading)
+            return $lines
+        }
+        'Unattributable' {
+            $head = '- **Escaped defect rate per tier.** `unmeasured` — the feed **is** marked and ' +
+                '**nothing in it names a merge**: all {0} marked report(s) are `unattributed`. ' +
+                'Triage is running, so this is not the unmarked-feed blank; but with no report ' +
+                'attributable to any merge, no window has a numerator, and the rate for this one ' +
+                'would be `at least 0 per delivered slice` — a sentence true of every window that ' +
+                'has ever existed.'
+            $lines = @($head -f @($Reading.Unattributed).Count)
+            $lines += ''
+            $why = '  This is the attribution half of the marker failing rather than the marking ' +
+                'half, and it is a different thing to go fix: the reports exist and somebody read ' +
+                'them, but nobody could identify the merge. Executor can be asked to bisect them ' +
+                '(ruling 1); until one is attributed, this row has nothing to divide.'
+            $lines += $why
+            $lines += (Get-DefectEvidenceLines -Reading $Reading)
+            $lines += (Get-DefectLivenessLine -Reading $Reading)
+            return $lines
+        }
+        'FeedSilent' {
+            $head = '- **Escaped defect rate per tier.** `unmeasured` — **no discussion has been ' +
+                'created in the feed since this window closed.** The window''s last merge was {0}, ' +
+                'and the newest of the {1} discussion(s) read is {2}. The feed is legible and past ' +
+                'both guards, but it has been silent over the entire period in which a report about ' +
+                'these merges would have been filed.'
+            $newest = if ($null -eq $Reading.FeedNewest) { 'older still — the feed is empty' } else { (Format-DefectDate $Reading.FeedNewest) }
+            $lines = @($head -f (Format-DefectDate $Reading.LastMerge), $Reading.Scanned, $newest)
+            $lines += ''
+            $why = '  Silence is not a finding. A dead feed reading as zero escaped defects is the ' +
+                'same false statement as an unread one, and it is the statement this instrument was ' +
+                'built to stop making. The row computes as soon as the feed shows any activity after ' +
+                'the window''s last merge.'
+            $lines += $why
+            $lines += (Get-DefectEvidenceLines -Reading $Reading)
             return $lines
         }
         'NoConvention' {
             $head = '- **Escaped defect rate per tier.** `unmeasured`, and the reason is structural ' +
                 'rather than a checkpoint that has not arrived. The raw feed exists and was read: ' +
-                '**{0} discussion(s)** on `{1}`, which is where player reports actually land. ' +
-                '**None of them carries the `exo-defect: escaped #<pr>` marker** this row computes ' +
-                'from, and nothing else in a discussion says which merge a defect escaped through.'
-            return @(
+                '**{0} discussion(s)** on `{1}`, which is where player reports actually land — ' +
+                'bodies **and** comments, which is where triage posts the marker. **None of them ' +
+                'carries the `exo-defect: escaped #<pr>` or `exo-defect: escaped unattributed` ' +
+                'marker** this row computes from, and nothing else in a discussion says which merge ' +
+                'a defect escaped through.'
+            $lines = @(
                 ($head -f $Reading.Scanned, $Repository),
                 '',
                 ('  Both halves of the marker are load-bearing. Unmarked, the feed is a mixed ' +
@@ -1026,15 +1535,19 @@ function Get-EscapedDefectReason {
                     'population.'),
                 '',
                 ('  **No M-checkpoint changes this.** A checkpoint marks no discussion. The row ' +
-                    'becomes computable when player reports start carrying the marker — the code ' +
-                    'path is live and reads the feed on every run — and from that point a rate of ' +
-                    '0 is a finding rather than a blank.'),
+                    'becomes readable when triage starts marking reports — the code path is live, ' +
+                    'reads bodies and comments, and runs on every run — **and** when the window ' +
+                    'also clears the marking-convention start date and the report lag floor. From ' +
+                    'that point a rate of 0 is a finding rather than a blank; before it, a 0 would ' +
+                    'be silence wearing the costume of a measurement.'),
                 '',
                 ('  Until then `whole-sequence-auth`, which `DECISIONS.md` defines as judged by GWR ' +
                     'and ACCR *stated net of escaped defect rate*, has no measurable quality cost ' +
                     'to be stated net of. That bounds what any graduation ruling on it can honestly ' +
                     'claim, and it is stated here so the bound is not rediscovered.')
             )
+            $lines += (Get-DefectLivenessLine -Reading $Reading)
+            return $lines
         }
         'NotConfigured' {
             return @(
@@ -1044,12 +1557,16 @@ function Get-EscapedDefectReason {
             )
         }
         'Truncated' {
-            $head = '- **Escaped defect rate per tier.** `unmeasured` — the feed read hit its page ' +
-                'cap with pages left ({0} discussion(s) scanned), so the marked reports found so ' +
-                'far are a **lower bound** and are not reported as a rate. An undercount of escaped ' +
-                'defects is the one direction that flatters the experiment this metric is the ' +
-                'stated cost of. Reason: `{1}`'
-            return @($head -f $Reading.Scanned, $Reading.FeedReason)
+            $head = '- **Escaped defect rate per tier.** `unmeasured` — the feed read did **not ' +
+                'complete** ({0} discussion(s) scanned): either the page cap was reached with pages ' +
+                'left, or a discussion carried more comments than were fetched and no marker in the ' +
+                'part that was read. Either way the marked reports found so far are a **lower ' +
+                'bound** and are not reported as a rate. An unread tail is not an unmarked one, and ' +
+                'an undercount of escaped defects is the one direction that flatters the experiment ' +
+                'this metric is the stated cost of. Reason: `{1}`'
+            $lines = @($head -f $Reading.Scanned, $Reading.FeedReason)
+            $lines += (Get-DefectEvidenceLines -Reading $Reading)
+            return $lines
         }
         default {
             $head = '- **Escaped defect rate per tier.** `unmeasured` — the player-report feed read ' +
@@ -1356,16 +1873,50 @@ function Invoke-SelfTest {
             "Bug: Wizard kill in Lower Guk hall triggers an arch magi respawn chip`n`nSeen twice tonight.",
             $script:DefectMarkerPattern)) 'The defect marker fired on an unmarked bug report — the feed is full of those.'
     Assert (-not [regex]::IsMatch("exo-defect: escaped (no pr)", $script:DefectMarkerPattern)) `
-        'A marker naming no merge was accepted — an unattributable report cannot be placed in a window or a tier.'
+        'Free text after the marker was accepted as a marker — the form has to be exact or the count is a guess.'
+
+    # 14b. DRA-133 ruling 3: `unattributed` is an ACCEPTED form. Before this,
+    #      "marked but not bisectable" was unrepresentable, so triage had one
+    #      option for it — leave it unmarked — and an unmarked defect is an
+    #      undercount, the one direction that flatters the experiment.
+    $unattr = "Zoning into Sebilis drops the client.`n`nexo-defect: escaped unattributed`n"
+    Assert ([regex]::IsMatch($unattr, $script:DefectMarkerPattern)) `
+        'The `unattributed` marker form was rejected — a defect nobody can bisect would go unrecorded.'
+    Assert (-not [regex]::Match($unattr, $script:DefectMarkerPattern).Groups[1].Success) `
+        'The `unattributed` form captured a merge number — it names no merge and must belong to no window.'
+    Assert ([regex]::Match($unattr, $script:DefectMarkerPattern).Groups[2].Success) `
+        'The `unattributed` form did not identify itself as unattributed.'
+    Assert (-not [regex]::IsMatch("exo-defect: escaped unattributed #630", $script:DefectMarkerPattern)) `
+        'A marker that is BOTH unattributed and attributed was accepted — that is two claims in one line.'
 
     # 15. The feed walk, against a FAKE page source: the loop is what has to be
     #     right, and -SelfTest must not need a network for it.
     $script:DefectFeedFailures = @()
-    function New-FeedNode([int]$Number, [string]$Body) {
-        return [pscustomobject]@{
+    function New-FeedNode([int]$Number, [string]$Body, $Comments = $null, [bool]$MoreComments = $false, [string]$Created = '2026-09-15T00:00:00Z') {
+        $node = [pscustomobject]@{
             number = $Number; title = "d$Number"; url = "https://x/$Number"
-            createdAt = '2026-09-15T00:00:00Z'; body = $Body; category = [pscustomobject]@{ name = 'Q&A' }
+            createdAt = $Created; body = $Body; category = [pscustomobject]@{ name = 'Q&A' }
         }
+        # `comments` is added only when the case is about comments, so the
+        # common shape — a discussion the query returned without them — stays
+        # covered. StrictMode turns a missing property into a crash, and the
+        # feed is mostly comment-less discussions.
+        if ($null -ne $Comments -or $MoreComments) {
+            $cnodes = @()
+            foreach ($c in @($Comments)) {
+                if ($null -eq $c) { continue }
+                $cnodes += , [pscustomobject]@{
+                    body = [string]$c; createdAt = '2026-09-20T00:00:00Z'
+                    url = "https://x/$Number#c"; author = [pscustomobject]@{ login = 'scribe' }
+                }
+            }
+            $node | Add-Member -NotePropertyName comments -NotePropertyValue ([pscustomobject]@{
+                    totalCount = $cnodes.Count
+                    pageInfo = [pscustomobject]@{ hasNextPage = $MoreComments }
+                    nodes = $cnodes
+                })
+        }
+        return $node
     }
     function New-FeedPage($Nodes, [bool]$More, [string]$Cursor = 'c1') {
         return [pscustomobject]@{
@@ -1402,63 +1953,270 @@ function Invoke-SelfTest {
     Assert ($off.Status -eq 'NotConfigured') '-NoDefectFeed did not read as NotConfigured.'
     $script:DefectFeedFailures = @()
 
+    # 15b. Ruling 5: the marker is a triage COMMENT. A read that matches bodies
+    #      only turns a marked feed into an unmarked one, which is the worst of
+    #      the failure modes here — the sweep runs, the instrument reports
+    #      nothing, and nothing reports that anything is missing.
+    $commentFeed = {
+        param($Cursor)
+        return (New-FeedPage @(
+                (New-FeedNode 11 'Kills stopped counting.' @('triaged', "exo-defect: escaped #630")),
+                (New-FeedNode 12 'Zoning crash.' @("exo-defect: escaped unattributed")),
+                (New-FeedNode 13 'A feature request.' @('nice idea'))
+            ) $false)
+    }
+    $cmt = Get-DefectReports -Repository 'o/n' -PageSource $commentFeed
+    Assert ($cmt.Status -eq 'Ok') 'A complete feed whose markers live in comments did not report Ok.'
+    Assert (@($cmt.Reports).Count -eq 2) `
+        'A marker posted as a COMMENT was invisible — the triage ritual would run and produce nothing readable.'
+    Assert (@($cmt.Reports | Where-Object { $_.MergedPr -eq 630 }).Count -eq 1) 'A comment marker lost the merge it names.'
+    Assert (@($cmt.Reports | Where-Object { $null -eq $_.MergedPr }).Count -eq 1) 'The unattributed comment marker was dropped or given a merge.'
+    Assert (@($cmt.Reports | Where-Object { $_.MarkerSource -eq 'comment' }).Count -eq 2) 'A comment marker was not recorded as coming from a comment.'
+    # Filtered, not indexed: when this regresses, Reports is EMPTY, and an
+    # index into an empty array crashes the suite instead of reporting which
+    # assertion failed. A test that cannot survive its own failure case is a
+    # test that reports a stack trace where a sentence was needed.
+    Assert (@($cmt.Reports | Where-Object { $_.Number -eq 11 -and $_.MarkedBy -eq 'scribe' }).Count -eq 1) `
+        'The comment marker lost its author — attribution of the TRIAGE is half of why ruling 1 chose a comment.'
+    Assert ($null -ne $cmt.Newest) 'The feed walk did not record the newest discussion — feed liveness has nothing to read.'
+
+    # 15c. A body marker still wins, and a discussion with an unread comment
+    #      tail AND no marker in what was read is TRUNCATED, not unmarked.
+    $mixed = {
+        param($Cursor)
+        return (New-FeedPage @(
+                (New-FeedNode 21 "exo-defect: escaped #631" @('chatter') $true),
+                (New-FeedNode 22 'no marker in the part we read' @('chatter') $true)
+            ) $false)
+    }
+    $mix = Get-DefectReports -Repository 'o/n' -PageSource $mixed
+    Assert ($mix.Status -eq 'Truncated') `
+        'A discussion with an unread comment tail and no marker read as unmarked — an unread tail is not an unmarked one.'
+    Assert (@($mix.Reports).Count -eq 1) 'The body-marked discussion was lost when another discussion truncated.'
+    Assert ($mix.Reason -match '22') 'The truncation did not name the discussion whose tail went unread.'
+    Assert ($mix.Reason -notmatch '#21[^0-9]') `
+        'A discussion whose marker was already found was reported as truncated — its tail could only repeat the report it already carries.'
+    $script:DefectFeedFailures = @()
+
     # 16. The reading, and the distinction DRA-127 is about: a LEGIBLE feed with
     #     no in-window report is a measured 0; an ILLEGIBLE feed is not a 0 at
     #     all. Collapsing those two is what let one sentence stand in for both.
+    #
+    #     Every case below states the four things a measured reading depends on
+    #     — convention start, window merge dates, the clock, and feed liveness —
+    #     because after DRA-133 a rate that does not state them is not a
+    #     reading, it is a coincidence. The fixture dates: the window merges
+    #     2026-09-10/12, the convention started 2026-09-01, the feed last spoke
+    #     2026-09-20, and "now" is 2026-10-20, five weeks past the merges.
+    $conventionStartSaved = $script:DefectConventionStart
+    $fixtureConvention = ConvertTo-Utc '2026-09-01T00:00:00Z'
+    $fixtureNow = ConvertTo-Utc '2026-10-20T00:00:00Z'
+    $fixtureAlive = ConvertTo-Utc '2026-09-20T00:00:00Z'
+    $script:DefectConventionStart = $fixtureConvention
+
     $fakeFacts = @(
-        ([pscustomobject]@{ Number = 630; Dra = 'DRA-77' }),
-        ([pscustomobject]@{ Number = 631; Dra = 'DRA-87' })
+        ([pscustomobject]@{ Number = 630; Dra = 'DRA-77'; Merged = (ConvertTo-Utc '2026-09-10T00:00:00Z') }),
+        ([pscustomobject]@{ Number = 631; Dra = 'DRA-87'; Merged = (ConvertTo-Utc '2026-09-12T00:00:00Z') })
     )
     $fakeDelivery = @(1, 2, 3, 4)   # four delivered slices
     $tierMap = @{ 'DRA-77' = 'T1' }
 
-    $emptyFeed = [pscustomobject]@{ Status = 'Ok'; Reports = @(); Scanned = 166; Reason = '' }
-    $noConv = Get-EscapedDefectReading -Feed $emptyFeed -Facts $fakeFacts -Delivery $fakeDelivery -TierMap $tierMap
+    function New-FakeFeed($Reports, $Newest = $null, [int]$Scanned = 166, [string]$Status = 'Ok') {
+        return [pscustomobject]@{
+            Status = $Status; Scanned = $Scanned; Reason = ''
+            Newest = $Newest; Reports = @($Reports)
+        }
+    }
+    function New-FakeReport([int]$Number, $MergedPr, $Created = $null) {
+        if ($null -eq $Created) { $Created = (ConvertTo-Utc '2026-09-20T00:00:00Z') }
+        return [pscustomobject]@{
+            Number = $Number; Title = "t$Number"; Url = "u$Number"; Created = $Created
+            MergedPr = $MergedPr; MarkerSource = 'comment'; MarkedAt = $Created; MarkedBy = 'scribe'
+        }
+    }
+    function Read-Fixture($Feed) {
+        return (Get-EscapedDefectReading -Feed $Feed -Facts $fakeFacts -Delivery $fakeDelivery `
+                -TierMap $tierMap -Now $fixtureNow)
+    }
+
+    $noConv = Read-Fixture (New-FakeFeed @() $fixtureAlive)
     Assert ($noConv.Status -eq 'NoConvention') 'A readable feed with NO marked report read as a measured rate.'
     Assert ($null -eq $noConv.Rate) 'An unmarked feed produced a RATE — that is the zero this row must never print.'
     Assert ((Format-EscapedDefectCell -Reading $noConv) -notmatch '^\s*`?0') 'An unmeasurable escaped-defect cell rendered as a zero.'
     Assert ((Format-EscapedDefectCell -Reading $noConv) -match 'unmeasured') 'An unmeasurable escaped-defect cell did not say unmeasured.'
 
-    $elsewhereFeed = [pscustomobject]@{
-        Status = 'Ok'; Scanned = 166; Reason = ''
-        Reports = @([pscustomobject]@{ Number = 501; Title = 't'; Url = 'u'; Created = $a; MergedPr = 4242 })
-    }
-    $zero = Get-EscapedDefectReading -Feed $elsewhereFeed -Facts $fakeFacts -Delivery $fakeDelivery -TierMap $tierMap
+    $zero = Read-Fixture (New-FakeFeed @((New-FakeReport 501 4242)) $fixtureAlive)
     Assert ($zero.Status -eq 'Ok') 'A legible feed whose reports name other windows was not treated as measured.'
     Assert ($zero.Rate -eq 0) 'A legible feed with no in-window report did not measure 0 — a finding was reported as a blank.'
     Assert ($zero.Elsewhere -eq 1) 'A report naming a merge outside the window was not counted as such.'
     Assert ((((Get-EscapedDefectReason -Reading $zero -Repository 'o/n') -join ' ') -match 'measurement')) `
         'A measured zero did not say it was a measurement rather than a blank.'
+    Assert (-not $zero.LowerBound) `
+        'A measured zero from a feed where attribution never failed was labelled a lower bound — that erases the measured-zero finding DRA-127 built.'
 
-    $hitFeed = [pscustomobject]@{
-        Status = 'Ok'; Scanned = 166; Reason = ''
-        Reports = @(
-            ([pscustomobject]@{ Number = 501; Title = 't1'; Url = 'u1'; Created = $a; MergedPr = 630 }),
-            ([pscustomobject]@{ Number = 502; Title = 't2'; Url = 'u2'; Created = $a; MergedPr = 631 })
-        )
-    }
-    $hit = Get-EscapedDefectReading -Feed $hitFeed -Facts $fakeFacts -Delivery $fakeDelivery -TierMap $tierMap
+    $hit = Read-Fixture (New-FakeFeed @((New-FakeReport 501 630), (New-FakeReport 502 631)) $fixtureAlive)
     Assert ($hit.Rate -eq 0.5) "Two in-window reports over four slices read $($hit.Rate) rather than 0.5."
     Assert ((@($hit.PerTier) | Where-Object { $_.Tier -eq 'T1' }).Count -eq 1) 'The per-tier split lost the tiered report.'
     Assert ((@($hit.PerTier) | Where-Object { $_.Tier -eq 'untiered' }).Count -eq 1) `
         'A report against an untiered work item was given a tier, or dropped.'
     Assert ((Format-EscapedDefectCell -Reading $hit) -notmatch 'unmeasured') 'A measured escaped-defect cell still said unmeasured.'
 
-    foreach ($st in @('NoConvention', 'NotConfigured', 'Truncated', 'Unreachable')) {
+    # 16a. THE TEST THIS CARD EXISTS FOR (DRA-133, the trap).
+    #
+    #      One marked report, on one discussion, naming one merge that is not in
+    #      this window. Under the pre-DRA-135 reading that single report cleared
+    #      `NoConvention` for EVERY window, and this window — whose merges
+    #      predate the convention start, and which nobody has triaged — computed
+    #      a measured `0.000`. Silence, printed as quality credit for
+    #      `whole-sequence-auth`, which `DECISIONS.md` judges net of this term.
+    $oldFacts = @(
+        ([pscustomobject]@{ Number = 585; Dra = 'DRA-10'; Merged = (ConvertTo-Utc '2026-08-05T00:00:00Z') }),
+        ([pscustomobject]@{ Number = 586; Dra = 'DRA-11'; Merged = (ConvertTo-Utc '2026-08-07T00:00:00Z') })
+    )
+    $oneReportElsewhere = New-FakeFeed @((New-FakeReport 501 4242)) $fixtureAlive
+    $unrelated = Get-EscapedDefectReading -Feed $oneReportElsewhere -Facts $oldFacts `
+        -Delivery $fakeDelivery -TierMap $tierMap -Now $fixtureNow
+    Assert ($unrelated.Status -eq 'PreConvention') `
+        'A single marked report naming an out-of-window merge promoted a PRE-CONVENTION window to a measured reading — the DRA-133 trap, re-opened.'
+    Assert ($null -eq $unrelated.Rate) `
+        'A window whose merges predate the marking convention produced a RATE. No sweep could have marked those merges; the number would be about nobody having looked.'
+    Assert ((Format-EscapedDefectCell -Reading $unrelated) -notmatch '(^|[^.\d])0([^.\d]|$)') `
+        'The pre-convention cell printed a zero.'
+    Assert ((Format-EscapedDefectCell -Reading $unrelated) -match 'predates the marking convention') `
+        'The pre-convention cell did not name its reason — an unmeasured row without a reason is the DRA-127 defect.'
+    Assert ((Format-EscapedDefectCell -Reading $unrelated) -match '2026-09-01') `
+        'The pre-convention cell did not carry the adopted date it is measuring against.'
+
+    # 16b. Ruling 4's placeholder state. Until Scribe's sweep sets a date, NO
+    #      window is inside the convention — including one that would otherwise
+    #      compute cleanly. This is the arm that holds on the day this lands.
+    $script:DefectConventionStart = $null
+    $unsetReading = Read-Fixture (New-FakeFeed @((New-FakeReport 501 4242)) $fixtureAlive)
+    Assert ($unsetReading.Status -eq 'PreConvention') 'With no adopted convention date, a window still computed.'
+    Assert ($unsetReading.ConventionCase -eq 'unset') 'The unset-convention case was not distinguished from a window that predates a set one.'
+    Assert ($null -eq $unsetReading.Rate) 'A window computed a rate against a convention that has no start date.'
+    Assert ((Format-EscapedDefectCell -Reading $unsetReading) -match 'no adopted date') `
+        'The unset-convention cell did not say the convention has no adopted date — the reader cannot tell who has to go fix it.'
+    $script:DefectConventionStart = $fixtureConvention
+
+    # 16c. Ruling 6, the lag floor. Same feed, same convention, window closed
+    #      two days ago. An escaped defect is reported LATER than the merge that
+    #      caused it, so `0/N` today is a fact about the calendar.
+    $freshFacts = @(
+        ([pscustomobject]@{ Number = 700; Dra = 'DRA-90'; Merged = $fixtureNow.AddDays(-2) })
+    )
+    $fresh = Get-EscapedDefectReading -Feed (New-FakeFeed @((New-FakeReport 501 4242)) $fixtureNow.AddDays(-1)) `
+        -Facts $freshFacts -Delivery $fakeDelivery -TierMap $tierMap -Now $fixtureNow
+    Assert ($fresh.Status -eq 'LagFloor') 'A window younger than the report lag floor computed anyway.'
+    Assert ($null -eq $fresh.Rate) 'A window younger than the lag floor produced a rate — its reports have not arrived yet.'
+    Assert ((Format-EscapedDefectCell -Reading $fresh) -match 'younger than the report lag floor') `
+        'The lag-floor cell did not name the lag floor as its reason.'
+    Assert ((((Get-EscapedDefectReason -Reading $fresh -Repository 'o/n') -join ' ') -match '14')) `
+        'The lag-floor reason did not carry the floor it is applying.'
+
+    # And the floor lets go on its own: the same window, read after L days.
+    $aged = Get-EscapedDefectReading -Feed (New-FakeFeed @((New-FakeReport 501 4242)) $fixtureNow.AddDays(20)) `
+        -Facts $freshFacts -Delivery $fakeDelivery -TierMap $tierMap -Now $fixtureNow.AddDays(21)
+    Assert ($aged.Status -eq 'Ok') 'A window past the lag floor stayed unmeasured — the guard must expire, not latch.'
+
+    # 16d. Ruling 6's second half: feed liveness. Past the convention, past the
+    #      floor, feed legible — and not one discussion created since the window
+    #      closed. A dead feed reading as zero escaped defects is the same lie
+    #      as an unread one.
+    $silent = Get-EscapedDefectReading -Feed (New-FakeFeed @((New-FakeReport 501 4242)) (ConvertTo-Utc '2026-09-05T00:00:00Z')) `
+        -Facts $fakeFacts -Delivery $fakeDelivery -TierMap $tierMap -Now $fixtureNow
+    Assert ($silent.Status -eq 'FeedSilent') `
+        'A feed that has produced nothing since the window closed still printed a rate for it.'
+    Assert ($null -eq $silent.Rate) 'A silent feed produced a rate.'
+    Assert ((Format-EscapedDefectCell -Reading $silent) -match 'no player report filed since') `
+        'The feed-silent cell did not name its reason.'
+    # A silent feed with a REAL in-window report is a reading, not silence.
+    $silentButHit = Get-EscapedDefectReading -Feed (New-FakeFeed @((New-FakeReport 501 630)) (ConvertTo-Utc '2026-09-05T00:00:00Z')) `
+        -Facts $fakeFacts -Delivery $fakeDelivery -TierMap $tierMap -Now $fixtureNow
+    Assert ($silentButHit.Status -eq 'Ok') `
+        'A window WITH a marked in-window report was suppressed by the liveness guard — the guard is against a zero, not against data.'
+
+    # 16e. Ruling 3: unattributed reports are counted, belong to no window, and
+    #      turn the cell into a lower bound when they outnumber the attributed.
+    $unattrFeed = New-FakeFeed @(
+        (New-FakeReport 501 630),
+        (New-FakeReport 502 $null),
+        (New-FakeReport 503 $null)
+    ) $fixtureAlive
+    $lb = Read-Fixture $unattrFeed
+    Assert ($lb.Status -eq 'Ok') 'A feed with attributed and unattributed reports did not read.'
+    Assert (@($lb.Unattributed).Count -eq 2) 'The unattributed reports were dropped — an uncounted defect is an undercount.'
+    Assert (@($lb.InWindow).Count -eq 1) 'An unattributed report was placed in a window it names no merge in.'
+    Assert ($lb.Rate -eq 0.25) "Unattributed reports entered the rate: 1 in-window over 4 slices read $($lb.Rate) rather than 0.25."
+    Assert ($lb.LowerBound) 'Two unattributed against one attributed did not make the cell a lower bound.'
+    Assert ((Format-EscapedDefectCell -Reading $lb) -match 'lower bound') 'The lower-bound cell did not say lower bound.'
+    Assert ((Format-EscapedDefectCell -Reading $lb) -match 'at least') `
+        'The lower-bound cell stated a bare rate — attribution difficulty has to show as uncertainty, not as a smaller number.'
+    Assert ((((Get-EscapedDefectReason -Reading $lb -Repository 'o/n') -join ' ') -match 'name no merge and are in no window')) `
+        'The unattributed reports got no §6 line of their own (ruling 3).'
+
+    # 16e-ii. And the degenerate lower bound, which is not a reading at all:
+    #      every marked report is unattributed, so the cell would have been
+    #      "at least 0 per delivered slice" — a sentence true of every window
+    #      that has ever existed. The done bar requires a marked ATTRIBUTED
+    #      report behind any zero, and this is the arm where there is none.
+    $allUnattr = Read-Fixture (New-FakeFeed @((New-FakeReport 502 $null), (New-FakeReport 503 $null)) $fixtureAlive)
+    Assert ($allUnattr.Status -eq 'Unattributable') `
+        'A feed whose every marked report is unattributed produced a rate — "at least 0" is a shape, not a measurement.'
+    Assert ($null -eq $allUnattr.Rate) 'An unattributable feed produced a rate.'
+    Assert ((Format-EscapedDefectCell -Reading $allUnattr) -match 'none naming a merge') `
+        'The unattributable cell did not distinguish itself from the unmarked-feed blank — triage IS running here.'
+    Assert ((Format-EscapedDefectCell -Reading $allUnattr) -notmatch '(^|[^.\d])0([^.\d]|$)') 'The unattributable cell printed a zero.'
+    Assert ((Format-EscapedDefectCell -Reading $allUnattr) -ne (Format-EscapedDefectCell -Reading $noConv)) `
+        'The unattributable cell and the unmarked-feed cell read the same — they are different things to go fix.'
+
+    # 16f. Ruling 6's observed lag, which is how L stops being a guess.
+    $lagFeed = New-FakeFeed @((New-FakeReport 501 630 (ConvertTo-Utc '2026-09-17T00:00:00Z'))) $fixtureAlive
+    $lagRead = Read-Fixture $lagFeed
+    Assert (@($lagRead.ObservedLags).Count -eq 1) 'No observed report lag was recorded — L can never be re-set from data.'
+    Assert (@($lagRead.ObservedLags | Where-Object { $_.Days -eq 7 }).Count -eq 1) `
+        "A report filed 2026-09-17 against a merge on 2026-09-10 did not measure 7 d of lag (got: $(@($lagRead.ObservedLags | ForEach-Object { $_.Days }) -join ', '))."
+    Assert ((((Get-EscapedDefectReason -Reading $lagRead -Repository 'o/n') -join ' ') -match 'Observed report lag')) `
+        'The observed lag was recorded and not reported — a number nobody prints cannot re-set the floor.'
+
+    foreach ($st in @('NoConvention', 'NotConfigured', 'Truncated', 'Unreachable', 'PreConvention', 'LagFloor', 'FeedSilent', 'Unattributable')) {
         $r = [pscustomobject]@{
             Status = $st; FeedStatus = $st; Rate = $null; Scanned = 166; MarkedTotal = 0
             InWindow = @(); Elsewhere = 0; DeliverySlices = 4; PerTier = @(); FeedReason = 'because'
+            Unattributed = @(([pscustomobject]@{ Number = 901; Title = 'u1'; Url = 'uu1' }))
+            LowerBound = $false; ConventionCase = 'predates'
+            ConventionStart = $fixtureConvention; LastMerge = (ConvertTo-Utc '2026-09-12T00:00:00Z')
+            DaysSinceLastMerge = 38.0; LagFloorDays = 14; FeedNewest = $fixtureAlive
+            ObservedLags = @(); CommentMarked = 0
         }
         Assert ((Format-EscapedDefectCell -Reading $r) -match 'unmeasured') "Status $st did not render as unmeasured."
+        Assert ((Format-EscapedDefectCell -Reading $r) -notmatch '(^|[^.\d])0([^.\d]|$)') "Status $st rendered a zero into the §2 cell."
         Assert (@(Get-EscapedDefectReason -Reading $r -Repository 'o/n').Count -gt 0) "Status $st produced no reason to print."
     }
+    # The three sub-forms of PreConvention are three different things to go fix,
+    # so they are three different sentences.
+    $preCells = @('predates', 'unset', 'no-merge') | ForEach-Object {
+        $case = $_
+        $r = [pscustomobject]@{
+            Status = 'PreConvention'; FeedStatus = 'Ok'; Rate = $null; Scanned = 166; MarkedTotal = 0
+            InWindow = @(); Elsewhere = 0; DeliverySlices = 4; PerTier = @(); FeedReason = ''
+            Unattributed = @(); LowerBound = $false; ConventionCase = $case
+            ConventionStart = $(if ($case -eq 'unset') { $null } else { $fixtureConvention })
+            LastMerge = $(if ($case -eq 'no-merge') { $null } else { (ConvertTo-Utc '2026-08-12T00:00:00Z') })
+            DaysSinceLastMerge = 38.0; LagFloorDays = 14; FeedNewest = $fixtureAlive
+            ObservedLags = @(); CommentMarked = 0
+        }
+        Format-EscapedDefectCell -Reading $r
+    }
+    Assert ((@($preCells | Sort-Object -Unique)).Count -eq 3) `
+        'Two PreConvention sub-forms rendered the same cell — a reader cannot tell which one somebody has to go fix.'
 
     # Every emitted string is fully substituted. `'a' + 'b {0}' -f $x` binds -f to
     # the last segment only and publishes the rest of the braces verbatim: the
     # first live run of this row printed "**{0} discussion(s)** on `{1}`" into the
     # document, and every assertion above still passed, because they all checked
     # for phrases rather than for the numbers the phrases were supposed to carry.
-    foreach ($case in @($noConv, $zero, $hit)) {
+    foreach ($case in @($noConv, $zero, $hit, $unrelated, $unsetReading, $fresh, $silent, $lb, $lagRead, $allUnattr)) {
         $rendered = ((Get-EscapedDefectReason -Reading $case -Repository 'o/n') -join "`n") + "`n" +
             (Format-EscapedDefectCell -Reading $case)
         Assert ($rendered -notmatch '\{\d+\}') `
@@ -1467,6 +2225,70 @@ function Invoke-SelfTest {
     Assert ((Format-EscapedDefectCell -Reading $hit) -match '0\.5') 'The measured cell did not carry the rate it measured.'
     Assert ((((Get-EscapedDefectReason -Reading $noConv -Repository 'o/n') -join ' ') -match '166 discussion')) `
         'The unmeasurable reason did not carry the number of discussions actually read — the count is what makes it a reading rather than an assertion.'
+
+    # 16g. The done bar for the whole family, asserted as a PROPERTY over the
+    #      input space rather than as a list of cases: no input — empty feed,
+    #      dead feed, old window, fresh window, unset convention, failed read —
+    #      may print a `0` into the §2 cell without marked, attributed reports
+    #      behind it and every guard cleared.
+    #
+    #      The permission is re-derived here from the FIXTURE inputs, not read
+    #      off the reading's own fields. Asking the implementation whether the
+    #      implementation agreed with itself is not a test; this restates the
+    #      five conditions in the test's own terms and compares.
+    $zeroProbes = @()
+    foreach ($convention in @($null, $fixtureConvention)) {
+        $script:DefectConventionStart = $convention
+        foreach ($factSet in @($fakeFacts, $oldFacts, $freshFacts, @())) {
+            $probeLastMerge = $null
+            $probeStamps = @($factSet | ForEach-Object { $_.Merged } | Where-Object { $null -ne $_ })
+            if ($probeStamps.Count -gt 0) { $probeLastMerge = ($probeStamps | Sort-Object)[-1] }
+            $probeNumbers = @($factSet | ForEach-Object { $_.Number })
+            foreach ($newest in @($null, (ConvertTo-Utc '2026-09-05T00:00:00Z'), $fixtureAlive)) {
+                foreach ($reportSet in @(@(), @((New-FakeReport 501 4242)), @((New-FakeReport 502 $null)), @((New-FakeReport 503 630)))) {
+                    $probeAttributed = @($reportSet | Where-Object { $null -ne $_.MergedPr })
+                    $probeInWindow = @($probeAttributed | Where-Object { $probeNumbers -contains $_.MergedPr })
+                    foreach ($feedStatus in @('Ok', 'Truncated', 'Unreachable', 'NotConfigured')) {
+                        # The five conditions, restated. A zero is a claim that
+                        # nothing escaped these merges, and it is only honest
+                        # when all five hold.
+                        $mayPrintZero = (
+                            $feedStatus -eq 'Ok' -and                                 # the feed was read in full
+                            $null -ne $convention -and                                # the convention has a start date
+                            $null -ne $probeLastMerge -and                            # the window has a merge to date
+                            $probeLastMerge -ge $convention -and                      # ... inside the convention
+                            ($fixtureNow - $probeLastMerge).TotalDays -ge 14 -and     # ... past the report lag floor
+                            @($probeAttributed).Count -gt 0 -and                      # somebody is actually marking
+                            $null -ne $newest -and $newest -gt $probeLastMerge        # the feed spoke after it closed
+                        )
+                        $probe = Get-EscapedDefectReading `
+                            -Feed (New-FakeFeed $reportSet $newest 166 $feedStatus) `
+                            -Facts $factSet -Delivery $fakeDelivery -TierMap $tierMap -Now $fixtureNow
+                        $zeroProbes += , [pscustomobject]@{
+                            Cell = (Format-EscapedDefectCell -Reading $probe)
+                            Permitted = $mayPrintZero
+                            HasReport = (@($probeInWindow).Count -gt 0)
+                        }
+                    }
+                }
+            }
+        }
+    }
+    $script:DefectConventionStart = $conventionStartSaved
+    Assert (@($zeroProbes).Count -gt 300) 'The zero-probe sweep collapsed — a sweep with no cases reports clean (trap 78).'
+    # A cell "prints a zero" when a 0 stands as a whole number: `0.250` does not
+    # count, `(0 report(s)` does, and a date like 2026-09-01 does not.
+    $printsZero = { param($Text) return [bool]([regex]::IsMatch($Text, '(^|[^.\d])0([^.\d]|$)')) }
+    $badZero = @($zeroProbes | Where-Object { -not $_.Permitted -and (& $printsZero $_.Cell) })
+    Assert (@($badZero).Count -eq 0) `
+        ("{0} input combination(s) printed a zero into the escaped-defect cell without all five conditions holding. First: '{1}'" -f
+            @($badZero).Count, $(if (@($badZero).Count -gt 0) { @($badZero)[0].Cell } else { '' }))
+    # And the sweep has to actually reach both sides, or it is a scan with no
+    # patterns: some probes are permitted a zero, and at least one prints one.
+    Assert (@($zeroProbes | Where-Object { $_.Permitted }).Count -gt 0) `
+        'No probe in the sweep was permitted a zero, so the sweep never exercised the case it discriminates against (trap 78).'
+    Assert (@($zeroProbes | Where-Object { $_.Permitted -and -not $_.HasReport -and (& $printsZero $_.Cell) }).Count -gt 0) `
+        'No probe printed a legitimate measured zero — the guards have latched shut, and a measured 0 is a finding this row must still be able to report.'
 
     # 17. DRA-127's own guard. The positive fixture is the RETIRED sentence, word
     #     for word, because a guard that has never fired on the defect it was
@@ -1506,11 +2328,17 @@ function Invoke-SelfTest {
 
     # And the sentences this script ACTUALLY emits survive their own guard, for
     # every status, over a window past the checkpoint the retired text named.
-    foreach ($st in @('Ok', 'NoConvention', 'NotConfigured', 'Truncated', 'Unreachable')) {
+    foreach ($st in @('Ok', 'NoConvention', 'NotConfigured', 'Truncated', 'Unreachable', 'PreConvention', 'LagFloor', 'FeedSilent', 'Unattributable')) {
         $r = [pscustomobject]@{
             Status = $st; FeedStatus = $st; Rate = $(if ($st -eq 'Ok') { 0 } else { $null })
             Scanned = 166; MarkedTotal = $(if ($st -eq 'Ok') { 1 } else { 0 })
             InWindow = @(); Elsewhere = 1; DeliverySlices = 4; PerTier = @(); FeedReason = 'because'
+            Unattributed = @(([pscustomobject]@{ Number = 901; Title = 'u1'; Url = 'uu1' }))
+            LowerBound = $false; ConventionCase = 'predates'
+            ConventionStart = (ConvertTo-Utc '2026-09-01T00:00:00Z')
+            LastMerge = (ConvertTo-Utc '2026-09-12T00:00:00Z'); DaysSinceLastMerge = 38.0
+            LagFloorDays = 14; FeedNewest = (ConvertTo-Utc '2026-09-20T00:00:00Z')
+            ObservedLags = @(); CommentMarked = 0
         }
         $text = (Get-EscapedDefectReason -Reading $r -Repository 'o/n') -join "`n"
         Assert (@(Get-WindowClaimViolations -Text $text -WindowStart $postM0Start -WindowEnd $postM0End).Count -eq 0) `
@@ -1807,6 +2635,16 @@ $current = [ordered]@{
     escapedDefectStatus = $defects.Status
     escapedDefectsMarked = $defects.MarkedTotal
     escapedDefectFeedScanned = $defects.Scanned
+    # DRA-135: a later window comparing against this file has to be able to tell
+    # a rate from a lower bound, and to see the guard state the rate was taken
+    # under. A frozen `0` whose guards nobody recorded is un-auditable later.
+    escapedDefectUnattributed = @($defects.Unattributed).Count
+    escapedDefectLowerBound = $defects.LowerBound
+    escapedDefectConventionStart = $(if ($null -eq $defects.ConventionStart) { $null } else { (Format-DefectDate $defects.ConventionStart) })
+    escapedDefectLagFloorDays = $defects.LagFloorDays
+    escapedDefectWindowLastMerge = $(if ($null -eq $defects.LastMerge) { $null } else { $defects.LastMerge.ToString('o') })
+    escapedDefectFeedNewest = $(if ($null -eq $defects.FeedNewest) { $null } else { $defects.FeedNewest.ToString('o') })
+    escapedDefectObservedLagDays = @($defects.ObservedLags | ForEach-Object { $_.Days })
 }
 
 # ---------------------------------------------------------------------------
