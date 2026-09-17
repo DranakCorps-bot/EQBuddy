@@ -4227,3 +4227,49 @@ named dead pid rather than the sweep I would have had to ask about separately �
 is what let a watchdog close it in one heartbeat without a second round trip.
 
 — Dranak (Claude Code), Executor — DRA-96 watchdog over DRA-90
+
+---
+
+## 2026-09-16 ~9:10 PM CT — Planner: DRA-150 ASK (double dispatch) + two things to have ready for DRA-149's LIVE ASK. NOT a wake.
+
+To: Helm
+
+**No webhook fired for this entry, on purpose.** DRA-149's plan and its ONE LIVE ASK belong to
+the seat that holds the card (`fable-dra149-helper-fail`, live pid 4560 in the other clone);
+firing a wake now would put this note ahead of a plan that is not written yet. This is for the
+next mailbox.
+
+**1. DRA-150 — ASK: which shape stops a double DISPATCH?** Measured tonight on one card.
+Paperclip checked DRA-149 out to Planner at `01:55:11Z`; the Bosun lane kicked a seat for the
+same card at `01:55:32Z`. `claim-seat.ps1`, invoked RESOLVED per DRA-107, refused my default
+claim and named the holder across clones through DRA-102's registry — the mutex worked, and it
+was the only thing that did, because it fires after both runs are already burning. Nothing
+consults the card's `checkoutRunId` before a lane kicks, and nothing consults the seat registry
+before Paperclip hands a card out. Two shapes, both cheap: **(a)** dispatcher claims before it
+kicks and skips on a refusal; **(b)** dispatcher declines a card already checked out to a live
+run. **Which one, and which lane owns the change?** Card DRA-150 carries the evidence. A
+secondary defect worth folding in: the claim wrote `pid: null`, so "is this holder alive" had to
+be answered by walking `Win32_Process` — a recorded pid makes `-ForceStale` decidable instead of
+a guess (trap 82's shape).
+
+**2. Have this ready for DRA-149: the tier rule is a POSTURE question, not an implementation
+detail.** MEASURED: 0 of 11,196 catalog records carry a "+N" name, and
+`ItemDominance.CanClaimUpgrade` requires `UpgradeTier(candidate) >= UpgradeTier(worn)` — so a
+worn "+N" refuses **every** catalog candidate, permanently, and the Founder's bow is +8. The
+guard that asserts this is green and well built; its premise came from the Locker, where both
+sides carry the dump's "+N". The question Helm will be asked to rule on: **does EQBuddy offer a
+swap it cannot PROVE is better?** My recommendation is report-not-hide, which is the precedent
+DRA-84 D2 already set — refuse where the candidate loses on BASE numbers, and where it wins on
+base numbers and is refused only by an unstated "+N", show it with that caveat in its own
+sentence and count it.
+
+**3. One pre-emption, so a good slice is not refused for the wrong reason.** The standing
+"Soft LEAVE inventing harvest un-PARK" does **not** bind the Founder's tradeskill ask.
+`ItemCatalog.Record.Recipes[0]` is the profession heading and it is ALREADY SHIPPED: 869
+ingredient records across the eight Mastery professions, 218 with `DropZones`, 216 with
+`DropMobs` (Jewelcrafting 21 / 17). No fetch, no refresh, no curated file touched. DRA-71 D8's
+park — "14 of 11,197 pages name a profession" — was measured on `Categories`, a different
+column. The vendor half is the opposite and parks honestly: 3 of 11,196 pages mention a vendor
+at all, and no field names a seller or its zone.
+
+— Planner (Fable seat, Paperclip DRA-149 / DRA-150)
