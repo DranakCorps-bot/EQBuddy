@@ -68,6 +68,33 @@ public enum GearIntentShape
 public sealed record WornItem(string Name, string BaseName, string Slot, ItemStatsBlock Stats);
 
 /// <summary>
+/// **WHAT ONE INVENTORY DUMP'S WORN ROWS CAME TO** — the anchors, and the rows that could not
+/// become one (DRA-149 D2, plan P2).
+///
+/// <para><b>Both halves come out of <see cref="GearUpgrades.WornFrom"/> because one method
+/// decided them</b> (trap 4). A caller that counted the anchors and then re-walked the dump to
+/// work out what was missing would be a second producer of "is this item readable", free to
+/// disagree with the first the day either one learns a rule — and the rule this pair exists to
+/// report is precisely one that was learned late.</para>
+///
+/// <para>An EMPTY <see cref="Unread"/> beside an empty <see cref="Worn"/> is "EQBuddy has
+/// never been told what you are wearing". A NON-empty <see cref="Unread"/> beside an empty
+/// <see cref="Worn"/> is a different state with a different remedy, and the engine says so
+/// rather than asking for a dump it already has
+/// (<see cref="GoalGapReason.NothingWornIsReadable"/>).</para>
+/// </summary>
+/// <param name="Worn">One entry per (item, slot) the sweep can anchor on.</param>
+/// <param name="Unread">The worn rows whose item the shipped catalog and the wiki cache both
+/// failed to describe, as the DUMP spells them — deduped, in the dump's own order. Never a
+/// guess at what they might have been: <see cref="ItemNameAliases"/> is curated and
+/// whole-string, so a name nobody has measured stays unread and is said out loud.</param>
+public sealed record WornSheet(IReadOnlyList<WornItem> Worn, IReadOnlyList<string> Unread)
+{
+    /// <summary>No dump at all — distinct from a dump whose every row was unreadable.</summary>
+    public static readonly WornSheet Nothing = new([], []);
+}
+
+/// <summary>
 /// One catalog item that beats something this character is wearing, and where it comes from.
 /// </summary>
 /// <param name="Item">The catalog's own name for it.</param>
@@ -376,6 +403,15 @@ public static class GearUpgrades
     /// would read as "no upgrades exist" instead of "EQBuddy has never read about this
     /// item".</para>
     ///
+    /// <para><b>…AND IT IS NAMED, which is the half that was missing</b> (DRA-149 D2, plan
+    /// P2). The paragraph above describes the right refusal and the wrong ending: the row
+    /// vanished, nothing counted it, and the room drew twenty worn items where the dump has
+    /// twenty-one. The Founder's bow is that row — the game spells it <c>Deterioriated</c> and
+    /// eqlwiki spells it <c>Deteriorated</c> — and from the outside a silent drop is
+    /// indistinguishable from an item with no upgrades. So the drops come back BESIDE the
+    /// anchors, from the one method that decided them (trap 4), and every surface can say what
+    /// it could not read.</para>
+    ///
     /// <para><b>ONE ANCHOR PER WORN ROW, and the slot is the DUMP'S</b>
     /// (<see cref="InventoryFile.Entry.WornSlot"/>, DRA-81 Founder smoke). This used to
     /// expand the CATALOG's <c>Slot:</c> line, which is a statement about where an item may
@@ -393,22 +429,41 @@ public static class GearUpgrades
     /// cache behind it) — the same delegate <c>GearLocker.Build</c> takes. The stats still
     /// have to say WEARABLE: a spell scroll sitting in a worn row is not gear, and it is the
     /// stats block rather than the location that knows that.</param>
-    public static List<WornItem> WornFrom(
+    public static WornSheet WornFrom(
         IEnumerable<InventoryFile.Entry> entries, Func<string, ItemStatsBlock?> statsFor)
     {
         var worn = new List<WornItem>();
+        var unread = new List<string>();
         foreach (var entry in entries.Where(e => e.Worn))
         {
             var slot = entry.WornSlot;
             if (slot.Length == 0) continue;   // a location that is only an ordinal
-            var baseName = QuestCatalog.BaseItemName(entry.Name);
-            if (statsFor(baseName) is not { Wearable: true } stats) continue;
+            // **THE ONE SEAM, and the alias table is inside it** (DRA-149 D2). `BaseName` has
+            // always been documented as "the wiki's title for it, which is the catalog's key"
+            // — and it used to be built by a second "+N" stripper that had never heard of a
+            // spelling, so the contract was true only where the two agreed. Asking
+            // `NormalizeTitle` is what makes it true generally, and it is the same call
+            // `ItemCatalog.Find` makes one layer down, so the anchor's key and the lookup's key
+            // can no longer disagree — which is what let the sweep's same-name refusal miss the
+            // catalog record for the very item being worn.
+            var baseName = EqlWikiItemService.NormalizeTitle(entry.Name);
+            if (statsFor(baseName) is not { Wearable: true } stats)
+            {
+                // The dump's OWN spelling, "+N" and all, because that is the string the player
+                // is looking at in the game and on the picker — a sentence naming the folded
+                // base name would be EQBuddy reporting a miss under a name nobody has seen
+                // (trap 35's shape: the right fact in a form the reader cannot use). Deduped,
+                // so a pair of unknown rings is one thing to say rather than two.
+                if (!unread.Contains(entry.Name, StringComparer.OrdinalIgnoreCase))
+                    unread.Add(entry.Name);
+                continue;
+            }
             if (worn.Any(w => w.Slot == slot
                               && w.Name.Equals(entry.Name, StringComparison.OrdinalIgnoreCase)))
                 continue;
             worn.Add(new WornItem(entry.Name, baseName, slot, stats));
         }
-        return worn;
+        return new WornSheet(worn, unread);
     }
 }
 

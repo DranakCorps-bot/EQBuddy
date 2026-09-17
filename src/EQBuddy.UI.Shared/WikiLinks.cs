@@ -59,7 +59,19 @@ public static class WikiLinks
     /// item-shaped — it strips a trailing " +N" tier suffix, which is meaningless on a
     /// faction and would quietly edit a name the player is reading on the row above.</para>
     /// </summary>
-    public static string Faction(string factionName) =>
+    public static string Faction(string factionName) => Page(factionName);
+
+    /// <summary>
+    /// Search eqlwiki for a name that is NOT an item — a faction, a profession, anything whose
+    /// spelling this app must not edit on the way past.
+    ///
+    /// <para><b>It is <see cref="Faction"/>'s body, lifted when a second non-item door arrived</b>
+    /// (DRA-149 D2): the Helper's profession door hands over a page title, and routing that
+    /// through <see cref="Search"/> would apply the item rule — stripping a trailing " +N" and
+    /// consulting the item alias table — to a name that is neither. Two callers with one
+    /// spelling rule, rather than each one picking whichever helper was nearest (trap 4).</para>
+    /// </summary>
+    public static string Page(string name) =>
         "https://eqlwiki.com/index.php?search="
-        + Uri.EscapeDataString((factionName ?? "").Trim());
+        + Uri.EscapeDataString((name ?? "").Trim());
 }

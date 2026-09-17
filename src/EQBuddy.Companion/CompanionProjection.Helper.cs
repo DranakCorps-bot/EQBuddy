@@ -66,6 +66,13 @@ public static partial class CompanionProjection
             // DRA-84 D4, same rule one slice on: a drop offer the PC withheld for having no
             // creature to name is withheld on the phone too, and says so in the same words.
             GearWhoWithheld: HelperPresentation.GearWhoWithheld(answers.GearWhoWithheld),
+            // DRA-149 D2, and it arrives WITH its doors in the same slice — DRA-84 D5's lesson
+            // was that a caption which reaches the wire and is never drawn passes every test in
+            // the parity suite, so the page-side must-list gains its row here too (trap 34).
+            UnreadWorn: HelperPresentation.UnreadWorn(answers.UnreadWorn),
+            UnreadWornDoors: Doors([.. answers.UnreadWorn
+                .Take(HelperPresentation.UnreadWornNamed)
+                .Select(item => new HelperDoor(HelperDoorKind.WikiItem, item))]),
             Gaps: [.. answers.Gaps.Select(Gap)],
             Deferred: [.. answers.NotAnsweredYet.Select(Deferred)],
             Empty: empty
@@ -241,7 +248,9 @@ public static partial class CompanionProjection
         // DRA-84 D2: the refusal sentence carries the level and the bands, so it moves when a
         // ding changes which zones the gate refuses even though no other field here does
         // (trap 72 — the repaint gate must see the store the feature writes).
-        h.MoneyNote, h.Cap, h.GearWithheld, h.GearBandRefused, h.GearWhoWithheld,
+        // DRA-149 D2: the unread sentence NAMES its items, so it moves when a new dump changes
+        // which of them EQBuddy cannot read even though no count beside it does (trap 72).
+        h.MoneyNote, h.Cap, h.GearWithheld, h.GearBandRefused, h.GearWhoWithheld, h.UnreadWorn,
         Join(h.Gaps, g => g.Text + "|" + g.Prompt?.Command),
         Join(h.Deferred, d => d.Text),
         h.Empty?.Heading);

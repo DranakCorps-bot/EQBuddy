@@ -461,6 +461,22 @@ public enum HelperDoorKind
     /// <see cref="WikiFaction"/>: EQBuddy fetches nothing, so the request policy toward the
     /// wiki is untouched.</summary>
     WikiSkill,
+
+    /// <summary>
+    /// An ITEM's page on eqlwiki, searched for by the name the game printed (DRA-149 D2).
+    ///
+    /// <para>The door under the unread-worn sentence, and the third player-clicked one:
+    /// EQBuddy fetches nothing here either. It is a SEARCH rather than a built page title for
+    /// <c>WikiLinks.Search</c>'s own reason — this door exists precisely because the name did
+    /// not match a page, so a guessed URL would 404 by construction where a search finds the
+    /// near-miss the player is looking for.</para>
+    ///
+    /// <para><b>This is the contribution shape, not a lookup</b> (CLAUDE.md: eqlwiki is the
+    /// source and EQBuddy is the tool that helps it update). A player who finds the real page
+    /// has found the row <see cref="ItemNameAliases"/> wants; one who finds no page has found
+    /// something the wiki is missing. Both are answers EQBuddy cannot produce on its own.</para>
+    /// </summary>
+    WikiItem,
 }
 
 /// <summary>One door under a recommendation.</summary>
@@ -639,6 +655,21 @@ public enum GoalGapReason
     /// emptied the list must be able to say it did.</para>
     /// </summary>
     NoUpgradeNamesACreature,
+
+    // ---- DRA-149 D2 ------------------------------------------------------------------
+
+    /// <summary>
+    /// There IS an inventory dump, every worn row in it named something EQBuddy has never read
+    /// about, and so there is nothing to anchor a sweep on (DRA-149 D2, plan P2).
+    ///
+    /// <para><b>A fourth distinct state, and <see cref="NoInventoryDump"/> would not merely
+    /// misdescribe it — it would ask for the thing the player already did.</b> That sentence
+    /// ends *"run the inventory command in game and this fills in"*, which for a character
+    /// whose dump EQBuddy simply cannot read is a loop with no exit. What actually happened is
+    /// named by <see cref="RecommendationSet.UnreadWorn"/>, item by item, beside this gap: the
+    /// remedy is the wiki's spelling, not another dump.</para>
+    /// </summary>
+    NothingWornIsReadable,
 }
 
 /// <summary>One selected goal that produced no recommendation, and why.</summary>
@@ -751,6 +782,21 @@ public sealed record HelperInputs(
     /// </summary>
     public IReadOnlyList<WornItem> Worn { get; init; } = [];
 
+    /// <summary>
+    /// The worn rows EQBuddy could not read about, as the dump spells them —
+    /// <see cref="WornSheet.Unread"/>, carried from the same fold that produced
+    /// <see cref="Worn"/> (DRA-149 D2, plan P2).
+    ///
+    /// <para><b>It rides the inputs rather than being recomputed, because it is the other half
+    /// of one answer.</b> The paragraph above says an empty <see cref="Worn"/> is a real state;
+    /// what it could not say until now is WHICH state, and the difference is a player being
+    /// asked to run a command they have already run. It is also what makes the Founder's
+    /// missing bow visible: a row that vanished silently is indistinguishable from a slot with
+    /// no upgrades, and no amount of gear machinery downstream can tell the player about an
+    /// anchor that was never built.</para>
+    /// </summary>
+    public IReadOnlyList<string> UnreadWorn { get; init; } = [];
+
     /// <summary>The shipped item catalog. Null answers nothing rather than throwing — a
     /// fixture without one is a test, not an error.</summary>
     public ItemCatalog? Items { get; init; }
@@ -840,6 +886,20 @@ public sealed record HelperInputs(
 /// zone it drops in, and a page that names creatures in one of two zones is answered in one
 /// place and withheld in the other.</para>
 /// </param>
+/// <param name="UnreadWorn">
+/// The worn rows EQBuddy could not read about, as the dump spells them (DRA-149 D2, plan P2).
+///
+/// <para><b>The fourth thing the gear block holds back, and the only one that is not a
+/// decision.</b> The cap, the band gate and the who rule each chose to leave something out;
+/// this one is EQBuddy admitting it never had the row at all. It reports the same way for the
+/// same reason (trap 50): the Founder's bow disappeared between his bags and his screen, and
+/// an absence nobody counts is indistinguishable from a slot with nothing better in it.</para>
+///
+/// <para>The NAMES rather than a count, because the remedy is per item — the player can check
+/// the spelling on eqlwiki — and because a bare "1 item" is a sentence nobody can act on. The
+/// cap on how many are named is the SURFACE's (<c>HelperPresentation.UnreadWornNamed</c>); this
+/// list is whole, so the count in that sentence is the real one.</para>
+/// </param>
 public sealed record RecommendationSet(
     IReadOnlyList<Recommendation> Top,
     int Withheld,
@@ -847,11 +907,15 @@ public sealed record RecommendationSet(
     IReadOnlyList<GoalGap> Gaps,
     int GearWithheld = 0,
     IReadOnlyList<GearBandRefusal>? GearBandRefusals = null,
-    int GearWhoWithheld = 0)
+    int GearWhoWithheld = 0,
+    IReadOnlyList<string>? UnreadWorn = null)
 {
     /// <summary>Never null, so no caller has to decide what an absent list means.</summary>
     public IReadOnlyList<GearBandRefusal> GearBandRefusals { get; init; }
         = GearBandRefusals ?? [];
+
+    /// <summary>Never null, for <see cref="GearBandRefusals"/>' reason.</summary>
+    public IReadOnlyList<string> UnreadWorn { get; init; } = UnreadWorn ?? [];
 
     public static readonly RecommendationSet Empty = new([], 0, [], []);
 }
@@ -1302,10 +1366,11 @@ public static partial class Recommendations
         var gearWithheld = 0;
         var gearWhoWithheld = 0;
         List<GearBandRefusal> gearBandRefusals = [];
+        IReadOnlyList<string> unreadWorn = [];
 
         if (goals.Contains(HelperGoal.LevelUp)) LevelUp(inputs, candidates, gaps);
         if (goals.Contains(HelperGoal.FarmGear))
-            (gearWithheld, gearBandRefusals, gearWhoWithheld) =
+            (gearWithheld, gearBandRefusals, gearWhoWithheld, unreadWorn) =
                 FarmGear(inputs, candidates, gaps);
         // DRA-71 D7. Both read the player's own play and nothing else; the catalog's half of
         // each was refused by its own survey, which is written down where the engine is.
@@ -1334,7 +1399,7 @@ public static partial class Recommendations
         var top = ordered.Take(Math.Max(0, cap)).Select(Trim).ToList();
         return new RecommendationSet(
             top, Math.Max(0, ordered.Count - top.Count), deferred, gaps, gearWithheld,
-            gearBandRefusals, gearWhoWithheld);
+            gearBandRefusals, gearWhoWithheld, unreadWorn);
     }
 
     // ---- the join: one place, every goal it serves (HOME-005) --------------------------
@@ -1976,9 +2041,15 @@ public static partial class Recommendations
     /// <see cref="LevelExemptReason"/>. It is the default in this delivery most worth a
     /// veto.</para>
     /// </summary>
-    /// <returns>What the sweep's per-anchor cap held back, and which zones the band gate
-    /// refused.</returns>
-    private static (int Withheld, List<GearBandRefusal> Refused, int WhoWithheld) FarmGear(
+    /// <returns>What the sweep's per-anchor cap held back, which zones the band gate refused,
+    /// what the who rule withheld, and the worn rows EQBuddy could never read (DRA-149 D2 —
+    /// the last one is not a decision this method made, which is exactly why it has to be
+    /// carried out rather than inferred from a short list of anchors).</returns>
+    private static (
+        int Withheld,
+        List<GearBandRefusal> Refused,
+        int WhoWithheld,
+        IReadOnlyList<string> UnreadWorn) FarmGear(
         HelperInputs inputs, List<Recommendation> into, List<GoalGap> gaps)
     {
         // A DECIDED deferral, said out loud. Every intent answers since DRA-71 D7, so this arm
@@ -1987,7 +2058,7 @@ public static partial class Recommendations
         if (GearUpgrades.ShapeFor(inputs.GearIntent) != GearIntentShape.Answered)
         {
             gaps.Add(new GoalGap(HelperGoal.FarmGear, GoalGapReason.GearIntentNotAnsweredYet));
-            return (0, [], 0);
+            return (0, [], 0, []);
         }
 
         // **"Farm to sell" is a different question and leaves here** (DRA-71 D7, plan P9). It
@@ -2001,18 +2072,31 @@ public static partial class Recommendations
         // camp: it ranks what the player has already looted, priced at what a vendor has
         // already paid them. There is no zone to look a band up for, and D7's coin reasoning
         // is untouched by anything D2 measured.
+        //
+        // **The unread worn rows leave with it, for the same reason** (DRA-149 D2). This intent
+        // never looked at a worn row, so it has nothing to report about one — a sentence naming
+        // an item the player is wearing, under a question about what to sell, would be an
+        // answer to a question nobody asked.
         if (inputs.GearIntent == GearIntent.FarmToSell)
         {
             FarmToSell(inputs, into, gaps);
-            return (0, [], 0);
+            return (0, [], 0, []);
         }
 
         // "EQBuddy has never been told what you are wearing" is a different state from
         // "nothing beats it", and only the first one has a command that fixes it.
+        //
+        // **AND A THIRD STATE SITS BETWEEN THEM** (DRA-149 D2, plan P2): a dump that arrived and
+        // whose every worn row named something EQBuddy has never read about. Asking for the
+        // inventory command there is a loop with no exit — the command has already been run and
+        // running it again produces the same unreadable rows — so the gap says which state it
+        // is, and the names ride out beside it either way.
         if (inputs.Worn.Count == 0)
         {
-            gaps.Add(new GoalGap(HelperGoal.FarmGear, GoalGapReason.NoInventoryDump));
-            return (0, [], 0);
+            gaps.Add(new GoalGap(HelperGoal.FarmGear, inputs.UnreadWorn.Count > 0
+                ? GoalGapReason.NothingWornIsReadable
+                : GoalGapReason.NoInventoryDump));
+            return (0, [], 0, inputs.UnreadWorn);
         }
 
         var sweep = GearUpgrades.Sweep(
@@ -2021,7 +2105,7 @@ public static partial class Recommendations
         if (sweep.Upgrades.Count == 0)
         {
             gaps.Add(new GoalGap(HelperGoal.FarmGear, GoalGapReason.NoCatalogUpgrade));
-            return (sweep.Withheld, [], 0);
+            return (sweep.Withheld, [], 0, inputs.UnreadWorn);
         }
 
         var byZone = new Dictionary<string, List<GearCandidate>>(StringComparer.OrdinalIgnoreCase);
@@ -2093,7 +2177,7 @@ public static partial class Recommendations
                 [new HelperDoor(HelperDoorKind.QuestCatalog, quest),
                  new HelperDoor(HelperDoorKind.Gear, "")]));
 
-        return (sweep.Withheld, refused, whoWithheld);
+        return (sweep.Withheld, refused, whoWithheld, inputs.UnreadWorn);
 
         static void Bucket(Dictionary<string, List<GearCandidate>> into, string key, GearCandidate c)
         {

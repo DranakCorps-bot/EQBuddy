@@ -485,9 +485,82 @@ public class HelperSurfaceParityTests
                      "renderHelper", "h.question", "h.picksLead", "h.answersHeading",
                      "h.sourceNote", "h.levelNote", "h.moneyNote", "h.cap", "h.gearWithheld",
                      "h.gearBandRefused", "h.gearWhoWithheld",
+                     // DRA-149 D2's caption and its doors, added in the SAME slice as the field
+                     // — which is the whole of what D5's lesson was.
+                     "h.unreadWorn", "h.unreadWornDoors",
                      "h.doorsLead", "h.empty", "h.gaps", "h.deferred",
                  })
             Assert.Contains(field, html, StringComparison.Ordinal);
+    }
+
+    // ---- DRA-149 D2: the unread worn rows reach the phone -----------------------------
+
+    /// <summary>
+    /// **A worn row the PC could not read is said on the phone too, in the same words.**
+    ///
+    /// <para>The sentence is <see cref="HelperPresentation"/>'s, not the projection's, and the
+    /// doors are one wiki search per NAMED item — capped the same way the caption is, so the
+    /// list under it can never be longer than the list in it.</para>
+    /// </summary>
+    [Fact]
+    public void TheUnreadWornSentenceAndItsDoorsRideTheWire()
+    {
+        IReadOnlyList<string> unread =
+            ["Deterioriated Ancient Faydark Longbow +2", "Lute +1", "Shiny Brass Shield +6",
+             "Mystery Pauldrons"];
+
+        var phone = Phone(Request(
+            Inputs() with { UnreadWorn = unread }, HelperGoal.FarmGear));
+
+        Assert.Equal(HelperPresentation.UnreadWorn(unread), phone.UnreadWorn);
+        Assert.Equal(HelperPresentation.UnreadWornNamed, phone.UnreadWornDoors.Count);
+        Assert.All(phone.UnreadWornDoors, d =>
+        {
+            Assert.Equal("eqlwiki", d.Label);
+            // The tip rides the ROW, because a phone has no pointer (trap 35).
+            Assert.Contains("never fetches", d.Detail);
+        });
+        // Each door is about one of the NAMED items, in the caption's own order.
+        Assert.Contains("Deterioriated Ancient Faydark Longbow +2", phone.UnreadWornDoors[0].Detail);
+        Assert.Contains("Lute +1", phone.UnreadWornDoors[1].Detail);
+    }
+
+    /// <summary>Nothing unread, nothing sent — the committed negative, so a phone with nothing
+    /// wrong in its dump does not draw an empty caption and a row of doors pointing at
+    /// nothing.</summary>
+    [Fact]
+    public void APhoneWithNothingUnreadIsSentNeitherSentenceNorDoors()
+    {
+        var phone = Phone(Request(Inputs(), HelperGoal.FarmGear));
+
+        Assert.Empty(phone.UnreadWorn);
+        Assert.Empty(phone.UnreadWornDoors);
+    }
+
+    /// <summary>The unread sentence is in the push key: it NAMES its items, so a new dump that
+    /// changes which of them EQBuddy cannot read moves nothing else on this screen (trap
+    /// 72).</summary>
+    [Fact]
+    public void AChangedUnreadListWakesThePairedDevice()
+    {
+        string Print(HelperInputs inputs) => CompanionProjection.SectionFingerprints(
+            CompanionProjection.Build(
+                new CompanionInputs
+                {
+                    Character = "Dranak", AppVersion = "2.0.0",
+                    Offered = CompanionSurfaces.All,
+                    Helper = Request(inputs, HelperGoal.FarmGear),
+                },
+                DateTime.Now))[CompanionSurfaces.Helper];
+
+        var clean = Inputs();
+        Assert.NotEqual(
+            Print(clean),
+            Print(clean with { UnreadWorn = ["Deterioriated Ancient Faydark Longbow +2"] }));
+        // A SWAP, which a count would not see.
+        Assert.NotEqual(
+            Print(clean with { UnreadWorn = ["Lute +1"] }),
+            Print(clean with { UnreadWorn = ["Mystery Pauldrons"] }));
     }
 
     // ---- trap 72 / trap 8: the push gate ---------------------------------------------

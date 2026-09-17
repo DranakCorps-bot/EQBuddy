@@ -155,7 +155,24 @@ public class HelperPresentationTests
             AssertClean(HelperPresentation.WithheldWhy(n), $"WithheldWhy({n})");
             AssertClean(HelperPresentation.FactionPickerCapNote(n), $"FactionPickerCapNote({n})");
             AssertClean(HelperPresentation.GearWithheld(n), $"GearWithheld({n})");
+            AssertClean(HelperPresentation.GearWhoWithheld(n), $"GearWhoWithheld({n})");
         }
+
+        // DRA-149 D2's unread sentence, at every shape it has: silent, one, exactly the name
+        // cap, and past it. It names ITEMS rather than places, which is a different way into
+        // the same temptation — "nothing better in that slot" is a claim about the game, and
+        // this sentence's whole subject is EQBuddy's own catalog.
+        foreach (var unread in new IReadOnlyList<string>[]
+                 {
+                     [],
+                     ["Deterioriated Ancient Faydark Longbow +2"],
+                     ["Shiny Brass Shield +6", "Lute +1", "Mystery Pauldrons"],
+                     [
+                         "Shiny Brass Shield +6", "Lute +1", "Mystery Pauldrons",
+                         "Cracked Staff +3", "Bronze Greaves",
+                     ],
+                 })
+            AssertClean(HelperPresentation.UnreadWorn(unread), $"UnreadWorn({unread.Count})");
 
         // **DRA-84 D2's refusal sentence, at the values that would most tempt an adjective.**
         // "eqlwiki lists its creatures at 5-20 and you are 30" is a place somebody would
@@ -668,6 +685,98 @@ public class HelperPresentationTests
         Assert.Contains(expected,
             HelperPresentation.Gap(new GoalGap(HelperGoal.WorkOnFaction, reason)),
             StringComparison.OrdinalIgnoreCase);
+
+    // ---- DRA-149 D2: the unread worn sentence ------------------------------------------
+
+    /// <summary>
+    /// **The Founder's bow, said out loud** — the sentence names it under the spelling the game
+    /// printed, counts it, and puts the subject on EQBuddy's catalog rather than on the game.
+    /// </summary>
+    [Fact]
+    public void TheUnreadSentenceNamesTheItemTheDumpNamed()
+    {
+        var said = HelperPresentation.UnreadWorn(["Deterioriated Ancient Faydark Longbow +2"]);
+
+        Assert.Contains("Deterioriated Ancient Faydark Longbow +2", said);
+        // Singular, because a sentence that says "1 things" reads as a bug in the sentence and
+        // makes a player doubt the number beside it.
+        Assert.Contains("1 thing you are wearing", said);
+        Assert.DoesNotContain("1 things", said);
+        // The subject. "That item does not exist" would be a claim about the world; what
+        // happened is that a name matched nothing EQBuddy ships.
+        Assert.Contains("EQBuddy has never read about", said);
+        Assert.Contains("item pages EQBuddy ships", said);
+    }
+
+    /// <summary>A cap that hid how much it was hiding is the silence this sentence exists to
+    /// end (trap 50). Three are named, the REST are counted, and the leading number is the
+    /// WHOLE count rather than the named one.</summary>
+    [Fact]
+    public void TheUnreadSentenceNamesThreeAndCountsTheRest()
+    {
+        var said = HelperPresentation.UnreadWorn(
+            ["First Thing", "Second Thing", "Third Thing", "Fourth Thing", "Fifth Thing"]);
+
+        Assert.Equal(3, HelperPresentation.UnreadWornNamed);
+        Assert.Contains("5 things you are wearing", said);
+        Assert.Contains("First Thing, Second Thing, Third Thing, and 2 more", said);
+        Assert.DoesNotContain("Fourth Thing", said);
+        // Exactly at the cap it counts nothing, rather than saying "and 0 more".
+        Assert.DoesNotContain("more",
+            HelperPresentation.UnreadWorn(["First Thing", "Second Thing", "Third Thing"]));
+    }
+
+    /// <summary>Nothing unread says NOTHING — the committed negative, so a caption that had
+    /// learned to fire always fails here rather than over a room with nothing wrong in
+    /// it.</summary>
+    [Fact]
+    public void AnUnreadSentenceWithNothingToSayIsSilent()
+    {
+        Assert.Empty(HelperPresentation.UnreadWorn([]));
+        Assert.Empty(HelperPresentation.UnreadWorn(null!));
+    }
+
+    /// <summary>
+    /// **The unreadable-dump gap must not ask for the dump again.**
+    ///
+    /// <para>That is the whole reason it is not <see cref="GoalGapReason.NoInventoryDump"/>: the
+    /// player has run the command, and telling them to run it produces the same unreadable rows
+    /// forever. The two sentences are asserted against each other so a later edit cannot quietly
+    /// converge them.</para>
+    /// </summary>
+    [Fact]
+    public void TheUnreadableDumpGapDoesNotAskForAnotherDump()
+    {
+        var unreadable = HelperPresentation.Gap(
+            new GoalGap(HelperGoal.FarmGear, GoalGapReason.NothingWornIsReadable));
+        var missing = HelperPresentation.Gap(
+            new GoalGap(HelperGoal.FarmGear, GoalGapReason.NoInventoryDump));
+
+        Assert.DoesNotContain("Run the inventory command", unreadable);
+        Assert.Contains("Run the inventory command", missing);
+        Assert.NotEqual(missing, unreadable);
+        // It says the dump ARRIVED, which is the fact that makes the two different.
+        Assert.Contains("your inventory dump is here", unreadable);
+        Assert.Contains("eqlwiki", unreadable);
+    }
+
+    /// <summary>The item door is a SEARCH and says so: it exists because the name matched no
+    /// page, so "open its page" would promise the thing that just failed. And like every wiki
+    /// door it says EQBuddy fetches nothing.</summary>
+    [Fact]
+    public void TheItemWikiDoorOffersASearchAndFetchesNothing()
+    {
+        var tip = HelperPresentation.DoorTip(new HelperDoor(
+            HelperDoorKind.WikiItem, "Deterioriated Ancient Faydark Longbow +2"));
+
+        Assert.Contains("Search eqlwiki", tip);
+        Assert.Contains("Deterioriated Ancient Faydark Longbow +2", tip);
+        Assert.Contains("never fetches", tip);
+        Assert.Equal("eqlwiki", HelperPresentation.DoorLabel(HelperDoorKind.WikiItem));
+        // A page is not a room — the null arm is a real answer, and a caller that read it as
+        // "no door" would drop the only affordance this caption has.
+        Assert.Null(HelperPresentation.AddressFor(HelperDoorKind.WikiItem));
+    }
 
     /// <summary>"Nothing left" is not worded as a gap in the data. A finished job and a
     /// missing file are different answers and a player can act on only one of them.</summary>

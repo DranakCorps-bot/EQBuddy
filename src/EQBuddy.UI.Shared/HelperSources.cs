@@ -91,7 +91,14 @@ public sealed class HelperSources
     public IReadOnlyList<SaleRoll> Sales { get; private set; } = [];
 
     /// <summary>What the character is WEARING — the Farm Gear sweep's anchor set.</summary>
-    public IReadOnlyList<WornItem> Worn { get; private set; } = [];
+    public IReadOnlyList<WornItem> Worn => _sheet.Worn;
+
+    /// <summary>The worn rows EQBuddy could not read about, as the dump spells them (DRA-149
+    /// D2). It comes off the SAME fold as <see cref="Worn"/> — see
+    /// <see cref="WornSheet"/> for why the two halves are never computed apart.</summary>
+    public IReadOnlyList<string> UnreadWorn => _sheet.Unread;
+
+    private WornSheet _sheet = WornSheet.Nothing;
 
     /// <summary>The dump <see cref="Worn"/> was folded from, for a caller's repaint
     /// fingerprint. A new dump changes what is worn, which changes every gear answer without
@@ -132,7 +139,9 @@ public sealed class HelperSources
         // the same cost as the session query it sits beside.
         var dump = _reads.LatestInventory();
         InventoryStamp = dump is null ? "" : $"{dump.Path}|{dump.WrittenAt:O}|{dump.Entries.Count}";
-        Worn = dump is null ? [] : GearUpgrades.WornFrom(dump.Entries, _reads.StatsFor);
+        _sheet = dump is null
+            ? WornSheet.Nothing
+            : GearUpgrades.WornFrom(dump.Entries, _reads.StatsFor);
     }
 
     /// <summary>A dump the player just produced landed: re-read on the next
@@ -199,6 +208,10 @@ public sealed class HelperSources
                 settings.SkyQuestChecklist, settings.SkyQuestCompleted, catalog, level)
             {
                 Worn = Worn,
+                // DRA-149 D2, and it is supplied HERE for the reason `Bands` below is: this is
+                // the one assembly point both surfaces go through, so a worn row EQBuddy could
+                // not read is reported on the phone and on the PC or on neither.
+                UnreadWorn = UnreadWorn,
                 Items = items,
                 MyClasses = ClassCodes(ledgerClasses, inferredClass),
                 GearIntent = intent,

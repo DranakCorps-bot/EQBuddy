@@ -1,3 +1,65 @@
+## 2026-09-17 — DRA-149 D2: the alias table's seam, a fourth gap reason, and a dead wiki door found on the way
+
+**Seat:** `opus-dra149-d2` (disjoint; D1 ran in parallel on `dra149/d1-sweep-base-vs-base`).
+Plan PR #649 merged at `2645cb96`, Helm SIGNED the D1-D5 sequence ~9:15 PM CT, Live Holds
+empty. Everything below is inside plan P2 except where it says otherwise; nothing here touches
+the consequence list, nothing fetches, no catalog was rebuilt, no release.
+
+**1. The alias lands INSIDE `EqlWikiItemService.NormalizeTitle`, not beside it.**
+P2 named that method as "the candidate" and told the executor to verify every reader routes
+through it. Verified: `ItemCatalog.Find`, `EqlWikiItemService.CachedInfo`, `LookupAsync`,
+`ItemInfoWindow`'s heading and `UI.Shared/WikiLinks.Search` all call it, and nothing else folds
+an item name. So one row fixes the catalog lookup, the wiki fetch and the player's own door
+together. **The default it could have gone the other way on:** a dedicated
+`ItemNameAliases.Resolve` call at the gear sweep only, which is a smaller diff and would have
+left the item window and the wiki door still showing the spelling that failed — a second answer
+to "what is this item called" (trap 4).
+
+**2. `WornItem.BaseName` is now built by that same seam, which is a behaviour change P2 did not
+spell out.** Its doc comment has always read *"the wiki's title for it, which is the catalog's
+key"*, and it was built by `QuestCatalog.BaseItemName` — a second `+N` stripper that has never
+heard of a spelling. The contract was therefore true only where the two agreed. This matters
+beyond tidiness: `GearUpgrades.Sweep` skips a candidate whose name equals the anchor's
+`BaseName` ("the catalog holds the item the player is wearing too"), and that refusal MISSED
+for exactly the items an alias covers. **The default:** leave `BaseName` as the dump's fold and
+alias only inside `statsFor`. I did not, because it leaves a live same-name hole for D1 to walk
+into — D1 is moving that comparison to base-vs-base. Pinned by
+`FounderWornSheetTests.EveryAnchorsBaseNameIsTheNameTheCatalogFiledItUnder` over his whole dump.
+
+**3. A FOURTH gap reason, `GoalGapReason.NothingWornIsReadable`.** P2 asked for unread rows to
+become a sentence and did not mention the gap. But with a dump present and every row
+unreadable, `Worn.Count == 0` drew `NoInventoryDump` — *"Run the inventory command in game and
+this fills in"* — which is a loop with no exit for the one player it fires for. It is the same
+shape `EveryZoneOutsideYourBand` already has (a state `NoCatalogUpgrade` would misdescribe),
+and the must-list tests cover a new member automatically. **The default:** ship the caption
+and leave the gap saying the wrong thing, on the grounds that the state is not in the fixture.
+Cost of the choice: one enum member on a public Core enum while D1 is in flight.
+
+**4. NOT in the plan, and reported loudly: `HelperDoorKind.WikiSkill` has been a silent no-op
+since DRA-71 D8 shipped it.** `HelperRoom.Door()` special-cased `WikiFaction`, then fell
+through to `AddressFor`, which answers null for every wiki kind — and the null arm `return`s
+the label UNWIRED, before `_doors++` and before `_deadDoors++`. So the "eqlwiki" control under
+all eight professions drew a tooltip and opened nothing, and `helperDeadDoors` could not see
+it. `HelperMustListTests.EveryDoorEitherLandsOnARoomOrOpensTheWiki` proves the WORDS exist and
+nothing proved the CONTROL opens — trap 34 one layer down. I fixed it in the same method rather
+than filing it, because D2 adds a THIRD wiki door and shipping a new one beside an identical
+dead one is not an option; the switch is now exhaustive by kind so a fourth is a compile-time
+question. **The default:** file a stub and ship the new door beside the broken one. Flagged in
+`FABLE-FEEDBACK.md` — the guard gap is the durable lesson, not the one-line fix.
+
+**5. `WikiLinks.Page` lifted out of `WikiLinks.Faction`.** Wiring the profession door needed a
+non-item search, and `WikiLinks.Search` applies the ITEM rule — it strips a trailing "+N" and
+now consults the item alias table. `Faction`'s own doc already warned against exactly that.
+One spelling rule, two callers, rather than each door picking the nearest helper.
+
+**Verification.** `scripts/check.ps1` all gates green (5,178 unit tests). Full local
+`tests/EQBuddy.E2E`: 369/370 — the one red is `EveryLandedRoomIsReachableByItsOwnAddress`
+(`world:drops`), an OPEN ledger row, passed 19/19 on an immediate re-run of the whole theory,
+and filed as a third occurrence in `docs/ops/flake-ledger.md` including the fact that this seat
+failed to capture the assert text. Four prove-fails run and recorded in `docs/TestPlan.md`.
+**No `WhatsNew.json` entry** — the plan puts the drafted entries in D5 with the re-smoke pack,
+and no release ships from here.
+
 ## 2026-09-16 — DRA-148 (#527 rebase): the rename reached a rail that was built after the PR was written
 
 **Seat:** `opus-dra148-pr527`. #527 sat CONFLICTING through 409 commits of `main` drift. The

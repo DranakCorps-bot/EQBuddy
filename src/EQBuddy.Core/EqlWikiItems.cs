@@ -74,10 +74,27 @@ public sealed partial class EqlWikiItemService
         _fetch = fetchOverride ?? FetchFromApi;
     }
 
-    /// <summary>Strips the in-game upgrade suffix ("Rusty Broad Sword +4" → base name) —
-    /// the wiki has no "+N" pages (verified: 404s, no redirects).</summary>
+    /// <summary>
+    /// Strips the in-game upgrade suffix ("Rusty Broad Sword +4" → base name) — the wiki has
+    /// no "+N" pages (verified: 404s, no redirects) — and then asks the curated alias table
+    /// how eqlwiki spells it (DRA-149 D2).
+    ///
+    /// <para><b>THE ONE SEAM, and the alias lands in it rather than beside it.</b> Every reader
+    /// of an item name in this app already comes through here —
+    /// <see cref="ItemCatalog.Find"/>, <see cref="CachedInfo"/>, <see cref="LookupAsync"/>, the
+    /// item window's heading and <c>WikiLinks.Search</c> — so one table fixes the catalog
+    /// lookup, the cache lookup, the fetch and the player's own wiki door at once. A second
+    /// place that knew about spellings would be a second answer to "what is this item called"
+    /// (trap 4), and the one that got asked would depend on which surface the player was
+    /// standing on.</para>
+    ///
+    /// <para>Order matters: the tier suffix comes off FIRST, so the table is keyed on base
+    /// names and one row covers "+2" and "+8" alike. <see cref="ItemNameAliases.Resolve"/> is
+    /// whole-string and never fuzzy — an unknown name comes back unchanged, which is what lets
+    /// <see cref="GearUpgrades.WornFrom"/> REPORT it as unread instead of guessing.</para>
+    /// </summary>
     public static string NormalizeTitle(string inGameName) =>
-        Regex.Replace(inGameName.Trim(), @"\s+\+\d+$", "");
+        ItemNameAliases.Resolve(Regex.Replace(inGameName.Trim(), @"\s+\+\d+$", ""));
 
     public async Task<ItemLookupResult> LookupAsync(string inGameName)
     {
