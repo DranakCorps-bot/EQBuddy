@@ -1,3 +1,62 @@
+## 2026-09-16 — DRA-149 D1: the Helper's gear sweep drops the "+N" tier rule, and its rows say so
+
+**Seat:** `opus-dra149-d1`. Fable's DRA-149 plan P1, taken as an ADOPT under the sequence-wide
+SIGN. **This is the plan's own "default most worth a veto", so it is logged here rather than
+merely shipped.**
+
+**What changed.** `GearUpgrades.Sweep` asked `ItemDominance.CanClaimUpgrade`, which is
+dominance PLUS `UpgradeTier(candidate) >= UpgradeTier(worn)`. It now asks
+`ItemDominance.Dominates` — base numbers against base numbers. The Gear Locker is untouched and
+still asks the tier rule; its never-BiS scope lock is untouched too.
+
+**Why it is not a loosening of a safety rule.** The premise the tier rule rests on is true in
+the Locker and false in the sweep. Both names in the Locker come off one inventory dump and
+both can carry a "+N". On the catalog side **0 of 11,196 names carry one**, so
+`UpgradeTier(candidate)` is 0 for every row and the test read `0 >= N` for any plussed worn
+item. Measured through the real code over the Founder's committed dump: **19 of 19 gear anchors
+returned zero candidates**, and the only anchor that ever answered was `Arrow`, the one item he
+wears with no "+N" on it. That is not a strict rule; it is an answer fixed before the inputs
+are read. He read `NoCatalogUpgrade`'s true sentence and reported the feature as broken, and he
+was right. After the change the same 19 of 19 answer.
+
+**What the rows may now CLAIM narrows to match, which is the actual protection.** The sentence
+moved from "X beats the Y in your head" to **"X is a better base item than the Y in your
+head"**, and ONE block-level caption says the rest: your item carries its "+N" on top and the
+wiki does not state what that is worth, so at the same "+" the listed item wins and EQBuddy
+cannot tell you whether it still wins against yours as it stands. Said once per block, never
+templated onto each of up to eight rows — eight identical caveats is trap 73's distinct-count
+shape, and it would bury the one thing each row exists to say. **No "+N" arithmetic is invented
+anywhere**; the gap is stated, not closed, because eqlwiki does not publish the value and being
+uniquely wrong costs more than being silent.
+
+**The default it could have gone the other way on:** keep the tier rule and treat the empty
+answer as correct conservatism — "we decline to tell a player to unequip their best item". I
+did not, because that framing describes a judgement the code never makes: the rule never
+compared anything. The alternative default, inventing a "+N" stat estimate so the comparison
+becomes honest again, is refused by the plan and by the wiki rule, and I did not take it
+either.
+
+**Also in this slice (P3, mechanical):** slot spellings normalize at the sweep's read seam —
+`FINGER`→`FINGERS` (209 catalog entries against the dump's word), `SHOULDER`→`SHOULDERS` (5),
+`SECONDAY`→`SECONDARY` (3), trailing `,`/`:` stripped; `/`, `EMPTY` and `ORNAMENTATION:` are
+refused as non-slots and counted in a test. An `Any Slot` worn row — the Founder's
+`Shiny Brass Shield +6` and `Lute +1` — takes its candidate pool from the item's own catalog
+`Slot:` line, since `ANY SLOT` is a key the catalog never emits. **The anchor's identity and
+label stay the dump's** (DRA-81 KEEP); only the pool moved. No catalog was rebuilt and the
+promoter's own debris stays the promoter's card.
+
+**The old guard was reworked, not deleted.** `AWornUpgradeTierIsNeverToldToUnequipItself` now
+asserts both halves — the Locker still refuses the pair, the sweep now offers it — so the fact
+that the two surfaces deliberately differ is the thing under test. Prove-failed by restoring
+the tier gate in `Sweep`: three guards go red, including the fixture floor. The ANY SLOT
+fallback prove-fails independently.
+
+**Gates:** `check.ps1` all green; 5,162 unit tests; Helper E2E 10/10. The band gate, the who
+rule and their order are untouched — their refusals simply become reachable for the first time,
+which is D5's re-smoke checklist's job to predict rather than a regression.
+
+— Dranak (Claude Code), Executor — DRA-149 D1
+
 ## 2026-09-16 — DRA-148 (#527 rebase): the rename reached a rail that was built after the PR was written
 
 **Seat:** `opus-dra148-pr527`. #527 sat CONFLICTING through 409 commits of `main` drift. The

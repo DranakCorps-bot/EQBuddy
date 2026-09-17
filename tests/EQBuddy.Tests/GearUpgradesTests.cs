@@ -93,18 +93,50 @@ public class GearUpgradesTests
         Assert.Empty(sweep.Upgrades);
     }
 
-    /// <summary>A worn "+N" is under-described rather than beaten — telling somebody to farm a
-    /// replacement for their best item is worse than saying nothing
-    /// (<see cref="ItemDominance.CanClaimUpgrade"/>).</summary>
+    /// <summary>
+    /// **THE TIER RULE, SPLIT BY WHERE ITS PREMISE IS TRUE** (DRA-149 D1, plan P1 — this test
+    /// REWORKED rather than deleted).
+    ///
+    /// <para>It used to assert that the sweep refuses a plussed worn item outright, and it
+    /// passed for a reason that was not the one written above it. The rule compares
+    /// <c>UpgradeTier(candidate) &gt;= UpgradeTier(worn)</c>, and <b>no catalog name carries a
+    /// "+N"</b> — so the candidate's tier is always 0 and the test is <c>0 &gt;= N</c>, false
+    /// for every plussed item in the game. That is not a careful refusal of a bad
+    /// recommendation; it is an answer fixed before the inputs are read, and it made the whole
+    /// feature return nothing for any character whose gear is plussed at all.</para>
+    ///
+    /// <para>So the LOCKER keeps the rule, where both names come off one dump and the premise
+    /// holds, and the SWEEP drops to base-vs-base and narrows what its rows may claim to
+    /// match. Both halves are asserted here, in one place, because the interesting fact is
+    /// that they now DIFFER on the same pair of items and that the difference is deliberate.
+    /// The prove-fail is restoring the tier gate in <c>GearUpgrades.Sweep</c>: the sweep half
+    /// goes red.</para>
+    /// </summary>
     [Fact]
     public void AWornUpgradeTierIsNeverToldToUnequipItself()
     {
         var catalog = Catalog(Record("Froglok Bone Helm", "HEAD", 9, zones: ["Lower Guk"]));
 
-        Assert.Empty(Sweep(catalog, [Worn("Rusty Helm +5", "HEAD", "AC: 4")]).Upgrades);
-        // …and the same comparison with a plain worn item DOES fire, so the row above is the
-        // tier rule rather than a fixture that could never have matched.
+        // THE SWEEP'S HALF, FLIPPED: a better base item is offered against a plussed worn one,
+        // because the alternative is offering nothing at all — which is what the Founder hit.
+        var plussed = Assert.Single(Sweep(catalog, [Worn("Rusty Helm +5", "HEAD", "AC: 4")]).Upgrades);
+        Assert.Equal("Froglok Bone Helm", plussed.Item);
+        // …and the plain worn item still answers too, so the row above is the policy change
+        // rather than a fixture that matches anything put in front of it.
         Assert.Single(Sweep(catalog, [Worn("Rusty Helm", "HEAD", "AC: 4")]).Upgrades);
+
+        // THE LOCKER'S HALF, UNCHANGED: the same pair, asked the Locker's question, is still
+        // refused. Its premise is intact there — both names carry the dump's "+N" — and its
+        // never-BiS scope lock is untouched by this slice.
+        var candidate = new ItemStatsBlock { Ac = 9, Slots = ["HEAD"] };
+        var worn = new ItemStatsBlock { Ac = 4, Slots = ["HEAD"] };
+        Assert.False(ItemDominance.CanClaimUpgrade(
+            "Froglok Bone Helm", candidate, "Rusty Helm +5", worn, []));
+        Assert.True(ItemDominance.CanClaimUpgrade(
+            "Froglok Bone Helm", candidate, "Rusty Helm", worn, []));
+        // The arithmetic both sides read is one table, and it says the same thing to both.
+        Assert.True(ItemDominance.Dominates(
+            "Froglok Bone Helm", candidate, "Rusty Helm +5", worn, []));
     }
 
     /// <summary>Somebody else's class-locked item is not an upgrade for you. An UNKNOWN class

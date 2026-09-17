@@ -301,8 +301,18 @@ public static class HelperPresentation
         // this one carries it instead (trap 4), or this is a QUEST row, where the quest is the
         // path and no creature drops the thing at all. A zone row that could name nobody is no
         // longer drawn — see GearWhoWithheld, which counts them out loud.
+        //
+        // **THE CLAIM IS BASE-vs-BASE SINCE DRA-149 D1** (plan P1). It used to read "beats the
+        // X in your Y", which the tier rule made true — and which that rule also made
+        // unreachable, since no catalog name carries a "+N" and so nothing was ever offered
+        // against a plussed item at all. The sweep now compares base numbers, so the sentence
+        // says base numbers. The "+N" caveat is said ONCE under the block
+        // (GearBaseClaimNote) and never templated onto the row: eight rows repeating one
+        // caveat is the distinct-count tell trap 73 is about, and it would bury the one thing
+        // each row is actually for.
         GearUpgradeFact f =>
-            $"{f.Item} beats the {f.Over} in your {Slot(f.Slot)} — {Gain(f)}."
+            $"{f.Item} is a better base item than the {f.Over} in your {Slot(f.Slot)} — "
+            + $"{Gain(f)}."
             + Who(f),
 
         // The personal half: measured, with its denominator, and the creature named from your
@@ -913,6 +923,28 @@ public static class HelperPresentation
         + "to the price on the item pages it ships only where you have never sold one — and "
         + "those are quoted at a particular Charisma and faction standing, so they are an "
         + "estimate and the page's own conditions are printed with them.";
+
+    /// <summary>
+    /// **WHAT A GEAR ROW IS AND IS NOT COMPARING — SAID ONCE, UNDER THE BLOCK** (DRA-149 D1,
+    /// plan P1).
+    ///
+    /// <para>The sweep compares the wiki's BASE numbers on both sides, and the player's own
+    /// item is very likely carrying a "+N" the wiki publishes no value for. That is a real
+    /// limit on every row at once, so it is stated at the block exactly once — <b>never
+    /// appended to each row</b>. Eight rows carrying one identical caveat is the distinct-count
+    /// shape trap 73 was written about, and it would crowd out the thing each row exists to
+    /// say.</para>
+    ///
+    /// <para><b>It states the gap; it does not close it.</b> No arithmetic converts a "+N" into
+    /// stats anywhere in this repo, because eqlwiki does not state one — so the honest sentence
+    /// names what EQBuddy compared and hands the judgement back, rather than estimating and
+    /// being uniquely wrong.</para>
+    /// </summary>
+    public const string GearBaseClaimNote =
+        "These compare the base item on eqlwiki against the base item you are wearing. Yours "
+        + "carries its \"+N\" on top, and the wiki does not state what that is worth — so at "
+        + "the same \"+\" the listed item wins, and EQBuddy cannot tell you whether it still "
+        + "wins against yours as it stands.";
 
     /// <summary>Said when the sweep's per-anchor cap held upgrades back — the one count that
     /// cannot ride a row, because it is spent before any row exists (trap 50). The door under

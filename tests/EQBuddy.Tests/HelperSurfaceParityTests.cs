@@ -467,6 +467,7 @@ public class HelperSurfaceParityTests
                      HelperPresentation.DoorsOnPc,
                      HelperPresentation.Nothing.Heading,
                      HelperPresentation.MoneyPriceNote,
+                     HelperPresentation.GearBaseClaimNote,
                      HelperPresentation.CatalogLabel,
                  })
             Assert.DoesNotContain(sentence, html, StringComparison.Ordinal);
@@ -483,8 +484,8 @@ public class HelperSurfaceParityTests
         foreach (var field in new[]
                  {
                      "renderHelper", "h.question", "h.picksLead", "h.answersHeading",
-                     "h.sourceNote", "h.levelNote", "h.moneyNote", "h.cap", "h.gearWithheld",
-                     "h.gearBandRefused", "h.gearWhoWithheld",
+                     "h.sourceNote", "h.levelNote", "h.moneyNote", "h.gearBaseNote", "h.cap",
+                     "h.gearWithheld", "h.gearBandRefused", "h.gearWhoWithheld",
                      "h.doorsLead", "h.empty", "h.gaps", "h.deferred",
                  })
             Assert.Contains(field, html, StringComparison.Ordinal);

@@ -138,10 +138,21 @@ public sealed record GearSweep(IReadOnlyList<GearUpgrade> Upgrades, int Withheld
 /// </list>
 ///
 /// <para><b>The metric table is <see cref="ItemDominance"/> and there is one of it.</b> The
-/// class-lock filter is the same, the "+N" tier refusal is the same
-/// (<see cref="ItemDominance.CanClaimUpgrade"/>), and the stats on both sides come out of the
-/// same <see cref="ItemStatsBlock"/> parser — the catalog is built THROUGH the app's own
-/// parsers precisely so a catalog record and a live page cannot disagree.</para>
+/// class-lock filter is the same, the same-name refusal is the same, and the stats on both
+/// sides come out of the same <see cref="ItemStatsBlock"/> parser — the catalog is built
+/// THROUGH the app's own parsers precisely so a catalog record and a live page cannot
+/// disagree.</para>
+///
+/// <para><b>THE "+N" TIER RULE IS THE ONE THING THE TWO SURFACES NO LONGER SHARE</b> (DRA-149
+/// D1, plan P1). The Locker still asks <see cref="ItemDominance.CanClaimUpgrade"/>, where its
+/// premise holds: both names come off the same dump and both carry a tier. The sweep asks
+/// <see cref="ItemDominance.Dominates"/>, because on this side the premise is false by
+/// construction — no catalog name carries a "+N" — and a rule whose answer is fixed before it
+/// reads its inputs is not a strict filter but an empty one. <b>The CLAIM narrows to match the
+/// weaker question</b>: a row says it is a better BASE item, and the block says once that a
+/// "+N" raises the worn one by an amount the wiki does not state. Sharing the table was never
+/// the same thing as sharing every rule built on it — what must not fork is the arithmetic,
+/// and that has not.</para>
 /// </summary>
 public static class GearUpgrades
 {
@@ -231,7 +242,8 @@ public static class GearUpgrades
 
         foreach (var anchor in anchors)
         {
-            if (!index.TryGetValue(anchor.Slot, out var inSlot)) continue;
+            var inSlot = PoolFor(anchor, index);
+            if (inSlot.Count == 0) continue;
 
             var beats = new List<GearUpgrade>();
             foreach (var record in inSlot)
@@ -244,10 +256,23 @@ public static class GearUpgrades
                     continue;
 
                 var stats = record.ToStatsBlock();
-                // The tier rule, not bare dominance: a worn "+9" whose BASE numbers lose is
-                // under-described rather than beaten, and telling somebody to go and farm a
-                // replacement for their best item is worse than saying nothing.
-                if (!ItemDominance.CanClaimUpgrade(
+                // **BASE-vs-BASE, and the tier rule is deliberately NOT asked here** (DRA-149
+                // D1, plan P1). `CanClaimUpgrade` also demands the candidate's "+N" match or
+                // beat the worn item's, which is sound in the Locker — both names come out of
+                // the same dump and both carry a tier. Here one side never can: **0 of the
+                // catalog's 11,196 names end in "+N"**, so `UpgradeTier(candidate)` is always 0
+                // and the comparison was `0 >= 6` for every plussed row a player owns. It is
+                // not a strict filter, it is a structurally empty answer — measured over the
+                // Founder's committed dump, 19 of 19 gear anchors returned nothing and only
+                // tier-0 `Arrow` passed anything at all. He read the true sentence under it and
+                // called the feature broken, correctly.
+                //
+                // What the row may CLAIM narrows to match: not "this beats what you wear" but
+                // "this is a better BASE item than yours — at the same +, it wins", with the
+                // caveat said once per block rather than templated onto every row (trap 73).
+                // No "+N" arithmetic is invented to close the gap, because the wiki does not
+                // state what a "+N" is worth.
+                if (!ItemDominance.Dominates(
                         record.Name, stats, anchor.Name, anchor.Stats, myClasses)) continue;
 
                 var zones = record.DropZones?.Where(z => z.Length > 0).ToList() ?? [];
@@ -353,13 +378,81 @@ public static class GearUpgrades
                 if (record.Slots is not { Count: > 0 }) continue;
                 foreach (var slot in record.Slots)
                 {
-                    var key = slot.ToUpperInvariant();
+                    if (NormalizeSlot(slot) is not { } key) continue;
                     if (!index.TryGetValue(key, out var list)) index[key] = list = [];
                     list.Add(record);
                 }
             }
             return index;
         });
+
+    /// <summary>
+    /// **ONE SPELLING OF A SLOT, DECIDED AT THE READ SEAM** (DRA-149 D1, plan P3).
+    ///
+    /// <para>The index is keyed on the catalog's slot vocabulary and looked up with the DUMP's,
+    /// and the two do not agree. Measured against the shipped catalog: <b>224 slot entries sit
+    /// under keys an inventory dump never produces</b> — <c>FINGER</c> 209 (the dump says
+    /// <c>FINGERS</c>, which the catalog itself uses 11 times), <c>SHOULDER</c> 5,
+    /// <c>SECONDAY</c> 3 — plus promoter debris: <c>PRIMARY,</c>, <c>BACK,</c>, <c>/</c>,
+    /// <c>EMPTY</c>, <c>ORNAMENTATION:</c>. Every one of those is a candidate that could never
+    /// be reached, silently, with nothing on screen able to say so.</para>
+    ///
+    /// <para><b>Null means "this is not a slot", and that is a different answer from a slot
+    /// nothing is worn in.</b> The debris keys are refused by name rather than passed through,
+    /// so a test can COUNT them against the shipped catalog (<c>GearUpgradesSlotTests</c>) and
+    /// notice the day the promoter emits a new one.</para>
+    ///
+    /// <para><b>It normalizes the LOOKUP, never the anchor.</b> A worn row's slot and label stay
+    /// exactly as the dump printed them (DRA-81) — this decides only which pile of catalog
+    /// records that row is compared against. Fixing the promoter's own output is a separate
+    /// card; no catalog is rebuilt here.</para>
+    /// </summary>
+    public static string? NormalizeSlot(string? slot)
+    {
+        if (slot is null) return null;
+        var key = slot.Trim().ToUpperInvariant();
+        while (key.Length > 0 && (key[^1] == ',' || key[^1] == ':')) key = key[..^1].TrimEnd();
+        return key switch
+        {
+            "" or "/" or "EMPTY" or "ORNAMENTATION" => null,
+            "SECONDAY" => "SECONDARY",
+            "SHOULDER" => "SHOULDERS",
+            "FINGER" => "FINGERS",
+            _ => key,
+        };
+    }
+
+    /// <summary>
+    /// The catalog records one anchor is compared against — <b>and the fallback that gives an
+    /// "Any Slot" row a pool at all</b> (DRA-149 D1, plan P3).
+    ///
+    /// <para>The dump writes <c>Any Slot</c> for a row the client does not attribute to a
+    /// named slot — the Founder's <c>Shiny Brass Shield +6</c> and <c>Lute +1</c> are both
+    /// there. <c>ANY SLOT</c> is a key the catalog never emits, so those anchors matched an
+    /// empty pile and answered nothing, forever, for a structural reason no sentence explained.
+    /// When the dump's own slot finds no pile, the item's CATALOG <c>Slot:</c> line is asked
+    /// instead — the shield's own page says where a shield goes.</para>
+    ///
+    /// <para><b>The fallback moves the POOL and never the anchor</b> (DRA-81 KEEP): the row is
+    /// still labelled and still identified by the dump's slot, because the catalog's line says
+    /// where an item MAY go and the dump says where this character actually has it. An item
+    /// naming two slots is de-duplicated by name, so a candidate listed in both cannot be
+    /// offered twice.</para>
+    /// </summary>
+    private static List<ItemCatalog.Record> PoolFor(
+        WornItem anchor, Dictionary<string, List<ItemCatalog.Record>> index)
+    {
+        if (NormalizeSlot(anchor.Slot) is { } key && index.TryGetValue(key, out var inSlot))
+            return inSlot;
+
+        var pooled = new List<ItemCatalog.Record>();
+        var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        foreach (var slot in anchor.Stats.Slots)
+            if (NormalizeSlot(slot) is { } fallback && index.TryGetValue(fallback, out var more))
+                foreach (var record in more)
+                    if (seen.Add(record.Name)) pooled.Add(record);
+        return pooled;
+    }
 
     // ---- what the character is wearing ---------------------------------------------------
 
