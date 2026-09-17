@@ -1929,8 +1929,14 @@ function boot() {
     // DRA-149 D1 adds `gearBaseNote` — what the gear rows above actually compared. It sits
     // beside `moneyNote` because it is the same kind of sentence: a caveat about the lines
     // directly above it, said once for the block rather than templated onto every row.
-    for (const line of [h.moneyNote, h.gearBaseNote, h.cap, h.gearWithheld, h.gearBandRefused,
-                        h.gearWhoWithheld])
+    //
+    // DRA-149 D3 adds the three materials sentences. `materialNote` sits with the other two
+    // block caveats and the two refusal counts with the gear ones — they are separate fields
+    // because they are counts about a DIFFERENT list, and folding them into the gear numbers
+    // would produce one sentence that can explain neither.
+    for (const line of [h.moneyNote, h.gearBaseNote, h.materialNote, h.cap, h.gearWithheld,
+                        h.gearBandRefused, h.gearWhoWithheld,
+                        h.materialBandRefused, h.materialWhoWithheld])
       if (line) wrap.appendChild(el("div", "caption", line));
 
     // DRA-149 D2: the worn rows EQBuddy could not read about, last of the captions and

@@ -105,11 +105,12 @@ public class HelperMustListTests
     /// be a deliberate line in a diff rather than something that happens as a side effect.
     /// Four in D1; Farm Gear joined them in DRA-71 D6; Farm Motes and Make Money in D7.</summary>
     [Fact]
-    public void SevenGoalsAreAnsweredInThisDelivery() =>
+    public void EightGoalsAreAnsweredInThisDelivery() =>
         Assert.Equal(
             [HelperGoal.LevelUp, HelperGoal.FarmGear, HelperGoal.UnlockClasses,
              HelperGoal.UnlockRaces, HelperGoal.FarmMotes, HelperGoal.WorkOnFaction,
-             HelperGoal.MakeMoney],
+             // DRA-149 D3: Farm Materials joined them. Achievements is the one still Deferred.
+             HelperGoal.FarmMaterials, HelperGoal.MakeMoney],
             Recommendations.All
                 .Where(g => Recommendations.ShapeFor(g) == HelperGoalShape.Answered)
                 .ToArray());
@@ -431,6 +432,18 @@ public class HelperMustListTests
                 // that named nobody would stop this must-list proving what it is about.
                 DropMobs = new() { ["Lower Guk"] = ["a froglok knight"] },
             },
+            // DRA-149 D3: a tradeskill INGREDIENT in the same zone, for the reason the gear
+            // record above is in the same zone — a materials answer that named somewhere with
+            // no band could not be affected by the level under any reading, and "differs at two
+            // levels" would then be proving something else. It carries a recipe heading so
+            // TradeskillMaterials admits it, and a creature so the who rule keeps it.
+            new ItemCatalog.Record
+            {
+                Name = "Bloodstone", StatsText = "Lore Item",
+                Recipes = ["Jewelcrafting", "Bloodstone Earring (Trivial: 102)"],
+                DropZones = ["Lower Guk"],
+                DropMobs = new() { ["Lower Guk"] = ["a froglok shaman"] },
+            },
         ]);
 
         var zones = ZoneHistory.Fold(sessions, pool);
@@ -517,6 +530,11 @@ public class HelperMustListTests
         // is precisely what this slice replaced — comes out visibly wrong in the sweep.
         if (type == typeof(IReadOnlyList<string>))
             return new List<string> { "a froglok knight", "a froglok shaman" };
+        // DRA-149 D3: the materials fact names the profession it belongs to. Jewelcrafting is
+        // the Founder's own example and is the one whose NAME differs from its AA's spelling,
+        // so a sentence that reached for the AA instead of Tradeskills.For().Name reads wrong
+        // in the sweep rather than merely being unproven.
+        if (type == typeof(Tradeskill)) return Tradeskill.Jewelcrafting;
         throw new InvalidOperationException(
             $"A WhyFact takes a {type.Name}, which this fixture cannot make up. Add an arm — "
             + "the sweep is only as complete as the values it can construct.");

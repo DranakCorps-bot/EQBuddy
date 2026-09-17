@@ -383,6 +383,31 @@ public sealed record SellableDropFact(
 public sealed record CatalogValueFact(string Item, long Copper, string Condition)
     : WhyFact(Evidence.Catalog);
 
+/// <summary>
+/// **AN INGREDIENT ONE OF YOUR PROFESSIONS NEEDS, AND WHAT DROPS IT HERE** (DRA-149 D3,
+/// plan P4; the Founder's FAIL item 3a — *"zones/creatures where gems drop more commonly"*).
+///
+/// <para><see cref="Evidence.Catalog"/>, because every word of it is something EQBuddy READ:
+/// the profession heading, the recipe under it and the creature list are all the item page's
+/// own. What the player has actually seen drop here rides beside it as a separate
+/// <see cref="GearDropSeenFact"/>, exactly as the gear rows do, and the two are never both
+/// drawn for one material — the who precedence is decided at the door (trap 4).</para>
+///
+/// <para><b><paramref name="Recipe"/> is the page's own line and is what makes the row
+/// checkable.</b> "Amber is a Jewelcrafting material" is a claim; "the page lists Amber under
+/// Jewelcrafting, for <i>Golden Amber Earring (Trivial: 102)</i>" is the evidence for it, and a
+/// player who disagrees knows which page to open. Empty where the heading carried no recipe
+/// line under it, which draws nothing rather than a guess (trap 73).</para>
+/// </summary>
+/// <param name="Who">The creatures the page named here, capped at
+/// <see cref="Recommendations.GearMobsPerItem"/> — the same cap and the same list the gear
+/// rows use.</param>
+/// <param name="WhoWithheld">How many more the page named. Said out loud (trap 50).</param>
+public sealed record TradeskillMaterialFact(
+    Tradeskill Skill, string Item, string Recipe, int OtherRecipes,
+    IReadOnlyList<string> Who, int WhoWithheld = 0)
+    : WhyFact(Evidence.Catalog);
+
 /// <summary>How far along an unlock is, from the game's own achievements dump.</summary>
 public sealed record UnlockScoreFact(string Subject, int Done, int Total)
     : WhyFact(Evidence.Personal);
@@ -670,6 +695,48 @@ public enum GoalGapReason
     /// remedy is the wiki's spelling, not another dump.</para>
     /// </summary>
     NothingWornIsReadable,
+
+    // ---- DRA-149 D3 ------------------------------------------------------------------
+
+    /// <summary>
+    /// The picked professions' ingredients are known and not one of them drops anywhere the
+    /// catalog names a place for (DRA-149 D3, plan P4).
+    ///
+    /// <para><b>Fletching is the shipped exhibit and the reason this has its own sentence.</b>
+    /// Its 33 materials carry ZERO drop zones between them — every one is bought, foraged or
+    /// crafted — so a Fletcher who picks only that profession gets this and nothing else. It
+    /// would be wrong to word that as "nothing to farm": there is plenty to farm, EQBuddy just
+    /// has no page saying a creature drops it. The difference is exactly the
+    /// <see cref="NoCatalogUpgrade"/> distinction one goal over — a statement about EQBuddy's
+    /// own catalog rather than about the game.</para>
+    /// </summary>
+    NoMaterialDrops,
+
+    /// <summary>
+    /// The materials drop somewhere, and the band gate refused every one of those places
+    /// (DRA-149 D3, plan P4).
+    ///
+    /// <para><see cref="EveryZoneOutsideYourBand"/>'s sibling, and separate for the same reason
+    /// the gear one is separate from <see cref="NoCatalogUpgrade"/>: a gate that emptied the
+    /// list must be able to say so in its own voice, or the room draws its whole-room empty
+    /// state and tells the player EQBuddy has nothing stored. The two are not merged because
+    /// their subjects differ — one is about upgrades to what you wear, this is about
+    /// ingredients — and one sentence covering both would have to name neither.</para>
+    /// </summary>
+    EveryMaterialZoneOutsideYourBand,
+
+    /// <summary>
+    /// The materials drop in places this character can reach, and not one page names a creature
+    /// in any of them (DRA-149 D3, plan P4).
+    ///
+    /// <para><see cref="NoUpgradeNamesACreature"/>'s sibling, and it carries the same rule for
+    /// the same reason: a drop offer that cannot say what drops it is not an offer. Materials
+    /// need it MORE than gear does, not less — 12 of the eight professions' (material, zone)
+    /// pairs say only <c>"Various Zones"</c>, and unlike the gear side's junk those DO name
+    /// creatures, so <see cref="TradeskillMaterials.IsPlace"/> refuses them before this rule
+    /// ever sees them.</para>
+    /// </summary>
+    NoMaterialNamesACreature,
 }
 
 /// <summary>One selected goal that produced no recommendation, and why.</summary>
@@ -844,6 +911,23 @@ public sealed record HelperInputs(
     /// <see cref="SaleHistory.Fold"/>'s own answer. Empty means they have never sold anything
     /// EQBuddy saw, which is when the catalog's own estimate is allowed to speak.</summary>
     public IReadOnlyList<SaleRoll> Sales { get; init; } = [];
+
+    // ---- Farm Materials (DRA-149 D3, plan P4) -------------------------------------------
+
+    /// <summary>
+    /// Which professions this character is raising — <see cref="TradeskillPickStore.Picked"/>'s
+    /// own answer, in the curated enum's order.
+    ///
+    /// <para><b>Empty means ALL EIGHT</b> — filter semantics, like <see cref="UnlockPicks"/> and
+    /// <see cref="WornPicks"/> and unlike <see cref="PickedFactions"/>. The list is eight rows
+    /// rather than a dump's several hundred, and the professions block above these rows already
+    /// says out loud that an empty pick shows everything.</para>
+    ///
+    /// <para>It was read by <c>HelperSources.Gather</c> and carried only to the picker until
+    /// this slice; the engine is the second reader of the SAME store rather than a second
+    /// producer of the pick (trap 4).</para>
+    /// </summary>
+    public IReadOnlyList<Tradeskill> Professions { get; init; } = [];
 }
 
 /// <summary>The whole answer for one set of chips.</summary>
@@ -908,7 +992,9 @@ public sealed record RecommendationSet(
     int GearWithheld = 0,
     IReadOnlyList<GearBandRefusal>? GearBandRefusals = null,
     int GearWhoWithheld = 0,
-    IReadOnlyList<string>? UnreadWorn = null)
+    IReadOnlyList<string>? UnreadWorn = null,
+    IReadOnlyList<GearBandRefusal>? MaterialBandRefusals = null,
+    int MaterialWhoWithheld = 0)
 {
     /// <summary>Never null, so no caller has to decide what an absent list means.</summary>
     public IReadOnlyList<GearBandRefusal> GearBandRefusals { get; init; }
@@ -916,6 +1002,19 @@ public sealed record RecommendationSet(
 
     /// <summary>Never null, for <see cref="GearBandRefusals"/>' reason.</summary>
     public IReadOnlyList<string> UnreadWorn { get; init; } = UnreadWorn ?? [];
+
+    /// <summary>
+    /// The zones the band gate refused on the MATERIALS list (DRA-149 D3, plan P4).
+    ///
+    /// <para><b>Its own list beside <see cref="GearBandRefusals"/> rather than folded into
+    /// it.</b> Both are the same rule run over the same catalog, and that is exactly why they
+    /// must not be summed: a player reading one sentence about "zones EQBuddy has upgrades for"
+    /// that silently also counted the zones its gems drop in could not act on either half. The
+    /// two engines run independently — one goal can be ticked without the other — so a merged
+    /// list would also be a count of a list nobody asked for.</para>
+    /// </summary>
+    public IReadOnlyList<GearBandRefusal> MaterialBandRefusals { get; init; }
+        = MaterialBandRefusals ?? [];
 
     public static readonly RecommendationSet Empty = new([], 0, [], []);
 }
@@ -1029,7 +1128,12 @@ public static partial class Recommendations
         // quoted rather than a property of an item (see the two engines below).
         HelperGoal.FarmMotes => HelperGoalShape.Answered,
         HelperGoal.MakeMoney => HelperGoalShape.Answered,
-        HelperGoal.FarmMaterials => HelperGoalShape.Deferred,
+        // **DRA-149 D3: this row flips, and what changed is a COLUMN rather than a decision.**
+        // It was Deferred from DRA-71 D8 on a survey that counted `[[Category:…]]` tags — 14 of
+        // 11,197 pages naming a profession, re-taken on the DRA-84 D3 refresh and still 14. The
+        // `Recipes` field is the one carrying the answer: all eight professions appear in it as
+        // headings, over 1,276 records. See FarmMaterials and TradeskillMaterials.
+        HelperGoal.FarmMaterials => HelperGoalShape.Answered,
         HelperGoal.Achievements => HelperGoalShape.Deferred,
         _ => null,
     };
@@ -1102,6 +1206,13 @@ public static partial class Recommendations
         // both readings of what it would do are wrong; see LevelExemptReason.
         HelperGoal.FarmMotes => LevelUse.Consumes,
         HelperGoal.MakeMoney => LevelUse.Exempt,
+        // **DRA-149 D3: a camp is a camp.** This engine names places out of the same catalog
+        // the gear one does, so a material whose only zone is Temple of Veeshan has to be
+        // refused for a level 30 for the identical reason a helm there is — and it is the SAME
+        // gate rather than a second one with the same numbers typed in. The band refusal is the
+        // only thing here that reads the level; nothing about which ingredients a profession
+        // needs depends on it.
+        HelperGoal.FarmMaterials => LevelUse.Consumes,
         _ => null,
     };
 
@@ -1367,6 +1478,8 @@ public static partial class Recommendations
         var gearWhoWithheld = 0;
         List<GearBandRefusal> gearBandRefusals = [];
         IReadOnlyList<string> unreadWorn = [];
+        List<GearBandRefusal> materialBandRefusals = [];
+        var materialWhoWithheld = 0;
 
         if (goals.Contains(HelperGoal.LevelUp)) LevelUp(inputs, candidates, gaps);
         if (goals.Contains(HelperGoal.FarmGear))
@@ -1376,6 +1489,11 @@ public static partial class Recommendations
         // each was refused by its own survey, which is written down where the engine is.
         if (goals.Contains(HelperGoal.FarmMotes)) FarmMotes(inputs, candidates, gaps);
         if (goals.Contains(HelperGoal.MakeMoney)) MakeMoney(inputs, candidates, gaps);
+        // DRA-149 D3. Its two counts are kept apart from the gear engine's above for the reason
+        // every cap in this file is said out loud separately (trap 50): they are answers about a
+        // different list, and one merged number would point at neither.
+        if (goals.Contains(HelperGoal.FarmMaterials))
+            (materialBandRefusals, materialWhoWithheld) = FarmMaterials(inputs, candidates, gaps);
         if (goals.Contains(HelperGoal.WorkOnFaction)) Faction(inputs, candidates, gaps);
         // **THE PICK NARROWS THE ENGINE, NOT THE ROOM** (DRA-71 D5, plan P11). It happens here
         // rather than in the caller so the phone gets it the day it calls Rank — porting a
@@ -1399,7 +1517,8 @@ public static partial class Recommendations
         var top = ordered.Take(Math.Max(0, cap)).Select(Trim).ToList();
         return new RecommendationSet(
             top, Math.Max(0, ordered.Count - top.Count), deferred, gaps, gearWithheld,
-            gearBandRefusals, gearWhoWithheld, unreadWorn);
+            gearBandRefusals, gearWhoWithheld, unreadWorn,
+            materialBandRefusals, materialWhoWithheld);
     }
 
     // ---- the join: one place, every goal it serves (HOME-005) --------------------------
@@ -2120,7 +2239,8 @@ public static partial class Recommendations
             // The creature question is answered HERE, once, for the (offer, place) pair — and
             // it is only ACTED on further down, after the band gate has had its say.
             foreach (var zone in upgrade.Zones.Distinct(StringComparer.OrdinalIgnoreCase))
-                Bucket(byZone, zone, new GearCandidate(upgrade, WhoFor(inputs, upgrade, zone)));
+                Bucket(byZone, zone,
+                    new GearCandidate(upgrade, WhoFor(inputs, upgrade.Item, upgrade.MobsIn(zone), zone)));
             // **A quest row is not a drop row and the who rule does not reach it.** "Who drops
             // it" has no answer for a hand-in and needs none — the quest IS the path, which is
             // the other half of acceptance item 2's "source mob(s) AND/OR quest".
@@ -2132,7 +2252,7 @@ public static partial class Recommendations
         // A refused zone is not a candidate, so it must not set the scale the surviving rows
         // are measured against — leaving it in `best` would let a camp this character cannot
         // farm decide how full every other row's bar looks.
-        var refused = GearBandGate(inputs, byZone);
+        var refused = BandGate(inputs, byZone);
 
         // **AND THE WHO RULE RUNS AFTER IT** (DRA-84 D4, plan P3; acceptance item 2, the Rathe
         // exhibit). Both rules can remove the same row and the ORDER decides which sentence the
@@ -2142,7 +2262,7 @@ public static partial class Recommendations
         // Crushbone at level 30 would vanish as "no creature named" instead of as "eqlwiki lists
         // its creatures at 5–20". A slice must not quietly narrow what the slice before it
         // refused out loud.
-        var whoWithheld = WhoRule(byZone);
+        var whoWithheld = WhoRule(byZone, c => c.Who);
 
         // ONE yardstick for the whole engine, folded once — a property of the SET, and a
         // per-row recomputation would be the same sum computed six times (trap 4 in a loop).
@@ -2178,20 +2298,25 @@ public static partial class Recommendations
                  new HelperDoor(HelperDoorKind.Gear, "")]));
 
         return (sweep.Withheld, refused, whoWithheld, inputs.UnreadWorn);
-
-        static void Bucket(Dictionary<string, List<GearCandidate>> into, string key, GearCandidate c)
-        {
-            if (!into.TryGetValue(key, out var list)) into[key] = list = [];
-            list.Add(c);
-        }
-
-        static List<KeyValuePair<string, List<GearCandidate>>> Ranked(
-            Dictionary<string, List<GearCandidate>> buckets) =>
-            [.. buckets
-                .OrderByDescending(kv => kv.Value.Count)
-                .ThenBy(kv => kv.Key, StringComparer.OrdinalIgnoreCase)
-                .Take(PerEngineCandidates)];
     }
+
+    /// <summary>Add one candidate under one key. Generic since DRA-149 D3 — the materials
+    /// engine buckets by zone the same way and for the same reason.</summary>
+    private static void Bucket<T>(Dictionary<string, List<T>> into, string key, T candidate)
+    {
+        if (!into.TryGetValue(key, out var list)) into[key] = list = [];
+        list.Add(candidate);
+    }
+
+    /// <summary>The buckets a drop engine will actually draw, best first: how many candidates
+    /// a place offers, then alphabetically so an equal pair is stable rather than
+    /// dictionary-ordered. Capped at <see cref="PerEngineCandidates"/>.</summary>
+    private static List<KeyValuePair<string, List<T>>> Ranked<T>(
+        Dictionary<string, List<T>> buckets) =>
+        [.. buckets
+            .OrderByDescending(kv => kv.Value.Count)
+            .ThenBy(kv => kv.Key, StringComparer.OrdinalIgnoreCase)
+            .Take(PerEngineCandidates)];
 
     /// <summary>
     /// One catalog upgrade, offered under one place, with the creature question already
@@ -2226,12 +2351,17 @@ public static partial class Recommendations
     /// slice's opening move (<c>ItemCatalogWhoCoverageTests</c>).</para>
     /// </summary>
     /// <returns>How many (item, zone) offers were withheld.</returns>
-    private static int WhoRule(Dictionary<string, List<GearCandidate>> byZone)
+    /// <remarks><b>It is generic since DRA-149 D3</b>, and nothing about the rule moved: Farm
+    /// Materials asks the same question of the same catalog and had to get the same answer, so
+    /// it calls this rather than growing a second copy that could later disagree about what
+    /// "nobody can say what drops it" means (trap 4). The candidate type is the only thing the
+    /// two engines do not share.</remarks>
+    private static int WhoRule<T>(Dictionary<string, List<T>> byZone, Func<T, GearWho> who)
     {
         var withheld = 0;
         foreach (var zone in byZone.Keys.ToList())
         {
-            var kept = byZone[zone].FindAll(c => c.Who.Answered);
+            var kept = byZone[zone].FindAll(c => who(c).Answered);
             withheld += byZone[zone].Count - kept.Count;
             if (kept.Count == 0) byZone.Remove(zone);
             else byZone[zone] = kept;
@@ -2266,13 +2396,18 @@ public static partial class Recommendations
         public bool Answered => Seen is not null || Named.Count > 0;
     }
 
-    private static GearWho WhoFor(HelperInputs inputs, GearUpgrade upgrade, string zone)
+    /// <param name="item">The thing being offered — a catalog upgrade, or since DRA-149 D3 a
+    /// tradeskill material. It takes the NAME and the page's creature list rather than a
+    /// <see cref="GearUpgrade"/> for that reason: the precedence is a rule about evidence, not
+    /// about gear, and a second copy of it for materials is the contradiction trap 4
+    /// names.</param>
+    private static GearWho WhoFor(
+        HelperInputs inputs, string item, IReadOnlyList<string> named, string zone)
     {
         if (zone.Length == 0) return GearWho.None;
-        if (SeenDrop(inputs.Pool, upgrade.Item, zone) is { } seen)
+        if (SeenDrop(inputs.Pool, item, zone) is { } seen)
             return new GearWho(seen, [], 0);
 
-        var named = upgrade.MobsIn(zone);
         return named.Count == 0
             ? GearWho.None
             : new GearWho(null, [.. named.Take(GearMobsPerItem)],
@@ -2332,8 +2467,13 @@ public static partial class Recommendations
     /// <param name="byZone">Mutated in place: a refused zone is REMOVED.</param>
     /// <returns>One entry per refused zone, in the order a reader would meet them
     /// (alphabetical), each carrying the band and the level its sentence quotes.</returns>
-    private static List<GearBandRefusal> GearBandGate(
-        HelperInputs inputs, Dictionary<string, List<GearCandidate>> byZone)
+    /// <remarks><b>Generic since DRA-149 D3, with the same constants and the same two arms.</b>
+    /// Farm Materials names camps out of the same catalog, so a material whose only zone is
+    /// Temple of Veeshan has to be refused for a level 30 for the identical reason a helm there
+    /// is. Sharing the gate rather than the numbers is what stops the two lists from drifting
+    /// apart the first time either constant is tuned.</remarks>
+    private static List<GearBandRefusal> BandGate<T>(
+        HelperInputs inputs, Dictionary<string, List<T>> byZone)
     {
         var refused = new List<GearBandRefusal>();
         if (!inputs.Level.Known || inputs.Bands is not { } bands) return refused;
@@ -2429,6 +2569,141 @@ public static partial class Recommendations
         return best is { } b
             ? new GearDropSeenFact(item, b.Mob.Name, zone, b.Loot.Count, b.Mob.Kills)
             : null;
+    }
+
+    // ---- Farm Materials: the drop half (DRA-149 D3, plan P4) ----------------------------
+
+    /// <summary>
+    /// How many materials one zone row names before the cap. <see cref="GearNamedPerRow"/>'s
+    /// number and its reason: three named things plus the creatures under them is what fits
+    /// under <see cref="WhyCap"/> without trimming the sentences a row was ranked on.
+    /// </summary>
+    public const int MaterialsNamedPerRow = 3;
+
+    /// <summary>One ingredient, offered under one place, with the creature question already
+    /// answered for it. <see cref="GearCandidate"/>'s shape and its reason — the who is decided
+    /// at the door and read at the row, because it decides whether the offer exists at
+    /// all.</summary>
+    private readonly record struct MaterialCandidate(TradeskillMaterial Material, GearWho Who);
+
+    /// <summary>
+    /// **WHERE TO FARM WHAT YOUR PROFESSIONS NEED** (DRA-149 D3, plan P4; the Founder's FAIL
+    /// item 3 — *"jewelcrafting … should recommend zones/creatures where gems drop more
+    /// commonly"*).
+    ///
+    /// <para><b>It un-parks a goal that had been Deferred since DRA-71 D8, and the park was not
+    /// wrong — it was about the wrong COLUMN.</b> That survey read <c>[[Category:…]]</c> and
+    /// found 14 of 11,197 pages naming a profession; the <c>Recipes</c> column names all eight
+    /// as headings over 1,276 records. <see cref="TradeskillMaterials"/> is the reader and
+    /// <c>scripts/dra149-materials-survey.py</c> is the measurement, including the answer to
+    /// the escalation question this slice was declared to ask: a page's <c>recipes</c> field
+    /// lists the recipes an item is USED IN, so the record IS the ingredient, and the 150
+    /// intermediates that are themselves recipe outputs drop nowhere and leave through the zone
+    /// gate without a rule of their own.</para>
+    ///
+    /// <para><b>It reuses the Farm Gear machinery whole rather than resembling it.</b> The same
+    /// <see cref="WhoFor"/> precedence (your own pooled kills WIN; the page's creature list
+    /// behind them, never both — trap 4), the same <see cref="BandGate{T}"/> with the same two
+    /// constants and the same arms, the same <see cref="WhoRule{T}"/> AFTER it in the same
+    /// order and for the same reason: a band refusal quotes eqlwiki's numbers and this
+    /// character's level, and the who rule can only say a page was silent, so running them the
+    /// other way round would swallow the louder sentence. Those three are shared code, not
+    /// shared prose.</para>
+    ///
+    /// <para><b>The weight is how many of your professions' ingredients one place feeds</b> —
+    /// the gear engine's own yardstick, one noun over. A zone that drops four gems you need
+    /// outranks one that drops a single ore, and the bucket count is both the weight and the
+    /// scale, so a pruned offer must not inflate the zone it can no longer be drawn under
+    /// (which is why the who rule prunes rather than filters at the door).</para>
+    ///
+    /// <para><b>There is no personal-rate arm and that is deliberate.</b> EQBuddy stores what
+    /// you have looted, so it could rank gem zones by your own drop rate — but the question the
+    /// Founder asked is "where do gems drop more commonly", which for a profession you are
+    /// STARTING is about places you have never been. Your own kills still speak, in the one
+    /// place they outrank the page: <see cref="WhoFor"/>'s first clause.</para>
+    /// </summary>
+    /// <returns>Which zones the band gate refused and how many offers the who rule withheld —
+    /// counted separately from the gear engine's, because they are answers about a different
+    /// list and a merged number would point at neither.</returns>
+    private static (List<GearBandRefusal> Refused, int WhoWithheld) FarmMaterials(
+        HelperInputs inputs, List<Recommendation> into, List<GoalGap> gaps)
+    {
+        var materials = TradeskillMaterials.From(inputs.Items, inputs.Professions);
+        if (materials.Count == 0)
+        {
+            gaps.Add(new GoalGap(HelperGoal.FarmMaterials, GoalGapReason.NoMaterialDrops));
+            return ([], 0);
+        }
+
+        // An ingredient that drops in five zones is offered under every one of them —
+        // GearFarmRollup's rule and its reason: the question a row answers is "if I camp here
+        // tonight, what can this place give me", and a per-zone list that hid a valid camp
+        // would make its own heading lie.
+        var byZone = new Dictionary<string, List<MaterialCandidate>>(StringComparer.OrdinalIgnoreCase);
+        foreach (var material in materials)
+            foreach (var zone in material.Zones)
+                Bucket(byZone, zone, new MaterialCandidate(
+                    material, WhoFor(inputs, material.Item, material.MobsIn(zone), zone)));
+
+        var refused = BandGate(inputs, byZone);
+        var whoWithheld = WhoRule(byZone, c => c.Who);
+
+        // **A RULE THAT EMPTIED THE LIST SAYS SO IN ITS OWN VOICE** — the gear engine's own
+        // clause, with this engine's three reasons. Silence here would draw the room's
+        // whole-room empty state, which says EQBuddy has nothing stored: the opposite of what
+        // happened, which is that it read the recipes, found the ingredients and refused every
+        // place they drop.
+        if (byZone.Count == 0)
+        {
+            gaps.Add(new GoalGap(HelperGoal.FarmMaterials,
+                refused.Count > 0 ? GoalGapReason.EveryMaterialZoneOutsideYourBand
+                : whoWithheld > 0 ? GoalGapReason.NoMaterialNamesACreature
+                : GoalGapReason.NoMaterialDrops));
+            return (refused, whoWithheld);
+        }
+
+        var best = byZone.Max(kv => kv.Value.Count);
+        foreach (var (zone, candidates) in Ranked(byZone))
+            into.Add(MaterialRow(zone, candidates, best));
+
+        return (refused, whoWithheld);
+    }
+
+    /// <summary>
+    /// One materials row: what this place drops that your professions need, and what to kill
+    /// for it.
+    ///
+    /// <para>The creature was answered at the door (<see cref="WhoFor"/>, trap 4), so every
+    /// candidate that reached here can name somebody. Materials are named in the page's own
+    /// order within a profession and then alphabetically, because there is no "better" among
+    /// ingredients to rank them by — a gem is not an improvement on an ore — and inventing one
+    /// would be arithmetic nobody asked for.</para>
+    /// </summary>
+    private static Recommendation MaterialRow(
+        string zone, List<MaterialCandidate> candidates, int best)
+    {
+        var named = candidates
+            .OrderBy(c => c.Material.Skill)
+            .ThenBy(c => c.Material.Item, StringComparer.OrdinalIgnoreCase)
+            .ToList();
+        var shown = named.Take(MaterialsNamedPerRow).ToList();
+
+        var why = new List<WhyFact>();
+        foreach (var (material, who) in shown)
+        {
+            why.Add(new TradeskillMaterialFact(
+                material.Skill, material.Item,
+                material.Recipes.Count > 0 ? material.Recipes[0] : "",
+                Math.Max(0, material.Recipes.Count - 1),
+                who.Named, who.Withheld));
+            if (who.Seen is { } seen) why.Add(seen);
+        }
+
+        return new Recommendation(
+            RecommendationKind.Zone, zone, zone, [HelperGoal.FarmMaterials], why,
+            [new HelperDoor(HelperDoorKind.World, zone), new HelperDoor(HelperDoorKind.Gear, "")],
+            named.Count - shown.Count,
+            best > 0 ? Math.Clamp(named.Count / (double)best, 0, 1) : 0);
     }
 
     // ---- Work on Faction: the grind, for any faction you picked -------------------------

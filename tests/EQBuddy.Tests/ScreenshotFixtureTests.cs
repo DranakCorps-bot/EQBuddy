@@ -801,7 +801,7 @@ public class ScreenshotFixtureTests
         // Both caps say so, in the words the PC uses (trap 50). Five offers the who rule
         // removed — the `Slime Blood of Cazic-Thule` phantom zones — and 89 the sweep's own
         // per-anchor cap held back before the rule ever ran.
-        Assert.Equal(HelperPresentation.GearWhoWithheld(5), helper.GearWhoWithheld);
+        Assert.Equal(HelperPresentation.DropOffersWithheld(5), helper.GearWhoWithheld);
         Assert.Equal(HelperPresentation.GearWithheld(89), helper.GearWithheld);
         // The band gate stood down, and the screen says which number it does not have.
         Assert.Equal("", helper.GearBandRefused);

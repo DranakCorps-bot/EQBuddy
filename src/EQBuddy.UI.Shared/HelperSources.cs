@@ -225,6 +225,13 @@ public sealed class HelperSources
                 // shape porting a feature to the phone keeps finding (trap 4). It is the lazy
                 // shipped catalog, so naming it costs nothing until something reads a band.
                 Bands = ZoneLevels.Default,
+                // **DRA-149 D3, and it is supplied HERE for the same reason.** The pick was
+                // already read a few lines up and carried only to the picker; the engine is the
+                // SECOND reader of that one store rather than a second producer of the pick
+                // (trap 4), and routing it through this one assembly point is what stops the
+                // phone from ranking materials against a different set of professions than the
+                // PC does.
+                Professions = professions,
             },
             goals, factions, unlockPicks, wornPicks, professions, skills);
     }

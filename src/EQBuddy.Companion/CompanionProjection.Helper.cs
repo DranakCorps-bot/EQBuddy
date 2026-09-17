@@ -67,10 +67,21 @@ public static partial class CompanionProjection
             // DRA-84 D2. Same words, same producer, same wire — a refusal the PC made and the
             // phone did not mention would be the two surfaces disagreeing about what the list
             // contains, and every sentence rides the wire rather than index.html (trap 32).
-            GearBandRefused: HelperPresentation.GearBandRefused(answers.GearBandRefusals),
+            GearBandRefused: HelperPresentation.BandRefused(
+                answers.GearBandRefusals, HelperPresentation.BandRefusedUpgrades),
             // DRA-84 D4, same rule one slice on: a drop offer the PC withheld for having no
             // creature to name is withheld on the phone too, and says so in the same words.
-            GearWhoWithheld: HelperPresentation.GearWhoWithheld(answers.GearWhoWithheld),
+            GearWhoWithheld: HelperPresentation.DropOffersWithheld(answers.GearWhoWithheld),
+            // DRA-149 D3: the SAME two rules over the materials list, on their own two fields
+            // rather than folded into the gear ones — the desktop room draws four captions here
+            // and the phone must draw the same four or the two surfaces disagree about what the
+            // list contains. The professions note rides too, because it is the sentence saying
+            // where these rows came FROM.
+            MaterialBandRefused: HelperPresentation.BandRefused(
+                answers.MaterialBandRefusals, HelperPresentation.BandRefusedMaterials),
+            MaterialWhoWithheld: HelperPresentation.DropOffersWithheld(answers.MaterialWhoWithheld),
+            MaterialNote: answers.Top.Any(r => r.Why.Any(w => w is TradeskillMaterialFact))
+                ? HelperPresentation.ProfessionsFarmNote : "",
             // DRA-149 D2, and it arrives WITH its doors in the same slice — DRA-84 D5's lesson
             // was that a caption which reaches the wire and is never drawn passes every test in
             // the parity suite, so the page-side must-list gains its row here too (trap 34).
@@ -255,8 +266,12 @@ public static partial class CompanionProjection
         // (trap 72 — the repaint gate must see the store the feature writes).
         // DRA-149 D2: the unread sentence NAMES its items, so it moves when a new dump changes
         // which of them EQBuddy cannot read even though no count beside it does (trap 72).
+        // DRA-149 D3: the materials captions ride too, and the band one for the same reason the
+        // gear band one does — it quotes the level, so a ding moves it while every count here
+        // stands still.
         h.MoneyNote, h.GearBaseNote, h.Cap, h.GearWithheld, h.GearBandRefused,
         h.GearWhoWithheld, h.UnreadWorn,
+        h.MaterialBandRefused, h.MaterialWhoWithheld, h.MaterialNote,
         Join(h.Gaps, g => g.Text + "|" + g.Prompt?.Command),
         Join(h.Deferred, d => d.Text),
         h.Empty?.Heading);

@@ -439,8 +439,8 @@ public class RecommendationsGearTests
 
         Assert.Empty(set.Top);
         Assert.Equal(1, set.GearWhoWithheld);
-        Assert.NotEmpty(HelperPresentation.GearWhoWithheld(set.GearWhoWithheld));
-        Assert.Empty(HelperPresentation.GearWhoWithheld(0));
+        Assert.NotEmpty(HelperPresentation.DropOffersWithheld(set.GearWhoWithheld));
+        Assert.Empty(HelperPresentation.DropOffersWithheld(0));
     }
 
     /// <summary>A zone keeps the offers that CAN answer and loses only the ones that cannot —
@@ -1269,7 +1269,7 @@ public class RecommendationsGearTests
     public void TheRefusalSaysHowManyAndOnWhatRule()
     {
         var set = RankIn(30, ZoneLevels.Default, "Crushbone", "Plane of Sky");
-        var said = HelperPresentation.GearBandRefused(set.GearBandRefusals);
+        var said = HelperPresentation.BandRefused(set.GearBandRefusals, HelperPresentation.BandRefusedUpgrades);
 
         Assert.Contains("2 zones", said, StringComparison.Ordinal);
         Assert.Contains("at your level 30", said, StringComparison.Ordinal);
@@ -1289,9 +1289,10 @@ public class RecommendationsGearTests
     [Fact]
     public void OnlyTheRuleThatFiredIsNamed()
     {
-        var said = HelperPresentation.GearBandRefused(
+        var said = HelperPresentation.BandRefused(
             Rank(Gear([Worn("Rusty Helm", "HEAD", 4)], OneHelmIn("Crushbone"),
-                level: 40, bands: ZoneLevels.Default)).GearBandRefusals);
+                level: 40, bands: ZoneLevels.Default)).GearBandRefusals,
+            HelperPresentation.BandRefusedUpgrades);
 
         Assert.Contains("tops out 10 or more levels under you", said, StringComparison.Ordinal);
         Assert.DoesNotContain("starts 5 or more", said, StringComparison.Ordinal);
@@ -1303,8 +1304,8 @@ public class RecommendationsGearTests
     public void TheRefusalNamesAFewZonesAndCountsTheRest()
     {
         var zones = new[] { "Crushbone", "Greater Faydark", "Najena", "Erud's Crossing" };
-        var said = HelperPresentation.GearBandRefused(
-            RankIn(60, ZoneLevels.Default, zones).GearBandRefusals);
+        var said = HelperPresentation.BandRefused(
+            RankIn(60, ZoneLevels.Default, zones).GearBandRefusals, HelperPresentation.BandRefusedUpgrades);
 
         Assert.Contains("4 zones", said, StringComparison.Ordinal);
         Assert.Contains($", and {4 - HelperPresentation.GearBandNamed} more",
@@ -1313,15 +1314,15 @@ public class RecommendationsGearTests
 
     [Fact]
     public void NoRefusalMeansNoSentence() =>
-        Assert.Equal("", HelperPresentation.GearBandRefused([]));
+        Assert.Equal("", HelperPresentation.BandRefused([], HelperPresentation.BandRefusedUpgrades));
 
     /// <summary>One refused zone reads as one zone. The singular is where a count-driven
     /// sentence usually breaks.</summary>
     [Fact]
     public void OneRefusedZoneReadsAsOne()
     {
-        var said = HelperPresentation.GearBandRefused(
-            RankIn(30, ZoneLevels.Default, "Crushbone").GearBandRefusals);
+        var said = HelperPresentation.BandRefused(
+            RankIn(30, ZoneLevels.Default, "Crushbone").GearBandRefusals, HelperPresentation.BandRefusedUpgrades);
 
         Assert.StartsWith("1 zone EQBuddy has upgrades for is not listed at your level 30", said,
             StringComparison.Ordinal);

@@ -68,6 +68,17 @@ namespace EQBuddy.Companion;
 /// NAMED item. Its own field rather than doors on a note, because this sentence is a caption in
 /// the caption stack rather than a <see cref="CompanionHelperNote"/>, and the desktop draws its
 /// doors the same way.</param>
+/// <param name="MaterialBandRefused">Which zones the band gate refused on the FARM MATERIALS
+/// list (DRA-149 D3). Its own field beside <paramref name="GearBandRefused"/> rather than the
+/// same one: they are the same rule over the same catalog, which is precisely why one merged
+/// sentence could explain neither list — and the two engines run independently, so a player can
+/// have one without the other.</param>
+/// <param name="MaterialWhoWithheld">What the who rule held back on the materials list
+/// (DRA-149 D3). Same producer and the same words as <paramref name="GearWhoWithheld"/> — the
+/// rule, the cause and the remedy are identical — on its own field for the reason above.</param>
+/// <param name="MaterialNote">Where the materials rows came FROM, and what still has no page
+/// (DRA-149 D3). Empty where no materials row was built, which is the money note's rule beside
+/// it, for the money note's reason.</param>
 /// <param name="Gaps">Answerable goals that produced nothing, each with its reason and —
 /// where the answer is a file the game writes — the command as selectable text.</param>
 /// <param name="Deferred">Selected goals whose engine does not exist yet, each naming the
@@ -91,6 +102,9 @@ public sealed record CompanionHelperSection(
     string GearWhoWithheld,
     string UnreadWorn,
     IReadOnlyList<CompanionHelperDoor> UnreadWornDoors,
+    string MaterialBandRefused,
+    string MaterialWhoWithheld,
+    string MaterialNote,
     IReadOnlyList<CompanionHelperNote> Gaps,
     IReadOnlyList<CompanionHelperNote> Deferred,
     CompanionHelperEmpty? Empty = null);

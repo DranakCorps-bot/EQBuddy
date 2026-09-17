@@ -3715,3 +3715,48 @@ candidate for P6 rather than a stub, because the pack is already going to stage 
 - No `WhatsNew.json` entry: P6 puts the drafted entries in D5 and no release ships from here.
 
 — Dranak (Claude Code)
+
+## 2026-09-16 ~11:55 PM CT — DRA-149 D3 LANDED: Farm Materials, drop half
+To: Fable
+
+**Reinforcing — the declared escalation seam paid for itself by NOT firing.** P4 made the
+survey the opening move, and that is what stopped me reasoning to "products probably don't
+drop". The corpus answers instead: of 905 records naming one of the eight, 165 are also a
+recipe output and **150 of those drop nowhere**, leaving through a zone gate the rows pass
+anyway; the 15 that are both are pelts, ores and bread. The exhibit is reusable — `A Giant
+Blood Sac` carries `["Brewing", "Legion Lager (Trivial: 36)"]` and drops in East Cabilis;
+`Legion Lager` carries no recipes and no drop zones. The field lists what an item is USED
+IN. `scripts/dra149-materials-survey.py` is committed.
+
+**Corrective — P4 says products self-filter, which is true, and is silent on what bit.**
+The gear side's non-places fell out for FREE because a `}}` names no creature. **All 12 of
+these professions' `Various Zones` pairs DO name creatures**, so the inherited who rule
+would have offered "Various Zones" as somewhere to go — the Rathe class of failure again.
+Shape worth carrying: **when a plan says "we inherit rule X", check what X was RELYING on,
+not what it did.** `TradeskillMaterials.IsPlace` is the named rule.
+
+**Constructive — "the 14/11,197 park sentence leaves it" is one word short.** The sentence
+left; the GUARD under it was pinned to the number in it. A plan line retiring a sentence is
+also retiring its pin. The pin moved to the same report's recipes row, plus a committed
+negative that the farming sentence must NOT quote the categories number.
+
+**Reinforcing — "reuses the machinery whole" was right and I took it literally.**
+`BandGate`/`WhoRule` are generic and SHARED (not duplicated constants), `WhoFor` takes a
+name + creature list, `DropOffersWithheld` is one sentence for both engines. Their COUNTS
+stay apart: one merged number explains neither list.
+
+**What it COST: "must-list flip" is about eleven guards** — and four archived-session E2E
+rows asserted *"the seeded session is the only answer"* while weighing ALL goals. True only
+while a goal is Deferred; false the moment an engine lands that answers from the shipped
+catalog with no stored play. They now pin the goal they are about. **Every future slice
+answering a goal would have moved those numbers again** — worth a standing plan line.
+
+**Four prove-fails, and one found a guard of mine was circular** (it asserted `IsPlace` over
+zones `IsPlace` had filtered — green for an implementation refusing nothing, trap 78). It
+stayed green through the prove-fail, which is how I caught it.
+
+**Gates:** `check.ps1` green (5,259 unit, +56), full E2E 370/370. Nothing fetched, no
+rebuild, no `WhatsNew.json` (P6 → D5), nothing near Pages/Play/tag/signing, **nothing marks
+DRA-84 PASS**. D4 next; its own survey decides ship-or-park.
+
+— Dranak (Claude Code), Executor — DRA-149 D3

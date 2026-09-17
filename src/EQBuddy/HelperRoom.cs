@@ -797,7 +797,9 @@ internal sealed class HelperRoom : Grid, IShellRoom
     /// <para>Three things per profession, and the plan named all three: where your skill
     /// stands, a one-click watch on its next skill-up, and the wiki page that says what it
     /// makes. Not one of them is a ranking, and the block says so out loud rather than letting
-    /// the absence read as a bug (<see cref="HelperPresentation.ProfessionsParkNote"/>).</para>
+    /// the absence read as a bug. <b>Since DRA-149 D3 the ranking IS below</b>, so that sentence is
+    /// no longer a park — it now says where the rows come from and what still has no page
+    /// (<see cref="HelperPresentation.ProfessionsFarmNote"/>).</para>
     ///
     /// <para><b>The standings are the reason this block exists at all.</b> A skill value used
     /// to die with the session — <c>StatsSnapshot.SkillUps</c> has always known what you raised
@@ -857,9 +859,9 @@ internal sealed class HelperRoom : Grid, IShellRoom
         // A margin of its own: it is the BLOCK's caveat and not the last row's, and without one
         // it butts against that row's doors and reads as belonging to it — which is how the
         // first staged shot came back.
-        var park = Line(HelperPresentation.ProfessionsParkNote, Role.Caption);
-        park.Margin = new Thickness(0, Tok.SpaceM, 0, 0);
-        block.Children.Add(park);
+        var note = Line(HelperPresentation.ProfessionsFarmNote, Role.Caption);
+        note.Margin = new Thickness(0, Tok.SpaceM, 0, 0);
+        block.Children.Add(note);
     }
 
     private void ToggleProfession(Tradeskill skill)
@@ -1001,21 +1003,43 @@ internal sealed class HelperRoom : Grid, IShellRoom
         // pointing at the room that has the whole wishlist. It is drawn from what the ENGINE
         // refused rather than from which goal is ticked, so it cannot appear over a list the
         // gate never ran on.
-        if (HelperPresentation.GearBandRefused(_answers.GearBandRefusals) is { Length: > 0 } bandCap)
+        if (HelperPresentation.BandRefused(
+                _answers.GearBandRefusals, HelperPresentation.BandRefusedUpgrades)
+            is { Length: > 0 } bandCap)
         {
             block.Children.Add(Line(bandCap, Role.Caption));
             block.Children.Add(Door(new HelperDoor(HelperDoorKind.Gear, "")));
         }
 
+        // **AND THE SAME GATE'S REFUSALS ON THE MATERIALS LIST** (DRA-149 D3, plan P4). Its own
+        // sentence beside the gear one rather than summed into it: both are the same rule over
+        // the same catalog, which is exactly why one merged count could explain neither — a
+        // player reading about "zones EQBuddy has upgrades for" that silently also counted
+        // where their gems drop cannot act on either half. Its door is the wiki's own skill
+        // pages rather than the Gear room, because the list this refused is a recipe list.
+        if (HelperPresentation.BandRefused(
+                _answers.MaterialBandRefusals, HelperPresentation.BandRefusedMaterials)
+            is { Length: > 0 } matBandCap)
+            block.Children.Add(Line(matBandCap, Role.Caption));
+
         // **AND THE WHO RULE'S** (DRA-84 D4, plan P3). The third count spent before a row
         // exists, and the third to get its own sentence rather than be summed into the others:
         // a cap, a band and a missing creature are three causes with three remedies, and the
         // player can act on all three only if they can tell which one happened.
-        if (HelperPresentation.GearWhoWithheld(_answers.GearWhoWithheld) is { Length: > 0 } whoCap)
+        if (HelperPresentation.DropOffersWithheld(_answers.GearWhoWithheld)
+            is { Length: > 0 } whoCap)
         {
             block.Children.Add(Line(whoCap, Role.Caption));
             block.Children.Add(Door(new HelperDoor(HelperDoorKind.Gear, "")));
         }
+
+        // The who rule's count on the MATERIALS list (DRA-149 D3). Same sentence from the same
+        // producer — the rule, the cause and the remedy are identical and a re-worded copy is
+        // the one that goes stale (trap 4) — and its own line, for the reason the band caption
+        // above has one.
+        if (HelperPresentation.DropOffersWithheld(_answers.MaterialWhoWithheld)
+            is { Length: > 0 } matWhoCap)
+            block.Children.Add(Line(matWhoCap, Role.Caption));
 
         // **AND THE ROWS THERE WAS NEVER AN ANCHOR FOR** (DRA-149 D2, plan P2). The fourth
         // sentence in this stack and the only one that is not a decision EQBuddy made: the
@@ -1328,7 +1352,7 @@ internal sealed class HelperRoom : Grid, IShellRoom
         // whether the gate could run at all (a level AND a band table), so a green run with a
         // zero count can be told from a run where the gate stood down.
         $"helperBandRefused={_answers.GearBandRefusals.Count} " +
-        $"helperBandLine={(HelperPresentation.GearBandRefused(_answers.GearBandRefusals).Length > 0 ? 1 : 0)} " +
+        $"helperBandLine={(HelperPresentation.BandRefused(_answers.GearBandRefusals, HelperPresentation.BandRefusedUpgrades).Length > 0 ? 1 : 0)} " +
         $"helperBandGate={(_bandGate ? 1 : 0)} " +
         // **DRA-84 D5: the gate's INPUTS beside its verdict** (plan P6). `helperBandRefused`
         // above is a COUNT, and a count is equally true of a gate that refused the right two
@@ -1347,7 +1371,7 @@ internal sealed class HelperRoom : Grid, IShellRoom
         // named creatures are the same screen to every other key here.
         $"helperWho={_answers.Top.Sum(r => r.Why.OfType<GearUpgradeFact>().Count(f => f.Who.Count > 0))} " +
         $"helperWhoWithheld={_answers.GearWhoWithheld} " +
-        $"helperWhoLine={(HelperPresentation.GearWhoWithheld(_answers.GearWhoWithheld).Length > 0 ? 1 : 0)} " +
+        $"helperWhoLine={(HelperPresentation.DropOffersWithheld(_answers.GearWhoWithheld).Length > 0 ? 1 : 0)} " +
         // **DRA-149 D2: the worn rows that never became an anchor** — the same two-numbers-one-
         // moment shape, and the one it matters most for. `helperWorn` above is the anchor count
         // and it was the ONLY thing this dump said about the dump: twenty anchors from a
@@ -1359,6 +1383,24 @@ internal sealed class HelperRoom : Grid, IShellRoom
         $"helperUnreadWorn={_answers.UnreadWorn.Count} " +
         $"helperUnreadNames={string.Join(',', _answers.UnreadWorn.Select(n => n.Replace(" ", "")))} " +
         $"helperUnreadLine={(HelperPresentation.UnreadWorn(_answers.UnreadWorn).Length > 0 ? 1 : 0)} " +
+        // **DRA-149 D3: the materials engine's INPUTS, in the shape the gear keys above use**
+        // (plan P4). `helperMaterialWhy` is how many DRAWN rows carry an ingredient line and
+        // `helperMaterialNamed` how many of those lines can name a creature — the two that
+        // separate "the engine answered" from "the engine answered with something to DO", which
+        // is the whole of the Founder's FAIL item 3a. `helperProfessions` is what it ranked FOR
+        // (empty = all eight, the store's own filter semantics), so a run that answered nothing
+        // because the pick was narrow can be told from one that answered nothing because the
+        // pages were silent. The refusal keys mirror the band/who pair above rather than
+        // reusing them: two engines refusing zones into one number is a count of a list nobody
+        // asked for (trap 56 — both halves from one moment, and about the right list).
+        $"helperProfessions={string.Join(',', TradeskillPickStore.Picked(_main.Settings, _main.QuestCharacterKey))} " +
+        $"helperMaterialWhy={_answers.Top.Count(r => r.Why.OfType<TradeskillMaterialFact>().Any())} " +
+        $"helperMaterialNamed={_answers.Top.Sum(r => r.Why.OfType<TradeskillMaterialFact>().Count(f => f.Who.Count > 0))} " +
+        $"helperMaterialSeen={_answers.Top.Count(r => r.Why.OfType<TradeskillMaterialFact>().Any() && r.Why.OfType<GearDropSeenFact>().Any())} " +
+        $"helperMaterialBandRefused={_answers.MaterialBandRefusals.Count} " +
+        $"helperMaterialBandLine={(HelperPresentation.BandRefused(_answers.MaterialBandRefusals, HelperPresentation.BandRefusedMaterials).Length > 0 ? 1 : 0)} " +
+        $"helperMaterialWhoWithheld={_answers.MaterialWhoWithheld} " +
+        $"helperMaterialWhoLine={(HelperPresentation.DropOffersWithheld(_answers.MaterialWhoWithheld).Length > 0 ? 1 : 0)} " +
         // Whether a popup is OPEN. The staged state the shot photographs, and the assertion
         // that the review hook armed the control rather than merely being spelled correctly.
         $"helperPickerOpen={((_goalPicker?.IsOpen ?? false) || (_factionPicker?.IsOpen ?? false) || (_unlockPicker?.IsOpen ?? false) || (_wornPicker?.IsOpen ?? false) || (_professionPicker?.IsOpen ?? false) ? 1 : 0)} " +

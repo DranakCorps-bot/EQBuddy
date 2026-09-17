@@ -1784,11 +1784,12 @@ public class ShellHostTests
         Assert.Equal(0, app.DumpValue("helperPickerOpen"));
 
         // Nothing picked is the "weigh everything" state, so the deferred goals all say so and
-        // the answerable ones name what they are missing. TWO since DRA-71 D7 — Farm Motes and
-        // Make Money gained engines and moved from deferrals to gaps, after Farm Gear did the
-        // same in D6. This is the row a slice that answers a goal is meant to edit.
+        // the answerable ones name what they are missing. ONE since DRA-149 D3 — Farm Materials
+        // gained an engine and moved from a deferral to a gap, after Farm Motes and Make Money
+        // did the same in D7 and Farm Gear in D6. This is the row a slice that answers a goal is
+        // meant to edit, and Achievements is the last one left to take it to zero.
         Assert.Equal("", app.DumpText("helperGoals"));
-        Assert.Equal(2, app.DumpValue("helperNotYet"));
+        Assert.Equal(1, app.DumpValue("helperNotYet"));
         Assert.True(app.DumpValue("helperGaps") > 0,
             $"no goal named the store it is waiting for; dump was: {app.Artifacts()}");
 
@@ -2225,7 +2226,17 @@ public class ShellHostTests
     [Fact]
     public void ArchivedThroughputReachesTheHelpersDrawnAnswers()
     {
-        using var app = new AppHarness(environment: OpenOn("helper"));
+        // **THE GOAL IS PICKED SINCE DRA-149 D3**, and the reason is this row's own premise.
+        // It used to weigh every goal and assert "the seeded session is the only one, so it is
+        // the only answer" — true while Farm Materials was Deferred, and false the moment that
+        // engine landed, because it answers out of the SHIPPED CATALOG and needs no stored play
+        // at all. Pinning the goal is what makes this a test about the throughput probe rather
+        // than about how many other engines happen to answer today; every later slice that
+        // answers a goal would otherwise move this number again.
+        var key = $"{AppHarness.Character}_{AppHarness.Server}".ToLowerInvariant();
+        using var app = new AppHarness(
+            configureSettings: s => s.HelperGoals[key] = [nameof(HelperGoal.LevelUp)],
+            environment: OpenOn("helper"));
         app.SeedStoredSession(
             "Najena 4 (Refined)", TimeSpan.FromHours(4), xpPercent: 32,
             dps: 42.0, hps: 0, combatSeconds: 3600, deaths: 0, activeFraction: 1.0,
@@ -2274,7 +2285,13 @@ public class ShellHostTests
     [Fact]
     public void ASessionWithNothingToDivideDrawsNoThroughputAndStillRanks()
     {
-        using var app = new AppHarness(environment: OpenOn("helper"));
+        // The goal this row prove-fails, picked — the same premise repair the row it guards
+        // took in DRA-149 D3. "Still ranks" is a claim about the experience engine, and it
+        // must not be satisfiable by some other engine answering about some other zone.
+        var key = $"{AppHarness.Character}_{AppHarness.Server}".ToLowerInvariant();
+        using var app = new AppHarness(
+            configureSettings: s => s.HelperGoals[key] = [nameof(HelperGoal.LevelUp)],
+            environment: OpenOn("helper"));
         app.SeedStoredSession(
             "Lower Guk", TimeSpan.FromHours(4), xpPercent: 32,
             dps: 0, hps: 0, combatSeconds: 0,
@@ -2318,7 +2335,18 @@ public class ShellHostTests
     [Fact]
     public void ArchivedMotesAndVendorSalesReachTheHelpersDrawnAnswers()
     {
-        using var app = new AppHarness(environment: OpenOn("helper"));
+        // The THREE engines this row is about, picked — see the throughput row above for why
+        // (DRA-149 D3). The join it asserts is between these three and nothing else, so a
+        // fourth engine answering about the same zone would make `helperTopGoals` pass for a
+        // reason this test does not mean.
+        var key = $"{AppHarness.Character}_{AppHarness.Server}".ToLowerInvariant();
+        using var app = new AppHarness(
+            configureSettings: s => s.HelperGoals[key] =
+            [
+                nameof(HelperGoal.LevelUp), nameof(HelperGoal.FarmMotes),
+                nameof(HelperGoal.MakeMoney),
+            ],
+            environment: OpenOn("helper"));
         app.SeedStoredSession(
             "Najena - Solo", TimeSpan.FromHours(4), xpPercent: 32,
             dps: 42.0, hps: 0, combatSeconds: 3600, deaths: 0, activeFraction: 1.0,
@@ -2397,7 +2425,17 @@ public class ShellHostTests
     [Fact]
     public void ASessionWithNoMotesDrawsNoMoteAnswerAndStillMakesMoney()
     {
-        using var app = new AppHarness(environment: OpenOn("helper"));
+        // The three goals this row prove-fails, picked — see the row above (DRA-149 D3). The
+        // silence it asserts is about the MOTE engine, so a fourth engine's row arriving would
+        // change `helperRecs` without changing anything this test means.
+        var key = $"{AppHarness.Character}_{AppHarness.Server}".ToLowerInvariant();
+        using var app = new AppHarness(
+            configureSettings: s => s.HelperGoals[key] =
+            [
+                nameof(HelperGoal.LevelUp), nameof(HelperGoal.FarmMotes),
+                nameof(HelperGoal.MakeMoney),
+            ],
+            environment: OpenOn("helper"));
         app.SeedStoredSession(
             "Najena - Solo", TimeSpan.FromHours(4), xpPercent: 32,
             dps: 42.0, hps: 0, combatSeconds: 3600, deaths: 0, activeFraction: 1.0,
@@ -2950,10 +2988,24 @@ public class ShellHostTests
         Assert.Equal(8, app.DumpValue("helperProfChips"));
         Assert.Equal("Baking·Pottery", app.DumpText("helperProfFace"));
         Assert.Equal(2, app.DumpValue("helperWatchPresets"));
-        // The goal is still Deferred — the ranking PARKED on its own evidence survey — so it
-        // says so under the answers while the block above it is full of the player's own
-        // professions. Both, from one Build.
-        Assert.Equal(1, app.DumpValue("helperNotYet"));
+
+        // **AND THE GOAL NOW ANSWERS** (DRA-149 D3). This row used to assert
+        // `helperNotYet == 1` — the ranking was PARKED on a survey of the wrong column — and
+        // the flip is the player-visible half of this slice: the block above is still full of
+        // the player's own professions, and under it there are now camps. Both, from one Build.
+        Assert.Equal(0, app.DumpValue("helperNotYet"));
+        app.WaitForDumpAtLeast("helperMaterialWhy", 1,
+            "the picked professions to produce a materials row");
+
+        // **THE PICK REACHED THE ENGINE, not just the picker.** Two rows in the block is a
+        // claim about a LIST; this is the claim that the SAME store narrowed what was RANKED,
+        // which is the whole of why the pick rides HelperInputs rather than stopping at the
+        // room (trap 4). Two numbers from one moment, and they are different claims (trap 56).
+        Assert.Equal("Baking,Pottery", app.DumpText("helperProfessions"));
+        // Every materials line names a creature — the who rule reaching the shipped catalog,
+        // which is the half the Founder failed the gear rows for.
+        Assert.True(app.DumpValue("helperMaterialNamed") > 0,
+            $"a materials row drew a line with nobody to kill; dump was: {app.Artifacts()}");
         Assert.Equal(0, app.DumpValue("helperDeadDoors"));
     }
 }

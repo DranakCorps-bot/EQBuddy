@@ -155,7 +155,7 @@ public class HelperPresentationTests
             AssertClean(HelperPresentation.WithheldWhy(n), $"WithheldWhy({n})");
             AssertClean(HelperPresentation.FactionPickerCapNote(n), $"FactionPickerCapNote({n})");
             AssertClean(HelperPresentation.GearWithheld(n), $"GearWithheld({n})");
-            AssertClean(HelperPresentation.GearWhoWithheld(n), $"GearWhoWithheld({n})");
+            AssertClean(HelperPresentation.DropOffersWithheld(n), $"GearWhoWithheld({n})");
         }
 
         // DRA-149 D2's unread sentence, at every shape it has: silent, one, exactly the name
@@ -192,7 +192,7 @@ public class HelperPresentationTests
                          new("Befallen", 7, 25, "7-25", 60, GearBandArm.TopUnder),
                      ],
                  })
-            AssertClean(HelperPresentation.GearBandRefused(refusals),
+            AssertClean(HelperPresentation.BandRefused(refusals, HelperPresentation.BandRefusedUpgrades),
                 $"GearBandRefused({refusals.Count})");
 
         foreach (var (min, max) in new (int, int?)[] { (5, 20), (12, 12), (50, null) })
@@ -883,10 +883,10 @@ public class HelperPresentationTests
     [Fact]
     public void TheParkNoteNamesTheCoverageItMeasured()
     {
-        var (pages, naming) = CategorySurvey();
+        var (pages, recipes) = RecipeSurvey();
 
-        Assert.Contains(pages.ToString("N0"), HelperPresentation.ProfessionsParkNote);
-        Assert.Contains(naming.ToString("N0"), HelperPresentation.ProfessionsParkNote);
+        Assert.Contains(pages.ToString("N0"), HelperPresentation.ProfessionsFarmNote);
+        Assert.Contains(recipes.ToString("N0"), HelperPresentation.ProfessionsFarmNote);
     }
 
     /// <summary>
@@ -901,9 +901,61 @@ public class HelperPresentationTests
             "EQBuddy does not rank where to farm materials yet. Of the 10,957 item pages it "
             + "has read, 14 say which profession an ingredient belongs to.";
 
-        var (pages, _) = CategorySurvey();
+        var (pages, _) = RecipeSurvey();
 
         Assert.DoesNotContain(pages.ToString("N0"), stale);
+    }
+
+    /// <summary>
+    /// **THE PARK'S OWN NUMBER MUST NOT BE THE ONE ON SCREEN** (DRA-149 D3).
+    ///
+    /// <para>The sentence this replaced was measured on <c>[[Category:…]]</c> — "14 of 11,197
+    /// pages name a profession" — and it was TRUE the whole time it was wrong to print: it
+    /// answered a different question from the one the block asks. The report carries both
+    /// columns, so the committed negative is that the profession-CATEGORY count is not what the
+    /// farming sentence quotes; a future edit that reached for the familiar number would go red
+    /// here rather than telling players EQBuddy cannot do a thing it now does.</para>
+    /// </summary>
+    [Fact]
+    public void TheFarmNoteQuotesTheRecipesColumnAndNotTheCategoriesOne()
+    {
+        var (_, naming) = CategorySurvey();
+        var (_, recipes) = RecipeSurvey();
+
+        Assert.NotEqual(naming, recipes);
+        Assert.DoesNotContain(
+            $"{naming:N0} say which profession", HelperPresentation.ProfessionsFarmNote);
+    }
+
+    /// <summary>The recipes column's two numbers, read from the same committed report the
+    /// category survey is read from and for the same reason: the sentence must not be the only
+    /// producer of a number it states as a measurement (trap 4). A parse that yields nothing is
+    /// itself a failure (trap 78).</summary>
+    private static (int Pages, int Recipes) RecipeSurvey()
+    {
+        var report = Report();
+
+        var pages = Regex.Match(report,
+            @"item pages with at least one Category:\s*[\d,]+\s+of\s+([\d,]+)");
+        var recipes = Regex.Match(report,
+            @"pages with a recipes field:\s*([\d,]+)");
+
+        Assert.True(pages.Success && recipes.Success,
+            "items-catalog-report.md did not yield the recipe survey numbers — "
+            + "itemcatalog-build's report format moved and this guard stopped measuring "
+            + "anything.");
+
+        return (int.Parse(pages.Groups[1].Value.Replace(",", "")),
+                int.Parse(recipes.Groups[1].Value.Replace(",", "")));
+    }
+
+    /// <summary>The committed promoter report, which both surveys above read.</summary>
+    private static string Report()
+    {
+        var repoRoot = Path.GetFullPath(Path.Combine(
+            AppContext.BaseDirectory, "..", "..", "..", "..", ".."));
+        return File.ReadAllText(Path.Combine(
+            repoRoot, "scripts", "harvests", "eqlwiki", "items-catalog-report.md"));
     }
 
     /// <summary>The two numbers the promoter's own survey printed, read from the committed
@@ -911,10 +963,7 @@ public class HelperPresentationTests
     /// went missing measures nothing at all (trap 78).</summary>
     private static (int Pages, int Naming) CategorySurvey()
     {
-        var repoRoot = Path.GetFullPath(Path.Combine(
-            AppContext.BaseDirectory, "..", "..", "..", "..", ".."));
-        var report = File.ReadAllText(Path.Combine(
-            repoRoot, "scripts", "harvests", "eqlwiki", "items-catalog-report.md"));
+        var report = Report();
 
         var pages = Regex.Match(report,
             @"item pages with at least one Category:\s*[\d,]+\s+of\s+([\d,]+)");
@@ -970,20 +1019,32 @@ public class HelperPresentationTests
     }
 
     /// <summary>
-    /// **The deferral says which HALF is missing** (DRA-71 D8).
+    /// **THE DEFERRAL IS GONE AND NOTHING MAY SAY OTHERWISE** (DRA-149 D3, plan P4).
     ///
-    /// <para>Farm Materials is still not ranked, and the block above it is now full of the
-    /// player's own numbers. A sentence that just said "not ranking this one yet" over that
-    /// block would read as the block having failed, so it names the thing that is absent —
-    /// WHERE to farm — and the reason.</para>
+    /// <para>This test used to assert that Farm Materials' deferral named the half that was
+    /// missing — "not ranking WHERE to farm the materials yet". D3 built that half, so the
+    /// sentence had to leave with the shape, and the FLIP is what gets asserted now: an engine
+    /// that answers must not also carry a sentence telling players it does not. The pairing
+    /// guard beside this one (<c>EveryDeferredGoalNamesTheRoomThatAnswersItToday</c>) covers
+    /// the other direction — a Deferred goal with no sentence.</para>
+    ///
+    /// <para><b>The block's own note is asserted here too, because that is where the promise
+    /// moved.</b> The professions block still explains itself; what it says changed from "this
+    /// is not ranked" to where the rows below it came from and what has no page at all.</para>
     /// </summary>
     [Fact]
-    public void TheMaterialsDeferralNamesTheHalfThatIsMissing()
+    public void FarmMaterialsNoLongerCarriesADeferralSentence()
     {
-        var line = HelperPresentation.NotAnsweredYet(HelperGoal.FarmMaterials);
+        Assert.Equal(HelperGoalShape.Answered, Recommendations.ShapeFor(HelperGoal.FarmMaterials));
+        Assert.Empty(HelperPresentation.NotAnsweredYet(HelperGoal.FarmMaterials));
+        Assert.Null(HelperPresentation.NotAnsweredDoor(HelperGoal.FarmMaterials));
 
-        Assert.Contains("professions", line, StringComparison.OrdinalIgnoreCase);
-        Assert.Contains("WHERE to farm", line, StringComparison.OrdinalIgnoreCase);
+        var note = HelperPresentation.ProfessionsFarmNote;
+        Assert.Contains("recipe", note, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain("does not rank", note, StringComparison.OrdinalIgnoreCase);
+        // The honest gap MOVED rather than closed, and the sentence still carries it — bought,
+        // foraged and crafted ingredients have no drop page, which is the whole of Fletching.
+        Assert.Contains("foraged", note, StringComparison.OrdinalIgnoreCase);
     }
 }
 

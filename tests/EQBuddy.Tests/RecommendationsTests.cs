@@ -581,15 +581,16 @@ public class RecommendationsTests
     [Fact]
     public void APickedDeferredGoalComesBackAsNotAnsweredYetRatherThanAsAGap()
     {
-        // Farm Materials since DRA-71 D7 — Farm Motes, which stood here after D6, gained its
-        // engine in that slice and now answers a GAP ("no mote has dropped for you") instead.
+        // Achievements since DRA-149 D3 — Farm Materials, which stood here after D7, gained its
+        // engine in that slice and now answers a GAP ("no page says where these drop") instead.
         // The subject of this test keeps moving because the feature keeps landing; the
         // distinction it exists for does not: a gap means a store is missing, a deferral means
-        // code is.
-        var set = Recommendations.Rank(HelperInputs.Nothing, [HelperGoal.FarmMaterials]);
-        Assert.Equal([HelperGoal.FarmMaterials], set.NotAnsweredYet);
+        // code is. It is the LAST subject available — when Achievements lands, this test has to
+        // be deleted rather than re-pointed, and that is the right outcome.
+        var set = Recommendations.Rank(HelperInputs.Nothing, [HelperGoal.Achievements]);
+        Assert.Equal([HelperGoal.Achievements], set.NotAnsweredYet);
         Assert.Empty(set.Gaps);
-        Assert.NotEmpty(HelperPresentation.NotAnsweredYet(HelperGoal.FarmMaterials));
+        Assert.NotEmpty(HelperPresentation.NotAnsweredYet(HelperGoal.Achievements));
     }
 
     // ---- 7. the doors are real ---------------------------------------------------------------
@@ -709,13 +710,15 @@ public class RecommendationsTests
         var set = Recommendations.Rank(HelperInputs.Nothing, Recommendations.All);
         Assert.Empty(set.Top);
         Assert.Equal(0, set.Withheld);
-        // TWO deferred goals since DRA-71 D7 (Farm Motes and Make Money gained engines, after
-        // Farm Gear gained one in D6), and SEVEN gaps: the five that were here plus the two new
-        // engines' own. On a fresh profile both are the no-history state rather than their own
-        // "you have never looted a mote / earned a coin" — EQBuddy has read nothing, which is a
-        // different sentence and the one a first-run player should get.
-        Assert.Equal(2, set.NotAnsweredYet.Count);
-        Assert.Equal(7, set.Gaps.Count);
+        // ONE deferred goal since DRA-149 D3 — Achievements, the last one without an engine —
+        // and EIGHT gaps: the seven that were here plus Farm Materials' own. On a fresh profile
+        // that one is NoMaterialDrops rather than a missing store, and the distinction is the
+        // point: there IS no dump to ask for, because the answer comes from the shipped catalog
+        // and this fixture ships none.
+        Assert.Equal(1, set.NotAnsweredYet.Count);
+        Assert.Equal(8, set.Gaps.Count);
+        Assert.Contains(set.Gaps,
+            g => g.Goal == HelperGoal.FarmMaterials && g.Reason == GoalGapReason.NoMaterialDrops);
         Assert.Contains(set.Gaps,
             g => g.Goal == HelperGoal.FarmGear && g.Reason == GoalGapReason.NoInventoryDump);
         Assert.Contains(set.Gaps,
