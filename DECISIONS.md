@@ -1,9 +1,10 @@
 ## 2026-09-17 — DRA-161 / EXO-HARDEN-A1e: the rotated archive copies are OUT of scope for mojibake repair, permanently
 
 **Seat:** Executor, carrying out the Planner ruling on DRA-160 (2026-09-17 09:50Z). This entry and one
-paragraph added to the archive's own `README.md` are the whole change — **zero bytes under
-`docs/ops/claude-archive/` were modified**, no transform was run against any archived path, and the PR's
-`git diff --stat` shows only those two files.
+paragraph added to the archive's own `README.md` are the whole change — **the three archived ledgers were
+not touched; their blobs are sha-identical either side of this commit (`022fdea4`, `7eada6af`,
+`fef3a1f9`), and the only file changed under `docs/ops/claude-archive/` is that README** — no transform
+was run against any archived path, and the PR's `git diff --stat` shows only those two files.
 
 **Verdict: OUT. All three files under `docs/ops/claude-archive/channels/2026-Q3/`, not now and not on the
 next sweep.** The counts that raised DRA-160 are real — 56,979 cp437 depth-1 plus 14 depth-2 in
