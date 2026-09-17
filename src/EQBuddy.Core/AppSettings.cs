@@ -640,6 +640,26 @@ public sealed class AppSettings
     /// specific one.</summary>
     public bool SkyStepsUnderEveryIsland { get; set; }
 
+    /// <summary>
+    /// The Plane of Sky checklist grouped by ISLAND rather than by class and reward (the
+    /// Founder's ask, 2026-09-17: *"everything to collect on island N before moving to
+    /// next"*, warrior/monk/druid).
+    ///
+    /// <para><b><c>false</c> is the default, and KEEP was the first word of the ask.</b> The
+    /// class-sorted view is unchanged and stays what a player who upgrades sees; the island
+    /// view is a second arrangement of the same rows
+    /// (<see cref="QuestChecklistLayout.SkyByIsland"/>), not a replacement.</para>
+    ///
+    /// <para>Profile-level and not per character, beside its sibling
+    /// <see cref="SkyStepsUnderEveryIsland"/>: it is a statement about how this player likes
+    /// to read a checklist, which does not change when they log in a different alt. The phone
+    /// follows the PC's choice for the same reason the sibling does — a surface that shows the
+    /// same list a different way is the drift <c>SurfaceParityTests</c> exists to stop.</para>
+    ///
+    /// <para>Sky only. Epic sections are not places and the Epic tab never offers it.</para>
+    /// </summary>
+    public bool SkyGroupByIsland { get; set; }
+
     /// <summary>Reward keys ("Class|Reward") the player has EXPANDED on a guided checklist.
     ///
     /// <para>Stored as the exception rather than the rule, and guided quests start folded:
