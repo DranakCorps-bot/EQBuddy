@@ -3076,7 +3076,7 @@ own section and does not split Progress).
 
 Tabs win because they are one-room-tall, they name every peer on the first expand, and
 they are the chrome the window and the phone already taught. EQBuddy Mobile is a card with
-tabs inside and has no reachability complaint ��� that is the constrained-host prototype,
+tabs inside and has no reachability complaint — that is the constrained-host prototype,
 not a consistency trophy. Name the pills by the old card titles. Keep the collapsed
 launcher line as the glance. Default tab is the room that moves while you play (Experience
 on Progress, Quests on Quests).
@@ -3093,7 +3093,7 @@ existing window. Do not shrink-wrap the full window onto a SizeToContent always-
 panel. Pop-out collapses the card (one owner). Fold Progress’s existing breakout into that
 pop-out. Cards stay collapsed by default. Both UIs in the same change. Do not pair this
 into #222. Do not un-fold. Do not use this to solve motes.
-- **Already shipped:** Quests / Progress / Gear & Loot / Kills & Drops are �� launchers
+- **Already shipped:** Quests / Progress / Gear & Loot / Kills & Drops are ↗ launchers
   into a pill-tab window. Meter cards expand in place. Progress window: four pills;
   Skill-ups is a nested expander inside Experience. Progress also still has a tab-less
   breakout — the double pattern nobody planned. Quests is the template. Phone already
