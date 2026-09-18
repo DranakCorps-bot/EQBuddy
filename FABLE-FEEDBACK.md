@@ -697,3 +697,21 @@ the standing `EXO-CHANNEL-ROTATE` seat's (DRA-154), not an Executor's and not th
 flagged there rather than fixed here.
 
 - Dranak (Claude Code)
+
+## 2026-09-17 ~10:20 PM CT — DRA-181 D4 executed: one producer for the Sky class-lens chips (plan P5)
+
+To: Fable
+
+**Seat:** `opus-dra181-d4`, disjoint-parallel per Helm's SIGN of #685 (D4 declared parallel-eligible; D1–D3/D5 untouched by this branch — no shared file, no shared store). Shipped exactly P5 and nothing else: `UI.Shared/QuestClassLens.Offered(picks, resolved)`, read by the desktop render, by `BuildClassStrip`, and by the phone's Sky leftover bands — which held a third copy of the ternary. KEEP held: classic Sky class view, island view, the identity line, `CharacterClasses.Resolve`, and the strip's own "fewer than two offers no lens" collapse.
+
+**Reinforcing — §0's mechanism was exact, down to the line numbers, and that is what made D4 a short slice.** "The render decides at ~885: `picks.Count > 0 ? picks : resolved`; the strip is built from `ClassSourceFor(...).Classes`" is a diagnosis you could act on without re-deriving it — and the second sentence, that a leftover chip is also a DEAD control, is the half that told me the fix was worth more than tidiness. It also named what NOT to touch (`Resolve`, the identity line, Bevel's Helm-signed lock) in the same breath, so the boundary of the slice was never a judgement call.
+
+**Reinforcing — naming the phone call site as a CONDITION rather than a claim.** P5 said "if the phone's checklist projection narrows by class anywhere, it reads the same producer" instead of asserting that it does. It does — `CompanionProjection.Checklists.cs`, the Sky leftover bands — and a plan that had asserted it would have been right by luck; one that had not mentioned it would have left a third copy of the decision in the repo behind a green slice.
+
+**Constructive — the plan said the repaint was already covered, and it is not quite.** D4 reads: "the render signature already carries `classes`, so a pick moves both." The signature carries the LENS-NARROWED list. With a lens on, deselecting a class you are not lensed to leaves every term in that signature unmoved while the strip has a chip to drop — and the picks store has a second writer that cannot force a refresh here, `CompanionActions.SetClasses` from the phone. So the offered list joined the signature in this slice (`off:`), trap 72 on this surface for the fifth time and the second with the writer in another room. One line, and inside the declared boundary, so it did not escalate — but the plan's sentence would have been safer as "check what the signature carries: it is the narrowed list."
+
+**Constructive — a worked stale-pick case would have saved a read of `Resolve`.** D4 asks for a unit row over "a stale pick naming a class the character lost", which reads as a defensive case until you notice `Resolve` caps at `Max` (3) and drops picks ENTIRELY once classes are stated. So a pick identity does not carry is ordinary, not exotic, and the pre-fix strip could not offer a chip for it — the class the player picked was the one class they could not lens to. That is a second user-visible symptom of the same defect and it is not in §0; one sentence in the plan would have put it there rather than in the test file.
+
+**Evidence.** Unit: `QuestClassLensTests` — the decision over picks-subset / no-picks / a pick identity does not carry / both-empty, plus a must-list of the surfaces that narrow by class and a scan for a fourth copy of the ternary, prove-failed against the two lines this slice deleted, verbatim (trap 78). E2E: `QuestClassStripTests` over a new `questsClassStrip` fact that folds the real strip's chip KEYS (a count is unmoved by a swap, trap 72). Prove-failed on the pre-fix build, which answers the Founder's own screen verbatim — `Any+WAR+PAL+CLR` with two classes picked, and `Any+BRD+DRU+ENC` for the stale-pick fixture. The KEEP row passes on BOTH builds, which is what stops the other two going green by accident. Gates: `check.ps1` all green (5,363 unit), full E2E 380/380 green against a rebuilt app (trap 64). `WhatsNew.json` entry DRAFTED in `docs/ops/dra181-whatsnew-draft.md` per the DRA-149 D5 idiom — the release stays the Founder's.
+
+— Dranak (Claude Code), Executor — DRA-181 D4

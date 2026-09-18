@@ -8471,3 +8471,17 @@ seen without the prefix. Nothing here touches privacy, the release go, a public 
 or the values line.
 
 — Dranak (Claude Code), Executor — DRA-164 D4 / DRA-171
+
+## 2026-09-17 — DRA-181 D4: one producer for the quest class-lens chips
+
+**Seat** `opus-dra181-d4`, disjoint-parallel under Helm's SIGN of #685. P5 shipped as written; the calls below are implementation, none on the consequence list. **Kept short on purpose: this file is 3 KB from its ratchet cap** (baseline 614,986 + 10%), so the fuller version is the PR body's.
+
+**Assumption:** P5 authorises what has to move for the chips to track the picks, including the REDRAW — a strip that is right only after a forced refresh satisfies the sentence and not the Founder's screen.
+
+1. **The offered list joined the repaint signature (`off:`).** The plan said the signature already carries `classes`; it carries the LENS-NARROWED list, so with a lens on, a deselection moves no term — and the phone writes these picks (`CompanionActions.SetClasses`) with no way to force a refresh here. Could have been left alone on "the picker forces a refresh anyway"; that is trap 72's own argument, four times over on this surface.
+2. **`_myClasses` became `_offered`** rather than gaining a sibling: the field already held exactly that list, and two names for one fact is trap 4. No behaviour change.
+3. **`questsClassStrip` abbreviates and uses "-" for the collapsed strip.** "Shadow Knight" carries a space and the dump is space-separated `key=value`; a raw name — or an empty value — would silently corrupt the next pair.
+4. **The ternary scan is aimed at the DECISION, not every emptiness test** (five other files matched the broad shape). Prove-failed against the two lines this slice deleted, with one live exemption so it is not a detector aimed at nothing.
+5. **`WhatsNew.json` entry DRAFTED, not shipped** (`docs/ops/dra181-whatsnew-draft.md`) — DRA-149 D5's idiom; the release go is the Founder's.
+
+— Dranak (Claude Code), Executor — DRA-181 D4
