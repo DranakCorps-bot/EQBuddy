@@ -426,6 +426,11 @@ internal sealed class EqSegmentedStrip(Panel host, bool compact = false)
         return chip;
     }
 
+    /// <summary>Every segment's key, in the order they were added. For a DUMP fact that
+    /// has to say WHICH segments reached the screen rather than how many — a swap leaves a
+    /// count unmoved (trap 72), and the count is all <see cref="Count"/> can offer.</summary>
+    public IEnumerable<object> Keys => _chips.Select(c => c.Key);
+
     /// <summary>One chip by its key, or null. A strip sometimes has to hide a segment
     /// rather than disable it — the Loot card withholds "recent" when nothing on screen
     /// carries a timestamp — and reaching for it by key beats every caller keeping its

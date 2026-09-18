@@ -326,7 +326,12 @@ public static partial class CompanionProjection
         // picked, the resolved list otherwise. Empty stays empty, which is what suppresses
         // band B — "only other classes want this" said about a class you actually play is the
         // one false claim this band exists to avoid, and no lens is not a wildcard.
-        var myClasses = req.Classes.Count > 0 ? req.Classes : req.CharacterClassNames;
+        //
+        // THE TERNARY WAS TYPED HERE and typed again in the desktop's render (DRA-181 D4,
+        // plan P5). Two copies agreed; the desktop's chip strip held a THIRD that did not,
+        // which is what made a deselected class keep a chip. Sharing the producer is what
+        // keeps "exactly as the desktop captures them" a fact rather than a comment.
+        var myClasses = QuestClassLens.Offered(req.Classes, req.CharacterClassNames);
         var leftovers = SkyLeftovers.Compute(
             req.Inventory, settings?.SkyQuestChecklist, settings?.SkyQuestCompleted,
             myClasses, req.Catalog);

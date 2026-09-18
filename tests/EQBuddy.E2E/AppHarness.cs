@@ -625,12 +625,19 @@ internal sealed class AppHarness : IDisposable
     /// at. <c>CharacterLevel.Resolve</c> weighs the two stamps and the fresher wins, so a
     /// fixture that wants a particular winner has to date them both — which is exactly what
     /// makes the two "both ways" E2E rows possible from out here.</param>
+    /// <param name="unlockedClasses">Classes whose unlock achievement the DUMP says is
+    /// complete — the half of identity <c>CharacterClasses.Resolve</c> reads FIRST, and the
+    /// only lever out here that can make the resolved list wider than the picks without
+    /// an achievements file. A character who has never dumped resolves off the log, which
+    /// collapses to one class (see <see cref="SeedQuestClasses"/>), so a scenario about
+    /// picks NARROWING an identity has to seed this side of it.</param>
     public void SeedQuestLedger(
         IReadOnlyList<string>? classes = null,
         IReadOnlyList<string>? tracked = null,
         IReadOnlyDictionary<string, int>? owned = null,
         (int Level, DateTime At)? level = null,
-        (int Level, DateTime At)? statedLevel = null)
+        (int Level, DateTime At)? statedLevel = null,
+        IReadOnlyList<string>? unlockedClasses = null)
     {
         File.WriteAllText(Path.Combine(ProfileDir, "quest-ledger.json"),
             JsonSerializer.Serialize(new Dictionary<string, object>
@@ -638,6 +645,7 @@ internal sealed class AppHarness : IDisposable
                 [$"{Character.ToLowerInvariant()}_{Server}"] = new
                 {
                     Classes = classes ?? (IReadOnlyList<string>)[],
+                    UnlockedClasses = unlockedClasses ?? (IReadOnlyList<string>)[],
                     Tracked = tracked ?? (IReadOnlyList<string>)[],
                     Items = (owned ?? new Dictionary<string, int>())
                         .ToDictionary(kv => kv.Key, kv => new { Manual = kv.Value }),

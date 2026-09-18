@@ -71,12 +71,20 @@ public partial class QuestsView : UserControl
     // Verified/VerifiedAt fields Progressed() already collapsed to Total.
     private IReadOnlyDictionary<string, QuestLedgerStore.Entry> _owned =
         new Dictionary<string, QuestLedgerStore.Entry>(StringComparer.OrdinalIgnoreCase);
-    /// <summary>The classes this CHARACTER has, captured before the view lens narrows
-    /// them. The leftover bands need the character's real class list, not the one class
-    /// the player is currently looking at: "only other classes want this" said about a
-    /// class you play — because you had it lensed out — is a false claim, and it is the
-    /// one claim band B exists to make carefully (#193's rule, one surface over).</summary>
-    private IReadOnlyList<string> _myClasses = [];
+    /// <summary>The classes this VIEW is about, from the one producer
+    /// (<see cref="QuestClassLens.Offered"/>) and captured before the view lens narrows
+    /// them to one.
+    ///
+    /// <para>Two readers, one stored answer, which is the point of the field rather than a
+    /// second call: the leftover bands need the character's real class list, not the one
+    /// class the player is currently looking at — "only other classes want this" said
+    /// about a class you play, because you had it lensed out, is a false claim and the one
+    /// claim band B exists to make carefully (#193's rule, one surface over) — and
+    /// <see cref="BuildClassStrip"/> needs exactly the same list, because a chip for a
+    /// class this render has already narrowed away is a control that does nothing
+    /// (DRA-181 D4). <see cref="Refresh"/> writes it before <see cref="BuildTabs"/> runs,
+    /// so the strip is never built from the render before last (trap 33).</para></summary>
+    private IReadOnlyList<string> _offered = [];
     /// <summary>The Helper's answers about the subjects this catalog's steps point at
     /// (DRA-83) — this view's OWN memo, like <see cref="_unlockPool"/> beside it, because
     /// QuestsWindow and QuestsRoom each build their own view (trap 45).</summary>
@@ -408,12 +416,18 @@ public partial class QuestsView : UserControl
     private void BuildClassStrip()
     {
         _classes.Clear();
-        var key = _main.QuestCharacterKey;
-        // The RESOLVED list, not the picks with one inferred class behind them: the dump
-        // leads, the log fills in, picks widen (`CharacterClasses`). Reading
-        // `InferredClass` here was the last place this window could see one class where
-        // the character has three.
-        var mine = _main.ClassSourceFor(_main.CurrentSnapshot()).Classes;
+        // THE SAME LIST THE RENDER NARROWED TO (DRA-181 D4, plan P5) — read off the field
+        // Refresh wrote a few lines earlier, never re-derived here.
+        //
+        // It used to call `ClassSourceFor(...).Classes` itself: the RESOLVED list, which is
+        // the right answer to "who is this character" (the dump leads, the log fills in,
+        // picks widen — `CharacterClasses`, and reading `InferredClass` here was the last
+        // place this window could see one class where the character has three) and the
+        // WRONG answer to "which classes is this view about". Picks narrow the render and
+        // do not narrow `Resolve`, so every class the player had just deselected kept a
+        // chip — and clicking one set a lens the render clears again on the same tick
+        // (trap 33: two producers, and the dead control is what the second one bought).
+        var mine = _offered;
         // One class and no lens to offer: a strip reading "Any · BRD" chooses nothing.
         if (mine.Count < 2) { ClassStrip.Visibility = Visibility.Collapsed; return; }
         ClassStrip.Visibility = Visibility.Visible;
@@ -882,15 +896,17 @@ public partial class QuestsView : UserControl
         // never persisted, and one popup pick overrides (David, 2026-08-11: players swap
         // classes, so this is a reading, not a fact).
         var (resolved, classSource) = _main.ClassSourceFor(_main.CurrentSnapshot());
-        var classes = picks.Count > 0 ? picks : resolved.ToList();
+        // THE ONE PRODUCER of "which classes this surface is about" (DRA-181 D4, plan P5).
+        // This ternary used to be typed here, again in the phone's leftover bands, and a
+        // THIRD time in BuildClassStrip as `resolved` alone — so picking three classes left
+        // every other resolved class holding a chip that narrowed to nothing.
+        _offered = QuestClassLens.Offered(picks, resolved);
+        var classes = _offered.ToList();
         // WHO the character is, shown whether or not classes are picked — Bevel,
         // Helm-signed 2026-08-23: "identity stays on screen after picks. It is not the
         // filter." Hiding it the moment they tick the picker hides the game's own answer
         // exactly when they are deciding what to look at.
         var identity = string.Join(" · ", resolved);
-        // Captured HERE, one line before the lens narrows `classes` to a single entry —
-        // see the field's note. Empty stays empty, which is what suppresses band B.
-        _myClasses = classes;
         // The lens narrows to ONE of the classes you play. Everything downstream reads
         // `classes`, so narrowing it here covers the catalog, the zone view and the
         // item-driven tabs at once. A stale lens (you dropped that class) is ignored
@@ -906,6 +922,15 @@ public partial class QuestsView : UserControl
         if (_tab == QuestTab.Unlocks) RefreshUnlockPool();
 
         var sig = $"{key}|{filter}|{_mode}|st:{_state}|{string.Join("+", classes)}|id:{identity}|{_settings.QuestEraFilter}|{_main.CurrentZoneName}" +
+            // THE OFFERED LIST, beside the narrowed one (DRA-181 D4). `classes` above is what
+            // the lens left, so with a lens ON it hides a change to the picks: deselect a
+            // class you are not lensed to and every term here is unmoved while the strip has
+            // a chip to drop. The desktop picker forces a refresh, so this is not about the
+            // control the player just touched — the PHONE writes these picks too
+            // (`CompanionActions.SetClasses`), and that writer has no way to force anything
+            // here. Trap 72 on this surface, with the writer in another room for the second
+            // time. Folded by CONTENT: a swap leaves a count unmoved.
+            $"|off:{string.Join("+", _offered)}" +
             $"|sel:{_selected}" +
             $"|{string.Join(";", tracked.Order(StringComparer.OrdinalIgnoreCase))}" +
             $"|{string.Join(";", hidden.Order(StringComparer.OrdinalIgnoreCase))}" +
@@ -1315,6 +1340,20 @@ public partial class QuestsView : UserControl
         $"questsReadySummary={(SummaryRow.Visibility == Visibility.Visible ? 1 : 0)} " +
         $"questsTabs={_tabs.Count} " +
         $"questsModes={_modes.Count} " +
+        // ---- the CLASS LENS strip (DRA-181 D4) ----------------------------------------
+        // WHICH chips the strip is offering, folded from the real strip's KEYS rather than
+        // counted: a count is unmoved by a swap (trap 72), and the Founder's fault was a
+        // strip of the RIGHT SIZE holding the wrong classes as often as it was one chip too
+        // many. The key is what a click sets the lens to, so this says the control is live
+        // as well as present — a chip naming a class the render has narrowed away is the
+        // dead control this slice removed.
+        //
+        // ABBREVIATED, as the chip itself reads: "Shadow Knight" carries a SPACE, and the
+        // dump is space-separated `key=value` — a raw class name would silently corrupt the
+        // pair after this one. "-" is "no chips at all", which is exactly the collapsed
+        // strip (the one-class case returns before adding any), and it has to be a sentinel
+        // because an empty value would corrupt the line the same way.
+        $"questsClassStrip={ClassStripFact()} " +
         // ---- the SKY tab's island view (DRA-164) --------------------------------------
         // The MODE as the setting holds it, and the STRIP that offers it — counted off the
         // real strip rather than from the list that built it, because the claim is that the
@@ -2955,7 +2994,7 @@ public partial class QuestsView : UserControl
         if (tab != QuestTab.Sky) return;
         var leftovers = SkyLeftovers.Compute(
             _main.LatestInventory(), _settings.SkyQuestChecklist, _settings.SkyQuestCompleted,
-            _myClasses, _main.QuestCatalog);
+            _offered, _main.QuestCatalog);
         if (leftovers.IsEmpty) return;
 
         // Band A first: it is the reporter's own sentence and the only strong claim.
@@ -3960,6 +3999,14 @@ public partial class QuestsView : UserControl
     /// space-separated <c>key=value</c> and a space would silently corrupt the NEXT pair.</summary>
     private static string Dumped(string value) =>
         value.Length == 0 ? "-" : value.Replace(' ', '_');
+
+    /// <summary>The class strip's own chips, off the STRIP and not off the list that built
+    /// it — an absent control photographs as an unremarkable panel (trap 29), and the whole
+    /// claim here is that the chips on screen are the classes the view is about. <c>""</c>
+    /// is the Any chip's key; see the field note on why Any is keyed on empty.</summary>
+    private string ClassStripFact() => Dumped(string.Join("+", _classes.Keys
+        .Select(k => (string)k)
+        .Select(k => k.Length == 0 ? "Any" : QuestClassFilter.Abbrev(k))));
 
     /// <summary>
     /// ONE checklist row, wired to its own tick — the control both Sky arrangements draw.
