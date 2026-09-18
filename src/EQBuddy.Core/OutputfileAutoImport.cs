@@ -261,6 +261,24 @@ public static class OutputfileAutoImport
         var completedAdded = settings.SkyQuestCompleted
             .Where(k => !completedBefore.Contains(k)).ToList();
 
+        // And the guesses the dump now contradicts (Hateborne, 2026-09-18): a * tick the
+        // loot auto-tick parked on a class, for an item the character no longer holds
+        // enough of. The ledger was squared to this same dump on the ingest thread, so its
+        // Total is "the dump, then the log since"; an item it never tracked falls back to
+        // the dump's own count. A CURRENCY item is never judged here - the dump cannot see
+        // it, and scans made before EQBuddy knew that recorded every rune as zero, so only a
+        // logged hand-in takes a rune guess back (his call, 2026-09-18: this ships to every
+        // player, and most of them hold runes the dump says they don't).
+        IReadOnlyList<SkyQuestChecklistItem> guessesCleared = [];
+        if (ledger is not null && characterKey.Length > 0)
+        {
+            var held = ledger.For(characterKey);
+            guessesCleared = SkyGuessReconcile.Apply(settings.SkyQuestChecklist, settings.SkyQuestCompleted,
+                item => ledger.IsOffDump(characterKey, item) ? null
+                    : held.TryGetValue(item, out var e) ? e.Total : dump.CountOf(item));
+        }
+        var guessIds = guessesCleared.Select(r => r.Id).ToList();
+
         return new AutoImportOutcome(OutputfileKind.Inventory, Path.GetFileName(dump.Path),
             dump.WrittenAt, GearTicked: flipped.Count, RaidsMarked: 0, SkyMarked: skyMarked)
         {
@@ -268,7 +286,9 @@ public static class OutputfileAutoImport
             // FindTurnedIn already excludes completed keys, so every match IS newly marked
             // and the report can name the list without re-deriving what Apply did.
             SkyRewardsMarkedItems = [.. skyMatches.Select(m => m.ClassName + " · " + m.Reward)],
-            Undo = flipped.Count == 0 && questUndo is null && skyMarked == 0 ? null : () =>
+            SkyGuessesClearedItems = [.. guessesCleared.Select(SkyGuessReconcile.Describe)],
+            Undo = flipped.Count == 0 && questUndo is null && skyMarked == 0 && guessIds.Count == 0
+                ? null : () =>
             {
                 if (flipped.Count > 0)
                 {
@@ -283,7 +303,8 @@ public static class OutputfileAutoImport
                         if (undoIds.Contains(item.Id)) item.Acquired = false;
                     foreach (var key in completedAdded) settings.SkyQuestCompleted.Remove(key);
                 }
-                if (flipped.Count > 0 || skyMarked > 0) settings.Save();
+                if (guessIds.Count > 0) SkyGuessReconcile.Undo(settings.SkyQuestChecklist, guessIds);
+                if (flipped.Count > 0 || skyMarked > 0 || guessIds.Count > 0) settings.Save();
                 questUndo?.Invoke();
             },
         };
@@ -330,6 +351,15 @@ public sealed record AutoImportOutcome(
     /// Count matches <see cref="SkyMarked"/> on this kind; empty on every other.</summary>
     public IReadOnlyList<string> SkyRewardsMarkedItems { get; init; } = [];
 
+    /// <summary>Sky ticks EQBuddy had GUESSED (the * rows) that an inventory dump no longer
+    /// covers, taken back - "Class · Item" (<see cref="SkyGuessReconcile"/>). Named rather
+    /// than counted for the same reason as the marked rewards: an unwatched change the
+    /// player cannot account for is not honest. Empty on every kind but
+    /// <see cref="OutputfileKind.Inventory"/>.</summary>
+    public IReadOnlyList<string> SkyGuessesClearedItems { get; init; } = [];
+
+    public int SkyGuessesCleared => SkyGuessesClearedItems.Count;
+
     /// <summary>Sky rewards the dump flagged obtained and the #101 guard refused, because
     /// the class unlock that flagged them was granted rather than earned. NOT a failure —
     /// the guard working — but the player has to be told, or a dump full of rewards reads
@@ -367,7 +397,7 @@ public sealed record AutoImportOutcome(
     public string Summary => Kind switch
     {
         OutputfileKind.Inventory =>
-            (GearTicked == 0 && QuestCountsTrued == 0 && SkyMarked == 0
+            (GearTicked == 0 && QuestCountsTrued == 0 && SkyMarked == 0 && SkyGuessesCleared == 0
                 ? $"Read your inventory dump ({At:HH:mm}) — nothing new to tick"
                 : $"Read your inventory dump ({At:HH:mm}) — " + string.Join(", ",
                     new[]
@@ -378,6 +408,9 @@ public sealed record AutoImportOutcome(
                             : null,
                         SkyMarked > 0
                             ? $"{SkyMarked} Sky reward{(SkyMarked == 1 ? "" : "s")} marked turned in"
+                            : null,
+                        SkyGuessesCleared > 0
+                            ? $"{SkyGuessesCleared} guessed Sky tick{(SkyGuessesCleared == 1 ? "" : "s")} cleared"
                             : null,
                     }.Where(s => s is not null)))
             // Its own clause after a ·, never folded into the comma list: the others are
@@ -433,6 +466,15 @@ public sealed record AutoImportOutcome(
                         + ". Right-click "
                         + (SkyMarked == 1 ? "the reward" : "a reward")
                         + " on the Sky tab to reopen it if EQBuddy has this wrong.");
+                if (SkyGuessesCleared > 0)
+                    paragraphs.Add("EQBuddy had guessed "
+                        + (SkyGuessesCleared == 1 ? "this Sky tick (a * row)" : "these Sky ticks (the * rows)")
+                        + " when the item dropped, and your dump plus the log since no longer "
+                        + "covers " + (SkyGuessesCleared == 1 ? "it" : "them") + ": "
+                        + string.Join(", ", SkyGuessesClearedItems)
+                        + ". Only guesses are ever taken back - a tick you made yourself is left alone, "
+                        + "and a Wind Rune guess only goes when the log shows the rune handed in, "
+                        + "because runes live in currency, where the dump cannot see.");
                 if (SkyLeftovers > 0)
                     paragraphs.Add("Every Sky reward that takes "
                         + (SkyLeftovers == 1 ? "this item is" : "these items is")

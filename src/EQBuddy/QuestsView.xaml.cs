@@ -48,7 +48,7 @@ namespace EQBuddy;
 /// stayed exactly where they were, because they are properties of the surface rather than
 /// of the window around it: the #241 turn-in provenance sentence
 /// (<see cref="Objectives"/>), the Sky bags/leftover bands (<see cref="RenderLeftoverBands"/>),
-/// the session-only band folds (<see cref="_skyBandOpen"/>), the Ready-unlocked caveat
+/// the session-only band folds (<see cref="BandOpen"/>), the Ready-unlocked caveat
 /// (<see cref="RenderReadyBand"/>) and the Alt+Tab-reachable Sky commands
 /// (<see cref="SkyAchievementsPrompt"/>). Each is asserted from
 /// <c>tests/EQBuddy.E2E</c> through <see cref="DebugFacts"/>, and the shell reports the
@@ -279,7 +279,7 @@ public partial class QuestsView : UserControl
         // collapsed rendering can be photographed at all (trap 22).
         else if (state == "folded")
             foreach (var id in new[] { "skyReady", "skyLeftoverA", "skyLeftoverB" })
-                _skyBandOpen[id] = false;
+                _main._questFolds.Set(id, false);
         // Anything else after the colon is a SEARCH. The item-grouped result (#108) only
         // exists while a query is live, so without this hook the layout that answers "who
         // wants this drop" could not be photographed at all — trap 22, the same reason
@@ -942,6 +942,9 @@ public partial class QuestsView : UserControl
             // drawing it open until something unrelated moved. Trap 72, one store later.
             $"|gx:{_settings.GuideExpanded.Count}."
             + $"{string.Join(";", _settings.GuideExpanded.Order(StringComparer.OrdinalIgnoreCase)).GetHashCode(StringComparison.Ordinal):x8}"
+            // The Sky band folds, same story as gx: one store (MainWindow's, for the run),
+            // two views - a fold in one host must repaint the other.
+            + $"|bf:{_main._questFolds.Version}"
             // THE UNLOCKS TAB'S OWN STORES, and only while that tab is the one drawing — the
             // pool fold is the one thing here that is not free, and no other tab reads any of
             // it. Trap 72, third time on this surface: the guidance lines (DRA-65) are built
@@ -2894,15 +2897,15 @@ public partial class QuestsView : UserControl
         QuestsPanel.Children.Add(band);
     }
 
-    /// <summary>Which Sky bands are open, keyed by band id ("skyReady", "skyLeftoverA",
-    /// "skyLeftoverB"). **A field, never a setting** (the ProgressCardView precedent —
-    /// Bevel, Helm-signed 2026-08-23: session-only): folding a band away to read the list
-    /// under it is a decision about the next thirty seconds, not about how the app opens
-    /// tomorrow, and <c>DeadSettingTests</c> exists because settings outlive the surfaces
-    /// that wrote them. Default OPEN — the bands are the tab's answers, not its chrome.</summary>
-    private readonly Dictionary<string, bool> _skyBandOpen = new(StringComparer.Ordinal);
-
-    private bool BandOpen(string id) => _skyBandOpen.GetValueOrDefault(id, true);
+    /// <summary>Whether a Sky band is open, keyed by band id ("skyReady", "skyLeftoverA",
+    /// "skyLeftoverB"). **Session-only, never a setting** (the ProgressCardView precedent -
+    /// Bevel, Helm-signed 2026-08-23): folding a band away to read the list under it is a
+    /// decision about this sitting, not about how the app opens tomorrow, and
+    /// <c>DeadSettingTests</c> exists because settings outlive the surfaces that wrote them.
+    /// The state lives on MainWindow (<see cref="MainWindow._questFolds"/>), not on this
+    /// view, so closing and reopening the tracker keeps it (Hateborne, 2026-09-18) and both
+    /// hosts agree. Default OPEN - the bands are the tab's answers, not its chrome.</summary>
+    private bool BandOpen(string id) => _main._questFolds.IsOpen(id);
 
     /// <summary>A Sky band's clickable fold heading: the band's identity icon, then an
     /// <see cref="EqFoldLabel"/> carrying the chevron and the heading-with-count — which
@@ -2931,7 +2934,7 @@ public partial class QuestsView : UserControl
         heading.MouseLeftButtonDown += (_, e) =>
         {
             e.Handled = true;
-            _skyBandOpen[id] = !BandOpen(id);
+            _main._questFolds.Toggle(id);
             Refresh(force: true);
         };
         return heading;
