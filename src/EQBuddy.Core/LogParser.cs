@@ -629,7 +629,8 @@ public static partial class LogParser
         if ((r = AutoStoreRx().Match(msg)).Success)
             return new LootEvent(ts, r.Groups["item"].Value, Normalize(r.Groups["source"].Value),
                 UpgradeResult: null,
-                Count: r.Groups["n"].Success ? int.Parse(r.Groups["n"].Value) : 1);
+                Count: r.Groups["n"].Success ? int.Parse(r.Groups["n"].Value) : 1,
+                StoredIn: r.Groups["where"].Value.Trim());
 
         if ((r = AutoSellRx().Match(msg)).Success)
             return new AutoSellEvent(ts, r.Groups["item"].Value,
@@ -668,6 +669,7 @@ public static partial class LogParser
 
         if ((r = DestroyedRx().Match(msg)).Success)
             return new ItemDestroyedEvent(ts, r.Groups["item"].Value, int.Parse(r.Groups["n"].Value));
+        if (TradeLines.Parse(ts, msg) is { } trade) return trade;   // hand-ins (HandInTracker)
 
         if ((r = LootWindowSaleRx().Match(msg)).Success)
         {
@@ -844,12 +846,6 @@ public static partial class LogParser
 
         if ((r = ThirdMissRx().Match(msg)).Success)
             return new ThirdMissEvent(ts, r.Groups["attacker"].Value.Trim());
-
-        if ((r = LocationRx().Match(msg)).Success)
-            return new LocationEvent(ts,
-                double.Parse(r.Groups["y"].Value, System.Globalization.CultureInfo.InvariantCulture),
-                double.Parse(r.Groups["x"].Value, System.Globalization.CultureInfo.InvariantCulture),
-                double.Parse(r.Groups["z"].Value, System.Globalization.CultureInfo.InvariantCulture));
 
         if ((r = InstanceCreatedRx().Match(msg)).Success)
             return new InstanceCreatedEvent(ts, r.Groups["zone"].Value, r.Groups["id"].Value);

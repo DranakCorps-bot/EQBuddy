@@ -64,7 +64,29 @@ public record ConsiderEvent(DateTime Time, string Name, int Level, bool Rare = f
 public record OutputfileEvent(DateTime Time, string FileName) : GameEvent(Time);
 /// <param name="Count">Stack size — auto-storage lines ("stored it in your tradeskill
 /// depot", issue #39) can carry counts like the auto-sell lines do.</param>
-public record LootEvent(DateTime Time, string Item, string Source, string? UpgradeResult, int Count = 1) : GameEvent(Time);
+/// <param name="StoredIn">Where an auto-storage line routed the item ("currency",
+/// "tradeskill depot"), or null for loot that went to your bags. An inventory dump has no
+/// currency or depot section, so the quest ledger must not read such an item's absence
+/// from a dump as "none held" (Hateborne, 2026-09-18: Wind Runes store to currency since
+/// 2026-09-16).</param>
+public record LootEvent(DateTime Time, string Item, string Source, string? UpgradeResult, int Count = 1,
+    string? StoredIn = null) : GameEvent(Time);
+
+/// <summary>"You offered 1 Wind Rune Meda to Cilin Spellsinger." - one item placed in a
+/// trade window. Nothing has left your hands yet: an offer with no
+/// <see cref="TradeCompleteEvent"/> after it is a cancelled trade.</summary>
+public record TradeOfferEvent(DateTime Time, string Item, int Count, string Target) : GameEvent(Time);
+
+/// <summary>"You complete the trade with Cilin Spellsinger." - the offers to that target
+/// were handed over. The hand-in the log was long believed not to record (Hateborne,
+/// 2026-09-18, verbatim from eqlog_Hateborne_neriak).</summary>
+public record TradeCompleteEvent(DateTime Time, string Target) : GameEvent(Time);
+
+/// <summary>"Wizard Schrock says, 'I have no need for this, Hateborne. You can have it
+/// back.'" - an NPC returning something just handed in, one line per item returned. The
+/// line never names the item, so a trade it follows is treated as not having
+/// happened.</summary>
+public record TradeRefusedEvent(DateTime Time, string Npc) : GameEvent(Time);
 /// <summary>Vendor=true means a merchant sale (Item = what was sold); otherwise corpse coin or split.</summary>
 public record MoneyEvent(DateTime Time, long Copper, bool Vendor = false, string? Item = null) : GameEvent(Time);
 public record XpEvent(DateTime Time, double Percent, bool Party) : GameEvent(Time);

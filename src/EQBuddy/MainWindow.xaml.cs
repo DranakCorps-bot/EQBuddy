@@ -204,8 +204,13 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
         // the store's time high-water mark keeps the replay from double-counting.
         QuestCatalog = QuestCatalog.LoadEmbedded();
         ZoneGraph = ZoneGraph.LoadEmbedded();
+        // Checklist items too: the Sky/Epic auto-ticks key on what this ledger accepts.
+        var autoTickItems = QuestChecklistLayout.AutoTickItemNames(_settings);
         QuestLedger = new QuestLedgerStore(AppPaths.File("quest-ledger.json"))
-        { TrackFilter = QuestCatalog.IsTurnInItem, Normalize = QuestCatalog.BaseItemName };
+        {
+            TrackFilter = n => QuestCatalog.IsTurnInItem(n) || autoTickItems.Contains(n),
+            Normalize = QuestCatalog.BaseItemName,
+        };
         _stats.QuestStore = QuestLedger;
         // Reconcile seam (#241): the ingest asks for the dump's snapshot only when the
         // announced file is actually an inventory dump — same finder InventoryFile has
@@ -1890,6 +1895,9 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
     /// still the thing that knows which room the next opener lands on, and the window's
     /// own tab changes still ride back through it.</summary>
     internal readonly ThemeHost<QuestTab> _questsHost = new(QuestSurface.DefaultTab);
+    /// <summary>The Quest Tracker's folds for this run, shared by both hosts and kept across a
+    /// close (Hateborne, 2026-09-18). Never a setting: see <see cref="SessionFolds"/>.</summary>
+    internal readonly SessionFolds _questFolds = new();
     /// <summary>Same story since cut 2 (2026-09-05): no card, so Collapsed or Window.</summary>
     internal readonly ThemeHost<WorldTab> _worldHost = new(WorldSurface.DefaultTab);
 
@@ -2043,6 +2051,10 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
             _questsWindow.TabChanged += t2 => _questsHost.SelectTab(t2);
             _questsWindow.Closed += (_, _) => _questsHost.WindowClosed();
             _questsWindow.Show();
+            // Reopen where the last one was left (Hateborne, 2026-09-18); the host kept the
+            // tab and nothing read it back. The map badge's item filter keeps its own landing.
+            if (tab is null && filterItem is not { Length: > 0 })
+                _questsWindow.SetTab(QuestSurface.KeyFor(_questsHost.SelectedTab));
         }
         if (tab is { } t0) _questsWindow.SetTab(QuestSurface.KeyFor(t0));
         if (filterItem is { Length: > 0 }) _questsWindow.FilterToItem(filterItem);
@@ -2188,7 +2200,6 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
         _watcher.Spawns = null;
         _watcher.Raids = null;
         _targetResults.Clear();
-        _quests.ResetLootSeen();
         ClearGearAutoCheckSeen();
         if (pick is not null) _watcher.Select(path, pick.StartOffset, pick.EndOffset);
         else _watcher.Select(path);
@@ -2274,7 +2285,6 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
             // in fact — with review mode switching logs freely now, clear them with the
             // rest of the character state.
             _targetResults.Clear();
-            _quests.ResetLootSeen();
             ClearGearAutoCheckSeen();
         }
     }
@@ -2457,12 +2467,11 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
         if (s.SessionStart != _autoCheckSessionStart)
         {
             _autoCheckSessionStart = s.SessionStart;
-            _quests.ResetLootSeen();
             ClearGearAutoCheckSeen();
         }
-        UpdateSkyQuestChecklist(s);
+        // Sky/Epic tick off loot the LEDGER accepted as new: a replay cannot tick twice.
+        _quests.ApplyLedgerDelta(_stats.QuestFeed.Drain());
         UpdateGearChecklist(s);
-        UpdateEpicQuestChecklist(s);
         // Remember the announced level per character — the "At N:" preview must survive
         // restarts and log truncation, and the log only says the number at the ding.
         // **The LOG's timestamp travels with it since DRA-71 D3** (trap 56: two facts about
@@ -2910,9 +2919,6 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
     // checklists from loot, and the achievements import — both of which feed the Quest
     // Tracker window and EQBuddy Mobile, neither of which needs a card to be open.
     // These two forward because XAML binds the ⚙ menu handlers by name.
-
-    private void UpdateEpicQuestChecklist(StatsSnapshot s) => _quests.UpdateEpicQuestChecklist(s);
-    private void UpdateSkyQuestChecklist(StatsSnapshot s) => _quests.UpdateSkyQuestChecklist(s);
 
     internal void OnImportAchievements(object sender, RoutedEventArgs e) =>
         _quests.OnImportAchievements(sender, e);
