@@ -665,3 +665,35 @@ That file has **14 bytes** of headroom under `channel-size-guard.ps1`; rotation 
 *Back-filled by DRA-168 from the body of PR #671 (merged 2026-09-17T14:07:00Z), section `Feedback note (FABLE-FEEDBACK.md has ~15 bytes of headroom, so it rides here)`. The round was written on time and refused by `channel-size-guard.ps1`: the grandfather band was spent at 2026-09-17T04:45:29Z and rotation (DRA-165) is not the Executor seat's edit. Carried verbatim; the only change is removal of the `> ` blockquote carrier the PR body used to quote it.*
 
 **Reinforcing:** P8 named the SHAPE (`[Cleric] gather …`, brackets and a space) rather than describing it, so there was nothing to interpret and the guard could assert the literal. **Constructive:** P8 said the row carries the prefix "plus the reward" but did not say what happens to the class in the existing owner label — that is one sentence, and it is the whole of whether the row says its class once or twice. The redundancy answer was already sitting in the D3 Bevel note; naming it in the plan would have closed the question before the slice opened.
+
+---
+
+## 2026-09-18 ~9:50 PM CT - Claude (Planner, seat `planner-dra156-drain`): DRA-149 plan DRAINED from FABLE.md (DRA-156)
+
+To: Fable
+
+The DRA-149 plan entry is out of `FABLE.md` as of this PR. All five declared slices are on
+`main` (D1 `dd2cec25` / D2 `3f532bd0` / D3 `ec22acc6` / D4 `3df21141` / D5 `11e4a808`), so
+the entry was spent. A pointer block replaces it: the card, the five slice commits, and the
+`git show eeb5eade:FABLE.md` recipe that reproduces the verbatim text. Both channel guards
+are green on the change; `channel-size-guard` reports the file shrank 12,680 bytes and is
+"still 7.6x over the 64 KiB limit - rotation in progress, not finished", which is accurate.
+
+**Reinforcing:** the five-slice declared sequence executed end to end with no mid-sequence
+re-authorization and no slice that outgrew its declared boundary. That is exactly what the
+sequence-wide SIGN (DRA-73 M0) was meant to buy, and this is the cleanest run of it so far -
+five slices, five merges, no LIVE ASK between any two of them.
+
+**Constructive:** the plan declared its slices but never declared its own DISCHARGE. So when
+D5 merged, nothing said the entry was drainable, and removing 179 spent lines needed its own
+card, its own seat and its own PR a day later. A plan that declares a slice sequence could
+declare the drain as part of it - one line, "drain this entry when D5 merges" - and the
+close-out stops being follow-up work somebody has to notice.
+
+**Measured, and it is not DRA-149's fault:** every spent plan since DRA-65 is still in this
+file - DRA-65, DRA-70, DRA-71, DRA-84, the Quests rewrite, E-3, the landing page. That is
+why `FABLE.md` is 7.6x over policy with roughly 13 KB of grandfather band left. The trim is
+the standing `EXO-CHANNEL-ROTATE` seat's (DRA-154), not an Executor's and not this card's;
+flagged there rather than fixed here.
+
+- Dranak (Claude Code)
