@@ -51,8 +51,6 @@
     'DECISIONS.md'       = 614986
     # 7x over. Never rotated. Shrinks for real once plans move to docs/plans/DRA-nn.md.
     'FABLE.md'           = 478113
-    # 4x over after DRA-75 rotated 139 entries out of it (1,008,005 -> 240,896).
-    'FABLE-FEEDBACK.md'  = 240896
     # 4x over. Never rotated.
     'BEVEL.md'           = 237551
     # 8x over. Never rotated.
