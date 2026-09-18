@@ -1,3 +1,105 @@
+## 2026-09-17 ~9:05 PM CT — Fable: DRA-179 JR/SR CAPABILITY-COST ROUTER — the routing plan under EXO-HARDEN (DRA-4). Founder SIGNED the model mix 2026-09-17. Plan only.
+
+To: Helm
+
+**Seat:** `fable-dra179-jr-sr-router` (this worktree's claim; `claim-seat.ps1` refused a
+second seat on the card, correctly). Plan only: no product code from this seat, no
+Executor kick from it, and nothing below touches Pages / Play / republish / signing.
+Paperclip DRA-179 moves to `in_review` with this PR. **The model mix itself is the
+Founder's signature (2026-09-17) and nothing below re-decides it**: Planner = Fable;
+Jr Executor = Qwen 3.8-27B (routine); Sr Executor = Opus 5.1 (hard + the Jr review
+gate); Jr reports to Sr.
+
+### 0. What this is
+
+A capability-cost router: systemic complexity vs capability vs cost, decided once per
+delivery at plan SIGN, inside the lane the org already has. It sits BELOW the CLAUDE.md
+routing table — V0–V1 vs V2–V3 still decides what reaches Fable at all; this router only
+decides WHICH EXECUTOR takes a delivery a signed plan already authorizes. Same rule as
+that table: consequence and reach, not effort.
+
+### 1. The routing rule (D1)
+
+- **Every delivery in a Fable plan carries `route: routine | hard`, written at plan
+  SIGN.** The tag is plan text, so the one SIGN that authorizes the slice sequence
+  authorizes its routing — no per-delivery re-authorization, exactly the DRA-73 M0 shape.
+- **An untagged delivery routes Sr.** Fail-closed; a missing tag is never a cheap default.
+- **The banned-Jr list decides before judgment does.** A delivery touching ANY of these
+  is `hard` no matter how small the diff:
+  1. auth / anything credential-shaped
+  2. AppData / live-state isolation (traps 68/69's surface)
+  3. parser guts (`Core/LogParser.cs`, the line-type regexes)
+  4. claim-seat / soft-seat store mechanics (traps 70/82)
+  5. a red CI whose cause is not yet known
+  6. security, all of it
+  7. harvest / catalog writers (the curated-catalog rule's surface)
+  8. Play / signing / prod secrets (the release lane)
+  9. Founder LOCK / EXO T2 surfaces
+  10. a sole consequence last-look — Jr is never the ONLY set of eyes on anything
+
+### 2. The two lanes (D2)
+
+- **Jr = Qwen 3.8-27B, CLI only.** No API integration is built for it, and no shipped
+  EQBuddy code path calls it or any model — this is a dev-time lane, invisible to the
+  product. Jr claims its seat through the resolved `claim-seat.ps1` form like any
+  executor, works only `route: routine` deliveries, and its output lands as a PR that
+  **cannot merge without Sr review** — the Jr review gate is a merge requirement.
+- **Sr = Opus 5.1.** Takes `route: hard` directly; reviews every Jr PR.
+- **Escalation is the existing seam.** Jr stops and hands the delivery to Sr when it
+  finds banned-list contact mid-slice, a gate failure it cannot explain, or a slice
+  outgrowing its declared boundary — the same stop-and-escalate every signed plan
+  already rests on.
+
+### 3. Sr quick-pass, then Planner alignment (D3)
+
+- **When the Fable plan for a delivery is robust** — checkable acceptance criteria, the
+  guards named, prove-fail listed — Sr's review of the Jr PR is a QUICK-PASS:
+  diff-against-plan conformance plus green gates, not a re-derivation. When the plan is
+  thin, Sr reviews deep or takes the delivery itself. Robust-or-not is Sr's call, said
+  in the PR review so it is auditable.
+- **Planner alignment closes the loop**: each plan cycle Fable reads the routing
+  outcomes — did routine stay routine — and re-tags in the NEXT plan. A misroute is
+  feedback (`FABLE-FEEDBACK.md`), never a mid-flight revert.
+
+### 4. Measurement, and what generalizes later (D4)
+
+- Per delivery: the tag, the executor, the review depth Sr chose, the outcome (merged
+  on quick-pass / Sr rework / escalated), riding the Paperclip card that already tracks
+  the work. The readout after a first cycle: Jr-routed deliveries merging on quick-pass
+  with no post-merge trap entries, and the misroute rate visible instead of anecdotal.
+- **Generalize LATER, deferred by name:** docs, screenshots, and clerk-class Jr pairs
+  each get their own follow-up card. Not slices of this plan.
+
+### Non-goals — the Founder's LEAVE list, kept
+
+Not invented here, at any slice: Qwen as Planner (Fable is the only Planner); a raw
+model-API integration (CLI only, both lanes); any third Executor role; Pages / Play;
+Founder mail; Qwen anywhere in the shipped product; a Grok Marketer bot.
+
+### Slices
+
+Process deliveries, not product code — and none of them are Jr-eligible (a router does
+not bootstrap through the lane it is creating, and items 4/9 of its own banned list
+cover the surfaces these touch):
+
+- **D1** — the routing rubric + banned-Jr list into the doctrine home (ops
+  `EXO-PLAYBOOK.md`, per DRA-4's shape; EQBuddy keeps a pointer), and the `route:` tag
+  convention added to the Fable section of `CLAUDE.md` in one line.
+- **D2** — Jr lane mechanics: seat discipline, the CLI-only rule, and the Jr review
+  gate as an enforced merge requirement (the enforcement mechanism — branch protection
+  vs checklist — is Helm's pick, named in the D2 PR).
+- **D3** — quick-pass criteria + the Planner-alignment cadence, written beside D1's
+  rubric.
+- **D4** — the measurement rows in Paperclip and the first-cycle readout.
+
+`needs-david:` none — the model mix is already his signature, and every slice below it
+is process. SIGN (PR review or `HELM.md` commit) authorizes D1–D4 in order on green
+gates; a HOLD stops the train as always.
+
+— Fable 5, seat `fable-dra179-jr-sr-router`
+
+---
+
 ## 2026-09-16 ~10:30 PM CT — Fable: DRA-149 HELPER UPGRADE / FARM GEAR — the plan from the Founder's FAIL of "Upgrade what I wear" / Farm Gear (Desktop 2.0.0+`275cc215`). Executor kicks only after Helm SIGN.
 
 To: Helm
