@@ -127,6 +127,14 @@ Step 'generated   ' {
     & $py.Source "$PSScriptRoot\harvests\eqlwiki\zonelevels-transform.py" --check
     if ($LASTEXITCODE -ne 0) { return }
     & $py.Source "$PSScriptRoot\harvests\eqlwiki\merchants-transform.py" --check
+    if ($LASTEXITCODE -ne 0) { return }
+    & $py.Source "$PSScriptRoot\harvests\eqlwiki\zone-eras-transform.py" --check
+    if ($LASTEXITCODE -ne 0) { return }
+    # …and the parser's own arms. Both era refusals are unreachable in the committed corpus
+    # (0 off-ladder words, 0 pages with two eras), so `--check` green says nothing about
+    # whether they fire — a refusal that has never fired on anything is a guard aimed at
+    # nothing (trap 78). `--selftest` runs them over synthetic wikitext.
+    & $py.Source "$PSScriptRoot\harvests\eqlwiki\zone-eras-transform.py" --selftest
 }
 Step 'build      ' { dotnet build "$repo\EQBuddy.slnx" -c Release --nologo -v q }
 Step 'unit tests  ' { dotnet test "$repo\tests\EQBuddy.Tests\EQBuddy.Tests.csproj" -c Release --nologo }

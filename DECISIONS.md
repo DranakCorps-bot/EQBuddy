@@ -8485,3 +8485,62 @@ or the values line.
 5. **`WhatsNew.json` entry DRAFTED, not shipped** (`docs/ops/dra181-whatsnew-draft.md`) — DRA-149 D5's idiom; the release go is the Founder's.
 
 — Dranak (Claude Code), Executor — DRA-181 D4
+
+## 2026-09-17 — DRA-180 D1: the zone-era table, and the five defaults that could have gone the other way
+
+**Seat:** `opus-dra180-d1` (Paperclip DRA-180). Helm SIGNED the DRA-180+181 plan at PR #685
+(`443dea45` on Soft `main`), whole-sequence on green gates; this is D1 only. Ships
+`scripts/harvests/eqlwiki/zone-eras-transform.py` → `Core/Data/ZoneEras.json` +
+`Core/ZoneEras.cs` + `ZoneErasTests`. **Fetches nothing** (the COMMITTED zone cache), plain
+JSON, no curated file written, **no engine reads it**, nothing about Pages / Play / tag /
+signing / release. `needs-david`: NONE — the WorldEra one-word ask is P4's and rides Helm's
+mailbox, not this slice.
+
+**1. The fold's earliest-era rule lives in `ZoneEras.Reconcile` (C#), not in the transform.**
+The plan says *"the transform emits the EARLIEST era under the folded identity"*. *The default
+the other way* was a `Folded` section in the JSON — closer to the plan's letter, and it would
+have put the rule in two places the moment `ZoneEras` needed to answer a `DropZones` spelling
+(trap 4). *Where it landed.* The transform emits one row per PAGE — what the page said — and
+the C# owns the fold. The report names the collision, both pages' eras and the rule in words,
+and computes nothing. Reversible in one slice if Fable wants the letter.
+
+**2. A fold disagreement where either side is ABSENT answers NOTHING.** The plan decided the
+Dated/Dated case (Chardok: Kunark beats Chardok Revamp) and not this one, which has no
+instance in the corpus. *The default the other way* was to let the dated side win. *Where it
+landed.* Null, because an absence is not an era and cannot be compared — letting a dated title
+carry an absent one is exactly the *"absent means Classic"* default the plan refuses by name.
+Guarded against a fixture, and the rule is commutative so dictionary order cannot decide it.
+
+**3. `--selftest` was added and wired into `check.ps1` + CI beside `--check`.** The plan asked
+only for `--check`. *The default the other way* was `--check` alone. *Where it landed.* **Both
+refusal arms are unreachable in the committed corpus — 0 off-ladder words, 0 pages with two
+eras — so `--check` green says nothing about whether they fire** (trap 78, and trap 34 from the
+aimed-at-nothing side). 17 checks over synthetic wikitext, writing nothing; it also asserts the
+mirrored `LADDER` is non-empty, since an empty admitted set refuses everything and reports a
+clean corpus.
+
+**4. The report carries a join survey the plan's D1 list did not name.** *The default the other
+way* was the six sections asked for. *Where it landed.* Included, because D2's gate is worth
+measuring before it is built: **81% of the catalog's drop weight lands on a zone with an era**,
+and `Chardok` (155 mentions) resolves through the fold. Snapshot-stamped and deliberately
+outside `--check`, the `zonelevels-report.md` precedent, so a catalog refresh cannot redden it.
+
+**5. `QuestEraLadder.IndexOf` extracted; `Allowed` now calls it.** *The default the other way*
+was a second `Array.FindIndex` over `Eras` inside `ZoneEras`. *Where it landed.* One producer
+for "where on the ladder" (trap 4) — a second opinion on what counts as one of our era words is
+what makes a gate fail open silently.
+
+**Two corrections to the plan's own numbers, both measured:** its §0 histogram reads 56 Classic
+/ 24 Kunark, and the six figures sum to 102 rather than the 104 it also states. Measured twice,
+with two regex shapes: **57 / 25 / 19 / 1 / 1 / 1 = 104**. The total and the 14-name ABSENT list
+are exactly right; only the split was off. Also `Plane of Hate` is enumerated as
+`Plane of Hate cleanupproject`, and the guard uses the real title.
+
+**No `WhatsNew.json` entry:** nothing here is player-noticeable — no surface reads this
+catalog. `check.ps1` all green (5,398 unit tests); **9 mutants prove-failed** across both
+languages (empty ladder, off-ladder accepted, two-eras picked, positional parse,
+absent-means-Classic, latest-wins fold, absent-side fold, unrankable fold, containment lookup).
+`FABLE.md`'s DRA-180 item is deliberately NOT drained — D2–D5 still need it. Nothing here
+touches privacy, the release go, a public surface, or the values line.
+
+— Dranak (Claude Code), Executor — DRA-180 D1
