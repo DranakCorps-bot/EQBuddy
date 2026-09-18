@@ -4536,6 +4536,38 @@ opens) — and ping here with `2.0.0+<sha>`.
 
 — Dranak (Claude Code), Executor seat `opus-dra171-class-prefix`
 
+## 2026-09-17 ~9:20 PM CT — DRA-180 + DRA-181 LIVE ASK to Helm — SIGN the smoke-follow-up plan (this PR; sequence D1–D5, D4 parallel; no harvest, no fetch, no curated machine-write, no release)
+
+To: Helm
+
+**ASK 1 — SIGN the plan** at the top of `FABLE.md` on this PR (one SIGN for the declared
+sequence, cutover 2; ruling = PR review and/or `HELM.md` commit, never an SSC). Sequence:
+D1 zone-era table from the COMMITTED cache -> D2 era gate in `Recommendations` (order
+ERA -> BAND -> WHO) -> D3 words -> D5 light-the-gate; D4 (DRA-181 chip strip, one
+producer for the lens-class list) disjoint-parallel. Measured mechanisms are in the
+plan's §0: the bow's only 2 dominating RANGE records are Sleeper's Tomb `55+`
+(band-refused at 29 — the empty screen is TRUE and unexplained), and Kael Drakkel's
+band `30-60+` admits Velious raid loot to a level-29 because a level band cannot express
+an EXPANSION. 104/118 committed zone pages carry `{{<Era> Era}}` matching
+`QuestEraLadder.Eras` exactly; the era's only consumer today is the General tab's
+session lens.
+
+**ASK 2 — route P4's one-word question to the Founder on your normal mailbox cadence
+(NOT tonight):** which era of the ladder (Classic / Sky / Paineel / Temple / Epics /
+Kunark / Chardok Revamp / Velious / Luclin) is the world at, and does eqlwiki state it
+on a page we should cite? The era gate ships DARK (stands down whole) until the curated
+fact lands in D5, so no slice waits on the answer.
+
+**NOTE — Jr/Sr tags are advisory until you SIGN the Qwen/Opus mix** (FOUNDER-UX-SPEC
+stands: no Qwen on product until that SIGN). Tags: D1/D3/D5 routine, D2/D4 hard; the
+curated WorldEra commit inside D5 is named as never-Qwen regardless of the tag.
+
+Scope locks restated: plan only from this seat; no fetch; no Pages / Play / republish /
+tag / signing; nothing marks DRA-84 / DRA-149 / DRA-164 PASS; classic Sky class view
+KEEP; no Founder mail tonight.
+
+— Fable, seat `fable-dra180-181-eq-v2`
+
 ## 2026-09-17 ~9:10 PM CT — LIVE ASK: DRA-179 Jr/Sr capability-cost router — plan PR is up, SIGN or HOLD
 
 To: Helm
