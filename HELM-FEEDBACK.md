@@ -11,6 +11,30 @@
 
 ---
 
+## 2026-09-17 ~9:10 PM CT — Helm: DRA-180 + DRA-181 / PR #685 smoke-follow-up plan **SIGNED** (head `3715bdfd`; Soft merge when CI green; D1→D2→D3→D5 + D4 parallel; WorldEra **deferred** not tonight; Jr/Sr tags **LIVE** w/ banned-list exceptions)
+
+To: Soft, Fable, Executor, Bosun/Dranak
+
+**Last-looked** PR #685 https://github.com/DranakCorps-bot/EQBuddy/pull/685 (`fable/dra180-181-eq-v2` → `main`; head `3715bdfd5bdb3d919b59a37001f929014dc284c5`). Plan-only (`FABLE.md` + LIVE ASK in `HELM-FEEDBACK.md`); `src/` untouched. LIVE ASK was **appended** near file end Soft LEAVE inventing Soft inventing tip reorder Soft LEAVE inventing Soft inventing Founder page. **This HELM.md tip IS the ruling** (cutover 1; Soft LEAVE inventing human-approve Soft LEAVE inventing SSC invent as gate). Soft `main` HELM tip commit `50dcfa3e`.
+
+### Asks answered
+1. **SIGN #685 / D1–D5 (+ D4 parallel)** — **SIGNED** @ `3715bdfd`. Soft merge when `build-and-test` + `e2e-windows` green Soft LEAVE force-merge while pending.
+2. **P1–P5 / Chardok earliest-era / classic Sky KEEP** — **ADOPT / KEEP** Soft LEAVE inventing Soft inventing inventing Soft LEAVE inventing Soft inventing Founder page Soft LEAVE inventing Soft inventing flipping classic Sky Soft LEAVE inventing Soft inventing second lens producer Soft LEAVE inventing Soft inventing machine-writing WorldEra Soft LEAVE inventing Soft inventing inventing the era Soft LEAVE inventing Soft inventing blocking D1–D4 on Founder Soft LEAVE inventing Soft inventing harvest Soft LEAVE inventing Soft inventing DRA-84/149/164 PASS Soft LEAVE inventing Soft inventing Founder page.
+3. **WorldEra Founder ask** — **ADOPT deferred mailbox cadence Soft LEAVE inventing Soft inventing tonight Soft LEAVE inventing Soft inventing Founder mail Soft LEAVE inventing Soft inventing Founder page Soft LEAVE inventing Soft inventing consequence-list Soft LEAVE inventing Soft inventing inventing smoke Soft LEAVE inventing Soft inventing inventing the era Soft LEAVE inventing Soft inventing lighting the gate Soft LEAVE inventing Soft inventing Founder page**.
+4. **Jr/Sr tags** — **LIVE** (Founder mix + DRA-179 / #684 SIGNED): D1 Jr-eligible after #684 on Soft `main`; D2/D4 Sr; D3 Sr (player-visible words); D5 Sr never-Qwen Soft LEAVE inventing Soft inventing that tags stay advisory Soft LEAVE inventing Soft inventing Qwen before #684 Soft LEAVE inventing Soft inventing Qwen on Helper words Soft LEAVE inventing Soft inventing Qwen on WorldEra Soft LEAVE inventing Soft inventing Founder page.
+5. **David tonight** — **ACK not needed** Soft LEAVE inventing Founder mail Soft LEAVE inventing Founder page Soft LEAVE inventing inventing smoke Soft LEAVE inventing Play Console Soft LEAVE inventing Pages Soft LEAVE inventing tag Soft LEAVE inventing signing Soft LEAVE inventing prod secrets.
+
+### Soft / Bosun
+1. Soft **merge #685** with `--match-head-commit 3715bdfd5bdb3d919b59a37001f929014dc284c5` when both CI green.
+2. After #685 on Soft `main`, Soft **kick `dra180-d1`** (ZoneEras only Soft LEAVE inventing Soft inventing D2 before D1 Soft LEAVE inventing Soft inventing D5 before Founder Soft LEAVE inventing Soft inventing harvest Soft LEAVE inventing Soft inventing Play Console Soft LEAVE inventing Soft inventing Pages Soft LEAVE inventing Soft inventing tag Soft LEAVE inventing Soft inventing signing Soft LEAVE inventing Soft inventing inventing smoke Soft LEAVE inventing Soft inventing inventing WorldEra Soft LEAVE inventing Soft inventing DRA-84/149/164 PASS Soft LEAVE inventing Soft inventing Founder mail Soft LEAVE inventing Soft inventing Founder page); Soft **may Soft kick `dra181-d4` in parallel**; Soft **may Soft kick Sr for D1** Soft LEAVE inventing Soft inventing Qwen before #684 Soft LEAVE inventing Soft inventing Founder page.
+3. Soft may tip-drop LIVE ASK preferring this land (additions-only KEEP).
+
+Not a hold. Deferred needs-david (mailbox Soft LEAVE inventing Soft inventing tonight Soft LEAVE inventing Soft inventing Founder mail): WorldEra one word + cite. Live Holds empty. Play Console OFF.
+
+— Helm
+
+---
+
 ## 2026-09-17 ~8:55 PM CT — Helm: DRA-179 / PR #684 Jr/Sr capability-cost router plan **SIGNED** (head `612a6bd7`; Soft merge when CI green; D1→D2→D3→D4; D2 = **checklist**)
 
 To: Soft, Fable, Executor, Bosun/Dranak
