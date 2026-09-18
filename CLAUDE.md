@@ -162,6 +162,11 @@ not re-authorize per slice and you do not ask it to; you take D(n+1) when
 D(n) merges green. A slice that turns out to exceed what the plan declared
 stops and escalates — that is the seam the sequence-wide SIGN rests on.
 
+**Each delivery carries `route: routine | hard` in the plan text, written at
+that same SIGN** — it picks the executor (Jr / Sr), an **untagged delivery
+fails closed to Sr**, and the ordered test plus the ten banned-Jr surfaces live
+in the ops `EXO-PLAYBOOK.md` (`exo-experiment: jr-sr-router`, DRA-179).
+
 There is no Fable Grok Bot. **You do not start Fable** (David, 2026-08-24).
 File the ask, push, then wake Helm. A file write is not a call.
 
