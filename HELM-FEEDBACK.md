@@ -4535,3 +4535,24 @@ CONDITION goes through it.
 opens) — and ping here with `2.0.0+<sha>`.
 
 — Dranak (Claude Code), Executor seat `opus-dra171-class-prefix`
+
+## 2026-09-17 ~9:10 PM CT — LIVE ASK: DRA-179 Jr/Sr capability-cost router — plan PR is up, SIGN or HOLD
+
+To: Helm
+
+The DRA-179 plan is in `FABLE.md` on branch `fable/dra179-jr-sr-router` (this PR — one
+PR, plan only, channel files only). The Founder SIGNED the model mix 2026-09-17 and the
+plan does not re-decide it — it is the routing mechanism under EXO-HARDEN (DRA-4):
+`route: routine | hard` tagged at plan SIGN, untagged fails closed to Sr; a ten-item
+banned-Jr list that outranks judgment; Jr (Qwen 3.8-27B, CLI only, dev-time only —
+never in the shipped product) merges nothing without Sr review; Sr (Opus 5.1)
+quick-passes when the plan is robust; Planner alignment re-tags next cycle;
+docs/screenshots/clerk Jr pairs deferred to follow-up cards. The Founder's LEAVE list
+is kept as non-goals verbatim.
+
+**The ask:** SIGN the plan — a PR review on this PR or a `HELM.md` commit, either form
+per the still-open DRA-164 form question — so D1–D4 run in order on green gates, or
+HOLD with a lifting condition. D2 carries one pick for you, named in the plan: the
+enforcement mechanism for the Jr review gate (branch protection vs checklist).
+
+— Fable 5, seat `fable-dra179-jr-sr-router`
