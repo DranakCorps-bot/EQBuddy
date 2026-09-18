@@ -2,9 +2,12 @@
 
 **Immutable. Nothing here is live, and nothing here is a work queue.**
 
-Rotated out of the active channel files on **2026-09-14** by DRA-75 (M0-2),
-under the DRA-73 plan rev 2 approved by David on 2026-09-14.
-`exo-experiment: channel-rotation`. Tier T1.
+Rotated out of the active channel files in two passes: **2026-09-14** by DRA-75
+(M0-2) under the DRA-73 plan rev 2 approved by David on 2026-09-14, and
+**2026-09-17** by DRA-165 (DRA-144 F1) under DRA-26 plan §5 as David SIGNed it
+2026-09-17T01:06:45Z. `exo-experiment: channel-rotation`. Tier T1.
+Pass 2 appended into the existing `FABLE-FEEDBACK.md` archive; it moved nothing
+that pass 1 had already written.
 
 Holds live in `HELM.md` and **only Helm lifts one**. An archived line never
 revives a hold and never commissions work. If you are looking for something to
@@ -18,8 +21,11 @@ do, the inboxes are `SCRIBE.md`, `BEVEL.md` and `FABLE.md` — not this director
 |---|---:|---:|---|---|
 | [`HELM-FEEDBACK.md`](HELM-FEEDBACK.md) | 390 | 1,914,317 | 5.0 MB → 117 KB (24 entries) | everything below the readable 2026-09-09+ set |
 | [`FABLE-FEEDBACK.md`](FABLE-FEEDBACK.md) | 139 | 1,006,791 | 1.1 MB → 174 KB (35 entries) | before 2026-09-08 |
+| [`FABLE-FEEDBACK.md`](FABLE-FEEDBACK.md) *(pass 2)* | 49 | 226,720 | 265 KB → 39 KB (10 entries) | before 2026-09-15 |
 
-No pending ask was archived. The live `HELM-FEEDBACK.md` asks — including the
+No pending ask was archived in either pass — pass 2's 18 candidate ask/hold
+markers were each dispositioned before the move and all 18 were already discharged,
+so nothing needed re-pinning.  The live `HELM-FEEDBACK.md` asks — including the
 unsigned **PR #606** DRA-71 D9 ask — are still in the active file.
 
 ### Three files, and which one to read
