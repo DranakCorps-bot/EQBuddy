@@ -342,7 +342,7 @@
             <TextBlock x:Name="CountsNote" TextWrapping="Wrap"
                        FontSize="{DynamicResource FontMetadata}"
                        Foreground="{DynamicResource DimBrush}"
-                       Text="After you scan bags, the count is your dump, then the log since. Hand-ins aren't in the log — use Mark as turned in, or right-click a row to clear it."/>
+                       Text="After you scan bags, the count is your dump, then the log since - loot adds; hand-ins, sales and destroys subtract. Runes kept in currency never show in a dump, so they count from the log alone. A * tick is EQBuddy's guess: right-click a row to clear it."/>
             <TextBlock x:Name="WikiNote" TextWrapping="Wrap"
                        Margin="{DynamicResource StackXs}"
                        FontSize="{DynamicResource FontMetadata}"

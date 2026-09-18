@@ -704,6 +704,17 @@ public static class QuestChecklistLayout
     /// thing on every screen.</summary>
     public static string RewardKey(string className, string reward) => className + "|" + reward;
 
+    /// <summary>Every item the Sky and Epic loot auto-ticks can match, as base names. The
+    /// auto-ticks key on loot the quest ledger ACCEPTS (its persisted time gate is what
+    /// stops the launch replay ticking a row twice), so the ledger's filter must admit all
+    /// of these whether or not the wiki catalog lists them as turn-ins - an item the filter
+    /// refused could never tick anything.</summary>
+    public static HashSet<string> AutoTickItemNames(AppSettings settings) => new(
+        settings.SkyQuestChecklist.Select(i => QuestCatalog.BaseItemName(i.QuestItem))
+            .Concat(settings.EpicQuestChecklist.SelectMany(i => i.ItemNames))
+            .Where(n => n.Length > 0),
+        StringComparer.OrdinalIgnoreCase);
+
     /// <summary>
     /// The settings-only half of "mark a Sky reward turned in" — idempotent, and returns
     /// whether THIS call was the transition into turned-in.

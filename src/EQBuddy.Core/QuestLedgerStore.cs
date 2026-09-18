@@ -26,14 +26,21 @@ public sealed class QuestLedgerStore
     {
         public int Looted { get; set; }
         public int Manual { get; set; }
-        /// <summary>Items the log saw leave: merchant sales, destroys, and merges (two
-        /// become one). Hand-ins still aren't logged — that stays the ✔ click.</summary>
+        /// <summary>Items the log saw leave: merchant sales, destroys, merges (two become
+        /// one), and hand-ins - EQL does log those, as "You offered ... / You complete the
+        /// trade with ..." (Hateborne, 2026-09-18).</summary>
         public int Consumed { get; set; }
+        /// <summary>The log has seen this item auto-stored somewhere an inventory dump cannot
+        /// see (currency, the tradeskill depot). <see cref="ReconcileInventory"/> leaves such
+        /// an entry alone when the dump does not list it - "absent from the dump" means
+        /// nothing for an item that never lives in your bags. Since 2026-09-16 that is every
+        /// Wind Rune.</summary>
+        public bool OffDump { get; set; }
         public DateTime LastTime { get; set; }
         /// <summary>What the player's own <c>/outputfile inventory</c> dump said this
         /// character held, as of <see cref="VerifiedAt"/> (#241, DasGud) — the game's own
         /// statement of possession, strictly better information than a log tally that
-        /// cannot see hand-ins. Set only by <see cref="ReconcileInventory"/>, which zeroes
+        /// cannot see off-log acquisitions or mail. Set only by <see cref="ReconcileInventory"/>, which zeroes
         /// <see cref="Looted"/>, <see cref="Manual"/> and <see cref="Consumed"/> in the same
         /// stroke: the dump supersedes everything derived before it, not just this field.</summary>
         public int Verified { get; set; }
@@ -321,34 +328,50 @@ public sealed class QuestLedgerStore
 
     /// <summary>Offer a loot event. Ignored unless the filter admits the item and the
     /// timestamp beats the item's high-water mark (see class remarks).</summary>
-    public void RecordLoot(string characterKey, string item, int count, DateTime time)
+    /// <param name="offDump">The line said the item was auto-stored where an inventory
+    /// dump cannot see it. Learned BEFORE the time gate, so a replayed line teaches it
+    /// too.</param>
+    /// <returns>True only when the loot was NEW - the replay-safe signal the Sky and Epic
+    /// loot auto-ticks key on, so a re-read log cannot tick a checklist twice.</returns>
+    public bool RecordLoot(string characterKey, string item, int count, DateTime time,
+        bool offDump = false)
     {
         item = Normalize(item);
-        if (characterKey.Length == 0 || count <= 0 || !TrackFilter(item)) return;
+        if (characterKey.Length == 0 || count <= 0 || !TrackFilter(item)) return false;
         lock (_lock)
         {
             var entry = EntryFor(characterKey, item);
-            if (time <= entry.LastTime) return;
+            var learned = offDump && !entry.OffDump;
+            if (learned) entry.OffDump = true;
+            if (time <= entry.LastTime)
+            {
+                if (learned) Save();
+                return false;
+            }
             entry.Looted += count;
             entry.LastTime = time;
             Save();
+            return true;
         }
     }
 
-    /// <summary>The item left the world: a merchant sale, a destroy, or a merge (two
-    /// tiers became one). Same filter, normalization, and replay-safe time gate as
+    /// <summary>The item left the world: a merchant sale, a destroy, a merge (two tiers
+    /// became one), or a hand-in. Same filter, normalization, and replay-safe time gate as
     /// <see cref="RecordLoot"/> — the startup replay re-offers these too.</summary>
-    public void RecordConsumed(string characterKey, string item, int count, DateTime time)
+    /// <returns>True only when the exit was NEW, so the Sky tab can take back guesses the
+    /// lower count no longer covers.</returns>
+    public bool RecordConsumed(string characterKey, string item, int count, DateTime time)
     {
         item = Normalize(item);
-        if (characterKey.Length == 0 || count <= 0 || !TrackFilter(item)) return;
+        if (characterKey.Length == 0 || count <= 0 || !TrackFilter(item)) return false;
         lock (_lock)
         {
             var entry = EntryFor(characterKey, item);
-            if (time <= entry.LastTime) return;
+            if (time <= entry.LastTime) return false;
             entry.Consumed += count;
             entry.LastTime = time;
             Save();
+            return true;
         }
     }
 
@@ -364,6 +387,10 @@ public sealed class QuestLedgerStore
     /// because the dump supersedes everything derived before it. A Manual count meaning "my
     /// mule holds two" is truthfully wrong about what THIS character carries, and the dump
     /// wins — the cost is one +1 click if that was ever a real statement.
+    ///
+    /// The one exception is an off-dump item (<see cref="IsOffDump(string, string)"/>) the dump
+    /// does not list: it lives in currency or the depot, which the dump never shows, so
+    /// absence proves nothing and the entry is left exactly as the log built it.
     ///
     /// Idempotent by a per-character watermark: a <paramref name="writtenAt"/> at or before
     /// the last reconcile is a no-op, so the launch replay (which re-offers the same
@@ -394,6 +421,9 @@ public sealed class QuestLedgerStore
             var trued = 0;
             foreach (var item in union)
             {
+                // Currency and depot items never appear in the dump, so their absence is
+                // not a zero - squaring them would erase runes the player holds.
+                if (!counts.ContainsKey(item) && IsOffDump(c, item)) continue;
                 var entry = EntryFor(characterKey, item);
                 var verified = counts.TryGetValue(item, out var n) ? n : 0;
                 var totalBefore = entry.Total;
@@ -481,6 +511,20 @@ public sealed class QuestLedgerStore
         }
     }
 
+    /// <summary>Whether an inventory dump is blind to this item: the log has shown it
+    /// auto-stored off the bags, or it is a known currency item
+    /// (<see cref="CurrencyItems"/>). Such an item's count comes from the log alone, so a
+    /// dump must not square it and a scan must not act on it.</summary>
+    public bool IsOffDump(string characterKey, string item)
+    {
+        item = Normalize(item);
+        lock (_lock)
+            return _byCharacter.TryGetValue(characterKey, out var c) ? IsOffDump(c, item) : CurrencyItems.IsKnown(item);
+    }
+
+    private static bool IsOffDump(CharacterLedger c, string item) =>
+        CurrencyItems.IsKnown(item) || c.Items.TryGetValue(item, out var e) && e.OffDump;
+
     /// <summary>Item → owned counts for one character (copy; empty when unknown).</summary>
     public Dictionary<string, Entry> For(string characterKey)
     {
@@ -492,6 +536,7 @@ public sealed class QuestLedgerStore
                         Looted = kv.Value.Looted, Manual = kv.Value.Manual,
                         Consumed = kv.Value.Consumed, LastTime = kv.Value.LastTime,
                         Verified = kv.Value.Verified, VerifiedAt = kv.Value.VerifiedAt,
+                        OffDump = kv.Value.OffDump,
                     },
                     StringComparer.OrdinalIgnoreCase)
                 : new(StringComparer.OrdinalIgnoreCase);

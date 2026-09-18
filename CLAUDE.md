@@ -1386,6 +1386,21 @@ after the named guard left with its surface.
     repay capturing). Count BY MODE, print every bucket including the zeroes, and fire each one
     on demand in the same commit.
 
+85. **A high-water mark held in RAM, over a log that is RE-READ every launch, is not a
+    high-water mark - it re-applies the same lines on every restart.** The Sky and Epic
+    loot auto-ticks diffed session loot against a dictionary that launch, session start,
+    character switch and review all cleared, while `LogWatcher` replays the whole file each
+    time. So one looted Wind Rune parked one more `*` guess on the NEXT class's row per
+    restart, until Hateborne (2026-09-18) had runes "held" across six classes with none in
+    his bags. The quest ledger beside it had solved exactly this in August with a PERSISTED
+    per-item time gate, and said so in its own class comment. -> **A consumer of replayed
+    events keys on a persisted gate, never on "what I have seen since I started".** The
+    auto-ticks now tick only loot `QuestLedgerStore.RecordLoot` accepts (`QuestLedgerFeed`,
+    `ChecklistLedgerSync`); pinned by `SkyGuessReconcileTests.ARelaunchReplayingTheSameLootTicksNothingNew`.
+    -> **And a story the codebase tells itself can be false.** "Hand-ins aren't in the log"
+    stood in two surfaces and three doc comments; EQL writes "You offered ... / You complete
+    the trade with ..." for every one (`HandInTracker`). Read the player's log before the comment.
+
 New trap discovered the hard way? Add the compact rule here and the novel
 under `docs/ops/claude-archive/traps.md`. That is the whole point.
 

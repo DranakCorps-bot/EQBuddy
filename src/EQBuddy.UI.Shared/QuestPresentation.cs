@@ -137,7 +137,9 @@ public static class QuestPresentation
     ///
     /// Three states, Bevel's words: reconciled with nothing logged since; reconciled with
     /// loot or a hand-in landing after; never reconciled at all, so the number is a log
-    /// tally that cannot see hand-ins.</summary>
+    /// tally - loot in, hand-ins, sales and destroys out (EQL logs hand-ins as "You offered
+    /// ... / You complete the trade with ...", Hateborne 2026-09-18), blind only to what never
+    /// touched the log.</summary>
     public static string TurnInProvenanceText(
         IReadOnlyList<QuestItemProgress> items,
         IReadOnlyDictionary<string, QuestLedgerStore.Entry> owned, DateTime now)
@@ -152,7 +154,7 @@ public static class QuestPresentation
             if (e.VerifiedAt > dumpAt) dumpAt = e.VerifiedAt;
             if (e.Looted != 0 || e.Manual != 0 || e.Consumed != 0) movedSince = true;
         }
-        if (!everDumped) return "from your log — hand-ins aren't in the log";
+        if (!everDumped) return "from your log - loot in, hand-ins and sales out";
         var age = WikiFreshness.Ago(now - dumpAt);
         return movedSince
             ? $"from your inventory dump, {age} · plus loot since"

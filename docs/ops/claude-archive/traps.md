@@ -2499,3 +2499,47 @@ lesson, one layer up.
 
 Prove-failed against six mutants, with every allow-list row exercised (trap 78: a
 dead row has no symptom).
+
+### Trap 85
+
+85. **A HIGH-WATER MARK HELD IN RAM, OVER A LOG THAT IS RE-READ EVERY LAUNCH, IS NOT A
+HIGH-WATER MARK.** Hateborne, 2026-09-18: *"I do not have the 'High Quality Raiment' or
+'Wind Rune Meda', but the current tool is convinced that I do."*
+
+**What the profile said.** Every wrong row was a `*` guess - `SkyLootAutoCheck` rule 3,
+which parks ONE tick on the first open row when several classes want an item and none
+passed the class lens. His quest ledger was right (0 of each, squared to his dump that
+morning); the Sky rows read a separate saved bool that loot set and nothing ever cleared.
+68 rows carried a `*`. Wind Rune Azia alone was starred on six classes after about two
+were ever looted.
+
+**Why one loot became six ticks.** `QuestChecklistView` diffed the snapshot's session loot
+against `_skyQuestLootSeen`, a dictionary cleared on launch, on session start, on character
+switch and on review. `LogWatcher.Select` re-reads the whole current log each time. So each
+launch offered the same `--You have looted a Wind Rune Meda--` line again; the row it ticked
+last time was full, so rule 3 parked the next `*` on the next class. The ledger's own class
+comment described the fix it had used since August - a persisted per-item time gate that
+bounces a replayed line - and the checklist beside it never used it.
+
+**Why nothing took a tick back.** The codebase believed hand-ins never reach the log, and
+said so in the Quest Tracker's footer, the provenance sentence and `Entry.Consumed`. His log
+disagreed on the first grep:
+
+```
+You offered 1 Light Woolen Mask to Cilin Spellsinger.
+You offered 1 Wind Rune Meda to Cilin Spellsinger.
+You complete the trade with Cilin Spellsinger.
+Wizard Schrock says, 'I have no need for this, <name>. You can have it back.'
+```
+
+**The second-order catch.** Since 2026-09-16 every Wind Rune loots "...and stored it in your
+currency", and an inventory dump has no currency section - so every scan since recorded every
+rune as ZERO. A first cut that took back guesses against the ledger would have cleared 55 of
+his 68, many for runes he holds, and done the same to every player on update. Hateborne's
+call: a scan never judges a rune (`CurrencyItems`, `Entry.OffDump`); only a logged hand-in
+takes one back, one guess per rune.
+
+**The fix.** The auto-ticks key on loot the ledger ACCEPTS (`QuestLedgerFeed`,
+`ChecklistLedgerSync`); `HandInTracker` turns trades into ledger exits; `SkyGuessReconcile`
+takes back only `*` guesses the count no longer covers. Found by an offline replay of his
+archive against a COPY of his profile: the whole archive replayed twice ticks nothing new.
