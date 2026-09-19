@@ -64,9 +64,50 @@ Two rules the general path enforces that DRA-75 did not need:
 Byte conservation (preamble + archived + kept == input) is asserted before any
 write. This tool MOVES bytes; it never rewrites them.
 
+DRA-211 made the SECOND rotation of a file safe, which is what DRA-154's weekly
+cadence produces by construction. DRA-207 left two things contained rather than
+fixed, and they were related:
+
+  * A rotation marker is a dated entry and archived ITSELF. `FABLE-FEEDBACK.md`
+    opens with `## 2026-09-14 / 2026-09-17 - THIS CHANNEL HAS BEEN ROTATED
+    TWICE ...`, whose own body says "This marker stays live in every future
+    pass"; `BEVEL-FEEDBACK.md` line 1 is the same shape. `block_date` reads
+    2026-09-14 off both, so any later cutoff moved the file's own rotation
+    record into the archive. Markers are now HELD LIVE regardless of date --
+    a marker is metadata ABOUT the file, not an entry of its history.
+
+  * `--force` was a one-way door: the archive write was `write_bytes(header +
+    moved)`, which REPLACES. Every archive write now goes through
+    `write_archive`, which refuses any proposal that is not a byte-prefix
+    extension of what is already on disk. That refusal is UNCONDITIONAL --
+    `--force` cannot override it, because the whole point is that no flag
+    should be able to drop archived history.
+
+  The append question is answered APPEND, not a new dated file per pass. That
+  is what DRA-165's hand-carried second FABLE pass already did (both passes are
+  in the one immutable `2026-Q3/FABLE-FEEDBACK.md`, and the live marker table
+  records them that way), and it keeps true the one path the live pointer
+  names. A second pass writes a `## ` PASS MARKER into the archive ahead of its
+  entries -- a heading of its own on purpose, because an unheaded separator
+  would be swallowed by the last archived entry, and `verify` compares entries
+  byte-for-byte, so it would report real history as LOST.
+
+  The append machinery (`write_archive`, the prefix refusal, the pass marker)
+  is DRA-175's, written on PR #696 against pre-DRA-207 main and never merged;
+  DRA-211 carries it onto the generalised `rotate_file` path. #696 additionally
+  holds the `rotate_helm` zero-flattened-lines SKIP and the nothing-to-move
+  guard for the frozen pair, which are still its to land.
+
+A second pass does NOT write a second pointer. The active file's pointer block
+is hand-written prose (DRA-165 consolidated two passes into one table);
+regenerating it would be an Executor trimming channel content (DRA-26 rev 3
+section 5), so the tool REPORTS the cumulative numbers an appended pass makes
+stale instead of inventing a third pointer that contradicts the other two.
+
 Pick the unit and the date source per file from `report`; do not guess them.
 `report --show-blocks` lists every entry with its resolved date and its
-archive/keep disposition -- read that back before rotating anything.
+archive/keep/hold disposition -- read that back before rotating anything.
+`selftest` proves the DRA-211 arms and proves the refusal FIRES (trap 78).
 """
 
 from __future__ import annotations
@@ -77,7 +118,19 @@ import hashlib
 import re
 import subprocess
 import sys
+import tempfile
 from pathlib import Path
+
+# `report --show-blocks` prints real channel headings, which carry em-dashes and
+# arrows. Windows hands this process a cp1252 stdout, so the pre-flight the
+# module docstring tells you to read back crashed with UnicodeEncodeError on the
+# first heading containing U+2192 -- on FABLE-FEEDBACK.md, today. A diagnostic
+# must never be the thing that fails.
+for _stream in (sys.stdout, sys.stderr):
+    try:
+        _stream.reconfigure(encoding="utf-8", errors="replace")
+    except (AttributeError, ValueError):  # pragma: no cover - redirected streams
+        pass
 
 REPO = Path(__file__).resolve().parent.parent
 ARCHIVE_DIR = "docs/ops/claude-archive/channels/2026-Q3"
@@ -154,6 +207,90 @@ def entry_date(heading: bytes, block: bytes, source: str = "heading"):
 
 def dated_of(blocks, source: str = "heading"):
     return [(entry_date(h, b, source), h, b) for h, b in blocks]
+
+
+# A rotation marker is a dated entry, so a date partition archives the file's
+# own rotation record and the live file loses it. It is metadata ABOUT the file,
+# not an entry of its history, so it is HELD regardless of date.
+#
+# Calibrated against every level-2 and level-3 heading in all nine ledgers (618
+# h2 headings): this matches 2, and they are exactly the two live markers --
+#   FABLE-FEEDBACK.md  "## 2026-09-14 / 2026-09-17 - THIS CHANNEL HAS BEEN
+#                       ROTATED TWICE (pass 1: ... pass 2: ...)"
+#   BEVEL-FEEDBACK.md  "## 2026-09-14 - WHERE THE HISTORY WENT: two channel
+#                       files rotated, and yours is the next candidate ..."
+# Eight other headings contain the substring "rotat" (HELM.md x4,
+# HELM-FEEDBACK.md x2, DECISIONS.md x2) and none of them match -- they are
+# rulings and decisions ABOUT rotation, which are ordinary history and must
+# still age out. That margin is why this is phrase-anchored rather than a
+# `rotat` substring test.
+#
+# Prose matching is a guess, so it is never silent: every held entry is printed
+# by `report` and by `rotate`, with its heading, before anything is written.
+# `--hold` adds a substring (SCRIBE-FEEDBACK.md's re-pinned standing rules were
+# held by hand this way) and `--no-marker-hold` turns the default off.
+HOLD_MARKER_RE = re.compile(
+    rb"(?i)\b(this channel (has been|was) rotated"
+    rb"|where the history went"
+    rb"|(channel|history) rotated"
+    rb"|rotation (pass|marker|pointer))\b"
+)
+
+
+def is_held(heading: bytes, holds: tuple = (), marker_hold: bool = True) -> str:
+    """Return the reason this entry is held live, or "" if it is not.
+
+    The reason is returned rather than a bool so the operator reads WHY a
+    dated entry stayed behind, not just that one did.
+    """
+    if marker_hold and HOLD_MARKER_RE.search(heading[:200]):
+        return "rotation marker"
+    for h in holds:
+        if h.lower().encode("utf-8") in heading.lower():
+            return f"--hold {h!r}"
+    return ""
+
+
+class ArchiveReplace(Exception):
+    """A rotation tried to REPLACE archived bytes instead of adding to them."""
+
+
+def _common_prefix(a: bytes, b: bytes) -> bytes:
+    n = 0
+    for x, y in zip(a, b):
+        if x != y:
+            break
+        n += 1
+    return a[:n]
+
+
+def write_archive(path: Path, proposed: bytes, apply: bool) -> bytes:
+    """Write an archive, refusing anything that is not a pure APPEND.
+
+    DRA-175 / PR #696. The caller composes the whole proposed file; this asks
+    one question of it -- does it still START with every byte already on disk?
+    That is what makes the refusal reachable: the DRA-75 composition
+    (`header + moved`) fails it, and `selftest` runs exactly that composition to
+    watch it fire. A size check alone would pass a same-length rewrite.
+
+    There is deliberately no force parameter. `--force` exists to let an
+    operator past the already-rotated tells; it must not be able to drop
+    archived history, which is the whole defect DRA-211 was opened on.
+    """
+    existing = path.read_bytes() if path.exists() else b""
+    if existing and not proposed.startswith(existing):
+        keep = len(_common_prefix(existing, proposed))
+        raise ArchiveReplace(
+            f"{path.name}: REFUSED — this is a replace, not an append. "
+            f"{len(existing):,}B are archived; the proposal agrees with the "
+            f"first {keep:,}B and then diverges, dropping {len(existing)-keep:,}B "
+            f"of archived history. Q3 archives are immutable (Helm, 2026-09-17); "
+            f"no flag overrides this."
+        )
+    if apply:
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_bytes(proposed)
+    return existing
 
 
 def sha(data: bytes) -> str:
@@ -268,6 +405,32 @@ def pointer_text(through, archive, count, size, *, card, date):
     ).encode("utf-8")
 
 
+# A LATER pass's marker, written into the ARCHIVE ahead of that pass's entries.
+# It is a heading block of its own on purpose: anything without a heading would
+# be swallowed by the last already-archived entry, changing that entry's bytes
+# -- and `verify` compares entries byte-for-byte, so a decorative separator
+# would report real history as LOST. DRA-175 / PR #696, with the card and date
+# parameterised the way DRA-207 parameterised the header and the pointer.
+#
+# `{hashes}` is the rotation's own --unit, not a hardcoded `##`. A level-2
+# marker in a level-3 file (SCRIBE.md) is not a block at that unit: it would be
+# swallowed by the preceding entry, which is the exact failure the heading is
+# there to avoid, one unit over.
+PASS_MARKER = """{hashes} {date} — ROTATION PASS APPENDED ({card}; entries dated before {through})
+
+Everything BELOW this line was moved out of the active `{name}` by
+`scripts/channel-rotate.py rotate --apply` in a later pass than the one this
+file's header above describes. Nothing above this line was touched: the write is
+a byte-exact append, and `write_archive` refuses any proposal that is not a
+prefix extension of what was already on disk.
+
+- Entries appended in this pass: **{count}**
+- Bytes appended: **{size:,}**  (sha {sha})
+
+---
+
+"""
+
 HF_NOTE = """**This archive is RECOVERED TEXT, not the bytes that were in the file.**
 Commit `c7a597a8` flattened the entire 12,254-line `HELM-FEEDBACK.md` onto a
 single line and re-encoded it through cp437 (trap 60c); a later append did it
@@ -291,11 +454,16 @@ def fmt_date(d) -> str:
 
 def cmd_report(args):
     cutoff = tuple(int(x) for x in args.cutoff.split("-"))
+    holds = tuple(getattr(args, "hold", ()) or ())
+    marker_hold = not getattr(args, "no_marker_hold", False)
     for name in args.files:
         data = (REPO / name).read_bytes()
         preamble, blocks = split_blocks(data, args.unit)
         dated = dated_of(blocks, args.date_from)
-        old = [x for x in dated if x[0] is not None and x[0] < cutoff]
+        reasons = [is_held(h, holds, marker_hold) for _, h, _ in dated]
+        held = [x for x, r in zip(dated, reasons) if r]
+        old = [x for x, r in zip(dated, reasons)
+               if not r and x[0] is not None and x[0] < cutoff]
         undated = [x for x in dated if x[0] is None]
         dates = sorted(d for d, _, _ in dated if d)
         print(f"{name}")
@@ -322,12 +490,27 @@ def cmd_report(args):
               f"{sum(len(b) for _, _, b in old):,}B")
         print(f"  undated (never archived by a date cut, kept live): "
               f"{len(undated)} blocks / {sum(len(b) for _, _, b in undated):,}B")
+        # Held entries are ALWAYS named, never just counted: the hold is decided
+        # by matching prose, and a silent prose match is a guess nobody audited.
+        # Under --show-blocks the listing below already names them with their
+        # reason, and printing them twice under a count of 1 reads as two holds.
+        print(f"  held live regardless of date: {len(held)} blocks / "
+              f"{sum(len(b) for _, _, b in held):,}B")
+        if not args.show_blocks:
+            for (d, h, b), r in ((x, y) for x, y in zip(dated, reasons) if y):
+                print(f"    HOLD ({r}) {fmt_date(d)} {len(b):,}B  "
+                      f"{h.rstrip(chr(13).encode()).decode('utf-8', 'replace')[:88]}")
 
         if args.show_blocks:
-            for d, h, b in dated:
-                mark = "ARCHIVE" if (d is not None and d < cutoff) else "keep   "
+            for (d, h, b), r in zip(dated, reasons):
+                if r:
+                    mark = f"HOLD ({r})"
+                elif d is not None and d < cutoff:
+                    mark = "ARCHIVE"
+                else:
+                    mark = "keep"
                 head = h.rstrip(b"\r").decode("utf-8", "replace")[:88]
-                print(f"    {mark} {fmt_date(d)} {len(b):>8,}B  {head}")
+                print(f"    {mark:<24} {fmt_date(d)} {len(b):>8,}B  {head}")
         print()
 
 
@@ -350,9 +533,13 @@ def rotate_fable(cutoff, through, apply: bool):
         card=DRA75_CARD, date=DRA75_DATE,
     )
 
+    # The composition is DRA-75's, unchanged; only the write is routed through
+    # the append guard. On the pristine tree there is no archive, so this is a
+    # no-op and the bytes are identical -- that is a done-bar condition. On a
+    # tree DRA-75 has already rotated it stops this path replacing the archive,
+    # which is the same one-way door DRA-211 closed on rotate_file.
+    write_archive(REPO / ARCHIVE_DIR / name, header + moved, apply)
     if apply:
-        (REPO / ARCHIVE_DIR).mkdir(parents=True, exist_ok=True)
-        (REPO / ARCHIVE_DIR / name).write_bytes(header + moved)
         (REPO / name).write_bytes(pointer + preamble + b"".join(new))
     print(f"{name}: {len(data):,}B -> active {len(pointer)+len(preamble)+sum(len(b) for b in new):,}B "
           f"+ archive {len(header)+len(moved):,}B   moved={len(old)} kept={len(new)} "
@@ -425,9 +612,11 @@ def rotate_helm(apply: bool):
     raw_name = name.replace(".md", ".original-flattened.md")
 
     active = pointer + rest.lstrip(b"\r\n")
+    # Same append guard as everywhere else; a no-op on the pristine tree this
+    # path is written for, and a refusal rather than a replace on any other.
+    write_archive(REPO / ARCHIVE_DIR / name, header + moved, apply)
     if apply:
         (REPO / ARCHIVE_DIR).mkdir(parents=True, exist_ok=True)
-        (REPO / ARCHIVE_DIR / name).write_bytes(header + moved)
         (REPO / ARCHIVE_DIR / raw_name).write_bytes(
             raw_header + b"\n".join(flat) + b"\n"
         )
@@ -442,23 +631,36 @@ def rotate_helm(apply: bool):
 
 
 def rotate_file(name, cutoff, through, *, card, date, unit=DEFAULT_UNIT,
-                date_source="heading", apply=False, force=False, holds=""):
+                date_source="heading", apply=False, force=False, holds="",
+                hold_terms=(), marker_hold=True, repo: Path | None = None):
     """Date-rotate one file. The general path: `report` and `rotate` agree
-    because both partition through split_blocks(data, unit) and date through
-    dated_of(blocks, source).
+    because both partition through split_blocks(data, unit), date through
+    dated_of(blocks, source), and hold through is_held(heading).
 
     Undated entries are KEPT LIVE, never archived by a date cut -- an entry with
     no date has not been shown to be old.
+
+    Rotation markers are KEPT LIVE regardless of date. A marker is a dated `## `
+    entry, so a naive date cut moves the file's own rotation record into the
+    archive; it is metadata ABOUT the file, not an entry of its history.
+
+    A SECOND pass APPENDS to the existing archive behind a pass marker, and
+    writes no second pointer. It cannot replace: every archive write goes
+    through `write_archive`.
     """
-    data = (REPO / name).read_bytes()
+    repo = repo or REPO
+    data = (repo / name).read_bytes()
     preamble, blocks = split_blocks(data, unit)
     if not blocks:
         print(f"{name}: no level-{unit} headings -- wrong unit, nothing done")
         return 1
 
     dated = dated_of(blocks, date_source)
-    old = [b for d, _, b in dated if d is not None and d < cutoff]
-    new = [b for d, _, b in dated if d is None or d >= cutoff]
+    reasons = [is_held(h, hold_terms, marker_hold) for _, h, _ in dated]
+    old = [b for (d, _, b), r in zip(dated, reasons)
+           if not r and d is not None and d < cutoff]
+    new = [b for (d, _, b), r in zip(dated, reasons)
+           if r or d is None or d >= cutoff]
 
     # This tool MOVES bytes; it never rewrites them. Every byte of the input is
     # in exactly one of preamble / archived / kept. Asserted before any write.
@@ -469,65 +671,121 @@ def rotate_file(name, cutoff, through, *, card, date, unit=DEFAULT_UNIT,
         f"({len(preamble)}+{len(moved)}+{len(kept)} != {len(data)})"
     )
 
+    for (d, h, b), r in ((x, y) for x, y in zip(dated, reasons) if y):
+        print(f"{name}: HELD LIVE ({r}) {fmt_date(d)} {len(b):,}B  "
+              f"{h.rstrip(chr(13).encode()).decode('utf-8', 'replace')[:88]}")
+
     if not old:
         print(f"{name}: nothing older than {through} -- nothing to rotate")
         return 0
 
-    archive_path = REPO / ARCHIVE_DIR / name
-    # Re-running a rotation on an already-rotated file OVERWRITES the previous
-    # archive with a smaller one and reports success -- the prior history is
-    # gone and the run looks green. Refuse both tells unless forced.
-    if archive_path.exists() and not force:
-        print(f"{name}: REFUSING -- {ARCHIVE_DIR}/{name} already exists. Re-running a "
-              f"rotation overwrites the earlier archive and still reports success. "
-              f"Archive the existing file under a new name first, or pass --force.")
+    archive_path = repo / ARCHIVE_DIR / name
+    existing = archive_path.read_bytes() if archive_path.exists() else b""
+    pointer_present = b"history rotated" in data[:4000].lower()
+
+    # The two already-rotated tells still gate a second pass behind --force,
+    # because a second pass makes the active file's hand-written pointer prose
+    # stale and a human has to fix it. What --force can no longer do is drop
+    # archived history: the composition below is an APPEND and write_archive
+    # refuses anything else, with no override.
+    if existing and not force:
+        print(f"{name}: REFUSING -- {ARCHIVE_DIR}/{name} already exists "
+              f"({len(existing):,}B, {len(split_blocks(existing, unit)[1])} entries). "
+              f"--force now APPENDS behind a pass marker and cannot overwrite it, "
+              f"but it leaves this file's pointer prose naming pass-1 numbers only. "
+              f"Pass --force once you are willing to correct that prose by hand.")
         return 1
-    if b"history rotated" in data[:4000].lower() and not force:
-        print(f"{name}: REFUSING -- the file already carries a rotation pointer. "
-              f"Rotate from the live working set, or pass --force.")
+    if pointer_present and not existing and not force:
+        print(f"{name}: REFUSING -- the file carries a rotation pointer but "
+              f"{ARCHIVE_DIR}/{name} does not exist. The archive this pointer names "
+              f"has been moved or renamed; find it before rotating, or pass --force "
+              f"to start a fresh archive at that path.")
         return 1
 
-    header = archive_header(name, through, "", len(old), len(moved),
-                            card=card, date=date, holds=holds)
-    pointer = pointer_text(through, f"{ARCHIVE_DIR}/{name}", len(old), len(moved),
-                           card=card, date=date)
+    if existing:
+        # SECOND pass onward. The first pass's header stays exactly as written
+        # -- a second header would be a second file claiming to be this one --
+        # and the new entries go on the END behind a marker naming the pass.
+        addition = PASS_MARKER.format(
+            hashes="#" * unit, date=date, card=card, name=name, through=through,
+            count=len(old), size=len(moved), sha=sha(moved),
+        ).encode("utf-8") + moved
+        proposed = existing + addition
+    else:
+        addition = archive_header(name, through, "", len(old), len(moved),
+                                  card=card, date=date, holds=holds) + moved
+        proposed = addition
+
+    # No second pointer. The active file's pointer block is hand-written prose
+    # (DRA-165 consolidated two passes into one table); regenerating it would be
+    # an Executor trimming channel content, DRA-26 rev 3 section 5. The tool
+    # reports the numbers this pass makes stale instead.
+    #
+    # An EXISTING ARCHIVE suppresses the pointer just as a present pointer does,
+    # and that is not belt-and-braces. The template says "({count} entries,
+    # {size} bytes)" and means the whole archive; on any pass after the first
+    # those are this pass's numbers, so writing it would state a smaller archive
+    # than the one on disk. A pointer that undercounts the archive is the same
+    # class of false-green the replace was.
+    pointer = b"" if (existing or pointer_present) else pointer_text(
+        through, f"{ARCHIVE_DIR}/{name}", len(old), len(moved),
+        card=card, date=date,
+    )
     active = pointer + preamble + kept
 
+    write_archive(archive_path, proposed, apply)
     if apply:
-        (REPO / ARCHIVE_DIR).mkdir(parents=True, exist_ok=True)
-        archive_path.write_bytes(header + moved)
-        (REPO / name).write_bytes(active)
+        (repo / name).write_bytes(active)
+
+    verb = "append" if existing else "create"
     print(f"{name}: {len(data):,}B -> active {len(active):,}B + archive "
-          f"{len(header)+len(moved):,}B   moved={len(old)} kept={len(new)} "
+          f"{len(existing):,}B +{len(addition):,}B = {len(proposed):,}B ({verb})   "
+          f"moved={len(old)} kept={len(new)} "
           f"undated-kept={sum(1 for d, _, _ in dated if d is None)} "
-          f"moved-sha={sha(moved)}")
+          f"held={sum(1 for r in reasons if r)} moved-sha={sha(moved)}")
     print(f"  unit=h{unit} date-from={date_source} stamp={card} {date}")
+    if existing or pointer_present:
+        cum_blocks = split_blocks(proposed, unit)[1]
+        markers = sum(1 for h, _ in cum_blocks if b"ROTATION PASS APPENDED" in h)
+        print(f"  NO new pointer was written; the existing pointer prose was left "
+              f"alone and now names pass-1 numbers only. Cumulative after this pass: "
+              f"{len(cum_blocks) - markers} entries + {markers} pass marker(s) / "
+              f"{len(proposed):,}B in {ARCHIVE_DIR}/{name}. "
+              f"Correct the pointer and the live rotation marker by hand.")
     return 0
 
 
 def cmd_rotate(args):
     cutoff = tuple(int(x) for x in args.cutoff.split("-"))
-    if not args.files:
-        # No file named: the DRA-75 pair, on its frozen incident-specific path.
-        # These two encode recoveries (a cp437 de-mojibake, a flattened-line
-        # splice) that must NOT be generalised away.
-        rotate_helm(args.apply)
-        rotate_fable(cutoff, args.cutoff, args.apply)
-        if not args.apply:
-            print("\n(dry run -- pass --apply to write)")
-        return 0
+    try:
+        if not args.files:
+            # No file named: the DRA-75 pair, on its frozen incident-specific
+            # path. These two encode recoveries (a cp437 de-mojibake, a
+            # flattened-line splice) that must NOT be generalised away.
+            rotate_helm(args.apply)
+            rotate_fable(cutoff, args.cutoff, args.apply)
+            if not args.apply:
+                print("\n(dry run -- pass --apply to write)")
+            return 0
 
-    if not args.card:
-        print("rotate: --card is required (the card id stamped into the archive "
-              "header and the live pointer)")
+        if not args.card:
+            print("rotate: --card is required (the card id stamped into the archive "
+                  "header and the live pointer)")
+            return 2
+
+        rc = 0
+        for name in args.files:
+            rc |= rotate_file(name, cutoff, args.cutoff, card=args.card,
+                              date=args.date, unit=args.unit,
+                              date_source=args.date_from,
+                              apply=args.apply, force=args.force,
+                              holds=DRA75_HOLDS if args.holds else "",
+                              hold_terms=tuple(args.hold or ()),
+                              marker_hold=not args.no_marker_hold)
+    except ArchiveReplace as e:
+        print(f"\n*** {e}", file=sys.stderr)
+        print("*** nothing was written.", file=sys.stderr)
         return 2
-
-    rc = 0
-    for name in args.files:
-        rc |= rotate_file(name, cutoff, args.cutoff, card=args.card, date=args.date,
-                          unit=args.unit, date_source=args.date_from,
-                          apply=args.apply, force=args.force,
-                          holds=DRA75_HOLDS if args.holds else "")
     if not args.apply:
         print("\n(dry run -- pass --apply to write)")
     return rc
@@ -622,6 +880,190 @@ def cmd_verify(args):
     return 0 if ok else 1
 
 
+# The fixture is shaped like the real thing, not like a unit test: the marker
+# heading is FABLE-FEEDBACK.md's verbatim (two dates, the em-dash, the pass
+# parenthetical), because the hold is decided by matching that prose and a
+# fixture that paraphrases it would prove nothing about the file on disk.
+ST_MARKER = (
+    "## 2026-09-14 / 2026-09-17 — THIS CHANNEL HAS BEEN ROTATED TWICE "
+    "(pass 1: before 2026-09-08 · pass 2: before 2026-09-15)\n\n"
+    "This marker stays live in every future pass.\n\n"
+)
+ST_POINTER = (
+    "<!-- DRA-75: history before 2026-09-08 lives in the Q3 archive -->\n\n"
+    "> **History rotated 2026-09-14.** 2 entries moved.\n\n---\n\n"
+)
+ST_MOVE = "## 2026-09-09 — an entry the second pass should MOVE\n\nbody three\n\n"
+ST_KEEP = "## 2026-09-20 — an entry the second pass should KEEP\n\nbody four\n\n"
+ST_ARCHIVE_1 = (
+    "# ARCHIVE — FABLE-FEEDBACK.md (through 2026-09-08)\n\n"
+    "- Entries archived: **2**\n\n---\n\n"
+    "## 2026-09-01 — an entry from the first pass\n\nbody one\n\n"
+    "## 2026-09-02 — a second entry from the first pass\n\nbody two\n\n"
+)
+
+
+def cmd_selftest(args):
+    """Prove the DRA-211 arms, prove-failed rather than green-only (trap 78).
+
+    Every claim here is entry-count or byte arithmetic. "the guard reported
+    green" is explicitly not evidence -- the defect this card was opened on was
+    a run that reported success while deleting an archive.
+    """
+    checks: list[tuple[str, bool, str]] = []
+
+    def check(label, ok, detail=""):
+        checks.append((label, bool(ok), detail))
+
+    name = "FABLE-FEEDBACK.md"
+    cutoff, through = (2026, 9, 15), "2026-09-15"
+
+    with tempfile.TemporaryDirectory() as td:
+        tmp = Path(td)
+        (tmp / ARCHIVE_DIR).mkdir(parents=True)
+        arch = tmp / ARCHIVE_DIR / name
+        active = tmp / name
+        first_pass = ST_ARCHIVE_1.encode("utf-8")
+        arch.write_bytes(first_pass)
+        before = (ST_POINTER + ST_MARKER + ST_MOVE + ST_KEEP).encode("utf-8")
+        active.write_bytes(before)
+
+        def rot(**kw):
+            return rotate_file(name, cutoff, through, card="DRA-211",
+                               date="2026-09-22", apply=True, force=True,
+                               repo=tmp, **kw)
+
+        # ---- 1. PROVE-FAIL FIRST. Without the hold, the marker is archived.
+        #      This is the defect; if it does not reproduce, the hold below is
+        #      proving nothing.
+        rot(marker_hold=False)
+        check("prove-fail: WITHOUT the hold the marker is archived",
+              b"HAS BEEN ROTATED TWICE" in arch.read_bytes()
+              and b"HAS BEEN ROTATED TWICE" not in active.read_bytes())
+
+        # Reset and run the real path.
+        arch.write_bytes(first_pass)
+        active.write_bytes(before)
+        rot()
+        after_arch = arch.read_bytes()
+        after_act = active.read_bytes()
+
+        # ---- 2. The marker stays live, and only the dated entry moved.
+        check("marker is present in the live file after the second rotation",
+              ST_MARKER.encode("utf-8") in after_act)
+        check("marker did NOT reach the archive",
+              b"HAS BEEN ROTATED TWICE" not in after_arch)
+        check("the dated old entry moved, the new one stayed",
+              ST_MOVE.encode("utf-8") in after_arch
+              and ST_MOVE.encode("utf-8") not in after_act
+              and ST_KEEP.encode("utf-8") in after_act)
+
+        # ---- 3. Byte arithmetic on the ACTIVE file: exactly the moved entry
+        #      left, and nothing else changed.
+        check("active shrank by exactly the moved entry",
+              len(before) - len(after_act) == len(ST_MOVE.encode("utf-8")),
+              f"{len(before):,} - {len(after_act):,} = "
+              f"{len(before)-len(after_act):,}B, moved entry is "
+              f"{len(ST_MOVE.encode('utf-8')):,}B")
+
+        # ---- 4. Byte arithmetic on the ARCHIVE: every byte of the first pass
+        #      is still there, in place, and the growth is marker + entry.
+        check("archive still STARTS with the first pass byte-for-byte",
+              after_arch.startswith(first_pass),
+              f"{len(first_pass):,}B -> {len(after_arch):,}B")
+        grew = len(after_arch) - len(first_pass)
+        moved_b = ST_MOVE.encode("utf-8")
+        want_marker = PASS_MARKER.format(
+            hashes="##", date="2026-09-22", card="DRA-211", name=name,
+            through=through, count=1, size=len(moved_b), sha=sha(moved_b),
+        ).encode("utf-8")
+        check("archive grew by exactly pass-marker + moved entry",
+              grew == len(want_marker) + len(moved_b)
+              and after_arch[len(first_pass):] == want_marker + moved_b,
+              f"+{grew:,}B = marker {len(want_marker):,}B + entry {len(moved_b):,}B")
+
+        # ---- 5. Entry arithmetic: 2 first-pass entries + 1 pass marker + 1
+        #      appended entry, and both originals are still whole.
+        _, a_blocks = split_blocks(after_arch)
+        heads = [h for h, _ in a_blocks]
+        check("both first-pass entries survive as whole entries",
+              sum(b"first pass" in h for h in heads) == 2,
+              f"{len(a_blocks)} blocks in the archive")
+        check("the pass marker is a block of its own, not swallowed",
+              sum(b"ROTATION PASS APPENDED" in h for h in heads) == 1)
+        check("archive entry count is 2 old + 1 marker + 1 appended",
+              len(a_blocks) == 4, f"got {len(a_blocks)}")
+
+        # ---- 6. No second pointer.
+        check("no second pointer was written",
+              after_act.count(b"History rotated") == 1
+              and after_act.startswith(ST_POINTER.encode("utf-8")))
+
+        # ---- 7. Re-running at the same cutoff moves nothing and writes nothing.
+        rot()
+        check("a repeat pass at the same cutoff leaves the archive identical",
+              arch.read_bytes() == after_arch and active.read_bytes() == after_act)
+
+        # ---- 8. PROVE-FAIL: the DRA-75 composition (header + moved) against a
+        #      populated archive must be REFUSED, and must write nothing. This
+        #      is the one-way door the card names.
+        stock = archive_header(name, through, "", 0, 0,
+                               card="DRA-211", date="2026-09-22")
+        fired = ""
+        try:
+            write_archive(arch, stock, apply=True)
+        except ArchiveReplace as e:
+            fired = str(e)
+        check("stock replace proposal is REFUSED", bool(fired), fired[:110])
+        check("the refused proposal wrote nothing", arch.read_bytes() == after_arch)
+
+        # ---- 9. And the refusal is not a blanket no.
+        try:
+            write_archive(arch, after_arch + b"\n## 2026-09-21 - later\n\nx\n",
+                          apply=False)
+            check("a genuine append is NOT refused", True)
+        except ArchiveReplace as e:
+            check("a genuine append is NOT refused", False, str(e))
+
+    # ---- 10. The pass marker's heading level follows --unit. A `## ` marker in
+    #      a level-3 file is not a block at that unit -- it would be swallowed
+    #      by the preceding entry, which is the exact failure the heading exists
+    #      to avoid, one unit over.
+    with tempfile.TemporaryDirectory() as td:
+        tmp = Path(td)
+        (tmp / ARCHIVE_DIR).mkdir(parents=True)
+        n3 = "SCRIBE.md"
+        a3 = tmp / ARCHIVE_DIR / n3
+        first3 = b"# ARCHIVE\n\n---\n\n### an old level-3 entry\n\n2026-09-01 body\n\n"
+        a3.write_bytes(first3)
+        (tmp / n3).write_bytes(
+            b"### an entry to move\n\n2026-09-09 body\n\n"
+            b"### an entry to keep\n\n2026-09-20 body\n\n"
+        )
+        rotate_file(n3, cutoff, through, card="DRA-211", date="2026-09-22",
+                    unit=3, date_source="body", apply=True, force=True, repo=tmp)
+        got = a3.read_bytes()
+        _, b3 = split_blocks(got, 3)
+        check("level-3 rotation writes a level-3 pass marker",
+              sum(b"ROTATION PASS APPENDED" in h for h, _ in b3) == 1
+              and b"\n## " not in got.split(b"---", 1)[1],
+              f"{len(b3)} level-3 blocks")
+        check("level-3 archive still starts with the first pass",
+              got.startswith(first3))
+        # An archive already exists here, so no pointer may be written even
+        # though this active file carries none -- the template's count would
+        # name this pass only and undercount what is on disk.
+        check("an existing archive suppresses the pointer too",
+              b"History rotated" not in (tmp / n3).read_bytes())
+
+    print()
+    for label, ok, detail in checks:
+        print(f"  [{'PASS' if ok else 'FAIL'}] {label}" + (f"   {detail}" if detail else ""))
+    bad = [c for c in checks if not c[1]]
+    print(f"\n{len(checks)-len(bad)}/{len(checks)} checks pass")
+    return 0 if not bad else 1
+
+
 def main():
     p = argparse.ArgumentParser()
     sub = p.add_subparsers(dest="cmd", required=True)
@@ -637,6 +1079,17 @@ def main():
                             "(default, DRA-75 behaviour) or, when the heading has "
                             "none, the first date in the block body. SCRIBE.md "
                             "needs `body`: 0 of its 89 headings carry a date.")
+        p.add_argument("--hold", action="append", default=[], metavar="SUBSTRING",
+                       help="hold live any entry whose heading contains this "
+                            "substring, regardless of its date. Repeatable. Use it "
+                            "for standing rules that must not age out (DRA-178 "
+                            "re-pinned two in SCRIBE-FEEDBACK.md by hand).")
+        p.add_argument("--no-marker-hold", action="store_true",
+                       dest="no_marker_hold",
+                       help="turn OFF the default hold on rotation markers. A "
+                            "marker is a dated entry, so without the hold a later "
+                            "cutoff archives the file's own rotation record. Every "
+                            "held entry is named in the output either way.")
 
     r = sub.add_parser("report")
     r.add_argument("files", nargs="+")
@@ -664,8 +1117,12 @@ def main():
                         "feedback channels, and false of SCRIBE.md / DECISIONS.md / "
                         "BEVEL.md. Do not set it for a file that has no holds.")
     o.add_argument("--force", action="store_true",
-                   help="override the already-rotated guards. Re-rotating a file "
-                        "overwrites its earlier archive and still reports success.")
+                   help="run a SECOND pass on an already-rotated file. It APPENDS "
+                        "behind a pass marker and cannot overwrite the earlier "
+                        "archive -- write_archive refuses any proposal that is not "
+                        "a byte-prefix extension, and no flag overrides that. What "
+                        "--force does accept is that the active file's hand-written "
+                        "pointer prose will be left naming pass-1 numbers only.")
     o.add_argument("--apply", action="store_true")
     partition_args(o)
     o.set_defaults(func=cmd_rotate)
@@ -675,6 +1132,11 @@ def main():
                    help="directory holding byte copies of the files taken "
                         "BEFORE the rotation (not git blobs -- autocrlf)")
     v.set_defaults(func=cmd_verify)
+
+    s = sub.add_parser("selftest",
+                       help="prove the DRA-211 arms: marker hold, second-pass "
+                            "append, and that the replace refusal FIRES")
+    s.set_defaults(func=cmd_selftest)
 
     args = p.parse_args()
     sys.exit(args.func(args) or 0)
