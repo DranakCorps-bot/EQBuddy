@@ -84,6 +84,51 @@ public class QuestClassStripTests
     }
 
     /// <summary>
+    /// **ONE offered class collapses the strip to nothing, and that is the arm that regresses
+    /// silently** (DRA-181 D4's done bar, landed in DRA-196).
+    ///
+    /// <para>"Any · WAR" chooses nothing, so <c>QuestsView.BuildClassStrip</c> clears the
+    /// strip and returns before adding a single chip. That is what "the chips scale to the
+    /// multi-select" buys at the bottom end — and every other row in this file asserts a
+    /// NON-empty strip, so a build that started padding the strip back out to the identity list
+    /// would leave all of them green.</para>
+    ///
+    /// <para><b>The pick is what narrows it here, not the identity</b>, which is why this row
+    /// also prove-fails against the pre-D4 build: the dump names three classes, so the strip
+    /// built from <c>resolved</c> held three chips and never reached the collapse at all. The
+    /// decision under test is that the collapse reads the OFFERED list.</para>
+    ///
+    /// <para><b>The negative claim is anchored to a positive event</b> (trap 62). <c>-</c> is
+    /// also what the dump reads before a strip has ever been built, so asserting it alone would
+    /// pass on an app that had not drawn yet. <c>questsTabs</c> is the anchor and it is exact:
+    /// <c>BuildClassStrip</c> is called from <c>BuildTabs</c>, in the same synchronous pass that
+    /// fills <c>_tabs</c>, past the signature gate and after the offered list is assigned. So a
+    /// dump carrying tabs is a dump whose strip was built from these picks — and both facts are
+    /// read from ONE dump because two reads are two moments (trap 56).</para>
+    /// </summary>
+    [Fact]
+    public void PickingOneClassCollapsesTheStripToNoChipsAtAll()
+    {
+        using var app = Window();
+        app.SeedQuestLedger(
+            classes: ["Warrior"],
+            unlockedClasses: ["Warrior", "Paladin", "Cleric"]);
+        app.Launch();
+
+        WaitForTheWindow(app);
+
+        var facts = app.DumpTexts("questsTabs", "questsClassStrip");
+        // The anchor first: without it the sentinel below is satisfied by an app that has not
+        // built a strip yet, which is every app for the first few hundred milliseconds.
+        Assert.NotEqual("0", facts[0]);
+        Assert.NotEqual("", facts[0]);
+        // "-" is the dump's "no chips at all" sentinel — asserted rather than a count, because
+        // a count is what a strip padded back to the identity list would also answer wrongly
+        // and the sentinel is the only value that says the control left the screen.
+        Assert.Equal("-", facts[1]);
+    }
+
+    /// <summary>
     /// **A pick identity does not carry still gets its chip**, which is the other half of one
     /// producer and is not reachable by accident: the dump names three classes, so
     /// <c>CharacterClasses.Resolve</c> is at <c>Max</c> before it ever looks at the picks, and
