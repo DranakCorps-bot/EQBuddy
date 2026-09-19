@@ -149,3 +149,104 @@ cutovers, and the dashboard computes their successors differently (it unions
 overlapping waits instead of summing them, and it clamps a standing lane's lead
 time to the window). Where they disagree, the dashboard's definition is the one
 the M2 comparison must use, because it is the one that was frozen.
+
+---
+
+## 7. The Jr/Sr executor lanes (DRA-179)
+
+The capability-cost router decides **which executor takes a delivery a signed
+plan has already authorized**. It sits BELOW CLAUDE.md's V0–V1 / V2–V3 table
+and changes nothing about what reaches Fable at all. The rubric and the ten
+banned-Jr surfaces are doctrine and live in the ops `EXO-PLAYBOOK.md`
+(registered there as the `jr-sr-router` experiment, D1); the compact live rule
+is the `route:` line in [CLAUDE.md](../../CLAUDE.md). **This section is the
+mechanics** — the seat, the CLI-only rule, and the review gate (D2).
+
+The model mix is the Founder's signature (2026-09-17) and nothing here
+re-decides it: Planner = Fable; Jr = Qwen 3.8-27B on `route: routine`; Sr =
+Opus 5.1 on `route: hard`, and on every Jr review.
+
+### 7.1 Seat discipline
+
+- **A Jr executor claims the card's seat like any other executor** — through
+  the RESOLVED `scripts/claim-seat.ps1` form CLAUDE.md's *Commands* section
+  documents (`git rev-parse --path-format=absolute --git-common-dir`), and it
+  releases at close. A new lane is new call sites, which is exactly the
+  population traps 70/82 and DRA-107 were measured on: the relative
+  invocation runs whichever copy the worktree happens to carry.
+- **The claim key is the card, `DRA-<n>`, and the lane is not part of it.**
+  There is no `-jr` work item and no per-lane spelling: two lanes on one card
+  is two seats on one card, and `claim-seat.ps1` refuses that for Jr exactly
+  as it refuses it for Sr. A challenger or a disjoint slice still says so with
+  `-Mode`, unchanged.
+- **Sr's review is NOT a second claim.** Reviewing is not executing, and a
+  reviewer that claimed the card would either be refused or have to declare a
+  mode it is not in. So the gate block below is the reviewer's only artifact,
+  and the number of seats a card carries is unchanged by the router.
+
+### 7.2 CLI only, both lanes
+
+Jr runs as a CLI, like every seat here. **No model API integration is built
+for either lane, and no shipped EQBuddy code path calls Qwen or any model** —
+this is a dev-time lane and it is invisible to the product. A change that adds
+a model client, key, endpoint or dependency is therefore not a `routine`
+delivery by construction: it is banned-list items 1 and 6, and it routes Sr
+before anybody argues about the size of the diff.
+
+### 7.3 The Jr review gate
+
+**A Jr PR does not merge without an Sr review, and the enforcement mechanism
+is a CHECKLIST** — Helm's pick, 2026-09-17 (the DRA-179 tip in `HELM.md`),
+against the alternative of GitHub branch protection. Two reasons it is the
+right mechanism here rather than a weaker stand-in for the other one: the org
+pushes through ONE bot identity, so *"require a review from somebody else"*
+has nobody to name without inventing a second GitHub identity — which both
+Helm's ruling and the plan's non-goals LEAVE — and an unread rejection
+teaches people to route around a gate instead of reading it. **Nothing here
+changes repository settings.**
+
+The gate rides the PR BODY. A Jr PR carries this block; **Sr ticks the last
+box in its review**, and that box is what the merge carrier reads:
+
+```markdown
+### Jr lane gate — DRA-179
+- [ ] `route: routine` — the tag the signed plan wrote for this delivery
+- [ ] Seat `<seat-id>` on `DRA-<n>`, claimed through the resolved `claim-seat.ps1` form
+- [ ] No banned-Jr surface touched — contact would have stopped and escalated to Sr
+- [ ] CLI only — no model API, key, endpoint or dependency; no shipped path calls a model
+- [ ] `build-and-test` + `e2e-windows` green
+- [ ] **Sr reviewed — Sr ticks this, never Jr** (Sr: `<who>`)
+```
+
+**The merge rule is one sentence: an unticked last box is a merge that does
+not happen.** The first five are Jr's own statement about its own slice; the
+sixth is the gate. A PR that arrives with all six already ticked is a PR whose
+gate was not read — what is required is the review, not the tick.
+
+**What a checklist buys, and what it does not.** It refuses nothing by
+itself: an unticked box is *visible*, in the same place CI's red is, to the
+carrier deciding to merge. It does not have branch protection's property of
+being unskippable, so a skipped gate is an incident to report rather than an
+impossibility, and D4's measurement rows are where a skipped one surfaces
+afterwards. Saying that out loud is the point — a checklist described as
+unskippable would be the lie, and the next person would stop checking.
+
+**Why the gate is not a pull_request_template.md.** A template fills the
+GitHub WEB form. Every PR in this repo is created by `gh pr create --body …`,
+which renders no template, so a template would carry this gate on exactly the
+PRs that do not need it and on none of the ones that do — trap 78's shape, a
+check aimed at nothing that still reports clean. The block above is cited,
+pasted and guarded (`DocumentationTests`) instead.
+
+### 7.4 Escalation, and what is NOT landed here
+
+- **Jr stops and hands the delivery to Sr** on banned-list contact found
+  mid-slice, a gate failure it cannot explain, or a slice outgrowing its
+  declared boundary. That is the stop-and-escalate seam every signed plan
+  already rests on; an escalation is the lane working, not a failure of it.
+- **Sr's review DEPTH — quick-pass versus deep — is D3**, and this section
+  does not decide it. Until D3 lands, Sr reviews and says in the review what
+  it did.
+- **Measurement is D4.** No row is added to §6's table here: those baselines
+  are DRA-73's frozen window, and a router row with no reading behind it would
+  be a number nobody measured (trap 81).
