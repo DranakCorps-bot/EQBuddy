@@ -492,22 +492,25 @@ def cmd_report(args):
               f"{len(undated)} blocks / {sum(len(b) for _, _, b in undated):,}B")
         # Held entries are ALWAYS named, never just counted: the hold is decided
         # by matching prose, and a silent prose match is a guess nobody audited.
+        # Under --show-blocks the listing below already names them with their
+        # reason, and printing them twice under a count of 1 reads as two holds.
         print(f"  held live regardless of date: {len(held)} blocks / "
               f"{sum(len(b) for _, _, b in held):,}B")
-        for (d, h, b), r in ((x, y) for x, y in zip(dated, reasons) if y):
-            print(f"    HOLD ({r}) {fmt_date(d)} {len(b):,}B  "
-                  f"{h.rstrip(chr(13).encode()).decode('utf-8', 'replace')[:88]}")
+        if not args.show_blocks:
+            for (d, h, b), r in ((x, y) for x, y in zip(dated, reasons) if y):
+                print(f"    HOLD ({r}) {fmt_date(d)} {len(b):,}B  "
+                      f"{h.rstrip(chr(13).encode()).decode('utf-8', 'replace')[:88]}")
 
         if args.show_blocks:
             for (d, h, b), r in zip(dated, reasons):
                 if r:
-                    mark = "HOLD   "
+                    mark = f"HOLD ({r})"
                 elif d is not None and d < cutoff:
                     mark = "ARCHIVE"
                 else:
-                    mark = "keep   "
+                    mark = "keep"
                 head = h.rstrip(b"\r").decode("utf-8", "replace")[:88]
-                print(f"    {mark} {fmt_date(d)} {len(b):>8,}B  {head}")
+                print(f"    {mark:<24} {fmt_date(d)} {len(b):>8,}B  {head}")
         print()
 
 
