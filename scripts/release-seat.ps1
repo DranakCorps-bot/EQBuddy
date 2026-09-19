@@ -15,15 +15,26 @@
     holder is gone.
 
     Does not write HELM-FEEDBACK.md. Does not touch scheduled_tasks.lock or the
-    screen lock. Local store only (see scripts/soft-seat-store.ps1).
+    screen lock. Local store only (see scripts/soft-seat-store.ps1) — and since
+    DRA-102 that is a deliberate half of union-READ / local-WRITE: this script
+    never abandons a row in another clone's store, it NAMES it and the command
+    that would, in the clone that owns it.
 
     -WorkItem is NOT key-checked here, unlike claim-seat.ps1. Claims recorded
     before DRA-50 carry bare issue numbers, and refusing to release them would
     strand every one of them behind a rule they predate.
 
+    INVOKE THIS SCRIPT RESOLVED, through the clone's MAIN checkout (DRA-107,
+    Helm-signed 2026-09-16) — the same rule as claim-seat.ps1, for the same
+    reason: a linked worktree carries its OWN, possibly stale, copy of this file,
+    and the bare relative path runs that copy. --git-common-dir answers the
+    clone's .git from a linked worktree and from the main checkout alike, so one
+    invocation is right everywhere. Needs git >= 2.31 for --path-format=absolute.
+    The bare relative form still works and is DEMOTED, not removed.
+
 .EXAMPLE
-    pwsh -NoProfile -File scripts/release-seat.ps1 -WorkItem DRA-28 -SeatId opus-isolation
-    pwsh -NoProfile -File scripts/release-seat.ps1 -WorkItem DRA-28 -ForceStale
+    pwsh -NoProfile -File "$(git rev-parse --path-format=absolute --git-common-dir)/../scripts/release-seat.ps1" -WorkItem DRA-28 -SeatId opus-isolation
+    pwsh -NoProfile -File "$(git rev-parse --path-format=absolute --git-common-dir)/../scripts/release-seat.ps1" -WorkItem DRA-28 -ForceStale
 #>
 [CmdletBinding()]
 param(
@@ -41,7 +52,11 @@ param(
 $ErrorActionPreference = 'Stop'
 . (Join-Path $PSScriptRoot 'soft-seat-store.ps1')
 
-$dir = Get-SoftSeatStoreDir -StoreDir $StoreDir -Repo $Repo
+$origin = Get-SoftSeatStoreOrigin -StoreDir $StoreDir -Repo $Repo
+$dir = $origin.dir
+# Register on first use here too (DRA-102): a clone that only ever releases is
+# still a clone whose claims another seat must be refused by.
+$null = Register-SoftSeatStore -Origin $origin
 
 try {
     $result = Invoke-SoftSeatRelease -StoreDir $dir -WorkItem $WorkItem -SeatId $SeatId `
@@ -54,5 +69,26 @@ catch {
 
 if ($Json) { $result | ConvertTo-Json -Depth 6 }
 else { Write-Host $result.message }
+
+# The union read changes what this script must SAY, not what it may write.
+# claim-seat.ps1 can now refuse over a holder in another clone; without this,
+# the reader's next move — run release-seat here — answers "no live claim
+# matches", which reads as the refusal having been spurious. Read-only: the
+# recovery is named, and it runs in the clone that owns the row.
+if (-not $result.ok -and -not $Json -and $result.message -match 'no live claim matches') {
+    $registry = Read-SoftSeatRegistry
+    $foreign = Read-SoftSeatForeignHolders -Stores (Get-SoftSeatForeignStores -Origin $origin -Registry $registry) -WorkItem $WorkItem
+    if (@($foreign.holders).Count -gt 0) {
+        Write-Host "...but $(@($foreign.holders).Count) live seat(s) on this card are registered in ANOTHER CLONE. This script writes only its own store, so release them where they are:"
+        foreach ($h in @($foreign.holders)) {
+            Write-Host "  - $(Format-SoftSeatHolder $h)"
+            $r = if ($h.store_root) { $h.store_root } else { (Split-Path (Split-Path $h.store_dir -Parent) -Parent) }
+            Write-Host "    pwsh -NoProfile -File `"$(Join-Path $r 'scripts/release-seat.ps1')`" -WorkItem $(Format-SoftSeatWorkItem $h.work_item) -SeatId $($h.seat_id)"
+        }
+    }
+    foreach ($u in @($foreign.unreadable)) {
+        Write-Host "WARNING: registered store $($u.dir) could not be read ($($u.reason)) — its seats were NOT consulted."
+    }
+}
 
 if ($result.ok) { exit 0 } else { exit 1 }

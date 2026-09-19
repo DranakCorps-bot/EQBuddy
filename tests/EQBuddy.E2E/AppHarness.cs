@@ -224,6 +224,27 @@ internal sealed class AppHarness : IDisposable
             Path.Combine(GameDir, $"{Character}_{Server}-Inventory.txt"), lines.ToString());
     }
 
+    /// <summary>
+    /// **A COMMITTED inventory dump, copied verbatim to where the game writes it** (DRA-149 D5).
+    ///
+    /// <para><c>WriteInventoryDump</c> above builds a dump from tuples, which is right for a
+    /// two-item fixture whose point is the shape. It is the wrong tool for the re-smoke: the
+    /// Founder's FAIL is about HIS dump — twenty worn rows, "+2".."+9" on every one of them, an
+    /// <c>Any Slot</c> shield, and a bow the game spells <c>Deterioriated</c>. A hand-built
+    /// stand-in renders a state that is real and is not the one under test (trap 23), and every
+    /// one of those details is a thing a slice of this card fixed.</para>
+    ///
+    /// <para>Verbatim bytes, through the real <c>InventoryFile</c> parser the app already runs.
+    /// Call BEFORE <see cref="Launch"/>.</para>
+    /// </summary>
+    /// <param name="fixture">A file name under <c>tests/fixtures/inventory/</c>.</param>
+    public void WriteInventoryDumpFrom(string fixture) =>
+        File.Copy(
+            Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..",
+                "fixtures", "inventory", fixture),
+            Path.Combine(GameDir, $"{Character}_{Server}-Inventory.txt"),
+            overwrite: true);
+
     /// <summary>An `/outputfile achievements` dump where the game writes it, lines given
     /// verbatim in the dump's own tab-separated shape
     /// (<c>C\tRace Unlock - High Elf</c> / <c>I\t\tGet maximum faction with X.</c>) so it goes
@@ -604,12 +625,19 @@ internal sealed class AppHarness : IDisposable
     /// at. <c>CharacterLevel.Resolve</c> weighs the two stamps and the fresher wins, so a
     /// fixture that wants a particular winner has to date them both — which is exactly what
     /// makes the two "both ways" E2E rows possible from out here.</param>
+    /// <param name="unlockedClasses">Classes whose unlock achievement the DUMP says is
+    /// complete — the half of identity <c>CharacterClasses.Resolve</c> reads FIRST, and the
+    /// only lever out here that can make the resolved list wider than the picks without
+    /// an achievements file. A character who has never dumped resolves off the log, which
+    /// collapses to one class (see <see cref="SeedQuestClasses"/>), so a scenario about
+    /// picks NARROWING an identity has to seed this side of it.</param>
     public void SeedQuestLedger(
         IReadOnlyList<string>? classes = null,
         IReadOnlyList<string>? tracked = null,
         IReadOnlyDictionary<string, int>? owned = null,
         (int Level, DateTime At)? level = null,
-        (int Level, DateTime At)? statedLevel = null)
+        (int Level, DateTime At)? statedLevel = null,
+        IReadOnlyList<string>? unlockedClasses = null)
     {
         File.WriteAllText(Path.Combine(ProfileDir, "quest-ledger.json"),
             JsonSerializer.Serialize(new Dictionary<string, object>
@@ -617,6 +645,7 @@ internal sealed class AppHarness : IDisposable
                 [$"{Character.ToLowerInvariant()}_{Server}"] = new
                 {
                     Classes = classes ?? (IReadOnlyList<string>)[],
+                    UnlockedClasses = unlockedClasses ?? (IReadOnlyList<string>)[],
                     Tracked = tracked ?? (IReadOnlyList<string>)[],
                     Items = (owned ?? new Dictionary<string, int>())
                         .ToDictionary(kv => kv.Key, kv => new { Manual = kv.Value }),

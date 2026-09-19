@@ -1,3 +1,743 @@
+## 2026-09-17 — DRA-164 D1–D3: the Plane of Sky Island view, and the republish this land does NOT do
+
+**Seat:** `dra164-d1` → `d2` → `d3`, one signed sequence (Helm SIGNED PR #663 @ `148cdd6e`,
+whole-sequence on green gates). Founder ask ~5:50 AM CT: KEEP the class-sorted Sky view, ADD a
+Class/Island toggle, island view multi-selects classes and groups by island —
+"everything to collect on island N before moving to next", warrior/monk/druid. D1 `dab8d03d`
+(#664), D2 `a1748054` (#665), D3 `a386d886` (#666). Nothing here fetched, no curated catalog
+was written, **no tag, no signing, no release** — see item 8, which is the one place this
+entry departs from the card's own text.
+
+**1. The veto-worthy default Helm named: the island view EXCLUDES hand-ins and turned-in
+rewards, and counts both out loud.** Hand-ins go because the ★ Ready band already owns "what
+can I turn in right now" and stays on screen in both modes; turned-in rewards go because
+`MarkRewardTurnedIn` force-acquires every row under them, so keeping them renders each island
+as mostly-done noise. **The default the other way** was to draw everything and let the player
+sort it out, which is defensible right up until the first island is twelve rows of work already
+done. Both sentences are EMPTY when nothing was hidden — a note that always fires is furniture,
+not a disclosure — and Class view is named in them as where the excluded rows still live.
+
+**2. Class view KEEPS the default (`SkyGroupByIsland` = false), and the E2E proves it by
+ABSENCE.** `questsIslandGroups` reports `-1`, meaning "this render drew no island layout at
+all" — a different claim from "it drew an empty one", and the only fact that can say the new
+renderer did not run. Without it every assertion in the suite would still pass on a build that
+had quietly replaced the view this card was told to keep.
+
+**3. THE PARSER WAS ALREADY WRONG ABOUT 22 OBJECTIVES, AND THE FAILURE LOOKED EXACTLY LIKE AN
+ANSWER.** The guide catalog writes the Efreeti drop as *"Plane of Sky - Isles 1.5, 4 and 8
+respectively."* — one isle word governing a list — and the five shapes the shipped `Parse` knew
+captured only the number touching the word. All 22 parsed to `[1.5]` and would have been filed
+on the half-island alone. **The before-picture is committed**: the shipped regex is pasted
+verbatim into `SkyIslandsTests` and SHOWN returning `[1.5]` beside the fix returning
+`[1.5, 4, 8]`, because green-only would have been vacuous here — both parsers return the same
+317 objectives and the same 97/95 split, and only the 103-vs-125 count tells them apart (trap
+34). The new shape's tail is DIGITS ONLY: *"Isle four - griffons and pegasus"* is also a real
+catalog string. **Scope-locked to that one shape**, per the SIGN; no second prose shape, no
+invented island scaffold.
+
+**4. The island fact rides the ROW, rather than being parsed back out of the heading.** One
+fact stored in one place and read out of another is trap 4, and the other place here is a
+string the two producers spell differently — `"Island 6"` from the classic layout,
+`"Isle 6: Bazzt Zzzt"` from the guide projection. `QuestChecklistRow.IslandKey` is stamped by
+the same code that stamps the heading, in both producers; `SkyIslands.SetKey` gained its
+inverse, round-trip tested with the zero-padding asserted AS TEXT so a later tidy-up cannot
+silently re-order the groups.
+
+**5. The prose fallback is REFUSED on a turn-in, and the count is what keeps that guard
+honest.** 48 of the 95 hand-in objectives mention Isle 1 — they are directions TO the Efreeti
+Chamber, not gathering work on Island 1. A naive `Where` fallback would have filed all 48 under
+Island 1 with full confidence. The 48 is asserted, so a catalog rewording cannot quietly make
+the guard vacuous.
+
+**6. The phone's note needed its own FIELD because it could not ride a group.** The page drops
+a group with no rows (`if (!rows.length) continue;`), so a sentence about the list as a whole
+has nowhere to sit among the groups, and hanging it on the first island would read as a fact
+about that island. `CompanionChecklistSection.Note` is nullable and additive — the envelope
+does not change shape, so `CurrentProtocol` does not move. **Both halves of the page claim are
+asserted**: every word is Core's and the page spells none of them (trap 32), AND the page is
+asserted to READ `data.note`, because a sentence the page is sent but never draws passes every
+projection test there is. DRA-84's D2 and D4 each shipped a caption without that second half
+and the phone drew four of five.
+
+**7. Two things the pictures said that the counts could not, both RECORDED rather than fixed.**
+(a) The desktop frame reaches Island 6 and stops at 900px, so it is evidence that the islands
+ascend and NOT evidence about where the multi-island set and the unlocated rows sit — said out
+loud rather than cropped quietly. (b) Every guided row says its island three times: the
+heading, the step title, and the detail. That is the exact redundancy `WithoutIslePrefix`
+removes for CLASSIC rows and never reached a guided row's detail. **It is not new here** — the
+same three copies are on screen in class view today — so touching it would change the view this
+card was told to KEEP. Filed to `BEVEL-FEEDBACK.md` with the frame as evidence.
+
+**8. THE CARD'S OWN ROUTE SAYS "Desktop republish → ping Helm with 2.0.0+sha when LIVE", AND
+THIS LAND DOES NOT DO THAT.** Helm's SIGN forbids it by name from this land — *"LEAVE inventing
+Desktop republish … LEAVE inventing release / `release.ps1` / tag / signing / prod secrets"* —
+and a release is the one hard Founder gate that stays (CLAUDE.md, consequence list item 2). So
+D1–D3 are source only. **The default the other way** was to read the card as authorizing the
+republish because it is written into the route; I did not, because a SIGN that names the
+prohibition is later and more specific than the card that was written before it, and because
+the release gate is not Helm's to waive either. **Where it landed:** the three slices merge, and
+the republish is named as owed to Helm/the Founder rather than performed. If the ~2:00 PM CT
+Desktop smoke was meant to run against a republished build rather than a local one, that is the
+gap, and it is theirs to close.
+
+**9. Fable's feedback for this sequence is in PR #666's body, not in its channel.**
+`FABLE-FEEDBACK.md` has spent its grandfather band — recorded baseline 240,896 B, ratchet
+ceiling 264,985 B, file at 264,970 B, **fifteen bytes of headroom** — and `channel-size-guard`
+refuses the append. Verified by probing it rather than assumed: a test append reddened the
+guard with that exact arithmetic, and was reverted. The guard's own refusal says raising the
+row is not the fix and that rotation belongs to the standing `EXO-CHANNEL-ROTATE` card, not to
+the Executor seat that tripped it — so the note goes in the PR body verbatim and is reported on
+DRA-144. Not skipped: a skipped round is indistinguishable from not bothering.
+
+**Gates:** `check.ps1` green at each slice (5,341 unit at D2, 5,347 at D3); D2's three new E2E
+rows pass locally against a rebuilt app (trap 64); both channel guards green with the
+`BEVEL-FEEDBACK.md` append verified additions-only (46/0) and its identifiers read back after
+the write (trap 60c). `WhatsNew.json` entry landed in D2. No `GuideCatalog.json` or
+`SkyQuestDefaults.cs` write, no eqlwiki fetch, and nothing here marks DRA-149 or DRA-84 PASS.
+
+— Dranak (Claude Code), Executor — DRA-164 D1–D3
+
+## 2026-09-17 — DRA-149 D5: the re-smoke pack, and the prediction that caught itself
+
+**Seat:** `opus-dra149-d5` (disjoint). D4 merged at `3df21141`; this is the last slice of the
+signed sequence. Everything below is inside plan P6 except items 3 and 6, which say so. Nothing
+here touches the consequence list, nothing fetches, no catalog was rebuilt, **no release and no
+tag**, and nothing here marks DRA-84 PASS — that is still the Founder's call.
+
+**1. `GearCandidates` is a new field on a public Core record, and the reason is that P6's E2E
+list named an input nothing carried.** The plan asked the re-smoke to dump "anchors, unread
+count, candidates, band refusals, who withholdings". Four of those five were already in the
+`EQBUDDY_EXPAND` dump; **candidates** was not, and it is the one that matters most. Without it
+the two empty gear screens are indistinguishable: a sweep that found NOTHING (the pre-D1 state —
+the tier rule compared a worn `+2` against catalog names where 0 of 11,196 carry one) and a
+sweep that found 147 and had every place refused. Both draw one grey sentence, and
+`helperGearWhy` counts DRAWN rows, so it is 0 in both. **The default the other way:** infer it
+from `helperGearWithheld`, which is the sweep's per-anchor CAP rather than its output — a proxy
+for a fact nobody had named (trap 64b), and wrong whenever the cap is 0.
+
+**2. THE FIRST RUN OF THE PREDICTION TESTS REPORTED ZERO BAND REFUSALS AT EVERY LEVEL, AND IT
+WAS THE TESTS THAT WERE WRONG.** Those numbers were minutes from being written into a checklist
+the Founder would have read. The fixture did not set `HelperInputs.Bands`, and the gate stands
+down entirely without them (trap 73, correctly) — it reports nothing and everything passes. That
+is trap 78 from the test side: a guard aimed at a rule that never ran. What makes the E2E row
+trustworthy is that it asserts `helperBandGate=1` BEFORE it reads any refusal count, which is a
+liveness check DRA-84 D2 already wrote for exactly this reason and which I had not copied into
+the unit half. **Recorded because it is the single most likely way this pack could have shipped
+confidently wrong.**
+
+**3. NOT in P6: `AppHarness.WriteInventoryDumpFrom`, and the number it settles.** The plan says
+to stage the Founder's screens; it does not say how. `WriteInventoryDump` builds a dump from
+tuples, which is right when the point is the SHAPE. His FAIL is about HIS dump — 21 worn rows,
+`+2`..`+9` on every one, an `Any Slot` shield, a bow the game spells `Deterioriated` — and every
+one of those is a thing a slice of this card fixed, so a hand-typed stand-in photographs a real
+state that is not the one under test (trap 23). It copies the committed fixture verbatim.
+**It also settles a pair that reads as a contradiction:** the room dumps 21 anchors and
+`GearUpgradesFixtureSweepTests` says 20, because that suite excludes AMMO deliberately — a floor
+met by the one anchor that already worked would be met by the thing that was never broken. Two
+numbers, two questions, both right, and now both written down.
+
+**4. The unit half and the E2E half disagree on the counts ON PURPOSE, and the disagreement is
+load-bearing.** 155 candidates / 16 refusals from the engine; 147 / 18 through the launched app.
+The app knows the character's CLASS from the log and the fixture does not, so the class lock
+removes different candidates and a different set of zones reaches the gate. Both are right about
+their own inputs. The tests are therefore FLOORS on both sides rather than equalities — a gate
+that reddens because a wiki refresh moved one row is a gate the next person re-runs until green
+(trap 74's lesson), and this one would additionally redden on a fixture difference that is not a
+defect.
+
+**5. The `WhatsNew.json` entries are drafted in `docs/ops/` and NOT in `WhatsNew.json`.** P6 says
+to draft them and that the release shipping them is later. The tempting place is the existing
+`2.0.0` entry, and it is the wrong one: **2.0.0 is the build the Founder failed**
+(`2.0.0+275cc215`), so filing these there would tell every player that the fix was in the build
+that lacked it. They land when `<Version>` moves, which is a release decision and David's.
+**The default:** append to 2.0.0 now so nothing can be forgotten. The forgetting risk is real and
+is handled by `release.ps1` refusing a tag without an entry.
+
+**6. NOT named in P6: the checklist leads with the two screens that look like failures.** The
+plan asked for a checklist saying what each screen should SAY, and for the band refusal to be
+predicted "instead of letting it read as a failure". Writing it surfaced a SECOND screen of that
+shape, in the opposite direction: the vendor block needs **no play history at all**, so it is the
+one block in the room where *"it is empty because I have not played enough"* is not available as
+an explanation — an empty one is a real defect. Every other block in this room gets better the
+more you play, so the reading is inverted exactly where a reader would not expect it. Both are
+⚠️ boxes in `docs/ops/dra149-founder-resmoke.md`.
+
+**7. The plan's worked example was right, and it is now pinned rather than quoted.** P6 predicted
+*"4 base-better items — Temple of Veeshan `60+` and Sleeper's Tomb `55+` refused against the
+staged level, 1 quest row behind the toggle"*. Measured: two Velium Reinforced bows in Sleeper's
+Tomb, the Bow of the Silver Fang in Temple of Veeshan, and `Rune Shafted Harpoon` from *The
+Mighty Snowfang Hero* — which appears ONLY with include-quests on, because a quest is not a camp
+and neither the band gate nor the who rule touches it. That is a plan prediction surviving
+contact with the shipped catalog, and it is worth saying so as loudly as the one that did not
+(DRA-84 D2's Crushbone example was a level off its own constant).
+
+**8. THE STAGED SHOT CORRECTED THE PLAN'S WORKED EXAMPLE, AND NO ASSERTION COULD HAVE.** P6
+predicted four base-better items for the bow. There are four — **for a character who is both a
+Ranger and a Shaman**, which is nobody. `Bow of the Silver Fang` (Temple of Veeshan) is `RNG`
+only; `Rune Shafted Harpoon` (The Mighty Snowfang Hero) is `SHM` only; the two Sleeper's Tomb
+bows are `WAR|PAL|RNG|SHD|ROG`. The fixture character sees ONE refused zone and no quest row, and
+`shell-helper-founder-bow` photographs exactly that. `FounderResmokeTests` runs with no class
+lock, so its four is a fact about the CATALOG and was one sentence away from being read as a fact
+about the Founder — it now says so, and so does the checklist. **The class lock is working
+correctly**; what was wrong was a claim's scope, which is the kind of defect a green test cannot
+see.
+
+**9. `shell-helper-founder` ships with a stated caveat rather than a restyle.** The shell window
+clamps near 885px tall on a 1080 screen whatever `EQBUDDY_SHELL_SIZE` asks for — a take at
+`946x1000` came back 932x993 with the bottom ~110px black and the content ending mid-sentence at
+the same place as the 880 take. So the three withheld captions are below the fold in the very
+picture chosen to photograph one of them. **The default the other way:** shorten the room's
+content by narrowing the staged pick until they fit, which would have made the picture agree with
+the recipe by changing what it is a picture OF. Instead the caveat is in the recipe (trap 79's
+rule: say which part of a capture is unfaithful, do not restyle the product until the camera
+agrees), `shell-helper-founder-bow` is the narrowed staging that shows a refusal caption whole,
+and the numbers are asserted where a fold cannot hide them.
+
+## 2026-09-17 — DRA-161 / EXO-HARDEN-A1e: the rotated archive copies are OUT of scope for mojibake repair, permanently
+
+**Seat:** Executor, carrying out the Planner ruling on DRA-160 (2026-09-17 09:50Z). This entry and one
+paragraph added to the archive's own `README.md` are the whole change — **the three archived ledgers were
+not touched; their blobs are sha-identical either side of this commit (`022fdea4`, `7eada6af`,
+`fef3a1f9`), and the only file changed under `docs/ops/claude-archive/` is that README** — no transform
+was run against any archived path, and the PR's `git diff --stat` shows only those two files.
+
+**Verdict: OUT. All three files under `docs/ops/claude-archive/channels/2026-Q3/`, not now and not on the
+next sweep.** The counts that raised DRA-160 are real — 56,979 cp437 depth-1 plus 14 depth-2 in
+`HELM-FEEDBACK.original-flattened.md` (4,926,243 bytes, blob `fef3a1f9`), 5,429 cp1252 in the archived
+`HELM-FEEDBACK.md` (1,915,606 bytes, blob `7eada6af`), 1,527 cp1252 in the archived `FABLE-FEEDBACK.md`
+(1,000,117 bytes, blob `022fdea4`) — each measured off `/git/blobs/{sha}` with the decoded byte length
+asserted against the tree's `size`, which is the only read that does not hit the contents-API false-clean
+trap. They are real and they are not a defect to repair. **A future mojibake sweep reads this entry
+instead of re-raising the card.**
+
+### The Helm LOCK is not spent by this, and it stays live
+
+The governing sentence is the DRA-55 Helm SIGN (2026-09-16 19:53Z), quoted here verbatim rather than
+paraphrased, and re-read off the source comment during carry-out rather than trusted from the relay:
+
+> Helm SIGN DRA-55 plan (ops PR #10). Executor owns slice 1 producer fix then slice 2 ledger repair.
+> **Soft LEAVE inventing archive repair without separate Helm ruling.** BEVEL.md marker line stays.
+
+That LOCK forbids *repairing* the archive without a Helm ruling. It does not require a Helm ruling to
+*decline* to repair: leaving the archive untouched is the LOCK's own default state, so this verdict
+affirms the LOCK rather than lifting it. No LIVE ASK was opened and Helm's door stays unspent.
+
+**The LOCK remains live.** Anyone who wants these files repaired later still needs a real, separate Helm
+ruling. This entry neither grants one nor pre-empts one — it records why nobody should bother asking.
+
+### Three files, three different reasons — not one bucket
+
+**1. `HELM-FEEDBACK.original-flattened.md` — it is corrupt on purpose, and two artifacts already said so.**
+It holds 56,979 of the ~57k cp437 occurrences on the card, and it exists so DRA-75's "nothing was lost"
+claim can be checked **against the bytes** instead of taken on trust, and so `channel-wipe-guard`'s
+ARCHIVE exemption can see the entries that moved. It is also the cp437 detector's only clean-checkout
+fixture — real corrupt bytes with no git archaeology needed, as DRA-55's intake comment named it. The
+archive README has said *"Do not try to read it; do not edit it"* since the day it landed. Those 56,979
+markers are the exhibit, not the damage.
+
+**2. `HELM-FEEDBACK.md` — it is a git blob carried byte-verbatim, and every marker sits inside the
+verbatim region.** Byte arithmetic, re-derived during carry-out rather than copied from the ruling:
+`f4af3b5f` resolves as commit `f4af3b5f5ac6dc1b06290a478278bd9d19681d90`; `HELM-FEEDBACK.md` at that
+commit is blob `8e18b203fcbe42a20d255f477f386b5d283afcf2`, **1,909,798 bytes**. That blob is byte-contained
+in the 1,915,606-byte archive copy **at offset 5,808, with zero bytes after it** — the archive file is
+exactly `[5,808 bytes of header + recovered PR #564 entry]` + `[the f4af3b5f blob, whole]`. All 5,429
+cp1252 occurrences are inside the verbatim tail; none are in the prepended part. So a repair pass edits
+the verbatim region, and that breaks two live assertions: the README's own claim (L84-85) that the
+recovered history is carried verbatim, and `channel-rotate.py verify`, which per README L140-143 asserts
+that the archive contains the `f4af3b5f` blob verbatim. It also buys nothing — git still holds blob
+`8e18b203` with all 5,429 markers intact. Repairing the copy does not repair the history; it only makes
+the copy stop matching the history it exists to document.
+
+**3. `FABLE-FEEDBACK.md` — rotation moved these bytes, it did not create them.** The pre-rotation live
+`FABLE-FEEDBACK.md` at `c3a40c1e` (parent of rotation commit `8f9e3205`) is blob
+`51b18b02101c5210b94892a652549872f7f9a0b2`, 1,170,568 bytes, carrying **1,527** cp1252 occurrences — the
+identical count now in the 1,000,117-byte archive copy. Those bytes were already permanent in git before
+the archive existed.
+
+### The principle, stated once so the next sweep quotes it instead of re-deriving it
+
+**A rotated archive copy is not an independent site of corruption.** Rotation is a one-way move of bytes
+that are already immutable in git history. Repairing a rotated copy removes zero corruption from the
+record — it only makes the archive diverge from the revisions it was cut from, and it spends the fixtures
+and byte-identity assertions that were deliberately built on that sameness. Count archive markers as
+*copies of* live-surface markers when scoping a sweep, never as their own findings.
+
+Repair pays on the **live** surface, and that work is done and guarded: DRA-119 slice A (PR #657, merged
+2026-09-17 07:25Z) made `channel-wipe-guard.ps1` check 4 fail CI on cp437 at both depths, and slice B
+(PR #659, merged 2026-09-17 09:40Z) repaired 77 lines while preserving 4 quoted ones. Rotation is
+one-way, so nothing in the archive can reach a live file. Nothing is at risk from this verdict.
+
+### The default this could have gone the other way on
+
+Repair all three, on the grounds that ~64k mojibake occurrences in the tree is obviously bad and the fix
+is a script that already exists (`scripts/demojibake.py`). That reading counts markers instead of reading
+what each file is for, and it would have destroyed a SIGNed checkability exhibit, a detector fixture, and
+two byte-identity assertions in order to change nothing about how much corruption git holds. The tell is
+that the archive numbers do not move the live numbers in either direction — which is what makes them the
+wrong surface to measure.
+
+## 2026-09-17 — DRA-149 D4: the vendor half ships, and a guard deleted three keywords a human wrote
+
+**Seat:** `opus-dra149-d4` (disjoint). D3 merged at `ec22acc6` (PR #653, both gates green), so
+the sequence-wide SIGN carries this slice. Everything below is inside plan P5 except items 5
+and 8, which say so; nothing here touches the consequence list, **nothing fetches** (the 118
+zone wikitexts are the COMMITTED cache), no catalog was rebuilt, no release, and nothing here
+marks DRA-84 PASS.
+
+**1. The opening survey said SHIP, not park, and the number is on the record.** P5's park
+condition was *"if Jewelcrafting matches fewer than 3 zones the face parks with that number and
+the wiki door"*. Measured against the committed cache: 50 of 118 zone pages name a merchant in
+their map key, 359 lines, 353 of them distinct; all eight professions match at least one zone,
+and Jewelcrafting matches **17**. The face shipped.
+`EveryProfessionMatchesAZoneAndJewelcraftingClearsTheParkFloor` keeps that condition alive in
+the suite, so the day a wiki edit takes it under three the park is back on the table.
+
+**2. The ADMIT rule is a LIST ITEM in THREE spellings, not one, and reading the refusals is what
+found the other two.** The first pass admitted only `*` and refused 86 lines. Most of them were
+map keys written differently — Misty Thicket and Everfrost Peaks number theirs with `#`, and
+Halas, Oggok, Runnyeye and Timorous Deep write theirs as raw HTML `<li>` (three of those four
+with the previous item's `</li>` on the front of the line, so an anchored `^<li>` rule missed
+Oggok's entire fifteen-entry key). Widening to all three took the catalog from 41 zones to 50.
+**The default it could have gone the other way on:** ship the `*`-only rule with a clean report
+and 86 refusals. Nothing would have failed and five zones would simply have had no shops
+forever. A COUNT of refusals would not have found it — the report listing them by zone did,
+which is the argument for the report being part of the transform rather than a nicety.
+
+**3. Prose stays refused even where it names a real merchant.** Kaladim's page says *"Note that
+there is a merchant who sells Ore located at approximately 750, 200 on this map."* — true,
+useful, and not admitted. **The default:** take it, on the grounds that it is obviously good
+data. Refused because *"a sentence mentioning a merchant"* is a rule with no edge, and the same
+relaxation admits Freeport's city history and Crushbone's hunting advice, both of which mention
+merchants and neither of which points at one. All 42 refusals are listed by zone in
+`merchants-report.md`, so what the strictness costs is visible rather than assumed.
+
+**4. The vendor's NAME is not a field.** It is the obvious next step — `[[Bndainy Everhot]]`
+looks exactly like an NPC — and the same Kaladim list also holds `[[Cleric]] Guild`,
+`[[Rogue]] Guild Members` and `[[Kadek Norkhitter]]`. A rule that lifted link targets into a
+"vendor" column would print "Cleric" as a merchant's name, and a rule that tried to tell them
+apart would be guessing about the wiki's own linking. The name survives IN the transcribed
+sentence, which is where the page put it and where a player can check it. **The default:** a
+`Vendors` array per line, which every surface would then have had to caveat.
+
+**5. NOT spelled out in the plan: `MerchantsShown` shows ONE line per ZONE.** P5 named a cap
+and did not say per what. Per LINE, Freeport — the busiest map key in the cache — fills a
+profession's whole list on its own, and "where should I go" answers with one place three times.
+The cap is a travel budget, so it counts destinations. It lives in `HelperPresentation` rather
+than in either surface because both draw the same three (trap 4), and
+`TheShownListIsCappedAndNeverRepeatsAZone` prove-fails by removing the `continue`.
+
+**6. THE GUARD DELETED THREE CURATED KEYWORDS, AND THIS IS THE ITEM MOST WORTH A VETO.** The
+first draft of `ZoneMerchants.Keywords` carried `spices` (Baking), `metal bit` (Blacksmithing)
+and `pelt` (Tailoring). All three are real trade supplies. Not one of them appears on any
+shipped merchant line, so all three matched nothing, contributed nothing, and made the table
+look longer and better-researched than it was — the failure with no symptom, because a dead
+keyword produces a perfectly well-formed empty result (trap 78). They were removed because
+`EveryCuratedKeywordMatchesSomethingInTheShippedCatalog` named them.
+**The default the other way:** keep them as future-proofing against a wiki edit that adds the
+word. I did not, because a curated table is only worth its curation if every row was checked
+against the data, and a row nobody can point at a line for is a guess with a comment on it. The
+consequence is stated plainly: **a keyword added here without a shipped line behind it fails the
+build**, so a future wiki edit that introduces "Spices" needs the row put back deliberately.
+
+**7. Stations and finished products are refused by name, which is a judgement.** No `oven`,
+`kiln`, `forge`, `loom` or `barrel` — they sit on about a third of the lines, they are not
+something a merchant sells, and matching on one files most of Norrath's shops under most
+professions. `alcohol` is out for the same reason from the other side: it is Brewing's PRODUCT,
+it is on forty lines, and a brewer buys "Brewing Supplies". Where a station rides a line matched
+for another reason it is still on screen, because the line is shown whole.
+`NoProfessionMatchesOnACraftingStationOrAFinishedProduct` pins all six.
+
+**8. NOT named in D4's row: the phone got the block in this slice.** P5's row reads "transform +
+reader + face + committed negatives". The parity rule in `CLAUDE.md` is a standing repo rule
+rather than a plan extension — when a surface exists on both, the decision lives in `UI.Shared`
+and all three call it — and DRA-84 D5's lesson is that a sentence reaching the wire without a
+page-side must-list row passes every parity test there is. Both words already lived in
+`HelperPresentation`, so the wire, the page and the must-list rows landed together.
+**The default:** ship desktop-only and let D5's checklist caveat it. The cost of the choice is
+three fields and one record on the Helper section; the cost of the other was a re-smoke that
+finds the phone missing a block the PC has.
+
+**9. A FOURTH wiki door, and it is wired.** `HelperDoorKind.WikiZone` resolves through
+`WikiLinks.Page`, not `Search`: a zone title is not an item and must not go through the
+item-alias rule. D2 found `WikiSkill` had shipped UNWIRED for a whole slice because `Door()`
+fell through to `AddressFor`, which answers null for every wiki kind; the switch D2 left behind
+is exhaustive by kind, so adding this one was a compile-time question rather than a silent
+no-op.
+
+**10. THE FABLE FEEDBACK FOR THIS SLICE IS NOT IN `FABLE-FEEDBACK.md`, AND THAT IS THE GUARD'S
+CALL RATHER THAN MINE.** `channel-size-guard` refuses the append: the file has spent its
+grandfather band (baseline 240,896 B, ceiling 264,985 B, currently 264,970 B — fifteen bytes of
+headroom), and the refusal says in its own words that *"RAISING the row is not the fix"* and
+*"rotation belongs to the standing EXO-CHANNEL-ROTATE card, not to the Executor seat that
+tripped this."* So there is no version of this entry that fits and no edit here that is mine to
+make. The note is written and lives **verbatim in the PR body**, and DRA-144 (*Channel hygiene
+B: rotation pass 2*) carries a comment naming this file and this block. `BEVEL-FEEDBACK.md` is
+well inside its band and its note landed normally. Recording it here because "feedback is not
+optional" and a silently skipped round is indistinguishable from not bothering.
+
+Gates: `check.ps1` all green (5,289 unit, +30), the two Helper E2E rows green. Four prove-fails
+recorded: a plain substring rule reddens two word-boundary rows, dropping the per-zone rule
+reddens the cap row, dropping the page's `m.lines` reddens the page-side must-list, and dropping
+the transform's HTML arm reddens `--check` on both generated files.
+
+## 2026-09-17 — DRA-149 D2: the alias table's seam, a fourth gap reason, and a dead wiki door found on the way
+
+**Seat:** `opus-dra149-d2` (disjoint; D1 ran in parallel on `dra149/d1-sweep-base-vs-base`).
+Plan PR #649 merged at `2645cb96`, Helm SIGNED the D1-D5 sequence ~9:15 PM CT, Live Holds
+empty. Everything below is inside plan P2 except where it says otherwise; nothing here touches
+the consequence list, nothing fetches, no catalog was rebuilt, no release.
+
+**1. The alias lands INSIDE `EqlWikiItemService.NormalizeTitle`, not beside it.**
+P2 named that method as "the candidate" and told the executor to verify every reader routes
+through it. Verified: `ItemCatalog.Find`, `EqlWikiItemService.CachedInfo`, `LookupAsync`,
+`ItemInfoWindow`'s heading and `UI.Shared/WikiLinks.Search` all call it, and nothing else folds
+an item name. So one row fixes the catalog lookup, the wiki fetch and the player's own door
+together. **The default it could have gone the other way on:** a dedicated
+`ItemNameAliases.Resolve` call at the gear sweep only, which is a smaller diff and would have
+left the item window and the wiki door still showing the spelling that failed — a second answer
+to "what is this item called" (trap 4).
+
+**2. `WornItem.BaseName` is now built by that same seam, which is a behaviour change P2 did not
+spell out.** Its doc comment has always read *"the wiki's title for it, which is the catalog's
+key"*, and it was built by `QuestCatalog.BaseItemName` — a second `+N` stripper that has never
+heard of a spelling. The contract was therefore true only where the two agreed. This matters
+beyond tidiness: `GearUpgrades.Sweep` skips a candidate whose name equals the anchor's
+`BaseName` ("the catalog holds the item the player is wearing too"), and that refusal MISSED
+for exactly the items an alias covers. **The default:** leave `BaseName` as the dump's fold and
+alias only inside `statsFor`. I did not, because it leaves a live same-name hole for D1 to walk
+into — D1 is moving that comparison to base-vs-base. Pinned by
+`FounderWornSheetTests.EveryAnchorsBaseNameIsTheNameTheCatalogFiledItUnder` over his whole dump.
+
+**3. A FOURTH gap reason, `GoalGapReason.NothingWornIsReadable`.** P2 asked for unread rows to
+become a sentence and did not mention the gap. But with a dump present and every row
+unreadable, `Worn.Count == 0` drew `NoInventoryDump` — *"Run the inventory command in game and
+this fills in"* — which is a loop with no exit for the one player it fires for. It is the same
+shape `EveryZoneOutsideYourBand` already has (a state `NoCatalogUpgrade` would misdescribe),
+and the must-list tests cover a new member automatically. **The default:** ship the caption
+and leave the gap saying the wrong thing, on the grounds that the state is not in the fixture.
+Cost of the choice: one enum member on a public Core enum while D1 is in flight.
+
+**4. NOT in the plan, and reported loudly: `HelperDoorKind.WikiSkill` has been a silent no-op
+since DRA-71 D8 shipped it.** `HelperRoom.Door()` special-cased `WikiFaction`, then fell
+through to `AddressFor`, which answers null for every wiki kind — and the null arm `return`s
+the label UNWIRED, before `_doors++` and before `_deadDoors++`. So the "eqlwiki" control under
+all eight professions drew a tooltip and opened nothing, and `helperDeadDoors` could not see
+it. `HelperMustListTests.EveryDoorEitherLandsOnARoomOrOpensTheWiki` proves the WORDS exist and
+nothing proved the CONTROL opens — trap 34 one layer down. I fixed it in the same method rather
+than filing it, because D2 adds a THIRD wiki door and shipping a new one beside an identical
+dead one is not an option; the switch is now exhaustive by kind so a fourth is a compile-time
+question. **The default:** file a stub and ship the new door beside the broken one. Flagged in
+`FABLE-FEEDBACK.md` — the guard gap is the durable lesson, not the one-line fix.
+
+**5. `WikiLinks.Page` lifted out of `WikiLinks.Faction`.** Wiring the profession door needed a
+non-item search, and `WikiLinks.Search` applies the ITEM rule — it strips a trailing "+N" and
+now consults the item alias table. `Faction`'s own doc already warned against exactly that.
+One spelling rule, two callers, rather than each door picking the nearest helper.
+
+**Verification.** `scripts/check.ps1` all gates green (5,178 unit tests). Full local
+`tests/EQBuddy.E2E`: 369/370 — the one red is `EveryLandedRoomIsReachableByItsOwnAddress`
+(`world:drops`), an OPEN ledger row, passed 19/19 on an immediate re-run of the whole theory,
+and filed as a third occurrence in `docs/ops/flake-ledger.md` including the fact that this seat
+failed to capture the assert text. Four prove-fails run and recorded in `docs/TestPlan.md`.
+**No `WhatsNew.json` entry** — the plan puts the drafted entries in D5 with the re-smoke pack,
+and no release ships from here.
+## 2026-09-16 — DRA-149 D1: the Helper's gear sweep drops the "+N" tier rule, and its rows say so
+
+**Seat:** `opus-dra149-d1`. Fable's DRA-149 plan P1, taken as an ADOPT under the sequence-wide
+SIGN. **This is the plan's own "default most worth a veto", so it is logged here rather than
+merely shipped.**
+
+**What changed.** `GearUpgrades.Sweep` asked `ItemDominance.CanClaimUpgrade`, which is
+dominance PLUS `UpgradeTier(candidate) >= UpgradeTier(worn)`. It now asks
+`ItemDominance.Dominates` — base numbers against base numbers. The Gear Locker is untouched and
+still asks the tier rule; its never-BiS scope lock is untouched too.
+
+**Why it is not a loosening of a safety rule.** The premise the tier rule rests on is true in
+the Locker and false in the sweep. Both names in the Locker come off one inventory dump and
+both can carry a "+N". On the catalog side **0 of 11,196 names carry one**, so
+`UpgradeTier(candidate)` is 0 for every row and the test read `0 >= N` for any plussed worn
+item. Measured through the real code over the Founder's committed dump: **19 of 19 gear anchors
+returned zero candidates**, and the only anchor that ever answered was `Arrow`, the one item he
+wears with no "+N" on it. That is not a strict rule; it is an answer fixed before the inputs
+are read. He read `NoCatalogUpgrade`'s true sentence and reported the feature as broken, and he
+was right. After the change the same 19 of 19 answer.
+
+**What the rows may now CLAIM narrows to match, which is the actual protection.** The sentence
+moved from "X beats the Y in your head" to **"X is a better base item than the Y in your
+head"**, and ONE block-level caption says the rest: your item carries its "+N" on top and the
+wiki does not state what that is worth, so at the same "+" the listed item wins and EQBuddy
+cannot tell you whether it still wins against yours as it stands. Said once per block, never
+templated onto each of up to eight rows — eight identical caveats is trap 73's distinct-count
+shape, and it would bury the one thing each row exists to say. **No "+N" arithmetic is invented
+anywhere**; the gap is stated, not closed, because eqlwiki does not publish the value and being
+uniquely wrong costs more than being silent.
+
+**The default it could have gone the other way on:** keep the tier rule and treat the empty
+answer as correct conservatism — "we decline to tell a player to unequip their best item". I
+did not, because that framing describes a judgement the code never makes: the rule never
+compared anything. The alternative default, inventing a "+N" stat estimate so the comparison
+becomes honest again, is refused by the plan and by the wiki rule, and I did not take it
+either.
+
+**Also in this slice (P3, mechanical):** slot spellings normalize at the sweep's read seam —
+`FINGER`→`FINGERS` (209 catalog entries against the dump's word), `SHOULDER`→`SHOULDERS` (5),
+`SECONDAY`→`SECONDARY` (3), trailing `,`/`:` stripped; `/`, `EMPTY` and `ORNAMENTATION:` are
+refused as non-slots and counted in a test. An `Any Slot` worn row — the Founder's
+`Shiny Brass Shield +6` and `Lute +1` — takes its candidate pool from the item's own catalog
+`Slot:` line, since `ANY SLOT` is a key the catalog never emits. **The anchor's identity and
+label stay the dump's** (DRA-81 KEEP); only the pool moved. No catalog was rebuilt and the
+promoter's own debris stays the promoter's card.
+
+**The old guard was reworked, not deleted.** `AWornUpgradeTierIsNeverToldToUnequipItself` now
+asserts both halves — the Locker still refuses the pair, the sweep now offers it — so the fact
+that the two surfaces deliberately differ is the thing under test. Prove-failed by restoring
+the tier gate in `Sweep`: three guards go red, including the fixture floor. The ANY SLOT
+fallback prove-fails independently.
+
+**Gates:** `check.ps1` all green; 5,162 unit tests; Helper E2E 10/10. The band gate, the who
+rule and their order are untouched — their refusals simply become reachable for the first time,
+which is D5's re-smoke checklist's job to predict rather than a regression.
+
+— Dranak (Claude Code), Executor — DRA-149 D1
+
+## 2026-09-16 — DRA-148 (#527 rebase): the rename reached a rail that was built after the PR was written
+
+**Seat:** `opus-dra148-pr527`. #527 sat CONFLICTING through 409 commits of `main` drift. The
+two textual conflicts were channel-shaped and resolved by the standing rule (their file PLUS
+my entry): `DECISIONS.md` took my 2026-09-10 entry back into reverse-chronological place, and
+`WhatsNew.json` kept `main`'s edit of the shared sidebar highlight — `main` had since dropped
+the "jump to a room" clause from it — and appended only the Bard-spear line. Nothing in the
+PR's own intent changed.
+
+**1. The one real call: re-running `scripts/dra83-attachments.py` rather than stopping.**
+DRA-83 landed on `main` AFTER #527 was written and added
+`EpicGuideTests.TheTwoUnresolvableSkyRewardsAreNamedAndCarryNoReference`, which git could not
+see as a conflict because it is a different file. It went red on the rebase, exactly as its
+own doc comment predicted it would: *"`Harmonic Spear` is the wiki's Spear of Harmony (PR #527
+carries the rename) ... when either is fixed the count above moves — which is the point of
+asserting both ends."* The Bard's turn-in now resolves to a real `ItemCatalog` item, so DRA-83
+rule 1 ("`GearUpgrade` on the turn-in step, keyed on the reward ITEM, placed only where
+`ItemCatalog` knows the name") applies to it and it was carrying no reference.
+
+I re-ran the committed script rather than hand-editing the catalog or filing a stub. It skips
+any objective that already has attachments, so it placed **exactly one** — `GearUpgrade` /
+`Spear of Harmony` on `pos-bard-harmonic-spear`'s turn-in — and refused exactly one,
+`Windhowl/Spirit Render`, which is what the PR's intent says stays in Delivery 2. The guard's
+count moved 93 → 94 and its named list went from two to one, edited in the same commit that
+reddened it — the same shape the PR already applies to `GuideCatalogTests`.
+
+**The default it could have gone the other way on:** treat a newly-red guard as "product
+judgment beyond the stated intent", stop, and leave the PR open with a note. I did not,
+because nothing here is a judgement: the rule is committed and re-derivable, the script is its
+own record, the script CHOSE the placement, and the guard's author wrote #527 into the doc
+comment as the thing that would move the number. Deciding anything about
+`Windhowl/Spirit Render` WOULD have been that call, and it is untouched.
+
+**2. No scope beyond the rename's reach.** `QuestCatalog.json`, `AchievementsImport`, the
+guide's internal id `pos-bard-harmonic-spear`, and the Delivery 2 `RewardCard` shape question
+are all still untouched, for the reasons in the 2026-09-10 entry below.
+
+## 2026-09-15 — DRA-87: the last three "log-only" labels, and why SECURITY.md got its own boundary line rather than an exemption
+
+**Seat:** `opus-dra87-docs-honesty`. Paperclip DRA-87, authorized by Helm as a one-slice
+follow-on after #631 (DRA-68) landed. Nothing here is on the consequence list: correcting a
+false claim is not a values-line change, and this is docs + one test file — no `src/`, no
+tag, no signing, no public post. No `WhatsNew.json` entry, matching DRA-67 (#568) and DRA-68
+(#631), which shipped none: a docs wording fix is not player-noticeable in the app.
+
+### 1. Why two honesty cards walked past these three
+
+DRA-67 corrected `site/index.html`; DRA-68 corrected `README.md` and `EQBuddy-Evolved.md`.
+All three remaining sites are **LABELS over prose that was already true**, which is a
+different failure from the hero pill and is why a reader of either earlier card's diff would
+not have noticed them:
+
+- `PRODUCT.md:39` `### Log-only and local-first` and the v2 charter's `## 2.2 Log-only and
+  local-first` both head bullet lists — "no game-memory reads", "no packet inspection", "no
+  telemetry by default" — where **every bullet is true**. Nothing under the heading is wrong.
+- `SECURITY.md:18` *"EQBuddy's rule is **log-only, zero telemetry**: it never sends your data
+  anywhere on its own"* is a **correct statement about EGRESS wearing the wrong noun**. The
+  sentence heads the network-destination table and the claim it actually makes ("never sends
+  your data") is true and stays.
+
+The heading is the part a reader quotes back at you, so the label is the bug. And the chain
+is the DRA-67→68 one, one link further: `EQBuddy-Evolved.md:7` — a surface DRA-68 corrected —
+points at `PRODUCT.md` **by name** for "the product identity — principles, surfaces, and the
+north star in full". A reader who checked us walked from a corrected surface onto this one.
+
+`SECURITY.md:3` earned a second correction the card did not name: it said EQBuddy "reads your
+log file" on the page whose next clause promises *"exactly what the app does with it — every
+network connection, every file it writes"*. An incomplete statement of what we read is worst
+on the page whose whole genre is completeness, so the opening paragraph now names the `/log`
+and all four dumps. The charter's ACCURACY-001 corpus row said `inventory, achievements,
+factions` — three of four, and a misspelling of `faction`; it now matches `GameCommands`.
+
+### 2. The decision the card handed me: whether/how to claim-test SECURITY.md
+
+**Decision: cover it, with all four arms, and give arm (d) the boundary line THAT PAGE
+actually makes.**
+
+Arms (a) claim / (b) disclose / (c) enumerate fit `SECURITY.md` better than any other
+surface. Its own genre is exhaustiveness — *"The complete list of hosts"*, *"That's the whole
+list"*, *"Everything lives under `%AppData%`"* — so it is the last surface that may take
+README's short form, and a fifth `/outputfile` dump **should** redden it.
+
+Arm (d) was the problem, and the measurement is what decided it: the committed
+`SECURITY.md` carries **neither** product values line. Not "game memory", not "measures other
+players". Not an oversight — the page is about what leaves the machine, what is written to
+disk, and how an update is verified. Requiring the product pair would have forced two
+unrelated sentences onto a correct page, which is the same failure as demanding one spelling
+(trap 74's shape, and DRA-68's own stated reason for matching concepts rather than bytes).
+
+**The default it could have gone the other way on: adding a `MustCarryValuesLines: false`
+switch.** I refused that shape. A bool has two states and both are visible in the table, but
+an off switch invites the next surface to join with the check silently disabled — and
+`Violations` would then report that file clean forever. Instead `ValuesLines` became
+**per-surface DATA**: the four product surfaces carry the product pair, `SECURITY.md` carries
+`zero telemetry` / `never sends your data`. No surface's arm (d) is ever off.
+
+That swap opens one hole a bool did not — an **empty** set turns the arm off while still
+looking configured (trap 78 aimed at the surface table rather than at the detector). So it is
+closed in the same commit: `EverySurfaceCarriesABoundaryToKeep` refuses a surface with no
+boundary line, and demonstrates the hole is real by showing the same text passing with `[]`
+and failing without it.
+
+The point of arm (d) was never those two specific sentences. It was that **correcting a false
+claim must not cost the true boundary line standing next to it** — and on this page that line
+is "zero telemetry", which the obvious fix (deleting "log-only," from the pair) would have
+left within one word of being spent.
+
+### 3. Two calls beyond what the card named
+
+**(a) I widened the values pattern instead of rewriting two true sentences.** `PRODUCT.md`
+says "a way to judge other players" and the charter "mechanism for judging other players",
+where the landing says "measures other players" and `EQBuddy-Evolved.md` says "judge other
+people" — four spellings of one concept, all correct, all already shipped. The pattern is now
+`judg(?:e|ing) other (?:people|players)`. Editing a correct sentence to buy a green run is
+exactly how a gate teaches people to edit around it. Widening an ACCEPT pattern **weakens** a
+guard, so it gets its own negative (`TheWidenedJudgingPatternStillRefusesASilentPage`): a page
+that names neither the judging nor the measuring is still caught, and the alternation did not
+quietly decay into a match on "other players" alone.
+
+**(b) I covered the v2 charter as a sixth surface, which the card asked me only to reword.**
+Leaving the false label in the charter would have recreated the exact defect this card exists
+to close — and worse, a contradiction: `PRODUCT.md:7` says it wins for v2 over older language
+while the charter's own header says the charter wins. Two live docs disagreeing about what
+EQBuddy reads is not a state to ship.
+
+It takes the **short form** (`MustEnumerateDumps: false`), like README. The must-list exists
+for a PLAYER asking "what does EQBuddy read?", and that reader reaches the landing, README,
+`PRODUCT.md` and `SECURITY.md` — not an internal requirements doc whose own audience line
+names Helm, Fable and the execution agents. What the charter owes is that its hard lines are
+not false. The prove-fail confirmed the shape rather than assuming it: **the charter failed on
+the CLAIM alone**, because it already mentioned `/outputfile` in four places.
+
+So a fifth dump now reddens four enumerating surfaces (landing, `EQBuddy-Evolved.md`,
+`PRODUCT.md`, `SECURITY.md`) and README plus the charter have nothing to go stale.
+
+### 4. Prove-failed against the real pre-change bytes, not only fixtures
+
+Docs reverted with the guard kept: **4 of 31 fail, and the landing, README and
+`EQBuddy-Evolved.md` stay green** — the discrimination is the point, not the count.
+`PRODUCT.md` and `SECURITY.md` reddened on all three arms (claim, undisclosed, no single
+paragraph); the charter on the claim alone. The three pre-change strings also ride as
+committed `InlineData`. `SecurityMdKeepsItsOwnPromiseAndWouldFailTheProductOne` proves the two
+boundary sets are not a distinction without a difference by running the real file under both.
+
+`scripts/check.ps1`: all gates green, 5130 unit tests.
+
+**Left alone deliberately, per the card:** `README.md:358` (the position-sentence exemption,
+still exactly true), `CLAUDE.md` (`DECISIONS.md:2388`'s reopen), and the BEVEL critique quote.
+
+---
+
+## 2026-09-14 ~10:40 PM CT — DRA-68: the front door's "log-only", and the tension inside the card that sent me
+
+**Seat:** `dra68-executor`. Paperclip DRA-68, the DRA-67 follow-on Helm already ruled is its
+own card rather than a rider on the landing PR. Nothing here is on the consequence list:
+correcting a false claim is not a values-line change, and this is docs + one test file — no
+`src/`, no Pages enable, no tag, no signing. No `WhatsNew.json` entry, matching DRA-67's own
+merged PR (#568), which shipped none: a README wording fix is not player-noticeable in the app.
+
+### 1. The card told me two things that cannot both be true, and I had to pick
+
+The card says `EQBuddy-Evolved.md:68` *"is the one place worth listing all four dumps … The
+other two take the short form"* — and, one paragraph later, that extending the guard means
+*"a fifth dump reddens every covered surface at once."* **A surface that takes the short form
+has nothing to redden.** If README must enumerate the four dumps to satisfy the must-list, it
+is not taking the short form; if it takes the short form, a fifth dump cannot redden it.
+
+**Decision: the short form wins, and the guard says so out loud.** `MustEnumerateDumps` is
+per-surface — true for the landing and `EQBuddy-Evolved.md`, false for README — and the
+parameter's doc comment states the consequence rather than hiding it: a fifth dump reddens the
+two enumerating surfaces, and README has nothing to go stale. The default it could have gone
+the other way on: forcing README to name all four, which would have bought a third redden at
+the cost of overruling the card's explicit instruction about the file every contributor reads.
+
+**But "short form" must not become "silence."** Deleting a false claim and answering nothing is
+the exact failure DRA-67's must-list exists to prevent, and dropping the enumeration for README
+would have reopened it. So there is a third arm every surface takes: the file must MENTION
+`/outputfile` at all (`TheShortFormMustStillDiscloseTheDumps`). README is excused from
+enumerating the dumps, not from disclosing them.
+
+### 2. The one true sentence the guard had to be taught not to break
+
+`README.md:358` — *"EQBuddy reads only the log, so the marker moves when you ask it to, not by
+magic"* — contains a forbidden claim verbatim and is **exactly true**, because it is about live
+POSITION: no `/outputfile` dump reports where you are standing. The card named it and said not
+to touch it.
+
+**Decision: exempt the SENTENCE, not the file and not a line number.** A file-level or
+regex-level carve-out would have quietly excused the next "log-only" someone adds to README —
+an exemption list with a hole in it is worse than no exemption (trap 52's shape). Three
+properties make it narrow, and each has a test: the exempt text is stripped **before the claim
+scan and nowhere else**, so it can never satisfy the must-list or stand in for a values line;
+`TheExemptionDoesNotCoverTheNextClaim` proves a second "log-only" in the same text is still
+caught, and that the position sentence IS caught without the exemption — so the carve-out is
+what is doing the work, not a gap in the claim list; and `EveryExemptSentenceIsStillInItsFile`
+reddens if README is reworded and the exemption goes stale, which is trap 34 aimed at the
+guard's own carve-out rather than at the product.
+
+### 3. Two calls I made that the card did not ask for
+
+**`README.md:739` — "the log-only principle" — corrected to "the no-game-memory principle."**
+The card said correct it *only* if the surrounding sentence reads as a capability claim, and it
+does not: it is a passing label in a list of ideas that cannot be licensed. I corrected it
+anyway, because after this change no other surface names the principle that way, and leaving it
+would have left an orphan label restating the false claim in the file the card calls the front
+door. The honest name is also the true one — the principle is that we never read game memory.
+The default it could have gone the other way on: leave it and add a second exemption. I judged
+a true label cheaper than a carve-out I would have to keep honest forever.
+
+**The values lines are matched as CONCEPTS, not bytes.** The three surfaces have always said
+these in different words: README writes "game memory" where the landing writes "game-memory",
+and `EQBuddy-Evolved.md`'s hard line says *"a way to judge other people"* where the other two
+say *"measures other players"*. A literal scan would have reddened two correct sentences and
+demanded they be rewritten to suit the gate — which is trap 74's real cost, a gate people learn
+to edit around. Accepted phrasings are curated and committed, and
+`EachSurfacesOwnSpellingOfTheValuesLineCounts` pins both live variants.
+
+### 4. What the prove-fail actually measured, and the fixture I got wrong first
+
+Reverting only the two docs and keeping the guard: **fails 2 of 21, and the landing stays
+green.** That discrimination is the point — the guard reddens on exactly the surfaces DRA-68
+exists to fix and not on the one DRA-67 already fixed. README reddened on BOTH `log-only` **and**
+`knows only what your own log`; the second is README's own phrasing, and a scan for the
+hyphenated pill — the obvious way to widen this guard — would have reported that file clean
+while it carried the same false claim in its own words.
+
+**My first markdown fixture asserted a property the rule does not have**, and the run caught it:
+I wrote a two-bullet case where the second bullet answered in full, and asserted it was a
+violation because the answer was not in the bullet making the claim. The rule is "some single
+paragraph answers in full" and never has been "the claiming paragraph answers" — the fixture was
+green-lighting a stronger guard than the code implements. The replacement tests what the
+list-item split genuinely buys: `EQBuddy-Evolved.md`'s four "Hard lines" bullets have no blank
+line between them, so a blank-line-only splitter hands the must-list ONE block and an answer
+scattered across bullets passes. The fixture now asserts every required word IS present in the
+text and the guard refuses it anyway — the demonstration, not just the assertion.
+
+— Dranak (Claude Code, DRA-68)
+
 ## 2026-09-14 ~9:40 PM CT — DRA-84 D2: the Farm Gear band gate, the open top, and the one-level gap between the plan's example and the plan's constant
 
 **Seat:** `opus-dra84-d2` (`-Mode disjoint`; `opus-dra84-d1` and `opus-dra84-d3` both still
@@ -2884,6 +3624,35 @@ touching the actual unknown, which is rendering.
 PR #501 still open carrying the full plan; filed the LIVE ASK for Helm's SIGN + merge instead
 of writing a second plan in this seat. One `gh pr list` before writing — the corrective from
 the DRA-48 #508/#510 collision, applied.
+
+## 2026-09-10 (Fable's two #514 follow-ups — the calls I made alone)
+
+**1. The Bard's guide ID stays `pos-bard-harmonic-spear` after the rename.** Everything a
+player can SEE now says "Spear of Harmony", but the guide's internal id does not, and that is
+deliberate: `GuideProgressRouter` uses `Guide.Id` as the per-character ledger key for steps
+that belong to no checklist item, so renaming it would silently drop this Bard's recorded skips
+and travel steps to buy a tidier string nobody reads. Fable's blast-radius list did not include
+it either. The default it could have gone the other way on: rename for consistency and accept
+the progress loss. If it ever DOES get renamed, it needs its own ledger migration.
+
+**2. `GuideExpanded` migrates with the rename rather than accepting one re-fold.** Fable named
+this as a choice and asked me to say which I took. Migrating is four lines in a loop that
+already exists and it means a player with that quest open does not find it silently folded on
+next launch. The two loops are separate because an expanded quest is not a completed one — the
+first loop's `continue` would have skipped it. `AnExpandedQuestStaysExpandedThroughARename`
+prove-failed.
+
+**3. `QuestCatalog.json` keeps "Harmonic Spear" and was not touched.** It is HARVESTED wiki
+data, auto-written by the weekly refresh, and that string is a rewards entry on a quest page —
+hand-editing it would be overwritten next refresh and would make us disagree with our own
+harvest. The rename is ours to make in the CURATED rows (`SkyQuestDefaults`, the guide
+catalog); the wiki's quest page saying something different from its item page is the wiki's to
+fix, not ours to paper over.
+
+**4. `AchievementsImport`'s drift-match pair keeps BOTH spellings.** It exists to tolerate the
+game's export and our catalog disagreeing, and the game's export is not renamed by us. Removing
+the old spelling would break the import for anyone whose dump predates this.
+
 ## 2026-09-10 (DRA-33 Evolved republish — the calls I made alone)
 
 **1. "Fable files the look" was treated as satisfied by the pushed channel filing on the seat
@@ -3801,11 +4570,11 @@ Authority: `docs/BEVEL-cog-options-ia-faces.md` (Helm-signed ~2:13 PM CT, owner 
 - **`HudBarView.AttachDoubleClick` was DELETED, and its sentence kept** · leaving it costs nothing and touches less · deleted, because both remaining callers stopped passing it a key once every breakout cell became an expansion chip, so it was a method that could no longer fire (trap 43's polarity). Its tooltip was the only place on the bar the opt-in double-click was advertised, so that half moved into `HudBarView.WithDoubleClick` rather than going with it (traps 20/26 — a fold owes an account of every control it absorbed).
 - **Every pinned watch rule's chip expands the SAME target** · a per-rule target was the alternative · one target, because the Watch float is a list of every pinned rule — four names for one window — and lock 1 then does the rest: hovering a second rule's chip replaces the peek instead of stacking a panel.
 
-## 2026-09-07 (PR-3 â€” the tick-freeze fix: a bounded tooltip duration)
+## 2026-09-07 (PR-3 — the tick-freeze fix: a bounded tooltip duration)
 
 - **The bounded duration is 30 000 ms** Â· Helm's sign recommended 30 000 and allowed
-  15 000â€“60 000 Â· 30 000, because nothing in the mechanism cares about the exact number â€”
-  anything far below `int.MaxValue` is safe by construction â€” so the only real question is
+  15 000–60 000 · 30 000, because nothing in the mechanism cares about the exact number —
+  anything far below `int.MaxValue` is safe by construction — so the only real question is
   how long someone needs to READ a tooltip. The xp chip's three-line hover (OE-3) is the
   longest text in the app and is comfortable inside 30 s; 15 s would snatch it from a slow
   reader and 60 s is indistinguishable from the accidental "forever" for anyone who has
@@ -3824,7 +4593,7 @@ Authority: `docs/BEVEL-cog-options-ia-faces.md` (Helm-signed ~2:13 PM CT, owner 
 - **The override is on `DependencyObject`, not on `FrameworkElement` + `FrameworkContentElement`** Â·
   both would work and the pair is the more conventional shape Â· the root, because
   `ShowDuration` is read straight off the owning element and metadata lookup walks to the
-  root, so one override answers for everything WPF can hang a tooltip on â€” and two overrides
+  root, so one override answers for everything WPF can hang a tooltip on — and two overrides
   is the beginning of a list (trap 30). Verified rather than assumed: a scratch probe on this
   runtime returned 2147483647 before and 30000 after, for `Button`, `TextBlock` and `Border`.
 - **The trap-42 effect assertion was NOT run locally against a launched app** Â· the honest
@@ -3834,10 +4603,10 @@ Authority: `docs/BEVEL-cog-options-ia-faces.md` (Helm-signed ~2:13 PM CT, owner 
   The underlying claim was verified another way (the scratch probe above), and `e2e-windows`
   runs the assertion itself on PR-3's own tip.
 
-## 2026-09-06 (Phase-2 â€” GearCard tick-freeze diagnosis)
+## 2026-09-06 (Phase-2 — GearCard tick-freeze diagnosis)
 
 - **The local Ã—20 repro loop was SKIPPED** Â· Fable's Phase-2 plan offers it first ("Local repro
-  loop on a Windows seatâ€¦ If not: wait for the next CI red") Â· skipped, because the red had
+  loop on a Windows seat… If not: wait for the next CI red") · skipped, because the red had
   already arrived carrying the minidump, and the mechanism reproduced deterministically in a
   49-line standalone console app in seven seconds. Looping the real suite would have taken the
   trap-61 screen lock for ~15 minutes to reproduce something already reproduced, on the one
@@ -3847,7 +4616,7 @@ Authority: `docs/BEVEL-cog-options-ia-faces.md` (Helm-signed ~2:13 PM CT, owner 
   `3ce1b0f9` it diagnoses** Â· the seat was scoped off #357's tip and the obvious move was to
   stack on it Â· based on main, because #357's branch is BEHIND main on all five channel files
   (`HELM-FEEDBACK.md` alone is 19 lines behind), and prepending a mailbox entry onto a stale
-  base is trap 60(a) exactly â€” the failure that deleted Helm's #323 and #324 signs. The
+  base is trap 60(a) exactly — the failure that deleted Helm's #323 and #324 signs. The
   diagnosis references #357 by number instead; nothing about it needs that branch's code.
 - **No fix was written, and no fix was sketched** Â· the mechanism is named precisely enough
   that a one-line change suggests itself Â· not written, because Helm's sign and Fable's plan
@@ -3864,7 +4633,7 @@ Authority: `docs/BEVEL-cog-options-ia-faces.md` (Helm-signed ~2:13 PM CT, owner 
   severity call Â· reported to Helm only, because "what players are told" and the release go are
   consequence-list decisions, and Phase 3 has not been scoped.
 
-## 2026-09-06 (OE-6 â€” the first-run Setup / `/outputfile` guide)
+## 2026-09-06 (OE-6 — the first-run Setup / `/outputfile` guide)
 
 Bevel's #356 pre-design left three residuals as executor calls ("exact modal chrome; precise
 dismiss-flag name and its default; whether the Behavior-tab re-open entry is a button or a
@@ -3875,21 +4644,21 @@ the two calls the work itself turned up.
 - **The chrome is an opaque LAYER over the room cell, stretched on both axes** Â· a dialog
   window, a slide-over and a room-shaped overlay were the three Bevel named Â· the layer,
   because it is what the shell already knows how to draw (`PaletteLayer` is the same shape),
-  it inherits the room's degrade for free, and it keeps the rail and the title bar visible â€”
+  it inherits the room's degrade for free, and it keeps the rail and the title bar visible —
   so the screen reads as EQBuddy asking something rather than as a modal that has taken the
   app over. A dialog window would also have been a second always-on-top surface at exactly
   the moment a new player has never seen the first one.
 - **`SetupDismissed`, defaulting FALSE** Â· `SetupShown`, `SetupSeen` and a nullable date were
   the alternatives Â· dismissed-and-false, because the DEFAULT is what a fresh install gets
   and false is the only default that makes the screen appear for the player it exists for.
-  A "shown" flag would have been the first-run boolean the pre-design rules out â€” the ask
+  A "shown" flag would have been the first-run boolean the pre-design rules out — the ask
   stops because the dumps are satisfied, not because it has been shown once.
 - **The Behavior entry is a BUTTON, not a tick box** Â· the tour beside it is a checkbox and
   copying it was the obvious move Â· a button, because there is nothing to configure: the
   auto-launch answer is a fact about the dumps plus one "stop offering", and a tick box would
   invite somebody to re-arm the nag. It sits directly under the tour, which is the block's own
   onboarding territory.
-- **ONE close, and it persists â€” the button and Escape are the same act** Â· a "not now" beside
+- **ONE close, and it persists — the button and Escape are the same act** · a "not now" beside
   a "never" was the obvious two-button shape Â· one, because two paths deciding one question is
   trap 47's shape (with a nag rather than a deletion for a consequence), and the "not now" path
   is the one that turns an onboarding screen into something a player meets every launch. What
@@ -3901,14 +4670,14 @@ the two calls the work itself turned up.
   because Bevel's ruling is explicit that Setup reuses `CommandFor(OutputfileKind)` rather
   than growing a second switch, and a must-list row keyed on `SetupView.cs` would be asking a
   file that correctly names no command to name three. **What it costs, said out loud:** the
-  count of HOSTS is no longer in that list. It never was what trap 34 guards â€” that rule is
+  count of HOSTS is no longer in that list. It never was what trap 34 guards — that rule is
   about a surface with NO copy source at all, and a host rendering these rows structurally
-  cannot have one â€” and the per-host claim moved to where controls can be seen
+  cannot have one — and the per-host claim moved to where controls can be seen
   (`shellHomeCopyCmd` and `shellSetupCopyCmd`, off two launched surfaces).
 - **`SetupDismissed = $true` is seeded in `scripts/shoot.ps1`'s base settings and in
   `AppHarness`** Â· neither was in the seat's scope Â· seeded, because the batch profile and the
   E2E profile both have a character and NO dumps, which is precisely the state the auto-launch
-  predicate opens for â€” Fable's seat note assumed the opposite ("the batch's seeded profile has
+  predicate opens for — Fable's seat note assumed the opposite ("the batch's seeded profile has
   dumps imported"), and `shell-home`'s own prediction says three â§‰ buttons *"because the shoot
   profile has no dumps"*. Left alone, every shell shot and every shell E2E would have run with
   a screen over the surface it is about: trap 23 arriving through the harness. The
@@ -3916,12 +4685,12 @@ the two calls the work itself turned up.
   open rather than a re-run of the predicate, so the picture stays evidence about the screen on
   the day the fixture gains a dump.
 
-## 2026-09-06 (OE-3 â€” the xp-chip tooltip: ETA + level)
+## 2026-09-06 (OE-3 — the xp-chip tooltip: ETA + level)
 
 - **The level readout goes on the TOOLTIP, not on the Progress window's Experience header**
   Â· the #347 sign allowed either and named the header as the alternative Â· the tooltip,
   because it pairs the level with the ETA in ONE hover on the surface the owner was actually
-  reading. The header would have put the level on the window the forecast already lives in â€”
+  reading. The header would have put the level on the window the forecast already lives in —
   answering "where is my level" with "one window away", which is the same shape as the gap
   being fixed. Fable's plan pre-decided this; it is recorded here because the sign left the
   choice open and the alternative was a real one.
@@ -3929,7 +4698,7 @@ the two calls the work itself turned up.
   line when there is nothing to forecast, and the obvious move was to copy that Â· spoken,
   because the two surfaces are answering different questions. A tally list that drops a line
   is reading as "nothing yet"; a HOVER that drops its level line is indistinguishable from an
-  app that does not track levels â€” which is the exact report this item exists to answer.
+  app that does not track levels — which is the exact report this item exists to answer.
   Omitting it would have shipped the complaint back as the fix.
 - **The ETA is a shared SENTENCE, not a shared formatter** Â·
   `ProgressPresentation.FormatEta` was already public, so the tooltip could have composed its
@@ -3940,21 +4709,21 @@ the two calls the work itself turned up.
   eye lands, which argues for the new facts on top Â· first, because it is the only place the
   peek/pin interaction is explained at all and a hover opening on a bare "Level 27" over a
   chip reading "12.4%/hr" has stopped identifying itself. Line 2 of a 3-line tooltip is not
-  below any fold â€” trap 44 was about a report behind 21 rows and a scrollbar.
+  below any fold — trap 44 was about a report behind 21 rows and a scrollbar.
 - **The widget paid for the wiring by de-duplicating `TrackedLevel`, not by a ratchet bump** Â·
   the `MainWindow*` entry was at 4,222 of 4,222 and one argument was needed Â· the file had
   written `QuestLedger?.LevelFor(QuestCharacterKey) is > 0 and var lv ? lv : null` out by hand
   twice and was about to do it a third time, so one named member pays for the new argument and
   leaves the count where it was. The baseline is untouched at 3,839 and OE-4 still inherits
   zero headroom, which is what its roster lift is for.
-## 2026-09-06 (OE-2 â€” the Open EQBuddy door / shell recover)
+## 2026-09-06 (OE-2 — the Open EQBuddy door / shell recover)
 
 - **The door is a CONTEXT-MENU ROW on the widget** Â· the comments that named it three times
   say "the HUD's 'Open EQBuddy'", which reads as a control on the bar Â· a row, per Fable's
   recommendation and for two independent reasons: the trap-59 floor needs a door a player who
-  has configured NOTHING already has (a hotkey is not one â€” `HotkeyManager` binds nothing by
+  has configured NOTHING already has (a hotkey is not one — `HotkeyManager` binds nothing by
   default), and a control on the HUD bar would have collided with lane W, which owns
-  `HudBarView` while OE-1/OE-3/OE-4 run. It sits above `Worldâ€¦` and `Questsâ€¦`, which are rows
+  `HudBarView` while OE-1/OE-3/OE-4 run. It sits above `World…` and `Quests…`, which are rows
   for the same reason.
 - **The row names NO address, so it fronts an open shell instead of sending it Home** Â· the
   other way is `ShellHost.Show(main, "home")`, which reads like "recover the guidance hub" Â·
@@ -3966,23 +4735,23 @@ the two calls the work itself turned up.
   is the âœ•, and "open it if closed, front it if open" answers exactly that Â· widened, because
   `Activate` does not undo `WindowState.Minimized`: the same row would have done visibly
   nothing for the player who put the shell out of the way instead of closing it. That state
-  has a taskbar button, so it would never have arrived as a bug report â€” it would just have
+  has a taskbar button, so it would never have arrived as a bug report — it would just have
   made the new row feel unreliable. Restores to `Normal` rather than a remembered maximize;
   coming back the wrong size is a nuisance and not coming back is the bug.
 - **`ShellHost` owns the shell window now (`ShellHost.Window`), instead of bumping the
-  `MainWindow*` ratchet baseline** Â· the entry stood at 4,222 of 4,222 â€” literally zero
-  headroom â€” so the one line of glue the XAML `Click` needs had to come from somewhere Â· the
+  `MainWindow*` ratchet baseline** · the entry stood at 4,222 of 4,222 — literally zero
+  headroom — so the one line of glue the XAML `Click` needs had to come from somewhere · the
   field's own doc comment had been asserting the answer since PR 1 (*"Opened by `ShellHost`,
-  never from here â€” the widget does not own it"*), and a reference the widget holds, never
+  never from here — the widget does not own it"*), and a reference the widget holds, never
   assigns and never reads is not ownership. Net âˆ’1 line, and no edit to
-  `ArchitectureTests.Hotspots` â€” which also keeps this seat off the file lane W is about to
+  `ArchitectureTests.Hotspots` — which also keeps this seat off the file lane W is about to
   change. The alternative, a +1 baseline bump, is headroom nobody argued for.
 - **The E2E drives the row's own handler through a RUNTIME rendezvous
   (`EQBUDDY_DOORPROBE=1` plus a trigger file), not a startup hook** Â· every other hook in
   `DebugHooks` fires once at `Loaded`, and one of those could have opened the shell from a
   launch where none existed Â· that would prove the door works from a state reached by a
   different road, and "the âœ• leaves the same state as never opening it" is a reading of the
-  code â€” the kind of step trap 49 spent thirteen green tests on. The suite closes the real
+  code — the kind of step trap 49 spent thirteen green tests on. The suite closes the real
   window with a real `WM_CLOSE`, asserts the stranded state, then clicks. `doorProbeClicks`
   rises AFTER the handler returns so the "and nothing moved" assertion is not asked a moment
   too early (trap 62).
@@ -3993,13 +4762,13 @@ the two calls the work itself turned up.
   keep true.
 - **Did NOT touch the "No longer on the widget" rule even though its stated premise moved.**
   `RetiredCardsTests` refuses a row that names an Evolved room, and its reason was
-  *"`EQBUDDY_SHELL` is the only way into one today"* â€” which stopped being true with this
+  *"`EQBUDDY_SHELL` is the only way into one today"* — which stopped being true with this
   change. The rule stands: a retired CARD's row names the door that opens that surface, and
   the shell's door opens the shell, not a room. Whether a row may name a two-step destination
   is Bevel's I-11 Â§4 to revisit, so it is filed in `BEVEL-FEEDBACK.md` rather than decided
   here; the test's comment now says which half moved.
 
-## 2026-09-06 (OE-1 â€” the mini-bar tracked-chip expand)
+## 2026-09-06 (OE-1 — the mini-bar tracked-chip expand)
 
 - **The under-bar panel is a SLAVED COMPANION WINDOW, not a panel inside the widget** Â· the
   owner's words are "expand under the bar", and the obvious reading is a body in the widget's
@@ -4007,7 +4776,7 @@ the two calls the work itself turned up.
   HOVER and grows on a TIMER is a geometry change on an always-on-top transparent window over
   a fullscreen game, which is trap 12 / #173's exact mechanism and cost KoboldCoterie the
   keyboard. `HudChipRowWindow` (SA-2, Helm-signed 2026-09-05) is the precedent and this is its
-  second user â€” same `HudChipRow.Placement` arithmetic, no geometry of its own, nothing
+  second user — same `HudChipRow.Placement` arithmetic, no geometry of its own, nothing
   persisted. Fable's OE-1 plan names this hypothesis; it is verified rather than assumed.
 - **Peek and pin are ONE placement plus a flag, not a fourth `ThemePlacement`** Â· Fable's own
   labelled hypothesis was that they fit as a transient Inline, with "if the executor finds it
@@ -4021,7 +4790,7 @@ the two calls the work itself turned up.
   now. Nothing in a diff or a screenshot tells the two apart; a unit test does.
 - **`BreakoutHost.Open` is a new member rather than a reuse of `Toggle`** Â· one method for
   "the chip wants this window" is tidier Â· separate, because the default profile ships
-  `DisabledBreakouts = ["Healing"]`, so a minimized widget already has the Damage float up â€”
+  `DisabledBreakouts = ["Healing"]`, so a minimized widget already has the Damage float up —
   and the first â§‰ on it would have CLOSED it. The common case, silently wrong.
 - **Only the DPS and third slots wear button chrome in this PR** Â· lock 2 says "chips must
   look like buttons", full stop, and a bar where two of ten look like buttons is uneven Â·
@@ -4038,10 +4807,10 @@ the two calls the work itself turned up.
   because OE-1 was told to leave that setting untouched and silently changing what an opt-in
   does is worse than an unused gesture. Both ride ONE mouse-down handler: WPF skips later
   handlers on an element once one sets `Handled`, and this element must set it or the bar's
-  `DragMove` eats the click â€” so a second `+=` would simply never run.
+  `DragMove` eats the click — so a second `+=` would simply never run.
 - **The chip row parks BELOW the panel** Â· both are slaved to the same widget edge Â· the
   panel's height plus its gap is handed to `HudChipRow.Placement` as part of the HUD's own
-  height, because to a chicklet the widget and whatever hangs off it are one block â€” and the
+  height, because to a chicklet the widget and whatever hangs off it are one block — and the
   flip-above-the-widget rule has to treat them as one or it flips the row into the panel.
 - **Two screenshots, not four** Â· the four modes are peek / pinned / window / collapsed Â·
   two, keyed on the TARGET, because a peek and a pin are the same picture. Two identical
@@ -4052,7 +4821,7 @@ the two calls the work itself turned up.
   that convention is about not RAISING a ceiling; room that is freed and not claimed quietly
   refills, and OE-3/OE-4 are queued behind this in the same lane on the same file.
 
-## 2026-09-06 (F3 / SR-5 â€” the Settings room lands)
+## 2026-09-06 (F3 / SR-5 — the Settings room lands)
 
 - **The room does NOT enter the â˜… alert-banner's placement mode, although the v1 window
   does** Â· parity argues for copying it, and the shared header block prints a sentence about
@@ -4062,12 +4831,12 @@ the two calls the work itself turned up.
   leave a draggable tile on the desktop for as long as the shell stayed open on any OTHER
   room. Worse than the thing it copies. The sentence stays true as written (it is a statement
   about Options, which still exists and still works), and rehoming the drag target is now a
-  named BLOCKER on the commit that retires `OptionsWindow` â€” the `GearRoom` loot-star
+  named BLOCKER on the commit that retires `OptionsWindow` — the `GearRoom` loot-star
   pattern, asserted by `SettingsRoomTests` so a retirement cannot take it silently.
 - **The room neither reads nor writes `AppSettings.OptionsTab`** Â· reading it would let the
   room open where the player last was, which is a real courtesy Â· neither, because the two
   key sets differ (`look/alerts/watch/cards/behavior` against `look/alerts/hud/behavior`), so
-  a room that wrote "hud" would send the WINDOW home to Look on its next open â€” one host
+  a room that wrote "hud" would send the WINDOW home to Look on its next open — one host
   silently editing the other's landing. Reading without writing would be an asymmetry nobody
   could predict from either side. The room opens on Look, and an address is what a caller who
   cares uses. No setting is added, so `DeadSettingTests` has nothing new to carry.
@@ -4077,7 +4846,7 @@ the two calls the work itself turned up.
   them lazily would report a different surface from the window for as long as a tab went
   unvisited, and the whole value of the `EQBUDDY_EXPAND` comparison is that two live hosts of
   one block describe the same thing. The cost is what opening Options costs, and the ROOM is
-  still lazy â€” nothing is paid by a shell opened to look at experience.
+  still lazy — nothing is paid by a shell opened to look at experience.
 - **The Alerts family sub-strip is BUILT on every tab and only its visibility follows the
   selection** Â· building it with its tab is the obvious shape Â· always built, because a
   lazily-built strip reports zero families in the dump from every tab but one, which turns
@@ -4086,12 +4855,12 @@ the two calls the work itself turned up.
   level** Â· `settings:alerts:crowd` is more explicit and needs no disjointness argument Â·
   fallthrough, because the alert families already HAVE keys every other surface spells the
   same way, and a second grammar for one destination is trap 33 lifted into navigation. The
-  cost is a new obligation â€” the two key tables must stay disjoint â€” so that is asserted in
+  cost is a new obligation — the two key tables must stay disjoint — so that is asserted in
   both directions rather than left as a comment on the resolver.
 - **`settings:cards` answers HUD** Â· the ban retires the WORD, so retiring the key with it
   looks consistent Â· kept, because nothing renders it: it is the v1 tab tag, and a saved
   `OptionsTab`, a `scripts/shoot.ps1` row and an old doc address should land on the tab that
-  content is actually on rather than nowhere â€” `LootSurface` extends the same courtesy to
+  content is actually on rather than nowhere — `LootSurface` extends the same courtesy to
   "locker". Â§4 is about what a player READS. It is an exemption row with that reason, not a
   silence.
 - **`OptionsWindow` GREW rather than shrank, in a series whose every other PR lowered its
@@ -4104,8 +4873,8 @@ the two calls the work itself turned up.
   edit Â· one word (`private` â†’ `internal` on `_optionsWindow`, with the trailing comment the
   five sibling window fields already carry) and ZERO net lines, which matters because that
   entry has exactly one line of headroom. Without it `WidgetDump` cannot see the v1 window,
-  and the two-host comparison â€” the thing trap 58's per-host prefixing exists to keep
-  possible â€” could not be written at all. Nothing else in lane W is touched; the residual
+  and the two-host comparison — the thing trap 58's per-host prefixing exists to keep
+  possible — could not be written at all. Nothing else in lane W is touched; the residual
   `ImportGearChecklist`/`ClearGearChecklist` deletion SR-2 disclosed is deliberately left
   alone rather than ridden in on this.
 - **The block facts are counted off BUILT CONTROLS, not off the settings object** Â· reading
@@ -4122,16 +4891,16 @@ the two calls the work itself turned up.
 - **Shipped the four new shots WITHOUT the full batch behind them, and said so instead of
   letting the take-note's "the full BATCH ran" stand** Â· the note was already written and the
   four images are correct, so the cheap move was to leave the sentence alone Â· corrected,
-  because the session running the batch died partway through â€” after the settings rows, before
-  the ~60 that follow â€” and the #332 duty is therefore **still owed**, not discharged here. The
+  because the session running the batch died partway through — after the settings rows, before
+  the ~60 that follow — and the #332 duty is therefore **still owed**, not discharged here. The
   four rows were each shot under the screen lock and reviewed against their written
   predictions (trap 23), which is what makes THEM trustworthy; nothing about that says
   anything about the rows nobody re-ran. Re-running a 90-row batch to rescue one sentence
-  would have collided with whatever else holds the desktop (trap 61) for no reviewer benefit â€”
+  would have collided with whatever else holds the desktop (trap 61) for no reviewer benefit —
   but a batch that stops early and is written up as complete is exactly trap 53's six dark
   days, and the only thing that ever makes it visible is someone recording that it stopped.
 
-## 2026-09-05 (F3 / SR-3 â€” the HUD block leaves OptionsWindow)
+## 2026-09-05 (F3 / SR-3 — the HUD block leaves OptionsWindow)
 
 - **`OptionsCardsView` was RENAMED to `SettingsHudView`, not wrapped by one** Â· the item
   offered either ("it, or a thin `SettingsHudView` around it") and a wrapper keeps the git
@@ -4151,7 +4920,7 @@ the two calls the work itself turned up.
 - **"Mini dashboard" was NOT renamed, although both headings beside it were** Â· consistency
   argues for finishing the sweep Â· left alone, because it is not on the Â§4 ban list, item 3
   says this PR adds nothing beyond what re-hosting needs, and the v1 `PinWatchChips` row that
-  STAYS on the Watch tab still says "mini dashboard" â€” renaming here would have split one
+  STAYS on the Watch tab still says "mini dashboard" — renaming here would have split one
   vocabulary across two tabs for no player benefit. Pinned by a test so a later sweep does not
   "finish the job" without re-deciding.
 - **The two row-button tooltips ("Show card" / "Hide card (data still collected)") were
@@ -4182,34 +4951,34 @@ the two calls the work itself turned up.
   block, so it is in scope by the same rule `AltTabPolicy` is, and the row costs nothing while
   covering the next label somebody adds. The honesty is in the disclosure, not in the omission.
 
-## 2026-09-05 (SA-R â€” PinWatchChips retires; the per-rule ðŸ“Œ is the one switch)
+## 2026-09-05 (SA-R — PinWatchChips retires; the per-rule 📌 is the one switch)
 
 - **The MASTER retires and the PIN survives**, not the other way round Â· Helm #341 said
   "one switch, not two" and named neither Â· the pin, because it is the finer-grained of the
   two (a master can only ever be expressed as "pin everything" or "pin nothing", so retiring
-  the pin would LOSE a capability) and because it is the only one both hosts can carry â€”
+  the pin would LOSE a capability) and because it is the only one both hosts can carry —
   `SettingsAlertsView`'s Watch block already draws it, and the Evolved shell's Alerts tab
   composes that same block.
 - **The mini-bar watch chips STAY** Â· "it retires with the mini bar" could be read as
   retiring the chips too Â· stayed, because the mini bar itself is not retired (SA-1 lifted it
   and the starred cells empty per card cut, per the SA-R table) and nothing in #341 authorises
-  a chip cut. This PR removes a SWITCH, not a surface â€” no `OverlaySections.Retired` row is
+  a chip cut. This PR removes a SWITCH, not a surface — no `OverlaySections.Retired` row is
   owed, because no card left the widget.
 - **`AppSettings.PinWatchChips` is KEPT as an inert property** rather than deleted Â· SA-2's
   eight chip-geometry fields were removed outright, which is the live precedent Â· kept,
   because those fields positioned surfaces that no longer existed and this one carries a
   CHOICE a player made: deleting it drops the value out of every `settings.json` on the next
   parse, and the retirement has to read it once to honour an unticked box.
-  `MigratePromotedHudStats` is the shape â€” read the switch before stripping it.
+  `MigratePromotedHudStats` is the shape — read the switch before stripping it.
 - **The retirement lives in `UI.Shared/WatchPinMigration`, not in `AppSettings.ApplyMigrations`**
   Â· the migration chain is the obvious home and gets `SectionFoldIdempotenceTests` for free Â·
   `WatchPinMigration`, because the #253 promotion is already there for a stated reason (it must
-  `Save()`, and `Load` has a `persistMigrations: false` caller â€” trap 13), the two passes have
+  `Save()`, and `Load` has a `persistMigrations: false` caller — trap 13), the two passes have
   to run in a fixed ORDER, and putting them in one file is what makes that order assertable.
 - **Ordering buys the `hadFile` guard**, so the retirement takes no such parameter Â· could
   have threaded `hadFile` through `Apply` to match `MigratePromotedHudStats` Â· ordering,
   because the #253 promotion running first already turns the master ON for every profile that
-  has one to turn on, fresh installs included â€” so a `false` that survives it is a choice by
+  has one to turn on, fresh installs included — so a `false` that survives it is a choice by
   construction. Written into the doc comment and asserted, not left implicit.
 - **A second flag (`WatchChipMasterRetired`) rather than inferring from the value** Â· setting
   `PinWatchChips = true` at the end would be self-idempotent and cost no field Â· a flag,
@@ -4219,15 +4988,15 @@ the two calls the work itself turned up.
   a retired guard could just go Â· inverted, because the old assertion being green on the
   pre-change tree IS this change's prove-fail, and a guard that says "the switch is still
   there" cannot tell a deliberate retirement from a lift that dropped a control on the floor.
-  The src-wide reader scan moved to `WatchPinMigrationTests` â€” `SettingsFileCollectionTests`
+  The src-wide reader scan moved to `WatchPinMigrationTests` — `SettingsFileCollectionTests`
   scans test sources for writer NAMES, so naming the migration in a string literal put the
   block file in a serial collection it does not belong in.
 - **`WatchChipMasterRetired = true` joins the E2E harness and `shoot.ps1` seeds** Â· could have
   left staging to the migration Â· seeded, because a seeded profile leaves `PinWatchChips` at
-  its default false, so the retirement would unpin every seeded rule before the bar rendered â€”
+  its default false, so the retirement would unpin every seeded rule before the bar rendered —
   a picture and an assertion about a real state that is not the state under test (trap 23).
 
-## 2026-09-05 (F2 / SA-4 â€” Edit mode: Place, Mute, Dismiss on the one row)
+## 2026-09-05 (F2 / SA-4 — Edit mode: Place, Mute, Dismiss on the one row)
 
 - **A family the stored `HudChipOrder` OMITS is appended, never dropped** Â· `Merge`'s own
   contract drops a family missing from the order it is handed, so passing the setting through
@@ -4267,7 +5036,7 @@ the two calls the work itself turned up.
 
 ---
 
-## 2026-09-05 (E-3 lane D / SR-2 â€” the gear checklist import leaves Options)
+## 2026-09-05 (E-3 lane D / SR-2 — the gear checklist import leaves Options)
 
 - **`Clear` now ASKS before it wipes an imported gear list** Â· could have carried the button
   across unchanged, as Options had it Â· the move is what changed the risk: the button went from
@@ -4278,13 +5047,13 @@ the two calls the work itself turned up.
   Â· this app's button style carries no disabled visual (trap 17), so the Options version rendered
   identically to a live button and silently swallowed the click. Hidden says the same thing in a
   way a player can see, and the row keeps its two live buttons.
-- **The block's heading and blurb did NOT travel** Â· could have carried â€œGear checklistâ€ + â€œImport
-  the exported shopping-list HTMLâ€¦â€ verbatim Â· the destination already says both, and says them
+- **The block's heading and blurb did NOT travel** · could have carried “Gear checklist” + “Import
+  the exported shopping-list HTML…” verbatim · the destination already says both, and says them
   better: the tab IS the gear checklist, and `EmptyRoute` is the explanation David made us rewrite
-  twice on 2026-08-20. Carrying them would have shipped one fact twice on one surface â€” SR-1's
+  twice on 2026-08-20. Carrying them would have shipped one fact twice on one surface — SR-1's
   log-archive paragraph, same call.
-- **The status line kept only the OUTCOMES** Â· could have kept printing â€œ{name}: {done}/{total}
-  checked.â€ Â· that is what `_listName` says two lines above it on this surface; what only the
+- **The status line kept only the OUTCOMES** · could have kept printing “{name}: {done}/{total}
+  checked.” · that is what `_listName` says two lines above it on this surface; what only the
   status line can say is what the last action did, so it says that (including on success) and is
   collapsed until there is something to report.
 - **The mutation went to Core rather than calling back into `MainWindow`** Â· could have threaded
@@ -4295,12 +5064,12 @@ the two calls the work itself turned up.
   `ClearGearChecklist` are now callerless and owe a deletion from the next lane-W-safe change.
 
 ---
-## 2026-09-05 (E-3 lane D / SR-1 â€” the Look and Behavior blocks leave OptionsWindow)
+## 2026-09-05 (E-3 lane D / SR-1 — the Look and Behavior blocks leave OptionsWindow)
 
 - **The Behavior tab's duplicated log-archive paragraph says it ONCE now** Â· could have been
   carried across verbatim, which is what a lift is supposed to do, and filed as pre-existing Â·
   deduplicated, because the second copy was a strict SUBSET of the first, rendered directly
-  under it, and the block now serves two hosts â€” carrying it would have shipped one editing
+  under it, and the block now serves two hosts — carrying it would have shipped one editing
   accident twice, in two places, and made it that much harder to notice. Named in the 2.0.0
   What's-new entry. `EQBuddy/SettingsBehaviorView.BuildLogHousekeeping`.
 - **The hotkey recorder's key capture is a METHOD the host forwards to, not a handler the block
@@ -4313,7 +5082,7 @@ the two calls the work itself turned up.
   `SettingsBehaviorView.HandleRecordingKey` / `OptionsWindow.OnPreviewKeyDown`.
 - **"Widget size" and "Whole-widget opacity" were relabelled rather than left alone** Â· the
   ban's own scope line exempts v1 `OptionsWindow`, so leaving them was defensible Â· relabelled,
-  because a block serving two hosts has ONE string set and it has to pass in shell scope â€”
+  because a block serving two hosts has ONE string set and it has to pass in shell scope —
   lifting a block IS its vocab sweep (Fable's SR series, signed). They get a What's-new line in
   the same breath, because a label a player hunts for is #219's shape in miniature.
 - **`AltTabPolicy` and `MobileAlertSounds` joined `ShellTerminologyTests.ShellStringSources`** Â·
@@ -4322,23 +5091,23 @@ the two calls the work itself turned up.
   block's own scan reads an identifier and learns nothing. One of the two was carrying a banned
   word at its source.
 
-## 2026-09-05 (F2 / SA-3 â€” net-new deadline chips: watch-fire and buff-expiring)
+## 2026-09-05 (F2 / SA-3 — net-new deadline chips: watch-fire and buff-expiring)
 
 - **The watch-fire chip is gated on the rule's own `AlertBanner`** Â· could have fired on every
   rule that reaches `FireAlert`, which is the literal reading of "the same event that drives
   `AlertSoundPlan`" Â· gated, because SA-4 brings per-family Mute and until then an ungated chip
   is an on-screen output with no off-switch anywhere, added to rules that already have one.
-  Sound and speech untouched either way. `UI.Shared/WatchFireLedger.Record(TrackedRule,â€¦)`,
+  Sound and speech untouched either way. `UI.Shared/WatchFireLedger.Record(TrackedRule,…)`,
   asserted by `HudDeadlineChipTests`.
 - **The buff threshold REUSES `AppSettings.BuffWarnSeconds`** rather than the pinned constant
   the plan called for Â· a pinned 60 s would have satisfied SA-3 item 2 literally Â· reused,
   because it is still "no new Options row" and it is the answer the player already gave the
-  Buffs card â€” two numbers for one question is trap 4. The card's three inline
-  `Math.Max(10, â€¦)` clamps now call `HudChipRow.BuffWarnWindow` for the same reason.
+  Buffs card — two numbers for one question is trap 4. The card's three inline
+  `Math.Max(10, …)` clamps now call `HudChipRow.BuffWarnWindow` for the same reason.
 - **The watch-fire linger is 30 s, pinned** Â· could have been any number, or a setting Â· 30 s
   is five times `AlertWindow`'s six-second banner: the toast answers "did something just
   happen", the chip answers "what did I miss" after you look up. No cap on how many rules can
-  be lingering â€” trap 50 says a hidden truncation is worse than a long row.
+  be lingering — trap 50 says a hidden truncation is worse than a long row.
 - **A buff chip is NOT dismissible** Â· could have carried a per-instance dismissal like a slow
   chip Â· followed the mez precedent (it clears itself on fade or recast), because a dismissal
   that has to survive a re-landing is state SA-3 does not need and SA-4's Mute answers better.
@@ -4354,16 +5123,16 @@ the two calls the work itself turned up.
   four families, so the row's family order is photographed for the first time.
 - **`shoot.ps1` gained `AppendLive`** (lines written after the target window is up) Â· could
   have used a debug hook, or left the watch family unphotographed Â· added, because a watch rule
-  staged the ordinary way is a rule that correctly does nothing â€” the startup replay fires no
-  alerts â€” and the picture would have looked like a broken feature.
+  staged the ordinary way is a rule that correctly does nothing — the startup replay fires no
+  alerts — and the picture would have looked like a broken feature.
 - **NOT FIXED, filed instead: `MainWindow._gearChecklistDirty` has nine writers and no
-  readers** â€” trap 43's exact shape, and the compiler says so (`warning CS0414`). The Gear
+  readers** — trap 43's exact shape, and the compiler says so (`warning CS0414`). The Gear
   checklist's "rebuild only when a box changed" optimisation has lost its reader, presumably
   when `GearCardView` was lifted out. Left alone because the fix is ambiguous (restore the
   reader vs delete the field), it touches nine Gear sites, and it is not SA-3's subject. Filed
   to Fable in `FABLE-FEEDBACK.md`.
 
-## 2026-09-05 (F2 / SA-2 â€” one HUD chip row)
+## 2026-09-05 (F2 / SA-2 — one HUD chip row)
 
 - **The Options-open PLACEMENT PREVIEW and its draggable placeholder were deleted, not
   ported.** `ChipStackPlan.PlacementPreview()` and `FightStack`'s `optionsOpen` /
@@ -4372,7 +5141,7 @@ the two calls the work itself turned up.
   the HUD and saves no coordinates, so there is nothing left to park; keeping a preview of a
   choice the player no longer makes would be a control that does nothing. Could have kept the
   API and fed it `optionsOpen: false` forever. **This is the one place SA-2 departs from the
-  plan's letter** â€” F2 Â§1 says "its tests keep passing unchanged" while Â§6 says the
+  plan's letter** — F2 §1 says "its tests keep passing unchanged" while §6 says the
   placeholder "dies with placement"; the fold obligation is the more specific instruction and
   the product-correct one. Named in the Helm ask. â†’ `ChipStackPlan.cs`, `ChipStackPlanTests`.
 - **The eight chip-geometry settings were removed outright rather than kept for round-trip**
@@ -4385,7 +5154,7 @@ the two calls the work itself turned up.
   handler) is still true and still binds every surface that persists geometry; what retired is
   its named guard, because the chip row persists none. Could have kept them as dead guards.
   â†’ `CLAUDE.md` trap 2, `docs/TestPlan.md` Â§5.
-- **Mez before spawn as the default family order**, per the plan â€” combat-urgent first, which
+- **Mez before spawn as the default family order**, per the plan — combat-urgent first, which
   is the distinction the two retired windows' own doc comments drew. Could have been
   spawn-first or alphabetical. â†’ `HudChipRow.DefaultOrder`.
 - **Slow chips ride in the MEZ family rather than becoming a fifth family.** They shared one
@@ -4399,7 +5168,7 @@ the two calls the work itself turned up.
   unit test for the first time. â†’ `HudChipRow.cs`, `HudChipRowTests`.
 - **The row keeps the chip stacks' existing per-second measure change; it is NOT given
   reserved-width countdown slots.** Trap 12 binds the WIDGET, which is precisely what the
-  slaved companion protects â€” F2's own reason for the hosting amendment. Fixing a resize the
+  slaved companion protects — F2's own reason for the hosting amendment. Fixing a resize the
   two stacks have always had would have been new behaviour in a parity refactor, and it would
   have cost a fixed ~46 units of HUD per chip. Flagged rather than smuggled: if a player
   reports it, it is a V1 follow-up. â†’ `HudChipRowWindow`, `HudChip`.
@@ -4408,7 +5177,7 @@ the two calls the work itself turned up.
   spawn chip and right-click dismiss all carry over. Full fold enumeration is in the PR
   description. â†’ `HudChipRowWindow.ClickOf/DoubleClickOf/DismissOf`.
 
-## 2026-09-05 (T1 â€” the `shoot.ps1` intermittent full-batch look)
+## 2026-09-05 (T1 — the `shoot.ps1` intermittent full-batch look)
 
 - **Diagnosed the intermittency as a CROSS-SEAT COLLISION rather than a per-shot defect, and
   fixed it in the harness instead of in the kick order.** `Get-Process EQBuddy` matches by
@@ -4416,19 +5185,19 @@ the two calls the work itself turned up.
   app; the row that fails is whichever was on screen at that moment, which is exactly why
   `shell-gear-narrow`, `options-window` and `drops-window` failed across three runs of #306's
   batch and each passed alone. The other way: leave it to `FABLE.md` Â§4's kick-order convention
-  and treat the failures as flakes. Declined â€” a convention with no interlock has now cost two
+  and treat the failures as flakes. Declined — a convention with no interlock has now cost two
   batches, and the acceptance criterion this repo leans on cannot be the thing that is unreliable.
   `scripts/shoot.ps1`, `CLAUDE.md` trap 61.
-- **The guard REFUSES rather than waits.** A lock file held for the batch (it cannot go stale â€”
+- **The guard REFUSES rather than waits.** A lock file held for the batch (it cannot go stale —
   the handle dies with the process), plus a refusal when any EQBuddy is already running from a
   `bin\Release` / `bin\Debug` path, since `tests/EQBuddy.E2E` launches the same exe and takes no
   lock. The other way: queue and wait for the holder. Declined for now because a shoot batch is
   ~45 minutes and a silent 45-minute block is worse than a message naming the holder's pid;
   `-Force` is the override. **This is the OPPOSITE call from `UI.Shared/SingleInstance`** on
-  purpose â€” there a widget that will not launch is worse than two of them, here a batch that
+  purpose — there a widget that will not launch is worse than two of them, here a batch that
   runs anyway corrupts someone else's acceptance criterion at a random row.
 - **A build-output PATH is the discriminator for "not the player's app".** The other way: read
-  each process's `EQBUDDY_APPDATA` and check for a temp profile. Declined â€” reading another
+  each process's `EQBUDDY_APPDATA` and check for a temp profile. Declined — reading another
   process's environment from PowerShell is WMI-shaped and fails on access-denied, while a
   player's EQBuddy never runs from `bin\Release` and a harness's always does. Same move
   `Core/GameWrittenLog` makes for log names (trap 48).
@@ -4441,9 +5210,9 @@ the two calls the work itself turned up.
 - **Changed the readiness wait to wait for the shot's own window, and made the change unable to
   be worse than today.** It was satisfied by the widget on every satellite/room shot, so the
   90-second deadline was dead code and the target's whole budget was the 8-second settle. On a
-  miss the new code does not throw â€” it falls through to the capture exactly as before, so it
+  miss the new code does not throw — it falls through to the capture exactly as before, so it
   can only ever wait longer, never fail where the old code succeeded. The other way: raise
-  `$Settle`. Declined â€” a bigger guess is still a guess (trap 56's third round).
+  `$Settle`. Declined — a bigger guess is still a guess (trap 56's third round).
 - **Patched the harness without running a batch to verify it, and said so rather than holding
   the finding.** SA-1 owns the desktop; running the batch is precisely the collision this change
   is about. Verified what could be verified without the app: both scripts parse, `-List` still
@@ -4452,35 +5221,35 @@ the two calls the work itself turned up.
   was proved to refuse a second process and to name the holder. The other way: file the
   diagnosis only and leave the patch to a screen-holding lane. Declined because the diagnosis
   without the guard is what the last two rounds already produced. **The next lane that holds the
-  screen runs the batch first** â€” named in the Helm ask, not left implicit.
+  screen runs the batch first** — named in the Helm ask, not left implicit.
 - **`shot.ps1`'s `GetWindowText` P/Invoke bound the ANSI entry point** (no `CharSet`), while
   `shoot.ps1`'s own copy of the same import says `CharSet.Unicode`. Five shot rows have matched
   on em-dash titles since E-3. Fixed rather than left as a latent, machine-dependent risk; it is
   not claimed as a cause of the reported failures.
 - **`docs/screenshots/quest-tracker.png` is STILL left stale** (880Ã—658 vs a committed 880Ã—868),
-  and this is the second round it has been named in. The other way: re-shoot it here. Declined â€”
+  and this is the second round it has been named in. The other way: re-shoot it here. Declined —
   it needs the screen, which this pass explicitly does not have. Carried as a named follow-up in
   `FABLE.md` I-14 rather than dropped, alongside the 17 committed illustrations that no longer
   match what `main` renders.
 
-## 2026-09-05 (HUD subtraction cut 2 â€” the World `misc` card, lane-w)
+## 2026-09-05 (HUD subtraction cut 2 — the World `misc` card, lane-w)
 
 - **Deleted `WorldSurface.LauncherSummary` / `InlineModeFor` and `WorldTheme`'s four glance
-  methods instead of leaving them.** Could have kept them â€” they are pure, tested and cost
-  nothing to run â€” but the cut card was every one of their callers, so their tests would have
+  methods instead of leaving them.** Could have kept them — they are pure, tested and cost
+  nothing to run — but the cut card was every one of their callers, so their tests would have
   gone on asserting the wording of sentences nothing renders, which is trap 34's shape (a
   guard that cannot fail reading as coverage). Exactly what W1 did to `QuestSurface`'s three
   inline members hours earlier. `src/EQBuddy.Core/WorldSurface.cs`,
   `src/EQBuddy.UI.Shared/WorldTheme.cs`.
 - **Deleted `WorldSurface.AbsorbedCardKeys` and `ThemeCardKey` rather than leaving the fold's
   record in place.** The alternative was to keep them as history and drop only the
-  `SectionFoldIdempotenceTests` row. But a fold may only name keys that are no longer cards â€”
-  that guard's own premise (trap 55, #252) â€” and no `FoldThemeSections` call ever read these
+  `SectionFoldIdempotenceTests` row. But a fold may only name keys that are no longer cards —
+  that guard's own premise (trap 55, #252) — and no `FoldThemeSections` call ever read these
   two, uniquely among the five themes, because this theme absorbed one card and kept its key.
   A fold record with no reader and a false premise is a hole waiting for the next regression.
 - **Added `EQBUDDY_WORLD` rather than re-pointing the E2E Travels assertions at nothing.**
   Travels was the one World room the widget drew itself, so it was the one room with no
-  `EQBUDDY_*` hook â€” and the cut would have left it unphotographable and unassertable while
+  `EQBUDDY_*` hook — and the cut would have left it unphotographable and unassertable while
   reading as reviewed (trap 22). Could have dropped the assertions instead; that trades a
   covered surface for a smaller diff. `src/EQBuddy/DebugHooks.cs`, and `world-travels` is now
   the first `shoot.ps1` recipe the Travels tab has ever had (illustration lock).
@@ -4492,7 +5261,7 @@ the two calls the work itself turned up.
   `lootInline` assertion or it would have passed on an empty widget (trap 39).
 - **Kept the tombstone comments after the ratchet failed the change, and compressed them
   rather than deleting them.** First pass removed 19 lines of code and added 32 of
-  commentary, so `MainWindow.xaml.cs` GREW by 13 and `ArchitectureTests` refused it â€” the
+  commentary, so `MainWindow.xaml.cs` GREW by 13 and `ArchitectureTests` refused it — the
   guard doing a job it was not written for. Could have cut the comments entirely for a bigger
   ratchet drop; a cut nobody can find afterwards is what CLAUDE.md's "three ways back" and
   trap 55 both refuse, so the reasoning moved to `docs/Architecture.md`'s ratchet history and
@@ -4500,7 +5269,7 @@ the two calls the work itself turned up.
 - **Removed `TravelsView`'s own "Drop camp marker" row, which was one line outside the
   scoped cut.** Its doc comment named the inline card as its reason (*"lives here so the
   inline Full Travels card calls the same handler"*), and both surviving hosts pin their own
-  copy as chrome â€” so on the World window's Travels tab the affordance had been drawn twice
+  copy as chrome — so on the World window's Travels tab the affordance had been drawn twice
   since the World fold, in a window no committed illustration had ever photographed. Could
   have left it as a pre-existing defect out of scope; that would have shipped the new
   `world-travels` capture with a visible duplicate in it, which the illustration lock makes
@@ -4508,7 +5277,7 @@ the two calls the work itself turned up.
 - **Re-shot only the images this change actually alters, not the whole batch.** Every widget
   shot, `options-cards` and the new `world-travels`; the shell and window shots that a
   re-run changes only through the fixture's shifting clock are left alone. The alternative
-  â€” commit every re-shot PNG â€” is ~30 more binaries of pure timestamp churn in a PR two
+  — commit every re-shot PNG — is ~30 more binaries of pure timestamp churn in a PR two
   agents have to read. **The full batch could not be completed in one invocation regardless:
   another seat's EQBuddy was running on the same desktop and `shoot.ps1` stands the running
   app down and relaunches it, so multi-shot runs died at a different shell shot each time
@@ -4526,21 +5295,21 @@ the two calls the work itself turned up.
 
 ---
 
-## 2026-09-05 (Surface A / SA-1 â€” collapsed HUD numbers, lane W)
+## 2026-09-05 (Surface A / SA-1 — collapsed HUD numbers, lane W)
 
 - **The heal-vs-damage dominance signal is derived PURELY from event totals, anchored on the
-  last log timestamp** â€” the plan named this as the executor's call. Could have extended
+  last log timestamp** — the plan named this as the executor's call. Could have extended
   `CurrentDps`'s wall-clock read and its snapshot-memo caveat instead; that would have made the
   whole snapshot un-memoizable while healing was in play and made the unit test a test about the
   clock. Cost, stated: a player who stops playing keeps the last thirty seconds' weight until
-  they act again â€” the same way XP%/hr, the number beside it, freezes on idle.
+  they act again — the same way XP%/hr, the number beside it, freezes on idle.
   (`Core/SessionStats.cs` `RecentEffort`, `EffortWindow`/`EffortResumeWindow`.)
-- **TWO windows rather than one â€” 30 s for dominance, 5 s for "damage-combat returned".** The
+- **TWO windows rather than one — 30 s for dominance, 5 s for "damage-combat returned".** The
   signed spec asks for a slow entry and an instant exit, and one window cannot answer both:
   thirty seconds of healing drowns a swing that has only just landed. Could have used a single
   window and accepted a laggy swap back.
 - **The migration is guarded by a one-time flag AND by `hadFile`.** It reads a star's absence as
-  "that window was off", and after run one all three keys are absent â€” so without the flag it
+  "that window was off", and after run one all three keys are absent — so without the flag it
   would close two windows on every launch (trap 55), and without `hadFile` it would read the NEW
   defaults on a fresh profile as an old choice and take away the Damage window a fresh install
   has always had. Could have inferred "already done" from the keys being gone.
@@ -4551,7 +5320,7 @@ the two calls the work itself turned up.
 - **The collapsed bar's empty-state hint ("â˜… star stats in full view") is DELETED, not kept.**
   With the trio always on, its condition can never hold again; a hint that cannot appear reads
   as coverage while being unreachable. Could have kept it as dead code.
-- **The xp chip's double-click SURVIVES on the slot that replaced it** â€” while minimized it was
+- **The xp chip's double-click SURVIVES on the slot that replaced it** — while minimized it was
   the only door to the Progress window. Could have let the gesture lapse with the cell. The
   dps/hps chips' double-clicks do lapse: that gesture is opt-in and off by default, so no
   default profile loses a way to those windows, and Options is still their switch.
@@ -4563,14 +5332,14 @@ the two calls the work itself turned up.
   promotion commit, which is the move this table exists to make someone argue for out loud.
 - **`AppSettings.Load`'s `hadFile` was FIXED rather than worked around.** It read a private
   field `System.Text.Json` never sets, so it has answered "brand new profile" on every launch
-  of every profile since 2026-08-21 â€” which would have made this PR's migration a no-op on
+  of every profile since 2026-08-21 — which would have made this PR's migration a no-op on
   exactly the profiles it exists for. Could have picked a different discriminator and left the
   wrong one for the next migration to trip over. Blast radius checked: the only other caller,
   `MigrateMotesCard`, uses `hadFile` solely to decide whether to force a save and changes its
   state unconditionally, so nothing a player can see moves. A corrupted parse now counts as
   "no file", because defaults are not the player's stored choices.
 - **Options â†’ Cards & windows gained a line saying where the three switches WENT.** This is the
-  screen someone opens when a switch they had is missing, and three of them now are â€” the same
+  screen someone opens when a switch they had is missing, and three of them now are — the same
   reason a folded card's name comes back on the card that absorbed it. Could have left the list
   three rows shorter with no explanation, which is #233's complaint (naming the destination
   without naming the origin) arriving as an absence.
@@ -4580,7 +5349,7 @@ the two calls the work itself turned up.
   taken. Could have accepted the chipless picture as the new truth and left the quick tour's
   sentence promising chips the shot does not show.
 - **`BreakoutPresentation.Blurb` and the Options double-click copy were rewritten too**, beyond
-  the tooltip the plan's vocabulary rider named â€” they had become untrue for Damage and
+  the tooltip the plan's vocabulary rider named — they had become untrue for Damage and
   Healing, which is a correctness matter rather than a scope creep. `OptionsWindow.xaml`'s
   "mini-pill" label went with it; `TutorialWindow` and the rest of the v1 "mini pill" debt did
   NOT, and stays for the #326 follow-up.
@@ -4588,14 +5357,14 @@ the two calls the work itself turned up.
 ## 2026-09-05 (CLAUDE.md write-side channel trap, lane-d)
 
 - **Filed the channel write hazard as ONE trap (60) with two lettered halves, not two traps.**
-  Could have gone in as separate entries â€” the encoding half and the stale-base half have
-  different mechanisms â€” but they share one file class, one blast radius and one check (a
+  Could have gone in as separate entries — the encoding half and the stale-base half have
+  different mechanisms — but they share one file class, one blast radius and one check (a
   channel diff must be additions-only), and every session reads this list start to finish.
   Helm signed them as one item ("write-side sibling of trap 54"). `CLAUDE.md` trap 60.
 - **Named the missing guard in the trap and did not build it.** Could have shipped a mojibake
   scan over the channel files in the same change; it would fail on the 446 corrupted lines
   already committed to `HELM.md` / `HELM-FEEDBACK.md` / `SCRIBE-FEEDBACK.md`, and repairing
-  those is itself a whole-file rewrite of files another agent owns â€” the thing the trap
+  those is itself a whole-file rewrite of files another agent owns — the thing the trap
   forbids. Signed scope was docs-only, so the scanner and the repair are the ask's follow-up.
 - **Quoted the corruption byte-exactly inside `CLAUDE.md` rather than describing it.** The
   cost is that a future mojibake scan will match the trap that documents it and will need the
@@ -4606,14 +5375,14 @@ the two calls the work itself turned up.
 
 - **Placed the new "mini pill" row NEXT TO "overlay section / mini-stat" rather than at the
   end of Â§4's table, and amended the doc's prose to say the table was amended.** The two are
-  one family â€” the HUD strip's internal names â€” and `Ban` is pinned to the table in ORDER, so
+  one family — the HUD strip's internal names — and `Ban` is pinned to the table in ORDER, so
   the position is a real choice rather than a formatting one. Could have gone "append at the
   end", which keeps the signed rows byte-identical in place; that reads as an afterthought
   bolted onto a signed ruling and separates the two rows a future author is most likely to
   confuse. Helm signed **(b)** as "one new Â§4 table row + one `Ban` row" without naming a
   position. `docs/BEVEL-v2-staging-critique.md`, `tests/EQBuddy.Tests/ShellTerminologyTests.cs`.
-- **Said "the HUD, or the chip by its job â€” the DPS chip, the mez chip" in the replacement
-  column**, from Helm's *"the HUD control / deadline chip â€” player words"*. Uses "chip"
+- **Said "the HUD, or the chip by its job — the DPS chip, the mez chip" in the replacement
+  column**, from Helm's *"the HUD control / deadline chip — player words"*. Uses "chip"
   deliberately: **(c)** was rejected, so chip stays product vocabulary and the breakout row's
   "HUD chip" is untouched. Could have written a replacement that avoids the word entirely,
   which would have quietly enacted the rejected option.
@@ -4622,21 +5391,21 @@ the two calls the work itself turned up.
   phrase only; every real offender in the tree is hyphenated (`OptionsWindow.xaml`,
   `AppSettings.cs`), so an exact match would have been a row that catches nothing anyone
   writes. Scope unchanged: still the SHELL scanner, and no shell string trips the new row
-  today â€” the offenders are all v1 surfaces, deliberately outside it.
+  today — the offenders are all v1 surfaces, deliberately outside it.
 
 ## 2026-09-05 (E-2d Wine knob, clause (a), lane-d)
 
 - **`WineText.Reapply` and `WineText.IsOfferedHere` were DELETED with the checkbox, not left
-  in place.** The other way: remove only what Helm named â€” the XAML panel, its wiring and the
-  handler â€” and keep `WineText` byte-for-byte, since the ruling's KEEP list says "`WineText`".
+  in place.** The other way: remove only what Helm named — the XAML panel, its wiring and the
+  handler — and keep `WineText` byte-for-byte, since the ruling's KEEP list says "`WineText`".
   Declined: the checkbox was the only caller of either, so keeping them leaves two methods no
   code can reach, which is #210's exact shape (*"the helper that did the work had passing tests
   and NO CALLER"*) and the mirror of the very list this PR adds a row to. `WineText` itself
-  stays, and the two members #277 actually kept it for â€” `ApplyIfNeeded` and `Resolve` â€” are
+  stays, and the two members #277 actually kept it for — `ApplyIfNeeded` and `Resolve` — are
   untouched, so the CrossOver-on-Windows-artifact population loses nothing. Named in the Helm
   ask so a scope call is visible rather than inferred from a diff.
 - **No `WhatsNew.json` entry and no version bump.** The other way: treat the loss of an
-  Options control as player-noticeable and cut a release for it. Declined â€” the control was
+  Options control as player-noticeable and cut a release for it. Declined — the control was
   drawn only under Wine, Helm's sign says in as many words that there is *"no player-visible
   change on the supported Windows artifact"*, the existing 1.99.2 entry describing the box is a
   shipped record that must not be edited (`whatsnew-guard.ps1`), and the kick forbids
@@ -4644,7 +5413,7 @@ the two calls the work itself turned up.
   next ships and it is cheap; flagged in the ask rather than decided silently.
 - **`docs/v2/v1-feature-disposition.md` Â§8 was updated to record the landing.** The other way:
   leave the signed E-2e text alone as a snapshot of the ask. Declined on CLAUDE.md's own
-  opening rule â€” the row said `OptionsWindow.xaml.cs:253` "its only writer", and after this
+  opening rule — the row said `OptionsWindow.xaml.cs:253` "its only writer", and after this
   commit that line is false, which is worse than absent. The argument and the ruling are
   untouched; the row's state and a dated "clause (a) has landed" note are what changed.
 
@@ -4657,12 +5426,12 @@ the two calls the work itself turned up.
   not appear in "the HUD, the shell, Settings copy, empties, toasts, or What's-new player
   text". A scan that wide is red on arrival: shipped `WhatsNew.json` entries are immutable by
   rule (`whatsnew-guard.ps1`) and the v1 widget and Options are the debt the shell exists to
-  retire, so the guard would have been switched off in its first week â€” trap 54's lesson with
+  retire, so the guard would have been switched off in its first week — trap 54's lesson with
   the polarity flipped. Could have gone "enforce the sentence as written, with an exemption
   list"; that buys a permanent hole in a real guard on day one (trap 52). The file is called
   `ShellTerminologyTests`, not `BannedVocabularyTests`, so nothing reads it as wider than it
   is, and widening it to a surface is the deliberate act of adding that surface's row.
-- **Enforced Â§4's TABLE verbatim â€” seven rows â€” and did not add "chip" or "mini pill".**
+- **Enforced §4's TABLE verbatim — seven rows — and did not add "chip" or "mini pill".**
   Bevel's prose elsewhere calls both implementation vocabulary, but the signed acceptance
   criterion is the table, and there "HUD chip" is the *replacement* the breakout row points
   at. Adding a term the ruling does not list would be this lane inventing product vocabulary.
@@ -4672,7 +5441,7 @@ the two calls the work itself turned up.
   this codebase argues about `card`/`breakout`/`theme` by name in its own doc comments; both
   are ours and neither is a surface. Could have gone "flag them and exempt each one", which is
   an exemption list with nothing legitimate in it. The `Exempt` list exists and is empty.
-- **XAML is scanned narrowly â€” only `Text`/`Content`/`ToolTip`/`Header`/`Title`, bindings
+- **XAML is scanned narrowly — only `Text`/`Content`/`ToolTip`/`Header`/`Title`, bindings
   skipped.** Every other attribute value is a type name or a resource key, and
   `Style="{StaticResource CardPanel}"` is our architecture correctly named. Flagging it is the
   false positive that gets the file deleted. The trade is that a new player-visible attribute
@@ -4685,7 +5454,7 @@ the two calls the work itself turned up.
 
 - **The four spine counts in the signed E-2e spec were corrected against the tree rather than
   built on.** The other way: write the table to the counts as given (43 windows, ten cards, 12
-  mini-dashboard checkboxes, eight breakout toggles) and note the drift afterwards. Declined â€”
+  mini-dashboard checkboxes, eight breakout toggles) and note the drift afterwards. Declined —
   a disposition table built on a stale count silently omits rows, and all four were one `grep`
   each because the spec named its source for every one of them. Landed in
   `docs/v2/v1-feature-disposition.md` ("Four counts in that spec have moved").
@@ -4693,13 +5462,13 @@ the two calls the work itself turned up.
   take #277 literally, drop the knobs and delete the crossover assets by adjacency. Declined
   on a premise re-check (trap 52): only ONE of the three named settings has an Options knob,
   the other two are documented `DeadSettingTests` "no UI by design" rows, and `WineOverlay.cs`
-  â€” reported to have gone with the deleted Avalonia project â€” is still in the WPF project and
+  — reported to have gone with the deleted Avalonia project — is still in the WPF project and
   still wired from two call sites, with `scripts/crossover/` and a README-linked doc alive
   beside it. Deleting a documented CrossOver setup for people running the SUPPORTED Windows
   artifact is a product call, not a cleanup. Three options + a recommendation in
   `HELM-FEEDBACK.md` (~12:30 PM CT); no Wine code touched.
 - **The Phase 2 gate was RUN in the file and reported as half-failing, rather than described.**
-  The other way: state the gate and leave the assessment to whoever executes a cut. Declined â€”
+  The other way: state the gate and leave the assessment to whoever executes a cut. Declined —
   "the table is what makes the gate a test rather than an opinion" is the spec's own sentence,
   and a gate nobody runs is trap 34's shape (a guard that reads as coverage). Eight surfaces
   are context-menu-only today and each is named with who owes it a door.
@@ -4713,34 +5482,34 @@ the two calls the work itself turned up.
 ## 2026-09-05 (harnesses default to Evolved)
 
 - **`shot.ps1` now prefers an EXACT title match over a substring one.** The other way: give
-  the widget a harness-only title suffix so the substring stayed unambiguous. Declined â€”
+  the widget a harness-only title suffix so the substring stayed unambiguous. Declined —
   CLAUDE.md's trap 24 already calls a title invented for the harness a smell, and the shot
   table has always meant "this window" when a `Title` is a window's whole name. Without it,
-  `Title = 'EQBuddy'` would match the shell's `EQBuddy â€” Home` in the same process, which is
+  `Title = 'EQBuddy'` would match the shell's `EQBuddy — Home` in the same process, which is
   the half of trap 24 that `-OwnerPid` cannot cover.
 - **The graceful close in `shoot.ps1` (and `AppHarness`) aims at the widget by name, not at
   `MainWindowHandle`.** The other way: keep `CloseMainWindow()` and trust Z-order. Declined
   because "the first visible, unowned top-level window" fitted exactly one window until E-3
-  and now fits two â€” and only the widget's `OnClosed` finalizes the session into
+  and now fits two — and only the widget's `OnClosed` finalizes the session into
   `history.db`. Closing the other one leaves the app running, stages history that is not
   there, and photographs a real empty state over it.
 - **Prime runs open the shell too.** The other way: leave them v1-only, since they stage
-  history rather than being reviewed. Declined once the close above was aimed properly â€” the
+  history rather than being reviewed. Declined once the close above was aimed properly — the
   order is about what appears on the monitor, and a prime run is eight seconds of bare v1
   widget like any other launch.
 - **The harness places the widget BESIDE the shell, off the same `SecondaryOrigin` call the
   shell makes.** The other way: leave both at the band's 60px margin. Declined because the
-  widget is `Topmost` and 320 wide, so it lands squarely over the rail â€” a local run would
+  widget is `Topmost` and 320 wide, so it lands squarely over the rail — a local run would
   show the shell with its navigation covered, which is the part of Evolved the run exists to
   look at. Asked of the same function rather than re-derived: two answers to "where is the
   second monitor" is trap 4's shape, and the disagreement would be invisible.
 - **`drag-verify.ps1` and `drag-check.ps1` still pop a bare v1 widget.** The other way:
-  give them the same default for consistency. Declined for now â€” both are hand-driven
+  give them the same default for consistency. Declined for now — both are hand-driven
   diagnostics for one v1 window's drag behaviour, neither was in the T2 scope, and
   `drag-verify`'s close would have needed the by-name fix for no benefit. Named in the Helm
   ask rather than left silent; one line each if Helm wants them in.
 - **`docs/screenshots/quest-tracker.png` is left stale.** Re-shooting it here comes back
-  880Ã—658 against a committed 880Ã—868 â€” real drift (the PNG is 2026-08-23, `QuestsView`
+  880×658 against a committed 880×868 — real drift (the PNG is 2026-08-23, `QuestsView`
   was lifted 2026-09-05), and not caused by this change. The other way: regenerate it in
   passing. Declined because a tests-only PR is the wrong door for an illustration, and
   Fable's T1 batch look is the right one; flagged there instead.
@@ -4751,13 +5520,13 @@ the two calls the work itself turned up.
   way: leave the switch alone and have David set the variable himself each time. Declined
   because that script is the only way an Evolved build ever gets run on this machine, so a
   smoke that does not open the shell is a smoke of the half of Evolved that has not changed
-  â€” trap 22 (a surface nobody can reach reads as reviewed anyway) arriving through the
+  — trap 22 (a surface nobody can reach reads as reviewed anyway) arriving through the
   launcher. **Deliberately confined to the `-Evolved` branch**, which is already the branch
   that refuses to install, refuses to touch OneDrive and refuses to touch the v1 profile; no
   installed or released build goes through it, so this does not open the player door that
   `ShellHost` and the entry above it are still holding shut.
 - **`scripts/Launch-Evolved-Shell.cmd` re-opens the already-published copy without
-  rebuilding.** The other way: nothing â€” the install script was the only door. Declined
+  rebuilding.** The other way: nothing — the install script was the only door. Declined
   because coming back to the shell an hour later meant a 172 MB re-publish or remembering two
   environment variables. It builds nothing and refuses with instructions when
   `dist\publish\EQBuddy.exe` is absent, rather than quietly starting a publish that looks
@@ -4765,15 +5534,15 @@ the two calls the work itself turned up.
   Notepad.
 - **The shell opens on a monitor BESIDE the primary when there is one.** The other way: keep
   `CenterScreen`. Declined because CenterScreen means the PRIMARY screen, which is where
-  EverQuest is â€” the widget lands on DISPLAY2 because it restores a saved position and the
+  EverQuest is — the widget lands on DISPLAY2 because it restores a saved position and the
   shell has none, so every review open dropped a 960Ã—640 window over the game. The
   arithmetic is `WindowPlacement.SecondaryOrigin` (unit-tested, in the same DIP space as
-  `Window.Left` â€” reading `GetMonitorInfo`'s physical-pixel rects instead would be trap 1);
+  `Window.Left` — reading `GetMonitorInfo`'s physical-pixel rects instead would be trap 1);
   the window is the wiring. Verified against the launched app, not just the tests: the shell
   came back at (1980, 60) on a 1920-wide primary.
 - **A monitor ABOVE or BELOW the primary is refused rather than guessed at.** The other way:
   place into the vertical band too. Declined because the virtual-screen rectangle says how
-  far the desk extends, never which COLUMN a stacked monitor occupies â€” a guess would put the
+  far the desk extends, never which COLUMN a stacked monitor occupies — a guess would put the
   shell half on a screen and half on nothing, which is worse than the primary-centred window
   it replaces. A stacked desk keeps today's behaviour, and a single-monitor desk (or a
   1024Ã—768 CI runner) is untouched.
@@ -4781,7 +5550,7 @@ the two calls the work itself turned up.
   way: leave the literals and retype them in the test. Declined because the size is an INPUT
   to the placement decision ("is there a band wide enough to hold this window"), so a number
   in the XAML and again in a test is one that disagrees with itself silently, with both sides
-  internally consistent â€” the same argument `MinWidth` was already carrying one line up.
+  internally consistent — the same argument `MinWidth` was already carrying one line up.
 ## 2026-09-05 (E-3 PR 5, the Live room)
 
 - **Live's six rooms are Damage Â· Healing Â· Pet Â· Timeline Â· Kills Â· Raids, and the first is
@@ -4789,13 +5558,13 @@ the two calls the work itself turned up.
   that is what the widget and the phone screen both call it. Declined because on a strip
   that already says Healing and Pet, "Combat" is the only label naming a category rather
   than a number, and a player looking for their DPS would have to know that Combat is where
-  it lives â€” the breakout window has said "Your damage" since it shipped.
+  it lives — the breakout window has said "Your damage" since it shipped.
   `LiveSurface.TabForKey` still resolves `combat`, `dps`, `hps` and `fight`, so no old
   habit lands nowhere (`src/EQBuddy.Core/LiveSurface.cs`).
 - **The Raids move is expressed as `ProgressSurface.MovedToLive(tab)`, a total predicate,
   rather than a `ShellTabs` list beside `Tabs()`.** The other way: a second array, which is
-  what the file's shape suggests. Declined on trap 55 â€” two hand-maintained lists describing
-  one arrangement is exactly what cost #252 â€” and because a predicate defaulting to "no, it
+  what the file's shape suggests. Declined on trap 55 — two hand-maintained lists describing
+  one arrangement is exactly what cost #252 — and because a predicate defaulting to "no, it
   stayed" means a fifth Progress tab reaches the Evolved room and the phone with no edit.
 - **The phone's raids block moved to the SESSION screen**, not to Combat and not to a new
   screen. The other way: a `live` screen of its own. Declined because
@@ -4805,14 +5574,14 @@ the two calls the work itself turned up.
   ledger would have been sent to a screen that no longer draws it.
 - **Live's Fight/Session scope and sort are room state and are NOT persisted.** The other
   way: reuse `AppSettings.BreakoutDamageScope` and friends, which are right there. Declined
-  because that would make two writers of one settings key (trap 13's loaded gun â€” a save
+  because that would make two writers of one settings key (trap 13's loaded gun — a save
   writes the whole file from the startup snapshot). Evolved is behind `EQBUDDY_SHELL` with no
   player door, so a preference it forgets on close costs nobody anything. The room defaults
   to **Session** where the floating breakout defaults to Fight: a bar over the game is about
   the pull, a room called "This sitting" is about the sitting.
 - **`live:raids` replaces `progress:raids`, and `ProgressRoom.SetTab` REFUSES the old key**
   rather than resolving it. The other way: leave `TabForKey` to answer and let the room land
-  on a tab it no longer draws. Declined â€” the strip would light nothing over an unchanged
+  on a tab it no longer draws. Declined — the strip would light nothing over an unchanged
   body. `ProgressSurface.TabForKey` still resolves `"raids"`, which is about an old saved tab
   choice landing somewhere true and is a different question.
 - **The retired `shell-progress-raids` shot and its committed PNG are DELETED, not
@@ -4820,8 +5589,8 @@ the two calls the work itself turned up.
   illustration lock: a picture of a state the code no longer produces is exactly the drift it
   exists to stop. `shell-live-raids` is the replacement, and `docs/TestPlan.md` moved with it.
 - **`LanesPanel` raises a `Panned` event instead of casting `Window.GetWindow(this)` to
-  `FightTimelineWindow`.** Not really a choice â€” the cast is an `InvalidCastException` the
-  moment a second host draws the panel â€” but it is a change to a shipped v1 window made from
+  `FightTimelineWindow`.** Not really a choice — the cast is an `InvalidCastException` the
+  moment a second host draws the panel — but it is a change to a shipped v1 window made from
   the Live PR, so it is logged rather than buried. Found by reading what the old host did for
   the surface, not by a failure.
 
@@ -4829,7 +5598,7 @@ the two calls the work itself turned up.
 
 - **`ShellHost.Show` passes the address to the CONSTRUCTOR rather than navigating after
   it.** The other way: leave the two-step alone, since it worked. Declined because it
-  stopped being free the moment the default became Home â€” every addressed open built the
+  stopped being free the moment the default became Home — every addressed open built the
   default room, painted it (three file stats and a SQLite query on Home's first paint) and
   threw it away. `ShellHostTests`'s existing `shellRooms=1` is what caught it, which is the
   assertion doing exactly the job its comment claims. `ShellWindow.Navigate` returns
@@ -4838,7 +5607,7 @@ the two calls the work itself turned up.
 - **Home's content column is capped at `ShellLayoutPolicy.MinRoomWidth` and pinned left.**
   The other way: let it stretch like every other room. Declined on the first `shell-home`
   capture, which put "Not run yet" about 600 units from the row it belonged to at a 946-wide
-  window â€” two columns rather than one row. `MinRoomWidth` rather than a new constant
+  window — two columns rather than one row. `MinRoomWidth` rather than a new constant
   because it is the narrowest this content is ever drawn, already measured and signed; the
   room now reads the same at every width, and `shell-home-narrow` is the picture that can
   disprove it.
@@ -4847,25 +5616,25 @@ the two calls the work itself turned up.
   session row on the record and rely on Home not rendering the meters. Declined because the
   temptation is one property access away in the room's own file, and "a reviewer notices" is
   not a mechanism. Live reads the same record and adds its meters on its own surface.
-- **Readiness has two states, not three â€” there is no "stale".** The other way: an age past
+- **Readiness has two states, not three — there is no "stale".** The other way: an age past
   which a dump is called out. Declined because nobody has signed a threshold, and an invented
   one arrives as a nag on a player who ran the command this morning. Bevel asked only that
   never-scanned and healthy not be collapsed; the date is reported and the reading is theirs.
 - **The four `/outputfile` dump finders became one.** `InventoryFile.FindLatest`,
   `FactionsFile.FindLatest` and two inside `UnlockSource` each carried their own copy of
-  "newest file matching a character-and-kind glob in the log folder's parent" â€” each one's
+  "newest file matching a character-and-kind glob in the log folder's parent" — each one's
   comment claiming the root rule lived in exactly one place. Home would have been the fifth
   and sixth. The other way: add Home's lookups beside them and leave the four. Declined;
   they all route through `OutputfileAutoImport.FindLatest` now, with the first test any of
   them has ever had.
 - **`scripts/shoot.ps1`'s `Write-Dump` clears before it writes.** The other way: leave it
   additive, as it has always been. Declined because it is trap 51 with an `/outputfile` dump
-  in place of a log append â€” the three dump-staging shots were near the END of the table so
+  in place of a log append — the three dump-staging shots were near the END of the table so
   nothing downstream ever inherited one, and `shell-home-ready` is the first near the top:
   its inventory dump would have auto-ticked the wishlist `shell-gear-narrow` photographs.
 - **Deleted a stranded doc comment in `MainWindow.xaml.cs`** (a second `<summary>` on
-  `StoredMobRows`, describing the âœ¦ marker route into the wiki pack). It was dead text â€”
-  C# takes the last summary â€” and `DropsCardView.cs`'s player-visible tooltip already
+  `StoredMobRows`, describing the ✦ marker route into the wiki pack). It was dead text —
+  C# takes the last summary — and `DropsCardView.cs`'s player-visible tooltip already
   documents that route in more detail. It is also what paid for `StoredSessions`: the file
   had exactly one line of ratchet headroom, deliberately, and this PR leaves it at
   4,573/4,573. **The next WPF change must lift a surface.**
@@ -4876,20 +5645,20 @@ the two calls the work itself turned up.
   split.** `QuestsView.xaml` takes the title row, the close button and the drag handler
   with it; the window is a `ContentControl` around it. The other way: leave the title row
   in the window and lift only the body, which reads tidier. Declined because the window is
-  borderless and hand-drawn â€” there is no clean seam â€” and `SpawnsView` (World PR 1) had
+  borderless and hand-drawn — there is no clean seam — and `SpawnsView` (World PR 1) had
   the identical shape for the identical reason. `HideOwnTitleBar()` is how the shell's room
   stops a second title bar drawing under the native one, exactly as `WorldRoom` does.
-- **The room draws the character heading ("Quest Tracker â€” Dranak") as a caption; the
+- **The room draws the character heading ("Quest Tracker — Dranak") as a caption; the
   window keeps it in its title row.** The other way: drop it in the room, the way World and
   Gear dropped their window titles. Declined because no other room's title carried the
-  CHARACTER and the shell's native title bar reads "EQBuddy â€” Quests" and cannot say it â€”
+  CHARACTER and the shell's native title bar reads "EQBuddy — Quests" and cannot say it —
   dropping it is trap 26's sentence verbatim, the data surviving a move and the thing that
   showed it not. Eight lines, one producer (`QuestsView.Heading`), two consumers. Flagged
   to Bevel as a room-chrome ruling that is theirs to overturn.
 - **`IShellRoom` grew `ApplyLayout(ShellLayout)` rather than the room measuring itself.**
   The other way: have `QuestsRoom` read its own `ActualWidth` and skip touching an
   interface three other rooms implement. Declined because the threshold is about the room's
-  share of the window AFTER the rail, arithmetic only the host has both halves of â€” a room
+  share of the window AFTER the rail, arithmetic only the host has both halves of — a room
   computing it would be a second producer of one boolean, disagreeing exactly at the
   boundary where a resize bug lives (trap 33). The other three implement it empty with a
   stated reason, the contract `Release()` already set.
@@ -4897,7 +5666,7 @@ the two calls the work itself turned up.
   throttle.** The other way: forward `MaybeRefresh()` the way `WorldRoom` forwards
   `MapView.MaybeRefresh()`. Declined because a 2 s throttle nested inside the shell's 1 s
   tick makes the room report last tick's row counts beside this tick's totals in a dump
-  whose whole contract is one moment â€” trap 56, which cost the E2E suite four rounds. The
+  whose whole contract is one moment — trap 56, which cost the E2E suite four rounds. The
   signature check inside `Refresh` is what makes the un-throttled call free. The v1 window
   keeps its throttle; its own tick is the only thing driving it.
 - **`ShellLayoutPolicy.SplitRoomWidth` 640 â†’ 700, because the shot the signed ruling asked
@@ -4905,8 +5674,8 @@ the two calls the work itself turned up.
   let the room live with it. Declined on the picture: at a 640 room the detail column is
   ~190 units, the quest title breaks MID-WORD and the 220-capped reward tiles clip. 640 was
   `HistoryWindow`'s measured pair off a 330-wide list; this room's list is 400, Gate 2's
-  shipped number that a lift may not re-decide. `MinRoomWidth`'s own rule is the precedent â€”
-  *"if a room clips horizontally there, this constant is what moves, not the shot"* â€” and
+  shipped number that a lift may not re-decide. `MinRoomWidth`'s own rule is the precedent —
+  *"if a room clips horizontally there, this constant is what moves, not the shot"* — and
   Bevel Â§3 predicted the class of finding. 700 stays clear of `RailLabelWidth` (720) so the
   two axes cannot collapse into one number. **Flagged to Helm as an edit to a number its
   sign named**, with the offer to revert. The disproving picture is NOT committed: an
@@ -4914,10 +5683,10 @@ the two calls the work itself turned up.
 - **`docs/Architecture.md` Â§1 and `docs/TestPlan.md` Â§5 project sizes re-measured** (EQBuddy
   75â†’85 files / 23,159â†’25,053 lines; UI.Shared and Companion likewise). They were inside
   `DocumentationSizeTests`' 10% tolerance before this PR and two new files tipped the file
-  count out. Re-measured rather than re-anchored â€” the numbers are the repo's, not a guess.
+  count out. Re-measured rather than re-anchored — the numbers are the repo's, not a guess.
 - **`IconPaths` gained `ChevronLeft`** (ChevronRight mirrored about x=12) for the
-  single-pane "all quests" button. The other way: reuse `Undo`, which exists. Declined â€”
-  it means something else, and a vector is what this repo uses instead of a `â€¹` (#148/#166).
+  single-pane "all quests" button. The other way: reuse `Undo`, which exists. Declined —
+  it means something else, and a vector is what this repo uses instead of a `‹` (#148/#166).
 
 ## 2026-09-05 (E-3 PR 2, the World and Gear rooms)
 
@@ -4926,27 +5695,27 @@ the two calls the work itself turned up.
   the World fold already unified Map/Camps/Path/Travels, and `GearLootWindow` is already
   bags plus wishlist plus what you picked up. The other way: take Quests as well, since the
   verdict is identical. Declined because `QuestsWindow` is 2,481 lines of window-owned
-  rendering with no view to compose â€” that is a LIFT wearing a move's clothes, and it
+  rendering with no view to compose — that is a LIFT wearing a move's clothes, and it
   deserves its own diff rather than being the third thing in this one. Live, Home and
   Settings are held back by a missing room or a real design, not by effort.
 - **PR 2 is rooms, not the HUD, even though the plan's next heading is "HUD (Surface A),
   for the PR after the host".** The other way: read that literally and start subtracting
   card rendering from `MainWindow`. Declined because the HUD is defined as *"`MainWindow`
   minus what the shell takes"*, and with one room in the shell it would have taken almost
-  nothing â€” subtracting now would delete surfaces with nowhere to land, against the E-3
+  nothing — subtracting now would delete surfaces with nowhere to land, against the E-3
   gate's own requirement that a player can find every retained primary feature. The plan's
   sentence describes the sequence, and the rooms are what make the subtraction possible.
 - **The rooms are LAZY: built on first arrival, not in the shell's constructor.** The other
   way: build all three up front, which is what PR 1 did with its one room and is simpler to
-  read. Changed because two of the three do real work when constructed â€” `SpawnsView`
+  read. Changed because two of the three do real work when constructed — `SpawnsView`
   starts a one-second `DispatcherTimer` and reads the spawn ledger, `InventoryView` scans
-  the game folder â€” and a shell opened to look at experience should pay for neither. It is
+  the game folder — and a shell opened to look at experience should pay for neither. It is
   the same argument `SurfaceOwnershipTests` already records for World having four separate
   factories instead of one combined set.
 - **The rooms report their facts by asking the SAME view for the SAME string and re-keying
-  it (`ShellDumpFacts.Prefixed`), rather than hand-writing `shellWorldMapZones = â€¦`.** The
+  it (`ShellDumpFacts.Prefixed`), rather than hand-writing `shellWorldMapZones = …`.** The
   other way is the obvious one and it is a second producer of a number the window already
-  reports â€” trap 33 one level up â€” and it would stop covering `MapView` the day it gains a
+  reports — trap 33 one level up — and it would stop covering `MapView` the day it gains a
   seventh fact (trap 30). The re-key also fixes a live hazard the hand-written version
   would have had anyway: the dump is one flat namespace, so with both hosts open the
   shell's `mapZones` would silently overwrite the window's and every existing `map*`
@@ -4954,7 +5723,7 @@ the two calls the work itself turned up.
 - **`ShellLayoutPolicy.MinRoomWidth` stayed at 520 although `GearLootWindow` opens at 880.**
   The other way: take the maximum of the landed rooms' shipped widths, which is the
   literal reading of "the narrowest this content has been drawn at". Declined because
-  those are OPENING widths and both windows have been resizable to 320 since 2026-08-21 â€”
+  those are OPENING widths and both windows have been resizable to 320 since 2026-08-21 —
   and a floor of 940 against a shell that OPENS at 960 would make Bevel's degrade axis
   unreachable on any window a player could make, which is a designed state existing only
   in a unit test. It is a claim rather than a measurement, so it is tested by a picture:
@@ -4981,15 +5750,15 @@ the two calls the work itself turned up.
   to single-source the desktop rail and the mobile âš™ Screens picker; Bevel filed the ask
   having explicitly not opened `CompanionSurfaces` and said so. Opening it is the grep it
   asked for, and it says the two lists are at different granularities BY A SIGNED PRODUCT
-  DECISION â€” eleven phone screens against seven rooms, with `CompanionSurfaces.Travel`
+  DECISION — eleven phone screens against seven rooms, with `CompanionSurfaces.Travel`
   stating in as many words that the phone does not fold to match the desktop (World PR 4).
   The other way: collapse `All` onto the enum, which is literally what "single source"
   reads as. It would break the wire protocol AND undo that call. `CompanionSurfaces.PageFor`
   is a total function into `ShellPage` instead, so renaming or removing a room stops the
-  file COMPILING â€” more coupling than two hand-maintained lists could ever have (trap 55's
+  file COMPILING — more coupling than two hand-maintained lists could ever have (trap 55's
   shape). `ShellNavigationTests` asserts totality plus a negative, so the join cannot go
   vacuous (trap 39).
-- **The shell has no player-facing door in PR 1 â€” `EQBUDDY_SHELL` only.** The other way: a
+- **The shell has no player-facing door in PR 1 — `EQBUDDY_SHELL` only.** The other way: a
   right-click menu entry, which is how every other window in the app is reached. Declined
   because the rail has one row, Evolved is local-only until the owner opens the channel,
   and a door into a one-room shell is the unexplained empty the Phase 2 gate forbids. It is
@@ -4999,52 +5768,52 @@ the two calls the work itself turned up.
 - **`ProgressWindow` is NOT retired in this PR, so the Progress room is a second
   composition rather than a view extracted from it.** The other way: extract a shared
   `ProgressRoomView` both hosts render, which is this repo's standing "two producers, one
-  builder" move (trap 33). Declined because every RULE is already shared â€” tabs, order,
+  builder" move (trap 33). Declined because every RULE is already shared — tabs, order,
   labels, keys and badges all come from `ProgressSurface`/`ProgressTheme`, and the bodies
-  from one factory â€” while Bevel's signed IA RESHAPES this room for Evolved (Raids leave
+  from one factory — while Bevel's signed IA RESHAPES this room for Evolved (Raids leave
   for Live, Faction becomes Advanced). Extracting now would couple the two exactly where
   they are about to diverge, then be unpicked one PR later. An E2E test asserts the two
   hosts report the same four row counts, so a divergence fails rather than ships.
-- **The shell's title bar carries the room ("EQBuddy â€” Progress").** The other way: plain
+- **The shell's title bar carries the room ("EQBuddy — Progress").** The other way: plain
   "EQBuddy", which is what the product calls it. Changed because `MainWindow.xaml`'s title
-  is exactly `EQBuddy`, so `shot.ps1`'s `-TitleLike` would match the widget too â€” trap 24
+  is exactly `EQBuddy`, so `shot.ps1`'s `-TitleLike` would match the widget too — trap 24
   INSIDE one process, where `-OwnerPid` cannot separate them. `HistoryWindow` already had
   this shape, and naming the room is what a shell application should do anyway.
 - **The mini-dashboard stars did not come into the shell's Progress room.** The other way:
   carry them, since they are the only writers `MiniStats` has for xp/money/motes and
   dropping the last writer of a setting is the #204/#210/#212 shape (trap 20/26). Safe
-  because `ProgressWindow` still carries them this PR â€” but the room is the wrong home
+  because `ProgressWindow` still carries them this PR — but the room is the wrong home
   regardless: Bevel's IA sends HUD configuration to the HUD's Edit mode and to Settings.
   **Written into `ShellWindow`'s header as a blocker on retiring that window**, because
   that is the commit where this becomes a real bug.
 - **Degrade axis 2 (list+detail â†’ one pane) is DECIDED in `ShellLayoutPolicy` with no
   consumer yet.** The other way: leave it until a list+detail room lands, since Progress is
   single-column and nothing calls it. Built now because Helm's sign names two axes and the
-  point of two is that they have DIFFERENT thresholds â€” a policy that answers only one
+  point of two is that they have DIFFERENT thresholds — a policy that answers only one
   cannot be tested for the thing that matters, and conflating them is how a resize bug
   hides.
 - **`EQBUDDY_SHELL_SIZE` exists purely so the DEGRADED rail can be photographed.** The
   other way: no hook, and prove the collapse with the unit test alone. Declined because a
   unit test proves the arithmetic and cannot prove the window applied it, which is exactly
-  the gap trap 42 cost two builds â€” and the sixteen hooks in `DebugHooks` are all built on
+  the gap trap 42 cost two builds — and the sixteen hooks in `DebugHooks` are all built on
   the same argument.
 
 ## 2026-09-05 (E-2c, the Avalonia deletion)
 
-- **`evolved-channel-guard.ps1` gained a fourth check â€” no workflow answers a `release:`
-  event â€” rather than just deleting `release-assets.yml`.** That file was the guard's own
+- **`evolved-channel-guard.ps1` gained a fourth check — no workflow answers a `release:`
+  event — rather than just deleting `release-assets.yml`.** That file was the guard's own
   named RESIDUAL: unreachable through `release.ps1` (checks 1 and 2 make the release itself
   unreachable) but perfectly reachable by making a release BY HAND in the GitHub UI, after
   which the first Evolved release ever published would have carried Linux and macOS
   artifacts of a Windows-only product. The other way: delete the file and close the
   residual paragraph, which the E-2 plan literally authorises and which is one line shorter.
   It landed on the guard because deleting the thing without guarding the shape leaves the
-  mechanism exactly as blind as it was â€” the argument Helm signed for check 1's fourth token
+  mechanism exactly as blind as it was — the argument Helm signed for check 1's fourth token
   on #297. Matched on the TRIGGER, not the filename, for the same reason that token matched
   acts. Proven to fail at the pre-E-2c main tip `24642fda` (one problem, exit 1).
   `scripts/evolved-channel-guard.ps1`.
 - **`e2e-windows` was NOT made a required status check while removing `build-avalonia-linux`
-  from the required list.** Dropping the Avalonia context is forced â€” the job is gone, so it
+  from the required list.** Dropping the Avalonia context is forced — the job is gone, so it
   can never report and every future PR would wait on it forever. The other way, and the
   tempting one: add `e2e-windows` in its place, since the whole disposition argument is that
   E2E replaces the rendering coverage Avalonia used to run on a push, and leaving only
@@ -5053,12 +5822,12 @@ the two calls the work itself turned up.
   a required check that flakes blocks every merge in the repo, including the fix for the
   flake. Reversible in one API call once it has a clean run of green. Named in the Helm ask
   as the residual rather than left for someone to notice. Out-of-tree (branch protection).
-- **The `TestPlan` rows whose only holder was a deleted suite say `Manual â€” Â§6` and point at
+- **The `TestPlan` rows whose only holder was a deleted suite say `Manual — §6` and point at
   the disposition doc, rather than being re-pointed at a plausible-looking survivor.** The
   other way: cite the nearest Core/UI.Shared suite, which would have kept every row reading
   **Auto** and cost nothing today. It landed on the honest mark because this file is the
   contract for what EQBuddy is expected to do, and a row that names a guard which does not
-  cover it is worth less than a row that admits a human has to look â€” the same reason the
+  cover it is worth less than a row that admits a human has to look — the same reason the
   disposition doc has a ledger of six genuine losses instead of absorbing them.
   `docs/TestPlan.md`.
 
@@ -5066,7 +5835,7 @@ the two calls the work itself turned up.
 
 - **`release.ps1 -EvolvedLocal` stops building the installer, and KEEPS the portable zip.**
   Fable's V1 defect 1 named "skip ISCC + its `Invoke-EqSign` + the `.sha256`", and which
-  `.sha256` was left open â€” there are two. The other way: drop the zip and its hash as well,
+  `.sha256` was left open — there are two. The other way: drop the zip and its hash as well,
   which would make `-EvolvedLocal` produce nothing but `dist\publish\`. It landed on the
   hazard rather than on tidiness: `EQBuddySetup.exe` carries v1's `AppId` and
   `{autopf}\EQBuddy`, so a signed 2.0.0 one is a double-click from replacing the v1 install
@@ -5075,7 +5844,7 @@ the two calls the work itself turned up.
   the E-2b ask so it can be ruled the other way cheaply. `scripts/release.ps1`.
 - **Paired it with a guard row rather than shipping the one-line fix alone.** Fable said "one
   commit either way", and the other way was to make the edit and stop. It landed as fix +
-  guard because the guard was **green on the pre-rider tree at `-AssumeVersion 2.0.0`** â€” it
+  guard because the guard was **green on the pre-rider tree at `-AssumeVersion 2.0.0`** — it
   had never been able to see this, which is trap 34's "reads as coverage while seeing
   nothing", and the whole point of `evolved-channel-guard.ps1` is that local-only is
   structural or it is not enforced. The row matches the ACTS (compile / sign / hash) and not
@@ -5084,21 +5853,21 @@ the two calls the work itself turned up.
   `scripts/evolved-channel-guard.ps1`, `docs/TestPlan.md`.
 - **A leftover 2.x installer in `dist\` is NAMED, not deleted.** The fix stops new ones; it
   does nothing about one a pre-fix run already made, and a fix that leaves the artifact it
-  was written to prevent sitting on disk has shut the door behind the horse (trap 43 â€”
+  was written to prevent sitting on disk has shut the door behind the horse (trap 43 —
   proving the producer is not proving the effect). The other way: `Remove-Item` it. It landed
   as a loud yellow warning in the `-EvolvedLocal` summary because `dist\` is build output but
   it is still David's, and a script that quietly removes signed binaries is a worse habit
-  than one that points at them. Verified on this machine: nothing 2.x is in `dist\` today â€”
+  than one that points at them. Verified on this machine: nothing 2.x is in `dist\` today —
   the E-1 acceptance used `install-local.ps1 -Evolved`, which never built one.
 
 ## 2026-09-04
 
 - **Stopped WAITING for the satellite windows to agree with the widget and made them agree
-  instead** â€” `RefreshUi` now ticks them after it builds the snapshot rather than before, and
+  instead** — `RefreshUi` now ticks them after it builds the snapshot rather than before, and
   the `EQBUDDY_EXPAND` dump paints any open surface still behind before it reads a row count
   off one (`WidgetDump.PaintOneMoment`). The other way: raise the `surfacesBehind=0` timeout,
   which is the fifth version of "wait longer" and would have been the fourth to fail. It
-  landed as a fix because the wait was on a COINCIDENCE â€” the windows' 1â€“3 s throttles were
+  landed as a fix because the wait was on a COINCIDENCE — the windows' 1–3 s throttles were
   never obliged to line up with the tick that writes the dump, and CI showed the wait timing
   out at 90 s beside `ingestDone=1 logPending=0 killKinds=14 kills=13`. Carries a player-side
   improvement with it: every satellite used to paint LAST tick's snapshot, so it was a second
@@ -5108,19 +5877,19 @@ the two calls the work itself turned up.
   `[Collection("avalonia")]`; the ones without it got a collection each and xUnit ran them in
   parallel, so `EnsureIsolatedApplication` rebuilt the app on the wrong thread and blamed
   whichever test was in cleanup (runs `33920002880`, `33918054739` on main, both green on
-  re-run). The other way: leave it â€” it is not this PR's code, and touching it widens the
+  re-run). The other way: leave it — it is not this PR's code, and touching it widens the
   diff. It landed as a fix for the same reason the wiki one did: eight consecutive greens on
   one head is unreachable with a 1-in-5 flake in another lane, and re-running until lucky
   would be proving the wrong thing. Assembly-wide `DisableTestParallelization` rather than one
   more `[Collection]` attribute, because the constraint is a fact about the session and not
   about which classes someone remembered to label. Trap 57, `TestAppBuilder.cs`.
-- **Fixed a SECOND flake in the same PR as the E2E one â€” `EqlWikiMobsTests
+- **Fixed a SECOND flake in the same PR as the E2E one — `EqlWikiMobsTests
   .NoMoreThanTwoFetchesAreEverInFlight`, which is a Core test, not an E2E one.** It asserted
   the in-flight count 100 ms after starting eight thread-pool lookups, so a hosted runner that
   had not scheduled them all failed it with 1 (run `33925423795`). The other way: leave it and
   keep the PR to Helm's stated scope. It landed as a fix because the bar on #294 is eight
   consecutive greens on one head, and a ~1-in-8 flake anywhere in CI makes that bar
-  unreachable â€” so "in scope" and "achievable" pointed the same way. Polling replaces the
+  unreachable — so "in scope" and "achievable" pointed the same way. Polling replaces the
   delay; the cap is now checked on every poll rather than sampled once, which is more
   coverage, not less. Called out explicitly in the last-look ask rather than folded in
   silently.
@@ -5131,12 +5900,12 @@ the two calls the work itself turned up.
   (a stalled tail and a line that parsed without counting both read as "the counter will not
   move"), and one dump showed `kills=13` against `killsTotal=82` with nothing able to say
   which number was lying. `LogWatcher.PendingBytes`/`SelectCount` are new public API on Core
-  for this â€” diagnostics, documented as such. Trap 56, `WidgetDump.cs`, `AppHarness.cs`.
+  for this — diagnostics, documented as such. Trap 56, `WidgetDump.cs`, `AppHarness.cs`.
 - **The `/SILENT` local install is inside `release.ps1`'s `-EvolvedLocal` region too, not
   just the OneDrive copy and `gh release create`** (E-1 commit 2, `scripts/release.ps1`). Â·
   The other way: the signed plan's commit 2 lists three things `-EvolvedLocal` does and the
   local install is not one of them, so leaving it live would have been the literal reading. Â·
-  It is the same defect at one machine's scale â€” the installer has one `AppId` and
+  It is the same defect at one machine's scale — the installer has one `AppId` and
   `{autopf}\EQBuddy`, so an Evolved build installed by that line REPLACES David's working v1
   in place and inherits its profile, and #158's `EQBuddy.previous.exe` rollback returns the
   binary and not the profile. The plan's own hazard section names it as "a smaller edge of
@@ -5149,15 +5918,15 @@ the two calls the work itself turned up.
   local-only gate that only fires when someone remembers to run `check.ps1` is exactly the
   enforcement-by-memory the guard exists to replace, and the failure it prevents arrives as a
   pull request. Check 3 needs a live update folder no runner has and fails open with a loud
-  SKIPPED line, so what CI adds is the script-shape half â€” which is the half a PR can get
+  SKIPPED line, so what CI adds is the script-shape half — which is the half a PR can get
   wrong. Cheap to revert if Fable or Helm would rather keep CI to the plan's letter.
 
-- **EQBuddy Mobile's alert cue is TWO NUMBERS on the envelope â€” a switch state and a
-  count â€” and names nothing about the alert that fired** (#208,
+- **EQBuddy Mobile's alert cue is TWO NUMBERS on the envelope — a switch state and a
+  count — and names nothing about the alert that fired** (#208,
   `src/EQBuddy.Companion/CompanionSnapshot.cs`). Â· The other way: send the rule name, the
   mob and the zone, so the phone could show a toast and one day pick a tone per event. Â·
   Bevel's cut is audio only and per-event pickers are explicitly out, so a name on the wire
-  would be a field nothing reads â€” the mirror of trap 20, and the thing that grows into a
+  would be a field nothing reads — the mirror of trap 20, and the thing that grows into a
   second product. The count also has the property the fingerprint needs: it steps on an
   event and never on the clock (trap 8). Adding a name later is additive; taking one back
   is not.
@@ -5166,8 +5935,8 @@ the two calls the work itself turned up.
   `src/EQBuddy.Companion/Web/index.html`). Â· The other way: the explicit tap-to-enable
   control our own 2026-08-22 reply to sbaum23 predicted we would need. Â· Bevel ruled out a
   first-run modal and an obligatory sample, and every real use of this page starts with a
-  tap anyway (âš™, a tab, a scroll). The one state that would otherwise be a silent no-op â€” a
-  propped-up tablet nobody has touched â€” is named in the panel instead of being solved with
+  tap anyway (⚙, a tab, a scroll). The one state that would otherwise be a silent no-op — a
+  propped-up tablet nobody has touched — is named in the panel instead of being solved with
   a dialog nobody asked for. Verified in headless Edge against the shipped page.
 - **The two WPF alert call sites were written compactly (brace-on-one-line) rather than
   bumping the `MainWindow.xaml.cs` ratchet** (#208). Â· The other way: `+10` lines and a
@@ -5179,7 +5948,7 @@ the two calls the work itself turned up.
   (`src/EQBuddy.Core/AppSettings.cs`). Â· The other way: leave it and make
   `FoldThemeSections` skip keys that are not cards. Â· The default's whole job was to give
   older profiles the `gear` card, and the 2026-08-20 Gear & Loot fold removed `gear` from
-  `OverlaySections.Catalog` and from both widgets' `SectionMap` â€” so since that day the key
+  `OverlaySections.Catalog` and from both widgets' `SectionMap` — so since that day the key
   it inserted could not draw anything, and its only remaining effect was to feed the loot
   fold a phantom absorbed key every launch. Guarding it would have kept a migration whose
   successful outcome is a no-op. Old profiles carrying their own `gear` key are untouched:
@@ -5187,7 +5956,7 @@ the two calls the work itself turned up.
   that case.
 - **#252 does not try to restore hidden state the bug already destroyed** (same commit). Â·
   The other way: re-hide Gear & Loot and Motes for profiles that look like they were bitten.
-  Â· `HiddenSections` carries no provenance â€” the entry the bug removed and a card the player
+  · `HiddenSections` carries no provenance — the entry the bug removed and a card the player
   deliberately switched on are indistinguishable, which is the same reasoning
   `MigrateMotesCard` already records for the #228 restore. Re-hiding on a guess would take a
   card away from someone who wants it, invisibly; the What's-new says plainly to hide them
@@ -5206,21 +5975,21 @@ the two calls the work itself turned up.
   settings.json edit** (#264, CompanionPairingText.AddressLabel, both CompanionWindows).
   Â· The other way: CompanionPairingAddress as a power-user JSON knob, the way
   CursorRingSize is. Â· The reporter's literal sentence was "How do I force it", asked by
-  someone already looking at the pairing window â€” a knob he would have had to be told about
+  someone already looking at the pairing window — a knob he would have had to be told about
   is the same defect as naming an in-game command and shipping no â§‰ button. It is hidden
   when the PC has one address, because a choice of one is not a choice.
 - **The legacy download links in `LEGACY-V1.md` and the README pin `v1.99.17`, the current
   1.x release, rather than waiting for the bridge tag** (P0-3). Â· The other way: leave the
   asset links out until the bridge release exists, or point them at `releases/latest`. Â· A
   support page with no download on it is not a support page, and `releases/latest` is the
-  one URL that must never appear there â€” it becomes the v2 page the moment v2 ships. The
+  one URL that must never appear there — it becomes the v2 page the moment v2 ships. The
   pin is stated as a pin in both files ("these move to the final tag when it is published"),
   so it reads as pending rather than as a claim, and the guard below fails any link that
   reverts to `releases/latest`. Re-pinning is a P0-1 checklist row on #275.
 - **The LEGACY-007 obligation ships as a GUARD as well as a checklist row**
   (`scripts/legacy-notice-guard.ps1`, wired into `check.ps1` and `release.ps1`). Â· The other
   way: the checklist row alone, which is what the plan offered as sufficient. Â· Helm signed
-  "LEGACY-007 whatsnew-style guard: yes" (2026-09-04 ~12:05 PM CT) and it came out cheap â€”
+  "LEGACY-007 whatsnew-style guard: yes" (2026-09-04 ~12:05 PM CT) and it came out cheap —
   file reads only, no git parsing beyond a tag list, so trap 54's encoding hole is not on
   its path. It is a no-op on the 1.x line and arms at 2.0.0.
 - **That guard asks for the "Legacy Linux/macOS" release-notes section on the FIRST 2.x
@@ -5235,13 +6004,13 @@ the two calls the work itself turned up.
   bridge release. Â· Helm's PR #282 ruling assigns it here ("bridge entry is P0-3 with Don
   Thompson + quasarj credits") and P0-2's own decision line above hands it forward to the
   P0-3 wording pass. It is the only in-app announcement Linux and macOS users will ever get,
-  and it carries no URL â€” no highlight in the file ever has, and an unbreakable token is a
+  and it carries no URL — no highlight in the file ever has, and an unbreakable token is a
   geometry change on a `SizeToContent` window (trap 12).
 - **`UpdateChecker.GitHubLegacyReleasePage` points at the RUNNING BUILD's own tag, not a
   hard-coded bridge tag** (P0-2, `src/EQBuddy.Core/UpdateChecker.cs`). Â· The other way: the
   literal the plan asked for, `.../releases/tag/v1.99.N`. Â· That literal has to be written
   before the tag it names exists, and a 404 is the worst possible last thing EQBuddy ever
-  says to a Linux or macOS player â€” nothing in CI would catch it. Only installs that took
+  says to a Linux or macOS player — nothing in CI would catch it. Only installs that took
   the bridge can ever see the notice, so for every reader of this value the bridge tag and
   the running version are the same string; a copy that later takes a legacy patch points at
   that patch, which is the right answer rather than a stale one. The negative the plan
@@ -5252,7 +6021,7 @@ the two calls the work itself turned up.
   assigns the one in-app announcement Linux and macOS users will ever get to the bridge
   release's own entry, alongside the `LEGACY-V1.md` / README / FeatureGuide wording P0-3
   owns. Written into `FABLE-FEEDBACK.md` as an explicit handoff rather than left to be
-  assumed â€” a rule everyone thinks someone else satisfied is how a bridge ships silent.
+  assumed — a rule everyone thinks someone else satisfied is how a bridge ships silent.
 - **The WPF hotspot baseline moved 4,214 â†’ 4,273, the minimum that fits** (P0-2,
   `tests/EQBuddy.Tests/ArchitectureTests.cs`, `docs/Architecture.md`). Â· The other way:
   lift a surface out of `MainWindow.xaml.cs` instead, which is the standing move. Â· `main`
@@ -5265,19 +6034,19 @@ the two calls the work itself turned up.
   (P0-1, `scripts/release.ps1`). Â· The other way: accept it silently, since the flag only
   reaches `gh release create` and that block already only runs with a tag. Â· A tagless run
   still builds, signs, copies to OneDrive and installs locally, so the switch would have
-  looked honoured while doing nothing â€” "silent no-ops are broken" with the switch on the
+  looked honoured while doing nothing — "silent no-ops are broken" with the switch on the
   other side. The check is the first thing in the script, so it costs a second rather than a
   172 MB publish. Pinned by `ReleasePrereleaseTests`.
 - **The P0-1 guard also pins `UpdateChecker`'s `/releases/latest` URL, which is product code
   outside the PR's edit scope** (`tests/EQBuddy.Tests/ReleasePrereleaseTests.cs`). Â· The other
   way: assert only on `release.ps1`, staying strictly inside the scoped file. Â· The flag
   protects nobody if the client is ever pointed at `/releases` instead, and that is the
-  natural edit for anyone wanting the updater to see more than one release â€” two files that
+  natural edit for anyone wanting the updater to see more than one release — two files that
   must agree, which is the shape `WeeklyRefreshWiringTests` already guards. Nothing in
   `UpdateChecker` was changed; the test only reads it.
 - **The #273 bonus-XP fix carries its `WhatsNew.json` entry into the UNRELEASED 1.99.18
   section, rather than waiting for whoever tags it** (PR #274, `src/EQBuddy.Core/Data/WhatsNew.json`).
-  Â· The other way: code-only PR, entry written at tag time by the releaser â€” the literal scope
+  · The other way: code-only PR, entry written at tag time by the releaser — the literal scope
   Helm's 9:52 authorize named was `XpRx` + tests. Â· `CLAUDE.md` makes the entry non-negotiable
   for a player-noticeable change and `release.ps1` refuses without one, so the version that
   ships this would have had to grow it anyway; 1.99.18 has no tag, so nothing shipped is being
@@ -5286,7 +6055,7 @@ the two calls the work itself turned up.
 - **The bonus parenthetical is NON-capturing, so `XpEvent` gains no field**
   (`LogParser.XpRx`). Â· The other way: a `bonus` group and a `Bonus` flag on `XpEvent`, which
   would let a future surface say "that hit was boosted". Â· It carries nothing the percent does
-  not â€” the percent already IS the boosted number â€” and a written-never-read field is trap 43's
+  not — the percent already IS the boosted number — and a written-never-read field is trap 43's
   shape. Cheap to add the day a surface actually wants it.
 
 ## 2026-09-03
@@ -5295,7 +6064,7 @@ _All four items this day were direct owner-session requests from Hateborne (fold
 completion detection, inventory prompt, Alt+Tab); the calls below are the defaults each
 one could have gone the other way on._
 
-- **Owning a Sky reward's finished item auto-MARKS it turned in â€” not "suggests"** (`SkyRewardAutoComplete`,
+- **Owning a Sky reward's finished item auto-MARKS it turned in — not "suggests"** (`SkyRewardAutoComplete`,
   wired into `OutputfileAutoImport.ImportInventory`). Â· The other way: a suggest-only row the
   player confirms, the `SuggestRarity` bar. Â· Ownership is decisive (the game's own unlock
   criterion is "Obtain X" and the item existing IS the obtain), the mark is add-only, the report
@@ -5319,11 +6088,11 @@ one could have gone the other way on._
   with it. HELM.md's "#243 no Inventory annotate in V1" was read as covering band-row
   annotations, not the tab naming its own data source; logged in HELM-FEEDBACK.md.
 
-- **WPF's fold click has no E2E coverage** â€” Avalonia's real click tests plus the
+- **WPF's fold click has no E2E coverage** — Avalonia's real click tests plus the
   word-for-word-twins rule are the mitigation; the E2E dump pins the default-open facts only.
   Â· The other way: a UI-automation dependency for one feature. Â· Not worth the harness.
 
-- **`shoot.ps1`'s `Kill($true)` became `Stop-Hard` (`Stop-Process -Force`)** â€” the tree-kill
+- **`shoot.ps1`'s `Kill($true)` became `Stop-Hard` (`Stop-Process -Force`)** — the tree-kill
   overload exists only on pwsh 7's runtime, and on a machine with only Windows PowerShell 5.1
   every kill-fallback THREW, leaking the shot app and wedging the run. Â· The other way:
   require pwsh 7. Â· EQBuddy spawns no children, so a plain force-stop is the same act and the
@@ -5331,12 +6100,12 @@ one could have gone the other way on._
 
 ## 2026-09-02
 
-- **On the phone, the DUMP reaches the render signature through the row ids â€” not through the
+- **On the phone, the DUMP reaches the render signature through the row ids — not through the
   dump's timestamp** (#243 PR 2, `CompanionProjection.LeftoverRowId`). Â· The other way: put
   `WrittenAt` on the wire and fold it into the Quests section fingerprint, which is the literal
   translation of what the two desktop signatures do. Â· The phone's key is computed FROM the
   projected groups, so the held count and the location riding each row id already move it
-  exactly when a band's claim moves â€” while a timestamp would also wake every quests-subscribed
+  exactly when a band's claim moves — while a timestamp would also wake every quests-subscribed
   phone for a dump that changed nothing on that tab (trap 8), and would add a wire field no page
   reads (trap 43's mirror). The desktop needed the stamp because its signature is built from
   settings and never looks at the rendered rows; this one does.
@@ -5344,22 +6113,22 @@ one could have gone the other way on._
 - **The group NOTE joined `ChecklistPrint`, for every checklist rather than just the new bands**
   (#243 PR 2, `CompanionProjection.SectionFingerprints`). Â· The other way: leave the shared
   print alone and special-case the leftover bands. Â· The note is DRAWN by the page and is the
-  one thing a checklist change can move without moving a row â€” the held-back note names the
+  one thing a checklist change can move without moving a row — the held-back note names the
   items another quest vetoed, and those are deliberately not rows. Every note in the system is a
   state word or a list of names, so nothing that drifts on a clock enters the key.
 
 - **The leftover bands go in the phone's Sky groups as a second non-tickable group, rather than
   as a new wire section** (#243 PR 2). Â· The other way: their own section, which would be
   subscribable on its own. Â· `index.html` already renders a `tickable === false` group
-  generically â€” heading, note, row text and detail â€” so the feature reaches every open phone the
+  generically — heading, note, row text and detail — so the feature reaches every open phone the
   moment the PC updates, where a page-side change can sit unseen for weeks (trap 32).
 
-- **The leftover row's words â€” `{Item} Ã—{held} Â· {where}`, both headings, the hover and the
-  held-back note â€” live on `SkyLeftoverRow`/`SkyLeftoversResult` in Core, not in each
+- **The leftover row's words — `{Item} ×{held} · {where}`, both headings, the hover and the
+  held-back note — live on `SkyLeftoverRow`/`SkyLeftoversResult` in Core, not in each
   renderer** (#243 PR 1, `Core/SkyLeftovers.cs`). Â· The other way: format in each window, which
   is what every other band on that tab does today. Â· The desktop pair and the phone group after
   them are three renderers of ONE decision, and the honesty of this feature is carried entirely
-  by its words â€” band B under band A's heading would be the app telling someone an item is
+  by its words — band B under band A's heading would be the app telling someone an item is
   finished with when it is not. A format string hand-copied into three files is what drifted
   before #184. `SkyLeftoversResult`'s shape is unchanged; these are added members only.
 
@@ -5367,18 +6136,18 @@ one could have gone the other way on._
   it** (#243 PR 1, both `QuestsWindow`s' `_myClasses`). Â· The other way: use the same `classes`
   everything downstream reads, which is one fewer field. Â· That variable has been narrowed to
   the ONE class the player is currently looking at, so "only other classes want this" would be
-  said about a class they play merely because they had it lensed out â€” a false claim, and the
+  said about a class they play merely because they had it lensed out — a false claim, and the
   one claim band B exists to make carefully (#193's rule, one surface over).
 
 - **The newest inventory dump's stamp went into both windows' render signature** (#243 PR 1). Â·
-  The other way: leave the signature alone â€” nothing else on that tab moves when a dump is
+  The other way: leave the signature alone — nothing else on that tab moves when a dump is
   read. Â· Which is exactly the problem: the bands are a join against the dump, so without it
   they would go on answering from whichever dump was current when the window opened, and the
   player's `/outputfile inventory` would appear to do nothing (silent no-ops are broken).
 
 - **This track's What's-new went into the existing unreleased 1.99.17 entry rather than opening
   1.99.18** (`Core/Data/WhatsNew.json`). Â· The other way: a version of its own. Â· 1.99.17 is not
-  tagged and not released â€” `gh release list` tops out at v1.99.16 â€” so nothing shipped is being
+  tagged and not released — `gh release list` tops out at v1.99.16 — so nothing shipped is being
   edited (trap 54's guard agrees: the what's-new gate is green). Two tracks landing in one
   unreleased cut is the normal case, and David still gates the tag.
 
@@ -5386,7 +6155,7 @@ one could have gone the other way on._
   `ShowLevelUps`** (#240 PR 2, `Web/index.html`). Â· The other way: ride the setting, which is
   what Bevel's lock names and what would make the two surfaces agree exactly. Â· A phone tap
   would then fold or unfold a window on the PC somebody is playing at, over the LAN, with no
-  way to tell what did it â€” and the desktop setting is that WINDOW's fold. The page follows
+  way to tell what did it — and the desktop setting is that WINDOW's fold. The page follows
   `nextGroupOpen`, the fold beside it, which is session-only per device for the same reason.
   What DOES ride the wire is everything a surface could disagree about: the rows, their order
   and the label. Default shut on both, which is the half of the lock that is about what a
@@ -5395,37 +6164,37 @@ one could have gone the other way on._
   wire** (#240 PR 2, `CompanionProjection.Live.cs`). Â· The other way: cap it, which is the
   house rule for a wire payload and is what `unlocks`, `loot` and `faction` all do. Â· The rows
   are newest-first and bounded by the level cap rather than by how long you played, so a cap
-  drops the EARLIEST dings â€” the rarest rows, and the ones somebody opens the list to find
+  drops the EARLIEST dings — the rarest rows, and the ones somebody opens the list to find
   (trap 50, #234). A trimmed list that looks complete is the failure that took a bug report to
   find last time; ~60 short rows on a section that only re-sends on a ding is the cheaper side
   of that trade.
 - **The Progress fingerprint gained the fold LABEL rather than a join over the rows** (#240
-  PR 2, `CompanionProjection.cs`). Â· The other way: `Join(pr.LevelUps, â€¦)` like the other
-  lists in that key. Â· The label is "Level-ups (17) Â· last Aug 23" â€” the count and the last
-  ding â€” so it moves on exactly what can change the list while costing one short string per
+  PR 2, `CompanionProjection.cs`). · The other way: `Join(pr.LevelUps, …)` like the other
+  lists in that key. · The label is "Level-ups (17) · last Aug 23" — the count and the last
+  ding — so it moves on exactly what can change the list while costing one short string per
   tick instead of a join over a career. Nothing in it drifts on the clock, which is the
   property trap 8 is about.
 - **The Level-ups What's-new entry NAMES its location but carries no `MOVED:` badge**
   (#240 PR 1, `WhatsNew.json` 1.99.17). Â· The other way: mark it MOVED, since joeymavity is
-  exactly the player the badge exists for â€” he went looking for something and could not find
+  exactly the player the badge exists for — he went looking for something and could not find
   it (#219's shape). Â· Declined because nothing actually moved: the session line he
   remembers is untouched and the durable list never existed to be relocated, so the badge
   would be a false claim in the one note a player is told never to skim. The X-is-now-Y
-  duty is met in the sentence instead â€” the entry leads with "Progress > Experience >
+  duty is met in the sentence instead — the entry leads with "Progress > Experience >
   Level-ups" and says plainly that nothing was moved or removed to make room.
 - **`LevelHistory.Stored` owns the archiver-scoping rule, rather than each widget owning a
   copy** (#240 PR 1, `UI.Shared/LevelHistory.cs`). Â· The other way: leave the four-line
   method on both `MainWindow`s, which is where it was written and where the repository and
   the archiver both live. Â· The WPF ratchet is what forced the question (4638 against a 4635
   limit) and the answer was the one the ratchet's own message names: it is the same `if` in
-  two lanes with the phone as a third caller in PR 2, and the mistake it prevents â€” a blank
+  two lanes with the phone as a third caller in PR 2, and the mistake it prevents — a blank
   identity asking `ProgressSeries` for EVERY character's dings, since it treats an empty side
-  as "do not filter" â€” is silent and renders as a plausible list. The baseline was NOT bumped.
+  as "do not filter" — is silent and renders as a plausible list. The baseline was NOT bumped.
 - **The `progress-levelups` shot primes stored history under the FIXTURE'S OWN character**,
   which needed a two-line fix to `Invoke-PrimeRun` (#240 PR 1, `scripts/shoot.ps1`). Â· The
   other way: prime under a second name the way `history-charts` does, or skip the shot. Â·
   Neither works here: the surface matches on the archiver's identity with SQL `=`, so rows
-  written as "Aludra" render as a correct picture of an empty fold â€” trap 23 exactly â€” and a
+  written as "Aludra" render as a correct picture of an empty fold — trap 23 exactly — and a
   surface with no fixture state reads as reviewed anyway (trap 22). Priming as `Testchar`
   writes the fixture log's own path, so the harness now restores it from the pristine copy
   rather than leaving the next run with no log, and `Append-Log` moved after the prime.
@@ -5434,7 +6203,7 @@ one could have gone the other way on._
   two dings, which is what a player probably pictures. Â· The miner
   (`SessionRepository.ProgressSeries`) reads two fields out of each stored snapshot and
   played-time-per-session is not one of them, so "time in level" would have been wall clock
-  wearing a better label â€” the trap-50 shape, a number claiming more than it knows. Taken
+  wearing a better label — the trap-50 shape, a number claiming more than it knows. Taken
   from Fable's plan; the in-session "(43m)" in the Experience summary line is untouched.
 - **`GameWrittenLog`'s comment was corrected to match its regex, rather than the regex
   tightened to match the comment** (Fable's v1.99.14 review nit, "post-tag is fine"). Â· The
@@ -5442,13 +6211,13 @@ one could have gone the other way on._
   claimed and would shrink the destructive target slightly. Â· Declined because it changes
   what a DESTRUCTIVE gate does to a player's files on no evidence: Fable's own 2026-08-29
   check found eqlwiki has no server list at all, so "every server short name is lower case"
-  is an assumption â€” and the assumption already written down is the thing being removed.
+  is an assumption — and the assumption already written down is the thing being removed.
   Replacing one unevidenced claim with an unevidenced behaviour change is a worse trade than
   telling the truth about the character set. Trap 47/48's family; `src/EQBuddy.Core/GameWrittenLog.cs`.
 - **The What's-new guard FAILS the build rather than warning**, and it compares against the
   newest tag only. Â· The other way: warn (an old entry might legitimately need a typo fix),
   or compare every entry against its own tag. Â· A shipped entry is the record of what players
-  were told, so amending one is the defect, not an exception to it â€” and a warning on a gate
+  were told, so amending one is the defect, not an exception to it — and a warning on a gate
   that fires twice in three releases is a line people stop reading. Newest-tag-only is not a
   shortcut: that tag's copy of the file already contains every older entry, so one `git show`
   covers the whole history. `scripts/whatsnew-guard.ps1`, wired into `check.ps1` (first stage)
@@ -5458,20 +6227,20 @@ one could have gone the other way on._
   `travel-window.png` show surfaces that still exist in content and are gone in chrome; a new
   Map shot needs a maps folder the throwaway profile has not got, and a new Path shot needs a
   destination no env hook can set. So each caption now names the current home in the repo's
-  own "X is now Y" form â€” the moved-surface rule applied to the README instead of to a
-  release note â€” and says plainly that the capture predates the fold. Dropping the rows would
+  own "X is now Y" form — the moved-surface rule applied to the README instead of to a
+  release note — and says plainly that the capture predates the fold. Dropping the rows would
   have removed the only picture of a real feature. `README.md`; the residual shot work stays
   on the `FABLE.md` README-screenshots item.
 - **The What's-new guard also runs in CI, which Fable's follow-up did not ask for**, and the
   checkout in `ci.yml` goes to `fetch-depth: 0` to make that possible. Â· The other way: leave
   it at the two homes named (`check.ps1`, `release.ps1`). Â· Both of those need a human to run
-  them, and the defect being guarded is one nobody noticed twice â€” a gate that depends on
+  them, and the defect being guarded is one nobody noticed twice — a gate that depends on
   being remembered is the thing this repo keeps writing traps about. A shallow checkout has
   no tags, so the guard would have skipped cleanly and read as coverage (trap 34). Costs one
   full clone per CI run. `.github/workflows/ci.yml`.
-- **#243 PR 0 â€” the plan's four "decided without asking" calls, taken as written**: surplus
+- **#243 PR 0 — the plan's four "decided without asking" calls, taken as written**: surplus
   counts are out (a multi-class allocation is the guess #106 declines to make); Band B exists
-  and is never shown without a class lens (#193 â€” no lens is not a wildcard); another catalog
+  and is never shown without a class lens (#193 — no lens is not a wildcard); another catalog
   quest wanting the item vetoes "no longer needed" (the reporter asked about Sky alone, but
   the cost of a wrong Band A row is a destroyed turn-in); bank items are labelled, not
   excluded (the problem is bag space, and the fact costs one word).
@@ -5497,7 +6266,7 @@ one could have gone the other way on._
   ("scrolling belongs to the host") both point at deleting it. Â· The other way: drop the
   scroller and let the window's `BodyScroll` carry one long body. Â· That scroller is what
   keeps the â§‰ copy of `/outputfile inventory`, the auto-tick note and the import report
-  outside the scrolling region â€” the exact affordance `GameCommandsTests` has a must-list
+  outside the scrolling region — the exact affordance `GameCommandsTests` has a must-list
   row for on this surface (trap 34), and dropping it would have put the only in-app route to
   the command under a forty-row list (trap 37, and trap 44 for the report). So the cap comes
   from the host and the pinning stays. Net effect at the window's opening height: the list
@@ -5513,7 +6282,7 @@ one could have gone the other way on._
   Told to Helm in `HELM-FEEDBACK.md` at the time rather than after. (PR 0/1, #250 track)
 - **The body cap is sized from the height the MONITOR granted, not the raw drag.** Â· The
   other way: pass `ContentHeight` through as the plan's `playerContentHeight` reads. Â· The
-  two agree at 100% on a big screen and diverge exactly where nobody looks â€” a 900-unit drag
+  two agree at 100% on a big screen and diverge exactly where nobody looks — a 900-unit drag
   on a 1032px work area is granted 698 units at 125% scale, and a body sized from 900 would
   claim room the stack never had. Recomputed through `WidgetMetrics.SectionMaxHeight` rather
   than read off the control, so the answer cannot depend on which writer ran last (trap 33).
@@ -5521,14 +6290,14 @@ one could have gone the other way on._
 - **`theme-inline-loot.png` was re-shot on this build although it is not the change's
   subject.** Â· The other way: leave the committed 2026-08-26 capture as the baseline. Â· It
   is the BASELINE half of the acceptance pair, and a pair shot on two different builds is
-  the exact "reads as a regression" failure trap 51 was written about â€” the stale one
+  the exact "reads as a regression" failure trap 51 was written about — the stale one
   already differed in the last card's title. Same fixture, same shot definition, only the
   build moved. (PR 1)
 
 - **PR #256 follow-up shipped WITHOUT the authorized KnownGaps list, because the premise it
   rested on turned out to be false** Â· Helm's 2026-08-31 2:05 PM ruling authorized a curated
   known-gaps list, reason `no eqlwiki prose`, for the 24 spells the KhazamSpellRow rename left
-  description-less â€” the obvious move was to write those 24 rows and unblock Â· checking each
+  description-less — the obvious move was to write those 24 rows and unblock · checking each
   one first showed all 24 DO have prose on eqlwiki, on their own spell page: they were missed
   because the description fallback looked them up by the page's `spellname` field, which
   `class-spells-harvest.py`'s own docstring already warns is a copy-paste artefact and not a
@@ -5538,13 +6307,13 @@ one could have gone the other way on._
   to exempt Â· the guard therefore stays strict at 100% with no exemption list, which is also
   what Helm asked for ("do not weaken the guard"); an exemption list with no entries to
   justify is a ready-made hole for the next harvest regression Â· flagged to Helm as the
-  headline of the last-look request rather than decided quietly â€” Helm signed option 1 and
+  headline of the last-look request rather than decided quietly — Helm signed option 1 and
   is owed the correction Â· `spell-levels-promote.py`, `LevelUnlocksTests.cs`, PR follow-up
   to #256.
 - **The #246 cask pin became a promote-time correction table instead of a hand re-edit** Â·
   could have re-applied qty=3 to the catalog by hand as the repaired branch did, which is the
   literal reading of "preserve the pin through the re-harvest" Â· but the 2026-08-31 refresh
-  proved the revert recurs weekly â€” `CatalogSanityTests` pinned it "so a future harvest run
+  proved the revert recurs weekly — `CatalogSanityTests` pinned it "so a future harvest run
   can't silently reset it back to 1" and the very next run reset it, so a pin only a human can
   re-apply is a chore that is invisible until the build breaks Â· the parser is not wrong (the
   page says "three of these casks" in prose, not "3 x"), so teaching it English number words
@@ -5575,7 +6344,7 @@ one could have gone the other way on._
   row Â· could have given the quest-ledger reconcile its own outcome type and surface row,
   mirroring how Gear and Achievements are separate entries in that must-list Â· the dump is
   ONE event with two internal consumers (gear checklist, quest ledger), and the report
-  already reaches the Gear surface via the property that must-list already covers â€” a
+  already reaches the Gear surface via the property that must-list already covers — a
   second tracked property for the same announcement would be trap 4's shape (one fact, two
   places to report it) rather than a fix for it Â· `OutputfileAutoImport.cs`.
 
@@ -5598,7 +6367,7 @@ one could have gone the other way on._
   mirrored `ProgressSurfaceSet`/`CreatureSurfaceSet`/`LootSurfaceSet` for consistency Â·
   `MapView`/`SpawnsView` do real construction-time work (`PopulateZoneList` reads disk,
   `SpawnsViewModel.RefreshZoneList` walks the ledger), and there is no multi-tab
-  WorldWindow yet to need all four at once â€” a combined factory would make opening the
+  WorldWindow yet to need all four at once — a combined factory would make opening the
   Travel window silently also touch the maps folder, a behaviour change PR 1 may not make Â·
   `MainWindow.xaml.cs`/`MainWindow.cs`, `SurfaceOwnershipTests.EveryWorldHostBuildsItsOwnFreshView`.
 - **Avalonia's `MapWindow`/`TravelWindow` keep taking `IZoneHost` directly rather than
@@ -5610,7 +6379,7 @@ one could have gone the other way on._
   `EQBuddy.Avalonia/MapWindow.cs`, `TravelWindow.cs`.
 - **The #238 Unlocks tab is a GLANCE inline, not a Full room** Â· could have let the
   `InlineModeFor` catch-all make it Full Â· it postdates Bevel's signed table and is a
-  review checklist over two dumps with its own lens â€” the same host-rule shape as
+  review checklist over two dumps with its own lens — the same host-rule shape as
   Inventory; conservative until Bevel rules, flagged in the pending Unlocks review ask Â·
   `QuestSurface.InlineModeFor`.
 - **Inline Epic/Sky checklist rows are READ-ONLY** Â· could have carried the old cards'
@@ -5636,7 +6405,7 @@ one could have gone the other way on._
   harness re-ran green on the merged build (progress full acceptance, spawns, quests) Â·
   `WindowZoom.cs` + `FramelessResize.cs`.
 - **Fixed a defect in #238 rather than bouncing the PR: the Alt+Tab feature stripped
-  `WS_EX_TOOLWINDOW` from chip/overlay windows that set it deliberately** â€” with the box OFF
+  `WS_EX_TOOLWINDOW` from chip/overlay windows that set it deliberately** — with the box OFF
   (the default) every chip would have joined the switcher Â· could have asked Hateborne to fix
   Â· one guard line per lane (`NoActivate.SetToolWindow`, `WinClickThrough.SetToolWindow`), told
   him in the PR reply Â· TestPlan Â§4b row.
@@ -5647,11 +6416,11 @@ one could have gone the other way on._
 
 ## 2026-08-25
 
-- **Helm's `claude -p` kick: ALLOWED until the plane's launcher (PR 1) lands â€” David's call,
+- **Helm's `claude -p` kick: ALLOWED until the plane's launcher (PR 1) lands — David's call,
   asked with the question tool** Â· the 2026-08-24 recorded ruling had retired it before first
   use, and Helm declined to accept an agent's notice as the word Â· two conditions attached:
   the kicked session runs against its own clone (never David's working checkout), and the kick
-  carries the permission profile its purpose needs â€” an unpermissioned kick is
+  carries the permission profile its purpose needs — an unpermissioned kick is
   documentation-only, per the 2026-08-24 night test. Plane repo record corrected to match
   (`HELM-FEEDBACK.md` 2026-08-25 entry is the in-channel relay).
 
@@ -5659,21 +6428,21 @@ one could have gone the other way on._
 
 - **Did NOT fire the Helm wake, though David asked for a live test** Â· could have run
   `gh workflow run helm-back-channel.yml` to exercise the loop Â· the session could not commit or
-  push, so the POST would have paged Helm to read a file that never left the machine â€” the exact
-  failure the rule names â€” and would have mis-attributed a local permissions fault to the plane.
+  push, so the POST would have paged Helm to read a file that never left the machine — the exact
+  failure the rule names — and would have mis-attributed a local permissions fault to the plane.
   A wake with nothing behind it is a worse test result than no wake.
 
 - **Rewrote the standing header of `HELM-FEEDBACK.md` myself; left `HELM.md` alone** Â· could
   have asked Helm to correct both, or corrected both Â· the header was still instructing
   sessions to make David the courier (Helm's own note said that line was already gone), and
-  `HELM-FEEDBACK.md` is my channel so the fix is mine â€” `HELM.md` is Helm's STATE file, so the
+  `HELM-FEEDBACK.md` is my channel so the fix is mine — `HELM.md` is Helm's STATE file, so the
   missing command there is a request in the mailbox, not an edit. Dated entries left untouched:
   a delivered message stays where it was delivered.
 
-- **Kept `Nedaria's Landing` in ZoneGraph â€” David's call, asked with the question tool** Â·
+- **Kept `Nedaria's Landing` in ZoneGraph — David's call, asked with the question tool** ·
   could have dropped it and filtered the harvester Â· eqlwiki asserts the adjacency and has no
   page for it, and dropping it is departing from the wiki on game data (consequence list 6).
-  Logged here for the reasoning rather than the decision: "no wiki page" is not the tell â€” 18
+  Logged here for the reasoning rather than the decision: "no wiki page" is not the tell — 18
   other graph zones have none and all resolve via aliases; this is the only one that resolves
   to nothing (`ZoneMapCoverageTests.ZonesWithNoClientMap`).
 - **Merged PR #236 after a local review rather than on sight** Â· could have merged a bot PR
@@ -5691,7 +6460,7 @@ one could have gone the other way on._
 - **Doc audit: fixed the stale numbers AND added `DocumentationSizeTests` rather than only
   fixing them** Â· could have corrected the figures and moved on Â· Architecture.md's own note
   says its size table had already "drifted far enough to mislead" once, and it had drifted
-  10-15% again in four days â€” a measurement nobody re-measures rots untouched, so it belongs
+  10-15% again in four days — a measurement nobody re-measures rots untouched, so it belongs
   in the build like the ratchet (`DocumentationSizeTests`).
 - **Size checks assert within 10%, not exactly** Â· could have pinned the numbers to the line Â·
   exact pinning makes every commit a documentation edit and a check people route around is
@@ -5735,7 +6504,7 @@ one could have gone the other way on._
 
 - **Auto-empty now only touches files with the exact shape the game writes** Â· could have kept
   the `eqlog_*.txt` glob and relied on the archive folder as the safety net Â· **David's call,
-  asked with the question tool** â€” logged here because it is the reasoning, not the decision:
+  asked with the question tool** — logged here because it is the reasoning, not the decision:
   the discriminator is the character set, not the segment count, since a real server short name
   can contain an underscore (`Core/GameWrittenLog`, `ea2e27d`).
 - **Bumped to 1.99.9 and staged rather than asking to ship first** Â· could have asked David for
@@ -5753,7 +6522,7 @@ one could have gone the other way on._
 
 ## 2026-08-23
 
-- **Class inference (Fable 5): classes are a LIST with a SOURCE â€” the achievements dump
+- **Class inference (Fable 5): classes are a LIST with a SOURCE — the achievements dump
   first, inference second (every qualifying class within 0.25 of the leader, at most three,
   cited to the wiki's "trio builds"), picks as a lens that widens and never narrows;
   `LeadMargin` deleted** Â· keep a single inferred class and raise the margin; let picks
@@ -5772,13 +6541,13 @@ one could have gone the other way on._
 - **v1.99.6 re-review (Fable 5): the fifth Island 6 bee (`Bizazzzt`) is a pre-tag catalog
   row, not a follow-up** Â· ship the four and file the fifth Â· it is discovered-and-learned on
   two kills, the exact defect the release claims to fix; `FABLE-FEEDBACK.md`.
-- **VETOED nothing â€” but recorded because David decided it in session:** when eqlwiki's class
+- **VETOED nothing — but recorded because David decided it in session:** when eqlwiki's class
   page and its spell pages disagree about a spell's level, **the class page wins and spell
   pages fill gaps only where the class page has no section**, with anything derived flagged as
   such Â· class-page-only, or keeping the spell-page harvest and patching the gaps Â· found from
   Druid 34: class page 5, our catalog 10, missing `Healing Water` and padded with five ports.
   `FABLE.md` stub, 2026-08-23.
-- **Bzzazzt is catalogued with eqlwiki's 12-hour clock, NOT as triggered â€” against what the
+- **Bzzazzt is catalogued with eqlwiki's 12-hour clock, NOT as triggered — against what the
   reporter asked for** Â· mark both new bees triggered as #109 requested Â· the wiki is the
   tie-breaker and its reason holds independently (a chain's opener cannot itself be
   triggered). His evidence is all from personal instances, which never respawn, so the two
@@ -5832,7 +6601,7 @@ one could have gone the other way on._
   someone else's wiki is the one who should weigh a 2-of-7.
 - **The rare fact is said ONCE, in the contribution block, and NOT in the observed stat
   block** Â· repeat it there, where the other /consider-derived facts live Â· the stat block is
-  kill-gated and heads itself "thin sample, for your notes rather than the wiki yet" â€” which
+  kill-gated and heads itself "thin sample, for your notes rather than the wiki yet" — which
   would put a paste-it instruction and a don't-paste-it-yet caveat on one fact three lines
   apart. Found by reading the real paste block, not from the diff.
 - **A rare-conned creature whose loot the wiki already has still earns NO pack section** Â·
@@ -5852,7 +6621,7 @@ one could have gone the other way on._
   inventory report sits on Gear Â· the second screenshot showed it behind a scrollbar under
   21 rows (now trap 44). A notification is read on arrival; a card footer is not.
 - **1.99.6 is its own release rather than riding the next feature** Â· fold it into whatever
-  ships next Â· the What's-new rule â€” a player-noticeable fix earns the release that ships it,
+  ships next · the What's-new rule — a player-noticeable fix earns the release that ships it,
   and this one has a reporter (#101, Frankthetankk) waiting on the answer.
 - **The agent run cadence (Scribe 6am Â· Bevel 1pm Â· Helm 8pm) goes in `CLAUDE.md`, beside the
   "inboxes inform you" boundary, not in `HANDOFF.md` or an agent's own section** Â· a handoff
@@ -5875,8 +6644,8 @@ one could have gone the other way on._
 - **Dead helpers `IsExcluded`/`IsTimeableNamed`: delete, do not wire; build `DeadHelperTests`
   as V1** Â· wire them to the pet registry Â· the suffix rule covers what the log prints, and a
   promise with no caller is worse than none; `FABLE-FEEDBACK.md`.
-- **v1.99.5 review: the pet purge must spare `Custom` entries and manual timers â€” pre-tag**
-  Â· ship as is, it only touches "â€¦ pet" names Â· the file's own principle says a discovery is
+- **v1.99.5 review: the pet purge must spare `Custom` entries and manual timers — pre-tag**
+  · ship as is, it only touches "… pet" names · the file's own principle says a discovery is
   discarded without touching the player's additions; `FABLE-FEEDBACK.md`.
 - **v1.99.4 review: the motes "stays off" promise is fixed by WORDING, not by a
   "player-touched" flag** Â· could have added a setting recording the player's own toggle Â·
@@ -5884,7 +6653,7 @@ one could have gone the other way on._
 - **BOM/whitespace churn across fifteen files is next-loop hygiene, not a pre-tag block** Â·
   could have held the tag for a normalisation commit Â· nothing breaks and a renormalisation
   is its own diff; `.gitattributes` is the executor's V1 call.
-- **Avalonia theme bodies: option (a) â€” the `IWidgetCard` seam, every host builds its own
+- **Avalonia theme bodies: option (a) — the `IWidgetCard` seam, every host builds its own
   instance; a control never moves between windows, as a trap with a source-scan guard** Â·
   (b) make the move safe, or (c) a projection Â· the move is an open Avalonia bug since 11.2
   (#12753, #17906, #21267), still in 12.1.1; `FABLE.md` plan, Fable 5.
@@ -5893,7 +6662,7 @@ one could have gone the other way on._
   every existing Progress render test unchanged; mixing it with the card hides which half broke.
 - **On Avalonia the window renders only its visible tab, as WPF does** Â· could have rendered
   every tab every tick as the widget's paint block did Â· one rule on both lanes.
-- **Inline themes: one owner â€” expanding a card while its window is open brings the window
+- **Inline themes: one owner — expanding a card while its window is open brings the window
   forward, closing the window never re-expands the card, the selected tab is session-only**
   Â· could have allowed card and window at once (WPF can), or re-expanded on close Â· Avalonia
   cannot show a body twice, and re-growing the widget after a close is a surprise;
@@ -5920,20 +6689,20 @@ one could have gone the other way on._
   be re-checked, pack re-check bounded to flagged creatures** Â· could have been 1/60 s or
   uncapped as today Â· wiki re-check plan, `FABLE-FEEDBACK.md` 2026-08-21. *Put in front of
   David as "adjust at approval" at the time; it should have been this line instead.*
-- **One spawn type, `triggered`, with a free-text `triggeredBy` â€” not a `chained` /
+- **One spawn type, `triggered`, with a free-text `triggeredBy` — not a `chained` /
   `player-triggered` pair** Â· the reporter's two-word taxonomy was real in the world Â· eqlwiki
   records one value, and the engine treats both the same; `SpawnEntry.SpawnType`.
 - **A re-check in flight keeps the OLD wiki answer on screen rather than showing "not checked
   yet"** Â· could have nulled the memo entry Â· the #217 rule (pending â‰  nothing new), wiki
   re-check plan.
 
-## 2026-08-22 â€” Claude (executor)
+## 2026-08-22 — Claude (executor)
 
 - **Took Bevel's 1.99.1 post-hoc item without asking** (Helm-signed, V1, unreleased). Default it
   could have gone the other way: wait for David. Landed: the release gate is the protection, and
   "do I like this wording" fails both question tests.
 - **The triggered glance is named-if-it-fits, never an ellipsis.** Could have gone: truncate with
-  "â€¦", or widen the fixed 150px timer column. Landed: bare word when it does not fit; widening a
+  "…", or widen the fixed 150px timer column. Landed: bare word when it does not fit; widening a
   shared column is a layout call and is back with Bevel with the screenshot.
 - **Healed poisoned overrides for raid-instanced entries too**, not only triggered ones as Fable's
   note said. Same contradiction on screen; the method is `SuppressedByCatalog`'s own definition.
@@ -5942,29 +6711,29 @@ one could have gone the other way on._
 - **Fixed a 1-in-3 flake in `SettingsClobberTests` mid-PR rather than filing it.** Default it
   could have gone the other way: leave it, it is pre-existing and unrelated to inline themes.
   Landed: it is the guard Fable asked for in the v1.99.3 release review, it has been flaky since
-  the hour it shipped, and I was about to run the gates repeatedly against it â€” a gate that lies
+  the hour it shipped, and I was about to run the gates repeatedly against it — a gate that lies
   one run in three trains you to re-run until green. Cause: `CompanionHost` and
   `OutputfileAutoImport` write the shared profile's settings.json from a different xUnit
   collection, and collections run in parallel. Cost 2,350 tests and still 2 s, because the fix
   is a serial collection of four files rather than disabling parallelism (which was 2 s â†’ 8 s).
 - **Guarded it with a source scan, not just the four attributes.** Could have gone: add
   `[Collection]` and move on. Landed: the file's old comment *claimed* nothing else touched
-  settings.json, and that claim is what let the flake exist â€” trap 34, a comment standing in for
+  settings.json, and that claim is what let the flake exist — trap 34, a comment standing in for
   a guard. `SettingsFileCollectionTests` fails the build when a fifth writer appears.
 - **Inline themes PR 1 ships `ThemeBodyMaxHeight = 320` with the screenshot unable to choose.**
   Bevel offered 280 or 320 and delegated the pick. Landed: 320, because `GearCardView` already
-  uses it and a second nearby constant is two answers to one question â€” and the shot is recorded
+  uses it and a second nearby constant is two answers to one question — and the shot is recorded
   as NOT deciding it, since no Progress room is tall enough to reach either cap. PR 2's Loot and
   Drops rows are where the number is actually tested.
 - **Extended `EQBUDDY_EXPAND` to name a room (`progress:raids`) instead of adding a variable.**
   Could have gone: a new `EQBUDDY_THEMETAB`. Landed: an inline theme has four bodies behind one
-  key, and three of them were unreachable by a test or a screenshot â€” trap 22, a surface that
+  key, and three of them were unreachable by a test or a screenshot — trap 22, a surface that
   cannot be reviewed reads as reviewed.
 - **Reverted the Avalonia half of Inline themes PR 1 rather than shipping it half-working or
   forcing it.** Default it could have gone the other way: keep pushing (it was six fixes deep),
   or leave the failing test and file it. Landed: the blocker is that Avalonia's theme surfaces
   are shared field-backed instances with no `IWidgetCard`-style seam, which is a V2 refactor of
-  a 5,593-line file â€” and CLAUDE.md says stop and stub when work turns out V2 mid-session, not
+  a 5,593-line file — and CLAUDE.md says stop and stub when work turns out V2 mid-session, not
   finish it and label it. `main` now has inline themes on one widget and not the other, which
   is a parity gap that is REPORTED rather than quiet, and no What's-new claims it.
 - **Did not write the `WhatsNew.json` entry for PR 1.** Could have gone: write it now so it is
@@ -5973,8 +6742,8 @@ one could have gone the other way on._
   in `HANDOFF.md`.
 - **Took Helm's #228 ruling as WORK, and restored the Motes card from the mini-dashboard star
   rather than from `hadFile`.** Could have gone: show the card to every existing profile (the
-  maximal reading of "restore"). Landed: the fold destroyed the real preference â€” it removes the
-  key from `SectionOrder` AND `HiddenSections` â€” so the star is the only surviving evidence, and
+  maximal reading of "restore"). Landed: the fold destroyed the real preference — it removes the
+  key from `SectionOrder` AND `HiddenSections` — so the star is the only surviving evidence, and
   restoring what can be proven beats growing everyone's widget. It under-restores on purpose,
   and that limit is written into the code.
 - **Did NOT write the What's-new entry, and asked David instead** (he chose "ask Helm, hold the
@@ -5986,7 +6755,7 @@ one could have gone the other way on._
   says the same rather than `-2 left`. Bevel named the two states; the wording of the empty one
   was left to me. Landed: a zero is a number to read, and that state is an achievement.
 - **Changed the Wealth CHIP only, not the Progress window's Wealth body.** Bevel's ruling was
-  justified with "window Wealth is coin too", which is not true â€” the window's Wealth tab still
+  justified with "window Wealth is coin too", which is not true — the window's Wealth tab still
   draws Coin, Sold and Motes. Default it could have gone the other way: strip the body to match
   the justification. Landed: the Motes card ships hidden, so for most profiles that block is the
   only place mote rows appear, and removing a surface uninvited is exactly how #204/#210/#212
@@ -5995,7 +6764,7 @@ one could have gone the other way on._
   a fix was built and we were held back from telling the reporter. False: both reporters were
   told on 2026-08-21 and 1.99.0's notes announced it. I had read Helm's hold and Scribe's item
   and never opened the threads. The lesson is narrow and worth keeping: **an agent's hold text
-  describes an intention, not the state of a thread** â€” check the thread before describing what
+  describes an intention, not the state of a thread** — check the thread before describing what
   a player has been told.
 - **Staged 1.99.4 with a Windows-scoped entry for the inline Progress card**, rather than
   releasing it unannounced or reverting it off `main`. Default it could have gone the other way:
@@ -6009,7 +6778,7 @@ one could have gone the other way on._
   Default it could have gone the other way: add a "player touched it" flag. Landed: one day of
   exposure, one toggle to undo, and a setting that remembers a single day is a setting forever.
 - **PATTERN, not a one-off: I write comments from the INTENT and not from the code.** Fable
-  caught the same shape twice in one day â€” the `AppSettings.Load` "never saves" claim and the
+  caught the same shape twice in one day — the `AppSettings.Load` "never saves" claim and the
   motes "stays off" claim. Both times the tests were right and the prose asserted a safety
   property the code lacks. Worth checking for deliberately in review.
 - **Stripped the BOMs and rebuilt `WhatsNew.json` from the tag's own bytes.** The cause was my
@@ -6024,66 +6793,66 @@ one could have gone the other way on._
   than leaving them in `SCRIBE.md`.** Default it could have gone the other way: create the two
   files and leave the holds where they are, which is the smaller change. Landed: the holds were
   wrong all three at once this morning precisely because their author and their list-maintainer
-  were different, and two lists would be strictly worse than one â€” the one a session reads would
+  were different, and two lists would be strictly worse than one — the one a session reads would
   be the stale one. `SCRIBE.md` now carries a pointer and an explicit "do not restore holds
   here"; Scribe and Bevel were both told why, and Scribe's `## Holds` / `Retired` conventions
   moved wholesale rather than being rewritten.
 - **`HELM.md` is documented as STATE, not a work queue.** The other three inboxes are
   take-an-item-and-delete-it; a hold is never taken, it binds until Helm lifts it. Writing that
-  distinction down is the point â€” treating a hold like a work item is how "a shipped fix lifts
+  distinction down is the point — treating a hold like a work item is how "a shipped fix lifts
   the hold" gets invented.
 
-## 2026-08-22 â€” clearing the `waiting (David's call)` pile
+## 2026-08-22 — clearing the `waiting (David's call)` pile
 
 David: *"only elevate to me for items appropriately needing my focus."* Six items sat on him;
 one genuinely does. Each line below is a decision I made instead of a question I asked.
 
 - **Motes are excluded from what the wiki pack SUGGESTS.** Could have gone: leave it for David
   as filed. Landed: it FOLLOWS eqlwiki (its own Mote Guide says motes are not creature-specific),
-  and "departing from the wiki" is the thing on his list â€” matching it is not. Kept distinct
+  and "departing from the wiki" is the thing on his list — matching it is not. Kept distinct
   from the admins' ruling that common drops stay IN: a cheap gem really did drop from that
   creature, a mote did not. `WikiContribution.SuggestableToWiki`, with the negative asserted.
-- **"What's-new should cover skipped versions" was CLOSED, not decided** â€” it was already built
+- **"What's-new should cover skipped versions" was CLOSED, not decided** — it was already built
   before it was filed. `EntriesBetween` returns every entry between two versions and
   `WhatsNewTests` covers a multi-version hop. The item's "Already shipped" line was wrong, which
   is the rot Scribe's own SSC promises to sweep. Verified rather than assumed.
 - **The pack's session-vs-history scope went to `FABLE.md` as a V2, not to David.** It reads as
   a scope call and is a design one: three open sub-questions the reporter named, and the data
   source moves from a live object to a query over archives.
-- **Two UX items went to Bevel, not David** â€” the slow chip's icon (an overlay-space call) and
+- **Two UX items went to Bevel, not David** — the slow chip's icon (an overlay-space call) and
   Mobile "New at level" using the played class rather than the Quest Tracker filter (a
   which-surface-owns-this-state call, the #212 shape).
 - **Two stay with David, and both belong to him:** the spawn-timer mega-thread (public posture
   under the project's name, consequence-list item 3) and the `/consider` park, which is his own
-  decision â€” worth telling him only that #217 has since answered its destination question.
+  decision — worth telling him only that #217 has since answered its destination question.
 
-## 2026-08-22 â€” David's three calls, asked with the question tool
+## 2026-08-22 — David's three calls, asked with the question tool
 
 - **#228: star-only IS enough.** He ruled the lifting condition met. Recorded for Helm rather
   than acted on: Helm's condition named him, but the LIFT is still Helm's, and he answered the
   question rather than telling me to post. Nothing posted; he is carrying the note.
 - **Spawn-timer mega-thread: he took none of the three options.** *"We should have a way for
   people to feed verified updates to EQLWiki."* So: no thread we host, and a new V2 in
-  `FABLE.md` instead. The redirect is better than any option I offered â€” a thread we host is a
+  `FABLE.md` instead. The redirect is better than any option I offered — a thread we host is a
   second source of truth competing with the wiki, maintained by us forever.
 - **`/consider`: unparked, wiki half only.** The spawn-chip half stays parked. The wiki half now
   has a reporter-confirmed, admin-backed destination; the chip half has neither.
 - **Deferred `DeadHelperTests` rather than building it in the release loop** (Fable's V1, my
   call on timing). Could have gone: build it now while the shape is fresh. Landed: it is a
-  whole-assembly scan whose value lives in a curated `Known` list with a reason per entry â€” the
-  `DeadSettingTests` pattern â€” and doing that badly under a release is how a guard becomes a
+  whole-assembly scan whose value lives in a curated `Known` list with a reason per entry — the
+  `DeadSettingTests` pattern — and doing that badly under a release is how a guard becomes a
   green tick nobody trusts. Logged so it is a dated decision rather than a thing that quietly
   did not happen.
 - **Deleted `IsExcluded`/`IsTimeableNamed` rather than wiring them** (Fable's ruling). The
   suffix rule covers every possessive pet the log prints and `Killer == "You"` closes the
   players case. A promise with no caller is worse than no promise.
 
-## 2026-08-23 â€” the two features on 1.99.6: next-level spells by class, and motes/hr
+## 2026-08-23 — the two features on 1.99.6: next-level spells by class, and motes/hr
 
 - **Motes/hr went to David with the question tool, and he chose the Experience room.** The
   question passed both tests: the Progress WINDOW and the phone already carry that line inside
   their Wealth tab's Motes body, so the only surface missing it was the widget's inline Wealth
-  room â€” which is coin-only by a Helm-signed ruling. My recommendation was the inline Wealth
+  room — which is coin-only by a Helm-signed ruling. My recommendation was the inline Wealth
   body (semantic home, and all three surfaces would then agree); I named the cost of the
   Experience room in the option, which is that the Progress window now states the mote rate in
   two places, an inch apart, on two different tabs. **He chose Experience knowing that.** So
@@ -6100,12 +6869,12 @@ one genuinely does. Each line below is a decision I made instead of a question I
   yet", which is the wording argument `MotesPresentation.Summary` was written to win.
 - **No class in play now HIDES the next-level fold** (Bevel's rule, Helm-signed). This removes
   a behaviour: a classless character used to get a preview built from the class-agnostic AA
-  categories. It could have gone the other way â€” those rows are true for everyone â€” and the
+  categories. It could have gone the other way — those rows are true for everyone — and the
   reason it did not is that `LevelUnlocks.Next` walks forward to the next level with ANY row,
   so the surface offered David "At level 39: 1 new AA ability" about a pet ability five levels
   away, for a character with no pet. Called out in `WhatsNew.json` rather than left to be
   discovered, and asserted in `WidgetRenderTests` so a later refactor cannot restore it quietly.
-- **Which group opens is "the first with something to show", not "index 0"** â€” a decision I
+- **Which group opens is "the first with something to show", not "index 0"** — a decision I
   made, not one Bevel wrote. Its rule says *"first inferred class open"*. A Warrior whose next
   milestone is an Archetype AA produces an empty Warrior group above the shared bucket holding
   the only row, so open-by-index would have shown "nothing new at 15" over a collapsed heading
@@ -6116,36 +6885,36 @@ one genuinely does. Each line below is a decision I made instead of a question I
   expander was mine. A fold that opens nothing is an affordance that lies, which is trap 16
   with the switch the other way.
 - **The per-class open/shut state is a FIELD on the view, never a setting** (Bevel's rule,
-  followed). Worth logging because the neighbouring folds â€” `ShowNextUnlocks`, `ShowAllAAs` â€”
+  followed). Worth logging because the neighbouring folds — `ShowNextUnlocks`, `ShowAllAAs` —
   are both settings, so the inconsistency is deliberate rather than an oversight.
 - **Fixed a trap-8 violation I was standing next to.** The mobile Progress fingerprint keyed on
-  `Wealth.MotesSummary`, which is the RATE â€” the one value in that record that moves on the
+  `Wealth.MotesSummary`, which is the RATE — the one value in that record that moves on the
   clock while nothing happens, and also the only thing standing in for "a mote dropped". It now
   keys on the mote tiers. Could have gone: leave it, since it predates this work. It is three
   lines from the block whose comment says exactly why not to do it.
 - **The E2E "no class hides the preview" assertion was deleted, not made to pass.** The harness
   always writes the shifted fixture log and that log infers WARRIOR, so the no-class state is
-  unreachable there â€” the test would have been about a state the harness cannot produce. Moved
+  unreachable there — the test would have been about a state the harness cannot produce. Moved
   to `WidgetRenderTests`, where the class list is a parameter, with a comment in the E2E file
   saying why it is not there. Writing a second class-free fixture for one assertion is a worse
   trade than one test on the other lane.
 - **The new screenshot shoots the INLINE card, not the Progress window.** The window restores
   to a height whose body scrolls after ~3 lines, so `progress-card.png` has been photographing
-  a panel cut off ABOVE the two lists it is named for â€” pre-existing, visible in the committed
+  a panel cut off ABOVE the two lists it is named for — pre-existing, visible in the committed
   file, and filed separately rather than fixed here.
 
-## 2026-08-23 (night) â€” actioning Fable's third pass
+## 2026-08-23 (night) — actioning Fable's third pass
 
 - **Took the blocker at face value only after checking it.** Fable said `ClassName` serialises as
   `className` while the page reads `g.class`, and said plainly it had not run the serialiser.
-  Verified all three legs before touching anything â€” `JsonOpts` is CamelCase,
-  `CompanionBuffGroup` is declared `Class`, the page reads `g.class` at five sites â€” because a
+  Verified all three legs before touching anything — `JsonOpts` is CamelCase,
+  `CompanionBuffGroup` is declared `Class`, the page reads `g.class` at five sites — because a
   bot's claim about source is a place to look. It was right in every detail.
 - **Renamed the property rather than changing the page.** Both would work and the page side is
   new code too (so trap 32 does not bite either way). The record now matches its siblings, which
   is the property that stops the next group record inventing a third spelling.
 - **The guard asserts the emitted JSON, not the record.** `Assert.Contains("\"class\":")` alone
-  passes on the broken payload, because `className` contains `class` â€” so the load-bearing line
+  passes on the broken payload, because `className` contains `class` — so the load-bearing line
   is `Assert.DoesNotContain("className", json)`. Verified by running it on the pre-fix tree: 2 of
   3 fail there.
 - **Built `WriteMobileProgressSnapshot` rather than fixing the hand-written snapshot.** The
@@ -6166,12 +6935,12 @@ one genuinely does. Each line below is a decision I made instead of a question I
   that plan makes wrong rather than merely dated. The stub now says the shipping release owes a
   line saying so.
 
-## 2026-08-23 (night) â€” #233, and the rule it produced
+## 2026-08-23 (night) — #233, and the rule it produced
 
 - **#233 went to David with the question tool, and he chose the guarantee.** It passed both
   tests: the theme fold is his roadmap direction (consequence-list item 5) and a reply would be
   read as a promise (item 3). His answer: keep the roadmap, add the "what moved" commitment, and
-  say WHY â€” *"organizing after rapid initial build out of feature requestsâ€¦ the new homes make
+  say WHY — *"organizing after rapid initial build out of feature requests… the new homes make
   more logical sense and are intuitive for new users though of course the long term users will
   feel the changes."*
 - **Treated as a pattern, not a voice.** #219, #227/#228 and now #233 are one complaint arriving
@@ -6179,33 +6948,33 @@ one genuinely does. Each line below is a decision I made instead of a question I
   rule", and it is why the reply concedes it out loud rather than explaining the fold again.
 - **The rule is about the ORIGIN, not the destination.** Every one of those releases had a
   truthful What's-new entry describing where a surface had ARRIVED. None named where it had
-  LEFT, which is useless to the only person who needs it â€” someone looking for something. The
+  LEFT, which is useless to the only person who needs it — someone looking for something. The
   rule is the form "X is now Y", both halves.
 - **Built before replying, not promised.** The 1.99.6 What's-new carries the whole current map
   and the promise; `CLAUDE.md` carries the standing rule. Could have gone: post the reply and
   add the rule later. A promise made in a thread and not written into the file every session
   reads first is a promise that lasts one session.
-- **NOT posted â€” routed to Helm.** `HELM.md`'s process line is "new-thread thank-you still comes
+- **NOT posted — routed to Helm.** `HELM.md`'s process line is "new-thread thank-you still comes
   to Helm", and this is a new thread. David has settled the direction, so Helm is being asked
   only about posture and timing; the full draft is in `HELM-FEEDBACK.md` so one carry is enough.
 - **#109 gets no reply yet, deliberately.** Its last comment is Frankthetankk's verbatim
-  evidence, which is exactly what 1.99.6's bee work was built from â€” so the honest reply is the
+  evidence, which is exactly what 1.99.6's bee work was built from — so the honest reply is the
   release itself, and replying before the tag would mean either claiming it shipped (false) or
   saying "soon". The thread is answered by shipping, and the What's-new credits him by name.
 - **#233's REPLY is David's; #233's RULE is ours, and they separated cleanly.** He read the draft
   and took the thread himself. The Helm sign-off request is withdrawn in place rather than
-  deleted â€” a live-looking ask that nobody needs answered is the exact shape that made three
+  deleted — a live-looking ask that nobody needs answered is the exact shape that made three
   holds describe states that had stopped being true. The two durable outcomes (the "X is now Y"
   rule in `CLAUDE.md`, the WHERE THINGS MOVED map in 1.99.6) shipped and are unaffected by who
   writes the reply.
 - **`status.ps1` will keep flagging #233 as awaiting a reply, and that is correct.** Written into
   the handoff so a later session does not read the flag as an unfinished job and post over him.
 
-## 2026-08-23 (afternoon) â€” the three queued items
+## 2026-08-23 (afternoon) — the three queued items
 
 - **Progress-window clipping: measured, then FILED rather than fixed.** `AllowResize` releases
   the height on `ContentRendered`, which for a replay-filled body is a frame with nothing in it
-  â€” proven by running the same shot with the pin skipped (203px â†’ 389px), with
+  — proven by running the same shot with the pin skipped (203px → 389px), with
   `progress-wealth` as the control at 741px. The FIX is not a V1 call: `AllowResize` wants
   "size to content" and "let the user drag the edge", WPF will not do both, and resolving it
   decides chrome for four windows. Four candidate fixes are in the stub with the cost of each.
@@ -6214,14 +6983,14 @@ one genuinely does. Each line below is a decision I made instead of a question I
   every class page carries every level and PR 0 found none do (all stop at 50 against a cap of
   60). So 362 rows return as DERIVED. Worth logging because the plan's headline number is the
   one a reviewer would check against.
-- **`era` is parsed but NOT shipped.** Fixing PR 0's row regex made it come through cleanly â€”
+- **`era` is parsed but NOT shipped.** Fixing PR 0's row regex made it come through cleanly —
   and it is "Classic" on all 1,504 rows. One value discriminates nothing, and a harvest field
   no surface reads is trap 43's mirror.
 - **`PageTitle` deferred with a reason, not forgotten.** The plan lists it; links work without
   it because the wiki resolves redirects itself, so it buys nothing until something needs the
   served title.
 - **The spell hover is ONE LINE because of a rule I nearly tripped over.** Both widgets switch
-  a tooltip to monospace when it contains a newline â€” right for the stat blocks that rule
+  a tooltip to monospace when it contains a newline — right for the stat blocks that rule
   exists for, wrong for wiki prose, and invisible to every test and screenshot.
 - **1.99.7 exists because 1.99.6 had already shipped.** The first draft of these notes went
   into 1.99.6's block, which would have claimed things the released build does not have.
@@ -6231,17 +7000,17 @@ one genuinely does. Each line below is a decision I made instead of a question I
   could not tell a three-class character from an ambiguous log.
 - **`MemberFraction` stays at 0.25 even though it drops a class after two idle half-lives.**
   That is what separates an alt-swap (blocks) from a multi-class character (rotation inside a
-  fight), and the dump â€” which outranks inference â€” is the answer for anyone it gets wrong.
+  fight), and the dump — which outranks inference — is the answer for anyone it gets wrong.
 - **`ClassSourceWritersTests` joins the settings.json collection despite writing nothing.** It
   names `OutputfileAutoImport.cs` as a path string and the flake guard reads that as a call.
   Serialising four file reads is cheaper than teaching that guard to tell a path from a call,
   and a guard with a convenience exception carved into it stops being a guard.
 
-## 2026-08-23 (afternoon) â€” the V3 presentation half
+## 2026-08-23 (afternoon) — the V3 presentation half
 
 - **What looked like a labelling job was hiding two functional collapses.** Both Quest windows
-  were still reading `CurrentSnapshot().InferredClass` directly â€” one class, bypassing
-  `CharacterClasses.Resolve` â€” in `BuildClassStrip` and in the filter. The window that most
+  were still reading `CurrentSnapshot().InferredClass` directly — one class, bypassing
+  `CharacterClasses.Resolve` — in `BuildClassStrip` and in the filter. The window that most
   needs the multi-class answer was the last place still collapsing it. Renaming a label is what
   took me into the file; the collapse is what I found there.
 - **`ClassSourceFor` went ON `IQuestsHost` rather than being reached for.** A seam that window
@@ -6250,18 +7019,18 @@ one genuinely does. Each line below is a decision I made instead of a question I
   Trap 32: an open phone runs the page it downloaded weeks ago, so removing the field it reads
   would blank the line on every device that has not reloaded.
 - **The new wire keys were pinned the same day they were written.** `characterClasses` and
-  `classSourceLabel` are in `CompanionWireKeyTests` â€” the last field added to this wire reached
+  `classSourceLabel` are in `CompanionWireKeyTests` — the last field added to this wire reached
   the page under the wrong name and the manual check could not see it because the payload was
   hand-typed.
 - **Bevel has NOT ruled on this wording** and Fable's plan asked for a pre-design pass. I built
-  it as a like-for-like replacement of an existing string rather than a new surface â€” "(inferred)"
+  it as a like-for-like replacement of an existing string rather than a new surface — "(inferred)"
   said one of three things and said nothing when the GAME had told us. Bevel's next run should
   see it; flagged rather than presented as settled.
 
-## 2026-08-23 â€” self-review pass over 1.99.7
+## 2026-08-23 — self-review pass over 1.99.7
 
 - **The phone fixture could never have tested the thing it was for.** `WriteMobileQuestsSnapshot`
-  sets picked classes, and the page suppresses the class-source line whenever picks exist â€” so
+  sets picked classes, and the page suppresses the class-source line whenever picks exist — so
   the state the line lives in was unreachable from the fixture. A second snapshot now covers
   no-picks-plus-a-dump. This is the same shape as the wire-key defect: a check that runs and
   cannot fail. Found by asking what the fixture would show rather than that it passed.
@@ -6273,7 +7042,7 @@ one genuinely does. Each line below is a decision I made instead of a question I
   ledger lock twice and copying two lists, every second a phone is paired. Nothing was WRONG;
   it is the steady-state allocation perf audit #1 exists to remove.
 - **One Avalonia gate run reported 1 failed / 279 total and never reproduced** (seven runs
-  since, all 278/278 green). Name unrecoverable â€” `check.ps1` keeps no log. Ruled out a
+  since, all 278/278 green). Name unrecoverable — `check.ps1` keeps no log. Ruled out a
   data-driven count (every theory in that project is static `InlineData`), which points at a
   transient host crash rather than a logic flake. **Disclosed to Fable with the reasoning
   labelled as a hypothesis, and the decision of whether to chase it before the tag handed to
@@ -6282,26 +7051,26 @@ one genuinely does. Each line below is a decision I made instead of a question I
   gate that fails without leaving a name behind costs exactly one incident like this.
 
 
-## 2026-09-05 â€” HUD subtraction cut 1 (the Quests card)
+## 2026-09-05 — HUD subtraction cut 1 (the Quests card)
 
-- **Added a `Questsâ€¦` row to the widget's right-click menu, in the same commit as the cut.**
+- **Added a `Quests…` row to the widget's right-click menu, in the same commit as the cut.**
   The default it could have gone the other way on: Bevel's pre-design says Quests is safe to
-  cut because it has "a second, independent way in â€” the `toggleQuests` hotkey", and the
+  cut because it has "a second, independent way in — the `toggleQuests` hotkey", and the
   literal scope was two deletions. **The premise is half true and the half that is false is
   the one that decides it: nothing is bound by default.** `HotkeyManager`'s own doc comment
-  is explicit â€” *"hotkeys exist ONLY when the player binds them"* â€” and the widget's context
-  menu carries `Worldâ€¦` and no Quests row, because the 2026-08-16 fold deliberately removed
+  is explicit — *"hotkeys exist ONLY when the player binds them"* — and the widget's context
+  menu carries `World…` and no Quests row, because the 2026-08-16 fold deliberately removed
   the cog's Quest tracker line when the card became the door. So on a fresh profile, cutting
   the card with nothing else would have left the Quest Tracker window unreachable by any
   means. That is #219's shape exactly, and CLAUDE.md lists the three ways back as not up for
   renegotiation. Where it landed: build the row, log it here, and say so plainly in the ask
-  to Helm rather than treat a one-line XAML addition as scope creep. Trap 52's lesson â€”
+  to Helm rather than treat a one-line XAML addition as scope creep. Trap 52's lesson —
   re-derive the premise before acting on the decision it triggers; one `grep` of
   `HotkeyManager.cs` was the whole check.
 - **`MigrateQuestSections` now REMOVES `quests` instead of creating it.** Could have gone the
   other way: leave the migration alone, since `ApplySectionLayout` filters `SectionOrder` by
   the map and `NormalizeSectionOrder` filters by the catalog, so a stale key is harmless
-  *today*. It is not harmless as a pattern â€” every 1.x profile carries the key,
+  *today*. It is not harmless as a pattern — every 1.x profile carries the key,
   `OptionsViewModel.Cards` resolves each one with `First(...)`, and a phantom key fed to a
   fold on every launch is precisely what #252 was made of (trap 55). The migration is the
   one place that can drain it, and `SectionFoldIdempotenceTests` already fails any migration
@@ -6317,7 +7086,7 @@ one genuinely does. Each line below is a decision I made instead of a question I
   `QuestSurface.InlineModeFor` / `GeneralGlance` / `UnlocksGlance`,
   `QuestChecklistView.SummaryLine()`, and the `QuestRooms` theory in `InlineModeTests`.**
   Each had exactly one consumer and it was the card. Leaving them would have left a test
-  file asserting inline-mode rules for a surface nobody draws â€” trap 34's shape, a guard
+  file asserting inline-mode rules for a surface nobody draws — trap 34's shape, a guard
   that cannot fail reading as coverage. `QuestSurface`'s tab table, labels, keys and
   counting rules are untouched: the window, the shell's Quests room and EQBuddy Mobile all
   still read them.
@@ -6328,7 +7097,7 @@ one genuinely does. Each line below is a decision I made instead of a question I
   for it is the empty-state/Options lane's work, not this one; it is written into the Helm
   ask and into the `options-cards` shot's prediction rather than papered over.
 - **Left `src/EQBuddy/Assets/tutorial/t-widget.png` alone.** It is the quick tour's widget
-  illustration and it does show a Quests card â€” but it also shows "Kills", separate "Loot"
+  illustration and it does show a Quests card — but it also shows "Kills", separate "Loot"
   and "Gear" cards, and "Travels & Deaths", so it predates three folds and was already
   wrong before today. It is one of the 42 recipe-less captures Bevel inventoried on
   2026-09-04. Fixing it needs a capture recipe that does not exist, which is the standing
@@ -7252,3 +8021,594 @@ merge bar and the local screen is a mutex a concurrent seat was holding (trap 61
 
 — Dranak (Claude Code, DRA-86)
 
+
+---
+
+## 2026-09-15 — DRA-84 D4: the who rule, its sentence's home, and one finding the plan did not foresee
+
+Seat `opus-dra84-d4`, plan P3 (+ P4's verification half), under #623's whole-sequence SIGN.
+Defaults below are mine to make; the veto surface is this file.
+
+**1. THE COVERAGE SURVEY CAME BACK 98.2%, SO THE SLICE PROCEEDED.** The plan made D4 open with a
+measurement and named the number that would stop it: under half, the withhold default is wrong
+and the slice escalates to Helm rather than shipping a hollowed room. Measured on the post-D3
+catalog: **5,897 of 6,004 wearable (item, zone) pairs name a creature — 98.2%**; 10,497 of 10,637
+over the whole catalog; 5,591 of 5,626 records. 4,712 distinct names over 25,695 mentions, which
+is the trap-73 tell passing comfortably. The survey is COMMITTED as `ItemCatalogWhoCoverageTests`
+with the floor left armed, because the data is regenerated weekly by a transform nobody reads
+line by line and a refresh that reverted the creature half would empty the Farm Gear room
+honestly and silently.
+
+**2. THE WITHHELD COUNT GETS ITS OWN SENTENCE, and the plan's prose said otherwise.** P3 said the
+withheld offers are *"counted in the existing withheld sentence"*. They are not — `GearWhoWithheld`
+is its own field and its own line beside `GearWithheld`. **`GearWithheld` is a CAP** (EQBuddy
+naming a few of many it could have named, remedy: open the Gear room); **this is a RULE** (nothing
+can say what drops it, remedy: play there, or edit the page). Summing them gives one number that
+can explain neither, which is the failure trap 50 is about rather than a tidier surface. The
+room now carries three such lines — cap, band, who — and a player can act on all three only if
+they can tell which fired. **Named for Helm as a departure from the plan's wording**; if Helm
+reads the phrase as load-bearing rather than as a suggested home, the fold is one line.
+
+**3. THE WHO RULE RUNS AFTER THE BAND GATE, and the order decides which sentence a player gets.**
+Both rules can remove the same row. D2's refusal quotes eqlwiki's own band and the character's
+level; this one can only say a page was silent. Running the who rule first would have swallowed
+refusals D2 shipped — a level-30 character's anonymous Crushbone offer would vanish as "no
+creature named" instead of "eqlwiki lists its creatures at 5–20". **A slice must not quietly
+narrow what the slice before it refused out loud.** Pinned by
+`TheBandGateReportsARefusalTheWhoRuleWouldOtherwiseHaveSwallowed`, which is one of the six
+prove-failed mutants.
+
+**4. `GearMobsPerItem` = 3, and the order is the wiki page's own.** Three because a zone row names
+three items, so an uncapped clause puts eighteen creature names on one row; and because one name
+reads as *the* thing to kill where three read as the sort of thing this zone drops it from, which
+is what a camp is. **Nothing ranks creatures** — nothing here has measured them — so the page's
+order stands and what is held back is attributed to the page ("and 4 more on its page") rather
+than to EQBuddy. Load-bearing on real data: 3,830 pairs name more than one and 1,384 more than
+three.
+
+**5. THE FINDING THE PLAN DID NOT FORESEE — the who rule removes a class of camp that is not a
+place at all.** 75 of the 107 anonymous wearable (item, zone) pairs have a "zone" string that is
+not a zone: `}}`, `Category:2H Slashing`, `N O T _ C L A S S I C`, `ITEM REMOVED FROM GAME`,
+`EQL Note - Dropped from an ogre shaman (9/9/26)`, and free prose. The staged shot is the
+exhibit: a warrior in `Cloth Gloves` was being offered **five** camps off ONE record — `Plane of
+Fear<br>`, `:* Fright`, `:* Dread`, `:* Terror`, `:* Cazic Thule (God) (needs confirmation)` —
+all parsed out of one bulleted wiki line onto `Slime Blood of Cazic-Thule`. The rule removes all
+five, not because anything here learned to recognise a broken zone name, but because **a string
+that is not a place has no creature under it on the page either.** That is the Founder's "junk
+camps" arriving by a second mechanism.
+
+**The promoter defect itself is NOT fixed here and that is deliberate.** Correcting how
+`items-promote.py` reads a bulleted drop list is a transform change whose output is the catalog,
+and rebuilding the catalog is a harvest question — D3's AUTHORIZE is discharged. Filed as a stub
+in `FABLE.md` with the numbers. **What ships is the engine refusing to act on it**, which is the
+right layer for this slice and leaves the data honest either way.
+
+**6. Existing fixtures gained a creature, and that is a change worth seeing.** `RecommendationsGearTests.Record`
+and two sibling fixtures now populate `DropMobs` by default, with `anonymous: true` as the opt-out
+for the tests about the rule. They were written when the field was empty on all 11,146 records; a
+null default now would make every fixture in those files the 1.8% case and the who rule would
+silently be the thing every other test was measuring.
+
+**Not done, deliberately:** no fetch, no harvest, no curated write, no transform change, no rate
+or policy change; no Pages, Play Console, tag, `release.ps1` or signing; the never-BiS three
+refusals, the single-select intent strip, the include-quests toggle and the count-based zone
+ranking all KEEP. The item side of the band gate stays ungated (D6's survey, unchanged).
+
+— Dranak (Claude Code, DRA-84 D4)
+
+---
+
+## 2026-09-15 — DRA-84 D5: the re-smoke found the phone had been drawing four of five sentences
+
+**Seat:** `opus-dra84-d5` (default; `opus-dra84-d4` released as DISCHARGED on #633's merge,
+per Helm's ~11:55 PM CT ruling). Paperclip DRA-84, plan P6, under the #623 whole-sequence
+SIGN — D4 landed on `main` as `1c00e298` with both gates green, which is what authorizes this
+one. Nothing here is on the consequence list: no release, no tag, no signing, no Pages, no
+Play Console, no public post, no privacy surface, no third-party request, no fetch.
+
+### 1. The finding, because a re-smoke that finds nothing has not been run
+
+**`gearWhoWithheld` reached the wire and was never drawn.** D4's withheld sentence is
+produced by `CompanionProjection.Helper` (line 68), is in the Helper section's fingerprint
+(line 244), and passes `HelperSurfaceParityTests.AWithheldDropOfferSaysSoOnThePhoneToo` —
+which compares the PROJECTION to `HelperPresentation` and never to the page. `index.html`
+drew `[moneyNote, cap, gearWithheld, gearBandRefused]` and stopped. So on a phone, five drop
+offers left the list with nothing said about them, while the PC beside it said exactly why.
+
+That is trap 50's failure with the right shape everywhere else, and it is the one thing the
+phone half is explicitly not allowed to do: the two surfaces disagreeing about what a list
+contains, where the phone reader has no PC in front of them to notice.
+
+**The guard that should have caught it was aimed at a screen that no longer exists** (trap
+34). `ThePageSpellsNoneOfTheHelpersWords` pairs its forbid-scan with a must-list of the
+fields the page has to draw — written when the Helper had ONE gear caption. D2 added
+`gearBandRefused` and D4 added `gearWhoWithheld`; neither added a row. The page happened to
+draw the first and not the second, and a must-list that stops growing cannot tell those
+apart. It now names all five, and was prove-failed against the pre-fix page.
+
+**Default taken:** fixed here rather than filed. It is one line of the page plus two rows of
+a must-list, it is inside acceptance items 2 and 3 on the surface the plan's P3 named
+("the same words ride the wire"), and D4's `WhatsNew` entry already promises the sentence to
+everyone. A stub would have left the release shipping a promise that is false on one screen.
+
+### 2. The phone shot is staged against the REAL catalog, and its numbers come from the E2E
+
+`WriteHelperGearSnapshot` stages the same anchor, intent and unknown level as
+`AnUpgradeNothingCanNameADropperForIsWithheldAndTheRoomSaysSo`, so every number it asserts is
+one the launched app already committed: three zones, six creature clauses, five withheld, 89
+capped. A hand-built two-record catalog would have photographed the feature being absent.
+
+**The prediction was wrong first time and the fixture moved, not the number** (trap 23). The
+first draft left `MyClasses` empty — the honest reading of "EQBuddy has not been told", which
+filters nothing — and the three zones came back as Plane of Growth / Temple of Veeshan /
+Chardok. A real screen of a different character. The E2E's profile is a WARRIOR and the
+class-lock filter is an INPUT to the sweep, which is exactly the kind of thing predicting
+catches and eyeballing does not.
+
+**Its caveat, stated rather than papered over:** the shot carries no band-gate sentence,
+because the level is unknown and the gate stands down (trap 73). Staging a level would have
+re-ranked the zones and left this picture with numbers nothing else had computed. The gate's
+own picture is `shell-helper-gear-band`, and that the phone says the same words when it fires
+is `ARefusedZoneSaysSoOnThePhoneToo`'s claim. Headless Edge's 492 px viewport clamp applies
+here as it did to `mobile-helper.png`: 516×1500, a large phone's line breaks rather than a
+small one's.
+
+### 3. `helperBandRefused` is a count, and a count cannot fail the right way
+
+The D2 E2E asserted two refusals and a drawn sentence. Both stay true if the gate read the
+wrong band, fired the wrong arm, or compared against a level it never read — the arithmetic
+lived only in a doc comment. `helperBandRefusals` now carries what the gate COMPARED
+(`TempleofVeeshan:60+:BottomOver,Veeshan'sPeak:60+:BottomOver`) beside the `helperLevel` 28
+already asserted, so the relationship is an assertion. A `TopUnder` in that string would be
+D2's signed open-top ruling broken with both counts still green.
+
+### 4. What the checklist says that a test cannot
+
+`docs/ops/dra84-founder-resmoke.md` maps acceptance 1–4 to what to look at, what would count
+as a FAIL rather than a preference, and — the section worth the most — **what is knowingly
+not fixed**: the promoter still writes `DropZones` strings that are not places, and the Gear
+room, item lookups and the wishlist still read them directly, so looking an item up can still
+show you `}}` as a zone. The Helper refuses to offer them as camps; that is an engine refusal
+and not a data fix, and the checklist says so in those words.
+
+**Not done, deliberately:** no fetch, no harvest, no transform change, no curated write, no
+rate or policy change; no Pages, Play Console, tag, `release.ps1` or signing; no promoter
+rebuild (Fable stub STANDS, Helm ACKed the stop); no second D4 seat; no re-ranking, no new
+weight and no new threshold — this slice changes what is SAID, not what is chosen.
+
+— Dranak (Claude Code, DRA-84 D5)
+
+## 2026-09-15 — DRA-90: the seat store was already shared; the hole was that nothing tested it
+
+**The card's root cause is wrong, and I did not implement its directions as written.** DRA-90
+reported that `.claude/soft-seats/` is per-working-copy, so `claim-seat.ps1` could not see a
+sibling's live claim, and proposed anchoring the store to the git common dir (direction 1).
+
+**Measured, before changing anything:** that anchoring has been in `Get-SoftSeatMainRoot`
+since the store's ORIGINAL commit, `b7f2eae4` (2026-09-08) — a week before the DRA-87
+duplicate that prompted the report. A real linked worktree refuses a default claim held by
+the main tree, in both directions, with no `-StoreDir`. There is exactly ONE `claims.json` on
+the machine, and it holds exactly ONE DRA-87 row (`dra87-docs-honesty`, 06:20:34Z). **The
+second DRA-87 seat never claimed at all** — so the mutex did not lose a race over the store,
+it was never consulted. A mutex nobody is obliged to take refuses nobody.
+
+**What WAS broken is the coverage.** All 45 existing selftest checks pass `-StoreDir
+<throwaway>`, so the refusal predicate is proven exhaustively against a directory the test
+hands it, and store DISCOVERY — the only thing deciding whether two seats meet — had none.
+That is why an experienced executor could file the resolution as broken and nobody could
+contradict it cheaply.
+
+**Decided, and the default it could have gone the other way on.** The obvious default was to
+implement direction 1 as asked. I did not: implementing an anchoring that already exists
+would have produced a green diff that changed nothing and closed the card on a false story.
+Instead the slice lands the card's own verification bar — a real repo, a real linked
+worktree, no `-StoreDir`, refusal asserted BOTH directions, one identical resolved path, and
+a reachable negative that claims the same card against a private store and asserts it
+SUCCEEDS so the rows cannot pass by accident. Prove-failed: forcing the fallback reddens 7.
+59 checks green after.
+
+**Two smaller calls inside it.** (a) The common-dir answer used to additionally require a
+`.gitignore` at the resolved root and fall through to the WORKTREE root when absent — a proxy
+for "is this the repo root" (trap 64b) whose failure mode is silently giving every copy its
+own store. Removed; only "git named nothing" falls back now. (b) The resolution is a value
+(`explicit` / `git-common-dir` / `fallback`) printed by `claim-seat.ps1 -Where`, and a grant
+from a `fallback` store WARNS on the screen that granted it. The reporter's misdiagnosis was
+reading a directory listing — `claims.json` is gitignored while `README.md` and
+`claims.template.json` are committed, so a fresh worktree shows the folder without the store.
+That is now asserted as correct rather than left to the eye.
+
+**Direction 3 (a remote backstop) is NOT implemented, and I think the card overrates it for
+this incident.** On DRA-87's own timeline the seat that claimed did so at 06:20:34, and the
+other seat's branch and PR did not exist until 06:28–06:29. A remote check at claim time would
+have found nothing. It remains worth having as a backstop for a different case (starting on a
+card that already has an open PR), and the store README now names `gh pr list` / `git ls-remote`
+as the habit, but shipping it under the claim that it closes DRA-87 would be a guard sold on a
+failure it cannot see. Filed as the open half rather than quietly dropped.
+
+**Still not closed:** two independent CLONES share no store, and nothing here changes that.
+Neither does anything here OBLIGE a seat to claim, which is the actual DRA-87 mechanism.
+
+— Dranak (Claude Code, DRA-90)
+
+## 2026-09-16 — DRA-87's mechanism CORRECTED to the two-store miss; trap-82's sentence rewritten
+
+**This entry corrects the last line of the DRA-90 entry above.** That line says the DRA-87
+mechanism is "nothing obliges a seat to claim". It is measured false. This file is an
+append-only ledger, so the old entry stands as written and this one supersedes it.
+
+**What was actually measured** (twice, by two seats, the second time over both stores): there
+are **two** `claims.json` on this machine, in two independent clones — the Bosun/local
+checkout (`C:\Users\david\source\EQBuddy`, 65 rows, `opus-*`/`fable-*` seats, worktree always
+set) and the Paperclip instance clone (28 rows, `*-executor`/`claude-*` seats, worktree always
+empty). Each is its own git toplevel with a plain `.git`, so the common-dir anchoring trap 82
+describes correctly does not join them. **Both DRA-87 seats claimed** —
+`opus-dra87-docs-honesty` 06:18:05Z and `dra87-docs-honesty` 06:20:34Z, 2m29s apart — into
+stores that cannot see each other. Neither was refused; neither was warned.
+
+**The decision, and the default it could have gone the other way on.** Helm AUTHORIZED
+correcting the trap-82 sentence and nothing else (ruling `cd7b5f97`, 2026-09-16 ~1:00 AM CT).
+The tempting default was to rewrite trap 82's discovery block to match the new story, or to
+drop the trap. Neither happened: #636's discovery delivery is still the right work for linked
+worktrees of one clone, and the trap's lesson (a suite that hands the store in never tests
+discovery) is unchanged. Only the DRA-87 claim sentence moved, gap (b) was demoted to a
+standing process risk with its own example (`DRA-78` — a row in neither store), and the
+correction cites the two-store measurement inline.
+
+**The instrument lesson is the one worth keeping.** The false sentence came from a sweep run
+inside ONE clone, which reports a sibling's claim as its absence — trap 11's shape, a table of
+evidence only one side could produce. The corrected claim rate is 18 of 19, not 8 of 19. Any
+future claim-rate measurement must sweep every store on the machine, or it is measuring its
+own clone's dispatch lane.
+
+**Open, and now owned by the re-scoped DRA-95:** a store anchored to a clone cannot refuse or
+warn about a seat in another clone, and the two clones are the two dispatch lanes. Plan filed
+for Helm SIGN; no implementation taken. Also open and unmeasurable today: a claim row carries
+`started_at` and a current `status` but no end stamp, so `opus-dra84-d2`/`-d3` — which have
+rows in **both** stores, 33 and 41 minutes apart — cannot be classified as collision or
+re-dispatch.
+
+— Dranak (Claude Code), Planner — DRA-95 / Helm DRA-96 ruling
+
+## 2026-09-16 — DRA-106 ranked: the soft-seat staleness is per-WORKTREE, and the fix ranked first is a call-site path, not a change to the signed script
+
+**Decision (Planner, pre-authorized — process, reversible, not consequence-list):**
+rank the four options DRA-106 filed, and rank FIRST an option nobody had filed —
+change the documented INVOCATION of `claim-seat.ps1` / `release-seat.ps1` to resolve
+through the clone's main checkout, the same `git rev-parse --git-common-dir` resolver
+DRA-90 already uses for the store. Docs only; the Helm-signed mechanism is untouched.
+
+**The default it could have gone the other way on:** option 3 (change the script), which
+is what both the card and the DRA-96 watchdog ranked as the only real closer. It was
+demoted because **code added to `main` cannot repair a copy that will never receive it** —
+a stale worktree gets the fix only when it updates, at which point it would have had
+DRA-102 anyway. Option 3 is a forward guard, not a repair, and was ranked and described
+as one.
+
+**Measured before ranking** (`-Check` twice, wrote nothing), harness clone, pre-DRA-102
+worktree `EQBuddy-dra68`, card DRA-98 held live in the Bosun clone: the worktree's own
+copy **granted**; the same card resolved through the main checkout **refused**, naming
+the foreign holder through the DRA-102 registry. The identical one-liner from the main
+checkout gives the identical refusal, so one invocation is correct everywhere.
+
+**The correction that decided option 1:** merged-ness is the wrong denominator. The
+exposure is the set of worktrees an agent can be DISPATCHED into — a property of the
+harness, not of branch history — which is why 6 of 7 in the harness clone outweighs 54
+of 72 being merged in the Bosun one. "Most of them are finished" was never the
+reassurance it looked like.
+
+**Where it landed:** LIVE ASK to Helm (`HELM-FEEDBACK.md`, `36635eca`, back-channel run
+35068979008) asking SIGN-or-HOLD on the docs change and SIGN-or-defer on the in-script
+guard. DRA-107 carries both slices with the acceptance bar, blocked on that relay, next
+seat Executor. DRA-108 carries the worktree sweep at `low` — hygiene, explicitly not a
+mutex fix. No Executor kicked, no worktree touched, no code moved, no seat claimed.
+
+— Dranak (Claude Code), Planner — DRA-106
+
+## 2026-09-16 — DRA-107 slice A: the soft-seat scripts are invoked RESOLVED, through the clone's main checkout
+
+**Assumption at the top:** this is the docs-only ranked-(1) of DRA-106, **Helm-signed**
+at `6bd325a1` (2026-09-16 ~2:35 AM CT) — "SIGN ranked-1 call-site path (docs-only);
+DEFER ranked-2 in-script guard". Slice B is **not** started here and is **not** a merge
+gate for this, on Helm's explicit words.
+
+**What was decided:** the documented invocation of `claim-seat.ps1` **and**
+`release-seat.ps1` is now
+
+```
+pwsh -NoProfile -File "$(git rev-parse --path-format=absolute --git-common-dir)/../scripts/<script>.ps1"
+```
+
+in CLAUDE.md `## Commands`, CLAUDE.md's trap-82 row, both scripts' comment-help, the
+usage error, the `-List` foreign-store line, the private-store `-Where` warning, the
+refusal's `-ForceStale` recovery line, `.claude/soft-seats/README.md` and
+`.claude/launch-templates/README.md` (the dispatch prompt).
+
+**The default it could have gone the other way on:** removing the relative form, or
+"fixing" it inside the script. Neither happened. The relative form is **demoted, not
+removed** — Helm named that explicitly, and anything in flight keeps working. The
+in-script guard stays deferred because code on `main` cannot repair a copy that will
+never receive it.
+
+**Measured, this heartbeat, bidirectionally** (`-Check` throughout — wrote nothing;
+the acceptance bar Helm kept verbatim):
+
+| from | card | relative form | resolved form |
+|---|---|---|---|
+| harness clone, pre-102 worktree `EQBuddy-dra68` | DRA-98 (held in Bosun) | `OK: claimable` **exit 0** | `REFUSED … [in another CLONE: C:\Users\david\source\EQBuddy]` **exit 1** |
+| Bosun clone, pre-102 worktree `bosun-532-stale` | DRA-107 (held in harness) | `OK: claimable` **exit 0** | `REFUSED … [in another CLONE: …\7218e9ce-…\EQBuddy]` **exit 1** |
+
+The Planner had measured one direction in one clone; this is the other direction, in the
+other clone, against a card held in the first. **And the old form still works**: the same
+relative call from the harness clone's MAIN checkout refuses DRA-98 correctly (exit 1),
+which is the "nothing in flight breaks" half of the bar, asserted rather than assumed.
+
+**Census re-taken independently** (not inherited from the card): Bosun **72 pre-DRA-102 /
+1 post / 132 with no script at all**, of 205 worktrees; harness **6 pre / 1 post**, of 7 —
+and the sixth is `workspaces/c96997d1-…/dra-28`, this Executor's own dispatch target.
+
+**A rendering risk that would have shipped silently:** three of those strings are
+PowerShell **double-quoted** here-strings, where `$(git rev-parse …)` executes at
+string-build time. Un-escaped, the refusal would have printed a path instead of the
+recipe — or a blank. Escaped with a backtick, and each of the four changed emit sites was
+run and read back rather than assumed: refusal, usage error, `-List` tail, `-Where`.
+
+**Scope note, stated because it is a judgement:** `run-seat-PROMPT-only.cmd` resolves its
+repo from `%~dp0..\..`, so a worktree's copy of the launcher points `claim-seat.ps1` back
+at that worktree. That is the same defect one layer up. It was **not** fixed by editing
+the `.cmd` (that would be a code change Helm did not sign); the README now documents
+running the **main checkout's** launcher, which makes its own `%~dp0` resolve correctly.
+The `.cmd`'s internal resolution is named in the slice-B follow-on.
+
+**Gates:** `soft-seat-selftest.ps1` **80 checks green**; `channel-wipe-guard.ps1` ok (11
+files, 1149 entries); all three scripts parse-checked. Needs **git ≥ 2.31** for
+`--path-format=absolute`, stated where the invocation is documented; both clones 2.54.0.
+
+— Dranak (Claude Code), Executor — DRA-107
+
+## 2026-09-16 — DRA-149 D3: Farm Materials un-parks on the RECIPES column; a non-place is refused by name
+
+**Assumption stated at the top, and it is the default most worth a veto:** an item page's
+`recipes` field names the recipes the item is **used in**, so a record carrying a
+profession heading IS an ingredient for that profession. The plan declared an escalation
+seam here — *"if materials cannot be told from products defensibly it STOPS AND ESCALATES
+with the number"* — and it did not fire, because the corpus answers rather than the
+reasoning: of the 905 records naming one of the eight, 165 are themselves a recipe output
+somewhere and **150 of those drop nowhere**, so they leave through a zone gate the rows
+have to pass anyway. The 15 that are both an output and a real drop are the pelts, the
+ores and a loaf of bread — genuinely farmable, so naming them is true either way.
+`scripts/dra149-materials-survey.py` is the committed measurement.
+
+**The DRA-71 D8 park was not wrong; it measured the wrong COLUMN.** "14 of 11,197 pages
+name a profession" is a survey of `[[Category:…]]`, re-taken on the DRA-84 D3 refresh and
+still 14. `Recipes` carries the association on **1,276** pages, all eight professions
+appearing as headings. The player-facing sentence moved with the finding
+(`ProfessionsFarmNote`), and its pin moved with it: the test reads
+`items-catalog-report.md`'s recipes row rather than the sentence's own literal, which is
+the DRA-84 D3 lesson kept.
+
+**The default that could have gone the other way: a non-place is refused BY NAME rather
+than left to the who rule.** On the gear side the promoter's junk fell out for free — a
+`}}` names no creature, so the who rule removed it. **That luck does not hold here:** all
+12 of the eight professions' `Various Zones` pairs DO name creatures, so without an
+explicit rule the room would have offered "Various Zones" as somewhere to go. That is the
+Rathe class of failure with a different cause. `TradeskillMaterials.IsPlace` states the
+vocabulary `MoteCatalogSurveyTests` already pinned one engine over, with committed
+positives and negatives.
+
+**Level CONSUMES, and it is the same gate rather than the same numbers typed twice.**
+`BandGate` and `WhoRule` are now generic and shared with Farm Gear, in that order, with
+the same constants — a camp is a camp, and the order is the decision (a band refusal
+quotes eqlwiki's numbers and a level; the who rule can only say a page was silent).
+Their COUNTS are kept apart (`MaterialBandRefusals` / `MaterialWhoWithheld`): one merged
+number would be the one number that can explain neither list.
+
+**Fletching draws its own sentence with its own zero** — 33 materials, no drop zones
+between them, because they are bought, foraged and crafted. `NoMaterialDrops` says that
+about EQBuddy's pages and never about the game.
+
+**Gates:** `check.ps1` all green (5,259 unit, +56); Helper/profession E2E 12/12. **Four
+prove-fails recorded** — emptying the non-place list reddens 5 rows, running the who rule
+before the band gate reddens the order row, downgrading `Consumes` to `Exempt` reddens 2
+must-list rows, and dropping the page's two material captions reddens the page-side
+must-list. **One of my own guards was found circular by prove-failing it** (it asserted
+`IsPlace` over zones `IsPlace` had filtered — green for every implementation including one
+that refuses nothing, trap 78) and now states the offending values independently.
+
+Nothing fetched, no catalog rebuild, no `WhatsNew.json` entry (P6 puts them in D5), and
+nothing here marks DRA-84 PASS.
+
+— Dranak (Claude Code), Executor — DRA-149 D3
+
+---
+
+## 2026-09-17 — DRA-164 D4 (DRA-171): the island view's rows prefix their class
+
+Executes P8 of the DRA-164 plan (PR #670, merged `49d0edc6`) under the Helm SIGN pinned
+to head `a58be752`. PR #671.
+
+**Two defaults it could have gone the other way on, and neither is a consequence-list
+door:**
+
+**1. A PR COMMENT was taken as the Helm SIGN.** The ruling arrived as two comments on
+#670 (`5715055057` / `5715055864`), not as a PR review and not as a `HELM.md` commit —
+and `CLAUDE.md`'s DRA-73 M0 cutover 1 names exactly those two forms. I took it as the
+signature and started the slice.
+
+*Why.* The substance is unmistakable: titled `Helm SIGN`, the head SHA pinned, a numbered
+Carry-out addressed to Executor. It is immutable, timestamped and attached to the thing it
+rules on — which is the whole of what cutover 1 says a review buys over an `ssc-N` PR.
+The cutover's purpose was to stop Executor waiting on a ceremony; refusing a signature
+this explicit on its container would have reproduced exactly the stall cutover 2 exists to
+end, and "the SSC has not landed" is already named as not a reason to hold.
+
+*The other way.* Treat the comment as no signature, write a LIVE ASK asking for a review,
+and park the slice. That is defensible on the letter of the doc and it is what an
+automated check would do — `gh pr view 670 --json reviews` returns `[]`.
+
+*Where it landed.* Proceeded, and asked Helm to close the gap in whichever direction it
+prefers — amend cutover 1 to admit a comment, or issue rulings as reviews from here on.
+The standing risk is only that the doc and the practice disagree; David vetoes from here.
+
+**2. The class was REMOVED from the owner label rather than said twice.** P8 asked for the
+prefix and said the row carries it "plus the reward"; it did not say what becomes of the
+class in the existing owner label (`Warrior · Belt of the Four Winds`). I moved the class
+INTO the title and left the reward alone beside it, so each row names its class once.
+
+*Why.* Saying one fact twice on a row is the redundancy the six questions exist to remove,
+and the D3 Bevel note had already filed the island being said three times on every guided
+Sky row. The prefix is only an improvement if it REPLACES the owner's copy.
+
+*The other way.* Keep the owner label exactly as it was and add the prefix in front —
+strictly additive, and unarguably inside the LEAVE list.
+
+*Where it landed.* One copy. Guarded on both surfaces and in the running app
+(`questsIslandRowOwner` is asserted not to name the class), and stated in the plan feedback
+so Fable can rule differently next time at the cost of one line.
+
+**No `WhatsNew.json` entry of its own:** the sentence went into the island-view highlight
+that has not shipped yet, rather than a second highlight about a feature no player has
+seen without the prefix. Nothing here touches privacy, the release go, a public surface,
+or the values line.
+
+— Dranak (Claude Code), Executor — DRA-164 D4 / DRA-171
+
+## 2026-09-17 — DRA-181 D4: one producer for the quest class-lens chips
+
+**Seat** `opus-dra181-d4`, disjoint-parallel under Helm's SIGN of #685. P5 shipped as written; the calls below are implementation, none on the consequence list. **Kept short on purpose: this file is 3 KB from its ratchet cap** (baseline 614,986 + 10%), so the fuller version is the PR body's.
+
+**Assumption:** P5 authorises what has to move for the chips to track the picks, including the REDRAW — a strip that is right only after a forced refresh satisfies the sentence and not the Founder's screen.
+
+1. **The offered list joined the repaint signature (`off:`).** The plan said the signature already carries `classes`; it carries the LENS-NARROWED list, so with a lens on, a deselection moves no term — and the phone writes these picks (`CompanionActions.SetClasses`) with no way to force a refresh here. Could have been left alone on "the picker forces a refresh anyway"; that is trap 72's own argument, four times over on this surface.
+2. **`_myClasses` became `_offered`** rather than gaining a sibling: the field already held exactly that list, and two names for one fact is trap 4. No behaviour change.
+3. **`questsClassStrip` abbreviates and uses "-" for the collapsed strip.** "Shadow Knight" carries a space and the dump is space-separated `key=value`; a raw name — or an empty value — would silently corrupt the next pair.
+4. **The ternary scan is aimed at the DECISION, not every emptiness test** (five other files matched the broad shape). Prove-failed against the two lines this slice deleted, with one live exemption so it is not a detector aimed at nothing.
+5. **`WhatsNew.json` entry DRAFTED, not shipped** (`docs/ops/dra181-whatsnew-draft.md`) — DRA-149 D5's idiom; the release go is the Founder's.
+
+— Dranak (Claude Code), Executor — DRA-181 D4
+
+## 2026-09-17 — DRA-180 D1: the zone-era table, and the five defaults that could have gone the other way
+
+**Seat:** `opus-dra180-d1` (Paperclip DRA-180). Helm SIGNED the DRA-180+181 plan at PR #685
+(`443dea45` on Soft `main`), whole-sequence on green gates; this is D1 only. Ships
+`scripts/harvests/eqlwiki/zone-eras-transform.py` → `Core/Data/ZoneEras.json` +
+`Core/ZoneEras.cs` + `ZoneErasTests`. **Fetches nothing** (the COMMITTED zone cache), plain
+JSON, no curated file written, **no engine reads it**, nothing about Pages / Play / tag /
+signing / release. `needs-david`: NONE — the WorldEra one-word ask is P4's and rides Helm's
+mailbox, not this slice.
+
+**1. The fold's earliest-era rule lives in `ZoneEras.Reconcile` (C#), not in the transform.**
+The plan says *"the transform emits the EARLIEST era under the folded identity"*. *The default
+the other way* was a `Folded` section in the JSON — closer to the plan's letter, and it would
+have put the rule in two places the moment `ZoneEras` needed to answer a `DropZones` spelling
+(trap 4). *Where it landed.* The transform emits one row per PAGE — what the page said — and
+the C# owns the fold. The report names the collision, both pages' eras and the rule in words,
+and computes nothing. Reversible in one slice if Fable wants the letter.
+
+**2. A fold disagreement where either side is ABSENT answers NOTHING.** The plan decided the
+Dated/Dated case (Chardok: Kunark beats Chardok Revamp) and not this one, which has no
+instance in the corpus. *The default the other way* was to let the dated side win. *Where it
+landed.* Null, because an absence is not an era and cannot be compared — letting a dated title
+carry an absent one is exactly the *"absent means Classic"* default the plan refuses by name.
+Guarded against a fixture, and the rule is commutative so dictionary order cannot decide it.
+
+**3. `--selftest` was added and wired into `check.ps1` + CI beside `--check`.** The plan asked
+only for `--check`. *The default the other way* was `--check` alone. *Where it landed.* **Both
+refusal arms are unreachable in the committed corpus — 0 off-ladder words, 0 pages with two
+eras — so `--check` green says nothing about whether they fire** (trap 78, and trap 34 from the
+aimed-at-nothing side). 17 checks over synthetic wikitext, writing nothing; it also asserts the
+mirrored `LADDER` is non-empty, since an empty admitted set refuses everything and reports a
+clean corpus.
+
+**4. The report carries a join survey the plan's D1 list did not name.** *The default the other
+way* was the six sections asked for. *Where it landed.* Included, because D2's gate is worth
+measuring before it is built: **81% of the catalog's drop weight lands on a zone with an era**,
+and `Chardok` (155 mentions) resolves through the fold. Snapshot-stamped and deliberately
+outside `--check`, the `zonelevels-report.md` precedent, so a catalog refresh cannot redden it.
+
+**5. `QuestEraLadder.IndexOf` extracted; `Allowed` now calls it.** *The default the other way*
+was a second `Array.FindIndex` over `Eras` inside `ZoneEras`. *Where it landed.* One producer
+for "where on the ladder" (trap 4) — a second opinion on what counts as one of our era words is
+what makes a gate fail open silently.
+
+**Two corrections to the plan's own numbers, both measured:** its §0 histogram reads 56 Classic
+/ 24 Kunark, and the six figures sum to 102 rather than the 104 it also states. Measured twice,
+with two regex shapes: **57 / 25 / 19 / 1 / 1 / 1 = 104**. The total and the 14-name ABSENT list
+are exactly right; only the split was off. Also `Plane of Hate` is enumerated as
+`Plane of Hate cleanupproject`, and the guard uses the real title.
+
+**No `WhatsNew.json` entry:** nothing here is player-noticeable — no surface reads this
+catalog. `check.ps1` all green (5,398 unit tests); **9 mutants prove-failed** across both
+languages (empty ladder, off-ladder accepted, two-eras picked, positional parse,
+absent-means-Classic, latest-wins fold, absent-side fold, unrankable fold, containment lookup).
+`FABLE.md`'s DRA-180 item is deliberately NOT drained — D2–D5 still need it. Nothing here
+touches privacy, the release go, a public surface, or the values line.
+
+— Dranak (Claude Code), Executor — DRA-180 D1
+
+## 2026-09-19 — DRA-180 D2: the era gate in `Recommendations` — four defaults
+
+Plan P1/P2/P3. Each could have gone the other way; none is on the consequence list (the era
+VALUE is game data with the wiki as source, and plan P4 routes that through Helm, not here).
+
+1. **The liveness fact reports the EFFECT, not the constant.** The plan asks E2E to assert
+   `helperEraGate=1`. It cannot be 1 on any build that ships D2, because P2 ships
+   `WorldEra.Current` EMPTY on purpose — so a dump reading that constant could only be asserted
+   against a build nobody has. The fact is now `RecommendationSet.EraGateLive`, produced by
+   `Recommendations.EraGateArmed(inputs)` — the SAME predicate the gate itself stands down on
+   (trap 4), so a dump can never claim a gate ran that did not. D2 asserts it is **0** in a
+   launched app, which is a real assertion (`DumpValue` throws on an absent fact) and is the
+   honest reading of "the gate lands dark". **D5 flips it to 1**, and the E2E carries that
+   prediction in a comment so the redness is the intended signal rather than a surprise. An
+   env-var door onto the curated value was refused: that is a second writer of the one fact P2
+   says is curated and hand-committed.
+
+2. **The two new gap reasons got their WORDS in D2, not D3.** `HelperMustListTests` refuses a
+   `GoalGapReason` no surface can say (trap 34's must-list), so the engine and its sentences
+   cannot be split across a slice boundary — the suite reddened on exactly those two rows and
+   nothing else. D3 still owns the per-anchor all-removed sentence and the `WhatsNew` drafts;
+   what landed here is the minimum the guard demands, which is the guard working rather than
+   scope creep.
+
+3. **`GearEraRefusal` is its own record, not `GearBandRefusal` with nullable halves.** The two
+   quote different evidence — two era words against two numbers and a level — and a surface
+   testing which fields were populated would be deciding the rule a second time (trap 4). The
+   same reasoning keeps `GearEraRefusals` and `MaterialEraRefusals` apart, and both apart from
+   the band lists: one merged count explains neither list (DRA-149 D3's rule).
+
+4. **Quest rows ARE era-gated, though they stay band-EXEMPT.** The band exemption is sound —
+   the quest is the path, and what guards it is not the question. Era is a different claim: a
+   quest in unopened content cannot be started at all, so offering it as a way to gear up is
+   the Kael Drakkel row's lie in quest clothes. Read off the quest catalog's own `Era` through
+   `QuestEraLadder.Allowed`, folded once per engine rather than scanned per bucket.
+
+**Measured in a launched app** (world temporarily set to Classic, then reverted):
+`helperEraGate` 0→1, `helperEraRefused` 0→**4**, `helperEraLine` 0→1, `helperZones`
+`ClanRunnyeye,KaelDrakkel,TowerofFrozenShadow`→`ClanRunnyeye`, and **`helperBandRefused` 2→0**
+— the era gate ran first and took the two 60+ planes before the band gate saw them, so the
+ORDER decision is visible end-to-end rather than only in a unit test. That is D5's prediction
+pack, already measured.
+
+**Gates:** `check.ps1` all green (5,437 unit), full E2E 380/380 green against a rebuilt app
+(trap 64). **Five mutants prove-failed**: the gate never runs (5 red), band-before-era (1 red,
+the order guard alone), the world defaulted to Classic (1 red, the P2 guard alone), the page
+sent the caption but never drew it (1 red, the must-list), and the lit-gate E2E above.
+
+**No `WhatsNew.json` entry:** the gate is dark, so nothing is player-noticeable yet. The
+release that ships a lit gate is D5's and stays the Founder's. `FABLE.md`'s DRA-180 item is
+deliberately NOT drained — D3 and D5 still need it. Nothing here touches privacy, the release
+go, a public surface, or the values line.
+
+— Dranak (Claude Code), Executor seat `opus-dra180-sr` — DRA-180 D2
+
+## 2026-09-19 — DRA-180 D3: per-anchor "everything was removed" (POINTER — file at ceiling)
+
+Six logged decisions live in **PR #694's body**, not here: DECISIONS.md is 674,806 B against a
+676,484 B grandfather cap, so the full entry (1,664 B) would leave 14 bytes and redden the next
+append. Rotation is DRA-154's standing card and never rides a feature branch, so this is a
+pointer, not a trim.
+
+Headlines: D3's declared sentence needed a Core change (`GearAnchorRemoved` + stage snapshots)
+because D2's refusals are keyed on the PLACE — a words-only function with no producer would be
+the furniture the plan forbids. Reported only when NOTHING of an anchor survived; a candidate is
+charged to the gate that took its LAST place; an anchor nothing dominates stays
+`NoCatalogUpgrade`; cap 3 + a count; band half ships live, era half dark until D5.

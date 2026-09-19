@@ -249,18 +249,31 @@ $MinBaseEntries       = 20
 
 # Built from code points on purpose: this file must survive being read by a host that
 # guesses its encoding, and a literal mojibake glyph in the source is the one string that
-# cannot. Each is a UTF-8 sequence that has been decoded as cp1252 and re-encoded.
+# cannot. Each is a UTF-8 sequence that has been decoded through the WRONG CODEC and
+# re-encoded. Two codecs are represented, because two different producers did this:
+# cp1252 (the Windows ANSI path, DRA-55) and cp437 (the console OEM path, DRA-119).
 # EACH ELEMENT IS PARENTHESISED. PowerShell binds `,` TIGHTER than `+`, so the obvious
 # spelling - `[char]0xE2 + [char]0x20AC, [char]0xC3 + [char]0xA2` - parses as
 # `a + (b, c) + d` and silently collapses the whole list into ONE string of every marker
 # joined by $OFS. It matched nothing, and the guard reported a clean file for the exact
 # commit that laid down 12,684 markers. A guard that forbids the wrong thing is trap 34;
 # a guard that forbids a thing that cannot occur is worse, because it is green.
+#
+# The cp437 pair is that same lesson at a different table. UTF-8 `E2 80` is the lead of
+# every U+2xxx punctuation character (em dash, en dash, curly quotes, ellipsis); read as
+# cp437 it becomes U+0393 U+00C7, and read as cp437 a SECOND time it becomes U+256C
+# U+00F4. BOTH depths are live in the ledgers, so both are listed - a depth-1-only entry
+# scores 0 on the eleven HELM-FEEDBACK.md lines that are corrupt at depth 2 and reports
+# them clean, which is the green-with-no-bulb failure one paragraph up, rediscovered.
+# Neither pair can occur in honest prose: a Greek capital gamma followed by a C-cedilla,
+# and a box-drawing glyph followed by an o-circumflex.
 $MojibakeMarkers = @(
     ([string][char]0x00E2 + [string][char]0x20AC),   # "a-hat euro"  - em dash / smart quotes
     ([string][char]0x00C3 + [string][char]0x00A2),   # "A-tilde a-hat" - the second round trip
     ([string][char]0x00C3 + [string][char]0x201A),   # "A-tilde single-low-quote"
     ([string][char]0x00C2 + [string][char]0x00A0),   # "A-circumflex" + no-break space
+    ([string][char]0x0393 + [string][char]0x00C7),   # cp437 depth 1 - "Gamma C-cedilla"
+    ([string][char]0x256C + [string][char]0x00F4),   # cp437 depth 2 - the same trip twice
     ([string][char]0xFFFD)                           # U+FFFD, decode already given up
 )
 

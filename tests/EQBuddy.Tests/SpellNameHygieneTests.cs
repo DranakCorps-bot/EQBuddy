@@ -67,6 +67,8 @@ public class SpellNameHygieneTests
         ["RaidTargets.json"] = "boss names",
         ["ZoneGraph.json"] = "zone names and connections",
         ["ZoneLevelBands.json"] = "zone names, two level numbers and the wiki row they were read from",
+        ["ZoneMerchants.json"] = "zone names and merchant lines transcribed verbatim from eqlwiki's map keys — wiki prose about shops, never a token the game casts",
+        ["ZoneEras.json"] = "zone names, an era word off QuestEraLadder.Eras, and the wiki banner template it was read from — an expansion's name, never a token the game casts",
         ["WhatsNew.json"] = "release notes — prose written by us, for players",
     };
 

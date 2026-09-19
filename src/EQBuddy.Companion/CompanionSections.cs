@@ -264,7 +264,24 @@ public sealed record CompanionChecklistSection(
     /// "set it up on the PC" would name a task with no route — Gear's list is a website
     /// export behind a particular Options page, and saying so is the other half of the
     /// same defect the ⧉ buttons fix (David, 2026-08-20). Null keeps the generic line.</summary>
-    string? Empty = null);
+    string? Empty = null,
+    /// <summary>
+    /// What this checklist is NOT showing, above the groups — the island view's two
+    /// exclusions and the fact that it crosses every class (DRA-164 D3).
+    ///
+    /// <para><b>It could not ride a group.</b> The page drops a group with no rows
+    /// (<c>if (!rows.length) continue;</c>), so a sentence about the LIST as a whole has
+    /// nowhere to sit among the groups, and hanging it on the first island would make it
+    /// read as a fact about that island.</para>
+    ///
+    /// <para>Every word is Core's — <c>QuestChecklistLayout.SkyIslandLayout</c> and
+    /// <c>SkyIslandCrossClassNote</c> — and the page draws it and spells none of it (trap 32).
+    /// Null in every other mode and on every other checklist, so it costs nothing: null is
+    /// omitted from the JSON.</para>
+    ///
+    /// <para><b>Additive, and the envelope does not move.</b> A nullable field on an existing
+    /// section is not a shape change, so <c>CurrentProtocol</c> stays where it is.</para></summary>
+    string? Note = null);
 
 /// <summary>An in-game command shown as SELECTABLE TEXT rather than offered as a ⧉ copy
 /// (David, 2026-08-20): the phone's clipboard cannot paste into the game on the PC, so a

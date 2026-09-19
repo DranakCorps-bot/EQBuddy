@@ -63,6 +63,35 @@ jobs:
       - name: Channel wipe guard refuses each violation
         run: pwsh -NoProfile -File scripts/channel-wipe-guard-selftest.ps1
 
+      # The other half of the same policy, and until now the missing half. The guard above
+      # forbids a ledger getting SMALLER by the wrong mechanism; nothing forbade one getting
+      # BIGGER without limit, which is a failure that happens every day rather than three
+      # times in six days. DRA-73 rev 2 (approved 2026-09-14) set a 30-day / ~64 KB rotation
+      # policy and named this ratchet; DRA-75 shipped the rotation, the ratchet did not ship,
+      # and DRA-73 then closed — so the check had no live owner until DRA-26 rev 3 card A.
+      #
+      # It arrives with 9 of the 11 rostered files ALREADY over the limit (HELM.md by 14x),
+      # so `scripts/channel-size-baseline.psd1` grandfathers those nine at their measured
+      # size plus the hotspot ratchet's 10%. That table only ever shrinks, and this guard is
+      # what enforces that: a row may not be raised or added, and a rotation must delete its
+      # row in the same pull request.
+      #
+      # Same -BaseRef expression as the wipe guard above, for the same reason and with the
+      # same loud SKIPPED line when no base resolves. Every arm asks what THIS pull request
+      # did to a file, never what size the file happens to be — on a merge-result checkout
+      # that difference is the whole guard, because DRA-144 is still rotating these files and
+      # failing every author for the branch they merged into is not enforcement.
+      - name: Channel ledgers are not grown past 64 KiB
+        run: >
+          pwsh -NoProfile -File scripts/channel-size-guard.ps1
+          -BaseRef "${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || github.event.before }}"
+
+      # Its prove-fail, same idiom and same reason as the wipe guard's above: twenty cases in
+      # a throwaway repo, every arm driven into the red at least once and eleven shapes
+      # asserted GREEN — a size ratchet's real risk is refusing an append that policy allows.
+      - name: Channel size ratchet refuses each violation
+        run: pwsh -NoProfile -File scripts/channel-size-selftest.ps1
+
       # Experiment A′ self-test (trap 70, EQBuddy lab): default second claim on
       # one work item must refuse. Throwaway StoreDir; not the live claims.
       - name: Soft seat claims refuse a duplicate default
@@ -76,6 +105,20 @@ jobs:
       # secret, no network and no GitHub event.
       - name: Paperclip merge-sync decides, refuses and stays one-way
         run: pwsh -NoProfile -File scripts/merge-sync-selftest.ps1
+
+      # The ExO dashboard's detectors (DRA-78, extended by DRA-127). Every other
+      # self-test above has its own step here; this one had only `check.ps1`,
+      # which CI never invokes — so the detectors behind every §6 number were
+      # reachable by a human running one script and by nothing else. That is the
+      # same shape as the gates above: a check whose only runner is someone
+      # remembering to run it is not a gate, and `ExoDashboardTests` cannot cover
+      # it because it reads the committed doc rather than the script.
+      #
+      # Offline by construction: the classifiers are pure, the feed walk runs
+      # against a fake page source, and the one socket it opens is to a closed
+      # local port on purpose — a refused connection is what it asserts.
+      - name: ExO dashboard detectors fire, and no reason outlives its window
+        run: pwsh -NoProfile -File scripts/exo-metrics.ps1 -SelfTest
 
       # The GENERATED catalogs are byte-reproducible from their inputs, and this is
       # where that claim is actually checked. `HarvestedGuides.json.gz` is 1,164 machine-
@@ -99,6 +142,12 @@ jobs:
           python scripts/harvests/eqlwiki/guides-transform.py --check
           python scripts/harvests/eqlwiki/epic-guides-build.py --check
           python scripts/harvests/eqlwiki/zonelevels-transform.py --check
+          python scripts/harvests/eqlwiki/merchants-transform.py --check
+          python scripts/harvests/eqlwiki/zone-eras-transform.py --check
+          # Both era refusals are unreachable in the committed corpus, so --check green says
+          # nothing about whether they fire (trap 78). --selftest runs them over synthetic
+          # wikitext and writes nothing.
+          python scripts/harvests/eqlwiki/zone-eras-transform.py --selftest
 
       - uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
         with:

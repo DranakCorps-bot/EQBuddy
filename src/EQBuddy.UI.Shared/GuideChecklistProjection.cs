@@ -112,12 +112,6 @@ public static class GuideChecklistProjection
         return index;
     }
 
-    /// <summary>Replace every guided group's rows with its guide's objectives, and hand back
-    /// every other group untouched.
-    ///
-    /// <para>Called from exactly where <c>QuestsView.RenderChecklist</c> and
-    /// <c>CompanionProjection.BuildSky</c> get their groups, so the two screens cannot show
-    /// different guides — or a guide on one and the classic list on the other.</para></summary>
     /// <summary>
     /// The reward item's stats block, by item name — injected the way
     /// <c>GearLocker</c> already takes its <c>statsFor</c>, so this stays a pure function of
@@ -130,6 +124,12 @@ public static class GuideChecklistProjection
     public static string? ShippedItemStats(string itemName) =>
         ItemCatalog.Default.Find(itemName)?.StatsText;
 
+    /// <summary>Replace every guided group's rows with its guide's objectives, and hand back
+    /// every other group untouched.
+    ///
+    /// <para>Called from exactly where <c>QuestsView.RenderChecklist</c> and
+    /// <c>CompanionProjection.BuildSky</c> get their groups, so the two screens cannot show
+    /// different guides — or a guide on one and the classic list on the other.</para></summary>
     public static IReadOnlyList<QuestChecklistGroup> Apply(
         IReadOnlyList<QuestChecklistGroup> groups,
         GuideCatalog catalog,
@@ -468,7 +468,8 @@ public static class GuideChecklistProjection
                 // The step's own references first, then its stage's — on the stage's first drawn
                 // row only. `For` answers "" for a step nobody attached anything to and for one
                 // the Helper cannot answer, which is nearly every row in the catalog.
-                HelperLine(helper, objective, stageFor, stagesAnswered)));
+                HelperLine(helper, objective, stageFor, stagesAnswered),
+                IslandKeyFor(guide, stageOf.GetValueOrDefault(objective.Id, ""), objective)));
         }
 
         var counts = GuideProgressRouter.Counts(
@@ -507,6 +508,46 @@ public static class GuideChecklistProjection
             GuideCard = Card(group, guide, settings, ledger, characterKey, stores),
         };
     }
+
+    /// <summary>
+    /// Which islands a GUIDED row names — <c>QuestChecklistRow.IslandKey</c>, the second of the
+    /// two producers P2 names (DRA-164).
+    ///
+    /// <para><b>The stage name first, the objective's <c>Where</c> only as a fallback.</b> A
+    /// Plane of Sky guide's stages ARE its islands — `Isle 6: Bazzt Zzzt` — so 103 of the 317
+    /// shipped objectives are answered by the heading they already sit under, and the stage is
+    /// the more reliable of the two: it is one curated string per island rather than one per
+    /// step. The fallback exists for exactly one stage, `The Efreeti drop`, whose 22 objectives
+    /// name no island in the stage and all carry the same `Where`: *"Plane of Sky - Isles 1.5,
+    /// 4 and 8 respectively."*</para>
+    ///
+    /// <para><b>A TURN-IN never reads the fallback, and that exclusion is load-bearing.</b> 48
+    /// of the 95 hand-in objectives mention Isle 1 in their `Where` — they are the directions
+    /// to the Efreeti Chamber, where you GO to hand the pieces over. Reading those would file
+    /// 48 hand-ins as gathering work on Island 1, which is the exact failure the island view
+    /// exists to prevent: a confident wrong island on a row a player would plan around. The
+    /// island view drops turn-in rows anyway (P5), so this is the second of the two locks
+    /// rather than the only one.</para>
+    ///
+    /// <para>Sky guides only. An Epic guide's stages are section names and its rows have never
+    /// had an island; `EpicRowsHaveNoIslandHeading` is the committed negative that says so, and
+    /// this is its sibling.</para>
+    /// </summary>
+    private static string IslandKeyFor(Guide guide, string stageName, GuideObjective objective)
+    {
+        if (guide.GuideType != GuideType.PlaneOfSkyQuest) return "";
+        var islands = SkyIslands.Parse(stageName);
+        if (islands.Count == 0 && !IsTurnInType(objective))
+            islands = SkyIslands.Parse(objective.Where);
+        return SkyIslands.SetKey(islands);
+    }
+
+    /// <summary>The hand-in, by the catalog's own type. Deliberately NOT the row's
+    /// <c>IsTurnIn</c> flag: that one is decided by <c>GuideProgressRouter.HomeFor</c> — where
+    /// the TICK lives — and this is a question about what the step IS. They agree today; making
+    /// the parse depend on the routing would tie a data reading to a storage decision.</summary>
+    private static bool IsTurnInType(GuideObjective objective) =>
+        string.Equals(objective.ObjectiveType, "TurnIn", StringComparison.OrdinalIgnoreCase);
 
     /// <summary>
     /// The Helper's line for one row: this step's references, and its stage's the first time

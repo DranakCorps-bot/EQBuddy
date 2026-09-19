@@ -46,12 +46,66 @@ namespace EQBuddy.Companion;
 /// <param name="Answers">The ranked answers, capped.</param>
 /// <param name="MoneyNote">The vendor-price caveat, when a price was quoted. Empty
 /// otherwise — drawn from what was BUILT, never from which goal is ticked.</param>
+/// <param name="GearBaseNote">The base-vs-base caveat, when a gear row was built (DRA-149 D1).
+/// Empty otherwise, and drawn from what was BUILT rather than from which goal is ticked — the
+/// money note's rule beside it, for the money note's reason.</param>
 /// <param name="Cap">What the answer cap held back, when it held anything (trap 50).</param>
 /// <param name="GearWithheld">What the gear sweep's own per-anchor cap held back. A separate
 /// field because it is spent before any row exists and so cannot ride one.</param>
 /// <param name="GearBandRefused">Which zones the Farm Gear band gate refused, with their bands
 /// and this character's level (DRA-84 D2). Its own field for the same reason as
 /// <paramref name="GearWithheld"/>, one rule out: the row is what did not get built.</param>
+/// <param name="GearEraRefused">Which places and quests the Farm Gear ERA gate refused, with
+/// the era each page gives itself and the era the world is at (DRA-180 D2). Its own field
+/// beside <paramref name="GearBandRefused"/> rather than folded into it: the two quote
+/// different evidence, and a phone that drew the band sentence but not this one would leave the
+/// player reading level numbers as the reason a place vanished for a different cause.</param>
+/// <param name="MaterialEraRefused">The era gate's refusals on the FARM MATERIALS list
+/// (DRA-180 D2) — its own field for the reason <paramref name="MaterialBandRefused"/> is its
+/// own field.</param>
+/// <param name="GearWhoWithheld">What the who rule held back — drop offers whose item page names
+/// no creature in that zone and which this character has never looted there (DRA-84 D4). Its own
+/// field beside <paramref name="GearWithheld"/> rather than summed into it: a cap and a rule are
+/// different causes, and one number could explain neither.</param>
+/// <param name="UnreadWorn">The worn rows EQBuddy could not read about, named (DRA-149 D2). The
+/// fourth field of this shape and the only one that is not a decision — the three above chose to
+/// hold something back, this one is EQBuddy admitting it never had the row. It rides the wire for
+/// the reason all of them do: a phone that quietly listed one fewer anchor than the PC is the two
+/// surfaces disagreeing about what the player is wearing.</param>
+/// <param name="UnreadWornDoors">Where to check those names, as intent — one wiki search per
+/// NAMED item. Its own field rather than doors on a note, because this sentence is a caption in
+/// the caption stack rather than a <see cref="CompanionHelperNote"/>, and the desktop draws its
+/// doors the same way.</param>
+/// <param name="MaterialBandRefused">Which zones the band gate refused on the FARM MATERIALS
+/// list (DRA-149 D3). Its own field beside <paramref name="GearBandRefused"/> rather than the
+/// same one: they are the same rule over the same catalog, which is precisely why one merged
+/// sentence could explain neither list — and the two engines run independently, so a player can
+/// have one without the other.</param>
+/// <param name="MaterialWhoWithheld">What the who rule held back on the materials list
+/// (DRA-149 D3). Same producer and the same words as <paramref name="GearWhoWithheld"/> — the
+/// rule, the cause and the remedy are identical — on its own field for the reason above.</param>
+/// <param name="AnchorsAllRemoved">One sentence per WORN ITEM whose every catalog upgrade the
+/// ladder removed (DRA-180 D3). A list rather than one joined string because the phone draws
+/// them as separate captions exactly as the PC does, and because the cap is a COUNT of them —
+/// joining here would make <paramref name="AnchorsNotNamed"/> a number about a string. Already
+/// capped and already worded by <c>HelperPresentation</c>: the projection decides no word and
+/// no cap (trap 33). This is the field the Founder's bow and Baron FAILs are answered in, so a
+/// phone that carried the block captions without it would be the surface that still says
+/// nothing.</param>
+/// <param name="AnchorsNotNamed">What the cap above held back, said out loud (trap 50).</param>
+/// <param name="MaterialNote">Where the materials rows came FROM, and what still has no page
+/// (DRA-149 D3). Empty where no materials row was built, which is the money note's rule beside
+/// it, for the money note's reason.</param>
+/// <param name="MerchantNote">Where the vendor lines came from, said once over the whole block
+/// (DRA-149 D4). Empty when no profession is listed.</param>
+/// <param name="MerchantDoorNote">The zone-page door, as INTENT (trap 35). One sentence over
+/// the block rather than a link per line: the phone cannot open a browser on the PC, and the
+/// desktop's per-row door tip is the same sentence with a zone name in it — thirty copies of it
+/// down a phone screen is the wall trap 73 names in prose.</param>
+/// <param name="Merchants">One entry per LISTED profession, in the curated enum's order. It is
+/// the listed set and not the picked one, because "picked nothing" means "show me all eight" —
+/// the rule lives in <c>TradeskillPickStore.ListedFrom</c> so the phone cannot arrive at a
+/// different eight from the PC.</param>
 /// <param name="Gaps">Answerable goals that produced nothing, each with its reason and —
 /// where the answer is a file the game writes — the command as selectable text.</param>
 /// <param name="Deferred">Selected goals whose engine does not exist yet, each naming the
@@ -68,12 +122,46 @@ public sealed record CompanionHelperSection(
     string LevelNote,
     IReadOnlyList<CompanionHelperAnswer> Answers,
     string MoneyNote,
+    string GearBaseNote,
     string Cap,
     string GearWithheld,
     string GearBandRefused,
+    string GearEraRefused,
+    string MaterialEraRefused,
+    string GearWhoWithheld,
+    string UnreadWorn,
+    IReadOnlyList<CompanionHelperDoor> UnreadWornDoors,
+    IReadOnlyList<string> AnchorsAllRemoved,
+    string AnchorsNotNamed,
+    string MaterialBandRefused,
+    string MaterialWhoWithheld,
+    string MaterialNote,
+    string MerchantNote,
+    string MerchantDoorNote,
+    IReadOnlyList<CompanionHelperMerchants> Merchants,
     IReadOnlyList<CompanionHelperNote> Gaps,
     IReadOnlyList<CompanionHelperNote> Deferred,
     CompanionHelperEmpty? Empty = null);
+
+/// <summary>
+/// One profession's vendor lines, transcribed from eqlwiki's zone maps (DRA-149 D4).
+///
+/// <para>Every string here is a sentence <c>HelperPresentation</c> already built, and
+/// <see cref="Lines"/> carries the wiki's own words with the zone in front. The projection
+/// decides nothing: which lines, how many, and what the cap says are all the desktop room's
+/// answers, asked of the same <c>ZoneMerchants</c> catalog.</para>
+/// </summary>
+/// <param name="Profession">The trade, in the curated list's own spelling.</param>
+/// <param name="Lines">Up to <c>HelperPresentation.MerchantLineCap</c> rows, one per zone.</param>
+/// <param name="More">What the cap held back (trap 50). Empty when it held nothing.</param>
+/// <param name="Empty">The honest empty state when no zone page names this trade. Empty string
+/// when <see cref="Lines"/> has something — the two are never both set, and the page draws
+/// whichever is there rather than deciding which case it is in.</param>
+public sealed record CompanionHelperMerchants(
+    string Profession,
+    IReadOnlyList<string> Lines,
+    string More,
+    string Empty);
 
 /// <summary>
 /// One of the desktop room's pickers, ported as INTENT (trap 35).

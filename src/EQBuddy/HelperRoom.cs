@@ -148,6 +148,11 @@ internal sealed class HelperRoom : Grid, IShellRoom
     private int _professionsKnown;
     private int _professionsWatched;
     private int _watchPresets;
+    /// <summary>DRA-149 D4: how many transcribed merchant lines the professions block actually
+    /// drew. It is counted at DRAW rather than read back off <see cref="ZoneMerchants"/>,
+    /// because "the catalog has thirty for Jewelcrafting" and "the screen shows three" are
+    /// different claims and the E2E assertion is about the second (trap 56).</summary>
+    private int _merchantRows;
     private string _goalFace = "";
     private string _factionFace = "";
     private string _unlockFace = "";
@@ -179,6 +184,7 @@ internal sealed class HelperRoom : Grid, IShellRoom
     /// and "the player has a way to fix it" are different claims.</summary>
     private bool _levelDoor;
     private bool _moneyNote;
+    private bool _gearBaseNote;
 
     public HelperRoom(MainWindow main, Action<string> navigate)
     {
@@ -350,6 +356,7 @@ internal sealed class HelperRoom : Grid, IShellRoom
         _professionsKnown = 0;
         _professionsWatched = 0;
         _watchPresets = 0;
+        _merchantRows = 0;
         _goalFace = "";
         _factionFace = "";
         _unlockFace = "";
@@ -368,6 +375,7 @@ internal sealed class HelperRoom : Grid, IShellRoom
         _copyCommands = 0;
         _levelDoor = false;
         _moneyNote = false;
+        _gearBaseNote = false;
 
         _scroll.Content = _blocks;
         _blocks.Margin = new Thickness(Tok.SpaceL);
@@ -795,7 +803,9 @@ internal sealed class HelperRoom : Grid, IShellRoom
     /// <para>Three things per profession, and the plan named all three: where your skill
     /// stands, a one-click watch on its next skill-up, and the wiki page that says what it
     /// makes. Not one of them is a ranking, and the block says so out loud rather than letting
-    /// the absence read as a bug (<see cref="HelperPresentation.ProfessionsParkNote"/>).</para>
+    /// the absence read as a bug. <b>Since DRA-149 D3 the ranking IS below</b>, so that sentence is
+    /// no longer a park — it now says where the rows come from and what still has no page
+    /// (<see cref="HelperPresentation.ProfessionsFarmNote"/>).</para>
     ///
     /// <para><b>The standings are the reason this block exists at all.</b> A skill value used
     /// to die with the session — <c>StatsSnapshot.SkillUps</c> has always known what you raised
@@ -848,6 +858,7 @@ internal sealed class HelperRoom : Grid, IShellRoom
             doors.Children.Add(Door(new HelperDoor(
                 HelperDoorKind.WikiSkill, Tradeskills.For(skill).WikiPage)));
             row.Children.Add(doors);
+            BuildMerchants(row, skill);
             block.Children.Add(row);
             _professionRows++;
         }
@@ -855,9 +866,68 @@ internal sealed class HelperRoom : Grid, IShellRoom
         // A margin of its own: it is the BLOCK's caveat and not the last row's, and without one
         // it butts against that row's doors and reads as belonging to it — which is how the
         // first staged shot came back.
-        var park = Line(HelperPresentation.ProfessionsParkNote, Role.Caption);
-        park.Margin = new Thickness(0, Tok.SpaceM, 0, 0);
-        block.Children.Add(park);
+        var note = Line(HelperPresentation.ProfessionsFarmNote, Role.Caption);
+        note.Margin = new Thickness(0, Tok.SpaceM, 0, 0);
+        block.Children.Add(note);
+
+        // The source caption for the merchant lines, under the whole block for
+        // ProfessionLearnNote's reason. It is LAST because it explains rows the reader has
+        // already passed, and because putting it first would head the block with a sentence
+        // about a sub-list rather than about professions.
+        var merchants = Line(HelperPresentation.MerchantsNote, Role.Caption);
+        merchants.Margin = new Thickness(0, Tok.SpaceS, 0, 0);
+        block.Children.Add(merchants);
+    }
+
+    /// <summary>
+    /// **THE VENDOR HALF — where the wiki says you can BUY this profession's supplies**
+    /// (DRA-149 D4, plan P5; the Founder's FAIL item 3, second half).
+    ///
+    /// <para>D3's rows above this block answer "what drops and where". This answers the other
+    /// plan for the same evening: the shop. It is drawn on the PROFESSION's row rather than as a
+    /// block of its own because that is the question it answers — a player reading the
+    /// Jewelcrafting row wants Jewelcrafting's shops, and a fourteenth block between them and
+    /// the farming rows would be a second place to look for one trade's answer.</para>
+    ///
+    /// <para><b>Every line is the page's own sentence</b>, from <see cref="ZoneMerchants"/>, and
+    /// the door beside it opens the page it came from — because the map key it was lifted out of
+    /// sits under a map image this room does not ship, so "where in the zone" is an answer only
+    /// the page can give.</para>
+    ///
+    /// <para><b>Capped at <see cref="HelperPresentation.MerchantLineCap"/>, and the cap says
+    /// so</b> (trap 50). A profession nothing names draws
+    /// <see cref="HelperPresentation.NoMerchantsFor"/> rather than nothing, so an absent list is
+    /// distinguishable from a list that has not loaded.</para>
+    /// </summary>
+    private void BuildMerchants(Panel row, Tradeskill skill)
+    {
+        var shown = HelperPresentation.MerchantsShown(ZoneMerchants.Default, skill);
+        if (shown.Count == 0)
+        {
+            var empty = Line(HelperPresentation.NoMerchantsFor(skill), Role.Caption);
+            empty.Margin = new Thickness(Tok.SpaceM, Tok.SpaceXs, 0, 0);
+            row.Children.Add(empty);
+            return;
+        }
+
+        foreach (var merchant in shown)
+        {
+            var text = Line(HelperPresentation.MerchantRow(merchant), Role.Caption);
+            text.Margin = new Thickness(Tok.SpaceM, Tok.SpaceXs, 0, 0);
+            row.Children.Add(text);
+
+            var doors = new WrapPanel { Margin = new Thickness(Tok.SpaceM, 0, 0, 0) };
+            doors.Children.Add(Door(new HelperDoor(HelperDoorKind.WikiZone, merchant.Zone)));
+            doors.Children.Add(Door(new HelperDoor(HelperDoorKind.World, merchant.Zone)));
+            row.Children.Add(doors);
+            _merchantRows++;
+        }
+
+        var capped = HelperPresentation.MerchantsCapped(shown.Count, ZoneMerchants.Default.ZonesFor(skill));
+        if (capped.Length == 0) return;
+        var more = Line(capped, Role.Caption);
+        more.Margin = new Thickness(Tok.SpaceM, Tok.SpaceXs, 0, 0);
+        row.Children.Add(more);
     }
 
     private void ToggleProfession(Tradeskill skill)
@@ -970,6 +1040,16 @@ internal sealed class HelperRoom : Grid, IShellRoom
             r.Why.Any(w => w is SellableDropFact or CatalogValueFact));
         if (_moneyNote) block.Children.Add(Line(HelperPresentation.MoneyPriceNote, Role.Caption));
 
+        // **The base-vs-base caveat, once for the whole block** (DRA-149 D1, plan P1). Same
+        // idiom as the money note directly above and for the same reason: it is driven by what
+        // was actually BUILT — a gear row exists in this list — rather than by which goal is
+        // ticked, so it cannot appear over a list with no gear row in it and cannot be missing
+        // from one that has. Once here rather than on each of up to eight rows: the caveat is
+        // identical every time, and a row's own words are what the player came for (trap 73).
+        _gearBaseNote = _answers.Top.Any(r => r.Why.Any(w => w is GearUpgradeFact));
+        if (_gearBaseNote)
+            block.Children.Add(Line(HelperPresentation.GearBaseClaimNote, Role.Caption));
+
         // The cap, out loud when it held something back.
         if (HelperPresentation.Cap(_answers.Withheld) is { Length: > 0 } cap)
             block.Children.Add(Line(cap, Role.Caption));
@@ -984,16 +1064,108 @@ internal sealed class HelperRoom : Grid, IShellRoom
             block.Children.Add(Door(new HelperDoor(HelperDoorKind.Gear, "")));
         }
 
+        // **THE ERA GATE'S REFUSALS COME FIRST** (DRA-180 D2, plan P3), because the gate ran
+        // first and because its sentence is the complete explanation: a place refused for its
+        // era would otherwise be read against the band numbers directly below, which are not
+        // the reason it is missing. Its door is the Gear room's, like the band caption's — the
+        // wishlist behind both is the same one.
+        if (HelperPresentation.EraRefused(
+                _answers.GearEraRefusals, HelperPresentation.BandRefusedUpgrades)
+            is { Length: > 0 } eraCap)
+        {
+            block.Children.Add(Line(eraCap, Role.Caption));
+            block.Children.Add(Door(new HelperDoor(HelperDoorKind.Gear, "")));
+        }
+
         // **AND THE BAND GATE'S REFUSALS** (DRA-84 D2, plan P2). The same shape one rule out:
         // a count spent before any row exists, said out loud with the numbers it was spent on,
         // pointing at the room that has the whole wishlist. It is drawn from what the ENGINE
         // refused rather than from which goal is ticked, so it cannot appear over a list the
         // gate never ran on.
-        if (HelperPresentation.GearBandRefused(_answers.GearBandRefusals) is { Length: > 0 } bandCap)
+        if (HelperPresentation.BandRefused(
+                _answers.GearBandRefusals, HelperPresentation.BandRefusedUpgrades)
+            is { Length: > 0 } bandCap)
         {
             block.Children.Add(Line(bandCap, Role.Caption));
             block.Children.Add(Door(new HelperDoor(HelperDoorKind.Gear, "")));
         }
+
+        // **AND THE SAME GATE'S REFUSALS ON THE MATERIALS LIST** (DRA-149 D3, plan P4). Its own
+        // sentence beside the gear one rather than summed into it: both are the same rule over
+        // the same catalog, which is exactly why one merged count could explain neither — a
+        // player reading about "zones EQBuddy has upgrades for" that silently also counted
+        // where their gems drop cannot act on either half. Its door is the wiki's own skill
+        // pages rather than the Gear room, because the list this refused is a recipe list.
+        if (HelperPresentation.BandRefused(
+                _answers.MaterialBandRefusals, HelperPresentation.BandRefusedMaterials)
+            is { Length: > 0 } matBandCap)
+            block.Children.Add(Line(matBandCap, Role.Caption));
+
+        // The era gate's refusals on the MATERIALS list — its own sentence beside the gear one
+        // for the reason the materials BAND caption is its own sentence (DRA-180 D2).
+        if (HelperPresentation.EraRefused(
+                _answers.MaterialEraRefusals, HelperPresentation.BandRefusedMaterials)
+            is { Length: > 0 } matEraCap)
+            block.Children.Add(Line(matEraCap, Role.Caption));
+
+        // **AND THE WHO RULE'S** (DRA-84 D4, plan P3). The third count spent before a row
+        // exists, and the third to get its own sentence rather than be summed into the others:
+        // a cap, a band and a missing creature are three causes with three remedies, and the
+        // player can act on all three only if they can tell which one happened.
+        if (HelperPresentation.DropOffersWithheld(_answers.GearWhoWithheld)
+            is { Length: > 0 } whoCap)
+        {
+            block.Children.Add(Line(whoCap, Role.Caption));
+            block.Children.Add(Door(new HelperDoor(HelperDoorKind.Gear, "")));
+        }
+
+        // The who rule's count on the MATERIALS list (DRA-149 D3). Same sentence from the same
+        // producer — the rule, the cause and the remedy are identical and a re-worded copy is
+        // the one that goes stale (trap 4) — and its own line, for the reason the band caption
+        // above has one.
+        if (HelperPresentation.DropOffersWithheld(_answers.MaterialWhoWithheld)
+            is { Length: > 0 } matWhoCap)
+            block.Children.Add(Line(matWhoCap, Role.Caption));
+
+        // **AND THE ROWS THERE WAS NEVER AN ANCHOR FOR** (DRA-149 D2, plan P2). The fourth
+        // sentence in this stack and the only one that is not a decision EQBuddy made: the
+        // three above chose to hold something back, this one admits it never had the row. It is
+        // drawn LAST of the four and directly above the gaps because that is where the
+        // `NothingWornIsReadable` gap lands — the caption names the items and the gap says what
+        // it cost, in that order.
+        //
+        // Its doors are the wiki, one per NAMED item rather than one for the block: the check a
+        // player can actually make is per item (is this how eqlwiki spells it?), and a single
+        // door would have to pick one of them to be about.
+        if (HelperPresentation.UnreadWorn(_answers.UnreadWorn) is { Length: > 0 } unreadCap)
+        {
+            block.Children.Add(Line(unreadCap, Role.Caption));
+            var doors = new WrapPanel { Margin = new Thickness(0, Tok.SpaceXs, 0, 0) };
+            foreach (var item in _answers.UnreadWorn.Take(HelperPresentation.UnreadWornNamed))
+                doors.Children.Add(Door(new HelperDoor(HelperDoorKind.WikiItem, item)));
+            doors.Children.Add(Door(new HelperDoor(HelperDoorKind.Gear, "")));
+            block.Children.Add(doors);
+        }
+
+        // **AND THEN, PER WORN ITEM, THE ANSWER THE FOUNDER ASKED FOR** (DRA-180 D3, plan P3).
+        //
+        // Every caption above counts PLACES and every one of them can be true while the player's
+        // actual question goes unanswered — he asked about a bow and about the Baron's Blade,
+        // and a sentence about Sleeper's Tomb does not name either. These lines are the same
+        // evidence turned to face the character.
+        //
+        // They are drawn AFTER the block captions and BEFORE the gaps because they are more
+        // specific than the first and less final than the second: the captions explain the list,
+        // these explain one row of the player's own gear, and a gap closes the goal. A door per
+        // line would be the same Gear door three times over, so the block's one door (already
+        // drawn with the captions above) is left to serve them.
+        var anchors = _answers.GearAnchorsRemoved;
+        foreach (var anchor in anchors.Take(HelperPresentation.GearAnchorsNamed))
+            block.Children.Add(Line(HelperPresentation.AnchorAllRemoved(anchor), Role.Caption));
+        if (HelperPresentation.AnchorsNotNamed(
+                anchors.Count - Math.Min(anchors.Count, HelperPresentation.GearAnchorsNamed))
+            is { Length: > 0 } anchorCap)
+            block.Children.Add(Line(anchorCap, Role.Caption));
 
         foreach (var gap in _answers.Gaps) block.Children.Add(Gap(gap));
 
@@ -1154,10 +1326,34 @@ internal sealed class HelperRoom : Grid, IShellRoom
         link.Margin = new Thickness(0, 0, Tok.SpaceM, 0);
         link.ToolTip = HelperPresentation.DoorTip(door);
 
-        if (door.Kind == HelperDoorKind.WikiFaction)
+        // **THE THREE WIKI ARMS, AND THE SECOND ONE WAS A SILENT NO-OP** (found in DRA-149 D2).
+        // `AddressFor` answers null for every wiki kind — correctly, a page is not a room — and
+        // the fall-through below returns the label UNWIRED, so `WikiSkill` has drawn an
+        // "eqlwiki" control with a tooltip and no click since DRA-71 D8 shipped it under all
+        // eight professions. `helperDeadDoors` could not see it either: that counter is only
+        // reached past the `address is null` return. The must-list proves the WORDS exist
+        // (`EveryDoorEitherLandsOnARoomOrOpensTheWiki`) and nothing proved the CONTROL opens —
+        // trap 34 one layer down. Adding a third wiki door beside a dead one was not an option,
+        // so both are wired here and the switch is exhaustive by kind rather than by fall-
+        // through, which is what makes a fourth wiki kind a compile-time question.
+        var url = door.Kind switch
         {
-            var faction = door.Target;
-            DesignSystem.WireClick(link, () => MainWindow.OpenWikiUrl(WikiLinks.Faction(faction)));
+            HelperDoorKind.WikiFaction => WikiLinks.Faction(door.Target),
+            // `Page`, not `Search`: a profession's page title is not an item, and the item
+            // rule would fold a "+N" and consult the item alias table on the way past.
+            HelperDoorKind.WikiSkill => WikiLinks.Page(door.Target),
+            // The name the GAME printed, searched rather than resolved — see WikiItem's own
+            // summary: this door only exists for names that matched no page.
+            HelperDoorKind.WikiItem => WikiLinks.Search(door.Target),
+            // DRA-149 D4, and it is the FOURTH arm the comment above predicted. `Page`, for
+            // WikiSkill's reason exactly: a zone title is not an item, and putting one through
+            // the item rule would fold a "+N" off it and consult the alias table on the way.
+            HelperDoorKind.WikiZone => WikiLinks.Page(door.Target),
+            _ => null,
+        };
+        if (url is { Length: > 0 })
+        {
+            DesignSystem.WireClick(link, () => MainWindow.OpenWikiUrl(url));
             _doors++;
             return link;
         }
@@ -1246,6 +1442,12 @@ internal sealed class HelperRoom : Grid, IShellRoom
         $"helperIntent={_intent.ToString().ToLowerInvariant()} " +
         $"helperIntentChips={_intentChips} " +
         $"helperWorn={_sources.Worn.Count} " +
+        // DRA-149 D5. **The number that tells the two empty gear screens apart.** A sweep that
+        // found nothing is what the tier rule guaranteed for every plussed character until D1;
+        // a sweep that found plenty and had every zone refused is a different event with the
+        // same grey sentence. `helperGearWhy` counts DRAWN rows and cannot separate them,
+        // because both are 0.
+        $"helperCandidates={_answers.GearCandidates} " +
         $"helperWornChips={_wornChips} " +
         $"helperWornFace={_wornFace.Replace(" ", "")} " +
         $"helperWornPicks={string.Join(',', GearIntentStore.WornPicks(_main.Settings, _main.QuestCharacterKey).Select(p => p.Replace(" ", "")))} " +
@@ -1265,9 +1467,76 @@ internal sealed class HelperRoom : Grid, IShellRoom
         // about is a row that vanished. `helperBandLine` is the line, `helperBandGate` is
         // whether the gate could run at all (a level AND a band table), so a green run with a
         // zero count can be told from a run where the gate stood down.
+        // **DRA-180 D2: the LIVENESS fact comes FIRST and is not a count.** `helperEraGate` says
+        // the gate was wired and asked at all; a refusal count of 0 is the same number on a
+        // build where the gate does not exist, which is the assertion DRA-149 D5 item 2 was
+        // caught by. It reads the INPUTS the gate stands down on, so it is 1 only when the
+        // world's era is known and rankable and an era table is present.
+        $"helperEraGate={(_answers.EraGateLive ? 1 : 0)} " +
+        $"helperEraRefused={_answers.GearEraRefusals.Count} " +
+        $"helperEraLine={(HelperPresentation.EraRefused(_answers.GearEraRefusals, HelperPresentation.BandRefusedUpgrades).Length > 0 ? 1 : 0)} " +
+        $"helperMaterialEraRefused={_answers.MaterialEraRefusals.Count} " +
         $"helperBandRefused={_answers.GearBandRefusals.Count} " +
-        $"helperBandLine={(HelperPresentation.GearBandRefused(_answers.GearBandRefusals).Length > 0 ? 1 : 0)} " +
+        $"helperBandLine={(HelperPresentation.BandRefused(_answers.GearBandRefusals, HelperPresentation.BandRefusedUpgrades).Length > 0 ? 1 : 0)} " +
         $"helperBandGate={(_bandGate ? 1 : 0)} " +
+        // **DRA-84 D5: the gate's INPUTS beside its verdict** (plan P6). `helperBandRefused`
+        // above is a COUNT, and a count is equally true of a gate that refused the right two
+        // zones for the wrong reason — the band it read, the arm that fired, or the level it
+        // compared against could each be wrong without moving it. This key carries what the
+        // gate actually COMPARED: the zone, eqlwiki's own row verbatim, and which of the two
+        // arms decided. Read beside `helperLevel`, an E2E can assert the RELATIONSHIP — this
+        // band against that level, therefore refused on this arm — instead of leaving the
+        // arithmetic in a doc comment nobody runs. Spaces go and `:` separates, because the
+        // dump is one flat space-separated namespace (trap 58).
+        $"helperBandRefusals={string.Join(',', _answers.GearBandRefusals.Select(r => $"{r.Zone.Replace(" ", "")}:{r.Verbatim.Replace(" ", "")}:{r.Arm}"))} " +
+        // **DRA-84 D4: the who rule, in the same two-numbers-one-moment shape.** `helperWho` is
+        // how many DRAWN item lines can name a creature from the page, `helperWhoWithheld` is
+        // how many offers the rule removed, and `helperWhoLine` is whether the room said so. A
+        // room drawing three items with three silent who clauses and a room drawing three with
+        // named creatures are the same screen to every other key here.
+        // **DRA-180 D3: the per-anchor answer, and its INPUTS beside its count** — the shape
+        // `helperBandRefusals` above established. `helperAnchorsEmptied` is how many worn items
+        // the ladder left with nothing and `helperAnchorLines` is how many the room actually
+        // DREW, so a cap that silently swallowed them all can be told from an engine that found
+        // none (trap 34 in dump form). `helperAnchorsRemoved` carries the arithmetic the
+        // sentence rests on — the anchor, what was found, and the three causes in the gates'
+        // own order — so an E2E asserts era+band+who == found rather than trusting the prose.
+        // Spaces go and `:` separates: one flat namespace (trap 58).
+        $"helperAnchorsEmptied={_answers.GearAnchorsRemoved.Count} " +
+        $"helperAnchorLines={Math.Min(_answers.GearAnchorsRemoved.Count, HelperPresentation.GearAnchorsNamed)} " +
+        $"helperAnchorsRemoved={string.Join(',', _answers.GearAnchorsRemoved.Select(a => $"{a.Anchor.Replace(" ", "")}:{a.Found}:{a.LaterContent}:{a.OutsideBand}:{a.NoCreature}"))} " +
+        $"helperWho={_answers.Top.Sum(r => r.Why.OfType<GearUpgradeFact>().Count(f => f.Who.Count > 0))} " +
+        $"helperWhoWithheld={_answers.GearWhoWithheld} " +
+        $"helperWhoLine={(HelperPresentation.DropOffersWithheld(_answers.GearWhoWithheld).Length > 0 ? 1 : 0)} " +
+        // **DRA-149 D2: the worn rows that never became an anchor** — the same two-numbers-one-
+        // moment shape, and the one it matters most for. `helperWorn` above is the anchor count
+        // and it was the ONLY thing this dump said about the dump: twenty anchors from a
+        // twenty-one-row sheet and twenty from a twenty-row sheet are the same number, which is
+        // precisely how the Founder's bow left without a trace. `helperUnreadWorn` is the count,
+        // `helperUnreadNames` is what they were (spaces out, `,` between — trap 58's flat
+        // namespace), and `helperUnreadLine` is whether the room actually SAID it, because the
+        // engine reporting it and the screen drawing it are different claims (trap 56).
+        $"helperUnreadWorn={_answers.UnreadWorn.Count} " +
+        $"helperUnreadNames={string.Join(',', _answers.UnreadWorn.Select(n => n.Replace(" ", "")))} " +
+        $"helperUnreadLine={(HelperPresentation.UnreadWorn(_answers.UnreadWorn).Length > 0 ? 1 : 0)} " +
+        // **DRA-149 D3: the materials engine's INPUTS, in the shape the gear keys above use**
+        // (plan P4). `helperMaterialWhy` is how many DRAWN rows carry an ingredient line and
+        // `helperMaterialNamed` how many of those lines can name a creature — the two that
+        // separate "the engine answered" from "the engine answered with something to DO", which
+        // is the whole of the Founder's FAIL item 3a. `helperProfessions` is what it ranked FOR
+        // (empty = all eight, the store's own filter semantics), so a run that answered nothing
+        // because the pick was narrow can be told from one that answered nothing because the
+        // pages were silent. The refusal keys mirror the band/who pair above rather than
+        // reusing them: two engines refusing zones into one number is a count of a list nobody
+        // asked for (trap 56 — both halves from one moment, and about the right list).
+        $"helperProfessions={string.Join(',', TradeskillPickStore.Picked(_main.Settings, _main.QuestCharacterKey))} " +
+        $"helperMaterialWhy={_answers.Top.Count(r => r.Why.OfType<TradeskillMaterialFact>().Any())} " +
+        $"helperMaterialNamed={_answers.Top.Sum(r => r.Why.OfType<TradeskillMaterialFact>().Count(f => f.Who.Count > 0))} " +
+        $"helperMaterialSeen={_answers.Top.Count(r => r.Why.OfType<TradeskillMaterialFact>().Any() && r.Why.OfType<GearDropSeenFact>().Any())} " +
+        $"helperMaterialBandRefused={_answers.MaterialBandRefusals.Count} " +
+        $"helperMaterialBandLine={(HelperPresentation.BandRefused(_answers.MaterialBandRefusals, HelperPresentation.BandRefusedMaterials).Length > 0 ? 1 : 0)} " +
+        $"helperMaterialWhoWithheld={_answers.MaterialWhoWithheld} " +
+        $"helperMaterialWhoLine={(HelperPresentation.DropOffersWithheld(_answers.MaterialWhoWithheld).Length > 0 ? 1 : 0)} " +
         // Whether a popup is OPEN. The staged state the shot photographs, and the assertion
         // that the review hook armed the control rather than merely being spelled correctly.
         $"helperPickerOpen={((_goalPicker?.IsOpen ?? false) || (_factionPicker?.IsOpen ?? false) || (_unlockPicker?.IsOpen ?? false) || (_wornPicker?.IsOpen ?? false) || (_professionPicker?.IsOpen ?? false) ? 1 : 0)} " +
@@ -1349,6 +1618,7 @@ internal sealed class HelperRoom : Grid, IShellRoom
         $"helperSellable={_answers.Top.Count(r => r.Why.OfType<SellableDropFact>().Any())} " +
         $"helperCatalogValue={_answers.Top.Count(r => r.Why.OfType<CatalogValueFact>().Any())} " +
         $"helperMoneyNote={(_moneyNote ? 1 : 0)} " +
+        $"helperGearBaseNote={(_gearBaseNote ? 1 : 0)} " +
         // **DRA-71 D8.** The store's claim and the screen's claim, from one Build (trap 56):
         // `helperSkills` is how many profession standings the LEDGER holds and
         // `helperProfKnown` how many of the DRAWN rows carried a number. A skill-up that
@@ -1366,5 +1636,13 @@ internal sealed class HelperRoom : Grid, IShellRoom
         // in Options moves it back — "the room added one" and "the player has one" are the same
         // fact with one producer, and this is what says so from outside.
         $"helperWatchPresets={_watchPresets} " +
-        $"helperWatched={_professionsWatched}";
+        $"helperWatched={_professionsWatched} " +
+        // DRA-149 D4. The vendor half's two numbers, from ONE moment: what the SCREEN drew and
+        // what the shipped catalog HAS for the same professions. The relationship is the
+        // assertion — drawn is capped at three per profession, so it can never exceed the
+        // catalog's, and a zero beside a non-zero catalog is the cap or the pick misbehaving
+        // rather than an empty file (trap 56).
+        $"helperMerchantRows={_merchantRows} " +
+        $"helperMerchantZones={ZoneMerchants.Default.ZoneCount} " +
+        $"helperMerchantLines={ZoneMerchants.Default.LineCount}";
 }

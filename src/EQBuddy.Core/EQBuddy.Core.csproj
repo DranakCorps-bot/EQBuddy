@@ -8,7 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Data.Sqlite" Version="10.0.11" />
+    <PackageReference Include="Microsoft.Data.Sqlite" Version="10.0.12" />
     <!-- Direct reference overriding the transitive 2.1.11, which carries the
          high-severity GHSA-2m69-gcr7-jv3q (NU1903 on every release build).
          Drop this once Microsoft.Data.Sqlite itself depends on >= 2.1.12. -->
@@ -47,6 +47,8 @@
     <EmbeddedResource Include="Data\ZoneGraph.json" />
     <!-- eqlwiki's "Level of Monsters" band per zone (zonelevels-transform.py; no fetch). -->
     <EmbeddedResource Include="Data\ZoneLevelBands.json" />
+    <EmbeddedResource Include="Data\ZoneEras.json" />
+    <EmbeddedResource Include="Data\ZoneMerchants.json" />
     <EmbeddedResource Include="Data\SpellLevels.json" />
     <!-- ~11k items from Category:Items, gzipped (items-harvest.py + itemcatalog-build). -->
     <EmbeddedResource Include="Data\ItemCatalog.json.gz" />

@@ -148,6 +148,42 @@ public static partial class CompanionProjection
         // value no player can change is not a filter.
         var scoped = all.ToList();
 
+        // ISLAND VIEW (DRA-164 D3) — the player's own choice, read from the same setting the
+        // PC writes, answered by the same `SkyByIsland` call from the same point. Not a port:
+        // porting a feature TO the phone is the signal the logic never went through the shared
+        // layer (David, 2026-08-18), and every decision here — which rows group together, in
+        // what order, what is excluded and what the sentences say — is already made in Core.
+        //
+        // The Ready band and the leftover bands stay ABOVE it, exactly as they do on the PC:
+        // they answer cross-class questions the arrangement does not change, and the island
+        // view's own note points at the first of them.
+        if (settings?.SkyGroupByIsland == true)
+        {
+            var islands = QuestChecklistLayout.SkyByIsland(
+                scoped, settings.SkyStepsUnderEveryIsland);
+
+            groups.AddRange(islands.Groups.Select(i => new CompanionChecklistGroup(
+                i.Heading,
+                // The island's own score, which is what makes "everything to collect on island
+                // N" checkable at a glance. Worded here rather than in Core because it is the
+                // phone's heading FORMAT — the desktop draws the same two numbers beside the
+                // heading and neither invents the numbers.
+                $"{i.Done} of {i.Total}",
+                [.. i.Rows.Select(IslandRow)],
+                // NO CLASS, and this is load-bearing. The page's class chips drop a group whose
+                // `class` is outside the pick, and an island group holds several classes at
+                // once — so naming one of them would hide the other two behind a chip, and
+                // naming none is what makes the chips stand down honestly. Same choice the ★
+                // Ready band already makes, for the same reason; `SkyIslandCrossClassNote`
+                // is the half that says so out loud.
+                Class: null,
+                Title: i.Heading)));
+
+            return new CompanionChecklistSection(
+                scoped.Sum(g => g.Done), scoped.Sum(g => g.Total), groups,
+                Note: IslandNote(islands));
+        }
+
         groups.AddRange(scoped.Select(g => new CompanionChecklistGroup(
             g.Heading,
             // A guided group leads with its guide caption ("Guide · 0 of 3 · 1 stub") and
@@ -169,6 +205,40 @@ public static partial class CompanionProjection
         return new CompanionChecklistSection(
             scoped.Sum(g => g.Done), scoped.Sum(g => g.Total), groups);
     }
+
+    /// <summary>One ISLAND row on the wire (DRA-164 D3) — the same
+    /// <see cref="GuideRows"/> shape with the owner joined onto the detail.
+    ///
+    /// <para>In class view the reward is the heading above the row; in island view nothing
+    /// above it says whose work it is, so the row has to — and it says it with Core's own
+    /// strings, which are the ones the desktop draws too. The CLASS leads the title
+    /// ("[Cleric] Wind Rune Fana", <c>SkyIslandRow.Title</c> — Founder CLARIFY 2026-09-17)
+    /// and the REWARD joins the detail. The desktop puts the reward in its own coloured run
+    /// and the phone joins it to the detail; the WORDS, and which of the two carries the
+    /// class, are one producer either way (#184).</para></summary>
+    private static CompanionChecklistRow IslandRow(QuestChecklistLayout.SkyIslandRow row)
+    {
+        var one = GuideRows(new QuestChecklistGroup("", "", [row.Row])).Single();
+        return one with
+        {
+            Text = row.Title,
+            Detail = one.Detail is { Length: > 0 } detail
+                ? row.Reward + " · " + detail
+                : row.Reward,
+        };
+    }
+
+    /// <summary>The island view's own notes, joined into the one sentence block the section
+    /// carries. Every word is Core's; this decides ORDER and nothing else — the cross-class
+    /// caveat first because it is about the controls the reader can see, then what was left
+    /// out and why.</summary>
+    private static string IslandNote(QuestChecklistLayout.SkyIslandLayout layout) =>
+        string.Join(" ", new[]
+        {
+            QuestChecklistLayout.SkyIslandCrossClassNote,
+            layout.TurnInNote,
+            layout.HiddenNote,
+        }.Where(s => s.Length > 0));
 
     /// <summary>
     /// One guided group's rows on the wire — <b>the one producer</b>, which Sky, Epic and the
@@ -256,7 +326,12 @@ public static partial class CompanionProjection
         // picked, the resolved list otherwise. Empty stays empty, which is what suppresses
         // band B — "only other classes want this" said about a class you actually play is the
         // one false claim this band exists to avoid, and no lens is not a wildcard.
-        var myClasses = req.Classes.Count > 0 ? req.Classes : req.CharacterClassNames;
+        //
+        // THE TERNARY WAS TYPED HERE and typed again in the desktop's render (DRA-181 D4,
+        // plan P5). Two copies agreed; the desktop's chip strip held a THIRD that did not,
+        // which is what made a deselected class keep a chip. Sharing the producer is what
+        // keeps "exactly as the desktop captures them" a fact rather than a comment.
+        var myClasses = QuestClassLens.Offered(req.Classes, req.CharacterClassNames);
         var leftovers = SkyLeftovers.Compute(
             req.Inventory, settings?.SkyQuestChecklist, settings?.SkyQuestCompleted,
             myClasses, req.Catalog);

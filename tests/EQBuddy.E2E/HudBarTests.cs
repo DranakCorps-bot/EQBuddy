@@ -170,7 +170,19 @@ public sealed class HudBarTests
         Wait.Until(() =>
         {
             var seen = app.DumpTexts("tick", "hudGlance");
-            if (seen[0] == lastTick || seen[0].Length == 0) return false;
+            // BOTH facts have to be there, not just the liveness one. A dump can carry an
+            // ADVANCING `tick` with no `hudGlance` beside it — `WidgetDump.MaybeWrite`'s
+            // catch writes precisely that shape (`tick=… dumpError=…`, every other key
+            // absent, so a stuck dump can still be told from a stopped app) — and
+            // `DumpTexts` answers an absent key "". Guarding only `tick` let such a sample
+            // into the set, where an absent row reads as a SECOND row the bar RENDERED:
+            // run 35191480659 failed `{"dps,hps,xp", ""}` on a .gitignore-only PR, naming
+            // the HUD for a frame nobody wrote. An empty `hudGlance` is a sample of NO
+            // frame, so it is not one of the five — which is also what the dump asks of a
+            // reader of an absent key ("a wait for one of them then times out on its own
+            // terms", WidgetDump): a state that never clears now fails HERE, as a timeout
+            // carrying error.log in the artifact, instead of as a HashSet diff.
+            if (seen[0] == lastTick || seen[0].Length == 0 || seen[1].Length == 0) return false;
             lastTick = seen[0];
             rows.Add(seen[1]);
             return ++renders >= 5;

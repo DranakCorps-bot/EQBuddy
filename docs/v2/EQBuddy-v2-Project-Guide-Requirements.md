@@ -54,9 +54,9 @@ It may track:
 
 It must **not** become a party/raid ranking tool, leaderboard, coaching score, or mechanism for judging other players.
 
-## 2.2 Log-only and local-first
+## 2.2 Your own files, and local-first
 
-Existing hard lines remain:
+EQBuddy's sources are the files the game writes for the player on their own PC: the `/log` it tails live, and the `/outputfile` dumps the player asks the game for. Existing hard lines remain:
 
 - no game-memory reads;
 - no packet inspection;
@@ -1025,7 +1025,7 @@ At minimum:
 | CC | mez/charm/slow/fade patterns |
 | Loot/Money | loot, coin, sale/trade events that feed supported stats |
 | Progress | skill-ups, AA, level |
-| Output files | inventory, achievements, factions |
+| Output files | inventory, achievements, faction, spellbook — the four `/outputfile` dumps `GameCommands` ships |
 | World | zone, loc, named kill, spawn evidence |
 
 ## ACCURACY-002 — Every parser escape becomes a permanent fixture

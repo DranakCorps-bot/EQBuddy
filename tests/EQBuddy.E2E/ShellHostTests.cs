@@ -1784,11 +1784,12 @@ public class ShellHostTests
         Assert.Equal(0, app.DumpValue("helperPickerOpen"));
 
         // Nothing picked is the "weigh everything" state, so the deferred goals all say so and
-        // the answerable ones name what they are missing. TWO since DRA-71 D7 — Farm Motes and
-        // Make Money gained engines and moved from deferrals to gaps, after Farm Gear did the
-        // same in D6. This is the row a slice that answers a goal is meant to edit.
+        // the answerable ones name what they are missing. ONE since DRA-149 D3 — Farm Materials
+        // gained an engine and moved from a deferral to a gap, after Farm Motes and Make Money
+        // did the same in D7 and Farm Gear in D6. This is the row a slice that answers a goal is
+        // meant to edit, and Achievements is the last one left to take it to zero.
         Assert.Equal("", app.DumpText("helperGoals"));
-        Assert.Equal(2, app.DumpValue("helperNotYet"));
+        Assert.Equal(1, app.DumpValue("helperNotYet"));
         Assert.True(app.DumpValue("helperGaps") > 0,
             $"no goal named the store it is waiting for; dump was: {app.Artifacts()}");
 
@@ -2225,7 +2226,17 @@ public class ShellHostTests
     [Fact]
     public void ArchivedThroughputReachesTheHelpersDrawnAnswers()
     {
-        using var app = new AppHarness(environment: OpenOn("helper"));
+        // **THE GOAL IS PICKED SINCE DRA-149 D3**, and the reason is this row's own premise.
+        // It used to weigh every goal and assert "the seeded session is the only one, so it is
+        // the only answer" — true while Farm Materials was Deferred, and false the moment that
+        // engine landed, because it answers out of the SHIPPED CATALOG and needs no stored play
+        // at all. Pinning the goal is what makes this a test about the throughput probe rather
+        // than about how many other engines happen to answer today; every later slice that
+        // answers a goal would otherwise move this number again.
+        var key = $"{AppHarness.Character}_{AppHarness.Server}".ToLowerInvariant();
+        using var app = new AppHarness(
+            configureSettings: s => s.HelperGoals[key] = [nameof(HelperGoal.LevelUp)],
+            environment: OpenOn("helper"));
         app.SeedStoredSession(
             "Najena 4 (Refined)", TimeSpan.FromHours(4), xpPercent: 32,
             dps: 42.0, hps: 0, combatSeconds: 3600, deaths: 0, activeFraction: 1.0,
@@ -2274,7 +2285,13 @@ public class ShellHostTests
     [Fact]
     public void ASessionWithNothingToDivideDrawsNoThroughputAndStillRanks()
     {
-        using var app = new AppHarness(environment: OpenOn("helper"));
+        // The goal this row prove-fails, picked — the same premise repair the row it guards
+        // took in DRA-149 D3. "Still ranks" is a claim about the experience engine, and it
+        // must not be satisfiable by some other engine answering about some other zone.
+        var key = $"{AppHarness.Character}_{AppHarness.Server}".ToLowerInvariant();
+        using var app = new AppHarness(
+            configureSettings: s => s.HelperGoals[key] = [nameof(HelperGoal.LevelUp)],
+            environment: OpenOn("helper"));
         app.SeedStoredSession(
             "Lower Guk", TimeSpan.FromHours(4), xpPercent: 32,
             dps: 0, hps: 0, combatSeconds: 0,
@@ -2318,7 +2335,18 @@ public class ShellHostTests
     [Fact]
     public void ArchivedMotesAndVendorSalesReachTheHelpersDrawnAnswers()
     {
-        using var app = new AppHarness(environment: OpenOn("helper"));
+        // The THREE engines this row is about, picked — see the throughput row above for why
+        // (DRA-149 D3). The join it asserts is between these three and nothing else, so a
+        // fourth engine answering about the same zone would make `helperTopGoals` pass for a
+        // reason this test does not mean.
+        var key = $"{AppHarness.Character}_{AppHarness.Server}".ToLowerInvariant();
+        using var app = new AppHarness(
+            configureSettings: s => s.HelperGoals[key] =
+            [
+                nameof(HelperGoal.LevelUp), nameof(HelperGoal.FarmMotes),
+                nameof(HelperGoal.MakeMoney),
+            ],
+            environment: OpenOn("helper"));
         app.SeedStoredSession(
             "Najena - Solo", TimeSpan.FromHours(4), xpPercent: 32,
             dps: 42.0, hps: 0, combatSeconds: 3600, deaths: 0, activeFraction: 1.0,
@@ -2397,7 +2425,17 @@ public class ShellHostTests
     [Fact]
     public void ASessionWithNoMotesDrawsNoMoteAnswerAndStillMakesMoney()
     {
-        using var app = new AppHarness(environment: OpenOn("helper"));
+        // The three goals this row prove-fails, picked — see the row above (DRA-149 D3). The
+        // silence it asserts is about the MOTE engine, so a fourth engine's row arriving would
+        // change `helperRecs` without changing anything this test means.
+        var key = $"{AppHarness.Character}_{AppHarness.Server}".ToLowerInvariant();
+        using var app = new AppHarness(
+            configureSettings: s => s.HelperGoals[key] =
+            [
+                nameof(HelperGoal.LevelUp), nameof(HelperGoal.FarmMotes),
+                nameof(HelperGoal.MakeMoney),
+            ],
+            environment: OpenOn("helper"));
         app.SeedStoredSession(
             "Najena - Solo", TimeSpan.FromHours(4), xpPercent: 32,
             dps: 42.0, hps: 0, combatSeconds: 3600, deaths: 0, activeFraction: 1.0,
@@ -2539,6 +2577,13 @@ public class ShellHostTests
         // because this fixture has never looted one of these.
         Assert.Equal(3, app.DumpValue("helperGearWhy"));
         Assert.Equal(0, app.DumpValue("helperGearSeen"));
+        // **DRA-84 D4: what each of those rows can now SAY.** Six item lines across the three
+        // drawn zones (3 + 2 + 1), and every one of them names a creature — the half of
+        // acceptance item 2 that read as empty on the Founder's build. None of the eight
+        // upgrades is anonymous, so nothing is withheld here; the row two below stages a fixture
+        // where the rule fires.
+        Assert.Equal(6, app.DumpValue("helperWho"));
+        Assert.Equal(0, app.DumpValue("helperWhoWithheld"));
         // Every gear line is catalog-sourced, so every one of them carries the estimate label.
         Assert.Equal(0, app.DumpValue("helperPersonalWhy"));
         Assert.True(app.DumpValue("helperCatalogWhy") >= 3,
@@ -2610,6 +2655,39 @@ public class ShellHostTests
         Assert.Equal(2, app.DumpValue("helperBandRefused"));
         Assert.Equal(1, app.DumpValue("helperBandLine"));
 
+        // **DRA-84 D5: the relationship, not the count** (plan P6). Two is equally the answer
+        // of a gate that refused these two zones off the wrong band, the wrong arm or a level
+        // it never read — the count moves for none of those. This asserts the comparison the
+        // gate actually made: eqlwiki's own `60+` for both zones, against the 28 asserted
+        // above, refused on the BOTTOM arm because 60 is 32 over 28 and `GearBandReachAbove`
+        // is 5. The TOP arm cannot appear here — an open-topped band has no maximum to be
+        // under — and a run that reported `TopUnder` would be the D2 ruling broken while both
+        // counts stayed green.
+        Assert.Equal("TempleofVeeshan:60+:BottomOver,Veeshan'sPeak:60+:BottomOver",
+            app.DumpText("helperBandRefusals"));
+
+        // **DRA-180 D2: THE ERA GATE IS WIRED AND DELIBERATELY DARK, and this is where that is
+        // checked in a launched app.**
+        //
+        // `WorldEra.Current` ships EMPTY (plan P2) — no file in this repo states what era the
+        // world is at and D2 refuses to invent one — so the gate stands down whole and this
+        // fixture behaves exactly as it did before the slice. `helperEraGate` is the LIVENESS
+        // fact and it is read FIRST: a zero refusal count below is the same zero on a build
+        // where the gate was never wired at all, which is the assertion DRA-149 D5 item 2 was
+        // caught by. `DumpValue` throws on a fact that is absent, so this line also proves the
+        // room is emitting it.
+        //
+        // **This test is D5's prediction pack anchor.** Kael Drakkel is drawn above and eqlwiki
+        // dates it to Velious. The day the curated world era is set to anything before Velious,
+        // `helperEraGate` becomes 1, Kael leaves `helperZones`, `helperEraRefused` becomes 1
+        // and `helperEraLine` becomes 1 — and this test reddens on all four at once, which is
+        // exactly the signal D5 wants rather than a silent change to a Founder's screen.
+        Assert.Equal(0, app.DumpValue("helperEraGate"));
+        Assert.Equal(0, app.DumpValue("helperEraRefused"));
+        Assert.Equal(0, app.DumpValue("helperMaterialEraRefused"));
+        // A gate that refused nothing must not draw a caption about refusing things.
+        Assert.Equal(0, app.DumpValue("helperEraLine"));
+
         // The sweep's own cap is untouched by the gate — two caps, two numbers, no wiring.
         Assert.Equal(103, app.DumpValue("helperGearWithheld"));
         Assert.Equal(3, app.DumpValue("helperRecs"));
@@ -2658,6 +2736,78 @@ public class ShellHostTests
             "every worn slot to sweep rather than only the picked one");
         Assert.Equal(225, app.DumpValue("helperGearWithheld"));
         Assert.Equal(3, app.DumpValue("helperGearWhy"));
+        Assert.Equal(0, app.DumpValue("helperDeadDoors"));
+
+        // **DRA-84 D4: every drawn item line can say what drops it.** Eight lines across three
+        // zones (Western Wastes and Temple of Veeshan name three apiece, Clan Runnyeye two),
+        // and none of the sixteen upgrades is anonymous, so the who rule withholds nothing here
+        // and the room draws no sentence about it. That zero is the PREDICTION and not a
+        // shrug — the row below stages a fixture where it fires.
+        Assert.Equal(8, app.DumpValue("helperWho"));
+        Assert.Equal(0, app.DumpValue("helperWhoWithheld"));
+        Assert.Equal(0, app.DumpValue("helperWhoLine"));
+    }
+
+    /// <summary>
+    /// **THE WHO RULE FIRING, IN THE LAUNCHED APP, AGAINST THE REAL CATALOG** (DRA-84 D4, plan
+    /// P3; Founder acceptance items 2 and 3).
+    ///
+    /// <para><b>Prediction, computed against the shipped catalog before the run</b> (trap 23).
+    /// A warrior in AC-2 <c>Cloth Gloves</c> with the sweep on every slot has one anchor; 97
+    /// catalog HANDS items beat it, the per-anchor cap keeps 8 and reports <b>89</b> withheld.
+    /// Those eight land in eleven zone buckets — and <b>five of the eleven come from one
+    /// record</b>, <c>Slime Blood of Cazic-Thule</c>, whose <c>DropZones</c> the promoter parsed
+    /// out of a bulleted wiki line as <c>Plane of Fear&lt;br&gt;</c>, <c>:* Fright</c>,
+    /// <c>:* Dread</c>, <c>:* Terror</c> and
+    /// <c>:* Cazic Thule (God) (needs confirmation)</c>.</para>
+    ///
+    /// <para><b>Those five are the Founder's "junk camps" arriving by a second mechanism the
+    /// plan did not foresee</b>, and the who rule removes all five — not because anyone taught
+    /// it to recognise a broken zone name, but because a string that is not a place has no
+    /// creature under it on the page either. <c>helperWhoWithheld</c> is <b>5</b>. The six real
+    /// zones survive, the top three are drawn, and all six of their item lines name a creature.
+    /// The promoter defect itself is filed for Fable — this slice does not parse wikitext.</para>
+    ///
+    /// <para><b>Both halves from one moment</b> (trap 56): the ENGINE's count
+    /// (<c>helperWhoWithheld</c>) beside whether the ROOM said so (<c>helperWhoLine</c>). A rule
+    /// that silently removed five camps would satisfy the first alone, which is the shape trap
+    /// 50 exists to refuse.</para>
+    /// </summary>
+    [Fact]
+    public void AnUpgradeNothingCanNameADropperForIsWithheldAndTheRoomSaysSo()
+    {
+        var key = $"{AppHarness.Character}_{AppHarness.Server}".ToLowerInvariant();
+        using var app = new AppHarness(
+            configureSettings: s =>
+            {
+                s.HelperGoals[key] = [nameof(HelperGoal.FarmGear)];
+                s.HelperGearIntent[key] = nameof(GearIntent.ReplaceSlot);
+            },
+            environment: OpenOn("helper"));
+        app.WriteInventoryDump(("Hands", "Cloth Gloves", 1));
+        app.Launch();
+
+        app.WaitForDump("shellPage", "helper", "the shell to land on the Helper room");
+        app.WaitForDump("helperWorn", "1", "the inventory dump to become one anchor");
+
+        app.WaitForDump("helperZones", "TempleofVeeshan,KaelDrakkel,DragonNecropolis",
+            "the who rule to drop the five phantom zones and rank the real ones");
+
+        // The ENGINE's count, and the ROOM's sentence about it.
+        Assert.Equal(5, app.DumpValue("helperWhoWithheld"));
+        Assert.Equal(1, app.DumpValue("helperWhoLine"));
+
+        // The sweep's own cap is a DIFFERENT number with a different cause, and folding the two
+        // together is precisely what this slice refused to do.
+        Assert.Equal(89, app.DumpValue("helperGearWithheld"));
+
+        // Every drawn item line answers WHO — three rows, six lines, six creatures.
+        Assert.Equal(3, app.DumpValue("helperRecs"));
+        Assert.Equal(3, app.DumpValue("helperGearWhy"));
+        Assert.Equal(6, app.DumpValue("helperWho"));
+        // Nothing in the fixture log looted any of these, so the personal half stays silent and
+        // every one of those six creatures came from the catalog.
+        Assert.Equal(0, app.DumpValue("helperGearSeen"));
         Assert.Equal(0, app.DumpValue("helperDeadDoors"));
     }
 
@@ -2789,6 +2939,112 @@ public class ShellHostTests
     }
 
     /// <summary>
+    /// **THE FOUNDER'S OWN DUMP, THROUGH THE REAL APP, WITH THE NUMBERS THE CHECKLIST PREDICTS**
+    /// (DRA-149 D5, plan P6).
+    ///
+    /// <para>The unit half of this lives in <c>FounderResmokeTests</c> and runs the engine
+    /// directly. This is the other claim: that those numbers survive the app — the tail, the
+    /// inventory watcher, the settings store, the room's own paint. "The engine computed it" and
+    /// "the screen shows it" are different claims (trap 56), and the screen is the one he
+    /// failed.</para>
+    ///
+    /// <para><b>It asserts RELATIONSHIPS, never the screen</b> (plan P6): the anchors, the unread
+    /// count, the candidate count, the band refusals and the who withholdings, dumped from ONE
+    /// moment, with the pair that tells the two empty gear screens apart at the centre of it.
+    /// <c>helperCandidates</c> is large and <c>helperGearWhy</c> is small — the gate removing
+    /// places, not the sweep failing to find any.</para>
+    ///
+    /// <para>Level 29 is the Founder's own, from the failing build, so the prediction is about
+    /// the screen he will actually open.</para>
+    /// </summary>
+    [Fact]
+    public void TheFoundersOwnDumpReachesTheHelperWithCandidatesAndRefusals()
+    {
+        var key = $"{AppHarness.Character}_{AppHarness.Server}".ToLowerInvariant();
+        using var app = new AppHarness(
+            configureSettings: s => s.HelperGoals[key] = [nameof(HelperGoal.FarmGear)],
+            environment: OpenOn("helper"));
+        app.WriteInventoryDumpFrom("dranak.txt");
+        app.SeedQuestLedger(statedLevel: (29, DateTime.Now.AddHours(-1)));
+        app.Launch();
+
+        app.WaitForDump("shellPage", "helper", "the shell to land on the Helper room");
+        // TWENTY-ONE, not twenty: the room counts every worn row, and the AMMO anchor is one of
+        // them. `GearUpgradesFixtureSweepTests` says 20 because it excludes AMMO deliberately —
+        // that is the one anchor that ALREADY worked before D1, and a floor met by it would be
+        // met by the thing that was never broken. Two numbers, two questions, both right.
+        app.WaitForDump("helperWorn", "21", "the Founder's readable worn rows");
+        app.WaitForDump("helperLevel", "29", "the seeded statement to be what the Helper ranks with");
+
+        // The gate is LIVE. A zero refusal count below is otherwise indistinguishable from a
+        // gate that never ran, which is exactly how this test first went green while `Bands`
+        // was null (trap 78).
+        Assert.Equal(1, app.DumpValue("helperBandGate"));
+
+        // **FAIL 1.** Every row he is wearing is readable now — the bow included, via D2's
+        // curated alias — so the unread caption is correctly ABSENT. Predicting the blank is
+        // what stops it reading as a missing feature.
+        Assert.Equal(0, app.DumpValue("helperUnreadWorn"));
+        Assert.Equal(0, app.DumpValue("helperUnreadLine"));
+
+        // **FAIL 2, and this is the pair.** The sweep found plenty; the gate removed places.
+        // Before D1 the first number was 0 for all 19 gear anchors and the screen looked the
+        // same as a refusal.
+        var candidates = app.DumpValue("helperCandidates");
+        var refused = app.DumpValue("helperBandRefused");
+        Assert.True(candidates >= 50, $"only {candidates} candidates for the Founder's dump");
+        Assert.True(refused >= 10, $"only {refused} zones refused at level 29");
+        Assert.True(candidates > refused);
+
+        // …and the ROOM said so, with rows left over. A gate that emptied the list would be a
+        // different screen and a different sentence.
+        Assert.Equal(1, app.DumpValue("helperBandLine"));
+        Assert.True(app.DumpValue("helperGearWhy") > 0, "the gate refused everything");
+        Assert.Equal(0, app.DumpValue("helperDeadDoors"));
+    }
+
+    /// <summary>
+    /// **THE VENDOR LINES ARE ON THE SCREEN, AND THE CAP IS WHY THERE ARE NOT MORE**
+    /// (DRA-149 D4, plan P5; the Founder's FAIL item 3, second half).
+    ///
+    /// <para>Three numbers from ONE moment (trap 56), and the assertion is the RELATIONSHIP
+    /// rather than any of them: <c>helperMerchantLines</c> is what the shipped catalog holds,
+    /// <c>helperMerchantRows</c> is what the room drew, and the second is bounded by the cap
+    /// times the eight rows above it. A room that read the catalog perfectly and drew nothing
+    /// satisfies the first two and fails the third — which is the professions block's own
+    /// <c>helperProfChips</c>/<c>helperProfRows</c> discipline, one sub-list in.</para>
+    ///
+    /// <para>The drop half's rows need a played session to rank; these need none, because they
+    /// are the catalog's and a player who has never logged in can still be told where a shop
+    /// is. That is the whole reason the vendor half is a different surface from D3's.</para>
+    /// </summary>
+    [Fact]
+    public void TheProfessionsBlockDrawsTheWikisVendorLinesUnderEachTrade()
+    {
+        using var app = new AppHarness(environment: OpenOn("helper"));
+        app.Launch();
+
+        app.WaitForDump("shellPage", "helper", "the shell to land on the Helper room");
+        app.WaitForDump("helperProfRows", 8, "the professions block to draw the curated eight");
+
+        var catalogLines = app.DumpValue("helperMerchantLines");
+        var catalogZones = app.DumpValue("helperMerchantZones");
+        var drawn = app.DumpValue("helperMerchantRows");
+
+        // The shipped file is not the empty one LoadEmbedded answers with when the resource is
+        // missing — a launched app is the only place that can say so about the packaged build.
+        Assert.True(catalogZones >= 40, $"the packaged catalog has only {catalogZones} zones");
+        Assert.True(catalogLines >= 300, $"the packaged catalog has only {catalogLines} lines");
+
+        // Drawn, capped, and fewer than the catalog holds — the cap doing its job rather than an
+        // empty fold, which is the pair a single number could not tell apart.
+        Assert.True(drawn > 0, "the professions block drew no vendor line");
+        Assert.True(drawn <= 8 * 3, $"{drawn} rows is more than eight professions capped at three");
+        Assert.True(drawn < catalogLines);
+        Assert.Equal(0, app.DumpValue("helperDeadDoors"));
+    }
+
+    /// <summary>
     /// **A SKILL-UP IN THE LOG BECOMES A STANDING ON THE SCREEN** — the writer and the reader
     /// in one assertion (trap 20), from a launched app.
     ///
@@ -2860,10 +3116,24 @@ public class ShellHostTests
         Assert.Equal(8, app.DumpValue("helperProfChips"));
         Assert.Equal("Baking·Pottery", app.DumpText("helperProfFace"));
         Assert.Equal(2, app.DumpValue("helperWatchPresets"));
-        // The goal is still Deferred — the ranking PARKED on its own evidence survey — so it
-        // says so under the answers while the block above it is full of the player's own
-        // professions. Both, from one Build.
-        Assert.Equal(1, app.DumpValue("helperNotYet"));
+
+        // **AND THE GOAL NOW ANSWERS** (DRA-149 D3). This row used to assert
+        // `helperNotYet == 1` — the ranking was PARKED on a survey of the wrong column — and
+        // the flip is the player-visible half of this slice: the block above is still full of
+        // the player's own professions, and under it there are now camps. Both, from one Build.
+        Assert.Equal(0, app.DumpValue("helperNotYet"));
+        app.WaitForDumpAtLeast("helperMaterialWhy", 1,
+            "the picked professions to produce a materials row");
+
+        // **THE PICK REACHED THE ENGINE, not just the picker.** Two rows in the block is a
+        // claim about a LIST; this is the claim that the SAME store narrowed what was RANKED,
+        // which is the whole of why the pick rides HelperInputs rather than stopping at the
+        // room (trap 4). Two numbers from one moment, and they are different claims (trap 56).
+        Assert.Equal("Baking,Pottery", app.DumpText("helperProfessions"));
+        // Every materials line names a creature — the who rule reaching the shipped catalog,
+        // which is the half the Founder failed the gear rows for.
+        Assert.True(app.DumpValue("helperMaterialNamed") > 0,
+            $"a materials row drew a line with nobody to kill; dump was: {app.Artifacts()}");
         Assert.Equal(0, app.DumpValue("helperDeadDoors"));
     }
 }

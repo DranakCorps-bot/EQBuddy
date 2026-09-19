@@ -105,11 +105,12 @@ public class HelperMustListTests
     /// be a deliberate line in a diff rather than something that happens as a side effect.
     /// Four in D1; Farm Gear joined them in DRA-71 D6; Farm Motes and Make Money in D7.</summary>
     [Fact]
-    public void SevenGoalsAreAnsweredInThisDelivery() =>
+    public void EightGoalsAreAnsweredInThisDelivery() =>
         Assert.Equal(
             [HelperGoal.LevelUp, HelperGoal.FarmGear, HelperGoal.UnlockClasses,
              HelperGoal.UnlockRaces, HelperGoal.FarmMotes, HelperGoal.WorkOnFaction,
-             HelperGoal.MakeMoney],
+             // DRA-149 D3: Farm Materials joined them. Achievements is the one still Deferred.
+             HelperGoal.FarmMaterials, HelperGoal.MakeMoney],
             Recommendations.All
                 .Where(g => Recommendations.ShapeFor(g) == HelperGoalShape.Answered)
                 .ToArray());
@@ -255,10 +256,12 @@ public class HelperMustListTests
         Assert.NotEmpty(HelperPresentation.DoorTip(new HelperDoor(kind, "Faydark Rangers")));
 
         var address = HelperPresentation.AddressFor(kind);
-        // DRA-71 D8 added the second wiki door, and it is listed here rather than pattern
-        // matched on the name: "a kind whose name starts with Wiki" is a proxy, and the fact
-        // is that these two open a browser (trap 64b).
-        if (kind is HelperDoorKind.WikiFaction or HelperDoorKind.WikiSkill)
+        // DRA-71 D8 added the second wiki door, DRA-149 D2 the third and DRA-149 D4 the fourth,
+        // and they are listed here rather than pattern matched on the name: "a kind whose name
+        // starts with Wiki" is a proxy, and the fact is that these four open a browser (trap
+        // 64b).
+        if (kind is HelperDoorKind.WikiFaction or HelperDoorKind.WikiSkill
+                 or HelperDoorKind.WikiItem or HelperDoorKind.WikiZone)
         {
             Assert.Null(address);
             return;
@@ -426,6 +429,21 @@ public class HelperMustListTests
             {
                 Name = "Froglok Bone Helm", StatsText = "Slot: HEAD\nAC: 9",
                 Slots = ["HEAD"], Ac = 9, DropZones = ["Lower Guk"],
+                // DRA-84 D4: a drop offer with no creature to name is withheld, so a fixture
+                // that named nobody would stop this must-list proving what it is about.
+                DropMobs = new() { ["Lower Guk"] = ["a froglok knight"] },
+            },
+            // DRA-149 D3: a tradeskill INGREDIENT in the same zone, for the reason the gear
+            // record above is in the same zone — a materials answer that named somewhere with
+            // no band could not be affected by the level under any reading, and "differs at two
+            // levels" would then be proving something else. It carries a recipe heading so
+            // TradeskillMaterials admits it, and a creature so the who rule keeps it.
+            new ItemCatalog.Record
+            {
+                Name = "Bloodstone", StatsText = "Lore Item",
+                Recipes = ["Jewelcrafting", "Bloodstone Earring (Trivial: 102)"],
+                DropZones = ["Lower Guk"],
+                DropMobs = new() { ["Lower Guk"] = ["a froglok shaman"] },
             },
         ]);
 
@@ -508,6 +526,16 @@ public class HelperMustListTests
         // prints with two denominations, so a sentence that dropped one would be visible.
         if (type == typeof(long)) return 320L;
         if (type == typeof(Evidence)) return Evidence.Personal;
+        // DRA-84 D4: a fact may carry a LIST of names now (the plural WHO). Two entries rather
+        // than one, so a sentence that joined them wrongly — or printed only the first, which
+        // is precisely what this slice replaced — comes out visibly wrong in the sweep.
+        if (type == typeof(IReadOnlyList<string>))
+            return new List<string> { "a froglok knight", "a froglok shaman" };
+        // DRA-149 D3: the materials fact names the profession it belongs to. Jewelcrafting is
+        // the Founder's own example and is the one whose NAME differs from its AA's spelling,
+        // so a sentence that reached for the AA instead of Tradeskills.For().Name reads wrong
+        // in the sweep rather than merely being unproven.
+        if (type == typeof(Tradeskill)) return Tradeskill.Jewelcrafting;
         throw new InvalidOperationException(
             $"A WhyFact takes a {type.Name}, which this fixture cannot make up. Add an arm — "
             + "the sweep is only as complete as the values it can construct.");

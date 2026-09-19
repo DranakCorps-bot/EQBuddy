@@ -274,9 +274,9 @@ def curated_flags(changed_titles):
     return flags
 
 
-def run(script):
+def run(script, *args):
     print(f"== {script.name}", flush=True)
-    r = subprocess.run([sys.executable, str(script)], cwd=str(script.parent))
+    r = subprocess.run([sys.executable, str(script), *args], cwd=str(script.parent))
     if r.returncode != 0:
         raise RuntimeError(f"{script.name} exited {r.returncode}")
 
@@ -307,7 +307,14 @@ def main():
     if not articles and not templates:
         report += ["", "No wiki changes in the window — catalogs already current."]
         REPORT.write_text("\n".join(report) + "\n", encoding="utf-8")
-        STATE.write_text(json.dumps({"since": newest, "ranAt": now}, indent=1),
+        # `since` advances; `ranAt` does NOT. Nothing was promoted on this path, and `ranAt`'s
+        # only consumer is the `retrievedAt` guides-transform bakes into HarvestedGuides — so
+        # advancing it here would date the committed file to a run that never rebuilt it, and
+        # the `generated` gate would redden on the stamp alone with no data behind it. Keeping
+        # it is also the truer claim: the date means "the last refresh that rebuilt these", and
+        # on a quiet week that is still the previous one.
+        keep = json.loads(STATE.read_text(encoding="utf-8"))["ranAt"] if STATE.exists() else now
+        STATE.write_text(json.dumps({"since": newest, "ranAt": keep}, indent=1),
                          encoding="utf-8")
         print("No changes; done.")
         return
@@ -319,7 +326,14 @@ def main():
     for script in HARVESTERS:
         run(WIKI / script)
     for script in PROMOTIONS:
-        run(script)
+        # guides-transform bakes the refresh date into every guide's `retrievedAt`. Hand it
+        # the stamp THIS run is about to write, rather than letting it read the state we have
+        # not written yet: it would take the PREVIOUS run's date, the stamp below would then
+        # advance past it, and `--check` would redden on a date the committed file cannot
+        # have — with the data identical (trap 74's "compare the thing the claim is about",
+        # from the other side). The state write stays LAST so a promotion that throws cannot
+        # leave the window advanced past pages nobody processed.
+        run(script, *(["--stamp", now] if script.name == "guides-transform.py" else []))
 
     changed_catalogs = [n for n in PROMOTED if file_hash(DATA / n) != before[n]]
     report += ["## Promoted catalogs",

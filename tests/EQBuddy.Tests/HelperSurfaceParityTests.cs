@@ -172,10 +172,75 @@ public class HelperSurfaceParityTests
         var request = Request(inputs, HelperGoal.FarmGear);
         var desktop = Recommendations.Rank(request.Inputs, request.Goals);
 
-        var said = HelperPresentation.GearBandRefused(desktop.GearBandRefusals);
+        var said = HelperPresentation.BandRefused(desktop.GearBandRefusals, HelperPresentation.BandRefusedUpgrades);
         Assert.NotEmpty(desktop.GearBandRefusals);
         Assert.NotEqual("", said);
         Assert.Equal(said, Phone(request).GearBandRefused);
+    }
+
+    /// <summary>
+    /// **AND SO DOES A WITHHELD DROP OFFER** (DRA-84 D4, plan P3). Same shape one rule on: the
+    /// PC dropped an offer because nothing could say what drops it, and a phone that listed one
+    /// fewer row without a word would be the two surfaces disagreeing about the list again.
+    ///
+    /// <para>Its fixture makes a real withhold — a catalog record whose page names nobody, in a
+    /// zone the band gate keeps — and asserts the count is non-zero BEFORE comparing the
+    /// sentences, because "" == "" is what a guard aimed at nothing looks like (trap 78).</para>
+    /// </summary>
+    [Fact]
+    public void AWithheldDropOfferSaysSoOnThePhoneToo()
+    {
+        var inputs = Inputs(new ResolvedLevel(30, LevelSource.Observed, DateTime.Now)) with
+        {
+            Worn = [new WornItem("Rusty Helm", "Rusty Helm", "HEAD",
+                ItemStatsBlock.Parse(["Slot: HEAD", "AC: 4"]))],
+            Items = new ItemCatalog([
+                new ItemCatalog.Record
+                {
+                    Name = "Bone Helm", StatsText = "Slot: HEAD\nAC: 9",
+                    Slots = ["HEAD"], Ac = 9, DropZones = ["Lower Guk"],
+                },
+            ]),
+        };
+        var request = Request(inputs, HelperGoal.FarmGear);
+        var desktop = Recommendations.Rank(request.Inputs, request.Goals);
+
+        var said = HelperPresentation.DropOffersWithheld(desktop.GearWhoWithheld);
+        Assert.True(desktop.GearWhoWithheld > 0);
+        Assert.NotEqual("", said);
+        Assert.Equal(said, Phone(request).GearWhoWithheld);
+    }
+
+    /// <summary>
+    /// **AND THE CREATURES THEMSELVES RIDE THE WIRE** (trap 32). The who clause is part of the
+    /// why-line's own sentence rather than a field of its own, so this asserts the phone's TEXT
+    /// carries the names — a projection that dropped them would still match on every field name.
+    /// </summary>
+    [Fact]
+    public void ThePhonesRowNamesTheSameCreaturesAsThePcs()
+    {
+        var record = new ItemCatalog.Record
+        {
+            Name = "Bone Helm", StatsText = "Slot: HEAD\nAC: 9",
+            Slots = ["HEAD"], Ac = 9, DropZones = ["Lower Guk"],
+            DropMobs = new() { ["Lower Guk"] = ["a froglok knight", "a froglok shaman"] },
+        };
+        var inputs = Inputs(new ResolvedLevel(30, LevelSource.Observed, DateTime.Now)) with
+        {
+            Worn = [new WornItem("Rusty Helm", "Rusty Helm", "HEAD",
+                ItemStatsBlock.Parse(["Slot: HEAD", "AC: 4"]))],
+            Items = new ItemCatalog([record]),
+        };
+        var request = Request(inputs, HelperGoal.FarmGear);
+        var desktop = Recommendations.Rank(request.Inputs, request.Goals);
+
+        var fact = Assert.Single(desktop.Top[0].Why.OfType<GearUpgradeFact>());
+        Assert.Equal(["a froglok knight", "a froglok shaman"], fact.Who);
+
+        var lines = Phone(request).Answers.SelectMany(a => a.Why).Select(w => w.Text).ToList();
+        Assert.Contains(lines,
+            text => text.Contains("a froglok knight and a froglok shaman drop it",
+                StringComparison.Ordinal));
     }
 
     /// <summary>The Helper names the level it used, on both screens, off the one readout.
@@ -402,18 +467,268 @@ public class HelperSurfaceParityTests
                      HelperPresentation.DoorsOnPc,
                      HelperPresentation.Nothing.Heading,
                      HelperPresentation.MoneyPriceNote,
+                     HelperPresentation.GearBaseClaimNote,
                      HelperPresentation.CatalogLabel,
+                     // DRA-149 D3: the materials block's own note. It is the one new SENTENCE
+                     // this slice sends, and the page must not have learned to say it (trap 32).
+                     HelperPresentation.ProfessionsFarmNote,
+                     // DRA-149 D4: the vendor block's source caption and the honest empty state
+                     // for a trade no zone page names. Both ride the wire; neither is in the
+                     // page.
+                     HelperPresentation.MerchantsNote,
+                     HelperPresentation.NoMerchantsFor(Tradeskill.Fletching),
                  })
             Assert.DoesNotContain(sentence, html, StringComparison.Ordinal);
 
         // …and it draws what it is sent, or every field above is decoration.
+        //
+        // **DRA-84 D5: this list is the half that goes stale** (trap 34). It was written when
+        // the screen had one gear caption, and D2 and D4 each added another without adding a
+        // row here — so `h.gearWhoWithheld` reached the wire, reached the fingerprint, passed
+        // every parity assertion in this file, and was never drawn: five offers vanished off
+        // the phone in silence, which is the exact failure trap 50 exists to refuse. The
+        // staged shot found it. Every caption the page is sent is named below; a sixth one
+        // added without a row here is the same bug again.
         foreach (var field in new[]
                  {
                      "renderHelper", "h.question", "h.picksLead", "h.answersHeading",
-                     "h.sourceNote", "h.levelNote", "h.moneyNote", "h.cap", "h.gearWithheld",
+                     "h.sourceNote", "h.levelNote", "h.moneyNote", "h.gearBaseNote", "h.cap",
+                     "h.gearWithheld", "h.gearBandRefused", "h.gearWhoWithheld",
+                     // DRA-149 D2's caption and its doors, added in the SAME slice as the field
+                     // — which is the whole of what D5's lesson was.
+                     "h.unreadWorn", "h.unreadWornDoors",
+                     // DRA-149 D3's three, added in the SAME slice as the fields — D5's lesson,
+                     // and the reason this half of the list exists at all. Two of them are
+                     // counts the desktop room draws as its own captions; the third is the
+                     // block note above.
+                     "h.materialNote", "h.materialBandRefused", "h.materialWhoWithheld",
+                     // DRA-149 D4's three, added in the SAME slice as the fields. `m.lines` and
+                     // `m.empty` are named as well as the block: a page that drew the heading
+                     // and neither of those would pass on the block's row alone, which is
+                     // exactly the shape D5 got caught by.
+                     "h.merchants", "h.merchantNote", "h.merchantDoorNote",
+                     "m.profession", "m.lines", "m.more", "m.empty",
+                     // DRA-180 D2's two era captions, added in the SAME slice as the fields.
+                     // The era gate runs BEFORE the band gate, so these name refusals the band
+                     // sentence never mentions: a page that drew only the band ones would show
+                     // a shorter list than the PC with nothing on screen explaining why.
+                     "h.gearEraRefused", "h.materialEraRefused",
+                     // DRA-180 D3's per-anchor answer and its cap, added in the SAME slice as
+                     // the fields. BOTH are named rather than just the list: a page that looped
+                     // the sentences and dropped the cap line would pass on one row while
+                     // silently swallowing every anchor past the third, which is trap 50 wearing
+                     // D5's clothes.
+                     "h.anchorsAllRemoved", "h.anchorsNotNamed",
                      "h.doorsLead", "h.empty", "h.gaps", "h.deferred",
                  })
             Assert.Contains(field, html, StringComparison.Ordinal);
+    }
+
+    // ---- DRA-149 D2: the unread worn rows reach the phone -----------------------------
+
+    /// <summary>
+    /// **A worn row the PC could not read is said on the phone too, in the same words.**
+    ///
+    /// <para>The sentence is <see cref="HelperPresentation"/>'s, not the projection's, and the
+    /// doors are one wiki search per NAMED item — capped the same way the caption is, so the
+    /// list under it can never be longer than the list in it.</para>
+    /// </summary>
+    [Fact]
+    public void TheUnreadWornSentenceAndItsDoorsRideTheWire()
+    {
+        IReadOnlyList<string> unread =
+            ["Deterioriated Ancient Faydark Longbow +2", "Lute +1", "Shiny Brass Shield +6",
+             "Mystery Pauldrons"];
+
+        var phone = Phone(Request(
+            Inputs() with { UnreadWorn = unread }, HelperGoal.FarmGear));
+
+        Assert.Equal(HelperPresentation.UnreadWorn(unread), phone.UnreadWorn);
+        Assert.Equal(HelperPresentation.UnreadWornNamed, phone.UnreadWornDoors.Count);
+        Assert.All(phone.UnreadWornDoors, d =>
+        {
+            Assert.Equal("eqlwiki", d.Label);
+            // The tip rides the ROW, because a phone has no pointer (trap 35).
+            Assert.Contains("never fetches", d.Detail);
+        });
+        // Each door is about one of the NAMED items, in the caption's own order.
+        Assert.Contains("Deterioriated Ancient Faydark Longbow +2", phone.UnreadWornDoors[0].Detail);
+        Assert.Contains("Lute +1", phone.UnreadWornDoors[1].Detail);
+    }
+
+    // ---- DRA-180 D2: the era gate's refusals reach the phone ---------------------------
+
+    /// <summary>
+    /// **A place the PC refused for its ERA is refused on the phone too, in the same words.**
+    ///
+    /// <para>The sentence is <see cref="HelperPresentation"/>'s, not the projection's — the
+    /// phone decides no word (DRA-71 D9). It matters more here than for the band caption,
+    /// because the era gate runs FIRST: a phone carrying only the band sentence would draw a
+    /// shorter list than the PC with nothing on screen accounting for the difference, which is
+    /// the DRA-84 D5 miss wearing a new field.</para>
+    /// </summary>
+    [Fact]
+    public void TheEraRefusalSentenceRidesTheWireInThePresentationsOwnWords()
+    {
+        var record = new ItemCatalog.Record
+        {
+            Name = "Blade of Carnage",
+            StatsText = "Slot: PRIMARY\nAC: 20",
+            Slots = ["PRIMARY"],
+            Ac = 20,
+            DropZones = ["Kael Drakkel"],
+            DropMobs = new Dictionary<string, List<string>>(StringComparer.OrdinalIgnoreCase)
+            {
+                ["Kael Drakkel"] = ["a Kromrif general"],
+            },
+        };
+
+        var inputs = Inputs() with
+        {
+            Worn = [new WornItem("Rusty Blade", "Rusty Blade", "PRIMARY",
+                ItemStatsBlock.Parse(["Slot: PRIMARY", "AC: 2"]))],
+            Items = new ItemCatalog([record]),
+            GearIntent = GearIntent.UpgradeWorn,
+            Eras = new ZoneEras(
+                new Dictionary<string, ZoneEras.Banner>
+                {
+                    ["Kael Drakkel"] = new("Velious", "{{Velious Era}}"),
+                },
+                new Dictionary<string, string>()),
+            World = "Classic",
+        };
+
+        var set = Recommendations.Rank(inputs, [HelperGoal.FarmGear]);
+        Assert.NotEmpty(set.GearEraRefusals);
+
+        var phone = Phone(Request(inputs, HelperGoal.FarmGear));
+
+        Assert.Equal(
+            HelperPresentation.EraRefused(
+                set.GearEraRefusals, HelperPresentation.BandRefusedUpgrades),
+            phone.GearEraRefused);
+        // The words themselves, so a producer that started answering "" could not pass by
+        // agreeing with itself.
+        Assert.Contains("Kael Drakkel (Velious)", phone.GearEraRefused);
+        Assert.Contains("Classic", phone.GearEraRefused);
+    }
+
+    /// <summary>The committed negative: a character whose places are all in reach is sent no
+    /// era sentence at all, so the caption can never appear over a list the gate refused
+    /// nothing from.</summary>
+    [Fact]
+    public void APhoneWithNothingEraRefusedIsSentNoEraSentence()
+    {
+        var phone = Phone(Request(Inputs(), HelperGoal.FarmGear));
+
+        Assert.Empty(phone.GearEraRefused);
+        Assert.Empty(phone.MaterialEraRefused);
+    }
+
+    /// <summary>Nothing unread, nothing sent — the committed negative, so a phone with nothing
+    /// wrong in its dump does not draw an empty caption and a row of doors pointing at
+    /// nothing.</summary>
+    [Fact]
+    public void APhoneWithNothingUnreadIsSentNeitherSentenceNorDoors()
+    {
+        var phone = Phone(Request(Inputs(), HelperGoal.FarmGear));
+
+        Assert.Empty(phone.UnreadWorn);
+        Assert.Empty(phone.UnreadWornDoors);
+    }
+
+    /// <summary>The unread sentence is in the push key: it NAMES its items, so a new dump that
+    /// changes which of them EQBuddy cannot read moves nothing else on this screen (trap
+    /// 72).</summary>
+    [Fact]
+    public void AChangedUnreadListWakesThePairedDevice()
+    {
+        string Print(HelperInputs inputs) => CompanionProjection.SectionFingerprints(
+            CompanionProjection.Build(
+                new CompanionInputs
+                {
+                    Character = "Dranak", AppVersion = "2.0.0",
+                    Offered = CompanionSurfaces.All,
+                    Helper = Request(inputs, HelperGoal.FarmGear),
+                },
+                DateTime.Now))[CompanionSurfaces.Helper];
+
+        var clean = Inputs();
+        Assert.NotEqual(
+            Print(clean),
+            Print(clean with { UnreadWorn = ["Deterioriated Ancient Faydark Longbow +2"] }));
+        // A SWAP, which a count would not see.
+        Assert.NotEqual(
+            Print(clean with { UnreadWorn = ["Lute +1"] }),
+            Print(clean with { UnreadWorn = ["Mystery Pauldrons"] }));
+    }
+
+    // ---- DRA-149 D4: the vendor half reaches the phone --------------------------------
+
+    /// <summary>
+    /// **The phone lists the SAME shops, in the same words, for the same eight professions.**
+    ///
+    /// <para>The projection chooses nothing: every line is
+    /// <c>HelperPresentation.MerchantsShown</c>'s, which is the desktop room's own call, and the
+    /// professions are <c>TradeskillPickStore.ListedFrom</c>'s — so "picked nothing" resolves to
+    /// the same eight rows on both surfaces rather than to a second reading of what empty
+    /// means.</para>
+    /// </summary>
+    [Fact]
+    public void TheVendorLinesRideTheWireForEveryListedProfession()
+    {
+        var phone = Phone(Request(Inputs(), HelperGoal.FarmMaterials));
+
+        Assert.Equal(Tradeskills.All.Count, phone.Merchants.Count);
+        Assert.Equal(HelperPresentation.MerchantsNote, phone.MerchantNote);
+        // The door is INTENT, said once (trap 35): no link, and the sentence that says what is
+        // behind it.
+        Assert.Contains("never fetches it for you", phone.MerchantDoorNote);
+
+        foreach (var skill in Enum.GetValues<Tradeskill>())
+        {
+            var block = phone.Merchants.Single(m => m.Profession == Tradeskills.For(skill).Name);
+            var shown = HelperPresentation.MerchantsShown(ZoneMerchants.Default, skill);
+
+            Assert.Equal([.. shown.Select(HelperPresentation.MerchantRow)], block.Lines);
+            // The two states are never both set: a block either has lines or says why it has
+            // none, and the page draws whichever is there rather than deciding which case it is.
+            Assert.True(block.Lines.Count == 0 ^ block.Empty.Length == 0);
+        }
+    }
+
+    /// <summary>The committed negative: a player who picked only Level Up gets no vendor block,
+    /// and — the part that is easy to miss — no caption over it either. A source note printed
+    /// above nothing is the disclosure-line rule broken one block along.</summary>
+    [Fact]
+    public void APhoneThatDidNotPickMaterialsIsSentNoVendorBlockAndNoCaptionForIt()
+    {
+        var phone = Phone(Request(Inputs(), HelperGoal.LevelUp));
+
+        Assert.Empty(phone.Merchants);
+        Assert.Empty(phone.MerchantNote);
+        Assert.Empty(phone.MerchantDoorNote);
+    }
+
+    /// <summary>A profession SWAP moves the push key. It is trap 72's own shape: one pick out
+    /// and one in leaves every count on this screen unmoved, so a fingerprint that folded counts
+    /// would leave the phone drawing the trade the player just deselected.</summary>
+    [Fact]
+    public void ASwappedProfessionPickWakesThePairedDevice()
+    {
+        string Print(params Tradeskill[] professions) => CompanionProjection.SectionFingerprints(
+            CompanionProjection.Build(
+                new CompanionInputs
+                {
+                    Character = "Dranak", AppVersion = "2.0.0",
+                    Offered = CompanionSurfaces.All,
+                    Helper = new CompanionHelperRequest(
+                        Inputs(), [HelperGoal.FarmMaterials], professions, Tradeskills.All.Count),
+                },
+                DateTime.Now))[CompanionSurfaces.Helper];
+
+        Assert.NotEqual(Print(Tradeskill.Jewelcrafting), Print(Tradeskill.Pottery));
+        Assert.NotEqual(Print(Tradeskill.Jewelcrafting), Print());
     }
 
     // ---- trap 72 / trap 8: the push gate ---------------------------------------------

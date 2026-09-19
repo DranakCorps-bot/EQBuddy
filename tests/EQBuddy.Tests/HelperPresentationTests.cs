@@ -155,7 +155,24 @@ public class HelperPresentationTests
             AssertClean(HelperPresentation.WithheldWhy(n), $"WithheldWhy({n})");
             AssertClean(HelperPresentation.FactionPickerCapNote(n), $"FactionPickerCapNote({n})");
             AssertClean(HelperPresentation.GearWithheld(n), $"GearWithheld({n})");
+            AssertClean(HelperPresentation.DropOffersWithheld(n), $"GearWhoWithheld({n})");
         }
+
+        // DRA-149 D2's unread sentence, at every shape it has: silent, one, exactly the name
+        // cap, and past it. It names ITEMS rather than places, which is a different way into
+        // the same temptation — "nothing better in that slot" is a claim about the game, and
+        // this sentence's whole subject is EQBuddy's own catalog.
+        foreach (var unread in new IReadOnlyList<string>[]
+                 {
+                     [],
+                     ["Deterioriated Ancient Faydark Longbow +2"],
+                     ["Shiny Brass Shield +6", "Lute +1", "Mystery Pauldrons"],
+                     [
+                         "Shiny Brass Shield +6", "Lute +1", "Mystery Pauldrons",
+                         "Cracked Staff +3", "Bronze Greaves",
+                     ],
+                 })
+            AssertClean(HelperPresentation.UnreadWorn(unread), $"UnreadWorn({unread.Count})");
 
         // **DRA-84 D2's refusal sentence, at the values that would most tempt an adjective.**
         // "eqlwiki lists its creatures at 5-20 and you are 30" is a place somebody would
@@ -175,11 +192,30 @@ public class HelperPresentationTests
                          new("Befallen", 7, 25, "7-25", 60, GearBandArm.TopUnder),
                      ],
                  })
-            AssertClean(HelperPresentation.GearBandRefused(refusals),
+            AssertClean(HelperPresentation.BandRefused(refusals, HelperPresentation.BandRefusedUpgrades),
                 $"GearBandRefused({refusals.Count})");
 
         foreach (var (min, max) in new (int, int?)[] { (5, 20), (12, 12), (50, null) })
             AssertClean(HelperPresentation.BandPhrase(min, max), $"BandPhrase({min},{max})");
+
+        // **DRA-180 D3's per-anchor sentence, and it is the one most likely to grow an
+        // adjective.** It is the only line on this screen that says "nothing here beats what
+        // you are wearing", which is one word away from "your gear is good" — a claim about
+        // the player rather than about the catalog. Every cause combination, singular and
+        // plural, plus the cap line.
+        foreach (var anchor in new GearAnchorRemoved[]
+                 {
+                     new("Deteriorated Ancient Faydark Longbow", "RANGE", 2, 0, 2, 0),
+                     new("The Baron's Blade", "PRIMARY", 1, 1, 0, 0),
+                     new("Rusty Helm", "HEAD", 1, 0, 0, 1),
+                     new("Rusty Helm", "HEAD", 3, 1, 1, 1),
+                     new("Rusty Helm", "HEAD", 8, 4, 3, 1),
+                 })
+            AssertClean(HelperPresentation.AnchorAllRemoved(anchor),
+                $"AnchorAllRemoved({anchor.Anchor}/{anchor.Found})");
+
+        foreach (var held in new[] { 0, 1, 5 })
+            AssertClean(HelperPresentation.AnchorsNotNamed(held), $"AnchorsNotNamed({held})");
 
         foreach (var maxed in new[] { false, true })
             AssertClean(
@@ -669,6 +705,98 @@ public class HelperPresentationTests
             HelperPresentation.Gap(new GoalGap(HelperGoal.WorkOnFaction, reason)),
             StringComparison.OrdinalIgnoreCase);
 
+    // ---- DRA-149 D2: the unread worn sentence ------------------------------------------
+
+    /// <summary>
+    /// **The Founder's bow, said out loud** — the sentence names it under the spelling the game
+    /// printed, counts it, and puts the subject on EQBuddy's catalog rather than on the game.
+    /// </summary>
+    [Fact]
+    public void TheUnreadSentenceNamesTheItemTheDumpNamed()
+    {
+        var said = HelperPresentation.UnreadWorn(["Deterioriated Ancient Faydark Longbow +2"]);
+
+        Assert.Contains("Deterioriated Ancient Faydark Longbow +2", said);
+        // Singular, because a sentence that says "1 things" reads as a bug in the sentence and
+        // makes a player doubt the number beside it.
+        Assert.Contains("1 thing you are wearing", said);
+        Assert.DoesNotContain("1 things", said);
+        // The subject. "That item does not exist" would be a claim about the world; what
+        // happened is that a name matched nothing EQBuddy ships.
+        Assert.Contains("EQBuddy has never read about", said);
+        Assert.Contains("item pages EQBuddy ships", said);
+    }
+
+    /// <summary>A cap that hid how much it was hiding is the silence this sentence exists to
+    /// end (trap 50). Three are named, the REST are counted, and the leading number is the
+    /// WHOLE count rather than the named one.</summary>
+    [Fact]
+    public void TheUnreadSentenceNamesThreeAndCountsTheRest()
+    {
+        var said = HelperPresentation.UnreadWorn(
+            ["First Thing", "Second Thing", "Third Thing", "Fourth Thing", "Fifth Thing"]);
+
+        Assert.Equal(3, HelperPresentation.UnreadWornNamed);
+        Assert.Contains("5 things you are wearing", said);
+        Assert.Contains("First Thing, Second Thing, Third Thing, and 2 more", said);
+        Assert.DoesNotContain("Fourth Thing", said);
+        // Exactly at the cap it counts nothing, rather than saying "and 0 more".
+        Assert.DoesNotContain("more",
+            HelperPresentation.UnreadWorn(["First Thing", "Second Thing", "Third Thing"]));
+    }
+
+    /// <summary>Nothing unread says NOTHING — the committed negative, so a caption that had
+    /// learned to fire always fails here rather than over a room with nothing wrong in
+    /// it.</summary>
+    [Fact]
+    public void AnUnreadSentenceWithNothingToSayIsSilent()
+    {
+        Assert.Empty(HelperPresentation.UnreadWorn([]));
+        Assert.Empty(HelperPresentation.UnreadWorn(null!));
+    }
+
+    /// <summary>
+    /// **The unreadable-dump gap must not ask for the dump again.**
+    ///
+    /// <para>That is the whole reason it is not <see cref="GoalGapReason.NoInventoryDump"/>: the
+    /// player has run the command, and telling them to run it produces the same unreadable rows
+    /// forever. The two sentences are asserted against each other so a later edit cannot quietly
+    /// converge them.</para>
+    /// </summary>
+    [Fact]
+    public void TheUnreadableDumpGapDoesNotAskForAnotherDump()
+    {
+        var unreadable = HelperPresentation.Gap(
+            new GoalGap(HelperGoal.FarmGear, GoalGapReason.NothingWornIsReadable));
+        var missing = HelperPresentation.Gap(
+            new GoalGap(HelperGoal.FarmGear, GoalGapReason.NoInventoryDump));
+
+        Assert.DoesNotContain("Run the inventory command", unreadable);
+        Assert.Contains("Run the inventory command", missing);
+        Assert.NotEqual(missing, unreadable);
+        // It says the dump ARRIVED, which is the fact that makes the two different.
+        Assert.Contains("your inventory dump is here", unreadable);
+        Assert.Contains("eqlwiki", unreadable);
+    }
+
+    /// <summary>The item door is a SEARCH and says so: it exists because the name matched no
+    /// page, so "open its page" would promise the thing that just failed. And like every wiki
+    /// door it says EQBuddy fetches nothing.</summary>
+    [Fact]
+    public void TheItemWikiDoorOffersASearchAndFetchesNothing()
+    {
+        var tip = HelperPresentation.DoorTip(new HelperDoor(
+            HelperDoorKind.WikiItem, "Deterioriated Ancient Faydark Longbow +2"));
+
+        Assert.Contains("Search eqlwiki", tip);
+        Assert.Contains("Deterioriated Ancient Faydark Longbow +2", tip);
+        Assert.Contains("never fetches", tip);
+        Assert.Equal("eqlwiki", HelperPresentation.DoorLabel(HelperDoorKind.WikiItem));
+        // A page is not a room — the null arm is a real answer, and a caller that read it as
+        // "no door" would drop the only affordance this caption has.
+        Assert.Null(HelperPresentation.AddressFor(HelperDoorKind.WikiItem));
+    }
+
     /// <summary>"Nothing left" is not worded as a gap in the data. A finished job and a
     /// missing file are different answers and a player can act on only one of them.</summary>
     [Fact]
@@ -774,10 +902,10 @@ public class HelperPresentationTests
     [Fact]
     public void TheParkNoteNamesTheCoverageItMeasured()
     {
-        var (pages, naming) = CategorySurvey();
+        var (pages, recipes) = RecipeSurvey();
 
-        Assert.Contains(pages.ToString("N0"), HelperPresentation.ProfessionsParkNote);
-        Assert.Contains(naming.ToString("N0"), HelperPresentation.ProfessionsParkNote);
+        Assert.Contains(pages.ToString("N0"), HelperPresentation.ProfessionsFarmNote);
+        Assert.Contains(recipes.ToString("N0"), HelperPresentation.ProfessionsFarmNote);
     }
 
     /// <summary>
@@ -792,9 +920,61 @@ public class HelperPresentationTests
             "EQBuddy does not rank where to farm materials yet. Of the 10,957 item pages it "
             + "has read, 14 say which profession an ingredient belongs to.";
 
-        var (pages, _) = CategorySurvey();
+        var (pages, _) = RecipeSurvey();
 
         Assert.DoesNotContain(pages.ToString("N0"), stale);
+    }
+
+    /// <summary>
+    /// **THE PARK'S OWN NUMBER MUST NOT BE THE ONE ON SCREEN** (DRA-149 D3).
+    ///
+    /// <para>The sentence this replaced was measured on <c>[[Category:…]]</c> — "14 of 11,197
+    /// pages name a profession" — and it was TRUE the whole time it was wrong to print: it
+    /// answered a different question from the one the block asks. The report carries both
+    /// columns, so the committed negative is that the profession-CATEGORY count is not what the
+    /// farming sentence quotes; a future edit that reached for the familiar number would go red
+    /// here rather than telling players EQBuddy cannot do a thing it now does.</para>
+    /// </summary>
+    [Fact]
+    public void TheFarmNoteQuotesTheRecipesColumnAndNotTheCategoriesOne()
+    {
+        var (_, naming) = CategorySurvey();
+        var (_, recipes) = RecipeSurvey();
+
+        Assert.NotEqual(naming, recipes);
+        Assert.DoesNotContain(
+            $"{naming:N0} say which profession", HelperPresentation.ProfessionsFarmNote);
+    }
+
+    /// <summary>The recipes column's two numbers, read from the same committed report the
+    /// category survey is read from and for the same reason: the sentence must not be the only
+    /// producer of a number it states as a measurement (trap 4). A parse that yields nothing is
+    /// itself a failure (trap 78).</summary>
+    private static (int Pages, int Recipes) RecipeSurvey()
+    {
+        var report = Report();
+
+        var pages = Regex.Match(report,
+            @"item pages with at least one Category:\s*[\d,]+\s+of\s+([\d,]+)");
+        var recipes = Regex.Match(report,
+            @"pages with a recipes field:\s*([\d,]+)");
+
+        Assert.True(pages.Success && recipes.Success,
+            "items-catalog-report.md did not yield the recipe survey numbers — "
+            + "itemcatalog-build's report format moved and this guard stopped measuring "
+            + "anything.");
+
+        return (int.Parse(pages.Groups[1].Value.Replace(",", "")),
+                int.Parse(recipes.Groups[1].Value.Replace(",", "")));
+    }
+
+    /// <summary>The committed promoter report, which both surveys above read.</summary>
+    private static string Report()
+    {
+        var repoRoot = Path.GetFullPath(Path.Combine(
+            AppContext.BaseDirectory, "..", "..", "..", "..", ".."));
+        return File.ReadAllText(Path.Combine(
+            repoRoot, "scripts", "harvests", "eqlwiki", "items-catalog-report.md"));
     }
 
     /// <summary>The two numbers the promoter's own survey printed, read from the committed
@@ -802,10 +982,7 @@ public class HelperPresentationTests
     /// went missing measures nothing at all (trap 78).</summary>
     private static (int Pages, int Naming) CategorySurvey()
     {
-        var repoRoot = Path.GetFullPath(Path.Combine(
-            AppContext.BaseDirectory, "..", "..", "..", "..", ".."));
-        var report = File.ReadAllText(Path.Combine(
-            repoRoot, "scripts", "harvests", "eqlwiki", "items-catalog-report.md"));
+        var report = Report();
 
         var pages = Regex.Match(report,
             @"item pages with at least one Category:\s*[\d,]+\s+of\s+([\d,]+)");
@@ -861,20 +1038,132 @@ public class HelperPresentationTests
     }
 
     /// <summary>
-    /// **The deferral says which HALF is missing** (DRA-71 D8).
+    /// **THE DEFERRAL IS GONE AND NOTHING MAY SAY OTHERWISE** (DRA-149 D3, plan P4).
     ///
-    /// <para>Farm Materials is still not ranked, and the block above it is now full of the
-    /// player's own numbers. A sentence that just said "not ranking this one yet" over that
-    /// block would read as the block having failed, so it names the thing that is absent —
-    /// WHERE to farm — and the reason.</para>
+    /// <para>This test used to assert that Farm Materials' deferral named the half that was
+    /// missing — "not ranking WHERE to farm the materials yet". D3 built that half, so the
+    /// sentence had to leave with the shape, and the FLIP is what gets asserted now: an engine
+    /// that answers must not also carry a sentence telling players it does not. The pairing
+    /// guard beside this one (<c>EveryDeferredGoalNamesTheRoomThatAnswersItToday</c>) covers
+    /// the other direction — a Deferred goal with no sentence.</para>
+    ///
+    /// <para><b>The block's own note is asserted here too, because that is where the promise
+    /// moved.</b> The professions block still explains itself; what it says changed from "this
+    /// is not ranked" to where the rows below it came from and what has no page at all.</para>
     /// </summary>
     [Fact]
-    public void TheMaterialsDeferralNamesTheHalfThatIsMissing()
+    public void FarmMaterialsNoLongerCarriesADeferralSentence()
     {
-        var line = HelperPresentation.NotAnsweredYet(HelperGoal.FarmMaterials);
+        Assert.Equal(HelperGoalShape.Answered, Recommendations.ShapeFor(HelperGoal.FarmMaterials));
+        Assert.Empty(HelperPresentation.NotAnsweredYet(HelperGoal.FarmMaterials));
+        Assert.Null(HelperPresentation.NotAnsweredDoor(HelperGoal.FarmMaterials));
 
-        Assert.Contains("professions", line, StringComparison.OrdinalIgnoreCase);
-        Assert.Contains("WHERE to farm", line, StringComparison.OrdinalIgnoreCase);
+        var note = HelperPresentation.ProfessionsFarmNote;
+        Assert.Contains("recipe", note, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain("does not rank", note, StringComparison.OrdinalIgnoreCase);
+        // The honest gap MOVED rather than closed, and the sentence still carries it — bought,
+        // foraged and crafted ingredients have no drop page, which is the whole of Fletching.
+        Assert.Contains("foraged", note, StringComparison.OrdinalIgnoreCase);
+    }
+
+    // ---- DRA-180 D3: the per-anchor sentence's subject rules --------------------------
+
+    /// <summary>
+    /// **THE SUBJECT IS EQBUDDY'S CATALOG, NEVER THE GAME** — the never-BiS lock, restated for
+    /// the one sentence on this screen that could most easily break it.
+    ///
+    /// <para>"Nothing in reach beats this item's base" is a claim about what EQBuddy has READ
+    /// and what its own gates did with it. It is one careless edit away from "this is the best
+    /// bow in the game", which the catalog cannot support and which the Gear Locker has refused
+    /// to say since #104. The sentence must lead with what EQBuddy found, name its own reading
+    /// as the source, and never generalise past it.</para>
+    /// </summary>
+    [Fact]
+    public void ThePerAnchorSentenceSpeaksAboutWhatEqbuddyReadAndNotAboutTheGame()
+    {
+        var said = HelperPresentation.AnchorAllRemoved(
+            new GearAnchorRemoved("Deteriorated Ancient Faydark Longbow", "RANGE", 2, 0, 2, 0));
+
+        // It leads with the FINDING. "EQBuddy has read about 2 better base items" is the
+        // evidence that the sweep ran, and an empty screen's whole problem was that it was
+        // indistinguishable from one that had not.
+        Assert.Contains("EQBuddy has read about", said);
+        Assert.Contains("2 better base items", said);
+        // It names the worn item, because a caption about a zone does not answer a question
+        // about a bow — which is the entire reason this record exists.
+        Assert.Contains("Deteriorated Ancient Faydark Longbow", said);
+        Assert.Contains("range", said);
+        // It cites eqlwiki as the source of the numbers that removed them.
+        Assert.Contains("eqlwiki", said);
+
+        // And it makes no claim about the game or about the player.
+        foreach (var forbidden in new[]
+                 {
+                     "best in slot", "best-in-slot", "your gear is", "nothing in the game",
+                     "no better", "you are well equipped", "perfect",
+                 })
+            Assert.DoesNotContain(forbidden, said, StringComparison.OrdinalIgnoreCase);
+    }
+
+    /// <summary>
+    /// **A CAUSE THAT REMOVED NOTHING IS NOT NAMED** (plan D3: a sentence about a gate that did
+    /// not run is furniture).
+    ///
+    /// <para>This is live on every shipped build, not a hypothetical: <c>WorldEra.Current</c> is
+    /// empty, so the era gate stands down, so <c>LaterContent</c> is 0 for every player today.
+    /// A sentence reading "0 come from content eqlwiki dates later than…" would be EQBuddy
+    /// explaining a rule it did not apply.</para>
+    /// </summary>
+    [Fact]
+    public void OnlyTheCausesThatRemovedSomethingAppearInThePerAnchorSentence()
+    {
+        var bandOnly = HelperPresentation.AnchorAllRemoved(
+            new GearAnchorRemoved("Rusty Helm", "HEAD", 2, 0, 2, 0));
+        Assert.Contains("creature levels outside yours", bandOnly);
+        Assert.DoesNotContain("later than the era", bandOnly);
+        Assert.DoesNotContain("name nothing that drops them", bandOnly);
+
+        var eraOnly = HelperPresentation.AnchorAllRemoved(
+            new GearAnchorRemoved("Rusty Helm", "HEAD", 2, 2, 0, 0));
+        Assert.Contains("later than the era", eraOnly);
+        Assert.DoesNotContain("creature levels outside yours", eraOnly);
+
+        // All three, and the list reads as a sentence rather than as three sentences.
+        var all = HelperPresentation.AnchorAllRemoved(
+            new GearAnchorRemoved("Rusty Helm", "HEAD", 3, 1, 1, 1));
+        Assert.Contains("later than the era", all);
+        Assert.Contains("creature levels outside yours", all);
+        Assert.Contains("name nothing that drops them", all);
+        Assert.Contains(", ", all);
+        Assert.Contains(" and ", all);
+
+        // Nothing found at all is not this sentence's subject — NoCatalogUpgrade owns it.
+        Assert.Equal("", HelperPresentation.AnchorAllRemoved(
+            new GearAnchorRemoved("Rusty Helm", "HEAD", 0, 0, 0, 0)));
+    }
+
+    /// <summary>Singular and plural are both written out, because "1 better base items" is the
+    /// tell that a sentence was never read at the value it will most often be produced at.
+    /// </summary>
+    [Fact]
+    public void ThePerAnchorSentenceReadsAtOneAsWellAsAtMany()
+    {
+        var one = HelperPresentation.AnchorAllRemoved(
+            new GearAnchorRemoved("Rusty Helm", "HEAD", 1, 0, 1, 0));
+        Assert.Contains("1 better base item ", one);
+        Assert.Contains("left it out", one);
+        Assert.Contains("1 drops only where", one);
+
+        var many = HelperPresentation.AnchorAllRemoved(
+            new GearAnchorRemoved("Rusty Helm", "HEAD", 4, 0, 4, 0));
+        Assert.Contains("4 better base items", many);
+        Assert.Contains("left every one out", many);
+        Assert.Contains("4 drop only where", many);
+
+        // The cap line is silent at zero and says the number otherwise (trap 50).
+        Assert.Equal("", HelperPresentation.AnchorsNotNamed(0));
+        Assert.Contains("1 more worn item ", HelperPresentation.AnchorsNotNamed(1));
+        Assert.Contains("5 more worn items", HelperPresentation.AnchorsNotNamed(5));
     }
 }
 

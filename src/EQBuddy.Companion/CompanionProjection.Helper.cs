@@ -44,6 +44,15 @@ public static partial class CompanionProjection
         // appear over a list with no price in it nor be missing from one that has.
         var money = answers.Top.Any(r => r.Why.Any(w => w is SellableDropFact or CatalogValueFact));
 
+        // DRA-149 D1, the same rule one caveat along: the sweep compares base numbers, so the
+        // phone says so wherever a gear row was built — once for the block, never per row.
+        var gearBase = answers.Top.Any(r => r.Why.Any(w => w is GearUpgradeFact));
+
+        // DRA-149 D4. Built before the record so the two captions over it can be withheld with
+        // it — a phone that printed "shops eqlwiki's zone maps name" over nothing would be the
+        // disclosure-line rule broken one block along.
+        var merchants = Merchants(request);
+
         return new CompanionHelperSection(
             Question: HelperPresentation.RoomQuestion,
             PicksLead: HelperPresentation.PicksOnPc,
@@ -57,12 +66,62 @@ public static partial class CompanionProjection
             LevelNote: empty ? "" : LevelReadout.UsedByHelper(request.Inputs.Level),
             Answers: [.. answers.Top.Select(Answer)],
             MoneyNote: money ? HelperPresentation.MoneyPriceNote : "",
+            GearBaseNote: gearBase ? HelperPresentation.GearBaseClaimNote : "",
             Cap: HelperPresentation.Cap(answers.Withheld),
             GearWithheld: HelperPresentation.GearWithheld(answers.GearWithheld),
             // DRA-84 D2. Same words, same producer, same wire — a refusal the PC made and the
             // phone did not mention would be the two surfaces disagreeing about what the list
             // contains, and every sentence rides the wire rather than index.html (trap 32).
-            GearBandRefused: HelperPresentation.GearBandRefused(answers.GearBandRefusals),
+            GearBandRefused: HelperPresentation.BandRefused(
+                answers.GearBandRefusals, HelperPresentation.BandRefusedUpgrades),
+            // DRA-180 D2, the same discipline one axis over. The era gate runs BEFORE the band
+            // gate, so these are refusals the band sentence will never mention — a phone that
+            // carried only the band caption would draw a shorter list than the PC with no
+            // sentence explaining the difference.
+            GearEraRefused: HelperPresentation.EraRefused(
+                answers.GearEraRefusals, HelperPresentation.BandRefusedUpgrades),
+            MaterialEraRefused: HelperPresentation.EraRefused(
+                answers.MaterialEraRefusals, HelperPresentation.BandRefusedMaterials),
+            // DRA-84 D4, same rule one slice on: a drop offer the PC withheld for having no
+            // creature to name is withheld on the phone too, and says so in the same words.
+            GearWhoWithheld: HelperPresentation.DropOffersWithheld(answers.GearWhoWithheld),
+            // DRA-149 D3: the SAME two rules over the materials list, on their own two fields
+            // rather than folded into the gear ones — the desktop room draws four captions here
+            // and the phone must draw the same four or the two surfaces disagree about what the
+            // list contains. The professions note rides too, because it is the sentence saying
+            // where these rows came FROM.
+            // **DRA-180 D3, and it is the reason the phone half of this slice is not optional.**
+            // Every caption on this record counts PLACES; these count the player's own worn
+            // items, which is the question that produced the FAIL. A phone that drew the band
+            // and era sentences and not these would show the player the same list as the PC and
+            // still leave the bow unexplained. Capped and worded HERE by the same producer the
+            // room calls, so the projection decides no word and no number (trap 33).
+            AnchorsAllRemoved: [.. answers.GearAnchorsRemoved
+                .Take(HelperPresentation.GearAnchorsNamed)
+                .Select(HelperPresentation.AnchorAllRemoved)],
+            AnchorsNotNamed: HelperPresentation.AnchorsNotNamed(
+                answers.GearAnchorsRemoved.Count
+                - Math.Min(answers.GearAnchorsRemoved.Count, HelperPresentation.GearAnchorsNamed)),
+            MaterialBandRefused: HelperPresentation.BandRefused(
+                answers.MaterialBandRefusals, HelperPresentation.BandRefusedMaterials),
+            MaterialWhoWithheld: HelperPresentation.DropOffersWithheld(answers.MaterialWhoWithheld),
+            MaterialNote: answers.Top.Any(r => r.Why.Any(w => w is TradeskillMaterialFact))
+                ? HelperPresentation.ProfessionsFarmNote : "",
+            // DRA-149 D4, the vendor half. Both captions ride the wire rather than index.html
+            // (trap 32), and the door is INTENT: the phone cannot open a browser on the PC, so
+            // it gets the sentence saying what is behind it, once (trap 35).
+            MerchantNote: merchants.Count == 0 ? "" : HelperPresentation.MerchantsNote,
+            MerchantDoorNote: merchants.Count == 0
+                ? ""
+                : HelperPresentation.DoorTip(new HelperDoor(HelperDoorKind.WikiZone, "")),
+            Merchants: merchants,
+            // DRA-149 D2, and it arrives WITH its doors in the same slice — DRA-84 D5's lesson
+            // was that a caption which reaches the wire and is never drawn passes every test in
+            // the parity suite, so the page-side must-list gains its row here too (trap 34).
+            UnreadWorn: HelperPresentation.UnreadWorn(answers.UnreadWorn),
+            UnreadWornDoors: Doors([.. answers.UnreadWorn
+                .Take(HelperPresentation.UnreadWornNamed)
+                .Select(item => new HelperDoor(HelperDoorKind.WikiItem, item))]),
             Gaps: [.. answers.Gaps.Select(Gap)],
             Deferred: [.. answers.NotAnsweredYet.Select(Deferred)],
             Empty: empty
@@ -153,6 +212,38 @@ public static partial class CompanionProjection
         return picks;
     }
 
+    /// <summary>
+    /// **THE VENDOR HALF, PORTED** (DRA-149 D4, plan P5).
+    ///
+    /// <para>One entry per LISTED profession — <c>TradeskillPickStore.ListedFrom</c>, so "picked
+    /// nothing" means the same eight here as it does on the PC — and the lines inside each are
+    /// <c>HelperPresentation.MerchantsShown</c>'s, which is the desktop room's own call. The
+    /// projection chooses no line, no order and no cap.</para>
+    ///
+    /// <para>Gated on the same condition the desktop room draws the professions block on: the
+    /// goal is picked, or nothing is. An empty list is what a player who picked only Level Up
+    /// gets, and it withholds the two captions with it.</para>
+    /// </summary>
+    private static List<CompanionHelperMerchants> Merchants(CompanionHelperRequest r)
+    {
+        if (r.Goals.Count != 0 && !r.Goals.Contains(HelperGoal.FarmMaterials)) return [];
+
+        var rows = new List<CompanionHelperMerchants>();
+        foreach (var skill in TradeskillPickStore.ListedFrom(r.Professions))
+        {
+            var shown = HelperPresentation.MerchantsShown(ZoneMerchants.Default, skill);
+            rows.Add(new CompanionHelperMerchants(
+                Tradeskills.For(skill).Name,
+                [.. shown.Select(HelperPresentation.MerchantRow)],
+                shown.Count == 0
+                    ? ""
+                    : HelperPresentation.MerchantsCapped(
+                        shown.Count, ZoneMerchants.Default.ZonesFor(skill)),
+                shown.Count == 0 ? HelperPresentation.NoMerchantsFor(skill) : ""));
+        }
+        return rows;
+    }
+
     /// <summary>How many unlock subjects the picker is offering — the desktop room's own
     /// arithmetic, which is per SECTION: a player who picked only races is offered only
     /// races, and a face that counted both halves would say "of 31" over a list of 12.</summary>
@@ -238,7 +329,30 @@ public static partial class CompanionProjection
         // DRA-84 D2: the refusal sentence carries the level and the bands, so it moves when a
         // ding changes which zones the gate refuses even though no other field here does
         // (trap 72 — the repaint gate must see the store the feature writes).
-        h.MoneyNote, h.Cap, h.GearWithheld, h.GearBandRefused,
+        // DRA-149 D2: the unread sentence NAMES its items, so it moves when a new dump changes
+        // which of them EQBuddy cannot read even though no count beside it does (trap 72).
+        // DRA-149 D3: the materials captions ride too, and the band one for the same reason the
+        // gear band one does — it quotes the level, so a ding moves it while every count here
+        // stands still.
+        // DRA-180 D2: the era captions fold too. They quote the WORLD's era, which is a
+        // curated value a build can change without moving a single count beside it (trap 72).
+        h.MoneyNote, h.GearBaseNote, h.Cap, h.GearWithheld, h.GearBandRefused,
+        h.GearEraRefused, h.MaterialEraRefused,
+        h.GearWhoWithheld, h.UnreadWorn,
+        // DRA-180 D3: the per-anchor sentences fold as LINES, never as a count. They NAME the
+        // worn item and carry its three cause numbers, so swapping one picked anchor for another
+        // — or a ding moving which of its candidates the band gate takes — rewrites them while
+        // every count on this record stands still (trap 72, and trap 8's other half: nothing in
+        // them drifts on a tick).
+        Join(h.AnchorsAllRemoved, a => a), h.AnchorsNotNamed,
+        h.MaterialBandRefused, h.MaterialWhoWithheld, h.MaterialNote,
+        // DRA-149 D4: the vendor blocks fold their LINES, not a count. The profession PICK is
+        // what moves them, and a pick swapped one-for-one leaves every count here unmoved
+        // (trap 72's own shape) — Jewelcrafting out and Pottery in is eight rows before and
+        // eight rows after. The lines are transcribed wiki prose: no clock, no age, nothing
+        // that drifts on a tick (trap 8).
+        Join(h.Merchants, m => m.Profession + "=" + Join(m.Lines, l => l) + "|" + m.More
+            + "|" + m.Empty),
         Join(h.Gaps, g => g.Text + "|" + g.Prompt?.Command),
         Join(h.Deferred, d => d.Text),
         h.Empty?.Heading);

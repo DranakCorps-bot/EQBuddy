@@ -2,9 +2,12 @@
 
 **Immutable. Nothing here is live, and nothing here is a work queue.**
 
-Rotated out of the active channel files on **2026-09-14** by DRA-75 (M0-2),
-under the DRA-73 plan rev 2 approved by David on 2026-09-14.
-`exo-experiment: channel-rotation`. Tier T1.
+Rotated out of the active channel files in two passes: **2026-09-14** by DRA-75
+(M0-2) under the DRA-73 plan rev 2 approved by David on 2026-09-14, and
+**2026-09-17** by DRA-165 (DRA-144 F1) under DRA-26 plan §5 as David SIGNed it
+2026-09-17T01:06:45Z. `exo-experiment: channel-rotation`. Tier T1.
+Pass 2 appended into the existing `FABLE-FEEDBACK.md` archive; it moved nothing
+that pass 1 had already written.
 
 Holds live in `HELM.md` and **only Helm lifts one**. An archived line never
 revives a hold and never commissions work. If you are looking for something to
@@ -18,8 +21,11 @@ do, the inboxes are `SCRIBE.md`, `BEVEL.md` and `FABLE.md` — not this director
 |---|---:|---:|---|---|
 | [`HELM-FEEDBACK.md`](HELM-FEEDBACK.md) | 390 | 1,914,317 | 5.0 MB → 117 KB (24 entries) | everything below the readable 2026-09-09+ set |
 | [`FABLE-FEEDBACK.md`](FABLE-FEEDBACK.md) | 139 | 1,006,791 | 1.1 MB → 174 KB (35 entries) | before 2026-09-08 |
+| [`FABLE-FEEDBACK.md`](FABLE-FEEDBACK.md) *(pass 2)* | 49 | 226,720 | 265 KB → 39 KB (10 entries) | before 2026-09-15 |
 
-No pending ask was archived. The live `HELM-FEEDBACK.md` asks — including the
+No pending ask was archived in either pass — pass 2's 18 candidate ask/hold
+markers were each dispositioned before the move and all 18 were already discharged,
+so nothing needed re-pinning.  The live `HELM-FEEDBACK.md` asks — including the
 unsigned **PR #606** DRA-71 D9 ask — are still in the active file.
 
 ### Three files, and which one to read
@@ -32,6 +38,31 @@ unsigned **PR #606** DRA-71 D9 ask — are still in the active file.
   entries that moved. Do not try to read it; do not edit it.
 - **`FABLE-FEEDBACK.md`** — a straight date rotation of an uncorrupted file, so
   it needs no counterpart.
+
+### None of the three gets repaired — including the mojibake (ruled 2026-09-17)
+
+All three files carry mojibake: ~57k cp437 occurrences in the flattened one, 5,429 cp1252 in
+`HELM-FEEDBACK.md`, 1,527 in `FABLE-FEEDBACK.md`. They are **OUT of scope for repair, permanently** —
+ruled on DRA-160 and recorded with its byte evidence in `DECISIONS.md` (DRA-161). The "do not edit it"
+above was written for the flattened file alone, and that gap is exactly what let the card be raised.
+One reason each, and they are three different reasons:
+
+- **`HELM-FEEDBACK.original-flattened.md`** — corrupt on purpose: it is the checkability exhibit
+  described above and the only clean-checkout fixture the cp437 detector has.
+- **`HELM-FEEDBACK.md`** — from offset 5,808 to end it is the `f4af3b5f` blob carried verbatim, and all
+  5,429 of its markers are inside that region, so repairing them breaks both the verbatim claim below
+  and what `channel-rotate.py verify` asserts — while git keeps the same markers in that blob anyway.
+- **`FABLE-FEEDBACK.md`** — its marker count is identical to the pre-rotation blob's. Rotation moved
+  those bytes; it did not create them.
+
+**The rule behind all three:** a rotated archive copy is not an independent site of corruption. Rotation
+is a one-way move of bytes already immutable in git, so repairing the copy removes nothing from the
+record — it only makes the archive diverge from the revisions it was cut from. Repair pays on the live
+files at the repo root, and that work is done (DRA-55, DRA-119). It never pays here.
+
+The DRA-55 Helm LOCK — *"Soft LEAVE inventing archive repair without separate Helm ruling."* — **stays
+live.** The ruling above declines to seek repair; it does not lift the LOCK. Wanting these files
+repaired later still needs a real, separate Helm ruling.
 
 ### A transcript is not a map, and the doc sweep had to learn the difference
 

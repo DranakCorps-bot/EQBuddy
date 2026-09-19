@@ -612,6 +612,115 @@ public class ScreenshotFixtureTests
     }
 
     /// <summary>
+    /// **The Plane of Sky ISLAND view, for EQBuddy Mobile** (DRA-164 D3).
+    ///
+    /// <para>The phone reads the PC's own <c>SkyGroupByIsland</c> and calls the same
+    /// <c>QuestChecklistLayout.SkyByIsland</c> from the same point — so this fixture is
+    /// staged by flipping ONE setting on a shipped checklist, which is exactly what a player
+    /// does. Anything else would be a fixture in the wrong shape rendering a state that is
+    /// real (trap 23).</para>
+    ///
+    /// <para>PREDICTION, derived from the shipped <c>SkyQuestDefaults</c> before the run. Nine
+    /// groups, ascending, with these counts:</para>
+    ///
+    /// <code>
+    ///   Island 2               0/2      Island 7                0/20
+    ///   Island 3               0/16     Island 8                0/16
+    ///   Island 4               0/15     Islands 1.5 · 4 · 8     0/22
+    ///   Island 5               0/17     Anywhere on the plane   0/94
+    ///   Island 6               0/18
+    /// </code>
+    ///
+    /// <para>220 rows, not 222: the Bard's Ervaj's Flute of Flight is turned in, so its two
+    /// rows are hidden — one from Island 5 (18→17) and one from "Anywhere" (95→94) — and the
+    /// section's note must SAY that one reward is not listed. That is the point of staging a
+    /// completed reward rather than a clean profile: an exclusion nobody can see fire is an
+    /// exclusion nobody can review.</para>
+    ///
+    /// <para><b>No ledger, so these are the CLASSIC rows</b> — a fresh profile's state, and the
+    /// one where the island fact comes from each step's own <c>Source</c> prose rather than a
+    /// guide's stage name. The guided half is covered by <c>SkyIslandPlacementSweepTests</c>
+    /// over the real catalog; this frame is about what the PHONE draws.</para>
+    ///
+    ///     dotnet test --filter WriteSkyIslandSnapshot -e EQBUDDY_SHOOT=1 -e EQBUDDY_SHOOT_SKY_ISLAND=&lt;path&gt;
+    ///     pwsh scripts/mobile-harness.ps1 -Snapshot &lt;path&gt; -Screenshot
+    /// </summary>
+    [Fact]
+    public void WriteSkyIslandSnapshot()
+    {
+        if (Environment.GetEnvironmentVariable("EQBUDDY_SHOOT") != "1") return;
+        var outPath = Environment.GetEnvironmentVariable("EQBUDDY_SHOOT_SKY_ISLAND");
+        if (string.IsNullOrWhiteSpace(outPath)) return;
+
+        var now = new DateTime(2026, 9, 17, 9, 30, 0);
+        var settings = new AppSettings();
+        settings.ApplyDefaultSkyQuestChecklist();   // the shipped catalog, not a hand list
+        settings.SkyGroupByIsland = true;           // the ONE thing a player flips
+        settings.SkyQuestCompleted.Add(
+            QuestChecklistLayout.RewardKey("Bard", "Ervaj's Flute of Flight"));
+
+        var catalog = QuestCatalog.LoadEmbedded();
+        var snap = CompanionProjection.Build(new CompanionInputs
+        {
+            Character = "Dranak",
+            AppVersion = UpdateChecker.CurrentVersion.ToString(),
+            Offered = [CompanionSurfaces.Quests],
+            Stats = new StatsSnapshot { CurrentZone = "Plane of Sky" },
+            Settings = settings,
+            Quests = new CompanionQuestRequest
+            {
+                Catalog = catalog,
+                CharacterClassNames = ["Warrior", "Monk", "Druid"],
+                ClassSource = ClassSource.Achievements,
+            },
+            QuestIndex = CompanionQuestIndex.Build(catalog),
+            Theme = CompanionTheme.Project("ParchmentBrass",
+                EQBuddy.UI.Shared.ThemePalettes.For("ParchmentBrass")),
+        }, now);
+
+        File.WriteAllText(outPath!, JsonSerializer.Serialize(snap, CompanionSnapshot.JsonOpts));
+
+        // The prediction above, as assertions. A shot whose numbers were not predicted in
+        // advance has not been reviewed (trap 23).
+        var islands = snap.Quests!.Sky.Groups.Where(g => g.Tickable).ToList();
+        Assert.Equal(
+            [("Island 2", "0 of 2"), ("Island 3", "0 of 16"), ("Island 4", "0 of 15"),
+             ("Island 5", "0 of 17"), ("Island 6", "0 of 18"), ("Island 7", "0 of 20"),
+             ("Island 8", "0 of 16"), ("Islands 1.5 · 4 · 8", "0 of 22"),
+             ("Anywhere on the plane", "0 of 94")],
+            islands.Select(g => (g.Heading, g.Note)));
+        Assert.Equal(220, islands.Sum(g => g.Rows.Count));
+
+        // The note is on the WIRE — the exclusion and the reason the class chips stand down.
+        Assert.NotNull(snap.Quests.Sky.Note);
+        Assert.Contains(QuestChecklistLayout.SkyIslandCrossClassNote, snap.Quests.Sky.Note);
+        Assert.Contains("1 turned-in reward is not listed here", snap.Quests.Sky.Note);
+
+        // And every row still says whose work it is, because no heading does any more — since
+        // D4 by PREFIXING the class (Founder CLARIFY 2026-09-17, plan P8), with the reward
+        // leading the detail beside it and the class said ONCE.
+        //
+        // **The class is read back out of the row rather than compared to a list.** This
+        // fixture is the phone's, and the phone is not narrowed to the played classes — all
+        // sixteen are on this wire — so a three-name list would fail on a Wizard row that is
+        // perfectly correct. The bracket is asserted to hold a REAL class name instead.
+        Assert.All(islands.SelectMany(g => g.Rows), r =>
+        {
+            var close = r.Text.IndexOf("] ", StringComparison.Ordinal);
+            Assert.True(r.Text.StartsWith('[') && close > 1,
+                $"island row '{r.Text}' carries no class prefix");
+            var named = r.Text[1..close];
+            Assert.Contains(named, QuestClassFilter.Classes);
+            // …and the REWARD beside it does not repeat that class. Scoped to the reward
+            // segment on purpose: the rest of the detail is the drop location, and one of the
+            // shipped NPCs is called "Wizard Schrock" — a whole-string check here would be
+            // reading the game's own naming as our redundancy.
+            Assert.DoesNotContain(named, (r.Detail ?? "").Split(" · ")[0],
+                StringComparison.OrdinalIgnoreCase);
+        });
+    }
+
+    /// <summary>
     /// **The Helper screen, for EQBuddy Mobile** (DRA-71 D9).
     ///
     /// <para>Staged through the REAL projection over a real <c>HelperInputs</c>, so what the
@@ -687,6 +796,126 @@ public class ScreenshotFixtureTests
         // An unknown level draws its own sentence and the door that fixes it — never a guess.
         Assert.Equal(LevelReadout.UsedByHelper(ResolvedLevel.Unknown), helper.LevelNote);
         // Nothing on this screen is a control, and no door on it is a link.
+        Assert.False(CompanionSurfaces.AcceptsTicks(CompanionSurfaces.Helper));
+    }
+
+    /// <summary>
+    /// **The Helper answering FARM GEAR, for EQBuddy Mobile** (DRA-84 D5, plan P6).
+    ///
+    /// <para>The row above pictures the Helper a new profile meets; this one pictures the
+    /// screen the Founder FAILED. It is staged against the <b>REAL shipped catalog</b> rather
+    /// than a two-record fixture, because acceptance 1 is precisely that the answers come from
+    /// full item knowledge and not from what this session happened to loot — a hand-built
+    /// catalog would photograph as a correct screenshot of the thing under test being absent
+    /// (trap 23).</para>
+    ///
+    /// <para><b>The prediction is not mine to invent: it is a number already committed.</b>
+    /// This fixture stages the same anchor, the same intent and the same unknown level as the
+    /// E2E row <c>AnUpgradeNothingCanNameADropperForIsWithheldAndTheRoomSaysSo</c>, which
+    /// asserts the desktop's three zones, its six named creatures and its two withheld counts
+    /// against the launched app. So the phone's numbers are PREDICTED from the PC's committed
+    /// ones, and a disagreement here is a parity defect rather than a fixture to re-fit —
+    /// which is the one thing a second surface's screenshot is uniquely able to find (trap
+    /// 4).</para>
+    ///
+    /// <para><b>What this picture deliberately does NOT carry: the band gate's sentence.</b>
+    /// The level is unknown, so the gate stands down (trap 73) and the screen shows its
+    /// level disclosure and the Character door instead. The gate's own picture is the
+    /// desktop's <c>shell-helper-gear-band</c>, and that the phone says the same words when
+    /// it does fire is <c>HelperSurfaceParityTests.ARefusedZoneSaysSoOnThePhoneToo</c>'s
+    /// claim, asserted against a fixture that produces a real refusal. Staging a level here
+    /// would have re-ranked the zones and left this shot with numbers nothing else had
+    /// computed.</para>
+    ///
+    ///     dotnet test --filter WriteHelperGearSnapshot -e EQBUDDY_SHOOT=1 -e EQBUDDY_SHOOT_HELPER_GEAR=&lt;path&gt;
+    ///     pwsh scripts/mobile-harness.ps1 -Snapshot &lt;path&gt; -Screenshot
+    ///     msedge --headless=new --disable-gpu --hide-scrollbars --virtual-time-budget=20000 \
+    ///            --window-size=516,1500 --screenshot=docs/screenshots/mobile-helper-gear.png \
+    ///            dist/mobile-harness/harness.html
+    ///
+    /// <para><b>The third line is here because it was missing for `mobile-helper.png` and had
+    /// to be reconstructed.</b> The harness builds a page; it does not take a picture, so a
+    /// recipe that stops at line two is a recipe nobody can re-run (the illustration lock).
+    /// 516 is not a choice — headless Edge clamps its CSS viewport at 492 px however small
+    /// `--window-size` is (trap 7, measured in DRA-71 D9), so these line breaks are a large
+    /// phone's rather than a small one's. 1500 is the height this content needs; at 1060 the
+    /// two cap sentences fell below the fold, which is a correct photograph of the evidence
+    /// being absent.</para>
+    /// </summary>
+    [Fact]
+    public void WriteHelperGearSnapshot()
+    {
+        if (Environment.GetEnvironmentVariable("EQBUDDY_SHOOT") != "1") return;
+        var outPath = Environment.GetEnvironmentVariable("EQBUDDY_SHOOT_HELPER_GEAR");
+        if (string.IsNullOrWhiteSpace(outPath)) return;
+
+        var now = new DateTime(2026, 9, 15, 0, 20, 0);
+        var items = ItemCatalog.Default;
+        // The anchor the E2E wears, resolved the way the app resolves it — the catalog's own
+        // stats for the base name, which is what `GearUpgrades.WornFrom` is handed in
+        // production. AC-2 cloth, so the sweep has plenty to beat.
+        var gloves = items.Find("Cloth Gloves")
+            ?? throw new InvalidOperationException("the shipped catalog has no Cloth Gloves");
+        var inputs = HelperInputs.Nothing with
+        {
+            Worn = [new WornItem("Cloth Gloves", "Cloth Gloves", "HANDS", gloves.ToStatsBlock())],
+            Items = items,
+            // **The E2E's character is a WARRIOR, and the class-lock filter is an INPUT to the
+            // sweep.** The first draft of this fixture left it empty — which filters nothing,
+            // and is the honest reading of "EQBuddy has not been told" — and the three zones
+            // came back as Plane of Growth / Temple of Veeshan / Chardok. That is a real screen
+            // of a different character, which is what trap 23 is about: the prediction caught
+            // it, and the fixture moved rather than the number.
+            MyClasses = ["WAR"],
+            GearIntent = GearIntent.ReplaceSlot,
+            // Named for the reason `HelperSources.Gather` names it: a gate that is live on one
+            // surface and stood down on the other is trap 4 wearing a fixture (it stands down
+            // here anyway, because the level is unknown).
+            Bands = ZoneLevels.Default,
+        };
+
+        var snap = CompanionProjection.Build(new CompanionInputs
+        {
+            Character = "Dranak",
+            AppVersion = UpdateChecker.CurrentVersion.ToString(),
+            Offered = [CompanionSurfaces.Helper],
+            Stats = new StatsSnapshot { CurrentZone = "Lower Guk" },
+            Helper = new CompanionHelperRequest(
+                inputs, [HelperGoal.FarmGear], [], Tradeskills.All.Count),
+            Theme = CompanionTheme.Project("ParchmentBrass",
+                EQBuddy.UI.Shared.ThemePalettes.For("ParchmentBrass")),
+        }, now);
+
+        File.WriteAllText(outPath!, JsonSerializer.Serialize(snap, CompanionSnapshot.JsonOpts));
+
+        // THE PREDICTION, as assertions (trap 23) — every number below is the E2E row's.
+        var helper = snap.Helper!;
+        Assert.Equal(["Temple of Veeshan", "Kael Drakkel", "Dragon Necropolis"],
+            helper.Answers.Select(a => a.Headline));
+
+        // Acceptance 2, on the phone: every drawn item line names its creatures. Six lines
+        // across the three zones, and the sentence carries the names rather than a field
+        // beside them (trap 32).
+        // BOTH verbs: the clause agrees with the count ("a bandit drops it" / "a bandit, a
+        // hill giant and a ghoul drop it"), and a predicate that knew only the plural counted
+        // one of these six.
+        var gear = helper.Answers.SelectMany(a => a.Why)
+            .Where(w => w.Text.Contains(" drops it", StringComparison.Ordinal)
+                        || w.Text.Contains(" drop it", StringComparison.Ordinal)).ToList();
+        Assert.Equal(6, gear.Count);
+        // Nothing was looted in this fixture, so every one of those creatures is the
+        // CATALOG's and carries the estimate label that says so.
+        foreach (var line in gear) Assert.False(line.Personal);
+
+        // Both caps say so, in the words the PC uses (trap 50). Five offers the who rule
+        // removed — the `Slime Blood of Cazic-Thule` phantom zones — and 89 the sweep's own
+        // per-anchor cap held back before the rule ever ran.
+        Assert.Equal(HelperPresentation.DropOffersWithheld(5), helper.GearWhoWithheld);
+        Assert.Equal(HelperPresentation.GearWithheld(89), helper.GearWithheld);
+        // The band gate stood down, and the screen says which number it does not have.
+        Assert.Equal("", helper.GearBandRefused);
+        Assert.Equal(LevelReadout.UsedByHelper(ResolvedLevel.Unknown), helper.LevelNote);
+        // Still read-only, one surface down (trap 35).
         Assert.False(CompanionSurfaces.AcceptsTicks(CompanionSurfaces.Helper));
     }
 }

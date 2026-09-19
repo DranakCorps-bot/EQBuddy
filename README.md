@@ -41,10 +41,11 @@ player's suggestion.** Rough edges, wild ideas, wrong numbers: [say so in
 Discussions](https://github.com/DranakCorps-bot/EQBuddy/discussions) and watch what
 happens.
 
-**Log-only, by principle. Zero telemetry, always contribution.** EQBuddy never reads
-game memory, never phones home, and never measures other players — it knows only what
-your own log says. When knowledge moves between players, it moves because a player
-chose to move it: zone spawn archives export as paste-safe strings you hand to a
+**Your own files, by principle. Zero telemetry, always contribution.** EQBuddy never
+reads game memory, never phones home, and never measures other players — it knows only
+what the game writes for you on your own PC: the `/log` it tails, and the `/outputfile`
+dumps you ask the game for. When knowledge moves between players, it moves because a
+player chose to move it: zone spawn archives export as paste-safe strings you hand to a
 friend, imports show you every change before anything applies, and contributions to
 EQBuddy itself go through a public review on GitHub — streamlined collaboration from
 within the community, never a quiet upload. **Windows is the supported desktop** for
@@ -736,7 +737,7 @@ visible way: a **"based on [EQBuddy](https://github.com/DranakCorps-bot/EQBuddy)
 line in your README or about screen, naming what you took.
 
 Ideas — spawn timers that learn from your kills, the /loc breadcrumb trail, the
-camp-pin map, the log-only principle — can't be licensed, and we wouldn't want
+camp-pin map, the no-game-memory principle — can't be licensed, and we wouldn't want
 to: reimplement anything. But if EQBuddy's designs shaped your tool, say so by
 name, the same way the credits above name everyone whose work shaped EQBuddy.
 

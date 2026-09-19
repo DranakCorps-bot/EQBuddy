@@ -233,11 +233,19 @@ public static class TradeskillPickStore
 {
     /// <summary>The professions to list — every one of them when the player has never
     /// picked.</summary>
-    public static IReadOnlyList<Tradeskill> Listed(AppSettings settings, string characterKey)
-    {
-        var picked = Picked(settings, characterKey);
-        return picked.Count == 0 ? [.. Enum.GetValues<Tradeskill>()] : picked;
-    }
+    public static IReadOnlyList<Tradeskill> Listed(AppSettings settings, string characterKey) =>
+        ListedFrom(Picked(settings, characterKey));
+
+    /// <summary>The same rule, applied to a pick that has already been read — <b>one producer
+    /// for what "absent means all eight" means</b> (trap 4, DRA-149 D4).
+    ///
+    /// <para>It exists because the phone never sees <c>AppSettings</c>: the projection is handed
+    /// the PICKED list over the wire and has to arrive at the same eight-or-fewer rows the
+    /// desktop drew. Re-deriving that there with its own <c>Count == 0</c> would be the second
+    /// copy of a rule whose whole content is which of two states means everything.</para>
+    /// </summary>
+    public static IReadOnlyList<Tradeskill> ListedFrom(IReadOnlyCollection<Tradeskill> picked) =>
+        picked.Count == 0 ? [.. Enum.GetValues<Tradeskill>()] : [.. picked];
 
     /// <summary>What the store actually HOLDS — empty when nothing is picked. Separate from
     /// <see cref="Listed"/> because a picker has to draw ticks: "all of them" and "eight

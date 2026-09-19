@@ -1915,11 +1915,68 @@ function boot() {
     for (const a of h.answers || []) wrap.appendChild(helperAnswer(a, h.doorsLead));
 
     // The caveats, in the room's own order: the vendor-price one first (it is about lines
-    // above it), then the caps and the band gate's refusals. A surviving cap says what it
-    // withheld, and so does a refusal (trap 50). Every one of these sentences is built by
-    // HelperPresentation and arrives on the wire — this page never words one (trap 32).
-    for (const line of [h.moneyNote, h.cap, h.gearWithheld, h.gearBandRefused])
+    // above it), then the caps, the band gate's refusals and the who rule's. A surviving cap
+    // says what it withheld, and so does a refusal (trap 50). Every one of these sentences is
+    // built by HelperPresentation and arrives on the wire — this page never words one (trap
+    // 32).
+    //
+    // DRA-84 D5: `gearWhoWithheld` was MISSING from this list, so five drop offers left the
+    // phone's list with nothing said about them while the PC said so — found by the re-smoke's
+    // own staged picture, not by a test, because the parity suite compares the projection to
+    // HelperPresentation and never to what this page draws. Its page-side must-list is the
+    // guard, and it now names every one of these five (trap 34).
+    //
+    // DRA-149 D1 adds `gearBaseNote` — what the gear rows above actually compared. It sits
+    // beside `moneyNote` because it is the same kind of sentence: a caveat about the lines
+    // directly above it, said once for the block rather than templated onto every row.
+    //
+    // DRA-149 D3 adds the three materials sentences. `materialNote` sits with the other two
+    // block caveats and the two refusal counts with the gear ones — they are separate fields
+    // because they are counts about a DIFFERENT list, and folding them into the gear numbers
+    // would produce one sentence that can explain neither.
+    // DRA-180 D2 adds the two ERA captions, each directly BEFORE its band sibling — the order
+    // the gates ran in, so a reader meets the complete explanation before the partial one.
+    for (const line of [h.moneyNote, h.gearBaseNote, h.materialNote, h.cap, h.gearWithheld,
+                        h.gearEraRefused, h.gearBandRefused, h.gearWhoWithheld,
+                        h.materialEraRefused, h.materialBandRefused, h.materialWhoWithheld])
       if (line) wrap.appendChild(el("div", "caption", line));
+
+    // DRA-180 D3: one caption per WORN ITEM the ladder emptied, after the block captions and
+    // before the unread-worn one — the desktop room's own order. Every sentence above this is
+    // about the LIST; these are about the player's own character, which is what they asked.
+    // The PC has already capped them and already chosen every word, so this draws what it is
+    // sent and counts nothing (trap 33).
+    for (const line of (h.anchorsAllRemoved || []))
+      if (line) wrap.appendChild(el("div", "caption", line));
+    if (h.anchorsNotNamed) wrap.appendChild(el("div", "caption", h.anchorsNotNamed));
+
+    // DRA-149 D2: the worn rows EQBuddy could not read about, last of the captions and
+    // directly above the gaps — the desktop's own order, because that is where its
+    // `NothingWornIsReadable` gap lands. It is the one caption with doors of its own (a wiki
+    // search per named item), so it is drawn here rather than in the loop above.
+    if (h.unreadWorn) {
+      const box = el("div", "note");
+      box.appendChild(el("div", "caption", h.unreadWorn));
+      helperDoors(box, h.unreadWornDoors, h.doorsLead);
+      wrap.appendChild(box);
+    }
+
+    // DRA-149 D4: the vendor half — shops eqlwiki's zone maps name, per profession. Every
+    // string is one HelperPresentation built and the wire carried; this page decides only
+    // where they go. `merchantDoorNote` is the zone-page door as INTENT, said once over the
+    // whole block rather than thirty times down it (trap 35).
+    if ((h.merchants || []).length) {
+      if (h.merchantNote) wrap.appendChild(el("div", "caption", h.merchantNote));
+      for (const m of h.merchants) {
+        const box = el("div", "note");
+        box.appendChild(el("div", "head", m.profession));
+        for (const line of m.lines || []) box.appendChild(el("div", "caption", line));
+        if (m.more) box.appendChild(el("div", "serves", m.more));
+        if (m.empty) box.appendChild(el("div", "caption", m.empty));
+        wrap.appendChild(box);
+      }
+      if (h.merchantDoorNote) wrap.appendChild(el("div", "caption", h.merchantDoorNote));
+    }
 
     for (const note of (h.gaps || []).concat(h.deferred || []))
       wrap.appendChild(helperNote(note, h.doorsLead));
@@ -2134,6 +2191,13 @@ function boot() {
     // the page cannot call into Core. Keep the two in step: same match fields, same
     // most-wanted-first order.
     if (filter) return checklistSearchBody(surface, data, opts, filter);
+    // WHAT THIS LIST IS NOT SHOWING, above the groups (DRA-164 D3). Sent by the PC, worded
+    // entirely in Core - the island view's two exclusions and the fact that it crosses every
+    // class, so the class chips below are not a live-looking no-op. It could not ride a group:
+    // the loop under this drops a group with no rows, and a sentence about the whole list has
+    // nowhere to sit among them. Null on every other checklist and every other mode, so this
+    // draws nothing at all in the common case.
+    if (data.note) wrap.appendChild(el("div", "note", data.note));
     let any = false;
     for (const g of data.groups) {
       if (opts.classes && opts.classes.length && g.class

@@ -9,7 +9,7 @@
     repository in TEMP - never this repo, never the real channel files - seeds it with
     fixture ledgers, and then does each destructive thing on purpose.
 
-    Twenty-one cases. Eight of them are "must PASS" on purpose: the useful half of a guard
+    Twenty-three cases. Eight of them are "must PASS" on purpose: the useful half of a guard
     like this is the workflows it does NOT interrupt, and every one of the passes below
     corresponds to a real commit in this repo's history that must keep landing (a drained
     inbox, a lifted hold, an encoding repair, an archive move, a rebase that reorders).
@@ -46,6 +46,14 @@ $script:step = 0
 # Built from code points for the same reason the guard is: a literal mojibake glyph in
 # this file is the one string a host that guesses the encoding cannot be trusted with.
 $MojiEmDash = [string][char]0x00E2 + [string][char]0x20AC + [string][char]0x201D
+
+# The cp437 producer (DRA-119), at both depths that are live in the real ledgers. An em
+# dash is UTF-8 `E2 80 94`; read as cp437 that is U+0393 U+00C7 U+00F6, and reading THAT
+# as cp437 again gives the six-character depth-2 form. Cases 22 and 23 exist because the
+# marker list scored 0 on both of these for as long as it was cp1252-only.
+$MojiCp437       = [string][char]0x0393 + [string][char]0x00C7 + [string][char]0x00F6
+$MojiCp437Double = [string][char]0x256C + [string][char]0x00F4 + [string][char]0x251C +
+                   [string][char]0x00E7 + [string][char]0x251C + [string][char]0x2562
 
 function New-Utf8File([string] $path, [string] $text) {
     $dir = Split-Path $path -Parent
@@ -276,6 +284,22 @@ try {
     Reset-Tree
     New-Utf8File (Join-Path $root $INBOX) ((Get-LedgerText 40 'FABLE.md').Replace([string][char]0x2014, $MojiEmDash))
     Assert-Result 'check 4 - mojibake in an INBOX REFUSES too' $true 'double-encoded' $B
+
+    # The cp437 pair, and the reason they are APPENDS rather than whole-file replacements
+    # like the two cases above. An append leaves checks 1, 2, 3a and 3b with nothing to say,
+    # so check 4 is the ONLY check that can speak - which makes these two the exact shape of
+    # the prove-fail: against the cp1252-only marker list both of these were a clean exit 0,
+    # not a refusal for another reason. That is also the shape the real damage arrived in.
+    # Depth 2 gets its own case because a depth-1-only marker scores 0 on it: eleven real
+    # HELM-FEEDBACK.md lines are corrupt at depth 2, and a fix that listed only the first
+    # form would have left every one of them corrupt and green.
+    Reset-Tree
+    New-Utf8File $ledgerPath ($baseLedger + (Get-LedgerText 3 'a new entry').Replace([string][char]0x2014, $MojiCp437))
+    Assert-Result 'check 4 - cp437 mojibake (depth 1) APPENDED REFUSES' $true 'double-encoded' $B
+
+    Reset-Tree
+    New-Utf8File $ledgerPath ($baseLedger + (Get-LedgerText 3 'a new entry').Replace([string][char]0x2014, $MojiCp437Double))
+    Assert-Result 'check 4 - cp437 mojibake (depth 2) APPENDED REFUSES' $true 'double-encoded' $B
 
     Reset-Tree
     New-Utf8File (Join-Path $root 'ORACLE-FEEDBACK.md') (Get-LedgerText 20 'a new channel nobody rostered')

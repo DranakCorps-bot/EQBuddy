@@ -192,16 +192,31 @@
                           Content="Classic-doable only"
                           Foreground="{DynamicResource DimBrush}"
                           ToolTip="Show only the Epic steps that can be finished in the classic era"/>
-                <!-- The Sky tab's own lens, same rule and same column as the Epic one above:
-                     a tab-scoped view choice belongs on the tab, not in Options. -->
-                <CheckBox x:Name="SkyIslandRepeatCheck" Grid.Column="3"
-                          VerticalAlignment="Center" Margin="{DynamicResource GapS}"
-                          FontSize="{DynamicResource FontCaption}"
-                          Visibility="Collapsed"
-                          Checked="OnSkyIslandRepeatToggled" Unchecked="OnSkyIslandRepeatToggled"
-                          Content="Repeat multi-island steps"
-                          Foreground="{DynamicResource DimBrush}"
-                          ToolTip="Some Sky pieces drop on several islands. Off: each is listed once, under &quot;Several islands&quot;. On: each appears under every island it drops on, so one island's list is complete — the same step then shows more than once."/>
+                <!-- The Sky tab's own lenses, same rule and same column as the Epic one above:
+                     a tab-scoped view choice belongs on the tab, not in Options.
+
+                     ONE HOST for both, and it is the host that carries the tab visibility
+                     (trap 15: visibility and spacing belong to the thing that decides them —
+                     the decision is "are we on the Sky tab", which is about the pair, not
+                     about either control). It also keeps the FilterRow's fixed columns
+                     exactly as they were, which is the #184 geometry this row has already
+                     been bitten by once. -->
+                <StackPanel x:Name="SkyViewHost" Grid.Column="3" Orientation="Horizontal"
+                            VerticalAlignment="Center" Visibility="Collapsed">
+                    <!-- Class view · Island view (DRA-164). A WrapPanel and not a horizontal
+                         StackPanel for the chips' own reason: they have no fixed width, and a
+                         stack measures with infinite width and clips with no ellipsis to say
+                         so (trap 25). Built in code as EqSegmentedStrip — the same primitive
+                         as the tabs, the class lens and the mode strip, never hand-built. -->
+                    <WrapPanel x:Name="SkyViewStrip" VerticalAlignment="Center"/>
+                    <CheckBox x:Name="SkyIslandRepeatCheck"
+                              VerticalAlignment="Center" Margin="{DynamicResource GapS}"
+                              FontSize="{DynamicResource FontCaption}"
+                              Checked="OnSkyIslandRepeatToggled" Unchecked="OnSkyIslandRepeatToggled"
+                              Content="Repeat multi-island steps"
+                              Foreground="{DynamicResource DimBrush}"
+                              ToolTip="Some Sky pieces drop on several islands. Off: each is listed once, under &quot;Several islands&quot;. On: each appears under every island it drops on, so one island's list is complete — the same step then shows more than once."/>
+                </StackPanel>
                 <!-- Where EqMultiPicker's popup is added, in the column the hand-built one
                      occupied (a Popup takes no room in the row it is declared in — it needs
                      a logical tree to resolve its theme brushes, and nothing else). -->

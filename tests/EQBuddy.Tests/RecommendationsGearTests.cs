@@ -17,12 +17,31 @@ public class RecommendationsGearTests
 {
     // ---- fixtures ----------------------------------------------------------------------
 
+    /// <summary>
+    /// A catalog record. <b>Every drop zone gets a creature unless the test asks for the
+    /// opposite</b> (DRA-84 D4).
+    ///
+    /// <para>Before D4 this helper left <c>DropMobs</c> null, which matched the shipped catalog
+    /// of the day — the field was empty on all 11,146 records. It is now populated on 98.2% of
+    /// the shipped catalog's wearable (item, zone) pairs, so a null here would make every
+    /// fixture in this file the 1.8% case, and the who rule would silently be the thing every
+    /// other test was measuring. The zones a test names are still exactly the zones it names;
+    /// only the creature is implied.</para>
+    /// </summary>
+    /// <param name="anonymous">The page names nobody — the case the who rule exists for. Only a
+    /// test about that rule passes it.</param>
     private static ItemCatalog.Record Record(
-        string name, string slot, int ac, string[]? zones = null, string[]? quests = null) =>
+        string name, string slot, int ac, string[]? zones = null, string[]? quests = null,
+        bool anonymous = false) =>
         new()
         {
             Name = name, StatsText = $"Slot: {slot}\nAC: {ac}", Slots = [slot], Ac = ac,
             DropZones = zones?.ToList(), Quests = quests?.ToList(),
+            DropMobs = anonymous || zones is not { Length: > 0 }
+                ? null
+                : zones.Distinct(StringComparer.OrdinalIgnoreCase)
+                    .ToDictionary(z => z, z => new List<string> { $"a {z.ToLowerInvariant()} dweller" },
+                        StringComparer.OrdinalIgnoreCase),
         };
 
     private static WornItem Worn(string name, string slot, int ac) =>
@@ -40,7 +59,8 @@ public class RecommendationsGearTests
         IReadOnlyList<MobSummary>? pool = null,
         IReadOnlyList<SessionRow>? sessions = null,
         int? level = null,
-        ZoneLevels? bands = null) =>
+        ZoneLevels? bands = null,
+        IReadOnlyList<string>? unread = null) =>
         new(ZoneHistory.Fold(sessions ?? [], pool ?? []), pool ?? [], null, [], [], [], [],
             false, [], [], null,
             level is { } l
@@ -49,6 +69,7 @@ public class RecommendationsGearTests
         {
             Worn = worn, Items = catalog, GearIntent = intent,
             WornPicks = picks ?? [], IncludeQuests = includeQuests, Bands = bands,
+            UnreadWorn = unread ?? [],
         };
 
     /// <summary>A fixture band table. Named zones only, so a test says which band it is about
@@ -88,7 +109,9 @@ public class RecommendationsGearTests
 
         var sentence = HelperPresentation.Why(fact);
         Assert.Contains("Froglok Bone Helm", sentence);
-        Assert.Contains("beats the Rusty Helm", sentence);
+        // DRA-149 D1: the row claims a better BASE item rather than "beats", because that is
+        // what base-vs-base actually established. The "+N" caveat is the block's, once.
+        Assert.Contains("is a better base item than the Rusty Helm", sentence);
         Assert.Contains("head", sentence);
         Assert.Contains("+5 AC", sentence);
         Assert.EndsWith(HelperPresentation.CatalogLabel, sentence);
@@ -268,16 +291,18 @@ public class RecommendationsGearTests
             [Worn("Rusty Helm", "HEAD", 4)], new ItemCatalog([record]), pool: pool));
 
         var catalogFact = Assert.Single(set.Top[0].Why.OfType<GearUpgradeFact>());
-        Assert.Equal("", catalogFact.Who);
+        Assert.Empty(catalogFact.Who);
         Assert.DoesNotContain("a froglok knight", HelperPresentation.Why(catalogFact));
         Assert.Equal("a froglok shaman",
             Assert.Single(set.Top[0].Why.OfType<GearDropSeenFact>()).Mob);
     }
 
     /// <summary>With no kill of your own, the catalog's creature rides the catalog line — and
-    /// where the page named nobody, the clause is simply absent (trap 73).</summary>
+    /// since DRA-84 D4 a page that named nobody is not an offer at all. The old behaviour was a
+    /// row that said the item and the place and then stopped, which is the row the Founder read
+    /// as "somewhere in the Rathe".</summary>
     [Fact]
-    public void TheCatalogCreatureRidesTheLineOnlyWhenThePageNamedOne()
+    public void TheCatalogCreatureRidesTheLineAndAnAnonymousOfferIsNotDrawn()
     {
         var named = Record("Bone Helm", "HEAD", 9, ["Lower Guk"]);
         named.DropMobs = new() { ["Lower Guk"] = ["a froglok knight"] };
@@ -285,12 +310,15 @@ public class RecommendationsGearTests
         var withName = Rank(Gear([Worn("Rusty Helm", "HEAD", 4)], new ItemCatalog([named])));
         Assert.Contains("a froglok knight drops it",
             HelperPresentation.Why(withName.Top[0].Why.OfType<GearUpgradeFact>().First()));
+        Assert.Equal(0, withName.GearWhoWithheld);
 
         var anonymous = Rank(Gear(
             [Worn("Rusty Helm", "HEAD", 4)],
-            new ItemCatalog([Record("Bone Helm", "HEAD", 9, ["Lower Guk"])])));
-        Assert.DoesNotContain("drops it",
-            HelperPresentation.Why(anonymous.Top[0].Why.OfType<GearUpgradeFact>().First()));
+            new ItemCatalog([Record("Bone Helm", "HEAD", 9, ["Lower Guk"], anonymous: true)])));
+        Assert.Empty(anonymous.Top);
+        Assert.Equal(1, anonymous.GearWhoWithheld);
+        Assert.Equal(GoalGapReason.NoUpgradeNamesACreature,
+            Assert.Single(anonymous.Gaps).Reason);
     }
 
     // ---- the caps say what they held back (trap 50) --------------------------------------
@@ -330,6 +358,238 @@ public class RecommendationsGearTests
         Assert.Empty(HelperPresentation.GearWithheld(0));
     }
 
+    // ---- the WHO half: plural, capped, or withheld (DRA-84 D4, plan P3) -------------------
+
+    /// <summary>
+    /// **THE CLAUSE IS PLURAL, AND IT AGREES WITH ITSELF.** One name reads as the thing to kill;
+    /// three read as the sort of thing this zone drops it from, which is what a camp is. The
+    /// verb is the only thing in the clause that tells a reader which they are looking at — the
+    /// names are lower-case nouns straight off the page.
+    /// </summary>
+    [Fact]
+    public void ARowNamesEveryCreatureThePageNamedUpToTheCap()
+    {
+        var record = Record("Bone Helm", "HEAD", 9, ["Lower Guk"]);
+        record.DropMobs = new()
+        {
+            ["Lower Guk"] = ["a froglok knight", "a froglok shaman", "a froglok tactician"],
+        };
+
+        var set = Rank(Gear([Worn("Rusty Helm", "HEAD", 4)], new ItemCatalog([record])));
+
+        var fact = Assert.Single(set.Top[0].Why.OfType<GearUpgradeFact>());
+        Assert.Equal(["a froglok knight", "a froglok shaman", "a froglok tactician"], fact.Who);
+        Assert.Equal(0, fact.WhoWithheld);
+        Assert.Contains(
+            "a froglok knight, a froglok shaman and a froglok tactician drop it",
+            HelperPresentation.Why(fact));
+    }
+
+    /// <summary>One creature keeps the singular verb — the shape that would read wrong if the
+    /// join were written for lists only.</summary>
+    [Fact]
+    public void OneCreatureReadsAsOne()
+    {
+        var record = Record("Bone Helm", "HEAD", 9, ["Lower Guk"]);
+        record.DropMobs = new() { ["Lower Guk"] = ["a froglok knight"] };
+
+        var set = Rank(Gear([Worn("Rusty Helm", "HEAD", 4)], new ItemCatalog([record])));
+
+        Assert.Contains("a froglok knight drops it",
+            HelperPresentation.Why(set.Top[0].Why.OfType<GearUpgradeFact>().First()));
+    }
+
+    /// <summary>Past the cap, the rest are counted and attributed to the PAGE — "and 4 more"
+    /// alone would read as EQBuddy having measured something it has not (trap 50).</summary>
+    [Fact]
+    public void PastTheCapTheRestAreCountedAsThePagesOwn()
+    {
+        var record = Record("Bone Helm", "HEAD", 9, ["Lower Guk"]);
+        record.DropMobs = new()
+        {
+            ["Lower Guk"] = [.. Enumerable.Range(1, Recommendations.GearMobsPerItem + 4)
+                .Select(i => $"a froglok {i:00}")],
+        };
+
+        var set = Rank(Gear([Worn("Rusty Helm", "HEAD", 4)], new ItemCatalog([record])));
+
+        var fact = Assert.Single(set.Top[0].Why.OfType<GearUpgradeFact>());
+        Assert.Equal(Recommendations.GearMobsPerItem, fact.Who.Count);
+        Assert.Equal(4, fact.WhoWithheld);
+
+        var sentence = HelperPresentation.Why(fact);
+        Assert.Contains("and 4 more on its page", sentence);
+        Assert.Contains("drop it", sentence);
+        // The names past the cap are not smuggled in anywhere else in the sentence.
+        Assert.DoesNotContain("a froglok 05", sentence);
+    }
+
+    /// <summary>
+    /// **THE RATHE CLASS OF FAILURE** (Founder acceptance item 2). A zone whose only offer can
+    /// name nobody is not a row: the Founder's Rathe row named an item and a place and stopped,
+    /// and its band spans most characters so no level rule could ever have refused it.
+    /// </summary>
+    [Fact]
+    public void AZoneWhoseOnlyOfferCanNameNobodyIsNotARow()
+    {
+        var set = Rank(Gear(
+            [Worn("Rusty Helm", "HEAD", 4)],
+            new ItemCatalog([
+                Record("Bone Helm", "HEAD", 9, ["Rathe Mountains"], anonymous: true)])));
+
+        Assert.Empty(set.Top);
+        Assert.Equal(1, set.GearWhoWithheld);
+        Assert.NotEmpty(HelperPresentation.DropOffersWithheld(set.GearWhoWithheld));
+        Assert.Empty(HelperPresentation.DropOffersWithheld(0));
+    }
+
+    /// <summary>A zone keeps the offers that CAN answer and loses only the ones that cannot —
+    /// the pruning is per offer, not per zone.</summary>
+    [Fact]
+    public void AZoneKeepsTheOffersThatCanAnswerAndLosesOnlyTheRest()
+    {
+        var named = Record("Bone Helm", "HEAD", 9, ["Lower Guk"]);
+        named.DropMobs = new() { ["Lower Guk"] = ["a froglok knight"] };
+
+        var set = Rank(Gear(
+            [Worn("Rusty Helm", "HEAD", 4), Worn("Rusty Boots", "FEET", 2)],
+            new ItemCatalog([
+                named, Record("Bone Boots", "FEET", 7, ["Lower Guk"], anonymous: true)])));
+
+        var top = Assert.Single(set.Top);
+        Assert.Equal("Lower Guk", top.Zone);
+        Assert.Equal("Bone Helm", Assert.Single(top.Why.OfType<GearUpgradeFact>()).Item);
+        Assert.Equal(1, set.GearWhoWithheld);
+    }
+
+    /// <summary>The same item is offered under every zone it drops in, and the who question is
+    /// asked per PAIR — so a page that names creatures in one of its two zones is answered in
+    /// one place and withheld in the other.</summary>
+    [Fact]
+    public void TheWhoQuestionIsAskedPerZoneAndNotPerItem()
+    {
+        var record = Record("Bone Helm", "HEAD", 9, ["Lower Guk", "Befallen"]);
+        record.DropMobs = new() { ["Lower Guk"] = ["a froglok knight"] };
+
+        var set = Rank(Gear([Worn("Rusty Helm", "HEAD", 4)], new ItemCatalog([record])));
+
+        var top = Assert.Single(set.Top);
+        Assert.Equal("Lower Guk", top.Zone);
+        Assert.Equal(1, set.GearWhoWithheld);
+    }
+
+    /// <summary>
+    /// **THE PLAYER'S OWN KILLS ARE AN ANSWER TOO**, so an anonymous page in a zone they have
+    /// farmed is NOT withheld. The rule asks "can anything say what drops this here", and the
+    /// pool is one of the two things that can.
+    /// </summary>
+    [Fact]
+    public void YourOwnKillsAnswerTheQuestionWhereThePageCannot()
+    {
+        MobSummary[] pool =
+        [
+            new("a froglok shaman", 340, 340, 30, 0, 0, [new MobLoot("Bone Helm", 2, 0.6)])
+                { Zone = "Lower Guk" },
+        ];
+
+        var set = Rank(Gear(
+            [Worn("Rusty Helm", "HEAD", 4)],
+            new ItemCatalog([Record("Bone Helm", "HEAD", 9, ["Lower Guk"], anonymous: true)]),
+            pool: pool));
+
+        var top = Assert.Single(set.Top);
+        Assert.Equal(0, set.GearWhoWithheld);
+        Assert.Equal("a froglok shaman", Assert.Single(top.Why.OfType<GearDropSeenFact>()).Mob);
+        Assert.Empty(Assert.Single(top.Why.OfType<GearUpgradeFact>()).Who);
+    }
+
+    /// <summary>
+    /// **A QUEST ROW IS NOT A DROP ROW.** Nothing drops a hand-in, the quest IS the path, and the
+    /// rule that removes an anonymous drop offer must not remove a quest that names no creature
+    /// because no creature is involved.
+    /// </summary>
+    [Fact]
+    public void AQuestRowIsNotSubjectToTheWhoRule()
+    {
+        var set = Rank(Gear(
+            [Worn("Rusty Helm", "HEAD", 4)],
+            new ItemCatalog([
+                Record("Bone Helm", "HEAD", 9, quests: ["Ancient Cyclops Ring"])]),
+            includeQuests: true));
+
+        var top = Assert.Single(set.Top);
+        Assert.Equal(RecommendationKind.Quest, top.Kind);
+        Assert.Equal(0, set.GearWhoWithheld);
+        Assert.Empty(Assert.Single(top.Why.OfType<GearUpgradeFact>()).Who);
+        Assert.DoesNotContain("drop it",
+            HelperPresentation.Why(top.Why.OfType<GearUpgradeFact>().First()));
+    }
+
+    /// <summary>
+    /// **THE BAND GATE SPEAKS FIRST, AND THAT ORDER IS A DECISION.** Both rules can remove the
+    /// same row. Crushbone at 30 is refused on eqlwiki's own 5–20 with the level in the sentence;
+    /// if the who rule ran first, an anonymous Crushbone offer would vanish as "no creature
+    /// named" and D2's refusal — signed, shipped, and the louder of the two — would never be
+    /// reported. A slice must not quietly narrow what the slice before it refused out loud.
+    /// </summary>
+    [Fact]
+    public void TheBandGateReportsARefusalTheWhoRuleWouldOtherwiseHaveSwallowed()
+    {
+        var set = Rank(Gear(
+            [Worn("Rusty Helm", "HEAD", 4)],
+            new ItemCatalog([Record("Bone Helm", "HEAD", 9, ["Crushbone"], anonymous: true)]),
+            level: 30,
+            bands: Bands(("Crushbone", 5, 20))));
+
+        var refusal = Assert.Single(set.GearBandRefusals);
+        Assert.Equal("Crushbone", refusal.Zone);
+        Assert.Equal(GearBandArm.TopUnder, refusal.Arm);
+        // The offer left with the zone, so the who rule never saw it and counts nothing.
+        Assert.Equal(0, set.GearWhoWithheld);
+        Assert.Equal(GoalGapReason.EveryZoneOutsideYourBand, Assert.Single(set.Gaps).Reason);
+    }
+
+    /// <summary>And where the band gate did NOT fire, the who rule's gap is its own — calling it
+    /// <c>NoCatalogUpgrade</c> would say EQBuddy read about nothing better, which is false.</summary>
+    [Fact]
+    public void AnEmptyListFromTheWhoRuleIsItsOwnGapAndNotNoCatalogUpgrade()
+    {
+        var set = Rank(Gear(
+            [Worn("Rusty Helm", "HEAD", 4)],
+            new ItemCatalog([Record("Bone Helm", "HEAD", 9, ["Lower Guk"], anonymous: true)]),
+            level: 30,
+            bands: Bands(("Lower Guk", 25, 45))));
+
+        Assert.Empty(set.GearBandRefusals);
+        Assert.Equal(GoalGapReason.NoUpgradeNamesACreature, Assert.Single(set.Gaps).Reason);
+        Assert.NotEqual("", HelperPresentation.Gap(
+            new GoalGap(HelperGoal.FarmGear, GoalGapReason.NoUpgradeNamesACreature)));
+    }
+
+    /// <summary>A withheld offer does not set the weight yardstick either — the same reason D2
+    /// put the band gate before the fold, one rule on.</summary>
+    [Fact]
+    public void AWithheldOfferDoesNotSetTheWeightYardstick()
+    {
+        var real = Record("Bone Helm", "HEAD", 9, ["Lower Guk"]);
+        real.DropMobs = new() { ["Lower Guk"] = ["a froglok knight"] };
+
+        var anonymousZone = Enumerable.Range(1, 5)
+            .Select(i => Record($"a fine thing {i}", $"SLOT{i}", 9, ["Befallen"], anonymous: true));
+
+        var worn = new List<WornItem> { Worn("Rusty Helm", "HEAD", 4) };
+        worn.AddRange(Enumerable.Range(1, 5).Select(i => Worn($"a rusty thing {i}", $"SLOT{i}", 1)));
+
+        var set = Rank(Gear(worn, new ItemCatalog([real, .. anonymousZone])));
+
+        var top = Assert.Single(set.Top);
+        Assert.Equal("Lower Guk", top.Zone);
+        // Five offers in Befallen withheld; the surviving zone is the best row, so its bar is
+        // full rather than one fifth of a zone that was never drawn.
+        Assert.Equal(5, set.GearWhoWithheld);
+        Assert.Equal(1, top.Weight);
+    }
+
     // ---- the three ways to have nothing to say --------------------------------------------
 
     /// <summary>No inventory dump is a DIFFERENT state from "nothing beats it", and it is the
@@ -342,7 +602,90 @@ public class RecommendationsGearTests
         var gap = Assert.Single(set.Gaps);
         Assert.Equal(GoalGapReason.NoInventoryDump, gap.Reason);
         Assert.Empty(set.Top);
+        Assert.Empty(set.UnreadWorn);
         Assert.Contains("what you are wearing", HelperPresentation.Gap(gap));
+    }
+
+    // ---- DRA-149 D2: and a FOURTH way, between the first two ------------------------------
+
+    /// <summary>
+    /// **A DUMP EQBUDDY CANNOT READ IS NOT A MISSING DUMP** (DRA-149 D2, plan P2).
+    ///
+    /// <para>Both states have no anchors, and before this slice both drew the same sentence —
+    /// which for a player whose dump is sitting right there is a loop with no exit: run the
+    /// command, get the same unreadable rows, be told to run the command. The names are what
+    /// makes it actionable, so they ride out with the gap.</para>
+    /// </summary>
+    [Fact]
+    public void ADumpWhoseEveryRowIsUnreadableIsItsOwnGapAndNamesTheRows()
+    {
+        var set = Rank(Gear([], new ItemCatalog([]),
+            unread: ["Deterioriated Ancient Faydark Longbow +2", "Mystery Pauldrons"]));
+
+        var gap = Assert.Single(set.Gaps);
+        Assert.Equal(GoalGapReason.NothingWornIsReadable, gap.Reason);
+        Assert.Equal(
+            ["Deterioriated Ancient Faydark Longbow +2", "Mystery Pauldrons"], set.UnreadWorn);
+        Assert.DoesNotContain("Run the inventory command", HelperPresentation.Gap(gap));
+    }
+
+    /// <summary>The unread rows are reported even when the sweep DID find upgrades — the usual
+    /// case, and the Founder's: twenty anchors answering normally beside one row that never
+    /// became an anchor at all. A sentence that only appeared when everything failed would
+    /// never have fired for him.</summary>
+    [Fact]
+    public void UnreadRowsAreReportedBesideARoomFullOfAnswers()
+    {
+        var set = Rank(Gear(
+            [Worn("Bronze Breastplate", "CHEST", 10)],
+            new ItemCatalog([Record("Mithril Breastplate", "CHEST", 30, ["Lower Guk"])]),
+            unread: ["Deterioriated Ancient Faydark Longbow +2"]));
+
+        Assert.NotEmpty(set.Top);
+        Assert.Empty(set.Gaps);
+        Assert.Equal(["Deterioriated Ancient Faydark Longbow +2"], set.UnreadWorn);
+    }
+
+    /// <summary>…and when the sweep found nothing, which is the state the Founder actually read
+    /// as "the bow is missing": the catalog sentence and the unread sentence are about different
+    /// things and both are true at once.</summary>
+    [Fact]
+    public void UnreadRowsSurviveTheNoCatalogUpgradeGap()
+    {
+        var set = Rank(Gear(
+            [Worn("Bronze Breastplate", "CHEST", 99)],
+            new ItemCatalog([Record("Rusty Breastplate", "CHEST", 1, ["Lower Guk"])]),
+            unread: ["Deterioriated Ancient Faydark Longbow +2"]));
+
+        Assert.Equal(GoalGapReason.NoCatalogUpgrade, Assert.Single(set.Gaps).Reason);
+        Assert.Equal(["Deterioriated Ancient Faydark Longbow +2"], set.UnreadWorn);
+    }
+
+    /// <summary>**Farm to sell has no worn anchor, so it has nothing to say about a worn row.**
+    /// It never looked at one — an unread-worn sentence under a question about what to sell
+    /// would be an answer to a question nobody asked, and it is refused here for the same
+    /// reason the sweep itself is.</summary>
+    [Fact]
+    public void FarmToSellReportsNoUnreadWornRows()
+    {
+        var set = Rank(Gear([], new ItemCatalog([]), intent: GearIntent.FarmToSell,
+            unread: ["Deterioriated Ancient Faydark Longbow +2"]));
+
+        Assert.Empty(set.UnreadWorn);
+    }
+
+    /// <summary>And a player who never picked Farm Gear is told nothing about their gear. The
+    /// engine is what reports this, so the narrowing is the engine's — which is what makes the
+    /// phone inherit it (DRA-71 D9).</summary>
+    [Fact]
+    public void AGoalSetWithoutFarmGearReportsNoUnreadWornRows()
+    {
+        var set = Recommendations.Rank(
+            Gear([], new ItemCatalog([]),
+                unread: ["Deterioriated Ancient Faydark Longbow +2"]),
+            [HelperGoal.LevelUp]);
+
+        Assert.Empty(set.UnreadWorn);
     }
 
     /// <summary>
@@ -926,7 +1269,7 @@ public class RecommendationsGearTests
     public void TheRefusalSaysHowManyAndOnWhatRule()
     {
         var set = RankIn(30, ZoneLevels.Default, "Crushbone", "Plane of Sky");
-        var said = HelperPresentation.GearBandRefused(set.GearBandRefusals);
+        var said = HelperPresentation.BandRefused(set.GearBandRefusals, HelperPresentation.BandRefusedUpgrades);
 
         Assert.Contains("2 zones", said, StringComparison.Ordinal);
         Assert.Contains("at your level 30", said, StringComparison.Ordinal);
@@ -946,9 +1289,10 @@ public class RecommendationsGearTests
     [Fact]
     public void OnlyTheRuleThatFiredIsNamed()
     {
-        var said = HelperPresentation.GearBandRefused(
+        var said = HelperPresentation.BandRefused(
             Rank(Gear([Worn("Rusty Helm", "HEAD", 4)], OneHelmIn("Crushbone"),
-                level: 40, bands: ZoneLevels.Default)).GearBandRefusals);
+                level: 40, bands: ZoneLevels.Default)).GearBandRefusals,
+            HelperPresentation.BandRefusedUpgrades);
 
         Assert.Contains("tops out 10 or more levels under you", said, StringComparison.Ordinal);
         Assert.DoesNotContain("starts 5 or more", said, StringComparison.Ordinal);
@@ -960,8 +1304,8 @@ public class RecommendationsGearTests
     public void TheRefusalNamesAFewZonesAndCountsTheRest()
     {
         var zones = new[] { "Crushbone", "Greater Faydark", "Najena", "Erud's Crossing" };
-        var said = HelperPresentation.GearBandRefused(
-            RankIn(60, ZoneLevels.Default, zones).GearBandRefusals);
+        var said = HelperPresentation.BandRefused(
+            RankIn(60, ZoneLevels.Default, zones).GearBandRefusals, HelperPresentation.BandRefusedUpgrades);
 
         Assert.Contains("4 zones", said, StringComparison.Ordinal);
         Assert.Contains($", and {4 - HelperPresentation.GearBandNamed} more",
@@ -970,15 +1314,15 @@ public class RecommendationsGearTests
 
     [Fact]
     public void NoRefusalMeansNoSentence() =>
-        Assert.Equal("", HelperPresentation.GearBandRefused([]));
+        Assert.Equal("", HelperPresentation.BandRefused([], HelperPresentation.BandRefusedUpgrades));
 
     /// <summary>One refused zone reads as one zone. The singular is where a count-driven
     /// sentence usually breaks.</summary>
     [Fact]
     public void OneRefusedZoneReadsAsOne()
     {
-        var said = HelperPresentation.GearBandRefused(
-            RankIn(30, ZoneLevels.Default, "Crushbone").GearBandRefusals);
+        var said = HelperPresentation.BandRefused(
+            RankIn(30, ZoneLevels.Default, "Crushbone").GearBandRefusals, HelperPresentation.BandRefusedUpgrades);
 
         Assert.StartsWith("1 zone EQBuddy has upgrades for is not listed at your level 30", said,
             StringComparison.Ordinal);

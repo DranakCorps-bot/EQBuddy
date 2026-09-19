@@ -40,7 +40,19 @@ $script:SoftSeatKeyPattern = '^DRA-\d+$'
 # copies would let the sentence and the behaviour drift apart (trap 4).
 $script:SoftSeatStaleAfterHours = 8
 
-function Get-SoftSeatMainRoot {
+# Where the ONE store lives, and HOW we decided. The 'how' is returned, not
+# just the path, because DRA-90 was reported as "the store is per-working-copy"
+# by an executor who looked at a fresh worktree's .claude/soft-seats/ (README +
+# claims.template.json are COMMITTED; claims.json is gitignored, so it is absent
+# there BY DESIGN) and concluded the seats could not see each other. They can —
+# git rev-parse --git-common-dir sends every linked worktree to the main tree's
+# copy. A resolution nobody can print is a resolution everybody has to guess at,
+# so claim-seat.ps1 -Where prints this.
+#
+# Resolution kinds: 'explicit' (-StoreDir), 'git-common-dir' (the shared answer),
+# 'fallback' (git told us nothing — this copy is on its OWN store and any other
+# seat is invisible, which is the failure DRA-90 described).
+function Resolve-SoftSeatMainRoot {
     param([string] $Hint)
     $starts = @()
     if ($Hint) { $starts += $Hint }
@@ -54,23 +66,305 @@ function Get-SoftSeatMainRoot {
             try { $common = git -C $start rev-parse --git-common-dir 2>$null } catch { $common = $null }
         }
         if ($common) {
-            $common = $common.Trim()
+            $common = ([string] $common).Trim()
+            if (-not $common) { continue }
             if (-not [IO.Path]::IsPathRooted($common)) {
                 $common = [IO.Path]::GetFullPath((Join-Path $start $common))
             }
             $root = Split-Path $common -Parent
-            if (Test-Path (Join-Path $root '.gitignore')) { return $root }
+            # The parent of the common dir IS the main working tree, by
+            # construction. This used to additionally require a .gitignore
+            # there and fall through to the WORKTREE root when it was missing
+            # — a proxy for "is this the repo root" (trap 64b) whose failure
+            # mode is silent and is exactly the bug: every worktree quietly
+            # gets its own store and no seat ever refuses another. Accept the
+            # directory git named; only "git named nothing" falls back now.
+            if ($root -and (Test-Path -LiteralPath $root -PathType Container)) {
+                return [pscustomobject]@{ root = $root; kind = 'git-common-dir'; shared = $true }
+            }
         }
     }
-    if ($PSScriptRoot) { return (Split-Path $PSScriptRoot -Parent) }
-    return (Get-Location).Path
+    $fallback = if ($PSScriptRoot) { (Split-Path $PSScriptRoot -Parent) } else { (Get-Location).Path }
+    return [pscustomobject]@{ root = $fallback; kind = 'fallback'; shared = $false }
+}
+
+function Get-SoftSeatMainRoot {
+    param([string] $Hint)
+    return (Resolve-SoftSeatMainRoot -Hint $Hint).root
+}
+
+function Get-SoftSeatStoreOrigin {
+    param([string] $StoreDir, [string] $Repo)
+    if ($StoreDir) {
+        return [pscustomobject]@{
+            dir    = [IO.Path]::GetFullPath($StoreDir)
+            kind   = 'explicit'
+            shared = $false
+            root   = $null
+        }
+    }
+    $resolved = Resolve-SoftSeatMainRoot -Hint $Repo
+    return [pscustomobject]@{
+        dir    = [IO.Path]::GetFullPath((Join-Path $resolved.root '.claude/soft-seats'))
+        kind   = $resolved.kind
+        shared = $resolved.shared
+        root   = $resolved.root
+    }
 }
 
 function Get-SoftSeatStoreDir {
     param([string] $StoreDir, [string] $Repo)
-    if ($StoreDir) { return [IO.Path]::GetFullPath($StoreDir) }
-    $root = Get-SoftSeatMainRoot -Hint $Repo
-    return [IO.Path]::GetFullPath((Join-Path $root '.claude/soft-seats'))
+    return (Get-SoftSeatStoreOrigin -StoreDir $StoreDir -Repo $Repo).dir
+}
+
+# --- DRA-95 A' / DRA-102: union-READ, local-WRITE across independent CLONES --
+#
+# git-common-dir makes every linked WORKTREE of one clone share a store (above).
+# Two independent CLONES share nothing, and on this machine the two clones ARE
+# the two dispatch lanes: DRA-87's two executors both claimed, 2m29s apart, and
+# neither was refused or warned because neither store could see the other.
+#
+# The signed shape is a machine-level REGISTRY OF PATHS. Each clone registers
+# its own resolved store once; the refusal decision reads every registered
+# store; the write touches only this clone's. No claim data leaves the repo —
+# the registry holds paths and a first-seen stamp and nothing else, which is why
+# this is A' and not A (moving the claims themselves out of the tree).
+#
+# Registry absent, unreadable, or switched off => behave exactly as before.
+# That degradation is DELIBERATE and it is also a hole somebody could fall into
+# without noticing (trap 68), so a GRANT that was decided without the union read
+# says so on the same screen (claim-seat.ps1).
+$script:SoftSeatRegistryEnvVar = 'EQBUDDY_SOFT_SEAT_REGISTRY'
+$script:SoftSeatRegistryOff = 'off'
+
+function Get-SoftSeatRegistryLocation {
+    $override = [Environment]::GetEnvironmentVariable($script:SoftSeatRegistryEnvVar)
+    if ($override) {
+        $t = ([string] $override).Trim()
+        # Exactly that string, and nothing else, is the door (trap 68).
+        if ($t -ieq $script:SoftSeatRegistryOff) {
+            return [pscustomobject]@{ path = $null; state = 'off'; why = "$($script:SoftSeatRegistryEnvVar)=$($script:SoftSeatRegistryOff)" }
+        }
+        if ($t) {
+            return [pscustomobject]@{ path = [IO.Path]::GetFullPath($t); state = 'ok'; why = "$($script:SoftSeatRegistryEnvVar) points here" }
+        }
+    }
+    $base = [Environment]::GetEnvironmentVariable('LOCALAPPDATA')
+    if (-not $base) {
+        return [pscustomobject]@{ path = $null; state = 'unavailable'; why = 'LOCALAPPDATA is not set, so there is no machine-level place to keep it' }
+    }
+    return [pscustomobject]@{
+        path  = [IO.Path]::GetFullPath((Join-Path $base 'DranakCorps/soft-seats/stores.json'))
+        state = 'ok'
+        why   = 'the machine default'
+    }
+}
+
+# One spelling for "are these two paths the same store". Every comparison in
+# this block goes through it, so a trailing slash or a case difference cannot
+# make this clone's own store look like a foreign one (it would then read its
+# own rows twice and refuse itself).
+function Get-SoftSeatComparablePath {
+    param([string] $Path)
+    if ([string]::IsNullOrWhiteSpace($Path)) { return $null }
+    $full = $Path
+    try { $full = [IO.Path]::GetFullPath($Path) } catch { $full = $Path }
+    return ($full.TrimEnd('\', '/')).ToLowerInvariant()
+}
+
+function Read-SoftSeatRegistry {
+    $loc = Get-SoftSeatRegistryLocation
+    $result = [pscustomobject]@{
+        path      = $loc.path
+        state     = $loc.state
+        why       = $loc.why
+        stores    = @()
+        malformed = @()
+    }
+    if ($loc.state -ne 'ok') { return $result }
+    if (-not (Test-Path -LiteralPath $loc.path -PathType Leaf)) { $result.state = 'absent'; return $result }
+
+    $raw = $null
+    try { $raw = [IO.File]::ReadAllText($loc.path) }
+    catch { $result.state = 'unreadable'; $result.why = $_.Exception.Message; return $result }
+    if ([string]::IsNullOrWhiteSpace($raw)) { $result.state = 'absent'; return $result }
+
+    $obj = $null
+    try { $obj = $raw | ConvertFrom-Json }
+    catch { $result.state = 'unreadable'; $result.why = $_.Exception.Message; return $result }
+
+    $entries = @()
+    $bad = @()
+    # trap 80, twice over. (a) Enumerate through the PIPELINE — @($obj.stores)
+    # is safe for a property but ForEach-Object unrolls the 1-element case that
+    # ConvertTo-Json writes differently on 5.1 and 7 as well. (b) The field we
+    # are about to ACT on must be a SCALAR: if 'dir' arrives as an array, then
+    # `$dir -ieq $ownDir` is a FILTER returning the matching elements, not a
+    # boolean — an empty result is falsy, a non-empty one is truthy, and either
+    # way the decision is no longer the one the code reads as. A malformed entry
+    # is DROPPED and NAMED, never guessed at.
+    foreach ($e in @($obj.stores | ForEach-Object { $_ })) {
+        if ($null -eq $e) { continue }
+        $dir = $e.dir
+        if ($dir -isnot [string] -or [string]::IsNullOrWhiteSpace($dir)) {
+            $shape = if ($null -eq $dir) { 'absent' } else { $dir.GetType().Name }
+            $bad += "an entry whose 'dir' is not a single path string (it is $shape)"
+            continue
+        }
+        $root = $e.root
+        if ($root -isnot [string] -or [string]::IsNullOrWhiteSpace($root)) { $root = $null }
+        $entries += [pscustomobject]@{
+            dir        = $dir
+            root       = $root
+            first_seen = (Get-SoftSeatStartedAtIso $e.first_seen)
+        }
+    }
+    $result.stores = @($entries)
+    $result.malformed = @($bad)
+    return $result
+}
+
+function Write-SoftSeatRegistryFile {
+    param([string] $Path, $Stores)
+    $payload = [ordered]@{
+        version    = 1
+        updated_at = [datetime]::UtcNow.ToString('yyyy-MM-ddTHH:mm:ssZ')
+        stores     = @($Stores)
+    }
+    $json = $payload | ConvertTo-Json -Depth 6
+    $dir = Split-Path $Path -Parent
+    if ($dir -and -not (Test-Path -LiteralPath $dir -PathType Container)) {
+        New-Item -ItemType Directory -Force -Path $dir | Out-Null
+    }
+    $tmp = "$Path.tmp"
+    [IO.File]::WriteAllText($tmp, $json, [Text.UTF8Encoding]::new($false))
+    [IO.File]::Copy($tmp, $Path, $true)
+    Remove-Item -LiteralPath $tmp -Force -ErrorAction SilentlyContinue
+}
+
+# Register THIS clone's store, once. An explicit -StoreDir is a per-call store —
+# claim-seat.ps1 already prints it as "this call only, NOT the machine's shared
+# store" — so it never registers and never union-reads. Registering a throwaway
+# dir would put a path that is deleted minutes later in front of every future
+# refusal.
+#
+# Never throws: a registry we cannot write is the degraded case, not a failure.
+function Register-SoftSeatStore {
+    param($Origin)
+    if (-not $Origin -or $Origin.kind -eq 'explicit') {
+        return [pscustomobject]@{ action = 'skipped'; why = 'an explicit -StoreDir is a per-call store, not a clone'; path = $null }
+    }
+    $loc = Get-SoftSeatRegistryLocation
+    if ($loc.state -ne 'ok') {
+        return [pscustomobject]@{ action = $loc.state; why = $loc.why; path = $null }
+    }
+    try {
+        $dir = Split-Path $loc.path -Parent
+        if ($dir -and -not (Test-Path -LiteralPath $dir -PathType Container)) {
+            New-Item -ItemType Directory -Force -Path $dir | Out-Null
+        }
+        $lockPath = Join-Path $dir 'stores.lock'
+        $lock = $null
+        for ($try = 0; $try -lt 4 -and -not $lock; $try++) {
+            try {
+                $lock = [IO.File]::Open($lockPath, [IO.FileMode]::OpenOrCreate, [IO.FileAccess]::ReadWrite, [IO.FileShare]::None)
+            }
+            catch {
+                $lock = $null
+                Start-Sleep -Milliseconds 100
+            }
+        }
+        if (-not $lock) {
+            return [pscustomobject]@{ action = 'failed'; why = "another process holds $lockPath"; path = $loc.path }
+        }
+        try {
+            # Re-read UNDER the lock: two clones registering at once must not
+            # each write the other away.
+            $reg = Read-SoftSeatRegistry
+            $own = Get-SoftSeatComparablePath $Origin.dir
+            foreach ($s in @($reg.stores)) {
+                if ((Get-SoftSeatComparablePath $s.dir) -eq $own) {
+                    return [pscustomobject]@{ action = 'present'; why = 'already registered'; path = $loc.path }
+                }
+            }
+            # Malformed rows are dropped by the reader and therefore by this
+            # rewrite. A row whose 'dir' is not a path names no store, so there
+            # is nothing to preserve — and keeping it would hand the next read
+            # the same unusable entry to warn about forever.
+            $next = @($reg.stores) + [pscustomobject]@{
+                dir        = [IO.Path]::GetFullPath($Origin.dir)
+                root       = $Origin.root
+                first_seen = [datetime]::UtcNow.ToString('yyyy-MM-ddTHH:mm:ssZ')
+            }
+            Write-SoftSeatRegistryFile -Path $loc.path -Stores $next
+            return [pscustomobject]@{ action = 'registered'; why = $loc.why; path = $loc.path }
+        }
+        finally { $lock.Dispose() }
+    }
+    catch {
+        return [pscustomobject]@{ action = 'failed'; why = $_.Exception.Message; path = $loc.path }
+    }
+}
+
+# Every registered store that is NOT this one. Empty for an explicit -StoreDir.
+function Get-SoftSeatForeignStores {
+    param($Origin, $Registry)
+    if (-not $Origin -or $Origin.kind -eq 'explicit') { return @() }
+    if (-not $Registry -or $Registry.state -ne 'ok') { return @() }
+    $own = Get-SoftSeatComparablePath $Origin.dir
+    $out = @()
+    foreach ($s in @($Registry.stores)) {
+        $cmp = Get-SoftSeatComparablePath $s.dir
+        if (-not $cmp -or $cmp -eq $own) { continue }
+        $root = $s.root
+        if (-not $root) {
+            $parent = Split-Path $s.dir -Parent
+            if ($parent) { $root = Split-Path $parent -Parent }
+        }
+        $out += [pscustomobject]@{
+            dir    = $s.dir
+            root   = $root
+            exists = (Test-Path -LiteralPath $s.dir -PathType Container)
+        }
+    }
+    return @($out)
+}
+
+# The union READ. Foreign stores are read WITHOUT taking their lock: a lock we
+# hold across two stores is a deadlock the moment the other clone claims in the
+# other order, and a torn read throws rather than lying, which is reported.
+#
+# A foreign row is NOT excluded by seat id, unlike a local one. Locally that
+# exclusion is what makes a re-claim idempotent; across clones the same seat
+# name in another working copy is a second checkout doing the work, and the
+# refusal names where its row lives so it can be released THERE.
+function Read-SoftSeatForeignHolders {
+    param($Stores, [string] $WorkItem)
+    $holders = @()
+    $unreadable = @()
+    foreach ($s in @($Stores)) {
+        if (-not $s) { continue }
+        if (-not $s.exists) {
+            $unreadable += [pscustomobject]@{ dir = $s.dir; reason = 'the directory no longer exists' }
+            continue
+        }
+        $path = Join-Path $s.dir 'claims.json'
+        # A registered clone that has never claimed has no store file. That is
+        # not a hole — there is nothing there to miss.
+        if (-not (Test-Path -LiteralPath $path -PathType Leaf)) { continue }
+        $store = $null
+        try { $store = Read-SoftSeatStoreFile $s.dir }
+        catch {
+            $unreadable += [pscustomobject]@{ dir = $s.dir; reason = $_.Exception.Message }
+            continue
+        }
+        foreach ($c in @(Get-SoftSeatMatches $store -WorkItem $WorkItem -HoldingOnly)) {
+            $c | Add-Member -NotePropertyName store_dir -NotePropertyValue $s.dir -Force
+            $c | Add-Member -NotePropertyName store_root -NotePropertyValue $s.root -Force
+            $holders += $c
+        }
+    }
+    return [pscustomobject]@{ holders = @($holders); unreadable = @($unreadable) }
 }
 
 function Normalize-SoftSeatWorkItem {
@@ -281,7 +575,16 @@ function Format-SoftSeatHolder {
     if ($Claim.pid) { $parts += "pid $($Claim.pid)" }
     if ($Claim.branch) { $parts += "branch $($Claim.branch)" }
     if ($Claim.worktree) { $parts += "worktree $($Claim.worktree)" }
-    return ($parts -join ', ')
+    $line = ($parts -join ', ')
+    # A foreign holder must name the CLONE it is in, or the refusal sends the
+    # reader to look for a row in a store that does not have it (DRA-102).
+    # store_dir is stamped only by Read-SoftSeatForeignHolders, so a local row
+    # prints exactly as it always did.
+    if ($Claim.PSObject.Properties['store_dir'] -and $Claim.store_dir) {
+        $where = if ($Claim.store_root) { $Claim.store_root } else { $Claim.store_dir }
+        $line += " [in another CLONE: $where — store $($Claim.store_dir)]"
+    }
+    return $line
 }
 
 function New-SoftSeatClaimObject {
@@ -315,6 +618,7 @@ function Invoke-SoftSeatClaim {
         [string] $Branch,
         [string] $Worktree,
         $ExecutorPid,
+        $ForeignStores,
         [switch] $Check
     )
     $Mode = $Mode.ToLowerInvariant()
@@ -335,6 +639,13 @@ function Invoke-SoftSeatClaim {
         # it is not an exception, this seat is simply not a second executor.
         $holders = @(Get-SoftSeatMatches $store -WorkItem $item -NotSeatId $SeatId -HoldingOnly)
 
+        # ...and every live seat in every OTHER registered clone (DRA-102).
+        # This is the whole union-READ half: the decision sees them, the write
+        # below never touches their file.
+        $foreign = Read-SoftSeatForeignHolders -Stores $ForeignStores -WorkItem $item
+        $foreignHolders = @($foreign.holders)
+        if ($foreignHolders.Count -gt 0) { $holders = @($holders) + $foreignHolders }
+
         $ownExclusive = $false
         foreach ($c in $mine) {
             if (Test-SoftSeatExclusive $c.status) { $ownExclusive = $true; break }
@@ -352,20 +663,48 @@ function Invoke-SoftSeatClaim {
                 $names = ($stale | ForEach-Object { "'$($_.seat_id)'" }) -join ', '
                 $staleLine = "`nLooks stale (age >= $($script:SoftSeatStaleAfterHours)h or a recorded pid that is no longer running): $names."
             }
+            # A foreign row cannot be released from here — this seat writes only
+            # its own store. Naming the clone is not decoration: without the
+            # path, the reader runs release-seat.ps1 in THIS tree, is told "no
+            # live claim matches", and concludes the refusal was spurious.
+            $foreignLine = ''
+            if ($foreignHolders.Count -gt 0) {
+                $cmds = @($foreignHolders | ForEach-Object {
+                        $r = if ($_.store_root) { $_.store_root } else { (Split-Path (Split-Path $_.store_dir -Parent) -Parent) }
+                        "  pwsh -NoProfile -File `"$(Join-Path $r 'scripts/release-seat.ps1')`" -WorkItem $label -SeatId $($_.seat_id)"
+                    } | Select-Object -Unique)
+                $foreignLine = "`n$($foreignHolders.Count) of those seat(s) live in ANOTHER CLONE on this machine (found through the store registry, DRA-102). This script writes only its own store, so release them where they are:`n$($cmds -join "`n")"
+            }
             $msg = @"
 REFUSED: $label is already held by $($holders.Count) live seat(s):
 $($lines -join "`n")
-A default Soft seat on a work item another seat already holds is the duplicate executor this store exists to stop (CLAUDE.md trap 70). A challenger and a disjoint slice HOLD the item too — only an abandoned claim releases it.$staleLine
+A default Soft seat on a work item another seat already holds is the duplicate executor this store exists to stop (CLAUDE.md trap 70). A challenger and a disjoint slice HOLD the item too — only an abandoned claim releases it.$staleLine$foreignLine
 If this seat is an explicit challenger, disjoint slice, or replacement, pass -Mode challenger|disjoint|replacement.
-If the holder is gone: pwsh -NoProfile -File scripts/release-seat.ps1 -WorkItem $label -ForceStale
+If the holder is gone: pwsh -NoProfile -File "`$(git rev-parse --path-format=absolute --git-common-dir)/../scripts/release-seat.ps1" -WorkItem $label -ForceStale
+(That long form runs the clone's MAIN checkout — a linked worktree carries its OWN, possibly stale, copy of these scripts. The bare relative path still works from the main checkout; it is demoted, not removed. DRA-107.)
 "@.Trim()
-            return [pscustomobject]@{ ok = $false; message = $msg; claim = $holders[0]; holders = $holders; store = $store }
+            return [pscustomobject]@{
+                ok                 = $false
+                message            = $msg
+                claim              = $holders[0]
+                holders            = $holders
+                foreign_holders    = $foreignHolders
+                foreign_unreadable = @($foreign.unreadable)
+                store              = $store
+            }
         }
 
         if ($Check) {
             $msg = "OK: $(Format-SoftSeatWorkItem $item) is claimable as $Mode by seat '$($SeatId.Trim())'."
             if ($ownExclusive) { $msg = "OK: $(Format-SoftSeatWorkItem $item) is already claimed by this seat ($((Format-SoftSeatHolder $mine[0])))." }
-            return [pscustomobject]@{ ok = $true; message = $msg; claim = $(if ($mine) { $mine[0] } else { $null }); store = $store }
+            return [pscustomobject]@{
+                ok                 = $true
+                message            = $msg
+                claim              = $(if ($mine) { $mine[0] } else { $null })
+                foreign_holders    = $foreignHolders
+                foreign_unreadable = @($foreign.unreadable)
+                store              = $store
+            }
         }
 
         if ($Mode -eq 'replacement') {
@@ -405,7 +744,18 @@ If the holder is gone: pwsh -NoProfile -File scripts/release-seat.ps1 -WorkItem 
         Write-SoftSeatStoreFile $StoreDir $store
         $verb = if ($updated) { 'refreshed' } else { 'claimed' }
         $msg = "OK: $verb $(Format-SoftSeatWorkItem $item) as $Mode for seat '$($SeatId.Trim())' ($(Format-SoftSeatHolder $claim))."
-        return [pscustomobject]@{ ok = $true; message = $msg; claim = $claim; store = $store }
+        return [pscustomobject]@{
+            ok                 = $true
+            message            = $msg
+            claim              = $claim
+            # An explicit mode was ADMITTED beside these; -Mode replacement
+            # abandoned the local exclusive row and could not touch theirs.
+            # Saying so is the difference between "took over" and "took over
+            # here" (local-WRITE is the other half of the signed shape).
+            foreign_holders    = $foreignHolders
+            foreign_unreadable = @($foreign.unreadable)
+            store              = $store
+        }
     }
     finally {
         $lock.Dispose()

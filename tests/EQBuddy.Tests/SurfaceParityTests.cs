@@ -723,4 +723,208 @@ public class SurfaceParityTests
         Assert.Null(section.ClassSourceLabel);
         Assert.Equal("", CharacterClasses.SourceLabel(ClassSource.Unknown));
     }
+
+    // ----- DRA-164 D3: the island view on the phone ---------------------------------------
+
+    private static AppSettings IslandSettings()
+    {
+        var s = Settings();
+        s.SkyGroupByIsland = true;
+        return s;
+    }
+
+    /// <summary>
+    /// **The phone's island groups ARE the desktop's** — same call, same arguments, same
+    /// result. Parity by shared module rather than by a feature list somebody keeps level
+    /// (David, 2026-08-18), which is the only kind that does not drift.
+    ///
+    /// <para>Asserted against a direct <c>SkyByIsland</c> call over the desktop's own groups,
+    /// so a phone that had started deciding anything for itself — an order, an exclusion, a
+    /// heading — fails here rather than in a player's screenshot.</para>
+    /// </summary>
+    [Fact]
+    public void ThePhoneGroupsSkyByIslandExactlyAsTheDesktopDoes()
+    {
+        var s = IslandSettings();
+        var desktop = QuestChecklistLayout.SkyByIsland(Desktop(s));
+        var phone = Checklist(Sky(s)).ToList();
+
+        Assert.NotEmpty(desktop.Groups);
+        Assert.Equal(desktop.Groups.Select(g => g.Heading), phone.Select(g => g.Heading));
+        // The counts the phone SENDS are the layout's, not a re-derivation.
+        Assert.Equal(
+            desktop.Groups.Select(g => $"{g.Done} of {g.Total}"),
+            phone.Select(g => g.Note));
+        // And the same rows, in the same order, under each of them.
+        Assert.Equal(
+            desktop.Groups.Select(g => string.Join("|", g.Rows.Select(r => r.Row.Id))),
+            phone.Select(g => string.Join("|", g.Rows.Select(r => r.Id))));
+    }
+
+    /// <summary>**The toggle is the only thing that changed.** Off, the phone draws the
+    /// reward groups it always has — which is the prove-fail for every row above: without it
+    /// they could pass on a build that had replaced the class view on the phone as well.</summary>
+    [Fact]
+    public void WithTheToggleOffThePhoneDrawsTheRewardGroupsItAlwaysHas()
+    {
+        var headings = Checklist(Sky(Settings())).Select(g => g.Heading).ToList();
+
+        Assert.Contains("Bard · Mask of Song", headings);
+        Assert.DoesNotContain(headings, h => h.StartsWith("Island ", StringComparison.Ordinal));
+        Assert.Null(Sky(Settings()).Note);
+    }
+
+    /// <summary>
+    /// **An island group carries NO class, and that is the decision rather than an omission.**
+    ///
+    /// <para>The page drops a group whose <c>class</c> falls outside the chip pick. An island
+    /// holds several classes at once, so naming one would hide the others behind a chip — the
+    /// ★ Ready band already answers this the same way. The chips then stand down, and
+    /// <see cref="QuestChecklistLayout.SkyIslandCrossClassNote"/> is the half that says so:
+    /// a control that stays on screen and stops narrowing must SAY it, or it is a live-looking
+    /// no-op (the <c>SearchScopeNote</c> rule, one surface over).</para>
+    /// </summary>
+    [Fact]
+    public void IslandGroupsCarryNoClassAndTheNoteSaysWhyTheChipsStandDown()
+    {
+        var sky = Sky(IslandSettings());
+
+        Assert.All(Checklist(sky), g => Assert.Null(g.Class));
+        Assert.NotNull(sky.Note);
+        Assert.Contains(QuestChecklistLayout.SkyIslandCrossClassNote, sky.Note);
+        // A row of one class's work still knows whose it is — the heading above it no longer
+        // does, so the row carries Core's own strings: the class PREFIXES the title and the
+        // reward leads the detail (Founder CLARIFY 2026-09-17, plan P8).
+        var rows = Checklist(sky).SelectMany(g => g.Rows).ToList();
+        Assert.Contains(rows, r => r.Text.StartsWith("[Bard] ", StringComparison.Ordinal));
+        Assert.Contains(rows,
+            r => r.Detail is { } d && d.StartsWith("Mask of Song", StringComparison.Ordinal));
+    }
+
+    /// <summary>
+    /// **The phone's island row says the class exactly where Core says it does** — the
+    /// prefixed title is <c>SkyIslandRow.Title</c> verbatim, not the phone's own bracket
+    /// grammar. Asserted row-for-row against a direct <c>SkyByIsland</c> call, so a phone that
+    /// spelled "(Bard)" or dropped the prefix on the surface with no hover fails here.
+    ///
+    /// <para>The sibling of the note test below: Core decides the WORDS, the page decides
+    /// nothing, and the class is said ONCE — so the detail beside the title carries the reward
+    /// with no second copy of the class in it.</para>
+    /// </summary>
+    [Fact]
+    public void ThePhonesIslandRowsCarryCoresClassPrefixVerbatim()
+    {
+        var s = IslandSettings();
+        var desktop = QuestChecklistLayout.SkyByIsland(Desktop(s));
+        var phone = Checklist(Sky(s)).ToList();
+
+        Assert.Equal(
+            desktop.Groups.Select(g => string.Join("|", g.Rows.Select(r => r.Title))),
+            phone.Select(g => string.Join("|", g.Rows.Select(r => r.Text))));
+
+        // Every one of them actually carries a bracket — without this the equality above is
+        // satisfied by two surfaces agreeing to draw no prefix at all (trap 78).
+        var all = desktop.Groups.SelectMany(g => g.Rows).ToList();
+        Assert.NotEmpty(all);
+        Assert.All(all, r =>
+        {
+            Assert.StartsWith("[" + r.Row.ClassName + "] ", r.Title, StringComparison.Ordinal);
+            Assert.DoesNotContain(r.Row.ClassName, r.Reward, StringComparison.OrdinalIgnoreCase);
+        });
+
+        // AND THE PHONE'S OWN DETAIL DOES NOT PUT IT BACK. The equality above compares TEXT, so
+        // it is blind to a projection that re-joined "Bard · " onto the detail beside the
+        // prefix — which is exactly the pre-P8 line, and the one change most likely to survive
+        // a careless merge. Read off the wire rows a player would be sent.
+        //
+        // Scoped to the REWARD segment the prefix change is about, not the whole detail: the
+        // rest is the drop location, where the game's own names ("Wizard Schrock") would read
+        // as our redundancy and fail a correct row.
+        var classes = desktop.Groups.SelectMany(g => g.Rows)
+            .Select(r => r.Row.ClassName).Where(c => c.Length > 0)
+            .Distinct(StringComparer.OrdinalIgnoreCase).ToList();
+        Assert.NotEmpty(classes);
+        foreach (var row in phone.SelectMany(g => g.Rows))
+        {
+            var named = classes.Single(c =>
+                row.Text.StartsWith("[" + c + "] ", StringComparison.Ordinal));
+            Assert.DoesNotContain(named, (row.Detail ?? "").Split(" · ")[0],
+                StringComparison.OrdinalIgnoreCase);
+        }
+    }
+
+    /// <summary>Every exclusion sentence Core produced rides the wire beside the cross-class
+    /// caveat — so what the phone is not showing is on the PHONE's screen, not only the PC's.
+    ///
+    /// <para>Written as "whichever of them fired", with a floor that at least one did. The
+    /// fixture turns a Bard reward in, so the hidden-rewards sentence is the one that fires;
+    /// it draws no HAND-IN rows at all, because a turn-in row is the guide projection's and
+    /// these rewards are invented rather than catalog ones. Asserting a sentence this fixture
+    /// cannot produce would have been a test about the fixture.</para></summary>
+    [Fact]
+    public void EveryExclusionSentenceTheLayoutProducedRidesTheWire()
+    {
+        var s = IslandSettings();
+        var note = Sky(s).Note;
+        var layout = QuestChecklistLayout.SkyByIsland(Desktop(s));
+        var fired = new[] { layout.TurnInNote, layout.HiddenNote }
+            .Where(x => x.Length > 0).ToList();
+
+        Assert.NotNull(note);
+        Assert.NotEmpty(fired);
+        foreach (var sentence in fired) Assert.Contains(sentence, note);
+
+        // The fixture's own: one reward turned in, hidden and counted.
+        Assert.Equal(1, layout.HiddenRewards);
+        Assert.Contains("1 turned-in reward is not listed here", note);
+    }
+
+    /// <summary>
+    /// **The page DRAWS the note, and spells none of it.**
+    ///
+    /// <para>Two halves, and the second is the one that gets skipped: a sentence the page is
+    /// SENT but never draws passes every projection test there is (DRA-84 D5, trap 34). So
+    /// this asserts the page reads <c>data.note</c> AND that none of Core's words are in the
+    /// HTML — a page-side copy would sit unseen on an open phone for weeks after the PC moved
+    /// on (trap 32).</para>
+    /// </summary>
+    [Fact]
+    public void ThePageDrawsTheIslandNoteAndSpellsNoneOfIt()
+    {
+        var html = File.ReadAllText(Path.Combine(
+            SurfaceParityPaths.SrcRoot(), "EQBuddy.Companion", "Web", "index.html"));
+
+        Assert.Contains("data.note", html);
+
+        // A REAL layout, so the exclusion sentences are the ones a player would be sent
+        // rather than ones this test composed.
+        var layout = QuestChecklistLayout.SkyByIsland(Desktop(IslandSettings()));
+        var sentences = new[]
+        {
+            QuestChecklistLayout.SkyIslandCrossClassNote,
+            layout.TurnInNote,
+            layout.HiddenNote,
+        }.Where(s => s.Length > 0).ToList();
+
+        // A floor: an empty list would make the loop below vacuous (trap 78 — a guard aimed
+        // at nothing is green).
+        Assert.True(sentences.Count >= 2, "the fixture must produce sentences to check");
+        foreach (var sentence in sentences) Assert.DoesNotContain(sentence, html);
+    }
+}
+
+/// <summary>Where the repo's <c>src</c> is, for the page-side half of the parity claim.</summary>
+internal static class SurfaceParityPaths
+{
+    public static string SrcRoot()
+    {
+        var dir = AppContext.BaseDirectory;
+        while (dir is { Length: > 0 })
+        {
+            var src = Path.Combine(dir, "src");
+            if (Directory.Exists(Path.Combine(src, "EQBuddy.Companion"))) return src;
+            dir = Path.GetDirectoryName(dir);
+        }
+        throw new DirectoryNotFoundException("could not find the repo's src/ from the test binary");
+    }
 }
