@@ -225,6 +225,16 @@ public sealed class HelperSources
                 // shape porting a feature to the phone keeps finding (trap 4). It is the lazy
                 // shipped catalog, so naming it costs nothing until something reads a band.
                 Bands = ZoneLevels.Default,
+                // **DRA-180 D2, and it is supplied HERE for the reason `Bands` above it is.**
+                // An era gate live on the PC and stood down on the phone would draw two
+                // different worlds from one profile, which is the exact shape trap 4 keeps
+                // finding when a feature is ported rather than shared. Both are lazy shipped
+                // catalogs, so naming them costs nothing until something reads an era.
+                Eras = ZoneEras.Default,
+                // The curated single fact (plan P2). It is EMPTY on `main` and stays empty
+                // until D5 sets it from named evidence — so this line ships the wiring, not a
+                // guess, and the gate stands down whole until somebody has actually answered.
+                World = WorldEra.Current,
                 // **DRA-149 D3, and it is supplied HERE for the same reason.** The pick was
                 // already read a few lines up and carried only to the picker; the engine is the
                 // SECOND reader of that one store rather than a second producer of the pick

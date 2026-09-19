@@ -2666,6 +2666,28 @@ public class ShellHostTests
         Assert.Equal("TempleofVeeshan:60+:BottomOver,Veeshan'sPeak:60+:BottomOver",
             app.DumpText("helperBandRefusals"));
 
+        // **DRA-180 D2: THE ERA GATE IS WIRED AND DELIBERATELY DARK, and this is where that is
+        // checked in a launched app.**
+        //
+        // `WorldEra.Current` ships EMPTY (plan P2) — no file in this repo states what era the
+        // world is at and D2 refuses to invent one — so the gate stands down whole and this
+        // fixture behaves exactly as it did before the slice. `helperEraGate` is the LIVENESS
+        // fact and it is read FIRST: a zero refusal count below is the same zero on a build
+        // where the gate was never wired at all, which is the assertion DRA-149 D5 item 2 was
+        // caught by. `DumpValue` throws on a fact that is absent, so this line also proves the
+        // room is emitting it.
+        //
+        // **This test is D5's prediction pack anchor.** Kael Drakkel is drawn above and eqlwiki
+        // dates it to Velious. The day the curated world era is set to anything before Velious,
+        // `helperEraGate` becomes 1, Kael leaves `helperZones`, `helperEraRefused` becomes 1
+        // and `helperEraLine` becomes 1 — and this test reddens on all four at once, which is
+        // exactly the signal D5 wants rather than a silent change to a Founder's screen.
+        Assert.Equal(0, app.DumpValue("helperEraGate"));
+        Assert.Equal(0, app.DumpValue("helperEraRefused"));
+        Assert.Equal(0, app.DumpValue("helperMaterialEraRefused"));
+        // A gate that refused nothing must not draw a caption about refusing things.
+        Assert.Equal(0, app.DumpValue("helperEraLine"));
+
         // The sweep's own cap is untouched by the gate — two caps, two numbers, no wiring.
         Assert.Equal(103, app.DumpValue("helperGearWithheld"));
         Assert.Equal(3, app.DumpValue("helperRecs"));

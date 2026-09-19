@@ -55,6 +55,14 @@ namespace EQBuddy.Companion;
 /// <param name="GearBandRefused">Which zones the Farm Gear band gate refused, with their bands
 /// and this character's level (DRA-84 D2). Its own field for the same reason as
 /// <paramref name="GearWithheld"/>, one rule out: the row is what did not get built.</param>
+/// <param name="GearEraRefused">Which places and quests the Farm Gear ERA gate refused, with
+/// the era each page gives itself and the era the world is at (DRA-180 D2). Its own field
+/// beside <paramref name="GearBandRefused"/> rather than folded into it: the two quote
+/// different evidence, and a phone that drew the band sentence but not this one would leave the
+/// player reading level numbers as the reason a place vanished for a different cause.</param>
+/// <param name="MaterialEraRefused">The era gate's refusals on the FARM MATERIALS list
+/// (DRA-180 D2) — its own field for the reason <paramref name="MaterialBandRefused"/> is its
+/// own field.</param>
 /// <param name="GearWhoWithheld">What the who rule held back — drop offers whose item page names
 /// no creature in that zone and which this character has never looted there (DRA-84 D4). Its own
 /// field beside <paramref name="GearWithheld"/> rather than summed into it: a cap and a rule are
@@ -109,6 +117,8 @@ public sealed record CompanionHelperSection(
     string Cap,
     string GearWithheld,
     string GearBandRefused,
+    string GearEraRefused,
+    string MaterialEraRefused,
     string GearWhoWithheld,
     string UnreadWorn,
     IReadOnlyList<CompanionHelperDoor> UnreadWornDoors,

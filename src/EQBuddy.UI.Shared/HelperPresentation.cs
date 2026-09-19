@@ -660,6 +660,30 @@ public static class HelperPresentation
             + "the zone it drops in, and you have not looted one there. It would rather say "
             + "that than send you to a zone with only a name in hand.",
 
+        // ---- DRA-180 D2 ----------------------------------------------------------------
+
+        // **THE SUBJECT IS EQLWIKI'S DATING OF THE CONTENT, NOT THE SERVER AND NOT THE PLAYER.**
+        // "That content is not in the game yet" is a claim about the server that EQBuddy has no
+        // standing to make; what it actually did was read the era banner each place's own wiki
+        // page carries and compare it against the one era this repo was told. The eras and the
+        // world's own arrive under this line, so the sentence says WHAT happened and leaves the
+        // words each page used to the one that quotes them.
+        //
+        // It says what IS true rather than stopping at a refusal — the upgrades exist, which is
+        // the fact the Founder's empty screen destroyed. HOME-006's ban is untouched: nothing
+        // here calls anywhere safe, easy or survivable.
+        GoalGapReason.EverythingIsLaterThanTheWorld =>
+            $"{GoalLabel(gap.Goal)}: EQBuddy found upgrades in its catalog and eqlwiki dates "
+            + "every place and quest they come from to content later than the era it has been "
+            + "told the world is at. Those upgrades are real — this is about when their content "
+            + "opens, and the eras are below. Nothing in reach beats what you are wearing.",
+
+        GoalGapReason.EveryMaterialZoneLaterThanTheWorld =>
+            $"{GoalLabel(gap.Goal)}: EQBuddy found the ingredients your professions need and "
+            + "eqlwiki dates every place they drop to content later than the era it has been "
+            + "told the world is at. The eras are below — that is a statement about the wiki's "
+            + "own dating of those zones rather than about the game.",
+
         _ => "",
     };
 
@@ -1265,6 +1289,52 @@ public static class HelperPresentation
             + $"{what} for {(refused.Count == 1 ? "is" : "are")} not listed at your level "
             + $"{refused[0].Level}: {list}. Those are eqlwiki's own creature levels — EQBuddy "
             + $"leaves a zone out of this list when its band {string.Join(" or ", arms)}.";
+    }
+
+    /// <summary>How many refused subjects are NAMED before the sentence counts the rest.
+    /// <see cref="GearBandNamed"/>'s own number and its reason, one gate over: a caption
+    /// listing eleven zones with eleven era words is a table pretending to be a
+    /// sentence.</summary>
+    public const int GearEraNamed = 3;
+
+    /// <summary>
+    /// **WHAT THE ERA GATE HELD BACK, WITH THE DATES IT HELD IT BACK ON** (DRA-180 D2, plan
+    /// P3; trap 50).
+    ///
+    /// <para><b>This is the sentence the Founder's screen owed him, and it is owed twice
+    /// over.</b> His Replace list drew Kael Drakkel with nothing marking it as unreachable; his
+    /// bow and Baron screens drew nothing at all with no sentence saying why. A refusal that
+    /// says nothing is indistinguishable from a catalog with nothing in it — the same reason
+    /// <see cref="BandRefused"/> exists, one axis over.</para>
+    ///
+    /// <para><b>Two era words and a source, and no adjective</b> (HOME-006). It quotes the
+    /// wiki's own dating and the one era this repo was told, and then stops. "Not in the game
+    /// yet" would be a claim about the SERVER that nothing here measured and that EQBuddy has
+    /// no standing to make; "eqlwiki dates it to Velious" is a statement about a wiki page,
+    /// which is exactly what was read.</para>
+    /// </summary>
+    /// <param name="what">What EQBuddy found there, as a plural noun —
+    /// <see cref="BandRefusedUpgrades"/> or <see cref="BandRefusedMaterials"/>. Required for
+    /// the reason it is required there: one producer, and the single word that differs between
+    /// the two lists is the caller's to state, so neither caption can describe the other
+    /// engine's refusals.</param>
+    public static string EraRefused(IReadOnlyList<GearEraRefusal> refused, string what)
+    {
+        if (refused.Count == 0) return "";
+
+        var named = refused
+            .Take(GearEraNamed)
+            .Select(r => $"{r.Subject} ({r.Era})")
+            .ToList();
+        var rest = refused.Count - named.Count;
+        var list = string.Join(", ", named) + (rest > 0 ? $", and {rest} more" : "");
+
+        var one = refused.Count == 1;
+        return $"{refused.Count:N0} {(one ? "place" : "places")} EQBuddy has {what} for "
+            + $"{(one ? "sits" : "sit")} in content eqlwiki dates later than {refused[0].World}: "
+            + $"{list}. That is the era each page gives itself, against the era EQBuddy has "
+            + "been told the world is at — it leaves them out rather than sending you somewhere "
+            + "you cannot go yet.";
     }
 
     /// <summary>Said when the picker held standings back. Trap 50 again, one surface

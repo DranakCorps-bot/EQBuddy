@@ -1064,6 +1064,19 @@ internal sealed class HelperRoom : Grid, IShellRoom
             block.Children.Add(Door(new HelperDoor(HelperDoorKind.Gear, "")));
         }
 
+        // **THE ERA GATE'S REFUSALS COME FIRST** (DRA-180 D2, plan P3), because the gate ran
+        // first and because its sentence is the complete explanation: a place refused for its
+        // era would otherwise be read against the band numbers directly below, which are not
+        // the reason it is missing. Its door is the Gear room's, like the band caption's — the
+        // wishlist behind both is the same one.
+        if (HelperPresentation.EraRefused(
+                _answers.GearEraRefusals, HelperPresentation.BandRefusedUpgrades)
+            is { Length: > 0 } eraCap)
+        {
+            block.Children.Add(Line(eraCap, Role.Caption));
+            block.Children.Add(Door(new HelperDoor(HelperDoorKind.Gear, "")));
+        }
+
         // **AND THE BAND GATE'S REFUSALS** (DRA-84 D2, plan P2). The same shape one rule out:
         // a count spent before any row exists, said out loud with the numbers it was spent on,
         // pointing at the room that has the whole wishlist. It is drawn from what the ENGINE
@@ -1087,6 +1100,13 @@ internal sealed class HelperRoom : Grid, IShellRoom
                 _answers.MaterialBandRefusals, HelperPresentation.BandRefusedMaterials)
             is { Length: > 0 } matBandCap)
             block.Children.Add(Line(matBandCap, Role.Caption));
+
+        // The era gate's refusals on the MATERIALS list — its own sentence beside the gear one
+        // for the reason the materials BAND caption is its own sentence (DRA-180 D2).
+        if (HelperPresentation.EraRefused(
+                _answers.MaterialEraRefusals, HelperPresentation.BandRefusedMaterials)
+            is { Length: > 0 } matEraCap)
+            block.Children.Add(Line(matEraCap, Role.Caption));
 
         // **AND THE WHO RULE'S** (DRA-84 D4, plan P3). The third count spent before a row
         // exists, and the third to get its own sentence rather than be summed into the others:
@@ -1427,6 +1447,15 @@ internal sealed class HelperRoom : Grid, IShellRoom
         // about is a row that vanished. `helperBandLine` is the line, `helperBandGate` is
         // whether the gate could run at all (a level AND a band table), so a green run with a
         // zero count can be told from a run where the gate stood down.
+        // **DRA-180 D2: the LIVENESS fact comes FIRST and is not a count.** `helperEraGate` says
+        // the gate was wired and asked at all; a refusal count of 0 is the same number on a
+        // build where the gate does not exist, which is the assertion DRA-149 D5 item 2 was
+        // caught by. It reads the INPUTS the gate stands down on, so it is 1 only when the
+        // world's era is known and rankable and an era table is present.
+        $"helperEraGate={(_answers.EraGateLive ? 1 : 0)} " +
+        $"helperEraRefused={_answers.GearEraRefusals.Count} " +
+        $"helperEraLine={(HelperPresentation.EraRefused(_answers.GearEraRefusals, HelperPresentation.BandRefusedUpgrades).Length > 0 ? 1 : 0)} " +
+        $"helperMaterialEraRefused={_answers.MaterialEraRefusals.Count} " +
         $"helperBandRefused={_answers.GearBandRefusals.Count} " +
         $"helperBandLine={(HelperPresentation.BandRefused(_answers.GearBandRefusals, HelperPresentation.BandRefusedUpgrades).Length > 0 ? 1 : 0)} " +
         $"helperBandGate={(_bandGate ? 1 : 0)} " +

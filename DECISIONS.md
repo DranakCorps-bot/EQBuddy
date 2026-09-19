@@ -8544,3 +8544,58 @@ absent-means-Classic, latest-wins fold, absent-side fold, unrankable fold, conta
 touches privacy, the release go, a public surface, or the values line.
 
 — Dranak (Claude Code), Executor — DRA-180 D1
+
+## 2026-09-19 — DRA-180 D2: the era gate in `Recommendations` — four defaults
+
+Plan P1/P2/P3. Each could have gone the other way; none is on the consequence list (the era
+VALUE is game data with the wiki as source, and plan P4 routes that through Helm, not here).
+
+1. **The liveness fact reports the EFFECT, not the constant.** The plan asks E2E to assert
+   `helperEraGate=1`. It cannot be 1 on any build that ships D2, because P2 ships
+   `WorldEra.Current` EMPTY on purpose — so a dump reading that constant could only be asserted
+   against a build nobody has. The fact is now `RecommendationSet.EraGateLive`, produced by
+   `Recommendations.EraGateArmed(inputs)` — the SAME predicate the gate itself stands down on
+   (trap 4), so a dump can never claim a gate ran that did not. D2 asserts it is **0** in a
+   launched app, which is a real assertion (`DumpValue` throws on an absent fact) and is the
+   honest reading of "the gate lands dark". **D5 flips it to 1**, and the E2E carries that
+   prediction in a comment so the redness is the intended signal rather than a surprise. An
+   env-var door onto the curated value was refused: that is a second writer of the one fact P2
+   says is curated and hand-committed.
+
+2. **The two new gap reasons got their WORDS in D2, not D3.** `HelperMustListTests` refuses a
+   `GoalGapReason` no surface can say (trap 34's must-list), so the engine and its sentences
+   cannot be split across a slice boundary — the suite reddened on exactly those two rows and
+   nothing else. D3 still owns the per-anchor all-removed sentence and the `WhatsNew` drafts;
+   what landed here is the minimum the guard demands, which is the guard working rather than
+   scope creep.
+
+3. **`GearEraRefusal` is its own record, not `GearBandRefusal` with nullable halves.** The two
+   quote different evidence — two era words against two numbers and a level — and a surface
+   testing which fields were populated would be deciding the rule a second time (trap 4). The
+   same reasoning keeps `GearEraRefusals` and `MaterialEraRefusals` apart, and both apart from
+   the band lists: one merged count explains neither list (DRA-149 D3's rule).
+
+4. **Quest rows ARE era-gated, though they stay band-EXEMPT.** The band exemption is sound —
+   the quest is the path, and what guards it is not the question. Era is a different claim: a
+   quest in unopened content cannot be started at all, so offering it as a way to gear up is
+   the Kael Drakkel row's lie in quest clothes. Read off the quest catalog's own `Era` through
+   `QuestEraLadder.Allowed`, folded once per engine rather than scanned per bucket.
+
+**Measured in a launched app** (world temporarily set to Classic, then reverted):
+`helperEraGate` 0→1, `helperEraRefused` 0→**4**, `helperEraLine` 0→1, `helperZones`
+`ClanRunnyeye,KaelDrakkel,TowerofFrozenShadow`→`ClanRunnyeye`, and **`helperBandRefused` 2→0**
+— the era gate ran first and took the two 60+ planes before the band gate saw them, so the
+ORDER decision is visible end-to-end rather than only in a unit test. That is D5's prediction
+pack, already measured.
+
+**Gates:** `check.ps1` all green (5,437 unit), full E2E 380/380 green against a rebuilt app
+(trap 64). **Five mutants prove-failed**: the gate never runs (5 red), band-before-era (1 red,
+the order guard alone), the world defaulted to Classic (1 red, the P2 guard alone), the page
+sent the caption but never drew it (1 red, the must-list), and the lit-gate E2E above.
+
+**No `WhatsNew.json` entry:** the gate is dark, so nothing is player-noticeable yet. The
+release that ships a lit gate is D5's and stays the Founder's. `FABLE.md`'s DRA-180 item is
+deliberately NOT drained — D3 and D5 still need it. Nothing here touches privacy, the release
+go, a public surface, or the values line.
+
+— Dranak (Claude Code), Executor seat `opus-dra180-sr` — DRA-180 D2

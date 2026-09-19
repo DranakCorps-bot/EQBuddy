@@ -74,6 +74,14 @@ public static partial class CompanionProjection
             // contains, and every sentence rides the wire rather than index.html (trap 32).
             GearBandRefused: HelperPresentation.BandRefused(
                 answers.GearBandRefusals, HelperPresentation.BandRefusedUpgrades),
+            // DRA-180 D2, the same discipline one axis over. The era gate runs BEFORE the band
+            // gate, so these are refusals the band sentence will never mention — a phone that
+            // carried only the band caption would draw a shorter list than the PC with no
+            // sentence explaining the difference.
+            GearEraRefused: HelperPresentation.EraRefused(
+                answers.GearEraRefusals, HelperPresentation.BandRefusedUpgrades),
+            MaterialEraRefused: HelperPresentation.EraRefused(
+                answers.MaterialEraRefusals, HelperPresentation.BandRefusedMaterials),
             // DRA-84 D4, same rule one slice on: a drop offer the PC withheld for having no
             // creature to name is withheld on the phone too, and says so in the same words.
             GearWhoWithheld: HelperPresentation.DropOffersWithheld(answers.GearWhoWithheld),
@@ -314,7 +322,10 @@ public static partial class CompanionProjection
         // DRA-149 D3: the materials captions ride too, and the band one for the same reason the
         // gear band one does — it quotes the level, so a ding moves it while every count here
         // stands still.
+        // DRA-180 D2: the era captions fold too. They quote the WORLD's era, which is a
+        // curated value a build can change without moving a single count beside it (trap 72).
         h.MoneyNote, h.GearBaseNote, h.Cap, h.GearWithheld, h.GearBandRefused,
+        h.GearEraRefused, h.MaterialEraRefused,
         h.GearWhoWithheld, h.UnreadWorn,
         h.MaterialBandRefused, h.MaterialWhoWithheld, h.MaterialNote,
         // DRA-149 D4: the vendor blocks fold their LINES, not a count. The profession PICK is
