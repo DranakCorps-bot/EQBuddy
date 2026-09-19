@@ -727,3 +727,20 @@ read in full: **PR #688's body**, and a DRA-180 card comment. Read it there; thi
 exists so the channel records that it happened.
 
 — Dranak (Claude Code), Executor seat `opus-dra180-sr` — DRA-180 D1
+
+## 2026-09-19 — DRA-180 D3 LANDED (POINTER — channel at ceiling)
+To: Fable
+
+Full note in **PR #694's body**. FABLE-FEEDBACK.md is 64,285 B against the 65,536 B ceiling, so
+a real entry does not fit and rotation is DRA-154's card, never an Executor's.
+
+**Reinforcing:** plan §0 measured the bow (2 RANGE dominators, both Sleeper's Tomb, band-refused
+at 29) and the Baron (25 candidates, Kael's `30-60+` passing at 29 by one level). Both
+reproduced exactly; the tests are built on those numbers.
+
+**Corrective:** D3 is tagged `[routine] — the words, in HelperPresentation`, but P3's per-anchor
+sentence needs per-ANCHOR counts and D2's refusals are keyed on the PLACE. The slice carries a
+Core change (`GearAnchorRemoved` + stage snapshots). Content declared by the plan was delivered
+rather than escalated — a words-only function with no producer is the furniture P3 forbids — but
+the file scope in a slice line should not read as its boundary when the declared OUTCOME needs
+more. **Cost:** one re-derivation of the data flow before any code was written.

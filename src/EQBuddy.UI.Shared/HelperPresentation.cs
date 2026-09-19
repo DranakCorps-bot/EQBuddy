@@ -1337,6 +1337,88 @@ public static class HelperPresentation
             + "you cannot go yet.";
     }
 
+    /// <summary>How many emptied anchors are NAMED before the sentence counts the rest.
+    /// <see cref="GearBandNamed"/>'s number and its reason: "Replace what I wear" anchors on
+    /// EVERY worn slot, so a character early enough in the game can empty a dozen of them at
+    /// once, and a dozen of these sentences is a wall rather than an answer.</summary>
+    public const int GearAnchorsNamed = 3;
+
+    /// <summary>
+    /// **THE SENTENCE THE FOUNDER WAS OWED AND DID NOT GET** (DRA-180 D3, plan P3).
+    ///
+    /// <para>He asked for upgrades to a worn bow, got an empty list, and filed a FAIL. The list
+    /// was RIGHT: two catalog items beat that bow's base, both drop in Sleeper's Tomb, and the
+    /// band gate refused both at level 29. Every fact needed to say so was in the engine and
+    /// none of it was on the screen, so the correct answer and a broken sweep looked
+    /// identical.</para>
+    ///
+    /// <para><b>It leads with what EQBuddy FOUND, and that ordering is the point.</b> "Nothing
+    /// to show you" and "two things, both out of reach" are different states of the world, and
+    /// a sentence that opened with the absence would read as the same shrug the old empty list
+    /// gave. The count comes first because the count is the evidence that the sweep ran.</para>
+    ///
+    /// <para><b>Only the causes that actually removed something are named</b> — the
+    /// <see cref="BandRefused"/> arm rule, one surface over, and the plan's own instruction that
+    /// a sentence about a gate that did not run is furniture. On today's builds
+    /// <see cref="WorldEra.Current"/> is empty, so the era gate stands down, so
+    /// <see cref="GearAnchorRemoved.LaterContent"/> is 0 and no era clause is drawn at all. The
+    /// band half of the bow's answer ships live regardless, which is why this slice does not
+    /// wait on D5.</para>
+    ///
+    /// <para><b>The subject is EQBuddy's catalog and eqlwiki's numbers, never the game.</b> It
+    /// does not say the bow is the best bow in EverQuest — the never-BiS lock forbids exactly
+    /// that, and the catalog cannot support it. It says what EQBuddy read and what it did with
+    /// it. HOME-006 is untouched: no clause here describes what a place is like, only which
+    /// numbers a page carries.</para>
+    /// </summary>
+    public static string AnchorAllRemoved(GearAnchorRemoved anchor)
+    {
+        if (anchor.Found <= 0) return "";
+
+        // Only the causes that spent something. A "0 sit in later content" clause would be a
+        // sentence about a gate that did not run, which is the plan's own worked example of
+        // furniture — and on every shipped build so far that is the era gate every time.
+        var causes = new List<string>();
+        if (anchor.LaterContent > 0)
+            causes.Add($"{anchor.LaterContent} {(anchor.LaterContent == 1 ? "comes" : "come")} "
+                + "from content eqlwiki dates later than the era EQBuddy has been told the "
+                + "world is at");
+        if (anchor.OutsideBand > 0)
+            causes.Add($"{anchor.OutsideBand} {(anchor.OutsideBand == 1 ? "drops" : "drop")} "
+                + "only where eqlwiki lists creature levels outside yours");
+        if (anchor.NoCreature > 0)
+            causes.Add($"{anchor.NoCreature} {(anchor.NoCreature == 1 ? "sits" : "sit")} on "
+                + "pages that name nothing that drops them");
+
+        var one = anchor.Found == 1;
+        return $"{anchor.Anchor} — {Slot(anchor.Slot)}: EQBuddy has read about {anchor.Found:N0} "
+            + $"better base {(one ? "item" : "items")} and left {(one ? "it" : "every one")} "
+            + $"out. {Join(causes)}. Nothing in reach beats this item's base.";
+
+        // "a and b" / "a, b and c" — the shape a person writes, and the count can only ever be
+        // one, two or three because there are three gates.
+        static string Join(List<string> parts) => parts.Count switch
+        {
+            0 => "",
+            1 => Capitalise(parts[0]),
+            2 => Capitalise($"{parts[0]} and {parts[1]}"),
+            _ => Capitalise(string.Join(", ", parts.Take(parts.Count - 1))
+                 + $" and {parts[^1]}"),
+        };
+
+        // Every clause starts with a digit today, so this is a no-op that stays honest if a
+        // future cause opens with a word instead.
+        static string Capitalise(string s) =>
+            s.Length == 0 ? s : char.ToUpperInvariant(s[0]) + s[1..];
+    }
+
+    /// <summary>Said when more worn items got the same answer than
+    /// <see cref="GearAnchorsNamed"/> will name (trap 50: a surviving cap says so).</summary>
+    public static string AnchorsNotNamed(int held) => held <= 0
+        ? ""
+        : $"{held:N0} more worn {(held == 1 ? "item" : "items")} got the same answer. "
+          + "Gear & Loot lists what EQBuddy has read about each of them.";
+
     /// <summary>Said when the picker held standings back. Trap 50 again, one surface
     /// down.</summary>
     public static string FactionPickerCapNote(int withheld) => withheld <= 0

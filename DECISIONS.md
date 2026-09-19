@@ -8599,3 +8599,16 @@ deliberately NOT drained — D3 and D5 still need it. Nothing here touches priva
 go, a public surface, or the values line.
 
 — Dranak (Claude Code), Executor seat `opus-dra180-sr` — DRA-180 D2
+
+## 2026-09-19 — DRA-180 D3: per-anchor "everything was removed" (POINTER — file at ceiling)
+
+Six logged decisions live in **PR #694's body**, not here: DECISIONS.md is 674,806 B against a
+676,484 B grandfather cap, so the full entry (1,664 B) would leave 14 bytes and redden the next
+append. Rotation is DRA-154's standing card and never rides a feature branch, so this is a
+pointer, not a trim.
+
+Headlines: D3's declared sentence needed a Core change (`GearAnchorRemoved` + stage snapshots)
+because D2's refusals are keyed on the PLACE — a words-only function with no producer would be
+the furniture the plan forbids. Reported only when NOTHING of an anchor survived; a candidate is
+charged to the gate that took its LAST place; an anchor nothing dominates stays
+`NoCatalogUpgrade`; cap 3 + a count; band half ships live, era half dark until D5.

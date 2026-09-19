@@ -1147,6 +1147,26 @@ internal sealed class HelperRoom : Grid, IShellRoom
             block.Children.Add(doors);
         }
 
+        // **AND THEN, PER WORN ITEM, THE ANSWER THE FOUNDER ASKED FOR** (DRA-180 D3, plan P3).
+        //
+        // Every caption above counts PLACES and every one of them can be true while the player's
+        // actual question goes unanswered — he asked about a bow and about the Baron's Blade,
+        // and a sentence about Sleeper's Tomb does not name either. These lines are the same
+        // evidence turned to face the character.
+        //
+        // They are drawn AFTER the block captions and BEFORE the gaps because they are more
+        // specific than the first and less final than the second: the captions explain the list,
+        // these explain one row of the player's own gear, and a gap closes the goal. A door per
+        // line would be the same Gear door three times over, so the block's one door (already
+        // drawn with the captions above) is left to serve them.
+        var anchors = _answers.GearAnchorsRemoved;
+        foreach (var anchor in anchors.Take(HelperPresentation.GearAnchorsNamed))
+            block.Children.Add(Line(HelperPresentation.AnchorAllRemoved(anchor), Role.Caption));
+        if (HelperPresentation.AnchorsNotNamed(
+                anchors.Count - Math.Min(anchors.Count, HelperPresentation.GearAnchorsNamed))
+            is { Length: > 0 } anchorCap)
+            block.Children.Add(Line(anchorCap, Role.Caption));
+
         foreach (var gap in _answers.Gaps) block.Children.Add(Gap(gap));
 
         foreach (var goal in _answers.NotAnsweredYet)
@@ -1474,6 +1494,17 @@ internal sealed class HelperRoom : Grid, IShellRoom
         // how many offers the rule removed, and `helperWhoLine` is whether the room said so. A
         // room drawing three items with three silent who clauses and a room drawing three with
         // named creatures are the same screen to every other key here.
+        // **DRA-180 D3: the per-anchor answer, and its INPUTS beside its count** — the shape
+        // `helperBandRefusals` above established. `helperAnchorsEmptied` is how many worn items
+        // the ladder left with nothing and `helperAnchorLines` is how many the room actually
+        // DREW, so a cap that silently swallowed them all can be told from an engine that found
+        // none (trap 34 in dump form). `helperAnchorsRemoved` carries the arithmetic the
+        // sentence rests on — the anchor, what was found, and the three causes in the gates'
+        // own order — so an E2E asserts era+band+who == found rather than trusting the prose.
+        // Spaces go and `:` separates: one flat namespace (trap 58).
+        $"helperAnchorsEmptied={_answers.GearAnchorsRemoved.Count} " +
+        $"helperAnchorLines={Math.Min(_answers.GearAnchorsRemoved.Count, HelperPresentation.GearAnchorsNamed)} " +
+        $"helperAnchorsRemoved={string.Join(',', _answers.GearAnchorsRemoved.Select(a => $"{a.Anchor.Replace(" ", "")}:{a.Found}:{a.LaterContent}:{a.OutsideBand}:{a.NoCreature}"))} " +
         $"helperWho={_answers.Top.Sum(r => r.Why.OfType<GearUpgradeFact>().Count(f => f.Who.Count > 0))} " +
         $"helperWhoWithheld={_answers.GearWhoWithheld} " +
         $"helperWhoLine={(HelperPresentation.DropOffersWithheld(_answers.GearWhoWithheld).Length > 0 ? 1 : 0)} " +

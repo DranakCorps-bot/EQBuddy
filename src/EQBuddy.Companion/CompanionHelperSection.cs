@@ -84,6 +84,15 @@ namespace EQBuddy.Companion;
 /// <param name="MaterialWhoWithheld">What the who rule held back on the materials list
 /// (DRA-149 D3). Same producer and the same words as <paramref name="GearWhoWithheld"/> — the
 /// rule, the cause and the remedy are identical — on its own field for the reason above.</param>
+/// <param name="AnchorsAllRemoved">One sentence per WORN ITEM whose every catalog upgrade the
+/// ladder removed (DRA-180 D3). A list rather than one joined string because the phone draws
+/// them as separate captions exactly as the PC does, and because the cap is a COUNT of them —
+/// joining here would make <paramref name="AnchorsNotNamed"/> a number about a string. Already
+/// capped and already worded by <c>HelperPresentation</c>: the projection decides no word and
+/// no cap (trap 33). This is the field the Founder's bow and Baron FAILs are answered in, so a
+/// phone that carried the block captions without it would be the surface that still says
+/// nothing.</param>
+/// <param name="AnchorsNotNamed">What the cap above held back, said out loud (trap 50).</param>
 /// <param name="MaterialNote">Where the materials rows came FROM, and what still has no page
 /// (DRA-149 D3). Empty where no materials row was built, which is the money note's rule beside
 /// it, for the money note's reason.</param>
@@ -122,6 +131,8 @@ public sealed record CompanionHelperSection(
     string GearWhoWithheld,
     string UnreadWorn,
     IReadOnlyList<CompanionHelperDoor> UnreadWornDoors,
+    IReadOnlyList<string> AnchorsAllRemoved,
+    string AnchorsNotNamed,
     string MaterialBandRefused,
     string MaterialWhoWithheld,
     string MaterialNote,
