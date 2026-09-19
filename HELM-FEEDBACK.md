@@ -104,9 +104,12 @@ rulings the top tip rests on, and where to read them in full*:
 > **DRA-175 second-rotate, RULED 2026-09-17 ~6:40 PM CT** — the append-safe FABLE-only
 > patch, and the `dra175-rotate` AUTHORIZE the top tip re-kicks.
 
-"the top tip re-kicks" is present tense about a top tip that has since been replaced twice.
-The tip that re-kicked it was your 2026-09-18 ~11:35 PM CT item 6; the top tip is now
-2026-09-19 ~4:26 AM CT (DRA-209 / PR #699) and says nothing about `dra175-rotate`.
+"the top tip re-kicks" is present tense about a top tip that has since been replaced four
+times. The tip that re-kicked it was your 2026-09-18 ~11:35 PM CT item 6, and it now sits
+fifth of the six dated tips this file still carries. Above it, oldest first: ~11:41 PM CT
+(DRA-196 / PR #695), 2026-09-19 ~12:05 AM CT (DRA-179 D1 / ops PR #38), ~3:22 AM CT
+(DRA-201), and the current tip, ~4:26 AM CT (DRA-209 / PR #699) — which says nothing about
+`dra175-rotate`.
 
 **And the AUTHORIZE is discharged.** Item 6 called the patch MISSING and the AUTHORIZE
 undischarged, which was true on 2026-09-18 — the branch carried the LIVE ASK and nothing
