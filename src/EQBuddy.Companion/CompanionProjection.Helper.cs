@@ -90,6 +90,18 @@ public static partial class CompanionProjection
             // and the phone must draw the same four or the two surfaces disagree about what the
             // list contains. The professions note rides too, because it is the sentence saying
             // where these rows came FROM.
+            // **DRA-180 D3, and it is the reason the phone half of this slice is not optional.**
+            // Every caption on this record counts PLACES; these count the player's own worn
+            // items, which is the question that produced the FAIL. A phone that drew the band
+            // and era sentences and not these would show the player the same list as the PC and
+            // still leave the bow unexplained. Capped and worded HERE by the same producer the
+            // room calls, so the projection decides no word and no number (trap 33).
+            AnchorsAllRemoved: [.. answers.GearAnchorsRemoved
+                .Take(HelperPresentation.GearAnchorsNamed)
+                .Select(HelperPresentation.AnchorAllRemoved)],
+            AnchorsNotNamed: HelperPresentation.AnchorsNotNamed(
+                answers.GearAnchorsRemoved.Count
+                - Math.Min(answers.GearAnchorsRemoved.Count, HelperPresentation.GearAnchorsNamed)),
             MaterialBandRefused: HelperPresentation.BandRefused(
                 answers.MaterialBandRefusals, HelperPresentation.BandRefusedMaterials),
             MaterialWhoWithheld: HelperPresentation.DropOffersWithheld(answers.MaterialWhoWithheld),
@@ -327,6 +339,12 @@ public static partial class CompanionProjection
         h.MoneyNote, h.GearBaseNote, h.Cap, h.GearWithheld, h.GearBandRefused,
         h.GearEraRefused, h.MaterialEraRefused,
         h.GearWhoWithheld, h.UnreadWorn,
+        // DRA-180 D3: the per-anchor sentences fold as LINES, never as a count. They NAME the
+        // worn item and carry its three cause numbers, so swapping one picked anchor for another
+        // — or a ding moving which of its candidates the band gate takes — rewrites them while
+        // every count on this record stands still (trap 72, and trap 8's other half: nothing in
+        // them drifts on a tick).
+        Join(h.AnchorsAllRemoved, a => a), h.AnchorsNotNamed,
         h.MaterialBandRefused, h.MaterialWhoWithheld, h.MaterialNote,
         // DRA-149 D4: the vendor blocks fold their LINES, not a count. The profession PICK is
         // what moves them, and a pick swapped one-for-one leaves every count here unmoved

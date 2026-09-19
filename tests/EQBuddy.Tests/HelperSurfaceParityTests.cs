@@ -513,6 +513,12 @@ public class HelperSurfaceParityTests
                      // sentence never mentions: a page that drew only the band ones would show
                      // a shorter list than the PC with nothing on screen explaining why.
                      "h.gearEraRefused", "h.materialEraRefused",
+                     // DRA-180 D3's per-anchor answer and its cap, added in the SAME slice as
+                     // the fields. BOTH are named rather than just the list: a page that looped
+                     // the sentences and dropped the cap line would pass on one row while
+                     // silently swallowing every anchor past the third, which is trap 50 wearing
+                     // D5's clothes.
+                     "h.anchorsAllRemoved", "h.anchorsNotNamed",
                      "h.doorsLead", "h.empty", "h.gaps", "h.deferred",
                  })
             Assert.Contains(field, html, StringComparison.Ordinal);

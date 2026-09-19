@@ -1941,6 +1941,15 @@ function boot() {
                         h.materialEraRefused, h.materialBandRefused, h.materialWhoWithheld])
       if (line) wrap.appendChild(el("div", "caption", line));
 
+    // DRA-180 D3: one caption per WORN ITEM the ladder emptied, after the block captions and
+    // before the unread-worn one — the desktop room's own order. Every sentence above this is
+    // about the LIST; these are about the player's own character, which is what they asked.
+    // The PC has already capped them and already chosen every word, so this draws what it is
+    // sent and counts nothing (trap 33).
+    for (const line of (h.anchorsAllRemoved || []))
+      if (line) wrap.appendChild(el("div", "caption", line));
+    if (h.anchorsNotNamed) wrap.appendChild(el("div", "caption", h.anchorsNotNamed));
+
     // DRA-149 D2: the worn rows EQBuddy could not read about, last of the captions and
     // directly above the gaps — the desktop's own order, because that is where its
     // `NothingWornIsReadable` gap lands. It is the one caption with doors of its own (a wiki
