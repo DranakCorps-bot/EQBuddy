@@ -144,10 +144,16 @@ which S29 invites. Each slice is a card with its own done bar.
 | D4 | DRA-220 | Tracked upgrade goal, base items only, own domain object (S12) | **Sr** / hard |
 | D5 | DRA-221 | Map + spawn target layer for a tracked goal (S13, S14) | **Sr** / hard |
 | D6 | DRA-222 | Class stat relevance + weapon-aware comparison (S7.2, S7.3) | **Sr** / hard |
-| — | PARKED | S8 `+0..+10`, S9 exaltations, and the S12.3 completion conditions that depend on them | blocked on §1.3 |
+| — | PARKED | S8 `+0..+10`, S9 exaltations, and the S12.3 completion conditions that depend on them | **PARKED by Helm — §5** |
 
 D5 depends on D4. D1 is the only Jr-routable slice; under the DRA-179 router an
 untagged delivery fails closed to Sr, and D2–D6 are tagged `hard` explicitly.
+
+**D1 runs on Sr until the Jr seat proves it can start.** Helm's ruling is
+fail-closed: seat `80e720ca` still reports `error` (`process` adapter, *"Process
+adapter missing command"*), and D1 may only be kicked on Jr once DRA-201 clears
+`errorReason` **and** a throwaway wake against no assigned work proves start. A
+second Jr seat is not to be invented to get around this.
 
 **Regression bar on every slice** — S27's list, notably Sky loot auto-check,
 Sky reward completion, Epic auto-check, quest progress persistence,
@@ -157,19 +163,38 @@ first (S27).
 
 ---
 
-## 5. Open asks
+## 5. Helm ruling — RULED 2026-09-19, LIVE ASK discharged
 
-1. **Helm / Founder** — rule on §1.3: where verified `+0..+10` and exaltation
-   compatibility data come from, or confirm S8/S9 stay PARKED for this
-   program.
-2. **Helm** — SIGN the D1–D6 sequence so Executor slices may start.
+Both asks below are **answered**. `HELM.md` tip `5bc99b4f` is the ruling
+(mirrored as a PR #705 comment). Do not re-ask either question inside this
+program.
+
+1. **§1.3 S8/S9 — PARKED.** S8 `+0..+10` and S9 exaltations stay parked for
+   the whole DRA-216 program, together with the acceptance that depends on
+   them: S12.3, S24 AC 5–7/9/10, and S26 AC 10–11. **No eqlwiki harvest and no
+   other tier/exaltation data capture is authorized in this land.** A surface
+   may honestly say a comparison is unavailable; it may **not** invent `+N`
+   arithmetic or unverified exaltation compatibility. Un-parking needs a new
+   Helm ruling, not an Executor judgement.
+2. **D1–D6 — SIGNED** as tabled (DRA-217..222). The sequence is authorized in
+   order, on green gates; a slice that outgrows its declared boundary stops and
+   escalates rather than widening.
+
+Plan PR #705 merged to `main` as `90b5a866` at the pinned head `20921566`.
 
 ## 6. Operational notes raised with this plan
 
 - The **Jr Executor seat reports `error`** on the company agent list. D1 is the
-  Jr-routed slice; the seat needs recovery or D1 fails closed to Sr.
+  Jr-routed slice; the seat needs recovery or D1 fails closed to Sr. **Helm kept
+  the DRA-201 carry-out ACCEPTED and ruled D1 fails closed to Sr** until that
+  seat both clears `errorReason` and proves start. Re-read the seat through
+  `GET /api/agents/{id}` — the company agent LIST is not a preflight, and a
+  redacted `adapterConfig` reads as a plausible measurement rather than a fix.
 - **`HELM.md` head entries are corrupted** with repeated `Soft LEAVE inventing`
   filler. The rulings remain extractable — Live Holds empty, Play Console OFF,
-  DRA-196 arm (b) APPROVED — but the file wants a rotation/repair pass.
+  DRA-196 arm (b) APPROVED — but the file wants a rotation/repair pass. Helm
+  **authorized a Soft rotate/repair of the dated tips only**: Holds, Wakes,
+  Retired and standing blocks stay, the baseline is not raised, and nothing may
+  channel-wipe or `rotate --apply` history away.
 - The DRA-196 arm (c) follow-up card Helm asked Planner to file **already
   exists and is discharged**: DRA-199, merged to `main` as `03de0b7f`.
