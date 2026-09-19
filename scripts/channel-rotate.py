@@ -1139,6 +1139,58 @@ def cmd_selftest(args):
         check("an existing archive suppresses the pointer too",
               b"History rotated" not in (tmp / n3).read_bytes())
 
+    # ---- 10b. DRA-215: the FIRST-pass branch stamps the CALLER's card and date
+    #      into the LIVE file's pointer, not just into the archive header.
+    #      Case 10 above cannot reach this: it pre-writes an archive, so it is a
+    #      second pass and the pointer is suppressed by design. Nothing else in
+    #      this selftest exercises `rotate_file` with no archive on disk, so
+    #      until now the one call site that writes a pointer was uncovered.
+    #
+    #      The negative arm is the load-bearing one. A pointer built from
+    #      DRA75_CARD/DRA75_DATE -- the frozen literals rotate_fable and
+    #      rotate_helm correctly use, and which a fix applied to the wrong call
+    #      site would put here -- would still produce a well-formed pointer and
+    #      a green run, while the archive header two lines away named the real
+    #      card. The two disagreeing inside one commit is the failure; asserting
+    #      the caller's strings are present does not catch it on its own.
+    with tempfile.TemporaryDirectory() as td:
+        tmp = Path(td)
+        n3 = "SCRIBE.md"
+        (tmp / n3).write_bytes(
+            b"### an entry to move\n\n2026-09-09 body\n\n"
+            b"### an entry to keep\n\n2026-09-20 body\n\n"
+        )
+        # No archive, no pointer, no --force: the genuine first-pass state.
+        rc = rotate_file(n3, cutoff, through, card="DRA-215", date="2026-09-19",
+                         unit=3, date_source="body", apply=True, repo=tmp)
+        live = (tmp / n3).read_bytes()
+        arch3 = (tmp / ARCHIVE_DIR / n3).read_bytes()
+        want_ptr = pointer_text(through, f"{ARCHIVE_DIR}/{n3}", 1,
+                                len(b"### an entry to move\n\n2026-09-09 body\n\n"),
+                                card="DRA-215", date="2026-09-19")
+        check("first pass runs without --force", rc == 0, f"rc={rc}")
+        check("first pass writes the caller's card into the LIVE pointer",
+              b"DRA-215" in live and live.startswith(want_ptr),
+              live[:78].decode("utf-8", "replace"))
+        check("first pass writes the caller's date into the LIVE pointer",
+              b"History rotated 2026-09-19" in live)
+        check("the LIVE pointer carries NO frozen DRA-75 stamp",
+              DRA75_CARD.encode("utf-8") not in live
+              and DRA75_DATE.encode("utf-8") not in live)
+        # Read the stamp back OUT of each artifact and compare them, rather
+        # than asserting the same literal is present in both: a hardcode in one
+        # composition and the caller's value in the other is exactly a pair
+        # that both "contain a card id" while disagreeing.
+        ptr_card = re.search(rb"<!-- (.+?): history before", live)
+        hdr = re.search(rb"(?m)^\*\*Immutable\.\*\* Rotated out of the active "
+                        rb"`.+?` on (\S+) by (.+?)\.$", arch3)
+        check("live pointer and archive header name the SAME card and date",
+              bool(ptr_card) and bool(hdr)
+              and ptr_card.group(1) == hdr.group(2) == b"DRA-215"
+              and hdr.group(1) == b"2026-09-19",
+              f"pointer={ptr_card and ptr_card.group(1)} "
+              f"header={hdr and hdr.groups()}")
+
     # ---- 11-16. DRA-175 / PR #696: the same three arms on the FROZEN pair,
     #      which rotate_file's checks above cannot reach -- rotate_helm and
     #      rotate_fable are the incident-specific path and have their own
