@@ -25,11 +25,54 @@ Two files are rotated:
 HELM.md / FABLE.md / DECISIONS.md are IN SCOPE but hold nothing older than
 30 days (oldest content anywhere is 2026-08-21), so they are not touched.
 `report` is the evidence for that.
+
+DRA-207 generalised the partitioner and the driver so the tool can target the
+remaining ledgers. Three limits were removed; nothing above changed.
+
+  * The entry unit is a parameter (`--unit`, default 2). DRA-75 hardcoded
+    level 2. SCRIBE.md keeps its entries at level 3 -- under level 2 the tool
+    saw 2 blocks in a 200 KB file and reported nothing to rotate.
+
+  * The date source is a parameter (`--date-from`, default `heading`). None of
+    SCRIBE.md's 89 level-3 headings carry a date, so `heading` leaves every
+    entry undated; `body` falls back to the first date in the block. It never
+    overrides a heading date.
+
+  * `rotate` takes files, a `--card` and a `--date`, on the same partition path
+    `report` uses, and writes. With no file argument it still runs the frozen
+    DRA-75 pair: `rotate_helm` and `rotate_fable` are untouched, because they
+    encode two incident-specific recoveries that must not be generalised away.
+    Their output is byte-for-byte what main's script produces; that is a
+    done-bar condition, proved by running both scripts on the same input.
+
+  * The archive banner's Helm-holds sentence is a parameter (`--holds`, OFF by
+    default). DRA-75 hardcoded it because both files it rotated were
+    Helm-adjacent feedback channels. It is true of HELM.md and false of
+    SCRIBE.md, DECISIONS.md and BEVEL.md -- stamping it into their archives
+    asserts a hold mechanic they do not have, which is the hardcoded-card-id
+    defect one field over.
+
+Two rules the general path enforces that DRA-75 did not need:
+
+  * Undated entries are KEPT LIVE. An entry with no date has not been shown to
+    be old. (SCRIBE.md: 23 entries, 25,799 B.)
+
+  * Re-rotating a file OVERWRITES its earlier archive with a smaller one and
+    still reports success. `rotate` refuses when the archive already exists or
+    the file already carries a rotation pointer, unless `--force`.
+
+Byte conservation (preamble + archived + kept == input) is asserted before any
+write. This tool MOVES bytes; it never rewrites them.
+
+Pick the unit and the date source per file from `report`; do not guess them.
+`report --show-blocks` lists every entry with its resolved date and its
+archive/keep disposition -- read that back before rotating anything.
 """
 
 from __future__ import annotations
 
 import argparse
+import datetime as dt
 import hashlib
 import re
 import subprocess
@@ -46,15 +89,31 @@ HF_LAST_GOOD = "f4af3b5f"
 # against the next one an hour later -- trap 60a, re-read at splice time).
 HF_FLAT_MIN = 100_000
 
+# The DRA-75 stamp. Frozen: these two archives are already on main and must
+# keep reproducing byte-for-byte. Every other rotation supplies its own.
+DRA75_CARD = "DRA-75 (M0-2)"
+DRA75_DATE = "2026-09-14"
+
 HEADING = re.compile(rb"(?m)^## .*$")
 DATE = re.compile(rb"(20\d\d)-(\d\d)-(\d\d)")
+
+# The entry unit, per file. DRA-75 hardcoded level 2 because both files it
+# rotated keep entries at level 2. Three of the five ledgers left do too, but
+# SCRIBE.md keeps its entries at level 3 with only two level-2 headings in the
+# whole file -- so a level-2 partition sees 2 blocks in a 200 KB file and finds
+# nothing to rotate. Pick this per file from `report`; never guess it.
+DEFAULT_UNIT = 2
+
+
+def heading_re(unit: int) -> re.Pattern:
+    return re.compile(rb"(?m)^" + b"#" * unit + rb" .*$")
 
 
 # ---------------------------------------------------------------- helpers
 
 
-def split_blocks(data: bytes):
-    starts = [m.start() for m in HEADING.finditer(data)]
+def split_blocks(data: bytes, unit: int = DEFAULT_UNIT):
+    starts = [m.start() for m in heading_re(unit).finditer(data)]
     if not starts:
         return data, []
     preamble = data[: starts[0]]
@@ -71,8 +130,30 @@ def block_date(heading: bytes):
     return tuple(int(g) for g in m.groups()) if m else None
 
 
-def dated_of(blocks):
-    return [(block_date(h), h, b) for h, b in blocks]
+def entry_date(heading: bytes, block: bytes, source: str = "heading"):
+    """Resolve an entry's date.
+
+    `heading` (the DRA-75 behaviour, and the default) reads the date out of the
+    heading line only. `body` falls back to the first date anywhere in the block
+    when the heading has none -- it never overrides a heading date, so it can
+    only ever date an entry that `heading` left undated.
+
+    SCRIBE.md needs `body`: none of its 89 level-3 headings carry a date, so
+    under `heading` every entry is undated and a date cut archives nothing.
+    66 of the 89 carry a date in the body. `body` is opt-in because the first
+    date in a body is not guaranteed to be the entry's own date -- use
+    `report --show-blocks` to read the resolved dates back before rotating.
+    """
+    d = block_date(heading)
+    if d is None and source == "body":
+        m = DATE.search(block)
+        if m:
+            return tuple(int(g) for g in m.groups())
+    return d
+
+
+def dated_of(blocks, source: str = "heading"):
+    return [(entry_date(h, b, source), h, b) for h, b in blocks]
 
 
 def sha(data: bytes) -> str:
@@ -117,12 +198,10 @@ def flat_line_indices(data: bytes):
 
 ARCHIVE_HEADER = """# ARCHIVE — {name} (through {through})
 
-**Immutable.** Rotated out of the active `{name}` on 2026-09-14 by DRA-75
-(M0-2), under the DRA-73 plan rev 2 approved by David on 2026-09-14.
+{provenance}
 `exo-experiment: channel-rotation`.
 
-Nothing in this file is a work queue and nothing here is live. Holds live in
-`HELM.md` and only Helm lifts one — an archived line never revives a hold.
+Nothing in this file is a work queue and nothing here is live.{holds}
 Do not append here; append to the active `{name}`.
 
 {note}
@@ -134,9 +213,31 @@ Do not append here; append to the active `{name}`.
 
 """
 
-POINTER = """<!-- DRA-75 (M0-2): history before {through} lives in {archive} — immutable, do not append there. -->
+PROVENANCE = "**Immutable.** Rotated out of the active `{name}` on {date} by {card}."
 
-> **History rotated 2026-09-14.** Entries before {through} moved to
+# The holds sentence is HELM-specific and is NOT generic provenance. DRA-75
+# wrote it into both its archives because both were Helm-adjacent feedback
+# channels. Stamped into a SCRIBE.md or DECISIONS.md archive it asserts a
+# hold mechanic that file does not have -- the same defect as a hardcoded card
+# id, in a different field. Frozen for the DRA-75 pair, empty by default, and
+# passable per rotation for a file that genuinely carries Helm holds.
+DRA75_HOLDS = (
+    " Holds live in\n"
+    "`HELM.md` and only Helm lifts one — an archived line never revives a hold."
+)
+
+# Frozen verbatim, including the line wrap that falls mid-card-id. The two
+# DRA-75 archives on main were written with exactly these bytes; reproducing
+# them is a done-bar condition, so this literal is not re-derived from the
+# generic template. New rotations use PROVENANCE above and pass their own card.
+DRA75_PROVENANCE = (
+    "**Immutable.** Rotated out of the active `{name}` on 2026-09-14 by DRA-75\n"
+    "(M0-2), under the DRA-73 plan rev 2 approved by David on 2026-09-14."
+)
+
+POINTER = """<!-- {card}: history before {through} lives in {archive} — immutable, do not append there. -->
+
+> **History rotated {date}.** Entries before {through} moved to
 > [`{archive}`]({archive_rel}) ({count} entries, {size:,} bytes).
 > This file carries the live working set only. Append at the top, in explicit
 > UTF-8, additions-only (trap 60).
@@ -144,6 +245,28 @@ POINTER = """<!-- DRA-75 (M0-2): history before {through} lives in {archive} —
 ---
 
 """
+
+
+def archive_header(name, through, note, count, size, *, card, date,
+                   provenance=None, holds=""):
+    """Archive banner. `card` and `date` are the CALLING card and the REAL
+    rotation date -- DRA-75 hardcoded its own, which would stamp the wrong
+    provenance into every later archive. `holds` is the same problem one field
+    over: it defaults to empty, because the Helm-holds sentence is true of the
+    two DRA-75 channels and of nothing else."""
+    prov = (provenance or PROVENANCE).format(name=name, date=date, card=card)
+    return ARCHIVE_HEADER.format(
+        name=name, through=through, provenance=prov, holds=holds, note=note,
+        count=count, size=size
+    ).encode("utf-8")
+
+
+def pointer_text(through, archive, count, size, *, card, date):
+    return POINTER.format(
+        card=card, date=date, through=through, archive=archive,
+        archive_rel=archive, count=count, size=size,
+    ).encode("utf-8")
+
 
 HF_NOTE = """**This archive is RECOVERED TEXT, not the bytes that were in the file.**
 Commit `c7a597a8` flattened the entire 12,254-line `HELM-FEEDBACK.md` onto a
@@ -162,21 +285,49 @@ above is checkable against them.
 # ---------------------------------------------------------------- commands
 
 
+def fmt_date(d) -> str:
+    return "%04d-%02d-%02d" % d if d else "(undated)"
+
+
 def cmd_report(args):
     cutoff = tuple(int(x) for x in args.cutoff.split("-"))
     for name in args.files:
         data = (REPO / name).read_bytes()
-        preamble, blocks = split_blocks(data)
-        dated = dated_of(blocks)
+        preamble, blocks = split_blocks(data, args.unit)
+        dated = dated_of(blocks, args.date_from)
         old = [x for x in dated if x[0] is not None and x[0] < cutoff]
+        undated = [x for x in dated if x[0] is None]
         dates = sorted(d for d, _, _ in dated if d)
         print(f"{name}")
-        print(f"  bytes={len(data):,}  blocks={len(blocks)}  preamble={len(preamble):,}B")
+        print(f"  bytes={len(data):,}  unit=h{args.unit}  date-from={args.date_from}  "
+              f"blocks={len(blocks)}  preamble={len(preamble):,}B")
+
+        # The unit census, so the operator PICKS the unit instead of guessing.
+        census = {u: len(heading_re(u).findall(data)) for u in (2, 3)}
+        print(f"  headings: h2={census[2]} h3={census[3]}")
+        if census[args.unit] == 0:
+            print(f"  *** no level-{args.unit} headings -- wrong unit for this file")
+        # A heading of the OTHER level inside a block is a sub-section being
+        # swallowed (fine, it travels with its entry) or an entry being missed
+        # (not fine). Surfaced either way; the operator decides which it is.
+        other = 3 if args.unit == 2 else 2
+        swallowed = sum(len(heading_re(other).findall(b)) for _, _, b in dated)
+        if swallowed:
+            print(f"  h{other} headings carried INSIDE h{args.unit} blocks: {swallowed}"
+                  f"  (sub-sections travel with their entry; confirm they are not entries)")
+
         if dates:
-            print(f"  dates {'-'.join('%02d' % v for v in dates[0])} .. "
-                  f"{'-'.join('%02d' % v for v in dates[-1])}")
+            print(f"  dates {fmt_date(dates[0])} .. {fmt_date(dates[-1])}")
         print(f"  older than {args.cutoff}: {len(old)} blocks / "
               f"{sum(len(b) for _, _, b in old):,}B")
+        print(f"  undated (never archived by a date cut, kept live): "
+              f"{len(undated)} blocks / {sum(len(b) for _, _, b in undated):,}B")
+
+        if args.show_blocks:
+            for d, h, b in dated:
+                mark = "ARCHIVE" if (d is not None and d < cutoff) else "keep   "
+                head = h.rstrip(b"\r").decode("utf-8", "replace")[:88]
+                print(f"    {mark} {fmt_date(d)} {len(b):>8,}B  {head}")
         print()
 
 
@@ -189,16 +340,15 @@ def rotate_fable(cutoff, through, apply: bool):
     new = [b for d, _, b in dated if d is None or d >= cutoff]
 
     moved = b"".join(old)
-    header = ARCHIVE_HEADER.format(
-        name=name, through=through, note="", count=len(old), size=len(moved)
-    ).encode("utf-8")
-    pointer = POINTER.format(
-        through=through,
-        archive=f"{ARCHIVE_DIR}/{name}",
-        archive_rel=f"{ARCHIVE_DIR}/{name}",
-        count=len(old),
-        size=len(moved),
-    ).encode("utf-8")
+    header = archive_header(
+        name, through, "", len(old), len(moved),
+        card=DRA75_CARD, date=DRA75_DATE, provenance=DRA75_PROVENANCE,
+        holds=DRA75_HOLDS,
+    )
+    pointer = pointer_text(
+        through, f"{ARCHIVE_DIR}/{name}", len(old), len(moved),
+        card=DRA75_CARD, date=DRA75_DATE,
+    )
 
     if apply:
         (REPO / ARCHIVE_DIR).mkdir(parents=True, exist_ok=True)
@@ -237,17 +387,16 @@ def rotate_helm(apply: bool):
     moved = recovered + last_good
     archived_count = len(lg_blocks) + 1
 
-    header = ARCHIVE_HEADER.format(
-        name=name, through="2026-09-11", note=HF_NOTE,
-        count=archived_count, size=len(moved),
-    ).encode("utf-8")
-    pointer = POINTER.format(
-        through="2026-09-11 (through the PR #564 ask)",
-        archive=f"{ARCHIVE_DIR}/{name}",
-        archive_rel=f"{ARCHIVE_DIR}/{name}",
-        count=archived_count,
-        size=len(moved),
-    ).encode("utf-8")
+    header = archive_header(
+        name, "2026-09-11", HF_NOTE, archived_count, len(moved),
+        card=DRA75_CARD, date=DRA75_DATE, provenance=DRA75_PROVENANCE,
+        holds=DRA75_HOLDS,
+    )
+    pointer = pointer_text(
+        "2026-09-11 (through the PR #564 ask)",
+        f"{ARCHIVE_DIR}/{name}", archived_count, len(moved),
+        card=DRA75_CARD, date=DRA75_DATE,
+    )
 
     # The EXACT bytes that left, kept beside the recovery. Two reasons, and the
     # second is the load-bearing one:
@@ -292,12 +441,96 @@ def rotate_helm(apply: bool):
           f"recovered-sha={sha(recovered)}")
 
 
+def rotate_file(name, cutoff, through, *, card, date, unit=DEFAULT_UNIT,
+                date_source="heading", apply=False, force=False, holds=""):
+    """Date-rotate one file. The general path: `report` and `rotate` agree
+    because both partition through split_blocks(data, unit) and date through
+    dated_of(blocks, source).
+
+    Undated entries are KEPT LIVE, never archived by a date cut -- an entry with
+    no date has not been shown to be old.
+    """
+    data = (REPO / name).read_bytes()
+    preamble, blocks = split_blocks(data, unit)
+    if not blocks:
+        print(f"{name}: no level-{unit} headings -- wrong unit, nothing done")
+        return 1
+
+    dated = dated_of(blocks, date_source)
+    old = [b for d, _, b in dated if d is not None and d < cutoff]
+    new = [b for d, _, b in dated if d is None or d >= cutoff]
+
+    # This tool MOVES bytes; it never rewrites them. Every byte of the input is
+    # in exactly one of preamble / archived / kept. Asserted before any write.
+    moved = b"".join(old)
+    kept = b"".join(new)
+    assert len(preamble) + len(moved) + len(kept) == len(data), (
+        f"{name}: byte conservation failed "
+        f"({len(preamble)}+{len(moved)}+{len(kept)} != {len(data)})"
+    )
+
+    if not old:
+        print(f"{name}: nothing older than {through} -- nothing to rotate")
+        return 0
+
+    archive_path = REPO / ARCHIVE_DIR / name
+    # Re-running a rotation on an already-rotated file OVERWRITES the previous
+    # archive with a smaller one and reports success -- the prior history is
+    # gone and the run looks green. Refuse both tells unless forced.
+    if archive_path.exists() and not force:
+        print(f"{name}: REFUSING -- {ARCHIVE_DIR}/{name} already exists. Re-running a "
+              f"rotation overwrites the earlier archive and still reports success. "
+              f"Archive the existing file under a new name first, or pass --force.")
+        return 1
+    if b"history rotated" in data[:4000].lower() and not force:
+        print(f"{name}: REFUSING -- the file already carries a rotation pointer. "
+              f"Rotate from the live working set, or pass --force.")
+        return 1
+
+    header = archive_header(name, through, "", len(old), len(moved),
+                            card=card, date=date, holds=holds)
+    pointer = pointer_text(through, f"{ARCHIVE_DIR}/{name}", len(old), len(moved),
+                           card=card, date=date)
+    active = pointer + preamble + kept
+
+    if apply:
+        (REPO / ARCHIVE_DIR).mkdir(parents=True, exist_ok=True)
+        archive_path.write_bytes(header + moved)
+        (REPO / name).write_bytes(active)
+    print(f"{name}: {len(data):,}B -> active {len(active):,}B + archive "
+          f"{len(header)+len(moved):,}B   moved={len(old)} kept={len(new)} "
+          f"undated-kept={sum(1 for d, _, _ in dated if d is None)} "
+          f"moved-sha={sha(moved)}")
+    print(f"  unit=h{unit} date-from={date_source} stamp={card} {date}")
+    return 0
+
+
 def cmd_rotate(args):
     cutoff = tuple(int(x) for x in args.cutoff.split("-"))
-    rotate_helm(args.apply)
-    rotate_fable(cutoff, args.cutoff, args.apply)
+    if not args.files:
+        # No file named: the DRA-75 pair, on its frozen incident-specific path.
+        # These two encode recoveries (a cp437 de-mojibake, a flattened-line
+        # splice) that must NOT be generalised away.
+        rotate_helm(args.apply)
+        rotate_fable(cutoff, args.cutoff, args.apply)
+        if not args.apply:
+            print("\n(dry run -- pass --apply to write)")
+        return 0
+
+    if not args.card:
+        print("rotate: --card is required (the card id stamped into the archive "
+              "header and the live pointer)")
+        return 2
+
+    rc = 0
+    for name in args.files:
+        rc |= rotate_file(name, cutoff, args.cutoff, card=args.card, date=args.date,
+                          unit=args.unit, date_source=args.date_from,
+                          apply=args.apply, force=args.force,
+                          holds=DRA75_HOLDS if args.holds else "")
     if not args.apply:
         print("\n(dry run -- pass --apply to write)")
+    return rc
 
 
 def cmd_verify(args):
@@ -393,14 +626,48 @@ def main():
     p = argparse.ArgumentParser()
     sub = p.add_subparsers(dest="cmd", required=True)
 
+    def partition_args(p):
+        p.add_argument("--unit", type=int, default=DEFAULT_UNIT, choices=(2, 3),
+                       help="heading level that delimits one entry (default 2, the "
+                            "DRA-75 behaviour). SCRIBE.md needs 3. Pick it from "
+                            "`report`; do not guess it.")
+        p.add_argument("--date-from", default="heading", choices=("heading", "body"),
+                       dest="date_from",
+                       help="where an entry's date is read: the heading line "
+                            "(default, DRA-75 behaviour) or, when the heading has "
+                            "none, the first date in the block body. SCRIBE.md "
+                            "needs `body`: 0 of its 89 headings carry a date.")
+
     r = sub.add_parser("report")
     r.add_argument("files", nargs="+")
     r.add_argument("--cutoff", default="2026-08-15")
+    r.add_argument("--show-blocks", action="store_true", dest="show_blocks",
+                   help="list every entry with its resolved date and archive/keep "
+                        "disposition -- read this back before rotating")
+    partition_args(r)
     r.set_defaults(func=cmd_report)
 
     o = sub.add_parser("rotate")
+    o.add_argument("files", nargs="*",
+                   help="files to rotate. With NO file argument this runs the "
+                        "frozen DRA-75 pair (HELM-FEEDBACK.md + FABLE-FEEDBACK.md) "
+                        "on their incident-specific recovery path.")
     o.add_argument("--cutoff", default="2026-09-08")
+    o.add_argument("--card", help="calling card id, stamped into the archive header "
+                                  "and the live pointer. Required with a file.")
+    o.add_argument("--date", default=dt.date.today().isoformat(),
+                   help="rotation date stamped into header and pointer "
+                        "(default: today)")
+    o.add_argument("--holds", action="store_true",
+                   help="include the Helm-holds sentence in the archive banner. "
+                        "OFF by default: it is true of HELM.md and the two DRA-75 "
+                        "feedback channels, and false of SCRIBE.md / DECISIONS.md / "
+                        "BEVEL.md. Do not set it for a file that has no holds.")
+    o.add_argument("--force", action="store_true",
+                   help="override the already-rotated guards. Re-rotating a file "
+                        "overwrites its earlier archive and still reports success.")
     o.add_argument("--apply", action="store_true")
+    partition_args(o)
     o.set_defaults(func=cmd_rotate)
 
     v = sub.add_parser("verify")
