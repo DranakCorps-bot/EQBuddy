@@ -53,8 +53,6 @@
     'FABLE.md'           = 478113
     # 4x over. Never rotated.
     'BEVEL.md'           = 237551
-    # 8x over. Never rotated.
-    'BEVEL-FEEDBACK.md'  = 501704
     # 3x over. Never rotated.
     'SCRIBE.md'          = 177198
 }
