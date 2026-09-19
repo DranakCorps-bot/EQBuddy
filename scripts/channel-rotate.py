@@ -42,7 +42,15 @@ remaining ledgers. Three limits were removed; nothing above changed.
     `report` uses, and writes. With no file argument it still runs the frozen
     DRA-75 pair: `rotate_helm` and `rotate_fable` are untouched, because they
     encode two incident-specific recoveries that must not be generalised away.
-    Their output is byte-for-byte what is on main; that is a done-bar condition.
+    Their output is byte-for-byte what main's script produces; that is a
+    done-bar condition, proved by running both scripts on the same input.
+
+  * The archive banner's Helm-holds sentence is a parameter (`--holds`, OFF by
+    default). DRA-75 hardcoded it because both files it rotated were
+    Helm-adjacent feedback channels. It is true of HELM.md and false of
+    SCRIBE.md, DECISIONS.md and BEVEL.md -- stamping it into their archives
+    asserts a hold mechanic they do not have, which is the hardcoded-card-id
+    defect one field over.
 
 Two rules the general path enforces that DRA-75 did not need:
 
@@ -193,8 +201,7 @@ ARCHIVE_HEADER = """# ARCHIVE — {name} (through {through})
 {provenance}
 `exo-experiment: channel-rotation`.
 
-Nothing in this file is a work queue and nothing here is live. Holds live in
-`HELM.md` and only Helm lifts one — an archived line never revives a hold.
+Nothing in this file is a work queue and nothing here is live.{holds}
 Do not append here; append to the active `{name}`.
 
 {note}
@@ -207,6 +214,17 @@ Do not append here; append to the active `{name}`.
 """
 
 PROVENANCE = "**Immutable.** Rotated out of the active `{name}` on {date} by {card}."
+
+# The holds sentence is HELM-specific and is NOT generic provenance. DRA-75
+# wrote it into both its archives because both were Helm-adjacent feedback
+# channels. Stamped into a SCRIBE.md or DECISIONS.md archive it asserts a
+# hold mechanic that file does not have -- the same defect as a hardcoded card
+# id, in a different field. Frozen for the DRA-75 pair, empty by default, and
+# passable per rotation for a file that genuinely carries Helm holds.
+DRA75_HOLDS = (
+    " Holds live in\n"
+    "`HELM.md` and only Helm lifts one — an archived line never revives a hold."
+)
 
 # Frozen verbatim, including the line wrap that falls mid-card-id. The two
 # DRA-75 archives on main were written with exactly these bytes; reproducing
@@ -229,13 +247,17 @@ POINTER = """<!-- {card}: history before {through} lives in {archive} — immuta
 """
 
 
-def archive_header(name, through, note, count, size, *, card, date, provenance=None):
+def archive_header(name, through, note, count, size, *, card, date,
+                   provenance=None, holds=""):
     """Archive banner. `card` and `date` are the CALLING card and the REAL
     rotation date -- DRA-75 hardcoded its own, which would stamp the wrong
-    provenance into every later archive."""
+    provenance into every later archive. `holds` is the same problem one field
+    over: it defaults to empty, because the Helm-holds sentence is true of the
+    two DRA-75 channels and of nothing else."""
     prov = (provenance or PROVENANCE).format(name=name, date=date, card=card)
     return ARCHIVE_HEADER.format(
-        name=name, through=through, provenance=prov, note=note, count=count, size=size
+        name=name, through=through, provenance=prov, holds=holds, note=note,
+        count=count, size=size
     ).encode("utf-8")
 
 
@@ -321,6 +343,7 @@ def rotate_fable(cutoff, through, apply: bool):
     header = archive_header(
         name, through, "", len(old), len(moved),
         card=DRA75_CARD, date=DRA75_DATE, provenance=DRA75_PROVENANCE,
+        holds=DRA75_HOLDS,
     )
     pointer = pointer_text(
         through, f"{ARCHIVE_DIR}/{name}", len(old), len(moved),
@@ -367,6 +390,7 @@ def rotate_helm(apply: bool):
     header = archive_header(
         name, "2026-09-11", HF_NOTE, archived_count, len(moved),
         card=DRA75_CARD, date=DRA75_DATE, provenance=DRA75_PROVENANCE,
+        holds=DRA75_HOLDS,
     )
     pointer = pointer_text(
         "2026-09-11 (through the PR #564 ask)",
@@ -418,7 +442,7 @@ def rotate_helm(apply: bool):
 
 
 def rotate_file(name, cutoff, through, *, card, date, unit=DEFAULT_UNIT,
-                date_source="heading", apply=False, force=False):
+                date_source="heading", apply=False, force=False, holds=""):
     """Date-rotate one file. The general path: `report` and `rotate` agree
     because both partition through split_blocks(data, unit) and date through
     dated_of(blocks, source).
@@ -464,7 +488,7 @@ def rotate_file(name, cutoff, through, *, card, date, unit=DEFAULT_UNIT,
         return 1
 
     header = archive_header(name, through, "", len(old), len(moved),
-                            card=card, date=date)
+                            card=card, date=date, holds=holds)
     pointer = pointer_text(through, f"{ARCHIVE_DIR}/{name}", len(old), len(moved),
                            card=card, date=date)
     active = pointer + preamble + kept
@@ -502,7 +526,8 @@ def cmd_rotate(args):
     for name in args.files:
         rc |= rotate_file(name, cutoff, args.cutoff, card=args.card, date=args.date,
                           unit=args.unit, date_source=args.date_from,
-                          apply=args.apply, force=args.force)
+                          apply=args.apply, force=args.force,
+                          holds=DRA75_HOLDS if args.holds else "")
     if not args.apply:
         print("\n(dry run -- pass --apply to write)")
     return rc
@@ -633,6 +658,11 @@ def main():
     o.add_argument("--date", default=dt.date.today().isoformat(),
                    help="rotation date stamped into header and pointer "
                         "(default: today)")
+    o.add_argument("--holds", action="store_true",
+                   help="include the Helm-holds sentence in the archive banner. "
+                        "OFF by default: it is true of HELM.md and the two DRA-75 "
+                        "feedback channels, and false of SCRIBE.md / DECISIONS.md / "
+                        "BEVEL.md. Do not set it for a file that has no holds.")
     o.add_argument("--force", action="store_true",
                    help="override the already-rotated guards. Re-rotating a file "
                         "overwrites its earlier archive and still reports success.")
