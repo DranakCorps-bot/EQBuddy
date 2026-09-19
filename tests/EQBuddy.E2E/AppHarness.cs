@@ -865,6 +865,55 @@ internal sealed class AppHarness : IDisposable
             $"hudStarProbeSets past {before}; is EQBUDDY_STARPROBE=1 set on this scenario?)");
     }
 
+    /// <summary>
+    /// Lenses the Quest Tracker's class strip to one class — or to the Any chip when
+    /// <paramref name="cls"/> is null — through the <c>EQBUDDY_LENSPROBE</c> rendezvous,
+    /// which the scenario must have asked for (DRA-199).
+    ///
+    /// **The lens has two writers and both are <c>onClick</c> handlers on controls inside
+    /// that window**, which this suite cannot press and may not assert the screen of; it is
+    /// not persisted either, so it cannot be seeded before <see cref="Launch"/>. So the probe
+    /// calls <c>QuestsView.LensTo</c> — the chip's own click body, lifted out for exactly
+    /// this — never a private path built for the test.
+    ///
+    /// **It returns on <c>questsLensProbeSets</c>, which the probe raises AFTER the write**,
+    /// not on the trigger file disappearing, which only says the probe saw it (trap 62). The
+    /// same rendezvous shape as <see cref="ClickGuideDoor"/>, <see cref="DropHudChip"/> and
+    /// <see cref="SetMiniStat"/>.
+    /// </summary>
+    public void SetClassLens(string? cls) =>
+        DriveLensProbe("lens", cls ?? "-", $"lens the class strip to {cls ?? "Any"}");
+
+    /// <summary>
+    /// Rewrites the character's picked classes through the same rendezvous — the tick the
+    /// class multi-select writes.
+    ///
+    /// **It drives <c>QuestLedgerStore.SetClasses</c> and forces NO refresh, deliberately.**
+    /// That is EQBuddy Mobile's own writer (<c>CompanionActions.SetClasses</c>), and the phone
+    /// has no way to force a repaint of this window either — so the redraw has to come from
+    /// the <c>off:</c> term DRA-181 D4 put in the view's signature. Forcing one here would
+    /// exercise a path the remote writer does not have and would hide trap 72 on this surface.
+    ///
+    /// **So the counter is not the whole wait.** It says the ledger was written; it does not
+    /// say the strip has repainted. Anchor the repaint on <c>questsRenders</c> moving, then
+    /// read the facts you are asserting from ONE dump (trap 56).
+    ///
+    /// <param name="classes">The pick list. Empty means nothing picked, which is the state
+    /// where the character's resolved identity fills the strip instead.</param>
+    /// </summary>
+    public void SetClassPicks(params string[] classes) =>
+        DriveLensProbe("picks", classes.Length == 0 ? "-" : string.Join("+", classes),
+            $"write picks [{string.Join(", ", classes)}]");
+
+    private void DriveLensProbe(string verb, string arg, string doing)
+    {
+        var before = DumpValue("questsLensProbeSets");
+        File.WriteAllText(Path.Combine(ProfileDir, "quest-lens.trigger"), $"{verb} {arg}");
+        Until(() => DumpValue("questsLensProbeSets") > before, AssertTimeout,
+            $"the lens probe to {doing} (debug.txt questsLensProbeSets past {before}; is " +
+            "EQBUDDY_LENSPROBE=1 set on this scenario, and is the Quest Tracker open?)");
+    }
+
     /// <summary>Current value of a debug.txt "key=value" field, or -1 while the dump is
     /// missing, mid-write, or lacks the key — callers poll via <see cref="WaitForDump"/>.</summary>
     public int DumpValue(string key)

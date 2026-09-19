@@ -46,6 +46,12 @@ internal static class DebugHooks
     /// unless <c>EQBUDDY_STARPROBE=1</c> armed it.</summary>
     internal static int StarProbeSets;
 
+    /// <summary>How many times the lens probe has driven the Quest Tracker's class lens or
+    /// its class picks (DRA-199) — the chip's own click body and the ledger writer EQBuddy
+    /// Mobile uses. Reported in the <c>EQBUDDY_EXPAND</c> dump so the suite has a positive
+    /// event to wait on; 0 forever unless <c>EQBUDDY_LENSPROBE=1</c> armed it.</summary>
+    internal static int LensProbeSets;
+
     /// <summary>Called once from the widget's constructor, at the point the block used to
     /// sit — after the tray icon and the item-catalog warm, before the What's-new notes.
     /// </summary>
@@ -394,6 +400,56 @@ internal static class DebugHooks
                     // AFTER the write, so a wait on this is a wait on the far side of it
                     // (trap 62) rather than on the trigger file being noticed.
                     StarProbeSets++;
+                };
+                poll.Start();
+            };
+
+        // THE LENS PROBE (DRA-199, AUTHORIZED by Helm `d15c1369`), the FOURTH of this shape
+        // and deliberately not a fifth one: same trigger file in the profile, same
+        // read-before-delete, same counter raised AFTER the write.
+        //
+        // The claim is "un-picking the class the lens is ON drops its chip and lands the
+        // selection on Any", and every writer it needs is behind a pointer this suite does not
+        // have. `_classLens` has exactly two writers, both `onClick` handlers inside
+        // QuestsView, and it is not persisted — so it cannot be seeded before launch either.
+        // The picks are no better: the ledger is read once at load, so rewriting the file
+        // mid-run is never seen, and the in-memory writer is reachable from the desktop picker
+        // and the phone and from nothing a test can call.
+        //
+        // The trigger's content is "<verb> <arg>" — "lens Cleric" lenses (a bare "-" is the
+        // Any chip), "picks Warrior+Paladin" writes the pick list ("-" writes none). An
+        // unknown verb, or a window that is not open, raises nothing rather than guessing, so
+        // a staging mistake times out naming the probe.
+        if (Environment.GetEnvironmentVariable("EQBUDDY_LENSPROBE") == "1")
+            w.Loaded += (_, _) =>
+            {
+                var trigger = AppPaths.File("quest-lens.trigger");
+                var poll = new System.Windows.Threading.DispatcherTimer(
+                    System.Windows.Threading.DispatcherPriority.Background)
+                { Interval = TimeSpan.FromMilliseconds(200) };
+                poll.Tick += (_, _) =>
+                {
+                    if (!System.IO.File.Exists(trigger)) return;
+                    string text;
+                    // READ before DELETE, for the three probes above's reason: a write that
+                    // throws must not spin the timer on one trigger forever, and the suite's
+                    // next drop must be a new event.
+                    try
+                    {
+                        text = System.IO.File.ReadAllText(trigger);
+                        System.IO.File.Delete(trigger);
+                    }
+                    catch (System.IO.IOException) { return; }
+                    var parts = text.Trim().Split(' ',
+                        StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+                    if (parts.Length != 2) return;
+                    if (w._questsWindow is not { } quests) return;
+                    if (!quests.ProbeLens(parts[0], parts[1])) return;
+                    // AFTER the write, so a wait on this is a wait on the far side of it
+                    // (trap 62) rather than on the trigger file being noticed. What it does
+                    // NOT claim is that the strip has REPAINTED — the picks verb forces no
+                    // refresh on purpose, so the suite anchors the repaint on questsRenders.
+                    LensProbeSets++;
                 };
                 poll.Start();
             };
