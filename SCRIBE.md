@@ -31,6 +31,61 @@ After you take items, write a short note in `SCRIBE-FEEDBACK.md` so Scribe can l
 
 
 
+### Reddit: "Parser in MAC" — EQL parser in CrossOver on macOS, overlay won't show (u/Axorthor, harvest-only, disambiguation pending)
+
+
+
+- **Priority:** `waiting` (needs disambiguation — reporter says generic "Eqlcompanion" / "the parser"; if ours, a Mac-CrossOver overlay-visibility question on one rig; if not ours, close as non-ours). Not authorized. Soft leave. Reddit reply harvest-only unless Helm authorizes.
+
+
+
+- **Place (pending disambiguation):** If EQBuddy: the macOS/CrossOver overlay lane — `WineOverlay.cs` + the `WineFloatOverFullscreen` opt-in + the one-time `winemac.so` driver-patch flow, all documented on tip in `docs/CrossOver-macOS-overlay.md`. Neighbourhood, do not fold: the Proton/Linux item (Emberstone73 — different OS/runtime), the flicker item (-NOiCE- — reporter-resolved, different symptom), #208 (native Linux/Wayland) and #254 (macOS AltTab activation policy) — different asks. If a third-party "EQL companion" parser: not our product.
+
+
+
+- **Source (harvest-only):** Reddit r/EQLegends u/Axorthor, Sep 19, 10:13 AM CT (2026-09-19 15:13 UTC). https://www.reddit.com/r/EQLegends/comments/1wkwbrj/parser_in_mac/ — Post title: "Parser in MAC". At harvest, 3 comments (15:19–17:10 UTC). u/Dranak75 not involved. Harvest-only; nothing posted back.
+
+
+
+- **Ask (verbatim, reporter's own words):** "hey im playing eql in a new mac, using crossover, but the parser wich runs in crossover too Eqlcompanion doesnt show overlay, i assume it cant overlay the mac being in crossover.. anyone got anything to make this kind of stuff work? or do you recomend another parser? thanks"
+
+
+
+- **Ask (scoped):** New Mac, EQL under CrossOver; a log-reading parser (reporter's words: "Eqlcompanion") runs in the same bottle but its overlay does not show; reporter assumes CrossOver can't overlay, and asks (a) for a way to make the overlay work under CrossOver and (b) whether we'd recommend another parser. Product identity is NOT confirmed — nobody in-thread has pinned which tool it is.
+
+
+
+- **Thread colour (community lines, not Ask, not Scribe voice — do not act on):** u/heinekev 15:54 UTC: offered a macOS-*native* build path for the third-party `everquest-companion` (jmoyers/everquest-companion PR #54 + regnare's fork) and offered to share a prebuilt Mac app — third-party, not a DranakCorps artifact; do not link or recommend on our side without Helm. u/UnconfidentShirt 15:19 UTC: "That parser is fantastic, but the developer recently stepped away. … he just needs a breather, doesn't know when he'll return." — attribution unconfirmed; treat as community colour only. u/Expert_Garlic_2258 17:10 UTC (last line at harvest): "which parser is this?" — the community itself cannot identify the reporter's tool.
+
+
+
+- **Already shipped / checked (origin/main, this run 2026-09-19):** EQBuddy ships first-class Mac/CrossOver overlay support on tip: `docs/CrossOver-macOS-overlay.md` ("Running EQBuddy over fullscreen EverQuest on macOS (CrossOver / Wine)" — patch `winemac.so` via `scripts/crossover/setup-overlay.sh`, opt-in `"WineFloatOverFullscreen": true` in settings.json, restart, verify winlevels) + `scripts/crossover/winemac-overlay.patch` (LGPL, default-off driver knobs) + `src/EQBuddy/WineOverlay.cs` (Wine-gated, inert on Windows) + `WineFloatOverFullscreen` / `WineKeepGameFullscreen` settings in `src/EQBuddy.Core/AppSettings.cs` (both default false). The reporter's exact symptom — the overlay window not appearing over the game under CrossOver — is the precise problem that doc describes ("the game paints over them") and answers. **Not confirmed this pass:** what the reporter actually has installed (EQBuddy Windows build in the bottle vs a third-party parser vs the native-macOS build) — unconfirmed until they say.
+
+
+
+- **Hypothesis (label as such):** product identity still open (they never say "buddy"). If it *is* EQBuddy: a setup gap, not a missing feature — the overlay under CrossOver only appears after the one-time driver patch + the opt-in setting, both default-off / inert by design; the likely reply lane is the setup doc, possibly plus discoverability (the doc is not discoverable from the app). If it's a third-party parser: close as non-ours. Do not assert which.
+
+
+
+- **Class:** V0 if not ours (close as non-ours); V0 if ours (setup / discoverability guidance on the existing CrossOver doc — no new code asserted). Do not write FABLE.md from Scribe.
+
+
+
+- **Holds re-read (HELM.md this run, 2026-09-19):** Live Holds block empty; process notes only (new-thread thank-yous come to Helm before posting; promise of review/fix comes to Helm). Reddit replies remain harvest-only unless Helm/David authorize a reply. Talking to u/Axorthor is fine if, and only if, Helm posts.
+
+
+
+- **Scribe 2026-09-19 5:56 PM CT (cron intake):** New Reddit intake. Do not implement. Do not write FABLE.md. Do not open the work. Do not fold into the Proton item (Emberstone73) / the flicker item (-NOiCE-) / #208 / #254. In-thread third-party macOS builds (jmoyers / regnare) are community colour only — do not link, do not recommend. No Reddit reply drafted or posted (harvest-only). Draft below for Helm QA — NOT posted, and no reply at all without Helm.
+
+
+
+- **DranakCorps-bot thank-you (draft, for Helm QA/post — do not post without Helm. No promises, dates, pricing, or ToS.):**
+
+  > Hey Axorthor — thanks for laying it all out (new Mac, CrossOver, overlay not showing). Quick question so this lands with the right people: when you say "the parser," are you running our EQBuddy (the local log-reading overlay), or a different tool you found in CrossOver? If it's EQBuddy, the Mac overlay needs a one-time setup before it floats over the fullscreen game — happy to point you at the exact steps. Either way it's captured and on its way to the team.
+  >
+  > — EQBuddy team
+
+
 ### Banestrike achievement tracking (Untapped Potential / General / Tradeskill / Slayer / EQL)
 
 
