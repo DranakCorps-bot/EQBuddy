@@ -98,6 +98,28 @@ fixed, and they were related:
   holds the `rotate_helm` zero-flattened-lines SKIP and the nothing-to-move
   guard for the frozen pair, which are still its to land.
 
+DRA-175 / PR #696 lands that remainder on the FROZEN pair, and only there --
+the 2026-09-17 ruling names an append-safe FABLE-only patch. Three arms, each
+one measured against main at 6dc9b3b8:
+
+  * `rotate_helm` SKIPS on zero flattened lines. DRA-75 removed both, so the
+    `assert len(idx) == 2` fires and kills the WHOLE `rotate` command before the
+    FABLE half runs -- `rotate --cutoff 2026-09-08` and `--cutoff 2026-09-15`
+    both die there, rc=1, so even the dry run cannot be read. That is how the
+    FABLE half stayed unmeasured. It never re-rotates HELM-FEEDBACK.md; that
+    room is DRA-154's.
+
+  * `rotate_fable` APPENDS on a second pass, through DRA-211's `write_archive`
+    and `PASS_MARKER`. Without it the frozen path can only ever propose
+    `header + moved`, which `write_archive` correctly REFUSES -- safe, but it
+    makes a second FABLE rotation impossible rather than append-only, and the
+    weekly DRA-154 cadence produces second passes by construction.
+
+  * Nothing to move writes NOTHING. `write_archive` cannot catch this one: a
+    header-only proposal against an empty archive is a legal first write, and
+    against a populated one the refusal fires but the run exits 2 on a tree
+    whose correct answer is "no work". That is the tree at the default cutoff.
+
 A second pass does NOT write a second pointer. The active file's pointer block
 is hand-written prose (DRA-165 consolidated two passes into one table);
 regenerating it would be an Executor trimming channel content (DRA-26 rev 3
@@ -146,6 +168,12 @@ HF_FLAT_MIN = 100_000
 # keep reproducing byte-for-byte. Every other rotation supplies its own.
 DRA75_CARD = "DRA-75 (M0-2)"
 DRA75_DATE = "2026-09-14"
+
+# The card stamped into a pass marker written by the FROZEN pair's append path.
+# The frozen path takes no `--card` (DRA-207 added that to the general path
+# only), so this names the mechanism rather than pretending to a caller id
+# nobody supplied.
+DRA175_CARD = "DRA-175"
 
 HEADING = re.compile(rb"(?m)^## .*$")
 DATE = re.compile(rb"(20\d\d)-(\d\d)-(\d\d)")
@@ -514,43 +542,98 @@ def cmd_report(args):
         print()
 
 
-def rotate_fable(cutoff, through, apply: bool):
+def rotate_fable(cutoff, through, apply: bool, repo: Path | None = None):
+    repo = repo or REPO
     name = "FABLE-FEEDBACK.md"
-    data = (REPO / name).read_bytes()
+    data = (repo / name).read_bytes()
     preamble, blocks = split_blocks(data)
     dated = dated_of(blocks)
     old = [b for d, _, b in dated if d is not None and d < cutoff]
     new = [b for d, _, b in dated if d is None or d >= cutoff]
 
     moved = b"".join(old)
-    header = archive_header(
-        name, through, "", len(old), len(moved),
-        card=DRA75_CARD, date=DRA75_DATE, provenance=DRA75_PROVENANCE,
-        holds=DRA75_HOLDS,
-    )
-    pointer = pointer_text(
-        through, f"{ARCHIVE_DIR}/{name}", len(old), len(moved),
-        card=DRA75_CARD, date=DRA75_DATE,
-    )
+    archive = repo / ARCHIVE_DIR / name
+    existing = archive.read_bytes() if archive.exists() else b""
 
-    # The composition is DRA-75's, unchanged; only the write is routed through
-    # the append guard. On the pristine tree there is no archive, so this is a
-    # no-op and the bytes are identical -- that is a done-bar condition. On a
-    # tree DRA-75 has already rotated it stops this path replacing the archive,
-    # which is the same one-way door DRA-211 closed on rotate_file.
-    write_archive(REPO / ARCHIVE_DIR / name, header + moved, apply)
+    # DRA-175: nothing to move is not a reason to write. `write_archive` cannot
+    # catch this one -- a header-only proposal against an EMPTY archive is a
+    # legal first write, and against a populated one the refusal fires but the
+    # run still exits 2 on a tree where the correct answer is "no work". This
+    # is the exact state of the tree at the default cutoff.
+    if not old:
+        print(f"{name}: NOTHING TO ROTATE at cutoff {through} — "
+              f"{len(blocks)} blocks, none older. Archive untouched "
+              f"({len(existing):,}B, {len(split_blocks(existing)[1])} entries).")
+        return 0
+
+    if existing:
+        # DRA-175: SECOND pass onward. The DRA-75 header stays exactly as
+        # written -- a second header would be a second file claiming to be this
+        # one -- and the new entries go on the END behind DRA-211's pass marker.
+        # Without this arm the frozen path can only ever propose `header +
+        # moved`, which `write_archive` correctly REFUSES: safe, but it makes a
+        # second FABLE rotation impossible rather than append-only.
+        addition = PASS_MARKER.format(
+            hashes="#" * DEFAULT_UNIT, date=dt.date.today().isoformat(),
+            card=DRA175_CARD, name=name, through=through,
+            count=len(old), size=len(moved), sha=sha(moved),
+        ).encode("utf-8") + moved
+        proposed = existing + addition
+        # No second pointer, for the reason rotate_file states: the active
+        # file's pointer prose is hand-written across the earlier passes and
+        # regenerating it would be an Executor trimming channel content.
+        pointer = b""
+    else:
+        # The first-pass composition is DRA-75's, unchanged and byte-for-byte.
+        addition = archive_header(
+            name, through, "", len(old), len(moved),
+            card=DRA75_CARD, date=DRA75_DATE, provenance=DRA75_PROVENANCE,
+            holds=DRA75_HOLDS,
+        ) + moved
+        proposed = addition
+        pointer = pointer_text(
+            through, f"{ARCHIVE_DIR}/{name}", len(old), len(moved),
+            card=DRA75_CARD, date=DRA75_DATE,
+        )
+
+    write_archive(archive, proposed, apply)
+    active = pointer + preamble + b"".join(new)
     if apply:
-        (REPO / name).write_bytes(pointer + preamble + b"".join(new))
-    print(f"{name}: {len(data):,}B -> active {len(pointer)+len(preamble)+sum(len(b) for b in new):,}B "
-          f"+ archive {len(header)+len(moved):,}B   moved={len(old)} kept={len(new)} "
-          f"moved-sha={sha(moved)}")
+        (repo / name).write_bytes(active)
+
+    verb = "append" if existing else "create"
+    print(f"{name}: {len(data):,}B -> active {len(active):,}B "
+          f"+ archive {len(existing):,}B +{len(addition):,}B = {len(proposed):,}B "
+          f"({verb})   moved={len(old)} kept={len(new)} moved-sha={sha(moved)}")
+    if existing:
+        cum = split_blocks(proposed)[1]
+        markers = sum(1 for h, _ in cum if b"ROTATION PASS APPENDED" in h)
+        print(f"  NO new pointer was written; the existing pointer prose was left "
+              f"alone and now names the earlier passes only. Cumulative after this "
+              f"pass: {len(cum) - markers} entries + {markers} pass marker(s) / "
+              f"{len(proposed):,}B in {ARCHIVE_DIR}/{name}. "
+              f"Correct the pointer and the live rotation marker by hand.")
+    return 0
 
 
-def rotate_helm(apply: bool):
+def rotate_helm(apply: bool, repo: Path | None = None):
+    repo = repo or REPO
     name = "HELM-FEEDBACK.md"
-    data = (REPO / name).read_bytes()
+    data = (repo / name).read_bytes()
     lines = data.split(b"\n")
     idx = flat_line_indices(data)
+    # DRA-175: zero flattened lines is not a failure -- it is DRA-75 having
+    # already done this half. The assert below was written when exactly two
+    # were guaranteed, and post-DRA-75 it aborts the WHOLE rotate command
+    # before the FABLE half runs, so even the dry run cannot be read. Measured
+    # on main at 6dc9b3b8: `rotate --cutoff 2026-09-08` and `--cutoff
+    # 2026-09-15` both die here, rc=1, before FABLE is reached. This function
+    # never re-rotates HELM-FEEDBACK.md; that room is DRA-154's.
+    if not idx:
+        print(f"{name}: SKIPPED — 0 flattened lines >= {HF_FLAT_MIN:,}B "
+              f"({len(data):,}B on disk). DRA-75 discharged this half; "
+              f"nothing here to move and no re-rotation is attempted.")
+        return
     assert len(idx) == 2, f"expected 2 flattened lines, found {len(idx)}: {idx}"
     flat = [lines[i] for i in idx]
     rest = b"\n".join(l for i, l in enumerate(lines) if i not in idx)
@@ -614,13 +697,13 @@ def rotate_helm(apply: bool):
     active = pointer + rest.lstrip(b"\r\n")
     # Same append guard as everywhere else; a no-op on the pristine tree this
     # path is written for, and a refusal rather than a replace on any other.
-    write_archive(REPO / ARCHIVE_DIR / name, header + moved, apply)
+    write_archive(repo / ARCHIVE_DIR / name, header + moved, apply)
     if apply:
-        (REPO / ARCHIVE_DIR).mkdir(parents=True, exist_ok=True)
-        (REPO / ARCHIVE_DIR / raw_name).write_bytes(
+        (repo / ARCHIVE_DIR).mkdir(parents=True, exist_ok=True)
+        (repo / ARCHIVE_DIR / raw_name).write_bytes(
             raw_header + b"\n".join(flat) + b"\n"
         )
-        (REPO / name).write_bytes(active)
+        (repo / name).write_bytes(active)
     print(f"  kept the exact removed bytes at {ARCHIVE_DIR}/{raw_name} "
           f"({sum(len(f) for f in flat):,}B)")
     print(f"{name}: {len(data):,}B -> active {len(active):,}B + archive "
@@ -1055,6 +1138,54 @@ def cmd_selftest(args):
         # name this pass only and undercount what is on disk.
         check("an existing archive suppresses the pointer too",
               b"History rotated" not in (tmp / n3).read_bytes())
+
+    # ---- 11-16. DRA-175 / PR #696: the same three arms on the FROZEN pair,
+    #      which rotate_file's checks above cannot reach -- rotate_helm and
+    #      rotate_fable are the incident-specific path and have their own
+    #      control flow.
+    with tempfile.TemporaryDirectory() as td:
+        tmp = Path(td)
+        (tmp / ARCHIVE_DIR).mkdir(parents=True)
+        arch = tmp / ARCHIVE_DIR / name
+        active = tmp / name
+        first_pass = ST_ARCHIVE_1.encode("utf-8")
+        arch.write_bytes(first_pass)
+        active.write_bytes((ST_POINTER + ST_MOVE + ST_KEEP).encode("utf-8"))
+        # 0 flattened lines, exactly like the post-DRA-75 file on main today.
+        helm = tmp / "HELM-FEEDBACK.md"
+        helm_bytes = "## 2026-09-16 — a normal readable entry\n\nbody\n".encode("utf-8")
+        helm.write_bytes(helm_bytes)
+
+        # The HELM half SKIPS instead of asserting, and writes nothing. On main
+        # this raises AssertionError and the FABLE half below never runs.
+        rotate_helm(apply=True, repo=tmp)
+        check("frozen: helm-skip leaves HELM-FEEDBACK.md byte-identical",
+              helm.read_bytes() == helm_bytes)
+        check("frozen: helm-skip creates no HELM archive",
+              not (tmp / ARCHIVE_DIR / "HELM-FEEDBACK.md").exists())
+
+        # The FABLE half APPENDS rather than proposing a replace. On main this
+        # composes `header + moved` and write_archive refuses it.
+        rotate_fable(cutoff, through, apply=True, repo=tmp)
+        after = arch.read_bytes()
+        check("frozen: archive still STARTS with the first pass verbatim",
+              after.startswith(first_pass), f"{len(first_pass):,}B -> {len(after):,}B")
+        heads = [h for h, _ in split_blocks(after)[1]]
+        check("frozen: both first-pass entries survive and the moved one arrived",
+              sum(b"first pass" in h for h in heads) == 2
+              and any(b"should MOVE" in h for h in heads)
+              and sum(b"ROTATION PASS APPENDED" in h for h in heads) == 1)
+        act = active.read_bytes()
+        check("frozen: the kept entry stayed live and no second pointer landed",
+              b"should KEEP" in act and b"should MOVE" not in act
+              and act.count(b"History rotated") == 1)
+
+        # Nothing to move writes NOTHING -- the state of the real tree at the
+        # default cutoff, and the state in which the pre-DRA-211 code replaced
+        # 188 entries with a header.
+        rotate_fable(cutoff, through, apply=True, repo=tmp)
+        check("frozen: a repeat pass with nothing to move writes nothing",
+              arch.read_bytes() == after)
 
     print()
     for label, ok, detail in checks:
