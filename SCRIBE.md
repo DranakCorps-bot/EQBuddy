@@ -2329,3 +2329,35 @@ stops two voices on one account, and it is the half that worked.
 - **Already shipped:** in-app Sky checklist.
 
 - **Where it might live:** print stylesheet or copy-as-text. Not a PDF pipeline.
+
+
+
+### Sky tab: ghost auto-ticks that stick, hand-ins never taking ticks back, Wind Runes zero since they store to currency (hateborne, PR #691)
+
+- **Priority:** `waiting` (new submission Sep 18; claims player-facing break on the Sky tab — ghost `*` ticks and zeroed Wind Rune counts — **claims from the requester, unverified on tip**; not authorized). Filed at `waiting`, not `must-fix`, because the reporter's own framing is "the break is real *and* the fix is done and tested" — the ask to Helm is a disposition of the PR, not a greenfield break. No code opened by Scribe.
+- **Place:** Quest Tracker / Plane of Sky tab (Sky checklist) + the ledger behind have-counts. The PR touches `LogParser`, `QuestLedgerStore`/`QuestLedgerFeed`, new `HandInTracker` + `SkyGuessReconcile` (per PR body — quoted, not verified this pass). Neighbourhood, do not fold: #241 DasGud (have-count *mismatch* — different reporter, different shape), #243 (leftover Sky audit, already authorized by David), #235 (achievements import button), #210 (Sky design pass — different ask, do not merge).
+- **Source:** PR **#691** (OPEN, unmerged) https://github.com/DranakCorps-bot/EQBuddy/pull/691 — branch `sky-ticks-handins-folds` from `main` at `3dde6d80`, head `8940c294`. Opened 2026-09-18 4:26 PM CT (17:26 UTC) by **u/hateborne** (GitHub, "Hateborne"). 0 comments at harvest. Body says **Claude Code** generated it and names the reporter's in-game alt (**Hateborne_neriak**). u/Dranak75 not a party to the PR. A *separate* u/hateborne Reddit harvest from Aug 25 (resize this window, `1vkwbol`) exists below this file — different thread, do not fold.
+- **Ask (verbatim, PR body § 1–3):**
+  > 1. **The Plane of Sky tab ticked items I don't have** (High Quality Raiment, Wind Rune Meda, Wind Rune Ozah). Every wrong row was a `*` guess (`SkyLootAutoCheck` rule 3). Two causes:
+  >    - **Restarts re-ticked old loot.** The Sky/Epic auto-ticks diffed session loot against a RAM high-water mark that launch, session start, character switch and review all cleared, while `LogWatcher` re-reads the whole log. Each restart parked one more `*` on the next class: 68 on my profile, Wind Rune Azia starred on six classes after ~2 looted. They now tick only loot `QuestLedgerStore.RecordLoot` accepts as new; its time gate is persisted (`QuestLedgerFeed`, `ChecklistLedgerSync`).
+  >    - **Nothing took a tick back.** EQL does log hand-ins: `You offered N X to Y.` then `You complete the trade with Y.`, and a "You can have it back" refusal cancels. `HandInTracker` turns trades into ledger exits, and `SkyGuessReconcile` takes back only `*` guesses the count no longer covers. That happens on a hand-in, sale or destroy, and on an inventory scan, where each cleared guess is named in the Sky import report with Undo.
+  > 2. **Wind Runes store to currency since 2026-09-16**, which no dump shows, so every scan since then has recorded every rune as zero. The ledger no longer squares them to a dump (`Entry.OffDump` is learned from the loot line; `CurrencyItems` names runes before that), a scan never judges a rune guess, and a rune hand-in takes back one guess per rune.
+  > 3. **Sky band folds survive closing the Quest Tracker.** `SessionFolds` on MainWindow holds them for the run, shared by the pop-out and the shell's Quests room, and never as a setting (so the "session-only" ruling holds). A fresh tracker also reopens on the last tab; `_questsHost.SelectedTab` was kept and never read.
+
+- **Already shipped / checked (origin/main this run, 2026-09-19 06:20 CT):**
+  - `SkyLootAutoCheck` rule 3 exists on tip (grep-confirmed on the existing #243 / #241 entries in this file) — the *guess* mechanism the PR is correcting is in-tree.
+  - `LogWatcher` re-reading the log at launch and the RAM high-water mark the PR cites: **not re-grepped on tip this pass**; treat as *unverified claim from the PR body* until tip-checked.
+  - `HandInTracker` / `SkyGuessReconcile` / `SessionFolds`: **do not exist on tip** (grep 0-hits on tip this run). These are the PR's new classes.
+  - "EQL does log hand-ins: `You offered N X to Y.` … `You complete the trade with Y.` … 'You can have it back'": **game-truth claim from the PR body, not verified against eqlwiki or sample logs this pass.** Do not paste into an eqlwiki item without a wiki / log citation.
+  - "Wind Runes store to currency since 2026-09-16": **the 2026-09-16 date is a PR-body claim, not a sourced game-truth.** eqlwiki or a changelog entry is the lane for the actual date. Until then treat as *reporter-supplied*.
+  - The PR's own test claim: "Gates: 5,384 unit and 377 E2E, green locally" (PR body, unverified, self-reported). Live check claim: replayed a full log archive against a COPY of the reporter's profile; two replays tick nothing new. **Not reproduced by Scribe this pass.**
+- **Hypothesis (label as such):** the PR is *three fixes in one* (guess re-tick on restart; take-back on hand-in/sale/destroy/scan; rune currency gap), plus a small UX carry (folds survive close, fresh tracker reopens last tab). Each has the reporter's own log-replay as evidence and a dedicated test class. Disposition options for Helm are: (a) review the PR's diff and call it as-is, (b) call it in pieces, (c) decline with reasons. The #243 leftover-audit item (David-authorized V0–V1) is a *different* ask — do not fold into #243; do not let the PR's scan-clearing path quietly subsume it. The #210 Sky design pass is a *different* scope. Do not fold.
+- **Class:** V1–V2 if Helm takes the PR in full (new Core classes + parser + ledger changes + 4 new test suites); V1 if Helm only takes the rune-currency piece; V0 if Helm only takes the fold/last-tab UX. Do not write FABLE.md from Scribe.
+- **Off-topic here:** none.
+- **Holds re-read (HELM.md this run, 2026-09-19):** Live Holds block empty (checked 2026-09-19 run, prior entries still in force on process: new-thread thank-you still comes to Helm; promise of review/fix comes to Helm before it posts). No retired hold (not #208 / #228 / #226 / #231). Talking to hateborne is fine.
+- **Scribe 2026-09-19 06:20 CT (cron intake):** New intake. Do not implement. Do not write FABLE.md. Do not merge PR #691 without Helm/David. Do not fold into #243 / #241 / #235 / #210 / #165 / #435. Disposition is Helm's.
+- **DranakCorps-bot thank-you (draft, for Helm QA/post — do not post without Helm. No promises, dates, pricing, ToS.):**
+
+  > Hi hateborne — thank you for PR #691 and for the log-replay evidence in the body; that's a very complete shape for this. Captured and sent on for review.
+  >
+  > — EQBuddy team
