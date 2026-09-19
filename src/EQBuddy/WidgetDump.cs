@@ -725,6 +725,14 @@ internal static class WidgetDump
                     // suite's synchronisation point on the far side of the click, and 0 on
                     // every profile that did not ask for the probe.
                     $"doorProbeClicks={DebugHooks.DoorProbeClicks} " +
+                    // …and the lens probe's, beside it and reported the same way: whether or
+                    // not the Quest Tracker is open, so a suite waiting on it times out
+                    // naming the rendezvous rather than on a key that is simply absent.
+                    // Raised AFTER the write (trap 62), and 0 on every profile that did not
+                    // ask for EQBUDDY_LENSPROBE. It does NOT claim the strip has repainted —
+                    // the picks verb forces no refresh, by design; `questsRenders` is what
+                    // says a render happened on the far side of it.
+                    $"questsLensProbeSets={DebugHooks.LensProbeSets} " +
 
                     // The EVOLVED SHELL, when one is open. This is the only thing besides a
                     // screenshot that can say the rail drew, the Search affordance exists

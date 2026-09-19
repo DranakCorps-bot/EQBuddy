@@ -364,8 +364,16 @@ internal sealed class EqChip : Border
         SetSelected(false);
     }
 
+    /// <summary>Whether this chip is currently PAINTED as the selected one. Written by
+    /// <see cref="SetSelected"/> and by nothing else, so it is the one producer of the
+    /// question (trap 4) — a strip that recorded what <see cref="EqSegmentedStrip.Select"/>
+    /// was ASKED for would answer with a key no chip on screen carries, which is exactly the
+    /// stale-lens state <see cref="EqSegmentedStrip.Selected"/> exists to catch.</summary>
+    public bool Selected { get; private set; }
+
     public void SetSelected(bool on)
     {
+        Selected = on;
         var ink = _compact ? ChipStyle.ForCompact(on) : ChipStyle.For(on);
         Paint(this, BackgroundProperty, ink.Background);
         Paint(this, BorderBrushProperty, ink.Border);
@@ -436,6 +444,18 @@ internal sealed class EqSegmentedStrip(Panel host, bool compact = false)
     /// carries a timestamp — and reaching for it by key beats every caller keeping its
     /// own field.</summary>
     public EqChip? Chip(object key) => _chips.FirstOrDefault(c => Equals(c.Key, key));
+
+    /// <summary>The key of the chip PAINTED selected, or <c>null</c> when no chip is — the
+    /// sibling of <see cref="Keys"/> and added for the same reason (DRA-199): a DUMP fact has
+    /// to say what reached the SCREEN, and the field a caller lensed with is a different
+    /// claim from the chip a player can see lit.
+    ///
+    /// <para><b>Null is the load-bearing answer.</b> <see cref="Select"/> paints nothing when
+    /// no chip carries the key, so a view holding a lens on a class whose chip has just been
+    /// dropped reads <c>null</c> here — the stale-lens bug — while the field would still name
+    /// the class. Read off the chips rather than off a key this strip remembered, so the two
+    /// cannot part company (trap 4).</para></summary>
+    public object? Selected => _chips.FirstOrDefault(c => c.Selected)?.Key;
 
     /// <summary>Paints the selection. Compared with <see cref="object.Equals(object?,
     /// object?)"/> so strips keyed on strings, enums or null all work without the caller

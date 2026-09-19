@@ -125,7 +125,16 @@ with `Wait.Until` — every assertion is an observable condition with a timeout 
 reason; there are no bare sleeps. Timeouts fold in the dump content and the profile's
 `error.log` tail.
 
-**One channel runs the other way: `EQBUDDY_DOORPROBE=1` plus a trigger file** (OE-2). The
+**Four channels run the other way, and they are ONE shape: an `EQBUDDY_*PROBE` env name
+plus a trigger file in the profile.** `EQBUDDY_DOORPROBE` (OE-2, below) was the first;
+`EQBUDDY_PETDROP` drives a real mini-bar drop (SIGNED #422), `EQBUDDY_STARPROBE` a Mini
+dashboard ★ (DRA-81), and `EQBUDDY_LENSPROBE` the Quest Tracker's class lens and its picks
+(DRA-199). Each drives the SAME writer the control drives — never a private path built for
+the test — and each raises its own counter in the dump AFTER the write, so a wait on it is a
+wait on the far side of the change (trap 62). **A fifth of this shape should be a fifth
+instance of it, not a fifth design.**
+
+**The first of them: `EQBUDDY_DOORPROBE=1` plus a trigger file** (OE-2). The
 dump is one-way — the app writes, the suite reads — and every other `EQBUDDY_*` hook fires
 once at `Loaded`, which cannot reach a state that only exists MID-run: "the player has closed
 the shell". The probe polls the profile for `door.trigger` and drives the widget's
@@ -147,8 +156,8 @@ shell's exact title, leaving the app running.
 
 - **UI Automation** — no clicks, no visual-tree reads. `debug.txt` proved sufficient
   for v1, so no FlaUI/UIA dependency was taken. v2 candidate if a scenario needs
-  interaction (Options, breakouts, satellite windows). *The OE-2 door probe above is not
-  an exception to this: nothing presses a menu row, the app invokes its own handler.*
+  interaction (Options, breakouts, satellite windows). *The four probes above are not an
+  exception to this: nothing presses a control, the app invokes its own handler's writer.*
 - **Avalonia app** — it has its own headless render tests; a Linux E2E lane is separate work.
 - **Installer / updater** — `UpdateFolder` is pointed at an empty dir on purpose.
 - **Spawn timers, mez/slow chips, buff timers, alerts firing** (sound/speech/banners),

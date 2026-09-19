@@ -1,3 +1,14 @@
+## 2026-09-19 — DRA-199: the live class-lens transition (DRA-181 D4 arm (c))
+
+**AUTHORIZED by Helm** `d15c1369`; seat `sr-dra199-lensprobe`. Test-only `src/`:
+`EQBUDDY_LENSPROBE`, a `questsClassLens` dump fact, additive `EqSegmentedStrip.Selected`.
+No production behaviour change, no `WhatsNew` entry. Three calls, defaults noted:
+`Selected` is backed by `EqChip.Selected`, not a key the strip remembers — a stranded lens
+must read as nothing painted; the chip's click body moved to `LensTo` rather than being
+copied into the probe (trap 4); `picks` forces NO refresh, because the phone's writer
+cannot. Prove-failed 3×, incl. those mutants re-read off `_classLens` going GREEN — which
+is why the fact is read off the strip. Full rationale: PR body. E2E 382/382.
+
 ## 2026-09-17 — DRA-164 D1–D3: the Plane of Sky Island view, and the republish this land does NOT do
 
 **Seat:** `dra164-d1` → `d2` → `d3`, one signed sequence (Helm SIGNED PR #663 @ `148cdd6e`,

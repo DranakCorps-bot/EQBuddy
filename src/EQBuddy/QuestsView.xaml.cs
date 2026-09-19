@@ -440,7 +440,22 @@ public partial class QuestsView : UserControl
                 tip: cls is null
                     ? "Every class you play"
                     : $"Show only {cls} — quests, Epic and Plane of Sky alike",
-                onClick: () => { _classLens = cls; Refresh(force: true); });
+                onClick: () => LensTo(cls));
+    }
+
+    /// <summary>What pressing a class chip DOES — lifted out of the handler above so the
+    /// <c>EQBUDDY_LENSPROBE</c> rendezvous drives the chip's own path instead of a copy of it
+    /// (DRA-199). Behaviour is the handler's, unchanged: a second producer of "what the chip
+    /// does" is trap 4, and a probe that re-typed these two lines would go on passing on the
+    /// day the real click learned a third.
+    ///
+    /// <para><c>null</c> is the Any chip. The repaint is <see cref="Refresh"/>'s — it reaches
+    /// <see cref="ApplyTabVisual"/> through <c>BuildTabs</c>, which is what moves the
+    /// selection.</para></summary>
+    private void LensTo(string? cls)
+    {
+        _classLens = cls;
+        Refresh(force: true);
     }
 
     // The counting RULE is Core's (QuestSurface.CountOf) — this window, the Avalonia one
@@ -1354,6 +1369,11 @@ public partial class QuestsView : UserControl
         // strip (the one-class case returns before adding any), and it has to be a sentinel
         // because an empty value would corrupt the line the same way.
         $"questsClassStrip={ClassStripFact()} " +
+        // WHICH of those chips is lit, from the SAME moment as the list above (trap 56) —
+        // "the chip went away" and "the selection landed somewhere real" are two claims and
+        // reading them from two dumps would be reading them from two renders. See
+        // ClassLensFact for why it is off the strip and not off `_classLens`.
+        $"questsClassLens={ClassLensFact()} " +
         // ---- the SKY tab's island view (DRA-164) --------------------------------------
         // The MODE as the setting holds it, and the STRIP that offers it — counted off the
         // real strip rather than from the list that built it, because the claim is that the
@@ -4007,6 +4027,72 @@ public partial class QuestsView : UserControl
     private string ClassStripFact() => Dumped(string.Join("+", _classes.Keys
         .Select(k => (string)k)
         .Select(k => k.Length == 0 ? "Any" : QuestClassFilter.Abbrev(k))));
+
+    /// <summary>WHICH chip the strip is painting selected (DRA-199) — read off the REAL strip
+    /// through <see cref="EqSegmentedStrip.Selected"/>, deliberately NOT off
+    /// <c>_classLens</c>.
+    ///
+    /// <para><b>The field and the screen are different claims, and this slice exists because
+    /// they can disagree.</b> Un-picking the class the lens is on drops that chip; the lens is
+    /// supposed to fall back to Any. A fact read off <c>_classLens</c> would report the
+    /// fallback even on a build that had stopped repainting the selection — measured: with
+    /// <c>ApplyTabVisual</c>'s <c>Select</c> removed, the field says <c>Any</c> and the strip
+    /// lights nothing, and only this reading fails. Trap 42, on the surface whose whole
+    /// complaint was a chip that did not track. Abbreviated and underscore-free for
+    /// <see cref="ClassStripFact"/>'s reasons — same strip, same dump line.</para>
+    ///
+    /// <para><c>-</c> is "no chip is lit", which covers both the collapsed strip (no chips at
+    /// all) and a lens stranded on a class whose chip has gone. It is a sentinel rather than
+    /// an empty value because the dump is space-separated <c>key=value</c>.</para></summary>
+    private string ClassLensFact() => Dumped(_classes.Selected is string key
+        ? key.Length == 0 ? "Any" : QuestClassFilter.Abbrev(key)
+        : "");
+
+    /// <summary>
+    /// **THE LENS PROBE's one entry** (DRA-199, AUTHORIZED by Helm <c>d15c1369</c>) — driven
+    /// only by the <c>EQBUDDY_LENSPROBE</c> rendezvous in <see cref="DebugHooks"/>, which is
+    /// inert unless a scenario armed it.
+    ///
+    /// <para><b>Why it exists.</b> Both writers of the class lens are <c>onClick</c> handlers
+    /// on controls inside this window, and nothing in <c>tests/EQBuddy.E2E</c> can put a
+    /// pointer on one — the suite may not assert the screen, let alone drive it. The lens is
+    /// not persisted either, so it cannot be seeded before launch. Same shape, and the same
+    /// reason, as the door / pet / ★ probes.</para>
+    ///
+    /// <para><b>Both verbs drive a REAL writer, never a private path.</b> <c>lens</c> calls
+    /// <see cref="LensTo"/> — the chip's own click body. <c>picks</c> calls
+    /// <c>QuestLedgerStore.SetClasses</c>, which is the writer EQBuddy Mobile uses
+    /// (<c>CompanionActions.SetClasses</c>), and it deliberately forces NO refresh: that
+    /// remote writer has no way to force one either, so the repaint has to come from the
+    /// <c>off:</c> term D4 put in the signature. Forcing one here would test a path the phone
+    /// does not have and would hide trap 72 on this surface.</para>
+    ///
+    /// <para>Returns false for anything it cannot honour — an unknown verb, or picks with no
+    /// character key — so a staging mistake times out naming the probe rather than reading as
+    /// a feature that did not fire.</para>
+    /// </summary>
+    /// <param name="verb"><c>lens</c> or <c>picks</c>.</param>
+    /// <param name="arg">For <c>lens</c>, a class name or <c>-</c> for the Any chip. For
+    /// <c>picks</c>, <c>+</c>-separated class names, or <c>-</c> for none picked.</param>
+    internal bool ProbeLens(string verb, string arg)
+    {
+        switch (verb)
+        {
+            case "lens":
+                LensTo(arg == "-" ? null : arg);
+                return true;
+            case "picks":
+                var key = _main.QuestCharacterKey;
+                if (_main.QuestLedger is not { } ledger || key.Length == 0) return false;
+                ledger.SetClasses(key, arg == "-"
+                    ? []
+                    : [.. arg.Split('+', StringSplitOptions.RemoveEmptyEntries
+                        | StringSplitOptions.TrimEntries)]);
+                return true;
+            default:
+                return false;
+        }
+    }
 
     /// <summary>
     /// ONE checklist row, wired to its own tick — the control both Sky arrangements draw.
