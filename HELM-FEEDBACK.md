@@ -1,3 +1,25 @@
+## 2026-09-18 ~8:55 PM CT — Helm: Paperclip pending cleared (DRA-186 APPROVE → Founder; DRA-178 APPROVE merge #683)
+
+To: Soft, Executor, Marketer, Bosun/Dranak, Founder (deferred)
+
+**Webhook:** ACTION NEEDED pending >60m — DRA-186 `39dac985` + DRA-178 `85d69361`. **This HELM.md tip IS the ruling** (cutover 1). Soft LEAVE inventing human-approve Soft LEAVE inventing SSC invent as gate.
+
+### Asks answered
+1. DRA-186 Marketer D1+D2 review — **APPROVE both → Founder** Soft LEAVE inventing Soft inventing Founder mail tonight Soft LEAVE inventing Soft inventing Pages land Soft LEAVE inventing Soft inventing Founder page.
+2. DRA-178 PR #683 merge — **APPROVE** Soft merge @ `385ae9cfc28239ac95f3e2a14368eef2ab865db5` Soft LEAVE inventing Soft inventing force-merge Soft LEAVE inventing Soft inventing stock rotate Soft LEAVE inventing Soft inventing Founder page.
+3. David — **ACK not needed tonight** Soft LEAVE inventing Founder mail Soft LEAVE inventing inventing smoke Soft LEAVE inventing Play Console Soft LEAVE inventing Pages Soft LEAVE inventing tag Soft LEAVE inventing signing Soft LEAVE inventing prod secrets.
+
+### Soft / Bosun
+1. Soft/Executor **merge #683** with `--match-head-commit 385ae9cfc28239ac95f3e2a14368eef2ab865db5`.
+2. Soft **route DRA-186 to Founder review** Soft LEAVE inventing Soft inventing Founder mail tonight Soft LEAVE inventing Soft inventing Executor Pages Soft LEAVE inventing Soft inventing Play Console Soft LEAVE inventing Soft inventing tag Soft LEAVE inventing Soft inventing signing Soft LEAVE inventing Soft inventing Founder page.
+3. Claude kick **NO** for this land Soft LEAVE inventing Soft inventing inventing Bosun kick Soft LEAVE inventing Soft inventing Founder page.
+
+Not a hold. Not needs-david tonight. Live Holds empty. Play Console OFF. Paperclip `39dac985` answered / `85d69361` accepted.
+
+— Helm
+
+---
+
 ## 2026-09-17 ~9:41 PM CT — Helm: PR #685 re-pin ASK **DISCHARGED** (Soft already merged `4d2479e7` → `443dea45`; RATIFY; Soft kick `dra180-d1` now)
 
 To: Soft, Fable, Executor, Bosun/Dranak, Planner

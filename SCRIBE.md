@@ -30,6 +30,101 @@ After you take items, write a short note in `SCRIBE-FEEDBACK.md` so Scribe can l
 
 
 
+### Banestrike achievement tracking (Untapped Potential / General / Tradeskill / Slayer / EQL)
+
+
+
+- **Priority:** `someday` (real ask, not this gate) — **not authorized** (new thread; no code opened yet — Scribe intake only).
+
+- **Place:** Achievements surface — EQBuddy surfaces individual event lines (`You have completed achievement: …` appears in the reporter's #679 haul block) but has no persistent per-achievement progress card today. Neighbourhood: #235 "Import achievements button does not function" (import/entry flow, different ask) and `docs/WatchListGuide.md` (watch/alerts on loot + motes; not the same thing). **Do not fold into #435 / #165 / #235 / #679 (#679 is a loot-parse gap, different surface).**
+
+- **Source:** #690 FatGuyGamin Sep 19, 3:51 AM CT (2026-09-18 08:51 UTC). https://github.com/DranakCorps-bot/EQBuddy/discussions/690 — New thread. Category: Ideas. 0 comments. Footer: `EQBuddy 1.99.18 · Windows 26200`. u/Dranak75 not involved.
+
+- **Ask (verbatim, the whole entry):** "I would love the ability to track achievement progress in regards to Banestrike. I've downloaded that log but it is damn near impossible for my old man brain to make much sense out of. Like the Untapped Potential, General, Tradeskill, Slayer, & Everquest achievements."
+
+- **Already shipped (checked on origin/main, this run 2026-09-19):** `LogParser.cs` recognises `You have completed achievement: <name>` as a session event line; `Motes.cs` handles the `Mote of X Potential` family across the loot stream. **Not grepped this pass:** whether an achievement-progress model or a Banestrike-specific card already lives in `src/EQBuddy.UI.*` on tip — treat as *unchecked* and confirm before coding. No Banestrike-specific surface is visible in origin/main.
+
+- **Hypothesis (label as such):** the shape is (a) a persistent per-achievement tally across sessions keyed off the `completed achievement: …` lines, with the Banestrike achievement *categories* the reporter named (Untapped Potential / General / Tradeskill / Slayer / Everquest) as the axis, and (b) a card/surface that reads it — the reporter's framing ("downloaded that log but it is damn near impossible to make sense out of") is an aggregation/display ask, not a parse ask. Banestrike category structure is game-truth; eqlwiki is the lane for any category/list copy (wiki-first). Not to be conflated with #235 (import-button failure) or with watch/alerts.
+
+- **Class:** V1–V2 (new persisted achievement-progress lane + surface + categorization). Do not write FABLE.md from Scribe.
+
+- **Off-topic here:** none reported.
+
+- **Holds re-read (HELM.md this run, 2026-09-19):** Live Holds block is empty; only process notes (new-thread thank-you still comes to Helm; promise of review/fix comes to Helm before it posts). No retired hold applies (not #208 / #228 / #226 / #231). Talking to FatGuyGamin is fine.
+
+- **Scribe 2026-09-19 02:20 AM CT (cron intake):** New intake. Do not implement. Do not write FABLE.md. Do not open the work. Do not fold into #435 / #165 / #235 / #679. Thank-you drafted below for Helm QA/post — not auto-posted.
+
+- **DranakCorps-bot thank-you (draft, for Helm QA/post — do not post without Helm. No promises, dates, pricing, ToS.):**
+
+  > Hi FatGuyGamin — thank you for the request and for naming the Banestrike categories you want to track. Captured and sent on for review.
+  >
+  > — EQBuddy team
+
+
+
+### Dungeon-crawl reward-chest loot: motes (and other chest drops) not captured
+
+
+
+- **Priority:** `must-fix` (player-facing parse gap on shipped `v1.99.18` — motes are upgrade currency, so this is data a player is not seeing counted) — **waiting / not authorized** (new thread; no code opened yet — Scribe intake only).
+
+- **Place:** Motes capture / Loot-card session accounting, upstream in `LogParser.cs` — the "looted … and stored it in your …" line parser. Affects the Motes card (motes are currency-class loot) and any loot/depot tally keyed on these lines. Not an eqlwiki-first item (item truth is fine; the *parse* is the break). **Do not fold into the #435 merge-flag batch, #165 bag-flags, #228 motes-in-pack, #226 wiki-pack motes, or the motes dropdown (#250):** this is *capture* of chest drops, a different surface than suggest/flag/dropdown.
+
+- **Source:** #679 joeymavity Sep 18, 5:16 AM CT (2026-09-17 22:16 UTC). https://github.com/DranakCorps-bot/EQBuddy/discussions/679 — New thread. Category: Bug. Footer: `EQBuddy 1.99.18 · Windows 26200`. One follow-up comment same reporter 2026-09-18 12:31 PM CT (17:31 UTC) with a *full* 19-line reward-chest haul block (motes, tradeskill-depot loot, an auto-sold item, ability points, level, instance-charge refund, achievement line). u/Dranak75 not involved.
+
+- **Ask (verbatim, the whole entry):** "Your're not capturing motes from reward chests from dungeon crawls, ex: / You looted 5 Mote of Major Potential from Reward Chest and stored it in your currency". Follow-up comment, additional mote lines: "[Thu Sep 17 23:20:52 2026] You looted a Mote of Greater Potential from Reward Chest and stored it in your currency" / "[Thu Sep 17 23:20:52 2026] You looted 4 Mote of Major Potential from Reward Chest and stored it in your currency" / "[Thu Sep 10 15:44:58 2026] You looted 4 Mote of Major Potential from Reward Chest and stored it in your currency" / "[Thu Sep 10 17:01:45 2026] You looted 10 Mote of Major Potential from Reward Chest and stored it in your currency". Then: "You might be missing other loot from rewards chest, so here's an example of a full 'reward chest haul':" followed by the 19-line block below.
+
+- **Reporter's full haul block (verbatim, the ready regression fixture):**
+  ```
+  [Thu Sep 10 17:01:45 2026] You gain party experience! (3.489%)
+  [Thu Sep 10 17:01:45 2026] You have completed the Dungeon Crawl and earned reward loot!
+  [Thu Sep 10 17:01:45 2026] You receive 80 platinum, 5 silver and 1 copper from the corpse.
+  [Thu Sep 10 17:01:45 2026] You gained reward experience from the Dungeon Crawl!
+  [Thu Sep 10 17:01:45 2026] You have gained an ability point!  You now have 6 ability points.
+  [Thu Sep 10 17:01:45 2026] You have improved Unbound Clarity 2 at a cost of 0 ability points.
+  [Thu Sep 10 17:01:45 2026] You have improved Unbound Destruction 2 at a cost of 0 ability points.
+  [Thu Sep 10 17:01:45 2026] You have improved Unbound Life 2 at a cost of 0 ability points.
+  [Thu Sep 10 17:01:45 2026] You have gained a level! Welcome to level 30!
+  [Thu Sep 10 17:01:45 2026] You earned a refund of your instance charge.
+  [Thu Sep 10 17:01:45 2026] The froglok king has been slain by <player name>!
+  [Thu Sep 10 17:01:45 2026] You looted 12 Phosphorous Powder from Reward Chest and stored it in your tradeskill depot
+  [Thu Sep 10 17:01:45 2026] You looted 10 Mote of Major Potential from Reward Chest and stored it in your currency
+  [Thu Sep 10 17:01:45 2026] You looted 2 Mote of Greater Potential from Reward Chest and stored it in your currency
+  [Thu Sep 10 17:01:45 2026] You looted a Bronze Knuckles +4 from Reward Chest and sold it for 2 gold.
+  [Thu Sep 10 17:01:46 2026] You looted an Undead Froglok Tongue from Reward Chest and stored it in your tradeskill depot
+  [Thu Sep 10 17:01:46 2026] You have completed achievement: Level 30
+  [Thu Sep 10 17:01:46 2026] You looted an Amber from Reward Chest and stored it in your tradeskill depot
+  [Thu Sep 10 17:01:47 2026] You looted an Evil Eye Eyestalk from Reward Chest and stored it in your tradeskill depot
+  [Thu Sep 10 17:01:48 2026] You looted a Froglok Leg from Reward Chest and stored it in your tradeskill depot
+  [Thu Sep 10 17:01:49 2026] You looted 2 Gargoyle Eye from Reward Chest and stored it in your tradeskill depot
+  ```
+
+- **Already shipped (quoted on origin/main, this run 2026-09-19):** `src/EQBuddy.Core/LogParser.cs:244`
+  ```
+  [GeneratedRegex(@"^You looted (?:(?<n>\d+)|an?) (?<item>.+?) from (?<source>.+?)'s corpse and stored it in your (?<where>.+?)\.?$")]
+  ```
+  The comments above it (`:238-239`) cite the *corpse* forms as the two target examples, and the tests (`tests/EQBuddy.Tests/LogParserTests.cs`, `SessionStatsTests.cs`) only ever exercise `… from a spite golem's corpse …`. The reporter's line — `You looted <n> Mote of X Potential from Reward Chest and stored it in your currency` — has **no `'s corpse`**, so it does not match that rule and is silently dropped from the loot/mote stream. **Not grepped this pass:** whether a later commit added a `Reward Chest` / free-form-source variant after `:244` on tip — treat "not matched" as *shipped-as-grepped*; confirm against tip before a code pass.
+
+- **Hypothesis (label as such):** one "looted … from `<source>` … and stored it in your `<where>`" rule hard-codes the `'s corpse` source grammar, so the `Reward Chest` source (no possessive, no `corpse`) never fires — the whole reward-chest haul is invisible to the motes/loot/depot/XP/achievement lines that key off it. The likely fix is a *source-grammar widening* at the pattern level (keep the `corpse` forms, accept a free-form source), not a pile of special cases; the reporter's 19-line block is the ready regression fixture (mote, depot, sold, level, ability-point, achievement, charge-refund, XP-percentage in one case). Note the sold line (`…from Reward Chest and sold it for 2 gold`) and the loot-from-corpse money line (`…from the corpse`) are *separate* grammar branches — a confident code pass should check all three of those against the reporter block, not just the motes one.
+
+- **Needed from reporter (optional; they already supplied the lines):** whether the same gap shows on the UI *Motes* card for a crawl run (vs. just absent from the loot log) and a session id / log file if we want an end-to-end diff. Not blocking — the literal lines are in-thread.
+
+- **Class:** V1 (one regex widening + its unit fixtures from the reporter's block). Do not write FABLE.md.
+
+- **Off-topic here:** none reported.
+
+- **Holds re-read (HELM.md this run, 2026-09-19):** Live Holds block is empty; only process notes (new-thread thank-you still comes to Helm; promise of review/fix comes to Helm before it posts). No retired hold applies (not #208 / #228 / #226 / #231). Talking to joeymavity is fine.
+
+- **Scribe 2026-09-19 02:20 AM CT (cron intake):** New intake. Do not implement. Do not write FABLE.md. Do not open the work. Do not fold into #435 / #165 / #228 / #226 / #250. Thank-you drafted below for Helm QA/post — not auto-posted.
+
+- **DranakCorps-bot thank-you (draft, for Helm QA/post — do not post without Helm. No promises, dates, pricing, ToS.):**
+
+  > Hi joeymavity — thank you for the full reward-chest haul block; that's the most useful form of this report I could ask for. Captured and sent on for review.
+  >
+  > — EQBuddy team
+
+
+
 
 ### Reddit: eql-gearbot-plus — guild gear-donation + crafting/gathering work-order Discord bot (wiz3n, harvest-only)
 

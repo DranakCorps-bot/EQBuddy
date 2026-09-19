@@ -57,6 +57,4 @@
     'BEVEL-FEEDBACK.md'  = 501704
     # 3x over. Never rotated.
     'SCRIBE.md'          = 177198
-    # 2x over. Never rotated. The smallest debt, and DRA-144 rotates it first.
-    'SCRIBE-FEEDBACK.md' = 133264
 }
