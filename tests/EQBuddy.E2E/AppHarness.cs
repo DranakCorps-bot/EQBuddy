@@ -905,6 +905,23 @@ internal sealed class AppHarness : IDisposable
         DriveLensProbe("picks", classes.Length == 0 ? "-" : string.Join("+", classes),
             $"write picks [{string.Join(", ", classes)}]");
 
+    /// <summary>
+    /// Presses the class picker's <c>My Classes</c> quick-select (DRA-216 D1, S4.3), through
+    /// the same rendezvous.
+    ///
+    /// **It takes no argument, and that IS the feature.** The control's whole claim is that
+    /// the player does not tell it which classes they play — it asks
+    /// <c>CharacterClasses.Resolve</c> through <c>QuestClassLens.MyClasses</c>. A harness
+    /// method that passed a class list would be testing a path the button does not have.
+    ///
+    /// **The probe drives the button's own click body**, which is inside a WPF
+    /// <c>Popup</c> — a separate top-level HWND this suite can neither press nor photograph
+    /// (trap 79). Unlike <see cref="SetClassPicks"/> this one DOES force a refresh, because
+    /// the button itself does: it is a local control, not the phone's remote writer.
+    /// </summary>
+    public void PressMyClasses() =>
+        DriveLensProbe("myclasses", "-", "press the My Classes quick-select");
+
     private void DriveLensProbe(string verb, string arg, string doing)
     {
         var before = DumpValue("questsLensProbeSets");
