@@ -1,3 +1,4 @@
+bash.exe: warning: could not find /tmp, please create!
 # Scribe inbox
 
 
@@ -167,13 +168,40 @@ After you take items, write a short note in `SCRIBE-FEEDBACK.md` so Scribe can l
 - **Already shipped:** EQBuddy reads the same /outputfile inventory dump and ships the catalog (wiki-first on item truth); the #435 merge-flag trio and #165 bag-flags are the in-app versions of this shape, all `someday` / `Not authorized` as of 2026-09-16.
 - **Checked:** harvested 2026-09-16 via arctic-shift (post + comment list). No comment, vote, or message. Could not copy more thread signal — comments 0 at harvest. Did not open or test either tool.
 
-### Reddit: SEQO overlay post — title-only, body removed (harvest-only)
+### Reddit: SEQO (Simple EQ Overlay) — re-harvest on 2026-09-17 post with full body (harvest-only)
 
-- **Priority:** someday (harvest; not authorized. Do not reply on Reddit.)
-- **Place:** competitive context, overlay/companion chain again (cf. EQLegends Advisor entry) — DPS meter, loot tracking, quest/epic/BiS checklist claimed in the title. Post body was [removed] before harvest and the thread has no comments; nothing quotable. Do not fold into the Advisor entry; do not treat as an EQBuddy ask.
-- **Source:** u/Extension-Chair-7250 r/EQLegends Sept 15 ~11:40 PM CT. https://www.reddit.com/r/EQLegends/comments/1whn7xz/seqo_a_free_open_source_overlay_i_built_for_eq/ Harvest-only. Score 1, zero comments at harvest (2026-09-16).
-- **Ask:** none readable. Title: "SEQO - a free open source overlay I built for EQ Legends (DPS meter, loot tracking, quest/epic/BiS checklists)". Body [removed], no repo URL captured.
-- **Checked:** harvested 2026-09-16 via arctic-shift. No comment, vote, or message. If the post resurfaces with a body or repo, re-harvest and update this entry.
+- **Priority:** `someday` (real ask, not this gate) — **harvest-only**; no reply on Reddit. Not authorized; Scribe intake only. Do not treat as an EQBuddy ask.
+- **Place:** competitive context, overlay/companion chain (cf. EQLegends Advisor entry, cashsusclaymore loot-filter tools, eql-gearbot-plus context, jbenga loot-filter tool, foraern 3D map app). Overlaps in claimed surface with EQBuddy items that are already filed under `someday` / `waiting` / or closed: #120 (configurable buff sets with missing-buff indicator — "Camp timers … buff fade" and "Unlock tracker" in SEQO touch this surface), #94 (attack-speed debuff alerts with cure/dispel — "charm break" alerts in SEQO touch this surface), #208 (chips and alerts on a different monitor — SEQO is a separate overlay that claims "Never touches the game or its files … read the log file"; different shape, but same neighbourhood), #217 (wiki-contribution pack — SEQO data lineage cites eqlegendstools / Alanna's race unlock guide / Manlaan's epic checklist), #109 (raid-instance spawn timers), #435 (merge-flag inventory), #165 (bag/inventory quest-vs-junk flags), #227 (standalone Motes card), #159 (never delete log data). Do **not** fold this competitive-context entry into those in-app asks — this is a third-party overlay, not a request to EQBuddy, and the author explicitly disclaims competition.
+- **Source:** u/Extension-Chair-7250 r/EQLegends **Sept 17, ~3:00 PM CT (2026-09-17 20:00 UTC)** — a second / refresh post with a full body, following the initial Sept 15 post (1whn7xz) that harvested body-removed. https://www.reddit.com/r/EQLegends/comments/1wj4m84/i_built_an_overlay_for_myself_with_a_dps_meter/ . Score 0, **2 comments** at 2026-09-19 re-harvest. u/Dranak75 not involved. Harvest-only; nothing posted back.
+- **Ask (verbatim, the whole entry):**
+
+>  Be gentle with me, I don't get anything out of this — I built it for myself and figured others might find it useful. I am not trying to promote or compete with others, just wanted something tailored to my needs.
+>  
+>  It's called SEQO (Simple EQ Overlay). It never touches the game or its files. All it does is read the log file the game already writes to disk, the same way GamParse and nParse worked for 20 years of classic EQ. No injection, no memory reading, no automation. If you type /outputfile inventory, achievements and faction in game it also reads those files to keep your progress current on its own.
+>  
+>  What it does:
+>  * DPS meter with per-fight and session views, spell and proc breakdowns, and pet damage tracked separately
+>  * Loot tracking with real drop rates from your own kills, a keep/junk/sell advisor, and a run tracker for instances (start it, clear, end it - coin, motes and every drop counted with coin per hour)
+>  * Unlock tracker for races, classes and deities with live faction progress bars and the fastest known grind for each
+>  * Epic checklists for every class with the exact Legends item names, checked off automatically from your bags, bank and key ring
+>  * Best in slot lists for all 16 classes with a check on everything you already own
+>  * Plane of Sky quest tracker - all 95 turn-ins, items check off as you loot them
+>  * World map with route planning, druid ring / wizard spire markers, and nearest-port info
+>  * Camp timers with placeholder support, plus rare spawn, charm break, buff fade and AFK alerts
+>  * Syncs between your computers through Dropbox/Drive if you play on more than one
+>  
+>  It's fully open source so you can review every line of code before you run it, and I'm actively maintaining it - the last update went up this week. Link is in the comments.
+>  
+>  The data comes from work by the eqlegendstools site, Alanna's race unlock guide and Manlaan's epic checklist on the wiki. Go support them.
+>  
+>  Happy to answer questions or take feature requests.
+
+- **Comments (verbatim, all 2):**
+  - u/GrendeL- (2026-09-17): "Where’s the link ?"
+  - u/hrethnar (2026-09-17): "Cool!   In before comments about AI slop."
+  - **No repo / GitHub / source-code link captured from either comment.** The author says "Link is in the comments" but neither harvested comment contains one. If the link appears later, re-harvest and update this entry.
+- **Already shipped (checked on origin/main, 2026-09-19):** EQBuddy reads the same /outputfile inventory dump and ships the catalog (wiki-first on item truth); the #435 merge-flag trio and #165 bag-flags are the in-app versions of the loot / merge / bag-flag shape; #235 + #101 are the achievement-import / achievement-marking flows; #165 and #173 cover several of the same surfaces. None is this overlay as a product.
+- **Checked:** re-harvested 2026-09-19 via arctic-shift (post 1wj4m84 + comment list, 2 comments). No comment, vote, or message. Repo link **still not captured** from either comment — will re-harvest if it appears. Did not open or test the tool. No ToS, pricing, dates, or promises implied.
 
 ### Reddit: 3D EQ Legends Map App, Apple Silicon (foraern, harvest-only)
 
