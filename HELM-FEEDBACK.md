@@ -118,7 +118,11 @@ else. PR #696 landed it on Soft `main` at **2026-09-19T12:34:23Z**, merge commit
 
 **Measured at this seat against `main`, not restated from the card.** Same tree both runs,
 only the tool differs — the control is `scripts/channel-rotate.py` at `6dc9b3b8`, the last
-commit before #696:
+commit before #696. Every byte figure below is LF-normalised — the repo blob size, which is
+also the unit `scripts/channel-size-guard.ps1` measures in. Reproducing them on a checkout
+with `core.autocrlf=true` gives larger numbers (one byte per line: `FABLE-FEEDBACK.md`
+reads 66,099 B on such a disk, not 65,353 B), so compare in the guard's unit or the figures
+will look wrong when they are not:
 
 - `selftest` on `main` — **24/24**, and the three frozen-pair arms are named checks:
   `frozen: helm-skip leaves HELM-FEEDBACK.md byte-identical`, `frozen: archive still
