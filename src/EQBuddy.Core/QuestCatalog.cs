@@ -83,13 +83,23 @@ public static class QuestEraLadder
         ["Classic", "Sky", "Paineel", "Temple", "Epics", "Kunark",
          "Chardok Revamp", "Velious", "Luclin"];
 
+    /// <summary>Where an era sits on the ladder, or -1 when the word is not one of ours.
+    ///
+    /// <para>The ONE producer of that answer (trap 4): <see cref="Allowed"/> asks it, and so
+    /// does <see cref="ZoneEras"/>'s identity fold, which resolves two titles claiming
+    /// different eras by taking the EARLIER one. A second hand-rolled
+    /// <c>Array.FindIndex</c> over <see cref="Eras"/> would be a second opinion on what
+    /// counts as one of our era words.</para></summary>
+    public static int IndexOf(string era) =>
+        Array.FindIndex(Eras, e => e.Equals(era, StringComparison.OrdinalIgnoreCase));
+
     /// <summary>Is a quest of <paramref name="questEra"/> available when the world is
     /// at <paramref name="throughEra"/>? Unknown eras on either side fail open.</summary>
     public static bool Allowed(string questEra, string throughEra)
     {
         if (throughEra.Length == 0 || questEra.Length == 0) return true;
-        var q = Array.FindIndex(Eras, e => e.Equals(questEra, StringComparison.OrdinalIgnoreCase));
-        var t = Array.FindIndex(Eras, e => e.Equals(throughEra, StringComparison.OrdinalIgnoreCase));
+        var q = IndexOf(questEra);
+        var t = IndexOf(throughEra);
         return q < 0 || t < 0 || q <= t;
     }
 }

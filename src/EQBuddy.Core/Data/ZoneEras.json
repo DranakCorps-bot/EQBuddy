@@ -1,0 +1,437 @@
+{
+ "Source": "eqlwiki zone pages, the {{<Era> Era}} banner template (scripts/harvests/eqlwiki/zone-eras-transform.py; fetches nothing)",
+ "Eras": {
+  "Ak'Anon": {
+   "Era": "Classic",
+   "Verbatim": "{{Classic Era}}"
+  },
+  "Befallen": {
+   "Era": "Classic",
+   "Verbatim": "{{Classic Era}}"
+  },
+  "Blackburrow": {
+   "Era": "Classic",
+   "Verbatim": "{{Classic Era}}"
+  },
+  "Burning Wood": {
+   "Era": "Kunark",
+   "Verbatim": "{{Kunark Era}}"
+  },
+  "Butcherblock Mountains": {
+   "Era": "Classic",
+   "Verbatim": "{{Classic Era}}"
+  },
+  "Cabilis": {
+   "Era": "Kunark",
+   "Verbatim": "{{Kunark Era}}"
+  },
+  "Cazic Thule (Zone)": {
+   "Era": "Classic",
+   "Verbatim": "{{Classic Era}}"
+  },
+  "Chardok (Post-Revamp)": {
+   "Era": "Chardok Revamp",
+   "Verbatim": "{{Chardok Revamp Era}}"
+  },
+  "Chardok (Pre-Revamp)": {
+   "Era": "Kunark",
+   "Verbatim": "{{Kunark Era}}"
+  },
+  "City of Mist": {
+   "Era": "Kunark",
+   "Verbatim": "{{Kunark Era}}"
+  },
+  "Cobalt Scar": {
+   "Era": "Velious",
+   "Verbatim": "{{Velious Era}}"
+  },
+  "Crushbone": {
+   "Era": "Classic",
+   "Verbatim": "{{Classic Era}}"
+  },
+  "Crystal Caverns": {
+   "Era": "Velious",
+   "Verbatim": "{{Velious Era}}"
+  },
+  "Dagnor's Cauldron": {
+   "Era": "Classic",
+   "Verbatim": "{{Classic Era}}"
+  },
+  "Dalnir": {
+   "Era": "Kunark",
+   "Verbatim": "{{Kunark Era}}"
+  },
+  "Dragon Necropolis": {
+   "Era": "Velious",
+   "Verbatim": "{{Velious Era}}"
+  },
+  "Dreadlands": {
+   "Era": "Kunark",
+   "Verbatim": "{{Kunark Era}}"
+  },
+  "East Commonlands": {
+   "Era": "Classic",
+   "Verbatim": "{{Classic Era}}"
+  },
+  "Eastern Plains of Karana": {
+   "Era": "Classic",
+   "Verbatim": "{{Classic Era}}"
+  },
+  "Eastern Wastes": {
+   "Era": "Velious",
+   "Verbatim": "{{Velious Era}}"
+  },
+  "Emerald Jungle": {
+   "Era": "Kunark",
+   "Verbatim": "{{Kunark Era}}"
+  },
+  "Erud's Crossing": {
+   "Era": "Classic",
+   "Verbatim": "{{Classic Era}}"
+  },
+  "Erudin": {
+   "Era": "Classic",
+   "Verbatim": "{{Classic Era}}"
+  },
+  "Everfrost Peaks": {
+   "Era": "Classic",
+   "Verbatim": "{{Classic Era}}"
+  },
+  "Felwithe": {
+   "Era": "Classic",
+   "Verbatim": "{{Classic Era}}"
+  },
+  "Field of Bone": {
+   "Era": "Kunark",
+   "Verbatim": "{{Kunark Era}}"
+  },
+  "Firiona Vie": {
+   "Era": "Kunark",
+   "Verbatim": "{{Kunark Era}}"
+  },
+  "Freeport": {
+   "Era": "Classic",
+   "Verbatim": "{{Classic Era}}"
+  },
+  "Frontier Mountains": {
+   "Era": "Kunark",
+   "Verbatim": "{{Kunark Era}}"
+  },
+  "Gorge of King Xorbb": {
+   "Era": "Classic",
+   "Verbatim": "{{Classic Era}}"
+  },
+  "Great Divide": {
+   "Era": "Velious",
+   "Verbatim": "{{Velious Era}}"
+  },
+  "Greater Faydark": {
+   "Era": "Classic",
+   "Verbatim": "{{Classic Era}}"
+  },
+  "High Keep": {
+   "Era": "Classic",
+   "Verbatim": "{{Classic Era}}"
+  },
+  "Howling Stones": {
+   "Era": "Kunark",
+   "Verbatim": "{{Kunark Era}}"
+  },
+  "Iceclad Ocean": {
+   "Era": "Velious",
+   "Verbatim": "{{Velious Era}}"
+  },
+  "Icewell Keep": {
+   "Era": "Velious",
+   "Verbatim": "{{Velious Era}}"
+  },
+  "Innothule Swamp": {
+   "Era": "Classic",
+   "Verbatim": "{{Classic Era}}"
+  },
+  "Jaggedpine Forest": {
+   "Era": "Classic",
+   "Verbatim": "{{Classic Era}}"
+  },
+  "Kael Drakkel": {
+   "Era": "Velious",
+   "Verbatim": "{{Velious Era}}"
+  },
+  "Kaesora": {
+   "Era": "Kunark",
+   "Verbatim": "{{Kunark Era}}"
+  },
+  "Karnor's Castle": {
+   "Era": "Kunark",
+   "Verbatim": "{{Kunark Era}}"
+  },
+  "Kedge Keep": {
+   "Era": "Classic",
+   "Verbatim": "{{Classic Era}}"
+  },
+  "Kelethin": {
+   "Era": "Classic",
+   "Verbatim": "{{Classic Era}}"
+  },
+  "Kithicor Forest": {
+   "Era": "Classic",
+   "Verbatim": "{{Classic Era}}"
+  },
+  "Kurn's Tower": {
+   "Era": "Kunark",
+   "Verbatim": "{{Kunark Era}}"
+  },
+  "Lake Rathetear": {
+   "Era": "Classic",
+   "Verbatim": "{{Classic Era}}"
+  },
+  "Lake of Ill Omen": {
+   "Era": "Kunark",
+   "Verbatim": "{{Kunark Era}}"
+  },
+  "Lavastorm Mountains": {
+   "Era": "Classic",
+   "Verbatim": "{{Classic Era}}"
+  },
+  "Lesser Faydark": {
+   "Era": "Classic",
+   "Verbatim": "{{Classic Era}}"
+  },
+  "Mines of Nurga": {
+   "Era": "Kunark",
+   "Verbatim": "{{Kunark Era}}"
+  },
+  "Mistmoore Castle": {
+   "Era": "Classic",
+   "Verbatim": "{{Classic Era}}"
+  },
+  "Nagafen's Lair": {
+   "Era": "Classic",
+   "Verbatim": "{{Classic Era}}"
+  },
+  "Najena": {
+   "Era": "Classic",
+   "Verbatim": "{{Classic Era}}"
+  },
+  "Nektulos Forest": {
+   "Era": "Classic",
+   "Verbatim": "{{Classic Era}}"
+  },
+  "Neriak": {
+   "Era": "Classic",
+   "Verbatim": "{{Classic Era}}"
+  },
+  "New Sebilis Expedition": {
+   "Era": "Classic",
+   "Verbatim": "{{Classic Era}}"
+  },
+  "Northern Plains of Karana": {
+   "Era": "Classic",
+   "Verbatim": "{{Classic Era}}"
+  },
+  "Ocean of Tears": {
+   "Era": "Classic",
+   "Verbatim": "{{Classic Era}}"
+  },
+  "Old Sebilis": {
+   "Era": "Kunark",
+   "Verbatim": "{{Kunark Era}}"
+  },
+  "Paineel": {
+   "Era": "Paineel",
+   "Verbatim": "{{Paineel Era}}"
+  },
+  "Permafrost": {
+   "Era": "Classic",
+   "Verbatim": "{{Classic Era}}"
+  },
+  "Plane of Fear": {
+   "Era": "Classic",
+   "Verbatim": "{{Classic Era}}"
+  },
+  "Plane of Growth": {
+   "Era": "Velious",
+   "Verbatim": "{{Velious Era}}"
+  },
+  "Plane of Hate": {
+   "Era": "Classic",
+   "Verbatim": "{{Classic Era}}"
+  },
+  "Plane of Mischief": {
+   "Era": "Velious",
+   "Verbatim": "{{Velious Era}}"
+  },
+  "Plane of Sky": {
+   "Era": "Classic",
+   "Verbatim": "{{Classic Era}}"
+  },
+  "Qeynos": {
+   "Era": "Classic",
+   "Verbatim": "{{Classic Era}}"
+  },
+  "Qeynos Aqueducts": {
+   "Era": "Classic",
+   "Verbatim": "{{Classic Era}}"
+  },
+  "Qeynos Hills": {
+   "Era": "Classic",
+   "Verbatim": "{{Classic Era}}"
+  },
+  "Rathe Mountains": {
+   "Era": "Classic",
+   "Verbatim": "{{Classic Era}}"
+  },
+  "Runnyeye": {
+   "Era": "Classic",
+   "Verbatim": "{{Classic Era}}"
+  },
+  "Siren's Grotto": {
+   "Era": "Velious",
+   "Verbatim": "{{Velious Era}}"
+  },
+  "Skyfire Mountains": {
+   "Era": "Kunark",
+   "Verbatim": "{{Kunark Era}}"
+  },
+  "Skyshrine": {
+   "Era": "Velious",
+   "Verbatim": "{{Velious Era}}"
+  },
+  "Sleeper's Tomb": {
+   "Era": "Velious",
+   "Verbatim": "{{Velious Era}}"
+  },
+  "Solusek's Eye": {
+   "Era": "Classic",
+   "Verbatim": "{{Classic Era}}"
+  },
+  "Southern Desert of Ro": {
+   "Era": "Classic",
+   "Verbatim": "{{Classic Era}}"
+  },
+  "Southern Karana": {
+   "Era": "Classic",
+   "Verbatim": "{{Classic Era}}"
+  },
+  "Splitpaw Lair": {
+   "Era": "Classic",
+   "Verbatim": "{{Classic Era}}"
+  },
+  "Steamfont Mountains": {
+   "Era": "Classic",
+   "Verbatim": "{{Classic Era}}"
+  },
+  "Surefall Glade": {
+   "Era": "Classic",
+   "Verbatim": "{{Classic Era}}"
+  },
+  "Swamp of No Hope": {
+   "Era": "Kunark",
+   "Verbatim": "{{Kunark Era}}"
+  },
+  "Temple of Droga": {
+   "Era": "Kunark",
+   "Verbatim": "{{Kunark Era}}"
+  },
+  "Temple of Veeshan": {
+   "Era": "Velious",
+   "Verbatim": "{{Velious Era}}"
+  },
+  "The Arena": {
+   "Era": "Classic",
+   "Verbatim": "{{Classic Era}}"
+  },
+  "The Estate of Unrest": {
+   "Era": "Classic",
+   "Verbatim": "{{Classic Era}}"
+  },
+  "The Feerrott": {
+   "Era": "Classic",
+   "Verbatim": "{{Classic Era}}"
+  },
+  "The Hole": {
+   "Era": "Classic",
+   "Verbatim": "{{Classic Era}}"
+  },
+  "The Northern Desert of Ro": {
+   "Era": "Classic",
+   "Verbatim": "{{Classic Era}}"
+  },
+  "The Overthere": {
+   "Era": "Kunark",
+   "Verbatim": "{{Kunark Era}}"
+  },
+  "The Temple of Solusek Ro": {
+   "Era": "Temple",
+   "Verbatim": "{{Temple Era}}"
+  },
+  "The Wakening Land": {
+   "Era": "Velious",
+   "Verbatim": "{{Velious Era}}"
+  },
+  "Thurgadin": {
+   "Era": "Velious",
+   "Verbatim": "{{Velious Era}}"
+  },
+  "Timorous Deep": {
+   "Era": "Kunark",
+   "Verbatim": "{{Kunark Era}}"
+  },
+  "Tower of Frozen Shadow": {
+   "Era": "Velious",
+   "Verbatim": "{{Velious Era}}"
+  },
+  "Toxxulia Forest": {
+   "Era": "Classic",
+   "Verbatim": "{{Classic Era}}"
+  },
+  "Trakanon's Teeth": {
+   "Era": "Kunark",
+   "Verbatim": "{{Kunark Era}}"
+  },
+  "Tutorial Zone": {
+   "Era": "Classic",
+   "Verbatim": "{{Classic Era}}"
+  },
+  "Veeshan's Peak": {
+   "Era": "Kunark",
+   "Verbatim": "{{Kunark Era}}"
+  },
+  "Velketor's Labyrinth": {
+   "Era": "Velious",
+   "Verbatim": "{{Velious Era}}"
+  },
+  "Warsliks Woods": {
+   "Era": "Kunark",
+   "Verbatim": "{{Kunark Era}}"
+  },
+  "West Commonlands": {
+   "Era": "Classic",
+   "Verbatim": "{{Classic Era}}"
+  },
+  "Western Karana": {
+   "Era": "Classic",
+   "Verbatim": "{{Classic Era}}"
+  },
+  "Western Wastes": {
+   "Era": "Velious",
+   "Verbatim": "{{Velious Era}}"
+  }
+ },
+ "NoEra": {
+  "Grobb": "",
+  "Halas": "",
+  "Highpass Hold": "",
+  "Kaladim": "",
+  "Kerra Island": "",
+  "Lower Guk": "",
+  "Misty Thicket": "",
+  "Oasis of Marr": "",
+  "Oggok": "",
+  "Plane of Hate cleanupproject": "",
+  "Rivervale": "",
+  "Stonebrunt Mountains": "",
+  "The Warrens": "",
+  "Upper Guk": ""
+ }
+}

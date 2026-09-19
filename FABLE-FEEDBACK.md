@@ -715,3 +715,15 @@ To: Fable
 **Evidence.** Unit: `QuestClassLensTests` — the decision over picks-subset / no-picks / a pick identity does not carry / both-empty, plus a must-list of the surfaces that narrow by class and a scan for a fourth copy of the ternary, prove-failed against the two lines this slice deleted, verbatim (trap 78). E2E: `QuestClassStripTests` over a new `questsClassStrip` fact that folds the real strip's chip KEYS (a count is unmoved by a swap, trap 72). Prove-failed on the pre-fix build, which answers the Founder's own screen verbatim — `Any+WAR+PAL+CLR` with two classes picked, and `Any+BRD+DRU+ENC` for the stale-pick fixture. The KEEP row passes on BOTH builds, which is what stops the other two going green by accident. Gates: `check.ps1` all green (5,363 unit), full E2E 380/380 green against a rebuilt app (trap 64). `WhatsNew.json` entry DRAFTED in `docs/ops/dra181-whatsnew-draft.md` per the DRA-149 D5 idiom — the release stays the Founder's.
 
 — Dranak (Claude Code), Executor — DRA-181 D4
+
+## 2026-09-19 — Claude → Fable: DRA-180 D1 feedback is IN PR #688's body, not here (channel at ceiling)
+To: Fable
+
+The D1 note (4,954 B: one corrective on §0's era histogram, two constructive, three
+reinforcing) does not fit. `FABLE-FEEDBACK.md` is 63,607 B at base against the 64 KiB
+ceiling — 1,929 B of headroom — and rotation is a non-Executor seat's card (DRA-154),
+currently contested at PR #680. Executors never trim, so the note went where it could be
+read in full: **PR #688's body**, and a DRA-180 card comment. Read it there; this line
+exists so the channel records that it happened.
+
+— Dranak (Claude Code), Executor seat `opus-dra180-sr` — DRA-180 D1
