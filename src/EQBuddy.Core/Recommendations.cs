@@ -695,6 +695,35 @@ public enum GoalGapReason
     /// </summary>
     NoUpgradeNamesACreature,
 
+    // ---- DRA-180 D2 ------------------------------------------------------------------
+
+    /// <summary>
+    /// The sweep found upgrades and the ERA gate refused every place and quest they come from
+    /// (DRA-180 D2, plan P1/P3).
+    ///
+    /// <para><b>The fourth state <see cref="NoCatalogUpgrade"/> would misdescribe, and the one
+    /// the Founder's Replace screen was actually in.</b> The catalog carries better items, the
+    /// bands say their camps are in reach, pages name the creatures — and every one of them
+    /// sits in content the world has not opened. Saying "nothing better exists" there is false;
+    /// saying nothing at all is the FAIL this card was filed for.</para>
+    ///
+    /// <para>Asked BEFORE <see cref="EveryZoneOutsideYourBand"/> because the gates run in that
+    /// order and the first one to remove a row owns its explanation. The eras ride
+    /// <see cref="RecommendationSet.GearEraRefusals"/>.</para>
+    /// </summary>
+    EverythingIsLaterThanTheWorld,
+
+    /// <summary>
+    /// Every camp this character's professions need an ingredient from is later than the world
+    /// (DRA-180 D2) — <see cref="EverythingIsLaterThanTheWorld"/>'s materials sibling.
+    ///
+    /// <para>Separate for the reason <see cref="EveryMaterialZoneOutsideYourBand"/> is separate
+    /// from its gear twin: the two engines answer different goals and are ticked
+    /// independently, so one sentence covering both would be a claim about a list the reader
+    /// did not ask for.</para>
+    /// </summary>
+    EveryMaterialZoneLaterThanTheWorld,
+
     // ---- DRA-149 D2 ------------------------------------------------------------------
 
     /// <summary>
@@ -790,6 +819,32 @@ public enum GearBandArm
 /// <param name="Arm">Which of the two rules fired.</param>
 public sealed record GearBandRefusal(
     string Zone, int Min, int? Max, string Verbatim, int Level, GearBandArm Arm);
+
+/// <summary>
+/// One row the era gate refused, carrying everything its sentence quotes (DRA-180, plan P1/P3).
+///
+/// <para><b>The wiki's own banner travels with the refusal, exactly as the band's row travels
+/// with <see cref="GearBandRefusal"/>.</b> The player is owed the claim and its source —
+/// *"eqlwiki dates Kael Drakkel to Velious; the world is at Classic"* — because a zone that
+/// silently vanished from a list is indistinguishable from a zone with nothing in it, which is
+/// the FAIL this whole card is about. <see cref="Verbatim"/> is the page's own template text,
+/// so a lowercase or decorated wiki edit reads as what it actually said.</para>
+///
+/// <para><b>It is a separate record from the band refusal rather than a shared one with a
+/// nullable half</b>, because the two quote different evidence and a surface that had to test
+/// which fields were populated would be deciding the rule a second time (trap 4). A band
+/// refusal quotes two numbers and a level; this one quotes two era words.</para>
+/// </summary>
+/// <param name="Subject">The zone as the item catalog spelled it, or the QUEST name — what the
+/// row would have said. Both are era-gated and both name themselves the same way.</param>
+/// <param name="Era">The era eqlwiki dates this subject to, on the ladder's spelling.</param>
+/// <param name="Verbatim">The page's own banner text, word for word. Empty for a quest, whose
+/// era is the catalog's own field rather than a template this repo transcribed.</param>
+/// <param name="World">The era the world was at when the refusal was made.</param>
+/// <param name="Kind">Whether a place or a quest was refused — the two draw in different
+/// lists and a reader needs to know which without re-deriving it from the name.</param>
+public sealed record GearEraRefusal(
+    string Subject, string Era, string Verbatim, string World, RecommendationKind Kind);
 
 /// <summary>
 /// Everything the Helper needs, read once by its host and handed over in one object.
@@ -913,6 +968,30 @@ public sealed record HelperInputs(
     /// </summary>
     public ZoneLevels? Bands { get; init; }
 
+    /// <summary>
+    /// What eqlwiki dates each zone to — <see cref="ZoneEras"/>, read by the era gate
+    /// (DRA-180 D1/D2, plan P1).
+    ///
+    /// <para><b>Null stands the ERA arm down and nothing else</b>, in the same voice
+    /// <see cref="Bands"/> uses above it. Per-arm stand-down is the whole design: a fixture
+    /// with bands and no eras still gets the band gate, because an unanswered question gates
+    /// nothing (trap 73) and must not take a working rule down with it.</para>
+    /// </summary>
+    public ZoneEras? Eras { get; init; }
+
+    /// <summary>
+    /// The era the WORLD has reached — <see cref="WorldEra.Current"/>, supplied at the one
+    /// assembly point so the room and the phone cannot be at different points in history.
+    ///
+    /// <para><b>Empty is the shipped state and it stands the era arm down whole</b> (plan P2):
+    /// no file in this repo states the world's era, this slice does not invent one, and a
+    /// guessed value is the single input that would make the gate refuse real places. An era
+    /// word that is not on <see cref="QuestEraLadder.Eras"/> stands it down too — an era we
+    /// cannot rank is one we cannot compare against, which is the refusal
+    /// <see cref="ZoneEras.Source.Refused"/> already makes on the zone side.</para>
+    /// </summary>
+    public string World { get; init; } = "";
+
     // ---- Farm Motes / Make Money (DRA-71 D7, plans P9 and P10) --------------------------
 
     /// <summary>What each zone has paid this character in motes —
@@ -1009,7 +1088,10 @@ public sealed record RecommendationSet(
     IReadOnlyList<string>? UnreadWorn = null,
     IReadOnlyList<GearBandRefusal>? MaterialBandRefusals = null,
     int MaterialWhoWithheld = 0,
-    int GearCandidates = 0)
+    int GearCandidates = 0,
+    IReadOnlyList<GearEraRefusal>? GearEraRefusals = null,
+    IReadOnlyList<GearEraRefusal>? MaterialEraRefusals = null,
+    bool EraGateLive = false)
 {
     /// <summary>Never null, so no caller has to decide what an absent list means.</summary>
     public IReadOnlyList<GearBandRefusal> GearBandRefusals { get; init; }
@@ -1050,6 +1132,47 @@ public sealed record RecommendationSet(
     /// inferred from it.</para>
     /// </summary>
     public int GearCandidates { get; init; } = GearCandidates;
+
+    /// <summary>
+    /// The places and quests the ERA gate refused on the gear list (DRA-180 D2, plan P1/P3).
+    ///
+    /// <para><b>Its own list beside <see cref="GearBandRefusals"/>, and trap 50 is why it
+    /// exists at all.</b> The Founder's Replace rows were refused by nothing and drawn; his bow
+    /// and Baron rows were refused by a gate that said nothing. Both halves of that FAIL are
+    /// answered by a refusal that can be counted and quoted — a zone that vanished without a
+    /// sentence is indistinguishable from a zone with nothing in it.</para>
+    ///
+    /// <para><b>Not summed with the band refusals</b>, for the reason the materials list is not
+    /// summed with the gear one: the two quote different evidence, and a merged count would
+    /// leave a player unable to act on either. Empty is the shipped state while
+    /// <see cref="WorldEra.Current"/> is absent.</para>
+    /// </summary>
+    public IReadOnlyList<GearEraRefusal> GearEraRefusals { get; init; }
+        = GearEraRefusals ?? [];
+
+    /// <summary>The era gate's refusals on the MATERIALS list — apart from
+    /// <see cref="GearEraRefusals"/> for the reason <see cref="MaterialBandRefusals"/> is apart
+    /// from <see cref="GearBandRefusals"/> (DRA-149 D3's rule, DRA-180 D2).</summary>
+    public IReadOnlyList<GearEraRefusal> MaterialEraRefusals { get; init; }
+        = MaterialEraRefusals ?? [];
+
+    /// <summary>
+    /// **WHETHER THE ERA GATE WAS ARMED AND ASKED AT ALL** (DRA-180 D2; DRA-149 D5 item 2's
+    /// lesson, and trap 42's).
+    ///
+    /// <para><b>A refusal count of zero is the same number on a build where the gate does not
+    /// exist</b>, on a build where it exists and stood down, and on a build where it ran and
+    /// refused nothing. Those are three different worlds and a count cannot tell them apart —
+    /// so the liveness fact is its own boolean and it is the thing asserted FIRST, before any
+    /// count is read.</para>
+    ///
+    /// <para>It reports the EFFECT rather than the presence of a value: true only where the
+    /// world's era is known AND this repo can rank it AND an era table was supplied, which is
+    /// exactly the conjunction <see cref="Recommendations"/> stands the arm down on. <b>It is
+    /// FALSE on every shipped build until D5</b>, because <see cref="WorldEra.Current"/> is
+    /// empty — which is the whole point of P2 and is asserted as such.</para>
+    /// </summary>
+    public bool EraGateLive { get; init; } = EraGateLive;
 
     public static readonly RecommendationSet Empty = new([], 0, [], []);
 }
@@ -1516,11 +1639,16 @@ public static partial class Recommendations
         List<GearBandRefusal> materialBandRefusals = [];
         var materialWhoWithheld = 0;
         var gearCandidates = 0;
+        // DRA-180 D2. Kept apart from the band lists above for the reason every count in this
+        // file is said separately (trap 50): one merged number would explain neither list, and
+        // these two quote era words where those quote levels.
+        List<GearEraRefusal> gearEraRefusals = [];
+        List<GearEraRefusal> materialEraRefusals = [];
 
         if (goals.Contains(HelperGoal.LevelUp)) LevelUp(inputs, candidates, gaps);
         if (goals.Contains(HelperGoal.FarmGear))
-            (gearWithheld, gearBandRefusals, gearWhoWithheld, unreadWorn, gearCandidates) =
-                FarmGear(inputs, candidates, gaps);
+            (gearWithheld, gearBandRefusals, gearWhoWithheld, unreadWorn, gearCandidates,
+                gearEraRefusals) = FarmGear(inputs, candidates, gaps);
         // DRA-71 D7. Both read the player's own play and nothing else; the catalog's half of
         // each was refused by its own survey, which is written down where the engine is.
         if (goals.Contains(HelperGoal.FarmMotes)) FarmMotes(inputs, candidates, gaps);
@@ -1529,7 +1657,8 @@ public static partial class Recommendations
         // every cap in this file is said out loud separately (trap 50): they are answers about a
         // different list, and one merged number would point at neither.
         if (goals.Contains(HelperGoal.FarmMaterials))
-            (materialBandRefusals, materialWhoWithheld) = FarmMaterials(inputs, candidates, gaps);
+            (materialBandRefusals, materialWhoWithheld, materialEraRefusals) =
+                FarmMaterials(inputs, candidates, gaps);
         if (goals.Contains(HelperGoal.WorkOnFaction)) Faction(inputs, candidates, gaps);
         // **THE PICK NARROWS THE ENGINE, NOT THE ROOM** (DRA-71 D5, plan P11). It happens here
         // rather than in the caller so the phone gets it the day it calls Rank — porting a
@@ -1554,7 +1683,8 @@ public static partial class Recommendations
         return new RecommendationSet(
             top, Math.Max(0, ordered.Count - top.Count), deferred, gaps, gearWithheld,
             gearBandRefusals, gearWhoWithheld, unreadWorn,
-            materialBandRefusals, materialWhoWithheld, gearCandidates);
+            materialBandRefusals, materialWhoWithheld, gearCandidates,
+            gearEraRefusals, materialEraRefusals, EraGateArmed(inputs));
     }
 
     // ---- the join: one place, every goal it serves (HOME-005) --------------------------
@@ -2212,7 +2342,8 @@ public static partial class Recommendations
         List<GearBandRefusal> Refused,
         int WhoWithheld,
         IReadOnlyList<string> UnreadWorn,
-        int Candidates) FarmGear(
+        int Candidates,
+        List<GearEraRefusal> EraRefused) FarmGear(
         HelperInputs inputs, List<Recommendation> into, List<GoalGap> gaps)
     {
         // A DECIDED deferral, said out loud. Every intent answers since DRA-71 D7, so this arm
@@ -2221,7 +2352,7 @@ public static partial class Recommendations
         if (GearUpgrades.ShapeFor(inputs.GearIntent) != GearIntentShape.Answered)
         {
             gaps.Add(new GoalGap(HelperGoal.FarmGear, GoalGapReason.GearIntentNotAnsweredYet));
-            return (0, [], 0, [], 0);
+            return (0, [], 0, [], 0, []);
         }
 
         // **"Farm to sell" is a different question and leaves here** (DRA-71 D7, plan P9). It
@@ -2243,7 +2374,7 @@ public static partial class Recommendations
         if (inputs.GearIntent == GearIntent.FarmToSell)
         {
             FarmToSell(inputs, into, gaps);
-            return (0, [], 0, [], 0);
+            return (0, [], 0, [], 0, []);
         }
 
         // "EQBuddy has never been told what you are wearing" is a different state from
@@ -2259,7 +2390,7 @@ public static partial class Recommendations
             gaps.Add(new GoalGap(HelperGoal.FarmGear, inputs.UnreadWorn.Count > 0
                 ? GoalGapReason.NothingWornIsReadable
                 : GoalGapReason.NoInventoryDump));
-            return (0, [], 0, inputs.UnreadWorn, 0);
+            return (0, [], 0, inputs.UnreadWorn, 0, []);
         }
 
         var sweep = GearUpgrades.Sweep(
@@ -2268,7 +2399,7 @@ public static partial class Recommendations
         if (sweep.Upgrades.Count == 0)
         {
             gaps.Add(new GoalGap(HelperGoal.FarmGear, GoalGapReason.NoCatalogUpgrade));
-            return (sweep.Withheld, [], 0, inputs.UnreadWorn, 0);
+            return (sweep.Withheld, [], 0, inputs.UnreadWorn, 0, []);
         }
 
         var byZone = new Dictionary<string, List<GearCandidate>>(StringComparer.OrdinalIgnoreCase);
@@ -2291,6 +2422,15 @@ public static partial class Recommendations
             foreach (var quest in upgrade.Quests.Distinct(StringComparer.OrdinalIgnoreCase))
                 Bucket(byQuest, quest, new GearCandidate(upgrade, GearWho.None));
         }
+
+        // **THE ERA GATE RUNS FIRST OF THE THREE** (DRA-180 D2, plan P1). It is the rule that
+        // can explain the Founder's Replace rows — Kael Drakkel, Icewell Keep, Veeshan's Peak
+        // — and the band gate cannot, because their bands are true and their era is not
+        // reachable. Quests are gated too and are NOT exempt the way the band gate exempts
+        // them: the quest being the path says nothing about whether the path is open yet.
+        var eraRefused = EraGate(inputs, byZone, RecommendationKind.Zone, ZoneEraOf(inputs));
+        eraRefused.AddRange(
+            EraGate(inputs, byQuest, RecommendationKind.Quest, QuestEraOf(inputs)));
 
         // **THE BAND GATE, AND IT RUNS BEFORE THE YARDSTICK IS TAKEN** (DRA-84 D2, plan P2).
         // A refused zone is not a candidate, so it must not set the scale the surviving rows
@@ -2323,10 +2463,14 @@ public static partial class Recommendations
         // place they drop. NoCatalogUpgrade would be a lie for the same reason.
         if (byZone.Count == 0 && byQuest.Count == 0)
         {
-            // Two rules can empty this list and they are different states, so they get
-            // different sentences. The band gate is named first because it is the louder of
-            // the two and carries its own numbers; the who rule answers for the rest.
-            if (refused.Count > 0)
+            // THREE rules can empty this list since DRA-180 D2 and they are different states,
+            // so they get different sentences. They are asked in the order they RAN, which is
+            // also the order of how completely each one explains an empty screen: the era gate
+            // names a world and a date, the band gate its own numbers, the who rule can only
+            // say a page was silent.
+            if (eraRefused.Count > 0)
+                gaps.Add(new GoalGap(HelperGoal.FarmGear, GoalGapReason.EverythingIsLaterThanTheWorld));
+            else if (refused.Count > 0)
                 gaps.Add(new GoalGap(HelperGoal.FarmGear, GoalGapReason.EveryZoneOutsideYourBand));
             else if (whoWithheld > 0)
                 gaps.Add(new GoalGap(HelperGoal.FarmGear, GoalGapReason.NoUpgradeNamesACreature));
@@ -2341,7 +2485,8 @@ public static partial class Recommendations
                 [new HelperDoor(HelperDoorKind.QuestCatalog, quest),
                  new HelperDoor(HelperDoorKind.Gear, "")]));
 
-        return (sweep.Withheld, refused, whoWithheld, inputs.UnreadWorn, sweep.Upgrades.Count);
+        return (sweep.Withheld, refused, whoWithheld, inputs.UnreadWorn, sweep.Upgrades.Count,
+                eraRefused);
     }
 
     /// <summary>Add one candidate under one key. Generic since DRA-149 D3 — the materials
@@ -2536,6 +2681,112 @@ public static partial class Recommendations
     }
 
     /// <summary>
+    /// **THE ERA GATE, AND IT RUNS BEFORE THE BAND GATE** (DRA-180 D2, plan P1).
+    ///
+    /// <para>Refuses a CATALOG row whose subject eqlwiki dates LATER than the world has
+    /// reached. This is the axis the Founder's FAIL exposed and the one a band cannot carry:
+    /// Kael Drakkel's published band is <c>30-60+</c>, so at level 29 the bottom arm sees a
+    /// distance of 1 and passes it — correctly, because the band is true. The giants are
+    /// level 30. They are level 30 in Velious.</para>
+    ///
+    /// <para><b>The ORDER is the decision, not an accident of where it was typed</b> — the
+    /// same reasoning DRA-84 D4 used to put the who rule after the band gate, applied one
+    /// step earlier. All three rules can remove the same row, and whichever runs first owns
+    /// the sentence the player reads. An era refusal quotes the wiki's own dating of the place
+    /// and explains the absence completely; a band refusal quotes two numbers that are not
+    /// what is wrong with it; the who rule can only say a page was silent. Running the band
+    /// gate first would explain Kael Drakkel to a level-55 as in-reach and then quietly drop
+    /// it, and a level-29 would get numbers that are not the reason.</para>
+    ///
+    /// <para><b>Only <see cref="Evidence.Catalog"/> rows are era-gated, and personal ones are
+    /// exempt by construction.</b> A camp the player has actually farmed is in the game
+    /// whatever a wiki template says — the evidence beats the claim, which is the same
+    /// asymmetry <see cref="WhoFor"/> already applies to creatures. The gate reads the catalog
+    /// buckets and never the player's pool.</para>
+    ///
+    /// <para><b>Three ways to stand down, each a different silence, and each per-arm</b> (trap
+    /// 73): no world era (the shipped state — <see cref="WorldEra"/>), no
+    /// <see cref="HelperInputs.Eras"/>, and a world era this repo cannot rank. A zone the
+    /// table does not date stands ITSELF down without touching the others — 14 of 118 pages
+    /// carry no banner and three of them are the Paineel-adjacent set that proves "absent
+    /// means Classic" would be an invented fact. The band gate runs regardless.</para>
+    /// </summary>
+    /// <param name="byZone">Mutated in place: a refused subject is REMOVED, so it cannot set
+    /// the yardstick the surviving rows are measured against — <see cref="BandGate{T}"/>'s own
+    /// reason, and the gate that runs first has it first.</param>
+    /// <param name="kind">What is being gated, for the refusal's own sentence.</param>
+    /// <param name="eraOf">This subject's era, or null where nothing dates it.</param>
+    /// <returns>One entry per refused subject, alphabetical — the order a reader meets them.</returns>
+    /// <summary>**The one answer to "is the era gate armed"** — asked by the gate itself and
+    /// reported as <see cref="RecommendationSet.EraGateLive"/>, so the number a dump prints and
+    /// the rule a row is refused by can never disagree (trap 4). A second hand-rolled copy of
+    /// this conjunction is how a diagnostic starts claiming a gate ran that did not.</summary>
+    internal static bool EraGateArmed(HelperInputs inputs) =>
+        inputs.Eras is not null
+        && inputs.World.Length != 0
+        && QuestEraLadder.IndexOf(inputs.World) >= 0;
+
+    private static List<GearEraRefusal> EraGate<T>(
+        HelperInputs inputs, Dictionary<string, List<T>> byZone,
+        RecommendationKind kind, Func<string, ZoneEras.Answer?> eraOf)
+    {
+        var refused = new List<GearEraRefusal>();
+        // An era we cannot place on the ladder is an era we cannot compare against. Standing
+        // down is the only honest answer: the alternative is refusing every dated zone because
+        // one curated word was misspelled.
+        if (!EraGateArmed(inputs)) return refused;
+        var world = inputs.World;
+
+        foreach (var subject in byZone.Keys
+                     .OrderBy(z => z, StringComparer.OrdinalIgnoreCase).ToList())
+        {
+            if (eraOf(subject) is not { } answer) continue;
+            if (answer.Source != ZoneEras.Source.Dated) continue;
+            if (QuestEraLadder.Allowed(answer.Era, world)) continue;
+            byZone.Remove(subject);
+            refused.Add(new GearEraRefusal(
+                subject, answer.Era, answer.Verbatim, world, kind));
+        }
+        return refused;
+    }
+
+    /// <summary>The era lookup a ZONE bucket uses, or one that dates nothing when the table is
+    /// absent. Split out so both drop engines ask the identical question of the identical
+    /// table (trap 4) and neither can grow its own fallback.</summary>
+    private static Func<string, ZoneEras.Answer?> ZoneEraOf(HelperInputs inputs) =>
+        inputs.Eras is { } eras ? zone => eras.Lookup(zone) : _ => null;
+
+    /// <summary>
+    /// The era lookup a QUEST bucket uses — the quest catalog's own <c>Era</c> field.
+    ///
+    /// <para><b>Quest rows are exempt from the band gate and are NOT exempt from this one</b>
+    /// (plan P1). The band exemption is sound: a quest IS the path, and the levels of whatever
+    /// guards it are not the question. Era is a different claim. "Paladin Epic Quest" offered
+    /// as a way to gear up in a world that has not opened Epics is the same lie the Kael row
+    /// told, wearing quest clothes, and the player cannot start it either.</para>
+    ///
+    /// <para>The catalog's field is already the ladder's spelling and is already the input
+    /// <see cref="QuestEraLadder.Allowed"/> was written for — the General tab's era filter has
+    /// asked it this exact question since the quests rewrite. An unstated era dates nothing
+    /// and refuses nothing.</para>
+    /// </summary>
+    private static Func<string, ZoneEras.Answer?> QuestEraOf(HelperInputs inputs)
+    {
+        if (inputs.Catalog is not { } catalog) return _ => null;
+        // Folded ONCE for the whole engine rather than scanned per bucket: 1,178 quests behind
+        // a handful of rows is the same sum computed repeatedly (trap 4 in a loop), and the
+        // first spelling wins so a duplicate page name cannot make the answer depend on
+        // iteration order.
+        var byName = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        foreach (var quest in catalog.Quests)
+            if (quest.Era.Length != 0) byName.TryAdd(quest.Name, quest.Era);
+
+        return name => byName.TryGetValue(name, out var era)
+            ? new ZoneEras.Answer(ZoneEras.Source.Dated, era, "")
+            : null;
+    }
+
+    /// <summary>
     /// Which arm refuses this band at this level, or null for a band that is in reach.
     ///
     /// <para>Split out so the judgement is one expression a test can drive at a boundary: the
@@ -2669,14 +2920,15 @@ public static partial class Recommendations
     /// <returns>Which zones the band gate refused and how many offers the who rule withheld —
     /// counted separately from the gear engine's, because they are answers about a different
     /// list and a merged number would point at neither.</returns>
-    private static (List<GearBandRefusal> Refused, int WhoWithheld) FarmMaterials(
+    private static (List<GearBandRefusal> Refused, int WhoWithheld,
+        List<GearEraRefusal> EraRefused) FarmMaterials(
         HelperInputs inputs, List<Recommendation> into, List<GoalGap> gaps)
     {
         var materials = TradeskillMaterials.From(inputs.Items, inputs.Professions);
         if (materials.Count == 0)
         {
             gaps.Add(new GoalGap(HelperGoal.FarmMaterials, GoalGapReason.NoMaterialDrops));
-            return ([], 0);
+            return ([], 0, []);
         }
 
         // An ingredient that drops in five zones is offered under every one of them —
@@ -2689,6 +2941,12 @@ public static partial class Recommendations
                 Bucket(byZone, zone, new MaterialCandidate(
                     material, WhoFor(inputs, material.Item, material.MobsIn(zone), zone)));
 
+        // **THE SAME SHARED SPINE, IN THE SAME ORDER** (DRA-180 D2). A gem whose only camp is
+        // Temple of Veeshan is unreachable in a Classic world for exactly the reason a helm
+        // there is, so the rule is shared rather than copied — the DRA-149 D3 discipline, which
+        // is what stops the two lists drifting the first time either rule is tuned. Materials
+        // have no quest arm: a recipe ingredient is farmed, never handed in.
+        var eraRefused = EraGate(inputs, byZone, RecommendationKind.Zone, ZoneEraOf(inputs));
         var refused = BandGate(inputs, byZone);
         var whoWithheld = WhoRule(byZone, c => c.Who);
 
@@ -2700,17 +2958,18 @@ public static partial class Recommendations
         if (byZone.Count == 0)
         {
             gaps.Add(new GoalGap(HelperGoal.FarmMaterials,
-                refused.Count > 0 ? GoalGapReason.EveryMaterialZoneOutsideYourBand
+                eraRefused.Count > 0 ? GoalGapReason.EveryMaterialZoneLaterThanTheWorld
+                : refused.Count > 0 ? GoalGapReason.EveryMaterialZoneOutsideYourBand
                 : whoWithheld > 0 ? GoalGapReason.NoMaterialNamesACreature
                 : GoalGapReason.NoMaterialDrops));
-            return (refused, whoWithheld);
+            return (refused, whoWithheld, eraRefused);
         }
 
         var best = byZone.Max(kv => kv.Value.Count);
         foreach (var (zone, candidates) in Ranked(byZone))
             into.Add(MaterialRow(zone, candidates, best));
 
-        return (refused, whoWithheld);
+        return (refused, whoWithheld, eraRefused);
     }
 
     /// <summary>

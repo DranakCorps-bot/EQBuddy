@@ -508,6 +508,11 @@ public class HelperSurfaceParityTests
                      // exactly the shape D5 got caught by.
                      "h.merchants", "h.merchantNote", "h.merchantDoorNote",
                      "m.profession", "m.lines", "m.more", "m.empty",
+                     // DRA-180 D2's two era captions, added in the SAME slice as the fields.
+                     // The era gate runs BEFORE the band gate, so these name refusals the band
+                     // sentence never mentions: a page that drew only the band ones would show
+                     // a shorter list than the PC with nothing on screen explaining why.
+                     "h.gearEraRefused", "h.materialEraRefused",
                      "h.doorsLead", "h.empty", "h.gaps", "h.deferred",
                  })
             Assert.Contains(field, html, StringComparison.Ordinal);
@@ -543,6 +548,75 @@ public class HelperSurfaceParityTests
         // Each door is about one of the NAMED items, in the caption's own order.
         Assert.Contains("Deterioriated Ancient Faydark Longbow +2", phone.UnreadWornDoors[0].Detail);
         Assert.Contains("Lute +1", phone.UnreadWornDoors[1].Detail);
+    }
+
+    // ---- DRA-180 D2: the era gate's refusals reach the phone ---------------------------
+
+    /// <summary>
+    /// **A place the PC refused for its ERA is refused on the phone too, in the same words.**
+    ///
+    /// <para>The sentence is <see cref="HelperPresentation"/>'s, not the projection's — the
+    /// phone decides no word (DRA-71 D9). It matters more here than for the band caption,
+    /// because the era gate runs FIRST: a phone carrying only the band sentence would draw a
+    /// shorter list than the PC with nothing on screen accounting for the difference, which is
+    /// the DRA-84 D5 miss wearing a new field.</para>
+    /// </summary>
+    [Fact]
+    public void TheEraRefusalSentenceRidesTheWireInThePresentationsOwnWords()
+    {
+        var record = new ItemCatalog.Record
+        {
+            Name = "Blade of Carnage",
+            StatsText = "Slot: PRIMARY\nAC: 20",
+            Slots = ["PRIMARY"],
+            Ac = 20,
+            DropZones = ["Kael Drakkel"],
+            DropMobs = new Dictionary<string, List<string>>(StringComparer.OrdinalIgnoreCase)
+            {
+                ["Kael Drakkel"] = ["a Kromrif general"],
+            },
+        };
+
+        var inputs = Inputs() with
+        {
+            Worn = [new WornItem("Rusty Blade", "Rusty Blade", "PRIMARY",
+                ItemStatsBlock.Parse(["Slot: PRIMARY", "AC: 2"]))],
+            Items = new ItemCatalog([record]),
+            GearIntent = GearIntent.UpgradeWorn,
+            Eras = new ZoneEras(
+                new Dictionary<string, ZoneEras.Banner>
+                {
+                    ["Kael Drakkel"] = new("Velious", "{{Velious Era}}"),
+                },
+                new Dictionary<string, string>()),
+            World = "Classic",
+        };
+
+        var set = Recommendations.Rank(inputs, [HelperGoal.FarmGear]);
+        Assert.NotEmpty(set.GearEraRefusals);
+
+        var phone = Phone(Request(inputs, HelperGoal.FarmGear));
+
+        Assert.Equal(
+            HelperPresentation.EraRefused(
+                set.GearEraRefusals, HelperPresentation.BandRefusedUpgrades),
+            phone.GearEraRefused);
+        // The words themselves, so a producer that started answering "" could not pass by
+        // agreeing with itself.
+        Assert.Contains("Kael Drakkel (Velious)", phone.GearEraRefused);
+        Assert.Contains("Classic", phone.GearEraRefused);
+    }
+
+    /// <summary>The committed negative: a character whose places are all in reach is sent no
+    /// era sentence at all, so the caption can never appear over a list the gate refused
+    /// nothing from.</summary>
+    [Fact]
+    public void APhoneWithNothingEraRefusedIsSentNoEraSentence()
+    {
+        var phone = Phone(Request(Inputs(), HelperGoal.FarmGear));
+
+        Assert.Empty(phone.GearEraRefused);
+        Assert.Empty(phone.MaterialEraRefused);
     }
 
     /// <summary>Nothing unread, nothing sent — the committed negative, so a phone with nothing
