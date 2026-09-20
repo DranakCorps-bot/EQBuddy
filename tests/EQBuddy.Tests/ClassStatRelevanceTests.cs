@@ -390,6 +390,140 @@ public class ClassStatRelevanceTests
             "// RelevantMetrics decides the order; GainMetric is what the row says."));
     }
 
+    /// <summary>
+    /// **AND NO DRAWN SURFACE REACHES IT EITHER — the half a blanket forbid cannot express**
+    /// (DRA-222 D6 done bar 3, S16.3).
+    ///
+    /// <para><see cref="NoPlayerFacingWordDrawsTheRelevanceCount"/> above forbids the token
+    /// outright in the two files that own the Helper's WORDS. That rule can only be written
+    /// where the count is absent, and it is exactly the wrong shape for the file the finding
+    /// was about: <c>EQBuddy/HelperRoom.cs</c> both draws text straight to the screen — its
+    /// <c>Line(string, Role)</c> helper is called upwards of forty times — AND legitimately
+    /// carries the count once, in the <c>helperRelevant=</c> <c>EQBUDDY_EXPAND</c> dump line.
+    /// Zero tolerance there is unwritable, so the only rule that covers it is an ALLOWLIST:
+    /// <b>this line and no other</b>.</para>
+    ///
+    /// <para><b>Which is why the shape of the mistake S16.3 exists to prevent lives here and
+    /// not above.</b> A quick debug binding — <c>Line($"Relevance: {f.RelevantMetrics}",
+    /// Role.Body)</c> — is a change to the room, not to a words file, and the room is the one
+    /// surface a blanket forbid had to leave out. The count is a tally over how often eqlwiki's
+    /// item blocks carry each number for this class; drawn as a bare figure it states that
+    /// tally as though it were a measurement of the character.</para>
+    ///
+    /// <para>The allowlisted line is recognised by BEING the dump line (it names the dump key),
+    /// never by a line number — those drift with every edit above them, and a guard pinned to
+    /// one would be re-pointed by hand at whatever now sits there. Scope is the three trees
+    /// that can put a glyph in front of a player: the desktop, UI.Shared, and Companion
+    /// (whose page can only draw what the projection sends — trap 32).</para>
+    ///
+    /// <para><b>One deliberate departure from the reviewer's spec, because taking it literally
+    /// would have reproduced the hole.</b> It names <c>src/EQBuddy/**/*.xaml.cs</c>, which does
+    /// not match <c>HelperRoom.cs</c> — that is a plain <c>.cs</c>, not a code-behind — while
+    /// the same spec allowlists "the single <c>HelperRoom.cs</c> dump line". A glob that cannot
+    /// match the file its own allowlist exempts is a typo in the spec, not a scope decision, so
+    /// the scan is over <c>*.cs</c>/<c>*.xaml</c> and the allowlist means something.</para>
+    /// </summary>
+    [Fact]
+    public void TheOnlyDrawnSurfaceLineThatReachesTheRelevanceCountIsTheAllowedDumpLine()
+    {
+        var offenders = new List<string>();
+        var allowed = 0;
+        var scanned = 0;
+
+        foreach (var file in DrawnSurfaceFiles())
+        {
+            scanned++;
+            foreach (var line in RelevanceCountDraws(File.ReadAllText(file)))
+            {
+                if (IsTheAllowedDumpLine(file, line)) { allowed++; continue; }
+                offenders.Add($"{Relative(file)}: {line.Trim()}");
+            }
+        }
+
+        // Liveness (trap 78): a glob that matches nothing scans clean and reports this rule as
+        // held for every surface at once. The floor is well under the ~279 files these three
+        // trees hold, so it survives ordinary growth and still fails a broken enumeration.
+        Assert.True(scanned > 200,
+            $"the scan found only {scanned} files — the globs stopped matching, so a clean "
+            + "result says nothing about any surface");
+
+        // …and the allowlist is REACHED. If the dump line is renamed or moved out of the room,
+        // this guard would go on passing while exempting nothing, which is the same silence.
+        Assert.True(allowed == 1,
+            $"expected exactly the one allowlisted dump line, found {allowed}. If "
+            + "HelperRoom's helperRelevant= line legitimately moved, re-point the allowlist; "
+            + "if a SECOND dump-shaped line appeared, it needs its own decision.");
+
+        Assert.True(offenders.Count == 0,
+            "a drawn surface reaches the S7.2 relevance count. It is a ranking term, not a "
+            + "fact about the character — the visible half is HelperPresentation.Gain's "
+            + "\"+12 AC\", a delta against a metric's own name (S16.3):\n  "
+            + string.Join("\n  ", offenders));
+    }
+
+    /// <summary>
+    /// **THE MUST-LIST PARTNER: the token's whole footprint in <c>src/</c> is the known set**
+    /// (trap 34 — a forbid over the surfaces cannot see a reader appearing somewhere new).
+    ///
+    /// <para>The forbid above is what keeps the number off the screen. This is what keeps the
+    /// forbid HONEST: it pins which files carry the count at all, so a sixth site anywhere in
+    /// <c>src/</c> has to be looked at rather than merely landing outside the globs. Three
+    /// files, and the reviewer's enumeration reconciles to them — two engine sites
+    /// (<c>GearUpgrades</c>, <c>Recommendations</c>) plus the single room dump line.</para>
+    ///
+    /// <para>Deliberately the FILE SET and not a line count: an engine refactor that moves a
+    /// sort key around inside <c>Recommendations.cs</c> changes nothing a player can read, and
+    /// a guard that reddens on it is one the next person edits to green without thinking. What
+    /// must not happen quietly is the count acquiring a reader in a file that never had one.
+    /// <c>HelperRoom.cs</c> is the exception and is pinned tighter above, at exactly one
+    /// line, because that is the file where a new line IS the risk.</para>
+    /// </summary>
+    [Fact]
+    public void TheRelevanceCountIsCarriedByExactlyTheKnownFiles()
+    {
+        var carriers = Directory
+            .EnumerateFiles(Path.Combine(RepoRoot(), "src"), "*.cs", SearchOption.AllDirectories)
+            .Where(NotBuildOutput)
+            .Where(f => RelevanceCountDraws(File.ReadAllText(f)).Count > 0)
+            .Select(f => Path.GetFileName(f))
+            .OrderBy(n => n, StringComparer.Ordinal)
+            .ToList();
+
+        Assert.Equal(
+            new[] { "GearUpgrades.cs", "HelperRoom.cs", "Recommendations.cs" },
+            carriers);
+    }
+
+    /// <summary>The one exempt line: the room's <c>EQBUDDY_EXPAND</c> dump key, identified by
+    /// the key it emits rather than by where it currently sits.</summary>
+    private static bool IsTheAllowedDumpLine(string file, string line) =>
+        Path.GetFileName(file) == "HelperRoom.cs"
+        && line.Contains("helperRelevant=", StringComparison.Ordinal);
+
+    /// <summary>Every file in the three trees that can put a glyph in front of a player.</summary>
+    private static IEnumerable<string> DrawnSurfaceFiles()
+    {
+        string[] trees = ["EQBuddy", "EQBuddy.UI.Shared", "EQBuddy.Companion"];
+        string[] kinds = ["*.cs", "*.xaml", "*.html"];
+
+        return trees
+            .Select(t => Path.Combine(RepoRoot(), "src", t))
+            .Where(Directory.Exists)
+            .SelectMany(dir => kinds.SelectMany(k =>
+                Directory.EnumerateFiles(dir, k, SearchOption.AllDirectories)))
+            .Where(NotBuildOutput);
+    }
+
+    private static bool NotBuildOutput(string path)
+    {
+        var p = path.Replace('\\', '/');
+        return !p.Contains("/obj/", StringComparison.Ordinal)
+            && !p.Contains("/bin/", StringComparison.Ordinal);
+    }
+
+    private static string Relative(string path) =>
+        Path.GetRelativePath(RepoRoot(), path).Replace('\\', '/');
+
     /// <summary>Lines of <paramref name="source"/> that reach the ranking count, with XML doc
     /// comments and line comments removed first.</summary>
     private static IReadOnlyList<string> RelevanceCountDraws(string source) => source
