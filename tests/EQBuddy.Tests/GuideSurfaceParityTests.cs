@@ -833,4 +833,138 @@ public sealed class GuideSurfaceParityTests : IDisposable
         Assert.Contains(GuideCatalog.Default.Guides, g =>
             g.GuideType != GuideType.NormalQuest && g.QuestName.Length > 0);
     }
+
+    // ----- DRA-218: the blocked sentence and the Closest to Completion lens ---------------
+
+    /// <summary>Strike ONE piece out and leave the other open — the reachable S23 AC 8 shape,
+    /// on the SHIPPED Warrior guide. Work remains, so the player can go and do it; the hand-in
+    /// still cannot happen at the end of it.</summary>
+    private QuestChecklistGroup BlockOnePiece(AppSettings settings, QuestLedgerStore ledger)
+    {
+        var rows = Desktop(settings, ledger).Single(g => g.CompletionKey == RewardKey)
+            .Rows.Where(r => !r.IsTurnIn).ToList();
+        Assert.True(rows.Count >= 2, "the shipped Warrior seed needs two pieces for this");
+        Assert.True(CompanionActions.Apply(settings, ledger, Dranak,
+            new CompanionAction(CompanionSurfaces.Sky,
+                CompanionActions.SkipVerb + rows[^1].Id, Done: true)));
+        return Desktop(settings, ledger).Single(g => g.CompletionKey == RewardKey);
+    }
+
+    /// <summary>
+    /// **The phone is SENT the sentence, word for word, and it is Core's** — so the heading on
+    /// the PC and the heading on the phone cannot start explaining one quest differently.
+    ///
+    /// <para>Asserted against a direct <c>BlockedNote</c> call over the desktop's own group,
+    /// the way every row in this file is asserted: parity by shared module, never by two
+    /// feature lists somebody keeps level (David, 2026-08-18).</para></summary>
+    [Fact]
+    public void ThePhoneIsSentTheBlockedSentenceTheDesktopDraws()
+    {
+        var settings = Settings();
+        var ledger = Store();
+        var desktop = BlockOnePiece(settings, ledger);
+
+        Assert.True(desktop.Blocked);
+        Assert.Equal("blocked", desktop.Note);
+
+        var phone = PhoneGroup(Phone(settings, ledger), desktop.Heading);
+
+        Assert.Equal(QuestChecklistLayout.BlockedNote(desktop), phone.Blocked);
+        Assert.StartsWith(QuestChecklistLayout.BlockedLead, phone.Blocked!, StringComparison.Ordinal);
+    }
+
+    /// <summary>The prove-fail beside it: with nothing struck out the field is NULL on the
+    /// wire, so the page adds nothing for the ordinary case. Without this row the assertion
+    /// above could pass on a projection that sent a sentence for every quest.</summary>
+    [Fact]
+    public void AnOrdinaryQuestSendsNoBlockedSentenceAtAll()
+    {
+        var settings = Settings();
+        var ledger = Store();
+        var desktop = Desktop(settings, ledger).Single(g => g.CompletionKey == RewardKey);
+
+        Assert.False(desktop.Blocked);
+        Assert.Null(PhoneGroup(Phone(settings, ledger), desktop.Heading).Blocked);
+    }
+
+    /// <summary>
+    /// **The page DRAWS it, and spells none of it.**
+    ///
+    /// <para>The half that gets skipped: a sentence the page is SENT but never draws passes
+    /// every projection test there is (DRA-84 D5, trap 34) — D2 and D4 of DRA-71 each added a
+    /// caption without this row and the phone drew four of five. So this asserts the page
+    /// reads <c>g.blocked</c> AND that Core's lead is not in the HTML, because a page-side
+    /// copy sits unseen on an open phone for weeks after the PC moves on (trap 32).</para>
+    /// </summary>
+    [Fact]
+    public void ThePageDrawsTheBlockedSentenceAndSpellsNoneOfIt()
+    {
+        var html = File.ReadAllText(Path.Combine(
+            SurfaceParityPaths.SrcRoot(), "EQBuddy.Companion", "Web", "index.html"));
+
+        Assert.Contains("g.blocked", html);
+        Assert.DoesNotContain(QuestChecklistLayout.BlockedLead, html);
+
+        // A REAL sentence, so this is the one a player would be sent rather than one the
+        // test composed — and a floor, because an empty check is a green check (trap 78).
+        var settings = Settings();
+        var ledger = Store();
+        var note = QuestChecklistLayout.BlockedNote(BlockOnePiece(settings, ledger));
+        Assert.False(string.IsNullOrWhiteSpace(note));
+        Assert.DoesNotContain(note!, html);
+    }
+
+    /// <summary>
+    /// **The phone orders by the lens with the SAME call from the same point** — the island
+    /// view's rule (DRA-164 D3) one setting later. The PC writes
+    /// <c>SkyClosestToCompletion</c>; the phone reads it and runs Core's
+    /// <c>ClosestToCompletion</c>, so an order that started being decided on the phone fails
+    /// here rather than in a screenshot.
+    ///
+    /// <para>The ★ Ready band is deliberately excluded from the comparison: everything in it
+    /// is equally actionable and it has always had a stable order rather than a ranking.</para>
+    /// </summary>
+    [Fact]
+    public void ThePhoneOrdersByCompletionExactlyAsTheDesktopDoes()
+    {
+        var settings = Settings();
+        settings.SkyClosestToCompletion = true;
+        var ledger = Store();
+        BlockOnePiece(settings, ledger);
+
+        var desktop = QuestChecklistLayout.ClosestToCompletion(Desktop(settings, ledger));
+        var phone = Phone(settings, ledger).Groups
+            .Where(g => g.Tickable && g.Class is not null).ToList();
+
+        Assert.NotEmpty(phone);
+        Assert.Equal(desktop.Select(g => g.Heading), phone.Select(g => g.Heading));
+        // The BLOCKED reward is last, which is the acceptance bar rather than merely
+        // "the two lists match" — two identically wrong lists match too.
+        Assert.Equal(RewardKey, desktop[^1].CompletionKey);
+    }
+
+    /// <summary>**The toggle is the only thing that changed** — the prove-fail for the row
+    /// above. Off, the phone's order is the class-and-reward one it has always had, which is
+    /// what a player who upgrades keeps (S4.4 / S23 AC 1).</summary>
+    [Fact]
+    public void WithTheLensOffThePhoneKeepsTheOrderItAlwaysHad()
+    {
+        var settings = Settings();
+        var ledger = Store();
+        BlockOnePiece(settings, ledger);
+
+        var off = Phone(settings, ledger).Groups
+            .Where(g => g.Tickable && g.Class is not null).Select(g => g.Heading).ToList();
+
+        Assert.Equal(Desktop(settings, ledger).Select(g => g.Heading), off);
+
+        settings.SkyClosestToCompletion = true;
+        var on = Phone(settings, ledger).Groups
+            .Where(g => g.Tickable && g.Class is not null).Select(g => g.Heading).ToList();
+
+        // Same groups, different order — so neither list above could have passed by the lens
+        // being a no-op on this fixture.
+        Assert.Equal(off.Order(StringComparer.Ordinal), on.Order(StringComparer.Ordinal));
+        Assert.NotEqual(off, on);
+    }
 }

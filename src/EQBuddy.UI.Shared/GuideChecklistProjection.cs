@@ -469,7 +469,21 @@ public static class GuideChecklistProjection
                 // row only. `For` answers "" for a step nobody attached anything to and for one
                 // the Helper cannot answer, which is nearly every row in the catalog.
                 HelperLine(helper, objective, stageFor, stagesAnswered),
-                IslandKeyFor(guide, stageOf.GetValueOrDefault(objective.Id, ""), objective)));
+                IslandKeyFor(guide, stageOf.GetValueOrDefault(objective.Id, ""), objective),
+                // What this step is waiting on that the remaining work will NOT deliver — a
+                // prerequisite the player struck out (DRA-218, S23 AC 8). Empty on almost
+                // every row. `byId` is the whole guide rather than the drawn set on purpose:
+                // a skip is a decision the player made about a specific step, and it keeps
+                // binding when a lens takes that step's row off the tab.
+                string.Join(
+                    QuestChecklistLayout.BlockerSeparator,
+                    GuidePresentation.BlockedBy(
+                            objective, byId,
+                            p => GuideProgressRouter.IsDone(
+                                settings, ledger, characterKey, guide.Id, p, stores),
+                            p => GuideProgressRouter.IsSkipped(
+                                ledger, characterKey, guide.Id, p))
+                        .Select(GuidePresentation.StepName))));
         }
 
         var counts = GuideProgressRouter.Counts(

@@ -631,13 +631,22 @@ internal sealed class AppHarness : IDisposable
     /// an achievements file. A character who has never dumped resolves off the log, which
     /// collapses to one class (see <see cref="SeedQuestClasses"/>), so a scenario about
     /// picks NARROWING an identity has to seed this side of it.</param>
+    /// <param name="skippedObjectives">Guide objectives the player has STRUCK OUT, keyed by
+    /// guide id (DRA-218). The only lever out here that can produce a BLOCKED quest, and
+    /// trap 22 in its usual shape: a skip lives in the guide ledger rather than in
+    /// <c>AppSettings</c>, so <c>configureSettings</c> cannot reach it and a test about the
+    /// blocked heading would otherwise be asserting over a state the fixture cannot enter.
+    /// <c>DoneObjectiveIds</c> is deliberately left empty beside it — "I did this" and "I am
+    /// not doing this" contradict, and a fixture that wrote both would be staging a state the
+    /// app refuses to create.</param>
     public void SeedQuestLedger(
         IReadOnlyList<string>? classes = null,
         IReadOnlyList<string>? tracked = null,
         IReadOnlyDictionary<string, int>? owned = null,
         (int Level, DateTime At)? level = null,
         (int Level, DateTime At)? statedLevel = null,
-        IReadOnlyList<string>? unlockedClasses = null)
+        IReadOnlyList<string>? unlockedClasses = null,
+        IReadOnlyDictionary<string, IReadOnlyList<string>>? skippedObjectives = null)
     {
         File.WriteAllText(Path.Combine(ProfileDir, "quest-ledger.json"),
             JsonSerializer.Serialize(new Dictionary<string, object>
@@ -653,6 +662,13 @@ internal sealed class AppHarness : IDisposable
                     LevelAt = level?.At ?? default,
                     StatedLevel = statedLevel?.Level ?? 0,
                     StatedLevelAt = statedLevel?.At ?? default,
+                    Guides = (skippedObjectives
+                            ?? new Dictionary<string, IReadOnlyList<string>>())
+                        .ToDictionary(kv => kv.Key, kv => new
+                        {
+                            DoneObjectiveIds = (IReadOnlyList<string>)[],
+                            SkippedObjectiveIds = kv.Value,
+                        }),
                 },
             }, new JsonSerializerOptions { WriteIndented = true }));
     }

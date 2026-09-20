@@ -736,6 +736,43 @@ $Shots = [ordered]@{
                            Set = @{
                                SkyGroupByIsland = $true
                            } }
+    # ---- DRA-218: Closest to Completion, and the blocked quest under it ---------------
+    #
+    # **A state with a SKIPPED step in it, because that is the only state the lens visibly
+    # changes on this catalog.** Measured with the slice: the Warrior's six Sky guides hold
+    # three or four objectives each, and over those sizes the class view's own
+    # progress-descending order and this lens's fewest-remaining order cannot disagree
+    # (`k/4 > j/3` and `4-k > 3-j` have no solution). So a shot of the lens over a fresh
+    # profile would photograph the class view and read as a passing feature — trap 22's
+    # failure with the fixture present but wrong-shaped, and trap 23's with a real state of
+    # something else in frame.
+    #
+    # The staged skip is the Azure Ruby Ring's Azure Ring loot step, which is a prerequisite
+    # of that quest's hand-in — so the quest has one step left by the count, cannot be
+    # finished at all, and is alphabetically FIRST (which is where the class view puts it).
+    # Ids are the shipped catalog's; `GuideCatalog.Validate` refuses a prerequisite that
+    # names nothing, so a rename breaks the build rather than this picture silently.
+    #
+    # PREDICTION, written before the run (trap 23). At 1000x900 in class view with the box
+    # ticked: the Azure Ruby Ring heading is NOT first - it is LAST among the Warrior's six -
+    # and reads "Warrior · Azure Ruby Ring 0/3 · blocked", with the line under it
+    # "Waiting on a step you skipped: Loot the Azure Ring from Gorgalosk." Above it sit the
+    # other five rewards, each 0/3 or 0/4 and each reading no state word at all (nothing is
+    # started), ordered fewest-left first. The "Closest to completion first" box is ticked,
+    # beside the Class view / Island view chips and the "Repeat multi-island steps" box.
+    'shell-quests-sky-closest' = @{ Title = 'EQBuddy — Guide'
+                           Env = @{ EQBUDDY_SHELL = 'quests:sky'
+                                    EQBUDDY_SHELL_SIZE = '1000x900' }
+                           Ledger = @{ Classes = @('Warrior')
+                                       Guides = @{
+                                           'pos-warrior-azure-ruby-ring' = @{
+                                               DoneObjectiveIds = @()
+                                               SkippedObjectiveIds = @('azure-ring')
+                                           }
+                                       } }
+                           Set = @{
+                               SkyClosestToCompletion = $true
+                           } }
     # ---- E-3 PR 4: the HOME room, and the default landing ----------------------------
     #
     # **`EQBUDDY_SHELL = '1'` is deliberate and is half of what these shots prove.** Every
