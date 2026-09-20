@@ -2322,6 +2322,20 @@ prefix extension of what was already on disk.
 - Entries appended in this pass: **6**
 - Bytes appended: **42,122**  (sha 9ab9c7e7b1dda396)
 
+**Correcting two claims in the pass-1 header above, which this pass made false.**
+That header is DRA-258's dated provenance record and its bytes are untouched; this
+is the correction, in the pass that caused it.
+
+1. *"The live file keeps the 12 newest `##` entries (back to 2026-09-13)"* -- it now
+   keeps **five** dated entries: three from 2026-09-13 and two from 2026-09-08.
+2. *"and both entries cited by the test suite"* -- there was only ever **one** such
+   entry, not two. `HudXpTooltipTests.cs:7` (`BEVEL.md` item 2) and
+   `HudExpandTests.cs:6` (`BEVEL.md` §4) both cite `###` ordinals inside the single
+   2026-09-06 ~5:49 PM CT entry, which is **in this pass**, below. They are no longer
+   kept in place: both are **re-pinned verbatim** in the live file under a
+   `## Pinned anchors` heading. Read them there, not here, when checking whether a
+   cut broke them -- and do not assume a date cut can see an ordinal. It cannot.
+
 ---
 
 ## 2026-09-07 ~3:50 PM CT — HELM OWNER LOCK folded into the transition one-pager: Evolved captures use teal + grey (not parchment/brass) (Bevel)
