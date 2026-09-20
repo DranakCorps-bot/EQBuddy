@@ -1756,15 +1756,32 @@ public partial class QuestsView : UserControl
         // would press Skip and the card would keep naming the step they just struck out.
         // Trap 72, one surface later: when you add a READER of a store, put that store in
         // what makes the surface redraw.
+        //
+        // **WHICH LIST an id is in is part of the fold, and leaving it out was a collision.**
+        // The two lists used to go through one `guideId + "/" + id` string, so an id present
+        // in exactly one of them contributed the same hash and the same 1 either way —
+        // and `QuestLedgerStore.SetObjectiveMembership` MOVES an id across in a single
+        // locked write (ticking a struck-out step clears the strike, and vice versa). One
+        // user action, XOR unmoved, count unmoved, whole signature unmoved, early return.
+        // The term was wrong from the day it shipped and cost nothing while skip and done
+        // both meant "not the next step"; DRA-218 gave the difference a READER
+        // (QuestChecklistRow.BlockedBy, and through it the group heading's "blocked"), and
+        // the two lists now mean opposite things. Prefixing the list is what makes the two
+        // contributions unable to coincide.
         var guide = 0;
         var guideOn = 0;
         if (_main.QuestLedger is { } ledger && _main.QuestCharacterKey is { Length: > 0 } key)
             foreach (var guideId in ledger.GuidesTouchedBy(key))
             {
                 var progress = ledger.GuideProgressFor(key, guideId);
-                foreach (var id in progress.SkippedObjectiveIds.Concat(progress.DoneObjectiveIds))
+                foreach (var id in progress.SkippedObjectiveIds)
                 {
-                    guide ^= (guideId + "/" + id).GetHashCode(StringComparison.Ordinal);
+                    guide ^= ("s/" + guideId + "/" + id).GetHashCode(StringComparison.Ordinal);
+                    guideOn++;
+                }
+                foreach (var id in progress.DoneObjectiveIds)
+                {
+                    guide ^= ("d/" + guideId + "/" + id).GetHashCode(StringComparison.Ordinal);
                     guideOn++;
                 }
             }
@@ -4290,9 +4307,63 @@ public partial class QuestsView : UserControl
                     : [.. arg.Split('+', StringSplitOptions.RemoveEmptyEntries
                         | StringSplitOptions.TrimEntries)]);
                 return true;
+            // A guide step ticked by SOMETHING THAT IS NOT THIS VIEW — the phone's tap
+            // (`CompanionActions`), or the other instance's own checkbox (QuestsWindow and
+            // QuestsRoom build one QuestsView each over one ledger, trap 45). Like `picks`
+            // it forces NO refresh, and for the same reason: neither of those writers can
+            // force one either, so the repaint has to come out of the `ck:` term in
+            // `Refresh`'s signature. Forcing one here would exercise a path the remote
+            // writer does not have and would hide trap 72 on this surface.
+            //
+            // Through `GuideProgressRouter`, never the store: which of the six homes owns a
+            // step's done state is that class's question and nothing else may answer it
+            // (`GuideProgressRoutingTests` scans for exactly that).
+            case "guidedone":
+            case "guideskip":
+                return ProbeGuideStep(arg, done: verb == "guidedone");
             default:
                 return false;
         }
+    }
+
+    /// <summary>
+    /// The <c>guidedone</c>/<c>guideskip</c> verbs' body — see <see cref="ProbeLens"/>.
+    ///
+    /// <para><b>It refuses any step whose home depends on stores it is not holding.</b> The
+    /// rendezvous exists for the GUIDE LEDGER's own rows, which is where the skip and the
+    /// tick live in two lists of one record and where moving between them is a single write.
+    /// <c>GuideProgressRouter.HomeFor</c> has four branches that answer somewhere else, and
+    /// three of them read stores a probe does not hold — a reward key (the Sky turn-in), an
+    /// epic row bearing this id, a <c>TurnIn</c> inside a quest's guide (the completion
+    /// record), and an acquire-shaped step naming one of a group's rows. Each is excluded by
+    /// NAME below, which is what makes the empty <see cref="GuideStores"/> true rather than
+    /// convenient: what is left is guide-ledger-homed under EVERY store set. Passing one of
+    /// the others would write the wrong store and report success.</para>
+    ///
+    /// <para>False for anything it cannot honour — an unknown row id, a refused shape, no
+    /// character key — so a staging mistake times out naming the probe rather than reading
+    /// as a feature that did not fire.</para>
+    /// </summary>
+    private bool ProbeGuideStep(string rowId, bool done)
+    {
+        var key = _main.QuestCharacterKey;
+        if (_main.QuestLedger is not { } ledger || key.Length == 0) return false;
+        if (GuideChecklistProjection.Resolve(GuideCatalog.Default, rowId)
+            is not ({ } guide, { } step)) return false;
+        if (step.RewardKey.Length > 0
+            || string.Equals(step.ObjectiveType, "TurnIn", StringComparison.Ordinal)
+            || GuideProgressRouter.ItemBackedObjectiveTypes.Contains(
+                step.ObjectiveType, StringComparer.Ordinal)
+            || _settings.EpicQuestChecklist.Any(
+                r => string.Equals(r.Id, step.Id, StringComparison.OrdinalIgnoreCase)))
+            return false;
+
+        if (done)
+            GuideProgressRouter.SetDone(
+                _settings, ledger, key, guide.Id, step, new GuideStores([], [], null), true);
+        else
+            GuideProgressRouter.SetSkipped(ledger, key, guide.Id, step, true);
+        return true;
     }
 
     /// <summary>

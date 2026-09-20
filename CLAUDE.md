@@ -954,6 +954,19 @@ after the named guard left with its surface.
     before the fix and passes in 4 s after. Dump both numbers from one moment
     (`questsSkyAcquired` beside `questsGuideDone`) — "the store says so" and
     "the screen says so" are different claims (trap 56).
+    **And a fold over TWO lists must carry WHICH LIST.** The same gate put
+    `SkippedObjectiveIds` and `DoneObjectiveIds` through one `guideId + "/" + id`
+    string, so an id in exactly one of them contributed the same hash and the same
+    1 either way — while `QuestLedgerStore.SetObjectiveMembership` MOVES an id
+    across in one locked write. Signature unmoved, early return, the other window
+    still drawing the step crossed out. Harmless until DRA-218 gave the difference
+    a reader (`QuestChecklistRow.BlockedBy`); the list is now in the hashed string.
+    **The guard needs the writer to be one that cannot force a repaint** — every
+    write site inside a view force-refreshes itself, so only the phone or the other
+    instance reaches the gate (`ChecklistTickSignatureTests`, the lens probe's
+    `guidedone` verb) — **and it needs the surface to have STOPPED redrawing on its
+    own first** (`WaitUntilStill`): without that anchor the row is GREEN on the
+    broken build, riding a repaint that was already coming.
 
 73. **A schema that has a field for every question becomes a licence to
     ANSWER every question.** "All six must be addressed" was read as
