@@ -63,8 +63,20 @@
     'DECISIONS.md'       = 85238
     # 7x over. Never rotated. Shrinks for real once plans move to docs/plans/DRA-nn.md.
     'FABLE.md'           = 478113
-    # 4x over. Never rotated.
-    'BEVEL.md'           = 237551
+    # BEVEL.md left this table on 2026-09-20, discharged by the DRA-258 rotation
+    # (DRA-144 F9): 237,542 B -> 60,352 B, into channels/2026-Q3/BEVEL.md. It was 4x over
+    # and had never rotated, because 68% of it was a single UNDATED container heading
+    # holding 20 dated h3 pre-designs: a date cut that reads h2 headings sees one undated
+    # block and walks past it, which is how this file survived every prior pass. The cut
+    # was made at h3 INSIDE the container; the container heading stays live with a pointer
+    # to the archive, and the orientation notes under it are undated and still current.
+    # This row is DELETED rather than lowered, which is the difference from SCRIBE.md and
+    # DECISIONS.md above: check C discharges a row the moment the file reaches 64 KiB or
+    # less, and 60,352 B is under the ceiling, so the ceiling arm governs BEVEL.md now and
+    # it has no tolerance band at all. That is a known cost, not an oversight - at the
+    # measured 16.4 KB/day this file is back over policy in well under a week, and check B
+    # refuses any pull request that adds this key back. The successor rotation is filed
+    # rather than bought with a number here (trap 52).
     # Rotated 2026-09-20 by DRA-229 (DRA-144 F4b): 213,675 B -> 114,715 B, into
     # channels/2026-Q3/SCRIBE.md. The cut is a TRIAGE by the entries' own Priority field,
     # not a date cut - SCRIBE.md is an inbox and 42 of its 92 entries are still open at
