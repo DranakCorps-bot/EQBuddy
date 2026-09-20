@@ -2,13 +2,15 @@
 
 **Immutable. Nothing here is live, and nothing here is a work queue.**
 
-Rotated out of the active channel files in three passes: **2026-09-14** by DRA-75
+Rotated out of the active channel files in four passes: **2026-09-14** by DRA-75
 (M0-2) under the DRA-73 plan rev 2 approved by David on 2026-09-14,
 **2026-09-17** by DRA-165 (DRA-144 F1) under DRA-26 plan §5 as David SIGNed it
 2026-09-17T01:06:45Z, and **2026-09-18** by DRA-154 (`EXO-CHANNEL-ROTATE`) under the
-Helm AUTHORIZE of that evening. `exo-experiment: channel-rotation`. Tier T1.
+Helm AUTHORIZE of that evening, and **2026-09-20** by DRA-229 (DRA-144 F4b) under
+DRA-26 plan rev 3 section 5. `exo-experiment: channel-rotation`. Tier T1.
 Pass 2 appended into the existing `FABLE-FEEDBACK.md` archive and pass 3 into the
-existing `HELM-FEEDBACK.md` one; neither moved anything an earlier pass had written.
+existing `HELM-FEEDBACK.md` one; neither moved anything an earlier pass had written,
+and pass 4 wrote a new `SCRIBE.md` archive that no earlier pass had opened.
 
 Holds live in `HELM.md` and **only Helm lifts one**. An archived line never
 revives a hold and never commissions work. If you are looking for something to
@@ -25,10 +27,18 @@ do, the inboxes are `SCRIBE.md`, `BEVEL.md` and `FABLE.md` — not this director
 | [`FABLE-FEEDBACK.md`](FABLE-FEEDBACK.md) *(pass 2)* | 49 | 226,720 | 265 KB → 39 KB (10 entries) | before 2026-09-15 |
 | [`HELM.md`](HELM.md) *(pass 3)* | 144 tips + 134 sign-offs | 1,033,986 | 1,047,518 B → 25,411 B (1 tip) | before 2026-09-18 |
 | [`HELM-FEEDBACK.md`](HELM-FEEDBACK.md) *(pass 3)* | 81 | 342,571 | 344,449 B → 4,730 B (1 entry) | before 2026-09-18 |
+| [`SCRIBE.md`](SCRIBE.md) *(pass 4)* | 47 | 99,145 | 213,675 B → 114,715 B (45 entries) | **triage by `Priority`, not a date** |
 
 No pending ask was archived in any pass — pass 2's 18 candidate ask/hold
 markers were each dispositioned before the move and all 18 were already discharged,
-so nothing needed re-pinning, and pass 3 did the same for 43.  The live
+so nothing needed re-pinning, and pass 3 did the same for 43.
+**Pass 4 could not use a cutoff at all.** `SCRIBE.md` is an inbox, not a dated ledger:
+its entries carry a `Priority` field, 42 of the 92 were still open by that field, and the
+oldest of those (`waiting`, 2026-08-19) sit further down than entries already discharged.
+A date cut would have archived live `must-fix` player-facing defects, so pass 4 partitioned
+per entry by Priority instead: `someday` / `taken` / `done` and the terminal dispositions
+moved, and **zero** entries marked `must-fix`, `approved`, `authorized`, `authorized-next`,
+`open` or `waiting` were archived - a count measured over the archive file, not a claim.  The live
 `HELM-FEEDBACK.md` asks are still in the active file; the **PR #606** DRA-71 D9 ask
 that was unsigned when pass 1 ran has since been SIGNED and moved in pass 3.
 

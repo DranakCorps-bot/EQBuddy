@@ -52,6 +52,11 @@
     'FABLE.md'           = 478113
     # 4x over. Never rotated.
     'BEVEL.md'           = 237551
-    # 3x over. Never rotated.
-    'SCRIBE.md'          = 177198
+    # Rotated 2026-09-20 by DRA-229 (DRA-144 F4b): 213,675 B -> 114,715 B, into
+    # channels/2026-Q3/SCRIBE.md. The cut is a TRIAGE by the entries' own Priority field,
+    # not a date cut - SCRIBE.md is an inbox and 42 of its 92 entries are still open at
+    # any age, so a date cut would have been silent closure. Still 1.7x over policy, so
+    # this row is LOWERED and KEPT: check C discharges a row only at 64 KiB or less, and
+    # the open-ask floor is ~105 KB on its own, so no legal cut reaches the ceiling.
+    'SCRIBE.md'          = 114715
 }
