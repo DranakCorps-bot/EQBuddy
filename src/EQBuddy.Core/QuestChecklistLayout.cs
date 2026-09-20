@@ -333,16 +333,27 @@ public sealed record QuestChecklistGroup(
 
     /// <summary>The word after the count on the heading. Finer than <see cref="State"/>
     /// on purpose: a group nobody has started says nothing at all, where the lens puts it
-    /// in "open" alongside one that is half done. Derived from the same fields as
-    /// <see cref="State"/> so the label and the filter cannot disagree.</summary>
+    /// in "open" alongside one that is half done.
+    ///
+    /// <para><b>Every word here NARROWS one of <see cref="State"/>'s four, and never
+    /// contradicts it</b> — which is the promise, rather than the older and stronger claim
+    /// that the two read the same fields. "set aside" and "blocked" are both readings of
+    /// <see cref="QuestChecklistLayout.StateOpen"/>, and "blocked" is the one word here that
+    /// consults something <see cref="State"/> does not
+    /// (<see cref="QuestChecklistRow.BlockedBy"/>, DRA-218): a blocked group is genuinely
+    /// open, so the state lens keeps it where it was and only the label gets sharper. The
+    /// four-word lens vocabulary is unchanged, deliberately — it is the same four the General
+    /// tab offers, and a fifth filter word would be a player learning two vocabularies for
+    /// one screen.</para></summary>
     public string? Note =>
         Completed ? "done"
         // The same split <see cref="State"/> makes, and it was NOT made here: a group with no
         // turn-in of its own (every Epic group) read "ready" on the heading while the state
         // lens filed it under "done", so the label and the filter disagreed about the same
-        // group. The doc above has claimed since it was written that they are derived from the
-        // same fields; on the Epic tab that was untrue, and guiding the tab is what made it
-        // visible — one heading per class instead of one per section.
+        // group. The doc above CLAIMED, until DRA-218 replaced it with the narrowing rule,
+        // that the two are derived from the same fields; on the Epic tab that was untrue, and
+        // guiding the tab is what made it visible — one heading per class instead of one per
+        // section.
         : AllPiecesInHand ? (CompletionKey is null ? "done" : "ready")
         : SetAside ? "set aside"
         // BEFORE "in progress", because it is the sharper of the two true words and the
