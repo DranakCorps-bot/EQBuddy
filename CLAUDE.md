@@ -1216,11 +1216,21 @@ after the named guard left with its surface.
     on `main` already carried that email** (121 as `David Edwards`, 5 as
     `DranakCorps-bot`): the three PRs were the instance somebody noticed, at a
     eighteenth of the real scale. Cause was environmental, not the repo —
-    `~/.gitconfig` has NO `[user]` block, so every clone carries its own and they
-    disagree; `C:\Users\david\source\EQBuddy` (a dispatch lane with ~20 `%TEMP%`
-    worktrees on `claude/*` / `sr-exec/*`) said `David Edwards`, and one
-    `git config --local` fixed all 20 at once. **`git var GIT_AUTHOR_IDENT` is the
-    one command that ends the guessing** — ask the CLONE, not the checkout.
+    `~/.gitconfig` had NO `[user]` block, so every clone carries its own and they
+    disagree; `C:\Users\david\source\EQBuddy` (a dispatch lane carrying **253**
+    worktrees, on `claude/*`, `opus-dra*`, `fable*` and `sr-exec/*` alike) said
+    `David Edwards`, and one `git config --local` fixed all 253 at once — which is
+    also why the branch prefix reads as a lead and is not one: those are not
+    different lanes, they are worktrees of the same clone.
+    **`git var GIT_AUTHOR_IDENT` is the one command that ends the guessing** — ask
+    the CLONE, not the checkout you are standing in.
+    **Second layer, so a clone inherits an identity instead of inventing one:**
+    `~/.gitconfig` now carries one `includeIf "hasconfig:remote.*.url:…"` rule per
+    agent repo → `~/.gitconfig-dranakcorps-bot`. **Keyed on the REMOTE, not a path**
+    — runs create clones in unpredictable temp dirs, so a path rule covers today's
+    workspaces and none of tomorrow's. Local config still wins (it supplies an
+    identity, never overrides a chosen one), and David's own repos under the same
+    account are deliberately not globbed in, one repo named at a time.
     **It is rewritable on an unmerged branch and impossible after the merge**, which
     is why the guard is pre-merge. Guard: `scripts/commit-identity-guard.ps1` +
     `-selftest`, in `check.ps1` and CI on `pull_request`. It reads EMAIL on BOTH
