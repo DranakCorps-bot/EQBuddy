@@ -242,6 +242,13 @@ public sealed class HelperSources
                 // phone from ranking materials against a different set of professions than the
                 // PC does.
                 Professions = professions,
+                // **DRA-216 D4, and it is supplied HERE for the reason every line above it
+                // is.** A tracked goal is the one thing in this room that survives the answers
+                // moving, so a surface that read the store for itself could be showing a goal
+                // the other surface has already been untracked out of (trap 33). It is read
+                // per tick like the picks beside it and deliberately not cached: a row the
+                // player just tracked must appear now, not in five seconds.
+                Tracked = TrackedUpgradeStore.For(settings, characterKey),
             },
             goals, factions, unlockPicks, wornPicks, professions, skills);
     }

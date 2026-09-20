@@ -53,6 +53,13 @@ public static partial class CompanionProjection
         // disclosure-line rule broken one block along.
         var merchants = Merchants(request);
 
+        // DRA-216 D4. Built before the record for the reason `merchants` above it is: the three
+        // captions over it are withheld with it. Gated on the same condition the desktop room
+        // draws the block on — the gear goal is picked, or nothing is, which weighs everything.
+        var tracked = request.Goals.Count != 0 && !request.Goals.Contains(HelperGoal.FarmGear)
+            ? new List<string>()
+            : [.. request.Inputs.Tracked.Select(HelperPresentation.TrackedRow)];
+
         return new CompanionHelperSection(
             Question: HelperPresentation.RoomQuestion,
             PicksLead: HelperPresentation.PicksOnPc,
@@ -123,6 +130,18 @@ public static partial class CompanionProjection
                 ? ""
                 : HelperPresentation.DoorTip(new HelperDoor(HelperDoorKind.WikiZone, "")),
             Merchants: merchants,
+            // **DRA-216 D4, and the phone half is not optional.** A tracked goal is the one
+            // thing in this room that OUTLIVES the answers, so a phone that drew the list and
+            // not the PC — or the PC and not the phone — would have the two surfaces disagreeing
+            // about what the player is working on, which is the one thing the phone half is not
+            // allowed to do. It is READ-ONLY here: every control in this room writes the PC's
+            // profile, so the tracking door ports as the sentence saying where it is (trap 35).
+            // The three captions are withheld with the list they are about, the merchant block's
+            // own rule directly above.
+            TrackedHeading: tracked.Count == 0 ? "" : HelperPresentation.TrackedHeading,
+            TrackedNote: tracked.Count == 0 ? "" : HelperPresentation.TrackedNote,
+            TrackedOnPc: tracked.Count == 0 ? "" : HelperPresentation.TrackedOnPc,
+            Tracked: tracked,
             // DRA-149 D2, and it arrives WITH its doors in the same slice — DRA-84 D5's lesson
             // was that a caption which reaches the wire and is never drawn passes every test in
             // the parity suite, so the page-side must-list gains its row here too (trap 34).
@@ -364,6 +383,12 @@ public static partial class CompanionProjection
         // that drifts on a tick (trap 8).
         Join(h.Merchants, m => m.Profession + "=" + Join(m.Lines, l => l) + "|" + m.More
             + "|" + m.Empty),
+        // DRA-216 D4: the tracked rows fold as LINES, never as a count — trap 72 is the reason
+        // this store exists to be watched at all. A goal untracked and another tracked in one
+        // pass leaves the count unmoved, and a paired phone would keep drawing a goal the
+        // player has already dropped. The rows carry an absolute DATE and nothing relative, so
+        // none of this drifts on a tick (trap 8).
+        Join(h.Tracked, t => t), h.TrackedHeading,
         Join(h.Gaps, g => g.Text + "|" + g.Prompt?.Command),
         Join(h.Deferred, d => d.Text),
         h.Empty?.Heading);

@@ -106,6 +106,19 @@ namespace EQBuddy.Companion;
 /// the listed set and not the picked one, because "picked nothing" means "show me all eight" —
 /// the rule lives in <c>TradeskillPickStore.ListedFrom</c> so the phone cannot arrive at a
 /// different eight from the PC.</param>
+/// <param name="TrackedHeading">The tracked block's heading (DRA-216 D4). Empty — with the two
+/// fields under it — when nothing is tracked, which is the desktop room's own rule: that block
+/// draws nothing at all rather than a heading over an empty list.</param>
+/// <param name="TrackedNote">What a tracked goal is and the two things it does not claim. The
+/// SAME sentence the PC draws: it carries the parked "+N" gap and the fact that nothing ticks
+/// itself off, and a phone without it would show a list of goals implying a comparison EQBuddy
+/// cannot make.</param>
+/// <param name="TrackedOnPc">Where a goal is tracked and untracked, as INTENT (trap 35). Every
+/// control in this room writes the profile the PC is playing from, so the phone gets the
+/// sentence rather than a button that could not work.</param>
+/// <param name="Tracked">One already-worded row per goal, newest first —
+/// <c>HelperPresentation.TrackedRow</c>'s own sentence and the store's own order. The projection
+/// picks no word and no order.</param>
 /// <param name="Gaps">Answerable goals that produced nothing, each with its reason and —
 /// where the answer is a file the game writes — the command as selectable text.</param>
 /// <param name="Deferred">Selected goals whose engine does not exist yet, each naming the
@@ -146,6 +159,10 @@ public sealed record CompanionHelperSection(
     string MerchantNote,
     string MerchantDoorNote,
     IReadOnlyList<CompanionHelperMerchants> Merchants,
+    string TrackedHeading,
+    string TrackedNote,
+    string TrackedOnPc,
+    IReadOnlyList<string> Tracked,
     IReadOnlyList<CompanionHelperNote> Gaps,
     IReadOnlyList<CompanionHelperNote> Deferred,
     CompanionHelperEmpty? Empty = null);
