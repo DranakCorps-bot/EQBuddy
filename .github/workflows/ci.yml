@@ -143,6 +143,11 @@ jobs:
           python scripts/harvests/eqlwiki/epic-guides-build.py --check
           python scripts/harvests/eqlwiki/zonelevels-transform.py --check
           python scripts/harvests/eqlwiki/merchants-transform.py --check
+          python scripts/harvests/eqlwiki/zone-eras-transform.py --check
+          # Both era refusals are unreachable in the committed corpus, so --check green says
+          # nothing about whether they fire (trap 78). --selftest runs them over synthetic
+          # wikitext and writes nothing.
+          python scripts/harvests/eqlwiki/zone-eras-transform.py --selftest
 
       - uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
         with:

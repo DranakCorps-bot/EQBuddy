@@ -71,12 +71,20 @@ public partial class QuestsView : UserControl
     // Verified/VerifiedAt fields Progressed() already collapsed to Total.
     private IReadOnlyDictionary<string, QuestLedgerStore.Entry> _owned =
         new Dictionary<string, QuestLedgerStore.Entry>(StringComparer.OrdinalIgnoreCase);
-    /// <summary>The classes this CHARACTER has, captured before the view lens narrows
-    /// them. The leftover bands need the character's real class list, not the one class
-    /// the player is currently looking at: "only other classes want this" said about a
-    /// class you play — because you had it lensed out — is a false claim, and it is the
-    /// one claim band B exists to make carefully (#193's rule, one surface over).</summary>
-    private IReadOnlyList<string> _myClasses = [];
+    /// <summary>The classes this VIEW is about, from the one producer
+    /// (<see cref="QuestClassLens.Offered"/>) and captured before the view lens narrows
+    /// them to one.
+    ///
+    /// <para>Two readers, one stored answer, which is the point of the field rather than a
+    /// second call: the leftover bands need the character's real class list, not the one
+    /// class the player is currently looking at — "only other classes want this" said
+    /// about a class you play, because you had it lensed out, is a false claim and the one
+    /// claim band B exists to make carefully (#193's rule, one surface over) — and
+    /// <see cref="BuildClassStrip"/> needs exactly the same list, because a chip for a
+    /// class this render has already narrowed away is a control that does nothing
+    /// (DRA-181 D4). <see cref="Refresh"/> writes it before <see cref="BuildTabs"/> runs,
+    /// so the strip is never built from the render before last (trap 33).</para></summary>
+    private IReadOnlyList<string> _offered = [];
     /// <summary>The Helper's answers about the subjects this catalog's steps point at
     /// (DRA-83) — this view's OWN memo, like <see cref="_unlockPool"/> beside it, because
     /// QuestsWindow and QuestsRoom each build their own view (trap 45).</summary>
@@ -96,6 +104,7 @@ public partial class QuestsView : UserControl
         BuildStaticChrome();
         EpicClassicOnlyCheck.IsChecked = _settings.EpicQuestClassicOnly;
         SkyIslandRepeatCheck.IsChecked = _settings.SkyStepsUnderEveryIsland;
+        SkyClosestCheck.IsChecked = _settings.SkyClosestToCompletion;
         BuildClassChecks();
         BuildUnlockPicker();
         EraCombo.Items.Add("Any era");
@@ -408,12 +417,18 @@ public partial class QuestsView : UserControl
     private void BuildClassStrip()
     {
         _classes.Clear();
-        var key = _main.QuestCharacterKey;
-        // The RESOLVED list, not the picks with one inferred class behind them: the dump
-        // leads, the log fills in, picks widen (`CharacterClasses`). Reading
-        // `InferredClass` here was the last place this window could see one class where
-        // the character has three.
-        var mine = _main.ClassSourceFor(_main.CurrentSnapshot()).Classes;
+        // THE SAME LIST THE RENDER NARROWED TO (DRA-181 D4, plan P5) — read off the field
+        // Refresh wrote a few lines earlier, never re-derived here.
+        //
+        // It used to call `ClassSourceFor(...).Classes` itself: the RESOLVED list, which is
+        // the right answer to "who is this character" (the dump leads, the log fills in,
+        // picks widen — `CharacterClasses`, and reading `InferredClass` here was the last
+        // place this window could see one class where the character has three) and the
+        // WRONG answer to "which classes is this view about". Picks narrow the render and
+        // do not narrow `Resolve`, so every class the player had just deselected kept a
+        // chip — and clicking one set a lens the render clears again on the same tick
+        // (trap 33: two producers, and the dead control is what the second one bought).
+        var mine = _offered;
         // One class and no lens to offer: a strip reading "Any · BRD" chooses nothing.
         if (mine.Count < 2) { ClassStrip.Visibility = Visibility.Collapsed; return; }
         ClassStrip.Visibility = Visibility.Visible;
@@ -426,7 +441,22 @@ public partial class QuestsView : UserControl
                 tip: cls is null
                     ? "Every class you play"
                     : $"Show only {cls} — quests, Epic and Plane of Sky alike",
-                onClick: () => { _classLens = cls; Refresh(force: true); });
+                onClick: () => LensTo(cls));
+    }
+
+    /// <summary>What pressing a class chip DOES — lifted out of the handler above so the
+    /// <c>EQBUDDY_LENSPROBE</c> rendezvous drives the chip's own path instead of a copy of it
+    /// (DRA-199). Behaviour is the handler's, unchanged: a second producer of "what the chip
+    /// does" is trap 4, and a probe that re-typed these two lines would go on passing on the
+    /// day the real click learned a third.
+    ///
+    /// <para><c>null</c> is the Any chip. The repaint is <see cref="Refresh"/>'s — it reaches
+    /// <see cref="ApplyTabVisual"/> through <c>BuildTabs</c>, which is what moves the
+    /// selection.</para></summary>
+    private void LensTo(string? cls)
+    {
+        _classLens = cls;
+        Refresh(force: true);
     }
 
     // The counting RULE is Core's (QuestSurface.CountOf) — this window, the Avalonia one
@@ -769,6 +799,84 @@ public partial class QuestsView : UserControl
         UpdateClassButton(saved);
     }
 
+    /// <summary>What the quick-select would tick at the last render, kept for the
+    /// <c>EQBUDDY_EXPAND</c> dump. The control lives inside a popup, so a screenshot cannot
+    /// show it is there at all (traps 29 and 79) and only a launched app can answer.</summary>
+    private IReadOnlyList<string> _myClasses = [];
+
+    /// <summary>The hover the strip on screen is carrying. Kept beside <see cref="_myClasses"/>
+    /// because the two together are what <see cref="RefreshMyClassesAction"/> compares: the
+    /// source can move under a steady class list, and that changes the words without changing
+    /// a class. Empty is both "no control" and "no hover", which are the same screen.</summary>
+    private string _myClassesTip = "";
+
+    /// <summary>
+    /// **The <c>My Classes</c> quick-select** (DRA-216 D1, S4.3; acceptance S22 AC 5/6).
+    ///
+    /// <para>Selecting the classes you actually play was three or four trips through a
+    /// sixteen-row popup, re-entering something the app already knows — it has resolved the
+    /// character's identity since #210 and prints it one line above this control.</para>
+    ///
+    /// <para><b>The answer comes from <see cref="QuestClassLens.MyClasses"/> and nowhere
+    /// else</b> (S4.3): identity, canonicalised to the lens's own row keys. It is a different
+    /// question from <see cref="QuestClassLens.Offered"/> and deliberately cannot see the
+    /// picks — quick-selecting from the picks would re-select what is already selected.</para>
+    ///
+    /// <para><b>Nothing here writes the picks store.</b> The action paints the ticks and then
+    /// hands off to <see cref="OnClassCheckChanged"/>, which has been that store's one writer
+    /// since the picker shipped — so the quick-select cannot drift from what the checkboxes
+    /// themselves do, and the list stored is the one the picker reports (trap 4). Everything
+    /// downstream follows for free: the face, the strip, the refresh, the phone.</para>
+    ///
+    /// <para><b>It does not move identity</b> (S3.3). <c>CharacterClasses.Resolve</c> is read
+    /// and untouched; picks widen identity and never remove from it, so a player who
+    /// quick-selects and then unticks a class has narrowed a LENS, and the identity note
+    /// above the list still says who they are. And they CAN untick it — the rows are the same
+    /// rows, unchanged by this (S22 AC 6).</para>
+    ///
+    /// <para>Offered only when identity has something to say. A character with no dump, no
+    /// qualifying log evidence and no statement gets NO button rather than one that does
+    /// nothing when clicked — silent no-ops are broken, and a disabled button in this popup
+    /// would not look disabled (trap 17).</para>
+    ///
+    /// <para><b>It is called ABOVE the render's signature gate, so it rebuilds only when the
+    /// CONTROL has moved</b> — <see cref="QuestClassLens.MyClassesActionMoved"/> owns that
+    /// decision and the whole of why is written there. Short version: both hosts repaint on a
+    /// timer (the shell's room every tick through <c>PaintNow</c>, the v1 window off the dump's
+    /// <c>PaintOneMoment</c>), <see cref="EqMultiPicker.SetActions"/> clears and news up a fresh
+    /// <c>Button</c> unconditionally, and a control rebuilt once a second cannot hold a hover
+    /// long enough to read or survive a press that straddles a tick (trap 46).</para>
+    ///
+    /// <para>The call stays above the gate on purpose. The gate's signature is about the
+    /// CHECKLIST — identity is not in it and putting it there would make every render fold a
+    /// term only this control reads, which is the opposite of what a signature is for.</para>
+    /// </summary>
+    private void RefreshMyClassesAction(IReadOnlyList<string> resolved, ClassSource source)
+    {
+        if (_classPicker is null) return;
+        var mine = QuestClassLens.MyClasses(resolved, QuestClassFilter.Classes);
+        var tip = ClassFilterLabel.MyClassesTip(mine, source);
+        if (!QuestClassLens.MyClassesActionMoved(_myClasses, _myClassesTip, mine, tip)) return;
+        _myClasses = mine;
+        _myClassesTip = tip;
+        // Empty REMOVES the control rather than leaving one that does nothing — SetActions'
+        // own contract, and the reason the empty arm goes through here rather than returning
+        // early above: losing an identity has to take the button away with it.
+        _classPicker.SetActions(mine.Count == 0
+            ? []
+            : [new PickerAction(ClassFilterLabel.MyClasses, SelectMyClasses, tip)]);
+    }
+
+    private void SelectMyClasses()
+    {
+        if (_classPicker is null || _myClasses.Count == 0) return;
+        var mine = new HashSet<string>(_myClasses, StringComparer.OrdinalIgnoreCase);
+        _classPicker.SetChecked(key => mine.Contains((string)key));
+        // SetChecked never calls back (trap 20's sync half), so the ONE writer is called
+        // here rather than duplicated: it reads the picker, stores, repaints and refreshes.
+        OnClassCheckChanged();
+    }
+
     /// <summary>The Epic tab's classic-era lens. Persisted, because EQBuddy Mobile's
     /// Epic tab honors the same setting — one filter, both screens.</summary>
     private void OnEpicClassicOnlyToggled(object sender, RoutedEventArgs e)
@@ -785,6 +893,16 @@ public partial class QuestsView : UserControl
     private void OnSkyIslandRepeatToggled(object sender, RoutedEventArgs e)
     {
         _settings.SkyStepsUnderEveryIsland = SkyIslandRepeatCheck.IsChecked == true;
+        _settings.Save();
+        Refresh(force: true);
+    }
+
+    /// <summary>The Sky tab's Closest to Completion lens (DRA-218). Persisted for its two
+    /// siblings' reason — EQBuddy Mobile reads the same setting, so one checklist is ordered
+    /// one way on both screens.</summary>
+    private void OnSkyClosestToggled(object sender, RoutedEventArgs e)
+    {
+        _settings.SkyClosestToCompletion = SkyClosestCheck.IsChecked == true;
         _settings.Save();
         Refresh(force: true);
     }
@@ -882,15 +1000,21 @@ public partial class QuestsView : UserControl
         // never persisted, and one popup pick overrides (David, 2026-08-11: players swap
         // classes, so this is a reading, not a fact).
         var (resolved, classSource) = _main.ClassSourceFor(_main.CurrentSnapshot());
-        var classes = picks.Count > 0 ? picks : resolved.ToList();
+        // The quick-select is offered from IDENTITY, beside the picks it will replace
+        // (DRA-216 D1). Here because this is where identity is already in hand — resolving
+        // it again inside the picker's own code is how the class strip earned DRA-181.
+        RefreshMyClassesAction(resolved, classSource);
+        // THE ONE PRODUCER of "which classes this surface is about" (DRA-181 D4, plan P5).
+        // This ternary used to be typed here, again in the phone's leftover bands, and a
+        // THIRD time in BuildClassStrip as `resolved` alone — so picking three classes left
+        // every other resolved class holding a chip that narrowed to nothing.
+        _offered = QuestClassLens.Offered(picks, resolved);
+        var classes = _offered.ToList();
         // WHO the character is, shown whether or not classes are picked — Bevel,
         // Helm-signed 2026-08-23: "identity stays on screen after picks. It is not the
         // filter." Hiding it the moment they tick the picker hides the game's own answer
         // exactly when they are deciding what to look at.
         var identity = string.Join(" · ", resolved);
-        // Captured HERE, one line before the lens narrows `classes` to a single entry —
-        // see the field's note. Empty stays empty, which is what suppresses band B.
-        _myClasses = classes;
         // The lens narrows to ONE of the classes you play. Everything downstream reads
         // `classes`, so narrowing it here covers the catalog, the zone view and the
         // item-driven tabs at once. A stale lens (you dropped that class) is ignored
@@ -906,6 +1030,15 @@ public partial class QuestsView : UserControl
         if (_tab == QuestTab.Unlocks) RefreshUnlockPool();
 
         var sig = $"{key}|{filter}|{_mode}|st:{_state}|{string.Join("+", classes)}|id:{identity}|{_settings.QuestEraFilter}|{_main.CurrentZoneName}" +
+            // THE OFFERED LIST, beside the narrowed one (DRA-181 D4). `classes` above is what
+            // the lens left, so with a lens ON it hides a change to the picks: deselect a
+            // class you are not lensed to and every term here is unmoved while the strip has
+            // a chip to drop. The desktop picker forces a refresh, so this is not about the
+            // control the player just touched — the PHONE writes these picks too
+            // (`CompanionActions.SetClasses`), and that writer has no way to force anything
+            // here. Trap 72 on this surface, with the writer in another room for the second
+            // time. Folded by CONTENT: a swap leaves a count unmoved.
+            $"|off:{string.Join("+", _offered)}" +
             $"|sel:{_selected}" +
             $"|{string.Join(";", tracked.Order(StringComparer.OrdinalIgnoreCase))}" +
             $"|{string.Join(";", hidden.Order(StringComparer.OrdinalIgnoreCase))}" +
@@ -933,7 +1066,13 @@ public partial class QuestsView : UserControl
             // unrelated moved. Exactly the fold's story, one store later; the repeat flag has
             // had the same hole since it shipped and gets closed here because DRA-164 gave it
             // its second reader.
-            $"|sky:{(_settings.SkyGroupByIsland ? 1 : 0)}{(_settings.SkyStepsUnderEveryIsland ? 1 : 0)}" +
+            //
+            // The completion lens is the THIRD digit and joins for exactly the same reason
+            // (DRA-218): it is a profile-level setting with two writers — this window and the
+            // shell's Guide room — and it reorders every group and every island row on the
+            // tab without touching a tick, a fold or a pick.
+            $"|sky:{(_settings.SkyGroupByIsland ? 1 : 0)}{(_settings.SkyStepsUnderEveryIsland ? 1 : 0)}"
+            + $"{(_settings.SkyClosestToCompletion ? 1 : 0)}" +
             // THE FOLD. Every guided group on all three tabs reads AppSettings.GuideExpanded
             // to decide whether it starts open, and nothing else in this signature moves when
             // it does. The fold control's own click forces a refresh, so this is not about
@@ -983,6 +1122,9 @@ public partial class QuestsView : UserControl
         _lastIslandLayout = null;
         _lastIslandRowTitle = "";
         _lastIslandRowOwner = "";
+        _lastBlockedNote = "";
+        _lastFirstGroupHeading = "";
+        _lastFirstGroupRemaining = -1;
         _rows.Clear();
         _renderedCount = 0;
         _suppressed = 0;
@@ -1315,6 +1457,49 @@ public partial class QuestsView : UserControl
         $"questsReadySummary={(SummaryRow.Visibility == Visibility.Visible ? 1 : 0)} " +
         $"questsTabs={_tabs.Count} " +
         $"questsModes={_modes.Count} " +
+        // ---- the CLASS LENS strip (DRA-181 D4) ----------------------------------------
+        // WHICH chips the strip is offering, folded from the real strip's KEYS rather than
+        // counted: a count is unmoved by a swap (trap 72), and the Founder's fault was a
+        // strip of the RIGHT SIZE holding the wrong classes as often as it was one chip too
+        // many. The key is what a click sets the lens to, so this says the control is live
+        // as well as present — a chip naming a class the render has narrowed away is the
+        // dead control this slice removed.
+        //
+        // ABBREVIATED, as the chip itself reads: "Shadow Knight" carries a SPACE, and the
+        // dump is space-separated `key=value` — a raw class name would silently corrupt the
+        // pair after this one. "-" is "no chips at all", which is exactly the collapsed
+        // strip (the one-class case returns before adding any), and it has to be a sentinel
+        // because an empty value would corrupt the line the same way.
+        $"questsClassStrip={ClassStripFact()} " +
+        // WHICH of those chips is lit, from the SAME moment as the list above (trap 56) —
+        // "the chip went away" and "the selection landed somewhere real" are two claims and
+        // reading them from two dumps would be reading them from two renders. See
+        // ClassLensFact for why it is off the strip and not off `_classLens`.
+        $"questsClassLens={ClassLensFact()} " +
+        // ---- the My Classes quick-select (DRA-216 D1) ---------------------------------
+        // WHAT IT WOULD TICK, and whether the button reached the popup. Two facts because
+        // they are two claims (trap 56): the producer answering and the control existing are
+        // exactly what came apart the last time a picker grew a face (#184's sibling), and
+        // this one lives inside a Popup — its own top-level HWND, which PrintWindow does not
+        // capture at all (trap 79), so no screenshot can ever say the button is there.
+        // Counted off the REAL picker rather than off the list handed to it (trap 29).
+        // ABBREVIATED, like the strip above and for the same reason: "Shadow Knight" carries
+        // a space and the dump is space-separated `key=value`. "-" is "nothing to select",
+        // which is the state where the button is deliberately ABSENT.
+        $"questsMyClasses={Dumped(string.Join("+", _myClasses.Select(QuestClassFilter.Abbrev)))} " +
+        $"questsMyClassesBtn={_classPicker?.ActionCount ?? -1} " +
+        // HOW MANY TIMES THAT BUTTON HAS BEEN DESTROYED AND REBUILT — a THIRD claim, and the
+        // one neither fact above can make: `questsMyClassesBtn` reads 1 whether the strip has
+        // stood still all session or been replaced on every tick, because a strip rebuilt
+        // every tick holds exactly one button at every moment anybody looks. It shipped at 1
+        // and climbed with the tick, which tore the hover down before it could be read and
+        // swallowed any press that straddled a tick (trap 46). One build per identity, so a
+        // steady character reads 1 forever.
+        $"questsMyClassesBuilds={_classPicker?.ActionBuilds ?? -1} " +
+        // THE ROWS ARE STILL THERE — S22 AC 6, "the player can still add/remove other classes
+        // afterward". A quick-select that rebuilt or narrowed the list would take that away,
+        // and every other fact here would be unmoved by it. Sixteen, before and after.
+        $"questsClassRows={_classPicker?.RowCount ?? 0} " +
         // ---- the SKY tab's island view (DRA-164) --------------------------------------
         // The MODE as the setting holds it, and the STRIP that offers it — counted off the
         // real strip rather than from the list that built it, because the claim is that the
@@ -1325,6 +1510,20 @@ public partial class QuestsView : UserControl
         $"questsSkyRepeat={(_settings.SkyStepsUnderEveryIsland ? 1 : 0)} " +
         $"questsSkyViewChips={_skyView.Count} " +
         $"questsSkyViewShown={(SkyViewHost.Visibility == Visibility.Visible ? 1 : 0)} " +
+        // ---- Closest to Completion (DRA-218) ------------------------------------------
+        // THE SETTING and THE CONTROL, from one moment (trap 56) — a lens that reached the
+        // store and no checkbox is trap 20's shape, and the checkbox is the only door this
+        // lens has.
+        $"questsSkyClosest={(_settings.SkyClosestToCompletion ? 1 : 0)} " +
+        $"questsSkyClosestBox={(SkyClosestCheck.IsChecked == true ? 1 : 0)} " +
+        // THE ORDER THE SCREEN IS IN, which is the whole acceptance bar and the one thing
+        // no setting can assert: the first group's heading in the order it was drawn. A
+        // blocked reward leading this value is the failure S23 AC 8 names.
+        $"questsSkyFirstGroup={Dumped(_lastFirstGroupHeading)} " +
+        $"questsSkyFirstRemaining={_lastFirstGroupRemaining} " +
+        // The blocked sentence that reached the PANEL — not the one BlockedNote answered,
+        // which is the store's claim rather than the screen's (trap 56).
+        $"questsSkyBlockedNote={Dumped(_lastBlockedNote)} " +
         // WHAT THE LAST RENDER DREW, from ONE moment (trap 56): the setting says the player
         // asked for the island view, and these say the screen actually built one. -1 is
         // "this render drew no island layout at all", which is a different claim from "it
@@ -1557,15 +1756,32 @@ public partial class QuestsView : UserControl
         // would press Skip and the card would keep naming the step they just struck out.
         // Trap 72, one surface later: when you add a READER of a store, put that store in
         // what makes the surface redraw.
+        //
+        // **WHICH LIST an id is in is part of the fold, and leaving it out was a collision.**
+        // The two lists used to go through one `guideId + "/" + id` string, so an id present
+        // in exactly one of them contributed the same hash and the same 1 either way —
+        // and `QuestLedgerStore.SetObjectiveMembership` MOVES an id across in a single
+        // locked write (ticking a struck-out step clears the strike, and vice versa). One
+        // user action, XOR unmoved, count unmoved, whole signature unmoved, early return.
+        // The term was wrong from the day it shipped and cost nothing while skip and done
+        // both meant "not the next step"; DRA-218 gave the difference a READER
+        // (QuestChecklistRow.BlockedBy, and through it the group heading's "blocked"), and
+        // the two lists now mean opposite things. Prefixing the list is what makes the two
+        // contributions unable to coincide.
         var guide = 0;
         var guideOn = 0;
         if (_main.QuestLedger is { } ledger && _main.QuestCharacterKey is { Length: > 0 } key)
             foreach (var guideId in ledger.GuidesTouchedBy(key))
             {
                 var progress = ledger.GuideProgressFor(key, guideId);
-                foreach (var id in progress.SkippedObjectiveIds.Concat(progress.DoneObjectiveIds))
+                foreach (var id in progress.SkippedObjectiveIds)
                 {
-                    guide ^= (guideId + "/" + id).GetHashCode(StringComparison.Ordinal);
+                    guide ^= ("s/" + guideId + "/" + id).GetHashCode(StringComparison.Ordinal);
+                    guideOn++;
+                }
+                foreach (var id in progress.DoneObjectiveIds)
+                {
+                    guide ^= ("d/" + guideId + "/" + id).GetHashCode(StringComparison.Ordinal);
                     guideOn++;
                 }
             }
@@ -2955,7 +3171,7 @@ public partial class QuestsView : UserControl
         if (tab != QuestTab.Sky) return;
         var leftovers = SkyLeftovers.Compute(
             _main.LatestInventory(), _settings.SkyQuestChecklist, _settings.SkyQuestCompleted,
-            _myClasses, _main.QuestCatalog);
+            _offered, _main.QuestCatalog);
         if (leftovers.IsEmpty) return;
 
         // Band A first: it is the reporter's own sentence and the only strong claim.
@@ -3655,6 +3871,14 @@ public partial class QuestsView : UserControl
 
         var matching = QuestChecklistLayout.InState(inScope, _state).ToList();
 
+        // CLOSEST TO COMPLETION (DRA-218). Last of the three, and downstream of all of them:
+        // it reorders whatever the picker, the class lens and the state lens left, and adds
+        // and removes nothing — so the row objects, their ids and their tick setters are the
+        // same ones class order would have handed to the loop below. Sky only; an Epic
+        // section is a stage of one quest rather than a reward you could be closer to.
+        if (tab == QuestTab.Sky && _settings.SkyClosestToCompletion)
+            matching = [.. QuestChecklistLayout.ClosestToCompletion(matching)];
+
         if (matching.Count == 0)
         {
             // NAME what emptied the list. "Nothing matches" over a checklist that is
@@ -3688,6 +3912,15 @@ public partial class QuestsView : UserControl
         var lastClass = "";
         foreach (var group in matching)
         {
+            // THE ORDER, as the panel received it (DRA-218). Written before anything can
+            // `continue` past it, so it is the first group the render was HANDED and not the
+            // first one that happened to draw a control — the ordering claim is about the
+            // list, and a fold decides how much of it appears.
+            if (_lastFirstGroupHeading.Length == 0)
+            {
+                _lastFirstGroupHeading = group.Heading;
+                _lastFirstGroupRemaining = group.Remaining;
+            }
             // A class whose epic is marked complete has LOCKED rows. Not decoration: the
             // master check's undo restores the snapshot it took, so a tick made while
             // complete would be silently discarded on Reopen — EpicCompleteToggle.Restore
@@ -3826,6 +4059,21 @@ public partial class QuestsView : UserControl
                 headingRow.Children.Add(guideCaption);
             }
 
+            // WHY THIS ONE WILL NOT FINISH (DRA-218, S23 AC 8). Above the rows and on the
+            // heading, because a folded group is often the only thing on screen for a quest
+            // and the count on that line is the thing being corrected: "1 left" with a
+            // struck-out prerequisite behind it is the reading this sentence exists to stop.
+            // Core's words, so the phone says it identically (#184).
+            if (QuestChecklistLayout.BlockedNote(group) is { } blocked)
+            {
+                var blockedLine = DesignSystem.Text(Role.Caption, blocked);
+                blockedLine.TextWrapping = TextWrapping.Wrap;
+                blockedLine.Margin = new Thickness(DesignTokens.SpaceXs, 0, 0, DesignTokens.SpaceXs);
+                blockedLine.Ink("DimBrush");
+                QuestsPanel.Children.Add(blockedLine);
+                _lastBlockedNote = blocked;
+            }
+
             // FOLDED: the heading line — which now carries the fold control itself — its
             // counts and its caption, and nothing else. That is what lets a whole class fit
             // on one screen and be dug into one quest at a time.
@@ -3880,7 +4128,11 @@ public partial class QuestsView : UserControl
     private void RenderIslandView(
         IReadOnlyList<QuestChecklistGroup> matching, Dictionary<string, Action<bool>> setters)
     {
-        var layout = QuestChecklistLayout.SkyByIsland(matching, _settings.SkyStepsUnderEveryIsland);
+        // The completion lens rides through rather than being applied above: the groups have
+        // no headings on this screen to reorder, so it has to reach the ROWS inside an island
+        // or it is a control that changes nothing and says nothing (DRA-218).
+        var layout = QuestChecklistLayout.SkyByIsland(
+            matching, _settings.SkyStepsUnderEveryIsland, _settings.SkyClosestToCompletion);
         _lastIslandLayout = layout;
         _lastIslandRowTitle = "";
         _lastIslandRowOwner = "";
@@ -3948,6 +4200,20 @@ public partial class QuestsView : UserControl
     /// screen's answer, not the store's, which is the distinction trap 56 is about.</summary>
     private QuestChecklistLayout.SkyIslandLayout? _lastIslandLayout;
 
+    /// <summary>The blocked sentence that actually reached the panel (DRA-218), for the
+    /// <c>EQBUDDY_EXPAND</c> dump. The SCREEN's answer and not the group's — trap 56's
+    /// distinction, and the reason it is written where the control is added rather than
+    /// where <c>BlockedNote</c> is asked. Cleared with the panel (trap 38).</summary>
+    private string _lastBlockedNote = "";
+
+    /// <summary>The first group the class-view render was handed, and how much work it has
+    /// left (DRA-218). The ORDER is the acceptance bar for the completion lens and no setting
+    /// can assert it; these two are what an E2E reads. "-" / -1 when the render drew no class
+    /// view at all, which is a different claim from "it drew an empty one" (trap 38).</summary>
+    private string _lastFirstGroupHeading = "";
+
+    private int _lastFirstGroupRemaining = -1;
+
     /// <summary>The first island row that actually reached the panel, as the two strings the
     /// control was built from (plan P8). Reset on every island render and cleared by a class
     /// render, so "-" is the honest answer for "no island row is on screen" rather than the
@@ -3960,6 +4226,145 @@ public partial class QuestsView : UserControl
     /// space-separated <c>key=value</c> and a space would silently corrupt the NEXT pair.</summary>
     private static string Dumped(string value) =>
         value.Length == 0 ? "-" : value.Replace(' ', '_');
+
+    /// <summary>The class strip's own chips, off the STRIP and not off the list that built
+    /// it — an absent control photographs as an unremarkable panel (trap 29), and the whole
+    /// claim here is that the chips on screen are the classes the view is about. <c>""</c>
+    /// is the Any chip's key; see the field note on why Any is keyed on empty.</summary>
+    private string ClassStripFact() => Dumped(string.Join("+", _classes.Keys
+        .Select(k => (string)k)
+        .Select(k => k.Length == 0 ? "Any" : QuestClassFilter.Abbrev(k))));
+
+    /// <summary>WHICH chip the strip is painting selected (DRA-199) — read off the REAL strip
+    /// through <see cref="EqSegmentedStrip.Selected"/>, deliberately NOT off
+    /// <c>_classLens</c>.
+    ///
+    /// <para><b>The field and the screen are different claims, and this slice exists because
+    /// they can disagree.</b> Un-picking the class the lens is on drops that chip; the lens is
+    /// supposed to fall back to Any. A fact read off <c>_classLens</c> would report the
+    /// fallback even on a build that had stopped repainting the selection — measured: with
+    /// <c>ApplyTabVisual</c>'s <c>Select</c> removed, the field says <c>Any</c> and the strip
+    /// lights nothing, and only this reading fails. Trap 42, on the surface whose whole
+    /// complaint was a chip that did not track. Abbreviated and underscore-free for
+    /// <see cref="ClassStripFact"/>'s reasons — same strip, same dump line.</para>
+    ///
+    /// <para><c>-</c> is "no chip is lit", which covers both the collapsed strip (no chips at
+    /// all) and a lens stranded on a class whose chip has gone. It is a sentinel rather than
+    /// an empty value because the dump is space-separated <c>key=value</c>.</para></summary>
+    private string ClassLensFact() => Dumped(_classes.Selected is string key
+        ? key.Length == 0 ? "Any" : QuestClassFilter.Abbrev(key)
+        : "");
+
+    /// <summary>
+    /// **THE LENS PROBE's one entry** (DRA-199, AUTHORIZED by Helm <c>d15c1369</c>) — driven
+    /// only by the <c>EQBUDDY_LENSPROBE</c> rendezvous in <see cref="DebugHooks"/>, which is
+    /// inert unless a scenario armed it.
+    ///
+    /// <para><b>Why it exists.</b> Both writers of the class lens are <c>onClick</c> handlers
+    /// on controls inside this window, and nothing in <c>tests/EQBuddy.E2E</c> can put a
+    /// pointer on one — the suite may not assert the screen, let alone drive it. The lens is
+    /// not persisted either, so it cannot be seeded before launch. Same shape, and the same
+    /// reason, as the door / pet / ★ probes.</para>
+    ///
+    /// <para><b>Both verbs drive a REAL writer, never a private path.</b> <c>lens</c> calls
+    /// <see cref="LensTo"/> — the chip's own click body. <c>picks</c> calls
+    /// <c>QuestLedgerStore.SetClasses</c>, which is the writer EQBuddy Mobile uses
+    /// (<c>CompanionActions.SetClasses</c>), and it deliberately forces NO refresh: that
+    /// remote writer has no way to force one either, so the repaint has to come from the
+    /// <c>off:</c> term D4 put in the signature. Forcing one here would test a path the phone
+    /// does not have and would hide trap 72 on this surface.</para>
+    ///
+    /// <para>Returns false for anything it cannot honour — an unknown verb, or picks with no
+    /// character key — so a staging mistake times out naming the probe rather than reading as
+    /// a feature that did not fire.</para>
+    /// </summary>
+    /// <param name="verb"><c>lens</c>, <c>picks</c> or <c>myclasses</c>.</param>
+    /// <param name="arg">For <c>lens</c>, a class name or <c>-</c> for the Any chip. For
+    /// <c>picks</c>, <c>+</c>-separated class names, or <c>-</c> for none picked. Ignored by
+    /// <c>myclasses</c>, which takes its argument from the character rather than the
+    /// caller — the whole point of the control being tested.</param>
+    internal bool ProbeLens(string verb, string arg)
+    {
+        switch (verb)
+        {
+            case "lens":
+                LensTo(arg == "-" ? null : arg);
+                return true;
+            // The My Classes quick-select (DRA-216 D1). Same rule as the two above: it calls
+            // the BUTTON's own click body, which lives inside a Popup — its own top-level
+            // HWND that PrintWindow does not capture (trap 79) and that nothing in this suite
+            // can click. It returns true even with nothing to select, because "the button was
+            // absent so nothing happened" is a state the dump reports and not a staging
+            // mistake; `questsMyClassesBtn` is what tells the two apart.
+            case "myclasses":
+                SelectMyClasses();
+                return true;
+            case "picks":
+                var key = _main.QuestCharacterKey;
+                if (_main.QuestLedger is not { } ledger || key.Length == 0) return false;
+                ledger.SetClasses(key, arg == "-"
+                    ? []
+                    : [.. arg.Split('+', StringSplitOptions.RemoveEmptyEntries
+                        | StringSplitOptions.TrimEntries)]);
+                return true;
+            // A guide step ticked by SOMETHING THAT IS NOT THIS VIEW — the phone's tap
+            // (`CompanionActions`), or the other instance's own checkbox (QuestsWindow and
+            // QuestsRoom build one QuestsView each over one ledger, trap 45). Like `picks`
+            // it forces NO refresh, and for the same reason: neither of those writers can
+            // force one either, so the repaint has to come out of the `ck:` term in
+            // `Refresh`'s signature. Forcing one here would exercise a path the remote
+            // writer does not have and would hide trap 72 on this surface.
+            //
+            // Through `GuideProgressRouter`, never the store: which of the six homes owns a
+            // step's done state is that class's question and nothing else may answer it
+            // (`GuideProgressRoutingTests` scans for exactly that).
+            case "guidedone":
+            case "guideskip":
+                return ProbeGuideStep(arg, done: verb == "guidedone");
+            default:
+                return false;
+        }
+    }
+
+    /// <summary>
+    /// The <c>guidedone</c>/<c>guideskip</c> verbs' body — see <see cref="ProbeLens"/>.
+    ///
+    /// <para><b>It refuses any step whose home depends on stores it is not holding.</b> The
+    /// rendezvous exists for the GUIDE LEDGER's own rows, which is where the skip and the
+    /// tick live in two lists of one record and where moving between them is a single write.
+    /// <c>GuideProgressRouter.HomeFor</c> has four branches that answer somewhere else, and
+    /// three of them read stores a probe does not hold — a reward key (the Sky turn-in), an
+    /// epic row bearing this id, a <c>TurnIn</c> inside a quest's guide (the completion
+    /// record), and an acquire-shaped step naming one of a group's rows. Each is excluded by
+    /// NAME below, which is what makes the empty <see cref="GuideStores"/> true rather than
+    /// convenient: what is left is guide-ledger-homed under EVERY store set. Passing one of
+    /// the others would write the wrong store and report success.</para>
+    ///
+    /// <para>False for anything it cannot honour — an unknown row id, a refused shape, no
+    /// character key — so a staging mistake times out naming the probe rather than reading
+    /// as a feature that did not fire.</para>
+    /// </summary>
+    private bool ProbeGuideStep(string rowId, bool done)
+    {
+        var key = _main.QuestCharacterKey;
+        if (_main.QuestLedger is not { } ledger || key.Length == 0) return false;
+        if (GuideChecklistProjection.Resolve(GuideCatalog.Default, rowId)
+            is not ({ } guide, { } step)) return false;
+        if (step.RewardKey.Length > 0
+            || string.Equals(step.ObjectiveType, "TurnIn", StringComparison.Ordinal)
+            || GuideProgressRouter.ItemBackedObjectiveTypes.Contains(
+                step.ObjectiveType, StringComparer.Ordinal)
+            || _settings.EpicQuestChecklist.Any(
+                r => string.Equals(r.Id, step.Id, StringComparison.OrdinalIgnoreCase)))
+            return false;
+
+        if (done)
+            GuideProgressRouter.SetDone(
+                _settings, ledger, key, guide.Id, step, new GuideStores([], [], null), true);
+        else
+            GuideProgressRouter.SetSkipped(ledger, key, guide.Id, step, true);
+        return true;
+    }
 
     /// <summary>
     /// ONE checklist row, wired to its own tick — the control both Sky arrangements draw.

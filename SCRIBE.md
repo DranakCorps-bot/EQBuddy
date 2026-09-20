@@ -1,3 +1,4 @@
+bash.exe: warning: could not find /tmp, please create!
 # Scribe inbox
 
 
@@ -30,6 +31,198 @@ After you take items, write a short note in `SCRIBE-FEEDBACK.md` so Scribe can l
 
 
 
+### SK "watch buff list" — Shroud of Hate + Shroud of Pain missing from the buff list (add-request)
+
+- **Priority:** `someday` (real ask, catalog addition — not authorized; Scribe intake only). Not must-fix (nothing breaks; a shadowknight simply isn't tracking these two spells).
+
+- **Place (hypothesis, wiki-grounded):** the buff-durations / watch-buff catalog lane — `src/EQBuddy.Core/Data/BuffDurations.json` (ships "Shroud of Undeath", "Shroud of Death", "Shroud of the Spirits", but NOT "Shroud of Hate" nor "Shroud of Pain"), fed by the eqlwiki buffs harvest in `scripts/harvests/eqlwiki/` (`buffs-harvest.py`, `buffs-report.md`, plus the wiki wikitext already cached in-tree). Surface touched: the buff card / watch list (`BuffsCardView`, `BuffTracker`, `docs/WatchListGuide.md`). **Not** a parse break (the log lines will already land like any other spell), **not** a debuff-tracking item (the two *spells* as cast on a target are `Detrimental`; the requester wants the buff side tracked — "Shroud of Hate Recourse" exists on eqlwiki as the buff component; "Shroud of Pain Recourse" 404s — the benefit is inherent in the 10-minute spell). **Do not fold into** #690 (Banestrike achievements), #679 (chest-mote capture), #435 (merge-flags), #165 (bag-flags), or the Reddit items above.
+
+- **Wiki check (wiki-first, this run 2026-09-19):** [eqlwiki.com/Shroud_of_Pain](https://eqlwiki.com/Shroud_of_Pain) — Shadow Knight level 50, "Covers your target in a mass of darkness that steals their armor class and gives it to you for 10 min", duration 10 minutes. [eqlwiki.com/Shroud_of_Hate](https://eqlwiki.com/Shroud_of_Hate) — Shadow Knight level 35, ATB/ATK siphon, "Recourse: Shroud of Hate Recourse", duration 10 minutes. [eqlwiki.com/Shroud_of_Hate_Recourse](https://eqlwiki.com/Shroud_of_Hate_Recourse) — "The buff component of the Shroud of Hate ATK siphon", Shadow Knight level 39, 10 minutes. [eqlwiki.com/Shroud_of_Pain_Recourse](https://eqlwiki.com/Shroud_of_Pain_Recourse) — 404 (no recourse page; benefit is the AC transfer to the caster). Spell names + levels from the wiki, not guessed.
+
+- **Source:** #710 TheOneGargoyle Sep 19, 8:07 PM CT (2026-09-20 01:07 UTC). <https://github.com/DranakCorps-bot/EQBuddy/discussions/710> — New thread. 0 comments. Footer: `EQBuddy 1.99.18 · Windows 26200`. u/Dranak75 not involved.
+
+- **Ask (verbatim, the whole entry):** "Love this app. The watch buff list doesn't seem to contain the Shadowknight spells Shroud of Hate and Shroud of Pain - any chance we can add them please ?" (plus the version/device footer above).
+
+- **Already shipped / Checked (origin/main, this run 2026-09-19):** `src/EQBuddy.Core/Data/BuffDurations.json` grep: "Shroud of Undeath", "Shroud of Death", "Shroud of the Spirits" present; **no** "Shroud of Hate", **no** "Shroud of Pain" → the reporter's observation holds on tip. `scripts/harvests/eqlwiki/buffs-report.md`: 360 buffs across 207 landing lines; neither spell named anywhere (not in the catalog, not in the "Excluded" section, not in shared-landing lines). The three relevant wiki pages are already cached in-tree: `scripts/harvests/eqlwiki/cache/Shroud of Hate.12036ea6.wikitext`, `Shroud of Pain.c9d04a83.wikitext`, `Shroud of Hate Recourse.bd3849de.wikitext` — the harvest has seen them. Unchecked this pass: whether the in-app watch *editor* lets a user add a custom buff rule that would cover these today — hypothesis, unverified; the reporter's "watch buff list" phrasing most plausibly means the default/auto-tracked catalog. Not confirmed against a running app.
+
+- **Hypothesis (label as such):** the gap is upstream in the eqlwiki buffs harvest / the BuffDurations.json generation (both spells are 10-minute Shadow Knight buffs with wiki pages already cached), i.e. a catalog entry (or two), not UI work. Whether the "Recourse" pages or the base spells are the tracked landing lines is an implementation decision — Scribe does not assert either.
+
+- **Class:** V0 (catalog content in an existing trackable lane; no new code asserted). Do not write FABLE.md from Scribe.
+
+- **Holds re-read (this run, 2026-09-19):** live Holds block empty at last known state; process notes stand (new-thread thank-yous come to Helm before any post; no promise of review/fix beyond "captured and sent on for review"). Reddit stays harvest-only. Talking to u/TheOneGargoyle is fine if, and only if, Helm posts.
+
+- **Scribe 2026-09-19 8:1x PM CT (cron intake):** New EQBuddy intake — first new GitHub community item above the #690/#679 baseline. Do not implement. Do not write FABLE.md. Do not open the work. Thank-you drafted below for Helm QA/post — NOT auto-posted.
+
+- **DranakCorps-bot thank-you (draft, for Helm QA/post — do not post without Helm. No promises, dates, pricing, or ToS.):**
+
+  > Hi TheOneGargoyle — thank you for the heads-up on Shroud of Hate and Shroud of Pain. Captured and sent along for review.
+
+  > — EQBuddy team
+
+
+
+### Reddit: "Parser in MAC"
+— EQL parser in CrossOver on macOS, overlay won't show (u/Axorthor, harvest-only, disambiguation pending)
+
+
+
+- **Priority:** `waiting` (needs disambiguation — reporter says generic "Eqlcompanion" / "the parser"; if ours, a Mac-CrossOver overlay-visibility question on one rig; if not ours, close as non-ours). Not authorized. Soft leave. Reddit reply harvest-only unless Helm authorizes.
+
+
+
+- **Place (pending disambiguation):** If EQBuddy: the macOS/CrossOver overlay lane — `WineOverlay.cs` + the `WineFloatOverFullscreen` opt-in + the one-time `winemac.so` driver-patch flow, all documented on tip in `docs/CrossOver-macOS-overlay.md`. Neighbourhood, do not fold: the Proton/Linux item (Emberstone73 — different OS/runtime), the flicker item (-NOiCE- — reporter-resolved, different symptom), #208 (native Linux/Wayland) and #254 (macOS AltTab activation policy) — different asks. If a third-party "EQL companion" parser: not our product.
+
+
+
+- **Source (harvest-only):** Reddit r/EQLegends u/Axorthor, Sep 19, 10:13 AM CT (2026-09-19 15:13 UTC). https://www.reddit.com/r/EQLegends/comments/1wkwbrj/parser_in_mac/ — Post title: "Parser in MAC". At harvest, 3 comments (15:19–17:10 UTC). u/Dranak75 not involved. Harvest-only; nothing posted back.
+
+
+
+- **Ask (verbatim, reporter's own words):** "hey im playing eql in a new mac, using crossover, but the parser wich runs in crossover too Eqlcompanion doesnt show overlay, i assume it cant overlay the mac being in crossover.. anyone got anything to make this kind of stuff work? or do you recomend another parser? thanks"
+
+
+
+- **Ask (scoped):** New Mac, EQL under CrossOver; a log-reading parser (reporter's words: "Eqlcompanion") runs in the same bottle but its overlay does not show; reporter assumes CrossOver can't overlay, and asks (a) for a way to make the overlay work under CrossOver and (b) whether we'd recommend another parser. Product identity is NOT confirmed — nobody in-thread has pinned which tool it is.
+
+
+
+- **Thread colour (community lines, not Ask, not Scribe voice — do not act on):** u/heinekev 15:54 UTC: offered a macOS-*native* build path for the third-party `everquest-companion` (jmoyers/everquest-companion PR #54 + regnare's fork) and offered to share a prebuilt Mac app — third-party, not a DranakCorps artifact; do not link or recommend on our side without Helm. u/UnconfidentShirt 15:19 UTC: "That parser is fantastic, but the developer recently stepped away. … he just needs a breather, doesn't know when he'll return." — attribution unconfirmed; treat as community colour only. u/Expert_Garlic_2258 17:10 UTC (last line at harvest): "which parser is this?" — the community itself cannot identify the reporter's tool.
+
+
+
+- **Already shipped / checked (origin/main, this run 2026-09-19):** EQBuddy ships first-class Mac/CrossOver overlay support on tip: `docs/CrossOver-macOS-overlay.md` ("Running EQBuddy over fullscreen EverQuest on macOS (CrossOver / Wine)" — patch `winemac.so` via `scripts/crossover/setup-overlay.sh`, opt-in `"WineFloatOverFullscreen": true` in settings.json, restart, verify winlevels) + `scripts/crossover/winemac-overlay.patch` (LGPL, default-off driver knobs) + `src/EQBuddy/WineOverlay.cs` (Wine-gated, inert on Windows) + `WineFloatOverFullscreen` / `WineKeepGameFullscreen` settings in `src/EQBuddy.Core/AppSettings.cs` (both default false). The reporter's exact symptom — the overlay window not appearing over the game under CrossOver — is the precise problem that doc describes ("the game paints over them") and answers. **Not confirmed this pass:** what the reporter actually has installed (EQBuddy Windows build in the bottle vs a third-party parser vs the native-macOS build) — unconfirmed until they say.
+
+
+
+- **Hypothesis (label as such):** product identity still open (they never say "buddy"). If it *is* EQBuddy: a setup gap, not a missing feature — the overlay under CrossOver only appears after the one-time driver patch + the opt-in setting, both default-off / inert by design; the likely reply lane is the setup doc, possibly plus discoverability (the doc is not discoverable from the app). If it's a third-party parser: close as non-ours. Do not assert which.
+
+
+
+- **Class:** V0 if not ours (close as non-ours); V0 if ours (setup / discoverability guidance on the existing CrossOver doc — no new code asserted). Do not write FABLE.md from Scribe.
+
+
+
+- **Holds re-read (HELM.md this run, 2026-09-19):** Live Holds block empty; process notes only (new-thread thank-yous come to Helm before posting; promise of review/fix comes to Helm). Reddit replies remain harvest-only unless Helm/David authorize a reply. Talking to u/Axorthor is fine if, and only if, Helm posts.
+
+
+
+- **Scribe 2026-09-19 5:56 PM CT (cron intake):** New Reddit intake. Do not implement. Do not write FABLE.md. Do not open the work. Do not fold into the Proton item (Emberstone73) / the flicker item (-NOiCE-) / #208 / #254. In-thread third-party macOS builds (jmoyers / regnare) are community colour only — do not link, do not recommend. No Reddit reply drafted or posted (harvest-only). Draft below for Helm QA — NOT posted, and no reply at all without Helm.
+
+
+
+- **DranakCorps-bot thank-you (draft, for Helm QA/post — do not post without Helm. No promises, dates, pricing, or ToS.):**
+
+  > Hey Axorthor — thanks for laying it all out (new Mac, CrossOver, overlay not showing). Quick question so this lands with the right people: when you say "the parser," are you running our EQBuddy (the local log-reading overlay), or a different tool you found in CrossOver? If it's EQBuddy, the Mac overlay needs a one-time setup before it floats over the fullscreen game — happy to point you at the exact steps. Either way it's captured and on its way to the team.
+  >
+  > — EQBuddy team
+
+
+### Banestrike achievement tracking (Untapped Potential / General / Tradeskill / Slayer / EQL)
+
+
+
+- **Priority:** `someday` (real ask, not this gate) — **not authorized** (new thread; no code opened yet — Scribe intake only).
+
+- **Place:** Achievements surface — EQBuddy surfaces individual event lines (`You have completed achievement: …` appears in the reporter's #679 haul block) but has no persistent per-achievement progress card today. Neighbourhood: #235 "Import achievements button does not function" (import/entry flow, different ask) and `docs/WatchListGuide.md` (watch/alerts on loot + motes; not the same thing). **Do not fold into #435 / #165 / #235 / #679 (#679 is a loot-parse gap, different surface).**
+
+- **Source:** #690 FatGuyGamin Sep 19, 3:51 AM CT (2026-09-18 08:51 UTC). https://github.com/DranakCorps-bot/EQBuddy/discussions/690 — New thread. Category: Ideas. 0 comments. Footer: `EQBuddy 1.99.18 · Windows 26200`. u/Dranak75 not involved.
+
+- **Ask (verbatim, the whole entry):** "I would love the ability to track achievement progress in regards to Banestrike. I've downloaded that log but it is damn near impossible for my old man brain to make much sense out of. Like the Untapped Potential, General, Tradeskill, Slayer, & Everquest achievements."
+
+- **Already shipped (checked on origin/main, this run 2026-09-19):** `LogParser.cs` recognises `You have completed achievement: <name>` as a session event line; `Motes.cs` handles the `Mote of X Potential` family across the loot stream. **Not grepped this pass:** whether an achievement-progress model or a Banestrike-specific card already lives in `src/EQBuddy.UI.*` on tip — treat as *unchecked* and confirm before coding. No Banestrike-specific surface is visible in origin/main.
+
+- **Hypothesis (label as such):** the shape is (a) a persistent per-achievement tally across sessions keyed off the `completed achievement: …` lines, with the Banestrike achievement *categories* the reporter named (Untapped Potential / General / Tradeskill / Slayer / Everquest) as the axis, and (b) a card/surface that reads it — the reporter's framing ("downloaded that log but it is damn near impossible to make sense out of") is an aggregation/display ask, not a parse ask. Banestrike category structure is game-truth; eqlwiki is the lane for any category/list copy (wiki-first). Not to be conflated with #235 (import-button failure) or with watch/alerts.
+
+- **Class:** V1–V2 (new persisted achievement-progress lane + surface + categorization). Do not write FABLE.md from Scribe.
+
+- **Off-topic here:** none reported.
+
+- **Holds re-read (HELM.md this run, 2026-09-19):** Live Holds block is empty; only process notes (new-thread thank-you still comes to Helm; promise of review/fix comes to Helm before it posts). No retired hold applies (not #208 / #228 / #226 / #231). Talking to FatGuyGamin is fine.
+
+- **Scribe 2026-09-19 02:20 AM CT (cron intake):** New intake. Do not implement. Do not write FABLE.md. Do not open the work. Do not fold into #435 / #165 / #235 / #679. Thank-you drafted below for Helm QA/post — not auto-posted.
+
+- **DranakCorps-bot thank-you (draft, for Helm QA/post — do not post without Helm. No promises, dates, pricing, ToS.):**
+
+  > Hi FatGuyGamin — thank you for the request and for naming the Banestrike categories you want to track. Captured and sent on for review.
+  >
+  > — EQBuddy team
+
+
+
+### Dungeon-crawl reward-chest loot: motes (and other chest drops) not captured
+
+
+
+- **Priority:** `must-fix` (player-facing parse gap on shipped `v1.99.18` — motes are upgrade currency, so this is data a player is not seeing counted) — **waiting / not authorized** (new thread; no code opened yet — Scribe intake only).
+
+- **Place:** Motes capture / Loot-card session accounting, upstream in `LogParser.cs` — the "looted … and stored it in your …" line parser. Affects the Motes card (motes are currency-class loot) and any loot/depot tally keyed on these lines. Not an eqlwiki-first item (item truth is fine; the *parse* is the break). **Do not fold into the #435 merge-flag batch, #165 bag-flags, #228 motes-in-pack, #226 wiki-pack motes, or the motes dropdown (#250):** this is *capture* of chest drops, a different surface than suggest/flag/dropdown.
+
+- **Source:** #679 joeymavity Sep 18, 5:16 AM CT (2026-09-17 22:16 UTC). https://github.com/DranakCorps-bot/EQBuddy/discussions/679 — New thread. Category: Bug. Footer: `EQBuddy 1.99.18 · Windows 26200`. One follow-up comment same reporter 2026-09-18 12:31 PM CT (17:31 UTC) with a *full* 19-line reward-chest haul block (motes, tradeskill-depot loot, an auto-sold item, ability points, level, instance-charge refund, achievement line). u/Dranak75 not involved.
+
+- **Ask (verbatim, the whole entry):** "Your're not capturing motes from reward chests from dungeon crawls, ex: / You looted 5 Mote of Major Potential from Reward Chest and stored it in your currency". Follow-up comment, additional mote lines: "[Thu Sep 17 23:20:52 2026] You looted a Mote of Greater Potential from Reward Chest and stored it in your currency" / "[Thu Sep 17 23:20:52 2026] You looted 4 Mote of Major Potential from Reward Chest and stored it in your currency" / "[Thu Sep 10 15:44:58 2026] You looted 4 Mote of Major Potential from Reward Chest and stored it in your currency" / "[Thu Sep 10 17:01:45 2026] You looted 10 Mote of Major Potential from Reward Chest and stored it in your currency". Then: "You might be missing other loot from rewards chest, so here's an example of a full 'reward chest haul':" followed by the 19-line block below.
+
+- **Reporter's full haul block (verbatim, the ready regression fixture):**
+  ```
+  [Thu Sep 10 17:01:45 2026] You gain party experience! (3.489%)
+  [Thu Sep 10 17:01:45 2026] You have completed the Dungeon Crawl and earned reward loot!
+  [Thu Sep 10 17:01:45 2026] You receive 80 platinum, 5 silver and 1 copper from the corpse.
+  [Thu Sep 10 17:01:45 2026] You gained reward experience from the Dungeon Crawl!
+  [Thu Sep 10 17:01:45 2026] You have gained an ability point!  You now have 6 ability points.
+  [Thu Sep 10 17:01:45 2026] You have improved Unbound Clarity 2 at a cost of 0 ability points.
+  [Thu Sep 10 17:01:45 2026] You have improved Unbound Destruction 2 at a cost of 0 ability points.
+  [Thu Sep 10 17:01:45 2026] You have improved Unbound Life 2 at a cost of 0 ability points.
+  [Thu Sep 10 17:01:45 2026] You have gained a level! Welcome to level 30!
+  [Thu Sep 10 17:01:45 2026] You earned a refund of your instance charge.
+  [Thu Sep 10 17:01:45 2026] The froglok king has been slain by <player name>!
+  [Thu Sep 10 17:01:45 2026] You looted 12 Phosphorous Powder from Reward Chest and stored it in your tradeskill depot
+  [Thu Sep 10 17:01:45 2026] You looted 10 Mote of Major Potential from Reward Chest and stored it in your currency
+  [Thu Sep 10 17:01:45 2026] You looted 2 Mote of Greater Potential from Reward Chest and stored it in your currency
+  [Thu Sep 10 17:01:45 2026] You looted a Bronze Knuckles +4 from Reward Chest and sold it for 2 gold.
+  [Thu Sep 10 17:01:46 2026] You looted an Undead Froglok Tongue from Reward Chest and stored it in your tradeskill depot
+  [Thu Sep 10 17:01:46 2026] You have completed achievement: Level 30
+  [Thu Sep 10 17:01:46 2026] You looted an Amber from Reward Chest and stored it in your tradeskill depot
+  [Thu Sep 10 17:01:47 2026] You looted an Evil Eye Eyestalk from Reward Chest and stored it in your tradeskill depot
+  [Thu Sep 10 17:01:48 2026] You looted a Froglok Leg from Reward Chest and stored it in your tradeskill depot
+  [Thu Sep 10 17:01:49 2026] You looted 2 Gargoyle Eye from Reward Chest and stored it in your tradeskill depot
+  ```
+
+- **Already shipped (quoted on origin/main, this run 2026-09-19):** `src/EQBuddy.Core/LogParser.cs:244`
+  ```
+  [GeneratedRegex(@"^You looted (?:(?<n>\d+)|an?) (?<item>.+?) from (?<source>.+?)'s corpse and stored it in your (?<where>.+?)\.?$")]
+  ```
+  The comments above it (`:238-239`) cite the *corpse* forms as the two target examples, and the tests (`tests/EQBuddy.Tests/LogParserTests.cs`, `SessionStatsTests.cs`) only ever exercise `… from a spite golem's corpse …`. The reporter's line — `You looted <n> Mote of X Potential from Reward Chest and stored it in your currency` — has **no `'s corpse`**, so it does not match that rule and is silently dropped from the loot/mote stream. **Not grepped this pass:** whether a later commit added a `Reward Chest` / free-form-source variant after `:244` on tip — treat "not matched" as *shipped-as-grepped*; confirm against tip before a code pass.
+
+- **Hypothesis (label as such):** one "looted … from `<source>` … and stored it in your `<where>`" rule hard-codes the `'s corpse` source grammar, so the `Reward Chest` source (no possessive, no `corpse`) never fires — the whole reward-chest haul is invisible to the motes/loot/depot/XP/achievement lines that key off it. The likely fix is a *source-grammar widening* at the pattern level (keep the `corpse` forms, accept a free-form source), not a pile of special cases; the reporter's 19-line block is the ready regression fixture (mote, depot, sold, level, ability-point, achievement, charge-refund, XP-percentage in one case). Note the sold line (`…from Reward Chest and sold it for 2 gold`) and the loot-from-corpse money line (`…from the corpse`) are *separate* grammar branches — a confident code pass should check all three of those against the reporter block, not just the motes one.
+
+- **Needed from reporter (optional; they already supplied the lines):** whether the same gap shows on the UI *Motes* card for a crawl run (vs. just absent from the loot log) and a session id / log file if we want an end-to-end diff. Not blocking — the literal lines are in-thread.
+
+- **Class:** V1 (one regex widening + its unit fixtures from the reporter's block). Do not write FABLE.md.
+
+- **Off-topic here:** none reported.
+
+- **Holds re-read (HELM.md this run, 2026-09-19):** Live Holds block is empty; only process notes (new-thread thank-you still comes to Helm; promise of review/fix comes to Helm before it posts). No retired hold applies (not #208 / #228 / #226 / #231). Talking to joeymavity is fine.
+
+- **Scribe 2026-09-19 02:20 AM CT (cron intake):** New intake. Do not implement. Do not write FABLE.md. Do not open the work. Do not fold into #435 / #165 / #228 / #226 / #250. Thank-you drafted below for Helm QA/post — not auto-posted.
+
+- **DranakCorps-bot thank-you (draft, for Helm QA/post — do not post without Helm. No promises, dates, pricing, ToS.):**
+
+  > Hi joeymavity — thank you for the full reward-chest haul block; that's the most useful form of this report I could ask for. Captured and sent on for review.
+  >
+  > — EQBuddy team
+
+
+
+
+### Reddit: eql-gearbot-plus — guild gear-donation + crafting/gathering work-order Discord bot (wiz3n, harvest-only)
+
+- **Priority:** someday (harvest; not authorized. Do not reply on Reddit.) Competitive context; third-party tool + poster, not a reporter filing into our repo — **no DranakCorps-bot thank-you drafted and no Reddit reply** (harvest-only pattern; cf. SEQO / jbenga item-ID DB / Character-Sheet-Planner / 3D-map shelf).
+- **Place:** competitive context around the Inventory / Gear + crafting-work-order area, **not** an EQBuddy surface. Shape is a *guild / guild-Discord* management workflow (gear donation + crafting / gathering work orders + eqlwiki autocomplete/verification + inventory-dump GUI) — community/guild lane, not a player-session surface. Do **not** fold into the #435 batch (merge-flag inventory trio) or #165 (bag flags) — different ask (guild work-order tracking with eqlwiki autocomplete), not player inventory. Not an eqlwiki-first SUGGEST (third-party tool *cites* eqlwiki as its verification source; that is our shared game-truth lane they build against).
+- **Source:** u/wiz3n r/EQLegends 2026-09-17, 2:38 PM CT (17:38 UTC). https://www.reddit.com/r/EQLegends/comments/1wj0qof/bot_website_to_manage_giving_getting_and_making_items_in_eql/ Harvest-only. 4 comments at harvest (2026-09-17 sweep window). Public repo: https://github.com/wizen/eql-gearbot-plus (verified exists 2026-09-17; JavaScript; created 2026-09-17 00:54 UTC; 1 star; pushed 2026-09-17 16:51 UTC — "EverQuest Legends Discord bot & companion website to manage donated gear and crafting/gathering work orders"). u/Dranak75 not in the thread. Poster handle "wiz3n" rhymes with GitHub reporter "wizen" (discussions #189 / #190) — *hypothesis only, do not assert identity.*
+- **Ask:** none directed at EQBuddy. OP verbatim: "Pseudonym from Rivervale, here. I've made something helpful for people who manage a guild / guild discord. [https://github.com/wizen/eql-gearbot-plus] Basically a guild gear donation and crafting / gathering work order management system, with autocomplete and verification via eqlwiki, and a companion website that allows you to donate straight from your inventory dump via gui. Enjoy!"
+- **Comments (harvest colour):** u/AM_86 "But why.gif"; u/SuperHooligan "Who needs donations in the easiest game ever?"; u/Rat_Rat "Omg - someone made a tool to help others. Quick internet - shit on it because you don't find it immediately useful!"; OP follow-ups: "For the moment you have a point, but I'm sure (gods, I hope) they'll add in more stuff." and "Besides, it's more than donations. It's work orders, so ppl can say they need 800 tumpy tonics or 667 fruit or whatever. Just a way to record who has what and who needs what." All in-thread community colour; no EQBuddy-named help; no DranakCorps-named help.
+- **Already shipped / checked:** EQBuddy's inventory / catalog / quest-flag lane (reads the same `/outputfile inventory` dump; wiki-first on item truth; quest badges on the Loot card) is the in-app shape; the #435 merge-flag trio and #165 bag-flag ask are the closest in-app inventory shapes — all `someday / Not authorized`. The specific "guild donation + crafting/gathering work-order + eqlwiki autocomplete + inventory-dump GUI" shape has **no direct EQBuddy counterpart** today; it is a community/guild-management lane, not a player-session lane.
+- **Checked:** harvested 2026-09-17 via arctic-shift (post body + 4 comments) + repo metadata from `repos/wizen/eql-gearbot-plus`. No comment, vote, or message. Did not open, clone, or run the bot/website; did not install anything; did not visit the companion site beyond the README title.
+- **Holds re-read (HELM.md this run — 2026-09-17 ~6:10 AM CT tip, PR #663 DRA-164 SIGNED):** Live Holds empty. Play Console OFF. Soft-leave on Reddit replies unchanged (harvest-only unless Helm/David authorize). Do not fold into #435 / #165 / #243. No FABLE.md. No implement. Do not start Claude. Thank-you: **none drafted** — competitive-context self-promo, not a GitHub reporter; no DranakCorps-bot public reply on r/EQLegends without Helm authorization.
 
 ### Reddit: UI - Recommendations (cashsusclaymore, harvest-only)
 
@@ -61,13 +254,40 @@ After you take items, write a short note in `SCRIBE-FEEDBACK.md` so Scribe can l
 - **Already shipped:** EQBuddy reads the same /outputfile inventory dump and ships the catalog (wiki-first on item truth); the #435 merge-flag trio and #165 bag-flags are the in-app versions of this shape, all `someday` / `Not authorized` as of 2026-09-16.
 - **Checked:** harvested 2026-09-16 via arctic-shift (post + comment list). No comment, vote, or message. Could not copy more thread signal — comments 0 at harvest. Did not open or test either tool.
 
-### Reddit: SEQO overlay post — title-only, body removed (harvest-only)
+### Reddit: SEQO (Simple EQ Overlay) — re-harvest on 2026-09-17 post with full body (harvest-only)
 
-- **Priority:** someday (harvest; not authorized. Do not reply on Reddit.)
-- **Place:** competitive context, overlay/companion chain again (cf. EQLegends Advisor entry) — DPS meter, loot tracking, quest/epic/BiS checklist claimed in the title. Post body was [removed] before harvest and the thread has no comments; nothing quotable. Do not fold into the Advisor entry; do not treat as an EQBuddy ask.
-- **Source:** u/Extension-Chair-7250 r/EQLegends Sept 15 ~11:40 PM CT. https://www.reddit.com/r/EQLegends/comments/1whn7xz/seqo_a_free_open_source_overlay_i_built_for_eq/ Harvest-only. Score 1, zero comments at harvest (2026-09-16).
-- **Ask:** none readable. Title: "SEQO - a free open source overlay I built for EQ Legends (DPS meter, loot tracking, quest/epic/BiS checklists)". Body [removed], no repo URL captured.
-- **Checked:** harvested 2026-09-16 via arctic-shift. No comment, vote, or message. If the post resurfaces with a body or repo, re-harvest and update this entry.
+- **Priority:** `someday` (real ask, not this gate) — **harvest-only**; no reply on Reddit. Not authorized; Scribe intake only. Do not treat as an EQBuddy ask.
+- **Place:** competitive context, overlay/companion chain (cf. EQLegends Advisor entry, cashsusclaymore loot-filter tools, eql-gearbot-plus context, jbenga loot-filter tool, foraern 3D map app). Overlaps in claimed surface with EQBuddy items that are already filed under `someday` / `waiting` / or closed: #120 (configurable buff sets with missing-buff indicator — "Camp timers … buff fade" and "Unlock tracker" in SEQO touch this surface), #94 (attack-speed debuff alerts with cure/dispel — "charm break" alerts in SEQO touch this surface), #208 (chips and alerts on a different monitor — SEQO is a separate overlay that claims "Never touches the game or its files … read the log file"; different shape, but same neighbourhood), #217 (wiki-contribution pack — SEQO data lineage cites eqlegendstools / Alanna's race unlock guide / Manlaan's epic checklist), #109 (raid-instance spawn timers), #435 (merge-flag inventory), #165 (bag/inventory quest-vs-junk flags), #227 (standalone Motes card), #159 (never delete log data). Do **not** fold this competitive-context entry into those in-app asks — this is a third-party overlay, not a request to EQBuddy, and the author explicitly disclaims competition.
+- **Source:** u/Extension-Chair-7250 r/EQLegends **Sept 17, ~3:00 PM CT (2026-09-17 20:00 UTC)** — a second / refresh post with a full body, following the initial Sept 15 post (1whn7xz) that harvested body-removed. https://www.reddit.com/r/EQLegends/comments/1wj4m84/i_built_an_overlay_for_myself_with_a_dps_meter/ . Score 0, **2 comments** at 2026-09-19 re-harvest. u/Dranak75 not involved. Harvest-only; nothing posted back.
+- **Ask (verbatim, the whole entry):**
+
+>  Be gentle with me, I don't get anything out of this — I built it for myself and figured others might find it useful. I am not trying to promote or compete with others, just wanted something tailored to my needs.
+>  
+>  It's called SEQO (Simple EQ Overlay). It never touches the game or its files. All it does is read the log file the game already writes to disk, the same way GamParse and nParse worked for 20 years of classic EQ. No injection, no memory reading, no automation. If you type /outputfile inventory, achievements and faction in game it also reads those files to keep your progress current on its own.
+>  
+>  What it does:
+>  * DPS meter with per-fight and session views, spell and proc breakdowns, and pet damage tracked separately
+>  * Loot tracking with real drop rates from your own kills, a keep/junk/sell advisor, and a run tracker for instances (start it, clear, end it - coin, motes and every drop counted with coin per hour)
+>  * Unlock tracker for races, classes and deities with live faction progress bars and the fastest known grind for each
+>  * Epic checklists for every class with the exact Legends item names, checked off automatically from your bags, bank and key ring
+>  * Best in slot lists for all 16 classes with a check on everything you already own
+>  * Plane of Sky quest tracker - all 95 turn-ins, items check off as you loot them
+>  * World map with route planning, druid ring / wizard spire markers, and nearest-port info
+>  * Camp timers with placeholder support, plus rare spawn, charm break, buff fade and AFK alerts
+>  * Syncs between your computers through Dropbox/Drive if you play on more than one
+>  
+>  It's fully open source so you can review every line of code before you run it, and I'm actively maintaining it - the last update went up this week. Link is in the comments.
+>  
+>  The data comes from work by the eqlegendstools site, Alanna's race unlock guide and Manlaan's epic checklist on the wiki. Go support them.
+>  
+>  Happy to answer questions or take feature requests.
+
+- **Comments (verbatim, all 2):**
+  - u/GrendeL- (2026-09-17): "Where’s the link ?"
+  - u/hrethnar (2026-09-17): "Cool!   In before comments about AI slop."
+  - **No repo / GitHub / source-code link captured from either comment.** The author says "Link is in the comments" but neither harvested comment contains one. If the link appears later, re-harvest and update this entry.
+- **Already shipped (checked on origin/main, 2026-09-19):** EQBuddy reads the same /outputfile inventory dump and ships the catalog (wiki-first on item truth); the #435 merge-flag trio and #165 bag-flags are the in-app versions of the loot / merge / bag-flag shape; #235 + #101 are the achievement-import / achievement-marking flows; #165 and #173 cover several of the same surfaces. None is this overlay as a product.
+- **Checked:** re-harvested 2026-09-19 via arctic-shift (post 1wj4m84 + comment list, 2 comments). No comment, vote, or message. Repo link **still not captured** from either comment — will re-harvest if it appears. Did not open or test the tool. No ToS, pricing, dates, or promises implied.
 
 ### Reddit: 3D EQ Legends Map App, Apple Silicon (foraern, harvest-only)
 
@@ -2223,3 +2443,35 @@ stops two voices on one account, and it is the half that worked.
 - **Already shipped:** in-app Sky checklist.
 
 - **Where it might live:** print stylesheet or copy-as-text. Not a PDF pipeline.
+
+
+
+### Sky tab: ghost auto-ticks that stick, hand-ins never taking ticks back, Wind Runes zero since they store to currency (hateborne, PR #691)
+
+- **Priority:** `waiting` (new submission Sep 18; claims player-facing break on the Sky tab — ghost `*` ticks and zeroed Wind Rune counts — **claims from the requester, unverified on tip**; not authorized). Filed at `waiting`, not `must-fix`, because the reporter's own framing is "the break is real *and* the fix is done and tested" — the ask to Helm is a disposition of the PR, not a greenfield break. No code opened by Scribe.
+- **Place:** Quest Tracker / Plane of Sky tab (Sky checklist) + the ledger behind have-counts. The PR touches `LogParser`, `QuestLedgerStore`/`QuestLedgerFeed`, new `HandInTracker` + `SkyGuessReconcile` (per PR body — quoted, not verified this pass). Neighbourhood, do not fold: #241 DasGud (have-count *mismatch* — different reporter, different shape), #243 (leftover Sky audit, already authorized by David), #235 (achievements import button), #210 (Sky design pass — different ask, do not merge).
+- **Source:** PR **#691** (OPEN, unmerged) https://github.com/DranakCorps-bot/EQBuddy/pull/691 — branch `sky-ticks-handins-folds` from `main` at `3dde6d80`, head `8940c294`. Opened 2026-09-18 4:26 PM CT (17:26 UTC) by **u/hateborne** (GitHub, "Hateborne"). 0 comments at harvest. Body says **Claude Code** generated it and names the reporter's in-game alt (**Hateborne_neriak**). u/Dranak75 not a party to the PR. A *separate* u/hateborne Reddit harvest from Aug 25 (resize this window, `1vkwbol`) exists below this file — different thread, do not fold.
+- **Ask (verbatim, PR body § 1–3):**
+  > 1. **The Plane of Sky tab ticked items I don't have** (High Quality Raiment, Wind Rune Meda, Wind Rune Ozah). Every wrong row was a `*` guess (`SkyLootAutoCheck` rule 3). Two causes:
+  >    - **Restarts re-ticked old loot.** The Sky/Epic auto-ticks diffed session loot against a RAM high-water mark that launch, session start, character switch and review all cleared, while `LogWatcher` re-reads the whole log. Each restart parked one more `*` on the next class: 68 on my profile, Wind Rune Azia starred on six classes after ~2 looted. They now tick only loot `QuestLedgerStore.RecordLoot` accepts as new; its time gate is persisted (`QuestLedgerFeed`, `ChecklistLedgerSync`).
+  >    - **Nothing took a tick back.** EQL does log hand-ins: `You offered N X to Y.` then `You complete the trade with Y.`, and a "You can have it back" refusal cancels. `HandInTracker` turns trades into ledger exits, and `SkyGuessReconcile` takes back only `*` guesses the count no longer covers. That happens on a hand-in, sale or destroy, and on an inventory scan, where each cleared guess is named in the Sky import report with Undo.
+  > 2. **Wind Runes store to currency since 2026-09-16**, which no dump shows, so every scan since then has recorded every rune as zero. The ledger no longer squares them to a dump (`Entry.OffDump` is learned from the loot line; `CurrencyItems` names runes before that), a scan never judges a rune guess, and a rune hand-in takes back one guess per rune.
+  > 3. **Sky band folds survive closing the Quest Tracker.** `SessionFolds` on MainWindow holds them for the run, shared by the pop-out and the shell's Quests room, and never as a setting (so the "session-only" ruling holds). A fresh tracker also reopens on the last tab; `_questsHost.SelectedTab` was kept and never read.
+
+- **Already shipped / checked (origin/main this run, 2026-09-19 06:20 CT):**
+  - `SkyLootAutoCheck` rule 3 exists on tip (grep-confirmed on the existing #243 / #241 entries in this file) — the *guess* mechanism the PR is correcting is in-tree.
+  - `LogWatcher` re-reading the log at launch and the RAM high-water mark the PR cites: **not re-grepped on tip this pass**; treat as *unverified claim from the PR body* until tip-checked.
+  - `HandInTracker` / `SkyGuessReconcile` / `SessionFolds`: **do not exist on tip** (grep 0-hits on tip this run). These are the PR's new classes.
+  - "EQL does log hand-ins: `You offered N X to Y.` … `You complete the trade with Y.` … 'You can have it back'": **game-truth claim from the PR body, not verified against eqlwiki or sample logs this pass.** Do not paste into an eqlwiki item without a wiki / log citation.
+  - "Wind Runes store to currency since 2026-09-16": **the 2026-09-16 date is a PR-body claim, not a sourced game-truth.** eqlwiki or a changelog entry is the lane for the actual date. Until then treat as *reporter-supplied*.
+  - The PR's own test claim: "Gates: 5,384 unit and 377 E2E, green locally" (PR body, unverified, self-reported). Live check claim: replayed a full log archive against a COPY of the reporter's profile; two replays tick nothing new. **Not reproduced by Scribe this pass.**
+- **Hypothesis (label as such):** the PR is *three fixes in one* (guess re-tick on restart; take-back on hand-in/sale/destroy/scan; rune currency gap), plus a small UX carry (folds survive close, fresh tracker reopens last tab). Each has the reporter's own log-replay as evidence and a dedicated test class. Disposition options for Helm are: (a) review the PR's diff and call it as-is, (b) call it in pieces, (c) decline with reasons. The #243 leftover-audit item (David-authorized V0–V1) is a *different* ask — do not fold into #243; do not let the PR's scan-clearing path quietly subsume it. The #210 Sky design pass is a *different* scope. Do not fold.
+- **Class:** V1–V2 if Helm takes the PR in full (new Core classes + parser + ledger changes + 4 new test suites); V1 if Helm only takes the rune-currency piece; V0 if Helm only takes the fold/last-tab UX. Do not write FABLE.md from Scribe.
+- **Off-topic here:** none.
+- **Holds re-read (HELM.md this run, 2026-09-19):** Live Holds block empty (checked 2026-09-19 run, prior entries still in force on process: new-thread thank-you still comes to Helm; promise of review/fix comes to Helm before it posts). No retired hold (not #208 / #228 / #226 / #231). Talking to hateborne is fine.
+- **Scribe 2026-09-19 06:20 CT (cron intake):** New intake. Do not implement. Do not write FABLE.md. Do not merge PR #691 without Helm/David. Do not fold into #243 / #241 / #235 / #210 / #165 / #435. Disposition is Helm's.
+- **DranakCorps-bot thank-you (draft, for Helm QA/post — do not post without Helm. No promises, dates, pricing, ToS.):**
+
+  > Hi hateborne — thank you for PR #691 and for the log-replay evidence in the body; that's a very complete shape for this. Captured and sent on for review.
+  >
+  > — EQBuddy team

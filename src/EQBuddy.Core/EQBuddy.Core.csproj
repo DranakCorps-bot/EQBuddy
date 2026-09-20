@@ -47,6 +47,7 @@
     <EmbeddedResource Include="Data\ZoneGraph.json" />
     <!-- eqlwiki's "Level of Monsters" band per zone (zonelevels-transform.py; no fetch). -->
     <EmbeddedResource Include="Data\ZoneLevelBands.json" />
+    <EmbeddedResource Include="Data\ZoneEras.json" />
     <EmbeddedResource Include="Data\ZoneMerchants.json" />
     <EmbeddedResource Include="Data\SpellLevels.json" />
     <!-- ~11k items from Category:Items, gzipped (items-harvest.py + itemcatalog-build). -->

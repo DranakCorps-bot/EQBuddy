@@ -1,3 +1,14 @@
+## 2026-09-19 — DRA-199: the live class-lens transition (DRA-181 D4 arm (c))
+
+**AUTHORIZED by Helm** `d15c1369`; seat `sr-dra199-lensprobe`. Test-only `src/`:
+`EQBUDDY_LENSPROBE`, a `questsClassLens` dump fact, additive `EqSegmentedStrip.Selected`.
+No production behaviour change, no `WhatsNew` entry. Three calls, defaults noted:
+`Selected` is backed by `EqChip.Selected`, not a key the strip remembers — a stranded lens
+must read as nothing painted; the chip's click body moved to `LensTo` rather than being
+copied into the probe (trap 4); `picks` forces NO refresh, because the phone's writer
+cannot. Prove-failed 3×, incl. those mutants re-read off `_classLens` going GREEN — which
+is why the fact is read off the strip. Full rationale: PR body. E2E 382/382.
+
 ## 2026-09-17 — DRA-164 D1–D3: the Plane of Sky Island view, and the republish this land does NOT do
 
 **Seat:** `dra164-d1` → `d2` → `d3`, one signed sequence (Helm SIGNED PR #663 @ `148cdd6e`,
@@ -8471,3 +8482,144 @@ seen without the prefix. Nothing here touches privacy, the release go, a public 
 or the values line.
 
 — Dranak (Claude Code), Executor — DRA-164 D4 / DRA-171
+
+## 2026-09-17 — DRA-181 D4: one producer for the quest class-lens chips
+
+**Seat** `opus-dra181-d4`, disjoint-parallel under Helm's SIGN of #685. P5 shipped as written; the calls below are implementation, none on the consequence list. **Kept short on purpose: this file is 3 KB from its ratchet cap** (baseline 614,986 + 10%), so the fuller version is the PR body's.
+
+**Assumption:** P5 authorises what has to move for the chips to track the picks, including the REDRAW — a strip that is right only after a forced refresh satisfies the sentence and not the Founder's screen.
+
+1. **The offered list joined the repaint signature (`off:`).** The plan said the signature already carries `classes`; it carries the LENS-NARROWED list, so with a lens on, a deselection moves no term — and the phone writes these picks (`CompanionActions.SetClasses`) with no way to force a refresh here. Could have been left alone on "the picker forces a refresh anyway"; that is trap 72's own argument, four times over on this surface.
+2. **`_myClasses` became `_offered`** rather than gaining a sibling: the field already held exactly that list, and two names for one fact is trap 4. No behaviour change.
+3. **`questsClassStrip` abbreviates and uses "-" for the collapsed strip.** "Shadow Knight" carries a space and the dump is space-separated `key=value`; a raw name — or an empty value — would silently corrupt the next pair.
+4. **The ternary scan is aimed at the DECISION, not every emptiness test** (five other files matched the broad shape). Prove-failed against the two lines this slice deleted, with one live exemption so it is not a detector aimed at nothing.
+5. **`WhatsNew.json` entry DRAFTED, not shipped** (`docs/ops/dra181-whatsnew-draft.md`) — DRA-149 D5's idiom; the release go is the Founder's.
+
+— Dranak (Claude Code), Executor — DRA-181 D4
+
+## 2026-09-17 — DRA-180 D1: the zone-era table, and the five defaults that could have gone the other way
+
+**Seat:** `opus-dra180-d1` (Paperclip DRA-180). Helm SIGNED the DRA-180+181 plan at PR #685
+(`443dea45` on Soft `main`), whole-sequence on green gates; this is D1 only. Ships
+`scripts/harvests/eqlwiki/zone-eras-transform.py` → `Core/Data/ZoneEras.json` +
+`Core/ZoneEras.cs` + `ZoneErasTests`. **Fetches nothing** (the COMMITTED zone cache), plain
+JSON, no curated file written, **no engine reads it**, nothing about Pages / Play / tag /
+signing / release. `needs-david`: NONE — the WorldEra one-word ask is P4's and rides Helm's
+mailbox, not this slice.
+
+**1. The fold's earliest-era rule lives in `ZoneEras.Reconcile` (C#), not in the transform.**
+The plan says *"the transform emits the EARLIEST era under the folded identity"*. *The default
+the other way* was a `Folded` section in the JSON — closer to the plan's letter, and it would
+have put the rule in two places the moment `ZoneEras` needed to answer a `DropZones` spelling
+(trap 4). *Where it landed.* The transform emits one row per PAGE — what the page said — and
+the C# owns the fold. The report names the collision, both pages' eras and the rule in words,
+and computes nothing. Reversible in one slice if Fable wants the letter.
+
+**2. A fold disagreement where either side is ABSENT answers NOTHING.** The plan decided the
+Dated/Dated case (Chardok: Kunark beats Chardok Revamp) and not this one, which has no
+instance in the corpus. *The default the other way* was to let the dated side win. *Where it
+landed.* Null, because an absence is not an era and cannot be compared — letting a dated title
+carry an absent one is exactly the *"absent means Classic"* default the plan refuses by name.
+Guarded against a fixture, and the rule is commutative so dictionary order cannot decide it.
+
+**3. `--selftest` was added and wired into `check.ps1` + CI beside `--check`.** The plan asked
+only for `--check`. *The default the other way* was `--check` alone. *Where it landed.* **Both
+refusal arms are unreachable in the committed corpus — 0 off-ladder words, 0 pages with two
+eras — so `--check` green says nothing about whether they fire** (trap 78, and trap 34 from the
+aimed-at-nothing side). 17 checks over synthetic wikitext, writing nothing; it also asserts the
+mirrored `LADDER` is non-empty, since an empty admitted set refuses everything and reports a
+clean corpus.
+
+**4. The report carries a join survey the plan's D1 list did not name.** *The default the other
+way* was the six sections asked for. *Where it landed.* Included, because D2's gate is worth
+measuring before it is built: **81% of the catalog's drop weight lands on a zone with an era**,
+and `Chardok` (155 mentions) resolves through the fold. Snapshot-stamped and deliberately
+outside `--check`, the `zonelevels-report.md` precedent, so a catalog refresh cannot redden it.
+
+**5. `QuestEraLadder.IndexOf` extracted; `Allowed` now calls it.** *The default the other way*
+was a second `Array.FindIndex` over `Eras` inside `ZoneEras`. *Where it landed.* One producer
+for "where on the ladder" (trap 4) — a second opinion on what counts as one of our era words is
+what makes a gate fail open silently.
+
+**Two corrections to the plan's own numbers, both measured:** its §0 histogram reads 56 Classic
+/ 24 Kunark, and the six figures sum to 102 rather than the 104 it also states. Measured twice,
+with two regex shapes: **57 / 25 / 19 / 1 / 1 / 1 = 104**. The total and the 14-name ABSENT list
+are exactly right; only the split was off. Also `Plane of Hate` is enumerated as
+`Plane of Hate cleanupproject`, and the guard uses the real title.
+
+**No `WhatsNew.json` entry:** nothing here is player-noticeable — no surface reads this
+catalog. `check.ps1` all green (5,398 unit tests); **9 mutants prove-failed** across both
+languages (empty ladder, off-ladder accepted, two-eras picked, positional parse,
+absent-means-Classic, latest-wins fold, absent-side fold, unrankable fold, containment lookup).
+`FABLE.md`'s DRA-180 item is deliberately NOT drained — D2–D5 still need it. Nothing here
+touches privacy, the release go, a public surface, or the values line.
+
+— Dranak (Claude Code), Executor — DRA-180 D1
+
+## 2026-09-19 — DRA-180 D2: the era gate in `Recommendations` — four defaults
+
+Plan P1/P2/P3. Each could have gone the other way; none is on the consequence list (the era
+VALUE is game data with the wiki as source, and plan P4 routes that through Helm, not here).
+
+1. **The liveness fact reports the EFFECT, not the constant.** The plan asks E2E to assert
+   `helperEraGate=1`. It cannot be 1 on any build that ships D2, because P2 ships
+   `WorldEra.Current` EMPTY on purpose — so a dump reading that constant could only be asserted
+   against a build nobody has. The fact is now `RecommendationSet.EraGateLive`, produced by
+   `Recommendations.EraGateArmed(inputs)` — the SAME predicate the gate itself stands down on
+   (trap 4), so a dump can never claim a gate ran that did not. D2 asserts it is **0** in a
+   launched app, which is a real assertion (`DumpValue` throws on an absent fact) and is the
+   honest reading of "the gate lands dark". **D5 flips it to 1**, and the E2E carries that
+   prediction in a comment so the redness is the intended signal rather than a surprise. An
+   env-var door onto the curated value was refused: that is a second writer of the one fact P2
+   says is curated and hand-committed.
+
+2. **The two new gap reasons got their WORDS in D2, not D3.** `HelperMustListTests` refuses a
+   `GoalGapReason` no surface can say (trap 34's must-list), so the engine and its sentences
+   cannot be split across a slice boundary — the suite reddened on exactly those two rows and
+   nothing else. D3 still owns the per-anchor all-removed sentence and the `WhatsNew` drafts;
+   what landed here is the minimum the guard demands, which is the guard working rather than
+   scope creep.
+
+3. **`GearEraRefusal` is its own record, not `GearBandRefusal` with nullable halves.** The two
+   quote different evidence — two era words against two numbers and a level — and a surface
+   testing which fields were populated would be deciding the rule a second time (trap 4). The
+   same reasoning keeps `GearEraRefusals` and `MaterialEraRefusals` apart, and both apart from
+   the band lists: one merged count explains neither list (DRA-149 D3's rule).
+
+4. **Quest rows ARE era-gated, though they stay band-EXEMPT.** The band exemption is sound —
+   the quest is the path, and what guards it is not the question. Era is a different claim: a
+   quest in unopened content cannot be started at all, so offering it as a way to gear up is
+   the Kael Drakkel row's lie in quest clothes. Read off the quest catalog's own `Era` through
+   `QuestEraLadder.Allowed`, folded once per engine rather than scanned per bucket.
+
+**Measured in a launched app** (world temporarily set to Classic, then reverted):
+`helperEraGate` 0→1, `helperEraRefused` 0→**4**, `helperEraLine` 0→1, `helperZones`
+`ClanRunnyeye,KaelDrakkel,TowerofFrozenShadow`→`ClanRunnyeye`, and **`helperBandRefused` 2→0**
+— the era gate ran first and took the two 60+ planes before the band gate saw them, so the
+ORDER decision is visible end-to-end rather than only in a unit test. That is D5's prediction
+pack, already measured.
+
+**Gates:** `check.ps1` all green (5,437 unit), full E2E 380/380 green against a rebuilt app
+(trap 64). **Five mutants prove-failed**: the gate never runs (5 red), band-before-era (1 red,
+the order guard alone), the world defaulted to Classic (1 red, the P2 guard alone), the page
+sent the caption but never drew it (1 red, the must-list), and the lit-gate E2E above.
+
+**No `WhatsNew.json` entry:** the gate is dark, so nothing is player-noticeable yet. The
+release that ships a lit gate is D5's and stays the Founder's. `FABLE.md`'s DRA-180 item is
+deliberately NOT drained — D3 and D5 still need it. Nothing here touches privacy, the release
+go, a public surface, or the values line.
+
+— Dranak (Claude Code), Executor seat `opus-dra180-sr` — DRA-180 D2
+
+## 2026-09-19 — DRA-180 D3: per-anchor "everything was removed" (POINTER — file at ceiling)
+
+Six logged decisions live in **PR #694's body**, not here: DECISIONS.md is 674,806 B against a
+676,484 B grandfather cap, so the full entry (1,664 B) would leave 14 bytes and redden the next
+append. Rotation is DRA-154's standing card and never rides a feature branch, so this is a
+pointer, not a trim.
+
+Headlines: D3's declared sentence needed a Core change (`GearAnchorRemoved` + stage snapshots)
+because D2's refusals are keyed on the PLACE — a words-only function with no producer would be
+the furniture the plan forbids. Reported only when NOTHING of an anchor survived; a candidate is
+charged to the gate that took its LAST place; an anchor nothing dominates stays
+`NoCatalogUpgrade`; cap 3 + a count; band half ships live, era half dark until D5.

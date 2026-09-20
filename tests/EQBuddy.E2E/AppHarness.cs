@@ -625,12 +625,28 @@ internal sealed class AppHarness : IDisposable
     /// at. <c>CharacterLevel.Resolve</c> weighs the two stamps and the fresher wins, so a
     /// fixture that wants a particular winner has to date them both — which is exactly what
     /// makes the two "both ways" E2E rows possible from out here.</param>
+    /// <param name="unlockedClasses">Classes whose unlock achievement the DUMP says is
+    /// complete — the half of identity <c>CharacterClasses.Resolve</c> reads FIRST, and the
+    /// only lever out here that can make the resolved list wider than the picks without
+    /// an achievements file. A character who has never dumped resolves off the log, which
+    /// collapses to one class (see <see cref="SeedQuestClasses"/>), so a scenario about
+    /// picks NARROWING an identity has to seed this side of it.</param>
+    /// <param name="skippedObjectives">Guide objectives the player has STRUCK OUT, keyed by
+    /// guide id (DRA-218). The only lever out here that can produce a BLOCKED quest, and
+    /// trap 22 in its usual shape: a skip lives in the guide ledger rather than in
+    /// <c>AppSettings</c>, so <c>configureSettings</c> cannot reach it and a test about the
+    /// blocked heading would otherwise be asserting over a state the fixture cannot enter.
+    /// <c>DoneObjectiveIds</c> is deliberately left empty beside it — "I did this" and "I am
+    /// not doing this" contradict, and a fixture that wrote both would be staging a state the
+    /// app refuses to create.</param>
     public void SeedQuestLedger(
         IReadOnlyList<string>? classes = null,
         IReadOnlyList<string>? tracked = null,
         IReadOnlyDictionary<string, int>? owned = null,
         (int Level, DateTime At)? level = null,
-        (int Level, DateTime At)? statedLevel = null)
+        (int Level, DateTime At)? statedLevel = null,
+        IReadOnlyList<string>? unlockedClasses = null,
+        IReadOnlyDictionary<string, IReadOnlyList<string>>? skippedObjectives = null)
     {
         File.WriteAllText(Path.Combine(ProfileDir, "quest-ledger.json"),
             JsonSerializer.Serialize(new Dictionary<string, object>
@@ -638,6 +654,7 @@ internal sealed class AppHarness : IDisposable
                 [$"{Character.ToLowerInvariant()}_{Server}"] = new
                 {
                     Classes = classes ?? (IReadOnlyList<string>)[],
+                    UnlockedClasses = unlockedClasses ?? (IReadOnlyList<string>)[],
                     Tracked = tracked ?? (IReadOnlyList<string>)[],
                     Items = (owned ?? new Dictionary<string, int>())
                         .ToDictionary(kv => kv.Key, kv => new { Manual = kv.Value }),
@@ -645,6 +662,13 @@ internal sealed class AppHarness : IDisposable
                     LevelAt = level?.At ?? default,
                     StatedLevel = statedLevel?.Level ?? 0,
                     StatedLevelAt = statedLevel?.At ?? default,
+                    Guides = (skippedObjectives
+                            ?? new Dictionary<string, IReadOnlyList<string>>())
+                        .ToDictionary(kv => kv.Key, kv => new
+                        {
+                            DoneObjectiveIds = (IReadOnlyList<string>)[],
+                            SkippedObjectiveIds = kv.Value,
+                        }),
                 },
             }, new JsonSerializerOptions { WriteIndented = true }));
     }
@@ -855,6 +879,98 @@ internal sealed class AppHarness : IDisposable
         Until(() => DumpValue("hudStarProbeSets") > before, AssertTimeout,
             $"the ★ probe to turn \"{key}\" {(on ? "on" : "off")} (debug.txt " +
             $"hudStarProbeSets past {before}; is EQBUDDY_STARPROBE=1 set on this scenario?)");
+    }
+
+    /// <summary>
+    /// Lenses the Quest Tracker's class strip to one class — or to the Any chip when
+    /// <paramref name="cls"/> is null — through the <c>EQBUDDY_LENSPROBE</c> rendezvous,
+    /// which the scenario must have asked for (DRA-199).
+    ///
+    /// **The lens has two writers and both are <c>onClick</c> handlers on controls inside
+    /// that window**, which this suite cannot press and may not assert the screen of; it is
+    /// not persisted either, so it cannot be seeded before <see cref="Launch"/>. So the probe
+    /// calls <c>QuestsView.LensTo</c> — the chip's own click body, lifted out for exactly
+    /// this — never a private path built for the test.
+    ///
+    /// **It returns on <c>questsLensProbeSets</c>, which the probe raises AFTER the write**,
+    /// not on the trigger file disappearing, which only says the probe saw it (trap 62). The
+    /// same rendezvous shape as <see cref="ClickGuideDoor"/>, <see cref="DropHudChip"/> and
+    /// <see cref="SetMiniStat"/>.
+    /// </summary>
+    public void SetClassLens(string? cls) =>
+        DriveLensProbe("lens", cls ?? "-", $"lens the class strip to {cls ?? "Any"}");
+
+    /// <summary>
+    /// Rewrites the character's picked classes through the same rendezvous — the tick the
+    /// class multi-select writes.
+    ///
+    /// **It drives <c>QuestLedgerStore.SetClasses</c> and forces NO refresh, deliberately.**
+    /// That is EQBuddy Mobile's own writer (<c>CompanionActions.SetClasses</c>), and the phone
+    /// has no way to force a repaint of this window either — so the redraw has to come from
+    /// the <c>off:</c> term DRA-181 D4 put in the view's signature. Forcing one here would
+    /// exercise a path the remote writer does not have and would hide trap 72 on this surface.
+    ///
+    /// **So the counter is not the whole wait.** It says the ledger was written; it does not
+    /// say the strip has repainted. Anchor the repaint on <c>questsRenders</c> moving, then
+    /// read the facts you are asserting from ONE dump (trap 56).
+    ///
+    /// <param name="classes">The pick list. Empty means nothing picked, which is the state
+    /// where the character's resolved identity fills the strip instead.</param>
+    /// </summary>
+    public void SetClassPicks(params string[] classes) =>
+        DriveLensProbe("picks", classes.Length == 0 ? "-" : string.Join("+", classes),
+            $"write picks [{string.Join(", ", classes)}]");
+
+    /// <summary>
+    /// Presses the class picker's <c>My Classes</c> quick-select (DRA-216 D1, S4.3), through
+    /// the same rendezvous.
+    ///
+    /// **It takes no argument, and that IS the feature.** The control's whole claim is that
+    /// the player does not tell it which classes they play — it asks
+    /// <c>CharacterClasses.Resolve</c> through <c>QuestClassLens.MyClasses</c>. A harness
+    /// method that passed a class list would be testing a path the button does not have.
+    ///
+    /// **The probe drives the button's own click body**, which is inside a WPF
+    /// <c>Popup</c> — a separate top-level HWND this suite can neither press nor photograph
+    /// (trap 79). Unlike <see cref="SetClassPicks"/> this one DOES force a refresh, because
+    /// the button itself does: it is a local control, not the phone's remote writer.
+    /// </summary>
+    public void PressMyClasses() =>
+        DriveLensProbe("myclasses", "-", "press the My Classes quick-select");
+
+    /// <summary>
+    /// Ticks (or strikes out) ONE guide-ledger step the way a writer OUTSIDE the surface
+    /// under assertion does — the phone's tap, or the checkbox in the OTHER instance
+    /// (QuestsWindow and QuestsRoom build one <c>QuestsView</c> each over one ledger,
+    /// trap 45). Through the same rendezvous, and it forces NO refresh.
+    ///
+    /// <para><b>That is the whole point of it</b> (DRA-218's signature collision). Every
+    /// write site inside a view force-refreshes itself, so a step ticked by the view under
+    /// assertion proves nothing about the repaint gate — the only way to reach that gate is
+    /// to write the ledger from somewhere that cannot force a repaint, which is exactly
+    /// what a remote writer is. Same shape, and the same reason, as
+    /// <see cref="SetClassPicks"/>.</para>
+    ///
+    /// <para><b>So the counter is not the whole wait.</b> It says the ledger was written; it
+    /// does not say anything has repainted. Anchor the assertion on the screen fact the
+    /// change is about.</para>
+    ///
+    /// <para>The probe REFUSES a reward-keyed or acquire-shaped step — those live in the Sky
+    /// and Epic stores and a probe holding no reward group cannot tell which — so a fixture
+    /// that names one times out here, naming the probe.</para>
+    /// </summary>
+    /// <param name="rowId"><c>GuideChecklistProjection.RowId(guideId, objectiveId)</c>.</param>
+    public void RemotelyTickGuideStep(string rowId, bool done = true) =>
+        DriveLensProbe(done ? "guidedone" : "guideskip", rowId,
+            $"{(done ? "tick" : "strike out")} the guide step \"{rowId}\" from outside the view");
+
+    private void DriveLensProbe(string verb, string arg, string doing)
+    {
+        var before = DumpValue("questsLensProbeSets");
+        File.WriteAllText(Path.Combine(ProfileDir, "quest-lens.trigger"), $"{verb} {arg}");
+        Until(() => DumpValue("questsLensProbeSets") > before, AssertTimeout,
+            $"the lens probe to {doing} (debug.txt questsLensProbeSets past {before}; is " +
+            "EQBUDDY_LENSPROBE=1 set on this scenario, and is the Quest Tracker open?)");
     }
 
     /// <summary>Current value of a debug.txt "key=value" field, or -1 while the dump is

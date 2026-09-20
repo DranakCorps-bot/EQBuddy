@@ -55,10 +55,23 @@ namespace EQBuddy.Companion;
 /// <param name="GearBandRefused">Which zones the Farm Gear band gate refused, with their bands
 /// and this character's level (DRA-84 D2). Its own field for the same reason as
 /// <paramref name="GearWithheld"/>, one rule out: the row is what did not get built.</param>
+/// <param name="GearEraRefused">Which places and quests the Farm Gear ERA gate refused, with
+/// the era each page gives itself and the era the world is at (DRA-180 D2). Its own field
+/// beside <paramref name="GearBandRefused"/> rather than folded into it: the two quote
+/// different evidence, and a phone that drew the band sentence but not this one would leave the
+/// player reading level numbers as the reason a place vanished for a different cause.</param>
+/// <param name="MaterialEraRefused">The era gate's refusals on the FARM MATERIALS list
+/// (DRA-180 D2) — its own field for the reason <paramref name="MaterialBandRefused"/> is its
+/// own field.</param>
 /// <param name="GearWhoWithheld">What the who rule held back — drop offers whose item page names
 /// no creature in that zone and which this character has never looted there (DRA-84 D4). Its own
 /// field beside <paramref name="GearWithheld"/> rather than summed into it: a cap and a rule are
 /// different causes, and one number could explain neither.</param>
+/// <param name="GearOffHandRefused">What the off-hand rule refused — upgrades that beat the
+/// worn item on every number and are two-handed, for a character with something in SECONDARY
+/// (DRA-222 D6, S7.3). Its own field beside <paramref name="GearWhoWithheld"/> for that one's
+/// reason: five causes with five remedies, and a phone summing any two of them would hand the
+/// player a number that explains neither.</param>
 /// <param name="UnreadWorn">The worn rows EQBuddy could not read about, named (DRA-149 D2). The
 /// fourth field of this shape and the only one that is not a decision — the three above chose to
 /// hold something back, this one is EQBuddy admitting it never had the row. It rides the wire for
@@ -76,6 +89,15 @@ namespace EQBuddy.Companion;
 /// <param name="MaterialWhoWithheld">What the who rule held back on the materials list
 /// (DRA-149 D3). Same producer and the same words as <paramref name="GearWhoWithheld"/> — the
 /// rule, the cause and the remedy are identical — on its own field for the reason above.</param>
+/// <param name="AnchorsAllRemoved">One sentence per WORN ITEM whose every catalog upgrade the
+/// ladder removed (DRA-180 D3). A list rather than one joined string because the phone draws
+/// them as separate captions exactly as the PC does, and because the cap is a COUNT of them —
+/// joining here would make <paramref name="AnchorsNotNamed"/> a number about a string. Already
+/// capped and already worded by <c>HelperPresentation</c>: the projection decides no word and
+/// no cap (trap 33). This is the field the Founder's bow and Baron FAILs are answered in, so a
+/// phone that carried the block captions without it would be the surface that still says
+/// nothing.</param>
+/// <param name="AnchorsNotNamed">What the cap above held back, said out loud (trap 50).</param>
 /// <param name="MaterialNote">Where the materials rows came FROM, and what still has no page
 /// (DRA-149 D3). Empty where no materials row was built, which is the money note's rule beside
 /// it, for the money note's reason.</param>
@@ -89,6 +111,19 @@ namespace EQBuddy.Companion;
 /// the listed set and not the picked one, because "picked nothing" means "show me all eight" —
 /// the rule lives in <c>TradeskillPickStore.ListedFrom</c> so the phone cannot arrive at a
 /// different eight from the PC.</param>
+/// <param name="TrackedHeading">The tracked block's heading (DRA-216 D4). Empty — with the two
+/// fields under it — when nothing is tracked, which is the desktop room's own rule: that block
+/// draws nothing at all rather than a heading over an empty list.</param>
+/// <param name="TrackedNote">What a tracked goal is and the two things it does not claim. The
+/// SAME sentence the PC draws: it carries the parked "+N" gap and the fact that nothing ticks
+/// itself off, and a phone without it would show a list of goals implying a comparison EQBuddy
+/// cannot make.</param>
+/// <param name="TrackedOnPc">Where a goal is tracked and untracked, as INTENT (trap 35). Every
+/// control in this room writes the profile the PC is playing from, so the phone gets the
+/// sentence rather than a button that could not work.</param>
+/// <param name="Tracked">One already-worded row per goal, newest first —
+/// <c>HelperPresentation.TrackedRow</c>'s own sentence and the store's own order. The projection
+/// picks no word and no order.</param>
 /// <param name="Gaps">Answerable goals that produced nothing, each with its reason and —
 /// where the answer is a file the game writes — the command as selectable text.</param>
 /// <param name="Deferred">Selected goals whose engine does not exist yet, each naming the
@@ -109,15 +144,31 @@ public sealed record CompanionHelperSection(
     string Cap,
     string GearWithheld,
     string GearBandRefused,
+    string GearEraRefused,
+    string MaterialEraRefused,
     string GearWhoWithheld,
+    // DRA-219: the quest acquisition path's three captions. Apart from `GearWhoWithheld` above
+    // for the reason it is apart from `GearWithheld` — different rules, different remedies — and
+    // on the wire at all because a refusal the PC made and the phone did not mention is the two
+    // surfaces disagreeing about what the list contains.
+    string GearQuestWithheld,
+    string GearNoSource,
+    string GearQuestOnly,
+    string GearOffHandRefused,
     string UnreadWorn,
     IReadOnlyList<CompanionHelperDoor> UnreadWornDoors,
+    IReadOnlyList<string> AnchorsAllRemoved,
+    string AnchorsNotNamed,
     string MaterialBandRefused,
     string MaterialWhoWithheld,
     string MaterialNote,
     string MerchantNote,
     string MerchantDoorNote,
     IReadOnlyList<CompanionHelperMerchants> Merchants,
+    string TrackedHeading,
+    string TrackedNote,
+    string TrackedOnPc,
+    IReadOnlyList<string> Tracked,
     IReadOnlyList<CompanionHelperNote> Gaps,
     IReadOnlyList<CompanionHelperNote> Deferred,
     CompanionHelperEmpty? Empty = null);

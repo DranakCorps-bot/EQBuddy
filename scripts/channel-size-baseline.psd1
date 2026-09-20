@@ -43,22 +43,15 @@
 #   nobody appends to (untouched since 2026-08-31) would be coverage theatre.
 
 @{
-    # 14x over. Never rotated. The busiest file in the repo by commit count.
-    'HELM.md'            = 942417
-    # 5x over even AFTER DRA-75 rotated 390 entries out of it (1,504,146 -> 311,088).
-    'HELM-FEEDBACK.md'   = 311088
+    # HELM.md and HELM-FEEDBACK.md left this table on 2026-09-18, discharged by the DRA-154
+    # rotation that took them to 25,411 B and 4,730 B - the first rotation of the HELM.md
+    # class. Rows only ever leave, and they leave in the pull request that earns it.
     # 9x over. Never rotated. Append-only by design, which is why it only ever grows.
     'DECISIONS.md'       = 614986
     # 7x over. Never rotated. Shrinks for real once plans move to docs/plans/DRA-nn.md.
     'FABLE.md'           = 478113
-    # 4x over after DRA-75 rotated 139 entries out of it (1,008,005 -> 240,896).
-    'FABLE-FEEDBACK.md'  = 240896
     # 4x over. Never rotated.
     'BEVEL.md'           = 237551
-    # 8x over. Never rotated.
-    'BEVEL-FEEDBACK.md'  = 501704
     # 3x over. Never rotated.
     'SCRIBE.md'          = 177198
-    # 2x over. Never rotated. The smallest debt, and DRA-144 rotates it first.
-    'SCRIBE-FEEDBACK.md' = 133264
 }

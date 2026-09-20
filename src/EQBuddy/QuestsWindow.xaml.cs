@@ -138,6 +138,11 @@ public partial class QuestsWindow : Window, IFollowingSurface
 
     internal void SetTab(string tab) => _view.SetTab(tab);
 
+    /// <summary>The <c>EQBUDDY_LENSPROBE</c> rendezvous's one way in (DRA-199) — a
+    /// passthrough in <see cref="SetTab"/>'s idiom, so the hook never reaches past this host
+    /// into the view it owns. See <c>QuestsView.ProbeLens</c> for what the verbs drive.</summary>
+    internal bool ProbeLens(string verb, string arg) => _view.ProbeLens(verb, arg);
+
     internal void FactionsChanged() => _view.FactionsChanged();
 
     public void MaybeRefresh() => _view.MaybeRefresh();

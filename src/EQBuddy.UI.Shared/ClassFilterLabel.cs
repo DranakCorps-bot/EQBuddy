@@ -35,4 +35,36 @@ public static class ClassFilterLabel
         selected, "class", "classes",
         offered: QuestClassFilter.Classes.Length,
         abbreviate: QuestClassFilter.Abbrev);
+
+    /// <summary>The quick-select's own words (DRA-216 D1, S4.3). The requirements document
+    /// and the plan both name the control <c>My Classes</c>, so that is what it is called on
+    /// screen — a surface that renames the thing a requirement asks for costs a reader the
+    /// join.</summary>
+    public const string MyClasses = "My Classes";
+
+    /// <summary>
+    /// What the quick-select's hover says: the classes it will tick, then WHERE they came
+    /// from.
+    ///
+    /// <para>Naming them is the whole of the honesty here. The action replaces the selection,
+    /// so a player about to click it is entitled to know what it is about to become — and the
+    /// source is the difference between the game's own statement and a guess off the log,
+    /// which is exactly the judgement they need to decide whether to trust it.</para>
+    ///
+    /// <para><b><see cref="CharacterClasses.SourceLabel"/> rides VERBATIM in a parenthetical</b>
+    /// — the same construction the identity note above the list already uses. Bevel's
+    /// Helm-signed lock is that SourceLabel is one table and nobody composes a second verb
+    /// around it: the verb here belongs to the classes ("Tick …"), and the parenthetical is
+    /// the table's string untouched.</para>
+    /// </summary>
+    /// <param name="mine">What <c>QuestClassLens.MyClasses</c> answered. Never abbreviated:
+    /// a hover has the room the face does not, and the codes exist for the face's width
+    /// budget (#184), not for prose.</param>
+    public static string MyClassesTip(IReadOnlyList<string> mine, ClassSource source)
+    {
+        if (mine is null || mine.Count == 0) return "";
+        var named = $"Tick {string.Join(" · ", mine)}";
+        var from = CharacterClasses.SourceLabel(source);
+        return from.Length > 0 ? $"{named} ({from})" : named;
+    }
 }

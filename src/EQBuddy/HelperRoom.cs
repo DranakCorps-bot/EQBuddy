@@ -185,6 +185,16 @@ internal sealed class HelperRoom : Grid, IShellRoom
     private bool _levelDoor;
     private bool _moneyNote;
     private bool _gearBaseNote;
+    /// <summary>What this character is going after (DRA-216 D4), captured from the SAME bundle
+    /// the answers were ranked from so the block and the row buttons beside it cannot disagree
+    /// about what is tracked (trap 56).</summary>
+    private IReadOnlyList<TrackedUpgrade> _tracked = [];
+    /// <summary>How many tracked rows the block DREW, and how many Track buttons the answers
+    /// carried. Counted from the built tree rather than from the store, because an absent
+    /// control photographs as an unremarkable panel (trap 29) — "the store holds three goals"
+    /// and "the player can see three goals" are different claims.</summary>
+    private int _trackedRows;
+    private int _trackButtons;
 
     public HelperRoom(MainWindow main, Action<string> navigate)
     {
@@ -279,6 +289,8 @@ internal sealed class HelperRoom : Grid, IShellRoom
         _bandGate = bundle.Inputs.Level.Known && bundle.Inputs.Bands is not null;
         _includeQuests = bundle.Inputs.IncludeQuests;
         _skills = bundle.Skills;
+        // DRA-216 D4: off the same bundle, for the reason the gate state above is.
+        _tracked = bundle.Inputs.Tracked;
 
         // **THE FINGERPRINT, AND EVERY STORE THIS ROOM READS IS IN IT** (trap 72: the Quests
         // tab drew the moment before for a whole session because its signature carried
@@ -296,6 +308,12 @@ internal sealed class HelperRoom : Grid, IShellRoom
             // DRA-71 D6's three clicks. The dump they are ABOUT rides the bundle's own
             // signature below.
             _intent, string.Join(',', wornPicks), _includeQuests,
+            // **DRA-216 D4's store, folded by CONTENT** (trap 72: the Quests tab drew the
+            // moment before for a whole session because its key carried everything except the
+            // lists the feature wrote). A count could not see an untrack-and-track in one pass,
+            // and the STAMP rides because it is in the drawn sentence — a goal re-tracked after
+            // being dropped is the same item on a different day.
+            string.Join(',', _tracked.Select(t => $"{t.Item}:{t.TrackedAt.Ticks}")),
             // **Every store the shared bundle holds, folded by CONTENT by the bundle itself**
             // (trap 72). It is one call rather than six lines here because the phone's
             // projection is fed by the identical object: two hosts keying on two different
@@ -376,6 +394,8 @@ internal sealed class HelperRoom : Grid, IShellRoom
         _levelDoor = false;
         _moneyNote = false;
         _gearBaseNote = false;
+        _trackedRows = 0;
+        _trackButtons = 0;
 
         _scroll.Content = _blocks;
         _blocks.Margin = new Thickness(Tok.SpaceL);
@@ -389,7 +409,14 @@ internal sealed class HelperRoom : Grid, IShellRoom
         // DRA-71 D6, drawn on the same condition every sub-block in this room is: only while
         // its goal is picked, or while nothing is — which weighs everything.
         if (goals.Count == 0 || goals.Contains(HelperGoal.FarmGear))
+        {
             BuildGearIntent(wornPicks);
+            // DRA-216 D4, on the gear goal's own condition and directly under the question it
+            // is the durable half of. It is the one block here with no picker in it: a tracked
+            // goal is written by a ROW below, which is why it draws nothing at all when nothing
+            // is tracked — a heading over an empty list would be a control that is not there.
+            BuildTracked();
+        }
         if (goals.Count == 0 || goals.Contains(HelperGoal.WorkOnFaction))
             BuildFactionPicker(factions, unlocks);
         if (goals.Count == 0 || goals.Contains(HelperGoal.UnlockRaces)
@@ -541,6 +568,106 @@ internal sealed class HelperRoom : Grid, IShellRoom
         // them.
         if (_intent != GearIntent.FarmToSell)
             block.Children.Add(Line(HelperPresentation.GearCatalogNote, Role.Caption));
+    }
+
+    /// <summary>
+    /// **WHAT THIS CHARACTER IS GOING AFTER** (DRA-216 D4, S12).
+    ///
+    /// <para>The durable half of the Farm Gear question, and the only block in this room built
+    /// from a store the ANSWERS below write. Its rows survive everything that can remove the
+    /// offer they came from — a new dump, a worn pick, a catalog refresh, the band gate — which
+    /// is the whole reason a tracked goal is its own object rather than a flag on a swept row
+    /// (plan §3 Q3).</para>
+    ///
+    /// <para><b>Nothing tracked draws NOTHING</b>, not a heading with an empty state under it.
+    /// Every other block here is a control the player can use on arrival; this one is a record
+    /// of decisions they have already made, so before the first one there is nothing to say —
+    /// and the Track buttons on the gear lines below are where the feature is discovered.</para>
+    ///
+    /// <para>Each row's untrack control is the same toggle the answers carry, with the same
+    /// words from the same producer: two spellings of one action is how a surface ends up
+    /// disagreeing with itself about what a click does (trap 4).</para>
+    /// </summary>
+    private void BuildTracked()
+    {
+        if (_tracked.Count == 0) return;
+
+        var block = Block(HelperPresentation.TrackedHeading);
+        block.Children.Add(Line(HelperPresentation.TrackedNote, Role.BodySecondary));
+
+        foreach (var goal in _tracked)
+        {
+            var row = new StackPanel { Margin = new Thickness(0, Tok.SpaceS, 0, 0) };
+            row.Children.Add(Line(HelperPresentation.TrackedRow(goal), Role.Body));
+            var controls = new WrapPanel { Margin = new Thickness(0, Tok.SpaceXs, 0, 0) };
+            // Always the tracked face here, and it is read from the STORE rather than assumed
+            // from the fact that this row was drawn: the two cannot disagree that way round.
+            controls.Children.Add(TrackControl(goal.Item, () => Untrack(goal.Item)));
+            row.Children.Add(controls);
+            block.Children.Add(row);
+            _trackedRows++;
+        }
+
+        // ONE door for the block rather than one per row — the room's own rule, written down
+        // where `BuildAnswers` draws its captions: a door per line here would be the same Gear
+        // door however many goals the player is holding, and the row's own control is the thing
+        // each line exists to offer.
+        block.Children.Add(Door(new HelperDoor(HelperDoorKind.Gear, "")));
+    }
+
+    /// <summary>
+    /// The Track / Tracked ✓ control — <b>one control, drawn in two places, labelled from the
+    /// store both times</b>.
+    ///
+    /// <para><b>The label is read from <c>TrackedUpgradeStore</c> rather than passed in</b>, so
+    /// a caller cannot draw "Track" over something already tracked; the ACTION is passed in,
+    /// because the two callers reach the store by different doors on purpose. An answer row
+    /// holds a real <c>GearUpgradeFact</c> and toggles with it; a tracked row holds a goal and
+    /// can only ever untrack. Neither host fabricates a fact — see
+    /// <c>TrackedUpgradeStore</c>'s summary for why the way IN is a fact the engine produced
+    /// and nothing else.</para>
+    ///
+    /// <para>It is a caption-styled link like the doors beside it, deliberately: it does not
+    /// navigate, but it is the same weight of action, and a button in this stack would read as
+    /// the primary thing on a row whose point is the sentence above it.</para>
+    /// </summary>
+    private UIElement TrackControl(string item, Action click)
+    {
+        var tracked = TrackedUpgradeStore.IsTracked(
+            _main.Settings, _main.QuestCharacterKey, item);
+        var link = DesignSystem.Text(Role.Caption, HelperPresentation.TrackLabel(tracked));
+        link.Ink("AccentBrush");
+        link.Margin = new Thickness(0, 0, Tok.SpaceM, 0);
+        link.ToolTip = HelperPresentation.TrackTip(tracked, item);
+        DesignSystem.WireClick(link, click);
+        _trackButtons++;
+        return link;
+    }
+
+    /// <summary>Start or stop going after an offer the engine actually made, then repaint so
+    /// the block above the answers moves in the same beat as the label that was clicked. The
+    /// write is the store's and the save is <see cref="AppSettings"/>'s own — the
+    /// <see cref="ChooseIntent"/> idiom, which is what makes a goal survive the restart S18.3
+    /// asks for.</summary>
+    private void ToggleTracked(GearUpgradeFact offer)
+    {
+        if (_main.QuestCharacterKey.Length == 0) return;
+        TrackedUpgradeStore.Toggle(
+            _main.Settings, _main.QuestCharacterKey, offer, DateTime.Now);
+        _main.Settings.Save();
+        Repaint();
+    }
+
+    /// <summary>Stop going after one, from the block that lists them. It is the store's
+    /// <c>Untrack</c> and not its <c>Toggle</c>: this control only ever exists over a goal that
+    /// IS tracked, and a toggle here would be a path that could re-add one with a stamp of
+    /// now.</summary>
+    private void Untrack(string item)
+    {
+        if (_main.QuestCharacterKey.Length == 0) return;
+        TrackedUpgradeStore.Untrack(_main.Settings, _main.QuestCharacterKey, item);
+        _main.Settings.Save();
+        Repaint();
     }
 
     private void ChooseIntent(GearIntent intent)
@@ -1064,6 +1191,19 @@ internal sealed class HelperRoom : Grid, IShellRoom
             block.Children.Add(Door(new HelperDoor(HelperDoorKind.Gear, "")));
         }
 
+        // **THE ERA GATE'S REFUSALS COME FIRST** (DRA-180 D2, plan P3), because the gate ran
+        // first and because its sentence is the complete explanation: a place refused for its
+        // era would otherwise be read against the band numbers directly below, which are not
+        // the reason it is missing. Its door is the Gear room's, like the band caption's — the
+        // wishlist behind both is the same one.
+        if (HelperPresentation.EraRefused(
+                _answers.GearEraRefusals, HelperPresentation.BandRefusedUpgrades)
+            is { Length: > 0 } eraCap)
+        {
+            block.Children.Add(Line(eraCap, Role.Caption));
+            block.Children.Add(Door(new HelperDoor(HelperDoorKind.Gear, "")));
+        }
+
         // **AND THE BAND GATE'S REFUSALS** (DRA-84 D2, plan P2). The same shape one rule out:
         // a count spent before any row exists, said out loud with the numbers it was spent on,
         // pointing at the room that has the whole wishlist. It is drawn from what the ENGINE
@@ -1088,6 +1228,13 @@ internal sealed class HelperRoom : Grid, IShellRoom
             is { Length: > 0 } matBandCap)
             block.Children.Add(Line(matBandCap, Role.Caption));
 
+        // The era gate's refusals on the MATERIALS list — its own sentence beside the gear one
+        // for the reason the materials BAND caption is its own sentence (DRA-180 D2).
+        if (HelperPresentation.EraRefused(
+                _answers.MaterialEraRefusals, HelperPresentation.BandRefusedMaterials)
+            is { Length: > 0 } matEraCap)
+            block.Children.Add(Line(matEraCap, Role.Caption));
+
         // **AND THE WHO RULE'S** (DRA-84 D4, plan P3). The third count spent before a row
         // exists, and the third to get its own sentence rather than be summed into the others:
         // a cap, a band and a missing creature are three causes with three remedies, and the
@@ -1096,6 +1243,45 @@ internal sealed class HelperRoom : Grid, IShellRoom
             is { Length: > 0 } whoCap)
         {
             block.Children.Add(Line(whoCap, Role.Caption));
+            block.Children.Add(Door(new HelperDoor(HelperDoorKind.Gear, "")));
+        }
+
+        // **AND THE QUEST-SOURCE RULE'S** (DRA-219, S10/S11). The who rule's sibling on the
+        // other acquisition path, drawn directly after it because they are the same principle
+        // — an offer that cannot say how to pursue it is not an offer — and its own sentence
+        // rather than a merged count, because the remedies differ: one is an item page naming
+        // no creature, this is the shipped quest list not holding a quest at all. Its door is
+        // the quest list, which is both the thing that is missing the quest and the place a
+        // player would look for it.
+        if (HelperPresentation.QuestOffersWithheld(_answers.GearQuestWithheld)
+            is { Length: > 0 } questCap)
+        {
+            block.Children.Add(Line(questCap, Role.Caption));
+            block.Children.Add(Door(new HelperDoor(HelperDoorKind.QuestCatalog, "")));
+        }
+
+        // **AND THE TWO THINGS THE SWEEP NEVER PASSED ON** (DRA-219, S10.1/S19.2). Every caption
+        // above is about an offer that existed and was removed; these are about items that never
+        // reached a bucket. Apart from each other because only one of them has a remedy — the
+        // include-quests toggle is on this screen, and "no page says where it comes from" has
+        // nothing behind it at all.
+        if (HelperPresentation.SourcelessUpgrades(_answers.GearNoSource)
+            is { Length: > 0 } noSourceCap)
+            block.Children.Add(Line(noSourceCap, Role.Caption));
+
+        if (HelperPresentation.QuestOnlyUpgrades(_answers.GearQuestOnly)
+            is { Length: > 0 } questOnlyCap)
+            block.Children.Add(Line(questOnlyCap, Role.Caption));
+
+        // **AND THE OFF-HAND RULE'S** (DRA-222 D6, S7.3). Fifth count, fifth sentence, same
+        // argument one more time: this one removed offers that WON on every number, for a cost
+        // that is not a number at all, and a player who cannot tell it from the band gate's
+        // refusals cannot act on either. Its door is the Gear room's, like every gear caption's
+        // — the swap this leaves to them is one they make by looking at both hands.
+        if (HelperPresentation.OffHandRefused(_answers.GearOffHandRefusals)
+            is { Length: > 0 } offHandCap)
+        {
+            block.Children.Add(Line(offHandCap, Role.Caption));
             block.Children.Add(Door(new HelperDoor(HelperDoorKind.Gear, "")));
         }
 
@@ -1126,6 +1312,26 @@ internal sealed class HelperRoom : Grid, IShellRoom
             doors.Children.Add(Door(new HelperDoor(HelperDoorKind.Gear, "")));
             block.Children.Add(doors);
         }
+
+        // **AND THEN, PER WORN ITEM, THE ANSWER THE FOUNDER ASKED FOR** (DRA-180 D3, plan P3).
+        //
+        // Every caption above counts PLACES and every one of them can be true while the player's
+        // actual question goes unanswered — he asked about a bow and about the Baron's Blade,
+        // and a sentence about Sleeper's Tomb does not name either. These lines are the same
+        // evidence turned to face the character.
+        //
+        // They are drawn AFTER the block captions and BEFORE the gaps because they are more
+        // specific than the first and less final than the second: the captions explain the list,
+        // these explain one row of the player's own gear, and a gap closes the goal. A door per
+        // line would be the same Gear door three times over, so the block's one door (already
+        // drawn with the captions above) is left to serve them.
+        var anchors = _answers.GearAnchorsRemoved;
+        foreach (var anchor in anchors.Take(HelperPresentation.GearAnchorsNamed))
+            block.Children.Add(Line(HelperPresentation.AnchorAllRemoved(anchor), Role.Caption));
+        if (HelperPresentation.AnchorsNotNamed(
+                anchors.Count - Math.Min(anchors.Count, HelperPresentation.GearAnchorsNamed))
+            is { Length: > 0 } anchorCap)
+            block.Children.Add(Line(anchorCap, Role.Caption));
 
         foreach (var gap in _answers.Gaps) block.Children.Add(Gap(gap));
 
@@ -1190,6 +1396,14 @@ internal sealed class HelperRoom : Grid, IShellRoom
             stack.Children.Add(Line(sentence, Role.Caption));
             _whyLines++;
             if (fact.Evidence == Evidence.Personal) _personalWhy++; else _catalogWhy++;
+
+            // **DRA-216 D4: the one why-line a player can act on with a click.** It rides the
+            // GEAR line rather than the row, because a zone row can carry several upgrades and
+            // a control under the row would not say which item it was about — and because this
+            // is the only fact here that names something the player can decide to go and get.
+            // Every other line is evidence about a place.
+            if (fact is GearUpgradeFact offer)
+                stack.Children.Add(TrackControl(offer.Item, () => ToggleTracked(offer)));
         }
 
         if (HelperPresentation.WithheldWhy(rec.WithheldWhy) is { Length: > 0 } more)
@@ -1416,6 +1630,15 @@ internal sealed class HelperRoom : Grid, IShellRoom
         // an unremarkable panel.
         $"helperQuestsOn={(_includeQuests ? 1 : 0)} " +
         $"helperQuestToggle={(_questToggle ? 1 : 0)} " +
+        // **DRA-216 D4: what the STORE holds, what the block DREW, and how many controls the
+        // room offered** — three keys because they are three claims, the `helperUnlockPicks`
+        // trio's own shape one store along. A goal that reached settings.json and no row is
+        // trap 20's state and photographs as an ordinary room (trap 29); a room with rows and
+        // no Track button is a feature nobody can start. The items are folded by NAME, because
+        // a count cannot see one goal swapped for another (trap 72).
+        $"helperTracked={string.Join(',', _tracked.Select(t => t.Item.Replace(" ", "")))} " +
+        $"helperTrackedRows={_trackedRows} " +
+        $"helperTrackButtons={_trackButtons} " +
         // What the ENGINE found: how many drawn answers carry a catalog upgrade line, how many
         // carry an observed drop (the personal half), and what the sweep's own cap withheld.
         $"helperGearWhy={_answers.Top.Count(r => r.Why.OfType<GearUpgradeFact>().Any())} " +
@@ -1427,6 +1650,15 @@ internal sealed class HelperRoom : Grid, IShellRoom
         // about is a row that vanished. `helperBandLine` is the line, `helperBandGate` is
         // whether the gate could run at all (a level AND a band table), so a green run with a
         // zero count can be told from a run where the gate stood down.
+        // **DRA-180 D2: the LIVENESS fact comes FIRST and is not a count.** `helperEraGate` says
+        // the gate was wired and asked at all; a refusal count of 0 is the same number on a
+        // build where the gate does not exist, which is the assertion DRA-149 D5 item 2 was
+        // caught by. It reads the INPUTS the gate stands down on, so it is 1 only when the
+        // world's era is known and rankable and an era table is present.
+        $"helperEraGate={(_answers.EraGateLive ? 1 : 0)} " +
+        $"helperEraRefused={_answers.GearEraRefusals.Count} " +
+        $"helperEraLine={(HelperPresentation.EraRefused(_answers.GearEraRefusals, HelperPresentation.BandRefusedUpgrades).Length > 0 ? 1 : 0)} " +
+        $"helperMaterialEraRefused={_answers.MaterialEraRefusals.Count} " +
         $"helperBandRefused={_answers.GearBandRefusals.Count} " +
         $"helperBandLine={(HelperPresentation.BandRefused(_answers.GearBandRefusals, HelperPresentation.BandRefusedUpgrades).Length > 0 ? 1 : 0)} " +
         $"helperBandGate={(_bandGate ? 1 : 0)} " +
@@ -1445,9 +1677,50 @@ internal sealed class HelperRoom : Grid, IShellRoom
         // how many offers the rule removed, and `helperWhoLine` is whether the room said so. A
         // room drawing three items with three silent who clauses and a room drawing three with
         // named creatures are the same screen to every other key here.
+        // **DRA-180 D3: the per-anchor answer, and its INPUTS beside its count** — the shape
+        // `helperBandRefusals` above established. `helperAnchorsEmptied` is how many worn items
+        // the ladder left with nothing and `helperAnchorLines` is how many the room actually
+        // DREW, so a cap that silently swallowed them all can be told from an engine that found
+        // none (trap 34 in dump form). `helperAnchorsRemoved` carries the arithmetic the
+        // sentence rests on — the anchor, what was found, and the three causes in the gates'
+        // own order — so an E2E asserts era+band+who == found rather than trusting the prose.
+        // Spaces go and `:` separates: one flat namespace (trap 58).
+        $"helperAnchorsEmptied={_answers.GearAnchorsRemoved.Count} " +
+        $"helperAnchorLines={Math.Min(_answers.GearAnchorsRemoved.Count, HelperPresentation.GearAnchorsNamed)} " +
+        // DRA-219 adds the FOURTH cause to the tuple, in the rules' own order, so the E2E's
+        // `era+band+who == found` assertion becomes `era+band+who+quest == found` rather than
+        // quietly starting to fail on a character with quests switched on.
+        $"helperAnchorsRemoved={string.Join(',', _answers.GearAnchorsRemoved.Select(a => $"{a.Anchor.Replace(" ", "")}:{a.Found}:{a.LaterContent}:{a.OutsideBand}:{a.NoCreature}:{a.NoQuestPath}"))} " +
         $"helperWho={_answers.Top.Sum(r => r.Why.OfType<GearUpgradeFact>().Count(f => f.Who.Count > 0))} " +
         $"helperWhoWithheld={_answers.GearWhoWithheld} " +
         $"helperWhoLine={(HelperPresentation.DropOffersWithheld(_answers.GearWhoWithheld).Length > 0 ? 1 : 0)} " +
+        // **DRA-219: the QUEST acquisition path, in the shape the who keys above it use** (S10,
+        // S11). `helperQuestRows` is how many drawn rows are quests and `helperQuestSource` how
+        // many of those can actually say who starts it and where — the pair that separates "a
+        // quest row exists" from "a quest row is a direction", which is the whole of S11.2.
+        // `helperQuestWithheld`/`helperQuestLine` mirror the who rule's count-and-did-it-say-so
+        // pair (trap 56: the engine refusing and the screen saying so are different claims).
+        // `helperNoSource` and `helperQuestOnly` are the two the sweep never passed on at all,
+        // apart because their remedies are apart.
+        $"helperQuestRows={_answers.Top.Count(r => r.Kind == RecommendationKind.Quest)} " +
+        $"helperQuestSource={_answers.Top.Sum(r => r.Why.OfType<QuestSourceFact>().Count(f => f.Giver.Length > 0 || f.StartZone.Length > 0))} " +
+        $"helperQuestWithheld={_answers.GearQuestWithheld} " +
+        $"helperQuestLine={(HelperPresentation.QuestOffersWithheld(_answers.GearQuestWithheld).Length > 0 ? 1 : 0)} " +
+        $"helperNoSource={_answers.GearNoSource} " +
+        $"helperNoSourceLine={(HelperPresentation.SourcelessUpgrades(_answers.GearNoSource).Length > 0 ? 1 : 0)} " +
+        $"helperQuestOnly={_answers.GearQuestOnly} " +
+        $"helperQuestOnlyLine={(HelperPresentation.QuestOnlyUpgrades(_answers.GearQuestOnly).Length > 0 ? 1 : 0)} " +
+        // **DRA-222 D6: the off-hand rule, in the same two-numbers-one-moment shape** (trap 56).
+        // `helperOffHandRefused` is how many winning offers it removed and `helperOffHandLine`
+        // is whether the room SAID so — a refusal nobody was told about is a row that vanished,
+        // which is the whole of what this slice fixes. `helperRelevant` is the OTHER half of
+        // D6 and is deliberately not a count of refusals, because relevance refuses nothing: it
+        // is how many drawn upgrade lines named a metric this character's classes' own gear
+        // carries, which is 0 for every row when the class is unknown and is what an E2E
+        // asserts the ORDER against.
+        $"helperOffHandRefused={_answers.GearOffHandRefusals} " +
+        $"helperOffHandLine={(HelperPresentation.OffHandRefused(_answers.GearOffHandRefusals).Length > 0 ? 1 : 0)} " +
+        $"helperRelevant={_answers.Top.Sum(r => r.Why.OfType<GearUpgradeFact>().Sum(f => f.RelevantMetrics))} " +
         // **DRA-149 D2: the worn rows that never became an anchor** — the same two-numbers-one-
         // moment shape, and the one it matters most for. `helperWorn` above is the anchor count
         // and it was the ONLY thing this dump said about the dump: twenty anchors from a
