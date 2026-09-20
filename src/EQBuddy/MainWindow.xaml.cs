@@ -337,6 +337,7 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
                 QuestLedger = QuestLedger,
                 QuestCharacterKey = () => QuestCharacterKey,
                 ZoneGraph = ZoneGraph,   // World PR 4: Path tab reads the same graph TravelPlan does
+                GearTargets = () => GearTargets,   // DRA-216 D5: the map window's own answer
                 DropMarker = DropCampMarker,
             });
         ThemeManager.PaletteApplied += _companion.SetTheme;
@@ -3723,6 +3724,9 @@ public partial class MainWindow : Window, ICardContext, IZoneHost
     public SpawnPointLedger SpawnPoints => _spawnPoints;   // IZoneHost, World PR 1
     public SpawnOverrides SpawnOverridesStore => _spawnOverrides;
     public SpawnCatalog SpawnCatalogData => _spawnCatalog;
+    private readonly GearTargetMemo _gearTargets = new();   // DRA-216 D5: one answer, both maps
+    public GearTargetSet GearTargets =>                     // IZoneHost, DRA-216 D5
+        _gearTargets.For(Settings, QuestCharacterKey);
 
     // What the focus hide took down, so the same windows — and only those — come back.
     // Not "everything that is closed now": a window the player shut while alt-tabbed

@@ -64,7 +64,23 @@ internal sealed class MapView
     // projection.
     private readonly List<(FrameworkElement El, double X, double Y, double Dx, double Dy)> _spawnCircles = [];
     private readonly List<SpawnCircle> _circleMeta = [];
-    private (string Zone, int Revision, int TimerHash) _circleStamp = ("\0", -1, 0);
+    private (string Zone, int Revision, int TimerHash, string Targets) _circleStamp = ("\0", -1, 0, "");
+
+    // ---- The target layer (DRA-216 D5, S13/S14) ----------------------------
+    // What this character is going after, joined to THIS zone — the host's answer, read once
+    // per tick and shared by the rings and the panel below (trap 4). A dashed ring goes round
+    // an archived point where one of the goals' creatures has actually been killed; the panel
+    // says which goals, who drops them here, and — for a goal that drops somewhere else — the
+    // zones its page names. No geometry of its own: the point was already archived and already
+    // drawn, and the only new question is whether this dot is one of the player's (S13.1, S20).
+    private IReadOnlyList<GearTargetZone> _targetsHere = [];
+    private readonly StackPanel _targetPanel = new() { Margin = new Thickness(8, 4, 8, 4) };
+    /// <summary>How many rings the map DREW and how many rows the panel did — counted off the
+    /// built tree rather than off the set, because "the join found three" and "the player can
+    /// see three" are different claims and an absent mark photographs as an ordinary map
+    /// (trap 29).</summary>
+    private int _targetRings;
+    private int _targetRows;
 
     /// <summary>"Imminent" = due within this many seconds (David, 2026-08-13).</summary>
     internal const double PulseWindowSeconds = 10;
@@ -81,6 +97,11 @@ internal sealed class MapView
         /// basis the label suppression uses, so a named killed under an alias still
         /// finds its timer and pulses (review 2026-08-13).</summary>
         public required string? NamedName;
+        /// <summary>The tracked goals this point answers (DRA-216 D5) — empty for almost every
+        /// point, which is why it is a list on the meta rather than a flag: the hover has to
+        /// name WHICH goal and WHICH creature, and a point that has seen five mobs would
+        /// otherwise be marked without saying what for.</summary>
+        public IReadOnlyList<GearTargetHit> Targets = [];
         public bool Pulsing;
     }
 
@@ -153,9 +174,14 @@ internal sealed class MapView
         // 2026-08-10): current-zone named with their respawn countdowns, camps
         // pinned from YOUR /loc at kill time or the wiki's location field. All of
         // it from the log and public pages; nothing reads or touches the game.
+        // The target block sits ABOVE the named list, because it is what a player with a goal
+        // opened the map for; the named list keeps its own scroll and its own rebuild clock.
+        var sideStack = new StackPanel();
+        sideStack.Children.Add(_targetPanel);
+        sideStack.Children.Add(_namedPanel);
         var scroll = new ScrollViewer
         {
-            Content = _namedPanel,
+            Content = sideStack,
             VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
         };
         // Zone knowledge sharing lives with the map because the map is where the
@@ -326,7 +352,13 @@ internal sealed class MapView
                 .Where(t => string.Equals(t.Zone, timerZone, StringComparison.OrdinalIgnoreCase))
                 .ToList()
             : [];
+        // DRA-216 D5: the goals for THIS zone, resolved ONCE per tick and handed to both the
+        // rings and the panel — asking twice is how a dot ends up ringed under a heading that
+        // does not mention it (trap 4). The host memoizes the join; this is a filter on it.
+        var targets = _host.GearTargets;
+        _targetsHere = targets.Here(timerZone);
         UpdateSpawnCircles(now, timerZone, zoneTimers);   // before the pins so pins stay on top
+        UpdateTargetPanel(targets, timerZone);            // after the circles: it counts rings
         UpdateNamedPanel(now, zoneTimers);
     }
 
@@ -350,13 +382,23 @@ internal sealed class MapView
         // with no countdown running).
         var timerHash = timers.Aggregate(17,
             (h, t) => h * 31 + StringComparer.OrdinalIgnoreCase.GetHashCode(t.Name));
-        var stamp = showing ? (timerZone, _host.SpawnPoints.Revision, timerHash) : ("", 0, 0);
+        // **DRA-216 D5's store is IN the stamp, folded by CONTENT** (trap 72: the Quests tab
+        // drew the moment before for a whole session because its key carried everything except
+        // the list the feature wrote). Tracking a goal moves no coordinate, no timer and no
+        // kill count, so without this term the rings would be yesterday's for as long as the
+        // player stayed in the zone — and a count could not see one goal swapped for another.
+        var targetKey = string.Join('¦', _targetsHere.Select(
+            t => t.Item + "/" + string.Join(',', t.Creatures)));
+        var stamp = showing
+            ? (timerZone, _host.SpawnPoints.Revision, timerHash, targetKey)
+            : ("", 0, 0, "");
         if (stamp != _circleStamp)
         {
             _circleStamp = stamp;
             foreach (var (el, _, _, _, _) in _spawnCircles) _canvas.Children.Remove(el);
             _spawnCircles.Clear();
             _circleMeta.Clear();
+            _targetRings = 0;
             if (showing)
                 foreach (var p in _host.SpawnPoints.Snapshot(timerZone).Points)
                     BuildCircle(timerZone, p, timers);
@@ -388,14 +430,42 @@ internal sealed class MapView
         ring.SetResourceReference(System.Windows.Shapes.Shape.StrokeProperty,
             named ? "AccentBrush" : "DimBrush");
         ToolTipService.SetInitialShowDelay(ring, 150);
+        // DRA-216 D5: is this dot one of MINE? Asked once here, kept on the meta so the hover
+        // and the ring cannot disagree about it.
+        var hits = GearTargets.AtPoint(_targetsHere, p.Mobs.Keys);
         // Built fresh at open — the countdown must read the clock, not the rebuild.
-        var meta = new SpawnCircle { Ring = ring, Halo = halo, Point = p, NamedName = namedName };
+        var meta = new SpawnCircle
+        {
+            Ring = ring, Halo = halo, Point = p, NamedName = namedName, Targets = hits,
+        };
         ring.ToolTipOpening += (_, _) => ring.ToolTip = CircleTip(zone, meta);
         ring.ContextMenu = CircleMenu(zone, meta);
         _spawnCircles.Add((halo, mx, my, -(d + 8) / 2, -(d + 8) / 2));
         _spawnCircles.Add((ring, mx, my, -d / 2, -d / 2));
         _canvas.Children.Add(halo);
         _canvas.Children.Add(ring);
+        if (hits.Count > 0)
+        {
+            // A SECOND ring outside the circle, never a recolour of it (David's brief gave
+            // the accent to "named" and dim to "ordinary", and overwriting that would make
+            // the map forget which question it was answering). Dashed, so it reads as a mark
+            // somebody put there rather than as more archive; WarnBrush because it is the one
+            // colour on this canvas that already means "this is for you" — the /loc marker
+            // and a DUE named both wear it.
+            var td = d + 10;
+            var target = new System.Windows.Shapes.Ellipse
+            {
+                Width = td, Height = td,
+                StrokeThickness = 1.6,
+                StrokeDashArray = [3, 3],
+                Fill = Brushes.Transparent,
+                IsHitTestVisible = false,   // the circle under it owns the hover and the menu
+            };
+            target.SetResourceReference(System.Windows.Shapes.Shape.StrokeProperty, "WarnBrush");
+            _spawnCircles.Add((target, mx, my, -td / 2, -td / 2));
+            _canvas.Children.Add(target);
+            _targetRings++;
+        }
         if (p.Confirmed)
         {
             // A confirmed spot wears a small filled center dot — "this one is
@@ -535,7 +605,135 @@ internal sealed class MapView
             lines.Add(named
                 ? "Respawn: no running timer"
                 : "Projected respawn: unknown — this zone documents no clock");
+        // DRA-216 D5, LAST: the countdown above is about the POINT, and this is about why the
+        // player is looking at it. Below the respawn rather than above it, because a ringed
+        // point is still first of all a spawn point and the clock is what the hover is for.
+        if (EQBuddy.UI.Shared.GearTargetPresentation.CircleTip(c.Targets) is { Length: > 0 } tip)
+        {
+            lines.Add("");
+            lines.Add(tip);
+        }
         return string.Join("\n", lines);
+    }
+
+    /// <summary>
+    /// **WHAT YOU ARE GOING AFTER, AND WHETHER ANY OF THESE DOTS ANSWER IT** (DRA-216 D5,
+    /// S13/S14).
+    ///
+    /// <para><b>Nothing tracked draws NOTHING</b> — not a heading with an empty state under
+    /// it. That is the Helper room's <c>BuildTracked</c> rule, and it matters more here: the
+    /// map is a surface a player opens for a reason that has nothing to do with gear, and a
+    /// permanent empty block beside the named list would be rent paid by everyone for a
+    /// feature some people use. A set holding only REFUSALS still draws, because a goal
+    /// EQBuddy cannot place is exactly the thing a player would otherwise assume it was
+    /// quietly working on.</para>
+    ///
+    /// <para>The ring count comes off <see cref="_targetRings"/> — what the map DREW — and not
+    /// off a second pass over the archive. "The join found three points" and "three rings are
+    /// on the screen" are two claims, and counting the second is the one that can catch the
+    /// first failing (trap 56).</para>
+    ///
+    /// <para>Rebuilt whenever its own sentences change rather than every tick: nothing in this
+    /// block carries a clock (the countdowns are the named panel's and the circles'), so a
+    /// per-tick rebuild would be churn with no new information in it (trap 46).</para>
+    /// </summary>
+    private string _targetSignature = "\0";
+
+    private void UpdateTargetPanel(GearTargetSet set, string zone)
+    {
+        var showing = _map is not null && !_userPicked && zone.Length > 0 && !set.IsEmpty;
+        var archived = _circleMeta.Count;
+        var signature = showing
+            ? $"{zone}§{_targetRings}/{archived}§" + string.Join('¦', _targetsHere.Select(
+                t => t.Item + "/" + string.Join(',', t.Creatures))) + "§"
+              + string.Join('¦', set.Zones.Select(z => z.Item + "@" + z.Zone)) + "§"
+              + string.Join('¦', set.Refused.Select(r => $"{r.Item}:{r.Why}"))
+            : "";
+        if (signature == _targetSignature) return;
+        _targetSignature = signature;
+
+        _targetPanel.Children.Clear();
+        _targetRows = 0;
+        if (!showing) return;
+
+        var header = new TextBlock
+        {
+            Text = EQBuddy.UI.Shared.GearTargetPresentation.Heading(zone),
+            FontSize = 11, FontWeight = FontWeights.SemiBold,
+            TextTrimming = TextTrimming.CharacterEllipsis,
+            Margin = new Thickness(0, 2, 0, 4),
+            ToolTip = EQBuddy.UI.Shared.GearTargetPresentation.RingTip,
+        };
+        header.SetResourceReference(TextBlock.ForegroundProperty, "WarnBrush");
+        _targetPanel.Children.Add(header);
+
+        foreach (var goal in _targetsHere)
+        {
+            _targetPanel.Children.Add(TargetLine(
+                EQBuddy.UI.Shared.GearTargetPresentation.GoalRow(goal), "TextBrush"));
+            _targetRows++;
+        }
+
+        // The ring count, and then where the rings come from — in that order, because the
+        // number is what a player checks and the caveat is what stops them reading it as a
+        // claim about where the game spawns things.
+        if (_targetsHere.Count > 0)
+        {
+            _targetPanel.Children.Add(TargetLine(
+                EQBuddy.UI.Shared.GearTargetPresentation.PointsHere(_targetRings, archived),
+                "DimBrush"));
+            _targetPanel.Children.Add(TargetLine(
+                EQBuddy.UI.Shared.GearTargetPresentation.PointsNote, "DimBrush"));
+        }
+
+        // Where else each goal drops — the "so where do I go" half, which is the whole answer
+        // for a player standing in a zone none of their goals touch.
+        var elsewhere = set.Zones.Select(z => z.Item)
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .Select(item => EQBuddy.UI.Shared.GearTargetPresentation.Elsewhere(
+                item, GearTargets.Elsewhere(set, item, zone)))
+            .Where(line => line.Length > 0)
+            .ToList();
+        if (elsewhere.Count > 0)
+        {
+            var elseHead = new TextBlock
+            {
+                Text = EQBuddy.UI.Shared.GearTargetPresentation.ElsewhereHeading,
+                FontSize = 11, FontWeight = FontWeights.SemiBold,
+                Margin = new Thickness(0, 8, 0, 4),
+            };
+            elseHead.SetResourceReference(TextBlock.ForegroundProperty, "DimBrush");
+            _targetPanel.Children.Add(elseHead);
+            foreach (var line in elsewhere)
+            {
+                _targetPanel.Children.Add(TargetLine(line, "TextBrush"));
+                _targetRows++;
+            }
+        }
+
+        // The refusals, named and counted (trap 50). The subject of both is EQBuddy's catalog
+        // and never the game — a goal it cannot place is a gap in what we ship.
+        foreach (var refusal in (string[])
+                 [
+                     EQBuddy.UI.Shared.GearTargetPresentation.Unreadable(
+                         [.. set.Refused.Where(r => r.Why == GearTargetGap.Unreadable)
+                             .Select(r => r.Item)]),
+                     EQBuddy.UI.Shared.GearTargetPresentation.NoDropZone(
+                         [.. set.Refused.Where(r => r.Why == GearTargetGap.NoDropZone)
+                             .Select(r => r.Item)]),
+                 ])
+            if (refusal.Length > 0) _targetPanel.Children.Add(TargetLine(refusal, "DimBrush"));
+    }
+
+    private static TextBlock TargetLine(string text, string ink)
+    {
+        var block = new TextBlock
+        {
+            Text = text, FontSize = 10, TextWrapping = TextWrapping.Wrap,
+            Margin = new Thickness(0, 0, 0, 3),
+        };
+        block.SetResourceReference(TextBlock.ForegroundProperty, ink);
+        return block;
     }
 
     /// <summary>Start or stop the imminence pulse per circle. BeginAnimation(null)
@@ -1087,5 +1285,13 @@ internal sealed class MapView
     public string DebugFacts() =>
         $"mapShown={(_shownFile.Length > 0 ? 1 : 0)} mapZones={_zonePick.Items.Count} " +
         $"mapNamedRows={_namedPanel.Children.Count} mapCircles={_spawnCircles.Count} " +
-        $"mapCampPins={_campPins.Count} mapMarkerVisible={(_marker.Visibility == Visibility.Visible ? 1 : 0)}";
+        $"mapCampPins={_campPins.Count} mapMarkerVisible={(_marker.Visibility == Visibility.Visible ? 1 : 0)} " +
+        // **DRA-216 D5: what the JOIN found, what the map DREW, and what the panel SAID** —
+        // three keys because they are three claims (the `helperTracked` trio's shape, one
+        // surface along). A goal that reached the catalog and no ring is trap 20's state and
+        // photographs as an ordinary map (trap 29); rings with no rows is a mark nobody can
+        // read. The goals are folded by NAME because a count cannot see one swapped for
+        // another (trap 72).
+        $"mapTargetGoals={string.Join(',', _targetsHere.Select(t => t.Item.Replace(" ", "")))} " +
+        $"mapTargetRings={_targetRings} mapTargetRows={_targetRows}";
 }

@@ -4131,6 +4131,61 @@ $Shots = [ordered]@{
                            Env = @{}
                            Set = @{ LastSeenVersion = '1.96.1' } }
     'zone-map'        = @{ Title = 'EQBuddy World'; Env = @{ EQBUDDY_MAP = '1' }; Set = @{} }
+    # ---- DRA-216 D5: the map's target layer -------------------------------------------------
+    #
+    #   'zone-map-target' — the same window as 'zone-map' with THREE things staged that the
+    #     row above deliberately has none of: a map pack, a tracked goal, and a kill with a
+    #     fresh /loc behind it. Put the two side by side and the difference is exactly this
+    #     slice plus the pack, which is why the no-pack row stays rather than being upgraded.
+    #
+    #   THE EXHIBIT IS THE SHIPPED CATALOGS' OWN, not a fixture's: Blackened Wand's item page
+    #   names Priest Amiaz in Befallen, and the spawn catalog knows him as one of Befallen's
+    #   nameds. So the ringed dot also carries a REAL learned countdown (S14) rather than the
+    #   ordinary point's projection — a shot staged on an invented creature would photograph
+    #   the estimate arm and say nothing about the one the slice claims (trap 23).
+    #
+    #   THE LINES ARE `AppendLive`, and they have to be. The point archives only where a kill
+    #   lands near a /loc the app has already read, and the startup replay deliberately does
+    #   not re-fire; staged through `Append` this would be a correct no-op photographed as a
+    #   broken feature, which is the trap the AppendLive comment above was written for.
+    #
+    #   PREDICTED (trap 23), before the take:
+    #     * The World window on its Map tab, drawing the staged square with the /loc marker
+    #       at map (-200, -100) — the FromLoc inversion of "100, 200".
+    #     * ONE spawn circle wearing the accent (Priest Amiaz is a catalog named), with a
+    #       DASHED ring around it and no recolouring of the circle itself.
+    #     * A side panel headed "Going after — Befallen" ABOVE "Named — Befallen": one goal
+    #       row naming Blackened Wand and Priest Amiaz, then "1 of your 1 archived spawn
+    #       points here is one of these", then the note saying EQBuddy does not know where
+    #       anything spawns.
+    #     * NO "Drops somewhere else" heading — Blackened Wand's page names Befallen and
+    #       nowhere else, which is the honest single-zone case.
+    #
+    #   TAKEN 2026-09-20 AND EVERY PREDICTION HELD. One thing the prediction did not cover and
+    #   the picture does: the /loc marker, the spawn circle, its target ring and the camp pin
+    #   all land on the SAME spot, because one /loc staged both the position and the kill. That
+    #   is a true consequence of the staging rather than a layout defect — a real session
+    #   /locs in several places — but it does make the dashed ring hard to read at the fitted
+    #   zoom. Said here rather than restyled: the density question is Bevel's, and trap 79's
+    #   rule is that you do not change the product because of what a capture looks like.
+    'zone-map-target' = @{ Title = 'EQBuddy World'
+                           Env = @{ EQBUDDY_MAP = '1' }
+                           Maps = @{ befallen = @(
+                               'L -600.0, -600.0, 0.0, 600.0, -600.0, 0.0, 200, 200, 200'
+                               'L 600.0, -600.0, 0.0, 600.0, 600.0, 0.0, 200, 200, 200'
+                               'L 600.0, 600.0, 0.0, -600.0, 600.0, 0.0, 200, 200, 200'
+                               'L -600.0, 600.0, 0.0, -600.0, -600.0, 0.0, 200, 200, 200'
+                               'P 0.0, 0.0, 0.0, 240, 200, 60, 3, Zone_In') }
+                           AppendLive = @(
+                               'You have entered Befallen.'
+                               'Your Location is 100.00, 200.00, 5.00'
+                               'You have slain Priest Amiaz!')
+                           Set = @{
+                               TrackedUpgrades = @{ 'testchar_test' = @(
+                                   @{ Item = 'Blackened Wand'; Slot = 'PRIMARY'
+                                      Over = 'Rusty Dagger +2'
+                                      TrackedAt = '2026-09-15T20:14:00' }) }
+                           } }
     # THE TRAVELS TAB, which had no recipe until 2026-09-05 and did not need one: it was
     # the one World room the WIDGET drew, on the misc card, so EQBUDDY_EXPAND=1 put it in
     # 'widget-expanded' for free. HUD subtraction cut 2 removed that card, which would have
@@ -4557,6 +4612,31 @@ function Write-Dump([hashtable]$dump) {
     if ($null -eq $dump) { return }
     foreach ($file in $dump.Keys) {
         Set-Content -Path (Join-Path $root "game/$file") -Value $dump[$file] -Encoding UTF8
+    }
+}
+
+# ZONE MAP FILES, into the GAME's own maps folder (DRA-216 D5).
+#
+# **Without this, everything the map DRAWS is switched off and a shot of it is a picture of
+# a blank canvas that looks like a finished review** (trap 22). `MapView` gates its spawn
+# circles, its camp pins, its target rings and the /loc marker on a LOADED map, so the
+# long-standing 'zone-map' row photographs the honest no-pack state and can never show a
+# layer. A target ring cannot be reviewed from it at all.
+#
+# The stem is the map PACK's shortname, which is what `ZoneMapFiles.Resolve` looks for —
+# 'befallen', not 'Befallen'. Written under `game/maps` rather than through `MapFolder` so
+# the precedence under test is the one a player who has never opened "Maps folder…" has.
+#
+# **IT CLEARS FIRST, for `Write-Dump`'s reason above** (trap 51): a map left behind by one
+# row would let a later shot draw circles on a picture its own recipe never asked for, and
+# the picture would be correct for a state that is not the one under test.
+function Write-Maps([hashtable]$maps) {
+    $dir = Join-Path $root 'game/maps'
+    if (Test-Path $dir) { Remove-Item $dir -Recurse -Force -ErrorAction SilentlyContinue }
+    if ($null -eq $maps) { return }
+    New-Item -ItemType Directory -Path $dir -Force | Out-Null
+    foreach ($stem in $maps.Keys) {
+        Set-Content -Path (Join-Path $dir "$stem.txt") -Value $maps[$stem] -Encoding UTF8
     }
 }
 
@@ -5029,6 +5109,7 @@ try {
         Write-Ledger $spec.Ledger
         Write-Raids $spec.Raids
         Write-Dump $spec.Dump
+        Write-Maps $spec.Maps
         # AFTER Write-Dump, which clears the folder before it writes (DRA-149 D5).
         Write-DumpFrom $spec.DumpFrom
         Write-WikiCache $spec.Wiki
