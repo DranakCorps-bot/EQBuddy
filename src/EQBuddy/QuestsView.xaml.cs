@@ -804,6 +804,12 @@ public partial class QuestsView : UserControl
     /// show it is there at all (traps 29 and 79) and only a launched app can answer.</summary>
     private IReadOnlyList<string> _myClasses = [];
 
+    /// <summary>The hover the strip on screen is carrying. Kept beside <see cref="_myClasses"/>
+    /// because the two together are what <see cref="RefreshMyClassesAction"/> compares: the
+    /// source can move under a steady class list, and that changes the words without changing
+    /// a class. Empty is both "no control" and "no hover", which are the same screen.</summary>
+    private string _myClassesTip = "";
+
     /// <summary>
     /// **The <c>My Classes</c> quick-select** (DRA-216 D1, S4.3; acceptance S22 AC 5/6).
     ///
@@ -832,17 +838,33 @@ public partial class QuestsView : UserControl
     /// qualifying log evidence and no statement gets NO button rather than one that does
     /// nothing when clicked — silent no-ops are broken, and a disabled button in this popup
     /// would not look disabled (trap 17).</para>
+    ///
+    /// <para><b>It is called ABOVE the render's signature gate, so it rebuilds only when the
+    /// CONTROL has moved</b> — <see cref="QuestClassLens.MyClassesActionMoved"/> owns that
+    /// decision and the whole of why is written there. Short version: both hosts repaint on a
+    /// timer (the shell's room every tick through <c>PaintNow</c>, the v1 window off the dump's
+    /// <c>PaintOneMoment</c>), <see cref="EqMultiPicker.SetActions"/> clears and news up a fresh
+    /// <c>Button</c> unconditionally, and a control rebuilt once a second cannot hold a hover
+    /// long enough to read or survive a press that straddles a tick (trap 46).</para>
+    ///
+    /// <para>The call stays above the gate on purpose. The gate's signature is about the
+    /// CHECKLIST — identity is not in it and putting it there would make every render fold a
+    /// term only this control reads, which is the opposite of what a signature is for.</para>
     /// </summary>
     private void RefreshMyClassesAction(IReadOnlyList<string> resolved, ClassSource source)
     {
         if (_classPicker is null) return;
-        _myClasses = QuestClassLens.MyClasses(resolved, QuestClassFilter.Classes);
-        _classPicker.SetActions(_myClasses.Count == 0
+        var mine = QuestClassLens.MyClasses(resolved, QuestClassFilter.Classes);
+        var tip = ClassFilterLabel.MyClassesTip(mine, source);
+        if (!QuestClassLens.MyClassesActionMoved(_myClasses, _myClassesTip, mine, tip)) return;
+        _myClasses = mine;
+        _myClassesTip = tip;
+        // Empty REMOVES the control rather than leaving one that does nothing — SetActions'
+        // own contract, and the reason the empty arm goes through here rather than returning
+        // early above: losing an identity has to take the button away with it.
+        _classPicker.SetActions(mine.Count == 0
             ? []
-            : [new PickerAction(
-                ClassFilterLabel.MyClasses,
-                SelectMyClasses,
-                ClassFilterLabel.MyClassesTip(_myClasses, source))]);
+            : [new PickerAction(ClassFilterLabel.MyClasses, SelectMyClasses, tip)]);
     }
 
     private void SelectMyClasses()
@@ -1466,6 +1488,14 @@ public partial class QuestsView : UserControl
         // which is the state where the button is deliberately ABSENT.
         $"questsMyClasses={Dumped(string.Join("+", _myClasses.Select(QuestClassFilter.Abbrev)))} " +
         $"questsMyClassesBtn={_classPicker?.ActionCount ?? -1} " +
+        // HOW MANY TIMES THAT BUTTON HAS BEEN DESTROYED AND REBUILT — a THIRD claim, and the
+        // one neither fact above can make: `questsMyClassesBtn` reads 1 whether the strip has
+        // stood still all session or been replaced on every tick, because a strip rebuilt
+        // every tick holds exactly one button at every moment anybody looks. It shipped at 1
+        // and climbed with the tick, which tore the hover down before it could be read and
+        // swallowed any press that straddled a tick (trap 46). One build per identity, so a
+        // steady character reads 1 forever.
+        $"questsMyClassesBuilds={_classPicker?.ActionBuilds ?? -1} " +
         // THE ROWS ARE STILL THERE — S22 AC 6, "the player can still add/remove other classes
         // afterward". A quick-select that rebuilt or narrowed the list would take that away,
         // and every other fact here would be unmoved by it. Sixteen, before and after.
