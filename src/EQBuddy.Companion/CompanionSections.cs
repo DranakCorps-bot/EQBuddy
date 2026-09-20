@@ -355,7 +355,22 @@ public sealed record CompanionChecklistGroup(
     /// <para>It is <c>GuideChecklistProjection.FoldKey</c> — the same string the desktop's "+"
     /// writes — so the two surfaces are folding the same thing by the same name even though
     /// only one of them persists it.</para></summary>
-    string? Fold = null);
+    string? Fold = null,
+    /// <summary>Why this quest will not finish — a prerequisite the player struck out, named
+    /// (DRA-218, S23 AC 8). Already worded by <c>QuestChecklistLayout.BlockedNote</c>; null
+    /// on every group that is not blocked, which is nearly all of them.
+    ///
+    /// <para><b>Its own field rather than a clause on <see cref="Note"/>.</b> That line is
+    /// the one-word state ("ready", "blocked") beside the guide caption, and it is drawn on a
+    /// FOLDED heading where it has to stay one line. This is a sentence naming another step,
+    /// and it earns a line: a folded group is often the only thing on screen for a quest, and
+    /// the count on that heading is exactly what it is correcting.</para>
+    ///
+    /// <para>Drawn on the phone rather than hovered, for <see cref="Reward"/>'s reason
+    /// (trap 35) — and a sentence the page is SENT but never DRAWS passes every projection
+    /// test there is, which is why <c>SurfaceParityTests</c> carries a page-side row for
+    /// it.</para></summary>
+    string? Blocked = null);
 
 /// <summary>The phone's half of the active-step card. Every field arrives worded; a null or
 /// empty one simply is not drawn, so a step that answers three of the six questions shows
