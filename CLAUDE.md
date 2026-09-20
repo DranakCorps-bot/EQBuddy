@@ -1285,6 +1285,31 @@ after the named guard left with its surface.
     the BASE term alone while the `--not main` term was deleted: the catching case is a
     branch cut from an OLD base that then merges a moved-on `main`.
 
+84. **A return value the code writes about ITSELF is a label, not an observation of
+    which call ran.** `WholeFilePublish.Outcome.Replaced`'s own docstring said it existed
+    so "a test can assert WHICH path ran" — trap 78's rationale, written down and wrong.
+    Reverting the live-name arm from the atomic rename back to `File.Move(overwrite: true)`
+    — DRA-257's defect, exactly — left **all ten tests GREEN**, because the mutant returned
+    `Replaced` too. The only guard that could still see it was a 2-core race test that is
+    green on a 32-core box against the broken code (trap 77), so the revert would have
+    merged clean on every hosted runner. Assert the FACT the call leaves behind
+    (`AtomicRename.Renames`, incremented inside the rename that succeeded), never the value
+    the mutation controls. **Trap 64b one level up:** there the proxy was a condition read
+    off a value, here it is the value itself. A returned enum is only evidence about a
+    branch that ANOTHER branch cannot also return.
+    **Two more came out of the same card.** (a) **The primitive everyone names as the atomic
+    one was the worst of four measured**: `File.Replace` / Win32 `ReplaceFile` went 12 red of
+    12 at ~25% torn reads, adding DRA-225's share-mask failure back on top of the absent name
+    it was supposed to remove — `File.Move(overwrite: true)` is 3 in 8, and only
+    `FileRenameInfoEx` + `FILE_RENAME_FLAG_POSIX_SEMANTICS` reaches zero. Documentation is a
+    place to look; the mask is the measurement. (b) **A counter that says `torn reads: N` for
+    five different defects tells the next seat nothing** — absent name, delete-pending,
+    refused open, zero-byte and half-written have four different fixes, and DRA-257 hid inside
+    DRA-225's admitted residual for two cards because one number covered them all (trap 75,
+    and five rows of the flake ledger say "assert text NOT captured" because that text did not
+    repay capturing). Count BY MODE, print every bucket including the zeroes, and fire each one
+    on demand in the same commit.
+
 New trap discovered the hard way? Add the compact rule here and the novel
 under `docs/ops/claude-archive/traps.md`. That is the whole point.
 
