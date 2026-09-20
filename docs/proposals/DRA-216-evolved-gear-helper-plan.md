@@ -77,7 +77,7 @@ are the useful ones.
 | Req | F | V | Proof |
 |---|---|---|---|
 | S3.1 three-class identity | EXISTING | **EXISTING** | `CharacterClasses.Resolve`, `.Max` |
-| S3.2 stated-class override UI | VERIFY | **VERIFY — Core exists, UI unconfirmed** | `Stated` source in `CharacterClasses` |
+| S3.2 stated-class override UI | VERIFY | **EXISTING — verified 2026-09-20, §2.1** | `HomeRoom.BuildClassLine:531`, `ToggleStated:602`, `WriteStated:615` → `QuestLedgerStore.SetStatedClasses:622` |
 | S4.2 multi-select class lens | ENHANCEMENT | **EXISTING — already shipped** | `UI.Shared/QuestClassLens.Offered` (DRA-181 D4, #689); `EqMultiPicker` |
 | S4.3 `My Classes` quick-select | ENHANCEMENT | **NEW, but trivial** | no quest-lens match; `QuestClassLens` + `Resolve` make it one call |
 | S5.1 Closest-to-Completion lens | NEW | **NEW — lens only** | zero matches in `src/` |
@@ -97,6 +97,37 @@ are the useful ones.
 Founder's suggested sequence are partly done; and S5.2's arithmetic largely
 exists, so Closest-to-Completion is a lens plus a blocker model, not a
 calculation engine.
+
+**Every row above now resolves to EXISTING, a slice in §4, or PARKED in §5.**
+That is the property D7's review depends on: a row still reading VERIFY is a
+requirement nobody owns, and it would let the program finish with the Founder's
+ask unmet and nothing red to say so.
+
+### 2.1 S3.2 — the one VERIFY row, settled: it is already built
+
+Filed as VERIFY because §2's first pass found the `Stated` source in
+`CharacterClasses` but could not find a writer, and a Core enum value with no UI
+behind it is a capability nobody can reach (trap 20). Measured on `main`
+2026-09-20: **the writer exists and is player-facing.**
+
+The Evolved shell's **Home room** draws the class reading and its correction
+(DRA-66) — `HomeRoom.BuildClassLine:531` writes the line, `ToggleStated:602`
+toggles a class chip against `CharacterClasses.Max` (a fourth tick changes
+nothing rather than silently evicting the first pick), and a clear-to-empty door
+sits under the chips (`:598`). Both go through `WriteStated:615` to
+`QuestLedgerStore.SetStatedClasses:622` — the **one** store
+`CharacterClasses.Resolve` honours, so the strip is a writer of that store and
+never a second resolution (trap 33). `MainWindow.xaml.cs:1510` reads the same
+store back through `StatedClassesFor`.
+
+**So S3.2 needs no slice.** It is not one of the six rows whose *label* was
+wrong — the Founder wrote VERIFY and asked; the answer is yes, already built.
+It joins S4.2 and S5.3 as work the program does not have to do. What is *not*
+claimed here: this
+verifies the override exists and persists per character, not that its wording or
+placement has had a Bevel pass. If the Founder's intent was a *new* surface
+rather than the existing Home-room strip, that is a scope question for Helm and
+not a defect in what shipped.
 
 ---
 
