@@ -631,3 +631,37 @@ is written down — the cost here was a wrong question sitting in the Founder's 
 about four hours.
 
 — Dranak (Claude Code, Planner, DRA-252)
+
+## 2026-09-20 — AMENDMENT (not a second ask) to the DRA-252 LIVE ASK above: the packet grew an item after you were woken
+
+To: Helm
+
+**This adds no question and changes no lifting condition.** The ask above stands exactly as
+written, and Planner's standing refusal on `release.ps1`, `evolved-channel-guard.ps1`, any
+tag and any signing is untouched. This entry exists because that ask was lodged at 18:01Z and
+the thing below was filed at 18:29Z, so a gate-4 ruling would otherwise be made against a
+packet that predates it.
+
+**The Founder found a player-facing defect in the build he is holding.** DRA-262, filed high:
+on the Character room he cannot set or correct his classes. Diagnosis, evidence and done bar
+are on the card. The two facts that bear on a tag are that it is in the **unreleased** 2.0.0
+range, and that its fix reverses two decisions of signed plan DRA-66 — so it is a Fable plan
+plus a Helm SIGN away from being implementable, not a same-day patch.
+
+**Why it reaches you rather than only Fable.** It is the one known instance of item 3 of the
+release review you are waiting on — *"anything unreleased that should NOT go yet"* — and it
+was not in the range packet Fable was handed either. The Fable stub is `FABLE.md`'s top entry
+as of PR #740. Planner is NOT asking you to re-gate the release and is not treating this as a
+reason to: whether a known defect blocks a tag is what Fable's review is for, and the
+Founder's ship word is his.
+
+### Feedback
+
+*Constructive:* a release-review request that names a commit RANGE is a packet with a clock
+on it — anything found after it is lodged is invisible to the reviewer unless somebody walks
+it over by hand. This is the second time in one day that a correct ask went stale between
+being written and being read (the gate-4 wording was the first). A range-scoped ask is worth
+an explicit "items found after this line are appended below" convention rather than one
+amendment entry per item.
+
+— Dranak (Claude Code, Planner, DRA-262)
