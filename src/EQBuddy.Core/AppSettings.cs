@@ -817,6 +817,29 @@ public sealed class AppSettings
     /// </summary>
     public Dictionary<string, bool> HelperGearQuests { get; set; } = [];
 
+    /// <summary>
+    /// The gear upgrades this character has decided to go and get (DRA-216 D4, S12).
+    ///
+    /// <para><b>It is a LIST OF GOALS and not a selection, which is what makes it the one gear
+    /// key here that is written by a row rather than by a picker.</b> Every other Helper key on
+    /// this object narrows what the room answers; this one records a decision the room's answers
+    /// are no longer allowed to lose — see <see cref="TrackedUpgrade"/> for why a goal must
+    /// outlive the sweep that offered it.</para>
+    ///
+    /// <para>Per character, for <see cref="HelperGearQuests"/>' reason one key up: a level-8 alt
+    /// and a main farming raid zones are not going after the same thing.</para>
+    ///
+    /// <para><b>The item is the BASE name</b> — folded through the one seam by
+    /// <see cref="TrackedUpgradeStore.Key"/>, so a profile cannot come to hold two spellings of
+    /// one goal. The worn item beside it keeps the DUMP's spelling, "+N" and all, exactly as
+    /// <see cref="HelperWornPicks"/> does and for the same reason: it is the string on the
+    /// player's own character sheet.</para>
+    ///
+    /// <para>An empty list REMOVES the key rather than being stored, the idiom every selection
+    /// above keeps.</para>
+    /// </summary>
+    public Dictionary<string, List<TrackedUpgrade>> TrackedUpgrades { get; set; } = [];
+
     /// <summary>Color theme key (see EQBuddy.UI.Shared.ThemeCatalog); defaults to the
     /// original parchment-and-brass look so existing installs don't change on upgrade.</summary>
     public string Theme { get; set; } = "ParchmentBrass";

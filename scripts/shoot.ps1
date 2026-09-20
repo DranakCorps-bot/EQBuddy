@@ -1778,6 +1778,50 @@ $Shots = [ordered]@{
                                HelperWornPicks = @{ 'testchar_test' = @('Cloth Cap') }
                                HelperGearIntent = @{ 'testchar_test' = 'ReplaceSlot' }
                            } }
+    # ---- DRA-216 D4: the goal that outlived its offer --------------------------------------
+    #
+    #   'shell-helper-tracked' — 'shell-helper-gear' with TWO tracked goals seeded into the
+    #     profile, and the pairing is what makes it evidence: put it beside 'shell-helper-gear'
+    #     and the only difference is the block this slice adds.
+    #
+    #   THE STAGED GOALS ARE DELIBERATELY NOT IN TODAY'S ANSWERS. A Blade of Carnage and a
+    #   Wurmslayer are not upgrades over a Cloth Cap in HEAD or a Cloth Choker in NECK, so the
+    #   sweep below offers neither — which is exactly the state the slice exists for. A shot
+    #   staged so that the block and the answers named the same item would photograph the easy
+    #   case and say nothing about the hard one (trap 23: a wrong-shape staging photographs a
+    #   real state of something else).
+    #
+    #   PREDICTED (trap 23), before the take:
+    #     * A block headed "What you are going after", ABOVE "Worth doing next" and below the
+    #       Farm Gear block — the room's own order, because a goal outlives the list under it.
+    #     * Its note, saying the two things it does NOT claim: nothing ticks itself off, and
+    #       EQBuddy has no numbers for what a "+N" adds to either side.
+    #     * TWO rows, NEWEST FIRST — Wurmslayer (17 Sep) above Blade of Carnage (15 Sep) —
+    #       each naming what it replaces and its slot, each with "Tracked ✓" and a Gear door.
+    #     * Every item line under the answers gains a "Track" of its own, and NONE of them
+    #       reads "Tracked ✓", because neither staged goal is in today's list.
+    #
+    #   THE HEIGHT IS PART OF THE STAGING, for 'shell-helper-gear-who''s own reason one block
+    #   along: this slice adds a heading, a four-line note and two rows ABOVE the answers, so at
+    #   the default 946x633 the Track controls this shot is half about would be below the fold.
+    #   The density question stays with Bevel and is not restyled from here.
+    'shell-helper-tracked' = @{ Title = 'EQBuddy — Helper'
+                           Env = @{ EQBUDDY_SHELL = 'helper'; EQBUDDY_SHELL_SIZE = '946x880' }
+                           Dump = @{ 'Testchar_test-Inventory.txt' = @(
+                               "Location`tName`tID`tCount`tSlots"
+                               "Head`tCloth Cap`t0`t1`t0"
+                               "Neck`tCloth Choker`t0`t1`t0") }
+                           Set = @{
+                               HelperGoals = @{ 'testchar_test' = @('FarmGear') }
+                               HelperWornPicks = @{ 'testchar_test' = @('Cloth Cap') }
+                               TrackedUpgrades = @{ 'testchar_test' = @(
+                                   @{ Item = 'Blade of Carnage'; Slot = 'PRIMARY'
+                                      Over = 'Rusty Short Sword +3'
+                                      TrackedAt = '2026-09-15T20:14:00' }
+                                   @{ Item = 'Wurmslayer'; Slot = 'SECONDARY'
+                                      Over = 'Shiny Brass Shield +6'
+                                      TrackedAt = '2026-09-17T21:02:00' }) }
+                           } }
     # ---- DRA-84 D2: the band gate visibly refusing ----------------------------------------
     #
     #   'shell-helper-gear-band' — 'shell-helper-gear' with ONE thing added: a stated level in

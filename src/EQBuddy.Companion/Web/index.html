@@ -1904,6 +1904,17 @@ function boot() {
       return;
     }
 
+    // DRA-216 D4: what the player is going after, ABOVE the answers — the desktop room's own
+    // order, because a tracked goal outlives whatever the list below says today. It is
+    // read-only here: `trackedOnPc` is the tracking control ported as intent (trap 35), and
+    // every string is one HelperPresentation built and the wire carried (trap 32).
+    if ((h.tracked || []).length) {
+      if (h.trackedHeading) wrap.appendChild(el("h3", "group", h.trackedHeading));
+      if (h.trackedNote) wrap.appendChild(el("div", "sub-head", h.trackedNote));
+      for (const row of h.tracked) wrap.appendChild(el("div", "note", row));
+      if (h.trackedOnPc) wrap.appendChild(el("div", "caption", h.trackedOnPc));
+    }
+
     wrap.appendChild(el("h3", "group", h.answersHeading));
     // The values line and the level disclosure, in the order the room says them: where the
     // answers come from, then which level was weighed and where THAT came from. A ranking

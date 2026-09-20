@@ -1934,6 +1934,82 @@ public class ShellHostTests
     }
 
     /// <summary>
+    /// **A TRACKED UPGRADE COMES BACK AFTER A RESTART, AND THE ROOM DRAWS IT** (DRA-216 D4,
+    /// S12/S18.3).
+    ///
+    /// <para>The whole claim of the slice is that a goal outlives things — the sweep that
+    /// offered it, and the process that was running when the player clicked. The unit suite
+    /// proves the store and the serializer; only a launched app can prove the profile written
+    /// by one run is READ by the next under the key the room writes under, which is the
+    /// <c>helperGoals</c> row's own lesson one store along (trap 20).</para>
+    ///
+    /// <para><b>Three facts from one moment</b> (trap 56), because they are three claims:
+    /// <c>helperTracked</c> is what the store held, <c>helperTrackedRows</c> is what the block
+    /// DREW — an absent block photographs as an unremarkable room (trap 29) — and
+    /// <c>helperTrackButtons</c> is whether the player has a way to undo it. A list you cannot
+    /// get out of is the silent no-op wearing a feature.</para>
+    ///
+    /// <para>This fixture has no inventory dump, so the sweep offers nothing and every Track
+    /// control counted here belongs to the tracked rows themselves. That is deliberate: it is
+    /// the state the slice exists for — the offer is gone and the goal is not.</para>
+    /// </summary>
+    [Fact]
+    public void ATrackedUpgradeComesBackUnderTheKeyTheRoomWritesUnderAndIsDrawn()
+    {
+        var key = $"{AppHarness.Character}_{AppHarness.Server}".ToLowerInvariant();
+        var day = new DateTime(2026, 9, 15, 20, 14, 0, DateTimeKind.Local);
+        using var app = new AppHarness(
+            configureSettings: s =>
+            {
+                s.HelperGoals[key] = [nameof(HelperGoal.FarmGear)];
+                s.TrackedUpgrades[key] =
+                [
+                    new TrackedUpgrade("Blade of Carnage", "PRIMARY", "Rusty Short Sword +3", day),
+                    new TrackedUpgrade(
+                        "Wurmslayer", "SECONDARY", "Shiny Brass Shield +6", day.AddDays(2)),
+                ];
+            },
+            environment: OpenOn("helper"));
+        app.Launch();
+
+        app.WaitForDump("shellPage", "helper", "the shell to land on the Helper room");
+        // Newest first, which is the store's own order and not the profile's — the room draws
+        // what it is given and decides no order of its own.
+        app.WaitForDump("helperTracked", "Wurmslayer,BladeofCarnage",
+            "both goals to come back newest-first under the room's own character key");
+
+        // …and the block actually drew them, with a way out of each.
+        Assert.Equal(2, app.DumpValue("helperTrackedRows"));
+        Assert.Equal(2, app.DumpValue("helperTrackButtons"));
+        // The state this slice is FOR: no dump, so nothing in this run offers either item, and
+        // the goals are there anyway.
+        Assert.Equal(0, app.DumpValue("helperWorn"));
+        Assert.Equal(0, app.DumpValue("helperGearWhy"));
+        Assert.Equal(0, app.DumpValue("helperDeadDoors"));
+    }
+
+    /// <summary>The committed negative beside it: a profile nobody has tracked anything in
+    /// draws no block at all — not a heading over an empty list, which is a control that is not
+    /// there (trap 29 read the other way round).</summary>
+    [Fact]
+    public void AProfileWithNothingTrackedDrawsNoTrackedBlock()
+    {
+        var key = $"{AppHarness.Character}_{AppHarness.Server}".ToLowerInvariant();
+        using var app = new AppHarness(
+            configureSettings: s => s.HelperGoals[key] = [nameof(HelperGoal.FarmGear)],
+            environment: OpenOn("helper"));
+        app.Launch();
+
+        app.WaitForDump("shellPage", "helper", "the shell to land on the Helper room");
+        app.WaitForDump("helperGoals", nameof(HelperGoal.FarmGear),
+            "the gear goal to be the one this room is answering");
+
+        Assert.Equal("", app.DumpText("helperTracked"));
+        Assert.Equal(0, app.DumpValue("helperTrackedRows"));
+        Assert.Equal(0, app.DumpValue("helperTrackButtons"));
+    }
+
+    /// <summary>
     /// **THE FACE COUNTS INSTEAD OF LISTING ONCE THE NAMES STOP FITTING** — #184's cap, on the
     /// Helper's own noun, from a launched app (DRA-71 D2).
     ///

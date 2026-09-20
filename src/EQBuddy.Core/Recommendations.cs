@@ -1072,6 +1072,25 @@ public sealed record HelperInputs(
     /// producer of the pick (trap 4).</para>
     /// </summary>
     public IReadOnlyList<Tradeskill> Professions { get; init; } = [];
+
+    // ---- Track Upgrade (DRA-216 D4, S12) ------------------------------------------------
+
+    /// <summary>
+    /// The upgrades this character has decided to go and get —
+    /// <see cref="TrackedUpgradeStore.For"/>'s own answer, newest first.
+    ///
+    /// <para><b>The ranking does not read it, and it rides here anyway</b>, which is worth
+    /// saying out loud. <c>HelperSources.Gather</c> is the ONE assembly point the desktop room
+    /// and the phone both go through, and a goal list read by each surface separately is two
+    /// callers reading one store at slightly different moments — whichever ran last wins
+    /// (trap 33). It is carried rather than ranked because a tracked goal is a DECISION the
+    /// player made, not evidence: weighing it would let the room quietly re-rank itself toward
+    /// whatever was clicked last, and no engine in this file has been asked for that.</para>
+    ///
+    /// <para>Empty is the ordinary state — nobody has tracked anything — and it draws nothing
+    /// at all rather than an empty block.</para>
+    /// </summary>
+    public IReadOnlyList<TrackedUpgrade> Tracked { get; init; } = [];
 }
 
 /// <summary>The whole answer for one set of chips.</summary>

@@ -1090,6 +1090,77 @@ public static class HelperPresentation
         "Off by default: farming a camp and running a quest chain are different evenings. "
         + "Turn it on and items a quest hands out are offered too, each with its quest named.";
 
+    // ---- Track Upgrade (DRA-216 D4, S12) ------------------------------------------------
+
+    /// <summary>The tracked block's heading. It names the PLAYER's decision rather than
+    /// EQBuddy's list, because that is whose it is — everything else in this room is something
+    /// EQBuddy worked out.</summary>
+    public const string TrackedHeading = "What you are going after";
+
+    /// <summary>
+    /// **WHAT A TRACKED UPGRADE IS, AND THE TWO THINGS IT IS NOT** — said once under the block
+    /// rather than on each row (trap 73), in <see cref="GearBaseClaimNote"/>'s own idiom.
+    ///
+    /// <para>It has to carry the park out loud. S8 is parked, so EQBuddy holds no enhanced-item
+    /// stats at all and cannot tell anybody whether the base item they are chasing beats the
+    /// "+N" they are wearing; and with no honest completion condition, a goal ends when the
+    /// player says it does. A list that quietly ticked itself off — or that implied a
+    /// comparison EQBuddy cannot make — would be worse than no list, because the player would
+    /// act on it.</para>
+    /// </summary>
+    public const string TrackedNote =
+        "These stay here until you untrack them. EQBuddy does not tick one off for you: it "
+        + "compares the base item on eqlwiki against the base item you are wearing, and it has "
+        + "no numbers at all for what a \"+N\" adds to either — so whether the one you are "
+        + "chasing beats the one you have is your call, not ours.";
+
+    /// <summary>
+    /// One tracked row: what you are going after, what it was offered against, and when you
+    /// decided.
+    ///
+    /// <para><b>The anchor is in the sentence for the reason it is in
+    /// <see cref="GearUpgradeFact"/>'s:</b> an upgrade with nothing behind it is a claim about
+    /// the game rather than about this character, and that is the line <c>GearUpgrades</c>'
+    /// lock draws. The worn item keeps the DUMP's spelling — the "+N" the player can see on
+    /// their own character sheet — and nothing here does arithmetic with it.</para>
+    ///
+    /// <para>The date is absolute and never relative: "3 days ago" drifts on a clock, and every
+    /// surface that folds this sentence into a repaint key would then move on its own (trap 8).
+    /// It is the decision's own stamp, which is the one fact about a goal that nothing else in
+    /// the room can recover.</para>
+    /// </summary>
+    public static string TrackedRow(TrackedUpgrade tracked)
+    {
+        var over = tracked.Over is { Length: > 0 } worn
+            ? $" — to replace {worn}{(tracked.Slot is { Length: > 0 } s ? $" ({Slot(s)})" : "")}"
+            : "";
+        return $"{tracked.Item}{over}. Tracked {tracked.TrackedAt:d MMM yyyy}.";
+    }
+
+    /// <summary>The per-row control's label, both ways round. A toggle whose label did not
+    /// change is a control that lies about what it just did.</summary>
+    public static string TrackLabel(bool tracked) => tracked ? "Tracked ✓" : "Track";
+
+    /// <summary>What the control does, on the hover the desktop gives it. It names the ITEM,
+    /// because a row carries several gear lines and a tip reading "track this" would not say
+    /// which — and it says where the row goes, which is the whole point of the block.</summary>
+    public static string TrackTip(bool tracked, string item) => tracked
+        ? $"Stop going after {item}. It leaves \"{TrackedHeading}\" — nothing else changes, and "
+          + "you can track it again from here."
+        : $"Go after {item}. It is added to \"{TrackedHeading}\" above and stays there, whatever "
+          + "this list says next time.";
+
+    /// <summary>
+    /// **WHERE A TRACKED GOAL IS CHANGED, for the surface that cannot change it** (trap 35).
+    ///
+    /// <para>Tracking writes the profile the PC is playing from, so the phone ports the list as
+    /// what it is — a read of a decision made on the PC — rather than growing a control that
+    /// writes back. It is the <c>PicksOnPc</c> rule one block along, and it is drawn ONLY where
+    /// there is a list to explain.</para>
+    /// </summary>
+    public const string TrackedOnPc =
+        "Tracked on your PC, from the answers below — each gear line there has a Track button.";
+
     /// <summary>
     /// **THE SENTENCE UNDER A MONEY ANSWER**, and it is the twin of
     /// <see cref="GearCatalogNote"/> above (DRA-71 D7, plan P9).
