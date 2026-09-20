@@ -11,4 +11,10 @@
     <ProjectReference Include="..\EQBuddy.Core\EQBuddy.Core.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <!-- So WholeFilePublishTests can assert that a publish over a live name actually went
+         through AtomicRename (DRA-257). Core and Companion already do this. -->
+    <InternalsVisibleTo Include="EQBuddy.Tests" />
+  </ItemGroup>
+
 </Project>
