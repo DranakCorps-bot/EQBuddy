@@ -310,10 +310,23 @@ public static class HelperPresentation
         // (GearBaseClaimNote) and never templated onto the row: eight rows repeating one
         // caveat is the distinct-count tell trap 73 is about, and it would bury the one thing
         // each row is actually for.
+        // **THE PROC CLAUSE IS A REPORT, AND ITS GRAMMAR IS THE RULING** (DRA-241, Helm ruling
+        // 27302878). It is its own sentence AFTER the comparison rather than another clause
+        // inside it, because everything before that full stop is something EQBuddy MEASURED and
+        // this is something the item's page SAYS. "+12 AC and it procs Ykesha" would read as a
+        // second entry on one list of improvements — which is pricing it, at a weight the reader
+        // supplies. "It procs Ykesha." reads as what it is.
+        //
+        // No adverb and no conjunction: not "also", not "and it even", not "with a Ykesha proc
+        // on top". Every one of those is a valuation, and the one thing this sentence may not do
+        // is imply how much the proc is worth. The caveat saying EQBuddy cannot is under the
+        // block, once (GearProcNote) — never templated onto the row, for the reason the "+N"
+        // caveat above it is not (trap 73).
         GearUpgradeFact f =>
             $"{f.Item} is a better base item than the {f.Over} in your {Slot(f.Slot)} — "
             + $"{Gain(f)}."
-            + Who(f.Who, f.WhoWithheld),
+            + Who(f.Who, f.WhoWithheld)
+            + (f.Proc.Length > 0 ? $" It procs {f.Proc}." : ""),
 
         // **THE FARM MATERIALS LINE** (DRA-149 D3, plan P4; the Founder's FAIL item 3a).
         //
@@ -1225,6 +1238,32 @@ public static class HelperPresentation
         + "carries its \"+N\" on top, and the wiki does not state what that is worth — so at "
         + "the same \"+\" the listed item wins, and EQBuddy cannot tell you whether it still "
         + "wins against yours as it stands.";
+
+    /// <summary>
+    /// **WHAT A PROC IS AND IS NOT DOING TO THE ORDER — SAID ONCE, UNDER THE BLOCK** (DRA-241,
+    /// Helm ruling <c>27302878</c>: report only, never price).
+    ///
+    /// <para><see cref="GearBaseClaimNote"/>'s twin, and it exists for the opposite reason. That
+    /// one says a number EQBuddy compared is incomplete. This one says a fact EQBuddy PRINTED
+    /// was never in the comparison at all — because there is no number anywhere for what a proc
+    /// is worth, and inventing an exchange rate between a Ykesha proc and +40 Mana is the line
+    /// the Gear Locker's lock draws.</para>
+    ///
+    /// <para><b>Without it the rows are silently misleading in the helpful direction.</b> A
+    /// player reading "It procs Ykesha." under a ranked list will reasonably assume the ranking
+    /// knew that — every other sentence on those rows IS something the comparison weighed. The
+    /// sentence's whole job is to say the proc rode along beside the ranking rather than inside
+    /// it, and to hand the judgement back rather than make it.</para>
+    ///
+    /// <para><b>Once per block, never per row</b> (trap 73), and drawn only where a row actually
+    /// names a proc — a caveat about procs over a list with none in it is the disclosure-line
+    /// rule broken one caption along.</para>
+    /// </summary>
+    public const string GearProcNote =
+        "Where a weapon's page names a combat proc, it is printed on the row — and it counted "
+        + "for nothing in the order above. EQBuddy has no way to say what a proc is worth "
+        + "against armour class or mana, so it tells you which weapons have one and leaves that "
+        + "trade to you.";
 
     /// <summary>Said when the sweep's per-anchor cap held upgrades back — the one count that
     /// cannot ride a row, because it is spent before any row exists (trap 50). The door under

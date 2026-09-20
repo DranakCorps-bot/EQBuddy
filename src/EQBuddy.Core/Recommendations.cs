@@ -257,9 +257,19 @@ public sealed record ZoneOutgrownFact(
 /// and not true enough to say out loud. So <paramref name="GainMetric"/> is the visible half:
 /// the row names the biggest RELEVANT improvement rather than the biggest one, which is a
 /// better sentence with no new claim in it.</para></param>
+/// <param name="Proc">The combat proc the item's own page names, or "" (DRA-241, Helm ruling
+/// <c>27302878</c>). <see cref="GearUpgrade.Proc"/>, carried rather than re-read.
+///
+/// <para><b>The one fact on this record that is DRAWN and weighed by nothing.</b>
+/// <paramref name="RelevantMetrics"/> is its mirror image — that one decides the order and draws
+/// no sentence, because saying it would be a claim about what a class needs; this one decides no
+/// order and draws a sentence, because a proc is the page's own word about the item and there is
+/// no number anywhere for what it is worth. Between them they are the two halves of "report it,
+/// never price it".</para></param>
 public sealed record GearUpgradeFact(
     string Item, string Over, string Slot, string GainMetric, double GainBy,
-    IReadOnlyList<string> Who, int WhoWithheld = 0, int RelevantMetrics = 0)
+    IReadOnlyList<string> Who, int WhoWithheld = 0, int RelevantMetrics = 0,
+    string Proc = "")
     : WhyFact(Evidence.Catalog);
 
 /// <summary>
@@ -3412,7 +3422,11 @@ public static partial class Recommendations
         {
             why.Add(new GearUpgradeFact(
                 upgrade.Item, upgrade.Over, upgrade.Slot, upgrade.GainMetric, upgrade.GainBy,
-                who.Named, who.Withheld, upgrade.RelevantMetrics));
+                who.Named, who.Withheld, upgrade.RelevantMetrics,
+                // DRA-241. Carried onto the fact AFTER the comparer above has already chosen
+                // which candidates this row names — the proc is in neither ordering key, so it
+                // cannot move a row up into the cap nor keep one out of it.
+                upgrade.Proc));
             if (who.Seen is { } fact) why.Add(fact);
         }
 

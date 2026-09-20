@@ -2726,6 +2726,14 @@ public class ShellHostTests
         // cloth cap and a cloth robe, not a weapon. Pinning the zero is what keeps the
         // paragraph above honest: without it, "the re-rank did this" would be an assumption.
         Assert.Equal(0, app.DumpValue("helperOffHandRefused"));
+        // **DRA-241, stood down here for the SAME reason** — a cloth cap does not proc. Both
+        // numbers come from the one Build (trap 56): no drawn row names a proc, so the caveat
+        // under the block is not drawn either. The PAIR is the assertion — it is what proves
+        // the caveat cannot appear over a list with no proc in it, and a build that drew it on
+        // "a gear row exists" rather than "a row names a proc" reddens the second of these
+        // while the first stays honest.
+        Assert.Equal(0, app.DumpValue("helperGearProcRows"));
+        Assert.Equal(0, app.DumpValue("helperGearProcNote"));
 
         // The SCREEN's claim beside the engine's, and the personal half staying silent
         // because this fixture has never looted one of these.

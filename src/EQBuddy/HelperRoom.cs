@@ -185,6 +185,11 @@ internal sealed class HelperRoom : Grid, IShellRoom
     private bool _levelDoor;
     private bool _moneyNote;
     private bool _gearBaseNote;
+    /// <summary>Whether the block drew the proc caveat (DRA-241). Its own flag beside
+    /// <see cref="_gearBaseNote"/> rather than folded into it: they are gated on different
+    /// questions — a gear row EXISTS versus a gear row NAMES A PROC — and a dump that could not
+    /// tell them apart could not prove the caveat stays off a list of helms.</summary>
+    private bool _gearProcNote;
     /// <summary>What this character is going after (DRA-216 D4), captured from the SAME bundle
     /// the answers were ranked from so the block and the row buttons beside it cannot disagree
     /// about what is tracked (trap 56).</summary>
@@ -394,6 +399,7 @@ internal sealed class HelperRoom : Grid, IShellRoom
         _levelDoor = false;
         _moneyNote = false;
         _gearBaseNote = false;
+        _gearProcNote = false;
         _trackedRows = 0;
         _trackButtons = 0;
 
@@ -1177,6 +1183,17 @@ internal sealed class HelperRoom : Grid, IShellRoom
         if (_gearBaseNote)
             block.Children.Add(Line(HelperPresentation.GearBaseClaimNote, Role.Caption));
 
+        // **The proc caveat, on the same rule one caveat along** (DRA-241, Helm ruling
+        // 27302878). Gated on a row actually NAMING a proc rather than on a gear row existing:
+        // most gear rows are armour, and a sentence about procs over a list of helms is the
+        // disclosure-line rule broken one caption along. The two are not folded together —
+        // the one above says a number EQBuddy compared is incomplete, this says a fact EQBuddy
+        // printed was never in the comparison, and a reader needs to know which is which.
+        _gearProcNote = _answers.Top.Any(r =>
+            r.Why.Any(w => w is GearUpgradeFact { Proc.Length: > 0 }));
+        if (_gearProcNote)
+            block.Children.Add(Line(HelperPresentation.GearProcNote, Role.Caption));
+
         // The cap, out loud when it held something back.
         if (HelperPresentation.Cap(_answers.Withheld) is { Length: > 0 } cap)
             block.Children.Add(Line(cap, Role.Caption));
@@ -1832,6 +1849,13 @@ internal sealed class HelperRoom : Grid, IShellRoom
         $"helperCatalogValue={_answers.Top.Count(r => r.Why.OfType<CatalogValueFact>().Any())} " +
         $"helperMoneyNote={(_moneyNote ? 1 : 0)} " +
         $"helperGearBaseNote={(_gearBaseNote ? 1 : 0)} " +
+        // **DRA-241, and BOTH numbers from the one Build** (trap 56). `helperGearProcRows` is
+        // how many drawn rows carry a proc and `helperGearProcNote` whether the caveat under
+        // them was drawn — "the engine found procs" and "the screen says EQBuddy did not price
+        // them" are different claims, and the pair is what proves the caveat is never over a
+        // list with no proc in it.
+        $"helperGearProcRows={_answers.Top.Count(r => r.Why.OfType<GearUpgradeFact>().Any(f => f.Proc.Length > 0))} " +
+        $"helperGearProcNote={(_gearProcNote ? 1 : 0)} " +
         // **DRA-71 D8.** The store's claim and the screen's claim, from one Build (trap 56):
         // `helperSkills` is how many profession standings the LEDGER holds and
         // `helperProfKnown` how many of the DRAWN rows carried a number. A skill-up that

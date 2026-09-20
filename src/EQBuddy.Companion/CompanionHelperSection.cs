@@ -49,6 +49,15 @@ namespace EQBuddy.Companion;
 /// <param name="GearBaseNote">The base-vs-base caveat, when a gear row was built (DRA-149 D1).
 /// Empty otherwise, and drawn from what was BUILT rather than from which goal is ticked — the
 /// money note's rule beside it, for the money note's reason.</param>
+/// <param name="GearProcNote">The proc caveat, when a gear row actually NAMES a proc (DRA-241,
+/// Helm ruling <c>27302878</c>). Empty otherwise — gated on a stricter question than
+/// <paramref name="GearBaseNote"/> beside it, because most gear rows are armour and a sentence
+/// about procs over a list of helms would be the disclosure-line rule broken one caption along.
+///
+/// <para>The proc itself rides the row's own why-line and needs no field here. This does, because
+/// it is the sentence saying the ranking never weighed it — and a phone drawing "It procs Ykesha."
+/// under a ranked list WITHOUT it would be telling the player something the PC does not: that the
+/// order knew.</para></param>
 /// <param name="Cap">What the answer cap held back, when it held anything (trap 50).</param>
 /// <param name="GearWithheld">What the gear sweep's own per-anchor cap held back. A separate
 /// field because it is spent before any row exists and so cannot ride one.</param>
@@ -141,6 +150,8 @@ public sealed record CompanionHelperSection(
     IReadOnlyList<CompanionHelperAnswer> Answers,
     string MoneyNote,
     string GearBaseNote,
+    // DRA-241: beside the base-vs-base caveat, gated on a stricter question. See the param docs.
+    string GearProcNote,
     string Cap,
     string GearWithheld,
     string GearBandRefused,
