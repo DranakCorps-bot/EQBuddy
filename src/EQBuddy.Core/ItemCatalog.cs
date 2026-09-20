@@ -106,16 +106,26 @@ public sealed class ItemCatalog
         public string? MerchantCondition { get; set; }
 
         /// <summary>The structured stats in the shape the Gear Locker compares.</summary>
-        public ItemStatsBlock ToStatsBlock() => new()
+        public ItemStatsBlock ToStatsBlock()
         {
-            Slots = Slots,
-            Ac = Ac, Dmg = Dmg, Delay = Delay, Hp = Hp, Mana = Mana,
-            Attributes = Attributes is null
-                ? new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase)
-                : new Dictionary<string, int>(Attributes, StringComparer.OrdinalIgnoreCase),
-            Classes = Classes ?? [],
-            Skill = Skill,
-        };
+            // DRA-241. Every other field here is a COLUMN the promoter already wrote; the
+            // effect is not one, so it is read off `StatsText` — the raw block this record
+            // already ships — through `ItemStatsBlock`'s own rule rather than through a copy
+            // of it (trap 4). Adding a column instead would mean regenerating the committed
+            // catalog for a fact its own text already carries.
+            var (effect, mentionsEffect) = ItemStatsBlock.ReadEffect(StatsText);
+            return new ItemStatsBlock
+            {
+                Slots = Slots,
+                Ac = Ac, Dmg = Dmg, Delay = Delay, Hp = Hp, Mana = Mana,
+                Attributes = Attributes is null
+                    ? new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase)
+                    : new Dictionary<string, int>(Attributes, StringComparer.OrdinalIgnoreCase),
+                Classes = Classes ?? [],
+                Skill = Skill,
+                Effect = effect, MentionsEffect = mentionsEffect,
+            };
+        }
     }
 
     public sealed class Root { public List<Record> Items { get; set; } = []; }

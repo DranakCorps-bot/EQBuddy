@@ -48,6 +48,13 @@ public static partial class CompanionProjection
         // phone says so wherever a gear row was built — once for the block, never per row.
         var gearBase = answers.Top.Any(r => r.Why.Any(w => w is GearUpgradeFact));
 
+        // DRA-241, the same rule one caveat along — and on a STRICTER question than `gearBase`
+        // above, which is the desktop room's gate verbatim: the proc clause rides the why-line
+        // of a WEAPON row, and most gear rows are armour. Reusing `gearBase` would put a
+        // sentence about procs over a list of helms.
+        var gearProc = answers.Top.Any(r =>
+            r.Why.Any(w => w is GearUpgradeFact { Proc.Length: > 0 }));
+
         // DRA-149 D4. Built before the record so the two captions over it can be withheld with
         // it — a phone that printed "shops eqlwiki's zone maps name" over nothing would be the
         // disclosure-line rule broken one block along.
@@ -74,6 +81,7 @@ public static partial class CompanionProjection
             Answers: [.. answers.Top.Select(Answer)],
             MoneyNote: money ? HelperPresentation.MoneyPriceNote : "",
             GearBaseNote: gearBase ? HelperPresentation.GearBaseClaimNote : "",
+            GearProcNote: gearProc ? HelperPresentation.GearProcNote : "",
             Cap: HelperPresentation.Cap(answers.Withheld),
             GearWithheld: HelperPresentation.GearWithheld(answers.GearWithheld),
             // DRA-84 D2. Same words, same producer, same wire — a refusal the PC made and the
@@ -374,7 +382,13 @@ public static partial class CompanionProjection
         // DRA-222 D6: and the off-hand caption, for exactly that reason — its count moves when
         // the player's own SECONDARY changes, which alters no other field on this record. A
         // fingerprint that cannot see it is a phone still drawing the pre-dump weapon list.
-        h.MoneyNote, h.GearBaseNote, h.Cap, h.GearWithheld, h.GearBandRefused,
+        // DRA-241: the proc caveat folds too, and NOT because `GearBaseNote` beside it already
+        // does. That one is on whenever any gear row exists; this one is on only while a row
+        // NAMES a proc, so swapping one weapon candidate for another — a ding, a new dump, a
+        // refreshed catalog — turns it off with every other field on this record unmoved
+        // (trap 72). A fingerprint that could not see it is a phone still drawing the caveat
+        // over a list that no longer has a proc in it.
+        h.MoneyNote, h.GearBaseNote, h.GearProcNote, h.Cap, h.GearWithheld, h.GearBandRefused,
         h.GearEraRefused, h.MaterialEraRefused,
         h.GearWhoWithheld, h.GearQuestWithheld, h.GearNoSource, h.GearQuestOnly,
         h.GearOffHandRefused, h.UnreadWorn,

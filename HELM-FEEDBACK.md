@@ -495,3 +495,52 @@ reach — otherwise the gap is found by a reviewer weeks later (R2, DRA-234) and
 SIGN to close, which is this card.
 
 — Dranak (Claude Code, Planner, DRA-241)
+
+---
+
+## 2026-09-20 — LOOP CLOSED: DRA-241 shipped, and D6's item-4 bar is corrected
+To: Helm
+
+**Ruling `27302878` is carried out.** ADOPT (a) report only, never price; annotate, never
+refuse. The LIVE ASK above is DISCHARGED and this entry is the correction the ruling asked
+for as part of (a).
+
+**D6's item 4 is corrected here, in one line.** Its bar asked that weapons compare on
+*"damage/delay/ratio/hand-restriction/dual-wield/proc"*. That list is now recorded as
+**five facts delivered by DRA-222 D6 and one by DRA-241** — and the sixth is not "compared"
+on any reading: it is REPORTED beside the comparison and weighed by nothing. The history
+should not read as though one slice delivered six facts, and it should not read as though
+this one finished the sentence D6 started. It did something narrower and deliberately so.
+
+**What shipped:** `ItemStatsBlock.Effect` + `WeaponProcs`, the fifth reader of a stats block
+this repo already ships. It fetches nothing, adds no data file, and un-PARKs nothing —
+S8/S9 stay PARKED and no `+N` is held, compared or invented anywhere in it.
+
+**Two guards are the slice**, and both are executable rather than asserted:
+`TheProcWeighsNothing` (the metric table and every `DominanceVerdict` identical with a proc
+and without one, including the LOSING case) and `TheProcRefusesNothing` (the whole sweep run
+twice against the same catalog with and without its effect lines — offers identical in count,
+identity and order, every refusal counter unmoved). Prove-failed against four mutants: the
+`DMG:` scope removed, the proc priced into `MetricPairs`, the proc made to refuse, and the
+match widened to the two left-of-colon spellings. Each reddens the row it was aimed at.
+
+**Three corrections to the card's own numbers, all found by re-measuring before writing:**
+
+1. The `(Combat)` count, the bucket counts and the seven unadmitted rows all reproduce
+   exactly as Planner restated them. Nothing there moved.
+2. **`Deadly Poison` is not in the committed catalog under that spelling.** The bar named it
+   as one of three verbatim Rogue poisons for the scope guard; two exist, that one does not.
+   `Crookstinger Poison` is a real one and the guard names it instead. Recorded rather than
+   quietly swapped, because the next person to read the bar will look for it.
+3. **`Keg Mallet` spells its damage `Base Dmg: 9`**, which `ItemStatsBlock` does not read as
+   damage. That is the whole of the 1,649-vs-1,648 gap Planner corrected: the textual scan
+   finds it and the shipped parser does not. **Not fixed here** — teaching the parser that
+   spelling would give the record a `Dmg`, therefore a `Ratio`, therefore a place in
+   `ItemDominance`, which is a comparison change and outside this bar. Filed as a finding on
+   the card for Planner to sequence; nothing on a player's screen is wrong today, the row is
+   simply absent from the weapon half.
+
+**No webhook fired for this** — it is a reporting duty and a loop close, not a LIVE ASK.
+Nothing is blocked on an answer.
+
+— Dranak (Claude Code, Sr Executor, seat `sr-exec-dra241`, DRA-241)
