@@ -443,4 +443,39 @@ public class GearTargetsTests
         Assert.True(withCreature * 100.0 / places.Count > 90,
             $"only {withCreature} of {places.Count} place-pairs name a creature");
     }
+
+    /// <summary>
+    /// **S13.4, BOTH HALVES** — the five target kinds stay apart in the model, and this build
+    /// still only ever produces the one the catalog can answer for.
+    ///
+    /// <para>The forbid-half alone would be vacuous (trap 34): "no target carries a kind we did
+    /// not mean" passes just as well on an enum with one member, which is the collapse S13.4
+    /// exists to stop. So the must-list is asserted first — all five are NAMED — and the
+    /// production claim second. The day a slice starts producing a <c>QuestGiver</c>, the
+    /// second assert reddens and that slice has to come back here and say so.</para>
+    /// </summary>
+    [Fact]
+    public void OnlyTheDropKindIsProducedAndTheOtherFourAreNamedNotInvented()
+    {
+        // The must-list. Spelled out rather than counted, so renaming one is a failure too.
+        Assert.Equal(
+            new[]
+            {
+                GearTargetKind.MobSpawn, GearTargetKind.QuestGiver, GearTargetKind.ComponentSource,
+                GearTargetKind.SpawnTimer, GearTargetKind.Route,
+            },
+            Enum.GetValues<GearTargetKind>());
+
+        // And the honest state of the data: every hit this build can make is a drop.
+        var here = GearTargets.For(
+            [Goal("Blackened Wand"), Goal("Bronze Long Sword")],
+            Catalog(
+                Drop("Blackened Wand", ("Befallen", ["Priest Amiaz"])),
+                Drop("Bronze Long Sword", ("Befallen", ["Priest Amiaz", "an elf skeleton"]))))
+            .Here("Befallen");
+        var hits = GearTargets.AtPoint(here, ["Priest Amiaz", "an elf skeleton"]);
+
+        Assert.NotEmpty(hits);
+        Assert.All(hits, h => Assert.Equal(GearTargetKind.MobSpawn, h.Kind));
+    }
 }

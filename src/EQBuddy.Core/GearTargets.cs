@@ -43,10 +43,61 @@ public enum GearTargetGap
 /// reasons it was.</summary>
 public sealed record GearTargetRefusal(string Item, GearTargetGap Why);
 
-/// <summary>One tracked goal a spawn point answers: which goal, and which of its creatures was
-/// killed there. Both halves are needed in the sentence — a ring saying only "a target" over a
-/// point that has seen five different mobs does not say which one to wait for.</summary>
-public sealed record GearTargetHit(string Item, string Creature);
+/// <summary>
+/// **WHAT KIND OF TARGET A MARK IS** — S13.4's five, kept apart in the MODEL so a reader never
+/// has to guess which question a dot was answering.
+///
+/// <para><b>Only <see cref="MobSpawn"/> is produced by this build, and that is the honest state
+/// rather than an oversight.</b> A tracked goal is resolved through <see cref="ItemCatalog"/>,
+/// whose <c>DropZones</c>/<c>DropMobs</c> can only ever name a creature in a zone — so a drop
+/// target is the one kind the catalog can answer for. The other four need the quest join (a
+/// giver, a turn-in, a component step) or a route engine, and building either one here is the
+/// second map engine S13.1/S20 refuses.</para>
+///
+/// <para>The enum ships whole anyway because S13.4's requirement is about the MODEL and not
+/// about today's data: <i>"the model should not collapse these into one ambiguous point
+/// type"</i>. That is <c>GuideAttachment</c>'s precedent one surface along, where
+/// <c>GearFarm</c> ships EMPTY on purpose because no curated step farms gear — the category is
+/// real, and nothing is invented to fill it (trap 73).
+/// <c>GearTargetsTests.OnlyTheDropKindIsProducedAndTheOtherFourAreNamedNotInvented</c> pins
+/// both halves, so the day a slice produces a second kind it has to say so there.</para>
+///
+/// <para>Final iconography is Bevel's. Nothing in this file picks a picture.</para>
+/// </summary>
+public enum GearTargetKind
+{
+    /// <summary>A creature the item's own page named, at a spawn point your log archived. The
+    /// only kind this build produces.</summary>
+    MobSpawn,
+
+    /// <summary>A quest giver or turn-in NPC. Needs the quest join; nothing produces it yet.</summary>
+    QuestGiver,
+
+    /// <summary>Where a component of the acquisition path is farmed. Needs the quest join;
+    /// nothing produces it yet.</summary>
+    ComponentSource,
+
+    /// <summary>A target whose mark is the running respawn itself rather than the place. Nothing
+    /// produces it yet — S14's countdown rides the POINT's own circle, which already had one,
+    /// and inventing a second is the duplicate timer S14.1 refuses.</summary>
+    SpawnTimer,
+
+    /// <summary>A route or destination — an island, a camp, a way in. Needs a route engine;
+    /// nothing produces it yet.</summary>
+    Route,
+}
+
+/// <summary>One tracked goal a spawn point answers: which goal, which of its creatures was
+/// killed there, and what kind of target that makes the dot. Both name halves are needed in the
+/// sentence — a ring saying only "a target" over a point that has seen five different mobs does
+/// not say which one to wait for.
+///
+/// <para><see cref="Kind"/> defaults to <see cref="GearTargetKind.MobSpawn"/> because that is
+/// the only kind a catalog drop row can be (see the enum). It is CARRIED rather than assumed so
+/// that a reader asks the target what it is instead of knowing — which is the whole of S13.4's
+/// "not one ambiguous point type".</para></summary>
+public sealed record GearTargetHit(
+    string Item, string Creature, GearTargetKind Kind = GearTargetKind.MobSpawn);
 
 /// <summary>
 /// **EVERY TRACKED GOAL, TURNED INTO PLACES** — the whole answer for one character, built once
