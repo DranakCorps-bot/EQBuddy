@@ -215,3 +215,8 @@ Core change (`GearAnchorRemoved` + stage snapshots). Content declared by the pla
 rather than escalated — a words-only function with no producer is the furniture P3 forbids — but
 the file scope in a slice line should not read as its boundary when the declared OUTCOME needs
 more. **Cost:** one re-derivation of the data flow before any code was written.
+
+## 2026-09-20 — RELEASE REVIEW REQUESTED: v2.0.0
+To: Fable
+
+Range v1.99.18..999b6692 (1,285 commits, 78 notes). Packet + scope on DRA-252.
