@@ -1,3 +1,4 @@
+using System.Text.Json.Nodes;
 using EQBuddy.Core;
 using EQBuddy.UI.Shared;
 using Xunit;
@@ -258,6 +259,56 @@ public class TrackedUpgradesTests
         Assert.Equal("SECONDARY", goal.Slot);
         Assert.Equal(Tuesday, goal.TrackedAt);
         Assert.True(TrackedUpgradeStore.IsTracked(reloaded, Me, "Blade of Carnage"));
+    }
+
+    /// <summary>
+    /// **THE ROOM FOR A REQUIRED RANK AND AN EXALTATION, PINNED TO A GUARD RATHER THAN TO A
+    /// COMMENT** (Fable's last-look on PR #712, the one note it left).
+    ///
+    /// <para>This card's done bar asks that S8/S9 can be un-parked — a required rank, a required
+    /// exaltation — without a schema migration, and that is true today only because
+    /// <see cref="AppSettings"/>' serializer options leave <c>UnmappedMemberHandling</c> at the
+    /// default, which IGNORES a member this build has never heard of, and because a positional
+    /// record fills an absent parameter with its default. Neither of those is anything in D4's
+    /// diff: the claim rested on reading the options, so a later tightening to
+    /// <c>Disallow</c> — a plausible, well-meant change — would break the bar with every test
+    /// still green.</para>
+    ///
+    /// <para><b>Both directions, because a migration-free field has to survive both.</b> An
+    /// OLDER build reading a profile a NEWER one wrote: the unknown members are dropped and the
+    /// rest of the row still loads. A NEWER build reading an OLDER profile: the parameter that
+    /// is not in the file comes back as its default and the row is not refused — which is
+    /// exactly what a future <c>RequiredRank</c> does to every profile written before it.</para>
+    ///
+    /// <para>The row from the future is written BY HAND on purpose: this build cannot serialize
+    /// a field it does not have, so staging one is the only way to ask the question.</para>
+    /// </summary>
+    [Fact]
+    public void AStoredGoalSurvivesAFieldThisBuildHasNeverHeardOf()
+    {
+        var settings = Fresh();
+        TrackedUpgradeStore.Track(settings, Me, Offer("Blade of Carnage"), Tuesday);
+        settings.Save();
+
+        var path = AppPaths.File("settings.json");
+        var json = JsonNode.Parse(File.ReadAllText(path))!;
+        var rows = json["TrackedUpgrades"]![Me]!.AsArray();
+        // What a post-S8 build would have written over this row.
+        rows[0]!["RequiredRank"] = "+5";
+        rows[0]!["RequiredExaltation"] = "Exalted";
+        // …and a row carrying ONLY what a build older than the new field wrote.
+        rows.Add(new JsonObject { ["Item"] = "Wurmslayer" });
+        File.WriteAllText(path, json.ToJsonString());
+
+        var goals = TrackedUpgradeStore.For(AppSettings.Load(), Me);
+
+        var carried = Assert.Single(goals, g => g.Item == "Blade of Carnage");
+        Assert.Equal("Shiny Brass Shield +6", carried.Over);
+        Assert.Equal("SECONDARY", carried.Slot);
+        Assert.Equal(Tuesday, carried.TrackedAt);
+
+        var sparse = Assert.Single(goals, g => g.Item == "Wurmslayer");
+        Assert.Equal(default, sparse.TrackedAt);
     }
 
     /// <summary>A profile nobody has tracked anything in holds no key at all — an install that
