@@ -106,6 +106,41 @@ public sealed class WholeFilePublishTests : IDisposable
     /// <c>torn reads: N of 4000</c> — the CI red's mechanism, reproduced on demand. The
     /// reader also counts how many reads SAW something, so a reader that silently stopped
     /// reading cannot pass this by observing nothing (trap 34).</para>
+    ///
+    /// <para><b>The reader is HANDED OFF before the publish loop starts, and that is
+    /// DRA-255</b> (run <c>35515932572</c>, PR #737). The reader used to go onto
+    /// <c>Task.Run</c> and the publishes began immediately; on a starved CI pool the task was
+    /// scheduled zero times before <c>done.Cancel()</c>, so its loop condition was false on
+    /// first evaluation, <c>reads</c> stayed 0, and the anti-vacuity line below correctly
+    /// refused to claim anything — blocking a merge for three and a half hours. The race was
+    /// in the TEST's setup and not in <see cref="WholeFilePublish"/>; the PR's diff was two
+    /// markdown appends and <c>e2e-windows</c> was green beside it. Two changes, and the
+    /// second does not replace the first: the reader is a dedicated thread
+    /// (<see cref="TaskCreationOptions.LongRunning"/>) so a saturated pool cannot starve a
+    /// loop that by design spins for the whole publish run, AND it SIGNALS after its first
+    /// completed read, waited on with a bounded timeout, so "the reader is running" is a fact
+    /// this test establishes rather than assumes. A timeout fails with its own sentence
+    /// naming what did not happen — it is not the torn-read assertion, and the anti-vacuity
+    /// line stays exactly as it was (trap 34: it is the only thing between this test and
+    /// vacuous coverage, and it is what CAUGHT this).</para>
+    ///
+    /// <para><b>THIS TEST IS RED UNTIL DRA-257 LANDS, AND THAT IS THE POINT OF DRA-257.</b>
+    /// Handing the reader off before the publish loop means it overlaps the publisher for the
+    /// whole run instead of by luck — and the REAL publisher then fails on a 2-core
+    /// `ProcessorAffinity` mask, 2 runs in 8:
+    /// <c>torn reads: 2566 of 77844 [empty=2566 partial=0 skipped=0 | notFound=2566 io=0
+    /// zeroByte=2 unauth=0]</c>. Every torn read is a <c>FileNotFoundException</c> — nothing was
+    /// half-written (<c>partial=0</c>, <c>zeroByte=0</c>) and every publish took the atomic path
+    /// (<c>skipped=0</c>). The target NAME briefly does not resolve, because
+    /// <c>File.Move(overwrite: true)</c> is <c>MoveFileEx(REPLACE_EXISTING)</c> and that is not
+    /// atomic. <c>Read</c> catches it under <c>catch (IOException)</c>, answers "", and
+    /// <c>DumpValue</c> prints <c>-1</c> — the same sentinel DRA-225 and DRA-228 chased.
+    /// **That defect is not new and this change did not cause it; it stopped hiding it** — the
+    /// pre-DRA-255 shape measured 44k–58k reads over 8 mask-3 runs with <c>notFound=0</c>
+    /// because its reader started at an arbitrary phase. <b>Do not merge this ahead of DRA-257
+    /// and do not "fix" it by loosening either assertion.</b> A 32-core run is green on the
+    /// broken publisher, so it is the measurement that cannot tell the hypothesis from its
+    /// negation (trap 77) — prove it on the mask.</para>
     /// </summary>
     [Fact]
     public void TheRealPublisherIsNeverCaughtHalfway()
@@ -116,18 +151,31 @@ public sealed class WholeFilePublishTests : IDisposable
         var torn = 0;
         var reads = 0;
         using var done = new CancellationTokenSource();
+        using var readerIsRunning = new ManualResetEventSlim(false);
 
-        var reader = Task.Run(() =>
+        void ReadOnce()
         {
-            while (!done.IsCancellationRequested)
-            {
-                var kills = ReadKeyAsTheHarnessWould("shellLiveKillRows");
-                reads++;
-                // -1 here can only mean a file with no such key. The key is in BOTH dumps,
-                // and the file exists throughout, so any sentinel is a torn read.
-                if (kills < 0) torn++;
-            }
-        });
+            var kills = ReadKeyAsTheHarnessWould("shellLiveKillRows");
+            reads++;
+            // -1 here can only mean a file with no such key. The key is in BOTH dumps,
+            // and the file exists throughout, so any sentinel is a torn read.
+            if (kills < 0) torn++;
+        }
+
+        var reader = Task.Factory.StartNew(() =>
+        {
+            // One read BEFORE the loop, so the signal means "a read has COMPLETED" rather
+            // than "a thread reached this line" — and set ONCE, off the hot loop.
+            ReadOnce();
+            readerIsRunning.Set();
+
+            while (!done.IsCancellationRequested) ReadOnce();
+        }, CancellationToken.None, TaskCreationOptions.LongRunning, TaskScheduler.Default);
+
+        Assert.True(readerIsRunning.Wait(TimeSpan.FromSeconds(30)),
+            "the reader did not complete a single read in 30 s, so the publish loop below "
+            + "would have measured nothing — that is this test's own setup failing to start, "
+            + "not a fault in WholeFilePublish");
 
         var skipped = 0;
         for (var i = 0; i < Publishes; i++)
