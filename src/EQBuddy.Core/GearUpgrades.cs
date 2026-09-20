@@ -397,10 +397,21 @@ public static class GearUpgrades
             // That is still a count and still not a taste: `ClassStatRelevance` measures what
             // share of the class's OWN catalog items carry each number, so "this one moved
             // three of the numbers your classes' gear carries and that one moved none" is as
-            // checkable as the total beside it. The total stays as the tiebreak rather than
-            // being replaced — a row that moved eleven numbers and no relevant one is still
-            // worth more than a row that moved two — and with an unknown class every row scores
-            // zero on the new key, so this list comes out in exactly its pre-D6 order.
+            // checkable as the total beside it.
+            //
+            // **The two keys are LEXICOGRAPHIC, and that is the whole of the claim.** The
+            // relevant count is asked first and the total only breaks its ties, so a row that
+            // moved two numbers of which one is a warrior's outranks a row that moved eleven of
+            // which none is. That is the intended reading of S7.2 — "how many of YOUR numbers"
+            // is the question, and the total is what settles rows the first question cannot
+            // separate — but it is worth stating plainly, because "the total stays as the
+            // tiebreak" is easy to read as "the total still wins when it is much larger", and
+            // it does not. The bound on the damage is that neither key can REMOVE a row: the
+            // per-anchor cap keeps the same number of candidates either way, so the worst a
+            // wrong relevance set can do is put the right upgrade lower down the same list.
+            //
+            // With an unknown class every row scores zero on the new key and this list comes
+            // out in exactly its pre-D6 order.
             var ordered = beats
                 .OrderByDescending(u => u.RelevantMetrics)
                 .ThenByDescending(u => u.ImprovedMetrics)
