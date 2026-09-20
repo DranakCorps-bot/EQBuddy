@@ -85,6 +85,14 @@ public static partial class CompanionProjection
             // DRA-84 D4, same rule one slice on: a drop offer the PC withheld for having no
             // creature to name is withheld on the phone too, and says so in the same words.
             GearWhoWithheld: HelperPresentation.DropOffersWithheld(answers.GearWhoWithheld),
+            // DRA-219, the same discipline on the other acquisition path. The quest-source rule
+            // removes rows the PC's list does not have either, and the two sweep counts are
+            // about items that never reached a bucket — a phone that carried the who caption and
+            // not these would leave a player reading a shorter list with three sentences' worth
+            // of explanation missing.
+            GearQuestWithheld: HelperPresentation.QuestOffersWithheld(answers.GearQuestWithheld),
+            GearNoSource: HelperPresentation.SourcelessUpgrades(answers.GearNoSource),
+            GearQuestOnly: HelperPresentation.QuestOnlyUpgrades(answers.GearQuestOnly),
             // DRA-149 D3: the SAME two rules over the materials list, on their own two fields
             // rather than folded into the gear ones — the desktop room draws four captions here
             // and the phone must draw the same four or the two surfaces disagree about what the
@@ -336,9 +344,12 @@ public static partial class CompanionProjection
         // stands still.
         // DRA-180 D2: the era captions fold too. They quote the WORLD's era, which is a
         // curated value a build can change without moving a single count beside it (trap 72).
+        // DRA-219: the quest path's three captions fold too. Each carries a COUNT that can move
+        // while every other field here stands still — flipping the include-quests toggle turns
+        // one of them off and another on with the same rows on screen (trap 72).
         h.MoneyNote, h.GearBaseNote, h.Cap, h.GearWithheld, h.GearBandRefused,
         h.GearEraRefused, h.MaterialEraRefused,
-        h.GearWhoWithheld, h.UnreadWorn,
+        h.GearWhoWithheld, h.GearQuestWithheld, h.GearNoSource, h.GearQuestOnly, h.UnreadWorn,
         // DRA-180 D3: the per-anchor sentences fold as LINES, never as a count. They NAME the
         // worn item and carry its three cause numbers, so swapping one picked anchor for another
         // — or a ding moving which of its candidates the band gate takes — rewrites them while

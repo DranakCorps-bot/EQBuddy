@@ -1119,6 +1119,33 @@ internal sealed class HelperRoom : Grid, IShellRoom
             block.Children.Add(Door(new HelperDoor(HelperDoorKind.Gear, "")));
         }
 
+        // **AND THE QUEST-SOURCE RULE'S** (DRA-219, S10/S11). The who rule's sibling on the
+        // other acquisition path, drawn directly after it because they are the same principle
+        // — an offer that cannot say how to pursue it is not an offer — and its own sentence
+        // rather than a merged count, because the remedies differ: one is an item page naming
+        // no creature, this is the shipped quest list not holding a quest at all. Its door is
+        // the quest list, which is both the thing that is missing the quest and the place a
+        // player would look for it.
+        if (HelperPresentation.QuestOffersWithheld(_answers.GearQuestWithheld)
+            is { Length: > 0 } questCap)
+        {
+            block.Children.Add(Line(questCap, Role.Caption));
+            block.Children.Add(Door(new HelperDoor(HelperDoorKind.QuestCatalog, "")));
+        }
+
+        // **AND THE TWO THINGS THE SWEEP NEVER PASSED ON** (DRA-219, S10.1/S19.2). Every caption
+        // above is about an offer that existed and was removed; these are about items that never
+        // reached a bucket. Apart from each other because only one of them has a remedy — the
+        // include-quests toggle is on this screen, and "no page says where it comes from" has
+        // nothing behind it at all.
+        if (HelperPresentation.SourcelessUpgrades(_answers.GearNoSource)
+            is { Length: > 0 } noSourceCap)
+            block.Children.Add(Line(noSourceCap, Role.Caption));
+
+        if (HelperPresentation.QuestOnlyUpgrades(_answers.GearQuestOnly)
+            is { Length: > 0 } questOnlyCap)
+            block.Children.Add(Line(questOnlyCap, Role.Caption));
+
         // The who rule's count on the MATERIALS list (DRA-149 D3). Same sentence from the same
         // producer — the rule, the cause and the remedy are identical and a re-worded copy is
         // the one that goes stale (trap 4) — and its own line, for the reason the band caption
@@ -1504,10 +1531,29 @@ internal sealed class HelperRoom : Grid, IShellRoom
         // Spaces go and `:` separates: one flat namespace (trap 58).
         $"helperAnchorsEmptied={_answers.GearAnchorsRemoved.Count} " +
         $"helperAnchorLines={Math.Min(_answers.GearAnchorsRemoved.Count, HelperPresentation.GearAnchorsNamed)} " +
-        $"helperAnchorsRemoved={string.Join(',', _answers.GearAnchorsRemoved.Select(a => $"{a.Anchor.Replace(" ", "")}:{a.Found}:{a.LaterContent}:{a.OutsideBand}:{a.NoCreature}"))} " +
+        // DRA-219 adds the FOURTH cause to the tuple, in the rules' own order, so the E2E's
+        // `era+band+who == found` assertion becomes `era+band+who+quest == found` rather than
+        // quietly starting to fail on a character with quests switched on.
+        $"helperAnchorsRemoved={string.Join(',', _answers.GearAnchorsRemoved.Select(a => $"{a.Anchor.Replace(" ", "")}:{a.Found}:{a.LaterContent}:{a.OutsideBand}:{a.NoCreature}:{a.NoQuestPath}"))} " +
         $"helperWho={_answers.Top.Sum(r => r.Why.OfType<GearUpgradeFact>().Count(f => f.Who.Count > 0))} " +
         $"helperWhoWithheld={_answers.GearWhoWithheld} " +
         $"helperWhoLine={(HelperPresentation.DropOffersWithheld(_answers.GearWhoWithheld).Length > 0 ? 1 : 0)} " +
+        // **DRA-219: the QUEST acquisition path, in the shape the who keys above it use** (S10,
+        // S11). `helperQuestRows` is how many drawn rows are quests and `helperQuestSource` how
+        // many of those can actually say who starts it and where — the pair that separates "a
+        // quest row exists" from "a quest row is a direction", which is the whole of S11.2.
+        // `helperQuestWithheld`/`helperQuestLine` mirror the who rule's count-and-did-it-say-so
+        // pair (trap 56: the engine refusing and the screen saying so are different claims).
+        // `helperNoSource` and `helperQuestOnly` are the two the sweep never passed on at all,
+        // apart because their remedies are apart.
+        $"helperQuestRows={_answers.Top.Count(r => r.Kind == RecommendationKind.Quest)} " +
+        $"helperQuestSource={_answers.Top.Sum(r => r.Why.OfType<QuestSourceFact>().Count(f => f.Giver.Length > 0 || f.StartZone.Length > 0))} " +
+        $"helperQuestWithheld={_answers.GearQuestWithheld} " +
+        $"helperQuestLine={(HelperPresentation.QuestOffersWithheld(_answers.GearQuestWithheld).Length > 0 ? 1 : 0)} " +
+        $"helperNoSource={_answers.GearNoSource} " +
+        $"helperNoSourceLine={(HelperPresentation.SourcelessUpgrades(_answers.GearNoSource).Length > 0 ? 1 : 0)} " +
+        $"helperQuestOnly={_answers.GearQuestOnly} " +
+        $"helperQuestOnlyLine={(HelperPresentation.QuestOnlyUpgrades(_answers.GearQuestOnly).Length > 0 ? 1 : 0)} " +
         // **DRA-149 D2: the worn rows that never became an anchor** — the same two-numbers-one-
         // moment shape, and the one it matters most for. `helperWorn` above is the anchor count
         // and it was the ONLY thing this dump said about the dump: twenty anchors from a
