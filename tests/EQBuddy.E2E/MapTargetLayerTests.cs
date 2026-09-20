@@ -65,6 +65,12 @@ public sealed class MapTargetLayerTests
         app.WaitForDump("mapTargetRings", 1, "the archived point to wear a target ring");
         Assert.True(app.DumpValue("mapTargetRows") >= 1,
             "the panel should carry at least the goal's own row");
+        // The layer is ON with nothing written into the profile to say so, and the chip that
+        // switches it is on screen painted that way. This is the DEFAULT half of the done bar's
+        // item 1, asserted from a launched app rather than off the property's initialiser.
+        Assert.Equal(1, app.DumpValue("mapTargetToggle"));
+        // Nothing was refused — a placeable goal must not also produce a refusal sentence.
+        Assert.Equal(0, app.DumpValue("mapTargetRefused"));
 
         // ---- S27's regression bar, from the same dump -------------------------------
         // Map load: the seeded pack resolved and the picture is up.
@@ -113,11 +119,126 @@ public sealed class MapTargetLayerTests
         Assert.Equal("", app.DumpText("mapTargetGoals"));
         Assert.Equal(0, app.DumpValue("mapTargetRings"));
         Assert.Equal(0, app.DumpValue("mapTargetRows"));
+        // …and nothing was REFUSED either, which is what separates this state from the one
+        // below it. Until the refusal key existed, these three zeroes were also the whole dump
+        // of a profile whose every goal the catalog had rejected — so this negative would have
+        // passed unchanged on a build where the refusal path drew nothing at all.
+        Assert.Equal(0, app.DumpValue("mapTargetRefused"));
+        // The switch is still there and still on. Nothing tracked does not hide the control:
+        // a chip that vanished with the layer would have nothing to bring it back with.
+        Assert.Equal(1, app.DumpValue("mapTargetToggle"));
 
         // The rest of the map is exactly the other test's map.
         Assert.Equal(1, app.DumpValue("mapShown"));
         Assert.Equal(1, app.DumpValue("mapMarkerVisible"));
         Assert.True(app.DumpValue("mapNamedRows") >= 2);
+    }
+
+    /// <summary>
+    /// **A GOAL EQBUDDY CANNOT PLACE STILL SAYS SO, AND THE DUMP CAN NOW SEE IT SAYING SO**
+    /// (D5 Planner review, finding D5-2).
+    ///
+    /// <para>The panel deliberately draws for a set holding only refusals — a goal EQBuddy
+    /// cannot place is exactly the thing a player would otherwise assume it was quietly working
+    /// on. But the only instrument the WPF layer has could not tell that state from the empty
+    /// one: no goal rows, no rings, no elsewhere rows, and the refusal sentences were not
+    /// counted anywhere. <c>mapTargetRefused</c> is the key that separates them and this is the
+    /// row that reads it.</para>
+    ///
+    /// <para><i>Nothing We Ship</i> is the fixture the unit suite already uses for this: the
+    /// shipped catalog holds no page under that name, so the refusal is the <c>Unreadable</c>
+    /// arm and it comes off the real catalog rather than a staged one (trap 23).</para>
+    /// </summary>
+    [Fact]
+    public void AGoalTheCatalogCannotPlaceDrawsItsRefusalAndTheDumpSaysSo()
+    {
+        using var app = new AppHarness(
+            configureSettings: s => s.TrackedUpgrades[Key()] = [Goal("Nothing We Ship")],
+            environment: new Dictionary<string, string> { ["EQBUDDY_MAP"] = "1" });
+        app.SeedZoneMap("befallen");
+        app.Launch();
+        app.WaitForWindow("mapShown", "the Map window to open and dump its first facts");
+
+        app.AppendLogLines(
+            "You have entered Befallen.",
+            "Your Location is 100.00, 200.00, 5.00",
+            "You have slain Priest Amiaz!");
+        app.WaitForDumpAtLeast("mapCircles", 1,
+            "the kill to archive a spawn point and the map to draw its circle");
+
+        // The block DREW, and what it drew was the refusal.
+        app.WaitForDumpAtLeast("mapTargetRefused", 1,
+            "a goal with no shipped item page should get its refusal sentence drawn");
+        // And it is a refusal rather than a row: no goal reached this zone, nothing is ringed,
+        // and there is nothing for the panel to call a row.
+        Assert.Equal("", app.DumpText("mapTargetGoals"));
+        Assert.Equal(0, app.DumpValue("mapTargetRings"));
+        Assert.Equal(0, app.DumpValue("mapTargetRows"));
+    }
+
+    /// <summary>
+    /// **THE TOGGLE, AND IT IS THE HALF THAT CANNOT BE PROVEN ANYWHERE ELSE** (D5 Planner
+    /// review, finding D5-1; done-bar item 1, S13.3 / S26 AC 3/4).
+    ///
+    /// <para>Same fixture as the ring test in every respect but the one setting, so the
+    /// difference between the two is the flag and not the staging. On the build this fixes, this
+    /// test fails on its first assertion — the setting does not exist — and on a build that
+    /// wired the chip but not the gate it fails on <c>mapTargetRings</c>, which is the
+    /// half-shipped state the finding names.</para>
+    ///
+    /// <para><b>One flag, both surfaces of the layer.</b> The rings and the panel are asserted
+    /// off the same dump moment (trap 56): a gate that reached the canvas and not the panel
+    /// would leave a block naming goals whose dots had stopped being marked, which is worse
+    /// than either state on its own.</para>
+    ///
+    /// <para>And the rest of the map is asserted unchanged in that same moment, because a
+    /// preference that switches a layer off by switching the map off would pass every assertion
+    /// above.</para>
+    /// </summary>
+    [Fact]
+    public void TheLayerSwitchedOffDrawsNoRingsAndNoBlockAndLeavesTheMapAlone()
+    {
+        using var app = new AppHarness(
+            configureSettings: s =>
+            {
+                s.TrackedUpgrades[Key()] = [Goal("Blackened Wand")];
+                s.ShowGearTargetsOnMap = false;
+            },
+            environment: new Dictionary<string, string> { ["EQBUDDY_MAP"] = "1" });
+        app.SeedZoneMap("befallen");
+        app.Launch();
+        app.WaitForWindow("mapShown", "the Map window to open and dump its first facts");
+
+        app.AppendLogLines(
+            "You have entered Befallen.",
+            "Your Location is 100.00, 200.00, 5.00",
+            "You have slain Priest Amiaz!");
+        // Wait on the thing that proves the map ticked AFTER the append, or the zeroes below are
+        // true of a window that has not looked yet (trap 62). The circle is the right anchor:
+        // it is drawn by the same rebuild the rings would have ridden.
+        app.WaitForDumpAtLeast("mapCircles", 1,
+            "the kill to archive a spawn point and the map to draw its circle");
+
+        // The chip is on screen and painted OFF — the control exists, which an absent one
+        // photographs identically to (trap 29).
+        Assert.Equal(0, app.DumpValue("mapTargetToggle"));
+        // The map draws none of the layer: no join, no rings, no rows, no refusals. The goal is
+        // untouched in the profile — this preference never writes the tracked list — but that
+        // is a claim about a store the map dump cannot see, and it is asserted where it can be:
+        // GearTargetsTests' unit half, over the settings object.
+        Assert.Equal("", app.DumpText("mapTargetGoals"));
+        Assert.Equal(0, app.DumpValue("mapTargetRings"));
+        Assert.Equal(0, app.DumpValue("mapTargetRows"));
+        Assert.Equal(0, app.DumpValue("mapTargetRefused"));
+
+        // Everything else about the map is the ring test's map, from this same dump.
+        Assert.Equal(1, app.DumpValue("mapShown"));
+        Assert.True(app.DumpValue("mapZones") >= 1);
+        Assert.Equal(1, app.DumpValue("mapMarkerVisible"));
+        Assert.True(app.DumpValue("mapNamedRows") >= 2,
+            "the named panel and its learned timer are untouched by a preference about rings");
+        Assert.True(app.DumpValue("mapCircles") >= 1,
+            "the spawn point itself is still archived and still drawn");
     }
 
     /// <summary>

@@ -205,6 +205,13 @@ public class MapTargetSurfaceParityTests : IDisposable
                      GearTargetPresentation.PointsHere(0, 0),
                      GearTargetPresentation.Unreadable(["Blackened Wand"]),
                      GearTargetPresentation.NoDropZone(["Blackened Wand"]),
+                     // The toggle's two tips (D5 Planner review, D5-1). These are forbidden for
+                     // a second reason on top of trap 32: the chip is a PC control, and a phone
+                     // that spelled its words would be offering an affordance it cannot honour —
+                     // every control in that room writes the profile the PC plays from
+                     // (trap 35). The layer is switched where the switch is.
+                     GearTargetPresentation.ToggleTip(true),
+                     GearTargetPresentation.ToggleTip(false),
                  })
             Assert.DoesNotContain(sentence, html, StringComparison.Ordinal);
 

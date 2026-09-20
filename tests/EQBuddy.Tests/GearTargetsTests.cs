@@ -478,4 +478,51 @@ public class GearTargetsTests
         Assert.NotEmpty(hits);
         Assert.All(hits, h => Assert.Equal(GearTargetKind.MobSpawn, h.Kind));
     }
+
+    /// <summary>
+    /// **THE LAYER IS ON UNTIL A PLAYER SAYS OTHERWISE, AND "OFF" IS THE SET EVERY READER
+    /// ALREADY DRAWS NOTHING ON** (D5 Planner review, finding D5-1).
+    ///
+    /// <para>Two small claims, and the pair is the point. A default that flipped would make the
+    /// whole slice invisible to everyone who never found the chip — the same failure a
+    /// default-off <c>TrackSpawns</c> would be — and <see cref="GearTargetSet.None"/> being
+    /// genuinely empty is what lets the gate be one expression at one producer instead of a
+    /// branch in each of the three surfaces.</para>
+    ///
+    /// <para>The GATE itself lives in <c>GearTargetMemo.For</c>, which is WPF-project and has no
+    /// unit tests (<c>docs/TestPlan.md</c> §5) — <c>MapTargetLayerTests</c> asserts it from a
+    /// launched app, which is where a reader should go to see it proven.</para>
+    /// </summary>
+    [Fact]
+    public void TheTargetLayerDefaultsOnAndItsOffStateIsTheEmptyAnswer()
+    {
+        Assert.True(new AppSettings().ShowGearTargetsOnMap);
+
+        Assert.True(GearTargetSet.None.IsEmpty);
+        Assert.Empty(GearTargetSet.None.Zones);
+        Assert.Empty(GearTargetSet.None.Refused);
+        Assert.Empty(GearTargetSet.None.Here("Befallen"));
+    }
+
+    /// <summary>
+    /// **HIDING THE LAYER IS NOT UNTRACKING, AND THIS IS WHERE THAT IS PROVEN.**
+    ///
+    /// <para>It is the whole reason the finding was a finding: before the toggle existed the
+    /// only way to clear the layer off a busy map was to untrack the goal, which throws away the
+    /// decision D4's store exists to remember. So the two live in different places and this
+    /// pins it — the map dump cannot see the tracked store, and
+    /// <c>MapTargetLayerTests.TheLayerSwitchedOffDrawsNoRingsAndNoBlockAndLeavesTheMapAlone</c>
+    /// points here for exactly this half.</para>
+    /// </summary>
+    [Fact]
+    public void SwitchingTheLayerOffLeavesTheTrackedListWhereItWas()
+    {
+        var settings = new AppSettings();
+        settings.TrackedUpgrades["dranak_test"] = [Goal("Blackened Wand")];
+
+        settings.ShowGearTargetsOnMap = false;
+
+        var still = TrackedUpgradeStore.For(settings, "dranak_test");
+        Assert.Equal("Blackened Wand", Assert.Single(still).Item);
+    }
 }

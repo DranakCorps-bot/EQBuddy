@@ -26,10 +26,26 @@ namespace EQBuddy;
 internal sealed class GearTargetMemo
 {
     private string _key = "\0";
-    private GearTargetSet _answer = new([], []);
+    private GearTargetSet _answer = GearTargetSet.None;
 
+    /// <summary>
+    /// <b>And the ONE place <see cref="AppSettings.ShowGearTargetsOnMap"/> is applied</b> (D5
+    /// Planner review, finding D5-1).
+    ///
+    /// <para>The gate is here rather than in the two views because this method is already the
+    /// single producer both of them read — the desktop map through <c>IZoneHost.GearTargets</c>,
+    /// the phone through the companion host's func. Gating each view separately is two callers
+    /// answering one question with whichever ran last winning (trap 33), and the rings, the
+    /// panel and the phone's copy would be three places it could be answered differently.
+    /// Switched off it returns the set every reader already draws nothing on, so no surface
+    /// needs a second branch and the catalog is never walked.</para>
+    ///
+    /// <para>Off touches neither <c>_key</c> nor <c>_answer</c>, so switching the layer back on
+    /// recomputes the same key and returns the cached answer rather than rebuilding it.</para>
+    /// </summary>
     public GearTargetSet For(AppSettings? settings, string characterKey)
     {
+        if (settings?.ShowGearTargetsOnMap != true) return GearTargetSet.None;
         var tracked = TrackedUpgradeStore.For(settings, characterKey);
         var key = characterKey + "§" + string.Join(
             ',', tracked.Select(t => $"{t.Item}:{t.TrackedAt.Ticks}"));

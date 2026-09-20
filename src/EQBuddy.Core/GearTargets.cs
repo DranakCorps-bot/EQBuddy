@@ -115,6 +115,12 @@ public sealed record GearTargetSet(
     /// rather than an empty state — the <c>BuildTracked</c> rule one slice back.</summary>
     public bool IsEmpty => Zones.Count == 0 && Refused.Count == 0;
 
+    /// <summary>THE empty answer, so the three places that need one cannot each write their own
+    /// (trap 4): the memo's pre-first-call value, and the two states that produce no answer at
+    /// all — nothing tracked, and <c>AppSettings.ShowGearTargetsOnMap</c> switched off. A
+    /// caller drawing this draws nothing, which is exactly what all three mean.</summary>
+    public static readonly GearTargetSet None = new([], []);
+
     /// <summary>
     /// The goals whose zone IS this zone — <b>exact title, then
     /// <see cref="ZoneMapFiles.IdentityKey"/>, and NOTHING looser</b>.
