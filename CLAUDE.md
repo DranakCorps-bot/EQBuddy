@@ -54,7 +54,20 @@ Keep these even when this file is short:
 - **Last-look where consequence warrants.** Helm signs; you do not invent a
   SIGNED stamp.
 - **Local greens are not CI.** `build-and-test` + `e2e-windows` remain the
-  merge bar. See [docs/ops/verification-ladder.md](docs/ops/verification-ladder.md).
+  merge bar — and since **2026-09-20 (DRA-228) both are REQUIRED status checks
+  on `main`, with `enforce_admins` ON**, so this sentence is enforced rather
+  than believed. It was not, for eleven days: protection listed
+  `build-and-test` alone, the second green was held up by hand every time, and
+  PR #715 merged at 02:31Z with `e2e-windows` still running the moment somebody
+  used `--auto`. **Admin enforcement is half the fix, not a flourish** — every
+  merge here is made by `DranakCorps-bot`, which is a repo admin, so without it
+  the new bar would have bound auto-merge and waved through every hand merge by
+  the one account that performs them.
+  **`--auto` is allowed again**, and that is the point of the change rather
+  than a concession: the required set now matches the documented bar, which is
+  exactly what auto-merge waits for. Measured on PR #729 — armed, and it did
+  not fire against a red `e2e-windows`. See
+  [docs/ops/verification-ladder.md](docs/ops/verification-ladder.md).
 - **"Passed on rerun" is observation, not resolution.** File
   [docs/ops/flake-ledger.md](docs/ops/flake-ledger.md).
 
