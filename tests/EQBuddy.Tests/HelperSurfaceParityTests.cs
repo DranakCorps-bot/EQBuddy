@@ -519,6 +519,11 @@ public class HelperSurfaceParityTests
                      // silently swallowing every anchor past the third, which is trap 50 wearing
                      // D5's clothes.
                      "h.anchorsAllRemoved", "h.anchorsNotNamed",
+                     // DRA-222 D6's off-hand caption, added in the SAME slice as the field.
+                     // It is the fifth gear count and the only one about the player's hands,
+                     // so a page missing it draws a shorter weapon list than the PC with
+                     // nothing on screen saying why — D5's failure with a different noun.
+                     "h.gearOffHandRefused",
                      "h.doorsLead", "h.empty", "h.gaps", "h.deferred",
                  })
             Assert.Contains(field, html, StringComparison.Ordinal);

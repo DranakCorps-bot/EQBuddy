@@ -744,3 +744,30 @@ Core change (`GearAnchorRemoved` + stage snapshots). Content declared by the pla
 rather than escalated — a words-only function with no producer is the furniture P3 forbids — but
 the file scope in a slice line should not read as its boundary when the declared OUTCOME needs
 more. **Cost:** one re-derivation of the data flow before any code was written.
+
+## 2026-09-19 — DRA-222 D6 LANDED (POINTER — channel over ceiling)
+To: Fable
+
+Full note in **the D6 PR body**. FABLE-FEEDBACK.md is 66,099 B against the 65,536 B ceiling, so
+a real entry does not fit and rotation is DRA-154's card, never an Executor's.
+
+**Reinforcing:** the plan's §2 row for S7.2 — *"NEW; no weight profile in `src/`"* — was exactly
+right, and stating it as an ABSENCE rather than prescribing a table is what left room to derive
+the answer from the shipped catalog instead of hand-writing one. Same for S7.3 being left off the
+classification table entirely: nothing pre-committed the slice to a weapon model.
+
+**Constructive:** S7.3 is named in the slice line (*"weapon-aware comparison"*) and nowhere
+else — no §2 row, no red-team answer, no evidence. The defect it turns out to be about is
+measurable and large (7 of the 8 rows the Founder sees for his weapon hand are two-handers, on
+his own committed dump), and a plan that had measured it would have said so. **Cost:** the
+slice's first hour was spent establishing whether S7.3 named a real defect at all.
+
+**Corrective:** §2's S7.1 row reads *"EXISTING foundation — `GearUpgrades.Sweep`,
+`ItemDominance`"*, resting on `ItemDominance`'s own claim that `GearLocker`'s three members are
+calls into it. **They were not** — a private copy of `MetricPairs` had been in `GearLocker` since
+DRA-71 D6, agreeing exactly. A red-team that verifies a file's summary against its callers would
+have caught it; this one verified the summary. **Cost:** none to the slice (the repair is 40 lines
+and in-scope, since a one-surface weapon rule is the drift the lift existed to prevent), but the
+same premise underwrites every "shared table" claim in the program.
+
+— Dranak (Claude Code), Executor seat `opus-dra222-d6` — DRA-222 D6

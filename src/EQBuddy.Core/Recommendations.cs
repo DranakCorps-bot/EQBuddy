@@ -247,9 +247,19 @@ public sealed record ZoneOutgrownFact(
 /// a row at all any more: see <see cref="RecommendationSet.GearWhoWithheld"/>.</para></param>
 /// <param name="WhoWithheld">How many more creatures the page named that the cap held back. Said
 /// out loud rather than dropped (trap 50).</param>
+/// <param name="RelevantMetrics">How many of the numbers this upgrade moved are ones this
+/// character's classes' own catalog items carry (<see cref="ClassStatRelevance"/>, DRA-222 D6
+/// S7.2) — <see cref="GearUpgrade.RelevantMetrics"/>, carried rather than recomputed.
+///
+/// <para><b>It decides the ORDER and nothing draws it as a sentence, on purpose.</b> "This
+/// moved two stats your class uses" would be EQBuddy telling a player what their class needs,
+/// off a measurement of what the wiki's item blocks happen to carry — true enough to rank on
+/// and not true enough to say out loud. So <paramref name="GainMetric"/> is the visible half:
+/// the row names the biggest RELEVANT improvement rather than the biggest one, which is a
+/// better sentence with no new claim in it.</para></param>
 public sealed record GearUpgradeFact(
     string Item, string Over, string Slot, string GainMetric, double GainBy,
-    IReadOnlyList<string> Who, int WhoWithheld = 0)
+    IReadOnlyList<string> Who, int WhoWithheld = 0, int RelevantMetrics = 0)
     : WhyFact(Evidence.Catalog);
 
 /// <summary>
@@ -1143,7 +1153,8 @@ public sealed record RecommendationSet(
     IReadOnlyList<GearEraRefusal>? GearEraRefusals = null,
     IReadOnlyList<GearEraRefusal>? MaterialEraRefusals = null,
     bool EraGateLive = false,
-    IReadOnlyList<GearAnchorRemoved>? GearAnchorsRemoved = null)
+    IReadOnlyList<GearAnchorRemoved>? GearAnchorsRemoved = null,
+    int GearOffHandRefusals = 0)
 {
     /// <summary>Never null, so no caller has to decide what an absent list means.</summary>
     public IReadOnlyList<GearBandRefusal> GearBandRefusals { get; init; }
@@ -1151,6 +1162,30 @@ public sealed record RecommendationSet(
 
     /// <summary>Never null, for <see cref="GearBandRefusals"/>' reason.</summary>
     public IReadOnlyList<string> UnreadWorn { get; init; } = UnreadWorn ?? [];
+
+    /// <summary>
+    /// **UPGRADES REFUSED BECAUSE TAKING THEM WOULD EMPTY THE OFF-HAND** (DRA-222 D6, S7.3).
+    ///
+    /// <para>Every candidate counted here beat the worn item on every number either of them
+    /// carries. It was removed anyway, because it is two-handed, the worn item is not, and this
+    /// character's own dump shows something in SECONDARY — a cost the metric table prices
+    /// nothing for, so nothing in it could have ranked the row down instead.</para>
+    ///
+    /// <para><b>Its own number beside <see cref="GearWithheld"/> and the two refusal lists, and
+    /// the cause is what separates it</b> (trap 50). The per-anchor cap is a NUMBER EQBuddy
+    /// chose; the band and era gates refuse a PLACE and quote it; the who rule refuses an
+    /// offer nothing can answer for. This one refuses a SWAP, and it is the only one of the
+    /// five whose sentence is about the player's hands. Measured on the Founder's committed
+    /// dump against the shipped catalog: 29 for his primary hand alone, which is why the eight
+    /// rows he could see for it were seven two-handers.</para>
+    ///
+    /// <para>A count rather than a list, unlike the band refusals beside it: those quote a band
+    /// and a level, which is evidence a player weighs. This one has nothing per-row to quote —
+    /// the reason is the same sentence every time and the remedy is the same one — so naming
+    /// seven greatswords would be an item list inside a sentence about a slot (trap 50 asks a
+    /// cap to ADMIT itself, not to re-list what it took).</para>
+    /// </summary>
+    public int GearOffHandRefusals { get; init; } = GearOffHandRefusals;
 
     /// <summary>
     /// The zones the band gate refused on the MATERIALS list (DRA-149 D3, plan P4).
@@ -1724,11 +1759,16 @@ public static partial class Recommendations
         // are all about the LIST, and this one is about the player's own character. A worn item
         // the ladder emptied is the question the Founder actually asked twice.
         List<GearAnchorRemoved> gearAnchorsRemoved = [];
+        // DRA-222 D6. Its own number for trap 50's reason and its own cause: the three lists
+        // above are about a PLACE and this is about a SWAP — an offer that beat the worn item
+        // on every number and was removed because taking it would empty the player's off-hand.
+        var gearOffHandRefusals = 0;
 
         if (goals.Contains(HelperGoal.LevelUp)) LevelUp(inputs, candidates, gaps);
         if (goals.Contains(HelperGoal.FarmGear))
             (gearWithheld, gearBandRefusals, gearWhoWithheld, unreadWorn, gearCandidates,
-                gearEraRefusals, gearAnchorsRemoved) = FarmGear(inputs, candidates, gaps);
+                gearEraRefusals, gearAnchorsRemoved, gearOffHandRefusals) =
+                FarmGear(inputs, candidates, gaps);
         // DRA-71 D7. Both read the player's own play and nothing else; the catalog's half of
         // each was refused by its own survey, which is written down where the engine is.
         if (goals.Contains(HelperGoal.FarmMotes)) FarmMotes(inputs, candidates, gaps);
@@ -1765,7 +1805,7 @@ public static partial class Recommendations
             gearBandRefusals, gearWhoWithheld, unreadWorn,
             materialBandRefusals, materialWhoWithheld, gearCandidates,
             gearEraRefusals, materialEraRefusals, EraGateArmed(inputs),
-            gearAnchorsRemoved);
+            gearAnchorsRemoved, gearOffHandRefusals);
     }
 
     // ---- the join: one place, every goal it serves (HOME-005) --------------------------
@@ -2431,7 +2471,8 @@ public static partial class Recommendations
         IReadOnlyList<string> UnreadWorn,
         int Candidates,
         List<GearEraRefusal> EraRefused,
-        List<GearAnchorRemoved> AnchorsRemoved) FarmGear(
+        List<GearAnchorRemoved> AnchorsRemoved,
+        int OffHandRefusals) FarmGear(
         HelperInputs inputs, List<Recommendation> into, List<GoalGap> gaps)
     {
         // A DECIDED deferral, said out loud. Every intent answers since DRA-71 D7, so this arm
@@ -2440,7 +2481,7 @@ public static partial class Recommendations
         if (GearUpgrades.ShapeFor(inputs.GearIntent) != GearIntentShape.Answered)
         {
             gaps.Add(new GoalGap(HelperGoal.FarmGear, GoalGapReason.GearIntentNotAnsweredYet));
-            return (0, [], 0, [], 0, [], []);
+            return (0, [], 0, [], 0, [], [], 0);
         }
 
         // **"Farm to sell" is a different question and leaves here** (DRA-71 D7, plan P9). It
@@ -2462,7 +2503,7 @@ public static partial class Recommendations
         if (inputs.GearIntent == GearIntent.FarmToSell)
         {
             FarmToSell(inputs, into, gaps);
-            return (0, [], 0, [], 0, [], []);
+            return (0, [], 0, [], 0, [], [], 0);
         }
 
         // "EQBuddy has never been told what you are wearing" is a different state from
@@ -2478,7 +2519,7 @@ public static partial class Recommendations
             gaps.Add(new GoalGap(HelperGoal.FarmGear, inputs.UnreadWorn.Count > 0
                 ? GoalGapReason.NothingWornIsReadable
                 : GoalGapReason.NoInventoryDump));
-            return (0, [], 0, inputs.UnreadWorn, 0, [], []);
+            return (0, [], 0, inputs.UnreadWorn, 0, [], [], 0);
         }
 
         var sweep = GearUpgrades.Sweep(
@@ -2487,7 +2528,7 @@ public static partial class Recommendations
         if (sweep.Upgrades.Count == 0)
         {
             gaps.Add(new GoalGap(HelperGoal.FarmGear, GoalGapReason.NoCatalogUpgrade));
-            return (sweep.Withheld, [], 0, inputs.UnreadWorn, 0, [], []);
+            return (sweep.Withheld, [], 0, inputs.UnreadWorn, 0, [], [], sweep.OffHandRefusals);
         }
 
         var byZone = new Dictionary<string, List<GearCandidate>>(StringComparer.OrdinalIgnoreCase);
@@ -2596,7 +2637,7 @@ public static partial class Recommendations
                  new HelperDoor(HelperDoorKind.Gear, "")]));
 
         return (sweep.Withheld, refused, whoWithheld, inputs.UnreadWorn, sweep.Upgrades.Count,
-                eraRefused, anchorsRemoved);
+                eraRefused, anchorsRemoved, sweep.OffHandRefusals);
     }
 
     /// <summary>
@@ -3014,8 +3055,14 @@ public static partial class Recommendations
         RecommendationKind kind, string subject, string zone,
         List<GearCandidate> candidates, int best, List<HelperDoor> doors)
     {
+        // **THE SAME KEYS THE SWEEP ORDERED ON, IN THE SAME ORDER** (DRA-222 D6). This row's
+        // cap is `GearNamedPerRow`, so whichever comparer runs here decides which upgrades the
+        // player actually READS about — and a second comparer disagreeing with the sweep's
+        // would mean the eight the sweep kept and the three this names were chosen on different
+        // grounds (trap 4, with the symptom visible only on rows where the two disagree).
         var named = candidates
-            .OrderByDescending(c => c.Upgrade.ImprovedMetrics)
+            .OrderByDescending(c => c.Upgrade.RelevantMetrics)
+            .ThenByDescending(c => c.Upgrade.ImprovedMetrics)
             .ThenBy(c => c.Upgrade.Item, StringComparer.OrdinalIgnoreCase)
             .ToList();
         var shown = named.Take(GearNamedPerRow).ToList();
@@ -3025,7 +3072,7 @@ public static partial class Recommendations
         {
             why.Add(new GearUpgradeFact(
                 upgrade.Item, upgrade.Over, upgrade.Slot, upgrade.GainMetric, upgrade.GainBy,
-                who.Named, who.Withheld));
+                who.Named, who.Withheld, upgrade.RelevantMetrics));
             if (who.Seen is { } fact) why.Add(fact);
         }
 

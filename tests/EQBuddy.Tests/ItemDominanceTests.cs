@@ -47,29 +47,45 @@ public class ItemDominanceTests
             ("Paladin Helm", Block("Slot: HEAD", "AC: 20", "Class: PAL")),
             ("Sword", Block("Slot: PRIMARY", "Skill: 1H Slashing", "DMG: 10", "Atk Delay: 26")),
             ("Better Sword", Block("Slot: PRIMARY", "Skill: 1H Slashing", "DMG: 14", "Atk Delay: 26")),
+            // DRA-222 D6: the two-handed pair, so the off-hand rule is inside the ONE-table
+            // claim rather than beside it. The Locker owns exactly the failure this catches —
+            // a player reading "⬆ upgrade over your sword" on a greatsword in the Gear room.
+            ("Greatsword", Block("Slot: PRIMARY", "Skill: 2H Slashing", "DMG: 20", "Atk Delay: 40")),
+            ("Better Greatsword", Block("Slot: PRIMARY", "Skill: 2H Slashing", "DMG: 26", "Atk Delay: 40")),
             ("Plain Helm +5", Block("Slot: HEAD", "AC: 4")),
         ];
         string[][ ] classSets = [[], ["PAL"], ["WAR", "RNG"]];
+        bool[] offHands = [false, true];
 
         var compared = 0;
+        var refused = 0;
         foreach (var classes in classSets)
-            foreach (var a in items)
-                foreach (var b in items)
-                {
-                    Assert.Equal(
-                        GearLocker.Dominates(Row(b.Name, b.Stats), Row(a.Name, a.Stats), classes),
-                        ItemDominance.Dominates(b.Name, b.Stats, a.Name, a.Stats, classes));
-                    Assert.Equal(
-                        GearLocker.CanClaimUpgrade(
-                            Row(b.Name, b.Stats), Row(a.Name, a.Stats), classes),
-                        ItemDominance.CanClaimUpgrade(
-                            b.Name, b.Stats, a.Name, a.Stats, classes));
-                    compared++;
-                }
+            foreach (var offHand in offHands)
+                foreach (var a in items)
+                    foreach (var b in items)
+                    {
+                        Assert.Equal(
+                            GearLocker.Dominates(
+                                Row(b.Name, b.Stats), Row(a.Name, a.Stats), classes, offHand),
+                            ItemDominance.Dominates(
+                                b.Name, b.Stats, a.Name, a.Stats, classes, offHand));
+                        Assert.Equal(
+                            GearLocker.CanClaimUpgrade(
+                                Row(b.Name, b.Stats), Row(a.Name, a.Stats), classes, offHand),
+                            ItemDominance.CanClaimUpgrade(
+                                b.Name, b.Stats, a.Name, a.Stats, classes, offHand));
+                        if (ItemDominance.Compare(
+                                b.Name, b.Stats, a.Name, a.Stats, classes, offHand)
+                            == DominanceVerdict.CostsTheOffHand) refused++;
+                        compared++;
+                    }
 
         // The sweep's own trap 78: a loop that compared nothing would agree perfectly.
-        Assert.Equal(items.Length * items.Length * classSets.Length, compared);
+        Assert.Equal(items.Length * items.Length * classSets.Length * offHands.Length, compared);
         Assert.True(compared > 100);
+        // …and the new verdict is actually REACHED by this table, or the rows above are
+        // decoration and the agreement they prove is about the old rule only.
+        Assert.True(refused > 0, "no pair in this table ever reached CostsTheOffHand");
     }
 
     /// <summary>The "+N" rule is one function now and the Locker still asks the same
@@ -160,6 +176,45 @@ public class ItemDominanceTests
         Assert.Contains(ItemDominance.MetricPairs(candidate, worn),
             p => p.Metric == "ratio" && p.B > p.A);
     }
+
+    /// <summary>
+    /// **THE BIGGEST RELEVANT IMPROVEMENT, NOT THE BIGGEST** (DRA-222 D6, S7.2).
+    ///
+    /// <para>The metrics are not on one scale, so the raw maximum is an arithmetic accident:
+    /// twelve points of HP beats two points of WIS every time, for every class. The relevance
+    /// set narrows which improvements may be NAMED and changes nothing else — and when nothing
+    /// relevant improved, the largest is still named rather than the row going quiet.</para>
+    /// </summary>
+    [Fact]
+    public void GainPrefersAMetricTheClassesGearActuallyCarries()
+    {
+        var worn = Block("Slot: HEAD", "AC: 4", "WIS: +2");
+        var candidate = Block("Slot: HEAD", "AC: 6", "HP: 12", "WIS: +5");
+
+        // Blind: HP moved most, so HP is named — the pre-D6 answer, unchanged.
+        Assert.Equal("HP", ItemDominance.Gain(candidate, worn)?.Metric);
+        Assert.Equal("HP", ItemDominance.Gain(candidate, worn,
+            new HashSet<string>(StringComparer.OrdinalIgnoreCase))?.Metric);
+
+        // With a priest's numbers, WIS is named even though it moved by three against HP's
+        // twelve — and the DELTA reported is WIS's own, not HP's.
+        var priest = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { "AC", "WIS" };
+        var gain = ItemDominance.Gain(candidate, worn, priest);
+        Assert.Equal("WIS", gain?.Metric);
+        Assert.Equal(3, gain!.Value.By);
+
+        // Nothing relevant improved ⇒ the largest overall, rather than no sentence at all.
+        var irrelevant = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { "Mana" };
+        Assert.Equal("HP", ItemDominance.Gain(candidate, worn, irrelevant)?.Metric);
+    }
+
+    /// <summary>Nothing improved answers null, so a caller cannot be handed a row with no
+    /// reason on it — with or without a relevance set.</summary>
+    [Fact]
+    public void GainIsNullWhenNothingImprovedEvenWithARelevanceSet() =>
+        Assert.Null(ItemDominance.Gain(
+            Block("Slot: HEAD", "AC: 4"), Block("Slot: HEAD", "AC: 4"),
+            new HashSet<string>(StringComparer.OrdinalIgnoreCase) { "AC" }));
 
     /// <summary>Nothing improved answers null, so a caller cannot be handed a row with no
     /// reason on it.</summary>

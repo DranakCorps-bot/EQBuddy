@@ -1170,6 +1170,36 @@ public static class HelperPresentation
               + "leaves out a camp it cannot tell you what to kill at.";
 
     /// <summary>
+    /// **WHAT THE OFF-HAND RULE REFUSED** (DRA-222 D6, S7.3; trap 50).
+    ///
+    /// <para><b>Its own sentence, beside the cap and the who rule and not folded into
+    /// either.</b> Those two are about a LIST and a PLACE; this one is about the player's hands,
+    /// and the remedy is different again — nothing is wrong with the data and nothing needs
+    /// editing, the item is simply a trade the player might still want to make with their eyes
+    /// open. Summing three causes into one number is the failure trap 50 is about.</para>
+    ///
+    /// <para><b>It names the cost and does not make the judgement.</b> EQBuddy has no way to
+    /// price an off-hand — that depends on the shield, the second weapon and the class, none of
+    /// which this repo has measured — so the sentence says what the swap would take and leaves
+    /// the call with the player, who can see it in the Gear room. The one thing it must not do
+    /// is what the rows used to do, which is offer the greatsword with no mention of the hand
+    /// it costs.</para>
+    ///
+    /// <para><b>The subject is what the player is wearing, never the item.</b> "Two-handed
+    /// weapons are worse" is a claim about the game; "you are holding something in your off
+    /// hand" is a row in their own dump.</para>
+    /// </summary>
+    public static string OffHandRefused(int refused) => refused <= 0
+        ? ""
+        : refused == 1
+            ? "1 upgrade is not listed: it is two-handed, and you have something in your off "
+              + "hand. EQBuddy cannot price what you would be putting down, so it leaves the "
+              + "swap to you."
+            : $"{refused:N0} upgrades are not listed: they are two-handed, and you have "
+              + "something in your off hand. EQBuddy cannot price what you would be putting "
+              + "down, so it leaves the swap to you.";
+
+    /// <summary>
     /// How many unread worn items are NAMED before the sentence counts the rest.
     ///
     /// <para>Three, which is <see cref="GearBandNamed"/>'s number and its argument: the names

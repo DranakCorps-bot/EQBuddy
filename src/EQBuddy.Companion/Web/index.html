@@ -1936,8 +1936,16 @@ function boot() {
     // would produce one sentence that can explain neither.
     // DRA-180 D2 adds the two ERA captions, each directly BEFORE its band sibling — the order
     // the gates ran in, so a reader meets the complete explanation before the partial one.
+    //
+    // DRA-222 D6 adds `gearOffHandRefused`, after the who rule's and before the materials
+    // block — the desktop room's own order, and the last of the five gear counts. It is the
+    // only one about the player's HANDS rather than about a place, which is exactly why it
+    // must not be missing here: a phone drawing the four above it and not this one shows a
+    // shorter weapon list than the PC with nothing on screen saying why. Its row in the
+    // page-side must-list is what makes that checkable (trap 34).
     for (const line of [h.moneyNote, h.gearBaseNote, h.materialNote, h.cap, h.gearWithheld,
                         h.gearEraRefused, h.gearBandRefused, h.gearWhoWithheld,
+                        h.gearOffHandRefused,
                         h.materialEraRefused, h.materialBandRefused, h.materialWhoWithheld])
       if (line) wrap.appendChild(el("div", "caption", line));
 

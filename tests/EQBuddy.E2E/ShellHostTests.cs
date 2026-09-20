@@ -3004,6 +3004,79 @@ public class ShellHostTests
     }
 
     /// <summary>
+    /// **THE OFF-HAND RULE, AND THE ONE ROW THAT TURNS IT ON** (DRA-222 D6, S7.3).
+    ///
+    /// <para>Two launches of the same app over the same primary-hand weapon, differing by ONE
+    /// line of the inventory dump: whether anything is worn in SECONDARY. That pairing is the
+    /// whole assertion, because a build that refused two-handers unconditionally — or one that
+    /// never refused any — satisfies either half alone.</para>
+    ///
+    /// <para><b>Relationships rather than exact counts</b>, the discipline the Founder row above
+    /// keeps: the sweep runs against the real shipped catalog, which is regenerated weekly, and
+    /// the launched app also narrows on the character's own class. The DIRECTION is what the
+    /// rule is, and it cannot drift.</para>
+    ///
+    /// <para><b>Both claims from one moment</b> (trap 56): <c>helperOffHandRefused</c> is what
+    /// the ENGINE removed and <c>helperOffHandLine</c> is whether the ROOM said so. A rule that
+    /// silently took the greatswords off his screen would satisfy the first alone, which is the
+    /// failure trap 50 exists to refuse and the one the phone half of D5 was caught by.</para>
+    /// </summary>
+    [Fact]
+    public void TheOffHandRuleRefusesTheGreatswordsAndTheRoomSaysSo()
+    {
+        var key = $"{AppHarness.Character}_{AppHarness.Server}".ToLowerInvariant();
+
+        // **OFF HAND FULL.** The same 1H Blunt morning star in both hands — the Founder's own
+        // arrangement, and the one the catalog's 441 two-handers are measured against.
+        int refusedWithOffHand;
+        using (var full = new AppHarness(
+                   configureSettings: s =>
+                   {
+                       s.HelperGoals[key] = [nameof(HelperGoal.FarmGear)];
+                       s.HelperGearIntent[key] = nameof(GearIntent.ReplaceSlot);
+                   },
+                   environment: OpenOn("helper")))
+        {
+            full.WriteInventoryDump(
+                ("Primary", "Enchanted Fine Steel Morning Star", 1),
+                ("Secondary", "Enchanted Fine Steel Morning Star", 1));
+            full.Launch();
+
+            full.WaitForDump("shellPage", "helper", "the shell to land on the Helper room");
+            full.WaitForDump("helperWorn", "2", "both hands to become anchors");
+
+            refusedWithOffHand = full.DumpValue("helperOffHandRefused");
+            Assert.True(refusedWithOffHand > 0,
+                "no two-handed offer was refused for a character wielding two one-handers — "
+                + "the rule never reached the sweep");
+            // …and the room SAID so. The count alone is a rule that removed rows in silence.
+            Assert.Equal(1, full.DumpValue("helperOffHandLine"));
+            // The sweep's own cap is a different number with a different cause, and the whole
+            // point of this slice's fifth count is that the two are never summed.
+            Assert.True(full.DumpValue("helperCandidates") > 0,
+                "the sweep found nothing at all, so the refusal above is about an empty list");
+        }
+
+        // **OFF HAND EMPTY.** One line removed. A two-hander now costs this character nothing,
+        // so the rule stands down whole and the room says nothing about it.
+        using var free = new AppHarness(
+            configureSettings: s =>
+            {
+                s.HelperGoals[key] = [nameof(HelperGoal.FarmGear)];
+                s.HelperGearIntent[key] = nameof(GearIntent.ReplaceSlot);
+            },
+            environment: OpenOn("helper"));
+        free.WriteInventoryDump(("Primary", "Enchanted Fine Steel Morning Star", 1));
+        free.Launch();
+
+        free.WaitForDump("shellPage", "helper", "the shell to land on the Helper room");
+        free.WaitForDump("helperWorn", "1", "the one-handed anchor");
+
+        Assert.Equal(0, free.DumpValue("helperOffHandRefused"));
+        Assert.Equal(0, free.DumpValue("helperOffHandLine"));
+    }
+
+    /// <summary>
     /// **THE VENDOR LINES ARE ON THE SCREEN, AND THE CAP IS WHY THERE ARE NOT MORE**
     /// (DRA-149 D4, plan P5; the Founder's FAIL item 3, second half).
     ///
