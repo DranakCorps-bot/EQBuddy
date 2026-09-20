@@ -243,3 +243,121 @@ No webhook fired for this — it is a reporting duty, not a LIVE ASK, and nothin
 blocked on an answer.
 
 — Dranak (Claude Code, Sr Executor, seat `opus-dra222-d6`, DRA-222 D6)
+
+---
+
+## 2026-09-20 — LIVE ASK: DRA-241 — may the D6 proc gap be closed, and in which shape?
+To: Helm
+
+**This is a LIVE ASK and the back-channel webhook fired for it.** DRA-241 is BLOCKED until
+Helm rules. Nothing is being implemented; not a line of the slice is written.
+
+**The ask in one sentence.** D6's done bar (SIGN `5bc99b4f`, DRA-222) asked that weapons
+compare on *"damage/delay/ratio/hand-restriction/dual-wield/proc"*. Five of the six shipped;
+**proc did not, and D6 item 4 is recorded NOT fully met.** Closing that gap EXTENDS a slice
+Helm already signed, and Planner may not widen a signed slice — so which of three readings is
+the ruling?
+
+- **(a) Report only, never price** — Planner's recommendation, shape below.
+- **(b) Price nothing, report nothing** — close DRA-241 WONTFIX and correct D6's bar, which
+  overreached what one slice could authorize.
+- **(c) Defer** behind a later gate, with the gate named.
+
+Nothing shipped overclaims today: `WhatsNew.json` never mentions proc and `ItemDominance`
+says nothing about it. This is a gap in a BAR, not a wrong statement on a player's screen.
+
+### The data is already committed. No harvest, no un-PARK.
+
+Measured by Planner against the shipped `src/EQBuddy.Core/Data/ItemCatalog.json.gz`
+(11,196 records, committed, fetches nothing):
+
+| reading | count |
+|---|---:|
+| records whose stats block has a `DMG:` line | **1,648** |
+| ... carrying an `Effect:` line | 488 |
+| ... `Effect: X (Combat, …)` — a combat PROC | **378** (22.9% of weapons) |
+| ... `(Must Equip)` / `(Any Slot…)` / `(Worn)` | 47 / 47 / 9 |
+| ... none of those, i.e. unadmitted | 7 |
+
+**Correction to Planner's own figure on the card: the DMG count is 1,648, not 1,649.** Both
+readings agree (line-anchored and substring), so the card was one too many. `ItemStatsBlock`
+has no `Effect` field; this is a FIFTH reader of a block we already ship — the shape
+`WeaponHands` used for the `Skill:` line and the `2H` prefix (D6 S7.3) — not a new source.
+
+### Two things Planner measured AFTER writing the card, and they change the shape
+
+**1. The `(Combat)` parenthetical is not the fact — it is one spelling of it.** Two committed
+rows put the word on the LEFT of the colon:
+
+```
+Sabertooth Short Bow    Combat Effect: Knee Shot (Req Level 15)
+Sharp Claws             Combat Effect: Laceration (Req Level 15)
+```
+
+Those are combat procs. A rule keyed on the parenthetical misses both — **trap 66's shape
+exactly**: a forgiveness rule written against one POSITION is a rule about the fact. The other
+five unadmitted rows are `Rod of Understanding` (`(Proc)`, literally), `Blam Stick` (a bare
+`Effect:` with nothing after it), `TornEar Thumper` (`(Req Level 30)`), `Spiroc Wingblade` and
+`Trakanon's Tooth` (`at Level ?`). **So the Unadmitted-refuses-nothing arm has seven committed
+instances and is not hypothetical** — that is the prove-fail material the guard needs, and it
+is why Planner does NOT propose widening the match to rescue them: the two `Combat Effect:`
+rows are a measured cost stated out loud, not a defect to paper over.
+
+**2. Scoping to the Effect LINE instead of the weapon admits 66 items that are not weapons.**
+Across the whole catalog 444 records carry `Effect: X (Combat…)`, and 66 of them have no
+`DMG:` line at all — they are Rogue POISONS (`Asp Poison`, `Basilisk Poison`, `Deadly
+Poison`…), a consumable applied to a weapon rather than a weapon. The reading must be scoped
+to the weapon RECORD. All 378 DMG+(Combat) rows carry a non-empty `Slots` (362 PRIMARY, 189
+SECONDARY, 28 RANGE, in two case spellings), so the scope is already on the record.
+
+### The shape Planner expects to be right, if (a)
+
+- `ItemStatsBlock.Effect` plus a `CombatProc` reading off the committed block, admitted
+  STRUCTURALLY, scoped to a record carrying a `DMG:` line, with anything unrecognised REPORTED
+  by name and refusing nothing (`WeaponHands.Unadmitted`'s rule, verbatim).
+- **The proc weighs NOTHING in `ItemDominance.MetricPairs`.** Nothing anywhere says a Ykesha
+  proc beats +40 Mana, and inventing an exchange rate is what S20 forbids and what
+  `ItemDominance`'s posture refuses by name. It rides the row as a named fact, so a player
+  choosing between two otherwise-close weapons can see that one procs and the other does not.
+- The caveat said ONCE per block, never per row (trap 73): EQBuddy cannot say what a proc is
+  worth.
+
+### The one question Planner cannot answer without Helm
+
+**May a proc ever REFUSE an offer, the way the off-hand rule does?** D6's off-hand refusal
+reads a FACT off the player's own dump (SECONDARY occupied). A proc refusal would have no
+equivalent fact behind it — it would be a judgement that a procing weapon the player does not
+own beats one they do, which is pricing wearing a refusal's clothes. Planner's reading is
+**no: annotate, never refuse.** That is a posture call, and it is the reason a SIGN is wanted
+before a line is written rather than after a reviewer finds it.
+
+### What a SIGN would and would not authorize
+
+It would authorize ONE slice: the reading, the annotation, and their guards. It would NOT
+authorize any `+N` arithmetic — **S8 (+0..+10) and S9 (exaltations) stay PARKED**, and a proc
+is a property of the BASE item, so nothing here holds, compares or invents a `+N`. Play
+Console OFF. Pages OFF. Harvest PARKED, and **this card does not need it un-PARKED** — that is
+what the measurement above is for. Reported to the Founder in DRA-223's step-2 email as a
+known gap with these numbers, explicitly not as a PARK.
+
+**Lifting condition:** a `HELM.md` tip or a PR review naming DRA-241 and choosing (a), (b) or
+(c), and — if (a) — answering the refuse/annotate question above. On (b) Planner closes the
+card WONTFIX and corrects D6's bar; on (a) the done bar is written TO the ruling and the card
+routes to Sr Executor. **No done bar is written yet, deliberately:** D6 item 4 was a bar
+written past its own authorization, and writing one here before the ruling would be the same
+error twice.
+
+### Feedback
+
+*Reinforcing:* the D6 SIGN (`5bc99b4f`) PARKing S8/S9 **by name** is what made this card cheap
+to scope — "a proc is a property of the BASE item, so nothing here touches a `+N`" is a
+sentence Planner could write without asking anyone, because the park had already drawn that
+line. Naming the parks in the SIGN lets the next card inherit its own boundary.
+
+*Constructive:* D6's bar listed six comparisons and its slice could deliver five. Bar and
+slice were written in the same breath and only the slice was measured against what the SIGN
+covered. A bar naming N facts deserves one line saying which of them the slice is expected to
+reach — otherwise the gap is found by a reviewer weeks later (R2, DRA-234) and costs a second
+SIGN to close, which is this card.
+
+— Dranak (Claude Code, Planner, DRA-241)
