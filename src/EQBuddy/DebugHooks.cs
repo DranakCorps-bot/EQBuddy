@@ -417,9 +417,12 @@ internal static class DebugHooks
         // and the phone and from nothing a test can call.
         //
         // The trigger's content is "<verb> <arg>" — "lens Cleric" lenses (a bare "-" is the
-        // Any chip), "picks Warrior+Paladin" writes the pick list ("-" writes none). An
-        // unknown verb, or a window that is not open, raises nothing rather than guessing, so
-        // a staging mistake times out naming the probe.
+        // Any chip), "picks Warrior+Paladin" writes the pick list ("-" writes none), and
+        // "guidedone guide:<id>/<step>" / "guideskip …" move one guide-ledger step the way a
+        // writer OUTSIDE this view does (the phone, or the other instance's own checkbox —
+        // DRA-218's signature collision). An unknown verb, or a window that is not open,
+        // raises nothing rather than guessing, so a staging mistake times out naming the
+        // probe.
         if (Environment.GetEnvironmentVariable("EQBUDDY_LENSPROBE") == "1")
             w.Loaded += (_, _) =>
             {

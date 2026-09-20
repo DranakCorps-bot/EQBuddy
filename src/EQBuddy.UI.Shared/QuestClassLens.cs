@@ -109,4 +109,62 @@ public static class QuestClassLens
         var mine = new HashSet<string>(resolved, StringComparer.OrdinalIgnoreCase);
         return [.. rows.Where(mine.Contains)];
     }
+
+    /// <summary>
+    /// **Does the quick-select have to be REBUILT?** (DRA-216 D1, the churn fix.)
+    ///
+    /// <para><b>What went wrong.</b> The host refreshed the control from its render, ABOVE the
+    /// render's own signature gate, and the shell's room repaints every tick by design
+    /// (<c>QuestsRoom</c> calls <c>PaintNow</c>) while the v1 window repaints off the dump's
+    /// <c>PaintOneMoment</c>. The rebuild is unconditional — it clears the strip and news up a
+    /// fresh <c>Button</c> — so the player's control was destroyed and replaced about once a
+    /// second on an identity that had not moved. Trap 46 in its own words: when a surface
+    /// moves hosts, check what the new host calls every tick.</para>
+    ///
+    /// <para><b>Two user-visible costs, neither of which a screenshot can show.</b> The hover
+    /// that names the classes the action is about to tick — the whole of
+    /// <c>ClassFilterLabel.MyClassesTip</c>'s honesty argument — hangs off that <c>Button</c>
+    /// instance and was torn down before it could be read. And WPF raises <c>Click</c> only
+    /// when the press and the release land on the SAME element, so a click that straddled a
+    /// tick did nothing at all: a silent no-op on a one-click control.</para>
+    ///
+    /// <para><b>The comparison is the CONTENT of the control, not the identity of its
+    /// inputs.</b> Both things the strip actually draws are compared — the classes it will
+    /// tick and the words it hovers — because <see cref="EQBuddy.Core.ClassSource"/> can move
+    /// under a steady class list (the game's own dump arriving where the log had been
+    /// guessing), and that changes the tip without changing a single class. A guard that
+    /// compared only the classes would pin a stale parenthetical on screen for the rest of the
+    /// session, which is the control lying about where its answer came from.</para>
+    ///
+    /// <para><b>Ordinal, and deliberately not case-insensitive.</b> <see cref="MyClasses"/>
+    /// ships the ROW's spelling, so two answers about one identity are byte-identical; a
+    /// difference in case here is a difference in what the tip PRINTS, and the strip should
+    /// be rebuilt to print it.</para>
+    ///
+    /// <para><b>"Nothing yet" and "nothing, painted" are the same state, so they compare
+    /// equal.</b> A host's first pass over a character with no identity finds empty against its
+    /// own empty start and builds nothing — which is right, because building nothing is
+    /// exactly what an empty action list does. The state that matters is the reverse one and
+    /// it is a CHANGE: something to nothing MUST come back true, or a character who loses
+    /// their identity keeps a button that selects classes they no longer hold.</para>
+    /// </summary>
+    /// <param name="shownClasses">What the strip on screen is offering to tick.</param>
+    /// <param name="shownTip">The hover that strip is carrying.</param>
+    /// <param name="nextClasses">What this render's <see cref="MyClasses"/> answered.</param>
+    /// <param name="nextTip">The hover this render would give it.</param>
+    /// <returns><c>true</c> when the host must call its picker's action builder — including
+    /// the empty case, which REMOVES the control rather than offering one that does nothing.
+    /// </returns>
+    public static bool MyClassesActionMoved(
+        IReadOnlyList<string>? shownClasses, string? shownTip,
+        IReadOnlyList<string>? nextClasses, string? nextTip)
+    {
+        if (!string.Equals(shownTip ?? "", nextTip ?? "", StringComparison.Ordinal)) return true;
+        var shown = shownClasses ?? [];
+        var next = nextClasses ?? [];
+        if (shown.Count != next.Count) return true;
+        for (var i = 0; i < shown.Count; i++)
+            if (!string.Equals(shown[i], next[i], StringComparison.Ordinal)) return true;
+        return false;
+    }
 }
