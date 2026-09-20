@@ -2,15 +2,17 @@
 
 **Immutable. Nothing here is live, and nothing here is a work queue.**
 
-Rotated out of the active channel files in four passes: **2026-09-14** by DRA-75
+Rotated out of the active channel files in five passes: **2026-09-14** by DRA-75
 (M0-2) under the DRA-73 plan rev 2 approved by David on 2026-09-14,
 **2026-09-17** by DRA-165 (DRA-144 F1) under DRA-26 plan §5 as David SIGNed it
 2026-09-17T01:06:45Z, and **2026-09-18** by DRA-154 (`EXO-CHANNEL-ROTATE`) under the
-Helm AUTHORIZE of that evening, and **2026-09-20** by DRA-229 (DRA-144 F4b) under
-DRA-26 plan rev 3 section 5. `exo-experiment: channel-rotation`. Tier T1.
+Helm AUTHORIZE of that evening, and **2026-09-20** by DRA-229 (DRA-144 F4b) and
+DRA-231 (DRA-144 F6), both under DRA-26 plan rev 3 section 5.
+`exo-experiment: channel-rotation`. Tier T1.
 Pass 2 appended into the existing `FABLE-FEEDBACK.md` archive and pass 3 into the
 existing `HELM-FEEDBACK.md` one; neither moved anything an earlier pass had written,
-and pass 4 wrote a new `SCRIBE.md` archive that no earlier pass had opened.
+and passes 4 and 5 wrote new `SCRIBE.md` and `DECISIONS.md` archives that no earlier
+pass had opened.
 
 Holds live in `HELM.md` and **only Helm lifts one**. An archived line never
 revives a hold and never commissions work. If you are looking for something to
@@ -28,10 +30,30 @@ do, the inboxes are `SCRIBE.md`, `BEVEL.md` and `FABLE.md` — not this director
 | [`HELM.md`](HELM.md) *(pass 3)* | 144 tips + 134 sign-offs | 1,033,986 | 1,047,518 B → 25,411 B (1 tip) | before 2026-09-18 |
 | [`HELM-FEEDBACK.md`](HELM-FEEDBACK.md) *(pass 3)* | 81 | 342,571 | 344,449 B → 4,730 B (1 entry) | before 2026-09-18 |
 | [`SCRIBE.md`](SCRIBE.md) *(pass 4)* | 47 | 99,145 | 213,675 B → 114,715 B (45 entries) | **triage by `Priority`, not a date** |
+| [`DECISIONS.md`](DECISIONS.md) *(pass 5)* | 143 | 595,476 | 676,431 B → 85,238 B (18 blocks) | before 2026-09-17, **plus a hand-triaged floor** |
 
-No pending ask was archived in any pass — pass 2's 18 candidate ask/hold
+No pending ask is archived in any pass — pass 2's 18 candidate ask/hold
 markers were each dispositioned before the move and all 18 were already discharged,
 so nothing needed re-pinning, and pass 3 did the same for 43.
+**Pass 5 is the first pass that had to re-pin, and the marker sweep is not what caught
+it.** All five 2026-09-14 blocks carrying an `exo-experiment:` tag are correctly archived
+as history, but the tag itself is read out of the *live* file by `Get-Experiments` in
+`scripts/exo-metrics.ps1` and by two tests, so archiving all six tags broke the ExO
+dashboard's regenerability. Both channel guards were green; CI tests caught it. The six
+tag lines and their judging clauses are re-pinned verbatim into a dated `STANDING` block
+in the live file (3,440 B), and the full entries stay here. **The lesson for pass 6 and
+later: the never-rotate floor is a keyword set, so it cannot see content whose liveness is
+carried by a consumer rather than by a marker. Grep `scripts/` and `tests/` for the
+ledger's filename before cutting it.**
+**Pass 5 is also the first pass whose triage changed the cut.** `DECISIONS.md` had 30 blocks
+older than the 2026-09-17 date cut carrying a `LIVE ASK` / `PARK` / `HOLD` / `STANDING`
+marker. Each was dispositioned by hand: 24 moved — the marker was product vocabulary
+(a parked HUD chip row, a seat-mutex holder), a counterfactual ("could have gone the
+other way: LIVE ASK first"), a narrative reference to an ask whose residence is another
+file and which is now discharged, or a rule that has since graduated to a live document
+— and **6 were kept in the live file at any age** because they carry a park with an
+unmet reopen condition, an unfixed defect named for veto, a rule whose only residence
+is `DECISIONS.md` itself, or a relay another card is still blocked on.
 **Pass 4 could not use a cutoff at all.** `SCRIBE.md` is an inbox, not a dated ledger:
 its entries carry a `Priority` field, 42 of the 92 were still open by that field, and the
 oldest of those (`waiting`, 2026-08-19) sit further down than entries already discharged.
