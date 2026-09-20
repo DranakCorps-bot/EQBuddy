@@ -104,6 +104,7 @@ public partial class QuestsView : UserControl
         BuildStaticChrome();
         EpicClassicOnlyCheck.IsChecked = _settings.EpicQuestClassicOnly;
         SkyIslandRepeatCheck.IsChecked = _settings.SkyStepsUnderEveryIsland;
+        SkyClosestCheck.IsChecked = _settings.SkyClosestToCompletion;
         BuildClassChecks();
         BuildUnlockPicker();
         EraCombo.Items.Add("Any era");
@@ -818,6 +819,16 @@ public partial class QuestsView : UserControl
         Refresh(force: true);
     }
 
+    /// <summary>The Sky tab's Closest to Completion lens (DRA-218). Persisted for its two
+    /// siblings' reason — EQBuddy Mobile reads the same setting, so one checklist is ordered
+    /// one way on both screens.</summary>
+    private void OnSkyClosestToggled(object sender, RoutedEventArgs e)
+    {
+        _settings.SkyClosestToCompletion = SkyClosestCheck.IsChecked == true;
+        _settings.Save();
+        Refresh(force: true);
+    }
+
     // The state filter (Reddit ask, 2026-08-11): cuts across every tab and search —
     // session-scoped on purpose, like the search box; a sticky "done" filter would
     // read as an empty tracker tomorrow.
@@ -973,7 +984,13 @@ public partial class QuestsView : UserControl
             // unrelated moved. Exactly the fold's story, one store later; the repeat flag has
             // had the same hole since it shipped and gets closed here because DRA-164 gave it
             // its second reader.
-            $"|sky:{(_settings.SkyGroupByIsland ? 1 : 0)}{(_settings.SkyStepsUnderEveryIsland ? 1 : 0)}" +
+            //
+            // The completion lens is the THIRD digit and joins for exactly the same reason
+            // (DRA-218): it is a profile-level setting with two writers — this window and the
+            // shell's Guide room — and it reorders every group and every island row on the
+            // tab without touching a tick, a fold or a pick.
+            $"|sky:{(_settings.SkyGroupByIsland ? 1 : 0)}{(_settings.SkyStepsUnderEveryIsland ? 1 : 0)}"
+            + $"{(_settings.SkyClosestToCompletion ? 1 : 0)}" +
             // THE FOLD. Every guided group on all three tabs reads AppSettings.GuideExpanded
             // to decide whether it starts open, and nothing else in this signature moves when
             // it does. The fold control's own click forces a refresh, so this is not about
@@ -1023,6 +1040,9 @@ public partial class QuestsView : UserControl
         _lastIslandLayout = null;
         _lastIslandRowTitle = "";
         _lastIslandRowOwner = "";
+        _lastBlockedNote = "";
+        _lastFirstGroupHeading = "";
+        _lastFirstGroupRemaining = -1;
         _rows.Clear();
         _renderedCount = 0;
         _suppressed = 0;
@@ -1384,6 +1404,20 @@ public partial class QuestsView : UserControl
         $"questsSkyRepeat={(_settings.SkyStepsUnderEveryIsland ? 1 : 0)} " +
         $"questsSkyViewChips={_skyView.Count} " +
         $"questsSkyViewShown={(SkyViewHost.Visibility == Visibility.Visible ? 1 : 0)} " +
+        // ---- Closest to Completion (DRA-218) ------------------------------------------
+        // THE SETTING and THE CONTROL, from one moment (trap 56) — a lens that reached the
+        // store and no checkbox is trap 20's shape, and the checkbox is the only door this
+        // lens has.
+        $"questsSkyClosest={(_settings.SkyClosestToCompletion ? 1 : 0)} " +
+        $"questsSkyClosestBox={(SkyClosestCheck.IsChecked == true ? 1 : 0)} " +
+        // THE ORDER THE SCREEN IS IN, which is the whole acceptance bar and the one thing
+        // no setting can assert: the first group's heading in the order it was drawn. A
+        // blocked reward leading this value is the failure S23 AC 8 names.
+        $"questsSkyFirstGroup={Dumped(_lastFirstGroupHeading)} " +
+        $"questsSkyFirstRemaining={_lastFirstGroupRemaining} " +
+        // The blocked sentence that reached the PANEL — not the one BlockedNote answered,
+        // which is the store's claim rather than the screen's (trap 56).
+        $"questsSkyBlockedNote={Dumped(_lastBlockedNote)} " +
         // WHAT THE LAST RENDER DREW, from ONE moment (trap 56): the setting says the player
         // asked for the island view, and these say the screen actually built one. -1 is
         // "this render drew no island layout at all", which is a different claim from "it
@@ -3714,6 +3748,14 @@ public partial class QuestsView : UserControl
 
         var matching = QuestChecklistLayout.InState(inScope, _state).ToList();
 
+        // CLOSEST TO COMPLETION (DRA-218). Last of the three, and downstream of all of them:
+        // it reorders whatever the picker, the class lens and the state lens left, and adds
+        // and removes nothing — so the row objects, their ids and their tick setters are the
+        // same ones class order would have handed to the loop below. Sky only; an Epic
+        // section is a stage of one quest rather than a reward you could be closer to.
+        if (tab == QuestTab.Sky && _settings.SkyClosestToCompletion)
+            matching = [.. QuestChecklistLayout.ClosestToCompletion(matching)];
+
         if (matching.Count == 0)
         {
             // NAME what emptied the list. "Nothing matches" over a checklist that is
@@ -3747,6 +3789,15 @@ public partial class QuestsView : UserControl
         var lastClass = "";
         foreach (var group in matching)
         {
+            // THE ORDER, as the panel received it (DRA-218). Written before anything can
+            // `continue` past it, so it is the first group the render was HANDED and not the
+            // first one that happened to draw a control — the ordering claim is about the
+            // list, and a fold decides how much of it appears.
+            if (_lastFirstGroupHeading.Length == 0)
+            {
+                _lastFirstGroupHeading = group.Heading;
+                _lastFirstGroupRemaining = group.Remaining;
+            }
             // A class whose epic is marked complete has LOCKED rows. Not decoration: the
             // master check's undo restores the snapshot it took, so a tick made while
             // complete would be silently discarded on Reopen — EpicCompleteToggle.Restore
@@ -3885,6 +3936,21 @@ public partial class QuestsView : UserControl
                 headingRow.Children.Add(guideCaption);
             }
 
+            // WHY THIS ONE WILL NOT FINISH (DRA-218, S23 AC 8). Above the rows and on the
+            // heading, because a folded group is often the only thing on screen for a quest
+            // and the count on that line is the thing being corrected: "1 left" with a
+            // struck-out prerequisite behind it is the reading this sentence exists to stop.
+            // Core's words, so the phone says it identically (#184).
+            if (QuestChecklistLayout.BlockedNote(group) is { } blocked)
+            {
+                var blockedLine = DesignSystem.Text(Role.Caption, blocked);
+                blockedLine.TextWrapping = TextWrapping.Wrap;
+                blockedLine.Margin = new Thickness(DesignTokens.SpaceXs, 0, 0, DesignTokens.SpaceXs);
+                blockedLine.Ink("DimBrush");
+                QuestsPanel.Children.Add(blockedLine);
+                _lastBlockedNote = blocked;
+            }
+
             // FOLDED: the heading line — which now carries the fold control itself — its
             // counts and its caption, and nothing else. That is what lets a whole class fit
             // on one screen and be dug into one quest at a time.
@@ -3939,7 +4005,11 @@ public partial class QuestsView : UserControl
     private void RenderIslandView(
         IReadOnlyList<QuestChecklistGroup> matching, Dictionary<string, Action<bool>> setters)
     {
-        var layout = QuestChecklistLayout.SkyByIsland(matching, _settings.SkyStepsUnderEveryIsland);
+        // The completion lens rides through rather than being applied above: the groups have
+        // no headings on this screen to reorder, so it has to reach the ROWS inside an island
+        // or it is a control that changes nothing and says nothing (DRA-218).
+        var layout = QuestChecklistLayout.SkyByIsland(
+            matching, _settings.SkyStepsUnderEveryIsland, _settings.SkyClosestToCompletion);
         _lastIslandLayout = layout;
         _lastIslandRowTitle = "";
         _lastIslandRowOwner = "";
@@ -4006,6 +4076,20 @@ public partial class QuestsView : UserControl
     /// <summary>What the LAST island render drew, for the <c>EQBUDDY_EXPAND</c> dump — the
     /// screen's answer, not the store's, which is the distinction trap 56 is about.</summary>
     private QuestChecklistLayout.SkyIslandLayout? _lastIslandLayout;
+
+    /// <summary>The blocked sentence that actually reached the panel (DRA-218), for the
+    /// <c>EQBUDDY_EXPAND</c> dump. The SCREEN's answer and not the group's — trap 56's
+    /// distinction, and the reason it is written where the control is added rather than
+    /// where <c>BlockedNote</c> is asked. Cleared with the panel (trap 38).</summary>
+    private string _lastBlockedNote = "";
+
+    /// <summary>The first group the class-view render was handed, and how much work it has
+    /// left (DRA-218). The ORDER is the acceptance bar for the completion lens and no setting
+    /// can assert it; these two are what an E2E reads. "-" / -1 when the render drew no class
+    /// view at all, which is a different claim from "it drew an empty one" (trap 38).</summary>
+    private string _lastFirstGroupHeading = "";
+
+    private int _lastFirstGroupRemaining = -1;
 
     /// <summary>The first island row that actually reached the panel, as the two strings the
     /// control was built from (plan P8). Reset on every island render and cleared by a class

@@ -107,7 +107,30 @@ public sealed record QuestChecklistRow(
     /// same islands compare equal, which every repaint gate and every equality assertion in
     /// this app already relies on. <see cref="SkyIslands.FromSetKey"/> is the inverse and is
     /// round-trip tested.</para></summary>
-    string IslandKey = "");
+    string IslandKey = "",
+    /// <summary>The prerequisites of THIS step that the player cannot get to from here —
+    /// by NAME, joined with <see cref="QuestChecklistLayout.BlockerSeparator"/>. Empty on
+    /// every classic row and on the overwhelming majority of guide rows, which is the
+    /// normal state and not a gap.
+    ///
+    /// <para><b>Waiting is not the same as blocked, and only one of the two belongs here.</b>
+    /// A turn-in whose pieces you have not collected yet is waiting on work that is already
+    /// counted — <see cref="QuestChecklistGroup.Remaining"/> holds it, and the row's own
+    /// <c>Detail</c> already says "after: …". This field carries the OTHER kind: a
+    /// prerequisite the player struck out, which no amount of the remaining work will close.
+    /// Sorting or labelling on the count alone cannot tell those apart, and that is the whole
+    /// defect DRA-218's lens exists to avoid (S23 AC 8).</para>
+    ///
+    /// <para>ONE PRODUCER (trap 4): <c>GuidePresentation.BlockedBy</c> answers the same
+    /// question for the active-step card's "the hand-in waits on a step you skipped"
+    /// sentence, and the projection stamps this from that same call. A second reading of the
+    /// prerequisite graph is how the card and the heading start disagreeing about one
+    /// quest.</para>
+    ///
+    /// <para>A joined string rather than a list for <see cref="IslandKey"/>'s reason: the
+    /// record stays value-equal, so every repaint gate that folds these rows keeps
+    /// working.</para></summary>
+    string BlockedBy = "");
 
 /// <summary>
 /// The active-step card: what the player should do NEXT in one guided reward, lifted out of
@@ -256,6 +279,44 @@ public sealed record QuestChecklistGroup(
 
     public int Total => Rows.DistinctBy(r => r.Id, StringComparer.Ordinal).Count();
 
+    /// <summary>The steps this group still has to DO — not in hand, and not struck out.
+    ///
+    /// <para><b>Not <c>Total - Done</c>, and the difference is the point.</b> A skipped step
+    /// is not work: the player said they are not doing it, and counting it would rank a
+    /// reward as further away than the player believes it is. It is the same exclusion
+    /// <see cref="SetAside"/> already makes on the heading — said once, as a number, so the
+    /// ordering lens and the label cannot disagree.</para>
+    ///
+    /// <para>DISTINCT rows, for <see cref="Done"/>'s reason: a step naming three islands
+    /// renders three times when the player asks for it, and counting rows would call a
+    /// six-piece reward a twelve-piece one.</para>
+    ///
+    /// <para><b>It says nothing about whether the work can be STARTED</b> — see
+    /// <see cref="Blocked"/>. Two rewards both reading "1 left" can be one hand-in apart and
+    /// permanently stuck respectively, and the count alone cannot tell you which.</para></summary>
+    public int Remaining => Rows.DistinctBy(r => r.Id, StringComparer.Ordinal)
+        .Count(r => !r.Acquired && !r.IsSkipped);
+
+    /// <summary>Something this group still has to do is waiting on a step the player struck
+    /// out, so the remaining work will not finish it (S23 AC 8).
+    ///
+    /// <para>Read off the rows' own <see cref="QuestChecklistRow.BlockedBy"/> rather than
+    /// re-walking the prerequisite graph, which Core does not hold — the projection stamped
+    /// the answer, and one producer is the rule (trap 4). A group with no guide behind it
+    /// carries no prerequisites at all and is never blocked, which is the honest reading of
+    /// "we hold no prerequisite data for this" rather than a claim that there is none.</para>
+    ///
+    /// <para>An ACQUIRED or SKIPPED row is not asked: nothing blocks a step nobody is going
+    /// to take.</para></summary>
+    public bool Blocked => BlockedRows.Count > 0;
+
+    /// <summary>The remaining rows that carry a blocker — the set
+    /// <see cref="QuestChecklistLayout.BlockedNote"/> words. Private to the two of them so
+    /// no surface re-derives the membership rule.</summary>
+    internal IReadOnlyList<QuestChecklistRow> BlockedRows =>
+        [.. Rows.DistinctBy(r => r.Id, StringComparer.Ordinal)
+            .Where(r => !r.Acquired && !r.IsSkipped && r.BlockedBy.Length > 0)];
+
     /// <summary>Which slice of the state lens this group falls in — one of
     /// <see cref="QuestChecklistLayout.States"/>, never "any state", which is the absence
     /// of a filter rather than a state a group can be in.
@@ -284,6 +345,13 @@ public sealed record QuestChecklistGroup(
         // visible — one heading per class instead of one per section.
         : AllPiecesInHand ? (CompletionKey is null ? "done" : "ready")
         : SetAside ? "set aside"
+        // BEFORE "in progress", because it is the sharper of the two true words and the
+        // heading carries only one (DRA-218, S23 AC 8). A reward waiting on a step the
+        // player struck out read "in progress" — true, and it is the reading that makes a
+        // one-step-left group look like the next thing to go and do. AFTER "set aside",
+        // because a group whose every remaining step is skipped is one the player put down
+        // whole; "blocked" would invite them to go unblock something they closed.
+        : Blocked ? "blocked"
         : Rows.Any(r => r.Acquired) ? "in progress"
         : null;
 
@@ -522,6 +590,84 @@ public static class QuestChecklistLayout
         if (note is null) return npc;
         return npc.Length == 0 ? note : npc + " — " + note;
     }
+
+    // ---- CLOSEST TO COMPLETION, and the blocker that keeps it honest (DRA-218) ----------
+    //
+    // S5.1/S5.2 asked for a lens that answers "which of these am I actually about to
+    // finish". The arithmetic was already here — Done, Total, Progress — and the reason it
+    // was not enough is S23 AC 8: a reward with one step left and a struck-out prerequisite
+    // is not one step from anything. That fact lives on the ROWS
+    // (QuestChecklistRow.BlockedBy), stamped by the one place that holds the prerequisite
+    // graph, and everything below reads it rather than re-deriving it (trap 4).
+
+    /// <summary>What joins several blocker names inside one
+    /// <see cref="QuestChecklistRow.BlockedBy"/>. The app's list separator — the same one
+    /// the checklist rows, the raid rows and <see cref="SkyIslands.SeveralHeading"/> use, and
+    /// chosen there for a reason that applies here too: a comma reads as part of a name.</summary>
+    public const string BlockerSeparator = " · ";
+
+    /// <summary>The lead of the heading's blocked sentence. Names the KIND of wait before it
+    /// names the step, because the player scanning a folded list needs to know this is not
+    /// the ordinary "collect the rest" wait before they read a step name.</summary>
+    public const string BlockedLead = "Waiting on a step you skipped: ";
+
+    /// <summary>
+    /// Why a group is <see cref="QuestChecklistGroup.Blocked"/>, in words, or null when it is
+    /// not — so a surface adds nothing at all for the ordinary case.
+    ///
+    /// <para>Core computes the words and every surface renders them, the
+    /// <see cref="ReadyNote"/> rule verbatim (#184). The names come off the rows exactly as
+    /// the projection wrote them; nothing here re-words a step.</para>
+    ///
+    /// <para><b>It does not tell the player to un-skip anything.</b> Skipping is a decision
+    /// they made and may have meant; the sentence names what the decision is now costing and
+    /// stops. The undo is the row's own strike-through, on the same screen.</para>
+    /// </summary>
+    public static string? BlockedNote(QuestChecklistGroup group)
+    {
+        var blockers = group.BlockedRows
+            .Select(r => r.BlockedBy)
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToList();
+        return blockers.Count == 0 ? null
+            : BlockedLead + string.Join("; ", blockers) + ".";
+    }
+
+    /// <summary>
+    /// "Which of these am I closest to finishing" (S5.1) — the same groups, reordered by how
+    /// much work is left rather than by class and alphabet.
+    ///
+    /// <para><b>It is an ORDER, not a view.</b> Pass the groups you would have drawn, after
+    /// the class picker, the class lens and the state lens have had their say — like
+    /// <see cref="SkyByIsland"/> and unlike <see cref="SearchByItem"/>. Nothing is added,
+    /// nothing is removed, and no row's identity or tick changes, which is what lets this
+    /// compose with the island view instead of competing with it (S23 AC 9/10).</para>
+    ///
+    /// <para><b>BLOCKED GROUPS SINK, and that is the whole reason this is not one
+    /// <c>OrderBy</c> over <see cref="QuestChecklistGroup.Remaining"/></b> (S23 AC 8). A
+    /// reward holding one of two pieces with the other struck out has exactly one step left
+    /// by the count — the hand-in — and leads a fewest-first list while being the one reward
+    /// on the tab that cannot be finished at all. The count is right; it is just not an
+    /// answer to the question the lens was asked.</para>
+    ///
+    /// <para>A group with NOTHING left sinks below both, for the reason <see cref="Sky"/>
+    /// already sinks a turned-in one: nothing is left to be close to. Ties break on progress
+    /// and then on class and title, so the order is total and a repaint cannot shuffle two
+    /// equal rewards.</para>
+    /// </summary>
+    public static IReadOnlyList<QuestChecklistGroup> ClosestToCompletion(
+        IEnumerable<QuestChecklistGroup> groups) =>
+        [
+            .. groups
+                // Nothing left to do at all — turned in, or every remaining step struck out.
+                // Ordered last as a block, so "closest" never leads with something finished.
+                .OrderBy(g => g.Remaining == 0)
+                .ThenBy(g => g.Blocked)
+                .ThenBy(g => g.Remaining)
+                .ThenByDescending(g => g.Progress)
+                .ThenBy(g => g.ClassName, StringComparer.OrdinalIgnoreCase)
+                .ThenBy(g => g.Title, StringComparer.OrdinalIgnoreCase),
+        ];
 
     /// <summary>Done / Ready / Partial / Total per class (#136, bjstrange), so "how am I
     /// doing across all sixteen" is one glance rather than a scroll. Classes come back in
@@ -802,16 +948,38 @@ public static class QuestChecklistLayout
     /// off, it gets its own group whose heading NAMES them. This is the setting's second
     /// reader and the one that makes it matter again — with every Sky reward now guided, the
     /// projection replaces the classic rows that used to be the only thing it moved.</param>
+    /// <param name="byCompletion">The player has the completion lens on
+    /// (<see cref="ClosestToCompletion"/>, DRA-218). Rows inside an island then lead with the
+    /// reward that is closest to finished, and a BLOCKED reward's rows sink — so the lens
+    /// means the same thing in both views.
+    ///
+    /// <para><b>It exists because the alternative is a live-looking no-op.</b> The lens
+    /// reorders GROUPS, and this view has no groups on screen to reorder: without this,
+    /// turning it on in island view changes nothing at all and says nothing about it, which
+    /// is the failure <see cref="SkyIslandCrossClassNote"/> was written to avoid one control
+    /// along. Ordering is the honest answer here because an island's rows already carry which
+    /// reward they belong to.</para>
+    ///
+    /// <para>Off, the ordering is the class/reward/step one this view has always had, byte
+    /// for byte.</para></param>
     public static SkyIslandLayout SkyByIsland(
-        IEnumerable<QuestChecklistGroup> groups, bool repeatMultiIsland = false)
+        IEnumerable<QuestChecklistGroup> groups, bool repeatMultiIsland = false,
+        bool byCompletion = false)
     {
-        var placements = new List<(double Sort, string Key, string Heading, SkyIslandRow Row)>();
+        var placements = new List<(
+            double Sort, string Key, string Heading, SkyIslandRow Row,
+            bool Blocked, int Remaining)>();
         var hiddenRewards = 0;
         var hiddenTurnIns = 0;
 
         foreach (var group in groups)
         {
             if (group.Completed) { hiddenRewards++; continue; }
+            // Read ONCE per group rather than per row: both walk every row of the group, and
+            // a step drawn under three islands would otherwise ask the same question three
+            // more times for an answer that cannot have changed.
+            var blocked = group.Blocked;
+            var remaining = group.Remaining;
             foreach (var row in group.Rows)
             {
                 if (row.IsTurnIn) { hiddenTurnIns++; continue; }
@@ -828,23 +996,23 @@ public static class QuestChecklistLayout
                     var heading = row.IslandHeading.Length > 0
                         ? row.IslandHeading
                         : SkyIslands.AnywhereHeading;
-                    placements.Add((AnywhereSort, heading, heading, entry));
+                    placements.Add((AnywhereSort, heading, heading, entry, blocked, remaining));
                 }
                 else if (islands.Count == 1)
                 {
                     placements.Add((islands[0], SkyIslands.SetKey(islands),
-                        SkyIslands.Heading(islands[0]), entry));
+                        SkyIslands.Heading(islands[0]), entry, blocked, remaining));
                 }
                 else if (repeatMultiIsland)
                 {
                     foreach (var island in islands)
                         placements.Add((island, SkyIslands.SetKey([island]),
-                            SkyIslands.Heading(island), entry));
+                            SkyIslands.Heading(island), entry, blocked, remaining));
                 }
                 else
                 {
                     placements.Add((SeveralSort, SkyIslands.SetKey(islands),
-                        SkyIslands.SeveralHeading(islands), entry));
+                        SkyIslands.SeveralHeading(islands), entry, blocked, remaining));
                 }
             }
         }
@@ -861,10 +1029,16 @@ public static class QuestChecklistLayout
                 .Select(g => new SkyIslandGroup(
                     g.First().Heading,
                     [
-                        .. g.Select(p => p.Row)
-                            .OrderBy(r => r.Row.ClassName, StringComparer.OrdinalIgnoreCase)
-                            .ThenBy(r => r.Reward, StringComparer.OrdinalIgnoreCase)
-                            .ThenBy(r => r.Row.Title, StringComparer.OrdinalIgnoreCase),
+                        // The completion terms lead only when the lens asked for them, and
+                        // they are the SAME two ClosestToCompletion sorts on — blocked last,
+                        // then fewest left. With the lens off both keys are constant, so the
+                        // class/reward/step order below is untouched.
+                        .. g.OrderBy(p => byCompletion && p.Blocked)
+                            .ThenBy(p => byCompletion ? p.Remaining : 0)
+                            .ThenBy(p => p.Row.Row.ClassName, StringComparer.OrdinalIgnoreCase)
+                            .ThenBy(p => p.Row.Reward, StringComparer.OrdinalIgnoreCase)
+                            .ThenBy(p => p.Row.Row.Title, StringComparer.OrdinalIgnoreCase)
+                            .Select(p => p.Row),
                     ])),
         ], hiddenRewards, hiddenTurnIns);
     }
