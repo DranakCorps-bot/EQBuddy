@@ -78,11 +78,19 @@ them.
 
 ### Channel files: who trims, and how they stay small
 
-- **Executor never trims.** Executors append only; spotted rot goes into a card
-  comment, never fixed inline. Trimming is janitorial, not engineering, and must
-  never ride inside a feature branch.
-- **Rotation owner is a non-Executor Soft seat** — Clerk/Researcher-class,
-  claiming the standing `EXO-CHANNEL-ROTATE` card (**DRA-154**).
+- **"Executor never trims" means never INLINE, inside a feature branch.** Helm
+  ruled the DRA-267 LIVE ASK on 2026-09-20 ~3:45 PM CT (ADOPT (a), narrowing
+  the bar to its own rationale). In a work session Executors still append only;
+  spotted rot goes into a card comment, never fixed inline. But a **standalone
+  janitorial rotation PR** — changed files exactly the ledger, its archive under
+  `docs/ops/claude-archive/channels/<YYYY-Qn>/`, and
+  `scripts/channel-size-baseline.psd1` when and only when the ledger carries a
+  row at the PR's base — is permitted on **any Soft seat, Sr Executor
+  included**. PR #744 is the tested template.
+- **Rotation seat is any free Soft seat** claiming the standing
+  `EXO-CHANNEL-ROTATE` card (**DRA-154**) — the non-Executor-only restriction
+  is retired (DRA-267). DRA-154's "Who may claim" holds the exact
+  changed-file test; read it before claiming.
 - **When a pass fires: headroom, not a calendar.** There is no weekly date.
   Helm ruled the DRA-232 LIVE ASK on 2026-09-19 ~11:35 PM CT
   ([EQBuddy PR #719](https://github.com/DranakCorps-bot/EQBuddy/pull/719)):
