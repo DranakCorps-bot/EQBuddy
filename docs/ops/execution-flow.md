@@ -104,7 +104,10 @@ the pre-merge SIGN on a planned slice.
 ## 5. What is NOT changed by either cutover
 
 - **CI is still the merge bar.** `build-and-test` + `e2e-windows`. A local
-  green is not a CI green.
+  green is not a CI green. Both have been REQUIRED status checks on `main`
+  since 2026-09-20 (DRA-228, with `enforce_admins` on); before that only
+  `build-and-test` was, and the second green depended on whoever merged
+  holding it up by hand.
 - **The guard suite is untouched.** `ArchitectureTests`,
   `RetiredCardsTests`, `GameCommandsTests`, the isolation tests, every trap
   guard.

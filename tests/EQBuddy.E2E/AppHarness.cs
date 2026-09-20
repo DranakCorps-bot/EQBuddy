@@ -1049,18 +1049,21 @@ internal sealed class AppHarness : IDisposable
     ///
     /// <para>It answers "" for a missing or unreadable dump, so every caller below spells
     /// absent the one way (trap 4: one producer).</para>
+    ///
+    /// <para><b>DRA-228 moved the body into <see cref="UI.Shared.WholeFilePublish.Read"/>,
+    /// beside the WRITER that publishes this file, because the two are one mechanism.</b> The
+    /// trade described above was the right one and it was not the whole story: the app's
+    /// `File.WriteAllText` TRUNCATES before it fills, so the 0.22% partial read was a file
+    /// that genuinely had no keys in it. The writer now builds the next dump in a scratch
+    /// file and replaces this one atomically, and the read retries the one case an atomic
+    /// replace introduces — an EXISTING file that refuses the open for the instant its
+    /// directory entry is being re-pointed. Measured over the real pair: torn content went to
+    /// zero on the write change alone, and the SENTINEL did not (1,258 of 13,433 reads, 9.4%)
+    /// until the retry landed beside it. Both halves are in `EQBuddy.Tests`, so the guard for
+    /// what makes this lane flaky runs in `build-and-test` rather than only in the lane it is
+    /// meant to stabilise.</para>
     /// </summary>
-    private string ReadDump()
-    {
-        try
-        {
-            using var fs = new FileStream(DebugDumpPath, FileMode.Open, FileAccess.Read,
-                FileShare.ReadWrite | FileShare.Delete);
-            using var reader = new StreamReader(fs, Encoding.UTF8);
-            return reader.ReadToEnd();
-        }
-        catch (IOException) { return ""; }   // covers FileNotFound too: missing dump = not yet
-    }
+    private string ReadDump() => UI.Shared.WholeFilePublish.Read(DebugDumpPath);
 
     /// <summary>Current value of a debug.txt "key=value" field, or -1 while the dump is
     /// missing, mid-write, or lacks the key — callers poll via <see cref="WaitForDump"/>.

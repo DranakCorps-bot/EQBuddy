@@ -779,7 +779,7 @@ internal static class WidgetDump
                     // means style=1 AND appWindow=0, and only the HWND can say so.
                     $"altTabAppWindow={(NoActivate.HasAppWindowStyle(w) ? 1 : 0)} " +
                     $"altTabTaskbar={(w.ShowInTaskbar ? 1 : 0)}";
-                System.IO.File.WriteAllText(Core.AppPaths.File("debug.txt"), dump);
+                WriteWholeOrNotAtAll(dump);
             }
             catch (Exception ex)
             {
@@ -794,13 +794,19 @@ internal static class WidgetDump
                 // this line in the artifact, rather than being answered by a stale value.
                 try
                 {
-                    System.IO.File.WriteAllText(Core.AppPaths.File("debug.txt"),
-                        $"tick={w._uiTicks} dumpError={ex.GetType().Name}");
+                    WriteWholeOrNotAtAll($"tick={w._uiTicks} dumpError={ex.GetType().Name}");
                 }
                 catch { /* a logger that can throw is the bug it reports */ }
             }
         }
     }
+
+    /// <summary>The dump, published so a reader sees ALL of it or NONE of it — never half.
+    /// The arithmetic and the reasoning live in <see cref="UI.Shared.WholeFilePublish"/>,
+    /// which is in UI.Shared rather than here so that it is unit-testable in
+    /// `build-and-test` (docs/TestPlan.md §5 — the WPF layer has no test project).</summary>
+    private static void WriteWholeOrNotAtAll(string dump) =>
+        UI.Shared.WholeFilePublish.Write(Core.AppPaths.File("debug.txt"), dump);
 
     /// <summary>The muted chip families as one space-free token, through the SAME reader the
     /// row itself uses (SA-4). Not a re-read of <c>MutedChipFamilies</c>: a dump that parsed
