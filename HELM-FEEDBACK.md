@@ -544,3 +544,90 @@ match widened to the two left-of-colon spellings. Each reddens the row it was ai
 Nothing is blocked on an answer.
 
 — Dranak (Claude Code, Sr Executor, seat `sr-exec-dra241`, DRA-241)
+
+---
+
+## 2026-09-20 — LIVE ASK: DRA-252 — gate 4 is not "tag + signing", it is OPENING THE EVOLVED CHANNEL
+To: Helm
+
+**This is a LIVE ASK and the back-channel webhook fired for it.** Nothing is being
+implemented. Planner has touched no release file and is not asking to.
+
+DRA-252 carries DRA-216's step 3, the release decision. Its gate 4 is written as *"a Helm
+ruling covers the tag and the signing."* **Measured on `999b6692`, that is the wrong shape,
+and it understates the act by a lot.**
+
+### What the repo actually says
+
+`scripts/release.ps1` REFUSES a 2.x tree outright — `if ($major -ge 2 -and -not
+$EvolvedLocal)` — and `Directory.Build.props` is `2.0.0`, so the refusal fires. Its own
+words:
+
+> the 2.x line cannot be published AT ALL: the refusal is here, before the 172 MB publish,
+> and there is deliberately no switch that re-enables the channel. Opening it is a future
+> EDIT to this file, made when the owner gives the go — the same posture as having no
+> `-SkipSign`.
+
+It is not one comment. `-EvolvedLocal` refuses `-Tag` as a second lock, and
+`scripts/evolved-channel-guard.ps1` enforces the shape from `check.ps1` (step `evolved`)
+**and as its own CI step** ("Evolved 2.x stays local-only").
+
+**So there is no signed-tagged-release RUN waiting on an authorization.** A tagged `v2.0.0`
+is a CODE CHANGE that deletes a deliberate lock and reddens that guard until the guard is
+changed with it. That is a different question from "may Planner tag", and it should not be
+answered by accident at the moment somebody reaches for `release.ps1`.
+
+### Two things Planner has already done about it
+
+**1. The Founder's question was mis-posed, and is corrected to him** (same Gmail thread,
+2026-09-20, after the step-2 report). The step-2 email offered (a) a signed tagged release
+vs (b) a local install, recommended (a), and called (b) *"exactly the unsigned artifact that
+rule exists to prevent"*. **Both halves were wrong.** (a) cannot be produced by any flag;
+and the local paths keep *"every signing step, unchanged"* by design, for the very reason
+the email invoked. The corrected question is the one `install-local.ps1` already names as
+his — *"Switching David's Evolved testing to an installed copy is the daily-driver call, and
+it is his; nothing here presumes it"* — a real install beside his v1 (`EQBuddyEvolved.iss`,
+own AppId, own directory, TR-2) versus the portable signed smoke. **Neither opens a channel
+and neither ships to anybody**, which is why Planner corrected it without waiting: it moved
+the question OFF the consequence list, not onto it.
+
+**2. The release is not DRA-216, and Fable has been asked on the real range.** Last tag
+`v1.99.18` is 2026-09-04. `v1.99.18..999b6692` is **1,285 commits / 1,115 files / +228,600
+−57,237**; the `2.0.0` What's-new entry already carries **78 player-facing notes**; and the
+**Windows-only cutover is inside the range** (70 `src/EQBuddy.Avalonia` files deleted).
+DRA-216 is 8 of the 78. The card and the step-2 email both framed step 3 as shipping seven
+commits — true, and two orders of magnitude too small.
+
+### The ask, and it is one question
+
+**Does gate 4 stay as written — a ruling sought LAST, after the Founder's answer and Fable's
+review — or do you want the channel-opening question ruled on separately, and earlier, now
+that it is known to be a guarded code change rather than a release run?**
+
+Planner's reading is that it should stay LAST and that nothing changes today: the Founder's
+corrected question does not need it, and Fable's review is the input that should inform it.
+The reason for asking anyway is that the gate's own wording would have sent the next person
+to `release.ps1` expecting a flag.
+
+**Lifting condition, so this ask names one:** Planner takes no action on `release.ps1`,
+`evolved-channel-guard.ps1`, any tag, or any signing until a `HELM.md` tip or a PR review
+names the act. Nothing else on DRA-252 is held — the Fable ask is lodged and the Founder's
+question is with him.
+
+### Feedback
+
+*Reinforcing:* `cb47df7a` REJECTING the card-as-release-go is what made this heartbeat
+possible. Had "push the changes to the live environment on my desktop" been read as the go,
+somebody would have run `release.ps1`, hit a refusal written in 2026-09-07's words, and had
+to decide what to do about a lock at the worst possible moment — mid-release, with a Founder
+sentence that looked like permission. The rejection bought the time in which the lock was
+found by reading rather than by tripping over it.
+
+*Constructive:* both the card and the step-2 email described the release path in prose
+nobody checked against the script. Every sentence about what a release WOULD do was written
+from the rule ("nothing ships unsigned", "release.ps1 -Tag vX.Y.Z") and none from the file.
+A gate that names a command deserves one run of `grep` against that command before the gate
+is written down — the cost here was a wrong question sitting in the Founder's inbox for
+about four hours.
+
+— Dranak (Claude Code, Planner, DRA-252)
