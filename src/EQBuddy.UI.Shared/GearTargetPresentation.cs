@@ -170,4 +170,31 @@ public static class GearTargetPresentation
     public const string RingTip =
         "Rings mark the archived spawn points where you have killed something that drops an item "
         + "you are tracking. Track and untrack in the Helper room on your PC.";
+
+    /// <summary>
+    /// The map toolbar's on/off control for this whole layer — the rings and the block together
+    /// (D5 Planner review, finding D5-1).
+    ///
+    /// <para>It carries <see cref="Heading"/>'s noun on purpose: the control and the thing it
+    /// switches have to be recognisably one feature, and "Targets" would be a second name for
+    /// something the panel two inches away already calls something else.</para>
+    /// </summary>
+    public const string ToggleLabel = "Going after";
+
+    /// <summary>
+    /// <b>The tip's job is the sentence that is not about the map at all.</b> A player hiding a
+    /// layer on a busy screen has to know the goal itself survives — the alternative way to get
+    /// a clean map was to untrack, and untracking throws away the decision the tracked list
+    /// exists to remember. So the second sentence is the load-bearing one and it says the same
+    /// thing in both states.
+    ///
+    /// <para>Written as one method over the state rather than two constants so the two halves
+    /// cannot drift into disagreeing about what the control does.</para>
+    /// </summary>
+    public static string ToggleTip(bool on) =>
+        (on
+            ? "Showing the spawn points and rows for the upgrades you are tracking. Click to hide "
+              + "them and leave the rest of the map alone. "
+            : "Hidden. Click to show the spawn points and rows for the upgrades you are tracking. ")
+        + "Nothing is untracked either way — this only changes what this map draws.";
 }

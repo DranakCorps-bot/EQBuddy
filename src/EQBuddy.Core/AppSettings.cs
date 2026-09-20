@@ -878,6 +878,28 @@ public sealed class AppSettings
     /// <summary>Folder of classic-format zone map files (Brewall packs and kin).
     /// Null = auto-detect the game's own maps folder beside Logs.</summary>
     public string? MapFolder { get; set; }
+    /// <summary>
+    /// **THE MAP'S TRACKED-GOAL LAYER — THE RINGS AND THE "GOING AFTER" BLOCK TOGETHER**
+    /// (DRA-216 D5, S13.3; the toggle D5's Planner review found missing).
+    ///
+    /// <para><b>Default ON</b>, because the layer's whole value is that a player who has
+    /// decided on an upgrade opens the map and the answer is already there — a default-off
+    /// display behind a control is a feature nobody finds, which is <see cref="TrackSpawns"/>'s
+    /// reason verbatim.</para>
+    ///
+    /// <para><b>It is a DISPLAY preference, and that is the point of its existing.</b> Without
+    /// it the only way to clear the layer off a small, already-busy map is to untrack the goal —
+    /// which discards the thing the tracked list exists to remember. One flag covers the rings
+    /// AND the panel AND the phone's copy, gated at the single producer
+    /// (<c>GearTargetMemo.For</c>), so no two of the three can ever disagree about whether
+    /// the layer is on.</para>
+    ///
+    /// <para>Written from the map's own toolbar, beside the other controls that belong to the
+    /// map rather than to the app (<see cref="MapFolder"/>'s precedent). The phone reads it and
+    /// offers no control for it — every control in that room would be writing the profile the
+    /// PC is playing from (trap 35).</para>
+    /// </summary>
+    public bool ShowGearTargetsOnMap { get; set; } = true;
     /// <summary>Ring diameter in DIPs.</summary>
     public double CursorRingSize { get; set; } = 46;
 

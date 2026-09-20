@@ -81,6 +81,34 @@ internal sealed class MapView
     /// (trap 29).</summary>
     private int _targetRings;
     private int _targetRows;
+    /// <summary>How many REFUSAL sentences the panel drew — its OWN counter, not folded into
+    /// <see cref="_targetRows"/> (D5 Planner review, finding D5-2). A refusal is a different
+    /// claim from a row: a row says "go here", a refusal says "EQBuddy ships no page for this".
+    /// It was uncounted, so a set holding only refusals — which this panel deliberately DOES
+    /// draw for — dumped `goals= rings=0 rows=0`, byte-identical to the nothing-tracked state.
+    /// The committed negative for "nothing tracked" would therefore have passed unchanged on a
+    /// build where the refusal path drew nothing at all.</summary>
+    private int _targetRefused;
+
+    /// <summary>
+    /// **THE LAYER'S OWN ON/OFF, ON THE SURFACE IT GOVERNS** (D5 Planner review, finding D5-1).
+    ///
+    /// <para>It is <see cref="EqChip"/> rather than a fifth <see cref="Theming.Button"/> beside
+    /// it because the row's other controls are ACTIONS ("Follow me", "Maps folder…") and this one
+    /// is a STATE — and the chip is the repo's one selectable pill, which nothing may hand-build
+    /// a second copy of.</para>
+    ///
+    /// <para><b>It is on the map and not in Options for the reason the finding gave</b>: the
+    /// player this control exists for is mid-hunt looking at a map they want less on, and
+    /// <see cref="AppSettings.MapFolder"/> is the standing precedent for a persisted setting the
+    /// map owns its own door to.</para>
+    ///
+    /// <para><b>ALWAYS VISIBLE, deliberately — even with nothing tracked.</b> Hiding it when the
+    /// layer has nothing to draw sounds tidier and is a trap: switched off, the host answers the
+    /// empty set, so a chip that hid itself on an empty answer would hide itself the moment it
+    /// was used and leave no way back on.</para>
+    /// </summary>
+    private EqChip? _targetToggle;
 
     /// <summary>"Imminent" = due within this many seconds (David, 2026-08-13).</summary>
     internal const double PulseWindowSeconds = 10;
@@ -151,14 +179,29 @@ internal sealed class MapView
             "folder (next to Logs) — EQBuddy picks them up from there. Maps by Brewall.";
         getMaps.Click += (_, _) => System.Diagnostics.Process.Start(
             new System.Diagnostics.ProcessStartInfo(MapPackUrl) { UseShellExecute = true });
+        // DRA-216 D5 (Planner review D5-1): the target layer's switch, beside the map's other
+        // own controls. Its own click persists and forces a refresh — the same three lines
+        // ChooseFolder uses — so the map clears in the same frame as the chip repaints rather
+        // than on whichever tick comes next.
+        var targetToggle = new EqChip(
+            EQBuddy.UI.Shared.GearTargetPresentation.ToggleLabel, key: "targets",
+            tip: EQBuddy.UI.Shared.GearTargetPresentation.ToggleTip(
+                _host.Settings.ShowGearTargetsOnMap),
+            onClick: ToggleTargetLayer, compact: false);
+        targetToggle.SetSelected(_host.Settings.ShowGearTargetsOnMap);
+        targetToggle.VerticalAlignment = VerticalAlignment.Center;
+        targetToggle.Margin = new Thickness(6, 0, 0, 0);
+        _targetToggle = targetToggle;
         DockPanel.SetDock(zoneLabel, Dock.Left);
         DockPanel.SetDock(chooseFolder, Dock.Right);
         DockPanel.SetDock(getMaps, Dock.Right);
         DockPanel.SetDock(follow, Dock.Right);
+        DockPanel.SetDock(targetToggle, Dock.Right);
         bar.Children.Add(zoneLabel);
         bar.Children.Add(chooseFolder);
         bar.Children.Add(getMaps);
         bar.Children.Add(follow);
+        bar.Children.Add(targetToggle);
         bar.Children.Add(_zonePick);
         _zonePick.SelectionChanged += (_, _) =>
         {
@@ -654,6 +697,7 @@ internal sealed class MapView
 
         _targetPanel.Children.Clear();
         _targetRows = 0;
+        _targetRefused = 0;
         if (!showing) return;
 
         var header = new TextBlock
@@ -713,6 +757,11 @@ internal sealed class MapView
 
         // The refusals, named and counted (trap 50). The subject of both is EQBuddy's catalog
         // and never the game — a goal it cannot place is a gap in what we ship.
+        // COUNTED into their own total, not into _targetRows: a refusals-only set draws a
+        // header and these sentences and nothing else, so folding them into the row count
+        // would still have been better than the zero they used to dump, but it would say the
+        // panel had ROWS — and "go here" and "EQBuddy ships no page for this" are two claims
+        // one number cannot tell apart (D5 Planner review, finding D5-2).
         foreach (var refusal in (string[])
                  [
                      EQBuddy.UI.Shared.GearTargetPresentation.Unreadable(
@@ -722,7 +771,11 @@ internal sealed class MapView
                          [.. set.Refused.Where(r => r.Why == GearTargetGap.NoDropZone)
                              .Select(r => r.Item)]),
                  ])
-            if (refusal.Length > 0) _targetPanel.Children.Add(TargetLine(refusal, "DimBrush"));
+            if (refusal.Length > 0)
+            {
+                _targetPanel.Children.Add(TargetLine(refusal, "DimBrush"));
+                _targetRefused++;
+            }
     }
 
     private static TextBlock TargetLine(string text, string ink)
@@ -1267,6 +1320,26 @@ internal sealed class MapView
         AfterViewChanged();
     }
 
+    /// <summary>
+    /// The layer's one WRITER (trap 20 — a setting only readers touch is a lost capability).
+    ///
+    /// <para>Write, persist, repaint the chip, force a refresh: the setting sticks across a
+    /// restart like every other display preference the map owns, and the map redraws now rather
+    /// than on the next tick. The rings and the panel both come off
+    /// <c>GearTargetMemo.For</c>, which is already reading this flag, so neither is touched
+    /// here and neither can be left disagreeing with the other.</para>
+    /// </summary>
+    private void ToggleTargetLayer()
+    {
+        var on = !_host.Settings.ShowGearTargetsOnMap;
+        _host.Settings.ShowGearTargetsOnMap = on;
+        _host.Settings.Save();
+        _targetToggle?.SetSelected(on);
+        if (_targetToggle is not null)
+            _targetToggle.ToolTip = EQBuddy.UI.Shared.GearTargetPresentation.ToggleTip(on);
+        MaybeRefresh(force: true);
+    }
+
     private void ChooseFolder()
     {
         var dlg = new Microsoft.Win32.OpenFolderDialog { Title = "Pick the folder holding zone map .txt files" };
@@ -1293,5 +1366,15 @@ internal sealed class MapView
         // read. The goals are folded by NAME because a count cannot see one swapped for
         // another (trap 72).
         $"mapTargetGoals={string.Join(',', _targetsHere.Select(t => t.Item.Replace(" ", "")))} " +
-        $"mapTargetRings={_targetRings} mapTargetRows={_targetRows}";
+        $"mapTargetRings={_targetRings} mapTargetRows={_targetRows} " +
+        // **AND THE TWO STATES THE THREE KEYS ABOVE CANNOT TELL FROM "NOTHING TRACKED"** (D5
+        // Planner review). A refusals-only set draws a header and its sentences and dumps
+        // `goals= rings=0 rows=0`, which is the empty state's own line — so the committed
+        // negative for "nothing tracked" passed on a build where the refusal path drew nothing
+        // at all. And the layer switched OFF dumps that same line for a third reason, which is
+        // why the toggle's PAINTED state is dumped rather than the setting: `SetSelected` is
+        // the one producer of "which way is this chip drawn" (trap 4), and an off-screen
+        // control photographs as an ordinary toolbar (trap 29).
+        $"mapTargetRefused={_targetRefused} " +
+        $"mapTargetToggle={(_targetToggle?.Selected == true ? 1 : 0)}";
 }

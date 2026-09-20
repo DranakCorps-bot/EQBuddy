@@ -4186,6 +4186,48 @@ $Shots = [ordered]@{
                                       Over = 'Rusty Dagger +2'
                                       TrackedAt = '2026-09-15T20:14:00' }) }
                            } }
+    #   'zone-map-target-off' — the SAME fixture with the layer's own toggle off, which is the
+    #   half the row above cannot photograph. D5's Planner review found the layer shipped with
+    #   no way to turn it off at all (finding D5-1), so a picture of the switch in its other
+    #   state is what makes the fix reviewable rather than described: put the two side by side
+    #   and the ONLY differences are the chip's fill and the layer itself.
+    #
+    #   IT IS A SHOT AND NOT A CAVEAT because the state is stageable — one bool in the same
+    #   `Set` block the row above already writes. An illustration of our own UI is a capture
+    #   with a recipe or it does not ship, and "the off state presumably looks like the map
+    #   without the block" is exactly the invented picture that lock exists to refuse.
+    #
+    #   PREDICTED (trap 23), before the take:
+    #     * The same World window on Map, the same square, the same /loc marker and the same
+    #       camp pin — the preference is about the layer, not about the map.
+    #     * The "Going after" chip UNFILLED in the top bar, still there and still hoverable.
+    #     * The spawn circle still drawn and still wearing the accent (Priest Amiaz is a
+    #       catalog named), with NO dashed ring outside it.
+    #     * NO "Going after — Befallen" block: the side panel starts at "Named — Befallen",
+    #       which is the pre-D5 map exactly.
+    #     * The goal is NOT untracked — nothing on this screen says otherwise, and the Helper
+    #       room (not photographed here) still lists it.
+    #
+    #   TAKEN 2026-09-20 AND EVERY PREDICTION HELD.
+    'zone-map-target-off' = @{ Title = 'EQBuddy World'
+                           Env = @{ EQBUDDY_MAP = '1' }
+                           Maps = @{ befallen = @(
+                               'L -600.0, -600.0, 0.0, 600.0, -600.0, 0.0, 200, 200, 200'
+                               'L 600.0, -600.0, 0.0, 600.0, 600.0, 0.0, 200, 200, 200'
+                               'L 600.0, 600.0, 0.0, -600.0, 600.0, 0.0, 200, 200, 200'
+                               'L -600.0, 600.0, 0.0, -600.0, -600.0, 0.0, 200, 200, 200'
+                               'P 0.0, 0.0, 0.0, 240, 200, 60, 3, Zone_In') }
+                           AppendLive = @(
+                               'You have entered Befallen.'
+                               'Your Location is 100.00, 200.00, 5.00'
+                               'You have slain Priest Amiaz!')
+                           Set = @{
+                               ShowGearTargetsOnMap = $false
+                               TrackedUpgrades = @{ 'testchar_test' = @(
+                                   @{ Item = 'Blackened Wand'; Slot = 'PRIMARY'
+                                      Over = 'Rusty Dagger +2'
+                                      TrackedAt = '2026-09-15T20:14:00' }) }
+                           } }
     # THE TRAVELS TAB, which had no recipe until 2026-09-05 and did not need one: it was
     # the one World room the WIDGET drew, on the misc card, so EQBUDDY_EXPAND=1 put it in
     # 'widget-expanded' for free. HUD subtraction cut 2 removed that card, which would have
