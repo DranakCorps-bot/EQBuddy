@@ -2902,10 +2902,21 @@ public class ShellHostTests
     /// because its page lists none: the trap-73 half of the feature, on screen.</para>
     ///
     /// <para><b>And the two refusals are different numbers with different causes, which is why
-    /// they are separate keys.</b> <c>helperQuestWithheld</c> is <b>5</b>: five (item, quest)
+    /// they are separate keys.</b> <c>helperQuestWithheld</c> is <b>2</b>: two (item, quest)
     /// offers name quests the shipped quest list does not hold, so they could be given a title
     /// and nothing else. <c>helperNoSource</c> is <b>6</b>: catalog cloaks that beat this anchor
     /// and whose pages name no zone and no quest at all, dropped in silence until now.</para>
+    ///
+    /// <para><b>That first number was 5 when this row was written, and DRA-222 D6 moved it —
+    /// which is the two slices meeting rather than either one breaking.</b> D6 sorts each
+    /// anchor's candidates by how many of the character's own classes' numbers they improve
+    /// BEFORE the per-anchor cap takes eight, so a different eight survive and fewer of them
+    /// happen to be offers whose quest this build cannot resolve. Three things say the rule
+    /// itself is untouched: the ROWS are identical (the same three subjects, the same two
+    /// quests, both still naming a giver and a zone), <c>helperNoSource</c> is unmoved at 6
+    /// because the sweep counts it BEFORE any ordering, and the count is still non-zero with
+    /// <c>helperQuestLine</c> at 1, so the rule fires and says so. <b>Measured, not assumed:</b>
+    /// restoring the pre-D6 comparer in both places puts this row back to 5 and it passes.</para>
     ///
     /// <para><b>Each engine count is asserted beside whether the ROOM said it</b> (trap 56, and
     /// trap 50's rule that a surviving cap says so): a rule that removed five offers in silence
@@ -2937,7 +2948,9 @@ public class ShellHostTests
         Assert.Equal(2, app.DumpValue("helperQuestSource"));
 
         // The quest-source rule: the ENGINE's count beside the ROOM's sentence.
-        Assert.Equal(5, app.DumpValue("helperQuestWithheld"));
+        // 5 -> 2 at DRA-222 D6, for the reason set out in this row's summary: a different eight
+        // survive the per-anchor cap, and the ROWS below are the evidence the rule is unmoved.
+        Assert.Equal(2, app.DumpValue("helperQuestWithheld"));
         Assert.Equal(1, app.DumpValue("helperQuestLine"));
 
         // The sweep's sourceless count, same pair.
@@ -2967,10 +2980,15 @@ public class ShellHostTests
     /// control had done it.</para>
     ///
     /// <para>The pair with the row above is the point: same anchor, same catalog, ONE setting,
-    /// and the two quest counts trade places — <c>helperQuestWithheld</c> 5 → 0 because no quest
+    /// and the two quest counts trade places — <c>helperQuestWithheld</c> 2 → 0 because no quest
     /// offer reaches a bucket at all, and <c>helperQuestOnly</c> 0 → 5. <b>The sourceless count
     /// does not move</b>, which is the evidence that it is a different fact rather than the same
     /// one counted twice.</para>
+    ///
+    /// <para>That first number reads 2 rather than the 5 this row was written with because
+    /// DRA-222 D6 moved the row above; <b>this row's own 5 is unmoved</b>, and the asymmetry is
+    /// the point. <c>helperQuestOnly</c> is counted inside the sweep BEFORE anything is ordered,
+    /// so no re-ranking can reach it — which is exactly why the two are separate keys.</para>
     /// </summary>
     [Fact]
     public void WithQuestsOffTheRoomCountsTheUpgradesTheToggleIsHiding()
