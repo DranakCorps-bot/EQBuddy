@@ -33,6 +33,74 @@ Retired items are rotated verbatim into [`docs/ops/claude-archive/channels/2026-
 
 
 
+### Watch buff list: Shadowknight's Shroud of Hate / Shroud of Pain missing
+— the two SK shroud buffs are not in the watch buff list (discussion #710, Ideas, 0 comments)
+
+- **Priority:** `someday` (real ask, not authorized — new Ideas thread; soft leave). Not approved for a code pass.
+
+- **Place:** watch-buff / roster area on tip — `src/EQBuddy.UI.Shared/BuffRosterPresentation.cs`, `src/EQBuddy/BuffsCardView.cs`, `src/EQBuddy.Core/BuffSetStore.cs` / `BuffTracker.cs` / `RankedBuffDurations.cs` / `SpellCatalog.cs` neighbourhood (file names from this run's listings; confirm the actual catalog source before a code pass). Neighbourhood, do not fold: `SkyQuestDefaults.cs` + `Recommendations.cs` both name a "Shroud" but on the quest/recommendation surface — different ask. #690 Banestrike achievements (different reporter, different product surface). #679 motes/reward-chest (different surface).
+
+- **Source (GitHub, no reply posted):** EQBuddy discussion #710, u/TheOneGargoyle, Sep 19, 8:07 PM CT (2026-09-20 01:07 UTC). https://github.com/DranakCorps-bot/EQBuddy/discussions/710 — Category: Ideas. 0 comments at harvest. Footer: `EQBuddy 1.99.18 · Windows 26200`. u/Dranak75 not involved. No reply drafted to the thread.
+
+- **Ask (verbatim, reporter's own words):** "Love this app.
+The watch buff list doesn't seem to contain the Shadowknight spells Shroud of Hate and Shroud of Pain - any chance we can add them please ?"
+
+- **Ask (scoped):** add the two Shadowknight spells **Shroud of Hate** and **Shroud of Pain** to the watch buff list so SK players can track them like the rest of the watched buffs.
+
+- **Wiki-first (eqlwiki, via the repo's own harvest cache on origin/main):** both are real spells with their own pages. `Shroud of Hate` (cached page quoted verbatim this run): "Consumes your target in a wave of hatred, lowering their attack rating and increasing yours." — Shadow Knight — Level 35, Alteration, duration 10 minutes, cast line "Hatred fuels your arms." `Shroud of Pain` page also cached in-repo (`Shroud of Pain.c9d04a83.wikitext`) — **not quoted this pass** (read it before a code pass; do not guess the Pain page's numbers from the Hate page).
+
+- **Already shipped / checked (origin/main, this run 2026-09-20):** code-search for "Shroud" in `.cs` files found only `SkyQuestDefaults.cs` and `Recommendations.cs` (quest / recommendation surfaces — not a watch-buff catalog) plus the eqlwiki harvest cache pages above. No watch-buff / roster / buff-catalog source file names either spell at the point of these greps. Caveat (label as such): code-search was rate-limited partway through this run, so "not present" is shipped-as-grepped against the files I could name; the watch-buff candidate list's exact source and the spells' landing-line grammar were NOT verified. A confident code pass must open the actual catalog source and a real SK landing line first.
+
+- **Hypothesis (label as such):** the two shroud buffs have not been added to whatever name space drives the watch-buff candidate list — likely a catalog/duration addition (Shroud of Hate is a fixed 10-minute buff per the wiki page quoted above), not a new mechanic. Do not assert the fix is one-line; the landing-line grammar for both spells is unverified.
+
+- **Class:** V0–V1 (catalog addition + landing-line verification, if our pass owns the surface). Do not write FABLE.md.
+
+- **Holds re-read (HELM.md this run, 2026-09-20 ~12:48 UTC):** Live Holds empty (Retired #208/#228 only). Play Console OFF. Standing process rule: new-thread thank-yous route to Helm before posting. Talking to u/TheOneGargoyle is fine if, and only if, Helm posts.
+
+- **Scribe 2026-09-20 8:55 AM CT (cron intake):** New GitHub intake — a discussion, missed in the Sep 19 sweep that ran on issues only. Do not implement. Do not write FABLE.md. Do not open the work. Do not fold into #690 (Banestrike achievements) / #679 (motes) / the Mac-Proton items. Thank-you drafted below for Helm QA — NOT posted.
+
+- **DranakCorps-bot thank-you (draft, for Helm QA/post — do not post without Helm. No promises, dates, pricing, or ToS.):**
+
+  > Hi TheOneGargoyle — thanks for the two names (Shroud of Hate and Shroud of Pain); that's exactly the form this needed to arrive in. Captured and sent on for review.
+  >
+  > — EQBuddy team
+
+
+
+
+### Banestrike achievement progress: the downloaded log is unusable to the reporter
+— wants Banestrike-scoped achievement progress (Untapped Potential / General / Tradeskill / Slayer / Everquest); the raw log will not make sense (discussion #690, Ideas, 0 comments)
+
+- **Priority:** `someday` (real ask, not authorized — new Ideas thread; soft leave). Not approved for a code pass.
+
+- **Place:** achievements / AA neighbourhood on tip — the already-shipped retro path is the `/outputfile achievements` import + import report, with the AA ledger behind it (`AaCatalog`, 144 abilities from the eqlwiki Alternate Advancement harvest 2026-08-06; `AchievementsImportTests.cs`; `OutputfileAutoImport.cs`; `tests/fixtures/achievements/averaj.txt`). `Untapped Potential` already appears on the **unlock-requirements** surface (`UnlockRequirements.cs`, the `UnlockPick*` tests) — a different surface from a Banestrike progress view; do not fold. Neighbourhood, do not fold: #679 (motes / reward-chest — different surface), #243 (leftover Sky audit), #241 (have-count mismatch), #710 (watch-buff list — different reporter, different surface).
+
+- **Source (GitHub, no reply posted):** EQBuddy discussion #690, u/FatGuyGamin, Sep 18, 3:51 AM CT (2026-09-18 08:51 UTC). https://github.com/DranakCorps-bot/EQBuddy/discussions/690 — Category: Ideas. 0 comments at harvest. Footer: `EQBuddy 1.99.18 · Windows 26200`. u/Dranak75 not involved. No reply drafted to the thread.
+
+- **Ask (verbatim, reporter's own words):** "I would love the ability to track achievement progress in regards to Banestrike. I've downloaded that log but it is damn near impossible for my old man brain to make much sense out of. Like the Untapped Potential, General, Tradeskill, Slayer, & Everquest achievements."
+
+- **Ask (scoped):** Banestrike-scoped achievement progress, readable in the app — the reporter names the families they care about (Untapped Potential, General, Tradeskill, Slayer, Everquest) and says the log *they downloaded* is not something they can make sense of. The reporter never names which file they download, or what shape the tracking should take; do not assert either.
+
+- **Already shipped / checked (origin/main, this run 2026-09-20, quoted):** the achievements import path exists on tip — `AaCatalog.cs` class comment: "One AA ability as the eqlwiki Alternate Advancement page describes it … the Progress card's AA ledger rows show what each owned ability actually does." (144-ability catalog, harvest 2026-08-06); `UnlockRequirements.cs` + the `UnlockPick*` / `AchievementsImport*` tests carry an `Untapped Potential` surface; `tests/fixtures/achievements/averaj.txt` is a sample import fixture. `"Banestrike"` in code appears on tip in `AaCatalog.json` + the harvest cache (`Alternate_Advancement.wikitext`, `aas.json`) + the archived SCRIBE. Caveat (label as such): code-search was rate-limited partway; whether the existing import *already renders* a Banestrike log the way this reporter needs was NOT verified against a real log.
+
+- **Hypothesis (label as such):** two defensible readings, and the thread does not decide. (a) Discoverability gap — the import exists; the reporter used the wrong file or the right file in an unhelpful view → V0 guidance on the shipped path. (b) A Banestrike-scoped progress surface that does not exist at all (per-family progress for the five named families) → V2, David-authorized only. A code pass should decide by looking at what the achievements import shows for a Banestrike log — Scribe did NOT run the app.
+
+- **Needed from reporter (optional, not blocking intake):** which file they downloaded (in-game `/outputfile achievements`? a Banestrike-specific log?) and what "track" should look like to them (tick list, progress bar, per-family summary). The verbatim ask is in-thread; this is not blocking.
+
+- **Class:** V0 (discoverability on the shipped import path) up to V2 (new Banestrike progress surface — David authorization either way for the V2 shape; Scribe intake only). Do not write FABLE.md.
+
+- **Holds re-read (HELM.md this run, 2026-09-20 ~12:48 UTC):** Live Holds empty (Retired #208/#228 only). Play Console OFF. Standing process rule: new-thread thank-yous route to Helm before posting. Talking to u/FatGuyGamin is fine if, and only if, Helm posts.
+
+- **Scribe 2026-09-20 8:55 AM CT (cron intake):** New GitHub intake — thread created Sep 18, missed in the Sep 19 sweep that ran on issues, not discussions (this sweep covers both). Do not implement. Do not write FABLE.md. Do not open the work. Do not fold into #679 / #243 / #241 / #710. Thank-you drafted below for Helm QA — NOT posted.
+
+- **DranakCorps-bot thank-you (draft, for Helm QA/post — do not post without Helm. No promises, dates, pricing, or ToS.):**
+
+  > Hi FatGuyGamin — thanks for naming exactly which achievements you're after (Untapped Potential, General, Tradeskill, Slayer, Everquest) and for saying the log you're downloading isn't working — that's the useful part of the report. Captured and sent on for review.
+  >
+  > — EQBuddy team
+
+
+
 ### Reddit: "Parser in MAC"
 — EQL parser in CrossOver on macOS, overlay won't show (u/Axorthor, harvest-only, disambiguation pending)
 
