@@ -212,6 +212,113 @@ public class HelperSurfaceParityTests
     }
 
     /// <summary>
+    /// **AND SO DO THE QUEST PATH'S THREE** (DRA-219, S10/S11). The same shape one acquisition
+    /// path over, and three captions in one fixture because they all come off one sweep: a quest
+    /// the shipped quest list cannot describe, an upgrade no page can source at all, and one
+    /// hidden behind the include-quests toggle.
+    ///
+    /// <para>Every count is asserted NON-zero before its sentence is compared, because "" == ""
+    /// is what a guard aimed at nothing looks like (trap 78) — and the fixture is built so all
+    /// three fire at once, which is also the screen a player can actually be looking at.</para>
+    /// </summary>
+    [Fact]
+    public void TheQuestPathsThreeCaptionsSaySoOnThePhoneToo()
+    {
+        var inputs = Inputs() with
+        {
+            Worn = [new WornItem("Rusty Helm", "Rusty Helm", "HEAD",
+                ItemStatsBlock.Parse(["Slot: HEAD", "AC: 4"]))],
+            Items = new ItemCatalog([
+                // Describable by nothing: the quest list does not hold "A Silent Errand".
+                new ItemCatalog.Record
+                {
+                    Name = "Silent Helm", StatsText = "Slot: HEAD\nAC: 9",
+                    Slots = ["HEAD"], Ac = 9, Quests = ["A Silent Errand"],
+                },
+                // No zone, no quest — nowhere to send anybody.
+                new ItemCatalog.Record
+                {
+                    Name = "Mystery Helm", StatsText = "Slot: HEAD\nAC: 10",
+                    Slots = ["HEAD"], Ac = 10,
+                },
+            ]),
+            Catalog = new QuestCatalog
+            {
+                Quests = [new QuestEntry { Name = "A Humble Errand", QuestGiver = "a herald" }],
+            },
+            IncludeQuests = true,
+        };
+
+        var request = Request(inputs, HelperGoal.FarmGear);
+        var desktop = Recommendations.Rank(request.Inputs, request.Goals);
+        var phone = Phone(request);
+
+        Assert.True(desktop.GearQuestWithheld > 0);
+        Assert.True(desktop.GearNoSource > 0);
+        Assert.Equal(
+            HelperPresentation.QuestOffersWithheld(desktop.GearQuestWithheld),
+            phone.GearQuestWithheld);
+        Assert.NotEqual("", phone.GearQuestWithheld);
+        Assert.Equal(
+            HelperPresentation.SourcelessUpgrades(desktop.GearNoSource), phone.GearNoSource);
+        Assert.NotEqual("", phone.GearNoSource);
+
+        // The third one needs the toggle OFF, which is the state it is about.
+        var off = Request(inputs with { IncludeQuests = false }, HelperGoal.FarmGear);
+        var offDesktop = Recommendations.Rank(off.Inputs, off.Goals);
+        Assert.True(offDesktop.GearQuestOnly > 0);
+        Assert.Equal(
+            HelperPresentation.QuestOnlyUpgrades(offDesktop.GearQuestOnly),
+            Phone(off).GearQuestOnly);
+        Assert.NotEqual("", Phone(off).GearQuestOnly);
+    }
+
+    /// <summary>
+    /// **AND THE QUEST'S GIVER AND START ZONE RIDE THE WIRE AS TEXT** (trap 32). The
+    /// six-question answer is part of a why-line's own sentence rather than a field of its own,
+    /// so a projection that dropped it would still match on every field name — the same reason
+    /// the creature names below have their own row.
+    /// </summary>
+    [Fact]
+    public void TheQuestGiverAndStartZoneRideTheWireAsText()
+    {
+        var inputs = Inputs() with
+        {
+            Worn = [new WornItem("Rusty Helm", "Rusty Helm", "HEAD",
+                ItemStatsBlock.Parse(["Slot: HEAD", "AC: 4"]))],
+            Items = new ItemCatalog([
+                new ItemCatalog.Record
+                {
+                    Name = "Blessed Helm", StatsText = "Slot: HEAD\nAC: 9",
+                    Slots = ["HEAD"], Ac = 9, Quests = ["A Humble Errand"],
+                },
+            ]),
+            Catalog = new QuestCatalog
+            {
+                Quests =
+                [
+                    new QuestEntry
+                    {
+                        Name = "A Humble Errand", QuestGiver = "Herald Ganelorn",
+                        StartZone = "Qeynos", MinLevel = 12,
+                    },
+                ],
+            },
+            IncludeQuests = true,
+        };
+
+        var phone = Phone(Request(inputs, HelperGoal.FarmGear));
+        var lines = phone.Answers.SelectMany(a => a.Why).Select(w => w.Text).ToList();
+
+        Assert.Contains(lines, t => t.Contains("Herald Ganelorn", StringComparison.Ordinal));
+        Assert.Contains(lines, t => t.Contains("Qeynos", StringComparison.Ordinal));
+        // …and the map door the desktop row offers is carried as intent, with its zone in the
+        // sentence rather than as a link the phone cannot open (trap 35).
+        var doors = phone.Answers.SelectMany(a => a.Doors).ToList();
+        Assert.Contains(doors, d => d.Detail.Contains("Qeynos", StringComparison.Ordinal));
+    }
+
+    /// <summary>
     /// **AND THE CREATURES THEMSELVES RIDE THE WIRE** (trap 32). The who clause is part of the
     /// why-line's own sentence rather than a field of its own, so this asserts the phone's TEXT
     /// carries the names — a projection that dropped them would still match on every field name.
@@ -477,6 +584,13 @@ public class HelperSurfaceParityTests
                      // page.
                      HelperPresentation.MerchantsNote,
                      HelperPresentation.NoMerchantsFor(Tradeskill.Fletching),
+                     // DRA-219: the quest path's three captions. Each is a COMPUTED sentence
+                     // rather than a constant, so a plural value is passed — the singular arm
+                     // reads differently and a page that had learned to say either one would be
+                     // the trap-32 defect.
+                     HelperPresentation.QuestOffersWithheld(2),
+                     HelperPresentation.SourcelessUpgrades(2),
+                     HelperPresentation.QuestOnlyUpgrades(2),
                  })
             Assert.DoesNotContain(sentence, html, StringComparison.Ordinal);
 
@@ -513,6 +627,11 @@ public class HelperSurfaceParityTests
                      // sentence never mentions: a page that drew only the band ones would show
                      // a shorter list than the PC with nothing on screen explaining why.
                      "h.gearEraRefused", "h.materialEraRefused",
+                     // DRA-219's three, added in the SAME slice as the fields. The first is a
+                     // RULE's count (the quest-source rule's, the who rule's sibling); the other
+                     // two are about candidates that never reached a bucket, and they are named
+                     // separately because a page drawing one of the three would otherwise pass.
+                     "h.gearQuestWithheld", "h.gearNoSource", "h.gearQuestOnly",
                      // DRA-180 D3's per-anchor answer and its cap, added in the SAME slice as
                      // the fields. BOTH are named rather than just the list: a page that looped
                      // the sentences and dropped the cap line would pass on one row while

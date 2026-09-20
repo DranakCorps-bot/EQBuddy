@@ -1861,14 +1861,81 @@ $Shots = [ordered]@{
     #   AND THE REGRESSION PICTURES: all four 'shell-helper-gear*' shots above change in this
     #     slice — every one of their item lines gains a creature clause it did not have. That is
     #     the slice working, and they are re-taken in the same change.
+    #
+    #   **946x880 → 946x1080 in DRA-219**, and the re-take is what found it. That slice adds two
+    #   captions to this same block (*"82 better base items are not listed at all"* and *"21
+    #   better base items come only from quests"* — this fixture has the toggle OFF), which
+    #   pushed the who caption this shot exists FOR below the fold. The picture stayed
+    #   well-composed and stopped being of the feature, which is the paragraph above happening a
+    #   second time rather than a new lesson.
     'shell-helper-gear-who' = @{ Title = 'EQBuddy — Helper'
-                           Env = @{ EQBUDDY_SHELL = 'helper'; EQBUDDY_SHELL_SIZE = '946x880' }
+                           Env = @{ EQBUDDY_SHELL = 'helper'; EQBUDDY_SHELL_SIZE = '946x1080' }
                            Dump = @{ 'Testchar_test-Inventory.txt' = @(
                                "Location`tName`tID`tCount`tSlots"
                                "Hands`tCloth Gloves`t0`t1`t0") }
                            Set = @{
                                HelperGoals = @{ 'testchar_test' = @('FarmGear') }
                                HelperGearIntent = @{ 'testchar_test' = 'ReplaceSlot' }
+                           } }
+    # ---- DRA-219: the QUEST acquisition path, and the two the sweep never passed on -------
+    #
+    #   'shell-helper-gear-quest' — the same shape as 'shell-helper-gear-who' with the
+    #     include-quests toggle ON, on a DIFFERENT anchor: a warrior in an AC-4
+    #     `Cape of Underfoot`.
+    #
+    #   WHY NOT THE GLOVES. The first draft reused this file's `Cloth Gloves` and was predicted
+    #   from a sweep with NO class. In the app, which knows the character is a warrior, the
+    #   class-lock filter removes every quest-sourced glove before the per-anchor cap is
+    #   reached — so the picture would have been a well-composed photograph of three zone rows,
+    #   i.e. of the feature being absent. The fixture moved, not the number (trap 23, and the
+    #   same lesson `mobile-helper-gear` records one surface over).
+    #
+    #   PREDICTED (trap 23) — computed against the shipped `ItemCatalog.json.gz` AND
+    #   `QuestCatalog.json` before the take, with `MyClasses = ["WAR"]`, and the same prediction
+    #   the E2E row `QuestSourcedUpgradesAnswerTheSixQuestionsAndTheirRefusalsAreCountedApart`
+    #   makes:
+    #     * THREE answers: Temple of Veeshan (3 cloaks), then two QUESTS — `Aid the Dar Brood`
+    #       and `Deck of Spontaneous Generation Quest`.
+    #     * THE SENTENCE THIS SHOT EXISTS FOR, first on each quest row: *"eqlwiki has Aid the Dar
+    #       Brood starting with Harla Dar in Western Wastes from level 60. It takes 1 turn-in
+    #       item — Frakadar's Talisman."* Before this slice that row was the quest's NAME and an
+    #       item line, and nothing else.
+    #     * THE SECOND QUEST ROW CARRIES NO COMPONENT CLAUSE — *"eqlwiki has Deck of Spontaneous
+    #       Generation Quest starting with Ferjeneror in Plane of Mischief from level 46."* — and
+    #       that is the trap-73 half of the feature ON SCREEN: its page lists no turn-in items, so
+    #       nothing is drawn rather than a zero. Predicting the blank is the point.
+    #     * A MAP BUTTON on each quest row, beside Quests and Gear, pointing at the START ZONE
+    #       (Western Wastes; Plane of Mischief) — the S11.2 door a hand-in could never offer
+    #       until the quest catalog was joined.
+    #     * FOUR captions under the answers, and the point of the shot is that they are four
+    #       different numbers with four different causes: *"2 more answers matched your goals"*
+    #       (the room's own list cap), *"8 more upgrades matched"* (the sweep's per-anchor cap),
+    #       *"5 more quest rewards are not listed"* (the new rule — the shipped quest list does
+    #       not hold the quests those item pages name), and *"6 better base items are not listed
+    #       at all"* (no page names a zone OR a quest for them). The last two have doors of their
+    #       own — Quests and Gear — because the lists they point at are different lists.
+    #     * NO who-rule caption and NO band or era sentence: every page this anchor reaches names
+    #       a creature, and the level is unknown so both gates stand down.
+    #     * NO "5 better base items come only from quests" line, because the toggle is ON here.
+    #       That caption belongs to the DEFAULT screen and the E2E row
+    #       `WithQuestsOffTheRoomCountsTheUpgradesTheToggleIsHiding` is where it is pinned.
+    #
+    #   THE HEIGHT IS PART OF THE STAGING, for the reason 'shell-helper-gear-band' records: the
+    #   captions come AFTER three answers, two of which now carry a six-question line as well as
+    #   their item lines.
+    #
+    #   AND THE REGRESSION PICTURES: every 'shell-helper-gear*' shot above gains the quest-only
+    #     caption in this slice, because all of them have the toggle off. They are re-taken in
+    #     the same change.
+    'shell-helper-gear-quest' = @{ Title = 'EQBuddy — Helper'
+                           Env = @{ EQBUDDY_SHELL = 'helper'; EQBUDDY_SHELL_SIZE = '946x1020' }
+                           Dump = @{ 'Testchar_test-Inventory.txt' = @(
+                               "Location`tName`tID`tCount`tSlots"
+                               "Back`tCape of Underfoot`t0`t1`t0") }
+                           Set = @{
+                               HelperGoals = @{ 'testchar_test' = @('FarmGear') }
+                               HelperGearIntent = @{ 'testchar_test' = 'ReplaceSlot' }
+                               HelperGearQuests = @{ 'testchar_test' = $true }
                            } }
     # ---- DRA-149 D5: the FOUNDER'S OWN DUMP, and the two halves of FAIL 3 ------------------
     #
@@ -1961,8 +2028,19 @@ $Shots = [ordered]@{
     #   'shell-helper-vendors-light' — the same staging in SOLARIZED, the only light palette.
     #     Twenty-four transcribed caption lines with two accent links each is a new density for
     #     this room and light is where dim-on-light contrast fails.
+    #   **946x880 → 946x1240 in DRA-219, fixing a PRE-EXISTING crop rather than one that slice
+    #   caused.** The recipe above promises *"THE SENTENCE THIS SHOT EXISTS FOR, under them: 18
+    #   zones EQBuddy has upgrades for are not listed at your level 29…"*, and in the committed
+    #   picture that sentence was below the fold — verified by pixel-diffing the re-take against
+    #   `HEAD`: 122 rows differ and all of them are scrollbar, so the crop predates this change.
+    #   A picture that contradicts its own recipe is the illustration lock failing quietly, so it
+    #   is corrected in the change that re-takes it. Nothing about the STAGING moved. **The
+    #   capture comes back 932x1093 rather than 1240** — the shell is clamped to the desk it is
+    #   shot on, which is why this asks for more than it needs rather than for the exact figure.
+    #   At 1093 the band sentence and the who sentence are both on screen; the two DRA-219
+    #   captions under them are not, and they have their own shot.
     'shell-helper-founder' = @{ Title = 'EQBuddy — Helper'
-                           Env = @{ EQBUDDY_SHELL = 'helper'; EQBUDDY_SHELL_SIZE = '946x880' }
+                           Env = @{ EQBUDDY_SHELL = 'helper'; EQBUDDY_SHELL_SIZE = '946x1240' }
                            DumpFrom = @{ 'Testchar_test-Inventory.txt' = 'inventory/dranak.txt' }
                            Ledger = @{ StatedLevel = 29; StatedLevelAt = '2026-09-16T20:00:00' }
                            Set = @{
