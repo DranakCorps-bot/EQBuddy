@@ -49,7 +49,9 @@ internal sealed class AppHarness : IDisposable
     /// writes `/outputfile` dumps and where `InventoryFile.FindLatest` looks for them.</summary>
     public string GameDir => Path.GetDirectoryName(LogsDir)!;
     public string HistoryDbPath => Path.Combine(ProfileDir, "history.db");
-    private string DebugDumpPath => Path.Combine(ProfileDir, "debug.txt");
+    /// <summary>Public so <c>DumpReadTests</c> can seed the states this harness's read
+    /// rules exist for — an app write handle held open, and a dump missing a key.</summary>
+    public string DebugDumpPath => Path.Combine(ProfileDir, "debug.txt");
     private string ErrorLogPath => Path.Combine(ProfileDir, "error.log");
 
     public const string Character = "Testchar";
@@ -1011,19 +1013,72 @@ internal sealed class AppHarness : IDisposable
             "EQBUDDY_LENSPROBE=1 set on this scenario, and is the Quest Tracker open?)");
     }
 
-    /// <summary>Current value of a debug.txt "key=value" field, or -1 while the dump is
-    /// missing, mid-write, or lacks the key — callers poll via <see cref="WaitForDump"/>.</summary>
-    public int DumpValue(string key)
+    /// <summary>
+    /// ONE read of the dump, taken so that reading it cannot DAMAGE it (DRA-225).
+    ///
+    /// <para><b>`File.ReadAllText` opens with `FileShare.Read`, which denies a concurrent
+    /// WRITER — and the writer here is the app.</b> `WidgetDump.MaybeWrite` writes the dump
+    /// with `File.WriteAllText` inside a try whose catch replaces the WHOLE file with
+    /// `tick=… dumpError=…`, every other key absent. So a harness read that happened to
+    /// overlap a dump write made the app throw, log, and blank its own dump — and the
+    /// suite's NEXT `DumpValue` then read `-1` for whatever key it asked for. The observer
+    /// was breaking the thing it observed, and the breakage looked like a flake in whatever
+    /// assertion came next.</para>
+    ///
+    /// <para><b>Measured, two processes over the same file at the dump's real size
+    /// (~6.4 KB):</b> with `FileShare.Read` the writer was DENIED <b>103 of 378</b> writes
+    /// (27%) and the reader never saw a partial file; with the share mask below the writer
+    /// was denied <b>0 of 377</b> and the reader saw a partial file 223 times in 102,503
+    /// (0.22%). That is the whole trade, and it is the right way round twice over.</para>
+    ///
+    /// <para><b>By RECOVERABILITY:</b> a torn read is the HARNESS's problem and it can
+    /// simply read again, whereas a denied write is the APP's problem and it cannot — the
+    /// moment is gone and the catch has already blanked the file.</para>
+    ///
+    /// <para><b>And by DURATION, which is the bigger of the two and matters to every test
+    /// in this suite rather than only the ones edited for DRA-225:</b> a denied write
+    /// poisons the dump for a whole UI TICK — about a second, during which EVERY key is
+    /// absent from EVERY read. A torn read spoils ONE read, for microseconds, and only for
+    /// the keys after the tear. So the bare `DumpValue` calls elsewhere in this suite are
+    /// strictly better off under this mask even though nothing about them changed: the
+    /// mechanism that blanked the dump under them is gone.</para>
+    ///
+    /// <para>`FileShare.Delete` rides along because `AppHarness.Launch` deletes this file
+    /// between launches, and a reader that denied that would trade one collision for
+    /// another.</para>
+    ///
+    /// <para>It answers "" for a missing or unreadable dump, so every caller below spells
+    /// absent the one way (trap 4: one producer).</para>
+    /// </summary>
+    private string ReadDump()
     {
         try
         {
-            foreach (var pair in File.ReadAllText(DebugDumpPath).Split(' '))
-                if (pair.StartsWith(key + "=", StringComparison.Ordinal) &&
-                    int.TryParse(pair.AsSpan(key.Length + 1), NumberStyles.Integer,
-                        CultureInfo.InvariantCulture, out var value))
-                    return value;
+            using var fs = new FileStream(DebugDumpPath, FileMode.Open, FileAccess.Read,
+                FileShare.ReadWrite | FileShare.Delete);
+            using var reader = new StreamReader(fs, Encoding.UTF8);
+            return reader.ReadToEnd();
         }
-        catch (IOException) { }   // covers FileNotFound too: missing dump = not yet
+        catch (IOException) { return ""; }   // covers FileNotFound too: missing dump = not yet
+    }
+
+    /// <summary>Current value of a debug.txt "key=value" field, or -1 while the dump is
+    /// missing, mid-write, or lacks the key — callers poll via <see cref="WaitForDump"/>.
+    ///
+    /// <b>-1 is "ask again", not "the answer is -1".</b> Asserting on a bare `DumpValue`
+    /// taken after a wait is the DRA-225 flake: four `ShellHostTests` reds whose only
+    /// invariant was this sentinel on a SECOND read. Use <see cref="WaitForDump(string,int,string)"/>
+    /// when the expected value is known, or <see cref="WaitForDumpValues"/> when it is
+    /// not.</summary>
+    public int DumpValue(string key) => Parse(ReadDump().Split(' '), key);
+
+    private static int Parse(string[] pairs, string key)
+    {
+        foreach (var pair in pairs)
+            if (pair.StartsWith(key + "=", StringComparison.Ordinal) &&
+                int.TryParse(pair.AsSpan(key.Length + 1), NumberStyles.Integer,
+                    CultureInfo.InvariantCulture, out var value))
+                return value;
         return -1;
     }
 
@@ -1039,19 +1094,35 @@ internal sealed class AppHarness : IDisposable
     /// </summary>
     public int[] DumpValues(params string[] keys)
     {
-        var text = "";
-        try { text = File.ReadAllText(DebugDumpPath); }
-        catch (IOException) { }
-        var pairs = text.Split(' ');
-        return [.. keys.Select(key =>
-        {
-            foreach (var pair in pairs)
-                if (pair.StartsWith(key + "=", StringComparison.Ordinal) &&
-                    int.TryParse(pair.AsSpan(key.Length + 1), NumberStyles.Integer,
-                        CultureInfo.InvariantCulture, out var value))
-                    return value;
-            return -1;
-        })];
+        var pairs = ReadDump().Split(' ');
+        return [.. keys.Select(key => Parse(pairs, key))];
+    }
+
+    /// <summary>
+    /// ONE read of the dump that carried EVERY key asked for — the tool the two-host
+    /// agreement tests need, and the one DRA-225 found neither existing tool could supply.
+    ///
+    /// <para><b>It is `DumpValues` and `WaitForDump` composed, because each alone leaves
+    /// half the flake standing.</b> `DumpValues` gives ONE MOMENT, which is what a
+    /// comparison between two hosts requires — but it does not give a COMPLETE moment, and
+    /// a single read of a `tick=… dumpError=…` dump answers -1 for every key at once, which
+    /// is one moment and still red. `WaitForDump` retries until a value arrives — but it is
+    /// an EQUALITY, so it cannot be used at all where the expected number is whatever the
+    /// app happens to report (`spawnsZones`, `dropsMobs`): there is nothing to wait FOR.
+    /// Here the wait is on PRESENCE and the values come back together.</para>
+    ///
+    /// <para>On a timeout the message names the keys it required; WHICH of them were
+    /// absent is readable off the `debug.txt` line in the artifact every wait already
+    /// folds in, so the diagnosis costs no second channel. A dump that has stopped
+    /// carrying them at all aborts early on the `tick` question instead, which is the
+    /// difference between "late" and "the app cannot answer".</para>
+    /// </summary>
+    public int[] WaitForDumpValues(string reason, params string[] keys)
+    {
+        int[] values = [];
+        Until(() => (values = DumpValues(keys)).All(v => v >= 0), AssertTimeout,
+            $"{reason} (ONE read of debug.txt carrying every one of: {string.Join(", ", keys)})");
+        return values;
     }
 
     /// <summary>Wait until a key EXISTS in the dump.
@@ -1125,15 +1196,13 @@ internal sealed class AppHarness : IDisposable
             $"{reason} (debug.txt {key} to read '{expected}'; last seen '{DumpText(key)}')");
 
     /// <summary>The raw value for a key, or "" when the dump has not appeared yet.</summary>
-    public string DumpText(string key)
+    public string DumpText(string key) => ParseText(ReadDump().Split(' '), key);
+
+    private static string ParseText(string[] pairs, string key)
     {
-        try
-        {
-            foreach (var pair in File.ReadAllText(DebugDumpPath).Split(' '))
-                if (pair.StartsWith(key + "=", StringComparison.Ordinal))
-                    return pair[(key.Length + 1)..];
-        }
-        catch (IOException) { }
+        foreach (var pair in pairs)
+            if (pair.StartsWith(key + "=", StringComparison.Ordinal))
+                return pair[(key.Length + 1)..];
         return "";
     }
 
@@ -1150,17 +1219,8 @@ internal sealed class AppHarness : IDisposable
     /// </summary>
     public string[] DumpTexts(params string[] keys)
     {
-        var text = "";
-        try { text = File.ReadAllText(DebugDumpPath); }
-        catch (IOException) { }
-        var pairs = text.Split(' ');
-        return [.. keys.Select(key =>
-        {
-            foreach (var pair in pairs)
-                if (pair.StartsWith(key + "=", StringComparison.Ordinal))
-                    return pair[(key.Length + 1)..];
-            return "";
-        })];
+        var pairs = ReadDump().Split(' ');
+        return [.. keys.Select(key => ParseText(pairs, key))];
     }
 
     /// <summary>Closes the WIDGET (WM_CLOSE — the same path as the user's ✕) and waits
@@ -1271,10 +1331,21 @@ internal sealed class AppHarness : IDisposable
         return sb.ToString();
     }
 
+    /// <summary>Reads a file the APP may be writing this instant, without denying it the
+    /// write — the same share mask and the same reason as <see cref="ReadDump"/> (DRA-225).
+    /// Both files here are live: the app rewrites debug.txt every UI tick and appends
+    /// error.log whenever it logs, and this runs on the failure path, which is exactly when
+    /// the app is least worth interfering with.</summary>
     private static string? TryRead(string path)
     {
-        try { return File.Exists(path) ? File.ReadAllText(path) : null; }
-        catch (IOException) { return null; }
+        try
+        {
+            using var fs = new FileStream(path, FileMode.Open, FileAccess.Read,
+                FileShare.ReadWrite | FileShare.Delete);
+            using var reader = new StreamReader(fs, Encoding.UTF8);
+            return reader.ReadToEnd();
+        }
+        catch (IOException) { return null; }   // covers FileNotFound: the file is not there
     }
 
 
