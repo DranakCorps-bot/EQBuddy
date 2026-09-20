@@ -591,6 +591,12 @@ public class HelperSurfaceParityTests
                      HelperPresentation.QuestOffersWithheld(2),
                      HelperPresentation.SourcelessUpgrades(2),
                      HelperPresentation.QuestOnlyUpgrades(2),
+                     // DRA-216 D4: the tracked block's three sentences. The note is the one
+                     // that matters most here — it carries the parked "+N" gap, and a copy of
+                     // it in the page would go stale on a phone the day the park lifts.
+                     HelperPresentation.TrackedHeading,
+                     HelperPresentation.TrackedNote,
+                     HelperPresentation.TrackedOnPc,
                  })
             Assert.DoesNotContain(sentence, html, StringComparison.Ordinal);
 
@@ -638,6 +644,12 @@ public class HelperSurfaceParityTests
                      // silently swallowing every anchor past the third, which is trap 50 wearing
                      // D5's clothes.
                      "h.anchorsAllRemoved", "h.anchorsNotNamed",
+                     // DRA-216 D4's four, added in the SAME slice as the fields. All four are
+                     // named rather than just the list: a page that drew the rows and dropped
+                     // `trackedOnPc` would leave a phone holding a list of goals with nothing
+                     // saying where they are changed, and one that dropped `trackedNote` would
+                     // leave it implying a comparison EQBuddy cannot make. D5's lesson.
+                     "h.tracked", "h.trackedHeading", "h.trackedNote", "h.trackedOnPc",
                      // DRA-222 D6's off-hand caption, added in the SAME slice as the field.
                      // It is the fifth gear count and the only one about the player's hands,
                      // so a page missing it draws a shorter weapon list than the PC with
@@ -853,6 +865,102 @@ public class HelperSurfaceParityTests
 
         Assert.NotEqual(Print(Tradeskill.Jewelcrafting), Print(Tradeskill.Pottery));
         Assert.NotEqual(Print(Tradeskill.Jewelcrafting), Print());
+    }
+
+    // ---- DRA-216 D4: the tracked goals reach the phone ---------------------------------
+
+    /// <summary>
+    /// **WHAT THE PLAYER IS GOING AFTER IS THE SAME LIST ON BOTH SCREENS.**
+    ///
+    /// <para>A tracked goal is the one thing in this room that OUTLIVES the answers, so the two
+    /// surfaces disagreeing about it is worse than disagreeing about a ranked row: the player
+    /// would be working from a list the PC has already dropped a goal out of. Every row is
+    /// <c>HelperPresentation.TrackedRow</c>'s sentence in the store's own order — the projection
+    /// picks no word and no order — and the block's note rides too, because it carries the
+    /// parked "+N" gap and the fact that nothing ticks itself off.</para>
+    ///
+    /// <para>The control does NOT port. Tracking writes the profile the PC is playing from, so
+    /// the phone gets the sentence saying where it is done (trap 35).</para>
+    /// </summary>
+    [Fact]
+    public void TheTrackedGoalsRideTheWireInThePresentationsOwnWords()
+    {
+        IReadOnlyList<TrackedUpgrade> goals =
+        [
+            new("Wurmslayer", "PRIMARY", "Rusty Short Sword +3", new DateTime(2026, 9, 17)),
+            new("Blade of Carnage", "SECONDARY", "Shiny Brass Shield +6",
+                new DateTime(2026, 9, 15)),
+        ];
+
+        var phone = Phone(Request(Inputs() with { Tracked = goals }, HelperGoal.FarmGear));
+
+        Assert.Equal(HelperPresentation.TrackedHeading, phone.TrackedHeading);
+        Assert.Equal(HelperPresentation.TrackedNote, phone.TrackedNote);
+        Assert.Equal(HelperPresentation.TrackedOnPc, phone.TrackedOnPc);
+        Assert.Equal([.. goals.Select(HelperPresentation.TrackedRow)], phone.Tracked);
+        // The row says what it is FOR, not just what it is — the anchor is in the sentence for
+        // the reason it is in the fact (`GearUpgrades`' own lock).
+        Assert.Contains("Shiny Brass Shield +6", phone.Tracked[1]);
+    }
+
+    /// <summary>Nothing tracked, nothing sent — and the part that is easy to miss, no caption
+    /// over it either. A heading and a "these stay until you untrack them" note printed above an
+    /// empty list is the disclosure-line rule broken the way the vendor block's own negative
+    /// describes.</summary>
+    [Fact]
+    public void APhoneWithNothingTrackedIsSentNeitherRowsNorCaptions()
+    {
+        var phone = Phone(Request(Inputs(), HelperGoal.FarmGear));
+
+        Assert.Empty(phone.Tracked);
+        Assert.Empty(phone.TrackedHeading);
+        Assert.Empty(phone.TrackedNote);
+        Assert.Empty(phone.TrackedOnPc);
+    }
+
+    /// <summary>Drawn on exactly the condition the desktop room draws the block on: the gear
+    /// goal is picked, or nothing is. A player working faction gets the same room on both
+    /// screens.</summary>
+    [Fact]
+    public void TheTrackedBlockIsDrawnOnTheConditionTheDesktopRoomDrawsItOn()
+    {
+        IReadOnlyList<TrackedUpgrade> goals =
+            [new("Wurmslayer", "PRIMARY", "Rusty Short Sword +3", new DateTime(2026, 9, 17))];
+        var inputs = Inputs() with { Tracked = goals };
+
+        Assert.Single(Phone(Request(inputs, HelperGoal.FarmGear)).Tracked);
+        // Nothing picked weighs everything, so the block is there.
+        Assert.Single(Phone(Request(inputs)).Tracked);
+        Assert.Empty(Phone(Request(inputs, HelperGoal.WorkOnFaction)).Tracked);
+    }
+
+    /// <summary>A goal tracked — or swapped for another — moves the push key. Trap 72's own
+    /// shape on the one store in this room the ANSWERS write: one out and one in leaves every
+    /// count on this screen unmoved, so a paired phone would keep drawing a goal the player has
+    /// already dropped.</summary>
+    [Fact]
+    public void AChangedTrackedListWakesThePairedDevice()
+    {
+        string Print(HelperInputs inputs) => CompanionProjection.SectionFingerprints(
+            CompanionProjection.Build(
+                new CompanionInputs
+                {
+                    Character = "Dranak", AppVersion = "2.0.0",
+                    Offered = CompanionSurfaces.All,
+                    Helper = Request(inputs, HelperGoal.FarmGear),
+                },
+                DateTime.Now))[CompanionSurfaces.Helper];
+
+        var day = new DateTime(2026, 9, 17);
+        var clean = Inputs();
+
+        Assert.NotEqual(
+            Print(clean),
+            Print(clean with { Tracked = [new("Wurmslayer", "PRIMARY", "Rusty Sword", day)] }));
+        // A SWAP, which a count would not see.
+        Assert.NotEqual(
+            Print(clean with { Tracked = [new("Wurmslayer", "PRIMARY", "Rusty Sword", day)] }),
+            Print(clean with { Tracked = [new("Blade of Carnage", "PRIMARY", "Rusty Sword", day)] }));
     }
 
     // ---- trap 72 / trap 8: the push gate ---------------------------------------------
