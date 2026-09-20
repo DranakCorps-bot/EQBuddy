@@ -1,3 +1,86 @@
+## 2026-09-20 — STUB from Planner (DRA-262): the Character room's class editor is unreachable once the achievements dump has answered — and a statement could not change the answer anyway
+
+To: Fable
+
+**Founder report on DRA-252, 2026-09-20 17:57Z, with a screenshot, against the signed 2.0.0
+build running on his desktop:** *"On Character screen of the Guide, I am not able to set my
+classes (or correct from what is inferred from the logs)."* His Character room reads
+**"Paladin · Warrior · Druid (from your achievements)"** over *"Your achievements dump answers
+this — run it again below if it is out of date."*, and there is no editor.
+
+**Read this first: it is UNRELEASED-BUILD evidence, and you are holding the v2.0.0 release
+review right now** (request at the top of `FABLE-FEEDBACK.md`, range `v1.99.18..999b6692`).
+This is the one known instance of your item 3 — *"anything unreleased that should NOT go
+yet"* — and it was filed after that request landed, so it is not in the packet you were
+handed. It does not by itself re-gate the release; DRA-252 holds that decision.
+
+### Two defects, and only the second one is a judgement call
+
+**Layer 1 — the door is hidden exactly when he wants it.** `EQBuddy/HomeRoom.cs:547`
+returns from `BuildClassLine` before the "Set class…" door at `:556` is ever created,
+whenever `_classSource == ClassSource.Achievements`. The only repair it offers is
+`HomeReadout.DumpAnswersClass` — *"run it again below if it is out of date"* — which cannot
+help a player whose complaint IS the dump's answer.
+
+**Layer 2 — un-hiding the door alone would ship a silent no-op.** `CharacterClasses.Resolve`
+adds the dump first (`:98`) and unions the statement after (`:104`), while `Add` stops dead
+at the cap (`:91`, `CharacterClasses.Max` = `ClassInference.MaxClasses` = **3**). His dump
+already names three. So every chip he ticked would be written by
+`QuestLedgerStore.SetStatedClasses:622` and contribute **nothing** to the resolved list —
+stored, ignored, with no sentence saying why. "Silent no-ops are broken" is a standing rule,
+and the obvious fix ships one. With a one- or two-class dump a statement WOULD contribute,
+and the door is still hidden.
+
+### Why it cannot be an executor edit
+
+1. `Resolve`'s precedence is the rule for who the character IS, read by the Quest Tracker,
+   the Gear Locker, the Sky class lens, the unlock list, the Helper and the phone.
+2. The `:547` collapse is **signed plan DRA-66 D4**, and *"stated never suppresses the dump"*
+   is **D3**, argued at length in `CharacterClasses.cs:67–76`. Reversing either is a departure
+   from a signed plan — the named escalation path, not an implementation detail.
+3. It is GUARDED on purpose: `tests/EQBuddy.E2E/ShellHostTests.cs:778` asserts
+   `shellHomeClassChips == 0` once a dump lands. A fix reddens a guard somebody wrote
+   deliberately, so the guard must be re-decided in the same change, never deleted around.
+4. There is a real Bevel question under it: what a surface says when the game's dump and the
+   player disagree. Today it says the player is out of date.
+
+**The one-question test, run honestly.** No single answer from David turns this into V1. The
+question I DID put to him (below) narrows the slice; it does not collapse it, because the
+correction path is unexpressible under D3 on every branch of his answer.
+
+### What is asked of you, and the one fork
+
+Decide, and say what the surface says for each:
+
+- **May a statement DISPLACE a dump-sourced class, or only union with it?** A union can never
+  express a correction to a three-class dump, so "make the door reachable" and "keep D3" are
+  not both satisfiable. If you keep D3, the alternative is an explicit refusal sentence — the
+  editor reachable, the chip ticked, and the surface SAYING the dump outranks it — which is
+  honest but is also telling the Founder no.
+- **What replaces `HomeReadout.DumpAnswersClass`,** the D4 collapse sentence, which currently
+  offers a repair that cannot work.
+- **What the source label reads** once a statement can outrank the game's own writing
+  (`CharacterClasses.SourceLabel` is ONE table, Bevel-locked).
+
+**The fork, and it is genuinely open.** `AchievementsImport.UnlockedClasses:82` collects
+**every completed "Class Unlock — X"**, primary first, then `Resolve` truncates at 3 and
+labels the result the game's statement. If a Legends character can unlock more classes over
+time than the three they hold at once, that is an unlock HISTORY being read as a ROSTER, and
+no re-run of the dump would ever correct it — a second, separate defect in the INPUT.
+`Companion/CompanionQuestSource.cs:40` already draws the distinction the resolver does not:
+*"an earned unlock may never be played."* **This is a game mechanic, so the Founder is the
+authority and I asked rather than reasoning it out** — Paperclip interaction
+`68fa65ac-0523-4c07-a92b-75ea5369c40c`, pending as of this writing. Plan the two defects
+above now; hold the input arm until his answer lands, and I will carry it to you.
+
+**Done bar, the E2E re-decision and the `WhatsNew.json` duty are on DRA-262** — not restated
+here. Nothing is authorized: this plan needs a Helm SIGN because it reverses two decisions of
+a signed one, and no executor may take it before that.
+
+— Dranak (Claude Code), Planner
+
+---
+
 ## 2026-09-19 — STUB from Claude (DRA-219 / DRA-216 D3): the SAME promoter bug, on the quest side — `items-promote.py` emits wikitext as a quest TITLE
 
 To: Fable
