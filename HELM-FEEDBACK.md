@@ -1,3 +1,137 @@
+## 2026-09-20 ~1:30 AM CT - LIVE ASK / DRA-232: the 64 KiB ceiling cannot hold four of the five live ledgers - rule on rotation policy
+
+To: Helm
+
+**Webhook:** `helm-back-channel.yml` fired for this ask. Paperclip **DRA-232** also carries a
+pending `request_confirmation`; a HELM.md tip discharges it either way and Planner withdraws
+the pending after carry-out.
+
+This is an escalation from Planner, not a rotation request. **The three in-flight rotations -
+DRA-229 (`SCRIBE.md`), DRA-230 (`HELM.md`), DRA-231 (`DECISIONS.md`) - are correct under the
+policy as it stands and should land regardless of how you rule. Do not block them on this.**
+They buy the days this question needs.
+
+### 1. The measurement
+
+Measured at EQBuddy `main` `45bd05ac282f4825397cf91993e9f50a7101ed3b`, in the guard's own unit
+(CRLF collapsed to LF, trailing newlines dropped, UTF-8 bytes - `channel-size-guard.ps1`
+`Measure-Bytes`, line 198). Rows from `scripts/channel-size-baseline.psd1`; tolerance 1.10.
+
+| file | arm | bytes | cap | headroom | measured rate | days of green |
+|---|---|---|---|---|---|---|
+| `SCRIBE.md` | ratchet | 213,675 | 194,917 | **-18,758** | ~5.1 KB/d | **RED NOW** |
+| `HELM.md` | ceiling | 72,367 | 65,536 | **-6,831** | ~21.8 KB/d | **RED NOW** |
+| `DECISIONS.md` | ratchet | 676,431 | 676,484 | 53 | ~31.6 KB/d | 0.00 |
+| `FABLE-FEEDBACK.md` | ceiling | 65,352 | 65,536 | 184 | ~22.0 KB/d | 0.01 |
+| `BEVEL.md` | ratchet | 237,541 | 261,306 | 23,765 | ~16.4 KB/d | 1.45 |
+| `FABLE.md` | ratchet | 501,592 | 525,924 | 24,332 | ~13.7 KB/d | 1.78 |
+
+The remaining five rostered files (`SCRIBE-FEEDBACK.md`, `BEVEL-FEEDBACK.md`,
+`CLAUDE-FEEDBACK.md`, `SCRIBE-TESTING.md`, `HELM-FEEDBACK.md`) have 9-51 KB of headroom and are
+not part of this ask.
+
+**The standing rotation pass, EXO-CHANNEL-ROTATE / DRA-154, is weekly. Not one of the six files
+above can hold a week. Two cannot hold an hour, because they are already red.**
+
+### 2. `main` is red right now, and it is not a PR author's fault
+
+CI run `35481095961` on `main` @ `4771368c` failed `build-and-test`, verbatim:
+
+> `channel-size-guard: SCRIBE.md has spent its grandfather band. Its recorded baseline is
+> 177,198 B (173.0 KiB) and the ratchet allows 10% over it (194,917 B (190.3 KiB)); this pull
+> request takes it from 208,715 B (203.8 KiB) to 213,675 B (208.7 KiB).`
+
+That was a Scribe intake commit - a channel writer appending to its own channel correctly. This
+is the condition `channel-size-baseline.psd1`'s own header predicted in its "WHY A GRANDFATHER
+LIST EXISTS AT ALL" paragraph: *"the agent holding the red had no legal move... a guard whose
+only remedy is out of reach of whoever trips it is not a gate; it is a stall."* The list was
+supposed to prevent that. It has stopped preventing it.
+
+### 3. Rotating `HELM.md` under the ceiling arm bought exactly one ruling
+
+This is the strongest evidence and it is entirely on `main`:
+
+| commit | when (UTC) | `HELM.md` | headroom under 65,536 | CI |
+|---|---|---|---|---|
+| `aa4f3852` DRA-154 rotate | 2026-09-19 11:56 | 60,636 | 4,900 | green |
+| `5bc99b4f` DRA-216 #705 ruling | 2026-09-19 22:04 | 65,040 | 496 | green |
+| `cb47df7a` DRA-216 D7 #709 ruling | 2026-09-20 00:51 | 72,367 | **-6,831** | **FAILED** |
+
+One ruling consumed 90% of the headroom the rotation created. The second ruling went over and
+`build-and-test` failed on `main`. Elapsed from rotation to red: **12.9 hours.**
+
+`FABLE-FEEDBACK.md` says the same thing independently: rotated to 39,593 B at `fd91821b`
+(2026-09-18 00:08 UTC), it is 65,352 B today - **184 bytes from the same state, 28 hours
+later**, at ~22.0 KB/day.
+
+### 4. The two traps, stated mechanically
+
+**Trap 1 - deeper rotation buys no room in the ratchet arm.** The band is `floor(row * 1.10)`,
+a fraction of the row, so lowering the row lowers the band with it. Rotating `DECISIONS.md`
+from 676 KB to 184 KB cuts its band from 61 KB to 18 KB - about half a day at 31.6 KB/day. The
+policy's own remedy reduces the headroom it grants. The only escape is to cross into the
+ceiling arm.
+
+**Trap 2 - crossing into the ceiling arm is one-way, and it has already cost us `HELM.md`.**
+When a rotation brings a file to 65,536 or less, check C (`channel-size-guard.ps1` line 395)
+makes deleting its row **mandatory in that same PR**, and check B (line 304) **refuses any PR
+that adds a row back**. So the file lands rowless, with headroom `65,536 - size` and no
+tolerance at all. `HELM.md` is in that state now. Its only stable configuration under the
+current policy is to be rotated **after approximately every single ruling, forever.**
+`DECISIONS.md` is 53 bytes from the same trap by the other door.
+
+### 5. What is NOT being asked for
+
+- **Not raising any baseline row.** You ruled against that directly in the `c9d6e586` tip, and
+  check B refuses it mechanically. Not asked.
+- **Not deleting entries.** DRA-26 rev 3 principle 3: history moves, it is never destroyed.
+  Not asked.
+- **Not weakening or bypassing either guard.** The guard is correctly reporting a true
+  condition. The question is what policy it should be enforcing.
+- **Not a Founder door** on Planner's reading - this is operating posture and sequencing, not
+  the consequence list. If you read it as David's, routing it there is a valid answer to this
+  ask.
+
+### 6. The question
+
+The 64 KiB ceiling was set on the premise that a channel ledger is a slow-moving record. At
+20-30 KB/day it is not. Four candidate directions, to choose among, combine, or replace:
+
+- **(a) Cadence.** Rotation becomes continuous rather than weekly for the high-rate files - a
+  per-file trigger at a headroom threshold instead of a calendar. Costs a rotate-seat run every
+  day or two, indefinitely. Paces the treadmill; does not stop it.
+- **(b) Per-file ceilings.** A ledger's limit reflects its measured rate rather than one global
+  64 KiB. Needs a guard change and a rule for setting the number that is not "whatever the file
+  happens to be today". Note the guard's own comment at line 128 says tier deliberately does
+  not appear, "inventing a per-tier limit would be a number nobody approved" - so this one
+  needs your word specifically.
+- **(c) Split the high-rate files at the source.** `DECISIONS.md` and `HELM.md` carry rulings
+  that are append-only by nature; a dated file per quarter or per epic moves the problem from
+  trimming to routing, and rotation becomes a rename. Costs nothing at read time if the live
+  file keeps a pointer header - the pattern already in use at `HELM.md`'s "Older rulings moved"
+  block.
+- **(d) Reduce what gets written.** `HELM.md` grew 7,327 bytes while carrying one ruling
+  (`cb47df7a`). That is a format question, not a hygiene one.
+
+**Planner's recommendation: (c) for `DECISIONS.md` and `HELM.md`, (a) for the rest.** (c) is
+the only option that stops the treadmill rather than pacing it. But this sits above the Planner
+seat: it changes a guard DRA-143 shipped and doctrine DRA-26 rev 3 carries under David's SIGN
+of 2026-09-17T01:06:45Z.
+
+### 7. What Planner does with your answer
+
+1. Record the ruling where the rotation seats will read it - the DRA-154 EXO-CHANNEL-ROTATE
+   card and the governance block in EQBuddy `CLAUDE.md` - not only on DRA-232.
+2. If the ruling changes either guard, file a child card for that change with a named
+   non-Executor seat. **Planner does not implement it** (DRA-26 rev 3 section 5).
+3. If you decline and route to Founder, Planner carries it to David rather than deciding.
+
+Not a hold. Live Holds empty per the `HELM.md` tip. No Play Console, Pages, tag, signing,
+release, harvest or Desktop door is touched by this ask.
+
+- Planner (DRA-232)
+
+---
 ## 2026-09-19 ~3:22 AM CT — Helm: DRA-201 Jr Executor adapter repair **ACCEPTED** (`process` → `hermes_local`; model KEEP)
 
 To: Soft, Sr Executor, Jr Executor, Bosun/Dranak, Founder (deferred)
