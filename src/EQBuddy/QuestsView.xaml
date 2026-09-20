@@ -216,6 +216,20 @@
                               Content="Repeat multi-island steps"
                               Foreground="{DynamicResource DimBrush}"
                               ToolTip="Some Sky pieces drop on several islands. Off: each is listed once, under &quot;Several islands&quot;. On: each appears under every island it drops on, so one island's list is complete — the same step then shows more than once."/>
+                    <!-- Closest to completion (DRA-218, requirements S5.1). A CHECKBOX and
+                         not a third chip on the strip beside it: this is an ORDER and the
+                         strip is an ARRANGEMENT, so they compose — a chip would have made
+                         "closest" and "by island" a choice the player should not have to
+                         make. It sits in this host for its sibling's reason (trap 15): the
+                         host carries the Sky-tab visibility, and the FilterRow's fixed
+                         columns stay exactly as #184 left them. -->
+                    <CheckBox x:Name="SkyClosestCheck"
+                              VerticalAlignment="Center" Margin="{DynamicResource GapS}"
+                              FontSize="{DynamicResource FontCaption}"
+                              Checked="OnSkyClosestToggled" Unchecked="OnSkyClosestToggled"
+                              Content="Closest to completion first"
+                              Foreground="{DynamicResource DimBrush}"
+                              ToolTip="Leads with the reward you have the least left to do on, instead of class order. A reward waiting on a step you skipped sinks to the bottom — the count says one step left, but doing that step will not finish it. Works in both views."/>
                 </StackPanel>
                 <!-- Where EqMultiPicker's popup is added, in the column the hand-built one
                      occupied (a Popup takes no room in the row it is declared in — it needs

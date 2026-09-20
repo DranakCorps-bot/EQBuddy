@@ -218,6 +218,10 @@
   .gcard { border:1px solid var(--hairline); border-radius:8px; padding:10px 12px; margin:6px 0 10px; }
   .gcard .lead { font-size:11px; color:var(--accent); letter-spacing:.06em; }
   .reward { font-size:12px; color:var(--dim); margin:2px 0 6px; }
+  /* The blocked sentence (DRA-218). Same size and ink as the reward line it sits above —
+     it is a caption about the quest, not an alert, and the desktop draws it dim for the
+     same reason: the player made the skip on purpose. */
+  .blocked { font-size:12px; color:var(--dim); margin:2px 0 6px; }
   /* The reward item's own stats block, as the game prints it: preserved newlines and a
      monospace face, because "WIS: +9  MANA: +60" is a column and not a sentence. */
   .rcard { font-size:11.5px; color:var(--text); margin:2px 0 8px; white-space:pre-wrap;
@@ -2249,6 +2253,12 @@ function boot() {
       h.append(name);
       if (g.note) h.append(el("span", "note", g.note));
       wrap.appendChild(h);
+      // WHY THIS ONE WILL NOT FINISH (DRA-218). Drawn above the reward line and under the
+      // heading, where the eye lands (trap 44), and drawn on a FOLDED group too: the count
+      // on that heading is exactly what it is correcting, and a folded quest is often the
+      // only thing on screen. Core's sentence, verbatim — the page decides layout and not a
+      // word of it.
+      if (g.blocked) wrap.appendChild(el("div", "blocked", g.blocked));
       // What this quest pays. The desktop hangs it on the heading's hover; a phone has no
       // hover, so it is drawn - and on a folded quest it is the only thing that answers
       // "what do I get" (trap 35).
