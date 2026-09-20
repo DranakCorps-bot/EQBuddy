@@ -6,7 +6,58 @@
 
 **What never rotates** — an open ask, an unexpired PARK or HOLD, and a standing rule stay in this file at any age, however old they are.
 
-**Last cut** — 2026-09-20 by DRA-231 (DRA-144 F6): kept everything dated 2026-09-17 or later, plus 6 older blocks that still carry something open; moved 143 blocks (595,334 B) to the archive.
+**Last cut** — 2026-09-20 by DRA-231 (DRA-144 F6): kept everything dated 2026-09-17 or later, plus 6 older blocks that still carry something open; moved 143 blocks (595,334 B) to the archive, then re-pinned the six `exo-experiment:` tags verbatim from five of them.
+
+## 2026-09-20 — STANDING: the `exo-experiment:` tag index (re-pinned by DRA-231)
+
+**This block never rotates.** Plan §10.1 makes the tag below the thing the M0-exit doctrine
+capture cites, and `Get-Experiments` in `scripts/exo-metrics.ps1` regenerates the "Experiments in
+flight" table in `docs/ops/exo-dashboard.md` by reading these lines — each tag *and the judging
+clause running from it to the next blank line* — out of **this file**. DRA-231's cut moved the five
+2026-09-14 entries that first carried them into the archive, so the tags are re-pinned here
+**verbatim** under DRA-144's never-rotate floor: all six experiments they name are still in flight.
+The full entries, with their calls and evidence, are in
+`docs/ops/claude-archive/channels/2026-Q3/DECISIONS.md` — follow a tag there for the reasoning, and
+keep it here for as long as the experiment is open. Retire a tag by graduating the experiment, never
+by rotating this block.
+
+`exo-experiment: merge-sync` — judged by *merge-to-close latency*: the wall time
+from a PR merging to its linked issue reaching a terminal state. The observed
+failure is days (EXO-HARDEN-A2, EQ-V2-HOME-CATCHUP sat `in_review` long after the
+work was on `main`), and the target is minutes, because the run starts on the
+merge event. Stated net of the **wrong-close count** — issues this job moved to
+`done` that a human then reopened. A sync that closes the wrong card is not
+faster than the drift, it is just more confident, and the same "state net of the
+harm" shape the seat-mutex tag uses for false blocks.
+
+`exo-experiment: seat-mutex` — judged by *rework rate* and *PRs per delivered slice*
+(baseline 3.7% and 2.15), because a duplicate executor spends both: #566/#568 cost one
+full run and produced a second PR for one slice. Stated net of the **false-block count**
+kept in `.claude/soft-seats/README.md`'s evidence list — a mutex that refuses work that
+should have started is not cheaper than the collision, it is just quieter.
+
+`exo-experiment: metrics-baseline` — judged by *whether a later window's claim can be
+checked against it without re-deriving the window*: concretely, whether the §10.3
+"current vs baseline" column fills from `docs/ops/exo-baseline.json` alone at the M2
+checkpoint, without any §6 KPI being recomputed by hand. Stated net of the count of
+metrics still reading `unmeasured`.
+
+`exo-experiment: channel-rotation` — judged by *rework rate* (baseline 3.7%), counting
+a channel-file clobber, a silently truncated append or a mojibake re-encode as rework,
+because that is the class trap 60 records three times in six days and the only §6 term
+this change can move. **Stated net of the effect that is NOT a §6 metric at all:** the
+bytes an agent must read before it can append correctly. That is the reason the rotation
+was worth doing and there is no KPI for it, so a later graduation entry cites the rework
+rows and says the primary benefit went unmeasured rather than mapping it onto a number
+it did not move.
+
+exo-experiment: ssc-retirement — judged by *PRs + Helm touches per slice*
+(baseline 2.3 PRs/slice, ≥2 touches/slice), stated net of *veto rate* and
+*rework rate*.
+
+exo-experiment: whole-sequence-auth — judged by *Governance Wait Ratio* and
+*Autonomous Correct Completion Rate* (baseline GWR 0.40–0.60, ACCR 0%),
+stated net of *escaped defect rate*.
 
 ## 2026-09-19 — DRA-199: the live class-lens transition (DRA-181 D4 arm (c))
 

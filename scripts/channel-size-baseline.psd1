@@ -46,16 +46,21 @@
     # HELM.md and HELM-FEEDBACK.md left this table on 2026-09-18, discharged by the DRA-154
     # rotation that took them to 25,411 B and 4,730 B - the first rotation of the HELM.md
     # class. Rows only ever leave, and they leave in the pull request that earns it.
-    # Rotated 2026-09-20 by DRA-231 (DRA-144 F6): 676,431 B -> 81,798 B, into
+    # Rotated 2026-09-20 by DRA-231 (DRA-144 F6): 676,431 B -> 85,238 B, into
     # channels/2026-Q3/DECISIONS.md. A date cut at 2026-09-17 with a hand-triaged floor:
     # of the 30 older blocks a coarse LIVE ASK / PARK / HOLD / STANDING sweep flagged, 24
     # were dispositioned as closed and moved, and 6 that carry something genuinely open
-    # were kept at any age. Still 1.2x over policy, so this row is LOWERED and KEPT:
-    # check C discharges a row only at 64 KiB or less, and no legal cut reaches the
-    # ceiling while the never-rotate floor stands. The 10% band this buys is 8,179 B -
-    # about a quarter of one median day's append (32,231 B/day measured 2026-09-10..19).
+    # were kept at any age. The first cut of this rotation landed 81,798 B and was wrong by
+    # 3,440: that coarse sweep has no LIVE ASK / PARK / HOLD / STANDING marker to flag an
+    # `exo-experiment:` tag, so all six of them rotated out from under a generator and three
+    # tests that read them from the LIVE file. The tags are re-pinned verbatim, which is what
+    # the never-rotate floor asks for and why this row is 85,238 and not 81,798.
+    # Still 1.3x over policy, so this row is LOWERED and KEPT: check C discharges a row only
+    # at 64 KiB or less, and no legal cut reaches the ceiling while that floor stands. The
+    # 10% band this buys is 8,523 B - about a quarter of one median day's append
+    # (32,231 B/day measured 2026-09-10..19).
     # That the ceiling and the band cannot both hold this file is DRA-144 F8's subject.
-    'DECISIONS.md'       = 81798
+    'DECISIONS.md'       = 85238
     # 7x over. Never rotated. Shrinks for real once plans move to docs/plans/DRA-nn.md.
     'FABLE.md'           = 478113
     # 4x over. Never rotated.
