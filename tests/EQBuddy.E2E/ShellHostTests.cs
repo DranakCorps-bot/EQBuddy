@@ -314,7 +314,21 @@ public class ShellHostTests
         app.Launch();
 
         app.WaitForDump(key, room, $"the shell to land on {address}");
-        Assert.Equal(ShellPages.Landed.Count, app.DumpValue("shellRail"));
+        // **`WaitForDump`, not `DumpValues`, and the two are not interchangeable here
+        // (DRA-225).** The rail count is KNOWN before the app is asked — it is
+        // `ShellPages.Landed.Count` — so the question is an EQUALITY, and an equality is
+        // exactly what a wait can ask. A bare `DumpValue` here was this test's flake in all
+        // four of its sightings: the assert read `Expected: 7|8 / Actual: -1`, the harness's
+        // missing-key sentinel, on a SECOND read taken a moment after the wait above
+        // succeeded. It is never the rail that is wrong — a wrong rail would fail all 21
+        // addresses rather than one — it is that the dump did not carry the key at that
+        // instant, and the old pattern had no second read with which to notice.
+        //
+        // `DumpValues` would be the wrong tool even though it is the one moment: there is
+        // no second key to hold this one to, and one read of a `dumpError` dump answers -1
+        // just as readily. The value is known, so wait for it.
+        app.WaitForDump("shellRail", ShellPages.Landed.Count,
+            $"the shell rail to report its {ShellPages.Landed.Count} landed rows on {address}");
     }
 
     /// <summary>
@@ -347,14 +361,41 @@ public class ShellHostTests
         // it off that strip; an equality here would have to be "fixed" either by breaking
         // the window or by taking the room's fifth tab away. Written as the predicate's own
         // count rather than as a 1, so a sixth shell-only tab needs no edit here.
-        Assert.Equal(
-            app.DumpValue("worldTabs") + WorldSurface.Tabs().Count(h => WorldSurface.ShellOnly(h.Tab)),
-            app.DumpValue("shellWorldTabs"));
-        Assert.Equal(app.DumpValue("spawnsRows"), app.DumpValue("shellWorldSpawnsRows"));
-        Assert.Equal(app.DumpValue("spawnsZones"), app.DumpValue("shellWorldSpawnsZones"));
-        Assert.Equal(app.DumpValue("mapZones"), app.DumpValue("shellWorldMapZones"));
-        Assert.Equal(app.DumpValue("travelZones"), app.DumpValue("shellWorldTravelZones"));
+        // **All ten facts off ONE read that carried all ten (DRA-225).** This used to be
+        // ten separate `DumpValue` calls — ten moments — and it produced both of this
+        // test's ledger rows: `spawnsRows` vs `shellWorldSpawnsRows` at `4 / 13`, which is
+        // two hosts sampled while the replay was still landing, and `spawnsZones` vs
+        // `shellWorldSpawnsZones` at `119 / -1`, which is a read that did not carry the key
+        // at all. One read answers the first; requiring the read to CARRY every key answers
+        // the second, and neither tool answers both alone.
+        //
+        // `WaitForDumpValues`, not `WaitForDump` per key, and the two are not
+        // interchangeable here: the expected numbers are whatever the fixture replay
+        // produced, so there is no value to wait FOR — the assertion is that two hosts
+        // agree, which only has meaning at one instant.
+        var (tabs, shellTabs, spawnRows, shellSpawnRows, spawnZones, shellSpawnZones,
+             mapZones, shellMapZones, travelZones, shellTravelZones) = Ten(
+            app.WaitForDumpValues("both hosts to report the Camps room in one dump",
+                "worldTabs", "shellWorldTabs",
+                "spawnsRows", "shellWorldSpawnsRows",
+                "spawnsZones", "shellWorldSpawnsZones",
+                "mapZones", "shellWorldMapZones",
+                "travelZones", "shellWorldTravelZones"));
+
+        Assert.Equal(tabs + WorldSurface.Tabs().Count(h => WorldSurface.ShellOnly(h.Tab)),
+            shellTabs);
+        Assert.Equal(spawnRows, shellSpawnRows);
+        Assert.Equal(spawnZones, shellSpawnZones);
+        Assert.Equal(mapZones, shellMapZones);
+        Assert.Equal(travelZones, shellTravelZones);
     }
+
+    /// <summary>Names the ten values <see cref="AppHarness.WaitForDumpValues"/> returned,
+    /// so an agreement assertion still READS as the pair it is about. The positional array
+    /// is what makes "one read" expressible at all; this is what stops that costing the
+    /// test its legibility.</summary>
+    private static (int, int, int, int, int, int, int, int, int, int) Ten(int[] v) =>
+        (v[0], v[1], v[2], v[3], v[4], v[5], v[6], v[7], v[8], v[9]);
 
     /// <summary>
     /// **The Drops surface, from its two live hosts at once** — the shell's World room and
@@ -397,11 +438,25 @@ public class ShellHostTests
         app.WaitForDumpAtLeast("shellWorldDropsMobs", 1,
             "the fixture replay to land at least one creature with a drop in the shell's room");
 
-        Assert.Equal(app.DumpValue("dropsMobs"), app.DumpValue("shellWorldDropsMobs"));
-        Assert.Equal(app.DumpValue("dropsRows"), app.DumpValue("shellWorldDropsRows"));
-        Assert.Equal(app.DumpValue("dropsItems"), app.DumpValue("shellWorldDropsItems"));
-        Assert.Equal(app.DumpValue("dropsFilterLen"), app.DumpValue("shellWorldDropsFilterLen"));
-        Assert.Equal(app.DumpValue("dropsRecheck"), app.DumpValue("shellWorldDropsRecheck"));
+        // One read carrying all ten, for the reason the Camps pair above carries: these are
+        // two hosts of one surface and the comparison only means anything at one instant,
+        // while the replay behind `dropsMobs` is still landing (DRA-225). This test has its
+        // own ledger row — `Expected -1 / Actual 13`, the same missing-key sentinel — and
+        // its own history of passing alone and failing in company.
+        var (mobs, shellMobs, rows, shellRows, items, shellItems,
+             filterLen, shellFilterLen, recheck, shellRecheck) = Ten(
+            app.WaitForDumpValues("both hosts to report the Drops surface in one dump",
+                "dropsMobs", "shellWorldDropsMobs",
+                "dropsRows", "shellWorldDropsRows",
+                "dropsItems", "shellWorldDropsItems",
+                "dropsFilterLen", "shellWorldDropsFilterLen",
+                "dropsRecheck", "shellWorldDropsRecheck"));
+
+        Assert.Equal(mobs, shellMobs);
+        Assert.Equal(rows, shellRows);
+        Assert.Equal(items, shellItems);
+        Assert.Equal(filterLen, shellFilterLen);
+        Assert.Equal(recheck, shellRecheck);
     }
 
     /// <summary>
