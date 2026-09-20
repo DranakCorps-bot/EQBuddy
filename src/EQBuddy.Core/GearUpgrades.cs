@@ -103,8 +103,17 @@ public sealed record WornSheet(IReadOnlyList<WornItem> Worn, IReadOnlyList<strin
 /// <param name="GainMetric">The biggest single number that improved ("AC", "HP", "STR"), from
 /// <see cref="ItemDominance.Gain"/>. Words are <c>HelperPresentation</c>'s.</param>
 /// <param name="GainBy">By how much.</param>
-/// <param name="ImprovedMetrics">How many numbers improved at all — the ordering key, and an
-/// arithmetic one rather than a taste one. See <see cref="GearUpgrades.Sweep"/>.</param>
+/// <param name="ImprovedMetrics">How many numbers improved at all — the SECOND ordering key
+/// since DRA-222 D6, and an arithmetic one rather than a taste one. See
+/// <see cref="GearUpgrades.Sweep"/>.</param>
+/// <param name="RelevantMetrics">How many of those improved numbers this character's classes'
+/// own catalog items carry (<see cref="ClassStatRelevance"/>) — the FIRST ordering key since
+/// DRA-222 D6 (S7.2).
+///
+/// <para><b>Zero for every row when the classes are unknown</b>, which is what makes an
+/// unknown-class sweep order exactly as it did before D6 rather than differently-but-plausibly.
+/// It is still a count and still not a weight: no row can outrank another by more than how many
+/// of the class's own numbers it moved, and a low one is never removed.</para></param>
 /// <param name="Zones">Where the catalog says it drops. May be empty for a quest-only
 /// item.</param>
 /// <param name="Quests">Which quests hand it out, per the catalog. Only ever REACHED behind
@@ -123,7 +132,8 @@ public sealed record GearUpgrade(
     int ImprovedMetrics,
     IReadOnlyList<string> Zones,
     IReadOnlyList<string> Quests,
-    IReadOnlyDictionary<string, IReadOnlyList<string>> Mobs)
+    IReadOnlyDictionary<string, IReadOnlyList<string>> Mobs,
+    int RelevantMetrics = 0)
 {
     /// <summary>The creatures the catalog named in one zone, or empty. Empty is a real answer
     /// and never a zero — the wiki page said nothing, or this build's catalog predates the
@@ -133,7 +143,7 @@ public sealed record GearUpgrade(
 }
 
 /// <summary>
-/// What one sweep found, and the three things it did not pass on (trap 50).
+/// What one sweep found, and the four things it did not pass on (trap 50).
 /// </summary>
 /// <param name="Upgrades">The candidates, after the per-anchor cap.</param>
 /// <param name="Withheld">What <see cref="GearUpgrades.MaxPerAnchor"/> held back.</param>
@@ -161,8 +171,19 @@ public sealed record GearUpgrade(
 /// leaves the toggle off is routinely being shown a narrower list than EQBuddy found, with
 /// nothing on screen saying so.</para>
 /// </param>
+/// <param name="OffHandRefusals">How many candidates beat the worn item on every number and
+/// were removed anyway, because they are two-handed and this character's SECONDARY is occupied
+/// (DRA-222 D6).
+///
+/// <para><b>Its own number beside the three above and never summed into any of them</b>, for
+/// the reason they keep theirs apart from each other: <paramref name="Withheld"/> is a CAP,
+/// <paramref name="NoSource"/> is a gap in the catalog, <paramref name="QuestOnly"/> has a
+/// remedy the player is holding — and this is a RULE about the character's own hands. One
+/// merged figure would explain none of the four. Measured on the Founder's committed dump
+/// against the shipped catalog: his PRIMARY anchor alone contributes 29.</para></param>
 public sealed record GearSweep(
-    IReadOnlyList<GearUpgrade> Upgrades, int Withheld, int NoSource = 0, int QuestOnly = 0)
+    IReadOnlyList<GearUpgrade> Upgrades, int Withheld, int NoSource = 0, int QuestOnly = 0,
+    int OffHandRefusals = 0)
 {
     public static readonly GearSweep Nothing = new([], 0);
 }
@@ -209,6 +230,24 @@ public sealed record GearSweep(
 /// "+N" raises the worn one by an amount the wiki does not state. Sharing the table was never
 /// the same thing as sharing every rule built on it — what must not fork is the arithmetic,
 /// and that has not.</para>
+///
+/// <para><b>WEAPON-AWARE SINCE DRA-222 D6</b> (S7.3). The table prices every number on both
+/// blocks and no SLOT, so a two-handed weapon that wins on all of them "beat" the one-hander in
+/// the player's hand and the advice quietly emptied their off-hand. Measured on the Founder's
+/// committed dump: his PRIMARY anchor found 64 dominating candidates, 29 of them two-handed,
+/// and because <see cref="MaxPerAnchor"/> is 8 the eight rows he could actually see were SEVEN
+/// two-handers and one one-hander — for a character wielding a second morning star in
+/// SECONDARY. The refusal is <see cref="ItemDominance.Compare"/>'s, it fires only where the
+/// dump shows an occupied off-hand, and it is COUNTED
+/// (<see cref="GearSweep.OffHandRefusals"/>).</para>
+///
+/// <para><b>CLASS-AWARE SINCE DRA-222 D6, AND ONLY IN THE ORDER AND THE SENTENCE</b> (S7.2).
+/// <see cref="ClassStatRelevance"/> measures what share of a class's own catalog items carry
+/// each number; the sweep uses it to pick which improvement a row NAMES and to rank the
+/// relevant count above the total. <b>It removes nothing</b> — the dominance question is
+/// untouched, so no player can lose a candidate to a measurement they would argue with — and
+/// with unknown classes it is the empty set and this sweep behaves exactly as it did before the
+/// slice.</para>
 /// </summary>
 public static class GearUpgrades
 {
@@ -299,7 +338,24 @@ public static class GearUpgrades
         // player is looking at. See GearSweep for the shipped numbers behind both.
         var noSource = 0;
         var questOnly = 0;
+        // DRA-222 D6. A THIRD reason, and the only one of the three that removes a candidate
+        // which beat the worn item on every number - see GearSweep.
+        var offHandRefused = 0;
         var index = SlotIndex(catalog);
+
+        // **READ FROM THE WHOLE WORN SHEET, NEVER FROM THE ANCHORS** (DRA-222 D6, S7.3). The
+        // anchors may have been narrowed to the player's picks; whether their off-hand is full
+        // is a fact about the CHARACTER, and a player who picked only their helm has not
+        // emptied their shield hand by doing so.
+        //
+        // A row the dump files under "Any Slot" does not count — the Founder's own shield is
+        // one — which is the conservative direction on purpose: this rule only ever removes
+        // offers, so an off-hand nobody has measured leaves it stood down.
+        var offHandInUse = worn.Any(w => WeaponSkills.IsOffHand(w.Slot));
+
+        // The metrics this character's classes' own catalog items carry (DRA-222 D6, S7.2).
+        // EMPTY for an unknown class, and empty is the pre-D6 ranking exactly.
+        var relevant = ClassStatRelevance.For(catalog, myClasses);
 
         foreach (var anchor in anchors)
         {
@@ -333,8 +389,16 @@ public static class GearUpgrades
                 // caveat said once per block rather than templated onto every row (trap 73).
                 // No "+N" arithmetic is invented to close the gap, because the wiki does not
                 // state what a "+N" is worth.
-                if (!ItemDominance.Dominates(
-                        record.Name, stats, anchor.Name, anchor.Stats, myClasses)) continue;
+                //
+                // **AND THE OFF-HAND RULE IS ASKED THROUGH THE SAME CALL** (DRA-222 D6, S7.3).
+                // `Compare` answers three things rather than two so this loop can tell "it
+                // loses on AC" from "it wins and costs you your shield hand" and COUNT the
+                // second — a rule that removes offers says so by count (trap 50), and a bool
+                // could not have carried the difference.
+                var verdict = ItemDominance.Compare(
+                    record.Name, stats, anchor.Name, anchor.Stats, myClasses, offHandInUse);
+                if (verdict == DominanceVerdict.CostsTheOffHand) { offHandRefused++; continue; }
+                if (verdict != DominanceVerdict.Yes) continue;
 
                 var zones = record.DropZones?.Where(z => z.Length > 0).ToList() ?? [];
                 var quests = record.Quests?.Where(q => q.Length > 0).ToList() ?? [];
@@ -354,7 +418,11 @@ public static class GearUpgrades
                     if (!includeQuests) { questOnly++; continue; }
                 }
 
-                var gain = ItemDominance.Gain(stats, anchor.Stats);
+                // **THE NAMED GAIN IS THE BIGGEST RELEVANT ONE, NOT THE BIGGEST**
+                // (DRA-222 D6, S7.2). The metrics are not on one scale, so "+12 HP" beat
+                // "+2 WIS" on every cleric's row by arithmetic that has nothing to do with
+                // the cleric. An unknown class passes an empty set and gets the old answer.
+                var gain = ItemDominance.Gain(stats, anchor.Stats, relevant);
                 if (gain is not { } g) continue;   // Dominates has already ruled this out
 
                 beats.Add(new GearUpgrade(
@@ -362,7 +430,8 @@ public static class GearUpgrades
                     ItemDominance.MetricPairs(stats, anchor.Stats).Count(p => p.B > p.A),
                     zones,
                     includeQuests ? quests : [],
-                    Mobs(record, zones)));
+                    Mobs(record, zones),
+                    ClassStatRelevance.Improved(relevant, stats, anchor.Stats)));
             }
 
             // **Ordered by how many numbers improved, and that is arithmetic rather than
@@ -370,15 +439,36 @@ public static class GearUpgrades
             // it depends on what the character does, and nothing here knows that. "This one
             // improves six of the numbers and that one improves two" is a count, and a count
             // is something the player can disagree with.
+            //
+            // **AND SINCE DRA-222 D6 THE COUNT IS TAKEN TWICE, RELEVANT ONES FIRST** (S7.2).
+            // That is still a count and still not a taste: `ClassStatRelevance` measures what
+            // share of the class's OWN catalog items carry each number, so "this one moved
+            // three of the numbers your classes' gear carries and that one moved none" is as
+            // checkable as the total beside it.
+            //
+            // **The two keys are LEXICOGRAPHIC, and that is the whole of the claim.** The
+            // relevant count is asked first and the total only breaks its ties, so a row that
+            // moved two numbers of which one is a warrior's outranks a row that moved eleven of
+            // which none is. That is the intended reading of S7.2 — "how many of YOUR numbers"
+            // is the question, and the total is what settles rows the first question cannot
+            // separate — but it is worth stating plainly, because "the total stays as the
+            // tiebreak" is easy to read as "the total still wins when it is much larger", and
+            // it does not. The bound on the damage is that neither key can REMOVE a row: the
+            // per-anchor cap keeps the same number of candidates either way, so the worst a
+            // wrong relevance set can do is put the right upgrade lower down the same list.
+            //
+            // With an unknown class every row scores zero on the new key and this list comes
+            // out in exactly its pre-D6 order.
             var ordered = beats
-                .OrderByDescending(u => u.ImprovedMetrics)
+                .OrderByDescending(u => u.RelevantMetrics)
+                .ThenByDescending(u => u.ImprovedMetrics)
                 .ThenBy(u => u.Item, StringComparer.OrdinalIgnoreCase)
                 .ToList();
             found.AddRange(ordered.Take(MaxPerAnchor));
             withheld += Math.Max(0, ordered.Count - MaxPerAnchor);
         }
 
-        return new GearSweep(found, withheld, noSource, questOnly);
+        return new GearSweep(found, withheld, noSource, questOnly, offHandRefused);
     }
 
     /// <summary>

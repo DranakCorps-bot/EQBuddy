@@ -1273,6 +1273,18 @@ internal sealed class HelperRoom : Grid, IShellRoom
             is { Length: > 0 } questOnlyCap)
             block.Children.Add(Line(questOnlyCap, Role.Caption));
 
+        // **AND THE OFF-HAND RULE'S** (DRA-222 D6, S7.3). Fifth count, fifth sentence, same
+        // argument one more time: this one removed offers that WON on every number, for a cost
+        // that is not a number at all, and a player who cannot tell it from the band gate's
+        // refusals cannot act on either. Its door is the Gear room's, like every gear caption's
+        // — the swap this leaves to them is one they make by looking at both hands.
+        if (HelperPresentation.OffHandRefused(_answers.GearOffHandRefusals)
+            is { Length: > 0 } offHandCap)
+        {
+            block.Children.Add(Line(offHandCap, Role.Caption));
+            block.Children.Add(Door(new HelperDoor(HelperDoorKind.Gear, "")));
+        }
+
         // The who rule's count on the MATERIALS list (DRA-149 D3). Same sentence from the same
         // producer — the rule, the cause and the remedy are identical and a re-worded copy is
         // the one that goes stale (trap 4) — and its own line, for the reason the band caption
@@ -1698,6 +1710,17 @@ internal sealed class HelperRoom : Grid, IShellRoom
         $"helperNoSourceLine={(HelperPresentation.SourcelessUpgrades(_answers.GearNoSource).Length > 0 ? 1 : 0)} " +
         $"helperQuestOnly={_answers.GearQuestOnly} " +
         $"helperQuestOnlyLine={(HelperPresentation.QuestOnlyUpgrades(_answers.GearQuestOnly).Length > 0 ? 1 : 0)} " +
+        // **DRA-222 D6: the off-hand rule, in the same two-numbers-one-moment shape** (trap 56).
+        // `helperOffHandRefused` is how many winning offers it removed and `helperOffHandLine`
+        // is whether the room SAID so — a refusal nobody was told about is a row that vanished,
+        // which is the whole of what this slice fixes. `helperRelevant` is the OTHER half of
+        // D6 and is deliberately not a count of refusals, because relevance refuses nothing: it
+        // is how many drawn upgrade lines named a metric this character's classes' own gear
+        // carries, which is 0 for every row when the class is unknown and is what an E2E
+        // asserts the ORDER against.
+        $"helperOffHandRefused={_answers.GearOffHandRefusals} " +
+        $"helperOffHandLine={(HelperPresentation.OffHandRefused(_answers.GearOffHandRefusals).Length > 0 ? 1 : 0)} " +
+        $"helperRelevant={_answers.Top.Sum(r => r.Why.OfType<GearUpgradeFact>().Sum(f => f.RelevantMetrics))} " +
         // **DRA-149 D2: the worn rows that never became an anchor** — the same two-numbers-one-
         // moment shape, and the one it matters most for. `helperWorn` above is the anchor count
         // and it was the ONLY thing this dump said about the dump: twenty anchors from a

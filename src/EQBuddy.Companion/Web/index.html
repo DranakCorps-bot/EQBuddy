@@ -1955,9 +1955,16 @@ function boot() {
     // `gearQuestWithheld` directly after `gearWhoWithheld` because they are the same rule on the
     // two halves of S10.1, then the two the sweep never passed on at all. Added in the SAME
     // slice as the fields, which is the whole of D5's lesson.
+    // DRA-222 D6 adds `gearOffHandRefused` LAST of the gear counts and before the materials
+    // block — the desktop room's own order. It is the only one about the player's HANDS rather
+    // than about a place, which is exactly why it must not be missing here: a phone drawing the
+    // ones above it and not this one shows a shorter weapon list than the PC with nothing on
+    // screen saying why. Its row in the page-side must-list is what makes that checkable
+    // (trap 34).
     for (const line of [h.moneyNote, h.gearBaseNote, h.materialNote, h.cap, h.gearWithheld,
                         h.gearEraRefused, h.gearBandRefused, h.gearWhoWithheld,
                         h.gearQuestWithheld, h.gearNoSource, h.gearQuestOnly,
+                        h.gearOffHandRefused,
                         h.materialEraRefused, h.materialBandRefused, h.materialWhoWithheld])
       if (line) wrap.appendChild(el("div", "caption", line));
 

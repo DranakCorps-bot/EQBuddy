@@ -55,9 +55,14 @@ public static class GearLocker
         Func<string, ItemStatsBlock?> statsFor,
         IReadOnlyList<string> myClasses)
     {
+        // Materialized because it is read twice — the fold below and the off-hand
+        // question further down — and a caller handing in a lazy query would otherwise
+        // have it run twice for one Build.
+        var dump = entries as IReadOnlyList<InventoryFile.Entry> ?? [.. entries];
+
         // Fold duplicate names (same item in three bag slots = one row, ×3), keep
         // the most prominent location: worn beats bags beats bank.
-        var owned = entries
+        var owned = dump
             .GroupBy(e => e.Name, StringComparer.OrdinalIgnoreCase)
             .Select(g =>
             {
@@ -83,19 +88,28 @@ public static class GearLocker
                     rows.Add((slot.ToUpperInvariant(), row));
         }
 
+        // **THE OFF-HAND, READ OFF THE DUMP ONCE** (DRA-222 D6, S7.3). A two-handed
+        // candidate forecloses SECONDARY, which no number in the metric table prices —
+        // so the rule needs to know whether this character has that hand filled, and
+        // that is a fact their own inventory states rather than one to infer from the
+        // item being compared (trap 64b). It is a property of the CHARACTER, so it is
+        // taken here and passed down rather than re-derived per slot group.
+        var offHandInUse = dump.Any(e => e.Worn && WeaponSkills.IsOffHand(e.WornSlot));
+
         var groups = new List<GearSlotGroup>();
         foreach (var slot in SlotOrder)
         {
             var inSlot = rows.Where(r => r.Slot == slot).Select(r => r.Row).ToList();
             if (inSlot.Count == 0) continue;
-            groups.Add(new GearSlotGroup(slot, MarkOutclassed(inSlot, myClasses)));
+            groups.Add(new GearSlotGroup(slot, MarkOutclassed(inSlot, myClasses, offHandInUse)));
         }
         // Slots the order list doesn't know (a new expansion's word) still show —
         // silently dropping a slot reads as a lost item.
         foreach (var slot in rows.Select(r => r.Slot).Distinct()
                      .Where(s => s != "UNKNOWN" && !SlotOrder.Contains(s)).Order())
-            groups.Add(new GearSlotGroup(slot,
-                MarkOutclassed(rows.Where(r => r.Slot == slot).Select(r => r.Row).ToList(), myClasses)));
+            groups.Add(new GearSlotGroup(slot, MarkOutclassed(
+                rows.Where(r => r.Slot == slot).Select(r => r.Row).ToList(),
+                myClasses, offHandInUse)));
 
         var unknown = rows.Where(r => r.Slot == "UNKNOWN").Select(r => r.Row)
             .DistinctBy(r => r.BaseName, StringComparer.OrdinalIgnoreCase).ToList();
@@ -104,7 +118,8 @@ public static class GearLocker
         return groups;
     }
 
-    private static List<GearRow> MarkOutclassed(List<GearRow> rows, IReadOnlyList<string> myClasses)
+    private static List<GearRow> MarkOutclassed(
+        List<GearRow> rows, IReadOnlyList<string> myClasses, bool offHandInUse)
     {
         // Best rows first: by the slot's leading metric (weapon ratio, else AC,
         // else HP), stats-less rows last.
@@ -120,8 +135,9 @@ public static class GearLocker
         return ordered.Select(r =>
         {
             var beater = ordered.FirstOrDefault(other => !ReferenceEquals(other, r)
-                && Dominates(other, r, myClasses));
-            var upgrade = wornNow is not null && !r.Worn && CanClaimUpgrade(r, wornNow, myClasses)
+                && Dominates(other, r, myClasses, offHandInUse));
+            var upgrade = wornNow is not null && !r.Worn
+                          && CanClaimUpgrade(r, wornNow, myClasses, offHandInUse)
                 ? wornNow.Name : "";
             return r with { OutclassedBy = beater?.Name ?? "", UpgradeOver = upgrade };
         }).ToList();
@@ -135,52 +151,42 @@ public static class GearLocker
     /// numbers lose is not beaten, it is merely under-described. Claiming otherwise
     /// would tell a player to unequip their best item, which is worse than saying
     /// nothing. A candidate at the same tier or higher has no such excuse against it.
+    ///
+    /// <para><b>This is <see cref="ItemDominance.CanClaimUpgrade"/>, called</b> — see
+    /// <see cref="Dominates"/> for why that sentence became true only in DRA-222 D6.</para>
     /// </summary>
-    public static bool CanClaimUpgrade(GearRow candidate, GearRow worn, IReadOnlyList<string> myClasses)
-    {
-        if (!Dominates(candidate, worn, myClasses)) return false;
-        return UpgradeTier(candidate.Name) >= UpgradeTier(worn.Name);
-    }
+    public static bool CanClaimUpgrade(
+        GearRow candidate, GearRow worn, IReadOnlyList<string> myClasses,
+        bool offHandInUse = false) =>
+        Dominates(candidate, worn, myClasses, offHandInUse)
+        && UpgradeTier(candidate.Name) >= UpgradeTier(worn.Name);
 
-    /// <summary>The "+N" suffix the dump prints, or 0 for a plain item.</summary>
-    public static int UpgradeTier(string name)
-    {
-        var m = System.Text.RegularExpressions.Regex.Match(name.Trim(), @"\+(\d+)$");
-        return m.Success && int.TryParse(m.Groups[1].Value, out var n) ? n : 0;
-    }
+    /// <summary>The "+N" suffix the dump prints, or 0 for a plain item —
+    /// <see cref="ItemDominance.UpgradeTier"/>, called.</summary>
+    public static int UpgradeTier(string name) => ItemDominance.UpgradeTier(name);
 
     /// <summary>B outclasses A only when B is at least as good on EVERY number either
     /// of them carries and strictly better on one — and B is actually usable (not
     /// class-locked away from the player, when their classes are known). Absent
     /// numbers count as zero on both sides: honest for additive stats, and the
-    /// reason this is conservative by design.</summary>
-    public static bool Dominates(GearRow b, GearRow a, IReadOnlyList<string> myClasses)
-    {
-        if (b.Stats is not { } bs || a.Stats is not { } asb) return false;
-        if (bs.Classes.Count > 0 && myClasses.Count > 0
-            && !bs.Classes.Intersect(myClasses, StringComparer.OrdinalIgnoreCase).Any())
-            return false;   // the better item is for somebody else's class
-        if (b.Name.Equals(a.Name, StringComparison.OrdinalIgnoreCase)) return false;
-
-        var strictly = false;
-        foreach (var (bv, av) in MetricPairs(bs, asb))
-        {
-            if (bv < av) return false;
-            if (bv > av) strictly = true;
-        }
-        return strictly;
-    }
-
-    private static IEnumerable<(double B, double A)> MetricPairs(ItemStatsBlock b, ItemStatsBlock a)
-    {
-        yield return (b.Ac ?? 0, a.Ac ?? 0);
-        yield return (b.Hp ?? 0, a.Hp ?? 0);
-        yield return (b.Mana ?? 0, a.Mana ?? 0);
-        yield return (b.Dmg ?? 0, a.Dmg ?? 0);
-        yield return (b.Ratio ?? 0, a.Ratio ?? 0);
-        foreach (var key in b.Attributes.Keys.Union(a.Attributes.Keys, StringComparer.OrdinalIgnoreCase))
-            yield return (b.Attributes.GetValueOrDefault(key), a.Attributes.GetValueOrDefault(key));
-    }
+    /// reason this is conservative by design.
+    ///
+    /// <para><b>ONE TABLE, AND IT REALLY IS ONE SINCE DRA-222 D6.</b> DRA-71 D6 lifted
+    /// the arithmetic into <see cref="ItemDominance"/> so the Helper's catalog sweep and
+    /// this room could not drift, and wrote in both files that these three members were
+    /// now calls into it. They were not: a private copy of the metric list stayed here,
+    /// agreeing with the original exactly, which is what a second implementation does
+    /// right up until one of them learns something (trap 4). D6 is that day — the
+    /// off-hand rule (S7.3) would have reached the Helper and left this room telling the
+    /// same player that the same greatsword outclassed the sword in his hand.</para>
+    /// </summary>
+    /// <param name="offHandInUse">Whether the character has something worn in SECONDARY,
+    /// which is what makes a two-handed candidate cost them a slot. <see cref="Build"/>
+    /// reads it off the dump; a caller comparing two loose rows cannot prove it and
+    /// passes false, which stands the rule down.</param>
+    public static bool Dominates(
+        GearRow b, GearRow a, IReadOnlyList<string> myClasses, bool offHandInUse = false) =>
+        ItemDominance.Dominates(b.Name, b.Stats, a.Name, a.Stats, myClasses, offHandInUse);
 
     public static string StatLine(ItemStatsBlock s)
     {

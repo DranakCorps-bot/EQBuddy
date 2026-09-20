@@ -67,6 +67,11 @@ namespace EQBuddy.Companion;
 /// no creature in that zone and which this character has never looted there (DRA-84 D4). Its own
 /// field beside <paramref name="GearWithheld"/> rather than summed into it: a cap and a rule are
 /// different causes, and one number could explain neither.</param>
+/// <param name="GearOffHandRefused">What the off-hand rule refused — upgrades that beat the
+/// worn item on every number and are two-handed, for a character with something in SECONDARY
+/// (DRA-222 D6, S7.3). Its own field beside <paramref name="GearWhoWithheld"/> for that one's
+/// reason: five causes with five remedies, and a phone summing any two of them would hand the
+/// player a number that explains neither.</param>
 /// <param name="UnreadWorn">The worn rows EQBuddy could not read about, named (DRA-149 D2). The
 /// fourth field of this shape and the only one that is not a decision — the three above chose to
 /// hold something back, this one is EQBuddy admitting it never had the row. It rides the wire for
@@ -149,6 +154,7 @@ public sealed record CompanionHelperSection(
     string GearQuestWithheld,
     string GearNoSource,
     string GearQuestOnly,
+    string GearOffHandRefused,
     string UnreadWorn,
     IReadOnlyList<CompanionHelperDoor> UnreadWornDoors,
     IReadOnlyList<string> AnchorsAllRemoved,

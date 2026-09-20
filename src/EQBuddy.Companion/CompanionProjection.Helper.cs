@@ -100,6 +100,11 @@ public static partial class CompanionProjection
             GearQuestWithheld: HelperPresentation.QuestOffersWithheld(answers.GearQuestWithheld),
             GearNoSource: HelperPresentation.SourcelessUpgrades(answers.GearNoSource),
             GearQuestOnly: HelperPresentation.QuestOnlyUpgrades(answers.GearQuestOnly),
+            // DRA-222 D6, the same discipline one rule on. This one removes a SWAP rather than
+            // a place, so its sentence is the only one on the record about the player's hands —
+            // a phone drawing the four captions above and not this one would show a shorter
+            // list than the PC with nothing saying why.
+            GearOffHandRefused: HelperPresentation.OffHandRefused(answers.GearOffHandRefusals),
             // DRA-149 D3: the SAME two rules over the materials list, on their own two fields
             // rather than folded into the gear ones — the desktop room draws four captions here
             // and the phone must draw the same four or the two surfaces disagree about what the
@@ -366,9 +371,13 @@ public static partial class CompanionProjection
         // DRA-219: the quest path's three captions fold too. Each carries a COUNT that can move
         // while every other field here stands still — flipping the include-quests toggle turns
         // one of them off and another on with the same rows on screen (trap 72).
+        // DRA-222 D6: and the off-hand caption, for exactly that reason — its count moves when
+        // the player's own SECONDARY changes, which alters no other field on this record. A
+        // fingerprint that cannot see it is a phone still drawing the pre-dump weapon list.
         h.MoneyNote, h.GearBaseNote, h.Cap, h.GearWithheld, h.GearBandRefused,
         h.GearEraRefused, h.MaterialEraRefused,
-        h.GearWhoWithheld, h.GearQuestWithheld, h.GearNoSource, h.GearQuestOnly, h.UnreadWorn,
+        h.GearWhoWithheld, h.GearQuestWithheld, h.GearNoSource, h.GearQuestOnly,
+        h.GearOffHandRefused, h.UnreadWorn,
         // DRA-180 D3: the per-anchor sentences fold as LINES, never as a count. They NAME the
         // worn item and carry its three cause numbers, so swapping one picked anchor for another
         // — or a ding moving which of its candidates the band gate takes — rewrites them while

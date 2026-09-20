@@ -2603,10 +2603,21 @@ public class ShellHostTests
     /// character infers WARRIOR from the fixture log, so the class lock is WAR. "Cloth Cap" is
     /// the only picked anchor, and 111 catalog HEAD items beat AC 2 while being usable by a
     /// warrior and having somewhere to drop. The per-anchor cap keeps 8 and reports
-    /// <b>103</b> withheld. Those eight group into five zones — Temple of Veeshan (3), Clan
-    /// Runnyeye (2), then Kael Drakkel, Tower of Frozen Shadow and Veeshan's Peak with one
-    /// each — so the room's cap shows <b>three</b> and says it held <b>two</b> back. Nothing
-    /// in the fixture log ever looted any of them, so there is no observed-drop line.</para>
+    /// <b>103</b> withheld.
+    ///
+    /// <para><b>WHICH eight changed at DRA-222 D6; HOW MANY did not</b> (S7.2). The relevance
+    /// re-rank sorts the candidates by how many of the WARRIOR's own numbers each improves
+    /// before the per-anchor cap takes eight, so it reshuffles the survivors without adding or
+    /// removing one — <c>helperCandidates</c> is still 8 and <c>helperGearWithheld</c> is still
+    /// 103, and those two are the assertions that would move first if the dominance question
+    /// itself had been touched.</para>
+    ///
+    /// <para>The eight now group into <b>six</b> zones — Temple of Veeshan (3), then Clan
+    /// Runnyeye, Kael Drakkel, The Overthere, Tower of Frozen Shadow and Veeshan's Peak with
+    /// one each — so the room's cap shows <b>three</b> and says it held <b>three</b> back.
+    /// Before D6 it was five zones with Clan Runnyeye on two: one of its upgrades lost its cap
+    /// slot to a The Overthere upgrade that moves more of a warrior's numbers. Nothing in the
+    /// fixture log ever looted any of them, so there is no observed-drop line.</para>
     ///
     /// <para><b>Both halves from one moment</b> (trap 56): <c>helperGearWithheld</c> is what
     /// the ENGINE held back and <c>helperGearWhy</c> is how many drawn rows actually carry an
@@ -2646,19 +2657,40 @@ public class ShellHostTests
         app.WaitForDump("helperZones", "TempleofVeeshan,ClanRunnyeye,KaelDrakkel",
             "the gear sweep to rank the zones by how many upgrades each one feeds");
         Assert.Equal(3, app.DumpValue("helperRecs"));
-        Assert.Equal(2, app.DumpValue("helperWithheld"));
+        Assert.Equal(3, app.DumpValue("helperWithheld"));
         Assert.Equal(103, app.DumpValue("helperGearWithheld"));
+
+        // **THE CAUSE, BESIDE THE CONSEQUENCE** (DRA-222 D6, S7.2). The two numbers this row
+        // pins that MOVED at D6 — `helperWithheld` 2 -> 3 above and `helperWho` 6 -> 5 below —
+        // are one swap inside an unchanged cap, and this is the fact that caused it. Non-zero
+        // is the liveness half (trap 78): a build where the relevance set came back empty
+        // scores zero here AND puts both of those numbers back to their pre-D6 values, so
+        // whichever way this slice is broken, more than one assertion says so.
+        Assert.Equal(5, app.DumpValue("helperRelevant"));
+        // The S7.3 rule is a DIFFERENT rule and it is stood down here — this fixture wears a
+        // cloth cap and a cloth robe, not a weapon. Pinning the zero is what keeps the
+        // paragraph above honest: without it, "the re-rank did this" would be an assumption.
+        Assert.Equal(0, app.DumpValue("helperOffHandRefused"));
 
         // The SCREEN's claim beside the engine's, and the personal half staying silent
         // because this fixture has never looted one of these.
         Assert.Equal(3, app.DumpValue("helperGearWhy"));
         Assert.Equal(0, app.DumpValue("helperGearSeen"));
-        // **DRA-84 D4: what each of those rows can now SAY.** Six item lines across the three
-        // drawn zones (3 + 2 + 1), and every one of them names a creature — the half of
+        // **DRA-84 D4: what each of those rows can now SAY.** Five item lines across the three
+        // drawn zones (3 + 1 + 1), and every one of them names a creature — the half of
         // acceptance item 2 that read as empty on the Founder's build. None of the eight
         // upgrades is anonymous, so nothing is withheld here; the row two below stages a fixture
         // where the rule fires.
-        Assert.Equal(6, app.DumpValue("helperWho"));
+        //
+        // **It was SIX until DRA-222 D6, and the sixth did not disappear — it moved** (S7.2).
+        // Clan Runnyeye's bucket went 2 -> 1: one of its upgrades lost its per-anchor cap slot
+        // to an upgrade that drops in The Overthere and improves more of this character's
+        // classes' own numbers. That is the same single swap that takes `helperWithheld` from
+        // 2 to 3 above — the survivors now span six zones rather than five — and the two
+        // numbers move in OPPOSITE directions for one event because they count different
+        // things: that one counts zone BUCKETS, this one counts the CONTENTS of the first
+        // three. Neither counts candidates, which is why `helperGearWithheld` is still 103.
+        Assert.Equal(5, app.DumpValue("helperWho"));
         Assert.Equal(0, app.DumpValue("helperWhoWithheld"));
         // Every gear line is catalog-sourced, so every one of them carries the estimate label.
         Assert.Equal(0, app.DumpValue("helperPersonalWhy"));
@@ -2678,8 +2710,10 @@ public class ShellHostTests
     /// answered on the surface he failed rather than in a unit test.</para>
     ///
     /// <para><b>Prediction, computed against the shipped bands before the run</b> (trap 23).
-    /// The eight surviving upgrades group into Temple of Veeshan (3), Clan Runnyeye (2), Kael
-    /// Drakkel, Tower of Frozen Shadow and Veeshan's Peak. At level 28:</para>
+    /// The eight surviving upgrades group into Temple of Veeshan (3), then Clan Runnyeye, Kael
+    /// Drakkel, The Overthere, Tower of Frozen Shadow and Veeshan's Peak with one each — the
+    /// six-zone spread the row above explains, and the only thing DRA-222 D6 changed here. At
+    /// level 28:</para>
     /// <list type="bullet">
     /// <item>Temple of Veeshan `60+` and Veeshan's Peak `60+` — bottom 60, which is 32 over 28,
     /// so both go on the BOTTOM arm. <b>Two refused.</b></item>
@@ -2688,12 +2722,27 @@ public class ShellHostTests
     /// <item>Tower of Frozen Shadow `26-51` — 28 sits inside it. Kept.</item>
     /// <item>Clan Runnyeye — the fold does not bridge it to the wiki's "Runnyeye" page, so it
     /// has NO band and an unanswered question gates nothing (trap 73). Kept.</item>
+    /// <item>The Overthere — also NO band, and for the OTHER of the two reasons a zone can
+    /// have none: the page is not silent, it is unreadable. Its `Level of Monsters` row is
+    /// `20-40+ (50+ inside pit)`, which is prose rather than one of D1/D2's four admitted
+    /// shapes, so it is refused into `NoBand` and the gate stands down. Kept — and note the
+    /// refusal is what keeps it, because 28 sits inside the range a human would read there.
+    /// That is the D1 cost being paid rather than an invented number, and it is deliberate.
+    /// </item>
     /// </list>
-    /// <para>So the three drawn zones become Clan Runnyeye (2 upgrades), Kael Drakkel and Tower
-    /// of Frozen Shadow — and the top row CHANGES, which is the gate visible in the answers and
-    /// not only in a caption. <c>helperGearWithheld</c> stays <b>103</b>: the sweep's per-anchor
-    /// cap is spent before the gate runs, and a gate that moved it would mean the two counts had
-    /// been wired together.</para>
+    /// <para>So four zones survive the gate, each holding ONE upgrade, and the three drawn are
+    /// Clan Runnyeye, Kael Drakkel and The Overthere with Tower of Frozen Shadow the one held
+    /// back — the top row CHANGES, which is the gate visible in the answers and not only in a
+    /// caption. <c>helperGearWithheld</c> stays <b>103</b>: the sweep's per-anchor cap is spent
+    /// before the gate runs, and a gate that moved it would mean the two counts had been wired
+    /// together.</para>
+    ///
+    /// <para><b>DRA-222 D6 moved third place here, and only third place.</b> The survivors are
+    /// four zones tied at one upgrade apiece, so which three are drawn is the ranker's
+    /// tiebreak — and The Overthere is only IN the tie because the relevance re-rank put one of
+    /// its upgrades into the per-anchor eight (see the row above). Everything the gate itself
+    /// decides is unmoved: the same two zones refused, on the same arm, off the same bands,
+    /// which is what <c>helperBandRefusals</c> below asserts verbatim.</para>
     ///
     /// <para><b>Three claims from one moment</b> (trap 56): the ENGINE refused two
     /// (<c>helperBandRefused</c>), the ROOM drew the sentence saying so
@@ -2724,7 +2773,7 @@ public class ShellHostTests
         // from a gate that never ran (trap 78).
         Assert.Equal(1, app.DumpValue("helperBandGate"));
 
-        app.WaitForDump("helperZones", "ClanRunnyeye,KaelDrakkel,TowerofFrozenShadow",
+        app.WaitForDump("helperZones", "ClanRunnyeye,KaelDrakkel,TheOverthere",
             "the band gate to remove the two level-60 planes and re-rank what is left");
 
         // What the ENGINE refused, and that the ROOM said so.
@@ -2814,14 +2863,30 @@ public class ShellHostTests
         Assert.Equal(3, app.DumpValue("helperGearWhy"));
         Assert.Equal(0, app.DumpValue("helperDeadDoors"));
 
-        // **DRA-84 D4: every drawn item line can say what drops it.** Eight lines across three
-        // zones (Western Wastes and Temple of Veeshan name three apiece, Clan Runnyeye two),
-        // and none of the sixteen upgrades is anonymous, so the who rule withholds nothing here
-        // and the room draws no sentence about it. That zero is the PREDICTION and not a
-        // shrug — the row below stages a fixture where it fires.
-        Assert.Equal(8, app.DumpValue("helperWho"));
+        // **DRA-84 D4: every drawn item line can say what drops it.** Seven lines across three
+        // zones, and none of the sixteen upgrades is anonymous, so the who rule withholds
+        // nothing here and the room draws no sentence about it. That zero is the PREDICTION and
+        // not a shrug — the row below stages a fixture where it fires.
+        //
+        // **It was EIGHT until DRA-222 D6** (S7.2), for the reason the UpgradeWorn row above
+        // sets out at length: the relevance re-rank changes WHICH sixteen survive the two
+        // per-anchor caps, and one upgrade that used to sit in a drawn zone now sits in an
+        // undrawn one. The candidate count and the cap are untouched — `helperGearWithheld` is
+        // still 225 above — so this is a survivor moving between buckets, not a row being
+        // refused. Nothing on this surface withholds it; the zone it moved to is simply below
+        // the top three.
+        Assert.Equal(7, app.DumpValue("helperWho"));
         Assert.Equal(0, app.DumpValue("helperWhoWithheld"));
         Assert.Equal(0, app.DumpValue("helperWhoLine"));
+
+        // **THE CAUSE, BESIDE THE CONSEQUENCE** (DRA-222 D6). `helperWho` moved 8 -> 7 because
+        // the relevance re-rank changed WHICH sixteen survive the two per-anchor caps, and a
+        // count that moved with nothing asserting WHY is a number the next reader has to
+        // re-derive. Non-zero is the liveness half (trap 78): zero here is equally a character
+        // whose classes the catalog holds no opinion about, and on that build this row's 7 would
+        // be back to 8 — so the two assertions fail together or not at all.
+        Assert.Equal(7, app.DumpValue("helperRelevant"));
+        Assert.Equal(0, app.DumpValue("helperOffHandRefused"));
     }
 
     /// <summary>
@@ -2913,10 +2978,21 @@ public class ShellHostTests
     /// because its page lists none: the trap-73 half of the feature, on screen.</para>
     ///
     /// <para><b>And the two refusals are different numbers with different causes, which is why
-    /// they are separate keys.</b> <c>helperQuestWithheld</c> is <b>5</b>: five (item, quest)
+    /// they are separate keys.</b> <c>helperQuestWithheld</c> is <b>2</b>: two (item, quest)
     /// offers name quests the shipped quest list does not hold, so they could be given a title
     /// and nothing else. <c>helperNoSource</c> is <b>6</b>: catalog cloaks that beat this anchor
     /// and whose pages name no zone and no quest at all, dropped in silence until now.</para>
+    ///
+    /// <para><b>That first number was 5 when this row was written, and DRA-222 D6 moved it —
+    /// which is the two slices meeting rather than either one breaking.</b> D6 sorts each
+    /// anchor's candidates by how many of the character's own classes' numbers they improve
+    /// BEFORE the per-anchor cap takes eight, so a different eight survive and fewer of them
+    /// happen to be offers whose quest this build cannot resolve. Three things say the rule
+    /// itself is untouched: the ROWS are identical (the same three subjects, the same two
+    /// quests, both still naming a giver and a zone), <c>helperNoSource</c> is unmoved at 6
+    /// because the sweep counts it BEFORE any ordering, and the count is still non-zero with
+    /// <c>helperQuestLine</c> at 1, so the rule fires and says so. <b>Measured, not assumed:</b>
+    /// restoring the pre-D6 comparer in both places puts this row back to 5 and it passes.</para>
     ///
     /// <para><b>Each engine count is asserted beside whether the ROOM said it</b> (trap 56, and
     /// trap 50's rule that a surviving cap says so): a rule that removed five offers in silence
@@ -2948,7 +3024,9 @@ public class ShellHostTests
         Assert.Equal(2, app.DumpValue("helperQuestSource"));
 
         // The quest-source rule: the ENGINE's count beside the ROOM's sentence.
-        Assert.Equal(5, app.DumpValue("helperQuestWithheld"));
+        // 5 -> 2 at DRA-222 D6, for the reason set out in this row's summary: a different eight
+        // survive the per-anchor cap, and the ROWS below are the evidence the rule is unmoved.
+        Assert.Equal(2, app.DumpValue("helperQuestWithheld"));
         Assert.Equal(1, app.DumpValue("helperQuestLine"));
 
         // The sweep's sourceless count, same pair.
@@ -2978,10 +3056,15 @@ public class ShellHostTests
     /// control had done it.</para>
     ///
     /// <para>The pair with the row above is the point: same anchor, same catalog, ONE setting,
-    /// and the two quest counts trade places — <c>helperQuestWithheld</c> 5 → 0 because no quest
+    /// and the two quest counts trade places — <c>helperQuestWithheld</c> 2 → 0 because no quest
     /// offer reaches a bucket at all, and <c>helperQuestOnly</c> 0 → 5. <b>The sourceless count
     /// does not move</b>, which is the evidence that it is a different fact rather than the same
     /// one counted twice.</para>
+    ///
+    /// <para>That first number reads 2 rather than the 5 this row was written with because
+    /// DRA-222 D6 moved the row above; <b>this row's own 5 is unmoved</b>, and the asymmetry is
+    /// the point. <c>helperQuestOnly</c> is counted inside the sweep BEFORE anything is ordered,
+    /// so no re-ranking can reach it — which is exactly why the two are separate keys.</para>
     /// </summary>
     [Fact]
     public void WithQuestsOffTheRoomCountsTheUpgradesTheToggleIsHiding()
@@ -3201,6 +3284,79 @@ public class ShellHostTests
         Assert.Equal(1, app.DumpValue("helperBandLine"));
         Assert.True(app.DumpValue("helperGearWhy") > 0, "the gate refused everything");
         Assert.Equal(0, app.DumpValue("helperDeadDoors"));
+    }
+
+    /// <summary>
+    /// **THE OFF-HAND RULE, AND THE ONE ROW THAT TURNS IT ON** (DRA-222 D6, S7.3).
+    ///
+    /// <para>Two launches of the same app over the same primary-hand weapon, differing by ONE
+    /// line of the inventory dump: whether anything is worn in SECONDARY. That pairing is the
+    /// whole assertion, because a build that refused two-handers unconditionally — or one that
+    /// never refused any — satisfies either half alone.</para>
+    ///
+    /// <para><b>Relationships rather than exact counts</b>, the discipline the Founder row above
+    /// keeps: the sweep runs against the real shipped catalog, which is regenerated weekly, and
+    /// the launched app also narrows on the character's own class. The DIRECTION is what the
+    /// rule is, and it cannot drift.</para>
+    ///
+    /// <para><b>Both claims from one moment</b> (trap 56): <c>helperOffHandRefused</c> is what
+    /// the ENGINE removed and <c>helperOffHandLine</c> is whether the ROOM said so. A rule that
+    /// silently took the greatswords off his screen would satisfy the first alone, which is the
+    /// failure trap 50 exists to refuse and the one the phone half of D5 was caught by.</para>
+    /// </summary>
+    [Fact]
+    public void TheOffHandRuleRefusesTheGreatswordsAndTheRoomSaysSo()
+    {
+        var key = $"{AppHarness.Character}_{AppHarness.Server}".ToLowerInvariant();
+
+        // **OFF HAND FULL.** The same 1H Blunt morning star in both hands — the Founder's own
+        // arrangement, and the one the catalog's 441 two-handers are measured against.
+        int refusedWithOffHand;
+        using (var full = new AppHarness(
+                   configureSettings: s =>
+                   {
+                       s.HelperGoals[key] = [nameof(HelperGoal.FarmGear)];
+                       s.HelperGearIntent[key] = nameof(GearIntent.ReplaceSlot);
+                   },
+                   environment: OpenOn("helper")))
+        {
+            full.WriteInventoryDump(
+                ("Primary", "Enchanted Fine Steel Morning Star", 1),
+                ("Secondary", "Enchanted Fine Steel Morning Star", 1));
+            full.Launch();
+
+            full.WaitForDump("shellPage", "helper", "the shell to land on the Helper room");
+            full.WaitForDump("helperWorn", "2", "both hands to become anchors");
+
+            refusedWithOffHand = full.DumpValue("helperOffHandRefused");
+            Assert.True(refusedWithOffHand > 0,
+                "no two-handed offer was refused for a character wielding two one-handers — "
+                + "the rule never reached the sweep");
+            // …and the room SAID so. The count alone is a rule that removed rows in silence.
+            Assert.Equal(1, full.DumpValue("helperOffHandLine"));
+            // The sweep's own cap is a different number with a different cause, and the whole
+            // point of this slice's fifth count is that the two are never summed.
+            Assert.True(full.DumpValue("helperCandidates") > 0,
+                "the sweep found nothing at all, so the refusal above is about an empty list");
+        }
+
+        // **OFF HAND EMPTY.** One line removed. A two-hander now costs this character nothing,
+        // so the rule stands down whole and the room says nothing about it.
+        using var free = new AppHarness(
+            configureSettings: s =>
+            {
+                s.HelperGoals[key] = [nameof(HelperGoal.FarmGear)];
+                s.HelperGearIntent[key] = nameof(GearIntent.ReplaceSlot);
+            },
+            environment: OpenOn("helper"));
+        free.WriteInventoryDump(("Primary", "Enchanted Fine Steel Morning Star", 1));
+        free.Launch();
+
+        free.WaitForDump("shellPage", "helper", "the shell to land on the Helper room");
+        free.WaitForDump("helperWorn", "1", "the one-handed anchor");
+
+        Assert.Equal(0, free.DumpValue("helperOffHandRefused"));
+        Assert.Equal(0, free.DumpValue("helperOffHandLine"));
     }
 
     /// <summary>

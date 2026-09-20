@@ -650,6 +650,11 @@ public class HelperSurfaceParityTests
                      // saying where they are changed, and one that dropped `trackedNote` would
                      // leave it implying a comparison EQBuddy cannot make. D5's lesson.
                      "h.tracked", "h.trackedHeading", "h.trackedNote", "h.trackedOnPc",
+                     // DRA-222 D6's off-hand caption, added in the SAME slice as the field.
+                     // It is the fifth gear count and the only one about the player's hands,
+                     // so a page missing it draws a shorter weapon list than the PC with
+                     // nothing on screen saying why — D5's failure with a different noun.
+                     "h.gearOffHandRefused",
                      "h.doorsLead", "h.empty", "h.gaps", "h.deferred",
                  })
             Assert.Contains(field, html, StringComparison.Ordinal);
