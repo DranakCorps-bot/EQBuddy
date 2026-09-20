@@ -798,6 +798,62 @@ public partial class QuestsView : UserControl
         UpdateClassButton(saved);
     }
 
+    /// <summary>What the quick-select would tick at the last render, kept for the
+    /// <c>EQBUDDY_EXPAND</c> dump. The control lives inside a popup, so a screenshot cannot
+    /// show it is there at all (traps 29 and 79) and only a launched app can answer.</summary>
+    private IReadOnlyList<string> _myClasses = [];
+
+    /// <summary>
+    /// **The <c>My Classes</c> quick-select** (DRA-216 D1, S4.3; acceptance S22 AC 5/6).
+    ///
+    /// <para>Selecting the classes you actually play was three or four trips through a
+    /// sixteen-row popup, re-entering something the app already knows — it has resolved the
+    /// character's identity since #210 and prints it one line above this control.</para>
+    ///
+    /// <para><b>The answer comes from <see cref="QuestClassLens.MyClasses"/> and nowhere
+    /// else</b> (S4.3): identity, canonicalised to the lens's own row keys. It is a different
+    /// question from <see cref="QuestClassLens.Offered"/> and deliberately cannot see the
+    /// picks — quick-selecting from the picks would re-select what is already selected.</para>
+    ///
+    /// <para><b>Nothing here writes the picks store.</b> The action paints the ticks and then
+    /// hands off to <see cref="OnClassCheckChanged"/>, which has been that store's one writer
+    /// since the picker shipped — so the quick-select cannot drift from what the checkboxes
+    /// themselves do, and the list stored is the one the picker reports (trap 4). Everything
+    /// downstream follows for free: the face, the strip, the refresh, the phone.</para>
+    ///
+    /// <para><b>It does not move identity</b> (S3.3). <c>CharacterClasses.Resolve</c> is read
+    /// and untouched; picks widen identity and never remove from it, so a player who
+    /// quick-selects and then unticks a class has narrowed a LENS, and the identity note
+    /// above the list still says who they are. And they CAN untick it — the rows are the same
+    /// rows, unchanged by this (S22 AC 6).</para>
+    ///
+    /// <para>Offered only when identity has something to say. A character with no dump, no
+    /// qualifying log evidence and no statement gets NO button rather than one that does
+    /// nothing when clicked — silent no-ops are broken, and a disabled button in this popup
+    /// would not look disabled (trap 17).</para>
+    /// </summary>
+    private void RefreshMyClassesAction(IReadOnlyList<string> resolved, ClassSource source)
+    {
+        if (_classPicker is null) return;
+        _myClasses = QuestClassLens.MyClasses(resolved, QuestClassFilter.Classes);
+        _classPicker.SetActions(_myClasses.Count == 0
+            ? []
+            : [new PickerAction(
+                ClassFilterLabel.MyClasses,
+                SelectMyClasses,
+                ClassFilterLabel.MyClassesTip(_myClasses, source))]);
+    }
+
+    private void SelectMyClasses()
+    {
+        if (_classPicker is null || _myClasses.Count == 0) return;
+        var mine = new HashSet<string>(_myClasses, StringComparer.OrdinalIgnoreCase);
+        _classPicker.SetChecked(key => mine.Contains((string)key));
+        // SetChecked never calls back (trap 20's sync half), so the ONE writer is called
+        // here rather than duplicated: it reads the picker, stores, repaints and refreshes.
+        OnClassCheckChanged();
+    }
+
     /// <summary>The Epic tab's classic-era lens. Persisted, because EQBuddy Mobile's
     /// Epic tab honors the same setting — one filter, both screens.</summary>
     private void OnEpicClassicOnlyToggled(object sender, RoutedEventArgs e)
@@ -911,6 +967,10 @@ public partial class QuestsView : UserControl
         // never persisted, and one popup pick overrides (David, 2026-08-11: players swap
         // classes, so this is a reading, not a fact).
         var (resolved, classSource) = _main.ClassSourceFor(_main.CurrentSnapshot());
+        // The quick-select is offered from IDENTITY, beside the picks it will replace
+        // (DRA-216 D1). Here because this is where identity is already in hand — resolving
+        // it again inside the picker's own code is how the class strip earned DRA-181.
+        RefreshMyClassesAction(resolved, classSource);
         // THE ONE PRODUCER of "which classes this surface is about" (DRA-181 D4, plan P5).
         // This ternary used to be typed here, again in the phone's leftover bands, and a
         // THIRD time in BuildClassStrip as `resolved` alone — so picking three classes left
@@ -1374,6 +1434,22 @@ public partial class QuestsView : UserControl
         // reading them from two dumps would be reading them from two renders. See
         // ClassLensFact for why it is off the strip and not off `_classLens`.
         $"questsClassLens={ClassLensFact()} " +
+        // ---- the My Classes quick-select (DRA-216 D1) ---------------------------------
+        // WHAT IT WOULD TICK, and whether the button reached the popup. Two facts because
+        // they are two claims (trap 56): the producer answering and the control existing are
+        // exactly what came apart the last time a picker grew a face (#184's sibling), and
+        // this one lives inside a Popup — its own top-level HWND, which PrintWindow does not
+        // capture at all (trap 79), so no screenshot can ever say the button is there.
+        // Counted off the REAL picker rather than off the list handed to it (trap 29).
+        // ABBREVIATED, like the strip above and for the same reason: "Shadow Knight" carries
+        // a space and the dump is space-separated `key=value`. "-" is "nothing to select",
+        // which is the state where the button is deliberately ABSENT.
+        $"questsMyClasses={Dumped(string.Join("+", _myClasses.Select(QuestClassFilter.Abbrev)))} " +
+        $"questsMyClassesBtn={_classPicker?.ActionCount ?? -1} " +
+        // THE ROWS ARE STILL THERE — S22 AC 6, "the player can still add/remove other classes
+        // afterward". A quick-select that rebuilt or narrowed the list would take that away,
+        // and every other fact here would be unmoved by it. Sixteen, before and after.
+        $"questsClassRows={_classPicker?.RowCount ?? 0} " +
         // ---- the SKY tab's island view (DRA-164) --------------------------------------
         // The MODE as the setting holds it, and the STRIP that offers it — counted off the
         // real strip rather than from the list that built it, because the claim is that the
@@ -4071,15 +4147,26 @@ public partial class QuestsView : UserControl
     /// character key — so a staging mistake times out naming the probe rather than reading as
     /// a feature that did not fire.</para>
     /// </summary>
-    /// <param name="verb"><c>lens</c> or <c>picks</c>.</param>
+    /// <param name="verb"><c>lens</c>, <c>picks</c> or <c>myclasses</c>.</param>
     /// <param name="arg">For <c>lens</c>, a class name or <c>-</c> for the Any chip. For
-    /// <c>picks</c>, <c>+</c>-separated class names, or <c>-</c> for none picked.</param>
+    /// <c>picks</c>, <c>+</c>-separated class names, or <c>-</c> for none picked. Ignored by
+    /// <c>myclasses</c>, which takes its argument from the character rather than the
+    /// caller — the whole point of the control being tested.</param>
     internal bool ProbeLens(string verb, string arg)
     {
         switch (verb)
         {
             case "lens":
                 LensTo(arg == "-" ? null : arg);
+                return true;
+            // The My Classes quick-select (DRA-216 D1). Same rule as the two above: it calls
+            // the BUTTON's own click body, which lives inside a Popup — its own top-level
+            // HWND that PrintWindow does not capture (trap 79) and that nothing in this suite
+            // can click. It returns true even with nothing to select, because "the button was
+            // absent so nothing happened" is a state the dump reports and not a staging
+            // mistake; `questsMyClassesBtn` is what tells the two apart.
+            case "myclasses":
+                SelectMyClasses();
                 return true;
             case "picks":
                 var key = _main.QuestCharacterKey;
