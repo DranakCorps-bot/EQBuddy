@@ -17,12 +17,23 @@ red rather than this page going quietly wrong.
 
 ## Before you start
 
-1. A build with all five slices in it. `Help → About` should show a commit at or after D5
-   (`11e4a808`). **The Desktop published on your machine is `2.0.0+798cd23d`** — a later
-   republish (DRA-164), which carries all five: every D1–D5 commit is an ancestor of it, and
-   each slice's own strings were read back out of that `EQBuddy.exe` rather than trusted from
-   the version stamp (trap 18). If About shows `798cd23d`, you are on the right build and
-   nothing needs republishing.
+1. A build with all five slices in it. The bar is a **rule, not one commit string**: `Help →
+   About` must show a commit that has **D5 (`11e4a808`) as an ancestor**. Check it with
+
+   ```
+   git merge-base --is-ancestor 11e4a808 <the commit About shows>
+   ```
+
+   Exit 0 means that build carries all five slices. **A LATER commit is not a wrong build** —
+   `main` keeps moving and each republish carries the slices forward, so a string you do not
+   recognise is a reason to run the check, never a reason to republish.
+
+   The build **verified on your machine on 2026-09-19 was `2.0.0+30feb603`** — an example of a
+   pass, not the only right answer. All five D1–D5 commits are ancestors of it, and the
+   player-facing string each of D1–D4 added was read back out of *that* `EQBuddy.exe` as
+   UTF-16-LE rather than trusted from the version stamp (trap 18): D1's base-item caveat, D2's
+   two spellings of the bow, D3's recipes sentence and D4's no-merchants sentence, all five
+   present. D5 is this page, so it puts no string in the binary.
 2. `/outputfile inventory` in game, once. Nothing below needs a played session — every answer
    comes from the catalog, which is the point.
 3. Tell EQBuddy your level if it does not know: **Character room**. The gear answers change a
