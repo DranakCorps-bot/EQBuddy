@@ -1206,6 +1206,37 @@ after the named guard left with its surface.
     Code on `main` cannot repair a copy that will never receive it, so this is a
     call-site rule, not a guard in the script.
 
+83. **A linked worktree shares its clone's `[user]` block, so ONE wrong identity
+    mis-attributes every worktree hanging off it — and GitHub attributes by EMAIL,
+    so a commit reads as whoever owns the address no matter what the name says.**
+    Three DRA-216 branches landed 7 commits / 4,589 lines of agent-written code
+    authored AND committed as `David Edwards <david.edwards08@gmail.com>` — the one
+    person here whose name carries release accountability. Caught only because a
+    Planner review happened to read the authors, and **126 of the last 600 commits
+    on `main` already carried that email** (121 as `David Edwards`, 5 as
+    `DranakCorps-bot`): the three PRs were the instance somebody noticed, at a
+    eighteenth of the real scale. Cause was environmental, not the repo —
+    `~/.gitconfig` has NO `[user]` block, so every clone carries its own and they
+    disagree; `C:\Users\david\source\EQBuddy` (a dispatch lane with ~20 `%TEMP%`
+    worktrees on `claude/*` / `sr-exec/*`) said `David Edwards`, and one
+    `git config --local` fixed all 20 at once. **`git var GIT_AUTHOR_IDENT` is the
+    one command that ends the guessing** — ask the CLONE, not the checkout.
+    **It is rewritable on an unmerged branch and impossible after the merge**, which
+    is why the guard is pre-merge. Guard: `scripts/commit-identity-guard.ps1` +
+    `-selftest`, in `check.ps1` and CI on `pull_request`. It reads EMAIL on BOTH
+    identities (a rebase moves committer without author; checking one is a hole the
+    size of the other) over **base..head MINUS `main`** — history is never judged,
+    because `main` holds 126 commits it would refuse and a permanently red gate is a
+    gate nobody believes (trap 74). **The Founder's door is the `founder-commit`
+    LABEL, not a rule read off the commit**: an agent running in his clone produces a
+    commit byte-identical in identity to one he types, so the separation has to come
+    from outside the object; the label admits his identity for that PR only and still
+    refuses everyone else. **Both fail-open paths SAY they judged nothing** — an
+    empty range is exactly how a broken range computation reads as green. Prove-failed
+    against six mutants, and the first draft's "main is never judged" row passed on
+    the BASE term alone while the `--not main` term was deleted: the catching case is a
+    branch cut from an OLD base that then merges a moved-on `main`.
+
 New trap discovered the hard way? Add the compact rule here and the novel
 under `docs/ops/claude-archive/traps.md`. That is the whole point.
 
