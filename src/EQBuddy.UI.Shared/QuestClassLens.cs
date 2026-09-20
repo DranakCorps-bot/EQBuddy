@@ -49,4 +49,64 @@ public static class QuestClassLens
     public static IReadOnlyList<string> Offered(
         IReadOnlyList<string>? picks, IReadOnlyList<string>? resolved) =>
         picks is { Count: > 0 } ? picks : resolved ?? [];
+
+    /// <summary>
+    /// **What a "My classes" quick-select TICKS (DRA-216 D1, requirement S4.3).**
+    ///
+    /// <para>Selecting every class the character actually plays is three or four clicks
+    /// through a sixteen-row popup, and the player is re-entering something the app already
+    /// knows. This is the one call that joins the two: the resolved identity list
+    /// (<see cref="EQBuddy.Core.CharacterClasses.Resolve"/>, via the host's own
+    /// <c>ClassSourceFor</c>) expressed as the lens's own row keys.</para>
+    ///
+    /// <para><b>It takes no <c>picks</c> parameter, and that is the design rather than an
+    /// omission.</b> S4.3 says this answers from <c>Resolve</c> and never from stale
+    /// class-filter picks, so the only way to keep that true under later edits is for the
+    /// picks not to be in the room: a member that cannot see them cannot quietly grow a
+    /// second copy of <see cref="Offered"/>'s ternary (traps 4 and 33). What is already
+    /// ticked is the CALLER's business — the action replaces the selection, which is what
+    /// "select my classes" means, and the player adds or removes afterwards through the same
+    /// rows they always have (S22 AC 6).</para>
+    ///
+    /// <para><b>It moves no identity.</b> <c>Resolve</c> is read and never written: picks
+    /// widen identity and never remove from it (S3.3), so a player who quick-selects and then
+    /// unticks a class is narrowing a LENS, and the identity line above the list keeps saying
+    /// who they are — Bevel's Helm-signed lock, unchanged by this.</para>
+    /// </summary>
+    /// <param name="resolved">The character's identity, already resolved. Never re-resolved
+    /// here — this file chooses between lists and derives none.</param>
+    /// <param name="rows">The keys the lens actually offers (<c>QuestClassFilter.Classes</c>).
+    /// **The answer ships the ROW's spelling**, case-insensitively matched, because the tick
+    /// is painted by key: an identity carrying "shadow knight" has to light the
+    /// "Shadow Knight" row or the action reports success and changes nothing.
+    ///
+    /// <para><b>A resolved class with NO row is DROPPED, and that case is reachable rather
+    /// than theoretical.</b> Two of the three identity sources cannot produce one —
+    /// <c>ClassInference</c> gates its output on this very list, and the Character room's
+    /// stated chips are built from it — but the DUMP deliberately can:
+    /// <c>AchievementsImport.UnlockedClasses</c> runs <c>QuestClassFilter.Canonical</c> and
+    /// then KEEPS a name it could not resolve, on the stated grounds that *"a class we do not
+    /// recognise is still a class the dump says they hold"*. That is right for identity and
+    /// impossible for a LENS: there is no row to tick, and storing a pick no row shows is a
+    /// selection the player cannot see to undo. So the identity line keeps naming the class
+    /// and the quick-select quietly cannot select it — the one honest split, because the
+    /// filter genuinely has nothing to narrow to.</para>
+    ///
+    /// <para>Which is also why matching is a plain case-insensitive compare and not another
+    /// <c>Canonical</c> pass: every producer of identity has already been through it or is
+    /// drawn from these rows, so a name that misses here is one <c>Canonical</c> itself could
+    /// not place.</para></param>
+    /// <returns>Row keys in ROW order, empty when nothing resolves. Row order because the
+    /// picker reports its ticks that way, so answering in identity order would store one
+    /// spelling of a selection and read back another the moment the player touched anything
+    /// else. **Empty means the action has nothing to do** — a character with no dump, no
+    /// qualifying log evidence and no statement — and the caller HIDES the control rather
+    /// than offering one that silently does nothing.</returns>
+    public static IReadOnlyList<string> MyClasses(
+        IReadOnlyList<string>? resolved, IReadOnlyList<string>? rows)
+    {
+        if (resolved is not { Count: > 0 } || rows is not { Count: > 0 }) return [];
+        var mine = new HashSet<string>(resolved, StringComparer.OrdinalIgnoreCase);
+        return [.. rows.Where(mine.Contains)];
+    }
 }

@@ -1,4 +1,5 @@
 using System.Text.RegularExpressions;
+using EQBuddy.Core;
 using EQBuddy.UI.Shared;
 
 namespace EQBuddy.Tests;
@@ -99,6 +100,196 @@ public class QuestClassLensTests
     public void OnePickAnswersAloneAndTheListIsNotPaddedFromIdentity()
     {
         Assert.Equal(["Cleric"], QuestClassLens.Offered(["Cleric"], ["Warrior", "Cleric"]));
+    }
+
+    // ---- the My Classes quick-select (DRA-216 D1, S4.3) -------------------------------
+    //
+    // A DIFFERENT question from Offered, in the same file because it is the same subject:
+    // Offered asks "which classes is this view about" and answers picks-first; this asks
+    // "which classes would a player mean by MY classes" and answers from identity ALONE. It
+    // takes no picks parameter at all — a member that cannot see them cannot become a second
+    // copy of the ternary above (traps 4 and 33), which is S4.3's "never stale class-filter
+    // picks" expressed in a signature rather than in a comment.
+
+    /// <summary>The plain case: identity ticks, in the lens's own row keys.</summary>
+    [Fact]
+    public void MyClassesTicksTheResolvedIdentity()
+    {
+        var mine = QuestClassLens.MyClasses(
+            ["Warrior", "Cleric"], QuestClassFilter.Classes);
+
+        Assert.Equal(["Cleric", "Warrior"], mine);
+    }
+
+    /// <summary>**Row order, not identity order.** The picker reports its ticks in row order,
+    /// so an answer in identity order would store one spelling of a selection and read a
+    /// different one back the moment the player touched any other row — the same selection
+    /// with two representations, which is the shape trap 4 keeps charging for. Warrior is the
+    /// character's primary here and the dump names it first; the rows are alphabetical and put
+    /// it last.</summary>
+    [Fact]
+    public void MyClassesAnswersInRowOrderRatherThanIdentityOrder()
+    {
+        var mine = QuestClassLens.MyClasses(
+            ["Warrior", "Bard", "Cleric"], QuestClassFilter.Classes);
+
+        Assert.Equal(["Bard", "Cleric", "Warrior"], mine);
+        // Named, so this cannot go green on a build that simply sorted identity:
+        Assert.NotEqual(["Warrior", "Bard", "Cleric"], mine);
+    }
+
+    /// <summary>**The ROW's spelling ships, whatever identity's is.** The tick is painted by
+    /// key, so a lowercase identity that came back lowercase would light nothing at all and
+    /// the action would report success having changed the screen not at all — trap 17's
+    /// invisible failure, one layer down.</summary>
+    [Theory]
+    [InlineData("shadow knight")]
+    [InlineData("SHADOW KNIGHT")]
+    [InlineData("Shadow Knight")]
+    public void MyClassesShipsTheRowSpellingAndNotIdentitys(string spelling)
+    {
+        Assert.Equal(["Shadow Knight"],
+            QuestClassLens.MyClasses([spelling], QuestClassFilter.Classes));
+    }
+
+    /// <summary>
+    /// **A class the lens has no row for is dropped, and the rest still tick.**
+    ///
+    /// <para>Reachable, not theoretical: <c>AchievementsImport.UnlockedClasses</c> canonicalises
+    /// and then deliberately KEEPS a name it could not resolve — "a class we do not recognise is
+    /// still a class the dump says they hold" — which is right for identity and impossible for a
+    /// filter. Dropping the whole answer instead would punish the player for the one class
+    /// EQBuddy cannot read; storing the unknown name would put a pick behind no row, which is a
+    /// selection they cannot reach to undo.</para>
+    /// </summary>
+    [Fact]
+    public void AnIdentityClassTheLensHasNoRowForIsDroppedAndTheRestStillTick()
+    {
+        var mine = QuestClassLens.MyClasses(
+            ["Warrior", "Frobnicator"], QuestClassFilter.Classes);
+
+        Assert.Equal(["Warrior"], mine);
+        Assert.DoesNotContain("Frobnicator", mine);
+    }
+
+    /// <summary>**Nothing resolved is EMPTY, which is how the caller knows to offer no button
+    /// at all.** A character with no dump, no qualifying log evidence and no statement is a
+    /// real and common state — the first minutes of a fresh install — and a "My Classes" that
+    /// silently does nothing when clicked is the broken kind of no-op. An empty ROW list is
+    /// the same answer for the same reason.</summary>
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public void NothingResolvedMeansNoQuickSelectRatherThanAnEmptyOne(bool nulls)
+    {
+        Assert.Empty(QuestClassLens.MyClasses(nulls ? null : [], QuestClassFilter.Classes));
+        Assert.Empty(QuestClassLens.MyClasses(["Warrior"], nulls ? null : []));
+    }
+
+    /// <summary>
+    /// **It answers from identity even where the picks disagree — which is the requirement.**
+    ///
+    /// <para>S4.3 is "uses <c>Resolve</c>, never stale class-filter picks". The player is lensed
+    /// to a friend's Bard (#104's reachable state) while their own character is a Warrior/Cleric;
+    /// "My Classes" means the Warrior and the Cleric, or it means nothing. The member cannot
+    /// consult picks — there is no parameter to pass them through — so this row is a statement
+    /// about the SIGNATURE as much as the behaviour, and the guard under it is what keeps a
+    /// later edit from adding one.</para>
+    /// </summary>
+    [Fact]
+    public void MyClassesIsIdentityEvenWhenThePicksSayOtherwise()
+    {
+        // What Offered says about this same character, for contrast: picks win there.
+        Assert.Equal(["Bard"], QuestClassLens.Offered(["Bard"], ["Warrior", "Cleric"]));
+
+        Assert.Equal(["Cleric", "Warrior"],
+            QuestClassLens.MyClasses(["Warrior", "Cleric"], QuestClassFilter.Classes));
+    }
+
+    /// <summary>The signature guard: no overload of this member may take the picks. A
+    /// behaviour test cannot see a second parameter arriving with a helpful-looking default,
+    /// and that parameter is the whole distance between this member and the ternary above
+    /// (trap 34 — a rule that forbids the wrong thing cannot see a thing being added).</summary>
+    [Fact]
+    public void NoOverloadOfMyClassesCanBeHandedThePicks()
+    {
+        var overloads = typeof(QuestClassLens).GetMethods()
+            .Where(m => m.Name == nameof(QuestClassLens.MyClasses))
+            .ToList();
+
+        Assert.NotEmpty(overloads);
+        Assert.All(overloads, m => Assert.DoesNotContain(
+            m.GetParameters(),
+            p => p.Name!.Contains("pick", StringComparison.OrdinalIgnoreCase)));
+    }
+
+    /// <summary>
+    /// **The hover names what the click is about to do, and where it got it.**
+    ///
+    /// <para>The action REPLACES the selection, so the player is entitled to read what it will
+    /// become before they commit — and the source is the difference between the game's own
+    /// statement and a guess off the log. <c>SourceLabel</c> rides verbatim in the parenthetical,
+    /// the same construction the identity note uses: Bevel's Helm-signed lock is that it is one
+    /// table and nobody composes a second verb around it.</para>
+    /// </summary>
+    [Fact]
+    public void TheQuickSelectsHoverNamesTheClassesAndTheSource()
+    {
+        var tip = ClassFilterLabel.MyClassesTip(["Cleric", "Warrior"], ClassSource.Achievements);
+
+        Assert.Equal("Tick Cleric · Warrior (from your achievements)", tip);
+        // VERBATIM, not re-worded — the assertion is against the table, not against a literal.
+        Assert.Contains(CharacterClasses.SourceLabel(ClassSource.Achievements), tip,
+            StringComparison.Ordinal);
+        // Unabbreviated: the codes exist for the FACE's width budget (#184), not for prose.
+        Assert.DoesNotContain("CLR", tip, StringComparison.Ordinal);
+    }
+
+    /// <summary>An unknown source says nothing rather than trailing an empty bracket — and
+    /// nothing to tick has no tip at all, which is the state where there is no button to hover.
+    /// <c>SourceLabel</c> answers <c>""</c> for Unknown, so without this the hover would read
+    /// "Tick Cleric ()".</summary>
+    [Fact]
+    public void TheHoverDropsTheSourceWhenNothingKnowsOneAndIsEmptyWithNothingToTick()
+    {
+        Assert.Equal("Tick Cleric", ClassFilterLabel.MyClassesTip(["Cleric"], ClassSource.Unknown));
+        Assert.Equal("", ClassFilterLabel.MyClassesTip([], ClassSource.Achievements));
+    }
+
+    /// <summary>
+    /// **The quick-select writes no store of its own, and resolves no list of its own.**
+    ///
+    /// <para>Two source guards, both aimed at the failure this surface has already had.
+    /// <c>OnClassCheckChanged</c> has been the picks store's ONE writer since the picker
+    /// shipped; a quick-select that called <c>SetClasses</c> itself would be a second writer of
+    /// one fact, and the two would agree until the day one of them was edited (trap 4). And
+    /// <c>RefreshMyClassesAction</c> is handed identity by a render that has already resolved
+    /// it — reaching for <c>ClassSourceFor</c> or <c>ClassesFor</c> from in there is exactly
+    /// how <c>BuildClassStrip</c> earned DRA-181 (trap 33).</para>
+    /// </summary>
+    [Theory]
+    [InlineData("private void SelectMyClasses()", "OnClassCheckChanged",
+        new[] { "SetClasses", "ClassSourceFor", "_settings.Save" })]
+    [InlineData("private void RefreshMyClassesAction(", "QuestClassLens.MyClasses(",
+        new[] { "ClassSourceFor", "ClassesFor", "SelectedClasses" })]
+    public void TheQuickSelectAsksTheOneProducerAndCallsTheOneWriter(
+        string signature, string must, string[] mustNot)
+    {
+        var source = File.ReadAllText(
+            Path.Combine(Root, "src", "EQBuddy", "QuestsView.xaml.cs"));
+
+        var start = source.IndexOf(signature, StringComparison.Ordinal);
+        Assert.True(start > 0, $"{signature} has been renamed — this guard needs re-aiming");
+        var end = source.IndexOf("\n    private ", start + 1, StringComparison.Ordinal);
+        Assert.True(end > start, $"could not find the end of {signature}");
+        // CODE only: the reasons are written in the comments above these methods and a guard
+        // that cannot tell a call from a comment punishes writing them down.
+        var body = string.Join('\n', source[start..end].Split('\n')
+            .Where(line => !line.TrimStart().StartsWith("//", StringComparison.Ordinal)
+                        && !line.TrimStart().StartsWith("///", StringComparison.Ordinal)));
+
+        Assert.Contains(must, body, StringComparison.Ordinal);
+        Assert.All(mustNot, bad => Assert.DoesNotContain(bad, body, StringComparison.Ordinal));
     }
 
     // ---- the "ONE producer" half -----------------------------------------------------
