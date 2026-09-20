@@ -46,8 +46,16 @@
     # HELM.md and HELM-FEEDBACK.md left this table on 2026-09-18, discharged by the DRA-154
     # rotation that took them to 25,411 B and 4,730 B - the first rotation of the HELM.md
     # class. Rows only ever leave, and they leave in the pull request that earns it.
-    # 9x over. Never rotated. Append-only by design, which is why it only ever grows.
-    'DECISIONS.md'       = 614986
+    # Rotated 2026-09-20 by DRA-231 (DRA-144 F6): 676,431 B -> 81,798 B, into
+    # channels/2026-Q3/DECISIONS.md. A date cut at 2026-09-17 with a hand-triaged floor:
+    # of the 30 older blocks a coarse LIVE ASK / PARK / HOLD / STANDING sweep flagged, 24
+    # were dispositioned as closed and moved, and 6 that carry something genuinely open
+    # were kept at any age. Still 1.2x over policy, so this row is LOWERED and KEPT:
+    # check C discharges a row only at 64 KiB or less, and no legal cut reaches the
+    # ceiling while the never-rotate floor stands. The 10% band this buys is 8,179 B -
+    # about a quarter of one median day's append (32,231 B/day measured 2026-09-10..19).
+    # That the ceiling and the band cannot both hold this file is DRA-144 F8's subject.
+    'DECISIONS.md'       = 81798
     # 7x over. Never rotated. Shrinks for real once plans move to docs/plans/DRA-nn.md.
     'FABLE.md'           = 478113
     # 4x over. Never rotated.
