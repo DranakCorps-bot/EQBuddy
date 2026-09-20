@@ -660,6 +660,27 @@ public sealed class AppSettings
     /// </summary>
     public bool SkyGroupByIsland { get; set; }
 
+    /// <summary>
+    /// The Plane of Sky checklist ordered by how much work each reward has LEFT — the
+    /// Closest to Completion lens (DRA-218, requirements S5.1).
+    ///
+    /// <para><b>An ORDER, not a third view, and that is what makes it compose.</b> It rides
+    /// on top of whichever arrangement is on: class view reorders its groups, island view
+    /// reorders the rows inside each island (<see cref="QuestChecklistLayout.SkyByIsland"/>'s
+    /// <c>byCompletion</c>). Neither adds or removes a row, so ticks, row ids and progress
+    /// are the same objects either way. A third mutually-exclusive chip would have made
+    /// "closest" and "by island" a choice the player should not have to make.</para>
+    ///
+    /// <para><b><c>false</c> is the default</b>, for <see cref="SkyGroupByIsland"/>'s reason
+    /// and the requirements' own (S4.4): the class-oriented view a player already knows is
+    /// what they see after an upgrade.</para>
+    ///
+    /// <para>Profile-level beside its two siblings — how this player likes to read a
+    /// checklist does not change when they log in an alt — and Sky only, because an Epic
+    /// section is a stage of one quest rather than a reward you could be closer to.</para>
+    /// </summary>
+    public bool SkyClosestToCompletion { get; set; }
+
     /// <summary>Reward keys ("Class|Reward") the player has EXPANDED on a guided checklist.
     ///
     /// <para>Stored as the exception rather than the rule, and guided quests start folded:

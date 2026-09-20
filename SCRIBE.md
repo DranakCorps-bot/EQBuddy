@@ -31,7 +31,38 @@ After you take items, write a short note in `SCRIBE-FEEDBACK.md` so Scribe can l
 
 
 
-### Reddit: "Parser in MAC" — EQL parser in CrossOver on macOS, overlay won't show (u/Axorthor, harvest-only, disambiguation pending)
+### SK "watch buff list" — Shroud of Hate + Shroud of Pain missing from the buff list (add-request)
+
+- **Priority:** `someday` (real ask, catalog addition — not authorized; Scribe intake only). Not must-fix (nothing breaks; a shadowknight simply isn't tracking these two spells).
+
+- **Place (hypothesis, wiki-grounded):** the buff-durations / watch-buff catalog lane — `src/EQBuddy.Core/Data/BuffDurations.json` (ships "Shroud of Undeath", "Shroud of Death", "Shroud of the Spirits", but NOT "Shroud of Hate" nor "Shroud of Pain"), fed by the eqlwiki buffs harvest in `scripts/harvests/eqlwiki/` (`buffs-harvest.py`, `buffs-report.md`, plus the wiki wikitext already cached in-tree). Surface touched: the buff card / watch list (`BuffsCardView`, `BuffTracker`, `docs/WatchListGuide.md`). **Not** a parse break (the log lines will already land like any other spell), **not** a debuff-tracking item (the two *spells* as cast on a target are `Detrimental`; the requester wants the buff side tracked — "Shroud of Hate Recourse" exists on eqlwiki as the buff component; "Shroud of Pain Recourse" 404s — the benefit is inherent in the 10-minute spell). **Do not fold into** #690 (Banestrike achievements), #679 (chest-mote capture), #435 (merge-flags), #165 (bag-flags), or the Reddit items above.
+
+- **Wiki check (wiki-first, this run 2026-09-19):** [eqlwiki.com/Shroud_of_Pain](https://eqlwiki.com/Shroud_of_Pain) — Shadow Knight level 50, "Covers your target in a mass of darkness that steals their armor class and gives it to you for 10 min", duration 10 minutes. [eqlwiki.com/Shroud_of_Hate](https://eqlwiki.com/Shroud_of_Hate) — Shadow Knight level 35, ATB/ATK siphon, "Recourse: Shroud of Hate Recourse", duration 10 minutes. [eqlwiki.com/Shroud_of_Hate_Recourse](https://eqlwiki.com/Shroud_of_Hate_Recourse) — "The buff component of the Shroud of Hate ATK siphon", Shadow Knight level 39, 10 minutes. [eqlwiki.com/Shroud_of_Pain_Recourse](https://eqlwiki.com/Shroud_of_Pain_Recourse) — 404 (no recourse page; benefit is the AC transfer to the caster). Spell names + levels from the wiki, not guessed.
+
+- **Source:** #710 TheOneGargoyle Sep 19, 8:07 PM CT (2026-09-20 01:07 UTC). <https://github.com/DranakCorps-bot/EQBuddy/discussions/710> — New thread. 0 comments. Footer: `EQBuddy 1.99.18 · Windows 26200`. u/Dranak75 not involved.
+
+- **Ask (verbatim, the whole entry):** "Love this app. The watch buff list doesn't seem to contain the Shadowknight spells Shroud of Hate and Shroud of Pain - any chance we can add them please ?" (plus the version/device footer above).
+
+- **Already shipped / Checked (origin/main, this run 2026-09-19):** `src/EQBuddy.Core/Data/BuffDurations.json` grep: "Shroud of Undeath", "Shroud of Death", "Shroud of the Spirits" present; **no** "Shroud of Hate", **no** "Shroud of Pain" → the reporter's observation holds on tip. `scripts/harvests/eqlwiki/buffs-report.md`: 360 buffs across 207 landing lines; neither spell named anywhere (not in the catalog, not in the "Excluded" section, not in shared-landing lines). The three relevant wiki pages are already cached in-tree: `scripts/harvests/eqlwiki/cache/Shroud of Hate.12036ea6.wikitext`, `Shroud of Pain.c9d04a83.wikitext`, `Shroud of Hate Recourse.bd3849de.wikitext` — the harvest has seen them. Unchecked this pass: whether the in-app watch *editor* lets a user add a custom buff rule that would cover these today — hypothesis, unverified; the reporter's "watch buff list" phrasing most plausibly means the default/auto-tracked catalog. Not confirmed against a running app.
+
+- **Hypothesis (label as such):** the gap is upstream in the eqlwiki buffs harvest / the BuffDurations.json generation (both spells are 10-minute Shadow Knight buffs with wiki pages already cached), i.e. a catalog entry (or two), not UI work. Whether the "Recourse" pages or the base spells are the tracked landing lines is an implementation decision — Scribe does not assert either.
+
+- **Class:** V0 (catalog content in an existing trackable lane; no new code asserted). Do not write FABLE.md from Scribe.
+
+- **Holds re-read (this run, 2026-09-19):** live Holds block empty at last known state; process notes stand (new-thread thank-yous come to Helm before any post; no promise of review/fix beyond "captured and sent on for review"). Reddit stays harvest-only. Talking to u/TheOneGargoyle is fine if, and only if, Helm posts.
+
+- **Scribe 2026-09-19 8:1x PM CT (cron intake):** New EQBuddy intake — first new GitHub community item above the #690/#679 baseline. Do not implement. Do not write FABLE.md. Do not open the work. Thank-you drafted below for Helm QA/post — NOT auto-posted.
+
+- **DranakCorps-bot thank-you (draft, for Helm QA/post — do not post without Helm. No promises, dates, pricing, or ToS.):**
+
+  > Hi TheOneGargoyle — thank you for the heads-up on Shroud of Hate and Shroud of Pain. Captured and sent along for review.
+
+  > — EQBuddy team
+
+
+
+### Reddit: "Parser in MAC"
+— EQL parser in CrossOver on macOS, overlay won't show (u/Axorthor, harvest-only, disambiguation pending)
 
 
 
