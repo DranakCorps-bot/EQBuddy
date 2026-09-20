@@ -322,4 +322,94 @@ public class ClassStatRelevanceTests
             Assert.Equal(expected, perAnchor.Select(u => u.Item).ToList());
         }
     }
+
+    /// <summary>
+    /// **AND THE PLAYER NEVER READS THE COUNT ITSELF** (DRA-222 D6 done bar 3, S16.3).
+    ///
+    /// <para><c>RelevantMetrics</c> is a RANKING term. It decides which upgrades are named and
+    /// in what order, and the visible half of that decision is the better-chosen
+    /// <c>GainMetric</c> — "+12 AC" — which is a delta against a metric's own name. The count
+    /// behind it is not a fact about the game: it is a tally over how often eqlwiki's item
+    /// blocks happen to carry each number for this class. "This moved 3 of your stats" would
+    /// state that tally as though it were a measurement of the character, which is exactly the
+    /// unexplained numeric score S16.3 forbids.</para>
+    ///
+    /// <para><b>It is absent by construction today, and that is the problem this guard
+    /// solves</b> — nothing stopped the next slice from interpolating it into a sentence, and
+    /// an absence no test defends is one a refactor removes silently (trap 20's shape). The
+    /// scan is over the two files that own the words for BOTH surfaces: every phone sentence
+    /// rides the wire from the same producers (trap 32), so guarding the desktop's words and
+    /// the projection covers the phone without a third copy.</para>
+    ///
+    /// <para><b>Comments are stripped before the scan.</b> The paragraph you are reading names
+    /// the field, and so may a future one; a rule that cannot tell prose from code would make
+    /// explaining the rule the thing that breaks it. The committed negative below is what
+    /// proves the stripped scan still FIRES (trap 78: a detector aimed at nothing is green).
+    /// Its must-list partner is <see cref="ARowNamesARelevantMetricWheneverOneImproved"/> —
+    /// forbidding the bare count is only half a rule without something asserting the row names
+    /// a concrete metric instead (trap 34).</para>
+    /// </summary>
+    [Theory]
+    [InlineData("src/EQBuddy.UI.Shared/HelperPresentation.cs")]
+    [InlineData("src/EQBuddy.Companion/CompanionProjection.Helper.cs")]
+    public void NoPlayerFacingWordDrawsTheRelevanceCount(string relative)
+    {
+        var path = Path.Combine(RepoRoot(), relative.Replace('/', Path.DirectorySeparatorChar));
+        var source = File.ReadAllText(path);
+
+        // The file is the one we think it is, and it was actually read: an empty or moved file
+        // scans clean and would report this rule as held for a surface nobody is guarding.
+        // The anchor is the CARRIER of the count rather than any one word, so a clean scan
+        // means "this file handles the object and declines to draw the number" rather than
+        // "this file never met it".
+        Assert.NotEmpty(source);
+        Assert.Contains("GearUpgradeFact", source);
+
+        Assert.Empty(RelevanceCountDraws(source));
+    }
+
+    /// <summary>
+    /// **THE COMMITTED NEGATIVE — the scan above catches the sentence it exists to forbid.**
+    ///
+    /// <para>Both shapes are checked: the interpolation a words file would actually use, and a
+    /// bare member access. And the third case is the one that makes the strip load-bearing —
+    /// prose naming the field is NOT a finding, so the rule survives being documented.</para>
+    /// </summary>
+    [Fact]
+    public void TheRelevanceCountScanFiresOnTheSentenceItForbids()
+    {
+        Assert.NotEmpty(RelevanceCountDraws(
+            "static string Why(GearUpgradeFact f) => $\"moved {f.RelevantMetrics} of your stats\";"));
+        Assert.NotEmpty(RelevanceCountDraws(
+            "var n = fact.RelevantMetrics;"));
+
+        // …and prose about the rule is not a violation of it.
+        Assert.Empty(RelevanceCountDraws(
+            "/// <summary>RelevantMetrics never reaches a word.</summary>"));
+        Assert.Empty(RelevanceCountDraws(
+            "// RelevantMetrics decides the order; GainMetric is what the row says."));
+    }
+
+    /// <summary>Lines of <paramref name="source"/> that reach the ranking count, with XML doc
+    /// comments and line comments removed first.</summary>
+    private static IReadOnlyList<string> RelevanceCountDraws(string source) => source
+        .Split('\n')
+        .Select(line =>
+        {
+            var code = line.TrimStart();
+            if (code.StartsWith("///", StringComparison.Ordinal)
+                || code.StartsWith("//", StringComparison.Ordinal)) return "";
+            var slash = line.IndexOf("//", StringComparison.Ordinal);
+            return slash >= 0 ? line[..slash] : line;
+        })
+        .Where(code => code.Contains("RelevantMetrics", StringComparison.Ordinal))
+        .ToList();
+
+    private static string RepoRoot()
+    {
+        var d = new DirectoryInfo(AppContext.BaseDirectory);
+        while (d is not null && !File.Exists(Path.Combine(d.FullName, "EQBuddy.slnx")))
+            d = d.Parent;
+        return d?.FullName ?? throw new InvalidOperationException("repo root not found");
+    }
 }
