@@ -30,12 +30,22 @@ do, the inboxes are `SCRIBE.md`, `BEVEL.md` and `FABLE.md` — not this director
 | [`HELM.md`](HELM.md) *(pass 3)* | 144 tips + 134 sign-offs | 1,033,986 | 1,047,518 B → 25,411 B (1 tip) | before 2026-09-18 |
 | [`HELM-FEEDBACK.md`](HELM-FEEDBACK.md) *(pass 3)* | 81 | 342,571 | 344,449 B → 4,730 B (1 entry) | before 2026-09-18 |
 | [`SCRIBE.md`](SCRIBE.md) *(pass 4)* | 47 | 99,145 | 213,675 B → 114,715 B (45 entries) | **triage by `Priority`, not a date** |
-| [`DECISIONS.md`](DECISIONS.md) *(pass 5)* | 143 | 595,476 | 676,431 B → 81,798 B (17 blocks) | before 2026-09-17, **plus a hand-triaged floor** |
+| [`DECISIONS.md`](DECISIONS.md) *(pass 5)* | 143 | 595,476 | 676,431 B → 85,238 B (18 blocks) | before 2026-09-17, **plus a hand-triaged floor** |
 
-No pending ask was archived in any pass — pass 2's 18 candidate ask/hold
+No pending ask is archived in any pass — pass 2's 18 candidate ask/hold
 markers were each dispositioned before the move and all 18 were already discharged,
 so nothing needed re-pinning, and pass 3 did the same for 43.
-**Pass 5 is the first pass whose triage changed the cut.** `DECISIONS.md` had 30 blocks
+**Pass 5 is the first pass that had to re-pin, and the marker sweep is not what caught
+it.** All five 2026-09-14 blocks carrying an `exo-experiment:` tag are correctly archived
+as history, but the tag itself is read out of the *live* file by `Get-Experiments` in
+`scripts/exo-metrics.ps1` and by two tests, so archiving all six tags broke the ExO
+dashboard's regenerability. Both channel guards were green; CI tests caught it. The six
+tag lines and their judging clauses are re-pinned verbatim into a dated `STANDING` block
+in the live file (3,440 B), and the full entries stay here. **The lesson for pass 6 and
+later: the never-rotate floor is a keyword set, so it cannot see content whose liveness is
+carried by a consumer rather than by a marker. Grep `scripts/` and `tests/` for the
+ledger's filename before cutting it.**
+**Pass 5 is also the first pass whose triage changed the cut.** `DECISIONS.md` had 30 blocks
 older than the 2026-09-17 date cut carrying a `LIVE ASK` / `PARK` / `HOLD` / `STANDING`
 marker. Each was dispositioned by hand: 24 moved — the marker was product vocabulary
 (a parked HUD chip row, a seat-mutex holder), a counterfactual ("could have gone the
