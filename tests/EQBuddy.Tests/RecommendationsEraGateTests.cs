@@ -358,6 +358,13 @@ public class RecommendationsEraGateTests
     }
 
     // ---- P1: quests are band-EXEMPT and era-GATED --------------------------------------
+    //
+    // **Every quest entry below names a GIVER since DRA-219, and that is not decoration.**
+    // `Recommendations.QuestSourceRule` now withholds a quest offer whose catalog entry answers
+    // none of who / where / when / how — a row that can only print a title is the Rathe defect
+    // wearing quest clothes. A name-and-era entry is exactly that state, so without a giver
+    // these fixtures would be testing the era gate through rows the rule beside it removes, and
+    // the two negatives below would go green for the wrong reason.
 
     /// <summary>
     /// **A quest later than the world is refused, even though quest rows are exempt from the
@@ -373,7 +380,10 @@ public class RecommendationsEraGateTests
     {
         var catalog = new QuestCatalog
         {
-            Quests = [new QuestEntry { Name = "Paladin Epic Quest", Era = "Epics" }],
+            Quests = [new QuestEntry
+            {
+                Name = "Paladin Epic Quest", Era = "Epics", QuestGiver = "a guildmaster",
+            }],
         };
         var set = Rank(Gear(
             [Worn("Rusty Helm", "HEAD", 4)],
@@ -394,7 +404,10 @@ public class RecommendationsEraGateTests
     {
         var catalog = new QuestCatalog
         {
-            Quests = [new QuestEntry { Name = "A Humble Errand", Era = "Classic" }],
+            Quests = [new QuestEntry
+            {
+                Name = "A Humble Errand", Era = "Classic", QuestGiver = "a herald",
+            }],
         };
         var set = Rank(Gear(
             [Worn("Rusty Helm", "HEAD", 4)],
@@ -412,7 +425,10 @@ public class RecommendationsEraGateTests
     {
         var catalog = new QuestCatalog
         {
-            Quests = [new QuestEntry { Name = "An Undated Errand", Era = "" }],
+            Quests = [new QuestEntry
+            {
+                Name = "An Undated Errand", Era = "", QuestGiver = "a herald",
+            }],
         };
         var set = Rank(Gear(
             [Worn("Rusty Helm", "HEAD", 4)],

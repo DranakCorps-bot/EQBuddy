@@ -337,6 +337,19 @@ public static class HelperPresentation
             + "."
             + Who(f.Who, f.WhoWithheld),
 
+        // **THE QUEST ROW'S SIX-QUESTION LINE** (DRA-219, S11; acceptance S25 AC 1–6).
+        //
+        // A drop row has answered who/where/when/how since DRA-84 D4; a quest row answered a
+        // name. This is the other half, and every clause in it is CONDITIONAL because the
+        // catalog's fields are (trap 73): a quest whose page named no giver gets no "from"
+        // clause rather than "from an unknown NPC", and a MinLevel of 0 means the page stated no
+        // level, which is not level 1.
+        //
+        // The order is the player's own reading order — who, where, when, then what it takes —
+        // and the sentence stops at the first thing the catalog cannot answer rather than
+        // padding. `Why` appends the estimate label, because this is a file EQBuddy ships.
+        QuestSourceFact f => QuestSource(f),
+
         // The personal half: measured, with its denominator, and the creature named from your
         // own pooled kills rather than from a page.
         GearDropSeenFact f =>
@@ -633,6 +646,18 @@ public static class HelperPresentation
             + "what to kill for any of them — no item page names a creature in the zone it "
             + "drops in, and you have not looted one there. It would rather say that than send "
             + "you to a zone with only a name in hand.",
+
+        // ---- DRA-219 -------------------------------------------------------------------
+
+        // The sibling of the line above it, on the other acquisition path — and the subject is
+        // EQBuddy's OWN quest list rather than the game or the wiki. "That quest does not exist"
+        // would be false; what happened is that the item pages named quests the shipped quest
+        // list does not hold, so a row could print a title and nothing else.
+        GoalGapReason.NoUpgradeNamesAQuestPath =>
+            $"{GoalLabel(gap.Goal)}: EQBuddy found upgrades its catalog says come from quests, "
+            + "and cannot tell you how to run any of them — none of those quests is in the quest "
+            + "list EQBuddy ships, so there is no quest giver, no start zone and no step list to "
+            + "hand you. It would rather say that than show you a title with nothing behind it.",
 
         // ---- DRA-149 D3 ----------------------------------------------------------------
 
@@ -1241,6 +1266,74 @@ public static class HelperPresentation
               + "leaves out a camp it cannot tell you what to kill at.";
 
     /// <summary>
+    /// **WHAT THE QUEST-SOURCE RULE HELD BACK** (DRA-219, S10/S11; trap 50).
+    ///
+    /// <para><see cref="DropOffersWithheld"/>'s sibling on the other acquisition path, and it
+    /// needs its own words rather than that one's: the remedy is different. A withheld drop offer
+    /// means an ITEM page names no creature; this means EQBuddy's shipped QUEST list does not hold
+    /// the quest an item page pointed at — a gap in a different catalog, fixed by a different
+    /// edit, and on the shipped data the common case rather than the corner one (1,028 of 2,380
+    /// wearable offers).</para>
+    ///
+    /// <para><b>The subject is EQBuddy's own quest list, never the game.</b> "That quest does not
+    /// exist" would be a claim about the world, and it would be false — the item page is usually
+    /// right and the quest list is usually the one that has not caught up.</para>
+    /// </summary>
+    public static string QuestOffersWithheld(int withheld) => withheld <= 0
+        ? ""
+        : withheld == 1
+            ? "1 more quest reward is not listed: the quest its item page names is not in the "
+              + "quest list EQBuddy ships, so there is no giver, no start zone and no step list "
+              + "to hand you. EQBuddy leaves out a quest it can only give you the title of."
+            : $"{withheld:N0} more quest rewards are not listed: the quests their item pages name "
+              + "are not in the quest list EQBuddy ships, so there is no giver, no start zone and "
+              + "no step list to hand you. EQBuddy leaves out a quest it can only give you the "
+              + "title of.";
+
+    /// <summary>
+    /// **UPGRADES WITH NO ACQUISITION SOURCE AT ALL** (DRA-219, S10.1/S19.2; trap 50).
+    ///
+    /// <para><b>Every other sentence in this block is about an offer that existed and was
+    /// removed. This one is about an item that never got that far.</b> The sweep compared it,
+    /// found it better than what the player wears, and dropped it because no page says where it
+    /// comes from — 1,772 of the shipped catalog's 6,844 wearable records carry neither a drop
+    /// zone nor a quest. That refusal is right; its silence is the Founder's bow one layer up,
+    /// where an absence nobody counts cannot be told apart from a slot with nothing better in
+    /// it.</para>
+    ///
+    /// <para><b>It names no remedy, because there is none the player can act on.</b> The page is
+    /// the answer and the wiki is where it changes — the sentence says which of the two things
+    /// happened and stops rather than inventing an instruction.</para>
+    /// </summary>
+    public static string SourcelessUpgrades(int found) => found <= 0
+        ? ""
+        : found == 1
+            ? "1 better base item is not listed at all: its eqlwiki page names no zone it drops "
+              + "in and no quest that hands it out, so there is nowhere to send you."
+            : $"{found:N0} better base items are not listed at all: their eqlwiki pages name no "
+              + "zone they drop in and no quest that hands them out, so there is nowhere to send "
+              + "you.";
+
+    /// <summary>
+    /// **UPGRADES THE INCLUDE-QUESTS TOGGLE IS HIDING** (DRA-219, S10.1 — *"do not restrict
+    /// recommendations to direct creature drops"*; trap 50).
+    ///
+    /// <para><b>The one refusal in this whole block the player can undo from where they are
+    /// standing</b>, which is exactly why it must be said. 1,284 of the shipped catalog's
+    /// wearable records are quest-only, so a character with the toggle off is routinely shown a
+    /// narrower list than EQBuddy found — and the toggle is a checkbox whose consequence nobody
+    /// could see. It names the control rather than describing it, because the control is on the
+    /// same screen.</para>
+    /// </summary>
+    public static string QuestOnlyUpgrades(int found) => found <= 0
+        ? ""
+        : found == 1
+            ? "1 better base item comes only from a quest, and quest rewards are switched off — "
+              + "turn on \"include quests\" above to see it."
+            : $"{found:N0} better base items come only from quests, and quest rewards are "
+              + "switched off — turn on \"include quests\" above to see them.";
+
+    /// <summary>
     /// How many unread worn items are NAMED before the sentence counts the rest.
     ///
     /// <para>Three, which is <see cref="GearBandNamed"/>'s number and its argument: the names
@@ -1460,6 +1553,12 @@ public static class HelperPresentation
         if (anchor.NoCreature > 0)
             causes.Add($"{anchor.NoCreature} {(anchor.NoCreature == 1 ? "sits" : "sit")} on "
                 + "pages that name nothing that drops them");
+        // DRA-219's cause, last because its rule runs last. It is 0 for every character with
+        // quest rewards switched off — those candidates never reach a bucket at all — so this
+        // clause stays off the screen unless the player has actually asked for quests.
+        if (anchor.NoQuestPath > 0)
+            causes.Add($"{anchor.NoQuestPath} {(anchor.NoQuestPath == 1 ? "comes" : "come")} "
+                + "only from quests that are not in the quest list EQBuddy ships");
 
         var one = anchor.Found == 1;
         return $"{anchor.Anchor} — {Slot(anchor.Slot)}: EQBuddy has read about {anchor.Found:N0} "
@@ -1467,7 +1566,7 @@ public static class HelperPresentation
             + $"out. {Join(causes)}. Nothing in reach beats this item's base.";
 
         // "a and b" / "a, b and c" — the shape a person writes, and the count can only ever be
-        // one, two or three because there are three gates.
+        // one to four because there are four rules (DRA-219 added the quest-source one).
         static string Join(List<string> parts) => parts.Count switch
         {
             0 => "",
@@ -1759,5 +1858,60 @@ public static class HelperPresentation
             ? $", and {withheld:N0} more on its page"
             : "";
         return $" {names}{more} {verb} it.";
+    }
+
+    /// <summary>
+    /// **HOW TO RUN THE QUEST, IN THE QUEST CATALOG'S OWN FIELDS** (DRA-219, S11; acceptance
+    /// S25 AC 1–6).
+    ///
+    /// <para><b>Every clause is conditional and none is padded</b> (trap 73). The schema has a
+    /// field per question and that is not a licence to answer every question: a page that named
+    /// no giver gets no "from" clause rather than "from an unknown NPC", and a
+    /// <see cref="QuestSourceFact.MinLevel"/> of 0 is a page that stated no level rather than a
+    /// quest you can take at 1. Measured on the shipped catalog, the four clauses are answered
+    /// on 532 / 529 / 504 / 386 of the 537 quests this engine can reach, so the common row
+    /// carries all four and the empty ones are real.</para>
+    ///
+    /// <para><b>The subject is the wiki's own record, and the verb says so.</b> "Kanthuk Tar
+    /// starts it in Cabilis" is a claim about the game; "eqlwiki has it starting with Kanthuk Tar
+    /// in Cabilis" is a claim about a page, which is what was actually read. The
+    /// <c>Evidence.Catalog</c> label arrives on the end of it by construction.</para>
+    ///
+    /// <para><b>The component clause counts the whole list and names up to
+    /// <c>Recommendations.QuestItemsPerRow</c></b> (trap 50): a row that showed three of nine
+    /// turn-ins without saying so would read as a short quest.</para>
+    ///
+    /// <para>Returns "" when the catalog answered none of the four. The engine does not build
+    /// a row in that state at all (<c>Recommendations.QuestSourceRule</c>), so this is the
+    /// belt beside that brace rather than a reachable screen — and it draws nothing rather
+    /// than a sentence with no facts in it.</para>
+    /// </summary>
+    private static string QuestSource(QuestSourceFact f)
+    {
+        var clauses = new List<string>();
+        if (f.Giver.Length > 0) clauses.Add($"starting with {f.Giver}");
+        if (f.StartZone.Length > 0) clauses.Add($"in {f.StartZone}");
+        if (f.MinLevel > 0) clauses.Add($"from level {f.MinLevel}");
+        if (clauses.Count == 0 && f.Components == 0) return "";
+
+        var lead = clauses.Count > 0
+            ? $"eqlwiki has {f.Quest} {string.Join(" ", clauses)}."
+            : $"eqlwiki has {f.Quest}.";
+
+        if (f.Components == 0) return lead;
+
+        // The named items and the whole count, in the who clause's grammar one path over — the
+        // page's own order, because nothing here has measured which component is hardest.
+        var named = f.Items.Count switch
+        {
+            0 => "",
+            1 => f.Items[0],
+            _ => string.Join(", ", f.Items.Take(f.Items.Count - 1)) + " and " + f.Items[^1],
+        };
+        var takes = $" It takes {Count(f.Components, "turn-in item", "turn-in items")}";
+        return named.Length == 0
+            ? lead + takes + "."
+            : lead + takes + $" — {named}"
+              + (f.Components > f.Items.Count ? ", and the rest on its page." : ".");
     }
 }

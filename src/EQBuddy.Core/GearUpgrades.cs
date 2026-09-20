@@ -132,8 +132,37 @@ public sealed record GearUpgrade(
         Mobs.TryGetValue(zone, out var mobs) ? mobs : [];
 }
 
-/// <summary>What one sweep found, and what its cap held back (trap 50).</summary>
-public sealed record GearSweep(IReadOnlyList<GearUpgrade> Upgrades, int Withheld)
+/// <summary>
+/// What one sweep found, and the three things it did not pass on (trap 50).
+/// </summary>
+/// <param name="Upgrades">The candidates, after the per-anchor cap.</param>
+/// <param name="Withheld">What <see cref="GearUpgrades.MaxPerAnchor"/> held back.</param>
+/// <param name="NoSource">
+/// **DOMINATING ITEMS THE CATALOG CANNOT SAY HOW TO GET** (DRA-219, plan S10.1).
+///
+/// <para>The sweep has always dropped a candidate with no drop zone and no quest, silently —
+/// it is not a camp and not a hand-in, so there is nothing to put on a row. That refusal is
+/// right and its SILENCE is the Founder's bow one layer up: from the player's side a
+/// candidate nobody counted is indistinguishable from a slot with nothing better in it. 1,772
+/// of the shipped catalog's 6,844 wearable records carry neither a <c>DropZones</c> nor a
+/// <c>Quests</c>, so this is a routine number rather than a rare one.</para>
+///
+/// <para>Counted per (anchor, item) CANDIDATE, which is what one <see cref="GearUpgrade"/> is,
+/// and counted BEFORE the per-anchor cap — the candidate never enters the list the cap trims,
+/// so the two numbers cannot double-count one item.</para>
+/// </param>
+/// <param name="QuestOnly">
+/// Candidates whose ONLY source is a quest, while the include-quests toggle is off (S10.1:
+/// *"do not restrict recommendations to direct creature drops"*).
+///
+/// <para><b>A different fact from <paramref name="NoSource"/> and it must not be summed with
+/// it</b>: this one has a remedy the player is holding — the toggle they set — and that one
+/// has none. 1,284 wearable records are quest-only in the shipped catalog, so a character who
+/// leaves the toggle off is routinely being shown a narrower list than EQBuddy found, with
+/// nothing on screen saying so.</para>
+/// </param>
+public sealed record GearSweep(
+    IReadOnlyList<GearUpgrade> Upgrades, int Withheld, int NoSource = 0, int QuestOnly = 0)
 {
     public static readonly GearSweep Nothing = new([], 0);
 }
@@ -265,6 +294,11 @@ public static class GearUpgrades
 
         var found = new List<GearUpgrade>();
         var withheld = 0;
+        // DRA-219. Two DIFFERENT reasons a dominating item never becomes a row, counted apart
+        // because their remedies are different: one has none and the other is a toggle the
+        // player is looking at. See GearSweep for the shipped numbers behind both.
+        var noSource = 0;
+        var questOnly = 0;
         var index = SlotIndex(catalog);
 
         foreach (var anchor in anchors)
@@ -308,7 +342,17 @@ public static class GearUpgrades
                 // item that both drops AND is a quest reward stays in either way — its drop
                 // zones are the farmable half, and dropping it for carrying a quest line too
                 // would hide a real camp.
-                if (zones.Count == 0 && (!includeQuests || quests.Count == 0)) continue;
+                //
+                // **THE TWO REFUSALS ARE NOW COUNTED APART** (DRA-219, S10.1/S19.2). They used
+                // to be one `continue` and one silence, and they are not one fact: "no page says
+                // where this comes from" has no remedy, and "this comes only from a quest, and
+                // quests are switched off" has one the player is looking at. A single number
+                // would point at neither.
+                if (zones.Count == 0)
+                {
+                    if (quests.Count == 0) { noSource++; continue; }
+                    if (!includeQuests) { questOnly++; continue; }
+                }
 
                 var gain = ItemDominance.Gain(stats, anchor.Stats);
                 if (gain is not { } g) continue;   // Dominates has already ruled this out
@@ -334,7 +378,7 @@ public static class GearUpgrades
             withheld += Math.Max(0, ordered.Count - MaxPerAnchor);
         }
 
-        return new GearSweep(found, withheld);
+        return new GearSweep(found, withheld, noSource, questOnly);
     }
 
     /// <summary>

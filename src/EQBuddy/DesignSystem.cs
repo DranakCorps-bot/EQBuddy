@@ -671,9 +671,17 @@ internal sealed class EqMultiPicker
     /// effect is on the rows behind it, and a host that repaints them under an open panel is
     /// asking the player to verify a list that moved while they were looking at it. Closing
     /// also makes the result visible on the FACE, which is where the selection is reported.</para>
+    ///
+    /// <para><b>Every call REPLACES the strip, and the empty call is no exception</b> — the
+    /// clear is the first thing that happens and there is no early "nothing changed" arm here
+    /// on purpose. Whether a rebuild is warranted is a question about the HOST's data, which
+    /// this control cannot see; deciding it in here would be a second producer of an answer
+    /// the host already has (trap 4). What this owes the host is the honest cost, which is
+    /// <see cref="ActionBuilds"/>.</para>
     /// </summary>
     public void SetActions(IReadOnlyList<PickerAction> actions)
     {
+        ActionBuilds++;
         _actions.Children.Clear();
         if (actions.Count == 0) return;
 
@@ -714,6 +722,25 @@ internal sealed class EqMultiPicker
     /// is ABSENT photographs as an unremarkable panel, and this one lives inside a popup a
     /// screenshot does not even contain (traps 29 and 79).</summary>
     public int ActionCount => _actions.Children.OfType<Button>().Count();
+
+    /// <summary>
+    /// **How many times the strip has been REPLACED.** Reported in the <c>EQBUDDY_EXPAND</c>
+    /// dump, and it is the only way anything outside this class can say the player's button
+    /// survived a tick.
+    ///
+    /// <para><b>A count rather than the button's identity, and the count is the stronger
+    /// claim.</b> <see cref="SetActions"/> clears unconditionally, so one call IS one
+    /// destroyed-and-rebuilt <c>Button</c>; comparing object hash codes across two dumps would
+    /// pass the day a rebuild happened to land on the same value, and would say nothing at all
+    /// about the empty arm, which destroys a button and builds none.</para>
+    ///
+    /// <para>It exists because no other surface can see this failure. <see cref="ActionCount"/>
+    /// reads 1 either way — a strip rebuilt every tick holds exactly one button at every
+    /// moment anybody looks — and the control lives inside a <c>Popup</c>, its own top-level
+    /// HWND that <c>PrintWindow</c> does not render (trap 79). The symptom is a hover that
+    /// will not stay up and a click that is sometimes swallowed, and neither is a pixel.</para>
+    /// </summary>
+    public int ActionBuilds { get; private set; }
 
     /// <summary>Paints the ticks from the caller's own store, without rebuilding the rows and
     /// without calling back — the sync half of trap 20's writer/reader pair.</summary>

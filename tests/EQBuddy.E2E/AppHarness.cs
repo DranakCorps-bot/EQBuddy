@@ -938,6 +938,32 @@ internal sealed class AppHarness : IDisposable
     public void PressMyClasses() =>
         DriveLensProbe("myclasses", "-", "press the My Classes quick-select");
 
+    /// <summary>
+    /// Ticks (or strikes out) ONE guide-ledger step the way a writer OUTSIDE the surface
+    /// under assertion does — the phone's tap, or the checkbox in the OTHER instance
+    /// (QuestsWindow and QuestsRoom build one <c>QuestsView</c> each over one ledger,
+    /// trap 45). Through the same rendezvous, and it forces NO refresh.
+    ///
+    /// <para><b>That is the whole point of it</b> (DRA-218's signature collision). Every
+    /// write site inside a view force-refreshes itself, so a step ticked by the view under
+    /// assertion proves nothing about the repaint gate — the only way to reach that gate is
+    /// to write the ledger from somewhere that cannot force a repaint, which is exactly
+    /// what a remote writer is. Same shape, and the same reason, as
+    /// <see cref="SetClassPicks"/>.</para>
+    ///
+    /// <para><b>So the counter is not the whole wait.</b> It says the ledger was written; it
+    /// does not say anything has repainted. Anchor the assertion on the screen fact the
+    /// change is about.</para>
+    ///
+    /// <para>The probe REFUSES a reward-keyed or acquire-shaped step — those live in the Sky
+    /// and Epic stores and a probe holding no reward group cannot tell which — so a fixture
+    /// that names one times out here, naming the probe.</para>
+    /// </summary>
+    /// <param name="rowId"><c>GuideChecklistProjection.RowId(guideId, objectiveId)</c>.</param>
+    public void RemotelyTickGuideStep(string rowId, bool done = true) =>
+        DriveLensProbe(done ? "guidedone" : "guideskip", rowId,
+            $"{(done ? "tick" : "strike out")} the guide step \"{rowId}\" from outside the view");
+
     private void DriveLensProbe(string verb, string arg, string doing)
     {
         var before = DumpValue("questsLensProbeSets");
