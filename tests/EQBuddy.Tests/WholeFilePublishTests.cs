@@ -146,7 +146,21 @@ public sealed class WholeFilePublishTests : IDisposable
         // WidgetDump's own catch exists to distinguish, and it would read as zero torn reads
         // here (trap 11: a measurement only one side can produce is a verdict, not a vote).
         // Dropping the replace retry reddens this line and not the one above it.
-        Assert.True(skipped == 0, $"publishes dropped to keep the previous file: {skipped} of {Publishes}");
+        //
+        // **The bar is a RATE and not zero, and the first version of it was zero.** That
+        // passed on this desk and on the pull request, then failed on `main`'s own hosted
+        // runner with `1 of 4000` (run `35507162594`) — a two-core box, a reader thread
+        // spinning against the publisher, and one publish that exhausted a deliberately
+        // finite retry budget. **Dropping that version is the CONTRACT working, not a
+        // defect:** the previous dump stayed whole, which is the whole point of the skip
+        // arm. A guard that reddens for the scheduler rather than for the change is the one
+        // trap 74 warns about — it teaches the next person to re-run until green, and then
+        // nobody believes it. So the assertion measures what it actually cares about: that
+        // skipping is RARE rather than routine. Observed worst case 0.025%, ceiling 1%,
+        // mutant (no retry at all) 51% — two orders of margin on each side.
+        Assert.True(skipped * 100 <= Publishes,
+            $"publishes dropped to keep the previous file: {skipped} of {Publishes} "
+            + $"(ceiling is 1%, {Publishes / 100}); dropping the replace retry gives about half of them");
     }
 
     /// <summary>The publish lands, atomically: after it returns the reader sees the NEXT
