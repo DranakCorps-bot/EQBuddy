@@ -8623,23 +8623,3 @@ because D2's refusals are keyed on the PLACE — a words-only function with no p
 the furniture the plan forbids. Reported only when NOTHING of an anchor survived; a candidate is
 charged to the gate that took its LAST place; an anchor nothing dominates stays
 `NoCatalogUpgrade`; cap 3 + a count; band half ships live, era half dark until D5.
-
-## 2026-09-19 — DRA-222 D6: class stat relevance + weapon-aware comparison (POINTER — file at ceiling)
-
-Full entry in **the D6 PR body**, not here: DECISIONS.md is at its grandfather cap and rotation
-is DRA-154's standing card, never an Executor's branch.
-
-Headlines, each a default that could have gone the other way. **(1)** S7.2's relevance is
-DERIVED by counting the shipped catalog's own `Class:` lines rather than hand-written, and it
-is a SET with no weights — the alternative was a curated per-class table, which is a claim about
-what a class needs (S20). **(2)** `RelevanceFloor` 0.25, ONE arm, no lift-over-baseline: a lift
-makes AC irrelevant to a WARRIOR (66% vs a 67% baseline). **(3)** The floor was NOT moved to fix
-Mana for CLR (19%) and SHM (23%); the miss ships as a committed negative, because tuning until
-the table matches a prior is the failure the mechanism exists against — affordable only because
-relevance **never removes a row**. **(4)** S7.3 REFUSES a two-hander over a not-two-hander when
-the dump shows SECONDARY occupied, rather than demoting it — and it does NOT refuse a cross-SKILL
-swap, which a training cost makes recoverable where a foreclosed slot is not. **(5)** Relaxing
-`Dominates` so a caster's row may ignore STR was considered and NOT done: that widens what a row
-CLAIMS and needs its own ruling. **(6)** `GearLocker`'s private copy of `MetricPairs` was deleted
-and its three members now really do delegate — repaired in-slice because the off-hand rule reaching
-one surface and not the other is the drift the lift existed to prevent (trap 4).

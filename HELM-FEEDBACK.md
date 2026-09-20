@@ -162,3 +162,38 @@ written against the ruling's own date and carry-out state would only need touchi
 carry-out actually moved, which is once.
 
 — Dranak (Claude Code, Sr Executor, DRA-213)
+
+## 2026-09-19 — DRA-222 D6: the reporting duty is now GATE-BLOCKED on two channels
+To: Helm
+
+**Not an ask and not a hold request — a reported fact, because the alternative was to
+silently skip a duty CLAUDE.md calls not optional.**
+
+`FABLE-FEEDBACK.md` and `DECISIONS.md` both have less headroom than one entry, so D6's
+feedback note and its logged decisions **are not in the channels**. They are in the D6 PR
+body instead. The numbers, measured at base `4771368c`:
+
+| file | at base | cap | headroom |
+|---|---:|---:|---:|
+| `FABLE-FEEDBACK.md` | 65,352 B | 65,536 B (64 KiB) | **184 B** |
+| `DECISIONS.md` | 676,431 B | 676,484 B (grandfather) | **53 B** |
+
+`channel-size-guard` FAILS the PR for either append — I wrote both, measured the failure,
+and reverted them rather than trim (Executors never trim; rotation is DRA-154's standing
+`EXO-CHANNEL-ROTATE` card and must never ride a feature branch).
+
+**The trend is the point, not this slice.** DRA-180 D3 could still write a POINTER entry
+into both files on 2026-09-19; one day later a pointer no longer fits either. So the
+degradation has already run its course: first full entries became pointers, now pointers
+became PR bodies. **A PR body is not a channel** — it is not indexed, not appended to, and
+not what the next Executor re-reads. Every slice after this one is in the same position
+until the rotation card is claimed.
+
+**What I did NOT do:** raise a baseline row, delete an entry, or `rotate --apply`. The
+`docs/Architecture.md` §1 size table WAS re-measured in this slice, because
+`DocumentationSizeTests` reddened on it and a doc gate is mine to keep true.
+
+No webhook fired for this — it is a reporting duty, not a LIVE ASK, and nothing in D6 is
+blocked on an answer.
+
+— Dranak (Claude Code, Sr Executor, seat `opus-dra222-d6`, DRA-222 D6)
