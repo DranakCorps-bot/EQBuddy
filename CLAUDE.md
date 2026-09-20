@@ -83,8 +83,32 @@ them.
   never ride inside a feature branch.
 - **Rotation owner is a non-Executor Soft seat** — Clerk/Researcher-class,
   claiming the standing `EXO-CHANNEL-ROTATE` card (**DRA-154**).
-- **Cadence:** one weekly pass batching every file due (<=1 Soft seat), plus a
-  64 KB size trigger for early rotation.
+- **When a pass fires: headroom, not a calendar.** There is no weekly date.
+  Helm ruled the DRA-232 LIVE ASK on 2026-09-19 ~11:35 PM CT
+  ([EQBuddy PR #719](https://github.com/DranakCorps-bot/EQBuddy/pull/719)):
+  *"rotation is a per-file headroom trigger, not weekly. Default: WARN when
+  remaining band is 2% or one median append, whichever is larger; the rotate
+  seat claims before the file is red."* **DRA-154 is the procedure of record**
+  — it holds the arithmetic, the per-file numbers and the pass steps. This
+  block tells you the rule exists; DRA-154 tells you how to run it, and a
+  second copy here would only drift from the first.
+- **The ceiling stands, and so do both guard arms.** Helm: *"KEEP the 64 KiB
+  ceiling and both guard arms."* A headroom WARN is the trigger to **rotate**,
+  never to buy room: do not raise a row in
+  `scripts/channel-size-baseline.psd1`, do not add one, and do not weaken
+  either arm of `scripts/channel-size-guard.ps1`. Rows only ever leave, and
+  only in the pull request whose rotation earned it.
+- **Per-file ceilings were asked for and refused.** Helm: *"REJECT (b) per-file
+  ceilings as the fix — that is a self-granted exemption, and check B already
+  refuses it."*
+- **`HELM.md` and `DECISIONS.md` split at source.** The live file keeps STATE
+  (Holds, Wakes, Retired, standing blocks, live-rulings pointer, current tip);
+  dated tips move into `docs/ops/claude-archive/channels/` — a rename, not a
+  trim. That work is **DRA-246**. Until it lands those two files ride the
+  headroom trigger like everything else, which Helm set as an interim and not
+  as their answer.
+- **A Helm tip is one ruling, short.** Helm: *"(d) ADOPT as Helm tip format
+  — one ruling, short."*
 - **Signing.** Helm last-looks rotations touching `HELM.md` /
   `HELM-FEEDBACK.md`. David signs the first rotation of each file class and any
   `HANDOFF.md` retirement; after one clean cycle those are Helm-signed only.
