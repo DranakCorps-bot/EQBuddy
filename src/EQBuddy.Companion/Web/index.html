@@ -2766,7 +2766,7 @@ function boot() {
     // about this wide, and the circles are drawn at 5-7px.
     const TAP_REACH_PX = 26;
     let svg = null, layer = null, trailG = null, dyn = null, wrap = null, tip = null, selBar = null;
-    let row = null, side = null, sideHead = null, sideRows = null;
+    let row = null, side = null, sideHead = null, sideRows = null, sideTargets = null;
     let stamp = "", bounds = null, dynKey = "";
     let k = 1, tx = 0, ty = 0, fitted = false;
     const pointers = new Map();
@@ -2801,7 +2801,11 @@ function boot() {
       side = el("div", "mapside");
       sideHead = el("h3");
       sideRows = el("div", "rows");
-      side.append(sideHead, sideRows);
+      // DRA-216 D5: what you are going after, ABOVE the named list — the desktop map's own
+      // order, because it is what the player opened the map for. Read-only here (trap 35):
+      // tracking writes the profile the PC plays from, and `note` carries where it is done.
+      sideTargets = el("div", "rows");
+      side.append(sideTargets, sideHead, sideRows);
       row.append(wrap, side);
       bindGestures();
       // Refit when the box changes shape — rotating a tablet, entering fullscreen, or
@@ -2825,6 +2829,7 @@ function boot() {
     function drawSide(data) {
       const named = data.named || [];
       const key = JSON.stringify(named.map(n => [n.name, n.due, n.x, n.y, n.fromWiki]));
+      drawTargets(data.targets);
       sideHead.textContent = "Named — " + (data.timerZone || data.zone || "");
       if (key !== sideKey) {
         sideKey = key;
@@ -2872,6 +2877,27 @@ function boot() {
           ref.fill.style.width = (frac * 100).toFixed(1) + "%";
         }
       }
+    }
+
+    // DRA-216 D5: the target block. Nothing tracked sends no `targets` at all and this draws
+    // NOTHING — not a heading over an empty list, which is the desktop map's rule and the
+    // Helper block's before it. Every string is one GearTargetPresentation built and the wire
+    // carried (trap 32); this function words nothing and caps nothing.
+    let targetKey = "";
+    function drawTargets(t) {
+      const key = JSON.stringify(t || null);
+      if (key === targetKey) return;
+      targetKey = key;
+      sideTargets.replaceChildren();
+      if (!t) return;
+      sideTargets.appendChild(el("h3", "", t.heading));
+      if (t.note) sideTargets.appendChild(el("div", "none", t.note));
+      for (const g of (t.goals || [])) sideTargets.appendChild(el("div", "row", g));
+      if (t.points) sideTargets.appendChild(el("div", "none", t.points));
+      if (t.elsewhereHeading) sideTargets.appendChild(el("h3", "", t.elsewhereHeading));
+      for (const e of (t.elsewhere || [])) sideTargets.appendChild(el("div", "row", e));
+      if (t.unreadable) sideTargets.appendChild(el("div", "none", t.unreadable));
+      if (t.noDropZone) sideTargets.appendChild(el("div", "none", t.noDropZone));
     }
 
     // ---- curation ----
@@ -3165,6 +3191,25 @@ function boot() {
           ring.appendChild(a);
         }
         dyn.appendChild(ring);
+        // DRA-216 D5: a target ring OUTSIDE the circle, never a recolour of it. The circle's
+        // own colour already answers "is this a named", and overwriting it would make the map
+        // forget which question it was answering — so this is a second, wider ring, dashed so
+        // it reads as a mark somebody put there rather than as more archive.
+        if (c.target) {
+          const t = document.createElementNS(SVG, "circle");
+          t.setAttribute("cx", c.x); t.setAttribute("cy", c.y);
+          t.setAttribute("fill", "none"); t.setAttribute("stroke", warn);
+          t.setAttribute("stroke-width", "1.6");
+          t.setAttribute("stroke-dasharray", "3 3");
+          t.setAttribute("vector-effect", "non-scaling-stroke");
+          t.dataset.px = c.named ? 12 : 10;
+          // The line the desktop puts on the circle's hover, as the title a tap-and-hold
+          // shows: the phone has no hover, so it rides the element (trap 35).
+          const title = document.createElementNS(SVG, "title");
+          title.textContent = c.targetText;
+          t.appendChild(title);
+          dyn.appendChild(t);
+        }
         if (c.confirmed) {
           const d = document.createElementNS(SVG, "circle");
           d.setAttribute("cx", c.x); d.setAttribute("cy", c.y);

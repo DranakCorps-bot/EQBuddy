@@ -161,7 +161,18 @@ public static partial class CompanionProjection
         if (snap.Map is { } m)
             map[CompanionSurfaces.Map] = Fold(m.Zone, m.GeometryStamp, m.Missing,
                 m.You is { } you ? $"{you.X:0.#},{you.Y:0.#}" : "-",
-                Join(m.Circles, c => $"{c.X:0}:{c.Y:0}:{c.Label}:{c.Imminent}:{c.Confirmed}:{c.Kills}"),
+                // DRA-216 D5: the target flag rides the circle key. A goal tracked or untracked
+                // moves no coordinate, no label and no kill count, so without it a paired phone
+                // would keep drawing yesterday's rings for the whole time the player stayed in
+                // the zone (trap 72, the same store-nobody-watches shape).
+                Join(m.Circles, c => $"{c.X:0}:{c.Y:0}:{c.Label}:{c.Imminent}:{c.Confirmed}:{c.Kills}:{(c.Target ? 'T' : '-')}"),
+                // The block's own sentences, folded as LINES rather than as a count: one goal
+                // untracked and another tracked in one pass leaves every count unmoved. Nothing
+                // here carries a clock (trap 8) — the rows name items, creatures and zones.
+                m.Targets is { } tg
+                    ? Fold(tg.Heading, Join(tg.Goals, g => g), tg.Points,
+                        Join(tg.Elsewhere, e => e), tg.Unreadable, tg.NoDropZone)
+                    : "-",
                 // Crumb POSITIONS only. A trail that is merely fading is not news — the
                 // page burns it down locally on the same curve, and shipping ages here
                 // would wake every map device every single second.

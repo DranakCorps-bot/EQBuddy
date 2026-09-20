@@ -69,7 +69,49 @@ public sealed record CompanionMapSection(
     /// been dropped, or when a marker exists but carries no location (dropped before the
     /// first /loc) — that marker still shows on the Travels list, it just plants no pin
     /// here, exactly as a named with no camp yet gets a row but no dot.</summary>
-    IReadOnlyList<CompanionMapPin> Markers);
+    IReadOnlyList<CompanionMapPin> Markers,
+    /// <summary>What this character is going after, and which of these dots answer it
+    /// (DRA-216 D5). <b>Null when nothing is tracked</b> — the desktop map's own rule and the
+    /// Helper block's before it: a block with nothing in it is a heading over a control that
+    /// is not there, so it draws nothing at all rather than an empty state.</summary>
+    CompanionMapTargets? Targets = null);
+
+/// <summary>
+/// **THE MAP'S TARGET LAYER, AS ALREADY-WORDED SENTENCES** (DRA-216 D5, S13/S14).
+///
+/// <para>Every string here is one <see cref="EQBuddy.UI.Shared.GearTargetPresentation"/> built
+/// and the wire carried (trap 32: the page never words anything). The projection picks no word,
+/// no order and no cap — the caps are inside those producers, which is where they can say how
+/// much they held back.</para>
+///
+/// <para><b>READ-ONLY, like the Helper room's tracked block it belongs to</b> (trap 35).
+/// Tracking writes the profile the PC is playing from, so the phone gets the rings and the
+/// sentences and no control; <see cref="EQBuddy.UI.Shared.GearTargetPresentation.RingTip"/>
+/// carries where it IS changed.</para>
+/// </summary>
+/// <param name="Heading">The block's heading, which names the zone.</param>
+/// <param name="Note">Where a ring comes from, said once — the sentence that keeps this layer
+/// from reading as a claim about where the game spawns things.</param>
+/// <param name="Goals">One row per tracked goal that drops in THIS zone: the item and who
+/// drops it here.</param>
+/// <param name="Points">How many of the zone's archived points are marked, out of how many
+/// there are.</param>
+/// <param name="ElsewhereHeading">The heading over <paramref name="Elsewhere"/>. Empty with the
+/// list, so a phone cannot draw a heading over nothing.</param>
+/// <param name="Elsewhere">One row per tracked goal that drops somewhere the player is not —
+/// the "so where do I go" half, capped and counted by its own producer.</param>
+/// <param name="Unreadable">The goals EQBuddy ships no item page for, named and counted, or
+/// "".</param>
+/// <param name="NoDropZone">The goals whose page names no drop zone at all, or "".</param>
+public sealed record CompanionMapTargets(
+    string Heading,
+    string Note,
+    IReadOnlyList<string> Goals,
+    string Points,
+    string ElsewhereHeading,
+    IReadOnlyList<string> Elsewhere,
+    string Unreadable,
+    string NoDropZone);
 
 /// <summary>One dropped camp marker, plotted. <see cref="AgeSeconds"/> rides the wire
 /// rather than a label already worded ("3m ago") for the same reason
@@ -145,7 +187,15 @@ public sealed record CompanionMapCircle(
     bool Projected,
     int Kills,
     string Mobs,
-    double LocY, double LocX);
+    double LocY, double LocX,
+    /// <summary>This point has seen something killed at it that drops an item the character is
+    /// tracking (DRA-216 D5). It rides BESIDE <see cref="Named"/> rather than replacing it —
+    /// the two are different facts about one dot, and a target that stopped wearing the accent
+    /// because it is also a named would be the map forgetting which question it answered.</summary>
+    bool Target = false,
+    /// <summary>Which goals and which of their creatures, already worded — the line the desktop
+    /// adds to the circle's hover. Empty when <see cref="Target"/> is false.</summary>
+    string TargetText = "");
 
 // ---------------- travel ----------------
 

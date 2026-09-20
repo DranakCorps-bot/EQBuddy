@@ -544,6 +544,44 @@ internal sealed class AppHarness : IDisposable
     }
 
     /// <summary>
+    /// Writes one classic-format map file into the GAME's own maps folder — the fallback
+    /// <c>ZoneMapFiles.DefaultFolder</c> probes, beside <c>Logs</c> (DRA-216 D5).
+    ///
+    /// <para><b>Trap 22: without it the map window has no picture, and everything the map
+    /// DRAWS is switched off.</b> <c>MapView</c> gates its circles, its camp pins, its target
+    /// rings and its marker on a loaded map, so a test asserting any of them against a harness
+    /// with no maps folder would be asserting zero against zero and passing on a build that
+    /// draws nothing. <c>WorldOpenersTests</c> says so in as many words — <c>mapZones</c> is
+    /// "legitimately 0 with no maps folder configured" — which is the right bar for "the window
+    /// opened" and the wrong one for "the layer drew".</para>
+    ///
+    /// <para>The stem is the map PACK's shortname, not the display name
+    /// (<c>ZoneMapFiles.ExpectedShortname</c>): "befallen", "commons", "crushbone". Seeded into
+    /// the game folder rather than through <c>MapFolder</c> so the precedence under test is the
+    /// one a player who has never opened "Maps folder…" actually has. Call before
+    /// <see cref="Launch"/>.</para>
+    /// </summary>
+    public void SeedZoneMap(string stem, params string[] lines)
+    {
+        var maps = Directory.CreateDirectory(
+            Path.Combine(Path.GetDirectoryName(Path.TrimEndingDirectorySeparator(LogsDir))!,
+                "maps")).FullName;
+        File.WriteAllLines(Path.Combine(maps, stem + ".txt"),
+            lines.Length > 0
+                ? lines
+                // A square big enough to hold any /loc a test plots, with one labelled POI so
+                // the file is a real two-shape map rather than a single line.
+                : (string[])
+                [
+                    "L -600.0, -600.0, 0.0, 600.0, -600.0, 0.0, 200, 200, 200",
+                    "L 600.0, -600.0, 0.0, 600.0, 600.0, 0.0, 200, 200, 200",
+                    "L 600.0, 600.0, 0.0, -600.0, 600.0, 0.0, 200, 200, 200",
+                    "L -600.0, 600.0, 0.0, -600.0, -600.0, 0.0, 200, 200, 200",
+                    "P 0.0, 0.0, 0.0, 240, 200, 60, 3, Zone_In",
+                ]);
+    }
+
+    /// <summary>
     /// Seeds running spawn countdowns, which live in <c>spawn-timers.json</c> rather than in
     /// settings.json — so a scenario that wants chips on the HUD row cannot get there through
     /// <c>configureSettings</c>. Trap 22: with no timers the spawn family contributes nothing

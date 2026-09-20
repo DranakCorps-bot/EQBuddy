@@ -41,6 +41,16 @@ public sealed record CompanionSources
     /// same question the same way.</summary>
     public Func<SpawnTimerState, (double Y, double X, bool FromWiki)?>? CampFor { get; init; }
 
+    /// <summary>
+    /// What this character is going after, joined to places (DRA-216 D5, S13).
+    ///
+    /// <para>A function rather than a value because the goals change while the host runs, and
+    /// the WIDGET builds it: the desktop map and this surface read one object per pass, so the
+    /// two cannot ring different dots from two reads of the same store moments apart
+    /// (trap 33). Null is a host that does not answer, which is no target block at all.</para>
+    /// </summary>
+    public Func<GearTargetSet>? GearTargets { get; init; }
+
     /// <summary>The quest surface's per-tick bundle: catalog + this character's
     /// ledger slice. Asked only while the surface is offered and a device is paired.</summary>
     public Func<CompanionQuestRequest>? Quests { get; init; }
@@ -433,6 +443,7 @@ public sealed class CompanionHost : IDisposable
                     Trail = stats?.LocationTrail,
                     CampFor = _sources.CampFor,
                     Markers = stats?.Markers,
+                    Targets = _sources.GearTargets?.Invoke(),
                 }, now)
                 : null,
             ZoneGraph = On(CompanionSurfaces.Travel) ? _sources.ZoneGraph : null,

@@ -30,4 +30,18 @@ public interface IZoneHost
     void EnsureMobLookup(string name);
     void PlayAlertSound(string choiceOrPath, bool coalesce = false);
     void DropCampMarker();
+
+    /// <summary>
+    /// What this character is going after, already joined to places (DRA-216 D5, S13).
+    ///
+    /// <para><b>The host answers it, rather than the view asking the store</b>, for the reason
+    /// every other member here is a host read: the desktop map and the phone's map must be
+    /// looking at ONE answer, and two views calling <see cref="GearTargets.For"/> with their
+    /// own arguments is the shape where whichever ran last wins (trap 33). The host memoizes
+    /// it and hands the same object to both.</para>
+    ///
+    /// <para>An empty set is the ordinary state — nobody has tracked anything — and every
+    /// reader draws nothing at all on it.</para>
+    /// </summary>
+    GearTargetSet GearTargets { get; }
 }

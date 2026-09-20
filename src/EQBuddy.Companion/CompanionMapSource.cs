@@ -33,6 +33,19 @@ public sealed record CompanionMapRequest
     /// <summary>Camp resolution, owned by the desktop — see CompanionSources.CampFor.
     /// Null simply means no pins, which is what a host that can't answer should get.</summary>
     public Func<SpawnTimerState, (double Y, double X, bool FromWiki)?>? CampFor { get; init; }
+
+    /// <summary>
+    /// What this character is going after, already joined to places (DRA-216 D5, S13).
+    ///
+    /// <para><b>It arrives built rather than as a store to read</b>, for the reason every input
+    /// on this record does: the desktop map and the phone must not each ask
+    /// <see cref="GearTargets.For"/> with their own arguments, because whichever ran last would
+    /// win and the two surfaces would ring different dots (trap 33). The widget builds it once
+    /// per pass and hands the same object to both.</para>
+    ///
+    /// <para>Null is the ordinary state — nothing tracked — and it draws no block at all.</para>
+    /// </summary>
+    public GearTargetSet? Targets { get; init; }
 }
 
 /// <summary>
@@ -93,9 +106,14 @@ public sealed class CompanionMapSource
     {
         EnsureGeometry(request.MapZone);
 
+        // DRA-216 D5. Resolved ONCE per pass and handed to both halves: the rings on the
+        // circles and the sentences in the block are the same answer, and asking twice is how
+        // a dot ends up marked under a heading that does not mention it (trap 4).
+        var here = request.Targets is { } set ? set.Here(request.TimerZone) : [];
+
         var circles = request.Points is null || request.TimerZone.Length == 0
             ? []
-            : BuildCircles(request.Points, request.TimerZone, request.Timers, now);
+            : BuildCircles(request.Points, request.TimerZone, request.Timers, now, here);
 
         CompanionMapMarker? you = request.Location is { } loc
             ? Marker(loc, now)
@@ -111,7 +129,8 @@ public sealed class CompanionMapSource
             Circles: circles,
             Trail: BuildTrail(request.Trail, now),
             Named: BuildNamed(request.Timers, request.CampFor, now),
-            Markers: BuildMarkers(request.Markers, now));
+            Markers: BuildMarkers(request.Markers, now),
+            Targets: BuildTargets(request.Targets, here, request.TimerZone, circles));
     }
 
     /// <summary>Session camp markers, plotted where a /loc was known at drop time — a
@@ -296,8 +315,57 @@ public sealed class CompanionMapSource
             strokes, pois, truncated);
     }
 
+    /// <summary>
+    /// **THE TARGET BLOCK** (DRA-216 D5, S13) — the desktop map's side panel, ported as
+    /// sentences.
+    ///
+    /// <para>Nothing tracked draws NOTHING (null), which is the Helper block's rule and the
+    /// desktop map's: a heading over an empty list is a control that is not there. A set that
+    /// holds only REFUSALS still draws, because a goal EQBuddy cannot place is exactly the
+    /// thing a player would otherwise think it was quietly working on.</para>
+    ///
+    /// <para>The marked count is taken off the CIRCLES that were built, not off the ledger
+    /// again — "the archive holds a point for this creature" and "the phone drew a ring" are
+    /// two claims, and counting the second is the one that can catch the first failing
+    /// (trap 56).</para>
+    /// </summary>
+    private static CompanionMapTargets? BuildTargets(
+        GearTargetSet? set, IReadOnlyList<GearTargetZone> here, string zone,
+        IReadOnlyList<CompanionMapCircle> circles)
+    {
+        if (set is null || set.IsEmpty) return null;
+
+        var elsewhere = set.Zones
+            .Select(z => z.Item)
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .Select(item => GearTargetPresentation.Elsewhere(
+                item, GearTargets.Elsewhere(set, item, zone)))
+            .Where(line => line.Length > 0)
+            .ToList();
+
+        return new CompanionMapTargets(
+            Heading: GearTargetPresentation.Heading(zone),
+            Note: GearTargetPresentation.PointsNote,
+            Goals: [.. here.Select(GearTargetPresentation.GoalRow)],
+            // Only where the zone has a goal in it at all: "none of your 14 points is one of
+            // these" under a block whose goal list is empty would be counting an absence
+            // nobody asked about.
+            Points: here.Count == 0
+                ? ""
+                : GearTargetPresentation.PointsHere(circles.Count(c => c.Target), circles.Count),
+            ElsewhereHeading: elsewhere.Count == 0
+                ? ""
+                : GearTargetPresentation.ElsewhereHeading,
+            Elsewhere: elsewhere,
+            Unreadable: GearTargetPresentation.Unreadable(
+                [.. set.Refused.Where(r => r.Why == GearTargetGap.Unreadable).Select(r => r.Item)]),
+            NoDropZone: GearTargetPresentation.NoDropZone(
+                [.. set.Refused.Where(r => r.Why == GearTargetGap.NoDropZone).Select(r => r.Item)]));
+    }
+
     private List<CompanionMapCircle> BuildCircles(
-        SpawnPointLedger points, string zone, IReadOnlyList<SpawnTimerState> timers, DateTime now)
+        SpawnPointLedger points, string zone, IReadOnlyList<SpawnTimerState> timers, DateTime now,
+        IReadOnlyList<GearTargetZone> here)
     {
         // Change detection by the ledger's revision counter, not a deep clone per
         // tick — the same trick the desktop map uses.
@@ -318,6 +386,9 @@ public sealed class CompanionMapSource
                 : points.ProjectedRespawn(zone, p);
             var secs = due is { } d ? (d - now).TotalSeconds : (double?)null;
             var (x, y) = ZoneMap.FromLoc(p.LocY, p.LocX);
+            // DRA-216 D5: is this dot one of MINE? The same question the desktop asks, from the
+            // same producer over the same point — the only thing this slice adds to a circle.
+            var hits = GearTargets.AtPoint(here, p.Mobs.Keys);
             circles.Add(new CompanionMapCircle(
                 x, y,
                 Named: named is not null,
@@ -331,7 +402,9 @@ public sealed class CompanionMapSource
                     .OrderByDescending(kv => kv.Value.Kills)
                     .Take(4)
                     .Select(kv => $"{kv.Key} ×{kv.Value.Kills}")),
-                LocY: p.LocY, LocX: p.LocX));
+                LocY: p.LocY, LocX: p.LocX,
+                Target: hits.Count > 0,
+                TargetText: GearTargetPresentation.CircleTip(hits)));
         }
         return circles;
     }
