@@ -85,6 +85,14 @@ public static partial class CompanionProjection
             // DRA-84 D4, same rule one slice on: a drop offer the PC withheld for having no
             // creature to name is withheld on the phone too, and says so in the same words.
             GearWhoWithheld: HelperPresentation.DropOffersWithheld(answers.GearWhoWithheld),
+            // DRA-219, the same discipline on the other acquisition path. The quest-source rule
+            // removes rows the PC's list does not have either, and the two sweep counts are
+            // about items that never reached a bucket — a phone that carried the who caption and
+            // not these would leave a player reading a shorter list with three sentences' worth
+            // of explanation missing.
+            GearQuestWithheld: HelperPresentation.QuestOffersWithheld(answers.GearQuestWithheld),
+            GearNoSource: HelperPresentation.SourcelessUpgrades(answers.GearNoSource),
+            GearQuestOnly: HelperPresentation.QuestOnlyUpgrades(answers.GearQuestOnly),
             // DRA-222 D6, the same discipline one rule on. This one removes a SWAP rather than
             // a place, so its sentence is the only one on the record about the player's hands —
             // a phone drawing the four captions above and not this one would show a shorter
@@ -341,9 +349,16 @@ public static partial class CompanionProjection
         // stands still.
         // DRA-180 D2: the era captions fold too. They quote the WORLD's era, which is a
         // curated value a build can change without moving a single count beside it (trap 72).
+        // DRA-219: the quest path's three captions fold too. Each carries a COUNT that can move
+        // while every other field here stands still — flipping the include-quests toggle turns
+        // one of them off and another on with the same rows on screen (trap 72).
+        // DRA-222 D6: and the off-hand caption, for exactly that reason — its count moves when
+        // the player's own SECONDARY changes, which alters no other field on this record. A
+        // fingerprint that cannot see it is a phone still drawing the pre-dump weapon list.
         h.MoneyNote, h.GearBaseNote, h.Cap, h.GearWithheld, h.GearBandRefused,
         h.GearEraRefused, h.MaterialEraRefused,
-        h.GearWhoWithheld, h.GearOffHandRefused, h.UnreadWorn,
+        h.GearWhoWithheld, h.GearQuestWithheld, h.GearNoSource, h.GearQuestOnly,
+        h.GearOffHandRefused, h.UnreadWorn,
         // DRA-180 D3: the per-anchor sentences fold as LINES, never as a count. They NAME the
         // worn item and carry its three cause numbers, so swapping one picked anchor for another
         // — or a ding moving which of its candidates the band gate takes — rewrites them while

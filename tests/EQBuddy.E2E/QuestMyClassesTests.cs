@@ -1,3 +1,4 @@
+using System.Globalization;
 using EQBuddy.Core;
 using Xunit;
 
@@ -26,6 +27,16 @@ namespace EQBuddy.E2E;
 /// class on its own, so every launched character has an identity. It is covered at the unit
 /// level by <c>NothingResolvedMeansNoQuickSelectRatherThanAnEmptyOne</c>, and the dump carries
 /// <c>questsMyClassesBtn</c> so the day a class-silent fixture exists the arm is one row.</para>
+///
+/// <para><b>The other absent arm is a CHANGING identity</b> — the other half of the rebuild
+/// guard below. Nothing in this suite can move <c>CharacterClasses.Resolve</c> after
+/// <c>Launch</c>: the achievements dump is read at start-up and the harness's own doc says to
+/// write it BEFORE launching. So "a changed identity still replaces the control, and losing
+/// one removes it" is proved at the unit level over the shared decision
+/// (<c>QuestClassLensTests.GainingAnIdentityBuildsTheQuickSelectAndLosingOneRemovesIt</c> and
+/// its two siblings), with a source guard pinning the call site to that one decision. What
+/// this suite owns is the half no unit test in this project can reach — that the control on
+/// SCREEN survived the tick.</para>
 /// </summary>
 public class QuestMyClassesTests
 {
@@ -170,5 +181,90 @@ public class QuestMyClassesTests
         // a disagreement that exists rather than about two lists that happen to match.
         Assert.Equal(Strip("Bard", "Druid"), facts[0]);
         Assert.Equal(Mine("Cleric", "Paladin", "Warrior"), facts[1]);
+    }
+
+    /// <summary>
+    /// **The button the player is reaching for is still the SAME button a moment later**
+    /// (DRA-216 D1, the churn fix; trap 46).
+    ///
+    /// <para><b>The defect.</b> <c>RefreshMyClassesAction</c> is called from the render ABOVE
+    /// the render's own signature gate, and both hosts of this surface repaint on a timer — the
+    /// shell's Guide room every tick through <c>PaintNow</c>, the v1 window on its own
+    /// two-second follow throttle. <c>EqMultiPicker.SetActions</c> clears the strip and news up
+    /// a fresh <c>Button</c> unconditionally, so the control was destroyed and replaced about
+    /// once a second on an identity that had not moved.</para>
+    ///
+    /// <para><b>Two user-visible costs.</b> The hover that names the classes the action will
+    /// tick hangs off that <c>Button</c> instance, so it was torn down before it could be read —
+    /// the whole honesty argument for a control that REPLACES a selection. And WPF raises
+    /// <c>Click</c> only when the press and the release land on the same element, so a press
+    /// that straddled a tick did nothing at all: a silent no-op on a one-click control, and
+    /// silent no-ops are broken.</para>
+    ///
+    /// <para><b>Why nothing else here could see it.</b> <c>questsMyClassesBtn</c> reads 1
+    /// either way — a strip rebuilt every tick holds exactly one button at every moment anybody
+    /// looks — and <c>PressMyClasses</c> drives the click body directly, which is right for what
+    /// the three rows above assert and structurally cannot touch the <c>Button</c> that gets
+    /// destroyed. The control lives inside a <c>Popup</c>, its own top-level HWND that
+    /// <c>PrintWindow</c> does not render (trap 79), so no screenshot can see it either.
+    /// <c>questsMyClassesBuilds</c> is the fact that can.</para>
+    ///
+    /// <para><b>The tick is asserted, not assumed</b> (trap 62). "The count did not move" is an
+    /// "and nothing happened" claim and needs the moment it is true AT: without the tick anchor
+    /// it would pass just as well on an app that had stopped repainting this surface entirely,
+    /// which is a different bug wearing the same green.</para>
+    /// </summary>
+    [Fact]
+    public void TheQuickSelectIsBuiltOnceAndSurvivesEveryTickAfterThat()
+    {
+        using var app = ProbeWindow();
+        app.SeedQuestLedger(classes: [], unlockedClasses: ["Warrior", "Paladin", "Cleric"]);
+        app.Launch();
+
+        WaitForTheWindow(app);
+        // On the CONTROL rather than on the window, so "built once" below is read after the
+        // build rather than racing it.
+        Wait.Until(() => app.DumpValue("questsMyClassesBtn") == 1, TimeSpan.FromSeconds(30),
+            "the My Classes quick-select to reach the popup", app.Artifacts);
+
+        // ONE dump, three facts (trap 56): what the control is, how many times it has been
+        // built, and the moment both of those are true at.
+        var before = app.DumpTexts("questsMyClassesBuilds", "questsMyClassesBtn", "tick");
+        Assert.Equal("1", before[0]);
+        Assert.Equal("1", before[1]);
+        var start = int.Parse(before[2], CultureInfo.InvariantCulture);
+
+        // EIGHT ticks. The v1 window's follow throttle is two seconds, so this is four of its
+        // own repaints — on the pre-fix build the count climbs with them and one would have
+        // been enough. Eight, so a runner that misses a tick fails on the assertion rather
+        // than on the size of the window it was given.
+        Wait.Until(() => app.DumpValue("tick") >= start + 8, TimeSpan.FromSeconds(60),
+            $"the app to tick eight times past {start}", app.Artifacts);
+
+        var after = app.DumpTexts("questsMyClassesBuilds", "questsMyClassesBtn", "tick",
+            "questsMyClasses");
+        // THE ASSERTION: not one rebuild in all of that. `questsMyClassesBtn` is beside it
+        // because "it was never rebuilt" and "it is still there" are two claims, and a guard
+        // that counted builds alone would pass on a surface that had lost the button entirely.
+        Assert.Equal("1", after[0]);
+        Assert.Equal("1", after[1]);
+        // The liveness half — the app really did tick under that steady count.
+        Assert.True(int.Parse(after[2], CultureInfo.InvariantCulture) >= start + 8,
+            $"the tick did not advance: {after[2]} against a start of {start}");
+        // And the control is still about this character, unchanged by having been left alone.
+        Assert.Equal(Mine("Cleric", "Paladin", "Warrior"), after[3]);
+
+        // Still LIVE, not merely present: the strip the player has been looking at all along
+        // still performs the action. A guard that stopped at the count would pass on an early
+        // return that had quietly stranded a dead control.
+        app.PressMyClasses();
+        Wait.Until(
+            () => app.DumpText("questsClassStrip") == Strip("Cleric", "Paladin", "Warrior"),
+            TimeSpan.FromSeconds(30),
+            "the class strip to follow the quick-select after eight quiet ticks",
+            app.Artifacts);
+        // And pressing it rebuilt nothing either: the action replaces the SELECTION, and the
+        // identity the strip is built from has not moved (S3.3).
+        Assert.Equal("1", app.DumpText("questsMyClassesBuilds"));
     }
 }

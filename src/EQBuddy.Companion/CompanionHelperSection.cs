@@ -134,6 +134,13 @@ public sealed record CompanionHelperSection(
     string GearEraRefused,
     string MaterialEraRefused,
     string GearWhoWithheld,
+    // DRA-219: the quest acquisition path's three captions. Apart from `GearWhoWithheld` above
+    // for the reason it is apart from `GearWithheld` — different rules, different remedies — and
+    // on the wire at all because a refusal the PC made and the phone did not mention is the two
+    // surfaces disagreeing about what the list contains.
+    string GearQuestWithheld,
+    string GearNoSource,
+    string GearQuestOnly,
     string GearOffHandRefused,
     string UnreadWorn,
     IReadOnlyList<CompanionHelperDoor> UnreadWornDoors,

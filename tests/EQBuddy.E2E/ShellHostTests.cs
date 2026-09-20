@@ -2877,6 +2877,130 @@ public class ShellHostTests
     }
 
     /// <summary>
+    /// **THE QUEST ACQUISITION PATH, IN THE LAUNCHED APP** (DRA-219, requirements S10/S11;
+    /// acceptance S25 AC 1–6).
+    ///
+    /// <para>A warrior in an AC-4 <c>Cape of Underfoot</c> with the include-quests toggle ON.
+    /// Before this slice that toggle bought a row headed with a quest's title and nothing else in
+    /// it to act on: S11.2's *"never force the player to reverse-engineer the source"*, failing
+    /// silently.</para>
+    ///
+    /// <para><b>A DIFFERENT ANCHOR FROM THE ROW ABOVE, and choosing it was the prediction doing
+    /// its job</b> (trap 23). The first draft of this row reused D4's <c>Cloth Gloves</c>,
+    /// predicted from a sweep with NO class — and in the launched app, which knows the character
+    /// is a warrior, the class-lock filter removes every quest-sourced glove before the
+    /// per-anchor cap is reached, so the screen has no quest row on it at all. The fixture moved,
+    /// not the number. Re-predicted with <c>MyClasses = ["WAR"]</c>, which reproduces the app's
+    /// counts exactly on the row above.</para>
+    ///
+    /// <para><b>Prediction, computed against the shipped catalogs before the run.</b> Three rows:
+    /// Temple of Veeshan, then <c>Aid the Dar Brood</c> (Harla Dar, Western Wastes, from level 60,
+    /// 1 turn-in item — Frakadar's Talisman) and <c>Deck of Spontaneous Generation Quest</c>
+    /// (Ferjeneror, Plane of Mischief, from level 46). <b>Two quest rows, both naming a giver and
+    /// a zone</b> — <c>helperQuestSource</c> — which is the pair that separates "a quest row
+    /// exists" from "a quest row is a direction". The second of them carries NO component clause,
+    /// because its page lists none: the trap-73 half of the feature, on screen.</para>
+    ///
+    /// <para><b>And the two refusals are different numbers with different causes, which is why
+    /// they are separate keys.</b> <c>helperQuestWithheld</c> is <b>5</b>: five (item, quest)
+    /// offers name quests the shipped quest list does not hold, so they could be given a title
+    /// and nothing else. <c>helperNoSource</c> is <b>6</b>: catalog cloaks that beat this anchor
+    /// and whose pages name no zone and no quest at all, dropped in silence until now.</para>
+    ///
+    /// <para><b>Each engine count is asserted beside whether the ROOM said it</b> (trap 56, and
+    /// trap 50's rule that a surviving cap says so): a rule that removed five offers in silence
+    /// satisfies the first assertion alone.</para>
+    /// </summary>
+    [Fact]
+    public void QuestSourcedUpgradesAnswerTheSixQuestionsAndTheirRefusalsAreCountedApart()
+    {
+        var key = $"{AppHarness.Character}_{AppHarness.Server}".ToLowerInvariant();
+        using var app = new AppHarness(
+            configureSettings: s =>
+            {
+                s.HelperGoals[key] = [nameof(HelperGoal.FarmGear)];
+                s.HelperGearIntent[key] = nameof(GearIntent.ReplaceSlot);
+                s.HelperGearQuests[key] = true;
+            },
+            environment: OpenOn("helper"));
+        app.WriteInventoryDump(("Back", "Cape of Underfoot", 1));
+        app.Launch();
+
+        app.WaitForDump("shellPage", "helper", "the shell to land on the Helper room");
+        app.WaitForDump("helperWorn", "1", "the inventory dump to become one anchor");
+        app.WaitForDump("helperQuestRows", "2",
+            "the include-quests toggle to put two quest rows on the screen");
+
+        // Both quest rows answer WHO and WHERE from the shipped quest list. A row that could
+        // only print its title is exactly what the rule below withholds.
+        Assert.Equal(3, app.DumpValue("helperRecs"));
+        Assert.Equal(2, app.DumpValue("helperQuestSource"));
+
+        // The quest-source rule: the ENGINE's count beside the ROOM's sentence.
+        Assert.Equal(5, app.DumpValue("helperQuestWithheld"));
+        Assert.Equal(1, app.DumpValue("helperQuestLine"));
+
+        // The sweep's sourceless count, same pair.
+        Assert.Equal(6, app.DumpValue("helperNoSource"));
+        Assert.Equal(1, app.DumpValue("helperNoSourceLine"));
+
+        // With quests ON nothing is hidden BY the toggle, so that caption stays off the screen —
+        // a sentence about a rule that did not run is furniture.
+        Assert.Equal(0, app.DumpValue("helperQuestOnly"));
+        Assert.Equal(0, app.DumpValue("helperQuestOnlyLine"));
+
+        // **THE REGRESSION HALF** (S27). The drop path is untouched — a zone row survives with
+        // its creature clause, every door opens something, and the who rule is silent here
+        // because every page this anchor reaches names somebody.
+        Assert.Equal(0, app.DumpValue("helperWhoWithheld"));
+        Assert.Equal(0, app.DumpValue("helperDeadDoors"));
+    }
+
+    /// <summary>
+    /// **AND WITH THE TOGGLE OFF, THE ROOM SAYS WHAT THE TOGGLE IS HIDING** (DRA-219, S10.1 —
+    /// *"do not restrict recommendations to direct creature drops"*).
+    ///
+    /// <para>This is the DEFAULT state of the room, which is what makes it worth its own row:
+    /// <c>HelperGearQuests</c> is absent unless a player turns it on, so every character starts
+    /// here. <b>Predicted at 5</b> — five catalog cloaks beat this anchor and come only from a
+    /// quest, and until this slice the toggle removed all five with nothing on screen saying a
+    /// control had done it.</para>
+    ///
+    /// <para>The pair with the row above is the point: same anchor, same catalog, ONE setting,
+    /// and the two quest counts trade places — <c>helperQuestWithheld</c> 5 → 0 because no quest
+    /// offer reaches a bucket at all, and <c>helperQuestOnly</c> 0 → 5. <b>The sourceless count
+    /// does not move</b>, which is the evidence that it is a different fact rather than the same
+    /// one counted twice.</para>
+    /// </summary>
+    [Fact]
+    public void WithQuestsOffTheRoomCountsTheUpgradesTheToggleIsHiding()
+    {
+        var key = $"{AppHarness.Character}_{AppHarness.Server}".ToLowerInvariant();
+        using var app = new AppHarness(
+            configureSettings: s =>
+            {
+                s.HelperGoals[key] = [nameof(HelperGoal.FarmGear)];
+                s.HelperGearIntent[key] = nameof(GearIntent.ReplaceSlot);
+            },
+            environment: OpenOn("helper"));
+        app.WriteInventoryDump(("Back", "Cape of Underfoot", 1));
+        app.Launch();
+
+        app.WaitForDump("shellPage", "helper", "the shell to land on the Helper room");
+        app.WaitForDump("helperQuestOnly", "5",
+            "the sweep to count the quest-only upgrades the toggle is hiding");
+
+        Assert.Equal(1, app.DumpValue("helperQuestOnlyLine"));
+        // No quest offer reached a bucket, so the rule that prunes them has nothing to say.
+        Assert.Equal(0, app.DumpValue("helperQuestRows"));
+        Assert.Equal(0, app.DumpValue("helperQuestWithheld"));
+        Assert.Equal(0, app.DumpValue("helperQuestLine"));
+        // …and the sourceless count is the SAME 6 as with the toggle on, because it is not about
+        // the toggle. Two numbers that move independently is why they are two numbers.
+        Assert.Equal(6, app.DumpValue("helperNoSource"));
+    }
+
+    /// <summary>
     /// **"FARM TO SELL" ANSWERS, AND IT ANSWERS A DIFFERENT QUESTION FROM THE OTHER TWO**
     /// (DRA-71 D7, plan P9; the Founder's smoke item 4c).
     ///

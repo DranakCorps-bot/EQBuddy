@@ -256,6 +256,124 @@ public class QuestClassLensTests
         Assert.Equal("", ClassFilterLabel.MyClassesTip([], ClassSource.Achievements));
     }
 
+    // ---- WHEN the quick-select may be rebuilt (DRA-216 D1, the churn fix) ---------------
+    //
+    // The host refreshes this control from its render, above the render's own signature gate,
+    // and both hosts repaint on a timer — the shell's room every tick through PaintNow, the v1
+    // window off the dump's PaintOneMoment. SetActions clears and news up a fresh Button
+    // unconditionally, so the player's control was destroyed and replaced about once a second
+    // on an identity that had not moved: the hover naming what the click is about to tick was
+    // torn down before it could be read, and WPF raises Click only when the press and the
+    // release land on the same element, so a click that straddled a tick did nothing (trap 46).
+    //
+    // These rows are the DECISION. That it reached the screen is QuestMyClassesTests'
+    // `questsMyClassesBuilds`, because no unit test in this project can hold a WPF Button.
+
+    /// <summary>
+    /// **A character whose identity has not moved keeps the button they were hovering.**
+    ///
+    /// <para>The steady state, and by a long way the common one: the answer is recomputed on
+    /// every render because identity is already in hand there, and on all but a handful of those
+    /// renders it is the same list with the same words. Saying so is what lets the host skip the
+    /// rebuild.</para>
+    ///
+    /// <para>The lists are deliberately DIFFERENT OBJECTS holding equal contents —
+    /// <c>MyClasses</c> allocates a fresh one every call, so a guard that compared references
+    /// would answer "moved" every time and change nothing at all.</para>
+    /// </summary>
+    [Fact]
+    public void AnIdentityThatHasNotMovedDoesNotRebuildTheQuickSelect()
+    {
+        var shown = QuestClassLens.MyClasses(
+            ["Warrior", "Cleric"], QuestClassFilter.Classes);
+        var next = QuestClassLens.MyClasses(
+            ["Cleric", "Warrior"], QuestClassFilter.Classes);
+        // The premise: two calls, two allocations, one answer.
+        Assert.NotSame(shown, next);
+        Assert.Equal(shown, next);
+
+        var tip = ClassFilterLabel.MyClassesTip(shown, ClassSource.Achievements);
+
+        Assert.False(QuestClassLens.MyClassesActionMoved(
+            shown, tip, next, ClassFilterLabel.MyClassesTip(next, ClassSource.Achievements)));
+    }
+
+    /// <summary>
+    /// **The SOURCE moving under a steady class list still rebuilds** — the arm a guard
+    /// comparing only the classes would miss.
+    ///
+    /// <para>It is a real transition, not a hypothetical: the character's achievements dump
+    /// arriving where <c>ClassInference</c> had been reading the log names the same classes and
+    /// changes where they came from, which is exactly the judgement the hover exists to hand the
+    /// player. Leaving the old parenthetical up would be the control lying about its own
+    /// evidence for the rest of the session.</para>
+    /// </summary>
+    [Fact]
+    public void TheSourceMovingUnderASteadyClassListStillRebuildsTheQuickSelect()
+    {
+        string[] mine = ["Cleric", "Warrior"];
+        var fromLog = ClassFilterLabel.MyClassesTip(mine, ClassSource.Inferred);
+        var fromDump = ClassFilterLabel.MyClassesTip(mine, ClassSource.Achievements);
+        // The premise: one class list, two different sentences.
+        Assert.NotEqual(fromLog, fromDump);
+
+        Assert.True(QuestClassLens.MyClassesActionMoved(mine, fromLog, mine, fromDump));
+    }
+
+    /// <summary>
+    /// **Something to nothing and back, both ways.**
+    ///
+    /// <para>Losing an identity has to take the BUTTON away with it — a quick-select that
+    /// selects classes the character no longer holds is worse than none, and <c>SetActions([])</c>
+    /// is the only thing that removes it. Gaining one has to build it. Both are a "moved", which
+    /// is why the empty case goes through the rebuild rather than returning early beside it.</para>
+    ///
+    /// <para>The pair that is NOT a move is the last row: a host's first pass over a character
+    /// with no identity at all, comparing its own empty start against an empty answer. Building
+    /// nothing and having built nothing are the same screen.</para>
+    /// </summary>
+    [Fact]
+    public void GainingAnIdentityBuildsTheQuickSelectAndLosingOneRemovesIt()
+    {
+        string[] mine = ["Cleric"];
+        var tip = ClassFilterLabel.MyClassesTip(mine, ClassSource.Achievements);
+
+        // Nothing -> something: build it.
+        Assert.True(QuestClassLens.MyClassesActionMoved([], "", mine, tip));
+        // Something -> nothing: remove it. The tip is "" on that side because MyClassesTip
+        // answers "" for an empty list — there is no button to hover.
+        Assert.True(QuestClassLens.MyClassesActionMoved(mine, tip, [], ""));
+        // ... and back again.
+        Assert.True(QuestClassLens.MyClassesActionMoved([], "", mine, tip));
+        // Nothing -> nothing: the character with no dump, no qualifying log evidence and no
+        // statement. Nothing to build, nothing to tear down.
+        Assert.False(QuestClassLens.MyClassesActionMoved([], "", [], ""));
+        // A null start is the same claim as an empty one — the host's field is never null, but
+        // a guard that threw here would take the surface down rather than fail a comparison.
+        Assert.False(QuestClassLens.MyClassesActionMoved(null, null, [], ""));
+        Assert.True(QuestClassLens.MyClassesActionMoved(null, null, mine, tip));
+    }
+
+    /// <summary>
+    /// **A SWAP is a move, even though the count is unmoved** (trap 72's shape, which this
+    /// surface has already been bitten by).
+    ///
+    /// <para>Two classes for two other classes leaves every count in the dump identical, so a
+    /// cheaper guard on <c>Count</c> alone would pin a button that ticks somebody else's
+    /// classes. The tip moves too here — both halves fire — and the classes are compared
+    /// element-wise so the tip is not load-bearing for it.</para>
+    /// </summary>
+    [Fact]
+    public void ASwapThatLeavesTheCountUnmovedStillRebuildsTheQuickSelect()
+    {
+        string[] shown = ["Cleric", "Warrior"];
+        string[] next = ["Druid", "Ranger"];
+        Assert.Equal(shown.Length, next.Length);
+
+        // Element-wise, proven by holding the WORDS still: only the classes have moved.
+        Assert.True(QuestClassLens.MyClassesActionMoved(shown, "same words", next, "same words"));
+    }
+
     /// <summary>
     /// **The quick-select writes no store of its own, and resolves no list of its own.**
     ///
@@ -272,6 +390,11 @@ public class QuestClassLensTests
         new[] { "SetClasses", "ClassSourceFor", "_settings.Save" })]
     [InlineData("private void RefreshMyClassesAction(", "QuestClassLens.MyClasses(",
         new[] { "ClassSourceFor", "ClassesFor", "SelectedClasses" })]
+    // And the rebuild is gated on the ONE decision above, not on a comparison typed here. A
+    // second copy of it is how this method would drift back into rebuilding the player's
+    // button on every tick without a single test going red (traps 4 and 46).
+    [InlineData("private void RefreshMyClassesAction(", "QuestClassLens.MyClassesActionMoved(",
+        new[] { "SequenceEqual", "_myClasses.Count == 0" })]
     public void TheQuickSelectAsksTheOneProducerAndCallsTheOneWriter(
         string signature, string must, string[] mustNot)
     {

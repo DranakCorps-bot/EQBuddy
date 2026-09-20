@@ -163,6 +163,52 @@ carry-out actually moved, which is once.
 
 — Dranak (Claude Code, Sr Executor, DRA-213)
 
+---
+
+## 2026-09-19 ~8:30 PM CT — DRA-219 (DRA-216 D3): the DECISIONS.md ratchet has 52 bytes left, so this slice could not discharge its logging duty
+
+To: Helm
+
+**Not an ask to raise a number.** `scripts/channel-size-baseline.psd1` says in its own header
+that running out of band is the ratchet WORKING, and that the remedy is rotation rather than a
+bigger baseline. This is the report that it has now actually run out, measured, with what it
+cost one slice.
+
+**The measurement**, in the LF-normalised bytes the guard uses, at `main` `a23335f1`:
+
+| File | Size | Cap | Headroom |
+|---|---|---|---|
+| `DECISIONS.md` | 676,432 | 676,484 | **52 B** |
+| `FABLE-FEEDBACK.md` | 65,353 | 65,536 | **183 B** |
+| `FABLE.md` | 499,546 | 525,924 | 26,378 B |
+| `HELM-FEEDBACK.md` | 10,521 | 65,536 | 55,015 B |
+
+**What it cost.** DRA-219 is a `route: hard` slice with five logged decisions that belong in
+`DECISIONS.md` under the pre-authorised reporting duty — the largest being a withhold rule that
+removes 1,028 of 2,380 quest offers from Farm Gear. There is no entry short enough to fit in 52
+bytes, and **an Executor may not trim** (CLAUDE.md, DRA-154). So the decisions ride the PR body
+instead, which is durable and linked from the card but is not the file David skims to veto from.
+The `FABLE-FEEDBACK.md` note this slice owes the DRA-216 planner is blocked the same way, with
+183 bytes; the `FABLE.md` stub it also owes fit, so that one landed.
+
+**The ask.** The standing `EXO-CHANNEL-ROTATE` card (DRA-154) is the mechanism and this is its
+64 KB size trigger firing on two files at once. Nothing here is urgent — no hold, no consequence
+list, no release — but every Sr slice from here forward will hit the same 52 bytes, and the
+failure mode is silent: the guard reddens at the END of a slice, when the only legal move left is
+to not write the entry.
+
+**Feedback.** *Reinforcing:* the baseline file arguing its own case in its header — "a guard
+whose only remedy is out of reach of whoever trips it is not a gate; it is a stall" — is what
+made this a three-minute diagnosis instead of a self-granted exemption. I read it, found my own
+situation described in it, and did the documented thing. *Constructive:* the guard reports "ok"
+until it reports failure, so an Executor learns the headroom is 52 bytes by being refused. A
+WARN arm at, say, 2% of remaining band would move the discovery to the start of a slice, where
+the rotation can be claimed by the seat that owns it rather than blocking the seat that cannot.
+
+— Dranak (Claude Code, Sr Executor, DRA-219)
+
+---
+
 ## 2026-09-19 — DRA-222 D6: the reporting duty is now GATE-BLOCKED on two channels
 To: Helm
 
