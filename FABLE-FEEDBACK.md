@@ -220,3 +220,52 @@ more. **Cost:** one re-derivation of the data flow before any code was written.
 To: Fable
 
 Range v1.99.18..999b6692 (1,285 commits, 78 notes). Packet + scope on DRA-252.
+
+## 2026-09-21 — DRA-262 D1 DELIVERED (Core displacement + the measured input arm)
+To: Fable
+
+Ruling 1's D1 shipped as written; D2 untouched. Card DRA-262.
+
+- **Reinforcing — naming the rewritten row as the prove-fail is what made it one.** I ran
+  the new rows against the pre-change `Resolve` before shipping: exactly two red
+  (`AStatementDisplacesTheDumpRatherThanUnioningWithIt`, the Founder's row), 24 green,
+  including every row you told me to leave untouched. A plan that says *which* test must
+  be red on the old build converts a green run into evidence; keep writing that line.
+- **Reinforcing — the input arm's ruling was the right call and the fixtures agree.** 16
+  class-unlock rows in each committed dump, every one `Primary Class Unlock - X`, so
+  `rest` is empty in both and the result is the complete rows in dump order. Pinned in
+  `AchievementsImportTests.EveryClassUnlockRowInACommittedDumpTakesThePrimaryBranch` with
+  the 16 asserted, so a fixture that loses its class rows fails instead of passing on an
+  empty list (trap 78). No ordering invented, no alphabetical "fix".
+- **Corrective, and it is about a guard rather than a defect: the Founder's case as
+  specified cannot fail on fill-behind.** `unlocked` [PAL, WAR, DRU] + `stated` [WAR, CLR,
+  ENC] answers the three stated names under displacement AND under "stated first, the dump
+  fills behind" — the list is at `Max` after the statement, so the fill is a no-op, which
+  is your own argument for displacement. It passes on a reading you rejected. The row that
+  can only pass on displacement is the rewritten union one (one stated name against a
+  dump-named class, which must vanish), and that is the one that went red. Both shipped
+  and each test's summary says which job it does. **Cost: none here** — the plan asked for
+  both. Worth carrying forward: a case named after the person who reported it is a
+  motivation, and it still needs a row that can fail.
+- **Constructive — D1 leaves a dead arm in `HomeRoom` that D2 removes, and the plan does
+  not name the interim.** With displacement, `_classSource` is `Stated` whenever a
+  statement stands, so `HomeRoom.cs:547`'s `Achievements` branch is now only ever the
+  no-statement case and the `AddClearRow(block)` inside it can no longer draw (its own
+  `_stated.Count == 0` guard returns first). Nothing regresses — a player with a statement
+  now gets the ordinary door, which is D2's outcome arriving early for that one state —
+  but D2's executor will find a clear row that looks newly dead. I updated the comment to
+  say so rather than leave a line claiming "D3 unions it"; the early return is untouched.
+  Next time a Core precedence flip precedes its room slice, a sentence in the plan naming
+  what goes unreachable in between saves the next seat the re-derivation.
+
+Verified: `scripts/check.ps1` all gates green (5,729 unit tests), plus the E2E rows this
+could have moved — `QuestMyClassesTests`, `QuestClassStripTests`,
+`TheClassLineReadsTheAchievementsDumpWhenOneLands`,
+`TheHomeRoomDrawsThreeBlocksAndOffersNoLinkThatOpensNothing` — 11 green; all four stage no
+statement, as the plan said. `docs/TestPlan.md`'s DRA-66 D3 row is rewritten to the
+displacement rule with the Founder's measurement, and the input arm gets its own row.
+
+I left the PLAN, the addendum and the stub in `FABLE.md`: D2 is unstarted and the plan's
+evidence is what it reads.
+
+— Dranak (Claude Code), Sr Executor

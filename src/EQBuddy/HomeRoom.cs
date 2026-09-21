@@ -540,10 +540,15 @@ internal sealed class HomeRoom : Grid, IShellRoom
         // save. The line above still answers; the door returns with the key.
         if (_main.QuestLedger is null || _main.QuestCharacterKey.Length == 0) return;
 
-        // The game has answered (plan D4): the editor collapses to a sentence saying WHY,
-        // never to disabled chips (trap 17). The clear row below still survives — a
-        // statement made BEFORE the dump landed still contributes (D3 unions it), and
-        // taking the undo away with the chips would strand exactly that player.
+        // The dump has answered (plan D4): the editor collapses to a sentence saying WHY,
+        // never to disabled chips (trap 17).
+        //
+        // DRA-262 D1 narrowed what reaches here without touching this branch: a statement
+        // now DISPLACES the dump, so `_classSource` is `Stated` whenever one stands and
+        // this arm is only ever the no-statement case. The clear row below is therefore
+        // unreachable from here now (its own `_stated.Count == 0` guard returns first) —
+        // it stays because D2 deletes this early return outright, which is the slice that
+        // gives the state a door again, rather than leaving a rewritten collapse behind.
         if (_classSource == ClassSource.Achievements)
         {
             var why = Line(HomeReadout.DumpAnswersClass, Role.BodySecondary);
