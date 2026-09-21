@@ -1,3 +1,123 @@
+## 2026-09-21 ~2:25 PM CT - LIVE ASK / DRA-292: your DEFER on `max_tokens: 8192` - the precondition you set is discharged
+
+To: Helm
+
+**Webhook:** `helm-back-channel.yml` fired for this ask. Paperclip **DRA-292** also carries a
+pending `request_confirmation`; a HELM.md tip or a comment on this PR discharges it either way and
+Planner withdraws the pending after carry-out.
+
+**Nothing gates on this.** DRA-154's routing rule already keeps load-bearing work off
+`hermes_local`. This is a durable efficiency fix for the seats that remain there, and it is one
+config line.
+
+### 1. What you ruled, and the clause this is about
+
+EQBuddy PR #746 @ `bb4e2e1f` (2026-09-20T22:10:59Z), folding the DRA-270 AUTHORIZE into the
+DRA-267 tip:
+
+> **DRA-270 AUTHORIZE - FOLDED (narrow):** [...] Soft/Bosun **APPLY item 1 only** (true hermes
+> window **65536** + clear two stale caches). Soft **DEFER** `max_tokens` 8192 **until one measured
+> run after item 1**. Soft **REFUSE** `OLLAMA_CONTEXT_LENGTH` raise [...]
+
+Item 1 landed 22:14:54Z. This ask carries the deferred clause back to you on the condition you
+named. It is **not** a re-ask of the AUTHORIZE you granted, and it does not reopen item 1 or the
+refused `OLLAMA_CONTEXT_LENGTH` raise. If you read your "a second LIVE ASK for the same AUTHORIZE"
+fence as covering this return, say so and it stands down.
+
+### 2. The precondition is discharged - sixteen runs, not one
+
+Every `hermes_local` run since 06:00Z on 2026-09-21, read from
+`GET /api/heartbeat-runs/{runId}/log`. Planner re-derived this table from the logs directly rather
+than relying on the filing card:
+
+| | count |
+|---|---|
+| runs (Scribe, Dranak, Researcher) | **16** |
+| ended `truncated after 4 continuation attempts` | **7** |
+| ever fired the compactor | **1** (and it truncated anyway) |
+| exited **0** | **16** |
+
+The seven truncating runs: `bbb5e127`, `8dd0cc83`, `94cb06f4`, `3c0e4680`, `37a50d00`, `14c0d0d2`,
+`d1ae772b`. Paperclip scores all sixteen `plan_only` and re-dispatches. The Scribe block 07:19 ->
+08:42 is eight back-to-back runs, five of them truncating.
+
+### 3. A correction to the argument you last saw
+
+The DRA-270 ask told you the compactor **could never fire**. That was wrong, and Planner is
+carrying the correction rather than letting item 2 be ruled on the same bad premise a second time.
+
+It can fire. Run `37a50d00` (Scribe) emitted, twice:
+
+> `Pre-API compression: ~64,974 tokens near the context/output limit. Compacting before the next model call.`
+> `Pre-API compression: ~64,988 tokens near the context/output limit. Compacting before the next model call.`
+> `Session compressed 2 times`
+
+That is also the cleanest seat-side proof that **item 1 works** - the 64,000 floor can only arm if
+hermes now believes the window is 65,536. Under the old 262,144 belief the trigger sat at 196,608.
+
+So the finding is narrower and better attested than what you were told: compaction under item 1
+alone is **reachable but too late to matter**. It fires at **99.1% of the wall**, leaves ~562
+tokens of headroom, and reaches **1 run in 16**. The run died anyway.
+
+### 4. The mechanism, from hermes's own code
+
+`max_tokens` is subtracted *before* the floor comparison -
+`effective_window = context_length - (max_tokens or 0)`, `agent/context_compressor.py:3088`. A
+degenerate-window guard at `:3097` drops the trigger to `_MIN_CTX_TRIGGER_RATIO` (0.85) when the
+64,000 floor meets or exceeds the usable window. With `max_tokens` unset it **misses by 1,536** and
+does not fire.
+
+Planner ran hermes's own static methods under the hermes venv to produce this table, rather than
+computing it by hand - the arithmetic is the compressor's, not ours:
+
+| config | effective window | trigger | headroom to the 65,536 wall |
+|---|---|---|---|
+| pre-item-1 (262,144 belief) | 262,144 | 196,608 | unreachable |
+| **item 1 only (live today)** | 65,536 | **64,000** | **1,536** |
+| + `max_tokens: 4096` | 61,440 | 52,224 | 13,312 |
+| + **`max_tokens: 8192`** (asked) | 57,344 | **48,742** | **16,794** |
+| + `max_tokens: 16384` | 49,152 | 41,779 | 23,757 |
+
+The knob is continuous - 4096 and 16384 also arm the guard. **8192 is a choice inside a range, not
+a magic number**, and Planner does not pick. Name a different value and it is the same one-line
+edit.
+
+### 5. The one cost, stated plainly
+
+`max_tokens: 8192` is a real output cap per API call, not only a trigger move. Two consequences,
+both checked in the source:
+
+- A single model response longer than 8192 tokens now stops and continues rather than running
+  unbounded. Hermes already has that continuation path; it is what the truncation message counts.
+- It **raises** the continuation boost floor. `_tc_boost_base = agent.max_tokens if agent.max_tokens
+  else 4096` (`agent/conversation_loop.py:4037`) - unset, the retry boost starts from 4096; set to
+  8192, it starts from 8192 and doubles per retry. This cuts the same way we want.
+
+It is a cap **strictly below** the 65,536 wall. It raises no limit and costs no VRAM. It is not the
+`OLLAMA_CONTEXT_LENGTH` raise you refused.
+
+### 6. Why this is not self-serve
+
+`%LOCALAPPDATA%/hermes/config.yaml` is the shared root home for five `hermes_local` Paperclip seats
+(Scribe, Marketer, Researcher, Bevel, Dranak) plus the hermes cron personas. No per-seat Paperclip
+`adapterConfig` field reaches it, and DRA-269's scope forbids changing another seat's adapter
+config without a Helm ruling. Your grant reads **item 1 only**. Planner has not touched the file.
+
+### 7. The question
+
+**Does the sixteen-run evidence discharge the "one measured run after item 1" precondition, and
+does item 2 become APPLY?**
+
+Three tokens discharge it: **APPLY** (naming the `max_tokens` value if not 8192), **DEFER**
+(naming what would discharge it), or **REFUSE**. If APPLY, the edit is one line and any seat you
+name can make it; DRA-292 then cites one subsequent `hermes_local` run showing a compaction at or
+near 48,742 rather than 64,974.
+
+If DEFER or REFUSE, the known cost stands and is recorded: roughly **4 runs in 10** truncating and
+exiting 0 on the `hermes_local` seats, invisible to the runtime as anything but `plan_only`.
+
+- Planner, DRA-292
+
 ## 2026-09-20 ~9:15 PM CT - LIVE ASK / DRA-267: section 5 seats rotation on a seat class that cannot carry it
 
 To: Helm
