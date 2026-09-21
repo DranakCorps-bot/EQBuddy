@@ -9,13 +9,25 @@
     channel files - seeds it with fixture ledgers and a fixture baseline table, and then
     does each forbidden thing on purpose.
 
-    Twenty cases, and eleven of them are "must PASS". That ratio is not padding. A size
+    Twenty-five cases, and fifteen of them are "must PASS". That ratio is not padding. A size
     ratchet's whole risk is the false positive: it sits in front of files that 40% of this
     repo's commits touch, and the single most likely way for it to be wrong is to refuse an
     append that policy allows. So the passes carry the same weight as the refusals, and each
     one corresponds to a real shape this repo produces - an ordinary append under the limit,
     a rotation, a partly-finished rotation, a 2 MB archive write, a pull request that never
     touched the file at all.
+
+    CASES 20-24 ARE THE WARN BAND (DRA-284, carrying Helm's DRA-282 Q1 ruling). They exist
+    because a warning nobody has watched FIRE is trap 34 in its purest form: the WARN
+    changes no exit code, so every other case in this file would stay green if the band
+    silently stopped matching anything, and the guard would go on printing "ok" while the
+    trigger `CLAUDE.md` line 104 promises - "a headroom WARN is the trigger to rotate" - did
+    nothing. Case 23 is the one that earns its keep: it builds a real append history so the
+    `3 x median append` term is live, and asserts a WARN at 10,536 B of headroom, which is
+    eight times the 2% floor. A guard that shipped only the percentage arm passes cases 20-22
+    and fails 23 - and shipping only the percentage arm is precisely what DRA-284's done bar
+    warns against, because 2% of 65,536 is 1,311 B and no Helm-class ledger is ever that
+    close to its cap for more than one append.
 
     THE ONE THAT MATTERS MOST IS CASE 7: a pull request that does not touch HELM.md, on a
     tree where HELM.md is already 14x over the limit. On a `pull_request` run the checkout
@@ -75,6 +87,19 @@ function Get-LedgerText([int] $bytes, [string] $tag) {
         [void]$sb.AppendLine("- **Corrective:** entry $i names the evidence it rests on ($tag/$i).")
     }
     $sb.ToString()
+}
+
+# Get-LedgerText sizes a ledger APPROXIMATELY - it appends whole entries until it is big
+# enough, and one of them carries an em-dash that is three bytes and one char. The WARN
+# cases assert a headroom NUMBER, and "about 64 KB" is not a number, so they need a file
+# whose LF-normalised UTF-8 size is exactly what was asked for. All ASCII, so bytes and
+# chars agree, and it never ends in a newline - Measure-Bytes trims those, and a fixture
+# that is one byte off the size it claims is a fixture arguing with the guard.
+function Get-SizedText([int] $bytes, [string] $tag) {
+    $head = "# $tag`n"
+    $lines = [int][Math]::Floor(($bytes - $head.Length - 1) / 80)
+    $body = (('x' * 79) + "`n") * $lines
+    return $head + $body + ('y' * ($bytes - $head.Length - $body.Length))
 }
 
 function Get-BaselineText([hashtable] $rows) {
@@ -323,6 +348,56 @@ try {
             'HANDOFF.md'        = 248286
         })
     Assert-Result 'TABLE - a row for an unrostered path REFUSES' $true 'not in this guard''s roster' $B
+
+    # -- the WARN band (DRA-284, carrying Helm's DRA-282 Q1 ruling) ----------------------
+    # Every case here must stay GREEN except the last. The band is a claim signal for the
+    # rotate seat, not a third arm: "a WARN never changes an exit code".
+
+    Reset-Tree
+    # 65,536 - 64,300 = 1,236 B of headroom, inside the 1,311 B floor. This fixture's history
+    # is one commit deep, so no file here has a median append and the 2% term decides alone -
+    # which is exactly the case the floor exists for and is asserted on its own before
+    # case 24 brings the median term in.
+    New-Utf8File $underPath (Get-SizedText 64300 'CLAUDE-FEEDBACK.md parked just inside the band')
+    Assert-Result 'WARN - a file inside the band warns, and the run stays GREEN' $false 'WARN - CLAUDE-FEEDBACK.md has 1,236 B of headroom' $B
+
+    Reset-Tree
+    # The remedy, held to the same word the red arms are held to in case 12. A WARN that read
+    # as "you have room, keep going" would invert CLAUDE.md line 104 - the whole sentence the
+    # band exists to make actionable.
+    New-Utf8File $underPath (Get-SizedText 64300 'CLAUDE-FEEDBACK.md parked just inside the band')
+    Assert-Result '  ...and it names ROTATION, never buying room' $false 'the trigger to rotate, never to buy room' $B
+
+    Reset-Tree
+    # The false-positive control, and the reason the three cases above prove anything: a band
+    # that fired on every file would satisfy all of them. 25,536 B of headroom draws nothing.
+    New-Utf8File $underPath (Get-SizedText 40000 'CLAUDE-FEEDBACK.md with room to spare')
+    Assert-Result 'WARN - a file with room to spare draws no warning' $false 'channel files measured' $B 'WARN - CLAUDE-FEEDBACK\.md'
+
+    Reset-Tree
+    # THE ONE THAT DECIDES WHETHER THE RULED BAND SHIPPED. Five real appends of 6,000 B give
+    # SCRIBE-TESTING.md a median append of 6,000 B, so its band is 3 x 6,000 = 18,000 B and
+    # the 1,311 B floor is not what decides. At 55,000 B it has 10,536 B of headroom: eight
+    # times the floor, and still inside the band. A guard that implemented only the percentage
+    # arm - the shape DRA-284's done bar explicitly refuses - is silent here and green
+    # everywhere else in this file.
+    $sized = 20000
+    for ($i = 1; $i -le 5; $i++) {
+        $sized += 6000
+        New-Utf8File (Join-Path $root 'SCRIBE-TESTING.md') (Get-SizedText $sized 'SCRIBE-TESTING.md')
+        Invoke-Git @('add', '-A')
+        Invoke-Git @('commit', '--quiet', '-m', "fixture: append $i of 6,000 B to SCRIBE-TESTING.md")
+    }
+    New-Utf8File (Join-Path $root 'SCRIBE-TESTING.md') (Get-SizedText 55000 'SCRIBE-TESTING.md')
+    Assert-Result 'WARN - three median appends is the binding term, not the 2% floor' $false 'WARN - SCRIBE-TESTING.md has 10,536 B of headroom left against the 64 KiB ceiling at working tree: it is 55,000 B (53.7 KiB) against a cap of 65,536 B (64.0 KiB). The WARN band is 18,000 B - the larger of 2% of 65,536 = 1,311 B and 3 x its median append of 6,000 B = 18,000 B.' $B
+    Invoke-Git @('reset', '--hard', '--quiet', $base)
+
+    Reset-Tree
+    # The known-red control: the ceiling arm still refuses, with the message it has always
+    # had, and the file it refused is NOT also warned. One condition, one message - a warning
+    # that outlived the red it duplicates would be this band's own trap-74 moment.
+    New-Utf8File $underPath (Get-SizedText 70000 'CLAUDE-FEEDBACK.md over the ceiling')
+    Assert-Result 'WARN - a file that is RED this run is not also warned' $true 'crosses the 64 KiB channel limit' $B 'WARN - CLAUDE-FEEDBACK\.md'
 
     # -- and the honest skip -----------------------------------------------------------
 
