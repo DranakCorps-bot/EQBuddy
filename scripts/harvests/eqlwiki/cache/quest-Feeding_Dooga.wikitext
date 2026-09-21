@@ -1,5 +1,5 @@
 {{Classic Era}}
-[[File:npc_chef_dooga.png|frame|Chef Dooga]]
+[[File:npc_chef_dooga.png|thumb|Chef Dooga]]
 {| class="questTopTable"
 ! ''' Start Zone: '''
 | [[Oggok]]

@@ -1,5 +1,5 @@
 {{Classic Era}}
-[[File:npc_narex_t`vem.png|frame|Narex T`Vem]]
+[[File:npc_narex_t`vem.png|thumb|Narex T`Vem]]
 {| class="questTopTable"
 ! ''' Start Zone: '''
 | [[Neriak|Neriak Commons]]

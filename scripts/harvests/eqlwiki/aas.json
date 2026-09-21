@@ -518,8 +518,8 @@
       "ranks_raw": "1",
       "cost_per_rank_raw": "5",
       "level_requirement": 40,
-      "requirements_raw": "Requirements: Level 40.",
-      "effect_text": "Ability Activation ID: 80 - Refresh Time: 0:00:07 - Ability Timer(s): 2. This ability, when activated, grants you standard invisibility for up to 20 minutes. Requirements: Level 40."
+      "requirements_raw": "Requirements: Level 40.<br>",
+      "effect_text": "Ability Activation ID: 80 - Refresh Time: 0:00:07 - Ability Timer(s): 2. This ability, when activated, grants you standard invisibility for up to 20 minutes. Requirements: Level 40.<br>"
     },
     {
       "name": "Innate Invis to Undead",
@@ -558,12 +558,12 @@
       "name": "Master of All",
       "category": "Archetype",
       "class": null,
-      "max_rank": 4,
-      "ranks_raw": "4",
-      "cost_per_rank_raw": "5/5/5/5",
+      "max_rank": 1,
+      "ranks_raw": "1",
+      "cost_per_rank_raw": "10",
       "level_requirement": 20,
       "requirements_raw": "Requirements: Level 20.",
-      "effect_text": "This passive ability allows you to you gain a second specialization. Specialized schools of magic benefit from a from a reduction in mana cost and fizzle chance. After acquiring this ability, the next specialization to go over its current cap becomes your second specialization. Requirements: Level 20."
+      "effect_text": "This passive ability allows you to increase all your specializations. Specialized schools of magic benefit from a reduction in mana cost and fizzle chance. Requirements: Level 20."
     },
     {
       "name": "Mastery of the Past",
@@ -1520,7 +1520,7 @@
       "cost_per_rank_raw": "6",
       "level_requirement": 30,
       "requirements_raw": "Requirements: Level 30.",
-      "effect_text": "This passive ability increases your hit point regeneration by 1% per 6 seconds. Requirements: Level 30."
+      "effect_text": "This passive ability increases your hit point regeneration rate by 1% of your maximum health per 6 seconds. Requirements: Level 30."
     },
     {
       "name": "Improved Familiar",

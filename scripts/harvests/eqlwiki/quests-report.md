@@ -1,10 +1,10 @@
 # Quest harvest report
 
-- Quest Items category members: 4034
+- Quest Items category members: 4037
 - Pages enumerated: 930
 - Parsed: 1173 (empty pages: 0)
-- With turn-in items: 851
-- Unique turn-in item names: 2429
+- With turn-in items: 852
+- Unique turn-in item names: 2428
 - Missing quest giver: 27
 - Collection pages split: 56 (243 step quests)
 - Backoff events: 0
@@ -405,6 +405,7 @@
 - Erud's Tonic Quest
 - Erudin Cures
 - Escort the Cargo Clockwork
+- Fabian's Strings
 - Faction Quests
 - Faerie Dragon Wings
 - Fang Tooth (quest)
@@ -527,8 +528,6 @@
 - Lionskin Gloves Quest
 - Living Dragons
 - Lizard Dolls
-- Lizard Meat No 2
-- Lizard Tails
 - Lord Grimlot's Love
 - Lupine Claw Gauntlets Quest
 - Lydl Mastat

@@ -1,5 +1,5 @@
 {{Classic Era}}
-[[File:npc_oracle_of_k`arnon.png|frame|Oracle of K`Arnon]]
+[[File:npc_oracle_of_k`arnon.png|thumb|Oracle of K`Arnon]]
 {| class="questTopTable"
 ! ''' Start Zone: '''
 | [[Ocean of Tears]]

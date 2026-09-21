@@ -28,7 +28,7 @@
 
 == Walkthrough ==
 
-You can give Soonog in the Greenblood guild 4 [[lizard meat]] for a rusty two handed sword.
+You can give Soonog in the Greenblood guild 4 [[Lizard Meat]] for a rusty two handed sword.
 
 You say, 'Hail, Soonog'
 
@@ -36,24 +36,21 @@ You say, 'Hail, Soonog'
 
 You say, 'Me Greenblood'
 
-: Soonog says 'Gud. you go kill da lizzies in da Feerrott. Bring Soonog four of dere meatses. Soonog give you gud sword to bash more lizzies wif.'
+: Soonog says, 'Good, you mine.  We tuffest, bestest, scariest warriors in da Norrath.  Not like dem wimpy Craknek hoomie wannabees.  You Greenblood, you my toy.  You lives or dies at my will.  Go, brings me many lizard meats cause I Greenblood leader and I berry hungry lots.  So hungry dat I eats four lizards.  Go bring meat or I eats you.'
 
-'''You hand the four lizardmen tails to Soonog:'''
+[[Lizard Meat]] drops from any lizardman in [[The Feerrott]], [[Rathe Mountains]], or [[Cazic Thule (Zone)|Cazic Thule]]. Hand 4 of them (or a stack of any multiple of 4) to Soonog.
 
-: Soonog says, "Mmm Lizzie meat!! Here, go bash dem lizzies more better wif dis."
+: Soonog says, 'Small meats but is good nuff.  No Craknek culd do dis.  You good Greenblood.  Me like you.  You feeds me.  You take dis and go kill eberyting.  Make all scared of da Greenblood Knights.  You get ready for next inb... ins... invat... you get ready for next war.  You learning stuff, you come bak here and me teach you more Greenblood stuf so we be more tuffest.'
 
 <div class="facblock">
-* Your faction standing with [[Clurg]] got better.
-* Your faction standing with [[Green Blood Knights]] got better.
-* Your faction standing with [[Storm Guard]] got worse.
-* Your faction standing with [[Shadowknights of Night Keep]] got worse.
+* Your faction standing with [[Green Blood Knights]] has been adjusted by 5.
+* Your faction standing with [[Clurg]] has been adjusted by 5.
+* Your faction standing with [[Storm Guard]] has been adjusted by -1.
+* Your faction standing with [[Shadowknights of Night Keep]] has been adjusted by -1.
 </div>
-
 {{YouGainExperience}}.
 
-You Receive {{:Rusty Two Handed Sword}}.
-
-At Indiffrent, you cannot do this quest. Presumably, this is only doable by fledgling Shadow Knights.
+'''You Receive a [[Rusty Two Handed Sword]].'''
 
 [[Category:Quests]]
 [[Category:Oggok]]

@@ -11,8 +11,9 @@
 
 | items_with_effect = 
 
-<ul><li> {{:Fang Amulet of Calling}}
-</li></ul>
+<ul><li> {{:Fang Amulet of Calling}}</li>
+<li> {{:Gnoll_Slayer_(final)}}</li>
+</ul>
 
 | slots = 
 

@@ -33,7 +33,8 @@
 * Kizdean can be charmed to acquire the note, however the final turn in NPC ('''[[Loveal S`Nez]])''' cannot be charmed. Raising [[The Dead]] faction is possible by killing high elf or gnome casters from [[Eldritch Collective]] or [[Keepers of the Art]] such as [[Linara Parlone]] (highly recommended: +47 faction/kill, faction hits reversible by [[Bat Wings]] quest) or [[Retlon Brenclog]]. 
 * Faction can be bypassed as both the [[Thex Mallet]] and [[Reaper of the Dead]] are tradable.
 
-* For Bards (and possibly Enchanters) with Dubious or higher faction, you can still turn in the Thex Mallet through the combination of Alliance spells like [[Cinda's Charismatic Carillon|Cinda's Charismatric Carillon]] and Dark Elf Illusion; this is enough to get Amiable.
+* For Bards (and possibly Enchanters) with Dubious or higher faction, you can still turn in the Thex Mallet through the combination of Alliance spells like [[Cinda's Charismatic Carillon|Cinda's Charismatric Carillon]] and Dark Elf Illusion; this is enough to get Amiable. *High-Elf to Dark elf illusion Give +550 Faction, need verify if all Race to Dark Elf illusion give same (must do)
+ 
 ** While the GMs and Merchants cannot have alliance spells cast on them, there is a Shadow Knight named [[DeGarran Kixl]] roaming the outside ramparts of the SK & Necro Guild
 
 * The [[Messages For Neriak]] quest can be a simple way to quickly raise [[The Dead]] as well.

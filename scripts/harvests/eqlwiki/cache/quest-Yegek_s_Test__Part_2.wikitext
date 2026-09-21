@@ -1,5 +1,5 @@
 {{Classic Era}}
-[[File:npc_yegek_b`larin.png|frame|Yegek B`Larin]]
+[[File:npc_yegek_b`larin.png|thumb|Yegek B`Larin]]
 {| class="questTopTable"
 ! ''' Start Zone: '''
 | [[Neriak|Neriak Commons]]

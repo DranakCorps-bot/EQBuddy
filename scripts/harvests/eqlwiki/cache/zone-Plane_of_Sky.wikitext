@@ -89,6 +89,9 @@ This the island that you enter Plane of Sky on. Thankfully the fairies are NOT k
 
 The thunder spirits are bards and use some weak DoTs. Ideal to cut your teeth and farm a Wind Rune or three.
 
+==== Dungeon Crawls ====
+You will need to kill the [[Thunder Spirit Princess]] for completion, and the other fairies are so easy you can make quick work of them to count towards your total kills.
+
 == Island 1.5: Noble Island ==
 
 * Boss: [[Noble Dojorn]]
@@ -102,6 +105,9 @@ This small island features a windmill and a portal to island 2. [[Noble Dojorn]]
 
 Note that the blade storms WILL assist the Noble Dojorn. There's one less on solo mode than on group mode.
 
+==== Dungeon Crawls ====
+[[Noble Dojorn]] is required for completing the Dungeon Crawl. Once killed he will spawn [[Overseer of Air]] which will then become required to complete the Dungeon Crawl.  However, if you kill Dojorn last, after all other requirements are met - the Dungeon Crawl will immediately complete upon his death. This can allow you to skip [[Overseer of Air]] and [[the Hand of Veeshan]].
+
 == Island 2: Azarack Island ==
 
 * Boss: [[Protector of Sky]]
@@ -113,6 +119,10 @@ Reached through the eastern teleporter on Island 1.
 
 The mobs here are social, so expect a few adds during your first pull. Killing a few Azaracks will cause the [[Protector of Sky]] to spawn - he drops the key to Island 3: Harpy Island and some quest pieces.
 
+==== Dungeon Crawls ====
+
+This island can be skipped, since the [[Protector of Sky]] is not spawned at the start. If you do kill azaracks here, and the boss spawns, he will be required to complete the Dungeon Crawl. It is recommended that you just plan to clear this island anyways, it is quick and you can use the trash and boss to count towards your total kills.
+
 == Island 3: Harpy Island ==
 
 * Boss: [[Gorgalosk]]
@@ -123,6 +133,9 @@ The mobs here are social, so expect a few adds during your first pull. Killing a
 You are discouraged from sitting too close to the edge as [[a watchful guard]] and [[an avenging gazer]] will rarely cast Mana Detonation which can fling people off the island or into adds.
 
 A heart harpie, an avenging gazer, and the boss [[Gorgalosk]] will start off spawned inside of the building. [[Gorgalosk]] is also pretty tough in general, and will frequently cast Stone Breath, which can stun for 12-15 seconds. You can choose to clear a pull path to single it out, or engage all of the targets inside of the room. Engaging inside of the room seems to be fairly safe if you feel confident in handling the boss with two adds, and as long as no one gets flung out the door, typically can be fought without any additional adds joining the fray.
+
+==== Dungeon Crawls ====
+You will need to kill [[Gorgalosk]] for completion. This is also a good island to get trash kills for completion as well.
 
 == Island 4: Pegasus Island ==
 
@@ -144,6 +157,9 @@ There is no particular strategy for killing [[Keeper of Souls]], it is a simple 
 
 The next island is also aggressive, so be fully prepared and invised before moving on.
 
+==== Dungeon Crawls ====
+[[Keeper of Souls]] - and [[Overseer of Air]] if he is up - are required kills. However, everything else on the island is a giant pain to deal with. Your best bet is to kill the named and then move on.
+
 == Island 5: Spiroc Island ==
 
 * Boss: [[The Spiroc Lord]]
@@ -152,11 +168,19 @@ The next island is also aggressive, so be fully prepared and invised before movi
 * Key required: [[Avian Key]]
 * Key dropped: [[Key of the Swarm]]
 
-When farming this island, take note of the following: Killing [[a spiroc banisher]] , [[a spiroc walker]] , or [[a spiroc revolter]] will spawn the miniboss [[The Spiroc Guardian]], which in turn spawns [[The Spiroc Lord]], which will drop the key to the next island and the unique pieces required for quest armor. The island respawns quickly, and one of the mobs to spawn the Guardian will likely be up again when you kill [[The Spiroc Lord]], so this island can be endlessly farmed. 
+When farming this island, take note of the following: Killing [[a spiroc banisher]] , [[a spiroc walker]] , or [[a spiroc revolter]] will spawn the miniboss [[The Spiroc Guardian]], which in turn spawns [[The Spiroc Lord]], which will drop the key to the next island and the unique pieces required for quest armor.  These three spawns are stationary, each one guarding one of the three roosts on the island.
 
-Spirocs are particularly nasty mobs not only for their respawn ability but also their spells. Besides having a range of druid and ranger nukes, some are capable of [[A Dark Terror]]-type knockbacks which can send your pullers and tanks careening off into the wild blue yonder. Again, the direction your character faces is the only thing that figures on the direction of the knockback. It takes additional effort, but all trash should be immediately turned after they are pulled so that the tank can face outwards, looking at the edge with his back towards the center of the island. If knocked back, the tank will probably glance off the hill and not get thrown too far. 
+Spirocs are particularly nasty mobs due to their spells. Besides having a range of druid and ranger nukes, some are capable of [[A Dark Terror]]-type knockbacks which can send your pullers and tanks careening off into the wild blue yonder. Again, the direction your character faces is the only thing that figures on the direction of the knockback. It takes additional effort, but all trash should be immediately turned after they are pulled so that the tank can face outwards, looking at the edge with his back towards the center of the island. If knocked back, the tank will probably glance off the hill and not get thrown too far.  (Do the spirocs actually have this ability in EQ Legends?)
+
+They can also cause Blindness, so take care not to move around while blind and risk plummeting below. This ''is'' confirmed in EQ Legends.
 
 The next island is bee hell, so ''bee'' invisible before zoning up.
+
+==== Normal Instances ====
+In public or private normal instances, the island respawns quickly. One of the mobs to spawn the Guardian will likely be up again when you kill [[The Spiroc Lord]], so this island can be endlessly farmed.
+
+==== Dungeon Crawls ====
+In a Dungeon Crawl, the island will '''not''' respawn. If you want to maximize your drops from the island, avoid pulling the three stationary spirocs that spawn [[The Spiroc Guardian]].  Then when the rest of the island is clear, kill one of the stationary spirocs, then the bosses, then repeat two more times.  Alternatively, if you don't need drops here, you can skip the island completely - since the boss isn't spawned when you start, it is not required for Dungeon Crawl completion.
 
 == Island 6: Bee Island ==
 
@@ -168,9 +192,9 @@ The next island is bee hell, so ''bee'' invisible before zoning up.
 
 Bees do not see invis, but they social and have very large aggro radiuses (probably the whole island will aggro you at once).
 
-The three original bees are all named "Bzzazzt". Only the final boss will drop the [[Key of Scale]] you need to progress to the next island. They are easily mezzed, slowed, or stunned. Like the soul carriers back on Pegasus island, they can split into multiple mobs when killed. All of the bees and their split spawns hit very hard and very fast. They also proc poison dots (about 100hp/tick) which aren't life threatening but significant if not cured for awhile. 
+The three original bees are all named "Bzzazzt". Only the final boss will drop the [[Key of Scale]] you need to progress to the next island. They are easily mezzed, slowed, or stunned. Like the soul carriers back on Pegasus island, they can split into multiple mobs when killed. All of the bees and their split spawns hit very hard and very fast. They also proc poison dots (about 100hp/tick) which aren't life threatening but significant if not cured for awhile.
 
-Each original spawn will either spawn 1, 2, or 3 [[Bazzzazzt]]s, and it may be difficult or impossible to know which is which, so be prepared for a 3-split on your first pull. The original bee that spawns the queen is larger than the other two, but for thoroughness' sake:
+Each original spawn will either spawn 1, 2, or 3 [[Bazzzazzt]]s:
 * If you get a 3-split, then those 3 [[Bazzzazzt]]s are each final and will not spawn any more mobs. You will not get the boss from this pull.
 * If you get a 2-split, both of those [[Bazzzazzt]]s will spawn a single [[Bizazzt]]. Both [[Bizazzt]]s are final and won't spawn anything else. You will also not get the boss from this pull.
 * If you only have a 1-split of a single [[Bazzzazzt]], then you are on the chain of splits that results in the boss of the island, [[Bazzt Zzzt]]. Your single [[Bazzzazzt]] upon death will spawn [[Bzzzt]], the mini-queen. Mini-queen's death leads to [[Bazzt Zzzt]], the queen bee and boss of the island.
@@ -179,7 +203,14 @@ The mini-queen is at least as hard as the rest of the bees and also casts a nast
 
 The boss, [[Bazzt Zzzt]], is a particularly nasty bixie that will drop the key to the next island. If you wipe, be aware that queen bee will return to where she spawned, the location of Bzzzt's death, so kill him somewhere besides the port-in spot for sure. Like other bees she has a very large aggro radius. Dealing with several fights in a row can be quite taxing. If you are a class that can feign death or evacuate/succor, you can take the opportunity to take a breath and wait for some of your resources to regenerate - however, she will pretty much sit right you spawned her from killing the previous bee.
 
-After you're done, go invisible once again.
+==== Finding the Queen Bee ====
+
+If you go over to Island 6 without invisibility, the bees will agro you immediately. However, if you invs over, you can identify the bee that spawns the queen because her spawn is always in the middle of the island a little further back and between the other two bees. With a combination of lull and feign death it's possible to lull the other bees, pull the main bee to the back of the island and safely fight her without bothering with the other bees at all.
+
+Additionally, the queen [[Bzzazzt]] is larger than the other two, and immune to Charm. So if you can mez, you could mez them, identify the queen, kill them, and then memblur the other two and head to the far back side of the island to recuperate outside of their agro range.
+
+==== Dungeon Crawls ====
+Technically this island can be skipped - though the Queen Bee drops some of the most sought after quest items, so you'll likely want to kill her.  Killing the other two bees are a giant pain, and best avoided if possible. If you don't need anything from this island, just skip on ahead.
 
 == Island 7: Drake Island ==
 
@@ -190,18 +221,18 @@ After you're done, go invisible once again.
 
 Note that many of the trash mobs here cast nasty things like mez (sphinxes) and grav flux (drakes). The grav flux from the windrider drakes can shoot you clear off the island, so engage them with care. 
 
-[[Sister of the Spire]] is the boss here. She is not so terribly hard compared to all those bees. If engaged in her room, you risk social agro through the wall with the Sphinxes - the safest bet is to clear them out before engaging her. They can be split off solo without attracting the attention of the drakes. Once you've thinned the Sphinx herd, she can be knocked over pretty safely.
+[[Sister of the Spire]] is the boss here - she is the only mob on the island that is agro, but the others will come to her aid if they're nearby. She is not so terribly hard compared to all those bees. If engaged in her room, you risk social agro through the wall with the Sphinxes - the safest bet is to clear them out before engaging her. They can be split off solo without attracting the attention of the drakes. Once you've thinned the Sphinx herd, she can be knocked over pretty safely.
 
 == Island 8: Veeshan Island ==
 
 * Boss: [[Eye of Veeshan]]
-* Common: None?
+* Common: None
 * Other: [[the Hand of Veeshan]]
 * Key required: [[Veeshan's Key]]
 
 This small island is home to [[the Hand of Veeshan]] and [[Eye of Veeshan]]. The Hand is only spawned by killing the [[Overseer of Air]] way back on island 4. He can easily be singled out from the Eye by engaging him on the northern(behind the house) end of the island. The Eye is social with him, but neither see invis, so you can pick your engagement spot and wait for the Hand to come to you.
 
-[[Eye of Veeshan]] is the very last boss. The fight is pretty straightforward tank and spank, but the Eye can be difficult to land a slow on if you haven't mote-upgraded your spells. She spams lifetaps, which can make for occasionally unpredictable spikes of damage, so don't get comfortable letting your HP get too low. When engaged in a solo instance at diff 0, she has 32000 HP. 
+[[Eye of Veeshan]] is the very last boss. The fight is pretty straightforward tank and spank, but the Eye can be difficult to land a slow on if you haven't mote-upgraded your spells. She spams lifetaps, which can make for occasionally unpredictable spikes of damage, so don't get comfortable letting your HP get too low. When engaged in a solo instance at diff 0, she has 32000 HP.
 
 == Plane of Sky Class Quests ==
 

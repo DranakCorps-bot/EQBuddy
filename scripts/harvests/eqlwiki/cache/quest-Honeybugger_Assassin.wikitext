@@ -1,4 +1,4 @@
-[[File:npc_pazin_punox.png|frame|Pazin Punox]]
+[[File:npc_pazin_punox.png|thumb|Pazin Punox]]
 {| class="questTopTable"
 ! ''' Start Zone: '''
 | [[Neriak|Neriak Third Gate]]

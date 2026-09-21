@@ -189,7 +189,7 @@ Keyword scan (case-insensitive) of effect text for: duration, extend, mesmeri, c
 *Requirements: Level 30.*
 
 - Keywords `regen`:
-  > This passive ability increases your hit point regeneration by 1% per 6 seconds.
+  > This passive ability increases your hit point regeneration rate by 1% of your maximum health per 6 seconds.
 
 ### Improved Familiar (Wizard; 1 rank(s), cost 6)
 *Requirements: Level 45.*

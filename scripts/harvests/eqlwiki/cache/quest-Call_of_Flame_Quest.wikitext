@@ -1,5 +1,5 @@
 {{Classic Era}}
-[[File:npc_lily_ashwood.png|frame|Lily Ashwood]]
+[[File:npc_lily_ashwood.png|thumb|Lily Ashwood]]
 {| class="questTopTable"
 ! ''' Start Zone: '''
 | [[Greater Faydark]]

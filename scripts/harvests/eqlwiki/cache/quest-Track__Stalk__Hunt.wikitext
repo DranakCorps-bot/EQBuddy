@@ -1,6 +1,6 @@
 {{Classic Era}}
 {{Disambig3|[[Bone Chips Quests]]}}
-
+[[File:Vexia.png|thumb|Vexia D`Ynth]]
 {| class="questTopTable"
 ! ''' Start Zone: '''
 | [[Neriak Commons]]
@@ -31,30 +31,57 @@
 </ul>
 
 == Walkthrough ==
+[[Vexia D`Ynth]] in [[Neriak|Neriak Commons]] wants you to track, stalk, and hunt for the glory of Innoruuk. Bring her several different types of trophies to be rewarded, mostly in faction.
+
+Note: You will need to understand [[Languages|Dark Elvish]] in order to understand her quest dialogue.
 
 You say, 'Hail, Vexia D`Ynth'
 
-Vexia D`Ynth says, in Dark Elvish, '[Track].'
+: Vexia D`Ynth says, in Dark Elvish, '[Track].'
 
 You say, 'Track'
 
-Vexia D`Ynth says, in Dark Elvish, '[Stalk].'
+: Vexia D`Ynth says, in Dark Elvish, '[Stalk].'
 
 You say, 'Stalk'
 
-Vexia D`Ynth says, in Dark Elvish, '[Hunt].'
+: Vexia D`Ynth says, in Dark Elvish, '[Hunt].'
 
 You say, 'Hunt'
 
-Vexia D`Ynth says, in Dark Elvish, 'Yes. Hunt. Track, stalk, and hunt. Ignore that silly talk about conservation. Protecting nature. Nurturing the forest. [Drivel]. It's all drivel.'
+: Vexia D`Ynth says, in Dark Elvish, 'Yes. Hunt. Track, stalk, and hunt. Ignore that silly talk about conservation. Protecting nature. Nurturing the forest. [Drivel]. It's all drivel.'
 
 You say, 'Drivel'
 
-Vexia D`Ynth says, in Dark Elvish, 'Yes, drivel. Hunt for the joy of the kill. Hunt for Queen Cristanos and King Naythox Thex. Hunt for the [glory] of Innoruuk.'
+: Vexia D`Ynth says, in Dark Elvish, 'Yes, drivel. Hunt for the joy of the kill. Hunt for Queen Cristanos and King Naythox Thex. Hunt for the [glory] of Innoruuk.'
 
 You say, 'glory'
 
-Vexia D`Ynth says, in Dark Elvish, 'Yes. You will hunt for the Dread Slayers. You will hunt and you will learn through the doing. You do not have to hunt these all at once. I will accept each as its own task. Bring back four each of Garter Snake Tongue, Spider Venom Sac, Wolf Meat, Bone Chips, and Giant Bat Fur.'
+: Vexia D`Ynth says, in Dark Elvish, 'Yes. You will hunt for the Dread Slayers. You will hunt and you will learn through the doing. You do not have to hunt these all at once. I will accept each as its own task. Bring back four each of Garter Snake Tongue, Spider Venom Sac, Wolf Meat, Bone Chips, and Giant Bat Fur.'
+
+Garter Snakes don't exist in EverQuest Legends, but she will reward you for giving her 4 at a time of:
+* [[Spider Venom Sac]]
+* [[Wolf Meat]]
+* [[Bone Chips]]
+* [[Giant Bat Fur]]
+
+When turning in 4 [[Spider Venom Sac]]:
+
+: Vexia D`Ynth says, in Dark Elvish, 'Though venom is not the main tool of a ranger, don't ignore its efficacy.'
+
+When turning in 4 [[Wolf Meat]]:
+
+: Vexia D`Ynth says, in Dark Elvish, 'Though the life of a hunter is often solitary, don't neglect working with a group as a pack. A group can take on more than a single person.'
+
+When turning in 4 [[Bone Chips]]:
+
+: Vexia D`Ynth says, in Dark Elvish, 'The undead are an exemplar of hate. Learn from them.'
+
+When turning in 4 [[Giant Bat Fur]]:
+
+: Vexia D`Ynth says, in Dark Elvish, 'The ability to avoid damage is as important as killing.'
+
+The faction hits are similar for all 4 types of item turned in, though turning in [[Giant Bat Fur]] grants +10 to Dread Slayers, -2 to [[Guardians of the Vale]], and -2 to [[Wolves of the North]].
 
 <div class="facblock">
 * Your faction standing with [[Dread Slayers]] has been adjusted by 5.
@@ -64,13 +91,7 @@ Vexia D`Ynth says, in Dark Elvish, 'Yes. You will hunt for the Dread Slayers. Yo
 * Your faction standing with [[Guardians of the Vale]] has been adjusted by -1.
 * Your faction standing with [[Wolves of the North]] has been adjusted by -1.
 </div>
-
 {{YouGainExperience}}
 
-
-== Notes ==
-
-All of the turn ins here can be done independently; as described by Vexia you just have to hand in four of a kind. Turn in whatever you have - likely [[Bone Chips]]. 
-Turning in Giant Bat Fur grants +10 to Dread Slayers
 [[Category: Quests]]
 [[Category: Neriak Commons]]

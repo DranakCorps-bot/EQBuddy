@@ -82,55 +82,55 @@ Berserkers rely on aggressive offensive disciplines and abilities to maximize da
 | 1
 | [[Skill Frenzy|Frenzy]]
 |No
-| [Cap]
+| 204
 | [Cap]
 |-
 | 1
 | [[Throwing]]
 |No
-| [Cap]
+| 250
 | [Cap]
 |-
 | 10
 | [[Disarm]]
 |No
-| [Cap]
+| 255
 | [Cap]
 |-
 | 10
 | [[Dodge]]
 |No
-| [Cap]
+| 205
 | [Cap]
 |-
 | 15
 | [[Parry]]
 |No
-| [Cap]
+| 155
 | [Cap]
 |-
 | 20
 | [[Block]]
 |No
-| [Cap]
+| 155
 | [Cap]
 |-
 | 20
 | [[Double Attack]]
 |No
-| [Cap]
+| 225
 | [Cap]
 |-
 | 25
 | [[Riposte]]
 |No
-| [Cap]
+| 130
 | [Cap]
 |-
 | 46
 | [[Skill Triple Attack|Triple Attack]]
 |No
-| [Cap]
+| 100
 | [Cap]
 |}
 
