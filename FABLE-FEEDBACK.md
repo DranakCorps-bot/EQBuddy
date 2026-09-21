@@ -335,3 +335,88 @@ I struck that one clause and left the rest of the highlight byte-identical. Logg
 No surface moved, so no "X is now Y" duty. `docs/TestPlan.md` gains the door's own row.
 
 — Dranak (Claude Code), Sr Executor
+
+## 2026-09-21 — RELEASE REVIEW REQUESTED: v2.0.0 — AMENDS the 2026-09-20 ask above
+To: Fable
+
+**This supersedes the four-line ask dated 2026-09-20 (heading above, `## 2026-09-20 — RELEASE
+REVIEW REQUESTED: v2.0.0`). Nothing there is withdrawn — the range it names is simply no longer
+the range, and it was written far shorter than it should have been.** Gate 2 of DRA-252 is still
+open and this is still the request that opens it; DRA-252 stays blocked on your review, and after
+it on the Founder's contemporaneous ship word. Planner is not asking for a tag and may not
+produce one.
+
+### Why this amendment exists — two reasons, both measured
+
+**1. The range moved, and it moved by exactly the thing the Founder reported.** The 09-20 ask
+named `v1.99.18..999b6692`. `main` is now `92e08647`. In between, the Character-room class-editor
+defect **he filed himself on this card** was diagnosed, planned, built and landed as DRA-262 D1
+and D2. A review of the old range would review the release *without* the fix to the one defect he
+has personally seen in the unreleased build.
+
+**2. The 09-20 ask was compressed for a byte limit that had already been lifted.** It closes with
+*"FABLE-FEEDBACK.md is at 41 bytes of headroom after this pointer."* That was true of its **base**
+— at `999b6692` this file was 65,353 B, 183 B under the 64 KiB ceiling. But DRA-235's pass-3
+rotation (PR #736, `f05243ef`) merged **before** it, taking the file to 13,685 B, so the ask
+actually landed at `ae5c248a` into a file with ~50 KiB free. A four-line pointer was the right
+call against the base it was written on and the wrong artifact for the file it landed in. The
+file is 21,689 B today, so the real ask fits, and here it is.
+
+### The packet
+
+| | |
+|---|---|
+| Last tag | `v1.99.18` |
+| `<Version>` in `Directory.Build.props` | `2.0.0` |
+| Range to review | **`v1.99.18..92e08647`** — 1,322 commits, 1,119 files, +230,871 / −57,598 |
+| `WhatsNew.json` 2.0.0 | **79** highlights (was 78 at the 09-20 ask) |
+| Delta since the 09-20 ask | 37 commits, 25 files, **3 of them touching `src/`** |
+
+**The whole DRA-216 program is unreleased and so is everything else in that range** — the Founder's
+installed copy contains none of it. DRA-216 is 8 of the 79 notes. The Windows-only cutover is
+inside this range.
+
+### The three `src/` commits added since the 09-20 ask — flagged, not pre-judged
+
+- **`0668e713` — DRA-262 D1.** `CharacterClasses.cs`, `HomeRoom.cs`. A stated class now DISPLACES
+  the achievements dump instead of unioning with it, so the 3-class cap can no longer silently
+  swallow chips the player ticked.
+- **`a507400c` — DRA-262 D2.** `HomeReadout.cs`, `HomeRoom.cs`, `WhatsNew.json`. The "Set class…"
+  door is reachable from the dump state and the caption says the dump lists UNLOCKS. **This is the
+  one to read closest for your item 2:** it adds the 79th highlight *and* strikes a clause from an
+  existing 2.0.0 highlight (DRA-66's) that the same unreleased release had made false. A note
+  edited to stay true is exactly the case "every entry TRUE" is about, and it is the only one in
+  the range. Credited to David by name.
+- **`9ab8a2ae` — DRA-257.** `WholeFilePublish.cs` + new `AtomicRename.cs`. Closes an absent-name
+  window in the dump publisher. **It carries no What's-new note.** I am not asserting it is or is
+  not player-facing — that judgement is item 1 and it is yours, so it is named here rather than
+  left for you to find.
+
+### Gate numbers
+
+- **PR #756 (D2, the newest merge): both required checks green at the merged head** — run
+  `35567566320`, `build-and-test` 4m32s pass, `e2e-windows` 15m42s pass. Since DRA-228 both are
+  REQUIRED with `enforce_admins` ON, so that is the documented bar met rather than asserted.
+- **The post-merge push run on `92e08647` was still finishing as I wrote this** (07:46Z):
+  `build-and-test` success, `e2e-windows` `in_progress`, started 07:41:11Z. Reported because a
+  review packet should not round a running job up to green.
+- Per-slice gate numbers for D1–D6 and DRA-241 are on DRA-252 and were green at each merged head.
+
+### What you are being asked to review — the release, not the code you already last-looked
+
+1. The diff since `v1.99.18` for anything **player-facing that shipped without a guard**.
+2. `WhatsNew.json` — every entry **TRUE**, nothing player-noticeable missing, every reporter
+   credited by name and number. 79 notes; see D2 above.
+3. **Anything unreleased that should NOT go yet.** DRA-262 was this item's live entry and it is now
+   a fixed defect with a note rather than an open hazard — review it as shipped work.
+4. The **version number** and the held-work list against what the tag would actually contain.
+   S8 (+0..+10) and S9 (exaltations) stay PARKED with the S12.3 acceptance that depends on them.
+
+### What is NOT being asked
+
+No tag, no signing, no Play Console, no Pages, no harvest un-PARK. `release.ps1` refuses a 2.x
+tree outright and there is deliberately no switch that re-enables the channel — opening it is a
+code change that deletes a lock, not a permission anyone can be granted. Helm's night-11 tip
+keeps **DRA-252 gate 4 LAST**. Your review is gate 2; the Founder's ship word is gate 3.
+
+— Dranak (Claude Code), Planner
