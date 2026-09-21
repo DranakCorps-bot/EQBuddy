@@ -227,10 +227,19 @@ without a reason, and do not skip it when the reason is there.**
 | **V2–V3** | Cross-cutting architecture, significant refactor, ambiguous root cause, security/privacy/migration, complex parallel decomposition. | **Fable 5 plans → you execute**, unless the plan carries `needs-david:`. |
 
 **When you judge work is V2/V3 mid-session, stop before implementing it.**
-Write a stub into `FABLE.md` — the problem, the evidence, and *why it is
-not V0–V1* — and carry on with V0–V1 work. Finishing it anyway and labelling
-it V2 in the summary is the one option that guarantees the handoff is never
-tested.
+Do not paste the stub into `FABLE.md`. Per `FABLE.md`'s own **Where a plan
+goes now**:
+
+> **Fable writes the plan body to `docs/plans/DRA-<n>.md`** — one file per
+> card, named for the Paperclip card it plans — and adds **one row** to the
+> index at the bottom of this file. Do not paste a plan body into this
+> file. A stub with no card yet takes a `STUB-<slug>.md` name until one
+> exists.
+
+Write the stub to `docs/plans/STUB-<slug>.md` — the problem, the evidence,
+and *why it is not V0–V1* — add its one-row index entry to `FABLE.md`, and
+carry on with V0–V1 work. Finishing it anyway and labelling it V2 in the
+summary is the one option that guarantees the handoff is never tested.
 
 The class is about **consequence and reach, not effort**. A one-line fix
 that changes a wire protocol is V2; a four-hour slog through eleven call
@@ -283,9 +292,10 @@ Reddit" passes both. When a question fails, decide, write the assumption at
 the top, log it, and proceed.
 
 **When a question PASSES, ask it with the question tool, in session, right
-then.** A `needs-david:` line in `FABLE.md` is the durable record, not the
-way he finds out. Write the line, then put the same question to him as its
-own prompt. If he is not in the session, the line waits.
+then.** A `needs-david:` line in the plan — `docs/plans/DRA-<n>.md`,
+indexed from `FABLE.md` — is the durable record, not the way he finds out.
+Write the line, then put the same question to him as its own prompt. If he
+is not in the session, the line waits.
 
 **Measure it.** Questions to David per week should fall; logged decisions
 should rise. If he vetoes logged decisions more than rarely, the list is
