@@ -112,9 +112,10 @@ them.
 - **`HELM.md` and `DECISIONS.md` split at source.** The live file keeps STATE
   (Holds, Wakes, Retired, standing blocks, live-rulings pointer, current tip);
   dated tips move into `docs/ops/claude-archive/channels/` — a rename, not a
-  trim. That work is **DRA-246**. Until it lands those two files ride the
-  headroom trigger like everything else, which Helm set as an interim and not
-  as their answer.
+  trim. Both halves have landed: `HELM.md` under **DRA-277** and `DECISIONS.md`
+  under **DRA-281** (the re-seat of DRA-246), both 2026-09-21. The interim that
+  had those two files ride the headroom trigger like everything else is spent —
+  this rule is how they rotate now.
 - **A Helm tip is one ruling, short.** Helm: *"(d) ADOPT as Helm tip format
   — one ruling, short."*
 - **Signing.** Helm last-looks rotations touching `HELM.md` /
