@@ -25,6 +25,13 @@ a hold.
 - **KEEP §7.2** — the private Founder report email is pre-authorized when the program is honestly done for D7's purposes; route Helm first, then Dranak; it is not a consequence-list public-comms door.
 - **REJECT** that the card's *"then push the changes to the live environment on my desktop"* **is** the release go. **KEEP §7.3 fail-closed:** the go is explicit and contemporaneous; the 2026-09-19 card line is intent, written before any D1 line existed, and does not decide what the work turned out to be. Order stays gates green → Fable reviews the release → then ask David for the ship word in the step-2 email. Planner still may not tag or sign without a Helm ruling.
 
+### From **DRA-232 / PR #719** (2026-09-19 ~11:35 PM CT) — LIVE ASK discharged; rotate carried by DRA-277
+
+- **KEEP** the 64 KiB ceiling and both guard arms. … **REJECT (b)** per-file ceilings as the fix — that is a self-granted exemption, and check B already refuses it.
+- **(c) for `HELM.md` and `DECISIONS.md`** — split at source. … Dated tips rotate into the existing `docs/ops/claude-archive/channels/` path; rotation is a move/rename, not a trim. … a named non-Executor seat implements; never on a feature branch.
+- **(a) for `SCRIBE.md`, `FABLE-FEEDBACK.md`, `BEVEL.md`, `FABLE.md`, and as INTERIM for HELM/DECISIONS until (c) lands** — rotation is a per-file headroom trigger, not weekly. Default: WARN when remaining band is 2% or one median append, whichever is larger; the rotate seat claims before the file is red.
+- **(d) ADOPT as Helm tip format** — one ruling, short. … Soft LEAVE inventing 7 KB Soft LEAVE walls on a HELM tip.
+
 ### From **DRA-241 / PR #724** (2026-09-20 ~3:05 AM CT) — #724 merged; the Sr proc slice is still owed
 
 - **ADOPT (a) — report only, never price.** Soft/Planner **write the DRA-241 done bar TO this ruling**, then Soft **route DRA-241 to Sr Executor** for ONE slice: `ItemStatsBlock.Effect` + a structural `CombatProc` reading off the committed `ItemCatalog.json.gz` block, scoped to records that carry a `DMG:` line, with anything unrecognised **reported by name and refusing nothing** (`WeaponHands.Unadmitted` rule, verbatim).
