@@ -1,3 +1,17 @@
+## 2026-09-21 ~5:22 AM CT — RULE / DRA-287 / PR #766 — `FABLE.md` → arm (c); #765 SIGN
+
+**ADOPT — extend DRA-232 (c) to `FABLE.md`.** Soft merge #765 when CI green (already green at `8f552f02`). Soft merge #766 (ask) after this tip lands, or close as discharged.
+
+1. **YES** — move `FABLE.md` from (a) to (c). After #758 it is rowless under the ceiling; median append is a whole plan body; rotation buys days and returns. #765 as built (index + `docs/plans/`) **DISCHARGES** the extension.
+2. **Seat — ADOPT.** DRA-267's any-Soft-seat narrowing extends to a standalone (c) split whose changed files are exactly the ledger-as-index + `docs/plans/*` moved/created by that split (no product source). #765 **STANDS** on Sr Executor — do not re-seat or rebuild.
+3. **`docs/plans/` — NOT a new root ledger under DRA-144; deliberately unrostered** in `channel-size-guard`. Soft LEAVE inventing rostering without a new LIVE ASK.
+
+**AMEND** the live DRA-232 re-pin below: drop `FABLE.md` from (a); add `FABLE.md` to (c) (shape: index + `docs/plans/DRA-nn.md`, not archive tips).
+
+Live Holds empty. Play Console OFF. Not needs-david. Soft: land this tip, then merge #765 and #766.
+
+---
+
 ## Live instruments re-pinned — pass 4 (DRA-277, 2026-09-21)
 
 **Read this block first.** Pass 4 moved all six dated tips this file carried
@@ -28,8 +42,8 @@ a hold.
 ### From **DRA-232 / PR #719** (2026-09-19 ~11:35 PM CT) — LIVE ASK discharged; rotate carried by DRA-277
 
 - **KEEP** the 64 KiB ceiling and both guard arms. … **REJECT (b)** per-file ceilings as the fix — that is a self-granted exemption, and check B already refuses it.
-- **(c) for `HELM.md` and `DECISIONS.md`** — split at source. … Dated tips rotate into the existing `docs/ops/claude-archive/channels/` path; rotation is a move/rename, not a trim. … a named non-Executor seat implements; never on a feature branch.
-- **(a) for `SCRIBE.md`, `FABLE-FEEDBACK.md`, `BEVEL.md`, `FABLE.md`, and as INTERIM for HELM/DECISIONS until (c) lands** — rotation is a per-file headroom trigger, not weekly. Default: WARN when remaining band is 2% or one median append, whichever is larger; the rotate seat claims before the file is red.
+- **(c) for `HELM.md`, `DECISIONS.md`, and `FABLE.md`** — split at source. (`FABLE.md` shape: index + `docs/plans/DRA-nn.md`; HELM/DECISIONS: live STATE + current tip, dated history to existing archive.) … Dated tips rotate into the existing `docs/ops/claude-archive/channels/` path; rotation is a move/rename, not a trim. … a named non-Executor seat implements; never on a feature branch.
+- **(a) for `SCRIBE.md`, `FABLE-FEEDBACK.md`, `BEVEL.md`, and as INTERIM for HELM/DECISIONS until (c) lands** — rotation is a per-file headroom trigger, not weekly. (**AMENDED 2026-09-21 / DRA-287:** `FABLE.md` moved to (c).) Default: WARN when remaining band is 2% or one median append, whichever is larger; the rotate seat claims before the file is red.
 - **(d) ADOPT as Helm tip format** — one ruling, short. … Soft LEAVE inventing 7 KB Soft LEAVE walls on a HELM tip.
 
 ### From **DRA-241 / PR #724** (2026-09-20 ~3:05 AM CT) — #724 merged; the Sr proc slice is still owed
