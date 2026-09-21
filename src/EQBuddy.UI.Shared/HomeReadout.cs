@@ -1,3 +1,4 @@
+using System.Globalization;
 using EQBuddy.Core;
 
 namespace EQBuddy.UI.Shared;
@@ -157,10 +158,17 @@ public static class HomeReadout
     /// <summary>Over the editor's chips: what stating does, and the cap — named up front
     /// so the fourth click refusing is an announced rule rather than a silent no-op. The
     /// limit is the game's (up to three active classes), through
-    /// <see cref="CharacterClasses.Max"/>.</summary>
+    /// <see cref="CharacterClasses.Max"/>.
+    ///
+    /// **The second sentence carries the new RANK** (DRA-262, signed plan Ruling 3). It used
+    /// to read "EQBuddy stops guessing", which was true about inference and silent about the
+    /// dump — and the dump was the one thing a player in this editor is most likely to be
+    /// arguing with. Now it says what <c>CharacterClasses.Resolve</c> actually does: a
+    /// statement displaces the dump and the log alike, until it is cleared.</summary>
     public const string ClassEditorNote =
         "Tick what this character actually is — up to three, the game's own limit. "
-        + "While anything is ticked here, EQBuddy stops guessing.";
+        + "What you tick here is the answer, over the dump and the log alike, until you "
+        + "clear it.";
 
     /// <summary>The way back (the plan's own words), offered only while a statement
     /// exists: clearing it returns the line to EQBuddy's own reading (the dump if one has
@@ -168,12 +176,58 @@ public static class HomeReadout
     /// player who set it wrong once would be stuck telling EQBuddy forever.</summary>
     public const string ClearStated = "Let EQBuddy work it out";
 
-    /// <summary>What replaces the editor when the source is the achievements dump (plan
-    /// D4): a sentence saying WHY there is nothing to tick, not disabled chips — trap 17,
-    /// a disabled control with no visual is invisible, and even a dimmed one says nothing
-    /// about why. The repair it points at is the Achievements row one block down.</summary>
-    public const string DumpAnswersClass =
-        "Your achievements dump answers this — run it again below if it is out of date.";
+    /// <summary>
+    /// What the class line says UNDER it while the dump is the reading and nobody has
+    /// stated anything (DRA-262, signed plan Ruling 3).
+    ///
+    /// <para>It replaces <c>DumpAnswersClass</c>, which said *"your achievements dump
+    /// answers this — run it again below if it is out of date"*. Both halves of that were
+    /// wrong: the dump does not answer "which three are you playing" — it lists every class
+    /// this character has ever UNLOCKED (<see cref="CharacterClasses"/>'s class note) — and
+    /// re-running it cannot correct the reading, because the Founder's dump yields the same
+    /// three names every time. So the sentence that used to send a player back to the ⧉ row
+    /// now sends them to the editor directly underneath it.</para>
+    ///
+    /// <para>The subject is the DUMP and EQBuddy, never the game being wrong. The game
+    /// wrote a true unlock history; what was wrong was EQBuddy reading its first three as a
+    /// roster.</para>
+    /// </summary>
+    public const string DumpListsUnlocks =
+        "Your achievements dump lists what this character has unlocked. If that's not who "
+        + "you're playing, set it below.";
+
+    /// <summary>
+    /// The same sentence when the dump lists MORE unlocks than EQBuddy can show — a cap
+    /// that says so (trap 50: a "top N" list that hides rows silently is the defect).
+    /// Without this arm a four-unlock character reads "your dump lists what you have
+    /// unlocked" beside three names and has no way to know two more exist; that is the
+    /// Founder's own state, and it is what made a wrong line look like a complete one.
+    ///
+    /// <para><b>A FORMAT, not a finished sentence</b> — <c>{0}</c> is the unlock count.
+    /// Go through <see cref="DumpListsClasses"/> rather than formatting it at a call site,
+    /// so the count and the choice of sentence are made in one place.</para>
+    ///
+    /// <para>"the first three" is spelled as a word, the same way <see cref="ClassEditorNote"/>
+    /// spells the cap: <see cref="CharacterClasses.Max"/> is a game fact that has never
+    /// moved, and an integer substituted into English would read "the first 3".</para>
+    /// </summary>
+    public const string DumpListsUnlocksTruncated =
+        "Your achievements dump lists {0} unlocked classes — EQBuddy shows the first three. "
+        + "Set the ones you're playing below.";
+
+    /// <summary>Which of the two the dump-led line carries, chosen on how many class
+    /// unlocks the dump states.
+    ///
+    /// <para><b>This is a caption ABOUT the dump, not a second identity resolution</b>
+    /// (trap 33). <c>CharacterClasses.Resolve</c> stays the one producer of who the
+    /// character IS; the count here only decides whether the sentence has to admit that
+    /// something was held back. Passing it in — rather than reading a store from in here —
+    /// is what keeps this file framework-free and keeps the room's one captured moment
+    /// (trap 56) the moment this sentence describes.</para></summary>
+    public static string DumpListsClasses(int unlocked) =>
+        unlocked > CharacterClasses.Max
+            ? string.Format(CultureInfo.InvariantCulture, DumpListsUnlocksTruncated, unlocked)
+            : DumpListsUnlocks;
 
     // ---- readiness --------------------------------------------------------------
 
