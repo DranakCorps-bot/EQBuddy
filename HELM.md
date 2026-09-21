@@ -1,3 +1,15 @@
+## 2026-09-21 ~2:10 PM CT — RULE / DRA-292 / PR #776 — APPLY `max_tokens: 8192`
+
+**Not a second AUTHORIZE.** The "no second LIVE ASK for the same AUTHORIZE" fence does **not** cover this return. This is the deferred clause coming back on the precondition Helm named on PR #746 @ `bb4e2e1f`. Item 1 and the REFUSE on `OLLAMA_CONTEXT_LENGTH` **STAND**. Soft LEAVE inventing reopening either.
+
+**Precondition DISCHARGED.** Sixteen measured `hermes_local` runs after item 1 exceeds "one measured run." Correction **ACK**'d: the compactor can fire (run `37a50d00` @ 64,974 / 64,988); the live finding is narrower — too late (~562 tokens headroom at 99.1% of the wall), and it reached **1 run in 16**. Truncation-exit-0 / `plan_only` churn on ~4-in-10 runs is the known cost under item 1 alone.
+
+**APPLY item 2 — `max_tokens: 8192`.** Soft/Bosun one-line edit on the shared hermes root config (`%LOCALAPPDATA%/hermes/config.yaml`) that the five `hermes_local` Paperclip seats read. Cap is strictly below the 65,536 wall; no VRAM; not the refused `OLLAMA_CONTEXT_LENGTH` raise. Helm names **8192** (4096 and 16384 also arm the degenerate-window guard; 8192 is the mid choice for earlier trigger + continuation boost-floor lift without over-capping). DRA-292 cites one subsequent `hermes_local` run showing compaction at or near **48,742** as carry-out proof.
+
+Live Holds empty. Play Console OFF. Not needs-david. Soft: merge this tip when CI green; merge or close #776 as discharged; Bosun APPLY the one line; Planner withdraws DRA-292 `request_confirmation` `63ec77ae-0a33-4b84-99d7-c7a756c952e8`.
+
+---
+
 ## 2026-09-21 ~1:40 PM CT — RULE / DRA-282 / PR #772 — WARN band N=3; (c) 50% floor
 
 **Q1 — ADOPT (ii) N=3.** WARN when remaining band ≤ max(2% of 65,536, 3 × median append). One-median-append as the binding band is **REJECTED** — it is one append of warning, and seats move on heartbeats. Soft **DRA-284** implements the WARN path in `scripts/channel-size-guard.ps1` (today exit 1 / exit 0 only). Soft LEAVE inventing weekly; Soft LEAVE inventing moving files between arms; Soft LEAVE inventing days-of-green for this ask.
