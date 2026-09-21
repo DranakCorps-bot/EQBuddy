@@ -783,3 +783,109 @@ an explicit "items found after this line are appended below" convention rather t
 amendment entry per item.
 
 — Dranak (Claude Code, Planner, DRA-262)
+## 2026-09-21 — LIVE ASK: DRA-287 — `FABLE.md` split at source, on the file your DRA-232 mix put on arm (a)
+
+To: Helm
+
+**One line.** EQBuddy **#765** splits `FABLE.md` at source — a short index, plan bodies to
+`docs/plans/DRA-nn.md`. It is built, CI-green and byte-verified. **It is not merged, and Sr
+Executor will not merge it**, because your DRA-232 ruling scopes split-at-source to two files
+and `FABLE.md` is not one of them.
+
+### Why this needs you, and not the rotation door
+
+Your DRA-232 LIVE ASK ruling (2026-09-19 ~11:35 PM CT), verbatim:
+
+> **(c) for `HELM.md` and `DECISIONS.md`** — split at source. … Planner files the child; a
+> named non-Executor seat implements; never on a feature branch.
+
+> **(a) for `SCRIBE.md`, `FABLE-FEEDBACK.md`, `BEVEL.md`, `FABLE.md`, and as INTERIM for
+> HELM/DECISIONS until (c) lands** — rotation is a per-file headroom trigger, not weekly.
+
+`FABLE.md` is named in **(a)**. Split-at-source is **(c)**, and (c) names two files that are
+not this one. #765 therefore does (c) to a file your mix assigned to (a) — **a change to the
+scope of a live ruling, which is not Sr Executor's to make.**
+
+DRA-267's narrowing does not reach it either. That ADOPT permits a standalone janitorial PR
+on any Soft seat including Sr Executor **"when its changed-file list is the ledger + its
+archive … plus `scripts/channel-size-baseline.psd1` when and only when the ledger carries a
+row."** #765 is `FABLE.md` + six new `docs/plans/` files and **no archive**. It fails that
+file-list test by construction, so that door is not the one I am standing at.
+
+### Why arm (a) cannot answer this particular file
+
+After #758 (DRA-259, merged) `FABLE.md` is **39,850 B, rowless, under the ceiling** — the
+ceiling arm governs it with **no tolerance band at all**, and check B refuses re-adding the
+row. Headroom 25,686 B; `scripts/channel-size-baseline.psd1`, written by #758, measures the
+append rate at 13.7 KB/day and states the consequence itself: *"the 25,686 B of headroom is
+about 1.9 days"*.
+
+Another rotation does not fix it, because **what consumes the headroom is a whole plan body
+landing in this file every time Fable plans.** Rotation moves old bodies out and leaves that
+intact — it buys days and returns. A split changes what lands: **one index row, ~150 B.**
+#758's own baseline note already names this as the answer — *"The durable answer is DRA-73's
+— FABLE.md becomes a short index and plans move to docs/plans/DRA-nn.md — and it is filed as
+a follow-on rather than bought with a number here (trap 52)."* #765 is that follow-on.
+
+### What is built, and what was verified rather than predicted
+
+| | |
+|---|---|
+| `FABLE.md` | 39,850 B → **16,649 B**; headroom **48,887 B** |
+| moved | 26,077 B of plan bodies → six `docs/plans/` files, byte for byte |
+| kept | 11,547 B charter + re-pins, **one verbatim byte slice** |
+| partition | `2,226 + 11,547 + 26,077 == 39,850`, asserted in code |
+| CI @ `8f552f02` | `build-and-test` **green**, `e2e-windows` **green** |
+| guards | both run locally with `-Repo/-BaseRef/-HeadRef`, **and driven RED** on three throwaway commits each naming `FABLE.md` |
+| citations | all **ten** section-number citers re-derived from `origin/main`, per location — all ten resolve |
+
+The four undated charter sections — *When this file is in play / How Fable reaches Helm / How
+Claude calls Fable / Item shape* — stay live in the index, inside that kept byte slice. All
+three code-cited anchors (§4 SCREEN mutex, §3 TR-2, "plan §3, DRA-48") are in the same slice,
+so **nothing about what the ten citations resolve to changes.** The new file's complete `###`
+heading list is now exactly those three anchors, which makes `FABLE.md §n` **less** ambiguous
+than #758 leaves it, not more.
+
+### The ask — three questions
+
+1. **Extend (c) to `FABLE.md`?** Your mix put this file on (a); (a) cannot hold it, for the
+   reason above. May split-at-source apply here, and does #765 as built discharge it?
+2. **Seat.** (c) says *"Planner files the child; a named non-Executor seat implements."* #765
+   was implemented by **Sr Executor**, on a standalone janitorial branch off `main` (not a
+   feature branch). Does DRA-267's *"any Soft seat, including Sr Executor"* narrowing reach a
+   (c) split, or must this be re-seated and rebuilt elsewhere?
+3. **Is `docs/plans/` a new file class under DRA-144?** (c) says *"Prefer no new root-level
+   ledger (that would be a new file class under DRA-144)."* `docs/plans/` is not root-level
+   and its files are not ledgers — nobody appends to them; a plan is written once, and
+   rotation of this class becomes a rename. Should it be rostered in the size guard, or
+   deliberately left out?
+
+### What I am NOT asking, and will not do without a further word
+
+Not asking to raise or re-add a baseline row (check B stands). Not asking to weaken either
+guard. Not asking to touch `shoot.ps1`, `release.ps1`, `ScreenLock.cs` or any other citing
+source file — **no source file is edited by #765**, and had the split broken a citation that
+would be its own Executor card. Not a release or consequence-list door.
+
+**If you rule no**, the fallback is a second full rotation of `FABLE.md` under (a). That is
+in-shape for DRA-267 and I can carry it on this seat — it buys days, and this ask returns.
+
+### One correction I owe this ask
+
+An earlier revision of #765's body said the DRA-287 card's ~1.9-day figure *"could not be
+reproduced from a source in this repo"*. **That was wrong, and it is corrected in the body.**
+The source is `scripts/channel-size-baseline.psd1`, written by #758, and the arithmetic checks
+(`65,536 - 39,850 = 25,686`; `25,686 / 13,700 = 1.87`). Flagged here because you should not
+rule against a demerit I invented.
+
+### Feedback
+
+*Constructive:* a ruling that assigns files to arms **by name** — DRA-232's (a)/(c) mix — is
+precise and easy to audit, which is exactly why it went brittle here. The arm was chosen per
+file, but the *reason* a file needs (c) is a property of its **append shape**, not of its
+name. `FABLE.md` earns (c) for the same reason `HELM.md` did, and the mix could not say so
+because it enumerated. An arm rule that named a **test** — *"a file whose median append is a
+whole document belongs on (c)"* — would have routed this file without costing a second LIVE
+ASK and two days of headroom.
+
+— Dranak (Claude Code, Sr Executor, DRA-287)
