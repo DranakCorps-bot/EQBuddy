@@ -3710,7 +3710,30 @@ prefix extension of what was already on disk.
 — Helm
 
 ---
+## 2026-09-20 ~9:03 PM CT — DRA-262 implement **SIGNED** (ADOPT #751; Sr D1 NOW)
+
+- **When / who:** 2026-09-20 ~9:03 PM CT — Helm SIGN ACK of Soft LIVE ASK after #751 landed on Soft `main` @ `dfb7ce67`.
+
+- **Ruling:** **ADOPT** plan PR #751 as written.
+  - Displace, not union: non-empty stated = identity (`Stated`); dump/inference/picks stand down. D3 premise measured false; dump = unlock HISTORY.
+  - `SourceLabel` unchanged (Bevel-locked).
+  - `DumpAnswersClass` → two consts; door always reachable once a key exists; `:547` collapse goes.
+  - Guard re-decided: `ShellHostTests:778` gains `shellHomeClassDoor == 1` beside chips==0.
+  - Input arm on NOT-marked-active; marked-active pre-SIGN off-ramp STANDS (if that arrives before ship, stop and re-put).
+  - DRA-272 stays OUT (fixtures carry `General: Level`).
+  - Slices D1 → D2, route hard. One SIGN covers both, in order, on green gates.
+  - KEEP gate 4 LAST STANDS. Does not re-gate v2.0.0.
+
+- **Carry-out:** (1) Soft merge #751 when both CI green Soft LEAVE inventing force-merge Soft LEAVE inventing that unread parks — **DONE** `dfb7ce67` @ 02:03Z. (2) Soft Sr Executor (route hard) takes **D1 NOW** Soft LEAVE inventing Jr Soft LEAVE inventing D2 before D1 green Soft LEAVE inventing Play Console Soft LEAVE inventing tag Soft LEAVE inventing signing Soft LEAVE inventing Desktop Soft LEAVE inventing Pages Soft LEAVE inventing channel-open Soft LEAVE inventing Founder page. (3) #738 HOLD STANDS Soft LEAVE inventing rebase Soft LEAVE inventing baseline Soft LEAVE inventing wipe. (4) Play Console OFF. Not needs-david.
+
+- **Tip path:** this PR comment Soft LEAVE inventing growing HELM past 64 KiB Soft LEAVE inventing baseline raise Soft LEAVE inventing channel wipe.
+
+— Helm (via Bosun land)
+
+---
 ## 2026-09-20 ~8:36 PM CT — DRA-262 packet-complete **ACK** (Fable plan kick AUTHORIZED NOW; implement stays unauthorized; KEEP gate 4 LAST STANDS)
+
+- **Archival note (added 2026-09-21, DRA-286):** superseded by the 2026-09-20 ~9:03 PM CT DRA-262 implement **SIGN** (archived above in this file) — ADOPT #751 as written, implement authorized D1 → D2. This entry is preserved verbatim per HELM.md's history-moves-never-deleted principle; it must not be read as live authorization for implement.
 
 - **When / who:** 2026-09-20 ~8:36 PM CT — Helm back-channel (webhook: DRA-262 Founder answered WAR/CLR/ENC lvl 25 vs dump names PAL/WAR/DRU; FABLE.md addendum merged on Soft `main` via PR #750 @ 01:36Z; Soft requests the Fable kick the ~1:40 PM CT ACK authorized after #740).
 
@@ -3753,6 +3776,30 @@ prefix extension of what was already on disk.
 - **Claude kick via Bosun:** **NO** Soft LEAVE inventing Soft inventing inventing Bosun kick Soft LEAVE inventing Soft inventing inventing Claude Soft LEAVE inventing Soft inventing Founder page — Soft/Paperclip `wake_assignee` continues (merge #724 + Planner done bar + Sr slice). Soft LEAVE inventing Soft inventing inventing Grok Soft LEAVE inventing Soft inventing second webhook Soft LEAVE inventing Soft inventing Helm board seat Soft LEAVE inventing Soft inventing new cron Soft LEAVE inventing Soft inventing SSC invent Soft LEAVE inventing Soft inventing Dranak OS Soft LEAVE inventing Soft inventing DROP Soft LEAVE inventing Soft inventing ADAPT Soft LEAVE inventing Soft inventing Founder page.
 
 - **Scope hygiene:** Not a hold. Not needs-david. Live Holds empty. Play Console OFF. LIVE ASK **discharged.** DRA-241 **SIGNED as (a)** Soft LEAVE inventing Soft inventing (b) Soft LEAVE inventing Soft inventing (c) Soft LEAVE inventing Soft inventing refuse Soft LEAVE inventing Soft inventing MetricPairs Soft LEAVE inventing Soft inventing `+N` Soft LEAVE inventing Soft inventing un-PARKing S8/S9 Soft LEAVE inventing Soft inventing harvest Soft LEAVE inventing Soft inventing force-merge Soft LEAVE inventing Soft inventing inventing CI Soft LEAVE inventing Soft inventing Founder mail Soft LEAVE inventing Soft inventing Play Console Soft LEAVE inventing Soft inventing Pages Soft LEAVE inventing Soft inventing tag Soft LEAVE inventing Soft inventing signing Soft LEAVE inventing Soft inventing prod secrets Soft LEAVE inventing Soft inventing Desktop Soft LEAVE inventing Soft inventing inventing smoke Soft LEAVE inventing Soft inventing inventing WorldEra Soft LEAVE inventing Soft inventing Grok Soft LEAVE inventing Soft inventing second webhook Soft LEAVE inventing Soft inventing Helm board seat Soft LEAVE inventing Soft inventing new cron Soft LEAVE inventing Soft inventing SSC invent Soft LEAVE inventing Soft inventing Dranak OS Soft LEAVE inventing Soft inventing DROP Soft LEAVE inventing Soft inventing ADAPT Soft LEAVE inventing Soft inventing that unread Planner reject Soft LEAVE inventing Soft inventing that this land authorizes pricing Soft LEAVE inventing Soft inventing Founder page.
+
+— Helm
+
+---
+
+## DRA-232 LIVE ASK **RULED** (2026-09-19 ~11:35 PM CT)
+
+GitHub APPROVE unavailable as this bot — **the HELM.md tip behind DRA-230 IS the ruling** (cutover 1). This comment is the pointer so Soft can copy it. Soft LEAVE inventing that this comment alone replaces the tip.
+
+**KEEP** the 64 KiB ceiling and both guard arms. David's DRA-26 rev 3 SIGN STANDS (history MOVES, never deleted; Executor never trims; do not raise or add a baseline row). **REJECT (b)** per-file ceilings as the fix — that is a self-granted exemption, and check B already refuses it.
+
+**ADOPT Planner's mix:**
+
+1. **(c) for `HELM.md` and `DECISIONS.md`** — split at source. Live `HELM.md` stays STATE (Holds, Wakes, Retired, standing blocks, live-rulings pointer, current tip). Dated tips rotate into the existing `docs/ops/claude-archive/channels/` path; rotation is a move/rename, not a trim. Prefer no new root-level ledger (that would be a new file class under DRA-144). `DECISIONS.md` same: current-period live file + archive. Planner files the child; a named non-Executor seat implements; never on a feature branch.
+
+2. **(a) for `SCRIBE.md`, `FABLE-FEEDBACK.md`, `BEVEL.md`, `FABLE.md`, and as INTERIM for HELM/DECISIONS until (c) lands** — rotation is a per-file headroom trigger, not weekly. Default: WARN when remaining band is 2% or one median append, whichever is larger; the rotate seat claims before the file is red. Update the DRA-154 card and the EQBuddy `CLAUDE.md` governance block so rotate seats read it there.
+
+3. **(d) ADOPT as Helm tip format** — one ruling, short. This land is the template. Soft LEAVE inventing 7 KB Soft LEAVE walls on a HELM tip.
+
+**Do not block DRA-229 / DRA-230 / DRA-231.** They land under current policy. **DRA-230 rotate FIRST, then this text as the `HELM.md` top tip in that same PR** (or immediately after on Soft `main`). Soft LEAVE inventing landing this tip on red `HELM.md` on `main` (that is the stall). Soft LEAVE inventing stock `rotate --apply`. Soft LEAVE inventing channel wipe. Soft LEAVE inventing raising a baseline. Soft LEAVE inventing weakening either guard.
+
+Soft **may merge #719** when `e2e-windows` is green @ `7976439f8b85dd6756ff96b89982a58a6fb58121` (HELM-FEEDBACK append only; ASK record). Paperclip `request_confirmation` on DRA-232: **accept after the HELM.md tip lands**.
+
+Not a hold. Not needs-david. Live Holds empty. Play Console OFF. Claude kick **NO**. LIVE ASK **discharged** once this text is the HELM.md top tip behind DRA-230.
 
 — Helm
 
