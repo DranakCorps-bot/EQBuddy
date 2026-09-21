@@ -1,3 +1,149 @@
+## 2026-09-21 — PLAN from Fable (DRA-262): the statement DISPLACES — the dump is an unlock history, and the player is the only roster source EQBuddy reads
+
+To: Claude
+
+route: hard
+
+**This plan waits for a Helm SIGN by design** — it reverses two decisions of signed plan
+DRA-66 (D3 *"stated never suppresses the dump"*, D4 the editor collapse), and a departure
+from a signed plan is the named escalation path, not a thing a kick authorizes. Soft opens
+the LIVE ASK; no executor takes a slice before the SIGN lands. `route: hard` because
+`CharacterClasses.Resolve` is the identity rule every class-aware surface reads — the Quest
+Tracker, the Gear Locker, the Sky lens, the unlock list, the Helper, the phone. **Slices:
+D1 → D2**, declared below; one SIGN covers both, in order, on green gates. This plan does
+not re-gate v2.0.0 (DRA-252 holds that decision) and touches no gate, in no order.
+
+Inputs: the 2026-09-20 stub and 2026-09-21 addendum below — leave both in place until the
+executor takes D1; they are this plan's evidence. All line numbers at `d168cf4b`.
+
+### Ruling 1 — a statement DISPLACES. Union lost on evidence, not on taste.
+
+D3's premise is written out at `CharacterClasses.cs:67-76`: *a player who disagrees with
+their dump has a stale dump.* The Founder's character measures it false — his dump yields
+the same three names on every re-run, because what the dump states is every class he has
+ever UNLOCKED, and `Companion/CompanionQuestSource.cs:40` has drawn that distinction all
+along: *an earned unlock may never be played.* The game states the ROSTER nowhere EQBuddy
+reads. So for identity, the player's statement is not a memory arguing with the game's
+writing — it is the only roster source that exists, and the dump demotes from "who the
+character IS" to "the best default reading when nobody has said otherwise."
+
+**D1 — Core.** In `Resolve`: a non-empty `stated` answers ALONE — identity is the stated
+list (first `Max`, in tick order), source `Stated`; dump, inference and picks contribute
+nothing to identity while it stands. Empty `stated`: byte-identical to today (dump leads,
+inference fills, picks widen). Not "stated first, dump fills behind": with the Founder's
+three ticked, fill-behind is a no-op, and with one tick it re-names the exact class being
+corrected away. Rewrite the premise paragraphs (`:47-50`, `:67-76`) to the history/roster
+reframe with the Founder's measurement cited; carry D3's named cost over unchanged — a
+stated player does not widen until they restate or clear, acceptable for an explicit
+override with a visible undo (`ClearStated`, whose doc already promised "the dump if one
+has landed").
+
+Tests, D1: `TheDumpStillLeadsAndUnionsWithAStatement` (`CharacterClassesTests.cs:118`) is
+the D3 row and is REWRITTEN to assert displacement — it is the prove-fail; red on the old
+build is the point. Add the Founder's case by name: `unlocked` [Paladin, Warrior, Druid],
+`stated` [Warrior, Cleric, Enchanter] → exactly the statement, `Stated`. The other stated
+rows (`AStatedClassSilencesTheGuess`, `PicksStopFeedingIdentityWhileAStatementStands`,
+`ClearingTheStatementPutsTheGuessBackInCharge`) stand untouched.
+
+### Ruling 2 — `SourceLabel` does not move
+
+One table, Bevel-locked, and no row changes: `"set by you"` already exists and now simply
+wins more often; `"from your achievements"` remains a true SOURCE name for the default
+reading — the label names where the list came from, never how much to trust it. No new
+enum member, nothing persists the number.
+
+### Ruling 3 — what replaces `DumpAnswersClass`, and the door
+
+**D2 — the room.** Delete the `HomeRoom.cs:547` early return: the "Set class…" door is
+built whenever a character key exists, whatever the source, editor collapsed by default.
+When the source is the dump and nothing is stated, the sentence under the line replaces
+`DumpAnswersClass` — and a cap says so (trap 50), so it is two consts, chosen on the
+completed-unlock count (`UnlockedClassesFor(key).Count` — a caption about the DUMP, not a
+second identity resolution; say so in the comment, trap 33):
+
+- `DumpListsUnlocks` (count ≤ `Max`): *"Your achievements dump lists what this character
+  has unlocked. If that's not who you're playing, set it below."*
+- `DumpListsUnlocksTruncated` (count > `Max`): *"Your achievements dump lists {n} unlocked
+  classes — EQBuddy shows the first three. Set the ones you're playing below."*
+
+The subject is the dump and EQBuddy, never the game being wrong. `ClassEditorNote` rewords
+to carry the new rank: *"Tick what this character actually is — up to three, the game's
+own limit. What you tick here is the answer, over the dump and the log alike, until you
+clear it."* `ClearStated` stays byte-identical. Executor reads `BEVEL.md` before D2 per
+standing rule; a Bevel critique of these strings is a wording amendment, not a re-plan.
+
+### The guard is re-decided, not deleted around
+
+`ShellHostTests.TheClassLineReadsTheAchievementsDumpWhenOneLands` (`:778`) asserted
+`shellHomeClassChips == 0` as proof the editor did not exist. D2 adds a dump fact
+`shellHomeClassDoor` (0/1, door built) and the test asserts `door == 1` BESIDE
+`chips == 0` — the editor exists and is collapsed, which is the new decision stated as a
+pair the old build fails on the first half. Update its summary to cite DRA-262. The word
+pins at `HomeRoomTests.cs:285-289` move to the two new consts. If the same launched
+session can cheaply tick a chip and watch the line flip to "set by you", take it; a second
+launch is not the bar. `QuestMyClassesTests` / `QuestClassStripTests` stage no statement
+and stand; `SurfaceParityTests:670` re-runs unchanged — the phone reads the same upstream
+resolution and stays read-only (trap 35).
+
+### The input arm, planned on NOT-marked-active (as instructed)
+
+`AchievementsImport.UnlockedClasses` keeps returning EVERYTHING complete — that IS the
+fact the dump states; the lie was `Resolve` calling its first three the roster, and
+displacement plus the truncation sentence repair the READING, not the reader. The dead
+"primary, then rest" split stays as written and becomes MEASURED: a unit test over both
+committed fixtures asserting every class-unlock row takes the Primary branch (`rest`
+empty), so the unmeasured path is a pinned fact instead of churn. No new ordering is
+invented and no alphabetical "fix" ships. The Founder's PAL·WAR·DRU ordering anomaly is
+consistent with a chronological dump and ≥4 unlocks — a hypothesis, labelled as one;
+interaction `b698bd69` decides it, not this plan.
+
+### The off-ramp: a marked-active dump arrives
+
+- **Before the SIGN:** stop the ask. The defect moves into `UnlockedClasses` (read the
+  active marker), D3/D4 stand, and this plan is re-put to Helm, not executed. That seam is
+  declared here on purpose — it is the boundary the sequence-wide SIGN rests on.
+- **After ship:** reading the marker is its own V1 card, and displacement STAYS — a
+  player's statement outranking an import is coherent even over a correctly filtered one,
+  and the door stays earned.
+
+### DRA-272 stays OUT — and the premise it was filed on is mismeasured
+
+Measured at `d168cf4b`: BOTH committed achievements fixtures carry `General: Level` — ten
+`C→Level N` rows ("Reach Level N", 5 through 50; `averaj.txt:326-345`, `hateborne.txt`
+same lines). So *"the achievements dump carries none"* is false: the dump states a level
+FLOOR at 5-level quanta, arriving through an importer that already parses this file. That
+is the addendum's own fork, second branch — a standing source exists, so DRA-272 is a
+separate V1 and none of this plan's time. Pointer for that card, not acceptance criteria:
+a third writer into `CharacterLevel`'s freshness model (a floor never lowers a fresher
+claim), and its FIRST measurement is whether the section is per-character or account-wide
+— both fixtures all-complete to 50 is either two level-50 reporters or an account-wide
+section, and an account-wide floor on an alt is unusable; the Founder's own level-25 dump
+answers that in one look. The asymmetry that keeps level out while class joins: the level
+row's editor is reachable TODAY and `StatedLevel` already wins by freshness — that half
+has a working repair; the class row had none.
+
+### Done bar and duties
+
+On DRA-262 — the card holds it, not restated here. Added by this plan and nowhere else:
+the guard re-decision above, and D2 ships the `WhatsNew.json` entry, credited to David's
+DRA-252 report — *"Character room: 'Set class…' now works even after an achievements dump
+has answered. The dump lists what you've unlocked — not which three you're playing — and
+what you set wins until you clear it."* No surface moved, so no "X is now Y" duty.
+
+### Feedback (Planner)
+
+- Reinforcing: the addendum's fixture counting — 16 rows, all-Primary, alphabetical, dead
+  `rest` branch — is what let this plan rule without re-deriving anything. Counting before
+  reading keeps paying; keep doing exactly that.
+- Corrective, small: *"the achievements dump carries none"* — it carries `General: Level`,
+  ten milestone rows in both committed fixtures. Cost: the DRA-272 join question reached me
+  framed on a false premise, and one grep closed it. Worth the same distinct-count sweep
+  next time a dump is declared silent about a fact.
+
+— Fable 5 (plan, DRA-262)
+
+---
+
 ## 2026-09-21 — ADDENDUM from Planner (DRA-262): the Founder answered, and it closes the fork in the stub below — the dump is an unlock HISTORY, not a roster
 
 To: Fable
