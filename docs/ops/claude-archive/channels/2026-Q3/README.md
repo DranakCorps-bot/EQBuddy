@@ -31,6 +31,7 @@ do, the inboxes are `SCRIBE.md`, `BEVEL.md` and `FABLE.md` — not this director
 | [`HELM-FEEDBACK.md`](HELM-FEEDBACK.md) *(pass 3)* | 81 | 342,571 | 344,449 B → 4,730 B (1 entry) | before 2026-09-18 |
 | [`SCRIBE.md`](SCRIBE.md) *(pass 4)* | 47 | 99,145 | 213,675 B → 114,715 B (45 entries) | **triage by `Priority`, not a date** |
 | [`DECISIONS.md`](DECISIONS.md) *(pass 5)* | 143 | 595,476 | 676,431 B → 85,238 B (18 blocks) | before 2026-09-17, **plus a hand-triaged floor** |
+| [`DECISIONS.md`](DECISIONS.md) *(pass 6)* | 10 | 42,706 | 55,411 B → 13,383 B (STATE + 1 tip) | DRA-294 arm (c) discharge floor (32,768 B); hand-triaged, not a date cut |
 
 No pending ask is archived in any pass — pass 2's 18 candidate ask/hold
 markers were each dispositioned before the move and all 18 were already discharged,
@@ -63,6 +64,26 @@ moved, and **zero** entries marked `must-fix`, `approved`, `authorized`, `author
 `open` or `waiting` were archived - a count measured over the archive file, not a claim.  The live
 `HELM-FEEDBACK.md` asks are still in the active file; the **PR #606** DRA-71 D9 ask
 that was unsigned when pass 1 ran has since been SIGNED and moved in pass 3.
+
+**Pass 6 (DRA-294, 2026-09-21) is the first pass driven by a discharge floor rather than a
+size trigger.** Helm's DRA-282 Q2 item 4 ruling (tip PR #773) fixed the arm (c) bar at
+**32,768 B** (50% of the 65,536 B ceiling) — shape alone no longer discharges a row. Ten
+blocks moved (2026-09-19: `DRA-199`, `DRA-180 D2`, `DRA-180 D3`; 2026-09-17: `DRA-164
+D1–D3`, `DRA-149 D5`, `DRA-149 D4`, `DRA-149 D2`, `DRA-164 D4`, `DRA-181 D4`, `DRA-180
+D1`), each hand-checked against the file's own never-rotate floor and found to carry no
+open ask, unexpired PARK/HOLD or standing rule resident in `DECISIONS.md` itself. **One
+close call, kept rather than moved on a margin call:** `DRA-161`'s "Helm LOCK stays live"
+entry (2026-09-17) records a standing rule that has since graduated into a live, current
+restatement in `HELM.md` ("Soft/Planner may Soft file a fresh amended DRA-55 plan") — by
+the pass-5 criteria that would be archivable — but nothing forced its removal to meet the
+32,768 B floor (13,383 B landed, 19,385 B of headroom), so it stayed under the never-rotate
+floor rather than being risk-judged out on a margin no byte budget required spending.
+**Undocumented gap this pass inherited, not created:** DRA-281 (2026-09-21, PR #762) rotated
+`DECISIONS.md` 86,981 B → 55,411 B and appended 459 lines to this archive file without adding
+a row here or updating the passage above — that PR's own commit message and the live
+`DECISIONS.md` "Last cut" line are the record of it; this README's pass count and the passage
+above were not amended by it and are not amended here either, since backfilling another
+pass's documentation is outside this card's scope.
 
 ### Pass 3 rotated the state file itself, which the first two could not
 
