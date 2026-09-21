@@ -55,6 +55,28 @@ $MojiCp437       = [string][char]0x0393 + [string][char]0x00C7 + [string][char]0
 $MojiCp437Double = [string][char]0x256C + [string][char]0x00F4 + [string][char]0x251C +
                    [string][char]0x00E7 + [string][char]0x251C + [string][char]0x2562
 
+# DRA-244. The cp1252 producer again, but on the TWO-byte leads - which is where the
+# enumerated marker list had its hole. A middot is UTF-8 `C2 B7`; read as cp1252 that is
+# U+00C2 U+00B7. The list carried exactly one U+00C2 pair, U+00A0, and DECISIONS.md at
+# blob f5036bc5 held 481 U+00C2 sequences of which ZERO were that pair: 459 middots, 21
+# section signs, 1 plus-minus. The file's two marker hits were both cp437; every cp1252
+# arm scored 0 on 532 real cp1252 sequences. Enumeration is what produced that, so these
+# fixtures are the characters the ledgers actually use rather than three more list rows.
+$MojiMiddot  = [string][char]0x00C2 + [string][char]0x00B7   # UTF-8 C2 B7 - a middot
+$MojiSection = [string][char]0x00C2 + [string][char]0x00A7   # UTF-8 C2 A7 - a section sign
+$MojiArrow   = [string][char]0x00E2 + [string][char]0x2020 +
+               [string][char]0x2019                          # UTF-8 E2 86 92 - a right arrow
+
+# The false-positive control, and the reason check 4 cannot just forbid the U+00C2 and
+# U+00E2 characters outright: these are the HONEST forms of the three above, and the
+# ledgers are full of them. A detector that cannot tell a real middot from its
+# double-encoding refuses the repair it is supposed to be asking for.
+$RealMiddot  = [string][char]0x00B7
+$RealSection = [string][char]0x00A7
+$RealArrow   = [string][char]0x2192
+
+$Cp1252 = [Text.Encoding]::GetEncoding(1252)
+
 function New-Utf8File([string] $path, [string] $text) {
     $dir = Split-Path $path -Parent
     if (-not (Test-Path -LiteralPath $dir)) { New-Item -ItemType Directory -Force -Path $dir | Out-Null }
@@ -300,6 +322,61 @@ try {
     Reset-Tree
     New-Utf8File $ledgerPath ($baseLedger + (Get-LedgerText 3 'a new entry').Replace([string][char]0x2014, $MojiCp437Double))
     Assert-Result 'check 4 - cp437 mojibake (depth 2) APPENDED REFUSES' $true 'double-encoded' $B
+
+    # DRA-244. Appends again, for the reason the cp437 pair are appends: check 4 is then the
+    # only check that can speak, so a green here is a green from check 4 specifically and not
+    # a refusal borrowed from another arm. Each of these three was a clean exit 0 against the
+    # enumerated marker list while carrying the single most common artefact in these ledgers.
+    Reset-Tree
+    New-Utf8File $ledgerPath ($baseLedger + (Get-LedgerText 3 'a new entry').Replace([string][char]0x2014, $MojiMiddot))
+    Assert-Result 'check 4 - cp1252 mojibake (middot, C2 B7) APPENDED REFUSES' $true 'double-encoded' $B
+
+    Reset-Tree
+    New-Utf8File $ledgerPath ($baseLedger + (Get-LedgerText 3 'a new entry').Replace([string][char]0x2014, $MojiSection))
+    Assert-Result 'check 4 - cp1252 mojibake (section sign, C2 A7) APPENDED REFUSES' $true 'double-encoded' $B
+
+    Reset-Tree
+    New-Utf8File $ledgerPath ($baseLedger + (Get-LedgerText 3 'a new entry').Replace([string][char]0x2014, $MojiArrow))
+    Assert-Result 'check 4 - cp1252 mojibake (arrow, E2 86 92) APPENDED REFUSES' $true 'double-encoded' $B
+
+    # The whole-file shape the card is actually about: a ledger re-encoded through cp1252 in
+    # one pass. 459 of DECISIONS.md's sequences were this. It must refuse on check 4 and it
+    # must say HOW MANY, because a count is what exposed the collapsed list (trap 74) and a
+    # count is the only part of this message that can be checked against the file.
+    Reset-Tree
+    New-Utf8File $ledgerPath ($baseLedger.Replace([string][char]0x2014, $MojiMiddot))
+    Assert-Result '  ...and a whole-file cp1252 re-encode names the COUNT it gained' $true 'gains 60 double-encoded characters' $B
+
+    # DRA-244 deleted four enumerated cp1252 rows from the guard's marker list on the claim
+    # that the reversibility test subsumes them. This is that claim held to account: the
+    # second round trip is where `C3 A2` and `C3 201A` - two of the deleted rows - come
+    # from, and it is BUILT here rather than transcribed, because "read the wrong codec
+    # twice" is the definition and a hand-copied code point is a guess at it.
+    Reset-Tree
+    $MojiCp1252Double = $Cp1252.GetString([Text.Encoding]::UTF8.GetBytes($MojiEmDash))
+    New-Utf8File $ledgerPath ($baseLedger + (Get-LedgerText 3 'a new entry').Replace([string][char]0x2014, $MojiCp1252Double))
+    Assert-Result 'check 4 - cp1252 mojibake at DEPTH 2 APPENDED REFUSES' $true 'double-encoded' $B
+
+    # -- check 4's false positives, which cost more than its false negatives ------------
+    # The ledgers use all three of these constantly - the middot IS the separator the
+    # decision entries are built out of. If check 4 cannot tell them from their
+    # double-encodings it refuses every honest append, and the first repair PR it blocks is
+    # the one repairing the damage it was widened to see.
+    Reset-Tree
+    New-Utf8File $ledgerPath ($baseLedger + (Get-LedgerText 3 'an honest entry').Replace(
+            [string][char]0x2014, "$RealMiddot $RealSection $RealArrow"))
+    Assert-Result 'check 4 - REAL middot / section sign / arrow appended passes' $false 'channel files intact' $B
+
+    # The detector against its own source bytes, which is the assertion this suite could not
+    # make while the detector was a list of glyphs: a marker written literally into the
+    # script is re-encoded by the first host that guesses wrong, and then the scan undercounts
+    # itself with no symptom. Both scripts are pure ASCII on purpose. Appending 35 KB of
+    # PowerShell to a ledger is a strange-looking fixture and an exact one - it puts the
+    # guard's own bytes through the guard, and the append leaves every other check silent.
+    Reset-Tree
+    $ownSource = [IO.File]::ReadAllText($guard) + [IO.File]::ReadAllText($PSCommandPath)
+    New-Utf8File $ledgerPath ($baseLedger + $ownSource)
+    Assert-Result 'check 4 - the guard and this suite score ZERO on their own source' $false 'channel files intact' $B
 
     Reset-Tree
     New-Utf8File (Join-Path $root 'ORACLE-FEEDBACK.md') (Get-LedgerText 20 'a new channel nobody rostered')
