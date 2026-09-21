@@ -86,9 +86,13 @@ jobs:
           pwsh -NoProfile -File scripts/channel-size-guard.ps1
           -BaseRef "${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || github.event.before }}"
 
-      # Its prove-fail, same idiom and same reason as the wipe guard's above: twenty cases in
-      # a throwaway repo, every arm driven into the red at least once and eleven shapes
-      # asserted GREEN — a size ratchet's real risk is refusing an append that policy allows.
+      # Its prove-fail, same idiom and same reason as the wipe guard's above: twenty-five
+      # cases in a throwaway repo, every arm driven into the red at least once and fifteen
+      # shapes asserted GREEN — a size ratchet's real risk is refusing an append that policy
+      # allows. Five of those (DRA-284) are the headroom WARN band, which changes no exit
+      # code and so would go dead silently: only its own cases can catch that, and one of
+      # them builds a real append history so the ruled `3 × median append` term is what
+      # fires rather than the 2% floor.
       - name: Channel size ratchet refuses each violation
         run: pwsh -NoProfile -File scripts/channel-size-selftest.ps1
 
