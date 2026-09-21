@@ -2,12 +2,17 @@
 
 **Immutable. Nothing here is live, and nothing here is a work queue.**
 
-Rotated out of the active channel files in two passes: **2026-09-14** by DRA-75
-(M0-2) under the DRA-73 plan rev 2 approved by David on 2026-09-14, and
+Rotated out of the active channel files in five passes: **2026-09-14** by DRA-75
+(M0-2) under the DRA-73 plan rev 2 approved by David on 2026-09-14,
 **2026-09-17** by DRA-165 (DRA-144 F1) under DRA-26 plan §5 as David SIGNed it
-2026-09-17T01:06:45Z. `exo-experiment: channel-rotation`. Tier T1.
-Pass 2 appended into the existing `FABLE-FEEDBACK.md` archive; it moved nothing
-that pass 1 had already written.
+2026-09-17T01:06:45Z, and **2026-09-18** by DRA-154 (`EXO-CHANNEL-ROTATE`) under the
+Helm AUTHORIZE of that evening, and **2026-09-20** by DRA-229 (DRA-144 F4b) and
+DRA-231 (DRA-144 F6), both under DRA-26 plan rev 3 section 5.
+`exo-experiment: channel-rotation`. Tier T1.
+Pass 2 appended into the existing `FABLE-FEEDBACK.md` archive and pass 3 into the
+existing `HELM-FEEDBACK.md` one; neither moved anything an earlier pass had written,
+and passes 4 and 5 wrote new `SCRIBE.md` and `DECISIONS.md` archives that no earlier
+pass had opened.
 
 Holds live in `HELM.md` and **only Helm lifts one**. An archived line never
 revives a hold and never commissions work. If you are looking for something to
@@ -22,14 +27,69 @@ do, the inboxes are `SCRIBE.md`, `BEVEL.md` and `FABLE.md` — not this director
 | [`HELM-FEEDBACK.md`](HELM-FEEDBACK.md) | 390 | 1,914,317 | 5.0 MB → 117 KB (24 entries) | everything below the readable 2026-09-09+ set |
 | [`FABLE-FEEDBACK.md`](FABLE-FEEDBACK.md) | 139 | 1,006,791 | 1.1 MB → 174 KB (35 entries) | before 2026-09-08 |
 | [`FABLE-FEEDBACK.md`](FABLE-FEEDBACK.md) *(pass 2)* | 49 | 226,720 | 265 KB → 39 KB (10 entries) | before 2026-09-15 |
+| [`HELM.md`](HELM.md) *(pass 3)* | 144 tips + 134 sign-offs | 1,033,986 | 1,047,518 B → 25,411 B (1 tip) | before 2026-09-18 |
+| [`HELM-FEEDBACK.md`](HELM-FEEDBACK.md) *(pass 3)* | 81 | 342,571 | 344,449 B → 4,730 B (1 entry) | before 2026-09-18 |
+| [`SCRIBE.md`](SCRIBE.md) *(pass 4)* | 47 | 99,145 | 213,675 B → 114,715 B (45 entries) | **triage by `Priority`, not a date** |
+| [`DECISIONS.md`](DECISIONS.md) *(pass 5)* | 143 | 595,476 | 676,431 B → 85,238 B (18 blocks) | before 2026-09-17, **plus a hand-triaged floor** |
 
-No pending ask was archived in either pass — pass 2's 18 candidate ask/hold
+No pending ask is archived in any pass — pass 2's 18 candidate ask/hold
 markers were each dispositioned before the move and all 18 were already discharged,
-so nothing needed re-pinning.  The live `HELM-FEEDBACK.md` asks — including the
-unsigned **PR #606** DRA-71 D9 ask — are still in the active file.
+so nothing needed re-pinning, and pass 3 did the same for 43.
+**Pass 5 is the first pass that had to re-pin, and the marker sweep is not what caught
+it.** All five 2026-09-14 blocks carrying an `exo-experiment:` tag are correctly archived
+as history, but the tag itself is read out of the *live* file by `Get-Experiments` in
+`scripts/exo-metrics.ps1` and by two tests, so archiving all six tags broke the ExO
+dashboard's regenerability. Both channel guards were green; CI tests caught it. The six
+tag lines and their judging clauses are re-pinned verbatim into a dated `STANDING` block
+in the live file (3,440 B), and the full entries stay here. **The lesson for pass 6 and
+later: the never-rotate floor is a keyword set, so it cannot see content whose liveness is
+carried by a consumer rather than by a marker. Grep `scripts/` and `tests/` for the
+ledger's filename before cutting it.**
+**Pass 5 is also the first pass whose triage changed the cut.** `DECISIONS.md` had 30 blocks
+older than the 2026-09-17 date cut carrying a `LIVE ASK` / `PARK` / `HOLD` / `STANDING`
+marker. Each was dispositioned by hand: 24 moved — the marker was product vocabulary
+(a parked HUD chip row, a seat-mutex holder), a counterfactual ("could have gone the
+other way: LIVE ASK first"), a narrative reference to an ask whose residence is another
+file and which is now discharged, or a rule that has since graduated to a live document
+— and **6 were kept in the live file at any age** because they carry a park with an
+unmet reopen condition, an unfixed defect named for veto, a rule whose only residence
+is `DECISIONS.md` itself, or a relay another card is still blocked on.
+**Pass 4 could not use a cutoff at all.** `SCRIBE.md` is an inbox, not a dated ledger:
+its entries carry a `Priority` field, 42 of the 92 were still open by that field, and the
+oldest of those (`waiting`, 2026-08-19) sit further down than entries already discharged.
+A date cut would have archived live `must-fix` player-facing defects, so pass 4 partitioned
+per entry by Priority instead: `someday` / `taken` / `done` and the terminal dispositions
+moved, and **zero** entries marked `must-fix`, `approved`, `authorized`, `authorized-next`,
+`open` or `waiting` were archived - a count measured over the archive file, not a claim.  The live
+`HELM-FEEDBACK.md` asks are still in the active file; the **PR #606** DRA-71 D9 ask
+that was unsigned when pass 1 ran has since been SIGNED and moved in pass 3.
 
-### Three files, and which one to read
+### Pass 3 rotated the state file itself, which the first two could not
 
+Passes 1 and 2 moved feedback ledgers. Pass 3 is the first rotation of the **`HELM.md`
+class** — the file that holds the holds — and that is why its cut is drawn where it is.
+**A hold, an open ask and a standing rule do not rotate at any age**, so the live file
+keeps its Holds block (empty, which is a live fact and not an omission), its Wakes and
+Claude-kick block, its five retired-hold lines, its item shape and its "What Helm does
+NOT decide" section, whatever their date. What moved was rulings, plus a pile of 122
+`### PR #…` sign-off entries that had accumulated *underneath* the retired-hold lines
+and were never holds themselves.
+
+Two live rulings sat below the calendar cutoff, so the live file carries a pointer block
+naming them and where to read them in full rather than relying on a reader's memory:
+the **PR #685** whole-sequence SIGN (DRA-180/181) and the **PR #684** Jr/Sr router SIGN
+(DRA-179). A rotation that silently moves the authorization the top of the file rests on
+is technically a move and practically a loss.
+
+Pass 3 also discharged both grandfather rows in `scripts/channel-size-baseline.psd1`
+in the same pull request, which is what `scripts/channel-size-guard.ps1` check C requires
+and the only way a row ever leaves that table. It used explicit line ranges and a
+reconstruction assertion rather than `scripts/channel-rotate.py`, because Helm had
+refused the stock `rotate --apply` for these two files on 2026-09-17.
+
+### Four files, and which one to read
+
+- **`HELM.md`** — every Helm ruling before 2026-09-18, in two blocks.
 - **`HELM-FEEDBACK.md`** — the readable recovery. **This is the one you want.**
 - **`HELM-FEEDBACK.original-flattened.md`** — the verbatim 4.93 MB that was
   removed: two ~2.4 MB lines of cp437 mojibake. Unreadable on purpose. It is
@@ -88,6 +148,15 @@ transcripts (trap 34). Prove-failed by disabling the predicate: 4 red, 21 green.
 `channels/` directory, not on these three filenames.
 
 ## What was NOT rotated, and why
+
+**Amended 2026-09-18 (pass 3): `HELM.md` has now rotated, and not on the >30-day arm.**
+The paragraph below is left as written because it was true and correctly reasoned on
+2026-09-14; what it could not see is that the **size** arm is the one that fires first on
+this file. `HELM.md` reached 1,047,518 B — 16x the 64 KiB policy — while still holding
+nothing over 30 days old, because it takes ~13 KB per append. A calendar rule alone would
+never have moved it. `FABLE.md` and `DECISIONS.md` stay unrotated: `DECISIONS.md` is at
+675,660 B against a 676,484 B grandfather cap, which is 824 bytes of band and its own next
+pass, and appending a pointer into 824 bytes is not a margin.
 
 `HELM.md`, `FABLE.md` and `DECISIONS.md` are named in DRA-75 for a **>30-day**
 rotation. On 2026-09-14 they hold **nothing older than 30 days** — the oldest

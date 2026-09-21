@@ -326,6 +326,41 @@ public static class GuidePresentation
     public const string BlockedBySkipLead = "The hand-in waits on a step you skipped: ";
 
     /// <summary>
+    /// The prerequisites of ONE step that the player STRUCK OUT — the steps that will not
+    /// arrive no matter how much of the remaining work gets done.
+    ///
+    /// <para><b>Only the skipped ones, and the exclusion is the definition.</b> A turn-in
+    /// whose pieces are merely uncollected is waiting on work that is already on the list and
+    /// already counted; the row's own detail says "after: …" and the checklist's remaining
+    /// count holds it. This answers the other question — what is outstanding that DOING THE
+    /// LIST will not close — and those are two different facts about one step, which is why
+    /// the count alone cannot tell a one-hand-in-away reward from a stuck one
+    /// (<c>QuestChecklistLayout.ClosestToCompletion</c>, S23 AC 8).</para>
+    ///
+    /// <para><b>One producer, three readers</b> (trap 4): <see cref="NoNextStep"/>'s blocked
+    /// sentence, the checklist row's <c>QuestChecklistRow.BlockedBy</c>, and through that the
+    /// group heading's "blocked". They were going to be three walks of one graph with three
+    /// chances to disagree about the same quest.</para>
+    ///
+    /// <para>A prerequisite id that names nothing in <paramref name="byId"/> is DROPPED
+    /// rather than reported: the set passed in is the DRAWN objectives, and a step this tab
+    /// is not showing is not a step the player skipped. <c>GuideCatalog.Validate</c> already
+    /// refuses a prerequisite id that names nothing in the guide at all, so a dangling id
+    /// here means the lens narrowed, never that the data is broken.</para>
+    /// </summary>
+    public static IReadOnlyList<GuideObjective> BlockedBy(
+        GuideObjective objective,
+        IReadOnlyDictionary<string, GuideObjective> byId,
+        Func<GuideObjective, bool> isDone, Func<GuideObjective, bool> isSkipped) =>
+        [
+            .. objective.PrerequisiteObjectiveIds
+                .Select(id => byId.TryGetValue(id, out var p) ? p : null)
+                .Where(p => p is not null && !isDone(p) && isSkipped(p))
+                .Select(p => p!)
+                .DistinctBy(p => p.Id, StringComparer.OrdinalIgnoreCase),
+        ];
+
+    /// <summary>
     /// What a step is CALLED on screen — its instruction where it has one, its title where it
     /// does not.
     ///
@@ -392,12 +427,15 @@ public static class GuidePresentation
         var byId = new Dictionary<string, GuideObjective>(StringComparer.OrdinalIgnoreCase);
         foreach (var objective in objectives) byId[objective.Id] = objective;
 
+        // Through BlockedBy, so this sentence and the checklist row's own blocker string are
+        // one rule read twice rather than two rules that happen to agree today (trap 4).
+        // `done` rather than `isDone` is deliberate and unchanged: it is the set built from
+        // the DRAWN objectives above, so a prerequisite the lens removed cannot become a
+        // blocker here either.
         var blockers = objectives
             .Where(o => !done.Contains(o.Id) && !isSkipped(o))
-            .SelectMany(o => o.PrerequisiteObjectiveIds)
-            .Where(id => !done.Contains(id)
-                && byId.TryGetValue(id, out var prerequisite) && isSkipped(prerequisite))
-            .Select(id => StepName(byId[id]))
+            .SelectMany(o => BlockedBy(o, byId, p => done.Contains(p.Id), isSkipped))
+            .Select(StepName)
             .Distinct(StringComparer.OrdinalIgnoreCase)
             .ToList();
 

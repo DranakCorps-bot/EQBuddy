@@ -49,7 +49,9 @@ internal sealed class AppHarness : IDisposable
     /// writes `/outputfile` dumps and where `InventoryFile.FindLatest` looks for them.</summary>
     public string GameDir => Path.GetDirectoryName(LogsDir)!;
     public string HistoryDbPath => Path.Combine(ProfileDir, "history.db");
-    private string DebugDumpPath => Path.Combine(ProfileDir, "debug.txt");
+    /// <summary>Public so <c>DumpReadTests</c> can seed the states this harness's read
+    /// rules exist for — an app write handle held open, and a dump missing a key.</summary>
+    public string DebugDumpPath => Path.Combine(ProfileDir, "debug.txt");
     private string ErrorLogPath => Path.Combine(ProfileDir, "error.log");
 
     public const string Character = "Testchar";
@@ -544,6 +546,44 @@ internal sealed class AppHarness : IDisposable
     }
 
     /// <summary>
+    /// Writes one classic-format map file into the GAME's own maps folder — the fallback
+    /// <c>ZoneMapFiles.DefaultFolder</c> probes, beside <c>Logs</c> (DRA-216 D5).
+    ///
+    /// <para><b>Trap 22: without it the map window has no picture, and everything the map
+    /// DRAWS is switched off.</b> <c>MapView</c> gates its circles, its camp pins, its target
+    /// rings and its marker on a loaded map, so a test asserting any of them against a harness
+    /// with no maps folder would be asserting zero against zero and passing on a build that
+    /// draws nothing. <c>WorldOpenersTests</c> says so in as many words — <c>mapZones</c> is
+    /// "legitimately 0 with no maps folder configured" — which is the right bar for "the window
+    /// opened" and the wrong one for "the layer drew".</para>
+    ///
+    /// <para>The stem is the map PACK's shortname, not the display name
+    /// (<c>ZoneMapFiles.ExpectedShortname</c>): "befallen", "commons", "crushbone". Seeded into
+    /// the game folder rather than through <c>MapFolder</c> so the precedence under test is the
+    /// one a player who has never opened "Maps folder…" actually has. Call before
+    /// <see cref="Launch"/>.</para>
+    /// </summary>
+    public void SeedZoneMap(string stem, params string[] lines)
+    {
+        var maps = Directory.CreateDirectory(
+            Path.Combine(Path.GetDirectoryName(Path.TrimEndingDirectorySeparator(LogsDir))!,
+                "maps")).FullName;
+        File.WriteAllLines(Path.Combine(maps, stem + ".txt"),
+            lines.Length > 0
+                ? lines
+                // A square big enough to hold any /loc a test plots, with one labelled POI so
+                // the file is a real two-shape map rather than a single line.
+                : (string[])
+                [
+                    "L -600.0, -600.0, 0.0, 600.0, -600.0, 0.0, 200, 200, 200",
+                    "L 600.0, -600.0, 0.0, 600.0, 600.0, 0.0, 200, 200, 200",
+                    "L 600.0, 600.0, 0.0, -600.0, 600.0, 0.0, 200, 200, 200",
+                    "L -600.0, 600.0, 0.0, -600.0, -600.0, 0.0, 200, 200, 200",
+                    "P 0.0, 0.0, 0.0, 240, 200, 60, 3, Zone_In",
+                ]);
+    }
+
+    /// <summary>
     /// Seeds running spawn countdowns, which live in <c>spawn-timers.json</c> rather than in
     /// settings.json — so a scenario that wants chips on the HUD row cannot get there through
     /// <c>configureSettings</c>. Trap 22: with no timers the spawn family contributes nothing
@@ -631,13 +671,22 @@ internal sealed class AppHarness : IDisposable
     /// an achievements file. A character who has never dumped resolves off the log, which
     /// collapses to one class (see <see cref="SeedQuestClasses"/>), so a scenario about
     /// picks NARROWING an identity has to seed this side of it.</param>
+    /// <param name="skippedObjectives">Guide objectives the player has STRUCK OUT, keyed by
+    /// guide id (DRA-218). The only lever out here that can produce a BLOCKED quest, and
+    /// trap 22 in its usual shape: a skip lives in the guide ledger rather than in
+    /// <c>AppSettings</c>, so <c>configureSettings</c> cannot reach it and a test about the
+    /// blocked heading would otherwise be asserting over a state the fixture cannot enter.
+    /// <c>DoneObjectiveIds</c> is deliberately left empty beside it — "I did this" and "I am
+    /// not doing this" contradict, and a fixture that wrote both would be staging a state the
+    /// app refuses to create.</param>
     public void SeedQuestLedger(
         IReadOnlyList<string>? classes = null,
         IReadOnlyList<string>? tracked = null,
         IReadOnlyDictionary<string, int>? owned = null,
         (int Level, DateTime At)? level = null,
         (int Level, DateTime At)? statedLevel = null,
-        IReadOnlyList<string>? unlockedClasses = null)
+        IReadOnlyList<string>? unlockedClasses = null,
+        IReadOnlyDictionary<string, IReadOnlyList<string>>? skippedObjectives = null)
     {
         File.WriteAllText(Path.Combine(ProfileDir, "quest-ledger.json"),
             JsonSerializer.Serialize(new Dictionary<string, object>
@@ -653,6 +702,13 @@ internal sealed class AppHarness : IDisposable
                     LevelAt = level?.At ?? default,
                     StatedLevel = statedLevel?.Level ?? 0,
                     StatedLevelAt = statedLevel?.At ?? default,
+                    Guides = (skippedObjectives
+                            ?? new Dictionary<string, IReadOnlyList<string>>())
+                        .ToDictionary(kv => kv.Key, kv => new
+                        {
+                            DoneObjectiveIds = (IReadOnlyList<string>)[],
+                            SkippedObjectiveIds = kv.Value,
+                        }),
                 },
             }, new JsonSerializerOptions { WriteIndented = true }));
     }
@@ -865,19 +921,181 @@ internal sealed class AppHarness : IDisposable
             $"hudStarProbeSets past {before}; is EQBUDDY_STARPROBE=1 set on this scenario?)");
     }
 
-    /// <summary>Current value of a debug.txt "key=value" field, or -1 while the dump is
-    /// missing, mid-write, or lacks the key — callers poll via <see cref="WaitForDump"/>.</summary>
-    public int DumpValue(string key)
+    /// <summary>
+    /// Lenses the Quest Tracker's class strip to one class — or to the Any chip when
+    /// <paramref name="cls"/> is null — through the <c>EQBUDDY_LENSPROBE</c> rendezvous,
+    /// which the scenario must have asked for (DRA-199).
+    ///
+    /// **The lens has two writers and both are <c>onClick</c> handlers on controls inside
+    /// that window**, which this suite cannot press and may not assert the screen of; it is
+    /// not persisted either, so it cannot be seeded before <see cref="Launch"/>. So the probe
+    /// calls <c>QuestsView.LensTo</c> — the chip's own click body, lifted out for exactly
+    /// this — never a private path built for the test.
+    ///
+    /// **It returns on <c>questsLensProbeSets</c>, which the probe raises AFTER the write**,
+    /// not on the trigger file disappearing, which only says the probe saw it (trap 62). The
+    /// same rendezvous shape as <see cref="ClickGuideDoor"/>, <see cref="DropHudChip"/> and
+    /// <see cref="SetMiniStat"/>.
+    /// </summary>
+    public void SetClassLens(string? cls) =>
+        DriveLensProbe("lens", cls ?? "-", $"lens the class strip to {cls ?? "Any"}");
+
+    /// <summary>
+    /// Rewrites the character's picked classes through the same rendezvous — the tick the
+    /// class multi-select writes.
+    ///
+    /// **It drives <c>QuestLedgerStore.SetClasses</c> and forces NO refresh, deliberately.**
+    /// That is EQBuddy Mobile's own writer (<c>CompanionActions.SetClasses</c>), and the phone
+    /// has no way to force a repaint of this window either — so the redraw has to come from
+    /// the <c>off:</c> term DRA-181 D4 put in the view's signature. Forcing one here would
+    /// exercise a path the remote writer does not have and would hide trap 72 on this surface.
+    ///
+    /// **So the counter is not the whole wait.** It says the ledger was written; it does not
+    /// say the strip has repainted. Anchor the repaint on <c>questsRenders</c> moving, then
+    /// read the facts you are asserting from ONE dump (trap 56).
+    ///
+    /// <param name="classes">The pick list. Empty means nothing picked, which is the state
+    /// where the character's resolved identity fills the strip instead.</param>
+    /// </summary>
+    public void SetClassPicks(params string[] classes) =>
+        DriveLensProbe("picks", classes.Length == 0 ? "-" : string.Join("+", classes),
+            $"write picks [{string.Join(", ", classes)}]");
+
+    /// <summary>
+    /// Presses the class picker's <c>My Classes</c> quick-select (DRA-216 D1, S4.3), through
+    /// the same rendezvous.
+    ///
+    /// **It takes no argument, and that IS the feature.** The control's whole claim is that
+    /// the player does not tell it which classes they play — it asks
+    /// <c>CharacterClasses.Resolve</c> through <c>QuestClassLens.MyClasses</c>. A harness
+    /// method that passed a class list would be testing a path the button does not have.
+    ///
+    /// **The probe drives the button's own click body**, which is inside a WPF
+    /// <c>Popup</c> — a separate top-level HWND this suite can neither press nor photograph
+    /// (trap 79). Unlike <see cref="SetClassPicks"/> this one DOES force a refresh, because
+    /// the button itself does: it is a local control, not the phone's remote writer.
+    /// </summary>
+    public void PressMyClasses() =>
+        DriveLensProbe("myclasses", "-", "press the My Classes quick-select");
+
+    /// <summary>
+    /// Ticks (or strikes out) ONE guide-ledger step the way a writer OUTSIDE the surface
+    /// under assertion does — the phone's tap, or the checkbox in the OTHER instance
+    /// (QuestsWindow and QuestsRoom build one <c>QuestsView</c> each over one ledger,
+    /// trap 45). Through the same rendezvous, and it forces NO refresh.
+    ///
+    /// <para><b>That is the whole point of it</b> (DRA-218's signature collision). Every
+    /// write site inside a view force-refreshes itself, so a step ticked by the view under
+    /// assertion proves nothing about the repaint gate — the only way to reach that gate is
+    /// to write the ledger from somewhere that cannot force a repaint, which is exactly
+    /// what a remote writer is. Same shape, and the same reason, as
+    /// <see cref="SetClassPicks"/>.</para>
+    ///
+    /// <para><b>So the counter is not the whole wait.</b> It says the ledger was written; it
+    /// does not say anything has repainted. Anchor the assertion on the screen fact the
+    /// change is about.</para>
+    ///
+    /// <para>The probe REFUSES a reward-keyed or acquire-shaped step — those live in the Sky
+    /// and Epic stores and a probe holding no reward group cannot tell which — so a fixture
+    /// that names one times out here, naming the probe.</para>
+    /// </summary>
+    /// <param name="rowId"><c>GuideChecklistProjection.RowId(guideId, objectiveId)</c>.</param>
+    public void RemotelyTickGuideStep(string rowId, bool done = true) =>
+        DriveLensProbe(done ? "guidedone" : "guideskip", rowId,
+            $"{(done ? "tick" : "strike out")} the guide step \"{rowId}\" from outside the view");
+
+    private void DriveLensProbe(string verb, string arg, string doing)
     {
-        try
-        {
-            foreach (var pair in File.ReadAllText(DebugDumpPath).Split(' '))
-                if (pair.StartsWith(key + "=", StringComparison.Ordinal) &&
-                    int.TryParse(pair.AsSpan(key.Length + 1), NumberStyles.Integer,
-                        CultureInfo.InvariantCulture, out var value))
-                    return value;
-        }
-        catch (IOException) { }   // covers FileNotFound too: missing dump = not yet
+        var before = DumpValue("questsLensProbeSets");
+        File.WriteAllText(Path.Combine(ProfileDir, "quest-lens.trigger"), $"{verb} {arg}");
+        Until(() => DumpValue("questsLensProbeSets") > before, AssertTimeout,
+            $"the lens probe to {doing} (debug.txt questsLensProbeSets past {before}; is " +
+            "EQBUDDY_LENSPROBE=1 set on this scenario, and is the Quest Tracker open?)");
+    }
+
+    /// <summary>
+    /// ONE read of the dump, taken so that reading it cannot DAMAGE it (DRA-225).
+    ///
+    /// <para><b>`File.ReadAllText` opens with `FileShare.Read`, which denies a concurrent
+    /// WRITER — and the writer here is the app.</b> `WidgetDump.MaybeWrite` writes the dump
+    /// with `File.WriteAllText` inside a try whose catch replaces the WHOLE file with
+    /// `tick=… dumpError=…`, every other key absent. So a harness read that happened to
+    /// overlap a dump write made the app throw, log, and blank its own dump — and the
+    /// suite's NEXT `DumpValue` then read `-1` for whatever key it asked for. The observer
+    /// was breaking the thing it observed, and the breakage looked like a flake in whatever
+    /// assertion came next.</para>
+    ///
+    /// <para><b>Measured, two processes over the same file at the dump's real size
+    /// (~6.4 KB):</b> with `FileShare.Read` the writer was DENIED <b>103 of 378</b> writes
+    /// (27%) and the reader never saw a partial file; with the share mask below the writer
+    /// was denied <b>0 of 377</b> and the reader saw a partial file 223 times in 102,503
+    /// (0.22%). That is the whole trade, and it is the right way round twice over.</para>
+    ///
+    /// <para><b>By RECOVERABILITY:</b> a torn read is the HARNESS's problem and it can
+    /// simply read again, whereas a denied write is the APP's problem and it cannot — the
+    /// moment is gone and the catch has already blanked the file.</para>
+    ///
+    /// <para><b>And by DURATION, which is the bigger of the two and matters to every test
+    /// in this suite rather than only the ones edited for DRA-225:</b> a denied write
+    /// poisons the dump for a whole UI TICK — about a second, during which EVERY key is
+    /// absent from EVERY read. A torn read spoils ONE read, for microseconds, and only for
+    /// the keys after the tear. So the bare `DumpValue` calls elsewhere in this suite are
+    /// strictly better off under this mask even though nothing about them changed: the
+    /// mechanism that blanked the dump under them is gone.</para>
+    ///
+    /// <para>`FileShare.Delete` rides along because `AppHarness.Launch` deletes this file
+    /// between launches, and a reader that denied that would trade one collision for
+    /// another.</para>
+    ///
+    /// <para>It answers "" for a missing or unreadable dump, so every caller below spells
+    /// absent the one way (trap 4: one producer).</para>
+    ///
+    /// <para><b>DRA-228 moved the body into <see cref="UI.Shared.WholeFilePublish.Read"/>,
+    /// beside the WRITER that publishes this file, because the two are one mechanism.</b> The
+    /// trade described above was the right one and it was not the whole story: the app's
+    /// `File.WriteAllText` TRUNCATES before it fills, so the 0.22% partial read was a file
+    /// that genuinely had no keys in it. The writer now builds the next dump in a scratch
+    /// file and replaces this one atomically, and the read retries the one case an atomic
+    /// replace introduces — an EXISTING file that refuses the open for the instant its
+    /// directory entry is being re-pointed. Measured over the real pair: torn content went to
+    /// zero on the write change alone, and the SENTINEL did not (1,258 of 13,433 reads, 9.4%)
+    /// until the retry landed beside it. Both halves are in `EQBuddy.Tests`, so the guard for
+    /// what makes this lane flaky runs in `build-and-test` rather than only in the lane it is
+    /// meant to stabilise.</para>
+    ///
+    /// <para><b>The paragraph above described a retry that was not in the tree, for two
+    /// cards, and DRA-257 is what noticed.</b> `WholeFilePublish.Read` shipped from DRA-228
+    /// with NO retry and said so in its own docstring — deleted as unguardable, measured at
+    /// zero refused opens in 1,986,753 reads — while this comment went on describing the
+    /// retry and the 9.4% it removed. Two docstrings about one mechanism, contradicting each
+    /// other, and each read on its own looked authoritative (trap 4, one layer up: two
+    /// PRODUCERS of the same explanation). <b>The retry is real again as of DRA-257</b>, which
+    /// is the only reason this paragraph is being corrected rather than deleted — and it
+    /// covers more than this text claims: an absent NAME as well as a refused open, because
+    /// the window is the kernel's rename and not a share conflict. The sizing, the budgets and
+    /// the four primitives that were measured to get there are in `WholeFilePublish` and
+    /// `AtomicRename`; when they disagree with this comment, they are right, because they sit
+    /// beside the code.</para>
+    /// </summary>
+    private string ReadDump() => UI.Shared.WholeFilePublish.Read(DebugDumpPath);
+
+    /// <summary>Current value of a debug.txt "key=value" field, or -1 while the dump is
+    /// missing, mid-write, or lacks the key — callers poll via <see cref="WaitForDump"/>.
+    ///
+    /// <b>-1 is "ask again", not "the answer is -1".</b> Asserting on a bare `DumpValue`
+    /// taken after a wait is the DRA-225 flake: four `ShellHostTests` reds whose only
+    /// invariant was this sentinel on a SECOND read. Use <see cref="WaitForDump(string,int,string)"/>
+    /// when the expected value is known, or <see cref="WaitForDumpValues"/> when it is
+    /// not.</summary>
+    public int DumpValue(string key) => Parse(ReadDump().Split(' '), key);
+
+    private static int Parse(string[] pairs, string key)
+    {
+        foreach (var pair in pairs)
+            if (pair.StartsWith(key + "=", StringComparison.Ordinal) &&
+                int.TryParse(pair.AsSpan(key.Length + 1), NumberStyles.Integer,
+                    CultureInfo.InvariantCulture, out var value))
+                return value;
         return -1;
     }
 
@@ -893,19 +1111,35 @@ internal sealed class AppHarness : IDisposable
     /// </summary>
     public int[] DumpValues(params string[] keys)
     {
-        var text = "";
-        try { text = File.ReadAllText(DebugDumpPath); }
-        catch (IOException) { }
-        var pairs = text.Split(' ');
-        return [.. keys.Select(key =>
-        {
-            foreach (var pair in pairs)
-                if (pair.StartsWith(key + "=", StringComparison.Ordinal) &&
-                    int.TryParse(pair.AsSpan(key.Length + 1), NumberStyles.Integer,
-                        CultureInfo.InvariantCulture, out var value))
-                    return value;
-            return -1;
-        })];
+        var pairs = ReadDump().Split(' ');
+        return [.. keys.Select(key => Parse(pairs, key))];
+    }
+
+    /// <summary>
+    /// ONE read of the dump that carried EVERY key asked for — the tool the two-host
+    /// agreement tests need, and the one DRA-225 found neither existing tool could supply.
+    ///
+    /// <para><b>It is `DumpValues` and `WaitForDump` composed, because each alone leaves
+    /// half the flake standing.</b> `DumpValues` gives ONE MOMENT, which is what a
+    /// comparison between two hosts requires — but it does not give a COMPLETE moment, and
+    /// a single read of a `tick=… dumpError=…` dump answers -1 for every key at once, which
+    /// is one moment and still red. `WaitForDump` retries until a value arrives — but it is
+    /// an EQUALITY, so it cannot be used at all where the expected number is whatever the
+    /// app happens to report (`spawnsZones`, `dropsMobs`): there is nothing to wait FOR.
+    /// Here the wait is on PRESENCE and the values come back together.</para>
+    ///
+    /// <para>On a timeout the message names the keys it required; WHICH of them were
+    /// absent is readable off the `debug.txt` line in the artifact every wait already
+    /// folds in, so the diagnosis costs no second channel. A dump that has stopped
+    /// carrying them at all aborts early on the `tick` question instead, which is the
+    /// difference between "late" and "the app cannot answer".</para>
+    /// </summary>
+    public int[] WaitForDumpValues(string reason, params string[] keys)
+    {
+        int[] values = [];
+        Until(() => (values = DumpValues(keys)).All(v => v >= 0), AssertTimeout,
+            $"{reason} (ONE read of debug.txt carrying every one of: {string.Join(", ", keys)})");
+        return values;
     }
 
     /// <summary>Wait until a key EXISTS in the dump.
@@ -979,15 +1213,13 @@ internal sealed class AppHarness : IDisposable
             $"{reason} (debug.txt {key} to read '{expected}'; last seen '{DumpText(key)}')");
 
     /// <summary>The raw value for a key, or "" when the dump has not appeared yet.</summary>
-    public string DumpText(string key)
+    public string DumpText(string key) => ParseText(ReadDump().Split(' '), key);
+
+    private static string ParseText(string[] pairs, string key)
     {
-        try
-        {
-            foreach (var pair in File.ReadAllText(DebugDumpPath).Split(' '))
-                if (pair.StartsWith(key + "=", StringComparison.Ordinal))
-                    return pair[(key.Length + 1)..];
-        }
-        catch (IOException) { }
+        foreach (var pair in pairs)
+            if (pair.StartsWith(key + "=", StringComparison.Ordinal))
+                return pair[(key.Length + 1)..];
         return "";
     }
 
@@ -1004,17 +1236,8 @@ internal sealed class AppHarness : IDisposable
     /// </summary>
     public string[] DumpTexts(params string[] keys)
     {
-        var text = "";
-        try { text = File.ReadAllText(DebugDumpPath); }
-        catch (IOException) { }
-        var pairs = text.Split(' ');
-        return [.. keys.Select(key =>
-        {
-            foreach (var pair in pairs)
-                if (pair.StartsWith(key + "=", StringComparison.Ordinal))
-                    return pair[(key.Length + 1)..];
-            return "";
-        })];
+        var pairs = ReadDump().Split(' ');
+        return [.. keys.Select(key => ParseText(pairs, key))];
     }
 
     /// <summary>Closes the WIDGET (WM_CLOSE — the same path as the user's ✕) and waits
@@ -1125,10 +1348,21 @@ internal sealed class AppHarness : IDisposable
         return sb.ToString();
     }
 
+    /// <summary>Reads a file the APP may be writing this instant, without denying it the
+    /// write — the same share mask and the same reason as <see cref="ReadDump"/> (DRA-225).
+    /// Both files here are live: the app rewrites debug.txt every UI tick and appends
+    /// error.log whenever it logs, and this runs on the failure path, which is exactly when
+    /// the app is least worth interfering with.</summary>
     private static string? TryRead(string path)
     {
-        try { return File.Exists(path) ? File.ReadAllText(path) : null; }
-        catch (IOException) { return null; }
+        try
+        {
+            using var fs = new FileStream(path, FileMode.Open, FileAccess.Read,
+                FileShare.ReadWrite | FileShare.Delete);
+            using var reader = new StreamReader(fs, Encoding.UTF8);
+            return reader.ReadToEnd();
+        }
+        catch (IOException) { return null; }   // covers FileNotFound: the file is not there
     }
 
 

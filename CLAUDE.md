@@ -54,7 +54,20 @@ Keep these even when this file is short:
 - **Last-look where consequence warrants.** Helm signs; you do not invent a
   SIGNED stamp.
 - **Local greens are not CI.** `build-and-test` + `e2e-windows` remain the
-  merge bar. See [docs/ops/verification-ladder.md](docs/ops/verification-ladder.md).
+  merge bar — and since **2026-09-20 (DRA-228) both are REQUIRED status checks
+  on `main`, with `enforce_admins` ON**, so this sentence is enforced rather
+  than believed. It was not, for eleven days: protection listed
+  `build-and-test` alone, the second green was held up by hand every time, and
+  PR #715 merged at 02:31Z with `e2e-windows` still running the moment somebody
+  used `--auto`. **Admin enforcement is half the fix, not a flourish** — every
+  merge here is made by `DranakCorps-bot`, which is a repo admin, so without it
+  the new bar would have bound auto-merge and waved through every hand merge by
+  the one account that performs them.
+  **`--auto` is allowed again**, and that is the point of the change rather
+  than a concession: the required set now matches the documented bar, which is
+  exactly what auto-merge waits for. Measured on PR #729 — armed, and it did
+  not fire against a red `e2e-windows`. See
+  [docs/ops/verification-ladder.md](docs/ops/verification-ladder.md).
 - **"Passed on rerun" is observation, not resolution.** File
   [docs/ops/flake-ledger.md](docs/ops/flake-ledger.md).
 
@@ -65,13 +78,45 @@ them.
 
 ### Channel files: who trims, and how they stay small
 
-- **Executor never trims.** Executors append only; spotted rot goes into a card
-  comment, never fixed inline. Trimming is janitorial, not engineering, and must
-  never ride inside a feature branch.
-- **Rotation owner is a non-Executor Soft seat** — Clerk/Researcher-class,
-  claiming the standing `EXO-CHANNEL-ROTATE` card (**DRA-154**).
-- **Cadence:** one weekly pass batching every file due (<=1 Soft seat), plus a
-  64 KB size trigger for early rotation.
+- **"Executor never trims" means never INLINE, inside a feature branch.** Helm
+  ruled the DRA-267 LIVE ASK on 2026-09-20 ~3:45 PM CT (ADOPT (a), narrowing
+  the bar to its own rationale). In a work session Executors still append only;
+  spotted rot goes into a card comment, never fixed inline. But a **standalone
+  janitorial rotation PR** — changed files exactly the ledger, its archive under
+  `docs/ops/claude-archive/channels/<YYYY-Qn>/`, and
+  `scripts/channel-size-baseline.psd1` when and only when the ledger carries a
+  row at the PR's base — is permitted on **any Soft seat, Sr Executor
+  included**. PR #744 is the tested template.
+- **Rotation seat is any free Soft seat** claiming the standing
+  `EXO-CHANNEL-ROTATE` card (**DRA-154**) — the non-Executor-only restriction
+  is retired (DRA-267). DRA-154's "Who may claim" holds the exact
+  changed-file test; read it before claiming.
+- **When a pass fires: headroom, not a calendar.** There is no weekly date.
+  Helm ruled the DRA-232 LIVE ASK on 2026-09-19 ~11:35 PM CT
+  ([EQBuddy PR #719](https://github.com/DranakCorps-bot/EQBuddy/pull/719)):
+  *"rotation is a per-file headroom trigger, not weekly. Default: WARN when
+  remaining band is 2% or one median append, whichever is larger; the rotate
+  seat claims before the file is red."* **DRA-154 is the procedure of record**
+  — it holds the arithmetic, the per-file numbers and the pass steps. This
+  block tells you the rule exists; DRA-154 tells you how to run it, and a
+  second copy here would only drift from the first.
+- **The ceiling stands, and so do both guard arms.** Helm: *"KEEP the 64 KiB
+  ceiling and both guard arms."* A headroom WARN is the trigger to **rotate**,
+  never to buy room: do not raise a row in
+  `scripts/channel-size-baseline.psd1`, do not add one, and do not weaken
+  either arm of `scripts/channel-size-guard.ps1`. Rows only ever leave, and
+  only in the pull request whose rotation earned it.
+- **Per-file ceilings were asked for and refused.** Helm: *"REJECT (b) per-file
+  ceilings as the fix — that is a self-granted exemption, and check B already
+  refuses it."*
+- **`HELM.md` and `DECISIONS.md` split at source.** The live file keeps STATE
+  (Holds, Wakes, Retired, standing blocks, live-rulings pointer, current tip);
+  dated tips move into `docs/ops/claude-archive/channels/` — a rename, not a
+  trim. That work is **DRA-246**. Until it lands those two files ride the
+  headroom trigger like everything else, which Helm set as an interim and not
+  as their answer.
+- **A Helm tip is one ruling, short.** Helm: *"(d) ADOPT as Helm tip format
+  — one ruling, short."*
 - **Signing.** Helm last-looks rotations touching `HELM.md` /
   `HELM-FEEDBACK.md`. David signs the first rotation of each file class and any
   `HANDOFF.md` retirement; after one clean cycle those are Helm-signed only.
@@ -653,7 +698,11 @@ they live on `legacy-v1`.)
 | What a quest row's badge and state rule say | `UI.Shared/QuestPresentation.cs` |
 | What this item is called, and what it is called on the wiki | `Core/EqlWikiItems.cs` `NormalizeTitle` — **the ONE seam**: folds the "+N" tier off, then asks `Core/ItemNameAliases.cs`. Every reader is already through it (`ItemCatalog.Find`, `CachedInfo`, `LookupAsync`, `ItemInfoWindow`'s heading, `UI.Shared/WikiLinks.Search`), so one alias row fixes the catalog lookup, the fetch and the player's wiki door at once. The table is **CURATED, hand-written, one row per MEASURED miss with its evidence** — seeded by the Founder's bow, which the game spells `Deterioriated` and eqlwiki `Deteriorated` (DRA-149 D2). **Never fuzzy**: whole-string, case-insensitive, no containment and no distance — a near-match describes an item the player is not wearing, and an unknown name comes back unchanged so it is REPORTED as unread (row below) rather than guessed at. `WikiLinks.Page` is the non-item sibling (factions, professions): a page title must not be put through the item rule |
 | What the player is wearing that EQBuddy cannot read about | `Core/GearUpgrades.cs` `WornFrom` → `WornSheet` — anchors AND the rows that could not become one, from ONE method (trap 4). A row the catalog cannot describe is still DROPPED, but it is now NAMED: `Recommendations` carries it to `RecommendationSet.UnreadWorn`, words are `HelperPresentation.UnreadWorn` (3 named + the count, trap 50; subject is EQBuddy's catalog, never the game) with a wiki SEARCH door per named item, and both surfaces draw it. A dump whose EVERY row is unreadable is `GoalGapReason.NothingWornIsReadable` and **does not ask for the dump again** — the command has been run and re-running it produces the same rows |
-| Is this item better than that one | `Core/ItemDominance.cs` — the ONE metric table (AC/HP/Mana/DMG/ratio/attributes), the class-lock filter and the `+N` tier refusal. Lifted out of `UI.Shared/GearLocker.cs` in DRA-71 D6 so the Helper's catalog sweep and the Gear Locker read the SAME ARITHMETIC (trap 4); the Locker's three members are now calls into it and **its "never BiS" scope lock is unchanged — it still compares your bags.** **The TIER rule is the one thing they no longer share** (DRA-149 D1): the Locker asks `CanClaimUpgrade`, where both names come off one dump and can carry a "+N"; the sweep asks `Dominates`, because **0 of 11,196 catalog names carry one**, so the tier test read `0 >= N` and returned nothing for 19 of the Founder's 19 gear anchors — a rule answered before it read its inputs, not a strict one. The CLAIM narrows to match ("a better BASE item than yours"), with the "+N is worth an amount the wiki does not state" caveat said ONCE per block, never per row (trap 73); no "+N" arithmetic is invented. Guard: `GearUpgradesFixtureSweepTests` (the Founder's committed dump vs the shipped catalog, floor 15 of 19). The Helper may name CATALOG items as farmable upgrades (`Core/GearUpgrades.cs`), and the amendment is narrow: every candidate has a WORN anchor, an empty slot answers nothing, every line is `Evidence.Catalog`, and the empty state's subject is the CATALOG rather than the game. `ItemDominanceTests` runs both surfaces over one table and proves each metric one at a time |
+| Is this item better than that one | `Core/ItemDominance.cs` — the ONE metric table (AC/HP/Mana/DMG/ratio/attributes), the class-lock filter and the `+N` tier refusal. Lifted out of `UI.Shared/GearLocker.cs` in DRA-71 D6 so the Helper's catalog sweep and the Gear Locker read the SAME ARITHMETIC (trap 4); the Locker's three members are calls into it **since DRA-222 D6 — this line and `ItemDominance`'s own summary had claimed it since D6 while a private copy of `MetricPairs` stayed in the Locker, agreeing exactly, which is what a second implementation does until one of them learns something** — and **its "never BiS" scope lock is unchanged — it still compares your bags.** **The TIER rule is the one thing they no longer share** (DRA-149 D1): the Locker asks `CanClaimUpgrade`, where both names come off one dump and can carry a "+N"; the sweep asks `Dominates`, because **0 of 11,196 catalog names carry one**, so the tier test read `0 >= N` and returned nothing for 19 of the Founder's 19 gear anchors — a rule answered before it read its inputs, not a strict one. The CLAIM narrows to match ("a better BASE item than yours"), with the "+N is worth an amount the wiki does not state" caveat said ONCE per block, never per row (trap 73); no "+N" arithmetic is invented. Guard: `GearUpgradesFixtureSweepTests` (the Founder's committed dump vs the shipped catalog, floor 15 of 19). The Helper may name CATALOG items as farmable upgrades (`Core/GearUpgrades.cs`), and the amendment is narrow: every candidate has a WORN anchor, an empty slot answers nothing, every line is `Evidence.Catalog`, and the empty state's subject is the CATALOG rather than the game. `ItemDominanceTests` runs both surfaces over one table and proves each metric one at a time. **`Compare` answers a `DominanceVerdict` rather than a bool since DRA-222 D6** (S7.3) so a REFUSAL can be told from a loss and counted: the table prices every number and no SLOT, and a two-handed weapon that wins on all of them costs the off-hand. Row below |
+| How many hands a weapon takes | `Core/WeaponHands.cs` — the ONE reader of a stats block's `Skill:` line (DRA-222 D6, S7.3). Two-handedness is the wiki's own **`2H` PREFIX**, never a name list: 441 of the shipped catalog's 6,844 wearable records, 1,159 one-handed, 2 `Unadmitted` (`SHIELD`/`Shield`, both carrying no `Dmg` and no `Delay`) and that value **refuses nothing** — the rule fires on `Two` alone, so a spelling nobody has measured cannot take a row off the player's screen (trap 73). The five spell-school skills sit on records with no `Slot:` line, asserted so a promoter change reddens `WeaponHandsTests`. **Archery and Throwing are deliberately NOT modelled as two-handed** — the block says nothing about hands and they sit in RANGE, so they read `One`, the permissive answer for a rule that only ever removes. `ItemDominance.Compare` refuses a `Two` candidate over a not-`Two` worn item **only when the player's own dump shows SECONDARY occupied** — a FACT and not the convenient proxy "the worn item is one-handed", which is wrong for an empty off-hand (trap 64b) — read off the WHOLE worn sheet rather than the anchors, since a player who picked only their helm has not emptied their shield hand. Counted end to end: `GearSweep.OffHandRefusals` → `RecommendationSet.GearOffHandRefusals` → `HelperPresentation.OffHandRefused` → the room AND the phone (trap 50). **MEASURED on the Founder's committed dump: his PRIMARY anchor found 64 dominating candidates, 29 two-handed — and with `MaxPerAnchor` 8, seven of the eight rows he could SEE were greatswords**, for a character wielding a second morning star |
+| Which stats this character's classes actually wear | `Core/ClassStatRelevance.cs` (DRA-222 D6, S7.2) — the share of a class's OWN class-restricted catalog items that carry each number, derived from the catalog INSTANCE through a weak table (`GearUpgrades.SlotIndex`'s arrangement, and its reason), relevant at `RelevanceFloor` **0.25** over `MinClassRecords` **100**. **It is the game's own item design COUNTED, never a claim about what a class needs**: Mana on 50% of WIZ / 49% ENC+MAG / 47% NEC items against 3–6% of WAR/ROG/BER; INT 51–52% of the four INT casters against 6–8% melee; WIS 42% DRU / 30% CLR / 29% SHM against 6% BER; DMG 48% RNG / 40% ROG against 6% CLR. `ratio` takes DMG's answer because it is computed rather than transcribed (trap 4). ONE threshold and **no lift arm** — a lift over the wearable baseline makes AC irrelevant to a WARRIOR (66% vs 67%). **THE LIMITATION IS A COMMITTED NEGATIVE, NOT A TUNED FLOOR**: Mana is 19% for CLR and 23% for SHM and both answer NO, pinned in `ClassStatRelevanceTests` so a refresh that moves either says so. The cost is bounded because **it removes NOTHING** — it picks which improvement `ItemDominance.Gain` NAMES and puts `GearUpgrade.RelevantMetrics` above `ImprovedMetrics` in the sweep's order (and in `Recommendations.GearRow`'s, which had its own copy of the old key). Unknown classes ⇒ the EMPTY set ⇒ the pre-D6 ranking exactly (trap 73). **No sentence draws it**: "this moved two stats your class uses" would be a claim off a measurement of what item blocks happen to carry, so the visible half is the better-chosen `GainMetric` alone |
+| Which upgrade the player has decided to GO AND GET | `Core/TrackedUpgrades.cs` — `TrackedUpgrade` (item · slot · the worn item it beat · the local stamp) + `TrackedUpgradeStore` over `AppSettings.TrackedUpgrades`, per character (DRA-216 D4, S12). **Its OWN object because a goal outlives the sweep**: `GearUpgrade` is rebuilt from the current dump and catalog every pass, so a decision hung on one would vanish when a new dump, a worn pick, a refused zone or a refresh removes the offer. **BASE ITEMS ONLY** — the identity is `EqlWikiItemService.NormalizeTitle`'s, the one seam, so a "+5" and its base name are ONE goal; **S8/S9 are PARKED by Helm** and nothing here holds, compares or invents a `+N` or an exaltation. **NO COMPLETION CONDITION, deliberately** (S12.3 is parked with them): untracking is the only way out and the block says so. The way IN is a `GearUpgradeFact` the engine produced — a bare name would be an anchorless BiS claim `GearUpgrades`' lock forbids — and re-tracking keeps the FIRST stamp. No gain and no drop zone is stored (the catalog and `ItemDominance` stay the one producer of each); the map/spawn join over this object is the row below. Carried on `HelperInputs.Tracked` from the one assembly point, RANKED ON BY NOTHING. Words: `HelperPresentation.TrackedHeading`/`TrackedNote`/`TrackedRow`/`TrackLabel`/`TrackTip`/`TrackedOnPc`; the phone is READ-ONLY (trap 35) |
+| WHERE the thing you are going after drops, and which dot it is | `Core/GearTargets.cs` (DRA-216 D5, S13/S14, plan §3 Q8) — the join from the row above to a zone, a creature and your own archived spawn points. **A READER, never a store**: `TrackedUpgrade` holds no drop zone on purpose, so `ItemCatalog` is asked every pass (trap 4). **NO SECOND MAP ENGINE** (S13.1, S20) — `SpawnPointLedger` already archives the points, `ZoneMap.FromLoc` already places them and the map already draws a circle with a countdown; the only new question is *is this dot one of MINE?*, and the file computes no coordinate and loads no file. Three rules, all about what NOT to match: the ZONE is exact title then `ZoneMapFiles.IdentityKey` **and nothing looser** (the `ZoneLevels`/`ZoneEras` rule verbatim — `Bronze Long Sword` names `Commonlands` and a player in `West Commonlands` must get nothing); a non-place is refused through `TradeskillMaterials.IsPlace` (40 of the 6,004 wearable pairs, 15 spellings); the CREATURE is `SpawnCatalog.NameMatches` and **deliberately not `NameMatchesFuzzy`** — fuzzy rescues a TIMER from a wiki typo where a miss costs a countdown, here a false hit is a ring on a dot that does not drop it and a player travels to it. S13.5 falls out because `Points` is a list and `AtPoint` is asked once per point. **Two refusals, both REPORTED by name** (`Unreadable` = no page shipped, `NoDropZone` = the page names nowhere — 3,104 of 6,844 wearable records, the ordinary state of a quest/vendor/craft item), subject always EQBuddy's catalog and never the game. MEASURED before it drew: 5,871 of 5,964 place-pairs name a creature, and 2,213 name one `SpawnCatalog` knows as a zone named — that is the S14 split, so about a third of targets get a learned timer and the rest the ordinary point's projection. Words are `UI.Shared/GearTargetPresentation.cs` (caps say what they held back; `PointsNote` is the sentence that stops it reading as a spawn database). Hosts: `EQBuddy/MapView.cs` (a DASHED second ring outside the circle — never a recolour, the accent already answers "named") over `IZoneHost.GearTargets` ← `EQBuddy/GearTargetMemo.cs`, one per host (trap 45); the phone is `CompanionMapTargets` + `CompanionMapCircle.Target`, READ-ONLY (trap 35), with the target flag IN the map fingerprint (trap 72: tracking moves no coordinate). **The whole layer has ONE switch and it is applied in ONE place** (review D5-1): `AppSettings.ShowGearTargetsOnMap`, default ON, read in `GearTargetMemo.For` — already the single producer the map and the phone both read, so gating the views apart would be two callers answering one question, last one winning (trap 33). Off answers `GearTargetSet.None` and every reader already draws nothing on it. Writer is an `EqChip` in the MAP's toolbar (`MapFolder`'s precedent — a display preference belongs on the surface a mid-hunt player is looking at), **always visible**: a chip that hid itself on an empty answer would hide itself the moment it was used. Hiding is never untracking, and the tip says so. Dump keys are `mapTargetToggle` (the chip's PAINTED state) and `mapTargetRefused` — the refusal sentences went uncounted, so a refusals-only panel dumped the nothing-tracked line exactly (D5-2) |
 | What a player can DO about an unlock requirement | `Core/UnlockGuidance.cs` — one already-worded sentence per fact, three shapes and no fourth: own-kill faction movers + a kills-to-go estimate, the Sky checklist's piece count, a catalog-matched Task door. `ShapeFor` decides for every `UnlockNeed` and answers **null** for undecided (trap 34's must-list). **It never moves a tick** — an unlock is the game's answer, and "pieces in your bags" is not "obtained" (trap 4). A faction nobody has farmed draws nothing (trap 73). `UnlockLayout.Groups` emits one row per actionable criterion IN ORDER, which is how a surface pairs a row with its criterion. **The row is drawn in the six-question SHAPE since DRA-71 D5**: `RowDetail` is `who · where` (the top RAISER and its zone — a cost-only row points nowhere), `RowLines` is the two QUANTITIES that stay on screen (piece count, kills-to-go), `Hover` is the per-creature prose; `Lines` is still the whole set and their union is asserted to be it. **Which unlocks a character is chasing is `Core/UnlockPicks.cs` (`UnlockPickStore` over `AppSettings.UnlockPicks`) — ONE store, read by the Helper AND the Quests Unlocks tab.** Absent = ALL (filter semantics, the opposite of `HelperFactions` beside it), one flat list of subject names, and `Narrow` applies it PER SECTION so a race pick never empties the class half. Words for both pickers: `UI.Shared/UnlockPickReadout.cs`. `Recommendations.Rank` does the narrowing, not the room, so the phone inherits it |
 | What the Buffs card's roster shows | `UI.Shared/BuffRosterPresentation.cs` — drawn by `EQBuddy/BuffsCardView.cs`. The HUD's expiring-buff chicklet is a DIFFERENT surface |
 | Anything shared by both UIs | `UI.Shared/` — must stay framework-free (a test enforces it) |
@@ -954,6 +1003,19 @@ after the named guard left with its surface.
     before the fix and passes in 4 s after. Dump both numbers from one moment
     (`questsSkyAcquired` beside `questsGuideDone`) — "the store says so" and
     "the screen says so" are different claims (trap 56).
+    **And a fold over TWO lists must carry WHICH LIST.** The same gate put
+    `SkippedObjectiveIds` and `DoneObjectiveIds` through one `guideId + "/" + id`
+    string, so an id in exactly one of them contributed the same hash and the same
+    1 either way — while `QuestLedgerStore.SetObjectiveMembership` MOVES an id
+    across in one locked write. Signature unmoved, early return, the other window
+    still drawing the step crossed out. Harmless until DRA-218 gave the difference
+    a reader (`QuestChecklistRow.BlockedBy`); the list is now in the hashed string.
+    **The guard needs the writer to be one that cannot force a repaint** — every
+    write site inside a view force-refreshes itself, so only the phone or the other
+    instance reaches the gate (`ChecklistTickSignatureTests`, the lens probe's
+    `guidedone` verb) — **and it needs the surface to have STOPPED redrawing on its
+    own first** (`WaitUntilStill`): without that anchor the row is GREEN on the
+    broken build, riding a repaint that was already coming.
 
 73. **A schema that has a field for every question becomes a licence to
     ANSWER every question.** "All six must be addressed" was read as
@@ -1189,6 +1251,72 @@ after the named guard left with its surface.
     nothing branches on where you stand. The bare form is DEMOTED, not removed.
     Code on `main` cannot repair a copy that will never receive it, so this is a
     call-site rule, not a guard in the script.
+
+83. **A linked worktree shares its clone's `[user]` block, so ONE wrong identity
+    mis-attributes every worktree hanging off it — and GitHub attributes by EMAIL,
+    so a commit reads as whoever owns the address no matter what the name says.**
+    Three DRA-216 branches landed 7 commits / 4,589 lines of agent-written code
+    authored AND committed as `David Edwards <david.edwards08@gmail.com>` — the one
+    person here whose name carries release accountability. Caught only because a
+    Planner review happened to read the authors, and **126 of the last 600 commits
+    on `main` already carried that email** (121 as `David Edwards`, 5 as
+    `DranakCorps-bot`): the three PRs were the instance somebody noticed, at a
+    eighteenth of the real scale. Cause was environmental, not the repo —
+    `~/.gitconfig` had NO `[user]` block, so every clone carries its own and they
+    disagree; `C:\Users\david\source\EQBuddy` (a dispatch lane carrying **253**
+    worktrees, on `claude/*`, `opus-dra*`, `fable*` and `sr-exec/*` alike) said
+    `David Edwards`, and one `git config --local` fixed all 253 at once — which is
+    also why the branch prefix reads as a lead and is not one: those are not
+    different lanes, they are worktrees of the same clone.
+    **`git var GIT_AUTHOR_IDENT` is the one command that ends the guessing** — ask
+    the CLONE, not the checkout you are standing in.
+    **Second layer, so a clone inherits an identity instead of inventing one:**
+    `~/.gitconfig` now carries one `includeIf "hasconfig:remote.*.url:…"` rule per
+    agent repo → `~/.gitconfig-dranakcorps-bot`. **Keyed on the REMOTE, not a path**
+    — runs create clones in unpredictable temp dirs, so a path rule covers today's
+    workspaces and none of tomorrow's. Local config still wins (it supplies an
+    identity, never overrides a chosen one), and David's own repos under the same
+    account are deliberately not globbed in, one repo named at a time.
+    **It is rewritable on an unmerged branch and impossible after the merge**, which
+    is why the guard is pre-merge. Guard: `scripts/commit-identity-guard.ps1` +
+    `-selftest`, in `check.ps1` and CI on `pull_request`. It reads EMAIL on BOTH
+    identities (a rebase moves committer without author; checking one is a hole the
+    size of the other) over **base..head MINUS `main`** — history is never judged,
+    because `main` holds 126 commits it would refuse and a permanently red gate is a
+    gate nobody believes (trap 74). **The Founder's door is the `founder-commit`
+    LABEL, not a rule read off the commit**: an agent running in his clone produces a
+    commit byte-identical in identity to one he types, so the separation has to come
+    from outside the object; the label admits his identity for that PR only and still
+    refuses everyone else. **Both fail-open paths SAY they judged nothing** — an
+    empty range is exactly how a broken range computation reads as green. Prove-failed
+    against six mutants, and the first draft's "main is never judged" row passed on
+    the BASE term alone while the `--not main` term was deleted: the catching case is a
+    branch cut from an OLD base that then merges a moved-on `main`.
+
+84. **A return value the code writes about ITSELF is a label, not an observation of
+    which call ran.** `WholeFilePublish.Outcome.Replaced`'s own docstring said it existed
+    so "a test can assert WHICH path ran" — trap 78's rationale, written down and wrong.
+    Reverting the live-name arm from the atomic rename back to `File.Move(overwrite: true)`
+    — DRA-257's defect, exactly — left **all ten tests GREEN**, because the mutant returned
+    `Replaced` too. The only guard that could still see it was a 2-core race test that is
+    green on a 32-core box against the broken code (trap 77), so the revert would have
+    merged clean on every hosted runner. Assert the FACT the call leaves behind
+    (`AtomicRename.Renames`, incremented inside the rename that succeeded), never the value
+    the mutation controls. **Trap 64b one level up:** there the proxy was a condition read
+    off a value, here it is the value itself. A returned enum is only evidence about a
+    branch that ANOTHER branch cannot also return.
+    **Two more came out of the same card.** (a) **The primitive everyone names as the atomic
+    one was the worst of four measured**: `File.Replace` / Win32 `ReplaceFile` went 12 red of
+    12 at ~25% torn reads, adding DRA-225's share-mask failure back on top of the absent name
+    it was supposed to remove — `File.Move(overwrite: true)` is 3 in 8, and only
+    `FileRenameInfoEx` + `FILE_RENAME_FLAG_POSIX_SEMANTICS` reaches zero. Documentation is a
+    place to look; the mask is the measurement. (b) **A counter that says `torn reads: N` for
+    five different defects tells the next seat nothing** — absent name, delete-pending,
+    refused open, zero-byte and half-written have four different fixes, and DRA-257 hid inside
+    DRA-225's admitted residual for two cards because one number covered them all (trap 75,
+    and five rows of the flake ledger say "assert text NOT captured" because that text did not
+    repay capturing). Count BY MODE, print every bucket including the zeroes, and fire each one
+    on demand in the same commit.
 
 New trap discovered the hard way? Add the compact rule here and the novel
 under `docs/ops/claude-archive/traps.md`. That is the whole point.

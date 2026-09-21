@@ -1,0 +1,549 @@
+using EQBuddy.Core;
+using Xunit;
+
+namespace EQBuddy.Tests;
+
+/// <summary>
+/// **WHICH NUMBERS A CLASS'S OWN GEAR CARRIES, MEASURED AGAINST THE SHIPPED CATALOG**
+/// (DRA-222 D6, S7.2).
+///
+/// <para>The rule is a count over eqlwiki's own item blocks, so the tests are the count —
+/// taken through the real code over the real catalog rather than re-implemented here. Every
+/// row below is a separation the rule has to produce to be worth having, and every one comes
+/// with its NEGATIVE, because "Mana is relevant to a wizard" passes for a rule that returns
+/// every metric for every class (trap 11's shape: evidence only one side can produce).</para>
+/// </summary>
+public class ClassStatRelevanceTests
+{
+    private static IReadOnlySet<string> For(params string[] classes) =>
+        ClassStatRelevance.For(ItemCatalog.Default, classes);
+
+    /// <summary>
+    /// **THE SEPARATIONS, EACH WITH THE CLASS THEY DO NOT REACH.**
+    ///
+    /// <para>These are the cells the Founder's S7.2 is about: a caster's row should be able to
+    /// be about mana, and a warrior's should not.</para>
+    /// </summary>
+    [Theory]
+    // Mana: 47–50% of the four INT casters' items carry it; 3–6% of WAR / ROG / BER / MNK.
+    [InlineData("Mana", "WIZ", "WAR")]
+    [InlineData("Mana", "ENC", "ROG")]
+    [InlineData("Mana", "MAG", "BER")]
+    [InlineData("Mana", "NEC", "MNK")]
+    // INT: 51–52% of the same four; 6–8% of the melee roster.
+    [InlineData("INT", "WIZ", "WAR")]
+    [InlineData("INT", "NEC", "RNG")]
+    // WIS: 42% DRU, 30% CLR, 29% SHM; 6% BER.
+    [InlineData("WIS", "DRU", "BER")]
+    [InlineData("WIS", "CLR", "WAR")]
+    [InlineData("WIS", "SHM", "ROG")]
+    // DMG: 48% RNG, 40% ROG, 36% WAR; 6% CLR, 13–14% of the INT casters.
+    [InlineData("DMG", "RNG", "CLR")]
+    [InlineData("DMG", "ROG", "WIZ")]
+    [InlineData("DMG", "WAR", "ENC")]
+    // The weapon ratio travels with DMG, because it is computed rather than transcribed.
+    [InlineData("ratio", "RNG", "CLR")]
+    public void TheCatalogSeparatesTheClassesItsOwnItemsAreWrittenFor(
+        string metric, string carries, string doesNot)
+    {
+        Assert.Contains(metric, For(carries));
+        Assert.DoesNotContain(metric, For(doesNot));
+    }
+
+    /// <summary>
+    /// **AC CLEARS THE FLOOR FOR ALL SIXTEEN, AND THAT IS THE RIGHT ANSWER.**
+    ///
+    /// <para>It is also the row that would be absent under a lift-over-baseline rule — a
+    /// warrior's items carry AC 66% of the time against a 67% wearable baseline — which is why
+    /// the floor is absolute. A metric every class uses is not evidence that the measure is
+    /// degenerate; the assertions above are what rule that out.</para>
+    /// </summary>
+    [Theory]
+    [InlineData("WAR")] [InlineData("CLR")] [InlineData("WIZ")] [InlineData("ROG")]
+    [InlineData("SHD")] [InlineData("PAL")] [InlineData("BRD")] [InlineData("RNG")]
+    [InlineData("SHM")] [InlineData("NEC")] [InlineData("DRU")] [InlineData("ENC")]
+    [InlineData("MAG")] [InlineData("MNK")] [InlineData("BER")] [InlineData("BST")]
+    public void EveryClassTheCatalogHoldsGearForAnswersSomething(string cls)
+    {
+        var relevant = For(cls);
+        Assert.NotEmpty(relevant);
+        Assert.Contains("AC", relevant);
+    }
+
+    /// <summary>
+    /// **THE LIMITATION, COMMITTED AS A NEGATIVE RATHER THAN TUNED AWAY.**
+    ///
+    /// <para>A share of the class's own items is a share, so a number that is rare across the
+    /// catalog can miss the floor for a class that really does use it. Mana sits at 19% for CLR
+    /// and 23% for SHM, and both therefore answer NO. That is written down here, in the file
+    /// that measures it, so the day a refresh moves either cell this suite says so and a reader
+    /// can decide with numbers in front of them — rather than the threshold being moved until
+    /// the table matched what somebody already believed, which is the failure this whole
+    /// mechanism is written against.</para>
+    ///
+    /// <para><b>The cost is bounded and that is why it is acceptable:</b> relevance decides an
+    /// ORDER and which true sentence to say. It removes no row, so a player cannot lose a
+    /// cleric's mana upgrade to this — <see cref="RelevanceNeverRemovesACandidate"/> is that
+    /// claim, proved.</para>
+    /// </summary>
+    [Theory]
+    [InlineData("CLR")]
+    [InlineData("SHM")]
+    public void ThePriestClassesMissManaAndTheMissIsAdmitted(string cls) =>
+        Assert.DoesNotContain("Mana", For(cls));
+
+    /// <summary>
+    /// **UNKNOWN STANDS DOWN WHOLE** (trap 73) — and it is the EMPTY set rather than a set
+    /// somebody has to remember means "everything".
+    /// </summary>
+    [Fact]
+    public void NothingKnownAnswersNothing()
+    {
+        Assert.Empty(ClassStatRelevance.For(ItemCatalog.Default, []));
+        Assert.Empty(ClassStatRelevance.For(ItemCatalog.Default, null));
+        Assert.Empty(ClassStatRelevance.For(null, ["WIZ"]));
+        // A class the catalog has never heard of contributes nothing, rather than every metric
+        // or a crash — the same conservative reading a class-locked comparison has.
+        Assert.Empty(For("NOTACLASS"));
+        // …and it does not poison a real one standing beside it.
+        Assert.Contains("Mana", For("NOTACLASS", "WIZ"));
+    }
+
+    /// <summary>
+    /// **A THREE-CLASS CHARACTER GETS THE UNION**, because they are wearing one set of gear for
+    /// all three. An intersection would answer nothing for the common melee/caster pair, and a
+    /// "primary class only" reading would be this file deciding which of a player's classes is
+    /// the real one.
+    /// </summary>
+    [Fact]
+    public void ThreeClassesAreOneCharacter()
+    {
+        var both = For("WAR", "WIZ");
+        Assert.Contains("DMG", both);    // the warrior's
+        Assert.Contains("Mana", both);   // the wizard's
+        Assert.Superset(For("WAR").ToHashSet(), both.ToHashSet());
+        Assert.Superset(For("WIZ").ToHashSet(), both.ToHashSet());
+    }
+
+    /// <summary>
+    /// **RELEVANCE NEVER REMOVES A CANDIDATE** — the property the limitation above rests on.
+    ///
+    /// <para>Run the real sweep over the Founder's committed dump with no classes and with a
+    /// caster's, and the SET of items offered is identical. Only the order and the named gain
+    /// may move. If this ever fails, the rule has grown a refusal and the file's own summary is
+    /// no longer true.</para>
+    /// </summary>
+    [Fact]
+    public void RelevanceNeverRemovesACandidate()
+    {
+        var worn = FounderFixture.Worn();
+
+        var blind = GearUpgrades.Sweep(
+            GearIntent.ReplaceSlot, worn, [], ItemCatalog.Default, [], includeQuests: false);
+        // A class list the catalog's own items name, so the class-lock filter inside Dominates
+        // is not what moves the numbers: every one of these rows is offered to both runs.
+        var known = GearUpgrades.Sweep(
+            GearIntent.ReplaceSlot, worn, [], ItemCatalog.Default, ["WIZ"], includeQuests: false);
+
+        Assert.NotEmpty(blind.Upgrades);
+        // The class-lock filter DOES narrow (a WIZ cannot use a warrior's plate), so the
+        // comparison is made per anchor over items both runs could reach: nothing that survived
+        // the class filter may be missing from the known-class run.
+        var keys = (GearSweep s) => s.Upgrades
+            .Select(u => (u.Over, u.Slot, u.Item)).ToHashSet();
+        Assert.Subset(keys(blind), keys(known).Intersect(keys(blind)).ToHashSet());
+
+        // The off-hand counts DIFFER between the two runs, and that is the class-lock filter
+        // rather than relevance: 32 two-handers beat something this character wears, and only 2
+        // of them are items a WIZ may hold at all, so the other 30 lose at the class gate
+        // before the hand question is reached. Asserted rather than left implicit, because the
+        // obvious reading of the paragraph above is that this number should be stable.
+        Assert.True(blind.OffHandRefusals > known.OffHandRefusals);
+    }
+
+    /// <summary>
+    /// **THE SWEEP ACTUALLY CONSULTS IT — the guard that was missing when this file was first
+    /// written** (trap 78).
+    ///
+    /// <para>Every other assertion here proves the TABLE: which metrics a class's items carry,
+    /// that unknown stands down, that nothing is removed. All of them stayed green with BOTH
+    /// uses of the table deleted from <c>GearUpgrades.Sweep</c> — measured, by doing it — which
+    /// is a rule aimed at nothing. These two are the reachable ones.</para>
+    ///
+    /// <para>The invariant rather than a hand-picked pair: <b>if any relevant metric improved,
+    /// the row must name a relevant one.</b> That is exactly what <c>ItemDominance.Gain</c>'s
+    /// relevance argument buys, it holds for every row rather than for one the author found,
+    /// and it is false for every row the moment the argument is dropped.</para>
+    /// </summary>
+    [Fact]
+    public void ARowNamesARelevantMetricWheneverOneImproved()
+    {
+        var relevant = For("WIZ");
+        Assert.NotEmpty(relevant);
+
+        var sweep = GearUpgrades.Sweep(
+            GearIntent.ReplaceSlot, FounderFixture.Worn(), [], ItemCatalog.Default, ["WIZ"],
+            includeQuests: false);
+        Assert.NotEmpty(sweep.Upgrades);
+
+        var couldHave = 0;
+        foreach (var upgrade in sweep.Upgrades)
+        {
+            if (upgrade.RelevantMetrics == 0) continue;   // nothing relevant moved — see Gain
+            couldHave++;
+            Assert.True(relevant.Contains(upgrade.GainMetric),
+                $"{upgrade.Item} moved {upgrade.RelevantMetrics} of this character's own "
+                + $"numbers and the row names {upgrade.GainMetric}, which is not one of them");
+        }
+
+        // …and the loop is not vacuous: a run where nothing relevant ever improved would
+        // satisfy every assertion above without the rule existing (trap 78, one layer down).
+        Assert.True(couldHave > 0,
+            "no upgrade in this sweep improved a metric a wizard's own gear carries — the "
+            + "assertion above decided nothing");
+    }
+
+    /// <summary>
+    /// **AND IT ORDERS ON IT, AGAINST THE COUNT THAT USED TO DECIDE ALONE.**
+    ///
+    /// <para>Two claims, and the second is what makes the first non-vacuous: the list is sorted
+    /// on (relevant, improved, name) — and somewhere in it a row with FEWER improved metrics
+    /// sits above one with more, because more of its numbers are this character's. Without that
+    /// second assertion the sort check passes on a build that never looks at relevance, since
+    /// every row would score zero and the old key would produce the same order.</para>
+    /// </summary>
+    [Fact]
+    public void RelevanceOutranksTheRawImprovedCount()
+    {
+        var sweep = GearUpgrades.Sweep(
+            GearIntent.ReplaceSlot, FounderFixture.Worn(), [], ItemCatalog.Default, ["WIZ"],
+            includeQuests: false);
+
+        var inversions = 0;
+        foreach (var perAnchor in sweep.Upgrades.GroupBy(u => (u.Over, u.Slot)))
+        {
+            var rows = perAnchor.ToList();
+            var expected = rows
+                .OrderByDescending(u => u.RelevantMetrics)
+                .ThenByDescending(u => u.ImprovedMetrics)
+                .ThenBy(u => u.Item, StringComparer.OrdinalIgnoreCase)
+                .Select(u => u.Item)
+                .ToList();
+            Assert.Equal(expected, rows.Select(u => u.Item).ToList());
+
+            for (var i = 1; i < rows.Count; i++)
+                if (rows[i - 1].RelevantMetrics > rows[i].RelevantMetrics
+                    && rows[i - 1].ImprovedMetrics < rows[i].ImprovedMetrics)
+                    inversions++;
+        }
+
+        Assert.True(inversions > 0,
+            "no row was promoted over one that moved MORE numbers, so the sort above is the "
+            + "pre-D6 one and proves nothing about relevance");
+    }
+
+    /// <summary>
+    /// **AND THE ROW USES THE SAME KEYS THE SWEEP DID** (trap 4).
+    ///
+    /// <para><c>Recommendations.GearRow</c> re-sorts a zone's candidates and caps them at
+    /// <c>GearNamedPerRow</c>, so whichever comparer runs there decides which upgrades the
+    /// player actually READS about. It had its own copy of the pre-D6 key, which would have
+    /// meant the eight the sweep kept and the three the row names were chosen on different
+    /// grounds — visible only on the rows where the two disagree, which is exactly the class of
+    /// bug that survives a review.</para>
+    ///
+    /// <para>Measured through <c>Rank</c> over the shipped catalog and the Founder's own dump,
+    /// because a fixture small enough to reason about has no pair that disagrees.</para>
+    /// </summary>
+    [Fact]
+    public void TheDrawnRowNamesTheUpgradesTheSweepRankedFirst()
+    {
+        var inputs = new HelperInputs(
+            ZoneHistory.Fold([], []), [], null, [], [], [], [], false, [], [], null,
+            ResolvedLevel.Unknown)
+        {
+            Worn = FounderFixture.Worn(),
+            Items = ItemCatalog.Default,
+            MyClasses = ["WIZ"],
+            GearIntent = GearIntent.ReplaceSlot,
+        };
+
+        var set = Recommendations.Rank(inputs, [HelperGoal.FarmGear], cap: 40);
+        var rows = set.Top
+            .Select(r => r.Why.OfType<GearUpgradeFact>().ToList())
+            .Where(f => f.Count > 1)
+            .ToList();
+        Assert.NotEmpty(rows);
+
+        var varied = 0;
+        foreach (var facts in rows)
+        {
+            for (var i = 1; i < facts.Count; i++)
+            {
+                Assert.True(facts[i - 1].RelevantMetrics >= facts[i].RelevantMetrics,
+                    $"{facts[i].Item} moved more of this character's own numbers than "
+                    + $"{facts[i - 1].Item} and is named after it");
+                if (facts[i - 1].RelevantMetrics != facts[i].RelevantMetrics) varied++;
+            }
+        }
+
+        // …and the assertion above decided something: a set of rows whose facts all carry the
+        // same relevant count is non-decreasing whatever comparer produced it (trap 78).
+        Assert.True(varied > 0,
+            "every drawn row named upgrades with identical relevant counts, so the ordering "
+            + "assertion above proves nothing");
+    }
+
+    /// <summary>
+    /// **AND AN UNKNOWN CLASS RANKS EXACTLY AS THIS REPO RANKED BEFORE D6.**
+    ///
+    /// <para>The prove-fail is the ordering key itself: with an empty relevance set every row
+    /// scores <c>RelevantMetrics</c> 0, so the sort falls through to the improved-metric count
+    /// and the name, which is the pre-slice comparer verbatim. Asserted rather than reasoned
+    /// about, over the Founder's own dump.</para>
+    /// </summary>
+    [Fact]
+    public void AnUnknownClassOrdersOnTheOldKeyAlone()
+    {
+        var sweep = GearUpgrades.Sweep(
+            GearIntent.ReplaceSlot, FounderFixture.Worn(), [], ItemCatalog.Default, [],
+            includeQuests: false);
+
+        Assert.NotEmpty(sweep.Upgrades);
+        Assert.All(sweep.Upgrades, u => Assert.Equal(0, u.RelevantMetrics));
+
+        foreach (var perAnchor in sweep.Upgrades.GroupBy(u => (u.Over, u.Slot)))
+        {
+            var expected = perAnchor
+                .OrderByDescending(u => u.ImprovedMetrics)
+                .ThenBy(u => u.Item, StringComparer.OrdinalIgnoreCase)
+                .Select(u => u.Item)
+                .ToList();
+            Assert.Equal(expected, perAnchor.Select(u => u.Item).ToList());
+        }
+    }
+
+    /// <summary>
+    /// **AND THE PLAYER NEVER READS THE COUNT ITSELF** (DRA-222 D6 done bar 3, S16.3).
+    ///
+    /// <para><c>RelevantMetrics</c> is a RANKING term. It decides which upgrades are named and
+    /// in what order, and the visible half of that decision is the better-chosen
+    /// <c>GainMetric</c> — "+12 AC" — which is a delta against a metric's own name. The count
+    /// behind it is not a fact about the game: it is a tally over how often eqlwiki's item
+    /// blocks happen to carry each number for this class. "This moved 3 of your stats" would
+    /// state that tally as though it were a measurement of the character, which is exactly the
+    /// unexplained numeric score S16.3 forbids.</para>
+    ///
+    /// <para><b>It is absent by construction today, and that is the problem this guard
+    /// solves</b> — nothing stopped the next slice from interpolating it into a sentence, and
+    /// an absence no test defends is one a refactor removes silently (trap 20's shape). The
+    /// scan is over the two files that own the words for BOTH surfaces: every phone sentence
+    /// rides the wire from the same producers (trap 32), so guarding the desktop's words and
+    /// the projection covers the phone without a third copy.</para>
+    ///
+    /// <para><b>Comments are stripped before the scan.</b> The paragraph you are reading names
+    /// the field, and so may a future one; a rule that cannot tell prose from code would make
+    /// explaining the rule the thing that breaks it. The committed negative below is what
+    /// proves the stripped scan still FIRES (trap 78: a detector aimed at nothing is green).
+    /// Its must-list partner is <see cref="ARowNamesARelevantMetricWheneverOneImproved"/> —
+    /// forbidding the bare count is only half a rule without something asserting the row names
+    /// a concrete metric instead (trap 34).</para>
+    /// </summary>
+    [Theory]
+    [InlineData("src/EQBuddy.UI.Shared/HelperPresentation.cs")]
+    [InlineData("src/EQBuddy.Companion/CompanionProjection.Helper.cs")]
+    public void NoPlayerFacingWordDrawsTheRelevanceCount(string relative)
+    {
+        var path = Path.Combine(RepoRoot(), relative.Replace('/', Path.DirectorySeparatorChar));
+        var source = File.ReadAllText(path);
+
+        // The file is the one we think it is, and it was actually read: an empty or moved file
+        // scans clean and would report this rule as held for a surface nobody is guarding.
+        // The anchor is the CARRIER of the count rather than any one word, so a clean scan
+        // means "this file handles the object and declines to draw the number" rather than
+        // "this file never met it".
+        Assert.NotEmpty(source);
+        Assert.Contains("GearUpgradeFact", source);
+
+        Assert.Empty(RelevanceCountDraws(source));
+    }
+
+    /// <summary>
+    /// **THE COMMITTED NEGATIVE — the scan above catches the sentence it exists to forbid.**
+    ///
+    /// <para>Both shapes are checked: the interpolation a words file would actually use, and a
+    /// bare member access. And the third case is the one that makes the strip load-bearing —
+    /// prose naming the field is NOT a finding, so the rule survives being documented.</para>
+    /// </summary>
+    [Fact]
+    public void TheRelevanceCountScanFiresOnTheSentenceItForbids()
+    {
+        Assert.NotEmpty(RelevanceCountDraws(
+            "static string Why(GearUpgradeFact f) => $\"moved {f.RelevantMetrics} of your stats\";"));
+        Assert.NotEmpty(RelevanceCountDraws(
+            "var n = fact.RelevantMetrics;"));
+
+        // …and prose about the rule is not a violation of it.
+        Assert.Empty(RelevanceCountDraws(
+            "/// <summary>RelevantMetrics never reaches a word.</summary>"));
+        Assert.Empty(RelevanceCountDraws(
+            "// RelevantMetrics decides the order; GainMetric is what the row says."));
+    }
+
+    /// <summary>
+    /// **AND NO DRAWN SURFACE REACHES IT EITHER — the half a blanket forbid cannot express**
+    /// (DRA-222 D6 done bar 3, S16.3).
+    ///
+    /// <para><see cref="NoPlayerFacingWordDrawsTheRelevanceCount"/> above forbids the token
+    /// outright in the two files that own the Helper's WORDS. That rule can only be written
+    /// where the count is absent, and it is exactly the wrong shape for the file the finding
+    /// was about: <c>EQBuddy/HelperRoom.cs</c> both draws text straight to the screen — its
+    /// <c>Line(string, Role)</c> helper is called upwards of forty times — AND legitimately
+    /// carries the count once, in the <c>helperRelevant=</c> <c>EQBUDDY_EXPAND</c> dump line.
+    /// Zero tolerance there is unwritable, so the only rule that covers it is an ALLOWLIST:
+    /// <b>this line and no other</b>.</para>
+    ///
+    /// <para><b>Which is why the shape of the mistake S16.3 exists to prevent lives here and
+    /// not above.</b> A quick debug binding — <c>Line($"Relevance: {f.RelevantMetrics}",
+    /// Role.Body)</c> — is a change to the room, not to a words file, and the room is the one
+    /// surface a blanket forbid had to leave out. The count is a tally over how often eqlwiki's
+    /// item blocks carry each number for this class; drawn as a bare figure it states that
+    /// tally as though it were a measurement of the character.</para>
+    ///
+    /// <para>The allowlisted line is recognised by BEING the dump line (it names the dump key),
+    /// never by a line number — those drift with every edit above them, and a guard pinned to
+    /// one would be re-pointed by hand at whatever now sits there. Scope is the three trees
+    /// that can put a glyph in front of a player: the desktop, UI.Shared, and Companion
+    /// (whose page can only draw what the projection sends — trap 32).</para>
+    ///
+    /// <para><b>One deliberate departure from the reviewer's spec, because taking it literally
+    /// would have reproduced the hole.</b> It names <c>src/EQBuddy/**/*.xaml.cs</c>, which does
+    /// not match <c>HelperRoom.cs</c> — that is a plain <c>.cs</c>, not a code-behind — while
+    /// the same spec allowlists "the single <c>HelperRoom.cs</c> dump line". A glob that cannot
+    /// match the file its own allowlist exempts is a typo in the spec, not a scope decision, so
+    /// the scan is over <c>*.cs</c>/<c>*.xaml</c> and the allowlist means something.</para>
+    /// </summary>
+    [Fact]
+    public void TheOnlyDrawnSurfaceLineThatReachesTheRelevanceCountIsTheAllowedDumpLine()
+    {
+        var offenders = new List<string>();
+        var allowed = 0;
+        var scanned = 0;
+
+        foreach (var file in DrawnSurfaceFiles())
+        {
+            scanned++;
+            foreach (var line in RelevanceCountDraws(File.ReadAllText(file)))
+            {
+                if (IsTheAllowedDumpLine(file, line)) { allowed++; continue; }
+                offenders.Add($"{Relative(file)}: {line.Trim()}");
+            }
+        }
+
+        // Liveness (trap 78): a glob that matches nothing scans clean and reports this rule as
+        // held for every surface at once. The floor is well under the ~279 files these three
+        // trees hold, so it survives ordinary growth and still fails a broken enumeration.
+        Assert.True(scanned > 200,
+            $"the scan found only {scanned} files — the globs stopped matching, so a clean "
+            + "result says nothing about any surface");
+
+        // …and the allowlist is REACHED. If the dump line is renamed or moved out of the room,
+        // this guard would go on passing while exempting nothing, which is the same silence.
+        Assert.True(allowed == 1,
+            $"expected exactly the one allowlisted dump line, found {allowed}. If "
+            + "HelperRoom's helperRelevant= line legitimately moved, re-point the allowlist; "
+            + "if a SECOND dump-shaped line appeared, it needs its own decision.");
+
+        Assert.True(offenders.Count == 0,
+            "a drawn surface reaches the S7.2 relevance count. It is a ranking term, not a "
+            + "fact about the character — the visible half is HelperPresentation.Gain's "
+            + "\"+12 AC\", a delta against a metric's own name (S16.3):\n  "
+            + string.Join("\n  ", offenders));
+    }
+
+    /// <summary>
+    /// **THE MUST-LIST PARTNER: the token's whole footprint in <c>src/</c> is the known set**
+    /// (trap 34 — a forbid over the surfaces cannot see a reader appearing somewhere new).
+    ///
+    /// <para>The forbid above is what keeps the number off the screen. This is what keeps the
+    /// forbid HONEST: it pins which files carry the count at all, so a sixth site anywhere in
+    /// <c>src/</c> has to be looked at rather than merely landing outside the globs. Three
+    /// files, and the reviewer's enumeration reconciles to them — two engine sites
+    /// (<c>GearUpgrades</c>, <c>Recommendations</c>) plus the single room dump line.</para>
+    ///
+    /// <para>Deliberately the FILE SET and not a line count: an engine refactor that moves a
+    /// sort key around inside <c>Recommendations.cs</c> changes nothing a player can read, and
+    /// a guard that reddens on it is one the next person edits to green without thinking. What
+    /// must not happen quietly is the count acquiring a reader in a file that never had one.
+    /// <c>HelperRoom.cs</c> is the exception and is pinned tighter above, at exactly one
+    /// line, because that is the file where a new line IS the risk.</para>
+    /// </summary>
+    [Fact]
+    public void TheRelevanceCountIsCarriedByExactlyTheKnownFiles()
+    {
+        var carriers = Directory
+            .EnumerateFiles(Path.Combine(RepoRoot(), "src"), "*.cs", SearchOption.AllDirectories)
+            .Where(NotBuildOutput)
+            .Where(f => RelevanceCountDraws(File.ReadAllText(f)).Count > 0)
+            .Select(f => Path.GetFileName(f))
+            .OrderBy(n => n, StringComparer.Ordinal)
+            .ToList();
+
+        Assert.Equal(
+            new[] { "GearUpgrades.cs", "HelperRoom.cs", "Recommendations.cs" },
+            carriers);
+    }
+
+    /// <summary>The one exempt line: the room's <c>EQBUDDY_EXPAND</c> dump key, identified by
+    /// the key it emits rather than by where it currently sits.</summary>
+    private static bool IsTheAllowedDumpLine(string file, string line) =>
+        Path.GetFileName(file) == "HelperRoom.cs"
+        && line.Contains("helperRelevant=", StringComparison.Ordinal);
+
+    /// <summary>Every file in the three trees that can put a glyph in front of a player.</summary>
+    private static IEnumerable<string> DrawnSurfaceFiles()
+    {
+        string[] trees = ["EQBuddy", "EQBuddy.UI.Shared", "EQBuddy.Companion"];
+        string[] kinds = ["*.cs", "*.xaml", "*.html"];
+
+        return trees
+            .Select(t => Path.Combine(RepoRoot(), "src", t))
+            .Where(Directory.Exists)
+            .SelectMany(dir => kinds.SelectMany(k =>
+                Directory.EnumerateFiles(dir, k, SearchOption.AllDirectories)))
+            .Where(NotBuildOutput);
+    }
+
+    private static bool NotBuildOutput(string path)
+    {
+        var p = path.Replace('\\', '/');
+        return !p.Contains("/obj/", StringComparison.Ordinal)
+            && !p.Contains("/bin/", StringComparison.Ordinal);
+    }
+
+    private static string Relative(string path) =>
+        Path.GetRelativePath(RepoRoot(), path).Replace('\\', '/');
+
+    /// <summary>Lines of <paramref name="source"/> that reach the ranking count, with XML doc
+    /// comments and line comments removed first.</summary>
+    private static IReadOnlyList<string> RelevanceCountDraws(string source) => source
+        .Split('\n')
+        .Select(line =>
+        {
+            var code = line.TrimStart();
+            if (code.StartsWith("///", StringComparison.Ordinal)
+                || code.StartsWith("//", StringComparison.Ordinal)) return "";
+            var slash = line.IndexOf("//", StringComparison.Ordinal);
+            return slash >= 0 ? line[..slash] : line;
+        })
+        .Where(code => code.Contains("RelevantMetrics", StringComparison.Ordinal))
+        .ToList();
+
+    private static string RepoRoot()
+    {
+        var d = new DirectoryInfo(AppContext.BaseDirectory);
+        while (d is not null && !File.Exists(Path.Combine(d.FullName, "EQBuddy.slnx")))
+            d = d.Parent;
+        return d?.FullName ?? throw new InvalidOperationException("repo root not found");
+    }
+}

@@ -43,18 +43,45 @@
 #   nobody appends to (untouched since 2026-08-31) would be coverage theatre.
 
 @{
-    # 14x over. Never rotated. The busiest file in the repo by commit count.
-    'HELM.md'            = 942417
-    # 5x over even AFTER DRA-75 rotated 390 entries out of it (1,504,146 -> 311,088).
-    'HELM-FEEDBACK.md'   = 311088
-    # 9x over. Never rotated. Append-only by design, which is why it only ever grows.
-    'DECISIONS.md'       = 614986
+    # HELM.md and HELM-FEEDBACK.md left this table on 2026-09-18, discharged by the DRA-154
+    # rotation that took them to 25,411 B and 4,730 B - the first rotation of the HELM.md
+    # class. Rows only ever leave, and they leave in the pull request that earns it.
+    # Rotated 2026-09-20 by DRA-231 (DRA-144 F6): 676,431 B -> 85,238 B, into
+    # channels/2026-Q3/DECISIONS.md. A date cut at 2026-09-17 with a hand-triaged floor:
+    # of the 30 older blocks a coarse LIVE ASK / PARK / HOLD / STANDING sweep flagged, 24
+    # were dispositioned as closed and moved, and 6 that carry something genuinely open
+    # were kept at any age. The first cut of this rotation landed 81,798 B and was wrong by
+    # 3,440: that coarse sweep has no LIVE ASK / PARK / HOLD / STANDING marker to flag an
+    # `exo-experiment:` tag, so all six of them rotated out from under a generator and three
+    # tests that read them from the LIVE file. The tags are re-pinned verbatim, which is what
+    # the never-rotate floor asks for and why this row is 85,238 and not 81,798.
+    # Still 1.3x over policy, so this row is LOWERED and KEPT: check C discharges a row only
+    # at 64 KiB or less, and no legal cut reaches the ceiling while that floor stands. The
+    # 10% band this buys is 8,523 B - about a quarter of one median day's append
+    # (32,231 B/day measured 2026-09-10..19).
+    # That the ceiling and the band cannot both hold this file is DRA-144 F8's subject.
+    'DECISIONS.md'       = 85238
     # 7x over. Never rotated. Shrinks for real once plans move to docs/plans/DRA-nn.md.
     'FABLE.md'           = 478113
-    # 4x over. Never rotated.
-    'BEVEL.md'           = 237551
-    # 8x over. Never rotated.
-    'BEVEL-FEEDBACK.md'  = 501704
-    # 3x over. Never rotated.
-    'SCRIBE.md'          = 177198
+    # BEVEL.md left this table on 2026-09-20, discharged by the DRA-258 rotation
+    # (DRA-144 F9): 237,542 B -> 60,352 B, into channels/2026-Q3/BEVEL.md. It was 4x over
+    # and had never rotated, because 68% of it was a single UNDATED container heading
+    # holding 20 dated h3 pre-designs: a date cut that reads h2 headings sees one undated
+    # block and walks past it, which is how this file survived every prior pass. The cut
+    # was made at h3 INSIDE the container; the container heading stays live with a pointer
+    # to the archive, and the orientation notes under it are undated and still current.
+    # This row is DELETED rather than lowered, which is the difference from SCRIBE.md and
+    # DECISIONS.md above: check C discharges a row the moment the file reaches 64 KiB or
+    # less, and 60,352 B is under the ceiling, so the ceiling arm governs BEVEL.md now and
+    # it has no tolerance band at all. That is a known cost, not an oversight - at the
+    # measured 16.4 KB/day this file is back over policy in well under a week, and check B
+    # refuses any pull request that adds this key back. The successor rotation is filed
+    # rather than bought with a number here (trap 52).
+    # Rotated 2026-09-20 by DRA-229 (DRA-144 F4b): 213,675 B -> 114,715 B, into
+    # channels/2026-Q3/SCRIBE.md. The cut is a TRIAGE by the entries' own Priority field,
+    # not a date cut - SCRIBE.md is an inbox and 42 of its 92 entries are still open at
+    # any age, so a date cut would have been silent closure. Still 1.7x over policy, so
+    # this row is LOWERED and KEPT: check C discharges a row only at 64 KiB or less, and
+    # the open-ask floor is ~105 KB on its own, so no legal cut reaches the ceiling.
+    'SCRIBE.md'          = 114715
 }

@@ -725,6 +725,14 @@ internal static class WidgetDump
                     // suite's synchronisation point on the far side of the click, and 0 on
                     // every profile that did not ask for the probe.
                     $"doorProbeClicks={DebugHooks.DoorProbeClicks} " +
+                    // …and the lens probe's, beside it and reported the same way: whether or
+                    // not the Quest Tracker is open, so a suite waiting on it times out
+                    // naming the rendezvous rather than on a key that is simply absent.
+                    // Raised AFTER the write (trap 62), and 0 on every profile that did not
+                    // ask for EQBUDDY_LENSPROBE. It does NOT claim the strip has repainted —
+                    // the picks verb forces no refresh, by design; `questsRenders` is what
+                    // says a render happened on the far side of it.
+                    $"questsLensProbeSets={DebugHooks.LensProbeSets} " +
 
                     // The EVOLVED SHELL, when one is open. This is the only thing besides a
                     // screenshot that can say the rail drew, the Search affordance exists
@@ -771,7 +779,7 @@ internal static class WidgetDump
                     // means style=1 AND appWindow=0, and only the HWND can say so.
                     $"altTabAppWindow={(NoActivate.HasAppWindowStyle(w) ? 1 : 0)} " +
                     $"altTabTaskbar={(w.ShowInTaskbar ? 1 : 0)}";
-                System.IO.File.WriteAllText(Core.AppPaths.File("debug.txt"), dump);
+                WriteWholeOrNotAtAll(dump);
             }
             catch (Exception ex)
             {
@@ -786,13 +794,19 @@ internal static class WidgetDump
                 // this line in the artifact, rather than being answered by a stale value.
                 try
                 {
-                    System.IO.File.WriteAllText(Core.AppPaths.File("debug.txt"),
-                        $"tick={w._uiTicks} dumpError={ex.GetType().Name}");
+                    WriteWholeOrNotAtAll($"tick={w._uiTicks} dumpError={ex.GetType().Name}");
                 }
                 catch { /* a logger that can throw is the bug it reports */ }
             }
         }
     }
+
+    /// <summary>The dump, published so a reader sees ALL of it or NONE of it — never half.
+    /// The arithmetic and the reasoning live in <see cref="UI.Shared.WholeFilePublish"/>,
+    /// which is in UI.Shared rather than here so that it is unit-testable in
+    /// `build-and-test` (docs/TestPlan.md §5 — the WPF layer has no test project).</summary>
+    private static void WriteWholeOrNotAtAll(string dump) =>
+        UI.Shared.WholeFilePublish.Write(Core.AppPaths.File("debug.txt"), dump);
 
     /// <summary>The muted chip families as one space-free token, through the SAME reader the
     /// row itself uses (SA-4). Not a re-read of <c>MutedChipFamilies</c>: a dump that parsed

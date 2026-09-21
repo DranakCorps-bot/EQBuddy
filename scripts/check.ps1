@@ -48,7 +48,7 @@ function Step([string] $name, [scriptblock] $body) {
     if ($LASTEXITCODE -ne 0) {
         Write-Host "FAILED" -ForegroundColor Red
         # Only the lines that say why — a full MSBuild log buries the one that matters.
-        $output | Select-String -Pattern 'error |Failed!|\[FAIL\]|Assert\.|whatsnew-guard|legacy-notice-guard|evolved-channel-guard|channel-wipe-guard|channel-size-guard|channel-size-selftest|soft-seat-selftest|merge-sync' |
+        $output | Select-String -Pattern 'error |Failed!|\[FAIL\]|Assert\.|whatsnew-guard|legacy-notice-guard|evolved-channel-guard|channel-wipe-guard|channel-size-guard|channel-size-selftest|soft-seat-selftest|merge-sync|commit-identity|FAIL: ' |
             Select-Object -First 15 | ForEach-Object { Write-Host "   $_" }
         Write-Host "   full log: $log" -ForegroundColor Yellow
         $script:failed += $name
@@ -90,6 +90,18 @@ Step 'channel test' { & "$PSScriptRoot\channel-wipe-guard-selftest.ps1" 6>&1 }
 Step 'channel size' { & "$PSScriptRoot\channel-size-guard.ps1" 6>&1 }
 # …and its prove-fail, for the reason the one above has one.
 Step 'size test   ' { & "$PSScriptRoot\channel-size-selftest.ps1" 6>&1 }
+# No commit this branch ADDS may be authored or committed as the Founder (DRA-226). Seven
+# commits and 4,589 lines of agent-written code were about to land in `git blame` under
+# his name, from a dispatch clone whose [user] block said `David Edwards`; a linked
+# worktree shares its clone's config, so one wrong block mis-attributed ~20 worktrees and
+# 126 of the last 600 commits on main. Locally this judges HEAD against origin/main, so a
+# mis-authored commit fails here while it is still rewritable — which is the whole window,
+# because after the merge it is permanent.
+Step 'commit id   ' { & "$PSScriptRoot\commit-identity-guard.ps1" 6>&1 }
+# …and its prove-fail, for the reason the two above have one: six refusals driven red in a
+# throwaway repo, every allow-list row exercised, and both fail-open paths asserted to SAY
+# they judged nothing. Prove-failed against six mutants of the guard.
+Step 'commit test ' { & "$PSScriptRoot\commit-identity-selftest.ps1" 6>&1 }
 # Experiment A′ self-test (trap 70, EQBuddy lab): a second default seat on the
 # same work item must refuse. Throwaway StoreDir; not the machine's live claims.
 Step 'soft seats  ' { & "$PSScriptRoot\soft-seat-selftest.ps1" 6>&1 }

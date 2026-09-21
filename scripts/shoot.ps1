@@ -736,6 +736,43 @@ $Shots = [ordered]@{
                            Set = @{
                                SkyGroupByIsland = $true
                            } }
+    # ---- DRA-218: Closest to Completion, and the blocked quest under it ---------------
+    #
+    # **A state with a SKIPPED step in it, because that is the only state the lens visibly
+    # changes on this catalog.** Measured with the slice: the Warrior's six Sky guides hold
+    # three or four objectives each, and over those sizes the class view's own
+    # progress-descending order and this lens's fewest-remaining order cannot disagree
+    # (`k/4 > j/3` and `4-k > 3-j` have no solution). So a shot of the lens over a fresh
+    # profile would photograph the class view and read as a passing feature — trap 22's
+    # failure with the fixture present but wrong-shaped, and trap 23's with a real state of
+    # something else in frame.
+    #
+    # The staged skip is the Azure Ruby Ring's Azure Ring loot step, which is a prerequisite
+    # of that quest's hand-in — so the quest has one step left by the count, cannot be
+    # finished at all, and is alphabetically FIRST (which is where the class view puts it).
+    # Ids are the shipped catalog's; `GuideCatalog.Validate` refuses a prerequisite that
+    # names nothing, so a rename breaks the build rather than this picture silently.
+    #
+    # PREDICTION, written before the run (trap 23). At 1000x900 in class view with the box
+    # ticked: the Azure Ruby Ring heading is NOT first - it is LAST among the Warrior's six -
+    # and reads "Warrior · Azure Ruby Ring 0/3 · blocked", with the line under it
+    # "Waiting on a step you skipped: Loot the Azure Ring from Gorgalosk." Above it sit the
+    # other five rewards, each 0/3 or 0/4 and each reading no state word at all (nothing is
+    # started), ordered fewest-left first. The "Closest to completion first" box is ticked,
+    # beside the Class view / Island view chips and the "Repeat multi-island steps" box.
+    'shell-quests-sky-closest' = @{ Title = 'EQBuddy — Guide'
+                           Env = @{ EQBUDDY_SHELL = 'quests:sky'
+                                    EQBUDDY_SHELL_SIZE = '1000x900' }
+                           Ledger = @{ Classes = @('Warrior')
+                                       Guides = @{
+                                           'pos-warrior-azure-ruby-ring' = @{
+                                               DoneObjectiveIds = @()
+                                               SkippedObjectiveIds = @('azure-ring')
+                                           }
+                                       } }
+                           Set = @{
+                               SkyClosestToCompletion = $true
+                           } }
     # ---- E-3 PR 4: the HOME room, and the default landing ----------------------------
     #
     # **`EQBUDDY_SHELL = '1'` is deliberate and is half of what these shots prove.** Every
@@ -1778,6 +1815,50 @@ $Shots = [ordered]@{
                                HelperWornPicks = @{ 'testchar_test' = @('Cloth Cap') }
                                HelperGearIntent = @{ 'testchar_test' = 'ReplaceSlot' }
                            } }
+    # ---- DRA-216 D4: the goal that outlived its offer --------------------------------------
+    #
+    #   'shell-helper-tracked' — 'shell-helper-gear' with TWO tracked goals seeded into the
+    #     profile, and the pairing is what makes it evidence: put it beside 'shell-helper-gear'
+    #     and the only difference is the block this slice adds.
+    #
+    #   THE STAGED GOALS ARE DELIBERATELY NOT IN TODAY'S ANSWERS. A Blade of Carnage and a
+    #   Wurmslayer are not upgrades over a Cloth Cap in HEAD or a Cloth Choker in NECK, so the
+    #   sweep below offers neither — which is exactly the state the slice exists for. A shot
+    #   staged so that the block and the answers named the same item would photograph the easy
+    #   case and say nothing about the hard one (trap 23: a wrong-shape staging photographs a
+    #   real state of something else).
+    #
+    #   PREDICTED (trap 23), before the take:
+    #     * A block headed "What you are going after", ABOVE "Worth doing next" and below the
+    #       Farm Gear block — the room's own order, because a goal outlives the list under it.
+    #     * Its note, saying the two things it does NOT claim: nothing ticks itself off, and
+    #       EQBuddy has no numbers for what a "+N" adds to either side.
+    #     * TWO rows, NEWEST FIRST — Wurmslayer (17 Sep) above Blade of Carnage (15 Sep) —
+    #       each naming what it replaces and its slot, each with "Tracked ✓" and a Gear door.
+    #     * Every item line under the answers gains a "Track" of its own, and NONE of them
+    #       reads "Tracked ✓", because neither staged goal is in today's list.
+    #
+    #   THE HEIGHT IS PART OF THE STAGING, for 'shell-helper-gear-who''s own reason one block
+    #   along: this slice adds a heading, a four-line note and two rows ABOVE the answers, so at
+    #   the default 946x633 the Track controls this shot is half about would be below the fold.
+    #   The density question stays with Bevel and is not restyled from here.
+    'shell-helper-tracked' = @{ Title = 'EQBuddy — Helper'
+                           Env = @{ EQBUDDY_SHELL = 'helper'; EQBUDDY_SHELL_SIZE = '946x880' }
+                           Dump = @{ 'Testchar_test-Inventory.txt' = @(
+                               "Location`tName`tID`tCount`tSlots"
+                               "Head`tCloth Cap`t0`t1`t0"
+                               "Neck`tCloth Choker`t0`t1`t0") }
+                           Set = @{
+                               HelperGoals = @{ 'testchar_test' = @('FarmGear') }
+                               HelperWornPicks = @{ 'testchar_test' = @('Cloth Cap') }
+                               TrackedUpgrades = @{ 'testchar_test' = @(
+                                   @{ Item = 'Blade of Carnage'; Slot = 'PRIMARY'
+                                      Over = 'Rusty Short Sword +3'
+                                      TrackedAt = '2026-09-15T20:14:00' }
+                                   @{ Item = 'Wurmslayer'; Slot = 'SECONDARY'
+                                      Over = 'Shiny Brass Shield +6'
+                                      TrackedAt = '2026-09-17T21:02:00' }) }
+                           } }
     # ---- DRA-84 D2: the band gate visibly refusing ----------------------------------------
     #
     #   'shell-helper-gear-band' — 'shell-helper-gear' with ONE thing added: a stated level in
@@ -1861,14 +1942,81 @@ $Shots = [ordered]@{
     #   AND THE REGRESSION PICTURES: all four 'shell-helper-gear*' shots above change in this
     #     slice — every one of their item lines gains a creature clause it did not have. That is
     #     the slice working, and they are re-taken in the same change.
+    #
+    #   **946x880 → 946x1080 in DRA-219**, and the re-take is what found it. That slice adds two
+    #   captions to this same block (*"82 better base items are not listed at all"* and *"21
+    #   better base items come only from quests"* — this fixture has the toggle OFF), which
+    #   pushed the who caption this shot exists FOR below the fold. The picture stayed
+    #   well-composed and stopped being of the feature, which is the paragraph above happening a
+    #   second time rather than a new lesson.
     'shell-helper-gear-who' = @{ Title = 'EQBuddy — Helper'
-                           Env = @{ EQBUDDY_SHELL = 'helper'; EQBUDDY_SHELL_SIZE = '946x880' }
+                           Env = @{ EQBUDDY_SHELL = 'helper'; EQBUDDY_SHELL_SIZE = '946x1080' }
                            Dump = @{ 'Testchar_test-Inventory.txt' = @(
                                "Location`tName`tID`tCount`tSlots"
                                "Hands`tCloth Gloves`t0`t1`t0") }
                            Set = @{
                                HelperGoals = @{ 'testchar_test' = @('FarmGear') }
                                HelperGearIntent = @{ 'testchar_test' = 'ReplaceSlot' }
+                           } }
+    # ---- DRA-219: the QUEST acquisition path, and the two the sweep never passed on -------
+    #
+    #   'shell-helper-gear-quest' — the same shape as 'shell-helper-gear-who' with the
+    #     include-quests toggle ON, on a DIFFERENT anchor: a warrior in an AC-4
+    #     `Cape of Underfoot`.
+    #
+    #   WHY NOT THE GLOVES. The first draft reused this file's `Cloth Gloves` and was predicted
+    #   from a sweep with NO class. In the app, which knows the character is a warrior, the
+    #   class-lock filter removes every quest-sourced glove before the per-anchor cap is
+    #   reached — so the picture would have been a well-composed photograph of three zone rows,
+    #   i.e. of the feature being absent. The fixture moved, not the number (trap 23, and the
+    #   same lesson `mobile-helper-gear` records one surface over).
+    #
+    #   PREDICTED (trap 23) — computed against the shipped `ItemCatalog.json.gz` AND
+    #   `QuestCatalog.json` before the take, with `MyClasses = ["WAR"]`, and the same prediction
+    #   the E2E row `QuestSourcedUpgradesAnswerTheSixQuestionsAndTheirRefusalsAreCountedApart`
+    #   makes:
+    #     * THREE answers: Temple of Veeshan (3 cloaks), then two QUESTS — `Aid the Dar Brood`
+    #       and `Deck of Spontaneous Generation Quest`.
+    #     * THE SENTENCE THIS SHOT EXISTS FOR, first on each quest row: *"eqlwiki has Aid the Dar
+    #       Brood starting with Harla Dar in Western Wastes from level 60. It takes 1 turn-in
+    #       item — Frakadar's Talisman."* Before this slice that row was the quest's NAME and an
+    #       item line, and nothing else.
+    #     * THE SECOND QUEST ROW CARRIES NO COMPONENT CLAUSE — *"eqlwiki has Deck of Spontaneous
+    #       Generation Quest starting with Ferjeneror in Plane of Mischief from level 46."* — and
+    #       that is the trap-73 half of the feature ON SCREEN: its page lists no turn-in items, so
+    #       nothing is drawn rather than a zero. Predicting the blank is the point.
+    #     * A MAP BUTTON on each quest row, beside Quests and Gear, pointing at the START ZONE
+    #       (Western Wastes; Plane of Mischief) — the S11.2 door a hand-in could never offer
+    #       until the quest catalog was joined.
+    #     * FOUR captions under the answers, and the point of the shot is that they are four
+    #       different numbers with four different causes: *"2 more answers matched your goals"*
+    #       (the room's own list cap), *"8 more upgrades matched"* (the sweep's per-anchor cap),
+    #       *"5 more quest rewards are not listed"* (the new rule — the shipped quest list does
+    #       not hold the quests those item pages name), and *"6 better base items are not listed
+    #       at all"* (no page names a zone OR a quest for them). The last two have doors of their
+    #       own — Quests and Gear — because the lists they point at are different lists.
+    #     * NO who-rule caption and NO band or era sentence: every page this anchor reaches names
+    #       a creature, and the level is unknown so both gates stand down.
+    #     * NO "5 better base items come only from quests" line, because the toggle is ON here.
+    #       That caption belongs to the DEFAULT screen and the E2E row
+    #       `WithQuestsOffTheRoomCountsTheUpgradesTheToggleIsHiding` is where it is pinned.
+    #
+    #   THE HEIGHT IS PART OF THE STAGING, for the reason 'shell-helper-gear-band' records: the
+    #   captions come AFTER three answers, two of which now carry a six-question line as well as
+    #   their item lines.
+    #
+    #   AND THE REGRESSION PICTURES: every 'shell-helper-gear*' shot above gains the quest-only
+    #     caption in this slice, because all of them have the toggle off. They are re-taken in
+    #     the same change.
+    'shell-helper-gear-quest' = @{ Title = 'EQBuddy — Helper'
+                           Env = @{ EQBUDDY_SHELL = 'helper'; EQBUDDY_SHELL_SIZE = '946x1020' }
+                           Dump = @{ 'Testchar_test-Inventory.txt' = @(
+                               "Location`tName`tID`tCount`tSlots"
+                               "Back`tCape of Underfoot`t0`t1`t0") }
+                           Set = @{
+                               HelperGoals = @{ 'testchar_test' = @('FarmGear') }
+                               HelperGearIntent = @{ 'testchar_test' = 'ReplaceSlot' }
+                               HelperGearQuests = @{ 'testchar_test' = $true }
                            } }
     # ---- DRA-149 D5: the FOUNDER'S OWN DUMP, and the two halves of FAIL 3 ------------------
     #
@@ -1961,8 +2109,19 @@ $Shots = [ordered]@{
     #   'shell-helper-vendors-light' — the same staging in SOLARIZED, the only light palette.
     #     Twenty-four transcribed caption lines with two accent links each is a new density for
     #     this room and light is where dim-on-light contrast fails.
+    #   **946x880 → 946x1240 in DRA-219, fixing a PRE-EXISTING crop rather than one that slice
+    #   caused.** The recipe above promises *"THE SENTENCE THIS SHOT EXISTS FOR, under them: 18
+    #   zones EQBuddy has upgrades for are not listed at your level 29…"*, and in the committed
+    #   picture that sentence was below the fold — verified by pixel-diffing the re-take against
+    #   `HEAD`: 122 rows differ and all of them are scrollbar, so the crop predates this change.
+    #   A picture that contradicts its own recipe is the illustration lock failing quietly, so it
+    #   is corrected in the change that re-takes it. Nothing about the STAGING moved. **The
+    #   capture comes back 932x1093 rather than 1240** — the shell is clamped to the desk it is
+    #   shot on, which is why this asks for more than it needs rather than for the exact figure.
+    #   At 1093 the band sentence and the who sentence are both on screen; the two DRA-219
+    #   captions under them are not, and they have their own shot.
     'shell-helper-founder' = @{ Title = 'EQBuddy — Helper'
-                           Env = @{ EQBUDDY_SHELL = 'helper'; EQBUDDY_SHELL_SIZE = '946x880' }
+                           Env = @{ EQBUDDY_SHELL = 'helper'; EQBUDDY_SHELL_SIZE = '946x1240' }
                            DumpFrom = @{ 'Testchar_test-Inventory.txt' = 'inventory/dranak.txt' }
                            Ledger = @{ StatedLevel = 29; StatedLevelAt = '2026-09-16T20:00:00' }
                            Set = @{
@@ -3972,6 +4131,103 @@ $Shots = [ordered]@{
                            Env = @{}
                            Set = @{ LastSeenVersion = '1.96.1' } }
     'zone-map'        = @{ Title = 'EQBuddy World'; Env = @{ EQBUDDY_MAP = '1' }; Set = @{} }
+    # ---- DRA-216 D5: the map's target layer -------------------------------------------------
+    #
+    #   'zone-map-target' — the same window as 'zone-map' with THREE things staged that the
+    #     row above deliberately has none of: a map pack, a tracked goal, and a kill with a
+    #     fresh /loc behind it. Put the two side by side and the difference is exactly this
+    #     slice plus the pack, which is why the no-pack row stays rather than being upgraded.
+    #
+    #   THE EXHIBIT IS THE SHIPPED CATALOGS' OWN, not a fixture's: Blackened Wand's item page
+    #   names Priest Amiaz in Befallen, and the spawn catalog knows him as one of Befallen's
+    #   nameds. So the ringed dot also carries a REAL learned countdown (S14) rather than the
+    #   ordinary point's projection — a shot staged on an invented creature would photograph
+    #   the estimate arm and say nothing about the one the slice claims (trap 23).
+    #
+    #   THE LINES ARE `AppendLive`, and they have to be. The point archives only where a kill
+    #   lands near a /loc the app has already read, and the startup replay deliberately does
+    #   not re-fire; staged through `Append` this would be a correct no-op photographed as a
+    #   broken feature, which is the trap the AppendLive comment above was written for.
+    #
+    #   PREDICTED (trap 23), before the take:
+    #     * The World window on its Map tab, drawing the staged square with the /loc marker
+    #       at map (-200, -100) — the FromLoc inversion of "100, 200".
+    #     * ONE spawn circle wearing the accent (Priest Amiaz is a catalog named), with a
+    #       DASHED ring around it and no recolouring of the circle itself.
+    #     * A side panel headed "Going after — Befallen" ABOVE "Named — Befallen": one goal
+    #       row naming Blackened Wand and Priest Amiaz, then "1 of your 1 archived spawn
+    #       points here is one of these", then the note saying EQBuddy does not know where
+    #       anything spawns.
+    #     * NO "Drops somewhere else" heading — Blackened Wand's page names Befallen and
+    #       nowhere else, which is the honest single-zone case.
+    #
+    #   TAKEN 2026-09-20 AND EVERY PREDICTION HELD. One thing the prediction did not cover and
+    #   the picture does: the /loc marker, the spawn circle, its target ring and the camp pin
+    #   all land on the SAME spot, because one /loc staged both the position and the kill. That
+    #   is a true consequence of the staging rather than a layout defect — a real session
+    #   /locs in several places — but it does make the dashed ring hard to read at the fitted
+    #   zoom. Said here rather than restyled: the density question is Bevel's, and trap 79's
+    #   rule is that you do not change the product because of what a capture looks like.
+    'zone-map-target' = @{ Title = 'EQBuddy World'
+                           Env = @{ EQBUDDY_MAP = '1' }
+                           Maps = @{ befallen = @(
+                               'L -600.0, -600.0, 0.0, 600.0, -600.0, 0.0, 200, 200, 200'
+                               'L 600.0, -600.0, 0.0, 600.0, 600.0, 0.0, 200, 200, 200'
+                               'L 600.0, 600.0, 0.0, -600.0, 600.0, 0.0, 200, 200, 200'
+                               'L -600.0, 600.0, 0.0, -600.0, -600.0, 0.0, 200, 200, 200'
+                               'P 0.0, 0.0, 0.0, 240, 200, 60, 3, Zone_In') }
+                           AppendLive = @(
+                               'You have entered Befallen.'
+                               'Your Location is 100.00, 200.00, 5.00'
+                               'You have slain Priest Amiaz!')
+                           Set = @{
+                               TrackedUpgrades = @{ 'testchar_test' = @(
+                                   @{ Item = 'Blackened Wand'; Slot = 'PRIMARY'
+                                      Over = 'Rusty Dagger +2'
+                                      TrackedAt = '2026-09-15T20:14:00' }) }
+                           } }
+    #   'zone-map-target-off' — the SAME fixture with the layer's own toggle off, which is the
+    #   half the row above cannot photograph. D5's Planner review found the layer shipped with
+    #   no way to turn it off at all (finding D5-1), so a picture of the switch in its other
+    #   state is what makes the fix reviewable rather than described: put the two side by side
+    #   and the ONLY differences are the chip's fill and the layer itself.
+    #
+    #   IT IS A SHOT AND NOT A CAVEAT because the state is stageable — one bool in the same
+    #   `Set` block the row above already writes. An illustration of our own UI is a capture
+    #   with a recipe or it does not ship, and "the off state presumably looks like the map
+    #   without the block" is exactly the invented picture that lock exists to refuse.
+    #
+    #   PREDICTED (trap 23), before the take:
+    #     * The same World window on Map, the same square, the same /loc marker and the same
+    #       camp pin — the preference is about the layer, not about the map.
+    #     * The "Going after" chip UNFILLED in the top bar, still there and still hoverable.
+    #     * The spawn circle still drawn and still wearing the accent (Priest Amiaz is a
+    #       catalog named), with NO dashed ring outside it.
+    #     * NO "Going after — Befallen" block: the side panel starts at "Named — Befallen",
+    #       which is the pre-D5 map exactly.
+    #     * The goal is NOT untracked — nothing on this screen says otherwise, and the Helper
+    #       room (not photographed here) still lists it.
+    #
+    #   TAKEN 2026-09-20 AND EVERY PREDICTION HELD.
+    'zone-map-target-off' = @{ Title = 'EQBuddy World'
+                           Env = @{ EQBUDDY_MAP = '1' }
+                           Maps = @{ befallen = @(
+                               'L -600.0, -600.0, 0.0, 600.0, -600.0, 0.0, 200, 200, 200'
+                               'L 600.0, -600.0, 0.0, 600.0, 600.0, 0.0, 200, 200, 200'
+                               'L 600.0, 600.0, 0.0, -600.0, 600.0, 0.0, 200, 200, 200'
+                               'L -600.0, 600.0, 0.0, -600.0, -600.0, 0.0, 200, 200, 200'
+                               'P 0.0, 0.0, 0.0, 240, 200, 60, 3, Zone_In') }
+                           AppendLive = @(
+                               'You have entered Befallen.'
+                               'Your Location is 100.00, 200.00, 5.00'
+                               'You have slain Priest Amiaz!')
+                           Set = @{
+                               ShowGearTargetsOnMap = $false
+                               TrackedUpgrades = @{ 'testchar_test' = @(
+                                   @{ Item = 'Blackened Wand'; Slot = 'PRIMARY'
+                                      Over = 'Rusty Dagger +2'
+                                      TrackedAt = '2026-09-15T20:14:00' }) }
+                           } }
     # THE TRAVELS TAB, which had no recipe until 2026-09-05 and did not need one: it was
     # the one World room the WIDGET drew, on the misc card, so EQBUDDY_EXPAND=1 put it in
     # 'widget-expanded' for free. HUD subtraction cut 2 removed that card, which would have
@@ -4398,6 +4654,31 @@ function Write-Dump([hashtable]$dump) {
     if ($null -eq $dump) { return }
     foreach ($file in $dump.Keys) {
         Set-Content -Path (Join-Path $root "game/$file") -Value $dump[$file] -Encoding UTF8
+    }
+}
+
+# ZONE MAP FILES, into the GAME's own maps folder (DRA-216 D5).
+#
+# **Without this, everything the map DRAWS is switched off and a shot of it is a picture of
+# a blank canvas that looks like a finished review** (trap 22). `MapView` gates its spawn
+# circles, its camp pins, its target rings and the /loc marker on a LOADED map, so the
+# long-standing 'zone-map' row photographs the honest no-pack state and can never show a
+# layer. A target ring cannot be reviewed from it at all.
+#
+# The stem is the map PACK's shortname, which is what `ZoneMapFiles.Resolve` looks for —
+# 'befallen', not 'Befallen'. Written under `game/maps` rather than through `MapFolder` so
+# the precedence under test is the one a player who has never opened "Maps folder…" has.
+#
+# **IT CLEARS FIRST, for `Write-Dump`'s reason above** (trap 51): a map left behind by one
+# row would let a later shot draw circles on a picture its own recipe never asked for, and
+# the picture would be correct for a state that is not the one under test.
+function Write-Maps([hashtable]$maps) {
+    $dir = Join-Path $root 'game/maps'
+    if (Test-Path $dir) { Remove-Item $dir -Recurse -Force -ErrorAction SilentlyContinue }
+    if ($null -eq $maps) { return }
+    New-Item -ItemType Directory -Path $dir -Force | Out-Null
+    foreach ($stem in $maps.Keys) {
+        Set-Content -Path (Join-Path $dir "$stem.txt") -Value $maps[$stem] -Encoding UTF8
     }
 }
 
@@ -4870,6 +5151,7 @@ try {
         Write-Ledger $spec.Ledger
         Write-Raids $spec.Raids
         Write-Dump $spec.Dump
+        Write-Maps $spec.Maps
         # AFTER Write-Dump, which clears the folder before it writes (DRA-149 D5).
         Write-DumpFrom $spec.DumpFrom
         Write-WikiCache $spec.Wiki

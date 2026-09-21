@@ -48,10 +48,24 @@ public static partial class CompanionProjection
         // phone says so wherever a gear row was built — once for the block, never per row.
         var gearBase = answers.Top.Any(r => r.Why.Any(w => w is GearUpgradeFact));
 
+        // DRA-241, the same rule one caveat along — and on a STRICTER question than `gearBase`
+        // above, which is the desktop room's gate verbatim: the proc clause rides the why-line
+        // of a WEAPON row, and most gear rows are armour. Reusing `gearBase` would put a
+        // sentence about procs over a list of helms.
+        var gearProc = answers.Top.Any(r =>
+            r.Why.Any(w => w is GearUpgradeFact { Proc.Length: > 0 }));
+
         // DRA-149 D4. Built before the record so the two captions over it can be withheld with
         // it — a phone that printed "shops eqlwiki's zone maps name" over nothing would be the
         // disclosure-line rule broken one block along.
         var merchants = Merchants(request);
+
+        // DRA-216 D4. Built before the record for the reason `merchants` above it is: the three
+        // captions over it are withheld with it. Gated on the same condition the desktop room
+        // draws the block on — the gear goal is picked, or nothing is, which weighs everything.
+        var tracked = request.Goals.Count != 0 && !request.Goals.Contains(HelperGoal.FarmGear)
+            ? new List<string>()
+            : [.. request.Inputs.Tracked.Select(HelperPresentation.TrackedRow)];
 
         return new CompanionHelperSection(
             Question: HelperPresentation.RoomQuestion,
@@ -67,6 +81,7 @@ public static partial class CompanionProjection
             Answers: [.. answers.Top.Select(Answer)],
             MoneyNote: money ? HelperPresentation.MoneyPriceNote : "",
             GearBaseNote: gearBase ? HelperPresentation.GearBaseClaimNote : "",
+            GearProcNote: gearProc ? HelperPresentation.GearProcNote : "",
             Cap: HelperPresentation.Cap(answers.Withheld),
             GearWithheld: HelperPresentation.GearWithheld(answers.GearWithheld),
             // DRA-84 D2. Same words, same producer, same wire — a refusal the PC made and the
@@ -85,6 +100,19 @@ public static partial class CompanionProjection
             // DRA-84 D4, same rule one slice on: a drop offer the PC withheld for having no
             // creature to name is withheld on the phone too, and says so in the same words.
             GearWhoWithheld: HelperPresentation.DropOffersWithheld(answers.GearWhoWithheld),
+            // DRA-219, the same discipline on the other acquisition path. The quest-source rule
+            // removes rows the PC's list does not have either, and the two sweep counts are
+            // about items that never reached a bucket — a phone that carried the who caption and
+            // not these would leave a player reading a shorter list with three sentences' worth
+            // of explanation missing.
+            GearQuestWithheld: HelperPresentation.QuestOffersWithheld(answers.GearQuestWithheld),
+            GearNoSource: HelperPresentation.SourcelessUpgrades(answers.GearNoSource),
+            GearQuestOnly: HelperPresentation.QuestOnlyUpgrades(answers.GearQuestOnly),
+            // DRA-222 D6, the same discipline one rule on. This one removes a SWAP rather than
+            // a place, so its sentence is the only one on the record about the player's hands —
+            // a phone drawing the four captions above and not this one would show a shorter
+            // list than the PC with nothing saying why.
+            GearOffHandRefused: HelperPresentation.OffHandRefused(answers.GearOffHandRefusals),
             // DRA-149 D3: the SAME two rules over the materials list, on their own two fields
             // rather than folded into the gear ones — the desktop room draws four captions here
             // and the phone must draw the same four or the two surfaces disagree about what the
@@ -115,6 +143,18 @@ public static partial class CompanionProjection
                 ? ""
                 : HelperPresentation.DoorTip(new HelperDoor(HelperDoorKind.WikiZone, "")),
             Merchants: merchants,
+            // **DRA-216 D4, and the phone half is not optional.** A tracked goal is the one
+            // thing in this room that OUTLIVES the answers, so a phone that drew the list and
+            // not the PC — or the PC and not the phone — would have the two surfaces disagreeing
+            // about what the player is working on, which is the one thing the phone half is not
+            // allowed to do. It is READ-ONLY here: every control in this room writes the PC's
+            // profile, so the tracking door ports as the sentence saying where it is (trap 35).
+            // The three captions are withheld with the list they are about, the merchant block's
+            // own rule directly above.
+            TrackedHeading: tracked.Count == 0 ? "" : HelperPresentation.TrackedHeading,
+            TrackedNote: tracked.Count == 0 ? "" : HelperPresentation.TrackedNote,
+            TrackedOnPc: tracked.Count == 0 ? "" : HelperPresentation.TrackedOnPc,
+            Tracked: tracked,
             // DRA-149 D2, and it arrives WITH its doors in the same slice — DRA-84 D5's lesson
             // was that a caption which reaches the wire and is never drawn passes every test in
             // the parity suite, so the page-side must-list gains its row here too (trap 34).
@@ -336,9 +376,22 @@ public static partial class CompanionProjection
         // stands still.
         // DRA-180 D2: the era captions fold too. They quote the WORLD's era, which is a
         // curated value a build can change without moving a single count beside it (trap 72).
-        h.MoneyNote, h.GearBaseNote, h.Cap, h.GearWithheld, h.GearBandRefused,
+        // DRA-219: the quest path's three captions fold too. Each carries a COUNT that can move
+        // while every other field here stands still — flipping the include-quests toggle turns
+        // one of them off and another on with the same rows on screen (trap 72).
+        // DRA-222 D6: and the off-hand caption, for exactly that reason — its count moves when
+        // the player's own SECONDARY changes, which alters no other field on this record. A
+        // fingerprint that cannot see it is a phone still drawing the pre-dump weapon list.
+        // DRA-241: the proc caveat folds too, and NOT because `GearBaseNote` beside it already
+        // does. That one is on whenever any gear row exists; this one is on only while a row
+        // NAMES a proc, so swapping one weapon candidate for another — a ding, a new dump, a
+        // refreshed catalog — turns it off with every other field on this record unmoved
+        // (trap 72). A fingerprint that could not see it is a phone still drawing the caveat
+        // over a list that no longer has a proc in it.
+        h.MoneyNote, h.GearBaseNote, h.GearProcNote, h.Cap, h.GearWithheld, h.GearBandRefused,
         h.GearEraRefused, h.MaterialEraRefused,
-        h.GearWhoWithheld, h.UnreadWorn,
+        h.GearWhoWithheld, h.GearQuestWithheld, h.GearNoSource, h.GearQuestOnly,
+        h.GearOffHandRefused, h.UnreadWorn,
         // DRA-180 D3: the per-anchor sentences fold as LINES, never as a count. They NAME the
         // worn item and carry its three cause numbers, so swapping one picked anchor for another
         // — or a ding moving which of its candidates the band gate takes — rewrites them while
@@ -353,6 +406,12 @@ public static partial class CompanionProjection
         // that drifts on a tick (trap 8).
         Join(h.Merchants, m => m.Profession + "=" + Join(m.Lines, l => l) + "|" + m.More
             + "|" + m.Empty),
+        // DRA-216 D4: the tracked rows fold as LINES, never as a count — trap 72 is the reason
+        // this store exists to be watched at all. A goal untracked and another tracked in one
+        // pass leaves the count unmoved, and a paired phone would keep drawing a goal the
+        // player has already dropped. The rows carry an absolute DATE and nothing relative, so
+        // none of this drifts on a tick (trap 8).
+        Join(h.Tracked, t => t), h.TrackedHeading,
         Join(h.Gaps, g => g.Text + "|" + g.Prompt?.Command),
         Join(h.Deferred, d => d.Text),
         h.Empty?.Heading);

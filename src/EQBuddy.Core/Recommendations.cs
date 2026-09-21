@@ -247,9 +247,29 @@ public sealed record ZoneOutgrownFact(
 /// a row at all any more: see <see cref="RecommendationSet.GearWhoWithheld"/>.</para></param>
 /// <param name="WhoWithheld">How many more creatures the page named that the cap held back. Said
 /// out loud rather than dropped (trap 50).</param>
+/// <param name="RelevantMetrics">How many of the numbers this upgrade moved are ones this
+/// character's classes' own catalog items carry (<see cref="ClassStatRelevance"/>, DRA-222 D6
+/// S7.2) — <see cref="GearUpgrade.RelevantMetrics"/>, carried rather than recomputed.
+///
+/// <para><b>It decides the ORDER and nothing draws it as a sentence, on purpose.</b> "This
+/// moved two stats your class uses" would be EQBuddy telling a player what their class needs,
+/// off a measurement of what the wiki's item blocks happen to carry — true enough to rank on
+/// and not true enough to say out loud. So <paramref name="GainMetric"/> is the visible half:
+/// the row names the biggest RELEVANT improvement rather than the biggest one, which is a
+/// better sentence with no new claim in it.</para></param>
+/// <param name="Proc">The combat proc the item's own page names, or "" (DRA-241, Helm ruling
+/// <c>27302878</c>). <see cref="GearUpgrade.Proc"/>, carried rather than re-read.
+///
+/// <para><b>The one fact on this record that is DRAWN and weighed by nothing.</b>
+/// <paramref name="RelevantMetrics"/> is its mirror image — that one decides the order and draws
+/// no sentence, because saying it would be a claim about what a class needs; this one decides no
+/// order and draws a sentence, because a proc is the page's own word about the item and there is
+/// no number anywhere for what it is worth. Between them they are the two halves of "report it,
+/// never price it".</para></param>
 public sealed record GearUpgradeFact(
     string Item, string Over, string Slot, string GainMetric, double GainBy,
-    IReadOnlyList<string> Who, int WhoWithheld = 0)
+    IReadOnlyList<string> Who, int WhoWithheld = 0, int RelevantMetrics = 0,
+    string Proc = "")
     : WhyFact(Evidence.Catalog);
 
 /// <summary>
@@ -266,6 +286,39 @@ public sealed record GearUpgradeFact(
 /// </summary>
 public sealed record GearDropSeenFact(string Item, string Mob, string Zone, int Drops, int Kills)
     : WhyFact(Evidence.Personal);
+
+/// <summary>
+/// **HOW TO PURSUE A QUEST-REWARD UPGRADE** — the six questions, on the half of the engine that
+/// could only ever say a name (DRA-219, S11; acceptance S25 AC 1–6).
+///
+/// <para><b>A drop row has answered who/where/when/how since DRA-84 D4 and a quest row has
+/// answered none of them.</b> It drew the quest's NAME and the item, and left the player to go
+/// and find out who starts it, where they stand, what level it wants and what it takes — which
+/// is S11.2's *"never force the player to reverse-engineer the source"* word for word. Every
+/// field here comes out of <see cref="QuestCatalog"/>, which the era gate already reads: this
+/// is a second READER of the one quest silo, never a second silo (S20).</para>
+///
+/// <para><b>Each field is EMPTY where the catalog's entry does not answer it</b> (trap 73 —
+/// a schema with a field per question is not a licence to answer every question). Measured on
+/// the shipped catalog, over the 1,352 (wearable item, quest) offers whose quest resolves: 532
+/// of 537 distinct quests name a giver, 529 a start zone, 504 a minimum level and 386 their
+/// turn-in items. Exactly ONE resolves and answers none of the four, which is why the withhold
+/// rule beside this is really a rule about whether the name resolves at all.</para>
+/// </summary>
+/// <param name="Quest">The quest, as the item page named it — the row's own subject, repeated
+/// in the fact so the sentence stands alone in a merged list.</param>
+/// <param name="Giver">WHO starts it, or "" where the page named nobody.</param>
+/// <param name="StartZone">WHERE they stand, or "" where the page named nowhere.</param>
+/// <param name="MinLevel">WHEN you can take it — 0 means the page stated no level, which is a
+/// different fact from level 1 and is drawn as nothing rather than as a 1.</param>
+/// <param name="Components">HOW many distinct turn-in items the quest asks for, over every
+/// step. 0 where the page listed none — plenty of quests are a conversation.</param>
+/// <param name="Items">Up to <see cref="Recommendations.QuestItemsPerRow"/> of those items by
+/// name, in the catalog's own order. Nothing here ranks them.</param>
+public sealed record QuestSourceFact(
+    string Quest, string Giver, string StartZone, int MinLevel, int Components,
+    IReadOnlyList<string> Items)
+    : WhyFact(Evidence.Catalog);
 
 /// <summary>
 /// **WHAT THIS ZONE HAS ACTUALLY PAID YOU IN MOTES** (DRA-71 D7, plan P10; Founder smoke
@@ -780,6 +833,26 @@ public enum GoalGapReason
     /// ever sees them.</para>
     /// </summary>
     NoMaterialNamesACreature,
+
+    // ---- DRA-219 ---------------------------------------------------------------------
+
+    /// <summary>
+    /// The sweep found upgrades, quests are switched ON, and not one of the quests handing them
+    /// out is a quest EQBuddy's shipped quest list can describe (DRA-219, S10/S11).
+    ///
+    /// <para><b><see cref="NoUpgradeNamesACreature"/>'s sibling on the other acquisition path,
+    /// and it is the same class of failure as the Founder's Rathe row.</b> That row named a
+    /// place and stopped; a quest row could name a quest and stop — and 1,028 of the shipped
+    /// catalog's 2,380 (wearable item, quest) offers name a string the quest catalog does not
+    /// hold, five of which are not quests at all but wiki markup (<c>&lt;/ul&gt;</c>,
+    /// <c>== See Also ==</c>). A row built on one of those is a research dead end wearing the
+    /// shape of a direction.</para>
+    ///
+    /// <para>Asked AFTER <see cref="NoUpgradeNamesACreature"/> because the rules run in that
+    /// order and the first one to empty the list owns the sentence — the two are siblings, not
+    /// alternatives, and a player with quests off can never reach this one at all.</para>
+    /// </summary>
+    NoUpgradeNamesAQuestPath,
 }
 
 /// <summary>One selected goal that produced no recommendation, and why.</summary>
@@ -866,11 +939,12 @@ public sealed record GearEraRefusal(
 /// WHOLE list emptied, so a character with one dead anchor and nine live ones got no sentence
 /// at all for the dead one.</para>
 ///
-/// <para><b>The three causes are counted apart, and never summed</b> (trap 50, and the DRA-149
-/// D3 rule about merged numbers). They have three different remedies — wait for the content,
-/// come back at a level, or nobody has written down what drops it — so one total would point at
-/// none of them. A cause that removed nothing is not named at all, which is what keeps a
-/// sentence about a gate that did not run off the screen (plan D3: furniture).</para>
+/// <para><b>The four causes are counted apart, and never summed</b> (trap 50, and the DRA-149
+/// D3 rule about merged numbers). They have four different remedies — wait for the content,
+/// come back at a level, nobody has written down what drops it, or nobody has written down the
+/// quest — so one total would point at none of them. A cause that removed nothing is not named
+/// at all, which is what keeps a sentence about a gate that did not run off the screen (plan D3:
+/// furniture).</para>
 ///
 /// <para><b>Attribution is by STAGE, not by re-deriving a rule</b>: the engine records which
 /// upgrades were still reachable before the era gate, after it, after the band gate and after
@@ -885,7 +959,7 @@ public sealed record GearEraRefusal(
 /// <param name="Slot">The slot it is worn in, so two anchors of the same name in different
 /// slots are two rows rather than one ambiguous one.</param>
 /// <param name="Found">How many catalog items dominated this anchor's base — the number that
-/// makes the sentence a finding instead of an absence. Always the sum of the three causes
+/// makes the sentence a finding instead of an absence. Always the sum of the four causes
 /// below, because this record is only built when NOTHING survived.</param>
 /// <param name="LaterContent">Removed by the era gate: eqlwiki dates every place they come from
 /// later than the era the world is at. Zero whenever the era gate stood down, which is how a
@@ -894,8 +968,13 @@ public sealed record GearEraRefusal(
 /// they drop sit outside this character's.</param>
 /// <param name="NoCreature">Removed by the who rule: no page named anything that drops them and
 /// this character has never looted them there.</param>
+/// <param name="NoQuestPath">Removed by the quest-source rule (DRA-219): their only remaining
+/// source was a quest EQBuddy's shipped quest list cannot describe. Zero whenever the player has
+/// quests switched off — a quest-only candidate never reaches the buckets at all then, and is
+/// counted as <see cref="RecommendationSet.GearQuestOnly"/> instead.</param>
 public sealed record GearAnchorRemoved(
-    string Anchor, string Slot, int Found, int LaterContent, int OutsideBand, int NoCreature);
+    string Anchor, string Slot, int Found, int LaterContent, int OutsideBand, int NoCreature,
+    int NoQuestPath = 0);
 
 /// <summary>
 /// Everything the Helper needs, read once by its host and handed over in one object.
@@ -1072,6 +1151,25 @@ public sealed record HelperInputs(
     /// producer of the pick (trap 4).</para>
     /// </summary>
     public IReadOnlyList<Tradeskill> Professions { get; init; } = [];
+
+    // ---- Track Upgrade (DRA-216 D4, S12) ------------------------------------------------
+
+    /// <summary>
+    /// The upgrades this character has decided to go and get —
+    /// <see cref="TrackedUpgradeStore.For"/>'s own answer, newest first.
+    ///
+    /// <para><b>The ranking does not read it, and it rides here anyway</b>, which is worth
+    /// saying out loud. <c>HelperSources.Gather</c> is the ONE assembly point the desktop room
+    /// and the phone both go through, and a goal list read by each surface separately is two
+    /// callers reading one store at slightly different moments — whichever ran last wins
+    /// (trap 33). It is carried rather than ranked because a tracked goal is a DECISION the
+    /// player made, not evidence: weighing it would let the room quietly re-rank itself toward
+    /// whatever was clicked last, and no engine in this file has been asked for that.</para>
+    ///
+    /// <para>Empty is the ordinary state — nobody has tracked anything — and it draws nothing
+    /// at all rather than an empty block.</para>
+    /// </summary>
+    public IReadOnlyList<TrackedUpgrade> Tracked { get; init; } = [];
 }
 
 /// <summary>The whole answer for one set of chips.</summary>
@@ -1143,8 +1241,56 @@ public sealed record RecommendationSet(
     IReadOnlyList<GearEraRefusal>? GearEraRefusals = null,
     IReadOnlyList<GearEraRefusal>? MaterialEraRefusals = null,
     bool EraGateLive = false,
-    IReadOnlyList<GearAnchorRemoved>? GearAnchorsRemoved = null)
+    IReadOnlyList<GearAnchorRemoved>? GearAnchorsRemoved = null,
+    int GearQuestWithheld = 0,
+    int GearNoSource = 0,
+    int GearQuestOnly = 0,
+    int GearOffHandRefusals = 0)
 {
+    /// <summary>
+    /// **QUEST OFFERS HELD BACK BECAUSE NOTHING COULD SAY HOW TO PURSUE THEM** (DRA-219,
+    /// S10/S11; acceptance S25 AC 1–6).
+    ///
+    /// <para><b>Its own count beside <paramref name="GearWhoWithheld"/> rather than folded into
+    /// it</b>, for the reason that one is separate from <paramref name="GearWithheld"/>: the two
+    /// are different rules with different remedies. A withheld drop offer means a wiki page
+    /// names no creature; a withheld quest offer means EQBuddy's shipped quest list does not
+    /// hold the quest an item page pointed at, which is a gap in a different catalog and is
+    /// fixed by a different edit.</para>
+    ///
+    /// <para>Counted per (item, quest) OFFER, the who rule's own denominator and for the same
+    /// reason: one item is offered under every quest that hands it out.</para>
+    /// </summary>
+    public int GearQuestWithheld { get; init; } = GearQuestWithheld;
+
+    /// <summary>
+    /// Dominating catalog items dropped for having no acquisition source at all
+    /// (<see cref="GearSweep.NoSource"/>, DRA-219).
+    ///
+    /// <para><b>The only number in this record about something that never got as far as a
+    /// bucket.</b> Every refusal above it removed an offer that existed; this one counts items
+    /// EQBuddy read, compared, and found better — with no page saying where any of them come
+    /// from. Reported for <see cref="UnreadWorn"/>'s reason: an absence nobody counts cannot be
+    /// told apart from a slot with nothing better in it.</para>
+    /// </summary>
+    public int GearNoSource { get; init; } = GearNoSource;
+
+    /// <summary>
+    /// Dominating catalog items whose only source is a quest, while the include-quests toggle is
+    /// off (<see cref="GearSweep.QuestOnly"/>, DRA-219).
+    ///
+    /// <para><b>Apart from <see cref="GearNoSource"/> because the remedy is apart.</b> This is
+    /// the one refusal in the whole gear block the player can undo with a control they are
+    /// looking at, and S10.1 asks by name that recommendations not be restricted to direct
+    /// creature drops — a toggle doing that silently is the requirement failing quietly.</para>
+    /// </summary>
+    public int GearQuestOnly { get; init; } = GearQuestOnly;
+
+    /// <summary>How many offers the DRA-222 D6 off-hand rule removed: they beat the worn
+    /// item on every number and are two-handed while this character's off hand is full.
+    /// Its own number beside the counts above it, never summed into one (trap 50).</summary>
+    public int GearOffHandRefusals { get; init; } = GearOffHandRefusals;
+
     /// <summary>Never null, so no caller has to decide what an absent list means.</summary>
     public IReadOnlyList<GearBandRefusal> GearBandRefusals { get; init; }
         = GearBandRefusals ?? [];
@@ -1708,27 +1854,19 @@ public static partial class Recommendations
         var deferred = goals.Where(g => ShapeFor(g) == HelperGoalShape.Deferred).ToList();
         var gaps = new List<GoalGap>();
         var candidates = new List<Recommendation>();
-        var gearWithheld = 0;
-        var gearWhoWithheld = 0;
-        List<GearBandRefusal> gearBandRefusals = [];
-        IReadOnlyList<string> unreadWorn = [];
+        // DRA-219: one object rather than seven locals destructured out of a tuple — the gear
+        // engine now reports ten things and a positional unpack of ten is a shape where the next
+        // slice silently shifts one.
+        var gear = GearOutcome.None;
         List<GearBandRefusal> materialBandRefusals = [];
         var materialWhoWithheld = 0;
-        var gearCandidates = 0;
-        // DRA-180 D2. Kept apart from the band lists above for the reason every count in this
-        // file is said separately (trap 50): one merged number would explain neither list, and
-        // these two quote era words where those quote levels.
-        List<GearEraRefusal> gearEraRefusals = [];
+        // DRA-180 D2. Kept apart from the gear engine's own lists for the reason every count in
+        // this file is said separately (trap 50): one merged number would explain neither list,
+        // and these two quote era words where the band ones quote levels.
         List<GearEraRefusal> materialEraRefusals = [];
-        // DRA-180 D3. Apart from every count above it for a stronger reason than trap 50: those
-        // are all about the LIST, and this one is about the player's own character. A worn item
-        // the ladder emptied is the question the Founder actually asked twice.
-        List<GearAnchorRemoved> gearAnchorsRemoved = [];
 
         if (goals.Contains(HelperGoal.LevelUp)) LevelUp(inputs, candidates, gaps);
-        if (goals.Contains(HelperGoal.FarmGear))
-            (gearWithheld, gearBandRefusals, gearWhoWithheld, unreadWorn, gearCandidates,
-                gearEraRefusals, gearAnchorsRemoved) = FarmGear(inputs, candidates, gaps);
+        if (goals.Contains(HelperGoal.FarmGear)) gear = FarmGear(inputs, candidates, gaps);
         // DRA-71 D7. Both read the player's own play and nothing else; the catalog's half of
         // each was refused by its own survey, which is written down where the engine is.
         if (goals.Contains(HelperGoal.FarmMotes)) FarmMotes(inputs, candidates, gaps);
@@ -1761,11 +1899,12 @@ public static partial class Recommendations
 
         var top = ordered.Take(Math.Max(0, cap)).Select(Trim).ToList();
         return new RecommendationSet(
-            top, Math.Max(0, ordered.Count - top.Count), deferred, gaps, gearWithheld,
-            gearBandRefusals, gearWhoWithheld, unreadWorn,
-            materialBandRefusals, materialWhoWithheld, gearCandidates,
-            gearEraRefusals, materialEraRefusals, EraGateArmed(inputs),
-            gearAnchorsRemoved);
+            top, Math.Max(0, ordered.Count - top.Count), deferred, gaps, gear.Withheld,
+            gear.Refused, gear.WhoWithheld, gear.UnreadWorn,
+            materialBandRefusals, materialWhoWithheld, gear.Candidates,
+            gear.EraRefused, materialEraRefusals, EraGateArmed(inputs),
+            gear.AnchorsRemoved, gear.QuestWithheld, gear.NoSource, gear.QuestOnly,
+            gear.OffHandRefusals);
     }
 
     // ---- the join: one place, every goal it serves (HOME-005) --------------------------
@@ -2380,6 +2519,17 @@ public static partial class Recommendations
     public const int GearMobsPerItem = 3;
 
     /// <summary>
+    /// How many of a quest's turn-in items one row names before it counts the rest (DRA-219,
+    /// S11's HOW).
+    ///
+    /// <para><see cref="GearMobsPerItem"/>'s number and its argument, on the other acquisition
+    /// path: three named things is a PLAN and a full component list is a checklist the Guide
+    /// room already draws better. The catalog's own order is kept — nothing here has measured
+    /// which component is hardest, so nothing here ranks them.</para>
+    /// </summary>
+    public const int QuestItemsPerRow = 3;
+
+    /// <summary>
     /// **UPGRADE WHAT I WEAR / REPLACE WITH BETTER** — the Founder's smoke items 4a and 4b.
     ///
     /// <para><b>The engine does no comparing.</b> <see cref="GearUpgrades.Sweep"/> owns the
@@ -2424,14 +2574,7 @@ public static partial class Recommendations
     /// about the player's character, which is the question they asked. A count of refused
     /// zones cannot say that the bow was swept and beaten twice by items both sitting in
     /// Sleeper's Tomb, and that sentence is the whole of FAIL 1.</para></returns>
-    private static (
-        int Withheld,
-        List<GearBandRefusal> Refused,
-        int WhoWithheld,
-        IReadOnlyList<string> UnreadWorn,
-        int Candidates,
-        List<GearEraRefusal> EraRefused,
-        List<GearAnchorRemoved> AnchorsRemoved) FarmGear(
+    private static GearOutcome FarmGear(
         HelperInputs inputs, List<Recommendation> into, List<GoalGap> gaps)
     {
         // A DECIDED deferral, said out loud. Every intent answers since DRA-71 D7, so this arm
@@ -2440,7 +2583,7 @@ public static partial class Recommendations
         if (GearUpgrades.ShapeFor(inputs.GearIntent) != GearIntentShape.Answered)
         {
             gaps.Add(new GoalGap(HelperGoal.FarmGear, GoalGapReason.GearIntentNotAnsweredYet));
-            return (0, [], 0, [], 0, [], []);
+            return GearOutcome.None;
         }
 
         // **"Farm to sell" is a different question and leaves here** (DRA-71 D7, plan P9). It
@@ -2462,7 +2605,7 @@ public static partial class Recommendations
         if (inputs.GearIntent == GearIntent.FarmToSell)
         {
             FarmToSell(inputs, into, gaps);
-            return (0, [], 0, [], 0, [], []);
+            return GearOutcome.None;
         }
 
         // "EQBuddy has never been told what you are wearing" is a different state from
@@ -2478,17 +2621,38 @@ public static partial class Recommendations
             gaps.Add(new GoalGap(HelperGoal.FarmGear, inputs.UnreadWorn.Count > 0
                 ? GoalGapReason.NothingWornIsReadable
                 : GoalGapReason.NoInventoryDump));
-            return (0, [], 0, inputs.UnreadWorn, 0, [], []);
+            return GearOutcome.None with { UnreadWorn = inputs.UnreadWorn };
         }
 
         var sweep = GearUpgrades.Sweep(
             inputs.GearIntent, inputs.Worn, inputs.WornPicks,
             inputs.Items, inputs.MyClasses, inputs.IncludeQuests);
+        // DRA-219: the sweep's two silent refusals ride out of EVERY path below it, including
+        // the empty one. A sweep that found six upgrades and could not say where one of them
+        // comes from is not the same event as a sweep that found none, and the empty path is
+        // precisely where the difference is invisible.
+        var outcome = GearOutcome.None with
+        {
+            Withheld = sweep.Withheld,
+            UnreadWorn = inputs.UnreadWorn,
+            NoSource = sweep.NoSource,
+            QuestOnly = sweep.QuestOnly,
+            // DRA-222 D6. Taken here with the other three sweep-derived counts, so the
+            // early-return path below reports it too: an off-hand rule that removed every
+            // candidate would otherwise draw `NoCatalogUpgrade` with nothing saying why.
+            OffHandRefusals = sweep.OffHandRefusals,
+        };
         if (sweep.Upgrades.Count == 0)
         {
             gaps.Add(new GoalGap(HelperGoal.FarmGear, GoalGapReason.NoCatalogUpgrade));
-            return (sweep.Withheld, [], 0, inputs.UnreadWorn, 0, [], []);
+            return outcome;
         }
+
+        // **ONE FOLD OF THE QUEST CATALOG, READ BY THE ERA GATE AND BY THE ROWS** (DRA-219,
+        // trap 4). The era gate used to build its own name→era dictionary here; it now asks this
+        // for the whole entry, so "which quest is this" has one answer and the gate that refuses
+        // a quest and the fact that describes one cannot resolve the name differently.
+        var questOf = QuestEntriesOf(inputs);
 
         var byZone = new Dictionary<string, List<GearCandidate>>(StringComparer.OrdinalIgnoreCase);
         var byQuest = new Dictionary<string, List<GearCandidate>>(StringComparer.OrdinalIgnoreCase);
@@ -2503,12 +2667,22 @@ public static partial class Recommendations
             // it is only ACTED on further down, after the band gate has had its say.
             foreach (var zone in upgrade.Zones.Distinct(StringComparer.OrdinalIgnoreCase))
                 Bucket(byZone, zone,
-                    new GearCandidate(upgrade, WhoFor(inputs, upgrade.Item, upgrade.MobsIn(zone), zone)));
+                    new GearCandidate(
+                        upgrade,
+                        WhoFor(inputs, upgrade.Item, upgrade.MobsIn(zone), zone),
+                        GearQuestSource.None));
             // **A quest row is not a drop row and the who rule does not reach it.** "Who drops
             // it" has no answer for a hand-in and needs none — the quest IS the path, which is
             // the other half of acceptance item 2's "source mob(s) AND/OR quest".
+            //
+            // **AND SINCE DRA-219 IT HAS TO SAY WHAT THAT PATH IS** (S11). "The quest is the
+            // path" was true and was also the whole row: a name, and nothing about who starts
+            // it, where they stand, what level it wants or what it takes. The answer is decided
+            // HERE, once per (offer, quest), for the reason the creature question is — it is
+            // only ACTED on further down, after the era gate has had its say.
             foreach (var quest in upgrade.Quests.Distinct(StringComparer.OrdinalIgnoreCase))
-                Bucket(byQuest, quest, new GearCandidate(upgrade, GearWho.None));
+                Bucket(byQuest, quest,
+                    new GearCandidate(upgrade, GearWho.None, QuestSourceFor(questOf, quest)));
         }
 
         // **THE LADDER IS WATCHED STAGE BY STAGE FROM HERE DOWN** (DRA-180 D3, plan P3). Each
@@ -2530,7 +2704,7 @@ public static partial class Recommendations
         // them: the quest being the path says nothing about whether the path is open yet.
         var eraRefused = EraGate(inputs, byZone, RecommendationKind.Zone, ZoneEraOf(inputs));
         eraRefused.AddRange(
-            EraGate(inputs, byQuest, RecommendationKind.Quest, QuestEraOf(inputs)));
+            EraGate(inputs, byQuest, RecommendationKind.Quest, QuestEraOf(questOf)));
         var reachableAfterEra = Reachable(byZone, byQuest);
 
         // **THE BAND GATE, AND IT RUNS BEFORE THE YARDSTICK IS TAKEN** (DRA-84 D2, plan P2).
@@ -2551,12 +2725,21 @@ public static partial class Recommendations
         var whoWithheld = WhoRule(byZone, c => c.Who);
         var reachableAfterWho = Reachable(byZone, byQuest);
 
+        // **AND ITS SIBLING ON THE OTHER ACQUISITION PATH** (DRA-219, S10/S11). The who rule and
+        // this one are the same principle — an offer that cannot say how to pursue it is not an
+        // offer — applied to the two halves of S10.1. They touch disjoint buckets (that one
+        // prunes zones, this one quests), so the order between them decides no sentence; it is
+        // written here, last, because the era and band gates say "you cannot go there" and these
+        // two say "nobody wrote down how".
+        var questWithheld = QuestSourceRule(inputs, byQuest);
+        var reachableAfterQuest = Reachable(byZone, byQuest);
+
         // **NOW SAY IT PER WORN ITEM** (DRA-180 D3, plan P3). Everything above counts PLACES;
         // this counts the player's own character, which is what they asked about. It runs here
-        // because this is the first line at which all three gates have had their say.
+        // because this is the first line at which all four rules have had their say.
         var anchorsRemoved = AnchorsEmptied(
             sweep.Upgrades, reachableAtStart, reachableAfterEra, reachableAfterBand,
-            reachableAfterWho);
+            reachableAfterWho, reachableAfterQuest);
 
         // ONE yardstick for the whole engine, folded once — a property of the SET, and a
         // per-row recomputation would be the same sum computed six times (trap 4 in a loop).
@@ -2584,6 +2767,8 @@ public static partial class Recommendations
                 gaps.Add(new GoalGap(HelperGoal.FarmGear, GoalGapReason.EveryZoneOutsideYourBand));
             else if (whoWithheld > 0)
                 gaps.Add(new GoalGap(HelperGoal.FarmGear, GoalGapReason.NoUpgradeNamesACreature));
+            else if (questWithheld > 0)
+                gaps.Add(new GoalGap(HelperGoal.FarmGear, GoalGapReason.NoUpgradeNamesAQuestPath));
         }
 
         foreach (var (zone, candidates) in Ranked(byZone))
@@ -2592,11 +2777,73 @@ public static partial class Recommendations
 
         foreach (var (quest, candidates) in Ranked(byQuest))
             into.Add(GearRow(RecommendationKind.Quest, quest, "", candidates, best,
-                [new HelperDoor(HelperDoorKind.QuestCatalog, quest),
-                 new HelperDoor(HelperDoorKind.Gear, "")]));
+                QuestDoors(quest, candidates)));
 
-        return (sweep.Withheld, refused, whoWithheld, inputs.UnreadWorn, sweep.Upgrades.Count,
-                eraRefused, anchorsRemoved);
+        return outcome with
+        {
+            Refused = refused,
+            WhoWithheld = whoWithheld,
+            Candidates = sweep.Upgrades.Count,
+            EraRefused = eraRefused,
+            AnchorsRemoved = anchorsRemoved,
+            QuestWithheld = questWithheld,
+        };
+    }
+
+    /// <summary>
+    /// **WHAT A QUEST ROW OPENS** (DRA-219, S11.2 — *"never force the player to reverse-engineer
+    /// the source"*).
+    ///
+    /// <para>The quest list and the Gear room have always been there. The MAP is the one S11.2
+    /// names that a quest row could not offer: a hand-in is not a place, so the row has no
+    /// <see cref="Recommendation.Zone"/> and never joins one — but the quest catalog knows where
+    /// its giver stands, and that is a destination. <b>The door carries the START ZONE and the
+    /// row's own subject stays the quest</b>: a row that took the zone as its subject would join
+    /// with drop rows in that zone (HOME-005) and claim a camp hands out a quest reward.</para>
+    ///
+    /// <para>No door is invented where nothing answers: a quest whose page named no start zone
+    /// gets the two doors it always had (trap 73).</para>
+    /// </summary>
+    private static List<HelperDoor> QuestDoors(string quest, List<GearCandidate> candidates)
+    {
+        var doors = new List<HelperDoor>
+        {
+            new(HelperDoorKind.QuestCatalog, quest),
+            new(HelperDoorKind.Gear, ""),
+        };
+        // Every candidate under a quest bucket carries the SAME source — it was resolved from
+        // the quest name — so the first one is the bucket's answer rather than a sample.
+        if (candidates is [{ Source.Fact.StartZone: { Length: > 0 } zone }, ..])
+            doors.Insert(0, new HelperDoor(HelperDoorKind.World, zone));
+        return doors;
+    }
+
+    /// <summary>
+    /// What one Farm Gear pass produced besides its rows.
+    /// </summary>
+    /// <remarks>
+    /// <b>A record rather than the ten-field tuple it grew into</b> (DRA-219). Every early
+    /// return in <see cref="FarmGear"/> has to restate every field, and a positional tuple of ten
+    /// is a shape where a slice adding one number silently shifts another — the reason
+    /// <see cref="HelperInputs"/> stopped being positional at twelve. <see cref="None"/> plus a
+    /// <c>with</c> expression says what a path actually decided and leaves the rest at zero.
+    /// </remarks>
+    private readonly record struct GearOutcome(
+        int Withheld,
+        List<GearBandRefusal> Refused,
+        int WhoWithheld,
+        IReadOnlyList<string> UnreadWorn,
+        int Candidates,
+        List<GearEraRefusal> EraRefused,
+        List<GearAnchorRemoved> AnchorsRemoved,
+        int QuestWithheld,
+        int NoSource,
+        int QuestOnly,
+        int OffHandRefusals)
+    {
+        /// <summary>Nothing decided. The lists are fresh on every read rather than shared
+        /// statics — <see cref="FarmGear"/> hands them out and callers keep them.</summary>
+        public static GearOutcome None => new(0, [], 0, [], 0, [], [], 0, 0, 0, 0);
     }
 
     /// <summary>
@@ -2657,7 +2904,8 @@ public static partial class Recommendations
         HashSet<(string Anchor, string Slot, string Item)> atStart,
         HashSet<(string Anchor, string Slot, string Item)> afterEra,
         HashSet<(string Anchor, string Slot, string Item)> afterBand,
-        HashSet<(string Anchor, string Slot, string Item)> afterWho)
+        HashSet<(string Anchor, string Slot, string Item)> afterWho,
+        HashSet<(string Anchor, string Slot, string Item)> afterQuest)
     {
         var emptied = new List<GearAnchorRemoved>();
         foreach (var anchor in found
@@ -2671,8 +2919,9 @@ public static partial class Recommendations
                 .ToList();
 
             // Something of this anchor's is on the screen. The player has their answer and a
-            // count of what was refused beside it would be a caveat on a working list.
-            if (candidates.Any(afterWho.Contains)) continue;
+            // count of what was refused beside it would be a caveat on a working list. Asked at
+            // the LAST stage, which is what "nothing survived" means.
+            if (candidates.Any(afterQuest.Contains)) continue;
 
             // Never bucketed at all. Not this sentence's subject and not reachable today — the
             // sweep refuses an upgrade with no zone and no reachable quest before it is
@@ -2684,9 +2933,13 @@ public static partial class Recommendations
             var era = reachable.Count(c => !afterEra.Contains(c));
             var band = reachable.Count(c => afterEra.Contains(c) && !afterBand.Contains(c));
             var who = reachable.Count(c => afterBand.Contains(c) && !afterWho.Contains(c));
+            // DRA-219's stage, subtracted last for the reason the three above it are subtracted
+            // in order: the four counts stay a PARTITION of Found, which is the property the
+            // sentence leans on.
+            var quest = reachable.Count(c => afterWho.Contains(c) && !afterQuest.Contains(c));
 
             emptied.Add(new GearAnchorRemoved(
-                anchor.Key.Over, anchor.Key.Slot, reachable.Count, era, band, who));
+                anchor.Key.Over, anchor.Key.Slot, reachable.Count, era, band, who, quest));
         }
         return emptied;
     }
@@ -2719,7 +2972,117 @@ public static partial class Recommendations
     /// all: a bucket whose count disagreed with the rows drawn from it would make this
     /// engine's weight a number about a different list.</para>
     /// </summary>
-    private readonly record struct GearCandidate(GearUpgrade Upgrade, GearWho Who);
+    /// <remarks><b><see cref="Source"/> is the quest half of the same idea</b> (DRA-219): a
+    /// quest bucket's candidates all carry the answer resolved from the bucket's own quest name,
+    /// so the rule that withholds an offer and the fact that describes one read one object.
+    /// <see cref="GearQuestSource.None"/> on every zone candidate, because "which quest is this"
+    /// has no answer for a camp and needs none — the mirror of <see cref="GearWho.None"/> on a
+    /// quest one.</remarks>
+    private readonly record struct GearCandidate(
+        GearUpgrade Upgrade, GearWho Who, GearQuestSource Source);
+
+    /// <summary>
+    /// **A QUEST OFFER THAT CANNOT SAY HOW TO PURSUE IT IS NOT AN OFFER** (DRA-219, S10/S11;
+    /// acceptance S25 AC 1–6).
+    ///
+    /// <para><see cref="WhoRule{T}"/>'s sibling on the other acquisition path, and it exists for
+    /// the same measured reason. D4's exhibit was the Rathe row: an item, a place, and nothing to
+    /// DO. A quest row could be an item, a quest NAME, and nothing to do — and the shipped
+    /// catalog makes that the common case rather than the corner one. <b>1,028 of the 2,380
+    /// (wearable item, quest) offers name a string the shipped quest catalog does not hold</b>,
+    /// and five of those distinct strings are not quests at all but wiki markup the item promoter
+    /// read as one: <c>&lt;/ul&gt;</c>, <c>&lt;ul&gt;&lt;li&gt;Druid Skyshrine Leggings</c>,
+    /// <c>== See Also ==</c>, <c>{{Screenshot Needed}}</c>. A row pointing at those is the
+    /// non-place defect D4 found on the zone side, wearing quest clothes.</para>
+    ///
+    /// <para><b>It stands down whole when there is no quest catalog</b> — the band gate's own
+    /// voice (trap 73). A fixture without one is a test rather than an error, and an unanswered
+    /// question withholds nothing; production supplies it at the single assembly point both
+    /// surfaces go through (<c>HelperSources.Gather</c>), so neither can be the one that
+    /// forgot.</para>
+    ///
+    /// <para><b>It prunes rather than filtering at the door</b>, for <see cref="WhoRule{T}"/>'s
+    /// reason: the bucket count is this engine's weight AND its yardstick, so an offer that will
+    /// never be drawn must not inflate the quest it cannot be drawn under.</para>
+    ///
+    /// <para><b>The promoter defect is NOT fixed here.</b> Five wikitext fragments reaching a
+    /// shipped catalog's <c>Quests</c> list is a harvest bug; this rule keeps them off the
+    /// player's screen and counts them, which is a different job from teaching
+    /// <c>items-promote.py</c> to stop emitting them. That is a <c>FABLE.md</c> stub, exactly as
+    /// D4 left the <c>DropZones</c> non-places.</para>
+    /// </summary>
+    /// <returns>How many (item, quest) offers were withheld.</returns>
+    private static int QuestSourceRule(
+        HelperInputs inputs, Dictionary<string, List<GearCandidate>> byQuest)
+    {
+        if (inputs.Catalog is null) return 0;
+
+        var withheld = 0;
+        foreach (var quest in byQuest.Keys.ToList())
+        {
+            var kept = byQuest[quest].FindAll(c => c.Source.Answered);
+            withheld += byQuest[quest].Count - kept.Count;
+            if (kept.Count == 0) byQuest.Remove(quest);
+            else byQuest[quest] = kept;
+        }
+        return withheld;
+    }
+
+    /// <summary>
+    /// **THE SIX QUESTIONS FOR ONE QUEST — ONE ANSWER, FROM ONE SOURCE** (DRA-219, trap 4).
+    ///
+    /// <para><see cref="WhoFor"/>'s shape: resolved at the door, read at the row, and the RULE
+    /// above reads the same object rather than asking the catalog a second time. Everything
+    /// comes from the shipped <see cref="QuestCatalog"/> — the quest silo the Guide room, the
+    /// era gate and the General tab already read (S20: no second quest data silo).</para>
+    ///
+    /// <para><b>Unanswered fields stay empty and are never filled in.</b> The catalog's own
+    /// <c>MinLevel</c> of 0 means the page stated no level, which is not level 1; an empty
+    /// <c>QuestGiver</c> means the page named nobody, which is not "unknown NPC" (trap 73).</para>
+    /// </summary>
+    private static GearQuestSource QuestSourceFor(Func<string, QuestEntry?> questOf, string quest)
+    {
+        if (questOf(quest) is not { } entry) return GearQuestSource.None;
+
+        var items = entry.Items?.Where(i => i.Name.Length > 0).Select(i => i.Name).ToList() ?? [];
+        return new GearQuestSource(new QuestSourceFact(
+            quest,
+            entry.QuestGiver ?? "",
+            entry.StartZone ?? "",
+            Math.Max(0, entry.MinLevel),
+            items.Count,
+            [.. items.Take(QuestItemsPerRow)]));
+    }
+
+    /// <summary>
+    /// What EQBuddy's own quest list can say about the quest an item page pointed at.
+    ///
+    /// <para><see cref="GearWho"/>'s counterpart: a struct whose whole job is to carry an answer
+    /// AND the one predicate the withhold rule reads, so "can this offer be pursued" has a single
+    /// definition rather than a condition repeated at the rule and at the row.</para>
+    /// </summary>
+    /// <param name="Fact">The six-question answer, or null where the shipped quest catalog does
+    /// not hold this name at all.</param>
+    private readonly record struct GearQuestSource(QuestSourceFact? Fact)
+    {
+        /// <summary>The answer for a place that is not a quest — a zone row, which is asked
+        /// nothing here.</summary>
+        public static readonly GearQuestSource None = new((QuestSourceFact?)null);
+
+        /// <summary>
+        /// Whether anything at all can say how to pursue this. The withhold rule is this property
+        /// and nothing else.
+        ///
+        /// <para><b>Resolving the name is not enough</b>: an entry answering none of who / where /
+        /// when / how is a row that names a quest and stops, which is the thing the rule exists to
+        /// refuse. Exactly ONE of the shipped catalog's 537 resolvable quests is in that state
+        /// (<i>Cougarskin Sleeves Quest</i>), so the clause costs almost nothing and keeps the
+        /// rule about what a row can SAY rather than about a dictionary hit.</para>
+        /// </summary>
+        public bool Answered => Fact is { } f
+            && (f.Giver.Length > 0 || f.StartZone.Length > 0 || f.MinLevel > 0
+                || f.Components > 0);
+    }
 
     /// <summary>
     /// **A DROP OFFER THAT CANNOT SAY WHAT DROPS IT IS NOT AN OFFER** (DRA-84 D4, plan P3;
@@ -2972,20 +3335,37 @@ public static partial class Recommendations
     /// asked it this exact question since the quests rewrite. An unstated era dates nothing
     /// and refuses nothing.</para>
     /// </summary>
-    private static Func<string, ZoneEras.Answer?> QuestEraOf(HelperInputs inputs)
+    private static Func<string, ZoneEras.Answer?> QuestEraOf(Func<string, QuestEntry?> questOf) =>
+        // **IT READS THE SAME FOLD THE ROWS DO SINCE DRA-219** (trap 4). It used to build its
+        // own name→era dictionary, which was one producer while it was the only reader; a second
+        // reader resolving quest names its own way is how a gate refuses a quest the row beside
+        // it described. An entry with no era dates nothing and refuses nothing, exactly as
+        // before.
+        name => questOf(name) is { Era.Length: > 0 } entry
+            ? new ZoneEras.Answer(ZoneEras.Source.Dated, entry.Era, "")
+            : null;
+
+    /// <summary>
+    /// **THE ONE PRODUCER OF "WHICH QUEST IS THIS"** (DRA-219, trap 4).
+    ///
+    /// <para>Folded ONCE for the whole engine rather than scanned per bucket: 1,173 quests behind
+    /// a handful of rows is the same sum computed repeatedly (trap 4 in a loop), and the first
+    /// spelling wins so a duplicate page name cannot make the answer depend on iteration
+    /// order.</para>
+    ///
+    /// <para>A null catalog answers null for everything, which stands the era gate's quest arm
+    /// and the quest-source rule down together — both are asking one question of one absent
+    /// table, and a fixture with neither is a test rather than an error.</para>
+    /// </summary>
+    private static Func<string, QuestEntry?> QuestEntriesOf(HelperInputs inputs)
     {
         if (inputs.Catalog is not { } catalog) return _ => null;
-        // Folded ONCE for the whole engine rather than scanned per bucket: 1,178 quests behind
-        // a handful of rows is the same sum computed repeatedly (trap 4 in a loop), and the
-        // first spelling wins so a duplicate page name cannot make the answer depend on
-        // iteration order.
-        var byName = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-        foreach (var quest in catalog.Quests)
-            if (quest.Era.Length != 0) byName.TryAdd(quest.Name, quest.Era);
 
-        return name => byName.TryGetValue(name, out var era)
-            ? new ZoneEras.Answer(ZoneEras.Source.Dated, era, "")
-            : null;
+        var byName = new Dictionary<string, QuestEntry>(StringComparer.OrdinalIgnoreCase);
+        foreach (var quest in catalog.Quests)
+            if (quest.Name.Length != 0) byName.TryAdd(quest.Name, quest);
+
+        return name => byName.TryGetValue(name, out var entry) ? entry : null;
     }
 
     /// <summary>
@@ -3009,23 +3389,44 @@ public static partial class Recommendations
     /// <para><b>The creature was answered at the door</b> (<see cref="WhoFor"/>, trap 4). This
     /// method draws the answer and decides nothing about it: every candidate that reached here
     /// under a ZONE can name somebody, because one that could not was never bucketed.</para>
+    ///
+    /// <para><b>So was the quest, and its answer leads the row</b> (DRA-219, S11). A quest
+    /// bucket's candidates all resolved from one quest name, so the row emits ONE
+    /// <see cref="QuestSourceFact"/> — who starts it, where, from what level, what it takes —
+    /// and emits it FIRST, because it is the sentence the player acts on: the item lines under it
+    /// say what the reward is worth, and this one says how to go and get it. Zone rows carry
+    /// none, and that is not an omission: "which quest is this" has no answer for a camp.</para>
     /// </summary>
     private static Recommendation GearRow(
         RecommendationKind kind, string subject, string zone,
         List<GearCandidate> candidates, int best, List<HelperDoor> doors)
     {
+        // **THE SAME KEYS THE SWEEP ORDERED ON, IN THE SAME ORDER** (DRA-222 D6). This row's
+        // cap is `GearNamedPerRow`, so whichever comparer runs here decides which upgrades the
+        // player actually READS about — and a second comparer disagreeing with the sweep's
+        // would mean the eight the sweep kept and the three this names were chosen on different
+        // grounds (trap 4, with the symptom visible only on rows where the two disagree).
         var named = candidates
-            .OrderByDescending(c => c.Upgrade.ImprovedMetrics)
+            .OrderByDescending(c => c.Upgrade.RelevantMetrics)
+            .ThenByDescending(c => c.Upgrade.ImprovedMetrics)
             .ThenBy(c => c.Upgrade.Item, StringComparer.OrdinalIgnoreCase)
             .ToList();
         var shown = named.Take(GearNamedPerRow).ToList();
 
         var why = new List<WhyFact>();
-        foreach (var (upgrade, who) in shown)
+        // Read off the bucket rather than off the shown rows: the source belongs to the QUEST,
+        // and a row whose first item happened to be trimmed by the cap must not lose the one
+        // sentence that says how to pursue every item under it.
+        if (candidates is [{ Source.Fact: { } source }, ..]) why.Add(source);
+        foreach (var (upgrade, who, _) in shown)
         {
             why.Add(new GearUpgradeFact(
                 upgrade.Item, upgrade.Over, upgrade.Slot, upgrade.GainMetric, upgrade.GainBy,
-                who.Named, who.Withheld));
+                who.Named, who.Withheld, upgrade.RelevantMetrics,
+                // DRA-241. Carried onto the fact AFTER the comparer above has already chosen
+                // which candidates this row names — the proc is in neither ordering key, so it
+                // cannot move a row up into the cap nor keep one out of it.
+                upgrade.Proc));
             if (who.Seen is { } fact) why.Add(fact);
         }
 

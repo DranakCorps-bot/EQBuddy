@@ -156,6 +156,10 @@ public class HelperPresentationTests
             AssertClean(HelperPresentation.FactionPickerCapNote(n), $"FactionPickerCapNote({n})");
             AssertClean(HelperPresentation.GearWithheld(n), $"GearWithheld({n})");
             AssertClean(HelperPresentation.DropOffersWithheld(n), $"GearWhoWithheld({n})");
+            // DRA-222 D6: the off-hand refusal. The sentence most at risk of an adjective in
+            // this whole slice — "two-handed weapons are worse for you" is a claim about the
+            // game, and what actually happened is that the player is holding something.
+            AssertClean(HelperPresentation.OffHandRefused(n), $"OffHandRefused({n})");
         }
 
         // DRA-149 D2's unread sentence, at every shape it has: silent, one, exactly the name
@@ -1164,6 +1168,43 @@ public class HelperPresentationTests
         Assert.Equal("", HelperPresentation.AnchorsNotNamed(0));
         Assert.Contains("1 more worn item ", HelperPresentation.AnchorsNotNamed(1));
         Assert.Contains("5 more worn items", HelperPresentation.AnchorsNotNamed(5));
+    }
+
+    /// <summary>
+    /// **THE OFF-HAND SENTENCE SAYS THE COST AND MAKES NO JUDGEMENT** (DRA-222 D6, S7.3).
+    ///
+    /// <para>This one removes offers that WON on every number, so it is the sentence most at
+    /// risk of turning into a verdict about two-handed weapons. It names what the swap would
+    /// take — a hand the player has something in — and hands the call back, which is the only
+    /// honest shape when the repo has measured nothing about what an off-hand is worth.</para>
+    /// </summary>
+    [Fact]
+    public void TheOffHandSentenceNamesTheHandAndNotTheWeapon()
+    {
+        // Silent at zero: a rule that refused nothing has nothing to admit (trap 50's
+        // condition, not its exemption).
+        Assert.Equal("", HelperPresentation.OffHandRefused(0));
+        Assert.Equal("", HelperPresentation.OffHandRefused(-1));
+
+        var one = HelperPresentation.OffHandRefused(1);
+        var many = HelperPresentation.OffHandRefused(29);
+
+        // Singular and plural both written out — "1 upgrades are not listed" is the tell that
+        // a sentence was never read at the value it will most often be produced at.
+        Assert.Contains("1 upgrade is not listed", one);
+        Assert.Contains("29 upgrades are not listed", many);
+
+        foreach (var line in new[] { one, many })
+        {
+            // The SUBJECT is what the player is wearing. "Two-handed weapons are worse" would
+            // be a claim about the game; "you have something in your off hand" is a row in
+            // their own dump.
+            Assert.Contains("two-handed", line);
+            Assert.Contains("off hand", line);
+            // …and no verdict on either side of it.
+            foreach (var adjective in new[] { "better", "worse", "should", "recommend", "bad" })
+                Assert.DoesNotContain(adjective, line, StringComparison.OrdinalIgnoreCase);
+        }
     }
 }
 

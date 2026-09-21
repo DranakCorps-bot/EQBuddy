@@ -218,6 +218,10 @@
   .gcard { border:1px solid var(--hairline); border-radius:8px; padding:10px 12px; margin:6px 0 10px; }
   .gcard .lead { font-size:11px; color:var(--accent); letter-spacing:.06em; }
   .reward { font-size:12px; color:var(--dim); margin:2px 0 6px; }
+  /* The blocked sentence (DRA-218). Same size and ink as the reward line it sits above —
+     it is a caption about the quest, not an alert, and the desktop draws it dim for the
+     same reason: the player made the skip on purpose. */
+  .blocked { font-size:12px; color:var(--dim); margin:2px 0 6px; }
   /* The reward item's own stats block, as the game prints it: preserved newlines and a
      monospace face, because "WIS: +9  MANA: +60" is a column and not a sentence. */
   .rcard { font-size:11.5px; color:var(--text); margin:2px 0 8px; white-space:pre-wrap;
@@ -1904,6 +1908,17 @@ function boot() {
       return;
     }
 
+    // DRA-216 D4: what the player is going after, ABOVE the answers — the desktop room's own
+    // order, because a tracked goal outlives whatever the list below says today. It is
+    // read-only here: `trackedOnPc` is the tracking control ported as intent (trap 35), and
+    // every string is one HelperPresentation built and the wire carried (trap 32).
+    if ((h.tracked || []).length) {
+      if (h.trackedHeading) wrap.appendChild(el("h3", "group", h.trackedHeading));
+      if (h.trackedNote) wrap.appendChild(el("div", "sub-head", h.trackedNote));
+      for (const row of h.tracked) wrap.appendChild(el("div", "note", row));
+      if (h.trackedOnPc) wrap.appendChild(el("div", "caption", h.trackedOnPc));
+    }
+
     wrap.appendChild(el("h3", "group", h.answersHeading));
     // The values line and the level disclosure, in the order the room says them: where the
     // answers come from, then which level was weighed and where THAT came from. A ranking
@@ -1936,8 +1951,27 @@ function boot() {
     // would produce one sentence that can explain neither.
     // DRA-180 D2 adds the two ERA captions, each directly BEFORE its band sibling — the order
     // the gates ran in, so a reader meets the complete explanation before the partial one.
-    for (const line of [h.moneyNote, h.gearBaseNote, h.materialNote, h.cap, h.gearWithheld,
+    // DRA-219 adds the quest acquisition path's three, in the desktop room's own order:
+    // `gearQuestWithheld` directly after `gearWhoWithheld` because they are the same rule on the
+    // two halves of S10.1, then the two the sweep never passed on at all. Added in the SAME
+    // slice as the fields, which is the whole of D5's lesson.
+    // DRA-222 D6 adds `gearOffHandRefused` LAST of the gear counts and before the materials
+    // block — the desktop room's own order. It is the only one about the player's HANDS rather
+    // than about a place, which is exactly why it must not be missing here: a phone drawing the
+    // ones above it and not this one shows a shorter weapon list than the PC with nothing on
+    // screen saying why. Its row in the page-side must-list is what makes that checkable
+    // (trap 34).
+    // DRA-241 adds `gearProcNote`, directly after `gearBaseNote` — the desktop room's own
+    // order, and the two belong together: both are caveats about what the rows above compared.
+    // The PROC itself needs nothing here, because it rides the row's own why-line. This does,
+    // and it is the half that matters: the rows say "It procs Ykesha." and this is the sentence
+    // saying the ranking did not weigh it. A phone drawing the claim without the caveat tells
+    // the player something the PC does not — that the order knew.
+    for (const line of [h.moneyNote, h.gearBaseNote, h.gearProcNote, h.materialNote, h.cap,
+                        h.gearWithheld,
                         h.gearEraRefused, h.gearBandRefused, h.gearWhoWithheld,
+                        h.gearQuestWithheld, h.gearNoSource, h.gearQuestOnly,
+                        h.gearOffHandRefused,
                         h.materialEraRefused, h.materialBandRefused, h.materialWhoWithheld])
       if (line) wrap.appendChild(el("div", "caption", line));
 
@@ -2244,6 +2278,12 @@ function boot() {
       h.append(name);
       if (g.note) h.append(el("span", "note", g.note));
       wrap.appendChild(h);
+      // WHY THIS ONE WILL NOT FINISH (DRA-218). Drawn above the reward line and under the
+      // heading, where the eye lands (trap 44), and drawn on a FOLDED group too: the count
+      // on that heading is exactly what it is correcting, and a folded quest is often the
+      // only thing on screen. Core's sentence, verbatim — the page decides layout and not a
+      // word of it.
+      if (g.blocked) wrap.appendChild(el("div", "blocked", g.blocked));
       // What this quest pays. The desktop hangs it on the heading's hover; a phone has no
       // hover, so it is drawn - and on a folded quest it is the only thing that answers
       // "what do I get" (trap 35).
@@ -2733,7 +2773,7 @@ function boot() {
     // about this wide, and the circles are drawn at 5-7px.
     const TAP_REACH_PX = 26;
     let svg = null, layer = null, trailG = null, dyn = null, wrap = null, tip = null, selBar = null;
-    let row = null, side = null, sideHead = null, sideRows = null;
+    let row = null, side = null, sideHead = null, sideRows = null, sideTargets = null;
     let stamp = "", bounds = null, dynKey = "";
     let k = 1, tx = 0, ty = 0, fitted = false;
     const pointers = new Map();
@@ -2768,7 +2808,11 @@ function boot() {
       side = el("div", "mapside");
       sideHead = el("h3");
       sideRows = el("div", "rows");
-      side.append(sideHead, sideRows);
+      // DRA-216 D5: what you are going after, ABOVE the named list — the desktop map's own
+      // order, because it is what the player opened the map for. Read-only here (trap 35):
+      // tracking writes the profile the PC plays from, and `note` carries where it is done.
+      sideTargets = el("div", "rows");
+      side.append(sideTargets, sideHead, sideRows);
       row.append(wrap, side);
       bindGestures();
       // Refit when the box changes shape — rotating a tablet, entering fullscreen, or
@@ -2792,6 +2836,7 @@ function boot() {
     function drawSide(data) {
       const named = data.named || [];
       const key = JSON.stringify(named.map(n => [n.name, n.due, n.x, n.y, n.fromWiki]));
+      drawTargets(data.targets);
       sideHead.textContent = "Named — " + (data.timerZone || data.zone || "");
       if (key !== sideKey) {
         sideKey = key;
@@ -2839,6 +2884,27 @@ function boot() {
           ref.fill.style.width = (frac * 100).toFixed(1) + "%";
         }
       }
+    }
+
+    // DRA-216 D5: the target block. Nothing tracked sends no `targets` at all and this draws
+    // NOTHING — not a heading over an empty list, which is the desktop map's rule and the
+    // Helper block's before it. Every string is one GearTargetPresentation built and the wire
+    // carried (trap 32); this function words nothing and caps nothing.
+    let targetKey = "";
+    function drawTargets(t) {
+      const key = JSON.stringify(t || null);
+      if (key === targetKey) return;
+      targetKey = key;
+      sideTargets.replaceChildren();
+      if (!t) return;
+      sideTargets.appendChild(el("h3", "", t.heading));
+      if (t.note) sideTargets.appendChild(el("div", "none", t.note));
+      for (const g of (t.goals || [])) sideTargets.appendChild(el("div", "row", g));
+      if (t.points) sideTargets.appendChild(el("div", "none", t.points));
+      if (t.elsewhereHeading) sideTargets.appendChild(el("h3", "", t.elsewhereHeading));
+      for (const e of (t.elsewhere || [])) sideTargets.appendChild(el("div", "row", e));
+      if (t.unreadable) sideTargets.appendChild(el("div", "none", t.unreadable));
+      if (t.noDropZone) sideTargets.appendChild(el("div", "none", t.noDropZone));
     }
 
     // ---- curation ----
@@ -3132,6 +3198,25 @@ function boot() {
           ring.appendChild(a);
         }
         dyn.appendChild(ring);
+        // DRA-216 D5: a target ring OUTSIDE the circle, never a recolour of it. The circle's
+        // own colour already answers "is this a named", and overwriting it would make the map
+        // forget which question it was answering — so this is a second, wider ring, dashed so
+        // it reads as a mark somebody put there rather than as more archive.
+        if (c.target) {
+          const t = document.createElementNS(SVG, "circle");
+          t.setAttribute("cx", c.x); t.setAttribute("cy", c.y);
+          t.setAttribute("fill", "none"); t.setAttribute("stroke", warn);
+          t.setAttribute("stroke-width", "1.6");
+          t.setAttribute("stroke-dasharray", "3 3");
+          t.setAttribute("vector-effect", "non-scaling-stroke");
+          t.dataset.px = c.named ? 12 : 10;
+          // The line the desktop puts on the circle's hover, as the title a tap-and-hold
+          // shows: the phone has no hover, so it rides the element (trap 35).
+          const title = document.createElementNS(SVG, "title");
+          title.textContent = c.targetText;
+          t.appendChild(title);
+          dyn.appendChild(t);
+        }
         if (c.confirmed) {
           const d = document.createElementNS(SVG, "circle");
           d.setAttribute("cx", c.x); d.setAttribute("cy", c.y);

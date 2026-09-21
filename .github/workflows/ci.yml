@@ -92,6 +92,51 @@ jobs:
       - name: Channel size ratchet refuses each violation
         run: pwsh -NoProfile -File scripts/channel-size-selftest.ps1
 
+      # No commit a pull request ADDS may be authored or committed as the Founder
+      # (DRA-226). Every commit on three open DRA-216 branches - 7 commits, 4,589 lines of
+      # agent-written code - was authored AND committed as
+      # `David Edwards <david.edwards08@gmail.com>`, and was caught only because a Planner
+      # review happened to read the commit authors. It is rewritable on an unmerged branch
+      # and impossible afterwards, so the check has to sit here, before the merge.
+      #
+      # The cause was environmental and is not fixable from inside the repository: there is
+      # more than one EQBuddy working tree on the Founder's machine, `~/.gitconfig` has no
+      # [user] block, and one dispatch clone carried his identity - which ~20 linked
+      # worktrees then inherited, because a worktree shares its clone's config. The clones
+      # are fixed; this is the copy that does not depend on the next one being right.
+      #
+      # RANGE, and it is the whole design: base..head MINUS main. `main` carries 126
+      # commits this guard would refuse, so a check that read history would be permanently
+      # red and would teach everyone to ignore it (trap 74). It judges only what this pull
+      # request adds.
+      #
+      # HEAD SHA, NOT HEAD. `actions/checkout` leaves the MERGE RESULT checked out and that
+      # merge commit is authored by GitHub rather than by the author, so judging HEAD would
+      # fail every pull request on a commit its author never made.
+      #
+      # THE FOUNDER'S DOOR is the `founder-commit` label. An agent running inside his clone
+      # produces a commit byte-identical in identity to one he types himself, so nothing
+      # read off the commit object can separate them - the separation has to come from
+      # outside it. A human puts the label on; it admits HIS identity for that pull request
+      # only, and every other unknown identity stays refused. An agent cannot label a PR.
+      - name: Commits this pull request adds are authored by the bot
+        if: github.event_name == 'pull_request'
+        run: >
+          pwsh -NoProfile -File scripts/commit-identity-guard.ps1
+          -BaseRef "${{ github.event.pull_request.base.sha }}"
+          -HeadRef "${{ github.event.pull_request.head.sha }}"
+          ${{ contains(github.event.pull_request.labels.*.name, 'founder-commit') && '-AllowFounder' || '' }}
+
+      # Its prove-fail, same idiom and same reason as the two above. Six refusals driven
+      # red in a throwaway repo - including the shape that started the card, a commit whose
+      # NAME is the bot's and only whose email is the Founder's, which GitHub renders as
+      # "David Edwards" and which any name-based check would wave through. Every allow-list
+      # row is exercised too (trap 78: a dead row has no symptom), and both fail-open paths
+      # are asserted to SAY they judged nothing, because an empty range is exactly how a
+      # broken range computation would read as green.
+      - name: Commit-identity guard refuses each violation
+        run: pwsh -NoProfile -File scripts/commit-identity-selftest.ps1
+
       # Experiment A′ self-test (trap 70, EQBuddy lab): default second claim on
       # one work item must refuse. Throwaway StoreDir; not the live claims.
       - name: Soft seat claims refuse a duplicate default

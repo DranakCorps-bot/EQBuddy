@@ -51,8 +51,11 @@ construction. EQBuddy Mobile is still a second reader of every decision in there
   that entry is what the in-app "What's new" popup shows users after they update.
 - **Contributor lane:** feature branches → PRs. Every PR gets CI: build, the unit suite,
   and the end-to-end suite that launches the real exe (`e2e-windows`, on every push and
-  pull request since 2026-09-04). A UI change also gets a **smoke-run** by the maintainer
-  against a fixture profile, with findings posted in the PR.
+  pull request since 2026-09-04). **Both `build-and-test` and `e2e-windows` are required
+  status checks on `main` since 2026-09-20 (DRA-228)** — a red or still-running
+  `e2e-windows` blocks the merge rather than relying on whoever merges to notice. A UI
+  change also gets a **smoke-run** by the maintainer against a fixture profile, with
+  findings posted in the PR.
 - **Issues are the only sync channel.** Design-before-code for shared features.
   Decisions live in issue threads, not in chat memories.
 

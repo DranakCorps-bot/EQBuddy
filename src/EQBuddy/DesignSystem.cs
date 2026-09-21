@@ -364,8 +364,16 @@ internal sealed class EqChip : Border
         SetSelected(false);
     }
 
+    /// <summary>Whether this chip is currently PAINTED as the selected one. Written by
+    /// <see cref="SetSelected"/> and by nothing else, so it is the one producer of the
+    /// question (trap 4) — a strip that recorded what <see cref="EqSegmentedStrip.Select"/>
+    /// was ASKED for would answer with a key no chip on screen carries, which is exactly the
+    /// stale-lens state <see cref="EqSegmentedStrip.Selected"/> exists to catch.</summary>
+    public bool Selected { get; private set; }
+
     public void SetSelected(bool on)
     {
+        Selected = on;
         var ink = _compact ? ChipStyle.ForCompact(on) : ChipStyle.For(on);
         Paint(this, BackgroundProperty, ink.Background);
         Paint(this, BorderBrushProperty, ink.Border);
@@ -437,6 +445,18 @@ internal sealed class EqSegmentedStrip(Panel host, bool compact = false)
     /// own field.</summary>
     public EqChip? Chip(object key) => _chips.FirstOrDefault(c => Equals(c.Key, key));
 
+    /// <summary>The key of the chip PAINTED selected, or <c>null</c> when no chip is — the
+    /// sibling of <see cref="Keys"/> and added for the same reason (DRA-199): a DUMP fact has
+    /// to say what reached the SCREEN, and the field a caller lensed with is a different
+    /// claim from the chip a player can see lit.
+    ///
+    /// <para><b>Null is the load-bearing answer.</b> <see cref="Select"/> paints nothing when
+    /// no chip carries the key, so a view holding a lens on a class whose chip has just been
+    /// dropped reads <c>null</c> here — the stale-lens bug — while the field would still name
+    /// the class. Read off the chips rather than off a key this strip remembered, so the two
+    /// cannot part company (trap 4).</para></summary>
+    public object? Selected => _chips.FirstOrDefault(c => c.Selected)?.Key;
+
     /// <summary>Paints the selection. Compared with <see cref="object.Equals(object?,
     /// object?)"/> so strips keyed on strings, enums or null all work without the caller
     /// casting.</summary>
@@ -457,6 +477,16 @@ internal sealed class EqSegmentedStrip(Panel host, bool compact = false)
 /// that PORTS later re-picks this control rather than copying it (trap 35).</param>
 internal readonly record struct PickerRow(
     object Key, string Label, bool Checked, string? Tip = null);
+
+/// <summary>One quick-select inside an <see cref="EqMultiPicker"/> — a one-shot action over the
+/// rows, not a row (DRA-216 D1). See <c>EqMultiPicker</c>'s actions field for why the two are
+/// different controls.</summary>
+/// <param name="Label">What it reads. From a presentation file; this control writes no words.</param>
+/// <param name="Do">What clicking it does. The picker closes its popup first, so the host's
+/// handler is free to rebuild the rows without yanking a panel out from under the cursor.</param>
+/// <param name="Tip">Hover copy. An action that REPLACES a selection should say what the
+/// selection is about to become — the player cannot read that off the label.</param>
+internal readonly record struct PickerAction(string Label, Action Do, string? Tip = null);
 
 /// <summary>
 /// **THE multi-select dropdown** (DRA-71 D2, Fable plan P1; Founder smoke item 1) — a face
@@ -506,6 +536,25 @@ internal sealed class EqMultiPicker
     private readonly List<CheckBox> _checks = [];
     private readonly Action<object> _onToggle;
     private bool _syncing;
+
+    /// <summary>
+    /// **The quick-select strip, above the rows and outside the scroll** (DRA-216 D1).
+    ///
+    /// <para>An action is not a row, and the distinction is the reason this is its own panel
+    /// rather than a seventeenth <see cref="CheckBox"/>. A tick reports a STATE the player
+    /// owns; "My Classes" performs a one-shot REPLACEMENT and has no state of its own to
+    /// report — dressing it as a checkbox would leave a box that unticks itself the moment
+    /// they add a class afterwards, which is the control lying about what it just did.</para>
+    ///
+    /// <para><b>Outside the scroll on purpose</b> (trap 37): the class list is sixteen rows
+    /// against a twelve-row viewport, so a quick-select inside the scroll is a control the
+    /// player has to find by scrolling — and the whole point of it is being faster than
+    /// working down the list.</para>
+    ///
+    /// <para>It is EMPTY unless a host calls <see cref="SetActions"/>, so the three pickers
+    /// that do not want one are byte-for-byte the control they were.</para>
+    /// </summary>
+    private readonly StackPanel _actions = new();
 
     /// <summary>The button the player clicks. Owned by this picker when it built one, and
     /// merely wired when the host handed one in.</summary>
@@ -557,13 +606,17 @@ internal sealed class EqMultiPicker
             MaxHeight = MaxRows,
             Content = _rows,
         };
+        // The actions sit above the scroll, not inside it — see the field's own note.
+        var stack = new StackPanel();
+        stack.Children.Add(_actions);
+        stack.Children.Add(scroll);
         var frame = new Border
         {
             CornerRadius = new CornerRadius(DesignTokens.RadiusCard),
             BorderThickness = new Thickness(1),
             Padding = new Thickness(DesignTokens.SpaceL, DesignTokens.SpaceM,
                 DesignTokens.SpaceL, DesignTokens.SpaceM),
-            Child = scroll,
+            Child = stack,
         };
         frame.SetResourceReference(Panel.BackgroundProperty, "PopupBrush");
         frame.SetResourceReference(Border.BorderBrushProperty, "BorderBrush");
@@ -605,6 +658,89 @@ internal sealed class EqMultiPicker
         }
         _syncing = false;
     }
+
+    /// <summary>
+    /// Builds (or clears) the quick-select strip above the rows.
+    ///
+    /// <para>Pass an empty list to remove it — which is how a host says "this character has no
+    /// identity to select", and is the honest state rather than a disabled button nobody can
+    /// tell is disabled (trap 17: <c>IsEnabled = false</c> is invisible when the style has no
+    /// disabled visual, and this popup's does not).</para>
+    ///
+    /// <para><b>The click CLOSES the popup before the handler runs.</b> A quick-select's whole
+    /// effect is on the rows behind it, and a host that repaints them under an open panel is
+    /// asking the player to verify a list that moved while they were looking at it. Closing
+    /// also makes the result visible on the FACE, which is where the selection is reported.</para>
+    ///
+    /// <para><b>Every call REPLACES the strip, and the empty call is no exception</b> — the
+    /// clear is the first thing that happens and there is no early "nothing changed" arm here
+    /// on purpose. Whether a rebuild is warranted is a question about the HOST's data, which
+    /// this control cannot see; deciding it in here would be a second producer of an answer
+    /// the host already has (trap 4). What this owes the host is the honest cost, which is
+    /// <see cref="ActionBuilds"/>.</para>
+    /// </summary>
+    public void SetActions(IReadOnlyList<PickerAction> actions)
+    {
+        ActionBuilds++;
+        _actions.Children.Clear();
+        if (actions.Count == 0) return;
+
+        foreach (var action in actions)
+        {
+            var btn = new Button
+            {
+                Content = action.Label,
+                FontSize = DesignTokens.Spec(DesignTokens.TypeRole.Caption).Size,
+                Height = DesignTokens.ControlHeight,
+                HorizontalAlignment = HorizontalAlignment.Stretch,
+                Margin = new Thickness(0, 0, 0, DesignTokens.SpaceXs),
+                Padding = new Thickness(DesignTokens.SpaceL, DesignTokens.SpaceXxs,
+                    DesignTokens.SpaceL, DesignTokens.SpaceXxs),
+            };
+            // The face's own style, so the popup's action and the control that opened it are
+            // plainly the same family rather than two buttons that look alike.
+            btn.SetResourceReference(FrameworkElement.StyleProperty, "ActionButton");
+            if (action.Tip is { Length: > 0 }) btn.ToolTip = action.Tip;
+            var run = action.Do;
+            btn.Click += (_, _) => { _popup.IsOpen = false; run(); };
+            _actions.Children.Add(btn);
+        }
+
+        // Separates the actions from the rows they act on. Themed by reference like every
+        // other brush in here, so the eight palettes cannot disagree about it.
+        var rule = new Border
+        {
+            BorderThickness = new Thickness(0, 1, 0, 0),
+            Margin = new Thickness(0, 0, 0, DesignTokens.SpaceXs),
+        };
+        rule.SetResourceReference(Border.BorderBrushProperty, "BorderBrush");
+        _actions.Children.Add(rule);
+    }
+
+    /// <summary>How many quick-selects the popup is offering. Reported in the
+    /// <c>EQBUDDY_EXPAND</c> dump for the same reason <see cref="RowCount"/> is: a control that
+    /// is ABSENT photographs as an unremarkable panel, and this one lives inside a popup a
+    /// screenshot does not even contain (traps 29 and 79).</summary>
+    public int ActionCount => _actions.Children.OfType<Button>().Count();
+
+    /// <summary>
+    /// **How many times the strip has been REPLACED.** Reported in the <c>EQBUDDY_EXPAND</c>
+    /// dump, and it is the only way anything outside this class can say the player's button
+    /// survived a tick.
+    ///
+    /// <para><b>A count rather than the button's identity, and the count is the stronger
+    /// claim.</b> <see cref="SetActions"/> clears unconditionally, so one call IS one
+    /// destroyed-and-rebuilt <c>Button</c>; comparing object hash codes across two dumps would
+    /// pass the day a rebuild happened to land on the same value, and would say nothing at all
+    /// about the empty arm, which destroys a button and builds none.</para>
+    ///
+    /// <para>It exists because no other surface can see this failure. <see cref="ActionCount"/>
+    /// reads 1 either way — a strip rebuilt every tick holds exactly one button at every
+    /// moment anybody looks — and the control lives inside a <c>Popup</c>, its own top-level
+    /// HWND that <c>PrintWindow</c> does not render (trap 79). The symptom is a hover that
+    /// will not stay up and a click that is sometimes swallowed, and neither is a pixel.</para>
+    /// </summary>
+    public int ActionBuilds { get; private set; }
 
     /// <summary>Paints the ticks from the caller's own store, without rebuilding the rows and
     /// without calling back — the sync half of trap 20's writer/reader pair.</summary>

@@ -49,6 +49,15 @@ namespace EQBuddy.Companion;
 /// <param name="GearBaseNote">The base-vs-base caveat, when a gear row was built (DRA-149 D1).
 /// Empty otherwise, and drawn from what was BUILT rather than from which goal is ticked — the
 /// money note's rule beside it, for the money note's reason.</param>
+/// <param name="GearProcNote">The proc caveat, when a gear row actually NAMES a proc (DRA-241,
+/// Helm ruling <c>27302878</c>). Empty otherwise — gated on a stricter question than
+/// <paramref name="GearBaseNote"/> beside it, because most gear rows are armour and a sentence
+/// about procs over a list of helms would be the disclosure-line rule broken one caption along.
+///
+/// <para>The proc itself rides the row's own why-line and needs no field here. This does, because
+/// it is the sentence saying the ranking never weighed it — and a phone drawing "It procs Ykesha."
+/// under a ranked list WITHOUT it would be telling the player something the PC does not: that the
+/// order knew.</para></param>
 /// <param name="Cap">What the answer cap held back, when it held anything (trap 50).</param>
 /// <param name="GearWithheld">What the gear sweep's own per-anchor cap held back. A separate
 /// field because it is spent before any row exists and so cannot ride one.</param>
@@ -67,6 +76,11 @@ namespace EQBuddy.Companion;
 /// no creature in that zone and which this character has never looted there (DRA-84 D4). Its own
 /// field beside <paramref name="GearWithheld"/> rather than summed into it: a cap and a rule are
 /// different causes, and one number could explain neither.</param>
+/// <param name="GearOffHandRefused">What the off-hand rule refused — upgrades that beat the
+/// worn item on every number and are two-handed, for a character with something in SECONDARY
+/// (DRA-222 D6, S7.3). Its own field beside <paramref name="GearWhoWithheld"/> for that one's
+/// reason: five causes with five remedies, and a phone summing any two of them would hand the
+/// player a number that explains neither.</param>
 /// <param name="UnreadWorn">The worn rows EQBuddy could not read about, named (DRA-149 D2). The
 /// fourth field of this shape and the only one that is not a decision — the three above chose to
 /// hold something back, this one is EQBuddy admitting it never had the row. It rides the wire for
@@ -106,6 +120,19 @@ namespace EQBuddy.Companion;
 /// the listed set and not the picked one, because "picked nothing" means "show me all eight" —
 /// the rule lives in <c>TradeskillPickStore.ListedFrom</c> so the phone cannot arrive at a
 /// different eight from the PC.</param>
+/// <param name="TrackedHeading">The tracked block's heading (DRA-216 D4). Empty — with the two
+/// fields under it — when nothing is tracked, which is the desktop room's own rule: that block
+/// draws nothing at all rather than a heading over an empty list.</param>
+/// <param name="TrackedNote">What a tracked goal is and the two things it does not claim. The
+/// SAME sentence the PC draws: it carries the parked "+N" gap and the fact that nothing ticks
+/// itself off, and a phone without it would show a list of goals implying a comparison EQBuddy
+/// cannot make.</param>
+/// <param name="TrackedOnPc">Where a goal is tracked and untracked, as INTENT (trap 35). Every
+/// control in this room writes the profile the PC is playing from, so the phone gets the
+/// sentence rather than a button that could not work.</param>
+/// <param name="Tracked">One already-worded row per goal, newest first —
+/// <c>HelperPresentation.TrackedRow</c>'s own sentence and the store's own order. The projection
+/// picks no word and no order.</param>
 /// <param name="Gaps">Answerable goals that produced nothing, each with its reason and —
 /// where the answer is a file the game writes — the command as selectable text.</param>
 /// <param name="Deferred">Selected goals whose engine does not exist yet, each naming the
@@ -123,12 +150,22 @@ public sealed record CompanionHelperSection(
     IReadOnlyList<CompanionHelperAnswer> Answers,
     string MoneyNote,
     string GearBaseNote,
+    // DRA-241: beside the base-vs-base caveat, gated on a stricter question. See the param docs.
+    string GearProcNote,
     string Cap,
     string GearWithheld,
     string GearBandRefused,
     string GearEraRefused,
     string MaterialEraRefused,
     string GearWhoWithheld,
+    // DRA-219: the quest acquisition path's three captions. Apart from `GearWhoWithheld` above
+    // for the reason it is apart from `GearWithheld` — different rules, different remedies — and
+    // on the wire at all because a refusal the PC made and the phone did not mention is the two
+    // surfaces disagreeing about what the list contains.
+    string GearQuestWithheld,
+    string GearNoSource,
+    string GearQuestOnly,
+    string GearOffHandRefused,
     string UnreadWorn,
     IReadOnlyList<CompanionHelperDoor> UnreadWornDoors,
     IReadOnlyList<string> AnchorsAllRemoved,
@@ -139,6 +176,10 @@ public sealed record CompanionHelperSection(
     string MerchantNote,
     string MerchantDoorNote,
     IReadOnlyList<CompanionHelperMerchants> Merchants,
+    string TrackedHeading,
+    string TrackedNote,
+    string TrackedOnPc,
+    IReadOnlyList<string> Tracked,
     IReadOnlyList<CompanionHelperNote> Gaps,
     IReadOnlyList<CompanionHelperNote> Deferred,
     CompanionHelperEmpty? Empty = null);

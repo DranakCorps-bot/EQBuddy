@@ -2366,3 +2366,136 @@ directory, found no repository, and died in `Get-Slices` on an unrelated
 **A script that derives its repo root from its own location must be run from its
 own location**; copy a variant into `scripts/` rather than running it from
 elsewhere.
+
+### Trap 83
+
+**A linked worktree shares its clone's `[user]` block, so one wrong identity
+mis-attributes every worktree hanging off it.**
+
+DRA-226 was filed on a measured defect: every commit on the three open DRA-216
+delivery branches was authored **and** committed as `David Edwards
+<david.edwards08@gmail.com>`.
+
+| PR | Branch | Commits | Lines |
+|---|---|---|---|
+| #712 (D4) | `claude/dra220-d4-track` | 2 | 1,104 |
+| #714 (D6) | `claude/dra222-d6-classstats` | 3 | 1,612 |
+| #715 (D3) | `claude/dra219-d3-acq` | 2 | 1,873 |
+
+Seven commits, 4,589 lines of agent-written code, under the name of the one
+person here whose signature carries release accountability. They were corrected
+before merge (`--force-with-lease`, trees byte-identical) and they were caught
+because a Planner review happened to read the commit authors. **A defect whose
+detection depends on somebody noticing is not detected.**
+
+#### The three PRs were a eighteenth of it
+
+Over `git log origin/main -600`: **126 commits carry that email** — 121 as
+`David Edwards`, 5 as `DranakCorps-bot`. **99 of them carry a
+`Co-Authored-By: Claude …` trailer**, so they are agent commits wearing the
+Founder's name, and they had been landing daily for a month. Run against their
+real ranges, the guard refuses **64 of the last 200 merged pull requests**.
+
+The commit messages are not ambiguous about who wrote them: *"DRA-84 D1: zone
+level bands from the committed cache (plan P1, instrument only)"*, *"DRA-98
+Planner: learning-loop assessment (A–G)"*.
+
+`git blame` is permanent. This is rewritable on an unmerged branch and
+**impossible after the merge**, which is the whole reason the gate is pre-merge.
+
+#### The cause: one clone, 253 worktrees
+
+`C:\Users\david\source\EQBuddy` is a dispatch lane, and its `.git/config`
+carried `David Edwards <david.edwards08@gmail.com>`. **A linked worktree does
+not get its own `[user]` block — it reads the clone's**, the same way it shares
+the clone's store (trap 82). At the time of the fix that clone had **253
+worktrees** hanging off it, in `%TEMP%`, `tmp\` and beside the source tree, on
+branches whose prefixes are exactly the lanes that came out wrong: `claude/*`
+(48 of them), `opus-dra*` (31), `fable*` (9), `sr-exec/*`. **One
+`git config --local` fixed all 253 at once.**
+
+That single shared block is also why the branch prefix looked like a lead and
+is not one. `claude/*` is the worst lane — 243 Founder-authored against 85 bot,
+where `helm/*` is 65 bot against 12 — but `sr-exec/*` carries it too: three of
+the first four historical PRs the guard was tested against (#704, #701, #700)
+are `sr-exec/*`. They are not different lanes. They are different worktrees of
+the same clone.
+
+#### What it was not
+
+Measured before theorising, and kept because each one looks like the answer:
+
+- The project checkout's `.git/config` → `dranakcorps@gmail.com`. Clean.
+- No `GIT_AUTHOR_*` / `GIT_COMMITTER_*` in the run environment.
+- Not a cloud sandbox. **All 126 are `-0500`; none is `+0000`.**
+- Not the Windows account fallback: the implicit ident is
+  `david edwards <david@David2026.(none)>`, lowercase and with the wrong domain.
+  `David Edwards <david.edwards08@gmail.com>` can only come from a config file.
+
+**`git var GIT_AUTHOR_IDENT` is the one command that ends the guessing** — and
+it has to be asked of the CLONE, not of the checkout you happen to be standing
+in.
+
+#### Why there was a wrong answer available to inherit at all
+
+`~/.gitconfig` had **no `[user]` block**, and `--system` was empty. With no
+machine default, every clone decides its own identity ad hoc and nothing
+reconciles them. A sweep of all 28 clones on the host found exactly that: 8
+carrying the Founder, 6 the bot, several carrying nothing — the control-plane
+checkout *fails closed*, `got 'david@David2026.(none)'` — and one run-scratch
+clone carrying the hybrid `DranakCorps-bot <david.edwards08@gmail.com>`, which
+is the 5-commit hybrid on `main`. Nine clones carried an explicit **local**
+`user.email` of the Founder's, two of them ephemeral scratch clones: something
+that creates workspaces writes that block, and with no default to fall back on,
+"whatever the workspace creator happened to write" *is* the identity policy.
+
+So the second layer is a machine default that a clone inherits rather than
+invents: `~/.gitconfig` now carries one
+`includeIf "hasconfig:remote.*.url:…"` rule per agent repo, pointing at
+`~/.gitconfig-dranakcorps-bot`. **Keyed on the REMOTE, not on a path** — runs
+create clones in unpredictable temp directories, so a path rule covers the
+workspaces that exist now and none of the ones a run will create tomorrow, which
+is the entire failure mode. Two properties make it safe rather than merely
+effective: **local config still wins**, so it supplies an identity where a clone
+set none and cannot override a chosen one; and **David's own repositories are
+not globbed in** — `BardsTale2026`, `MTGManager`, `FamilyCalendar`,
+`FlossworksPublisher`, `EQL-Family-UI` and `CrossStitchPatternStudio` all sit
+under the same `DranakCorps-bot` account and all legitimately carry his name, so
+the rules name the three agent repos one at a time instead of the account.
+Verified after the change: the six no-identity agent clones now answer
+`DranakCorps-bot`, a fresh clone does too in both the https and ssh spellings,
+and those personal repos still answer `David Edwards`.
+
+#### The detector, because a config fix only covers today's machine
+
+`scripts/commit-identity-guard.ps1`, on `pull_request` and in `check.ps1`. It
+reads the **EMAIL on both identities** — GitHub attributes by address, so the
+`DranakCorps-bot <david.edwards08@gmail.com>` hybrid renders as "David Edwards"
+and any name-based check waves it through; and a rebase moves the committer
+without the author, so checking one is a hole the size of the other.
+
+**The range is base..head MINUS `main`, and the `--not main` term is
+load-bearing.** History is never judged — `main` holds 126 commits this guard
+would refuse, and a permanently red gate is a gate nobody believes. The first
+draft's "main is never judged" case passed on the base term alone while the
+`--not main` term was deleted; the case that actually catches it is a branch cut
+from an OLD base that then merges a moved-on `main`, which is the ordinary shape
+of every long-running PR in this repo.
+
+**The Founder's door is the `founder-commit` LABEL, not a rule read off the
+commit.** This is the part worth arguing with, so: an agent running in his clone
+produces a commit byte-identical in identity to one he types by hand. Nothing
+*inside* the object can separate them — not the name, not the email, and not a
+`Co-Authored-By` trailer, which anything that can write a commit can also write.
+So the separation has to come from outside: a label is applied through GitHub by
+an authenticated human with write access, it admits the Founder's identity for
+that one pull request, and it still refuses everybody else. Silently banning the
+repo owner from his own repository would be a worse defect than the one being
+fixed, and it is the obvious way to get a check like this wrong.
+
+**Both fail-open paths SAY they judged nothing** (`EMPTY`, `SKIPPED`), because an
+empty range is exactly how a broken range computation reads as green — trap 74's
+lesson, one layer up.
+
+Prove-failed against six mutants, with every allow-list row exercised (trap 78: a
+dead row has no symptom).

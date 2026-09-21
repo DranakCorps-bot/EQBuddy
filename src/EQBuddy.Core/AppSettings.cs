@@ -660,6 +660,27 @@ public sealed class AppSettings
     /// </summary>
     public bool SkyGroupByIsland { get; set; }
 
+    /// <summary>
+    /// The Plane of Sky checklist ordered by how much work each reward has LEFT — the
+    /// Closest to Completion lens (DRA-218, requirements S5.1).
+    ///
+    /// <para><b>An ORDER, not a third view, and that is what makes it compose.</b> It rides
+    /// on top of whichever arrangement is on: class view reorders its groups, island view
+    /// reorders the rows inside each island (<see cref="QuestChecklistLayout.SkyByIsland"/>'s
+    /// <c>byCompletion</c>). Neither adds or removes a row, so ticks, row ids and progress
+    /// are the same objects either way. A third mutually-exclusive chip would have made
+    /// "closest" and "by island" a choice the player should not have to make.</para>
+    ///
+    /// <para><b><c>false</c> is the default</b>, for <see cref="SkyGroupByIsland"/>'s reason
+    /// and the requirements' own (S4.4): the class-oriented view a player already knows is
+    /// what they see after an upgrade.</para>
+    ///
+    /// <para>Profile-level beside its two siblings — how this player likes to read a
+    /// checklist does not change when they log in an alt — and Sky only, because an Epic
+    /// section is a stage of one quest rather than a reward you could be closer to.</para>
+    /// </summary>
+    public bool SkyClosestToCompletion { get; set; }
+
     /// <summary>Reward keys ("Class|Reward") the player has EXPANDED on a guided checklist.
     ///
     /// <para>Stored as the exception rather than the rule, and guided quests start folded:
@@ -817,6 +838,29 @@ public sealed class AppSettings
     /// </summary>
     public Dictionary<string, bool> HelperGearQuests { get; set; } = [];
 
+    /// <summary>
+    /// The gear upgrades this character has decided to go and get (DRA-216 D4, S12).
+    ///
+    /// <para><b>It is a LIST OF GOALS and not a selection, which is what makes it the one gear
+    /// key here that is written by a row rather than by a picker.</b> Every other Helper key on
+    /// this object narrows what the room answers; this one records a decision the room's answers
+    /// are no longer allowed to lose — see <see cref="TrackedUpgrade"/> for why a goal must
+    /// outlive the sweep that offered it.</para>
+    ///
+    /// <para>Per character, for <see cref="HelperGearQuests"/>' reason one key up: a level-8 alt
+    /// and a main farming raid zones are not going after the same thing.</para>
+    ///
+    /// <para><b>The item is the BASE name</b> — folded through the one seam by
+    /// <see cref="TrackedUpgradeStore.Key"/>, so a profile cannot come to hold two spellings of
+    /// one goal. The worn item beside it keeps the DUMP's spelling, "+N" and all, exactly as
+    /// <see cref="HelperWornPicks"/> does and for the same reason: it is the string on the
+    /// player's own character sheet.</para>
+    ///
+    /// <para>An empty list REMOVES the key rather than being stored, the idiom every selection
+    /// above keeps.</para>
+    /// </summary>
+    public Dictionary<string, List<TrackedUpgrade>> TrackedUpgrades { get; set; } = [];
+
     /// <summary>Color theme key (see EQBuddy.UI.Shared.ThemeCatalog); defaults to the
     /// original parchment-and-brass look so existing installs don't change on upgrade.</summary>
     public string Theme { get; set; } = "ParchmentBrass";
@@ -834,6 +878,28 @@ public sealed class AppSettings
     /// <summary>Folder of classic-format zone map files (Brewall packs and kin).
     /// Null = auto-detect the game's own maps folder beside Logs.</summary>
     public string? MapFolder { get; set; }
+    /// <summary>
+    /// **THE MAP'S TRACKED-GOAL LAYER — THE RINGS AND THE "GOING AFTER" BLOCK TOGETHER**
+    /// (DRA-216 D5, S13.3; the toggle D5's Planner review found missing).
+    ///
+    /// <para><b>Default ON</b>, because the layer's whole value is that a player who has
+    /// decided on an upgrade opens the map and the answer is already there — a default-off
+    /// display behind a control is a feature nobody finds, which is <see cref="TrackSpawns"/>'s
+    /// reason verbatim.</para>
+    ///
+    /// <para><b>It is a DISPLAY preference, and that is the point of its existing.</b> Without
+    /// it the only way to clear the layer off a small, already-busy map is to untrack the goal —
+    /// which discards the thing the tracked list exists to remember. One flag covers the rings
+    /// AND the panel AND the phone's copy, gated at the single producer
+    /// (<c>GearTargetMemo.For</c>), so no two of the three can ever disagree about whether
+    /// the layer is on.</para>
+    ///
+    /// <para>Written from the map's own toolbar, beside the other controls that belong to the
+    /// map rather than to the app (<see cref="MapFolder"/>'s precedent). The phone reads it and
+    /// offers no control for it — every control in that room would be writing the profile the
+    /// PC is playing from (trap 35).</para>
+    /// </summary>
+    public bool ShowGearTargetsOnMap { get; set; } = true;
     /// <summary>Ring diameter in DIPs.</summary>
     public double CursorRingSize { get; set; } = 46;
 
