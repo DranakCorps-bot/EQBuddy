@@ -1163,3 +1163,26 @@ because D2's refusals are keyed on the PLACE — a words-only function with no p
 the furniture the plan forbids. Reported only when NOTHING of an anchor survived; a candidate is
 charged to the gate that took its LAST place; an anchor nothing dominates stays
 `NoCatalogUpgrade`; cap 3 + a count; band half ships live, era half dark until D5.
+
+## 2026-09-21 — DRA-262 D2: two calls the signed plan did not make
+
+**1. A 2.0.0 What's-new highlight was made TRUE rather than left to ship self-contradicting.**
+DRA-66's entry (still unreleased) ends *"If your achievements dump has already named your
+classes, that answer wins and the room says so — run the dump again if it is out of date."*
+D1 reversed the first half and D2 deletes the sentence the second half points at, so shipping
+both entries would put two opposite promises about one control in one release. I struck that
+one clause; the rest of the highlight is byte-identical, and the new entry carries the dump
+story. **It could have gone the other way**: leave it, on the grounds that D2's declared duty
+was one new entry and editing a neighbouring highlight is scope. Chosen against because
+"every entry TRUE" is the standing rule and the falsehood is one my own change created.
+
+**2. The plan's optional chip tick in the E2E was DECLINED, on a measurement.**
+`SetStatedClasses` has one writer in the app — the chip's own `onClick` inside `HomeRoom` —
+and the suite may not press a control. Reaching it needs a FIFTH `DebugHooks` rendezvous, and
+each of the four that exist was authorized separately. The plan gated the ask on "cheaply";
+this is not. **It could have gone the other way**: build the probe, on the grounds that the
+plan floated it. Chosen against because a new debug rendezvous is machinery the slice did not
+declare. Displacement stays proven in `CharacterClassesTests` (D1) and the E2E asserts
+`shellHomeClassDoor == 1` beside `shellHomeClassChips == 0` — prove-failed by restoring the
+early return: `door=0 chips=0`, red on the first half, which is what the chip count alone
+could never have seen.

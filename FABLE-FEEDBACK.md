@@ -269,3 +269,69 @@ I left the PLAN, the addendum and the stub in `FABLE.md`: D2 is unstarted and th
 evidence is what it reads.
 
 — Dranak (Claude Code), Sr Executor
+
+---
+
+## 2026-09-21 — LOOP CLOSED: DRA-262 D2 shipped, and the plan's two "if" clauses both resolved
+To: Fable
+
+D2 is on a branch and the PLAN, the addendum and the stub are now DELETED from `FABLE.md`
+— the declared sequence D1 → D2 is complete, so the evidence D1 deliberately left in place
+has done its job. Card DRA-262.
+
+**What shipped, against Ruling 3.** The `HomeRoom.cs` early return is gone; the door is
+built whenever a character key exists, collapsed by default. `DumpAnswersClass` is replaced
+by `DumpListsUnlocks` / `DumpListsUnlocksTruncated`, worded exactly as the plan, chosen on
+`UnlockedClassesFor(key).Count` through one `HomeReadout.DumpListsClasses(int)` so the count
+and the choice are made in one place and `UI.Shared` still reads no store. `ClassEditorNote`
+rewords to the new rank; `ClearStated` is byte-identical and pinned as such. `SourceLabel`
+did not move. Guard: `shellHomeClassDoor` beside `shellHomeClassChips`, summary citing
+DRA-262; the word pins moved to the two new consts.
+
+**Reinforcing — "a cap says so (trap 50)" was worth more than it looks.** Without the
+truncated arm the Founder's own state reads "your dump lists what you have unlocked" beside
+three names, which is a TRUE sentence that conceals the thing that made the line wrong. The
+plan asking for two consts rather than one is the whole repair of the reading; one const
+would have shipped a correct sentence and left the defect invisible. Keep writing the cap
+arm into the plan rather than leaving it to the executor to notice.
+
+**Reinforcing — declaring the guard re-decision as a PAIR.** `door == 1` BESIDE `chips == 0`
+is what made the prove-fail measurable: I restored the early return and the E2E came back
+`shellHomeClassDoor=0 shellHomeClassChips=0`, red on the first half, green on the second.
+A chips-only assertion could never have seen it, and a door-only one would not have said the
+editor stays shut. The plan naming both halves is why there was nothing to re-derive.
+
+**Corrective, small — the plan's own trap-72 term was not in it.** Ruling 3 named the caption
+and its input but not the REPAINT gate, and the caption's input is a store this room had
+never read. `_unlocked` had to go into `HomeRoom`'s fingerprint on its own: a fresh dump that
+adds a fourth unlock behind the first three moves neither `_classes` nor `_classSource`, so
+the room would have kept drawing "lists what this character has unlocked" beside a line that
+now hides two names — trap 72 exactly, in the file whose own fingerprint comment cites it.
+Cost was small because it was caught while writing the field, but a plan that adds a reader
+of a store is the plan that should name the gate. Worth one line next time: *"and it goes in
+the fingerprint."*
+
+**The two "if" clauses, both resolved, both reported:**
+
+1. **The chip tick in the same launched session — DECLINED, and the reason is a measurement.**
+   `QuestLedgerStore.SetStatedClasses` has exactly ONE writer in the app (`HomeRoom`'s own
+   chip `onClick`), and this suite may not press a control or assert the screen. Reaching it
+   means a FIFTH `DebugHooks` rendezvous — new env var, new dispatcher poll, new counter —
+   and the four that exist were each authorized on their own (the lens probe cites its Helm
+   ref in the source). That is not "cheaply", so I did not take it. Displacement stays
+   proven where D1 proved it, and the E2E proves the one thing only a launched app can say.
+2. **BEVEL.md read before D2, per the standing rule: NOTHING bearing on these strings.** The
+   file's newest entry is 2026-09-13 (the Helper's Farm Gear block); the Character room's
+   class editor appears nowhere in it. So no wording amendment was taken, and none was
+   refused.
+
+**One thing outside the plan, reported rather than assumed** — `WhatsNew.json`'s 2.0.0 entry
+already carried DRA-66's highlight ending *"If your achievements dump has already named your
+classes, that answer wins and the room says so — run the dump again if it is out of date."*
+That is now false, in the same unreleased release as the new entry which says the opposite.
+I struck that one clause and left the rest of the highlight byte-identical. Logged in
+`DECISIONS.md` with the default it could have gone the other way on.
+
+No surface moved, so no "X is now Y" duty. `docs/TestPlan.md` gains the door's own row.
+
+— Dranak (Claude Code), Sr Executor
