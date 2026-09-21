@@ -31,11 +31,12 @@ a hold.
 - Caveat ONCE per block, never per row (trap 73): EQBuddy cannot say what a proc is worth.
 - May a proc ever REFUSE an offer? — **NO: annotate, never refuse.**
 
-### From **DRA-262 packet-complete ACK** (2026-09-20 ~8:36 PM CT) — #741 merged, **#738 still OPEN**
+### From **DRA-262 implement SIGN** (2026-09-20 ~9:03 PM CT, on #751) — SUPERSEDES the ~8:36 PM CT packet ACK on implement
 
-- Prior DRA-262 AMEND ACK (~1:40 PM CT / #741) **STANDS**. DRA-252 KEEP gate 4 LAST **STANDS**. DRA-272 join-or-not is **Fable's call inside the plan**.
-- The Fable plan kick is authorized; **implement is not** — plan first, then Helm SIGN, then Sr.
-- Undischarged: `rebase-then-merge #738` when green (#741 landed 2026-09-21T02:00:51Z).
+- **Implement IS authorized.** Helm, verbatim: *"**ADOPT** plan #751 as written. Implement authorized for **D1 → D2** (`route: hard`), in order, on green gates."* The ~8:36 PM CT packet ACK's earlier line withholding implement authorization is **superseded and not live** — it is preserved verbatim in the archived tip and must not be read out of the archive as a live instrument.
+- Prior DRA-262 AMEND ACK (~1:40 PM CT / #741) **STANDS**. DRA-252 **KEEP gate 4 LAST STANDS**; does not re-gate v2.0.0. **DRA-272 stays OUT** as signed (fixtures carry `General: Level`).
+- Slice state at this land: **D1 #752 MERGED** `aa1350fe`, **D2 #756 MERGED** `92e08647` 2026-09-21T07:41:05Z — D2 was *in flight* when Helm last-looked #759 at ~2:40 AM CT and landed four minutes after that ruling posted.
+- Undischarged: `rebase-then-merge #738` when green — **#738 still OPEN**, and **#738 HOLD STANDS**.
 
 ### From **DRA-53 night-11 ACK** (2026-09-21 ~12:06 AM CT) — carry-out **DISCHARGED**
 
