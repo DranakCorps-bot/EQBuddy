@@ -10,6 +10,22 @@ Live Holds empty. Play Console OFF. Not needs-david. Soft: merge this tip when C
 
 ---
 
+## 2026-09-21 ~1:56 PM CT — RULE / DRA-291 / ops PR #51 — Challenger charter SPEC
+
+**Last look: ADOPT SPEC as written** (`purpose/CHALLENGER_ROLE_CHARTER.md` @ `41b0e5a9`). Soft LEAVE inventing the seat. Soft LEAVE inventing Grok Bot / Hermes profile / Claude kick for standup / product `src` / Play / Desktop / implement. Founder SIGN still required; Soft LEAVE inventing paging Founder tonight (§9 rule 12).
+
+**Q1 — ADOPT ops `purpose/` home.** Card's `FABLE.md` destination is superseded by DRA-287 + ceiling + org doctrine. Soft LEAVE inventing pasting into `FABLE.md`. No FABLE index pointer required for SPEC.
+
+**Q2 — KEEP both names; collision HARLESS.** `CURRENT_ORG.md` line 88 `challenger` = A′ / seat-mutex claim category. Role **Challenger** = Red Team. Soft LEAVE inventing renaming the role. Soft LEAVE inventing a T2 `CURRENT_ORG.md` mutex rename. Charter §2 distinction STANDS.
+
+**Q3 — ADOPT measurement gate before seat.** Soft/Planner tokenize doctrine + representative plan (`max_tokens: 1`, read `usage.prompt_tokens`) vs 65,536 combined wall / ~40k–49k session floor; post the number on DRA-291. Soft LEAVE inventing the seat until that measurement is on the card. If unfit: Soft files amended plane on the same card before Founder SIGN — still under Planner; Soft LEAVE inventing Anthropic API; Soft LEAVE inventing a Grok Bot. Soft LEAVE inventing auto-switching without recording the fail. §6.1 Jr Executor adapter error is a separate EXO-HARDEN defect Soft may file; it does not block charter ADOPT, but it blocks Qwen Challenger dispatch until that plane can run.
+
+Ops comment: https://github.com/DranakCorps-bot/dranakcorps-ops/pull/51#issuecomment-5765865379
+
+Live Holds empty. Play Console OFF. Not needs-david tonight. Soft: tip-merge when CI green; discharge Paperclip DRA-291 `ask_user_questions` 73f6cbf3.
+
+---
+
 ## 2026-09-21 ~1:40 PM CT — RULE / DRA-282 / PR #772 — WARN band N=3; (c) 50% floor
 
 **Q1 — ADOPT (ii) N=3.** WARN when remaining band ≤ max(2% of 65,536, 3 × median append). One-median-append as the binding band is **REJECTED** — it is one append of warning, and seats move on heartbeats. Soft **DRA-284** implements the WARN path in `scripts/channel-size-guard.ps1` (today exit 1 / exit 0 only). Soft LEAVE inventing weekly; Soft LEAVE inventing moving files between arms; Soft LEAVE inventing days-of-green for this ask.
