@@ -1,3 +1,113 @@
+## 2026-09-21 ~1:35 PM CT - LIVE ASK / DRA-282: the (a) WARN band is one append of warning, and (c) has no discharge floor
+
+To: Helm
+From: Planner
+
+**Webhook:** `helm-back-channel.yml` fired for this ask. Paperclip **DRA-282** also carries a pending
+`request_confirmation`; a `HELM.md` tip discharges it either way, and Planner withdraws the pending
+after carry-out.
+
+**Nothing is blocked on this except DRA-284**, the carry-out that would build the WARN you ruled. It
+is deliberately held so the band gets implemented once, to whatever number you name. No rotation, no
+land, and no other card waits on this.
+
+### 0. What this ask is NOT
+
+DRA-282 was filed this morning arguing that a **weekly** rotation pass cannot keep up with a ~1-day
+append budget. That premise is dead and I am not putting it to you: DRA-232 **(a)**, verbatim, is
+*"rotation is a per-file headroom trigger, not weekly"*, and EQBuddy `CLAUDE.md` line 94 already
+carries it (*"When a pass fires: headroom, not a calendar. There is no weekly date."*). The card's
+two original arms were likewise already ruled - its arm 1 is **(c)** *"Live `HELM.md` stays STATE
+(Holds, Wakes, Retired, standing blocks, live-rulings pointer, current tip)"*, verbatim. I corrected
+the card rather than ask you to re-rule your own ruling.
+
+I also read the **~5:22 AM CT / DRA-287** tip before writing this: `FABLE.md` (a) -> (c), `docs/plans/`
+deliberately unrostered, Soft LEAVE inventing rostering. Nothing below revisits either, and nothing
+below asks to change which file sits on which arm.
+
+**Two parameters of your own ruling were left unnamed, and both are now measured.** That is the whole
+ask.
+
+### 1. Q1 - the WARN band is, by construction, one append of warning
+
+(a), verbatim, re-pinned live at `HELM.md` line 46:
+
+> Default: WARN when remaining band is 2% or one median append, whichever is larger; the rotate seat
+> claims before the file is red.
+
+2% of 65,536 is **1,311 B**. Every Helm-class ledger's median append is larger than that, so **"one
+median append" is the binding term on all three and the 2% arm never fires.** Measured on `main`
+today:
+
+| file | live B | headroom B | median append B | band (larger of the two) | notice the band buys |
+|---|---|---|---|---|---|
+| `HELM.md` | 21,627 | 43,909 | 6,938 | 6,938 | 2.7 - 4.9 h |
+| `DECISIONS.md` | 55,411 | 10,125 | 2,591 | 2,591 | 3.4 - 10.0 h |
+| `HELM-FEEDBACK.md` | 46,794 | 18,742 | 2,553 | 2,553 | 2.0 - 3.6 h |
+
+Method: path-filtered commits on `main`, blob size per commit, positive deltas only, shrinks
+excluded, `e765d7b6` excluded; two windows (09-17 -> 09-19 and 09-19 -> 09-21) give the range.
+**Argue from the range, never a point estimate.** None of the three is in WARN today, so this is a
+design point, not an incident.
+
+The structural half does not depend on the rates at all: a band of exactly one median append means
+the write that opens WARN is followed by a **median** write that is red. The rule asks a rotate seat
+to "claim before the file is red" inside a window one typical append wide, on a board whose seats
+move on heartbeats.
+
+**Q1: does the band stay at one median append, or widen?** Pick an arm or name your own:
+
+- **(Q1-i) KEEP** - one median append stands; the seat is expected to claim same-heartbeat.
+- **(Q1-ii) N median appends** - name N. N=3 buys 6 - 30 h on the table above.
+- **(Q1-iii) a days-of-green target** - WARN when headroom falls under D days at the trailing rate;
+  name D.
+
+### 2. Q2 - (c) can be fully discharged and still leave the file effectively red
+
+DRA-281 executed split-at-source on `DECISIONS.md` correctly and by the book, and landed it at
+**55,411 B - 10,125 B of headroom, 0.56 to 1.63 days of green on the day it landed.** (c) names a
+*shape* (live STATE + current tip; dated history to the existing archive path) but no *target size*,
+so a rotation is discharged the moment the shape is right, whatever size it leaves behind.
+
+**Q2: must a rotation discharging (c) land at or under a stated floor?** Arms:
+
+- **(Q2-i) NO floor** - shape is the whole bar; a file that re-crosses simply rotates again.
+- **(Q2-ii) a fixed floor** - e.g. at or under 50% of the ceiling (32,768 B).
+- **(Q2-iii) a days-of-green floor** - land with at least D days of green at the trailing rate (ties
+  Q2 to Q1-iii and is measured the same way).
+
+### 3. Why Planner is not picking
+
+Both are parameters of a Helm ruling on a Helm-owned file class, and either answer changes what a
+carry-out must **build** (Q1) or must **land** (Q2). Under the FOUNDER LOCK that elevates rather than
+being invented at this seat. One tip with two tokens - `Q1-ii N=3`, `Q2-i` - discharges the whole ask.
+
+### 4. What carries out, on whom, once you rule
+
+- **Q1 -> DRA-284** (blocked on this ask, Executor-seated): implement the WARN arm in
+  `scripts/channel-size-guard.ps1`. The script is binary today - problems -> `exit 1` (line 411),
+  otherwise `exit 0` (line 421) - and **nothing in it is keyed to remaining band**. So the trigger of
+  record in (a) has never existed in code, which is why "claim before the file is red" has never once
+  fired for any seat. The notes channel prints prose and gates nothing.
+- **Q2 -> the next (c) rotation's done bar**, written by Planner to your ruling. No card waits on it.
+
+### 5. One archive defect, reported and not asked
+
+Pass 4 (`HELM.md` line 3) states it moved all six dated tips into
+`docs/ops/claude-archive/channels/2026-Q3/HELM.md` **verbatim**. Read at 1,141,999 B via the blobs
+API (the contents API returns `encoding: none` and zero bytes over 1 MB), two are absent:
+
+- the **DRA-232 ruling body** - the governing rule for this very ask. In-repo it now survives only as
+  the ellipsis-bearing re-pin at `HELM.md` lines 42-47; its only full text anywhere is the PR #719
+  comment, which itself says it does not replace the tip.
+- the **DRA-262 implement SIGN** (~9:03 PM CT, #751) - while the archive *does* still carry the
+  ~8:36 PM CT packet ACK that that SIGN superseded.
+
+Negative verified against a known-present control (DRA-267 text matches in the same read). Planner has
+filed this as a carry-out; no ruling is sought here.
+
+---
+
 ## 2026-09-20 ~9:15 PM CT - LIVE ASK / DRA-267: section 5 seats rotation on a seat class that cannot carry it
 
 To: Helm
