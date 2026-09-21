@@ -46,21 +46,19 @@
     # HELM.md and HELM-FEEDBACK.md left this table on 2026-09-18, discharged by the DRA-154
     # rotation that took them to 25,411 B and 4,730 B - the first rotation of the HELM.md
     # class. Rows only ever leave, and they leave in the pull request that earns it.
-    # Rotated 2026-09-20 by DRA-231 (DRA-144 F6): 676,431 B -> 85,238 B, into
-    # channels/2026-Q3/DECISIONS.md. A date cut at 2026-09-17 with a hand-triaged floor:
-    # of the 30 older blocks a coarse LIVE ASK / PARK / HOLD / STANDING sweep flagged, 24
-    # were dispositioned as closed and moved, and 6 that carry something genuinely open
-    # were kept at any age. The first cut of this rotation landed 81,798 B and was wrong by
-    # 3,440: that coarse sweep has no LIVE ASK / PARK / HOLD / STANDING marker to flag an
-    # `exo-experiment:` tag, so all six of them rotated out from under a generator and three
-    # tests that read them from the LIVE file. The tags are re-pinned verbatim, which is what
-    # the never-rotate floor asks for and why this row is 85,238 and not 81,798.
-    # Still 1.3x over policy, so this row is LOWERED and KEPT: check C discharges a row only
-    # at 64 KiB or less, and no legal cut reaches the ceiling while that floor stands. The
-    # 10% band this buys is 8,523 B - about a quarter of one median day's append
-    # (32,231 B/day measured 2026-09-10..19).
-    # That the ceiling and the band cannot both hold this file is DRA-144 F8's subject.
-    'DECISIONS.md'       = 85238
+    # DECISIONS.md left this table on 2026-09-21, discharged by the DRA-281 rotation
+    # (DRA-144 F8 / DRA-246 re-seat): 86,981 B -> 55,411 B, into channels/2026-Q3/DECISIONS.md.
+    # DRA-231's 2026-09-20 cut (row LOWERED to 85,238, not deleted - see the BEVEL.md note
+    # below for why a lowered row differs from a deleted one) kept a date-cut floor of
+    # 2026-09-17 plus 6 older blocks (2026-09-11..09-16) its coarse sweep called genuinely
+    # open. DRA-281 re-triaged those 6 by hand rather than trusting the label: DRA-57's LIVE
+    # ASK reads answered in its own text, DRA-106's LIVE ASK to Helm closed per the archived
+    # `HELM-FEEDBACK.md` LOOP CLOSE entry, DRA-71's and DRA-65's PARKs are tracked live in
+    # `FABLE.md` (not in this file, so archiving the DECISIONS.md report of them loses
+    # nothing the never-rotate floor protects), and DRA-84's D3-scoped un-PARK note is
+    # superseded now that D4/D5 already ran. All 6 (31,937 B) moved; this row is DELETED
+    # rather than lowered, same as BEVEL.md below - 55,411 B is under the ceiling so the
+    # ceiling arm governs this file now with no band at all.
     # 7x over. Never rotated. Shrinks for real once plans move to docs/plans/DRA-nn.md.
     'FABLE.md'           = 478113
     # BEVEL.md left this table on 2026-09-20, discharged by the DRA-258 rotation
@@ -70,8 +68,8 @@
     # block and walks past it, which is how this file survived every prior pass. The cut
     # was made at h3 INSIDE the container; the container heading stays live with a pointer
     # to the archive, and the orientation notes under it are undated and still current.
-    # This row is DELETED rather than lowered, which is the difference from SCRIBE.md and
-    # DECISIONS.md above: check C discharges a row the moment the file reaches 64 KiB or
+    # This row is DELETED rather than lowered, which is the difference from SCRIBE.md
+    # below: check C discharges a row the moment the file reaches 64 KiB or
     # less, and 60,352 B is under the ceiling, so the ceiling arm governs BEVEL.md now and
     # it has no tolerance band at all. That is a known cost, not an oversight - at the
     # measured 16.4 KB/day this file is back over policy in well under a week, and check B
