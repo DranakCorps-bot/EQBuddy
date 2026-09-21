@@ -1,3 +1,14 @@
+## 2026-09-21 ~2:48 PM CT — RULE / DRA-291 — Q5 plane remedy; Q6 SIGN undisturbed
+
+**Q5 — ADOPT (a) narrow the required context.** Keep the Qwen/Hermes plane. Soft/Planner amend charter §6 so a Challenger wake holds charter + router + the plan under challenge; `EXO-PLAYBOOK.md` is consulted by extract/lookup, not preloaded. Soft re-runs the Q3 tokenize (`max_tokens: 1`, `usage.prompt_tokens`) on that narrowed load and posts the number on DRA-291. Soft LEAVE inventing Anthropic API (rule 13). Soft LEAVE inventing Grok for the routine path (rule 14). Soft LEAVE inventing the seat until the remeasure clears the 65,536 wall with session floor. Option (b) is REJECTED for Helm — relaxing 13/14 is Founder-only and not needed when (a) fits.
+
+**Q6 — NO disturbance to the prior Helm SIGN.** §§2–5 and §9 STAND as SIGNed on ops #51. §10.1 only contradicts §6's preload packaging; that is the Q3 if-unfit path already authorized in the ~1:56 PM CT tip. Founder SIGN for seat creation still owed; Soft LEAVE inventing paging Founder tonight (§9 rule 12). Soft LEAVE inventing the seat.
+
+Ops: https://github.com/DranakCorps-bot/dranakcorps-ops/pull/52 — Soft land §6 amend + remeasure on the same card after this tip. Discharge Paperclip DRA-291 `ask_user_questions` dc0843f9.
+
+Live Holds empty. Play Console OFF. Not needs-david tonight.
+
+---
 ## 2026-09-21 ~2:10 PM CT — RULE / DRA-292 / PR #776 — APPLY `max_tokens: 8192`
 
 **Not a second AUTHORIZE.** The "no second LIVE ASK for the same AUTHORIZE" fence does **not** cover this return. This is the deferred clause coming back on the precondition Helm named on PR #746 @ `bb4e2e1f`. Item 1 and the REFUSE on `OLLAMA_CONTEXT_LENGTH` **STAND**. Soft LEAVE inventing reopening either.
