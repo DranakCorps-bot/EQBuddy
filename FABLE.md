@@ -1,3 +1,94 @@
+## 2026-09-21 — ADDENDUM from Planner (DRA-262): the Founder answered, and it closes the fork in the stub below — the dump is an unlock HISTORY, not a roster
+
+To: Fable
+
+**This AMENDS the 2026-09-20 stub immediately below; it does not replace it.** Read that
+entry first — the two code defects, the "why it cannot be an executor edit" argument, the
+guard at `ShellHostTests.cs:778` and the done bar are all still exactly as written. What
+changes is the one thing I told you was open and that I was holding: the INPUT arm.
+
+**The Founder answered, on DRA-262 at 2026-09-21 01:13Z (8:12 PM CST), testing the build on
+his desktop:** *"I just tested this a few minutes ago on Dranak — It should show my class is
+WAR / CLR / ENC and my level should be 25. So level and class are not capturing correctly."*
+
+His screen reads **Paladin · Warrior · Druid**. He is **Warrior · Cleric · Enchanter**. One
+of the three overlaps. (The interaction I had pending expired at that moment with
+`expirationReason: superseded_by_comment`, so the comment is its answer.)
+
+### What that settles, and it is the fork you were handed
+
+Signed plan **DRA-66 D3** rests on a premise written out at length in
+`CharacterClasses.cs:67-76`: *a player who disagrees with their dump has a stale dump.* That
+premise is the whole reason a statement may only UNION with a dump-sourced list and never
+displace it, and it is why **D4** collapses the editor to `HomeReadout.DumpAnswersClass` —
+*"run it again below if it is out of date."*
+
+**His character measures that premise false.** Re-running the dump yields the same three
+names forever, because the list EQBuddy reads is every class he has ever UNLOCKED. No re-run
+corrects it; no union expresses the correction either, because a union only widens and the
+list is already at `CharacterClasses.Max` = 3.
+
+So *"may a statement DISPLACE a dump-sourced class, or only union with it?"* is no longer
+two-sided. Keeping D3 now means EQBuddy goes on naming two classes he is not, with a repair
+sentence pointing at a dump re-run that cannot help. **I am not deciding it for you** — the
+words, the source label and the shape are yours. I am telling you the evidence the decision
+rests on has moved, so you do not spend the plan re-arguing a question the Founder has
+already closed.
+
+### Measured against the committed dumps, not inferred
+
+`tests/fixtures/achievements/averaj.txt` carries all **16** class rows under
+`Untapped Potential: Classes` — every one spelled `Primary Class Unlock - X`, listed
+**alphabetically**, 3 complete / 13 incomplete. `hateborne.txt` is the same shape, 2
+complete / 14. Two consequences, both of which the plan should name:
+
+1. `AchievementsImport.UnlockedClasses` returns *every class unlocked, alphabetically*, and
+   `Resolve` truncates at 3. **The truncation is alphabetical luck, not a tie-break** — a
+   player who unlocks four gets whichever three sort first, presented as the game's own
+   statement.
+2. The doc comment's *"primary first, then the rest in dump order"* describes a split that
+   **never fires on a real dump**: every row contains "Primary Class Unlock", so `rest` is
+   empty in both fixtures. An unmeasured code path inside the function that decides who the
+   character IS.
+
+**One anomaly I cannot close from here, and it may shrink the whole slice.** Alphabetically
+his three would read Druid · Paladin · Warrior; his screen reads Paladin · Warrior · Druid.
+**His dump is shaped differently from both committed ones.** If that shape marks which
+classes are ACTIVE rather than merely unlocked, this is a wrong-rows bug in
+`UnlockedClasses` and not a precedence change at all — the cheapest possible outcome, and it
+would leave D3 and D4 standing. I have asked him for the section (Paperclip interaction
+`b698bd69`, pending as of this writing) and I will carry it to you the moment it lands.
+**Plan the precedence arm on the assumption it does not**, and treat a marked-active dump as
+the happy path that makes the plan smaller.
+
+### The level half is DRA-272 and you should say whether it joins this plan
+
+He reported class and level in one breath about one screen; they are separate mechanisms and
+I filed the level half as its own card. There is exactly **one** level source in the whole
+parser — `LogParser.cs:265`, the ding line. No `/who` self-line regex exists, his own
+committed bag dump (`tests/fixtures/inventory/dranak.txt`) carries no level, and the
+achievements dump carries none. So EQBuddy learns a level only by WITNESSING a ding, and a
+level-25 character who has not dinged since install never catches up.
+
+The level editor IS reachable — that half is not broken — and `LevelReadout.Unknown` already
+anticipates the case in its own words. **If the answer turns out to be that no standing
+source exists, DRA-272 belongs in THIS plan**, because both rows are then the same question
+("what does this room say when the game's evidence is wrong or missing") one above the other
+on one screen. If a dump or log line does state a level, it is a separate V1 and none of your
+time. Your call, and it is a real one.
+
+### Authorization state, unchanged
+
+**Helm ACK'd the DRA-262 amendment 2026-09-20 ~1:40 PM CT** (PR #741 / #740 comment):
+implement is **NOT authorized**, the route is plan → Helm SIGN → Sr Executor, DRA-262 does
+**not** re-gate the release, and Soft may kick you on this stub now that #740 is on `main`.
+That ACK pre-dates the Founder answer above, but it asked no question this changes. Nothing
+here is authorization, and this addendum is not a SIGN.
+
+— Dranak (Claude Code), Planner
+
+---
+
 ## 2026-09-20 — STUB from Planner (DRA-262): the Character room's class editor is unreachable once the achievements dump has answered — and a statement could not change the answer anyway
 
 To: Fable
