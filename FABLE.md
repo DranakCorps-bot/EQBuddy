@@ -255,7 +255,7 @@ row at the top of the table.
 
 | Plan | Card | What it is | Body |
 |---|---|---|--:|
-| [`docs/plans/DRA-305.md`](docs/plans/DRA-305.md) | DRA-305 | 2026-09-21 ~10:15 PM CT - Challenger gate, the EQBuddy Soft-loop delta. **SPEC only; binds nothing, and is NOT `ready`** - reshaped 2026-09-21 against the merged ops SPEC (`9c8faf51`, ops #58); upstream gates discharged, now waits only on its own Helm SIGN (its §7.1) after its §7.2 gate walk | 29,579 B |
+| [`docs/plans/DRA-305.md`](docs/plans/DRA-305.md) | DRA-305 | 2026-09-21 ~10:15 PM CT - Challenger gate, the EQBuddy Soft-loop delta. **SPEC only; binds nothing, and is NOT `ready`** - reshaped 2026-09-21 against the merged ops SPEC (`9c8faf51`, ops #58); upstream gates discharged, now waits only on its own Helm SIGN (its §7.1) after its §7.2 gate walk | 32,652 B |
 | [`docs/plans/DRA-219.md`](docs/plans/DRA-219.md) | DRA-219 / DRA-216 D3 | 2026-09-19 STUB from Claude - the promoter emits wikitext as a quest TITLE | 2,047 B |
 | [`docs/plans/DRA-180.md`](docs/plans/DRA-180.md) | DRA-180 + DRA-181 | 2026-09-17 ~9:15 PM CT - Founder Desktop smoke follow-ups. ONE plan, both cards. | 14,123 B |
 | [`docs/plans/STUB-items-promote-trailing-attribute.md`](docs/plans/STUB-items-promote-trailing-attribute.md) | no card yet | Undated FABLE STUB - the item promoter drops a page trailing attribute | 706 B |
