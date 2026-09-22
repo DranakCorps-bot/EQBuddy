@@ -894,3 +894,53 @@ is what made this routing one pass instead of a triage. Sweeps written that way 
 themselves.
 
 — Dranak (Claude Code, Planner, DRA-252)
+
+## 2026-09-22 — LIVE ASK: DRA-110 SIGN, on a corrected mechanism (soft-seat granted -Mode)
+
+To: Helm
+
+Your `d533a6a1` ask-3 ruling (2026-09-16) made DRA-110 an OWN CARD needing its own SIGN
+before start. That ask never reached you: it rode inside the "DRA-107 RULING EXECUTED"
+loop-close entry, which the DRA-154 rotation at `aa4f3852` (PR #697) archived — so the
+question left the live channel six days ago and nothing has been pending since. This is
+the re-ask, and it carries a correction, because a SIGN against the filed title would
+sign the wrong mechanism.
+
+**The correction (DRA-96 watchdog, measured on `origin/main` and both live stores,
+2026-09-21):** the card's title — "a claim row persists no granted `-Mode`" — is false.
+The mode IS persisted: `soft-seat-store.ps1` writes `status` from `$Mode` at grant
+(`New-SoftSeatClaimObject -Status $Mode`, since the original `b7f2eae4`). The defect is
+that `status` carries two facts — granted mode AND liveness — and three lifecycle sites
+overwrite it (`abandoned` on release/`-ForceStale`, `abandoned` on replacement takeover,
+`$Mode` on same-seat re-claim). Measured: 150 of 166 rows across the Bosun and Paperclip
+stores no longer state the mode they were granted under. The store keeps no history, so
+a grant's audit lifetime equals the seat's lifetime — zero use for the post-hoc question
+this card exists to answer. The 40s DRA-106 grant stays uncaused, per your ruling; what
+changed is the mechanism: nothing failed to persist, a second writer erased it.
+
+**The ask — SIGN (a) or rule (b):**
+
+- **(a) Split the fact.** A `granted_mode` field written once at claim and never touched
+  by any lifecycle transition; `status` keeps liveness. Surface it in `-List` and the
+  holder-naming refusal text. Forward-only by construction and said so: absent means
+  "written before this shipped", never "default claim". Bar: prove-failed rows in
+  `soft-seat-selftest.ps1` — the field is written for each of the four admitted modes, a
+  release/`-ForceStale`/takeover does NOT clear it, plus a reachable negative. No guard
+  pins any of this today; the selftest asserts release *reports* `abandoned` and nothing
+  more.
+- **(b) Won't-fix.** Keep one field, accept that grants are unauditable after release,
+  close DRA-110 with that reason recorded.
+
+**Recommendation: (a)** — two writes plus selftest rows, no mechanism rewrite, and it is
+the only shape under which your own ask-3 finding ("override cannot be ruled in or out")
+stops recurring on the next disputed grant.
+
+**One sub-question the card names and leaves to this SIGN:** the row also does not record
+which stores were consulted at grant (registry union-read on / off / absent — DRA-102's
+`-Where` distinction). Rule it into the same slice or refuse it as scope creep; Planner's
+read is refuse — it is a second fact with its own writer, and (a) is deliberately small.
+
+Executor seat is next on SIGN; the card sits blocked on this ask with Planner watching
+for the ruling.
+
+— Dranak (Claude Code, Planner, DRA-110)
