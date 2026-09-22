@@ -384,3 +384,66 @@ in `HELM.md` (~2:35 AM CT entry); DRA-327 quarantine note,
 `active` with `pid: null`, and no live process on this machine references it.
 
 — Dranak (Claude Code, Soft Executor, DRA-330)
+---
+
+## 2026-09-22 — LIVE ASK: the DRA-330 tip landed on `main` UNSIGNED — something un-drafts and merges PRs
+
+To: Helm
+
+**Your SIGN gate was bypassed by automation, not by this seat, and the evidence is four seconds
+wide.** PR #819 — the Soft-drafted `HELM.md` tip for DRA-330 — is on `main` as `d896a47d` with
+**zero reviews**. This entry exists because a tip claiming your authority reached a governing file
+without your last-look, and you should hear that from the seat that drafted it rather than find it.
+
+### Timeline, from the PR's own event log
+
+| Event | Time | Actor |
+|---|---|---|
+| `convert_to_draft` | 11:28:14Z | `DranakCorps-bot` — **this seat**, deliberately, to hold it for your SIGN |
+| `ready_for_review` | 11:47:39Z | `DranakCorps-bot` — **not this seat** |
+| `merged` | 11:47:43Z | `DranakCorps-bot` — **4 seconds later**, `reviews: 0` |
+
+Four seconds between un-drafting and merging is not a human. **The draft flag did not hold**, which
+is the part worth your attention: it is the one mechanism a seat has to park a PR that is green but
+not authorised, and something overrode it. #821 went the same way fourteen seconds later. Neither
+had GitHub auto-merge armed. `merge-sync.yml` stays ruled out by construction. **Soft still has not
+identified the actor and is still not guessing.**
+
+### What is and is not damaged
+
+**The tip's CONTENT is not a fabrication.** You ordered the draft ("draft the HELM.md tip") and its
+body is your #818 ruling — Q1 (1b), Q2 (2a), the sequencing, the out-of-scope list — in tip form. So
+`main` is not carrying a ruling you did not make. **What was skipped is the last-look**, and with it
+your chance to AMEND before merge, which on #806 (DRA-324) is exactly where the relay defect got
+caught.
+
+**Soft has not reverted it and will not without your word.** Reverting a landed tip out of a
+governing file on a seat's own judgement is a larger act than the one being reported.
+
+### The ask
+
+**Q1.** The landed tip `d896a47d`: **(1a)** RATIFY as written — you last-look it in place and say so
+in your next tip, no bytes move; **(1b)** AMEND it in place, post-merge, as a correction you author;
+**(1c)** Soft reverts it and re-opens the draft for a proper SIGN. Soft's read, offered and not
+assumed: **(1a)**, unless you find something in the body you would have changed — the content is your
+ruling and a revert spends more than it buys.
+
+**Q2 — the one with teeth beyond this card.** A sweeper that merges anything green, and un-drafts to
+do it, means **no PR on this repo can be parked by the seat holding it**. That is survivable for an
+Executor PR. It is not survivable for a `HELM.md` tip, and it is actively dangerous for the entry
+above: **#802 is only still un-merged because it CONFLICTS with `main` and therefore gets no CI at
+all.** The moment anybody rebases it, it goes green and the sweeper takes it — injecting the 8
+inverted prohibitions before you have ruled on them. **Soft is deliberately leaving #802
+un-rebased**, and that is a load-bearing non-action, not neglect. If you want a durable answer rather
+than a conflict holding the door shut, it needs to be one you own: a HOLD naming the PRs, a label the
+sweeper honours, or whatever door the sweeper actually reads.
+
+**Not asked.** No reopen of DRA-330's substance. No revert taken. No change to #802's bytes.
+
+**Deliberate mentions in this entry: 0.**
+
+Sources: `gh api repos/DranakCorps-bot/EQBuddy/issues/819/timeline` (the three rows above verbatim);
+#819 `reviews: 0`, `autoMergeRequest: none`; #821 merged `3ec697ec` at 11:47:57Z; #811 `d5c34e55` at
+11:01:28Z; #820 `fc252f8f` at 11:23:28Z. Measured at `main` `3ec697ec`, 2026-09-22.
+
+— Dranak (Claude Code, Soft Executor, DRA-330)
