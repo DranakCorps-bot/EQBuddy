@@ -841,9 +841,9 @@ public sealed class LandingSourceClaimsTests
     /// band itself is now four measured stats, in order, painted from
     /// <c>site/metrics.json</c>: Quests Tracked, Items Cataloged, Downloads,
     /// Max Concurrent Users. Downloads are installer downloads of
-    /// <c>EQBuddySetup.exe</c>, and the concurrent tile stays an em dash while
-    /// <c>maxConcurrentUsers</c> is null — a number there would be a figure nobody
-    /// has published. The catalog counts are the arrays themselves, so a refresh
+    /// <c>EQBuddySetup.exe</c>, and the concurrent tile shows "Telemetry not live yet"
+    /// while <c>maxConcurrentUsers</c> is null — a number there would be a figure
+    /// nobody has published. The catalog counts are the arrays themselves, so a refresh
     /// that moves the file without moving the JSON goes red here.
     /// </summary>
     [Fact]
@@ -871,11 +871,13 @@ public sealed class LandingSourceClaimsTests
         var concurrentScope = metrics.GetProperty("scope").GetProperty("maxConcurrentUsers").GetString();
         Assert.NotNull(concurrentScope);
         Assert.Contains("opt-in", concurrentScope, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains(PendingConcurrent, concurrentScope, StringComparison.Ordinal);
+        Assert.DoesNotContain("em dash", concurrentScope, StringComparison.OrdinalIgnoreCase);
 
         var js = File.ReadAllText(Path.Combine(Repo, "site", "assets", "js", "landing.js"));
         Assert.Contains("metrics.json", js, StringComparison.Ordinal);
         Assert.Contains(
-            """if (value === null || value === undefined) return "\u2014";""",
+            """if (key === "maxConcurrentUsers" && (value === null || value === undefined)) return "Telemetry not live yet";""",
             js,
             StringComparison.Ordinal);
         Assert.DoesNotContain("28462", js, StringComparison.Ordinal);
@@ -924,15 +926,17 @@ public sealed class LandingSourceClaimsTests
               "maxConcurrentUsers": 128
             }
             """);
-        var inventedBand = MeasuredBand.Replace(">—</div>", ">128</div>", StringComparison.Ordinal);
+        var inventedBand = MeasuredBand.Replace(
+            $">{PendingConcurrent}</div>", ">128</div>", StringComparison.Ordinal);
         var inventedBad = HeroKpiViolations(inventedBand, invented.RootElement);
         Assert.Contains(inventedBad, v => v.Contains("fabricated integer", StringComparison.Ordinal));
-        Assert.Contains(inventedBad, v => v.Contains("em dash", StringComparison.Ordinal));
+        Assert.Contains(inventedBad, v => v.Contains(PendingConcurrent, StringComparison.Ordinal));
 
         using var unpublished = JsonDocument.Parse(ShippedMetricsJson);
-        var zeroBand = MeasuredBand.Replace(">—</div>", ">0</div>", StringComparison.Ordinal);
+        var zeroBand = MeasuredBand.Replace(
+            $">{PendingConcurrent}</div>", ">0</div>", StringComparison.Ordinal);
         var zeroBad = HeroKpiViolations(zeroBand, unpublished.RootElement);
-        Assert.Contains(zeroBad, v => v.Contains("em dash", StringComparison.Ordinal));
+        Assert.Contains(zeroBad, v => v.Contains(PendingConcurrent, StringComparison.Ordinal));
         Assert.DoesNotContain(zeroBad, v => v.Contains("fabricated integer", StringComparison.Ordinal));
     }
 
@@ -952,6 +956,8 @@ public sealed class LandingSourceClaimsTests
 
     private const int MeasuredInstallerDownloads = 28462;
 
+    private const string PendingConcurrent = "Telemetry not live yet";
+
     private const string ShippedMetricsJson = """
         {
           "questsTracked": 1173,
@@ -966,7 +972,7 @@ public sealed class LandingSourceClaimsTests
           <div class="kpi"><div class="n" data-metric="questsTracked">1,173</div><div class="l">Quests Tracked</div></div>
           <div class="kpi"><div class="n" data-metric="itemsCataloged">11,196</div><div class="l">Items Cataloged</div></div>
           <div class="kpi"><div class="n" data-metric="downloads">28,462</div><div class="l">Downloads</div><div class="note">installer, not uniques</div></div>
-          <div class="kpi"><div class="n" data-metric="maxConcurrentUsers">—</div><div class="l">Max Concurrent Users</div><div class="note">max concurrent (opt-in)</div></div>
+          <div class="kpi"><div class="n" data-metric="maxConcurrentUsers">Telemetry not live yet</div><div class="l">Max Concurrent Users</div><div class="note">max concurrent (opt-in)</div></div>
         </div>
         """;
 
@@ -1026,8 +1032,8 @@ public sealed class LandingSourceClaimsTests
             {
                 if (value.ValueKind != JsonValueKind.Null)
                     bad.Add("maxConcurrentUsers is a fabricated integer; it stays null until opt-in telemetry publishes a figure");
-                if (painted != "\u2014" || Regex.IsMatch(painted, @"\d"))
-                    bad.Add($"concurrent tile shows \"{painted}\" instead of an em dash");
+                if (painted != PendingConcurrent || Regex.IsMatch(painted, @"\d"))
+                    bad.Add($"concurrent tile shows \"{painted}\" instead of \"{PendingConcurrent}\"");
                 continue;
             }
 

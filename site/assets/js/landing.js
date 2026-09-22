@@ -103,14 +103,16 @@
 
 // Hero KPIs. site/metrics.json is the source of truth; the .n text in the
 // HTML is the same snapshot so the band still reads if this fetch does not
-// run. A null metric (max concurrent, until opt-in telemetry publishes one)
-// stays an em dash — this script never substitutes a number.
+// run. A null maxConcurrentUsers (until opt-in telemetry publishes a figure)
+// paints "Telemetry not live yet" — this script never substitutes a number
+// for that key. Other metrics stay comma-formatted integers.
 (function () {
   "use strict";
   var root = document.getElementById("hero-kpis");
   if (!root || !window.fetch) return;
 
-  function formatMetric(value) {
+  function formatMetric(key, value) {
+    if (key === "maxConcurrentUsers" && (value === null || value === undefined)) return "Telemetry not live yet";
     if (value === null || value === undefined) return "\u2014";
     if (typeof value !== "number" || !isFinite(value)) return "\u2014";
     var n = Math.round(value);
@@ -135,7 +137,7 @@
       for (var i = 0; i < nodes.length; i++) {
         var key = nodes[i].getAttribute("data-metric");
         if (!Object.prototype.hasOwnProperty.call(metrics, key)) continue;
-        nodes[i].textContent = formatMetric(metrics[key]);
+        nodes[i].textContent = formatMetric(key, metrics[key]);
       }
     })
     .catch(function () { /* keep the snapshot painted in the HTML */ });

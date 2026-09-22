@@ -8,6 +8,6 @@
     "questsTracked": "Count of the quests array in src/EQBuddy.Core/Data/QuestCatalog.json.",
     "itemsCataloged": "Count of the Items array in src/EQBuddy.Core/Data/ItemCatalog.json.gz.",
     "downloads": "Sum of GitHub release asset EQBuddySetup.exe download_count across all releases. Installer downloads, not unique people.",
-    "maxConcurrentUsers": "Null until opt-in telemetry (DRA-336) publishes a figure. Null is shown as an em dash."
+    "maxConcurrentUsers": "Null until opt-in telemetry (DRA-336) publishes a figure. Until then the tile shows \"Telemetry not live yet\"."
   }
 }
