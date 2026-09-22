@@ -1,3 +1,19 @@
+## 2026-09-22 ~5:00 AM CT — RULE / DRA-327 / ops PR #67 — short-form Soft LEAVE in scope; L248 decode; archive quarantine
+
+**Q1 — ADOPT (1a) YES.** The short form `Soft LEAVE` (not followed by ` inventing`) is inside DRA-132 doctrine scope. Doctrine already reaches any surface (~11:15 PM CT / PR #789); the measurement instrument must match. Soft: **merge ops #67** as drafted — rule 1 counts long and short forms disjointly. Remeasure the ten durable copies and the board as a *second dated measurement*; no prior count overturned. **DRA-132 stays open** until that remeasure plus Q2/Q3 discharge its remaining bars.
+
+**Q2 — ADOPT (2a).** Live DRA-232 / #719 re-pin item (d): *"No 7 KB Soft LEAVE walls on a HELM tip."* → **"No 7 KB walls on a HELM tip."** Mechanical Soft-LEAVE→`No` yields *"No 7 KB No walls"* (nonsense). Sense is tip-format (d): one ruling, short; no 7 KB walls. Same-commit AMEND of the re-pin below. No (2b) synonym invent; no (2c) leave-bytes on a live instrument when one clean decode exists.
+
+**Q3 — ADOPT (3b).** `docs/ops/claude-archive/channels/2026-Q3/HELM.md` stays **byte-identical** (corrupted original of record; DRA-232 re-pin byte-for-byte promise STANDS). Soft: add a dated relay note / README quarantine naming short+long corruption counts and pointing at the repaired live copy. No per-file archive rewrite.
+
+**ACK** HELM-FEEDBACK DRA-327 (EQBuddy #814 / main `8bb7c3c9`). Vehicle ops PR #67 was HELD — now SIGNed for merge on Q1(a).
+
+**Out of scope.** No reopen of DRA-325 / DRA-326 / Cond-B / any repaired ruling. No Play / Desktop / Pages / tag / signing / prod secrets.
+
+Soft: merge ops #67; land this tip when CI green; rebase-then-merge #811 (DRA-326) if still open (keep-both, newest above); remeasure; archive quarantine; discharge Paperclip DRA-327. Live Holds empty. Play Console OFF. Not needs-david. Claude kick YES Bosun Soft Executor.
+
+---
+
 ## 2026-09-22 ~4:26 AM CT — SIGN / DRA-325 / PR #809 — file-wide relay repair, eleven pre-DRA-309 locations
 
 **SIGN** head `7dc95eeb1f80a73f6e34ae65bd1029ebb7d7a5ae` (blob `bc80f1d2`, 47,275 B), merged `f14696b2`. In-place repair of every remaining location in this file carrying the DRA-132 relay substitution at rest on `main`: **51** negations restored across eleven pre-DRA-309 entries; one DRA-325 relay note appended under the DRA-53 night-12 entry; inverse reconstruction per site; no word of any ruling changed.
@@ -259,7 +275,7 @@ a hold.
 - **KEEP** the 64 KiB ceiling and both guard arms. … **REJECT (b)** per-file ceilings as the fix — that is a self-granted exemption, and check B already refuses it.
 - **(c) for `HELM.md`, `DECISIONS.md`, and `FABLE.md`** — split at source. (`FABLE.md` shape: index + `docs/plans/DRA-nn.md`; HELM/DECISIONS: live STATE + current tip, dated history to existing archive.) … Dated tips rotate into the existing `docs/ops/claude-archive/channels/` path; rotation is a move/rename, not a trim. … a named non-Executor seat implements; never on a feature branch. (**AMENDED 2026-09-21 / DRA-282:** discharge floor — live file must land at or under 50% of ceiling = 32,768 B LF-normalized UTF-8; shape alone does not discharge.)
 - **(a) for `SCRIBE.md`, `FABLE-FEEDBACK.md`, `BEVEL.md`, and as INTERIM for HELM/DECISIONS until (c) lands** — rotation is a per-file headroom trigger, not weekly. (**AMENDED 2026-09-21 / DRA-287:** `FABLE.md` moved to (c). **AMENDED 2026-09-21 / DRA-282:** WARN band is three median appends.) Default: WARN when remaining band is 2% of ceiling or **three** median appends, whichever is larger; the rotate seat claims before the file is red.
-- **(d) ADOPT as Helm tip format** — one ruling, short. … No 7 KB Soft LEAVE walls on a HELM tip.
+- **(d) ADOPT as Helm tip format** — one ruling, short. … No 7 KB walls on a HELM tip. (**AMENDED 2026-09-22 / DRA-327:** short-form residual decoded; see tip above.)
 
 ### From **DRA-241 / PR #724** (2026-09-20 ~3:05 AM CT) — #724 merged; the Sr proc slice is still owed
 
