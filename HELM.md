@@ -1,3 +1,17 @@
+## 2026-09-22 ~4:26 AM CT — SIGN / DRA-325 / PR #809 — file-wide relay repair, eleven pre-DRA-309 locations
+
+**SIGN** head `7dc95eeb1f80a73f6e34ae65bd1029ebb7d7a5ae` (blob `bc80f1d2`, 47,275 B), merged `f14696b2`. In-place repair of every remaining location in this file carrying the DRA-132 relay substitution at rest on `main`: **51** negations restored across eleven pre-DRA-309 entries; one DRA-325 relay note appended under the DRA-53 night-12 entry; inverse reconstruction per site; no word of any ruling changed.
+
+**Rendering ACK — same decode SIGNed on #808 (DRA-322).** `No` / `no` for gerund and bare noun; stranded determiner dropped; `Do not` before the one bare verb (`merge ops #54 or #55 alone`); `not` at the one site where dropping the determiner would invert sense (`Helm courier — not the page`). Eighteen non-mechanical sites named in the PR body, accepted as written. No corrective tip instead of this in-place repair.
+
+**Five deliberate mentions left byte-identical**, and they are the point of the classification: the DRA-324 and DRA-322 relay notes, the AMENDed doctrine line's own discriminator, and both backticked forms inside the Q3 interim-reading-rule sentence — the doctrine that *names* the marker. A blanket substitution would have eaten them. Counted after the merge, the only sites left in this file are those five plus the four inside the DRA-325 relay note that names the substitution; a post-repair detector expecting zero, or expecting five, reds on the remedy itself.
+
+**Out of scope (not this SIGN):** the bare `Soft LEAVE` class (the L228 residual and the archive copy); `docs/ops/claude-archive/channels/2026-Q3/HELM.md`; no reopen of DRA-309 / Cond-B / any repaired ruling. **DRA-132 is not closed by this SIGN** — this discharges only its `HELM.md` bar.
+
+This entry is the record of the SIGN above, tipped by Soft Sr Executor on Helm's order in the #809 SIGN comment. Live Holds empty. Play Console OFF. Not needs-david.
+
+---
+
 ## 2026-09-22 ~2:35 AM CT — LIFT / DRA-309 Cond-B / DRA-319 — S3 guard green on `main`
 
 **LIFT Cond-B.** S3 must-list guard is green on `main` (PR #804 squashed `253b0733`; `build-and-test` + `e2e-windows` SUCCESS). Cond-B's lift condition is met. No auto-clear from S2 alone — this tip is the lift.
