@@ -894,3 +894,77 @@ is what made this routing one pass instead of a triage. Sweeps written that way 
 themselves.
 
 — Dranak (Claude Code, Planner, DRA-252)
+
+## 2026-09-22 — LIVE ASK (DRA-309): the Soft-loop Challenger gate walked its own ask — SIGN S2+S3, or HOLD
+To: Helm
+
+**This is the first EQBuddy-lane walk of the DRA-305 gate, run on the gate's own
+implement ask**, per your #787 SIGN's condition: SPEC only, no §5 edits until a
+separate SIGN plus the §7.2 walk. The walk is done; this is the ask.
+
+**The keyed line, returned before this ask went up** (merged SPEC §4 order):
+
+> `challenge: dra-305-soft-loop-gate -> PROCEED-WITH (C2) as of 2026-09-22`
+
+Returned by the live Challenger seat on the DRA-315 wake card (Paperclip
+comment 2026-09-22T05:26:14Z), ~1 h into the 6-hour window — no NO-RETURN line
+exists for this walk. The wake took §3.1's over-ceiling branch, by named
+sections (plan §2, §3, §4, §5 + `execution-flow.md` §4): the artifact measures
+29,579 B against the 17,343 B ceiling, both numbers recorded on the wake card.
+The C-test walked as written: C2 fires first (a step in the loop's single
+plan-SIGN ask + a waker duty on Planner), C5 touches second, first-match wins.
+
+**The verdict's one blocking condition is reconciled in the same PR that
+carries this ask, so you read the discharge in the diff you are ruling on:**
+
+- **Cond-A** — §3.2 asserted *"that escalation IS a new plan-SIGN ask"* with no
+  source; the cited `execution-flow.md` §4 never says it. (Measured while
+  reconciling: the Challenger's own quote of §4 — *"the slice re-enters the
+  loop as a new slice with a new plan"* — is not in that file either; `re-enter`
+  greps 0 there. The gap was real; the quote pressing it was loose. Both are on
+  this record.) The reconciling sentence now closing §3.2 sources the link as
+  TRANSPORT: out-of-boundary work is unauthorized (§4's scope line), its
+  escalation rides the webhook wake (§4), the wake is reached only by a
+  `HELM-FEEDBACK.md` append + workflow (`CLAUDE.md`, Helm), and that route is
+  byte-for-byte §3.1's attach point — the loop's only plan-SIGN ask. No second
+  door.
+- **Cond-B, carried to you as a proposed HOLD** — a recommendation is not a
+  SIGN, and a hold is yours alone to place: *no slice whose safety depends on
+  this gate reaches you while the S2/S3 window is open AND the Challenger seat
+  is empty on that pass.* Adopt, reshape, or refuse; if adopted it lives in
+  `HELM.md` with its lifting condition (S3's guard green on `main`), not here.
+- **Cond-C, a record, not a condition** — until S3's must-list lands, the §2
+  prose layer is human-enforced only. Stated so the gate is not over-read as
+  mechanically verifiable inside the S2-live/S3-pending window.
+
+### The ask
+
+SIGN the implement slices, or HOLD:
+
+- **S2** — the plan §5 prose edits: one Executor PR, three files, four edits
+  (`CLAUDE.md` §"How a ruling lands", `FABLE.md` item shape, the
+  `docs/plans/DRA-<n>.md` keyed-line rule). Two load-bearing NON-edits ride the
+  PR body: `HELM.md` takes no edit — the gate is doctrine, doctrine is
+  `CLAUDE.md`'s, and your SIGN lands in `HELM.md` as your own tip — and no seat
+  script is touched, ever (plan §2.1: 36 of 42 live matching lines are CLI
+  tokens, and a flag value is not a prose use).
+- **S3** — the must-list guard, its own Executor PR (plan §6): every gate-
+  evaluated `docs/plans/DRA-*.md` carries a keyed line, PAIRED with a curated
+  must-list naming which plans those are (trap 34); ZERO keyed lines on a
+  D(n+1) slice hand-off (a line there is the gate drifting into the slice
+  sequence, §3.2's defect); prove-failed in the same commit (trap 78).
+
+**Recommendation: SIGN both, sequenced S2 then S3.** The verdict is
+PROCEED-WITH, its blocking condition is discharged in this PR's own diff, and
+the residual it names is exactly the S2→S3 window the plan's §7 sequencing
+already bounds. On SIGN, Planner re-seats S2/S3 to Executor per the card.
+
+### Feedback
+
+*Reinforcing:* the Challenger's falsifier was checkable in one grep — does
+`execution-flow.md` §4 make the identity link — and it pressed the plan's
+single most load-bearing sentence instead of its word count. That is what the
+2,000-token CONTENT bar was bought for, spent on the least convenient target
+available: the gate's own ask.
+
+— Dranak (Claude Code, Planner, DRA-309)
