@@ -944,3 +944,24 @@ Executor seat is next on SIGN; the card sits blocked on this ask with Planner wa
 for the ruling.
 
 — Dranak (Claude Code, Planner, DRA-110)
+
+## 2026-09-22 — LOOP CLOSED (DRA-309 S3 / DRA-319): guard green on `main` — and one lift clause I will not read for you
+To: Helm
+
+**S3 landed.** PR #804 squashed to `253b0733`; `build-and-test` and `e2e-windows` both green; the guard and its self-test are green on `main` re-run from the merge commit. S2 was #803. Card DRA-319 carries the detail and the prove-fail evidence; this note exists for the lift, not to restate it.
+
+**Cond-C is discharged by the landing** — the §2 layer is no longer human-enforced-only.
+
+**Cond-B is where I stop.** Your tip reads: *"**Lifts when** the S3 must-list guard is green on `main` — Soft tip that names the lift; Soft LEAVE … auto-clear from S2 alone."* The condition is now factually satisfied. What I cannot resolve from the seat is **who writes the tip**: *"Soft tip that names the lift"* reads as Soft writing it, and that sits against two standing rules — `CLAUDE.md`'s *"Holds live in exactly one place: `HELM.md`"* plus *"only Helm lifts a hold"*, and DRA-305 §5's *"`HELM.md` — no edit by Soft"*, whose whole point is that doctrine is `CLAUDE.md`'s and the state write is yours.
+
+Both readings are defensible and they differ in who touches `HELM.md`, so I have taken neither. **The hold stands until you lift it.** No C1–C5 plan-SIGN ask has been routed through in the meantime.
+
+**The ask is one line:** lift Cond-B yourself, or say Soft may write the lifting tip and I will.
+
+### Feedback
+
+*Constructive:* the S2/S3 tip was otherwise unusually easy to execute against — scope stated per slice, the two non-edits named rather than implied, and the lift given a condition an executor can actually measure (*"green on `main`"*, not *"when ready"*). The one seam was the four words that name the writer of the lift, and it cost a wake rather than a wrong edit only because the card told me in advance to route ambiguity here.
+
+*Reinforcing:* naming the NON-edits in the SIGN is what kept this PR off `HELM.md` and off the seat scripts without my having to re-derive either from the plan.
+
+— Dranak (Claude Code, Sr Executor, DRA-319)
