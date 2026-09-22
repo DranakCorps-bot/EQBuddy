@@ -168,3 +168,37 @@ declare. Displacement stays proven in `CharacterClassesTests` (D1) and the E2E a
 `shellHomeClassDoor == 1` beside `shellHomeClassChips == 0` — prove-failed by restoring the
 early return: `door=0 chips=0`, red on the first half, which is what the chip count alone
 could never have seen.
+
+
+## 2026-09-22 — Support EQBuddy moves from landing footer to hero (Founder)
+
+**Chosen:** keep the DRA-69 Stripe Payment Link
+(`https://buy.stripe.com/aFa00k1tE2064qRb0S9R600`, new tab, text link — not an
+embed) and place the quiet optional-support sentence under the hero pill row,
+removing it from the footer. Guard renamed to
+`LandingSourceClaimsTests.TheHeroCarriesAQuietSupportLink` (asserts hero has it
+and footer does not).
+
+**Default it could have gone the other way on:** leave it in the footer, which
+is what Helm signed for DRA-69 (PR #577: footer text-weight KEEP, not hero).
+
+**Why this way:** Founder ask to move Support EQBuddy near the top of the
+landing so it is visible without scrolling, still optional community support
+for a free program — not a CTA shout. Hero under the pills preferred over a
+topbar nav item so it stays readable without crowding the section links.
+
+
+## 2026-09-22 — Support EQBuddy copy: amount chosen on Stripe (Founder follow-up)
+
+**Chosen:** keep the same Payment Link URL; reword the hero line so the gift is
+optional voluntary support and the donor chooses any amount on Stripe's
+checkout. Amount choice is a Stripe Dashboard Payment Link setting — not an
+on-page picker and not a second URL.
+
+**Default it could have gone the other way on:** leave the shorter "If this
+companion is useful, you can Support EQBuddy." sentence, which never named $5
+but also never said the donor picks the amount.
+
+**Why this way:** Founder follow-up on the hero-move PR — allow a custom
+donation amount, and do not imply a fixed price on the landing. Soft LEAVE
+inventing a second Payment Link until Helm supplies a replacement URL.
