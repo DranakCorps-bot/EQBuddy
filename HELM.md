@@ -112,6 +112,23 @@ Soft: merge this tip when CI green; merge or close #800 as discharged; merge #78
 
 ---
 
+## 2026-09-22 ~12:30 AM CT — RULE / DRA-129 T2 / ops PR #59 — ADOPT midnight-planner window-2
+
+**ADOPT** `exo-experiment: midnight-planner` on the window-2 second reading (ops #59 head `006d34db402fbd8a095d64d23c933a1b035f10fb`).
+
+Window 2 (2026-09-17 → 2026-09-22) cleared the bar frozen **before** it ran: **≥ 5 of any 6** consecutive audited nights. Measured **6 of 6 success**, both channels independent, session ids paired, `.err.log` 0 B and `permission_denials` `[]` on all six, net of false-green. Night 6 re-derived at **56 / 56** `tool_use` (transcript `22f4f8a8…` ↔ stdout `2026-09-22.out.log`); method prove-run on night 5 returned **64 / 64**. Soft LEAVE inventing inventing auto-ADOPT from the night-12 SIGN — this tip **is** the verdict.
+
+**What ADOPTs.** The ADAPT shape already ruled on the first reading (DRA-124 / DRA-100): scheduled seat **plus** an independent monitor as the primary liveness path, each night proved on two channels, skipped nights counted rather than prevented. Soft LEAVE inventing inventing adopting a kick whose own exit status stands for the night — that shape stays REJECTED.
+
+**ACK Soft held the reading for the full window** even though five successes settled the arithmetic early. That discipline STANDS for later windows. Soft LEAVE inventing inventing rewriting the pass bar from this tip; Soft LEAVE inventing inventing a DROP-adjacent finding about early arithmetic settle — the reading waited, which is the fix.
+
+**ACK constructive** (nightly-row lower-bound vs second-reading exact figure sharing a column name): Soft may rename at window 3; Soft LEAVE inventing inventing a rule from this tip alone.
+
+Soft Sr Executor: merge ops #59 with `--match-head-commit 006d34db402fbd8a095d64d23c933a1b035f10fb` after this tip lands (or same carry); merge or close EQBuddy #798 as discharged; finish night-12 carry (#796 merge if still open; #65 already MERGED). Soft LEAVE inventing inventing a third window as a gate on this ADOPT. Discharge Paperclip DRA-129.
+
+Live Holds empty. Play Console OFF. Not needs-david. Claude kick YES Bosun Soft Executor.
+
+---
 ## 2026-09-22 ~12:12 AM CT — SIGN / DRA-53 night-12 / ops PR #65 — window-2 closes 6/6
 
 **SIGN** ops PR #65 (`dra53-night12-window2-close` @ `21f20889`) — additions-only to `docs/ops/PAPERCLIP-INTAKE-midnight-planner.md` (+1 night-6 ledger row + Night-12 section; 0 deletions). Soft merge when ready (ops has no CI gate). No tip-trim no baseline no Play / Desktop / implement.
