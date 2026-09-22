@@ -382,6 +382,43 @@ Detail and the numbers behind them:
   parked overnight at an authorization gap, and no pre-merge SIGN in it
   changed a slice.
 
+**A C1–C5 plan-SIGN ask walks the Challenger gate before Helm sees it**
+(DRA-305, Helm-signed 2026-09-22). The **Challenger role** — the Paperclip
+agent `ed169d99-fa28-4f30-b6a8-467b6a725bed`, under Planner, which is **not**
+`claim-seat -Mode challenger`'s seat-mutex claim category — argues the
+reasoning behind a consequenceful plan before that plan is signed. A plan that
+trips C1–C5 carries its keyed `challenge:` line (and its
+`challenge-overrule:` or 6-hour NO-RETURN line, where one applies) at the top
+of the plan body beside `route:`, and restates it in the LIVE ASK. Three
+things about it bind here:
+
+- **It fires ONCE, at the plan's SIGN, and NEVER per slice.** The bullet above
+  still holds unchanged — a signed plan authorizes every slice it declares. A
+  per-slice Challenger wake would re-create, one layer down, exactly the 84%
+  of parked wait that cutover bought out. A slice that outgrows its declared
+  boundary stops and escalates, and **that escalation IS a new plan-SIGN ask**,
+  so it takes the gate there like any other; nothing new is invented to catch
+  it. A keyed line on a D(n+1) hand-off is a **defect**, not thoroughness.
+- **Silence after a wake is never a pass.** "No C-test fired, so no wake" and
+  "waked, and no line came back" are different events, and no doc here may
+  merge them. Once the wake has fired an absent line is a **non-return**,
+  disposed by the NO-RETURN rule — never read as PROCEED.
+- **A plan over the slot ceiling is challenged by NAMED SECTIONS, never
+  truncated.** Before waking, Planner measures the committed
+  `docs/plans/DRA-<n>.md` in bytes and records that in the wake; over the
+  ceiling it names the spans carrying the load-bearing premises. A plan that
+  cannot be reduced under it goes to Helm as a reopen, carrying the NO-RETURN
+  line — never waked-and-hoped.
+
+C1–C5 themselves, the verdict semantics and the gate-outcome mapping live in
+**`CHALLENGER_PROCESS_GATE_SPEC.md` under `purpose/` in the `dranakcorps-ops`
+repo** (private, ops PR #58). **This is a POINTER and
+must never become a copy** — for that file's own reason: a copy either tracks
+the original or it goes stale, and the stale one is what somebody reads.
+**None of this is mechanically checked yet.** Until DRA-309 S3's must-list
+guard is green on `main` the layer is human-enforced, so write the line
+because the ask is wrong without it, not because CI will catch you.
+
 You still wake Helm for what the plan did **not** declare: a departure
 from it, a slice that outgrew its declared boundary, a guard failure, a
 cross-lane conflict, a public reply's posture, or anything on the
@@ -975,12 +1012,16 @@ after the named guard left with its surface.
 70. **Soft max ≤3 is a count, not a mutex.** Experiment A′ on EQBuddy
     (the lab), not a Corps standard. Claim before kick:
     `scripts/claim-seat.ps1` refuses a default claim on a work item **ANY
-    live seat holds** — a challenger and a disjoint slice hold it too, and
-    only an `abandoned` claim releases it (DRA-76). It used to refuse only
-    against an EXCLUSIVE holder, so a default executor started beside a
-    live challenger: two on one card, neither refused, which is what
-    #566/#568 cost. `-Mode challenger|disjoint|replacement` is the
-    explicit override and is never refused;
+    live seat holds** — a `-Mode challenger` claim and a disjoint slice hold
+    it too, and only an `abandoned` claim releases it (DRA-76). It used to
+    refuse only against an EXCLUSIVE holder, so a default executor started
+    beside a live `-Mode challenger` seat: two on one card, neither refused,
+    which is what #566/#568 cost. `-Mode challenger|disjoint|replacement` is
+    the explicit override and is never refused — **that `challenger` is a CLI
+    token naming a seat-mutex claim category, NOT the Challenger role of
+    "How a ruling lands" above**, which is a Paperclip agent and touches no
+    seat script (DRA-305 §2; the collision is harmless but never invisible,
+    so each sense is qualified where it appears);
     `scripts/release-seat.ps1 -ForceStale` recovers a dead holder and is
     now the only way past a holder that is gone — so the refusal names
     every holder AND which of them look stale.
