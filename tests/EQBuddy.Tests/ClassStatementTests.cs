@@ -18,6 +18,10 @@ namespace EQBuddy.Tests;
 /// it; the source guard at the bottom is what stops a second copy growing back in
 /// <c>HomeRoom</c> (trap 4).</para>
 /// </summary>
+// The refresh row calls OutputfileAutoImport.ImportAchievements. The settings.json
+// guard treats that name as a writer of the shared profile, so this class runs in
+// the serial collection — see SettingsFileCollection.
+[Collection(SettingsFileCollection.Name)]
 public sealed class ClassStatementTests : IDisposable
 {
     /// <summary>The dump's first three, in the order the line shows them. Paladin is the
