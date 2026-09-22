@@ -415,9 +415,17 @@ C1–C5 themselves, the verdict semantics and the gate-outcome mapping live in
 repo** (private, ops PR #58). **This is a POINTER and
 must never become a copy** — for that file's own reason: a copy either tracks
 the original or it goes stale, and the stale one is what somebody reads.
-**None of this is mechanically checked yet.** Until DRA-309 S3's must-list
-guard is green on `main` the layer is human-enforced, so write the line
-because the ask is wrong without it, not because CI will catch you.
+**Since DRA-309 S3 the line's PLACEMENT is mechanically checked and its
+SUBSTANCE is not.** `scripts/challenge-line-guard.ps1` (in `check.ps1` and CI)
+pairs a forbid-scan — no keyed line of any card inside a slice sequence, which
+is §3.2's defect — with a curated must-list of the plans that reached the
+C-test, the half that can see a walk which never happened (trap 34). It reads
+the KEY and that a disposition is present, and **deliberately never the
+verdict's SPELLING**: enumerating the four verdicts here would be exactly the
+copy the sentence above forbids, and would fail closed the day ops adds a
+fifth. So a malformed verdict word, a wrong C-classification and a line whose
+reasoning is empty all still pass it — write the line because the ask is wrong
+without it, not because CI will catch you.
 
 You still wake Helm for what the plan did **not** declare: a departure
 from it, a slice that outgrew its declared boundary, a guard failure, a
