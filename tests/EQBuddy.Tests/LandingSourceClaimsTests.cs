@@ -780,33 +780,45 @@ public sealed class LandingSourceClaimsTests
     }
 
     /// <summary>
-    /// DRA-69. The landing's Support EQBuddy control is a quiet text link in the
-    /// hero (under the pill row), not a download CTA and not a checkout embed. It
-    /// opens the Stripe Payment Link in a new tab. The page must not grow a
-    /// third-party script — "this page makes no third-party requests" is a live
-    /// claim in the footer. Founder asked 2026-09-22 to move it from the footer
-    /// to near the top so it is visible without scrolling, and that the copy treat
-    /// the gift as optional with the amount chosen on Stripe — never a fixed
-    /// price named on this page.
+    /// DRA-69. The landing's Support EQBuddy control is a quiet topbar chip
+    /// (top-right, after GitHub), not a hero paragraph, not a download CTA, and
+    /// not a checkout embed. It opens the Stripe Payment Link in a new tab. The
+    /// page must not grow a third-party script — "this page makes no third-party
+    /// requests" is a live claim in the footer. Founder asked 2026-09-22 for a
+    /// top-of-page placement, then after #826 landed clarified the placement as
+    /// a topbar chip rather than a hero sentence. Amount is chosen on Stripe's
+    /// checkout — never a fixed price named on this page.
     /// </summary>
     [Fact]
-    public void TheHeroCarriesAQuietSupportLink()
+    public void TheTopbarCarriesAQuietSupportChip()
     {
         var html = Page;
+        var topbar = Regex.Match(
+            html,
+            """<nav\s+class="topbar"[^>]*>.*?</nav>""",
+            RegexOptions.Singleline);
+        Assert.True(topbar.Success, "landing is missing the topbar");
+        var match = Regex.Match(
+            topbar.Value,
+            """<a\s+[^>]*href="https://buy\.stripe\.com/aFa00k1tE2064qRb0S9R600"[^>]*>\s*Support EQBuddy\s*</a>""",
+            RegexOptions.Singleline);
+        Assert.True(match.Success, "topbar is missing the Support EQBuddy Stripe Payment Link chip");
+        Assert.Contains("target=\"_blank\"", match.Value, StringComparison.Ordinal);
+        Assert.Contains("rel=\"noopener noreferrer\"", match.Value, StringComparison.Ordinal);
+        Assert.Contains("class=\"nav support\"", match.Value, StringComparison.Ordinal);
+        Assert.DoesNotContain("$5", topbar.Value, StringComparison.Ordinal);
+
         var hero = Regex.Match(
             html,
             """<section\s+class="hero"[^>]*>.*?</section>""",
             RegexOptions.Singleline);
         Assert.True(hero.Success, "landing is missing the hero section");
-        var match = Regex.Match(
+        Assert.DoesNotContain("Support EQBuddy", hero.Value, StringComparison.Ordinal);
+        Assert.DoesNotContain("class=\"support\"", hero.Value, StringComparison.Ordinal);
+        Assert.DoesNotContain(
+            "buy.stripe.com/aFa00k1tE2064qRb0S9R600",
             hero.Value,
-            """<a\s+href="https://buy\.stripe\.com/aFa00k1tE2064qRb0S9R600"[^>]*>\s*Support EQBuddy\s*</a>""",
-            RegexOptions.Singleline);
-        Assert.True(match.Success, "hero is missing the Support EQBuddy Stripe Payment Link");
-        Assert.Contains("target=\"_blank\"", match.Value, StringComparison.Ordinal);
-        Assert.Contains("rel=\"noopener noreferrer\"", match.Value, StringComparison.Ordinal);
-        Assert.Contains("choose any amount", hero.Value, StringComparison.OrdinalIgnoreCase);
-        Assert.DoesNotContain("$5", hero.Value, StringComparison.Ordinal);
+            StringComparison.Ordinal);
 
         var footer = Regex.Match(html, """<footer\b.*?</footer>""", RegexOptions.Singleline);
         Assert.True(footer.Success, "landing is missing the footer");
