@@ -195,7 +195,18 @@ carried to Helm as a follow-up, not rewritten by the seat that found it.
 **Where the repaired copy is.** The live `HELM.md` at the repo root is repaired and current: DRA-309
 and DRA-325 restored 51 negations across eleven entries (PR #809, merged `f14696b2`), and DRA-327 Q2(a)
 decoded the last short-form site there — *"No 7 KB walls on a HELM tip."* — in PR #815 (`86ae627e`).
-The live file now carries **zero** sites in either form. Quote rulings from it, never from
+
+**Do not expect the live file to count zero.** It carries **4 short-form and 9 long-form** occurrences
+on `main` at `86ae627e`, and every one of them is a **deliberate mention** — doctrine text *about* the
+substitution rather than a ruling corrupted by it. They are the DRA-309 and DRA-325 relay notes stating
+their own counts, the AMENDed doctrine line's discriminator, the reading rule that tells a seat how to
+reconstruct the negation, and Helm's DRA-327 tip itself, which necessarily quotes the corrupted string
+in the course of ruling on it. **Corrupted sites: zero. Total sites: thirteen.** The two numbers are
+different things, and a checker built to assert zero reds on the remedy rather than on a defect — which
+is why the repair was measured as "no site remains that a reader could mistake for a ruling", never as
+an absolute count.
+
+Quote rulings from it, never from
 `docs/ops/claude-archive/channels/2026-Q3/HELM.md`, which is the corrupted **original of record** and
 is kept that way on purpose: it is what the relay actually delivered, and a repaired archive could no
 longer prove that.
