@@ -202,3 +202,20 @@ but also never said the donor picks the amount.
 **Why this way:** Founder follow-up on the hero-move PR — allow a custom
 donation amount, and do not imply a fixed price on the landing. Soft LEAVE
 inventing a second Payment Link until Helm supplies a replacement URL.
+
+
+## 2026-09-22 — Support EQBuddy is a topbar chip, not a hero paragraph (Founder)
+
+**Chosen:** remove the hero `<p class="support">` sentence shipped in #826 and
+place a quiet `nav.topbar` chip labeled Support EQBuddy at the top-right
+(after GitHub). Same Payment Link URL, new tab, no embed. Guard renamed to
+`LandingSourceClaimsTests.TheTopbarCarriesAQuietSupportChip` (topbar has it;
+hero and footer must not).
+
+**Default it could have gone the other way on:** keep the hero paragraph #826
+just landed, which was near the top but not the top-right chip the Founder
+meant.
+
+**Why this way:** Founder feedback after #826 merged — he wanted a chip at the
+top right of the page, not the hero paragraph under the pills. Soft LEAVE
+inventing a second Payment Link or changing the Stripe URL.

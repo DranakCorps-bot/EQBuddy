@@ -133,6 +133,17 @@ body {
 }
 .topbar a.nav:hover, .topbar a.nav:focus-visible { color: var(--text); background: rgba(92, 138, 194, 0.2); }
 .topbar a.gh { color: var(--accent); }
+/* Quiet optional support chip (DRA-69) — top-right of the bar, not a CTA shout */
+.topbar a.support {
+  margin-left: 2px;
+  border: 1px solid var(--line);
+  color: var(--muted);
+}
+.topbar a.support:hover, .topbar a.support:focus-visible {
+  color: var(--accent);
+  border-color: rgba(95, 168, 211, 0.45);
+  background: rgba(95, 168, 211, 0.08);
+}
 
 /* Right-edge dot nav with hover labels */
 .dotnav {
@@ -240,7 +251,7 @@ section h2 { font-size: clamp(26px, 4vw, 36px); line-height: 1.15; margin: 0 0 1
   margin: 0 0 26px;
 }
 .hero .lead em { color: var(--text); font-style: italic; }
-.pillrow { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 22px; }
+.pillrow { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 40px; }
 .pill {
   padding: 7px 15px;
   border: 1px solid var(--line);
@@ -250,16 +261,6 @@ section h2 { font-size: clamp(26px, 4vw, 36px); line-height: 1.15; margin: 0 0 1
   font-size: 13.5px;
 }
 .pill b { color: var(--accent); font-weight: 600; }
-
-/* Quiet optional support (DRA-69) — under the pills, above the KPI band */
-.hero .support {
-  margin: 0 0 36px;
-  color: var(--muted);
-  font-size: 14.5px;
-  max-width: 52ch;
-}
-.hero .support a { color: var(--accent); text-decoration: none; }
-.hero .support a:hover, .hero .support a:focus-visible { text-decoration: underline; }
 
 /* Honest KPI band */
 .kpis {
