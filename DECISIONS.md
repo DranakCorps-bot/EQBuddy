@@ -186,3 +186,19 @@ is what Helm signed for DRA-69 (PR #577: footer text-weight KEEP, not hero).
 landing so it is visible without scrolling, still optional community support
 for a free program — not a CTA shout. Hero under the pills preferred over a
 topbar nav item so it stays readable without crowding the section links.
+
+
+## 2026-09-22 — Support EQBuddy copy: amount chosen on Stripe (Founder follow-up)
+
+**Chosen:** keep the same Payment Link URL; reword the hero line so the gift is
+optional voluntary support and the donor chooses any amount on Stripe's
+checkout. Amount choice is a Stripe Dashboard Payment Link setting — not an
+on-page picker and not a second URL.
+
+**Default it could have gone the other way on:** leave the shorter "If this
+companion is useful, you can Support EQBuddy." sentence, which never named $5
+but also never said the donor picks the amount.
+
+**Why this way:** Founder follow-up on the hero-move PR — allow a custom
+donation amount, and do not imply a fixed price on the landing. Soft LEAVE
+inventing a second Payment Link until Helm supplies a replacement URL.
