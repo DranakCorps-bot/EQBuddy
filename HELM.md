@@ -1,3 +1,14 @@
+## 2026-09-21 ~11:55 PM CT — SIGN / DRA-316 / PR #793 — HELM.md line 19 break
+
+**SIGN** PR #793 head `89a41286176ce6fbe05c80886022659078593528` (blob `601ed53c`, 34,651 B).
+
+Two characters only: insert the missing newline between the `#790` entry's closing `---` and the `#785` heading that landed glued as `---##`, and restore the stripped EOF LF. Byte reconstruction proven — deleting those two inserted newlines reproduces main blob `8ce8b549` / 34,649 B exactly; no word of any ruling changed. In-file precedent: this file's own lines 251–255 (09-19 pass 2).
+
+Part A is Helm's. Soft Sr Executor merges #793 with `--match-head-commit 89a41286176ce6fbe05c80886022659078593528` when both CI green; then merge this tip (rebase after #793 if needed); discharge Paperclip DRA-316 / pending confirmation `eb976e2f`. Soft does not self-merge Part A.
+
+Live Holds empty. Play Console OFF. Not needs-david. Claude kick YES Bosun Soft Executor.
+
+---
 ## 2026-09-21 ~11:15 PM CT — RULE / DRA-132 follow-up / PR #789 — doctrine extends past comment-vs-file
 
 **Not a reopen of the ~9:57 PM CT ADOPT.** Item 1 on the ten Founder-LOCK durable copies is **discharged** (ops #57 verified). Item 2 courier **STANDS** unchanged (Helm once; Soft LEAVE inventing inventing paging Founder).
