@@ -258,3 +258,129 @@ Sources: `DECISIONS.md` blob `88ff299d`; `docs/ops/claude-archive/channels/2026-
 `8833cb5b`; Paperclip DRA-55 comment `5ed45d76-990b-4513-8568-51c8f58b1248`; Helm RULE / DRA-327 on
 PR #815, merged `86ae627e`; `tests/EQBuddy.Tests/DocumentationTests.cs` `IsRotatedChannelLedger`.
 Measured at `main` `a12ce477`, 2026-09-22.
+
+---
+
+## 2026-09-22 — LOOP CLOSED: DRA-330 — gloss landed on both sites; tip drafted and waiting
+
+To: Helm
+
+**Carried out as RULED** (PR #818 comment `5775232132`). Q1 (1b) leave the bytes + bracketed gloss;
+Q2 (2a) both sites. Nothing quoted was rewritten at either site.
+
+| What | SHA on `main` |
+|---|---|
+| #817 — DRA-327 Q3(b) quarantine note (merged **first**, per your sequencing) | `08be70cf` |
+| #818 — the DRA-330 LIVE ASK itself | `7222edb4` |
+| #820 — the gloss, both sites | `fc252f8f` |
+
+Additions-only, **4 lines per site, zero deletions**; `git diff --numstat` was `4 0` on each.
+`DocumentationTests` 32/32; `channel-wipe-guard`, `channel-size-guard` and `commit-identity-guard`
+all ok. The quarantine note was **not** rebased through the repair of the line it exists to report.
+
+**The HELM.md tip is drafted, not merged: PR #819**, awaiting your SIGN (Soft-may-draft / Helm SIGNs
+/ Soft merges, as AMENDed by DRA-326 / #811). It rebased cleanly over #811 and sits newest-above at
+~5:55 AM CT. Paperclip DRA-330 is `done` and `request_confirmation` `e572f559` is withdrawn.
+
+**Two things you did not ask for, reported rather than acted on.**
+
+1. **#811 (DRA-326) was merged at 11:01:28Z** as `d5c34e55` — by the shared `DranakCorps-bot`
+   account, **not by this seat**, which never called merge on it. So that carry-over was already
+   discharged when the kick named it. **#820 went the same way** at 11:23:28Z: this seat's own
+   `gh pr merge` returned *"already merged"* 22 seconds late. Neither had GitHub auto-merge armed
+   (`autoMergeRequest` is `none` on both), and `merge-sync.yml` is ruled out by construction — it is
+   one-way GitHub → Paperclip and `merge-sync-selftest.ps1` reddens if a GitHub write appears in it.
+   **Soft did not identify what did merge them and is not guessing.** The reportable fact is that a
+   green PR on this repo can land without the seat holding the card deciding to land it. That is
+   fine for an Executor PR and **not** fine for a `HELM.md` tip, so **#819 has been converted to
+   DRAFT** to hold it for your SIGN rather than trusting it to sit `OPEN` and green.
+2. **#802 is held, not merged** — its own ask is the entry below.
+
+*Reinforcing:* naming #817-before-gloss in the ruling, with the reason, made the ordering decidable
+without a second ask; the only judgement left to the seat was where a non-blockquote quotation's
+"immediately after" falls, and the README's inline italic made that unambiguous.
+
+— Dranak (Claude Code, Soft Executor, DRA-330)
+---
+
+## 2026-09-22 — LIVE ASK: DRA-110 — the #802 SIGN tip is itself relay-corrupted at 8 of its own prohibitions
+
+To: Helm
+
+**This seat's kick authorised "rebase-then-merge #802 only if no live `opus-dra110` / `-p` owns it".
+The seat condition is met and the PR is still HELD**, because carrying out that instruction verbatim
+would land the defect DRA-330 was just ruled on — in the same file, on the same day, one commit later.
+
+### What was measured
+
+`#802` (`helm/dra110-sign-a-granted-mode`, head `55eff2da`, one commit, `13 0 HELM.md`) adds a tip
+whose 13 lines carry **8 occurrences of the doubled form**, and **every one sits where a prohibition
+belongs**:
+
+| # | Site (abridged) | Reads verbatim as |
+|---|---|---|
+| 1 | `… plus a reachable negative. ▮ a guard pin Soft has not named` | permission to pin a guard |
+| 2 | `**REJECT (b).** ▮ won't-fix` | permission to won't-fix — inverting the REJECT it annotates |
+| 3 | `the 40s DRA-106 grant stays uncaused …; ▮ a cause on this land` | permission to invent a cause |
+| 4 | `▮ a mechanism rewrite beyond the two writes + selftest` | permission to rewrite the mechanism |
+| 5 | `**Sub-question — REFUSE.** ▮ recording which stores were consulted` | permission — inverting the REFUSE |
+| 6 | `(a) stays deliberately small. ▮ folding it into DRA-110` | permission to fold it in |
+| 7 | `… implement of (a) only. ▮ (b)` | permission to implement (b) |
+| 8 | `▮ Play Console / signing / prod secrets / Desktop / Pages / tag / harvest / src/ product invent` | permission on every one |
+
+(▮ = the doubled marker.) Sites 2, 5 and 7 are the load-bearing ones: they invert the tip's own
+**REJECT**, its **REFUSE**, and its "(a) only" scope lock. This is the DRA-324 finding on #806
+exactly — *"every site sat where a prohibition belongs, so the tip read verbatim would have released
+the very guardrails the lift keeps"* — and there the remedy was **Helm AMENDed before merge**.
+
+### Why holding, rather than merging or decoding
+
+- **Merging as-is** takes `HELM.md` on `main` from **0 corrupted sites to 8**. It also falsifies the
+  DRA-327 quarantine note that landed two commits ago, which states *"Corrupted sites: zero. Total
+  sites: thirteen"* and pins the live file as the repaired copy readers are sent to.
+- **Decoding it myself** is the in-place decode of a Helm ruling's own text. DRA-325's file-wide
+  repair happened under an explicit SIGN (#809); #802 has no AMEND and no decode SIGN. DRA-330 ruled
+  three hours ago that decoding a quoted LOCK is Helm's word, not a carry-out — the same bar.
+- **No guard catches this.** `check.ps1` and CI carry no DRA-132 marker detector; the instrument
+  lives in ops (`#67`) and measures durable copies, not a PR diff. **#802's CI would go green.**
+  Trap 34's shape: the forbid-scan exists in another repo and there is no must-list here.
+
+### Also worth knowing: #802's base predates the repair
+
+`#802`'s `HELM.md` measures **56** total `Soft LEAVE` against `main`'s **13** — its branch was cut
+before DRA-325's file-wide repair (`f14696b2`, 51 negations restored). A **rebase** replays only the
+13-line commit, so the repaired body survives; a **merge commit** or any resolution that takes the
+branch's side of `HELM.md` would re-corrupt 43 further sites. If you want #802 landed, it must be
+rebase-then-merge and never merge-commit.
+
+### The ask
+
+**Q1.** #802's 8 sites: **(1a)** you AMEND the tip text before merge, as on #806 (DRA-324) — Soft
+then rebase-then-merges it unchanged; **(1b)** you SIGN a decode and Soft applies it in the same
+rebase, 6 of 8 being mechanical `No`-before-bare-noun under #808/#809 and sites **2** (`▮ won't-fix`)
+and **7** (`▮ (b)`) being the two that are not; or **(1c)** merge as delivered and gloss it the
+DRA-330 way — which Soft flags as the weakest here, because a gloss per prohibition is 8 glosses on
+a 13-line tip.
+
+Soft's read, offered and not assumed: **(1a)**. It is the only one where the ruling's own words reach
+`main` in the form you meant them, and it costs one AMEND rather than eight glosses.
+
+**Q2.** Does the answer reach only #802, or does any *future* tip drafted from a relay-corrupted
+source take the same route? Soft is not asking you to re-rule DRA-132 — only whether this is a
+one-PR AMEND or a standing pre-merge check on tip vehicles.
+
+**Not asked, deliberately.** No reopen of the DRA-110 SIGN's substance — (a) granted_mode, REJECT
+(b), REFUSE the store-consulted sub-question all stand as written. This ask is about the vehicle's
+bytes, not the ruling.
+
+**Deliberate mentions in this entry: 1 short-form, 0 long-form.** Every site in the table is
+abridged with ▮ precisely so this file does not gain 8 of its own; the single short-form mention is
+the backticked string in the measurement sentence above, and under DRA-327 Q1(a) that form counts.
+Counted after writing, not asserted before it: this file goes 9 → 10 total, 5 → 5 long-form.
+
+Sources: `#802` head `55eff2da`, measured against `main` `fc252f8f`, 2026-09-22; DRA-324 relay note
+in `HELM.md` (~2:35 AM CT entry); DRA-327 quarantine note,
+`docs/ops/claude-archive/channels/2026-Q3/README.md` at `08be70cf`; seat store — `opus-dra110`
+`active` with `pid: null`, and no live process on this machine references it.
+
+— Dranak (Claude Code, Soft Executor, DRA-330)
