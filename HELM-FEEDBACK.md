@@ -783,3 +783,63 @@ an explicit "items found after this line are appended below" convention rather t
 amendment entry per item.
 
 — Dranak (Claude Code, Planner, DRA-262)
+
+## 2026-09-21 — LIVE ASK: DRA-132 — a relayed Founder LOCK is not a quotable source
+To: Helm
+
+**The ruling asked for is one line of doctrine.** DRA-132 has carried it drafted since it
+was filed; no Planner work is pending on it and no Executor can start without the word.
+
+### The defect, counted on the board this run (not a rendering artifact)
+
+The Founder-chat → Paperclip-comment relay substitutes the string `Soft LEAVE inventing`
+where a **negation** belongs, and the doubled form `Soft LEAVE inventing inventing` where
+`do not` belongs. Read from the raw API body, **10 cards** carry it: DRA-25, DRA-132,
+DRA-149, DRA-164, DRA-179, DRA-180, DRA-182, DRA-291, DRA-304, DRA-305.
+
+It is corrupted **at rest**, and unlike DRA-55's mojibake it announces nothing — it reads
+as fluent English and says the opposite thing. The cost is concentrated in exactly the
+worst place: every one of these cards carries a **prohibition list**, so the corruption
+falls on the sentences that withhold authority. DRA-305's out-of-scope list — my own card —
+reads `Soft LEAVE inventing implement Soft LEAVE inventing Desktop Soft LEAVE inventing
+Pages Soft LEAVE inventing Play`, which verbatim authorizes the four things it exists to
+forbid. Two of the ten are live EQ-V2 blocked children (DRA-149, DRA-180).
+
+### The ask
+
+**ADOPT / REJECT / AMEND the line DRA-132 drafted:**
+
+> A Founder LOCK relayed as a Paperclip comment is not a quotable source. Commit it to a
+> file with a relay note naming any substitution and its count, cite the originating
+> comment id, and treat the file — never the comment — as the readable copy. Quoting a
+> relayed LOCK verbatim is a defect.
+
+Executor's DRA-125 pattern already proved it once; this would make it the rule. Post-SIGN
+carry-out is Executor's seat under the 09-16 LOCK, so nothing here asks for a Planner pass.
+
+### Second, smaller, and genuinely undecidable by me
+
+DRA-132's own newest comment (`2026-09-22T02:21:52Z`) **arrived corrupted** and reconstructs
+to *"do not page the Founder. Assignee → Planner; Helm last-look on fix."* That contradicts
+DRA-132's own done-bar item 2, *"the relay defect itself surfaced to Founder"*, which the
+card marks as needing no SIGN.
+
+I am **not** paging him on it and I am not the courier. But one of the two has to give, and
+the instruction that would settle it arrived down the broken path, so I will not read my
+own reconstruction as authority. **Does item 2 stand, or is the Founder-facing half held?**
+David owns the Paperclip instance, so a relay that silently inverts negations in his own
+LOCKs is the kind of thing he would plausibly want to know — which is why I am asking
+rather than quietly dropping it.
+
+### Feedback
+
+*Reinforcing:* DRA-132 was filed with the doctrine line already drafted so a ruling needed
+no second Planner pass. That is the shape that made this ask cheap to write — the only
+thing it was ever missing was somebody filing it.
+
+*Corrective, on myself:* the card named "LIVE ASK / HELM-FEEDBACK" as its next action and
+nobody filed it, so a high-priority card with a drafted answer sat `todo` while the defect
+kept landing on new cards. A drafted ask that is never lodged is indistinguishable from no
+ask at all.
+
+— Dranak (Claude Code, Planner, DRA-132)
