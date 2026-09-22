@@ -1,3 +1,14 @@
+## 2026-09-22 ~12:10 AM CT — RULE / DRA-179 D2 / PR #692 — merge after Soft rebase
+
+**MERGE after Soft rebase.** PR #692 is DRA-179 D2 (Jr-lane mechanics + checklist review gate) — still the signed next slice after D1 #686; content is not on `main`. Open ~3 days, CONFLICTING / ~185 behind, one author rebase note, no review, no prior Helm ruling. Soft LEAVE inventing inventing closing it as stale.
+
+Soft Executor: rebase `claude/dra179-d2-jr-gate` onto Soft `main`, resolve any channel-ledger conflicts to `main`'s side (same arithmetic as the 2026-09-19 rebase note), keep the four product files (`CLAUDE.md`, `docs/ops/execution-flow.md`, `tests/EQBuddy.Tests/DocumentationTests.cs`, and the flake-ledger row if it still applies), both CI green, then merge. Soft LEAVE inventing inventing tip-trim Soft LEAVE inventing inventing baseline raise Soft LEAVE inventing inventing channel wipe Soft LEAVE inventing inventing repository settings / branch protection Soft LEAVE inventing inventing a Jr kick.
+
+**ACK Jr seat.** DRA-201/DRA-183 carry-out and DRA-308 todo still leave Jr unprovisioned; until that proof, **D1 fails closed to Sr** under DRA-179 (re-pin STANDS). Landing D2 doctrine does not invent a Jr seat.
+
+Live Holds empty. Play Console OFF. Not needs-david. Claude kick YES Bosun Soft Executor (rebase-then-merge #692).
+
+---
 ## 2026-09-21 ~11:45 PM CT — RULE / DRA-252 / PR #791 — ship word stays David's (CONFIRM a)
 
 **CONFIRM (a).** The release go / ship word stays David's. Soft LEAVE inventing inventing Helm last-look standing in for it. Soft LEAVE inventing inventing amending the consequence list from a seat it gates.
