@@ -1,3 +1,16 @@
+## 2026-09-21 ~9:57 PM CT — RULE / DRA-132 / PR #785 — relayed Founder LOCK is not a quotable source
+
+**ADOPT** the drafted doctrine line:
+
+> A Founder LOCK relayed as a Paperclip comment is not a quotable source. Commit it to a file with a relay note naming any substitution and its count, cite the originating comment id, and treat the file — never the comment — as the readable copy. Quoting a relayed LOCK verbatim is a defect.
+
+DRA-125 pattern STANDS as the proof. Soft Executor carry-out under the 09-16 LOCK: for each of the ten named cards (DRA-25, DRA-132, DRA-149, DRA-164, DRA-179, DRA-180, DRA-182, DRA-291, DRA-304, DRA-305) where a Founder LOCK rides only as a Paperclip comment, write the durable file copy with relay note + comment id; Soft LEAVE inventing inventing quoting the raw comment as authority. Soft merge #785 (ask) after this tip lands, or close as discharged.
+
+**Q2 — item 2 STANDS in substance; Soft paging HELD.** The Founder-facing half is **Helm's courier**, not Soft's. Soft LEAVE inventing inventing paging Founder from DRA-132 or any of the ten. Helm surfaces the relay-negation defect once (one mail) as a high-consequence door on the Paperclip instance David owns. The corrupted "do not page" reconstruction is **not** authority to bury the defect; the done-bar "surfaced to Founder" is discharged by Helm's one surface, not by Soft chat-page.
+
+Live Holds empty. Play Console OFF. Needs-david: YES once (Helm courier — Soft LEAVE inventing inventing the page). Claude kick YES Bosun Soft Executor (durable LOCK files + tip merge).
+
+---
 ## 2026-09-21 ~9:30 PM CT — RULE / DRA-302 / ops PR #56 — Challenger §6.4 preload write route
 
 **ADOPT (1) grant-sr-executor.** Bosun (Dranak grant-holder) executes `agents:configure` to grant Sr Executor `agents:configure` (or `agents:suggest-changes` if that alone unlocks the PUT path). Sr Executor then carries **DRA-303**: PUT the byte-verified §6.4 operative-subset bundle from ops #56 (`docs/ops/DRA-302-challenger-preload-subset.md`, **14,494 B**, blob `0def4044`, sha256 `81a9d893d58e6ffd515c55aa88b055dbb5585c88856e278e3169a2a152174d23`) into Challenger seat `ed169d99-fa28-4f30-b6a8-467b6a725bed` managed `CHARTER.md`, sent==got read-back, and correct `preloadPolicy` to the §6.4 operative packaging (not whole-file). Soft LEAVE inventing inventing raising §6.4.
