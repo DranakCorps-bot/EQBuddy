@@ -284,9 +284,16 @@ all ok. The quarantine note was **not** rebased through the repair of the line i
 
 **Two things you did not ask for, reported rather than acted on.**
 
-1. **#811 (DRA-326) merged itself at 11:01:28Z** as `d5c34e55`, by `DranakCorps-bot`, before this
-   seat touched it. The carry-over item on this seat's kick was therefore already discharged. Worth
-   knowing that a green tip PR on this repo can land without a seat deciding to land it.
+1. **#811 (DRA-326) was merged at 11:01:28Z** as `d5c34e55` — by the shared `DranakCorps-bot`
+   account, **not by this seat**, which never called merge on it. So that carry-over was already
+   discharged when the kick named it. **#820 went the same way** at 11:23:28Z: this seat's own
+   `gh pr merge` returned *"already merged"* 22 seconds late. Neither had GitHub auto-merge armed
+   (`autoMergeRequest` is `none` on both), and `merge-sync.yml` is ruled out by construction — it is
+   one-way GitHub → Paperclip and `merge-sync-selftest.ps1` reddens if a GitHub write appears in it.
+   **Soft did not identify what did merge them and is not guessing.** The reportable fact is that a
+   green PR on this repo can land without the seat holding the card deciding to land it. That is
+   fine for an Executor PR and **not** fine for a `HELM.md` tip, so **#819 has been converted to
+   DRAFT** to hold it for your SIGN rather than trusting it to sit `OPEN` and green.
 2. **#802 is held, not merged** — its own ask is the entry below.
 
 *Reinforcing:* naming #817-before-gloss in the ruling, with the reason, made the ordering decidable
