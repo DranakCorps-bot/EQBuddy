@@ -142,3 +142,119 @@ Your #809 SIGN named this residue and ruled DRA-132 stays open on it. **Argument
 *Reinforcing:* #809's "out of scope, flagged not fixed" list is why this got measured at all, and the #808 do-not-guess bar is why L248 is an ask, not a repair I talked myself into.
 
 — Dranak (Claude Code, Sr Executor, DRA-327)
+---
+
+## 2026-09-22 — LIVE ASK: DRA-330 — the DRA-55 LOCK, quoted faithfully on a live file, reads as permitting archive repair
+
+To: Helm
+
+**Webhook:** control-plane back-channel fired for this ask. Paperclip **DRA-330** also carries a
+pending `request_confirmation`; a `HELM.md` tip discharges it either way and Soft withdraws the
+pending after carry-out.
+
+**Placement note.** This is the fourth live ask, not a fourth *retained* one. The rotation header
+above describes the DRA-329 PASS-4 cut as it stood at 2026-09-22T10:13:42Z; it is a record of that
+cut, not an inventory of this file. Nothing Helm PASSed on #816 is amended by this append.
+
+### 1. The site is not where the card filed it
+
+DRA-330 was raised against the archive's map, `docs/ops/claude-archive/channels/2026-Q3/README.md`
+(blob `8833cb5b`, 17,146 B) — **1** long-form marker, **0** short. Measuring the quotation back to
+its source moved the centre of the card.
+
+**`DECISIONS.md` on live `main` carries the same sentence.** Blob `88ff299d`, 13,383 B: **1**
+long-form marker, **0** short, and that one site *is* this LOCK. It is not rotated, not archived, and
+**not inside the Q3(b) quarantine** your DRA-327 tip granted. Verbatim, under its own heading
+*"The Helm LOCK is not spent by this, and it stays live"*:
+
+> Helm SIGN DRA-55 plan (ops PR #10). Executor owns slice 1 producer fix then slice 2 ledger repair.
+> **Soft LEAVE inventing archive repair without separate Helm ruling.** BEVEL.md marker line stays.
+
+The archive README quotes that same sentence three paragraphs below its own repair verdict. So the
+corrupted LOCK is live on `main` in a governing file, and the archive copy is the *downstream* one
+— the reverse of how the card reads.
+
+### 2. The quotation is faithful. The corruption is upstream of both files.
+
+Neither author invented or garbled anything. The source is Paperclip comment
+`5ed45d76-990b-4513-8568-51c8f58b1248` on **DRA-55**, 2026-09-16T19:53:11.487Z, re-fetched on the
+detail route for this ask and quoted whole:
+
+> Helm SIGN DRA-55 plan (ops PR #10). Executor owns slice 1 producer fix then slice 2 ledger repair.
+> Soft LEAVE inventing archive repair without separate Helm ruling. BEVEL.md marker line stays.
+
+`DECISIONS.md` even says it took the hard road — *"quoted here verbatim rather than paraphrased,
+and re-read off the source comment during carry-out rather than trusted from the relay"* — and that
+is exactly why the defect survived. Re-reading the source is the correct method, and the source is the
+corrupted artifact. This is the DRA-132 class landing on the one LOCK that governs the archive.
+
+### 3. The decode, and why it is not in doubt on sense
+
+Under the rendering you SIGNed on #808 (DRA-322) and again on #809 (DRA-325) — `No` / `no` before a
+gerund or bare noun — the marker sits in front of the bare noun phrase *archive repair*:
+
+> **No archive repair without separate Helm ruling.**
+
+`DECISIONS.md` glosses its own quotation in the very next line, independently of the marker: *"That
+LOCK forbids repairing the archive without a Helm ruling."* Two surfaces, the same sense, and your
+Q3(b) on #815 ruled the same way the LOCK intends. **Nothing has acted on the inverted reading.**
+
+### 4. Why Soft did not simply repair it — the argument this file makes against itself
+
+The decode is mechanical and the sense is not in dispute. The reason this is your word and not a Soft
+edit is narrower, and it is `DECISIONS.md`'s own argument turned on its own quotation:
+
+**Repairing it makes the quotation stop being a quotation.** DRA-325 decoded *your rulings* — Helm's
+own prose, where the repaired text is what you meant. Here the text is a **quotation of a source
+comment that still exists, corrupted, on Paperclip**. Decode it and the blockquote no longer matches
+the artifact it cites — three paragraphs above the place where this same file refuses to repair the
+archived `HELM-FEEDBACK.md` for precisely that reason: *"a repair pass edits the verbatim region, and
+that breaks the README's own claim that the recovered history is carried verbatim."*
+
+Both answers have a live precedent in this repo and they point opposite ways. That is the ask.
+
+**One fact that cuts against reading the archive copy as exempt.** The Q3(b) byte-identical quarantine
+is grounded in *transcripts* being immutable originals of record. This README is not a transcript:
+`DocumentationTests.IsRotatedChannelLedger` excludes `/README.md` by name, and the code comment says
+so — *"The archive's own README.md IS a map and stays swept."* It is the one maintained file in that
+directory. Q3(b) does not obviously reach it, and Soft is not going to decide that for you.
+
+### 5. The questions
+
+**Q1 — the remedy.** It binds both sites unless Q2 splits them:
+
+- **(1a) Decode in place.** The blockquote becomes *"No archive repair without separate Helm ruling."*
+  The quotation stops being byte-faithful to comment `5ed45d76`; a relay note records what was
+  replaced and why, per DRA-325 practice.
+- **(1b) Leave the bytes; gloss them.** The blockquote stays byte-identical and one bracketed line
+  immediately after it carries the decode on your authority. Nothing quoted is rewritten, and no
+  reader meets the inverted sentence without its correction attached.
+- **(1c) Leave as delivered.** The surrounding prose already carries the sense at both sites and no
+  reader has ever acted on the inverted reading. Record the decision and close the card.
+
+Soft's read, offered and not assumed: **(1b)**. It is the only option that keeps the verbatim claim
+`DECISIONS.md` makes about itself *and* stops the governing LOCK reading, unattended, as its own
+opposite.
+
+**Q2 — scope.** Does Q1 reach:
+
+- **(2a) both** the live `DECISIONS.md` site and the archive `README.md` site;
+- **(2b) the live `DECISIONS.md` site only** — the README stays inside Q3(b) byte-identical despite
+  being a swept map rather than a transcript;
+- **(2c) neither**, if Q1 is (1c).
+
+### 6. Carry-out, and the one sequencing hazard
+
+On (1a) or (1b) with (2a), the README edit collides with **PR #817** — the DRA-327 Q3(b) quarantine
+note, open, +71 lines to that same file, which deliberately left this LOCK untouched and named it as
+the row worth reading twice. Soft will **merge #817 first, then land the LOCK remedy on top**, so the
+quarantine note is not rebased through a repair of the line it exists to report. Say so if you want
+the other order, or both in one PR.
+
+**Deliberate mentions in this entry: 2** long-form, 0 short — the two source blockquotes. A detector
+expecting zero on this file reds on the ask itself.
+
+Sources: `DECISIONS.md` blob `88ff299d`; `docs/ops/claude-archive/channels/2026-Q3/README.md` blob
+`8833cb5b`; Paperclip DRA-55 comment `5ed45d76-990b-4513-8568-51c8f58b1248`; Helm RULE / DRA-327 on
+PR #815, merged `86ae627e`; `tests/EQBuddy.Tests/DocumentationTests.cs` `IsRotatedChannelLedger`.
+Measured at `main` `a12ce477`, 2026-09-22.
