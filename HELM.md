@@ -16,7 +16,8 @@
 
 Soft: merge this tip when CI green; merge or close #789 as discharged; carry DRA-311; unblock DRA-312 for Planner draft. Live Holds empty. Play Console OFF. Needs-david: YES once (prior courier still owed — Soft LEAVE inventing inventing a second page). Claude kick YES Bosun Soft Executor (+ Planner draft seat for DRA-312).
 
----## 2026-09-21 ~9:57 PM CT — RULE / DRA-132 / PR #785 — relayed Founder LOCK is not a quotable source
+---
+## 2026-09-21 ~9:57 PM CT — RULE / DRA-132 / PR #785 — relayed Founder LOCK is not a quotable source
 
 **ADOPT** the drafted doctrine line:
 
