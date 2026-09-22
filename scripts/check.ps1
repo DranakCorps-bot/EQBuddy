@@ -48,7 +48,7 @@ function Step([string] $name, [scriptblock] $body) {
     if ($LASTEXITCODE -ne 0) {
         Write-Host "FAILED" -ForegroundColor Red
         # Only the lines that say why — a full MSBuild log buries the one that matters.
-        $output | Select-String -Pattern 'error |Failed!|\[FAIL\]|Assert\.|whatsnew-guard|legacy-notice-guard|evolved-channel-guard|channel-wipe-guard|channel-size-guard|channel-size-selftest|soft-seat-selftest|merge-sync|commit-identity|FAIL: ' |
+        $output | Select-String -Pattern 'error |Failed!|\[FAIL\]|Assert\.|whatsnew-guard|legacy-notice-guard|evolved-channel-guard|channel-wipe-guard|channel-size-guard|channel-size-selftest|soft-seat-selftest|merge-sync|commit-identity|challenge-line-guard|FAIL: ' |
             Select-Object -First 15 | ForEach-Object { Write-Host "   $_" }
         Write-Host "   full log: $log" -ForegroundColor Yellow
         $script:failed += $name
@@ -102,6 +102,18 @@ Step 'commit id   ' { & "$PSScriptRoot\commit-identity-guard.ps1" 6>&1 }
 # throwaway repo, every allow-list row exercised, and both fail-open paths asserted to SAY
 # they judged nothing. Prove-failed against six mutants of the guard.
 Step 'commit test ' { & "$PSScriptRoot\commit-identity-selftest.ps1" 6>&1 }
+# The Challenger gate's keyed line (DRA-309 S3, off the DRA-305 SPEC). Every plan that
+# reached the C-test carries `challenge: dra-<n>-… -> …` at the TOP of its body, and ZERO
+# plans carry one inside a slice sequence — the gate fires once at plan SIGN and never per
+# slice (§3.2), so a keyed line on a D(n+1) hand-off is the gate drifting into the slice
+# sequence. The must-list is the half that can see a plan which quietly skipped the gate
+# (trap 34); the forbid-scan alone is green on a repo that stopped walking it entirely.
+Step 'gate line   ' { & "$PSScriptRoot\challenge-line-guard.ps1" 6>&1 }
+# …and its prove-fail. Ten refusals driven red over throwaway corpora, five allowed shapes
+# driven green (a guard that refused those would re-impose the every-card tax DRA-306's
+# condition removed), and BOTH curated lists proven load-bearing by mutation rather than by
+# inspection. Prove-failed against six mutants of the guard.
+Step 'gate test   ' { & "$PSScriptRoot\challenge-line-selftest.ps1" 6>&1 }
 # Experiment A′ self-test (trap 70, EQBuddy lab): a second default seat on the
 # same work item must refuse. Throwaway StoreDir; not the machine's live claims.
 Step 'soft seats  ' { & "$PSScriptRoot\soft-seat-selftest.ps1" 6>&1 }
