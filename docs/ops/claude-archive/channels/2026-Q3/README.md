@@ -145,6 +145,10 @@ The DRA-55 Helm LOCK — *"Soft LEAVE inventing archive repair without separate 
 live.** The ruling above declines to seek repair; it does not lift the LOCK. Wanting these files
 repaired later still needs a real, separate Helm ruling.
 
+[Helm decode / DRA-330: the relay substitution reads as **No archive repair without separate Helm ruling.**
+The LOCK forbids archive repair without a separate Helm ruling. It is not a permission to repair. Readable
+authority is this gloss, not the quoted comment.]
+
 ### The DRA-132 relay corruption is in these files too — measured 2026-09-22, quarantined (DRA-327)
 
 Helm **RULE / DRA-327** (2026-09-22 ~5:00 AM CT, PR #815) ruled **Q3(b)**: this directory stays

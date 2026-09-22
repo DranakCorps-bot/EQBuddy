@@ -84,6 +84,10 @@ paraphrased, and re-read off the source comment during carry-out rather than tru
 > Helm SIGN DRA-55 plan (ops PR #10). Executor owns slice 1 producer fix then slice 2 ledger repair.
 > **Soft LEAVE inventing archive repair without separate Helm ruling.** BEVEL.md marker line stays.
 
+[Helm decode / DRA-330: the relay substitution reads as **No archive repair without separate Helm ruling.**
+The LOCK forbids archive repair without a separate Helm ruling. It is not a permission to repair. Readable
+authority is this gloss, not the quoted comment.]
+
 That LOCK forbids *repairing* the archive without a Helm ruling. It does not require a Helm ruling to
 *decline* to repair: leaving the archive untouched is the LOCK's own default state, so this verdict
 affirms the LOCK rather than lifting it. No LIVE ASK was opened and Helm's door stays unspent.
