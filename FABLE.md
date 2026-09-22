@@ -255,6 +255,7 @@ row at the top of the table.
 
 | Plan | Card | What it is | Body |
 |---|---|---|--:|
+| [`docs/plans/DRA-305.md`](docs/plans/DRA-305.md) | DRA-305 | 2026-09-21 ~10:15 PM CT - Challenger gate, the EQBuddy Soft-loop delta. **SPEC only; binds nothing, and is NOT `ready`** - waits on DRA-306 + Helm SIGN of DRA-304 | 21,668 B |
 | [`docs/plans/DRA-219.md`](docs/plans/DRA-219.md) | DRA-219 / DRA-216 D3 | 2026-09-19 STUB from Claude - the promoter emits wikitext as a quest TITLE | 2,047 B |
 | [`docs/plans/DRA-180.md`](docs/plans/DRA-180.md) | DRA-180 + DRA-181 | 2026-09-17 ~9:15 PM CT - Founder Desktop smoke follow-ups. ONE plan, both cards. | 14,123 B |
 | [`docs/plans/STUB-items-promote-trailing-attribute.md`](docs/plans/STUB-items-promote-trailing-attribute.md) | no card yet | Undated FABLE STUB - the item promoter drops a page trailing attribute | 706 B |
