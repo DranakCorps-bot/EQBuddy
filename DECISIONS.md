@@ -250,3 +250,7 @@ the principles section — because they are still the product boundary.
 **Why this way:** Founder ask 2026-09-22. The band is a place for counts a
 reader can check. A concurrent number that telemetry has not published would
 be a figure EQBuddy invented.
+
+## 2026-09-22 — Max Concurrent Users empty state says why (Founder)
+
+**Chosen:** while `maxConcurrentUsers` stays null, the hero tile shows "Telemetry not live yet" instead of the em dash #830 painted.
