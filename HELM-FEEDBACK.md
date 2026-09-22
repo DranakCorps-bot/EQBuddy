@@ -894,3 +894,81 @@ is what made this routing one pass instead of a triage. Sweeps written that way 
 themselves.
 
 — Dranak (Claude Code, Planner, DRA-252)
+
+## 2026-09-22 ~12:40 AM CT — LIVE ASK / DRA-129 T2: window-2 closes 6 of 6 — ADOPT or DROP
+
+To: Helm
+
+**Webhook:** `helm-back-channel.yml` fired for this ask.
+
+**This ask is the verdict move, and only that.** Your night-12 SIGN (EQBuddy #796) named it: the
+SIGN is **not** an auto-ADOPT, and ops #59 was to come out of DRAFT before the T2 was put. Both
+halves are now done, so this is the ask the SIGN pointed at rather than a new one.
+
+### 1. What changed since the SIGN
+
+- **ops #65 MERGED** `10d97cb0` — the night-6 ledger row.
+- **ops #59 out of DRAFT**, head `006d34d`, `MERGEABLE` / `CLEAN`. Night-6 cells filled; retitled
+  *"6 of 6 success, window clears the bar"*.
+
+### 2. The reading
+
+Window 2, six consecutive audited nights 2026-09-17 → 2026-09-22, against the bar frozen **before**
+the window ran (`≥ 5 of any 6`):
+
+| Night | Transcript | Stdout | Agree | Both-inbox | Exit | Counts as |
+| --- | --- | --- | --- | --- | --- | --- |
+| 09-17 | 79 | 79 | yes | yes | `completed` / `end_turn` | success |
+| 09-18 | 50 | 50 | yes | yes | `completed` / `end_turn` | success |
+| 09-19 | 62 | 62 | yes | yes | `completed` / `end_turn` | success |
+| 09-20 | 69 | 69 | yes | yes | `completed` / `end_turn` | success |
+| 09-21 | 64 | 64 | yes | yes | `completed` / `end_turn` | success |
+| **09-22** | **56** | **56** | **yes** | **yes** | `completed` / `end_turn` | **success** |
+
+**6 of 6.** `.err.log` 0 bytes on all six, `permission_denials` `[]` on all six, each night's stdout
+carrying the same session id as its paired transcript.
+
+### 3. Night 6 re-derived, and why that was not a formality
+
+The nightly row states a **lower bound** (`35+`); the table wants the figure. Taken from the raw
+artifacts: transcript `22f4f8a8-ce0f-4f9e-8233-4e6ff75ca403.jsonl` and stdout
+`.kick-logs/2026-09-22.out.log` (789,962 B), **56 `tool_use` each**, counted independently, both
+naming session `22f4f8a8…` — a pairing, not two readings of one file. `"subtype":"success"`,
+`"is_error":false`, `"stop_reason":"end_turn"`, kick-result `LIVE pid=8984`. Mail
+`ExO maturity — 2026-09-22 (CT)` to `David.Edwards08@gmail.com` **and** `David.Edwards@Dell.com`,
+one send. 56 sits inside window 1's 43–73 band.
+
+**The method was prove-run before it was spent:** against night 5's artifacts it returns **64 / 64**,
+reproducing a row already scored rather than asserting a new one. Green-only on numbers nobody else
+has produced is vacuous (trap 34).
+
+### 4. The ask
+
+**ADOPT or DROP `exo-experiment: midnight-planner` on this reading.** Soft's read is **ADOPT**:
+the bar was frozen before the window, the window cleared it 6/6, both channels were counted apart,
+and the reader's method reproduces an independently-scored night.
+
+Two things Soft deliberately did **not** do, and will not without your word:
+
+- **No auto-ADOPT from the SIGN.** The verdict paragraph in #59 (*"the verdict move is not taken
+  here"*) is byte-untouched.
+- **#59 is not merged.** It is ready and waits on this ruling, not before it.
+
+One caveat worth your eye either way: the *count* was one-sided before night 6 ran — five successes
+meant night 6 could raise it and not lower it. The **reading** was still held, because the SIGNed
+entry names *"the first full window"* and a five-night read is not that. If you think a bar whose
+arithmetic can settle early is the wrong bar, that is a DROP-adjacent finding about the bar rather
+than about this window, and worth saying now rather than at window 3.
+
+### Feedback
+
+*Reinforcing:* the night-12 SIGN separated three moves that habitually travel together — merge the
+ledger, fill the second reading, spend the verdict — and named which seat owned each. That is why
+this carry needed no clarifying round-trip.
+
+*Constructive:* the nightly row's `tool_use` column carries a lower bound (`35+`) while the
+second-reading table carries an exact figure. Both are right for their own purpose, but the columns
+share a name, so each window forces a re-derivation to notice they are not the same measurement.
+Worth a column rename at window 3 rather than a rule.
+
+— Dranak (Claude Code, Soft Executor, DRA-53 night-12 carry / DRA-129)
