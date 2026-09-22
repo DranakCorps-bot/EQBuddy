@@ -117,6 +117,16 @@ for David to carry the ask.
 - **Priority:** `ready` (plan written; Claude may take it) Â· `needs-david: <the decision>`
   (names ONE consequence-list decision; waits for his answer, never for a generic "approve") Â·
   `someday`. David may still write `approved` as an explicit mark; it means `ready`.
+- **`challenge:`** — the keyed line from the **Challenger gate** (the Challenger role is a
+  Paperclip agent under Planner — *not* `claim-seat -Mode challenger`, which is a seat-mutex
+  claim category and a different thing), required on any plan that trips C1–C5. The rule and
+  the pointer to the ops SPEC are in `CLAUDE.md`, *How a ruling lands, and what a SIGN buys*;
+  this bullet only says where the line goes. It sits at the **top of the plan body**, beside
+  `route:` and `needs-david:` — that is the durable record, and the LIVE ASK restates it.
+  Where the C-test was **evaluated and no test fired**, Planner writes
+  `challenge: <slug> -> NOT-ENGAGED (no C-test fires)`: a **Planner gate-status line, not a
+  fifth Challenger verdict**, and **never required on a card that never reached the C-test**.
+  The gate fires at the plan's SIGN and never per slice, so a D(n+1) hand-off carries no line.
 - **Class:** `V2` or `V3` (if you cannot say why it is not V0–V1, it does not go here)
 - **Source:** discussion/issue, Bevel/Scribe item, or David's words
 - **Plan:** architecture, risks, decomposition, verification, what is out of scope
@@ -251,11 +261,14 @@ Card accent inset shadows: teal / good / warn only.
 ## Plan index
 
 One row per live plan. **The body is in the linked file, not here.** Newest first; add a new
-row at the top of the table.
+row at the top of the table. A row **may** carry its gate outcome in the *What it is* cell,
+and it takes **no new column** — the durable record is the `challenge:` line at the top of
+the plan body, so a column here would be a second producer of one fact (trap 4). The *Body*
+figure is the same byte count the over-ceiling branch measures.
 
 | Plan | Card | What it is | Body |
 |---|---|---|--:|
-| [`docs/plans/DRA-305.md`](docs/plans/DRA-305.md) | DRA-305 | 2026-09-21 ~10:15 PM CT - Challenger gate, the EQBuddy Soft-loop delta. **SPEC only; binds nothing, and is NOT `ready`** - reshaped 2026-09-21 against the merged ops SPEC (`9c8faf51`, ops #58); upstream gates discharged, now waits only on its own Helm SIGN (its §7.1) after its §7.2 gate walk | 29,579 B |
+| [`docs/plans/DRA-305.md`](docs/plans/DRA-305.md) | DRA-305 | 2026-09-21 ~10:15 PM CT - Challenger gate, the EQBuddy Soft-loop delta. **SPEC only; binds nothing, and is NOT `ready`** - reshaped 2026-09-21 against the merged ops SPEC (`9c8faf51`, ops #58); upstream gates discharged, now waits only on its own Helm SIGN (its §7.1) after its §7.2 gate walk | 32,652 B |
 | [`docs/plans/DRA-219.md`](docs/plans/DRA-219.md) | DRA-219 / DRA-216 D3 | 2026-09-19 STUB from Claude - the promoter emits wikitext as a quest TITLE | 2,047 B |
 | [`docs/plans/DRA-180.md`](docs/plans/DRA-180.md) | DRA-180 + DRA-181 | 2026-09-17 ~9:15 PM CT - Founder Desktop smoke follow-ups. ONE plan, both cards. | 14,123 B |
 | [`docs/plans/STUB-items-promote-trailing-attribute.md`](docs/plans/STUB-items-promote-trailing-attribute.md) | no card yet | Undated FABLE STUB - the item promoter drops a page trailing attribute | 706 B |
