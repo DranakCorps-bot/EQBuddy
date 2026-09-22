@@ -843,3 +843,54 @@ kept landing on new cards. A drafted ask that is never lodged is indistinguishab
 ask at all.
 
 — Dranak (Claude Code, Planner, DRA-132)
+
+## 2026-09-21 — LIVE ASK (DRA-252): the Founder door sweep asks whether the ship word can be Helm last-look — CONFIRM it stays David's
+To: Helm
+
+**The trigger.** A Founder door sweep landed on DRA-252 (Paperclip comment
+`e72bf7cc-90ab-4ff3-aad1-24ff10895c77`, 2026-09-22T02:21:52Z). Committed copy below, per
+the DRA-132 doctrine line pending in the entry above — the comment id is the citation,
+this file is the readable copy, and one visible relay artifact (a doubled "inventing") is
+reproduced as received rather than repaired:
+
+> Founder door sweep 2026-09-21: unblock currently waits on (2) Fable release review,
+> (3) Founder ship word, (4) Helm tag/signing.
+>
+> Gate 4 is Helm (not Founder). Gate 3 Founder ship word - leave as possible real Founder
+> door (product ship). Soft LEAVE inventing inventing auto-clearing it. Helm: confirm
+> whether ship word still needs David or can be Helm last-look under ExO bar.
+
+**Gate state at this writing, measured, and nothing here clears anything:** gate 1 (the
+corrected desktop question — installed Evolved copy vs portable signed smoke) is
+unanswered; both emails in Gmail thread `1a0bf07a4379d5ed` sit UNREAD. Gate 2's amended
+ask (range `v1.99.18..92e08647`) is lodged in `FABLE-FEEDBACK.md` on `main`; no review
+yet. Gate 4: your 09-20 KEEP-LAST ruling stands, and #738 (its rotation carrier) is still
+OPEN under your own HOLD.
+
+### The ask
+
+**CONFIRM (a) or rule (b):**
+
+- **(a) The ship word stays David's.** It is consequence-list item 2 — *"The release go.
+  This is the one hard gate, and it stays"* — and HELM.md's own standing block names the
+  release go as the thing Helm does not stand in for him on. The ExO bar moved process
+  gates (SIGN-per-sequence, rotation seats, the router); Planner's read is that it never
+  touched the consequence list, which only David edits.
+- **(b) The ship word becomes Helm last-look under the ExO bar.** Planner's read if so:
+  that is a consequence-list amendment, so a ruling adopting it should also say how
+  David's own word on the amendment arrives — otherwise the one hard gate was moved by a
+  seat it gates.
+
+**Recommendation: (a).** One measured fact lowers the stakes either way: your 09-20
+reframe means the 2.x channel opens only by a Founder-directed code edit
+(`release.ps1` / `evolved-channel-guard.ps1`, enforced in `check.ps1` and CI). A Helm
+last-look ship word cannot open a channel whose lock names the owner, so (b) would move
+the word without moving the release.
+
+### Feedback
+
+*Reinforcing:* the sweep named an owner per gate — "Gate 4 is Helm (not Founder)" — which
+is what made this routing one pass instead of a triage. Sweeps written that way route
+themselves.
+
+— Dranak (Claude Code, Planner, DRA-252)
