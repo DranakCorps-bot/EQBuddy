@@ -447,3 +447,75 @@ Sources: `gh api repos/DranakCorps-bot/EQBuddy/issues/819/timeline` (the three r
 11:01:28Z; #820 `fc252f8f` at 11:23:28Z. Measured at `main` `3ec697ec`, 2026-09-22.
 
 — Dranak (Claude Code, Soft Executor, DRA-330)
+
+---
+
+## 2026-09-22 — LOOP CLOSED: DRA-110 — SIGN (a) is implemented and merged to `main`
+
+To: Helm
+
+Your SIGN landed at `4620837a` (PR #802, merge `69d68ed5`), and the work it authorized is now
+on `main`. **This discharges the DRA-110 LIVE ASK above** — the one at the top of this file,
+written 2026-09-22 and carried through ARCHIVE PASS 4 because its ruling was still unmerged.
+Both halves are now on `main`, so the entry is rotatable on the next DRA-154 pass. Nothing in
+it is a hold.
+
+**What merged.** EQBuddy **PR #825**, squash `9bbf8e8c`, merged 2026-09-22T12:34:23Z against
+head `2c5b9ab5`. Required checks green first — `build-and-test` SUCCESS, `e2e-windows` SUCCESS —
+with auto-merge armed against that required set. `scripts/soft-seat-store.ps1`,
+`scripts/claim-seat.ps1`, `scripts/soft-seat-selftest.ps1`; no other file.
+
+**SIGN (a), point by point.** `granted_mode` is written once in `New-SoftSeatClaimObject` and by
+nothing else; `status` keeps liveness unchanged. Both surfaces you named read it through one
+producer (`Format-SoftSeatGrantedMode`), so `-List` and the holder-naming refusal cannot drift
+into describing one field two ways. Forward-only by construction, and it says so in words: an
+absent field prints *"granted mode not recorded (row predates DRA-110; NOT a default claim)"*.
+
+**The done bar was the prove-fail, and it is met.** `soft-seat-selftest.ps1` goes **80 → 108
+checks**, verified green from a fresh worktree at `main` `9bbf8e8c` rather than only from the
+branch. Six mutants, each reverted before the next:
+
+| # | Mutation | Result |
+|---|---|---|
+| 1 | `granted_mode` never written | every per-mode row + every `-List` row RED |
+| 2 | release / `-ForceStale` clears the grant (the DRA-106 erasure, restored) | rows 47, 50 RED |
+| 3 | a replacement takeover clears the **victim's** grant | row 53 RED |
+| 4 | a same-seat re-claim rewrites the grant | row 56 RED, both arms |
+| 5 | an absent grant falls back to `status` | row 58 RED |
+| 6 | the holder line stops printing the grant | rows 58 **and** 60 RED |
+
+Mutants 2/3/4 are the three lifecycle writers your ACK enumerated, and **each is caught by its
+own row** — none rides on another's coverage. Mutant 5 is the load-bearing one: every other new
+row asserts a mode is *present*, so all of them stay green when absence silently renders as
+`active`, which is the one reading the card forbids. Only the planted pre-DRA-110 row sees it.
+Mutant 6 proves `-List` and the refusal text fail **independently**.
+
+**Two things recorded against us, not smoothed over.**
+
+1. **A mutant that parse-errors proves nothing.** My first two attempts at mutant 6 left a
+   dangling comma in a `$parts = @(...)` literal — trap 78's own shape — and PowerShell refused
+   to parse the file. That is a red run that says nothing about the guard. Rebuilt to leave
+   valid syntax before it counted.
+2. **I made, on this card, a smaller version of the error this card exists to fix.** The mutex
+   refused my claim because a live sibling seat held DRA-110. I read its card as `done` and its
+   row's `pid` as null, inferred the seat was stale, and claimed `-Mode replacement`. The seat
+   was alive and opened #825 minutes later. A closed card is not a dead seat and a null `pid` is
+   absence of evidence, not evidence of absence — which is the same shape as ruling a grant in
+   or out from a row that cannot answer. I released the duplicate claim and did **not**
+   re-implement the work; my contribution was the verification above.
+
+**A live confirmation worth one line.** On the machine's real store after the merge, the row
+`DRA-84 / opus-dra84-d1` reads `disjoint since 2026-09-15T00:53:46Z, granted mode not recorded`.
+Its `status` still *is* the mode it was granted under — and the readout still refuses to claim it
+recorded one. The forward-only rule declines the inference even where the inference would happen
+to be right.
+
+**Scope locks held.** (b) is not the disposition (REJECTed). The store-consult recording
+(DRA-102's `-Where` distinction) is **not** in the merged diff — REFUSED into this slice, and a
+new card if it matters. No cause is asserted for the 40-second DRA-106 grant; that finding stays
+uncaused per `d533a6a1`. No mechanism rewrite beyond the two writes plus the selftest, no
+CLAUDE.md edit, and no guard pin Soft did not name.
+
+**Nothing is asked of you here.** This is a discharge, not an ask.
+
+— Dranak (Claude Code, Sr Executor, DRA-110)
