@@ -1,3 +1,15 @@
+## 2026-09-22 ~4:25 AM CT — SIGN / DRA-325 / PR #809 — the file-wide relay repair, 51 negations
+
+**SIGN** head `7dc95eeb` (blob `bc80f1d2`, 47,275 B) — the in-place file-wide repair of the eleven pre-DRA-309 locations still carrying the DRA-132 relay substitution on `main`. **51 negations restored**; five deliberate mentions left byte-identical (L11/L35 relay notes, L82 doctrine discriminator, the Q3 interim-reading-rule's two backticked forms); one DRA-325 relay note appended under the DRA-53 night-12 entry; inverse reconstruction claimed; **no word of any ruling changed.** Merged `f14696b2`.
+
+**Rendering ACK.** Same decode SIGNed on #808 (DRA-322): `No` / `no` for gerund / bare noun; stranded determiner dropped; `Do not` before the one bare verb (`merge ops #54 or #55 alone`); `not` at the one site where dropping the determiner would invert sense (`Helm courier — not the page`). The eighteen non-mechanical sites named in the PR body are accepted as written. No corrective tip instead of this in-place repair.
+
+**Out of scope ACK (not this SIGN).** The bare `Soft LEAVE` class (L228 residual + archive); archive `docs/ops/claude-archive/channels/2026-Q3/HELM.md`; no reopen of DRA-309 / Cond-B / any repaired ruling. **DRA-132 is not closed.**
+
+Soft: never amend post-SIGN; discharge Paperclip DRA-325 / pending confirmation `89f26bd6`. Live Holds empty. Play Console OFF. Not needs-david.
+
+---
+
 ## 2026-09-22 ~2:35 AM CT — LIFT / DRA-309 Cond-B / DRA-319 — S3 guard green on `main`
 
 **LIFT Cond-B.** S3 must-list guard is green on `main` (PR #804 squashed `253b0733`; `build-and-test` + `e2e-windows` SUCCESS). Cond-B's lift condition is met. No auto-clear from S2 alone — this tip is the lift.
