@@ -16,6 +16,8 @@ flight" table in `docs/ops/exo-dashboard.md` by reading these lines — each tag
 clause running from it to the next blank line* — out of **this file**. DRA-231's cut moved the five
 2026-09-14 entries that first carried them into the archive, so the tags are re-pinned here
 **verbatim** under DRA-144's never-rotate floor: all six experiments they name are still in flight.
+Tags registered after that cut are appended below the re-pinned six and live under the same floor:
+`challenger-seat` (DRA-300) is the first.
 The full entries, with their calls and evidence, are in
 `docs/ops/claude-archive/channels/2026-Q3/DECISIONS.md` — follow a tag there for the reasoning, and
 keep it here for as long as the experiment is open. Retire a tag by graduating the experiment, never
@@ -58,6 +60,24 @@ exo-experiment: ssc-retirement — judged by *PRs + Helm touches per slice*
 exo-experiment: whole-sequence-auth — judged by *Governance Wait Ratio* and
 *Autonomous Correct Completion Rate* (baseline GWR 0.40–0.60, ACCR 0%),
 stated net of *escaped defect rate*.
+
+`exo-experiment: challenger-seat` — judged by *the two-direction challenge count* that §8 of
+`purpose/CHALLENGER_ROLE_CHARTER.md` defines, both sides kept because a one-sided count is how
+`seat-mutex` above failed. **Direction A — the challenge that was owed and never came:** a plan
+shipped, the premise failed, and either no wake fired or the assessment said PROCEED; loud when it
+lands, and counted from the failure backwards. **Stated net of direction B — the challenge that
+cost more than it bought:** a wake fired, the plan changed, and the change bought nothing. §8 names
+direction B as *the direction a red team fails silently in*, because every individual challenge is
+defensible and nobody files a complaint about excess rigour — left uncounted, it is how the
+Challenger becomes a mandatory review gate while reporting green, which is the same one-sided defect
+the `seat-mutex` tag records. **Kill criterion, stated in advance:** after **ten** C1–C4 wakes, a
+direction-B count exceeding the direction-A count means the seat is **DROPped, not tuned** — the bar
+is a rate and not an anecdote. **No reading yet, and this tag claims none:** the §8 30-day baseline
+(over the preceding 30 days of `done` cards, the count of SIGNs later reversed or narrowed, and of
+plans whose stated premise was contradicted by what shipped) is **not frozen**; it is owed on its own
+card, **DRA-301**, and §8 requires it *before the first wake* — the seat has already taken one, so it
+is late. Wake count today is **1 of 10** (DRA-299, 2026-09-22, exit 0). Registered from the commit
+that stood the seat up, per §8, so the metric exists before the readings do rather than after.
 
 ## 2026-09-17 — DRA-161 / EXO-HARDEN-A1e: the rotated archive copies are OUT of scope for mojibake repair, permanently
 
