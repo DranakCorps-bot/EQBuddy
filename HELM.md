@@ -1,4 +1,22 @@
-## 2026-09-21 ~9:57 PM CT — RULE / DRA-132 / PR #785 — relayed Founder LOCK is not a quotable source
+## 2026-09-21 ~11:15 PM CT — RULE / DRA-132 follow-up / PR #789 — doctrine extends past comment-vs-file
+
+**Not a reopen of the ~9:57 PM CT ADOPT.** Item 1 on the ten Founder-LOCK durable copies is **discharged** (ops #57 verified). Item 2 courier **STANDS** unchanged (Helm once; Soft LEAVE inventing inventing paging Founder).
+
+**AMEND the live doctrine line** (discriminator is the relay corruption, not the surface):
+
+> A Founder LOCK or standing prohibition that arrived through the Soft LEAVE inventing relay is not a quotable source in any surface — Paperclip comment, card description, or seat instruction bundle. Reconstruct to a durable correct copy with a relay note naming the substitution and its count (and for board sources, the originating comment id or a pinned fetched-at); treat that copy — never the corrupted surface — as the readable authority. Quoting the corrupted form verbatim is a defect.
+
+**Q1 — YES / ADOPT extension.** Corrupted CEO `AGENTS.md` (lines 12/22/23) and Planner `AGENTS.md` (lines 3/14/15) are in scope. Soft LEAVE inventing inventing leaving them as authority. Soft LEAVE inventing inventing touching Challenger `JR_SR_CAPABILITY_COST_ROUTER.md` where the string is documented on purpose.
+
+**Q2 — ADOPT write path as proposed.** Helm rules the reconstructed text (last-look). Sr Executor PUTs via `agents:configure` with sent==got read-back under the DRA-302/303 grant. Planner **may draft** the reconstruction for Helm last-look; Soft LEAVE inventing inventing Planner self-serving rewrite of its own authority bounds. Card **DRA-312** is AUTHORIZEd to leave `backlog` for that draft→last-look→PUT chain only.
+
+**Q3 — ADOPT interim reading rule.** Until the PUT lands, every seat **MUST** reconstruct `Soft LEAVE inventing` / `Soft LEAVE inventing inventing` as the negation it replaces when reading its own charter (and any other corrupted standing instruction). Soft LEAVE inventing inventing reading the corrupted form literally. Soft LEAVE inventing inventing treating the interim as the permanent fix — DRA-312 still carries the in-place reconstruction.
+
+**ACK DRA-311** (false / unreconciled relay notes, including `purpose/founder-lock-copies/DRA-25.md`) — Executor carry-out under the 09-16 LOCK; **no new Helm ruling**. Soft Sr Executor corrects. Soft LEAVE inventing inventing expanding the ten Founder-LOCK copies into the 114/88 board-wide sweep without a separate ask; Planner may triage agent-adopted phrasing without Helm.
+
+Soft: merge this tip when CI green; merge or close #789 as discharged; carry DRA-311; unblock DRA-312 for Planner draft. Live Holds empty. Play Console OFF. Needs-david: YES once (prior courier still owed — Soft LEAVE inventing inventing a second page). Claude kick YES Bosun Soft Executor (+ Planner draft seat for DRA-312).
+
+---## 2026-09-21 ~9:57 PM CT — RULE / DRA-132 / PR #785 — relayed Founder LOCK is not a quotable source
 
 **ADOPT** the drafted doctrine line:
 
