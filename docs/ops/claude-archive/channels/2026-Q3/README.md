@@ -145,6 +145,77 @@ The DRA-55 Helm LOCK — *"Soft LEAVE inventing archive repair without separate 
 live.** The ruling above declines to seek repair; it does not lift the LOCK. Wanting these files
 repaired later still needs a real, separate Helm ruling.
 
+### The DRA-132 relay corruption is in these files too — measured 2026-09-22, quarantined (DRA-327)
+
+Helm **RULE / DRA-327** (2026-09-22 ~5:00 AM CT, PR #815) ruled **Q3(b)**: this directory stays
+**byte-identical**, and the DRA-232 re-pin's byte-for-byte promise **stands**. This note is the
+quarantine that ruling ordered. **No byte of any rotated file here was changed** — the counts below
+were taken by reading the blobs, and every blob sha in the table is still the sha on `main`.
+
+The defect is the one DRA-132 names: the Founder-chat to Paperclip relay drops negations at rest,
+substituting a stock phrase where a negation belongs, so a prohibition quoted verbatim **permits what
+it forbids**. DRA-327 established that the substitution has a **second, shorter form**, and that the
+marker every earlier count used is a superstring of it — so every count in that family before
+2026-09-22 was blind to the short form *by construction, not by error*.
+
+The two literal marker strings are deliberately **not** written in this file. This README is itself a
+row in the table below, and quoting the markers here would falsify its own counts the moment this note
+landed. They are stated once, with the counting rule that keeps the two forms disjoint, in the
+founder-lock-copies README in the dranakcorps-ops repo (rule 1, "Measurement basis").
+
+| file | bytes | blob | short form | long form |
+|---|--:|---|--:|--:|
+| `HELM.md` | 1,146,639 | `c1fc3ecf` | **627** | **6,090** |
+| `HELM-FEEDBACK.md` | 2,259,556 | `bde941af` | 171 | 256 |
+| `HELM-FEEDBACK.original-flattened.md` | 4,926,243 | `fef3a1f9` | 223 | 86 |
+| `DECISIONS.md` | 671,370 | `d4cb1579` | 10 | 4 |
+| `FABLE.md` | 472,049 | `5cf10863` | 2 | 0 |
+| `SCRIBE.md` | 100,221 | `8b5a60fd` | 2 | 1 |
+| `FABLE-FEEDBACK.md` | 1,281,304 | `fe141761` | 1 | 2 |
+| `README.md` (this file) | 17,146 | `8833cb5b` | 0 | 1 |
+| `BEVEL.md` | 222,075 | `40e6e767` | 0 | 0 |
+| `BEVEL-FEEDBACK.md` | 465,275 | `4efc2ebe` | 0 | 0 |
+| `SCRIBE-FEEDBACK.md` | 77,353 | `d6564dd7` | 0 | 0 |
+| **total** | **11,639,231** | | **1,036** | **6,440** |
+
+**DRA-327 measured only the first row.** The card was raised on `HELM.md` alone — 627 and 6,090 — and
+those two figures are exactly reproduced here. The other ten rows are new: **six further files in this
+directory carry the corruption**, and no count in the DRA-132 family had ever looked at them. That is
+what this note exists to stop being true.
+
+**This file's own row is not a curiosity.** The `1` counted against this README is in the DRA-55 LOCK
+quoted three paragraphs above — the LOCK that forbids repairing this archive without a separate Helm
+ruling. It arrived through the same relay as everything else it governs, so **read verbatim it says the
+opposite**: it reads as permitting archive repair. The sentences around it carry the true sense
+("**stays live**… still needs a real, separate Helm ruling"), and Q3(b) has now ruled the same way
+independently, so nothing has ever acted on the inverted reading. **It is left exactly as it is.** A
+quoted Helm LOCK is Part A text; decoding one is Helm's word, not a carry-out — it is recorded here and
+carried to Helm as a follow-up, not rewritten by the seat that found it.
+
+**Where the repaired copy is.** The live `HELM.md` at the repo root is repaired and current: DRA-309
+and DRA-325 restored 51 negations across eleven entries (PR #809, merged `f14696b2`), and DRA-327 Q2(a)
+decoded the last short-form site there — *"No 7 KB walls on a HELM tip."* — in PR #815 (`86ae627e`).
+
+**Do not expect the live file to count zero.** It carries **4 short-form and 9 long-form** occurrences
+on `main` at `86ae627e`, and every one of them is a **deliberate mention** — doctrine text *about* the
+substitution rather than a ruling corrupted by it. They are the DRA-309 and DRA-325 relay notes stating
+their own counts, the AMENDed doctrine line's discriminator, the reading rule that tells a seat how to
+reconstruct the negation, and Helm's DRA-327 tip itself, which necessarily quotes the corrupted string
+in the course of ruling on it. **Corrupted sites: zero. Total sites: thirteen.** The two numbers are
+different things, and a checker built to assert zero reds on the remedy rather than on a defect — which
+is why the repair was measured as "no site remains that a reader could mistake for a ruling", never as
+an absolute count.
+
+Quote rulings from it, never from
+`docs/ops/claude-archive/channels/2026-Q3/HELM.md`, which is the corrupted **original of record** and
+is kept that way on purpose: it is what the relay actually delivered, and a repaired archive could no
+longer prove that.
+
+This is the same logic as the mojibake ruling two sections up, reached separately and for the same
+reason — a rotated copy is not an independent site of corruption, and repair pays on the live files.
+The difference is only that this defect inverts meaning rather than mangling glyphs, so the count is
+worth stating precisely instead of leaving to a reader's guess.
+
 ### A transcript is not a map, and the doc sweep had to learn the difference
 
 `DocumentationTests.EveryFileTheDocsPointAtExists` sweeps every `.md` under
