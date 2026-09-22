@@ -103,6 +103,14 @@ internal sealed class HomeRoom : Grid, IShellRoom
     private IReadOnlyList<string> _classes = [];
     private ClassSource _classSource = ClassSource.Unknown;
     private List<string> _stated = [];
+    /// <summary>The three inputs <see cref="ClassStatement.EditorSelection"/> seeds from
+    /// when nobody has stated anything yet — captured in this same Render as
+    /// <c>_classes</c>, so the chips and the line describe one moment (trap 56). The
+    /// line itself still comes from <c>ClassSourceFor</c>; these are not a second
+    /// resolution.</summary>
+    private IReadOnlyList<string> _unlockedClasses = [];
+    private IReadOnlyList<string> _inferred = [];
+    private IReadOnlyList<string> _picks = [];
     /// <summary>How many class unlocks the achievements dump states for this character —
     /// the CAPTION's input (DRA-262 D2), never identity's. <c>_classes</c> above is capped
     /// at <see cref="CharacterClasses.Max"/> by the one resolution every surface reads, so
@@ -232,7 +240,10 @@ internal sealed class HomeRoom : Grid, IShellRoom
         // disk, and a cast that finally qualifies a class should not wait five seconds.
         (_classes, _classSource) = _main.ClassSourceFor(s);
         _stated = _main.QuestLedger?.StatedClassesFor(_main.QuestCharacterKey) ?? [];
-        _unlocked = _main.QuestLedger?.UnlockedClassesFor(_main.QuestCharacterKey).Count ?? 0;
+        _unlockedClasses = _main.QuestLedger?.UnlockedClassesFor(_main.QuestCharacterKey) ?? [];
+        _unlocked = _unlockedClasses.Count;
+        _inferred = s.InferredClasses;
+        _picks = _main.QuestLedger?.ClassesFor(_main.QuestCharacterKey) ?? [];
         // The level reading — the SAME resolution the Helper, the unlock preview and the xp
         // tooltip read (MainWindow.ResolvedLevel), so this room cannot name a level the rest
         // of the app disagrees with. Read every tick for the same reason the class line is:
@@ -604,10 +615,15 @@ internal sealed class HomeRoom : Grid, IShellRoom
         // A WrapPanel, never a horizontal StackPanel — sixteen chips at any width is the
         // canonical trap-25 strip.
         var wrap = new WrapPanel { Margin = new Thickness(0, Tok.SpaceXs, 0, 0) };
+        // The chips, from ClassStatement — a statement that stands, or the guess the
+        // line is already showing when nobody has stated anything. Selecting from
+        // `_stated` alone left this strip blank under a line that named three classes,
+        // and a click on one of those three stored it instead of removing it.
+        var selection = ChipSelection();
         foreach (var cls in QuestClassFilter.Classes)
         {
             var chip = new EqChip(cls, cls, onClick: () => ToggleStated(cls));
-            chip.SetSelected(_stated.Contains(cls, StringComparer.OrdinalIgnoreCase));
+            chip.SetSelected(selection.Contains(cls, StringComparer.OrdinalIgnoreCase));
             wrap.Children.Add(chip);
             _classChips++;
         }
@@ -632,17 +648,23 @@ internal sealed class HomeRoom : Grid, IShellRoom
         block.Children.Add(clear);
     }
 
+    /// <summary>What the chips are showing right now. <see cref="ClassStatement"/> is
+    /// the one answer. While a statement stands it is that statement; with none, it
+    /// asks <c>CharacterClasses.Resolve</c> for the guess — the same call the line
+    /// already made through <c>ClassSourceFor</c>, with the same inputs.</summary>
+    private IReadOnlyList<string> ChipSelection() =>
+        ClassStatement.EditorSelection(_stated, _unlockedClasses, _inferred, _picks);
+
     private void ToggleStated(string cls)
     {
-        var stated = new List<string>(_stated);
-        if (stated.RemoveAll(c => c.Equals(cls, StringComparison.OrdinalIgnoreCase)) == 0)
-        {
-            // The cap is announced in the note above the chips; a fourth tick changes
-            // nothing rather than silently evicting a class the player chose first.
-            if (stated.Count >= CharacterClasses.Max) return;
-            stated.Add(cls);
-        }
-        WriteStated(stated);
+        // The click is against the chips, which may be the seeded guess rather than
+        // the (empty) statement. Starting from `_stated` alone turned "take Paladin
+        // off" into "store Paladin". A click that changes nothing — the fourth tick,
+        // which the note above the chips already refuses — writes nothing.
+        var current = ChipSelection();
+        var next = ClassStatement.Toggle(current, cls);
+        if (next.SequenceEqual(current, StringComparer.OrdinalIgnoreCase)) return;
+        WriteStated([.. next]);
     }
 
     private void WriteStated(List<string> stated)
