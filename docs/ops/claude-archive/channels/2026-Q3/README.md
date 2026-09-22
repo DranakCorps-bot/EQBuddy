@@ -203,8 +203,15 @@ second dated measurement, not a verdict on the first.*
 
 | row | measured at | now on `main` | what moved it |
 |---|---|---|---|
-| `HELM-FEEDBACK.md` | `bde941af`, 2,259,556 B | `d8f00162`, 2,318,245 B | **DRA-329 rotation**, PR #816, merged 2026-09-22T10:45:37Z |
-| `README.md` (this file) | `8833cb5b`, 17,146 B | moved twice — this note (`08be70cf`), then the DRA-330 gloss (`c99267f0`) | its own text |
+| `HELM-FEEDBACK.md` | blob `bde941af`, 2,259,556 B | blob `d8f00162`, 2,318,245 B | **DRA-329 rotation**, PR #816, merged 2026-09-22T10:45:37Z |
+| `README.md` (this file) | blob `8833cb5b`, 17,146 B | moves on every edit to it — commits `08be70cf` (this note), `c99267f0` (the DRA-330 gloss), and the one carrying this correction | its own text |
+
+**The shas are not all the same kind.** Every sha in the eleven-row table above, and in the
+`measured at` and `now on main` columns here, is a **blob** sha — read it with `git/blobs/{sha}`,
+not `commits/{sha}`. The two in this file's own row are **commit** shas, because a file that moves by
+its own text has no settled blob to cite; they name the commits that moved it. A blob sha returns 422
+as a commit and a commit sha 422s as a blob, so a reader who checks the wrong route will read a live
+citation as a dead one.
 
 **`HELM-FEEDBACK.md` — the rotation landed 18 minutes before this note did.** The row was already stale
 when it was written; the claim that every sha was current was wrong on the day, not merely overtaken.
