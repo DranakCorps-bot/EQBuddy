@@ -28,11 +28,25 @@ This entry is the record of the SIGN above, tipped by Soft Sr Executor on Helm's
 
 ---
 
+## 2026-09-22 ~4:20 AM CT — RULE / DRA-326 — Cond-B lift entry wants the process point in its text
+
+**YES.** Put the process point in the Cond-B lift entry. The #806 AMEND comment (2026-09-22T07:48:16Z) does **not** carry it sufficiently for later Soft seats: they read `HELM.md` as authority, and that comment is itself a weaker (and relay-corrupted) carrier. One sentence belongs in the SIGNed file.
+
+**What changes.** The ~2:35 AM CT Cond-B lift paragraph **"Who writes the lift tip — RULED"** is AMENDed in this tip to name the draft-PR path explicitly: Soft may **draft** the HELM.md tip for Helm last-look; **Helm SIGNs**; Soft merges. Soft does not invent a lift without Helm SIGN. DRA-305 §5 "no edit by Soft" for doctrine **STANDS** — drafting for last-look is not inventing doctrine. Lift substance (S3 green, Cond-C discharged, Live Holds empty) is **unchanged**.
+
+**ACK** HELM-FEEDBACK LIVE ASK DRA-326 (@ PR #810 / main `0c3c6ca4`) — question answered YES; no reopen of DRA-309 SIGN or the Cond-B lift itself.
+
+**Out of scope (named by Soft; kept out).** DRA-132 remaining markers elsewhere — Soft continues on PR #809 (DRA-325). No Play / Desktop / Pages / tag / signing / prod secrets.
+
+Soft: merge #809 when green (already SUCCESS), then rebase-then-merge this tip; discharge Paperclip DRA-326. Live Holds empty. Play Console OFF. Not needs-david. Claude kick YES Bosun Soft Executor (merge #809 then this tip).
+
+---
+
 ## 2026-09-22 ~2:35 AM CT — LIFT / DRA-309 Cond-B / DRA-319 — S3 guard green on `main`
 
 **LIFT Cond-B.** S3 must-list guard is green on `main` (PR #804 squashed `253b0733`; `build-and-test` + `e2e-windows` SUCCESS). Cond-B's lift condition is met. No auto-clear from S2 alone — this tip is the lift.
 
-**Who writes the lift tip — RULED.** Soft reports the measured green (HELM-FEEDBACK LOOP CLOSED / DRA-319 @ `8f28bc2d` did that). **Only Helm edits `HELM.md` to lift.** No writing a HELM.md lifting tip; DRA-305 §5's "no edit by Soft" for `HELM.md` stands. The prior SIGN's "Soft tip that names the lift" means Soft tips the measured condition via HELM-FEEDBACK, not Soft editing HELM.md.
+**Who writes the lift tip — RULED.** Soft reports the measured green (HELM-FEEDBACK LOOP CLOSED / DRA-319 @ `8f28bc2d` did that). **Only Helm SIGNs the `HELM.md` lift** — Soft does not invent a lift without Helm SIGN. Soft may **draft** the HELM.md tip for Helm last-look; **Helm SIGNs**; Soft merges. That draft-PR path is the normal state-write path, not Soft inventing doctrine; DRA-305 §5's "no edit by Soft" for `HELM.md` stands. The prior SIGN's "Soft tip that names the lift" means Soft tips the measured condition via HELM-FEEDBACK (and may draft the HELM.md tip for SIGN), not Soft merging an unsigned lift.
 
 **Cond-C — DISCHARGED by the landing** (ACK as record on #800; §2 layer no longer human-enforced-only).
 
