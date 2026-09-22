@@ -20,7 +20,7 @@ byte-for-byte as they stood at `main` `8bb7c3c9`:
   (Q1 ADOPT 1a / Q2 ADOPT 2a / Q3 ADOPT 3b) is drafted on **PR #815**, open.
 
 **An ask stays live until its ruling is on `main`.** All three rulings above were unmerged at
-2026-09-22T10:2xZ when this cut was taken, so all three asks stay in the live file. Each one
+**2026-09-22T10:13:42Z**, when this cut was taken, so all three asks stay in the live file. Each one
 leaves on the pass that follows the merge of its tip, not before. DRA-329's own bar names
 DRA-327 specifically: *"Never rotate the pending ask into the archive while unanswered."*
 
