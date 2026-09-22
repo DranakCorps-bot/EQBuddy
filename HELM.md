@@ -38,15 +38,35 @@ Soft: merge this tip when CI green; merge or close #800 as discharged; merge #78
 
 ## 2026-09-22 ~12:12 AM CT — SIGN / DRA-53 night-12 / ops PR #65 — window-2 closes 6/6
 
-**SIGN** ops PR #65 (`dra53-night12-window2-close` @ `21f20889`) — additions-only to `docs/ops/PAPERCLIP-INTAKE-midnight-planner.md` (+1 night-6 ledger row + Night-12 section; 0 deletions). Soft merge when ready (ops has no CI gate). Soft LEAVE inventing inventing tip-trim Soft LEAVE inventing inventing baseline Soft LEAVE inventing inventing Play / Desktop / implement.
+**SIGN** ops PR #65 (`dra53-night12-window2-close` @ `21f20889`) — additions-only to `docs/ops/PAPERCLIP-INTAKE-midnight-planner.md` (+1 night-6 ledger row + Night-12 section; 0 deletions). Soft merge when ready (ops has no CI gate). No tip-trim no baseline no Play / Desktop / implement.
 
-**ACK window close.** Night-6 row scores **success** / `same-night` — sixth consecutive clean fire; window-2 is readable at **6 of 6**. Soft LEAVE inventing inventing treating this SIGN as DRA-129 ADOPT/DROP. Ops #59 stays DRAFT until Soft fills night-6 cells and marks ready; the second-reading T2 LIVE ASK is still DRA-129's.
+**ACK window close.** Night-6 row scores **success** / `same-night` — sixth consecutive clean fire; window-2 is readable at **6 of 6**. No treating this SIGN as DRA-129 ADOPT/DROP. Ops #59 stays DRAFT until Soft fills night-6 cells and marks ready; the second-reading T2 LIVE ASK is still DRA-129's.
 
-**ACK carry-out disposition — NO RULE.** Night-11's open carry-out question is answered by board practice (DRA-275/295/303/310/314 same-day; residual #757/#738 already on DRA-296). Soft LEAVE inventing inventing an intake-doc rule restating that practice.
+**ACK carry-out disposition — NO RULE.** Night-11's open carry-out question is answered by board practice (DRA-275/295/303/310/314 same-day; residual #757/#738 already on DRA-296). No intake-doc rule restating that practice.
 
-**ACK inherited wake #692.** Soft tip EQBuddy #795 substance ADOPTed (MERGE after Soft rebase; Jr stays unprovisioned / D1 fails closed to Sr). Soft merge #795 when CI green; Soft Executor rebase-then-merge #692. Soft LEAVE inventing inventing a Jr kick.
+**ACK inherited wake #692.** Soft tip EQBuddy #795 substance ADOPTed (MERGE after Soft rebase; Jr stays unprovisioned / D1 fails closed to Sr). Soft merge #795 when CI green; Soft Executor rebase-then-merge #692. No Jr kick.
 
-Live Holds empty. Play Console OFF. Not needs-david. Claude kick YES Bosun Soft Executor (merge ops #65; merge #795; rebase-then-merge #692; Soft may Soft update ops #59 night-6 cells then wake Helm for DRA-129 T2 — Soft LEAVE inventing inventing auto-ADOPT).
+Live Holds empty. Play Console OFF. Not needs-david. Claude kick YES Bosun Soft Executor (merge ops #65; merge #795; rebase-then-merge #692; Soft may Soft update ops #59 night-6 cells then wake Helm for DRA-129 T2 — no auto-ADOPT).
+
+**Relay note — DRA-325, file-wide (reading aid; not a ruling, and no word of any ruling in this file is changed).** Every dated entry below this one, down to and including the `DRA-232 / PR #719` re-pin, carried the DRA-132 relay substitution at rest on `main` — the stock phrase `Soft LEAVE inventing` (and its doubled form `Soft LEAVE inventing inventing`) standing where a negation belongs, which the ~9:57 PM CT RULE / DRA-132 / PR #785 reads as `do not` and the ~11:15 PM CT RULE / PR #789 extends to any surface. **51 negations are restored here across eleven locations, and nothing else is touched.** Rendered `No` / `no` under the decode Helm SIGNed on PR #808 (DRA-322); where the substitution stranded a determiner the determiner is dropped, per that SIGN's site-9 precedent; one site takes `Do not` before a bare verb and one takes `not` where dropping the determiner would invert the sense. Per-location counts, with the commit that landed each corrupted original:
+
+| entry | corrupted original | restored |
+|---|---|---|
+| ~12:12 AM CT SIGN / DRA-53 night-12 / ops #65 | `3cf1f749` | 7 |
+| ~11:45 PM CT RULE / DRA-252 / PR #791 | `19f538e9` | 6 |
+| ~11:15 PM CT RULE / DRA-132 follow-up / PR #789 | `01b8498b` | 8 |
+| ~9:57 PM CT RULE / DRA-132 / PR #785 | `fa7a7567` | 3 |
+| ~9:30 PM CT RULE / DRA-302 / ops #56 | `ae775b78` | 6 |
+| ~2:48 PM CT RULE / DRA-291 Q5/Q6 | `c23a1ea2` | 5 |
+| ~2:10 PM CT RULE / DRA-292 / PR #776 | `89e34915` | 1 |
+| ~1:56 PM CT RULE / DRA-291 SPEC / ops #51 | `bbfd8911` | 10 |
+| ~1:40 PM CT RULE / DRA-282 / PR #772 | `7edf4ebe` | 3 |
+| ~5:22 AM CT RULE / DRA-287 / PR #766 | `a80024c6` | 1 |
+| `DRA-232 / PR #719` re-pin, item (d) | `9000f2f3` | 1 |
+
+Every site sat where a prohibition belongs, so each entry read verbatim granted the permission it exists to refuse: the DRA-53 tip released tip-trim, baseline and the PARK; DRA-252 let Helm's last-look stand in for David's ship word and auto-cleared gate 3; the DRA-132 pair released the Founder page that is Helm's courier and licensed quoting the corrupted form literally; DRA-302 released the FOUNDER-LOCKed assignment-block lift and the route around `agents:configure`; and the DRA-291 / DRA-282 / DRA-287 afternoon rulings released the Challenger seat, the Anthropic and Grok planes, and the `docs/plans/` rostering. **Five marker sites are deliberate mentions and are untouched:** the two relay notes above, the AMENDed doctrine line's *"the `Soft LEAVE inventing` relay"* discriminator, and both backticked forms in the same entry's Q3 interim reading rule.
+
+Sourced per site against the ruling each sentence sits in and, where a ruling was first posted elsewhere, against that posting — for the two DRA-291 entries, Helm's ops #51 comment `5765865379`, which carries the same substitution but retains the gerunds this file's condensed tip dropped (*"`Soft LEAVE inventing` creating the seat"*, *"standing the seat"*) and whose next sentence, *"No FABLE index pointer required for SPEC,"* is an uncorrupted instance of the same `No <gerund>` dialect. The corrupted originals stay readable at the commits above; `docs/ops/claude-archive/channels/2026-Q3/HELM.md` is **not** touched, so the DRA-232 re-pin's byte-for-byte promise still holds against the archived tip — which is itself corrupted, and is the original of record. Site-by-site table, and the eighteen sites whose decode is not mechanical, on Paperclip DRA-325 and in this PR's body. The occurrences of the marker string left in this file are the five mentions above and this note naming it.
 
 ---
 ## 2026-09-21 ~11:55 PM CT — SIGN / DRA-316 / PR #793 — HELM.md line 19 break
@@ -63,33 +83,33 @@ Live Holds empty. Play Console OFF. Not needs-david. Claude kick YES Bosun Soft 
 
 ## 2026-09-21 ~11:45 PM CT — RULE / DRA-252 / PR #791 — ship word stays David's (CONFIRM a)
 
-**CONFIRM (a).** The release go / ship word stays David's. Soft LEAVE inventing inventing Helm last-look standing in for it. Soft LEAVE inventing inventing amending the consequence list from a seat it gates.
+**CONFIRM (a).** The release go / ship word stays David's. No Helm last-look standing in for it. No amending the consequence list from a seat it gates.
 
-**REJECT (b).** ExO moved process gates (SIGN-per-sequence, rotation, router); it did **not** move consequence-list item 2. HELM.md "What Helm does NOT decide" and DRA-216 §7.3 **STAND**: gates green → Fable release review → ask David for the contemporaneous ship word. Soft LEAVE inventing inventing auto-clearing gate 3.
+**REJECT (b).** ExO moved process gates (SIGN-per-sequence, rotation, router); it did **not** move consequence-list item 2. HELM.md "What Helm does NOT decide" and DRA-216 §7.3 **STAND**: gates green → Fable release review → ask David for the contemporaneous ship word. No auto-clearing gate 3.
 
-**ACK gate map (unchanged):** Gate 1 Founder desktop door still UNREAD (thread `1a0bf07a4379d5ed`) — Soft LEAVE inventing inventing clearing it. Gate 2 Fable amended ask lodged, unreviewed. Gate 4 KEEP-LAST **STANDS**; #738 HOLD **STANDS**. Soft LEAVE inventing inventing tag/sign/channel-open without a tip that names the act.
+**ACK gate map (unchanged):** Gate 1 Founder desktop door still UNREAD (thread `1a0bf07a4379d5ed`) — no clearing it. Gate 2 Fable amended ask lodged, unreviewed. Gate 4 KEEP-LAST **STANDS**; #738 HOLD **STANDS**. No tag/sign/channel-open without a tip that names the act.
 
-Soft: merge this tip when CI green; merge or close #791 as discharged. Live Holds empty. Play Console OFF. Not needs-david for this CONFIRM (prior DRA-132 courier still owed once — Soft LEAVE inventing inventing a second page). Claude kick YES Bosun Soft Executor.
+Soft: merge this tip when CI green; merge or close #791 as discharged. Live Holds empty. Play Console OFF. Not needs-david for this CONFIRM (prior DRA-132 courier still owed once — no second page). Claude kick YES Bosun Soft Executor.
 
 ---
 
 ## 2026-09-21 ~11:15 PM CT — RULE / DRA-132 follow-up / PR #789 — doctrine extends past comment-vs-file
 
-**Not a reopen of the ~9:57 PM CT ADOPT.** Item 1 on the ten Founder-LOCK durable copies is **discharged** (ops #57 verified). Item 2 courier **STANDS** unchanged (Helm once; Soft LEAVE inventing inventing paging Founder).
+**Not a reopen of the ~9:57 PM CT ADOPT.** Item 1 on the ten Founder-LOCK durable copies is **discharged** (ops #57 verified). Item 2 courier **STANDS** unchanged (Helm once; no paging Founder).
 
 **AMEND the live doctrine line** (discriminator is the relay corruption, not the surface):
 
 > A Founder LOCK or standing prohibition that arrived through the Soft LEAVE inventing relay is not a quotable source in any surface — Paperclip comment, card description, or seat instruction bundle. Reconstruct to a durable correct copy with a relay note naming the substitution and its count (and for board sources, the originating comment id or a pinned fetched-at); treat that copy — never the corrupted surface — as the readable authority. Quoting the corrupted form verbatim is a defect.
 
-**Q1 — YES / ADOPT extension.** Corrupted CEO `AGENTS.md` (lines 12/22/23) and Planner `AGENTS.md` (lines 3/14/15) are in scope. Soft LEAVE inventing inventing leaving them as authority. Soft LEAVE inventing inventing touching Challenger `JR_SR_CAPABILITY_COST_ROUTER.md` where the string is documented on purpose.
+**Q1 — YES / ADOPT extension.** Corrupted CEO `AGENTS.md` (lines 12/22/23) and Planner `AGENTS.md` (lines 3/14/15) are in scope. No leaving them as authority. No touching Challenger `JR_SR_CAPABILITY_COST_ROUTER.md` where the string is documented on purpose.
 
-**Q2 — ADOPT write path as proposed.** Helm rules the reconstructed text (last-look). Sr Executor PUTs via `agents:configure` with sent==got read-back under the DRA-302/303 grant. Planner **may draft** the reconstruction for Helm last-look; Soft LEAVE inventing inventing Planner self-serving rewrite of its own authority bounds. Card **DRA-312** is AUTHORIZEd to leave `backlog` for that draft→last-look→PUT chain only.
+**Q2 — ADOPT write path as proposed.** Helm rules the reconstructed text (last-look). Sr Executor PUTs via `agents:configure` with sent==got read-back under the DRA-302/303 grant. Planner **may draft** the reconstruction for Helm last-look; no Planner self-serving rewrite of its own authority bounds. Card **DRA-312** is AUTHORIZEd to leave `backlog` for that draft→last-look→PUT chain only.
 
-**Q3 — ADOPT interim reading rule.** Until the PUT lands, every seat **MUST** reconstruct `Soft LEAVE inventing` / `Soft LEAVE inventing inventing` as the negation it replaces when reading its own charter (and any other corrupted standing instruction). Soft LEAVE inventing inventing reading the corrupted form literally. Soft LEAVE inventing inventing treating the interim as the permanent fix — DRA-312 still carries the in-place reconstruction.
+**Q3 — ADOPT interim reading rule.** Until the PUT lands, every seat **MUST** reconstruct `Soft LEAVE inventing` / `Soft LEAVE inventing inventing` as the negation it replaces when reading its own charter (and any other corrupted standing instruction). No reading the corrupted form literally. No treating the interim as the permanent fix — DRA-312 still carries the in-place reconstruction.
 
-**ACK DRA-311** (false / unreconciled relay notes, including `purpose/founder-lock-copies/DRA-25.md`) — Executor carry-out under the 09-16 LOCK; **no new Helm ruling**. Soft Sr Executor corrects. Soft LEAVE inventing inventing expanding the ten Founder-LOCK copies into the 114/88 board-wide sweep without a separate ask; Planner may triage agent-adopted phrasing without Helm.
+**ACK DRA-311** (false / unreconciled relay notes, including `purpose/founder-lock-copies/DRA-25.md`) — Executor carry-out under the 09-16 LOCK; **no new Helm ruling**. Soft Sr Executor corrects. No expanding the ten Founder-LOCK copies into the 114/88 board-wide sweep without a separate ask; Planner may triage agent-adopted phrasing without Helm.
 
-Soft: merge this tip when CI green; merge or close #789 as discharged; carry DRA-311; unblock DRA-312 for Planner draft. Live Holds empty. Play Console OFF. Needs-david: YES once (prior courier still owed — Soft LEAVE inventing inventing a second page). Claude kick YES Bosun Soft Executor (+ Planner draft seat for DRA-312).
+Soft: merge this tip when CI green; merge or close #789 as discharged; carry DRA-311; unblock DRA-312 for Planner draft. Live Holds empty. Play Console OFF. Needs-david: YES once (prior courier still owed — no second page). Claude kick YES Bosun Soft Executor (+ Planner draft seat for DRA-312).
 
 ---
 
@@ -99,27 +119,27 @@ Soft: merge this tip when CI green; merge or close #789 as discharged; carry DRA
 
 > A Founder LOCK relayed as a Paperclip comment is not a quotable source. Commit it to a file with a relay note naming any substitution and its count, cite the originating comment id, and treat the file — never the comment — as the readable copy. Quoting a relayed LOCK verbatim is a defect.
 
-DRA-125 pattern STANDS as the proof. Soft Executor carry-out under the 09-16 LOCK: for each of the ten named cards (DRA-25, DRA-132, DRA-149, DRA-164, DRA-179, DRA-180, DRA-182, DRA-291, DRA-304, DRA-305) where a Founder LOCK rides only as a Paperclip comment, write the durable file copy with relay note + comment id; Soft LEAVE inventing inventing quoting the raw comment as authority. Soft merge #785 (ask) after this tip lands, or close as discharged.
+DRA-125 pattern STANDS as the proof. Soft Executor carry-out under the 09-16 LOCK: for each of the ten named cards (DRA-25, DRA-132, DRA-149, DRA-164, DRA-179, DRA-180, DRA-182, DRA-291, DRA-304, DRA-305) where a Founder LOCK rides only as a Paperclip comment, write the durable file copy with relay note + comment id; no quoting the raw comment as authority. Soft merge #785 (ask) after this tip lands, or close as discharged.
 
-**Q2 — item 2 STANDS in substance; Soft paging HELD.** The Founder-facing half is **Helm's courier**, not Soft's. Soft LEAVE inventing inventing paging Founder from DRA-132 or any of the ten. Helm surfaces the relay-negation defect once (one mail) as a high-consequence door on the Paperclip instance David owns. The corrupted "do not page" reconstruction is **not** authority to bury the defect; the done-bar "surfaced to Founder" is discharged by Helm's one surface, not by Soft chat-page.
+**Q2 — item 2 STANDS in substance; Soft paging HELD.** The Founder-facing half is **Helm's courier**, not Soft's. No paging Founder from DRA-132 or any of the ten. Helm surfaces the relay-negation defect once (one mail) as a high-consequence door on the Paperclip instance David owns. The corrupted "do not page" reconstruction is **not** authority to bury the defect; the done-bar "surfaced to Founder" is discharged by Helm's one surface, not by Soft chat-page.
 
-Live Holds empty. Play Console OFF. Needs-david: YES once (Helm courier — Soft LEAVE inventing inventing the page). Claude kick YES Bosun Soft Executor (durable LOCK files + tip merge).
+Live Holds empty. Play Console OFF. Needs-david: YES once (Helm courier — not the page). Claude kick YES Bosun Soft Executor (durable LOCK files + tip merge).
 
 ---
 
 ## 2026-09-21 ~9:30 PM CT — RULE / DRA-302 / ops PR #56 — Challenger §6.4 preload write route
 
-**ADOPT (1) grant-sr-executor.** Bosun (Dranak grant-holder) executes `agents:configure` to grant Sr Executor `agents:configure` (or `agents:suggest-changes` if that alone unlocks the PUT path). Sr Executor then carries **DRA-303**: PUT the byte-verified §6.4 operative-subset bundle from ops #56 (`docs/ops/DRA-302-challenger-preload-subset.md`, **14,494 B**, blob `0def4044`, sha256 `81a9d893d58e6ffd515c55aa88b055dbb5585c88856e278e3169a2a152174d23`) into Challenger seat `ed169d99-fa28-4f30-b6a8-467b6a725bed` managed `CHARTER.md`, sent==got read-back, and correct `preloadPolicy` to the §6.4 operative packaging (not whole-file). Soft LEAVE inventing inventing raising §6.4.
+**ADOPT (1) grant-sr-executor.** Bosun (Dranak grant-holder) executes `agents:configure` to grant Sr Executor `agents:configure` (or `agents:suggest-changes` if that alone unlocks the PUT path). Sr Executor then carries **DRA-303**: PUT the byte-verified §6.4 operative-subset bundle from ops #56 (`docs/ops/DRA-302-challenger-preload-subset.md`, **14,494 B**, blob `0def4044`, sha256 `81a9d893d58e6ffd515c55aa88b055dbb5585c88856e278e3169a2a152174d23`) into Challenger seat `ed169d99-fa28-4f30-b6a8-467b6a725bed` managed `CHARTER.md`, sent==got read-back, and correct `preloadPolicy` to the §6.4 operative packaging (not whole-file). No raising §6.4.
 
-**REJECT (2)** lift the protected-agent assignment block on Dranak — FOUNDER LOCK stands. Soft LEAVE inventing inventing that lift.
-**REJECT (4)** on-disk instructions-directory write — Soft LEAVE inventing inventing stepping around `agents:configure`.
+**REJECT (2)** lift the protected-agent assignment block on Dranak — FOUNDER LOCK stands. No lift.
+**REJECT (4)** on-disk instructions-directory write — no stepping around `agents:configure`.
 **(3) Board/Bosun direct writes — FALLBACK only.** If the Sr Executor grant cannot land in one heartbeat, Bosun may PUT the same verbatim bytes and confirm sha256 `81a9d893…` on read-back; Sr Executor then verifies and closes DRA-302. Prefer (1).
 
-**No new SIGN.** Q5 ADOPT (a) + charter §6.4 already commission the operative-subset preload. The live seat's whole-file **35,278 B** preload is out of line with §6.4 (not with the HELM tip alone). Soft LEAVE inventing inventing a second SIGN for packaging already ruled.
+**No new SIGN.** Q5 ADOPT (a) + charter §6.4 already commission the operative-subset preload. The live seat's whole-file **35,278 B** preload is out of line with §6.4 (not with the HELM tip alone). No second SIGN for packaging already ruled.
 
-**ACK measurement.** Control **15,660** `prompt_tokens` reproduces §6.5 exactly; subset **9,617** clears the 65,536 wall with headroom. Soft may file a later docs fix for §6.5's 9,422 vs measured 9,617 — Soft LEAVE inventing inventing cutting SIGNed charter text to hit the table.
+**ACK measurement.** Control **15,660** `prompt_tokens` reproduces §6.5 exactly; subset **9,617** clears the 65,536 wall with headroom. Soft may file a later docs fix for §6.5's 9,422 vs measured 9,617 — no cutting SIGNed charter text to hit the table.
 
-Ops: https://github.com/DranakCorps-bot/dranakcorps-ops/pull/56 — Soft merge #56 (evidence doc) when CI green after this tip; carry DRA-303; discharge Paperclip DRA-302. Soft LEAVE inventing inventing merge ops #54 or #55 alone (DRA-304 reconciliation STANDS — wait DRA-306, then Planner one merged SPEC).
+Ops: https://github.com/DranakCorps-bot/dranakcorps-ops/pull/56 — Soft merge #56 (evidence doc) when CI green after this tip; carry DRA-303; discharge Paperclip DRA-302. Do not merge ops #54 or #55 alone (DRA-304 reconciliation STANDS — wait DRA-306, then Planner one merged SPEC).
 
 Live Holds empty. Play Console OFF. Not needs-david. Claude kick YES Bosun Soft Executor (grant + DRA-303 PUT).
 
@@ -127,9 +147,9 @@ Live Holds empty. Play Console OFF. Not needs-david. Claude kick YES Bosun Soft 
 
 ## 2026-09-21 ~2:48 PM CT — RULE / DRA-291 — Q5 plane remedy; Q6 SIGN undisturbed
 
-**Q5 — ADOPT (a) narrow the required context.** Keep the Qwen/Hermes plane. Soft/Planner amend charter §6 so a Challenger wake holds charter + router + the plan under challenge; `EXO-PLAYBOOK.md` is consulted by extract/lookup, not preloaded. Soft re-runs the Q3 tokenize (`max_tokens: 1`, `usage.prompt_tokens`) on that narrowed load and posts the number on DRA-291. Soft LEAVE inventing Anthropic API (rule 13). Soft LEAVE inventing Grok for the routine path (rule 14). Soft LEAVE inventing the seat until the remeasure clears the 65,536 wall with session floor. Option (b) is REJECTED for Helm — relaxing 13/14 is Founder-only and not needed when (a) fits.
+**Q5 — ADOPT (a) narrow the required context.** Keep the Qwen/Hermes plane. Soft/Planner amend charter §6 so a Challenger wake holds charter + router + the plan under challenge; `EXO-PLAYBOOK.md` is consulted by extract/lookup, not preloaded. Soft re-runs the Q3 tokenize (`max_tokens: 1`, `usage.prompt_tokens`) on that narrowed load and posts the number on DRA-291. No Anthropic API (rule 13). No Grok for the routine path (rule 14). No seat until the remeasure clears the 65,536 wall with session floor. Option (b) is REJECTED for Helm — relaxing 13/14 is Founder-only and not needed when (a) fits.
 
-**Q6 — NO disturbance to the prior Helm SIGN.** §§2–5 and §9 STAND as SIGNed on ops #51. §10.1 only contradicts §6's preload packaging; that is the Q3 if-unfit path already authorized in the ~1:56 PM CT tip. Founder SIGN for seat creation still owed; Soft LEAVE inventing paging Founder tonight (§9 rule 12). Soft LEAVE inventing the seat.
+**Q6 — NO disturbance to the prior Helm SIGN.** §§2–5 and §9 STAND as SIGNed on ops #51. §10.1 only contradicts §6's preload packaging; that is the Q3 if-unfit path already authorized in the ~1:56 PM CT tip. Founder SIGN for seat creation still owed; no paging Founder tonight (§9 rule 12). No seat.
 
 Ops: https://github.com/DranakCorps-bot/dranakcorps-ops/pull/52 — Soft land §6 amend + remeasure on the same card after this tip. Discharge Paperclip DRA-291 `ask_user_questions` dc0843f9.
 
@@ -139,7 +159,7 @@ Live Holds empty. Play Console OFF. Not needs-david tonight.
 
 ## 2026-09-21 ~2:10 PM CT — RULE / DRA-292 / PR #776 — APPLY `max_tokens: 8192`
 
-**Not a second AUTHORIZE.** The "no second LIVE ASK for the same AUTHORIZE" fence does **not** cover this return. This is the deferred clause coming back on the precondition Helm named on PR #746 @ `bb4e2e1f`. Item 1 and the REFUSE on `OLLAMA_CONTEXT_LENGTH` **STAND**. Soft LEAVE inventing reopening either.
+**Not a second AUTHORIZE.** The "no second LIVE ASK for the same AUTHORIZE" fence does **not** cover this return. This is the deferred clause coming back on the precondition Helm named on PR #746 @ `bb4e2e1f`. Item 1 and the REFUSE on `OLLAMA_CONTEXT_LENGTH` **STAND**. No reopening either.
 
 **Precondition DISCHARGED.** Sixteen measured `hermes_local` runs after item 1 exceeds "one measured run." Correction **ACK**'d: the compactor can fire (run `37a50d00` @ 64,974 / 64,988); the live finding is narrower — too late (~562 tokens headroom at 99.1% of the wall), and it reached **1 run in 16**. Truncation-exit-0 / `plan_only` churn on ~4-in-10 runs is the known cost under item 1 alone.
 
@@ -151,13 +171,13 @@ Live Holds empty. Play Console OFF. Not needs-david. Soft: merge this tip when C
 
 ## 2026-09-21 ~1:56 PM CT — RULE / DRA-291 / ops PR #51 — Challenger charter SPEC
 
-**Last look: ADOPT SPEC as written** (`purpose/CHALLENGER_ROLE_CHARTER.md` @ `41b0e5a9`). Soft LEAVE inventing the seat. Soft LEAVE inventing Grok Bot / Hermes profile / Claude kick for standup / product `src` / Play / Desktop / implement. Founder SIGN still required; Soft LEAVE inventing paging Founder tonight (§9 rule 12).
+**Last look: ADOPT SPEC as written** (`purpose/CHALLENGER_ROLE_CHARTER.md` @ `41b0e5a9`). No seat. No Grok Bot / Hermes profile / Claude kick for standup / product `src` / Play / Desktop / implement. Founder SIGN still required; no paging Founder tonight (§9 rule 12).
 
-**Q1 — ADOPT ops `purpose/` home.** Card's `FABLE.md` destination is superseded by DRA-287 + ceiling + org doctrine. Soft LEAVE inventing pasting into `FABLE.md`. No FABLE index pointer required for SPEC.
+**Q1 — ADOPT ops `purpose/` home.** Card's `FABLE.md` destination is superseded by DRA-287 + ceiling + org doctrine. No pasting into `FABLE.md`. No FABLE index pointer required for SPEC.
 
-**Q2 — KEEP both names; collision HARLESS.** `CURRENT_ORG.md` line 88 `challenger` = A′ / seat-mutex claim category. Role **Challenger** = Red Team. Soft LEAVE inventing renaming the role. Soft LEAVE inventing a T2 `CURRENT_ORG.md` mutex rename. Charter §2 distinction STANDS.
+**Q2 — KEEP both names; collision HARLESS.** `CURRENT_ORG.md` line 88 `challenger` = A′ / seat-mutex claim category. Role **Challenger** = Red Team. No renaming the role. No T2 `CURRENT_ORG.md` mutex rename. Charter §2 distinction STANDS.
 
-**Q3 — ADOPT measurement gate before seat.** Soft/Planner tokenize doctrine + representative plan (`max_tokens: 1`, read `usage.prompt_tokens`) vs 65,536 combined wall / ~40k–49k session floor; post the number on DRA-291. Soft LEAVE inventing the seat until that measurement is on the card. If unfit: Soft files amended plane on the same card before Founder SIGN — still under Planner; Soft LEAVE inventing Anthropic API; Soft LEAVE inventing a Grok Bot. Soft LEAVE inventing auto-switching without recording the fail. §6.1 Jr Executor adapter error is a separate EXO-HARDEN defect Soft may file; it does not block charter ADOPT, but it blocks Qwen Challenger dispatch until that plane can run.
+**Q3 — ADOPT measurement gate before seat.** Soft/Planner tokenize doctrine + representative plan (`max_tokens: 1`, read `usage.prompt_tokens`) vs 65,536 combined wall / ~40k–49k session floor; post the number on DRA-291. No seat until that measurement is on the card. If unfit: Soft files amended plane on the same card before Founder SIGN — still under Planner; no Anthropic API; no Grok Bot. No auto-switching without recording the fail. §6.1 Jr Executor adapter error is a separate EXO-HARDEN defect Soft may file; it does not block charter ADOPT, but it blocks Qwen Challenger dispatch until that plane can run.
 
 Ops comment: https://github.com/DranakCorps-bot/dranakcorps-ops/pull/51#issuecomment-5765865379
 
@@ -167,7 +187,7 @@ Live Holds empty. Play Console OFF. Not needs-david tonight. Soft: tip-merge whe
 
 ## 2026-09-21 ~1:40 PM CT — RULE / DRA-282 / PR #772 — WARN band N=3; (c) 50% floor
 
-**Q1 — ADOPT (ii) N=3.** WARN when remaining band ≤ max(2% of 65,536, 3 × median append). One-median-append as the binding band is **REJECTED** — it is one append of warning, and seats move on heartbeats. Soft **DRA-284** implements the WARN path in `scripts/channel-size-guard.ps1` (today exit 1 / exit 0 only). Soft LEAVE inventing weekly; Soft LEAVE inventing moving files between arms; Soft LEAVE inventing days-of-green for this ask.
+**Q1 — ADOPT (ii) N=3.** WARN when remaining band ≤ max(2% of 65,536, 3 × median append). One-median-append as the binding band is **REJECTED** — it is one append of warning, and seats move on heartbeats. Soft **DRA-284** implements the WARN path in `scripts/channel-size-guard.ps1` (today exit 1 / exit 0 only). No weekly; no moving files between arms; no days-of-green for this ask.
 
 **Q2 — ADOPT (ii) fixed floor.** A (c) rotation discharges only when the live file lands at or under **50% of ceiling (32,768 B** LF-normalized UTF-8). Shape alone is not enough. Soft/Planner write that into the next (c) done bar.
 
@@ -185,7 +205,7 @@ Live Holds empty. Play Console OFF. Not needs-david. Soft: merge this tip when C
 
 1. **YES** — move `FABLE.md` from (a) to (c). After #758 it is rowless under the ceiling; median append is a whole plan body; rotation buys days and returns. #765 as built (index + `docs/plans/`) **DISCHARGES** the extension.
 2. **Seat — ADOPT.** DRA-267's any-Soft-seat narrowing extends to a standalone (c) split whose changed files are exactly the ledger-as-index + `docs/plans/*` moved/created by that split (no product source). #765 **STANDS** on Sr Executor — do not re-seat or rebuild.
-3. **`docs/plans/` — NOT a new root ledger under DRA-144; deliberately unrostered** in `channel-size-guard`. Soft LEAVE inventing rostering without a new LIVE ASK.
+3. **`docs/plans/` — NOT a new root ledger under DRA-144; deliberately unrostered** in `channel-size-guard`. No rostering without a new LIVE ASK.
 
 **AMEND** the live DRA-232 re-pin below: drop `FABLE.md` from (a); add `FABLE.md` to (c) (shape: index + `docs/plans/DRA-nn.md`, not archive tips).
 
@@ -225,7 +245,7 @@ a hold.
 - **KEEP** the 64 KiB ceiling and both guard arms. … **REJECT (b)** per-file ceilings as the fix — that is a self-granted exemption, and check B already refuses it.
 - **(c) for `HELM.md`, `DECISIONS.md`, and `FABLE.md`** — split at source. (`FABLE.md` shape: index + `docs/plans/DRA-nn.md`; HELM/DECISIONS: live STATE + current tip, dated history to existing archive.) … Dated tips rotate into the existing `docs/ops/claude-archive/channels/` path; rotation is a move/rename, not a trim. … a named non-Executor seat implements; never on a feature branch. (**AMENDED 2026-09-21 / DRA-282:** discharge floor — live file must land at or under 50% of ceiling = 32,768 B LF-normalized UTF-8; shape alone does not discharge.)
 - **(a) for `SCRIBE.md`, `FABLE-FEEDBACK.md`, `BEVEL.md`, and as INTERIM for HELM/DECISIONS until (c) lands** — rotation is a per-file headroom trigger, not weekly. (**AMENDED 2026-09-21 / DRA-287:** `FABLE.md` moved to (c). **AMENDED 2026-09-21 / DRA-282:** WARN band is three median appends.) Default: WARN when remaining band is 2% of ceiling or **three** median appends, whichever is larger; the rotate seat claims before the file is red.
-- **(d) ADOPT as Helm tip format** — one ruling, short. … Soft LEAVE inventing 7 KB Soft LEAVE walls on a HELM tip.
+- **(d) ADOPT as Helm tip format** — one ruling, short. … No 7 KB Soft LEAVE walls on a HELM tip.
 
 ### From **DRA-241 / PR #724** (2026-09-20 ~3:05 AM CT) — #724 merged; the Sr proc slice is still owed
 
