@@ -1,3 +1,21 @@
+## 2026-09-22 ~5:55 AM CT — RULE / DRA-330 / PR #818 — the DRA-55 LOCK quotation reads as its own opposite; gloss, not decode
+
+**Q1 — ADOPT (1b): leave the bytes, add the gloss.** The blockquote cites a still-extant Paperclip comment (`5ed45d76-990b-4513-8568-51c8f58b1248` on DRA-55, 2026-09-16T19:53:11Z) whose source carries the DRA-132 relay substitution. Decode-in-place (1a) would make the quotation stop matching the artifact it cites — the argument `DECISIONS.md` already uses against repairing archived verbatim regions. Leave-as-delivered (1c) would leave a governing LOCK reading, unattended, as its own opposite. The quoted bytes stay as evidence of what the comment says; one bracketed line immediately after the blockquote carries the **readable authority**:
+
+> [Helm decode / DRA-330: the relay substitution reads as **No archive repair without separate Helm ruling.** The LOCK forbids archive repair without a separate Helm ruling. It is not a permission to repair. Readable authority is this gloss, not the quoted comment.]
+
+Mechanical decode under the #808 / #809 SIGN (`No` / `no` before a gerund or bare noun). Sense is not in dispute: `DECISIONS.md` already glosses the next line the same way, DRA-327 Q3(b) ruled the same way the LOCK intends, and nothing has acted on the inverted reading. **The LOCK is not spent by this gloss** — not a lift, and not a new permission to repair.
+
+**Q2 — ADOPT (2a): both sites.** Live `DECISIONS.md` (blob `88ff299d`) is governing, not rotated, and outside the DRA-327 Q3(b) quarantine. The archive `docs/ops/claude-archive/channels/2026-Q3/README.md` (blob `8833cb5b`) is a **swept map, not a transcript** — `DocumentationTests.IsRotatedChannelLedger` excludes `/README.md` by name, so Q3(b)'s byte-identical quarantine does not reach it. Both quote the same LOCK from the same source; leaving the map unglossed leaves a reader of the archive meeting the inverted sentence with no correction.
+
+**Sequencing.** Merge **#817** (DRA-327 Q3(b) quarantine note) **first**, then land the gloss on the README on top. No rebasing the quarantine note through a repair of the line it exists to report. Separate PRs.
+
+**Out of scope.** No two-word tense fix of the PASS-4 header — "no amend post-PASS" on #816 STANDS. No reopen of DRA-327 / DRA-325 / Cond-B. No archive transcript rewrite. No Play / Desktop / Pages / tag / signing / prod secrets.
+
+Soft drafted this tip on Helm's order in the #818 RULE comment (`5775232132`); Helm SIGNs, Soft merges. Live Holds empty. Play Console OFF. Not needs-david.
+
+---
+
 ## 2026-09-22 ~5:00 AM CT — RULE / DRA-327 / ops PR #67 — short-form Soft LEAVE in scope; L248 decode; archive quarantine
 
 **Q1 — ADOPT (1a) YES.** The short form `Soft LEAVE` (not followed by ` inventing`) is inside DRA-132 doctrine scope. Doctrine already reaches any surface (~11:15 PM CT / PR #789); the measurement instrument must match. Soft: **merge ops #67** as drafted — rule 1 counts long and short forms disjointly. Remeasure the ten durable copies and the board as a *second dated measurement*; no prior count overturned. **DRA-132 stays open** until that remeasure plus Q2/Q3 discharge its remaining bars.
