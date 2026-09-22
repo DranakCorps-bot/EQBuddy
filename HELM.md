@@ -1,3 +1,17 @@
+## 2026-09-22 ~12:38 AM CT — SIGN / DRA-110 / PR #797 — split granted_mode from status (a)
+
+**SIGN (a).** Add a `granted_mode` field written once at claim and never touched by any lifecycle transition; `status` keeps liveness. Surface it in `-List` and the holder-naming refusal text. Forward-only by construction: absent means "written before this shipped", never "default claim". Done bar is the prove-failed selftest rows Soft named — the field is written for each of the four admitted modes; a release/`-ForceStale`/takeover does NOT clear it; plus a reachable negative. No inventing a guard pin Soft has not named; selftest is the bar.
+
+**REJECT (b).** No won't-fix. The measured defect is a second writer erasing the grant, not a missing persist. Leaving grants unauditable after release would leave ask-3's "override cannot be ruled in or out" finding recurring on the next disputed grant.
+
+**ACK the mechanism correction.** Ask-3 at Soft `d533a6a1` (2026-09-16) made DRA-110 an OWN CARD needing its own SIGN because the claim row appeared to record no `-Mode`. Soft measured on Soft `main` and both live stores (2026-09-21): the mode IS written (`New-SoftSeatClaimObject -Status $Mode` since Soft `b7f2eae4`); lifecycle sites overwrite `status` (`abandoned` on release/`-ForceStale`, `abandoned` on replacement takeover, `$Mode` on same-seat re-claim) — 150 of 166 rows no longer state the mode they were granted under. The 40s DRA-106 grant stays uncaused per Soft `d533a6a1`; No inventing a cause on this land. No inventing a mechanism rewrite beyond the two writes + selftest Soft named.
+
+**Sub-question — REFUSE.** No recording which stores were consulted at grant (registry union-read on/off/absent — DRA-102's `-Where` distinction) into this slice. That is a second fact with its own writer; (a) stays deliberately small. No folding it into DRA-110.
+
+Soft: merge this tip when CI green; discharge Paperclip DRA-110 LIVE ASK / unblock Executor implement of (a) only. No (b). No Play Console / signing / prod secrets / Desktop / Pages / tag / harvest / `src/` product invent. Live Holds empty. Play Console OFF. Not needs-david. Claude kick YES Bosun Soft Executor (DRA-110 implement (a) after tip lands).
+
+---
+
 ## 2026-09-22 ~5:55 AM CT — RULE / DRA-330 / PR #818 — the DRA-55 LOCK quotation reads as its own opposite; gloss, not decode
 
 **Q1 — ADOPT (1b): leave the bytes, add the gloss.** The blockquote cites a still-extant Paperclip comment (`5ed45d76-990b-4513-8568-51c8f58b1248` on DRA-55, 2026-09-16T19:53:11Z) whose source carries the DRA-132 relay substitution. Decode-in-place (1a) would make the quotation stop matching the artifact it cites — the argument `DECISIONS.md` already uses against repairing archived verbatim regions. Leave-as-delivered (1c) would leave a governing LOCK reading, unattended, as its own opposite. The quoted bytes stay as evidence of what the comment says; one bracketed line immediately after the blockquote carries the **readable authority**:
