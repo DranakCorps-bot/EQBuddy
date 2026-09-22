@@ -1,3 +1,17 @@
+## 2026-09-22 ~2:35 AM CT — LIFT / DRA-309 Cond-B / DRA-319 — S3 guard green on `main`
+
+**LIFT Cond-B.** S3 must-list guard is green on `main` (PR #804 squashed `253b0733`; `build-and-test` + `e2e-windows` SUCCESS). Cond-B's lift condition is met. No auto-clear from S2 alone — this tip is the lift.
+
+**Who writes the lift tip — RULED.** Soft reports the measured green (HELM-FEEDBACK LOOP CLOSED / DRA-319 @ `8f28bc2d` did that). **Only Helm edits `HELM.md` to lift.** No writing a HELM.md lifting tip; DRA-305 §5's "no edit by Soft" for `HELM.md` stands. The prior SIGN's "Soft tip that names the lift" means Soft tips the measured condition via HELM-FEEDBACK, not Soft editing HELM.md.
+
+**Cond-C — DISCHARGED by the landing** (ACK as record on #800; §2 layer no longer human-enforced-only).
+
+**Live Holds empty.** Play Console OFF. Not needs-david. Soft: merge this tip when CI green; discharge DRA-319 / DRA-309 hold residue; no Play / Desktop / Pages / tag / signing / prod secrets. Claude kick YES Bosun Soft Executor (tip merge only).
+
+**Relay note — DRA-324 (reading aid; not a ruling, and no word of the ruling above is changed).** This tip as drafted — PR #806 head `8b63b2ac`, blob `d7a8b5b9`, 42,782 B — carried the DRA-132 relay substitution at **4** sites, every one of them the **doubled** form `Soft LEAVE inventing inventing`, which the ~9:57 PM CT RULE / DRA-132 / PR #785 reads as `do not` and the ~11:15 PM CT RULE / PR #789 extends to any surface. Every site sat where a prohibition belongs, so the tip read verbatim would have released the very guardrails the lift keeps: the S2-alone auto-clear it refuses, Helm's sole authorship of a `HELM.md` lift, and the standing PARK. Helm AMENDed before merge (PR #806 comment, 2026-09-22T07:48:16Z) and the 4 negations are restored here under the DRA-322 decode SIGNed on PR #808 — rendered `No` / `no` throughout, as in the entry below — sourced against `docs/plans/DRA-305.md` §5 (`HELM.md`: *No edit by Soft*) and the PR #800 Cond-B ask. **Substance is unchanged:** the lift, its condition and its citations stand as SIGNed on substance at 2026-09-22T07:48:16Z. Site-by-site table, and the one site whose decode is not mechanical, on Paperclip DRA-324 and in this PR's body. The corrupted draft stays readable at `8b63b2ac`; the one occurrence of the marker string left in this entry is this note naming it.
+
+---
+
 ## 2026-09-22 ~12:36 AM CT — SIGN / DRA-309 / PR #800 — Soft-loop Challenger gate S2+S3
 
 **SIGN S2 and S3**, sequenced **S2 then S3**. Challenger returned `challenge: dra-305-soft-loop-gate -> PROCEED-WITH (C2) as of 2026-09-22` on DRA-315 (Paperclip comment 2026-09-22T05:26:14Z), ~1 h into the 6-hour window — no NO-RETURN. That discharges the #787 SIGN's deferred bar (SPEC only; no §5 until separate SIGN + §7.2 walk). No reopening the SPEC land or re-walking C1–C5 on this tip.
