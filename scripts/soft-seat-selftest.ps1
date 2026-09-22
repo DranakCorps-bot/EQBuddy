@@ -225,6 +225,183 @@ try {
     }
     # ------------------------------------------------------------------------
 
+    # --- DRA-110: the GRANTED MODE is its own field, and lifecycle cannot ----
+    # ---           overwrite it                                          ----
+    #
+    # status was doing two jobs: it carried the mode at grant AND the liveness
+    # afterwards, so every transition that ends a seat erased the grant. 150 of
+    # 166 rows on this machine no longer state the mode they were granted under,
+    # which is why the disputed DRA-106 grant (40 s apart) can be neither ruled
+    # in nor out. The demonstration consumed the evidence: one authorized
+    # -ForceStale turned the only surviving 'active' into 'abandoned'.
+    #
+    # Helm's bar, verbatim: the field is written for each of the four admitted
+    # modes; a release / -ForceStale / takeover does NOT clear it; plus a
+    # reachable negative. Every row below goes through the scripts.
+    $grantJson = Join-Path $store 'claims.json'
+    function Get-GrantRow {
+        param([string] $Card, [string] $Seat)
+        if (-not (Test-Path $grantJson)) { return $null }
+        $parsed = [IO.File]::ReadAllText($grantJson) | ConvertFrom-Json
+        foreach ($c in @($parsed.claims)) {
+            if (([string] $c.work_item) -eq $Card -and ([string] $c.seat_id) -ieq $Seat) { return $c }
+        }
+        return $null
+    }
+    # Reads the row's granted_mode the way an auditor would: the PROPERTY, not a
+    # substring of the file. A row that never grew the field and a row whose
+    # field is empty must be indistinguishable here, and both must read as
+    # "absent" rather than as a mode.
+    function Get-GrantMode {
+        param($Row)
+        if (-not $Row) { return $null }
+        $p = $Row.PSObject.Properties['granted_mode']
+        if (-not $p) { return $null }
+        if ($p.Value -isnot [string] -or [string]::IsNullOrWhiteSpace($p.Value)) { return $null }
+        return ([string] $p.Value)
+    }
+
+    # (1) WRITTEN FOR EACH OF THE FOUR ADMITTED MODES. One card per mode, so a
+    # field written only on the path somebody happened to test cannot pass
+    # (trap 78 — the same reason the DRA-76 block above runs four cards).
+    $grantCard = 1100
+    foreach ($mode in @('active', 'challenger', 'disjoint', 'replacement')) {
+        $grantCard++
+        $card = "DRA-$grantCard"
+        $seat = "grant-$mode"
+        # -Mode replacement on an unheld card is still an explicitly chosen
+        # mode; the point here is the field, not the takeover.
+        $made = Invoke-Seat $claim @('-WorkItem', $card, '-SeatId', $seat, '-Mode', $mode)
+        Expect-Ok "a $mode claim records its granted mode" $made "granted as $mode"
+
+        $script:step++
+        $got = Get-GrantMode (Get-GrantRow $card $seat)
+        if ($got -ne $mode) {
+            $script:failed += "$($script:step). $card/$seat must persist granted_mode '$mode' on the ROW, got '$got'. A mode that lives only in the printed sentence is not evidence."
+        }
+
+        # ...and a human reading the board sees it (Helm: surface it in -List).
+        $listGrant = Invoke-Seat $claim @('-List')
+        Expect-Ok "-List states the granted mode of the $mode seat" $listGrant "granted as $mode"
+    }
+
+    # (2) A RELEASE DOES NOT CLEAR IT. This is the exact transition that erased
+    # the DRA-106 evidence.
+    $relGrant = Invoke-Seat $release @('-WorkItem', 'DRA-1102', '-SeatId', 'grant-challenger')
+    Expect-Ok 'the challenger row releases' $relGrant 'abandoned'
+    $script:step++
+    $afterRel = Get-GrantRow 'DRA-1102' 'grant-challenger'
+    if (([string] $afterRel.status) -ne 'abandoned') {
+        $script:failed += "$($script:step). release must move status to abandoned, got '$($afterRel.status)'."
+    }
+    if ((Get-GrantMode $afterRel) -ne 'challenger') {
+        $script:failed += "$($script:step). a released row must STILL say it was granted as challenger, got '$(Get-GrantMode $afterRel)'. status moving is the point; the grant moving is the bug."
+    }
+
+    # (3) -ForceStale DOES NOT CLEAR IT. Helm authorized exactly this command on
+    # DRA-106 and it is what consumed the evidence, so it gets its own row
+    # rather than riding on the ordinary release above.
+    $staleGrant = Invoke-Seat $claim @('-WorkItem', 'DRA-1110', '-SeatId', 'grant-stale', '-Mode', 'disjoint', '-ExecutorPid', '2147483646')
+    Expect-Ok 'a disjoint claim with a dead pid records' $staleGrant 'granted as disjoint'
+    $relStale = Invoke-Seat $release @('-WorkItem', 'DRA-1110', '-ForceStale')
+    Expect-Ok '-ForceStale recovers the dead holder' $relStale 'abandoned'
+    $script:step++
+    $afterStale = Get-GrantRow 'DRA-1110' 'grant-stale'
+    if (([string] $afterStale.status) -ne 'abandoned' -or (Get-GrantMode $afterStale) -ne 'disjoint') {
+        $script:failed += "$($script:step). after -ForceStale the row must read status 'abandoned' AND granted_mode 'disjoint', got status '$($afterStale.status)' granted_mode '$(Get-GrantMode $afterStale)'."
+    }
+
+    # (4) A REPLACEMENT TAKEOVER DOES NOT CLEAR THE ROW IT TOOK OVER. The
+    # takeover writes 'abandoned' over somebody ELSE's status — the one erasure
+    # the seat being erased never ran itself.
+    $takenOver = Invoke-Seat $claim @('-WorkItem', 'DRA-1120', '-SeatId', 'grant-victim')
+    Expect-Ok 'the victim seat claims by default' $takenOver 'granted as active'
+    $takeover = Invoke-Seat $claim @('-WorkItem', 'DRA-1120', '-SeatId', 'grant-taker', '-Mode', 'replacement')
+    Expect-Ok 'a replacement takes the exclusive slot' $takeover 'granted as replacement'
+    $script:step++
+    $victim = Get-GrantRow 'DRA-1120' 'grant-victim'
+    if (([string] $victim.status) -ne 'abandoned') {
+        $script:failed += "$($script:step). the takeover must abandon the victim's status, got '$($victim.status)'."
+    }
+    if ((Get-GrantMode $victim) -ne 'active') {
+        $script:failed += "$($script:step). a seat somebody ELSE replaced must still say it was granted as active, got '$(Get-GrantMode $victim)'."
+    }
+
+    # (5) A SAME-SEAT RE-CLAIM MOVES LIVENESS, NOT THE GRANT. This is the third
+    # writer Helm's ACK enumerated, and the subtle one: the row entered as
+    # 'active', so escalating it to 'challenger' must not rewrite how it got in.
+    # Both facts stay readable — 'challenger since <t>, granted as active'.
+    $enter = Invoke-Seat $claim @('-WorkItem', 'DRA-1130', '-SeatId', 'grant-refresh')
+    Expect-Ok 'a row enters the store as active' $enter 'granted as active'
+    $escalate = Invoke-Seat $claim @('-WorkItem', 'DRA-1130', '-SeatId', 'grant-refresh', '-Mode', 'challenger')
+    Expect-Ok 'the same seat re-claims as a challenger' $escalate 'refreshed DRA-1130'
+    $script:step++
+    $refreshed = Get-GrantRow 'DRA-1130' 'grant-refresh'
+    if (([string] $refreshed.status) -ne 'challenger') {
+        $script:failed += "$($script:step). a re-claim must move status to challenger, got '$($refreshed.status)'."
+    }
+    if ((Get-GrantMode $refreshed) -ne 'active') {
+        $script:failed += "$($script:step). granted_mode is written ONCE at claim; a re-claim must leave it at 'active', got '$(Get-GrantMode $refreshed)'."
+    }
+    if ($escalate.text -notmatch [regex]::Escape('granted as active')) {
+        $script:failed += "$($script:step). the refreshed row must still PRINT its original grant: $($escalate.text)"
+    }
+
+    # (6) THE REACHABLE NEGATIVE, and the forward-only rule in one row.
+    # Every row above asserts a mode is present, and every one of them would
+    # stay green if the absent case silently rendered as 'active' — which is
+    # precisely the reading the card forbids. So plant a row in the pre-DRA-110
+    # SHAPE (seven fields, no granted_mode), which is what all 166 rows on this
+    # machine look like, and prove it reads as UNRECORDED and never as a mode.
+    $legacyGrant = @{
+        work_item  = 'DRA-1140'
+        seat_id    = 'grant-legacy'
+        branch     = $null
+        worktree   = $null
+        started_at = [datetime]::UtcNow.ToString('yyyy-MM-ddTHH:mm:ssZ')
+        status     = 'active'
+        pid        = $null
+    }
+    $plantedGrant = [IO.File]::ReadAllText($grantJson) | ConvertFrom-Json
+    $plantedGrant.claims = @($plantedGrant.claims | ForEach-Object { $_ }) + [pscustomobject] $legacyGrant
+    [IO.File]::WriteAllText($grantJson, ($plantedGrant | ConvertTo-Json -Depth 6), [Text.UTF8Encoding]::new($false))
+
+    $script:step++
+    if ($null -ne (Get-GrantMode (Get-GrantRow 'DRA-1140' 'grant-legacy'))) {
+        $script:failed += "$($script:step). the planted pre-DRA-110 row must carry NO granted_mode, or this negative is testing nothing."
+    }
+
+    $listLegacy = Invoke-Seat $claim @('-List')
+    Expect-Ok 'a pre-DRA-110 row reads as UNRECORDED, not as a mode' $listLegacy 'granted mode not recorded'
+    $script:step++
+    # The row is status 'active'. If the readout ever fell back to status, this
+    # line would read 'granted as active' — the one wrong answer, because it
+    # asserts a default claim about a row that never recorded one.
+    $legacyLine = @($listLegacy.text -split "`n" | Where-Object { $_ -match 'grant-legacy' })
+    if ($legacyLine.Count -eq 0) {
+        $script:failed += "$($script:step). -List did not print the planted legacy row at all: $($listLegacy.text)"
+    }
+    elseif (($legacyLine -join ' ') -match 'granted as') {
+        $script:failed += "$($script:step). a row with no granted_mode was rendered AS a mode — absent must never read as 'default claim': $($legacyLine -join ' ')"
+    }
+    # ...and the refusal text, the other surface Helm named, says the same thing
+    # about the same row. A refusal that omitted it is where a reader infers.
+    $legacyRefusal = Invoke-Seat $claim @('-WorkItem', 'DRA-1140', '-SeatId', 'grant-second')
+    Expect-Fail 'a refusal over a pre-DRA-110 holder says the grant is unrecorded' $legacyRefusal 'granted mode not recorded'
+
+    # And the sentence itself, not only its behaviour: an empty or mode-shaped
+    # "unrecorded" string would make rows (6) match anything or nothing
+    # (trap 78 — the detector aimed at nothing).
+    $script:step++
+    $unrecorded = [string] $script:SoftSeatGrantedModeUnrecorded
+    if ([string]::IsNullOrWhiteSpace($unrecorded)) {
+        $script:failed += "$($script:step). SoftSeatGrantedModeUnrecorded is EMPTY — every absent grant would print nothing and read as a default claim."
+    }
+    elseif ($unrecorded -match 'granted as') {
+        $script:failed += "$($script:step). the unrecorded sentence '$unrecorded' collides with the recorded one; the two cases must not be mistakable for each other."
+    }
+    # ------------------------------------------------------------------------
+
     $relOwn = Invoke-Seat $release @('-WorkItem', 'DRA-428', '-SeatId', 'seat-d')
     Expect-Ok 'own-seat release abandons the claim' $relOwn 'abandoned'
 
