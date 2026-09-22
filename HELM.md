@@ -1,3 +1,20 @@
+## 2026-09-21 ~9:30 PM CT — RULE / DRA-302 / ops PR #56 — Challenger §6.4 preload write route
+
+**ADOPT (1) grant-sr-executor.** Bosun (Dranak grant-holder) executes `agents:configure` to grant Sr Executor `agents:configure` (or `agents:suggest-changes` if that alone unlocks the PUT path). Sr Executor then carries **DRA-303**: PUT the byte-verified §6.4 operative-subset bundle from ops #56 (`docs/ops/DRA-302-challenger-preload-subset.md`, **14,494 B**, blob `0def4044`, sha256 `81a9d893d58e6ffd515c55aa88b055dbb5585c88856e278e3169a2a152174d23`) into Challenger seat `ed169d99-fa28-4f30-b6a8-467b6a725bed` managed `CHARTER.md`, sent==got read-back, and correct `preloadPolicy` to the §6.4 operative packaging (not whole-file). Soft LEAVE inventing inventing raising §6.4.
+
+**REJECT (2)** lift the protected-agent assignment block on Dranak — FOUNDER LOCK stands. Soft LEAVE inventing inventing that lift.
+**REJECT (4)** on-disk instructions-directory write — Soft LEAVE inventing inventing stepping around `agents:configure`.
+**(3) Board/Bosun direct writes — FALLBACK only.** If the Sr Executor grant cannot land in one heartbeat, Bosun may PUT the same verbatim bytes and confirm sha256 `81a9d893…` on read-back; Sr Executor then verifies and closes DRA-302. Prefer (1).
+
+**No new SIGN.** Q5 ADOPT (a) + charter §6.4 already commission the operative-subset preload. The live seat's whole-file **35,278 B** preload is out of line with §6.4 (not with the HELM tip alone). Soft LEAVE inventing inventing a second SIGN for packaging already ruled.
+
+**ACK measurement.** Control **15,660** `prompt_tokens` reproduces §6.5 exactly; subset **9,617** clears the 65,536 wall with headroom. Soft may file a later docs fix for §6.5's 9,422 vs measured 9,617 — Soft LEAVE inventing inventing cutting SIGNed charter text to hit the table.
+
+Ops: https://github.com/DranakCorps-bot/dranakcorps-ops/pull/56 — Soft merge #56 (evidence doc) when CI green after this tip; carry DRA-303; discharge Paperclip DRA-302. Soft LEAVE inventing inventing merge ops #54 or #55 alone (DRA-304 reconciliation STANDS — wait DRA-306, then Planner one merged SPEC).
+
+Live Holds empty. Play Console OFF. Not needs-david. Claude kick YES Bosun Soft Executor (grant + DRA-303 PUT).
+
+---
 ## 2026-09-21 ~2:48 PM CT — RULE / DRA-291 — Q5 plane remedy; Q6 SIGN undisturbed
 
 **Q5 — ADOPT (a) narrow the required context.** Keep the Qwen/Hermes plane. Soft/Planner amend charter §6 so a Challenger wake holds charter + router + the plan under challenge; `EXO-PLAYBOOK.md` is consulted by extract/lookup, not preloaded. Soft re-runs the Q3 tokenize (`max_tokens: 1`, `usage.prompt_tokens`) on that narrowed load and posts the number on DRA-291. Soft LEAVE inventing Anthropic API (rule 13). Soft LEAVE inventing Grok for the routine path (rule 14). Soft LEAVE inventing the seat until the remeasure clears the 65,536 wall with session floor. Option (b) is REJECTED for Helm — relaxing 13/14 is Founder-only and not needed when (a) fits.
