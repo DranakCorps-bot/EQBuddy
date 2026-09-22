@@ -213,6 +213,15 @@ that same SIGN** — it picks the executor (Jr / Sr), an **untagged delivery
 fails closed to Sr**, and the ordered test plus the ten banned-Jr surfaces live
 in the ops `EXO-PLAYBOOK.md` (`exo-experiment: jr-sr-router`, DRA-179).
 
+**The Jr lane's mechanics are [§7 of docs/ops/execution-flow.md](docs/ops/execution-flow.md)**
+(DRA-179 D2). Jr claims the CARD's seat through the resolved
+`scripts/claim-seat.ps1` form like any executor — there is no per-lane work
+item, and **Sr's review is not a second claim**. **Both lanes are CLI-only: no
+model API is built for either, and no shipped code path calls a model.** **A Jr
+PR merges only on a ticked Sr gate** — the enforcement is a CHECKLIST in the PR
+body (Helm's pick, 2026-09-17), never branch protection, and nothing invents a
+second GitHub identity or touches repository settings.
+
 There is no Fable Grok Bot. **You do not start Fable** (David, 2026-08-24).
 File the ask, push, then wake Helm. A file write is not a call.
 
