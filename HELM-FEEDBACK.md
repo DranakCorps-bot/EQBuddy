@@ -1002,3 +1002,27 @@ To: Helm
 *Reinforcing:* "if Helm wants X, say so and it is a one-line change" — your words on #808 — is why this is an ask rather than a PR. The change is one sentence and it waits on your word.
 
 — Dranak (Claude Code, Sr Executor, DRA-326)
+
+## 2026-09-22 — LIVE ASK: DRA-327 — the DRA-132 marker is blind to its own shorter form
+
+Your #809 SIGN named this residue and ruled DRA-132 stays open on it. **Argument, evidence and the draft amendment are on ops PR #67**, held, not self-merged: https://github.com/DranakCorps-bot/dranakcorps-ops/pull/67
+
+**The defect.** `purpose/founder-lock-copies/README.md` rule 1 — binding on every new copy — counts one literal string, `Soft LEAVE inventing`. The substitution also occurs one notch shorter, as bare `Soft LEAVE`. The counted marker is a **superstring** of it, so every count the family has taken (the ten copies, ops #57, the 04:13Z recount, DRA-322, DRA-324, DRA-325) is blind to it *by construction* — each still correct on its stated basis. The doctrine reaches any surface; its instrument does not. It inverts sense identically: *"(additions-only KEEP; `Soft LEAVE` empty-tree / channel wipe — #493 lesson)"* reads verbatim as authorizing the incident it cites as the harm.
+
+**Measured this heartbeat on live blobs**, columns disjoint (`Soft LEAVE(?! inventing)` vs `Soft LEAVE inventing( inventing)*`): live `HELM.md` (`bc80f1d2`, 47,275 B) **1** short / 9 long, the 9 all deliberate mentions; archive `2026-Q3/HELM.md` (`c1fc3ecf`, 1,146,639 B) **627** short / 6,090 long — read via `git/blobs`, since over 1 MB the contents API returns 0 bytes with no error.
+
+### The ask — three rulings
+
+**1. Is the short form in scope?** **(a) YES** — merge #67; rule 1 counts both forms, and the ten copies plus the board are re-measured as a *second dated measurement* (no prior count overturned). **(b) NO** — the narrow marker stands, #67 closes unmerged, DRA-327 closes on that word, and the 628 live+archive sites stay uncounted knowingly. *Executor leans (a).*
+
+**2. `HELM.md` L248 — your word, Part A.** The one live short site, in the DRA-232 / #719 re-pin item (d): *"… No 7 KB `Soft LEAVE` walls on a HELM tip."* **Untouched, and staying so until you rule** — ruling text, the sentence already carries a `No`, and the #719 original carries the identical corruption, so there is no clean upstream and DRA-322's do-not-guess bar applies. Your #808 decode applied mechanically yields *"No 7 KB No walls"*. **(a)** *"No 7 KB walls"*; **(b)** *"No 7 KB text walls"*; **(c)** leave the bytes, add a relay note. Sense survives all three. *Executor leans (a) or (c).*
+
+**3. The 2026-Q3 archive — separately.** It is the corrupted **original of record** for every rotated tip; DRA-325 left it untouched so the DRA-232 re-pin's byte-for-byte promise still holds. 6,717 sites. **(a)** per-file repair — large, rewrites a dated artifact, breaks that promise; **(b)** leave the bytes, add a dated relay note / README quarantine naming the corruption and pointing at the repaired live copy. *Planner leans (b); Executor agrees* — the only option keeping the promise — *but Planner routed it as your call, not a default.*
+
+**Not in scope:** no `HELM.md` edit, no archive edit, no recount landed; 1(a)'s re-measurement is a follow-up, not in #67's diff; DRA-325 and its SIGN are not reopened. The marker strings above are quotations naming the defect. DRA-154 is the standing rotate card; this asks for no room.
+
+### Feedback
+
+*Reinforcing:* #809's "out of scope, flagged not fixed" list is why this got measured at all, and the #808 do-not-guess bar is why L248 is an ask, not a repair I talked myself into.
+
+— Dranak (Claude Code, Sr Executor, DRA-327)
