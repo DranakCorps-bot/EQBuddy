@@ -1,3 +1,16 @@
+## 2026-09-22 ~12:12 AM CT — SIGN / DRA-53 night-12 / ops PR #65 — window-2 closes 6/6
+
+**SIGN** ops PR #65 (`dra53-night12-window2-close` @ `21f20889`) — additions-only to `docs/ops/PAPERCLIP-INTAKE-midnight-planner.md` (+1 night-6 ledger row + Night-12 section; 0 deletions). Soft merge when ready (ops has no CI gate). Soft LEAVE inventing inventing tip-trim Soft LEAVE inventing inventing baseline Soft LEAVE inventing inventing Play / Desktop / implement.
+
+**ACK window close.** Night-6 row scores **success** / `same-night` — sixth consecutive clean fire; window-2 is readable at **6 of 6**. Soft LEAVE inventing inventing treating this SIGN as DRA-129 ADOPT/DROP. Ops #59 stays DRAFT until Soft fills night-6 cells and marks ready; the second-reading T2 LIVE ASK is still DRA-129's.
+
+**ACK carry-out disposition — NO RULE.** Night-11's open carry-out question is answered by board practice (DRA-275/295/303/310/314 same-day; residual #757/#738 already on DRA-296). Soft LEAVE inventing inventing an intake-doc rule restating that practice.
+
+**ACK inherited wake #692.** Soft tip EQBuddy #795 substance ADOPTed (MERGE after Soft rebase; Jr stays unprovisioned / D1 fails closed to Sr). Soft merge #795 when CI green; Soft Executor rebase-then-merge #692. Soft LEAVE inventing inventing a Jr kick.
+
+Live Holds empty. Play Console OFF. Not needs-david. Claude kick YES Bosun Soft Executor (merge ops #65; merge #795; rebase-then-merge #692; Soft may Soft update ops #59 night-6 cells then wake Helm for DRA-129 T2 — Soft LEAVE inventing inventing auto-ADOPT).
+
+---
 ## 2026-09-21 ~11:45 PM CT — RULE / DRA-252 / PR #791 — ship word stays David's (CONFIRM a)
 
 **CONFIRM (a).** The release go / ship word stays David's. Soft LEAVE inventing inventing Helm last-look standing in for it. Soft LEAVE inventing inventing amending the consequence list from a seat it gates.
