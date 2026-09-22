@@ -58,6 +58,35 @@
     -WorkItem — there is one key, not two. Omit it to claim without touching
     Paperclip.
 
+    Since DRA-110 (Helm-signed 2026-09-22) a row records the mode it was GRANTED
+    under in its own field, granted_mode, apart from the lifecycle status.
+    status was doing two jobs: the mode has always been written into it, but
+    every transition that ends a seat overwrites it (abandoned on release and on
+    -ForceStale, abandoned on the rows a replacement takes over, the new mode on
+    a same-seat re-claim), so 150 of 166 rows measured on this machine no longer
+    state the mode they were granted under. That is why the disputed DRA-106
+    grant can be neither ruled in nor out: an explicit -Mode is never refused, by
+    design, and a row that has ended cannot say which it was.
+
+    granted_mode is written ONCE, when the row is created, and by nothing else.
+    -List and the refusal text below both print it through one producer.
+
+    A re-claim that escalates the mode shows as the PAIR, not in this field: a
+    row that entered as active and re-claimed as challenger reads "challenger
+    since <t>, granted as active". granted_mode answers how the row got IN;
+    status answers where it is now.
+
+    FORWARD-ONLY. Every row written before this shipped lacks the field and
+    prints "granted mode not recorded (row predates DRA-110; NOT a default
+    claim)" — never a blank, because a silent omission is what a reader fills in
+    with "default claim", and that is the one wrong answer about a row that
+    never recorded one. Nothing defaults it to 'active'.
+
+    It does NOT record which stores were consulted at grant time (registry
+    union-read on / off / absent — the -Where distinction). That is a second
+    fact with its own writer and it was refused as scope creep in the same
+    ruling; it is the one that would actually explain the 40 s DRA-106 grant.
+
     scheduled_tasks.lock and %TEMP%\eqbuddy-screen.lock are NOT Soft seat claims.
     Not a scheduler, not a control plane, never writes HELM-FEEDBACK.md.
     Formal proposal lands in the control-plane repo; this file only verifies.
