@@ -219,3 +219,34 @@ meant.
 **Why this way:** Founder feedback after #826 merged — he wanted a chip at the
 top right of the page, not the hero paragraph under the pills. Soft LEAVE
 inventing a second Payment Link or changing the Stripe URL.
+
+## 2026-09-22 — Landing hero KPIs are measured counts
+
+**Chosen:** the four tiles in the hero KPI band on `site/index.html` read, in
+order, Quests Tracked, Items Cataloged, Downloads, and Max Concurrent Users.
+`site/metrics.json` is the source of truth the page fetches. The `.n` text is
+that same snapshot, so the band still reads when the fetch does not run.
+Shipped 2026-09-22: `questsTracked` **1173** (length of the `quests` array in
+`src/EQBuddy.Core/Data/QuestCatalog.json`), `itemsCataloged` **11196** (length
+of the `Items` array in `src/EQBuddy.Core/Data/ItemCatalog.json.gz`),
+`downloads` **28462** (sum of GitHub release asset `EQBuddySetup.exe`
+`download_count` across all releases — installer downloads, not unique people),
+`maxConcurrentUsers` **null**, painted as an em dash.
+
+**How to refresh:** re-count those two arrays and write the counts into
+`site/metrics.json`. Re-sum `EQBuddySetup.exe` download counts from the GitHub
+releases API and write that sum into `downloads`. When opt-in telemetry
+(DRA-336) publishes a max-concurrent figure, replace null with that integer.
+Then set each hero `.n` to the formatted value (thousands separators; null
+stays an em dash). `LandingSourceClaimsTests.TheHeroKpisAreMeasuredStats`
+refuses a drift between the JSON, the catalog arrays, and the painted text,
+and it refuses a concurrent integer while the value is still null.
+
+**Default it could have gone the other way on:** leave the four principle zeros
+in the band (0 game-memory reads, 0 accounts, 0 telemetry by default, 11,000+
+catalog). Those sentences stay on the page outside the band — the pills and
+the principles section — because they are still the product boundary.
+
+**Why this way:** Founder ask 2026-09-22. The band is a place for counts a
+reader can check. A concurrent number that telemetry has not published would
+be a figure EQBuddy invented.

@@ -1,4 +1,7 @@
+using System.Globalization;
+using System.IO.Compression;
 using System.Reflection;
+using System.Text.Json;
 using System.Text.RegularExpressions;
 using EQBuddy.UI.Shared;
 using Xunit;
@@ -829,5 +832,261 @@ public sealed class LandingSourceClaimsTests
 
         Assert.DoesNotContain("js.stripe.com", html, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("paypal", html, StringComparison.OrdinalIgnoreCase);
+    }
+
+    /// <summary>
+    /// Founder ask 2026-09-22. The hero KPI band used to wear four principle zeros
+    /// (0 game-memory reads, 0 accounts, 0 telemetry by default, 11,000+ catalog).
+    /// Those sentences stay elsewhere on the page, where they are still true. The
+    /// band itself is now four measured stats, in order, painted from
+    /// <c>site/metrics.json</c>: Quests Tracked, Items Cataloged, Downloads,
+    /// Max Concurrent Users. Downloads are installer downloads of
+    /// <c>EQBuddySetup.exe</c>, and the concurrent tile stays an em dash while
+    /// <c>maxConcurrentUsers</c> is null — a number there would be a figure nobody
+    /// has published. The catalog counts are the arrays themselves, so a refresh
+    /// that moves the file without moving the JSON goes red here.
+    /// </summary>
+    [Fact]
+    public void TheHeroKpisAreMeasuredStats()
+    {
+        var band = HeroKpiBand(Page);
+        Assert.False(string.IsNullOrEmpty(band), "hero KPI band is missing");
+
+        using var metricsDoc = JsonDocument.Parse(
+            File.ReadAllText(Path.Combine(Repo, "site", "metrics.json")));
+        var metrics = metricsDoc.RootElement;
+
+        Assert.Empty(HeroKpiViolations(band, metrics));
+
+        Assert.Equal(QuestArrayCount(), metrics.GetProperty("questsTracked").GetInt32());
+        Assert.Equal(ItemArrayCount(), metrics.GetProperty("itemsCataloged").GetInt32());
+        Assert.Equal(MeasuredInstallerDownloads, metrics.GetProperty("downloads").GetInt32());
+        Assert.Equal(JsonValueKind.Null, metrics.GetProperty("maxConcurrentUsers").ValueKind);
+
+        var downloadsScope = metrics.GetProperty("scope").GetProperty("downloads").GetString();
+        Assert.NotNull(downloadsScope);
+        Assert.Contains("EQBuddySetup.exe", downloadsScope, StringComparison.Ordinal);
+        Assert.Contains("not unique", downloadsScope, StringComparison.OrdinalIgnoreCase);
+
+        var concurrentScope = metrics.GetProperty("scope").GetProperty("maxConcurrentUsers").GetString();
+        Assert.NotNull(concurrentScope);
+        Assert.Contains("opt-in", concurrentScope, StringComparison.OrdinalIgnoreCase);
+
+        var js = File.ReadAllText(Path.Combine(Repo, "site", "assets", "js", "landing.js"));
+        Assert.Contains("metrics.json", js, StringComparison.Ordinal);
+        Assert.Contains(
+            """if (value === null || value === undefined) return "\u2014";""",
+            js,
+            StringComparison.Ordinal);
+        Assert.DoesNotContain("28462", js, StringComparison.Ordinal);
+        Assert.DoesNotContain("1173", js, StringComparison.Ordinal);
+        Assert.DoesNotContain("11196", js, StringComparison.Ordinal);
+    }
+
+    /// <summary>
+    /// The pre-change band, kept as a committed negative. A guard that only checks
+    /// for the four new labels cannot see these phrases come back (trap 34).
+    /// </summary>
+    [Fact]
+    public void TheRetiredZeroKpiBandIsRefused()
+    {
+        const string old = """
+            <div class="kpis reveal">
+              <div class="kpi"><div class="n">0</div><div class="l">game-memory reads — ever</div></div>
+              <div class="kpi"><div class="n">0</div><div class="l">accounts or cloud services required</div></div>
+              <div class="kpi"><div class="n">0</div><div class="l">telemetry by default</div></div>
+              <div class="kpi"><div class="n">11,000+</div><div class="l">items in the built-in offline catalog</div></div>
+            </div>
+            """;
+
+        using var metrics = JsonDocument.Parse(ShippedMetricsJson);
+        var bad = HeroKpiViolations(old, metrics.RootElement);
+        Assert.Contains(bad, v => v.Contains("game-memory reads", StringComparison.Ordinal));
+        Assert.Contains(bad, v => v.Contains("telemetry by default", StringComparison.Ordinal));
+        Assert.Contains(bad, v => v.Contains("accounts or cloud services required", StringComparison.Ordinal));
+        Assert.Contains(bad, v => v.Contains("built-in offline catalog", StringComparison.Ordinal));
+    }
+
+    /// <summary>
+    /// A concurrent integer is a fabricated figure until opt-in telemetry publishes
+    /// one. Both halves have to fail: the JSON value, and a tile that paints a
+    /// number while the JSON is still null (the painted text is the fact a reader
+    /// sees).
+    /// </summary>
+    [Fact]
+    public void AFabricatedConcurrentIntegerIsRefused()
+    {
+        using var invented = JsonDocument.Parse("""
+            {
+              "questsTracked": 1173,
+              "itemsCataloged": 11196,
+              "downloads": 28462,
+              "maxConcurrentUsers": 128
+            }
+            """);
+        var inventedBand = MeasuredBand.Replace(">—</div>", ">128</div>", StringComparison.Ordinal);
+        var inventedBad = HeroKpiViolations(inventedBand, invented.RootElement);
+        Assert.Contains(inventedBad, v => v.Contains("fabricated integer", StringComparison.Ordinal));
+        Assert.Contains(inventedBad, v => v.Contains("em dash", StringComparison.Ordinal));
+
+        using var unpublished = JsonDocument.Parse(ShippedMetricsJson);
+        var zeroBand = MeasuredBand.Replace(">—</div>", ">0</div>", StringComparison.Ordinal);
+        var zeroBad = HeroKpiViolations(zeroBand, unpublished.RootElement);
+        Assert.Contains(zeroBad, v => v.Contains("em dash", StringComparison.Ordinal));
+        Assert.DoesNotContain(zeroBad, v => v.Contains("fabricated integer", StringComparison.Ordinal));
+    }
+
+    /// <summary>
+    /// "not uniques" is the honesty line. Stripping it must not hide a real claim
+    /// that the download count is unique people.
+    /// </summary>
+    [Fact]
+    public void CallingTheDownloadCountUniquesIsRefused()
+    {
+        var band = MeasuredBand.Replace("installer, not uniques", "unique players", StringComparison.Ordinal);
+        using var metrics = JsonDocument.Parse(ShippedMetricsJson);
+        var bad = HeroKpiViolations(band, metrics.RootElement);
+        Assert.Contains(bad, v => v.Contains("unique downloads", StringComparison.Ordinal));
+        Assert.Empty(HeroKpiViolations(MeasuredBand, metrics.RootElement));
+    }
+
+    private const int MeasuredInstallerDownloads = 28462;
+
+    private const string ShippedMetricsJson = """
+        {
+          "questsTracked": 1173,
+          "itemsCataloged": 11196,
+          "downloads": 28462,
+          "maxConcurrentUsers": null
+        }
+        """;
+
+    private const string MeasuredBand = """
+        <div class="kpis reveal" id="hero-kpis">
+          <div class="kpi"><div class="n" data-metric="questsTracked">1,173</div><div class="l">Quests Tracked</div></div>
+          <div class="kpi"><div class="n" data-metric="itemsCataloged">11,196</div><div class="l">Items Cataloged</div></div>
+          <div class="kpi"><div class="n" data-metric="downloads">28,462</div><div class="l">Downloads</div><div class="note">installer, not uniques</div></div>
+          <div class="kpi"><div class="n" data-metric="maxConcurrentUsers">—</div><div class="l">Max Concurrent Users</div><div class="note">max concurrent (opt-in)</div></div>
+        </div>
+        """;
+
+    private static readonly (string Key, string Label)[] HeroKpiOrder =
+    [
+        ("questsTracked", "Quests Tracked"),
+        ("itemsCataloged", "Items Cataloged"),
+        ("downloads", "Downloads"),
+        ("maxConcurrentUsers", "Max Concurrent Users"),
+    ];
+
+    private static readonly string[] RetiredKpiClaims =
+    [
+        "game-memory reads",
+        "telemetry by default",
+        "accounts or cloud services required",
+        "built-in offline catalog",
+    ];
+
+    private static readonly Regex HeroKpiTile = new(
+        """<div\s+class="kpi">\s*<div\s+class="n"\s+data-metric="(?<key>[^"]+)">(?<n>[^<]*)</div>\s*<div\s+class="l">(?<l>[^<]*)</div>(?:\s*<div\s+class="note">(?<note>[^<]*)</div>)?\s*</div>""",
+        RegexOptions.Singleline | RegexOptions.CultureInvariant);
+
+    internal static IReadOnlyList<string> HeroKpiViolations(string band, JsonElement metrics)
+    {
+        var bad = new List<string>();
+        foreach (var retired in RetiredKpiClaims)
+            if (band.Contains(retired, StringComparison.Ordinal))
+                bad.Add($"retired KPI claim still in the band: \"{retired}\"");
+
+        var honesty = Regex.Replace(band, "not uniques", "", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
+        honesty = Regex.Replace(honesty, "not unique", "", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
+        if (honesty.Contains("unique", StringComparison.OrdinalIgnoreCase))
+            bad.Add("the band claims unique downloads");
+
+        var tiles = HeroKpiTile.Matches(band);
+        if (tiles.Count != HeroKpiOrder.Length)
+            bad.Add($"expected {HeroKpiOrder.Length} KPI tiles, found {tiles.Count}");
+
+        for (var i = 0; i < HeroKpiOrder.Length && i < tiles.Count; i++)
+        {
+            var (key, label) = HeroKpiOrder[i];
+            var tile = tiles[i];
+            if (!string.Equals(tile.Groups["key"].Value, key, StringComparison.Ordinal))
+                bad.Add($"tile {i + 1} key is \"{tile.Groups["key"].Value}\", expected {key}");
+            if (!string.Equals(tile.Groups["l"].Value.Trim(), label, StringComparison.Ordinal))
+                bad.Add($"tile {i + 1} label is \"{tile.Groups["l"].Value.Trim()}\", expected {label}");
+
+            if (!metrics.TryGetProperty(key, out var value))
+            {
+                bad.Add($"metrics.json is missing {key}");
+                continue;
+            }
+
+            var painted = tile.Groups["n"].Value.Trim();
+            if (key == "maxConcurrentUsers")
+            {
+                if (value.ValueKind != JsonValueKind.Null)
+                    bad.Add("maxConcurrentUsers is a fabricated integer; it stays null until opt-in telemetry publishes a figure");
+                if (painted != "\u2014" || Regex.IsMatch(painted, @"\d"))
+                    bad.Add($"concurrent tile shows \"{painted}\" instead of an em dash");
+                continue;
+            }
+
+            if (value.ValueKind != JsonValueKind.Number || !value.TryGetInt32(out var number))
+            {
+                bad.Add($"{key} is not an integer");
+                continue;
+            }
+
+            var formatted = number.ToString("N0", CultureInfo.InvariantCulture);
+            if (!string.Equals(painted, formatted, StringComparison.Ordinal))
+                bad.Add($"{key} paints \"{painted}\" but metrics.json formats as \"{formatted}\"");
+        }
+
+        return bad;
+    }
+
+    private static string HeroKpiBand(string html)
+    {
+        const string marker = "id=\"hero-kpis\"";
+        var at = html.IndexOf(marker, StringComparison.Ordinal);
+        if (at < 0) return "";
+        var open = html.LastIndexOf("<div", at, StringComparison.Ordinal);
+        if (open < 0) return "";
+
+        var depth = 0;
+        for (var i = open; i < html.Length; i++)
+        {
+            if (i + 4 <= html.Length && html.AsSpan(i, 4).SequenceEqual("<div"))
+            {
+                depth++;
+                i += 3;
+                continue;
+            }
+
+            if (i + 6 <= html.Length && html.AsSpan(i, 6).SequenceEqual("</div>"))
+            {
+                depth--;
+                if (depth == 0) return html[open..(i + 6)];
+                i += 5;
+            }
+        }
+
+        return "";
+    }
+
+    private static int QuestArrayCount()
+    {
+        var path = Path.Combine(Repo, "src", "EQBuddy.Core", "Data", "QuestCatalog.json");
+        using var doc = JsonDocument.Parse(File.ReadAllText(path));
+        return doc.RootElement.GetProperty("quests").GetArrayLength();
+    }
+
+    private static int ItemArrayCount()
+    {
+        var path = Path.Combine(Repo, "src", "EQBuddy.Core", "Data", "ItemCatalog.json.gz");
+        using var file = File.OpenRead(path);
+        using var gz = new GZipStream(file, CompressionMode.Decompress);
+        using var doc = JsonDocument.Parse(gz);
+        return doc.RootElement.GetProperty("Items").GetArrayLength();
     }
 }

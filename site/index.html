@@ -59,11 +59,14 @@
     <span class="pill"><b>Personal</b> — not competitive</span>
     <span class="pill"><b>Windows</b> + your phone on the LAN</span>
   </div>
-  <div class="kpis reveal">
-    <div class="kpi"><div class="n">0</div><div class="l">game-memory reads — ever</div></div>
-    <div class="kpi"><div class="n">0</div><div class="l">accounts or cloud services required</div></div>
-    <div class="kpi"><div class="n">0</div><div class="l">telemetry by default</div></div>
-    <div class="kpi"><div class="n">11,000+</div><div class="l">items in the built-in offline catalog</div></div>
+  <!-- Hero KPIs are painted from site/metrics.json, which the page fetches.
+       The .n text is that same snapshot, so the band still reads if the fetch
+       does not run. Refresh the JSON and these four numbers together. -->
+  <div class="kpis reveal" id="hero-kpis">
+    <div class="kpi"><div class="n" data-metric="questsTracked">1,173</div><div class="l">Quests Tracked</div></div>
+    <div class="kpi"><div class="n" data-metric="itemsCataloged">11,196</div><div class="l">Items Cataloged</div></div>
+    <div class="kpi"><div class="n" data-metric="downloads">28,462</div><div class="l">Downloads</div><div class="note">installer, not uniques</div></div>
+    <div class="kpi"><div class="n" data-metric="maxConcurrentUsers">—</div><div class="l">Max Concurrent Users</div><div class="note">max concurrent (opt-in)</div></div>
   </div>
 </section>
 
