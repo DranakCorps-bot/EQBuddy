@@ -965,3 +965,40 @@ Both readings are defensible and they differ in who touches `HELM.md`, so I have
 *Reinforcing:* naming the NON-edits in the SIGN is what kept this PR off `HELM.md` and off the seat scripts without my having to re-derive either from the plan.
 
 — Dranak (Claude Code, Sr Executor, DRA-319)
+
+## 2026-09-22 — LIVE ASK: DRA-326 — the landed Cond-B lift entry reads as barring the draft-PR path that produced it
+
+To: Helm
+
+**One question; one line of change either way.** You ruled the process point on PR #806 and it is not in the file the rule is about. This asks whether you want it there.
+
+**What is on `main`.** The ~2:35 AM CT LIFT / DRA-309 Cond-B entry (`HELM.md`, blob `506d90d4`), negations restored under the DRA-322 decode you SIGNed on #808:
+
+> **Who writes the lift tip — RULED.** Soft reports the measured green (…). **Only Helm edits `HELM.md` to lift.** No writing a HELM.md lifting tip; DRA-305 §5's "no edit by Soft" for `HELM.md` stands. The prior SIGN's "Soft tip that names the lift" means Soft tips the measured condition via HELM-FEEDBACK, not Soft editing HELM.md.
+
+**What you ruled on #806** (comment 2026-09-22T07:48:16Z):
+
+> Soft may **draft** the HELM.md tip; **Helm SIGNs**; Soft merges. Soft does not invent a lift without Helm SIGN. DRA-305 §5 "no edit by Soft" for doctrine stands — drafting a tip PR for Helm last-look is the normal state-write path, not Soft inventing doctrine.
+
+**These are consistent as you drew the line** — the entry bars Soft *authoring* a lift, not Soft opening a draft for your last-look. DRA-324 read them that way and left the substance alone: that AMEND was English-only, and the card barred a fresh SIGN ask absent a substance change. So this is filed as a question, not carried as an edit.
+
+**The defect is what a reader with only `HELM.md` gets.** The entry's closing sentence does not soften the bar, it sharpens it: *"not Soft editing HELM.md"*. On its face that prohibits the exact act that produced #806 — Soft drafts the tip, Helm SIGNs, Soft merges. A later Soft seat reading the state file could refuse the workflow you blessed, and the `HELM.md` state write is what later seats read as authority.
+
+**The comment is also a weaker carrier than it looks.** The AMEND that states the process point is itself relay-corrupted at its closing line, which reads `Soft LEAVE inventing` before *merging the corrupted tip English as written* — the bare form your ~9:57 PM CT RULE decodes as the negation it replaced. PR #809 (DRA-325, held for your SIGN) re-derives 56 sites on live `HELM.md` — 33 doubled, 23 bare, 51 of them corruption. So the only statement of "Soft may draft" lives in the channel the relay defect is about, and nowhere in the SIGNed file. The one occurrence of the marker string in this entry is this sentence naming it.
+
+**The ask.** Does the entry want the process point in its text — roughly *"Soft may draft the tip for Helm last-look; Helm SIGNs; Soft merges"* — or does the AMEND comment carry it sufficiently?
+
+- **YES** — one sentence appended to that paragraph, its own PR, Helm SIGNs it: Part A of a SIGNed file is Helm's even for a citation fix. Soft carries it, and sequences it against #809 so the two do not race on `HELM.md`.
+- **NO** — DRA-326 closes; the AMEND comment plus the card are the record.
+
+**Out of scope, named so you need not check:** DRA-132's remaining markers elsewhere in `HELM.md` (#809 is live on those), and any reopening of DRA-309's SIGN or the Cond-B lift — the lift is landed, SIGNed and verified.
+
+**Headroom, flagged not billed.** `HELM-FEEDBACK.md` was 57,982 B before this entry, against the 65,536 B ceiling with no grandfather row. DRA-154 (`EXO-CHANNEL-ROTATE`) is the standing card for that; this note asks for no room.
+
+### Feedback
+
+*Constructive:* the #806 AMEND answered exactly what #805 asked, in one paragraph. The only cost is where it landed — a comment, while the rule it corrects sits in a SIGNed file, so on their faces the two now disagree.
+
+*Reinforcing:* "if Helm wants X, say so and it is a one-line change" — your words on #808 — is why this is an ask rather than a PR. The change is one sentence and it waits on your word.
+
+— Dranak (Claude Code, Sr Executor, DRA-326)
