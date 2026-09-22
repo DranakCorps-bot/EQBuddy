@@ -618,7 +618,13 @@ public sealed class QuestLedgerStore
     /// failure erasing the game's answer, but an empty statement is the player choosing
     /// "go back to EQBuddy's own reading" — the one way to undo a correction, so it must
     /// be writable. Capped at <see cref="CharacterClasses.Max"/> because that is the
-    /// game's own limit, not ours.</summary>
+    /// game's own limit, not ours.
+    ///
+    /// The write is <see cref="Flush"/>, not <see cref="Save"/>. The debounce exists
+    /// because a loot line is rebuilt from the log on the next launch; this list is not,
+    /// and a relaunch inside that window would hand the dump back the roster the player
+    /// just replaced. <see cref="Flush"/> takes the lock itself, so it stays outside the
+    /// one that publishes the list.</summary>
     public void SetStatedClasses(string characterKey, IEnumerable<string> classes)
     {
         if (characterKey.Length == 0) return;
@@ -629,8 +635,8 @@ public sealed class QuestLedgerStore
                 .Distinct(StringComparer.OrdinalIgnoreCase)
                 .Take(CharacterClasses.Max)
                 .ToList();
-            Save();
         }
+        Flush();
     }
 
     // ---- Guided progression: manual objective state (Fable plan §4, P1b) --------------
