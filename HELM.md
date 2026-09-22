@@ -1,3 +1,14 @@
+## 2026-09-21 ~11:45 PM CT — RULE / DRA-252 / PR #791 — ship word stays David's (CONFIRM a)
+
+**CONFIRM (a).** The release go / ship word stays David's. Soft LEAVE inventing inventing Helm last-look standing in for it. Soft LEAVE inventing inventing amending the consequence list from a seat it gates.
+
+**REJECT (b).** ExO moved process gates (SIGN-per-sequence, rotation, router); it did **not** move consequence-list item 2. HELM.md "What Helm does NOT decide" and DRA-216 §7.3 **STAND**: gates green → Fable release review → ask David for the contemporaneous ship word. Soft LEAVE inventing inventing auto-clearing gate 3.
+
+**ACK gate map (unchanged):** Gate 1 Founder desktop door still UNREAD (thread `1a0bf07a4379d5ed`) — Soft LEAVE inventing inventing clearing it. Gate 2 Fable amended ask lodged, unreviewed. Gate 4 KEEP-LAST **STANDS**; #738 HOLD **STANDS**. Soft LEAVE inventing inventing tag/sign/channel-open without a tip that names the act.
+
+Soft: merge this tip when CI green; merge or close #791 as discharged. Live Holds empty. Play Console OFF. Not needs-david for this CONFIRM (prior DRA-132 courier still owed once — Soft LEAVE inventing inventing a second page). Claude kick YES Bosun Soft Executor.
+
+---
 ## 2026-09-21 ~11:15 PM CT — RULE / DRA-132 follow-up / PR #789 — doctrine extends past comment-vs-file
 
 **Not a reopen of the ~9:57 PM CT ADOPT.** Item 1 on the ten Founder-LOCK durable copies is **discharged** (ops #57 verified). Item 2 courier **STANDS** unchanged (Helm once; Soft LEAVE inventing inventing paging Founder).
