@@ -156,6 +156,74 @@ public sealed class ClassStatementTests : IDisposable
         Assert.Equal(ClassSource.Stated, source);
     }
 
+    /// <summary>
+    /// Today's smoke, through the refresh the room actually gets. He set Warrior · Druid ·
+    /// Monk. The achievements file still says Paladin · Druid · Warrior — re-reading it is
+    /// what <see cref="OutputfileAutoImport.ImportAchievements"/> does, and it must not put
+    /// Paladin back on the line or on the chips. The test does not call <c>Flush</c>: a
+    /// loot line can wait out the ledger's debounce because the log rebuilds it, and a
+    /// statement cannot. Reopening the file is the relaunch.
+    /// </summary>
+    [Fact]
+    public void TheStatementReplacesTheDumpAndSurvivesARefresh()
+    {
+        var stated = new[] { "Warrior", "Druid", "Monk" };
+        var store = new QuestLedgerStore(_path);
+        store.SetStatedClasses(Dranak, stated);
+
+        var dir = Directory.CreateTempSubdirectory("eqb-class-refresh");
+        try
+        {
+            var dump = Path.Combine(dir.FullName, "Dranak_legends-Achievements.txt");
+            File.WriteAllLines(dump,
+            [
+                "Untapped Potential: Classes",
+                "C\tPrimary Class Unlock - Paladin",
+                "C\tPrimary Class Unlock - Druid",
+                "C\tPrimary Class Unlock - Warrior",
+            ]);
+
+            OutputfileAutoImport.ImportAchievements(
+                dump, new AppSettings(), raids: null, store, Dranak);
+
+            Assert.Equal(stated, store.StatedClassesFor(Dranak));
+            Assert.Equal(Guess, store.UnlockedClassesFor(Dranak));
+
+            var (live, liveSource) = CharacterClasses.Resolve(
+                store.UnlockedClassesFor(Dranak),
+                inferred: ["Paladin"],
+                picks: ["Paladin"],
+                store.StatedClassesFor(Dranak));
+            Assert.Equal(stated, live);
+            Assert.Equal(ClassSource.Stated, liveSource);
+            Assert.DoesNotContain("Paladin", live);
+
+            var chips = ClassStatement.EditorSelection(
+                store.StatedClassesFor(Dranak),
+                store.UnlockedClassesFor(Dranak),
+                inferred: ["Paladin"],
+                picks: ["Paladin"]);
+            Assert.Equal(stated, chips);
+        }
+        finally
+        {
+            dir.Delete(true);
+        }
+
+        var reopened = new QuestLedgerStore(_path);
+        var saved = reopened.StatedClassesFor(Dranak);
+        Assert.Equal(stated, saved);
+
+        var (classes, source) = CharacterClasses.Resolve(
+            reopened.UnlockedClassesFor(Dranak),
+            inferred: ["Paladin"],
+            picks: reopened.ClassesFor(Dranak),
+            saved);
+        Assert.Equal(stated, classes);
+        Assert.Equal(ClassSource.Stated, source);
+        Assert.DoesNotContain("Paladin", classes);
+    }
+
     /// <summary>The room paints the chips from <see cref="ClassStatement"/> and stores
     /// what <see cref="ClassStatement.Toggle"/> returns. Selecting from <c>_stated</c>
     /// alone is the blank-strip bug: the line shows the guess, the chips show nothing,
