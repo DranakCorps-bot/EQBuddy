@@ -37,13 +37,23 @@ public static class LevelReadout
     ///
     /// <para><see cref="Unknown"/> when nothing knows, which is a real answer: the room says
     /// what would fill it rather than drawing a blank row.</para>
+    ///
+    /// <para><b>The class half since DRA-356 (DRA-352 D4)</b> comes from
+    /// <c>CharacterLevel.BasisLabel</c>, the same one-table rule as the source: "Level 17 —
+    /// the lowest of your equipped classes (Enchanter), set by you", or, when an equipped class
+    /// has no level of its own, the fallback number followed by which class it could not
+    /// weigh.</para>
     /// </summary>
-    public static string Line(ResolvedLevel level) =>
-        !level.Known
-            ? Unknown
-            : CharacterLevel.SourceLabel(level.Source) is { Length: > 0 } from
-                ? $"Level {level.Level} — {from}"
-                : $"Level {level.Level}";
+    public static string Line(ResolvedLevel level)
+    {
+        if (!level.Known) return Unknown;
+        var from = CharacterLevel.SourceLabel(level.Source);
+        var basis = CharacterLevel.BasisLabel(level);
+        if (level.LowestClass.Length > 0)
+            return from.Length > 0 ? $"Level {level.Level} — {basis}, {from}" : $"Level {level.Level} — {basis}";
+        var head = from.Length > 0 ? $"Level {level.Level} — {from}" : $"Level {level.Level}";
+        return basis.Length > 0 ? $"{head}; {basis}" : head;
+    }
 
     /// <summary>What the line says before anything knows. It names how the answer arrives on
     /// its own AND that the player can say it now, because the log only ever states a level
@@ -54,47 +64,36 @@ public static class LevelReadout
         "Level not known yet — EQBuddy reads it from the log when you ding, and you can set "
         + "it here meanwhile.";
 
-    /// <summary>The door into the level editor. "Set", not "correct" or "override" — the same
-    /// ruling that worded <c>HomeReadout.EditClasses</c>: being told to override your own
-    /// character is a strange thing for an app to say.</summary>
-    public const string Edit = "Set level…";
-
-    /// <summary>The door's label while the editor is open. It COMMITS what is in the box and
-    /// closes the row — see <see cref="EditorNote"/> for why this one does real work where
-    /// the class editor's "Done" only closes a strip.</summary>
-    public const string EditDone = "Done";
-
     /// <summary>
-    /// Over the editor: what setting a level does, and how to commit it.
+    /// **The level is a DROPDOWN since DRA-356 (DRA-352 D4)** — the PoS pair's shape (a
+    /// compact list beside the class pill), replacing DRA-71 D3's Set level → type → Done
+    /// box. A list cannot hold a half-typed number, so the box's whole reason for an announced
+    /// commit key and a refusal sentence is gone with it; both strings went with the box.
     ///
-    /// <para><b>It says "press Enter" out loud, and that is a deliberate cost.</b> A box that
-    /// committed on focus loss would write a half-typed number — a player typing "30" is at
-    /// "3" for a moment, and this room rebuilds itself on a timer while a session is running,
-    /// so the moment is reachable without them doing anything. An announced key is a smaller
-    /// price than a silent wrong statement that then outranks their next ding.</para>
+    /// <para>The FACE is the resolved number — "what EQBuddy thinks" — and the line above it
+    /// says where that came from (<see cref="Line"/>). Picking a row STATES it.</para>
     /// </summary>
-    public const string EditorNote =
-        "Type the level this character actually is and press Enter. EQBuddy keeps using it "
-        + "until your next ding says otherwise.";
+    public static string Choice(int level) => $"Level {level}";
 
-    /// <summary>Placeholder-ish hover copy on the box itself, saying what happens next rather
-    /// than repeating the note.</summary>
-    public const string EditorTip =
-        "Your own statement about this character's level. A later ding in the log replaces "
-        + "it; an earlier one does not.";
+    /// <summary>The face while nothing knows. It names the action rather than drawing a blank
+    /// or a "Level 0" nobody claimed; the line above it already says how the answer arrives
+    /// on its own.</summary>
+    public const string PickFace = "Pick a level";
 
-    /// <summary>The way back, offered only while a statement stands — the same words and the
-    /// same reason as the class editor's (<c>HomeReadout.ClearStated</c>): without it a
-    /// correction is one-way and a player who typed it wrong once is telling EQBuddy forever.
-    /// Clearing returns the line to the log's own reading.</summary>
+    /// <summary>Hover copy on the dropdown: what picking does, per class (DRA-356). It says the
+    /// per-class rule in the player's words — the classes below the pick rise to it, and only
+    /// the lowest comes DOWN to it — because a player with a level-50 Warrior who picks 17 for
+    /// a new class must be able to read that the Warrior stays 50.</summary>
+    public const string PickerTip =
+        "Your own statement about this character's level. Equipped classes below it rise to "
+        + "it; only your lowest class comes down to it. A later ding in the log replaces it.";
+
+    /// <summary>The way back — the dropdown's first row, and offered as a row only while a
+    /// statement stands. The same words and the same reason as the class editor's
+    /// (<c>HomeReadout.ClearStated</c>): without it a correction is one-way and a player who
+    /// picked wrong once is telling EQBuddy forever. Clearing returns the line to the log's
+    /// own reading.</summary>
     public const string ClearStated = "Let EQBuddy work it out";
-
-    /// <summary>What the room says when the box held something it could not read. It names
-    /// the refusal rather than silently reverting, because a control that appears to accept
-    /// input and changes nothing is the silent no-op rule broken in the smallest possible
-    /// way.</summary>
-    public const string Refused =
-        "That is not a level EQBuddy can use — type a whole number above zero.";
 
     /// <summary>
     /// What the Helper says about the number it ranked with — <b>the plan's "the Helper names
@@ -109,7 +108,9 @@ public static class LevelReadout
     public static string UsedByHelper(ResolvedLevel level) =>
         !level.Known
             ? HelperUnknown
-            : $"Weighed at level {level.Level}, {CharacterLevel.SourceLabel(level.Source)}.";
+            : CharacterLevel.BasisLabel(level) is { Length: > 0 } basis
+                ? $"Weighed at level {level.Level}, {CharacterLevel.SourceLabel(level.Source)} — {basis}."
+                : $"Weighed at level {level.Level}, {CharacterLevel.SourceLabel(level.Source)}.";
 
     /// <summary>What the Helper says when it has no level. It says what it did anyway —
     /// because the answers above it are real and are ranked from the player's own play — and

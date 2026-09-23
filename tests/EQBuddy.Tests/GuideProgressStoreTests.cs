@@ -377,6 +377,10 @@ public sealed class GuideProgressStoreTests : IDisposable
             // point failing silently — the value already survived the session before this
             // store existed.
             "Skills",
+            // DRA-356 (DRA-352 D4): each class's own level pair. A class memory that did not
+            // survive the reload would make every equipped class "no memory" again, and the
+            // Founder's level-17 character would read as the Warrior's 50 after a restart.
+            "ClassLevels",
         ];
         Assert.Equal(
             populated.OrderBy(n => n, StringComparer.Ordinal),
@@ -396,6 +400,16 @@ public sealed class GuideProgressStoreTests : IDisposable
             LevelAt = new DateTime(2026, 9, 1, 20, 15, 0),
             StatedLevel = 31,
             StatedLevelAt = new DateTime(2026, 9, 3, 9, 5, 0),
+            ClassLevels =
+            {
+                ["Enchanter"] = new QuestLedgerStore.ClassLevel
+                {
+                    Level = 18,
+                    LevelAt = new DateTime(2026, 9, 23, 19, 0, 0),
+                    StatedLevel = 17,
+                    StatedLevelAt = new DateTime(2026, 9, 23, 18, 0, 0),
+                },
+            },
             Guides =
             {
                 [Guide] = new QuestLedgerStore.GuideProgress

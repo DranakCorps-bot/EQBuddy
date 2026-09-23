@@ -1503,10 +1503,22 @@ $Shots = [ordered]@{
     # The STATEMENT is seeded into the ledger so the undo row exists to be photographed — with
     # only a ding there is nothing to take back, and the row that proves a correction is
     # reversible would be absent from the one picture of the editor.
+    #
+    # DRA-356 (DRA-352 D4): the editor is now a DROPDOWN, so the hook opens its list and the
+    # shot composites the popup's own HWND (Popups = $true, trap 79). PREDICTION: the line
+    # "Level 28 — set by you", under it the class line, then the pair — a level dropdown whose
+    # face reads "Level 28" beside the class pill — and the open list headed by "Let EQBuddy
+    # work it out" then "Level 1", "Level 2"… scrolled so the SELECTED "Level 28" row is in view.
     'shell-home-level' = @{ Title = 'EQBuddy — Character'
                            Env = @{ EQBUDDY_SHELL = '1'; EQBUDDY_HOME_EDITOR = 'level' }
                            Ledger = @{ StatedLevel = 28; StatedLevelAt = '2026-09-12T20:00:00' }
-                           Set = @{} }
+                           Popups = $true; Set = @{} }
+    # DRA-356: the class PILL open. PREDICTION: the pill's popup — sixteen class rows, with
+    # the fixture's inferred Warrior ticked (no statement stands, so there is no "Let EQBuddy
+    # work it out" action above the rows) — hanging under a face reading "Warrior".
+    'shell-home-class' = @{ Title = 'EQBuddy — Character'
+                           Env = @{ EQBUDDY_SHELL = '1'; EQBUDDY_HOME_EDITOR = 'class' }
+                           Popups = $true; Set = @{} }
     # ---- DRA-70: the Helper room. Predictions are above, with the shell-home block. -----
     'shell-helper'    = @{ Title = 'EQBuddy — Helper'
                            Env = @{ EQBUDDY_SHELL = 'helper' }; Set = @{} }

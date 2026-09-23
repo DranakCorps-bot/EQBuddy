@@ -47,6 +47,22 @@ public readonly record struct LevelReading(int Level, DateTime At);
 /// <see cref="CharacterLevel"/>.</param>
 public readonly record struct ResolvedLevel(int Level, LevelSource Source, DateTime At)
 {
+    // Backing fields rather than positional parameters, so `default(ResolvedLevel)` — which
+    // HelperInputs takes as a default argument — stays EQUAL to Unknown: a positional string
+    // would be null in `default` and "" in Unknown, two states for one absence.
+    private readonly string? _lowestClass;
+    private readonly string? _unknownClass;
+
+    /// <summary>Set when the number is the LOWEST of two or more equipped classes' own levels
+    /// (DRA-356, DRA-352 D4) — the class that answered. Empty when one class or none was
+    /// weighed.</summary>
+    public string LowestClass { get => _lowestClass ?? ""; init => _lowestClass = value; }
+
+    /// <summary>Set when an equipped class has no level of its own yet, so the answer FELL
+    /// BACK to the character's single remembered pair — the class that has none. Unknown is
+    /// never guessed (trap 73); the surface says which class it could not weigh.</summary>
+    public string UnknownClass { get => _unknownClass ?? ""; init => _unknownClass = value; }
+
     /// <summary>Nothing knows yet. The state a brand-new profile is in, and a real answer
     /// rather than an error: a surface draws what it can and says the rest is unknown.</summary>
     public static readonly ResolvedLevel Unknown = new(0, LevelSource.Unknown, DateTime.MinValue);
@@ -84,13 +100,31 @@ public readonly record struct ResolvedLevel(int Level, LevelSource Source, DateT
 /// unstamped level as NOW — would have made every existing profile's stored number
 /// unbeatable until the next ding.</para>
 ///
-/// <para><b>Per-class levels are PARKED</b> (the signed plan's §4). No log line and no
-/// <c>/outputfile</c> dump in this repo carries a level per class; inventing a shape for
-/// one would be the schema-as-licence failure trap 73 names. The reopen condition is a game
-/// dump or log line that states it, or a reporter naming a source.</para>
+/// <para><b>Per-class levels are UN-PARKED by DRA-356 (DRA-352 D4, Founder-directed
+/// 2026-09-23), and the park's premise still stands:</b> no log line and no
+/// <c>/outputfile</c> dump carries a level per class. The source is not the game — it is the
+/// player's own statement plus the equipped-set join. A ding is written to every class
+/// equipped when it printed (<see cref="CharacterClasses.Resolve"/>'s answer), RAISE-ONLY; a
+/// statement raises every equipped class below it and LOWERS only the class(es) at the
+/// current minimum (or with no memory). The character's level is then the MINIMUM over the
+/// equipped classes (<see cref="ResolveEquipped"/>) — the Founder's rule: Warrior 50 with a
+/// newly equipped class at 17 is a level-17 character. An equipped class with no memory is
+/// never guessed: the answer falls back to the single pair above and says which class it
+/// could not weigh.</para>
+///
+/// <para><b>Known cost, stated rather than hidden:</b> the equipped set is the one EQBuddy
+/// holds when it READS the ding, not when the game printed it. A live ding is the same
+/// moment; a first-launch replay of an old ding lands on today's classes. Raise-only keeps
+/// that from ever lowering a class.</para>
 /// </summary>
 public static class CharacterLevel
 {
+    /// <summary>The highest level the Character room's picker offers (DRA-356). Legends' cap
+    /// is 60 through the top of today's era ladder (<see cref="QuestEraLadder.Eras"/> ends at
+    /// Luclin, a level-60 era; <c>SpellLevelCatalog</c> cites the same cap). A later era that
+    /// raises it moves this one number.</summary>
+    public const int MaxLevel = 60;
+
     /// <summary>
     /// Make a reading, or answer null for one there is no claim behind.
     ///
@@ -120,6 +154,56 @@ public static class CharacterLevel
         if (observed is { } log) return new ResolvedLevel(log.Level, LevelSource.Observed, log.At);
         return ResolvedLevel.Unknown;
     }
+
+    /// <summary>
+    /// **The character's level over its equipped classes** (DRA-356, DRA-352 D4): the
+    /// MINIMUM of each equipped class's own fresher-wins answer.
+    /// </summary>
+    /// <param name="equipped">The classes equipped now, in <see cref="CharacterClasses.Resolve"/>'s
+    /// order. Null or empty ⇒ the single pair answers, exactly as before per-class memory
+    /// existed.</param>
+    /// <param name="perClass">Each class's own observed/stated pair. A class absent here, or
+    /// present with neither reading, has no memory.</param>
+    /// <param name="observed">The character's single observed reading (the legacy pair).</param>
+    /// <param name="stated">The character's single stated reading (the legacy pair).</param>
+    public static ResolvedLevel ResolveEquipped(
+        IReadOnlyList<string>? equipped,
+        Func<string, (LevelReading? Observed, LevelReading? Stated)> perClass,
+        LevelReading? observed, LevelReading? stated)
+    {
+        var single = Resolve(observed, stated);
+        if (equipped is null || equipped.Count == 0) return single;
+
+        ResolvedLevel? lowest = null;
+        var lowestClass = "";
+        foreach (var cls in equipped)
+        {
+            var (o, s) = perClass(cls);
+            var mine = Resolve(o, s);
+            // The minimum is UNKNOWN when any equipped class has no level of its own — a
+            // class nothing has spoken for could be level 1. Fall back to the one pair the
+            // character has always had, and name the class (trap 73: never guessed).
+            if (!mine.Known) return single with { UnknownClass = cls };
+            if (lowest is null || mine.Level < lowest.Value.Level)
+            {
+                lowest = mine;
+                lowestClass = cls;
+            }
+        }
+        return equipped.Count > 1 ? lowest!.Value with { LowestClass = lowestClass } : lowest!.Value;
+    }
+
+    /// <summary>
+    /// How a surface says WHICH classes the number stands for — the class half of the level's
+    /// source, one table beside <see cref="SourceLabel"/> for the same ruling. Empty when the
+    /// number is the character's single pair with nothing to add.
+    /// </summary>
+    public static string BasisLabel(ResolvedLevel level) =>
+        level.LowestClass.Length > 0
+            ? $"the lowest of your equipped classes ({level.LowestClass})"
+            : level.UnknownClass.Length > 0
+                ? $"no level known yet for {level.UnknownClass}"
+                : "";
 
     /// <summary>
     /// How a surface says where the level came from. **ONE TABLE**, the same rule

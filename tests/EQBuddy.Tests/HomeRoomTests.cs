@@ -288,9 +288,8 @@ public class HomeRoomTests
             StringComparison.OrdinalIgnoreCase);
         Assert.Contains("until you clear it", HomeReadout.ClassEditorNote,
             StringComparison.OrdinalIgnoreCase);
-        Assert.NotEqual(HomeReadout.EditClasses, HomeReadout.EditClassesDone);
         Assert.Equal("Let EQBuddy work it out", HomeReadout.ClearStated);
-        foreach (var words in new[] { HomeReadout.ClassEditorNote, HomeReadout.EditClasses,
+        foreach (var words in new[] { HomeReadout.ClassEditorNote, HomeReadout.PickClasses,
                                       HomeReadout.ClearStated, HomeReadout.EmptyClass,
                                       HomeReadout.DumpListsUnlocks,
                                       HomeReadout.DumpListsUnlocksTruncated })
@@ -409,25 +408,57 @@ public class HomeRoomTests
     }
 
     /// <summary>
-    /// The editor's own words: the commit key is ANNOUNCED (a box that only commits on a key
-    /// nobody named is a silent no-op wearing a caret), the door and its open-state label are
-    /// different, the way back is the same sentence the class editor uses, and the refusal
-    /// says what would be accepted instead of just rejecting. "Override" stays banned for the
-    /// reason it was struck from the quest picker and the class row.
+    /// The level dropdown's own words (DRA-356, DRA-352 D4 — the typed box, its commit key
+    /// and its refusal went with it): the hover says the PER-CLASS rule in the player's words
+    /// (classes below rise, only the lowest comes down — the Founder's level-50 Warrior must be
+    /// able to read that it stays 50), the way back is the same sentence the class editor uses,
+    /// and a row reads as a level. "Override" stays banned for the reason it was struck from
+    /// the quest picker and the class row.
     /// </summary>
     [Fact]
-    public void TheLevelEditorAnnouncesItsCommitKeyItsWayBackAndItsRefusal()
+    public void TheLevelDropdownSaysThePerClassRuleAndItsWayBack()
     {
-        Assert.Contains("Enter", LevelReadout.EditorNote, StringComparison.Ordinal);
-        Assert.NotEqual(LevelReadout.Edit, LevelReadout.EditDone);
+        Assert.Contains("only your lowest class comes down", LevelReadout.PickerTip,
+            StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("rise", LevelReadout.PickerTip, StringComparison.OrdinalIgnoreCase);
         // The SAME words as the class editor's undo, deliberately: a player who has argued
         // with EQBuddy about their classes should not learn a second idiom for their level.
         Assert.Equal(HomeReadout.ClearStated, LevelReadout.ClearStated);
-        Assert.Contains("whole number", LevelReadout.Refused, StringComparison.OrdinalIgnoreCase);
-        foreach (var words in new[] { LevelReadout.EditorNote, LevelReadout.Edit,
-                                      LevelReadout.ClearStated, LevelReadout.Unknown,
-                                      LevelReadout.Refused, LevelReadout.EditorTip })
+        Assert.Equal("Level 17", LevelReadout.Choice(17));
+        Assert.DoesNotContain("0", LevelReadout.PickFace);
+        foreach (var words in new[] { LevelReadout.PickerTip, LevelReadout.PickFace,
+                                      LevelReadout.ClearStated, LevelReadout.Unknown })
             Assert.DoesNotContain("override", words, StringComparison.OrdinalIgnoreCase);
+    }
+
+    /// <summary>The list's ceiling is the game's (DRA-356): 60, the cap every era on today's
+    /// ladder shares. A number here that drifted from the cap would offer a level nobody can
+    /// be, or hide one somebody is.</summary>
+    [Fact]
+    public void TheLevelListStopsAtTheGamesCap() => Assert.Equal(60, CharacterLevel.MaxLevel);
+
+    /// <summary>
+    /// **The line names the CLASS the number stands for** (DRA-356): the lowest of two or more
+    /// equipped classes by name, or — when an equipped class has no level of its own — the
+    /// fallback number AND which class could not be weighed, never a guess (trap 73). The
+    /// Helper's disclosure carries the same half, from the same Core table.
+    /// </summary>
+    [Fact]
+    public void TheLevelLineNamesTheLowestClassOrTheOneItCouldNotWeigh()
+    {
+        var at = new DateTime(2026, 9, 23, 20, 0, 0);
+        var lowest = new ResolvedLevel(17, LevelSource.Stated, at) { LowestClass = "Enchanter" };
+        Assert.Equal("Level 17 — the lowest of your equipped classes (Enchanter), set by you",
+            LevelReadout.Line(lowest));
+        Assert.Contains("(Enchanter)", LevelReadout.UsedByHelper(lowest), StringComparison.Ordinal);
+
+        var fallback = new ResolvedLevel(50, LevelSource.Observed, at) { UnknownClass = "Enchanter" };
+        Assert.Equal("Level 50 — from your log's ding lines; no level known yet for Enchanter",
+            LevelReadout.Line(fallback));
+
+        // The negative: one class, or none, adds nothing to the line it always had.
+        Assert.Equal("Level 30 — set by you",
+            LevelReadout.Line(new ResolvedLevel(30, LevelSource.Stated, at)));
     }
 
     /// <summary>

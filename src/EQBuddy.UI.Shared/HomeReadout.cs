@@ -145,17 +145,36 @@ public static class HomeReadout
         "Class not known yet — EQBuddy reads it from your log as you play, and the "
         + "Achievements catch-up below answers it at once.";
 
-    /// <summary>The door into the class editor. "Set", not "correct" or "override" — the
-    /// same ruling that reworded the quest picker: being told to override your own
-    /// character is a strange thing for an app to say.</summary>
-    public const string EditClasses = "Set class…";
+    /// <summary>
+    /// **The class editor is an <c>EqMultiPicker</c> pill since DRA-356 (DRA-352 D4)** — the
+    /// PoS pair's shape, replacing DRA-66's "Set class…" door over sixteen chips. The face says
+    /// what is ticked through <see cref="PickerFace"/>'s one rule, with the quest lens's
+    /// abbreviations and a roomier budget: this face owns its own row in the Character block,
+    /// so three abbreviations always fit and it counts only past the game's own cap.
+    ///
+    /// <para><b>Empty is NOT "Any class".</b> <see cref="PickerFace"/>'s empty state is a
+    /// FILTER's ("show quests for any class"); this is identity, where empty means nothing
+    /// knows yet, so the face names the action instead.</para>
+    /// </summary>
+    public static string ClassFace(IReadOnlyList<string> selection) =>
+        selection is null || selection.Count == 0
+            ? PickClasses
+            : PickerFace.For(selection, "class", "classes",
+                offered: QuestClassFilter.Classes.Length,
+                abbreviate: QuestClassFilter.Abbrev,
+                maxChars: ClassFaceChars);
 
-    /// <summary>The door's label while the editor is open. It closes the strip; the picks
-    /// themselves were saved the moment they were ticked, and a button reading "Save"
-    /// over already-saved state would be claiming a job it does not do.</summary>
-    public const string EditClassesDone = "Done";
+    /// <summary>The class pill's face budget. <see cref="PickerFace.MaxChars"/> is 16 because
+    /// the quest window's face shares a crowded row (#184); this one sits beside only the level
+    /// dropdown, and "BRD · BST · BER" is 15, so the default already holds any three — kept
+    /// named so a later noun change has one number to argue with.</summary>
+    public const int ClassFaceChars = PickerFace.MaxChars;
 
-    /// <summary>Over the editor's chips: what stating does, and the cap — named up front
+    /// <summary>The class pill's face while nothing is ticked and nothing is known.</summary>
+    public const string PickClasses = "Pick classes";
+
+    /// <summary>The class pill's hover (it was the note over the chip strip until DRA-356):
+    /// what stating does, and the cap — named up front
     /// so the fourth click refusing is an announced rule rather than a silent no-op. The
     /// limit is the game's (up to three active classes), through
     /// <see cref="CharacterClasses.Max"/>.

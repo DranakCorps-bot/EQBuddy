@@ -64,6 +64,11 @@ public class MultiSelectPickerTests
             + "\"upgrade what I wear\" gear intent (DRA-71 D6), and the profession picker "
             + "under Farm Materials (DRA-71 D8)"
         },
+        {
+            @"src\EQBuddy\HomeRoom.cs",
+            "the Character room's class pill — who this character IS, up to three, beside the "
+            + "level dropdown (DRA-356, DRA-352 D4; it was a sixteen-chip strip)"
+        },
     };
 
     [Theory]
