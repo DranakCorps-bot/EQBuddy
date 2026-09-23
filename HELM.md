@@ -1,3 +1,30 @@
+## 2026-09-23 ~9:16 AM CT — SIGN / DRA-347 / ops PR #74 — DRA-345 implement: register Challenger on Corps ops
+
+**SIGN this implement** at head `5684e75c7e29c3d59fb80a80c817c7781e17a50c` (`5684e75`). Merge only with `--match-head-commit` at that sha. The plan door was SIGNed on ops `#73` @ `178dbb1` (2026-09-23T13:50Z). This is the separate pre-merge T2 SIGN that tip still owed. The ruling was given as ops PR `#74` comment 2026-09-23T14:16:27Z; this tip records it.
+
+**Scope check against the `#73` SIGN (pass):**
+1. `EXO-PLAYBOOK.md`: `exo-experiment: challenger-seat` registered after `jr-sr-router`, restating SPEC §6/§7 D1+D2 so §10.4 works from the entry alone.
+2. **Walk condition (C5 / DRA-346) folded.** The citation line names SPEC commit `3b2dbf8c` (blob `79247a51`), registered 2026-09-23 on DRA-345. The SPEC stays the sole C1–C5 authority, and the double-write is named.
+3. `CURRENT_ORG.md`: Paperclip seats section (Planner / Sr / Jr, and the Challenger under Planner with presence-not-content). The A′ "challenger" is D7-qualified on first use, and the header date is bumped.
+4. `purpose/README.md`: rows for the charter, the gate SPEC and the DRA-302 §6.4 pointer. They point, they do not restate.
+5. `purpose/CHALLENGER_PROCESS_GATE_SPEC.md`: status header retense only (force §2 ADOPT as written). The old "Not in force" is kept as dated history, and D3/D4 are untouched.
+
+**Out of scope (confirmed clean).** No D3/D4 router insert. No EQBuddy file. No second Challenger seat. No Play / Desktop / signing / prod secrets. Charter §§2–5/9 untouched. D6: `HOLD` appears only as gate-outcome shape, not as a verdict. D7: every changed file qualifies on first use.
+
+**P2: KEEP.** The model-lock table stays. Live verification passed with the recorded note: Planner `claude-fable-5` ✓, Jr `qwen3.8:27b` ✓. The Sr Opus lock holds: `claude-opus-5-5` is live, and the lock copy still reads 5.1 after the 2026-09-23T11:03Z board flip. This matches the `#73` tip's Sr = Opus 5.5 intent. Do not drop.
+
+**Named, still unruled (ACK, not deciding).** Does a C5 wake count toward the charter's "ten C1–C4 wakes" kill bar? That goes to its own card. The entry is right not to decide it.
+
+**Observed, out of scope (ACK).** The SPEC body has relay corruption at its prohibition sites. It needs its own A6 repair card. No editing the SPEC body under this SIGN.
+
+**Conflict.** Ops `#72` (DRA-335) is still open on a different playbook span. If `#72` lands first, rebase `#74` and re-ask for SIGN at the new head. No merging past a dirty rebase.
+
+**Soft:** merge this tip when CI is green. Then merge ops `#74` at `5684e75c7e29c3d59fb80a80c817c7781e17a50c` with `--match-head-commit`, and discharge the Paperclip DRA-347 pending confirmation `ceea69de` / LIVE ASK. Live Holds empty. Play Console OFF. Not needs-david. Claude kick YES Bosun Soft Executor (tip merge + ops `#74` merge).
+
+The Founder already AUTHORIZED the EXO-HARDEN align card. The `#73` plan SIGN and this implement SIGN close that door. No Founder page.
+
+---
+
 ## 2026-09-23 ~8:50 AM CT — SIGN / DRA-345 / ops PR #73 — ExO alignment plan: surface Challenger on Corps ops
 
 **SIGN this plan** at head `178dbb110e05efd56eb5c27260fbe83439c2d954` (`178dbb1`) as the authorized shape for the DRA-345 implement PR. Plan-only PR; nothing from `#73` lands in live docs. Implement is a separate Sr PR (`route: hard -> Sr (T1)`), still behind its own Helm pre-merge T2 SIGN.
