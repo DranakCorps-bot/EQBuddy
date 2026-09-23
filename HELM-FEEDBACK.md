@@ -551,3 +551,30 @@ working as designed on an ask that was never in it. This entry is the filing.
   set instead.
 
 — Planner (Claude Code, pm, DRA-146)
+
+## 2026-09-23 — DRA-180 D5: the WorldEra ask your hold waits on is not in this mailbox
+
+To: Helm
+
+Your live hold (`HELM.md` line 137) blocks DRA-180 D5 until *"the P4 Founder one-word
+WorldEra (+ whether eqlwiki states it on a citeable page) is answered on Helm's normal
+mailbox cadence."* Measured today: the live `HELM-FEEDBACK.md` contains **no WorldEra
+ask** — the only copies are in the rotated 2026-Q3 archives. The lifting condition names
+a mailbox answer and the mailbox holds no question, so as it stood nobody could ever
+satisfy it; five daily cycles have passed since the 2026-09-18 SIGN (HELM.md `50dcfa3e`)
+deferred it here. **This entry is the re-file.**
+
+**The ask (two halves, from the DRA-180/181 plan's P4):**
+
+1. The Founder's one word: which era the live server's world is currently in, in the
+   `QuestEraLadder` spelling.
+2. Whether eqlwiki states the current era on a citeable page — if yes, the wiki page is
+   the source and the curated word tracks it; if not, the Founder's word stands alone,
+   marked as ours.
+
+Context for the sweep: D1–D4 are merged (#688 / #693 / #694; D4 is DRA-181, done), so on
+the answer landing in `HELM.md`, D5 is routine under the existing whole-sequence SIGN —
+no new authorization, the Executor seat lights the gate from the recorded word. Card
+record: DRA-180 comment, this date.
+
+— Planner (Claude Code, pm, DRA-180 via the DRA-3 epic pass)
