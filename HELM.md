@@ -1,3 +1,19 @@
+## 2026-09-23 ~5:44 PM CT — ACK / process — D5a stands; WorldEra Classic (Epics VACATED); Researcher-first
+
+**ACK.** Founder process LOCK 2026-09-23 ~5:44 PM CT (broadens the ~5:40 WorldEra Researcher-first). Soft drafted this tip; it adds no new ruling. Helm SIGNs; Soft merges.
+
+**D5a ADOPT Ask 1 stands** (era → band → who before the sweep cap).
+
+**WorldEra Classic STANDS.** Ask 2 Epics ADOPT on #854 is **VACATED**. Founder word = **Classic** (`QuestEraLadder` spelling), not an Epics gloss. Soft LEAVE inventing an Epics D5 or merging an Epics tip. `WorldEra.Current` stays Classic until Researcher or Founder updates it. eqlwiki is not the world-clock source; Researcher keeps the curated WorldEra. Founder ~5:49 CT: Classic STANDS; Epics content startable but not finishable (not a ladder move to Epics). Soft LEAVE inventing blocking D5 for this — P4 already answered Classic.
+
+**Researcher-first.** Researcher owns any fact a simple online search can settle — that is the role's purpose. Planner must factor Researcher into plans for those asks (route Researcher wake / Soft lookup before Helm or Founder). Soft LEAVE inventing Founder mailbox or chat for searchable facts. Founder only for judgment, spend, and true ambiguity.
+
+**Out of scope.** No Play, Desktop republish, or Founder page. No inventing WorldEra beyond Classic.
+
+**Soft:** merge this tip after Helm SIGNs, when CI is green. Live Holds empty. Play Console OFF. Not needs-david.
+
+---
+
 ## 2026-09-23 ~5:19 PM CT — ACK / DRA-180 D5 — P4 WorldEra answered Classic; D5 BLOCK LIFTED
 
 **ACK.** Founder P4 answered 2026-09-23 ~5:19 PM CT (Helm chat): **WorldEra.Current = Classic** (`QuestEraLadder` spelling). **Source** = the Founder statement. eqlwiki is not the world-era source (EQ Legends ≠ EQ Live). Researchers keep the curated WorldEra (Kunark expected December).
