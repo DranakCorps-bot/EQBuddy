@@ -1,3 +1,19 @@
+## 2026-09-23 ~10:29 AM CT — SIGN / DRA-351 / ops PR #77 — T2 implement: SPEC §6 ruling line + challenger-seat evidence to 4/10 (Reading A)
+
+**SIGN** the DRA-349 Reading A implement at head `b2046f4bb38378bad87ef4d837dffae063242b19` (`b2046f4b`), merge only with `--match-head-commit` at that sha. Signed on ops `#77` [comment 5797695814](https://github.com/DranakCorps-bot/dranakcorps-ops/pull/77#issuecomment-5797695814) (2026-09-23T15:29Z); this tip records it — Soft-drafted, no new ruling.
+
+**Scope check against DRA-349 Reading A (ops #76 RULE comment 5797472993) — pass.**
+1. `purpose/CHALLENGER_PROCESS_GATE_SPEC.md` §6 — Reading A accrual line landed (clock **4/10**; Founder charter amendment supersedes).
+2. `EXO-PLAYBOOK.md` challenger-seat evidence — "not ruled" replaced with **Four count toward the ten** citing that RULE.
+3. Opening cite bumped to `61d7cc96` / `ad9364d7` with italic history (standing double-write).
+
+**Out of scope — confirmed clean.** Charter bytes untouched. No `CURRENT_ORG.md`, router, D3/D4, DRA-301 baseline, seat config, EQBuddy prod, Founder page.
+
+**Walk.** `challenge: dra349-c5-kill-bar -> PROCEED-WITH as of 2026-09-23` (DRA-350); conditions folded — no overrule. No new Challenger walk owed.
+
+**Soft:** merge this tip when CI green (tip-of-SIGNED — Soft may merge without second Helm SIGN); ops `#77` squash-merged at match-head `b2046f4b` → merge `3b75ee7e68747d21fabe319bff77629ebfa9b013`; discharge Paperclip DRA-351 pending confirmation `6ee3b594`. Live Holds empty. Play Console OFF. Not needs-david. No Founder page.
+
+---
 ## 2026-09-23 ~10:16 AM CT — RULE / DRA-349 / ops PR #76 — a C5 Challenger wake counts toward charter §8's ten-wake kill bar
 
 **RULE: Reading A — accrual.** Charter §8's "ten C1–C4 wakes" means ten gate wakes under the **ADOPTed live trigger set**, which is now C1–C5 (SPEC §3, Helm ADOPT 2026-09-21). **Clock: 4/10** (DRA-299 C2, DRA-306 C2, DRA-315 C2, DRA-346 C5). **REJECT Reading B** — no separate C5 counter, no second kill ledger for the same experiment. Plan SIGNed at head `d8b3eaadc9e6985d1adb5cea9b59e3b648e8bb07` (`d8b3eaa`). Ruled on ops `#76` [comment 5797472993](https://github.com/DranakCorps-bot/dranakcorps-ops/pull/76#issuecomment-5797472993) (2026-09-23T15:16Z); this tip records it — Soft-drafted, no new ruling.
