@@ -1188,6 +1188,11 @@ public sealed record HelperInputs(
 /// before there are rows at all, and a count attached to whichever row happened to be built
 /// first would be a number pointing at the wrong thing. A surviving cap says so (trap
 /// 50).</para>
+///
+/// <para><b>Since DRA-180 D5a it counts only candidates every gate let through.</b> The cap
+/// used to be spent inside the sweep, before the era, band and who gates, so it could hold back
+/// a reachable upgrade in favour of eight the gates then refused. It now runs after them; a
+/// refused candidate is the refusal lists' to report, never this number's.</para>
 /// </param>
 /// <param name="GearBandRefusals">
 /// The zones the Farm Gear band gate refused (DRA-84 D2, plan P2).
@@ -1323,9 +1328,9 @@ public sealed record RecommendationSet(
     /// different event with the same screen. Both draw one grey sentence; only this number says
     /// which happened.</para>
     ///
-    /// <para>It counts the sweep's output, so it is AFTER the sweep's own per-anchor cap
-    /// (<see cref="GearWithheld"/> is what that held back) and BEFORE the band gate and the who
-    /// rule. Zero on every path that never reached the sweep — no dump, no readable row, goal
+    /// <para>It counts the sweep's output BEFORE every gate AND before the per-anchor cap, which
+    /// since DRA-180 D5a runs LAST, over what the era gate, band gate, who rule and quest-source
+    /// rule left (<see cref="GearWithheld"/> is what the cap held back of those survivors). Zero on every path that never reached the sweep — no dump, no readable row, goal
     /// not picked — which is why it is reported beside <see cref="UnreadWorn"/> rather than
     /// inferred from it.</para>
     /// </summary>
@@ -2624,9 +2629,14 @@ public static partial class Recommendations
             return GearOutcome.None with { UnreadWorn = inputs.UnreadWorn };
         }
 
+        // **UNCAPPED, AND THE CAP RUNS LAST** (DRA-180 D5a, Helm ADOPT Ask 1). The sweep ranks
+        // each anchor's list by stats improved, which has nothing to do with whether a place is
+        // reachable; capping there spent the eight slots on Velious items the era gate then
+        // refused, and the room said "nothing in reach" over Classic upgrades ranked ninth.
+        // The cap is applied below, to what era → band → who → quest source left.
         var sweep = GearUpgrades.Sweep(
             inputs.GearIntent, inputs.Worn, inputs.WornPicks,
-            inputs.Items, inputs.MyClasses, inputs.IncludeQuests);
+            inputs.Items, inputs.MyClasses, inputs.IncludeQuests, GearUpgrades.Uncapped);
         // DRA-219: the sweep's two silent refusals ride out of EVERY path below it, including
         // the empty one. A sweep that found six upgrades and could not say where one of them
         // comes from is not the same event as a sweep that found none, and the empty path is
@@ -2741,6 +2751,23 @@ public static partial class Recommendations
             sweep.Upgrades, reachableAtStart, reachableAfterEra, reachableAfterBand,
             reachableAfterWho, reachableAfterQuest);
 
+        // **THE PER-ANCHOR CAP, NOW THAT EVERY GATE HAS HAD ITS SAY** (DRA-180 D5a). The same
+        // rule the sweep used to apply first (GearUpgrades.CapPerAnchor is its one producer),
+        // over the sweep's own per-anchor order filtered to the survivors — so it is spent on
+        // candidates the player can actually go and get. It never empties a bucket set: every
+        // surviving anchor keeps at least one upgrade, so the empty-list sentences above are
+        // decided by the gates alone. It runs BEFORE the yardstick, for the band gate's reason:
+        // a candidate the cap dropped must not set the scale of the rows that are drawn.
+        var shown = GearUpgrades.CapPerAnchor(
+            sweep.Upgrades.Where(u => reachableAfterQuest.Contains(UpgradeKey(u))),
+            GearUpgrades.MaxPerAnchor, out var gearWithheld);
+        if (gearWithheld > 0)
+        {
+            var kept = shown.Select(UpgradeKey).ToHashSet();
+            KeepOnly(byZone, kept);
+            KeepOnly(byQuest, kept);
+        }
+
         // ONE yardstick for the whole engine, folded once — a property of the SET, and a
         // per-row recomputation would be the same sum computed six times (trap 4 in a loop).
         // Zones and quests share it deliberately: they are answers to one goal and ranking
@@ -2781,6 +2808,7 @@ public static partial class Recommendations
 
         return outcome with
         {
+            Withheld = gearWithheld,
             Refused = refused,
             WhoWithheld = whoWithheld,
             Candidates = sweep.Upgrades.Count,
@@ -2862,12 +2890,29 @@ public static partial class Recommendations
     {
         var alive = new HashSet<(string, string, string)>();
         foreach (var bucket in byZone.Values)
-            foreach (var c in bucket) alive.Add(Key(c.Upgrade));
+            foreach (var c in bucket) alive.Add(UpgradeKey(c.Upgrade));
         foreach (var bucket in byQuest.Values)
-            foreach (var c in bucket) alive.Add(Key(c.Upgrade));
+            foreach (var c in bucket) alive.Add(UpgradeKey(c.Upgrade));
         return alive;
+    }
 
-        static (string, string, string) Key(GearUpgrade u) => (u.Over, u.Slot, u.Item);
+    /// <summary>The (anchor, slot, item) identity <see cref="Reachable"/> and the D5a cap
+    /// share, so "still reachable" and "still shown" cannot key an upgrade differently.</summary>
+    private static (string Anchor, string Slot, string Item) UpgradeKey(GearUpgrade u) =>
+        (u.Over, u.Slot, u.Item);
+
+    /// <summary>Drop every candidate the per-anchor cap did not keep, and any bucket that
+    /// leaves empty (DRA-180 D5a). A bucket's count is its row's weight, so a candidate the
+    /// cap held back must leave the bucket rather than only the drawn line.</summary>
+    private static void KeepOnly(
+        Dictionary<string, List<GearCandidate>> buckets,
+        HashSet<(string Anchor, string Slot, string Item)> kept)
+    {
+        foreach (var key in buckets.Keys.ToList())
+        {
+            buckets[key].RemoveAll(c => !kept.Contains(UpgradeKey(c.Upgrade)));
+            if (buckets[key].Count == 0) buckets.Remove(key);
+        }
     }
 
     /// <summary>
