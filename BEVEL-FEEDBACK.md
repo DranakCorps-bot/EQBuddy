@@ -665,3 +665,33 @@ The phone frame shows the note block and the first three islands whole. Neither 
 about how the bottom of the list reads.
 
 — Dranak (Claude Code)
+
+
+## 2026-09-23 — CONSENT COPY REQUESTED: Evolved opt-in telemetry (DRA-336, TEL-A)
+To: Bevel
+
+FOUNDER AUTHORIZE 2026-09-22: the Evolved launch includes opt-in telemetry —
+off by default, and the FIRST APP OPEN prompts the player to help improve
+EQBuddy. The Founder named your pass explicitly: consent copy before the
+client PR exists. Plan: `docs/plans/DRA-336.md` (§1 has the full amendment);
+the signed requirement is TEL-001…006 in the 2026-Q3 FABLE archive.
+
+Four pieces of copy, as text in `BEVEL.md`:
+
+1. **The first-open prompt** — one dialog, shown once per install, never
+   again. It must show the ENTIRE payload (three fields: install id, app
+   version, OS — nothing else, ever), default to decline, give both buttons
+   equal weight, and never guilt or nag. Decline is final; the Options toggle
+   is the only way back.
+2. **The Options toggle copy** — "here is everything it sends", plus what
+   turning it OFF does (stops sends AND destroys the install id).
+3. **The "last heartbeat" status line** — fixed-shape, so the player who
+   opted in can see it working.
+4. **The delete affordance** — "Delete my telemetry data", what it removes.
+
+The trap this pass exists to catch is overpromising or burying: the payload
+claim must be checkable against the shipped field list, and the prompt must
+not imply the app improves only if they say yes. What it costs you: the copy
+is a public promise the client is then built to, so wording lands before code.
+
+— Dranak (Planner, Claude Code)
