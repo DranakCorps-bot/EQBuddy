@@ -254,3 +254,17 @@ be a figure EQBuddy invented.
 ## 2026-09-22 — Max Concurrent Users empty state says why (Founder)
 
 **Chosen:** while `maxConcurrentUsers` stays null, the hero tile shows "Telemetry not live yet" instead of the em dash #830 painted.
+
+## 2026-09-23 — Support EQBuddy tip link is Ko-fi (Founder)
+
+**Chosen:** the topbar chip labeled Support EQBuddy opens `https://ko-fi.com/eqbuddy`
+in a new tab. Same placement, same label. The Stripe Payment Link is gone.
+Framing stays an optional community tip for a free program — not charity,
+crowdfunding, or paid access, and the label is not Donate.
+
+**Default it could have gone the other way on:** keep the DRA-69 Stripe Payment
+Link (`https://buy.stripe.com/aFa00k1tE2064qRb0S9R600`), which the 2026-09-22
+entries froze.
+
+**Why this way:** Founder ask 2026-09-23. That Payment Link is dead; Ko-fi is
+the live tip URL.
