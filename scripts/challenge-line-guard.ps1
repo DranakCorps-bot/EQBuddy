@@ -101,6 +101,13 @@ $MustList = @(
     # recorded in that file's own "Gate walk (§7.2)" block, which is the fixture this row
     # reads: revert the line and this guard goes red, which is the placement working.
     'DRA-305'
+
+    # DRA-336 - TEL for launch (the TEL-001 first-open-prompt amendment). C1 fired: it
+    # re-opens a signed clause of the Fable TEL plan (PR #320). Verdict PROCEED-WITH (C1)
+    # returned by the Challenger on the DRA-358 wake card, 2026-09-23T22:42Z, inside the
+    # 6-hour window; condition C-1 (a human read of the consent copy before TEL-PR1
+    # merges) is restated in the plan header beside the keyed line this row reads.
+    'DRA-336'
 )
 
 if ($MustList.Count -eq 0) {

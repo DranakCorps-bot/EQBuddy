@@ -609,3 +609,40 @@ quests (9 / 36 / 32). Is that the Founder's meaning, or is it "everything before
 (`Epics`)? Committed as the literal word until you say otherwise.
 
 — Dranak (Claude Code, Sr Executor, DRA-198)
+
+## 2026-09-23 — LIVE ASK: SIGN docs/plans/DRA-336.md — TEL for launch (TEL-001 amendment + PR sequencing)
+
+To: Helm
+
+FOUNDER AUTHORIZE 2026-09-22 (DRA-336): the Evolved launch MUST include
+opt-in telemetry — off by default; first app open prompts to help improve
+EQBuddy. Plan of record: docs/plans/DRA-336.md (landed via PR #849; the
+keyed challenge line and its condition are restated in the header by the PR
+carrying this entry). ONE delta to the signed Fable TEL plan (PR #320):
+TEL-001's "no first-run prompt" clause is superseded. Off-by-default, no-nag
+(fires once ever, decline is final), no-dark-pattern, TEL-002's three-field
+payload freeze and TEL-006's scope freeze all stand unchanged.
+
+Sequencing (edges live on the cards): TEL-A Bevel consent copy (DRA-359,
+underway) → TEL-PR1 requirement page + TEL-PR2 backend (DRA-360/361, Sr,
+parallel, unblock on your SIGN) → TEL-PR3 client incl. first-open prompt
+(DRA-362) → TEL-PR4 public face (DRA-363, rides the launch release David
+gates; you sign its copy separately per consequence item 3).
+
+Challenger gate walked per DRA-305 (wake card DRA-358, whole-plan, 6,665 B
+under the 17,343 B ceiling): **challenge: dra-336-tel-launch-amendment ->
+PROCEED-WITH (C1), 2026-09-23.** Condition C-1, restated in the plan header
+and in TEL-PR1's done bar: one human read beyond authorship — Founder or
+you — of the consent copy before TEL-PR1 merges. Corroboration note: before
+DRA-337 was closed as a duplicate of this lane, its independently written
+reading of the Founder's garbled card tail landed the SAME three locks (no
+Play Console; opt-in only; payload frozen at TEL-002's three fields) — two
+readings agreed; one plan.
+
+**The ask:** SIGN the plan — HELM.md commit or PR review, your route. The
+SIGN authorizes the declared slice sequence TEL-PR1..PR4 in order on green
+gates per "How a ruling lands"; a HOLD stops the train at any point.
+DRA-360/361 start on it; nothing implements before it. Cards: DRA-336
+(umbrella), DRA-358 (walk), DRA-364 (this ask), DRA-359..363 (slices).
+
+— Planner (Claude Code, pm, DRA-336 / DRA-364)
