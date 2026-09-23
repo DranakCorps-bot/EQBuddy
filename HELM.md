@@ -1,3 +1,21 @@
+## 2026-09-23 ~9:16 AM CT — SIGN / DRA-347 / ops PR #74 — T2 implement: register `exo-experiment: challenger-seat`
+
+**SIGN** the DRA-345 implement at head `5684e75c7e29c3d59fb80a80c817c7781e17a50c` (`5684e75`), merge only with `--match-head-commit` at that sha. This is the separate pre-merge T2 SIGN the ops `#73` tip (plan @ `178dbb1`) owed. Signed on ops `#74` [comment 5796476747](https://github.com/DranakCorps-bot/dranakcorps-ops/pull/74#issuecomment-5796476747) (2026-09-23T14:16Z); this tip records it — Soft-drafted, no new ruling.
+
+**Scope check against the `#73` SIGN — pass.** `EXO-PLAYBOOK.md` entry after `jr-sr-router` restating SPEC §6/§7 D1+D2; **walk condition (C5 / DRA-346) folded** — citation line names SPEC commit `3b2dbf8c` (blob `79247a51`), registered 2026-09-23 on DRA-345. `CURRENT_ORG.md` Paperclip seats (presence-not-content) + D7 first-use qualify + header date. `purpose/README.md` points, does not restate. SPEC status header retense only; D3/D4 untouched.
+
+**Out of scope — confirmed clean.** No D3/D4 router insert, no EQBuddy file, no second Challenger seat, no Play / Desktop / signing / prod secrets, charter §§2–5/9 untouched.
+
+**P2 — KEEP.** Model-lock table stays; live verification passed (Planner `claude-fable-5`, Jr `qwen3.8:27b`, Sr `claude-opus-5-5` live — lock copy still reads 5.1 after the 2026-09-23T11:03Z board flip).
+
+**ACK, not ruled:** whether a C5 wake counts toward the charter's ten-C1–C4-wake kill bar — its own card. **ACK, out of scope:** SPEC body relay corruption at prohibition sites — its own A6 repair card; not edited under this SIGN.
+
+**Conflict.** Ops `#72` (DRA-335) still open on a different playbook span. If `#72` lands first, rebase `#74` and re-ask for SIGN at the new head; no merge past a dirty rebase.
+
+**Soft:** merge this tip when CI green; then merge ops `#74` at `5684e75c7e29c3d59fb80a80c817c7781e17a50c` with `--match-head-commit`; discharge Paperclip DRA-347 pending confirmation `cea69de`. Live Holds empty. Play Console OFF. Not needs-david. No Founder page.
+
+---
+
 ## 2026-09-23 ~8:50 AM CT — SIGN / DRA-345 / ops PR #73 — ExO alignment plan: surface Challenger on Corps ops
 
 **SIGN this plan** at head `178dbb110e05efd56eb5c27260fbe83439c2d954` (`178dbb1`) as the authorized shape for the DRA-345 implement PR. Plan-only PR; nothing from `#73` lands in live docs. Implement is a separate Sr PR (`route: hard -> Sr (T1)`), still behind its own Helm pre-merge T2 SIGN.
