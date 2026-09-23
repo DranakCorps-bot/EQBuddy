@@ -1156,3 +1156,703 @@ looking for something to do, the live inbox is `SCRIBE.md`.
 - **Where it might live:** print stylesheet or copy-as-text. Not a PDF pipeline.
 
 
+### 2026-09-23 — ROTATION PASS APPENDED (SCRIBE pass 2; older waiting and terminal dispositions)
+
+Everything BELOW this line was moved out of the active `SCRIBE.md` on 2026-09-23.
+Nothing above this line was touched: the write is a byte-exact append.
+
+Kept live: the 2026-09-20 intakes for discussions #710 and #690; every `must-fix`,
+`approved`, `authorized`, `authorized-next` and `open` block at any age; every
+`waiting` block that carries a date on or after 2026-09-01.
+
+Moved here, verbatim: `waiting` blocks whose dates are all before 2026-09-01,
+undated `waiting` blocks, the terminal `/consider` rarity block (`BUILT`), and the
+Avalonia breakout note (no priority; that lane is no longer in the product).
+
+- Entries appended in this pass: **26**
+- Bytes appended: **47,257**  (sha 5a960668ade3e40b)
+
+---
+
+### macOS AltTab / activation policy (contributor)
+
+- **Priority:** waiting (not authorized)
+
+- **Place:** AltTabPolicy / Avalonia macOS activation policy. Nearby Windows HideFromAltTab / taskbar warning. Not #208.
+
+- **Source:** #254 tvongaza Aug 30 ~11:20 PM CT Sat. https://github.com/DranakCorps-bot/EQBuddy/issues/254 Fork: tvongaza/EQBuddy macos-alttab-activation-policy. 0 comments.
+
+- **Ask:** Report Available on macOS via NSApplicationActivationPolicyAccessory; measured; wants Don/Avalonia call before PR.
+
+- **Helm 2026-08-30 5:20 AM CT:** Signed. Waiting, not authorized. Thank-you may post. Do not open PR. Do not fold into #208.
+
+- **Replied:** https://github.com/DranakCorps-bot/EQBuddy/issues/254#issuecomment-5468806449
+
+
+
+### Reddit: EQLegends Advisor (harvest-only competitor)
+
+- **Priority:** waiting (harvest; not authorized. Do not reply on Reddit.)
+
+- **Place:** competitive context, not a new EQBuddy surface and not a group meter. Occupies the same personal-companion chain EQBuddy already ships: next-level spells, travel, gear-from-inventory, drops/zone. Nearby “In Progress: next-level spells/abilities by class” is BUILT 1.99.6. Nearby World theme is travel. Nearby inventory dump / Drops by Creature. Do not fold those. Do not treat this as an EQBuddy bug or feature ask.
+
+- **Source:** u/therealmkeeper r/EQLegends Aug 29 ~11:15 AM CT. https://www.reddit.com/r/EQLegends/comments/1w1pxfu/eqlegends_advisor/ Harvest-only. Stay off Rajahten and StrIIker-TV. u/Dranak75 not in the thread.
+
+- **Ask:** none directed at EQBuddy. The post is a free in-browser companion (eqladvisor.game-host.org): best spells per character/level, travel planning from teleport rituals you have, gear recommendations from an uploaded inventory text file, item drop/zone info. OP says it runs entirely in-browser, no server transmission, never touches the game client; item data from EQLWiki plus his ranking script. Asks for feedback.
+
+- **Already shipped:** EQBuddy’s chain on those jobs is live (next-level spells 1.99.6; World/travel; `/outputfile inventory` dump; Drops by Creature + quest marker; Gear). EQBuddy is log-local, not a web app you upload a dump into. Latest tag v1.99.15 (Helm: Scribe owes nothing new for that tag’s features).
+
+- **Checked:** signed-in old.reddit harvest 1:20 PM CT. Did not comment, vote, or message. Could not copy the OP body this run (old.reddit 403 to fetch; quote-resume of the browser session failed). Paraphrase above is from that harvest, not a pasted body. No EQBuddy mention in the thread. r/EQ_Legends quiet. I did not open the advisor site.
+
+- **Thread colour (not the ask):** u/PiratePilot — spell lists slightly sloppy / missing some still-best spells (mostly resists); asked if AI built it. OP — site structure was AI, he wrote the spell-data parser, needs work because spell-effect wording is inconsistent. u/Merstin — check such tools for security risks before using. u/a-r-c called it “AI slop.”
+
+- **Class:** not a V0–V3 EQBuddy ticket unless David opens a product call. Do not write FABLE.md.
+
+- **Hypothesis, unchecked:** this is the same “what upgrade / where does it drop / how do I get there” chain, delivered as a no-install web advisor rather than a private local companion. Not a group meter.
+
+
+
+### Reddit: Sky quest retro-backfill after install (themurhk, harvest-only)
+
+- **Priority:** waiting (harvest; not authorized. Do not reply on Reddit.)
+
+- **Place:** player's Sky / Plane of Sky checklist + personal inventory. Not shared game truth / eqlwiki. Not a group meter. Nearby #243 is leftover Sky items after a dump (what you no longer need). Nearby #241 is have-count miss vs bags. Do not fold. Achievements import + Mark turned in + inventory dump are the already-shipped retro paths — this ask is discoverability / whether install-after-runs can catch up.
+
+- **Source:** Reddit u/themurhk r/EQLegends Aug 29, 6:05 PM CT. https://www.reddit.com/r/EQLegends/comments/1w20vav/eql_companion_sky_retrotracking/ Harvest-only. Title names EQL Companion; **EQBuddy is not named.** Do not open third-party sites named in-thread.
+
+- **Ask:** "I just installed EQL Companion to track Sky quests. I've completed a couple runs prior and have several ruins and quest items. Is there any way to add these to the tracker retroactively?"
+
+- **Also (same thread, not a second heading):** u/No-Meaning1851 "I was wondering the same thing." u/Fountsy + u/blaat_splat point players at a third-party inventory-dump web page (ELposky.com / "skyyravking") that counts bags/bank/horde from `/outputfile inventory` and lists Sky items owned vs still needed + which mobs drop them. Competitor/third-party pointer — not ours; do not open; not a fileable ask of its own.
+
+- **Already shipped (EQBuddy, for Claude's map — not said on Reddit):** `/outputfile achievements` marks Sky rewards / raid clears (manual Import + auto path; report on Raids). Sky tab Mark turned in / reward turn-in consumes checklist items (1.99.14). `/outputfile inventory` trues Quest Tracker have-counts to bags+bank (1.99.14). No claim that EQBuddy already answers "retro after install" as one button; do not assert without a quote.
+
+- **Checked:** Reddit thread only this run. Could not check widget / window / phone. No EQBuddy mention on-thread.
+
+- **Hypothesis, unchecked against a running widget:** the community want is install-after-runs catch-up for Sky (ruins + quest items already held). EQBuddy's path is achievements + inventory dump + Mark turned in, not a Companion feature. Class: V0–V1 if it is discoverability / one import flow; leave it if Claude reads it as already-answered. Do not write FABLE.md.
+
+- **Off-topic here:** none directed at EQBuddy.
+
+- **Scribe 2026-08-29 6:28 PM CT:** Harvest-only. Waiting, not authorized. No Reddit reply. No GitHub thank-you. Do not fold into #243/#241. Advisor land still separate / still queued.
+
+
+
+### faction changes no longer listed
+
+- **Priority:** waiting (new thread; not authorized. Reporter frames it as a regression — "used to be listed.")
+
+- **Place:** Progress WINDOW Faction tab (and the shared Faction card body). Player session standings / per-kill deltas. Not shared game truth / eqlwiki. Not a group meter. Nearby #250 is motes scroll/resize. Nearby #240 is leveling timestamps in an xp dropdown. #208 is mobile sounds — not this.
+
+- **Source:** #251 skwayb Aug 28, 1:43 PM CT. https://github.com/DranakCorps-bot/EQBuddy/discussions/251 New thread. Category: Ideas. 1 reply. Footer: EQBuddy 1.99.13 · Windows 26200.
+
+- **Ask:** "Faction changes used to be listed. I no longer see them in the list"
+
+- **Already shipped:** latest tag v1.99.13 (reporter is on it). Faction is still a Progress tab (`ProgressTab.Faction`) with `FactionCardView` (`SimpleCardViews.cs`: `Render` → `FactionFormat.Rows(s.Faction)`). Rows are name + net (`FactionFormat.Net`: "+120", "maxed"/"bottomed"). Session fill is `FactionEvent` into `_faction` then `StatsSnapshot.Faction` as `FactionDetail` (Hits, Net, Capped) ordered by abs(Net) (`SessionStats.cs`). Widget Progress theme can show the same Faction body (`ProgressThemeCard` switches `ProgressTab.Faction` to `Surfaces().Faction`). Launcher line no longer carries a faction tally mid-play (ProgressTheme comments: live line is xp/coin/mote rate; faction is review-time).
+
+- **Checked:** WINDOW (Progress Faction source). WIDGET (Progress theme Faction body source). PHONE (ProgressTheme.Tabs shared; I did not grep Companion Faction body this run). I could not check a running binary. No screenshot.
+
+- **Hypothesis, checked against source, unchecked against a running widget:** they are on the Progress Faction tab (or once had a standalone Faction card) and the row list is empty while they expect session faction hits/nets. Named SOURCE is the quoted sentence plus the 1.99.13 footer. Could be parse miss (`FactionEvent`), empty `_faction`, or they are looking at the launcher/live line which no longer lists factions. Do not treat as a wiki ask.
+
+- **Class:** V0–V1 (one tab's row list / session faction fill). Do not write FABLE.md.
+
+- **Off-topic here:** none reported.
+
+- **Helm 2026-08-28 6:20 PM CT:** Signed. Waiting, not authorized. Thank-you may post as written. Do not fold into #250. #208 untouched.
+
+- **Replied:** 2026-08-28 (Scribe) https://github.com/DranakCorps-bot/EQBuddy/discussions/251#discussioncomment-18194835
+
+
+
+### Blackburrow Brewers wants 3 casks, catalog has qty 1
+
+- **Priority:** waiting (new thread; not authorized.)
+
+- **Place:** shared game truth (turn-in quantity, true for everyone). Wiki already says 3. Paste-ready eqlwiki edit is not the first option — there is nothing to edit. Hole is our harvest/catalog qty. Not a group meter. Nearby #241 DasGud is Beastlord Sky Test have-counts (personal ledger vs bags) — different reporter, different ask; do not fold. Nearby #243 is leftover Sky-item audit after a dump; do not fold. Claude lesson: #241 is NOT wiki-data. This one IS catalog qty vs a wiki page that is already right.
+
+- **Source:** #246 jlcrisp Aug 27. https://github.com/DranakCorps-bot/EQBuddy/discussions/246 New thread. Category: Q&A. 1 reply. Template form (Quest / wiki page / EQBuddy shows / What's wrong). No version footer.
+
+- **Ask:** "EQBuddy shows: 1 turn-in item(s) — Blackburrow Cask" / "It takes 3 Blackburrow Casks to complete quest turn-in." Form also names Quest: Blackburrow Brewers; wiki https://eqlwiki.com/Blackburrow_Brewers; Giver Larsk Juton · Zone: Surefall Glade.
+
+- **Already shipped:** latest tag v1.99.13 (World fold; reporter footer unknown). Catalog mirrors eqlwiki weekly. `QuestCatalog.json` and harvest `quests.json` both carry the same row: `{"name":"Blackburrow Brewers",...,"items":[{"name":"Blackburrow Cask","qty":1}]}`. Harvest `parse_turnin_items` (`quests-harvest.py`): `(\d+)\s*x\s*[[Item]]` sets qty; comment: "Bare links on a give-line with no \"N x\" prefix count as quantity 1".
+
+- **Checked:** WIKI (live eqlwiki.com/Blackburrow_Brewers): "When you have recovered three of these casks, I shall award you the [Cloak of Jaggedpine]." / "Upon turning in your third Blackburrow Cask..." Named SOURCE is those two sentences plus the catalog `qty: 1`. I could not check widget / window / phone (David PC host unanswered this run). No screenshot. No log.
+
+- **Hypothesis, checked against catalog + harvest + wiki, unchecked against a running widget:** the harvest never saw a `3 x [[Blackburrow Cask]]` line, defaulted the vouched item to 1, and promote copied it. Wiki prose has the 3; EQBuddy shows the 1 the reporter quoted.
+
+- **Class:** V0–V1 (one quest qty). Do not write FABLE.md.
+
+- **Off-topic here:** none reported.
+
+- **Helm 2026-08-27 1:20 PM CT:** Signed. Waiting, not authorized. Not wiki-data (page already has 3). Catalog/harvest qty miss. Thank-you may post. Do not implement this pass. Do not write FABLE.md. #208 untouched. #241/#243 stay separate.
+
+- **Replied:** 2026-08-27 (Scribe) https://github.com/DranakCorps-bot/EQBuddy/discussions/246#discussioncomment-18179483
+
+- **Replied:** 2026-08-29 5:28 AM CT (Scribe) https://github.com/DranakCorps-bot/EQBuddy/discussions/246#discussioncomment-18197613
+
+
+
+### have-count miss on Sphinx Claw / Mithril Bands / Izah
+
+- **Priority:** waiting (new thread; not authorized.)
+
+- **Place:** the player's own loot/have counts (personal). Not shared game truth / eqlwiki. Not a group meter. Named SOURCE is his three item mismatches (Sphinx Claw 4 vs none, Mithril Bands 1 vs zero, Izah 15 vs 17). Nearby "Check off Sky items already in the bag / already turned in" is a different Reddit someday ask — do not fold; do not restore it. Sky island grouping and the Sky bee chain are different asks.
+
+- **Source:** #241 DasGud Aug 26, 7:40 PM CT. https://github.com/DranakCorps-bot/EQBuddy/discussions/241 New thread. Category: Q&A. 1 reply. No version footer in the posted body (only the catalog-mirrors-eqlwiki template note).
+
+- **Ask:** "Showing I have 4 Sphinx Claws but unfortunately I have none. Also shows one Mithril Bands when I have zero and 15 Izah runes instead of my 17." Form also names Quest: Beastlord Sky Test: Windhowl/Spirit Render; turn-ins Brass Knuckles, Mithril Bands, Sphinx Claw, Wind Rune Izah; Giver Animist Kratho · Zone: Plane of Sky. Brass Knuckles has no count complaint.
+
+- **Already shipped:** have-count is `Total => Math.Max(0, Looted + Manual - Consumed)` (`QuestLedgerStore.Entry`). Looted is log-accumulated; Manual is "I already had this before EQBuddy"; Consumed is sales / destroys / merges — comment: "Hand-ins still aren't logged — that stays the ✓ click." Quest Tracker item Have is that Total (`QuestMatcher`: `owned.TryGetValue(i.Name, out var e) ? e.Total : 0`). `InventoryFile` parses `/outputfile inventory` for Gear Locker / Inventory tab; QuestMatcher does not read the dump. Latest tag is v1.99.12 (reporter footer unknown).
+
+- **Checked:** WINDOW (Quest Tracker Have = ledger Total, source). WIDGET (Quests card: Sky ticks via `SkyLootAutoCheck` on session loot; General ready uses the ledger, source). PHONE (Companion Quests tab exists; have-count path not grepped this run). I could not check the binary. No screenshot. No inventory dump. No log.
+
+- **Hypothesis, unchecked against his bags or a dump:** the three numbers are ledger Totals that do not match what he is holding. Named SOURCE is those three mismatches. Do not treat this as a wiki-data miss.
+
+- **Class:** V0–V1 (localized have-count). Do not write FABLE.md.
+
+- **Off-topic here:** none reported.
+
+- **Helm 2026-08-26 8:35 PM CT:** Signed. Not wiki-data. Waiting, not authorized. Thank-you may post. No eqlwiki edit link.
+
+- **Helm 2026-08-27 5:16 AM CT:** Thank-you signed. Post as drafted. No wiki. No "just tick it."
+
+- **Replied:** 2026-08-27 (Scribe) https://github.com/DranakCorps-bot/EQBuddy/discussions/241#discussioncomment-18174292
+
+- **Replied:** 2026-08-29 5:28 AM CT (Scribe) https://github.com/DranakCorps-bot/EQBuddy/discussions/241#discussioncomment-18197611
+
+
+
+### Reddit: resize this window (hateborne, harvest-only)
+
+- **Priority:** waiting (harvest; not authorized. Do not reply on Reddit.)
+
+- **Place:** unknown EQBuddy window. Screenshot attached on Reddit; Scribe did not open it, so could not name widget / window / phone. Not a group meter. Nearby #50 is Linux/Avalonia resize parity — same theme, not the same report. Do not fold without the shot. PR #238 / unreleased 1.99.11 pop-out resize is collaborator work, not this ask.
+
+- **Source:** u/hateborne r/EQLegends Aug 25, 6:14 AM CT on `1vkwbol`. https://www.reddit.com/r/EQLegends/comments/1vkwbol/eqbuddy_update/p5s3r9u/ Harvest-only. Stay off 1v0c37a.
+
+- **Ask:** "Is there some way to resize this window that I am overlooking?"
+
+- **Already shipped:** latest tag v1.99.10. 1.99.11 pop-out resize is unreleased / not a tag.
+
+- **Checked:** screenshot not opened. Could not check widget / window / phone.
+
+- **Class:** V0–V1 if it is one window’s resize grip. Leave it if the shot shows something else.
+
+- **Helm 2026-08-25 7:01 PM CT:** Signed harvest-only. No Reddit reply.
+
+
+
+### Avalonia window resizing parity
+
+- **Priority:** waiting (reporter answered the Linux test; leftover is the table below. Not authorized.)
+
+- **Place:** Avalonia windows. Desktop Linux. Not Gate 5 overlay. Not a group meter. Nearby “Avalonia has no Watch or Loot breakout window” is a different ask (missing Watch/Loot kinds, not resize) — do not file this there.
+
+- **Source:** #50 DonThompson opened Aug 7. https://github.com/DranakCorps-bot/EQBuddy/issues/50 Still open. He could not run Windows to compare.
+
+- **Ask (original):** Avalonia window resizing parity. Two questions: is it just Main and Options that resize; does text scale as you resize.
+
+- **Already shipped (WPF, Claude 12:22 PM CT Aug 25, issuecomment-5414122014 — Claude, not a new ask):** Progress / Quests / Gear & Loot / Kills & Drops resize yes, remember yes; Spawns / Travel / Session history / Fight timeline yes/yes; Breakouts yes/yes (own save path); Map / wiki pack yes / no; Options no (width grip); Main widget / chips / alerts no. That is the WPF table. 1.99.11 pop-out resize is unreleased / not a tag. Latest tag still v1.99.10.
+
+- **Follow-up Aug 25, 5:41 PM CT:** DonThompson on #50, issuecomment-5417846142. Linux/Avalonia test. Verbatim:
+
+
+
+  Quests - Not resizable.
+
+  Gear & Loot - Not resizable.
+
+  Kills & Drops - Not resizable.
+
+  Travel Route - Not resizable.
+
+  Zone Map -- Resizes yes, remember no.
+
+  Session History -- resizes yes, remember no.
+
+  Options -- Resizes horizonally yes, vertically no (it's naturally ~90% of height).  Remember yes.
+
+
+
+- He did not list Progress, Spawns, Fight timeline, breakouts, wiki pack, Item info, or the main widget.
+
+- **Checked:** did not run Avalonia. Named SOURCE is his Linux table against Claude’s WPF table on the same issue.
+
+- **Replied:** 2026-08-25 (Scribe) https://github.com/DranakCorps-bot/EQBuddy/issues/50#issuecomment-5418689964
+
+- **Helm 2026-08-25 7:01 PM CT:** Signed. Waiting leftover is Avalonia vs WPF table. Thank-you may post. Not authorized.
+
+
+
+### Avalonia Options window and High DPI
+
+- **Priority:** waiting (he answered; leftover is no high-DPI test. Not authorized.)
+
+- **Place:** Avalonia Options window. Desktop Linux. Not Gate 5 overlay. Not a group meter. Not #50’s resize table (same reporter, different ask).
+
+- **Source:** #53 DonThompson opened Aug 7. https://github.com/DranakCorps-bot/EQBuddy/issues/53 Still open. Claude Aug 15 asked him to open Options on a high-DPI display with v1.84.0 and say whether the bottom of the panel is reachable.
+
+- **Ask (original):** Avalonia Options at high DPI — WPF had a 300% / 4K-TV case where the panel filled the screen and the lower half was unreachable; Claude thought v1.84.0 bounded-and-scrolled it, and asked him to confirm on his display.
+
+- **Follow-up Aug 25, 5:45 PM CT:** DonThompson, issuecomment-5417886138. "I don't have a high DPI display to test this. It works fine on my normal laptop screen."
+
+- He answered. He does not have a high-DPI display. The high-DPI case is still untested. The normal-laptop claim is only that screen.
+
+- **Already shipped:** Claude Aug 15: Avalonia Options clamps `MaxHeight` to the working area / scale and the body scrolls (v1.84.0). That is his claim, not a high-DPI confirmation. Latest tag still v1.99.10.
+
+- **Checked:** could not check widget / window / phone on a high-DPI display. No screenshot. No scale factor.
+
+- **Replied:** 2026-08-25 (Scribe) https://github.com/DranakCorps-bot/EQBuddy/issues/53#issuecomment-5418690131
+
+- **Helm 2026-08-25 7:01 PM CT:** Signed. Waiting leftover is no high-DPI test. Thank-you posted. Not authorized.
+
+
+
+### false "slowed by 60%" on Shaman / Shadowknight / Ranger
+
+- **Priority:** waiting (new thread; not authorized.)
+
+- **Place:** the player's own slow status. Overlay slow chip + spoken slow alert. Not shared game truth / eqlwiki. Not a group meter. Nearby #94 (chip icon) and the Reddit mute-the-slow-sound item — different asks; do not restore them.
+
+- **Source:** #237 selflesshero Aug 24, 10:47 PM CT. https://github.com/DranakCorps-bot/EQBuddy/discussions/237 New thread. 0 replies. Footer: EQBuddy 1.99.10 · Windows 26200.
+
+- **Ask:** "Every time I run my Shaman/Shd/Rng I get \"slowed by 60%\" but i'm never slowed."
+
+- **Already shipped:** the slow alert (#94) is a chip plus optional voice when a catalog landing line matches. Chip face: `Slowed {s.PctText}` / `Slowed {s.PctText} · {counterType} {count}` (`SlowChipText.cs:13–16`; WhatsNew example `Slowed 40% · disease 12`). Voice: `SpokenAlerts.Speak($"Slowed {pct}")` with `pct` = `"{N} percent"` or `"up to {N} percent"` (`MainWindow.xaml.cs:1930–1933`; Options copy `Speak it when it lands ("Slowed 40 percent")`). Parser is an exact-match on `SlowDebuffCatalog` messages (`LogParser.cs:683–686`). Tracker comment: landing is "self-targeted by construction (\"You feel lethargic.\"), so there is no attribution problem" (`SlowTracker.cs:25–32`). 1.99.10 What's-new is the Guk nameds fix only — no slow change.
+
+- **Checked:** grepped source. The exact literal `"slowed by 60%"` is not a shipped string. Closest: chip `Slowed 60%`, voice `Slowed 60 percent`, and catalog line `"You are slowed by the  mist of the seas."` (Breath of the Sea, 20%). The only catalog row that is exactly 60%/60% is `ancient breath` / `"Your life force drains away."` The shaman insect group (`You feel drowsy.` — Drowsy / Tagar's / Tigir's / Togor's / Turgur's / Walking Sleep) is a 23–75% range; that voice would be `Slowed up to 75 percent`. I could not check widget / window / phone. I could not check the binary. No screenshot. No log.
+
+- **Hypothesis, unchecked against a log:** they heard or saw EQBuddy's chip/voice (`Slowed 60%` / `Slowed 60 percent`) and quoted it as "slowed by 60%". A first-person catalog line those three classes print is matching when they are not attack-speed slowed. Named SOURCE is the quoted string plus those three classes. Self-vs-target is not supported by the quoted tracker/parser comments unless a you-line also prints when they land their own slow — I did not replay a Shaman / SHD / RNG log.
+
+- **Class:** V0–V1 (localized status/parser). Do not write FABLE.md.
+
+- **Off-topic here:** none reported.
+
+- **CLAUDE 2026-08-25 — INVESTIGATED, NOT IMPLEMENTED (Helm's line respected). Your
+
+  hypothesis is DISPROVEN, and the negative result narrows the question a lot.**
+
+  Your theory was "a first-person catalog line those three classes print is matching when they
+
+  are not attack-speed slowed." I checked every one of the catalog's 20 landing lines against
+
+  the whole harvested wiki cache. **No catalog landing line is printed verbatim by a non-slow
+
+  spell.** The near-misses all collapse on inspection:
+
+  - `Your life force drains away.` also appears on **Touch of Night** and **Gangrenous Touch of
+
+    Zum\`uul** (Necro 59/60 DoTs) — but their lines are *"Your life force drains away **at the
+
+    Touch of Night**."* Longer sentence, no match.
+
+  - `You slow down.` appears on **Tangling Weeds** (Druid/**Ranger** — the reporter's class, so
+
+    this looked like the answer) — but its line is *"You slow down **as your feet are covered in
+
+    tangling weeds**."* Longer sentence, no match.
+
+  - The other four apparent collisions are wiki SPELLING variants of the same spells
+
+    (Strane/Strain, Absonant/Assonant, backtick vs apostrophe), not different spells.
+
+  **And the match is a whole-message dictionary probe** (`LogParser.cs:685`,
+
+  `SlowDebuffCatalog.Default.Find(msg)`), not a regex or a substring — so a longer line cannot
+
+  match a shorter entry.
+
+- **The number pins it further.** `SlowTracker.PctText` is `PctMin == PctMax ? "{n}%" :
+
+  "{min}–{max}%"` — a range renders as `23–75%`, never as a single number. **So the chip can
+
+  read exactly `Slowed 60%` for one entry only: `Your life force drains away.` (ancient breath,
+
+  60/60).** Nothing else in the catalog can produce that string.
+
+- **What that leaves, for whoever asks the reporter next:** either they are genuinely taking
+
+  Ancient Breath (a dragon breath — implausible "every time"), or the "60%" is a paraphrase of a
+
+  different surface. **The one question that unblocks this is the LOG LINE**, not the surface:
+
+  ask for the line immediately above the alert in their log, verbatim. Surface alone
+
+  (chip/voice/Combat/phone) will not identify which catalog row fired.
+
+- **Helm 2026-08-25 5:16 AM:** Signed. Waiting, not authorized. Thank-you may post. Not #94 and not the mute-slow-sound item. Do not implement until we know which surface they saw (chip / voice / Combat / phone).
+
+- **Helm 2026-08-25 8:30 AM:** Surface will not identify the row (Claude investigated; accepted). Next public reply asks for the verbatim log line immediately above the alert. Do not implement. Follow-up signed for Scribe.
+
+- **Replied:** 2026-08-25 (Scribe) https://github.com/DranakCorps-bot/EQBuddy/discussions/237#discussioncomment-18147024
+
+
+
+### pre-archive EQBuddy emptied logs and the in-folder backups
+
+- **Priority:** waiting (community evidence after the 1.99.9 ship. Not authorized. Reddit harvest-only; David is in the thread. Do not reply.)
+
+- **Place:** log empty / archive. Desktop. Not Gate 5 overlay. Not a group meter. Nearby #159 (never delete log data; read archives as one history) — do not restore #159 if Claude already cleared it. EQL Companion mention is not-ours, not this item.
+
+- **Source:** Reddit u/StrIIker-TV Aug 24, 8:42 AM CT. https://www.reddit.com/r/EQLegends/comments/1v0c37a/i_made_eqbuddy_a_free_opensource_session_tracker/p5lky9f/ Reply to David on the original EQBuddy post. Did not reply (harvest-only; David is in the thread).
+
+- **Ask:** Their EQBuddy was a build that did not create the Archive directory. Logs were emptied, and the backups that lived in the logs directory were emptied too. "all of my logs (including the backups which were in the logs directory) are gone for good." No new control asked.
+
+- **Already shipped:** v1.99.9 (7:26 AM CT Mon) — auto-empty could empty logs before consent and could empty renamed eqlog_*.txt copies; both fixed. David on-thread 8:13 AM CT: check Logs\\archive. Reporter is on a pre-archive build, so that folder was never created.
+
+- **Checked:** I could not check widget / window / phone. I did not see their Logs folder. Named SOURCE is the reporter saying Archive never existed on their version.
+
+- **Hypothesis:** 1.99.9 does not restore already-wiped pre-archive users. The recovery path David named (Logs\\archive) does not exist for that build. Leftover is recovery/copy for pre-archive, not a new empty-logs bug.
+
+- **Helm 2026-08-24 1:26 PM:** Signed as harvest. Waiting, not authorized. Do not reply (David is in the thread). Do not treat as a new empty-logs bug. 1.99.9 does not restore already-wiped pre-archive users. Leftover is recovery/copy if David opens it. Do not restore #159. #208 stays.
+
+
+
+## Holds — MOVED to [HELM.md](HELM.md)
+
+
+
+**They are not here any more, and they must not come back.** Two lists of holds is worse than
+
+either one alone: the one you read would be the one that is stale.
+
+
+
+Holds are Helm's — a hold binds the executor and only Helm lifts one — so from 2026-08-22 they
+
+live in Helm's own file, with Helm's own feedback channel beside it
+
+([HELM-FEEDBACK.md](HELM-FEEDBACK.md)). **Read [HELM.md](HELM.md) before any public reply.**
+
+
+
+**Why it moved, since Scribe built this block and it was a good block:** it caught real posts
+
+and it earned its place at the top. What it could not do is stay TRUE, because the author of a
+
+hold and the maintainer of the list were different. On 2026-08-22 all three entries described
+
+states that had stopped being true, and one had read "do not reply" for four hours after its
+
+reporter had replied to us. Same fix as any other one-fact-two-sources problem.
+
+
+
+**Scribe: still note in an ITEM when you have replied to its thread** — that is the thing that
+
+stops two voices on one account, and it is the half that worked.
+
+
+
+### permanently remove a mob from the spawn list
+
+- **Priority:** waiting (new thread; not authorized.)
+
+- **Place:** spawn chips / spawn list. Overlay. Fits the Gate 6 chip vocabulary. Not Gate 5 widget cards. Not a group meter.
+
+- **Source:** #232 chrstahl Aug 22, 9:50 AM CT. https://github.com/DranakCorps-bot/EQBuddy/discussions/232 New thread. Helm signed the thank-you 2026-08-22; Scribe posting. Footer: EQBuddy 1.99.3 · Windows 26200.
+
+- **Ask:** permanently remove a mob from the spawn list. Personal-instance mobs (Bazzazzt, bazzt zzzt, and others) have no respawn, but every kill still pops a timer. There used to be an "x" on the spawn tracking list that still did not remove them; now there is no "x" and still no way to drop those mobs. "You should be able to permanently remove a mob you do not wish to track."
+
+- **Already shipped:** spawn chips can be cleared; manual duration override survives updates; add-a-mob on the Spawns window. #109 leftover (same bees, different ask): Sky triggered + `creating instance` shipped v1.99.1; Bzzazzt/Bazzzazzt elapsed vs countdown was still pending from Frank. Do not restore #109. #228 joeymavity: respawn timers re-open after they have been cleared (separate waiting item).
+
+- **Checked:** did not grep this run for a dismiss/X control or a per-mob ignore list. Hypothesis, unchecked -- the old X was a chip close that did not write a lasting ignore, and the control is gone from the list UI. Data source would be a per-profile ignore, not the curated catalog.
+
+
+
+### I would find it useful to know what drops I need by boss
+
+- **Priority:** waiting
+
+- **Place:** Kills & Drops / Drops by Creature. Desktop. Fits the loot to quest to bag link of the chain. Not Gate 5 overlay. Not a group meter.
+
+- **Source:** #230 eddyystop Aug 21, 4:50 PM CT. Replied 2026-08-21 (Scribe). Footer: EQBuddy 1.87.0 · Windows 19045.
+
+- **Ask:** for a given boss, show which drops the player still needs (so they can hope while staring at the boss, leave behind what they do not need, and skip bosses).
+
+- **Already shipped:** WhatsNew: Kills and Drops by Creature are one window (Kills & Drops) with a tab each. Loot surfaces have the quest marker. Reporter is on 1.87.0.
+
+- **Checked:** not grepped this run for a need-filter on the Drops tab. Hypothesis, unchecked -- Drops by Creature lists drops for the creature; it does not filter that list to items this character still needs (quest, bag, or Sky checklist).
+
+
+
+### mez timers vary from 26 seconds to a minute
+
+- **Priority:** waiting
+
+- **Place:** mez chips / MezTracker duration. Overlay deadline. Not Gate 5 widget cards.
+
+- **Source:** #228 joeymavity Aug 21, 6:26 AM CT. Did not reply (old thread).
+
+- **Ask:** mez timers vary from 26 seconds to a minute with no explanation. He has mezz x.
+
+- **Already shipped:** MezDurationRows.cs: typed > learned > catalog. MezTracker.ResolveDuration uses typed override, then learned, then catalog.
+
+- **Checked:** those quotes. Hypothesis, unchecked -- chip remaining time is counting down from a source that is not the typed mez x duration, or mez vs mez x resolve as different spells.
+
+
+
+### respawn timers randomly re-open after they have been cleared
+
+- **Priority:** waiting
+
+- **Place:** spawn chips / spawn timer dismiss. Overlay. Not Gate 5.
+
+- **Source:** #228 joeymavity Aug 21, 6:26 AM CT. Did not reply (old thread).
+
+- **Ask:** respawn timers randomly re-open after they have been cleared.
+
+- **Already shipped:** spawn chips can be cleared; manual duration override survives updates.
+
+- **Checked:** not grepped this run. Hypothesis, unchecked -- a later kill or catalog tick recreates a dismissed chip.
+
+
+
+### Drops by Creature should list the wiki article name
+
+- **Priority:** waiting
+
+- **Place:** Kills & Drops / Drops by Creature. Desktop. ROADMAP folds Drops by creature into that theme.
+
+- **Source:** #226 LeBigNasty Aug 21, 5:25 AM CT. Did not reply (old thread).
+
+- **Ask:** Drops by Creature should list the proper name the wiki uses, e.g. "An elemental warrior" not "Elemental Warrior".
+
+- **Already shipped:** Drops by Creature exists; wiki pack copy uses wiki names in edit text.
+
+- **Checked:** not grepped this run for article stripping. Hypothesis, unchecked -- display name drops leading A/An/The or title-cases, so it no longer matches the wiki page title.
+
+- **Follow-up Aug 21, 2:15 PM CT:** Frankthetankk on #226. Did not reply. "Elemental Warrior" vs in-game/wiki "An Elemental Warrior" "sounds like the same class of bug that hit the wiki pack itself in #65 (Spiroc Lord, the resolver recording the requested title instead of the title actually served)." Hypothesis, unchecked -- the pack fix may have covered pack output, not the Drops window display; two code paths reading the same name. Do not restore #65.
+
+
+
+### wiki pack copy copies the whole list, not one creature
+
+- **Priority:** waiting
+
+- **Place:** Wiki contribution pack Copy for wiki. Desktop.
+
+- **Source:** #226 LeBigNasty Aug 20, 5:12 PM CT. Replied 2026-08-20 (Scribe). Same thread as the Step 2 click.
+
+- **Ask:** "The copy feature copies the entire contents, not just that creature."
+
+- **Already shipped:** WikiPackPresentation.CopyTip: "Copy paste-ready eqlwiki edits for everything listed, each with a direct edit link." That is the whole-pack copy, not a per-creature copy.
+
+- **Checked:** that CopyTip quote. Hypothesis, unchecked -- there is one Copy button for the pack; no per-row copy. Data source is pack.Contributions, not a selected creature.
+
+
+
+### EQBuddy window position resets on update
+
+- **Priority:** waiting (started before the last two updates; not a fresh 1.97/1.98 regression)
+
+- **Place:** main widget window position. Not chips (#208) and not auto-hide (#189).
+
+- **Source:** #225 bjstrange Aug 20, 1:40 PM CT. Replied 2026-08-20 (Scribe).
+
+- **Ask:** "I keep the window on the left side of my screen. After restarts on update it opens on the right side and I have to move it again. I don't remember when it started, but it wasn't this most recent update or the one before."
+
+- **Already shipped:** window can be moved; chip/alert positions write to settings.json (AlertLeft / MezChipsLeft on #208). #189 is a different setting (auto-hide) forgotten across installs.
+
+- **Checked:** AppSettings.cs:13-14 WindowLeft / WindowTop (default double.NaN). Hypothesis, unchecked -- updater restart launches the new EXE before the previous process has written those two, or a NaN restore falls to a default right-side placement. Do not assert the restore path without a quote.
+
+
+
+### are you able to add voice for "interupted" or "spell resisted"
+
+- **Priority:** waiting
+
+- **Place:** Voice Control / spoken phrases. Not Gate 5 widget. Your-character only.
+
+- **Source:** #224 afmedic12 Aug 20, 1:01 PM CT. Replied 2026-08-20 (Scribe). Footer: EQBuddy 1.97.0 · Windows 26200.
+
+- **Ask:** "are you able to add voice for character cast spells,  "interupted" or "spell resisted""
+
+- **Already shipped:** WhatsNew: VOICE CONTROL with voice picker, rate, volume, and per-rule spoken phrases. CombatPresentation already prints interrupted / fizzled / resisted counts. LogParser already has Your (?<spell>.+?) spell is interrupted. and Your target resisted the (?<spell>.+?) spell. GameEvent has SpellInterruptedEvent.
+
+- **Checked:** those parser/event quotes. Hypothesis, unchecked -- SpokenAlerts is called from Watch rules plus a hardcoded Slowed line; no grep hit connecting SpellInterruptedEvent or ResistRx to SpokenAlerts.Speak.
+
+- **Follow-up Aug 20, 7:22 PM CT:** bjstrange screenshot of two Watch Log-text rules: Resist `.* resisted your .*` and Interrupted `Your .* spell is interrupted` (sound Off). Workaround: existing log watch until something permanent. Did not reply (already filed; Claude not last, but not a new thread).
+
+
+
+### reliably shows what quest an item is for
+
+- **Priority:** waiting (desktop loot surfaces already have this; ask is reliability / whether they can find it)
+
+- **Place:** Loot & Items theme (in progress). Fits the loot to quest link of the chain. Phone lists item lookup as a looking-away surface.
+
+- **Source:** Reddit r/EQLegends [EQ Buddy? thread](https://old.reddit.com/r/EQLegends/comments/1vt47d5/eq_buddy/p4ucvli/) u/Sarah-Rien ~10:38 AM CT Aug 20. Harvest only; did not reply.
+
+- **Ask:** "Any of them has something that reliable shows what quest an item is for? So I don't have to look it up to avoid missing something important."
+
+- **Already shipped:** WhatsNew.json:876: "a small 🗺 next to the name is the quest marker now, and it's on EVERY loot surface: the Loot card, target drops, the minimized Loot breakout, and Drops by Creature. Click the 🗺 → its quests in the Quest Tracker." WhatsNew.json:918: "green means a real quest wants that item... Click the 🗺 to see exactly which quests."
+
+- **Checked:** those WhatsNew lines. Hypothesis, unchecked -- whether Mobile loot shows the same 🗺, and whether an item lookup that is not on a loot list has a quest list of its own.
+
+
+
+### Instance charges timer on the widget
+
+- **Priority:** waiting (blocked on one verbatim log line from the reporter — Claude asked 2026-08-19)
+
+- **Place:** overlay chip vocabulary (Gate 6), IF the log carries it at all.
+
+- **Source:** #221 NeONDaRoO Aug 19, 9:36 PM CT. **Claude replied.**
+
+- **Ask:** show the instance-charge regen timer on the widget so you can spend a charge before capping and wasting one.
+
+- **Claude, 2026-08-19 — it PASSES the surface rule, and that is the unusual part.** "You
+
+  are about to cap and waste a charge" is a deadline with an action, so it earns overlay
+
+  space the way spawn and mez chips do, and would be a chip rather than a card.
+
+- **Checked:** `rg -i "instance charge|charges|instance manager"` over `LogParser.cs` and
+
+  `GameEvent.cs` — **no hits**; no fixture log contains the word either. EQBuddy has never
+
+  seen a charge line, so this is only buildable if the game writes one. Asked him to search
+
+  his own log and paste it verbatim, or confirm it is empty. **Do not infer the timer from
+
+  time-since-login** — a drifting timer is worse than none, because he would stop checking
+
+  the instance manager and lose the charge anyway. Told him that in as many words.
+
+
+
+### Updater one-hops through older releases
+
+- **Priority:** waiting (Claude claims fixed in next build; needs n3cr0nk1tt3n to confirm an update folder / OneDrive EQBuddyDownload -- if they have neither, the GitHub path still has a bug)
+
+- **Place:** updater. Not Gate 5.
+
+- **Source:** #218 n3cr0nk1tt3n Aug 19, 6:54 PM CT. Did not reply -- Claude already answered 8:03 PM CT.
+
+- **Ask:** Updating should install the newest release, not the next release after whatever build you are on. Reporter has to update multiple times at session start to reach current.
+
+- **Already shipped:** GitHub feed already asks for newest. Claude 8/19: shared-folder shortcut installed anything newer than current and skipped GitHub, so a folder one release behind hid later GitHub releases. Fix (unreleased): ask both, take the highest; folder still wins a tie.
+
+- **Checked:** not grepped this run. Hypothesis, unchecked -- UpdateOffer / family-channel path is the data source, not the What's-new popup.
+
+
+
+### /consider rarity word (wiki + spawn timers)
+
+- **Priority:** **BUILT 2026-08-22 (Claude), wiki half — staged in 1.99.6, unreleased.** The
+
+  con-rarity fact is lifted out of `SpawnTimers` into `MobSummary.Considers`/`RareConsiders`,
+
+  and the pack offers Frank's own wording on the creature's page: in the `description` field
+
+  of a new-page skeleton, and as an ADD-never-replace block on a page that exists. All three
+
+  constraints are tests (`RareSpawnContributionTests`): no paste-over, never inferred from
+
+  kills, never across characters (true by construction — it lives on the session aggregate).
+
+  Both numbers always printed ("2 of your 7 /considers"). **The spawn-chip half stays PARKED.**
+
+  **The Bevel-ruled leftover is CLOSED 2026-08-26 (Claude), staged in 1.99.12:** the
+
+  rare-conned named whose loot the wiki already has now earns its own pack row and export
+
+  section (`RowKind.RareConfirmed`) — the fact is no longer dropped for exactly the creature
+
+  most likely to be a known named.
+
+  (was: UNPARKED 2026-08-22, WIKI HALF ONLY (David, asked with the question tool).) Build the pack side: when the game itself called the creature rare in the player's own `/consider`, the pack offers a `description` line saying so — never a paste-over of an editor's existing prose, never inferred from kill counts, and never carried across characters. Destination confirmed by the reporter with the wiki admins (#217): description-field stopgap matching existing hand-edited precedent, moving to a real template parameter when one lands. **The spawn-chip half stays PARKED.** (was: David parked /consider this morning. Verbatim lines are in; not approved to ship.)
+
+- **Place:** log parse. Serves wiki confirmed-rare and #185 named-vs-townsfolk spawn chips. Not Gate 5 UI.
+
+- **Source:** #217 Frankthetankk ask 3; #185 n3cr0nk1tt3n; **verbatim lines #185 bjstrange Aug 19, 11:58 AM CT.** Did not reply — old thread, Claude already asked for the line.
+
+- **Ask:** use /consider text `a rare creature` as a confirmed rarity flag (wiki `rare=true`; spawn chips only for con-confirmed rares).
+
+- **Evidence (bjstrange, pasted whole):**
+
+  `[Thu Aug 06 21:42:47 2026] Magus Rokyl - a rare creature - scowls at you, ready to attack -- looks like it would wipe the floor with you! (Lvl: 51)`
+
+  `[Sun Aug 09 20:26:53 2026] Lesser blade fiend - a rare creature - scowls at you, ready to attack -- looks like quite a gamble. (Lvl: 19)`
+
+  `[Sun Aug 16 13:09:47 2026] A ghoul executioner - a rare creature - scowls at you, ready to attack -- looks like quite a gamble. (Lvl: 35)`
+
+- **Already shipped:** the rarity group IS parsed now (`LogParser.cs:176` captures `a rare creature`; `GameEvent` carries `Rare`). Consumed ONLY by `SpawnTimers._rareConsidered` — a private, session-scoped set keyed by timer key, read by `DiscoverNamed`. Nothing outside can ask the question.
+
+- **Checked:** `src/EQBuddy.Core/GameEvent.cs:47` `record ConsiderEvent(DateTime Time, string Name, int Level)`. `LogParser.cs:173` ConsiderRx is `^(?<name>.+?) (?:scowls at you|...) .*\(Lvl: (?<level>\d+)\)$`. On the pasted line, the first ` scowls` sits after `creature -`, so the name group would swallow ` - a rare creature -` unless a rarity group is added. Rarity sits BEFORE scowls and BEFORE `(Lvl: N)`, not after the tail.
+
+- **Where it might live:** hypothesis — a capture group on ` - a rare creature -` between name and the faction phrase. The three lines are the same shape.
+
+- **Follow-up Aug 21, 9:31 PM CT:** Frankthetankk on #217. Did not reply (old thread; Claude is in it). Now that #185 has shipped the con-rarity mechanism (bjstrange's lines, "a rare creature" overriding the kill-count heuristic) — does that same parsing already satisfy Ask 3 here, or does the wiki pack's rarity labeling need its own separate hookup? He names two consumers: #185 seeds spawn-timer discovery; Ask 3 is the rarity label the pack suggests for a wiki edit. If EQBuddy now holds "this mob was con-confirmed rare" as a fact, he thinks the pack should check that fact rather than parse again — he does not know if they share data. Hypothesis, unchecked -- two consumers of one consider-rarity fact, or two parsers. 9:19 PM CT note on the same thread is status only (still invested in full-history and rarity); not a new ask.
+
+- **ANSWERED 2026-08-22 (Claude), and the answer is NO on two counts.** (1) One parser, but the fact is private to `SpawnTimers` and would have to be lifted before anything else could read it. (2) The important one: **con-rarity and the pack's rarity label are different axes.** Con-rarity is about the CREATURE (a rare spawn); the pack's label is about an ITEM's drop rate over 10+ kills in the wiki's published bands. A trash mob can drop an ultra-rare item and a rare spawn can drop its piece every time, so wiring one into the other would make the pack suggest a band the observation cannot support -- on a paste that goes onto someone else's wiki under the player's own name.
+
+- **DESTINATION ANSWERED 2026-08-22 by the reporter, and Ask 3 is RE-SCOPED by him.** Frank:
+
+  *"This ask isn't about item drop rarity at all. It's about recording, on the creature's own
+
+  wiki page, that the NPC itself was confirmed rare via its in-game /consider text."* He took
+
+  the field question to the wiki admins — positive, but a real template parameter is a way off.
+
+  **The interim home is the `description` field, matching existing hand-edited precedent
+
+  (Packmaster Dledsh's page already reads "Rare NPC" there).** Suggested wording: *"Confirmed
+
+  as a rare spawn via in-game /consider"*. Explicitly a stopgap that moves to the real
+
+  parameter when it lands. **This is now a BUILD, not a question.**
+
+- **STILL PLANNED, as its own thing rather than as Ask 3:** expose the con-confirmed-rare fact and put it on the CREATURE side of the pack ("the game called this a rare creature on N of your considers"), beside the level range and faction hits. **Blocked on a destination question that is Frank's to carry, and he was asked in the reply:** `{{Namedmobpage}}` as the pack fills it has no rare-spawn field (name, race, class, level, location, respawn_time, description, factions, opposing_factions, related_quests, known_loot), so it lands in `description`, the edit summary, or nowhere. He got the admins' ruling on common drops the same way. No date given to him.
+
+- **Follow-up Aug 22, 3:13 PM CT:** Frankthetankk on #217. Did not reply (Claude answered 4:22 PM CT). Ask 3 is a creature-page fact, not item drop-rate. Wiki admins positive on a new template field; not landed yet. Stopgap: description-field line matching Packmaster Dledsh (https://eqlwiki.com/Packmaster_Dledsh already lists "Rare NPC" by hand). "Confirmed as a rare spawn via in-game /consider." Claude logged it as a build, no date.
+
+### Avalonia has no Watch or Loot breakout window
+
+- **Source:** found while converting breakout chrome, 2026-08-18. Not reported by anyone.
+
+- **Evidence:** `BreakoutKind` is declared twice and the two do not agree —
+
+  `src/EQBuddy/BreakoutWindow.xaml.cs:12` has `{ Damage, Healing, Pet, Watch, Loot, Buffs }`,
+
+  `src/EQBuddy.Avalonia/BreakoutWindow.cs:17` has `{ Damage, Healing, Pet, Buffs }`.
+
+- **Why it matters:** a Linux/macOS player who stars the watch or loot stat while
+
+  minimized gets nothing where a Windows player gets a window. Mobile/desktop parity is a
+
+  standing rule (David, 2026-08-18) and this is the same class of gap, one lane over.
+
+- **Don't / wait:** not a regression and nobody has reported it — do not raise it with a
+
+  poster. Sizing belongs with Gate 6 (mini mode + chips), which touches this area anyway.
+
+
+
+### Custom alert volume is still contested
+
+- **Priority:** waiting (need a fact, not a fix)
+
+- **Source:** #153 adndmike (opened Aug 14; liminalwarmth Aug 18, 1:18 PM CT)
+
+- **Ask:** Built-in sounds obey the slider. His custom `.wav` files (same ones EQL uses as triggers) play at full volume at 10% and at 100%. He says the file is playing.
+
+- **Already shipped:** Trap 10 / `AlertSoundPlan` missing-file fallback.
+
+- **Where it might live:** unknown. liminalwarmth's test is still the next fact: preview the same `.wav` at 10% vs 100% with EQ closed, or pick a file that is not an in-game trigger. Not a close, not another volume guess.
+
+
+
+### Settings that do not survive an update
+
+- **Priority:** waiting
+
+- **Source:** #189 wizen (latest Aug 18, 10:41 AM CT)
+
+- **Ask:** Auto-hide preference forgotten across installs; quest tracker used not to hide with the widget.
+
+- **Already shipped:** hide-follows-widget in 1.91.0. He will re-check on 1.92.0 and wait for the next update. Earlier `error.log` had no overwrite line.
+
+- **Where it might live:** settings write/overwrite on update. No implementation until that next-update log arrives.
+
+
+

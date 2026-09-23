@@ -127,5 +127,15 @@
     # any age, so a date cut would have been silent closure. Still 1.7x over policy, so
     # this row is LOWERED and KEPT: check C discharges a row only at 64 KiB or less, and
     # the open-ask floor is ~105 KB on its own, so no legal cut reaches the ceiling.
-    'SCRIBE.md'          = 114715
+    # Rotated again 2026-09-23 on the #710+#690 intake (PR #733), which had spent the
+    # 10% band (116,999 B -> 126,424 B against a cap of 126,186 B). Pass 2 appended
+    # 26 blocks / 47,257 B into the same archive: waiting blocks dated before
+    # 2026-09-01, undated waiting blocks, the terminal BUILT /consider entry, and the
+    # Avalonia breakout note. Kept live: the two new intakes, every must-fix /
+    # approved / authorized / authorized-next / open block at any age, and every
+    # waiting block dated 2026-09-01 or later. 126,424 B -> 79,897 B. Still over
+    # 64 KiB, so this row is LOWERED to that measured size and KEPT. Check C
+    # deletes a row only at 64 KiB or less; deleting it here would be the HELM.md
+    # mistake named above (no band left, and check B refuses putting the key back).
+    'SCRIBE.md'          = 79897
 }
