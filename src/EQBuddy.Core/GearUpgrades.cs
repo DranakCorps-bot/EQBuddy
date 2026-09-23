@@ -123,6 +123,19 @@ public sealed record WornSheet(IReadOnlyList<WornItem> Worn, IReadOnlyList<strin
 /// wearable (item, zone) pairs. Empty for a zone whose page named nobody, which is a real answer
 /// and not a zero: an unanswered question draws nothing (trap 73), and since D4 a drop row that
 /// cannot answer at all is withheld rather than drawn silent.</param>
+/// <param name="Proc">The combat proc this weapon's own page names, or "" — <b>reported, and
+/// weighed by nothing</b> (DRA-241, Helm ruling <c>27302878</c>).
+///
+/// <para>From <see cref="WeaponProcs.Proc"/>, which is the one place the scope lives: only a
+/// record the block reads damage on, and only a <c>(Combat, …)</c> effect. It rides this record
+/// so a player choosing between two otherwise-close weapons can see that one procs and the other
+/// does not — and it appears in NO comparison. It is not in
+/// <see cref="ItemDominance.MetricPairs"/>, it breaks no tie, and it removes no row: there is no
+/// number anywhere for what a proc is worth, so EQBuddy states the fact and hands the judgement
+/// back.</para>
+///
+/// <para><b>It is deliberately not an ordering key either.</b> "Procs" sorting above "does not
+/// proc" would be a price of exactly one rank, paid in the currency the ruling forbids.</para></param>
 public sealed record GearUpgrade(
     string Item,
     string Slot,
@@ -133,7 +146,8 @@ public sealed record GearUpgrade(
     IReadOnlyList<string> Zones,
     IReadOnlyList<string> Quests,
     IReadOnlyDictionary<string, IReadOnlyList<string>> Mobs,
-    int RelevantMetrics = 0)
+    int RelevantMetrics = 0,
+    string Proc = "")
 {
     /// <summary>The creatures the catalog named in one zone, or empty. Empty is a real answer
     /// and never a zero — the wiki page said nothing, or this build's catalog predates the
@@ -431,7 +445,12 @@ public static class GearUpgrades
                     zones,
                     includeQuests ? quests : [],
                     Mobs(record, zones),
-                    ClassStatRelevance.Improved(relevant, stats, anchor.Stats)));
+                    ClassStatRelevance.Improved(relevant, stats, anchor.Stats),
+                    // DRA-241. Read here and carried, NOT consulted above: this line sits
+                    // AFTER every `continue` in the loop, so a proc cannot admit a candidate
+                    // the comparison refused, and it appears in neither ordering key below.
+                    // The row it lands on was already chosen on the numbers.
+                    WeaponProcs.Proc(stats)));
             }
 
             // **Ordered by how many numbers improved, and that is arithmetic rather than

@@ -23,6 +23,11 @@
   <a class="nav" href="#dive">Deep dive</a>
   <a class="nav" href="#today">Get it</a>
   <a class="nav gh" href="https://github.com/DranakCorps-bot/EQBuddy">GitHub</a>
+  <!-- DRA-69: quiet Support EQBuddy — optional community tip for a free program,
+       opened in a new tab. Not charity, crowdfunding, or paid access. -->
+  <a class="nav support"
+     href="https://ko-fi.com/eqbuddy"
+     target="_blank" rel="noopener noreferrer">Support EQBuddy</a>
 </nav>
 
 <nav class="dotnav" aria-label="Sections">
@@ -54,11 +59,15 @@
     <span class="pill"><b>Personal</b> — not competitive</span>
     <span class="pill"><b>Windows</b> + your phone on the LAN</span>
   </div>
-  <div class="kpis reveal">
-    <div class="kpi"><div class="n">0</div><div class="l">game-memory reads — ever</div></div>
-    <div class="kpi"><div class="n">0</div><div class="l">accounts or cloud services required</div></div>
-    <div class="kpi"><div class="n">0</div><div class="l">telemetry by default</div></div>
-    <div class="kpi"><div class="n">11,000+</div><div class="l">items in the built-in offline catalog</div></div>
+  <!-- Hero KPIs are painted from site/metrics.json, which the page fetches.
+       The .n text is that same snapshot, so the band still reads if the fetch
+       does not run. Refresh the JSON and these tiles together. A null
+       maxConcurrentUsers paints "Telemetry not live yet". -->
+  <div class="kpis reveal" id="hero-kpis">
+    <div class="kpi"><div class="n" data-metric="questsTracked">1,173</div><div class="l">Quests Tracked</div></div>
+    <div class="kpi"><div class="n" data-metric="itemsCataloged">11,196</div><div class="l">Items Cataloged</div></div>
+    <div class="kpi"><div class="n" data-metric="downloads">28,462</div><div class="l">Downloads</div><div class="note">installer, not uniques</div></div>
+    <div class="kpi"><div class="n" data-metric="maxConcurrentUsers">Telemetry not live yet</div><div class="l">Max Concurrent Users</div><div class="note">max concurrent (opt-in)</div></div>
   </div>
 </section>
 
@@ -676,10 +685,6 @@
   <p>EQBuddy reads what the game writes on your own PC — your /log, and the /outputfile
   dumps you ask for. It never reads game memory, never phones home, and never measures
   other players.</p>
-  <!-- DRA-69: quiet Support EQBuddy — Stripe Payment Link in a new tab, not an embed. -->
-  <p>If this companion is useful, you can
-  <a href="https://buy.stripe.com/aFa00k1tE2064qRb0S9R600"
-     target="_blank" rel="noopener noreferrer">Support EQBuddy</a>.</p>
   <p>EQBuddy Evolved © 2026 David Edwards — proprietary
   (<a href="https://github.com/DranakCorps-bot/EQBuddy/blob/main/LICENSE-EVOLVED.md">license</a>).
   Published EQBuddy 1.x remains

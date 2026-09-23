@@ -277,6 +277,62 @@ public class DocumentationTests
         Assert.Contains("exo-experiment: whole-sequence-auth", decisions);
     }
 
+    /// <summary>
+    /// DRA-179 D2 (Helm SIGNED the D1–D4 sequence 2026-09-17, and picked the gate's
+    /// enforcement mechanism in the same tip): the Jr/Sr lane mechanics.
+    ///
+    /// **Same failure mode as the test above, one lane down.** The Jr review gate is a
+    /// CHECKLIST rather than GitHub branch protection — Helm's pick, because the org
+    /// pushes through one bot identity and an unread rejection teaches people to route
+    /// around a gate. A checklist refuses nothing by itself, so the ONLY thing that keeps
+    /// it real is that the block is committed, cited, and unticked. Nothing else in the
+    /// repo notices if the gate quietly loses its last box, gains a pre-ticked one, or
+    /// stops being mentioned in the always-loaded file — and every one of those reads as
+    /// tidying rather than as a deleted control.
+    ///
+    /// Prove-failed by mutation, one at a time: deleting each asserted phrase, dropping
+    /// the Sr box from the block, pre-ticking a box, and reordering the Sr box out of last
+    /// place each redden exactly one assertion here.
+    /// </summary>
+    [Fact]
+    public void TheJrLaneMechanicsAndItsReviewGateAreStatedInTheLiveDocs()
+    {
+        // The compact live rule: an agent that reads only the always-loaded file still
+        // learns the three things that bind it — the seat, the lane, the gate.
+        var claude = Flatten(Read("CLAUDE.md"));
+        Assert.Contains("Sr's review is not a second claim", claude);
+        Assert.Contains("no shipped code path calls a model", claude);
+        Assert.Contains("A Jr PR merges only on a ticked Sr gate", claude);
+
+        var flow = Flatten(Read(Path.Combine("docs", "ops", "execution-flow.md")));
+        Assert.Contains(
+            "A Jr PR does not merge without an Sr review, and the enforcement mechanism "
+            + "is a CHECKLIST",
+            flow);
+        Assert.Contains("an unticked last box is a merge that does not happen", flow);
+        Assert.Contains("no shipped EQBuddy code path calls Qwen or any model", flow);
+
+        // The gate block itself, read as a block rather than as prose: it is the artifact
+        // a Jr PR pastes, so its SHAPE is the thing that has to survive an edit.
+        var raw = Read(Path.Combine("docs", "ops", "execution-flow.md"));
+        var block = Regex.Match(raw, @"```markdown\r?\n(?<body>### Jr lane gate.*?)```",
+            RegexOptions.Singleline);
+        Assert.True(block.Success, "docs/ops/execution-flow.md no longer carries the Jr lane gate block");
+
+        var boxes = Regex.Matches(block.Groups["body"].Value, @"^- \[(?<tick>[ x])\] (?<text>.+)$",
+            RegexOptions.Multiline);
+        Assert.Equal(6, boxes.Count);
+
+        // A shipped template with a box already ticked is a gate that arrives satisfied.
+        Assert.DoesNotContain(boxes.Cast<Match>(), m => m.Groups["tick"].Value == "x");
+
+        // The Sr box is LAST because the merge rule names it that way ("an unticked last
+        // box"). A reorder would leave the words true and the instruction wrong.
+        Assert.Contains("Sr reviewed — Sr ticks this, never Jr",
+            boxes[^1].Groups["text"].Value);
+        Assert.Contains("route: routine", boxes[0].Groups["text"].Value);
+    }
+
     [Fact]
     public void FlakeLedgerNamesTheRequiredColumnsAndTheRerunRule()
     {

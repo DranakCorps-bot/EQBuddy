@@ -96,7 +96,7 @@ public class CharacterClassesTests
         Assert.Equal(["Druid"], classes);
     }
 
-    // ---- Character Setup's statement (DRA-66) --------------------------------------
+    // ---- Character Setup's statement (DRA-66; displacement, DRA-262) ----------------
 
     /// <summary>
     /// The whole reason the parameter exists: "correct EQBuddy's guess" is not a
@@ -115,17 +115,55 @@ public class CharacterClassesTests
         Assert.Equal(ClassSource.Stated, source);
     }
 
-    /// <summary>The dump is the GAME's statement and outranks the player's memory of a
-    /// character screen — it stays, and the two union the way the dump and inference
-    /// always have. What the statement removes is only the GUESS.</summary>
+    /// <summary>
+    /// **A statement DISPLACES the dump** (DRA-262 Ruling 1), reversing DRA-66 D3, which
+    /// had this same staging union to `["Warrior", "Druid"]` under `Achievements`.
+    ///
+    /// The reversal is on evidence, not taste: what the dump states is every class ever
+    /// UNLOCKED, so a player correcting it is not disagreeing with the game — the game
+    /// states the roster nowhere EQBuddy reads, and the player is the only source of it
+    /// that exists. Union was the wrong shape twice over: it can widen but never un-name,
+    /// and with three unlocks the list is already at `Max` so it cannot even widen.
+    /// </summary>
     [Fact]
-    public void TheDumpStillLeadsAndUnionsWithAStatement()
+    public void AStatementDisplacesTheDumpRatherThanUnioningWithIt()
     {
         var (classes, source) = CharacterClasses.Resolve(
             unlocked: ["Warrior"], inferred: ["Monk"], picks: null, stated: ["Druid"]);
 
-        Assert.Equal(["Warrior", "Druid"], classes);
-        Assert.Equal(ClassSource.Achievements, source);
+        // Exactly the statement: not "Warrior · Druid", and Warrior is gone even though
+        // the dump named it — that is the displacement, and it is what the player asked
+        // for by ticking Druid alone.
+        Assert.Equal(["Druid"], classes);
+        Assert.Equal(ClassSource.Stated, source);
+    }
+
+    /// <summary>
+    /// The Founder's own character, measured 2026-09-21 on the signed 2.0.0 build: his
+    /// achievements dump yields **Paladin · Warrior · Druid** on every re-run, and he is
+    /// **Warrior · Cleric · Enchanter**. One name of three overlaps.
+    ///
+    /// This is the case DRA-66 D3 could not answer and is why displacement exists. Under
+    /// union he saw two classes he is not, over a sentence telling him to re-run the dump
+    /// — which yields the same three names forever, because they are what he has UNLOCKED.
+    /// Named by fixture, not paraphrased, so the row fails if the rule ever quietly
+    /// re-admits the dump: a fill-behind reading answers here at `Max` with his three
+    /// stated names and would pass; a "dump first, statement fills" reading answers
+    /// Paladin · Warrior · Druid and would not.
+    /// </summary>
+    [Fact]
+    public void TheFoundersUnlockHistoryLosesToTheClassesHeSaysHeIsPlaying()
+    {
+        var (classes, source) = CharacterClasses.Resolve(
+            unlocked: ["Paladin", "Warrior", "Druid"],
+            inferred: null,
+            picks: null,
+            stated: ["Warrior", "Cleric", "Enchanter"]);
+
+        Assert.Equal(["Warrior", "Cleric", "Enchanter"], classes);
+        Assert.Equal(ClassSource.Stated, source);
+        // And the words the room prints name the player, not the file he cannot correct.
+        Assert.Equal("set by you", CharacterClasses.SourceLabel(source));
     }
 
     /// <summary>An EMPTY statement is "go back to EQBuddy's own reading" — the undo the

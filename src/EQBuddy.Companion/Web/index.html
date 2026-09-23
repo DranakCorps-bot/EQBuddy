@@ -1961,7 +1961,14 @@ function boot() {
     // ones above it and not this one shows a shorter weapon list than the PC with nothing on
     // screen saying why. Its row in the page-side must-list is what makes that checkable
     // (trap 34).
-    for (const line of [h.moneyNote, h.gearBaseNote, h.materialNote, h.cap, h.gearWithheld,
+    // DRA-241 adds `gearProcNote`, directly after `gearBaseNote` — the desktop room's own
+    // order, and the two belong together: both are caveats about what the rows above compared.
+    // The PROC itself needs nothing here, because it rides the row's own why-line. This does,
+    // and it is the half that matters: the rows say "It procs Ykesha." and this is the sentence
+    // saying the ranking did not weigh it. A phone drawing the claim without the caveat tells
+    // the player something the PC does not — that the order knew.
+    for (const line of [h.moneyNote, h.gearBaseNote, h.gearProcNote, h.materialNote, h.cap,
+                        h.gearWithheld,
                         h.gearEraRefused, h.gearBandRefused, h.gearWhoWithheld,
                         h.gearQuestWithheld, h.gearNoSource, h.gearQuestOnly,
                         h.gearOffHandRefused,
