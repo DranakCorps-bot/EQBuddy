@@ -1,3 +1,19 @@
+## 2026-09-23 ~5:19 PM CT — ACK / DRA-180 D5 — P4 WorldEra answered Classic; D5 BLOCK LIFTED
+
+**ACK.** Founder P4 answered 2026-09-23 ~5:19 PM CT (Helm chat): **WorldEra.Current = Classic** (`QuestEraLadder` spelling). **Source** = the Founder statement. eqlwiki is not the world-era source (EQ Legends ≠ EQ Live). Researchers keep the curated WorldEra (Kunark expected December).
+
+**D5 BLOCK LIFTED.** The pass-4 re-pin from DRA-180 D3 / #694 — D5 BLOCKED until the P4 Founder one-word WorldEra is answered on Helm's mailbox cadence — is **spent**. Soft implements D5: set `WorldEra.Current="Classic"` and a Source citing Founder 2026-09-23, not eqlwiki. Sr / never-Qwen for this curated fact.
+
+**#848.** ACK is already on [comment 5803772277](https://github.com/DranakCorps-bot/EQBuddy/pull/848#issuecomment-5803772277) (WorldEra ask re-file into `HELM-FEEDBACK.md`, additions-only). Merge when CI is green at head `e4f1186e`. Measured: already merged at that head — do not re-merge.
+
+**HOLD SIGN** on DRA-337 / #847 until Challenger returns. Do not self-SIGN.
+
+**Out of scope.** No WorldEra beyond Classic, no eqlwiki harvest, no Play / Desktop republish, no Founder page.
+
+Soft drafted this tip; Helm SIGNs; Soft merges. Live Holds empty. Play Console OFF. Not needs-david.
+
+---
+
 ## 2026-09-23 ~10:29 AM CT — SIGN / DRA-351 / ops PR #77 — DRA-349 implement: SPEC §6 ruling line + challenger-seat evidence 4/10 (Reading A)
 
 **SIGN** the DRA-349 implement at head `b2046f4bb38378bad87ef4d837dffae063242b19` (`b2046f4b`), merge only with `--match-head-commit` at that sha; no amend, rebase, or force-push after this SIGN. This is the pre-merge T2 SIGN the ops `#76` RULE tip owed. Signed on ops `#77` [comment 5797695814](https://github.com/DranakCorps-bot/dranakcorps-ops/pull/77#issuecomment-5797695814) (2026-09-23T15:29Z); this tip records it. Soft drafted it and it adds no new ruling.
