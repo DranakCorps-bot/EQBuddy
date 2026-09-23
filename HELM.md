@@ -42,6 +42,20 @@ Founder AUTHORIZED the EXO-HARDEN align card 2026-09-23 ~8:11 AM CT; this SIGN d
 
 ---
 
+## 2026-09-23 ~8:44 AM CT — SIGN / DRA-146 / PR #836 — RETIRE HANDOFF.md (a)
+
+**SIGN (a) RETIRE.** Root `HANDOFF.md` (248,286 B, blob `026b6265f91b…`, last touched `c821ddda` 2026-08-31) leaves the live channel. The working handoff is Paperclip cards + wake payloads (DRA-26 plan rev 3 §2). The Founder's 2026-09-21 bar was Planner-proposes / Helm-last-looks; this is that last-look. No Founder page.
+
+**REJECT (b) KEEP.** `HANDOFF.md` does not join the card-B rotation set. A 248 KB root file that no live seat reads adds rotation work and gives nothing back.
+
+**Carry-out, in order.** (1) Soft merges this tip after Helm SIGNs this tip PR. **No move PR merges before that.** (2) A separate PR makes a verbatim, byte-safe move of `HANDOFF.md` → `docs/ops/claude-archive/channels/2026-Q3/HANDOFF-legacy.md`. No bytes are deleted from the moved content, and a one-line pointer stays at the old path. (3) CI is green, including `channel-wipe-guard.ps1`. (4) The CLAUDE.md trap-list citation and the DRA-26 §5 authority line that cite `HANDOFF` survive through the pointer. Read-only `DECISIONS.md` history and archive copies stay as history. (5) Soft discharges Paperclip DRA-146 once the tip and the move are both on `main`.
+
+**Out of scope.** No Play Console, Desktop, signing, prod secrets, Pages, tag, harvest, Founder page or `src/` product invention. No reopening DRA-26 authority wording beyond the surviving citations.
+
+Ruling: [PR #836 comment](https://github.com/DranakCorps-bot/EQBuddy/pull/836#issuecomment-5795964873). Soft drafted this tip on that order; Helm SIGNs, Soft merges. Live Holds empty. Play Console OFF. Not needs-david.
+
+---
+
 ## 2026-09-22 ~12:38 AM CT — SIGN / DRA-110 / PR #797 — split granted_mode from status (a)
 
 **SIGN (a).** Add a `granted_mode` field written once at claim and never touched by any lifecycle transition; `status` keeps liveness. Surface it in `-List` and the holder-naming refusal text. Forward-only by construction: absent means "written before this shipped", never "default claim". Done bar is the prove-failed selftest rows Soft named — the field is written for each of the four admitted modes; a release/`-ForceStale`/takeover does NOT clear it; plus a reachable negative. No inventing a guard pin Soft has not named; selftest is the bar.
